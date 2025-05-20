@@ -1,78 +1,77 @@
-Return-Path: <netdev+bounces-191992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5846ABE239
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 19:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC23ABE242
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 20:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DD5716C6CE
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 17:59:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1066917E381
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246D62750FD;
-	Tue, 20 May 2025 17:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13F72586EB;
+	Tue, 20 May 2025 18:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="iEIwP1kx"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z8xl8w2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8966B251798
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 17:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B5C1BD9F0
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 18:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747763971; cv=none; b=ub4Em8vwG0SiBQ32e9LnuUiwBvjxoSD8HSog3Ic7L/0gegRDTl736cspHPqLyDtiw2LqD1IRIQpHo+lj/s/53kFlGzJEw3mcAzWXHwJKq2XfNAGoBQNlQdL9yne2utONN+r7z6OIH5jbxnWgIcN4469M0FmOzJO97KFny0vRPuw=
+	t=1747764153; cv=none; b=jUdNOVrLBMjAcl+RyTcJ/Fi9bJQXIM5zGfcqzzrHBSSMzL54K4k1SlUBDOQCfByjU9rItZk6c1VEFGz1/RRcmCbyUZ8L4KYJYa1kg17QUX7mUARC6X9uFzLbGfVCAL0sKfRhZTZeIucdA7GNKbLQbe2hurZn/5oUNqTLz16TViA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747763971; c=relaxed/simple;
-	bh=sk1HYXDvnKjUBm5wbIYL2hxbtPS8MQRRAHhR6ynndh0=;
+	s=arc-20240116; t=1747764153; c=relaxed/simple;
+	bh=tCNStgP8NJRllI6nvFFJBc7ciOjJR7F3dIOyzgpOzjw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ofqS3c7BBAnv7M4w9otPSQWnrY7wJk/M6O+5okfDtmjrOQoZRw4SL8Q1HPBlDH2xxuS4nlGAZnFX6ZBqf1WmgMiF/2S8434nUGe1GG/xoNglhfhHVNaJniDddFjjgGXYUkXc5fUowM0hNRza+a1PgH6lkgW6aOveM/2TcnXhPfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=iEIwP1kx; arc=none smtp.client-ip=209.85.215.174
+	 In-Reply-To:Content-Type; b=YhZuszSw9fTgca3cViCNZ0WJGyxBqG6/HUfQiTpkhkquub4cOxP/I7n7nsQ6YWWXEz8EOE15NVq6TUbvDbZxHVqkPjgnipvS7LDmBoPAP6DvEDWETZhExP5ND3O2N2RhC1DY342orG6WtOPBXRJXL9SQGmPDZykmaYsMelunVfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z8xl8w2n; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b26ef4791a5so4481271a12.1
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 10:59:29 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7398d65476eso4672578b3a.1
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 11:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747763969; x=1748368769; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1747764151; x=1748368951; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=INM95q65BeODTHlD+8KmvZymICq+GNLSDmmtrJVHoBo=;
-        b=iEIwP1kx6xxDp2mo+ru0MoTqDkVU1t9mzCEACFgPVfAlZ41Cn8cWToKoUzQCujG7VK
-         Lo2SfPcAT1WgW0LVqstsY1dGY1palUJ6D6MBbHZ3PANDwGmc9U3TLegbH/koAFnighr4
-         Xam03WPX2Hh4F5h8EwtkOzNJlDAXOp2HCO038=
+        bh=/ZiTSgQ4tPZrLjCRnj9Ahso9pwCxKcG/I6bjIoaVkvw=;
+        b=Z8xl8w2n2bWrlGAWWkxfKb0xbH71b93DkzpcZBwYy/IDb2P2gL2PWEUv08vzoFuFgY
+         /zh2ZKzsp2TlOcs/1mHNPfGCw6A2shhFH8CapOp7O7ce5ZUMHqmihI5xCBzgRcpHGYto
+         JjcZxLFrNaSouecnskaM7KyEEpcT+ICaTQ/PQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747763969; x=1748368769;
+        d=1e100.net; s=20230601; t=1747764151; x=1748368951;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=INM95q65BeODTHlD+8KmvZymICq+GNLSDmmtrJVHoBo=;
-        b=tR/BVzgrLtj/1vjQdASq51+bNV0XJNZhnzYwPQu+DH3LAHt/gUxjUejjAr112jOpwc
-         Inf9dNYvTHo6RZobtYqdsFcI1JOGbnXIXCRmHRjxWELPD0gVAf40cB7fgsK4v/w+k+6B
-         QFV9QcRqJZFMnw9BSXxwJeUYHGzgeNssgem1s4sa+7Cprby2JEm/GkgAAunzuYcvfICA
-         gMjrwl3diBzWh/x9b98kMt6+5VJap95Ag3yC8Br6AvvpfQsbCu9RCBpwx4KWuQYPPHYH
-         +LouOTl9ELymoGE/bBqWtJLhhpWpW90Ci6rGRDXL0+sVFVhjN4szfPoMCaDSoOgsvT9I
-         x0FA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcLKjoWC/EFreFpAtPr7j/remUj2Ij2UNcBmwsST/IGxqFMFFlccISjJODayY1EdwHVSWEOnE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz07bnWwRfgkTgiKv4to49O9F6Tngz2IUw0UmM/IwXdFUcWcvId
-	XKmS8zzW9SkcgUoNHcOIvAyuWnTk7/ULSkmXwsEf801ch69E/e8E2ehHi+N7hZqnKA==
-X-Gm-Gg: ASbGncvcN6snc+aC/FKMrK23PIkDIJQbUTsXh5yMbgAT10/ynPnREf1+BkVFw81wNFV
-	7nVXcFJXgpwZxE7nhNtzgoc45xNeJRbb3JcYY1gl4SznylYB8SKNMZof/9ZjpHf6o3ePvJnwmtV
-	w8p0gtt+LziWRvl7lZmylkMi1Jqwl8BOFEG6vnJ4y/58gEaAsUF0mCXF5hJOADsum2pTC/qlnLm
-	blC3bYH5RGfigWD0jMbEbDkVsBc6ZurCPjz62luwoOMZJxNbDUgw63X83/IcpoNBm3ZHiWASYxn
-	euHW7xWLbHG8/R0Vhb+W6exe+AjGSQHACY9JrXxSKHhM3QBYeT06ftLyKgkv/8kGIwium1reo+Y
-	GyOWZ2WZDHt3imWw=
-X-Google-Smtp-Source: AGHT+IFaM8IaByeAyzbZ1A4gVDC35Pyz8pR9kNbpble9jg5fMy8ANLnTcAmpKkH3tcHj+isuz15jMQ==
-X-Received: by 2002:a17:90b:574c:b0:308:7270:d6ea with SMTP id 98e67ed59e1d1-30e7d5b7b41mr26127527a91.30.1747763968605;
-        Tue, 20 May 2025 10:59:28 -0700 (PDT)
+        bh=/ZiTSgQ4tPZrLjCRnj9Ahso9pwCxKcG/I6bjIoaVkvw=;
+        b=Ziz7bQRHe/t7rr4a3O3N3xKnQEs+nJdsKhOhWsPqKYOBmm+xORaCcQe4WEJzgN/CMP
+         u08dEkeSzavbGEajqxAYqviaDcQDyS9pKY13eGs6yuvBD/x2HC1MM4GHIHn9gGI3477e
+         hYMNF1U9Rl8YCatNCrsKowFlaDDQUAYlbmnv+AaoyNXHoGrqoY15YG7MAcsmeFWJwTkF
+         6c935tvphZKFKZ1pJ2ZqvMhMIRnj4W9ljKgY9Nc5JruQyfy46IDIZ3D/WoFOWKICMLXt
+         b20WU7JtzB/zW1i/4Vo9dNca0FNSzuIm/bEOfC2dGlFIYTNWl6wg9RfEn8I0SiKPsLJ8
+         0qZw==
+X-Gm-Message-State: AOJu0YxPE7pRdg72YmSKExd37n48H566t2WIfB4ph2RtBscXS0/7yhTb
+	qU7w+qlAqY3EPBl63/tpCxPvHay78dxQnyAbwTFBiQTeBpdT9e0atSQCyeRXtHBjEg==
+X-Gm-Gg: ASbGncuRFWC4gjLxRPJErkCcVU/2Aq9/s9GttQ35tFURfkEDJJowzbW1ZdfxB4koCfP
+	qJ/uaRwYdICc4lcwBarH2dCLlPISeU4gDP0R38+lh0xgafT4E2r3MeoDF2K6S3Dcuebbkvrsn8P
+	P9v5yegkk3eVGW8vaOtFN4zL+O5tuIeKgSCcR5kGK6JOrz23fHr+hZy8H54LASWpg0EvI93/pFG
+	AaZLKkG6Fs33JkndvlPHLOjQL5toJmhwzkhYQaC0tyUuD5M0heYMKUWn0n/4qw8YcGmHL3DgTUm
+	5SJkmCYkfbk07eEHY7PHWIIrtGohmvjl80+51PVD7/dVvR4hOe2JE+BkMBPcGOKTtk6RfGLCdyt
+	9X0MptyuBXUfDYVE=
+X-Google-Smtp-Source: AGHT+IGr1+OVB8taA+7VDoco/dSmDxTz+72kgWqYLIacDZpl9hvePSGzUrt9WY5+8vhZT9XMSZROyQ==
+X-Received: by 2002:a05:6a20:d70a:b0:218:17a2:4421 with SMTP id adf61e73a8af0-21817a2540dmr18163322637.10.1747764151411;
+        Tue, 20 May 2025 11:02:31 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e10039b2esm7535809a91.0.2025.05.20.10.59.23
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eb084936sm8153573a12.56.2025.05.20.11.02.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 10:59:27 -0700 (PDT)
-Message-ID: <e6b8d2c5-5e3a-42b3-a68c-ceeda2fd8632@broadcom.com>
-Date: Tue, 20 May 2025 10:59:22 -0700
+        Tue, 20 May 2025 11:02:30 -0700 (PDT)
+Message-ID: <f6cb2b6f-fc45-4a84-88a7-0b8442e49673@broadcom.com>
+Date: Tue, 20 May 2025 11:02:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,27 +79,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: phy: fixed_phy: remove irq argument
- from fixed_phy_register
-To: Heiner Kallweit <hkallweit1@gmail.com>, Greg Ungerer
- <gerg@linux-m68k.org>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Hauke Mehrtens <hauke@hauke-m.de>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <zajec5@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vladimir Oltean <olteanv@gmail.com>, Doug Berger <opendmb@gmail.com>,
- Thangaraj Samynathan <Thangaraj.S@microchip.com>,
- Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
- Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+Subject: Re: [PATCH net-next 3/3] net: phy: fixed_phy: constify status
+ argument where possible
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
  David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, linux-m68k@lists.linux-m68k.org,
- linux-mips@vger.kernel.org,
- Linux USB Mailing List <linux-usb@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <4d4c468e-300d-42c7-92a1-eabbdb6be748@gmail.com>
- <31cdb232-a5e9-4997-a285-cb9a7d208124@gmail.com>
+ <d1764b62-8538-408b-a4e3-b63715481a38@gmail.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -135,22 +123,17 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <31cdb232-a5e9-4997-a285-cb9a7d208124@gmail.com>
+In-Reply-To: <d1764b62-8538-408b-a4e3-b63715481a38@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/17/25 13:35, Heiner Kallweit wrote:
-> All callers pass PHY_POLL, therefore remove irq argument from
-> fixed_phy_register().
-> 
-> Note: I keep the irq argument in fixed_phy_add_gpiod() for now,
-> for the case that somebody may want to use a GPIO interrupt in
-> the future, by e.g. adding a call to fwnode_irq_get() to
-> fixed_phy_get_gpiod().
+On 5/17/25 13:37, Heiner Kallweit wrote:
+> Constify the passed struct fixed_phy_status *status where possible.
 > 
 > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
 Florian
+
 
