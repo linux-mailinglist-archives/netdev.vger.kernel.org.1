@@ -1,65 +1,59 @@
-Return-Path: <netdev+bounces-191927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7AFABDEC8
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 17:23:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3DBABDED0
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 17:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E228160902
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:18:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5B28161B87
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8393A25A64D;
-	Tue, 20 May 2025 15:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E36E25F797;
+	Tue, 20 May 2025 15:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIkvmAtt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJQr4VA5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5026B25229C;
-	Tue, 20 May 2025 15:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0152C25EF90;
+	Tue, 20 May 2025 15:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747754311; cv=none; b=Vbt9yVQYIg/trOmt9P36y+W3mLnAJqin1NDSnogCxd2AgIgqXNmbHenrSydaboVPpbOcA2sW4WWEyGfwIPTLCtf0B03nUwbJn9l2Vi8cSxe1mO0Uz2SAxwPTNlxUmeS1Jop9NwwRp4ac38ppjla6q6kybI5hVdf9yl2k+tMaLxc=
+	t=1747754313; cv=none; b=QEg46BcrRxUnoE6bOjverB9JpNzEA9Iut7DA9mQz377pHvubTD5+YHg2tgFZBv9XY5FAnF7+z5abt19GJqwzoLureWLHmcU3HQubJCSNQdZZOPkjw6bl7xXGny+9UTrvjg18kWoSBz+QBAwWhWd+hmoBY8i8SzDVnhZt1lZqZfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747754311; c=relaxed/simple;
-	bh=gOcAH/YL5VciW2jCfOJM+RDZl3zKyoeTRxoKCucXQKc=;
+	s=arc-20240116; t=1747754313; c=relaxed/simple;
+	bh=G7HZ66SmdXHKt4VEr2YiAj2viFMQ+WdO1H2Y1UCRV84=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNmkEERJHOsT0jVLXqV6syU2YG7UI19X5CVFnJpIomX9/PuNl8AGpn81o0b/x9XxDuHwzaZfjouNbhPcDIZfY4hYjDvOZR2YtQyvKLI0lpgpfAyi3QBJ2g1ZAUVKrLXIyKhc9MCWaW8eI7exBoGHgHKrFnbEdeuuI2ZXS26nCh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIkvmAtt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A749C4CEEA;
-	Tue, 20 May 2025 15:18:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0m96KzAnP3ABH7lhCzMuGD0xog+wLT9OSZZwJclf7cf0Sbnrtv590hmO8ahE92HpcztyYE4BODOhw143u2qn1UenfWAa38FNakaR6mUYZ1ne3WvuajLB805iNLxyNXXrBY/FAgLliMn2vKRKuLEccWdadoDQBc/uB0kTH7Sb8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJQr4VA5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289BBC4CEE9;
+	Tue, 20 May 2025 15:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747754310;
-	bh=gOcAH/YL5VciW2jCfOJM+RDZl3zKyoeTRxoKCucXQKc=;
+	s=k20201202; t=1747754312;
+	bh=G7HZ66SmdXHKt4VEr2YiAj2viFMQ+WdO1H2Y1UCRV84=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WIkvmAtt5TOeMvCDGBbPJgB4JjBBPqqSvNUUZs5g4513rRX5RxJkhlFPLNQkiiSyC
-	 kEEBnlMGbFy/UU2efYx4TS3uT1GkmLUB264f5DqVEAa1qu5AO0ZRlBcHoeOMvtBA6A
-	 dlCY/nTm3or20KEx0j9YfHik5x+PVGGk4VLjiEfUS3XV41Kx+8Mm28DQSJyEUF+vYJ
-	 OZB17ZWCrXlQ1JSY2UVx+PS5QsvjVLI4un1blQBMuTIzblz8vEuUEAWl+bbvgzxDeR
-	 +cE1X4cBIWWYk68/zYN0cY9FKSUESNiQcbeSYO/YpWyDDzCytghiSikW029Z+g86CS
-	 Ha7+ngUMOWpVw==
-Date: Tue, 20 May 2025 08:18:17 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Bernard Metzler <BMT@zurich.ibm.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH net-next 04/10] RDMA/siw: use skb_crc32c() instead of
- __skb_checksum()
-Message-ID: <20250520151817.GA1249@sol>
-References: <20250511004110.145171-1-ebiggers@kernel.org>
- <20250511004110.145171-5-ebiggers@kernel.org>
- <BN8PR15MB2513872CE462784A1A4E50B7999CA@BN8PR15MB2513.namprd15.prod.outlook.com>
- <20250520131841.GH7435@unreal>
+	b=VJQr4VA5P33AB4hSfUm1KKA+XEwvVN5s14iaLvcFWwkhzP17ru1yv6xyd+pP5cfZu
+	 Zqvf5j6At+TDaDtj0bYiJIbAtpIFn8hIK3c2kwJk1CjjgJ1B63mbCm+vtL+kWPLfCq
+	 Z883NsZoIoYKHYCH1aoDwAWKpfuPkRIlGkbz1xW2CJgUS1mI3CnZ/wyjyEEUr8wFs5
+	 V+3WAnRn4sMg52KkgDZolIwVyjX08O/xsjz8Mm5u4A8AgMcr2d1VX2F5vPbhZVuTV+
+	 r7dKZegDU9DNiluk/bbYquj9b0sWPjh/qM3LqvjEXmhbAJuhe1jIifB7aUdbt2fw+I
+	 dEVoGqLky2b1A==
+Date: Tue, 20 May 2025 16:18:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, andrew+netdev@lunn.ch, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	sdf@fomichev.me, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	jdamato@fastly.com, martin.lau@kernel.org, hramamurthy@google.com
+Subject: Re: [PATCH net-next] eth: bnxt: fix deadlock when xdp is attached or
+ detached
+Message-ID: <20250520151827.GA365796@horms.kernel.org>
+References: <20250520071155.2462843-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,29 +62,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250520131841.GH7435@unreal>
+In-Reply-To: <20250520071155.2462843-1-ap420073@gmail.com>
 
-On Tue, May 20, 2025 at 04:18:41PM +0300, Leon Romanovsky wrote:
-> On Mon, May 19, 2025 at 09:04:04AM +0000, Bernard Metzler wrote:
-> > 
+On Tue, May 20, 2025 at 07:11:55AM +0000, Taehee Yoo wrote:
+> When xdp is attached or detached, dev->ndo_bpf() is called by
+> do_setlink(), and it acquires netdev_lock() if needed.
+> Unlike other drivers, the bnxt driver is protected by netdev_lock while
+> xdp is attached/detached because it sets dev->request_ops_lock to true.
 > 
-> <...>
+> So, the bnxt_xdp(), that is callback of ->ndo_bpf should not acquire
+> netdev_lock().
+> But the xdp_features_{set | clear}_redirect_target() was changed to
+> acquire netdev_lock() internally.
+> It causes a deadlock.
+> To fix this problem, bnxt driver should use
+> xdp_features_{set | clear}_redirect_target_locked() instead.
 > 
-> > > 
-> > 
-> > Thanks Eric!
-> > Works fine. Correct checksum tested against siw and cxgb4 peers.
-> > 
-> > Reviewed-by: Bernard Metzler <bmt@zurich.ibm.com>
+> Splat looks like:
+> ============================================
+> WARNING: possible recursive locking detected
+> 6.15.0-rc6+ #1 Not tainted
+> --------------------------------------------
+> bpftool/1745 is trying to acquire lock:
+> ffff888131b85038 (&dev->lock){+.+.}-{4:4}, at: xdp_features_set_redirect_target+0x1f/0x80
 > 
-> This patch should go through RDMA repository, Please resend it.
+> but task is already holding lock:
+> ffff888131b85038 (&dev->lock){+.+.}-{4:4}, at: do_setlink.constprop.0+0x24e/0x35d0
 > 
-> Thanks
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(&dev->lock);
+>   lock(&dev->lock);
+> 
+>  *** DEADLOCK ***
 
-It depends on patches 1-2, and patches 6-7 depend on this one.  So your proposal
-would require that we drag this out over 3 cycles (patches 1-3,5,8-10 in net in
-6.16, patch 4 in RDMA in 6.17, patches 6-7 in net in 6.18).  Can we please just
-take the whole series through net in 6.16?  There aren't any conflicts.
+...
 
-- Eric
+> 
+> Fixes: 03df156dd3a6 ("xdp: double protect netdev->xdp_flags with netdev->lock")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+> 
+> This is a bugfix patch but target branch is net-next because the cause
+> commit is not yet merged to net.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
