@@ -1,91 +1,143 @@
-Return-Path: <netdev+bounces-191728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4370ABCECB
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 07:52:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 756FEABCECD
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 07:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 858D44A3934
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:52:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26DCD4A39F1
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5699C25B1C4;
-	Tue, 20 May 2025 05:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E8525B1D5;
+	Tue, 20 May 2025 05:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T4855GGO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4582571A9
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 05:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D13E219EB;
+	Tue, 20 May 2025 05:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747720372; cv=none; b=O4/4rouqgcXMUrbiqHkRwRi63pwIquNfny79l0kMMA7W9+7LiUQo88C505xI4eBWuQbGmhzDBht8Co0918dkfjh3PtX2iQcyylujOQPjfn34KMEnto8EDuejpWaDLyvJjY9hW8zMI0NYaj88D/lrjyyIGJp9HJDB4u9nbtNVXA0=
+	t=1747720398; cv=none; b=Mbf5qlDJAjKdow5FcLN+wV+Ezk38UKOdoK7akZApAkTQYgXp24xZzJYxujaZ+GGzAQjOgesFq2KuZYD8SMlndmhaUVVT+IzGcOO50sW/F8TWtDVaXqsBrS5y6Y/lq/D+KzfOzHgdt7V+Nl39+1Uig/jqsJdYCVAhEMfKYOX7bvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747720372; c=relaxed/simple;
-	bh=5XIkgHhF21vtLzxgjR3oL5SCXQnwhagit/ibtn3UXhU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PA35s2qbbIs9ehWd+fkTUGZIXDT+n4+3IYbLzuTHB+KnHMNWh8emQi3zXNibiLLX/VgmEbHJiwzR1gcGKApxph0whL9tWEeKwNnDswXaSly8ac/PitRfSSYbObqkCPBajIFaa+Bpr/1ZsYC1MjRjCOC5QS++d6GoVz2HxWx/i60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id F0A5B207AC;
-	Tue, 20 May 2025 07:52:47 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G9SWs4a3-xrw; Tue, 20 May 2025 07:52:47 +0200 (CEST)
-Received: from EXCH-04.secunet.de (unknown [10.32.0.244])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 6EA2520520;
-	Tue, 20 May 2025 07:52:47 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 6EA2520520
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-04.secunet.de
- (10.32.0.184) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Tue, 20 May
- 2025 07:52:46 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 20 May
- 2025 07:52:46 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 2B0D23182DA0; Tue, 20 May 2025 07:52:46 +0200 (CEST)
-Date: Tue, 20 May 2025 07:52:46 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Leon Romanovsky <leonro@nvidia.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH ipsec-next] xfrm: prevent configuration of interface
- index when offload is used
-Message-ID: <aCwYrv8vlqzdzLGo@gauss3.secunet.de>
-References: <ba693167024546895f704663d699132cbeb68c27.1747133865.git.leon@kernel.org>
+	s=arc-20240116; t=1747720398; c=relaxed/simple;
+	bh=ZqqKUB2MHGu20+fnBKcMePaJ4BIWkTxQW8WgURvProI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kSzN86xZBlIqK00s1pM/HELMgF6OWdQZBrZBABWFVVEO5EMT/XMh2yg6dxJkVJf7svS20CByu7vp9Z6LEYqv3vT5/MEySCLD3CYqlyYV/QOn0bwcAZgs8bqboVakrnSvRE5V5rOLPCqtSWNrosC0iKtgR41EGLHZexv0M9i0hqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T4855GGO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56C7C4CEE9;
+	Tue, 20 May 2025 05:53:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747720397;
+	bh=ZqqKUB2MHGu20+fnBKcMePaJ4BIWkTxQW8WgURvProI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=T4855GGO7RWxDN0Ci+fVFmDn+kPReyPrXUH1qrGNd0FOqOGYYnsccfybZamxIKt38
+	 46BnOQcyWbgZivjc1Vqt83WP8wIduMeiX2jPwqJsiBNp2Gh+zJ2PGMMU2QN+b0gcey
+	 wkBroq71LaucL0ugWATqgAQWOVO7jZ5Pq9so445KK2bq2M6WehnDuIoRByMdGHSlAF
+	 pgf95+k18yWWz2aT7pccq2jiiuMbmDEWzAz/UxIoH0PZbXLno+ynE3v3WDM0MVyW0A
+	 PSzs1i3GLgwjs83GEsNlGlN6j336WGekB1Lf2E1W9j9jk/A+d6vdiqetISDmh8Q+OU
+	 UnizqAY7jcV+g==
+Message-ID: <906c36f9-f8af-49a3-a2d7-b146a793f1bc@kernel.org>
+Date: Tue, 20 May 2025 07:53:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ba693167024546895f704663d699132cbeb68c27.1747133865.git.leon@kernel.org>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nfc: Correct Samsung "Electronics" spelling in copyright
+ headers
+To: Sumanth Gavini <sumanth.gavini@yahoo.com>, bongsu.jeon@samsung.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250519230915.150675-1-sumanth.gavini.ref@yahoo.com>
+ <20250519230915.150675-1-sumanth.gavini@yahoo.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250519230915.150675-1-sumanth.gavini@yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 13, 2025 at 01:59:19PM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On 20/05/2025 01:09, Sumanth Gavini wrote:
+> Fix the misspelling of "Electronics" in copyright headers across:
+> - s3fwrn5 driver
+> - virtual_ncidev driver
 > 
-> Both packet and crypto offloads perform decryption while packet is
-> arriving to the HW from the wire. It means that there is no possible
-> way to perform lookup on XFRM if_id as it can't be set to be "before' HW.
-> 
-> So instead of silently ignore this configuration, let's warn users about
-> misconfiguration.
-> 
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Signed-off-by: Sumanth Gavini <sumanth.gavini@yahoo.com>
 
-Also applied, thanks a lot!
+Please version your patches correctly, this is a v2, and provide
+changelog under ---.
+
+
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+<form letter>
+This is an automated instruction, just in case, because many review tags
+are being ignored. If you know the process, you can skip it (please do
+not feel offended by me posting it here - no bad intentions intended).
+If you do not know the process, here is a short explanation:
+
+Please add Acked-by/Reviewed-by/Tested-by tags when posting new versions
+of patchset, under or above your Signed-off-by tag, unless patch changed
+significantly (e.g. new properties added to the DT bindings). Tag is
+"received", when provided in a message replied to you on the mailing
+list. Tools like b4 can help here. However, there's no need to repost
+patches *only* to add the tags. The upstream maintainer will do that for
+tags received on the version they apply.
+
+Full context and explanation:
+https://elixir.bootlin.com/linux/v6.12-rc3/source/Documentation/process/submitting-patches.rst#L577
+</form letter>
+
+
+Best regards,
+Krzysztof
 
