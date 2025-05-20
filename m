@@ -1,50 +1,70 @@
-Return-Path: <netdev+bounces-191722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFDAABCDCC
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:20:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9CCABCE29
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 06:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0711B65D1B
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:20:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 391B17AD484
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 04:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69DE625A2B6;
-	Tue, 20 May 2025 03:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D882580FF;
+	Tue, 20 May 2025 04:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coNO+kDv"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="A4eeK5gg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350D410785;
-	Tue, 20 May 2025 03:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2427478F40;
+	Tue, 20 May 2025 04:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747711215; cv=none; b=LKw6kisjIkkNrbsigMhm4eMh98fgw2LQD0iRn8QOWLT0/AMccAa39pcWul79r25ZAmi2r+XMiXFvWc/edVAzsvjTnaG12R2YCXChf4Kz1y8w9u1DTNx09x6Rtuxf2uvc1YM9hbRlbp8aPvNCBxMMUAkBv28iDWEPcYybFBGHGlY=
+	t=1747714876; cv=none; b=YI4k3uZkVsWDci3WyXteb0l2XoFa6qH++we9L+pQT8HzjdqeqqLEX0KEp+sbehdQ3RM1jLSiPUzN6rRhvCMpW5fSwpu5+6xco/RjeRU/Kts2lXW3oTaLD/q4RzmBxft6UM2MMpvSzgIl7455yHmaNKFMuVLTqjiN9YhiEjKv1Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747711215; c=relaxed/simple;
-	bh=RMJrHFiATeA39B8b7uhnBtX8MFwRT0uz+UNsjco2Tu4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t0+y1xr14hRPwDPIfvNwklFmt7aBXBrUipX4FTFJ63IrdlRbxcO6GNLcaxmhPcKS/z+Fn2p03caFSm1NfLiEqZut2moBP2KxZ1s9ItjhR1k3D7AocgCt8+UacvRqP/xKm+GcdUcvT8eTEFcEslBdJr+am+ZlT4zgL/LoELpdx/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coNO+kDv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A86FDC4CEE4;
-	Tue, 20 May 2025 03:20:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747711214;
-	bh=RMJrHFiATeA39B8b7uhnBtX8MFwRT0uz+UNsjco2Tu4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=coNO+kDvAC9SLYoZn7Mj6LVj/pxfiLniEF3pxwUH/WqqqXc9mzKjATdwhu1iKBEWa
-	 Fl0j8h0qFyO74XWefQkn5PLESkFNfvWrGrmZispITB8H2wz4XcPqiqlHx8gGz382IC
-	 5RzMpJk4U81lLYSKuEUiAz1vXGfzfH3Dsm9N+YHd3qzdWxoom0jgNC407dRhR6V949
-	 nPLckOOU1YoCOGxZKPVyix0yvKYABBLtrs5dxHlKbIxc0NECopzYgtXfbTNDeY/U8u
-	 lcY9T0E4bLlxn23Q26AU5QvuloP589h3fMV3D2av1YlrkCzLzezPgdyPW2+LxoXasO
-	 25IBdMup3lolA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD82380AA70;
-	Tue, 20 May 2025 03:20:51 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747714876; c=relaxed/simple;
+	bh=tki70zGOXe8uDLHnr4w6sI/6H1GrLHAbBVvNzaE1BS0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QODmCwwKmV/N0PdKmJgbpWrvaMVa+okolW4fDhO0x51XKwmq8RTWGyOEfcO91QiSsY9Gg00fbCmeJQlBdsomEX9WM96xsRonjVRsb5+jAw5SAjGmg6GkCDC2upZaPb+6vRaRiV11oIXt4/4PVJtUjnjg40oGuAAemvFifwnY/ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=A4eeK5gg; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54K4KhKkA2041609, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1747714843; bh=tki70zGOXe8uDLHnr4w6sI/6H1GrLHAbBVvNzaE1BS0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=A4eeK5ggZhxkpEGEmGvxmMlQtiwm7BqF9eWmUuyIl6PVe/bzXU9wneF4NvbDJaItw
+	 bMLLPfV6QErE0flYeCvseidF6uJ9J0W0MTwhKwo4IC20l1AsG3p0vDQTT6nxyhzZK+
+	 bgfSgPwdYIwx8QY+Sr2I7Gsc9rU83L6xq7uMxA3Ws2gJVDDMb8p5h5IKG6Q2hits8U
+	 a9IdUuCbkr+74yzhTmbUy24+qYbjpb5Da7YUgJeZVHW/DF7yW8Uh4ory+WpUqOccTe
+	 Z63dYstq/nJ0QYo1MT6Z+HD2XxzBg/iDswH5V9Tk9Gw2knd0DAnFRTNLEFFPqVD7HC
+	 2qtglQT8Je25A==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54K4KhKkA2041609
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 May 2025 12:20:43 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 May 2025 12:20:43 +0800
+Received: from RTDOMAIN (172.21.210.70) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 20 May
+ 2025 12:20:43 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>,
+        Joe Damato
+	<jdamato@fastly.com>
+Subject: [PATCH net-next v3] rtase: Use min() instead of min_t()
+Date: Tue, 20 May 2025 12:20:31 +0800
+Message-ID: <20250520042031.9297-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +72,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: netlink: reduce extack cookie size
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174771125074.1146050.1563363556948881268.git-patchwork-notify@kernel.org>
-Date: Tue, 20 May 2025 03:20:50 +0000
-References: <20250516115927.38209-2-johannes@sipsolutions.net>
-In-Reply-To: <20250516115927.38209-2-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- johannes.berg@intel.com
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Hello:
+Use min() instead of min_t() to avoid the possibility of casting to the
+wrong type.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+Reviewed-by: Joe Damato <jdamato@fastly.com>
+---
+v1 -> v2:
+- Remove the Fixes tag.
+ 
+v2 -> v3:
+- Nothing has changed, and it simply has been rebased and reposted.
+---
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Fri, 16 May 2025 13:59:27 +0200 you wrote:
-> From: Johannes Berg <johannes.berg@intel.com>
-> 
-> Seems like the extack cookie hasn't found any users outside
-> of wireless, which always uses nl_set_extack_cookie_u64().
-> Thus, allocating 20 bytes for it is pointless, reduce that
-> to 8 bytes, and add a BUILD_BUG_ON() to ensure it's enough
-> (obviously it is, for a u64, but in case it changes again.)
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: netlink: reduce extack cookie size
-    https://git.kernel.org/netdev/net-next/c/a462903fa225
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 0efe7668e498..4d37217e9a14 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -1983,7 +1983,7 @@ static u16 rtase_calc_time_mitigation(u32 time_us)
+ 	u8 msb, time_count, time_unit;
+ 	u16 int_miti;
+ 
+-	time_us = min_t(int, time_us, RTASE_MITI_MAX_TIME);
++	time_us = min(time_us, RTASE_MITI_MAX_TIME);
+ 
+ 	if (time_us > RTASE_MITI_TIME_COUNT_MASK) {
+ 		msb = fls(time_us);
+@@ -2005,7 +2005,7 @@ static u16 rtase_calc_packet_num_mitigation(u16 pkt_num)
+ 	u8 msb, pkt_num_count, pkt_num_unit;
+ 	u16 int_miti;
+ 
+-	pkt_num = min_t(int, pkt_num, RTASE_MITI_MAX_PKT_NUM);
++	pkt_num = min(pkt_num, RTASE_MITI_MAX_PKT_NUM);
+ 
+ 	if (pkt_num > 60) {
+ 		pkt_num_unit = RTASE_MITI_MAX_PKT_NUM_IDX;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
