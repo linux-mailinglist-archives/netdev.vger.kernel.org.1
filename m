@@ -1,93 +1,74 @@
-Return-Path: <netdev+bounces-192299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15ADABF4FD
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 478CCABF5C2
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508613BB812
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 12:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 194B33AC5E0
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F24A26E176;
-	Wed, 21 May 2025 12:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668D026983B;
+	Wed, 21 May 2025 13:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b8YPmsb7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="LYoxcSd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13E26E145
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 12:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2602267B74;
+	Wed, 21 May 2025 13:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747832330; cv=none; b=S4BgG2OGpNvo4uRV78GSlXlx5qNpM6qIutQOLPgAmwmIcV7RwYkqxml3enV1WTxX7H+xlEFr4KAebDKpI1wkeyenz7aZVaT2F3Nk+UzXDZjxO6NGAfqmiyBjRZuzdZcOu8lK3aV9s2CO+N0T+DgbT6gUX3zIXzk7tTYkwwoP0pc=
+	t=1747833221; cv=none; b=GoabfVccGdEdP02/bz3aQlMab8FZbGnhx2B34KUX69duNHk0mP2L55kikxlx83mvpA0smek+f6Wnq+Aex45xcqpBkFbxbYjApiDE85DovnLo6hZyiHD1ex4Mwgzt+0ZYxEuny/S0N17OEw7+P8nmmSJQuw8LZFtRgY/BWO/hCCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747832330; c=relaxed/simple;
-	bh=sET+JP30XH2vndFawVkJ+lo/9fQG9u6Fq9nQGRLbOgw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lb++EYB+fTP85pwh1N7YWAkoaXcXexaoRkOMM/WcqrLmkg+eVeUZ4w402PzFvurJ+NHFRAaQ1ZHHuNINBZCzhySDPrhM9SF8kkuiWu2aM0pj+XZkbYxFdsWxiVJoKqfyiE0l6M+Ti7V1jFfyF9JAI9FW3LI0DJnCNA2FkWAL0gM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b8YPmsb7; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-afc857702d1so5943829a12.3
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 05:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747832328; x=1748437128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fNtWIFfA6Jkt69A7oEbtGtcZO8oSJxs0GTIB+9lBpFU=;
-        b=b8YPmsb7EJ7tPo0hj2aUm80Q3F4mFUZv5StfFsFxYcGWonDZBnU0EKzBBKC3TwckoI
-         BgKnBCWuM0ypXwY6/LXbGH7ZV5aG/5rUxRKhsZQo9CBbtKBPSNkzAuzTk9OClSNGJBHQ
-         EUOcMriDtcEyamDjji+GtYLLt+mODe18vjnawZRcb5a1xLPXhmfOVSrCndPobnTthhRg
-         npseT/wmRFkfn3LbkpvgEh3dwV2azYU8Bytb0uDeWL8uh4FX/9PXdvzklAF5xU08bgjF
-         xi90SXWvGNWSZGZg/Jd+neeryCRhzZoF0wxEZvagp2ES3mxtNzggfuXEqP8oUay0FiFt
-         fyag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747832328; x=1748437128;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fNtWIFfA6Jkt69A7oEbtGtcZO8oSJxs0GTIB+9lBpFU=;
-        b=gE3kOwnIMSKmTcA26oGgRiEH0sh5Qp7fXjwXrA4dRfhV12RVUNVHVbEds/ITk0WqSa
-         e+Mz7IeE8Y05pXWjDokHxbQeiDak1cdTpjM+ar0zjjaXZQ8YQxt1nn+/DtPooA9W15ev
-         LpOqvAnPpuSAhSvoDfZee/iZ84upeBLLixoHRz2huqzTk91/mp140HxyQmXkl0oCDcsa
-         y6KY5FEO8J+3D9s1t2Fr/qX4M2wxyA4mOs4vm7AXlk4XiCsFnBgkR0tyOCOupNQTXS83
-         8usF04iAGsy0cJtqNrirYN8RvstATaTIu5DJaWWcWXpxA4OdwYWwDVQ/g1UKgvZLlJr1
-         rYOw==
-X-Gm-Message-State: AOJu0YymunqloVgZmRPjcWQzdcPXhq/Kp11XB+20GGRVfz8erz91lsp3
-	xTKGoaQLFCcEObH1G7U0mVLIcCQM1mHSWo8i8iwssD8XaLVpv+PM9uFhitH61wFV
-X-Gm-Gg: ASbGncuWpi9U4hugfi3VAzI3rsRzBwTEl+qt1FWvYVIO9jpiWgrmvNeI7VaKCGBDG4c
-	uKdJf/VTCi3/CNdmZLorJgr89JwyTzARc5dgrIuVtPnkMFVqeWZ3DEo/XNbqJqScBQQiYFG6bQt
-	ej34kRSAcm3VUJjYGGXZVEXKL6dnL4SqaZR4aCN3s/tBbX0gDx5x+ZhF0l9B29DkPlsFxo9Idw/
-	HzZxUqcEh6OuuBB3gqS62nseJBs0rEi7AhH649qbvN3ojlnum9gxgk20JLxRU5QzoaNUB1vZ5wb
-	QKRHdbL4cD4Gpbp405z+PrQhP3Ox8El5RxkkobNhaMYPv4QVOzLITaNZORs2fX/aCf1DYs4xU2f
-	TMg==
-X-Google-Smtp-Source: AGHT+IGQQQGuYJiALi5gz/+8jYGdGNJ4so/Xs3F8HwSfzxgmm6P9c+MLdUwEXbM/BarlSWFM71GtQA==
-X-Received: by 2002:a17:903:2342:b0:223:90ec:80f0 with SMTP id d9443c01a7336-231d4516a4fmr317534985ad.22.1747832327755;
-        Wed, 21 May 2025 05:58:47 -0700 (PDT)
-Received: from shankari-IdeaPad.. ([103.24.60.247])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4adba85sm92760775ad.73.2025.05.21.05.58.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 05:58:47 -0700 (PDT)
-From: Shankari Anand <shankari.ak0208@gmail.com>
-To: netdev@vger.kernel.org
-Cc: allison.henderson@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	Shankari Anand <shankari.ak0208@gmail.com>
-Subject: [PATCH v4] net: rds: Replace strncpy with strscpy in connection setup
-Date: Wed, 21 May 2025 18:28:36 +0530
-Message-Id: <20250521125836.3507369-1-shankari.ak0208@gmail.com>
+	s=arc-20240116; t=1747833221; c=relaxed/simple;
+	bh=K7L5xXjKGwqao/240GIrsFv5DITq/nJrUbkX2CFlM4Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pXv7jARHxUOnUaEpI7ANPrBM0GVex8HABAHrPQsna825VBzrtkC3l5wuiezgCPHsgIME3yh9WvhYz885R7VHl7wSGgGSczrRzRQPm74v0GUSNVAzUHBP9M/siiWqITAXcw/M1dFRNV9nIVszVbdCdqmID9c/f+wR7GyEQAjzT+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=LYoxcSd/; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1747833220; x=1779369220;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=K7L5xXjKGwqao/240GIrsFv5DITq/nJrUbkX2CFlM4Q=;
+  b=LYoxcSd/diwWCvFwtxkYuZyzXjto0SpuyiOVonnQXNtRLROy8OeiUuRz
+   VuSma225dVqeTUmmZet2u/fjrxz4y1TAC6KdzZ+5vAIFx8I0z1M1c5Aop
+   YBN/AQf+3Mnnhzsqk3OKv7H3pTqThC+FGtAcEzAnPUyZda+iYgq7lXlGY
+   95yZzUaDe/VG3mH3O1ZoquJXUCIwAQXZa6GvK+KmHXapyB6WSGP5xhZi5
+   L+oLkPF7gOXzAvg3ztfSk8R1V9VyiQhks8FRbpGdRe/bnBnFUX1SRyg1g
+   713Ro5GTMewrCoHWN0Be27V4skCP2SoUAAdXdi/kQXfteOtO4RPN4Qz66
+   A==;
+X-CSE-ConnectionGUID: Ho6MR7HOQcaGdH2JBUdWGg==
+X-CSE-MsgGUID: /e80DkcVStK6KBJCNc6+vg==
+X-IronPort-AV: E=Sophos;i="6.15,303,1739862000"; 
+   d="scan'208";a="273274614"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 May 2025 06:13:38 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 21 May 2025 06:13:07 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Wed, 21 May 2025 06:13:05 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <kory.maincent@bootlin.com>,
+	<shannon.nelson@amd.com>, <viro@zeniv.linux.org.uk>, <atenart@kernel.org>,
+	<quentin.schulz@bootlin.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] net: phy: mscc: Fix memory leak when using one step timestamping
+Date: Wed, 21 May 2025 15:11:14 +0200
+Message-ID: <20250521131114.2719084-1-horatiu.vultur@microchip.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250521055417.3091176-1-shankari.ak0208@gmail.com>
-References: <20250521055417.3091176-1-shankari.ak0208@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,39 +76,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Replaces strncpy() with strscpy_pad() for copying the transport field.
-Unlike strscpy(), strscpy_pad() ensures the destination buffer is fully padded with null bytes, avoiding garbage data.
-This is safer for struct copies and comparisons. As strncpy() is deprecated (see: kernel.org/doc/html/latest/process/deprecated.html#strcpy),
-this change improves correctness and adheres to kernel guidelines for safe, bounded string handling.
+Fix memory leak when running one-step timestamping. When running
+one-step sync timestamping, the HW is configured to insert the TX time
+into the frame, so there is no reason to keep the skb anymore. As in
+this case the HW will never generate an interrupt to say that the frame
+was timestamped, then the frame will never released.
+Fix this by freeing the frame in case of one-step timestamping.
 
-Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
+Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- net/rds/connection.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/phy/mscc/mscc_ptp.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c749c5525b40..4689062db84f 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
- 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
- 	cinfo->tos = conn->c_tos;
--	strncpy(cinfo->transport, conn->c_trans->t_name,
-+	strscpy_pad(cinfo->transport, conn->c_trans->t_name,
- 		sizeof(cinfo->transport));
- 	cinfo->flags = 0;
+diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+index ed8fb14a7f215..db8ca1dfd5322 100644
+--- a/drivers/net/phy/mscc/mscc_ptp.c
++++ b/drivers/net/phy/mscc/mscc_ptp.c
+@@ -1173,6 +1173,13 @@ static void vsc85xx_txtstamp(struct mii_timestamper *mii_ts,
+ 		return;
+ 	}
  
-@@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
- 	cinfo6->laddr = conn->c_laddr;
- 	cinfo6->faddr = conn->c_faddr;
--	strncpy(cinfo6->transport, conn->c_trans->t_name,
-+	strscpy_pad(cinfo6->transport, conn->c_trans->t_name,
- 		sizeof(cinfo6->transport));
- 	cinfo6->flags = 0;
++	if (vsc8531->ptp->tx_type == HWTSTAMP_TX_ONESTEP_SYNC) {
++		if (ptp_msg_is_sync(skb, type)) {
++			kfree_skb(skb);
++			return;
++		}
++	}
++
+ 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
  
+ 	mutex_lock(&vsc8531->ts_lock);
 -- 
 2.34.1
 
