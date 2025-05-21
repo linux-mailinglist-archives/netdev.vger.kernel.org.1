@@ -1,90 +1,78 @@
-Return-Path: <netdev+bounces-192274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4426CABF338
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:45:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49757ABF353
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 610EB170D8E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:45:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EA7817BFB1
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6122236431;
-	Wed, 21 May 2025 11:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C263264A65;
+	Wed, 21 May 2025 11:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZMa14F6e"
+	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="Aor6vcDK";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="Monvn6qK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from mx.wizmail.org (smtp.wizmail.org [85.158.153.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D53C1B4121
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 11:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2546526461B;
+	Wed, 21 May 2025 11:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747827948; cv=none; b=IGBQI/Mf9PTK+ClejNhkoXAZOl2566IVpnqdNwBb8SZIybqaR7IAvMXVhXi4/0t0ERStdXt3G4inY6cRaj6PWtYCwJi7uG+mtAaWw60r+/NsY4wYZLI1YOzFFOn+bA2VRwhxos1KJ1/PLmTU3U96+DTRAxh9JS9QQyaUCDqU+dg=
+	t=1747828203; cv=none; b=FsyKlLyUuZC5VqxZH2A2nG81ktUCpUaeFDtOYw5skwol0D1W3oyeIq/HdbYnvEVSxC029gi0jkFz+3QoimUpkZisrGXVr9baTJSOgoKWdnvjBw5tP9aKDK0vnOOMt8vfhv9j+wTh7z9R8UiOYex91d8EIx7buJUdMagx45nvsUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747827948; c=relaxed/simple;
-	bh=+B0cm1z7+VBO1FW2h6d+w1Ym3K7ZfK1VSqRLl7SscVY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hlxdesg1mXcWGZdvCgH5VqBA3/R/VLsZ9MIk4+oHQiuYx/AHhF34hhjRmC96MHQf2J4579RZHaAjFLhpLREh4Na49IUJl6lRVlO+kysj7HPaXX0hFLlyVRLC36s9mAADpKhTma/NwFopnDZYkNMrTD6H2qzKsHyZb12A+7OQGO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZMa14F6e; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747827948; x=1779363948;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xSxX5/iP8F2HaLjmtH7cAftV6tUgFxuuS6OQ8yogM3g=;
-  b=ZMa14F6efIGJnIQWjUpoA+rvgTzuXKljef7BNP09AYJlBVMx7Cl+Tgjr
-   /UArBVfNIK26uWAskLGaZjIUOQVXiNgAa5BFHm7zPUtGScpNuBrowUOsb
-   X/lksH5PTqCvkqTDS9YzaS9F2B7WrKb9uiHAc28T3jFlMSD+ETAJsPdV9
-   PibQVVcvY9rgJC7a84HkATanjjW+Q6RRTuB8/vPiUfOq8i8UUSLoENZit
-   E7pw+MmM1IDB5g1jnzZTNf2sRMPrYnqiHxTVad+xWtECaLmEuTj3TE5D1
-   D5P2b9g0jYqEbGkP6we+Kw2f91sjxWGXe52w8m/OBihGklCAi67i3UIzI
-   A==;
-X-IronPort-AV: E=Sophos;i="6.15,303,1739836800"; 
-   d="scan'208";a="52368823"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 11:45:47 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:57843]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.22.206:2525] with esmtp (Farcaster)
- id 8a0e3cef-8aff-415c-882d-4893528bb9aa; Wed, 21 May 2025 11:45:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 8a0e3cef-8aff-415c-882d-4893528bb9aa
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 11:45:43 +0000
-Received: from HFA15-G9FV5D3.amazon.com (10.85.143.172) by
- EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 11:45:32 +0000
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
- Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
-	<leon@kernel.org>
-Subject: [PATCH v9 net-next 8/8] net: ena: Add a DEVLINK readme
-Date: Wed, 21 May 2025 14:42:54 +0300
-Message-ID: <20250521114254.369-9-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250521114254.369-1-darinzon@amazon.com>
-References: <20250521114254.369-1-darinzon@amazon.com>
+	s=arc-20240116; t=1747828203; c=relaxed/simple;
+	bh=94NKlIOM338OSq+CvmTZLZIeiiOYjMuldoOadqiH5aQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ideoqt6vaSpOKKpOORXVK3dPzPGwrpawP70kVzfoUV4iEEF2AszGBMEpw4pRfA7CZihIcoZf9u5i4E3oXywmJ0U8K9LmXEX/+u2M/rBamZZCUJwl0JypRzHp/f/nlCR0L4RuyUNebIlfZyisBZBpHrJBAc/DXVP4D86k8H0WWVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=Aor6vcDK; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=Monvn6qK; arc=none smtp.client-ip=85.158.153.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:MIME-Version:Message-ID
+	:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:
+	MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive:Autocrypt;
+	bh=/IJ6vO6nhMTBgy4Lv/wEdB9z5KQX1Rv8gmCE+6WeMWI=; b=Aor6vcDKhss3oabp+nfpcotSjL
+	oxTOEP7vFn8tehhlAzqT61gQUUYtbU/YS8mi8Z9wB01NhzvZ4hn0trB024Dw==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
+	; s=r202001; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
+	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive:Autocrypt;
+	bh=/IJ6vO6nhMTBgy4Lv/wEdB9z5KQX1Rv8gmCE+6WeMWI=; b=Monvn6qKAvJyaSxfm+xmWbTpJg
+	q27kLj/YUgVjJPFR/NQiCqmhG0IcXRHRjzLKwNlMNbBfW/FhMtdCzxfRlPjjU4wnq/nC/tP9Wx62j
+	kbt1YGXD7pdoCdhS3DO0pxPQneja2dPPbtjVPlAAIkZ28pRki75mdt2pSN+9cWlrRCrxK+qFMfYWD
+	iR/WK3wMjHK64An7DFyyANowAsbu6MVMETvu0Ca7ggd4/q2DfoGPtXRQ2E5N8c5CJ6qC3qoymHcfx
+	jCOoYg2fmq/rRxrbeDjep4GKDc4mIhoS+jt6fSFfSQNWM83w7aF0YxZRjMF9Ik9Pd5aPOh5XOlmNT
+	FzvUA0sQ==;
+Authentication-Results: wizmail.org;
+	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
+	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
+Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain)
+	by wizmail.org (Exim 4.98.115)
+	(TLS1.3) tls TLS_AES_256_GCM_SHA384
+	with esmtpsa
+	id 1uHht3-00000001yTm-4AAH
+	(return-path <jgh@exim.org>);
+	Wed, 21 May 2025 11:45:30 +0000
+From: Jeremy Harris <jgh@exim.org>
+To: netdev@vger.kernel.org
+Cc: linux-api@vger.kernel.org,
+	edumazet@google.com,
+	ncardwell@google.com,
+	Jeremy Harris <jgh@exim.org>
+Subject: [PATCH net-next v2 0/6] tcp: support preloading data on a listening socket
+Date: Wed, 21 May 2025 12:44:59 +0100
+Message-ID: <cover.1747826775.git.jgh@exim.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,61 +80,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D005EUA002.ant.amazon.com (10.252.50.11)
+X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain) with esmtpsa
 
-Adding a standard devlink readme which outlines the parameters
-that are supported by the ena driver.
+v2 changes:
+  - Split out the preload operation to a separate routine from
+    tcp_sendmsg_locked() and restrict from looping over the supplied
+    iovec
 
-Signed-off-by: David Arinzon <darinzon@amazon.com>
----
- Documentation/networking/devlink/ena.rst   | 25 ++++++++++++++++++++++
- Documentation/networking/devlink/index.rst |  1 +
- 2 files changed, 26 insertions(+)
- create mode 100644 Documentation/networking/devlink/ena.rst
+------
+Support write to a listen TCP socket, for immediate
+transmission on all later passive connection establishments
+parented by the listen socket.
 
-diff --git a/Documentation/networking/devlink/ena.rst b/Documentation/networking/devlink/ena.rst
-new file mode 100644
-index 00000000..0c66aec2
---- /dev/null
-+++ b/Documentation/networking/devlink/ena.rst
-@@ -0,0 +1,25 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===================
-+ena devlink support
-+===================
-+
-+This document describes the devlink features implemented by the ``ena``
-+device driver.
-+
-+Parameters
-+==========
-+
-+The ``ena`` driver implements the following driver-specific parameters.
-+
-+.. list-table:: Driver-specific parameters implemented
-+   :widths: 5 5 5 85
-+
-+   * - Name
-+     - Type
-+     - Mode
-+     - Description
-+   * - ``phc_enable``
-+     - Boolean
-+     - driverinit
-+     - Enables/disables the PHC feature
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 8319f43b..53d00934 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -98,3 +98,4 @@ parameters, info versions, and other features it supports.
-    iosm
-    octeontx2
-    sfc
-+   ena
+On a normal connection transmission of the data is triggered by the receipt
+of the 3rd-ack. On a fastopen (with accepted cookie) connection the data
+is sent in the synack packet.
+
+The data preload is done using a sendmsg with a newly-defined flag
+(MSG_PRELOAD); the amount of data limited to a single linear sk_buff.
+Note that this definition is the last-but-two bit available if "int"
+is 32 bits.
+
+Intent: lower latency for server-first protocols using TCP.
+  Known cases of this use are SMTP and MySQL.
+
+  Measurements:
+    Packet capture (laptop, loopback, TFO requeste) for initial SYN to first
+    client data packet (5 samples):
+
+    - baseline   TFO-C      1064 1470 1455 1547 1595  usec
+    - patched    non-TFO     140  150  159  144  153  usec
+    - patched    TFO-C       142  149  149  125  125  usec
+
+  Out of scope:
+  - Client-first protocols
+  - TLS-on-connect
+
+Testing:
+
+A) packetdrill scripts for
+   - normal non-TFO
+   - normal TFO
+   - synack lost
+   - 3rd-ack acks only the SYN
+   - 3rd-ack acks partial data
+     (NB: packetdrill can only check the data size, not actual content)
+
+B) Application use, running the application testsuite
+   and manual check of specific cases via packet capture
+
+C) Daily-driver laptop use (not expected to trigger the feature;
+   only regression-test)
+
+D) KASAN/syzkaller
+   - enable_syscalls "socket$inet_tcp", "listen", "sendmsg", "accept",
+      "read", "write", "close", "syz_emit_ethernet", "syz_extract_tcp_res"
+   - the coverage seems rather limited; the sendmsg onto a listen socket
+     is there, but I am not convinced actual TCP connections are being
+     excercised.  tcp_minisocks.c is entirely uncovered.
+   - A need for limiting iteration in the above sendmesg was found (RCU
+     timeouts), hence v2, but no hint of locking problems.
+     Eric: could you expand on your previous comment?  If it referred to
+     the listening socket, tcp_sendmsg_locked() is called with the sk
+     locked.
+
+Jeremy Harris (6):
+  tcp: support writing to a socket in listening state
+  tcp: copy write-data from listen socket to accept child socket
+  tcp: fastopen: add write-data to fastopen synack packet
+  tcp: transmit any pending data on receipt of 3rd-ack
+  tcp: fastopen: retransmit data when only the SYN of a synack-with-data
+    is acked
+  tcp: fastopen: extend retransmit-queue trimming to handle linear
+    sk_buff
+
+ include/linux/socket.h                        |   1 +
+ net/ipv4/tcp.c                                | 115 ++++++++++++++++++
+ net/ipv4/tcp_fastopen.c                       |   3 +-
+ net/ipv4/tcp_input.c                          |  15 ++-
+ net/ipv4/tcp_ipv4.c                           |   4 +-
+ net/ipv4/tcp_minisocks.c                      |  58 ++++++++-
+ net/ipv4/tcp_output.c                         |  50 +++++++-
+ .../perf/trace/beauty/include/linux/socket.h  |   1 +
+ tools/perf/trace/beauty/msg_flags.c           |   3 +
+ 9 files changed, 237 insertions(+), 13 deletions(-)
+
+
+base-commit: f685204c57e87d2a88b159c7525426d70ee745c9
 -- 
-2.47.1
+2.49.0
 
 
