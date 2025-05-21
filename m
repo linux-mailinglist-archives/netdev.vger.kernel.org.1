@@ -1,136 +1,121 @@
-Return-Path: <netdev+bounces-192183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35906ABECB5
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:05:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9893BABECC4
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF231179605
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:05:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B8923B19CD
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7393D234962;
-	Wed, 21 May 2025 07:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E565C23504C;
+	Wed, 21 May 2025 07:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrIUPiya"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="U3PA9w87"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A1F22B8C3;
-	Wed, 21 May 2025 07:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476F8235049;
+	Wed, 21 May 2025 07:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747811123; cv=none; b=u8LgGSZtsBW+YLR3v0EAo+QN5H89eSYorj1Ztj+X5uOezyn7tE//Ix1MHrVarJxKpdwhEznNMBbD1C5U9TXjQI8laMUojPv0NRdWvUPZgsm88bLgRZ10fr00GCSlsYUNaYYlMDz/SzVK2fPYT4Sft4Bz1/Vp7pvi8sCpgObaO48=
+	t=1747811212; cv=none; b=KtD/iue6XnxtTx90RzoJ8mMNAuc15CYhTaJMjEFbKqc5A3RH2Iu9iYiF6e9LLLSPrRVk1hBsfeGjekEFpbdZ7fdp8Ll27XdWM9dLPp7QT0Hc44EDHlPgXRH8FraO/Tr10QHamW+erNaB3NnPmwce5d4FPkmaLJx3qXEsoicuU38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747811123; c=relaxed/simple;
-	bh=CRWJpCEQTlPV9zuvKipkjRcKPNnuB3s5a8Y/uhRQISg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NN/d1Dmsb+zIY70QWdPh5MN0pkcVZd+26clCN/VfM+eM0YnuuVaXEoSAa33XCdC6wtj8REuo0+dPVtcFwJLzolaiQq4vZtMwOkd7hWS0FrjF2Z5E4ZjtJXEPfB2I6omUkDQZixOhgkkdE4ZMgNf36gBxMMRVpGY3gvm1rXhdE+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrIUPiya; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43ede096d73so46911685e9.2;
-        Wed, 21 May 2025 00:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747811120; x=1748415920; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cVBMFYR66wWyXi/ZLPMoKBQITzYK4w2QbdTYAurV8Y8=;
-        b=GrIUPiya8k7FN9ik+h3vp3mcIiJUZs+Xcf+q9Ph2FCA4dzLwevLAaCGLswhATZ1G5v
-         dHhKLiIQd4e8RsQsLR37ivrK5lCP3s5MSIZ2141aELlgbbhVPXBQBkw3wWNuo0Yt99El
-         3KLOtTqMCaX8d4Nt1tmfRgFYN/JPGIVINby7+1eFRTU7EWUTd2+7EZEsptZkbKmMMJ0+
-         6mnEiSgKpHkaUhJGaiC2msFXOUVK7vOq9CCJgIQzlMq+QMi5gKFohaIkfSI+mNxar6X1
-         bqHwD0tddOcvmpLfLWq2x16XbD0DBTS+mQrarbZLBGTBbaS7Fh3x0Qxf0FehIVSWUg3Z
-         E0Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747811120; x=1748415920;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cVBMFYR66wWyXi/ZLPMoKBQITzYK4w2QbdTYAurV8Y8=;
-        b=GA4ZR5v9+IM7SsGHwjDh6Ov1gQ/HGCo9VOXjpvOiffuFcIC5NfTa7RcByeu4gjLSIz
-         J9wEg9JJlVxSuhsyUPTKFE6cyGS2aduMypldrfrgGskfvF2aEHLyBvidq4JGEYxzWXCJ
-         j4EhYShyD5hs5gLMfOabWoGVCL45Ym4c1FDa0B/DArz5bQpOXhRVHknH7dMaFntwhycq
-         R0Or0UXv1KCfqMDkJAfz4rkFJIx41hLBnOFHPEQWA9mhoxHLY9eLXWlLryVBex5CD31E
-         2KlFbsbG0qUXVbc+4OB8/MtzkiuBn8wcQLa15mUBTfRGys9Wqw3WIEBVX6i5KHN2G9QW
-         ad6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUARHDsqypX7wtVV3ezxlfOkkx1IDUXVz5rBqyS9PJuz5C0QgL5i0RTH1bCBFUImwHilrJx/EkdeZw=@vger.kernel.org, AJvYcCUD5rGDwSe2w5+zhC3UyfH09zhREjjKM/3vRdIzv0YMyLH1ckqtKUqWFcnJZfml5xbPpcjSskcw@vger.kernel.org, AJvYcCUTr4j+BO33yW9DWEpM2VCm/MmbGVKtKCiO06L+Sfg2M9Djx0KqiRxxiqHBsrmk2SMQlhZbkYgfmW7cNA==@vger.kernel.org, AJvYcCVOsn++c/eTSx5QnZEgAEr0/PohnBkvNFTQzME43FTe+EQjllQfKp14/cqJcfTPCoMbL10JnvBo7IY9DG00/rDO@vger.kernel.org, AJvYcCX1Fieiac28MVoB2K0GIvnH+F8Z682FLOi4Ns+M/1woYQY1iXMWgA6CX7zTgHyaRLQa2dFeONU0AwR+eBFn@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyQzJ5d1qJpn8Qt+7tmO/6hp0aezjjPpHzqqjyeu6/VC8ZQiPR
-	lw9Qjr0MV7pH+Ww3HIOxcofdNozeNvvK5VoxjSgIv1ePJ4IunWbpK4dr
-X-Gm-Gg: ASbGnct4Ti7oj2RCkaeO3Jy17GNRdX0AOUkqesUjEpf1RoRiJgepr+qN79K4aS1VEA+
-	6cCqMB+hIM/3ro7xg/wlMkZ1PNi5qzkZZlFRSeDxMiDKc9gsunrIEwmviDTBJwMxyBV5g8C7vqH
-	7w6f5+SrVxOgioiisZxNZgdR6dUglw/3Mxo39m9N7HKQhhriyxLnwKmGnK7g8vZp4yAJgNC0N8r
-	wrEvYyTd5t4SJQ+BKssRKgY6XNp5JlP2mDql3TBJlYld3GBu5NA9JNeujnAmot6chB4/innHTc+
-	8f1dvp4BBxFarJHlCho1vK0RucNmIHM8LukJNWT65kYKzjbtUQlBJyYBv8j1tjlHtXRYgpbD
-X-Google-Smtp-Source: AGHT+IH76b0+NNb6/NkbSwWOkVm7cWNBavLWnfUchKABErnQARC8/2YWL6aXIXncA8+i1sj6S+5VGw==
-X-Received: by 2002:a05:6000:3105:b0:3a3:64d3:4047 with SMTP id ffacd0b85a97d-3a364d3405emr13275697f8f.37.1747811119524;
-        Wed, 21 May 2025 00:05:19 -0700 (PDT)
-Received: from [172.27.21.230] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca889a7sm18892685f8f.72.2025.05.21.00.05.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 May 2025 00:05:19 -0700 (PDT)
-Message-ID: <80b40828-8fa3-4313-8c98-823ac7c055c1@gmail.com>
-Date: Wed, 21 May 2025 10:05:13 +0300
+	s=arc-20240116; t=1747811212; c=relaxed/simple;
+	bh=y+EqpJywUMH9nHGD6s9CiK+qnZyK9vnfU8hT14XBxxs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wl0gVdAiaN7jKnTZrqODk+FC8fh5FtysLRD0qbEyJmusjOK7RMG1EXc+QCKbLr+HhTb/WHLGMOlFXM04IdSXL9rfcopK7tPyFJ/MeCiIaW+K/0Hpw0i1zGHCGbQq3XqcTzALwkxvHV/lZoXuTvL/aJDg0dxeFQX9i6dcbJyHUXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=U3PA9w87; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54KNkISX015649;
+	Wed, 21 May 2025 00:06:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=P8/ITfuQzWsLicHCkKnjp1NaO
+	TkPX9FT0tQbKECukXg=; b=U3PA9w87VighZgQ2Eyu7VtItKdloDjeOA+dP4Don6
+	beAelgGYfgsCE4vIjjvZiXARxnUnUH0rol9FAFafPJJr/d6l741mAPgq7CqKzbdF
+	ABDqvoQMTDrpJ+X4eBalIDPeVhGrRnd01psBrsZP//Z/PrQAE8cFe9slbxtqm9+j
+	QuQ7CNtMfMz/yp98y1VSOFnTLJu5fBPizcbLzoZ6YtLDFb3owXWwv/ugrZQCouI5
+	jRq4G6MFwakzdfhOX3N6J7HjJJIt9skAVYiQ3GmtmPF4fM9+8t38xiRFKGL0QlRV
+	QJP+Qli3C2Q8k2mkdVnXFLSvS1nLcrm/3UIs2ZopJtuzw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46s3purnqt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 May 2025 00:06:39 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 21 May 2025 00:06:38 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 21 May 2025 00:06:38 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id B01243F70B3;
+	Wed, 21 May 2025 00:06:34 -0700 (PDT)
+Date: Wed, 21 May 2025 12:36:33 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        "Subbaraya
+ Sundeep" <sbhatta@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        "Andrew Lunn" <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [net-next] octeontx2-pf: QOS: Perform cache sync on send queue
+ teardown
+Message-ID: <aC17efTkxDQ5+h1P@test-OptiPlex-Tower-Plus-7010>
+References: <20250520092248.1102707-1-hkelam@marvell.com>
+ <20250520170615.GO365796@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V10 2/6] selftest: netdevsim: Add devlink rate
- tc-bw test
-To: Jakub Kicinski <kuba@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jiri Pirko <jiri@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, Donald Hunter
- <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Shuah Khan <shuah@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-References: <1747766287-950144-1-git-send-email-tariqt@nvidia.com>
- <1747766287-950144-3-git-send-email-tariqt@nvidia.com>
- <20250520155957.04b27217@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250520155957.04b27217@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250520170615.GO365796@horms.kernel.org>
+X-Authority-Analysis: v=2.4 cv=SMtCVPvH c=1 sm=1 tr=0 ts=682d7b7f cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=t23tOx8119NCeN4cTkAA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: PVwdN8hdBB8HBBQh2nnlqKgbtslK1qdU
+X-Proofpoint-GUID: PVwdN8hdBB8HBBQh2nnlqKgbtslK1qdU
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDA2OCBTYWx0ZWRfXyFLO16LhMdPj 4QvyK1wwECkcehZbXFitX5LN4mv9Ia6VcmdOFqNm3a0ZYp+CH2QB0FvQxL/Vx7A0CRk9h1n/UFa LYlTsOD8eJQMvShXSAD+WPT2HOrGao67azz0PIdS5KWLz7m+qGIvGzSzUdSIaXNN8yJPwuWYMmS
+ eJAawmc7xox8MwHBZ87KBzM8jBhbVvdApZifSiPB1OizzSaCYvYKIA1J/kaw4G0NWSp9QeDlvqJ /Haomni4zofly+vUlCYIXJlFyIMT+UO3XSK/OcbXuoXyAej4gjGH8uXbcDxdNd5+WRDproNnwk0 mmkdZgXKiBpZwzt6dKNTD83vJmxC+qhQNYpPKcesdo+rMiViENmYUvCgKrKbBlCPwVUqnwj6iL+
+ uPa1hkTVOzFI+V+PcMNdjyUcnuFfbbUYgufoFCokEV1xsZa0BNMmE4jjyLqaJ1mhYgQyFYk5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-21_01,2025-05-20_03,2025-03-28_01
 
-
-
-On 21/05/2025 1:59, Jakub Kicinski wrote:
-> On Tue, 20 May 2025 21:38:03 +0300 Tariq Toukan wrote:
->> Test verifies that netdevsim correctly implements devlink ops callbacks
->> that set tc-bw on leaf or node rate object.
+On 2025-05-20 at 22:36:15, Simon Horman (horms@kernel.org) wrote:
+> On Tue, May 20, 2025 at 02:52:48PM +0530, Hariprasad Kelam wrote:
+> > QOS is designed to create a new send queue whenever  a class
+> > is created, ensuring proper shaping and scheduling. However,
+> > when multiple send queues are created and deleted in a loop,
+> > SMMU errors are observed.
+> > 
+> > This patch addresses the issue by performing an data cache sync
+> > during the teardown of QOS send queues.
+> > 
+> > Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 > 
-> Please add a test that can actually validate a NIC HW.
-> The test probably needs to be in Python to use a remote endpoint,
-> and should live under tools/testing/../drivers/net/hw
+> Hi Hariprasad,
 > 
-> We had a long conversation about what we expect from the API
-> vs how your HW works. One of the test cases should confirm
-> the expected behavior, IOW fail on mlx5. Which is fine,
-> unlikely that any NIC will have 100% compliance. But at
-> least we will be documenting the expectations.
+> This feels like a fix and if so:
+> * Warrants a Fixes tag
+> * Should also be targeted at net rather than net-next if it fixes a problem
+>   present in net
 > 
-
-No problem with that, we'll add.
-
-We could've saved this extra cycle if my questions [1] exactly about 
-this topic weren't ignored.
-Area is vague and not well defined. We can continue with the iterative 
-guess and fix cycles, or alternatively get it clearly and formally defined.
-
-[1] 
-https://lore.kernel.org/all/98386cab-11c0-4f74-9925-8230af2e65c8@gmail.com/
-
+   Ack, will post to net 
 
