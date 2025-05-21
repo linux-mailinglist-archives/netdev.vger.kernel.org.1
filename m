@@ -1,135 +1,87 @@
-Return-Path: <netdev+bounces-192132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1AAABE9A0
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 04:15:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA33ABE9BC
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 04:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B9E116D26E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 02:14:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71322168884
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 02:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414B322CBE8;
-	Wed, 21 May 2025 02:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D6315855C;
+	Wed, 21 May 2025 02:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbDQvkCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC7822CBC0;
-	Wed, 21 May 2025 02:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9112563
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 02:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747793673; cv=none; b=mhVn2UOElEQrT6xdwBRMdVOOYybpWBZm+RdLWnjI67X9digoXrzsX6n+1wac5grf5aaRhn+7a83WU5xMcXWwK3AIdk5X2go47mcVYHLM2CF+bNynwxjikhJebAk+NFRamESpz//tbaBgsK42oCwJKqT1jjkaoDtouipvj0ia4Ys=
+	t=1747793875; cv=none; b=P0p5S0PoFBQLI/f8ko4lNZPO3lRGCjwvjqC+iILLnQEqACBF+E8al8Doauv2CRAOUXfvkDo3ZYjerccHAwz/fvjuspEH1eblFY6+5jrejw5ON7TLmFJbxhuRvNtX2MdaIO5cfh8P/KGfWv/Js1wpTo/nFnsl+IorARedRn+YTGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747793673; c=relaxed/simple;
-	bh=6zpccith/abrhU1H7DLUzXdUOdDU3udxwjvX3isTFRg=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=AOKtN750IOQzHPz7KEyjartAhH3ax70H7t5FddczRX46DHyNpq+UnLICFxLQIm86QCO2+jt8d1Va5kvqeqZSlkQuTe6SXwLA2c3zjKkQUr2L9tx6nNQ03K9pQykuAXaNPXDnOv7oHuGhE4LIaw/SfpUvF4NFGG6lCTCBQdy2oWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4b2FNd73Vrz51SYf;
-	Wed, 21 May 2025 10:14:25 +0800 (CST)
-Received: from njy2app02.zte.com.cn ([10.40.13.116])
-	by mse-fl1.zte.com.cn with SMTP id 54L2E7Kj094652;
-	Wed, 21 May 2025 10:14:07 +0800 (+08)
-	(envelope-from jiang.kun2@zte.com.cn)
-Received: from mapi (njy2app01[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Wed, 21 May 2025 10:14:08 +0800 (CST)
-Date: Wed, 21 May 2025 10:14:08 +0800 (CST)
-X-Zmail-TransId: 2af9682d36f0076-b1c22
-X-Mailer: Zmail v1.0
-Message-ID: <20250521101408902uq7XQTEF6fr3v5HKWT2GO@zte.com.cn>
+	s=arc-20240116; t=1747793875; c=relaxed/simple;
+	bh=kYzxROcOBWbQGw21AvIeumYT/gGIziEG5zPtZMd6FXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bF65qLra0FERGszzCCo+Yreuoua4TN+saY3YB2FyVaURFRu6rItGLG1hx/V8cdrF8Bea4z0fWoWaeeNxh0Xy1tK+vLcPuf4zJYwUmGXUoGWUf7VRZKKqcQzwsqTixPBHwip+PIf18PXmCFkcSXp5C+swMCwHRcE90lyO8kNqAWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbDQvkCz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C81C4CEE9;
+	Wed, 21 May 2025 02:17:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747793874;
+	bh=kYzxROcOBWbQGw21AvIeumYT/gGIziEG5zPtZMd6FXQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QbDQvkCzXMt2DUrbojBmyT0my7N1NqxHfS1hrr/Kn969t6cxtHfUux8gYv9jHt0CC
+	 k6aUhDO0TstKAyflxz1QWrJ00oxP79q3uG16eXvUgMf4UNM6zdsAcksYtrnHfZrWr2
+	 6nqiqCUlUVoIIEM2FhQWMGJEll4BKETH0oAIN73VEEB4r03rSwfOrFXmF9+uUja9ce
+	 qNQtbLyY4hT6q9mpLIKbwepEMF13TSaYggSr6lubHbfzgSyX61lbHb+bDkELxS3e3y
+	 1fRjg46LMsJIH4xsIfoqW4l0UZaTPYT74UXZ6vg8VUxC0TTxcNvJIJ47veqvrQJIVc
+	 yU/u1ywysJQvw==
+Date: Tue, 20 May 2025 19:17:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com, David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS
+ contexts on queue reset
+Message-ID: <20250520191753.4e66bb08@kernel.org>
+In-Reply-To: <CACKFLimbOCecjpL2oOvj99SN8Ahct84r2grLkPG1491eTRMoxg@mail.gmail.com>
+References: <20250519204130.3097027-1-michael.chan@broadcom.com>
+	<20250519204130.3097027-4-michael.chan@broadcom.com>
+	<20250520182838.3f083f34@kernel.org>
+	<CACKFLikOwZmaucM4y2jMgKZ-s0vRyHBde+wuQRt33ScvfohyDA@mail.gmail.com>
+	<20250520185144.25f5cb47@kernel.org>
+	<CACKFLimbOCecjpL2oOvj99SN8Ahct84r2grLkPG1491eTRMoxg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.kun2@zte.com.cn>
-To: <horms@kernel.org>, <kuniyu@amazon.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <fan.yu9@zte.com.cn>,
-        <gnaaman@drivenets.com>, <he.peilin@zte.com.cn>, <kuba@kernel.org>,
-        <leitao@debian.org>, <linux-kernel@vger.kernel.org>,
-        <lizetao1@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <qiu.yutan@zte.com.cn>, <tu.qiang35@zte.com.cn>,
-        <wang.yaxin@zte.com.cn>, <xu.xin16@zte.com.cn>,
-        <yang.yang29@zte.com.cn>, <ye.xingchen@zte.com.cn>,
-        <zhang.yunkai@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4IG5leHQgdjJdIG5ldDogbmVpZ2g6IHVzZSBrZnJlZV9za2JfcmVhc29uKCkgaW4gbmVpZ2hfcmVzb2x2ZV9vdXRwdXQoKSBhbmQgbmVpZ2hfY29ubmVjdGVkX291dHB1dCgp?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 54L2E7Kj094652
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 682D3701.004/4b2FNd73Vrz51SYf
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Qiu Yutan <qiu.yutan@zte.com.cn>
+On Tue, 20 May 2025 19:10:37 -0700 Michael Chan wrote:
+> > Shutting down traffic to ZC queues is one thing, but now you
+> > seem to be walking all RSS contexts and shutting them all down.
+> > The whole point of the queue API is to avoid shutting down
+> > the entire device.  
+> 
+> The existing code has been setting the MRU to 0 for the default RSS
+> context's VNIC. 
 
-Replace kfree_skb() used in neigh_resolve_output() and
-neigh_connected_output() with kfree_skb_reason().
+:/ I must have misunderstood. I wouldn't have merged this if I knew.
+You can't be shutting down system queues because some application
+decided to bind a ZC queue.
 
-Following new skb drop reason is added:
-/* failed to fill the device hard header */
-SKB_DROP_REASON_NEIGH_HH_FILLFAIL
+> They found that this sequence was reliable.
 
-Signed-off-by: Qiu Yutan <qiu.yutan@zte.com.cn>
-Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
----
-v1->v2
-https://lore.kernel.org/all/20250520180552.GP365796@horms.kernel.org/
-1. use kfree_skb_reason() in neigh_connected_output()
-
- include/net/dropreason-core.h | 3 +++
- net/core/neighbour.c          | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index bea77934a235..bcf9d7467e1a 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -62,6 +62,7 @@
- 	FN(NEIGH_FAILED)		\
- 	FN(NEIGH_QUEUEFULL)		\
- 	FN(NEIGH_DEAD)			\
-+	FN(NEIGH_HH_FILLFAIL)		\
- 	FN(TC_EGRESS)			\
- 	FN(SECURITY_HOOK)		\
- 	FN(QDISC_DROP)			\
-@@ -348,6 +349,8 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_NEIGH_QUEUEFULL,
- 	/** @SKB_DROP_REASON_NEIGH_DEAD: neigh entry is dead */
- 	SKB_DROP_REASON_NEIGH_DEAD,
-+	/** @SKB_DROP_REASON_NEIGH_HH_FILLFAIL: failed to fill the device hard header */
-+	SKB_DROP_REASON_NEIGH_HH_FILLFAIL,
- 	/** @SKB_DROP_REASON_TC_EGRESS: dropped in TC egress HOOK */
- 	SKB_DROP_REASON_TC_EGRESS,
- 	/** @SKB_DROP_REASON_SECURITY_HOOK: dropped due to security HOOK */
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 254067b719da..a6e2c91ec3e7 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -1517,7 +1517,7 @@ int neigh_resolve_output(struct neighbour *neigh, struct sk_buff *skb)
- 	return rc;
- out_kfree_skb:
- 	rc = -EINVAL;
--	kfree_skb(skb);
-+	kfree_skb_reason(skb, SKB_DROP_REASON_NEIGH_HH_FILLFAIL);
- 	goto out;
- }
- EXPORT_SYMBOL(neigh_resolve_output);
-@@ -1541,7 +1541,7 @@ int neigh_connected_output(struct neighbour *neigh, struct sk_buff *skb)
- 		err = dev_queue_xmit(skb);
- 	else {
- 		err = -EINVAL;
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, SKB_DROP_REASON_NEIGH_HH_FILLFAIL);
- 	}
- 	return err;
- }
--- 
-2.25.1
+"reliable" is a bit of a big word that some people would reserve
+for code which is production tested or at the very least very
+heavily validated.
 
