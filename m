@@ -1,203 +1,203 @@
-Return-Path: <netdev+bounces-192319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73C38ABF803
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:41:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AACBCABF828
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC9A47AC1D1
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:40:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8DE01B65477
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB36A1DACB1;
-	Wed, 21 May 2025 14:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35891D63DF;
+	Wed, 21 May 2025 14:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEd/FJqj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UJsOElDh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150B214A627
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FC81537C6;
+	Wed, 21 May 2025 14:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747838505; cv=none; b=t4iwWp4KpmGaqfn4KBRiVsITkmuEpWnAifZxQPvixY9Ht4zaXeC7j7vfmVdZERAk3m5XwgiMznW6wMY33VMqCFrHUMJEl69b2HPRMPm6tnCJLwInLqZlYteZua+Eeaj2wataIBHwXeIwqbhKxvlZd3iEQxRlNchDWXcRdhy2n+w=
+	t=1747838966; cv=none; b=I38Whf2Vw7zHmWi1hr684V5pz58+vLHuOMl2ziWOVOvw4SGTnWPQnWF7kZ6NU4xemh/bcUTSztLjJXpQ3a/QSqJy8ds8QXZqYxhQvIA9XCvo9IuXCxSyzpgvtlMPotsHFHJmE6zocMlwm75e8gkrgYMySfmGZ3G9Gk2LrQYm+ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747838505; c=relaxed/simple;
-	bh=fJrz4e1Ti/Jt27bWzNcWF73I0K+Q9z0Ka+LDgDGAiMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A6onmz/fosdBU/v2e+XnW68JuP0XJx+W5iefD4HdtQAeCpINjM8rmqV81XDSwJ91lvTUmKcRUo6lADuzkxOUUBQLcTWRXFqsx21bLYzLF5I8y2hLZrZHz0rzkdRLi0DZcvBfwxRpH+GSzGktLq18tIRszSYAhx7/ChVV/yWfunQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cEd/FJqj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747838503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
-	b=cEd/FJqjuEwN+FiBB+vAgcFNTKcrRa7ndIC45HqR0iO+wN0X2OJcC2U4HgAdIOsTSBgTF1
-	jWIsZytTPHvrJJ0Q+v8b1MmoDwndSkAmWY07tJJpssOfKltofYXEwvAJ6/1lN65X2a/rom
-	TnypONEuRrap9YkOyNGHDc4exmq1jdA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-OeGvqQFCN82wrSjPQWM5fg-1; Wed, 21 May 2025 10:41:41 -0400
-X-MC-Unique: OeGvqQFCN82wrSjPQWM5fg-1
-X-Mimecast-MFC-AGG-ID: OeGvqQFCN82wrSjPQWM5fg_1747838501
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-60211a1705dso2022563a12.2
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 07:41:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747838500; x=1748443300;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
-        b=CIOSbSLmimNHgOgM9t+yR/kwaQ+Mp5Y12j/wvlohEFGXNreXheRSGfaQFANHhNgYqb
-         IltgHNaGLoZt71MOqKeKJwGMBjBiTrtF17qPpdcfoW5ODhHK1C8QAH2F3zs81/yFJ+1y
-         nKWeMZGnC8VUUvBl7yZshdhfigR8YyvUYdelaI+D7GtDwbWbt2yWYFzwdcZNPkI4lS90
-         EZqovqBW7vTtxKGeUI/bsZ1WIr/7IBmlF61L9Wo8benz+32GM4ygBIKkFIr/HgmQjT+q
-         o19f8+sOgV9/4zhF5F7qFVPdVJ41YqkV+QuBraMgR3o8GkpS3IN21sZpwkmrU81gPt5i
-         mKFw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7BqrglM7+phEBDzPRndCJauWA+pI8wSnqi4lmwVci6O2Xv1SUg5QaTI9q0fZSGFD1c3ZUzck=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yws3dC5bPdFKzFSxjQZ/8QUPD7MCbJeu453ANnJYiXTg/bhLJ/K
-	TBMkcaMErYRulN3AeIRumSxTrgVjcFL5Yn2y/4Uw67CrhmRcFT5nPcN41V3Ydt9C+JTM1tCsdWe
-	VEEfFvBuRiZLhyme6OD/tZ5MlFS6+/VV2esx9FH4Wfcq4YhGr9Gopbc9CBQ==
-X-Gm-Gg: ASbGncsw+tKKnwyUgtHXXfgi+dljM+GTdco3eaRAxUp+11hd4oDhOuHcwhPCeBJpYnP
-	S/Dsdr6lF3NixDdhdsk82NloWZ7C3Sw/vM4VUzjGnfVyhclrBeVd1kiM082p017jYEFOFqFgjcz
-	4lfgI1hQHJiDvgd86EwDQWEP95TpTpCQ258RehhvR2cHBM9Ht6C4E6C833FHOmecvTv5bPZqxTa
-	ZZc9kGZ77GI9f88H3A179RyfTsecUU05AcBK0hwkDnlrX5eKhZCrXdOOdnOMC0ap/X8t7MDDC6a
-	5uwdkW7OmxU7argEWlBvaJvQuywVp/qYxiBb/cOEsFaZCE/e8GpZhcmlOIzh
-X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768467066b.5.1747838500580;
-        Wed, 21 May 2025 07:41:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE66RxXKL2W6d/q5voawNHWMt+eYxa0BkwW3PNFANgomMqz2eIeLzBYh2MlVa3aFRZzUSRf1g==
-X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768463566b.5.1747838499992;
-        Wed, 21 May 2025 07:41:39 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d06dfa4sm914996266b.57.2025.05.21.07.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 07:41:39 -0700 (PDT)
-Date: Wed, 21 May 2025 16:41:34 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 4/5] vsock/test: Introduce enable_so_linger()
- helper
-Message-ID: <3uci6mlihjdst7iksimvsabnjggwpgskbhxz2262pmwdnrq3lx@v2dz7lsvpxew>
-References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
- <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
+	s=arc-20240116; t=1747838966; c=relaxed/simple;
+	bh=Ikd7c90aq2jxYEaiZ15DovdKivS9lNNSecfO21RFtbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jk6jDFOQVGGTAz4xrVJfsnJbUJV7UU62DPHSzXcHHEnzNDVktCWXfvLL3G5rJZp7whxm+IdFKVNNeG/+gKfS0WdKeGT9bFD5zgcewrLO7OVRkCkucM/AnRtzEOZrTbEQyp+2OxxDshxZvymbexgL7N2iMYoDUPqxJMbZ6KUO8Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UJsOElDh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94617C4CEE4;
+	Wed, 21 May 2025 14:49:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747838966;
+	bh=Ikd7c90aq2jxYEaiZ15DovdKivS9lNNSecfO21RFtbE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UJsOElDhFoFiAmm7sWz27VVd8viwyB1H/fnSSPvRNTxZC3r4jUFrQevIZdjbJfOkI
+	 JIfvs95PyVyI6/QeHmji4PmXRktqlMKVRjh0AcEQwxe9nSq+V3m9eqn6s65Qmvq1vj
+	 3s14fISOWdsFC1m2gDbHGdMKrbkuV0Sx73atF1aaMr8rAeL3MihoRF/ex9AsQlhl7/
+	 s+ovqQ9fO8WKuDVrxL0Ep3EniBeKLUv3VY/aNpxsJzbCXnvIBcNndgkvqxTwAJO31T
+	 YJoivbrwzIAlrhX7jaolbKCiOF5Dm92uHxcrx250EvwDdVs52E2XnufoEqocvdBoH0
+	 ahe/C0YVrEXZQ==
+From: Lee Jones <lee@kernel.org>
+To: lee@kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Rao Shoaib <Rao.Shoaib@oracle.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Lee Jones <joneslee@google.com>
+Subject: [PATCH v6.6 00/26] af_unix: Align with upstream to avoid a potential UAF
+Date: Wed, 21 May 2025 14:45:08 +0000
+Message-ID: <20250521144803.2050504-1-lee@kernel.org>
+X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 21, 2025 at 12:55:22AM +0200, Michal Luczaj wrote:
->Add a helper function that sets SO_LINGER. Adapt the caller.
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/util.c       | 13 +++++++++++++
-> tools/testing/vsock/util.h       |  4 ++++
-> tools/testing/vsock/vsock_test.c | 10 +---------
-> 3 files changed, 18 insertions(+), 9 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 120277be14ab2f58e0350adcdd56fc18861399c9..41b47f7deadcda68fddc2b22a6d9bb7847cc0a14 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -823,3 +823,16 @@ void enable_so_zerocopy_check(int fd)
-> 	setsockopt_int_check(fd, SOL_SOCKET, SO_ZEROCOPY, 1,
-> 			     "setsockopt SO_ZEROCOPY");
-> }
->+
->+void enable_so_linger(int fd)
->+{
->+	struct linger optval = {
->+		.l_onoff = 1,
->+		.l_linger = LINGER_TIMEOUT
->+	};
->+
->+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
->+		perror("setsockopt(SO_LINGER)");
->+		exit(EXIT_FAILURE);
->+	}
->+}
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e307f0d4f6940e984b84a95fd0d57598e7c4e35f..1b3d8eb2c4b3c41c9007584177455c4fa442334c 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -14,6 +14,9 @@ enum test_mode {
->
-> #define DEFAULT_PEER_PORT	1234
->
->+/* Half of the default to not risk timing out the control channel */
->+#define LINGER_TIMEOUT		(TIMEOUT / 2)
->+
-> /* Test runner options */
-> struct test_opts {
-> 	enum test_mode mode;
->@@ -80,4 +83,5 @@ void setsockopt_int_check(int fd, int level, int optname, int val,
-> void setsockopt_timeval_check(int fd, int level, int optname,
-> 			      struct timeval val, char const *errmsg);
-> void enable_so_zerocopy_check(int fd);
->+void enable_so_linger(int fd);
-> #endif /* UTIL_H */
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 4c2c94151070d54d1ed6e6af5a6de0b262a0206e..f401c6a79495bc7fda97012e5bfeabec7dbfb60a 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1813,10 +1813,6 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
->
-> static void test_stream_linger_client(const struct test_opts *opts)
-> {
->-	struct linger optval = {
->-		.l_onoff = 1,
->-		.l_linger = 1
+From: Lee Jones <joneslee@google.com>
 
-So, we are changing the timeout from 1 to 5, right?
-Should we mention in the commit description?
+This is the second attempt at achieving the same goal.  This time, the
+submission avoids forking the current code base, ensuring it remains
+easier to maintain over time.
 
->-	};
-> 	int fd;
->
-> 	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->@@ -1825,11 +1821,7 @@ static void test_stream_linger_client(const struct test_opts *opts)
-> 		exit(EXIT_FAILURE);
-> 	}
->
->-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
->-		perror("setsockopt(SO_LINGER)");
->-		exit(EXIT_FAILURE);
->-	}
->-
->+	enable_so_linger(fd);
+The set has been tested using the SCM_RIGHTS test suite [1] using QEMU
+and has been seen to successfully mitigate a UAF on on a top tier
+handset.
 
-If you need to resend, I'd pass the timeout as parameter, so the test
-can use whatever they want.
+RESULTS:
 
-The rest LGTM.
+  TAP version 13
+  1..20
+  # Starting 20 tests from 5 test cases.
+  #  RUN           scm_rights.dgram.self_ref ...
+  #            OK  scm_rights.dgram.self_ref
+  ok 1 scm_rights.dgram.self_ref
+  #  RUN           scm_rights.dgram.triangle ...
+  #            OK  scm_rights.dgram.triangle
+  ok 2 scm_rights.dgram.triangle
+  #  RUN           scm_rights.dgram.cross_edge ...
+  #            OK  scm_rights.dgram.cross_edge
+  ok 3 scm_rights.dgram.cross_edge
+  #  RUN           scm_rights.dgram.backtrack_from_scc ...
+  #            OK  scm_rights.dgram.backtrack_from_scc
+  ok 4 scm_rights.dgram.backtrack_from_scc
+  #  RUN           scm_rights.stream.self_ref ...
+  #            OK  scm_rights.stream.self_ref
+  ok 5 scm_rights.stream.self_ref
+  #  RUN           scm_rights.stream.triangle ...
+  #            OK  scm_rights.stream.triangle
+  ok 6 scm_rights.stream.triangle
+  #  RUN           scm_rights.stream.cross_edge ...
+  #            OK  scm_rights.stream.cross_edge
+  ok 7 scm_rights.stream.cross_edge
+  #  RUN           scm_rights.stream.backtrack_from_scc ...
+  #            OK  scm_rights.stream.backtrack_from_scc
+  ok 8 scm_rights.stream.backtrack_from_scc
+  #  RUN           scm_rights.stream_oob.self_ref ...
+  #            OK  scm_rights.stream_oob.self_ref
+  ok 9 scm_rights.stream_oob.self_ref
+  #  RUN           scm_rights.stream_oob.triangle ...
+  #            OK  scm_rights.stream_oob.triangle
+  ok 10 scm_rights.stream_oob.triangle
+  #  RUN           scm_rights.stream_oob.cross_edge ...
+  #            OK  scm_rights.stream_oob.cross_edge
+  ok 11 scm_rights.stream_oob.cross_edge
+  #  RUN           scm_rights.stream_oob.backtrack_from_scc ...
+  #            OK  scm_rights.stream_oob.backtrack_from_scc
+  ok 12 scm_rights.stream_oob.backtrack_from_scc
+  #  RUN           scm_rights.stream_listener.self_ref ...
+  #            OK  scm_rights.stream_listener.self_ref
+  ok 13 scm_rights.stream_listener.self_ref
+  #  RUN           scm_rights.stream_listener.triangle ...
+  #            OK  scm_rights.stream_listener.triangle
+  ok 14 scm_rights.stream_listener.triangle
+  #  RUN           scm_rights.stream_listener.cross_edge ...
+  #            OK  scm_rights.stream_listener.cross_edge
+  ok 15 scm_rights.stream_listener.cross_edge
+  #  RUN           scm_rights.stream_listener.backtrack_from_scc ...
+  #            OK  scm_rights.stream_listener.backtrack_from_scc
+  ok 16 scm_rights.stream_listener.backtrack_from_scc
+  #  RUN           scm_rights.stream_listener_oob.self_ref ...
+  #            OK  scm_rights.stream_listener_oob.self_ref
+  ok 17 scm_rights.stream_listener_oob.self_ref
+  #  RUN           scm_rights.stream_listener_oob.triangle ...
+  #            OK  scm_rights.stream_listener_oob.triangle
+  ok 18 scm_rights.stream_listener_oob.triangle
+  #  RUN           scm_rights.stream_listener_oob.cross_edge ...
+  #            OK  scm_rights.stream_listener_oob.cross_edge
+  ok 19 scm_rights.stream_listener_oob.cross_edge
+  #  RUN           scm_rights.stream_listener_oob.backtrack_from_scc ...
+  #            OK  scm_rights.stream_listener_oob.backtrack_from_scc
+  ok 20 scm_rights.stream_listener_oob.backtrack_from_scc
+  # PASSED: 20 / 20 tests passed.
+  # Totals: pass:20 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Thanks,
-Stefano
+[0] https://lore.kernel.org/all/20250304030149.82265-1-kuniyu@amazon.com/
+[1] https://lore.kernel.org/all/20240325202425.60930-16-kuniyu@amazon.com/
 
-> 	close(fd);
-> }
->
->
->-- 
->2.49.0
->
+Kuniyuki Iwashima (24):
+  af_unix: Return struct unix_sock from unix_get_socket().
+  af_unix: Run GC on only one CPU.
+  af_unix: Try to run GC async.
+  af_unix: Replace BUG_ON() with WARN_ON_ONCE().
+  af_unix: Remove io_uring code for GC.
+  af_unix: Remove CONFIG_UNIX_SCM.
+  af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
+  af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+  af_unix: Link struct unix_edge when queuing skb.
+  af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+  af_unix: Iterate all vertices by DFS.
+  af_unix: Detect Strongly Connected Components.
+  af_unix: Save listener for embryo socket.
+  af_unix: Fix up unix_edge.successor for embryo socket.
+  af_unix: Save O(n) setup of Tarjan's algo.
+  af_unix: Skip GC if no cycle exists.
+  af_unix: Avoid Tarjan's algorithm if unnecessary.
+  af_unix: Assign a unique index to SCC.
+  af_unix: Detect dead SCC.
+  af_unix: Replace garbage collection algorithm.
+  af_unix: Remove lock dance in unix_peek_fds().
+  af_unix: Try not to hold unix_gc_lock during accept().
+  af_unix: Don't access successor in unix_del_edges() during GC.
+  af_unix: Add dead flag to struct scm_fp_list.
+
+Michal Luczaj (1):
+  af_unix: Fix garbage collection of embryos carrying OOB with
+    SCM_RIGHTS
+
+Shigeru Yoshida (1):
+  af_unix: Fix uninit-value in __unix_walk_scc()
+
+ include/net/af_unix.h |  49 ++-
+ include/net/scm.h     |  11 +
+ net/Makefile          |   2 +-
+ net/core/scm.c        |  17 ++
+ net/unix/Kconfig      |   5 -
+ net/unix/Makefile     |   2 -
+ net/unix/af_unix.c    | 120 +++++---
+ net/unix/garbage.c    | 691 +++++++++++++++++++++++++++++-------------
+ net/unix/scm.c        | 161 ----------
+ net/unix/scm.h        |  10 -
+ 10 files changed, 617 insertions(+), 451 deletions(-)
+ delete mode 100644 net/unix/scm.c
+ delete mode 100644 net/unix/scm.h
+
+
+-- 
+2.49.0.1112.g889b7c5bd8-goog
 
 
