@@ -1,146 +1,155 @@
-Return-Path: <netdev+bounces-192242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B01ABF1A2
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 12:31:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA71ABF1B0
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 12:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69C567ACEB2
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:29:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08A428E29E2
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D1A239E79;
-	Wed, 21 May 2025 10:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E892405F5;
+	Wed, 21 May 2025 10:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IEdOypyD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5r8pXKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CE523498F
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 10:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EF9238C3A
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 10:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747823465; cv=none; b=rc2XYlW9zi+0eKFbBWkIpchOT4QktQT42IDcF0EDPvCH6g4N2kemMrr/pEByB5XPg5oE2+VoGDQbpVX7Wz4j0dyceDvulxmPdOLOSbrl+1I6AZ1VtjdNBVt5SZHRZnHkZvYSjCCkN/JTWYrRETw2yHe2e3yYT+S/XfQ5BGKTuh8=
+	t=1747823624; cv=none; b=sa8fr4e9vEJCghArtiU4/4ijnoMacvBdGisL3lDfvyAPpy4Dx+EdCt8eXZJyyTSo4HR2qBR553U2lDX3K6WDXrHBsM9VB1PQqxFGXx0TPL6tsH4e9oGK0yhto2qwnNauiC2nnbEt2ZUmSfVNHP/dDKpwiu31lYctCj1RMJN+Gd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747823465; c=relaxed/simple;
-	bh=LIrc7qPrLYHg2N8+aqhFKhZyeFP+FFndG9FoEykJLso=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hwqCp6ivWIYI+eUSxu91dDVC+zzP9MJONx05jW0IKC5iNR+g+xdzH/iF8yBQ5nlKGDcUBAqF+3iDccMJ5oEaAS2tr42SpxHooIwyIokzN5rBdu+WA1Q8aGtpf0IjxBqwfvARFc2d1ATaQQkIuDOV9irgI8gstuC0xxLgwABGS5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IEdOypyD; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54L9qgDD013465;
-	Wed, 21 May 2025 03:30:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=r10T2jBRvKwqz/WSaBj6vD4rRrk2OonJTL92GfT4UNU=; b=IEd
-	OypyD3m0ZsZBcXGCUjcBHDy6OKbHlwjj1AW3oQYpYZuFP9upOPzNt1fQ5/5b3JkV
-	ZLb57fKeifbOrIw54QWqpUPsRL1JoWfn10DlpBdd0OXtQQAnMCPR9Tu/d81nfL+Z
-	jvFNMu9oS2sIWRWjSfwL37GcTExbzoA6sYu/ZD9PSVoySCNyMe+eDMXi3wIpo8fr
-	nofUWtuL4p93biI+03Tx2jh25EKNkWpjtOpn45rzodj3KtN1j39irqqZzdiEeEju
-	L/cCrNQHJfEM6XPXAfjRrlDoeuz0VRypd8iFcFTvoQQSjlAJuU1TEtnP3SonF6or
-	rwOf6joiVAZ/wQ7rMpA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46s3pus0dc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 May 2025 03:30:51 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 21 May 2025 03:30:50 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 21 May 2025 03:30:50 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 924443F70B4;
-	Wed, 21 May 2025 03:30:45 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <michal.swiatkowski@linux.intel.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <bbhushan2@marvell.com>, <jerinj@marvell.com>
-CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net PATCH v3] octeontx2-af: Send Link events one by one
-Date: Wed, 21 May 2025 16:00:43 +0530
-Message-ID: <1747823443-404-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1747823624; c=relaxed/simple;
+	bh=2wPxTTukf4tNIuHclPXTgThRMuE/6aouOzoMcxgLgqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNjOWRfGgspirq1LReu5vsjkHWKch055UVXu1xnz/fm5brXcXr8mgHKvtL/8QN02HFgqFFTBtiXmmnGI9RFyDT+TXM5k/yjpNWjvKoAxP7d3mztfIAr434mqWp72orcOFYdE54oYKMUdfwVVWYApJxx9TydbZovj0FfAq58aXJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z5r8pXKB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747823621;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sfmRmqkxLtoiNMN/JzU9t/DyfeG/mq3+WLIZP+DLS+o=;
+	b=Z5r8pXKBX70onYUU7nZ16q9DebGpLCmmgiSu8Q6qaSMn/+5thFYHx6xDUoL68D0r+kSG3a
+	tYEGbGj9TwIL5HKCCrKOBG4GtS0S2xd8JqHtjbR5Hu8LC4OOJ5wYI/KJ1CmVB1v9POEUse
+	gLw9479vCc458bCtk9ZWQCTGVuYxKNo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-CEtLaI0EMWilwc7FQfQyBw-1; Wed,
+ 21 May 2025 06:33:38 -0400
+X-MC-Unique: CEtLaI0EMWilwc7FQfQyBw-1
+X-Mimecast-MFC-AGG-ID: CEtLaI0EMWilwc7FQfQyBw_1747823617
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F8EF1956086;
+	Wed, 21 May 2025 10:33:36 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.39])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AF02C195608F;
+	Wed, 21 May 2025 10:33:32 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Subject: [PATCH net-next 0/8] virtio: introduce GSO over UDP tunnel
+Date: Wed, 21 May 2025 12:32:34 +0200
+Message-ID: <cover.1747822866.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=SMtCVPvH c=1 sm=1 tr=0 ts=682dab5b cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=ba-9XGMmvJ23VOHwC14A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: qxhVd4ED9fNFFTlUlAYwaTjhRqhjQxXR
-X-Proofpoint-GUID: qxhVd4ED9fNFFTlUlAYwaTjhRqhjQxXR
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDEwNCBTYWx0ZWRfX2Rq2imX9ye66 58tYub+uHIh3FNF728DGLCxXq1rdSUy0SNY77GPb4Qcwg9nnu1VrbCCqKz7stHRxl7CKh53QJlE Ugsc3uADKzFjnJ605q4rSW8zpmcYF6QwnN26zf7msTGtTicGxYkYX7ktahOswRIG2UG28k3t97P
- r4ZJtDnfrXkPuBMdBbtTKMObAVWQ+tagO2MIpQPxs681sxdMQrmvvTt9CXmXFPH/DLEr2MalLaA V0tMrd7XWUI8m93wsqB3IojjwsdVhJb1BGJ3vArlpC1BWfGjdQllcbzDFk7BLeS6t2adJ1hWcYF lfiHsMTO2WbQQA3uAdjbbCH/FQ58QqXn6FP7uY2J5WDijlMtcbj2q0MTKEFcH+4x3M9i+N/dalv
- Yf75fGPExIzWn0DLo9nnEf5koBRwMV/a0rt8JFnl7WVWxyLpm+Eib4OqZUQ59LhzWcCGtCxt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-21_03,2025-05-20_03,2025-03-28_01
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Send link events one after another otherwise new message
-is overwriting the message which is being processed by PF.
+Some virtualized deployments use UDP tunnel pervasively and are impacted
+negatively by the lack of GSO support for such kind of traffic in the
+virtual NIC driver.
 
-Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
-v3:
- Modifid to wait for response at other places mcs_notify_pfvf
- and rvu_rep_up_notify as suggested by Simon Hormon and Michal Swiatkowski.
-v2:
- No changes. Added subject prefix net.
+The virtio_net specification recently introduced support for GSO over
+UDP tunnel, this series updates the virtio implementation to support
+such a feature.
 
- drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c | 2 ++
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c    | 2 ++
- drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c    | 2 ++
- 3 files changed, 6 insertions(+)
+Currently the kernel virtio support limits the feature space to 64,
+while the virtio specification allows for a larger number of features.
+Specifically the GSO-over-UDP-tunnel-related virtio features use bits
+65-69.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-index 655dd47..0277d22 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-@@ -143,6 +143,8 @@ static int mcs_notify_pfvf(struct mcs_intr_event *event, struct rvu *rvu)
- 
- 	otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pf);
- 
-+	otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pf);
-+
- 	mutex_unlock(&rvu->mbox_lock);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 992fa0b..ebb56eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
- 
- 		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
- 
-+		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
-+
- 		mutex_unlock(&rvu->mbox_lock);
- 	} while (pfmap);
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-index 052ae59..32953cc 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-@@ -60,6 +60,8 @@ static int rvu_rep_up_notify(struct rvu *rvu, struct rep_event *event)
- 
- 	otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pf);
- 
-+	otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pf);
-+
- 	mutex_unlock(&rvu->mbox_lock);
- 	return 0;
- }
+The first four patches in this series rework the virtio and vhost
+feature support to cope with up to 128 bits. The limit is arch-dependent:
+only arches with native 128 integer support allow for the wider feature
+space.
+
+This implementation choice is aimed at keeping the code churn as
+limited as possible. For the same reason, only the virtio_net driver is
+reworked to leverage the extended feature space; all other
+virtio/vhost drivers are unaffected, but could be upgraded to support
+the extended features space in a later time.
+
+The last four patches bring in the actual GSO over UDP tunnel support.
+As per specification, some additional fields are introduced into the
+virtio net header to support the new offload. The presence of such
+fields depends on the negotiated features.
+
+A new pair of helpers is introduced to convert the UDP-tunneled skb
+metadata to an extended virtio net header and vice versa. Such helpers
+are used by the tun and virtio_net driver to cope with the newly
+supported offloads.
+
+Tested with basic stream transfer with all the possible permutations of
+host kernel/qemu/guest kernel with/without GSO over UDP tunnel support.
+Sharing somewhat early to collect feedback, especially on the userland
+code.
+
+Paolo Abeni (8):
+  virtio: introduce virtio_features_t
+  virtio_pci_modern: allow setting configuring extended features
+  vhost-net: allow configuring extended features
+  virtio_net: add supports for extended offloads
+  net: implement virtio helpers to handle UDP GSO tunneling.
+  virtio_net: enable gso over UDP tunnel support.
+  tun: enable gso over UDP tunnel support.
+  vhost/net: enable gso over UDP tunnel support.
+
+ drivers/net/tun.c                      |  77 +++++++++--
+ drivers/net/tun_vnet.h                 |  74 +++++++++--
+ drivers/net/virtio_net.c               |  99 ++++++++++++--
+ drivers/vhost/net.c                    |  32 ++++-
+ drivers/vhost/vhost.h                  |   2 +-
+ drivers/virtio/virtio.c                |  12 +-
+ drivers/virtio/virtio_mmio.c           |   4 +-
+ drivers/virtio/virtio_pci_legacy.c     |   2 +-
+ drivers/virtio/virtio_pci_modern.c     |   7 +-
+ drivers/virtio/virtio_pci_modern_dev.c |  44 +++---
+ drivers/virtio/virtio_vdpa.c           |   2 +-
+ include/linux/virtio.h                 |   5 +-
+ include/linux/virtio_config.h          |  22 +--
+ include/linux/virtio_features.h        |  23 ++++
+ include/linux/virtio_net.h             | 177 +++++++++++++++++++++++--
+ include/linux/virtio_pci_modern.h      |  11 +-
+ include/uapi/linux/if_tun.h            |   9 ++
+ include/uapi/linux/vhost.h             |   8 ++
+ include/uapi/linux/virtio_net.h        |  33 +++++
+ 19 files changed, 551 insertions(+), 92 deletions(-)
+ create mode 100644 include/linux/virtio_features.h
+
 -- 
-2.7.4
+2.49.0
 
 
