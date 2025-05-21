@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-192110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95DBABE8F9
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 03:21:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5C8ABE8FB
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 03:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60F471B68755
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8DAD3B4093
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF91194124;
-	Wed, 21 May 2025 01:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E8619994F;
+	Wed, 21 May 2025 01:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XsZubK87"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mB/bQrbg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4760192B90;
-	Wed, 21 May 2025 01:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1611991B8;
+	Wed, 21 May 2025 01:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747790422; cv=none; b=evjYkEJo0gKHXX01okSAYTzT9LP1mg0sl7yORznvPOr4cughwSESJY87HZwSU572pLZsJMU9dBaPpzUZ0zJ7UoyvE/ydrqB+zudNuG3ZvzS9qQmXLMtXCnky5uifp6rZe4OqKaNH+bXM7lIDv4bPkhUfkSrONocIRzQb0WpTy6A=
+	t=1747790423; cv=none; b=Os8MK4V5vQJr7SKHtQYiMr5SaiAvSEOEjp/ZpApr68CbLEzLZrBomiAGbmODY2tduv+2OyWfcU+S8ZmFmITuFjBnDhx7y4vWJ2JQUtGsfEzs7uKW6l/L2liTOSVqvC/BIkWYnOounfkJfWujMOD3BzMVbRzhpR8UgQsCHGmond4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747790422; c=relaxed/simple;
-	bh=dMgkJgqMz3ctMMmSbSC4dm+FOOp5kC87tNKqiMADZQs=;
+	s=arc-20240116; t=1747790423; c=relaxed/simple;
+	bh=6cw2AlYCWLjE+TSTj9Ic8Mp7D9kUTOyLV7ooRycjEfc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=so10qnuMzmUYt5LkWCsNggzXCwyLEe3Cz1EmsjZpfivPCQBu9lSYIBbnXtpddHMkwxcKuNZBeND1fnqm4DKsb9oUfmdd0a+SoJsK1wcLLvSvwdPAQ1wo1fml8VvbPnmbxqNqPVMOqe/IstP4BGPMzT7tJNmG9TZwAo1hg+MyXVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XsZubK87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A07FC4CEEB;
-	Wed, 21 May 2025 01:20:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hEnTaNBtcNHZS8tSiAYXvax1GYv11KwXGsDkRNs+wwQKfrAoYnXU8TkkiDaNx8KDB2ejqogNZP37jxYDHsnisCvT7M1enGIBmxEWYoN7rAzu/VBKq3mQviIxlL5yJJwi64Mw0GKMikh9nTzMlUZIHeSLlyrIwkcmQ5PCffjyuh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mB/bQrbg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E49F8C4CEE9;
+	Wed, 21 May 2025 01:20:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747790421;
-	bh=dMgkJgqMz3ctMMmSbSC4dm+FOOp5kC87tNKqiMADZQs=;
+	s=k20201202; t=1747790423;
+	bh=6cw2AlYCWLjE+TSTj9Ic8Mp7D9kUTOyLV7ooRycjEfc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XsZubK87LEUjL9tKkGsshfsmYLQqDzEUEPa/dLYIFoBBjhpQDLBiNVw35b5iTUekd
-	 ZOoM2R4ycsxSEqsn8cqBIgvNw9fUOaUh2esaZ51uvduwMK7m1gYmW0cMWrvcVj4Q5W
-	 M1IDj7V36GcXtCzPg9VhMjnLXKeuI0fK0ZFCjOzQXvxFAx1vRRo8U/vzLdtvyEk9WX
-	 eGCxVp/Ye2xrPUPBjAhd3mH2bqgMC41b/kY/onU4jLWXRNESWyNyRtM5R2w2Y+dWBr
-	 h5mQKm7BXOUZSW0/7k9pPa+GUvh2YqMN+JzrtyG3K3KyDgwKgN6VlmgNgp8PD99Kyw
-	 Xup13pnMT43ng==
+	b=mB/bQrbghUpWn2FzPAGn5pJtKx8CctWB0li00fGLDaHFFU964Qqxj7o15XlV7ZXjz
+	 etwAz8hw5ndvhyitxudtAnuRuXnSIY4yZlJv/alZ0m/Wd9VIABw0bFhZkWb25ug2IE
+	 /y6moZ4j872KG2nZAFDRHjzu+IsyFtkb1DfPOKn+XEixa/kk3775F/H/mbO5QhO4pb
+	 1VX1neg102zea0tGXsJJWrgtnSji4X3t05fr3g+XXQnOrIO7gs63rs2k3Z4XhA8u2G
+	 shE8jBF05ulUtW3DkDM78mnQ3I0PWdGTb2qQ7xunbg/7XfuVDj+Z1psNwZG/s8phjx
+	 84pLjjzRS4o2A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7F380AAD0;
-	Wed, 21 May 2025 01:20:58 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1E8380AAD0;
+	Wed, 21 May 2025 01:20:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: enetc: fix the error handling in
- enetc4_pf_netdev_create()
+Subject: Re: [PATCH net-next v4 0/2] Add built-in 2.5G ethernet phy support on
+ MT7988
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174779045699.1526198.11812446231836291706.git-patchwork-notify@kernel.org>
-Date: Wed, 21 May 2025 01:20:56 +0000
-References: <20250516052734.3624191-1-wei.fang@nxp.com>
-In-Reply-To: <20250516052734.3624191-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
+ <174779045848.1526198.6198912452247192673.git-patchwork-notify@kernel.org>
+Date: Wed, 21 May 2025 01:20:58 +0000
+References: <20250516102327.2014531-1-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20250516102327.2014531-1-SkyLake.Huang@mediatek.com>
+To: Sky Huang <skylake.huang@mediatek.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ daniel@makrotopia.org, dqfext@gmail.com, SkyLake.Huang@mediatek.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Steven.Liu@mediatek.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 16 May 2025 13:27:34 +0800 you wrote:
-> Fix the handling of err_wq_init and err_reg_netdev paths in
-> enetc4_pf_netdev_create() function.
+On Fri, 16 May 2025 18:23:25 +0800 you wrote:
+> From: Sky Huang <skylake.huang@mediatek.com>
 > 
-> Fixes: 6c5bafba347b ("net: enetc: add MAC filtering for i.MX95 ENETC PF")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> This patchset adds support for built-in 2.5Gphy on MT7988, sort file
+> and config sequence in related Kconfig and Makefile.
+> 
 > ---
->  drivers/net/ethernet/freescale/enetc/enetc4_pf.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Change in v2:
+> - Add missing dt-bindings and dts node.
+> - Remove mtk_phy_leds_state_init() temporarily. I'm going to add LED support
+> later.
+> - Remove "Firmware loading/trigger ok" log.
+> - Add macro define for 0x800e & 0x800f
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: enetc: fix the error handling in enetc4_pf_netdev_create()
-    https://git.kernel.org/netdev/net-next/c/b98b70c103de
+  - [net-next,v4,1/2] net: phy: mediatek: Sort config and file names in Kconfig and Makefile
+    https://git.kernel.org/netdev/net-next/c/6d243c80fe91
+  - [net-next,v4,2/2] net: phy: mediatek: add driver for built-in 2.5G ethernet PHY on MT7988
+    https://git.kernel.org/netdev/net-next/c/26948c243041
 
 You are awesome, thank you!
 -- 
