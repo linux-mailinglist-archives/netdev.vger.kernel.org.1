@@ -1,143 +1,155 @@
-Return-Path: <netdev+bounces-192206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D44EABEEB1
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:57:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B91ABEED0
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:59:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73BD6189073F
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:57:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C8184E0594
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C11F238C36;
-	Wed, 21 May 2025 08:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98523235055;
+	Wed, 21 May 2025 08:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBa2lXpS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlVqA6Qz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEFA23817A
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 08:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6798E238D56
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 08:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747817824; cv=none; b=GfLPNlDBUlfFMrU5aaxST5a+3qEkFjELWlgMrrmBVedzAVDzlRggi5m2u8WUQmkQN6sqD8M7tjxds7wrV3edeUM4THNCLGkgS0WheN+d7qh6T24Cz/AEdTA1WsFiETeX8JdtwnUHxLxUPfZn29M1I0Ml7xDXOflp+Af/N0uSaPQ=
+	t=1747817936; cv=none; b=ezKxn3dz8ctGjVj74wtumzJjyCijDp5P1u9Y+PwY8fVveCxUpQxlZBVQ410pxqRKXn8flDLz7Q8I2dxkaT8Xj/hCVAmpYLqMCBBy9DqXvoWptOGXXFcz/uvmmuZqkb+Z33WB5W6oSjbpvitWUlNArRMiGkJZ9Gox9iCkv1lb1tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747817824; c=relaxed/simple;
-	bh=XSVAWIQJLeLQ+EnAe2fX432Jiet3EaT40S7A2jVLi7Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WlFYEONoL14kutsksJnQOy+Ai29I59VYbYSj1wbGc5LZUIOm3T8lLiZ8MBhTAYiVhkiem15MeAtkhx5k4MlEhW3iDRkC0oBIT580vzEgfD1ezo4hLZIGKrchRMVQ54G4giukLyVw2RP5elrAa5UlkjXZLZW/JkzxbuPyle9MABM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QBa2lXpS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747817822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z5ISw/s/gG2J/o4w18hQ658TJ8AN+hELaWEkOZaX4Ho=;
-	b=QBa2lXpSSJ8PDZLP/mjP4CtpyyBjXEQo0SjOsE5BvlKpUdHnwnt1b8GPUtM6hAM1697xB3
-	a+Vi+r34slAghzucIS9SyoH8owOjBRjFuOqWO/5VEwCZI0yBw4qZUDMHQvoTOMEeFvDjjB
-	6CFKQA6LImBFQL5iO0sHRNYW1ym6LMM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-265-WaRczTu4PaKu-yRC56_lAA-1; Wed, 21 May 2025 04:56:58 -0400
-X-MC-Unique: WaRczTu4PaKu-yRC56_lAA-1
-X-Mimecast-MFC-AGG-ID: WaRczTu4PaKu-yRC56_lAA_1747817818
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6f8e7b78eebso35157186d6.2
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 01:56:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747817818; x=1748422618;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z5ISw/s/gG2J/o4w18hQ658TJ8AN+hELaWEkOZaX4Ho=;
-        b=cf5/Unw0785WLuOxum08Zw2cyXCQFySXkQM4iZiQWNW9h4syTAincrfy2DYHAur7Sa
-         hhcolvMoT8p9mkh8KK0fCdtwanAflGC4WtfgBZuA19MeIhAtU4kL+sIG8fOzCvdBoF2G
-         HSX2hQArYMqhiGGEyaiAeJuddCqGkcMtm4e5iyy3MCMp8pBEMhoiYjIrcF2Ghalpj/+t
-         igCN0auAF5xnm9oK59xI0b8lFpjIDq7DxxQsD5mny2rjsHqOXIMpP7mup9Rp1a9uzD/t
-         1z7HDGwvLn2TBbnIxyFCTeVAc7aYf4xoR/lSwR+g/JXIg/C7duwtESAINGbkpgIDM7hy
-         g6zA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCb/LGkdXYlxoaIQu/dqvU+PjyxkBGfR7eKpRexI9rUK9VEIRIji7XzgryJBJD4ZqUiQ8xR+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh/kBAN4MOrRbA3TGn61xtujAV/G5/0OY3Om0HELmAFPjaz3DT
-	0z/PUvKTBDFaroN+oiWI3zn9s7XGGVcY643wy1uhfTtzM4MhLgCC7qSU7tiq1y+/t0zCPHMX4oJ
-	xi43wZ5cLMb2zbWvReOV0A07nvYuGun238GygTWnIMmp9BA6dtYEnqcJxTR1yZcvH/zGy4474Ci
-	hdIgeOTQK3otUf7d2GvpMA0Rl9ZcDOvOWP
-X-Gm-Gg: ASbGnctRuqFx9ue4N1MxQadfo0OvBhP+rpvvdsUdQ1X+KMxZrpo57jjGm6JtBIFibNH
-	Tf0d6XBAGSmRF41AZO65gbmxPI8QtxaefBCLi6DqusTdI/fD+0+q7UHzHhSZXNHfquaE=
-X-Received: by 2002:a05:6214:2681:b0:6f8:8df1:648 with SMTP id 6a1803df08f44-6f8b2c37a19mr343338766d6.7.1747817818407;
-        Wed, 21 May 2025 01:56:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGaO4WTOV6fJAlmH9DP3inkXOYir+cNPdLYhrMs4mbVZjO2ZBdSoayKvQmU0Z4z5PR9AxBgDQglVFmrFM7Wvjg=
-X-Received: by 2002:a05:6214:2681:b0:6f8:8df1:648 with SMTP id
- 6a1803df08f44-6f8b2c37a19mr343338606d6.7.1747817818106; Wed, 21 May 2025
- 01:56:58 -0700 (PDT)
+	s=arc-20240116; t=1747817936; c=relaxed/simple;
+	bh=thJ7ueoFNpIdnDT3hVYMlZ4dOo2TwzqeL+wDkr8GQDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EBqvOLAbG5Tn2wAcs4Qa6FlCsz7/qjNQFxMf62/Sn7cODZus7wPhmJRG/y91JqkIKLqt5uujwJmhJ8hJwLJn+NSBSgjRvPBPP6RUrTiNdLw3NBni/c7tTovsT3H9rEyhiJ34ABxRWhvIWrlySoWlyMIdRmZy8+O87Zxzw9j9uEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlVqA6Qz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74656C4CEE4;
+	Wed, 21 May 2025 08:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747817935;
+	bh=thJ7ueoFNpIdnDT3hVYMlZ4dOo2TwzqeL+wDkr8GQDA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qlVqA6Qzo2o/gIDllg+3y2w0ifELKPTUZug1Q1lkDN/qXHK0yDzX4+w+5+LLk0kxO
+	 BapqunvNSTXXEr0qvvhA4W4yirdtSKbqp+NmWIM4PLOH3PBetFBnldIOv2ahAu2eRa
+	 jKcweKkOUPhP5ZFXU5MYLOhgMOzL1O8dLO6m2apGTZLPe2W3TH7w+qaLyQT0xQo3fa
+	 yUEct5QzxGPr4uibPgK7s/YMHnbycmkTK1tAWHasQMC3+Mc1AdDjna5EzYBTNKvva7
+	 CDhrftW7B1fF6VCyKBRWUlzfFk8aLTid921lt6WuDZHfPamuoIsXr9n7U4Xbw0Golx
+	 bBA/JxA6KgoDA==
+Date: Wed, 21 May 2025 09:58:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Krishna Kumar <krikku@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, sridhar.samudrala@intel.com,
+	ahmed.zaki@intel.com, krishna.ku@flipkart.com
+Subject: Re: [PATCH v2 net] net: ice: Perform accurate aRFS flow match
+Message-ID: <20250521085851.GQ365796@horms.kernel.org>
+References: <20250520170656.2875753-1-krikku@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1747253032-663457-1-git-send-email-tariqt@nvidia.com>
- <CAADnVQLSMvk3uuzTCjqQKXs6hbZH9-_XeYo2Uvu2uHAiYrnkog@mail.gmail.com>
- <dcb3053f-6588-4c87-be42-a172dacb1828@gmail.com> <09377c1a-dac5-487d-9fc1-d973b20b04dd@kernel.org>
-In-Reply-To: <09377c1a-dac5-487d-9fc1-d973b20b04dd@kernel.org>
-From: Samuel Dobron <sdobron@redhat.com>
-Date: Wed, 21 May 2025 10:56:47 +0200
-X-Gm-Features: AX0GCFu5dfswcCWTTkSyc0z9SXYg_lElASwlqEtz7krxELOPksJgTCJdKDQl7-M
-Message-ID: <CA+h3auNLbmQFXrN1A5Ashek4UiMGa_j+EHaFFp-d74kGZvyjsA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/mlx5e: Reuse per-RQ XDP buffer to avoid
- stack zeroing overhead
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Network Development <netdev@vger.kernel.org>, 
-	linux-rdma@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Gal Pressman <gal@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, 
-	Sebastiano Miano <mianosebastiano@gmail.com>, Benjamin Poirier <bpoirier@redhat.com>, 
-	Toke Hoiland Jorgensen <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520170656.2875753-1-krikku@gmail.com>
 
-Hey,
-I ran tests just on stack zeroing kernel.
+On Tue, May 20, 2025 at 10:36:56PM +0530, Krishna Kumar wrote:
+> This patch fixes an issue seen in a large-scale deployment under heavy
+> incoming pkts where the aRFS flow wrongly matches a flow and reprograms the
+> NIC with wrong settings. That mis-steering causes RX-path latency spikes
+> and noisy neighbor effects when many connections collide on the same
+> hash (some of our production servers have 20-30K connections).
+> 
+> set_rps_cpu() calls ndo_rx_flow_steer() with flow_id that is calculated by
+> hashing the skb sized by the per rx-queue table size. This results in
+> multiple connections (even across different rx-queues) getting the same
+> hash value. The driver steer function modifies the wrong flow to use this
+> rx-queue, e.g.: Flow#1 is first added:
+>     Flow#1:  <ip1, port1, ip2, port2>, Hash 'h', q#10
+> 
+> Later when a new flow needs to be added:
+> 	    Flow#2:  <ip3, port3, ip4, port4>, Hash 'h', q#20
+> 
+> The driver finds the hash 'h' from Flow#1 and updates it to use q#20. This
+> results in both flows getting un-optimized - packets for Flow#1 goes to
+> q#20, and then reprogrammed back to q#10 later and so on; and Flow #2
+> programming is never done as Flow#1 is matched first for all misses. Many
+> flows may wrongly share the same hash and reprogram rules of the original
+> flow each with their own q#.
+> 
+> Tested on two 144-core servers with 16K netperf sessions for 180s. Netperf
+> clients are pinned to cores 0-71 sequentially (so that wrong packets on q#s
+> 72-143 can be measured). IRQs are set 1:1 for queues -> CPUs, enable XPS,
+> enable aRFS (global value is 144 * rps_flow_cnt).
+> 
+> Test notes about results from ice_rx_flow_steer():
+> ---------------------------------------------------
+> 1. "Skip:" counter increments here:
+>     if (fltr_info->q_index == rxq_idx ||
+> 	arfs_entry->fltr_state != ICE_ARFS_ACTIVE)
+> 	    goto out;
+> 2. "Add:" counter increments here:
+>     ret = arfs_entry->fltr_info.fltr_id;
+>     INIT_HLIST_NODE(&arfs_entry->list_entry);
+> 3. "Update:" counter increments here:
+>     /* update the queue to forward to on an already existing flow */
+> 
+> Runtime comparison: original code vs with the patch for different
+> rps_flow_cnt values.
+> 
+> +-------------------------------+--------------+--------------+
+> | rps_flow_cnt                  |      512     |    2048      |
+> +-------------------------------+--------------+--------------+
+> | Ratio of Pkts on Good:Bad q's | 214 vs 822K  | 1.1M vs 980K |
+> | Avoid wrong aRFS programming  | 0 vs 310K    | 0 vs 30K     |
+> | CPU User                      | 216 vs 183   | 216 vs 206   |
+> | CPU System                    | 1441 vs 1171 | 1447 vs 1320 |
+> | CPU Softirq                   | 1245 vs 920  | 1238 vs 961  |
+> | CPU Total                     | 29 vs 22.7   | 29 vs 24.9   |
+> | aRFS Update                   | 533K vs 59   | 521K vs 32   |
+> | aRFS Skip                     | 82M vs 77M   | 7.2M vs 4.5M |
+> +-------------------------------+--------------+--------------+
+> 
+> A separate TCP_STREAM and TCP_RR with 1,4,8,16,64,128,256,512 connections
+> showed no performance degradation.
+> 
+> Some points on the patch/aRFS behavior:
+> 1. Enabling full tuple matching ensures flows are always correctly matched,
+>    even with smaller hash sizes.
+> 2. 5-6% drop in CPU utilization as the packets arrive at the correct CPUs
+>    and fewer calls to driver for programming on misses.
+> 3. Larger hash tables reduces mis-steering due to more unique flow hashes,
+>    but still has clashes. However, with larger per-device rps_flow_cnt, old
+>    flows take more time to expire and new aRFS flows cannot be added if h/w
+>    limits are reached (rps_may_expire_flow() succeeds when 10*rps_flow_cnt
+>    pkts have been processed by this cpu that are not part of the flow).
+> 
+> Changes since v1:
+>   - Added "Fixes:" tag and documented return values.
+>   - Added @ for function parameters.
+>   - Updated subject line to denote target tree (net)
 
-> The XDP_TX number are actually lower than I expected.
-> Hmm... I wonder if we regressed here(?)
+Thanks for the updates, much appreciated.
 
-The absolute numbers look more or less the same,
-so I would say no. The first results we have for TX is from
-6.13.0-0.rc1.20241202gite70140ba0d2b.14.eln144
-comparing it to 6.15.0-0.rc5.250509g9c69f8884904.47.eln148
-there is actually 1% improvement. But that might be a
-random fluctuation (numbers are based on 1 iteration).
-We don't have data for earlier kernels...
+I don't think it is necessary to repost because of this, but for future
+reference, these days it is preferred to place change information, like
+that immediately above, below the scissors ("---"). That way it is visible
+to reviewers and appears in mailing list archives and so on.  But it is
+omitted from git history, as there the commit message is truncated at the
+scissors.
 
-However, for TX I get better results:
+> Fixes: 28bf26724fdb0 ("ice: Implement aRFS")
+> Signed-off-by: Krishna Kumar <krikku@gmail.com>
 
-XDP_TX: DPA, swap macs:
-- baseline: 9.75 Mpps
-- patched 10.78 Mpps (+10%)
-
-Maybe just different test configuration? We use xdp-bench
-in dpa mode+swapping macs.
-
-XDP_DROP:
-> >>> Stack zeroing enabled:
-> >>> - XDP_DROP:
-> >>>      * baseline:                     24.32 Mpps
-> >>>      * baseline + per-RQ allocation: 32.27 Mpps (+32.7%)
-
-Same results on my side:
-- baseline 16.6 Mpps
-- patched  24.6 Mpps (+32.5%)
-
-Seems to be fixed :)
-
-Sam.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
