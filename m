@@ -1,228 +1,122 @@
-Return-Path: <netdev+bounces-192312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00291ABF74E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:10:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31968ABF761
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:12:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B3363AE637
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:09:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E75B1BC6528
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B61E1990D8;
-	Wed, 21 May 2025 14:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE7F248F73;
+	Wed, 21 May 2025 14:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fO9TmUQn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmMkkQJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF4F18D643
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6ADE194137;
+	Wed, 21 May 2025 14:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747836539; cv=none; b=KzUbQaZqdZ1RHSVgO08VMVZbeP/HtMdFJ7UlW+S7IEdVP0vn/M3xIyAWj5IiKW4AsUDkXA0zX+BRs0XG0hJWSsCFhWz/786hfKCnCzqvYANkvGnSGr30QWBkYm59LG0nb2scdZ7PNpNs9NXfTpDA63uLz0UImGd3jihNAFWaBi8=
+	t=1747836611; cv=none; b=VRIqMc0EbfmCi+ipYzoQeHztE9ffxb+z6qmxBJ/YkEjvhSK7hhceVUJRwy44NSBfR0Nb49jnA7xgHp2woShdybwhcAwV8Q5ShuNbb1xavV+O+D+Lh1rfK/npRgVaDzDAt0FLMBB5yj4/H9NqW08tBjkUfctdzL0hxGPyYz6r6K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747836539; c=relaxed/simple;
-	bh=P67oshaMGyj6nzn7YY3Li2hijNWcTodXqpTtgZzgcgo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pKGCU//W5QvizvFjfC8SxxRxV5pGmiDBld5KPG4HTt/YKrpv9MSmOWVMFxtfO+13FyPwNyktfavJMmv8PZyw//NpbUj/B/FwtJEjDkW8NVhFo1ezv07DHskyDfOvuMh025+d+4v54IwGN2Q9c2p/OYmEanDmdrYYlzekFlz+CnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fO9TmUQn; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747836524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Lstvqu94arSzCLcXZ9mvkaN3tqku+fP1enpoWEl6Q0Y=;
-	b=fO9TmUQnNc0grh+DWgiSObu6ev8WYjtmVy6UaZRKtH5u8FzEARpt7R9Tk02/vFHoYdEXta
-	LMMjCCl9sNEh4exoc743dG6/xbri/PUHLPkctxXJcAU2+04ZcWm9cN22eb9UrxPeHJ/Qt8
-	NEzBt+wUpJWq/DScao0TYIV3M+Mi+8A=
-From: Yajun Deng <yajun.deng@linux.dev>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yajun Deng <yajun.deng@linux.dev>
-Subject: [PATCH net-next v2] net: sysfs: Implement is_visible for phys_(port_id, port_name, switch_id)
-Date: Wed, 21 May 2025 22:08:24 +0800
-Message-Id: <20250521140824.3523-1-yajun.deng@linux.dev>
+	s=arc-20240116; t=1747836611; c=relaxed/simple;
+	bh=DZEgFzM4nzHH/r9PZ/9x1SizshuzRtVrhWfn2VQ2doU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TOrMuxzzBQQqnDY+vEC0nX1/w614xThTkif/sYaOWiOBJb5kuGi8DO/YMmJtCF1QIiJdfccnPXhDQ6Iu9mPXHv0EpMPPM9SpjJ7+aF+Sepax+f7uTaqzulsgsi+x/h0+G4rUMz1bznfud5+P2dVfFkehN2hdNhg6TAu6/dhTrMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmMkkQJy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88FE2C4CEE4;
+	Wed, 21 May 2025 14:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747836609;
+	bh=DZEgFzM4nzHH/r9PZ/9x1SizshuzRtVrhWfn2VQ2doU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LmMkkQJyNw/VJjwBRHSX4EySj8hOlqgazOjmHYKGiPMEaXn8ah3/Tb2sJUt1zHkY7
+	 e4uGKGfZmvJnt6m7xBkPuEdk6A7JHQe7+iHfKB6azSYbRy2coHdgm8xjwAiToeTiIa
+	 AcyuLvWX+EbwkmH9EreeBYC6jjtT9Z8e1NLu5YHz0aQHsEq/SKo8YkWNtvWrgVstJW
+	 Ik21uYYr9k6KO35Ma7+6zyJ+XrpDJKezW+dqqILGnwPw7F8VIjwWUlBDvY8uDH45tP
+	 BNbDPhuXHAmIdp+65UdUcCn/P7rIWt31JyU5T6FWJycJfUhNYNp/72AESV69hrhEwI
+	 NWjGotVjDuyxA==
+Date: Wed, 21 May 2025 07:10:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Carolina Jubran <cjubran@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Jiri Pirko <jiri@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon
+ Romanovsky <leonro@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, Mark
+ Bloch <mbloch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next V10 2/6] selftest: netdevsim: Add devlink rate
+ tc-bw test
+Message-ID: <20250521071007.0cb6f546@kernel.org>
+In-Reply-To: <80b40828-8fa3-4313-8c98-823ac7c055c1@gmail.com>
+References: <1747766287-950144-1-git-send-email-tariqt@nvidia.com>
+	<1747766287-950144-3-git-send-email-tariqt@nvidia.com>
+	<20250520155957.04b27217@kernel.org>
+	<80b40828-8fa3-4313-8c98-823ac7c055c1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-phys_port_id_show, phys_port_name_show and phys_switch_id_show would
-return -EOPNOTSUPP if the netdev didn't implement the corresponding
-method.
+On Wed, 21 May 2025 10:05:13 +0300 Tariq Toukan wrote:
+> On 21/05/2025 1:59, Jakub Kicinski wrote:
+> > On Tue, 20 May 2025 21:38:03 +0300 Tariq Toukan wrote:  
+> >> Test verifies that netdevsim correctly implements devlink ops callbacks
+> >> that set tc-bw on leaf or node rate object.  
+> > 
+> > Please add a test that can actually validate a NIC HW.
+> > The test probably needs to be in Python to use a remote endpoint,
+> > and should live under tools/testing/../drivers/net/hw
+> > 
+> > We had a long conversation about what we expect from the API
+> > vs how your HW works. One of the test cases should confirm
+> > the expected behavior, IOW fail on mlx5. Which is fine,
+> > unlikely that any NIC will have 100% compliance. But at
+> > least we will be documenting the expectations.
+> 
+> No problem with that, we'll add.
+> 
+> We could've saved this extra cycle if my questions [1] exactly about 
+> this topic weren't ignored.
+> Area is vague and not well defined. We can continue with the iterative 
+> guess and fix cycles, or alternatively get it clearly and formally defined.
 
-There is no point in creating these files if they are unsupported.
+I started a couple of times on answering but my hands go a little limb
+when I have to explain things so obvious like "testing is a crucial part
+of software development" :S  I mean.. nvidia certainly tests their code,
+so I'm not sure where the disconnect is. I had a short conversation with
+Gal at some conference where he, AFAIU, was doubting that device testing
+can be part of an open source project.
 
-Put these attributes in netdev_phys_group and implement the is_visible
-method. make phys_(port_id, port_name, switch_id) invisible if the netdev
-dosen't implement the corresponding method.
+It certainly is not advantageous to companies to have to share their
+test code. So when you ask me for details on the rules what I hear is
+"how can we make sure we do as little as possible".
 
-Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
----
-v2: Remove worthless comments
-v1: https://lore.kernel.org/all/20250515130205.3274-1-yajun.deng@linux.dev/
----
- include/linux/netdevice.h |  2 +-
- net/core/net-sysfs.c      | 68 +++++++++++++++++++++++----------------
- 2 files changed, 42 insertions(+), 28 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 32a1e41636a9..efbcc4836498 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2384,7 +2384,7 @@ struct net_device {
- 	struct dm_hw_stat_delta __rcu *dm_private;
- #endif
- 	struct device		dev;
--	const struct attribute_group *sysfs_groups[4];
-+	const struct attribute_group *sysfs_groups[5];
- 	const struct attribute_group *sysfs_rx_queue_group;
- 
- 	const struct rtnl_link_ops *rtnl_link_ops;
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 1ace0cd01adc..f626dcd66d03 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -641,12 +641,6 @@ static ssize_t phys_port_id_show(struct device *dev,
- 	struct netdev_phys_item_id ppid;
- 	ssize_t ret;
- 
--	/* The check is also done in dev_get_phys_port_id; this helps returning
--	 * early without hitting the locking section below.
--	 */
--	if (!netdev->netdev_ops->ndo_get_phys_port_id)
--		return -EOPNOTSUPP;
--
- 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
- 	if (ret)
- 		return ret;
-@@ -659,7 +653,8 @@ static ssize_t phys_port_id_show(struct device *dev,
- 
- 	return ret;
- }
--static DEVICE_ATTR_RO(phys_port_id);
-+static struct device_attribute dev_attr_phys_port_id =
-+	__ATTR(phys_port_id, 0444, phys_port_id_show, NULL);
- 
- static ssize_t phys_port_name_show(struct device *dev,
- 				   struct device_attribute *attr, char *buf)
-@@ -668,13 +663,6 @@ static ssize_t phys_port_name_show(struct device *dev,
- 	char name[IFNAMSIZ];
- 	ssize_t ret;
- 
--	/* The checks are also done in dev_get_phys_port_name; this helps
--	 * returning early without hitting the locking section below.
--	 */
--	if (!netdev->netdev_ops->ndo_get_phys_port_name &&
--	    !netdev->devlink_port)
--		return -EOPNOTSUPP;
--
- 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
- 	if (ret)
- 		return ret;
-@@ -687,7 +675,8 @@ static ssize_t phys_port_name_show(struct device *dev,
- 
- 	return ret;
- }
--static DEVICE_ATTR_RO(phys_port_name);
-+static struct device_attribute dev_attr_phys_port_name =
-+	__ATTR(phys_port_name, 0444, phys_port_name_show, NULL);
- 
- static ssize_t phys_switch_id_show(struct device *dev,
- 				   struct device_attribute *attr, char *buf)
-@@ -696,14 +685,6 @@ static ssize_t phys_switch_id_show(struct device *dev,
- 	struct netdev_phys_item_id ppid = { };
- 	ssize_t ret;
- 
--	/* The checks are also done in dev_get_phys_port_name; this helps
--	 * returning early without hitting the locking section below. This works
--	 * because recurse is false when calling dev_get_port_parent_id.
--	 */
--	if (!netdev->netdev_ops->ndo_get_port_parent_id &&
--	    !netdev->devlink_port)
--		return -EOPNOTSUPP;
--
- 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
- 	if (ret)
- 		return ret;
-@@ -716,7 +697,42 @@ static ssize_t phys_switch_id_show(struct device *dev,
- 
- 	return ret;
- }
--static DEVICE_ATTR_RO(phys_switch_id);
-+static struct device_attribute dev_attr_phys_switch_id =
-+	__ATTR(phys_switch_id, 0444, phys_switch_id_show, NULL);
-+
-+static struct attribute *netdev_phys_attrs[] __ro_after_init = {
-+	&dev_attr_phys_port_id.attr,
-+	&dev_attr_phys_port_name.attr,
-+	&dev_attr_phys_switch_id.attr,
-+	NULL,
-+};
-+
-+static umode_t netdev_phys_is_visible(struct kobject *kobj,
-+				      struct attribute *attr, int index)
-+{
-+	struct device *dev = kobj_to_dev(kobj);
-+	struct net_device *netdev = to_net_dev(dev);
-+
-+	if (attr == &dev_attr_phys_port_id.attr) {
-+		if (!netdev->netdev_ops->ndo_get_phys_port_id)
-+			return 0;
-+	} else if (attr == &dev_attr_phys_port_name.attr) {
-+		if (!netdev->netdev_ops->ndo_get_phys_port_name &&
-+		    !netdev->devlink_port)
-+			return 0;
-+	} else if (attr == &dev_attr_phys_switch_id.attr) {
-+		if (!netdev->netdev_ops->ndo_get_port_parent_id &&
-+		    !netdev->devlink_port)
-+			return 0;
-+	}
-+
-+	return attr->mode;
-+}
-+
-+static const struct attribute_group netdev_phys_group = {
-+	.attrs = netdev_phys_attrs,
-+	.is_visible = netdev_phys_is_visible,
-+};
- 
- static ssize_t threaded_show(struct device *dev,
- 			     struct device_attribute *attr, char *buf)
-@@ -783,9 +799,6 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
- 	&dev_attr_tx_queue_len.attr,
- 	&dev_attr_gro_flush_timeout.attr,
- 	&dev_attr_napi_defer_hard_irqs.attr,
--	&dev_attr_phys_port_id.attr,
--	&dev_attr_phys_port_name.attr,
--	&dev_attr_phys_switch_id.attr,
- 	&dev_attr_proto_down.attr,
- 	&dev_attr_carrier_up_count.attr,
- 	&dev_attr_carrier_down_count.attr,
-@@ -2328,6 +2341,7 @@ int netdev_register_kobject(struct net_device *ndev)
- 		groups++;
- 
- 	*groups++ = &netstat_group;
-+	*groups++ = &netdev_phys_group;
- 
- 	if (wireless_group_needed(ndev))
- 		*groups++ = &wireless_group;
--- 
-2.25.1
-
+Broadly, any new uAPI should come with tests which exercise the
+functionality. We started a decade or so ago with netdevsim tests
+which just validate the API layer itself. That did not provide
+sufficient validation of the real implementations, crucially it did 
+not check whether shallow APIs (devlink) actually behave the same
+when implemented by multiple vendors. So two years ago we built 
+the Python harness to be able to write tests for NIC functionality.
+That is the level of testing we expect now. Obviously there will always
+be exceptions. For instance I was pushing for common tests for the time
+sync code (DPLL etc.) but I was convinced by the experts that it's hard
+and that they generally test with $x0,000 measurement equipment.
+So fair, I guess that's too hard. But for BW shaping tests? 
+IIRC mlxsw has qdisc offload tests for BW shaping upstream.
 
