@@ -1,146 +1,126 @@
-Return-Path: <netdev+bounces-192488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4FFEAC0085
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:17:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904F8AC0089
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 164179E64C4
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:17:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF7C1BC117C
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3107323AE95;
-	Wed, 21 May 2025 23:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7823A99E;
+	Wed, 21 May 2025 23:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="WJBv9E4h"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="haLd94tY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9F321D3C7;
-	Wed, 21 May 2025 23:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A41239E65;
+	Wed, 21 May 2025 23:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747869465; cv=none; b=Vu7EIfbC4Ow93q7p5Nv4b/iDg2/O2ZKRn4axr7JtGa3PJJZlCVZr/s7QmHVeEAIcaUaVy5s3GY8o8z+YcCwZKPGYbvTndou6p24tlQMu09n8cy54jJDaiDOj99DRDMxmV/4ZbPsxhDKVvFnm/fv7uh05cvmltx3gPsdry9e+13Q=
+	t=1747869493; cv=none; b=i9qsldoqKYqaJFvckYKDTCY5R/wRSwKNoHFYW7Yvt1lPH9pUCBp66tyEQOlsE7hN3fTJFWk4vWxAvNMSq0msdX4S1MoX7+7rpamQ8fjLQ/xVHON+Ai88X7rm08Ro4FO4EnNF+YKaEBGMQM05hYJdaCO1G69HGlNHkcMBhlCZ7s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747869465; c=relaxed/simple;
-	bh=XD4kuLxj1fx4ZHbQefTh9vvwweTOThXfuO8z55u63YM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qyoYc0oxziwRj1S2iycgA00xrBGYWSsa/M0gAZjY7ltL1YIQboz3M9gUEgaOiqPdQPISxujxKA7NDeE53zxD3slPB1zAZD407x9rJUO2Y2JQXk0eRZ0G9wqXtV99XmLY+0AfRi8GqHowNHbRj9XRF0Scdwo0lviCaKtVoPQAiVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=WJBv9E4h; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uHsgn-004RiA-NY; Thu, 22 May 2025 01:17:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=9nCmsaQp2owCm1/M2mf/Yw6FBV7gBVkunZx8ik/qseA=; b=WJBv9E4hKmylS07aHF/YU+FbuP
-	8ehnptW1MXqqeUfL87/y/krTUGmwoTEgALVRs41FreeuoePdkBy/9XVeiiBUE21Hpsozl9wrMRh2+
-	tsYsrQPF+05JkesmYLwTo+S/NtupSL/BfIYw89hINZ3hs4Zsgd4tVO28lDMbcKHIcCucZWC0q5IEE
-	MXXaATM8nIfce8kjNrT8evopyeMiMT51s3iJ6/9t1n6S23xMdhk/qM0IJh1iuQQ+7htADC64IiSXu
-	AvKKOWeVCdtaynQhkajR+MZ9P/CI95KH0lwIYOSdRd8SSDTjDMGcnTro0ioEnImCTbYbBY2DNypdO
-	ji8AHLZQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uHsgm-0006E7-Hp; Thu, 22 May 2025 01:17:32 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uHsgl-000gSv-IM; Thu, 22 May 2025 01:17:31 +0200
-Message-ID: <5dc16a14-e66c-4e1d-896f-a8483cdf0f04@rbox.co>
-Date: Thu, 22 May 2025 01:17:30 +0200
+	s=arc-20240116; t=1747869493; c=relaxed/simple;
+	bh=tc4Rc5WhaCG5eca6GJG/PxJnkROGcjQIe9XRR3o7jms=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vBInpIP13o4aRra++UhruWMjpIeULCM+NvXhLZ/VQoDpOfB558VZUKG126NeIedR1HoileAajSefGwlSvQ0g80NcsRjmifN4tHU+SjotByxBnyBcCbw78pgMjsCcUIqK+8K41aMK/WV1j+grfFEA7Bbxe+cBK5qhlLXo5mRdZok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=haLd94tY; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747869492; x=1779405492;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dAISRQHymGpSlZcgfow8gzL7H3J4aU50MP1wdq1m96U=;
+  b=haLd94tY0HaBAklco8bYS+J18b39ymbMLw8D51JqGFKL2evc++XLMxY8
+   kWYwcYFzLGSdACh8jJo8qGNhvhuJwy7+hkHB6ugKnBY49tVVXanKZWi50
+   V8RaGeWtJ3Pn1ECdyIVEU8Ff6Y+6PiCy3OxvazHb3fAQhdghiweSuvZRB
+   Y81Vdf0HmgDVlDtLGtgu+HOYZZkJP+nD2Cgt47QE8OH4ALascrVrIOy/A
+   0bhLA8Eol5UyQCQBgMOWzy2hS77MozL4J19jY6agsaHI7p7E5QSHAXAA0
+   8auELbQ8fBERckFPnrKAzVsDPIyK3HGzQ6VaM4ud1akUwulY2vdPb2fu+
+   g==;
+X-IronPort-AV: E=Sophos;i="6.15,304,1739836800"; 
+   d="scan'208";a="827214693"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 23:18:06 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:39713]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.117:2525] with esmtp (Farcaster)
+ id f8e2304d-e65c-44ce-99fe-0d478a97d9b6; Wed, 21 May 2025 23:18:05 +0000 (UTC)
+X-Farcaster-Flow-ID: f8e2304d-e65c-44ce-99fe-0d478a97d9b6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 21 May 2025 23:18:05 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.52.104) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 21 May 2025 23:18:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <alexei.starovoitov@gmail.com>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <jordan@jrife.io>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 bpf-next 03/10] bpf: tcp: Get rid of st_bucket_done
+Date: Wed, 21 May 2025 16:17:48 -0700
+Message-ID: <20250521231755.91774-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250521225800.89218-1-kuniyu@amazon.com>
+References: <20250521225800.89218-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next v5 5/5] vsock/test: Add test for an unexpectedly
- lingering close()
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
- <20250521-vsock-linger-v5-5-94827860d1d6@rbox.co>
- <edtepfqev6exbkfdnyzgkdkczif5wnn4oz4t5sxkl6sz64kcaf@f6yztxryvmlq>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <edtepfqev6exbkfdnyzgkdkczif5wnn4oz4t5sxkl6sz64kcaf@f6yztxryvmlq>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 5/21/25 16:56, Stefano Garzarella wrote:
-> On Wed, May 21, 2025 at 12:55:23AM +0200, Michal Luczaj wrote:
->> There was an issue with SO_LINGER: instead of blocking until all queued
->> messages for the socket have been successfully sent (or the linger timeout
->> has been reached), close() would block until packets were handled by the
->> peer.
->>
->> Add a test to alert on close() lingering when it should not.
->>
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> tools/testing/vsock/vsock_test.c | 49 ++++++++++++++++++++++++++++++++++++++++
->> 1 file changed, 49 insertions(+)
->>
->> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->> index f401c6a79495bc7fda97012e5bfeabec7dbfb60a..1040503333cf315e52592c876f2c1809b36fdfdb 100644
->> --- a/tools/testing/vsock/vsock_test.c
->> +++ b/tools/testing/vsock/vsock_test.c
->> @@ -1839,6 +1839,50 @@ static void test_stream_linger_server(const struct test_opts *opts)
->> 	close(fd);
->> }
->>
->> +static void test_stream_nolinger_client(const struct test_opts *opts)
->> +{
->> +	bool nowait;
->> +	time_t ns;
->> +	int fd;
->> +
->> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->> +	if (fd < 0) {
->> +		perror("connect");
->> +		exit(EXIT_FAILURE);
->> +	}
->> +
->> +	enable_so_linger(fd);
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Wed, 21 May 2025 15:57:59 -0700
+> From: Jordan Rife <jordan@jrife.io>
+> Date: Tue, 20 May 2025 07:50:50 -0700
+> > Get rid of the st_bucket_done field to simplify TCP iterator state and
+> > logic. Before, st_bucket_done could be false if bpf_iter_tcp_batch
+> > returned a partial batch; however, with the last patch ("bpf: tcp: Make
+> > sure iter->batch always contains a full bucket snapshot"),
+> > st_bucket_done == true is equivalent to iter->cur_sk == iter->end_sk.
+> > 
+> > Signed-off-by: Jordan Rife <jordan@jrife.io>
+> > ---
+> >  net/ipv4/tcp_ipv4.c | 14 ++++++--------
+> >  1 file changed, 6 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > index 27022018194a..20730723a02c 100644
+> > --- a/net/ipv4/tcp_ipv4.c
+> > +++ b/net/ipv4/tcp_ipv4.c
+> > @@ -3020,7 +3020,6 @@ struct bpf_tcp_iter_state {
+> >  	unsigned int end_sk;
+> >  	unsigned int max_sk;
+> >  	struct sock **batch;
+> > -	bool st_bucket_done;
+> >  };
+> >  
+> >  struct bpf_iter__tcp {
+> > @@ -3043,8 +3042,10 @@ static int tcp_prog_seq_show(struct bpf_prog *prog, struct bpf_iter_meta *meta,
+> >  
+> >  static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
+> >  {
+> > -	while (iter->cur_sk < iter->end_sk)
+> > -		sock_gen_put(iter->batch[iter->cur_sk++]);
+> > +	unsigned int cur_sk = iter->cur_sk;
+> > +
+> > +	while (cur_sk < iter->end_sk)
+> > +		sock_gen_put(iter->batch[cur_sk++]);
 > 
-> If we use a parameter for the linger timeout, IMO will be easy to 
-> understand this test, defining the timeout in this test, set it and 
-> check the value, without defining LINGER_TIMEOUT in util.h.
+> Why is this chunk included in this patch ?
 
-Yes, you're right. I'll fix that.
-
->> +	send_byte(fd, 1, 0); /* Left unread to expose incorrect behaviour. */
->> +	nowait = vsock_wait_sent(fd);
->> +
->> +	ns = current_nsec();
->> +	close(fd);
->> +	ns = current_nsec() - ns;
->> +
->> +	if (nowait) {
->> +		fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
->> +	} else if ((ns + NSEC_PER_SEC - 1) / NSEC_PER_SEC >= LINGER_TIMEOUT) {
-> 
-> Should we define a macro for this conversion?
-> 
-> Or just use DIV_ROUND_UP:
-
-Arrgh, I was looking for that. If you don't care much for a new macro, I'll
-explicitly use DIV_ROUND_UP for now.
-
-Thanks!
-Michal
+This should be in patch 5 to keep cur_sk for find_cookie
 
