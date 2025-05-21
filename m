@@ -1,155 +1,119 @@
-Return-Path: <netdev+bounces-192202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B65ABEE24
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:40:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5BC7ABEE26
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:41:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CFD93B8B2A
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:40:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66344E2FD2
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507512367D3;
-	Wed, 21 May 2025 08:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426D423816F;
+	Wed, 21 May 2025 08:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lQM5CfEC"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="sleVw0vy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B65C237A3B;
-	Wed, 21 May 2025 08:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2E1237172;
+	Wed, 21 May 2025 08:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747816833; cv=none; b=OX3DPx0lT+O1tgBI00zkyd3dbUuSAlkMOnjB1f9eOgwD+WvsiZ2yJRjIzdtpvr4zy/Nf9bFT6Rx7ZU0O8kGM5835/QzQPjh7Y99+zwrUpcLHcZpqLNDKZu/fW7EEZcvgHVDHsaYokdFxNuQkUpvrWElXG0gNBnsOnZ3JHxeFzFA=
+	t=1747816840; cv=none; b=PkEsAaSId80fq8hbjV/1oEjMyW57V0paZ+9YrjoYIwihv33zfQrtLQMSa3rQoSvz8vAxYfggvWYbP/NCcT46lRzulNQBcf5TE5ZPSCPWqURZmEPhoHdvCXTRT+2zyH89yzqavwzgQCa2Sxwm3IHH9uuXvIn6ghY5a9nUGTolvEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747816833; c=relaxed/simple;
-	bh=ZfjrbPi/++vFluGCkn52FEE/Q7CTtIEHaujenXpydjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tUomjKbGwBrN8QJ64NhOprmTZwAYh3nmoIOU7+rhWezTFVyLxsbpaFHFyn9xAzUybjHH/QYHue2Nu5Na2Rehkm8UHM+fux61TChI7WghznmcMREGaSIIyRFze6SQg8h0z2cj2lAgxKz7KqKAkNHDNMvgsVd3TXoO5Y0ujEE3qCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lQM5CfEC; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747816832; x=1779352832;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZfjrbPi/++vFluGCkn52FEE/Q7CTtIEHaujenXpydjI=;
-  b=lQM5CfECUM9E+2DNek8WFoVk9ptRYhCTlGGWi+QYibpJemfK+rWrIM0E
-   FSH0MaOHSHFzy3Qs5O/1qqEglMmZMro7WERL3OxRwoMsV4xKbUNpdGmVe
-   WyEBiFilrdA8SF8ilKOl4YiAJi8HZ4OEBCstZS2bofPHsIYZZjZSbXHGI
-   VruqyOlYK1bPS5RDRb3FLlV+6gEtZbIDfESSkqdtkgWYPDmMlIe8Id+8t
-   NPcJJLn/R+ad3nfxvslSNsACJEu/mib2BPmK6lvJk1HDo8eB1YTYee+XZ
-   65VtY3DL3Jv8GhGLuOqJNkmBh+S44rGmCmd7YrsSS+TJrnjS3qG5hkKY5
-   g==;
-X-CSE-ConnectionGUID: 9aAG0KpsShaBnvgq2AFXyQ==
-X-CSE-MsgGUID: QYMUcuSNSsCjNJtyKMnCeg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="49688179"
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="49688179"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 01:40:31 -0700
-X-CSE-ConnectionGUID: qdgOXjpcSU2ovHmlLDfuMg==
-X-CSE-MsgGUID: mlrJ3UG2SmuMpq6UTF+5iw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="140897815"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 01:40:28 -0700
-Date: Wed, 21 May 2025 10:39:52 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	andrew+netdev@lunn.ch, sgoutham@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com
-Subject: Re: [net PATCH 1/2] octeontx2-af: Set LMT_ENA bit for APR table
- entries
-Message-ID: <aC2RWIQgAxG03pSC@mev-dev.igk.intel.com>
-References: <20250521060834.19780-1-gakula@marvell.com>
- <20250521060834.19780-2-gakula@marvell.com>
+	s=arc-20240116; t=1747816840; c=relaxed/simple;
+	bh=FcZ4rj0HTHRfpV6mo76/+aaCSsr4jpuW3NYUeTQzbVA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JSu1oocy2JX6QPJkjJo91HDdzolfHCZwe7tPekPiTu5OCvpJghsPrjYw82hIDzQ4ta8kizpFL8GVf6BLgPVssmIs70y/ly1uT+WkrJtJp4TKA7JChj93ihrvy0DelB+ah7c0aK9N5nN8S8wW3CgjGj/41z2DCTzv8YsNflKyLfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=sleVw0vy; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54L8dtGbB4069531, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1747816796; bh=FcZ4rj0HTHRfpV6mo76/+aaCSsr4jpuW3NYUeTQzbVA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=sleVw0vyhjq7ckYs5nE7D6HDhONa8BxVs0Ulx3QMAM+4XpP2eBLKr5lF2riXlZtDq
+	 mX6JPMK0bdRRJyemuCdKaeDwvB7VoN7/Q0RZiVyh/oEboReDdLLeFRvDFKGiHVH1GQ
+	 E9jb4Tta4iiakzQy3m4FPziHfe2raz9apw27YyGE9EBZ6ZlTImQOTOicZdBic13xZB
+	 sOWW0oxCoZKxyGUMFtTngb2mnPicRHFtvhvlJgIbEu304YYI3ZOcE3xLtqsPzNyinG
+	 dmT6DHKM1IRdDPFC7dII2bAPgA/IxzSZSOd4koQ2Rm0ys/hDJ99Q182uUCIVQ4xj6o
+	 O6lc9U143LFeQ==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54L8dtGbB4069531
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 May 2025 16:39:55 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 21 May 2025 16:39:56 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 21 May 2025 16:39:55 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Wed, 21 May 2025 16:39:55 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Wentao Liang <vulab@iscas.ac.cn>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "ste3ls@gmail.com" <ste3ls@gmail.com>
+CC: "dianders@chromium.org" <dianders@chromium.org>,
+        "gmazyland@gmail.com"
+	<gmazyland@gmail.com>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH v2] r8152: Add wake up function for RTL8153
+Thread-Topic: [PATCH v2] r8152: Add wake up function for RTL8153
+Thread-Index: AQHbxgL3hH/sIcTMKEyDGu9tnvFmWLPcxKAQ
+Date: Wed, 21 May 2025 08:39:55 +0000
+Message-ID: <8654b1d586ef48f081f7d3931cbc5ea9@realtek.com>
+References: <20250516013552.798-1-vulab@iscas.ac.cn>
+In-Reply-To: <20250516013552.798-1-vulab@iscas.ac.cn>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250521060834.19780-2-gakula@marvell.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Wed, May 21, 2025 at 11:38:33AM +0530, Geetha sowjanya wrote:
-> From: Subbaraya Sundeep <sbhatta@marvell.com>
-> 
-> This patch enables the LMT line for a PF/VF by setting the
-> LMT_ENA bit in the APR_LMT_MAP_ENTRY_S structure.
-> 
-> Additionally, it simplifies the logic for calculating the
-> LMTST table index by consistently using the maximum
-> number of hw supported VFs (i.e., 256).
-> 
-> Fixes: 873a1e3d207a ("octeontx2-af: cn10k: Setting up lmtst map table").
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-> ---
->  .../net/ethernet/marvell/octeontx2/af/rvu_cn10k.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> index 7fa98aeb3663..3838c04b78c2 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> @@ -15,13 +15,17 @@
->  #define LMT_TBL_OP_WRITE	1
->  #define LMT_MAP_TABLE_SIZE	(128 * 1024)
->  #define LMT_MAPTBL_ENTRY_SIZE	16
-> +#define LMT_MAX_VFS		256
-> +
-> +#define LMT_MAP_ENTRY_ENA      BIT_ULL(20)
-> +#define LMT_MAP_ENTRY_LINES    GENMASK_ULL(18, 16)
->  
->  /* Function to perform operations (read/write) on lmtst map table */
->  static int lmtst_map_table_ops(struct rvu *rvu, u32 index, u64 *val,
->  			       int lmt_tbl_op)
->  {
->  	void __iomem *lmt_map_base;
-> -	u64 tbl_base;
-> +	u64 tbl_base, cfg;
->  
->  	tbl_base = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_MAP_BASE);
->  
-> @@ -35,6 +39,13 @@ static int lmtst_map_table_ops(struct rvu *rvu, u32 index, u64 *val,
->  		*val = readq(lmt_map_base + index);
->  	} else {
->  		writeq((*val), (lmt_map_base + index));
-> +
-> +		cfg = FIELD_PREP(LMT_MAP_ENTRY_ENA, 0x1);
-> +		/* 2048 LMTLINES */
-> +		cfg |= FIELD_PREP(LMT_MAP_ENTRY_LINES, 0x6);
-> +
-> +		writeq(cfg, (lmt_map_base + (index + 8)));
-Is this 8 LMT_MAP_TBL_W1_OFF? It isn't obvious for me why +8, but I
-don't know the driver, so maybe it should.
+Wentao Liang <vulab@iscas.ac.cn>
+> Sent: Friday, May 16, 2025 9:36 AM
+[...]
+> In rtl8153_runtime_enable(), the runtime enable/disable logic for RTL8153
+> devices was incomplete, missing r8153_queue_wake() to enable or disable
+> the automatic wake-up function. A proper implementation can be found in
+> rtl8156_runtime_enable().
 
-> +
->  		/* Flushing the AP interceptor cache to make APR_LMT_MAP_ENTRY_S
->  		 * changes effective. Write 1 for flush and read is being used as a
->  		 * barrier and sets up a data dependency. Write to 0 after a write
-> @@ -52,7 +63,7 @@ static int lmtst_map_table_ops(struct rvu *rvu, u32 index, u64 *val,
->  #define LMT_MAP_TBL_W1_OFF  8
->  static u32 rvu_get_lmtst_tbl_index(struct rvu *rvu, u16 pcifunc)
->  {
-> -	return ((rvu_get_pf(pcifunc) * rvu->hw->total_vfs) +
-> +	return ((rvu_get_pf(pcifunc) * LMT_MAX_VFS) +
->  		(pcifunc & RVU_PFVF_FUNC_MASK)) * LMT_MAPTBL_ENTRY_SIZE;
+r8153_queue_wake() is used to prevent the loss of wake-up events about link=
+ing
+change during the process of runtime suspend. And, I don't think RTL8153A
+supports it. Does this fix something?
 
-Just nit/question, patch looks fine
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Best Regards,
+Hayes
 
->  }
->  
-> -- 
-> 2.25.1
 
