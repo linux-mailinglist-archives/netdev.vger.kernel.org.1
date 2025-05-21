@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-192108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EEF7ABE8F1
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C4FAABE8F0
 	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 03:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D87CE1B67F6F
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:21:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F20184A3037
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E93318CBFC;
-	Wed, 21 May 2025 01:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95358190067;
+	Wed, 21 May 2025 01:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VrVP50T0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ozhp8qRN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DB018C002;
-	Wed, 21 May 2025 01:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDA918FC80;
+	Wed, 21 May 2025 01:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747790419; cv=none; b=HR5s4THO+OVEvB/1KvHoG+7lG0h09tpKrFFOoVDK9jJAgsHwH6fRNO1XTOmhvdus1hbw34ApRtPWfYUJ0Sp98klJQHrYly7NjTwDfttnpGibrPLMIM5jxmwhUv5c+Uc82L3dLdTUJZQnR19h8B5RiilRcp2lIeih+5luLYF3p20=
+	t=1747790420; cv=none; b=clZw1ZMqlHWQcYhcU7LcN/OomA7ycv3NP5Iyod5KHForHIzz8FgZ61zrKwa8TDUmgbhpncoUJcG7JD9JyvRHiM6lQu3LP7DEGiMNIJ2Oum9NIjeKSqT1lg2u/2h5qCXsqYZLPlzUXl9gp+449uPltIporFJ35drWwgWyvpytptA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747790419; c=relaxed/simple;
-	bh=LNS1vEUuMVV9aSljVz0rghhANekQi0j1/WToBCW6RQ4=;
+	s=arc-20240116; t=1747790420; c=relaxed/simple;
+	bh=X3CVAGPtJAeUMBOAhMThiN5wbimJFSIBytMVTLCCCsI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mEqMF//lvPI1MLf6uQor8QWEYTAm+o4pgaZpsx03d1y/p0Nv/NauydBBJ8xh+u0MIvt4oDWl1epKlK+ZmOlplNmIsVgjjS4EO12l33EDr94aukI+kcFySUmiQKAhiK24tVGs5TQfahzcAKsGlV9au1tDJlSET6xgP3e/jnRBsOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VrVP50T0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9895CC4CEE9;
-	Wed, 21 May 2025 01:20:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=l0flLVx+wL2wHbsIww2IHkkrLanpxuqtsXfDYyhQeKa5AzC5PjD4VxW+XlcXdKfQLWi45xc8+kZrNPTion3xBV/RR5fogJf/29OK1jI44wGtLyAG5b0OLbUfUeUSfqwj3nGpVxbBB9CO/BlR+tjvIMlfqRQ/co3U7byC6VbRDoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ozhp8qRN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0E80C4CEE9;
+	Wed, 21 May 2025 01:20:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747790418;
-	bh=LNS1vEUuMVV9aSljVz0rghhANekQi0j1/WToBCW6RQ4=;
+	s=k20201202; t=1747790419;
+	bh=X3CVAGPtJAeUMBOAhMThiN5wbimJFSIBytMVTLCCCsI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VrVP50T03j67dvpY5M1u1w72AT0KYlLtXNvrKQ8eF+PvrrsCDTqfxAfBsGLGlgvRt
-	 93a/XykLLi0ribvvQqHql/zDQQXKRJW4XPDE8q2ObdXIN5HzajpUWTbl8T8DTLC5tO
-	 8sRs+P12V73cGx61qDbKlEGaZU60nrxcFu8xWqkjgFArCOhWYoXznus1jkWUg7cgeB
-	 Pa3PLTmLumbsK8MEkzGB6kAgODaqyvWc6f/jUHMAPdJdL5bo8aCRX73BOwH2jtHBH7
-	 CnPFZsHbAYajehsjm/U6fbIFKD99A1NMJibxvWAmYml3V5kIDGtQexw20NE8mCiNoY
-	 gaLLGzBg2AoIA==
+	b=ozhp8qRN43gjD0eESqhjCzep/HMLodsCUPy9+5FFuWDyE6z5k5uf63Q2wD7e0JQLv
+	 cKdHrgEvaidVysDoFXE7TW+AeU4ITMG0MqNz/pC7Q4pCkjOxcZJk2Lat6wnvrgTDkb
+	 SmM7EcRbmSlnZ9rGHHOZggAeiZWZIKF4RNZYX55PQ1DTUiC/mJc1ms/amOPFqXolv8
+	 oEXTzN2dx3b2QDKCOWqhslMKb/rGMVtYzV/VDKUbC4oXzSBPbHOFlDDr/baXhMjMao
+	 1HCqQ8SMg82CR5zUL3CNkEn0/rmxa/lrb0ZDPggH0MqA5pYmbbW/DI2mzwpkCoLeFx
+	 SBYTxRHLHjz8g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDC1380AAD0;
-	Wed, 21 May 2025 01:20:55 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD6D380AAD0;
+	Wed, 21 May 2025 01:20:56 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] selftests: net: validate team flags propagation
+Subject: Re: [PATCH] sctp: Do not wake readers in __sctp_write_space()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174779045449.1526198.4318547635095706511.git-patchwork-notify@kernel.org>
-Date: Wed, 21 May 2025 01:20:54 +0000
-References: <20250516232205.539266-1-stfomichev@gmail.com>
-In-Reply-To: <20250516232205.539266-1-stfomichev@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jiri@resnulli.us, shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+ <174779045574.1526198.16807580460563727004.git-patchwork-notify@kernel.org>
+Date: Wed, 21 May 2025 01:20:55 +0000
+References: <20250516081727.1361451-1-oss@malat.biz>
+In-Reply-To: <20250516081727.1361451-1-oss@malat.biz>
+To: Petr Malat <oss@malat.biz>
+Cc: linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+ marcelo.leitner@gmail.com, lucien.xin@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 16 May 2025 16:22:05 -0700 you wrote:
-> Cover three recent cases:
-> 1. missing ops locking for the lowers during netdev_sync_lower_features
-> 2. missing locking for dev_set_promiscuity (plus netdev_ops_assert_locked
->    with a comment on why/when it's needed)
-> 3. rcu lock during team_change_rx_flags
-> 
-> Verified that each one triggers when the respective fix is reverted.
-> Not sure about the placement, but since it all relies on teaming,
-> added to the teaming directory.
+On Fri, 16 May 2025 10:17:28 +0200 you wrote:
+> Function __sctp_write_space() doesn't set poll key, which leads to
+> ep_poll_callback() waking up all waiters, not only these waiting
+> for the socket being writable. Set the key properly using
+> wake_up_interruptible_poll(), which is preferred over the sync
+> variant, as writers are not woken up before at least half of the
+> queue is available. Also, TCP does the same.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] selftests: net: validate team flags propagation
-    https://git.kernel.org/netdev/net-next/c/f792709e0baa
+  - sctp: Do not wake readers in __sctp_write_space()
+    https://git.kernel.org/netdev/net-next/c/af295892a7ab
 
 You are awesome, thank you!
 -- 
