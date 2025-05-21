@@ -1,122 +1,126 @@
-Return-Path: <netdev+bounces-192313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31968ABF761
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:12:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7758ABF78E
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:16:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E75B1BC6528
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:11:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB125022CC
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE7F248F73;
-	Wed, 21 May 2025 14:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912A919F101;
+	Wed, 21 May 2025 14:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmMkkQJy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ze9geiXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6ADE194137;
-	Wed, 21 May 2025 14:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA80F166F0C;
+	Wed, 21 May 2025 14:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747836611; cv=none; b=VRIqMc0EbfmCi+ipYzoQeHztE9ffxb+z6qmxBJ/YkEjvhSK7hhceVUJRwy44NSBfR0Nb49jnA7xgHp2woShdybwhcAwV8Q5ShuNbb1xavV+O+D+Lh1rfK/npRgVaDzDAt0FLMBB5yj4/H9NqW08tBjkUfctdzL0hxGPyYz6r6K0=
+	t=1747836813; cv=none; b=I6Z/px4SXmDVhCsslhIVXanurwLa/YD//Ll5Q6EjFgl6a1wna1LQfztAx8Il2O58fQCW5irrsb9LvnoXxwh4/1cr1MeePZmeMb8Jvn1jgXN49xEhntnTEA5/vWK2xCbd2APSqKTqd8aaCY6kPAxALDq0BmravelhOKr2YulFhJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747836611; c=relaxed/simple;
-	bh=DZEgFzM4nzHH/r9PZ/9x1SizshuzRtVrhWfn2VQ2doU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TOrMuxzzBQQqnDY+vEC0nX1/w614xThTkif/sYaOWiOBJb5kuGi8DO/YMmJtCF1QIiJdfccnPXhDQ6Iu9mPXHv0EpMPPM9SpjJ7+aF+Sepax+f7uTaqzulsgsi+x/h0+G4rUMz1bznfud5+P2dVfFkehN2hdNhg6TAu6/dhTrMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmMkkQJy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88FE2C4CEE4;
-	Wed, 21 May 2025 14:10:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747836609;
-	bh=DZEgFzM4nzHH/r9PZ/9x1SizshuzRtVrhWfn2VQ2doU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LmMkkQJyNw/VJjwBRHSX4EySj8hOlqgazOjmHYKGiPMEaXn8ah3/Tb2sJUt1zHkY7
-	 e4uGKGfZmvJnt6m7xBkPuEdk6A7JHQe7+iHfKB6azSYbRy2coHdgm8xjwAiToeTiIa
-	 AcyuLvWX+EbwkmH9EreeBYC6jjtT9Z8e1NLu5YHz0aQHsEq/SKo8YkWNtvWrgVstJW
-	 Ik21uYYr9k6KO35Ma7+6zyJ+XrpDJKezW+dqqILGnwPw7F8VIjwWUlBDvY8uDH45tP
-	 BNbDPhuXHAmIdp+65UdUcCn/P7rIWt31JyU5T6FWJycJfUhNYNp/72AESV69hrhEwI
-	 NWjGotVjDuyxA==
-Date: Wed, 21 May 2025 07:10:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Carolina Jubran <cjubran@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jiri Pirko <jiri@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon
- Romanovsky <leonro@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, Mark
- Bloch <mbloch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next V10 2/6] selftest: netdevsim: Add devlink rate
- tc-bw test
-Message-ID: <20250521071007.0cb6f546@kernel.org>
-In-Reply-To: <80b40828-8fa3-4313-8c98-823ac7c055c1@gmail.com>
-References: <1747766287-950144-1-git-send-email-tariqt@nvidia.com>
-	<1747766287-950144-3-git-send-email-tariqt@nvidia.com>
-	<20250520155957.04b27217@kernel.org>
-	<80b40828-8fa3-4313-8c98-823ac7c055c1@gmail.com>
+	s=arc-20240116; t=1747836813; c=relaxed/simple;
+	bh=oaxMgYhPNZMs2/XTZyPamnePQQnQGkysxNcqm+SqnTk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SdKFeBvvku0K2AzqHbmJHI9NsFIMbvSrCcN1GWGqE4rHzJPQjDbOtUy94FHKjXH+0MfPL1dKog4xWi0PHnPi6LsBaFs9jNwTpp9pq2927okLTW+hdhVsYwddsNnRoHCOC6h6JtVA/h9OJ8LSJ9o3oLOs8n388U6vollv9SFxCyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ze9geiXd; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-327ff195303so57591831fa.1;
+        Wed, 21 May 2025 07:13:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747836810; x=1748441610; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oaxMgYhPNZMs2/XTZyPamnePQQnQGkysxNcqm+SqnTk=;
+        b=Ze9geiXdRASSnANYhg1tci2KKRTMqWuge+I2lMYjhN87Tu13uKq0uXM4TePEKYMgRC
+         RInM7hKWRHn8oJIlKblE+UB2oYa+g8/m8zQiJc/mTgfBMzSpgsI/4VHTJl1GdiUsCsk0
+         A+PVnfeiRGaewBuLJK9IEZ8txjmpnQB9EjWjzC9Qa+uBurt2hL4SRjQB5KbB2DQZVF/B
+         NwIOwu/Y3Vy8u2gflbmh4ffDP64YiFljOG01WxbdbBhjuCx3Njx/JOLcIsx7lO2z2OwN
+         xYjhzS6+XJdgjOu9YsbFE3tWe3u0F8Ns+oau3BYLJjFcjoji19j/ZRdlm1msEzkSrkfE
+         HFvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747836810; x=1748441610;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oaxMgYhPNZMs2/XTZyPamnePQQnQGkysxNcqm+SqnTk=;
+        b=oDnAh+96WFTFJKiDc0QN4flqyDjriOnd5uSgr+tsxfsHmoYG0NmLcJTD+WWI1Q6hp5
+         GNnTEnysUbUM1m2uWX+QeyLtZUmr2Kb1JxLFPF611Sxnzua3QJDEtF4lwSeRF2CVn/2i
+         PUD0GIoPEXsiD7T0gLY4d7ryLILLvJ3CePmZlKVLr0zEY7XzQgloPw8TM3XP+guuEXJH
+         4aU4PSi6MFsB+5/48ZW/kJcivcgJrTAWiy7Xwx8khGaHglas9MkThfqPekTtdOROWb7+
+         eVSfaUl2pDpmq71ba/tSBbauiCZLlBAT/15a1ansbcCE3M+FHR6QUaULdM0b5c9YHj/R
+         IAKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbmKHbKgPjvXTW0oK6lmhLN84LdB8kmLlceyXPQVfCtbA/QZTPyDq935UIu48oHiXHsl/HDZNypLoVWrI=@vger.kernel.org, AJvYcCXep4fRzwP31rRD6po9kbxTnE6dNl1rFV/59toHyBp+18X4GfdjykiktRFT1ZV4x3Mx8i4uU8HB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx37RJ8jb5M9alsCdgmE5E2nzQ9ZZXWTd6vDbyIXkPUMiQjjoTc
+	Zx7KKIL4spFL1ockpJUlLfVjkTfymiGN+RrxgrRJ7HnbYSpvFCHKfU/WMQ4xQGESSsWoT6V5jOv
+	tFWq+qp3zQfcF8KestAXMRN/uTaxRsbZjcJJDBA==
+X-Gm-Gg: ASbGncslX8H4CxzZWtYabEWrYTyboGvgGKH1V+7hbmTBSF/ltVlC2GhC0QtHO1oYoNk
+	Zqr/N556owbKQiy2seKQb4/fZEqNnm9lmccCHP/3+oJiRq706hNRUmK0/4CdrKPhU5H3ZGX0yRj
+	LjpE0gexroeeBkHADQQXcqWAYZugoApqAVaogJF0RxuX0Zqjz972qX3oQ8uq8OETQg
+X-Google-Smtp-Source: AGHT+IEOaJbZM++Q0KRojp+3Aw+w6HCigFRyvGnKt7bSYukI4l+/DOz+RnKW0io0hgTr694UyJcCFQl5DVWoxiXsTNM=
+X-Received: by 2002:a2e:a590:0:b0:309:bc3:3a71 with SMTP id
+ 38308e7fff4ca-32807791587mr73247681fa.31.1747836809372; Wed, 21 May 2025
+ 07:13:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: John <john.cs.hey@gmail.com>
+Date: Wed, 21 May 2025 22:13:15 +0800
+X-Gm-Features: AX0GCFtOanhlZwGarVR69NoPJG3inDQ0psVlqb1GB6FHnNhWwdUWQX8s8vwof3g
+Message-ID: <CAP=Rh=N4QcPLWQ2dqUHmKYeEhig3Cbi-3N8Q4-7qGT00htXrVw@mail.gmail.com>
+Subject: [Bug] "WARNING in should_fail_ex" in Linux kernel v6.14
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 21 May 2025 10:05:13 +0300 Tariq Toukan wrote:
-> On 21/05/2025 1:59, Jakub Kicinski wrote:
-> > On Tue, 20 May 2025 21:38:03 +0300 Tariq Toukan wrote:  
-> >> Test verifies that netdevsim correctly implements devlink ops callbacks
-> >> that set tc-bw on leaf or node rate object.  
-> > 
-> > Please add a test that can actually validate a NIC HW.
-> > The test probably needs to be in Python to use a remote endpoint,
-> > and should live under tools/testing/../drivers/net/hw
-> > 
-> > We had a long conversation about what we expect from the API
-> > vs how your HW works. One of the test cases should confirm
-> > the expected behavior, IOW fail on mlx5. Which is fine,
-> > unlikely that any NIC will have 100% compliance. But at
-> > least we will be documenting the expectations.
-> 
-> No problem with that, we'll add.
-> 
-> We could've saved this extra cycle if my questions [1] exactly about 
-> this topic weren't ignored.
-> Area is vague and not well defined. We can continue with the iterative 
-> guess and fix cycles, or alternatively get it clearly and formally defined.
+Dear Linux Kernel Maintainers,
 
-I started a couple of times on answering but my hands go a little limb
-when I have to explain things so obvious like "testing is a crucial part
-of software development" :S  I mean.. nvidia certainly tests their code,
-so I'm not sure where the disconnect is. I had a short conversation with
-Gal at some conference where he, AFAIU, was doubting that device testing
-can be part of an open source project.
+I hope this message finds you well.
 
-It certainly is not advantageous to companies to have to share their
-test code. So when you ask me for details on the rules what I hear is
-"how can we make sure we do as little as possible".
+I am writing to report a potential vulnerability I encountered during
+testing of the Linux Kernel version v6.14.
 
-Broadly, any new uAPI should come with tests which exercise the
-functionality. We started a decade or so ago with netdevsim tests
-which just validate the API layer itself. That did not provide
-sufficient validation of the real implementations, crucially it did 
-not check whether shallow APIs (devlink) actually behave the same
-when implemented by multiple vendors. So two years ago we built 
-the Python harness to be able to write tests for NIC functionality.
-That is the level of testing we expect now. Obviously there will always
-be exceptions. For instance I was pushing for common tests for the time
-sync code (DPLL etc.) but I was convinced by the experts that it's hard
-and that they generally test with $x0,000 measurement equipment.
-So fair, I guess that's too hard. But for BW shaping tests? 
-IIRC mlxsw has qdisc offload tests for BW shaping upstream.
+Git Commit: 38fec10eb60d687e30c8c6b5420d86e8149f7557 (tag: v6.14)
+
+Bug Location: net/ipv4/ipmr.c:440 ipmr_free_table net/ipv4/ipmr.c:440
+
+Bug report: https://pastebin.com/xkfF5DBt
+
+Complete log: https://pastebin.com/uCfqY4D8
+
+Entire kernel config: https://pastebin.com/MRWGr3nv
+
+Root Cause Analysis:
+The kernel warning is triggered in ipmr_free_table() at
+net/ipv4/ipmr.c:440, where the multicast routing table (mr_table) is
+being freed during network namespace exit (ipmr_rules_exit).
+The warning indicates that the multicast forwarding cache count
+(mfc_cache_cnt) is non-zero, implying that resources were not
+correctly cleaned up prior to netns teardown.
+This suggests a possible bug in reference counting or teardown logic
+of the IPv4 multicast routing infrastructure.
+Additionally, the environment is running with fail_usercopy fault
+injection enabled, which deliberately triggers copy-from-user failures
+to test kernel error paths.
+While these failures are expected, they may interact with multicast
+socket setup/teardown paths, exacerbating latent issues.
+
+At present, I have not yet obtained a minimal reproducer for this
+issue. However, I am actively working on reproducing it, and I will
+promptly share any additional findings or a working reproducer as soon
+as it becomes available.
+
+Thank you very much for your time and attention to this matter. I
+truly appreciate the efforts of the Linux kernel community.
+
+Best regards,
+John
 
