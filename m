@@ -1,157 +1,134 @@
-Return-Path: <netdev+bounces-192315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1A71ABF7C0
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:24:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7030ABF7ED
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A46843A6FE8
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:23:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BEBF7A75A7
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AAF1A0BE0;
-	Wed, 21 May 2025 14:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BC51DB92C;
+	Wed, 21 May 2025 14:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kSbehpNa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROoqVqcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1A4194A59
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AE71D88D0;
+	Wed, 21 May 2025 14:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747837435; cv=none; b=siPepBLLGHLo1yv7HbQLNnNWjnQdj8WIpBpniKK6JYA7pIo3mFYi2ph21RwYUboivgfUMlPdNBcyyLlmGN4actnu1CeUvbb1vP1psogjl2sWkUFe93/mzQ/p+XbIB2rai+oxuxPzDIUmIF6NykOzI+9WAr+Njz1sdw0Mjzuj0Q0=
+	t=1747838044; cv=none; b=gM3uB8fTi6L1FtQhfugaXcZ6Db8cM0USaeav8oM51ctjqy2M0nanoSgI0AsjW90YwnsdoOmgXInxywo8PgH/m/tmVNV8Z7srbjKrRG159f8kowyt7Jpk4BIJF8jqPBiuNCLJJw7dXfTu5a1NNmVKFHHIGoxAEGYG3f8LVj2dHNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747837435; c=relaxed/simple;
-	bh=1NlA7Lajb+p5gKLZ4hdgRlVo+SU6VX1Ll7WgBh1g5DE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZwDeLnBexBDga7WjitUc0EEO4BNiYLeLDOAzgb9W3F7Fpm4fmewM8h77Z4ddKnraLc7pWVjl6JGMU9pwy6ftKZQK/eCiYQNj9jcoFGeSD7hn0U1GUlVMy4/ufOrEN4kbZwziK2TZO07RWYyB0YVY57uEDkw/iC3iBcGJ+vmhsRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kSbehpNa; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747837434; x=1779373434;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1NlA7Lajb+p5gKLZ4hdgRlVo+SU6VX1Ll7WgBh1g5DE=;
-  b=kSbehpNahOgGjqUew/hGXbVTySLqxRMxxEntGg3p8QtJfEy1wRWe4klS
-   1ZSS6FlVJ0MPW7b7M2TOgcNAOhC7EntU9ku1xgekXWm9zaSdrMfEu5vLD
-   WSidsujrC+mY45ONLr4RXvV5cqmfXKlMxyeM9PhFTg4Kc1BvSDvlPxi32
-   OnC4WMVKJftNYtcIn/MiwWnQvmrzUNVbD/yEIUYVLZFN+P6URo6GynoGo
-   5saYQMJnsdfaA5Qzcv30ofcWUaZtKmtPRbyBN+Ny0nix0xBN0pMO0vHIK
-   Wvn1f1VqNcV7MuahpIq/B6/+wbsxkuu19N2e76kvfOngGZhvXMxWw8PSO
-   g==;
-X-CSE-ConnectionGUID: vUg8DAM4QZqUYQdJ/Ej9Cw==
-X-CSE-MsgGUID: WkWFmkvzQjCEN7tL/CNPiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="53627261"
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="53627261"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 07:23:54 -0700
-X-CSE-ConnectionGUID: tsejvJ3ZQz2SyGRCTkvlyA==
-X-CSE-MsgGUID: 5VUxIBPFQHmxZ+YtD1+DmQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="139943813"
-Received: from pae-dbg-x10sri-f_n1_f_263.igk.intel.com (HELO localhost.igk.intel.com) ([172.28.191.222])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 07:23:52 -0700
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-next] i40e: add link_down_events statistic
-Date: Wed, 21 May 2025 16:23:32 +0200
-Message-ID: <20250521142332.449045-1-dawid.osuchowski@linux.intel.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1747838044; c=relaxed/simple;
+	bh=6P7mIPj7B7sJ/vEA58VPqJNIo45jgikPcikO/uSzLsk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uq+Nf31uK72j6Kks/LWHRq8rJ0HQSZr8ds29Joi7ZirSFAaVH2gHXxQrZvYanHIbai1l6XDOXCxC9neysWPDquABSvtBtQOiCXeNHJ3emdumjyHU7dslfqGOV8WC97mBIBUAEkG7jo+4umXxJJtkApgI9BJnXCL1hTJStdC1uPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROoqVqcZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 844E2C4CEE4;
+	Wed, 21 May 2025 14:34:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747838043;
+	bh=6P7mIPj7B7sJ/vEA58VPqJNIo45jgikPcikO/uSzLsk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ROoqVqcZH42CiPfobRxDgWMXSJf4HEuZ6B1czaH2zeQkFIBOACu3jK8u2NIUfuT6v
+	 cYl6uDa7GJEkHJsvzeCIYZcttLv4QoAEOf41rqvjb5Fi38bWgvQWJhiY0AT/e8LBp9
+	 Ac1NNbYgfSr6KOmglkrkgrTWucmupgDw+Cuh51tJnNGZgvSPRMUi2sTjnL0i4TGEhe
+	 xz78vjUlWFWZ09t83r11c+9EqGCDiQq4psW8ZeLppzE9UZohwQ42LIckZ9attzA8m+
+	 q+RLSpOQAhFx+hLxVAW3lVIvpDO79xY6PzqU2fXrwFGMN5nFPnW7Hz2Zl1D6e3X2pF
+	 yLD8HBwBPJVkQ==
+Date: Wed, 21 May 2025 07:34:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, skalluru@marvell.com, manishc@marvell.com,
+ andrew+netdev@lunn.ch, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, ajit.khaparde@broadcom.com,
+ sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ tariqt@nvidia.com, saeedm@nvidia.com, louis.peens@corigine.com,
+ shshaikh@marvell.com, GR-Linux-NIC-Dev@marvell.com, ecree.xilinx@gmail.com,
+ horms@kernel.org, dsahern@kernel.org, ruanjinjie@huawei.com,
+ mheib@redhat.com, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+ oss-drivers@corigine.com, linux-net-drivers@amd.com, leon@kernel.org
+Subject: Re: [PATCH net-next 2/3] udp_tunnel: remove rtnl_lock dependency
+Message-ID: <20250521073401.67fbd1bc@kernel.org>
+In-Reply-To: <20250520203614.2693870-3-stfomichev@gmail.com>
+References: <20250520203614.2693870-1-stfomichev@gmail.com>
+	<20250520203614.2693870-3-stfomichev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Introduce a link_down_events counter to the i40e driver, incremented
-each time the link transitions from up to down.
-This counter can help diagnose issues related to link stability,
-such as port flapping or unexpected link drops.
+On Tue, 20 May 2025 13:36:13 -0700 Stanislav Fomichev wrote:
+> Drivers that are using ops lock and don't depend on RTNL lock
+> still need to manage it because udp_tunnel's RTNL dependency.
+> Introduce new udp_tunnel_nic_lock and use it instead of
+> rtnl_lock. Drop non-UDP_TUNNEL_NIC_INFO_MAY_SLEEP mode from
+> udp_tunnel infra (udp_tunnel_nic_device_sync_work needs to
+> grab udp_tunnel_nic_lock mutex and might sleep).
 
-The value is exposed via ethtool's get_link_ext_stats() interface.
+There is a netdevsim-based test for this that needs to be fixed up.
 
-Co-developed-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
----
-Based on series [1] from Martyna where this was implemented for ixgbe
-and ice drivers.
+> diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+> index 2df3b8344eb5..7f5537fdf2c9 100644
+> --- a/include/net/udp_tunnel.h
+> +++ b/include/net/udp_tunnel.h
+> @@ -221,19 +221,17 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
+>  #define UDP_TUNNEL_NIC_MAX_TABLES	4
+>  
+>  enum udp_tunnel_nic_info_flags {
+> -	/* Device callbacks may sleep */
+> -	UDP_TUNNEL_NIC_INFO_MAY_SLEEP	= BIT(0),
 
-[1] https://lore.kernel.org/netdev/20250515105011.1310692-1-martyna.szapar-mudlaw@linux.intel.com/
----
- drivers/net/ethernet/intel/i40e/i40e.h         |  1 +
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 10 ++++++++++
- drivers/net/ethernet/intel/i40e/i40e_main.c    |  3 +++
- 3 files changed, 14 insertions(+)
+Could we use a different lock for sleeping and non-sleeping drivers?
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index c67963bfe14e..54d5fdc303ca 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -548,6 +548,7 @@ struct i40e_pf {
- 	u16 empr_count; /* EMP reset count */
- 	u16 pfr_count; /* PF reset count */
- 	u16 sw_int_count; /* SW interrupt count */
-+	u32 link_down_events;
- 
- 	struct mutex switch_mutex;
- 	u16 lan_vsi;       /* our default LAN VSI */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 21dd70125a16..adcf068202b0 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -2749,6 +2749,15 @@ static void i40e_diag_test(struct net_device *netdev,
- 	netif_info(pf, drv, netdev, "testing failed\n");
- }
- 
-+static void i40e_get_link_ext_stats(struct net_device *netdev,
-+				    struct ethtool_link_ext_stats *stats)
-+{
-+	struct i40e_netdev_priv *np = netdev_priv(netdev);
-+	struct i40e_pf *pf = np->vsi->back;
-+
-+	stats->link_down_events = pf->link_down_events;
-+}
-+
- static void i40e_get_wol(struct net_device *netdev,
- 			 struct ethtool_wolinfo *wol)
- {
-@@ -5807,6 +5816,7 @@ static const struct ethtool_ops i40e_ethtool_ops = {
- 	.get_regs		= i40e_get_regs,
- 	.nway_reset		= i40e_nway_reset,
- 	.get_link		= ethtool_op_get_link,
-+	.get_link_ext_stats	= i40e_get_link_ext_stats,
- 	.get_wol		= i40e_get_wol,
- 	.set_wol		= i40e_set_wol,
- 	.set_eeprom		= i40e_set_eeprom,
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index e421156717a4..d7368fa31ec8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -9933,6 +9933,9 @@ static void i40e_link_event(struct i40e_pf *pf)
- 	     new_link == netif_carrier_ok(vsi->netdev)))
- 		return;
- 
-+	if (!new_link && old_link)
-+		pf->link_down_events++;
-+
- 	i40e_print_link_message(vsi, new_link);
- 
- 	/* Notify the base of the switch tree connected to
--- 
-2.47.0
+> @@ -554,11 +543,11 @@ static void __udp_tunnel_nic_reset_ntf(struct net_device *dev)
+>  	struct udp_tunnel_nic *utn;
+>  	unsigned int i, j;
+>  
+> -	ASSERT_RTNL();
+> +	mutex_lock(&udp_tunnel_nic_lock);
+>  
+>  	utn = dev->udp_tunnel_nic;
 
+utn and info's lifetimes are tied to the lifetime of the device
+I think their existence can remain protected by the external locks
+
+>  	if (!utn)
+> -		return;
+> +		goto unlock;
+>  
+>  	utn->need_sync = false;
+>  	for (i = 0; i < utn->n_tables; i++)
+
+> -	rtnl_lock();
+> +	mutex_lock(&udp_tunnel_nic_lock);
+>  	utn->work_pending = 0;
+>  	__udp_tunnel_nic_device_sync(utn->dev, utn);
+>  
+> -	if (utn->need_replay)
+> +	if (utn->need_replay) {
+> +		rtnl_lock();
+>  		udp_tunnel_nic_replay(utn->dev, utn);
+> -	rtnl_unlock();
+> +		rtnl_unlock();
+> +	}
+> +	mutex_unlock(&udp_tunnel_nic_lock);
+>  }
+
+What's the lock ordering between the new lock and rtnl lock?
+
+BTW the lock could live in utn, right? We can't use the instance
+lock because of sharing, but we could put the lock in utn?
 
