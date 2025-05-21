@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-192394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BC58ABFBB8
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 18:56:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D300ABFBE4
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 19:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7215010BC
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:56:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9961BC7403
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C6122D4F6;
-	Wed, 21 May 2025 16:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6572609E7;
+	Wed, 21 May 2025 17:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdlqfkJ+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YEUWSBcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57AA22B8D1;
-	Wed, 21 May 2025 16:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E0A22F15E;
+	Wed, 21 May 2025 17:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747846501; cv=none; b=Nn0DlDbhZQ0aTUF0nnsn3kcFfBfzyvfjxvmzBQPBHDKpmippwP+bXIr5PASfLjZKoQgXKrihvnQ+BDdWi2pf/gPIuagLN/JgFOmjeGRs1nDhW7WQeVYlwcfOi/Cc/SXYqEjUf39qO9JoZ8iqY56JlJdMIcKKX7o6E16UT+ONNOM=
+	t=1747846912; cv=none; b=WltghUFFMw1f4J5mJKck/N9hFHQi87Ddhz2r9Gud2XAuVNLvxUry/dA1Ige5DxVZbGAwpHUmUUPi+rZM5LpEASXuRh+wW8u8xCM8u6eSULj7Ozrbz25AkQZGJ6MjO18kjegI4PbhRmIZlgcJZZ2rhtpBWSSe7mFFyqjql3IWr4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747846501; c=relaxed/simple;
-	bh=iBdO01+MJWdZZZwt6nKsyAe2xyhLK06UynHB6bZKuKE=;
+	s=arc-20240116; t=1747846912; c=relaxed/simple;
+	bh=1VT/9jZFLOXENQjEMSO3cV9vUhB4/4XxiCpXx9AgHhc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SDlgxVvogwMhwvLQYMHkEZYSSfRo22oiNGAR/EFBfU7I10agmc1fAcZtxt85++bHooTatgECoAR6BLrA1fiblS5UEEBRDvxUxEMSnZIYkDOWxGiEMyuhhqWCRYpJdwSJnq5aXbXG563rckhMcS9w5doNiNcCketi5y8cFpcE3F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LdlqfkJ+; arc=none smtp.client-ip=209.85.210.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=O71NGXj7tt9OJ/5XOIyOrUAlDxeJfQw6r6OOr+p5qUz+VSZXJl3WTcNo07PMjbVoclXkXrqDM+IC4tMvu6mZzpfP2RK32Zmzlg/K9oI770gDFDKIDfC/dfRUC4p0fZzv1FaBNY5xiD+gi4NoMH0pWjC5XoqQIAbmXZXmFE3jivQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YEUWSBcZ; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-742c9563fafso3548792b3a.0;
-        Wed, 21 May 2025 09:54:59 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-231ecd4f2a5so45245385ad.0;
+        Wed, 21 May 2025 10:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747846499; x=1748451299; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747846910; x=1748451710; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vqSusmLUTDDrAFmVvKIf96jCAPfZcQ7xzil/5W/oxZg=;
-        b=LdlqfkJ+diEQblLSqHn13hjo+rVCIst8cVqX2Cc3pG2xKl6zjKdd8onsZKGXyegoQq
-         QJv798artRhu1nW+QtwBylAMOYuanN2GjKTPoWizQhtotTJR1zFP01whd6WIg1N0AhpJ
-         KDK+rV4M/PfZptFw0LH3BNxkhYYhH20b7PVQbVzmnNXE7+RGrugYadXSEZNK+y9lHlmi
-         wyLzS3/wy8m0eEf+hKgb7jW7ok9vo7ldnZ7QQyauLG2dciWiv9Zg8hAGqr5gAqjA2qKY
-         zeLBYZ3ydrT9iijdwxb4wf5HeXP6Tau9PMa9gnYiqxMCcJZB+oeokP/HuwNvOU4U3in2
-         poeA==
+        bh=PWmX5o1KZHES75Hln8YX3lrBwYIMaAXXEFNBxe0jHFM=;
+        b=YEUWSBcZPXVjokfotdKKg/zka6gnfrsrHcdWXBsXOJ09PcndbTJqxv/r7aLFGtMlMk
+         5HnMYpOHhZv6o2CoE1yDeLhW+p+HN2/QU15/Seoi67hdsJqlisZAPA3IiUCduEUvwmhG
+         2bMU1q/B+ErhH8i8B6+V/eMLB23YdVwGeNIKslPWSINHY7CjLUl6muwcZ6zeMufXzSYK
+         QkPfYjS9cEUEuVg8aBGO9IQST/XAmh4Bp3Gpa2F4SRgYmRRTWuyKG8kGANFgfEpkamme
+         aCVPdM/FUyi3bj/kqRe4+agre36U4FIKEJ4ioyzrhLuLlmh4R4+ypAAHDXm2YTujpePr
+         IvDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747846499; x=1748451299;
+        d=1e100.net; s=20230601; t=1747846910; x=1748451710;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vqSusmLUTDDrAFmVvKIf96jCAPfZcQ7xzil/5W/oxZg=;
-        b=VLzKVgEtFqYG8CzbXCeHrZJi8DWvwdza4phZlJLchq4g8xax1YeW2F/OkdgmpAqiMq
-         4WiZHAeXeePMpdyv3qAmpCudrL6KwaEJ2CDhBJD11xGu5gwMJ/o1YhyW4spc6tJWfDzC
-         R4Etmlc/iMxqvpQ1YGux0ecUVi4ji49Q7qW9Mz4c2MVVAWEVC/1YqDr51pCS6UP6ryWS
-         KsljCagjr2XNeUE3zMSseSJu4xCCgy24nJWeAC3kZ/tTjGL2OHbIqzTdfE/5Z242/I4P
-         vE0bqOckzShKPAKzg/zP7zAbrTYLPWw486QTk6YSsls8aF8BSGJPe6OcvTq6pJAfGF7g
-         cCtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUOJwafFxE4sWfCYGpHNj+pTBbShLCkQYASw/MJXMpQsethxfy/eq4A3vlcfkeI5gxphSbA35wG@vger.kernel.org, AJvYcCW0v+gotHtShLAHJNzhk5AyYOXJppjup9M8DjbSMGgygzHuvjJtREk9HcZicF41/ELKnL1nZq5sEQo2fiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaKYXOQO480i/opHDSTntn/3BZ2uWVsvOMMrX2T4FxXVu50+WX
-	kJ3V5oYn3KZLFh+TQD9UE27zFR5nFDE14SvSvAai62LBEIXJBIogikU=
-X-Gm-Gg: ASbGnct51L3eCf+MTwwM6FID/Er6dxK+tYbZ7m37I/yZ8kxMmO+iXoJF5IdhGryVsCe
-	n1wIZg2TqHZZxX+SVR1u+/2hU+cUZz3m/+fLA5Y7PGRopz3etE0yLdqWN+bitfxnxXBjv/bBSxL
-	e7FwZjv+af8Qz+IJ/c77vc/I6ijLNk3tvWZkto+JJ3OoS2ITF39l/YCk1uw0mLtv2vvNPyf3owe
-	QesqweUqVcfD/Pc4HYOumBrCXhHlIJWRIV8NkrROmLsljjSOrhkHyqqsS+noOJdXY+d5DSQL6ZI
-	meObSnOEfutsHbRp489nwcUTGyrZb+Tan4U8VEJ5RVOesKH4kbeErPqDyjFEEtxD/xeR+XBVxaQ
-	Bh4hpeThySAQL
-X-Google-Smtp-Source: AGHT+IGfzklCLmeqYyT1I2rx1b3ghkJtG2vXmy4752jBGeg1x8Q83XHAGiyKh1OrZ1mOTBPOTfidKA==
-X-Received: by 2002:a05:6a00:a88f:b0:736:33fd:f57d with SMTP id d2e1a72fcca58-742a98a32e1mr23062791b3a.17.1747846498974;
-        Wed, 21 May 2025 09:54:58 -0700 (PDT)
+        bh=PWmX5o1KZHES75Hln8YX3lrBwYIMaAXXEFNBxe0jHFM=;
+        b=qtNRERutm497IIbxW/zFKKbwVuGO0Hoh6a0o5oTx/kdVe+R9yPbf57pDS4fzEbreNj
+         vciF7vV4n5ZcX6vnpiohgYDdU5ibpmdfbGhecUh8iY4QZKnhmI5rQV9e34ZNex8npuV+
+         ZSo9ZgwPCSnJn7gWe5zDnBCkxP+97boMr5ZbYVYjBHu8qg2ynWt/kIAsSOPdy1yXe+be
+         E2ECvVh4cISl4wb75dqLlOcSgoanADXV6lfEWK/wJcpPdPuouLAL7gugLX5qNMO9PdjQ
+         supZ01BCl0H3dNEvybP5RKWUKchKwbZbOT38nntJZ3g9t8X5ignZ0IKdbpXgeYKPvY4+
+         yWgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFcnuMdkyDe29QHkYdvglpkWwgmME2mWykdBP1rlpHCJCC/f1zry9YZYhL4yNFQwsLed/AxIW9m+WyPA==@vger.kernel.org, AJvYcCWHKlc8cRBbNXs+Nu0KqL0JExKUU+EuXklRqEmwyn/YApNvje9KtYtwqWtypQI72ckXoKFtyIEIOfPBxyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzdrn6nA4mLOlOT02NhY9SUXEta5xol8bC/ZKKNItHMHnPtWsQy
+	v/pxb13EruT0rtHgnMgIks2zc0d0SWD+JG1CtGKUGUX3Mc94GVttelw=
+X-Gm-Gg: ASbGncsAlYet/0RJwPsDP2sHscNkAQR8fl+kzCosaNwbyyoBAP5rU3tLPBXfCDa7Hx4
+	039ozl0OJMZImz7wEobAATL2lM7Fg0GTXRmePAeYKYn2rPYeP7hdLAvMIpIV+RafZO8ILXFOexW
+	hTOGJLY3KxHPEBgnQC5VlMKBjy784gYcsK5y3oSsOwqOuzojcaS7/MKBGTysUt3Ge3kS1g8ZTX4
+	rJcunb5ygw5d+L/0y2gegx7Zj8pORzK/Jk7Tc0zDrwuefBqU4HGrYwL5J50LuZYGpLIUR4ka3S7
+	X4ndXebM6xR8HhO94ojM2/tR/axwQgkS39zixxtN+BdQSqH57Y2u20fOo+20H4+B6E3UDGhrb6x
+	Oq/4CTDocsZpl3XPcGA48G1o=
+X-Google-Smtp-Source: AGHT+IG0Sa3DbuCkqkmdcG/fc0MxWlV6cSP48i9+QjTx97ZOfBSkfimF0N4vSUQyUW8Hx/YktfqF6A==
+X-Received: by 2002:a17:902:ea0c:b0:22e:61b2:5eb6 with SMTP id d9443c01a7336-231de3030bemr301106515ad.15.1747846910234;
+        Wed, 21 May 2025 10:01:50 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-742a96defc3sm9859254b3a.21.2025.05.21.09.54.58
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-231d4e988c3sm95414665ad.120.2025.05.21.10.01.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 09:54:58 -0700 (PDT)
-Date: Wed, 21 May 2025 09:54:57 -0700
+        Wed, 21 May 2025 10:01:49 -0700 (PDT)
+Date: Wed, 21 May 2025 10:01:48 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+b191b5ccad8d7a986286@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] af_packet: move notifier's packet_dev_mc out of rcu
- critical section
-Message-ID: <aC4FYWEtxCw25Uwu@mini-arch>
-References: <20250520202046.2620300-1-stfomichev@gmail.com>
- <682d3d5a77189_97c02294a3@willemb.c.googlers.com.notmuch>
- <20250520200020.270ff8b1@kernel.org>
- <682d4e3271490_9e43729454@willemb.c.googlers.com.notmuch>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"skalluru@marvell.com" <skalluru@marvell.com>,
+	"manishc@marvell.com" <manishc@marvell.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+	"pavan.chebbi@broadcom.com" <pavan.chebbi@broadcom.com>,
+	"ajit.khaparde@broadcom.com" <ajit.khaparde@broadcom.com>,
+	"sriharsha.basavapatna@broadcom.com" <sriharsha.basavapatna@broadcom.com>,
+	"somnath.kotur@broadcom.com" <somnath.kotur@broadcom.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"louis.peens@corigine.com" <louis.peens@corigine.com>,
+	"shshaikh@marvell.com" <shshaikh@marvell.com>,
+	"GR-Linux-NIC-Dev@marvell.com" <GR-Linux-NIC-Dev@marvell.com>,
+	"ecree.xilinx@gmail.com" <ecree.xilinx@gmail.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"mheib@redhat.com" <mheib@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"oss-drivers@corigine.com" <oss-drivers@corigine.com>,
+	"linux-net-drivers@amd.com" <linux-net-drivers@amd.com>,
+	"leon@kernel.org" <leon@kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH net-next 1/3] net: ASSERT_RTNL remove
+ netif_set_real_num_{rx, tx}_queues
+Message-ID: <aC4G_Pj118yoW-35@mini-arch>
+References: <20250520203614.2693870-1-stfomichev@gmail.com>
+ <20250520203614.2693870-2-stfomichev@gmail.com>
+ <SJ0PR11MB58660E85F76E4A347197C768E59EA@SJ0PR11MB5866.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,72 +120,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <682d4e3271490_9e43729454@willemb.c.googlers.com.notmuch>
+In-Reply-To: <SJ0PR11MB58660E85F76E4A347197C768E59EA@SJ0PR11MB5866.namprd11.prod.outlook.com>
 
-On 05/20, Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
-> > On Tue, 20 May 2025 22:41:30 -0400 Willem de Bruijn wrote:
-> > > > @@ -4277,6 +4280,13 @@ static int packet_notifier(struct notifier_block *this,
-> > > >  		}
-> > > >  	}
-> > > >  	rcu_read_unlock();
-> > > > +
-> > > > +	/* packet_dev_mc might grab instance locks so can't run under rcu */
-> > > > +	list_for_each_entry_safe(ml, tmp, &mclist, remove_list) {
-> > > > +		packet_dev_mc(dev, ml, -1);
-> > > > +		kfree(ml);
-> > > > +	}
-> > > > +  
-> > > 
-> > > Just verifying my understanding of the not entirely obvious locking:
-> > > 
-> > > po->mclist modifications (add, del, flush, unregister) are all
-> > > protected by the RTNL, not the RCU. The RCU only protects the sklist
-> > > and by extension the sks on it. So moving the mclist operations out of
-> > > the RCU is fine.
-> > > 
-> > > The delayed operation on the mclist entry is still within the RTNL
-> > > from unregister_netdevice_notifier. Which matter as it protects not
-> > > only the list, but also the actual operations in packet_dev_mc, such
-> > > as inc/dec on dev->promiscuity and associated dev_change_rx_flags.
-> > > And new packet_mclist.remove_list too.
+On 05/21, Loktionov, Aleksandr wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Stanislav Fomichev
+> > Sent: Tuesday, May 20, 2025 10:36 PM
+> > To: netdev@vger.kernel.org
+> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; skalluru@marvell.com; manishc@marvell.com;
+> > andrew+netdev@lunn.ch; michael.chan@broadcom.com;
+> > pavan.chebbi@broadcom.com; ajit.khaparde@broadcom.com;
+> > sriharsha.basavapatna@broadcom.com; somnath.kotur@broadcom.com;
+> > Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; tariqt@nvidia.com; saeedm@nvidia.com;
+> > louis.peens@corigine.com; shshaikh@marvell.com; GR-Linux-NIC-
+> > Dev@marvell.com; ecree.xilinx@gmail.com; horms@kernel.org;
+> > dsahern@kernel.org; ruanjinjie@huawei.com; mheib@redhat.com;
+> > stfomichev@gmail.com; linux-kernel@vger.kernel.org; intel-wired-
+> > lan@lists.osuosl.org; linux-rdma@vger.kernel.org; oss-
+> > drivers@corigine.com; linux-net-drivers@amd.com; leon@kernel.org
+> > Subject: [Intel-wired-lan] [PATCH net-next 1/3] net: ASSERT_RTNL
+> > remove netif_set_real_num_{rx, tx}_queues
 > > 
-> > Matches my understanding FWIW, but this will be a great addition 
-> > to the commit message. Let's add it in v2..
+> Can you consider more explicit title like:
+> net: remove redundant ASSERT_RTNL() in queue setup functions
+> ?
+> 
+> > Existing netdev_ops_assert_locked takes care of asserting either
+> > netdev lock or RTNL.
 > > 
-> > > >  	return NOTIFY_DONE;
-> > > >  }
-> > > >  
-> > > > diff --git a/net/packet/internal.h b/net/packet/internal.h
-> > > > index d5d70712007a..1e743d0316fd 100644
-> > > > --- a/net/packet/internal.h
-> > > > +++ b/net/packet/internal.h
-> > > > @@ -11,6 +11,7 @@ struct packet_mclist {
-> > > >  	unsigned short		type;
-> > > >  	unsigned short		alen;
-> > > >  	unsigned char		addr[MAX_ADDR_LEN];
-> > > > +	struct list_head	remove_list;  
-> > > 
-> > > INIT_LIST_HEAD on alloc in packet_mc_add?
-> > 
-> > Just to be clear this is an "entry node" not a "head node",
-> > is it common to init "entry nodes"? 
-> 
-> I wasn't sure. A small sample from net/core showed that many do, e.g.,
-> napi->poll_list. But not all, e.g., failover->list just calls
-> list_add_tail immediately.
-> 
-> I suspect, and from that it seems, that it is safe to not explicitly
-> initalize entry nodes if you know what you're doing / how they're
-> used.
-> 
-> But whether that is actually intended to work, especially with more
-> involved debugging (such as LIST_POISON) and invariant checking
-> (__list_add_valid), I don't know.
-> 
-> I did not find any authoritative documentation that says you have too,
-> so I guess it's fine. But not ideal.
+> I'd recommend rephrasing like:
+> The existing netdev_ops_assert_locked() already asserts that either
+> the RTNL lock or the per-device lock is held, making the explicit
+> ASSERT_RTNL() redundant.
 
-I can add the initialization to be safe and add more info to the commit
-message, thank you both for the feedback!
+Sure, will do, thanks!
 
