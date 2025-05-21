@@ -1,215 +1,279 @@
-Return-Path: <netdev+bounces-192425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7ABABFD93
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:51:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C6DABFD99
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:57:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDFA618898A9
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 19:52:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51FF11BA4937
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 19:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860EF19EEBD;
-	Wed, 21 May 2025 19:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE95223536B;
+	Wed, 21 May 2025 19:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t7ztdBc0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAW6/N8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB179172BD5
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 19:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747857107; cv=none; b=T8E4Jo2PyTiX5vipcZU0jkpYSTvHUDVbQ9du1Fnls9r7jXYe1QVpfS8V+izfvB6GOxoTmZvpZ77OvWOVJn/uM06wStM9IczrL/rUtcpecxt+jkEHlG8AlptNzjBN+3fda8XFquk/PrlDQjI0uxXCdkWYa+LwIdQis633GeVno1I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747857107; c=relaxed/simple;
-	bh=ena1yUYJ2wsrAoXFW7QUwDTaSoM9tZqaKrYzQuSLIrU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PO5sY3oiPn5dMfvign9ke/qmsI+cmW31dC3iMbIyjk/PACybhhz0BFlS44ld0liykgL31p4WY1slUDugZsVKrQdhWC/wko0T4dCCNtXh2quB0badSLa6uUq/sGnedCf17Ggn1M6I5IvqsN/FbfkXqK0ttf8cVcLuQUzGCFNo91M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t7ztdBc0; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-231f61dc510so1133135ad.0
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 12:51:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747857105; x=1748461905; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=24QkK8RqceHZ0n8fspRthg5IU3y9ZWuF2kXH2roLMcw=;
-        b=t7ztdBc0linE7tejnWqCUUNMNFO1y2uJMKRjR1Uuz4UYQpVohXTR6sApvrc+a56ZFt
-         446R2hAQWm7+L+H6ISe8dnsE1WiSHJS5sG2ODHjL19s4whXwKdjV0adJ7lN/IA6tezr/
-         8VB5v8GB/WISOFEW26gex463w14q5cmwPZt7nNpCMFYl0SAidgc4GRDo6xbvB7rBiOhI
-         gg7YlS3IrSaBzRCJ1K5meXMXw8kTDJNWekgStfI/jsur/8GdCwDpU2C5i2Y9wmB5FT0Y
-         HqrB2njmUcliGe6I28KGcjNyKWYW2zSPt6ZC02EETM6wxfv1yu/F3akuw+ab+s+tJse1
-         Mebg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747857105; x=1748461905;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=24QkK8RqceHZ0n8fspRthg5IU3y9ZWuF2kXH2roLMcw=;
-        b=PBR/0pBrtKmcEQCd/0ySy5h7U9zYfjylMfEZJOk5ia2E8JGKI6bjvZJbyuNl9+gJfg
-         sVTlcRlKrARc62dK9OcCodW0omZAzhgB7psIcpg2PQ4DWnkHsjtUs/1ue1f90rLCnBAK
-         5CTRyLZCGo8Q+QzKP67ewbHx+q2GocsGY6Ndobj2b+wH/3895wyliNQTfJySvIWTa4LT
-         uidjl0oD271rctZuhDrfgN5DqOYTw/obWeGIXyBqXxe4idwMM/tis/9a0K8p8iAKhMxK
-         ctQ7jqLXKoePjjiEL6RaZHlWQoZyxn53lBz5Ync4XYLDT9q//GZaAkkYV0M62pNu/671
-         6iyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXc0S2XAJvgTU7+6csUBytnwoFrT8UJ7OPf8uENa31rS/oIZh9HK2jjH2PAHg6Kon7hDxeFWRo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBL0UX7ofFUU+kxMdQB0SzFdnqEKNkuXa1mgjTno+6ob/TP7up
-	kBHHDiOwvBey8zWw6Hxt1HhYdTKli2sYWL6CQCf14mgRuXZRqF91tpalp7PC2xzYQXjZRljZedL
-	+6D6/+avxGggglN2JabJg1jqZMHLqbCdPppsKf5iq
-X-Gm-Gg: ASbGncvXSBzVSCf5EQsyeNDjdORR2h6325Ohc7ZTMVMsrn8DQmuq4V0BTdyK962lEmq
-	38sO01oYWfH36Hf9SoBXnFNLX2WR+3EFW7aGkib7ITHNgQKToDKZP9zckaWJWEv4Ocyhf9l3NyP
-	UQWvu/0mEnGQ2JFz7B5b8zKBFImdCeKYH5+2eRPtwD0ABz18/HOF+HUTe7cvurAEkzrQLDIcly2
-	Q==
-X-Google-Smtp-Source: AGHT+IEw7QjYcO39DU2lh94EzpQDBQiY1mpPkffvqtX5xrKS3CeXjaTkwYJTMWaovZr8s1w6VMqCq1bDCJP1g8o4f6Y=
-X-Received: by 2002:a17:903:11c8:b0:21d:dca4:21ac with SMTP id
- d9443c01a7336-231ffd0e31cmr12604085ad.6.1747857104779; Wed, 21 May 2025
- 12:51:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9F2322E;
+	Wed, 21 May 2025 19:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747857424; cv=fail; b=axT9itRY6dxBi8hJ1BMtL2rXTntG1QzaYFLr/Zsx6sPvs1yfWSQaXYz9ndz6A7d1ynOI3Zhzhm8b+YH+shdJu01o3tOJV+h+A4bcalNy9/LnI9uMtebTiWL26+YtKwk7QYGjbOxEeRxaKMtj1pHDzGtQ7dyAHu0afCN0+iQchI4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747857424; c=relaxed/simple;
+	bh=xFC4IG0nnxpLXkNoSOkKSYZNkPCg59GLnsiPKIb4HFY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LlBsuwq0VFY82YbNaSp1j9GKq4MzuTKvURPf0QJtzuDIB79R1CQaDLuAJ7gdOwS9Q+GXbJ7aNZofmgeVJQSNHfeS3LWf5EoBMKi0dpeRkhXAipJr11oOUWtINJ8yCK6gANf3Cz9X7R+8skJCnavd1SiQHNFFKW6eNCDEwpG5GKQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAW6/N8m; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747857423; x=1779393423;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=xFC4IG0nnxpLXkNoSOkKSYZNkPCg59GLnsiPKIb4HFY=;
+  b=NAW6/N8mq8DaDEIOPs/r87nzu0en+AezcKeb3azRV23YQHhzD/u+Rhc5
+   NjtwVHPWhH73X0DZoI262sBHq3RGlzsvgSq4lBdlZpb0M8Ytwoya6/HcI
+   jmvdnRcV78hwtzOKAXqLHWCGLB1C/7/nnmlkfJze9CPNC/ZNZmFmR+vko
+   QiYRMHz0KyMKyxiE7wj72vnK2M4VubnZ+TIuQ25CNse7XH7dX7xSUFZHV
+   SlJQIhuMp2NfxDDMswK+bwfp/VqNFs4rY6s/kqH1103ARrTCsdU5xVEmR
+   tzFMA9BtBjxTeurkpDl+WsBESQnydLxMh/YPaNqSPYcsAqlht4LMecnqb
+   g==;
+X-CSE-ConnectionGUID: dIX3nfasQUGjBIhnsPXY4g==
+X-CSE-MsgGUID: OvBhNwA8QD+3eLFoL1MQ9w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="60903865"
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="60903865"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 12:57:00 -0700
+X-CSE-ConnectionGUID: Lijts6QgRZSzZHDwx4XGAg==
+X-CSE-MsgGUID: quzveK54QbmayzUt+7BcBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="144956534"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 12:56:57 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 21 May 2025 12:56:56 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 21 May 2025 12:56:56 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Wed, 21 May 2025 12:56:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AXENEGLnCzgzvAk3aIia8ZLlUNMzIe7QvOThYLSztgGvvh+rQDmTredARqezKKdFgEUJAfUyZfT8gRzQAOnCm62uHudOZlFpM//4MfleH7xlmncWkSu9s2+8nfhxbpWqGTLUrFYXev4eGyern5LoWXpNVE+APg9l58NWE2WaJpBr4usgS+stPVMS26Mlx/b9S6haaVAAWSy/RGgK60FK1vMfUzMow9NZqzAZmrxMQ9xjYIPwIZtFT7S9H7Qm1dKzhRlA7wpC94wfeAJc9Mm9UW6sdUi3dgyByRiIbga80iWSGFbryvjtf4ddCZ9HbCJ+epB9kllhmka4B4clQjKhAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OhusqDEfx4obc2G8kVMNbHAdKFs0FYjw3VsuW7UhQ+s=;
+ b=TLwlgUE4cYbqAady/6SxD4GGa97eBhezhdpXXAZ6PIogz3UFwSXBQTBxQpDjnqN5MzEvaiVZzbwry/fIwnG/T5fieqo5gTs5cImXmTy8jpi4G0lsahijMLMFz6R5FV5NxnRw+EZJ8QnzXuRBwVrZwMQbKumH+dDeUWku1ioadHOTWE/A/JtqJbCoKu7Qq8m9127mqXV8tile5auny8PAZmx52tKBlv0hWDEc1XmANs+/TEvhJv2zrZ6c+HD8G/ihKBEfiKOCh7npcp2ZSzYBmc5DwwBDujT7MfQXd7Ae+BNzP7lrDX69NufiKx/uSqBmow/5vya5hq9EN1w0WUI3eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by CYYPR11MB8432.namprd11.prod.outlook.com (2603:10b6:930:be::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Wed, 21 May
+ 2025 19:56:54 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8746.030; Wed, 21 May 2025
+ 19:56:54 +0000
+Date: Wed, 21 May 2025 12:56:51 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>, Martin Habets
+	<habetsm.xilinx@gmail.com>, Edward Cree <ecree.xilinx@gmail.com>, "Jonathan
+ Cameron" <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v16 12/22] sfc: obtain root decoder with enough HPA free
+ space
+Message-ID: <682e300371a0_1626e1003@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250514132743.523469-1-alejandro.lucero-palau@amd.com>
+ <20250514132743.523469-13-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250514132743.523469-13-alejandro.lucero-palau@amd.com>
+X-ClientProxiedBy: BY3PR03CA0014.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::19) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250519224325.3117279-1-skhawaja@google.com> <20250520190941.56523ded@kernel.org>
- <CAEA6p_BxSA16cMXr5NaJCLZ+KWD2YVVwEdvVX_QG=_gyvNCP=w@mail.gmail.com> <CAAywjhR4znr9fsAdBKmYAwcyP8JgoesLkuS8p9D0goJBFFePWg@mail.gmail.com>
-In-Reply-To: <CAAywjhR4znr9fsAdBKmYAwcyP8JgoesLkuS8p9D0goJBFFePWg@mail.gmail.com>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Wed, 21 May 2025 12:51:33 -0700
-X-Gm-Features: AX0GCFvJhS0qV67VSS1iubwXI2_JV8lgsH2eWi6Kg-ik3yQBzT0rkFMl9D3FbfY
-Message-ID: <CAAywjhTjdgjz=oD0NUtp-k7Lccek-4e9wCJfMG-p0AGpDHwJiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: stop napi kthreads when THREADED napi is disabled
-To: Wei Wang <weiwan@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, jdamato@fastly.com, mkarsten@uwaterloo.ca, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CYYPR11MB8432:EE_
+X-MS-Office365-Filtering-Correlation-Id: e3aba6d5-dd63-468a-c821-08dd98a1a276
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?fAdp5IwIAYfdAkIw+v0qNVIp3yIGM7YbrdvSEsR1ke1Ad94fSvFLc7bWat75?=
+ =?us-ascii?Q?YjZd5nQahef+kqwdgg+m1fhW442PXEbsMzjR6MZcvpXg6fR08BqBDdaXVea3?=
+ =?us-ascii?Q?KDqbdvG7yl3EHa6DyREQKTU2P0bIPWxpp1xZwZBXhT2iGAsu3/9/pRtQpZ5/?=
+ =?us-ascii?Q?TbrFndgt2kVkj0jKkQflqA+KJVJEooT341bpMb1ilF685N+4O6XyeDkFJqYq?=
+ =?us-ascii?Q?LHzvTa3HDgiJnUgUBXZoXJ7uODsgvpvDYRhQFcUBrtKpZD2PMyQ4qWjtrtNG?=
+ =?us-ascii?Q?hA+vvQYwpfZWbf3gTGlEcWhh8Iv8/M+rLEldUEQx6FC22gWDUeZefHjtMYzV?=
+ =?us-ascii?Q?p+yFpurvPLUbJHh7lejQk8eNpLjSWq1ctQUPnEx0j/CbyGEh3GAa+2IYVfeR?=
+ =?us-ascii?Q?nOfUiCQy72F8MPc7aN9AnOirPgmzE0z5LzPPD75qqlEeapRGPn7vuugU2thN?=
+ =?us-ascii?Q?X7wqfOeFdQkVB/vAEBmabLc20mHwRFjwnwc3yrPOWCtwhflm8dR0ncw8A8iA?=
+ =?us-ascii?Q?44GLAuEjX97aJHvpAKZ6LRrR5ykxpq6sR6sDgQdk/vJxAFJst0fSPq3ksfsM?=
+ =?us-ascii?Q?sXKjxCDD1vwH10mjkfA43Xzo0gEV6tyxRUTzvfoVmae/YByNUlua1eSSHWP1?=
+ =?us-ascii?Q?W1XwF4tubpvKDvRDGtznq5zHSQcTrn25aFDuxODUVSR91m9T+MuW9DeHLxzU?=
+ =?us-ascii?Q?ExuhX3mN5hM53mqe9I77yOlCMJO8lkjCNgOkdJmw/eLCBl+KXOONWRzo5ZhA?=
+ =?us-ascii?Q?IhU21Joy6T48Fgd01QZpqX2tB1JM/ZXPT7jSa4SCZyK6puUwFI556nQetisw?=
+ =?us-ascii?Q?rqD7b2iK0a3BTArL5ZOCL4s0007C7By431T2DP8UjB/ZjLMuUJzlWcnds1Ot?=
+ =?us-ascii?Q?dwlsVZMHzQHzZTQEZ20ugGmGkaZasFRGp9b9Qs1DO5HoYoJuxBntk2WgAx5V?=
+ =?us-ascii?Q?H6hNUujFjWDEz6oTVN0T51+gUiZbYRqptT5gqX3BaaIuNmpyLo5QkE7gxqd/?=
+ =?us-ascii?Q?88ZpataK4+niWCurN1VDpgGmk5FqGsVwn4vGLQitX6AZIQp/yj5Qjmh2d35H?=
+ =?us-ascii?Q?ERAH1ARODYDF4G1PbVH1C/Kz1aMxUvmt11fghSLKJLm2NLnz6A3mkcJxcAnx?=
+ =?us-ascii?Q?gpqZRFhbDlsAWPrCSLPugHSxWUsAwVNeY4xE/GqX1vjDbuPNXlAhbceJdNoS?=
+ =?us-ascii?Q?M05xGse+oYHdOLlPIcwrdLI8k5vl4gPA/kS9AyHZOGlKNuz8sOs2F8eloC0Z?=
+ =?us-ascii?Q?FDQ1SfsyP30a9P9G4Fj5z6C4ZFX1jB1VvW1iMIP91SlNIrh1NDhdWZU+Ihye?=
+ =?us-ascii?Q?aDOteOWzBN0e0WgwgwgNdz8ZbQs0fLJbETm04rElUXojBFY1mwFoeEfFh3Zi?=
+ =?us-ascii?Q?SSJKm0wz1JpGRqxUJyEnmk6cDwOfQKSsGT5/rszhuKzxGNtAVG60NDsiVwj1?=
+ =?us-ascii?Q?nrGM3vxh/BjfCT4sW5o684B3COsVo/yvKeEkuS97pv433ATXfSKGAA=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j8nOqIYbpRHy6NjDNMSZIadicdbUNkFc6UgG9wQY30mrEbM8CN7tnTsCWjlA?=
+ =?us-ascii?Q?FaCJi8+M2cW+wOTj5D+/N/QOZxqQ7TQw+Yf9BT/Ju05I87f5fdxpwKtuMQ2G?=
+ =?us-ascii?Q?JKvzGvBCH4JX/9TO4OJVuzo3eJsqh3PsUgnu+0ttVo1ztXdzibi3U7NCquFu?=
+ =?us-ascii?Q?r+8FPrp79Tvx2a0J1fXSaz3/8kx9ELblmuTMGcy2uZ+fjREkwuEMoy8qJKos?=
+ =?us-ascii?Q?PCKxgxNuIkBc2z9913UiRZMtvciv25Rw6O4Y0LDFWpvP8KXJzKxS5HV2xrQt?=
+ =?us-ascii?Q?58kyK/QfkqjbBW0Hf5s7cDoPg/wH10W6rdMQRtpUduTI/PuBuRbbEVIn9dp7?=
+ =?us-ascii?Q?iGRRRnaLYAslI2LUYnxkUOan42iDiKefwvnbDFmMYhKxWSEeA0Mq5+0CiZCw?=
+ =?us-ascii?Q?mMevQNpqt5/mVKs9NNy7QcMbwyJuFQKOOyX6xYbFQ+vqJPYfdKO7cTdBjjbw?=
+ =?us-ascii?Q?FwH7R6kXiP9g9HST11Ri0OEZC8fy9c3UIQNO6WxNRyPSbJ8klU6YGZSls4s2?=
+ =?us-ascii?Q?Ggj2IyiZWL3LfU4C/nlKIAdVKTxR7qnGY6WXefTqbspGAAtlC3KIRr2mEpSg?=
+ =?us-ascii?Q?888WXmfSilx3SulWgEkGw2uS7w8sZ323bOpfzD4tJ3/UjSyAdlfixArKSTtj?=
+ =?us-ascii?Q?O1vpzV5+5cn6x/4IjTa6WJkEfgP4/5jhq6TMKgBefuTNdk+xTUTIDj5MQlJ4?=
+ =?us-ascii?Q?d9V6HgAy4KPb+Gewcw8gBnCIx3WoEvQIafJ70zcYgu9/X9mD28Dh8WkbFjyy?=
+ =?us-ascii?Q?QKK7AGxml6ZfZalMluazzTRY2lFVVOBFpIbIG3i2N8mAa3BFkvT04kC6R3u1?=
+ =?us-ascii?Q?Da5klfMmTQhB5Wzr6gAw+wVKvHZPNIErrcyL4IYqsMDZ327LZs5PtRjtSQEY?=
+ =?us-ascii?Q?m3yYEgMrEpqW1cqR+g4ngu54ABEXyyJs5xbLx7qdtrnyrIbLNx1kNUF8+t7Q?=
+ =?us-ascii?Q?1/rWIsKAkl/Rmv5Zq2IuAEQfTiP+Ai2wVFKOazQCI5nQmir/sStpkOxaGjfC?=
+ =?us-ascii?Q?bZcxq03zXQ9X+CE77Qwa8zoJrMbj+AhgkdkC/C8QC0NwFFkZvOzYkO3f1JFJ?=
+ =?us-ascii?Q?xQcxqnbFna9A3ZQpe+Y+F72dgDwIYilBVqPjqIyOvT4IC72gpRcshvdOOg7h?=
+ =?us-ascii?Q?A6jfPxz+wy/9kbJqKJxfjpJXyPtaX/SwEBvrrlbQDsOW2AKzlAG6JagDbUUv?=
+ =?us-ascii?Q?BL0Vwp3zXLFdkmfTgrOHj21MT3qWuNpDy2sy6AFC3KcGd9enhi2XsZGyN1XV?=
+ =?us-ascii?Q?9aKBNeQ0KJfFNYiTAshkwQcR5nb2Ev+DZjK0JjukSssH/yIxOAMXxgtCLiJ5?=
+ =?us-ascii?Q?g3twLsKOHMWZxgT2oRIwNbFP2sxpZVcv+C5xtH2ibuS5+BHnYrVQBPgEb1UQ?=
+ =?us-ascii?Q?5bG+OMbG7VbC0ePqBDktceM2ywuCUVW+N7Am6f8gO6hk42UrpgBp2rvJBnT5?=
+ =?us-ascii?Q?t0Tn7eqPkz02SVyvp5gdxEx0SnxFGZpJQmMFpBF8LscsUosO7XxZGBe2BX+j?=
+ =?us-ascii?Q?9frWuZQy/dmoQMdAy3WBmiJRreTKz6Wiz7uOWuwuKAvNZ0nY+ymtP/To486l?=
+ =?us-ascii?Q?eTC1HknCAULXqDv0bkGTBCwhoYztySAr/wWlSg1MVQg5lS9sDav9o2lpkMBg?=
+ =?us-ascii?Q?jQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3aba6d5-dd63-468a-c821-08dd98a1a276
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2025 19:56:54.0762
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m/3UstgNtLrTGLBEdP7l7JrjqMQs+DEhCZTifvrMJ8xlA9Z5ULfEcav1HdGiSvTHSqTXkXXXSADnpGgC1LKihAyI8w5oUE/v7/8h7nTHdlw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8432
+X-OriginatorOrg: intel.com
 
-On Wed, May 21, 2025 at 10:28=E2=80=AFAM Samiullah Khawaja <skhawaja@google=
-.com> wrote:
->
-> On Wed, May 21, 2025 at 9:41=E2=80=AFAM Wei Wang <weiwan@google.com> wrot=
-e:
-> >
-> > On Tue, May 20, 2025 at 7:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Mon, 19 May 2025 22:43:25 +0000 Samiullah Khawaja wrote:
-> > > > -/* Called with irq disabled */
-> > > > -static inline void ____napi_schedule(struct softnet_data *sd,
-> > > > -                                  struct napi_struct *napi)
-> > > > +static inline bool ____try_napi_schedule_threaded(struct softnet_d=
-ata *sd,
-> > > > +                                               struct napi_struct =
-*napi)
-> > > >  {
-> > > >       struct task_struct *thread;
-> > > > +     unsigned long new, val;
-> > > >
-> > > > -     lockdep_assert_irqs_disabled();
-> > > > +     do {
-> > > > +             val =3D READ_ONCE(napi->state);
-> > > > +
-> > > > +             if (!(val & NAPIF_STATE_THREADED))
-> > > > +                     return false;
-> > >
-> > > Do we really need to complicate the fastpath to make the slowpath eas=
-y?
-> > >
-> > > Plus I'm not sure it works.
-> > >
-> > >           CPU 0 (IRQ)             CPU 1 (NAPI thr)          CPU 2 (co=
-nfig)
-> > >                          if (test_bit(NAPI_STATE_SCHED_THREADED))
-> > >                                ...
-> > >
-> > >   ____napi_schedule()
-> > >   cmpxchg(...)
-> > >   wake_up_process(thread);
-> > >                                                        clear_bit(NAPI=
-_STATE_THREADED)
-> > >                                                        kthread_stop(t=
-hread)
-> > >
-> > >                          if (kthread_should_stop())
-> > >                                 exit
-> > >
-> > > Right?
-> +1
->
-> If the kthread checks whether it was not SCHED before it died then
-> this should not occur.
-> > >
-> > Hmm right... I think the main issue is that while dev_set_threaded()
-> > clears STATE_THREADED, SCHED_THREADED could already be set meaning the
-> > napi is already scheduled. And napi_thread_wait() does not really
-> > check STATE_THREADED...
-> >
-> > > I think the shutting down thread should do this:
-> > >
-> > >         while (true) {
-> > >                 state =3D READ_ONCE()
-> > >
-> > >                 // safe to clear if thread owns the NAPI,
-> > >                 // or NAPI is completely idle
-> > >                 if (state & SCHED_THREADED || !(state & SCHED)) {
-> This might suffer from the problem you highlighted earlier,
-> CPU 0 (IRQ)             CPU 1 (NAPI thr)          CPU 2 (config)
->
->   ____napi_schedule()
->     if (test_bit(NAPI_STATE_THREADED))
->     if (thread) {
->
->  kthread_stop()
->                               if (state & SCHED_THREADED || !(state & SCH=
-ED)) {
->                                    state &=3D ~THREADED;
->                               if (try_cmp_xchg())
->                                    break
->
->        set_bit(NAPI_STATE_SCHED_THREADED)
->        wake_up_process(thread);
->
-> This would happen without the try_cmp_xchg logic that I added in my
-> patch in the __napi_schedule (in the fast path). __napi_schedule would
-> have to make sure that the kthread is not stopping while it is trying
-> to do SCHED. This is similar to the logic we have in
-> napi_schedule_prep that handles the STATE_DISABLE, STATE_SCHED and
-> STATE_MISSED scenarios. Also if it falls back to normal softirq, it
-> needs to make sure that the kthread is not polling at the same time.
-Discard this as the SCHED would be set in napi_schedule_prepare before
-__napi_schedule is called in IRQ, so try_cmp_xchg would return false.
-I think if the thread stops if the napi is idle(SCHED is not) set then
-it should do. This should make sure any pending SCHED_THREADED are
-also done. The existing logic in napi_schedulle_prep should handle all
-the cases.
->
-> > I think we should make sure SCHED_THREADED is cleared as well, or
-> > otherwise the thread is in the middle of calling napi_threaded_poll()
-> > and we can't just disable the thread?
-> +1
->
-> We need to make sure that any scheduled polling should be completed.
->
-> >
-> > >                         state &=3D ~THREADED;
-> >
-> > STATE_THREADED to be exact. Right?
-> >
-> > >                 } else {
-> > >                         msleep(1);
-> > >                         continue;
-> > >                 }
-> > >
-> > >                 if (try_cmpxchg())
-> > >                         break;
-> > >         }
-> > >
-> > > But that's just an idea, it could also be wrong... :S
+alejandro.lucero-palau@ wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Asking for available HPA space is the previous step to try to obtain
+> an HPA range suitable to accel driver purposes.
+> 
+> Add this call to efx cxl initialization.
+> 
+> Make sfc cxl build dependent on CXL region.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  drivers/net/ethernet/sfc/Kconfig   |  1 +
+>  drivers/net/ethernet/sfc/efx_cxl.c | 19 +++++++++++++++++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
+> index 979f2801e2a8..e959d9b4f4ce 100644
+> --- a/drivers/net/ethernet/sfc/Kconfig
+> +++ b/drivers/net/ethernet/sfc/Kconfig
+> @@ -69,6 +69,7 @@ config SFC_MCDI_LOGGING
+>  config SFC_CXL
+>  	bool "Solarflare SFC9100-family CXL support"
+>  	depends on SFC && CXL_BUS >= SFC
+> +	depends on CXL_REGION
+>  	default SFC
+>  	help
+>  	  This enables SFC CXL support if the kernel is configuring CXL for
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 53ff97ad07f5..5635672b3fc3 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -26,6 +26,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct cxl_dpa_info sfc_dpa_info = {
+>  		.size = EFX_CTPIO_BUFFER_SIZE
+>  	};
+> +	resource_size_t max_size;
+>  	struct efx_cxl *cxl;
+>  	u16 dvsec;
+>  	int rc;
+> @@ -84,6 +85,22 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		return PTR_ERR(cxl->cxlmd);
+>  	}
+>  
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd, 1,
+> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+> +					   &max_size);
+> +
+> +	if (IS_ERR(cxl->cxlrd)) {
+> +		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
+> +		return PTR_ERR(cxl->cxlrd);
+> +	}
+
+This is a simple enough model, but it does mean that if async-driver
+loading causes this driver to load before cxl_acpi or cxl_mem have
+completed their init work, then it will die here.
+
+It is also worth noting that nothing stops cxl_mem or cxl_acpi from
+detaching immediately after passing the above check. So more work is
+needed here (likely post-merge) to revoke and invalidate usage of that
+freespace when that happens.
+
+Otherwise you can do something like:
+
+Driver1			Driver2			Notes
+cxl_get_hpa_freespace()				"Driver1 gets rangeX"
+	--- cxl_acpi unloaded ---		"forgets rangeX was assigned"	
+	--- cxl_acpi reloaded ---			
+			cxl_get_hpa_freespace() "Driver2 gets rangeX"
+use_cxl(rangeX)		use_cxl(rangeX)		"...uh oh"
+
+So longer term there needs to be notification back to the creator of the
+memdev to require it to handle cleaning up when the CXL topology is torn
+down either physically or logically.
+
+To date the CXL subsystem has not reset decoders on unload because it
+needs to handle coordinating with HDM decode established by platform
+firmware. Type-2 driver however should be prepared to have their CXL
+range revoked at any moment.
+
+The Type-3 case handles this because cxl_mem is the driver itself, for
+Type-2 that driver wants to coordinate with cxl_mem on these events. To
+me that looks like cxl_mem error handler operation callbacks.
 
