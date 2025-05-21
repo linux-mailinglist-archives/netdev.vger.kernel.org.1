@@ -1,135 +1,113 @@
-Return-Path: <netdev+bounces-192462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC173ABFF60
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 00:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C0DABFF62
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 00:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF0949E6B3E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 22:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 417813AB342
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 22:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D59238D2B;
-	Wed, 21 May 2025 22:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278D02397BE;
+	Wed, 21 May 2025 22:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="PWsrlOKO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7Axwh1z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3552B9A9;
-	Wed, 21 May 2025 22:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020AF1754B
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 22:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747866026; cv=none; b=hkr/pnOKS9gZjtFAWka4zlSum5QxsWlVPzZ1brEUH0pyN9IYr3TMoQssSt+ILD/qvj7JtT2SNS/be4S5GMLAkINkXDR06Vq4QMIFXwj1O3iJeX5o+M5Fn01yiqkuhKZTtj99x7U9z9tcQO15WC4trh6LRvP+41nMi3geO8OjB/8=
+	t=1747866109; cv=none; b=Lf5YOAvd54zZXm2eX8wfrS7rYkJ4ToDRv5FDf4TefT41qknXQ5eneNNQaAQjLa36GkYm7TeEk3oBF2KJ7itQmzGe0K42AyyfA5zCCXIR8lIdGZO+4+4YPbImt4W5Me3+icmL1/r92D4Di/dCBR5IgNMdBsUM/DcY06RGMt+P3vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747866026; c=relaxed/simple;
-	bh=gls+ZcFTEdOz3UEovmMZUR8naAEeaSWPKjBLlEoX8sE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u2asQIQud0dPQs2a8lhmJBP6pSdCD4Y1p07z4BScOTKcKqjpHb4VmJ2JQUPrf8fQKk1m+BCe/LFS/qljhYZwBQWs/Bg3j1ZiBzPlyxY/u2xozgmcKN5jnCHFbwQRWeIg9hvC96uZ/ZM0BO9oLvgVjjnSpS4AE1NnrnsJFxZME2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=PWsrlOKO; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747866025; x=1779402025;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vf4hc+qK1z5O+lchWhOjyB1mxri2NnFe5ss13arccME=;
-  b=PWsrlOKOsVY0loXuw5C7pnfCz78mSj0kzRigioa4ybfA5BdLTTH/JVkB
-   jxMpbb/0nZgovHe2jYxe9IdD/hqBb0NOKO5RkxcpQsuD+aPEPY6SkgJfa
-   dA9ar/CU28F4zjBf7bwkmg23Wa2iP5+F7QPghM87HYemFqKPQ7KDFFk6t
-   VhPZ5TtJ3NaOXnU8TvJZL1dNE65pW/v/wVQqht0SiwochMxImvUMhjhFj
-   gvplUTQBIUR2KOdAyvzaneILqSlErNivX08zR5bTFr8HTRBDj3K4ZJ7Ut
-   0uEfJnL3hl0U9M+q0W43D9+S4u/h4aLJt16G8tGlZPNv+YG3HqbjKxgrP
-   w==;
-X-IronPort-AV: E=Sophos;i="6.15,304,1739836800"; 
-   d="scan'208";a="52591237"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 22:20:22 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:45461]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.191:2525] with esmtp (Farcaster)
- id 7dc05fee-baff-4b98-9bf6-986dda3d4079; Wed, 21 May 2025 22:20:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 7dc05fee-baff-4b98-9bf6-986dda3d4079
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 22:20:21 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.52.104) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 22:20:18 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jordan@jrife.io>
-CC: <alexei.starovoitov@gmail.com>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
-	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v1 bpf-next 02/10] bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
-Date: Wed, 21 May 2025 15:20:06 -0700
-Message-ID: <20250521222009.85628-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250520145059.1773738-3-jordan@jrife.io>
-References: <20250520145059.1773738-3-jordan@jrife.io>
+	s=arc-20240116; t=1747866109; c=relaxed/simple;
+	bh=L9jqBe7WeGUMjBl8bfXNlFqbpsL7fdO6E4F4Xa18Sxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f0BESMeBIcbHAyh/Gv/3Z1eD3GQ5maYbh1gd8c3+hug9hXG8x8cXTG7jEWCI8v7nOTiRfjxRrD6JXO+Bm0TgyDykjfUYDLz0UVb8zFpnaDqgdqI/LLk7ogrJP/qAdPecSom3DxW0zpUEoIWnHR7uo5ky0z9G3sTYx+te3HDz9FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7Axwh1z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2756DC4CEE4;
+	Wed, 21 May 2025 22:21:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747866108;
+	bh=L9jqBe7WeGUMjBl8bfXNlFqbpsL7fdO6E4F4Xa18Sxw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b7Axwh1zBu2r1TrU4rgm7PCbUWDJ4jT+KRP7USx8/kDPZBNrC3Lzj2xMtiid6GMQw
+	 kzNPP2OeYw4sruyIAi9lF9qG3SEUUO7nCGhULM37ZtS37aOQ5AdDgkHfaAwAfYjTOd
+	 yi5M84NzxiNiyfYWT7mfw1rC7qvM4l1NCJ4rji7d4HzVvDbQ0YbVhURbhMH0ZxZbkl
+	 UZJ+X71hZ8ipGay7gcEMqc8jpdn7yJg36LjcE5ERHoIu5DGaYtgW70s1r305uPmCYx
+	 EFk/K+dxNW7LUU55WX5WGq5dfplWw4bh53fkAqRpWVusfYAr55jbm/1TDRMcEwx09e
+	 1vaeK6wsleY2w==
+Date: Wed, 21 May 2025 15:21:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Wei Wang <weiwan@google.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
+ mkarsten@uwaterloo.ca, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: stop napi kthreads when THREADED napi
+ is disabled
+Message-ID: <20250521152147.077f1cb0@kernel.org>
+In-Reply-To: <CAAywjhTjdgjz=oD0NUtp-k7Lccek-4e9wCJfMG-p0AGpDHwJiQ@mail.gmail.com>
+References: <20250519224325.3117279-1-skhawaja@google.com>
+	<20250520190941.56523ded@kernel.org>
+	<CAEA6p_BxSA16cMXr5NaJCLZ+KWD2YVVwEdvVX_QG=_gyvNCP=w@mail.gmail.com>
+	<CAAywjhR4znr9fsAdBKmYAwcyP8JgoesLkuS8p9D0goJBFFePWg@mail.gmail.com>
+	<CAAywjhTjdgjz=oD0NUtp-k7Lccek-4e9wCJfMG-p0AGpDHwJiQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jordan Rife <jordan@jrife.io>
-Date: Tue, 20 May 2025 07:50:49 -0700
-> Require that iter->batch always contains a full bucket snapshot. This
-> invariant is important to avoid skipping or repeating sockets during
-> iteration when combined with the next few patches. Before, there were
-> two cases where a call to bpf_iter_tcp_batch may only capture part of a
-> bucket:
-> 
-> 1. When bpf_iter_tcp_realloc_batch() returns -ENOMEM.
-> 2. When more sockets are added to the bucket while calling
->    bpf_iter_tcp_realloc_batch(), making the updated batch size
->    insufficient.
-> 
-> In cases where the batch size only covers part of a bucket, it is
-> possible to forget which sockets were already visited, especially if we
-> have to process a bucket in more than two batches. This forces us to
-> choose between repeating or skipping sockets, so don't allow this:
-> 
-> 1. Stop iteration and propagate -ENOMEM up to userspace if reallocation
->    fails instead of continuing with a partial batch.
-> 2. Try bpf_iter_tcp_realloc_batch() with GFP_USER just as before, but if
->    we still aren't able to capture the full bucket, call
->    bpf_iter_tcp_realloc_batch() again while holding the bucket lock to
->    guarantee the bucket does not change. On the second attempt use
->    GFP_NOWAIT since we hold onto the spin lock.
-> 
-> I did some manual testing to exercise the code paths where GFP_NOWAIT is
-> used and where ERR_PTR(err) is returned. I used the realloc test cases
-> included later in this series to trigger a scenario where a realloc
-> happens inside bpf_iter_tcp_batch and made a small code tweak to force
-> the first realloc attempt to allocate a too-small batch, thus requiring
-> another attempt with GFP_NOWAIT. Some printks showed both reallocs with
-> the tests passing:
-> 
-> May 09 18:18:55 crow kernel: resize batch TCP_SEQ_STATE_LISTENING
-> May 09 18:18:55 crow kernel: again GFP_USER
-> May 09 18:18:55 crow kernel: resize batch TCP_SEQ_STATE_LISTENING
-> May 09 18:18:55 crow kernel: again GFP_NOWAIT
-> May 09 18:18:57 crow kernel: resize batch TCP_SEQ_STATE_ESTABLISHED
-> May 09 18:18:57 crow kernel: again GFP_USER
-> May 09 18:18:57 crow kernel: resize batch TCP_SEQ_STATE_ESTABLISHED
-> May 09 18:18:57 crow kernel: again GFP_NOWAIT
-> 
-> With this setup, I also forced each of the bpf_iter_tcp_realloc_batch
-> calls to return -ENOMEM to ensure that iteration ends and that the
-> read() in userspace fails.
-> 
-> Signed-off-by: Jordan Rife <jordan@jrife.io>
+On Wed, 21 May 2025 12:51:33 -0700 Samiullah Khawaja wrote:
+> > This might suffer from the problem you highlighted earlier,
+> > CPU 0 (IRQ)             CPU 1 (NAPI thr)          CPU 2 (config)
+> >
+> >   ____napi_schedule()
+> >     if (test_bit(NAPI_STATE_THREADED))
+> >     if (thread) {
+> >
+> >  kthread_stop()
+> >                               if (state & SCHED_THREADED || !(state & SCHED)) {
+> >                                    state &= ~THREADED;
+> >                               if (try_cmp_xchg())
+> >                                    break
+> >
+> >        set_bit(NAPI_STATE_SCHED_THREADED)
+> >        wake_up_process(thread);
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+This got a bit line wrapped for me so can't judge :(
+
+> > This would happen without the try_cmp_xchg logic that I added in my
+> > patch in the __napi_schedule (in the fast path). __napi_schedule would
+> > have to make sure that the kthread is not stopping while it is trying
+> > to do SCHED. This is similar to the logic we have in
+> > napi_schedule_prep that handles the STATE_DISABLE, STATE_SCHED and
+> > STATE_MISSED scenarios. Also if it falls back to normal softirq, it
+> > needs to make sure that the kthread is not polling at the same time.  
+> Discard this as the SCHED would be set in napi_schedule_prepare before
+> __napi_schedule is called in IRQ, so try_cmp_xchg would return false.
+> I think if the thread stops if the napi is idle(SCHED is not) set then
+> it should do. This should make sure any pending SCHED_THREADED are
+> also done. The existing logic in napi_schedulle_prep should handle all
+> the cases.
+
+I think we're on the same page. We're clearing the THREADED bit 
+(not SCHED_THREADED). Only napi_schedule() path looks at that bit, 
+after setting SCHED. So if we cmpxchg on a state where SCHED was 
+clear - we can't race with anything that cares about THREADED bit.
+
+Just to be clear - the stopping of the thread has to be after the
+proposed loop, so kthread_should_stop() does not come into play.
+
+And FWIW my understanding is that we don't need any barriers on the
+fast path (SCHED vs checking THREADED) because memory ordering is
+a thing which exists only between distinct memory words.
 
