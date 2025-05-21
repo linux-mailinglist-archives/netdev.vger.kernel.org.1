@@ -1,122 +1,120 @@
-Return-Path: <netdev+bounces-192220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F94ABEF92
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:23:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5027DABEFEF
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2C3D1BA82DC
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:24:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D744E1159
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363C0241139;
-	Wed, 21 May 2025 09:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54CA24167F;
+	Wed, 21 May 2025 09:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXVjkvtn"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="uRKm31hS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82705241114
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 09:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7E5238173;
+	Wed, 21 May 2025 09:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747819373; cv=none; b=FZ/FbALyzM5Pg7XZ9l3qvpju+dF0d466o/Rl01Lp3PIxHoH5JFv+NBS5/4SeIhPRprGHFtRr7vtuzVF9RtUx++QPTSIxEY9vHp6ktFaFDBEQRH/W/LoWQemuKwmLyKShJ6bF9k8I0S1XX/hp2BqHsCkym9qSWbIz8dpsG+5XUkU=
+	t=1747819996; cv=none; b=FtHMzP51q1U0o9HUzW8CGKOaO5yV5/lVNO7q49srXWq2aEoi7kd9lVtJErBju5auyaFul0I1pScZ/SXxyBN/PQW2d+7WF1NWExgDWf3Qd1ZD6lqLR4T5b3ur4oSVMKO6gtnkACnP73w4XXdc+uQEdlPvHE1Cw+lnR2J3es70Fik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747819373; c=relaxed/simple;
-	bh=jlqjkVr9S+fhQc/GQZSnUfDxqzxMGUWnuuXyXkSebJo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kx2eK1Y/p6Cf7xnUhsXrNbrBjk1Nj05p5NjYKQbU5IvI/fJoKpOEiPFAkoLTV4P3MQfW6ycBv8P1coLOYSzcawlr3Q10+w4jp4pHVQuhRxgljYbOe5OfWTceASVOGxo7wVPHlpIpRcJNgob0aKwKIpt4IFvZ7tzz6AzSVqaL2r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NXVjkvtn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747819370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S01OyqRbOfmEw1jQdPVa38jcFNsvoKjej6vSXSbTUcg=;
-	b=NXVjkvtnxqSR+Kw1oGBnIjgrO+XduolfRmeAeENXWdAc7UlS8DeF21wUKcrB893aJEIMrt
-	S31FMPByLHzwRdXAqpCjdF7lIyKI+uoSm/pZ2Ep5qnUeVWvSfcjoynG4yBulIinHtQD1Lq
-	/t0eq1zrZB/FLA9lTuXVdtrfUA7+PKs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-32-cPZKKRWmO-W7Nf7TD4DkwA-1; Wed,
- 21 May 2025 05:22:48 -0400
-X-MC-Unique: cPZKKRWmO-W7Nf7TD4DkwA-1
-X-Mimecast-MFC-AGG-ID: cPZKKRWmO-W7Nf7TD4DkwA_1747819367
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A52161954B17;
-	Wed, 21 May 2025 09:22:47 +0000 (UTC)
-Received: from lenovo-t14s.redhat.com (unknown [10.44.33.64])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BEE8C1956096;
-	Wed, 21 May 2025 09:22:45 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	netdev@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH v2 3/3] virtio_net: Enforce minimum TX ring size for reliability
-Date: Wed, 21 May 2025 11:22:36 +0200
-Message-ID: <20250521092236.661410-4-lvivier@redhat.com>
-In-Reply-To: <20250521092236.661410-1-lvivier@redhat.com>
-References: <20250521092236.661410-1-lvivier@redhat.com>
+	s=arc-20240116; t=1747819996; c=relaxed/simple;
+	bh=qzl+GCezGpStnRyOr52+ceiFfjWtiTGDmpqhsXl8tEc=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=aEU4CW5J39HC2U6pOlVb4LqsosBWjffAg9sD4SDnZMOsdpIBkDKlQIsG3w+LjzHMzmSjXw4p/sZPVnZa0GfYow/0FvPfrludi9JtzwLtnUWVr43JnxGeE/Df/BxVryR681gf0U+Q29HGNdfpDJwPIddyydbhBy7eQ1uwhs9tLPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=uRKm31hS; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1747819984; h=Message-ID:Subject:Date:From:To;
+	bh=LwrdmgjpSSjCk4xY0DYUL0GPY9RuDrSmgjjk2Np2zCg=;
+	b=uRKm31hSVTjjaW0j5HLWxlU5Bz3Lzej22OfMlQcEsGtHoEMhzgVaIqLPD6b1h5QWqzjq0YOHcnrBa0nhVXGONCvI9zJAvKVo8B2eL+w4Lqo8u2ekByDzZcDSb3+9Uq1+UaeE0daQWGgE99sPTKtrxnErNtUjlMJWpn5+Lji3D5Q=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WbR961-_1747819984 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 21 May 2025 17:33:04 +0800
+Message-ID: <1747819548.635838-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH 1/2] virtio_ring: Fix error reporting in virtqueue_resize
+Date: Wed, 21 May 2025 17:25:48 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250520110526.635507-1-lvivier@redhat.com>
+ <20250520110526.635507-2-lvivier@redhat.com>
+In-Reply-To: <20250520110526.635507-2-lvivier@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-The `tx_may_stop()` logic stops TX queues if free descriptors
-(`sq->vq->num_free`) fall below the threshold of (`MAX_SKB_FRAGS` + 2).
-If the total ring size (`ring_num`) is not strictly greater than this
-value, queues can become persistently stopped or stop after minimal
-use, severely degrading performance.
 
-A single sk_buff transmission typically requires descriptors for:
-- The virtio_net_hdr (1 descriptor)
-- The sk_buff's linear data (head) (1 descriptor)
-- Paged fragments (up to MAX_SKB_FRAGS descriptors)
+We should provide feedback to the caller indicating the queue's current status
+whether it is still valid and whether its size has been successfully
+modified. Here I selected the first. The caller can know the second by
+virtqueue_get_vring_size().
 
-This patch enforces that the TX ring size ('ring_num') must be strictly
-greater than (MAX_SKB_FRAGS + 2). This ensures that the ring is
-always large enough to hold at least one maximally-fragmented packet
-plus at least one additional slot.
+Thanks.
 
-Reported-by: Lei Yang <leiyang@redhat.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- drivers/net/virtio_net.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index ff4160243538..50b851834ae2 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3481,6 +3481,12 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
- {
- 	int qindex, err;
- 
-+	if (ring_num <= MAX_SKB_FRAGS + 2) {
-+		netdev_err(vi->dev, "tx size (%d) cannot be smaller than %d\n",
-+			   ring_num, MAX_SKB_FRAGS + 2);
-+		return -EINVAL;
-+	}
-+
- 	qindex = sq - vi->sq;
- 
- 	virtnet_tx_pause(vi, sq);
--- 
-2.49.0
-
+On Tue, 20 May 2025 13:05:25 +0200, Laurent Vivier <lvivier@redhat.com> wrote:
+> The virtqueue_resize() function was not correctly propagating error codes
+> from its internal resize helper functions, specifically
+> virtqueue_resize_packet() and virtqueue_resize_split(). If these helpers
+> returned an error, but the subsequent call to virtqueue_enable_after_reset()
+> succeeded, the original error from the resize operation would be masked.
+> Consequently, virtqueue_resize() could incorrectly report success to its
+> caller despite an underlying resize failure.
+>
+> This change restores the original code behavior:
+>
+>        if (vdev->config->enable_vq_after_reset(_vq))
+>                return -EBUSY;
+>
+>        return err;
+>
+> Fix: commit ad48d53b5b3f ("virtio_ring: separate the logic of reset/enable from virtqueue_resize")
+> Cc: xuanzhuo@linux.alibaba.com
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index b784aab66867..4397392bfef0 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -2797,7 +2797,7 @@ int virtqueue_resize(struct virtqueue *_vq, u32 num,
+>  		     void (*recycle_done)(struct virtqueue *vq))
+>  {
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+> -	int err;
+> +	int err, err_reset;
+>
+>  	if (num > vq->vq.num_max)
+>  		return -E2BIG;
+> @@ -2819,7 +2819,11 @@ int virtqueue_resize(struct virtqueue *_vq, u32 num,
+>  	else
+>  		err = virtqueue_resize_split(_vq, num);
+>
+> -	return virtqueue_enable_after_reset(_vq);
+> +	err_reset = virtqueue_enable_after_reset(_vq);
+> +	if (err_reset)
+> +		return err_reset;
+> +
+> +	return err;
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_resize);
+>
+> --
+> 2.49.0
+>
 
