@@ -1,178 +1,204 @@
-Return-Path: <netdev+bounces-192348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925D0ABF879
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:57:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B1FABF825
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BEE47B37C1
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:56:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DBC1B655AF
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9696B220F51;
-	Wed, 21 May 2025 14:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A8E1DB346;
+	Wed, 21 May 2025 14:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H56f4tLY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfaWaNcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B592220F46;
-	Wed, 21 May 2025 14:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C2C1A238C;
+	Wed, 21 May 2025 14:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747839166; cv=none; b=T57xNlpmmSwUKUIcwPedOtec7bLPowr8RgXYVoYwEWzebjvFB2IM1g5g7w1F14shz3MJq3v8PprvLTxDf8BTXQrac5IZn2X6WhWdFKVPqol7WWKnf6cY4xx75+9PQhX2ayAZu5jC8ybxI6rWZ9W2ySWtpuo2GhV1iQOrYtaHglE=
+	t=1747838882; cv=none; b=IBOdctav1fug6+uFaxltksLqUDWt2nGOd8bCHY/hub1v5F/D8et4msvPC2lZzjM0+PPX/6Fv4BuIdUXrHQ5SX7lXMb83FEatI+YI2nFPh22N88wgQMI1yZcMcjAFprLuG8Me7kvUprJm8Hmuy+MgPg3xtzKF+tEmpyce0JafXZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747839166; c=relaxed/simple;
-	bh=aXs55NlSVM3VIwWtlSAUIA7UYBiL2MuTfKtNoqtLmI0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pMb0s8FDE45Bjp6MM5bhx8oRvpd5R/b37EV88/8U0Blw7tyvHTK+kMnYFCtuqSdeiXwHcyHs6qTLGww9LMytwGh0LxJDXqI/G0JRGE+HB8uYNNDYlZKwhDISKWV8KS5RXxbo/8LpB+7z0N0BoYVv/G7u9Vp3NUUEOadwrnf/u9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H56f4tLY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD83C4CEE4;
-	Wed, 21 May 2025 14:52:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747839166;
-	bh=aXs55NlSVM3VIwWtlSAUIA7UYBiL2MuTfKtNoqtLmI0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H56f4tLYqma46ZytPEcHP/iUlcHm9kwD74+sSJtVo1B/BpTLNSiTJwP6RK2u6rBBm
-	 6MzMVUQ00WPYh4fNrqh8dc/4bA3+cGRYw4ho8m6UlnWZBFd86VxVCusmYQLc6xv6Dj
-	 Bv4blWZXwft9yy8+V1HKJNdQcLycN+o9LBUpUo9zuaJ73P9S3WOLoAVXVdvxbY/JOY
-	 1S0Ba3XAKQzVNGrBW+sdZdAnMVMnoB+2hYznn3sVCP32EelvuYskW3Fvg9cYoaVc3P
-	 jrE3JsoSVLo3aaOJUS5ICN1vqCq4wQ4YStxgXv9GEhlr266zkjh1okhX1xe3xhS1nh
-	 4Ek1fuG0o7WcQ==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	Michal Luczaj <mhal@rbox.co>,
-	Rao Shoaib <Rao.Shoaib@oracle.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1747838882; c=relaxed/simple;
+	bh=Rn3mYP0b/ZcUFOZcI5aIq2hbO3SAa8ACPra/X3wtOck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u4/vBD/S8z681RnfgYIQ9EMuo35whpVuHcabi7eDqHpadWPwEWLHDkuFSeeL9TTL3lfqHBomR0nitGtzhLOalcc2A3XIUkS03QakV59NHEomQljla1dtyqQZ5odlR0W95mD5UM8hUJRPaM78OZvNVKbM5MrvWkvn891cOQ0nsw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfaWaNcG; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4e1432aaa68so4145834137.1;
+        Wed, 21 May 2025 07:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747838879; x=1748443679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ek0ujVFI+XdYX8gezk+looLrZ/N+e9mNbznFBtm+po0=;
+        b=jfaWaNcGPkDdKW1XZQ5ACWCHbbk5AfnpqM/L2sOnR3bl1IiHJqnfMxM58xXMZ5AB6q
+         YgR0lM606DVlDelCPDd+idhTPkCYKi5p85W+UblIILczog4m0ouY3Y5sl0ALxUVTccoi
+         tw3tm6uGP8L7WXSl2AGN7jNpSLSxvwZtp+zXG9y+kvpvGQGed18yN2s08btTwFA/I50u
+         HrguLYWS945hByckBy7DvXYwZ/QNHPsw5hqmp1dqOCO58Lno1NVMMMLaDA36m2fxmkC1
+         zeRkVS10WGk0L/3OLYHsQLogomerqekllO/PVIRoyYUJVT06OS9Jzp3eq7GhDf8hasYv
+         ttqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747838879; x=1748443679;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ek0ujVFI+XdYX8gezk+looLrZ/N+e9mNbznFBtm+po0=;
+        b=nbdYfRUJU/f3do0ZmtbXvthpMdIkBoMniahfTYDwn/XIfzZOgmAeetkeU9tU6YDc+E
+         sxgsDaLcH5XYymj9s1WqvtdwmUzR5SNpvQyPYSXESWZoYzATswREpBMNSUfTYHQG05+U
+         WcFAN+bx0Q46UCF0DAA6M2VQGJJYAnpG3q/z9VopLDBemQvbA308rdP5vGOoIltBq7cn
+         1PgJr56W+TBQA4Myfm4NL1TZvDpjmym5jL0EjxFJ4e3pGEgUX5Rn6M/85PhxyliCHdlS
+         nuGGbWFr4FNPNLlu+BfWqK3tTROiEzo5g+imxj0ZJuQ+fKF+RRlkwQtgEjx0roy1ngpS
+         zIJA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+i2bO7lKy/LBIMg7AJ/z++gDHoXAKfqU/NTFSvNA84ggnP9GzyMjSjUOCPtTpMTXZCyFSeV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvFFZGUoVtz2aqQ+kPvHYmDUSbKI9KCWdpEExrJKKotAcafHSr
+	0CGfQlM0gQANQUZIcw4bipHTEjnQQuGxXgwUOTHQ3WZmMi6XAEqxJfpG
+X-Gm-Gg: ASbGncu9iZrdFyrEVQaPZl9BlLwd2+7BIAbtDDmw8FVCcvnmontkJSiL+rmHjlEDeIY
+	p0edUJicIJsOA+m1y8Pw3JNSPFeFbcaIVPUt74Qs59mJjCjCHeRGYIkp76fPcEG4KlQyFgnBtu+
+	pwfg4vSrn0vmZ8zLI6ZV90gdy9YBbppyB8OGnHYAJaGaK3gY1lWNTrm4mdPMnZA+eB3VGldPrx+
+	5FgV9h2FmOtMF91y4xLjRMYcSjndhpjVHb+fbPuhWqS+1CEIHrYGLwKmUl91f2lcakR3iWIu/4L
+	jTEfgOLvkxgxHCaUBRgeSuiK8zsxOynZIjFTJu3ZIpuJED/MubA6e6oRqnTjKj4+XtnCTJ3AuDR
+	KGDyMZ/BlHl5g6EK+vI/wqHPO1ju+Ol8=
+X-Google-Smtp-Source: AGHT+IGkihi6pehUX1WcycRNIjiLjc5FvZZCJGNnbkwxFqKaEZNSnJcATPon5olaX/n261PVA82Yyw==
+X-Received: by 2002:a05:6102:3f9f:b0:4bb:e80b:473d with SMTP id ada2fe7eead31-4dfa6b6c352mr18831586137.6.1747838879404;
+        Wed, 21 May 2025 07:47:59 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87bec155e2csm9060834241.16.2025.05.21.07.47.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 07:47:58 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v6.6 26/26] af_unix: Fix uninit-value in __unix_walk_scc()
-Date: Wed, 21 May 2025 14:45:34 +0000
-Message-ID: <20250521144803.2050504-27-lee@kernel.org>
-X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-In-Reply-To: <20250521144803.2050504-1-lee@kernel.org>
-References: <20250521144803.2050504-1-lee@kernel.org>
+Subject: bluetooth-next 2025-05-21
+Date: Wed, 21 May 2025 10:47:55 -0400
+Message-ID: <20250521144756.3033239-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Shigeru Yoshida <syoshida@redhat.com>
+The following changes since commit e6b3527c3b0a676c710e91798c2709cc0538d312:
 
-[ Upstream commit 927fa5b3e4f52e0967bfc859afc98ad1c523d2d5 ]
+  Merge branch 'net-airoha-add-per-flow-stats-support-to-hw-flowtable-offloading' (2025-05-20 20:00:55 -0700)
 
-KMSAN reported uninit-value access in __unix_walk_scc() [1].
+are available in the Git repository at:
 
-In the list_for_each_entry_reverse() loop, when the vertex's index
-equals it's scc_index, the loop uses the variable vertex as a
-temporary variable that points to a vertex in scc. And when the loop
-is finished, the variable vertex points to the list head, in this case
-scc, which is a local variable on the stack (more precisely, it's not
-even scc and might underflow the call stack of __unix_walk_scc():
-container_of(&scc, struct unix_vertex, scc_entry)).
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-05-21
 
-However, the variable vertex is used under the label prev_vertex. So
-if the edge_stack is not empty and the function jumps to the
-prev_vertex label, the function will access invalid data on the
-stack. This causes the uninit-value access issue.
+for you to fetch changes up to 623029dcc53837d409deb70b65eb7c7b83ab9b9a:
 
-Fix this by introducing a new temporary variable for the loop.
+  Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach() (2025-05-21 10:31:01 -0400)
 
-[1]
-BUG: KMSAN: uninit-value in __unix_walk_scc net/unix/garbage.c:478 [inline]
-BUG: KMSAN: uninit-value in unix_walk_scc net/unix/garbage.c:526 [inline]
-BUG: KMSAN: uninit-value in __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
- __unix_walk_scc net/unix/garbage.c:478 [inline]
- unix_walk_scc net/unix/garbage.c:526 [inline]
- __unix_gc+0x2589/0x3c20 net/unix/garbage.c:584
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
- worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
- kthread+0x3c4/0x530 kernel/kthread.c:389
- ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
-Uninit was stored to memory at:
- unix_walk_scc net/unix/garbage.c:526 [inline]
- __unix_gc+0x2adf/0x3c20 net/unix/garbage.c:584
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xade/0x1bf0 kernel/workqueue.c:3312
- worker_thread+0xeb6/0x15b0 kernel/workqueue.c:3393
- kthread+0x3c4/0x530 kernel/kthread.c:389
- ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+core:
 
-Local variable entries created at:
- ref_tracker_free+0x48/0xf30 lib/ref_tracker.c:222
- netdev_tracker_free include/linux/netdevice.h:4058 [inline]
- netdev_put include/linux/netdevice.h:4075 [inline]
- dev_put include/linux/netdevice.h:4101 [inline]
- update_gid_event_work_handler+0xaa/0x1b0 drivers/infiniband/core/roce_gid_mgmt.c:813
+ - Add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+ - Separate CIS_LINK and BIS_LINK link types
+ - Introduce HCI Driver protocol
 
-CPU: 1 PID: 12763 Comm: kworker/u8:31 Not tainted 6.10.0-rc4-00217-g35bb670d65fc #32
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
-Workqueue: events_unbound __unix_gc
+drivers:
 
-Fixes: 3484f063172d ("af_unix: Detect Strongly Connected Components.")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://patch.msgid.link/20240702160428.10153-1-syoshida@redhat.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-(cherry picked from commit 927fa5b3e4f52e0967bfc859afc98ad1c523d2d5)
-Signed-off-by: Lee Jones <lee@kernel.org>
----
- net/unix/garbage.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ - btintel_pcie: Do not generate coredump for diagnostic events
+ - btusb: Add HCI Drv commands for configuring altsetting
+ - btusb: Add RTL8851BE device 0x0bda:0xb850
+ - btusb: Add new VID/PID 13d3/3584 for MT7922
+ - btusb: Add new VID/PID 13d3/3630 and 13d3/3613 for MT7925
+ - btnxpuart: Implement host-wakeup feature
 
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index dfe94a90ece40..23efb78fe9ef4 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -476,6 +476,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
- 	}
- 
- 	if (vertex->index == vertex->scc_index) {
-+		struct unix_vertex *v;
- 		struct list_head scc;
- 		bool scc_dead = true;
- 
-@@ -486,15 +487,15 @@ static void __unix_walk_scc(struct unix_vertex *vertex, unsigned long *last_inde
- 		 */
- 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
- 
--		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
-+		list_for_each_entry_reverse(v, &scc, scc_entry) {
- 			/* Don't restart DFS from this vertex in unix_walk_scc(). */
--			list_move_tail(&vertex->entry, &unix_visited_vertices);
-+			list_move_tail(&v->entry, &unix_visited_vertices);
- 
- 			/* Mark vertex as off-stack. */
--			vertex->index = unix_vertex_grouped_index;
-+			v->index = unix_vertex_grouped_index;
- 
- 			if (scc_dead)
--				scc_dead = unix_vertex_dead(vertex);
-+				scc_dead = unix_vertex_dead(v);
- 		}
- 
- 		if (scc_dead)
--- 
-2.49.0.1112.g889b7c5bd8-goog
+----------------------------------------------------------------
+Chandrashekar Devegowda (1):
+      Bluetooth: btintel_pcie: Dump debug registers on error
 
+Chen Ni (1):
+      Bluetooth: hci_uart: Remove unnecessary NULL check before release_firmware()
+
+Dmitry Antipov (1):
+      Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach()
+
+En-Wei Wu (1):
+      Bluetooth: btusb: use skb_pull to avoid unsafe access in QCA dump handling
+
+Hsin-chen Chuang (4):
+      Bluetooth: Introduce HCI Driver protocol
+      Bluetooth: btusb: Add HCI Drv commands for configuring altsetting
+      Revert "Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL"
+      Revert "Bluetooth: btusb: add sysfs attribute to control USB alt setting"
+
+Jiande Lu (1):
+      Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
+
+Kiran K (1):
+      Bluetooth: btintel_pcie: Do not generate coredump for diagnostic events
+
+Krzysztof Kozlowski (2):
+      Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device unbind
+      Bluetooth: btmtksdio: Fix wakeup source leaks on device unbind
+
+Liwei Sun (1):
+      Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
+
+Luiz Augusto von Dentz (3):
+      Bluetooth: ISO: Fix not using SID from adv report
+      Bluetooth: ISO: Fix getpeername not returning sockaddr_iso_bc fields
+      Bluetooth: L2CAP: Fix not checking l2cap_chan security level
+
+Neeraj Sanjay Kale (2):
+      dt-bindings: net: bluetooth: nxp: Add support for host-wakeup
+      Bluetooth: btnxpuart: Implement host-wakeup feature
+
+Pauli Virtanen (2):
+      Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
+      Bluetooth: separate CIS_LINK and BIS_LINK link types
+
+WangYuli (1):
+      Bluetooth: btusb: Add RTL8851BE device 0x0bda:0xb850
+
+Youn MÉLOIS (1):
+      Bluetooth: btusb: Add new VID/PID 13d3/3613 for MT7925
+
+ .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |  17 ++
+ drivers/bluetooth/Kconfig                          |  12 -
+ drivers/bluetooth/btintel.c                        |   3 +-
+ drivers/bluetooth/btintel.h                        |   6 -
+ drivers/bluetooth/btintel_pcie.c                   | 141 +++++++++-
+ drivers/bluetooth/btintel_pcie.h                   |  19 ++
+ drivers/bluetooth/btmrvl_sdio.c                    |   4 +-
+ drivers/bluetooth/btmtksdio.c                      |   2 +-
+ drivers/bluetooth/btnxpuart.c                      |  58 +++-
+ drivers/bluetooth/btusb.c                          | 302 ++++++++++++---------
+ drivers/bluetooth/hci_aml.c                        |   3 +-
+ include/net/bluetooth/bluetooth.h                  |   4 +
+ include/net/bluetooth/hci.h                        |   4 +-
+ include/net/bluetooth/hci_core.h                   |  51 ++--
+ include/net/bluetooth/hci_drv.h                    |  76 ++++++
+ include/net/bluetooth/hci_mon.h                    |   2 +
+ net/bluetooth/Makefile                             |   3 +-
+ net/bluetooth/af_bluetooth.c                       |  87 ++++++
+ net/bluetooth/hci_conn.c                           |  79 ++++--
+ net/bluetooth/hci_core.c                           |  45 ++-
+ net/bluetooth/hci_drv.c                            | 105 +++++++
+ net/bluetooth/hci_event.c                          |  40 ++-
+ net/bluetooth/hci_sock.c                           |  12 +-
+ net/bluetooth/hci_sync.c                           |  63 ++++-
+ net/bluetooth/iso.c                                |  30 +-
+ net/bluetooth/l2cap_core.c                         |  15 +-
+ net/bluetooth/mgmt.c                               |   3 +-
+ net/bluetooth/mgmt_util.c                          |   2 +-
+ 28 files changed, 918 insertions(+), 270 deletions(-)
+ create mode 100644 include/net/bluetooth/hci_drv.h
+ create mode 100644 net/bluetooth/hci_drv.c
 
