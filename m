@@ -1,50 +1,76 @@
-Return-Path: <netdev+bounces-192467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD310AC000C
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 00:50:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E131AC0044
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 572677B1025
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 22:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90BA1171A66
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 22:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A812376E4;
-	Wed, 21 May 2025 22:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5786D1624CE;
+	Wed, 21 May 2025 22:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/zCTlo+"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LWebdm15"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE7121E0A2
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 22:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B27323A99D;
+	Wed, 21 May 2025 22:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747867808; cv=none; b=QkF7OkwbeooxwvKJbqjputUanTswAP5uuqhVSQZrjIwmSOfH+Ik7NHksaz1JdNiN4nVSKhjR3GZJ7VO6MvPb0hvMPe+RWXkQAURWcyvw/LafOQ0cERLnM+obalbWObl6SzkbhxoFqjI/7rbfiViYWVS2vRUWihWe0rXRJuTEwPs=
+	t=1747868315; cv=none; b=ItmAZQeu/tH2evDHd6nl4q7XJq15TzBYf9qG9uxXA9exRsNhDriBUDv3GsWh5Wvpmr335E7iojNXcEJqwrp1YnoNUEQfqMP2BdDYXu6CzWH2b0ADOMhp9K/c7ohKJhNvlcxpdaOciH3ZqcU0/f9Mg5oZAVuwLTCbtQHGBBFa1WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747867808; c=relaxed/simple;
-	bh=PwPXXXwBJaEV2MVtNYm3cPTrYLT81D063IYtc8CMTy8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TzsOSq5YM3fzjLUDAOOhG6Vi2IQiQ/a3KS+hYWuuBee5CKIKZ6tga5mLQeli/7BxqwsAqTjQQd43SAek47sTW4iBoiBaEqSTLYNOM21yBTGc/qf16tpsrc0XEb0LZIw7o0MR7tgthJvvuvpvGcYESHTrPQBAdX3itq84yVFoRYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/zCTlo+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8750AC4CEE4;
-	Wed, 21 May 2025 22:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747867808;
-	bh=PwPXXXwBJaEV2MVtNYm3cPTrYLT81D063IYtc8CMTy8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c/zCTlo+CS8VR77sfMTZo4Nd4rkV1D5JKNHpwgm5XWM1dkdiEBpFShG8F3YK8ZkVV
-	 4d7tKckL60fBrHX/Kigliym3cCpr4KKbtWvkOvkAsIBnmOgvK2OffDMDv/EhaaK+pQ
-	 8efRsKDBU3D3ts2r1vJojg40QlGp+66L86XshAUZ77k0QLBLF7drFbjhjG2AFIzWGF
-	 0AlnTJv7G4/vjPwtTqE0r3QWZhB4SwZmE5W4hoB89JTDof0CGvfcDqB5eG0EI7CjwB
-	 0691UUCFtzJHfHJXS8qIiWGNRTNkpeAjruZwZM/mjXaFtmwn2ay2UqzJFETP6aW6rX
-	 3r0tRJez7B/ww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71009380CEEF;
-	Wed, 21 May 2025 22:50:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747868315; c=relaxed/simple;
+	bh=oUEfpUxJVtcfBRUWircRD/3AMoAwlb/YCvFi9VbaK40=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BWWnaR7uH/GTOznHTkaVePtr5TvvugOGOTaK67MBzIVs6m8cokEFI+uCKrr/zG3lQ7QzpVWuHAf6/UC2gVerFiVu1d9EJycIZznXbMwVHKw+Z4FFKIAm+0zBiIuqWny0pbpCWo7F3pRvZq1CkW20+UB7QvNdo1nAKz5pHWsebRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LWebdm15; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747868314; x=1779404314;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VLNQaO0joSFtaVP4xhVmyHesQI7WXFOgxK3mfwvHk0I=;
+  b=LWebdm15W/QTHc6I1ZTYdYVUy50+2USCPGpqL7LnjvzMB9L+BA+ulLkU
+   CRzw2EsbDG6Ie2bllLe1XW3fqbjmyvnKMCg9IYaqqgf/C9kz+E9Al27du
+   QaIhd8ZXuwDFrLfO+NLXeTYsNBEZOYKGqibbEMeqocDQUmJ9bSAryGP5W
+   ff8eHKiGMeR5zTUOcWp9MES4sSnOxSHLrGOTU70SW5LU0H9tAy+7nfo4l
+   M/Evz/e7XPm/1buvTWIKgEJXFMORrshe5PQviyIF/EhwtYiSqE7Xksj2R
+   dfwYqJr4QDCySEidqsBBSZrIwqVDjrJPpiNe2Inm3IXhIneB4smVib49/
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.15,304,1739836800"; 
+   d="scan'208";a="494871501"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 22:58:14 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:50996]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.117:2525] with esmtp (Farcaster)
+ id 17ebefff-4e5a-46fb-818f-0bdaf37eacd3; Wed, 21 May 2025 22:58:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 17ebefff-4e5a-46fb-818f-0bdaf37eacd3
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 21 May 2025 22:58:12 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.52.104) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 21 May 2025 22:58:09 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jordan@jrife.io>
+CC: <alexei.starovoitov@gmail.com>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 bpf-next 03/10] bpf: tcp: Get rid of st_bucket_done
+Date: Wed, 21 May 2025 15:57:59 -0700
+Message-ID: <20250521225800.89218-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250520145059.1773738-4-jordan@jrife.io>
+References: <20250520145059.1773738-4-jordan@jrife.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,67 +78,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/12] tools: ynl-gen: add support for "inherited"
- selector and therefore TC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174786784426.2306436.10410311936016337174.git-patchwork-notify@kernel.org>
-Date: Wed, 21 May 2025 22:50:44 +0000
-References: <20250520161916.413298-1-kuba@kernel.org>
-In-Reply-To: <20250520161916.413298-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, jacob.e.keller@intel.com, sdf@fomichev.me,
- jstancek@redhat.com, kory.maincent@bootlin.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 20 May 2025 09:19:04 -0700 you wrote:
-> Add C codegen support for constructs needed by TC, namely passing
-> sub-message selector from a lower nest, and sub-messages with
-> fixed headers.
+From: Jordan Rife <jordan@jrife.io>
+Date: Tue, 20 May 2025 07:50:50 -0700
+> Get rid of the st_bucket_done field to simplify TCP iterator state and
+> logic. Before, st_bucket_done could be false if bpf_iter_tcp_batch
+> returned a partial batch; however, with the last patch ("bpf: tcp: Make
+> sure iter->batch always contains a full bucket snapshot"),
+> st_bucket_done == true is equivalent to iter->cur_sk == iter->end_sk.
 > 
-> v2:
->  - [patch  1] new
->  - [patch  8] small refactor
->  - [patch 10] add more includes to build on Ubuntu 22.04 system headers
+> Signed-off-by: Jordan Rife <jordan@jrife.io>
+> ---
+>  net/ipv4/tcp_ipv4.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
 > 
-> [...]
+> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> index 27022018194a..20730723a02c 100644
+> --- a/net/ipv4/tcp_ipv4.c
+> +++ b/net/ipv4/tcp_ipv4.c
+> @@ -3020,7 +3020,6 @@ struct bpf_tcp_iter_state {
+>  	unsigned int end_sk;
+>  	unsigned int max_sk;
+>  	struct sock **batch;
+> -	bool st_bucket_done;
+>  };
+>  
+>  struct bpf_iter__tcp {
+> @@ -3043,8 +3042,10 @@ static int tcp_prog_seq_show(struct bpf_prog *prog, struct bpf_iter_meta *meta,
+>  
+>  static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
+>  {
+> -	while (iter->cur_sk < iter->end_sk)
+> -		sock_gen_put(iter->batch[iter->cur_sk++]);
+> +	unsigned int cur_sk = iter->cur_sk;
+> +
+> +	while (cur_sk < iter->end_sk)
+> +		sock_gen_put(iter->batch[cur_sk++]);
 
-Here is the summary with links:
-  - [net-next,v2,01/12] tools: ynl-gen: add makefile deps for neigh
-    (no matching commit)
-  - [net-next,v2,02/12] netlink: specs: tc: remove duplicate nests
-    https://git.kernel.org/netdev/net-next/c/e9033a846eb9
-  - [net-next,v2,03/12] netlink: specs: tc: use tc-gact instead of tc-gen as struct name
-    https://git.kernel.org/netdev/net-next/c/eb1f803f9851
-  - [net-next,v2,04/12] netlink: specs: tc: add C naming info
-    https://git.kernel.org/netdev/net-next/c/f9aec8025ab5
-  - [net-next,v2,05/12] netlink: specs: tc: drop the family name prefix from attrs
-    https://git.kernel.org/netdev/net-next/c/ba5a199b2401
-  - [net-next,v2,06/12] tools: ynl-gen: support passing selector to a nest
-    https://git.kernel.org/netdev/net-next/c/cb39645d9a6a
-  - [net-next,v2,07/12] tools: ynl-gen: move fixed header info from RenderInfo to Struct
-    https://git.kernel.org/netdev/net-next/c/a66a170b68af
-  - [net-next,v2,08/12] tools: ynl-gen: support local attrs in _multi_parse
-    https://git.kernel.org/netdev/net-next/c/092b34b93735
-  - [net-next,v2,09/12] tools: ynl-gen: support weird sub-message formats
-    https://git.kernel.org/netdev/net-next/c/4e9806a8f494
-  - [net-next,v2,10/12] tools: ynl: enable codegen for TC
-    https://git.kernel.org/netdev/net-next/c/e06c9d25159c
-  - [net-next,v2,11/12] netlink: specs: tc: add qdisc dump to TC spec
-    https://git.kernel.org/netdev/net-next/c/33baf6f73a7c
-  - [net-next,v2,12/12] tools: ynl: add a sample for TC
-    (no matching commit)
+Why is this chunk included in this patch ?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This is a bit confusing given bpf_iter_tcp_seq_next() proceeds
+iter->cur_sk during sock_gen_put().
 
+Otherwise looks good.
 
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
