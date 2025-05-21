@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-192213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89EFABEF42
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:12:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A565DABEF43
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 234CB1656D1
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:12:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53B9A3A9AB7
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23DC2397BE;
-	Wed, 21 May 2025 09:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AEE238D53;
+	Wed, 21 May 2025 09:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEc+xk//"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y8+9ljIE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B281A9B4C;
-	Wed, 21 May 2025 09:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986492343BE;
+	Wed, 21 May 2025 09:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747818753; cv=none; b=B+4X5qpBPbuLPjxumRF6qIrK48SXprjUj8I4Yd/VSuLDZAJw/PsJ4QNo/LXiMU5HQvi6zgGSci4tnR0BARAOWmYsDf8udJ8Qzv0MHPXcRNgtmMszHSqXqmVtJZ3QSnnbifeCvr4ilayDf8F06job2JvvN9Ih6umzKGfaDHpwsRc=
+	t=1747818775; cv=none; b=AKDTIXgNz6L84tmq2X1mHUl6ZOvBpq0eBQOELytIjFKuK7x7oZEKvccm2tP1oag/xzXMvGK4NeJnhVh1fnDe/CYo79CUFeqJtuuGdv36umU0udP8xjIBxpCCXyVQ2l7H3zeQlutD5pbaHkd4+6qkN8Ua9DBn9pjWfbU6ffCltUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747818753; c=relaxed/simple;
-	bh=ikhygHFZ9rkod/U2Fm9+LcynIwgOWRtuw85hfh8xlFI=;
+	s=arc-20240116; t=1747818775; c=relaxed/simple;
+	bh=gx5MmDJv49+IdFprNwhaD0Z3zaBUOM5InwhvPfZ3TH8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NdwPIURF/ezp+WNnaZrbJFj2sfAsxVc3vTnxZSzaAVHCVVOkLd3Umn39hgwQFibOry2wvAw0pJD625DmENCzA3WLLYB+1tMNFopBGztzgmKM4KaGapUDwhGTmneVAOXXiJwh7xlZluP75/tK6P7dpw0hYUo4cr2bzjNUVI/z1f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEc+xk//; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81DC6C4CEE4;
-	Wed, 21 May 2025 09:12:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=apoM5znN17RlGfJ/hyH20ESy5UUzzbCPPWn0/knrfllHw/QCTWHWiF8ia+RE/q79jGIcdbNLhVXTM/f1KZIDKM6Vyr1c0Qwqq1cJ51bfXQljPm8VCBAOMQIm/qF6Lav+6u3cJsB8P1Kx7MemMqXAJqGPllZDPICfUYoAQ26GnXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y8+9ljIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BDFBC4CEEA;
+	Wed, 21 May 2025 09:12:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747818753;
-	bh=ikhygHFZ9rkod/U2Fm9+LcynIwgOWRtuw85hfh8xlFI=;
+	s=k20201202; t=1747818774;
+	bh=gx5MmDJv49+IdFprNwhaD0Z3zaBUOM5InwhvPfZ3TH8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZEc+xk//2FDV1smvV+SbO7L/jlMiX0+LJgXCZXKaAnU7gmB7rpcmkX3jEDGQC/LHp
-	 BQ4KxbdKxLjTPqRxSeH7JRWT8LqB5VY4LiVDbHU0fZCubn/IhChovJ9hc/hd5wSmjy
-	 DBxUu2tBNpT8+ryRw796niU5rXRNAGA44F69qub8e/LlyxlC5ww5Sza5kklyHvCHsI
-	 ysln0q2RBRMvtdFLeZbSNuyiHFrAeLkghcK1L0Q2SIoKyLYOtrmX08IuKtY2AZ74tp
-	 Ipvw5niNVqkYGQ/Rb4Z9TD3d7UZmjo/pHpzZwsqdxLvcTa6dt/fYzo2BL2tQer4wTd
-	 F1elYkxuNhqNg==
-Date: Wed, 21 May 2025 10:12:28 +0100
+	b=Y8+9ljIENsbbGqVUqx2DH3iah8HtB1+JwIRF/Bex73joh1thhmsxg3R7rzGusGdex
+	 LE2HlQOhjlB0Czt/TnEdEy3dtDkYMKrVZgFoTODW2rSDj5nJB2bSGJpliDJ1TP3CoL
+	 G5BZHE5d0QLhzVXNQafluxEZ4egnMFRHNliL/Tqn0ZoWXAx9KW7e98kznRuRYjvxzm
+	 fWGd6t0z1OmMSnQmqEMtL8Pi8n87OIpWM+QpyVdRjSbyBIoIroREQKHBX9+UplunDb
+	 0dTom5VC/6Ah8L6VzfIEbvuY260Vwcj2XD8mnOXn9POEMfU/x0JKdOIxYvvDC43IPo
+	 54HsBZVZCLcXw==
+Date: Wed, 21 May 2025 10:12:49 +0100
 From: Simon Horman <horms@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -50,11 +50,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	chenhao418@huawei.com, jonathan.cameron@huawei.com,
 	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 1/2] net: hibmcge: fix incorrect statistics update
- issue
-Message-ID: <20250521091228.GS365796@horms.kernel.org>
+Subject: Re: [PATCH v2 net 2/2] net: hibmcge: fix wrong ndo.open() after
+ reset fail issue.
+Message-ID: <20250521091249.GT365796@horms.kernel.org>
 References: <20250517095828.1763126-1-shaojijie@huawei.com>
- <20250517095828.1763126-2-shaojijie@huawei.com>
+ <20250517095828.1763126-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,18 +63,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250517095828.1763126-2-shaojijie@huawei.com>
+In-Reply-To: <20250517095828.1763126-3-shaojijie@huawei.com>
 
-On Sat, May 17, 2025 at 05:58:27PM +0800, Jijie Shao wrote:
-> When the user dumps statistics, the hibmcge driver automatically
-> updates all statistics. If the driver is performing the reset operation,
-> the error data of 0xFFFFFFFF is updated.
+On Sat, May 17, 2025 at 05:58:28PM +0800, Jijie Shao wrote:
+> If the driver reset fails, it may not work properly.
+> Therefore, the ndo.open() operation should be rejected.
 > 
-> Therefore, if the driver is resetting, the hbg_update_stats_by_info()
-> needs to return directly.
+> In this patch, the driver calls netif_device_detach()
+> before the reset and calls netif_device_attach()
+> after the reset succeeds. If the reset fails,
+> netif_device_attach() is not called. Therefore,
+> netdev does not present and cannot be opened.
 > 
-> Fixes: c0bf9bf31e79 ("net: hibmcge: Add support for dump statistics")
+> If reset fails, only the PCI reset (via sysfs)
+> can be used to attempt recovery.
+> 
+> Fixes: 3f5a61f6d504 ("net: hibmcge: Add reset supported in this module")
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+> ChangeLog:
+> v1 -> v2:
+>   - Use netif_device_detach() to block netdev callbacks after reset fails, suggested by Jakub.
+>   v1: https://lore.kernel.org/all/20250430093127.2400813-1-shaojijie@huawei.com/
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
