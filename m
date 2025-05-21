@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-192160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F11ABEB85
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:53:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73D92ABEB8A
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724EC17C95E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 05:53:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD91E3B671E
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 05:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470C322FF42;
-	Wed, 21 May 2025 05:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5A222F770;
+	Wed, 21 May 2025 05:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGK2QMIv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkktSvqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE70E22D4F2
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 05:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4963C231C8D
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 05:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747806783; cv=none; b=Y9ztHtZZ7MNM5ZUbf4APh/Iv0i2MNwhmUFk7GAauA29mC3T97tB3LRX9KEBMAf6ejTOY0n+Ax+8eEQ0Dpe4xAYR4gFkzQO6ZZlPoC93UY/XXBrsuuzGXcz7hJHoe3xjVBjUNM2n1xaEnS6wsLkgneX4nyB2F8npYoiH5fmZmvkc=
+	t=1747806870; cv=none; b=CcMHPpluS664aDTPSThxgJJ3JzOLm7mwdL7ef6OqM5toIwV4TG+nJJFm8v3gTNDuaoTnmykeQIQq65+mxSULL3XqnnDkb3T4D1GQupivmFrdZpEVH8qmvinfLyPD/p5SuDL52WBY+Aa2rpJHXwtWeiGJwH/DdV0V08JGqZ868KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747806783; c=relaxed/simple;
-	bh=bw3WQB6kSQR1zc6JQgW/89lpk46txZA2ZfOeo3QKK3g=;
+	s=arc-20240116; t=1747806870; c=relaxed/simple;
+	bh=vcPq2MmXghJ4aAKiHFKJA9mCKv/Fq9noHFvdCb3yxLc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tvYfoGGlij6YQNkUD075SLDcmzCCmhY9URQFfslS+edh1kBHUKWYS+kMVdR1fqDMDH7syUiG6eYtuLzoqwjp/Pk0FmgOoYtDY3q1OiatIzCCAT2tF9YiaLWmW299h291XoZdHlVKNrD3ZOQd5Qmsh11jSDoMH8f+rdqf72Wb2K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGK2QMIv; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=m/fdLbVekXhXNL8XQm3yj1VdtbaeI0j+3b18lWrlrWvncRi4+UMtXpthspqq7RkLCiDMj8AC/1c8Gg2EwjqH0uQnlN+zrxpsr6r8IGDOqSer3R/YR1B1ueCJcW28RMz9tVvDkmNY+w2OIEHdeWeZqU0JowpxNS9Or2610MfcVRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kkktSvqc; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742c5f3456fso2752062b3a.0
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 22:53:01 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-23274dbcbc2so17512945ad.1
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 22:54:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747806781; x=1748411581; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747806868; x=1748411668; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BuFY2r/5u62DVQnsm0rMuIqkytzqgHDVbnhTLOAV/iY=;
-        b=bGK2QMIv7MgZ2x5S7WRI3XuEtTpc7nOcjNw3oWqB7HYjKxqI28OLO9e5EG8Q1cGkiz
-         1elru4Xj0A9RTvTaLs/jyvJkfB3HBY3V4VtrWtWtvExtNYUpMcpm7sNcWRUvCE71WKnD
-         7ciUVBn+AG0pcarqCfa7y2edzKntGTutfyI73Mze06InQw18alGAE2s4CGPRtUBTJuOM
-         of8QoyZ52T1SEubvYBHre2wGKqQ0R6QkHzo5gIv1p120ytSDV3qxLU8xZ8xObbKvH2sx
-         1MJK0sEKe4+Q4tyf4d8xoIRZyvzYomPgCuY/KgBn91sr0CnJJbxeXnCr3T+kXkhko834
-         rDTA==
+        bh=HaasjUIOiudZhpITTg/Ea1JpheK5Ok/woPqm3ve54VI=;
+        b=kkktSvqcAwgoyGcXDjl8CfcSGsmb7lyfeTJ1vxOcP3yr55J+DHQ+8JopZ7qKC6OMNa
+         SPuYYQthCl2xidNd5oqFXaZkEeuTubOfTlylxi8yh4rS7dVGf5tNsGOtUXq+P42pkhks
+         rPdLz2k0J+Nom8nHhxWYXIcKBlkrHx6BI2kZ4b85NheVmeQ0yG405UYsgtTfLFCxE/KZ
+         op0ARDk3l5ppBnd3Y1AHGDqLmVMj86rOhaN/zKFUP/0KXv7HAn9PGfmD3m5z2HNmpklv
+         OxMz+UOxDy97zVh3o6dnFhy7NvwC08Kk8PV4ompfC8rlk4Zpk5jsZuRAMU666xZojlVA
+         iA/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747806781; x=1748411581;
+        d=1e100.net; s=20230601; t=1747806868; x=1748411668;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BuFY2r/5u62DVQnsm0rMuIqkytzqgHDVbnhTLOAV/iY=;
-        b=ed7GfxhY1NtJnL9kq7TLoorJAl2RL9apLgKDqkyFnC8nUrnXpgTfjJJPFTElTuvMKG
-         jIWTXDxf/dvrJSKZSigfT6ZgQ8rE8KOpZF5shT/3VEXq4k9sgKRTLVJMHwn1B2IDeBZM
-         6/pUDFo2qkmaYzPHZ3mmtlIbOBovIpX8QbZAr/pcAU5Dd8UkE0nQUMAo4fjMqKiI5alU
-         OhmtyThmVmWscYiPS2AIZssfFChWGWWb1Yuw8nRlZfV9BM6FqLb8mF0wNgWNdyo5MIs2
-         z/impu4F0rkBfG8DaCqY+5eaIWMVaej4x1YG9ebDHo3KtgJyDSoorGY62urBFy54gQgA
-         w21Q==
-X-Gm-Message-State: AOJu0YxXFgvSxguT6QfwBQJ3FZf5KIVHB5dTImzBV+2MQ1P873SESMap
-	s9ozdlj+BmPdoAHZrkI5LuRwyZfhn3m+KeMxqgz87WFL+L2Mh4jkrc5h62mdgmx6
-X-Gm-Gg: ASbGncuSUetWC7rvCa98Dnv1GaNE1UpMN6HdjiyPqya8SRxx8k2Eb+gWPGa+6QZ6MRX
-	bV9skGOtURMu7248vV7o34zUBxlBItIeIEkZXomsmzxA6g/CKPtMio+OaNfBv5AwwrH0rOIMWz/
-	KRgTZ/olLS1z5oa+YMieEIOkybhUcxGs/Ig9fM5Phh4RK6xGM3MHNnXXVCpd5SLIAyJBerNfDSt
-	TXJ7YIaTGHop5/t+HPzufIockhmnOyiPI/XMhkzc9xn6RCAHfgzDzAUMmujaX/lYMaKJol4BiVS
-	6i2WcZD+z8GUx2V3MR3J1Tc34ShGFk/Y3UpBtjnkyoNsuViNJ3G2FKiBTZS2ms47y3qHKQbkcXt
-	O0g==
-X-Google-Smtp-Source: AGHT+IFdRdaiSh5Z3Ukdxtm1ZEvvF17Od3i1UtZ4NRG6iLTnCR+pq8vK3JUCIMlm9kl/z9BpuNcaiQ==
-X-Received: by 2002:a05:6a00:1256:b0:730:75b1:7219 with SMTP id d2e1a72fcca58-742a97df604mr27961325b3a.12.1747806780700;
-        Tue, 20 May 2025 22:53:00 -0700 (PDT)
+        bh=HaasjUIOiudZhpITTg/Ea1JpheK5Ok/woPqm3ve54VI=;
+        b=lWsx85Ji83eChk//yI5yW2fXzOtVfSU2YMYHtFgEzz6JakCscXHM0Tyji9SqkFLHap
+         hZpsNgg6tU6ulb6/OjixWgU4B57DLLiKWTlfh9ma6JfkPtHmOdyN0eP0bpGeMZmayJVp
+         akR/EK6VTVldW1W0pX2b3w5yHcSyDIaeV4JU+jifdTuKDPkKYUstq2/bGmnE0lwxICio
+         XCCByBAAvvOsQLGKE6Kra7NbRuJELyMmFnv5P92Ssj9ZIt9yT4u367TPgG7wuylr+8FF
+         ygS+MFdMONxwkzYNqVTuMA2oob0YlERVML+TDizCr6UDIpFSzHw4U0zGeRjlQJTl0Ef7
+         vhMA==
+X-Gm-Message-State: AOJu0Yzjqp9f9JBhG47lmwv7D7j+ijKqlP0qjwR3di98tl5pCBy0I1Xw
+	W7laupb4oRws+nkoHJQASJail6ViLLiT1U8FfJhXJ3mLuLx7CMN22sN0+Z61nW9u
+X-Gm-Gg: ASbGncuVDnJOa6SLzgih8CaGj5gfycdsIelQz+/pj5zgy3+m2iwb3cHvxVVI5UQRpY2
+	eklnLbb/2rVGoGNjPc86RGckkSRH8C+LXD1PJVZtLUPwIUjdIwPSdG1OiTeQ+PAmWTIYQd9uYJ3
+	RaiqC5tzBBVv1nq5FyvxVzj9MqY3Fkzhc8aHtxffEpvqkO3Zv07RZnkQJvCs5/2x8aG7dQLBDNm
+	gGO4skCzlngXpISDlBeDjW6qkcmtiZP3lnsTocWg4KSBfAIkDSS1R5PX7dEawV4OIdOtCvr2llo
+	RGSYm+xrTef2zwjtEH5xsAeRhtRAPeNT4biKDDf6rAnz2YZtlo1oDbcv5OHfRin+4KQ=
+X-Google-Smtp-Source: AGHT+IGyubQCq+X27QB+E75Qspepddqo0qxhh9yKufMqQJmiQsngpfI1yDKSl2Vuqp0udRGwq71L2A==
+X-Received: by 2002:a17:903:26c7:b0:231:cb38:8d0b with SMTP id d9443c01a7336-231de35f319mr219058835ad.15.1747806868024;
+        Tue, 20 May 2025 22:54:28 -0700 (PDT)
 Received: from shankari-IdeaPad.. ([103.24.60.247])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a970c6b1sm9188428b3a.59.2025.05.20.22.52.56
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4aca130sm85338145ad.18.2025.05.20.22.54.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 22:53:00 -0700 (PDT)
+        Tue, 20 May 2025 22:54:27 -0700 (PDT)
 From: Shankari Anand <shankari.ak0208@gmail.com>
 To: netdev@vger.kernel.org
 Cc: allison.henderson@oracle.com,
@@ -83,8 +82,8 @@ Cc: allison.henderson@oracle.com,
 	shuah@kernel.org,
 	Shankari02 <shankari.ak0208@gmail.com>
 Subject: [PATCH v3] net: rds: Replace strncpy with strscpy in connection setup
-Date: Wed, 21 May 2025 11:22:50 +0530
-Message-Id: <20250521055250.3090172-1-shankari.ak0208@gmail.com>
+Date: Wed, 21 May 2025 11:24:17 +0530
+Message-Id: <20250521055417.3091176-1-shankari.ak0208@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250430181657.GW3339421@horms.kernel.org>
 References: <20250430181657.GW3339421@horms.kernel.org>
@@ -117,7 +116,7 @@ index c749c5525b40..fb2f14a1279a 100644
  	cinfo->faddr = conn->c_faddr.s6_addr32[3];
  	cinfo->tos = conn->c_tos;
 -	strncpy(cinfo->transport, conn->c_trans->t_name,
-+	strscpy(cinfo->transport, conn->c_trans->t_name,
++	strscpy_pad(cinfo->transport, conn->c_trans->t_name,
  		sizeof(cinfo->transport));
  	cinfo->flags = 0;
  
@@ -126,7 +125,7 @@ index c749c5525b40..fb2f14a1279a 100644
  	cinfo6->laddr = conn->c_laddr;
  	cinfo6->faddr = conn->c_faddr;
 -	strncpy(cinfo6->transport, conn->c_trans->t_name,
-+	strscpy(cinfo6->transport, conn->c_trans->t_name,
++	strscpy_pad(cinfo6->transport, conn->c_trans->t_name,
  		sizeof(cinfo6->transport));
  	cinfo6->flags = 0;
  
