@@ -1,126 +1,147 @@
-Return-Path: <netdev+bounces-192489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 904F8AC0089
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:18:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043BCAC0099
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF7C1BC117C
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:18:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D2F171444
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7823A99E;
-	Wed, 21 May 2025 23:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8650524166B;
+	Wed, 21 May 2025 23:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="haLd94tY"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="CD0Wk8Sx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A41239E65;
-	Wed, 21 May 2025 23:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0123D2B1;
+	Wed, 21 May 2025 23:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747869493; cv=none; b=i9qsldoqKYqaJFvckYKDTCY5R/wRSwKNoHFYW7Yvt1lPH9pUCBp66tyEQOlsE7hN3fTJFWk4vWxAvNMSq0msdX4S1MoX7+7rpamQ8fjLQ/xVHON+Ai88X7rm08Ro4FO4EnNF+YKaEBGMQM05hYJdaCO1G69HGlNHkcMBhlCZ7s8=
+	t=1747869535; cv=none; b=bsPgLLPyjtWlMdpdm5e0P8xn9zaxzQAp3ZnweyaeYUzTxaXH3tE77aduGbYz9LNKXfQ7U8KT3CNkVVHfZq/25ot+g1i8LHHZwnFR2ZLh73j/JwgPNX7c/qp6v4IghD/qQaEHAkc6MtAk3VpaoYoiV7vMWUuA3Tm4AXusuMb9Bh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747869493; c=relaxed/simple;
-	bh=tc4Rc5WhaCG5eca6GJG/PxJnkROGcjQIe9XRR3o7jms=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBInpIP13o4aRra++UhruWMjpIeULCM+NvXhLZ/VQoDpOfB558VZUKG126NeIedR1HoileAajSefGwlSvQ0g80NcsRjmifN4tHU+SjotByxBnyBcCbw78pgMjsCcUIqK+8K41aMK/WV1j+grfFEA7Bbxe+cBK5qhlLXo5mRdZok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=haLd94tY; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747869492; x=1779405492;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dAISRQHymGpSlZcgfow8gzL7H3J4aU50MP1wdq1m96U=;
-  b=haLd94tY0HaBAklco8bYS+J18b39ymbMLw8D51JqGFKL2evc++XLMxY8
-   kWYwcYFzLGSdACh8jJo8qGNhvhuJwy7+hkHB6ugKnBY49tVVXanKZWi50
-   V8RaGeWtJ3Pn1ECdyIVEU8Ff6Y+6PiCy3OxvazHb3fAQhdghiweSuvZRB
-   Y81Vdf0HmgDVlDtLGtgu+HOYZZkJP+nD2Cgt47QE8OH4ALascrVrIOy/A
-   0bhLA8Eol5UyQCQBgMOWzy2hS77MozL4J19jY6agsaHI7p7E5QSHAXAA0
-   8auELbQ8fBERckFPnrKAzVsDPIyK3HGzQ6VaM4ud1akUwulY2vdPb2fu+
-   g==;
-X-IronPort-AV: E=Sophos;i="6.15,304,1739836800"; 
-   d="scan'208";a="827214693"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 23:18:06 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:39713]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.117:2525] with esmtp (Farcaster)
- id f8e2304d-e65c-44ce-99fe-0d478a97d9b6; Wed, 21 May 2025 23:18:05 +0000 (UTC)
-X-Farcaster-Flow-ID: f8e2304d-e65c-44ce-99fe-0d478a97d9b6
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 23:18:05 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.52.104) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 23:18:02 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <alexei.starovoitov@gmail.com>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <jordan@jrife.io>, <martin.lau@linux.dev>,
-	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v1 bpf-next 03/10] bpf: tcp: Get rid of st_bucket_done
-Date: Wed, 21 May 2025 16:17:48 -0700
-Message-ID: <20250521231755.91774-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250521225800.89218-1-kuniyu@amazon.com>
-References: <20250521225800.89218-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1747869535; c=relaxed/simple;
+	bh=4LdaDkfu2jy5/kU3mWx49wYFOvvJvoIpK2Qq4T20KK8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=abIZnrVczMpepuGX/p4+AyFOzVY8ld2HXVDB69POv/hufwRSUnixQLTm8i/g8bFoR4kaSBUf/w0XeO492mFkdtyzgW98UHN1BpcrcgW4I9I9EVzo5ujq2u22w5NhaZsbidZiM9gcGouuCnAH//ixbrymGmPgp1MFLzkbl4AyEpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=CD0Wk8Sx; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uHsi3-004Io2-Nm; Thu, 22 May 2025 01:18:51 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=fn9yhZT2l/8janItukUSTDYCPTAabfFAewfozngMcrw=
+	; b=CD0Wk8SxzlZBWt6uvblq5pzQDuk84bbNiUDkSEzBAD0IvHFt1oLG/jWIeYx2dndXsgYs+T+KJ
+	EqVl4DUWvkC1gsPp8C+HQqA7JaLKh5DNCAEpj1sQhFtfbcUp7z+oK1wbw6FCpVXw2v302/gyhV+EU
+	ZXrfopMURGz8CqiJn8tUGAZd8vY27kbQmW7qcr2z4cbvwCI3eKzYEZAGhf7PkJREQNclOe0pRe1ln
+	GqPR9EuPE/3YKl746LcLVknSVI70L3es1ik4PSpWEatUSycb0YJMfewKWr7pT7rJPeu0jwNlSvX6Z
+	uL5BY5x4W7AnSrsskDPbnOH4UF4xOC48eg/r7g==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uHsi3-0000kJ-CA; Thu, 22 May 2025 01:18:51 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uHshq-002oFI-94; Thu, 22 May 2025 01:18:38 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net-next v6 0/5] vsock: SOCK_LINGER rework
+Date: Thu, 22 May 2025 01:18:20 +0200
+Message-Id: <20250522-vsock-linger-v6-0-2ad00b0e447e@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADxfLmgC/2XOQW7DIBAF0KtErEs1hgFDV71HlYUx4wa1MhFYy
+ FXkuwexie0uR1/v/3mwTClQZh+XB0tUQg5xrod+u7DxNszfxIOvNxMgFEhAXnIcf/hvqFHiFoQ
+ mNVlr9MgquSeawtrqvthMC59pXdi1JreQl5j+2k7pWt4qEfpjZek48A6VAWlIohWfycX1fYytp
+ ogdFd2JikonshM5r1Frc6RyRyWcqKzUe0e9dEqi6o8UX1TBeRUrdTQ4580ABk9U7ei/h1WlFo3
+ ojQbfef2i27Y9AZWgUPecAQAA
+X-Change-ID: 20250304-vsock-linger-9026e5f9986c
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Wed, 21 May 2025 15:57:59 -0700
-> From: Jordan Rife <jordan@jrife.io>
-> Date: Tue, 20 May 2025 07:50:50 -0700
-> > Get rid of the st_bucket_done field to simplify TCP iterator state and
-> > logic. Before, st_bucket_done could be false if bpf_iter_tcp_batch
-> > returned a partial batch; however, with the last patch ("bpf: tcp: Make
-> > sure iter->batch always contains a full bucket snapshot"),
-> > st_bucket_done == true is equivalent to iter->cur_sk == iter->end_sk.
-> > 
-> > Signed-off-by: Jordan Rife <jordan@jrife.io>
-> > ---
-> >  net/ipv4/tcp_ipv4.c | 14 ++++++--------
-> >  1 file changed, 6 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index 27022018194a..20730723a02c 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -3020,7 +3020,6 @@ struct bpf_tcp_iter_state {
-> >  	unsigned int end_sk;
-> >  	unsigned int max_sk;
-> >  	struct sock **batch;
-> > -	bool st_bucket_done;
-> >  };
-> >  
-> >  struct bpf_iter__tcp {
-> > @@ -3043,8 +3042,10 @@ static int tcp_prog_seq_show(struct bpf_prog *prog, struct bpf_iter_meta *meta,
-> >  
-> >  static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
-> >  {
-> > -	while (iter->cur_sk < iter->end_sk)
-> > -		sock_gen_put(iter->batch[iter->cur_sk++]);
-> > +	unsigned int cur_sk = iter->cur_sk;
-> > +
-> > +	while (cur_sk < iter->end_sk)
-> > +		sock_gen_put(iter->batch[cur_sk++]);
-> 
-> Why is this chunk included in this patch ?
+Change vsock's lingerning to wait on close() until all data is sent, i.e.
+until workers picked all the packets for processing.
 
-This should be in patch 5 to keep cur_sk for find_cookie
+Changes in v6:
+- Make vsock_wait_sent() return bool, parametrize enable_so_linger() with
+  timeout, don't open code DIV_ROUND_UP [Stefano]
+- Link to v5: https://lore.kernel.org/r/20250521-vsock-linger-v5-0-94827860d1d6@rbox.co
+
+Changes in v5:
+- Move unsent_bytes fetching logic to utils.c
+- Add a helper for enabling SO_LINGER
+- Accommodate for close() taking a long time for reasons unrelated to
+  lingering
+- Separate and redo the testcase [Stefano]
+- Enrich the comment [Stefano]
+- Link to v4: https://lore.kernel.org/r/20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co
+
+Changes in v4:
+- While in virtio, stick to virtio_transport_unsent_bytes() [Stefano]
+- Squash the indentation reduction [Stefano]
+- Pull SOCK_LINGER check into vsock_linger() [Stefano]
+- Don't explicitly pass sk->sk_lingertime [Stefano]
+- Link to v3: https://lore.kernel.org/r/20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co
+
+Changes in v3:
+- Set "vsock/virtio" topic where appropriate
+- Do not claim that Hyper-V and VMCI ever lingered [Stefano]
+- Move lingering to af_vsock core [Stefano] 
+- Link to v2: https://lore.kernel.org/r/20250421-vsock-linger-v2-0-fe9febd64668@rbox.co
+
+Changes in v2:
+- Comment that some transports do not implement unsent_bytes [Stefano]
+- Reduce the indentation of virtio_transport_wait_close() [Stefano] 
+- Do not linger on shutdown(), expand the commit messages [Paolo]
+- Link to v1: https://lore.kernel.org/r/20250407-vsock-linger-v1-0-1458038e3492@rbox.co
+
+Changes in v1:
+- Do not assume `unsent_bytes()` is implemented by all transports [Stefano]
+- Link to v0: https://lore.kernel.org/netdev/df2d51fd-03e7-477f-8aea-938446f47864@rbox.co/
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (5):
+      vsock/virtio: Linger on unsent data
+      vsock: Move lingering logic to af_vsock core
+      vsock/test: Introduce vsock_wait_sent() helper
+      vsock/test: Introduce enable_so_linger() helper
+      vsock/test: Add test for an unexpectedly lingering close()
+
+ include/net/af_vsock.h                  |  1 +
+ net/vmw_vsock/af_vsock.c                | 33 +++++++++++++
+ net/vmw_vsock/virtio_transport_common.c | 21 +--------
+ tools/testing/vsock/util.c              | 38 +++++++++++++++
+ tools/testing/vsock/util.h              |  2 +
+ tools/testing/vsock/vsock_test.c        | 83 +++++++++++++++++++++++----------
+ 6 files changed, 134 insertions(+), 44 deletions(-)
+---
+base-commit: f44092606a3f153bb7e6b277006b1f4a5b914cfc
+change-id: 20250304-vsock-linger-9026e5f9986c
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
