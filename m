@@ -1,131 +1,205 @@
-Return-Path: <netdev+bounces-192354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C24ABF91B
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35B38ABF958
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:32:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0139E2747
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:22:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AB3E3B510C
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E724B1FFC5D;
-	Wed, 21 May 2025 15:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0353214F125;
+	Wed, 21 May 2025 15:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cg7eyo8P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06431E47A5
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 15:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5C29461;
+	Wed, 21 May 2025 15:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747840949; cv=none; b=sCv82qvjjmM1kSU0wZDWbIlTHRZHNe7NKL3ETtRFSytikr3lSk0tntjm2HYpr5qb5DJQrA3Gxws51p135/OJDq4u1Sw5mmUlmJWrg2ZcKPP0WV+xY8lh7bpXXbl7omssKboRz+E3xWCaUhrp9AR0jKQJnD75zZs7rfOX4jPlptE=
+	t=1747841536; cv=none; b=JgNOopwFdIv/ObiCmjbuZraeUm4VY8XibApeozH4ZUNk4D6UDrdEifb2+tKlT8Tu+fMTr4B9WfXOMYf3sY04V+noXE4ERtzStUUNUxcxj2zl2Lmts7nBsnRNQFpmqaaN0/uW31dROg3yhkjoVHLwDmIBd0Ga4Jz3TKlq5FyyuHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747840949; c=relaxed/simple;
-	bh=US6Qn/YPFfEQVJh/yquwxVsdo6yHequvshtAvfNQRnc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SdutMK20xVlWXP+WavxAiZ/DTNdeIC5k95GVAb7G+AUHvVx/GykD99fgJnUcFz45ssgLMSd+afJRnrLsjaOIZBy0uzyz52IU2fyhmi3GeMN9MF8os2mSVKQYkMHoTYiQOiEKRgTtWFYE7xnGxcTFtLDJqHQxAttz2x/E3brlpIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0leil.net; spf=pass smtp.mailfrom=0leil.net; arc=none smtp.client-ip=185.125.25.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0leil.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0leil.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4b2Zsk0B0Bz3fC;
-	Wed, 21 May 2025 17:22:18 +0200 (CEST)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4b2Zsh2wFGz8KK;
-	Wed, 21 May 2025 17:22:16 +0200 (CEST)
-From: Quentin Schulz <foss+kernel@0leil.net>
-Date: Wed, 21 May 2025 17:21:59 +0200
-Subject: [PATCH net] net: stmmac: platform: guarantee uniqueness of bus_id
+	s=arc-20240116; t=1747841536; c=relaxed/simple;
+	bh=5SONIjkkgio0G9/2yq0GzFXr4VaBVp93e8fBGFTaexk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ew6QuMr9nTYXiLfRHJtFt90nA4XTfFXY8TRWtSXglndlMJGa+vlhTnxYmCfdcmWZnE/81gzGxbTZzfEyNtpHxpEIi9Og5Bx0gX3KFPuABCjn9hcbg1CP8zYdi27f+qYePInfbtSMPsuyLwusZEeEzZ0o9nNi5Lwxjr+OA3iHWQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cg7eyo8P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36C67C4CEE7;
+	Wed, 21 May 2025 15:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747841536;
+	bh=5SONIjkkgio0G9/2yq0GzFXr4VaBVp93e8fBGFTaexk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Cg7eyo8PnZKsoBP0lzMTcuAz/2qun2XeZqW2QmLPSmVvBeHcIm2lU3s9PYrvUktU4
+	 +RXitnsVXvLkP0Dn1s9TAbscYnCPUSuWCbUsT//3BcRtvbsR/ul6hhsVm4Ak1LtDte
+	 e0vVlbYRAoS90C4U4WvJvYY8kQv7zuZhCtZ+mv0hjuQ7xF8R0ds6ECwUPCBb346fQu
+	 FX77bYryZAhHj08OqADQUAVR2n7QYD/DxsaEcVCCt9e3hfjYurdPiI+svipGe8Z0DH
+	 qFdFsVuGelK3UuaVMOmwwYhXYWiQCwIIUJUrv9O4NFIkemdbWD9cTrJQmVrvqB7ZWH
+	 M0J3qu6jSMm4w==
+From: Lee Jones <lee@kernel.org>
+To: lee@kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	Rao Shoaib <Rao.Shoaib@oracle.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [PATCH v6.1 00/27] af_unix: Align with upstream to avoid a potential UAF
+Date: Wed, 21 May 2025 16:26:59 +0100
+Message-ID: <20250521152920.1116756-1-lee@kernel.org>
+X-Mailer: git-send-email 2.49.0.1143.g0be31eac6b-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250521-stmmac-mdio-bus_id-v1-1-918a3c11bf2c@cherry.de>
-X-B4-Tracking: v=1; b=H4sIAJbvLWgC/x3MQQqEMAxA0atI1gZsO1L0KiKDtlGzaJWmI4J49
- yku3+L/G4QSk0Bf3ZDoZOE9Fqi6ArdNcSVkXwy60W3TaoWSQ5gcBs87zj/5skejzGw/ztrOGCj
- hkWjh650OECnD+Dx/ttnzIGkAAAA=
-X-Change-ID: 20250521-stmmac-mdio-bus_id-313b74c77933
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>, 
- Heiko Stuebner <heiko@sntech.de>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Quentin Schulz <quentin.schulz@cherry.de>
-X-Mailer: b4 0.14.2
-X-Infomaniak-Routing: alpha
+Content-Transfer-Encoding: 8bit
 
-From: Quentin Schulz <quentin.schulz@cherry.de>
+This is the second attempt at achieving the same goal.  This time, the
+submission avoids forking the current code base, ensuring it remains
+easier to maintain over time.
 
-bus_id is currently derived from the ethernetX alias. If one is missing
-for the device, 0 is used. If ethernet0 points to another stmmac device
-or if there are 2+ stmmac devices without an ethernet alias, then bus_id
-will be 0 for all of those.
+The set has been tested using the SCM_RIGHTS test suite [1] using QEMU
+and has been seen to successfully mitigate a UAF on on a top tier
+handset.
 
-This is an issue because the bus_id is used to generate the mdio bus id
-(new_bus->id in drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-stmmac_mdio_register) and this needs to be unique.
+RESULTS:
 
-This allows to avoid needing to define ethernet aliases for devices with
-multiple stmmac controllers (such as the Rockchip RK3588) for multiple
-stmmac devices to probe properly.
+  TAP version 13
+  1..20
+  # Starting 20 tests from 5 test cases.
+  #  RUN           scm_rights.dgram.self_ref ...
+  #            OK  scm_rights.dgram.self_ref
+  ok 1 scm_rights.dgram.self_ref
+  #  RUN           scm_rights.dgram.triangle ...
+  #            OK  scm_rights.dgram.triangle
+  ok 2 scm_rights.dgram.triangle
+  #  RUN           scm_rights.dgram.cross_edge ...
+  #            OK  scm_rights.dgram.cross_edge
+  ok 3 scm_rights.dgram.cross_edge
+  #  RUN           scm_rights.dgram.backtrack_from_scc ...
+  #            OK  scm_rights.dgram.backtrack_from_scc
+  ok 4 scm_rights.dgram.backtrack_from_scc
+  #  RUN           scm_rights.stream.self_ref ...
+  #            OK  scm_rights.stream.self_ref
+  ok 5 scm_rights.stream.self_ref
+  #  RUN           scm_rights.stream.triangle ...
+  #            OK  scm_rights.stream.triangle
+  ok 6 scm_rights.stream.triangle
+  #  RUN           scm_rights.stream.cross_edge ...
+  #            OK  scm_rights.stream.cross_edge
+  ok 7 scm_rights.stream.cross_edge
+  #  RUN           scm_rights.stream.backtrack_from_scc ...
+  #            OK  scm_rights.stream.backtrack_from_scc
+  ok 8 scm_rights.stream.backtrack_from_scc
+  #  RUN           scm_rights.stream_oob.self_ref ...
+  #            OK  scm_rights.stream_oob.self_ref
+  ok 9 scm_rights.stream_oob.self_ref
+  #  RUN           scm_rights.stream_oob.triangle ...
+  #            OK  scm_rights.stream_oob.triangle
+  ok 10 scm_rights.stream_oob.triangle
+  #  RUN           scm_rights.stream_oob.cross_edge ...
+  #            OK  scm_rights.stream_oob.cross_edge
+  ok 11 scm_rights.stream_oob.cross_edge
+  #  RUN           scm_rights.stream_oob.backtrack_from_scc ...
+  #            OK  scm_rights.stream_oob.backtrack_from_scc
+  ok 12 scm_rights.stream_oob.backtrack_from_scc
+  #  RUN           scm_rights.stream_listener.self_ref ...
+  #            OK  scm_rights.stream_listener.self_ref
+  ok 13 scm_rights.stream_listener.self_ref
+  #  RUN           scm_rights.stream_listener.triangle ...
+  #            OK  scm_rights.stream_listener.triangle
+  ok 14 scm_rights.stream_listener.triangle
+  #  RUN           scm_rights.stream_listener.cross_edge ...
+  #            OK  scm_rights.stream_listener.cross_edge
+  ok 15 scm_rights.stream_listener.cross_edge
+  #  RUN           scm_rights.stream_listener.backtrack_from_scc ...
+  #            OK  scm_rights.stream_listener.backtrack_from_scc
+  ok 16 scm_rights.stream_listener.backtrack_from_scc
+  #  RUN           scm_rights.stream_listener_oob.self_ref ...
+  #            OK  scm_rights.stream_listener_oob.self_ref
+  ok 17 scm_rights.stream_listener_oob.self_ref
+  #  RUN           scm_rights.stream_listener_oob.triangle ...
+  #            OK  scm_rights.stream_listener_oob.triangle
+  ok 18 scm_rights.stream_listener_oob.triangle
+  #  RUN           scm_rights.stream_listener_oob.cross_edge ...
+  #            OK  scm_rights.stream_listener_oob.cross_edge
+  ok 19 scm_rights.stream_listener_oob.cross_edge
+  #  RUN           scm_rights.stream_listener_oob.backtrack_from_scc ...
+  #            OK  scm_rights.stream_listener_oob.backtrack_from_scc
+  ok 20 scm_rights.stream_listener_oob.backtrack_from_scc
+  # PASSED: 20 / 20 tests passed.
+  # Totals: pass:20 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Obviously, the bus_id isn't guaranteed to be stable across reboots if no
-alias is set for the device but that is easily fixed by simply adding an
-alias if this is desired.
+[0] https://lore.kernel.org/all/20250304030149.82265-1-kuniyu@amazon.com/
+[1] https://lore.kernel.org/all/20240325202425.60930-16-kuniyu@amazon.com/
 
-Signed-off-by: Quentin Schulz <quentin.schulz@cherry.de>
----
-Unsure if I should cc stable since people who encountered that issue for
-sure had to add an ethernet alias to make things work with their DT so
-shouldn't be too much of an actual issue?
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Alexander Mikhalitsyn (1):
+  af_unix: Kconfig: make CONFIG_UNIX bool
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index c73eff6a56b87a3783c91b2ffbf5807a27df303f..15205a47cafc276442c3759a36d115d8da1fe51d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -430,6 +430,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	struct device_node *np = pdev->dev.of_node;
- 	struct plat_stmmacenet_data *plat;
- 	struct stmmac_dma_cfg *dma_cfg;
-+	static int bus_id = -ENODEV;
- 	int phy_mode;
- 	void *ret;
- 	int rc;
-@@ -465,8 +466,14 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	of_property_read_u32(np, "max-speed", &plat->max_speed);
- 
- 	plat->bus_id = of_alias_get_id(np, "ethernet");
--	if (plat->bus_id < 0)
--		plat->bus_id = 0;
-+	if (plat->bus_id < 0) {
-+		if (bus_id < 0)
-+			bus_id = of_alias_get_highest_id("ethernet");
-+		/* No ethernet alias found, init at -1 so first bus_id is 0 */
-+		if (bus_id < 0)
-+			bus_id = -1;
-+		plat->bus_id = ++bus_id;
-+	}
- 
- 	/* Default to phy auto-detection */
- 	plat->phy_addr = -1;
+Kuniyuki Iwashima (24):
+  af_unix: Return struct unix_sock from unix_get_socket().
+  af_unix: Run GC on only one CPU.
+  af_unix: Try to run GC async.
+  af_unix: Replace BUG_ON() with WARN_ON_ONCE().
+  af_unix: Remove io_uring code for GC.
+  af_unix: Remove CONFIG_UNIX_SCM.
+  af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
+  af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+  af_unix: Link struct unix_edge when queuing skb.
+  af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+  af_unix: Iterate all vertices by DFS.
+  af_unix: Detect Strongly Connected Components.
+  af_unix: Save listener for embryo socket.
+  af_unix: Fix up unix_edge.successor for embryo socket.
+  af_unix: Save O(n) setup of Tarjan's algo.
+  af_unix: Skip GC if no cycle exists.
+  af_unix: Avoid Tarjan's algorithm if unnecessary.
+  af_unix: Assign a unique index to SCC.
+  af_unix: Detect dead SCC.
+  af_unix: Replace garbage collection algorithm.
+  af_unix: Remove lock dance in unix_peek_fds().
+  af_unix: Try not to hold unix_gc_lock during accept().
+  af_unix: Don't access successor in unix_del_edges() during GC.
+  af_unix: Add dead flag to struct scm_fp_list.
 
----
-base-commit: 4a95bc121ccdaee04c4d72f84dbfa6b880a514b6
-change-id: 20250521-stmmac-mdio-bus_id-313b74c77933
+Michal Luczaj (1):
+  af_unix: Fix garbage collection of embryos carrying OOB with
+    SCM_RIGHTS
 
-Best regards,
+Shigeru Yoshida (1):
+  af_unix: Fix uninit-value in __unix_walk_scc()
+
+ include/net/af_unix.h |  48 ++-
+ include/net/scm.h     |  11 +
+ net/Makefile          |   2 +-
+ net/core/scm.c        |  17 ++
+ net/unix/Kconfig      |  11 +-
+ net/unix/Makefile     |   2 -
+ net/unix/af_unix.c    | 120 +++++---
+ net/unix/garbage.c    | 691 +++++++++++++++++++++++++++++-------------
+ net/unix/scm.c        | 154 ----------
+ net/unix/scm.h        |  10 -
+ 10 files changed, 618 insertions(+), 448 deletions(-)
+ delete mode 100644 net/unix/scm.c
+ delete mode 100644 net/unix/scm.h
+
+
 -- 
-Quentin Schulz <quentin.schulz@cherry.de>
+2.49.0.1143.g0be31eac6b-goog
 
 
