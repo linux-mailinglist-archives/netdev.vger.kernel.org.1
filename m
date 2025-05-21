@@ -1,101 +1,218 @@
-Return-Path: <netdev+bounces-192349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E8BABF89A
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:01:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D922FABF8C6
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C754E6268
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E8CEA22817
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFD7221F38;
-	Wed, 21 May 2025 14:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DB721578F;
+	Wed, 21 May 2025 14:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4ok8kMb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219AC221F0C
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4033121D3E2
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747839335; cv=none; b=bhbPPPINa0sR+Pl34lv2LPpjzkY/3jEGwumuafiXcrnkf6tBdUydr6bbeorVuDNbbsWqbUvRg0s1VTP2hWcADQ+W1W7WlyvbVgrZgquP3tTKVejVG0L+U0zocvMCD27fUICy40XfjTm9CO4pb8/6NI+GtG/pEJ7MaCdRrOs16As=
+	t=1747839379; cv=none; b=LTPMrDsXHjkJ7MIH1i0aAwZo9r4lot9HuL9yZDrqw7BySCsei4+yYGkLQ/v0LlYhNdiVgg+W4AxXKw5BZ+6hyspqL7COobwNlvqPPKkUAelDWYuRNtMPRiCYK7B+TP2LmaAFZzhiy27jX6uwVe/psrvmvyRVS4HXVHZUcENfng0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747839335; c=relaxed/simple;
-	bh=7aC1JFlJZC4DzuXo5UNsxoo2hoz3sVAMFo0FeeyWrBA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=izUYcn7XVd8Z75j8vzCZAEe9g1DBkodRVZ+QQJrz4TNC9gQWRrFWN+mycAnHHCezltOGXlyvNiJNPRKx6vvy+tMdQ6ZRtxHsMgJei5C6q8ezIA5jVwaTFHLsgRIWuoXL8nYHvNT4KWT6cRJb5hepIwz3CG7XByQkX0Mi8D9lT2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-86a50b5f5bdso345417739f.0
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 07:55:33 -0700 (PDT)
+	s=arc-20240116; t=1747839379; c=relaxed/simple;
+	bh=4+Wj4hxdaXN96SjUIAfwiVesd+p9hyy1LELAnrGN8UM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C38o7iMPfX+B+LoWgw7WhV6j0F5XKV0TcC5TxTUJm7QzVD9Oq+sVyfrVgiG9aByxLsaJwglXKzkmkxin6WarZxJk+XzfjoX3zxRU/uAI9o5W/tdIJreUiJRE+78YFGRTEL9KFzJUTf68/fDJ9RyGqE+FNX7asW0v90Nqv4ZglpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z4ok8kMb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747839377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JSCBFcNuY0Goh2S9d5LToDFwcxHuL80JaO8Gh+v1hTQ=;
+	b=Z4ok8kMbqYfNmgLVlMcdUXsC841s18DPkXoA7VRrwciooIk81EgWrz0dH+Hf3lzsHGtF+/
+	Zf9kxXZclokOxjhNqyGkaskSirtsTPct0JRKK+e4Nbp9WUjOF2u5/w+kcd90uzfMDNHmhf
+	HQV58JAxbf+t0zD0I+wC9NpEddY8adI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-HlZ3e3s6Ppu-hNBD_PsEjw-1; Wed, 21 May 2025 10:56:15 -0400
+X-MC-Unique: HlZ3e3s6Ppu-hNBD_PsEjw-1
+X-Mimecast-MFC-AGG-ID: HlZ3e3s6Ppu-hNBD_PsEjw_1747839374
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ad5669ab33bso344924666b.3
+        for <netdev@vger.kernel.org>; Wed, 21 May 2025 07:56:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747839333; x=1748444133;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JVkLcreEGxWf9CWcJBGD5Glu9UoiEI6rdnhABCYz4Uc=;
-        b=PEOoPOfAECoYf3KoXdjz4Nzwyex+xCmRrEbHE9O47TRtN9NHH/bbXmWi2iycDkEL5H
-         +AkeEbxGSbFdDc1cL4V/kljKVQlAc0SGcfAHTcItbjmEZZLrBsC9JbKEyQ9Nal9lbGot
-         oLR9xbtUNG8dnpFLrOaFveuUv9e90ozcQ0jViWIZrp4V6KaQoInljdDfr4MSPjr4rfQ9
-         og323GcdIcr9DYC5+TRY+Z0u/Z285E/a2UNHet8JEda7DfS11Qe3U3U6uPw3m6F1xj6D
-         S5TQNjK0xvim/+HImsm2VO+ov+b08u0r0VqczegJmRVhvSBGevsDWMIbXu049j4VuE/L
-         jhIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWrab8EIbiquoJ8wT+puxGxdi6r/LrMYVyYGpEZ1aXL50cDa7+5g3GUNnKOQkERAFrlEktWeCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyfxw/Xc8IRD7rZ0W6jYhhiq2xCSOm4hf7BpdK/w0L5HNTU6KD6
-	uK7COB2k5zuBe6X31k6Dv8cLoKM2Tx5lLInryO3XraDk72uPxYFGlOFz4MzCOBhf49/B+X4gXNj
-	mwXDE3z28i6dHlMSenNHhTycEV7hP9adGIpna5Rc33AXV/pyxdvJcwNh7zqg=
-X-Google-Smtp-Source: AGHT+IHU3VOEtR1uxykFIZrxe5rsDjd3adSviinbsN8tiduT8BUfJ+kIHoWgSOKKBBfAdvb56JDQ1InZaweUiKFe+b6dknXVv2b2
+        d=1e100.net; s=20230601; t=1747839374; x=1748444174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JSCBFcNuY0Goh2S9d5LToDFwcxHuL80JaO8Gh+v1hTQ=;
+        b=JDDwOHA0WejCUvDiebS7njSk3HvTPxsBRMODSvmf2Cfo8RW7g9s6wMInDsuRvPvOMR
+         Gz+sGXpWbhFuJA8xhH5d+PR0XP3izHxEYJOI/gILvanPD6ZnGwT2fAZ3LS/BDlnfcJEv
+         RxHXBR/iz+k6yVT4+gloDNO0e1KkvVtwS6QJw232izauuSqWYnbzQqZuU4cdhCULFE8b
+         LnqLWOWmhkkfRgfkuMlE2TUfGs4ty3MpMpyST8UO3r/q6SPIYs1IYlJdYE3wjFimDQ17
+         FT1Wnm20Gp9tLy1L1WMISaRH0kjHB0ZSZ5ThgGyA3GvWCKzJ+7YgVt1+TuDTekwNQDHI
+         AHqg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9wuGouYs3z7vborB3uA3Mx6aqPABK+VRu9XfgczbSaVRH/+r5jamcClkKq+h7cF4ykyQEXoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAUhMhxuGSX86H3RUrK932wyFSJ1dOMvns3CV8/dTc5XBe9zGm
+	4KujechavL037vajjxAgkKViJH4j8r/c44OC6POAbWEe3NkC3gGSqBIlkRG2FsocR5KD5/phR/i
+	U3IV5Vd5192WXhDNtrqYhwihROuFp3ZAtHfx+5miy2Lc2IjeJA9+xU8FKig==
+X-Gm-Gg: ASbGncsrzRfu9z/O8hQ/vXevmGcVfX/l5ZRHJhsbjVzzh7FmwI93WN5pbm5k0W3heRm
+	3gaa+dBbL1YwcBVBSi0JhEF53l1G0GyLUXXwpPd8E4hwXDylkkuIeeaDxkc+uPc6TiWeEZLxxMc
+	cD9tnonZ6IjHn3S/1CK8hZB8520C+UvBr90LaV434DXcMSg6YoLenARVfpo6TQu1QgZue+g4fLq
+	rtZ1oA0YOyUbQpv5aP8eNqoWqaHm3gZNECaTVwbV6u4jWoWAP5WchGUJfSihnugk8i9ZmLcZIzj
+	eKGpX6FFOs8xVNIH7m35yykO85Bnqt51vyrr9OR55GM0rz3OumM+l2L2KiRg
+X-Received: by 2002:a17:907:9495:b0:ace:d710:a8d1 with SMTP id a640c23a62f3a-ad52d4dae84mr1752074966b.24.1747839374460;
+        Wed, 21 May 2025 07:56:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpoMMbzNscVWDbJ9f7DsJa/QwbA0pdV/T5aW3r3Yle27irZapU6e/PHt7khHjWn7nACqdpnQ==
+X-Received: by 2002:a17:907:9495:b0:ace:d710:a8d1 with SMTP id a640c23a62f3a-ad52d4dae84mr1752071266b.24.1747839373682;
+        Wed, 21 May 2025 07:56:13 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d278290sm905573266b.78.2025.05.21.07.56.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 07:56:13 -0700 (PDT)
+Date: Wed, 21 May 2025 16:56:10 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v5 5/5] vsock/test: Add test for an unexpectedly
+ lingering close()
+Message-ID: <edtepfqev6exbkfdnyzgkdkczif5wnn4oz4t5sxkl6sz64kcaf@f6yztxryvmlq>
+References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
+ <20250521-vsock-linger-v5-5-94827860d1d6@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6a8e:b0:866:217f:80a with SMTP id
- ca18e2360f4ac-86a24c12feemr2365065639f.7.1747839333227; Wed, 21 May 2025
- 07:55:33 -0700 (PDT)
-Date: Wed, 21 May 2025 07:55:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682de965.a00a0220.29bc26.0290.GAE@google.com>
-Subject: [syzbot] Monthly hams report (May 2025)
-From: syzbot <syzbot+list0ce723fccf3cd8df852f@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250521-vsock-linger-v5-5-94827860d1d6@rbox.co>
 
-Hello hams maintainers/developers,
+On Wed, May 21, 2025 at 12:55:23AM +0200, Michal Luczaj wrote:
+>There was an issue with SO_LINGER: instead of blocking until all queued
+>messages for the socket have been successfully sent (or the linger timeout
+>has been reached), close() would block until packets were handled by the
+>peer.
+>
+>Add a test to alert on close() lingering when it should not.
+>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 49 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 49 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f401c6a79495bc7fda97012e5bfeabec7dbfb60a..1040503333cf315e52592c876f2c1809b36fdfdb 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1839,6 +1839,50 @@ static void test_stream_linger_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_stream_nolinger_client(const struct test_opts *opts)
+>+{
+>+	bool nowait;
+>+	time_t ns;
+>+	int fd;
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	enable_so_linger(fd);
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+If we use a parameter for the linger timeout, IMO will be easy to 
+understand this test, defining the timeout in this test, set it and 
+check the value, without defining LINGER_TIMEOUT in util.h.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 40 have already been fixed.
+>+	send_byte(fd, 1, 0); /* Left unread to expose incorrect behaviour. */
+>+	nowait = vsock_wait_sent(fd);
+>+
+>+	ns = current_nsec();
+>+	close(fd);
+>+	ns = current_nsec() - ns;
+>+
+>+	if (nowait) {
+>+		fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
+>+	} else if ((ns + NSEC_PER_SEC - 1) / NSEC_PER_SEC >= LINGER_TIMEOUT) {
 
-Some of the still happening issues:
+Should we define a macro for this conversion?
 
-Ref Crashes Repro Title
-<1> 4013    Yes   possible deadlock in nr_rt_device_down (3)
-                  https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
-<2> 685     Yes   KASAN: slab-use-after-free Read in rose_get_neigh
-                  https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
-<3> 263     Yes   possible deadlock in nr_remove_neigh (2)
-                  https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
-<4> 97      No    possible deadlock in serial8250_handle_irq
-                  https://syzkaller.appspot.com/bug?extid=5fd749c74105b0e1b302
+Or just use DIV_ROUND_UP:
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -1831,7 +1831,7 @@ static void test_stream_nolinger_client(const struct test_opts *opts)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+         if (nowait) {
+                 fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
+-       } else if ((ns + NSEC_PER_SEC - 1) / NSEC_PER_SEC >= LINGER_TIMEOUT) {
++       } else if (DIV_ROUND_UP(ns, NSEC_PER_SEC) >= LINGER_TIMEOUT) {
+                 fprintf(stderr, "Unexpected lingering\n");
+                 exit(EXIT_FAILURE);
+         }
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+The rest LGTM.
 
-You may send multiple commands in a single email message.
+Thanks,
+Stefano
+
+>+		fprintf(stderr, "Unexpected lingering\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("DONE");
+>+}
+>+
+>+static void test_stream_nolinger_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("DONE");
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1999,6 +2043,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_linger_client,
+> 		.run_server = test_stream_linger_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SO_LINGER close() on unread",
+>+		.run_client = test_stream_nolinger_client,
+>+		.run_server = test_stream_nolinger_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.49.0
+>
+
 
