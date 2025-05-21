@@ -1,129 +1,140 @@
-Return-Path: <netdev+bounces-192308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84851ABF6E8
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:01:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E17ABF701
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37CEC16DEDB
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:01:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF669E3E49
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D7B1494A3;
-	Wed, 21 May 2025 14:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAA417A309;
+	Wed, 21 May 2025 14:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqYnON9t"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5FA2A1BF;
-	Wed, 21 May 2025 14:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0914EC60;
+	Wed, 21 May 2025 14:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747836086; cv=none; b=o/0ZcW9IahCgbImuU8X21LWPydSkKj26+RLHlnUfxftr1KbdfzxK+/frca2z/wcwLhSAqC8LUdZU4Q4Jjn3Xj5t2TWEUxTbDdJzDcinjkY3b2lVYpz9Gh3iWUbXYEyp0iIRoDD/p5fgNyqB9isWLrnYnqNPEgIwOnrKECjH29ys=
+	t=1747836159; cv=none; b=ZvIUnhXSsZNL747C5yfKD7Ew/YDBjbEe/lKyTq3WmhWTttzSz3f7HF0/h2FWrM+YZIdiI1hEllRMbmMRppF7VtDh1VGuJHJdhSkY/lLy2q65xxXGP4d5lAK93BW9imErG+m+9+wY8/zDmBem1lADAC3SvVpSVuYWCVNNkWvA1Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747836086; c=relaxed/simple;
-	bh=rHiSEnPQVxe41kOxSNdhkkzgEtOJynN2Wt0zY8D+RV8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RSW6zQh2llhwMuecQfwh3P2rJ4RjiqiZv9Rffm2Id9V3/p7W4sDJpdbr7gdZbJgnLpv6PgvXbd/J/U++sSO4uA90dDwKm8UFmfzLjry0JnVeRQezy0AJIReACpBay3ENqwI3GaX8GOMKpEHCtGtFoj8B9wDX9WcCyH+vEkzzbfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 21 May
- 2025 17:01:15 +0300
-Received: from [192.168.211.132] (10.0.253.138) by Ex16-01.fintech.ru
- (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 21 May
- 2025 17:01:15 +0300
-Message-ID: <4b007a74-3399-41ba-8953-d7767fcad4f9@fintech.ru>
-Date: Wed, 21 May 2025 17:01:12 +0300
+	s=arc-20240116; t=1747836159; c=relaxed/simple;
+	bh=XzBNibcp7iKkeEFDUAzJdibe/Jo7NOOf5PX3W+wxgD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mVoNPW/8h8D5A1ZVIHUikLgf550p2RT8gjypiqVVm253W18VizrHa0Xi6yRDAMat3+GUzeEwzNykWvQKmzWMGXBG87992ZgHEDEN/gVQ4zOFhg+1qvSlPk11BzIg3oOoEN6uHI1AJlDc5q6xpzJYYgNy4sELsrVt61F6Fn61+vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqYnON9t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7C4C4CEE4;
+	Wed, 21 May 2025 14:02:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747836158;
+	bh=XzBNibcp7iKkeEFDUAzJdibe/Jo7NOOf5PX3W+wxgD0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qqYnON9tKaNxbz622vXY3a5h7IsI/+xBDvDXZa2hyvFfYeSmdv8EYSNVWOsAZRhSo
+	 4VMLh5AP7aPS0z++jYbK1J81HUMEYW+CVwNZdITNgGWHALlo5mUgQmM/RdLr7T3519
+	 hxt1g0F01btuw74hzw9xKDzXf+AD45KPhCbMVqrLqbSl8DsTCbgkA2h+D252WseKg9
+	 2dvz6JNAm0Qa4qcC3jd8so/+1qjD3zKHrJ8i3FR4DkeDngUckkbLaBezxLC5nECWQn
+	 eUBfkvyTuzMsNPtIsfzIyZRbnbqeuOgf7IptoXwQurBKBjODWatfRl3vkhFI3d9ZDC
+	 gqIOVPi1xYw5A==
+Date: Wed, 21 May 2025 15:02:31 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
+	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	hawk@kernel.org, tglx@linutronix.de,
+	shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+	kotaranov@microsoft.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next,v2] net: mana: Add support for Multi Vports on
+ Bare metal
+Message-ID: <20250521140231.GW365796@horms.kernel.org>
+References: <1747671636-5810-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: usb: aqc111: fix error handling of usbnet
- read calls
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com>,
-	<lvc-project@linuxtesting.org>
-References: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
- <39e2951b-6e57-4003-b1c7-c68947f579be@lunn.ch>
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Content-Language: en-US
-In-Reply-To: <39e2951b-6e57-4003-b1c7-c68947f579be@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1747671636-5810-1-git-send-email-haiyangz@microsoft.com>
 
-Hello,
-
-On 5/21/25 15:34, Andrew Lunn wrote:
-> On Tue, May 20, 2025 at 02:32:39PM +0300, Nikita Zhandarovich wrote:
->> Syzkaller, courtesy of syzbot, identified an error (see report [1]) in
->> aqc111 driver, caused by incomplete sanitation of usb read calls'
->> results. This problem is quite similar to the one fixed in commit
->> 920a9fa27e78 ("net: asix: add proper error handling of usb read errors").
->>
->> For instance, usbnet_read_cmd() may read fewer than 'size' bytes,
->> even if the caller expected the full amount, and aqc111_read_cmd()
->> will not check its result properly. As [1] shows, this may lead
->> to MAC address in aqc111_bind() being only partly initialized,
->> triggering KMSAN warnings.
+On Mon, May 19, 2025 at 09:20:36AM -0700, Haiyang Zhang wrote:
+> To support Multi Vports on Bare metal, increase the device config response
+> version. And, skip the register HW vport, and register filter steps, when
+> the Bare metal hostmode is set.
 > 
-> It looks like __ax88179_read_cmd() has the same issue? Please could
-> you have a look around and see if more of the same problem exists.
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+> v2:
+>   Updated comments as suggested by ALOK TIWARI.
+>   Fixed the version check.
 > 
-
-Yes, you are correct, similar issue with ax88179. There was once an
-attempt to enable similar sanity checks there, see
-https://lore.kernel.org/all/20220514133234.33796-1-k.kahurani@gmail.com/,
-but for some reason it did not pan out.
-
-As for other places with the same issue, after a quick glance I see these:
-
-__ax88179_read_cmd - drivers/net/usb/ax88179_178a.c
-cdc_ncm_init - drivers/net/usb/cdc_ncm.c
-nc_vendor_read - drivers/net/usb/net1080.c
-pla_read_word - drivers/net/usb/r8153_ecm.c
-pla_write_word - drivers/net/usb/r8153_ecm.c
-sierra_net_get_fw_attr - drivers/net/usb/sierra_net.c
-
-This covers all instances usbnet_read_cmd[_nopm] that do not check for
-full 'size' reads, only for straightforward errors. Roughly half of all
-usbnet_read_cmd() calls kernel-wide.
-
-> Are there any use cases where usbnet_read_cmd() can actually return
-> less than size and it not being an error? Maybe this check for ret !=
-> size can be moved inside usbnet_read_cmd()?
-
-I can't reliably state how normal it is when usbnet_read_cmd() ends up
-reading less than size. Both aqc111 and syzkaller with its repros (and
-ax88179/asix as well) tell us it does happen when it shouldn't.
-
-Personally, while I see logic of moving this fix into
-usbnet_read_cmd(), I am wary for the very reason you stated in your
-question - sometimes it may be expected. Also, more often than not
-functions that envelop usbnet_read_cmd() (like ax88179_read_cmd()) seem
-to be deliberately ignoring return values, but even an early warning
-may be helpful in such cases.
-
-In other words, I'd rather leave the decision up to the maintainers. I
-don't mind doing either option.
-
-Regards,
-Nikita
-
+> ---
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 24 ++++++++++++-------
+>  include/net/mana/mana.h                       |  4 +++-
+>  2 files changed, 19 insertions(+), 9 deletions(-)
 > 
-> 	Andrew
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 2bac6be8f6a0..9c58d9e0bbb5 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -921,7 +921,7 @@ static void mana_pf_deregister_filter(struct mana_port_context *apc)
+>  
+>  static int mana_query_device_cfg(struct mana_context *ac, u32 proto_major_ver,
+>  				 u32 proto_minor_ver, u32 proto_micro_ver,
+> -				 u16 *max_num_vports)
+> +				 u16 *max_num_vports, u8 *bm_hostmode)
+>  {
+>  	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+>  	struct mana_query_device_cfg_resp resp = {};
+> @@ -932,7 +932,7 @@ static int mana_query_device_cfg(struct mana_context *ac, u32 proto_major_ver,
+>  	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_DEV_CONFIG,
+>  			     sizeof(req), sizeof(resp));
+>  
+> -	req.hdr.resp.msg_version = GDMA_MESSAGE_V2;
+> +	req.hdr.resp.msg_version = GDMA_MESSAGE_V3;
+>  
+>  	req.proto_major_ver = proto_major_ver;
+>  	req.proto_minor_ver = proto_minor_ver;
 
+> @@ -956,11 +956,16 @@ static int mana_query_device_cfg(struct mana_context *ac, u32 proto_major_ver,
+>  
+>  	*max_num_vports = resp.max_num_vports;
+>  
+> -	if (resp.hdr.response.msg_version == GDMA_MESSAGE_V2)
+> +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V2)
+>  		gc->adapter_mtu = resp.adapter_mtu;
+>  	else
+>  		gc->adapter_mtu = ETH_FRAME_LEN;
+>  
+> +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V3)
+> +		*bm_hostmode = resp.bm_hostmode;
+> +	else
+> +		*bm_hostmode = 0;
+
+Hi,
+
+Perhaps not strictly related to this patch, but I see
+that mana_verify_resp_hdr() is called a few lines above.
+And that verifies a minimum msg_version. But I do not see
+any verification of the maximum msg_version supported by the code.
+
+I am concerned about a hypothetical scenario where, say the as yet unknown
+version 5 is sent as the version, and the above behaviour is used, while
+not being correct.
+
+Could you shed some light on this?
+
+...
 
