@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-192270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB667ABF330
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:44:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D138ABF331
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B8D63A7651
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:44:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B2C03A9EEA
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3AB25A2AF;
-	Wed, 21 May 2025 11:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF822239E79;
+	Wed, 21 May 2025 11:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="kehEKcIv"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="pcHrPkeG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68068239E79
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 11:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD1F3CF58
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 11:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747827882; cv=none; b=LnWr1oCOTHJgGJaH04Y+Cd7JypPM/QMKASFMaA0Axilcvctrz+pbG0csELOF2eNMWRGaNo8R0jdCP0xpvitLIOzA8lF3+1YQmsjLZBJcI9OmuwMDL6jhj3+7Z7HJ5AWPiOrxg3rMuErCDcfTr1lBq3MRBVZtjFdlDowO0F6Tdz0=
+	t=1747827897; cv=none; b=DYLdBlrkU+CH7bHCkbU/vZt7q/UX82VNmG0/AeBRFDFbjKU8a+wgXHFICpDU/UMkpYoRazDthbiV0L3bwtmdM9ZLkr3b38yuvgtTCEybv6tsux00mUpYSqAAmJ6YoLUysEX9YSkhPwv5F8+cYbrsRqRc8oxhxpoVVK6xuLjx0NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747827882; c=relaxed/simple;
-	bh=P7S0sV+c3kyNYEhAnMO5fSO/1cfX9Lr5010Fv/Jsla8=;
+	s=arc-20240116; t=1747827897; c=relaxed/simple;
+	bh=zOmsMcYpXBlt/wt7xQg4FRCbyItBJ4hUrGGh5s8taps=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F0BlmK2P89EMi3vCBSuPtqWxOrcy/30AEnrKLeua378s8d2XBspkZP9MyW5941z0zLbeLT4UBCOaIRD0PllMK+BCfqNaLygWOogcFY1MbXRiUBSAWbi7JmhnbfFQk+TeEsewkTqpzKkvrlAsH2ZbEm5VK1XfHrK0assVoT3VR4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=kehEKcIv; arc=none smtp.client-ip=52.95.48.154
+	 MIME-Version:Content-Type; b=O63dc5O2TEphEalfxaFvno2wgb8+i38hUUapZa7l7sCyms+hdBfu4QHG+urOXkeT4zaqoZ+IxyJX1yf1yhmmkSGrG5pu7Nh0OUUOtjq5YX1EMA7pTlnWm5Q/y9WbiClPsNbYcqsESj0lMVxNkLsRBE9jnhjXHuZGDnhPiOvYAMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=pcHrPkeG; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747827881; x=1779363881;
+  t=1747827896; x=1779363896;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8tz6LoI8LRkU21FN+Sd5e2/OyCA/N25DqbmZ4IWwZIU=;
-  b=kehEKcIvvb3AI3IFruIYyaN9Ty6/d2X51KTzZtyBDNSdJ3PFWHrgsRum
-   ioYI1SzJZG+zyvF92ppNn1VFFnDR02BhkWQeydpN5Tq1mspFFxX/a2+bv
-   jawkaI6OWLX37BG4szepnALvfvyIOkjhz0GtckzVwc0qbqof8J62hE37R
-   jGl2LhL1GN/YolPBCuz0Dwz1+DMt3ii5YkMvVjktHVY/anC6lpiBSqQ4p
-   kJCq8zEeJF0bFWxDKHZeqj0v3DsQdxQsWMF1s0Td4NMBXXFlKHLKMXJsr
-   Q13O0Qo51n2/X58P9gcmSGcY1SWajsJS575c5kX1R+B14CvprSDYN0Fuz
-   Q==;
+  bh=kYrvyTt50brhCubyf/obfENIa5PsloQs3JokOGFepxE=;
+  b=pcHrPkeG6yzIsinR/NRROtPPsB7tDlftH6T8JaVXf9u28BDMeo/2o6kU
+   hV8PawL34IlY5Vm6GP5Os/M22chlfSYSsSGCyeWUkT+h6ToXQhfX10tPH
+   AQrJ2vrAxpNjdXAH9RoENwUXYT7uiE1kQ9dhVFps4IBF/MyOHjIfX/1dO
+   1kwCGBJhTOy1csafg5+1A132c0hcWg1QOwjc6TFzArHQqBSYLEG6hmATv
+   owpC1hz8bj+RTYjV94K+Fx1Mn5hyZAyfu1/HCEocfGHIgzmeJiBfOZqX7
+   5Fs+Eas/zpQPjoVFvNHnxHSsZlqUkn4QT5Th/8RwHfSn3zQN0Gtp/Yvvc
+   w==;
 X-IronPort-AV: E=Sophos;i="6.15,303,1739836800"; 
-   d="scan'208";a="492496171"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 11:44:40 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:39114]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.21.132:2525] with esmtp (Farcaster)
- id c0a7d303-0fd4-4dcb-8f16-858d581f1e43; Wed, 21 May 2025 11:44:38 +0000 (UTC)
-X-Farcaster-Flow-ID: c0a7d303-0fd4-4dcb-8f16-858d581f1e43
+   d="scan'208";a="746956260"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 11:44:53 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:36579]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.121:2525] with esmtp (Farcaster)
+ id 9e458b17-eb41-4fce-a3f4-098ecdcf6b9e; Wed, 21 May 2025 11:44:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 9e458b17-eb41-4fce-a3f4-098ecdcf6b9e
 Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 11:44:38 +0000
+ Wed, 21 May 2025 11:44:50 +0000
 Received: from HFA15-G9FV5D3.amazon.com (10.85.143.172) by
  EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 21 May 2025 11:44:27 +0000
+ Wed, 21 May 2025 11:44:39 +0000
 From: David Arinzon <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -79,9 +79,9 @@ CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
 	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
 	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
 	<leon@kernel.org>
-Subject: [PATCH v9 net-next 4/8] net: ena: Control PHC enable through devlink
-Date: Wed, 21 May 2025 14:42:50 +0300
-Message-ID: <20250521114254.369-5-darinzon@amazon.com>
+Subject: [PATCH v9 net-next 5/8] net: ena: Add debugfs support to the ENA driver
+Date: Wed, 21 May 2025 14:42:51 +0300
+Message-ID: <20250521114254.369-6-darinzon@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250521114254.369-1-darinzon@amazon.com>
 References: <20250521114254.369-1-darinzon@amazon.com>
@@ -96,192 +96,164 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
  EX19D005EUA002.ant.amazon.com (10.252.50.11)
 
-Add the capability to set parameters through the devlink framework.
+Adding the base directory of debugfs to the driver.
+In order for the folder to be unique per driver instantiation,
+the chosen name is the device name.
 
-The parameter used for controlling PHC (enable/disable) details
-are as follows:
-- Name: phc_enable
-- Type: Boolean (true - enable/false - disable)
-- Mode: DEVLINK_PARAM_CMODE_DRIVERINIT
-- Effect: Changes take place during driver initialization,
-          any changes require a devlink reload to take effect.
+This commit contains the initialization and the
+base folder.
+
+The creation of the base folder may fail, but is considered
+non-fatal.
 
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_devlink.c | 93 +++++++++++++++++++
- drivers/net/ethernet/amazon/ena/ena_devlink.h |  2 +
- drivers/net/ethernet/amazon/ena/ena_netdev.c  |  2 +
- drivers/net/ethernet/amazon/ena/ena_phc.c     |  2 +
- 4 files changed, 99 insertions(+)
+ .../device_drivers/ethernet/amazon/ena.rst    |  1 +
+ drivers/net/ethernet/amazon/ena/Makefile      |  2 +-
+ drivers/net/ethernet/amazon/ena/ena_debugfs.c | 29 +++++++++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_debugfs.h | 27 +++++++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |  6 ++++
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |  4 +++
+ 6 files changed, 68 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_debugfs.c
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_debugfs.h
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_devlink.c b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-index e0294886..1f3d9a40 100644
---- a/drivers/net/ethernet/amazon/ena/ena_devlink.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-@@ -5,6 +5,63 @@
+diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
+index 3cbf9854..347aec34 100644
+--- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
++++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
+@@ -58,6 +58,7 @@ ena_xdp.[ch]        XDP files
+ ena_pci_id_tbl.h    Supported device IDs.
+ ena_phc.[ch]        PTP hardware clock infrastructure (see `PHC`_ for more info)
+ ena_devlink.[ch]    devlink files.
++ena_debugfs.[ch]    debugfs files.
+ =================   ======================================================
  
- #include "linux/pci.h"
- #include "ena_devlink.h"
-+#include "ena_phc.h"
+ Management Interface:
+diff --git a/drivers/net/ethernet/amazon/ena/Makefile b/drivers/net/ethernet/amazon/ena/Makefile
+index 4b6511db..6d8036bc 100644
+--- a/drivers/net/ethernet/amazon/ena/Makefile
++++ b/drivers/net/ethernet/amazon/ena/Makefile
+@@ -5,4 +5,4 @@
+ 
+ obj-$(CONFIG_ENA_ETHERNET) += ena.o
+ 
+-ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o ena_devlink.o
++ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o ena_devlink.o ena_debugfs.o
+diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.c b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
+new file mode 100644
+index 00000000..fea7bb7f
+--- /dev/null
++++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) Amazon.com, Inc. or its affiliates.
++ * All rights reserved.
++ */
 +
-+static int ena_devlink_phc_enable_validate(struct devlink *devlink, u32 id,
-+					   union devlink_param_value val,
-+					   struct netlink_ext_ack *extack)
++#ifdef CONFIG_DEBUG_FS
++
++#include <linux/seq_file.h>
++#include <linux/pci.h>
++#include "ena_debugfs.h"
++
++void ena_debugfs_init(struct net_device *dev)
 +{
-+	struct ena_adapter *adapter = ENA_DEVLINK_PRIV(devlink);
++	struct ena_adapter *adapter = netdev_priv(dev);
 +
-+	if (!val.vbool)
-+		return 0;
-+
-+	if (!ena_com_phc_supported(adapter->ena_dev)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Device doesn't support PHC");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
++	adapter->debugfs_base =
++		debugfs_create_dir(dev_name(&adapter->pdev->dev), NULL);
++	if (IS_ERR(adapter->debugfs_base))
++		netdev_err(dev, "Failed to create debugfs dir\n");
 +}
 +
-+enum ena_devlink_param_id {
-+	ENA_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
-+	ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-+};
-+
-+static const struct devlink_param ena_devlink_params[] = {
-+	DEVLINK_PARAM_DRIVER(ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-+			     "phc_enable", DEVLINK_PARAM_TYPE_BOOL,
-+			     BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-+			     NULL, NULL, ena_devlink_phc_enable_validate),
-+};
-+
-+void ena_devlink_params_get(struct devlink *devlink)
++void ena_debugfs_terminate(struct net_device *dev)
 +{
-+	struct ena_adapter *adapter = ENA_DEVLINK_PRIV(devlink);
-+	union devlink_param_value val;
-+	int err;
++	struct ena_adapter *adapter = netdev_priv(dev);
 +
-+	err = devl_param_driverinit_value_get(devlink,
-+					      ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-+					      &val);
-+	if (err) {
-+		netdev_err(adapter->netdev, "Failed to query PHC param\n");
-+		return;
-+	}
-+
-+	ena_phc_enable(adapter, val.vbool);
++	debugfs_remove_recursive(adapter->debugfs_base);
 +}
 +
-+void ena_devlink_disable_phc_param(struct devlink *devlink)
-+{
-+	union devlink_param_value value;
++#endif /* CONFIG_DEBUG_FS */
+diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.h b/drivers/net/ethernet/amazon/ena/ena_debugfs.h
+new file mode 100644
+index 00000000..dc61dd99
+--- /dev/null
++++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) Amazon.com, Inc. or its affiliates.
++ * All rights reserved.
++ */
 +
-+	value.vbool = false;
-+	devl_param_driverinit_value_set(devlink,
-+					ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-+					value);
-+}
- 
- static int ena_devlink_reload_down(struct devlink *devlink,
- 				   bool netns_change,
-@@ -80,6 +137,27 @@ static const struct devlink_ops ena_devlink_ops = {
- 	.reload_up	= ena_devlink_reload_up,
- };
- 
-+static int ena_devlink_configure_params(struct devlink *devlink)
-+{
-+	struct ena_adapter *adapter = ENA_DEVLINK_PRIV(devlink);
-+	union devlink_param_value value;
-+	int rc;
++#ifndef __ENA_DEBUGFS_H__
++#define __ENA_DEBUGFS_H__
 +
-+	rc = devlink_params_register(devlink, ena_devlink_params,
-+				     ARRAY_SIZE(ena_devlink_params));
-+	if (rc) {
-+		netdev_err(adapter->netdev, "Failed to register devlink params\n");
-+		return rc;
-+	}
++#include <linux/debugfs.h>
++#include <linux/netdevice.h>
++#include "ena_netdev.h"
 +
-+	value.vbool = ena_phc_is_enabled(adapter);
-+	devl_param_driverinit_value_set(devlink,
-+					ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-+					value);
++#ifdef CONFIG_DEBUG_FS
 +
-+	return 0;
-+}
++void ena_debugfs_init(struct net_device *dev);
 +
- struct devlink *ena_devlink_alloc(struct ena_adapter *adapter)
- {
- 	struct device *dev = &adapter->pdev->dev;
-@@ -97,11 +175,26 @@ struct devlink *ena_devlink_alloc(struct ena_adapter *adapter)
- 	ENA_DEVLINK_PRIV(devlink) = adapter;
- 	adapter->devlink = devlink;
- 
-+	if (ena_devlink_configure_params(devlink))
-+		goto free_devlink;
++void ena_debugfs_terminate(struct net_device *dev);
 +
- 	return devlink;
++#else /* CONFIG_DEBUG_FS */
 +
-+free_devlink:
-+	devlink_free(devlink);
-+	return NULL;
-+}
++static inline void ena_debugfs_init(struct net_device *dev) {}
 +
-+static void ena_devlink_configure_params_clean(struct devlink *devlink)
-+{
-+	devlink_params_unregister(devlink, ena_devlink_params,
-+				  ARRAY_SIZE(ena_devlink_params));
- }
- 
- void ena_devlink_free(struct devlink *devlink)
- {
-+	ena_devlink_configure_params_clean(devlink);
++static inline void ena_debugfs_terminate(struct net_device *dev) {}
 +
- 	devlink_free(devlink);
- }
- 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_devlink.h b/drivers/net/ethernet/amazon/ena/ena_devlink.h
-index cb1a5f21..7a19ce48 100644
---- a/drivers/net/ethernet/amazon/ena/ena_devlink.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_devlink.h
-@@ -15,5 +15,7 @@ struct devlink *ena_devlink_alloc(struct ena_adapter *adapter);
- void ena_devlink_free(struct devlink *devlink);
- void ena_devlink_register(struct devlink *devlink, struct device *dev);
- void ena_devlink_unregister(struct devlink *devlink);
-+void ena_devlink_params_get(struct devlink *devlink);
-+void ena_devlink_disable_phc_param(struct devlink *devlink);
- 
- #endif /* DEVLINK_H */
++#endif /* CONFIG_DEBUG_FS */
++
++#endif /* __ENA_DEBUGFS_H__ */
 diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index a4d35405..28878a42 100644
+index 28878a42..5b09f511 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -3138,6 +3138,8 @@ static int ena_device_init(struct ena_adapter *adapter, struct pci_dev *pdev,
- 		goto err_mmio_read_less;
+@@ -23,6 +23,8 @@
+ 
+ #include "ena_devlink.h"
+ 
++#include "ena_debugfs.h"
++
+ MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
+ MODULE_DESCRIPTION(DEVICE_NAME);
+ MODULE_LICENSE("GPL");
+@@ -4059,6 +4061,8 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_rss;
  	}
  
-+	ena_devlink_params_get(adapter->devlink);
++	ena_debugfs_init(netdev);
 +
- 	/* ENA admin level init */
- 	rc = ena_com_admin_init(ena_dev, &aenq_handlers);
- 	if (rc) {
-diff --git a/drivers/net/ethernet/amazon/ena/ena_phc.c b/drivers/net/ethernet/amazon/ena/ena_phc.c
-index 5ce9a32d..7867e893 100644
---- a/drivers/net/ethernet/amazon/ena/ena_phc.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_phc.c
-@@ -6,6 +6,7 @@
- #include <linux/pci.h>
- #include "ena_netdev.h"
- #include "ena_phc.h"
-+#include "ena_devlink.h"
+ 	INIT_WORK(&adapter->reset_task, ena_fw_reset_device);
  
- static int ena_phc_adjtime(struct ptp_clock_info *clock_info, s64 delta)
- {
-@@ -213,6 +214,7 @@ err_ena_com_phc_config:
- 	ena_com_phc_destroy(ena_dev);
- err_ena_com_phc_init:
- 	ena_phc_enable(adapter, false);
-+	ena_devlink_disable_phc_param(adapter->devlink);
- 	return rc;
- }
+ 	adapter->last_keep_alive_jiffies = jiffies;
+@@ -4138,6 +4142,8 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
+ 	ena_dev = adapter->ena_dev;
+ 	netdev = adapter->netdev;
  
++	ena_debugfs_terminate(netdev);
++
+ 	/* Make sure timer and reset routine won't be called after
+ 	 * freeing device resources.
+ 	 */
+diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.h b/drivers/net/ethernet/amazon/ena/ena_netdev.h
+index f48b12ff..41c8e5f0 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_netdev.h
++++ b/drivers/net/ethernet/amazon/ena/ena_netdev.h
+@@ -389,6 +389,10 @@ struct ena_adapter {
+ 	u32 xdp_num_queues;
+ 
+ 	struct devlink *devlink;
++#ifdef CONFIG_DEBUG_FS
++
++	struct dentry *debugfs_base;
++#endif /* CONFIG_DEBUG_FS */
+ };
+ 
+ void ena_set_ethtool_ops(struct net_device *netdev);
 -- 
 2.47.1
 
