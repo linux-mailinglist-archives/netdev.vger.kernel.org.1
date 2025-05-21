@@ -1,191 +1,223 @@
-Return-Path: <netdev+bounces-192135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA0E4ABE9F2
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 04:30:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA74ABE9FB
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 04:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 705EC7A59AA
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 02:28:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3614A570B
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 02:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8333022B8AD;
-	Wed, 21 May 2025 02:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E3A1C5F09;
+	Wed, 21 May 2025 02:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="V+5S/sv2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MplO6qD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88142D600
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 02:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8D54430;
+	Wed, 21 May 2025 02:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747794600; cv=none; b=Nd1lWlRUrORwqrCoY9emYyV8n5BQZ+OlL7Ivy1mII4SRv1s5dI5TvSnTbpgZGaYLK/PgCSSNill4+LQjwLwmyFpBZRdoLLBBek65Befw8ZvIY8d4PPo/WtFIIEPQIDBnP6pKi/WCoNaYc9HaN9h8+zxAB9hBRpz/nZR0Fi1QqKc=
+	t=1747795295; cv=none; b=Oun3F6S1PqrYkGCGIt08nH8tMzHVip86BPWhGG1lgtGowgL65Sccyaoq4GELhXwCTaq1I/Vjw9lg2X5iv/wVpYIHm7BqWg9xa6dHCgeTcyDtU0clLHfc/zoewtKONbkBqrUrmNKjLbkT8jqBq62OTE/T93SW4ufrNY8fxIyVyUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747794600; c=relaxed/simple;
-	bh=g7xGtqOGQcIQ5a/IW6RA29BxYMBoz5HtZhxIOKadzMM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FadI9WVGlzLUVkTs2tGBRlPGUMw/mENoHBlzLcEotbhUKExWGfaYVotxAYoNLr9AmhQIRN4k/40WSLkyfonKXBv66uocvqAcmnpaxfuGocRDEb8Z658N7+NjvNjZcqnXK0dFdY+IwBd4xhwbHIF3iwlVOgWBHcnktDS9jeHyd+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=V+5S/sv2; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-601f278369bso5296548a12.1
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 19:29:58 -0700 (PDT)
+	s=arc-20240116; t=1747795295; c=relaxed/simple;
+	bh=+/sRfFIsqUcfo9dusVUZk/wm5YQcmXYfkjbZgIdtTgc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Jd37kYbfRA4hbf6lc57442o0hmuh5phncBBQCaj52BgJboK31UsRFGN0Ll7DZrviCSHesiUJnVqDspNnqQSP8kAtU5ymEphCIhj4adpj4ChvJGSwDjlhnoB5GL/mQRHvC0LrH3p1RIjDPYtiORpu2L9ZrLXsJ+lKw3F3RhEc6gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MplO6qD9; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6f8aabbffaeso58365396d6.0;
+        Tue, 20 May 2025 19:41:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747794597; x=1748399397; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GNals4jMHMhd8J5AhEbkeahSWmOD/zdqajQwO1mVziY=;
-        b=V+5S/sv2AfumPMx/k7BAjkoqWBiFx7cdQq98hqgBbAJlHjq4lHRfDSnoetGP/Bsqvs
-         47ax/Wb5Znp5sRnPHa0Nrz4rfHiCed6adI6CNTtr0WkPBK9utQiYn6WSqFPDpejk7eh+
-         5v+5tHk50x422NcUabcKLQV3wfy3Cuhvi1iLI=
+        d=gmail.com; s=20230601; t=1747795291; x=1748400091; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aWGHJsw/qanQe5H1eio/FueQXZVPYyAwMXBqZf2HXGA=;
+        b=MplO6qD9ifxxwfumr8uPX/aqIz5barW34VxDwO8rFvG/gq+JSs6YgxxqrrmBK7lPYo
+         TXJjDjdeMZWffxR5sjZLA/vkM0X73hUhP1w1rlJJ7Zr/nyd1MvJksxClIy/tvakHbAGs
+         g7pb1p33rQYMMAlUgvS17i9xwbtGMaM6ByrVCwrjy1HuMbzUzF2mf7GmmyUnkDT+pueh
+         jkrJVPKbrCn7wz/Dd+8FB9BHf4MHjVAf/0TPg950gu+y9BN2a+wY0xFGgul13IzTJGWH
+         htakvnxH/j1kq5Yw/mz+P5yED3tEiJRbM2I031MPwpAeCgqm1TMjocEdbLVtnFGXvcrd
+         0FPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747794597; x=1748399397;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GNals4jMHMhd8J5AhEbkeahSWmOD/zdqajQwO1mVziY=;
-        b=Ks5U6B7dIBvdcV6vQ1byo5pRnVLSUviN1K86o0X/MxjLdQ3MJRTwjIiodR/TnlC3Yo
-         cbRB5TktuzlVnOWYjAAKBMTwlc0zf6K18sAhjM1xZGXiWHABVhhPMEOGupBuY1QtN68z
-         Jvyc13kVYrPdXIALj1eMy3ugoIimywy0l/nprodeUz5BQh9mb1VS4iNtsflJRUxZ9aoQ
-         MBEP92uIoGvQkcAYXvppjVoly1SzcyBh/cLjZfG6uZVFj80SUXKF9TSu+fTU0XLCAYRq
-         qPV/Sb/xiue9H79C2CCuFl3gYUX5f8GUQx0wl11s1/ndhfZbDkvK6GwTubEjZJGfo6Om
-         nMVg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7p/KwJtnFajAaJcEO713zgIDwU4WwL6s/Hh3tqGnsLv7BahrOgG5Zns3vYE4OenreOe7tcDo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeERLBz7hk9AABnZtnwyqxJFKu2aUa8r6IRAZ/m8fC2/Ya/0QD
-	15yZ7O0DLL4XqAyM6yAIcriZBKYvPZY0yzGUHHeU+0XtCdoAjuDIB6yVMkFpiJNzOIiocS7Yq0v
-	1R5nWRAwSvtWGLJtIgAMIyGIjqigaKLIeJRh+gyqr
-X-Gm-Gg: ASbGnctohNeZqNhZ0EGAmt+whuTMCavGHFmspRBBVoli9TTVrLJ7oyrS75lk3p9lrym
-	3H0CtG2zdjln2MtusmFh1Ru+N66fuFWFrNF5+w1hTK8ZeJdree2qCkQSwkX3XftH1pG/ugeel1s
-	/NRu13d2p7r485ChpWzoa8vB+D04zwK0+ysQ==
-X-Google-Smtp-Source: AGHT+IG5ftH74kdccVV9J5RAsIVQfnz/q/STu/Pvhv+RGylmqGBRZpHX77XjwbVaTsNc9rCcvKNtsR2pb8JkALU81kA=
-X-Received: by 2002:a17:907:1c91:b0:ad5:5857:ece2 with SMTP id
- a640c23a62f3a-ad55857f064mr1225831766b.37.1747794596940; Tue, 20 May 2025
- 19:29:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747795291; x=1748400091;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aWGHJsw/qanQe5H1eio/FueQXZVPYyAwMXBqZf2HXGA=;
+        b=IiSHE8S+CYPKLJX/ivjrSo140bAD9KHion4+KlU/EWzBo5mNkOufokLy75QLncUtBy
+         Jnvqh6ke6fxs49mBhM2wabL4YVVgtehaBuoYJTMWS5MpsBXjba/zWdC8CYWuRJl/b93a
+         gm4ObSkohDu9+sbji8/TXsb8pWwwXDL4jUGYS9lB3SL9bFHw+QebB8rSJf8rgvGaBwGs
+         PtFxTxDlllE3KInUAiBH3Xl6oG662CY3hd52fvOIEGYBowiQLFRYtHsb4eqNb18TYf8U
+         btI6WZL/+GPZHoz+rY6Ep6L8lc6Ev+uKh63IDlOkKKfLP40rFqYp5d+SmaLXj6ljBvN8
+         7vTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWa/3ZsthczSzE+s563DB0mwNcK3fXuzASBjXpdwt3f3QjY4S527kawP1aaXLtX0ewFweldOnA9ds4d+rI=@vger.kernel.org, AJvYcCXqG8LSXf0mjjB5WI2iUyyOZ9BAOB02ea4E2JIgB/TJ+FuDhXMqkQyiNQUaa6f321NaoqVKYXyQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw+Da9Pl77uETSOBqGyXj+DreSSG82Nq+7kcPN0HRStQ+QY61F
+	VVEgk+cfS/tWTr+CiMeVOmyXEHKyGNDIW/DVJG1BOhO44uRdRbItCcYa
+X-Gm-Gg: ASbGncuJ7R8s55oNKQyHYqKVhxU4eN+nHU6I6K4n8jO+sfTXDJb4Vf3sw0Nu2J03KeN
+	9suB9JeGbyW1A7abfr4YUWAsOwT1fS5zsyXEdVSwlchdYljdmghl0Kqy5dChDgDCMaEgkk8p6Fq
+	clHWVL02dfawQp29tXklA8byKpHeUiPGTxKtzXeghqBoy8B0GMOLwLQgTKXQXLx4dE3J8Tp2hkf
+	mCAQWxU8TrL+BPZye64/3PrC3FOiFtAt3P4upeyXS5arPsju9p1s2NZwq5cpD6GcdOz0PH+6YZq
+	dy0M2jFlNCpz22ttCVpxuUMd05nzYqnjQBjBEV9NCxbZiqMC6I/P7OS539MvafJ+GAkIu2tEpX/
+	uk+JrPWq3/Pdgw9yImZYhOAc=
+X-Google-Smtp-Source: AGHT+IF7Y4gTrg3WIMTBFet7GetU7N+rYSRJy+X6b2dvv0ufu7dTmNyzwUHPodMoH31XjTrQ5Rs6wg==
+X-Received: by 2002:a05:6214:2608:b0:6e8:f672:ace9 with SMTP id 6a1803df08f44-6f8b2d82abfmr329361456d6.29.1747795291568;
+        Tue, 20 May 2025 19:41:31 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f8b096571esm79418316d6.73.2025.05.20.19.41.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 May 2025 19:41:30 -0700 (PDT)
+Date: Tue, 20 May 2025 22:41:30 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ horms@kernel.org, 
+ stfomichev@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ syzbot+b191b5ccad8d7a986286@syzkaller.appspotmail.com
+Message-ID: <682d3d5a77189_97c02294a3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250520202046.2620300-1-stfomichev@gmail.com>
+References: <20250520202046.2620300-1-stfomichev@gmail.com>
+Subject: Re: [PATCH net] af_packet: move notifier's packet_dev_mc out of rcu
+ critical section
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250519204130.3097027-1-michael.chan@broadcom.com>
- <20250519204130.3097027-4-michael.chan@broadcom.com> <20250520182838.3f083f34@kernel.org>
- <CACKFLikOwZmaucM4y2jMgKZ-s0vRyHBde+wuQRt33ScvfohyDA@mail.gmail.com>
- <20250520185144.25f5cb47@kernel.org> <CACKFLimbOCecjpL2oOvj99SN8Ahct84r2grLkPG1491eTRMoxg@mail.gmail.com>
- <20250520191753.4e66bb08@kernel.org>
-In-Reply-To: <20250520191753.4e66bb08@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 20 May 2025 19:29:45 -0700
-X-Gm-Features: AX0GCFu0fbSq5l9CdRg0Hs5wHXrVHI4EmjXjJITCTH3O4Xjca1cedWWatz4men4
-Message-ID: <CACKFLikW2=ynZUJYbRfXvt70TsCZf0K=K=6V_Rp37F8gOroSZg@mail.gmail.com>
-Subject: Re: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS contexts
- on queue reset
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
-	andrew.gospodarek@broadcom.com, David Wei <dw@davidwei.uk>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001d212006359c2461"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---0000000000001d212006359c2461
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Stanislav Fomichev wrote:
+> Calling `PACKET_ADD_MEMBERSHIP` on an ops-locked device can trigger
+> the `NETDEV_UNREGISTER` notifier,
 
-On Tue, May 20, 2025 at 7:17=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 20 May 2025 19:10:37 -0700 Michael Chan wrote:
-> > They found that this sequence was reliable.
->
-> "reliable" is a bit of a big word that some people would reserve
-> for code which is production tested or at the very least very
-> heavily validated.
+This made it sound to me as if the notifier is called as a result of
+the setsockopt.
 
-FWIW, queue_mgmt_ops was heavily tested by Somnath under heavy traffic
-conditions.  Obviously RSS contexts were not included during testing
-and this problem was missed.
+If respinning, please rewrite to make clear that the two are
+independent events. The stack trace in the bug also makes clear
+that the notifier trigger is a device going away.
 
---0000000000001d212006359c2461
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> which may require disabling promiscuous
+> and/or allmulti mode. Both of these operations require acquiring the netdev
+> instance lock. Move the call to `packet_dev_mc` outside of the RCU critical
+> section.
+> 
+> Closes: https://syzkaller.appspot.com/bug?extid=b191b5ccad8d7a986286
+> Reported-by: syzbot+b191b5ccad8d7a986286@syzkaller.appspotmail.com
+> Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
+> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
+> ---
+>  net/packet/af_packet.c | 20 +++++++++++++++-----
+>  net/packet/internal.h  |  1 +
+>  2 files changed, 16 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index d4dba06297c3..5a6132816b2e 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -3713,15 +3713,15 @@ static int packet_dev_mc(struct net_device *dev, struct packet_mclist *i,
+>  }
+>  
+>  static void packet_dev_mclist_delete(struct net_device *dev,
+> -				     struct packet_mclist **mlp)
+> +				     struct packet_mclist **mlp,
+> +				     struct list_head *list)
+>  {
+>  	struct packet_mclist *ml;
+>  
+>  	while ((ml = *mlp) != NULL) {
+>  		if (ml->ifindex == dev->ifindex) {
+> -			packet_dev_mc(dev, ml, -1);
+> +			list_add(&ml->remove_list, list);
+>  			*mlp = ml->next;
+> -			kfree(ml);
+>  		} else
+>  			mlp = &ml->next;
+>  	}
+> @@ -4233,9 +4233,11 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
+>  static int packet_notifier(struct notifier_block *this,
+>  			   unsigned long msg, void *ptr)
+>  {
+> -	struct sock *sk;
+>  	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+>  	struct net *net = dev_net(dev);
+> +	struct packet_mclist *ml, *tmp;
+> +	LIST_HEAD(mclist);
+> +	struct sock *sk;
+>  
+>  	rcu_read_lock();
+>  	sk_for_each_rcu(sk, &net->packet.sklist) {
+> @@ -4244,7 +4246,8 @@ static int packet_notifier(struct notifier_block *this,
+>  		switch (msg) {
+>  		case NETDEV_UNREGISTER:
+>  			if (po->mclist)
+> -				packet_dev_mclist_delete(dev, &po->mclist);
+> +				packet_dev_mclist_delete(dev, &po->mclist,
+> +							 &mclist);
+>  			fallthrough;
+>  
+>  		case NETDEV_DOWN:
+> @@ -4277,6 +4280,13 @@ static int packet_notifier(struct notifier_block *this,
+>  		}
+>  	}
+>  	rcu_read_unlock();
+> +
+> +	/* packet_dev_mc might grab instance locks so can't run under rcu */
+> +	list_for_each_entry_safe(ml, tmp, &mclist, remove_list) {
+> +		packet_dev_mc(dev, ml, -1);
+> +		kfree(ml);
+> +	}
+> +
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
-XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIMwwcwBz6Xh/9OXUHyDe5Eqwq7VaJkfD
-nXRbtouIkGR/MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDUy
-MTAyMjk1N1owXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
-AQUABIIBAHxF1MrWdg2ZdkxrvLTRBqOHZ8e7CgqRgUmLe4V4fq+u3QyVq4kmEwDbIMv771FFqFio
-xb4LR5/s5ZVwr++fTg/niCrKqbH9wWBP01JIcP2iKaUfXC5s6gYcYd232p9uxiSZy1inJI0NNI8c
-fJunVxVx01IqThfPl8cNrLnvXViaP6OLFI/SzkL14t3xAy2Zd0XHkN1y99ikeKCS3WmciVsW309+
-kKF6a+NGBUaOpKjpiAHbEDTALGXJP7RDJZHBcccTyDSF/GabJXCCmw6odBmWmZwQQloKFjWEgsCy
-w4mEsdeImXmr0zdr12bn1+dzbSnzmMGc+zoJaf+McbV0FFM=
---0000000000001d212006359c2461--
+Just verifying my understanding of the not entirely obvious locking:
+
+po->mclist modifications (add, del, flush, unregister) are all
+protected by the RTNL, not the RCU. The RCU only protects the sklist
+and by extension the sks on it. So moving the mclist operations out of
+the RCU is fine.
+
+The delayed operation on the mclist entry is still within the RTNL
+from unregister_netdevice_notifier. Which matter as it protects not
+only the list, but also the actual operations in packet_dev_mc, such
+as inc/dec on dev->promiscuity and associated dev_change_rx_flags.
+And new packet_mclist.remove_list too.
+
+>  	return NOTIFY_DONE;
+>  }
+>  
+> diff --git a/net/packet/internal.h b/net/packet/internal.h
+> index d5d70712007a..1e743d0316fd 100644
+> --- a/net/packet/internal.h
+> +++ b/net/packet/internal.h
+> @@ -11,6 +11,7 @@ struct packet_mclist {
+>  	unsigned short		type;
+>  	unsigned short		alen;
+>  	unsigned char		addr[MAX_ADDR_LEN];
+> +	struct list_head	remove_list;
+
+INIT_LIST_HEAD on alloc in packet_mc_add?
+
+>  };
+>  
+>  /* kbdq - kernel block descriptor queue */
+> -- 
+> 2.49.0
+> 
+
+
 
