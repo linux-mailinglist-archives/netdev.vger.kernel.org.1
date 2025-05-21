@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-192163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68B4ABEBA9
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:06:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89ABFABEBAF
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:08:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 319F31BA5DA0
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 06:06:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D425D3A2823
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 06:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977DD230BC3;
-	Wed, 21 May 2025 06:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB4C230BEC;
+	Wed, 21 May 2025 06:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hprMeYK3"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="evMk45oG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1849B22B8D5
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 06:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F6512E5B;
+	Wed, 21 May 2025 06:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747807568; cv=none; b=XmyLLUUdxB60xxy73Mz7dSD1jtnDQInI/eHEgBMS6gpPeVudMxH5I4zoUuUHDklzaf8aR9kwp/CF8HM2DbZoGU27jqs64wNAKLbEXScajk/SqnDS3zdydfogFCRI9GWNCZcD0HAa6Yzbs6AkiuoNECoiGAXPCPH8Ds0ABA5pOpY=
+	t=1747807733; cv=none; b=fFIeYrZ1wQy0Fm7QfX/vRS7cWpHe8fAWoJxLryMuVNtME0U10/1W47mYjmX82vXNLd7MYOw3cGd98PQ56bJw1cGmqvf/lyQQ4YLv1Gz+0No2xwEOIvrDJchG8TZgeHv0IbxcUxAtJdflyibIcRg4Y0d/3SxZpCfHAs/HR9tcWbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747807568; c=relaxed/simple;
-	bh=fVZU6+8OvVRtAbmS7naLfkmlH9HFvAXAOKFK3R83awI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SZ9dHpH/fCwUinTV4q3THa96ShKB3u7KLD+yhuITYGkqfYJWKJlhkw0id5jk18eGeoCn7uB3wvAziDeMFSBatjab8LrhUUwahzSZ8qFXHsnrYBIR1sng/bcmAr0ltxiLA67WNobzrlYCi3IurXbIpzmmbISirtqvFQ1Onga/Bn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hprMeYK3; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso8044429b3a.2
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 23:06:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747807566; x=1748412366; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6iCVDly0IxOzISeZOCLN5D4tPXfLcRItbXp8G989jII=;
-        b=hprMeYK3Y8FCuDXSy8CKBRcIf93qb2VcjWGn7UKSDLmhc6n5WI9/pXPnZ6emzL9TRS
-         JG/kefu/qAfbeFmr/tz8+fevxA65dmq+gUmeVRtKXix0Mo1JrhqhcDyyDNEeBnKib0qM
-         yh4beyLzbTAjgvYqlFbqiUfyDZOI5Jd95X6Jka3agHqhCnbm7JcrOJovzDzHtGYW3omI
-         MwmkwYSLcmEk5pHORbd0mONiMgidbLZ4nJvaa7tdJTjnQK+2DoQwimqNGxS5ijP38veD
-         oXOCsYEq87RsPqHqB04KdnHeKOpfTUwei092Q4Mm4cppUphbzVaY5I/MKAUxc2ujkkbI
-         Co0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747807566; x=1748412366;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6iCVDly0IxOzISeZOCLN5D4tPXfLcRItbXp8G989jII=;
-        b=ct6YPZYGzKP0cAvtIvj/tvGdUhy/8Cqp0/F3WOU5i9eU6yGhNzvqBU8WkwGjLvm97k
-         dqNKhLk7PfaFAT1S3EFxNhTzwpR6nWs9mrrK/SIc82n3P069ud2JyPs0ntAcaCaDXBbi
-         6FHI30i4d9ptaI3FK8z47t6kd7lUpkXnKkeHlTx7IKwUZGk2UckxcjsJvvAeYKb6Ssk7
-         diihEljzaAF/Ztm56ObJXjrXYSviJpHfa0r1ASrd+1ItZ/IdrYDqDj7VEuQ4oysdNGn8
-         yrwhCRyfGi9q2xFjJywEiIzCG7J0AViSYkbpd+fcw4CCj9c7Jxm3K0HU35RKL2BpawrN
-         f+Vw==
-X-Gm-Message-State: AOJu0YwjeBidCo3H8tGtqZlFaq7mBclonfteS9z/PTBV5BZFxM7t7yLh
-	hIM57cxkASReI4ujWyV+t/UwVJx+ZkhEb7XOVI7QV+8HVrp1Du0Eksned2I0pORW
-X-Gm-Gg: ASbGncvFbWC9n3aVpJEUMA7Jtv2+WZi459P6bF6sBCc/e0tBg1NTOPBJjPWSeovXkif
-	ywZKLwi5+j5laWd1//bn+6ugaBW1w0wyvg2ADVS3Swccro32XN7aLmnhM0y8VerW9IN6Kp9lmOC
-	OU0jlvWs38h56UL/x/ryjDqDKmdS/gOfhVRrIDBuF7cQ4udX9dbxLJJYUeCmQlDoQ1mZ32oldx6
-	S9tAoDYMHZc3OfHi9SUDAfOc9vSuzdxtQELdqkIO5Oog//HiHh+bEalX7tIudtKNh2rXKT8dcem
-	cp0GS55yWcNA9sxdSkqudb4b8d3e8upqbmU/hsbpci92SjdDJX+u2S0P997+qiHFu5o=
-X-Google-Smtp-Source: AGHT+IHsr41lbyz2j6zq16oMSStIPlqNtOtQ2NJd/Sh63guWpizffZv2Hmwce8X2Ri+VV0UjVcZBWA==
-X-Received: by 2002:a05:6a00:c86:b0:740:9e87:9625 with SMTP id d2e1a72fcca58-742acc8ff71mr27317799b3a.4.1747807565644;
-        Tue, 20 May 2025 23:06:05 -0700 (PDT)
-Received: from shankari-IdeaPad.. ([103.24.60.247])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a98a229esm8848936b3a.161.2025.05.20.23.06.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 23:06:05 -0700 (PDT)
-From: Shankari Anand <shankari.ak0208@gmail.com>
-To: netdev@vger.kernel.org
-Cc: allison.henderson@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	Shankari Anand <shankari.ak0208@gmail.com>
-Subject: [PATCH v3] net: rds: Replace strncpy with strscpy in connection setup
-Date: Wed, 21 May 2025 11:35:57 +0530
-Message-Id: <20250521060557.3099412-1-shankari.ak0208@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250430181657.GW3339421@horms.kernel.org>
-References: <20250430181657.GW3339421@horms.kernel.org>
+	s=arc-20240116; t=1747807733; c=relaxed/simple;
+	bh=fqCmeUHx0FwWnh1ReP+MONXpTkX28d/rWGe51x8Qv5I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RucjwVfkgdHwyZJNVItAyY+bt+pxZCFRH9jMkPIF4UVzTVBf3oPGnBrdcRFChTfmw1LNom5UJenn9P/R+BcqsRGtsOh5YV42/SVsOxZzUGCGMpohn7/O1Tvd0qEOS8TdliVmAyiYRaZak4wBzyeSv1oxJgkppUFSBaTADhFbUkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=evMk45oG; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54KNcfu5031889;
+	Tue, 20 May 2025 23:08:40 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=T9eaAaDeNeEfWA5paAwl9kYIyBBzTBWsa+OvJ7s2/tY=; b=evM
+	k45oGlNOINk1aekJMZJ4TLiU3clO0f50HPhYZvuFlj9wVJzBeBkjE231m13VrCDN
+	FJKKXMjRrwMZRrbX7xjWM10E5RSTGlEQTLmcHdEzP5xPh6HT6AARAcsnuqtKPwNk
+	Xa59FDuPMGso/CEuGXeHlg2Q7Rn7OvWnUBZB1NZAzA9HkBi4AMC6tdML2jf81w/D
+	kvNlLPOffTzwxArB/JA/aRLrhHQfku3z9PJIxRWBNh9aWpB7saECz9ZX+sTR4rxY
+	cszCDjGNSfjkEr3AsrkHDr6ahCq006rGoOxSMeyb0uKXroZerra60bwSlbhUoBVh
+	lk6iVXs6QCUyfswhopQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46s3kc8kg7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 May 2025 23:08:40 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 20 May 2025 23:08:39 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 20 May 2025 23:08:39 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 143343F7077;
+	Tue, 20 May 2025 23:08:35 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net PATCH 0/2] octeontx2-af: APR Mapping Fixes
+Date: Wed, 21 May 2025 11:38:32 +0530
+Message-ID: <20250521060834.19780-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: jjTnz7CYTP4xqzFrfN-YgFACpDyF73L4
+X-Proofpoint-GUID: jjTnz7CYTP4xqzFrfN-YgFACpDyF73L4
+X-Authority-Analysis: v=2.4 cv=TcyWtQQh c=1 sm=1 tr=0 ts=682d6de8 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=73v077vbolFR-TuZ8xgA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDA1OCBTYWx0ZWRfX9nUJQycffXUd 7fqwUhEaYcbcdC6ot2FrTGGxs2KYfgyhhLWNg25EuJvH9l2DaShgajxl+3IONDK4vSybTWrWzvw V0yZPQufrKwBnmnTNhZWBL01MfhxmIPv6ALiANXc2b8J3cT7cUr6RE2cBZ9Hti1oja8MqO0UL/p
+ 9e9fluizM+V8nGZaKlXm9Dt4u9dL7Gks1qwikZJTsf3IL/WeRhgyPnYe8qj6vpv2V6mf4nrO0fi VV9a0bK6HhiI3KTsSwxW8Btl7UdrCsqfVXPCtDEi0T05d4NCIq3J0JyUbxH+NO258PxzY40L8jv /3EfXGO7SZYsXh+d3OD3CJPmqO6uiSNpHZXy70eZbOhaV50h4FDEH5m0KJQrW9VKIwToR2CfwOl
+ +kk4hp4lF/hIE+r0Mvye+uTMoDVafwkEXUWrplg6WD4A8U+W87ZCXLqpcBZ2SSFga+CsuuuU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-21_01,2025-05-20_03,2025-03-28_01
 
-Replaces strncpy() with strscpy_pad() for copying the transport field.
-Unlike strscpy(), strscpy_pad() ensures the destination buffer is fully padded with null bytes, avoiding garbage data.
-This is safer for struct copies and comparisons. As strncpy() is deprecated (see: kernel.org/doc/html/latest/process/deprecated.html#strcpy),
-this change improves correctness and adheres to kernel guidelines for safe, bounded string handling.
+This patch series includes fixes related to APR (LMT)
+mapping and debugfs support.
 
-Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
----
- net/rds/connection.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes include:
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c749c5525b40..fb2f14a1279a 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
- 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
- 	cinfo->tos = conn->c_tos;
--	strncpy(cinfo->transport, conn->c_trans->t_name,
-+	strscpy(cinfo->transport, conn->c_trans->t_name,
- 		sizeof(cinfo->transport));
- 	cinfo->flags = 0;
- 
-@@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
- 	cinfo6->laddr = conn->c_laddr;
- 	cinfo6->faddr = conn->c_faddr;
--	strncpy(cinfo6->transport, conn->c_trans->t_name,
-+	strscpy(cinfo6->transport, conn->c_trans->t_name,
- 		sizeof(cinfo6->transport));
- 	cinfo6->flags = 0;
- 
+Patch 1:Set LMT_ENA bit for APR table entries.
+	Enables the LMT line for each PF/VF by setting
+	the LMT_ENA bit in the APR_LMT_MAP_ENTRY_S
+	structure.
+
+Patch-2:Fix APR entry in debugfs
+	The APR table was previously mapped using a fixed size,
+	which could lead to incorrect mappings when the number
+	of PFs and VFs differed from the assumed value.
+	This patch updates the logic to calculate the APR table
+	size dynamically, based on values from the APR_LMT_CFG
+	register, ensuring correct representation in debugfs.
+
+Geetha sowjanya (1):
+   octeontx2-af: Fix APR entry mapping based on APR_LMT_CFG
+
+Subbaraya Sundeep (1):
+  octeontx2-af: Set LMT_ENA bit for APR table entries
+
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c | 24 +++++++++++++++----
+ .../marvell/octeontx2/af/rvu_debugfs.c        | 11 ++++++---
+ 2 files changed, 27 insertions(+), 8 deletions(-)
+
 -- 
-2.34.1
+2.25.1
 
 
