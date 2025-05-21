@@ -1,110 +1,81 @@
-Return-Path: <netdev+bounces-192212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EEAABEEE7
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:02:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89EFABEF42
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28EA0188F377
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:02:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 234CB1656D1
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 09:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209E22356CE;
-	Wed, 21 May 2025 09:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23DC2397BE;
+	Wed, 21 May 2025 09:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VLO4lJgH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEc+xk//"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F134D235368
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 09:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B281A9B4C;
+	Wed, 21 May 2025 09:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747818124; cv=none; b=XRWA7q3b+GIoVvGHNfS9xrLjer4w+jDxWeNqK213cmUQvgK8BCG1/wQ3zs/8nVbQcRk53URr+qtdh2FFh2/ehIvcVB8YQKjDppC8Vbc3UvFhJaEL1e4PlS1qGwx+eUAUcagHELCPkThhMdR8WtTrmNaPhl+NgqDZDV2UzcxkhKc=
+	t=1747818753; cv=none; b=B+4X5qpBPbuLPjxumRF6qIrK48SXprjUj8I4Yd/VSuLDZAJw/PsJ4QNo/LXiMU5HQvi6zgGSci4tnR0BARAOWmYsDf8udJ8Qzv0MHPXcRNgtmMszHSqXqmVtJZ3QSnnbifeCvr4ilayDf8F06job2JvvN9Ih6umzKGfaDHpwsRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747818124; c=relaxed/simple;
-	bh=0VgSwP5BioIojdUXUNIHYaT3n0OEMzXfB9SCMFJydNA=;
+	s=arc-20240116; t=1747818753; c=relaxed/simple;
+	bh=ikhygHFZ9rkod/U2Fm9+LcynIwgOWRtuw85hfh8xlFI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoYTfyZp8IJdnJ2ohVjVV/UL9cZmSkCE6jB+zdjt++f2Zmleq29WnE5eB5BvBOLREYNzloi9upnL071N4UBxDYWTTVPzujiX4Za/d+OYcjE4A2QD6bBZaBXtcmqIareUoaKqAi2Mhnfl4F7IK2bbACK9Qw3xZ7KpPC9SRzECPVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VLO4lJgH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F12E7C4CEE4;
-	Wed, 21 May 2025 09:02:01 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=NdwPIURF/ezp+WNnaZrbJFj2sfAsxVc3vTnxZSzaAVHCVVOkLd3Umn39hgwQFibOry2wvAw0pJD625DmENCzA3WLLYB+1tMNFopBGztzgmKM4KaGapUDwhGTmneVAOXXiJwh7xlZluP75/tK6P7dpw0hYUo4cr2bzjNUVI/z1f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEc+xk//; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81DC6C4CEE4;
+	Wed, 21 May 2025 09:12:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747818123;
-	bh=0VgSwP5BioIojdUXUNIHYaT3n0OEMzXfB9SCMFJydNA=;
+	s=k20201202; t=1747818753;
+	bh=ikhygHFZ9rkod/U2Fm9+LcynIwgOWRtuw85hfh8xlFI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VLO4lJgHRJhVQe1iTqZDwyMAdfmSTcxUzHi9b4aZp+3hoXSmAFU9QNN7rqP+wyNhp
-	 oWMLBHB2IB61jyZZ5/EbcfVR2yZfy80ewRB6W6Iqx9KS2/xNB29wfDRayJJLLd/9yR
-	 PcXmxkFERrNQwOGWuTClfMxv4+R/I/rZhFlx8+1VXsfwCGZpoyQpdsd+qxEIEofXnC
-	 jc4UxqNOXSRerobYOvvm0incRC9O6aMwgs94C3gqr9KBiuV7lZ33smXRo1QavTYbw3
-	 9bNjq+WFx6lfjzkS/KyCTQdZJm6A8yKvOzjHJCRn47vrYAcGRal5WQCis3tJJZFxxC
-	 uLUVQG0GKyTlQ==
-Date: Wed, 21 May 2025 10:01:59 +0100
+	b=ZEc+xk//2FDV1smvV+SbO7L/jlMiX0+LJgXCZXKaAnU7gmB7rpcmkX3jEDGQC/LHp
+	 BQ4KxbdKxLjTPqRxSeH7JRWT8LqB5VY4LiVDbHU0fZCubn/IhChovJ9hc/hd5wSmjy
+	 DBxUu2tBNpT8+ryRw796niU5rXRNAGA44F69qub8e/LlyxlC5ww5Sza5kklyHvCHsI
+	 ysln0q2RBRMvtdFLeZbSNuyiHFrAeLkghcK1L0Q2SIoKyLYOtrmX08IuKtY2AZ74tp
+	 Ipvw5niNVqkYGQ/Rb4Z9TD3d7UZmjo/pHpzZwsqdxLvcTa6dt/fYzo2BL2tQer4wTd
+	 F1elYkxuNhqNg==
+Date: Wed, 21 May 2025 10:12:28 +0100
 From: Simon Horman <horms@kernel.org>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mctp: use nlmsg_payload() for netlink
- message data extraction
-Message-ID: <20250521090159.GR365796@horms.kernel.org>
-References: <20250520-mctp-nlmsg-payload-v1-1-93dd0fed0548@codeconstruct.com.au>
- <20250520152315.GB365796@horms.kernel.org>
- <c41a3d3d22c078eab43f8ccd4eeef25d668fa9f9.camel@codeconstruct.com.au>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
+	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+	chenhao418@huawei.com, jonathan.cameron@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/2] net: hibmcge: fix incorrect statistics update
+ issue
+Message-ID: <20250521091228.GS365796@horms.kernel.org>
+References: <20250517095828.1763126-1-shaojijie@huawei.com>
+ <20250517095828.1763126-2-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c41a3d3d22c078eab43f8ccd4eeef25d668fa9f9.camel@codeconstruct.com.au>
+In-Reply-To: <20250517095828.1763126-2-shaojijie@huawei.com>
 
-On Wed, May 21, 2025 at 10:05:36AM +0800, Jeremy Kerr wrote:
-> Hi Horms,
+On Sat, May 17, 2025 at 05:58:27PM +0800, Jijie Shao wrote:
+> When the user dumps statistics, the hibmcge driver automatically
+> updates all statistics. If the driver is performing the reset operation,
+> the error data of 0xFFFFFFFF is updated.
 > 
-> Thanks for the review!
+> Therefore, if the driver is resetting, the hbg_update_stats_by_info()
+> needs to return directly.
 > 
-> > > --- a/net/mctp/neigh.c
-> > > +++ b/net/mctp/neigh.c
-> > > @@ -250,7 +250,10 @@ static int mctp_rtm_getneigh(struct sk_buff *skb, struct netlink_callback *cb)
-> > >                 int idx;
-> > >         } *cbctx = (void *)cb->ctx;
-> > >  
-> > > -       ndmsg = nlmsg_data(cb->nlh);
-> > > +       ndmsg = nlmsg_payload(cb->nlh, sizeof(*ndmsg));
-> > > +       if (!ndmsg)
-> > > +               return -EINVAL;
-> > > +
-> > 
-> > But is this one a bug fix?
-> 
-> At the moment, we cannot hit the case where the nlh does not contain a
-> full ndmsg, as the core handler (net/core/neighbour.c, neigh_get()) has
-> already validated the size (through neigh_valid_req_get()), and would
-> have failed the get before the MCTP hander is called.
-> 
-> However, relying on that is a bit fragile, hence applying the
-> nlmsg_payload replacement here.
-> 
-> I'm happy to split it out if that makes more sense though; in which case
-> this change would be initially implemented as check on ->nlmsg_len (in
-> order to be backportable to stable), and then a subsequent rework to use
-> nlmsg_payload. Let me know what would work best.
-
-Hi Jeremy,
-
-Thanks for the explanation. I think it might be best to add some commentary
-to the commit message, as this was not obvious to me. But I don't feel
-strongly about this.
-
-So either way, this patch now looks good to me.
+> Fixes: c0bf9bf31e79 ("net: hibmcge: Add support for dump statistics")
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
+
 
