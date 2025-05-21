@@ -1,525 +1,157 @@
-Return-Path: <netdev+bounces-192449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F0F4ABFEBA
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:08:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96D7ABFEE4
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD9264A631A
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:08:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F34DF4E55A3
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B6E2BD58E;
-	Wed, 21 May 2025 21:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5C92BD591;
+	Wed, 21 May 2025 21:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWf+YnAM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/BIEzek"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F6F2BCF73;
-	Wed, 21 May 2025 21:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAA82BD03D;
+	Wed, 21 May 2025 21:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747861696; cv=none; b=O802McgFoOAhHnVtHhBxqAVweYQS0PbmQjdcw9ggdWWByR+vaCD/Fd0gOFoptu70gJSYGHWlU/SCxw9MlNwJEtDcjtUU9NzLmGk3dh6kiDaHExcnGft7kGxHll6rjtjV3Ig8IwHM9XiBv0UQ5yqTPDh9WnNJdsRHuxdRr5tiDC0=
+	t=1747862776; cv=none; b=in7aXjaofuZs/ti8VgYlFGFCvyXeURp2C/IUNkK70HNTbP0SqSsCoZTQKM5eAYU5P5N6Y9IZtIPqDn9JAGIS9TRdAKBj9TdM5s2kJiYhHTp1JCulhj6tJKNVppcQpeA8cOijklOarw5ueJcAzFCffDaKZPtiNg03wgE0Cd1xP5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747861696; c=relaxed/simple;
-	bh=lHrc4CriDuk0r4ZeaHYQ8EhNheg+EuB7wvlbd/z8tvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C2yHsRvrGQXpaIyXKbQ2Wf8gx1nxQE56lJr6g6W+9LJdtANkvpI/lLPCtrmDFsnuQLR1N76V6VyuC8vof3VSe+SQguIQPYRR98I9ptDXDQUAGv+qM3WcivXJg/4+IPLKJevGOKDJT6Zc58rp/nF+GM9SsZFRS9N2MpxDBR9M8yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWf+YnAM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA582C4CEE4;
-	Wed, 21 May 2025 21:08:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747861695;
-	bh=lHrc4CriDuk0r4ZeaHYQ8EhNheg+EuB7wvlbd/z8tvw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lWf+YnAM/BuJZ3H0FD420xX3370XgkfSQbC54GFoHYwJl4BT4rwYxR3Kf843YeuVs
-	 hiFHlxPPi5a1Mj7MJf/UR3cny/fX1gD5VV3nMEbHGqF0/8pJHLxPE/qzJ+gTzfsWLY
-	 hSyRnIQUMSBro69WnLOFjRj0DxPkM2kZyp8pzmzJO/8et4tifcpwKPiNwk1LmThTTE
-	 tLrll6EhwhL37cu0NYId2lsYtDWPHQ7IcXVWhX8DXu7VCFGw+kl4tQ3pLrtYtmWOvq
-	 NmkDi4jqJ3jO0GVronELVoI+JsMmxfky4NBjBEjqKf10A+cvUhxzzPyYHmx1gK3DBE
-	 iEwcMRNJcWMpg==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>
-Cc: linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] dt-bindings: clock: Convert marvell-armada-370-gating-clock to DT schema
-Date: Wed, 21 May 2025 16:08:11 -0500
-Message-ID: <20250521210813.61484-1-robh@kernel.org>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1747862776; c=relaxed/simple;
+	bh=u7NR90DqN8fR+fEWP+HSd72pFTGEbU0BrJZcMruRDJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b2RPCmb8UUyA3/6fJpkZhA1gN076DFw6LeOztdB7azA58kcUUHYjn6l1FRJLsoIKaZMme6egW0D02JcSqT3Tpq7K2ijRlRKFs5Apxv/skho6d58ytz9F8vZfKeuwb86SnVgUV5vDSm2X5pyhoANsHcfJh5vaIwIzQOGmkewoBgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/BIEzek; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-70cc667a7ecso31768327b3.3;
+        Wed, 21 May 2025 14:26:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747862774; x=1748467574; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lfJ1qErzlYAlSOduBp0YqNghiuLR4YeiXIVbP181bPc=;
+        b=C/BIEzekQxnC/XyleL1ZxJS6QSiI3JpDT2oubhlj5FleLUb/v4ubCf3w5rSzgJa0Uq
+         h7h57W2QNoEzdTp6iA3hrB+5rbMUJWjwTgck4Cn6L1LbB5Farm49fsaFra8ay426HJgY
+         MqKSo3gQfD4GmAP6goE9dgQNXLJL4eunQ/4eM6cTVnPH0ciP6JxV6Hkw3sNJp/tENvRg
+         xT0HQJKrwWruUOSaqAwg5KiRj6/UnIfk8ADDC/bUmsG+mI6j0/YpBpwUAf5I1K12tAvB
+         ygXTcNLCwuskVrrpEHy4rzSRZXTFVJ/gXmyMLiTl4w5cKJ/7KlHw3bs7fxTelW+bqcQ6
+         JSbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747862774; x=1748467574;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lfJ1qErzlYAlSOduBp0YqNghiuLR4YeiXIVbP181bPc=;
+        b=K06raT0JDDVz9PrpS1YFVsYrucB+9ICliobwCehdpHerhbaHN94BW/K/DUFTSSOFUP
+         vz1tmcJFEDK48HMbZE1vOOHmRhTSrxYkajTYPGrgYI3Mf4Bh+Brm5vDQFVWfQI8G8RP1
+         9c2hHdlb2ppuNjYMzHy4b8UFj/WyERu+QZd8jQMAtEbMV1HVldCV59UNpdpy9otH4X4M
+         +GC+tzps4eS6exTUQrVtsw1XCGodHXkLmBfRMcn7yDqHUZ99K/Tg1ikndelpWwET3YtI
+         5EmR7R8W68R17URSzlLMI0QTjfXxVOkkd21B4/iEDu/cTCQml5uABnW7b8eV+oBsxlHm
+         3Vlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwd0Q9rtDcBQ7uRFkUGHwGN5+Pw1dVUK4HRFI0FCf0IirM8urS4HfBaRzz+jEGFeEcnE5yqP6DiRNjRXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz63P6EZNXQOE5pL2LM5g2whU++QmMN8jwFt1mGmporwZ1copeB
+	nUCP1xPUzSoVae4DfU+qRXXplSpxoQze/J1ZgOdINTJ0PGeY47QYB38iwVBBfHo21tEXmkopV21
+	9pazLXkt45Ya8YE4mflWE5zjYscbfosA=
+X-Gm-Gg: ASbGncsQ3phbmbPRgsGiL9ibaDwf8GhhCPQNL5bCoTyip2/XMsjzSDA/fMhK1WZxBNA
+	PuvkeJI8B38uWO2II0COHNgmeRI8oyJYzvffDEeqIkSBrSEGD2aCZc0/Bb3vjMFCh+LI1+27lO9
+	FSVC5nY+CcxjEdJYPLMhbpx+YfhdQjuobqSw==
+X-Google-Smtp-Source: AGHT+IGi72zw5+6IdEganAHfWsQ00ijO6N3xfZVrPh0NBXmBLqCM1IASjTO06087mCq1OeadLcq1dHWiT0qtC1Niz0I=
+X-Received: by 2002:a05:690c:6c8b:b0:70c:a0c9:c648 with SMTP id
+ 00721157ae682-70caafd5149mr268621617b3.19.1747862774091; Wed, 21 May 2025
+ 14:26:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250521113414.567414-1-stefano.radaelli21@gmail.com> <978c8c91-5c52-4e22-bdb8-5731a35278b1@oracle.com>
+In-Reply-To: <978c8c91-5c52-4e22-bdb8-5731a35278b1@oracle.com>
+From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+Date: Wed, 21 May 2025 23:25:56 +0200
+X-Gm-Features: AX0GCFsxiesad5Ep3KVBCvWh8ow4QJ5XZ1M3y_S2ZoAVhZYN0fd-oy5P79uAWu8
+Message-ID: <CAK+owoiyB2mG+Q+pfEOkDc7jUj=zngiup32F1f4C0Q8RzTCBEQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] net: phy: add driver for MaxLinear MxL86110 PHY
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Xu Liang <lxu@maxlinear.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Convert the Marvell gating clock binding to DT schema format. It's a
-straight forward conversion.
+Thank you Alok,
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
- .../marvell-armada-370-gating-clock.yaml      | 227 ++++++++++++++++++
- .../bindings/clock/mvebu-gated-clock.txt      | 205 ----------------
- 2 files changed, 227 insertions(+), 205 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/clock/marvell-armada-370-gating-clock.yaml
- delete mode 100644 Documentation/devicetree/bindings/clock/mvebu-gated-clock.txt
+I will make those fixes in the next release v6.
 
-diff --git a/Documentation/devicetree/bindings/clock/marvell-armada-370-gating-clock.yaml b/Documentation/devicetree/bindings/clock/marvell-armada-370-gating-clock.yaml
-new file mode 100644
-index 000000000000..0475360d2b6a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/marvell-armada-370-gating-clock.yaml
-@@ -0,0 +1,227 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+---
-+$id: http://devicetree.org/schemas/clock/marvell-armada-370-gating-clock.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell EBU SoC gating-clock
-+
-+maintainers:
-+  - Andrew Lunn <andrew@lunn.ch>
-+  - Gregory Clement <gregory.clement@bootlin.com>
-+
-+description: >
-+  Marvell Armada 370/375/380/385/39x/XP, Dove and Kirkwood allow some peripheral
-+  clocks to be gated to save some power. The clock ID is directly mapped to the
-+  corresponding clock gating control bit in HW to ease manual clock lookup in
-+  datasheet.
-+
-+  The following is a list of provided IDs for Armada 370:
-+
-+    ID    Clock    Peripheral
-+    -----------------------------------
-+    0     Audio    AC97 Cntrl
-+    1     pex0_en  PCIe 0 Clock out
-+    2     pex1_en  PCIe 1 Clock out
-+    3     ge1      Gigabit Ethernet 1
-+    4     ge0      Gigabit Ethernet 0
-+    5     pex0     PCIe Cntrl 0
-+    9     pex1     PCIe Cntrl 1
-+    15    sata0    SATA Host 0
-+    17    sdio     SDHCI Host
-+    23    crypto   CESA (crypto engine)
-+    25    tdm      Time Division Mplx
-+    28    ddr      DDR Cntrl
-+    30    sata1   SATA Host 0
-+
-+  The following is a list of provided IDs for Armada 375:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    2     mu              Management Unit
-+    3     pp              Packet Processor
-+    4     ptp             PTP
-+    5     pex0            PCIe 0 Clock out
-+    6     pex1            PCIe 1 Clock out
-+    8     audio           Audio Cntrl
-+    11    nd_clk          Nand Flash Cntrl
-+    14    sata0_link      SATA 0 Link
-+    15    sata0_core      SATA 0 Core
-+    16    usb3            USB3 Host
-+    17    sdio            SDHCI Host
-+    18    usb             USB Host
-+    19    gop             Gigabit Ethernet MAC
-+    20    sata1_link      SATA 1 Link
-+    21    sata1_core      SATA 1 Core
-+    22    xor0            XOR DMA 0
-+    23    xor1            XOR DMA 0
-+    24    copro           Coprocessor
-+    25    tdm             Time Division Mplx
-+    28    crypto0_enc     Cryptographic Unit Port 0 Encryption
-+    29    crypto0_core    Cryptographic Unit Port 0 Core
-+    30    crypto1_enc     Cryptographic Unit Port 1 Encryption
-+    31    crypto1_core    Cryptographic Unit Port 1 Core
-+
-+  The following is a list of provided IDs for Armada 380/385:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    0     audio           Audio
-+    2     ge2             Gigabit Ethernet 2
-+    3     ge1             Gigabit Ethernet 1
-+    4     ge0             Gigabit Ethernet 0
-+    5     pex1            PCIe 1
-+    6     pex2            PCIe 2
-+    7     pex3            PCIe 3
-+    8     pex0            PCIe 0
-+    9     usb3h0          USB3 Host 0
-+    10    usb3h1          USB3 Host 1
-+    11    usb3d           USB3 Device
-+    13    bm              Buffer Management
-+    14    crypto0z        Cryptographic 0 Z
-+    15    sata0           SATA 0
-+    16    crypto1z        Cryptographic 1 Z
-+    17    sdio            SDIO
-+    18    usb2            USB 2
-+    21    crypto1         Cryptographic 1
-+    22    xor0            XOR 0
-+    23    crypto0         Cryptographic 0
-+    25    tdm             Time Division Multiplexing
-+    28    xor1            XOR 1
-+    30    sata1           SATA 1
-+
-+  The following is a list of provided IDs for Armada 39x:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    5     pex1            PCIe 1
-+    6     pex2            PCIe 2
-+    7     pex3            PCIe 3
-+    8     pex0            PCIe 0
-+    9     usb3h0          USB3 Host 0
-+    10    usb3h1          USB3 Host 1
-+    15    sata0           SATA 0
-+    17    sdio            SDIO
-+    22    xor0            XOR 0
-+    28    xor1            XOR 1
-+
-+  The following is a list of provided IDs for Armada XP:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    0     audio           Audio Cntrl
-+    1     ge3             Gigabit Ethernet 3
-+    2     ge2             Gigabit Ethernet 2
-+    3     ge1             Gigabit Ethernet 1
-+    4     ge0             Gigabit Ethernet 0
-+    5     pex0            PCIe Cntrl 0
-+    6     pex1            PCIe Cntrl 1
-+    7     pex2            PCIe Cntrl 2
-+    8     pex3            PCIe Cntrl 3
-+    13    bp
-+    14    sata0lnk
-+    15    sata0           SATA Host 0
-+    16    lcd             LCD Cntrl
-+    17    sdio            SDHCI Host
-+    18    usb0            USB Host 0
-+    19    usb1            USB Host 1
-+    20    usb2            USB Host 2
-+    22    xor0            XOR DMA 0
-+    23    crypto          CESA engine
-+    25    tdm             Time Division Mplx
-+    28    xor1            XOR DMA 1
-+    29    sata1lnk
-+    30    sata1           SATA Host 1
-+
-+  The following is a list of provided IDs for 98dx3236:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    3     ge1             Gigabit Ethernet 1
-+    4     ge0             Gigabit Ethernet 0
-+    5     pex0            PCIe Cntrl 0
-+    17    sdio            SDHCI Host
-+    18    usb0            USB Host 0
-+    22    xor0            XOR DMA 0
-+
-+  The following is a list of provided IDs for Dove:
-+
-+  ID    Clock           Peripheral
-+  -----------------------------------
-+    0     usb0            USB Host 0
-+    1     usb1            USB Host 1
-+    2     ge              Gigabit Ethernet
-+    3     sata            SATA Host
-+    4     pex0            PCIe Cntrl 0
-+    5     pex1            PCIe Cntrl 1
-+    8     sdio0           SDHCI Host 0
-+    9     sdio1           SDHCI Host 1
-+    10    nand            NAND Cntrl
-+    11    camera          Camera Cntrl
-+    12    i2s0            I2S Cntrl 0
-+    13    i2s1            I2S Cntrl 1
-+    15    crypto          CESA engine
-+    21    ac97            AC97 Cntrl
-+    22    pdma            Peripheral DMA
-+    23    xor0            XOR DMA 0
-+    24    xor1            XOR DMA 1
-+    30    gephy           Gigabit Ethernet PHY
-+    Note: gephy(30) is implemented as a parent clock of ge(2)
-+
-+  The following is a list of provided IDs for Kirkwood:
-+
-+    ID    Clock           Peripheral
-+    -----------------------------------
-+    0     ge0             Gigabit Ethernet 0
-+    2     pex0            PCIe Cntrl 0
-+    3     usb0            USB Host 0
-+    4     sdio            SDIO Cntrl
-+    5     tsu             Transp. Stream Unit
-+    6     dunit           SDRAM Cntrl
-+    7     runit           Runit
-+    8     xor0            XOR DMA 0
-+    9     audio           I2S Cntrl 0
-+    14    sata0           SATA Host 0
-+    15    sata1           SATA Host 1
-+    16    xor1            XOR DMA 1
-+    17    crypto          CESA engine
-+    18    pex1            PCIe Cntrl 1
-+    19    ge1             Gigabit Ethernet 1
-+    20    tdm             Time Division Mplx
-+
-+properties:
-+  compatible:
-+    enum:
-+      - marvell,armada-370-gating-clock
-+      - marvell,armada-375-gating-clock
-+      - marvell,armada-380-gating-clock
-+      - marvell,armada-390-gating-clock
-+      - marvell,armada-xp-gating-clock
-+      - marvell,mv98dx3236-gating-clock
-+      - marvell,dove-gating-clock
-+      - marvell,kirkwood-gating-clock
-+
-+  reg:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  '#clock-cells':
-+    const: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - '#clock-cells'
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    clock-controller@d0038 {
-+        compatible = "marvell,dove-gating-clock";
-+        reg = <0xd0038 0x4>;
-+        /* default parent clock is tclk */
-+        clocks = <&core_clk 0>;
-+        #clock-cells = <1>;
-+    };
-diff --git a/Documentation/devicetree/bindings/clock/mvebu-gated-clock.txt b/Documentation/devicetree/bindings/clock/mvebu-gated-clock.txt
-deleted file mode 100644
-index de562da2ae77..000000000000
---- a/Documentation/devicetree/bindings/clock/mvebu-gated-clock.txt
-+++ /dev/null
-@@ -1,205 +0,0 @@
--* Gated Clock bindings for Marvell EBU SoCs
--
--Marvell Armada 370/375/380/385/39x/XP, Dove and Kirkwood allow some
--peripheral clocks to be gated to save some power. The clock consumer
--should specify the desired clock by having the clock ID in its
--"clocks" phandle cell. The clock ID is directly mapped to the
--corresponding clock gating control bit in HW to ease manual clock
--lookup in datasheet.
--
--The following is a list of provided IDs for Armada 370:
--ID	Clock	Peripheral
-------------------------------------
--0	Audio	AC97 Cntrl
--1	pex0_en	PCIe 0 Clock out
--2	pex1_en	PCIe 1 Clock out
--3	ge1	Gigabit Ethernet 1
--4	ge0	Gigabit Ethernet 0
--5	pex0	PCIe Cntrl 0
--9	pex1	PCIe Cntrl 1
--15	sata0	SATA Host 0
--17	sdio	SDHCI Host
--23	crypto	CESA (crypto engine)
--25	tdm	Time Division Mplx
--28	ddr	DDR Cntrl
--30	sata1	SATA Host 0
--
--The following is a list of provided IDs for Armada 375:
--ID	Clock		Peripheral
-------------------------------------
--2	mu		Management Unit
--3	pp		Packet Processor
--4	ptp		PTP
--5	pex0		PCIe 0 Clock out
--6	pex1		PCIe 1 Clock out
--8	audio		Audio Cntrl
--11	nd_clk		Nand Flash Cntrl
--14	sata0_link	SATA 0 Link
--15	sata0_core	SATA 0 Core
--16	usb3		USB3 Host
--17	sdio		SDHCI Host
--18	usb		USB Host
--19	gop		Gigabit Ethernet MAC
--20	sata1_link	SATA 1 Link
--21	sata1_core	SATA 1 Core
--22	xor0		XOR DMA 0
--23	xor1		XOR DMA 0
--24	copro		Coprocessor
--25	tdm		Time Division Mplx
--28	crypto0_enc	Cryptographic Unit Port 0 Encryption
--29	crypto0_core	Cryptographic Unit Port 0 Core
--30	crypto1_enc	Cryptographic Unit Port 1 Encryption
--31	crypto1_core	Cryptographic Unit Port 1 Core
--
--The following is a list of provided IDs for Armada 380/385:
--ID	Clock		Peripheral
-------------------------------------
--0	audio		Audio
--2	ge2		Gigabit Ethernet 2
--3	ge1		Gigabit Ethernet 1
--4	ge0		Gigabit Ethernet 0
--5	pex1		PCIe 1
--6	pex2		PCIe 2
--7	pex3		PCIe 3
--8	pex0		PCIe 0
--9	usb3h0		USB3 Host 0
--10	usb3h1		USB3 Host 1
--11	usb3d		USB3 Device
--13	bm		Buffer Management
--14	crypto0z	Cryptographic 0 Z
--15	sata0		SATA 0
--16	crypto1z	Cryptographic 1 Z
--17	sdio		SDIO
--18	usb2		USB 2
--21	crypto1		Cryptographic 1
--22	xor0		XOR 0
--23	crypto0		Cryptographic 0
--25	tdm		Time Division Multiplexing
--28	xor1		XOR 1
--30	sata1		SATA 1
--
--The following is a list of provided IDs for Armada 39x:
--ID	Clock		Peripheral
-------------------------------------
--5	pex1		PCIe 1
--6	pex2		PCIe 2
--7	pex3		PCIe 3
--8	pex0		PCIe 0
--9	usb3h0		USB3 Host 0
--10	usb3h1		USB3 Host 1
--15	sata0		SATA 0
--17	sdio		SDIO
--22	xor0		XOR 0
--28	xor1		XOR 1
--
--The following is a list of provided IDs for Armada XP:
--ID	Clock	Peripheral
-------------------------------------
--0	audio	Audio Cntrl
--1	ge3	Gigabit Ethernet 3
--2	ge2	Gigabit Ethernet 2
--3	ge1	Gigabit Ethernet 1
--4	ge0	Gigabit Ethernet 0
--5	pex0	PCIe Cntrl 0
--6	pex1	PCIe Cntrl 1
--7	pex2	PCIe Cntrl 2
--8	pex3	PCIe Cntrl 3
--13	bp
--14	sata0lnk
--15	sata0	SATA Host 0
--16	lcd	LCD Cntrl
--17	sdio	SDHCI Host
--18	usb0	USB Host 0
--19	usb1	USB Host 1
--20	usb2	USB Host 2
--22	xor0	XOR DMA 0
--23	crypto	CESA engine
--25	tdm	Time Division Mplx
--28	xor1	XOR DMA 1
--29	sata1lnk
--30	sata1	SATA Host 1
--
--The following is a list of provided IDs for 98dx3236:
--ID	Clock	Peripheral
-------------------------------------
--3	ge1	Gigabit Ethernet 1
--4	ge0	Gigabit Ethernet 0
--5	pex0	PCIe Cntrl 0
--17	sdio	SDHCI Host
--18	usb0	USB Host 0
--22	xor0	XOR DMA 0
--
--The following is a list of provided IDs for Dove:
--ID	Clock	Peripheral
-------------------------------------
--0	usb0	USB Host 0
--1	usb1	USB Host 1
--2	ge	Gigabit Ethernet
--3	sata	SATA Host
--4	pex0	PCIe Cntrl 0
--5	pex1	PCIe Cntrl 1
--8	sdio0	SDHCI Host 0
--9	sdio1	SDHCI Host 1
--10	nand	NAND Cntrl
--11	camera	Camera Cntrl
--12	i2s0	I2S Cntrl 0
--13	i2s1	I2S Cntrl 1
--15	crypto	CESA engine
--21	ac97	AC97 Cntrl
--22	pdma	Peripheral DMA
--23	xor0	XOR DMA 0
--24	xor1	XOR DMA 1
--30	gephy	Gigabit Ethernel PHY
--Note: gephy(30) is implemented as a parent clock of ge(2)
--
--The following is a list of provided IDs for Kirkwood:
--ID	Clock	Peripheral
-------------------------------------
--0	ge0	Gigabit Ethernet 0
--2	pex0	PCIe Cntrl 0
--3	usb0	USB Host 0
--4	sdio	SDIO Cntrl
--5	tsu	Transp. Stream Unit
--6	dunit	SDRAM Cntrl
--7	runit	Runit
--8	xor0	XOR DMA 0
--9	audio	I2S Cntrl 0
--14	sata0	SATA Host 0
--15	sata1	SATA Host 1
--16	xor1	XOR DMA 1
--17	crypto	CESA engine
--18	pex1	PCIe Cntrl 1
--19	ge1	Gigabit Ethernet 1
--20	tdm	Time Division Mplx
--
--Required properties:
--- compatible : shall be one of the following:
--	"marvell,armada-370-gating-clock" - for Armada 370 SoC clock gating
--	"marvell,armada-375-gating-clock" - for Armada 375 SoC clock gating
--	"marvell,armada-380-gating-clock" - for Armada 380/385 SoC clock gating
--	"marvell,armada-390-gating-clock" - for Armada 39x SoC clock gating
--	"marvell,armada-xp-gating-clock" - for Armada XP SoC clock gating
--	"marvell,mv98dx3236-gating-clock" - for 98dx3236 SoC clock gating
--	"marvell,dove-gating-clock" - for Dove SoC clock gating
--	"marvell,kirkwood-gating-clock" - for Kirkwood SoC clock gating
--- reg : shall be the register address of the Clock Gating Control register
--- #clock-cells : from common clock binding; shall be set to 1
--
--Optional properties:
--- clocks : default parent clock phandle (e.g. tclk)
--
--Example:
--
--gate_clk: clock-gating-control@d0038 {
--	compatible = "marvell,dove-gating-clock";
--	reg = <0xd0038 0x4>;
--	/* default parent clock is tclk */
--	clocks = <&core_clk 0>;
--	#clock-cells = <1>;
--};
--
--sdio0: sdio@92000 {
--	compatible = "marvell,dove-sdhci";
--	/* get clk gate bit 8 (sdio0) */
--	clocks = <&gate_clk 8>;
--};
--- 
-2.47.2
+Best Regards,
 
+Stefano
+
+Il giorno mer 21 mag 2025 alle ore 15:15 ALOK TIWARI
+<alok.a.tiwari@oracle.com> ha scritto:
+>
+>
+>
+> On 21-05-2025 17:04, stefano.radaelli21@gmail.com wrote:
+> > +/**
+> > + * mxl86110_enable_led_activity_blink - Enable LEDs activity blink on PHY
+> > + * @phydev: Pointer to the PHY device structure
+> > + *
+> > + * Configure all PHY LEDs to blink on traffic activity regardless of their
+> > + * ON or OFF state. This behavior allows each LED to serve as a pure activity
+> > + * indicator, independently of its use as a link status indicator.
+> > + *
+>
+> "regardless of whether they are ON or OFF"
+>
+> > + * By default, each LED blinks only when it is also in the ON state.
+> > + * This function modifies the appropriate registers (LABx fields)
+> > + * to enable blinking even when the LEDs are OFF, to allow the LED to be used
+> > + * as a traffic indicator without requiring it to also serve
+> > + * as a link status LED.
+> > + *
+> > + * Note: Any further LED customization can be performed via the
+> > + * /sys/class/led interface; the functions led_hw_is_supported,
+>
+> /sys/class/led -> /sys/class/leds (it is leds in sysfs)
+>
+> > + * led_hw_control_get, and led_hw_control_set are used
+> > + * to support this mechanism.
+> > + *
+> > + * This function assumes the caller already holds the MDIO bus lock
+> > + * or otherwise has exclusive access to the PHY.
+> > + *
+> > + * Return: 0 on success or a negative errno code on failure.
+> > + */
+> > +static int mxl86110_enable_led_activity_blink(struct phy_device *phydev)
+> > +{
+> > +     int i, ret = 0;
+> > +
+> > +     for (i = 0; i < MXL86110_MAX_LEDS; i++) {
+> > +             ret = __mxl86110_modify_extended_reg(phydev,
+> > +                                                  MXL86110_LED0_CFG_REG + i,
+> > +                                                  0,
+> > +                                                  MXL86110_LEDX_CFG_BLINK);
+> > +             if (ret < 0)
+> > +                     break;
+> > +     }
+> > +
+> > +     return ret;
+> > +};
+>
+> remove ;
+>
+>
+> Thanks,
+> Alok
+>
 
