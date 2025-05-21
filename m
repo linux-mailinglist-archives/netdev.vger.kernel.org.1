@@ -1,91 +1,112 @@
-Return-Path: <netdev+bounces-192310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEAF7ABF70A
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:04:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 366F1ABF74B
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F28C9E5D3F
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:03:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DD11BA64A0
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FB818A92D;
-	Wed, 21 May 2025 14:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA9718DB1F;
+	Wed, 21 May 2025 14:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="pmD/JPZX"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="r9tzsjMa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-13.smtpout.orange.fr [193.252.22.13])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638C32D613
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 14:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0111618DB14;
+	Wed, 21 May 2025 14:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747836234; cv=none; b=a+rHRoOKugzMS9EF+xqxUfeb3qwQsHOt7xCoRU6yLTmqDNdVYyRUuFKWHZXNjR1gXparKJz8qssOEuqZQfmaDFZxaKCVgNVzh4G+Nw8qxJl/SNhyYN1qIHY9Ym8C8eT8D2HV0ue8nizRDRk8twNmsNdWlo6yBd0cHWecdpGSvFg=
+	t=1747836527; cv=none; b=ROhw/bpTFUyEd+2EX3AIfU0i1TjeOWu03L7s9DlrR4jxSYe5oZBiAnfNo7HWsbkPLFIvvkaV1fnixJ7yCqdhgeIQ5S/cyNWi/fHt44s+WIFmxUxCBsl9Tv0Smd5OBwlJVypEOZRZEbCpOeEStCIP00WWMmKGG+OU+m8SNGfr1fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747836234; c=relaxed/simple;
-	bh=aUpK6F1vieS89w5al6dvXytAKjpxGiK9NGGWcqokAaE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P2DPMRl27lHYJ3rWlWxGI4gvFl3E8U3Xcg9Gmnic3zTWF2d9Ela/pmT7v///I/atJMxNvzajE06dQmerDKnD8E6L1vaY5suAGJR/N+zyGUrarB6Mh1FVRA+Ew+vCgMSYvDWEzM999hiIUrm8LPvms90JmmZlm72qyd8hhW5KAJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=pmD/JPZX; arc=none smtp.client-ip=109.224.244.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1747836222; x=1748095422;
-	bh=aUpK6F1vieS89w5al6dvXytAKjpxGiK9NGGWcqokAaE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=pmD/JPZXp1JgmsMxaoLiWXIrAswmtvLFnyetmwX2jyO9gDMX6fEXIyjwWHyBDv6H6
-	 c30fV71xZUaKgsq5rymgctwJ88WjH3ZMnh6Lc2r62658HL4owrpu2v8YPaJODltrr5
-	 uHYht3eN8lsr997rxR4fOO3A/JZwcSikI43Ie0idy+s+AkMv2E/lS59jEBtYHTJELO
-	 NJL9NvQl3iX4sKQLPf84TcGMJN10eDkCcPqOUw8FUZyePu7Dn7+Kxuz2yYQzRzJSHk
-	 N6vTmdBYRxp3KhnlNOy4kkdsa+mZ1GCajzFfdN6Iqf7bIubfogJh0tJOr2GF8SfHHC
-	 Xqx10Ldkk/UpA==
-Date: Wed, 21 May 2025 14:03:36 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <iEqzQsC-O2kAXqH1_58I59DIhBjRgebyGym2ZqyMEI3DaMtgsKSYR0KUsbxj5xqvfzf-4XzpM8dXvATHJhVVw3NedRdL3j1FJaqiXPlNWeE=@willsroot.io>
-In-Reply-To: <CAM0EoMmQau9+uXVm-vpuWqYjh=51a_CCS6orS6VrK6qBdddxrQ@mail.gmail.com>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMmKL68r_b1T4zHJTmdZPdCwS69F-Hh+0_ev+-5xPGy2=w@mail.gmail.com> <DglTO9NHmtFTRrCJf07R16_tYUUqoTV7M0hID_k-ryn5mAhe4ADq1mBpAuxNK24ZTnzIPaPq4x1woAtqZGXgAQS4k64C4SGRCfupe3H3dRs=@willsroot.io> <CAM0EoMmQau9+uXVm-vpuWqYjh=51a_CCS6orS6VrK6qBdddxrQ@mail.gmail.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 829ce49c067a3a5ac2562f590917866f88eb2798
+	s=arc-20240116; t=1747836527; c=relaxed/simple;
+	bh=7X2bDw7QnzI+Ry95G/GHDrSBj9tycNP3+ulwGxSrXgc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HZo0EunJssC4zhdEZ2OZyFZO1rGOQIvsGTl1SZQdL3sesKbl/CGI5nnofctcXctyueTe39O2KNViYD9WAfAlyEjEbv6Lf5jfX90i18He51YVP4Bi4SwFrGKvuCmG2eQcpNlHOsbn6RO2dGX2W9L61UVqRIiqcZrT64lfpHgwDbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=r9tzsjMa; arc=none smtp.client-ip=193.252.22.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id Hk6HuahaZpEs6Hk6QuvpuY; Wed, 21 May 2025 16:07:31 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1747836452;
+	bh=1p4bBOM6X/rWnNjj84c+v68lEDBrduzX5mBWWcyQmak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=r9tzsjMaVrP1Qp77I+48WpcjD4FydBs0ftajiJPZViYAe48B7LJTSj2CH2d+TKOO+
+	 16OhFfgqrot7pKbj0snZf7Kq/jjbHZHDWLFhoxR+JFNn6MtRdI1RkTR8oKEh9EdBsV
+	 M6AW+ZJ7x+SHIYn5Sw3ZvdxEwrBteX4uYcrkgV1w+Sj6T3gr7Q2BOLbvSkPFi9/FXF
+	 tl8sfUam/WhcLu/INgfXQE3Ej7nfpZO5+gY7R15XIv0lS0W8rlChYVbAK8J/qnmBy3
+	 b0koIuIKbpkSzKgr3XEo9cRNnYt3QHHTcGJNvVPJejunkvGcoZOBQUDlo+Y9pDTriR
+	 fIrPZaas4zfYw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 21 May 2025 16:07:32 +0200
+X-ME-IP: 124.33.176.97
+Message-ID: <e5487982-2a7a-44ca-95d6-f270a7533749@wanadoo.fr>
+Date: Wed, 21 May 2025 23:07:16 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] selftests: can: Import tst-filter from can-tests
+To: Felix Maurer <fmaurer@redhat.com>, socketcan@hartkopp.net,
+ mkl@pengutronix.de
+Cc: shuah@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, dcaratti@redhat.com, fstornio@redhat.com
+References: <87d289f333cba7bbcc9d69173ea1c320e4b5c3b8.1747833283.git.fmaurer@redhat.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <87d289f333cba7bbcc9d69173ea1c320e4b5c3b8.1747833283.git.fmaurer@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wednesday, May 21st, 2025 at 11:06 AM, Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
+On 21/05/2025 at 22:16, Felix Maurer wrote:
+> Tests for the can subsystem have been in the can-tests repository[1] so
+> far. Start moving the tests to kernel selftests by importing the current
+> tst-filter test. The test is now named test_raw_filter and is substantially
+> updated to be more aligned with the kernel selftests, follow the coding
+> style, and simplify the validation of received CAN frames. We also include
+> documentation of the test design. The test verifies that the single filters
+> on raw CAN sockets work as expected.
+> 
+> We intend to import more tests from can-tests and add additional test cases
+> in the future. The goal of moving the CAN selftests into the tree is to
+> align the tests more closely with the kernel, improve testing of CAN in
+> general, and to simplify running the tests automatically in the various
+> kernel CI systems.
+> 
+> [1]: https://github.com/linux-can/can-tests
+> 
+> Signed-off-by: Felix Maurer <fmaurer@redhat.com>
 
-> I am afraid using bits on the skb will not go well around here - and
-> zero chance if you are using those bits for a one-off like netem.
-> Take a look at net/sched/act_mirred.c for a more "acceptable"
-> solution, see use of mirred_nest_level.
->=20
+Thanks. I will send a follow-up patch which will add the support of physical can
+interfaces.
 
-Ah ok, thank you for the suggestion. We will take a look at that then.
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
-> Not that it matters but I dont understand why you moved the skb2 check
-> around. Was that resolving anything meaningful?
->=20
-> cheers,
-> jamal
->=20
 
-Yes - otherwise the limit value of the qdisc isn't properly respected and c=
-an go over by one due to duplication. The limit check happens before both t=
-he duplication and the skb enqueue, so after duplication, that limit check =
-would be stale for the original enqueue.
-
-Best,
-Will
+Yours sincerely,
+Vincent Mailhol
 
 
