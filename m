@@ -1,162 +1,156 @@
-Return-Path: <netdev+bounces-192239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40561ABF14E
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 12:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A1EABF17A
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 12:25:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B60C188B41F
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FDBA1BC2421
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97209238140;
-	Wed, 21 May 2025 10:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FD425C71B;
+	Wed, 21 May 2025 10:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kiYmIz4j";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cTvx893E";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kiYmIz4j";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cTvx893E"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eWeJQa6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA3023D285
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 10:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E55625C814;
+	Wed, 21 May 2025 10:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747822677; cv=none; b=GQm10Z6WuYYYDkhJoPHG3aCMfnjMhQumGmUNy4D4TQ2oNXwBTk8MxSNqzhEFhHwJ8Jtn+4NwWZoH5mt7ujlsfqO5szzS0I9/2597RaqmojyGYYJtB58SdM1D8lYAQ+kB3IdHxN1NBDBK6K9+IF55UaUDcOZ7D7WKai0NF6n/UFw=
+	t=1747823109; cv=none; b=lW9HozleZIcCy1IaapBOVuQfRwJPYCphXcQRK13eY2+mTiAGTdf6XQ35vg6mxBPLgo0LFM+D+Ru1H4lXKfucOBfW8PFnzoRspdKMYR1rbFDf4j3XvaAFj8Mx4dKQXjDbo0A5SSzXENcWc0zDdyi16yx+am+0I8GSZ/8TQJ9gozw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747822677; c=relaxed/simple;
-	bh=QcsTdbjN4xGn7DZjRxTqSlCgHU7YI8pF19UDJz1DSzk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O4HY/WruC4NUj10vb9Zk+6iyG5kbGvnACQzp3nvQPi6xNeNbGnckM/PAUoEmSiKZ0bVmY0h1D3qNgMeVdGAXJEPhfTJ2LrzWkEQxiZnRqqdgUwqMT2E5p705II0NujwAWDhf+5DLryL5g4MbLEd15/g3d5aLo1j1bJCLgFH+VYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kiYmIz4j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cTvx893E; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kiYmIz4j; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cTvx893E; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 77D08229A6;
-	Wed, 21 May 2025 10:17:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747822674; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XB9ufzomD7OPRNP5XuFnaHueioW0xDGgM7Luo4DEPYU=;
-	b=kiYmIz4jpZRRYrQtHewbBidduyuyrgBKAtmvOuCsYB//AeZIK0TMzPEDHnDYXjkBIgB5+W
-	5tGHw/8CFTrI04n+ofoND9Un1OZjxA7BkSN2s7n5B7FR8C3YmgKmWDSCjiq394Zng4kudl
-	z2WPleE6n4/lVp4tsoLqm3s9Wj6aQ3I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747822674;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XB9ufzomD7OPRNP5XuFnaHueioW0xDGgM7Luo4DEPYU=;
-	b=cTvx893Eu/KxepfdcOwkNxo9+SsW6UP290z1Gkpg5wPUEg8qtVYo+OzqtbMpP5KmXabk7P
-	SVQ6uVyhveEz63Cg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1747822674; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XB9ufzomD7OPRNP5XuFnaHueioW0xDGgM7Luo4DEPYU=;
-	b=kiYmIz4jpZRRYrQtHewbBidduyuyrgBKAtmvOuCsYB//AeZIK0TMzPEDHnDYXjkBIgB5+W
-	5tGHw/8CFTrI04n+ofoND9Un1OZjxA7BkSN2s7n5B7FR8C3YmgKmWDSCjiq394Zng4kudl
-	z2WPleE6n4/lVp4tsoLqm3s9Wj6aQ3I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1747822674;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XB9ufzomD7OPRNP5XuFnaHueioW0xDGgM7Luo4DEPYU=;
-	b=cTvx893Eu/KxepfdcOwkNxo9+SsW6UP290z1Gkpg5wPUEg8qtVYo+OzqtbMpP5KmXabk7P
-	SVQ6uVyhveEz63Cg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2E49E13AA0;
-	Wed, 21 May 2025 10:17:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id GPJJClKoLWibTQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 21 May 2025 10:17:54 +0000
-Message-ID: <0f9de3d1-89f4-4629-a858-5d9ab7c781b2@suse.de>
-Date: Wed, 21 May 2025 12:17:53 +0200
+	s=arc-20240116; t=1747823109; c=relaxed/simple;
+	bh=5HlH8MNJv3syXIN/vHnN2vVQp8Ri0Bh049wtA3tHBCE=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=F1jFZlYmdjy/1hQJTJuTKU0si8mkmh+UabbGCCZsu+SDqdO5uKMgUZAaziTniLc8dG+bEYfl+4OOcpy12+dK2514KTrUfo3JunB3K7S+/r08oW3eK9JeGX4Adu0goKfKVLU2FJ6+4zTyDmKZHc3hLxXPN1MQ2vZbjpiqp3NrEaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eWeJQa6e; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1127)
+	id C8E8C206832E; Wed, 21 May 2025 03:25:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C8E8C206832E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1747823106;
+	bh=QR4U2caREfe4Ci0S/IeCgwAGch4AUN3kUS6ReAl1HII=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eWeJQa6ex5RvTfbojYleEB1LCyZwvno5vXiEyXQi32dqUJu2w3hOass/vOFcuQ845
+	 byn7nsXClFZKcu9Me+QeA2wBWBk9sjRvBlwpzz5Pp1mgHqtjYRwPBH5J5TQ/WhIjFl
+	 gnoMDBCZt1cafttyeupHhDqUm91PSgNEJ3DLnBSQ=
+From: Saurabh Sengar <ssengar@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	kuniyu@amazon.com,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: ssengar@microsoft.com,
+	stable@vger.kernel.org,
+	Saurabh Sengar <ssengar@linux.microsoft.com>
+Subject: [PATCH net,v2] hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
+Date: Wed, 21 May 2025 03:25:03 -0700
+Message-Id: <1747823103-3420-1-git-send-email-ssengar@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/10] net: remove skb_copy_and_hash_datagram_iter()
-To: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- Daniel Borkmann <daniel@iogearbox.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
-References: <20250519175012.36581-1-ebiggers@kernel.org>
- <20250519175012.36581-11-ebiggers@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250519175012.36581-11-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: 0.20
-X-Spamd-Result: default: False [0.20 / 50.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,iogearbox.net,gmail.com,grimberg.me,kernel.org];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
 
-On 5/19/25 19:50, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Now that skb_copy_and_hash_datagram_iter() is no longer used, remove it.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->   include/linux/skbuff.h |  4 ----
->   net/core/datagram.c    | 37 -------------------------------------
->   2 files changed, 41 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+The MANA driver's probe registers netdevice via the following call chain:
 
-Cheers,
+mana_probe()
+  register_netdev()
+    register_netdevice()
 
-Hannes
+register_netdevice() calls notifier callback for netvsc driver,
+holding the netdev mutex via netdev_lock_ops().
+
+Further this netvsc notifier callback end up attempting to acquire the
+same lock again in dev_xdp_propagate() leading to deadlock.
+
+netvsc_netdev_event()
+  netvsc_vf_setxdp()
+    dev_xdp_propagate()
+
+This deadlock was not observed so far because net_shaper_ops was never set,
+and thus the lock was effectively a no-op in this case. Fix this by using
+netif_xdp_propagate() instead of dev_xdp_propagate() to avoid recursive
+locking in this path.
+
+Also, clean up the unregistration path by removing the unnecessary call to
+netvsc_vf_setxdp(), since unregister_netdevice_many_notify() already
+performs this cleanup via dev_xdp_uninstall().
+
+Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
+Cc: stable@vger.kernel.org
+Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
+Tested-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+[V2]
+ - Modified commit message
+
+ drivers/net/hyperv/netvsc_bpf.c | 2 +-
+ drivers/net/hyperv/netvsc_drv.c | 2 --
+ net/core/dev.c                  | 1 +
+ 3 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
+index e01c5997a551..1dd3755d9e6d 100644
+--- a/drivers/net/hyperv/netvsc_bpf.c
++++ b/drivers/net/hyperv/netvsc_bpf.c
+@@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
+ 	xdp.command = XDP_SETUP_PROG;
+ 	xdp.prog = prog;
+ 
+-	ret = dev_xdp_propagate(vf_netdev, &xdp);
++	ret = netif_xdp_propagate(vf_netdev, &xdp);
+ 
+ 	if (ret && prog)
+ 		bpf_prog_put(prog);
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index d8b169ac0343..ee3aaf9c10e6 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2462,8 +2462,6 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
+ 
+ 	netdev_info(ndev, "VF unregistering: %s\n", vf_netdev->name);
+ 
+-	netvsc_vf_setxdp(vf_netdev, NULL);
+-
+ 	reinit_completion(&net_device_ctx->vf_add);
+ 	netdev_rx_handler_unregister(vf_netdev);
+ 	netdev_upper_dev_unlink(vf_netdev, ndev);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index fccf2167b235..8c6c9d7fba26 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9953,6 +9953,7 @@ int netif_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
+ 
+ 	return dev->netdev_ops->ndo_bpf(dev, bpf);
+ }
++EXPORT_SYMBOL_GPL(netif_xdp_propagate);
+ 
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
+ {
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.43.0
+
 
