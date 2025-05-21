@@ -1,204 +1,125 @@
-Return-Path: <netdev+bounces-192320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B1FABF825
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:48:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20C7ABF85E
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 16:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DBC1B655AF
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:48:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04E519E68FA
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 14:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A8E1DB346;
-	Wed, 21 May 2025 14:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E6A214225;
+	Wed, 21 May 2025 14:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfaWaNcG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHki9TFk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C2C1A238C;
-	Wed, 21 May 2025 14:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F9A221710;
+	Wed, 21 May 2025 14:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747838882; cv=none; b=IBOdctav1fug6+uFaxltksLqUDWt2nGOd8bCHY/hub1v5F/D8et4msvPC2lZzjM0+PPX/6Fv4BuIdUXrHQ5SX7lXMb83FEatI+YI2nFPh22N88wgQMI1yZcMcjAFprLuG8Me7kvUprJm8Hmuy+MgPg3xtzKF+tEmpyce0JafXZw=
+	t=1747839054; cv=none; b=UtRXOwJfUj0iZkEYiI2H3gohCww5grB/MlAW1eAXkgk6QMdhxAR47zEUXRxYPoT9PJeh60zI2uEwb1NoC6p6qqPUplAPeAeb6DDc1doQHPFomJhuquaDJrUS3nWZGylSs8wXd2G8NqpXOVomNZyTGlmyWGGgWZ4jBzK1k2huZgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747838882; c=relaxed/simple;
-	bh=Rn3mYP0b/ZcUFOZcI5aIq2hbO3SAa8ACPra/X3wtOck=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u4/vBD/S8z681RnfgYIQ9EMuo35whpVuHcabi7eDqHpadWPwEWLHDkuFSeeL9TTL3lfqHBomR0nitGtzhLOalcc2A3XIUkS03QakV59NHEomQljla1dtyqQZ5odlR0W95mD5UM8hUJRPaM78OZvNVKbM5MrvWkvn891cOQ0nsw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfaWaNcG; arc=none smtp.client-ip=209.85.217.48
+	s=arc-20240116; t=1747839054; c=relaxed/simple;
+	bh=QxneKmmr3mJI+3YYUP0u3PQHesj8NFPMVLk5slN/ZNM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=lquwxuFrpP6FbG92S82xIWMb60HsOZ3F8rNsoRIG4AeF464V/iY/K4x9/CLSvDQP6RY+fHzMkiDLY4TS3SMtxKNm/Hst239XoibbSuT0SaDiWV08JjjRcMW6fhZX4/hLqlGQij+m+2J2InQPGBDiApxKBGFAJTafhFTi8HWwS4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHki9TFk; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4e1432aaa68so4145834137.1;
-        Wed, 21 May 2025 07:48:00 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30bf7d0c15eso65140181fa.0;
+        Wed, 21 May 2025 07:50:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747838879; x=1748443679; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ek0ujVFI+XdYX8gezk+looLrZ/N+e9mNbznFBtm+po0=;
-        b=jfaWaNcGPkDdKW1XZQ5ACWCHbbk5AfnpqM/L2sOnR3bl1IiHJqnfMxM58xXMZ5AB6q
-         YgR0lM606DVlDelCPDd+idhTPkCYKi5p85W+UblIILczog4m0ouY3Y5sl0ALxUVTccoi
-         tw3tm6uGP8L7WXSl2AGN7jNpSLSxvwZtp+zXG9y+kvpvGQGed18yN2s08btTwFA/I50u
-         HrguLYWS945hByckBy7DvXYwZ/QNHPsw5hqmp1dqOCO58Lno1NVMMMLaDA36m2fxmkC1
-         zeRkVS10WGk0L/3OLYHsQLogomerqekllO/PVIRoyYUJVT06OS9Jzp3eq7GhDf8hasYv
-         ttqA==
+        d=gmail.com; s=20230601; t=1747839051; x=1748443851; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QxneKmmr3mJI+3YYUP0u3PQHesj8NFPMVLk5slN/ZNM=;
+        b=lHki9TFkCaLnxyqmiua8fpSnEf/gVtPPtfzNgHao9BcIl0kESQIX3Ij3eM0PgQamhT
+         QH38nAARU4GcRf5Cxd4H84H9uO9XXSDAr1S/QN8Mqws4KC6nuORxu6RRr8F4iQjPUfhR
+         W1GqcdJjnu1udw/jV7c7zNr0hYy+7cr1v30i4cFq+hdBAvZLe+WyUeRXkBJG4rESyC7Z
+         NpArZf3wjIdvJmvs5K0ETN8r8DVlDuCNa9TSnlT8ARwlO4HOwiEz2vximluQZwqNbQWo
+         /lHKvR/TZdfPKZcX6/VNFacIsPhA7rc+eeeT74hqi26JXEuTmBKT3qDXfqRytIN/agxG
+         63gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747838879; x=1748443679;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ek0ujVFI+XdYX8gezk+looLrZ/N+e9mNbznFBtm+po0=;
-        b=nbdYfRUJU/f3do0ZmtbXvthpMdIkBoMniahfTYDwn/XIfzZOgmAeetkeU9tU6YDc+E
-         sxgsDaLcH5XYymj9s1WqvtdwmUzR5SNpvQyPYSXESWZoYzATswREpBMNSUfTYHQG05+U
-         WcFAN+bx0Q46UCF0DAA6M2VQGJJYAnpG3q/z9VopLDBemQvbA308rdP5vGOoIltBq7cn
-         1PgJr56W+TBQA4Myfm4NL1TZvDpjmym5jL0EjxFJ4e3pGEgUX5Rn6M/85PhxyliCHdlS
-         nuGGbWFr4FNPNLlu+BfWqK3tTROiEzo5g+imxj0ZJuQ+fKF+RRlkwQtgEjx0roy1ngpS
-         zIJA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+i2bO7lKy/LBIMg7AJ/z++gDHoXAKfqU/NTFSvNA84ggnP9GzyMjSjUOCPtTpMTXZCyFSeV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvFFZGUoVtz2aqQ+kPvHYmDUSbKI9KCWdpEExrJKKotAcafHSr
-	0CGfQlM0gQANQUZIcw4bipHTEjnQQuGxXgwUOTHQ3WZmMi6XAEqxJfpG
-X-Gm-Gg: ASbGncu9iZrdFyrEVQaPZl9BlLwd2+7BIAbtDDmw8FVCcvnmontkJSiL+rmHjlEDeIY
-	p0edUJicIJsOA+m1y8Pw3JNSPFeFbcaIVPUt74Qs59mJjCjCHeRGYIkp76fPcEG4KlQyFgnBtu+
-	pwfg4vSrn0vmZ8zLI6ZV90gdy9YBbppyB8OGnHYAJaGaK3gY1lWNTrm4mdPMnZA+eB3VGldPrx+
-	5FgV9h2FmOtMF91y4xLjRMYcSjndhpjVHb+fbPuhWqS+1CEIHrYGLwKmUl91f2lcakR3iWIu/4L
-	jTEfgOLvkxgxHCaUBRgeSuiK8zsxOynZIjFTJu3ZIpuJED/MubA6e6oRqnTjKj4+XtnCTJ3AuDR
-	KGDyMZ/BlHl5g6EK+vI/wqHPO1ju+Ol8=
-X-Google-Smtp-Source: AGHT+IGkihi6pehUX1WcycRNIjiLjc5FvZZCJGNnbkwxFqKaEZNSnJcATPon5olaX/n261PVA82Yyw==
-X-Received: by 2002:a05:6102:3f9f:b0:4bb:e80b:473d with SMTP id ada2fe7eead31-4dfa6b6c352mr18831586137.6.1747838879404;
-        Wed, 21 May 2025 07:47:59 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87bec155e2csm9060834241.16.2025.05.21.07.47.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 07:47:58 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: bluetooth-next 2025-05-21
-Date: Wed, 21 May 2025 10:47:55 -0400
-Message-ID: <20250521144756.3033239-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1747839051; x=1748443851;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QxneKmmr3mJI+3YYUP0u3PQHesj8NFPMVLk5slN/ZNM=;
+        b=nHqAtShy9lzOBzD+VHv4MhOhZli1MuxRUkf2DQsdFmwhXyi1u9OVJwQm4tH6MZz+3F
+         3OD/azCMaMWxO9m756hYPe6JqgyOemDRRP8Ch1oqennwk3DJBa8dZCZi0uY5+Cb61eZW
+         4JmboF63UtWhPoLaebMHR7NSumvRJNlotlBd0dMYFrQsOEEBidd8Sr0BDPqdNHfl9PKR
+         MAXBRuvDyeXkCKVd2FiP1gUUkoyf7E93IKU+uygGtgL6UFgN7Rx+XxKfGTpUczMEH1k2
+         mduuVUKlBKeaJeaSn5r8NDTeuuwIiZ38znxfjWxqc/yjnMxnGcysBxERff1Vur/XkjPd
+         yPkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfAOic3iKkDATYq1eqSf3vF4GWPQSaseUK8Te2U0r4+kiWCduVSzhPEzyAInIfGn6eM/CuFpPUoONnPGs=@vger.kernel.org, AJvYcCVnS4+yaRVuUo8B26EFYRzLtcTj6I5SpcgQx2SCYXYVw16+0JBLyvCSwksMh4rXQ8NyZ2s0lfHi@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbBp7bfAHp7SOBfouVtVB9ezonykcKMiMdHhOVjHIIU/FAthGA
+	zyJqSHgsii1sV20w/O5BkxPtHqEfMvBpji5+68XRg9cleNeSFLaPqchDiIAT7czwGU6mmSRbuVl
+	6KwuHQ4+9l/1Ose8K4/0mdEnAMd2BjzeSdYpLpg==
+X-Gm-Gg: ASbGncvFdCGcl6FwmlROxjuWbTdkXiJ2+A8EPIr0HNEJmg+TgKy4OGRHw15WU+ZVQEv
+	YJrYqujqdI6bQh2rk//Mi+50MgL1yLTLTNPsMDICpcDfznNLQjjVlFAzlEG1mdh9HA2/h9MYMOc
+	cONHNsvuPP5Drwyk6imOJ9qI1EVp/A7uBMSiwt65u4angJQJzSqqPaNQ==
+X-Google-Smtp-Source: AGHT+IGXeK2bJRSHq9+X9/weSD2S5DZ8I+axVPCz9+wAKg8SVazBUsA9ngz7AgsmmG9o6rp80Q5eMh9W5Cb2/VPt5ng=
+X-Received: by 2002:a2e:bcc1:0:b0:31f:8659:dc23 with SMTP id
+ 38308e7fff4ca-32809780216mr94716521fa.33.1747839050704; Wed, 21 May 2025
+ 07:50:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: John <john.cs.hey@gmail.com>
+Date: Wed, 21 May 2025 22:50:38 +0800
+X-Gm-Features: AX0GCFvNK6mL5qUAhg-uU6jliFdjaxqXLBL71sgv5-Tzci-EyZvQHvg1ssoNlxw
+Message-ID: <CAP=Rh=M1LzunrcQB1fSGauMrJrhL6GGps5cPAKzHJXj6GQV+-g@mail.gmail.com>
+Subject: [Bug] "general protection fault in calipso_sock_setattr" in Linux
+ kernel v6.12
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The following changes since commit e6b3527c3b0a676c710e91798c2709cc0538d312:
+Dear Linux Kernel Maintainers,
 
-  Merge branch 'net-airoha-add-per-flow-stats-support-to-hw-flowtable-offloading' (2025-05-20 20:00:55 -0700)
+I hope this message finds you well.
 
-are available in the Git repository at:
+I am writing to report a potential vulnerability I encountered during
+testing of the Linux Kernel version v6.12.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-05-21
+Git Commit: adc218676eef25575469234709c2d87185ca223a (tag: v6.12)
 
-for you to fetch changes up to 623029dcc53837d409deb70b65eb7c7b83ab9b9a:
+Bug Location: calipso_sock_setattr+0xf6/0x380 net/ipv6/calipso.c:1128
 
-  Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach() (2025-05-21 10:31:01 -0400)
+Bug report: https://hastebin.com/share/iredodibar.yaml
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
+Complete log: https://hastebin.com/share/biqowozonu.perl
 
-core:
+Entire kernel config: https://hastebin.com/share/huqucavidu.ini
 
- - Add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
- - Separate CIS_LINK and BIS_LINK link types
- - Introduce HCI Driver protocol
+Root Cause Analysis:
+The crash is caused by a NULL pointer dereference in txopt_get() (at
+include/net/ipv6.h:390) due to an uninitialized struct inet6_opt *opt
+field.
+The function is indirectly invoked during an SELinux policy
+enforcement path via calipso_sock_setattr(), which expects an
+initialized inet6_sk(sk)->opt structure.
+However, the socket in question does not have IPv6 tx options set up
+at the time of the call, likely due to missing or out-of-order
+initialization during socket creation or connection setup.
+This leads to an invalid access at offset +0x70, detected by KASAN,
+and results in a general protection fault.
 
-drivers:
+At present, I have not yet obtained a minimal reproducer for this
+issue. However, I am actively working on reproducing it, and I will
+promptly share any additional findings or a working reproducer as soon
+as it becomes available.
 
- - btintel_pcie: Do not generate coredump for diagnostic events
- - btusb: Add HCI Drv commands for configuring altsetting
- - btusb: Add RTL8851BE device 0x0bda:0xb850
- - btusb: Add new VID/PID 13d3/3584 for MT7922
- - btusb: Add new VID/PID 13d3/3630 and 13d3/3613 for MT7925
- - btnxpuart: Implement host-wakeup feature
+Thank you very much for your time and attention to this matter. I
+truly appreciate the efforts of the Linux kernel community.
 
-----------------------------------------------------------------
-Chandrashekar Devegowda (1):
-      Bluetooth: btintel_pcie: Dump debug registers on error
-
-Chen Ni (1):
-      Bluetooth: hci_uart: Remove unnecessary NULL check before release_firmware()
-
-Dmitry Antipov (1):
-      Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach()
-
-En-Wei Wu (1):
-      Bluetooth: btusb: use skb_pull to avoid unsafe access in QCA dump handling
-
-Hsin-chen Chuang (4):
-      Bluetooth: Introduce HCI Driver protocol
-      Bluetooth: btusb: Add HCI Drv commands for configuring altsetting
-      Revert "Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL"
-      Revert "Bluetooth: btusb: add sysfs attribute to control USB alt setting"
-
-Jiande Lu (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
-
-Kiran K (1):
-      Bluetooth: btintel_pcie: Do not generate coredump for diagnostic events
-
-Krzysztof Kozlowski (2):
-      Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device unbind
-      Bluetooth: btmtksdio: Fix wakeup source leaks on device unbind
-
-Liwei Sun (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: ISO: Fix not using SID from adv report
-      Bluetooth: ISO: Fix getpeername not returning sockaddr_iso_bc fields
-      Bluetooth: L2CAP: Fix not checking l2cap_chan security level
-
-Neeraj Sanjay Kale (2):
-      dt-bindings: net: bluetooth: nxp: Add support for host-wakeup
-      Bluetooth: btnxpuart: Implement host-wakeup feature
-
-Pauli Virtanen (2):
-      Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-      Bluetooth: separate CIS_LINK and BIS_LINK link types
-
-WangYuli (1):
-      Bluetooth: btusb: Add RTL8851BE device 0x0bda:0xb850
-
-Youn MÉLOIS (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3613 for MT7925
-
- .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |  17 ++
- drivers/bluetooth/Kconfig                          |  12 -
- drivers/bluetooth/btintel.c                        |   3 +-
- drivers/bluetooth/btintel.h                        |   6 -
- drivers/bluetooth/btintel_pcie.c                   | 141 +++++++++-
- drivers/bluetooth/btintel_pcie.h                   |  19 ++
- drivers/bluetooth/btmrvl_sdio.c                    |   4 +-
- drivers/bluetooth/btmtksdio.c                      |   2 +-
- drivers/bluetooth/btnxpuart.c                      |  58 +++-
- drivers/bluetooth/btusb.c                          | 302 ++++++++++++---------
- drivers/bluetooth/hci_aml.c                        |   3 +-
- include/net/bluetooth/bluetooth.h                  |   4 +
- include/net/bluetooth/hci.h                        |   4 +-
- include/net/bluetooth/hci_core.h                   |  51 ++--
- include/net/bluetooth/hci_drv.h                    |  76 ++++++
- include/net/bluetooth/hci_mon.h                    |   2 +
- net/bluetooth/Makefile                             |   3 +-
- net/bluetooth/af_bluetooth.c                       |  87 ++++++
- net/bluetooth/hci_conn.c                           |  79 ++++--
- net/bluetooth/hci_core.c                           |  45 ++-
- net/bluetooth/hci_drv.c                            | 105 +++++++
- net/bluetooth/hci_event.c                          |  40 ++-
- net/bluetooth/hci_sock.c                           |  12 +-
- net/bluetooth/hci_sync.c                           |  63 ++++-
- net/bluetooth/iso.c                                |  30 +-
- net/bluetooth/l2cap_core.c                         |  15 +-
- net/bluetooth/mgmt.c                               |   3 +-
- net/bluetooth/mgmt_util.c                          |   2 +-
- 28 files changed, 918 insertions(+), 270 deletions(-)
- create mode 100644 include/net/bluetooth/hci_drv.h
- create mode 100644 net/bluetooth/hci_drv.c
+Best regards,
+John
 
