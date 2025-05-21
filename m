@@ -1,117 +1,150 @@
-Return-Path: <netdev+bounces-192261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4116FABF269
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:08:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD1CABF280
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 13:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47FC7ACFB4
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:07:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8F837A3012
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 11:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481BB262807;
-	Wed, 21 May 2025 11:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A032620D1;
+	Wed, 21 May 2025 11:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="tnNcaERp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMySf8Ho"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F53A261568
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 11:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBB521D585;
+	Wed, 21 May 2025 11:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747825686; cv=none; b=Gpfy5pPRPf2qkzWr+aTXnVSTFKpawO8jWJOmnf54vDZVQrdbqGTMGeueb1/W4uDNY02pBqVx0jnaHIIExrJ8KM8ru6ZY8ZuMK50ULWdP3e7f7x7Bg7N+sNTozoAVtVFnpvPZHX33pwwD8PHPO1Pj35qhVKW7e750WbPf0tqQg9I=
+	t=1747825987; cv=none; b=XsEqLm9XEZp/HExJv+C4sqyJ2Vm3rUBKHRS5SZ7yqJ4voDU9TVulnp7DcbruG1OKRayg/iyQLMiS5GOc7eNGttx7ek8QhPTNEa45UaW8fxm65scsl3d0dFor01mFAEDiUnrC0ev0imqtDFAgjzD51AA8lCjuHvChgIkacEWI234=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747825686; c=relaxed/simple;
-	bh=XVbRaDerIyD1GwaZ95UFLunumBvPrxXai8ccr9OzpEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F7++dP1ok6wv1HZg5DdIKTa5flThZIVy3DvDBw+3hxexXdh9cDvaVES4xm0KzdaOcNMsf3WSCk5ZA9L4NRKc6mk71l+9rAUPHt2OXlYwDCOB366U0gdB9RwogBuxBuu3S9E6OMfxWcT6leCH3PqVAE2nY/04lG3A8RdJz1BvWYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=tnNcaERp; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7399838db7fso6253595b3a.0
-        for <netdev@vger.kernel.org>; Wed, 21 May 2025 04:08:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1747825683; x=1748430483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6IxjjkrWjp8AFqhIJZ3L4A7cTzC/C6p7siKh70KP82k=;
-        b=tnNcaERpE35jQO7mJSxuiKJazEvYldRB2uKEbt/Cjw3Mho+cC5HApqyWGS7kPgYUp0
-         mGLnYlM0of9j1qbNH6+xLNqCCadVqIPadc2+19mrOKO5PBFiBO9Yn/D+m+ucKvk2oClf
-         7NJG5y532VDVtn281hKXooJnHjEFGv4F3wbIms1zQ3s2eWDYHa6K3s5wrzc0734uyEr3
-         bfmnHTzPYaIMNCznpbb5cWZF/HkjtJFtH2aRezWTi8QZUHaWdiNhBkEBDjE2iUyvhY4s
-         sVI05BVZMGFn1VRCyLRmpHMXFBycK304YgIPg+GcEzDrJze97tJvoqd5+Z4gnpfcjPsw
-         xZXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747825683; x=1748430483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6IxjjkrWjp8AFqhIJZ3L4A7cTzC/C6p7siKh70KP82k=;
-        b=PPYlzaZdMAlo28ZrroNTm6lCSX+PYrTMEjSzgoYIKm6CgwhtUOSeyC8DawSntEoP4U
-         HKKEdwtkDZ5wp1TmImgL5eSy0bXojvR0+CsEhZs6gIHSoDF3DweVIObsM1xRfa0hASBq
-         WNyAKQsPDAtTvmp/sWhcP8NBzkkKrPvXtrtywfjTzyhKcfkmI47hPWCWJmyrT1raGooq
-         Sa0QBT5ylb3BuzM2IyKO7JJYqOQVdp8E21c+GnKmsMZMVNBnIgSpnQc7k9+CuD1TooBv
-         QcQ9dsJCm6zVLOJ1LJEnf2uBm51NxVNQpYtbdfQliaZxiGhuC/YSIc/8lWZ+x3qRaT91
-         0r5Q==
-X-Gm-Message-State: AOJu0YzZL2R4X/HJpYdbIbLHvxXFaMmxMxsq67+1aSHszFp9mWgJNpxu
-	yjkbLGRwhQmKU/zY75+myOdnvXO5vX/bMS15yYO5b3/dZx6lsMf1hMcM0HuBiVsvTY+eAy6NcTl
-	v40z6ltTp6Jk+Ey/q9bHSbvSZKCoWFX1bQtP0Ryxo
-X-Gm-Gg: ASbGncvpqHmJSAGrnXahU2OaiZm0xyqG45M9gWkzi742D7dFQ6DuUHsJnRWyck96qeR
-	mtZ3cyi1QTqu14QBNAB4EVTWRFpzU1IiXwu0FkES5twOJdhuoKU45P/L6e9/cp+iyQtYxXmYZ0r
-	qJ/U7+gteeRk88PV+DUFovulJnS7lZkAEt7WhcbVMxzw==
-X-Google-Smtp-Source: AGHT+IFUhRaHw+dzQT6VcPQ8JYrBD6KYGetXdoO4wRl2KsdoXqrvYAd7Paog3wRB8xQl51nbWZc9d2Nrn8WHaJdCqkc=
-X-Received: by 2002:a05:6a00:3d01:b0:740:58d3:71a8 with SMTP id
- d2e1a72fcca58-742a99fabb8mr25224197b3a.1.1747825683453; Wed, 21 May 2025
- 04:08:03 -0700 (PDT)
+	s=arc-20240116; t=1747825987; c=relaxed/simple;
+	bh=KMwk5bRKMU/LebBXEB9eWTnbBr+EpsbBuq9K0VaAGrg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bhSAYizkA4j9ujFuz3arsAPQG/pmU5PEvJKjroIIYMbQBx1nWPhk5avvWBommd4pBjl5ZtZCyw0bw4vE1IjiUz7dq+zUX2PMJTztMgNSsib0eNf/sgTPNiJurHBZt99ujFbPEZvVmrLo3LOno1SSzuBBO2P404esM+0GB6QsA7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMySf8Ho; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DDAAC4CEEA;
+	Wed, 21 May 2025 11:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747825985;
+	bh=KMwk5bRKMU/LebBXEB9eWTnbBr+EpsbBuq9K0VaAGrg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kMySf8HosZyaikPVyIScMp+hB3GqOkFWvUhUNKNKszxfbdGteSbO/Did8aatavUP/
+	 IVpBECjdkejEW911PVNXLhTcN6/ZZ72r1s4qEnDO9YKo+tJta8kNRqZciZyL/5vV+2
+	 ofuSl2tloNUKku7oWkrkFEPgGP22W1lrK+xhozxCOC2b1njBTke9/u9S4/pxfvYBYA
+	 SVV/8v73C3z7NUcy90QNLvNCT49BRRtjpFjHEh4AHuVuLQjA+I97kwL9WZprWPpMlM
+	 YXsa1+T7S7ISGFCFEBwFxwHJ8VaaJDdMuxltl60vtx+rnLAaYHamn4wkpoX6oPJtFp
+	 RYv0C3ly7qyhQ==
+Date: Wed, 21 May 2025 13:12:57 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <luca.boccassi@gmail.com>, 
+	Mike Yuan <me@yhndnzj.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>, 
+	Serge Hallyn <serge@hallyn.com>
+Subject: Re: [PATCH v8 0/9] coredump: add coredump socket
+Message-ID: <20250521-urenkel-panne-b19f93234e6f@brauner>
+References: <20250516-work-coredump-socket-v8-0-664f3caf2516@kernel.org>
+ <20250520122838.29131f04@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250518222038.58538-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20250518222038.58538-1-xiyou.wangcong@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 21 May 2025 07:07:52 -0400
-X-Gm-Features: AX0GCFsEUpS1i6naLW-NtoOHkz0WGIwifnKNk9e5bxAdW9bMjwOws0JqS__5UHY
-Message-ID: <CAM0EoM=0xo9FCr6UAowqCom5whmKwWvvagNCUn_4uAaN+Cy6eg@mail.gmail.com>
-Subject: Re: [Patch net 0/2] net_sched: Fix HFSC qlen/backlog accounting bug
- and add selftest
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250520122838.29131f04@hermes.local>
 
-On Sun, May 18, 2025 at 6:21=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
->
-> This series addresses a long-standing bug in the HFSC qdisc where queue l=
-ength
-> and backlog accounting could become inconsistent if a packet is dropped d=
-uring
-> a peek-induced dequeue operation, and adds a corresponding selftest to tc=
--testing.
->
+On Tue, May 20, 2025 at 12:28:38PM -0700, Stephen Hemminger wrote:
+> On Fri, 16 May 2025 13:25:27 +0200
+> Christian Brauner <brauner@kernel.org> wrote:
+> 
+> > Coredumping currently supports two modes:
+> > 
+> > (1) Dumping directly into a file somewhere on the filesystem.
+> > (2) Dumping into a pipe connected to a usermode helper process
+> >     spawned as a child of the system_unbound_wq or kthreadd.
+> > 
+> > For simplicity I'm mostly ignoring (1). There's probably still some
+> > users of (1) out there but processing coredumps in this way can be
+> > considered adventurous especially in the face of set*id binaries.
+> > 
+> > The most common option should be (2) by now. It works by allowing
+> > userspace to put a string into /proc/sys/kernel/core_pattern like:
+> > 
+> >         |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+> > 
+> > The "|" at the beginning indicates to the kernel that a pipe must be
+> > used. The path following the pipe indicator is a path to a binary that
+> > will be spawned as a usermode helper process. Any additional parameters
+> > pass information about the task that is generating the coredump to the
+> > binary that processes the coredump.
+> > 
+> > In the example core_pattern shown above systemd-coredump is spawned as a
+> > usermode helper. There's various conceptual consequences of this
+> > (non-exhaustive list):
+> > 
+> > - systemd-coredump is spawned with file descriptor number 0 (stdin)
+> >   connected to the read-end of the pipe. All other file descriptors are
+> >   closed. That specifically includes 1 (stdout) and 2 (stderr). This has
+> >   already caused bugs because userspace assumed that this cannot happen
+> >   (Whether or not this is a sane assumption is irrelevant.).
+> > 
+> > - systemd-coredump will be spawned as a child of system_unbound_wq. So
+> >   it is not a child of any userspace process and specifically not a
+> >   child of PID 1. It cannot be waited upon and is in a weird hybrid
+> >   upcall which are difficult for userspace to control correctly.
+> > 
+> > - systemd-coredump is spawned with full kernel privileges. This
+> >   necessitates all kinds of weird privilege dropping excercises in
+> >   userspace to make this safe.
+> > 
+> > - A new usermode helper has to be spawned for each crashing process.
+> > 
+> > This series adds a new mode:
+> > 
+> > (3) Dumping into an AF_UNIX socket.
+> > 
+> > Userspace can set /proc/sys/kernel/core_pattern to:
+> > 
+> >         @/path/to/coredump.socket
+> > 
+> > The "@" at the beginning indicates to the kernel that an AF_UNIX
+> > coredump socket will be used to process coredumps.
+> > 
+> > The coredump socket must be located in the initial mount namespace.
+> > When a task coredumps it opens a client socket in the initial network
+> > namespace and connects to the coredump socket.
+> 
+> 
+> There is a problem with using @ as naming convention.
+> The starting character of @ is already used to indicate abstract
+> unix domain sockets in some programs like ss.
 
-For the series:
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+This shouldn't be a problem. First because @ isn't part of the actual
+AF_UNIX path. But mostly because ss and other network related tools have
+no relationship with /proc/sys/kernel/core_pattern whatsoever. I'm not
+opposed to changing it if people do care strongly about it and send a
+patch. But that will happen as a fixup after the merge window.
 
-cheers,
-jamal
-> ---
-> Cong Wang (2):
->   sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
->   selftests/tc-testing: Add an HFSC qlen accounting test
->
->  net/sched/sch_hfsc.c                          |  6 ++---
->  .../tc-testing/tc-tests/infra/qdiscs.json     | 27 +++++++++++++++++++
->  2 files changed, 30 insertions(+), 3 deletions(-)
->
-> --
-> 2.34.1
->
+> And will the new coredump socekt allow use of abstrace unix
+> domain sockets?
+
+No. There's no safe permission model without involving LSMs.
+Unprivileged attackers can recycle the socket address and use it to get
+(suid) coredumps forwarded to them when the server crashes or restarts.
 
