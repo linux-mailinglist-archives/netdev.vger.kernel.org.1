@@ -1,92 +1,131 @@
-Return-Path: <netdev+bounces-192353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FBCCABF8F6
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:13:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C24ABF91B
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 17:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A46291745EE
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:13:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0139E2747
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 15:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755971DE891;
-	Wed, 21 May 2025 15:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tkNTqGQs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E724B1FFC5D;
+	Wed, 21 May 2025 15:22:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462A21D63DF;
-	Wed, 21 May 2025 15:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06431E47A5
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 15:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747840381; cv=none; b=bAz+GJshNraunWf1vryFVZpXB8BcrQ7ckwj1QhtDgREAkjUIGXqzAApLru+vnoe9dVtLp3T6etLSot4PAFwQJjV2GnPC/c5TwRsTuEQMODtLoOkA/7pJEf+Aa8rvsl/UzZcdgn7By3OMXifRcSPkXxdLhLrUd4iWG8KBvhHkfK8=
+	t=1747840949; cv=none; b=sCv82qvjjmM1kSU0wZDWbIlTHRZHNe7NKL3ETtRFSytikr3lSk0tntjm2HYpr5qb5DJQrA3Gxws51p135/OJDq4u1Sw5mmUlmJWrg2ZcKPP0WV+xY8lh7bpXXbl7omssKboRz+E3xWCaUhrp9AR0jKQJnD75zZs7rfOX4jPlptE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747840381; c=relaxed/simple;
-	bh=YKIYQlFJfiRSqvZ5K+grxRTf6ru0wjO7N2apehq86Fg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQj4FtkZ2frkoPZyiMmamSwuVd0thPNbrM86y2oFHXcDRZ4dLUuxRISej9HH0uhf/d4f4SnrvnHV8brJrKhxIgkaFssT4Yal6OtE/qwmmDbBl6F6znNl0JuxkcBQQvbExIGeCpWZMpl2FRCyu2nujet6OIRKPjsPEqMSe3a9URY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tkNTqGQs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D214C4CEE4;
-	Wed, 21 May 2025 15:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747840380;
-	bh=YKIYQlFJfiRSqvZ5K+grxRTf6ru0wjO7N2apehq86Fg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tkNTqGQsNf/aAr/nQVP0FQb48j45fv0zcv8XXhgWZdtDkePjhRzk3DOGY1+2dKUS1
-	 +2uhBF9KhVolSDKFdfhtbascrSMz56C+G8XeVY6o5Fz71jc5n1KmCV82XL5aaIru7v
-	 WWCDTqsATOrYnoISvCeRmkTyQHf/grASXTatzv2gFL3LV03s0RjpJoErLOiqiP64qo
-	 P6TO21cEdE9pSartdRY3/MGow2Ys/KMrpbBOoTsHB/9hyWWNyTYrqeJKOxKV1ueVef
-	 dTWq728qBRrwAJ34AZlGUciiVl0R8IsTxeL9w/ZaSMLJFw9/y+Xb6+Lox0epZ7mH/1
-	 4oxL77Rc/hh2w==
-Date: Wed, 21 May 2025 17:12:52 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jann Horn <jannh@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, stephen@networkplumber.org, 
-	alexander@mihalicyn.com, daan.j.demeyer@gmail.com, daniel@iogearbox.net, 
-	davem@davemloft.net, david@readahead.eu, edumazet@google.com, horms@kernel.org, 
-	jack@suse.cz, kuba@kernel.org, lennart@poettering.net, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, luca.boccassi@gmail.com, me@yhndnzj.com, netdev@vger.kernel.org, 
-	oleg@redhat.com, pabeni@redhat.com, serge@hallyn.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH v8 0/9] coredump: add coredump socket
-Message-ID: <20250521-knirschen-kommst-2fcf19f7d280@brauner>
-References: <20250520122838.29131f04@hermes.local>
- <20250521004207.10514-1-kuniyu@amazon.com>
- <CAG48ez0r4A7iMXzBBdPiHWycYSAGSm7VFWULCqKQPXoBKFWpEw@mail.gmail.com>
+	s=arc-20240116; t=1747840949; c=relaxed/simple;
+	bh=US6Qn/YPFfEQVJh/yquwxVsdo6yHequvshtAvfNQRnc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SdutMK20xVlWXP+WavxAiZ/DTNdeIC5k95GVAb7G+AUHvVx/GykD99fgJnUcFz45ssgLMSd+afJRnrLsjaOIZBy0uzyz52IU2fyhmi3GeMN9MF8os2mSVKQYkMHoTYiQOiEKRgTtWFYE7xnGxcTFtLDJqHQxAttz2x/E3brlpIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0leil.net; spf=pass smtp.mailfrom=0leil.net; arc=none smtp.client-ip=185.125.25.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0leil.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0leil.net
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4b2Zsk0B0Bz3fC;
+	Wed, 21 May 2025 17:22:18 +0200 (CEST)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4b2Zsh2wFGz8KK;
+	Wed, 21 May 2025 17:22:16 +0200 (CEST)
+From: Quentin Schulz <foss+kernel@0leil.net>
+Date: Wed, 21 May 2025 17:21:59 +0200
+Subject: [PATCH net] net: stmmac: platform: guarantee uniqueness of bus_id
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAG48ez0r4A7iMXzBBdPiHWycYSAGSm7VFWULCqKQPXoBKFWpEw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250521-stmmac-mdio-bus_id-v1-1-918a3c11bf2c@cherry.de>
+X-B4-Tracking: v=1; b=H4sIAJbvLWgC/x3MQQqEMAxA0atI1gZsO1L0KiKDtlGzaJWmI4J49
+ yku3+L/G4QSk0Bf3ZDoZOE9Fqi6ArdNcSVkXwy60W3TaoWSQ5gcBs87zj/5skejzGw/ztrOGCj
+ hkWjh650OECnD+Dx/ttnzIGkAAAA=
+X-Change-ID: 20250521-stmmac-mdio-bus_id-313b74c77933
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>, 
+ Heiko Stuebner <heiko@sntech.de>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Quentin Schulz <quentin.schulz@cherry.de>
+X-Mailer: b4 0.14.2
+X-Infomaniak-Routing: alpha
 
-> The path lookups work very differently between COREDUMP_SOCK and
-> COREDUMP_FILE - they are interpreted relative to different namespaces,
-> and they run with different privileges, and they do different format
-> string interpretation. I think trying to determine dynamically whether
-> the path refers to a socket or to a nonexistent location at which we
-> should create a file (or a preexisting file we should clobber) would
-> not be practical, partly for these reasons.
+From: Quentin Schulz <quentin.schulz@cherry.de>
 
-Agreed.
+bus_id is currently derived from the ethernetX alias. If one is missing
+for the device, 0 is used. If ethernet0 points to another stmmac device
+or if there are 2+ stmmac devices without an ethernet alias, then bus_id
+will be 0 for all of those.
 
-> 
-> Also, fundamentally, if we have the choice between letting userspace
-> be explicit about what it wants, or trying to guess userspace's intent
-> from the kernel, I think we should always go for being explicit.
+This is an issue because the bus_id is used to generate the mdio bus id
+(new_bus->id in drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+stmmac_mdio_register) and this needs to be unique.
 
-Agreed.
+This allows to avoid needing to define ethernet aliases for devices with
+multiple stmmac controllers (such as the Rockchip RK3588) for multiple
+stmmac devices to probe properly.
 
-> 
-> meaning in this context, like '>'; but I don't think we should be
-> changing the overall approach because of this.
+Obviously, the bus_id isn't guaranteed to be stable across reboots if no
+alias is set for the device but that is easily fixed by simply adding an
+alias if this is desired.
 
-Agreed.
+Signed-off-by: Quentin Schulz <quentin.schulz@cherry.de>
+---
+Unsure if I should cc stable since people who encountered that issue for
+sure had to add an ethernet alias to make things work with their DT so
+shouldn't be too much of an actual issue?
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index c73eff6a56b87a3783c91b2ffbf5807a27df303f..15205a47cafc276442c3759a36d115d8da1fe51d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -430,6 +430,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	struct device_node *np = pdev->dev.of_node;
+ 	struct plat_stmmacenet_data *plat;
+ 	struct stmmac_dma_cfg *dma_cfg;
++	static int bus_id = -ENODEV;
+ 	int phy_mode;
+ 	void *ret;
+ 	int rc;
+@@ -465,8 +466,14 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	of_property_read_u32(np, "max-speed", &plat->max_speed);
+ 
+ 	plat->bus_id = of_alias_get_id(np, "ethernet");
+-	if (plat->bus_id < 0)
+-		plat->bus_id = 0;
++	if (plat->bus_id < 0) {
++		if (bus_id < 0)
++			bus_id = of_alias_get_highest_id("ethernet");
++		/* No ethernet alias found, init at -1 so first bus_id is 0 */
++		if (bus_id < 0)
++			bus_id = -1;
++		plat->bus_id = ++bus_id;
++	}
+ 
+ 	/* Default to phy auto-detection */
+ 	plat->phy_addr = -1;
+
+---
+base-commit: 4a95bc121ccdaee04c4d72f84dbfa6b880a514b6
+change-id: 20250521-stmmac-mdio-bus_id-313b74c77933
+
+Best regards,
+-- 
+Quentin Schulz <quentin.schulz@cherry.de>
+
 
