@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-192158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121A3ABEB72
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:44:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDDAABEB6F
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 07:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA1B03BF149
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 05:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DAE28A0D8F
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 05:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19F123371E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EA4230D0A;
 	Wed, 21 May 2025 05:43:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC50622FDE8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC56F22FDEA
 	for <netdev@vger.kernel.org>; Wed, 21 May 2025 05:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747806238; cv=none; b=WYbCVNAR1V5LF49IRflGx2f6qjc88133zt8Ie7rmykgNpw9rngUkywoafl4vw7ZTE3kHBM1nOrEL/usK138nIL611gbnaQcZWx/5LOxvzAdtEiEX3HQhCXJQO1DehHCWRKZPwL5sqVj0ZwMvLdPgFrzUSLHMc975Lj+5Pe+jQxI=
+	t=1747806238; cv=none; b=iy94dE4BbuDAOKLhsounfrJMZJ5LFDzLsxkt/KSc2wxEIdjJJvWYzvSjOyEHSCHXDvb08plYl+xNIoLa5CeRVJGNOOroBrDlNr7DIbmFu+FeCR3VO5h0SonrOGbfAVHTu+YhJJ5egMgHPKg3K7g7WC/wNz58utzz3ieBLnhyaWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747806238; c=relaxed/simple;
-	bh=9m+4PwJviDmd+NXuzs0/sTRxsAQi0X8B0eDNepi1gxE=;
+	bh=7Kc47lTY4LePCA7ibacu8iRyJ5wdidF/eR8SOAbvo+Y=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bCmWDn0EaWX2RuOjWbCqxtud9HArOlyWwgDzFAbCLwJA5SJ+CsZMHL+clSxOQK2Urv6+DOL/OvxCkyi901igp07ra15qERSIL2RQCGtCXheMuTc0W/B9ZcwbizCMPSY4IDGfxIdmm415tncOVFt/xwKBX9f1+D8A771aVkABbAI=
+	 MIME-Version:Content-Type; b=mYoqZ8+lThV6kT/i4rt+YOfeQr8fkQGze5zjoqKHv1peiQdRRe0qt59UFZ4D4NcsYTa7YfcIT1uF2E2KuAXDpaEFra8PqZuGQDtrx+4hUj2U9qH/kl2IGK59veyFzuPndopi5XUBoy3xxppwznsRdykl4SNX8YQ4BoPPLDYq4jw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id D4551207D1;
-	Wed, 21 May 2025 07:43:52 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 206DB20754;
+	Wed, 21 May 2025 07:43:53 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dTNNeNXrUg9o; Wed, 21 May 2025 07:43:52 +0200 (CEST)
+ with ESMTP id x490WpwXPCOM; Wed, 21 May 2025 07:43:52 +0200 (CEST)
 Received: from EXCH-02.secunet.de (unknown [10.32.0.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 1605220748;
+	by mx1.secunet.com (Postfix) with ESMTPS id 662BB2074F;
 	Wed, 21 May 2025 07:43:52 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 1605220748
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 662BB2074F
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-02.secunet.de
  (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Wed, 21 May
@@ -51,14 +51,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 21 May
  2025 07:43:51 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id DA9923180FB8; Wed, 21 May 2025 07:43:50 +0200 (CEST)
+	id 17D4D3182B01; Wed, 21 May 2025 07:43:50 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 2/5] espintcp: remove encap socket caching to avoid reference leak
-Date: Wed, 21 May 2025 07:43:45 +0200
-Message-ID: <20250521054348.4057269-3-steffen.klassert@secunet.com>
+Subject: [PATCH 3/5] xfrm: Fix UDP GRO handling for some corner cases
+Date: Wed, 21 May 2025 07:43:46 +0200
+Message-ID: <20250521054348.4057269-4-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250521054348.4057269-1-steffen.klassert@secunet.com>
 References: <20250521054348.4057269-1-steffen.klassert@secunet.com>
@@ -70,250 +70,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 
-From: Sabrina Dubroca <sd@queasysnail.net>
+From: Tobias Brunner <tobias@strongswan.org>
 
-The current scheme for caching the encap socket can lead to reference
-leaks when we try to delete the netns.
+This fixes an issue that's caused if there is a mismatch between the data
+offset in the GRO header and the length fields in the regular sk_buff due
+to the pskb_pull()/skb_push() calls.  That's because the UDP GRO layer
+stripped off the UDP header via skb_gro_pull() already while the UDP
+header was explicitly not pulled/pushed in this function.
 
-The reference chain is: xfrm_state -> enacp_sk -> netns
+For example, an IKE packet that triggered this had len=data_len=1268 and
+the data_offset in the GRO header was 28 (IPv4 + UDP).  So pskb_pull()
+was called with an offset of 28-8=20, which reduced len to 1248 and via
+pskb_may_pull() and __pskb_pull_tail() it also set data_len to 1248.
+As the ESP offload module was not loaded, the function bailed out and
+called skb_push(), which restored len to 1268, however, data_len remained
+at 1248.
 
-Since the encap socket is a userspace socket, it holds a reference on
-the netns. If we delete the espintcp state (through flush or
-individual delete) before removing the netns, the reference on the
-socket is dropped and the netns is correctly deleted. Otherwise, the
-netns may not be reachable anymore (if all processes within the ns
-have terminated), so we cannot delete the xfrm state to drop its
-reference on the socket.
+So while skb_headlen() was 0 before, it was now 20.  The latter caused a
+difference of 8 instead of 28 (or 0 if pskb_pull()/skb_push() was called
+with the complete GRO data_offset) in gro_try_pull_from_frag0() that
+triggered a call to gro_pull_from_frag0() that corrupted the packet.
 
-This patch results in a small (~2% in my tests) performance
-regression.
+This change uses a more GRO-like approach seen in other GRO receivers
+via skb_gro_header() to just read the actual data we are interested in
+and does not try to "restore" the UDP header at this point to call the
+existing function.  If the offload module is not loaded, it immediately
+bails out, otherwise, it only does a quick check to see if the packet
+is an IKE or keepalive packet instead of calling the existing function.
 
-A GC-type mechanism could be added for the socket cache, to clear
-references if the state hasn't been used "recently", but it's a lot
-more complex than just not caching the socket.
-
-Fixes: e27cca96cd68 ("xfrm: add espintcp (RFC 8229)")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: 172bf009c18d ("xfrm: Support GRO for IPv4 ESP in UDP encapsulation")
+Fixes: 221ddb723d90 ("xfrm: Support GRO for IPv6 ESP in UDP encapsulation")
+Signed-off-by: Tobias Brunner <tobias@strongswan.org>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- include/net/xfrm.h    |  1 -
- net/ipv4/esp4.c       | 49 ++++---------------------------------------
- net/ipv6/esp6.c       | 49 ++++---------------------------------------
- net/xfrm/xfrm_state.c |  3 ---
- 4 files changed, 8 insertions(+), 94 deletions(-)
+ net/ipv4/xfrm4_input.c | 18 ++++++++++--------
+ net/ipv6/xfrm6_input.c | 18 ++++++++++--------
+ 2 files changed, 20 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 39365fd2ea17..06ab2a3d2ebd 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -236,7 +236,6 @@ struct xfrm_state {
- 
- 	/* Data for encapsulator */
- 	struct xfrm_encap_tmpl	*encap;
--	struct sock __rcu	*encap_sk;
- 
- 	/* NAT keepalive */
- 	u32			nat_keepalive_interval; /* seconds */
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 876df672c0bf..f14a41ee4aa1 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -120,47 +120,16 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
- }
- 
- #ifdef CONFIG_INET_ESPINTCP
--struct esp_tcp_sk {
--	struct sock *sk;
--	struct rcu_head rcu;
--};
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index b5b06323cfd9..0d31a8c108d4 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -182,11 +182,15 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	int offset = skb_gro_offset(skb);
+ 	const struct net_offload *ops;
+ 	struct sk_buff *pp = NULL;
+-	int ret;
 -
--static void esp_free_tcp_sk(struct rcu_head *head)
--{
--	struct esp_tcp_sk *esk = container_of(head, struct esp_tcp_sk, rcu);
--
--	sock_put(esk->sk);
--	kfree(esk);
--}
--
- static struct sock *esp_find_tcp_sk(struct xfrm_state *x)
- {
- 	struct xfrm_encap_tmpl *encap = x->encap;
- 	struct net *net = xs_net(x);
--	struct esp_tcp_sk *esk;
- 	__be16 sport, dport;
--	struct sock *nsk;
- 	struct sock *sk;
+-	offset = offset - sizeof(struct udphdr);
++	int len, dlen;
++	__u8 *udpdata;
++	__be32 *udpdata32;
  
--	sk = rcu_dereference(x->encap_sk);
--	if (sk && sk->sk_state == TCP_ESTABLISHED)
--		return sk;
--
- 	spin_lock_bh(&x->lock);
- 	sport = encap->encap_sport;
- 	dport = encap->encap_dport;
--	nsk = rcu_dereference_protected(x->encap_sk,
--					lockdep_is_held(&x->lock));
--	if (sk && sk == nsk) {
--		esk = kmalloc(sizeof(*esk), GFP_ATOMIC);
--		if (!esk) {
--			spin_unlock_bh(&x->lock);
--			return ERR_PTR(-ENOMEM);
--		}
--		RCU_INIT_POINTER(x->encap_sk, NULL);
--		esk->sk = sk;
--		call_rcu(&esk->rcu, esp_free_tcp_sk);
--	}
- 	spin_unlock_bh(&x->lock);
+-	if (!pskb_pull(skb, offset))
++	len = skb->len - offset;
++	dlen = offset + min(len, 8);
++	udpdata = skb_gro_header(skb, dlen, offset);
++	udpdata32 = (__be32 *)udpdata;
++	if (unlikely(!udpdata))
+ 		return NULL;
  
- 	sk = inet_lookup_established(net, net->ipv4.tcp_death_row.hashinfo, x->id.daddr.a4,
-@@ -173,20 +142,6 @@ static struct sock *esp_find_tcp_sk(struct xfrm_state *x)
- 		return ERR_PTR(-EINVAL);
- 	}
+ 	rcu_read_lock();
+@@ -194,11 +198,10 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	if (!ops || !ops->callbacks.gro_receive)
+ 		goto out;
  
--	spin_lock_bh(&x->lock);
--	nsk = rcu_dereference_protected(x->encap_sk,
--					lockdep_is_held(&x->lock));
--	if (encap->encap_sport != sport ||
--	    encap->encap_dport != dport) {
--		sock_put(sk);
--		sk = nsk ?: ERR_PTR(-EREMCHG);
--	} else if (sk == nsk) {
--		sock_put(sk);
--	} else {
--		rcu_assign_pointer(x->encap_sk, sk);
--	}
--	spin_unlock_bh(&x->lock);
--
- 	return sk;
- }
+-	ret = __xfrm4_udp_encap_rcv(sk, skb, false);
+-	if (ret)
++	/* check if it is a keepalive or IKE packet */
++	if (len <= sizeof(struct ip_esp_hdr) || udpdata32[0] == 0)
+ 		goto out;
  
-@@ -211,6 +166,8 @@ static int esp_output_tcp_finish(struct xfrm_state *x, struct sk_buff *skb)
- 		err = espintcp_push_skb(sk, skb);
- 	bh_unlock_sock(sk);
+-	skb_push(skb, offset);
+ 	NAPI_GRO_CB(skb)->proto = IPPROTO_UDP;
  
-+	sock_put(sk);
-+
+ 	pp = call_gro_receive(ops->callbacks.gro_receive, head, skb);
+@@ -208,7 +211,6 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 
  out:
  	rcu_read_unlock();
- 	return err;
-@@ -394,6 +351,8 @@ static struct ip_esp_hdr *esp_output_tcp_encap(struct xfrm_state *x,
- 	if (IS_ERR(sk))
- 		return ERR_CAST(sk);
+-	skb_push(skb, offset);
+ 	NAPI_GRO_CB(skb)->same_flow = 0;
+ 	NAPI_GRO_CB(skb)->flush = 1;
  
-+	sock_put(sk);
-+
- 	*lenp = htons(len);
- 	esph = (struct ip_esp_hdr *)(lenp + 1);
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index 4abc5e9d6322..841c81abaaf4 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -179,14 +179,18 @@ struct sk_buff *xfrm6_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	int offset = skb_gro_offset(skb);
+ 	const struct net_offload *ops;
+ 	struct sk_buff *pp = NULL;
+-	int ret;
++	int len, dlen;
++	__u8 *udpdata;
++	__be32 *udpdata32;
  
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 574989b82179..72adfc107b55 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -137,47 +137,16 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
- }
+ 	if (skb->protocol == htons(ETH_P_IP))
+ 		return xfrm4_gro_udp_encap_rcv(sk, head, skb);
  
- #ifdef CONFIG_INET6_ESPINTCP
--struct esp_tcp_sk {
--	struct sock *sk;
--	struct rcu_head rcu;
--};
+-	offset = offset - sizeof(struct udphdr);
 -
--static void esp_free_tcp_sk(struct rcu_head *head)
--{
--	struct esp_tcp_sk *esk = container_of(head, struct esp_tcp_sk, rcu);
--
--	sock_put(esk->sk);
--	kfree(esk);
--}
--
- static struct sock *esp6_find_tcp_sk(struct xfrm_state *x)
- {
- 	struct xfrm_encap_tmpl *encap = x->encap;
- 	struct net *net = xs_net(x);
--	struct esp_tcp_sk *esk;
- 	__be16 sport, dport;
--	struct sock *nsk;
- 	struct sock *sk;
+-	if (!pskb_pull(skb, offset))
++	len = skb->len - offset;
++	dlen = offset + min(len, 8);
++	udpdata = skb_gro_header(skb, dlen, offset);
++	udpdata32 = (__be32 *)udpdata;
++	if (unlikely(!udpdata))
+ 		return NULL;
  
--	sk = rcu_dereference(x->encap_sk);
--	if (sk && sk->sk_state == TCP_ESTABLISHED)
--		return sk;
--
- 	spin_lock_bh(&x->lock);
- 	sport = encap->encap_sport;
- 	dport = encap->encap_dport;
--	nsk = rcu_dereference_protected(x->encap_sk,
--					lockdep_is_held(&x->lock));
--	if (sk && sk == nsk) {
--		esk = kmalloc(sizeof(*esk), GFP_ATOMIC);
--		if (!esk) {
--			spin_unlock_bh(&x->lock);
--			return ERR_PTR(-ENOMEM);
--		}
--		RCU_INIT_POINTER(x->encap_sk, NULL);
--		esk->sk = sk;
--		call_rcu(&esk->rcu, esp_free_tcp_sk);
--	}
- 	spin_unlock_bh(&x->lock);
+ 	rcu_read_lock();
+@@ -194,11 +198,10 @@ struct sk_buff *xfrm6_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	if (!ops || !ops->callbacks.gro_receive)
+ 		goto out;
  
- 	sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo, &x->id.daddr.in6,
-@@ -190,20 +159,6 @@ static struct sock *esp6_find_tcp_sk(struct xfrm_state *x)
- 		return ERR_PTR(-EINVAL);
- 	}
+-	ret = __xfrm6_udp_encap_rcv(sk, skb, false);
+-	if (ret)
++	/* check if it is a keepalive or IKE packet */
++	if (len <= sizeof(struct ip_esp_hdr) || udpdata32[0] == 0)
+ 		goto out;
  
--	spin_lock_bh(&x->lock);
--	nsk = rcu_dereference_protected(x->encap_sk,
--					lockdep_is_held(&x->lock));
--	if (encap->encap_sport != sport ||
--	    encap->encap_dport != dport) {
--		sock_put(sk);
--		sk = nsk ?: ERR_PTR(-EREMCHG);
--	} else if (sk == nsk) {
--		sock_put(sk);
--	} else {
--		rcu_assign_pointer(x->encap_sk, sk);
--	}
--	spin_unlock_bh(&x->lock);
--
- 	return sk;
- }
+-	skb_push(skb, offset);
+ 	NAPI_GRO_CB(skb)->proto = IPPROTO_UDP;
  
-@@ -228,6 +183,8 @@ static int esp_output_tcp_finish(struct xfrm_state *x, struct sk_buff *skb)
- 		err = espintcp_push_skb(sk, skb);
- 	bh_unlock_sock(sk);
+ 	pp = call_gro_receive(ops->callbacks.gro_receive, head, skb);
+@@ -208,7 +211,6 @@ struct sk_buff *xfrm6_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
  
-+	sock_put(sk);
-+
  out:
  	rcu_read_unlock();
- 	return err;
-@@ -424,6 +381,8 @@ static struct ip_esp_hdr *esp6_output_tcp_encap(struct xfrm_state *x,
- 	if (IS_ERR(sk))
- 		return ERR_CAST(sk);
+-	skb_push(skb, offset);
+ 	NAPI_GRO_CB(skb)->same_flow = 0;
+ 	NAPI_GRO_CB(skb)->flush = 1;
  
-+	sock_put(sk);
-+
- 	*lenp = htons(len);
- 	esph = (struct ip_esp_hdr *)(lenp + 1);
- 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 341d79ecb5c2..2f57dabcc70b 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -838,9 +838,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
- 		xfrm_nat_keepalive_state_updated(x);
- 		spin_unlock(&net->xfrm.xfrm_state_lock);
- 
--		if (x->encap_sk)
--			sock_put(rcu_dereference_raw(x->encap_sk));
--
- 		xfrm_dev_state_delete(x);
- 
- 		/* All xfrm_state objects are created by xfrm_state_alloc.
 -- 
 2.34.1
 
