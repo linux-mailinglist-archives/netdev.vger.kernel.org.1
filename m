@@ -1,184 +1,190 @@
-Return-Path: <netdev+bounces-192199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BBBDABEDC9
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:23:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8268FABEE0C
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 10:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B6883AC184
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBF2F3A919F
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724152367B1;
-	Wed, 21 May 2025 08:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8412367D5;
+	Wed, 21 May 2025 08:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Be/9/vAC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5677723536A
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 08:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB8321ABB9;
+	Wed, 21 May 2025 08:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747815788; cv=none; b=L8lAxpOpPotfI/i1GF/+p3g33lBkFAgtO0abUSFC6Y47FG8fnePDIIyDQ91D4lh8qaqh0uNbrRce7hunACXu1x1O97bu2fvcGfnRbIo+E+cHni7u7rPhgLczNHvdC/ZBUrRVSmomLVOfhyYOnAe70npFtg3byyv3ZWXkNMTDGg4=
+	t=1747816607; cv=none; b=R72ZFnXbtjYKYQBQ2IyNgfoNHbOmSOpdcGo2MGunLAlzgB7/XmiYR5rrt+/rfbwd7Li1E4XKZBrM1nCpuBJP2TgKjgz2g/+DD9pG3rACe92hm564oA3f/ccOWGFJ+mrc3a1uycefaZgfc9xru2oKd8nYrfvh4VdykLkqr4eNWt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747815788; c=relaxed/simple;
-	bh=8xOr9S6yQTV1LJ7OlLB1jbsHxVL2XCYQMFKqucXQMnc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXgocVWJl6e5aMMMzyprnAq/Wkhollz50R6pWXYW8ppREm1q4R+TEoT3ft9yhoGUneY4CfcKhaYKmGLNmsVNJZP5puwIvgQiHb++FM+Y+vNA+FK8YQgoabkLOF+qJTBABzptodGWBCcj7Ch9z5TdnIYtKI1VgFRF6w1MeRJ/WAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uHej3-0003J5-Sb
-	for netdev@vger.kernel.org; Wed, 21 May 2025 10:22:57 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uHej3-000XfE-1m
-	for netdev@vger.kernel.org;
-	Wed, 21 May 2025 10:22:57 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 3FC3E4166A4
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 08:22:57 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 1D14541668A;
-	Wed, 21 May 2025 08:22:55 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 1cef31f0;
-	Wed, 21 May 2025 08:22:52 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Carlos Sanchez <carlossanchez@geotab.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	stable@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 4/4] can: slcan: allow reception of short error messages
-Date: Wed, 21 May 2025 10:14:28 +0200
-Message-ID: <20250521082239.341080-6-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250521082239.341080-2-mkl@pengutronix.de>
-References: <20250521082239.341080-2-mkl@pengutronix.de>
+	s=arc-20240116; t=1747816607; c=relaxed/simple;
+	bh=nnZ32l/wC8IB5jxsCJX2rZsRy0WE1KOizSvfjplrc7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNYBLf92+yEc17lVg8voiaiiTNKPKeoPf7dpjOns8IT/BNzydZ2aRzbBjx2dHEcigr58SOlXEHLcRyVoeC/B/HU3A1d8u/ZKPqjOKt/ytROHMww+DMJjMSnl/tT55Ma/ajhJmn3TiosppnvNj09pmCQJ3Heejjqc87NyaoBFf0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Be/9/vAC; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747816606; x=1779352606;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nnZ32l/wC8IB5jxsCJX2rZsRy0WE1KOizSvfjplrc7A=;
+  b=Be/9/vACYnXUAVkakioZa7pJP2dg1RrzNYdiTpZkeELaaKULf5IBiYWP
+   roR1O7ZK0eDHqSftg8JRjAZaIWS5kV/cW+xpVg4BRMGWK9CpKflnkUOoe
+   zWXzG6cPz183OCbdMuhJBolOTid8E0QOeueNsNOj/eUjS6U8mytQfux04
+   OzBDg6+jE9yym9i85g/2LPWZWqok7S6+zeNpQOLeLqs5d3FMqV1aenMyV
+   DS7nmRyEeu6HLp+0ihn8Y5+lP0KAndESccIKvKcKHF5DGiFI82Z37Hp0r
+   oO1mXcSxAXDKwyPqTUwF+S/YS5np2QBNFPiXS4+A4ExtUjIqV1dRp0ydn
+   w==;
+X-CSE-ConnectionGUID: yOl7dAnPTiKX/hF9L9Ah0w==
+X-CSE-MsgGUID: 8YqJT6IeSpiHIhkzAmR2fA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="49043864"
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="49043864"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 01:36:45 -0700
+X-CSE-ConnectionGUID: 4K+HPBIqRFC6s6qIRvQhWw==
+X-CSE-MsgGUID: 8In+ItoKREOWT2IKIdO+lA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="144701684"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 01:36:43 -0700
+Date: Wed, 21 May 2025 10:36:06 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	andrew+netdev@lunn.ch, sgoutham@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com
+Subject: Re: [net PATCH 2/2] octeontx2-af: Fix APR entry mapping based on
+ APR_LMT_CFG
+Message-ID: <aC2QdjlVJTNhfvV9@mev-dev.igk.intel.com>
+References: <20250521060834.19780-1-gakula@marvell.com>
+ <20250521060834.19780-3-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521060834.19780-3-gakula@marvell.com>
 
-From: Carlos Sanchez <carlossanchez@geotab.com>
+On Wed, May 21, 2025 at 11:38:34AM +0530, Geetha sowjanya wrote:
+> The current implementation maps the APR table using a fixed size,
+> which can lead to incorrect mapping when the number of PFs and VFs
+> varies.
+> This patch corrects the mapping by calculating the APR table
+> size dynamically based on the values configured in the
+> APR_LMT_CFG register, ensuring accurate representation
+> of APR entries in debugfs.
+> 
+> Fixes: 0daa55d033b0 ("octeontx2-af: cn10k: debugfs for dumping LMTST map table").
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> ---
+>  drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c |  9 ++++++---
+>  .../net/ethernet/marvell/octeontx2/af/rvu_debugfs.c   | 11 ++++++++---
+>  2 files changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> index 3838c04b78c2..4a3370a40dd8 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+> @@ -13,7 +13,6 @@
+>  /* RVU LMTST */
+>  #define LMT_TBL_OP_READ		0
+>  #define LMT_TBL_OP_WRITE	1
+> -#define LMT_MAP_TABLE_SIZE	(128 * 1024)
+>  #define LMT_MAPTBL_ENTRY_SIZE	16
+>  #define LMT_MAX_VFS		256
+>  
+> @@ -26,10 +25,14 @@ static int lmtst_map_table_ops(struct rvu *rvu, u32 index, u64 *val,
+>  {
+>  	void __iomem *lmt_map_base;
+>  	u64 tbl_base, cfg;
+> +	int pfs, vfs;
+>  
+>  	tbl_base = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_MAP_BASE);
+> +	cfg  = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_CFG);
+> +	vfs = 1 << (cfg & 0xF);
+> +	pfs = 1 << ((cfg >> 4) & 0x7);
+>  
+> -	lmt_map_base = ioremap_wc(tbl_base, LMT_MAP_TABLE_SIZE);
+> +	lmt_map_base = ioremap_wc(tbl_base, pfs * vfs * LMT_MAPTBL_ENTRY_SIZE);
+>  	if (!lmt_map_base) {
+>  		dev_err(rvu->dev, "Failed to setup lmt map table mapping!!\n");
+>  		return -ENOMEM;
+> @@ -80,7 +83,7 @@ static int rvu_get_lmtaddr(struct rvu *rvu, u16 pcifunc,
+>  
+>  	mutex_lock(&rvu->rsrc_lock);
+>  	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_SMMU_ADDR_REQ, iova);
+> -	pf = rvu_get_pf(pcifunc) & 0x1F;
+> +	pf = rvu_get_pf(pcifunc) & RVU_PFVF_PF_MASK;
+>  	val = BIT_ULL(63) | BIT_ULL(14) | BIT_ULL(13) | pf << 8 |
+>  	      ((pcifunc & RVU_PFVF_FUNC_MASK) & 0xFF);
+>  	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_SMMU_TXN_REQ, val);
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> index a1f9ec03c2ce..c827da626471 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> @@ -553,6 +553,7 @@ static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,
+>  	u64 lmt_addr, val, tbl_base;
+>  	int pf, vf, num_vfs, hw_vfs;
+>  	void __iomem *lmt_map_base;
+> +	int apr_pfs, apr_vfs;
+>  	int buf_size = 10240;
+>  	size_t off = 0;
+>  	int index = 0;
+> @@ -568,8 +569,12 @@ static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,
+>  		return -ENOMEM;
+>  
+>  	tbl_base = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_MAP_BASE);
+> +	val  = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_CFG);
+> +	apr_vfs = 1 << (val & 0xF);
+> +	apr_pfs = 1 << ((val >> 4) & 0x7);
+>  
+> -	lmt_map_base = ioremap_wc(tbl_base, 128 * 1024);
+> +	lmt_map_base = ioremap_wc(tbl_base, apr_pfs * apr_vfs *
+> +				  LMT_MAPTBL_ENTRY_SIZE);
 
-Allows slcan to receive short messages (typically errors) from the serial
-interface.
+As it is the same as in lmtst_map_table_ops() I think you can move whole
+to a new function.
 
-When error support was added to slcan protocol in
-b32ff4668544e1333b694fcc7812b2d7397b4d6a ("can: slcan: extend the protocol
-with error info") the minimum valid message size changed from 5 (minimum
-standard can frame tIII0) to 3 ("e1a" is a valid protocol message, it is
-one of the examples given in the comments for slcan_bump_err() ), but the
-check for minimum message length prodicating all decoding was not adjusted.
-This makes short error messages discarded and error frames not being
-generated.
+rvu_ioremap_wc(rvu, base, size);
 
-This patch changes the minimum length to the new minimum (3 characters,
-excluding terminator, is now a valid message).
+or sth like that. It isn't strong opinion. Rest looks fine, thanks.
 
-Signed-off-by: Carlos Sanchez <carlossanchez@geotab.com>
-Fixes: b32ff4668544 ("can: slcan: extend the protocol with error info")
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Link: https://patch.msgid.link/20250520102305.1097494-1-carlossanchez@geotab.com
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/slcan/slcan-core.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/can/slcan/slcan-core.c b/drivers/net/can/slcan/slcan-core.c
-index 24c6622d36bd..58ff2ec1d975 100644
---- a/drivers/net/can/slcan/slcan-core.c
-+++ b/drivers/net/can/slcan/slcan-core.c
-@@ -71,12 +71,21 @@ MODULE_AUTHOR("Dario Binacchi <dario.binacchi@amarulasolutions.com>");
- #define SLCAN_CMD_LEN 1
- #define SLCAN_SFF_ID_LEN 3
- #define SLCAN_EFF_ID_LEN 8
-+#define SLCAN_DATA_LENGTH_LEN 1
-+#define SLCAN_ERROR_LEN 1
- #define SLCAN_STATE_LEN 1
- #define SLCAN_STATE_BE_RXCNT_LEN 3
- #define SLCAN_STATE_BE_TXCNT_LEN 3
--#define SLCAN_STATE_FRAME_LEN       (1 + SLCAN_CMD_LEN + \
--				     SLCAN_STATE_BE_RXCNT_LEN + \
--				     SLCAN_STATE_BE_TXCNT_LEN)
-+#define SLCAN_STATE_MSG_LEN     (SLCAN_CMD_LEN +		\
-+                                 SLCAN_STATE_LEN +		\
-+                                 SLCAN_STATE_BE_RXCNT_LEN +	\
-+                                 SLCAN_STATE_BE_TXCNT_LEN)
-+#define SLCAN_ERROR_MSG_LEN_MIN (SLCAN_CMD_LEN +	\
-+                                 SLCAN_ERROR_LEN +	\
-+                                 SLCAN_DATA_LENGTH_LEN)
-+#define SLCAN_FRAME_MSG_LEN_MIN (SLCAN_CMD_LEN +	\
-+                                 SLCAN_SFF_ID_LEN +	\
-+                                 SLCAN_DATA_LENGTH_LEN)
- struct slcan {
- 	struct can_priv         can;
- 
-@@ -176,6 +185,9 @@ static void slcan_bump_frame(struct slcan *sl)
- 	u32 tmpid;
- 	char *cmd = sl->rbuff;
- 
-+	if (sl->rcount < SLCAN_FRAME_MSG_LEN_MIN)
-+		return;
-+
- 	skb = alloc_can_skb(sl->dev, &cf);
- 	if (unlikely(!skb)) {
- 		sl->dev->stats.rx_dropped++;
-@@ -281,7 +293,7 @@ static void slcan_bump_state(struct slcan *sl)
- 		return;
- 	}
- 
--	if (state == sl->can.state || sl->rcount < SLCAN_STATE_FRAME_LEN)
-+	if (state == sl->can.state || sl->rcount != SLCAN_STATE_MSG_LEN)
- 		return;
- 
- 	cmd += SLCAN_STATE_BE_RXCNT_LEN + SLCAN_CMD_LEN + 1;
-@@ -328,6 +340,9 @@ static void slcan_bump_err(struct slcan *sl)
- 	bool rx_errors = false, tx_errors = false, rx_over_errors = false;
- 	int i, len;
- 
-+	if (sl->rcount < SLCAN_ERROR_MSG_LEN_MIN)
-+		return;
-+
- 	/* get len from sanitized ASCII value */
- 	len = cmd[1];
- 	if (len >= '0' && len < '9')
-@@ -456,8 +471,7 @@ static void slcan_bump(struct slcan *sl)
- static void slcan_unesc(struct slcan *sl, unsigned char s)
- {
- 	if ((s == '\r') || (s == '\a')) { /* CR or BEL ends the pdu */
--		if (!test_and_clear_bit(SLF_ERROR, &sl->flags) &&
--		    sl->rcount > 4)
-+		if (!test_and_clear_bit(SLF_ERROR, &sl->flags))
- 			slcan_bump(sl);
- 
- 		sl->rcount = 0;
--- 
-2.47.2
-
-
+>  	if (!lmt_map_base) {
+>  		dev_err(rvu->dev, "Failed to setup lmt map table mapping!!\n");
+>  		kfree(buf);
+> @@ -591,7 +596,7 @@ static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,
+>  		off += scnprintf(&buf[off], buf_size - 1 - off, "PF%d  \t\t\t",
+>  				    pf);
+>  
+> -		index = pf * rvu->hw->total_vfs * LMT_MAPTBL_ENTRY_SIZE;
+> +		index = pf * apr_vfs * LMT_MAPTBL_ENTRY_SIZE;
+>  		off += scnprintf(&buf[off], buf_size - 1 - off, " 0x%llx\t\t",
+>  				 (tbl_base + index));
+>  		lmt_addr = readq(lmt_map_base + index);
+> @@ -604,7 +609,7 @@ static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,
+>  		/* Reading num of VFs per PF */
+>  		rvu_get_pf_numvfs(rvu, pf, &num_vfs, &hw_vfs);
+>  		for (vf = 0; vf < num_vfs; vf++) {
+> -			index = (pf * rvu->hw->total_vfs * 16) +
+> +			index = (pf * apr_vfs * LMT_MAPTBL_ENTRY_SIZE) +
+>  				((vf + 1)  * LMT_MAPTBL_ENTRY_SIZE);
+>  			off += scnprintf(&buf[off], buf_size - 1 - off,
+>  					    "PF%d:VF%d  \t\t", pf, vf);
+> -- 
+> 2.25.1
 
