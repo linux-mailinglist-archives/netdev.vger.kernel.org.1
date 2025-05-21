@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-192170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A64ABEC5A
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:48:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 962A4ABEC59
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 08:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B99B3B7025
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 06:48:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 443771BA35EE
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 06:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A0B23A9A0;
-	Wed, 21 May 2025 06:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756D6239E9E;
+	Wed, 21 May 2025 06:45:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AEC23A563
-	for <netdev@vger.kernel.org>; Wed, 21 May 2025 06:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20367239E73
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 06:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747809958; cv=none; b=d64pX16+NpEEy11o7zi72NSv69lS3f11S3Mem0NWUbwaBhv8YNBHKGywxyLaYBLJEPgQzZEDXDJsEeOce7pP7D/f2mSI2aMoMd+qeeMa4HEbA+37e/uyoiziL+SqTjsXq6BM+dBtFaRlJESsFEg5S0KlpovIc0Ebsj6fjN7ePjg=
+	t=1747809955; cv=none; b=XuGVVLOhTqFz3INCTtfH8zYguNk1ZHrqAqA0Ck6kIMSnmsOEkfVWqTMCxfPInw9zxqdfmE3mGxlB8lC6OXjKSZUWGDQua9GURgxQp0wjNtjJQWJDn0bb9JaXHzUw3boct8E0Gr/QSlZV0QktoNvhEWHEksE7mowhrZBHr+EcNK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747809958; c=relaxed/simple;
-	bh=MZ9XrhJl5gvFRup1aU5S+6jaCvHnXmeuEjEG9R0PeLU=;
+	s=arc-20240116; t=1747809955; c=relaxed/simple;
+	bh=FhsIHBqU1Xp8UxCF/jvt3eoIldzfqOrny0ARQiwRvF4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sy+6M6HQZXi1zx0F+fte9CnTfhP3gzNgOfnEspTZAHMWcESr5bR41xJMMQ+kkEEaA3HCJM/GOrdyhFLjY+qWmHL2BX56xvo50bCGBwPguOBWBPFTXscc9SsjN6pgHva9WAMfdEevTPCwqXBJCgB9pqtNVQfVX5f7PEhaeHTbTo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
+	 MIME-Version; b=itQnCwdNGmw7D23aq+/ANSVw4X6Brw4adOCmN5iLmozYeQ83r9KL0uvbvFDgzaKpT6i1+EZ9QGJYXMVTN7pws/04M+yV4eo6n1HZxDjF68Pgbe4lQvTt+hmn7cuQK7gfwh7kO0vSe6mgF4m6TF8bnO9nbxhotOQkwQAe6Q6aTEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpsz8t1747809865t7c6f10a4
-X-QQ-Originating-IP: EvrDiIy8BPH9L2hWQzgVvuxdoNYsLE4WSu1KaBWvDpU=
+X-QQ-mid: zesmtpsz8t1747809867ta0e3630a
+X-QQ-Originating-IP: ZGrHfisIbch6ynHWcfTan2nA/WJwcAMKqIgjNcq9B4E=
 Received: from w-MS-7E16.trustnetic.com ( [125.120.71.166])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 21 May 2025 14:44:24 +0800 (CST)
+	id ; Wed, 21 May 2025 14:44:26 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15518581242333566290
+X-BIZMAIL-ID: 10489968241910633397
 EX-QQ-RecipientCnt: 10
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ To: netdev@vger.kernel.org,
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v2 1/9] net: txgbe: Remove specified SP type
-Date: Wed, 21 May 2025 14:43:54 +0800
-Message-ID: <8EF712EC14B8FF70+20250521064402.22348-2-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 2/9] net: wangxun: Use specific flag bit to simplify the code
+Date: Wed, 21 May 2025 14:43:55 +0800
+Message-ID: <C731132E124D75E5+20250521064402.22348-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250521064402.22348-1-jiawenwu@trustnetic.com>
 References: <20250521064402.22348-1-jiawenwu@trustnetic.com>
@@ -64,212 +64,264 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N4KH/PyO63QvOWPZxvhDMbt113Ce9Hhed1/xTw+mgPGrlsEjWn9N8VDg
-	5bxGsZTEkXzEIn+QWdHD3/P4roNvzi2dm8mQO8oc6Ten/U4AImkZLdQPrFCnC6WQe50PEyA
-	+HQHs/qA+27aC93x4TXKNcmtdCe/NqLwWaM1hlzxuXekDHMXTM1v6d64xeIcPlE5UmdayCH
-	ryoGWWAdMJvsGV8OxGCkxNhxMuILUuKPHeRIbdbDdryes/Pwyz2NiYbqEa3uvscPrDTO8hm
-	VqowEEcn2YSqOb7gGr005lYIS1BCvREMRTnfDVUCDVGvKMVmDf/cnc41mLyAQwAlcDeLrE4
-	jf5foac9SZbQ8+13fvHpMWOeSKu4lowSXaRiHUG69gv/9ZFjMGGZUJv9NUuvDVwKAduzNgz
-	vsV0iZ4GoJmNcIcCSRUZQzg7wq3I6kYaHgzSlTmK/hY4tu8pZnDICC/bxOWDXhJHr1g8MfM
-	u4q0a4asOg6D8cYim/BkZ+faH8+2O6orGZ1LzgLYejhkPMUuIbH2TpZh84jVtuzoPEHLq7b
-	PPVMKHf1pGM0Rvi19CfJZHoYMCoIaf/X8tXgJ0k7lf2+a+ywEOr/V0IMDP8trFE+2oEA4vj
-	1a9XEqpwU+44lARlIQ1RJ2AZum9vcBgK2PUsMeJNvVA3CRYX1UYUODEvaLtFb9fkEa5dDHH
-	nI/WjCtvhqzheQRHgPrH/CrA/UTeFQZuizpRv8BFnscol41itDMJNo7XEVgBSP6L3Q8Pc//
-	UZhz7JUBcFcV+Srt4m1N5BKV6Wc0yzfd4wAs8wnTkm56EoW3+zSBg2PsGtOpGVEsf4Hu7TU
-	VdMZMfL+1GG2Xnjn5HkBVWPwQNxbRuXq3W2XtMm97N8ftXRmBUdCeQNACP8Ea6EdZAk3Ozo
-	+w2gw5b5wUB2eoHAczmq0lmlIzHw5LdcjhaJusCBonvpHq4v5nWIHVqWmi17359GKrMLVMc
-	lGMy4LEi5Ihf2+84M4A7oV/OpT2BMbW98BkLYEMEomb7zoH1PMHIUoMkO0oXTL/HiWJqxK0
-	jN8c5d6/IxJwsge1LsgaIJjkB5W0VJ+IFO037/aCVs01/UF0zc
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: NpfbsqbTlzxUQUaLYkMxuBrfKtSaeL6u7mrvsmLlKqztBjTsMQuPRWB0
+	RJIm4cbC+MyyhJcKe9hqhcaJWvR5VxsPB3tlvQrU6ss0/t9ZGRlCfXSoHSOYLyA6NtS8d3Z
+	6Ax/mp6d2i+BAe0IfabPPsYg+NSYDXEApHrCqpCiDlhdsbByyGD1/XxX2i9d9cBp0EKR12q
+	Cw/++tGBefC4qjm7uapLxJeYgxlBjDtyHDLpoFgA+uOO7g5w1Jst5atZ5yfi2rfkZ56Sz4t
+	2vl8hoUVcmMLX+W4kSQc5PLJx5to6E2oA6e6PPGrASWUKvYTjPwvMRfk+Z2pta++YRDONA8
+	h9Fj9xYliS17rnENUKnxMSf8RvJJH3orgh0HonJaqMcuSbkhdQpTf8h26B89YMAPQWi/kTV
+	fgw6Q9IGSiyPKV/p2JEhpqamaxqSkO4qLzcJGE5kJDb/aDBcuQuAfzpPSnwg/eKFh3xlLPG
+	i7lBSbhH7PbngzsDAnMyHIg41pL0QduB49sJ8jni+JrLHSyjYEcR2m4VE1eb90ZlfQxmS6S
+	ll6OJgGp3ZAuGtuJqE8tkE5c05ATMQ7TpGpcZWRwqxIs8v1LjMuHy5wRmOwT7qjJ1OSRxcU
+	b+Wep+GLY36fK1oXTb7ub+cLCx8+h5Z2KynrAoazxRSdw55gUjE27RGWMhv+LkxPshEWU1y
+	pU0z0Z/n39y4PBn2KhAW8c9v/W565pxtTird2BeWTBksuRq6iFKnWaqW6Phv23mtNnBPtRC
+	jJL5JJ9ze9eTe5xD65jm35z1yMDyVdq428tlTgMEcsRrbkJyTM8kDsJBqX+vAX9QKtKupqq
+	CM5rtnATviuFuwodecE7NBJ1qA9OYy7izk0IXVtGKMuEKWDJFK1bFMllnEqXzYXpzJcEypM
+	iRZIkF0KaaKlT/62pfWG/w+EuwVOnyeO02ptUHjaZTpbH3i1vzf8E1vIcJMCcl28mQIjARN
+	iFcnXboUqTIMfbbLDLucZa4JwWboB7Zj5MbfO9RmX0+cGRMPD2PUdaFTiL5UbYCGFdSGjmE
+	P2dmLqoBWjsCWxfhbWUKTSCfLuAJIVptmaPo6b+A==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
 X-QQ-RECHKSPAM: 0
 
-Since AML devices are going to reuse some definitions, remove the "SP"
-qualifier from these definitions.
+Most of the different code that requires MAC type in the common library
+is due to NGBE only supports a few queues and pools, unlike TXGBE, which
+supports 128 queues and 64 pools. This difference accounts for most of
+the hardware configuration differences in the driver code. So add a flag
+bit "WX_FLAG_MULTI_64_FUNC" for them to clean-up the driver code.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_type.h  | 12 ++++-----
- drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  4 +--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 26 +++++++++----------
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  8 +++---
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   | 14 +++++-----
- 5 files changed, 32 insertions(+), 32 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  9 ++---
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 35 ++++---------------
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 10 +++---
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c |  8 ++---
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
+ 6 files changed, 20 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 8cfed5d4ebf7..5f024f5ac3a6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -840,11 +840,11 @@ enum wx_mac_type {
- 	wx_mac_aml,
- };
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index 43019ec9329c..d58d7a8735bc 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -413,15 +413,10 @@ static unsigned int wx_max_channels(struct wx *wx)
+ 		max_combined = 1;
+ 	} else {
+ 		/* support up to max allowed queues with RSS */
+-		switch (wx->mac.type) {
+-		case wx_mac_sp:
+-		case wx_mac_aml:
++		if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
+ 			max_combined = 63;
+-			break;
+-		default:
++		else
+ 			max_combined = 8;
+-			break;
+-		}
+ 	}
  
--enum sp_media_type {
--	sp_media_unknown = 0,
--	sp_media_fiber,
--	sp_media_copper,
--	sp_media_backplane
-+enum wx_media_type {
-+	wx_media_unknown = 0,
-+	wx_media_fiber,
-+	wx_media_copper,
-+	wx_media_backplane
- };
+ 	return max_combined;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 143cc1088eea..1c5c14ac61bc 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -113,15 +113,10 @@ static void wx_intr_disable(struct wx *wx, u64 qmask)
+ 	if (mask)
+ 		wr32(wx, WX_PX_IMS(0), mask);
  
- enum em_mac_type {
-@@ -1211,7 +1211,7 @@ struct wx {
- 	struct wx_mbx_info mbx;
- 	struct wx_mac_info mac;
- 	enum em_mac_type mac_type;
--	enum sp_media_type media_type;
-+	enum wx_media_type media_type;
- 	struct wx_eeprom_info eeprom;
- 	struct wx_addr_filter_info addr_ctrl;
- 	struct wx_fc_info fc;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-index a054b259d435..e551ae0e2069 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-@@ -188,7 +188,7 @@ int txgbe_reset_hw(struct wx *wx)
- 	if (status != 0)
- 		return status;
- 
--	if (wx->media_type != sp_media_copper) {
-+	if (wx->media_type != wx_media_copper) {
- 		u32 val;
- 
- 		val = WX_MIS_RST_LAN_RST(wx->bus.func);
-@@ -218,7 +218,7 @@ int txgbe_reset_hw(struct wx *wx)
- 	 * clear the multicast table.  Also reset num_rar_entries to 128,
- 	 * since we modify this value when programming the SAN MAC address.
- 	 */
--	wx->mac.num_rar_entries = TXGBE_SP_RAR_ENTRIES;
-+	wx->mac.num_rar_entries = TXGBE_RAR_ENTRIES;
- 	wx_init_rx_addrs(wx);
- 
- 	pci_set_master(wx->pdev);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index f57d84628e07..ea0b1cb721c8 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -251,25 +251,25 @@ static void txgbe_init_type_code(struct wx *wx)
- 
- 	switch (device_type) {
- 	case TXGBE_ID_SFP:
--		wx->media_type = sp_media_fiber;
-+		wx->media_type = wx_media_fiber;
- 		break;
- 	case TXGBE_ID_XAUI:
- 	case TXGBE_ID_SGMII:
--		wx->media_type = sp_media_copper;
-+		wx->media_type = wx_media_copper;
- 		break;
- 	case TXGBE_ID_KR_KX_KX4:
- 	case TXGBE_ID_MAC_XAUI:
- 	case TXGBE_ID_MAC_SGMII:
--		wx->media_type = sp_media_backplane;
-+		wx->media_type = wx_media_backplane;
- 		break;
- 	case TXGBE_ID_SFI_XAUI:
- 		if (wx->bus.func == 0)
--			wx->media_type = sp_media_fiber;
-+			wx->media_type = wx_media_fiber;
- 		else
--			wx->media_type = sp_media_copper;
-+			wx->media_type = wx_media_copper;
- 		break;
- 	default:
--		wx->media_type = sp_media_unknown;
-+		wx->media_type = wx_media_unknown;
- 		break;
+-	switch (wx->mac.type) {
+-	case wx_mac_sp:
+-	case wx_mac_aml:
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		mask = (qmask >> 32);
+ 		if (mask)
+ 			wr32(wx, WX_PX_IMS(1), mask);
+-		break;
+-	default:
+-		break;
  	}
  }
-@@ -283,13 +283,13 @@ static int txgbe_sw_init(struct wx *wx)
- 	u16 msix_count = 0;
- 	int err;
  
--	wx->mac.num_rar_entries = TXGBE_SP_RAR_ENTRIES;
--	wx->mac.max_tx_queues = TXGBE_SP_MAX_TX_QUEUES;
--	wx->mac.max_rx_queues = TXGBE_SP_MAX_RX_QUEUES;
--	wx->mac.mcft_size = TXGBE_SP_MC_TBL_SIZE;
--	wx->mac.vft_size = TXGBE_SP_VFT_TBL_SIZE;
--	wx->mac.rx_pb_size = TXGBE_SP_RX_PB_SIZE;
--	wx->mac.tx_pb_size = TXGBE_SP_TDB_PB_SZ;
-+	wx->mac.num_rar_entries = TXGBE_RAR_ENTRIES;
-+	wx->mac.max_tx_queues = TXGBE_MAX_TXQ;
-+	wx->mac.max_rx_queues = TXGBE_MAX_RXQ;
-+	wx->mac.mcft_size = TXGBE_MC_TBL_SIZE;
-+	wx->mac.vft_size = TXGBE_VFT_TBL_SIZE;
-+	wx->mac.rx_pb_size = TXGBE_RX_PB_SIZE;
-+	wx->mac.tx_pb_size = TXGBE_TDB_PB_SZ;
+@@ -133,15 +128,10 @@ void wx_intr_enable(struct wx *wx, u64 qmask)
+ 	if (mask)
+ 		wr32(wx, WX_PX_IMC(0), mask);
  
- 	/* PCI config space info */
- 	err = wx_sw_init(wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 1863cfd27ee7..b5ae7c25ac99 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -165,7 +165,7 @@ static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *confi
- 	struct wx *wx = phylink_to_wx(config);
- 	struct txgbe *txgbe = wx->priv;
+-	switch (wx->mac.type) {
+-	case wx_mac_sp:
+-	case wx_mac_aml:
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		mask = (qmask >> 32);
+ 		if (mask)
+ 			wr32(wx, WX_PX_IMC(1), mask);
+-		break;
+-	default:
+-		break;
+ 	}
+ }
+ EXPORT_SYMBOL(wx_intr_enable);
+@@ -774,14 +764,8 @@ static int wx_set_rar(struct wx *wx, u32 index, u8 *addr, u64 pools,
+ 	/* setup VMDq pool mapping */
+ 	wr32(wx, WX_PSR_MAC_SWC_VM_L, pools & 0xFFFFFFFF);
  
--	if (wx->media_type != sp_media_copper)
-+	if (wx->media_type != wx_media_copper)
- 		return txgbe->pcs;
+-	switch (wx->mac.type) {
+-	case wx_mac_sp:
+-	case wx_mac_aml:
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
+ 		wr32(wx, WX_PSR_MAC_SWC_VM_H, pools >> 32);
+-		break;
+-	default:
+-		break;
+-	}
  
- 	return NULL;
-@@ -278,7 +278,7 @@ static int txgbe_phylink_init(struct txgbe *txgbe)
- 	config->mac_capabilities = MAC_10000FD | MAC_1000FD | MAC_100FD |
- 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+ 	/* HW expects these in little endian so we reverse the byte
+ 	 * order from network order (big endian) to little endian
+@@ -919,14 +903,9 @@ void wx_init_rx_addrs(struct wx *wx)
  
--	if (wx->media_type == sp_media_copper) {
-+	if (wx->media_type == wx_media_copper) {
- 		phy_mode = PHY_INTERFACE_MODE_XAUI;
- 		__set_bit(PHY_INTERFACE_MODE_XAUI, config->supported_interfaces);
+ 		wx_set_rar(wx, 0, wx->mac.addr, 0, WX_PSR_MAC_SWC_AD_H_AV);
+ 
+-		switch (wx->mac.type) {
+-		case wx_mac_sp:
+-		case wx_mac_aml:
++		if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 			/* clear VMDq pool/queue selection for RAR 0 */
+ 			wx_clear_vmdq(wx, 0, WX_CLEAR_VMDQ_ALL);
+-			break;
+-		default:
+-			break;
+ 		}
+ 	}
+ 
+@@ -1512,7 +1491,7 @@ static void wx_configure_virtualization(struct wx *wx)
+ 		wr32m(wx, WX_PSR_VM_L2CTL(pool),
+ 		      WX_PSR_VM_L2CTL_AUPE, WX_PSR_VM_L2CTL_AUPE);
+ 
+-	if (wx->mac.type == wx_mac_em) {
++	if (!test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		vf_shift = BIT(VMDQ_P(0));
+ 		/* Enable only the PF pools for Tx/Rx */
+ 		wr32(wx, WX_RDM_VF_RE(0), vf_shift);
+@@ -1543,7 +1522,7 @@ static void wx_configure_port(struct wx *wx)
+ {
+ 	u32 value, i;
+ 
+-	if (wx->mac.type == wx_mac_em) {
++	if (!test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		value = (wx->num_vfs == 0) ?
+ 			WX_CFG_PORT_CTL_NUM_VT_NONE :
+ 			WX_CFG_PORT_CTL_NUM_VT_8;
+@@ -2074,7 +2053,7 @@ static void wx_setup_psrtype(struct wx *wx)
+ 		  WX_RDB_PL_CFG_TUN_OUTL2HDR |
+ 		  WX_RDB_PL_CFG_TUN_TUNHDR;
+ 
+-	if (wx->mac.type == wx_mac_em) {
++	if (!test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		for_each_set_bit(pool, &wx->fwd_bitmask, 8)
+ 			wr32(wx, WX_RDB_PL_CFG(VMDQ_P(pool)), psrtype);
  	} else {
-@@ -576,7 +576,7 @@ int txgbe_init_phy(struct txgbe *txgbe)
- 	if (wx->mac.type == wx_mac_aml)
- 		return 0;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index 2a808afeb414..eab16c57b039 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -1633,7 +1633,7 @@ static bool wx_set_vmdq_queues(struct wx *wx)
+ 	/* Add starting offset to total pool count */
+ 	vmdq_i += wx->ring_feature[RING_F_VMDQ].offset;
  
--	if (txgbe->wx->media_type == sp_media_copper)
-+	if (txgbe->wx->media_type == wx_media_copper)
- 		return txgbe_ext_phy_init(txgbe);
+-	if (wx->mac.type == wx_mac_sp) {
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		/* double check we are limited to maximum pools */
+ 		vmdq_i = min_t(u16, 64, vmdq_i);
  
- 	ret = txgbe_swnodes_register(txgbe);
-@@ -643,7 +643,7 @@ void txgbe_remove_phy(struct txgbe *txgbe)
- 	if (txgbe->wx->mac.type == wx_mac_aml)
- 		return;
+@@ -1693,7 +1693,7 @@ static void wx_set_rss_queues(struct wx *wx)
  
--	if (txgbe->wx->media_type == sp_media_copper) {
-+	if (txgbe->wx->media_type == wx_media_copper) {
- 		phylink_disconnect_phy(txgbe->wx->phylink);
- 		phylink_destroy(txgbe->wx->phylink);
- 		return;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 261a83308568..8376248fecda 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -173,13 +173,13 @@
- #define TXGBE_MAX_RX_QUEUES   (TXGBE_MAX_FDIR_INDICES + 1)
- #define TXGBE_MAX_TX_QUEUES   (TXGBE_MAX_FDIR_INDICES + 1)
+ 	/* set mask for 16 queue limit of RSS */
+ 	f = &wx->ring_feature[RING_F_RSS];
+-	if (wx->mac.type == wx_mac_sp)
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
+ 		f->mask = WX_RSS_64Q_MASK;
+ 	else
+ 		f->mask = WX_RSS_8Q_MASK;
+@@ -1853,7 +1853,7 @@ static bool wx_cache_ring_vmdq(struct wx *wx)
+ 	if (!test_bit(WX_FLAG_VMDQ_ENABLED, wx->flags))
+ 		return false;
  
--#define TXGBE_SP_MAX_TX_QUEUES  128
--#define TXGBE_SP_MAX_RX_QUEUES  128
--#define TXGBE_SP_RAR_ENTRIES    128
--#define TXGBE_SP_MC_TBL_SIZE    128
--#define TXGBE_SP_VFT_TBL_SIZE   128
--#define TXGBE_SP_RX_PB_SIZE     512
--#define TXGBE_SP_TDB_PB_SZ      (160 * 1024) /* 160KB Packet Buffer */
-+#define TXGBE_MAX_TXQ        128
-+#define TXGBE_MAX_RXQ        128
-+#define TXGBE_RAR_ENTRIES    128
-+#define TXGBE_MC_TBL_SIZE    128
-+#define TXGBE_VFT_TBL_SIZE   128
-+#define TXGBE_RX_PB_SIZE     512
-+#define TXGBE_TDB_PB_SZ      (160 * 1024) /* 160KB Packet Buffer */
+-	if (wx->mac.type == wx_mac_sp) {
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		/* start at VMDq register offset for SR-IOV enabled setups */
+ 		reg_idx = vmdq->offset * __ALIGN_MASK(1, ~vmdq->mask);
+ 		for (i = 0; i < wx->num_rx_queues; i++, reg_idx++) {
+@@ -2354,10 +2354,10 @@ void wx_configure_vectors(struct wx *wx)
  
- #define TXGBE_MAX_VFS_DRV_LIMIT                 63
+ 	if (pdev->msix_enabled) {
+ 		/* Populate MSIX to EITR Select */
+-		if (wx->mac.type == wx_mac_sp) {
++		if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 			if (wx->num_vfs >= 32)
+ 				eitrsel = BIT(wx->num_vfs % 32) - 1;
+-		} else if (wx->mac.type == wx_mac_em) {
++		} else {
+ 			for (i = 0; i < wx->num_vfs; i++)
+ 				eitrsel |= BIT(i);
+ 		}
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+index 52e6a6faf715..16c8fb246c41 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+@@ -106,7 +106,7 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
+ 		wx->vfinfo[i].xcast_mode = WXVF_XCAST_MODE_NONE;
+ 	}
  
+-	if (wx->mac.type == wx_mac_em) {
++	if (!test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		value = WX_CFG_PORT_CTL_NUM_VT_8;
+ 	} else {
+ 		if (num_vfs < 32)
+@@ -599,10 +599,10 @@ static int wx_set_vf_vlan_msg(struct wx *wx, u32 *msgbuf, u16 vf)
+ 		if (VMDQ_P(0) < 32) {
+ 			bits = rd32(wx, WX_PSR_VLAN_SWC_VM_L);
+ 			bits &= ~BIT(VMDQ_P(0));
+-			if (wx->mac.type != wx_mac_em)
++			if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
+ 				bits |= rd32(wx, WX_PSR_VLAN_SWC_VM_H);
+ 		} else {
+-			if (wx->mac.type != wx_mac_em)
++			if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags))
+ 				bits = rd32(wx, WX_PSR_VLAN_SWC_VM_H);
+ 			bits &= ~BIT(VMDQ_P(0) % 32);
+ 			bits |= rd32(wx, WX_PSR_VLAN_SWC_VM_L);
+@@ -848,7 +848,7 @@ void wx_disable_vf_rx_tx(struct wx *wx)
+ {
+ 	wr32(wx, WX_TDM_VFTE_CLR(0), U32_MAX);
+ 	wr32(wx, WX_RDM_VFRE_CLR(0), U32_MAX);
+-	if (wx->mac.type != wx_mac_em) {
++	if (test_bit(WX_FLAG_MULTI_64_FUNC, wx->flags)) {
+ 		wr32(wx, WX_TDM_VFTE_CLR(1), U32_MAX);
+ 		wr32(wx, WX_RDM_VFRE_CLR(1), U32_MAX);
+ 	}
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 5f024f5ac3a6..6563d30e60c5 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -1184,6 +1184,7 @@ struct vf_macvlans {
+ };
+ 
+ enum wx_pf_flags {
++	WX_FLAG_MULTI_64_FUNC,
+ 	WX_FLAG_SWFW_RING,
+ 	WX_FLAG_VMDQ_ENABLED,
+ 	WX_FLAG_VLAN_PROMISC,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index ea0b1cb721c8..0c81d8fc2f7d 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -318,6 +318,7 @@ static int txgbe_sw_init(struct wx *wx)
+ 	wx->configure_fdir = txgbe_configure_fdir;
+ 
+ 	set_bit(WX_FLAG_RSC_CAPABLE, wx->flags);
++	set_bit(WX_FLAG_MULTI_64_FUNC, wx->flags);
+ 
+ 	/* enable itr by default in dynamic mode */
+ 	wx->rx_itr_setting = 1;
 -- 
 2.48.1
 
