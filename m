@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-192451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA5FABFEE6
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:27:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C1FABFEEA
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 23:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF7C34E55ED
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A41864E5497
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 21:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ABD2BD019;
-	Wed, 21 May 2025 21:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21FA2BCF7E;
+	Wed, 21 May 2025 21:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZOB+chS"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kBOvpatt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE54C2BD010;
-	Wed, 21 May 2025 21:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4D02367DA
+	for <netdev@vger.kernel.org>; Wed, 21 May 2025 21:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747862816; cv=none; b=oprZ5LcQey1gZxDtsA5476HbTdkXD/fT8yhE0ZaJiLSQ3A+n6dehH8K/nDkA3YhbOlH3Famg/Nf5+hTgq/Kjez53dolCoicnrYq+P9RFK9zXUMoZBQHCyFlmG907EtfhdNOpE91Bs8+GJwfGMRaddrnI7VuodqDkNFUh7noK/Bg=
+	t=1747862841; cv=none; b=abZcDzLEPFZU8JU5yIRUgdsaKSqopOwNBTrSsckwB30z0+2Y+/K5UC77jEz+U2r3AmhfRsMpfnwpRoU9Mh8TXp2wyBrfGcyh7g9FNqw6K1rYtVFpYODkYIvuDz0+5IjIhmAs9GRcCQn4D8OjA1+sHixYx7yqY7M2Rdr0hiqN8Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747862816; c=relaxed/simple;
-	bh=fGPASh4PnhqGsRBERfiWfGeflFxih9Uu3XXYIV/d5fM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WIEfEF/pFDpuzuciYoDEAiGTZ8bC70CDn1iqiEWisnfocNDnkQkpYVK696Yfh9owl0/7oX1y8WqTLVZnpXUGy6IAqHxrBg0R1H2jA/4Q6Owo6cEYeJOHLkMAJlpwoMgmQrkJ5ZZ1x5ZbyT9f7VFCS+Neb79Cu++ehZvO0dTX5cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZOB+chS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03C7AC4CEE4;
-	Wed, 21 May 2025 21:26:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747862816;
-	bh=fGPASh4PnhqGsRBERfiWfGeflFxih9Uu3XXYIV/d5fM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eZOB+chSSLV8SKqh6nzA1/jA+EAOKShILiHoROXIIzGC0Ux6TAhKaPr1EE3GtTjs+
-	 aN9ygVcaIEXKM/5gW0rI36sctXs9ZM40o+11oT7fl2371DkjsrpMO0R+gWACXJS/rf
-	 tFO2pe1lTs6Mt3UEVF9ZpTMB3Xl52P17rNVb0+zX03Sup6n/RnzE9h03i+Ny+XGeGv
-	 H4teh8jF5dAyTT+Ocmq0S4WRtaWvUuCfkpK6LCtpm6F6BSPP9wOaP1/EN8XA8YjLXi
-	 +2+32dgEEV4YKRYjhnCd1M/Bi/X70mJZzNFeTFkRVrWC1Ln71ChZSL1gRKW/Tsn0Lw
-	 w+DBMj1pl6Biw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	dhowells@redhat.com,
-	kees@kernel.org,
-	gustavoars@kernel.org,
-	aleksander.lobakin@intel.com,
-	tstruk@gigaio.com
-Subject: [PATCH] stddef: don't include compiler_types.h in the uAPI header
-Date: Wed, 21 May 2025 14:26:44 -0700
-Message-ID: <20250521212644.981148-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747862841; c=relaxed/simple;
+	bh=gFNpEdUUeb66cgnpY7pgymb1J0f31G+QOxN0RNBKp4g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q4cpjMuAvC8Qs5plhuhSd5owVpzSa4+oZ3ykPwyuodH2ffyF85MqXCHG9I9Wppr6JRoJ5w1BZzbStLFOMdMtCptqIgUobFsii0r1AtJGy0jMFxnZAls3viDCoW3SPEwxc+afeERzmQGVPYzor9JLy6aYQYdSrXadcUjY73M/cWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=kBOvpatt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91924C4CEE4;
+	Wed, 21 May 2025 21:27:19 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kBOvpatt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1747862837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BMJqugZzhRL4B01TTXZcWexDxBOWDxwW9juMAOSZrfo=;
+	b=kBOvpattxXi6vKg/bj36IJPDmNO+PVhTr6ZYAsiJP1OZiVKrYVeQIpv+yWEE0EaQVhXX+4
+	Dk/7Igsjs6cb/c/vH+YYZ2kz5fmIiJnAeuShOGx4FlQ7pejQ98wiPvjGUl7jnfj5bVmj3l
+	y3TIWRW8Ltht+30RC0rvYTjGXBLyqX8=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 70151021 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 21 May 2025 21:27:16 +0000 (UTC)
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: netdev@vger.kernel.org,
+	kuba@kernel.org
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net-next 0/5] wireguard updates for 6.16
+Date: Wed, 21 May 2025 23:27:02 +0200
+Message-ID: <20250521212707.1767879-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,51 +59,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The uAPI stddef header includes compiler_types.h, a non-uAPI
-header. There is a hack in scripts/headers_install.sh which
-strips includes of compiler.h and compiler_types.h.
+Hi Jakub,
 
-But AFAICT there is nothing in stddef.h which would need
-the include. The include dates back to when uAPI stddef.h
-was first created, back then the including of compiler.h
-was the only line in the file. So presumably stddef.h
-has been including compiler headers to retain some
-chain of dependency? Perhaps someone with more build system
-understanding knows what that chain would be, given
-kernel doesn't include uAPI stddef.h, and user space
-has the compiler headers stripped.
+This small series contains mostly cleanups and one new feature:
 
-Since nothing needs this include, let's remove it.
-Builds pass on x86, arm64, csky, m68k, riscv32.
-The direct motivation for the change is that the includes
-of compiler.h and co. make it hard to include uAPI headers
-from tools/.
+1) Kees' __nonstring annotation comes to wireguard.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: dhowells@redhat.com
-CC: kees@kernel.org
-CC: gustavoars@kernel.org
-CC: aleksander.lobakin@intel.com
-CC: tstruk@gigaio.com
----
- include/uapi/linux/stddef.h | 2 --
- 1 file changed, 2 deletions(-)
+2) Two selftest fixes, one to help with compilation on gcc 15, and one
+   removing stale config options.
 
-diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
-index b87df1b485c2..3da0266643e6 100644
---- a/include/uapi/linux/stddef.h
-+++ b/include/uapi/linux/stddef.h
-@@ -2,8 +2,6 @@
- #ifndef _UAPI_LINUX_STDDEF_H
- #define _UAPI_LINUX_STDDEF_H
- 
--#include <linux/compiler_types.h>
--
- #ifndef __always_inline
- #define __always_inline inline
- #endif
+3) Adoption of NLA_POLICY_MASK.
+
+4) Jordan has added the ability to run:
+
+    # wg set ... peer ... allowed-ips -192.168.1.0/24
+
+  Which will remove the allowed IP for that peer. Previously you had to
+  replace all the IPs non-atomically, or move it to a dummy peer
+  atomically, which wasn't very clean.
+
+Please pull!
+
+Thanks,
+Jason
+
+
+Jason A. Donenfeld (2):
+  wireguard: netlink: use NLA_POLICY_MASK where possible
+  wireguard: selftests: specify -std=gnu17 for bash
+
+Jordan Rife (1):
+  wireguard: allowedips: add WGALLOWEDIP_F_REMOVE_ME flag
+
+Kees Cook (1):
+  wireguard: global: add __nonstring annotations for unterminated
+    strings
+
+WangYuli (1):
+  wireguard: selftests: cleanup CONFIG_UBSAN_SANITIZE_ALL
+
+ drivers/net/wireguard/allowedips.c            | 102 ++++++++++++------
+ drivers/net/wireguard/allowedips.h            |   4 +
+ drivers/net/wireguard/cookie.c                |   4 +-
+ drivers/net/wireguard/netlink.c               |  47 ++++----
+ drivers/net/wireguard/noise.c                 |   4 +-
+ drivers/net/wireguard/selftest/allowedips.c   |  48 +++++++++
+ include/uapi/linux/wireguard.h                |   9 ++
+ tools/testing/selftests/wireguard/netns.sh    |  29 +++++
+ .../testing/selftests/wireguard/qemu/Makefile |   3 +-
+ .../selftests/wireguard/qemu/debug.config     |   1 -
+ 10 files changed, 194 insertions(+), 57 deletions(-)
+
 -- 
-2.49.0
-
+2.48.1
 
