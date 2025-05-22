@@ -1,447 +1,284 @@
-Return-Path: <netdev+bounces-192810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34A69AC1215
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 19:27:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E21AC130B
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 20:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 738041BA222F
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 923B4503E32
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B34F192B8C;
-	Thu, 22 May 2025 17:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FEF19D8AC;
+	Thu, 22 May 2025 18:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXEC2chm"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NZIGAIEW";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="dNZwGGrZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58AEE191F89;
-	Thu, 22 May 2025 17:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747934865; cv=none; b=igDzuU7oacrhqGqaZYnjab1p8SniApQMHvQfodOpik1MITIR1+APZgO5hIbxClsEZ44msvGEzpd8nGcIsEEPL56rxZzexkS10ZsAknQ2O54TC7D3h40VlUNk6JwlpQwNycU0QRIAOD6h45G317gRoG7FaWgZ7uEJ0KkV3iBe9qk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747934865; c=relaxed/simple;
-	bh=8M+vsbAnWHZbs6ctWGuja8i5Gmbw6mn8b8DkMQg2w+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rRL1bAvfp0gX2aYuPpRuKpSKcf8SyVpmWG5Y+9DVt5IS2kBMYa0I6vM6zD0B29gK76KgTBhpe38g+PqrmIUviWOGcgmri/bUZd2KqZaAdMkBMjnmJ9PpLOiaNwNgJF5fuY6miIoHyfchpDCNTp7XoynRiDtgLEdd/AYi5j2irQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXEC2chm; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e7d5f3e6169so1947066276.3;
-        Thu, 22 May 2025 10:27:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108A833F3;
+	Thu, 22 May 2025 18:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747937485; cv=fail; b=r2UwOCHoPrufYfj2/yhfC7y5vZ4BjU1WARtghxqRKgli506/zunzRtTiz7LVmIXK4KfASMhUcwefh/5aAaeH2rioeI9ohKGjOvpidvHAtW552e2vH62Syl0NpcIZhT6q+6iuz5JRfIUOiXskm86BU40P30KCv+6OAPYMjCLuBQA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747937485; c=relaxed/simple;
+	bh=DhhnZx4jEUTAejFQIEY3x5lzxCQ8fpKg9X/Jp2jcP9U=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jmhqrYTMLGmS9ATfRPPE/92QURfdgKUlsFrHME1ojbGDkgZoaHwU2fLc76XZj5L3pjkRW5USglos2FQ7aMzJINcwJN+rjVwxzToPpdptaXrT0dKlZdK/x6yViL3dRogLFJQ+dlbmVWaMLYkOucH5kUfvJ0+PbCp/yL6Wg6/FZJc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=NZIGAIEW; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=dNZwGGrZ; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MH0qKA000970;
+	Thu, 22 May 2025 18:11:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=rO+MQgejmyh1dw8/jKx3DCV2Yl0u5rRg4U3wlcJdlJw=; b=
+	NZIGAIEWUXvl5S61jB7xCs5dY4ORqBcLIMoiRfGNdKRFrhQGyfaNkF5/6tlmW+nh
+	v1vuYQOh76GzGOfueE0YE/swhlAiVPDptMjpaYjsbGqabPOwyS3Dz7IIbIgKX53z
+	IduyeC5urgeHc2gXRQGmwmIx3cSBznHRMzTEE78OlzN4gJ40+5Aq2V1f3cGgdsGW
+	2VmxyRnk48SJ1MA3aJ8eKJfe/QtOmnjBRg4K/zjTciJrmnuhSIdAFmXJ6dAg5i1o
+	pyztb9uYdSZcLldNkBUT7RHoHDoPqDoaH0yPJABE4wKRa8+Q8PNq5obxN3ajE8ok
+	s6Xwrf9c6L3D9negIbFT+Q==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46t7ts86km-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 May 2025 18:11:12 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54MHWYoR033497;
+	Thu, 22 May 2025 18:11:11 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11on2080.outbound.protection.outlook.com [40.107.236.80])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46rweq0td1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 May 2025 18:11:11 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YnKGf+469EeBm9ArDFUuUQqr9ZbR7MZxqRndBqcYxt72hULcriE0kdqOc8koxWD79W55A+CJUa+RJg3jzCzxVrVGSn2lA4kfh13SpmkBoMXyaZrSP1u/PGlzx9/DO9l41jAwTtWEXgCawDt+gpYY3qjsSFkNRD2ABir1xF80qnfKJ2WZzQ0IcG+MZgI/i8GLwVz7Ht+JLNiSYM9jBxU7MG6wQS4JfybVShDWEgyLtn4gnnHcbeTJiSGbk5b5MSKWx1oPUxu7EAcgi1qZfhH2iujvcVlntL9XLleRxDheVKgUgzn35pccZA8Y9kspJHEgi+3FH7yfxc8ZxwgsnDCABw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rO+MQgejmyh1dw8/jKx3DCV2Yl0u5rRg4U3wlcJdlJw=;
+ b=Q/Lx0KpwdyQOWSjvSxK7kaEpvGZprHtSeV6mNWwZk23fy/NqgSkvUx3Wl0IZwEd3XThkhQpXT1VTt7Wt9Ro25iMAXYtCf2wLoDR7xSVKX3WcHzkQUVpZb18DBnDOOemlPiDnzyMumhR1nusYElLc7yl7oASL4Zlbnmcfa/FqbQe2pGlRb7X9gHfKMDJvlDxDDuthxmRx/jNJ/8h278MFmiTEsfNTlD058s+gYxFDcXKUQgGWaUjM+pOaQ7ZDU7hWtvssZXYs0/ecwHj1v0UIQfnyaeJWdqD8cWlhnTpx/TlH1PPx1kB25W+wabvYIlgtena6m/gJlgFymmw2vcC00Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747934861; x=1748539661; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nJjqfm0wmq5HhNp0hjdzV0SAIZAvsS604ZIDl8zR8hY=;
-        b=KXEC2chmlcnyQghe17qoEdbrcLnYkmyWOnnlyxo4sIl6tQWByn6YuUixiaAMl+3Qii
-         RgFvN0Zn0T7dP8TDqlDAqf/h9CV0k3MAiJgHtrltHxvhbaMVZ+2B2tFNYdfK45qMsdco
-         RnPh4ew2jPOAuzif6gNSh4iS+MUnYfXWXw4x8QiqRDNi38FHu3JRpKO8oLdvgwX3Bzyr
-         gxqSzl048XCtWdRATvEIipOdQBmJ98L3Tqt5tq8LwVQ5PhPazVbJ240TeRbGH9r9Rd62
-         kXbr1MFE5k2gt46zw2dWwS/JhtaWBaCgEzNep822HLoFjbEOXMJh7bcdfGaPQU/KTwPI
-         XSPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747934861; x=1748539661;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nJjqfm0wmq5HhNp0hjdzV0SAIZAvsS604ZIDl8zR8hY=;
-        b=ZZeHD3W0NPNjmLScQrrYZJjslRD/HBahV4ieejn/T6dM9VEThxdNeD4h4G0iFO7TJl
-         AfMNcNyyi3QAOdiVDBwwZaCAYJokGP1cEtlw3q8waAmXNjq97mN3DPvOT4Rg1t3MXw66
-         5kjplntf9pFLztdgGMQrvPQ/LSorf3XvJRysPCpt1Iee5rhBGEcgewM1i70aRVnQmDyD
-         nG/KS8LnVu0zNiKzhG2t3NXpIrS68I7CvTXeusso59sMGdf6RX5wKTLjExBfWascVKkJ
-         CTvEx/Lb1nRVH+EIRUzrU7o671tNRVzHZS6RL7wKa3qTGuJf2JgTiJFthhvefT/M8Sm4
-         LJKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqpIdrOsMoz4yWrPSxsTxWg1pLc/RQUu36RvbfyAVQrdn+63Wtn3cwEjr9hlxcEzBNaUP6i8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx67dcKQPPgzZjAx2/pX5AQ603bYwEWxNxt8+InG+zcr5nucx1z
-	DLibWrhUeKpZeoVpA2pyt6cmZjvh5HsheONQMQFYJ7QPH4ZpIZy58/xCHDSfArAkPtG4M+HUlTt
-	pWWCjyLNmkB+IAINKZP03VKuXDm9lgEU=
-X-Gm-Gg: ASbGnct0rOM2UddkTc32YTYt3QJJfq+a8pFu1xhZv5LoohPz6whIDkExXLHJTzhS0TM
-	vxy0Uap1DOBpINnTo37q8zYqo105Z1bhIQMUbOv8667GT4qiOxOm6LN7JC79CRZHMvzDQitdaDV
-	3MRG0o+6GyyD0cwCDxZmknHX8T3VkSgboHU99d/U+qoRV3RSs=
-X-Google-Smtp-Source: AGHT+IFAO8LJ5LcZ2JHrnBG+tHKEap6/iQ/EwGMx9iyX7hZvZVRTn4AhEQwmy5B9gWrEdDfzFsAIgbeYL4hjgYGbmkg=
-X-Received: by 2002:a05:6902:2b12:b0:e7d:783b:5bc1 with SMTP id
- 3f1490d57ef6-e7d783b5c47mr2423740276.6.1747934861073; Thu, 22 May 2025
- 10:27:41 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rO+MQgejmyh1dw8/jKx3DCV2Yl0u5rRg4U3wlcJdlJw=;
+ b=dNZwGGrZAM3xRIMod6g5NJS00m1qNagBtwvpmeb0XTY0CemCZKkzYoB0w+gcI5J/MJ+GJjvI+s4nOq7uut5ugUEAkSqBURawTFcPQrZ/eHuHkPTGWeULG5QBhLYBkMRLD121b9X3PYDT69UzrYjWoYNaqtXwIxkWYlPl/IXREmM=
+Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
+ by PH3PPF54E75B76D.namprd10.prod.outlook.com (2603:10b6:518:1::7a0) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Thu, 22 May
+ 2025 18:11:08 +0000
+Received: from DS7PR10MB5328.namprd10.prod.outlook.com
+ ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
+ ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8746.030; Thu, 22 May 2025
+ 18:11:08 +0000
+Message-ID: <ce71fa5a-32c0-4cc2-b537-5849d9bdea69@oracle.com>
+Date: Thu, 22 May 2025 23:41:00 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] : Re: [PATCH] ixgbe: Fix typos and clarify comments in
+ X550 driver code
+To: Simon Horman <horms@kernel.org>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        darren.kenny@oracle.com
+References: <20250522074734.3634633-1-alok.a.tiwari@oracle.com>
+ <20250522172108.GK365796@horms.kernel.org>
+Content-Language: en-US
+From: ALOK TIWARI <alok.a.tiwari@oracle.com>
+In-Reply-To: <20250522172108.GK365796@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR02CA0070.apcprd02.prod.outlook.com
+ (2603:1096:4:54::34) To DS7PR10MB5328.namprd10.prod.outlook.com
+ (2603:10b6:5:3a6::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515211606.2697271-1-ameryhung@gmail.com> <20250515211606.2697271-2-ameryhung@gmail.com>
- <CAEf4BzZp4BKBaw=j1o9+mPv_EG0VWM5WGoG-ddxe7Fv1OXjP3A@mail.gmail.com>
-In-Reply-To: <CAEf4BzZp4BKBaw=j1o9+mPv_EG0VWM5WGoG-ddxe7Fv1OXjP3A@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Thu, 22 May 2025 10:27:30 -0700
-X-Gm-Features: AX0GCFthxzWfAHpIDZNLFNGByWZIe7_GQrU2hmAdin7mMjpZMvvtzWdarkTVe38
-Message-ID: <CAMB2axNNpCRje=cAChkg=jE1NrPmkvU_Q54jxJWKDfQxOVXoGg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 1/3] selftests/bpf: Introduce task local data
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
-	martin.lau@kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|PH3PPF54E75B76D:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0915a56c-2622-4540-c955-08dd995c0673
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VlJYa2t4YldhSU92eGU1SStTaW4zenR4bTNNckU3d1NBS2g0SnJIZmVFTmN6?=
+ =?utf-8?B?SEVFbHNyZy8xeUFGNFNadG1UZXZtU2grNFBqUmlxMGIvbU1UMmF6ekNHY2N4?=
+ =?utf-8?B?RlVpalRpc250N0p1NEREdmFXRzBvNExXK0NkOWE3emFmV2ttNUV4V2swREhI?=
+ =?utf-8?B?WVVvb0V6b3o3NHBkZmFISHlxS3gyajFKcjZNbjkzVWhJMG1qTXFtOVRWb1No?=
+ =?utf-8?B?Z25ZTlhTdy8wekhkYi9VcTczQkpaTTBLdXZpQzdTc28wSlVWSVRTKzg3THdY?=
+ =?utf-8?B?c1RPMzN3cmxsTVlnT0ViRGl0ai9RZkFDcERsalRqS2Y4dTVIRUV4OWd2MWN0?=
+ =?utf-8?B?bEIzeU9GdHdFaG02Q2lYVk5FZzRzR0NlQTZkNmVmb0tmRTZZMXo1cjI4NENl?=
+ =?utf-8?B?SFJ3R2ZOLzZWalgrbXgwL25vSlpIcjN6TzFiSjdIcTkyZ0M5WVYyY3JiVXVP?=
+ =?utf-8?B?WnpyV2dmNXJpYlBsY2I0VXBTUitBTXd1Mnl3ZTdzR1JiS3NCOXA0bUY4TkNp?=
+ =?utf-8?B?MGVyTXJIQjdlZFRUcHhOUU9tcEZGRUN5WmQ5YlNKeDVtTmt3eVJEendYTE9O?=
+ =?utf-8?B?WC90MWFUd2xJUk83VDRjS294dUpoU3krSmYvSGM5NVdhRFJhMW1Wb1NuSkZk?=
+ =?utf-8?B?bjJESlhoeU5naEhFQm9tMWc1dVExR3FLUHlTdXY1Y1dHQkN1MExGQjdqSXpO?=
+ =?utf-8?B?b1hRZFJVbjYvZ0srQW1ZSnpxVnRpSTFrL3RUc1BrMDhHdlBicXBYcVEvSjVJ?=
+ =?utf-8?B?M3VqQ0J5bXV6enBjT2pFUG1hRzRFQ21IT0xnSXRzSkJRUGRJK3E5MGJpOTRP?=
+ =?utf-8?B?SGZWY0IrdEk3QjRtRmJ5N1FEZlllWUNCZHpTYVl1Q3MvcGVLSFBJdXdQSkQ0?=
+ =?utf-8?B?b3FWc1lVVnVMNWFxZzRqREhJQ2hraGxsQ092R0xHNk82OXlrQ0ZDMkxVeTRN?=
+ =?utf-8?B?eUpDbnpheXJpYUVSUzZmTFRsL3NwaFFZWTV3Q21JbDkrK0xnUUtpcWhuelV0?=
+ =?utf-8?B?MnF6VDBxVm02TG5Xd1NyMnN5WEhOcDBUbm5PNXdPMFNPZWs1d1VLMTd2WlNY?=
+ =?utf-8?B?YkZpZWErTnRKTXJQbWNFMWNjaXhiZXhzdDZMckhZNW91c3grbFVoVnpEWWNr?=
+ =?utf-8?B?SSs4cEl5UnE0TWJuamxsOXM3ZVcxU1Uya0kvVWNPVkpWeTQxeEQ2VkxGcmFC?=
+ =?utf-8?B?SGk5QXIvdnBzajl3STZEektaUEY5TUFZenBZOGNKY1BOTnJzUkM4cmZyWmtW?=
+ =?utf-8?B?MkE4WW5jQXlqbThIVEI5Q28wZGp4d001VGJRdkpib3VRRjVmeUxxYkNNcVlh?=
+ =?utf-8?B?aVowcGdBZHFoN3VNZVpXOTU4Zm84bHRVM3p4Q2RYbGIzRzFFQkxvV3FTWjlp?=
+ =?utf-8?B?VVdhTTl6Z2hjWE12aE9vUVFDd0hwSmRwUFBNam83bFdhQ3FTUEc4RkpKcUlv?=
+ =?utf-8?B?cHBhcVh6a3FnSVdaZmdTM0VWRHZRTW9XTFNYeGtoZW81NWVxcGt4M3NFcTJp?=
+ =?utf-8?B?Vnp2Ukh1ek5yN000RG5JTUx1ZCtoYWY0QjRqYVV3WjRDdldnZ1RkNUg3NW5n?=
+ =?utf-8?B?NmNwcVJXdFhxUHFDek5weW1aaktaM042QUFmaTJOclFqcHJXcTZXUnlvdlVP?=
+ =?utf-8?B?ZlBOZWl6akhTdnNXTGpwNmtndVZqbERMRGJ6TWcyOXYrZ09QNm16UXZSSjZn?=
+ =?utf-8?B?Sm9FOTRlbVpuRTVvUkVrcUlRenhPRThuQ0I5Qzc3aml1ZTVqOHZKQ01Tcll0?=
+ =?utf-8?B?OTN2RzlZdzRQUzFKTDBMQnlSQmlJUXNUL0VPZjZYVlFLWnZLUS8wbTI3R0tt?=
+ =?utf-8?B?VGY2bENqZE1oZlRCTEZ2Z3BNUzlrWmgvV0hSc0hNRWQ2V1haRERGclcxK3ZU?=
+ =?utf-8?B?RVhrSXdWOGVaTkdtZU82TjJZSTl6eGxtdndxLzBNR1hzbGsvaFJndTdJcHJz?=
+ =?utf-8?Q?pSHrORB8j9g=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q2pHNGMvS2hBRUtYbVM2b1hIeTB1VTJ1Z1JkdVZGb05xangyR1BZa0YxYnVE?=
+ =?utf-8?B?c3N0b1dMa0ZQeUlVQXIveGZxSjRQbEVIUGdEcWNiaVhwY2MvQjVET1l0Ny9E?=
+ =?utf-8?B?SzJ5eWdqWjBzS0VQYVBBRk5Ha3l4ZTJQU3hmZmpBS2w2R3h6T05hZHYwbDUy?=
+ =?utf-8?B?NTJWb0JJVlNSdXlRK3ErV05VcHpuWDJrMy9ueGpBWnliaHIrdzZxVXFmT2pM?=
+ =?utf-8?B?aytJc0UyM1hRZkdYdi8zQ1liS3F5VXBJelpBOExNQS94akFMR2JCd2tHeW1D?=
+ =?utf-8?B?cFNOb3U3Q3J0d0xUTmtFc1REUlI3Ynp2M3JCaUIrODgrUTZna1ZDRFgySDUy?=
+ =?utf-8?B?ZHBsS1VscmcwbC92R3gyQW82UCtnejRkWFVnWXpaSVhMZVFmbjVzaWlZbStC?=
+ =?utf-8?B?cGFneTF1SzZyenRMYjZOWHVSQlhoY3dDWmlucFBkZHYrWm5FZS9nZ3hzV0M2?=
+ =?utf-8?B?Zi82UWhha0Z4cUVGYUxjR0xUVnB0aWpzWCs2K3ljZDE4bnUwY1A3dUc1Uk0x?=
+ =?utf-8?B?UW9xdmduUGlTZkZWWmlFdGJ1Mlplam90dHUwSXF4ZFVHTkpiSksvNHpkdUp6?=
+ =?utf-8?B?ejNOUTFwTXlkUFBUSmtIVVY0VjZQcTkzaldDMTF4TzJpVnVjcCthT1dKeE9k?=
+ =?utf-8?B?dlljSmpnWWpmci9FWkJhaWd0OGtrcnFNNUVkL3BjRk9pVy9yWVovbTJOQU1Q?=
+ =?utf-8?B?NUpLdjQwOWdwOGkwRHMweld5Y21YM2U2K0tWcDZrb1RHdE9uekdLTGNMVUtU?=
+ =?utf-8?B?Rk5HZTk4dGFPV1dONGxpeFJvOFdTeXFNdUpVSUt6ZkJKUEVKNjEwc1ZtVXEv?=
+ =?utf-8?B?K0J1MmNObEpORitkd01vWFRzMU9iZU5RZ1M1RlVpZk1lcVZHTGdsWWJoOGFk?=
+ =?utf-8?B?amZZNC9PTlJOWHAwa2FjcFBiK3FVU2RGN1ZoYWQyZE9XeDh4YmJ4cncxUFpE?=
+ =?utf-8?B?ZW5yZ2VmdW9HcXgzZ2ZCc3B5K3A5a2xYaU5SVkVOelpGU251NS84b0JWV05j?=
+ =?utf-8?B?ZnNndUhGbG1mM0pFd0xnOVR6akdpWjIyNGJlK0VoYytuSnYrcU1uU3lhRFlZ?=
+ =?utf-8?B?d1k1d0txZkFibUR1d2hKOThZa0RQZkNQa1RnZjVZUG5xZlZNZzJVbzBtdHNX?=
+ =?utf-8?B?ckFrT1BMYkdqRGk3aWpTUThBR2FDZlNXNVowcjh5MjhXUFhCU0xiekxqbGNS?=
+ =?utf-8?B?VmdaWmVQZDA1SWFCd2tyUXlJNTNiQmpBbkVHZjIrRmJKTnBJZTZiSXFJYUpy?=
+ =?utf-8?B?Y0Y1VjRhWXJXeDVVNUFkY1JTK3FRbTI2czc5aWVhYkxFZXNUZ0ZOL0l3b0tx?=
+ =?utf-8?B?aW8xayt4RklaY3pQTWZtekx2VTFYbUx5VUZtUFNPK0hEVGZCL2lYV1V2aGFG?=
+ =?utf-8?B?d2RrODFjRVk4TGl0TmE0aU8vbmN4SjNBc25PVlFSQVVYNFZDMXM0ZmdvVTc4?=
+ =?utf-8?B?UDBqcHdGdHZhb2ZyRlladWdJQjFBVU5hKzJ5OE15ai9GeFQzSUpUWWdwb3gy?=
+ =?utf-8?B?SXNsTVBSaFRaMHR6WVZSTkxSdE9wYzZlNDZ2YVBiVUNscFczYlNEU3VTVnJn?=
+ =?utf-8?B?Vm02S05BOFFiT3lLaW5aNDkrR09RNTVuaW42eUNvRnZvUEtGZDRBdzlsUytJ?=
+ =?utf-8?B?dDRlS3JXWUFpbXgyQk9FeWpoSGxVUGVIcGNGWHEwODMvQmR0RkhJL1RHSVpZ?=
+ =?utf-8?B?T29Ibk92VHN4blVySmhuck9yWTYzRm00WktLOFplcTZLNWZaQU5kb2lZQTM3?=
+ =?utf-8?B?T08xYUpLNTlGN3dZRHFOQ2FPNStsbGZrcUVBSW9YWWQ3ZGF2QmlyUHFSK2Ro?=
+ =?utf-8?B?WENrS28xQ0dCN1dRWFNMQWdwbStjTEVRU21Sa0ZkOEhNNEdjN3VIcUM4OUNZ?=
+ =?utf-8?B?OCtNR280aStzUUs2UGd5MjhXUzlVRVVnOFBObURaVEhwR3pRV1Z4eUxLSTR3?=
+ =?utf-8?B?MFB3ZlJLMmZWLzk1SFhsTU4xcWVZNjhkVkdqOFBnWGVEUzlCUi80TTk3QXZY?=
+ =?utf-8?B?bVEzdG84VEYvQzRTN3JxOUtRN0x2cTF3Z0V2aTlveU9pZTRTWmhDTDNDaFl4?=
+ =?utf-8?B?aytOUThhSXZGdEdOWEtYK0VIMDlrbDRkSXY0czlLMENIajVYc3Nha1Z0MG94?=
+ =?utf-8?B?MjFXVXFxT3pzNk5VNW9FOVl1KzBOeVlwQnkzSlBhNURFc25YSmtXQlhLcjJ4?=
+ =?utf-8?B?NkE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	D39iuYjJC2kcZ/JbmZNMd99p+UtE/8eCOGuWwADnjVDUB52MiUUG/BFWqH02KjirvfeS/FaSC2cGNStSlagJ0Xk94+S0RZtjukGycApyj3eXkGx+1ItC3kC2Dc+pHNPN0vLHD94lQvKoavYnb5HbK3Uuo3RU8CyF/8XZ6kFUZDk8CSXBS+YB+GcmiPcrR5i8Vuy6L1uCWJFVU6JCQEKukgPxKwoe1jQrV867O9xyt8NM8PAcPY5EDUssiyC4vgaN013zviXYIZB15mLU9/0mZOoI6qyxHwAe//hJerx3GlW0JpRyZ4XhYNF8kYmXjsGGQpJZSkYyK44i/SSOk17XgoypyLAo94UvKCPW73v7TgmNU09yZCuXNvKE/B0weVw8U5kwKCdUCeIcca2YVsymNRhAIkv2hj78ANphJtVgfdXxc3rO1IOQRtD+5hLYaTKHIOgIM26/LDtPcoAMvmokPmUTwPt/OcKuwEKKC7sUYjXeYpSiGsiXs0dqrJY2UTY4pkxxgeYOJQ/iCDkvYMfTavMFrmBBdfoQptaZMUX1cPeL0YHU2+b16+TNp402dhyNqvp2iJIWfShzVb1NOb8J4CifkJ5Y0Sph6okxUsmOYnQ=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0915a56c-2622-4540-c955-08dd995c0673
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2025 18:11:08.4296
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9tRgnLE+NX9AznQ8cHd30ZbiWObtzWu6dFbRF88ZqgBd+R607TvE1/W0M5r2uD37jb7GKU8fBXQG/7iTwJstpg3yebxRtyjIq4WS9O12Lsc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF54E75B76D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-22_08,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 phishscore=0 spamscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2505220183
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDE4MyBTYWx0ZWRfX/g7YLEKXEbBN MMJuq/PiG/gysOBaM54UlAGcCS/xUsSsOHH4zS6AyUeZAkADqdGkFRl+w4QSWUsENOshXupAiqt lKkiIa4VOLByQVNFiWAST/Wm6SwwzGXB46PhMxPInoStvvWdHtEGRQKZLTdxhr3GK9DcgKh5ggh
+ wgzgkRQWv+rN1DHHc8u8SyzZNZSxHo7XdiRvBCrWVuYziINBPm0kr57pBYn6EXUAK6oSBuu5n/A NfVH+6UjX/bLr8DD/XHIA0KWOWd6FXRAvH/Cq5qo2sVf9Z4+0jQfdn2sbjp8slZSmFFnJ526A3p Me6icbeE9NwgP6BY0PmqnKogfKWOR80Rbyjq+0fn2Pf+QTp9/wRtrFxgcTvKP1dyUHdZrIoXiEj
+ 7T0kayjZXapT+p1dD97EMhGbGLwZRaWkWlI+MuhEdZ5N8GFUZEPJffcu6AOnsYz55kzaD2J/
+X-Authority-Analysis: v=2.4 cv=JvrxrN4C c=1 sm=1 tr=0 ts=682f68c0 b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=bbmNwwe3OGvqmaZQ-GEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: MWlUHopyqO-NtHE7dTvIXj8PEC2hjgGG
+X-Proofpoint-GUID: MWlUHopyqO-NtHE7dTvIXj8PEC2hjgGG
 
-On Tue, May 20, 2025 at 3:58=E2=80=AFPM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Thu, May 15, 2025 at 2:16=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
-wrote:
-> >
-> > Task local data defines an abstract storage type for storing task-
-> > specific data (TLD). This patch provides user space and bpf
-> > implementation as header-only libraries for accessing task local data.
-> >
-> > Task local data is a bpf task local storage map with two UPTRs:
-> > 1) u_tld_metadata, shared by all tasks of the same process, consists of
-> > the total count of TLDs and an array of metadata of TLDs. A metadata of
-> > a TLD comprises the size and the name. The name is used to identify a
-> > specific TLD in bpf 2) data is memory for storing TLDs specific to the
-> > task.
-> >
-> > The following are the basic task local data API:
-> >
-> >                  User space               BPF
-> > Create key     tld_create_key()            -
-> > Fetch key            -               tld_fetch_key()
-> > Get data       tld_get_data()        tld_get_data()
-> >
-> > A TLD is first created by the user space with tld_create_key(). First,
-> > it goes through the metadata array to check if the TLD can be added.
-> > The total TLD size needs to fit into a page (limited by UPTR), and no
-> > two TLDs can have the same name. It also calculates the offset, the nex=
-t
-> > available space in u_tld_data, by summing sizes of TLDs. If the TLD
-> > can be added, it increases the count using cmpxchg as there may be othe=
-r
-> > concurrent tld_create_key(). After a successful cmpxchg, the last
-> > metadata slot now belongs to the calling thread and will be updated.
-> > tld_create_key() returns the offset encapsulated as a opaque object key
-> > to prevent user misuse.
-> >
-> > Then user space can pass the key to tld_get_data() to get a pointer
-> > to the TLD. The pointer will remain valid for the lifetime of the
-> > thread.
-> >
-> > BPF programs also locate TLDs with the keys. This is done by calling
-> > tld_fetch_key() with the name of the TLD. Similar to tld_create_key(),
-> > it scans through metadata array, compare the name of TLDs and compute
-> > the offset. Once found, the offset is also returned as a key, which
-> > can be passed to the bpf version of tld_get_data() to retrieve a
-> > pointer to the TLD.
-> >
-> > User space task local data library uses a light way approach to ensure
-> > thread safety (i.e., atomic operation + compiler and memory barriers).
-> > While a metadata is being updated, other threads may also try to read i=
-t.
-> > To prevent them from seeing incomplete data, metadata::size is used to
-> > signal the completion of the update, where 0 means the update is still
-> > ongoing. Threads will wait until seeing a non-zero size to read a
-> > metadata. Acquire/release order is required for metadata::size to
-> > prevent hardware reordering. For example, moving store to metadata::nam=
-e
-> > after store to metadata::size or moving load from metadata::name before
-> > load from metadata::size.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  .../bpf/prog_tests/task_local_data.h          | 263 ++++++++++++++++++
-> >  .../selftests/bpf/progs/task_local_data.bpf.h | 220 +++++++++++++++
-> >  2 files changed, 483 insertions(+)
-> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_d=
-ata.h
-> >  create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.b=
-pf.h
-> >
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/task_local_data.h b=
-/tools/testing/selftests/bpf/prog_tests/task_local_data.h
-> > new file mode 100644
-> > index 000000000000..ec43ea59267c
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/prog_tests/task_local_data.h
-> > @@ -0,0 +1,263 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#ifndef __TASK_LOCAL_DATA_H
-> > +#define __TASK_LOCAL_DATA_H
-> > +
-> > +#include <fcntl.h>
-> > +#include <errno.h>
-> > +#include <sched.h>
-> > +#include <stddef.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <unistd.h>
-> > +#include <sys/syscall.h>
-> > +#include <sys/types.h>
-> > +
-> > +#include <bpf/bpf.h>
-> > +
-> > +#ifndef PIDFD_THREAD
-> > +#define PIDFD_THREAD O_EXCL
-> > +#endif
-> > +
-> > +#define PAGE_SIZE 4096
-> > +
-> > +#ifndef __round_mask
-> > +#define __round_mask(x, y) ((__typeof__(x))((y)-1))
-> > +#endif
-> > +#ifndef round_up
-> > +#define round_up(x, y) ((((x)-1) | __round_mask(x, y))+1)
-> > +#endif
-> > +
-> > +#ifndef READ_ONCE
-> > +#define READ_ONCE(x) (*(volatile typeof(x) *)&(x))
-> > +#endif
-> > +
-> > +#ifndef WRITE_ONCE
-> > +#define WRITE_ONCE(x, val) ((*(volatile typeof(x) *)&(x)) =3D (val))
-> > +#endif
->
-> this is a lot of pollution of user applications with generic names...
-> consider TLD_ prefixing all of them?
->
+Hi Simon,
 
-I will make the name more specific by adding TLD_ prefix.
+Thanks for Your review.
 
-> > +
-> > +#define TLD_DATA_SIZE PAGE_SIZE
-> > +#define TLD_DATA_CNT 63
-> > +#define TLD_NAME_LEN 62
-> > +
-> > +typedef struct {
-> > +       __s16 off;
-> > +} tld_key_t;
-> > +
-> > +struct tld_metadata {
-> > +       char name[TLD_NAME_LEN];
-> > +       __u16 size;
-> > +};
-> > +
-> > +struct u_tld_metadata {
-> > +       __u8 cnt;
-> > +       __u8 padding[63];
-> > +       struct tld_metadata metadata[TLD_DATA_CNT];
-> > +};
-> > +
-> > +struct u_tld_data {
-> > +       char data[TLD_DATA_SIZE];
-> > +};
-> > +
-> > +struct tld_map_value {
-> > +       struct u_tld_data *data;
-> > +       struct u_tld_metadata *metadata;
-> > +};
-> > +
-> > +struct u_tld_metadata *tld_metadata_p __attribute__((weak));
-> > +__thread struct u_tld_data *tld_data_p __attribute__((weak));
-> > +
-> > +static int __tld_init_metadata(int map_fd)
-> > +{
-> > +       struct u_tld_metadata *new_metadata;
-> > +       struct tld_map_value map_val;
-> > +       int task_fd =3D 0, err;
-> > +
->
-> [...]
->
-> > +
-> > +       map_val.data =3D new_data;
-> > +       map_val.metadata =3D READ_ONCE(tld_metadata_p);
-> > +
-> > +       err =3D bpf_map_update_elem(map_fd, &task_fd, &map_val, 0);
-> > +       if (err) {
-> > +               free(new_data);
-> > +               goto out;
-> > +       }
-> > +
-> > +       tld_data_p =3D new_data;
-> > +out:
-> > +       if (task_fd > 0)
->
-> task_fd can be zero, so >=3D 0 and init to -1; same in init_metadata
+On 22-05-2025 22:51, Simon Horman wrote:
+>> @@ -1754,7 +1754,7 @@ ixgbe_setup_mac_link_sfp_n(struct ixgbe_hw *hw, ixgbe_link_speed speed,
+>>   	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
+>>   
+>>   	/* If no SFP module present, then return success. Return success since
+>> -	 * SFP not present error is not excepted in the setup MAC link flow.
+>> +	 * SFP not present error is not accepted in the setup MAC link flow.
+> I wonder if "excepted" was supposed to be "expected".
 
-Yeah. I will fix this in the next respin.
 
->
-> > +               close(task_fd);
-> > +       return err;
-> > +}
-> > +
-> > +/**
-> > + * tld_create_key() - Create a key associated with a TLD.
-> > + *
-> > + * @map_fd: A file descriptor of the underlying task local storage map=
-,
-> > + * tld_data_map
-> > + * @name: The name the TLD will be associated with
-> > + * @size: Size of the TLD
-> > + *
-> > + * Returns an opaque object key. Use tld_key_is_err() or tld_key_err_o=
-r_zero() to
-> > + * check if the key creation succeed. Pass to tld_get_data() to get a =
-pointer to
->
-> typo: succeeded
+Yes, "expected" definitely reads more naturally. However, I noticed that 
+in one place, the comment uses "accepted" instead — perhaps to imply a 
+policy or behavior enforcement.
 
-Will fix the typo. Thanks
+------------------
+static int
+ixgbe_setup_mac_link_sfp_x550em(struct ixgbe_hw *hw,
+                                 ixgbe_link_speed speed,
+                                 __always_unused bool 
+autoneg_wait_to_complete)
+{
+         bool setup_linear = false;
+         u16 reg_slice, reg_val;
+         int status;
 
->
-> > + * the TLD. bpf programs can also fetch the same key by name.
-> > + */
-> > +__attribute__((unused))
-> > +static tld_key_t tld_create_key(int map_fd, const char *name, size_t s=
-ize)
-> > +{
-> > +       int err, i, cnt, sz, off =3D 0;
-> > +
-> > +       if (!READ_ONCE(tld_metadata_p)) {
-> > +               err =3D __tld_init_metadata(map_fd);
-> > +               if (err)
-> > +                       return (tld_key_t) {.off =3D err};
-> > +       }
-> > +
-> > +       if (!tld_data_p) {
-> > +               err =3D __tld_init_data(map_fd);
-> > +               if (err)
-> > +                       return (tld_key_t) {.off =3D err};
-> > +       }
-> > +
-> > +       size =3D round_up(size, 8);
->
-> I'd record actual requested size, but internally round up to 8 where
-> necessary (see below)
->
-> > +
-> > +       for (i =3D 0; i < TLD_DATA_CNT; i++) {
-> > +retry:
-> > +               cnt =3D __atomic_load_n(&tld_metadata_p->cnt, __ATOMIC_=
-RELAXED);
-> > +               if (i < cnt) {
-> > +                       /*
-> > +                        * Pending tld_create_key() uses size to signal=
- if the metadata has
-> > +                        * been fully updated.
-> > +                        */
-> > +                       while (!(sz =3D __atomic_load_n(&tld_metadata_p=
-->metadata[i].size,
-> > +                                                     __ATOMIC_ACQUIRE)=
-))
-> > +                               sched_yield();
-> > +
-> > +                       if (!strncmp(tld_metadata_p->metadata[i].name, =
-name, TLD_NAME_LEN))
-> > +                               return (tld_key_t) {.off =3D -EEXIST};
->
-> do you check mismatched size for the same key? if not, should it be check=
-ed?
->
-> but if name and size matches, shouldn't this be a success instead of
-> -EEXIST error?...
->
+         /* Check if SFP module is supported and linear */
+         status = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
 
-I think users should only call tld_create_key() once for a TLD.
-Returning an -EEXIST gives us a way to detect conflict. If users knows
-that they will be calling tld_create_key() for a TLD in multiple
-places, they could still do it by treating -EEXIST as success.
+         /* If no SFP module present, then return success. Return 
+success since
+          * there is no reason to configure CS4227 and SFP not present 
+error is
+          * not accepted in the setup MAC link flow.
+          */
+         if (status == -ENOENT)
+--------------------
 
-Therefore, no checking mismatching size here.
+> 
+>>   	 */
+>>   	if (ret_val == -ENOENT)
+>>   		return 0;
+>> @@ -1804,7 +1804,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
+>>   	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
+>>   
+>>   	/* If no SFP module present, then return success. Return success since
+>> -	 * SFP not present error is not excepted in the setup MAC link flow.
+>> +	 * SFP not present error is not accepted in the setup MAC link flow.
+> Ditto.
+> 
+>>   	 */
+>>   	if (ret_val == -ENOENT)
+>>   		return 0;
+> The above notwithstanding, this looks good to me.
+> 
+> Reviewed-by: Simon Horman<horms@kernel.org>
 
->
-> > +
-> > +                       off +=3D sz;
->
-> you should probably specify alignment guarantees explicitly and round
-> that up somewhere here, so that if you allocate bool and then u64, u64
-> is properly 8 byte aligned and internally you know that the size was 1
-> and 8? With BPF ringbuf we guarantee 8 byte alignment, and so far it
-> worked out great, so I'd just document 8 and go with that.
->
 
-Thanks for the suggestion. I will document the alignment guarantee.
-
-> > +                       continue;
-> > +               }
-> > +
-> > +               if (off + size > TLD_DATA_SIZE)
-> > +                       return (tld_key_t) {.off =3D -E2BIG};
-> > +
-> > +               /*
-> > +                * Only one tld_create_key() can increase the current c=
-nt by one and
-> > +                * takes the latest available slot. Other threads will =
-check again if a new
-> > +                * TLD can still be added, and then compete for the new=
- slot after the
-> > +                * succeeding thread update the size.
-> > +                */
-> > +               if (!__atomic_compare_exchange_n(&tld_metadata_p->cnt, =
-&cnt, cnt + 1, true,
-> > +                                                __ATOMIC_RELAXED, __AT=
-OMIC_RELAXED))
-> > +                       goto retry;
-> > +
-> > +               strncpy(tld_metadata_p->metadata[i].name, name, TLD_NAM=
-E_LEN);
-> > +               __atomic_store_n(&tld_metadata_p->metadata[i].size, siz=
-e, __ATOMIC_RELEASE);
-> > +               return (tld_key_t) {.off =3D off};
-> > +       }
-> > +
-> > +       return (tld_key_t) {.off =3D -ENOSPC};
->
-> [...]
->
-> > + * USAGE
-> > + *
-> > + * Similar to user space, bpf programs locate a TLD using the same key=
-.
-> > + * tld_fetch_key() allows bpf programs to retrieve a key created in th=
-e user
-> > + * space by name, which is specified in the second argument of tld_cre=
-ate_key().
-> > + * tld_fetch_key() additionally will cache the key in a task local sto=
-rage map,
-> > + * tld_key_map, to avoid performing costly string comparisons every ti=
-me when
-> > + * accessing a TLD. This requires the developer to define the map valu=
-e type of
-> > + * tld_key_map, struct tld_keys. It only needs to contain keys used by=
- bpf
-> > + * programs in the compilation unit.
-> > + *
-> > + * struct tld_keys {
-> > + *     tld_key_t prio;
-> > + *     tld_key_t in_cs;
-> > + * };
-> > + *
-> > + * Then, for every new task, a bpf program will fetch and cache keys o=
-nce and
-> > + * for all. This should be done ideally in a non-critical path (e.g., =
-in
-> > + * sched_ext_ops::init_task).
-> > + *
-> > + *     struct tld_object tld_obj;
-> > + *
-> > + *     err =3D tld_object_init(task, &tld);
->
-> tld_obj?
-
-Will fix the typo
-
->
-> > + *     if (err)
-> > + *         return 0;
-> > + *
-> > + *     tld_fetch_key(&tld_obj, "priority", prio);
-> > + *     tld_fetch_key(&tld_obj, "in_critical_section", in_cs);
-> > + *
->
-> [...]
+Thanks,
+Alok
 
