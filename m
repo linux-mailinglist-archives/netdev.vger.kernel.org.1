@@ -1,193 +1,132 @@
-Return-Path: <netdev+bounces-192868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48AAAC16E3
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:33:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D62A5AC1707
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:55:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F66C5010C7
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFBEA441E0
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C0527AC2C;
-	Thu, 22 May 2025 22:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB5529B8FF;
+	Thu, 22 May 2025 22:55:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhG7qy4G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwoqHKt4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B7E2798F9
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 22:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1CD29A9F9;
+	Thu, 22 May 2025 22:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747953224; cv=none; b=sUpVPbi+ujgVd7YoapuY3NU6qGX8np/j2Bv4lX2ox8Id3Vm70udiQdMtjgy9qkCb3GWdpIBoW1qhN2ZCQ7i3nGM63YtA/+BQiqyS2lQLQ9KRtgr5ZKtD+Hdv0rIZiW+QeDHinoGZ0cWcriaNKqA/NKLJgpzKNeEIEWZB7vn7e4E=
+	t=1747954520; cv=none; b=j5Yb+B4G5VtKSreMHjte1CGzXJTNu8kCEM6j2fMCl6cNRKx+DhpRcJ+Z7OphhcLLHOSFeTXrMN3LnfA1BqTjWpLN+o4kBLSj4pwPb9hp/T96LnHaMb+K7IPOl81ZErUFlpd/atAs7w0HlRx/KUHuQ436U/BqeUsv5hOE9r5S9ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747953224; c=relaxed/simple;
-	bh=rlV74owtlLZxOsX/UaNbJlFwOkVPv4oyaAVJACHDqck=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=oCS47c17mrDYvvRvUTdAAi0C9xS4TWzQrvXeaJMKeA5fVnTvesA+81xRdmNJnOafIw6MtGsVQTZBboanPnylQDmfAsFKGsZNmPMNDoxwuFE6fY9MTDEC+XDuvgXUkAhsRIZ2aITsZy+S+VmoM4wWydPZAPYLK8VIyApCY+VbrlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhG7qy4G; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c54f67db99so38222885a.1
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747953222; x=1748558022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGaQFmcO1JVQYqBeTPReiTwqsPkWDyFeRyBvzVNLp68=;
-        b=NhG7qy4GmI+KlAhMXNMBo3xOvQaWBnMZ3+uilL6lRh6NDrFZeKMHS+P1OtCdVqIZUU
-         fNw44Re7ygi3R9JzJqge9jS1EFQeYw31jgW12I3GYKNYIkb7Z02+wR7++ppaJ5TBRkgn
-         o6Yugn9qDbHnuDBKMIVLyzVKfL15YvcIZdbkY6gpKV6MAZXq76C2dOEjEm1G0DaAytSm
-         RrMYg1QgGT8QXpFGrR6V5dKw1M56+kQ/v1t60GVCmMqkmRgLIKMXPJWFe26sitviuMnf
-         pE4M2q66YdXiMz+Gw0l4TWIib1/rm3PZzDz7PmbfPSKa/ZPv87AG8FU6ifNuPM6Nw9j+
-         pYIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747953222; x=1748558022;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NGaQFmcO1JVQYqBeTPReiTwqsPkWDyFeRyBvzVNLp68=;
-        b=sFUMVOX3PrxFfH7MqGI1DRnqMcEdY3PaQIdyOCYGz9uy4tIcRuYAsj0/HE5ncwU5az
-         AmHX0WFNUD/+v/lXEszLGh3yxJA3ar7Fo6zLfSBnqxU4dJy2pBNCQV1xiEDcI6csEqGF
-         dtP78YfcR2AW02w58tf0bbDwFYbRvjIXj8C5TEMbJjrLpqgAd890HJ63UH3Ux9x2/pjU
-         yVetMWs5RUcvg57L07vRNxSkP1yeKwZ5s0Pm/e7hUjMI4y11aiDUEk9Etlwq8FHEB6AR
-         w75DrLSsAsO/be8r7gTg3fMMmveUgKRnx/UbjqEuF6xi+7oWHq32eYeQfdQ2ThxcSwax
-         +rBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwoOfqvEmrOxYAD03W6kksEQVE5UeylXPTsiMx8wlb2Ost3AtWNNVLhRAGPKSREp5XiJkEr4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP7ol6rfN1UhfAMMFLtmFrX9IFSRqXOkTn3jDOqJUf0Ey3hE5P
-	01BEX0eVmEGu1PpoDVkLB2Cd18x4pVRLCPfhJFmkMhimRHG+jd/UJPiX
-X-Gm-Gg: ASbGncujsBLX+8QwsvGOOK+0Su4HbEOcnbkIgUOioX2wjVtzkvc1BvEh2UpZnwLqOUS
-	X+NZiCY8gsFhkiLfnnHQgI9NHAbCeMxOgajxH+M7dxUl88oRk//mfpsI6EdeWCCXIw5dkBnZvb8
-	XyiezPQ1/bAQVOJwtUa6kLK+FD3h+Nk4Z+XK3uilcs64I093qsp1UeXT0R4vwMRDAkBzj24jraK
-	JkBM9MEa5N++yLyepCoG8czBOc6LwA5VZDHHlkWiRE11g3/M4T0PsqPH7RxrA8z7cLQxWej3aMz
-	HJqm2t28xKk/VuN8IzsQDx1wczCguVbI9mD9PQ+D7cTclFRQycytRcITL1o89iOpmnzGbSPG//w
-	uKULozm+OVS5WQ8EllwZa2ceSXBkB40lJYg==
-X-Google-Smtp-Source: AGHT+IEnEcstKuBkGYDk9epUiUan0tChuvxfxSlPvlTZmHtCyoG87GDQ5Xr6gk4CL7vNE6Skc801uQ==
-X-Received: by 2002:a05:620a:1913:b0:7c5:9480:7cb4 with SMTP id af79cd13be357-7cee226cdd9mr188001485a.9.1747953222027;
-        Thu, 22 May 2025 15:33:42 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cd467ee660sm1082394085a.65.2025.05.22.15.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 15:33:41 -0700 (PDT)
-Date: Thu, 22 May 2025 18:33:41 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>
-Message-ID: <682fa6453d18f_13d837294ac@willemb.c.googlers.com.notmuch>
-In-Reply-To: <239bacdac9febd6f604f43fa8571aa2c44fd0f0b.1747822866.git.pabeni@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <239bacdac9febd6f604f43fa8571aa2c44fd0f0b.1747822866.git.pabeni@redhat.com>
-Subject: Re: [PATCH net-next 6/8] virtio_net: enable gso over UDP tunnel
- support.
+	s=arc-20240116; t=1747954520; c=relaxed/simple;
+	bh=20BxxCEe2TpJllJFUO+uu+ZTnDkvT1+Y6OoCQLuPVMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EIbswz5AMhyZM7nkaM2oTEqOlkM4uPBQ24OjWys68Y5lNjQU4gq94kz8tWohjH9aNdrUduCVXpajMecqslFl5Kp5oGN/BxOyq/03/mi6HvJ5d/BFFmP5LCbjgIZVNOWAnxWQ3dNPItiQg92258Px2pJsYi8NZylYFXitGykHVtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwoqHKt4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A67D3C4CEEB;
+	Thu, 22 May 2025 22:55:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747954520;
+	bh=20BxxCEe2TpJllJFUO+uu+ZTnDkvT1+Y6OoCQLuPVMo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GwoqHKt42hmw6eeGh/JitXySF3qirPMlq5ZuQjnFUDszGVPmHgEymvysZOjKqSdbm
+	 bIR8hf1UwKSA+fXvWOy8THGqjELjqhKBlCfKTdhgj7l04iV85pctx9YrQC44daPcs/
+	 4kAWjWZMP4L/4Pw3OLXkqRwDmXonWewlVsbr/7zbS64C6MWvD6rjI9oWVVYCkLlZuy
+	 w/gMlKYqlGUSuluTvqu4UH3Of5M3HPCmgsb2+42usD4tiaAXh8nPv2HV39el576Nmp
+	 +kejM0i5ISMAE78ga9L/0X2NwS7bi1Um4n+g/8aZIFIYBWuiA2R420nxpJiKQaR7+s
+	 0hH3T16c+GImg==
+Date: Thu, 22 May 2025 15:55:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next V2 11/11] net/mlx5e: Support ethtool
+ tcp-data-split settings
+Message-ID: <20250522155518.47ab81d3@kernel.org>
+In-Reply-To: <1747950086-1246773-12-git-send-email-tariqt@nvidia.com>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+	<1747950086-1246773-12-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Paolo Abeni wrote:
-> If the related virtio feature is set, enable transmission and reception
-> of gso over UDP tunnel packets.
-> 
-> Most of the work is done by the previously introduced helper, just need
-> to determine the UDP tunnel features inside the virtio_net_hdr and
-> update accordingly the virtio net hdr size.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  drivers/net/virtio_net.c | 78 +++++++++++++++++++++++++++++++---------
->  1 file changed, 62 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 71a972f20f19b..3ca275ab887fe 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -46,11 +46,6 @@ static bool virtio_is_mapped_offload(unsigned int obit)
->  	       obit <= VIRTIO_OFFLOAD_MAP_MAX;
+On Fri, 23 May 2025 00:41:26 +0300 Tariq Toukan wrote:
+> +	/* if HW GRO is not enabled due to external limitations but is wanted,
+> +	 * report HDS state as unknown so it won't get turned off explicitly.
+> +	 */
+> +	if (kernel_param->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED &&
+> +	    priv->netdev->wanted_features & NETIF_F_GRO_HW)
+> +		kernel_param->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_UNKNOWN;
+
+The kernel_param->tcp_data_split here is the user config, right?
+It would be cleaner to not support setting SPLIT_DISABLED.
+Nothing requires that, you can support just setting AUTO and ENABLED.
+
+> +
+
+nit: extra empty line, please run checkpatch
+
 >  }
 >  
-> -#define VIRTIO_FEATURE_TO_OFFLOAD(fbit)	\
-> -	({								\
-> -		unsigned int __f = fbit;				\
-> -		__f >= VIRTIO_FEATURES_MAP_MIN ? __f - VIRTIO_O2F_DELTA : __f; \
-> -	})
-
-This was introduced two patches ago. Never used. Remove entirely from the series.
-
->  #define VIRTIO_OFFLOAD_TO_FEATURE(obit)	\
->  	({								\
->  		unsigned int __o = obit;				\
-> @@ -85,16 +80,30 @@ static const unsigned long guest_offloads[] = {
->  	VIRTIO_NET_F_GUEST_CSUM,
->  	VIRTIO_NET_F_GUEST_USO4,
->  	VIRTIO_NET_F_GUEST_USO6,
-> -	VIRTIO_NET_F_GUEST_HDRLEN
-> +	VIRTIO_NET_F_GUEST_HDRLEN,
-> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
-> +	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED,
-> +	VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED,
-> +#endif
->  };
+>  static void mlx5e_get_ringparam(struct net_device *dev,
+> @@ -383,6 +391,43 @@ static void mlx5e_get_ringparam(struct net_device *dev,
+>  	mlx5e_ethtool_get_ringparam(priv, param, kernel_param);
+>  }
 >  
-> -#define GUEST_OFFLOAD_GRO_HW_MASK ((1ULL << VIRTIO_NET_F_GUEST_TSO4) | \
-> +#define __GUEST_OFFLOAD_GRO_HW_MASK ((1ULL << VIRTIO_NET_F_GUEST_TSO4) | \
->  				(1ULL << VIRTIO_NET_F_GUEST_TSO6) | \
->  				(1ULL << VIRTIO_NET_F_GUEST_ECN)  | \
->  				(1ULL << VIRTIO_NET_F_GUEST_UFO)  | \
->  				(1ULL << VIRTIO_NET_F_GUEST_USO4) | \
->  				(1ULL << VIRTIO_NET_F_GUEST_USO6))
->  
-> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
+> +static bool mlx5e_ethtool_set_tcp_data_split(struct mlx5e_priv *priv,
+> +					     u8 tcp_data_split)
+> +{
+> +	bool enable = (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED);
+> +	struct net_device *dev = priv->netdev;
 > +
-> +#define GUEST_OFFLOAD_GRO_HW_MASK (__GUEST_OFFLOAD_GRO_HW_MASK | \
-> +	(1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED) | \
-> +	(1ULL << VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED))
-> +#else
+> +	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
+> +		return true;
 > +
-> +#define GUEST_OFFLOAD_GRO_HW_MASK __GUEST_OFFLOAD_GRO_HW_MASK
-> +#endif
+> +	if (enable && !(dev->hw_features & NETIF_F_GRO_HW)) {
+> +		netdev_warn(dev, "TCP-data-split is not supported when GRO HW is not supported\n");
+> +		return false; /* GRO HW is not supported */
+> +	}
 > +
->  struct virtnet_stat_desc {
->  	char desc[ETH_GSTRING_LEN];
->  	size_t offset;
-> @@ -443,9 +452,14 @@ struct virtnet_info {
->  	/* Packet virtio header size */
->  	u8 hdr_len;
->  
-> +	/* UDP tunnel support*/
+> +	if (enable && (dev->features & NETIF_F_GRO_HW)) {
+> +		/* Already enabled */
+> +		dev->wanted_features |= NETIF_F_GRO_HW;
+> +		return true;
+> +	}
+> +
+> +	if (!enable && !(dev->features & NETIF_F_GRO_HW)) {
+> +		/* Already disabled */
+> +		dev->wanted_features &= ~NETIF_F_GRO_HW;
+> +		return true;
+> +	}
+> +
+> +	/* Try enable or disable GRO HW */
+> +	if (enable)
+> +		dev->wanted_features |= NETIF_F_GRO_HW;
+> +	else
+> +		dev->wanted_features &= ~NETIF_F_GRO_HW;
 
-space before closing asterisk
-
-> +	u8 tnl_offset;
-> +
->  	/* Work struct for delayed refilling if we run low on memory. */
->  	struct delayed_work refill;
->  
-> +	bool rx_tnl_csum;
-> +
-
-There are an awful lot of non consecutive bools here. Probably would
-be a nice cleanup to conver to an integer bitfield. Maybe not for this
-series.
-
->  	/* Is delayed refill enabled? */
->  	bool refill_enabled;
->  
+Why are you modifying wanted_features? wanted_features is what
+*user space* wanted! You should probably operate on hw_features ?
+Tho, may be cleaner to return an error and an extack if the user
+tries to set HDS and GRO to conflicting values.
 
