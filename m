@@ -1,218 +1,202 @@
-Return-Path: <netdev+bounces-192667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E2DAC0C14
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:59:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B756AC0C25
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C00B71BC55FD
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:59:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6F2F1892CEB
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE5028BA88;
-	Thu, 22 May 2025 12:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B5E28B3F9;
+	Thu, 22 May 2025 13:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s3WZbfg4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hZmkZopR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1187E28BA83;
-	Thu, 22 May 2025 12:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5121635963
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 13:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747918740; cv=none; b=BpWzTwfhDyjRhPtn+5NoduLoNZhiVfE8vS0eBXSVoi0yMd7aI8dAVqlWOi4QUJLYkEOdloTD1YdDwHXc9psDesJosYl7x4tSlQ06EB0fyqvsy8FmlL5dOsTmaTPUwTMXXJWmxWksY6i2LomGbalZZl7U7NCPMpoVMavQ/N7zc8s=
+	t=1747918976; cv=none; b=Dm6ypOUAh+Y9Cs2FlyNRutB0KLZl/RywrqAkuZA8QTaVfrClYVQ3zLExqcg9hvtS48tjaXqQyWQ/QgvY5Y5kFEGK4teccW7WX+NrHRMBnHvEWPNkQc/RbKI2mnQsPHnYdiifm33XpMc2nIegzY1czNd3mgyK8Qjf44/wS+EYAuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747918740; c=relaxed/simple;
-	bh=3UeWmO3Gu+/pCAZWrTHZMaFP839whgkO8tDT3XL2f0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fm694yp8T5SiDsKpX4Td5JGSHw43jCEacfwTsnEfsH8ur7Tvu6SxblTsC0qUwCe/ZJ9+v5a2IGSV+hCZi5PAUisI00TL+Z9O/p5OfGCT5bkapv8OZj3nFozjmCJkUt1hEjj5Hd5Om0qxEOGV2Z/ozBb62A0dEW3pT+WtlrNylDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s3WZbfg4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D97AC4CEE4;
-	Thu, 22 May 2025 12:58:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747918739;
-	bh=3UeWmO3Gu+/pCAZWrTHZMaFP839whgkO8tDT3XL2f0Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s3WZbfg42LGn7LjzdmUKp/O381+ow2RN1NgoAenJaRX+s0j67E+rCov2ZUwZrc8bV
-	 FUwaEJE6LekczyCPmSUNRZPtedptklNeDBf2xe768yHmrb4DsXMPlO94NBTZm1EOz+
-	 bksO+H2+5b2jjc/UqSe1fVnyKjyU78w64hRzU8r3G4jT513/LchNSRn6Ntl6h/tHGF
-	 qTU9mE4fIzIkyNU5UlJzX6I171HnGQ2ej5glou5NKZ2pWm+VjH8FGimvxZm0WPQ8oc
-	 Eq/ndajpwac91Fbf6pVp1AZ3ZWPOqy04QKEuzrcHZuC7RkdI41k85eyObfg8vxWoCC
-	 4Y+NFQc8hudhg==
-Date: Thu, 22 May 2025 14:58:56 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 4/4] net: airoha: Add the capability to
- allocate hfwd descriptors in SRAM
-Message-ID: <aC8fkFUEmBgyT3-W@lore-desk>
-References: <20250521-airopha-desc-sram-v3-0-a6e9b085b4f0@kernel.org>
- <20250521-airopha-desc-sram-v3-4-a6e9b085b4f0@kernel.org>
- <20250522123913.GY365796@horms.kernel.org>
+	s=arc-20240116; t=1747918976; c=relaxed/simple;
+	bh=Zdmq/J4jC/9RoGx6mYI9Ny57vnjoGwqK3Ih9kwM9kj0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lNkTSrzRdvmUkqcvicLHeQJJSxpaIoKYSwTlRtNRK7nAiso4abLYEJ44sjicYashFe+vnAovSXBt2psMMYcI65g3kwblH1DhJ9ICWaG3P78ojgXa8RPsGKHoJUT8ZepW0KBjGb0+w6ZF1YzNRqwkknBXt9cMCbjf6ejD/xLGbMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hZmkZopR; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-47666573242so1827371cf.0
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 06:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747918973; x=1748523773; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zdmq/J4jC/9RoGx6mYI9Ny57vnjoGwqK3Ih9kwM9kj0=;
+        b=hZmkZopRF36wH4Fxlmc3Gfn1gUdE6I3tTEImjrBFTIoYWMy+6t+h+Laji4pqCoJbzd
+         2hDheVDKRwKgasJpx1T+DIFMIBHhJSBXi9gL47vFK/7JdNrgDjnQt6cd0PqY+uFnPqPN
+         99XljA4MkWRTj2uOZYgh3N1rQhcXHehQDeLDXTwFjiRydEfHL52qWvhZo3ooNdZYlWsw
+         8nnKVbQrxbjWXktc4i9vJEBw7TUF/euplarz5tctnQA57hdxbbQ2D3ptlwUuxmjkNslL
+         KkhRgTvPEuL2ffHgxvhgZs0v863BNaXVoaaiux7PqSPmPUAL0B/nmh/Dj3mwKkJYkFyh
+         6isg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747918973; x=1748523773;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zdmq/J4jC/9RoGx6mYI9Ny57vnjoGwqK3Ih9kwM9kj0=;
+        b=G157Fs6c97qjsupEimWA5s7Gw5Zji895DzZLHUjMbwB96KBARFgc/OdCN52HpNN5IX
+         lowE4XpLr6D9If7WQdwlD7tmzeQMX6hzNgpkfxfX6T/wbbSjt40gpQYOaUR0SRzVev6o
+         MIyVqOrqOSqkBOigckdCB1Vw6OAYQ0LfcKuEAP/nOK+5d6cRoXNQBpXG86rbNE3rxjxj
+         pRjeTOkbKicHpXNvfR52y0p3Ck9d8UpkP37LgbS7W2QixECafLi+iLpc9NKSuMQtcJxg
+         vgjIRzCJqhclkGf7SjSJLjNZfxOirlAyo93gNo0a39XrZpBZVofgIDc1xhC7C3YuC3Im
+         bHlA==
+X-Gm-Message-State: AOJu0YzloW1sTVnJOFNXWIw0yW11hoAhsbeD3I+t8BCFyZq8Q3S3f3lk
+	tViYm7jMU7O/g6EeiyXTVBeMH5Lu1bNMr4VvFOKW2iu6i6DQUnI88TehB58csYaZnuqpNUigL2E
+	LI2bVpAmoI1TdAs0OOWxUJOzLsnNcPG9dlIUwkAp8
+X-Gm-Gg: ASbGnctuHO3CenjmngLLsDsM1XorA98WIsTcQA7qHhPaW5X2hLxSWZHXDTO8dYUCEvM
+	LKgMc3MQULnPiPza7kivbHIkOi7kayxvqUeajKP2rlx9S4mQ3bPnvrAM5GoJWhzHlG3m0K8Msa/
+	c7H7UdgJgoCGAO4o3etgO7g/5joG9m2HuaMefOEzPa4Z2Zva+7wj8OYVxRlnS0AAcZ/n9dg68gu
+	PC7
+X-Google-Smtp-Source: AGHT+IH5Im59hQJj6pgAr0wU8NMjEMK0+67zGNqmLaihLEHvRbIaW2GhUbrHfb6CAv2pNAq9zX6hQG9duT/R/uIeBvg=
+X-Received: by 2002:a05:622a:120a:b0:48d:8f6e:ece7 with SMTP id
+ d75a77b69052e-49cefbe14b9mr2819541cf.3.1747918972690; Thu, 22 May 2025
+ 06:02:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="iprZUwWZ4qRrgVsy"
-Content-Disposition: inline
-In-Reply-To: <20250522123913.GY365796@horms.kernel.org>
-
-
---iprZUwWZ4qRrgVsy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <CAAHxn9-ctPXJh1jeZc3bYeNod6pdfd6qgYWuXMb9uN_12McPAQ@mail.gmail.com>
+ <CADVnQy=RRLaTG4t5BqQ1XJskb+oxWe=M_qY0u9rzmXGS1+b7nQ@mail.gmail.com>
+ <CAAHxn98G9kKtVi34mC+NHwasixZd63C8+s5gC5T5o-vKUVVoKQ@mail.gmail.com>
+ <CADVnQyn=MXohOf1vskJcm9VTOeP31Y5AqCPu7B=zZuTB8nh8Eg@mail.gmail.com>
+ <CAAHxn9_++G0icFE1F+NCfnj3AkErmytQ3LUz2C-oY-TJKbdwmg@mail.gmail.com>
+ <CADVnQymURKQQHHwrcGRKqgbZuJrEpaC6t7tT7VeUsETcDTWg2Q@mail.gmail.com> <CAAHxn9_waCMAh3Me63WQv+1h=FmT10grA13t09xaym4hX1KgCg@mail.gmail.com>
+In-Reply-To: <CAAHxn9_waCMAh3Me63WQv+1h=FmT10grA13t09xaym4hX1KgCg@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 22 May 2025 09:02:36 -0400
+X-Gm-Features: AX0GCFvNmb9pEkNV2myml4MsTBr5eGLx8GKxb-MAY5A9-OpOoMFHI_a6iFK53KA
+Message-ID: <CADVnQynDkHVmTdnMZ+ZvDtwF9EVcOOphDbr+eLUMBijbc+2nQw@mail.gmail.com>
+Subject: Re: Re: [EXT] Re: tcp: socket stuck with zero receive window after SACK
+To: Simon Campion <simon.campion@deepl.com>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>, Jon Maloy <jmaloy@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> On Wed, May 21, 2025 at 09:16:39AM +0200, Lorenzo Bianconi wrote:
-> > In order to improve packet processing and packet forwarding
-> > performances, EN7581 SoC supports consuming SRAM instead of DRAM for
-> > hw forwarding descriptors queue.
-> > For downlink hw accelerated traffic request to consume SRAM memory
-> > for hw forwarding descriptors queue.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/ethernet/airoha/airoha_eth.c | 11 +----------
-> >  drivers/net/ethernet/airoha/airoha_eth.h |  9 +++++++++
-> >  drivers/net/ethernet/airoha/airoha_ppe.c |  6 ++++++
-> >  3 files changed, 16 insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/eth=
-ernet/airoha/airoha_eth.c
-> > index 20e590d76735e72a1a538a42d2a1f49b882deccc..3cd56de716a5269b1530cff=
-6d0ca3414d92ecb69 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> > @@ -71,15 +71,6 @@ static void airoha_qdma_irq_disable(struct airoha_ir=
-q_bank *irq_bank,
-> >  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
-> >  }
-> > =20
-> > -static bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
-> > -{
-> > -	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
-> > -	 * GDM{2,3,4} can be used as wan port connected to an external
-> > -	 * phy module.
-> > -	 */
-> > -	return port->id =3D=3D 1;
-> > -}
-> > -
-> >  static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 =
-*addr)
-> >  {
-> >  	struct airoha_eth *eth =3D port->qdma->eth;
-> > @@ -1128,7 +1119,7 @@ static int airoha_qdma_init_hfwd_queues(struct ai=
-roha_qdma *qdma)
-> >  			LMGR_INIT_START | LMGR_SRAM_MODE_MASK |
-> >  			HW_FWD_DESC_NUM_MASK,
-> >  			FIELD_PREP(HW_FWD_DESC_NUM_MASK, HW_DSCP_NUM) |
-> > -			LMGR_INIT_START);
-> > +			LMGR_INIT_START | LMGR_SRAM_MODE_MASK);
->=20
-> Hi Lorenzo,
+On Thu, May 22, 2025 at 6:34=E2=80=AFAM Simon Campion <simon.campion@deepl.=
+com> wrote:
+>
+> On Wed, 21 May 2025 at 17:56, Neal Cardwell <ncardwell@google.com> wrote:
+> > For my education, why do you set net.ipv4.tcp_shrink_window=3D1?
+>
+> We enabled it mainly as an attempt to decrease the frequency of a
+> different issue in which jumbo frames were dropped indefinitely on a
+> host, presumably after memory pressure, discussed in [1]. The jumbo
+> frame issue is most likely triggered by system-wide memory pressure
+> rather than hitting net.ipv4.tcp_mem. So,
+> net.ipv4.tcp_shrink_window=3D1, which, as far as we understand, makes
+> hitting net.ipv4.tcp_mem less likely, probably didn't help with
+> decreasing the frequency of the jumbo frame issue. But the issue had
+> sufficiently serious impact and we were sufficiently unsure about the
+> root cause that we deemed net.ipv4.tcp_shrink_window=3D1 worth a try.
+> (Also, the rationale behind net.ipv4.tcp_shrink_window=3D1 laid out in
+> [2] and [3] sounded reasonable.)
+>
+> But yes, it's feasible for us to revert to the default
+> net.ipv4.tcp_shrink_window=3D0, in particular because there's another
+> workaround for the jumbo frame issue: reduce the MTU. We've set
+> net.ipv4.tcp_shrink_window=3D0 yesterday and haven't seen the issue
+> since. So:
+>
+> 6.6.74 + net.ipv4.tcp_shrink_window=3D1: issue occurs
+> 6.6.83 + net.ipv4.tcp_shrink_window=3D1: issue occurs
+> 6.6.74 + net.ipv4.tcp_shrink_window=3D0: no issue so far
+> 6.6.83 + net.ipv4.tcp_shrink_window=3D0: no issue so far
+>
+> Since the issue occurred sporadically, it's too soon to be fully
+> confident that it's gone with net.ipv4.tcp_shrink_window=3D0. We'll
+> write again in a week or so to confirm.
 
-Hi Simon,
+Thanks for the data points and testing!
 
->=20
-> I'm wondering if setting the LMGR_SRAM_MODE_MASK bit (maybe a different
-> name for the #define would be nice) is dependent on the SRAM region
+I agree it will take a while to gather more confidence that the issue
+is gone for your workload with net.ipv4.tcp_shrink_window=3D0.
 
-I did this way because LMGR_SRAM_MODE_MASK is just a bit. Do you prefer
-to do something like:
+Based on your data, my current sense is that for your workload the
+buggy behavior was triggered by net.ipv4.tcp_shrink_window=3D1.
 
-FIELD_PREP(LMGR_SRAM_MODE_MASK, 1)?
+However, AFAICT with the current code there could be similar problems
+with the default net.ipv4.tcp_shrink_window=3D0 setting if the socket
+suffers a memory pressure event while there is a tiny amount of free
+receive buffer.
 
-> being described in DT, as per code added above this line to this
-> function by the previous patch in this series.
+> If net.ipv4.tcp_shrink_window=3D1 seems to have caused this issue, we'd
+> still be curious to understand why it leads to TCP connections being
+> stuck indefinitely even though the recv-q (as reported by ss) is 0.
+> Assuming the recv-q was indeed correctly reported as 0, the issue
+> might be that receive buffers can fill up in a way so that the only
+> way for data to leave the receive buffer is receipt of further data.
+> In particular, the application can't read data out of the receive
+> buffer and empty it that way. Maybe filling up buffers with data
+> received out-of-order (whether we SACK it or not) satisfies this
+> condition. This would explain why we saw this issue only in the
+> presence of SACK flags before we disabled SACK. With
+> net.ipv4.tcp_shrink_window=3D1, a full receive buffer leads to a zero
+> window being advertised (see [2]) and if the buffer filled up in a way
+> so that no data can leave until further data is received, we are stuck
+> forever because the kernel drops incoming data due to the zero window.
+> In contrast, with ipv4.tcp_shrink_window=3D0, we will keep advertising a
+> non-zero window, so incoming data isn't dropped and we can have data
+> leave the receive buffer.
 
-Are you referring to qdma0_buf/qdma1_buf memory regions?
-https://patchwork.kernel.org/project/netdevbpf/patch/20250521-airopha-desc-=
-sram-v3-1-a6e9b085b4f0@kernel.org/
+Yes, this matches my theory of the case as well.
 
-If so, they are DRAM memory-regions and not SRAM ones. They are used for
-hw forwarding buffers queue. SRAM is used for hw forwarding descriptor queu=
-e.
+Except I would add that with ipv4.tcp_shrink_window=3D0, AFAICT with
+recent kernels a receiver can get into a situation where a memory
+pressure event while there is a tiny amount of free receive buffer can
+cause the receiver to set tp->rcv_wnd to 0, and thus get into a
+similar situation where the receiver (due to the zero window) will
+keep advertising a zero window and dropping incoming data without
+pruning SACKed skbs to make room in the receive buffer.
 
-Regards,
-Lorenzo
+(It sounds like in your case the net.ipv4.tcp_shrink_window=3D1 is
+triggering the problem rather than the memory pressure issue.)
 
->=20
-> > =20
-> >  	return read_poll_timeout(airoha_qdma_rr, status,
-> >  				 !(status & LMGR_INIT_START), USEC_PER_MSEC,
-> > diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/eth=
-ernet/airoha/airoha_eth.h
-> > index 3e03ae9a5d0d21c0d8d717f2a282ff06ef3b9fbf..b815697302bfdf2a6d115a9=
-bbbbadc05462dbadb 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> > +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> > @@ -597,6 +597,15 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32=
- mask, u32 val);
-> >  #define airoha_qdma_clear(qdma, offset, val)			\
-> >  	airoha_rmw((qdma)->regs, (offset), (val), 0)
-> > =20
-> > +static inline bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
-> > +{
-> > +	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
-> > +	 * GDM{2,3,4} can be used as wan port connected to an external
-> > +	 * phy module.
-> > +	 */
-> > +	return port->id =3D=3D 1;
-> > +}
-> > +
-> >  bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
-> >  			      struct airoha_gdm_port *port);
-> > =20
-> > diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/eth=
-ernet/airoha/airoha_ppe.c
-> > index 2d273937f19cf304ab4b821241fdc3ea93604f0e..12d32c92717a6b4ba74728e=
-c02bb2e166d4d9407 100644
-> > --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> > +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> > @@ -251,6 +251,12 @@ static int airoha_ppe_foe_entry_prepare(struct air=
-oha_eth *eth,
-> >  		else
-> >  			pse_port =3D 2; /* uplink relies on GDM2 loopback */
-> >  		val |=3D FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, pse_port);
-> > +
-> > +		/* For downlink traffic consume SRAM memory for hw forwarding
-> > +		 * descriptors queue.
-> > +		 */
-> > +		if (airhoa_is_lan_gdm_port(port))
-> > +			val |=3D AIROHA_FOE_IB2_FAST_PATH;
-> >  	}
-> > =20
-> >  	if (is_multicast_ether_addr(data->eth.h_dest))
-> >=20
-> > --=20
-> > 2.49.0
-> >=20
-> >=20
+> ... I'm speculating here; once we confirm that
+> the issue seems to have been triggered by
+> net.ipv4.tcp_shrink_window=3D1, I'd be keen to hear other thoughts as to
+> why the setting may have this effect in certain environments.
 
---iprZUwWZ4qRrgVsy
-Content-Type: application/pgp-signature; name=signature.asc
+I suspect the environmental factors that make your workload
+susceptible to these issues are related to
 
------BEGIN PGP SIGNATURE-----
++ the amount of space used by the NIC driver on the receiver to hold
+incoming packets may be large relative to the rcvmss
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaC8fkAAKCRA6cBh0uS2t
-rMc/APsHFb0yGNDadbOPVqtqRVgDOqcuY/8cBBvHNN4yk6Ee2wD9F3b4lIMI3avz
-UzFWnDg6PR+xt1ROJTD3LIJwNDjk2gg=
-=Vggv
------END PGP SIGNATURE-----
++ the variation in the incoming packet sizes (the hole was 602 bytes
+when the rcvmss is a larger 1434 bytes) may be causing challenges
 
---iprZUwWZ4qRrgVsy--
++ the packet loss is definitely causing challenges for the algorithm,
+since the SACKed out-of-order data can eat up most of the space needed
+to buffer the packet to fill the hole and allow the app to read the
+data out of the receive buffer to free up more space
+
+Thanks,
+neal
+
+
+> [1] https://marc.info/?l=3Dlinux-netdev&m=3D174600337131981&w=3D2
+> [2] https://github.com/torvalds/linux/commit/b650d953cd391595e536153ce30b=
+4aab385643ac
+> [3] https://blog.cloudflare.com/unbounded-memory-usage-by-tcp-for-receive=
+-buffers-and-how-we-fixed-it/
 
