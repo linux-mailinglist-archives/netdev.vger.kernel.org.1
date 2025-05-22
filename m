@@ -1,178 +1,137 @@
-Return-Path: <netdev+bounces-192569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0E0AC0697
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:08:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8810FAC06D4
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005023B23A0
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:08:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB5589E10C5
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E190E262FE6;
-	Thu, 22 May 2025 08:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC68D262FEA;
+	Thu, 22 May 2025 08:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MoMu+Nxt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LS9j2jWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAB9261577
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B1925486F
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747901294; cv=none; b=JdZZAqZf6mtIRkKyuqjxqlEch3+K35QhyKSPVZu9G0aYxlAQPsVuT49WAljKAhKwQOA0KUyjJnK6+UfmtqgbcL7R9x4sKwXfQjr2eTbBGIGG3FabKZSKjZoBO+Bu3IX5VCnMib9i7nPk3BY2wKfxdwUcXYv2zcBGZ8rZa8+X/FQ=
+	t=1747901904; cv=none; b=s0jfylVxyvmdqvpROWQF1/cfqSVTq1uoCzFe7CFjICiqKkRq+xK2EdkqrfvESv5L8J7NiDPPb0tc4aZqAKCtT+jsV9ifd+OVDxyaii62VxeyiODi+8YDQtV8mVuWhdtCkhpt2SFSHS7DGUxrIGVgb7/NdrJd8r9HTztuY1xjBK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747901294; c=relaxed/simple;
-	bh=EX5kmSVBRAEXjNP2+5QT/wObVkwCn7KBTPH2XSu0cww=;
+	s=arc-20240116; t=1747901904; c=relaxed/simple;
+	bh=Jii8DnROvN5RU5vMD8/YqabKiAH1HBT7oUkPtkeEBJk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VMTuO6abHTLAktAu7p7MclL1zGA6yX+bHbk54OZjrjFrMxjfIGnwfSG9+e91HyuLcmDGaZZxYqsdUh0nDIKttl82xJdAdX/VOrfeqnDa3M6Zax6LexoCxBoxqYQq+zFFX5xSdLThJNQVpjaVZfS7bRMMNff/+dedLQZcxf1aH2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MoMu+Nxt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747901291;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v4Wd+YCxX35LZrCoOEx8nIlaA1xFBFeFa5Cgo0fIeyo=;
-	b=MoMu+Nxt0igH4ftuPMxDzFqwHydL8oeRKOxQPx1ot2iUBLc5Gzow94zHgNsqhJreNojH50
-	d38geBDugG2pQWaC8pxnzm2Mt0kEXtjRQDmUZGogVEbywj/MQGKUuwfFk7fUHaKlXy62DB
-	X1atUYa5nFUJpoUea8QLkExsEyuQJVI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-UE_Ick66O4yqdr05TVU0cw-1; Thu, 22 May 2025 04:08:10 -0400
-X-MC-Unique: UE_Ick66O4yqdr05TVU0cw-1
-X-Mimecast-MFC-AGG-ID: UE_Ick66O4yqdr05TVU0cw_1747901289
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a3660a9096so2280709f8f.2
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 01:08:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747901289; x=1748506089;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v4Wd+YCxX35LZrCoOEx8nIlaA1xFBFeFa5Cgo0fIeyo=;
-        b=qs/WaJM0HgPtW03krIcMjDaC3bRkmwnZr2aqoic7UQUJpxS8Qtiu/GZ3Y0wxN91nSK
-         C3y75gOAeGT+dOpbxqUCN1cr0DxVlXiux0l8uZVv71dCwvpprGF316s+YDqLRKRAM27q
-         TDdm/idYJgVkhCawsoipHgHTTdBJCk0jLb3Tb1DM5JMNaKLGb2L5+sngqXG5KCCvWPyy
-         gywc/kIDMrPWl8RohbBZXluNTrADrh0lpow8lhw8P7440wnoC1Cg9PoP5Z/99PVuIxqw
-         nkeH3a0KdEI22HokFx+XNT+L9o66Bou6kp6s3EsIQ008M8HiPDazVzQ3ieALTk2Y8YhB
-         sJtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhA9eDAQbPKKPvNgvspaQjPTx4v4lVHUqMah3vg1750vrtXw1hSnmgkLNUpWr5CyJFcp0Jr6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+W40FzKk8cIRjKXbvk2LrRhTu8ogbS5uBqePwt4mk/KkSCY/b
-	sdOEBQAaPNQMYUbfsiiSNPOE9C7aQADMbh3ao9Zil/rO8hQ5Qrl9ntfl6XBRVraRMXwvtB+qaCQ
-	WD8oM8i4Ylqr2AJu5S37oB59iv7S+8AS8KGFGVxQPf640w4rbmR9fvrTqhg==
-X-Gm-Gg: ASbGnctivInSkts7NIpKOncF9UUIzJuReMWSgQC1Eanc75fe1X7QjTGNeU+BjcD563q
-	IAPYLk6BZ51ttQlmB+VCuVEvZH+RhXfsx9o6ETMHfAn0HpwjZ7Rrx3bWz04dnFyreoSaL+mHaw9
-	/rX/xQb2xvQju89qCWrxr11dXQ5g1jf56btU5ALRaMMlgFWJSM0GzvQ4X7thLT4X1Eocq1J5pEH
-	ZLNzMRtoJ+gOdiitbVSbcnmHkqZ2nWgi7ToMNq973FEI6RFGKuOxUSXwVL4THzICtY8DraeaMqX
-	bw4zzy2yEQcGvi4+6rz7V+LRNMlS5Ra1MJGkv52emLDGpMOQI2fvU5ub7xl0
-X-Received: by 2002:a05:6000:2384:b0:3a3:6843:497f with SMTP id ffacd0b85a97d-3a368434b4emr17223466f8f.2.1747901288982;
-        Thu, 22 May 2025 01:08:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGB40eN1djVba1zLi/ieq+7/sYLnQly/oH/G63SZEMaHuLSaV/Sn473qGuURKSe2USXv485dA==
-X-Received: by 2002:a05:6000:2384:b0:3a3:6843:497f with SMTP id ffacd0b85a97d-3a368434b4emr17223414f8f.2.1747901288395;
-        Thu, 22 May 2025 01:08:08 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6b295e7sm94333515e9.2.2025.05.22.01.08.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 01:08:07 -0700 (PDT)
-Date: Thu, 22 May 2025 10:08:03 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v6 0/5] vsock: SOCK_LINGER rework
-Message-ID: <kqm3bdj66qkziz27xsy6k6rnyminleqvebgqoudmufa424jlzm@khnzut7q4nqq>
-References: <20250522-vsock-linger-v6-0-2ad00b0e447e@rbox.co>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cw2vUI9wlNiivP31rF/UEb5Xt98UT6xX2p5KzHXeckK3RSZdinHMaJEv02sBhpwYQp5nuHHj6iR433RDZJz23P+91uW7Biw/Y0BV6OzXpoteNabGzQ5uy7dcHn/H2BGYxuxf5T1r25NgWSi+MjTOriKas6CHkWHK6fhrpAmV2+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LS9j2jWV; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747901903; x=1779437903;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Jii8DnROvN5RU5vMD8/YqabKiAH1HBT7oUkPtkeEBJk=;
+  b=LS9j2jWVsET+ZM0cyan1RaR+IhrhoG6wl1tUHB7xgD08BZyIpCdkVdue
+   Mky7Wl9RdKISeVS0CBpxi3J2ow7/nAwK1o3OVR2LwumufZtmCLD7yFKse
+   PtYoVD/dRsDzWDZ2dQixyARQFvV+KdpOagPR9hq65HkYh/aDxfOQ9zKjL
+   cu6uYuZWYeB5Q6NVajKXV0qFcNOT0RCL7192t6E3pVTAatZmdpXZkLjXz
+   cFhy1GhZdOiCatHOIGApNRe2eHTwrULEqjIEAz6V6aChQKtOHrhso0sin
+   OMR0CNgTluT4kJfqNaSuZHqWxqqSWzV+tyZJrSJzfNS21f/QFuxpK2bg+
+   g==;
+X-CSE-ConnectionGUID: 415KHB5zT5yFRjHj5Lbxeg==
+X-CSE-MsgGUID: Oh8mQSRLQomqgWVfUZCcYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="53718799"
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="53718799"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 01:18:23 -0700
+X-CSE-ConnectionGUID: Tl/CSLl0SdGl4/VFYAnrCg==
+X-CSE-MsgGUID: +qfZfjn6QQW0k58uiDjvgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="145628796"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 22 May 2025 01:18:19 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uI185-000P5c-0Q;
+	Thu, 22 May 2025 08:18:17 +0000
+Date: Thu, 22 May 2025 16:17:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Subject: Re: [PATCH net-next 1/8] virtio: introduce virtio_features_t
+Message-ID: <202505221621.MhvgnFni-lkp@intel.com>
+References: <9a1c198245370c3ec403f14d118cd841df0fcfee.1747822866.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250522-vsock-linger-v6-0-2ad00b0e447e@rbox.co>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9a1c198245370c3ec403f14d118cd841df0fcfee.1747822866.git.pabeni@redhat.com>
 
-On Thu, May 22, 2025 at 01:18:20AM +0200, Michal Luczaj wrote:
->Change vsock's lingerning to wait on close() until all data is sent, i.e.
->until workers picked all the packets for processing.
+Hi Paolo,
 
-Thanks for the series and the patience :-)
+kernel test robot noticed the following build errors:
 
-LGTM! There should be my R-b for all patches.
+[auto build test ERROR on net-next/main]
 
-Thanks,
-Stefano
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/virtio-introduce-virtio_features_t/20250521-183700
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/9a1c198245370c3ec403f14d118cd841df0fcfee.1747822866.git.pabeni%40redhat.com
+patch subject: [PATCH net-next 1/8] virtio: introduce virtio_features_t
+config: x86_64-buildonly-randconfig-001-20250522 (https://download.01.org/0day-ci/archive/20250522/202505221621.MhvgnFni-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250522/202505221621.MhvgnFni-lkp@intel.com/reproduce)
 
->
->Changes in v6:
->- Make vsock_wait_sent() return bool, parametrize enable_so_linger() with
->  timeout, don't open code DIV_ROUND_UP [Stefano]
->- Link to v5: https://lore.kernel.org/r/20250521-vsock-linger-v5-0-94827860d1d6@rbox.co
->
->Changes in v5:
->- Move unsent_bytes fetching logic to utils.c
->- Add a helper for enabling SO_LINGER
->- Accommodate for close() taking a long time for reasons unrelated to
->  lingering
->- Separate and redo the testcase [Stefano]
->- Enrich the comment [Stefano]
->- Link to v4: https://lore.kernel.org/r/20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co
->
->Changes in v4:
->- While in virtio, stick to virtio_transport_unsent_bytes() [Stefano]
->- Squash the indentation reduction [Stefano]
->- Pull SOCK_LINGER check into vsock_linger() [Stefano]
->- Don't explicitly pass sk->sk_lingertime [Stefano]
->- Link to v3: https://lore.kernel.org/r/20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co
->
->Changes in v3:
->- Set "vsock/virtio" topic where appropriate
->- Do not claim that Hyper-V and VMCI ever lingered [Stefano]
->- Move lingering to af_vsock core [Stefano]
->- Link to v2: https://lore.kernel.org/r/20250421-vsock-linger-v2-0-fe9febd64668@rbox.co
->
->Changes in v2:
->- Comment that some transports do not implement unsent_bytes [Stefano]
->- Reduce the indentation of virtio_transport_wait_close() [Stefano]
->- Do not linger on shutdown(), expand the commit messages [Paolo]
->- Link to v1: https://lore.kernel.org/r/20250407-vsock-linger-v1-0-1458038e3492@rbox.co
->
->Changes in v1:
->- Do not assume `unsent_bytes()` is implemented by all transports [Stefano]
->- Link to v0: https://lore.kernel.org/netdev/df2d51fd-03e7-477f-8aea-938446f47864@rbox.co/
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
->Michal Luczaj (5):
->      vsock/virtio: Linger on unsent data
->      vsock: Move lingering logic to af_vsock core
->      vsock/test: Introduce vsock_wait_sent() helper
->      vsock/test: Introduce enable_so_linger() helper
->      vsock/test: Add test for an unexpectedly lingering close()
->
-> include/net/af_vsock.h                  |  1 +
-> net/vmw_vsock/af_vsock.c                | 33 +++++++++++++
-> net/vmw_vsock/virtio_transport_common.c | 21 +--------
-> tools/testing/vsock/util.c              | 38 +++++++++++++++
-> tools/testing/vsock/util.h              |  2 +
-> tools/testing/vsock/vsock_test.c        | 83 +++++++++++++++++++++++----------
-> 6 files changed, 134 insertions(+), 44 deletions(-)
->---
->base-commit: f44092606a3f153bb7e6b277006b1f4a5b914cfc
->change-id: 20250304-vsock-linger-9026e5f9986c
->
->Best regards,
->-- 
->Michal Luczaj <mhal@rbox.co>
->
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505221621.MhvgnFni-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+>> drivers/remoteproc/remoteproc_virtio.c:328:18: error: incompatible function pointer types initializing 'virtio_features_t (*)(struct virtio_device *)' (aka 'unsigned __int128 (*)(struct virtio_device *)') with an expression of type 'u64 (struct virtio_device *)' (aka 'unsigned long long (struct virtio_device *)') [-Wincompatible-function-pointer-types]
+     328 |         .get_features   = rproc_virtio_get_features,
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
+
+
+vim +328 drivers/remoteproc/remoteproc_virtio.c
+
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  326  
+9350393239153c drivers/remoteproc/remoteproc_virtio.c Stephen Hemminger 2013-02-10  327  static const struct virtio_config_ops rproc_virtio_config_ops = {
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20 @328  	.get_features	= rproc_virtio_get_features,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  329  	.finalize_features = rproc_virtio_finalize_features,
+b49503eaf9c74c drivers/remoteproc/remoteproc_virtio.c Jiri Pirko        2024-07-08  330  	.find_vqs	= rproc_virtio_find_vqs,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  331  	.del_vqs	= rproc_virtio_del_vqs,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  332  	.reset		= rproc_virtio_reset,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  333  	.set_status	= rproc_virtio_set_status,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  334  	.get_status	= rproc_virtio_get_status,
+92b38f851470f8 drivers/remoteproc/remoteproc_virtio.c Sjur Brændeland   2013-02-21  335  	.get		= rproc_virtio_get,
+92b38f851470f8 drivers/remoteproc/remoteproc_virtio.c Sjur Brændeland   2013-02-21  336  	.set		= rproc_virtio_set,
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  337  };
+ac8954a413930d drivers/remoteproc/remoteproc_rpmsg.c  Ohad Ben-Cohen    2011-10-20  338  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
