@@ -1,148 +1,198 @@
-Return-Path: <netdev+bounces-192654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3899AC0AF1
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:59:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6855DAC0B06
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 453DE1BA6B73
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:59:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 970E13AC188
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9385528A1CB;
-	Thu, 22 May 2025 11:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2030B28A1D3;
+	Thu, 22 May 2025 12:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dVWRtVlY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKWf7UZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86051EE00C;
-	Thu, 22 May 2025 11:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2711DF965;
+	Thu, 22 May 2025 12:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747915149; cv=none; b=pEcBn+f98pL/en1/af+CasRUEg3aqmBT2RPnVy4V7UC9bo9WZOPlLuaz8OKQVfNNij5o7ndaVNL17/cjs6Xm4rTdRJRphEXWVarKjZ9vGy6stHVB/2l5VIVwCAhxK3juWaFQl+3DJ3l7qg2OjxEm21PwonarQP2WM3z2jgPdY2c=
+	t=1747915357; cv=none; b=E4WBoE9xMv0itVC0gE/FQ/wjwfT7IiTn21PUSJyz75qlahLrEKsGRY5otmAi9fFBhs2kY4mZB6quOwivag7IPZhfrq9ZsNf8QnE3LsfFKZir8gi2Kco24T6UDgjwXGfgdJnXlliidk2FX3Hw0E9CWeITvr1gOcRAxdtNewM5R88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747915149; c=relaxed/simple;
-	bh=+ORgkMlH1I9NQoexpEQZtsWTzjeSLiJ9Fqc5HfcsgDM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DxqlUu/b51liSvUprm+CG8m9ThDN4QGPLVWzB/TpCzYWrN4PFrOKs7O7MvnNANmPCc+j8TptCGYSHNiwNweNb9sTpiBWEGe2wnMhgOWFeb+2H1kH4Vj2QU4/1sROOUw9Iij/gk3Pp70vxHqDWxcLhvyW9hS9Kq51W9VcouX4akU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=dVWRtVlY; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MBF0ZR023449;
-	Thu, 22 May 2025 04:58:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=YMnfwGoi1pok6reBJzRJnzk
-	AEtrf/C2mJOq10GLOnb0=; b=dVWRtVlYXjr688Eg5a7mC64R43Y8fYFIHaWjNlE
-	5DwB50Gatlro435KJCAnJDrVFu4Mmdn/TVCIHpdr12m95pDo3PEi8U5NJ32FScRz
-	SB+dFhs+fBPVt9AXw6Dru+ETo6dwbm2o69YAFEc62I9plU6k47/yZgVtvJtq6rFZ
-	JpjG/KdGHFI3MqWLzXdNrzPSG58niZ3mu7/pFLw6dGwiQ1noM7AK4UUuxq4r9TMX
-	mhCG2nLENlIVxdnw2Ibjliahmn390v0ZMaLgMzCjssApZ7Ci0qeEu9osjQPhUDf3
-	nXmINeGxPtsk0rDk3dvO0UjQG7x2g5T73aiTFkOzUvRLvpw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46sxr1gh85-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 04:58:57 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 22 May 2025 04:58:56 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 22 May 2025 04:58:56 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 443853F708A;
-	Thu, 22 May 2025 04:58:51 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Naveen Mamindlapalli
-	<naveenm@marvell.com>
-Subject: [net Patchv2] octeontx2-pf: QOS: Refactor TC_HTB_LEAF_DEL_LAST callback
-Date: Thu, 22 May 2025 17:28:42 +0530
-Message-ID: <20250522115842.1499666-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747915357; c=relaxed/simple;
+	bh=3EqVS0mPt9FHYeHpJEN9TOubD2eRleBP0208eEeLR2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ez5Xm7yCNPhzV6kMGu7NT1a6XZFfJeEIjJNo9GyfnfC6Jabn+n3rP56dZsOl9K4y4j/Zn/9S0w2xfM95xX7iy/XtO+RlwyqKYXvFKfqosg9AUduj9XjbbBYnuwHisCCTIQkhQY+PVstt9Neuzht+SwGG/1L6wRBfHE5leUy5Lfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKWf7UZr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DEDC4CEE4;
+	Thu, 22 May 2025 12:02:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747915356;
+	bh=3EqVS0mPt9FHYeHpJEN9TOubD2eRleBP0208eEeLR2s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kKWf7UZrSMObWEDDrmj8yJWq72sycQWbfYl/ymYM0KUSgFVtxmkEpwe/FlC3P/OwE
+	 qzXFvINcYYRcrGh3W9CuA9GkAoNONfTY/SHelsuth3KzWoCR2EdwuCJsvYLMi3IaVZ
+	 MR3Fusi7rfKC+65QQby5DmodHWCKvm3jsZ/VMu6gOlU2d4S17MiZm1aMXFKJp5gYmE
+	 kJ3sMJid/uUoabCzppg6t2zcoFaMb32nRGFA9z5I5Kl9ZkybaaH14v98w1JLm9mkEC
+	 drvWNVpQBbCzawLA+U0xgnbmN+33Kvn/rpgi2Tx+aYUSksSfPObedGeRUfmpcXDFcA
+	 V6mZid1e6fccw==
+Date: Thu, 22 May 2025 13:02:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	KY Srinivasan <kys@microsoft.com>,
+	Paul Rosswurm <paulros@microsoft.com>,
+	"olaf@aepfle.de" <olaf@aepfle.de>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"leon@kernel.org" <leon@kernel.org>, Long Li <longli@microsoft.com>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add support for
+ Multi Vports on Bare metal
+Message-ID: <20250522120229.GX365796@horms.kernel.org>
+References: <1747671636-5810-1-git-send-email-haiyangz@microsoft.com>
+ <20250521140231.GW365796@horms.kernel.org>
+ <MN0PR21MB34373B1A0162D8452018ABAACA9EA@MN0PR21MB3437.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: S1XzRqRka-swnZzKLE4PoOXX1e6ZvLyh
-X-Proofpoint-ORIG-GUID: S1XzRqRka-swnZzKLE4PoOXX1e6ZvLyh
-X-Authority-Analysis: v=2.4 cv=LYU86ifi c=1 sm=1 tr=0 ts=682f1181 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=k5zTugwU0-n4PqS4dVgA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDEyMSBTYWx0ZWRfX98JGANuXmbvy 44ZSg6XxRHQaHHQTyOHK/fQoi6KO1X9vlqdN4cC+tBiQePw4Yq/6Mtg8zR4I/RuYcc+M78DZF4L I/COFgQfiq714kjLYHrr/jYd/9p9Dvr8WzZyAor2ETPBdUrYnrIiAewgaXPfgemh6/o1NnGpeaA
- 6CI3E5W6qpHxMtyscSvCuukRx476o84X/vdFNQTFHiGxY4H+lrvpoOfcr0bEIgQFZD83iOl9HIt Fk0zy5mLhPIxneNp9hFkjgmRSEuCR2uWftRbO5Ml5aKffApVPFWRkFzkYzxtWX2LztB8I2MAnQi odC6b+ze84u0kCekguvHuqTN/wMKHvZjC+VdVFAMUV+0Zw/en3tn99i0boygMdVpjaCxIxDT0Lg
- 5FaiTcaBiwApQjVDgW+Kh4qnN7+cy6Wk+w1zLY7usaEvTfQLhVpZ1u5GlcL7eZEk3OC04MD1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_06,2025-05-22_01,2025-03-28_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN0PR21MB34373B1A0162D8452018ABAACA9EA@MN0PR21MB3437.namprd21.prod.outlook.com>
 
-This patch addresses below issues,
+On Wed, May 21, 2025 at 05:28:33PM +0000, Haiyang Zhang wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Wednesday, May 21, 2025 10:03 AM
+> > To: Haiyang Zhang <haiyangz@microsoft.com>
+> > Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Dexuan Cui
+> > <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
+> > <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
+> > olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
+> > wei.liu@kernel.org; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
+> > ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
+> > daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
+> > ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
+> > shradhagupta@linux.microsoft.com; andrew+netdev@lunn.ch; Konstantin
+> > Taranov <kotaranov@microsoft.com>; linux-kernel@vger.kernel.org
+> > Subject: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add support for
+> > Multi Vports on Bare metal
+> > 
+> > On Mon, May 19, 2025 at 09:20:36AM -0700, Haiyang Zhang wrote:
+> > > To support Multi Vports on Bare metal, increase the device config
+> > response
+> > > version. And, skip the register HW vport, and register filter steps,
+> > when
+> > > the Bare metal hostmode is set.
+> > >
+> > > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > > ---
+> > > v2:
+> > >   Updated comments as suggested by ALOK TIWARI.
+> > >   Fixed the version check.
+> > >
+> > > ---
+> > >  drivers/net/ethernet/microsoft/mana/mana_en.c | 24 ++++++++++++-------
+> > >  include/net/mana/mana.h                       |  4 +++-
+> > >  2 files changed, 19 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > > index 2bac6be8f6a0..9c58d9e0bbb5 100644
+> > > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > > @@ -921,7 +921,7 @@ static void mana_pf_deregister_filter(struct
+> > mana_port_context *apc)
+> > >
+> > >  static int mana_query_device_cfg(struct mana_context *ac, u32
+> > proto_major_ver,
+> > >  				 u32 proto_minor_ver, u32 proto_micro_ver,
+> > > -				 u16 *max_num_vports)
+> > > +				 u16 *max_num_vports, u8 *bm_hostmode)
+> > >  {
+> > >  	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+> > >  	struct mana_query_device_cfg_resp resp = {};
+> > > @@ -932,7 +932,7 @@ static int mana_query_device_cfg(struct mana_context
+> > *ac, u32 proto_major_ver,
+> > >  	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_DEV_CONFIG,
+> > >  			     sizeof(req), sizeof(resp));
+> > >
+> > > -	req.hdr.resp.msg_version = GDMA_MESSAGE_V2;
+> > > +	req.hdr.resp.msg_version = GDMA_MESSAGE_V3;
+> > >
+> > >  	req.proto_major_ver = proto_major_ver;
+> > >  	req.proto_minor_ver = proto_minor_ver;
+> > 
+> > > @@ -956,11 +956,16 @@ static int mana_query_device_cfg(struct
+> > mana_context *ac, u32 proto_major_ver,
+> > >
+> > >  	*max_num_vports = resp.max_num_vports;
+> > >
+> > > -	if (resp.hdr.response.msg_version == GDMA_MESSAGE_V2)
+> > > +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V2)
+> > >  		gc->adapter_mtu = resp.adapter_mtu;
+> > >  	else
+> > >  		gc->adapter_mtu = ETH_FRAME_LEN;
+> > >
+> > > +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V3)
+> > > +		*bm_hostmode = resp.bm_hostmode;
+> > > +	else
+> > > +		*bm_hostmode = 0;
+> > 
+> > Hi,
+> > 
+> > Perhaps not strictly related to this patch, but I see
+> > that mana_verify_resp_hdr() is called a few lines above.
+> > And that verifies a minimum msg_version. But I do not see
+> > any verification of the maximum msg_version supported by the code.
+> > 
+> > I am concerned about a hypothetical scenario where, say the as yet unknown
+> > version 5 is sent as the version, and the above behaviour is used, while
+> > not being correct.
+> > 
+> > Could you shed some light on this?
+> > 
+> 
+> In driver, we specify the expected reply msg version is v3 here:
+> req.hdr.resp.msg_version = GDMA_MESSAGE_V3;
+> 
+> If the HW side is upgraded, it won't send reply msg version higher
+> than expected, which may break the driver.
 
-1. Active traffic on the leaf node must be stopped before its send queue
-   is reassigned to the parent. This patch resolves the issue by marking
-   the node as 'Inner'.
+Thanks,
 
-2. During a system reboot, the interface receives TC_HTB_LEAF_DEL
-   and TC_HTB_LEAF_DEL_LAST callbacks to delete its HTB queues.
-   In the case of TC_HTB_LEAF_DEL_LAST, although the same send queue
-   is reassigned to the parent, the current logic still attempts to update
-   the real number of queues, leadning to below warnings
+If I understand things correctly the HW side will honour the
+req.hdr.resp.msg_version and thus the SW won't receive anything
+it doesn't expect. Is that right?
 
-        New queues can't be registered after device unregistration.
-        WARNING: CPU: 0 PID: 6475 at net/core/net-sysfs.c:1714
-        netdev_queue_update_kobjects+0x1e4/0x200
-
-Fixes: 5e6808b4c68d ("octeontx2-pf: Add support for HTB offload")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
-v2* update the commit description about making qid as inner.
-
-
- drivers/net/ethernet/marvell/octeontx2/nic/qos.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 35acc07bd964..5765bac119f0 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -1638,6 +1638,7 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
- 	if (!node->is_static)
- 		dwrr_del_node = true;
- 
-+	WRITE_ONCE(node->qid, OTX2_QOS_QID_INNER);
- 	/* destroy the leaf node */
- 	otx2_qos_disable_sq(pfvf, qid);
- 	otx2_qos_destroy_node(pfvf, node);
-@@ -1682,9 +1683,6 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
- 	}
- 	kfree(new_cfg);
- 
--	/* update tx_real_queues */
--	otx2_qos_update_tx_netdev_queues(pfvf);
--
- 	return 0;
- }
- 
--- 
-2.34.1
 
 
