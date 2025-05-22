@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-192815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBA2AC1320
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 20:15:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77786AC131F
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 20:15:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF3E13A5946
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:15:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C407F7B0714
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26D21581F8;
-	Thu, 22 May 2025 18:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBD9157A67;
+	Thu, 22 May 2025 18:15:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="cwl366i8"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RRvlHbOB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC8C27715
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 18:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40341A4F12
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 18:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747937721; cv=none; b=WZ6DvecFI4MjRVx8kq/aXZUU6TThMcdi9TsLvjE7qO6QJKrmF0zPrxROQ4tz0i7wsZWDOfrfwcbO07qajTFIPkLrRFZ80o1ECkk2jVVu2wONujWTEqat8CmIHDdFDdNC/OWK1XogyV/v+hOawBjRUSDGqhn8rCuor4pV8/qAkoQ=
+	t=1747937714; cv=none; b=ZuT/cXFWIHoNcUoFwtCNkyV1C4H6uQn8jye0hhsP2e+nY7mD/oVP8TxdlKh1GYTLaQwmc2bg6Pl98TNso58zC+AVo8xHqnxd9d6Br8TlMi+mx2RMFCOBwq/7XOOMFgpy3cXUd+SePsIJAd0IVDZc0Z7XQOdlC1IZDplHa4q7VEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747937721; c=relaxed/simple;
-	bh=GfymHMNTaeTD+b3iLJcROTS48wkchBmDo8Frfgdl8dE=;
+	s=arc-20240116; t=1747937714; c=relaxed/simple;
+	bh=+wiHdMjuWSOsGPXWXel6vMxPKUm102FRRXgkozkfUWc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lvLSc3zm6U/sokYCvUmwP43escIz8TyyZ7aFp0ZCccRgcUDMFJFmG9zaFBn4q0HjvrG58vQkEtftm9auDoemISM1nli641GojuXjijbT5Gnms8nrom/R+ypFao2FidW4hP1aW376jfpHV07vFY28NMb9Dp3/kBc/bX4p/E9D8ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=cwl366i8; arc=none smtp.client-ip=209.85.222.170
+	 MIME-Version; b=Y+Bm0zYPM/ii9zlUHXaCBCgqUhMAfgw86LxJkI9sxbh++KeXVhYyYllmiGJ/b1L19s0+RZMSYzPPSIn78y3zA06LgLq5drjmXZ4cjfcEvfdAzsbOXhNlVnWV3EOuKW2ZG/z51H6y+eylpvCBEdsDj8xiTzkASrMmvAxMiE4oknA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RRvlHbOB; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c5b8d13f73so957112885a.0
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 11:15:19 -0700 (PDT)
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-86feb84877aso2013481241.3
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 11:15:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1747937719; x=1748542519; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1747937711; x=1748542511; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6xD4LEmaTl8Jk7kv/jWLteQU32AjV0DVeZwUFpiWz6c=;
-        b=cwl366i8qZFE5waTXK9Zqk3K/rBOxWOz1w5ncISQSzabbQza6D0/YK9XzKzvFi/g/e
-         82qK/thlw0QPJKIwOiFJNF7bnNOQl77ighQiispkZJWKSr+wvV9oShXwaGWeYNd7cf9/
-         u+uQsZxF5QkswmQmOpKk2RRG+jQQOPYjY7gNHQw6Tyx51U+IY3wIQ5m0AZUOj9EVilun
-         m5ljm9jLCjdoZdDKCxX+iOMfTh0l5+HLQXkcPq18zT6Dnlu0Dv5g6YbonfhdD9l6b0p8
-         xKr7em0xDT1HEwzpY4Bm26O/UKiRqD/CxscE/Q6lqNAl6vGQBgTpa0AQ2zv8B3ZfRJ0D
-         /q2A==
+        bh=ZdVkoSK9a3kZJZpWboUpE3pkD4ba57U7CiLC/AWaO4w=;
+        b=RRvlHbOB7EZ55VduWuWF3ZhQ37rUHqKMgWT6Cqi/FcgCCXTsHaEHnWCi+XG9z3i+Kl
+         efin2S/EeHk17G+Eck2vhLUoVMaQCVWkVUo6nazV0Js+R4PfYfDnJeoQzeNtH8hVMZWp
+         U7bRKX4Yr7bVOjCRQ6xe0QN+cvoPcDDacLI1o5BzvWNR5aeA+Qlla557FIuVRq9pgJ6n
+         oKdh1jBUEiNMCLhM3LQ57uiJCc9vnGiKIdtmxxKK3sN62J9n7voj8ZS+T2GCFTVRnfVn
+         WYpF192FUQmpUxEzNPuXnR1Q2jJVW7bKSQx96veKGGR/1t9NLAsV0fFlioXgsFs23dSN
+         LIww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747937719; x=1748542519;
+        d=1e100.net; s=20230601; t=1747937711; x=1748542511;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6xD4LEmaTl8Jk7kv/jWLteQU32AjV0DVeZwUFpiWz6c=;
-        b=ixwsStGvtZmLFMQ06jm2hsVZftkehnggu44iFyrxMhUHfyPoIXBMD9MN6IFuBut58z
-         +hIdRmFdHVS4+JdKIgNehV0ztEAsxaokm+Pz+ePHwa+IcQf3EYJO8diEjNOCY3AWRGA5
-         PjZzSTRqKcvAyP+EaJEIYo45SkE7qUsgciwoYMklM50D2tDqU6J03xFFLJnYtBto1z0k
-         e+3o10qtw2ep4wPS+FBs22R545wLUeZ4j1ur4Z0NZn5Q/S9VawzPqAdZqanH/q3zzyb0
-         X/V0bZOH1MBjX93yew267LI1ven21FF3EAVSQiH5T+iovpBaKNF2/YqNpv59CsRCvZ3J
-         INug==
-X-Gm-Message-State: AOJu0YzAIxcMu1T11+QICURiX/Nba+z50ZKsHjF87N56udLY5hCLuziJ
-	MpR0wNcLQTR6qMpAMMyd0XL8d9AD4jrooE46h8pigdH25a4xKp4uNYyf+SntabfuRUF+oxebk+1
-	hvlfEQQ==
-X-Gm-Gg: ASbGncssLLppWzFE8Lg4RZb5P6R0FeJDKUmIy9tGHKawERtlKx43fyn7sltNkUZaA2l
-	dE+4BMtuxHHGBf4qHDCiD5r/Ib/ObcpSKS7VQ8w8HJM9CW0mouBmy2UGcH4rDpNkHI7mylA1OA8
-	mTQNDurS5b4qvVgo6GTeQrLgmqbhHqE1uSdavDnYON+GmDjcd1gd+9DPtNc7RijNcXaSyfLk2Zf
-	J8AYOBtCW+Vn4lmwX7LUMh7SusmtCwVxyeuXL2T/swEojVCrnz5ChFVTznzvxSBdVq1v5hW9Uij
-	uxcdFiTqYK3vnmKsA8M1FbrHci99pKmxHiqvibDKCpaSWeT9b7xMeggmNTpUwDVUkX3UZfMwpwA
+        bh=ZdVkoSK9a3kZJZpWboUpE3pkD4ba57U7CiLC/AWaO4w=;
+        b=tabceTiWdUAXcyu9GrSjsVfH6YkheekmTcrR8PcWPB0FqgmuyOA+uz+yfR2wdIbUUF
+         cMG8jtTKJfjGuA0bhipSjaeL2o4S3hCMGlm4MeP7+Bj5c3fnHxVL8YwVys2kZYOTy1fj
+         +QEa7mMl/kHNvaMD0bD6aTEKUNJbDY6ZQqr7ENmjExLETgbVVsyQMlb1KGpknbvaOk6W
+         Q4jC5pPUUwv9Z3dDaOU5pAfSQ9j6VbAa8MmW4em6HUgRA7JI/OuFhveUCbjnzx8tSnjA
+         o1hPxMeePmqcst0OzjyN/EGVcqwV0byXamgPr0Q35fIavtCC16h6fq0vZejX6wlb03VS
+         WK0g==
+X-Gm-Message-State: AOJu0YxZgSO7uMNF9ZqXhwmGfGBijGZxcPNNlne/n0g2qTqa74GDckGA
+	UGEWrSfLIIeK9WFBqKzAu1avPeBAp9uIOsEQg7wnnvrwgjIVUsr5J6sS9RjXkhtjiCdWZ05vsyk
+	LZf1d2A==
+X-Gm-Gg: ASbGncsDkq8HHe1IP4UNI6LF5s6xSKMktWSPr1xrgMkmMEnd5RDJAdvqtKAnXRHQuS0
+	V81etB5bzHj6aamlg/eElw9gPPOdk/0i4yAZlLmQ8hr/hi3nm62LCtSCICS/uhTAw1aNeuMC35k
+	2gvS1lYh7QEriZzKgy/LgnaBJIdlfzhudzK9PQh99LRnzSrbiBIHTl901M/Pq5+QIDd8hbk+aQE
+	M3F6oZsSPkrniGUqdoLpEAxuo0zka8QRP4UUdWbVHIEmFv5m0Ci24c3mEq2J1nSOCi4eYSRKOJV
+	rSMpvXBVs2SM4D8v61x1oyMpoGT7GjgWUDsG+FTeE61/26qcRRr94ejTHQDA1AAARyZYAb7A97Y
 	=
-X-Google-Smtp-Source: AGHT+IG2u/86a+7OPSl5FsOWc8u6HyYJgwP0KLdcYeK4OvDvrQR5GOKGtxjmFSU8W47LvCfaNuoZDA==
-X-Received: by 2002:a05:6102:d92:b0:4e1:48ee:6f3e with SMTP id ada2fe7eead31-4e2f1a20f8dmr117032137.20.1747937708121;
-        Thu, 22 May 2025 11:15:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFSio2xg8ViCR/rnpR5UVkFv2SiU/8wOWYRFTT6xS8Q9ItlVopvaalwQX5DnU/OBQ2qhUcAdQ==
+X-Received: by 2002:a05:6102:b0f:b0:4e2:a132:c50c with SMTP id ada2fe7eead31-4e2a132c627mr14706700137.2.1747937711342;
+        Thu, 22 May 2025 11:15:11 -0700 (PDT)
 Received: from rogue-one.tail33bf8.ts.net ([179.218.14.134])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e125de337bsm10573695137.17.2025.05.22.11.15.04
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e125de337bsm10573695137.17.2025.05.22.11.15.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 11:15:07 -0700 (PDT)
+        Thu, 22 May 2025 11:15:11 -0700 (PDT)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -84,12 +84,10 @@ Cc: jhs@mojatatu.com,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	Pedro Tammela <pctammela@mojatatu.com>,
-	Savino Dicanosa <savy@syst3mfailure.io>,
-	William Liu <will@willsroot.io>,
 	Victor Nogueira <victor@mojatatu.com>
-Subject: [PATCH net v2 1/2] net_sched: hfsc: Address reentrant enqueue adding class to eltree twice
-Date: Thu, 22 May 2025 15:14:47 -0300
-Message-ID: <20250522181448.1439717-2-pctammela@mojatatu.com>
+Subject: [PATCH net v2 2/2] selftests/tc-testing: Add a test for HFSC eltree double add with reentrant enqueue behaviour on netem
+Date: Thu, 22 May 2025 15:14:48 -0300
+Message-ID: <20250522181448.1439717-3-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250522181448.1439717-1-pctammela@mojatatu.com>
 References: <20250522181448.1439717-1-pctammela@mojatatu.com>
@@ -101,81 +99,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Savino says:
-    "We are writing to report that this recent patch
-    (141d34391abbb315d68556b7c67ad97885407547) [1]
-    can be bypassed, and a UAF can still occur when HFSC is utilized with
-    NETEM.
+Reproduce the UAF scenario where netem is a child of HFSC and HFSC
+is configured to use the eltree. In such case, this TDC test would
+cause the HFSC class to be added to the eltree twice resulting
+in a UAF.
 
-    The patch only checks the cl->cl_nactive field to determine whether
-    it is the first insertion or not [2], but this field is only
-    incremented by init_vf [3].
-
-    By using HFSC_RSC (which uses init_ed) [4], it is possible to bypass the
-    check and insert the class twice in the eltree.
-    Under normal conditions, this would lead to an infinite loop in
-    hfsc_dequeue for the reasons we already explained in this report [5].
-
-    However, if TBF is added as root qdisc and it is configured with a
-    very low rate,
-    it can be utilized to prevent packets from being dequeued.
-    This behavior can be exploited to perform subsequent insertions in the
-    HFSC eltree and cause a UAF."
-
-To fix both the UAF and the infinite loop, with netem as an hfsc child,
-check explicitly in hfsc_enqueue whether the class is already in the eltree
-whenever the HFSC_RSC flag is set.
-
-[1] https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=141d34391abbb315d68556b7c67ad97885407547
-[2] https://elixir.bootlin.com/linux/v6.15-rc5/source/net/sched/sch_hfsc.c#L1572
-[3] https://elixir.bootlin.com/linux/v6.15-rc5/source/net/sched/sch_hfsc.c#L677
-[4] https://elixir.bootlin.com/linux/v6.15-rc5/source/net/sched/sch_hfsc.c#L1574
-[5] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io/T/#u
-
-Fixes: 37d9cf1a3ce3 ("sched: Fix detection of empty queues in child qdiscs")
-Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-Reported-by: William Liu <will@willsroot.io>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Tested-by: Victor Nogueira <victor@mojatatu.com>
+Reviewed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- net/sched/sch_hfsc.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-index 7986145a5..5a7745170 100644
---- a/net/sched/sch_hfsc.c
-+++ b/net/sched/sch_hfsc.c
-@@ -175,6 +175,11 @@ struct hfsc_sched {
- 
- #define	HT_INFINITY	0xffffffffffffffffULL	/* infinite time value */
- 
-+static bool cl_in_el_or_vttree(struct hfsc_class *cl)
-+{
-+	return ((cl->cl_flags & HFSC_FSC) && cl->cl_nactive) ||
-+		((cl->cl_flags & HFSC_RSC) && !RB_EMPTY_NODE(&cl->el_node));
-+}
- 
- /*
-  * eligible tree holds backlogged classes being sorted by their eligible times.
-@@ -1040,6 +1045,8 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
- 	if (cl == NULL)
- 		return -ENOBUFS;
- 
-+	RB_CLEAR_NODE(&cl->el_node);
-+
- 	err = tcf_block_get(&cl->block, &cl->filter_list, sch, extack);
- 	if (err) {
- 		kfree(cl);
-@@ -1572,7 +1579,7 @@ hfsc_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
- 	sch->qstats.backlog += len;
- 	sch->q.qlen++;
- 
--	if (first && !cl->cl_nactive) {
-+	if (first && !cl_in_el_or_vttree(cl)) {
- 		if (cl->cl_flags & HFSC_RSC)
- 			init_ed(cl, len);
- 		if (cl->cl_flags & HFSC_FSC)
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+index ddc97ecd8..9aa44d817 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+@@ -600,5 +600,40 @@
+         "matchPattern": "qdisc hfsc",
+         "matchCount": "1",
+         "teardown": ["$TC qdisc del dev $DEV1 root handle 1: drr"]
++    },
++    {
++        "id": "309e",
++        "name": "Test HFSC eltree double add with reentrant enqueue behaviour on netem",
++        "category": [
++            "qdisc",
++            "hfsc"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$IP link set dev $DUMMY up || true",
++            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
++            "$TC qdisc add dev $DUMMY root handle 1: tbf rate 8bit burst 100b latency 1s",
++            "$TC qdisc add dev $DUMMY parent 1:0 handle 2:0 hfsc",
++            "ping -I $DUMMY -f -c10 -s48 -W0.001 10.10.11.1 || true",
++            "$TC class add dev $DUMMY parent 2:0 classid 2:1 hfsc rt m2 20Kbit",
++            "$TC qdisc add dev $DUMMY parent 2:1 handle 3:0 netem duplicate 100%",
++            "$TC class add dev $DUMMY parent 2:0 classid 2:2 hfsc rt m2 20Kbit",
++            "$TC filter add dev $DUMMY parent 2:0 protocol ip prio 1 u32 match ip dst 10.10.11.2/32 flowid 2:1",
++            "$TC filter add dev $DUMMY parent 2:0 protocol ip prio 2 u32 match ip dst 10.10.11.3/32 flowid 2:2",
++            "ping -c 1 10.10.11.2 -I$DUMMY > /dev/null || true",
++            "$TC filter del dev $DUMMY parent 2:0 protocol ip prio 1",
++            "$TC class del dev $DUMMY classid 2:1",
++            "ping -c 1 10.10.11.3 -I$DUMMY > /dev/null || true"
++        ],
++        "cmdUnderTest": "$TC class change dev $DUMMY parent 2:0 classid 2:2 hfsc sc m2 20Kbit",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -j class ls dev $DUMMY classid 2:1",
++        "matchJSON": [],
++        "teardown": [
++            "$TC qdisc del dev $DUMMY handle 1:0 root",
++            "$IP addr del 10.10.10.10/24 dev $DUMMY || true"
++        ]
+     }
+ ]
 -- 
 2.43.0
 
