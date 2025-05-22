@@ -1,150 +1,203 @@
-Return-Path: <netdev+bounces-192731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B611AC0F03
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:57:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8DE5AC0F4A
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2556B7A2D0C
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:56:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6783F3A6048
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2E828D8EE;
-	Thu, 22 May 2025 14:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1BA28D8DC;
+	Thu, 22 May 2025 15:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="iRSi31es"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIgxv6Mj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A3528DB58
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 14:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF8A28D8D1
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747925740; cv=none; b=o/5LsuUGDxr8SY55Z29bEr/pwQ5RD/zGRFdmF/HodbqnEIpXVosbG77NW1MIxNgpPuzyvMiPqPi3X1ne+hq8z7WCPjwHvt36mL5mVpZThN7dAK3yNNoMzgY+s7X7QcJSfqX2ny5YqznXJ3e2Z3w19x9N2rYR8LPZI1JPNCthz+w=
+	t=1747926103; cv=none; b=le0OnoLu2chVvAKV6i3CXVDBjQFMh21sdRfgNYt7uLxW361qFTijEOeKT4lWhCmg54mK7rKsou8O0kSyGzp9F1Ohbor+D7Fzw32wnOA1lLUzDgZ5+iX0qyWSDMsaJ7mv2OGnk/d316qnI9vGZquYXRhx0cvZhYcEv+NjWzGewPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747925740; c=relaxed/simple;
-	bh=e3pZ//oX0zG7RU6zMKZJ8niUMHM55nsr+Mg4q8xjB/k=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Q1hEZ9tCRdD95I4HnNEFe6Q3i04DUf1t6Dvq2ecUPht61Bqjtd+rivy8rZNfDX21HzAeYOIznyo6trvgEilZIH/6xQBJzNnsOBLaZ4SRUqtCtMVwHlGrfLQAFbJN50rlntWvsmylvR7P3Geq9zDB7uRAl9kd0ITe1+jqva/XOlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=iRSi31es; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747925740; x=1779461740;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=MKri9EjMJyXz7BsqgNUGvs9McbTJp2YY+CES4POmFOU=;
-  b=iRSi31esFtajgH8rfLP0772LfiFHe7+gYVr/PHmqmhQkeJzrQONd/rEX
-   Y2aEaIxoxIEBfJY9K5sns/3a0MtfUnXYC39zDRLAFhING+UdBySrsU2Vt
-   tpHfSJO5VsxuIBlEEVO9CN4LklESGjZmpjg6GyT2WMn/hPuvccuy7PVw5
-   KGp9YBqRDrKfSo6bb3R9YmJ8On6dXCLs9FHRK0boojIF4Twn8GfYY64f+
-   5mHdQmCjeydAQKQEy6ssvSS8Z0ie6ohcGEBlbKI/X9zwIksoeZ5fC6y/Y
-   7ccpo8sFu7N2FLlsUX+CrAoIffb4Au1AdNe+CsE2ig9YjZmeWEDE28wfp
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.15,306,1739836800"; 
-   d="scan'208";a="747499676"
-Subject: RE: [PATCH v10 net-next 4/8] net: ena: Control PHC enable through devlink
-Thread-Topic: [PATCH v10 net-next 4/8] net: ena: Control PHC enable through devlink
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 14:55:37 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:51364]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.17:2525] with esmtp (Farcaster)
- id 285f3b98-930e-4dd0-b23b-d9fc2a41d0c8; Thu, 22 May 2025 14:55:35 +0000 (UTC)
-X-Farcaster-Flow-ID: 285f3b98-930e-4dd0-b23b-d9fc2a41d0c8
-Received: from EX19D010EUA002.ant.amazon.com (10.252.50.108) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 22 May 2025 14:55:35 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D010EUA002.ant.amazon.com (10.252.50.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 22 May 2025 14:55:35 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1544.014; Thu, 22 May 2025 14:55:35 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, "Woodhouse,
- David" <dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>, "Bshara, Saeed"
-	<saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
-	<aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Schmeilin,
- Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
-	<benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
-	<ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Allen, Neil"
-	<shayagr@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>,
-	Leon Romanovsky <leon@kernel.org>
-Thread-Index: AQHbyyB0M9vwly4JDkatslAI5bthobPerL2AgAAGR3CAAAOigIAAArCw
-Date: Thu, 22 May 2025 14:55:35 +0000
-Message-ID: <6469535d9f814e238b371f56e91da4ad@amazon.com>
-References: <20250522134839.1336-1-darinzon@amazon.com>
- <20250522134839.1336-5-darinzon@amazon.com>
- <aq5z7dmgtdvdut437b3r3jfhevzfhknf5zr5obaunadp2xkzsh@iene76rtx3xc>
- <11eaa373bb894946bc693d9a1e112ca5@amazon.com>
- <76xnvcmdkohjxui2e2g7xe4b4iaxiork5e3k4n6inniut63a5s@6voxc4okdixd>
-In-Reply-To: <76xnvcmdkohjxui2e2g7xe4b4iaxiork5e3k4n6inniut63a5s@6voxc4okdixd>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1747926103; c=relaxed/simple;
+	bh=vc0vgLYAQE9jzGVdH+RIFukLzTCKNXnC6T+AWqR0grc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WJK5+UBUWEUWUFRA3l6JZIMKZvGgSUHFG/k952CSyy1EvBRWTB2Re0BXFTsHmv3/yHS/GiNiCLwSYZpE+osYhIaD2iNE1zhX9t2bHuEzybPmRH2COuMnOb9G4qpVQoVJxNoIFoHmhaeAPe8dz6pDumOJhuKZzN750CXIiw6+iv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIgxv6Mj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E71FC4CEE4;
+	Thu, 22 May 2025 15:01:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747926102;
+	bh=vc0vgLYAQE9jzGVdH+RIFukLzTCKNXnC6T+AWqR0grc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eIgxv6Mj51PvX1o5rPBmd4IAanffhW9zrpWpowZIbdXKqTPeLJ+7hugiWxxSqIBps
+	 ir8p8M0ytbp6rXks3fjA4NRkTns3fY3+6fCGP3S+kiWYmiKQIsH1WDobqwbbJMmnV0
+	 p6ClvJ6OFzHXh1dJAV+qgLubf5nhWdKuk8gUbJIoGvC2yaLc/+93WO5UoMHMb3F04M
+	 /MMJ6weO9NV1fEK+Wr7qa132N6ybtw5FsOYsp5uopJ1fgvTBDGGCLG6SUEhpCOuLkG
+	 6M0HgwmQtda4tBebexGN1cZPmdszeu9+wWhiSZaGcHTwJDOtAdz1tsZR/Ym4B0oNRy
+	 Z14VOPQPgWnDA==
+Message-ID: <ea50944f-8c64-4ceb-9d2c-70e4d9b38120@kernel.org>
+Date: Thu, 22 May 2025 17:01:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH v1 net-next 2/6] socket: Rename sock_create_kern() to
+ __sock_create_kern().
+Content-Language: en-GB, fr-BE
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org
+References: <20250517035120.55560-1-kuniyu@amazon.com>
+ <20250517035120.55560-3-kuniyu@amazon.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250517035120.55560-3-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> >> >+enum ena_devlink_param_id {
-> >> >+      ENA_DEVLINK_PARAM_ID_BASE =3D
-> >> DEVLINK_PARAM_GENERIC_ID_MAX,
-> >> >+      ENA_DEVLINK_PARAM_ID_PHC_ENABLE,
-> >>
-> >> What exactly is driver/vendor specific about this? Sounds quite
-> >> generic to me.
-> >
-> >Can you please clarify the question?
-> >If you refer to the need of ENA_DEVLINK_PARAM_ID_PHC_ENABLE, it was
-> >discussed as part of patchset v8 in
-> >https://lore.kernel.org/netdev/20250304190504.3743-6-
-> darinzon@amazon.co
-> >m/ More specifically in
-> >https://lore.kernel.org/netdev/55f9df6241d052a91dfde950af04c70969ea28
-> b2
-> >.camel@infradead.org/
-> >
->=20
-> Could you please read "Generic configuration parameters" section of
-> Documentation/networking/devlink/devlink-params.rst? Perhaps that would
-> help. So basically my question is, why your new param can't go in that li=
-st?
+Hi Kuniyuki,
 
-Thanks for the clarification.
-This is a topic that has been discussed in the versions of this patchset, s=
-pecifically in https://lore.kernel.org/netdev/20250304190504.3743-6-darinzo=
-n@amazon.com/
-Other modules in the kernel enable PHC unconditionally, due to potential bl=
-ast radius concerns, we've decided to not enable the feature unconditionall=
-y and allow customers to enable
-it if they choose to use the functionality.
-As this is a specific behavior for the ENA driver, we've added a specific d=
-evlink parameter (was a sysfs entry previously and changed to devlink in v9=
- due to feedback).
+On 17/05/2025 05:50, Kuniyuki Iwashima wrote:
+> sock_create_kern() is a catchy name and often chosen by non-networking
+> developers to create kernel sockets.  But due to its poor documentation,
+> it has caused a bunch of netns use-after-free:
+> 
+>   * commit ef7134c7fc48 ("smb: client: Fix use-after-free of network
+>      namespace.")
+>   * commit b013b817f32f ("nvme-tcp: fix use-after-free of netns by
+>      kernel TCP socket.")
+>   .. and more in NFS, SMC, MPTCP, RDS
+> 
+> Some non-networking maintainers mentioned that the socket API should
+> be more robust to prevent this type of issues. [0]
+> 
+> The current sock_create_kern() doesn't hold a reference to the netns,
+> which allows the netns to be removed while the socket is still around.
+> This is useful when the socket is used as the backend for a networking
+> device.
+> 
+> But, this is rather a special case, where netdev folks should use a
+> dedicated API, and we should provide sock_create_kern() as the standard
+> API for general in-kernel use cases.
+> 
+> In fact, we did so before commit 26abe14379f8 ("net: Modify sk_alloc
+> to not reference count the netns of kernel sockets."),
+> 
+>   sock_create_kern(&init_net, ..., &sock)
+>   sk_change_net(sock->sk, net);
+> 
+> but that implicit API change ended up causing a lot of problems.
+> 
+> Let's rename sock_create_kern() to __sock_create_kern() as a special
+> API and add a fat documentation.
+> 
+> The next patch will add sock_create_kern() that holds netns refcnt.
 
-David
+Thank you for clarifying this!
 
+(...)
 
+> diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+> index d39e7c178460..a7467497de0f 100644
+> --- a/net/mptcp/pm_kernel.c
+> +++ b/net/mptcp/pm_kernel.c
+> @@ -637,8 +637,8 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
+>  	int backlog = 1024;
+>  	int err;
+>  
+> -	err = sock_create_kern(sock_net(sk), entry->addr.family,
+> -			       SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
+> +	err = __sock_create_kern(sock_net(sk), entry->addr.family,
+> +				 SOCK_STREAM, IPPROTO_MPTCP, &entry->lsk);
+>  	if (err)
+>  		return err;
+>  
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 15613d691bfe..602e689e991f 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -1757,7 +1757,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+>  	if (unlikely(!sk->sk_socket))
+>  		return -EINVAL;
+>  
+> -	err = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
+> +	err = __sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
+>  	if (err)
+>  		return err;
+>  
+> @@ -1948,7 +1948,7 @@ static int subflow_ulp_init(struct sock *sk)
+>  	int err = 0;
+>  
+>  	/* disallow attaching ULP to a socket unless it has been
+> -	 * created with sock_create_kern()
+> +	 * created with __sock_create_kern()
+>  	 */
+>  	if (!sk->sk_kern_sock) {
+>  		err = -EOPNOTSUPP;
+For the changes in MPTCP:
 
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  # net/mptcp
+
+(...)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
