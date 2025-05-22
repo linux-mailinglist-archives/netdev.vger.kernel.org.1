@@ -1,186 +1,119 @@
-Return-Path: <netdev+bounces-192531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAF8AC0472
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:16:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DDEFAC0483
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2F1DA21E43
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:15:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 521E8166E76
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746BC22170F;
-	Thu, 22 May 2025 06:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F40221729;
+	Thu, 22 May 2025 06:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VXGzZVY7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YF9ByEW4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC39222155F
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 06:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2185D221723;
+	Thu, 22 May 2025 06:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747894569; cv=none; b=qI7HEHzepggK4fWbU10sJI/hwQS7baeyBy33ttWKgN+KWk3n97SnETeTitJN/J6I3NF0GdxFIFw7mT7izb98G1F6r7RehIIAIyCPUoykDekGgs1vYDtzjo9hDHiMcjTw44z+Z2xzkS74td5qOSIq0ZkoJoJI3raMwvsNHsPPJ/w=
+	t=1747894862; cv=none; b=By7bd7LJtTiKdg0bS4B9o+lmG7g6pkB0fLHBKaKisNuKnyLcg/kDMvjwlNPuuENMu9absanqSJJuKnN1PH8aCJCYG9vXOa54T4E15eX5NzhslRKHgfNhsQ3iUQFv8u5WSgJxfkcQjvSNv18tCvp4cbVT3WIw2SYZfeEA0hmSFsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747894569; c=relaxed/simple;
-	bh=/XyUgeXXxKU0BkZY7YzR3X4O9ySO8dItg/ybqv8/+qg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aEsGN/KK6VDR3W/WXK9DMTeIZ1kvc7kBAipKOAWq79SzRPBHCm9ofF/C9XWePg2fJnKMSfVyLh5Uf58U5ykvETfOKg6jx4u51cde72cKBTj0hHSHpZEM7zjYW3tCjmGrim+c/mcgo53rtRrvYHgEj+dfgL+GszXd22uMwOPCKks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VXGzZVY7; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M5Jgse013402;
-	Wed, 21 May 2025 23:15:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=zgD7mD36mu3a468bQxezFrZ/l0/DFW5ffr8Jkxihllo=; b=VXG
-	zZVY7QJKSL6TNrft+jflbp1NiwgOpl/KqwyUZTKEwq6orqcQkDvlfcitxmqsdpsM
-	v5gnSTiukpD7Yg21PqIpYSow7ddtBXV+oprzN5K8njMiiDfCUjJwb4/6pWx3/iBn
-	nfG4wkhBVIXzGQ8E3Ns92JGAZ0gGOiClbQkkXctL9QvDBcjHQvpfXR3X+GezFmGA
-	mXA47ZzWYXywWvQ0pwxul0oIbq2OEUuaVaSellFFkX8clF2FPCiy2ijeEZYaSjs6
-	KWZfjmOjNbmC7o+bGcLlWaH2cqsFPT27nNjr5s8EGbVIF6c0iwpGbS9R9kq7VQfs
-	n0TWYxKp3axRDJtcHFg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46swp682se-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 May 2025 23:15:57 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 21 May 2025 23:15:56 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 21 May 2025 23:15:56 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 938563F708A;
-	Wed, 21 May 2025 23:15:51 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <sd@queasysnail.net>, <gakula@marvell.com>, <hkelam@marvell.com>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <bbhushan2@marvell.com>, <jerinj@marvell.com>
-CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH v3 2/2] octeontx2-pf: macsec: Get MACSEC capability flag from AF
-Date: Thu, 22 May 2025 11:45:48 +0530
-Message-ID: <1747894548-4657-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1747894862; c=relaxed/simple;
+	bh=8Gf9CvcRiX0QDzOZJoLJ0kQ8Rhrd0PQeVZLFhyDeOQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tcsccu3dUdfY0Oj7/51YDI+71br96HCCl2/DuS7T/UULD+3yKbmG3YRuQXGfjDZK40JKe12fuJsp9JY06WpZd5QZYsH8WRsE7+XFE5I1IBg4oF4PslucnzRnzZTjOjcPHWCjHyz6aDBzjqYVmQU464f9xZ9NlchikjKnw2zY4fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YF9ByEW4; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-73712952e1cso7074976b3a.1;
+        Wed, 21 May 2025 23:21:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747894860; x=1748499660; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Gf9CvcRiX0QDzOZJoLJ0kQ8Rhrd0PQeVZLFhyDeOQU=;
+        b=YF9ByEW4e0P/m+v5qP7dyIJn2nb1wa7Rw8z0l4npSQ+Ln9mFn98XgNHKcoAWfPbYe4
+         wkDUSK2H5GfuRtUn8JXWpHfHqKKyRI0xkPzUHg7ziYFql/TGMskYDDzlgPZWX4cc1lta
+         yiaKWmKdSvG6Imd3pdIWTeNfRSUaYlRoim7QFMAeZ2WIJaXPh+1BjTYvxRNZ+p+CahHm
+         ogA0Su986KCvbnGsx6WbCiASdJLxXawj00Ttpei20ps2h/kFaw1WDP9YMkPLfhN6AE6F
+         7XiorLAOb1Z2q87eQe/RmpnfclmYDmg3gxoRgjGqadRywgqHXLlkJTO6yGXfydeoNrPD
+         WQGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747894860; x=1748499660;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8Gf9CvcRiX0QDzOZJoLJ0kQ8Rhrd0PQeVZLFhyDeOQU=;
+        b=mZorxcb1LenDEFdioDdog9lrqNRgpCpmB93azRdF3hn7qRJQE4Q7jvYfs123S75S3t
+         44DGQvaMOrGMItgETd0j+jKHl/tFYzQDhyHE84onGmAxMylUezBwoH8Nt45RjBQX1ydO
+         5RYsT/6Y0Fog6i1BWBOLahTQM2gmULcHeKDk31NbcCRoW1ztupl2abiLDrsMDdMjWGMU
+         6omgmubJUVq0QrmflCWHar1Fn9rRxImPAuLaAxgKAOTjechPLMh7U3NLZ1YfWDwLyG+C
+         aF/p3573v/+Lf9hUSkQtfi9TbzpFDUo+iJQ0FhOjhTGyp2y7mE3ZuWhsM3iZZGkF1uj6
+         fGSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWT0anbX6Qus426spUrK9DYqKvT9G1xhSC7Iq22zTXbvVxPC+TBka+JXMO6PGr4x5oBie8dDnm@vger.kernel.org, AJvYcCWE2haACsDi09alccgw7z6VjjPZFVMJrXW7ntxyC3PW5LauOL+SYEK2GFWkfPSALSSwX2Mf/1fwJdSKZDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbUzfm3xKp71qjFfYSAyuH0chnYOMg4O1Guqmz/TX1SO1WOG4v
+	i8dTa6nshcqQZ/NuXUHG6xfpjhXnzUxvwKSvD1eDBI3qhQqmhqBbvgFX
+X-Gm-Gg: ASbGncvV8OmWtOubNNutXemXtrfxGQhyI+5K0xIEfzfWm2M43Fr4+MUzHfwYoGN1qMR
+	hhFOxENrJW6K0Jf5B1qk8osu9U6xFgHFEMZ82Qdpy1UNobElk8AnTKW0IdVeK1BbQ3TYGqhfV1q
+	Vn/rn8sfhuCX93rB6OOeLbl6fgjwaIPJvyvrx3fc/K7psVVBmYpD48z62MYBZplspJXGFYHnZJs
+	MdGS+Z1xqHjqXKd3wnpywx8fmPbbtm+zAdUyF+SrJ3EnrcMQUn6LDORHIcqBxSzOZaMX5mZcGsO
+	B0giAKkyuyRZIaxIMJlflG6NPzyq5RPCaDd26oRT/tFvj9chdg==
+X-Google-Smtp-Source: AGHT+IFApv0QadyLlnFK7Jc8zTrCRT6Mn794aYfBhT+1fh5yci/dZulqyuNRKTH4wK4czcH2IicG/w==
+X-Received: by 2002:a05:6a20:6a28:b0:215:f6ab:cf78 with SMTP id adf61e73a8af0-2170cdf123amr35822445637.28.1747894860095;
+        Wed, 21 May 2025 23:21:00 -0700 (PDT)
+Received: from mythos-cloud ([125.138.201.7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eaf8a199sm9181408a12.33.2025.05.21.23.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 23:20:59 -0700 (PDT)
+Date: Thu, 22 May 2025 15:20:55 +0900
+From: Moon Yeounsu <yyyynoom@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dlink: add Kconfig option for RMON
+ registers
+Message-ID: <aC7CR1ZTaJ7m_Dna@mythos-cloud>
+References: <20250519214046.47856-2-yyyynoom@gmail.com>
+ <20250519165758.58157a0b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: t-lcX3PMxNkO0XbewjH514gByAOfaDDb
-X-Authority-Analysis: v=2.4 cv=DO+P4zNb c=1 sm=1 tr=0 ts=682ec11d cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=VwQbUJbxAAAA:8 a=HCoohpATzO-NyKTAk6kA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDA2MSBTYWx0ZWRfX33G8sRXGxGEF 444o3xcJHH/mFJo5w3hNMZqh2dam49JRqaOIuYTuxHRqDx8KUHOn7KbruOLqWggEHEsJGvn4/Cl zi3nJLZw015IjxOimFmOhBA/Cjk2f8PPAmhjffGuaN4As60b9Fp1+7u/XEDYymOPR+HJZxK202W
- D2Yp3LX8LucQkrbtIR28VgRXkcFRwtNRZAQIc4epfO07OqwnapJPBn67cUnW2eowOp1tQyUbFm0 vhPYL9SOufPpc6BuFzOMpZ5HC7a1w6F9qxw503MZMd8qdRRZJ4DHhKeOZRjfejKRwD6bHEiCJtX LVyS+vPUUTb1c3Rj76fMdGh8pJUtMaPND6DeOhrWkuF/M8HzU9tq5648/nNxjHrovW5iJb8+KCW
- v9pWmze+E3z0TeT0tH+caJcNHyz9GNKRIeiIIVIm3qY5jQl/7WZmcJIneelAr2ijSTOPdGq/
-X-Proofpoint-ORIG-GUID: t-lcX3PMxNkO0XbewjH514gByAOfaDDb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_03,2025-05-20_03,2025-03-28_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250519165758.58157a0b@kernel.org>
 
-The presence of MACSEC block is currently figured out based
-on the running silicon variant. This may not be correct all
-the times since the MACSEC block can be fused out. Hence get
-the macsec info from AF via mailbox.
+On Mon, May 19, 2025 at 04:57:58PM -0700, Jakub Kicinski wrote:
+> On Tue, 20 May 2025 06:40:45 +0900 Moon Yeounsu wrote:
+> Kconfig is not a great choice for chip specific logic.
+> You should check some sort of chip ID register or PCI ID
+> to match the chip version at runtime. Most users don't compile
+> their own kernels.
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- .../ethernet/marvell/octeontx2/nic/otx2_common.c   | 37 ++++++++++++++++++++++
- .../ethernet/marvell/octeontx2/nic/otx2_common.h   |  4 +--
- .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  2 ++
- 3 files changed, 40 insertions(+), 3 deletions(-)
+Just to confirm. are you suggesting that RMON MMIO should be enabled
+only on hardware known to support it correctly, instaed of exposing it
+via Kconfig?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 84cd029..6f57258 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -2055,6 +2055,43 @@ int otx2_handle_ntuple_tc_features(struct net_device *netdev, netdev_features_t
- }
- EXPORT_SYMBOL(otx2_handle_ntuple_tc_features);
- 
-+int otx2_set_hw_capabilities(struct otx2_nic *pfvf)
-+{
-+	struct mbox *mbox = &pfvf->mbox;
-+	struct otx2_hw *hw = &pfvf->hw;
-+	struct get_hw_cap_rsp *rsp;
-+	struct msg_req *req;
-+	int ret = -ENOMEM;
-+
-+	mutex_lock(&mbox->lock);
-+
-+	req = otx2_mbox_alloc_msg_get_hw_cap(mbox);
-+	if (!req)
-+		goto fail;
-+
-+	ret = otx2_sync_mbox_msg(mbox);
-+	if (ret)
-+		goto fail;
-+
-+	rsp = (struct get_hw_cap_rsp *)otx2_mbox_get_rsp(&pfvf->mbox.mbox,
-+							 0, &req->hdr);
-+	if (IS_ERR(rsp)) {
-+		ret = -EINVAL;
-+		goto fail;
-+	}
-+
-+	if (rsp->hw_caps & HW_CAP_MACSEC)
-+		__set_bit(CN10K_HW_MACSEC, &hw->cap_flag);
-+
-+	mutex_unlock(&mbox->lock);
-+
-+	return 0;
-+fail:
-+	dev_err(pfvf->dev, "Cannot get MACSEC capability from AF\n");
-+	mutex_unlock(&mbox->lock);
-+	return ret;
-+}
-+
- #define M(_name, _id, _fn_name, _req_type, _rsp_type)			\
- int __weak								\
- otx2_mbox_up_handler_ ## _fn_name(struct otx2_nic *pfvf,		\
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 6a38f91..ca0e6ab1 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -632,9 +632,6 @@ static inline void otx2_setup_dev_hw_settings(struct otx2_nic *pfvf)
- 		__set_bit(CN10K_PTP_ONESTEP, &hw->cap_flag);
- 		__set_bit(QOS_CIR_PIR_SUPPORT, &hw->cap_flag);
- 	}
--
--	if (is_dev_cn10kb(pfvf->pdev))
--		__set_bit(CN10K_HW_MACSEC, &hw->cap_flag);
- }
- 
- /* Register read/write APIs */
-@@ -1046,6 +1043,7 @@ void otx2_disable_napi(struct otx2_nic *pf);
- irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq);
- int otx2_rq_init(struct otx2_nic *pfvf, u16 qidx, u16 lpb_aura);
- int otx2_cq_init(struct otx2_nic *pfvf, u16 qidx);
-+int otx2_set_hw_capabilities(struct otx2_nic *pfvf);
- 
- /* RSS configuration APIs*/
- int otx2_rss_init(struct otx2_nic *pfvf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index d79b4b3..db7c466 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3144,6 +3144,8 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (err)
- 		goto err_ptp_destroy;
- 
-+	otx2_set_hw_capabilities(pf);
-+
- 	err = cn10k_mcs_init(pf);
- 	if (err)
- 		goto err_del_mcam_entries;
--- 
-2.7.4
+Then, I'll drop the Kconfig option and enable RMON MMIO only for
+known-good devices via a runtime check. Currently, that's limited to
+DGE-550T (`0x4000`) with revision A3 (`0x0c`).
 
+The `dw32(RmonStatMask, 0x0007ffff);` line will also be skipped
+accordingly.
+
+Let me know if you have any concerns. Otherwise, I'll send a revisied
+patch.
+
+Thank you for reviewing,
+Yeounsu
 
