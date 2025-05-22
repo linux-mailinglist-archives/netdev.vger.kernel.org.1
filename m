@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-192521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED8CAC032E
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:51:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3D4AAC0331
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F97E4A86DD
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 417E2A24A4C
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFEE190664;
-	Thu, 22 May 2025 03:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36790199223;
+	Thu, 22 May 2025 03:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHoOGTSH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/gQ0JmH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B2818FDBE;
-	Thu, 22 May 2025 03:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3141990D9;
+	Thu, 22 May 2025 03:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747885813; cv=none; b=p7oegy2bDnB44cix6hq+eA4ThaTn4zGQhwMfIeZT3A9+d6Esf2Lc5/xhW1cNa08OAUAIy9SG1hpgjf5c5RaBz8GMLKD4Zv1OmOIxOxzwPBJfss+yVqQ+93zQmSZngMr/R2JH6CUcWtYWmUudVhDV6oEiw0BMT3Fgiu5ZubfTwGg=
+	t=1747885815; cv=none; b=kGyqXHAN6MPPdUW0g108I+mYWDbtQ8OBRm3WnUaJMeZ69FVODYfivZxhpm5NEOYKYs9FmeUgKd5fkW4f4ai5WvCEl/4x+fpRM90vtIShMNqo890KBUSXMSxtirdR2Rl+ueAZLKQVbSZVaDCUT5sOW7F1X/+Y1piTK/fl8e5YC+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747885813; c=relaxed/simple;
-	bh=5bmRQ5FWNcUrlmbzVqI8v3MehweThc2e0m1Ovg3RPZs=;
+	s=arc-20240116; t=1747885815; c=relaxed/simple;
+	bh=AAi0UNWb2GFkIphLPOyR6H+ke8wyEf8txq1OJ/+7F0E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dxVqribmwLSOx/1CKUEkH5xpgT/x8QMebpT5lZP/U4urE7i8GXS9dcO8ii7qCd6BQiDDv2Fub2pywparjysdkQw1o/GJcMJsPQFxCqmr0iiON8moiF9aNpq+WojlQd8C/vK50cpJpbTyKK86oUSxUwug23OROA6ixXaka6KTRdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHoOGTSH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B127C4CEEB;
-	Thu, 22 May 2025 03:50:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=oR/u5i9Hn/YSiC8E8xkcspQls5z/xqGAl1yMiWiWl2DBpoN2oRaxzT7Lf2dnvr8MCyoeXQW6MUhKHoeIH/tjU4z0oJoepspp4F0KQzDdcTmiq9IuCUQKxerGBsek8+4tf62iUVPXj3n9T2+XY2jnOvzLI6Mq/5t7dn6t2lLaAFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/gQ0JmH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3A68C4CEED;
+	Thu, 22 May 2025 03:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747885813;
-	bh=5bmRQ5FWNcUrlmbzVqI8v3MehweThc2e0m1Ovg3RPZs=;
+	s=k20201202; t=1747885814;
+	bh=AAi0UNWb2GFkIphLPOyR6H+ke8wyEf8txq1OJ/+7F0E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DHoOGTSH9vaMJSq1yh6/IBTgib7TuOaJXeKERupx0OBwsBBbFUcR1zHNaXvSkKqqt
-	 XQvqGerceT0EE3F9T4/JC2lMNt1Ps5ooP9W4CY9hU+YDWw0XdYYukpf5F4akirDmp+
-	 dkTFcbKsG9+oOe6nyjyaQovAUGg2ZDGiyYfgrTch7OoX9teFTbb39E4eFnbsSWKRkO
-	 hDeFVzVFlXSSR8gKYBpn3mD/ET6Q77NIFRx3h0MtJ26gGAAZkKpyU5lfTEWIXzHS3t
-	 J/IzsRmAqWxlZcnY6YrqQZ3RNa3sHzCSbW6j/06QdYeTBksUNKzIKx6plRQUXg2g02
-	 lK+FkStTgiqeg==
+	b=j/gQ0JmHCjCbD79M8Eq25l9+VmR5XFSDKat2eTcrCcJgcc1Qz472UVRWC7iEa44gb
+	 2vkH/WDNviGwPNJ0Qd+7lXXf74D7bvm/RE5r7fDiZ23+588kTmN1ikNOGJhqBJD9qT
+	 XTHegn/n1Dg3W43gN8nW4b5ry5GePxF2qnjZUPW9z3RcPPQ1cc5S/BL1/B0PYbSWos
+	 kS6DqTEtjvb55wW/53c+jfdObGtEnbHdIiY3J8J93IhOcxZ/uNaayPNC09f4YZi0pn
+	 aQcASpg7yk6GWJkjNCwDGJXkNZxAbQeQPOP1M1K/iSgX9nMnZlL8f1KMF8DMw5cRtn
+	 +4ibUsGX4s2GA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FFC380AA7C;
-	Thu, 22 May 2025 03:50:50 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE86380AA7C;
+	Thu, 22 May 2025 03:50:51 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v17 0/1] net: hinic3: Add a driver for Huawei 3rd gen
- NIC
+Subject: Re: [PATCH net-next] net/enic: Allow at least 8 RQs to always be used
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174788584899.2369658.3358222992773503494.git-patchwork-notify@kernel.org>
-Date: Thu, 22 May 2025 03:50:48 +0000
-References: <cover.1747736586.git.gur.stavi@huawei.com>
-In-Reply-To: <cover.1747736586.git.gur.stavi@huawei.com>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: gongfan1@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ <174788585025.2369658.1657252596771829199.git-patchwork-notify@kernel.org>
+Date: Thu, 22 May 2025 03:50:50 +0000
+References: <20250521-enic_min_8rq-v1-1-691bd2353273@cisco.com>
+In-Reply-To: <20250521-enic_min_8rq-v1-1-691bd2353273@cisco.com>
+To: Nelson Escobar <neescoba@cisco.com>
+Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, andrew+netdev@lunn.ch, linux-doc@vger.kernel.org,
- corbet@lwn.net, helgaas@kernel.org, luosifu@huawei.com, guoxin09@huawei.com,
- shenchenyang1@hisilicon.com, zhoushuai28@huawei.com, wulike1@huawei.com,
- shijing34@huawei.com, meny.yossefi@huawei.com, lee@trager.us,
- mpe@ellerman.id.au, sumang@marvell.com, przemyslaw.kitszel@intel.com,
- jdamato@fastly.com, christophe.jaillet@wanadoo.fr
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, johndale@cisco.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 May 2025 13:26:58 +0300 you wrote:
-> This is the 1/3 patch of the patch-set described below.
+On Wed, 21 May 2025 01:19:29 +0000 you wrote:
+> Enic started using netif_get_num_default_rss_queues() to set the number
+> of RQs used in commit cc94d6c4d40c ("enic: Adjust used MSI-X
+> wq/rq/cq/interrupt resources in a more robust way")
 > 
-> The patch-set contains driver for Huawei's 3rd generation HiNIC
-> Ethernet device that will be available in the future.
-> 
-> This is an SRIOV device, designed for data centers.
-> Initially, the driver only supports VFs.
+> This resulted in machines with less than 16 cpus using less than 8 RQs.
+> Allow enic to use at least 8 RQs no matter how many cpus are in the
+> machine to not impact existing enic workloads after a kernel upgrade.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v17,1/1] hinic3: module initialization and tx/rx logic
-    https://git.kernel.org/netdev/net-next/c/17fcb3dc12bb
+  - [net-next] net/enic: Allow at least 8 RQs to always be used
+    https://git.kernel.org/netdev/net-next/c/8fa18a3e8c0d
 
 You are awesome, thank you!
 -- 
