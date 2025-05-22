@@ -1,142 +1,158 @@
-Return-Path: <netdev+bounces-192598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E1FAC0775
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:44:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F55AC0751
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 487581BC50B3
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2159E443C
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28260289E1F;
-	Thu, 22 May 2025 08:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C03927F194;
+	Thu, 22 May 2025 08:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VZ4xXI6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B55289352
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B4D279792
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747903309; cv=none; b=XOukpLlhRVhPPQGVa9vsAc1Il+s5AYhSgJT3PwBxBs5MgaIoJacqCCzhfRLjbiuHEEGv8kycqWeD9V3ebQ03/2XG7pe/X/H+Imew7O0tNVvXDBkRPLD+yv3TweyyRjdSLfuHsIDX3iUeG5hx24Xi02BTQ46ns3eWpr+DxuXe2eE=
+	t=1747903167; cv=none; b=LK8Myei9EYDQusl7Syb6G41FEtH2EgMUTxf8NStvSCbC1K3dxOJgi90kryMAxcjr8gDadxU8Y9/5oBC1/uvQ7VTGB5Fp3iJoRJvPHstAd256Et8q6EknG6/iWym2RIFCetxVxumgk1MnlwgzO/n1L0jgcj6iWwPME/YJjOzsm7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747903309; c=relaxed/simple;
-	bh=f6B/Gs2R/h2VZ58PvWhNWRf+c9KyccQuW+lJ1UcjNlA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UZeB7S7oMuuyOsIFjBTXqUWaLEhbqUn6VFm1dj4VnqUjZKrwgmVb/YlXf5z1mEDCCcOvA98O5CqODQs2u9g/zQBaFAFidUwA8WjH4akGslTXVpIwQonvzM2WnuTDQJTMc2BWCV5kj0Wd8zQYCjaZlsW+LQ+KdGb6zrIJarH8ZSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uI1Um-0006J3-Ln
-	for netdev@vger.kernel.org; Thu, 22 May 2025 10:41:44 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uI1Uj-000hrO-29
-	for netdev@vger.kernel.org;
-	Thu, 22 May 2025 10:41:41 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 58DA5417376
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:41:41 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 93AD741734E;
-	Thu, 22 May 2025 08:41:39 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id abba9649;
-	Thu, 22 May 2025 08:41:31 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 22/22] selftests: can: test_raw_filter.sh: add support of physical interfaces
-Date: Thu, 22 May 2025 10:36:50 +0200
-Message-ID: <20250522084128.501049-23-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250522084128.501049-1-mkl@pengutronix.de>
-References: <20250522084128.501049-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1747903167; c=relaxed/simple;
+	bh=9flE0QZImSW576+7I7BBU3UGpRsywlbNGBPZ1xv0BkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F/iK4EZXoyJ6SqdyvJ0pSzyLtFuPWWwspB1fJsgEthxxGIouBJDjFlp32CFW3mEwI2T2j6vjg9Mtz28Ca9JsrIeDV4I97wCN4KSlBb6eAinsfOm2/+CscfAml/aM9A0eUzTtqCxwePUAc/t1OmUqZ7WukPm7J5u0lZeV1Ihhkuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VZ4xXI6e; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747903165; x=1779439165;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9flE0QZImSW576+7I7BBU3UGpRsywlbNGBPZ1xv0BkI=;
+  b=VZ4xXI6e1D2zNhP2HLENM6b9OhNwd5ksrhp8/Jo3LaYeKP2Th1t44CMZ
+   26xTXu+HN1I89wN3alTHvOZ/mvW3uWJ9LjSnkii+9+/+HGSxALDji1r6g
+   QBaqbmCeeXzyLUII2jWUAZpr2g4Numct17o47P/STskq/bSN68SWZ436q
+   yuArzqdS8Ne4J0Rvbyb7IPPivHjFg8eS5Tjwv2H8ftJgY/iaxMiwLN6c0
+   p/J/qO6xywK0bUjzWYv6BWfR8Xv6jJ1ROE/EVgfI3iRhy5jBDjwnvetXi
+   /KCo3I6CvspvTmzhkGRfzydYrtXNxSJivi63eQ/N5d4RoUTAgTyC6r1ZM
+   Q==;
+X-CSE-ConnectionGUID: hQTwids8TaqVtJnIf+9urw==
+X-CSE-MsgGUID: A76+KXwPRJm43NB6h7wcsw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="37533993"
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="37533993"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 01:39:24 -0700
+X-CSE-ConnectionGUID: bBKy2rUhSF2IwwJ3cEGYFQ==
+X-CSE-MsgGUID: w2QEMPdUQIK9iojHz7bxoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="140262545"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 22 May 2025 01:39:22 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uI1SR-000P6q-1B;
+	Thu, 22 May 2025 08:39:19 +0000
+Date: Thu, 22 May 2025 16:38:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
+Subject: Re: [PATCH net-next 6/8] virtio_net: enable gso over UDP tunnel
+ support.
+Message-ID: <202505221624.32GrJRU2-lkp@intel.com>
+References: <239bacdac9febd6f604f43fa8571aa2c44fd0f0b.1747822866.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <239bacdac9febd6f604f43fa8571aa2c44fd0f0b.1747822866.git.pabeni@redhat.com>
 
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Hi Paolo,
 
-Allow the user to specify a physical interface through the $CANIF
-environment variable. Add a $BITRATE environment variable set with a
-default value of 500000.
+kernel test robot noticed the following build errors:
 
-If $CANIF is omitted or if it starts with vcan (e.g. vcan1), the test
-will use the virtual can interface type. Otherwise, it will assume
-that the provided interface is a physical can interface.
+[auto build test ERROR on net-next/main]
 
-For example:
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/virtio-introduce-virtio_features_t/20250521-183700
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/239bacdac9febd6f604f43fa8571aa2c44fd0f0b.1747822866.git.pabeni%40redhat.com
+patch subject: [PATCH net-next 6/8] virtio_net: enable gso over UDP tunnel support.
+config: i386-randconfig-011-20250522 (https://download.01.org/0day-ci/archive/20250522/202505221624.32GrJRU2-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250522/202505221624.32GrJRU2-lkp@intel.com/reproduce)
 
-  CANIF=can1 BITRATE=1000000 ./test_raw_filter.sh
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505221624.32GrJRU2-lkp@intel.com/
 
-will run set the can1 interface with a bitrate of one million and run
-the tests on it.
+All errors (new ones prefixed by >>):
 
-Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- tools/testing/selftests/net/can/test_raw_filter.sh | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+   In file included from <command-line>:
+   In function '__virtio_test_bit',
+       inlined from 'virtio_has_feature' at include/linux/virtio_config.h:204:9,
+       inlined from 'virtnet_probe' at drivers/net/virtio_net.c:6805:7:
+>> include/linux/compiler_types.h:557:45: error: call to '__compiletime_assert_792' declared with attribute error: BUILD_BUG_ON failed: fbit >= VIRTIO_FEATURES_MAX
+     557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                             ^
+   include/linux/compiler_types.h:538:25: note: in definition of macro '__compiletime_assert'
+     538 |                         prefix ## suffix();                             \
+         |                         ^~~~~~
+   include/linux/compiler_types.h:557:9: note: in expansion of macro '_compiletime_assert'
+     557 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+         |         ^~~~~~~~~~~~~~~~
+   include/linux/virtio_config.h:152:17: note: in expansion of macro 'BUILD_BUG_ON'
+     152 |                 BUILD_BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
+         |                 ^~~~~~~~~~~~
 
-diff --git a/tools/testing/selftests/net/can/test_raw_filter.sh b/tools/testing/selftests/net/can/test_raw_filter.sh
-index 2216134b431b..276d6c06ac95 100755
---- a/tools/testing/selftests/net/can/test_raw_filter.sh
-+++ b/tools/testing/selftests/net/can/test_raw_filter.sh
-@@ -9,17 +9,25 @@ net_dir=$(dirname $0)/..
- source $net_dir/lib.sh
- 
- export CANIF=${CANIF:-"vcan0"}
-+BITRATE=${BITRATE:-500000}
- 
- setup()
- {
--	ip link add name $CANIF type vcan || exit $ksft_skip
-+	if [[ $CANIF == vcan* ]]; then
-+		ip link add name $CANIF type vcan || exit $ksft_skip
-+	else
-+		ip link set dev $CANIF type can bitrate $BITRATE || exit $ksft_skip
-+	fi
- 	ip link set dev $CANIF up
- 	pwd
- }
- 
- cleanup()
- {
--	ip link delete $CANIF
-+	ip link set dev $CANIF down
-+	if [[ $CANIF == vcan* ]]; then
-+		ip link delete $CANIF
-+	fi
- }
- 
- test_raw_filter()
+
+vim +/__compiletime_assert_792 +557 include/linux/compiler_types.h
+
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  543  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  544  #define _compiletime_assert(condition, msg, prefix, suffix) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  545  	__compiletime_assert(condition, msg, prefix, suffix)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  546  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  547  /**
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  548   * compiletime_assert - break build and emit msg if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  549   * @condition: a compile-time constant condition to check
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  550   * @msg:       a message to emit if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  551   *
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  552   * In tradition of POSIX assert, this macro will break the build if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  553   * supplied condition is *false*, emitting the supplied error message if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  554   * compiler has support to do so.
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  555   */
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  556  #define compiletime_assert(condition, msg) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21 @557  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  
+
 -- 
-2.47.2
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
