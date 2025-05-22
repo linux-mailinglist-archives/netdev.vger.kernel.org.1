@@ -1,222 +1,150 @@
-Return-Path: <netdev+bounces-192510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D45AC02B5
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:11:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A13A8AC02B8
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55E224A57F7
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:11:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFC233BEF84
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634A513DDBD;
-	Thu, 22 May 2025 03:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B011487E9;
+	Thu, 22 May 2025 03:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fphwMoIx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NMG928al"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3B527718;
-	Thu, 22 May 2025 03:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504C23A1B6;
+	Thu, 22 May 2025 03:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747883494; cv=none; b=WLEG83H9YRj7hByMrztxkRjOJhychp8yB24h1vnj7sftquTHDNutTTDatabhU+SM128vzvppOT/EheonIMmBuTz6MyjeEvX/SZMWhufAyBaVj3U0i2GaHk2dlWsiLpEKqZd2zBOZukmc/fRlNy1/XD/YA7Ny6WkH40TS95g78Wg=
+	t=1747883575; cv=none; b=uYpCIR3A412svsyCeIEJiHJMHovwIDcxIC+k+7Fu0p1D7USsuToM6t1EJClcnk8H6xCjkeBhsedHUfmOZod+YLcxbioHj5hUZU5vcy3ULDlOgstQv7hqoC3IPtvubHXM5V9hoyEtgYdg2wI2c5z23H5uq3+njYJijzdbIrjN8l8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747883494; c=relaxed/simple;
-	bh=IPYn8fz9zcaLbQa6XS0icpIQHNwzuXngs2jCr56c5a8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z0k8UjTfNT2fXxqF5NrzVtmRtnzodL12esUPzg5UQyR7l5HSlzfKxD7D483OYCUq5z/xfhHqxPEzyrj5GeHKTzys0J6tO0OhkzA6JnjEEytC8+k0qww8+aFi6XjhXFBR3jMH5LDb1PlH2wyZ5Gjvyg6KcPQgDEqQsC2BBpjFKKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fphwMoIx; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-742c2ed0fe1so4796383b3a.1;
-        Wed, 21 May 2025 20:11:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747883490; x=1748488290; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w2h1eS/LzljS1IIkostr5pLzZhBsy848oiMCgLs6Xg0=;
-        b=fphwMoIx46qjrqKzTUlfF0Wl0/K3dH47qqvnkcDx3lV7VLfwlzdTyseGDSw4lpJzbM
-         Uh4cFWiTESP5T1qCUnEQec8QcH6lH/4KLCvOJlJUKLLERVx5z652yK1cRDMzHlx43pya
-         I2g/qhbqdpfqUbTOYhO2EWYLt3jlP1ec0G65tK6S88R9zvEPtQxHLnVsjFcBjfjd92Fx
-         KG5S+dHtDAbVkufrOTFhLbrDKvgX9Fc7BjXGxGdehpjhpNvfsvQzJtPNn7QBIRChauxG
-         UZSBP7RyJRZYticRnDm/A2DC9HCYcfTq7evLzRl2ZhuCgPgQXD8ajplwreOdErjSie8p
-         1dCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747883490; x=1748488290;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w2h1eS/LzljS1IIkostr5pLzZhBsy848oiMCgLs6Xg0=;
-        b=Qtv0J1IW4EpEiMEHmuNeorAs3OP4goGMTTwSMyXQ+hoHZ7yjysN8BbMlj3YUoYC8Ln
-         9U5dKD+O0GOUG7G0BtECReXDRZCmq42VM5YTuAK5vW5nLvyQH12kyHMXVMRmy7kHpzQN
-         ZF4eoaLprSwrqow6OiMSWks2J/JG7gtgOWJPO0Mdt+hpCokrbMkKvBm8rpF5cujXz0Yc
-         C+ff8EHaXTSewnqWjtbMVBXeRU5CGiv/vBMi5Od2h8tHTAx2HQSfWkXHxOnbvPIkEGCL
-         i29khUfYK71SwQidxXJ/dLfvpvDCwV4Uu5iPteikXKUQtsoRobs69xGP6vX7QQ3SlRXC
-         sH1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVfIfWosW01K3QMWSqZqYruJFfu8+NWOeGMPPyw4QUgO9qd+q6Ov5SanNbjMiMDI/wBqRemWw5uX/yVBKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx3weyRaorl8+z7+elT+lsiM0rsyKS1FaiubzS7aIsHMKstPW5
-	AM/bXuv6jJvBx3Fv6k/HQIdxgoC4Vj9pzhgGpME+spMyKqmIIN9TLJhP5bZ5
-X-Gm-Gg: ASbGnctCKnBpo7X9KZ2SRjEyLrageuTkvXSpFpna54cBHr2mJDruEVvgMqIbmz4CRFn
-	s0qIHTmI6/SZNLyJWdfxgImelujyC6X75t0mvTLGeFy0INMyC9RrH1hgQDWxTGBXhZtlg9AK0KH
-	W2xRu71aD5AbujuqDsOodWbsqeFixxBS71MUeuT8mZhmY6bV7alliHhgMqIDYxlI7skv3yDishs
-	dRhCwMC01Gr0OyNuHQfQIJ6qEgwC5wvSVIed0PHNLJqb9nVWUlR83NxUu9mDtdTEz6j+3kTR2xF
-	7U3hxtsXrKp7W2Gk8DA0Il4k/oe7xczCSaa1YvfheMD64TGmX+X/wyjb+J1Wnoj6R5USmgxHZzU
-	ExbU/+PQHd9Va
-X-Google-Smtp-Source: AGHT+IGniznh0ts9NxFH5+t9kJd249DOK+nfbCXQCEmCmvkI5lLK6lXs4GEDFzVngyLAHgRCQ3e+Rw==
-X-Received: by 2002:a05:6a21:502:b0:203:ca66:e30 with SMTP id adf61e73a8af0-216219edf88mr37148896637.37.1747883490479;
-        Wed, 21 May 2025 20:11:30 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-742a97395basm10351194b3a.76.2025.05.21.20.11.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 20:11:30 -0700 (PDT)
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com,
-	horms@kernel.org,
-	stfomichev@gmail.com,
-	linux-kernel@vger.kernel.org,
-	syzbot+b191b5ccad8d7a986286@syzkaller.appspotmail.com
-Subject: [PATCH net v2] af_packet: move notifier's packet_dev_mc out of rcu critical section
-Date: Wed, 21 May 2025 20:11:28 -0700
-Message-ID: <20250522031129.3247266-1-stfomichev@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747883575; c=relaxed/simple;
+	bh=5/LiaP+uX/OsJwwbgqyM+MuEPY85wwD6eLPaxD/gW/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+8QmTHLwEuB+UjxDhvav6lOzao1MWZut9ym6JFTEoyKu2P8tbY9m4UGfAiDq0BDxrg3sw5sbMBoSgRV5vp/Eofsl1n41+Xs0fzeN1wMRaq5QUGO76RQaFDVFw7xPs5/SE6tQ8rFzYlKbj51q9Qn3MgC1/kg0OLemMPb2J9Dn5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NMG928al; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747883572; x=1779419572;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5/LiaP+uX/OsJwwbgqyM+MuEPY85wwD6eLPaxD/gW/o=;
+  b=NMG928alRp4OyDLV7ObVfvCfjJMRRrqcZMP5e9vRWYbWZy87pXUKvwFK
+   f1HmCVLvofD2EgywWvtG8ScZI7KcMfYEGmmT6otQt2sb15b9QOdp9i9Yb
+   i07W7043bnS+NXtJliEfirXK8IZvJ2CBDFQp6GNVSfexwJU3gsZE2765U
+   4o1T6uWh3XPiVzuEmhWV762vpe7k8TMDectZCs9BZIHAIZzTsZwZoB7Dv
+   AHUu2CO3CdViiJxnKpyhXZ9ORrts5WBTM8DAr20NnE1YZNe9lYy+MJcDE
+   gMGc7gSWliDzo8wR4qfkyPRSmxtRqTUN3LxiecmBz/exqmMdB2c4VrGHX
+   A==;
+X-CSE-ConnectionGUID: 4qdnsOX1TIOCME1jXslAng==
+X-CSE-MsgGUID: h82ngtgGRYaFfh1Gopvc8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="72414850"
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="72414850"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 20:12:52 -0700
+X-CSE-ConnectionGUID: FuZxdP3RQWym+in8/eOzWA==
+X-CSE-MsgGUID: /6oOLcPMQtWU4RDqyGpVAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="177541262"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 21 May 2025 20:12:48 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uHwMP-000OsC-0J;
+	Thu, 22 May 2025 03:12:45 +0000
+Date: Thu, 22 May 2025 11:12:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wentao Liang <vulab@iscas.ac.cn>, saeedm@nvidia.com, leon@kernel.org,
+	tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>, stable@vger.kernel.org
+Subject: Re: [PATCH v3] net/mlx5: Add error handling in
+ mlx5_query_nic_vport_node_guid()
+Message-ID: <202505221016.r93lwUfJ-lkp@intel.com>
+References: <20250521132343.844-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521132343.844-1-vulab@iscas.ac.cn>
 
-Syzkaller reports the following issue:
+Hi Wentao,
 
- BUG: sleeping function called from invalid context at kernel/locking/mutex.c:578
- __mutex_lock+0x106/0xe80 kernel/locking/mutex.c:746
- team_change_rx_flags+0x38/0x220 drivers/net/team/team_core.c:1781
- dev_change_rx_flags net/core/dev.c:9145 [inline]
- __dev_set_promiscuity+0x3f8/0x590 net/core/dev.c:9189
- netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
- dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286 packet_dev_mc net/packet/af_packet.c:3698 [inline]
- packet_dev_mclist_delete net/packet/af_packet.c:3722 [inline]
- packet_notifier+0x292/0xa60 net/packet/af_packet.c:4247
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
- call_netdevice_notifiers net/core/dev.c:2228 [inline]
- unregister_netdevice_many_notify+0x15d8/0x2330 net/core/dev.c:11972
- rtnl_delete_link net/core/rtnetlink.c:3522 [inline]
- rtnl_dellink+0x488/0x710 net/core/rtnetlink.c:3564
- rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6955
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
+kernel test robot noticed the following build errors:
 
-Calling `PACKET_ADD_MEMBERSHIP` on an ops-locked device can trigger
-the `NETDEV_UNREGISTER` notifier, which may require disabling promiscuous
-and/or allmulti mode. Both of these operations require acquiring
-the netdev instance lock.
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.15-rc7 next-20250521]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Move the call to `packet_dev_mc` outside of the RCU critical section.
-The `mclist` modifications (add, del, flush, unregister) are protected by
-the RTNL, not the RCU. The RCU only protects the `sklist` and its
-associated `sks`. The delayed operation on the `mclist` entry remains
-within the RTNL.
+url:    https://github.com/intel-lab-lkp/linux/commits/Wentao-Liang/net-mlx5-Add-error-handling-in-mlx5_query_nic_vport_node_guid/20250521-212557
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250521132343.844-1-vulab%40iscas.ac.cn
+patch subject: [PATCH v3] net/mlx5: Add error handling in mlx5_query_nic_vport_node_guid()
+config: loongarch-randconfig-002-20250522 (https://download.01.org/0day-ci/archive/20250522/202505221016.r93lwUfJ-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250522/202505221016.r93lwUfJ-lkp@intel.com/reproduce)
 
-Reported-by: syzbot+b191b5ccad8d7a986286@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b191b5ccad8d7a986286
-Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
-Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
----
-v2: revise commit message (Willem & Jakub) and add INIT_LIST_HEAD (Willem)
----
- net/packet/af_packet.c | 21 ++++++++++++++++-----
- net/packet/internal.h  |  1 +
- 2 files changed, 17 insertions(+), 5 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505221016.r93lwUfJ-lkp@intel.com/
 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index d4dba06297c3..20be2c47cf41 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3713,15 +3713,15 @@ static int packet_dev_mc(struct net_device *dev, struct packet_mclist *i,
- }
- 
- static void packet_dev_mclist_delete(struct net_device *dev,
--				     struct packet_mclist **mlp)
-+				     struct packet_mclist **mlp,
-+				     struct list_head *list)
- {
- 	struct packet_mclist *ml;
- 
- 	while ((ml = *mlp) != NULL) {
- 		if (ml->ifindex == dev->ifindex) {
--			packet_dev_mc(dev, ml, -1);
-+			list_add(&ml->remove_list, list);
- 			*mlp = ml->next;
--			kfree(ml);
- 		} else
- 			mlp = &ml->next;
- 	}
-@@ -3769,6 +3769,7 @@ static int packet_mc_add(struct sock *sk, struct packet_mreq_max *mreq)
- 	memcpy(i->addr, mreq->mr_address, i->alen);
- 	memset(i->addr + i->alen, 0, sizeof(i->addr) - i->alen);
- 	i->count = 1;
-+	INIT_LIST_HEAD(&i->remove_list);
- 	i->next = po->mclist;
- 	po->mclist = i;
- 	err = packet_dev_mc(dev, i, 1);
-@@ -4233,9 +4234,11 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
- static int packet_notifier(struct notifier_block *this,
- 			   unsigned long msg, void *ptr)
- {
--	struct sock *sk;
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
- 	struct net *net = dev_net(dev);
-+	struct packet_mclist *ml, *tmp;
-+	LIST_HEAD(mclist);
-+	struct sock *sk;
- 
- 	rcu_read_lock();
- 	sk_for_each_rcu(sk, &net->packet.sklist) {
-@@ -4244,7 +4247,8 @@ static int packet_notifier(struct notifier_block *this,
- 		switch (msg) {
- 		case NETDEV_UNREGISTER:
- 			if (po->mclist)
--				packet_dev_mclist_delete(dev, &po->mclist);
-+				packet_dev_mclist_delete(dev, &po->mclist,
-+							 &mclist);
- 			fallthrough;
- 
- 		case NETDEV_DOWN:
-@@ -4277,6 +4281,13 @@ static int packet_notifier(struct notifier_block *this,
- 		}
- 	}
- 	rcu_read_unlock();
-+
-+	/* packet_dev_mc might grab instance locks so can't run under rcu */
-+	list_for_each_entry_safe(ml, tmp, &mclist, remove_list) {
-+		packet_dev_mc(dev, ml, -1);
-+		kfree(ml);
-+	}
-+
- 	return NOTIFY_DONE;
- }
- 
-diff --git a/net/packet/internal.h b/net/packet/internal.h
-index d5d70712007a..1e743d0316fd 100644
---- a/net/packet/internal.h
-+++ b/net/packet/internal.h
-@@ -11,6 +11,7 @@ struct packet_mclist {
- 	unsigned short		type;
- 	unsigned short		alen;
- 	unsigned char		addr[MAX_ADDR_LEN];
-+	struct list_head	remove_list;
- };
- 
- /* kbdq - kernel block descriptor queue */
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/mellanox/mlx5/core/vport.c: In function 'mlx5_query_nic_vport_node_guid':
+>> drivers/net/ethernet/mellanox/mlx5/core/vport.c:474:9: error: 'ret' undeclared (first use in this function); did you mean 'net'?
+     474 |         ret = mlx5_query_nic_vport_context(mdev, 0, out);
+         |         ^~~
+         |         net
+   drivers/net/ethernet/mellanox/mlx5/core/vport.c:474:9: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +474 drivers/net/ethernet/mellanox/mlx5/core/vport.c
+
+   463	
+   464	int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
+   465	{
+   466		u32 *out;
+   467		int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
+   468		int err;
+   469	
+   470		out = kvzalloc(outlen, GFP_KERNEL);
+   471		if (!out)
+   472			return -ENOMEM;
+   473	
+ > 474		ret = mlx5_query_nic_vport_context(mdev, 0, out);
+   475		if (err)
+   476			goto out;
+   477	
+   478		*node_guid = MLX5_GET64(query_nic_vport_context_out, out,
+   479					nic_vport_context.node_guid);
+   480	out:
+   481		kvfree(out);
+   482	
+   483		return err;
+   484	}
+   485	EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_node_guid);
+   486	
+
 -- 
-2.49.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
