@@ -1,178 +1,265 @@
-Return-Path: <netdev+bounces-192735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575A6AC0F53
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:04:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D839AC0F5B
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275833A32A6
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:03:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B03677B437F
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A2712DD95;
-	Thu, 22 May 2025 15:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEBvvL0+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E317828DB61;
+	Thu, 22 May 2025 15:04:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA3C35977
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33273239E85;
+	Thu, 22 May 2025 15:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747926202; cv=none; b=KYNf90o7HDYDxAkwUirSVd3e9fUebtNFt3nK8YHjif979CIzMvb/8giWPD7myE6E7qyuNiH7J1x0VJnz/kybjs7ArA1e5GpOMf9tiK1K4KOv0dzj6N2UVOocHLqObLnM3Hawv89KnpWlBUCtHMW+T/vtXm39B0Wk7hlMwRMYJqs=
+	t=1747926288; cv=none; b=EbaDBXaRZx3nYDVeFw9LCuArK0EHw1fQtSijEolMqI6IKcPWErD5lO+n325APEUo/n8LMsaVL1cUBzTV/8x0MRNsFsQonCRYiM3JFtwBIni6v/vpn2HgtE9O51dDbjD6rTPeIrF4QNocFcq3tZjyfsh2F1veVB4uyHr+fauJokI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747926202; c=relaxed/simple;
-	bh=aFlivPAtjSdCTu5LHQTFv68CeB0wv7TZc32vCAu/z/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xrf8wzoHO61PCAHs0MoYeqio/sPINuv8Y3CrGfg0EjURCh8z4DTWDlzete7TbhTG8wmfyDJZNMH7uNnIjEdRr8KtwM8T+5hCsu737Fb81H3OIOwKJgcuZoFZY8hKEoF2Gg3KJfOqaiGgXxojjJNu171TN3VigQF8RlPOngUZOW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEBvvL0+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE3DC4CEE4;
-	Thu, 22 May 2025 15:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747926201;
-	bh=aFlivPAtjSdCTu5LHQTFv68CeB0wv7TZc32vCAu/z/M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cEBvvL0+81fiows/tnzjWSlwCBS8hiLdLN1S5d2Sb+xdEjRQWse3YxOKcs4MhiMcg
-	 R4m8v8xyt9Vw//wur0c7AhnhkGSSx2axLKCjBh9zivJi2UuO3bT7uQM4XvHtg5X6oV
-	 T25WqvhaIfde5aMjBv1G1ZfYeU2GuWmS9PIkaaqHNifbrDsUebK22Jwj5AbMNw9o2c
-	 tUBe1MTpivm7/VM263/zl7x48Q3JRjT6YYqmJIa1khaPNmSANWjIYVt9JQO+dnSNZV
-	 vLdJNpQX/2v+ExfS/hRXRWtR+CiS/rkCbzUesLrlC6I+6GSWi0OHQbwb4E8OaoeIRc
-	 DEGAyvKo3e47g==
-Message-ID: <82e2d881-fd2f-4485-a8c4-d0580a5582ac@kernel.org>
-Date: Thu, 22 May 2025 17:03:16 +0200
+	s=arc-20240116; t=1747926288; c=relaxed/simple;
+	bh=6T1ttKIMuKzvujI7awY82v5YEXc/9trQlGSmdF2HvQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Z8Dv2NtokkAR82w5RHflHmoZ0p9cqpPD8Trup/lq0L8FLIUj3UqonFAlf+EXCXxUj3n6gnZvHnPBT0VA27sVsDVCZRXBGQr2bToN+2xlFho0N0djKqLr2CiT2cMowGWEBZiNVs3cdzLkcGnEeE4YDTmLKo9eehBfbxGACaqhby8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4b3BP55nltz1d1DG;
+	Thu, 22 May 2025 23:03:05 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 887BD1402EA;
+	Thu, 22 May 2025 23:04:42 +0800 (CST)
+Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 22 May 2025 23:04:42 +0800
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 22 May 2025 23:04:41 +0800
+Message-ID: <76635aef-45e5-4464-908b-57ea0920b01b@huawei.com>
+Date: Thu, 22 May 2025 23:04:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v1 net-next 4/6] socket: Remove kernel socket conversion
- except for net/rds/.
-Content-Language: en-GB, fr-BE
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250517035120.55560-1-kuniyu@amazon.com>
- <20250517035120.55560-5-kuniyu@amazon.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250517035120.55560-5-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG Report] KASAN: slab-use-after-free in
+ page_pool_recycle_in_ring
+To: Mina Almasry <almasrymina@google.com>
+CC: <hawk@kernel.org>, <ilias.apalodimas@linaro.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<zhangchangzhong@huawei.com>
+References: <20250513083123.3514193-1-dongchenchen2@huawei.com>
+ <CAHS8izOio0bnLp3+Vzt44NVgoJpmPTJTACGjWvOXvxVqFKPSwQ@mail.gmail.com>
+ <34f06847-f0d8-4ff3-b8a1-0b1484e27ba8@huawei.com>
+ <CAHS8izPh5Z-CAJpQzDjhLVN5ye=5i1zaDqb2xQOU3QP08f+Y0Q@mail.gmail.com>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <CAHS8izPh5Z-CAJpQzDjhLVN5ye=5i1zaDqb2xQOU3QP08f+Y0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq200002.china.huawei.com (7.202.195.90)
 
-Hi Kuniyuki,
 
-On 17/05/2025 05:50, Kuniyuki Iwashima wrote:
-> Since commit 26abe14379f8 ("net: Modify sk_alloc to not reference
-> count the netns of kernel sockets."), TCP kernel socket has caused
-> many UAF.
-> 
-> We have converted such sockets to hold netns refcnt, and we have
-> the same pattern in cifs, mptcp, nvme, rds, smc, and sunrpc.
-> 
->   __sock_create_kern(..., &sock);
->   sk_net_refcnt_upgrade(sock->sk);
-> 
-> Let's drop the conversion and use sock_create_kern() instead.
-> 
-> The changes for cifs, mptcp, nvme, and smc are straightforward.
-> 
-> For sunrpc, we call sock_create_net() for IPPROTO_TCP only and still
-> call __sock_create_kern() for others.
-> 
-> For rds, we cannot drop sk_net_refcnt_upgrade() for accept()ed
-> sockets.
+> On Tue, May 13, 2025 at 8:11 PM dongchenchen (A)
+> <dongchenchen2@huawei.com> wrote:
+>>
+>>> On Tue, May 13, 2025 at 1:28 AM Dong Chenchen <dongchenchen2@huawei.com> wrote:
+>>>> Hello,
+>>>>
+>>>> syzkaller found the UAF issue in page_pool_recycle_in_ring[1], which is
+>>>> similar to syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com.
+>>>>
+>>>> root cause is as follow:
+>>>>
+>>>> page_pool_recycle_in_ring
+>>>>     ptr_ring_produce
+>>>>       spin_lock(&r->producer_lock);
+>>>>       WRITE_ONCE(r->queue[r->producer++], ptr)
+>>>>         //recycle last page to pool
+>>>>                                   page_pool_release
+>>>>                                     page_pool_scrub
+>>>>                                       page_pool_empty_ring
+>>>>                                         ptr_ring_consume
+>>>>                                         page_pool_return_page //release all page
+>>>>                                     __page_pool_destroy
+>>>>                                        free_percpu(pool->recycle_stats);
+>>>>                                        kfree(pool) //free
+>>>>
+>>>>        spin_unlock(&r->producer_lock); //pool->ring uaf read
+>>>>     recycle_stat_inc(pool, ring);
+>>>>
+>>>> page_pool can be free while page pool recycle the last page in ring.
+>>>> After adding a delay to the page_pool_recycle_in_ring(), syzlog[2] can
+>>>> reproduce this issue with a high probability. Maybe we can fix it by
+>>>> holding the user_cnt of the page pool during the page recycle process.
+>>>>
+>>>> Does anyone have a good idea to solve this problem?
+>>>>
+>>> Ugh. page_pool_release is not supposed to free the page_pool until all
+>>> inflight pages have been returned. It detects that there are pending
+>>> inflight pages by checking the atomic stats, but in this case it looks
+>>> like we've raced checking the atomic stats with another cpu returning
+>>> a netmem to the ptr ring (and it updates the stats _after_ it already
+>>> returned to the ptr_ring).
+>>>
+>>> My guess here is that page_pool_scrub needs to acquire the
+>>> r->producer_lock to make sure there are no other producers returning
+>>> netmems to the ptr_ring while it's scrubbing them (and checking after
+>>> to make sure there are no inflight netmems).
+>>>
+>>> Can you test this fix? It may need some massaging. I only checked it
+>>> builds. I haven't thought through all the possible races yet:
+>>>
+>>> ```
+>>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>>> index 2b76848659418..8654608734773 100644
+>>> --- a/net/core/page_pool.c
+>>> +++ b/net/core/page_pool.c
+>>> @@ -1146,10 +1146,17 @@ static void page_pool_scrub(struct page_pool *pool)
+>>>
+>>>    static int page_pool_release(struct page_pool *pool)
+>>>    {
+>>> +       bool in_softirq;
+>>>           int inflight;
+>>>
+>>> +
+>>> +       /* Acquire producer lock to make sure we don't race with another thread
+>>> +        * returning a netmem to the ptr_ring.
+>>> +        */
+>>> +       in_softirq = page_pool_producer_lock(pool);
+>>>           page_pool_scrub(pool);
+>>>           inflight = page_pool_inflight(pool, true);
+>>> +       page_pool_producer_unlock(pool, in_softirq);
+>>>           if (!inflight)
+>>>                   __page_pool_destroy(pool);
+>>> ```
+>> Hi, Mina!
+>>
+>> I tested this patch and the problem still exists.
+>> Although this patch ensures that lock access is safe, the page recycle
+>> process
+>> can access the page pool after unlock.
+>>
+> Sorry for the very late reply; got a bit busy with some work work.
+>
+> My initial analysis was wrong as the test shows with the candidate
+> fix. I took another look, and here is what I can tell so far. The full
+> syzbot report is here for reference:
+>
+> https://syzkaller.appspot.com/bug?extid=204a4382fcb3311f3858
+>
+> page_pool_release_retry is supposed to block freeing the page_pool
+> until all netmems have been freed via page_pool_put_unrefed_netmem
+> using the inflight logic. What is clear from the syzbot report is that
+> this inflight logic didn't work properly, because the
+> page_pool_put_unrefed_netmem call happened after
+> page_pool_release_retry has allowed the page_pool to be freed
+> (__page_pool_destroy has already been called).
+>
+> The inflight logic works by taking the diff between
+> `pool->pages_state_release_cnt` and `pool->pages_state_hold_cnt`.
+> pages_state_hold_cnt is incremented when the page_pool allocates a new
+> page from the buddy allocator. pages_state_hold_cnt is incremented at
+> the end of the page_pool_put_unrefed_netmem.
+>
+> We don't expect new pages to be allocated by the page_pool owner after
+> page_pool_destroy has been called, so pages_state_hold_cnt is supposed
+> to not move after page_pool_destroy is called I think.
+> pages_state_release_cnt should be <= pages_state_hold_cnt at the time
+> of page_pool_destroy is called. Then when all the inflight netmems
+> have been freed via page_pool_put_unrefed_netmem,
+> pool->pages_state_release_cnt should be == to
+> pool->pages_state_hold_cnt, and the page_pool should be allowed to be
+> freed.
+>
+> Clearly this is not working, but I can't tell why. I also notice the
+> syzbot report is from the bpf/test_run.c, but I don't think we have
+> reports from prod, so it may be a test issue. Some possibilities:
+>
+> 1. Maybe the test is calling a page_pool allocation like
+> page_pool_dev_alloc_pages in parallel with page_pool_destroy. That may
+> increment pages_state_hold_cnt unexpectedly?
+>
+> 2.  Maybe one of the pages_state_*_cnt overflowed or something?
+>
+> 3. Memory corruption?
+>
+> I'm afraid I'm not sure. Possibly littering the code with warnings for
+> unexpected cases would give some insight. For example, I think this
+> would catch case #1:
+>
+> ```
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 4011eb305cee..9fa70c60f9b5 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -536,6 +536,9 @@ static struct page
+> *__page_pool_alloc_page_order(struct page_pool *pool,
+>          alloc_stat_inc(pool, slow_high_order);
+>          page_pool_set_pp_info(pool, page_to_netmem(page));
+>
+> +       /* Warn if we're allocating a page on a destroyed page_pool */
+> +       DEBUG_NET_WARN_ON(pool->destroy_cnt);
+> +
+>          /* Track how many pages are held 'in-flight' */
+>          pool->pages_state_hold_cnt++;
+>          trace_page_pool_state_hold(pool, page_to_netmem(page),
+> @@ -582,6 +585,8 @@ static noinline netmem_ref
+> __page_pool_alloc_pages_slow(struct page_pool *pool,
+>                  page_pool_set_pp_info(pool, netmem);
+>                  pool->alloc.cache[pool->alloc.count++] = netmem;
+>                  /* Track how many pages are held 'in-flight' */
+> +               /* Warn if we're allocating a page on a destroyed page_pool */
+> +               DEBUG_NET_WARN_ON(pool->destroy_cnt);
+>                  pool->pages_state_hold_cnt++;
+>                  trace_page_pool_state_hold(pool, netmem,
+>                                             pool->pages_state_hold_cnt);
+> @@ -1271,6 +1276,8 @@ void net_mp_niov_set_page_pool(struct page_pool
+> *pool, struct net_iov *niov)
+>
+>          page_pool_set_pp_info(pool, netmem);
+>
+> +       /* Warn if we're allocating a page on a destroyed page_pool */
+> +       DEBUG_NET_WARN_ON(pool->destroy_cnt);
+>          pool->pages_state_hold_cnt++;
+>          trace_page_pool_state_hold(pool, netmem, pool->pages_state_hold_cnt);
+> ```
+>
+> If you have steps to repro this, maybe post them and I'll try to take
+> a look when I get a chance if you can't root cause this further.
+HI, Mina
+Thank you for your rigorous analysis of the problem.
+We can use the config and log in syzkaller to reproduce the problem.
+Enable CONFIG_PAGE_POOL_STATS and add delay to
+page_pool_recycle_in_ring() can make it easier to reproduce the problem.
 
-Thank you for working on this!
+static noinline bool page_pool_recycle_in_ring(struct page_pool *pool, 
+netmem_ref netmem)
+{
+         int ret;
+         /* BH protection not needed if current is softirq */
+@@ -715,6 +719,8 @@ static bool page_pool_recycle_in_ring(struct 
+page_pool *pool, netmem_ref netmem)
+                 ret = ptr_ring_produce_bh(&pool->ring, (__force void 
+*)netmem);
 
-(...)
-
-> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-> index 602e689e991f..00e5cecb7683 100644
-> --- a/net/mptcp/subflow.c
-> +++ b/net/mptcp/subflow.c
-> @@ -1757,7 +1757,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
->  	if (unlikely(!sk->sk_socket))
->  		return -EINVAL;
->  
-> -	err = __sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
-> +	err = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
->  	if (err)
->  		return err;
->  
-> @@ -1770,11 +1770,6 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
->  	/* the newly created socket has to be in the same cgroup as its parent */
->  	mptcp_attach_cgroup(sk, sf->sk);
->  
-> -	/* kernel sockets do not by default acquire net ref, but TCP timer
-> -	 * needs it.
-> -	 * Update ns_tracker to current stack trace and refcounted tracker.
-> -	 */
-> -	sk_net_refcnt_upgrade(sf->sk);
->  	err = tcp_set_ulp(sf->sk, "mptcp");
->  	if (err)
->  		goto err_free;
-For the changes in MPTCP:
-
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  # net/mptcp
-
-(...)
-
-(and thanks to Paolo for the Cc :) )
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+         if (!ret) {
++               mdelay(2500);
+                 recycle_stat_inc(pool, ring);
+                 return true;
+         }
+> --
+> Thanks,
+> Mina
 
