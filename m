@@ -1,50 +1,96 @@
-Return-Path: <netdev+bounces-192523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F6EAC0333
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:51:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE82AC034D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35A04A84CC
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:51:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C03864E0684
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 04:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5D619E82A;
-	Thu, 22 May 2025 03:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929E2149E13;
+	Thu, 22 May 2025 04:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZEffVIE9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grjSF6bL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB72E19DFA7;
-	Thu, 22 May 2025 03:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D5A184E;
+	Thu, 22 May 2025 04:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747885818; cv=none; b=Y81AABEV0qifj6RwXSO+rNqXbzOhfyUl/91twqRAhpL0rpxaepOL5BB2TQmDGYBt0G5vKVbBxlH0C29EZqPz2dcdwnm4r784iF4FrR7bVCQYzy4hveaXXQyVGw0H5k62C4UCvKmOAQUs3hael9QlpaIDzukSxBYvo72HZbfqlp8=
+	t=1747886529; cv=none; b=pkCxAt9fAfBg8YuNj/xgO2iTpynkG2OUcG0bOhBhh/k9V+0OvtiVXAqyLKiuOTK5sw4bS2cxActRjWu/zJQpVrVe+/3W8/mkzEVw6uq3MM6rZGx5Djd3NLlLI0MWZJuY9yN7kRTgbrmns8Cf+6ui9ly6UkZ6vrGqf6oKx43NotU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747885818; c=relaxed/simple;
-	bh=p22G2JBMta/6iH6dP8U1a3F9uRlC3jbI5Wr2sWdOGF0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Q+IRGWyxYlFOOGMJvbdJKzdOH+HUfUDPQBhZ54XL1UIQjkTVSTipSc/fnJ66HlkyJW7O4b+lr8rdxahxCOpOyEAthzOFosErucFxXcvQIVVROEiC/ETcYiFOxvnTjnBan2RLoF7dC2zamZyNByOIkqbLi38AZhqMdY+NrkVvzek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZEffVIE9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FAB4C4CEEB;
-	Thu, 22 May 2025 03:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747885816;
-	bh=p22G2JBMta/6iH6dP8U1a3F9uRlC3jbI5Wr2sWdOGF0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZEffVIE9+yJUE7xH8jg4ks6LXjL4O2jNGMQwaEKF2XRYajBFdd+8fjJA2Jytu9+Sr
-	 1Bgtl++9dPQ/cx3HxOAy1qGOBBoghtmWyV5t6awwhMhxA4ZgrSS5tkBosVfoOItsTA
-	 Ysw85psBlCMu+gd6k6kiAS1cxuSUMVKIqPbCFr922UCDayFPwj+AX2gxqX69UMdsEW
-	 lmL0w6VGwDQyobgCeDUMyjchtuLTq3ZhQho+Ro1DYY6MhNVVZHRJJr4mfGrevTiMaG
-	 7/WDcqR/RBppAEiuICYYaKC4S0g0y6XX6k/5njA4y/xFxXU1aDBDCY4FO3J+gC5xi2
-	 pGZwXydgAoTfA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D40380AA7C;
-	Thu, 22 May 2025 03:50:53 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747886529; c=relaxed/simple;
+	bh=VaCm9odT9ZRMdbNFJ0psuY8WZxzOUA90QWzgpSQSWew=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=guuI8wuJcogsNXZWauDeyed6NOiiwhG0c5nAfWrXDH8VZSCkG1CsyY+WoFokIgogBU7OTC+nvX8Xm60/U++c0NK2NM+OF2RUkHgUJHoi4GbcfCQSZajxCdOmpMw7prxFaxXiBC7MQK7G2pjZsHS63RJkkKT5c49w/+CRKNZfSt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grjSF6bL; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23211e62204so36694975ad.3;
+        Wed, 21 May 2025 21:02:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747886526; x=1748491326; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PZhUzfOUEweTXHf5T0hPVYO2QZbak8VcGiB8Zx0TkCQ=;
+        b=grjSF6bLDdJl0xSQUo/0exCd/+roUR2k+yClevT11Ce1OEgqGYE6Lf9mhveAVCVi4q
+         Hmb5tt97JyvojuvWK4NKx8lI7+/ME3xq4q1i6B7IXLy/tUPau7NtRXYhvVXxefljNAYU
+         mtkGQGux1poMOz+4yuZHeT3MI2QdBj31/q6CtlWd+bS+W8zgVfxJHyi7Q/HNByvIPKbT
+         l+qwSH8Bpi9LnTayJU882noMqurQVGC3/6O4rhhcXm/7M7DOPkPRYzIlbH9g/wmcUHa1
+         G69UWG2xjyx/tUfw23P20QgOyV8Sufd/xUM45ibqKLs6xqHzhff1jUVfSE0qRzsQyYYV
+         i6fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747886526; x=1748491326;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PZhUzfOUEweTXHf5T0hPVYO2QZbak8VcGiB8Zx0TkCQ=;
+        b=XYafQb/0BVWDgRgfLMEDJ6/nzVznQ0M4nvw0OaCjEn9E/TdnvKY2+fQSUQ4Kxh7STR
+         wRFqLliePcG1ksv/RbXFZjKBzYPKe51jQak2/bYqCzhzJA7CRLnB9r0lDM6ATW54if0D
+         P93AsGWKG/mlFHLCSm3bhxoAgP56U3WALKJXOyMXYEgHxZE2ANmxAqwfwH4aLPBGdYXP
+         O1UXD/9rFgVO6PCRvUKP1UWJ4L+joK8k3pvXe9maVE/pkYzBSGwWBPHgQ2qPIuDJD7RB
+         V1YTbCg68Wpk1wcW9We8NUisHRptLOx3ztPSSMYIlRWxI76Q/b40lgM8zRCrmPP1YoVd
+         CeJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsxyG46gZ8sOsBseIH0UN1TBq7hq01BrocFeaw7Vn1eMWCGR4DFPXcbvwB2jy2ANkB7kQ=@vger.kernel.org, AJvYcCVg8DU5q/n86XM3Ee2AxOiuG4nud1tE018T144TI/F6+NpVm9uFRGhkYBOIA3q4EkezCFFMvT+AHtJMG5Xf@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCfEETt+Jc6bIHPeGE4RThFEtd883GDUzu1nlee6Ofd5bPLT/D
+	u1BpI8Asc9NS6sKM9w+OMPOSa8ISyPLBlQzgCXAJ/gbK86jtYmXdqPsBv7nGCQ==
+X-Gm-Gg: ASbGnctybxOCYGdlcDaazO/Pxa8MIzoPyR7YQcUOsSHk5kJymjbTJa6GB3QknOizZBN
+	XseHibN9od61UAOkTIDpQwxCEJohTixAS2eCbxI1LTK580uHA/KZ+dGilcpwg7PrSQemmKxTFYK
+	KrP6djho307JwIGcKyrC9qXSyTloXz3KHUSCPF3mWvnDNlQ7dmyrMEXIgpE0HHBt5LB8zXVptA/
+	UeHikpfbee1hV3nGT7vG50qgkeXyBrfxpGkEC7b0sVG855HlBr5VDy6iW9sH/U+heX8mxDjqs+a
+	iBwvEcJtitBeKS0bLhTTBhGqiAy9y4uxHuUAvbOcw+kR+AlLkTuAYw8mLawcZPNRfNM9Ld65EGd
+	g
+X-Google-Smtp-Source: AGHT+IHN4e8t0B8D9y55dtrTUEzkuMGlnFb8gkeKQPNLgOGCM3vx8v2UVamtSCZqaJLxtwmhUS6DIA==
+X-Received: by 2002:a17:902:e74c:b0:231:d0c4:e806 with SMTP id d9443c01a7336-231d459a971mr360062605ad.32.1747886526384;
+        Wed, 21 May 2025 21:02:06 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:e79e:1a85:fe3:abe2])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-30f36364f9asm4532890a91.4.2025.05.21.21.02.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 21:02:05 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH v2 net-next] xsk: add missing virtual address conversion for page
+Date: Thu, 22 May 2025 11:01:15 +0700
+Message-ID: <20250522040115.5057-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +98,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] nfc: Correct Samsung "Electronics" spelling in copyright
- headers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174788585174.2369658.2328362066344139918.git-patchwork-notify@kernel.org>
-Date: Thu, 22 May 2025 03:50:51 +0000
-References: <20250520072119.176018-1-sumanth.gavini@yahoo.com>
-In-Reply-To: <20250520072119.176018-1-sumanth.gavini@yahoo.com>
-To: Sumanth Gavini <sumanth.gavini@yahoo.com>
-Cc: krzk@kernel.org, bongsu.jeon@samsung.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, krzysztof.kozlowski@linaro.org
 
-Hello:
+In commit 7ead4405e06f ("xsk: convert xdp_copy_frags_from_zc() to use
+page_pool_dev_alloc()"), when converting from netmem to page, I missed a
+call to page_address() around skb_frag_page(frag) to get the virtual
+address of the page. This commit uses skb_frag_address() helper to fix
+the issue.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: 7ead4405e06f ("xsk: convert xdp_copy_frags_from_zc() to use page_pool_dev_alloc()")
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+Changes in v2:
+- Add Fixes tag
 
-On Tue, 20 May 2025 00:21:19 -0700 you wrote:
-> Fix the misspelling of "Electronics" in copyright headers across:
-> - s3fwrn5 driver
-> - virtual_ncidev driver
-> 
-> Signed-off-by: Sumanth Gavini <sumanth.gavini@yahoo.com>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> [...]
+ net/core/xdp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Here is the summary with links:
-  - [v3] nfc: Correct Samsung "Electronics" spelling in copyright headers
-    https://git.kernel.org/netdev/net-next/c/bd15b2b26c98
-
-You are awesome, thank you!
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index e6f22ba61c1e..491334b9b8be 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -709,8 +709,7 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
+ 			return false;
+ 		}
+ 
+-		memcpy(page_address(page) + offset,
+-		       skb_frag_page(frag) + skb_frag_off(frag),
++		memcpy(page_address(page) + offset, skb_frag_address(frag),
+ 		       LARGEST_ALIGN(len));
+ 		__skb_fill_page_desc_noacc(sinfo, i, page, offset, len);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
