@@ -1,165 +1,119 @@
-Return-Path: <netdev+bounces-192605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A372FAC07C5
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:52:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36ACEAC07CD
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ED197AF81B
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:51:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FF9B7A3B4A
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B0124E4C6;
-	Thu, 22 May 2025 08:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B402268FC8;
+	Thu, 22 May 2025 08:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L988hToX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGVbwsPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112331624E5
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036F3262FEA
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747903941; cv=none; b=soqZvL2h0kvrJgjFyUQM4BEeL/v28BBa7H0yk2MnDpBtDJJ++7I+7A4EWgJbFnXzfv9vqpnKM1ZUqmeJVaOMRUwfUIFpkOBveFVK/NsIAWmpahGCzpX6y4h3BdNBeIMj2CCacq3W9dQXxfA9Aqyl+j1Oct0CMcvKeBACq1oj1PQ=
+	t=1747904044; cv=none; b=dQZ1UvgaJXB//N+rsaOBKxm4Uj/iwS9hXV3E8zXEzauPqV1s978AqkvA0Ha8oq9Fag41cQuqKT4gLQI0HpO2RLmiklKIH3+mi1oKQEOmSTX7AL37vXrWX2i5snYm1l5t8w2kF4OFVuQkEoonMo7meQihhAmX4VNeQI5wCjaLFes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747903941; c=relaxed/simple;
-	bh=0+8eI1HxrSZFjYuny+D0+8nQ3/TGskQCq0fRWoB+Eas=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mr0jHuSTRZ/v3cbyQftSkXMciQKoEPEqYWcwuSqJ+zF4tslxCHG+5EsWeCe0ZOx3jDfKc1g9IK2gdp5jEBlfw9hLqsepjt/rzvwmyyvLqx0/PZG065d09chrsmj3pLmYRZRqUZSX8K0rIjYnWMyp9yZN1lUM7tDSJxSRKVG9XyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L988hToX; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747903940; x=1779439940;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0+8eI1HxrSZFjYuny+D0+8nQ3/TGskQCq0fRWoB+Eas=;
-  b=L988hToXN0za0L3fFyNrezX0yKfQ9eyQvsNYISa7Ee+93gd6ltfEIDPv
-   BhWiALMwNORAKWbSsCjGatDzUIRZXMa6c55YCayqA16xT90ryGTmDMAhP
-   h1QapJt7Rf6OgIaYVXPMJV+Yr9lImevHX9Hy4GCRnKuOeyKS6N3bTI0Nd
-   WZEW39rUDcG759RyI40XLREOF1eUQ4pY1XJ2ue04p6UNCUD6FInzLUh6X
-   sVJFIGMzSpG2nJSesZLjUvgd3vwKM2eQaEr2Irkf/+v072SLI99Idup5G
-   V3wyvc1wmoxqWHjinPXw+vnn9hlAtT+jKRvFsqP2okc9JeJWPdIpaLiwN
-   w==;
-X-CSE-ConnectionGUID: aHKlw48+TeSkFOn4WYpi6Q==
-X-CSE-MsgGUID: +hjcgc5kRm24K6XY5A5mOA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="75313061"
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="75313061"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 01:52:19 -0700
-X-CSE-ConnectionGUID: cF7LHSLRQJSLoecNMXXQYA==
-X-CSE-MsgGUID: C4rqEeTFR4+bQmFsaQsdzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="141419693"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by orviesa008.jf.intel.com with ESMTP; 22 May 2025 01:52:18 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH iwl-net v1] idpf: return 0 size for RSS key if not supported
-Date: Thu, 22 May 2025 10:52:06 +0200
-Message-ID: <20250522085206.1119209-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1747904044; c=relaxed/simple;
+	bh=VeaiAKCamGH/5KNTUY8LlityzfsbvxHoTWjUx8jGJKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J1vqp7vhiA5OfUetqEErzGXpBT9N1LUPaHeRTB1Q2vewn2/DqwCOddx2JM4gVJCSHDJWuKKrQPaBsNLiVGJwkM660dBEgOGmUZFaJ+5Cya4B5YcifKBuJdyUFbUh9pkCN/oJb1auqsWO0UfSMfN8SIxsk+yvjwhJBUpHWEZpK4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGVbwsPY; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b26ee6be1ecso4332972a12.0
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 01:54:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747904042; x=1748508842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JsEDHBZOOtazqkfVbNehyiVOpjWayP5/qV2gqESfGGw=;
+        b=OGVbwsPYIVnIGJll++0rSUi9iS66/JhtaYHd0/TWpOZPuXo74mSQJ9g+IQDh9LO4ZV
+         NJq4VNasIrS6LxowcIxrrZw51U3apuefYEhpJjDJ/9+Sb4Mq4eU1am93W6TEELjmWDp8
+         LvsNqwYxmKh1wLsYr+NEw0TDVo31R8C7JoZHpCc5U2n7584PDyRZkFlCaawp9pvx2Xlw
+         P5ZJfa5qrW18fMxTWgOp45uZbnB28Y1HKOOnIAIuwRrVoiGWG9fqJxr6f6U53p7Rw1fr
+         MAG/ZYuC/oJN/E1z9EsRT541vMTa00Nun/qnmlo+kEhovZ/ZhgAUFkocQmBwxoiFCQJ0
+         Vj9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747904042; x=1748508842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JsEDHBZOOtazqkfVbNehyiVOpjWayP5/qV2gqESfGGw=;
+        b=VjkblRwkKOa6qya/po+M7s4DPqwYaq2XcNm4gKg4jyQarKQKU780fsfMYYyCnNGX0u
+         JXXK2HJxZY05gIL+e6SBCUxVvDLzWkxcW5UHS/bHcoRpMKbjUJzsn3IDg92uscVeY5sy
+         euvvWJU+7k3thpBIgweT/Im7HRpkH0rPLAY7XuK2b4sIsNw5zYvSngNTt/FLB4/wEJ3i
+         nFWzjyf/pQJNqycpe4j1Qnzrm6Jjbx0hWM8PJ0e0bYmLaqeC2CYopM+BGf6FO9WWx7A6
+         MG0vygfFkfwlbxUcsIGJU5gLldSiR+hzoC0cURFpk6q62kUFAIXeIuFGabMrxmDuEf4B
+         KBZA==
+X-Gm-Message-State: AOJu0Yy4M4SCTVpgZmOxFBFDny2zZZkB2oi/J2Pr5RN4bQr+Mdq6Kvcw
+	sFfHrU1E3gegUdlS9GptLD3KGa9UEYk62moqBtDVYIDZU+iFgGtugtAaOS4O1JDd7cvYpMgeCNS
+	8M+h3E0spHCLqX3UmTscuohjAK2ILU/g=
+X-Gm-Gg: ASbGncu9+m4NpkVtKBIy1XDuUz4SB44T4c7fRtu1PmuyuivXsKNiKNIGsPDyVg5syUc
+	w7RU0C8U7bMkARdY3Kcvyvq3f5M3Lqg1d0sjORDag7ylWcjh5M+sg4M7hLGu7KuJ4WgVgeOzkPt
+	pv4b+npk7IfWerzR6+HKejD/NssZ6Bn/oX5g==
+X-Google-Smtp-Source: AGHT+IHvZ7DVS9R7C0uR7/ESSCBO20xscG251oAVQCQVj4jvT3GvYy/BzbWJ4IBsZHUSyWpqWDJI+BneTq2LjzVg6Jw=
+X-Received: by 2002:a17:902:fc46:b0:231:cb8e:472e with SMTP id
+ d9443c01a7336-231de3b9eedmr348242115ad.46.1747904042215; Thu, 22 May 2025
+ 01:54:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250520170656.2875753-1-krikku@gmail.com> <20250521085851.GQ365796@horms.kernel.org>
+In-Reply-To: <20250521085851.GQ365796@horms.kernel.org>
+From: Krishna Kumar <krikku@gmail.com>
+Date: Thu, 22 May 2025 14:23:25 +0530
+X-Gm-Features: AX0GCFv7gof8BoB4Ci3vKRuBaXy9gDGycYaSQ8C2QpMFxquFvGVwWqPO6FNr8hw
+Message-ID: <CACLgkEYgaqhEONPwgXq6X6WFiA767qu-WdJ7OrXZm6CYE=qiJQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] net: ice: Perform accurate aRFS flow match
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, anthony.l.nguyen@intel.com, 
+	przemyslaw.kitszel@intel.com, edumazet@google.com, 
+	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch, kuba@kernel.org, 
+	pabeni@redhat.com, sridhar.samudrala@intel.com, ahmed.zaki@intel.com, 
+	krishna.ku@flipkart.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Returning -EOPNOTSUPP from function returning u32 is leading to
-cast and invalid size value as a result.
+On Wed, May 21, 2025 at 2:28=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
 
--EOPNOTSUPP as a size probably will lead to allocation fail.
+> Thanks for the updates, much appreciated.
+>
+> I don't think it is necessary to repost because of this, but for future
+> reference, these days it is preferred to place change information, like
+> that immediately above, below the scissors ("---"). That way it is visibl=
+e
+> to reviewers and appears in mailing list archives and so on.  But it is
+> omitted from git history, as there the commit message is truncated at the
+> scissors.
+>
+> > Fixes: 28bf26724fdb0 ("ice: Implement aRFS")
+> > Signed-off-by: Krishna Kumar <krikku@gmail.com>
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Command: ethtool -x eth0
-It is visible on all devices that don't have RSS caps set.
+Thanks, Simon, for your feedback and review.
 
-[  136.615917] Call Trace:
-[  136.615921]  <TASK>
-[  136.615927]  ? __warn+0x89/0x130
-[  136.615942]  ? __alloc_frozen_pages_noprof+0x322/0x330
-[  136.615953]  ? report_bug+0x164/0x190
-[  136.615968]  ? handle_bug+0x58/0x90
-[  136.615979]  ? exc_invalid_op+0x17/0x70
-[  136.615987]  ? asm_exc_invalid_op+0x1a/0x20
-[  136.616001]  ? rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616016]  ? __alloc_frozen_pages_noprof+0x322/0x330
-[  136.616028]  __alloc_pages_noprof+0xe/0x20
-[  136.616038]  ___kmalloc_large_node+0x80/0x110
-[  136.616072]  __kmalloc_large_node_noprof+0x1d/0xa0
-[  136.616081]  __kmalloc_noprof+0x32c/0x4c0
-[  136.616098]  ? rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616105]  rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616114]  ethnl_default_doit+0x107/0x3d0
-[  136.616131]  genl_family_rcv_msg_doit+0x100/0x160
-[  136.616147]  genl_rcv_msg+0x1b8/0x2c0
-[  136.616156]  ? __pfx_ethnl_default_doit+0x10/0x10
-[  136.616168]  ? __pfx_genl_rcv_msg+0x10/0x10
-[  136.616176]  netlink_rcv_skb+0x58/0x110
-[  136.616186]  genl_rcv+0x28/0x40
-[  136.616195]  netlink_unicast+0x19b/0x290
-[  136.616206]  netlink_sendmsg+0x222/0x490
-[  136.616215]  __sys_sendto+0x1fd/0x210
-[  136.616233]  __x64_sys_sendto+0x24/0x30
-[  136.616242]  do_syscall_64+0x82/0x160
-[  136.616252]  ? __sys_recvmsg+0x83/0xe0
-[  136.616265]  ? syscall_exit_to_user_mode+0x10/0x210
-[  136.616275]  ? do_syscall_64+0x8e/0x160
-[  136.616282]  ? __count_memcg_events+0xa1/0x130
-[  136.616295]  ? count_memcg_events.constprop.0+0x1a/0x30
-[  136.616306]  ? handle_mm_fault+0xae/0x2d0
-[  136.616319]  ? do_user_addr_fault+0x379/0x670
-[  136.616328]  ? clear_bhb_loop+0x45/0xa0
-[  136.616340]  ? clear_bhb_loop+0x45/0xa0
-[  136.616349]  ? clear_bhb_loop+0x45/0xa0
-[  136.616359]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  136.616369] RIP: 0033:0x7fd30ba7b047
-[  136.616376] Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d bd d5 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
-[  136.616381] RSP: 002b:00007ffde1796d68 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-[  136.616388] RAX: ffffffffffffffda RBX: 000055d7bd89f2a0 RCX: 00007fd30ba7b047
-[  136.616392] RDX: 0000000000000028 RSI: 000055d7bd89f3b0 RDI: 0000000000000003
-[  136.616396] RBP: 00007ffde1796e10 R08: 00007fd30bb4e200 R09: 000000000000000c
-[  136.616399] R10: 0000000000000000 R11: 0000000000000202 R12: 000055d7bd89f340
-[  136.616403] R13: 000055d7bd89f3b0 R14: 000055d78943f200 R15: 0000000000000000
+Hi Paul, Ahmed,
 
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I have uploaded all the scripts and a README describing the steps @
+      https://github.com/kkumar-fk/community-net-scripts
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index 59b1a1a09996..f72420cf6821 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -46,7 +46,7 @@ static u32 idpf_get_rxfh_key_size(struct net_device *netdev)
- 	struct idpf_vport_user_config_data *user_config;
- 
- 	if (!idpf_is_cap_ena_all(np->adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
--		return -EOPNOTSUPP;
-+		return 0;
- 
- 	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
- 
-@@ -65,7 +65,7 @@ static u32 idpf_get_rxfh_indir_size(struct net_device *netdev)
- 	struct idpf_vport_user_config_data *user_config;
- 
- 	if (!idpf_is_cap_ena_all(np->adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
--		return -EOPNOTSUPP;
-+		return 0;
- 
- 	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
- 
--- 
-2.42.0
-
+Thanks,
+- Krishna
 
