@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-192517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6496AC0324
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:49:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B239AAC0327
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:50:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22F2B4A8023
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:49:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2241B66DE2
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EF412D1F1;
-	Thu, 22 May 2025 03:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E940F178CF8;
+	Thu, 22 May 2025 03:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmfuPfVO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHCFo+N/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1BB7DA73
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 03:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECE5178372;
+	Thu, 22 May 2025 03:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747885794; cv=none; b=KsXH9YPv9FiwkY+/ZblZ2yZxbkGzPJIDYOwh2pzZGIAAraVJkDevD91TSwjzbS6V0PmigJozOHxzk4PlRRKewg+NghYyVNDcWkp0y+h3wKa0T6XOkNTB5QvbbqlabIb8FFL1usKzdReySgC1cve/2v7nmjOjYFY8rDg8PWPsFC8=
+	t=1747885809; cv=none; b=Gc4y5fETorQ356vYdAjxeWk1xzVNsw37LmSC4nFOzqoA+A7l9oQ3C/Pnbf6rR6gkHO+JQwaimEfyIQ1OoTxRd9p2aEjnfAN0NCpKeM5SEl/OSZyWZDxgRjLlLwe1SnHKCjOFZPWHY6gY/1C89M5NkhFChtPWYtAdxh1rAnMpJcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747885794; c=relaxed/simple;
-	bh=HxuJ28tE6QJyk7j8oiBRw6OKZiT/H0p7Gk0T6I4vml8=;
+	s=arc-20240116; t=1747885809; c=relaxed/simple;
+	bh=GpMCBjr+80UXi5ii0UN+PxANa+Il8Uwb++7u39HnEA8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qtLCcvygRCbHc4uvVqG0IrqxTkRICwJFnitdF+9DB9CSm+9KGc9VyMx3HAkhzyp2tBCtdZ/CrlM7zJwoJO01ILnDOgXHT+t6H1zGFVlv4tZRWXndb8qLH8Oolzlm3ukwJ/Cx2G0uzF+4wD3HTeQLnX103diEAjtIGLaci7J/BJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmfuPfVO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2574CC4CEE4;
-	Thu, 22 May 2025 03:49:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YADBQRlJwgMz9P3HMwtVGF4CBHZSO8A0kF9rsuY3BxhT0r36jV4AF78iSMdGuWPL+MiHhOEiPqghow+17ApiE7Bde4geyB3H24Q4sXn3lXCeQb96J31WYoR0FCQeGgmbOKOU7tlsOM5ldJYsECkJ93EHg2Gz0TVzBUAnQPaMlWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHCFo+N/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20ED8C4CEE4;
+	Thu, 22 May 2025 03:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747885794;
-	bh=HxuJ28tE6QJyk7j8oiBRw6OKZiT/H0p7Gk0T6I4vml8=;
+	s=k20201202; t=1747885809;
+	bh=GpMCBjr+80UXi5ii0UN+PxANa+Il8Uwb++7u39HnEA8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LmfuPfVO1ULM02LqGqXeKcbyWyP7MgEej6fQ+k1SsAjYgjIB3ymUcDPyvOyTHQET2
-	 BW2o+eSVK1ZDfSX12vhLJ4TAuzCDD1n/T7vPaQcJs4USOaZX9XsNa+JdcD740M/b4o
-	 /BLGFewkZ4lWg4g+zS7dw4DFKy8lMcjkDU+bRMGiA3z7uezmb0fBSdtT4ITcoM78uL
-	 zgvfq1mdCd2YtknJ20xXKXOTyt3N2NF8GqfYK9urPhz8aGlwKqvWo/V6mfAUQiOhX2
-	 O6DPkjQOc9YmZZvNH6NfTix3j8ksMbuBSuf/9xUUvcdRJH6ZM0B/yQ4zF5drK8By3T
-	 6U6YQ20dVYyvg==
+	b=jHCFo+N/szYNJJEugSvgpo3TEuhaEWM3AYZFO+b7ZtPo5RTEMJS7f6Tr6T5oq7DJQ
+	 eoJyFDyfO/wOm/zztV3KzIiEX9rrqt5wlZEHVawIQ2yUsb/8LoWVSJ1Bex17r09Pxi
+	 AhxzIxSEAJlxBf1zjtPaB9K4B8G7xb07SOOzIVCW4UfRdWJIUGfUM8en3u4aWKKCqO
+	 HzKY8VEN2bfoA9GNGR+Wklkot5rCLtcZ9e4t1ohPSKssoSvhpG/0Nc0TYGUm8B5OAo
+	 izRlSAby2c5Up2cTdVYEi2kPRTyJcpfk74wPyTY0nHtk6e8ZPLEV4M7dh+HTu9/BwT
+	 zGJB9n56GDdIQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFC0380AA7C;
-	Thu, 22 May 2025 03:50:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0A6380AA7C;
+	Thu, 22 May 2025 03:50:45 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] idpf: fix idpf_vport_splitq_napi_poll()
+Subject: Re: [PATCH] emulex/benet: correct command version selection in
+ be_cmd_get_stats()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174788582976.2369658.8338626025769202622.git-patchwork-notify@kernel.org>
-Date: Thu, 22 May 2025 03:50:29 +0000
-References: <20250520124030.1983936-1-edumazet@google.com>
-In-Reply-To: <20250520124030.1983936-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, willemb@google.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, peternewman@google.com, joshua.a.hay@intel.com,
- alan.brady@intel.com, madhu.chittim@intel.com, phani.r.burra@intel.com,
- pavan.kumar.linga@intel.com
+ <174788584449.2369658.17188848797464910270.git-patchwork-notify@kernel.org>
+Date: Thu, 22 May 2025 03:50:44 +0000
+References: <20250519141731.691136-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250519141731.691136-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
+ somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, darren.kenny@oracle.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 May 2025 12:40:30 +0000 you wrote:
-> idpf_vport_splitq_napi_poll() can incorrectly return @budget
-> after napi_complete_done() has been called.
+On Mon, 19 May 2025 07:17:19 -0700 you wrote:
+> Logic here always sets hdr->version to 2 if it is not a BE3 or Lancer chip,
+> even if it is BE2. Use 'else if' to prevent multiple assignments, setting
+> version 0 for BE2, version 1 for BE3 and Lancer, and version 2 for others.
+> Fixes potential incorrect version setting when BE2_chip and
+> BE3_chip/lancer_chip checks could both be true.
 > 
-> This violates NAPI rules, because after napi_complete_done(),
-> current thread lost napi ownership.
-> 
-> Move the test against POLL_MODE before the napi_complete_done().
+> Fixes: 61000861e860 ("be2net: Call version 2 of GET_STATS ioctl for Skyhawk-R")
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] idpf: fix idpf_vport_splitq_napi_poll()
-    https://git.kernel.org/netdev/net/c/407e0efdf8ba
+  - emulex/benet: correct command version selection in be_cmd_get_stats()
+    https://git.kernel.org/netdev/net-next/c/edb888d29748
 
 You are awesome, thank you!
 -- 
