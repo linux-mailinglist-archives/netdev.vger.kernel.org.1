@@ -1,370 +1,226 @@
-Return-Path: <netdev+bounces-192830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4289AC1538
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:04:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91C4AC153F
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DBDF16E949
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 20:04:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F32C6A23E02
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 20:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756422236EB;
-	Thu, 22 May 2025 20:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A5C148827;
+	Thu, 22 May 2025 20:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aHMz8/48"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C411C701C
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 20:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747944270; cv=none; b=iwWJFKHtuGDolBQ+zfeLVRW8k0FtdrRzZFWZZGDmjEfEj+dK6yfyFMxw+E/Ts31WOvYeI71EmrUChqeHtigG/28BcCAdNFHkVgJ41A99cowoO+fANec9y04D6J8VrUxd8mLjB6nRsG6/V2En4bqTxxbKtQzEOHW0OjssAnoxerk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747944270; c=relaxed/simple;
-	bh=rV/Ro3iX2RMOfud0KrwZX3Hq/ENtf1zv5sHaVE5jOpg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dfjZB5UK2miB8UvJzju2t4VOMeDVSVcBcj2cgZ90MdjmU3jsg4dNDt0bSqHl+6ls9cnGJwrXFrCynLa4n5LXKt/QV299LdQvfy5+Y89T8YRmhAyzLnMRqE1Wi8SGQsXJZTVLRSN3T9TlYLexFhhh85jInmvyOhBKreZiFka+nrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86a5def8869so526809739f.0
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 13:04:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747944267; x=1748549067;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DQqYmnl7Dt0jcW9L7a+1hbupO+yf8/+C2SKc2pOJE8U=;
-        b=xAT79I7sWJ4pahgfW39k1bNNW2VSh9tcqcNdtaeyignm+Q4d+2WNxOtw/WKrAbQnWm
-         9rPViJ/oFYX5svBdrXLypttAceEwAQjFtcm2tfwW/fhxt03vUhZjqpvqmVy6bv1DjTnc
-         EU7Oqo6tCrMuNi30mkKUY7vsAZekLHsCIQJnLcDS17tCnt6KfbkXdqcJATigPSiJWNjL
-         vXuLdR15xOdbvxHzxVGtvf/N+VOG8DlUQE4SwSQjDTIYTOp3fRl/BrrJEN9+Mu+I2ne+
-         LCLNr02FOMBbE7m6LvpcFqMEz9fXzJaJ6VXR7DR2t2LEIfhPVSvjZV/vaEzHXuRvlEg4
-         VAGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcebhaiHla3Fif8CB3j+tl4mKH5RYt0RS+yGl+ohPv/nH8OJqQoDkNAQ09z1GTZc7dD+OhXOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGiwnpvHNblheA6RbMsxC718j7bVX2gB1HUB1pDTc1rKkxK/oP
-	kz0Yx1jCXMqDk8eIhk89Ui7iU0VBX8Oc8sxdjYwvVUgI+8P5G/z/k41UzpK62SjGqRikb0Elskq
-	xLZ5OZns/5ro4l9Tc9nhsaHrgGG+x29xBSkR3M21EeRzIMkqfetluWeHoOVY=
-X-Google-Smtp-Source: AGHT+IFvfHO2VnvfTIWLKtUbqi1ak+FnQOb/++fOtMXym9IHzFF71Q/LkmcVFyuTagT5zuzyTn2a2VWdPnm/+TfQ1V3sgrPCidyI
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EA6190696;
+	Thu, 22 May 2025 20:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747944323; cv=fail; b=fJ4GYnFJBD3bJwc+P/9p+WGCOlfcp1kgokdlfA3WZk2cS9TFl1Y1Kobt3I6CO45pTlkZII84COz3xtndFywYpIHHJVC2K3i0VZV1ajCLvXGC800VyctW0HKxvfcplXDUbFxieHbJMrcCQ82Z5WbAmAOzf2IKLVHQwLz+1yIv/Qs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747944323; c=relaxed/simple;
+	bh=djX/ka6rALcIL0OCbQCRSQ7hwmplV/c8uIyilp2ThZU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=RFnRzDkrGFYM+KwPwhfTdYp8u4+mKH7t+fE8g4a1/Ii2CEdL+sr2Y692bAlgD9m9du8kx7MHS0+YHu5+CuKHQsEpqtO9McgAY1Jw5mvX9TANnZ5L5uKq5kDNsTG2D/R5DxDRX6N6lSpnBSYZOsf66gbCwRz4GcmNB+MLiXuwXV4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aHMz8/48; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747944321; x=1779480321;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=djX/ka6rALcIL0OCbQCRSQ7hwmplV/c8uIyilp2ThZU=;
+  b=aHMz8/48fdAvhgRCtHrRJ4pfZG4VFz4OSc6IeBScWeW+OTltXZ2Mthhr
+   uYVXvTYotA9VQbxUStCURv0bEAjcWoEMERjtSpXVZYm6Pxb9dmj3CpK7/
+   HPvg/QCBJleXAW/UIK9wPORx8kCZ/W1EXvdlVwN66HmJPL3JvJr6ClUgX
+   rAvPUY0GwP5qnGctOkfPYjgQHVGK21tCJaqsSsQHpVFq74YQzqlMPjbiz
+   naM0VbdOW8PhJLgTWCFikicTp9gF50aDNjHAvcQxkn0NzCijfE3OiDM89
+   zzVNz8Ne44pp6q09NK5WEMfUPO9LIEv4aqBTv5PasxEH7eeRRYXnpuep0
+   g==;
+X-CSE-ConnectionGUID: zwIY4pmCQ9y/or/sgq8eXQ==
+X-CSE-MsgGUID: /LcV7RHQR0+51zPUHxmFHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49242984"
+X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
+   d="scan'208";a="49242984"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 13:05:20 -0700
+X-CSE-ConnectionGUID: D4vp/vpwQ3CbbJDlIPAKOg==
+X-CSE-MsgGUID: DMYKBRJLQZivlHfWr/iFkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
+   d="scan'208";a="145620133"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 13:05:20 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 22 May 2025 13:05:20 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Thu, 22 May 2025 13:05:20 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (40.107.212.54)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Thu, 22 May 2025 13:05:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BLXkB5B8PZQ33h48Jy9yBaEiVjLTMiMg9LrmgB61aRBDTqf26yMZ7dXbKyLwYPR0xLS1IBxhyMm5v36yKKsiBUCnBjjTJJhQmYzymOPF8XfGeZ+xlb/5I6wPF9iaUPDGJWWBO9ez8pMNVsP8z+mqQF39bHG2gyPWJQj4Fn2ATZl5YZ+lx2AxRVpFXN/eRXZ6M+oGDOJoWLcaU4u0pMR2F/+NNU2OPPJOmZ2xalZlt/BmjFrfCswDR7CDZjcnL4dVrbgm022ozLriMpqLaN68TbuSrpVp/BHCwhAK4AWhORlUM602JHSiz8zue955KW0EbQspkb/WcOIPR9d+KFXtKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aalOKOk9JSVkItK7jJoDrprq4tTLLA/eEs29ArRfrlM=;
+ b=lIWj4Gz6XnGvkNPUGrSJgpyci0K/PTO+siBPvhWSli3SUA+0HdACZ2RIH4jpra6DqRdmRj+/dDYuxgp27ecnoGCB/TcZsKmszcCE8fTTdSMPs5N2mmWrZjWIremvpPLvb5AFyuoIQyldcpIbk7biMLrLZrDb/UcKBxdoxHYBGnpXX6L9sMEB0BXoboOh08NbYrjVpiA84qhFX45i3xE/mImrlpmXdcQvEFchxP5K3p9nWkHf0WxfxKzF2d7HQaaa7bwWgKxek8k36KiuHPZySgwHH+NXDlKXxgOcdv5esvyh8vrWRwmcF5TnUOoQqlvvG0ehfduI2P12YOgDBMS5Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by SN7PR11MB6994.namprd11.prod.outlook.com (2603:10b6:806:2ad::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.21; Thu, 22 May
+ 2025 20:04:49 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8769.019; Thu, 22 May 2025
+ 20:04:49 +0000
+Date: Thu, 22 May 2025 13:04:47 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>, Dan Williams
+	<dan.j.williams@intel.com>, <alejandro.lucero-palau@amd.com>,
+	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>, <edward.cree@amd.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dave.jiang@intel.com>
+CC: Ben Cheatham <benjamin.cheatham@amd.com>, Jonathan Cameron
+	<Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v16 05/22] cxl: Add function for type2 cxl regs setup
+Message-ID: <682f835fba701_3e70100a5@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250514132743.523469-1-alejandro.lucero-palau@amd.com>
+ <20250514132743.523469-6-alejandro.lucero-palau@amd.com>
+ <682e1b368fc8_1626e100c3@dwillia2-xfh.jf.intel.com.notmuch>
+ <d64fad40-20f9-44ff-867a-8caacd70767b@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <d64fad40-20f9-44ff-867a-8caacd70767b@amd.com>
+X-ClientProxiedBy: SJ0PR13CA0081.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c4::26) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3f0c:b0:869:fc1b:2194 with SMTP id
- ca18e2360f4ac-86a24be4576mr3972513239f.6.1747944267341; Thu, 22 May 2025
- 13:04:27 -0700 (PDT)
-Date: Thu, 22 May 2025 13:04:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682f834b.a70a0220.1765ec.0144.GAE@google.com>
-Subject: [syzbot] [wireless?] KASAN: slab-out-of-bounds Read in mac80211_hwsim_new_radio
-From: syzbot <syzbot+314853b9e8b9b3624502@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SN7PR11MB6994:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d2b8364-752d-495e-5f7d-08dd996be865
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?lqmc6E0I/tb+v3R+jAHW56wfHg9HpCMjtFx0LWiG4iUZFoihpDJ7kQ/vsWTx?=
+ =?us-ascii?Q?yYe1hD4LdhbM7mG/dYuv3trbDMzPZKffLh5cXYquiid4rl7JWoCodX+fUV4H?=
+ =?us-ascii?Q?/rjDSptklFPdsnS5ZRPIEWh2FuqgIu6Sjnn95jS0MPmyAyFljLYZQk/rkRNu?=
+ =?us-ascii?Q?9y2YPWkerowIjMVGEzoE+x+K/t59f1RTL3+u8a+2BKPntiFqMi9obiNaHzbA?=
+ =?us-ascii?Q?usPSFQevsEMPwD0nZdjeGXbCYidvL0TN18MXxPb4CtJ1teKtAs7R0glqSvWP?=
+ =?us-ascii?Q?Ebbud4Dvfwa2CasWFF3rBgEQe0Tv4DU1u4jHI8aWD1b/usn5VqYGkjhslCtx?=
+ =?us-ascii?Q?NIHGGj/UXNWtNvO9uaI5OXcTjRHjgBk+JRny0xz+8xycWWLpNYzNY5q/94Nh?=
+ =?us-ascii?Q?uN//Y7yPlVR9xdT0FQOeSYrLkHrNneNoR5nprD1ptAVNclhjqljXs4ssfhry?=
+ =?us-ascii?Q?DJ3i0MhMJkMJm1Q3Q3CAVWJSPPbu24jEeLN3hBzU02yfkQ1FOJU9oX3Eu8A2?=
+ =?us-ascii?Q?7wG6bd5swCP8EA2X6Y7CPR1e8peeh8tfnIMMIdCnlrw2P76QwnT8/4C99miZ?=
+ =?us-ascii?Q?R9I7Tmi+Wa911Qb77TjXovX9CYkgaYf/tTnfgCliDTUaGA5wBRMTvzauKj6j?=
+ =?us-ascii?Q?kANVEIUON/SpHrzzvAa6A/1dByh4d+cGJH69n+WSw6PEHkwk1Lu0eEP++Gvj?=
+ =?us-ascii?Q?juxvASAjw/xHwennMZoEg1hzxITiAC+IHSmgfBB+5m4dGlpgy1GqLK3Kl9LY?=
+ =?us-ascii?Q?mJiGXCeiaE8FyCU7LFlK4IOea4h50+GvYcPZ5y044Ou8CK52axwxxXWgjCwu?=
+ =?us-ascii?Q?A9Av67DW9xvpkouhtMkwcJhUVNp47yvB1Fz9cvqNH8w8ZJ2YvsIHn9jB7F6Y?=
+ =?us-ascii?Q?uNPZUY6YFRZ/IcKJRN/GH2iuIDRvyB6LeK+7fotHKyX0v6Ov4u93qId7aYc3?=
+ =?us-ascii?Q?R3vDFiyu8JKl5EApOUbz1UR/lIogZ5jg96lb7F20GJ6Uo6Tm3Ju/UzTnK2oU?=
+ =?us-ascii?Q?zW+1R7tfBoXEI4nE8ZnWlG+FusgHHPTgS6yBRq4lBQv1FYf0FbuyspoWFuCo?=
+ =?us-ascii?Q?zHCXrvjn+QTByLuhtKvG9nKY9CeL5ZfN8rJbRQiKdMAMyrMJcVJmkwlAiSdc?=
+ =?us-ascii?Q?85ALzBifQecvxz3ExKvzPvUEfK0qfQVl3m5dWTDGyFb0j2eN9hXi14Ian8JC?=
+ =?us-ascii?Q?cfMuIZTjffpk0nvVkHAXByl6k79thJ/1w7Ro2jVhOgM3GfjCwRaF8tP5aW/E?=
+ =?us-ascii?Q?9/r/tLSvvCZL7316tuSfZfQS3HJRA+wfSx9JG1pi+x5IIuJqAX4nwEWdD66b?=
+ =?us-ascii?Q?fZslqsj68RzcRXOYTOCWAq8k2GC3jvpueiwVzuL+BqWxHo9OUIp1aW7BrKGj?=
+ =?us-ascii?Q?7EMFbkL6ob6rweQ3LnaRAcMH1JWYhIxS5mBiVzxg+81zR2TOTQvst9Tz1ilP?=
+ =?us-ascii?Q?MsPy6ke9PFUPjvIC5sgQys+lhMkg25eNuV2lzYBSZcRlwLgtVWe0kg=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fFhZRcEeWYQ8o9h/adpsb4Gg2PkcKz565gdJjYbTNzS0VnMCDiukF+inHYva?=
+ =?us-ascii?Q?xZWdK/czmYC51xxnhaCvLBsa/QFlfFnklSKOgfbRfF7l/IC7ucWpiASoL/RO?=
+ =?us-ascii?Q?UJx7RcNoKnv3pBQ4HQUyi7GQbNOmKjwPaF7ScVyOc6hM34en2kANVcwXmEO/?=
+ =?us-ascii?Q?D7ZXF8Oi15Va3mfSYM0R08YAJqdiRlrlWQZNqQLDDcaMyZqxGh+uf20Gk3kA?=
+ =?us-ascii?Q?VHR0USEf3CXVTH69G/P1ZxEhmoLVEZrW6f1nSFiyaHuN60ivOGCRjCFxcIiy?=
+ =?us-ascii?Q?KWSC7bxOPxYv5AmviXW3UpiLnZuliLoYKgNiwaXPIAOSADdL99xwnzZw/kiv?=
+ =?us-ascii?Q?U9O3Xd4OgZKjUEJsFtt/PZNb8gcBP+W+50RMe7YJn8mue8+Jj22Slwtq1wt5?=
+ =?us-ascii?Q?74ebKuAXbB/V1d+lqnZPsP+7ndUIQ0DcvecF3JB1EAfPRDWo1jufLO8sGcTc?=
+ =?us-ascii?Q?EAYnymgudsKbPgYydSDpHXtWey9uleAr4AFoLikEtlRECqKSnkhBGNv263Q6?=
+ =?us-ascii?Q?na06ecwXw75NJUMp/x2KQHy0W6EQqOjkCJ7hTnaHX5bN6UA1on2HYnaLPNSo?=
+ =?us-ascii?Q?+qAV3fYRR3kU9SeWaXISKHpmrLkS5995nAbfZx8uZ2/tWbw3LnvYbHg/r8FK?=
+ =?us-ascii?Q?GXTNfc8T0RKf2VkwF+K+YVO/68gvT8tRFWudo6d+BZeVUWBVAlt88Dgx4i3P?=
+ =?us-ascii?Q?fULcmbnmc67XTEoeWAhF7ECicx3T++LK5xlWvxjp9jgiHHuU0owCSJxtZ1Ex?=
+ =?us-ascii?Q?xSDdE0PlxbWGoAKP5u4D7A5qtFQDQO2qgg7Z0DLPYqGhpCUe9Glg3+8RNV81?=
+ =?us-ascii?Q?2HKLsxTdmjEEbXDMp5hGSOL9dU2b6gvgqdFpqxb/ksm53/gbvhLbYGUxw/29?=
+ =?us-ascii?Q?KqmbcGgDC3ycx8GgR06TDYIwyKsvtG1EryCRbFG6XN4XmrM7gHeb/AyKT3zP?=
+ =?us-ascii?Q?1tnjPoSU9MLnxPFS65kc/j02RRfuQxV4o2ZFXZWoHyEXMCA6MbxI3yfaBk3D?=
+ =?us-ascii?Q?RyGaBaK9817Js2OgloFJRqSZ+BLN+KA9tnAQMSamE1WAFRRa22Rp8OHnIceC?=
+ =?us-ascii?Q?5bAfYurJtykhjntZi7n3LNncd6xroHnojZUjhcroP4VpQfBoeIF2I0OmzMZo?=
+ =?us-ascii?Q?dAmqR+SudXcyXs0G2gXeFfTW1oczmak2JfXF17zgc36ONUh6/FjVGkDF3MVC?=
+ =?us-ascii?Q?winQTr32OrJTsSM0RNI2y+863y/ajbKF/ysEVIvtCbhgaYQTiL1C47aCs+jp?=
+ =?us-ascii?Q?ji7V3C/WtANB9kLS9otkoOTNF4qM/Jgjsj1UFN42I2P/z/VJxBPcnyHabWWJ?=
+ =?us-ascii?Q?QxbdoDk3hmb3X+Mg2z+nmZ9z2NTIiQ4gHfdb/7KHrEMDmaQw8XGjuKer35Rh?=
+ =?us-ascii?Q?AeUWmuAaIoVpIzg0AHoZOtUHkpiqUB7iAo3NNwOsMXNEeq9vNbjdci5dpP5o?=
+ =?us-ascii?Q?zigfmeKX7SHIaRz1tBC/NlUIVzaUtUOuhWdWchj6+00RraZSP8goiW7x3Qmf?=
+ =?us-ascii?Q?kXgv81z/fH1Vw2woZaX/upcoDAfgomPvbxYptBZhzTUez8qrbeJ9vwBDffpy?=
+ =?us-ascii?Q?EQUT/U2gHiPZEbbuhVRaMBiB3xU11a5MZnIAXPU+8b0BPh71nI69lf6h/t5A?=
+ =?us-ascii?Q?ew=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d2b8364-752d-495e-5f7d-08dd996be865
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2025 20:04:49.7651
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tJhJMSeScE09ldHUySMn+lRBOUc+aqnKjJ/nNfr731LPmG4OYhFwGO7ln3MIXEb+zjbNYaYmK2+GiAuddusg6g9f/1eIl1OwnDMhAObY4cU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6994
+X-OriginatorOrg: intel.com
 
-Hello,
+Alejandro Lucero Palau wrote:
+[..]
+> > The driver should know in advance if calling:
+> >
+> >      cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
+> >
+> > ...will fail. Put that logic where it belongs in the probe function of
+> > the type-2 driver directly. This helper is not helping, it is just
+> > obfuscating.
+> 
+> 
+> As I said in the previous email, I disagree. The CXL API should be 
+> handling all this. A client only cares about certain things, let's say 
+> manageable things like capabilities, without going deep into CXL specs 
+> about how all that needs to be implemented. This patch introduces a 
+> function embedding different calls for those innerworkings which should 
+> only be handled by the CXL core.
 
-syzbot found the following issue on:
+No. Please keep this policy out of the core. Do not invent a new
+"capabilities" contract that the CXL core needs to maintain, and do not
+add thin "cxl_pci_accel_" helpers that just wrap existing core
+functionality. Call existing core functions directly and only augment
+them at the point where fundamental assumptions are violated between
+the "Type-3" and "Type-2" device models.
 
-HEAD commit:    5723cc3450bc Merge tag 'dmaengine-fix-6.15' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13db41f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7b197212d89c3c28
-dashboard link: https://syzkaller.appspot.com/bug?extid=314853b9e8b9b3624502
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e9dbf7fa47fa/disk-5723cc34.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/da7091265dff/vmlinux-5723cc34.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/364a1ac0c828/bzImage-5723cc34.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+314853b9e8b9b3624502@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-out-of-bounds in __rhashtable_insert_fast include/linux/rhashtable.h:741 [inline]
-BUG: KASAN: slab-out-of-bounds in rhashtable_insert_fast include/linux/rhashtable.h:834 [inline]
-BUG: KASAN: slab-out-of-bounds in mac80211_hwsim_new_radio+0x4b81/0x54d0 drivers/net/wireless/virtual/mac80211_hwsim.c:5591
-Read of size 8 at addr ffff88807c02b0b0 by task syz-executor/10418
-
-CPU: 0 UID: 0 PID: 10418 Comm: syz-executor Not tainted 6.15.0-rc6-syzkaller-00346-g5723cc3450bc #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xc3/0x670 mm/kasan/report.c:521
- kasan_report+0xe0/0x110 mm/kasan/report.c:634
- __rhashtable_insert_fast include/linux/rhashtable.h:741 [inline]
- rhashtable_insert_fast include/linux/rhashtable.h:834 [inline]
- mac80211_hwsim_new_radio+0x4b81/0x54d0 drivers/net/wireless/virtual/mac80211_hwsim.c:5591
- hwsim_new_radio_nl+0xb51/0x12c0 drivers/net/wireless/virtual/mac80211_hwsim.c:6243
- genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16d/0x440 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x53d/0x7f0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- __sys_sendto+0x498/0x510 net/socket.c:2180
- __do_sys_sendto net/socket.c:2187 [inline]
- __se_sys_sendto net/socket.c:2183 [inline]
- __x64_sys_sendto+0xe0/0x1c0 net/socket.c:2183
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f42501907fc
-Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
-RSP: 002b:00007ffc18488b90 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f4250ee4620 RCX: 00007f42501907fc
-RDX: 0000000000000024 RSI: 00007f4250ee4670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffc18488be4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f4250ee4670 R15: 0000000000000000
- </TASK>
-
-Allocated by task 36:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4327 [inline]
- __kmalloc_node_track_caller_noprof+0x221/0x510 mm/slub.c:4346
- kmalloc_reserve+0xef/0x2c0 net/core/skbuff.c:599
- __alloc_skb+0x166/0x380 net/core/skbuff.c:668
- alloc_skb include/linux/skbuff.h:1340 [inline]
- nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:748 [inline]
- nsim_dev_trap_report drivers/net/netdevsim/dev.c:805 [inline]
- nsim_dev_trap_report_work+0x2b1/0xcf0 drivers/net/netdevsim/dev.c:851
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Freed by task 36:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2380 [inline]
- slab_free mm/slub.c:4642 [inline]
- kfree+0x2b6/0x4d0 mm/slub.c:4841
- skb_kfree_head net/core/skbuff.c:1058 [inline]
- skb_free_head+0x108/0x1d0 net/core/skbuff.c:1070
- skb_release_data+0x7a5/0x960 net/core/skbuff.c:1097
- skb_release_all net/core/skbuff.c:1162 [inline]
- __kfree_skb net/core/skbuff.c:1176 [inline]
- consume_skb net/core/skbuff.c:1408 [inline]
- consume_skb+0xbf/0x100 net/core/skbuff.c:1402
- nsim_dev_trap_report drivers/net/netdevsim/dev.c:821 [inline]
- nsim_dev_trap_report_work+0x8bd/0xcf0 drivers/net/netdevsim/dev.c:851
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff88807c02a000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 176 bytes to the right of
- allocated 4096-byte region [ffff88807c02a000, ffff88807c02b000)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7c028
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b442140 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801b442140 dead000000000122 0000000000000000
-head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000003 ffffea0001f00a01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 36, tgid 36 (kworker/u8:2), ts 742363181667, free_ts 742221384347
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x181/0x1b0 mm/page_alloc.c:1714
- prep_new_page mm/page_alloc.c:1722 [inline]
- get_page_from_freelist+0x135c/0x3920 mm/page_alloc.c:3684
- __alloc_frozen_pages_noprof+0x263/0x23a0 mm/page_alloc.c:4966
- alloc_pages_mpol+0x1fb/0x550 mm/mempolicy.c:2301
- alloc_slab_page mm/slub.c:2450 [inline]
- allocate_slab mm/slub.c:2618 [inline]
- new_slab+0x244/0x340 mm/slub.c:2672
- ___slab_alloc+0xd9c/0x1940 mm/slub.c:3858
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3948
- __slab_alloc_node mm/slub.c:4023 [inline]
- slab_alloc_node mm/slub.c:4184 [inline]
- __do_kmalloc_node mm/slub.c:4326 [inline]
- __kmalloc_node_track_caller_noprof+0x2ee/0x510 mm/slub.c:4346
- kmalloc_reserve+0xef/0x2c0 net/core/skbuff.c:599
- __alloc_skb+0x166/0x380 net/core/skbuff.c:668
- alloc_skb include/linux/skbuff.h:1340 [inline]
- nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:748 [inline]
- nsim_dev_trap_report drivers/net/netdevsim/dev.c:805 [inline]
- nsim_dev_trap_report_work+0x2b1/0xcf0 drivers/net/netdevsim/dev.c:851
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-page last free pid 10539 tgid 10539 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1258 [inline]
- __free_frozen_pages+0x69d/0xff0 mm/page_alloc.c:2721
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x4e/0x120 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4147 [inline]
- slab_alloc_node mm/slub.c:4196 [inline]
- __do_kmalloc_node mm/slub.c:4326 [inline]
- __kmalloc_node_track_caller_noprof+0x1d3/0x510 mm/slub.c:4346
- __kmemdup_nul mm/util.c:63 [inline]
- kstrdup+0x53/0x100 mm/util.c:83
- kstrdup_const+0x63/0x80 mm/util.c:103
- kvasprintf_const+0x10f/0x1a0 lib/kasprintf.c:48
- kobject_set_name_vargs+0x5a/0x140 lib/kobject.c:274
- dev_set_name+0xc7/0x100 drivers/base/core.c:3495
- netdev_register_kobject+0xc5/0x3a0 net/core/net-sysfs.c:2323
- register_netdevice+0x13dc/0x2270 net/core/dev.c:10999
- nsim_init_netdevsim drivers/net/netdevsim/netdev.c:960 [inline]
- nsim_create+0xc70/0x10a0 drivers/net/netdevsim/netdev.c:1028
- __nsim_dev_port_add+0x42b/0x7d0 drivers/net/netdevsim/dev.c:1393
- nsim_dev_port_add_all drivers/net/netdevsim/dev.c:1449 [inline]
- nsim_drv_probe+0xdca/0x1490 drivers/net/netdevsim/dev.c:1607
- call_driver_probe drivers/base/dd.c:579 [inline]
- really_probe+0x241/0xa90 drivers/base/dd.c:657
-
-Memory state around the buggy address:
- ffff88807c02af80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88807c02b000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88807c02b080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                                     ^
- ffff88807c02b100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88807c02b180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 UID: 0 PID: 10418 Comm: syz-executor Tainted: G    B               6.15.0-rc6-syzkaller-00346-g5723cc3450bc #0 PREEMPT(full) 
-Tainted: [B]=BAD_PAGE
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:__rhashtable_insert_fast include/linux/rhashtable.h:741 [inline]
-RIP: 0010:rhashtable_insert_fast include/linux/rhashtable.h:834 [inline]
-RIP: 0010:mac80211_hwsim_new_radio+0x3740/0x54d0 drivers/net/wireless/virtual/mac80211_hwsim.c:5591
-Code: 8b 6c 24 48 48 89 5c 24 70 48 8b 1c 24 4c 89 74 24 68 eb 3e e8 a1 6e c1 fa 4c 89 e0 48 b9 00 00 00 00 00 fc ff df 48 c1 e8 03 <80> 3c 08 00 0f 85 2f 14 00 00 4d 8b 24 24 31 ff 45 89 e6 41 83 e6
-RSP: 0018:ffffc900042df518 EFLAGS: 00010056
-RAX: 0000000000000000 RBX: ffff88802547f000 RCX: dffffc0000000000
-RDX: ffff88802a7d1e00 RSI: ffffffff86f9d69f RDI: 0000000000000005
-RBP: 0000000000000011 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 6e696c6261736944 R12: 0000000000000000
-R13: 000000000000000c R14: 0000000000000000 R15: ffff888066738e40
-FS:  0000555572ad4500(0000) GS:ffff8881249e0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff7a5f3d200 CR3: 000000003b5b7000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- hwsim_new_radio_nl+0xb51/0x12c0 drivers/net/wireless/virtual/mac80211_hwsim.c:6243
- genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16d/0x440 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x53d/0x7f0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- __sys_sendto+0x498/0x510 net/socket.c:2180
- __do_sys_sendto net/socket.c:2187 [inline]
- __se_sys_sendto net/socket.c:2183 [inline]
- __x64_sys_sendto+0xe0/0x1c0 net/socket.c:2183
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f42501907fc
-Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
-RSP: 002b:00007ffc18488b90 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f4250ee4620 RCX: 00007f42501907fc
-RDX: 0000000000000024 RSI: 00007f4250ee4670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffc18488be4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f4250ee4670 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__rhashtable_insert_fast include/linux/rhashtable.h:741 [inline]
-RIP: 0010:rhashtable_insert_fast include/linux/rhashtable.h:834 [inline]
-RIP: 0010:mac80211_hwsim_new_radio+0x3740/0x54d0 drivers/net/wireless/virtual/mac80211_hwsim.c:5591
-Code: 8b 6c 24 48 48 89 5c 24 70 48 8b 1c 24 4c 89 74 24 68 eb 3e e8 a1 6e c1 fa 4c 89 e0 48 b9 00 00 00 00 00 fc ff df 48 c1 e8 03 <80> 3c 08 00 0f 85 2f 14 00 00 4d 8b 24 24 31 ff 45 89 e6 41 83 e6
-RSP: 0018:ffffc900042df518 EFLAGS: 00010056
-RAX: 0000000000000000 RBX: ffff88802547f000 RCX: dffffc0000000000
-RDX: ffff88802a7d1e00 RSI: ffffffff86f9d69f RDI: 0000000000000005
-RBP: 0000000000000011 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 6e696c6261736944 R12: 0000000000000000
-R13: 000000000000000c R14: 0000000000000000 R15: ffff888066738e40
-FS:  0000555572ad4500(0000) GS:ffff8881249e0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff7a5f3d200 CR3: 000000003b5b7000 CR4: 0000000000350ef0
-----------------
-Code disassembly (best guess):
-   0:	8b 6c 24 48          	mov    0x48(%rsp),%ebp
-   4:	48 89 5c 24 70       	mov    %rbx,0x70(%rsp)
-   9:	48 8b 1c 24          	mov    (%rsp),%rbx
-   d:	4c 89 74 24 68       	mov    %r14,0x68(%rsp)
-  12:	eb 3e                	jmp    0x52
-  14:	e8 a1 6e c1 fa       	call   0xfac16eba
-  19:	4c 89 e0             	mov    %r12,%rax
-  1c:	48 b9 00 00 00 00 00 	movabs $0xdffffc0000000000,%rcx
-  23:	fc ff df
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 08 00          	cmpb   $0x0,(%rax,%rcx,1) <-- trapping instruction
-  2e:	0f 85 2f 14 00 00    	jne    0x1463
-  34:	4d 8b 24 24          	mov    (%r12),%r12
-  38:	31 ff                	xor    %edi,%edi
-  3a:	45 89 e6             	mov    %r12d,%r14d
-  3d:	41                   	rex.B
-  3e:	83                   	.byte 0x83
-  3f:	e6                   	.byte 0xe6
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+If the fundamental assumption violation boils down to a policy
+difference between Type-2 and Type-3 then move that policy out of the
+core. For example, register discovery is a mechanism, what the client
+does with the result of that mechanism is policy and belongs in the
+leaf/client. It was an accident of implementation that mandatory Type-3
+register blocks were validated in the core not in cxl_pci from the
+outset.
 
