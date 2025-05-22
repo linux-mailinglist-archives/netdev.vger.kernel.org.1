@@ -1,290 +1,332 @@
-Return-Path: <netdev+bounces-192766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03DDAC1157
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:43:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F53AC1163
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889B017C882
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:43:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D8F33A849D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAF428C842;
-	Thu, 22 May 2025 16:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E42928C5AF;
+	Thu, 22 May 2025 16:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y1jDldSY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lq3uBwrr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3AF25486F;
-	Thu, 22 May 2025 16:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747932198; cv=fail; b=VcgDm3NcYgvtt05EzJqLPd7F23162t9AmY70P5xFbUMPORTguoVu94ylp+yyus1C8dQN8L+G0ATsJy6Dtmq098MU4jAP3H8VKHuDAfP47R+sPB1WvgTsx+xU56YRZ3H11bXhin3lcFb0TDNyQFBTGLRGkhmjIX5mOMBfxpKOD88=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747932198; c=relaxed/simple;
-	bh=ugQhScny+rhaqHBmoPi4U8Lx3ujWBf/UQVyQ3zjTSP0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eDbDHoUXldkfe/dsLQlmsbC4BwHv09C31iGkJCnQIhyUuIQJcJrEjrKZScSAXAnhSbbu/iZYl640kfZbxFzG8mcxGflEuMNOjzGcgMp/ZwSjjVMadtm34LMvGxmq4WKfmYSAE3a+0PALG9xbm61Pkg6brpWweAecw5y1qsOOR8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y1jDldSY; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747932198; x=1779468198;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ugQhScny+rhaqHBmoPi4U8Lx3ujWBf/UQVyQ3zjTSP0=;
-  b=Y1jDldSYsQMcwW5ijNXt9aSH7stI3Jk/PqYyoBF77r6wgeps9V4GNDon
-   6kLY5Lv5ZT4O9f9IUXa5/UILmyRp6CoorofKDWppP69juhOlf4AGKWe5n
-   JhC39YTlQgllxjUfIf2qPQ+ADqh9dVnpu+36ebx3kbTO0RlIKeKqS5c1g
-   84qaYRNyMBxySu+G3jS+zp+5hvqXY59OK0p4ZFmfoltCeO/E1jFsfQMNn
-   ekPnrxE+ITtIQIOTTI1zPh50tTxedDYA6SdOgGoH0I65YpTnjsgCqxC81
-   6PBVGXp1On9jXsIXxSwavsjgN6vELw0dWvCREn5m2TuvG3VrYeyYtM1xn
-   Q==;
-X-CSE-ConnectionGUID: xFp+36pCTgyjBQTe89zGTQ==
-X-CSE-MsgGUID: 63yEuJNzTpe9wV40wMwxvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49889943"
-X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
-   d="scan'208";a="49889943"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 09:43:12 -0700
-X-CSE-ConnectionGUID: L6a92VjuS/+ma6s4d3QovQ==
-X-CSE-MsgGUID: AXfMzFk6SdGD4N6fPB6ong==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
-   d="scan'208";a="145635229"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 09:43:12 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 22 May 2025 09:43:11 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Thu, 22 May 2025 09:43:11 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.57)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Thu, 22 May 2025 09:43:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mdyI6VIuOydbXAeBy6rkZkikRamc7Od0xexkfyRLspFsBhwLXn9CsMYCBozmDgfBXJ8RTIEzkImbIfKPDFr6d/M9QAe2mkzkccqoFsDnLW9aAWBCJQbg2ReuaVU8vDGSVS+nMSl4aQRnEO1kAloH9GLnVHthp6aOL1cEc1uPgF4BbSe2SZuxFanHBopIyjXoJ9dSsRGT/7WDuGKV4q3grgDxwLBTibMHrN4aEBBY8AujMKjuyPB4a/qEkWzp9/gkP8I+y8ZXPYY3aldNTaK+pawUSEfDIyhOHbF/2QRwJbwvnl0qmgokcwmOMMUdAInmCVqvUI5qQeVrNA12td4DFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MnSZNTJWG6Q+LG88aaJINqdOgQINGbXOqm6bk9TWFHs=;
- b=kPG9aT1KVaFkgfzKlqOGJkUYnTFme7/pW2xTB5l5g9oQmKPm8R+P86rnqH2qkll8uiYbp6CrPcQLVB+NJGcLTL4fptJM6K4yoln9bpOhW8FZ1S71q+CFRx8yqcY19X/O8gHflWvCAMv5tmXGLw/lvCJdmen5nVcDKWE4qrgGY6kGfXjQitIp8J0x1Toifaslaewfwp71yEa5bb1452Oqe0du6FfVPcS+o8IvxQO7nY+f25lC4FDRq6j81sR2UAbV5bVau905R3E3cNSTNSBfaUMBh7JbAcdRvkvVg2k5YEotQjgrriwU0tzFX3w6GbM/Ayqff77jDdOUmSllFi79+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
- by PH0PR11MB7711.namprd11.prod.outlook.com (2603:10b6:510:291::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.36; Thu, 22 May
- 2025 16:42:40 +0000
-Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
- ([fe80::d200:bfac:918a:1a38%7]) with mapi id 15.20.8746.030; Thu, 22 May 2025
- 16:42:40 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "donald.hunter@gmail.com" <donald.hunter@gmail.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "Olech, Milena" <milena.olech@intel.com>
-Subject: RE: [PATCH net-next v2 2/3] dpll: add Reference SYNC get/set
-Thread-Topic: [PATCH net-next v2 2/3] dpll: add Reference SYNC get/set
-Thread-Index: AQHbwOFOGrGnya94jEWLCaOc2iE6HbPLS74AgBOh3JA=
-Date: Thu, 22 May 2025 16:42:40 +0000
-Message-ID: <SJ2PR11MB845204F3E5CDBBF5CB34FE969B99A@SJ2PR11MB8452.namprd11.prod.outlook.com>
-References: <20250509124651.1227098-1-arkadiusz.kubalewski@intel.com>
- <20250509124651.1227098-3-arkadiusz.kubalewski@intel.com>
- <icbprtryf7dhdwymtuvntfcfvl43b4rbzxukg7romz32cx2vmn@dkgfespynxln>
-In-Reply-To: <icbprtryf7dhdwymtuvntfcfvl43b4rbzxukg7romz32cx2vmn@dkgfespynxln>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|PH0PR11MB7711:EE_
-x-ms-office365-filtering-correlation-id: c221b8f1-11ac-4fcc-86bf-08dd994faab1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?eOjCVzz8F9i9BFFmoFOLiqG5JXbFOpLpFy6Anfp3X618xLnQHP61zWQKs76V?=
- =?us-ascii?Q?u9Fid+XxunBIcN86jE03AvQrD5K2KSlqbTnD3/wcWdGB52sIkqYWDkv4Uu28?=
- =?us-ascii?Q?xt+vqns0vPce3V5k05DNmHRk+tFPSB1kW3Xh7BqIoa3XDi10X3IUF2CUdLC1?=
- =?us-ascii?Q?I5V+TfaTpW/qM9t6qLx/NSSWLoXWSRnKJtN7ddhnLFK41p9Lc7xdwI0AHJsS?=
- =?us-ascii?Q?Ee9HHIrLQCa8mU2pRdO0Bqn6qCft5EikgUn3D4ube0s+ZwFSOVQCRkVdbyPb?=
- =?us-ascii?Q?usJ2S53x8qJVZJIiX7Kq27pUnKleZhhpVK6VRNPVbMQ5qeL83uwLw92UF6s9?=
- =?us-ascii?Q?S7b08M/C23CbmbDkPpSBHLku7kxDqh72LkXmPgFsqkgcHm21Y6MStTf5aAWn?=
- =?us-ascii?Q?GH9ZDkxy8lamcpiau2bdnipUAihYv4lmP8t6+QXX688MQH9IEY7CbrutwQYH?=
- =?us-ascii?Q?qQq2T9oeF602L/K/U34ICAULp4arhEjAOzfpv0QHgeZnYatoIf3JD7mOPs98?=
- =?us-ascii?Q?AvfLotY2pGPToUIO5MseKE+dCkNzuaetnLVHs2CphK/V8D+VgzO1RsNsSoaK?=
- =?us-ascii?Q?JY2lXgZqDbYO9CzE073JxxWY+yuU+ghIXGhZv/wJgXyuuSRidsKFst4XCUGT?=
- =?us-ascii?Q?0AJRtcR7tCywGTErjia1Ax38VqCQs0pVvTaxq+rDVit/D/Sy7GIRjPyIubd+?=
- =?us-ascii?Q?H0kQuzJLmEnULsa7lyxzlYUEBrgiK5YlJasHS3S4/LZ8OFi5qP2Ju8RO53RK?=
- =?us-ascii?Q?rVZ+a8wHWAgWRtYoKVqHeIfz0HBNiw1m6K6lTQrVUvU3PsRehVsE2A1ttBXj?=
- =?us-ascii?Q?SG17JioElZ++BWDVp9h1Pj/4khGaY+32Hc/eT6Ker92hHbuskhAYddFIVEPo?=
- =?us-ascii?Q?BadTmeTMf0P/+CRfix+CPMpxGNo4Bwl3Ru1hDjzU1XR7KIxeNNFv0SG/3QvF?=
- =?us-ascii?Q?i44e5DPIuIRhW8dFzlazVtrvI3Mnb9L/9J0dKnhhtb9nYplduF1Ws/04pMyF?=
- =?us-ascii?Q?OHpEwPB1ssETQ4Te/dCg4Gv1eKqr9QW0iTlD1DwcV5/3Z2PolWIVXY6DuNaf?=
- =?us-ascii?Q?oBTjDNNg0z9lKjJJi4A0KkAYBOWq4daAqwz0Gmc9iNiC7Axy3dotgcQv7wJ3?=
- =?us-ascii?Q?t3EFdExhDwBgRp1HgfVgPB6rn1aYjuTW8vl55iBnVZ/9gK/xIQoaI3g3JYek?=
- =?us-ascii?Q?X14LXv1CvHrvvQLy3sl68YSWJj1or6EEL+6xOp/d3AobIruXomenfyb/ky6e?=
- =?us-ascii?Q?MNSLJGOIjudZyt1cWk15QWNReO2PNOKemLMJ0ud9GH3qQA+mGrjKmEsDdAuH?=
- =?us-ascii?Q?oIvEhjgtPIZBcc9OwWEgZJ9I+HysGFkCu7FZSzZVnQLf4BT/gmmWYoKdHZIP?=
- =?us-ascii?Q?6MZatpfuaMAnaNJnF3IvC6joc3o+DTXjA/fcVbNGxhT8HYx5UvWNS2br/VvG?=
- =?us-ascii?Q?2S4djYF2VmVWwnxhftZ20p5TdEzNdKt9VzSDklhdyxlpIG2uxjjb6A=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?HCayC2kNY6g2Afx7gR/8vsdxIQ8q+7MWAcsD8bn4evWysqeOh2ewBWaMfzfa?=
- =?us-ascii?Q?9Q7VY/ebNl8DRSprtsA84iD2OCGerja82O7NB4t8A6iBf3FGGu4jn+hn/xOg?=
- =?us-ascii?Q?LRMR9YyrNFSNUL5rH+EbD/8Jkgj5qNgx2grPXlYkYSDyQ6v2ShyXsWOeb4gv?=
- =?us-ascii?Q?90IUpNRwyHJLN79QZznIko42SzxeaE6TI3mdO4vkuOpOj1nK3JC+oUAKmKqN?=
- =?us-ascii?Q?vnsqzAiIpIEYq3NTCRZe81Hp1zZt9wzDqhWczbDTe8jE5Ddu0Q3pGV4Ykrcv?=
- =?us-ascii?Q?qq+AHcx5pOm9b3AjuZcLvYPHzxoRPcPdh18bPZPeCpDD7SIgT+5UP8e2cI4f?=
- =?us-ascii?Q?pJjVxbc5EmBWCv0xNkuHP4Rotct5fL2v05dy2lOY3XCHnOJzWcfPPG5MZ3dW?=
- =?us-ascii?Q?3VU7A8CyWlX80YR5uV2F9IWqmyez6WG9bQsu3tnDpIlbXGRr/Ub1lRcCV2g4?=
- =?us-ascii?Q?SMR/QASIxoYnTTdPPtEisg5zoettTMiHa/OVi5hI018XRw6xsKg/aicFYeNw?=
- =?us-ascii?Q?vzdWXVMEDu0k303xr/WBea0ZsZfqEKJ1SR2kPvGWXo8XryY9GNgxwszUHK49?=
- =?us-ascii?Q?1Ovi5kVmeubEw0E07mVwh3uMqSkwfoK4kLA5AA/NrxbuivwJQX7UG3rH4gtR?=
- =?us-ascii?Q?ug7vfSpgNz2d3C8LhRYN4TOuQEaDpSzLlUCPtdvdTs4UNgLjZaUrg/HfL2yF?=
- =?us-ascii?Q?Kmmc6QOCe5MgpwzqnZaVGSP7cun0/UpVa1xgoewgFtTvG5GBU/vqJOI6abqb?=
- =?us-ascii?Q?eRiSxseYrtERBnAnbVlwBOdTBQ1ZgsjtB8enrjkBe4rrxIe456gTZxYdyEYH?=
- =?us-ascii?Q?E4XA6wGcOOFDYGIIbCa+OIo2C7U8Ufk0pS5VeFdR2WJkQwGySQ8yXtLlX2pF?=
- =?us-ascii?Q?V6q4XigV3UimsaKVn4afDyBnBwAEkhQegfVdEXdV2LAv0c6yY4WcDVe4sP0Q?=
- =?us-ascii?Q?H+xWLky0lLS/IX6iBPD7K/9zWNejLCRN6Mv3K6i+o8HnVC+g7sFsVTyLB+wV?=
- =?us-ascii?Q?ErPMBiO35mnPWV8OM+LiXE/U55q7ZdMB7fALym15j/ULCxxWTT19sEI/JFnZ?=
- =?us-ascii?Q?XZq+rKQt0+ncpw3PFnmqnEprrOVaNrjqh3yhPTw/6E3pphPwYdLYaKqEoo+F?=
- =?us-ascii?Q?y+c6oM0EWrgklVMMZRaA41Wyw2CI2gojjLF2wSN0V99gHvztIIjKb4dDwdr6?=
- =?us-ascii?Q?wfebJftZI3Uuxn8v63g3vZQKC7UDu52w4WL2LKCGnWeYRGt4254xYC4kJxK9?=
- =?us-ascii?Q?zP2Ougjc3OdgideYbeCB2KTSjkyZRVw/R75rcPkgazYhUByOV373C1wJ/QHE?=
- =?us-ascii?Q?E3v+w9ar7GGbrF37NZdS/qx3NOKQmLhRGjQe6aNPkZqHOMB8l4tsVnrfrk8C?=
- =?us-ascii?Q?ru2zjSbFo35UjEOJ1DYNUfdpXr9VzcHifhaKf22XhSxdChTs9FylNyeSwrHZ?=
- =?us-ascii?Q?Xe0E0Clj4+uIZaVFL/raxDrdpbJ/TE+UBxF1LtkWA7DX8ougTa484XFDWDJB?=
- =?us-ascii?Q?h4FZ4Jayf6FsxOQhdleUvRLQVd3BIwkxlEqipu3C1hJk3CAahRdhrjJXmuq/?=
- =?us-ascii?Q?7yyQ0jhZUzkqviBeyUv3SH9OMolGLUqoiID6HY3poAwv0L8+aCaLlmadrIMR?=
- =?us-ascii?Q?AQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3839528B503;
+	Thu, 22 May 2025 16:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747932576; cv=none; b=r61k8Vu8PfiKP4IEws2FCelKGhffurruAiqITfduFNKx4T7W84z2FFHD52Q5tnPEFsd19424y/R9edFuLTGBLfI18RPiZG+jYFSpQxdLQ8L6yRyDDdHFikUjOH2P8HUHp4rGjJ0cl6mJOrvE/uXNVXbibr7H9UiRSDIYR4H5ZrI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747932576; c=relaxed/simple;
+	bh=M5FyV7l+s1kn4lezW6gAevcX06k/08kXZmL+KiT0sVM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dulHXeKKs1lLpOLUfH4SoU0cOiAWyaFqif5dwg8a3j5tamWtxnneBevyde3A/jarW9A33PmTIcCrdkg1EDFRLAFncGgH8CtWCojuarPBGu6jQfYeQZ9fF5S5wKpCU2sKQ8oZ/z8gCTAZMaNVOXT37krI5R1kbW9B6B8Mrd8CPsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lq3uBwrr; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e7b3410e122so7763134276.2;
+        Thu, 22 May 2025 09:49:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747932574; x=1748537374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KizRQ40LYUpWNzlWIpAiXdtkcRkPrDvSwiFqCvAOjnc=;
+        b=Lq3uBwrryNdYPCr3TW2AGlqczk6XyBOThxeoHpQThMbUZ8WYp+kKGzPHzuLe6cCU0+
+         gph3dUUtk3tHwHL7A2TYmyfpSKeO5kSYh+/6naAoS9qeiEFWanjPh80ktBYdeAZ84WIL
+         Ji7KmSc2LRR34a8Btj/gsHA3dBJzphGC5xUR877ZOInOA5gqpOehp701vn1IYO8iu07S
+         6RtXua5sZlsVZ49nI6a3J8paJERLwGoOP/wR2ieWkVtN9a32UIvlZw1YMPWgAUPqUf1i
+         9CZb/I475eSp8wOvvFUsQSItlZsBZHS7ihRdeQywUu81okM/rJf9J3yTKJ3zEerF0h3J
+         rqKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747932574; x=1748537374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KizRQ40LYUpWNzlWIpAiXdtkcRkPrDvSwiFqCvAOjnc=;
+        b=l7Jvl+O9eIuIDRwU7kTB4xCJIOTIySF3d9/Z8jv9ZeeDGVVqfKI57q9Q1e2R7KMpkd
+         fFxKjx4mX4YTpbq3q8/qSxKB8GAUj700Oi03e2WtgBzPMlv8pqz79qdCake4hEwxHny6
+         I4+X0w+HjhJd1frAhmZ9bEL8fTcdBGFbC8wwUxYUv829TQ5Jp5l1PzxzT/AR28E5lbA7
+         MzjHqE1V4u3bo/BdKyFQ7jWkVQXLEHxvvkka+K9yr22hndehaZoFYRNYogojwMVzQUvX
+         IX6qrFs2+nsYTIhwXHM5ge1m1h1ei9JQbvglXEy3+fzSXEjqhx/AeOPlFtGqGmT8u2LF
+         dvpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPYUVHvgrUiWQATxV+sabszalvpi9XgnTU55IboMMrDEvdOoOAmED/TgQCAOC81z25ygblNu4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBMIoiH+KmoKIQItMqNeW4oqRFPaif2qTahjnqUx1JL7JzPQ2V
+	6JQzccTQXQK7Za+4bMGD4WD276mzhCcvFX93FasLCFlktK4QvxsXEYd2BlJrvmH5K7idXPH7VOA
+	js/Xg1KU50KDrA3JXnb5HsnOixjmEUN9o0FN9hJU=
+X-Gm-Gg: ASbGncugz0VM2nXaF+JHTBnQ1eJdRYSmzlJaSCEZzj0UnJsJbuIHRVQNQBo9oVlFopt
+	M8IFccn1/wYOd5JcLLIlpxnDeMLbp5VVGmvXN3+S9vwwgucuB9U5WMqzd4Ty38w/DI1AyXtCuPr
+	i52cFlrGAc5Be6jDOcR3TpKziKM/2kW9sAtOpSAyE/eiSBLqk=
+X-Google-Smtp-Source: AGHT+IGhOP+GsCTfypQm5gGwj9NCcUvv6OG+PBaB3UN3B6ANsZJFNjVHxTRyISXShQBWoptKffotcVK2wIobhLb6jk0=
+X-Received: by 2002:a05:6902:488a:b0:e79:e65:9169 with SMTP id
+ 3f1490d57ef6-e7b6a08c1aamr35046500276.20.1747932574093; Thu, 22 May 2025
+ 09:49:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c221b8f1-11ac-4fcc-86bf-08dd994faab1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2025 16:42:40.1158
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: S1fI2A6BhRcuRdss/OE43Qx/HqMhASmE10AZyuN/cP1IGa2iUTDsrKmjounTrEttHSOVXgxWi7vJGhT3lvZXgnvtmbRtkFG2tlK+FxYLjRU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7711
-X-OriginatorOrg: intel.com
+References: <20250515211606.2697271-1-ameryhung@gmail.com> <20250515211606.2697271-2-ameryhung@gmail.com>
+ <aC7iCGNsG7YuF297@kodidev-ubuntu>
+In-Reply-To: <aC7iCGNsG7YuF297@kodidev-ubuntu>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 22 May 2025 09:49:23 -0700
+X-Gm-Features: AX0GCFvE5gQbD7-hibula4lrWJ8LI6VN5nxVDIWZlqU-O12Zs_52j2Pu_pxOjAU
+Message-ID: <CAMB2axO1K3-=oAxfOd4bBopiC6NR_BFf28_jx1y=d9bpenAAgw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 1/3] selftests/bpf: Introduce task local data
+To: Tony Ambardar <tony.ambardar@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
+	martin.lau@kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->From: Jiri Pirko <jiri@resnulli.us>
->Sent: Saturday, May 10, 2025 6:48 AM
+On Thu, May 22, 2025 at 1:36=E2=80=AFAM Tony Ambardar <tony.ambardar@gmail.=
+com> wrote:
 >
-
-[..]
-
->>
->>+static int
->>+dpll_pin_ref_sync_state_set(struct dpll_pin *pin, unsigned long
->>sync_pin_idx,
->>+			    const enum dpll_pin_state state,
->>+			    struct netlink_ext_ack *extack)
->>+
->>+{
->>+	struct dpll_pin_ref *ref, *failed;
->>+	const struct dpll_pin_ops *ops;
->>+	enum dpll_pin_state old_state;
->>+	struct dpll_pin *sync_pin;
->>+	struct dpll_device *dpll;
->>+	unsigned long i;
->>+	int ret;
->>+
->>+	if (state !=3D DPLL_PIN_STATE_CONNECTED &&
->>+	    state !=3D DPLL_PIN_STATE_DISCONNECTED)
->>+		return -EINVAL;
->>+	sync_pin =3D xa_find(&pin->ref_sync_pins, &sync_pin_idx, ULONG_MAX,
->>+			   XA_PRESENT);
->>+	if (!sync_pin) {
->>+		NL_SET_ERR_MSG(extack, "reference sync pin not found");
->>+		return -EINVAL;
->>+	}
->>+	if (!dpll_pin_available(sync_pin)) {
->>+		NL_SET_ERR_MSG(extack, "reference sync pin not available");
->>+		return -EINVAL;
->>+	}
->>+	ref =3D dpll_xa_ref_dpll_first(&pin->dpll_refs);
->>+	ASSERT_NOT_NULL(ref);
->>+	ops =3D dpll_pin_ops(ref);
->>+	if (!ops->ref_sync_set || !ops->ref_sync_get) {
->>+		NL_SET_ERR_MSG(extack, "reference sync not supported by this
->>pin");
->>+		return -EOPNOTSUPP;
->>+	}
->>+	dpll =3D ref->dpll;
->>+	ret =3D ops->ref_sync_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
->sync_pin,
->>+				dpll_pin_on_dpll_priv(dpll, sync_pin),
->>+				&old_state, extack);
->>+	if (ret) {
->>+		NL_SET_ERR_MSG(extack, "unable to get old reference sync
->>state");
->>+		return -EINVAL;
+> Hi Amery,
 >
->Propagate ret. Not sure why you ignored my comment about this.
->
-
-Not ignored, this was on the other series, just missed it, fixed in v3.
-
+> I'm trying out your series in an arm32 JIT testing env I'm working on.
 >
 >
->>+	}
->>+	if (state =3D=3D old_state)
->>+		return 0;
->>+	xa_for_each(&pin->dpll_refs, i, ref) {
->>+		ops =3D dpll_pin_ops(ref);
->>+		dpll =3D ref->dpll;
->>+		ret =3D ops->ref_sync_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
->>+					sync_pin,
->>+					dpll_pin_on_dpll_priv(dpll, sync_pin),
->>+					state, extack);
->>+		if (ret) {
->>+			failed =3D ref;
->>+			NL_SET_ERR_MSG_FMT(extack, "reference sync set failed for
->dpll_id:%u",
->>+					   dpll->id);
+> On Thu, May 15, 2025 at 02:16:00PM -0700, Amery Hung wrote:
 >
->Why you print id? User knows what he works on, don't he?
+> [...]
+>
+> > diff --git a/tools/testing/selftests/bpf/progs/task_local_data.bpf.h b/=
+tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+> > new file mode 100644
+> > index 000000000000..5f48e408a5e5
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+> > @@ -0,0 +1,220 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef __TASK_LOCAL_DATA_BPF_H
+> > +#define __TASK_LOCAL_DATA_BPF_H
+> > +
+> > +/*
+> > + * Task local data is a library that facilitates sharing per-task data
+> > + * between user space and bpf programs.
+> > + *
+> > + *
+> > + * PREREQUISITE
+> > + *
+> > + * A TLD, an entry of data in task local data, first needs to be creat=
+ed by the
+> > + * user space. This is done by calling user space API, tld_create_key(=
+), with
+> > + * the name of the TLD and the size.
+> > + *
+> > + *     tld_key_t prio, in_cs;
+> > + *
+> > + *     prio =3D tld_create_key("priority", sizeof(int));
+> > + *     in_cs =3D tld_create_key("in_critical_section", sizeof(bool));
+> > + *
+> > + * A key associated with the TLD, which has an opaque type tld_key_t, =
+will be
+> > + * returned. It can be used to get a pointer to the TLD in the user sp=
+ace by
+> > + * calling tld_get_data().
+> > + *
+> > + *
+> > + * USAGE
+> > + *
+> > + * Similar to user space, bpf programs locate a TLD using the same key=
+.
+> > + * tld_fetch_key() allows bpf programs to retrieve a key created in th=
+e user
+> > + * space by name, which is specified in the second argument of tld_cre=
+ate_key().
+> > + * tld_fetch_key() additionally will cache the key in a task local sto=
+rage map,
+> > + * tld_key_map, to avoid performing costly string comparisons every ti=
+me when
+> > + * accessing a TLD. This requires the developer to define the map valu=
+e type of
+> > + * tld_key_map, struct tld_keys. It only needs to contain keys used by=
+ bpf
+> > + * programs in the compilation unit.
+> > + *
+> > + * struct tld_keys {
+> > + *     tld_key_t prio;
+> > + *     tld_key_t in_cs;
+> > + * };
+> > + *
+> > + * Then, for every new task, a bpf program will fetch and cache keys o=
+nce and
+> > + * for all. This should be done ideally in a non-critical path (e.g., =
+in
+> > + * sched_ext_ops::init_task).
+> > + *
+> > + *     struct tld_object tld_obj;
+> > + *
+> > + *     err =3D tld_object_init(task, &tld);
+> > + *     if (err)
+> > + *         return 0;
+> > + *
+> > + *     tld_fetch_key(&tld_obj, "priority", prio);
+> > + *     tld_fetch_key(&tld_obj, "in_critical_section", in_cs);
+> > + *
+> > + * Note that, the first argument of tld_fetch_key() is a pointer to tl=
+d_object.
+> > + * It should be declared as a stack variable and initialized via tld_o=
+bject_init().
+> > + *
+> > + * Finally, just like user space programs, bpf programs can get a poin=
+ter to a
+> > + * TLD by calling tld_get_data(), with cached keys.
+> > + *
+> > + *     int *p;
+> > + *
+> > + *     p =3D tld_get_data(&tld_obj, prio, sizeof(int));
+> > + *     if (p)
+> > + *         // do something depending on *p
+> > + */
+> > +#include <errno.h>
+> > +#include <bpf/bpf_helpers.h>
+> > +
+> > +#define TLD_DATA_SIZE __PAGE_SIZE
+> > +#define TLD_DATA_CNT 63
+> > +#define TLD_NAME_LEN 62
+> > +
+> > +typedef struct {
+> > +     __s16 off;
+> > +} tld_key_t;
+> > +
+> > +struct u_tld_data *dummy_data;
+> > +struct u_tld_metadata *dummy_metadata;
+>
+> I suspect I've overlooked something, but what are these 2 "dummy" globals
+> used for? The code builds OK without them, although I do see test errors
+> as noted below.
 >
 
-This is for easier debugging in case multiple parent dpll devices, that
-pin can be connected with. If that fails on one it is better to know which
-one caused failure.
+Hi, sorry for the confusion. The forward declaration is to prevent
+dummy_data/metadata tld_map_value to be fwd_kind. I will explain this
+in the comment.
 
-Thank you!
-Arkadiusz
+The BTF should look like this:
 
-[...]
+[9] STRUCT 'tld_map_value' size=3D16 vlen=3D2
+        'data' type_id=3D10 bits_offset=3D0
+        'metadata' type_id=3D11 bits_offset=3D64
+[10] PTR '(anon)' type_id=3D74
+[11] PTR '(anon)' type_id=3D73
+[57] STRUCT 'u_tld_data' size=3D4096 vlen=3D1
+        'data' type_id=3D58 bits_offset=3D0
+[61] STRUCT 'u_tld_metadata' size=3D4096 vlen=3D3
+        'cnt' type_id=3D62 bits_offset=3D0
+        'padding' type_id=3D64 bits_offset=3D8
+        'metadata' type_id=3D67 bits_offset=3D512
+[73] TYPE_TAG 'uptr' type_id=3D61
+[74] TYPE_TAG 'uptr' type_id=3D57
+
+Without the forward declaration, the BTF will look like this:
+
+[9] STRUCT 'tld_map_value' size=3D16 vlen=3D2
+        'data' type_id=3D10 bits_offset=3D0
+        'metadata' type_id=3D11 bits_offset=3D64
+[10] PTR '(anon)' type_id=3D63
+[11] PTR '(anon)' type_id=3D61
+[60] FWD 'u_tld_metadata' fwd_kind=3Dstruct
+[61] TYPE_TAG 'uptr' type_id=3D60
+[62] FWD 'u_tld_data' fwd_kind=3Dstruct
+[63] TYPE_TAG 'uptr' type_id=3D62
+
+> I'll also mention the only reason I noticed these is that "bpftool gen
+> skeleton" automatically maps these to user space, but results in an
+> ASSERT() failure during build on 32-bit targets due to lack of support,
+> so dropping them avoids that.
+
+Can you provide more details of the error?
+
+>
+>
+> 24: (85) call pc+25
+> caller:
+>  R6_w=3Dmap_value(map=3Dtld_key_map,ks=3D4,vs=3D6) R7=3D1 R10=3Dfp0 fp-8_=
+w=3Dmap_value(map=3Dtld_key_map,ks=3D4,vs=3D6) fp-16=3Dmap_value(map=3Dtld_=
+data_map,ks=3D4,vs=3D16)
+> callee:
+>  frame1: R1_w=3Dfp[0]-16 R2_w=3Dmap_value(map=3D.rodata.str1.1,ks=3D4,vs=
+=3D30) R10=3Dfp0
+> 50: frame1: R1_w=3Dfp[0]-16 R2_w=3Dmap_value(map=3D.rodata.str1.1,ks=3D4,=
+vs=3D30) R10=3Dfp0
+> ; static u16 __tld_fetch_key(struct tld_object *tld_obj, const char *name=
+) @ task_local_data.bpf.h:163
+> 50: (7b) *(u64 *)(r10 -16) =3D r2       ; frame1: R2_w=3Dmap_value(map=3D=
+.rodata.str1.1,ks=3D4,vs=3D30) R10=3Dfp0 fp-16_w=3Dmap_value(map=3D.rodata.=
+str1.1,ks=3D4,vs=3D30)
+> 51: (b4) w7 =3D 0                       ; frame1: R7_w=3D0
+> ; if (!tld_obj->data_map || !tld_obj->data_map->metadata) @ task_local_da=
+ta.bpf.h:169
+> 52: (79) r1 =3D *(u64 *)(r1 +0)         ; frame1: R1=3Dmap_value(map=3Dtl=
+d_data_map,ks=3D4,vs=3D16) fp-16=3Dmap_value(map=3D.rodata.str1.1,ks=3D4,vs=
+=3D30)
+> 53: (15) if r1 =3D=3D 0x0 goto pc+36      ; frame1: R1=3Dmap_value(map=3D=
+tld_data_map,ks=3D4,vs=3D16)
+> 54: (79) r6 =3D *(u64 *)(r1 +8)         ; frame1: R1=3Dmap_value(map=3Dtl=
+d_data_map,ks=3D4,vs=3D16) R6_w=3Dscalar()
+> 55: (15) if r6 =3D=3D 0x0 goto pc+34      ; frame1: R6_w=3Dscalar(umin=3D=
+1)
+> ; cnt =3D tld_obj->data_map->metadata->cnt; @ task_local_data.bpf.h:172
+> 56: (71) r8 =3D *(u8 *)(r6 +0)
+> R6 invalid mem access 'scalar'
+> processed 29 insns (limit 1000000) max_states_per_insn 0 total_states 3 p=
+eak_states 3 mark_read 1
+> -- END PROG LOAD LOG --
+> libbpf: prog 'task_init': failed to load: -EACCES
+> libbpf: failed to load object 'test_task_local_data'
+> libbpf: failed to load BPF skeleton 'test_task_local_data': -EACCES
+> test_task_local_data_basic:FAIL:skel_open_and_load unexpected error: -13
+> #409/1   task_local_data/task_local_data_basic:FAIL
+>
+>
+> I'm unsure if this verifier error is related to the dummy pointers, but
+> it does seem there's a pointer issue...
+>
+
+The error is exactly caused by removing the dummy_xxx.
+
+> Further thoughts or suggestions (from anyone) would be most welcome.
+>
+> Thanks,
+> Tony
+>
+> > +
+> > +struct tld_metadata {
+> > +     char name[TLD_NAME_LEN];
+> > +     __u16 size;
+> > +};
+> > +
+> > +struct u_tld_metadata {
+> > +     __u8 cnt;
+> > +     __u8 padding[63];
+> > +     struct tld_metadata metadata[TLD_DATA_CNT];
+> > +};
+> > +
+> > +struct u_tld_data {
+> > +     char data[TLD_DATA_SIZE];
+> > +};
+> > +
+> > +struct tld_map_value {
+> > +     struct u_tld_data __uptr *data;
+> > +     struct u_tld_metadata __uptr *metadata;
+> > +};
+> > +
+> > +struct tld_object {
+> > +     struct tld_map_value *data_map;
+> > +     struct tld_keys *key_map;
+> > +};
+> > +
+>
+> [...]
 
