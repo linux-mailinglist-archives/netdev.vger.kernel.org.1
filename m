@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-192734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD99AC0F51
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:03:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575A6AC0F53
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3F443A1E8D
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:02:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275833A32A6
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE63B35977;
-	Thu, 22 May 2025 15:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A2712DD95;
+	Thu, 22 May 2025 15:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNEJufCp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEBvvL0+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B927A12CDAE
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA3C35977
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747926169; cv=none; b=Huw3HJABPUMUGNmiowslGl5byWU5MrNNUm21JDmD8aXECq42kHemqFKH75ajLp1a6AmxKVl0HziaSrUo/zrbnJ9TmZDg5lPRD3cNvvX4pT4Cjl+xSOykWTlmdUn7vTj2S7tMvY7Z19irCZBAvYoksIJy6lOry6dUshmIRj/WdR0=
+	t=1747926202; cv=none; b=KYNf90o7HDYDxAkwUirSVd3e9fUebtNFt3nK8YHjif979CIzMvb/8giWPD7myE6E7qyuNiH7J1x0VJnz/kybjs7ArA1e5GpOMf9tiK1K4KOv0dzj6N2UVOocHLqObLnM3Hawv89KnpWlBUCtHMW+T/vtXm39B0Wk7hlMwRMYJqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747926169; c=relaxed/simple;
-	bh=kuuHzrpn6+u7mqPDSoDIG0yUIkc0PThyxzK5JYfFha4=;
+	s=arc-20240116; t=1747926202; c=relaxed/simple;
+	bh=aFlivPAtjSdCTu5LHQTFv68CeB0wv7TZc32vCAu/z/M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5IjGdJmbQ0UImK+DTgA9FRZgjn4zco94qyA+i8Qu+DL3RtvqzimHysnctpE773+kOc0x45BKNJlwGRY4tRlslVTyFR9A5j+6/4IaKrIZmpQgGeIlzI8BEaieJj35I4+cXbFVkLI1IZz4cvHmHRYbLwHSLqor+st5eaXdGcQnrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNEJufCp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5847AC4CEE4;
-	Thu, 22 May 2025 15:02:47 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=Xrf8wzoHO61PCAHs0MoYeqio/sPINuv8Y3CrGfg0EjURCh8z4DTWDlzete7TbhTG8wmfyDJZNMH7uNnIjEdRr8KtwM8T+5hCsu737Fb81H3OIOwKJgcuZoFZY8hKEoF2Gg3KJfOqaiGgXxojjJNu171TN3VigQF8RlPOngUZOW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEBvvL0+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE3DC4CEE4;
+	Thu, 22 May 2025 15:03:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747926169;
-	bh=kuuHzrpn6+u7mqPDSoDIG0yUIkc0PThyxzK5JYfFha4=;
+	s=k20201202; t=1747926201;
+	bh=aFlivPAtjSdCTu5LHQTFv68CeB0wv7TZc32vCAu/z/M=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HNEJufCp/uXINuDIdmsWbEiLMulbzsUTf/N6nvrYau9lh1Z/opJPsR+YKXRFIUlzD
-	 BOVYpQTG5b5shmOYkqLem2LRkj92ccKH4KFhpMy81aNw3i7hV/2V7vao8sUuBiYsUR
-	 L5A7zGUxgcKtSu55MJWlZ9iHKz19H+5/L2U/stHJwMeg1Id9LsKhWyNvh2Qlzv4N7z
-	 4i/9c8OnKW1Bg71zMgZlzJHP9fXnuKFeKEerfPoV8KviRNVJIQlFGIle2wUqKe5oV5
-	 qBvxlc04NFa9CkYZaAV/ppE+r4X/o31bublt+EynaYK32z0wBx3Qk76qPZYmVRK5YE
-	 RwJwKQsxqv7SQ==
-Message-ID: <a5654334-b0fc-419d-adbd-91eca9437e28@kernel.org>
-Date: Thu, 22 May 2025 17:02:45 +0200
+	b=cEBvvL0+81fiows/tnzjWSlwCBS8hiLdLN1S5d2Sb+xdEjRQWse3YxOKcs4MhiMcg
+	 R4m8v8xyt9Vw//wur0c7AhnhkGSSx2axLKCjBh9zivJi2UuO3bT7uQM4XvHtg5X6oV
+	 T25WqvhaIfde5aMjBv1G1ZfYeU2GuWmS9PIkaaqHNifbrDsUebK22Jwj5AbMNw9o2c
+	 tUBe1MTpivm7/VM263/zl7x48Q3JRjT6YYqmJIa1khaPNmSANWjIYVt9JQO+dnSNZV
+	 vLdJNpQX/2v+ExfS/hRXRWtR+CiS/rkCbzUesLrlC6I+6GSWi0OHQbwb4E8OaoeIRc
+	 DEGAyvKo3e47g==
+Message-ID: <82e2d881-fd2f-4485-a8c4-d0580a5582ac@kernel.org>
+Date: Thu, 22 May 2025 17:03:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v1 net-next 3/6] socket: Restore sock_create_kern().
+Subject: Re: [PATCH v1 net-next 4/6] socket: Remove kernel socket conversion
+ except for net/rds/.
 Content-Language: en-GB, fr-BE
 To: Kuniyuki Iwashima <kuniyu@amazon.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -59,7 +60,7 @@ To: Kuniyuki Iwashima <kuniyu@amazon.com>,
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
  netdev@vger.kernel.org
 References: <20250517035120.55560-1-kuniyu@amazon.com>
- <20250517035120.55560-4-kuniyu@amazon.com>
+ <20250517035120.55560-5-kuniyu@amazon.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -105,94 +106,70 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20250517035120.55560-4-kuniyu@amazon.com>
+In-Reply-To: <20250517035120.55560-5-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Kuniyuki,
 
 On 17/05/2025 05:50, Kuniyuki Iwashima wrote:
-> Let's restore sock_create_kern() that holds a netns reference.
+> Since commit 26abe14379f8 ("net: Modify sk_alloc to not reference
+> count the netns of kernel sockets."), TCP kernel socket has caused
+> many UAF.
 > 
-> Now, it's the same as the version before commit 26abe14379f8 ("net:
-> Modify sk_alloc to not reference count the netns of kernel sockets.").
+> We have converted such sockets to hold netns refcnt, and we have
+> the same pattern in cifs, mptcp, nvme, rds, smc, and sunrpc.
 > 
-> Back then, after creating a socket in init_net, we used sk_change_net()
-> to drop the netns ref and switch to another netns, but now we can
-> simply use __sock_create_kern() instead.
+>   __sock_create_kern(..., &sock);
+>   sk_net_refcnt_upgrade(sock->sk);
 > 
->   $ git blame -L:sk_change_net include/net/sock.h 26abe14379f8~
+> Let's drop the conversion and use sock_create_kern() instead.
 > 
-> DEBUG_NET_WARN_ON_ONCE() is to catch a path calling sock_create_kern()
-> from __net_init functions, since doing so would leak the netns as
-> __net_exit functions cannot run until the socket is removed.
+> The changes for cifs, mptcp, nvme, and smc are straightforward.
+> 
+> For sunrpc, we call sock_create_net() for IPPROTO_TCP only and still
+> call __sock_create_kern() for others.
+> 
+> For rds, we cannot drop sk_net_refcnt_upgrade() for accept()ed
+> sockets.
 
 Thank you for working on this!
 
 (...)
 
-> diff --git a/net/socket.c b/net/socket.c
-> index 7c4474c966c0..aeece4c4bb08 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -1632,6 +1632,48 @@ int __sock_create_kern(struct net *net, int family, int type, int protocol, stru
->  }
->  EXPORT_SYMBOL(__sock_create_kern);
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 602e689e991f..00e5cecb7683 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -1757,7 +1757,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+>  	if (unlikely(!sk->sk_socket))
+>  		return -EINVAL;
 >  
-> +/**
-> + * sock_create_kern - creates a socket for kernel space
-> + *
-> + * @net: net namespace
-> + * @family: protocol family (AF_INET, ...)
-> + * @type: communication type (SOCK_STREAM, ...)
-> + * @protocol: protocol (0, ...)
-> + * @res: new socket
-> + *
-> + * Creates a new socket and assigns it to @res.
-> + *
-> + * The socket is for kernel space and should not be exposed to
-> + * userspace via a file descriptor nor BPF hooks except for LSM
-> + * (see inet_create(), inet_release(), etc).
-> + *
-> + * The socket bypasses some LSMs that take care of @kern in
-> + * security_socket_create() and security_socket_post_create().
-> + *
-> + * The socket holds a reference count of @net so that the caller
-> + * does not need to care about @net's lifetime.
-> + *
-> + * This MUST NOT be called from the __net_init path and @net MUST
-> + * be alive as of calling sock_create_net().
-> + *
-> + * Context: Process context. This function internally uses GFP_KERNEL.
-> + * Return: 0 or an error.
-> + */
-> +int sock_create_kern(struct net *net, int family, int type, int protocol,
-> +		     struct socket **res)
-> +{
-> +	int ret;
-> +
-> +	DEBUG_NET_WARN_ON_ONCE(!net_initialized(net));
-> +
-> +	ret = __sock_create(net, family, type, protocol, res, 1);
-> +	if (!ret)
+> -	err = __sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
+> +	err = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP, &sf);
+>  	if (err)
+>  		return err;
+>  
+> @@ -1770,11 +1770,6 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+>  	/* the newly created socket has to be in the same cgroup as its parent */
+>  	mptcp_attach_cgroup(sk, sf->sk);
+>  
+> -	/* kernel sockets do not by default acquire net ref, but TCP timer
+> -	 * needs it.
+> -	 * Update ns_tracker to current stack trace and refcounted tracker.
+> -	 */
+> -	sk_net_refcnt_upgrade(sf->sk);
+>  	err = tcp_set_ulp(sf->sk, "mptcp");
+>  	if (err)
+>  		goto err_free;
+For the changes in MPTCP:
 
-A small suggestion if you have to send a v2: when quickly reading the
-code, I find it easy to interpret the code above as: "in case of error
-with __sock_create(), the refcnt is upgraded" . It might be clearer to
-simply rename "ret" to "err" or use "(ret < 0)".
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  # net/mptcp
 
-Up to you, a small detail for those who didn't directly realise what
-"ret" is :)
+(...)
 
-> +		sk_net_refcnt_upgrade((*res)->sk);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(sock_create_kern);
-> +
->  static struct socket *__sys_socket_create(int family, int type, int protocol)
->  {
->  	struct socket *sock;
+(and thanks to Paolo for the Cc :) )
+
 Cheers,
 Matt
 -- 
