@@ -1,226 +1,577 @@
-Return-Path: <netdev+bounces-192620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097CFAC0888
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:22:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39741AC08AF
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:30:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3C0A16CF63
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 730511BA593E
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461B3268C55;
-	Thu, 22 May 2025 09:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O3QhSCJj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E98267F5D;
+	Thu, 22 May 2025 09:29:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC4A264610;
-	Thu, 22 May 2025 09:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DBF70814
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 09:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747905741; cv=none; b=myhh6Ee4Bl8RfU0zLm1UZ9h6sfEBh86v+vG73aU9AxefBtKlbp6Yld2MaMLUS4qsBZQODh41EykJKfZMdjkeqxjuYrmIBVl/IINx3aKi3ntsGFFXAAWzFi3YKMFVvDMPgkAOjHBudxAluDral6Qn+IPOSj9YSPqpaBe85Ne89A8=
+	t=1747906198; cv=none; b=ROowHgAcZud9FtQoqyPReEmQGSyR9Hv9T9Ku/qLLZXDH63bWoPzWMtn2tyq41t/JzC52CJq47tUU6Fk+YoRTA1e583RiqBSgjX2Q9rAlLrdJKHOK6mbl2PlVAHraVPn2qoSlhVSUtmrgAsXRnCBRtl3G3z/AogvywXFh29u848I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747905741; c=relaxed/simple;
-	bh=Kc587A2Fx0EyjRROTIYd15K32+Jcj2thHWlVFSezv/c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lQ054jk0pVeZYcLIKKUhEL5ZMyKqRaeP7bzwjVjuHjaHH0IwvbgQ2HCX9BhPhVJzY7R+pkGEhb2DdBt6265Ei/F6cjFqXyChnFHSxajTKMWHFlr82lKJ8p7hT+aeumkXcXTcMoFDNfx9PnWOXCRYUqFBvbeaZo3fjDrZ1L+7PMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O3QhSCJj; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M6WIam008628;
-	Thu, 22 May 2025 02:21:54 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=AS/TcJ7cmLOB+ZLmbKmU5Cdjf
-	txToHQTNxnfSnqjuYU=; b=O3QhSCJj1X6rN0dXTOhnK/4OXLWxI1YM8TOqpoEV6
-	OStTP0JVX+jbKAbaZXVAtTmgonIFBMStQxXxmp6vHNYbaYWRT1/x9BXkc9I5FPLZ
-	OWB5HnGj9bkxizx8DMg72vE4uZtXQCNMLtw8lLal+9zPp/Hk8OyQglAEhg77liJg
-	xybsf20G5V0RWq1Bbn4o1W/tqPdJDcfVFbQeLPpuN7UhKjW2JXOVI57OFxWV1nA+
-	pJpVGYAcaF03tWigNG88iUkgcmCQoSaesASICOhAZZsaXGWq0dn1pdKFV/BF+kP/
-	wQU4AYHc3Ne+bPji8+bCMZPUQ6A8H89xm4pfSYMuWg4Fg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46sxr1g98m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 02:21:54 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 22 May 2025 02:21:52 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 22 May 2025 02:21:52 -0700
-Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id E30D95B694B;
-	Thu, 22 May 2025 02:21:45 -0700 (PDT)
-Date: Thu, 22 May 2025 14:51:44 +0530
-From: Tanmay Jagdale <tanmay@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
-        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <bbhushan2@marvell.com>, <bhelgaas@google.com>,
-        <pstanner@redhat.com>, <gregkh@linuxfoundation.org>,
-        <peterz@infradead.org>, <linux@treblig.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <gcherian@marvell.com>
-Subject: Re: [net-next PATCH v1 09/15] octeontx2-pf: ipsec: Allocate Ingress
- SA table
-Message-ID: <aC7sqDaHtFk-K8oV@optiplex>
-References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-10-tanmay@marvell.com>
- <20250507125625.GD3339421@horms.kernel.org>
+	s=arc-20240116; t=1747906198; c=relaxed/simple;
+	bh=IgJS/CW5D3saR5ixa29J1GhVTdlLoZnxPxHSV44nzrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T1fhqwCI5LDpmO3oIud5TjOzKV1K2MBP0h2+2IJsgB2vJEId2EIjDgYQK3nO7IQqcQUzgxwXGt/C8kriWb7QCUC2pQW9bUWFmZgvt3zbJAwrPXhm9caIdY+9nlqSKmy3QuOOzzsWkkHnSXxrzGuPPAdYWWaJyXUm6NeYxXYokuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uI2FD-0000kN-Hu; Thu, 22 May 2025 11:29:43 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uI2FC-000iCb-03;
+	Thu, 22 May 2025 11:29:42 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uI2FB-002ip5-2n;
+	Thu, 22 May 2025 11:29:41 +0200
+Date: Thu, 22 May 2025 11:29:41 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Piotr Kubik <piotr.kubik@adtran.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 2/2] net: pse-pd: Add Si3474 PSE controller
+ driver
+Message-ID: <aC7uhSMJG_VHtSCB@pengutronix.de>
+References: <f975f23e-84a7-48e6-a2b2-18ceb9148675@adtran.com>
+ <584b7975-1544-4833-8f8a-00a8769a80c2@adtran.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250507125625.GD3339421@horms.kernel.org>
-X-Proofpoint-GUID: qij0y2j8xFsmT6GCTGwSUZXIJy9bAk9m
-X-Proofpoint-ORIG-GUID: qij0y2j8xFsmT6GCTGwSUZXIJy9bAk9m
-X-Authority-Analysis: v=2.4 cv=LYU86ifi c=1 sm=1 tr=0 ts=682eecb2 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=XLaGVqOJLA6SmLViI-gA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDA5MyBTYWx0ZWRfXxwG0E6W2G08s t1nrin2JKqnMo0/zDITFhUbGg09HIMRJJo/9LcRywlb4W1GGR3AHC/AJkvu9rmDfRL30WxtwY7i jv65ixHET2bYk4xZjcPOaDgcyGUHi/SiH1aV9lKY0nm3nc8jYE7p3fw4nFIQL5npDKwItSpOm07
- 9/v5kQDa23LWFV5cma+ugqHL5n57ij5NlNC7nTsWA0KZZsnUpNP1wO6vV11jaCtbEBVIhjrv8Fz FhGPE1K7rMti30KoZ2z0Ci+fPwHvl08wIeATHFDv9Q7Xm4qE66fbNf9hGOSEi9u8EX3goArb7yC jqG06th2R24kbHeZkOOJ4dgpCbNPliPlK00f7Z/PcSwwlrAOZzk9xLhjnqkt3eEX2DyBH5TsSoc
- LNYMWW1l5sBAVa+lw4IGv6Rdk8oZzN4rT+ix4BfdB+7t/yVw/Bd9O+m79B0Jkqy31wNNhPVE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_04,2025-05-22_01,2025-03-28_01
+In-Reply-To: <584b7975-1544-4833-8f8a-00a8769a80c2@adtran.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Simon,
+Hi Piotr,
 
-On 2025-05-07 at 18:26:25, Simon Horman (horms@kernel.org) wrote:
-> On Fri, May 02, 2025 at 06:49:50PM +0530, Tanmay Jagdale wrote:
-> > Every NIX LF has the facility to maintain a contiguous SA table that
-> > is used by NIX RX to find the exact SA context pointer associated with
-> > a particular flow. Allocate a 128-entry SA table where each entry is of
-> > 2048 bytes which is enough to hold the complete inbound SA context.
-> > 
-> > Add the structure definitions for SA context (cn10k_rx_sa_s) and
-> > SA bookkeeping information (ctx_inb_ctx_info).
-> > 
-> > Also, initialize the inb_sw_ctx_list to track all the SA's and their
-> > associated NPC rules and hash table related data.
-> > 
-> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-> 
-> ...
-> 
-> > @@ -146,6 +169,76 @@ struct cn10k_tx_sa_s {
-> >  	u64 hw_ctx[6];		/* W31 - W36 */
-> >  };
-> >  
-> > +struct cn10k_rx_sa_s {
-> > +	u64 inb_ar_win_sz	: 3; /* W0 */
-> > +	u64 hard_life_dec	: 1;
-> > +	u64 soft_life_dec	: 1;
-> > +	u64 count_glb_octets	: 1;
-> > +	u64 count_glb_pkts	: 1;
-> > +	u64 count_mib_bytes	: 1;
-> > +	u64 count_mib_pkts	: 1;
-> > +	u64 hw_ctx_off		: 7;
-> > +	u64 ctx_id		: 16;
-> > +	u64 orig_pkt_fabs	: 1;
-> > +	u64 orig_pkt_free	: 1;
-> > +	u64 pkind		: 6;
-> > +	u64 rsvd_w0_40		: 1;
-> > +	u64 eth_ovrwr		: 1;
-> > +	u64 pkt_output		: 2;
-> > +	u64 pkt_format		: 1;
-> > +	u64 defrag_opt		: 2;
-> > +	u64 x2p_dst		: 1;
-> > +	u64 ctx_push_size	: 7;
-> > +	u64 rsvd_w0_55		: 1;
-> > +	u64 ctx_hdr_size	: 2;
-> > +	u64 aop_valid		: 1;
-> > +	u64 rsvd_w0_59		: 1;
-> > +	u64 ctx_size		: 4;
-> > +
-> > +	u64 rsvd_w1_31_0	: 32; /* W1 */
-> > +	u64 cookie		: 32;
-> > +
-> > +	u64 sa_valid		: 1; /* W2 Control Word */
-> > +	u64 sa_dir		: 1;
-> > +	u64 rsvd_w2_2_3		: 2;
-> > +	u64 ipsec_mode		: 1;
-> > +	u64 ipsec_protocol	: 1;
-> > +	u64 aes_key_len		: 2;
-> > +	u64 enc_type		: 3;
-> > +	u64 life_unit		: 1;
-> > +	u64 auth_type		: 4;
-> > +	u64 encap_type		: 2;
-> > +	u64 et_ovrwr_ddr_en	: 1;
-> > +	u64 esn_en		: 1;
-> > +	u64 tport_l4_incr_csum	: 1;
-> > +	u64 iphdr_verify	: 2;
-> > +	u64 udp_ports_verify	: 1;
-> > +	u64 l2_l3_hdr_on_error	: 1;
-> > +	u64 rsvd_w25_31		: 7;
-> > +	u64 spi			: 32;
-> 
-> As I understand it, this driver is only intended to run on arm64 systems.
-> While it is also possible, with COMPILE_TEST test, to compile the driver
-> on for 64-bit systems.
-Yes, this driver works only on Marvell CN10K SoC. I have COMPILE_TESTed
-on x86 and ARM64 platforms.
+here are some comments.
 
+On Fri, May 16, 2025 at 01:07:18PM +0000, Piotr Kubik wrote:
+> From: Piotr Kubik <piotr.kubik@adtran.com>
 > 
-> So, given the first point above, this may be moot. But the above
-> assumes that the byte order of the host is the same as the device.
-> Or perhaps more to the point, it has been written for a little-endian
-> host and the device is expecting the data in that byte order.
+> Add a driver for the Skyworks Si3474 I2C Power Sourcing Equipment
+> controller.
 > 
-> But u64 is supposed to represent host byte order.  And, in my understanding
-> of things, this is the kind of problem that FIELD_PREP and FIELD_GET are
-> intended to avoid, when combined on endian-specific integer types (in this
-> case __le64 seems appropriate).
+> Based on the TPS23881 driver code.
 > 
-> I do hesitate in bringing this up, as the above very likely works on
-> all systems on which this code is intended to run. But I do so
-> because it is not correct on all systems for which this code can be
-> compiled. And thus seems somehow misleading.
-Okay. Are you referring to a case where we compile on BE machine
-and then run on LE platform?
+> Driver supports basic features of Si3474 IC:
+> - get port status,
+> - get port power,
+> - get port voltage,
+> - enable/disable port power.
+> 
+> Only 4p configurations are supported at this moment.
+> 
+> Signed-off-by: Piotr Kubik <piotr.kubik@adtran.com>
+> ---
+>  drivers/net/pse-pd/Kconfig  |  10 +
+>  drivers/net/pse-pd/Makefile |   1 +
+>  drivers/net/pse-pd/si3474.c | 649 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 660 insertions(+)
+>  create mode 100644 drivers/net/pse-pd/si3474.c
+> 
+> diff --git a/drivers/net/pse-pd/Kconfig b/drivers/net/pse-pd/Kconfig
+> index 7fab916a7f46..d1b100eb8c52 100644
+> --- a/drivers/net/pse-pd/Kconfig
+> +++ b/drivers/net/pse-pd/Kconfig
+> @@ -32,6 +32,16 @@ config PSE_PD692X0
+>  	  To compile this driver as a module, choose M here: the
+>  	  module will be called pd692x0.
+>  
+> +config PSE_SI3474
+> +	tristate "Si3474 PSE controller"
+> +	depends on I2C
+> +	help
+> +	  This module provides support for Si3474 regulator based Ethernet
+> +	  Power Sourcing Equipment.
 
-With Regards,
-Tanmay
+Will be good to add here current limitation, that is supports only
+4-pair mode.
+
+> +static int si3474_pi_get_admin_state(struct pse_controller_dev *pcdev, int id,
+> +				     struct pse_admin_state *admin_state)
+> +{
+> +	struct si3474_priv *priv = to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	bool is_enabled = false;
+> +	u8 chan0, chan1;
+> +	s32 ret;
+> +
+> +	if (id >= SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	chan0 = priv->pi[id].chan[0];
+> +	chan1 = priv->pi[id].chan[1];
+> +
+> +	if (chan0 < 4)
+> +		client = priv->client[0];
+> +	else
+> +		client = priv->client[1];
+> +
+> +	ret = i2c_smbus_read_byte_data(client, PORT_MODE_REG);
+
+There are repeating patterns in client and channel calculation.
+Some of them can be uput in a separate function.
+
+> +	if (ret < 0) {
+> +		admin_state->c33_admin_state =
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN;
+> +		return ret;
+> +	}
+> +
+> +	is_enabled = ((ret & (0x03 << (2 * (chan0 % 4)))) |
+> +		      (ret & (0x03 << (2 * (chan1 % 4))))) != 0;
+
+Please replace magic numbers with defines.
+
+> +
+> +	if (is_enabled)
+> +		admin_state->c33_admin_state =
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED;
+> +	else
+> +		admin_state->c33_admin_state =
+> +			ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED;
+> +
+> +	return 0;
+> +}
+> +
+> +static int si3474_pi_get_pw_status(struct pse_controller_dev *pcdev, int id,
+> +				   struct pse_pw_status *pw_status)
+> +{
+> +	struct si3474_priv *priv = to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	bool delivering = false;
+> +	u8 chan0, chan1;
+> +	s32 ret;
+> +
+> +	if (id >= SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	chan0 = priv->pi[id].chan[0];
+> +	chan1 = priv->pi[id].chan[1];
+> +
+> +	if (chan0 < 4)
+> +		client = priv->client[0];
+> +	else
+> +		client = priv->client[1];
+> +
+> +	ret = i2c_smbus_read_byte_data(client, POWER_STATUS_REG);
+> +	if (ret < 0) {
+> +		pw_status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN;
+> +		return ret;
+> +	}
+> +
+> +	delivering = (ret & (BIT((chan0 % 4) + 4) | BIT((chan1 % 4) + 4))) != 0;
+> +
+> +	if (delivering)
+> +		pw_status->c33_pw_status =
+> +			ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING;
+> +	else
+> +		pw_status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED;
+> +
+> +	return 0;
+> +}
+> +
+> +/* Parse pse-pis subnode into chan array of si3474_priv */
+> +static int si3474_get_of_channels(struct si3474_priv *priv)
+> +{
+> +	struct device_node *pse_node;
+> +	struct pse_pi *pi;
+> +	u32 pi_no, chan_id;
+> +	s8 pairset_cnt;
+> +	s32 ret = 0;
+> +
+> +	pse_node = of_get_child_by_name(priv->np, "pse-pis");
+> +	if (!pse_node) {
+> +		dev_warn(&priv->client[0]->dev,
+> +			 "Unable to parse DT PSE power interface matrix, no pse-pis node\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	for_each_child_of_node_scoped(pse_node, node) {
+> +		if (!of_node_name_eq(node, "pse-pi"))
+> +			continue;
+> +
+> +		ret = of_property_read_u32(node, "reg", &pi_no);
+> +		if (ret) {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Failed to read pse-pi reg property\n");
+> +			goto out;
+> +		}
+> +		if (pi_no >= SI3474_MAX_CHANS) {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Invalid power interface number %u\n", pi_no);
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		pairset_cnt = of_property_count_elems_of_size(node, "pairsets",
+> +							      sizeof(u32));
+> +		if (!pairset_cnt) {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Failed to get pairsets property\n");
+> +			goto out;
+> +		}
+> +
+> +		pi = &priv->pcdev.pi[pi_no];
+> +		if (!pi->pairset[0].np) {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Missing pairset reference, power interface: %u\n",
+> +				pi_no);
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		ret = of_property_read_u32(pi->pairset[0].np, "reg", &chan_id);
+> +		if (ret) {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Failed to read channel reg property, ret:%d\n",
+> +				ret);
+> +			goto out;
+> +		}
+> +		priv->pi[pi_no].chan[0] = chan_id;
+
+should we validated chan_id?
+
+
+> +		priv->pi[pi_no].is_4p = FALSE;
+
+Please use lower case variant (false/true).
+
+> +
+> +		if (pairset_cnt == 2) {
+> +			if (!pi->pairset[1].np) {
+> +				dev_err(&priv->client[0]->dev,
+> +					"Missing pairset reference, power interface: %u\n",
+> +					pi_no);
+> +				ret = -EINVAL;
+> +				goto out;
+> +			}
+> +
+> +			ret = of_property_read_u32(pi->pairset[1].np, "reg",
+> +						   &chan_id);
+> +			if (ret) {
+> +				dev_err(&priv->client[0]->dev,
+> +					"Failed to read channel reg property\n");
+> +				goto out;
+> +			}
+> +			priv->pi[pi_no].chan[1] = chan_id;
+
+same here
+
+> +			priv->pi[pi_no].is_4p = TRUE;
+> +		} else {
+> +			dev_err(&priv->client[0]->dev,
+> +				"Number of pairsets incorrect - only 4p configurations supported\n");
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +out:
+> +	of_node_put(pse_node);
+> +	return ret;
+> +}
+> +
+...
+
+> +static int si3474_pi_get_chan_current(struct si3474_priv *priv, u8 chan)
+> +{
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 reg;
+> +	u64 tmp_64;
+> +
+> +	if (chan < 4)
+> +		client = priv->client[0];
+> +	else
+> +		client = priv->client[1];
+> +
+> +	/* Registers 0x30 to 0x3d */
+> +	reg = PORT1_CURRENT_LSB_REG + (chan % 4) * 4;
+
+Do this values are valid channels is not enabled and/or not delivering? 
+
+> +	ret = i2c_smbus_read_word_data(client, reg);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	tmp_64 = ret * SI3474_NA_STEP;
+> +
+> +	/* uA = nA / 1000 */
+> +	tmp_64 = DIV_ROUND_CLOSEST_ULL(tmp_64, 1000);
+> +	return (int)tmp_64;
+> +}
+> +
+> +static int si3474_pi_get_chan_voltage(struct si3474_priv *priv, u8 chan)
+> +{
+> +	struct i2c_client *client;
+> +	s32 ret;
+> +	u8 reg;
+> +	u32 val;
+> +
+> +	if (chan < 4)
+> +		client = priv->client[0];
+> +	else
+> +		client = priv->client[1];
+> +
+> +	/* Registers 0x32 to 0x3f */
+> +	reg = PORT1_VOLTAGE_LSB_REG + (chan % 4) * 4;
+> +
+> +	ret = i2c_smbus_read_word_data(client, reg);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	val = ret * SI3474_UV_STEP;
+> +
+> +	return (int)val;
+> +}
+> +
+> +static int si3474_pi_get_voltage(struct pse_controller_dev *pcdev, int id)
+> +{
+> +	struct si3474_priv *priv = to_si3474_priv(pcdev);
+> +	struct i2c_client *client;
+> +	u8 chan0, chan1;
+> +	s32 ret;
+> +
+> +	chan0 = priv->pi[id].chan[0];
+> +	chan1 = priv->pi[id].chan[1];
+> +
+> +	if (chan0 < 4)
+> +		client = priv->client[0];
+> +	else
+> +		client = priv->client[1];
+> +
+> +	/* Check which channels are enabled*/
+> +	ret = i2c_smbus_read_byte_data(client, POWER_STATUS_REG);
+> +	if (ret < 0)
+> +		return ret;
+
+Do voltage values are valide if channel is enabled by not delivering?
+
+> +	/* Take voltage from the first enabled channel */
+> +	if (ret & BIT(chan0 % 4))
+> +		ret = si3474_pi_get_chan_voltage(priv, chan0);
+> +	else if (ret & BIT(chan1))
+
+should it be (chan1 % 4) ?
+
+> +		ret = si3474_pi_get_chan_voltage(priv, chan1);
+> +	else
+> +		/* 'should' be no voltage in this case */
+> +		return 0;
+> +
+> +	return ret;
+> +}
+> +
+> +static int si3474_pi_get_actual_pw(struct pse_controller_dev *pcdev, int id)
+> +{
+> +	struct si3474_priv *priv = to_si3474_priv(pcdev);
+> +	s32 ret;
+> +	u32 uV, uA;
+> +	u64 tmp_64;
+> +	u8 chan0, chan1;
+> +
+> +	if (id >= SI3474_MAX_CHANS)
+> +		return -ERANGE;
+> +
+> +	ret = si3474_pi_get_voltage(&priv->pcdev, id);
+> +	if (ret < 0)
+> +		return ret;
+> +	uV = ret;
+> +
+> +	chan0 = priv->pi[id].chan[0];
+> +	chan1 = priv->pi[id].chan[1];
+> +
+> +	ret = si3474_pi_get_chan_current(priv, chan0);
+> +	if (ret < 0)
+> +		return ret;
+> +	uA = ret;
+> +
+> +	ret = si3474_pi_get_chan_current(priv, chan1);
+> +	if (ret < 0)
+> +		return ret;
+> +	uA += ret;
+> +
+> +	tmp_64 = uV;
+> +	tmp_64 *= uA;
+> +	/* mW = uV * uA / 1000000000 */
+> +	return DIV_ROUND_CLOSEST_ULL(tmp_64, 1000000000);
+> +}
+> +
+> +static const struct pse_controller_ops si3474_ops = {
+> +	.setup_pi_matrix = si3474_setup_pi_matrix,
+> +	.pi_enable = si3474_pi_enable,
+> +	.pi_disable = si3474_pi_disable,
+> +	.pi_get_actual_pw = si3474_pi_get_actual_pw,
+> +	.pi_get_voltage = si3474_pi_get_voltage,
+> +	.pi_get_admin_state = si3474_pi_get_admin_state,
+> +	.pi_get_pw_status = si3474_pi_get_pw_status,
+> +};
+> +
+> +static void si3474_ancillary_i2c_remove(void *data)
+> +{
+> +	struct i2c_client *client = data;
+> +
+> +	i2c_unregister_device(client);
+> +}
+> +
+> +static int si3474_i2c_probe(struct i2c_client *client)
+> +{
+> +	struct device *dev = &client->dev;
+> +	struct si3474_priv *priv;
+> +	s32 ret;
+> +	u8 fw_version;
+> +
+> +	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+> +		dev_err(dev, "i2c check functionality failed\n");
+> +		return -ENXIO;
+> +	}
+> +
+> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return -ENOMEM;
+> +
+> +	ret = i2c_smbus_read_byte_data(client, VENDOR_IC_ID_REG);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (ret != SI3474_DEVICE_ID) {
+> +		dev_err(dev, "Wrong device ID: 0x%x\n", ret);
+> +		return -ENXIO;
+> +	}
+> +
+> +	ret = i2c_smbus_read_byte_data(client, FIRMWARE_REVISION_REG);
+> +	if (ret < 0)
+> +		return ret;
+> +	fw_version = ret;
+> +
+> +	ret = i2c_smbus_read_byte_data(client, CHIP_REVISION_REG);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	dev_dbg(dev, "Chip revision: 0x%x, firmware version: 0x%x\n",
+> +		ret, fw_version);
+> +
+> +	priv->client[0] = client;
+> +	i2c_set_clientdata(client, priv);
+> +
+> +	priv->client[1] = i2c_new_ancillary_device(priv->client[0], "secondary",
+> +						   priv->client[0]->addr + 1);
+> +	if (IS_ERR(priv->client[1]))
+> +		return PTR_ERR(priv->client[1]);
+> +
+> +	ret = devm_add_action_or_reset(dev, si3474_ancillary_i2c_remove, priv->client[1]);
+> +	if (ret < 0) {
+> +		dev_err(&priv->client[1]->dev, "Cannot register remove callback\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = i2c_smbus_read_byte_data(priv->client[1], VENDOR_IC_ID_REG);
+> +	if (ret < 0) {
+> +		dev_err(&priv->client[1]->dev, "Cannot access secondary PSE controller\n");
+> +		return ret;
+> +	}
+> +
+> +	if (ret != SI3474_DEVICE_ID) {
+> +		dev_err(&priv->client[1]->dev,
+> +			"Wrong device ID for secondary PSE controller: 0x%x\n", ret);
+> +		return -ENXIO;
+> +	}
+> +
+> +	priv->np = dev->of_node;
+> +	priv->pcdev.owner = THIS_MODULE;
+> +	priv->pcdev.ops = &si3474_ops;
+> +	priv->pcdev.dev = dev;
+> +	priv->pcdev.types = ETHTOOL_PSE_C33;
+> +	priv->pcdev.nr_lines = SI3474_MAX_CHANS;
+
+Do we actually have SI3474_MAX_CHANS (8 channels) in 4p mode? I guess it
+will be 4.
+
+> +
+> +	ret = devm_pse_controller_register(dev, &priv->pcdev);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to register PSE controller: 0x%x\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct i2c_device_id si3474_id[] = {
+> +	{ "si3474" },
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(i2c, si3474_id);
+> +
+> +static const struct of_device_id si3474_of_match[] = {
+> +	{
+> +		.compatible = "skyworks,si3474",
+> +	},
+> +	{},
+> +};
+> +MODULE_DEVICE_TABLE(of, si3474_of_match);
+> +
+> +static struct i2c_driver si3474_driver = {
+> +	.probe = si3474_i2c_probe,
+> +	.id_table = si3474_id,
+> +	.driver = {
+> +		.name = "si3474",
+> +		.of_match_table = si3474_of_match,
+> +	},
+> +};
+> +module_i2c_driver(si3474_driver);
+> +
+> +MODULE_AUTHOR("Piotr Kubik <piotr.kubik@adtran.com>");
+> +MODULE_DESCRIPTION("Skyworks Si3474 PoE PSE Controller driver");
+> +MODULE_LICENSE("GPL");
+> -- 
+> 2.43.0
 > 
-> > +
-> > +	u64 w3;			/* W3 */
-> > +
-> > +	u8 cipher_key[32];	/* W4 - W7 */
-> > +	u32 rsvd_w8_0_31;	/* W8 : IV */
-> > +	u32 iv_gcm_salt;
-> > +	u64 rsvd_w9;		/* W9 */
-> > +	u64 rsvd_w10;		/* W10 : UDP Encap */
-> > +	u32 dest_ipaddr;	/* W11 - Tunnel mode: outer src and dest ipaddr */
-> > +	u32 src_ipaddr;
-> > +	u64 rsvd_w12_w30[19];	/* W12 - W30 */
-> > +
-> > +	u64 ar_base;		/* W31 */
-> > +	u64 ar_valid_mask;	/* W32 */
-> > +	u64 hard_sa_life;	/* W33 */
-> > +	u64 soft_sa_life;	/* W34 */
-> > +	u64 mib_octs;		/* W35 */
-> > +	u64 mib_pkts;		/* W36 */
-> > +	u64 ar_winbits;		/* W37 */
-> > +
-> > +	u64 rsvd_w38_w100[63];
-> > +};
-> > +
-> >  /* CPT instruction parameter-1 */
-> >  #define CN10K_IPSEC_INST_PARAM1_DIS_L4_CSUM		0x1
-> >  #define CN10K_IPSEC_INST_PARAM1_DIS_L3_CSUM		0x2
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
