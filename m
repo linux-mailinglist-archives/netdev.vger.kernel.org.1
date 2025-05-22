@@ -1,58 +1,55 @@
-Return-Path: <netdev+bounces-192515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665CEAC0305
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:35:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EECEAC0315
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 05:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287F31697B6
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:35:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C9641BA76A1
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEA3126BF7;
-	Thu, 22 May 2025 03:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1115578F4A;
+	Thu, 22 May 2025 03:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQ3vN6jx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OC8Nocn6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AE17E105;
-	Thu, 22 May 2025 03:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9208F9DA;
+	Thu, 22 May 2025 03:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747884950; cv=none; b=O7miSKUeX2jNLWIcm7yNLKorWFK0fgJgGOLuLnflyIPFZyYlwU9wQBHFww+1H04rTLdwWjKBvwtwQKqvr80idcVT22u7I8zffgt1edQPd8ZbF601RqwAGhtQ/f7IQi79jsjxr3Tk/BbPeRG4U4sC27pzQlFEe28dHq5NvwndpJ8=
+	t=1747885276; cv=none; b=nJnMHiEY41djGJPW2f7Olmvjr7BwX17PXRj8JeyQAXBxJTNJ6gEyu5b6y1GI+hjDxRxFSG5Nwa15h1HMYETV97/8mxzfyKMj3Je4sTXU6gnntDAuPqbE2aJ/SgUeq7miePDdmnsPNS+n1n+7MDrWzdcgON+WUklQrNmjOqsPF54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747884950; c=relaxed/simple;
-	bh=t2WGCOd+hZ3e1e76kH6PXBbgHX6CUfiBmh6jxHitVm4=;
+	s=arc-20240116; t=1747885276; c=relaxed/simple;
+	bh=hpje0d0hKUxLnhR5mVdZtV+IkwxSK8YLSTLyOoJXO+8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P/AmaGlsMBxNAVQSP7VX5z5gvNFot0rglVLnIVd5jPRfjtpRoT68k8yjAANqU55XKqv/voUbfbiiKcQaXR9am4qI4EuRkkHCU2fuSocHmr8No+Yc4CdwUZau5FPwAbFnM+YFA5ueRXc4RpW0BnDsfusEy2OpUWKAfYI7K4/BC1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQ3vN6jx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1579CC4CEE4;
-	Thu, 22 May 2025 03:35:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nkZnLOzuGvIzMI1ACcJGDM4ZVUltkAJv4FdG4EI954J/CyVjnfstGKSLgDkvWyRmix5PTt9BVXEsOZ9sh2/oojwy8SzT3DzZ3NvM/zc43lJbvj3DbgoJJXbPfusW6h3mQnlvh/cPqDoviXxJHpHg/CCB+dr66ODjwqCeY93P/eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OC8Nocn6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4A98C4CEE4;
+	Thu, 22 May 2025 03:41:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747884949;
-	bh=t2WGCOd+hZ3e1e76kH6PXBbgHX6CUfiBmh6jxHitVm4=;
+	s=k20201202; t=1747885276;
+	bh=hpje0d0hKUxLnhR5mVdZtV+IkwxSK8YLSTLyOoJXO+8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jQ3vN6jxqQzqLTqnwLvTI+oH4E08h7x/40eJWHsNSHnwuXSOtWi/NDOkJRQr1GdyQ
-	 lL/4esU1w+nmuTejPGu9F6+bzhoLwXVWw62UM5UEJ+3F6U68DhswYBFfmzlD1mCxNL
-	 BVgyyiAsuHUusX+0H5eJiBXUDxUIgGT5gLHTfkkrthccV5/T3+dqGznbhbO5s8W2Ns
-	 1cFKCPhHSX9RZBJmm/UnFliyaxRoktsd/CVlRoUovGiCDHRO6hqYkuKsTUZ4NwVwZU
-	 tYtCE+0r6ATKLtID9ecTGxFE4+M7BidePaufUjpr9ne8YFroWQVw+TQ9w3ulANiGDY
-	 IK1d4kxj8fZQQ==
-Date: Wed, 21 May 2025 20:35:47 -0700
+	b=OC8Nocn60ELqbs4vEw9ZXZq/Nte3ONo7sUTcbE38zltOjVRu3BjRWkPERlG6rCt2B
+	 2zB1IR3k/voZ+mwZmUDb6RS/USRgRU8lETAytd+F+sTSyzoGsM3eczcXQy4ciBQd9E
+	 OSlXuQm7IM1lyhHjLvDlMETzUYpg38QVF6fMXZjGR9qvHsvWqJhDDyB9YAh+j4kHde
+	 y6fNyflCED4oDJRhFOkEMRsASRc9eECLII0GkETiUFBlhBGY18RATXCO+PW6DQzmtb
+	 RBjXpFHW1EFoCotT69zaIujimTE1odzPOP2kW8EjoxAxcW1gMeGx1qO9QVpLZ1Gmr+
+	 XRRRewlc5AkeQ==
+Date: Wed, 21 May 2025 20:41:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v1 1/1] queue_api: add subqueue variant
- netif_subqueue_sent
-Message-ID: <20250521203547.43d73e5a@kernel.org>
-In-Reply-To: <f59625ada94078ffc14f90a7ed6d4df344dc9cb2.1747824040.git.gur.stavi@huawei.com>
-References: <cover.1747824040.git.gur.stavi@huawei.com>
-	<f59625ada94078ffc14f90a7ed6d4df344dc9cb2.1747824040.git.gur.stavi@huawei.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org,
+ kernel@pengutronix.de
+Subject: Re: [PATCH net 0/n] pull-request: can 2025-05-21
+Message-ID: <20250521204114.1d131ff9@kernel.org>
+In-Reply-To: <20250521082239.341080-2-mkl@pengutronix.de>
+References: <20250521082239.341080-2-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,20 +59,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 21 May 2025 14:06:12 +0300 Gur Stavi wrote:
-> Add a new macro, netif_subqueue_sent, which is a wrapper for
-> netdev_tx_sent_queue.
-> 
-> Drivers that use the subqueue variant macros, netif_subqueue_xxx,
-> identify queue by index and are not required to obtain
-> struct netdev_queue explicitly.
-> 
-> Such drivers still need to call netdev_tx_sent_queue which is a
-> counterpart of netif_subqueue_completed_wake. Allowing drivers to use a
-> subqueue variant for this purpose improves their code consistency by
-> always referring to queue by its index.
+On Wed, 21 May 2025 10:14:24 +0200 Marc Kleine-Budde wrote:
+> Subject: [PATCH net 0/n] pull-request: can 2025-05-21
 
-You need to post it with a user in the same series.
--- 
-pw-bot: cr
+Looks like the 0/n confused patchwork and it couldn't do our build
+testing. Given that we're targeting the final release I'd rather
+not risk merging this without a full run thru our builds.
+Could you respin? Not sure it will make tomorrow's PR but then again
+I don't think anything here is super critical for 6.15 final?
+
+Sorry for not noticing earlier.
 
