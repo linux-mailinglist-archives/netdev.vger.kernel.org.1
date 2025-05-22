@@ -1,81 +1,84 @@
-Return-Path: <netdev+bounces-192656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6855DAC0B06
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:02:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB964AC0B9A
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 970E13AC188
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:02:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBA3F1BC5548
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2030B28A1D3;
-	Thu, 22 May 2025 12:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AE328AB12;
+	Thu, 22 May 2025 12:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKWf7UZr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TF+AWf/a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2711DF965;
-	Thu, 22 May 2025 12:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A256E28B41A
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 12:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747915357; cv=none; b=E4WBoE9xMv0itVC0gE/FQ/wjwfT7IiTn21PUSJyz75qlahLrEKsGRY5otmAi9fFBhs2kY4mZB6quOwivag7IPZhfrq9ZsNf8QnE3LsfFKZir8gi2Kco24T6UDgjwXGfgdJnXlliidk2FX3Hw0E9CWeITvr1gOcRAxdtNewM5R88=
+	t=1747917013; cv=none; b=lhSOrIEgh6Ug5nTrppNdf4yRtwXVhY0jNXhgFOd4BMGBV8cNePrdKbCiXwChu3pWxCIQ3r9CSRaaMviGJMiOkaOZ/0oUat+lHiXbexoZLit9AQuxpnJrW0wsDKPB+4kFG3/elerYHgS7iveJuOYraLErmoceAU274xaQXWNPsRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747915357; c=relaxed/simple;
-	bh=3EqVS0mPt9FHYeHpJEN9TOubD2eRleBP0208eEeLR2s=;
+	s=arc-20240116; t=1747917013; c=relaxed/simple;
+	bh=Gac4+zSqOFgZP8b/FlbLVQWAbELY96H275svZbRTUFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ez5Xm7yCNPhzV6kMGu7NT1a6XZFfJeEIjJNo9GyfnfC6Jabn+n3rP56dZsOl9K4y4j/Zn/9S0w2xfM95xX7iy/XtO+RlwyqKYXvFKfqosg9AUduj9XjbbBYnuwHisCCTIQkhQY+PVstt9Neuzht+SwGG/1L6wRBfHE5leUy5Lfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKWf7UZr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DEDC4CEE4;
-	Thu, 22 May 2025 12:02:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747915356;
-	bh=3EqVS0mPt9FHYeHpJEN9TOubD2eRleBP0208eEeLR2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kKWf7UZrSMObWEDDrmj8yJWq72sycQWbfYl/ymYM0KUSgFVtxmkEpwe/FlC3P/OwE
-	 qzXFvINcYYRcrGh3W9CuA9GkAoNONfTY/SHelsuth3KzWoCR2EdwuCJsvYLMi3IaVZ
-	 MR3Fusi7rfKC+65QQby5DmodHWCKvm3jsZ/VMu6gOlU2d4S17MiZm1aMXFKJp5gYmE
-	 kJ3sMJid/uUoabCzppg6t2zcoFaMb32nRGFA9z5I5Kl9ZkybaaH14v98w1JLm9mkEC
-	 drvWNVpQBbCzawLA+U0xgnbmN+33Kvn/rpgi2Tx+aYUSksSfPObedGeRUfmpcXDFcA
-	 V6mZid1e6fccw==
-Date: Thu, 22 May 2025 13:02:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=pP3CUSVHYA+D+NnhnSyIvdxK9NpiqG+qR6A2ilatOfvktAww8nhyHQYe8vSMKeZqw93RHdXrjxHbkP5SFPT4Uy9uCY3bqbeHj/6G31nLbF/dsIgWqW856E7tHDEVZi/PkQ5pBYGqcid1JRUqO75J+k3dvaoGDdCYMNN5zZMV2yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TF+AWf/a; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=E9WXMhK4l3RlK7B2gxhPqbmwHHtvcoh/EBUmKFm+nto=; b=TF+AWf/aMigAbT67u2PubAtLfl
+	zY47zb7o8QXugAbsWGD8c8Fs05Ou/0V5sD1vpCRSuqxCWIvTmhxrzwJ6Gp47fhKBCNVm4mAz8af08
+	Q5jv48qYPPiL9QAWGzLIpVunFLbOgbHAwO9q3HwRbCwXIHsZFFzMUGfSbaG6DdKmj7kk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uI53g-00DUbU-6A; Thu, 22 May 2025 14:30:00 +0200
+Date: Thu, 22 May 2025 14:30:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Arinzon, David" <darinzon@amazon.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	KY Srinivasan <kys@microsoft.com>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	"olaf@aepfle.de" <olaf@aepfle.de>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"leon@kernel.org" <leon@kernel.org>, Long Li <longli@microsoft.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add support for
- Multi Vports on Bare metal
-Message-ID: <20250522120229.GX365796@horms.kernel.org>
-References: <1747671636-5810-1-git-send-email-haiyangz@microsoft.com>
- <20250521140231.GW365796@horms.kernel.org>
- <MN0PR21MB34373B1A0162D8452018ABAACA9EA@MN0PR21MB3437.namprd21.prod.outlook.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"Woodhouse, David" <dwmw@amazon.co.uk>,
+	"Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>,
+	"Bshara, Saeed" <saeedb@amazon.com>,
+	"Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>,
+	"Bshara, Nafea" <nafea@amazon.com>,
+	"Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"Dagan, Noam" <ndagan@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>,
+	"Allen, Neil" <shayagr@amazon.com>,
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
+	"Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH v9 net-next 5/8] net: ena: Add debugfs support to the ENA
+ driver
+Message-ID: <42091367-4dce-4c6f-8588-ffad8a66de3b@lunn.ch>
+References: <20250521114254.369-1-darinzon@amazon.com>
+ <20250521114254.369-6-darinzon@amazon.com>
+ <0754879f-5dbe-4748-8af3-0a588c90bcc0@lunn.ch>
+ <8b4dc75950b24bd6a98cb26661533f70@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,115 +87,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MN0PR21MB34373B1A0162D8452018ABAACA9EA@MN0PR21MB3437.namprd21.prod.outlook.com>
+In-Reply-To: <8b4dc75950b24bd6a98cb26661533f70@amazon.com>
 
-On Wed, May 21, 2025 at 05:28:33PM +0000, Haiyang Zhang wrote:
+On Thu, May 22, 2025 at 05:24:10AM +0000, Arinzon, David wrote:
+> > > +void ena_debugfs_init(struct net_device *dev) {
+> > > +     struct ena_adapter *adapter = netdev_priv(dev);
+> > > +
+> > > +     adapter->debugfs_base =
+> > > +             debugfs_create_dir(dev_name(&adapter->pdev->dev), NULL);
+> > > +     if (IS_ERR(adapter->debugfs_base))
+> > > +             netdev_err(dev, "Failed to create debugfs dir\n");
+> > 
+> > Don't check return codes from debugfs_ calls. It does not matter if it fails, it is
+> > just debug, and all debugfs_ calls are happy to take a NULL pointer,
+> > ERR_PTR() etc.
+> > 
+> >         Andrew
 > 
-> 
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: Wednesday, May 21, 2025 10:03 AM
-> > To: Haiyang Zhang <haiyangz@microsoft.com>
-> > Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Dexuan Cui
-> > <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
-> > <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
-> > olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
-> > wei.liu@kernel.org; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
-> > ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
-> > daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
-> > ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
-> > shradhagupta@linux.microsoft.com; andrew+netdev@lunn.ch; Konstantin
-> > Taranov <kotaranov@microsoft.com>; linux-kernel@vger.kernel.org
-> > Subject: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add support for
-> > Multi Vports on Bare metal
-> > 
-> > On Mon, May 19, 2025 at 09:20:36AM -0700, Haiyang Zhang wrote:
-> > > To support Multi Vports on Bare metal, increase the device config
-> > response
-> > > version. And, skip the register HW vport, and register filter steps,
-> > when
-> > > the Bare metal hostmode is set.
-> > >
-> > > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > > ---
-> > > v2:
-> > >   Updated comments as suggested by ALOK TIWARI.
-> > >   Fixed the version check.
-> > >
-> > > ---
-> > >  drivers/net/ethernet/microsoft/mana/mana_en.c | 24 ++++++++++++-------
-> > >  include/net/mana/mana.h                       |  4 +++-
-> > >  2 files changed, 19 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > > index 2bac6be8f6a0..9c58d9e0bbb5 100644
-> > > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > > @@ -921,7 +921,7 @@ static void mana_pf_deregister_filter(struct
-> > mana_port_context *apc)
-> > >
-> > >  static int mana_query_device_cfg(struct mana_context *ac, u32
-> > proto_major_ver,
-> > >  				 u32 proto_minor_ver, u32 proto_micro_ver,
-> > > -				 u16 *max_num_vports)
-> > > +				 u16 *max_num_vports, u8 *bm_hostmode)
-> > >  {
-> > >  	struct gdma_context *gc = ac->gdma_dev->gdma_context;
-> > >  	struct mana_query_device_cfg_resp resp = {};
-> > > @@ -932,7 +932,7 @@ static int mana_query_device_cfg(struct mana_context
-> > *ac, u32 proto_major_ver,
-> > >  	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_DEV_CONFIG,
-> > >  			     sizeof(req), sizeof(resp));
-> > >
-> > > -	req.hdr.resp.msg_version = GDMA_MESSAGE_V2;
-> > > +	req.hdr.resp.msg_version = GDMA_MESSAGE_V3;
-> > >
-> > >  	req.proto_major_ver = proto_major_ver;
-> > >  	req.proto_minor_ver = proto_minor_ver;
-> > 
-> > > @@ -956,11 +956,16 @@ static int mana_query_device_cfg(struct
-> > mana_context *ac, u32 proto_major_ver,
-> > >
-> > >  	*max_num_vports = resp.max_num_vports;
-> > >
-> > > -	if (resp.hdr.response.msg_version == GDMA_MESSAGE_V2)
-> > > +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V2)
-> > >  		gc->adapter_mtu = resp.adapter_mtu;
-> > >  	else
-> > >  		gc->adapter_mtu = ETH_FRAME_LEN;
-> > >
-> > > +	if (resp.hdr.response.msg_version >= GDMA_MESSAGE_V3)
-> > > +		*bm_hostmode = resp.bm_hostmode;
-> > > +	else
-> > > +		*bm_hostmode = 0;
-> > 
-> > Hi,
-> > 
-> > Perhaps not strictly related to this patch, but I see
-> > that mana_verify_resp_hdr() is called a few lines above.
-> > And that verifies a minimum msg_version. But I do not see
-> > any verification of the maximum msg_version supported by the code.
-> > 
-> > I am concerned about a hypothetical scenario where, say the as yet unknown
-> > version 5 is sent as the version, and the above behaviour is used, while
-> > not being correct.
-> > 
-> > Could you shed some light on this?
-> > 
-> 
-> In driver, we specify the expected reply msg version is v3 here:
-> req.hdr.resp.msg_version = GDMA_MESSAGE_V3;
-> 
-> If the HW side is upgraded, it won't send reply msg version higher
-> than expected, which may break the driver.
+> Thank you for the feedback.
+> We were looking to get a failure indication and not continue creating the rest of the nodes (patch 6/8).
 
-Thanks,
+That will automagically happen, because when you pass the ERR_PTR from
+debugfs_create_dir() to other functions, they become NOPs.
 
-If I understand things correctly the HW side will honour the
-req.hdr.resp.msg_version and thus the SW won't receive anything
-it doesn't expect. Is that right?
+If you look around, you will find bot drivers submitting patches
+removing such checks, because they are not wanted nor needed.
 
+	Andrew
 
 
