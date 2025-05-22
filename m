@@ -1,207 +1,537 @@
-Return-Path: <netdev+bounces-192807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04202AC11E4
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 19:11:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 882C3AC11F9
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 19:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A640117F9B8
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:11:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE4707AE51E
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27EDB185B48;
-	Thu, 22 May 2025 17:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFD818CC1D;
+	Thu, 22 May 2025 17:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYHddTZg"
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="SrUyXDkQ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QjqVcrmA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67371191484;
-	Thu, 22 May 2025 17:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1477617ADF8
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 17:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747933855; cv=none; b=GpCQfSZUUCdZOHEnJnF+kKjUL4kruEEQ+EGe+9wVF8TbOH/8nVUGbMapwcmjswXKjXtH4x033S4aV4NXgZ3WLxCELyLpfOY1OAPHlPFpK7mXTQy+zAetO/QxMCoznA9eYiAoknYCiOFEUGThD+BVmw8Nkz6A+CBfTW6Xy3wVDcM=
+	t=1747934400; cv=none; b=H8xPBZq78dYo1EY9eEeuEgPyANM5GoSl0kxHW84Oad+8dKfUzP4wdkUs+baRQKA0RS1OUmQKFfPZ0w6cw5EEWSoJmlLfBGARiLmuqeQBghCcbvtbP623caGkUMr1yHIctwKbh1PFiV4Osqhww2fRO1uTme3FxezFkcuhyoDI3WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747933855; c=relaxed/simple;
-	bh=e2m+mJ9Gs/nJqzSBhfaY9GTAr2JqYz/to53JIeX542s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jBS560XAizFP87d+sxcJauuKYFbj/4H3J5PJrfNqTJSNUxrEaUyaD8laewirC9DX4YLUehfXdElMoJQ6wxaVtXPySGtPJfi72V4va2+T0GKkdeeflzJVcj4vVpGwiKd2QAl9IKFausgY3eqGW0NL+8sttDwE0flS5tiW5lQG3aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYHddTZg; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4e14dd8abdaso2246257137.3;
-        Thu, 22 May 2025 10:10:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747933852; x=1748538652; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=T24kBpCJRpDRBSjC/H+JRSYfEBae8H3XSVOgeI97j2Y=;
-        b=fYHddTZgwDe260sAcbmogplbbYzeqiYyXj43gA2L+L7QFh6YRnKM8FFNKyHOkqqxdZ
-         bDlk+n/mPMw1ULxH0K0i+YHKdAUq+Q3GfsIl6FLJsMjAcA+BVyA0cXbC8JIp77EpepO2
-         d3g6NfzBW0d33LlZtbEjbPIKPRbaTTZIb6kIag8fnYxE00ar/zVlw8NgVgrg245QjCe1
-         xHWrr4PpiA/jWJTB8Bk7Yi8i2E0UViobvnm72VAtSbEO8uTAmK3VkcXryrU7lH3rx9Gk
-         Zbfd6lLX3ZYk6nlVawo/6yGzT1NZzytwqDTYS/XThq/cAad45+cY01jw5q82IQFLi0vv
-         Fijw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747933852; x=1748538652;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T24kBpCJRpDRBSjC/H+JRSYfEBae8H3XSVOgeI97j2Y=;
-        b=TiJ7UtJWS+Yu0+IN2YxOzbwiJQhA4eOhEHnxKrdsFesw/l+NNIAJA3SCylVnH4DF6E
-         VH9tIq1mAzBlpNfM8RWobEwfS6fY1LJV25FjlXvWSiDEtTIfY++PYLaoP2CB3foJ5J/b
-         OyWV7yGGaciHnjikP7L0pncapyfgny2hHlxx6yTYovCJnkRRiSaXh743mUu6G1LdXevk
-         N07orb0Q8opZb0YeykMqllYZYSI6YxpXLUgMf2raDBfkU+x7BJhvvSib9ekdkC/i6K3Q
-         N9s6nvyh8Qiohc1ccxx0rohHo6buCkh3fcBjOWuFwmeun4GlauPWAhsxYH52nNn3fQ45
-         isXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5uLog5I/m+UuY5HpwzIL57Vpi2+lOfiyhQoRgeBO+Y/ipVQObmbsYRKqN5TY/iZpVFLI4eNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDosGZYaq9OYZ75JrEm8SrjGPup3G/XsvuluZJxP/ko7xJCJqQ
-	H9oCnqj/x49/M9aRxYbqU3TtfbgJtznthqyFPsKPYci/8N/9VPkAWbAP
-X-Gm-Gg: ASbGnctTSUU63D/v80UpGy3FHcGKtedKZkkz/bePTvp0RVA7MhZwYC0EEp3maH1tb3q
-	e716E9gupsByryo/V5iJK0UKZ9GfanY7VFCdj1bomSjGgVQ8LroqyA6g5Qf55JrqXu6kON0tTlM
-	d/ayFrfxTNSfxj/1KNYRmBSJvwOn5vfPsyy5upK5PnS+SyOSSiYvvJVV1/9YersTquiHQ2Ym4hk
-	qP9/AxsJ1rB7soeNgnLZXovV0heg4pNsojqe3+6c3aQXiM+0D0u85rtdnacLB0TcqAzuzV4cFm0
-	7F9hKhIPkrKXogHVKem0d9byqai3Vafbaq54IEZKIAJlrwNXs+S5xmqX7n1ucUgIvhz56Pz0DAL
-	xPmh9b+9zdVSbS+WBKJ2j57ZmwtpbyE8=
-X-Google-Smtp-Source: AGHT+IELopIEmTHmgPOXJrmrTbcXXjQgU/nWwhJRuiVKSf9TMIgD9CvBIvTZ2u4A02XaAEtZZ2QM5A==
-X-Received: by 2002:a05:6122:1b07:b0:52c:49b6:7f05 with SMTP id 71dfb90a1353d-52dbcd6d4a1mr23519640e0c.6.1747933851840;
-        Thu, 22 May 2025 10:10:51 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52dbaa5a310sm12332422e0c.36.2025.05.22.10.10.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 10:10:51 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: bluetooth-next 2025-05-22
-Date: Thu, 22 May 2025 13:10:47 -0400
-Message-ID: <20250522171048.3307873-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747934400; c=relaxed/simple;
+	bh=NHrZ/IZJ6IrRTk6Y9XSHsFvIPW3Ndfr79+VJReBUwig=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=ZTTeFveeLr+6PWpFpt+JHHRg8Fd0JClSTcF9P7db2180vRPDg1ch/slIbF1fJ/dtGL/GvyRlqXvRut9wdTrrRJPlwdmvrAuCjUiDto8TvMzGCebWy+cxMFM6N7Hk/Yi2k8jF8kTuM//JHpcKy3s5jExL0FjxYvi/396TGJoRHuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=SrUyXDkQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QjqVcrmA; arc=none smtp.client-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id D016025400F2;
+	Thu, 22 May 2025 13:19:56 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 22 May 2025 13:19:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm2; t=1747934396; x=1748020796; bh=Pn
+	et9DSQTbbS0Xed/D3s7jBjFLkc5sXhGTv0b+ACzZk=; b=SrUyXDkQgAVmcqoJy6
+	oVc3N57lJCAGufcfgNtU0bq2f3vzhWJViYX9fUhQx2OxxbfHw42XCFAkVHiDVkPZ
+	EMwdT9NdaIAxdHISbVgXkISs0Wwj7+xDOj/4pPPNtIlE+WplosiN1oH1xJUDwCRB
+	AhkTXc+JYx1clXz9c3pUSeUswG3dGRWx63g/ZLk1/D3X0hC17aXbdYhCrXVHaXuH
+	v3mdjl9xVVaunG76wYhsjAtqwBaU/O/mvpu5gaGkWXWLh+t8YcHbB2Er0e7n6Dhr
+	wNl66jX5/4vaar3gKz/vgR481tAJygm6g3z/JR8h83A5fxTn4ZwH36Hwo5It9r3q
+	sbUQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1747934396; x=1748020796; bh=Pnet9DSQTbbS0Xed/D3s7jBjFLkc
+	5sXhGTv0b+ACzZk=; b=QjqVcrmAdHbHSOfjN0WHNPcQgQU6thfjl1MHxlWEegF7
+	PKmvUVWKWw4h0swKUMhPVAMCA3+GZ6kT/VkF+c12X32hhHMMN1w/kXW0Th1Fchm3
+	4exBayIuu8rsPSe55KbSNbXERwGvs0P5hbHTWBh/+APqigO0s4KJEt+lanz3GdyC
+	CvlMm9pGypvn+qbzsr2mqJBsb9hDTDS23M5qdf31bw6G9Me4gxQUMiLWHVk2p66k
+	CkrhYoNArZOdsgjmcUN8BmqGIXhZJGfFxZ4RPbsn2BoUV4s4eVzwxsmUabq8wmG/
+	sBE6c1en/Hx2QqWzTJaqVQlmT7v/p4/hmNg/2kqAhw==
+X-ME-Sender: <xms:vFwvaCAagE4Yy34wJJOegtBGY-pQcfsIRBaVCJFj6ySv05cfoMYkWg>
+    <xme:vFwvaMj7eaHCu57R9YpNElllAUopDlav4arUlXUL8WhUSItYECtfFLxWuFabzpEQG
+    fwrRQ5CnrmZZLmyatM>
+X-ME-Received: <xmr:vFwvaFk85twElO_7aXyihRbsLqTtmTUNifSO6c5lmyHqUNISO3zfF3PV4YTG9XMZP4MjNGV9AihskF7_mkZWzRxJlVISvTLXjNKxzHznsElW0w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeiheehucdltddurdegfedvrddttd
+    dmucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgf
+    nhhsuhgsshgtrhhisggvpdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttd
+    enucenucfjughrpefhtgfgggfukfffvefvofesthhqmhdthhdtjeenucfhrhhomheptfhi
+    tggrrhguuceuvghjrghrrghnohcuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqne
+    cuggftrfgrthhtvghrnhepieevgfeufeejfefgkefgkedtfeduvdffleetvdekgfegudff
+    iefgffetjedvledtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomheprhhitggrrhgusegsvghjrghrrghnohdrihhopdhnsggprhgtphhtthhopeel
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgrvghlrdhjrghmvghtsehinhhtvghl
+    rdgtohhmpdhrtghpthhtohepmhhikhgrrdifvghsthgvrhgsvghrgheslhhinhhugidrih
+    hnthgvlhdrtghomhdprhgtphhtthhopeihvghhvgiikhgvlhhshhgssehgmhgrihhlrdgt
+    ohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtph
+    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhm
+    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:vFwvaAwUL_2cH86QofDeq2H99VRv3JCw1zmOA6X3L1jxv9kehTCyKw>
+    <xmx:vFwvaHQVYjgNBN0N08VXC0GGwuD3VgbztQblWnaDG02j1FTGHeeJ3w>
+    <xmx:vFwvaLb23wBaINQea9gRnuzHCHOKOKyzEiRIg1hAcM4MJyyHlTMAAg>
+    <xmx:vFwvaAQhaU1c7T8sD6LUjK7feW1-k6UrrZuJ3-BZWLmT4xHuB7x2Uw>
+    <xmx:vFwvaCRCxqaQ-r3M7Hl-B2EByXPjoDeQaFpBRGME3vY3ptFQWrHaTLw3>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 22 May 2025 13:19:54 -0400 (EDT)
+From: Ricard Bejarano <ricard@bejarano.io>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Poor thunderbolt-net interface performance when bridged
+Message-Id: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
+Date: Thu, 22 May 2025 19:19:52 +0200
+Cc: michael.jamet@intel.com,
+ mika.westerberg@linux.intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-The following changes since commit e6b3527c3b0a676c710e91798c2709cc0538d312:
+Hi all,
 
-  Merge branch 'net-airoha-add-per-flow-stats-support-to-hw-flowtable-offloading' (2025-05-20 20:00:55 -0700)
+Please excuse me if this is not the right place or way to report this, =
+in which case I'd appreciate a pointer to the proper forum. I've CC'd =
+every one who showed up in get_maintainer.pl.
 
-are available in the Git repository at:
+I'm investigating a performance issue in the bridging of traffic coming =
+in via a Thunderbolt 3/4 (thunderbolt-net driver) network interface. I =
+don't think this is tracked from what I could find online.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-05-22
+Summary:
+When a thunderbolt-net interface is slave to a bridge, traffic in the =
+"other slave interfaces -> bridge -> thunderbolt-net interface" =
+direction approximates maximum line bandwidth (~9Gbps in Thunderbolt 3, =
+~16Gbps in Thunderbolt 4); but traffic in the opposite "thunderbolt -> =
+bridge -> other" direction drops to ~5Mbps (in my testing). More details =
+below.
 
-for you to fetch changes up to 3aa1dc3c9060e335e82e9c182bf3d1db29220b1b:
+I need some pointers on how to proceed.
 
-  Bluetooth: btintel: Check dsbr size from EFI variable (2025-05-22 13:06:28 -0400)
+Thanks,
+RB
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
+--=20
 
-core:
+## 1. Setup
 
- - Add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
- - Separate CIS_LINK and BIS_LINK link types
- - Introduce HCI Driver protocol
+Three hosts:
+- `red`:
+  - Board: Intel NUC8i5BEH2
+  - CPU: 1x 4-core x86-64 (Intel Core i5-8259U)
+  - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+  - Disk: 1x 120GB SATA SSD (Crucial BX500)
+  - Relevant interfaces:
+    - `br0` (`bridge` driver, `10.0.0.1/24` address)
+    - `tb0` (`thunderbolt-net` driver): maps to the board's Thunderbolt =
+port, slave of `br0`
+- `blue`:
+  - Board: Intel NUC8i5BEH2
+  - CPU: 1x 4-core x86-64 (Intel Core i5-8259U)
+  - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+  - Disk: 1x 120GB SATA SSD (Crucial BX500)
+  - Relevant interfaces:
+    - `br0` (`bridge` driver, `10.0.0.2/24` address)
+    - `tb0` (`thunderbolt-net` driver): maps to the board's Thunderbolt =
+port, slave of `br0`
+    - `eno1` (`e1000e` driver): maps to the board's Ethernet port, slave =
+of `br0`
+- `purple`:
+  - Board: Intel NUC8i5BEHS
+  - CPU: 1x 4-core x86-64 (Intel Core i5-8260U)
+  - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+  - Disk: 1x 240GB M.2 SATA SSD (WD Green)
+  - Relevant interfaces:
+    - `br0` (`bridge` driver, `10.0.0.3/24` address)
+    - `eno1` (`e1000e` driver): maps to the board's Ethernet port, slave =
+of `br0`
 
-drivers:
+Connected with two cables:
+- Amazon Basics Thunderbolt 3 & 4 cable, connecting `red` (`tb0`) to =
+`blue` (`tb0`).
+- Monoprice SlimRun Cat6A Ethernet cable, connecting `blue` (`eno1`) to =
+`purple` (`eno1`).
 
- - btintel_pcie: Do not generate coredump for diagnostic events
- - btusb: Add HCI Drv commands for configuring altsetting
- - btusb: Add RTL8851BE device 0x0bda:0xb850
- - btusb: Add new VID/PID 13d3/3584 for MT7922
- - btusb: Add new VID/PID 13d3/3630 and 13d3/3613 for MT7925
- - btnxpuart: Implement host-wakeup feature
+All three running Linux 6.14.7 (built from source) on Ubuntu Server =
+24.04.2 LTS, running iperf 2.1.9 servers.
+See "4. References" section for details.
 
-----------------------------------------------------------------
-Chandrashekar Devegowda (1):
-      Bluetooth: btintel_pcie: Dump debug registers on error
+## 2. The problem
 
-Chen Ni (1):
-      Bluetooth: hci_uart: Remove unnecessary NULL check before release_firmware()
+As seen in [4.6.3b], traffic going in the `purple:br0 -> purple:eno1 -> =
+blue:eno1 -> blue:br0 -> blue:tb0 -> red:tb0 -> red:br0` direction =
+approaches line speed (~1Gbps).
+However, per [4.6.3a], traffic going in the opposite `red:br0 -> red:tb0 =
+-> blue:tb0 -> blue:br0 -> blue:eno1 -> purple:eno1 -> purple:br0` =
+direction is several orders of magnitude slower (~5Mbps).
 
-Dmitry Antipov (1):
-      Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach()
+This is abnormal, given [4.6.1] sets the bidirectional Thunderbolt line =
+speed at ~9Gbps and [4.6.2] sets the bidirectional Ethernet line speed =
+at ~1Gbps.
 
-En-Wei Wu (1):
-      Bluetooth: btusb: use skb_pull to avoid unsafe access in QCA dump handling
+Per the above, we can safely assume that the problem is localized at =
+`blue`, specifically in how `blue` bridges traffic out of `tb0` and into =
+`eno1`.
 
-Hsin-chen Chuang (4):
-      Bluetooth: Introduce HCI Driver protocol
-      Bluetooth: btusb: Add HCI Drv commands for configuring altsetting
-      Revert "Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL"
-      Revert "Bluetooth: btusb: add sysfs attribute to control USB alt setting"
+=46rom prior undocumented anecdata, we know this also happens in =
+Thunderbolt-to-Thunderbolt bridged traffic, which hints at a problem in =
+how traffic goes out of `tb0` and into `br0`, not with how traffic goes =
+out of `br0` and into `eno1`.
+This is further consolidated by the fact that Ethernet-to-Ethernet =
+bridging is known to approach line speed in both directions (or =
+otherwise the Internet would be way slower, I suppose).
 
-Jiande Lu (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3630 for MT7925
+And finally, hosts are only assuming an IP address at their respective =
+`br0` interfaces, and [4.6.1] shows line speed performance in the =
+`red:br0 -> red:tb0 -> blue:tb0 -> blue:br0` direction (and reverse).
+Meaning, we can reduce the scope further to how traffic goes out of =
+`tb0` and into some other slave of `br0`, but not `br0` itself.
 
-Kees Cook (1):
-      Bluetooth: btintel: Check dsbr size from EFI variable
+## 3. The solution
 
-Kiran K (1):
-      Bluetooth: btintel_pcie: Do not generate coredump for diagnostic events
+    =C2=AF\_(;.;)_/=C2=AF
 
-Krzysztof Kozlowski (2):
-      Bluetooth: btmrvl_sdio: Fix wakeup source leaks on device unbind
-      Bluetooth: btmtksdio: Fix wakeup source leaks on device unbind
+## 4. References
 
-Liwei Sun (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3584 for MT7922
+### 4.1. `uname -a`
+#### 4.1.1. `red`
+```shell
+# red
+$ uname -a
+Linux red 6.14.7 #1 SMP PREEMPT_DYNAMIC Mon May 19 13:38:28 UTC 2025 =
+x86_64 x86_64 x86_64 GNU/Linux
+```
+#### 4.1.2. `blue`
+```shell
+# blue
+$ uname -a
+Linux blue 6.14.7 #1 SMP PREEMPT_DYNAMIC Mon May 19 15:01:20 UTC 2025 =
+x86_64 x86_64 x86_64 GNU/Linux
+```
+#### 4.1.3. `purple`
+```shell
+# purple
+$ uname -a
+Linux purple 6.14.7 #1 SMP PREEMPT_DYNAMIC Tue May 20 09:04:42 UTC 2025 =
+x86_64 x86_64 x86_64 GNU/Linux
+```
 
-Luiz Augusto von Dentz (3):
-      Bluetooth: ISO: Fix not using SID from adv report
-      Bluetooth: ISO: Fix getpeername not returning sockaddr_iso_bc fields
-      Bluetooth: L2CAP: Fix not checking l2cap_chan security level
+### 4.2. `ip a`
+#### 4.2.1. `red`
+```shell
+# red
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN =
+group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: eno1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group =
+default qlen 1000
+    link/ether 94:c6:91:a3:f5:1a brd ff:ff:ff:ff:ff:ff
+    altname enp0s31f6
+3: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue =
+state UP group default qlen 1000
+    link/ether 04:d3:b0:0f:e6:cd brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.201/23 metric 600 brd 192.168.11.255 scope global =
+dynamic wlp0s20f3
+       valid_lft 163sec preferred_lft 163sec
+    inet6 fd9f:7271:415f:d845:6d3:b0ff:fe0f:e6cd/64 scope global dynamic =
+mngtmpaddr noprefixroute
+       valid_lft 1724sec preferred_lft 1724sec
+    inet6 fe80::6d3:b0ff:fe0f:e6cd/64 scope link
+       valid_lft forever preferred_lft forever
+6: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state =
+UP group default qlen 1000
+    link/ether ce:42:52:00:a0:5b brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.1/24 brd 10.0.0.255 scope global br0
+       valid_lft forever preferred_lft forever
+7: tb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master =
+br0 state UP group default qlen 1000
+    link/ether 02:5f:d6:57:71:93 brd ff:ff:ff:ff:ff:ff
+```
+#### 4.2.2. `blue`
+```shell
+# blue
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN =
+group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel =
+master br0 state UP group default qlen 1000
+    link/ether 1c:69:7a:00:22:99 brd ff:ff:ff:ff:ff:ff
+    altname enp0s31f6
+5: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue =
+state UP group default qlen 1000
+    link/ether d0:c6:37:09:01:5a brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.200/23 metric 600 brd 192.168.11.255 scope global =
+dynamic wlp0s20f3
+       valid_lft 247sec preferred_lft 247sec
+    inet6 fd9f:7271:415f:d845:d2c6:37ff:fe09:15a/64 scope global dynamic =
+mngtmpaddr noprefixroute
+       valid_lft 1651sec preferred_lft 1651sec
+    inet6 fe80::d2c6:37ff:fe09:15a/64 scope link
+       valid_lft forever preferred_lft forever
+6: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state =
+UP group default qlen 1000
+    link/ether 3a:4d:83:e0:ab:3b brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.2/24 brd 10.0.0.255 scope global br0
+       valid_lft forever preferred_lft forever
+7: tb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master =
+br0 state UP group default qlen 1000
+    link/ether 02:70:19:dc:92:96 brd ff:ff:ff:ff:ff:ff
+```
+#### 4.2.3. `purple`
+```shell
+# purple
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN =
+group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute
+       valid_lft forever preferred_lft forever
+2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel =
+master br0 state UP group default qlen 1000
+    link/ether 1c:69:7a:60:d8:69 brd ff:ff:ff:ff:ff:ff
+    altname enp0s31f6
+3: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue =
+state UP group default qlen 1000
+    link/ether 94:e6:f7:7c:2d:fb brd ff:ff:ff:ff:ff:ff
+    inet 192.168.10.199/23 metric 600 brd 192.168.11.255 scope global =
+dynamic wlp0s20f3
+       valid_lft 165sec preferred_lft 165sec
+    inet6 fd9f:7271:415f:d845:96e6:f7ff:fe7c:2dfb/64 scope global =
+dynamic mngtmpaddr noprefixroute
+       valid_lft 1640sec preferred_lft 1640sec
+    inet6 fe80::96e6:f7ff:fe7c:2dfb/64 scope link
+       valid_lft forever preferred_lft forever
+4: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state =
+UP group default qlen 1000
+    link/ether 1a:45:1d:c0:46:02 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.3/24 brd 10.0.0.255 scope global br0
+       valid_lft forever preferred_lft forever
+```
 
-Neeraj Sanjay Kale (2):
-      dt-bindings: net: bluetooth: nxp: Add support for host-wakeup
-      Bluetooth: btnxpuart: Implement host-wakeup feature
+### 4.3. `ethtool -i br0`
+#### 4.3.1. `red`
+```shell
+# red
+$ ethtool -i br0
+driver: bridge
+version: 2.3
+firmware-version: N/A
+expansion-rom-version:
+bus-info: N/A
+supports-statistics: no
+supports-test: no
+supports-eeprom-access: no
+supports-register-dump: no
+supports-priv-flags: no
+```
+#### 4.3.2. `blue`
+```shell
+# blue
+$ ethtool -i br0
+driver: bridge
+version: 2.3
+firmware-version: N/A
+expansion-rom-version:
+bus-info: N/A
+supports-statistics: no
+supports-test: no
+supports-eeprom-access: no
+supports-register-dump: no
+supports-priv-flags: no
+```
+#### 4.3.3. `purple`
+```shell
+# purple
+$ ethtool -i br0
+driver: bridge
+version: 2.3
+firmware-version: N/A
+expansion-rom-version:
+bus-info: N/A
+supports-statistics: no
+supports-test: no
+supports-eeprom-access: no
+supports-register-dump: no
+supports-priv-flags: no
+```
 
-Pauli Virtanen (2):
-      Bluetooth: add support for SIOCETHTOOL ETHTOOL_GET_TS_INFO
-      Bluetooth: separate CIS_LINK and BIS_LINK link types
+### 4.4. `ethtool -i tb0`
+#### 4.4.1. `red`
+```shell
+# red
+$ ethtool -i tb0
+driver: thunderbolt-net
+version: 6.14.7
+firmware-version:
+expansion-rom-version:
+bus-info: 0-1.0
+supports-statistics: no
+supports-test: no
+supports-eeprom-access: no
+supports-register-dump: no
+supports-priv-flags: no
+```
+#### 4.4.2. `blue`
+```shell
+# blue
+$ ethtool -i tb0
+driver: thunderbolt-net
+version: 6.14.7
+firmware-version:
+expansion-rom-version:
+bus-info: 0-1.0
+supports-statistics: no
+supports-test: no
+supports-eeprom-access: no
+supports-register-dump: no
+supports-priv-flags: no
+```
 
-WangYuli (1):
-      Bluetooth: btusb: Add RTL8851BE device 0x0bda:0xb850
+### 4.5. `ethtool -i eno1`
+#### 4.4.1. `blue`
+```shell
+# blue
+$ ethtool -i eno1
+driver: e1000e
+version: 6.14.7
+firmware-version: 0.4-4
+expansion-rom-version:
+bus-info: 0000:00:1f.6
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+```
+#### 4.4.2. `purple`
+```shell
+# purple
+$ ethtool -i eno1
+driver: e1000e
+version: 6.14.7
+firmware-version: 0.4-4
+expansion-rom-version:
+bus-info: 0000:00:1f.6
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+```
 
-Youn MÉLOIS (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3613 for MT7925
+### 4.6. `iperf` tests
+#### 4.6.1a. `red` to `blue`
+```shell
+# red
+$ iperf -c 10.0.0.2
+------------------------------------------------------------
+Client connecting to 10.0.0.2, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.1 port 38902 connected with 10.0.0.2 port 5001 =
+(icwnd/mss/irtt=3D14/1448/538)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0076 sec  11.0 GBytes  9.40 Gbits/sec
+```
+#### 4.6.1b. `blue` to `red`
+```shell
+# blue
+$ iperf -c 10.0.0.1
+------------------------------------------------------------
+Client connecting to 10.0.0.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.2 port 49660 connected with 10.0.0.1 port 5001 =
+(icwnd/mss/irtt=3D14/1448/464)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0079 sec  10.8 GBytes  9.26 Gbits/sec
+```
+#### 4.6.2a. `purple` to `blue`
+```shell
+# purple
+$ iperf -c 10.0.0.2
+------------------------------------------------------------
+Client connecting to 10.0.0.2, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.3 port 56150 connected with 10.0.0.2 port 5001 =
+(icwnd/mss/irtt=3D14/1448/580)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0358 sec  1.09 GBytes   933 Mbits/sec
+```
+#### 4.6.2b. `blue` to `purple`
+```shell
+# blue
+$ iperf -c 10.0.0.3
+------------------------------------------------------------
+Client connecting to 10.0.0.3, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.2 port 37106 connected with 10.0.0.3 port 5001 =
+(icwnd/mss/irtt=3D14/1448/958)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0239 sec  1.09 GBytes   934 Mbits/sec
+```
+#### 4.6.3a. `red` to `purple`
+```shell
+# red
+$ iperf -c 10.0.0.3
+------------------------------------------------------------
+Client connecting to 10.0.0.3, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.1 port 38260 connected with 10.0.0.3 port 5001 =
+(icwnd/mss/irtt=3D14/1448/1578)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.2234 sec  5.88 MBytes  4.82 Mbits/sec
+```
+#### 4.6.3b. `purple` to `red`
+```shell
+# purple
+$ iperf -c 10.0.0.1
+------------------------------------------------------------
+Client connecting to 10.0.0.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.3 port 48392 connected with 10.0.0.1 port 5001 =
+(icwnd/mss/irtt=3D14/1448/1243)
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0233 sec  1.09 GBytes   932 Mbits/sec
+```
 
- .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |  17 ++
- drivers/bluetooth/Kconfig                          |  12 -
- drivers/bluetooth/btintel.c                        |  13 +-
- drivers/bluetooth/btintel.h                        |   6 -
- drivers/bluetooth/btintel_pcie.c                   | 141 +++++++++-
- drivers/bluetooth/btintel_pcie.h                   |  19 ++
- drivers/bluetooth/btmrvl_sdio.c                    |   4 +-
- drivers/bluetooth/btmtksdio.c                      |   2 +-
- drivers/bluetooth/btnxpuart.c                      |  58 +++-
- drivers/bluetooth/btusb.c                          | 302 ++++++++++++---------
- drivers/bluetooth/hci_aml.c                        |   3 +-
- include/net/bluetooth/bluetooth.h                  |   4 +
- include/net/bluetooth/hci.h                        |   4 +-
- include/net/bluetooth/hci_core.h                   |  51 ++--
- include/net/bluetooth/hci_drv.h                    |  76 ++++++
- include/net/bluetooth/hci_mon.h                    |   2 +
- net/bluetooth/Makefile                             |   3 +-
- net/bluetooth/af_bluetooth.c                       |  87 ++++++
- net/bluetooth/hci_conn.c                           |  79 ++++--
- net/bluetooth/hci_core.c                           |  45 ++-
- net/bluetooth/hci_drv.c                            | 105 +++++++
- net/bluetooth/hci_event.c                          |  40 ++-
- net/bluetooth/hci_sock.c                           |  12 +-
- net/bluetooth/hci_sync.c                           |  63 ++++-
- net/bluetooth/iso.c                                |  30 +-
- net/bluetooth/l2cap_core.c                         |  15 +-
- net/bluetooth/mgmt.c                               |   3 +-
- net/bluetooth/mgmt_util.c                          |   2 +-
- 28 files changed, 920 insertions(+), 278 deletions(-)
- create mode 100644 include/net/bluetooth/hci_drv.h
- create mode 100644 net/bluetooth/hci_drv.c
 
