@@ -1,173 +1,167 @@
-Return-Path: <netdev+bounces-192758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63045AC10FA
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:27:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0132CAC1126
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18F5DA41445
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:27:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BA29E1B0D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61AC239E7B;
-	Thu, 22 May 2025 16:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA0D28D859;
+	Thu, 22 May 2025 16:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fo9uMXKD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mxzAbpMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A4C45C14
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 16:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76051248862;
+	Thu, 22 May 2025 16:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747931242; cv=none; b=NPgEVDoG+h2VAyWcxaNeMld+o9YplPhPoRFmTmLGq8YOo15KqVCguQlfqk+eGd4lZbzIYkkHYqNhivsiJNbhgjRh6koV9uERVAIUlq/9IVSClHBu+x8pF+QM8O2jbaxf+rR3lXEFO7bc7EB468Z09qexvxw6G4F6oh8iabXkev0=
+	t=1747931749; cv=none; b=pFwrunwBQBRo6Z9yCux4+TOIu3vd8qCiB0Lp9jRiS9jLmD5BSCeTqmBoLFrH5VlEy33xGapga5Pp6ubjUMRFjVJilHmaKsf/ohuHegmb1hIXD+8AjUaHmiEZgNd9PFAjCoxdtwtTXoy2iuqn5kAlH3p0jiqP7V0AnyAQ0lz//HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747931242; c=relaxed/simple;
-	bh=k5tZ6EAqyKtpxOECK0+bdTC9lwPvNiBRD3mfo2wJY5A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oXRlOHNHErX0TKC/4oHEnM0In/kchCW4LhEZSZ0IVHwGMQKplwFMRF/d+ARUa7gb7j/MGXu16SMivIiS5iS8CE0k5RX+6l3/Auro+ErLvVbLfzmwSQXXnvXZc36hVXsGdXGT+O79hdmt7mAjMJP5NAa8xqq4H5DN8ItHX9JLBcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fo9uMXKD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747931239;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I51PbxXuXP01mfBHDXWV3sPVN6sURhiRYf9mPTsKTPQ=;
-	b=fo9uMXKDot2jVQYDM82UHR/mBuCAuHSas/UCwbFttek6aFft6LOKWuHaNrmwyx48JHEuya
-	p05yCBUVA/5V726tm1b7bgJ17eSeCAV6fbrS7VtJuIL9+rhzkfFhBLEq6oYDGHbuO++5uR
-	sEj6WDLjeFV6kmus7mRsOlAVOmUJu/g=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-468--WDdorttObOv16TllSTjUQ-1; Thu,
- 22 May 2025 12:27:15 -0400
-X-MC-Unique: -WDdorttObOv16TllSTjUQ-1
-X-Mimecast-MFC-AGG-ID: -WDdorttObOv16TllSTjUQ_1747931234
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8354419560B5;
-	Thu, 22 May 2025 16:27:13 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.88.72])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF54F19560AB;
-	Thu, 22 May 2025 16:27:10 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Faicker Mo <faicker.mo@zenlayer.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-  "dev@openvswitch.org" <dev@openvswitch.org>,  "echaudro@redhat.com"
- <echaudro@redhat.com>,  "i.maximets@ovn.org" <i.maximets@ovn.org>,
-  "davem@davemloft.net" <davem@davemloft.net>,  "edumazet@google.com"
- <edumazet@google.com>,  "kuba@kernel.org" <kuba@kernel.org>,
-  "pabeni@redhat.com" <pabeni@redhat.com>,  "horms@kernel.org"
- <horms@kernel.org>,  "martin.varghese@nokia.com"
- <martin.varghese@nokia.com>,  "pshelar@ovn.org" <pshelar@ovn.org>
-Subject: Re: [PATCH net-next v3] net: openvswitch: Fix the dead loop of MPLS
- parse
-In-Reply-To: <21855B7D-A3D5-4031-A618-CCA8FD75B6FD@zenlayer.com> (Faicker Mo's
-	message of "Thu, 22 May 2025 07:49:08 +0000")
-References: <21855B7D-A3D5-4031-A618-CCA8FD75B6FD@zenlayer.com>
-Date: Thu, 22 May 2025 12:27:08 -0400
-Message-ID: <f7ty0uod31f.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1747931749; c=relaxed/simple;
+	bh=ux9eZaPRebseznFfCMQVDgdu76v+ODiKx1nrwgRY7uY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tRNhd2W69QRFsSGmjDeWHCPRS6zZSVp1pvT7gTY3fZPHsxledat3VnCrb+HG3P949CmDa6IzOfvPemVVemYFQsO9WXrXE7MqUPWuau1z7uQI9useysIAyEW0o/CxNJF0y1cc1WDvQt4PPd8FEL9L1Ms7QVmaiVD51Ew0U8BC3qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mxzAbpMy; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747931748; x=1779467748;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ux9eZaPRebseznFfCMQVDgdu76v+ODiKx1nrwgRY7uY=;
+  b=mxzAbpMyKlHQuZ9GUoLLSZD0gPzxppvRMwercBiwLo/HV+CKJ26K6W9o
+   3DHLOOGw+yirprZJqmgg3WlBmq0ZG2WprDgdMsjMJ/taLnPYvrqTRexFY
+   LP8k6h+awJ6Nl1vVZvCAoSTzh6/nxHH+R/Q1+E6X8FKAisC6di1v5AwpW
+   XTxVxsOyit5UIw4JTYfLyfbJR/xB5qGaFH+ld6TretUvf40h/bTgzeV/l
+   2uz3h7BVps6MVKMuS/4HgKXkuxXIgRmhWzIb3G1osrzDrDlknoSckqDpa
+   9eRubHyS13+2ofzY6pP/7I2neoGTxQuxRczSQxPEgQklq9djSyHG21EAF
+   g==;
+X-CSE-ConnectionGUID: A5K775xTTceD33WfZD1F7A==
+X-CSE-MsgGUID: KEPc6NbOTg2/9qqNUOlMUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49889025"
+X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
+   d="scan'208";a="49889025"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 09:35:47 -0700
+X-CSE-ConnectionGUID: a6/QFpl9RSWoEr/nOLM3sQ==
+X-CSE-MsgGUID: WjNNFZnOQTmzoaUNJRYBHg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,306,1739865600"; 
+   d="scan'208";a="145631339"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orviesa004.jf.intel.com with ESMTP; 22 May 2025 09:35:42 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: donald.hunter@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	aleksandr.loktionov@intel.com,
+	corbet@lwn.net
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v3 0/3] dpll: add Reference SYNC feature
+Date: Thu, 22 May 2025 18:29:35 +0200
+Message-Id: <20250522162938.1490791-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
 
-Hi Faicker,
+The device may support the Reference SYNC feature, which allows the
+combination of two inputs into a Reference SYNC pair. In this
+configuration, clock signals from both inputs are used to synchronize
+the dpll device. The higher frequency signal is utilized for the loop
+bandwidth of the DPLL, while the lower frequency signal is used to
+syntonize the output signal of the DPLL device. This feature enables
+the provision of a high-quality loop bandwidth signal from an external
+source.
 
-Faicker Mo <faicker.mo@zenlayer.com> writes:
+A capable input provides a list of inputs that can be paired to create
+a Reference SYNC pair. To control this feature, the user must request a
+desired state for a target pin: use ``DPLL_PIN_STATE_CONNECTED`` to
+enable or ``DPLL_PIN_STATE_DISCONNECTED`` to disable the feature. Only
+two pins can be bound to form a Reference SYNC pair at any given time.
 
-> The unexpected MPLS packet may not end with the bottom label stack.
-> When there are many stacks, The label count value has wrapped around.
-> A dead loop occurs, soft lockup/CPU stuck finally.
->
-> stack backtrace:
-> UBSAN: array-index-out-of-bounds in /build/linux-0Pa0xK/linux-5.15.0/net/openvswitch/flow.c:662:26
-> index -1 is out of range for type '__be32 [3]'
-> CPU: 34 PID: 0 Comm: swapper/34 Kdump: loaded Tainted: G           OE   5.15.0-121-generic #131-Ubuntu
-> Hardware name: Dell Inc. PowerEdge C6420/0JP9TF, BIOS 2.12.2 07/14/2021
-> Call Trace:
-> <IRQ>
-> show_stack+0x52/0x5c
-> dump_stack_lvl+0x4a/0x63
-> dump_stack+0x10/0x16
-> ubsan_epilogue+0x9/0x36
-> __ubsan_handle_out_of_bounds.cold+0x44/0x49
-> key_extract_l3l4+0x82a/0x840 [openvswitch]
-> ? kfree_skbmem+0x52/0xa0
-> key_extract+0x9c/0x2b0 [openvswitch]
-> ovs_flow_key_extract+0x124/0x350 [openvswitch]
-> ovs_vport_receive+0x61/0xd0 [openvswitch]
-> ? kernel_init_free_pages.part.0+0x4a/0x70
-> ? get_page_from_freelist+0x353/0x540
-> netdev_port_receive+0xc4/0x180 [openvswitch]
-> ? netdev_port_receive+0x180/0x180 [openvswitch]
-> netdev_frame_hook+0x1f/0x40 [openvswitch]
-> __netif_receive_skb_core.constprop.0+0x23a/0xf00
-> __netif_receive_skb_list_core+0xfa/0x240
-> netif_receive_skb_list_internal+0x18e/0x2a0
-> napi_complete_done+0x7a/0x1c0
-> bnxt_poll+0x155/0x1c0 [bnxt_en]
-> __napi_poll+0x30/0x180
-> net_rx_action+0x126/0x280
-> ? bnxt_msix+0x67/0x80 [bnxt_en]
-> handle_softirqs+0xda/0x2d0
-> irq_exit_rcu+0x96/0xc0
-> common_interrupt+0x8e/0xa0
-> </IRQ>
->
-> Fixes: fbdcdd78da7c ("Change in Openvswitch to support MPLS label depth of 3 in ingress direction")
+Verify pins bind state/capabilities:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'disconnected'}],
+ [...]}
 
-This tells me it should go to 'net' rather than 'net-next', so your
-subject should look like:
+Bind the pins by setting connected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"connected"}}'
 
-  [PATCH net v4] net: openvswitch: Fix the dead loop of MPLS parse
+Verify pins bind state:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'connected'}],
+ [...]}
 
-> Signed-off-by: Faicker Mo <faicker.mo@zenlayer.com>
-> ---
-> v2
-> - Changed return value based on Eelco's feedback.
-> - Added Fixes.
-> v3
-> - Revert "Changed return value based on Eelco's feedback".
-> - Changed the label_count variable type based on Ilya's feedback.
+Unbind the pins by setting disconnected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"disconnected"}}'
+
+v3:
+- no change.
+
+Arkadiusz Kubalewski (3):
+  dpll: add reference-sync netlink attribute
+  dpll: add reference sync get/set
+  ice: add ref-sync dpll pins
+
+ Documentation/driver-api/dpll.rst             |  25 +++
+ Documentation/netlink/specs/dpll.yaml         |  19 ++
+ drivers/dpll/dpll_core.c                      |  27 +++
+ drivers/dpll/dpll_core.h                      |   2 +
+ drivers/dpll/dpll_netlink.c                   | 188 ++++++++++++++++--
+ drivers/dpll/dpll_nl.c                        |  10 +-
+ drivers/dpll/dpll_nl.h                        |   1 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 186 +++++++++++++++++
+ include/linux/dpll.h                          |  10 +
+ include/uapi/linux/dpll.h                     |   1 +
+ 11 files changed, 451 insertions(+), 20 deletions(-)
 
 
-Somehow, this patch is still getting corrupted.  For example, it is
-missing the leading ' ' character in the diffs.  This is one reason
-the patch fails to apply.
-
-> ---
-> net/openvswitch/flow.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
-> index 8a848ce72e29..b80bd3a90773 100644
-> --- a/net/openvswitch/flow.c
-> +++ b/net/openvswitch/flow.c
-> @@ -788,7 +788,7 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
-> 			memset(&key->ipv4, 0, sizeof(key->ipv4));
-> 		}
-> 	} else if (eth_p_mpls(key->eth.type)) {
-> -		u8 label_count = 1;
-> +		size_t label_count = 1;
-
-This change looks good to me.
-
->
-> 		memset(&key->mpls, 0, sizeof(key->mpls));
-> 		skb_set_inner_network_header(skb, skb->mac_len);
-> --
-> 2.34.1
+base-commit: 4ff4d86f6cceb6bea583bdb230e5439655778cce
+-- 
+2.38.1
 
 
