@@ -1,168 +1,165 @@
-Return-Path: <netdev+bounces-192660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 454C9AC0BA3
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:34:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ACBBAC0BBE
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 14:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78C4A3B967E
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:33:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F18334A378C
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 12:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83371E485;
-	Thu, 22 May 2025 12:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE6928A71F;
+	Thu, 22 May 2025 12:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0WUd+RSj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2isxQl6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540A5381BA
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 12:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746A32135CB;
+	Thu, 22 May 2025 12:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747917245; cv=none; b=oFYikv48fZw6sMeRdFlT3Ohv7h7WJEq8g831SfnNP++WDLjPyBcL25XsLSS2eD5v0MpHwOKrBr5YGjPEXF7QCwA/hD/y79pRBWkxqBivKOj7ooyTKXlwIQgw+Tj+l8DTvaptK3uaHZigXJYyWAwtgmTzWW9VAkVv+Gm3AUFAFNs=
+	t=1747917558; cv=none; b=r5PYoVYEwIioO0z4ilVRovzgfTb+uR4tZKYLgdfyCzZfw5mYyGv4xUj2Amd3fvRW9GBjrFEXGK41Pasuuxa5BscPGRh/6YhhCqelmEoTsm+4CLM+zsdQ50Yl1Wdgfn/xJ/rCgscmFqO4WsOrlWKEEwMz7iZ49Pe70ZhjwpNzax4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747917245; c=relaxed/simple;
-	bh=wltlSCroMeUOORJiPsst0BFz/6pts/MfbaS9SQi1/zg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X89KwN0pt1/BGKbdMOFBWmaiXRHUyS/RJPP5WFc10dqOcMDQv+LOgv6GgikbWgRtXT6b70G8G7DjXXap2YM12nkKUNxeVGuo9ubB124Uv1Esg1kaM41Ae/7X2syH5iwToHUiyS4WR9mC6X7g+AkM6yl4zRixwaLBRCBBhYOf1aA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=0WUd+RSj; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-74019695377so5868085b3a.3
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 05:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1747917243; x=1748522043; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wltlSCroMeUOORJiPsst0BFz/6pts/MfbaS9SQi1/zg=;
-        b=0WUd+RSjrlA8KD57v8j7xC/QbTpBF6gZ5dTH7hUSzFsx9wCj+bxcfrESRoKBqGBtmM
-         gkYdH6XgvzGD3M6LFn9OfB3OKk/ZPvR5qJFX4CEayAz+nji96+43sS7z1mMZiSMQzLMy
-         vyWScXzUlIZpYZCqhJJV3NuKMcIjY5VxNoDnEl2sXd9lDeiXH0qdrnlBmn0uOtTLA/Zp
-         gR+iOwLsJ0IzkvsXkVctXpAGwHZ4SqbnjeSdIPf4XGVVJTmVS4YH+eDYge9YSdJL5/ec
-         z1VNv5TgfQ0H5Hl2OO69V07QHu4SXrW83FmamA7HYYxrP6aLooAxJApHjh2JrsBn7FSl
-         1jZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747917243; x=1748522043;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wltlSCroMeUOORJiPsst0BFz/6pts/MfbaS9SQi1/zg=;
-        b=A6aId7L0yNk2TUgdTMx/LsPoFwt0DGeW3V1VhQjzTrVlRJfN7aaHJvIxfqut5qkSRQ
-         QqTf87fHLgyP/Nk0FORzT8OK6aQs65PR6+IKfvOfc1jRFOrT2Qx5winr8jZ0+zcB6183
-         vgP8qM4c+t/p9zeUGSsuynItOSfQZJpa3eZeCcNti7b40KuNNgEUOLaODFznaGPBMyBx
-         CV0mC2gqFsbASKtqMPUdNe/UFV1cX3vCoESzkSCw7jrtdn7fckvfqOI89jRieXiUV9Ok
-         Su3kS+Gu0uZwdOo0sBQf50f7hrnYB2AoECHhiX7DnIvwxSDowztRnlePsR6yJLTijTqC
-         ybNw==
-X-Gm-Message-State: AOJu0Yx+Xa1gDJ0iz1AhhyIkzFIpUXjx8iK0zIRBc7WgocCEx2asqhju
-	SLvG9Muftf3QhaYCIgwyhN9Up3BLeq8vk6wMnY/FhIKrzfkWA8R7DFp6w9tThsG5dowCdYkbpEb
-	L6g5t0B1UcK0zxxRfFoxkLfyB5RK/z75nPTEtJntD
-X-Gm-Gg: ASbGncvqQjykMafwZg8M81KOGJqvF4Gd0WQQJtW/TgCSpBsObwul7I3QCeakzs07FLZ
-	rx123IcMeae3jWuZOO05cG0XEK6uAECrFWYPfLlD3TZnTxkfTGOPDI1wlwCjlv0apMfs4CHlG/u
-	dEoO51aYQfnal++0VdmMmf1mNs7gd232k=
-X-Google-Smtp-Source: AGHT+IF/AdNXmqjRCf5ZVtcuhNrf8mWBPencRZ9HbeSRVvTPHvcGXGYDXJtZOUgoErHf9bDIfN+Exyx/NtWdbsw2XhE=
-X-Received: by 2002:a05:6a21:3384:b0:1f5:769a:a4bf with SMTP id
- adf61e73a8af0-21621a23f5fmr41392215637.36.1747917243480; Thu, 22 May 2025
- 05:34:03 -0700 (PDT)
+	s=arc-20240116; t=1747917558; c=relaxed/simple;
+	bh=PhT/kTDZ6gQ7sTz8kUJc4VzJgyedIPTFsuit5uZDo4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KI6QE/ffak6Vbj1Atsn8XGYCJtCB33hR6fezlmjsU1m84sCehd6kKvfmJyaotaLfPcDYwFhboMpYG7F2DrYlIL1GCH37l3NIf7/QLJS5HF85voWDbTGVdMX8Ma0HjLVhbmnn66JZO+WOHYiVlOL7wh6adZV6PsPxVTOthrACUj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2isxQl6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B33DC4CEE4;
+	Thu, 22 May 2025 12:39:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747917557;
+	bh=PhT/kTDZ6gQ7sTz8kUJc4VzJgyedIPTFsuit5uZDo4s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p2isxQl6r8sUX5xpsDxRunTHmHRVNWyU9cAKqdbZEcCbwd0ps+hz/uT/ck6H/2UaT
+	 GS7dDM7D9L0iISXSWRH5+14/spcvMLnJY9zkeaobZb5iqjf1LAEjfK8KURSyX5ftW0
+	 5xk8hYRHFi2C1Zkj1KuN+B7rPcNSNAK2OXgTPByNFo1WsOV/STGK3L3r8+J+ELgDCW
+	 IBFTB2flFVVQZ71zQ0lLG4UM7kRX+TYTX6pMLe/mXXK/9cgVV+qd2/AFK+ryIKkn8V
+	 ifIlwpMpo3+wlNcwnN/j6ZXwFHQjuufmKuMo1S88igw/Y6WNKZqKV17ZshuLAaPMvs
+	 vaFQsjag0kQbw==
+Date: Thu, 22 May 2025 13:39:13 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 4/4] net: airoha: Add the capability to
+ allocate hfwd descriptors in SRAM
+Message-ID: <20250522123913.GY365796@horms.kernel.org>
+References: <20250521-airopha-desc-sram-v3-0-a6e9b085b4f0@kernel.org>
+ <20250521-airopha-desc-sram-v3-4-a6e9b085b4f0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
- <CAM0EoMmKL68r_b1T4zHJTmdZPdCwS69F-Hh+0_ev+-5xPGy2=w@mail.gmail.com>
- <DglTO9NHmtFTRrCJf07R16_tYUUqoTV7M0hID_k-ryn5mAhe4ADq1mBpAuxNK24ZTnzIPaPq4x1woAtqZGXgAQS4k64C4SGRCfupe3H3dRs=@willsroot.io>
- <CAM0EoMmQau9+uXVm-vpuWqYjh=51a_CCS6orS6VrK6qBdddxrQ@mail.gmail.com>
- <iEqzQsC-O2kAXqH1_58I59DIhBjRgebyGym2ZqyMEI3DaMtgsKSYR0KUsbxj5xqvfzf-4XzpM8dXvATHJhVVw3NedRdL3j1FJaqiXPlNWeE=@willsroot.io>
- <ggSxq-NP-LDpev4N-rvkgs0Rrd0qOrbwtGRjcu4j4y3SuZth9k5RxTg2tFvhriQu4w_GxRPYjnkKN6VqFP6Q6FCyqWudz7_5iuOV06IEzgY=@willsroot.io>
-In-Reply-To: <ggSxq-NP-LDpev4N-rvkgs0Rrd0qOrbwtGRjcu4j4y3SuZth9k5RxTg2tFvhriQu4w_GxRPYjnkKN6VqFP6Q6FCyqWudz7_5iuOV06IEzgY=@willsroot.io>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 22 May 2025 08:33:51 -0400
-X-Gm-Features: AX0GCFu4Z_QCYdXdTVxuwZ-ZgF3SLVgMCxGrqXET5xavn_UgMvqvn1yWbk-7cVc
-Message-ID: <CAM0EoMkd87-6ZJ5PWsV8K+Pn+dVNEOP9NcfGAjXVrzAH70F4YA@mail.gmail.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-To: William Liu <will@willsroot.io>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Davide Caratti <dcaratti@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521-airopha-desc-sram-v3-4-a6e9b085b4f0@kernel.org>
 
-On Wed, May 21, 2025 at 11:38=E2=80=AFAM William Liu <will@willsroot.io> wr=
-ote:
->
-> On Wednesday, May 21st, 2025 at 2:03 PM, William Liu <will@willsroot.io> =
-wrote:
->
-> >
-> >
-> > On Wednesday, May 21st, 2025 at 11:06 AM, Jamal Hadi Salim jhs@mojatatu=
-.com wrote:
-> >
-> > > I am afraid using bits on the skb will not go well around here - and
-> > > zero chance if you are using those bits for a one-off like netem.
-> > > Take a look at net/sched/act_mirred.c for a more "acceptable"
-> > > solution, see use of mirred_nest_level.
-> >
-> >
-> > Ah ok, thank you for the suggestion. We will take a look at that then.
-> >
-> > > Not that it matters but I dont understand why you moved the skb2 chec=
-k
-> > > around. Was that resolving anything meaningful?
-> > >
-> > > cheers,
-> > > jamal
-> >
-> >
-> > Yes - otherwise the limit value of the qdisc isn't properly respected a=
-nd can go over by one due to duplication. The limit check happens before bo=
-th the duplication and the skb enqueue, so after duplication, that limit ch=
-eck would be stale for the original enqueue.
-> >
-> > Best,
-> > Will
->
-> Hi Jamal,
->
-> If we do a per cpu global variable approach like in act_mirred.c to track=
- nesting, then wouldn't this break in the case of having multiple normal qd=
-isc setups run in parallel across multiple interfaces?
+On Wed, May 21, 2025 at 09:16:39AM +0200, Lorenzo Bianconi wrote:
+> In order to improve packet processing and packet forwarding
+> performances, EN7581 SoC supports consuming SRAM instead of DRAM for
+> hw forwarding descriptors queue.
+> For downlink hw accelerated traffic request to consume SRAM memory
+> for hw forwarding descriptors queue.
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 11 +----------
+>  drivers/net/ethernet/airoha/airoha_eth.h |  9 +++++++++
+>  drivers/net/ethernet/airoha/airoha_ppe.c |  6 ++++++
+>  3 files changed, 16 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+> index 20e590d76735e72a1a538a42d2a1f49b882deccc..3cd56de716a5269b1530cff6d0ca3414d92ecb69 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -71,15 +71,6 @@ static void airoha_qdma_irq_disable(struct airoha_irq_bank *irq_bank,
+>  	airoha_qdma_set_irqmask(irq_bank, index, mask, 0);
+>  }
+>  
+> -static bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
+> -{
+> -	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
+> -	 * GDM{2,3,4} can be used as wan port connected to an external
+> -	 * phy module.
+> -	 */
+> -	return port->id == 1;
+> -}
+> -
+>  static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *addr)
+>  {
+>  	struct airoha_eth *eth = port->qdma->eth;
+> @@ -1128,7 +1119,7 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+>  			LMGR_INIT_START | LMGR_SRAM_MODE_MASK |
+>  			HW_FWD_DESC_NUM_MASK,
+>  			FIELD_PREP(HW_FWD_DESC_NUM_MASK, HW_DSCP_NUM) |
+> -			LMGR_INIT_START);
+> +			LMGR_INIT_START | LMGR_SRAM_MODE_MASK);
 
-A single skb cannot enter netem via multiple cpus. You can have
-multiple cpus entering the netem but they would be different skbs - am
-i missing something? Note mirred uses per-cpu counter which should
-suffice for being per skb counters.
+Hi Lorenzo,
 
-> We also considered adding a nesting tracker within netem_sched_data itsel=
-f (to increment and decrement in the prologue and epilogue netem_enqueue), =
-but that would break upon having multiple netems with duplication enabled i=
-n the qdisc hierarchy. If we aren't going to track it in sk_buff, I am not =
-sure if this approach is viable.
->
+I'm wondering if setting the LMGR_SRAM_MODE_MASK bit (maybe a different
+name for the #define would be nice) is dependent on the SRAM region
+being described in DT, as per code added above this line to this
+function by the previous patch in this series.
 
-As long as it's per-cpu, not sure where the breakage is.
-
-> This brings us back to the approach where we don't allow duplication in n=
-etem if a parent qdisc is a netem with duplication enabled. However, one is=
-sue we are worried about is in regards to qdisc_replace. This means this ch=
-eck would have to happen everytime we want to duplicate something in enqueu=
-e right? That isn't ideal either, but let me know if you know of a better p=
-lace to add the check.
->
-
-I didnt follow - can you be more specific?
-
-cheers,
-jamal
-
-
-> Will
-> Savy
+>  
+>  	return read_poll_timeout(airoha_qdma_rr, status,
+>  				 !(status & LMGR_INIT_START), USEC_PER_MSEC,
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+> index 3e03ae9a5d0d21c0d8d717f2a282ff06ef3b9fbf..b815697302bfdf2a6d115a9bbbbadc05462dbadb 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -597,6 +597,15 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32 mask, u32 val);
+>  #define airoha_qdma_clear(qdma, offset, val)			\
+>  	airoha_rmw((qdma)->regs, (offset), (val), 0)
+>  
+> +static inline bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
+> +{
+> +	/* GDM1 port on EN7581 SoC is connected to the lan dsa switch.
+> +	 * GDM{2,3,4} can be used as wan port connected to an external
+> +	 * phy module.
+> +	 */
+> +	return port->id == 1;
+> +}
+> +
+>  bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
+>  			      struct airoha_gdm_port *port);
+>  
+> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+> index 2d273937f19cf304ab4b821241fdc3ea93604f0e..12d32c92717a6b4ba74728ec02bb2e166d4d9407 100644
+> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
+> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+> @@ -251,6 +251,12 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+>  		else
+>  			pse_port = 2; /* uplink relies on GDM2 loopback */
+>  		val |= FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, pse_port);
+> +
+> +		/* For downlink traffic consume SRAM memory for hw forwarding
+> +		 * descriptors queue.
+> +		 */
+> +		if (airhoa_is_lan_gdm_port(port))
+> +			val |= AIROHA_FOE_IB2_FAST_PATH;
+>  	}
+>  
+>  	if (is_multicast_ether_addr(data->eth.h_dest))
+> 
+> -- 
+> 2.49.0
+> 
+> 
 
