@@ -1,78 +1,107 @@
-Return-Path: <netdev+bounces-192796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53423AC11AA
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:56:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA87AC11AF
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BF6AA23C30
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:55:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73FB97B8EC6
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A12E2BCF76;
-	Thu, 22 May 2025 16:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB8A29AAFC;
+	Thu, 22 May 2025 16:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="dYdatpep";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="aZN+ZgTA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nj17yPTt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BEB2BCF5F;
-	Thu, 22 May 2025 16:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44A29A32A;
+	Thu, 22 May 2025 16:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747932822; cv=none; b=QD78MrrG9TOgj1VoBF/Bu3xNCxJIiRjVrKYe65Z/l/LEpapWGtT6RP1JOAck71/VJHL6FPbhm/pCO7uacG9uZ3za+FZS9relI2wwBRlcu/vVpLBlCmnR0nrd4bMYbri25CXeiBjpjgn3AGG9b8BOx1xndY0hQorja68+3kx8wHo=
+	t=1747932834; cv=none; b=IBjPDqig/1BJRoGSIn0WRqqB8BGDlNVJxBCO/RULVxBxPafw34DMiMWYWtr2mGD6Ag+kQFKwcGOEeWt6Nf2ffaXeamGgn9ddlcvOF08xsTDzhLwbKZGYpm6SGRS7dwKJCaO4FBHvCXbGuwBXfdxYpwKA/yR1pDHVfkAOuITMbgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747932822; c=relaxed/simple;
-	bh=+WyuSzY8iTXakgKPrZTOoJAzKr6no3oaF9Hoo6viGco=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ttSWi19fC6lZ8e10EEORExhO69MsPUL/yazll+0pd+j8/7h/NkmlbkLqk8HHLlkFvriAW8tRoVAp42NCaJ3lpxqLVSVO+gaXQrsC/ejnKJ1WIM08T6BZOqrRy1hOArh3BxQd8cIpHMuDMqgGJjDIpaL8CsYOCTZ/hRXfxSPQC0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=dYdatpep; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=aZN+ZgTA; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 350226070B; Thu, 22 May 2025 18:53:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1747932819;
-	bh=fgtfte1RQBzSglXlyusqVeme6v6O+BEQRvyDXs0vEDE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dYdatpeph32JOoBRgFUK91ZAjlCfdFQm17J4vX1qftDJnGY11k79zk/cAkh7T4Kq1
-	 J1V2ohw/erkwYHr69B3C+B2KQYp6sNKuKRMW/dXFhRjrZnRTAiJUIRAdDWkcY1wJUi
-	 b0c593PEQ+fwWZ9b78ans/vx08+JO8LrBcAtR/D2EkeRwlLgCXmvQnaUBVZ56Ymcbi
-	 DBOe1GmShAIl8P7JROCe7oH3fpQpgHpuRfivUWpgKb8JCywv4j8tk00zWswfb0BLq0
-	 vX5IOAEFaRmmc8mEckYbk7CSMUZHMg60Mu4EGZxNV/zzHzD/4kxN01OxT6vmCAtJu7
-	 9653RLiL4q1qg==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 605BE60726;
-	Thu, 22 May 2025 18:53:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1747932784;
-	bh=fgtfte1RQBzSglXlyusqVeme6v6O+BEQRvyDXs0vEDE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aZN+ZgTAQyrMz2c8vFRP6QFqF92lWZRMZsjGfnsY1ehl+6gHvfotlTbg1HVpe8HZn
-	 qv0S0tJf2u0QW8S2MIgbdYHcfVkS14ug+IkeqLsnhUEY4pYpIRNakQ6nfJEVwO5XU4
-	 dBl5Q7h1TsOBpZ3wiUfeGNvTRifo2kSpFx/DLzfCUNbtNhH+s3SIre49bV17FTlEEo
-	 u66sVb0i1AqGZ1xitRRSSJfWJl/Pymzgpyylrf0bfx1Msn1l6ducLp++o5Aicv6Gvp
-	 SXiVee9df61WOkwHE9WfzJMvPi/urFaTeu8rit6BsrvaMrfo71T+dHhb733krs9YAS
-	 4jG1O8S/THDXw==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1747932834; c=relaxed/simple;
+	bh=xE5ZOtlR6OATG9/4T3dvjATiI+PvfvxCWdxptiFvfeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RqOK2LvLcBbQxr6A9HNtgqHuF3u78wOqYEmlFeOeyG5/iAqEBScbW8jyLNNe0jfnwSqNYun+sl4UzwpR1jLAWqx1L+4/erHCsH9mq4zPE/e4I9xrYvh1z36O8whkVTRtfpWH963Wv0jDIyPp1j8kEHX27rEOmyZos+KRA6HgjBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nj17yPTt; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so69279305e9.1;
+        Thu, 22 May 2025 09:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747932831; x=1748537631; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ARK5arm4xRMg5UA4OO1T6K5We9IiVU4dSpLE3tmkVDE=;
+        b=nj17yPTt1wQW4sbKrbPjq+Q/Gf9en3mptUNstFos4rda/qIUds+XuSc0Hn5Lkzb3ov
+         LjworIxRv0yuWIHAG0yjEnm9gm8rf/Bfz4XMUoVUcqaKy1i/8J2Nl0iEiSmkmZ8/I815
+         /y7f24Qsm+cL/A4D4qFqRbWcHzaICiFVwKQbQWPqbLgHBXCwInzxvRdhVtAwauN9DpGC
+         gO68xOyC5ltWB1yndvLtu7uaa+fV1hYgwZkxIyjiufQV88POEYpL6ZvMvjBW2Ip+y0xN
+         TQQ4oAtMugCKWvs2A/+RFqN8mGw9a+h1Rbgfs6dmVKRpLkx3fzWnK8FHKBn0/QpJsTp9
+         wCkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747932831; x=1748537631;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ARK5arm4xRMg5UA4OO1T6K5We9IiVU4dSpLE3tmkVDE=;
+        b=UVAzxNCIE2vHsHvFLvvXBuvjztk7NJZMT9lg6x0Z1BbX0VkL3MojVALsjpyFVn97dd
+         ZxQAbTeFWRMz81ZmnXDLOhGYI+QThGi4htk+Yz+traHvR6IJEv8AxibphWlsftgTdJEp
+         xwYOhNUFhDsa5KBm7eCbI7Zdw4z2B4T00bJHIel1im1MeCHdE4riQ7ItbrIogWkqJR97
+         MIVbmvdin96Wv0GKKH/Bp/n61Z3YIx/Fq6WkpLGJ3HeQN9muBvgFXcXYBEury4yFFM8F
+         zUKc1phJMVUb+WZZFdEWeBbJQGwjjFLhqDkAFZVj6r7z+Mksi4pn0CjXovdXclMqIWP1
+         z/hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUuWv9dtJDXw2GUWdZk7e2tQdMyGNGYFjcHbC0JHYQ808RFGD8ci6cOObCOLHAfjgKjrv1q1ThuGEFl@vger.kernel.org, AJvYcCVr0iZ9TK35h4SBgW2ZV+LQNQeo6FF7et5cX65jRF5im3U73aRalZe2KW7K/T9rT2Nq0eHPJnxq@vger.kernel.org, AJvYcCWp1ff+fv6PmvylxWTItfUsS7Rg7MlDYQ3owngXTI4rsq//UKoZFgnFztLx3YJ/yuegyxLklm259k7Jj1y9@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJOMij4+WfL/k+L77MCdDmrep3HQObnSZ3aKZ4zMVjWV2osWLj
+	U0KFQ8MDzRqmmUSspAzcw5rJkuNx31GYNszm7YlKPVXluE5DJXnCefYY
+X-Gm-Gg: ASbGncuMlq/mR4rqCs85eLRUdNqYWIEvKlOo3twmrdPWqi1pe087M0DOPXruR8MTD/g
+	v8roI/lg8mdgY3hcUYU3dAGrVfuvdjkR7BCIoN3ElS/Xizhgfiq9vgDslGy+HG8QpIjJjK5GL7B
+	HX80SlMb6nSGcBqXxTyM/YC1PxXfaBaGIrDvHJ6s4/pqpduPUkUchGj/JlVHcuArSdl3EAflJxe
+	IECwsJ1TXyxHeR6E/xrifThiqVST9Rcg9XsZ+wCLtL0qetw0xxUpINT7ax9yvMFLjUk6To/Wn7d
+	r8ykuUh/aoxrakvxLi9qSxsubRoYEwcGJdPswKbHy3NcYuZKrVn334ZR5aXXi5uKQ8GrKbmLmzD
+	DuQVtRLVoD2ywc8Zp8GsF
+X-Google-Smtp-Source: AGHT+IHWhtAWXRBGh/ENakgND9IzcrqJZpmuMgIAj3z1JdfL9BG36SGp+6PXxZ3vxlmo2rQYJG68cA==
+X-Received: by 2002:a05:600c:8411:b0:44b:1f5b:8c85 with SMTP id 5b1f17b1804b1-44b1f5b8d2cmr16008065e9.13.1747932830716;
+        Thu, 22 May 2025 09:53:50 -0700 (PDT)
+Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-447f6b297easm118737525e9.6.2025.05.22.09.53.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 May 2025 09:53:49 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
 	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net-next 26/26] selftests: netfilter: Torture nftables netdev hooks
-Date: Thu, 22 May 2025 18:52:38 +0200
-Message-Id: <20250522165238.378456-27-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250522165238.378456-1-pablo@netfilter.org>
-References: <20250522165238.378456-1-pablo@netfilter.org>
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH 0/3] net: dsa: mt7530: Add AN7583 support + PHY
+Date: Thu, 22 May 2025 18:53:08 +0200
+Message-ID: <20250522165313.6411-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,197 +110,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Phil Sutter <phil@nwl.cc>
+This small series add the required changes to make Airoha AN7583
+Switch and Internal PHY work due to strange default configuration.
 
-Add a ruleset which binds to various interface names via netdev-family
-chains and flowtables and massage the notifiers by frequently renaming
-interfaces to match these names. While doing so:
-- Keep an 'nft monitor' running in background to receive the notifications
-- Loop over 'nft list ruleset' to exercise ruleset dump codepath
-- Have iperf running so the involved chains/flowtables see traffic
+Christian Marangi (3):
+  dt-bindings: net: dsa: mediatek,mt7530: Add airoha,an7583-switch
+  net: dsa: mt7530: Add AN7583 support
+  net: phy: mediatek: Add Airoha AN7583 PHY support
 
-If supported, also test interface wildcard support separately by
-creating a flowtable with 'wild*' interface spec and quickly add/remove
-matching dummy interfaces.
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |  5 ++++
+ drivers/net/dsa/mt7530-mmio.c                 |  1 +
+ drivers/net/dsa/mt7530.c                      | 24 +++++++++++++++++--
+ drivers/net/dsa/mt7530.h                      | 18 ++++++++++----
+ drivers/net/phy/mediatek/mtk-ge-soc.c         | 20 ++++++++++++++++
+ 5 files changed, 62 insertions(+), 6 deletions(-)
 
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- .../testing/selftests/net/netfilter/Makefile  |   1 +
- .../net/netfilter/nft_interface_stress.sh     | 151 ++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100755 tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-
-diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
-index 3bdcbbdba925..e9b2f553588d 100644
---- a/tools/testing/selftests/net/netfilter/Makefile
-+++ b/tools/testing/selftests/net/netfilter/Makefile
-@@ -24,6 +24,7 @@ TEST_PROGS += nft_concat_range.sh
- TEST_PROGS += nft_conntrack_helper.sh
- TEST_PROGS += nft_fib.sh
- TEST_PROGS += nft_flowtable.sh
-+TEST_PROGS += nft_interface_stress.sh
- TEST_PROGS += nft_meta.sh
- TEST_PROGS += nft_nat.sh
- TEST_PROGS += nft_nat_zones.sh
-diff --git a/tools/testing/selftests/net/netfilter/nft_interface_stress.sh b/tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-new file mode 100755
-index 000000000000..11d82d11495e
---- /dev/null
-+++ b/tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-@@ -0,0 +1,151 @@
-+#!/bin/bash -e
-+#
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Torture nftables' netdevice notifier callbacks and related code by frequent
-+# renaming of interfaces which netdev-family chains and flowtables hook into.
-+
-+source lib.sh
-+
-+checktool "nft --version" "run test without nft tool"
-+checktool "iperf3 --version" "run test without iperf3 tool"
-+
-+# how many seconds to torture the kernel?
-+# default to 80% of max run time but don't exceed 48s
-+TEST_RUNTIME=$((${kselftest_timeout:-60} * 8 / 10))
-+[[ $TEST_RUNTIME -gt 48 ]] && TEST_RUNTIME=48
-+
-+trap "cleanup_all_ns" EXIT
-+
-+setup_ns nsc nsr nss
-+
-+ip -net $nsc link add cr0 type veth peer name rc0 netns $nsr
-+ip -net $nsc addr add 10.0.0.1/24 dev cr0
-+ip -net $nsc link set cr0 up
-+ip -net $nsc route add default via 10.0.0.2
-+
-+ip -net $nss link add sr0 type veth peer name rs0 netns $nsr
-+ip -net $nss addr add 10.1.0.1/24 dev sr0
-+ip -net $nss link set sr0 up
-+ip -net $nss route add default via 10.1.0.2
-+
-+ip -net $nsr addr add 10.0.0.2/24 dev rc0
-+ip -net $nsr link set rc0 up
-+ip -net $nsr addr add 10.1.0.2/24 dev rs0
-+ip -net $nsr link set rs0 up
-+ip netns exec $nsr sysctl -q net.ipv4.ip_forward=1
-+ip netns exec $nsr sysctl -q net.ipv4.conf.all.forwarding=1
-+
-+{
-+	echo "table netdev t {"
-+	for ((i = 0; i < 10; i++)); do
-+		cat <<-EOF
-+		chain chain_rc$i {
-+			type filter hook ingress device rc$i priority 0
-+			counter
-+		}
-+		chain chain_rs$i {
-+			type filter hook ingress device rs$i priority 0
-+			counter
-+		}
-+		EOF
-+	done
-+	echo "}"
-+	echo "table ip t {"
-+	for ((i = 0; i < 10; i++)); do
-+		cat <<-EOF
-+		flowtable ft_${i} {
-+			hook ingress priority 0
-+			devices = { rc$i, rs$i }
-+		}
-+		EOF
-+	done
-+	echo "chain c {"
-+	echo "type filter hook forward priority 0"
-+	for ((i = 0; i < 10; i++)); do
-+		echo -n "iifname rc$i oifname rs$i "
-+		echo    "ip protocol tcp counter flow add @ft_${i}"
-+	done
-+	echo "counter"
-+	echo "}"
-+	echo "}"
-+} | ip netns exec $nsr nft -f - || {
-+	echo "SKIP: Could not load nft ruleset"
-+	exit $ksft_skip
-+}
-+
-+for ((o=0, n=1; ; o=n, n++, n %= 10)); do
-+	ip -net $nsr link set rc$o name rc$n
-+	ip -net $nsr link set rs$o name rs$n
-+done &
-+rename_loop_pid=$!
-+
-+while true; do ip netns exec $nsr nft list ruleset >/dev/null 2>&1; done &
-+nft_list_pid=$!
-+
-+ip netns exec $nsr nft monitor >/dev/null &
-+nft_monitor_pid=$!
-+
-+ip netns exec $nss iperf3 --server --daemon -1
-+summary_expr='s,^\[SUM\] .* \([0-9\.]\+\) Kbits/sec .* receiver,\1,p'
-+rate=$(ip netns exec $nsc iperf3 \
-+	--format k -c 10.1.0.1 --time $TEST_RUNTIME \
-+	--length 56 --parallel 10 -i 0 | sed -n "$summary_expr")
-+
-+kill $nft_list_pid
-+kill $nft_monitor_pid
-+kill $rename_loop_pid
-+wait
-+
-+ip netns exec $nsr nft -f - <<EOF
-+table ip t {
-+	flowtable ft_wild {
-+		hook ingress priority 0
-+		devices = { wild* }
-+	}
-+}
-+EOF
-+if [[ $? -ne 0 ]]; then
-+	echo "SKIP wildcard tests: not supported by host's nft?"
-+else
-+	for ((i = 0; i < 100; i++)); do
-+		ip -net $nsr link add wild$i type dummy &
-+	done
-+	wait
-+	for ((i = 80; i < 100; i++)); do
-+		ip -net $nsr link del wild$i &
-+	done
-+	for ((i = 0; i < 80; i++)); do
-+		ip -net $nsr link del wild$i &
-+	done
-+	wait
-+	for ((i = 0; i < 100; i += 10)); do
-+		(
-+		for ((j = 0; j < 10; j++)); do
-+			ip -net $nsr link add wild$((i + j)) type dummy
-+		done
-+		for ((j = 0; j < 10; j++)); do
-+			ip -net $nsr link del wild$((i + j))
-+		done
-+		) &
-+	done
-+	wait
-+fi
-+
-+[[ $(</proc/sys/kernel/tainted) -eq 0 ]] || {
-+	echo "FAIL: Kernel is tainted!"
-+	exit $ksft_fail
-+}
-+
-+[[ $rate -gt 0 ]] || {
-+	echo "FAIL: Zero throughput in iperf3"
-+	exit $ksft_fail
-+}
-+
-+[[ -f /sys/kernel/debug/kmemleak && \
-+   -n $(</sys/kernel/debug/kmemleak) ]] && {
-+	echo "FAIL: non-empty kmemleak report"
-+	exit $ksft_fail
-+}
-+
-+exit $ksft_pass
 -- 
-2.30.2
+2.48.1
 
 
