@@ -1,86 +1,88 @@
-Return-Path: <netdev+bounces-192744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21E6AC1015
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:39:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF68FAC101F
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84B617A8EC
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:39:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4022A23E4E
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37A6299952;
-	Thu, 22 May 2025 15:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE61299933;
+	Thu, 22 May 2025 15:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBx2kQX/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="smsGvCSU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA750539A;
-	Thu, 22 May 2025 15:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE006539A;
+	Thu, 22 May 2025 15:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747928377; cv=none; b=mu0+ndphmQUqj3nKoDrXShWP2MnDtaGnA4Ll/8a9DuuDW9QAlGzosIHd1WVBmlzTbjN5VyNMRO07k7mRLYL7UeeRWDVdbf0FJyp2mdoy4kUBttxDUnjPzLg42POi08TSsTfHJGWNxqlSRb138GqQ3fAqjoK8lrg/1UdaZfQPCOA=
+	t=1747928462; cv=none; b=caUxyYmW05VWek5Jo6pCYfdyebSNzURJWi8BWyH1fWiOVlgNZZdKQSSXYHBwFJTRPdWD1rXdWfBEAsQICr9bhm2Q6r+BRKapjD9eCNXM+CAlXYwKcYyV6TF+Nqo9wJX1iz5MGmm6b0o6tRWdMcbgt21HEI+ofPjdN5jcaJoCHFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747928377; c=relaxed/simple;
-	bh=m48VDzvZxngsVThl7qEq+eGRhpEyzPfbTWTjwFWJ7sY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lzPU3/5gpfX3CNKWxcm1Yjzf6tswFgnweSg5LiDf7fLLNiaHgLHYoIZ9ff+/PxXbmCe8TUzxa8jQxtMZGqd/INx5cZD5JZ3rIQ53Lqw34L/+jpK1iJZwkfvpWC4cjgpL3ivT6iEOqMI4T/PPjLCj2+Qf4ZwwF3z8MClJJ7eznu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBx2kQX/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC80C4CEE4;
-	Thu, 22 May 2025 15:39:36 +0000 (UTC)
+	s=arc-20240116; t=1747928462; c=relaxed/simple;
+	bh=lCue99gfK3k3Le4BsyR2Ad8jnJGdsOlLpAI71GbiBR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3+BltNt6wAYa8TQjJ/DvLoglSlGbwwNqUPZcVrKpqualRHJElL2Puu9n03wl009OwrsfSvebmbzh7DzmpeqrhomUDSBEHzEBrMs09N569JaJ7KOolJg0Ts5t2Zijvnky/lj0McIdRAGDxOalQp7WoL5+wMRnNzztYEEjBdlo8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=smsGvCSU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED3FC4CEE4;
+	Thu, 22 May 2025 15:40:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747928377;
-	bh=m48VDzvZxngsVThl7qEq+eGRhpEyzPfbTWTjwFWJ7sY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YBx2kQX/Ge7poDRWNwFgzb8zQEJ1vnCJp0YhI5Aft6QT0MVMMpUC4j6KIAgzxXCPy
-	 /uFWEkc3dorlKv41FkxtffkdgVaSrrPaAw7R8TSaA8Yo3liQDpH7/JCoQPqb3DPKaS
-	 7n+CJKEuvpXKI4uuxa3Aj7zOihp8VIZElK83Vn6Fm/eO0dzEMkQhth4+apkjqgqYOu
-	 +7yKjVGFANkH65TUasCoqo+qRjRioKqbZ96vvg0X8Cykvm0pCrBBKU9HrNzLkO38GQ
-	 1Pe/igHx5cpvFecgWROV8Wh0oD+MvCGtUs/eZ5yS/F//9ISHkeuXrHSB+uHG0l4u2w
-	 XkQTbNP1U0+kA==
-Date: Thu, 22 May 2025 08:39:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: add Kconfig option for RMON
- registers
-Message-ID: <20250522083936.6ad10f45@kernel.org>
-In-Reply-To: <aC7CR1ZTaJ7m_Dna@mythos-cloud>
-References: <20250519214046.47856-2-yyyynoom@gmail.com>
-	<20250519165758.58157a0b@kernel.org>
-	<aC7CR1ZTaJ7m_Dna@mythos-cloud>
+	s=k20201202; t=1747928462;
+	bh=lCue99gfK3k3Le4BsyR2Ad8jnJGdsOlLpAI71GbiBR8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=smsGvCSUA9wUvoiQNY6Tp7JkMd8h/QpRkrFNQEZRU9UYoZ4p6bNfujf1ZaK0w4GLO
+	 zK/3uZU/TckfBhku9QH5YUHp+PUabazi/p9pIsVukWV4TvJ8dpT61na02rm4Si/8rJ
+	 SN5qZvrBPQ4ZQf4w+VPHQRprp5BMomuxN27EKekbOzG9qSAKS+JDjEfcf3UxuzydBV
+	 geEzhorVxxqp+2F2P/PE2RrwkmdKcn7ppjDTkkhgjrDv0tag92Ea4vk6RKYyemUeTd
+	 rpJeid25KQeBd3SvVdtx6t+Pb9lEz4UOkT4de2cvSgxdq5og/VY7mtnlwo4qglUEz8
+	 i09Xz58XH8sLw==
+Date: Thu, 22 May 2025 16:40:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] net/mlx5: Add error handling in
+ mlx5_query_nic_vport_node_guid()
+Message-ID: <20250522154057.GI365796@horms.kernel.org>
+References: <20250521132343.844-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521132343.844-1-vulab@iscas.ac.cn>
 
-On Thu, 22 May 2025 15:20:55 +0900 Moon Yeounsu wrote:
-> On Mon, May 19, 2025 at 04:57:58PM -0700, Jakub Kicinski wrote:
-> > On Tue, 20 May 2025 06:40:45 +0900 Moon Yeounsu wrote:
-> > Kconfig is not a great choice for chip specific logic.
-> > You should check some sort of chip ID register or PCI ID
-> > to match the chip version at runtime. Most users don't compile
-> > their own kernels.  
+On Wed, May 21, 2025 at 09:23:43PM +0800, Wentao Liang wrote:
+> The function mlx5_query_nic_vport_node_guid() calls the function
+> mlx5_query_nic_vport_context() but does not check its return value.
+> A proper implementation can be found in mlx5_nic_vport_query_local_lb().
 > 
-> Just to confirm. are you suggesting that RMON MMIO should be enabled
-> only on hardware known to support it correctly, instaed of exposing it
-> via Kconfig?
+> Add error handling for mlx5_query_nic_vport_context(). If it fails, free
+> the out buffer via kvfree() and return error code.
 > 
-> Then, I'll drop the Kconfig option and enable RMON MMIO only for
-> known-good devices via a runtime check. Currently, that's limited to
-> DGE-550T (`0x4000`) with revision A3 (`0x0c`).
-> 
-> The `dw32(RmonStatMask, 0x0007ffff);` line will also be skipped
-> accordingly.
+> Fixes: 9efa75254593 ("net/mlx5_core: Introduce access functions to query vport RoCE fields")
+> Cc: stable@vger.kernel.org # v4.5
+> Target: net
 
-Yes, sounds like that's along the lines of my suggestion.
+I don't think Target is a standard tag, so please omit it in v4.
+The correct way to target a Networking tree is to put the tree name
+in the subject line. Like this:
+
+  Subject: [PATCH net v4] ...
+
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+> v3: Explicitly mention target branch. Change improper code.
+> v2: Remove redundant reassignment. Fix typo error.
 
