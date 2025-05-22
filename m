@@ -1,144 +1,332 @@
-Return-Path: <netdev+bounces-192870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD0AAC170B
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:55:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62D3AC170D
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:57:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6D65A44252
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:55:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AC6C1C0297D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A171129DB8C;
-	Thu, 22 May 2025 22:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8A62BDC3A;
+	Thu, 22 May 2025 22:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hvwi6Dhm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0147229B8EC
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 22:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266EA27E7D3
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 22:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747954533; cv=none; b=RVDapgSiuia5SWlHEllCaMmCwfUmW+c0jGIqRvHZxyoO+SYvNbuuz/lOaRrYv5yz1rETwRMsI54TWd7PyE8J9OPcHEm5GxfIumYmffZ8JTgUAVpPds2t5y0b+bBACOYWCWVlqfPZy4qgcDhkFQoQIcgbfnzQ5zcL+fET8Vsr4EQ=
+	t=1747954635; cv=none; b=B0WI8cjbZdDYRblZgzl1YFLYNJHWv6NLkwvxeFfjL3P9NhNs5D0jSkFTM4QxMLnlej0+3OKHcp/nZ7U/i1Puwt8O6Veh823tZmsMuBJzoSwfnq3sewUaKiI/pE64nL51FUyG+TmpiU/ysuduxEDycBtQLe6Yr7UGZDUlhifLLsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747954533; c=relaxed/simple;
-	bh=ou6RSv/x7n9xL2cAtrEQ0u/WhTuETMCtobnEEi6T+u4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fUywQ3Jj3zm1WY2MwcjGKFIhrWKCYSWX4eD9AdNsxj8UhRo9JoxXd6TqPgMJvExSZfafrNiZLWFV/2iCtaaHebsfPz1uGmGoqALPkPSV6EL9APcO3V024hpup+f/1OWiFEAg/ZMuebYeCuRkaUBvfc2HyY2Ari+AzcRYglDNs6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e7d664bcd34so1880598276.0
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:55:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747954531; x=1748559331;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=adpV2Solr9Pp5IhRdG1YcgE2gI2kY44w0Hxu+crlaGw=;
-        b=hVmrfKtgL66QS3HUdQUqGjWlk63DE7vo8ryCR9g5YtU3E7uZ4GWOGTMuSj9ql6PY3s
-         6P0eLeJpuOZv5hFyK+1qQnueChcFkOT2kB6pImWozUi6JqhWYDS3wxDzcCCA9hR/UX75
-         J9GB0t0Nhqgjrf5sWADZ3PSj/gkRMgmJPk39+3DNjRgZvKc0DbTTH/2mHbos6XLJ0OQm
-         ql7VE8m4nFl1IjI9VmjaJklBFYmJFK+kaFQu8UV07juUdmD+Jjuf35xK9+k1qRE+Vh2G
-         2bXR8W3KI90jStaBc5oDiAAAeMJO8G17xPBL7FbE2HqbfacmU1ymEsqgYn56OLq+kL7r
-         xavw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5cM7IaOfo9dZKRD4no3pfXTgsOKcIc3cG5plsGt3QLPU82LNz83lwIkwIetEUsQVm7FJZfQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHFMl1NbiDkANKMOENSCWbpuGm39LdSsCCAMSwxk4n0gxIeGhD
-	OSFZm9fvu6ZATSmEg++lxbGtaKfB6x3lXeRTNbtD8NI5md29rnlUsiWP8Ww6xlgV
-X-Gm-Gg: ASbGncvwNpjw9j5XQVKfqU6zwqi+OTcC96wX5YuwWvqafubNVGOFXF5p9mxMoHpu4y9
-	irN/Oc9OanRqPZHzsutm8ZqnE4RD53MoH+ziEMjHHtujQBXFZTxIcNY0SVAUgYbx7ylX6b7VodQ
-	g3ZATlt19jaENI88150OJu5L7HbwQ+LOi8/r/5G7DgF6k20OwZGpdcuRxmbNG+BaykXqip/Wgat
-	f45xlxrCjqyXmoKMOORlrOpVoDWmkQkmaIE1P85B8KeaXqNIKp3bEBf7aRyXE/pqzkgPxEcjaAz
-	bkaKxEMRgRArRKOzJWZTGZ8gZTLn/o2jwVIOdX6DG0hZbt/HqoByRwc833phGV3S6iEswzeXFPv
-	FyeH3c4r954Kf
-X-Google-Smtp-Source: AGHT+IG9aNj8SEGv4Ji6u8r+OCmVe/mks/EiQqhXiFlQdoMj0ow8ye3sH9v5VUv82bG2Cr+fTxXGAw==
-X-Received: by 2002:a05:6902:1684:b0:e7c:3db3:9a1e with SMTP id 3f1490d57ef6-e7c3db39b1fmr24021440276.12.1747954530689;
-        Thu, 22 May 2025 15:55:30 -0700 (PDT)
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com. [209.85.128.182])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e7d5d2b447fsm1372715276.4.2025.05.22.15.55.29
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 15:55:29 -0700 (PDT)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-70dec158cb7so33400587b3.2
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 15:55:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVzRz4u2ijgL4fSWRmllI8JR7eZZOLcVqoQcfC0FYODoOudWMm9pPDfn1r7gNHrkUIKTV6Upuw=@vger.kernel.org
-X-Received: by 2002:a05:690c:650e:b0:70d:f237:6a6a with SMTP id
- 00721157ae682-70df2377852mr133458987b3.11.1747954529644; Thu, 22 May 2025
- 15:55:29 -0700 (PDT)
+	s=arc-20240116; t=1747954635; c=relaxed/simple;
+	bh=ShpH2Lrz40L9DOsJ3UQSgxelkKBLo/YVsgqN9p+w034=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=YFtyQKl2eflXiPOjCQ0AMNFkFQaPhmeU4XSwmkLU6bJSf8CigQG0958Y0i6UUKs9AilOw9aHYtNU3ETiEKFOmTA48UPyRqD7Ea/V5Km7dZxegTP5gycy8u5Zt0+BFnzmDRYPHhAVfsMkRTavMERCYNvBYc0Jmk3karDmZvQYyEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hvwi6Dhm; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174794271559.992.2895280719007840700.reportbug@localhost>
-In-Reply-To: <174794271559.992.2895280719007840700.reportbug@localhost>
-From: Luca Boccassi <bluca@debian.org>
-Date: Thu, 22 May 2025 23:55:18 +0100
-X-Gmail-Original-Message-ID: <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
-X-Gm-Features: AX0GCFvgn8QgRgIGFMJhTNArgoPPGhjrwpCbwuUo-zBZ1egEnTqiXP-0DJbnrHg
-Message-ID: <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
-Subject: Re: Bug#1106321: iproute2: "ip monitor" fails with current trixie's
- linux kernel / iproute2 combination
-To: Stephen Hemminger <stephen@networkplumber.org>, David Ahern <dsahern@kernel.org>
-Cc: 1106321@bugs.debian.org, Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747954618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJDADEXuHfqfTmAHEHNUhMdj/6JudXWWJl8mcFP32/s=;
+	b=Hvwi6Dhm6PdUO0889euxLcZpJjDxz7rpCSpB/RGawHif/VbiSsxwSQPXU9mg+YDp0qhrDq
+	Lal+XtseX+emD5Ba/1IN93xFlGK26cyLKSGBWYC4xH3cdiWXUVOCWw2Idh0tYxoOr5xga5
+	9/fTCY8YHHZEmZZwJoGjUHOO68apVPM=
+Date: Thu, 22 May 2025 22:56:52 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <2c8ab490e47d44ef5250ac755a5388fe147345d4@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v6] bpf, sockmap: avoid using sk_socket after
+ free when sending
+To: "Martin KaFai Lau" <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, "Michal Luczaj" <mhal@rbox.co>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Jakub Sitnicki" <jakub@cloudflare.com>,
+ "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Thadeu Lima de
+ Souza Cascardo" <cascardo@igalia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <3eb50302-d90c-4477-b296-f5f29a7d1eca@linux.dev>
+References: <20250516141713.291150-1-jiayuan.chen@linux.dev>
+ <3eb50302-d90c-4477-b296-f5f29a7d1eca@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 22 May 2025 at 20:41, Adel Belhouane <bugs.a.b@free.fr> wrote:
->
-> Package: iproute2
-> Version: 6.14.0-3
-> Severity: normal
-> X-Debbugs-Cc: bugs.a.b@free.fr
->
-> Dear Maintainer,
->
-> Having iproute2 >= 6.14 while running a linux kernel < 6.14
-> triggers this bug (tested using debian-13-nocloud-amd64-daily-20250520-2118.qcow2)
->
->     root@localhost:~# ip monitor
->     Failed to add ipv4 mcaddr group to list
->
-> More specifically this subcommand, which didn't exist in iproute2 6.13
-> is affected:
->
->     root@localhost:~# ip mon maddr
->     Failed to add ipv4 mcaddr group to list
->     root@localhost:~# ip -6 mon maddr
->     Failed to add ipv6 mcaddr group to list
->
-> causing the generic "ip monitor" command to fail.
->
-> As trixie will use a 6.12.x kernel, trixie is affected.
->
-> bookworm's iproute2/bookworm-backports is also affected since currently
-> bookworm's backport kernel is also 6.12.x
->
-> Workarounds:
-> * upgrade the kernel to experimental's (currently) 6.14.6-1~exp1
-> * downgrade iproute2 to 6.13.0-1 (using snapshot.d.o)
-> * on bookworm downgrade (using snapshot.d.o)
->   iproute2 backport to 6.13.0-1~bpo12+1
->
-> Details I could gather:
->
-> This appears to come from this iproute2 6.14's commit:
->
-> https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?h=v6.14.0&id=7240e0e40f8332dd9f11348700c0c96b8df4ca5b
->
-> which appears to depend on new kernel 6.14 rtnetlink features as described
-> in Kernelnewbies ( https://kernelnewbies.org/Linux_6.14#Networking ):
->
-> Add ipv6 anycast join/leave notifications
->
-> with this (kernel 6.14) commit:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=33d97a07b3ae6fa713919de4e1864ca04fff8f80
+2025/5/23 03:25, "Martin KaFai Lau" <martin.lau@linux.dev> wrote:
 
-Hi Stephen and David,
+>=20
+>=20On 5/16/25 7:17 AM, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> The sk->sk_socket is not locked or referenced in backlog thread, an=
+d
+> >=20
+>=20>  during the call to skb_send_sock(), there is a race condition with
+> >=20
+>=20>  the release of sk_socket. All types of sockets(tcp/udp/unix/vsock)
+> >=20
+>=20>  will be affected.
+> >=20
+>=20>  Race conditions:
+> >=20
+>=20>  '''
+> >=20
+>=20>  CPU0 CPU1
+> >=20
+>=20>  backlog::skb_send_sock
+> >=20
+>=20>  sendmsg_unlocked
+> >=20
+>=20>  sock_sendmsg
+> >=20
+>=20>  sock_sendmsg_nosec
+> >=20
+>=20>  close(fd):
+> >=20
+>=20>  ...
+> >=20
+>=20>  ops->release() -> sock_map_close()
+> >=20
+>=20>  sk_socket->ops =3D NULL
+> >=20
+>=20>  free(socket)
+> >=20
+>=20>  sock->ops->sendmsg
+> >=20
+>=20>  ^
+> >=20
+>=20>  panic here
+> >=20
+>=20>  '''
+> >=20
+>=20>  The ref of psock become 0 after sock_map_close() executed.
+> >=20
+>=20>  '''
+> >=20
+>=20>  void sock_map_close()
+> >=20
+>=20>  {
+> >=20
+>=20>  ...
+> >=20
+>=20>  if (likely(psock)) {
+> >=20
+>=20>  ...
+> >=20
+>=20>  // !! here we remove psock and the ref of psock become 0
+> >=20
+>=20>  sock_map_remove_links(sk, psock)
+> >=20
+>=20>  psock =3D sk_psock_get(sk);
+> >=20
+>=20>  if (unlikely(!psock))
+> >=20
+>=20>  goto no_psock; <=3D=3D=3D Control jumps here via goto
+> >=20
+>=20>  ...
+> >=20
+>=20>  cancel_delayed_work_sync(&psock->work); <=3D=3D=3D not executed
+> >=20
+>=20>  sk_psock_put(sk, psock);
+> >=20
+>=20>  ...
+> >=20
+>=20>  }
+> >=20
+>=20>  '''
+> >=20
+>=20>  Based on the fact that we already wait for the workqueue to finish=
+ in
+> >=20
+>=20>  sock_map_close() if psock is held, we simply increase the psock
+> >=20
+>=20>  reference count to avoid race conditions.
+> >=20
+>=20>  With this patch, if the backlog thread is running, sock_map_close(=
+) will
+> >=20
+>=20>  wait for the backlog thread to complete and cancel all pending wor=
+k.
+> >=20
+>=20>  If no backlog running, any pending work that hasn't started by the=
+n will
+> >=20
+>=20>  fail when invoked by sk_psock_get(), as the psock reference count =
+have
+> >=20
+>=20>  been zeroed, and sk_psock_drop() will cancel all jobs via
+> >=20
+>=20>  cancel_delayed_work_sync().
+> >=20
+>=20>  In summary, we require synchronization to coordinate the backlog t=
+hread
+> >=20
+>=20>  and close() thread.
+> >=20
+>=20>  The panic I catched:
+> >=20
+>=20>  '''
+> >=20
+>=20>  Workqueue: events sk_psock_backlog
+> >=20
+>=20>  RIP: 0010:sock_sendmsg+0x21d/0x440
+> >=20
+>=20>  RAX: 0000000000000000 RBX: ffffc9000521fad8 RCX: 0000000000000001
+> >=20
+>=20>  ...
+> >=20
+>=20>  Call Trace:
+> >=20
+>=20>  <TASK>
+> >=20
+>=20>  ? die_addr+0x40/0xa0
+> >=20
+>=20>  ? exc_general_protection+0x14c/0x230
+> >=20
+>=20>  ? asm_exc_general_protection+0x26/0x30
+> >=20
+>=20>  ? sock_sendmsg+0x21d/0x440
+> >=20
+>=20>  ? sock_sendmsg+0x3e0/0x440
+> >=20
+>=20>  ? __pfx_sock_sendmsg+0x10/0x10
+> >=20
+>=20>  __skb_send_sock+0x543/0xb70
+> >=20
+>=20>  sk_psock_backlog+0x247/0xb80
+> >=20
+>=20>  ...
+> >=20
+>=20>  '''
+> >=20
+>=20>  Reported-by: Michal Luczaj <mhal@rbox.co>
+> >=20
+>=20>  Fixes: 4b4647add7d3 ("sock_map: avoid race between sock_map_close =
+and sk_psock_put")
+> >=20
+>=20>  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >=20
+>=20>  ---
+> >=20
+>=20>  V5 -> V6: Use correct "Fixes" tag.
+> >=20
+>=20>  V4 -> V5:
+> >=20
+>=20>  This patch is extracted from my previous v4 patchset that containe=
+d
+> >=20
+>=20>  multiple fixes, and it remains unchanged. Since this fix is relati=
+vely
+> >=20
+>=20>  simple and easy to review, we want to separate it from other fixes=
+ to
+> >=20
+>=20>  avoid any potential interference.
+> >=20
+>=20>  ---
+> >=20
+>=20>  net/core/skmsg.c | 8 ++++++++
+> >=20
+>=20>  1 file changed, 8 insertions(+)
+> >=20
+>=20>  diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> >=20
+>=20>  index 276934673066..34c51eb1a14f 100644
+> >=20
+>=20>  --- a/net/core/skmsg.c
+> >=20
+>=20>  +++ b/net/core/skmsg.c
+> >=20
+>=20>  @@ -656,6 +656,13 @@ static void sk_psock_backlog(struct work_stru=
+ct *work)
+> >=20
+>=20>  bool ingress;
+> >=20
+>=20>  int ret;
+> >=20
+>=20>  > + /* Increment the psock refcnt to synchronize with close(fd) pa=
+th in
+> >=20
+>=20>  + * sock_map_close(), ensuring we wait for backlog thread completi=
+on
+> >=20
+>=20>  + * before sk_socket freed. If refcnt increment fails, it indicate=
+s
+> >=20
+>=20>  + * sock_map_close() completed with sk_socket potentially already =
+freed.
+> >=20
+>=20>  + */
+> >=20
+>=20>  + if (!sk_psock_get(psock->sk))
+> >=20
+>=20
+> This seems to be the first use case to pass "psock->sk" to "sk_psock_ge=
+t()".
+>=20
+>=20I could have missed the sock_map details here. Considering it is raci=
+ng with sock_map_close() which should also do a sock_put(sk) [?],
+>=20
+>=20could you help to explain what makes it safe to access the psock->sk =
+here?
+>=20
+>=20>=20
+>=20> + return;
+> >=20
+>=20>  mutex_lock(&psock->work_mutex);
+> >=20
+>=20>  while ((skb =3D skb_peek(&psock->ingress_skb))) {
+> >=20
+>=20>  len =3D skb->len;
+> >=20
+>=20>  @@ -708,6 +715,7 @@ static void sk_psock_backlog(struct work_struc=
+t *work)
+> >=20
+>=20>  }
+> >=20
+>=20>  end:
+> >=20
+>=20>  mutex_unlock(&psock->work_mutex);
+> >=20
+>=20>  + sk_psock_put(psock->sk, psock);
+> >=20
+>=20>  }
+> >=20
+>=20>  > struct sk_psock *sk_psock_init(struct sock *sk, int node)
+> >
+>
 
-It looks like there's a regression in iproute2 6.14, and 'ip monitor'
-no longer works with kernels < 6.14. Could you please have a look when
-you have a moment? Thanks!
+Hi Martin,
+
+Using 'sk_psock_get(psock->sk)' in the workqueue is safe because
+sock_map_close() only reduces the reference count of psock to zero, while
+the actual memory release is fully handled by the RCU callback: sk_psock_=
+destroy().
+
+In sk_psock_destroy(), we first cancel_delayed_work_sync() to wait for th=
+e
+workqueue to complete, and then perform sock_put(psock->sk). This means w=
+e
+already have an explicit synchronization mechanism in place that guarante=
+es
+safe access to both psock and psock->sk in the workqueue context.
+
+Thanks.
 
