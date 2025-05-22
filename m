@@ -1,153 +1,181 @@
-Return-Path: <netdev+bounces-192549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B54AC05CD
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:34:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05778AC05D8
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2383E17F0D0
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:34:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D931B61349
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC71E2222A7;
-	Thu, 22 May 2025 07:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7DE22256B;
+	Thu, 22 May 2025 07:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZXuAoVVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E40C3234;
-	Thu, 22 May 2025 07:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6079E1E32A3;
+	Thu, 22 May 2025 07:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747899239; cv=none; b=b66au5RPCMgE5UeGUTSnEQKA8kVD80ee5cGVJqU5xCH1SRF0w6jXESPsHhdun/x/R/Ow8PZaE/MBFKJBRIW2+7nA8y8nkpd2mjYiiG7m7QjMvtc3pguy09FCGGnT9XDlB0iUvVAU169RcdxUYOH9lykCCSFafGCq+15frLPX4F4=
+	t=1747899382; cv=none; b=B+dUWtvzJTrRsZcZxH5dfPxXAB3kmcRqUFCWODxIiI3MXFOHBdqRi1o2nLXCLxZ8fCX88Oz8N7V5Fz4UOCjpewK9y2uzF2i4PiOr0DczJy0UxEHqOSmjaBnsUGk5CAXIa7k1jo9qvsAmbK9K/YEfm7bm4KERwzkdQTDBlRfbbt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747899239; c=relaxed/simple;
-	bh=afyt6vYfbzReFuh6xX3pKfOpek+1H61IQUVeBZj8jEM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eXypGXYQt+r/qfnmoqyO6424xK/GDIv1zLLEwLju0c8Kot9nGA/CymLCs6LgcJTz2ECZMaqUFIQClGfKqcuo5N9bCd8dsrPHd3dk81ZzSDYQ6WxjXiq/N2AiDqJWE9bbQU/E3j/aqmGRsrSl8/1hR7dxCN+IXT/qSQlSSf+d728=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5242f137a1eso2377987e0c.1;
-        Thu, 22 May 2025 00:33:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747899235; x=1748504035;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X7KW42M2nPHRBzgnk6YsRbRV24Eym9REz3RjLED1wag=;
-        b=I1OExxbLDyUAkVZhhoEZyCilMQkquKKGH+LI/QJArc5rQWkQSVx8AXYeGWxNkTb5oy
-         jQgFQyNjQc0D+J7yQui+1/D12E1+azdMWI+PDsFJr2X1+I+sXPIiOQvh6OhyC6dXOHZp
-         4vloLPdrzcBZQqqZbPtmnSD9aB7p6YV4XFoyGM7LSPyzDE7liZ21FhMjSp7oPCWYkQYC
-         8sJpbhW1wYJpVA8xOdAt3AnnmT5UtZAeb1TP0uX0opSiTPjLOcXfDmxIKvhLicVBR2SP
-         apxX3QKoxjibfj9LTFgMRMnciHSo9/tSo0x++9lsJRlqicLaa69mJQ8S/UHfIh+U3vNp
-         OsZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWw7CsoLgcnJanHlpOs2YWXm2n1pOYOVvfTDUOkW1xAQZFj52fWFGEcWVoX+76DgQet5KCte6Ip@vger.kernel.org, AJvYcCX2dBlsx+hu7I6nDDCCzgXiVm4yll+BbuAEL90dHP5kKWyjzE2XuYKtiuppjHOAc374tbj/TYrsL7Y=@vger.kernel.org, AJvYcCXgJkzdDfR9BK426nRGmt8iK3l49IaTsn4HMdCzeqeb+go/9dw5zZwz+DBQCw2xjlLqLa45Zk1UzH4U@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiIKpWS1LsDdtG4Syg3DVtOaZUCr6QdoDT5C/Ecy/c4XMl5ahc
-	9lFzEWRkK55xy8JgKr+DMsSoqNO1GbQJCRUC2wR6/60lyNQwQZ9Qyn/HzAxa2mNy
-X-Gm-Gg: ASbGnctW+p3hBoTw05omx9MgU5hwKGqNOf46lh6qoxspkMLqKnjBaXJIhRdozFFAjU5
-	js/y/NQw5EWKukl2pi2WTGyLWBOUuDBVZ+IzllaVUzs8LSG9pw3heQH7OUTg/DZaZibm89iz2ki
-	kbDF8mepiynz9VT0uvFZ1GIQGEkjk5wl3gR7MpOuwxX4tZ7Jl6N5z8BAuFT1+8MmdX2f8nKkzu7
-	c6hDUX++u4tZICVbMvdLSDLHbEPixOoYn/hWUg57ZuDoZ45gNgOxgT25jOHDn5zPnoMFbIyYRIa
-	QdDRadtvTZCZJy9QezE6fpQWhcDmg0A54hYtJTBQLrMnOycI/X//D+tw8tcQHOtFjrL9DOqCX/Z
-	3lzLLvOxDn+J/HA==
-X-Google-Smtp-Source: AGHT+IHikIZLZ1dZSgH/RR2Hdv8CSv8vbOX08ARUI5So85blok34d0/WyJjUj46TinX6Rt76XAidYA==
-X-Received: by 2002:a05:6122:a1f:b0:527:8771:2d39 with SMTP id 71dfb90a1353d-52dbcd6d66dmr19724074e0c.7.1747899235036;
-        Thu, 22 May 2025 00:33:55 -0700 (PDT)
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com. [209.85.217.45])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52dba910901sm11367008e0c.2.2025.05.22.00.33.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 00:33:54 -0700 (PDT)
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4e14dd8abdaso2061520137.3;
-        Thu, 22 May 2025 00:33:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUQOsYvbTuRwXmLJS9UUXZGOsFd+L7QMvKR5welDqXnMH9wBqGnzpNKnCPe+pv5DfPBfO2+xHPpxfc=@vger.kernel.org, AJvYcCX+4R3Iz2nSf4Ps108yyz+lYgUSc47F2Cq/agLTUYYoG+iC1HOlFydgisr1QzA3W58uHXPgOEtH@vger.kernel.org, AJvYcCXI36llW902E4N2dEAsdFPZqUA5cO08XogZ3ovDmByput4ZFLitE4Hc+0fUW1/DrpvZ8/ObKaEzrA1X@vger.kernel.org
-X-Received: by 2002:a05:6102:b06:b0:4e2:aafe:1bb7 with SMTP id
- ada2fe7eead31-4e2aafe1e8dmr8036440137.15.1747899234351; Thu, 22 May 2025
- 00:33:54 -0700 (PDT)
+	s=arc-20240116; t=1747899382; c=relaxed/simple;
+	bh=F4i3Fk1Idix54PmX458wB/iZLA9kMy518Cyiy+f/9Eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MuhCpdzX+WycsK0zlb4UXsC4o0jG8QWfGcXKkemEgChd7bMIniF966oqHyOAi1E04cOI3CEWrB55CB8MvrC5a+TgkEw5tM1ONZOOy81jfSOHW6TKs20FJ1AqLZx6uDxk0RLC6KprdvUdlLqRp8PGb8IJcwEroaq5DtaVdodb/10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZXuAoVVf; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747899380; x=1779435380;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F4i3Fk1Idix54PmX458wB/iZLA9kMy518Cyiy+f/9Eg=;
+  b=ZXuAoVVfY4nhXv6GyKdc/mzOx5wU2ixfDhw0x/wBewM1/pHunpO2HMUE
+   M9+SmpCOSkQTLZmzhWnq7zzjSo+w3iGQIB9pUHKlX8OBTLOGPKq5LFU0P
+   YQqGy/ZOr3WiiKkR/8VKmnNGyy75cjpFzLtm7FJuiKDKj2gXGb7Np3lR8
+   JeIFcaWyxVNWoCv0snJSBxoOL2QE5r9I56V31IOPrdwf2o3tC3x8gZ1RF
+   Dxsu7MPmxVk+WNvcFwQVNDS02xJxrfjjLU3v8U800mlHJVaz14eGw1Ed/
+   xU4jxWOm54vJ5mVWLzRLBfGl2EFbidrD3Jw8CnKFKt0SlSWXLQDkFG/Z+
+   w==;
+X-CSE-ConnectionGUID: fJJLOPzpTT6tZnT/WPJxAw==
+X-CSE-MsgGUID: wX/s3yz3SoC1BpOP8b3Q3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="60150992"
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="60150992"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 00:36:19 -0700
+X-CSE-ConnectionGUID: rNnNqRNBRoe/uwtG46fbIg==
+X-CSE-MsgGUID: w1bwDTdSThC9NBAcrX3C7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
+   d="scan'208";a="140989093"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 22 May 2025 00:36:16 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uI0TN-000P34-2F;
+	Thu, 22 May 2025 07:36:13 +0000
+Date: Thu, 22 May 2025 15:36:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jeremy Harris <jgh@exim.org>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-api@vger.kernel.org, edumazet@google.com,
+	ncardwell@google.com, Jeremy Harris <jgh@exim.org>
+Subject: Re: [PATCH net-next v2 1/6]     tcp: support writing to a socket in
+ listening state
+Message-ID: <202505221529.hEVx1YPV-lkp@intel.com>
+References: <d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh@exim.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <a679123dfa5a5a421b8ed3e34963835e019099b0.1747820705.git.geert+renesas@glider.be>
- <20250521-ancient-discreet-weasel-98b145-mkl@pengutronix.de>
-In-Reply-To: <20250521-ancient-discreet-weasel-98b145-mkl@pengutronix.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 22 May 2025 09:33:42 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXVbBciPriF6wWBUE0FHs3ZfEHAodFOsACiaMCEbLKpeg@mail.gmail.com>
-X-Gm-Features: AX0GCFthFAH_k5GLf92vZ0TJkMlPKuOGRFvQs0hIExouVBk96m2MS6fQ5ujhrd8
-Message-ID: <CAMuHMdXVbBciPriF6wWBUE0FHs3ZfEHAodFOsACiaMCEbLKpeg@mail.gmail.com>
-Subject: Re: [PATCH] documentation: networking: can: Document alloc_candev_mqs()
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh@exim.org>
 
-Hi Marc,
+Hi Jeremy,
 
-On Wed, 21 May 2025 at 12:07, Marc Kleine-Budde <mkl@pengutronix.de> wrote:
-> On 21.05.2025 11:51:21, Geert Uytterhoeven wrote:
-> > Since the introduction of alloc_candev_mqs() and friends, there is no
-> > longer a need to allocate a generic network device and perform explicit
-> > CAN-specific setup.  Remove the code showing this setup, and document
-> > alloc_candev_mqs() instead.
->
-> Makes sense.
->
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > ---
-> > Dunno if this deserves
-> > Fixes: 39549eef3587f1c1 ("can: CAN Network device driver and Netlink interface")
-> >
-> >  Documentation/networking/can.rst | 9 +++------
-> >  1 file changed, 3 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
-> > index b018ce346392652b..784dbd19b140d262 100644
-> > --- a/Documentation/networking/can.rst
-> > +++ b/Documentation/networking/can.rst
-> > @@ -1106,13 +1106,10 @@ General Settings
-> >
-> >  .. code-block:: C
->
-> This breaks the rst rendering. I think you should remove the "..
-> code-block:: C"...
+kernel test robot noticed the following build warnings:
 
-Doh, how did I miss that? Will fix...
+[auto build test WARNING on f685204c57e87d2a88b159c7525426d70ee745c9]
 
->
-> >
-> > -    dev->type  = ARPHRD_CAN; /* the netdevice hardware type */
-> > -    dev->flags = IFF_NOARP;  /* CAN has no arp */
-> > +CAN network device drivers can use alloc_candev_mqs() and friends instead of
-> > +alloc_netdev_mqs(), to automatically take care of CAN-specific setup:
->
-> and add a second ":" after "setup:"
->
-> >
-> > -    dev->mtu = CAN_MTU; /* sizeof(struct can_frame) -> Classical CAN interface */
-> > -
-> > -    or alternative, when the controller supports CAN with flexible data rate:
-> > -    dev->mtu = CANFD_MTU; /* sizeof(struct canfd_frame) -> CAN FD interface */
-> > +    dev = alloc_candev_mqs(...);
-> >
-> >  The struct can_frame or struct canfd_frame is the payload of each socket
-> >  buffer (skbuff) in the protocol family PF_CAN.
-=
-Gr{oetje,eeting}s,
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Harris/tcp-support-writing-to-a-socket-in-listening-state/20250521-195234
+base:   f685204c57e87d2a88b159c7525426d70ee745c9
+patch link:    https://lore.kernel.org/r/d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh%40exim.org
+patch subject: [PATCH net-next v2 1/6]     tcp: support writing to a socket in listening state
+config: i386-buildonly-randconfig-001-20250522 (https://download.01.org/0day-ci/archive/20250522/202505221529.hEVx1YPV-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250522/202505221529.hEVx1YPV-lkp@intel.com/reproduce)
 
-                        Geert
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505221529.hEVx1YPV-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/ipv4/tcp.c:1065:23: warning: variable 'sockc' set but not used [-Wunused-but-set-variable]
+    1065 |         struct sockcm_cookie sockc;
+         |                              ^
+   1 warning generated.
+
+
+vim +/sockc +1065 net/ipv4/tcp.c
+
+  1059	
+  1060	/* Cut-down version of tcp_sendmsg_locked(), for writing on a listen socket
+  1061	 */
+  1062	static int tcp_sendmsg_preload(struct sock *sk, struct msghdr *msg)
+  1063	{
+  1064		struct sk_buff *skb;
+> 1065		struct sockcm_cookie sockc;
+  1066		int flags, err, copied = 0;
+  1067		int size_goal;
+  1068		int process_backlog = 0;
+  1069		long timeo;
+  1070	
+  1071		if (sk->sk_state != TCP_LISTEN)
+  1072			return -EINVAL;
+  1073	
+  1074		flags = msg->msg_flags;
+  1075	
+  1076		sockc = (struct sockcm_cookie){ .tsflags = READ_ONCE(sk->sk_tsflags) };
+  1077	
+  1078		timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
+  1079	
+  1080		/* Ok commence sending. */
+  1081	restart:
+  1082		/* Use a arbitrary "mss" value */
+  1083		size_goal = 1000;
+  1084	
+  1085		err = -EPIPE;
+  1086		if (sk->sk_err || (sk->sk_shutdown & SEND_SHUTDOWN))
+  1087			goto do_error;
+  1088	
+  1089		while (msg_data_left(msg)) {
+  1090			ssize_t copy = 0;
+  1091	
+  1092			skb = tcp_write_queue_tail(sk);
+  1093			if (skb)
+  1094				copy = size_goal - skb->len;
+  1095	
+  1096			trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
+  1097	
+  1098			if (copy <= 0 || !tcp_skb_can_collapse_to(skb)) {
+  1099				bool first_skb = !skb;
+  1100	
+  1101				/* Limit to only one skb on the sk write queue */
+  1102	
+  1103				if (!first_skb)
+  1104					goto out_nopush;
+  1105	
+  1106				if (!sk_stream_memory_free(sk))
+  1107					goto wait_for_space;
+  1108	
+  1109				if (unlikely(process_backlog >= 16)) {
+  1110					process_backlog = 0;
+  1111					if (sk_flush_backlog(sk))
+  1112						goto restart;
+  1113				}
+  1114	
+  1115				skb = tcp_stream_alloc_skb(sk, sk->sk_allocation,
+  1116							   first_skb);
+  1117				if (!skb)
+  1118					goto wait_for_space;
+  1119	
+  1120				process_backlog++;
+  1121	
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
