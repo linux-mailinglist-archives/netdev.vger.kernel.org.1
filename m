@@ -1,128 +1,178 @@
-Return-Path: <netdev+bounces-192577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A2F8AC071A
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:28:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C31E6AC071E
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 10:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C644A7C46
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:28:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BA974A7C0C
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2E326A1D5;
-	Thu, 22 May 2025 08:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C9F264625;
+	Thu, 22 May 2025 08:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrHNM0r2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DED26A0D6
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6FA149C6F;
+	Thu, 22 May 2025 08:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747902492; cv=none; b=RQYBZp0f8I7ESEr1yOho0SweqB8Cun1Nzbmbndi9+xxy6jGbuM/k9ft7e7aI4OB5TmHRPdHc+aQvwFrUcfIJncIOtmdz6dWeFrCrhAHBr8HyRDLdmJaQ7SGxsjV2tUFWK5oVGxeJ+uv4cBmuVNDV9CmKEYUqvVdtWtTW2p6SVug=
+	t=1747902592; cv=none; b=Si9yTiyMVI8EXVxUvVn3gs3+miSqYseRo34QQADHEpB4f963ZbHhKlLUyrjuk6mfRuFB+zkiAXdkOU8VwgvROex1EbNO6jED2fMc6p3EdDsjr6IXtZgMjYDZQZov6ZsX5JmQeUBsSzFub4YvhmQtfVh3trk9zxoM3NqqgpB6Yyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747902492; c=relaxed/simple;
-	bh=mFSxiGWPhswaQ1nNt3kiTF9YMqccLwUjFnisAuuMYG0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bcJAh9BbV1xRCz0wtQRay1VypEIHRNGViw3uJZJRQHsTrXxA5uD0nLw7ZpZL6vPv4KKFSb5ul/b1W34E9jc+ixI/SVHKH9TvN7Idf3T2VhNDnnePVyNpZX0rfPosPw7dHmtlK0TIRn1TI1fh8N0yTILpieoLn0/sqQTPdR2RM8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uI1Hb-0003Iw-1x; Thu, 22 May 2025 10:28:07 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uI1Ha-000hb2-2e;
-	Thu, 22 May 2025 10:28:06 +0200
-Received: from pengutronix.de (unknown [IPv6:2a03:2260:2009:2000::])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 341E241722D;
-	Thu, 22 May 2025 08:28:06 +0000 (UTC)
-Date: Thu, 22 May 2025 10:28:05 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org, 
-	kernel@pengutronix.de
-Subject: Re: [PATCH net 0/n] pull-request: can 2025-05-21
-Message-ID: <20250522-wakeful-kudu-of-acumen-26417a-mkl@pengutronix.de>
-References: <20250521082239.341080-2-mkl@pengutronix.de>
- <20250521204114.1d131ff9@kernel.org>
+	s=arc-20240116; t=1747902592; c=relaxed/simple;
+	bh=EI6iGpDZ/vQcd4w9J8oLLbHPKEuZtpcIMzOkLo3pq64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mLub3zMZukv5+TVwOC3LBnrcW6RhG4lsdjLFH3hSXh3M/fEQltxXQmkUx7S02hAqyAPD8MJMbp1RD5umRbr2Wvk8TOEgTFb2T0Fp2YGXwr2g7DUKsm5+7gmkkF8yBZH3TZnN5eu7FR1rcX3zwpAEKB5LEbEgwNlU5D9d45B/tdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrHNM0r2; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-601f1914993so6875297a12.0;
+        Thu, 22 May 2025 01:29:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747902589; x=1748507389; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JwcG1HfHxOaR8Nuyw/gar5ZU0L/jTzPHaK9H13HupME=;
+        b=lrHNM0r2Mx7qaaaA/zN75XKe4sv8de4AGQJPfycAB3rxLSpPZE7FFk8TfvKUgBgoe3
+         YgdckAjNgCKDV/ESVs/T0OPvrDrI9cU4qc5V4Ekv/aYa1dzjBo+OvcOjotv2Fu/3jEHZ
+         IOOMaP+U1xNY5OH4NWHuwER4X1DEnY1Liw9ZWTn9ql0lrG3W/LoIYArSH8YTL9++Z2m7
+         NjtFWxb+zayKWzeeNIzyl6X4bQ3dY0+m4hj8tcaNNmVT1XfJ1XJmJbYaYobs7q++1quv
+         AJydL01ismmVQ1stKGZkWB1irEtHzY2AV4COUVyyIsAMQYbsLLV6o8SHKXNDk+lrX4FF
+         7FFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747902589; x=1748507389;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JwcG1HfHxOaR8Nuyw/gar5ZU0L/jTzPHaK9H13HupME=;
+        b=UmZvfb5eLJe6vWFbLDbcCbOW2uMQKEjYMUykL/b4tDjdjwfyMwVm2RweS7PSZeSOPo
+         0AS3QSbRC5gNBX2SFua2+g+CBY1Sw30yfv5+/q8mm4tHwW7KjiCLkl930IHXEBx0nwi0
+         2uN86F+mDYpkCzsUsjviZjvuVP67Q5yhLICKMJlrOq9iQOG0bkHkgxeMjOfcWVk2jGlN
+         anIo6BHdPPFZxQYSqEzHzjZ7PUaPesU0dGECrMp8pP+pGH2MzGLaEm8TLZuXzbnq0Ygt
+         6tLv35hUg+/2QO/MuD4Tspl54Gdu9SQ594t0C4V7Y5jnFmwxxZDUI7iWS/JmtDKuru2l
+         Z6VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNCdZt8gn1HI4NzfNJ1UWCUnva+iAn5pgauHf/ZxJQR4p8Z6BfK5AeHqMPFeD/npXjMiin3FcRMyDBOfSSeJ2C@vger.kernel.org, AJvYcCXdDyIsWtHpqHdNdzFflu+pNx3kM4QX1dR8+6lpMr2fATjQ+PshKheg70HCPSpKhw6Gs45TQy0pPAfTpp0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcvGKe+5azcKvZ2YgD4JRmzrNWDeywCKUwXph01Dsh2DksoEvF
+	+vcrWbbH5iwnL6lAdwa3iWqFaOGXDbVhesJfG7/vNwLgl2WG6XVRKOFo
+X-Gm-Gg: ASbGncs6hlqWmnJFpGDHJiiQZxXWMadjbq9LqJl99Sgfs8rFT8umKsHhmni7wFN+Pem
+	Dw+FMm/o8zbFvn7wa+Q0xvLvn3c7ce5HWhP6e9smbM8UYevA1DjD3b72+yKe0Ft8t/AHBA8zawo
+	iVUaXSQpXJaIV56aEhKzQ341FL71IribnvbfT305KFvZ81kSOzudT2xZwmXnCQB8FjG7bbQFyRw
+	XiAcM5ApzogyKntoZAqwMdY8yVrAkmE5KcDYjPtB4mJ1WQb2k2lHk4n4HJP5UQaIafqsgf0hjN5
+	0/SZpSp5JkBe17ZzG/eT4hkQOKiMCo9dM7OpeXyPViAEIjTpqAjfzgra5RGzE62T
+X-Google-Smtp-Source: AGHT+IHmBpSiEsaipefyb2BI/VSpVRuTf2kD6pmT43qZJsIDgTDNcfucjr30BL1XPtEUnszdDiTyyg==
+X-Received: by 2002:a17:906:3890:b0:ad5:501a:b3c6 with SMTP id a640c23a62f3a-ad5501abddamr1443443966b.32.1747902588434;
+        Thu, 22 May 2025 01:29:48 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::3f6? ([2620:10d:c092:600::1:9142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d04b08bsm1053154166b.13.2025.05.22.01.29.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 May 2025 01:29:47 -0700 (PDT)
+Message-ID: <dd139cb5-3554-4b65-b886-fe648f2413d3@gmail.com>
+Date: Thu, 22 May 2025 09:31:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s4rwdoqqy27t7gnw"
-Content-Disposition: inline
-In-Reply-To: <20250521204114.1d131ff9@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: devmem: support single IOV with sendmsg
+To: Stanislav Fomichev <stfomichev@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, viro@zeniv.linux.org.uk,
+ horms@kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org, sagi@grimberg.me,
+ willemb@google.com, jdamato@fastly.com, kaiyuanz@google.com,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20250520203044.2689904-1-stfomichev@gmail.com>
+ <CAHS8izOTWF9PO9N6ZamJ0xSCTOojXV+LfYm+5B5b8Ad1MA0QpA@mail.gmail.com>
+ <aC4OgpSHKf51wQS-@mini-arch>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <aC4OgpSHKf51wQS-@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 5/21/25 18:33, Stanislav Fomichev wrote:
+> On 05/21, Mina Almasry wrote:
+>> On Tue, May 20, 2025 at 1:30 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+>>>
+>>> sendmsg() with a single iov becomes ITER_UBUF, sendmsg() with multiple
+>>> iovs becomes ITER_IOVEC. iter_iov_len does not return correct
+>>> value for UBUF, so teach to treat UBUF differently.
+>>>
+>>> Cc: Al Viro <viro@zeniv.linux.org.uk>
+>>> Cc: Pavel Begunkov <asml.silence@gmail.com>
+>>> Cc: Mina Almasry <almasrymina@google.com>
+>>> Fixes: bd61848900bf ("net: devmem: Implement TX path")
+>>> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
+>>> ---
+>>>   include/linux/uio.h | 8 +++++++-
+>>>   net/core/datagram.c | 3 ++-
+>>>   2 files changed, 9 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/linux/uio.h b/include/linux/uio.h
+>>> index 49ece9e1888f..393d0622cc28 100644
+>>> --- a/include/linux/uio.h
+>>> +++ b/include/linux/uio.h
+>>> @@ -99,7 +99,13 @@ static inline const struct iovec *iter_iov(const struct iov_iter *iter)
+>>>   }
+>>>
+>>>   #define iter_iov_addr(iter)    (iter_iov(iter)->iov_base + (iter)->iov_offset)
+>>> -#define iter_iov_len(iter)     (iter_iov(iter)->iov_len - (iter)->iov_offset)
+>>> +
+>>> +static inline size_t iter_iov_len(const struct iov_iter *i)
+>>> +{
+>>> +       if (i->iter_type == ITER_UBUF)
+>>> +               return i->count;
+>>> +       return iter_iov(i)->iov_len - i->iov_offset;
+>>> +}
+>>>
+>>
+>> This change looks good to me from devmem perspective, but aren't you
+>> potentially breaking all these existing callers to iter_iov_len?
+>>
+>> ackc -i iter_iov_len
+>> fs/read_write.c
+>> 846:                                            iter_iov_len(iter), ppos);
+>> 849:                                            iter_iov_len(iter), ppos);
+>> 858:            if (nr != iter_iov_len(iter))
+>>
+>> mm/madvise.c
+>> 1808:           size_t len_in = iter_iov_len(iter);
+>> 1838:           iov_iter_advance(iter, iter_iov_len(iter));
+>>
+>> io_uring/rw.c
+>> 710:                    len = iter_iov_len(iter);
+>>
+>> Or are you confident this change is compatible with these callers for
+>> some reason?
+>   
+> Pavel did go over all callers, see:
+> https://lore.kernel.org/netdev/7f06216e-1e66-433e-a247-2445dac22498@gmail.com/
 
---s4rwdoqqy27t7gnw
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net 0/n] pull-request: can 2025-05-21
-MIME-Version: 1.0
+Yes, the patch should work
 
-On 21.05.2025 20:41:14, Jakub Kicinski wrote:
-> On Wed, 21 May 2025 10:14:24 +0200 Marc Kleine-Budde wrote:
-> > Subject: [PATCH net 0/n] pull-request: can 2025-05-21
->=20
-> Looks like the 0/n confused patchwork and it couldn't do our build
-> testing.
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-Doh! Sorry :/
+> 
+>> Maybe better to handle this locally in zerocopy_fill_skb_from_devmem,
+>> and then follow up with a more ambitious change that streamlines how
+>> all the iters behave.
+> 
+> Yes, I can definitely do that, but it seems a bit strange that the
+> callers need to distinguish between IOVEC and UBUF (which is a 1-entry
+> IOVEC), so having working iter_iov_len seems a bit cleaner.
 
-> Given that we're targeting the final release I'd rather
-> not risk merging this without a full run thru our builds.
-> Could you respin?
+It might be a good idea to rename it at some point to highlight that
+it also works with ubufs (but not as a part of this fix).
 
-done:
-https://lore.kernel.org/all/20250522082344.490913-1-mkl@pengutronix.de/
+-- 
+Pavel Begunkov
 
-> Not sure it will make tomorrow's PR but then again
-> I don't think anything here is super critical for 6.15 final?
->=20
-> Sorry for not noticing earlier.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---s4rwdoqqy27t7gnw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmgu4BIACgkQDHRl3/mQ
-kZz6nwf+J2JKpvZgB4UKqg8kWf4ZewJo8OF5ZLK7p0HaAsGFZVRG0mdnKCSdOct5
-rKLEWOpanUcX/hfasefDRvWVdxrdtDQVoVXmMU5x41N78zTSYtmfxbR+Btl/vhqi
-LS0LwvcAmbURIXDVY5MAzD4Oqh71vYXT1sp4yO8vjrjpXhqlnjQAHnKgkM/MdAsb
-ctSyF6dXojj3WdirCgn4D2wKYlIjSozlaBdq9Js6PtJxitAETVl9K/bS6I0H8mTv
-z9KkjUi7jrbOjZlb0ITxXv+obiMcboTJj8neM/0mH3UAB8fZai25clb3te4JANtS
-cQ6vSg7oduz9tpTvPVv6sjLVi6SHAw==
-=hEu3
------END PGP SIGNATURE-----
-
---s4rwdoqqy27t7gnw--
 
