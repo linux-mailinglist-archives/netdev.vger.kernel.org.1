@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-192622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0818AC08B1
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:30:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF3BAC08B2
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9921BA81E3
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:30:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FB851BA827C
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA6F286D40;
-	Thu, 22 May 2025 09:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA02E2882B3;
+	Thu, 22 May 2025 09:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVmJayAG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N9GiZgYK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8DA24E4C6
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 09:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1776287509;
+	Thu, 22 May 2025 09:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747906201; cv=none; b=JUdpbIPPtb6blc52hBd9MmgoWz2ycr49HBszhYZjsSrw0VKisKdflwAb2lQRF9y54wHGXvnHF7hC02bjJ4TRk1r/Mrrj1r90WZpufI+itBYVElelAQtm2xcw4YSi/JWanupuVXXuLSML5DExUPHWzi4UUBo6Zv1/N71ND33CNow=
+	t=1747906202; cv=none; b=Ts8ywTPfZ8BhT+FNE2l2Z4YkvoFFx/Q2IxGlYQj3r1xrUoH+fWnTYAehzCZz7zWmHF/Ihqjnei2a7kbzhMcnptDVf6R4ZL6TDdUYXjy/od/aNThXZZMJ1RjfkxjnJNNU+SZlSPA04Q1DkllfAsPILTfsr8oWjfuLD7nJL8HreH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747906201; c=relaxed/simple;
-	bh=FeOnFPaIbBX9sOzEZROLJNqX8RCEfxSpxw+eoijlfac=;
+	s=arc-20240116; t=1747906202; c=relaxed/simple;
+	bh=LrhHBtCAj/5rfvAU6Fbhhc46QRBAOG5iW0o66arOxSA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mw8IWqHZjxaO2IdicEkKkxJv2xO4QYPv0RQsjrw6mJxs3wwS+HuOL6GtK20ty5pQAnbLxH+F4HqQhWym/o367KwVXbipnBo8tP/RKRxr31sXTcplgbNhFFONOwjE6F3bt2gJWngoy5y+0WZGafaTe2+yqoY0uHMMQEN/IC0M4I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVmJayAG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB87AC4CEE4;
-	Thu, 22 May 2025 09:30:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DHeL9KKBJm326dL1xaBTuV8SkcW5pq1luE3U3ZLc5GwKVj+uvLxkHCSAVI5ym8tdxDATzCqfKrD4YQKVCX+p+GkV+67ybEHNwQHL2OIapX13VwlaAiIWmMIMlImqOCsT1Kzi5cDDTDeP+2J7ngdg/YmJ4ovyCK6seNEhpAW8M5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9GiZgYK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1EEC4CEE4;
+	Thu, 22 May 2025 09:30:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747906201;
-	bh=FeOnFPaIbBX9sOzEZROLJNqX8RCEfxSpxw+eoijlfac=;
+	s=k20201202; t=1747906202;
+	bh=LrhHBtCAj/5rfvAU6Fbhhc46QRBAOG5iW0o66arOxSA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BVmJayAG7fNpiJauMYGKXzpgv/IuYliimo6wbiMyn1smGTc+evqhTnRoc4qyDZ/29
-	 Lc4xy9Zp6C/0FqjOhU2XOoIfEWu+5uyrLKAvzXdsS6SyA7ikOL6U/oya/ql15roCql
-	 3Xu8gbqsiEdATMFR9/OfDSbyjoG+xjI7fF0D0geV1HsgDYUpFgGY5ubI7JqMTmcqNc
-	 0bL17b19+2orAwkOq5gNciE3QMqcwRGnQfPlw1qRDbSON2aR98bxExwZ8N8JWteZwL
-	 bOFGFzrV/eznibzhvthpoMQcZ7ydAfhIgE4JPM4xNPXd0bX/tTqpNayQUB+1NJTb/f
-	 6VSqR9/9dza6w==
+	b=N9GiZgYKeDy7G+8i4LVBVfN7QIjlWCRGEY6UDWzR2KmXMG1Boe4gOCKVQ4W+Z84eN
+	 ibg9KA58HkfVZIw0u5lWjkIeV9rwQuZ4k3S4EElQTIBpWBtXRcJkRuGSYGEGBrBGcW
+	 v0jE66SegD0wJvCVSRLfaT+7FJssFLiY7xNRIURrzOrz6lCN8rLn0Je5o/DVcU8h/u
+	 fxKM1Ls2KhA9XQeuNsULS9Zm/xrl4xekf6IPnOCGm64L1dkNlB/eF2+a+2m0IElMTr
+	 dydRWwK/JTdiqnO6VKJJopoFoX1pHanQUaBghZC4TU7dPAuZimELZTNTor6IMgDpzn
+	 VHYgkalemZy3Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE6E380AA7C;
-	Thu, 22 May 2025 09:30:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1E7380AA7C;
+	Thu, 22 May 2025 09:30:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Patch net 0/2] net_sched: Fix HFSC qlen/backlog accounting bug and
- add selftest
+Subject: Re: [net PATCH] octeontx2-pf: Avoid adding dcbnl_ops for LBK and SDP vf
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174790623648.2464246.11027722128186057723.git-patchwork-notify@kernel.org>
-Date: Thu, 22 May 2025 09:30:36 +0000
-References: <20250518222038.58538-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20250518222038.58538-1-xiyou.wangcong@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, jhs@mojatatu.com
+ <174790623774.2464246.16312456507750189389.git-patchwork-notify@kernel.org>
+Date: Thu, 22 May 2025 09:30:37 +0000
+References: <20250519072658.2960851-1-sumang@marvell.com>
+In-Reply-To: <20250519072658.2960851-1-sumang@marvell.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, bbhushan2@marvell.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sun, 18 May 2025 15:20:36 -0700 you wrote:
-> This series addresses a long-standing bug in the HFSC qdisc where queue length
-> and backlog accounting could become inconsistent if a packet is dropped during
-> a peek-induced dequeue operation, and adds a corresponding selftest to tc-testing.
+On Mon, 19 May 2025 12:56:58 +0530 you wrote:
+> Priority flow control is not supported for LBK and SDP vf. This patch
+> adds support to not add dcbnl_ops for LBK and SDP vf.
 > 
+> Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
 > ---
-> Cong Wang (2):
->   sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
->   selftests/tc-testing: Add an HFSC qlen accounting test
-> 
-> [...]
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 
 Here is the summary with links:
-  - [net,1/2] sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
-    https://git.kernel.org/netdev/net/c/3f981138109f
-  - [net,2/2] selftests/tc-testing: Add an HFSC qlen accounting test
-    https://git.kernel.org/netdev/net/c/c3572acffb75
+  - [net] octeontx2-pf: Avoid adding dcbnl_ops for LBK and SDP vf
+    https://git.kernel.org/netdev/net/c/184fb40f731b
 
 You are awesome, thank you!
 -- 
