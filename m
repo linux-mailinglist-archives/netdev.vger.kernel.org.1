@@ -1,89 +1,78 @@
-Return-Path: <netdev+bounces-192694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A085AC0D51
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:52:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BFFCAC0D57
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FEBB1BC4929
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:52:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C978CA21F9E
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330F628C03A;
-	Thu, 22 May 2025 13:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7C428C2B0;
+	Thu, 22 May 2025 13:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZvYdCO9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QODs/v5P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D53528C01E;
-	Thu, 22 May 2025 13:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226FB2882BC;
+	Thu, 22 May 2025 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921932; cv=none; b=ToE/nnsQxcjHdhT3RVWkv2GZUuzcHoUg4Gzx8TUtr3dHKLamF0b2CFVI/7vENCyy+zbne02adBWea2WPROj2DzSFVdLhCvpq65QFU08rhGAN8J0nwrsZ8gauygLpK1CrxwVUg2vtYyP98xP8xTzEZFz4zgdOHCcv3sJSvswHZtg=
+	t=1747922017; cv=none; b=FcCSsH8pdK8Slm9bBjLVy3K7IMl4Y/VFnL4nRqKNsBK9tUm+Yu1PsvbNiZ1GtB2vYo3DpTV/QRFN2whVkPQaGLFdHU0N9DiRE2xsHSdqN7u2GjbYUhnelO0gCENVZk7s5nLwVthwx+uLD90bITup2X5UOBMQm591HUtKyfr4CzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921932; c=relaxed/simple;
-	bh=6Asv8ogK2+lf9UneA4gPVYzxO8G2cewAGm2bqeLWYeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VIrE2UsqMxeUkob+KdKEZpTmM2Br2uEgwqQYz+s6WMCzYDHt2SzrAJ8Edm4LHDUxNhmP8ZYNF89Q37bRBUbdCXJKAoMSyBsZyUc+Ozo/1GnIBL7Nh1YuFc1pjlqfo7TibZIXbS8s51lDOM1PLvSYQA6U1jv/6IQ4LXA1Wb/RH7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZvYdCO9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A97C4CEEB;
-	Thu, 22 May 2025 13:52:09 +0000 (UTC)
+	s=arc-20240116; t=1747922017; c=relaxed/simple;
+	bh=Sa/Gpq4MDNOi2J3fwC+rO1gFlrYFv2SlfwaB39iQP08=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oBTVaTOdZX7AMWNRmCsuaswgPSnAljD0THd+x+OLtrlQwFiXS3yTzdR7LHIdtiFTALEqvK9YY+efod0w+CItji74nCoJv3gV7Vgvh85k18Ws6d8qbNdymkPYAcw5/6qWNwkWJPVl4Ifow0jAiMDCZug2bUNeQxFAyo70wfTb1Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QODs/v5P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5552DC4CEEB;
+	Thu, 22 May 2025 13:53:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747921931;
-	bh=6Asv8ogK2+lf9UneA4gPVYzxO8G2cewAGm2bqeLWYeE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FZvYdCO9dkHdFSHJhOhFtRT6hRtEUw2+/+U+hSDqP62MqPd6dDWJzgX1q+idg1uZ0
-	 to7fnXu9g+kR1kXIRseJWUPSaPNVix9K+5nq3C2Mul2RE+1XuWYvUpbkSyMLg1xhMF
-	 WQeblJoogKkLmI1hHXDzGIlQXxpSkW0GPFPCWcLqXoH4s2+kPjZidfF180dsZsFAsp
-	 V4FvGsCD/eYtY92hsuOpAxKDmE0WjhBZaAf/GTfttDtmtVAmFrSRlMPmfkTnNdflcE
-	 bzs6QBmu7DmoAXKvNEBqMbL7YOAR5F6jyKD6qW0PlQfUEAubRiArqy0cuB3MCZIm4F
-	 fjPu9uaT5PxvA==
-Date: Thu, 22 May 2025 14:52:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: sysfs: Implement is_visible for
- phys_(port_id, port_name, switch_id)
-Message-ID: <20250522135207.GH365796@horms.kernel.org>
-References: <20250521140824.3523-1-yajun.deng@linux.dev>
+	s=k20201202; t=1747922016;
+	bh=Sa/Gpq4MDNOi2J3fwC+rO1gFlrYFv2SlfwaB39iQP08=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QODs/v5P1zGJQh7drAiLaZZuUTWJQqseEnQ+N5Xq4oAJU1zkekElCGd6lxkvLHlDG
+	 7iEb6zIWWDNyAK4ejDFl8TbfwUVjNOUNhpcMRJaYJ3kpR2eUGa6AfxsinHuiAtnvNN
+	 E7phopTcD9SxY50QxRQYOFdhNXAlbKCdS/E2xz0z1rNF0ZbkFZ5BbGmNP6aeJ2DlDl
+	 LMjmwOfT9j1Y4kZCEaoM9/d8tWey+JzA9ZX3vZXRFMtnGTzWAxYNYTpuE8L2GkIrB3
+	 +yVnp3woRPGPAsyzZVfPZdr59DLmSXDfZE8o2gM/pbvLea6/0h01DND5HVWiccrL6k
+	 Wc1yef8U8eEFg==
+Date: Thu, 22 May 2025 06:53:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: nft_queues.sh failures
+Message-ID: <20250522065335.1cc26362@kernel.org>
+In-Reply-To: <584524ef-9fd7-4326-9f1b-693ca62c5692@redhat.com>
+References: <584524ef-9fd7-4326-9f1b-693ca62c5692@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250521140824.3523-1-yajun.deng@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 21, 2025 at 10:08:24PM +0800, Yajun Deng wrote:
-> phys_port_id_show, phys_port_name_show and phys_switch_id_show would
-> return -EOPNOTSUPP if the netdev didn't implement the corresponding
-> method.
+On Thu, 22 May 2025 12:09:01 +0200 Paolo Abeni wrote:
+> Recently the nipa CI infra went through some tuning, and the mentioned
+> self-test now often fails.
 > 
-> There is no point in creating these files if they are unsupported.
-> 
-> Put these attributes in netdev_phys_group and implement the is_visible
-> method. make phys_(port_id, port_name, switch_id) invisible if the netdev
-> dosen't implement the corresponding method.
-> 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-> ---
-> v2: Remove worthless comments
-> v1: https://lore.kernel.org/all/20250515130205.3274-1-yajun.deng@linux.dev/
+> As I could not find any applied or pending relevant change, I have a
+> vague suspect that the timeout applied to the server command now
+> triggers due to different timing. Could you please have a look?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Oh, I was just staring at:
+https://lore.kernel.org/all/20250522031835.4395-1-shiming.cheng@mediatek.com/
+do you think it's not that?
 
-FWIIW, I had the same thought that Jakub related in his review of v1.
-
- "I'm slightly worried some user space depends on the files existing,
-  but maybe ENOENT vs EOPNOTSUPP doesn't make a big difference.|
-
-...
-
+I'll hide both that patch and Florian's fix from the queue for now, 
+for a test.
 
