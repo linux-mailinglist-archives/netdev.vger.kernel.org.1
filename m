@@ -1,181 +1,134 @@
-Return-Path: <netdev+bounces-192550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05778AC05D8
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:36:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B3BAC05DD
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:37:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D931B61349
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:36:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EED294A00D4
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7DE22256B;
-	Thu, 22 May 2025 07:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5DA1E32A3;
+	Thu, 22 May 2025 07:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZXuAoVVf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJMCBnel"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6079E1E32A3;
-	Thu, 22 May 2025 07:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CC2221FBF
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 07:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747899382; cv=none; b=B+dUWtvzJTrRsZcZxH5dfPxXAB3kmcRqUFCWODxIiI3MXFOHBdqRi1o2nLXCLxZ8fCX88Oz8N7V5Fz4UOCjpewK9y2uzF2i4PiOr0DczJy0UxEHqOSmjaBnsUGk5CAXIa7k1jo9qvsAmbK9K/YEfm7bm4KERwzkdQTDBlRfbbt8=
+	t=1747899425; cv=none; b=jI3rVWx8Nxj6jXHjhDb3u+C/iGRe+sKS7Bdj7DJZUrDp0uIRrAX37G/ufq16wchBnPkqkhZOeJb4U8EBmTw7dpmRP8MekgWxCD/qNvyAD1q59kU0h3jTWYQaKgrMooz4zjzATPUIa/Chon1cWBnxxKsveTtWg6+TQlFX/BaQsoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747899382; c=relaxed/simple;
-	bh=F4i3Fk1Idix54PmX458wB/iZLA9kMy518Cyiy+f/9Eg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MuhCpdzX+WycsK0zlb4UXsC4o0jG8QWfGcXKkemEgChd7bMIniF966oqHyOAi1E04cOI3CEWrB55CB8MvrC5a+TgkEw5tM1ONZOOy81jfSOHW6TKs20FJ1AqLZx6uDxk0RLC6KprdvUdlLqRp8PGb8IJcwEroaq5DtaVdodb/10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZXuAoVVf; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747899380; x=1779435380;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=F4i3Fk1Idix54PmX458wB/iZLA9kMy518Cyiy+f/9Eg=;
-  b=ZXuAoVVfY4nhXv6GyKdc/mzOx5wU2ixfDhw0x/wBewM1/pHunpO2HMUE
-   M9+SmpCOSkQTLZmzhWnq7zzjSo+w3iGQIB9pUHKlX8OBTLOGPKq5LFU0P
-   YQqGy/ZOr3WiiKkR/8VKmnNGyy75cjpFzLtm7FJuiKDKj2gXGb7Np3lR8
-   JeIFcaWyxVNWoCv0snJSBxoOL2QE5r9I56V31IOPrdwf2o3tC3x8gZ1RF
-   Dxsu7MPmxVk+WNvcFwQVNDS02xJxrfjjLU3v8U800mlHJVaz14eGw1Ed/
-   xU4jxWOm54vJ5mVWLzRLBfGl2EFbidrD3Jw8CnKFKt0SlSWXLQDkFG/Z+
-   w==;
-X-CSE-ConnectionGUID: fJJLOPzpTT6tZnT/WPJxAw==
-X-CSE-MsgGUID: wX/s3yz3SoC1BpOP8b3Q3A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="60150992"
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="60150992"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 00:36:19 -0700
-X-CSE-ConnectionGUID: rNnNqRNBRoe/uwtG46fbIg==
-X-CSE-MsgGUID: w1bwDTdSThC9NBAcrX3C7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,305,1739865600"; 
-   d="scan'208";a="140989093"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 22 May 2025 00:36:16 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uI0TN-000P34-2F;
-	Thu, 22 May 2025 07:36:13 +0000
-Date: Thu, 22 May 2025 15:36:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jeremy Harris <jgh@exim.org>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-api@vger.kernel.org, edumazet@google.com,
-	ncardwell@google.com, Jeremy Harris <jgh@exim.org>
-Subject: Re: [PATCH net-next v2 1/6]     tcp: support writing to a socket in
- listening state
-Message-ID: <202505221529.hEVx1YPV-lkp@intel.com>
-References: <d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh@exim.org>
+	s=arc-20240116; t=1747899425; c=relaxed/simple;
+	bh=MhUQi67lHUlGkXBhHW/SZd1W/BKvqtEtFsl54vZLR6I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wc/itXnR4xpLJqZu5pd5yC3ljzi0M4/rnMsU/kk0TzpfVIRJqMxh4/YUT0jbijujic0kqusuwi2iyChaXtSlui29goyqC1iDmYzvIQu1J2UmdwSkZ1C31SLaI4PrcP9EUQvfJLqtLcpbg2W9JiM4FP9aWMMPDNy0sT4kpICgiOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SJMCBnel; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747899422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jGzce2M0Egzfrl5h60jDGBZlObDAqhO7BYWw1jcjwRc=;
+	b=SJMCBnel6TMs1bD94okaBOiii5O13ug1NrZtIiShv5YYiV99OpiLBLkTfq1CiruxyHL+vZ
+	HigllqFbIPSGndQZmt/IKXtW+2iCwEpM3Zk0nMegX0ZZfX6Oey+Qsfhzq6lfXhvMAsTxoV
+	iPsDdEz1KZZY1N4/JyD5lk3slQkLNCg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-639-9X9n8KE0Pk2yHtDkrh0Ixg-1; Thu, 22 May 2025 03:37:01 -0400
+X-MC-Unique: 9X9n8KE0Pk2yHtDkrh0Ixg-1
+X-Mimecast-MFC-AGG-ID: 9X9n8KE0Pk2yHtDkrh0Ixg_1747899420
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442d472cf7fso59205055e9.3
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 00:37:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747899420; x=1748504220;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jGzce2M0Egzfrl5h60jDGBZlObDAqhO7BYWw1jcjwRc=;
+        b=lqWpAKYS8EG0ygWyxRrk8eDRBH7XZVEtwj1520nYPHmrKbVAmVFp7eOdmsuQCotzVT
+         m20uaUwPFMFSi7xDH/0yu3Dt2VK2dJ+/85LUP4zz67ZJFHhyfW99yxgtjsD3pItCU9mD
+         RbYFq65rIO4UUHP4nIJ5fHLdq0UqDT+99CtfZePd53la6RMPM9TXuWD9QTnHPV/whr8Y
+         C3COFtyG0QZUSrDKVc4qUP8K0WgpS18vM474iKWzknEnrOtSgQ/YuD3xwF5m74O6D5H5
+         4MvspoCp/dYqT/ozZo1dN1gmFJcnxvJIuWewsxfmtJA7ORN8qeM8qofEErC+pAhI8oIz
+         KqEg==
+X-Gm-Message-State: AOJu0Yxahy+B2fKJyPa4uNR7Spyvxg9N8OWjcp4Nd/acux7f3HmscgDR
+	uYeY/23GIhblkEuLMoLS3m5o1FECoSwulQpnzv4oLeAjbGchrXV/l14YmW3VBF91qYEdUsVM1DR
+	4/VCytU3HmsfzMKkLgFCVY856Tmsnj7YJQLJOMHHaNUjypwZM+prI4PwWMMG8BfNSE4j3
+X-Gm-Gg: ASbGncvS2MKU0IfRPqHp6+44MNpywC4+OTNYR/imopXClnhY+nx6LgRGbJCFGHFMfU2
+	tMSOvQiQ7JHdi8h2phcgODk/ebne+wBbJrP/LpQzBsSDRUjbyLSniK6sed4jcBSMDfn02swBjbh
+	ARcWfRdgl+xgmZf+6VCYtPFDBrQJr3vLj2ibhFdbDtLLRAeH8lZpAjGgHoWWfmT2JOuKP1/xcye
+	fNZg/+mHFWaGIUPBprJGNuO7K2WZxVQ6qV3lNfaZ0QENzUSAm7BKY/HG1NRhvlRtNvRcSChCQmD
+	pT8mxLHlYtT37te2Sb8=
+X-Received: by 2002:a05:600c:1d81:b0:43c:fc04:6d35 with SMTP id 5b1f17b1804b1-442fd606b8emr227710105e9.4.1747899419793;
+        Thu, 22 May 2025 00:36:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGFRyShp8cUV0MgYi62QPEO/hFSDw332Y5eNFZ2okW1FoNh6erJ5c+RArJcsTPlsr/E5Yqe3w==
+X-Received: by 2002:a05:600c:1d81:b0:43c:fc04:6d35 with SMTP id 5b1f17b1804b1-442fd606b8emr227709845e9.4.1747899419431;
+        Thu, 22 May 2025 00:36:59 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:247a:1010::f39? ([2a0d:3344:247a:1010::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f1ef01besm93633655e9.10.2025.05.22.00.36.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 May 2025 00:36:59 -0700 (PDT)
+Message-ID: <97283e6f-6018-4252-b3f0-e620f989c065@redhat.com>
+Date: Thu, 22 May 2025 09:36:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh@exim.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 02/15] net: homa: create homa_wire.h
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-3-ouster@cs.stanford.edu>
+ <835b43b9-b9c4-4f09-9ce3-9157e1d9fea6@redhat.com>
+ <CAGXJAmzxOxYHR+nM8qhFx2DrCD8dbPyzF-xsv40p3tO6EdDP2g@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAGXJAmzxOxYHR+nM8qhFx2DrCD8dbPyzF-xsv40p3tO6EdDP2g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Jeremy,
+On 5/22/25 7:31 AM, John Ousterhout wrote:
+> One small follow-up:
+> 
+> On Mon, May 5, 2025 at 1:28 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> [...]
+>>> +_Static_assert(sizeof(struct homa_data_hdr) <= HOMA_MAX_HEADER,
+>>> +            "homa_data_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
+>>> +_Static_assert(sizeof(struct homa_data_hdr) >= HOMA_MIN_PKT_LENGTH,
+>>> +            "homa_data_hdr too small: Homa doesn't currently have code to pad data packets");
+>>> +_Static_assert(((sizeof(struct homa_data_hdr) - sizeof(struct homa_seg_hdr)) &
+>>> +             0x3) == 0,
+>>> +            " homa_data_hdr length not a multiple of 4 bytes (required for TCP/TSO compatibility");
+>>
+>> Please use BUILD_BUG_ON() in a .c file instead. Many other cases below.
+> 
+> BUILD_BUG_ON expands to code, so it only works in contexts where there
+> can be code. I see that you said to put this in a .c file, but these
+> assertions are closely related to the structure declaration, so they
+> really belong right next to the structure (there's no natural place to
+> put them in a .c file).
 
-kernel test robot noticed the following build warnings:
+The customary practice is to add this kind of check in the relevant
+_init function, see as a random example:
 
-[auto build test WARNING on f685204c57e87d2a88b159c7525426d70ee745c9]
+https://elixir.bootlin.com/linux/v6.14.7/source/net/ipv4/tcp_bbr.c#L1178
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Harris/tcp-support-writing-to-a-socket-in-listening-state/20250521-195234
-base:   f685204c57e87d2a88b159c7525426d70ee745c9
-patch link:    https://lore.kernel.org/r/d3f47c9b5b08237b6e76f7b0739d59089683c86e.1747826775.git.jgh%40exim.org
-patch subject: [PATCH net-next v2 1/6]     tcp: support writing to a socket in listening state
-config: i386-buildonly-randconfig-001-20250522 (https://download.01.org/0day-ci/archive/20250522/202505221529.hEVx1YPV-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250522/202505221529.hEVx1YPV-lkp@intel.com/reproduce)
+Possibly a good location could be the homa per netns init.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505221529.hEVx1YPV-lkp@intel.com/
+/P
 
-All warnings (new ones prefixed by >>):
-
->> net/ipv4/tcp.c:1065:23: warning: variable 'sockc' set but not used [-Wunused-but-set-variable]
-    1065 |         struct sockcm_cookie sockc;
-         |                              ^
-   1 warning generated.
-
-
-vim +/sockc +1065 net/ipv4/tcp.c
-
-  1059	
-  1060	/* Cut-down version of tcp_sendmsg_locked(), for writing on a listen socket
-  1061	 */
-  1062	static int tcp_sendmsg_preload(struct sock *sk, struct msghdr *msg)
-  1063	{
-  1064		struct sk_buff *skb;
-> 1065		struct sockcm_cookie sockc;
-  1066		int flags, err, copied = 0;
-  1067		int size_goal;
-  1068		int process_backlog = 0;
-  1069		long timeo;
-  1070	
-  1071		if (sk->sk_state != TCP_LISTEN)
-  1072			return -EINVAL;
-  1073	
-  1074		flags = msg->msg_flags;
-  1075	
-  1076		sockc = (struct sockcm_cookie){ .tsflags = READ_ONCE(sk->sk_tsflags) };
-  1077	
-  1078		timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
-  1079	
-  1080		/* Ok commence sending. */
-  1081	restart:
-  1082		/* Use a arbitrary "mss" value */
-  1083		size_goal = 1000;
-  1084	
-  1085		err = -EPIPE;
-  1086		if (sk->sk_err || (sk->sk_shutdown & SEND_SHUTDOWN))
-  1087			goto do_error;
-  1088	
-  1089		while (msg_data_left(msg)) {
-  1090			ssize_t copy = 0;
-  1091	
-  1092			skb = tcp_write_queue_tail(sk);
-  1093			if (skb)
-  1094				copy = size_goal - skb->len;
-  1095	
-  1096			trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
-  1097	
-  1098			if (copy <= 0 || !tcp_skb_can_collapse_to(skb)) {
-  1099				bool first_skb = !skb;
-  1100	
-  1101				/* Limit to only one skb on the sk write queue */
-  1102	
-  1103				if (!first_skb)
-  1104					goto out_nopush;
-  1105	
-  1106				if (!sk_stream_memory_free(sk))
-  1107					goto wait_for_space;
-  1108	
-  1109				if (unlikely(process_backlog >= 16)) {
-  1110					process_backlog = 0;
-  1111					if (sk_flush_backlog(sk))
-  1112						goto restart;
-  1113				}
-  1114	
-  1115				skb = tcp_stream_alloc_skb(sk, sk->sk_allocation,
-  1116							   first_skb);
-  1117				if (!skb)
-  1118					goto wait_for_space;
-  1119	
-  1120				process_backlog++;
-  1121	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
