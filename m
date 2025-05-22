@@ -1,254 +1,132 @@
-Return-Path: <netdev+bounces-192615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB154AC0818
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 510CBAC083D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8D089E3751
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:59:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87DCF3A89E0
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC75286893;
-	Thu, 22 May 2025 08:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22332356CB;
+	Thu, 22 May 2025 09:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvGl6UE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6D12857FB
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 08:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1427B14830F
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 09:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747904320; cv=none; b=sMZrpAVooVQBULEIPb3hGHUynf7MFJ62Pe6H6BD5Oy9VPkut3bUQD5jVkfqWxnQe8K0nqWHHdzJRqaKgTbkzE3LFaGwausOaeXdO6QJZW188ivXO4VjdbzDbFdG+bPuwdDthzrf/YwDNMoRIBMtEPvm4TAthH15o5pAtZm73UZA=
+	t=1747905090; cv=none; b=Ki+XAvGkNIEJYsZaBV2PYIh+MkuOoI0Png/cV58XxjyCYGcFiqnbJ/R5NWUwyYtSIkC7Sytln8XffoYbpgSATAzRppm74x7qALRXPJtNJVXpmt1IoRRrxWaVLhkk4EnbiLwKnqlChVOOlKzxCp0ndvUfQnSSV/871R83DRUwRKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747904320; c=relaxed/simple;
-	bh=D++HUoGf+vJruVD7tStBvlSRU0YM+1KP7cStULiJfA0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DkdKHTW5Uhmk/diH6p5f/VlLxBMzz//U9AKCV03t3zPrn1azlgtdvBdd+9uhwc8OMd3Os0c3e+eZKGvQm6xeQBwhTv5DbW7ziiBct6GBUuCWhhWz5Nyn9WLt3ZtVIQhMdxTLyqkN0Yf0ODbDxCCyinCjgwkn0NBNY8skIx0vKCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpsz3t1747904227t32f739ae
-X-QQ-Originating-IP: tUHh4PhqS9RwoC4K++3lZpJ8ChXSDqbow6Yz8nC0TGk=
-Received: from localhost.localdomain ( [111.202.70.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 22 May 2025 16:57:04 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 119096427622245062
-EX-QQ-RecipientCnt: 12
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Zengbing Tu <tuzengbing@didiglobal.com>
-Subject: [PATCH net-next v1 1/1] net: bonding: add bond_is_icmpv6_nd() helper
-Date: Thu, 22 May 2025 16:57:03 +0800
-Message-Id: <20250522085703.16475-1-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1747905090; c=relaxed/simple;
+	bh=ZDC9x4MYunxqEojxt2QMnAUa/sa1GbM7hsgeW5aenQ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rPAV9jQLPqapWP+NUW87FFAG81MeEsPL6DLexQkGqJ/EbjY5SCvsy7eOUT4bgiq2B7XWiil8FNTA1Hw9pL0owlkORk6jon9G2NNeVGcBvyxEqdTaodpDtSxgsUK4jIHqonwcvPSIaM5AmWV7NtINhzEydp2zgv/rDQasZYiHmdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SvGl6UE2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747905087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Efw/xOoBR5JtsAGWTbkGb39F5QrJRSJy0Aiy1rPkylA=;
+	b=SvGl6UE2mvKUj/EYtR7dqlLngb9Y9PvIzgjBJnM6olXbHJnSObjmb7ownL5ehNbyaEXOfY
+	yd5cxQm/DX/SwzAyhPZSdDtPBcW9iBAOgSK2XEk/i/+HNHGXmpa+1CLeBCAMapOhitwC9N
+	t5nL/1jyCatLoTCATUjbZc2WxZlC3xg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-18-uwjRg0vMPji_u4vCkgYAqA-1; Thu, 22 May 2025 05:11:24 -0400
+X-MC-Unique: uwjRg0vMPji_u4vCkgYAqA-1
+X-Mimecast-MFC-AGG-ID: uwjRg0vMPji_u4vCkgYAqA_1747905084
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ea256f039so60909945e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 02:11:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747905083; x=1748509883;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Efw/xOoBR5JtsAGWTbkGb39F5QrJRSJy0Aiy1rPkylA=;
+        b=eGexYxJDTcb383AWF6tTQBjzdDj2tU1SIGEAy5NGpgsANKuCtenslh0uF/59YrwoJX
+         clYQpioGdjaA347ODHAt8U59z+pmS+rakT/ApKTVcabjGl22yBY1CAW/uVnDjz3DpdfR
+         MKNSlpN2wsqlWTAwrBnGsGMhrIc5pEe3Z/nwMcYrLVDH5lkOFC25RPF69ujQlSjEzl6H
+         pvGE1Aw0bDYC5VDqA/BjxykJcHO5ggWC5tolHMQLyGAslUsOKJf/Qg6o8L9JXdUWsjgs
+         WjVuFWedWR8Aq11AWkjEUP+GC/XQwdXsuYNb34t+GIgel86TxkGOBq8gwEnCh5wWhsPW
+         TTZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqUvDbdSnsaFJqdHJlAzn0DQ9oecGlHxgjdnv+SypjWhxs6e4rnoQl8mk/Xo2ySLPhBw0TK9Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9bmKg8nnQQ77CnZ0vnXkFKX0eQEvrprF1y9XRPyR7J/U9g0lO
+	U9K6tEWE9lphg0K7Ny0jTjYlNMM9McEKSYOgOoB868PiiaI6NsKn4xmH8fVHivE5pKBMZEGt52Q
+	oMS96RsIdw2CAmag2KCxKr1AiXki2707aH5pZvPCe+WgZ4GThYrJdLzTClw==
+X-Gm-Gg: ASbGnctTEzMrMlNy7/daJTLej7C08UjzgYwTJUOhhkRcKdxXATfgac6QzhFmRKMaoyl
+	iub/paTkm+DOYhz2XeQH0wHI3/j26RKaw25qV3mAb2LgtXFJ8sDDEi0mYhYRLl8xDwnG8kw63Hm
+	JiDr0qjEja8vV+BBKSevKDpeXgHwb75b//R09Fct5VHuc/I6ZGfBDeafs66MN03BDWBYGpztf7Y
+	CIVtsPJkvb3FDlIc3Utg7D2HI0Kp3xhT+UsKqOyBsRQT+R/PDTtoN3QjgdwDWk4qcJDpaootVJl
+	Yz/Ga0lySyemmvawrtY=
+X-Received: by 2002:a05:600c:a016:b0:441:d2d8:bd8b with SMTP id 5b1f17b1804b1-442fd622c81mr247895235e9.8.1747905083659;
+        Thu, 22 May 2025 02:11:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEciTJ/zcRf4AXElu0pqBhYj5jKqeehae3NT83Gy64LvlkBARBipL5idMvjE3WFf06oe/P65g==
+X-Received: by 2002:a05:600c:a016:b0:441:d2d8:bd8b with SMTP id 5b1f17b1804b1-442fd622c81mr247894945e9.8.1747905083275;
+        Thu, 22 May 2025 02:11:23 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:247a:1010::f39? ([2a0d:3344:247a:1010::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f05581sm97329145e9.13.2025.05.22.02.11.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 May 2025 02:11:22 -0700 (PDT)
+Message-ID: <f8640da1-c442-4704-8f0a-8d498e1b7e16@redhat.com>
+Date: Thu, 22 May 2025 11:11:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MTR5disOECbFiDPQ1Kz9kpLn5ZSyMMepcQXNIYKTz08YPI8p+TBiBZyy
-	ERk1ntpe6HxcMxcrLv/aRadOTQKzsbmYx2sOucVT1USe9V9aLNF3mU7cGO3vgGDeUP9FQi4
-	kx2sOlWKKGT2XFzJLo6vg+R3SG077zMFAIxO6XX5ceXJQe0OCIcvd68V19FYE20fbOWq9ds
-	8UgbkkF8JmY0/SRn0C47PVOfe54MgxxWGh8Y+74e8LeWCz+C51qK+4iizklwSO29Ow2rROq
-	Kn82/hSE2ifqjy0/5yYBNc50l4BWQTzFPT1anXtG2VHv5FddRP4pjXHxLwRbYgpYHEMnVcv
-	Z8JU4iTfU2GB6y3HEfe9knrlxJpVtieR3z/5rHS4oQ85KDHGfgMr0WE8iVAQxgImZsYiG/m
-	ggh6XvZL9j0z7byefOdx0Mg6L9FjBQW5Z7MINjmLZsbHNSC/0iIR6scYG0flfRYeoLSzq4q
-	1u8CQOunyi8atcOih8nCk+BOh6IpxwuPftEEd9hYrV+mlj+CPg+jYXKCQPKLHrvXMBhJCPo
-	e9EzVi8/5R0I9r8q2gLH7WbYCDuBLBjBGBe9U04BBkrGcLRqVZlsHqgt13OSlssAeSyc12K
-	ySwNqY5UUXmeCGpP1xTeRgem6s0C4R1n630P9tMrdyz/lcdorK/P79vHmx5q6au9GxyEL64
-	Ut8YhoH0ZqizENlvT1tgVfgQjZJayCrLneaV3fbCvg6eIcvpoPl57eppjUesgKcfMX8tugZ
-	nIypXG/zc1rn6ssnzu3PCiE94xWIaldESTYPvr9gyG55vMtxmdrnoNrYa27qSO9PPLNK2XR
-	I8QIN85qTP05CQcIOfUrvkBrJC1jJB3ipFhQ2l+SBFqzuTpoVFCWU+0Ad8RWH9IIgSUScFe
-	lx/vCeG+KwdNMttpUofj3X+gP+evtSd0nCHrp9x+zZc1ehsrs4+vw3RKncOQEjPrlk7rYmW
-	h6p7Gd8ydV+TZ4ooh6O2/8LZxRSo67VV/kppJzl+u3aZXuMTIymqLfu6bFdh5VIKmJCKnS0
-	J7xlM6bl2cnpm4CvBp/hZFHk8wVIAE/DO40htKUQ==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 5/6] socket: Replace most sock_create() calls
+ with sock_create_kern().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+ ocfs2-devel@lists.linux.dev
+References: <20250517035120.55560-1-kuniyu@amazon.com>
+ <20250517035120.55560-6-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250517035120.55560-6-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Introduce ipv6 ns/nd checking helper, using skb_header_pointer()
-instead of pskb_network_may_pull() on tx path.
+On 5/17/25 5:50 AM, Kuniyuki Iwashima wrote:
+> Except for only one user, sctp_do_peeloff(), all sockets created
+> by drivers and fs are not tied to userspace processes nor exposed
+> via file descriptors.
+> 
+> Let's use sock_create_kern() for such in-kernel use cases as CIFS
+> client and NFS.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-alb_determine_nd introduced from commit 0da8aa00bfcfe 
+The change makes sense to me, but it has a semantic change, let's add
+more CCs.
 
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
----
- drivers/net/bonding/bond_alb.c  | 32 +++++++-------------------------
- drivers/net/bonding/bond_main.c | 17 ++---------------
- include/net/bonding.h           | 19 +++++++++++++++++++
- 3 files changed, 28 insertions(+), 40 deletions(-)
+Link to the full series:
 
-diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
-index 7edf0fd58c34..beb80c487a29 100644
---- a/drivers/net/bonding/bond_alb.c
-+++ b/drivers/net/bonding/bond_alb.c
-@@ -19,7 +19,6 @@
- #include <linux/in.h>
- #include <net/arp.h>
- #include <net/ipv6.h>
--#include <net/ndisc.h>
- #include <asm/byteorder.h>
- #include <net/bonding.h>
- #include <net/bond_alb.h>
-@@ -1281,27 +1280,6 @@ static int alb_set_mac_address(struct bonding *bond, void *addr)
- 	return res;
- }
- 
--/* determine if the packet is NA or NS */
--static bool alb_determine_nd(struct sk_buff *skb, struct bonding *bond)
--{
--	struct ipv6hdr *ip6hdr;
--	struct icmp6hdr *hdr;
--
--	if (!pskb_network_may_pull(skb, sizeof(*ip6hdr)))
--		return true;
--
--	ip6hdr = ipv6_hdr(skb);
--	if (ip6hdr->nexthdr != IPPROTO_ICMPV6)
--		return false;
--
--	if (!pskb_network_may_pull(skb, sizeof(*ip6hdr) + sizeof(*hdr)))
--		return true;
--
--	hdr = icmp6_hdr(skb);
--	return hdr->icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT ||
--		hdr->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION;
--}
--
- /************************ exported alb functions ************************/
- 
- int bond_alb_initialize(struct bonding *bond, int rlb_enabled)
-@@ -1382,7 +1360,7 @@ struct slave *bond_xmit_tlb_slave_get(struct bonding *bond,
- 	if (!is_multicast_ether_addr(eth_data->h_dest)) {
- 		switch (skb->protocol) {
- 		case htons(ETH_P_IPV6):
--			if (alb_determine_nd(skb, bond))
-+			if (bond_is_icmpv6_nd(skb))
- 				break;
- 			fallthrough;
- 		case htons(ETH_P_IP):
-@@ -1468,16 +1446,20 @@ struct slave *bond_xmit_alb_slave_get(struct bonding *bond,
- 			break;
- 		}
- 
--		if (alb_determine_nd(skb, bond)) {
-+		if (bond_is_icmpv6_nd(skb)) {
- 			do_tx_balance = false;
- 			break;
- 		}
- 
--		/* The IPv6 header is pulled by alb_determine_nd */
- 		/* Additionally, DAD probes should not be tx-balanced as that
- 		 * will lead to false positives for duplicate addresses and
- 		 * prevent address configuration from working.
- 		 */
-+		if (!pskb_network_may_pull(skb, sizeof(*ip6hdr))) {
-+			do_tx_balance = false;
-+			break;
-+		}
-+
- 		ip6hdr = ipv6_hdr(skb);
- 		if (ipv6_addr_any(&ip6hdr->saddr)) {
- 			do_tx_balance = false;
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 7f03ca9bcbba..b3f0ac8e0720 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -5340,10 +5340,6 @@ static bool bond_should_broadcast_neighbor(struct sk_buff *skb,
- 					   struct net_device *dev)
- {
- 	struct bonding *bond = netdev_priv(dev);
--	struct {
--		struct ipv6hdr ip6;
--		struct icmp6hdr icmp6;
--	} *combined, _combined;
- 
- 	if (!static_branch_unlikely(&bond_bcast_neigh_enabled))
- 		return false;
-@@ -5351,19 +5347,10 @@ static bool bond_should_broadcast_neighbor(struct sk_buff *skb,
- 	if (!bond->params.broadcast_neighbor)
- 		return false;
- 
--	if (skb->protocol == htons(ETH_P_ARP))
-+	if (skb->protocol == htons(ETH_P_ARP) ||
-+	    (skb->protocol == htons(ETH_P_IPV6) && bond_is_icmpv6_nd(skb)))
- 		return true;
- 
--	if (skb->protocol == htons(ETH_P_IPV6)) {
--		combined = skb_header_pointer(skb, skb_mac_header_len(skb),
--					      sizeof(_combined),
--					      &_combined);
--		if (combined && combined->ip6.nexthdr == NEXTHDR_ICMP &&
--		    (combined->icmp6.icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
--		     combined->icmp6.icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT))
--			return true;
--	}
--
- 	return false;
- }
- 
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index e06f0d63b2c1..32d9fcca858c 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -29,6 +29,7 @@
- #include <net/bond_options.h>
- #include <net/ipv6.h>
- #include <net/addrconf.h>
-+#include <net/ndisc.h>
- 
- #define BOND_MAX_ARP_TARGETS	16
- #define BOND_MAX_NS_TARGETS	BOND_MAX_ARP_TARGETS
-@@ -814,4 +815,22 @@ static inline netdev_tx_t bond_tx_drop(struct net_device *dev, struct sk_buff *s
- 	return NET_XMIT_DROP;
- }
- 
-+static inline bool bond_is_icmpv6_nd(struct sk_buff *skb)
-+{
-+	struct {
-+		struct ipv6hdr ip6;
-+		struct icmp6hdr icmp6;
-+	} *combined, _combined;
-+
-+	combined = skb_header_pointer(skb, skb_mac_header_len(skb),
-+				      sizeof(_combined),
-+				      &_combined);
-+	if (combined && combined->ip6.nexthdr == NEXTHDR_ICMP &&
-+	    (combined->icmp6.icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
-+	     combined->icmp6.icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT))
-+		return true;
-+
-+	return false;
-+}
-+
- #endif /* _NET_BONDING_H */
--- 
-2.34.1
+https://lore.kernel.org/all/20250517035120.55560-1-kuniyu@amazon.com/
+
+/P
 
 
