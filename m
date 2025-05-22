@@ -1,245 +1,226 @@
-Return-Path: <netdev+bounces-192554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00FE9AC060E
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:48:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CB6AC0619
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 09:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F8B3BC97C
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:47:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54C9D1BA2501
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 07:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1257C223DD0;
-	Thu, 22 May 2025 07:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02972242D80;
+	Thu, 22 May 2025 07:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HWMWhS4E"
+	dkim=pass (1024-bit key) header.d=zenlayer.onmicrosoft.com header.i=@zenlayer.onmicrosoft.com header.b="DH57B7MR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2113.outbound.protection.outlook.com [40.107.101.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15004221701;
-	Thu, 22 May 2025 07:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747900076; cv=none; b=VtsWoL1bEWbi0UdLQEnlMGrcrG/15erc+MLXZmk54Pvn5Os1RHRCSLIPWFv1/UQY2IuA/YdcO9I51Rxc7lfdRsxGUoF4NRnrCFneWTl5fNuiDodogV89qnd/D1zZuLrddWp63ZqSm5DACwv74kzhw7aM+tPsOkq0OxpU90WiPC8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747900076; c=relaxed/simple;
-	bh=smdC8ntSuFz7RbikksRDtXxPHa88CKXItvJ63BI/zOY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BcM/Yu5iFeHZruSY62IeT8nikOv/LxXRURBoKrXBiFepa0NZ5zrwrjmhB2u2/CKKdPPCDrRF4MEkP67ORZgiHzmMjekz9pk5558OOjzyp1OsZlac54ZWhBwZwf2RMcstO+sQi1DnrunpnNYm83QsAnel9O4FRmF6nxIviWSlUAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=HWMWhS4E; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M7bKdm020411;
-	Thu, 22 May 2025 07:47:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=7M0sfJKDDhqb/GaL/zQpAc5hzFTOs
-	OvUTCDnKGL48Ug=; b=HWMWhS4E1skoqYcrvlV/j07qNTrOxtXSzT1+ScUccxK5E
-	xcJXUELJ5fMEDPAVANUtDwPF6jS/mvuowKbdXLnJ5Wla0p3RXdt6NM2/7xOOPiTs
-	mtwl4MfyXFZCaQNAvSLiFH6HnW7kcqBD0eIzbKoBO5rGHHbi0W42hVUPEK4+Elku
-	6NoLyj38/wXJPGcRNJP+jUJGEI7LuHeosqkAKfoBTPuseSBfiHG+IVP2Y0cN5Tj4
-	VWEh57HZrk2g8NOr3wXvAtEMjz+Vmwdf5hvkOZROdyqVRvs7mIn4l0gy9CEOZIji
-	RULYYjX6Wn+blQw3vXFYB1bpAswhA+ix6JZ15ZqAg==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46syphr0dy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 07:47:39 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54M66YIE011260;
-	Thu, 22 May 2025 07:47:38 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46rwep3p4w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 07:47:38 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 54M7lcSC025608;
-	Thu, 22 May 2025 07:47:38 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 46rwep3p4b-1;
-	Thu, 22 May 2025 07:47:38 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org
-Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, darren.kenny@oracle.com
-Subject: [PATCH] ixgbe: Fix typos and clarify comments in X550 driver code
-Date: Thu, 22 May 2025 00:47:26 -0700
-Message-ID: <20250522074734.3634633-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.47.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C5C23F421
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 07:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.113
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747900153; cv=fail; b=ZLzVVTxvE2+UH6z+t3/gvRFmfM8xOnpJpJo3xZGyGOlERApNaAMt2P0OnpherqptrBsNw3+KkLI1cSWvLP7StpM0WImbTYfa+gvYGe5IAm59K/K4dW0ARlv+lJoMW91Tfg2nGwyXJtydszM9ZQds8mZfhzaRSzl7jMOjmesZ5qw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747900153; c=relaxed/simple;
+	bh=uBd8YAb4eA71vyj2Ro4ksccF57fs6gnL1uA1GQVHIHc=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=mo8hvPvuZgDXZT7FnedigxT1L0HNTKhqBTDEAFMxF3PTKnOWFr/gtmxybCYC4Lcn331tbHgpaHcKawHIWCnNGY5kQqgeOf0TK8B1ipClzI+KTZolzYTnkT5k4Tc548fdxYb/Sl4GKc7aZeNYozsE1jrLsTJC/IqQ27yeqqWTN20=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zenlayer.com; spf=pass smtp.mailfrom=zenlayer.com; dkim=pass (1024-bit key) header.d=zenlayer.onmicrosoft.com header.i=@zenlayer.onmicrosoft.com header.b=DH57B7MR; arc=fail smtp.client-ip=40.107.101.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zenlayer.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zenlayer.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=p2yaKVmms3EuPhHnvf1ytfWk0T/GHtNGS6Jy/+GANFM6ArUJmFeMai8WD6qXXMGf6bIMH9UNB1r8BkxFXUSxsAs3uzR1EG0sGsNFmLOp9yxxXASViA0bajLOm3nrVP9S078oI3okAWqpqRbOI/Q5IkzWIx/gcpiU6zEiXESTDtXOman1kSCDf7WUmSm3W9BfcGi/N/GUwNGeXyQCYNhxsUZf2aFucsr4SEhAtQfK27m8hQzCGasOtbcQZuMPFFtla3Mo2Luvc4812uD7T8gOAaaC9BmxjeWLVvXzND2cJg2f7U5xkgxeCeuBD2Qb1B/CNSiMru2wIb+rfMtWnZWoOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uBd8YAb4eA71vyj2Ro4ksccF57fs6gnL1uA1GQVHIHc=;
+ b=fknLbHKCJkPC88w1JyYjWz3mGEqDJStVc2hDlrBuRg3fSAg0k0EOTFQwIEs64957rNBjBFZBLAUUvYn24UwqLJFM3EAD01103KOJooM8O6L3mXHdMYsbz4hYRO9fRUahNMk5GnQBfmrjkDv/ixtovtBFYlPyWmG0OnHpWewKTU4UTBe8Bhi2AYHZVFwZp14xKU+ffLc0y+wThwI5PR8zKAFmBaUhvlAE5vVnhUwfeTveKhM9bdeUJF5DX+spfrSIOn5l3m40CyMVZxk3ooporfnqpIh9aeq6RDtOuTcjdTMVL+msH10uNxvWutlPga3+eHorENvjx95UyyuunrPB2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=zenlayer.com; dmarc=pass action=none header.from=zenlayer.com;
+ dkim=pass header.d=zenlayer.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=zenlayer.onmicrosoft.com; s=selector2-zenlayer-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uBd8YAb4eA71vyj2Ro4ksccF57fs6gnL1uA1GQVHIHc=;
+ b=DH57B7MR9SNag6UBAthhCgXIxPAX7Bl3+AU7RWvESWgM1YrnPDSciaRuDeMC9f7dcT81TqcPOcSdl+EyWjf0VhRBf0bs6MSO+7PPifwplbXf1/YSEo/3aZ6iSaTtIZmQalq3t3qQggfjATrb7l/8ZINlcX7o2aMbD7gjGzjKun0=
+Received: from SJ0PR20MB6079.namprd20.prod.outlook.com (2603:10b6:a03:4d7::19)
+ by MW4PR20MB5180.namprd20.prod.outlook.com (2603:10b6:303:20e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.31; Thu, 22 May
+ 2025 07:49:09 +0000
+Received: from SJ0PR20MB6079.namprd20.prod.outlook.com
+ ([fe80::2c78:c02d:92:3811]) by SJ0PR20MB6079.namprd20.prod.outlook.com
+ ([fe80::2c78:c02d:92:3811%4]) with mapi id 15.20.8699.019; Thu, 22 May 2025
+ 07:49:08 +0000
+From: Faicker Mo <faicker.mo@zenlayer.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "dev@openvswitch.org" <dev@openvswitch.org>, "aconole@redhat.com"
+	<aconole@redhat.com>, "echaudro@redhat.com" <echaudro@redhat.com>,
+	"i.maximets@ovn.org" <i.maximets@ovn.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "martin.varghese@nokia.com"
+	<martin.varghese@nokia.com>, "pshelar@ovn.org" <pshelar@ovn.org>
+Subject: [PATCH net-next v3] net: openvswitch: Fix the dead loop of MPLS parse
+Thread-Topic: [PATCH net-next v3] net: openvswitch: Fix the dead loop of MPLS
+ parse
+Thread-Index: AQHbyu3/VJZsMK3bUE+qTE9tcCwtgQ==
+Date: Thu, 22 May 2025 07:49:08 +0000
+Message-ID: <21855B7D-A3D5-4031-A618-CCA8FD75B6FD@zenlayer.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=zenlayer.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR20MB6079:EE_|MW4PR20MB5180:EE_
+x-ms-office365-filtering-correlation-id: 70138865-24c0-427c-b0af-08dd9905227c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?NjhLRUpQblpkVDFkU0xPOGhRM01TZExvTmFUQURCV1I2TVVSL2o4QThmaDBF?=
+ =?utf-8?B?T1RKL2NIdjY2RzdwTUVtTkVvT2ZHak5pZ3FSNUlZbTFNSFZRanJpdllHbUkv?=
+ =?utf-8?B?Q25idm5ZLzBXdTU0M29MSjJSMzUxMk1RZlh0RlVSbFpkbjArTEtLR3NQRnA0?=
+ =?utf-8?B?aG5iZGJ6bUdnZUxJeFo0Y2l0NlU2UlNuUm5RVk95VTYxVzM1aE1BdGJMRVpV?=
+ =?utf-8?B?SFFnVkFqaHdWdG1XTm4wUDZWY3ZWR081NnhTOEhCdVNmcENTZGpCNEo2VnZR?=
+ =?utf-8?B?c2Z6czR6Q016K1JBeWhtY1o4YWk1R0J5aW1hSW5xUEN0V2xsaWlrK2d5U2NF?=
+ =?utf-8?B?bU5YcHUrVTV4dTlHb2hGQm9nbC91ODh6TCtPaE5oRzZrS3d6bWxqbUFtQ0wz?=
+ =?utf-8?B?RThFTml3aFA5QVRzaXBVQ25la1NXa3hxYml0THJVYkRJVGk1aWZXT2prZlUv?=
+ =?utf-8?B?TUpsdWpsbWFYdE10dmI4MmMwK013amptQ250L1ZlRFJ6b3FtVHVMaDNHUTVa?=
+ =?utf-8?B?RXZRMnZZbE1lRGpVQUo3aWQ0czQ5aEdnZ3dzUzNqUWgzWXU4L2VyNG5la3Bv?=
+ =?utf-8?B?cDhHamdRTExvNnBQVmk4RkUvVWNXUjkwc3A1b1VaT1hxVEhlVk5BSmV3SDZx?=
+ =?utf-8?B?dUd6R0Vnc04zNkJUQnJrWndLTy9xQXNTaUJmNlhIeVpCTDRRaWt1YWQxNGdP?=
+ =?utf-8?B?elJaQWIxQlMyN1YrOEdtaFdUaXU4ekpXekh0WDVVQU9wdG1meG0xT0YzVmVt?=
+ =?utf-8?B?WmVXaWh1dFVxRWIyRmlvakN5aXQ0dExmNmIrVlJXWGcwamtNT0VOeUNUL0dt?=
+ =?utf-8?B?VmIyN3pyT1NlQW9vcVlNakFhR3RYZGl3alNaY1BoU29UVU9QK21iWGZDb05l?=
+ =?utf-8?B?cEZtb1ZIMnV0YThpeCtGaDE1bGJsamtyVzJDWVZ5cStiUzQ4bHJ1RXZqdjA0?=
+ =?utf-8?B?QVR6YWNUZzZWakQ3bjdudXNzYkliLzl5MTMvYjJDclZSZjBRSHlmSjRING9K?=
+ =?utf-8?B?aEV0UHRoT3psTGhsUk9FRFdCR2pIckZzbm9wYWJXMWZ6RU4yTWhjc0xEdGtG?=
+ =?utf-8?B?c2ttUmJ4aGJiZkg3OUp2aDIrdSsxYUYyREtGOEdyMFdxdWxFVXl2cWNBR0E0?=
+ =?utf-8?B?U3F3NDRlVWNHSW5xaGdwL1dLNFVsWDEzdEwxZkRzcTNzWGJ0bGJUdnl1dWhz?=
+ =?utf-8?B?ZFVYRGpYYjNJTkhQWnRwbHdOOTNIYVo0b0ljL3B2R1pOUnhObWFaTzZ0cFlq?=
+ =?utf-8?B?NDgzamZCMDF0TDRFSFZDRlNKWmxvLzVVUmh4eDhvRmdkZ2U5QnVBb0JHLzE4?=
+ =?utf-8?B?dG1YOWwvdnA1WjkxOEtNSUpidHpjbE52cTQvaGlneG83ZUZLcXFEQVdFOHl3?=
+ =?utf-8?B?aW41OHp1RzZERDRQNEFEbW5aTjdELzZYRGhxRXVVYlBvYW14NTY5WFhnQkw0?=
+ =?utf-8?B?cUdObE96bmo3dGthQ1ZrNGtQU1o0S2Q5Y1p2ZEsyT0hCQXBOK3RFVXlFMHhx?=
+ =?utf-8?B?OFdNVnBjWU8vTTNkR2g0SzQvYmgyODFDZVYxQS9tOWp5Ty9wSHN2QkJrMXhL?=
+ =?utf-8?B?ZmtkTHBrVXhXWm1RRVM4S1Y5TzMrZ29CZFpwUUpCTXlITUtQNjhkVStCY1pw?=
+ =?utf-8?B?d1lhMEZja3pMSkVPSUpxdXJRNEpwNGUzV3dOM3hJQ01ReGVkYldSUXZ0bDVC?=
+ =?utf-8?B?Nm1aaTc1S00wVkZUVzlRWEVoS1lrMFlQYmZBeVpkck9BbHNXOXcvaWFydjZP?=
+ =?utf-8?B?alI5Z093ZCtBVTFrc1M0RWNnd2lTNWJIZTNvRTJwRzg1QkQvUVNiZjFlQ2R2?=
+ =?utf-8?B?WldRQ0c1M1NaVXFYTEVyNkx1bmEzNjIzUHNZYUNmRG1iTkN2SldTeFlCMEtk?=
+ =?utf-8?B?K3lIRklQOHp3RVBjOVhyMk1RR1FSTHVObUxPZEs5QXBtbGM5MzJuY29TbWRp?=
+ =?utf-8?B?Mi9Jajl0b2tzeUdoaDNpSUpETkFEUlB1UkxvTzN4UE1uS0REZmEydzNYZWRE?=
+ =?utf-8?B?R0dDVHlVblFnPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR20MB6079.namprd20.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dkVVa1N5em9UNWNoM3RLRkN6bGlva2ZxZVNkMHBxUmJnV3ZwZ3pzVElOZzBu?=
+ =?utf-8?B?ZG14N09NNVpUcTFUY3NKOHQzTHBJMGJhMExxejZZNEFPV0J3a0Y4KzNOZ3JX?=
+ =?utf-8?B?V1FnWWxLdkw5TWt4aVcxMnZyYkpWc3NMV3lrVDJqa3gwY1pDWXlRNjEvbUNt?=
+ =?utf-8?B?VjhsK0V4OVFhS09SMXBuaUdUTHZZUHg2MmlGSmNad1dESHE3Y3haS05LYVph?=
+ =?utf-8?B?YnhDTkJOcEpvdjl5b2hjbGxwYlBrZGFQQXIxTnRSVEc1QWNRZmF3bkZoWUZK?=
+ =?utf-8?B?aUdlQ2RvaVpBQ01MYndhNUszZHkwVnRDb1pRSHVuVDlCU2pGMW1TdTZwZ09L?=
+ =?utf-8?B?WHU3aUJrTm90VHBOck1ubUlscHpJSXZodjNIdGRRVWticWJwbEZhcUI0TmpB?=
+ =?utf-8?B?clRDelhuUU1QUTJ0YVptY0RVM0VERjJjM1VWbjJkemxGeUhTd2FWTzhILzA5?=
+ =?utf-8?B?ZGExdzdMRzdCREhnQ2V1d0krVW1BaEFwQ2RhbGorWUUxY1pMYkZtTnpDdFB6?=
+ =?utf-8?B?U2piRFB5ZDV5N2xWRXFiUVJEcGFnK0R3YVFzbG05ZGRDa1V0cHNYLzRJUDB5?=
+ =?utf-8?B?c0lZblZJR3BkdWdnd05pMnFTY2UwTDdTeHZJZWsxampLVkorQkxxSHZnaXZU?=
+ =?utf-8?B?U3hqL28yNGxubGp1SU1vUVQ3R29zVzVyUkhacTc2UGZlQk8xdTFOMDhpRktT?=
+ =?utf-8?B?cElVMHB5Qi85QldPTnc5dU5oblJlSzhNT05MWHBUWDg3SGpVTmVxd1BpRkd3?=
+ =?utf-8?B?ZU5OZ0Y5WjRIQmtSUnpYcmVyY1ZhbTZkeWVRYlQydURRaWh6UjdjM1dJd1My?=
+ =?utf-8?B?dzVvTGRyQU1WMUIrN1RLWDJnZ0xUditjMUlYSHJHMTB3cmpSU0tNL2pRZjZs?=
+ =?utf-8?B?UHI5aStKeHI2UkVSY3FoV1EwK1B5cnhtZGpNSXF2U3ZQKzA5bDBlS1BRSWhC?=
+ =?utf-8?B?WnlaKzdER2lMZDlxdlpxZ05nMUR3cDRuR3BqVW4wVjVleU5nejRyZWttdWlv?=
+ =?utf-8?B?d1g3cExNZXFackwzUDRPMk9TNVRhdURhLzR6TTZIT3FkanBycmVaQTRXdzFv?=
+ =?utf-8?B?NGxJeWwrUFpvTDNjaGtjbkQ1dXRnaUMwNnR1ajJGNUpNVi9UU3FoOUs5MHdR?=
+ =?utf-8?B?ZnhBbGlEOHMyMmFNZmpPM1A2TzV0NktoTTdGNmtoRGU4a0R4ZEl4dlhkcTFO?=
+ =?utf-8?B?MW5Xa0RKMk5FSldEaC8rblFHWGVRb2ZyQmp5NmJHVTh1dzR2bWZRWE5RVTlB?=
+ =?utf-8?B?NTZLNHRkeFVabmFCUjdmcittb0x6ci94cHhYb0RzVTd3QkFURGZMQXJIcnJB?=
+ =?utf-8?B?V1ZlQVdhc2tUK2toY00zQkp6MENmSm1SeGZVMlAwYlVqS0NYL1dZUDB6WjFq?=
+ =?utf-8?B?VFp1NktEaHVheXNaWkRXV3dGM2dNZGtUbmpiMVdVNWhzUnA3TER5YktzRkMv?=
+ =?utf-8?B?aHJ2ZXJ4em5nd0U2em9KeTZ3VytTYzhWZGlhMjBxYUkvN0REb3ZDK1M4a1No?=
+ =?utf-8?B?ZjFCVmE2dlZWeXB4TlNtckI1R3FVTVZBTlpGSER1M3FXWUtBT3lhVzYvaExK?=
+ =?utf-8?B?MHMyMU1Oc1NYQUJjK1FiamhYRnNVVk9VTzZ1VnNYc1NBZWZ1SENITjltS2pM?=
+ =?utf-8?B?TEJwRGUvcHpnZDltaEpSazJ2RCtxZHlqdjdoQXV3dWFaNCtyTldVaDJydDFB?=
+ =?utf-8?B?TVFzckFabTg4QVlsMTNJbnkrdTdhc3d2UEdFNklvZi83L2tFT256c3RaU0xT?=
+ =?utf-8?B?d2J5bmlhM3VVYmpodGNxZ1RubjVmWG15RGp6d2xSL2JBRWgvb2ZvWDZmSjNl?=
+ =?utf-8?B?Rnp5a3F1SlRuOXlveUkxQkZEb3pmZjE5UG5ZQVh6bFovYnRBdGNVOXlIR0JL?=
+ =?utf-8?B?QmM0NjF5Q0Y0emtXSUUvWCtTV1l5U0FBeVp5akZNVFVMK3J3QkxJb25BZE5J?=
+ =?utf-8?B?amZkb2hDZEgwVFVFZXU0TksrVHNZazVKV2dEeE42b2ZMbDNpdUF6K3R6VFR1?=
+ =?utf-8?B?UHZ0YzFMQ3d3SnMzRjB0eDFxeXFNQnBUeDNGcmJKdWxUdEgzRUVKNlVEckhm?=
+ =?utf-8?B?QVBzemRxd3ZNZjVoRHdaTVhjdFBMTVhzWHYrNnQ2bTk2dUM3WUxuUDE5bFBy?=
+ =?utf-8?B?WDNNRTJpb1B3V0JBWUErZnpUMFk3MzhxMWxPdGNnazYwdXh1QjNpV3AvVzBR?=
+ =?utf-8?B?UlE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <341EC15FB8D7F24691E998681F702740@namprd20.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_04,2025-05-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 adultscore=0 phishscore=0 malwarescore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2505220077
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDA3NyBTYWx0ZWRfXz6y3jFZ3aK2b XVoGHrGO1K3dtyjca2CYBeL5DPzy599thWzuSn0fz8QIbjJnZ2PRZLNzcLgVM0n57mzbwGmjKkL A5vZ2JHqr9GeyzsnTNgHk4k+dPi+e0WwtyCFa/rI52SNyoI+G2IS1ff4Qss/2oSjlJZtPnsc41E
- WZvH0oRoaLgvXi6x/VPkFdfvolpM5wmjZ0A+p7Z+o5dY5io4Je4Ud4GoGqnRyTjiaBwZD92ljgp p4TrILBuuVw4yz3jXsWizHkuQDN1P5VVLd20G/TPL0VJdGVFf+R1j4Fow+GQj9p0k3GZ/AieS1E hYH0JUuNfTEAo6HUXB31fqQSe/H/LKpsb8Sssvh78zBC1jx+CL1k1SCBS68n0kf109Tq0kWcJVx
- p6aARgUmH0Ivnrvl+WmBoxblUIyQzpGZez9N2vyJlNtU9aZdj5FOCr7yoOh6MaM5Rw2DEoIy
-X-Authority-Analysis: v=2.4 cv=aNTwqa9m c=1 sm=1 tr=0 ts=682ed69b b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=dt9VzEwgFbYA:10 a=yPCof4ZbAAAA:8 a=NBsIVx0fIra5UVodnlcA:9 cc=ntf awl=host:14714
-X-Proofpoint-ORIG-GUID: ZuEMEtUNLP6oWblbaPdDzloteqsQRbXO
-X-Proofpoint-GUID: ZuEMEtUNLP6oWblbaPdDzloteqsQRbXO
+X-OriginatorOrg: zenlayer.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR20MB6079.namprd20.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70138865-24c0-427c-b0af-08dd9905227c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2025 07:49:08.8527
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0d27725c-b11d-49f0-b479-a26ae758f26d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YorlNoNfa2FzWRzBFjfRI7A0lG2bd2opjhp4k20qjCjQMtjBWlRmJfhMpk4kvCPp2084PZoR5Bl1OsiQHpUQVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR20MB5180
 
-Corrected spelling errors such as "simular" -> "similar",
-"excepted" -> "accepted", and "Determime" -> "Determine".
-Fixed including incorrect word usage ("to MAC" -> "two MAC")
-and improved awkward phrasing.
-
-Aligned function header descriptions with their actual functionality
-(e.g., "Writes a value" -> "Reads a value").
-Corrected typo in error code from -ENIVAL to -EINVAL.
-Improved overall clarity and consistency in comment across various
-functions.
-
-These changes improve maintainability and readability of the code
-without affecting functionality.
-
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 28 +++++++++----------
- 1 file changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 277ceaf8a793..57f68a1addfe 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -20,7 +20,7 @@ static int ixgbe_get_invariants_X550_x(struct ixgbe_hw *hw)
- 	struct ixgbe_phy_info *phy = &hw->phy;
- 	struct ixgbe_link_info *link = &hw->link;
- 
--	/* Start with X540 invariants, since so simular */
-+	/* Start with X540 invariants, since so similar */
- 	ixgbe_get_invariants_X540(hw);
- 
- 	if (mac->ops.get_media_type(hw) != ixgbe_media_type_copper)
-@@ -48,7 +48,7 @@ static int ixgbe_get_invariants_X550_a(struct ixgbe_hw *hw)
- 	struct ixgbe_mac_info *mac = &hw->mac;
- 	struct ixgbe_phy_info *phy = &hw->phy;
- 
--	/* Start with X540 invariants, since so simular */
-+	/* Start with X540 invariants, since so similar */
- 	ixgbe_get_invariants_X540(hw);
- 
- 	if (mac->ops.get_media_type(hw) != ixgbe_media_type_copper)
-@@ -685,7 +685,7 @@ static int ixgbe_iosf_wait(struct ixgbe_hw *hw, u32 *ctrl)
- 	return 0;
- }
- 
--/** ixgbe_read_iosf_sb_reg_x550 - Writes a value to specified register of the
-+/** ixgbe_read_iosf_sb_reg_x550 - Reads a value to specified register of the
-  *  IOSF device
-  *  @hw: pointer to hardware structure
-  *  @reg_addr: 32 bit PHY register to write
-@@ -847,7 +847,7 @@ static int ixgbe_read_iosf_sb_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
- 
- /** ixgbe_read_ee_hostif_buffer_X550- Read EEPROM word(s) using hostif
-  *  @hw: pointer to hardware structure
-- *  @offset: offset of  word in the EEPROM to read
-+ *  @offset: offset of word in the EEPROM to read
-  *  @words: number of words
-  *  @data: word(s) read from the EEPROM
-  *
-@@ -1253,7 +1253,7 @@ static int ixgbe_get_bus_info_X550em(struct ixgbe_hw *hw)
- 
- /**
-  * ixgbe_fw_recovery_mode_X550 - Check FW NVM recovery mode
-- * @hw: pointer t hardware structure
-+ * @hw: pointer to hardware structure
-  *
-  * Returns true if in FW NVM recovery mode.
-  */
-@@ -1267,7 +1267,7 @@ static bool ixgbe_fw_recovery_mode_X550(struct ixgbe_hw *hw)
- 
- /** ixgbe_disable_rx_x550 - Disable RX unit
-  *
-- *  Enables the Rx DMA unit for x550
-+ *  Disables the Rx DMA unit for x550
-  **/
- static void ixgbe_disable_rx_x550(struct ixgbe_hw *hw)
- {
-@@ -1754,7 +1754,7 @@ ixgbe_setup_mac_link_sfp_n(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
- 
- 	/* If no SFP module present, then return success. Return success since
--	 * SFP not present error is not excepted in the setup MAC link flow.
-+	 * SFP not present error is not accepted in the setup MAC link flow.
- 	 */
- 	if (ret_val == -ENOENT)
- 		return 0;
-@@ -1804,7 +1804,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
- 
- 	/* If no SFP module present, then return success. Return success since
--	 * SFP not present error is not excepted in the setup MAC link flow.
-+	 * SFP not present error is not accepted in the setup MAC link flow.
- 	 */
- 	if (ret_val == -ENOENT)
- 		return 0;
-@@ -2324,7 +2324,7 @@ static int ixgbe_get_link_capabilities_X550em(struct ixgbe_hw *hw,
-  *	 PHY interrupt is lsc
-  * @is_overtemp: indicate whether an overtemp event encountered
-  *
-- * Determime if external Base T PHY interrupt cause is high temperature
-+ * Determine if external Base T PHY interrupt cause is high temperature
-  * failure alarm or link status change.
-  **/
- static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
-@@ -2669,7 +2669,7 @@ static int ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
- 	if (status)
- 		return status;
- 
--	/* If link is not still up, then no setup is necessary so return */
-+	/* If the link is still not up, no setup is necessary */
- 	status = ixgbe_ext_phy_t_x550em_get_link(hw, &link_up);
- 	if (status)
- 		return status;
-@@ -2768,7 +2768,7 @@ static int ixgbe_led_off_t_x550em(struct ixgbe_hw *hw, u32 led_idx)
-  *  Sends driver version number to firmware through the manageability
-  *  block.  On success return 0
-  *  else returns -EBUSY when encountering an error acquiring
-- *  semaphore, -EIO when command fails or -ENIVAL when incorrect
-+ *  semaphore, -EIO when command fails or -EINVAL when incorrect
-  *  params passed.
-  **/
- int ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
-@@ -3175,7 +3175,7 @@ static void ixgbe_read_mng_if_sel_x550em(struct ixgbe_hw *hw)
- 	hw->phy.nw_mng_if_sel = IXGBE_READ_REG(hw, IXGBE_NW_MNG_IF_SEL);
- 
- 	/* If X552 (X550EM_a) and MDIO is connected to external PHY, then set
--	 * PHY address. This register field was has only been used for X552.
-+	 * PHY address. This register field has only been used for X552.
- 	 */
- 	if (hw->mac.type == ixgbe_mac_x550em_a &&
- 	    hw->phy.nw_mng_if_sel & IXGBE_NW_MNG_IF_SEL_MDIO_ACT) {
-@@ -3735,7 +3735,7 @@ static int ixgbe_acquire_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
-  * @hw: pointer to hardware structure
-  * @mask: Mask to specify which semaphore to release
-  *
-- * Release the SWFW semaphore and puts the shared PHY token as needed
-+ * Release the SWFW semaphore and puts back the shared PHY token as needed
-  */
- static void ixgbe_release_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
- {
-@@ -3756,7 +3756,7 @@ static void ixgbe_release_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
-  * @phy_data: Pointer to read data from PHY register
-  *
-  * Reads a value from a specified PHY register using the SWFW lock and PHY
-- * Token. The PHY Token is needed since the MDIO is shared between to MAC
-+ * Token. The PHY Token is needed since the MDIO is shared between two MAC
-  * instances.
-  */
- static int ixgbe_read_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
--- 
-2.47.1
-
+VGhlIHVuZXhwZWN0ZWQgTVBMUyBwYWNrZXQgbWF5IG5vdCBlbmQgd2l0aCB0aGUgYm90dG9tIGxh
+YmVsIHN0YWNrLg0KV2hlbiB0aGVyZSBhcmUgbWFueSBzdGFja3MsIFRoZSBsYWJlbCBjb3VudCB2
+YWx1ZSBoYXMgd3JhcHBlZCBhcm91bmQuDQpBIGRlYWQgbG9vcCBvY2N1cnMsIHNvZnQgbG9ja3Vw
+L0NQVSBzdHVjayBmaW5hbGx5Lg0KDQpzdGFjayBiYWNrdHJhY2U6DQpVQlNBTjogYXJyYXktaW5k
+ZXgtb3V0LW9mLWJvdW5kcyBpbiAvYnVpbGQvbGludXgtMFBhMHhLL2xpbnV4LTUuMTUuMC9uZXQv
+b3BlbnZzd2l0Y2gvZmxvdy5jOjY2MjoyNg0KaW5kZXggLTEgaXMgb3V0IG9mIHJhbmdlIGZvciB0
+eXBlICdfX2JlMzIgWzNdJw0KQ1BVOiAzNCBQSUQ6IDAgQ29tbTogc3dhcHBlci8zNCBLZHVtcDog
+bG9hZGVkIFRhaW50ZWQ6IEcgICAgICAgICAgIE9FICAgNS4xNS4wLTEyMS1nZW5lcmljICMxMzEt
+VWJ1bnR1DQpIYXJkd2FyZSBuYW1lOiBEZWxsIEluYy4gUG93ZXJFZGdlIEM2NDIwLzBKUDlURiwg
+QklPUyAyLjEyLjIgMDcvMTQvMjAyMQ0KQ2FsbCBUcmFjZToNCjxJUlE+DQpzaG93X3N0YWNrKzB4
+NTIvMHg1Yw0KZHVtcF9zdGFja19sdmwrMHg0YS8weDYzDQpkdW1wX3N0YWNrKzB4MTAvMHgxNg0K
+dWJzYW5fZXBpbG9ndWUrMHg5LzB4MzYNCl9fdWJzYW5faGFuZGxlX291dF9vZl9ib3VuZHMuY29s
+ZCsweDQ0LzB4NDkNCmtleV9leHRyYWN0X2wzbDQrMHg4MmEvMHg4NDAgW29wZW52c3dpdGNoXQ0K
+PyBrZnJlZV9za2JtZW0rMHg1Mi8weGEwDQprZXlfZXh0cmFjdCsweDljLzB4MmIwIFtvcGVudnN3
+aXRjaF0NCm92c19mbG93X2tleV9leHRyYWN0KzB4MTI0LzB4MzUwIFtvcGVudnN3aXRjaF0NCm92
+c192cG9ydF9yZWNlaXZlKzB4NjEvMHhkMCBbb3BlbnZzd2l0Y2hdDQo/IGtlcm5lbF9pbml0X2Zy
+ZWVfcGFnZXMucGFydC4wKzB4NGEvMHg3MA0KPyBnZXRfcGFnZV9mcm9tX2ZyZWVsaXN0KzB4MzUz
+LzB4NTQwDQpuZXRkZXZfcG9ydF9yZWNlaXZlKzB4YzQvMHgxODAgW29wZW52c3dpdGNoXQ0KPyBu
+ZXRkZXZfcG9ydF9yZWNlaXZlKzB4MTgwLzB4MTgwIFtvcGVudnN3aXRjaF0NCm5ldGRldl9mcmFt
+ZV9ob29rKzB4MWYvMHg0MCBbb3BlbnZzd2l0Y2hdDQpfX25ldGlmX3JlY2VpdmVfc2tiX2NvcmUu
+Y29uc3Rwcm9wLjArMHgyM2EvMHhmMDANCl9fbmV0aWZfcmVjZWl2ZV9za2JfbGlzdF9jb3JlKzB4
+ZmEvMHgyNDANCm5ldGlmX3JlY2VpdmVfc2tiX2xpc3RfaW50ZXJuYWwrMHgxOGUvMHgyYTANCm5h
+cGlfY29tcGxldGVfZG9uZSsweDdhLzB4MWMwDQpibnh0X3BvbGwrMHgxNTUvMHgxYzAgW2JueHRf
+ZW5dDQpfX25hcGlfcG9sbCsweDMwLzB4MTgwDQpuZXRfcnhfYWN0aW9uKzB4MTI2LzB4MjgwDQo/
+IGJueHRfbXNpeCsweDY3LzB4ODAgW2JueHRfZW5dDQpoYW5kbGVfc29mdGlycXMrMHhkYS8weDJk
+MA0KaXJxX2V4aXRfcmN1KzB4OTYvMHhjMA0KY29tbW9uX2ludGVycnVwdCsweDhlLzB4YTANCjwv
+SVJRPg0KDQpGaXhlczogZmJkY2RkNzhkYTdjICgiQ2hhbmdlIGluIE9wZW52c3dpdGNoIHRvIHN1
+cHBvcnQgTVBMUyBsYWJlbCBkZXB0aCBvZiAzIGluIGluZ3Jlc3MgZGlyZWN0aW9uIikNClNpZ25l
+ZC1vZmYtYnk6IEZhaWNrZXIgTW8gPGZhaWNrZXIubW9AemVubGF5ZXIuY29tPg0KLS0tDQp2Mg0K
+LSBDaGFuZ2VkIHJldHVybiB2YWx1ZSBiYXNlZCBvbiBFZWxjbydzIGZlZWRiYWNrLg0KLSBBZGRl
+ZCBGaXhlcy4NCnYzDQotIFJldmVydCAiQ2hhbmdlZCByZXR1cm4gdmFsdWUgYmFzZWQgb24gRWVs
+Y28ncyBmZWVkYmFjayIuDQotIENoYW5nZWQgdGhlIGxhYmVsX2NvdW50IHZhcmlhYmxlIHR5cGUg
+YmFzZWQgb24gSWx5YSdzIGZlZWRiYWNrLg0KLS0tDQpuZXQvb3BlbnZzd2l0Y2gvZmxvdy5jIHwg
+MiArLQ0KMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQoNCmRp
+ZmYgLS1naXQgYS9uZXQvb3BlbnZzd2l0Y2gvZmxvdy5jIGIvbmV0L29wZW52c3dpdGNoL2Zsb3cu
+Yw0KaW5kZXggOGE4NDhjZTcyZTI5Li5iODBiZDNhOTA3NzMgMTAwNjQ0DQotLS0gYS9uZXQvb3Bl
+bnZzd2l0Y2gvZmxvdy5jDQorKysgYi9uZXQvb3BlbnZzd2l0Y2gvZmxvdy5jDQpAQCAtNzg4LDcg
+Kzc4OCw3IEBAIHN0YXRpYyBpbnQga2V5X2V4dHJhY3RfbDNsNChzdHJ1Y3Qgc2tfYnVmZiAqc2ti
+LCBzdHJ1Y3Qgc3dfZmxvd19rZXkgKmtleSkNCgkJCW1lbXNldCgma2V5LT5pcHY0LCAwLCBzaXpl
+b2Yoa2V5LT5pcHY0KSk7DQoJCX0NCgl9IGVsc2UgaWYgKGV0aF9wX21wbHMoa2V5LT5ldGgudHlw
+ZSkpIHsNCi0JCXU4IGxhYmVsX2NvdW50ID0gMTsNCisJCXNpemVfdCBsYWJlbF9jb3VudCA9IDE7
+DQoNCgkJbWVtc2V0KCZrZXktPm1wbHMsIDAsIHNpemVvZihrZXktPm1wbHMpKTsNCgkJc2tiX3Nl
+dF9pbm5lcl9uZXR3b3JrX2hlYWRlcihza2IsIHNrYi0+bWFjX2xlbik7DQotLQ0KMi4zNC4xDQoN
+Cg0K
 
