@@ -1,152 +1,89 @@
-Return-Path: <netdev+bounces-192693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95C7AC0D4D
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A085AC0D51
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45E8B1BC558E
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:51:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FEBB1BC4929
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B1F28C02D;
-	Thu, 22 May 2025 13:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330F628C03A;
+	Thu, 22 May 2025 13:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="igE8VsQw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZvYdCO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB0D2882BC
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 13:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D53528C01E;
+	Thu, 22 May 2025 13:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921897; cv=none; b=YCyPVfT8DXHaKsPnehmb1pP+89b54FL+cp3TNGQqN8rX/tviWzvavjUR2+BnqbIO/PozYWyQLSN0yt1V2yIzdVhqf+iOt1+tEEiuvRq3W1nB+fmYn/pgZDvXQv6DWEi7h8N5CLSj67axLKQFYBOlc3VesHoIKkm6bwSTvvBtb0s=
+	t=1747921932; cv=none; b=ToE/nnsQxcjHdhT3RVWkv2GZUuzcHoUg4Gzx8TUtr3dHKLamF0b2CFVI/7vENCyy+zbne02adBWea2WPROj2DzSFVdLhCvpq65QFU08rhGAN8J0nwrsZ8gauygLpK1CrxwVUg2vtYyP98xP8xTzEZFz4zgdOHCcv3sJSvswHZtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921897; c=relaxed/simple;
-	bh=+B0cm1z7+VBO1FW2h6d+w1Ym3K7ZfK1VSqRLl7SscVY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XnKFG3YlqP/OwcQxycrnux6m2wWMHpYGFnQN3FaCjG8qo4VuIKh2CNAx4yKbCEUDYTY9NkgMyKOhNn6pN0E1dUIVa2PbrMueuz0WVRsm1Qfo0v2O5xKc0ztKnGlY5wiqN9WSMMcsX2nBIn6r0cbKIzMulH+CF8vR7UZAlXYAz54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=igE8VsQw; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747921896; x=1779457896;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xSxX5/iP8F2HaLjmtH7cAftV6tUgFxuuS6OQ8yogM3g=;
-  b=igE8VsQwlygMOHsZmpkM1SoxSzu1cQW6Z7WRHJ3zeQE7qPpNx1BS3qDF
-   bWd6GhNtLAT4xlQpfCJz3DXnURLNqWRw4Ye208usZonNqPzglVv+VKW9Q
-   +GlNcidJyOXROhtVI/OGqYGi0N+qi/MSXCRc9iEBEH+vqtKG2XDfCiODW
-   v7rCSHnCVFSMbgnnnZ3a9ZB26i71QarTRZKW1qZzzMto33LZe/M0EwPuQ
-   Q22pfAvWDtaBnEsf0HpkBgwp8BPUn0nwEe9Nd6toFctZ11+kmi+PUZ6WP
-   3/j/OsJnYN2DuNz0qDoQbTL0XG30UpvGS2xCc17cPPM8juiP3dyeOz4Pp
-   w==;
-X-IronPort-AV: E=Sophos;i="6.15,306,1739836800"; 
-   d="scan'208";a="96244654"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 13:51:35 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:60269]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.28.53:2525] with esmtp (Farcaster)
- id 592b4880-2df5-4890-826a-4ed5dcdc5c2f; Thu, 22 May 2025 13:51:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 592b4880-2df5-4890-826a-4ed5dcdc5c2f
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 22 May 2025 13:51:33 +0000
-Received: from HFA15-G9FV5D3.amazon.com (10.85.143.172) by
- EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 22 May 2025 13:51:21 +0000
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
- Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
-	<leon@kernel.org>
-Subject: [PATCH v10 net-next 8/8] net: ena: Add a DEVLINK readme
-Date: Thu, 22 May 2025 16:48:39 +0300
-Message-ID: <20250522134839.1336-9-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250522134839.1336-1-darinzon@amazon.com>
-References: <20250522134839.1336-1-darinzon@amazon.com>
+	s=arc-20240116; t=1747921932; c=relaxed/simple;
+	bh=6Asv8ogK2+lf9UneA4gPVYzxO8G2cewAGm2bqeLWYeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIrE2UsqMxeUkob+KdKEZpTmM2Br2uEgwqQYz+s6WMCzYDHt2SzrAJ8Edm4LHDUxNhmP8ZYNF89Q37bRBUbdCXJKAoMSyBsZyUc+Ozo/1GnIBL7Nh1YuFc1pjlqfo7TibZIXbS8s51lDOM1PLvSYQA6U1jv/6IQ4LXA1Wb/RH7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZvYdCO9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A97C4CEEB;
+	Thu, 22 May 2025 13:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747921931;
+	bh=6Asv8ogK2+lf9UneA4gPVYzxO8G2cewAGm2bqeLWYeE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FZvYdCO9dkHdFSHJhOhFtRT6hRtEUw2+/+U+hSDqP62MqPd6dDWJzgX1q+idg1uZ0
+	 to7fnXu9g+kR1kXIRseJWUPSaPNVix9K+5nq3C2Mul2RE+1XuWYvUpbkSyMLg1xhMF
+	 WQeblJoogKkLmI1hHXDzGIlQXxpSkW0GPFPCWcLqXoH4s2+kPjZidfF180dsZsFAsp
+	 V4FvGsCD/eYtY92hsuOpAxKDmE0WjhBZaAf/GTfttDtmtVAmFrSRlMPmfkTnNdflcE
+	 bzs6QBmu7DmoAXKvNEBqMbL7YOAR5F6jyKD6qW0PlQfUEAubRiArqy0cuB3MCZIm4F
+	 fjPu9uaT5PxvA==
+Date: Thu, 22 May 2025 14:52:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: sysfs: Implement is_visible for
+ phys_(port_id, port_name, switch_id)
+Message-ID: <20250522135207.GH365796@horms.kernel.org>
+References: <20250521140824.3523-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
- EX19D005EUA002.ant.amazon.com (10.252.50.11)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521140824.3523-1-yajun.deng@linux.dev>
 
-Adding a standard devlink readme which outlines the parameters
-that are supported by the ena driver.
+On Wed, May 21, 2025 at 10:08:24PM +0800, Yajun Deng wrote:
+> phys_port_id_show, phys_port_name_show and phys_switch_id_show would
+> return -EOPNOTSUPP if the netdev didn't implement the corresponding
+> method.
+> 
+> There is no point in creating these files if they are unsupported.
+> 
+> Put these attributes in netdev_phys_group and implement the is_visible
+> method. make phys_(port_id, port_name, switch_id) invisible if the netdev
+> dosen't implement the corresponding method.
+> 
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> ---
+> v2: Remove worthless comments
+> v1: https://lore.kernel.org/all/20250515130205.3274-1-yajun.deng@linux.dev/
 
-Signed-off-by: David Arinzon <darinzon@amazon.com>
----
- Documentation/networking/devlink/ena.rst   | 25 ++++++++++++++++++++++
- Documentation/networking/devlink/index.rst |  1 +
- 2 files changed, 26 insertions(+)
- create mode 100644 Documentation/networking/devlink/ena.rst
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-diff --git a/Documentation/networking/devlink/ena.rst b/Documentation/networking/devlink/ena.rst
-new file mode 100644
-index 00000000..0c66aec2
---- /dev/null
-+++ b/Documentation/networking/devlink/ena.rst
-@@ -0,0 +1,25 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===================
-+ena devlink support
-+===================
-+
-+This document describes the devlink features implemented by the ``ena``
-+device driver.
-+
-+Parameters
-+==========
-+
-+The ``ena`` driver implements the following driver-specific parameters.
-+
-+.. list-table:: Driver-specific parameters implemented
-+   :widths: 5 5 5 85
-+
-+   * - Name
-+     - Type
-+     - Mode
-+     - Description
-+   * - ``phc_enable``
-+     - Boolean
-+     - driverinit
-+     - Enables/disables the PHC feature
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 8319f43b..53d00934 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -98,3 +98,4 @@ parameters, info versions, and other features it supports.
-    iosm
-    octeontx2
-    sfc
-+   ena
--- 
-2.47.1
+FWIIW, I had the same thought that Jakub related in his review of v1.
+
+ "I'm slightly worried some user space depends on the files existing,
+  but maybe ENOENT vs EOPNOTSUPP doesn't make a big difference.|
+
+...
 
 
