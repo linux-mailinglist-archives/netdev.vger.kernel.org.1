@@ -1,105 +1,208 @@
-Return-Path: <netdev+bounces-192768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC173AC1167
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:50:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C7DAC1175
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 18:53:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD767A227AE
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:49:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C5DC9E827F
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 16:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52061299926;
-	Thu, 22 May 2025 16:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FDA29A317;
+	Thu, 22 May 2025 16:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gRKBwT+C"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Uk2p9I80";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="En7lPhlm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2832C18C932;
-	Thu, 22 May 2025 16:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68574299AB9;
+	Thu, 22 May 2025 16:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747932596; cv=none; b=bManV6Lw2h0oD/wORAmzxklVQhefw3pn1S4mUHVsBqqSRnKSDcZzSsMAvSyHG5YYDOaNmQZvpGlinBhZ4ADoE3AXC1L+UnzQxtV1lR7dfW23BXDdz4BzVaTxkQbzguuq6GLrmoQWzYO0MIRSm5+bBt0mkNkmKOV5viBwGz3JvDE=
+	t=1747932780; cv=none; b=K/+Q0tabSCF8HCH5VpHqbkEsimYIYPZdPwv+7CxZGZxXQAyWqsRA5hnOP8wO73W6mN74rZ4oWoYVDCg7ckwGmD2D2NgEHmaNqr6Oh8tayT38W5/tImCan2Xj0BEwJ1tUlDcdfrJZ+3NfUG4VIQfYjVHrmIk/oGJLEbhMtl4p6lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747932596; c=relaxed/simple;
-	bh=uSsuvsWmK9ORuTQBOXLOaS8S9bzS1b6Hm6DJ88zHHzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RaOHbJP2KJ/N1fSYjIMG40MKR30fk8Htq//zfNEqUSmMDoXsSCYdfLswhUKlqhBul5qMRm5YM2QKdrqmceMBEJmJMTyBPXYnB8GUTAxJ4Vm4dEy8ocvvQvunoVebKBUbSsdArZhE7I3TfSL6Hp7QNWt6U/5HrI85sYofTsUlh+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gRKBwT+C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33FC5C4CEE4;
-	Thu, 22 May 2025 16:49:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747932595;
-	bh=uSsuvsWmK9ORuTQBOXLOaS8S9bzS1b6Hm6DJ88zHHzQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gRKBwT+CdogkwLafnrr3J6BYgTdzfnjj+TjiJyNl/22BlxoEtjWRO1Av7IbO9mB+D
-	 nitVbkyeqeqgSORzDTdVCnDyO+E1XDVledNnosQIi4N4cawHKDxOy9nPZ32eErunwk
-	 oXd+MgpMqiko4i9CyK4mjYz2Dh4iNuDI08NFlis0UsBn3qXHsIHlt7YlOx8bxDmM9U
-	 nSO9es6arfRTGpvCWPXRw/BNlL5/Fd5F8Y/ij+a/2fCRXJJQqYZjb1jyumfBZceX/7
-	 n+E9BBaOKUYNsqTiND6Z2kz4GKWnirICmH5FDy+6Dn4fHncRxwHv/Hf3gtOF9fJzfI
-	 24v7BWmc9BsEA==
-Date: Thu, 22 May 2025 09:49:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shiming Cheng <shiming.cheng@mediatek.com>
-Cc: <willemdebruijin.kernel@gmail.com>, <edumazet@google.com>,
- <davem@davemloft.net>, <pabeni@redhat.com>, <matthias.bgg@gmail.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <lena.wang@mediatek.com>
-Subject: Re: [PATCH] net: fix udp gso skb_segment after pull from frag_list
-Message-ID: <20250522094954.2f8090ce@kernel.org>
-In-Reply-To: <20250522031835.4395-1-shiming.cheng@mediatek.com>
-References: <20250522031835.4395-1-shiming.cheng@mediatek.com>
+	s=arc-20240116; t=1747932780; c=relaxed/simple;
+	bh=sJL9Z9DbWuzLwaCcaUovUmv2H3Qk40cqmEWHraNNcCI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qHsFuhkpF3j/Yg0z8aeV4m0WlIRx2pUyhkKXR5mRsfhqJtICP26fOf8a9Zn2X5Ry1jFAEC3E0yyNZ8/yVdKx+dTtxsm2jjNOTLJc9j9T43uq+n0O5AhaiQKroCenQYsawYTGeGpXQvAdtIaTVuOWPaTwOXT80IxLGaEDZ1AAdV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Uk2p9I80; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=En7lPhlm; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 4F9386072A; Thu, 22 May 2025 18:52:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1747932770;
+	bh=eQb0K1FTffzWAje34e2SMmv1VyKYoMyZidRKD4P6FeQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Uk2p9I80gKpuZWcefZPuypQIaw0TLS2bwk1OuV/pgtKo47sxAxcZWKJJmG3wvJcke
+	 S3SW4+7ybvQFGOv+oWVc8+IAJ6ZoaRag8MSOhHF+68PRHqPReG7P/NvZp6F3Tt6pGx
+	 ApFqgLO0iLC9as6rD+SLlGjnY9GDmHZez3xRr9ZVcyaEK/DauaEWKhMh6vOMt+Ct7y
+	 DQ0XMli1qfZJawiXvZFYBewzVxI2iYT9lgjvafaIbkuuGPAiAdV+CJ/ZTH3c+3wyXD
+	 xAPXPvrh2aEKT5Jq+yJ8IGZCE0tyFjZQU1L0t2rayJCDupUMBTY5NDk7M7NJJY2rhu
+	 OcLXZ7DSwlACA==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 16D0260717;
+	Thu, 22 May 2025 18:52:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1747932766;
+	bh=eQb0K1FTffzWAje34e2SMmv1VyKYoMyZidRKD4P6FeQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=En7lPhlm7CNh03r6R1kJlNvDu/JaDzXbSKENj0SFTQ36mtd9PQ2OO+j3HV+6/+KoA
+	 wZZx2BxcdpqIQiZ171Z6gfKD869C3e5ZYYNP6sk99ZLaHzMT+F7gGSW1euOjk5XWWB
+	 z1fO4DZFeCEw/mBwWajooixKd87fygdJ1xFmQMT9FznlMHby3r6aMB225RhKzjd8OZ
+	 mRyqS3CabNhpNtaZk5Ik1WgnIbUHeGs2NKDyOyuhB3jzceOHy8cDxDbCvQVtzdei/1
+	 O3ILskcY/9yJEBd87nTfvBS0gkGWvrqKrpf9duHjna8LOAjgdZ+xglBLjJ6m9IZp0K
+	 dubSNPyZw3SAw==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net-next 00/26] Netfilter updates for net-next
+Date: Thu, 22 May 2025 18:52:12 +0200
+Message-Id: <20250522165238.378456-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 22 May 2025 11:18:04 +0800 Shiming Cheng wrote:
->     Detect invalid geometry due to pull from frag_list, and pass to
->     regular skb_segment. if only part of the fraglist payload is pulled
->     into head_skb, When splitting packets in the skb_segment function,
->     it will always cause exception as below.
-> 
->     Valid SKB_GSO_FRAGLIST skbs
->     - consist of two or more segments
->     - the head_skb holds the protocol headers plus first gso_size
->     - one or more frag_list skbs hold exactly one segment
->     - all but the last must be gso_size
-> 
->     Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
->     modify fraglist skbs, breaking these invariants.
-> 
->     In extreme cases they pull one part of data into skb linear. For UDP,
->     this  causes three payloads with lengths of (11,11,10) bytes were
->     pulled tail to become (12,10,10) bytes.
-> 
->     When splitting packets in the skb_segment function, the first two
->     packets of (11,11) bytes are split using skb_copy_bits. But when
->     the last packet of 10 bytes is split, because hsize becomes nagative,
->     it enters the skb_clone process instead of continuing to use
->     skb_copy_bits. In fact, the data for skb_clone has already been
->     copied into the second packet.
-> 
->     when hsize < 0,  the payload of the fraglist has already been copied
->     (with skb_copy_bits), so there is no need to enter skb_clone to
->     process this packet. Instead, continue using skb_copy_bits to process
->     the next packet.
+Hi,
 
-nit: please un-indent the text, you can keep the stack trace indented
-but the commit message explanation should not be. And if you can
-run the stack trace thru decode_stacktrace to add source code
-references.
+The following batch contains Netfilter updates for net-next,
+specifically 26 patches: 5 patches adding/updating selftests,
+4 fixes, 3 PREEMPT_RT fixes, and 14 patches to enhance nf_tables):
 
-This patch seems to be causing regressions for SCTP, see:
-https://lore.kernel.org/all/aC82JEehNShMjW8-@strlen.de/
-If you send a v2 please make sure you add test cases to
-net/core/net_test.c for both the geometry you're trying to fix,
-and the geometry you got wrong in v1.
+1) Improve selftest coverage for pipapo 4 bit group format, from
+   Florian Westphal.
+
+2) Fix incorrect dependencies when compiling a kernel without
+   legacy ip{6}tables support, also from Florian.
+
+3) Two patches to fix nft_fib vrf issues, including selftest updates
+   to improve coverage, also from Florian Westphal.
+
+4) Fix incorrect nesting in nft_tunnel's GENEVE support, from
+   Fernando F. Mancera.
+
+5) Three patches to fix PREEMPT_RT issues with nf_dup infrastructure
+   and nft_inner to match in inner headers, from Sebastian Andrzej Siewior.
+
+6) Integrate conntrack information into nft trace infrastructure,
+   from Florian Westphal.
+
+7) A series of 13 patches to allow to specify wildcard netdevice in
+   netdev basechain and flowtables, eg.
+
+   table netdev filter {
+       chain ingress {
+           type filter hook ingress devices = { eth0, eth1, vlan* } priority 0; policy accept;
+       }
+   }
+
+   This also allows for runtime hook registration on NETDEV_{UN}REGISTER
+   event, from Phil Sutter.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-05-22
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit f685204c57e87d2a88b159c7525426d70ee745c9:
+
+  Merge branch 'queue_api-reduce-risk-of-name-collision-over-txq' (2025-05-19 20:09:07 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-05-22
+
+for you to fetch changes up to abc77025d71fcc1dc7315eda8d7ca50860d56f47:
+
+  selftests: netfilter: Torture nftables netdev hooks (2025-05-22 17:47:32 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-05-22
+
+----------------------------------------------------------------
+Fernando Fernandez Mancera (1):
+      netfilter: nft_tunnel: fix geneve_opt dump
+
+Florian Westphal (9):
+      selftests: netfilter: nft_concat_range.sh: add coverage for 4bit group representation
+      netfilter: xtables: support arpt_mark and ipv6 optstrip for iptables-nft only builds
+      selftests: netfilter: nft_fib.sh: add 'type' mode tests
+      selftests: netfilter: move fib vrf test to nft_fib.sh
+      netfilter: nf_tables: nft_fib_ipv6: fix VRF ipv4/ipv6 result discrepancy
+      netfilter: nf_tables: nft_fib: consistent l3mdev handling
+      selftests: netfilter: nft_fib.sh: add type and oif tests with and without VRFs
+      netfilter: conntrack: make nf_conntrack_id callable without a module dependency
+      netfilter: nf_tables: add packets conntrack state to debug trace info
+
+Phil Sutter (13):
+      netfilter: nf_tables: Introduce functions freeing nft_hook objects
+      netfilter: nf_tables: Introduce nft_hook_find_ops{,_rcu}()
+      netfilter: nf_tables: Introduce nft_register_flowtable_ops()
+      netfilter: nf_tables: Pass nf_hook_ops to nft_unregister_flowtable_hook()
+      netfilter: nf_tables: Have a list of nf_hook_ops in nft_hook
+      netfilter: nf_tables: Prepare for handling NETDEV_REGISTER events
+      netfilter: nf_tables: Respect NETDEV_REGISTER events
+      netfilter: nf_tables: Wrap netdev notifiers
+      netfilter: nf_tables: Handle NETDEV_CHANGENAME events
+      netfilter: nf_tables: Sort labels in nft_netdev_hook_alloc()
+      netfilter: nf_tables: Support wildcard netdev hook specs
+      netfilter: nf_tables: Add notifications for hook changes
+      selftests: netfilter: Torture nftables netdev hooks
+
+Sebastian Andrzej Siewior (3):
+      netfilter: nf_dup{4, 6}: Move duplication check to task_struct
+      netfilter: nft_inner: Use nested-BH locking for nft_pcpu_tun_ctx
+      netfilter: nf_dup_netdev: Move the recursion counter struct netdev_xmit
+
+ include/linux/netdevice_xmit.h                     |   3 +
+ include/linux/netfilter.h                          |  15 +-
+ include/linux/sched.h                              |   1 +
+ include/net/netfilter/nf_tables.h                  |  12 +-
+ include/net/netfilter/nft_fib.h                    |  16 +
+ include/uapi/linux/netfilter/nf_tables.h           |  18 +
+ include/uapi/linux/netfilter/nfnetlink.h           |   2 +
+ net/ipv4/netfilter/ip_tables.c                     |   2 +-
+ net/ipv4/netfilter/nf_dup_ipv4.c                   |   6 +-
+ net/ipv4/netfilter/nft_fib_ipv4.c                  |  11 +-
+ net/ipv6/netfilter/ip6_tables.c                    |   2 +-
+ net/ipv6/netfilter/nf_dup_ipv6.c                   |   6 +-
+ net/ipv6/netfilter/nft_fib_ipv6.c                  |  17 +-
+ net/netfilter/core.c                               |   3 -
+ net/netfilter/nf_conntrack_core.c                  |   6 +
+ net/netfilter/nf_dup_netdev.c                      |  22 +-
+ net/netfilter/nf_tables_api.c                      | 402 ++++++++++----
+ net/netfilter/nf_tables_offload.c                  |  51 +-
+ net/netfilter/nf_tables_trace.c                    |  54 +-
+ net/netfilter/nfnetlink.c                          |   1 +
+ net/netfilter/nft_chain_filter.c                   |  94 +++-
+ net/netfilter/nft_flow_offload.c                   |   2 +-
+ net/netfilter/nft_inner.c                          |  18 +-
+ net/netfilter/nft_tunnel.c                         |   8 +-
+ net/netfilter/xt_TCPOPTSTRIP.c                     |   4 +-
+ net/netfilter/xt_mark.c                            |   2 +-
+ tools/testing/selftests/net/netfilter/Makefile     |   1 +
+ .../selftests/net/netfilter/conntrack_vrf.sh       |  34 --
+ .../selftests/net/netfilter/nft_concat_range.sh    | 165 +++++-
+ tools/testing/selftests/net/netfilter/nft_fib.sh   | 612 ++++++++++++++++++++-
+ .../net/netfilter/nft_interface_stress.sh          | 151 +++++
+ 31 files changed, 1511 insertions(+), 230 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netfilter/nft_interface_stress.sh
 
