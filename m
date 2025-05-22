@@ -1,353 +1,87 @@
-Return-Path: <netdev+bounces-192543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F7DEAC04CB
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:48:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89417AC04AC
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 08:37:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B7031B673C2
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:48:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68DBF3BCEC1
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A52319924D;
-	Thu, 22 May 2025 06:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4436E22155F;
+	Thu, 22 May 2025 06:37:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDEE146D65
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 06:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784301ACEA6;
+	Thu, 22 May 2025 06:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747896485; cv=none; b=A9v2uGSRXsgj1TKxqa2VzHg5XZ3SismxeCl+z/aOVOI9Yh3sZC12jPzQDnjXN49rLmudWZkPt/ZeaY3vrNG3hPkBkYfAcq5mwOOCjoVuOgWzIRQKqLZpeW/I/SGJIzMO7tgLcNK5aivqNcNsl0rnm/P5zxk0o6ytraDima0oikw=
+	t=1747895874; cv=none; b=dMMVtm3Zpgka94a1kv8TMxRJOrKkOXPnQTIhZctxG7PvWPz5cJE1tYejXf0cEWNeqkk4nqilGiItdydh7ty3pB3CyIMY6xN4+SpPXVDsHCCHPhcWejzP8Q+mrc/MpwEicDbAQDlaK862m8RvXlyXB6JwJv0WdFyHC+Pb6xoOrEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747896485; c=relaxed/simple;
-	bh=DtSupU9zko9MofHs6mK3WJSM9gV9pwRVI9D0qhwCMOs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R+NYIgIBcWW9GjJSmYE2+hOvBY6Rb8MCPTyzNN+Up+Yd3wwt+f1VqlR2RxMH19XRBMp2kOKpMV6IhNRylZVua1xXbvoVrxaF+ezNzE+8BczKFoyiEFwznRFp4z8sFZeHxaM34asVPgYxWdZqlcMXIl3rf0DQ8O0X03F9lXHAmeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af503.dynamic.kabel-deutschland.de [95.90.245.3])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3594761E64855;
-	Thu, 22 May 2025 08:47:31 +0200 (CEST)
-Message-ID: <2d18429a-f999-4166-90db-834ea03a6e7a@molgen.mpg.de>
-Date: Thu, 22 May 2025 08:47:30 +0200
+	s=arc-20240116; t=1747895874; c=relaxed/simple;
+	bh=awsg4yO3SRHKC8llTafIGAlDFyGcLYFGSAV2e81IRI0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Oup/FlWLa4vKkalOzJwUWikh66NK5E4PRJPck3kjcId9fMuNkW0s4esdLoO+JeL0xST5n9lmvEEETkj5CAtWUyrCGMzznieYX+WJiT3nBkfKNIu2Qv26u/7kPfOYYq3zNvZkuSxyTZA53Tftdx+36BkleZpp5nVbelny0hx7fsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4b2z914PPfz6HJh7;
+	Thu, 22 May 2025 14:36:53 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id A83DE1402FC;
+	Thu, 22 May 2025 14:37:48 +0800 (CST)
+Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 22 May
+ 2025 08:37:43 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Fan Gong <gongfan1@huawei.com>
+Subject: [PATCH net-next v2 0/3] hinic3: queue_api related fixes
+Date: Thu, 22 May 2025 09:54:40 +0300
+Message-ID: <cover.1747896423.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/4] ice: skip completion for
- sideband queue writes
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- richardcochran@gmail.com, Milena Olech <milena.olech@intel.com>
-References: <20250520110823.1937981-6-karol.kolacinski@intel.com>
- <20250520110823.1937981-7-karol.kolacinski@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250520110823.1937981-7-karol.kolacinski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-Dear Karol,
+This patch series contains improvement to queue_api and 2 queue_api
+related patches to the hinic3 driver.
 
+Changes:
 
-Thank you for your patch.
+v1: http://lore.kernel.org/netdev/cover.1747824040.git.gur.stavi@huawei.com
 
-Am 20.05.25 um 13:06 schrieb Karol Kolacinski:
-> Sideband queue (SBQ) is a HW queue with very short completion time. All
-> SBQ writes were posted by default, which means that the driver did not
-> have to wait for completion from the neighbor device, because there was
-> none. This introduced unnecessary delays, where only those delays were
-> "ensuring" that the command is "completed" and this was a potential race
-> condition.
-> 
-> Add the possibility to perform non-posted writes where it's necessary to
-> wait for completion, instead of relying on fake completion from the FW,
-> where only the delays are guarding the writes.
-> 
-> Flush the SBQ by reading address 0 from the PHY 0 before issuing SYNC
-> command to ensure that writes to all PHYs were completed and skip SBQ
-> message completion if it's posted.
+v2:
+* Update cover letter subject and text.
+* Add 2 patches for user code related to queue api.
 
-How can these delays be analyzed, and verified that these are gone? It’d 
-be great if you added that to the commit mesasge.
+Gur Stavi (3):
+  queue_api: add subqueue variant netif_subqueue_sent
+  hinic3: use netif_subqueue_sent api
+  hinic3: remove tx_q name collision hack
 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_common.c   | 13 ++--
->   drivers/net/ethernet/intel/ice/ice_controlq.c |  4 ++
->   drivers/net/ethernet/intel/ice/ice_controlq.h |  1 +
->   drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 62 +++++++++++--------
->   drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |  5 +-
->   5 files changed, 52 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index 11a954e8dc62..53b9b5b54187 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -1523,6 +1523,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
->   {
->   	struct ice_sbq_cmd_desc desc = {0};
->   	struct ice_sbq_msg_req msg = {0};
-> +	struct ice_sq_cd cd = {};
->   	u16 msg_len;
->   	int status;
->   
-> @@ -1535,7 +1536,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
->   	msg.msg_addr_low = cpu_to_le16(in->msg_addr_low);
->   	msg.msg_addr_high = cpu_to_le32(in->msg_addr_high);
->   
-> -	if (in->opcode)
-> +	if (in->opcode == ice_sbq_msg_wr_p || in->opcode == ice_sbq_msg_wr_np)
-
-For me, it’d be helpful, if the suffixes were `_posted` and `_nonposted`.
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 23 ++++++++-----------
+ include/net/netdev_queues.h                   |  8 +++++++
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
 
-Kind regards,
-
-Paul
-
-
->   		msg.data = cpu_to_le32(in->data);
->   	else
->   		/* data read comes back in completion, so shorten the struct by
-> @@ -1543,10 +1544,12 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flags)
->   		 */
->   		msg_len -= sizeof(msg.data);
->   
-> +	cd.postpone = in->opcode == ice_sbq_msg_wr_p;
-> +
->   	desc.flags = cpu_to_le16(flags);
->   	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
->   	desc.param0.cmd_len = cpu_to_le16(msg_len);
-> -	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
-> +	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, &cd);
->   	if (!status && !in->opcode)
->   		in->data = le32_to_cpu
->   			(((struct ice_sbq_msg_cmpl *)&msg)->data);
-> @@ -6260,7 +6263,7 @@ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
->   	struct ice_sbq_msg_input cgu_msg = {
->   		.opcode = ice_sbq_msg_rd,
->   		.dest_dev = ice_sbq_dev_cgu,
-> -		.msg_addr_low = addr
-> +		.msg_addr_low = addr,
->   	};
->   	int err;
->   
-> @@ -6290,10 +6293,10 @@ int ice_read_cgu_reg(struct ice_hw *hw, u32 addr, u32 *val)
->   int ice_write_cgu_reg(struct ice_hw *hw, u32 addr, u32 val)
->   {
->   	struct ice_sbq_msg_input cgu_msg = {
-> -		.opcode = ice_sbq_msg_wr,
-> +		.opcode = ice_sbq_msg_wr_np,
->   		.dest_dev = ice_sbq_dev_cgu,
->   		.msg_addr_low = addr,
-> -		.data = val
-> +		.data = val,
->   	};
->   	int err;
->   
-> diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
-> index dcb837cadd18..5fb3a8441beb 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_controlq.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
-> @@ -1086,6 +1086,10 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
->   	wr32(hw, cq->sq.tail, cq->sq.next_to_use);
->   	ice_flush(hw);
->   
-> +	/* If the message is posted, don't wait for completion. */
-> +	if (cd && cd->postpone)
-> +		goto sq_send_command_error;
-> +
->   	/* Wait for the command to complete. If it finishes within the
->   	 * timeout, copy the descriptor back to temp.
->   	 */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h b/drivers/net/ethernet/intel/ice/ice_controlq.h
-> index 788040dd662e..7c98d3a0314e 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_controlq.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
-> @@ -77,6 +77,7 @@ struct ice_ctl_q_ring {
->   /* sq transaction details */
->   struct ice_sq_cd {
->   	struct libie_aq_desc *wb_desc;
-> +	u8 postpone : 1;
->   };
->   
->   /* rq event information */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> index 523f95271f35..9a4ecf1249ee 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-> @@ -352,6 +352,13 @@ void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
->   static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
->   {
->   	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
-> +	struct ice_sbq_msg_input msg = {
-> +		.dest_dev = ice_sbq_dev_phy_0,
-> +		.opcode = ice_sbq_msg_rd,
-> +	};
-> +
-> +	/* Flush SBQ by reading address 0 on PHY 0 */
-> +	ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   
->   	if (!ice_is_primary(hw))
->   		hw = ice_get_primary_hw(pf);
-> @@ -417,10 +424,10 @@ static int ice_write_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 val)
->   {
->   	struct ice_sbq_msg_input msg = {
->   		.dest_dev = ice_ptp_get_dest_dev_e825(hw, port),
-> -		.opcode = ice_sbq_msg_wr,
-> +		.opcode = ice_sbq_msg_wr_p,
->   		.msg_addr_low = lower_16_bits(addr),
->   		.msg_addr_high = upper_16_bits(addr),
-> -		.data = val
-> +		.data = val,
->   	};
->   	int err;
->   
-> @@ -2342,11 +2349,12 @@ static bool ice_is_40b_phy_reg_e82x(u16 low_addr, u16 *high_addr)
->   static int
->   ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.opcode = ice_sbq_msg_rd,
-> +	};
->   	int err;
->   
->   	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
-> -	msg.opcode = ice_sbq_msg_rd;
->   
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
-> @@ -2419,12 +2427,13 @@ ice_read_64b_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 low_addr, u64 *val)
->   static int
->   ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.opcode = ice_sbq_msg_wr_p,
-> +		.data = val,
-> +	};
->   	int err;
->   
->   	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
-> -	msg.opcode = ice_sbq_msg_wr;
-> -	msg.data = val;
->   
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
-> @@ -2578,15 +2587,15 @@ static int ice_fill_quad_msg_e82x(struct ice_hw *hw,
->   int
->   ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.opcode = ice_sbq_msg_rd,
-> +	};
->   	int err;
->   
->   	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
->   	if (err)
->   		return err;
->   
-> -	msg.opcode = ice_sbq_msg_rd;
-> -
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
->   		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-> @@ -2612,16 +2621,16 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
->   int
->   ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.opcode = ice_sbq_msg_wr_p,
-> +		.data = val,
-> +	};
->   	int err;
->   
->   	err = ice_fill_quad_msg_e82x(hw, &msg, quad, offset);
->   	if (err)
->   		return err;
->   
-> -	msg.opcode = ice_sbq_msg_wr;
-> -	msg.data = val;
-> -
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
->   		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-> @@ -4259,13 +4268,14 @@ static void ice_ptp_init_phy_e82x(struct ice_ptp_hw *ptp)
->    */
->   static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.dest_dev = ice_sbq_dev_phy_0,
-> +		.opcode = ice_sbq_msg_rd,
-> +		.msg_addr_low = lower_16_bits(addr),
-> +		.msg_addr_high = upper_16_bits(addr),
-> +	};
->   	int err;
->   
-> -	msg.msg_addr_low = lower_16_bits(addr);
-> -	msg.msg_addr_high = upper_16_bits(addr);
-> -	msg.opcode = ice_sbq_msg_rd;
-> -	msg.dest_dev = ice_sbq_dev_phy_0;
->   
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
-> @@ -4289,15 +4299,15 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
->    */
->   static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
->   {
-> -	struct ice_sbq_msg_input msg = {0};
-> +	struct ice_sbq_msg_input msg = {
-> +		.dest_dev = ice_sbq_dev_phy_0,
-> +		.opcode = ice_sbq_msg_wr_p,
-> +		.msg_addr_low = lower_16_bits(addr),
-> +		.msg_addr_high = upper_16_bits(addr),
-> +		.data = val,
-> +	};
->   	int err;
->   
-> -	msg.msg_addr_low = lower_16_bits(addr);
-> -	msg.msg_addr_high = upper_16_bits(addr);
-> -	msg.opcode = ice_sbq_msg_wr;
-> -	msg.dest_dev = ice_sbq_dev_phy_0;
-> -	msg.data = val;
-> -
->   	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
->   	if (err) {
->   		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-> index 183dd5457d6a..7960f888a655 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
-> @@ -53,8 +53,9 @@ enum ice_sbq_dev_id {
->   };
->   
->   enum ice_sbq_msg_opcode {
-> -	ice_sbq_msg_rd	= 0x00,
-> -	ice_sbq_msg_wr	= 0x01
-> +	ice_sbq_msg_rd		= 0x00,
-> +	ice_sbq_msg_wr_p	= 0x01,
-> +	ice_sbq_msg_wr_np	= 0x02,
->   };
->   
->   #define ICE_SBQ_MSG_FLAGS	0x40
+base-commit: 3da895b23901964fcf23450f10b529d45069f333
+-- 
+2.45.2
 
 
