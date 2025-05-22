@@ -1,122 +1,126 @@
-Return-Path: <netdev+bounces-192645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4ED5AC0A3D
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:01:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49D9AC0A57
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE2743AD327
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:01:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1CB1885DCD
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 11:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CEF289344;
-	Thu, 22 May 2025 11:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD428289349;
+	Thu, 22 May 2025 11:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="bb6UfpyO"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="L3RFVWSn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EBF221FAA
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 11:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B0C17BB6;
+	Thu, 22 May 2025 11:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747911698; cv=none; b=ipPGcec5dU+jDRqZxXawTOZWBSPb5cvBqKWUE+aNmLI5dkIOJJdXbZ5ybiBJPV4JhdR2a4nuoqx/YE4y8YLieYaaNoWasfqlZF0zPfhd6V+iLFSpT4bgGYEJO71IhVWus5ukhbFbgFynZwW5lzbjh0iBB+YYVJPiOFuvB0cifDc=
+	t=1747912303; cv=none; b=jIy5Xj9s7upNT5hTH7oFRHvoxZLPvWysGlg6x0b5cVcM97ReQ7LN7b6J13ASfcQDzysaeQLX3nqV0v4vXoyIaXN+/icVHAOUuOnHt3nMIvHJpN2rVxOl6AGGIFnB2T4A3A63VTU9VqsMIyGFCVgpFZJ1cSEorHKe0MDOw3PMmls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747911698; c=relaxed/simple;
-	bh=gAqncjsS4nRvRmi1gYLfh9vJ5nCE78Oii/HQl+jxbbc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d/fVJiH20A+ztJXuPAwAzb+BdlYTjgGjVLUNIxWVDlUr+sdOY662aEAyOUuUh40aD11FyYOuq0AKrYfw5aKm5EBMLDtCM1m4dVVSjVXZOGTJVsX2NiJ3Gwobo+1BIE5XkAWvI1RT7Z6ZksnDTSCTnhMJ9wJuEgwGXJe6uy3fP2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=bb6UfpyO; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9ebdfso14535599a12.3
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 04:01:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1747911695; x=1748516495; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3enV2xknpMHN3gRCs0IuDxOL/FDnx1Gi/rcMdQRg/ks=;
-        b=bb6UfpyOJtvHqNzMPuZzfc87q2tNarlo9xxJbQ8nz6nwRXw+HBJOyCGpCWg4zEXPtD
-         W5EgvD0vgFIYj5SwJgt7paSEHWvdFA/of2uSQ4KLODGQCCUJjr00jH8lnYVqcDXd1ENP
-         F01w4WyUsS6VEndQeNJlORld7HlPxcDF7bOIpjAAxGYZEHpBSfPYE/nINZ6ayPEJX2ao
-         ru06+FcwYEjUL44exQGirMohlHcja2lHyzyEYdQY/6cgpNx+m7sqbHONRS0YRafZ462O
-         uBxeZ5TrfeiS28GbwKm4QbvxsNNze6aU5QnryjJssY6Z0KPSGCaM2rLYoVszBkuYD834
-         UNvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747911695; x=1748516495;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3enV2xknpMHN3gRCs0IuDxOL/FDnx1Gi/rcMdQRg/ks=;
-        b=V4JHB0BM/GjBp57Fbx08HQj60qvBq5Qu/Fmk1SmohTdLiWqNhTFY0cWtv8Y5zkVhbG
-         S1a0KDIOnafoodFdpDk6lUzPBoPAApIS2EcvfIAy+DQO7VcctPPiH93WopSkcSG0IeKH
-         b8RxmbVHLweJvZo5WRCmB6iiIADOhgVow5lPbQ0Bie9l/ZdIc6tkOOvh5frkccjOMHhe
-         XbwCkxmx0RrjvWJYDBtHj2guCmmmTTUNwywLPtLIdIRFrrJPCw/uQ/2jtMc40L53TMmm
-         UDFs2HKk7Srxq0G16Q2OatTh+oQjQquViwqAFSArG0wc+4mWAofM42OT5F4Szxv5nMSy
-         z3Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUUZlsZx3wo43m6zgm6+BP52mcvaZ8t5FmbCoxByQFtKsbSRB6jeAgIjiVYNSqFQQhAyqb/toM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb31uC44QcrSRfbLlhxScAc0KUbyCJFjlWzMigjAQ9hObSJsWn
-	7f6KeMAIi1y4+Ke32xQoCd+k2bSRdP5zsIiLClH6oHEEPDoX5azi2SpKq/WIX0MP+0w=
-X-Gm-Gg: ASbGncva3vyn+24APWrPKP22031V2bIgnAeWwVSBuktIYgrEmF2VCAOnHdrCUTybkGF
-	7i4/py4Q994r02amEV2QxvvTWCT2tutVaU8TxHvymb5MDBKc+2yTghsKaLeyL9siivzqhKTZu4z
-	m46c7AJNOF7eXhLkTzT344B/fWEkBEUu4bt8OnwMIkhqrWfizgAHAqhxTAF0SRAZH5j/pLVCEga
-	qO5sc7bx5V3HKo2LTlm3jHvpb9EUdLdEtwC9Vbt5ONDKz3Z9godCyiLheocJ1y+sbyJ2Vl1KR4D
-	5z4N9IkEaRMJSuS139R2C7MDWP/hfoePCQxjats/YFNT9Jwj1fHyQmeqyscYRLW9JcN9j6hAPOC
-	xZpuEKsmOVp2J
-X-Google-Smtp-Source: AGHT+IF3np+y1OjyI7Xt+dXZVE2wG1g79uAdoZzvgqzC3k//Lin244xNPPZqlGN3Nk/qNJTJva/Fxg==
-X-Received: by 2002:a05:6402:4410:b0:5f4:c5eb:50c9 with SMTP id 4fb4d7f45d1cf-60119cc8f77mr20158087a12.21.1747911695174;
-        Thu, 22 May 2025 04:01:35 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1126:4:cc1:c3d6:1a7c:1c1b? ([2620:10d:c092:500::5:4cd9])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6005a6e745fsm10573533a12.48.2025.05.22.04.01.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 04:01:34 -0700 (PDT)
-Message-ID: <423fd162-d08e-467e-834d-2eb320db9ba1@davidwei.uk>
-Date: Thu, 22 May 2025 12:01:34 +0100
+	s=arc-20240116; t=1747912303; c=relaxed/simple;
+	bh=USl4YUVkSxfb7TfRutGSKttDMNWN/XNiBVJUodRetOc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HfeundFXype6CMegzp+Wq3OVO6Ib+bdqXVvZQqOsnaxY/uGusqR4DLkHjOz0ICnU/PAfh+D12kJa5MQtrAqmaDtNTemFSguN4P8DvDLr0KTgxBdm1Yro5P+sxJ9h4vIFSrZCRZlpQMKXwU086FjXghRfHeUArmrI+mUQXL+JwDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=L3RFVWSn; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LM67l6010041;
+	Thu, 22 May 2025 04:11:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=7RUf8XA3/mKUg3y1MmIWqtItv
+	jOGVG+m/4ggFiuOdAs=; b=L3RFVWSn+PGJFwbUDl8o4mVMxI+3YPWFHBD8UIDTN
+	hskFRKuTYRYRsaNTQr6gu2sk30bOKxWRovXHWUjTX5BSVwjmJVeRZU60DIAuyM0+
+	DM8ERC9EBffEruW6x/PGC/ig1kZGRAryM4SS7DkoDeH5T5gwRPW/7G3YoMbDgkUl
+	MQUcuLJtbSF2gn/n577iCVWtgLQ+webWfYZL8Dc+AL5Yj4rf763yNbd+i/ijC+H0
+	OWUzfXA9U8+chrlQc0/6SSQnJTp5K7uyfcdWrKiyljocmFwLTX7OEnU5TZ83DvVX
+	eOZEy0q8dPGn1b3s1gad6zmng/UB7CpvnDh2QYtIPTEaw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46sqap99bb-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 May 2025 04:11:32 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 22 May 2025 04:11:26 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 22 May 2025 04:11:26 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 08EBA3F7085;
+	Thu, 22 May 2025 04:11:21 -0700 (PDT)
+Date: Thu, 22 May 2025 16:41:20 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya
+	<gakula@marvell.com>,
+        Jerin Jacob <jerinj@marvell.com>,
+        Subbaraya Sundeep
+	<sbhatta@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>
+Subject: Re: [net-next] octeontx2-pf: ethtool: Display "Autoneg" and "Port"
+ fields
+Message-ID: <aC8GWDelB9YwOKIz@test-OptiPlex-Tower-Plus-7010>
+References: <20250519112333.1044645-1-hkelam@marvell.com>
+ <20250520165019.6d075176@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS contexts
- on queue reset
-To: Michael Chan <michael.chan@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com
-References: <20250519204130.3097027-1-michael.chan@broadcom.com>
- <20250519204130.3097027-4-michael.chan@broadcom.com>
- <20250520182838.3f083f34@kernel.org>
- <CACKFLikOwZmaucM4y2jMgKZ-s0vRyHBde+wuQRt33ScvfohyDA@mail.gmail.com>
- <20250520185144.25f5cb47@kernel.org>
- <CACKFLimbOCecjpL2oOvj99SN8Ahct84r2grLkPG1491eTRMoxg@mail.gmail.com>
- <20250520191753.4e66bb08@kernel.org>
- <CACKFLikW2=ynZUJYbRfXvt70TsCZf0K=K=6V_Rp37F8gOroSZg@mail.gmail.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CACKFLikW2=ynZUJYbRfXvt70TsCZf0K=K=6V_Rp37F8gOroSZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250520165019.6d075176@kernel.org>
+X-Proofpoint-GUID: NNbiD_89UzvgdfwUFqFFQ7RyTwLTr-TP
+X-Authority-Analysis: v=2.4 cv=HfgUTjE8 c=1 sm=1 tr=0 ts=682f0664 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=i3f_dDYzph6c6JWobKwA:9 a=CjuIK1q_8ugA:10 a=zZCYzV9kfG8A:10
+ a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-ORIG-GUID: NNbiD_89UzvgdfwUFqFFQ7RyTwLTr-TP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDExMyBTYWx0ZWRfX5wRxiW88lpKY r6yqAPf6P3IhrzGrEYmFZ5c8Az7twndLJgfZ+z7t0J/Xawb4iVevdK4+ZeWMho5mzHjXJR4PFkk aNWC6MSeYdL0VV4DG9iUbJ7baUV6b+3irnHWLhP4FbnGYCPEJuiZSYCZXAJ6PN6Ob71RyJmdhaX
+ HnSyf3F23vQGdAn84WV1rd4SBaAuQcrZ2cKds/MW2byMHRDcNAooZSmSxDmL07tKVpWOwFfeS8A FUn2NjRedNVkwX7rBQeQd1QJ09rAz/BqRI4Jk3B4PntpwaQwpyfAUaU/qJii4T1XbL6qmIEAejt hlOyC/7LS9mTeK2YbMa3kinJrsnygUQkfTKSs1cw01+qa+oFN2rR2eS/CF4cQirEamBQ3eGUCmP
+ QIE7Rr3Gw64pUpDNUR89UlwdapiqUfuLvdsyvgJu1Ag4icu/4cYBtpjacAOR/XR6nqDuhsMS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-22_06,2025-05-22_01,2025-03-28_01
 
-On 5/20/25 19:29, Michael Chan wrote:
-> On Tue, May 20, 2025 at 7:17 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Tue, 20 May 2025 19:10:37 -0700 Michael Chan wrote:
->>> They found that this sequence was reliable.
->>
->> "reliable" is a bit of a big word that some people would reserve
->> for code which is production tested or at the very least very
->> heavily validated.
+On 2025-05-21 at 05:20:19, Jakub Kicinski (kuba@kernel.org) wrote:
+> On Mon, 19 May 2025 16:53:33 +0530 Hariprasad Kelam wrote:
+> > The Octeontx2/CN10k netdev drivers access a shared firmware structure
+> > to obtain link configuration details, such as supported and advertised
+> > link modes.
+> > 
+> > This patch updates the shared firmware data to include additional
+> > fields like 'Autonegotiation' and 'Port type'.
+> > 
+> > example output:
+> >   ethtool ethx
+> > 	 Advertised auto-negotiation: Yes
+> > 	 Port: Twisted Pair
 > 
-> FWIW, queue_mgmt_ops was heavily tested by Somnath under heavy traffic
-> conditions.  Obviously RSS contexts were not included during testing
-> and this problem was missed.
-
-IIRC from the initial testing w/ Somnath even though the VNICs are reset
-the traffic on unrelated queues are unaffected. If we ensure that is the
-cse with this patchset, would that resolve your concerns Jakub?
+> Can you add the real output without trimming please?
+  Ack
+> 
+> > +	cmd->base.port = rsp->fwdata.port;
+> 
+> Do you validate somewhere this value is within the legitimate values
+> from kernel uAPI?
+  No, missed adding validation.
+  Will address this in next version.
 
