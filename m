@@ -1,95 +1,97 @@
-Return-Path: <netdev+bounces-192864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B8FAC16CF
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:30:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED18CAC16CA
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:30:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 358841BC84F3
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:30:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 627727A9513
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 22:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB6427B519;
-	Thu, 22 May 2025 22:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA84259C91;
+	Thu, 22 May 2025 22:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="u1MWOB5X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obNWYMD/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB57279330;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9913C81B;
 	Thu, 22 May 2025 22:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747953019; cv=none; b=B23+Vy/saP+ERD9HzJN1BCh7nyJHpkKJtlIK8ADa+1jhsqxRAs4fTbuAHOrRcWLeRRppFngESIuO2TlmPq3thAl5EoqM/ceIGr00a7PHgM7XASoYgWeu5tHUKmNdB8BQyd46OuYs/gy5NSli+wR2G3h5djk1HEd/8/vaasCt0IQ=
+	t=1747953015; cv=none; b=GYLnYJWsIFAMH8dHRPWN7dIGpW6bwlr4/8fzwHcOpWaWwhfx+ESDSMfyrPxieHmy169/gPvLKnAfNcmkKkPDRx4QaQBwDAfRfOJMsQQjjIwtR4x9ETohykOepZPy6J+FDGAJCBxJJ1mCFxFgEELIUJdk7jrHkDHFZg6ofGMb5b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747953019; c=relaxed/simple;
-	bh=6nlrUA/fMTKOObBYQK+Gk7I0UmQ0/p3SwQAXUH/DDgo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=i8hSCaRYNmBuNZv0nOJIo/ZzXE5cwCXuA7r9eHxvwNTrDEbzoh2ToVzahdSxkz8Lgxqe76MVYbIbtettgUV9KHovah53oS7KupCoJPGnmuGolye2AkL7JhZcXvkDO5uNVvyX7VokRLoq0hJxtjqzxsUXH8WwJjVYZQRl6viSQWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=u1MWOB5X; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uIEQS-007GOP-4r; Fri, 23 May 2025 00:30:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=aGuZyX3fslrEUusqSYEFKL1p6x06fg8Wgbqcbb2KmYE=; b=u1MWOB5XWOn6QImSwmqJF4Utap
-	WRmuDzFaLw8ppqdg8znfYdo4n1/qc7bGnEDjfEqOzwvcCHzUWespFsxLqs3/liNG5xlmN11sGSFsI
-	klX80AXVXd9P9GWrRXuCGA/Hp/7OUN4HCeO/q/BuoDnDozy1d5Q4QMDNg9rxequ+Pll8eJkLrMV4N
-	lK4UkRXYIptC3Gy75UreI8kl45hggwfp9kUvjdd7G2JKRcWKENjcGSjZvk9hY73/Mlo56Z/GHCLpy
-	kBKz66JXRn5UcYd08yMJjYDqHUNa6/3rntgksf7/zACbM3SEkou0r61KNB8Th7ZSpaAfrwpGTVhl3
-	3hnBloWg==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uIEQQ-000437-T4; Fri, 23 May 2025 00:30:07 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uIEQC-009KRJ-Dv; Fri, 23 May 2025 00:29:52 +0200
-Message-ID: <6d6b2f04-fc4b-436c-a963-f4f8977bed37@rbox.co>
-Date: Fri, 23 May 2025 00:29:51 +0200
+	s=arc-20240116; t=1747953015; c=relaxed/simple;
+	bh=jW9IdrEDsP9dLKs3o6gfn990nlhAFd7trNmrhCDWRIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=buBPipG/P6cDADPuXYBQlTQdUkHUsDlMo+t21FYjpsHrR/geP20UlzU+W6/NNf/P+kw2vg0OU/PF3F2fI9gygkbA2x8VwHZ+IKspMBO51LWjjrCV9SYgOAjDuqa60Oh3N6BC3VXXc8Mj5t8RdxL0c82HzA6Vdtr1PbgF4ouLa7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obNWYMD/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE62C4CEEF;
+	Thu, 22 May 2025 22:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747953014;
+	bh=jW9IdrEDsP9dLKs3o6gfn990nlhAFd7trNmrhCDWRIU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=obNWYMD/5Bwx1hqCakZIHjeBBRpDNPMNTHeyi2pqJ7N2SbPNuHw9RUB7B6LCru2vP
+	 z4YEHTiRuzmiDy+lXUoak1zEtryA5CKB+4ZsA+LWH+Lub14ST+gLL3jIzG9alpKyq6
+	 bmp3ry8RO3vmopj8dbGHCf9CW0gW+CrfzeCnFfJnKaoPDyP18xWTB82bffDJGqxKEo
+	 udFbocLtZ06ZyrX5fHE0Q8uKk3M++SMyU3H6X2pUXtFaJrtD8iacCRIpDWwwPQOmCS
+	 2wFxf2ggMriYjO0Mws2AtsBVBfY/E/G8F/kir+YpjA1vDyobuNT6dpVu5GFrczS+uN
+	 5M7oJ3XVbb21g==
+Date: Thu, 22 May 2025 15:30:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
+ <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <bpf@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next V2 06/11] net/mlx5e: SHAMPO: Separate pool for
+ headers
+Message-ID: <20250522153013.62ac43be@kernel.org>
+In-Reply-To: <1747950086-1246773-7-git-send-email-tariqt@nvidia.com>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+	<1747950086-1246773-7-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next v6 0/5] vsock: SOCK_LINGER rework
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250522-vsock-linger-v6-0-2ad00b0e447e@rbox.co>
- <kqm3bdj66qkziz27xsy6k6rnyminleqvebgqoudmufa424jlzm@khnzut7q4nqq>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <kqm3bdj66qkziz27xsy6k6rnyminleqvebgqoudmufa424jlzm@khnzut7q4nqq>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 5/22/25 10:08, Stefano Garzarella wrote:
-> On Thu, May 22, 2025 at 01:18:20AM +0200, Michal Luczaj wrote:
->> Change vsock's lingerning to wait on close() until all data is sent, i.e.
->> until workers picked all the packets for processing.
-> 
-> Thanks for the series and the patience :-)
-> 
-> LGTM! There should be my R-b for all patches.
+On Fri, 23 May 2025 00:41:21 +0300 Tariq Toukan wrote:
+> Allocate a separate page pool for headers when SHAMPO is enabled.
+> This will be useful for adding support to zc page pool, which has to be
+> different from the headers page pool.
 
-I think it went smoothly, thanks for the reviews :)
+Could you explain why always allocate a separate pool? 
+For bnxt we do it only if ZC is enabled (or system pages are large),
+see bnxt_separate_head_pool() and page_pool_is_unreadable().
 
-Michal
+Not sure if page_pool_is_unreadable() existed when this code
+was written.
 
+> -	wq_size = BIT(MLX5_GET(wq, wqc, log_wq_sz));
+> -	*pool_size += (rq->mpwqe.shampo->hd_per_wqe * wq_size) /
+> -		     MLX5E_SHAMPO_WQ_HEADER_PER_PAGE;
+> +
+> +	/* separate page pool for shampo headers */
+> +	{
+> +		int wq_size = BIT(MLX5_GET(wq, wqc, log_wq_sz));
+> +		struct page_pool_params pp_params = { };
+> +		u32 pool_size;
+
+A free standing code block? I this it's universally understood 
+to be very poor coding style..
 
