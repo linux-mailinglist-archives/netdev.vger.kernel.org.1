@@ -1,131 +1,79 @@
-Return-Path: <netdev+bounces-192681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D107AC0D26
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:47:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4B5AC0D2D
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 15:48:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5AB57B4C73
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:46:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCBA97B5BE6
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 13:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6351A317A;
-	Thu, 22 May 2025 13:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF36828C2CB;
+	Thu, 22 May 2025 13:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8V2N1yx"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4EE1EA80
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 13:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4DC28C2BE
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 13:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747921651; cv=none; b=EuDRDTa8ZFfoYNP549u1mRMEKXNnq+yfTuLzeLEt9mtlaO3AyfuElat0qaRA0E141NrDneF/sVe61IIwXk4I+d+h/6Lmq23Yh+WYXrMGrDANICYBwVhoOFIHwA1eAFwpHEqanI04hQbrrKzFDayVtVBJjtVci/dW6wuclRBedEc=
+	t=1747921677; cv=none; b=Wt00LHr+F3sulVXoFu46LE8NMuh/c31p56KHOe+h/KFRnqptmmnDNXsXN/batXuPLY5fxKarqjoeLtONplnRbkTZ+n02SpMFibmwSOCCs+9vAiByK0/H9kttJn5mYVJ05SRmNVuOahTq6WP5Cvt32MzbNLYdRCCEySMbin7qg9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747921651; c=relaxed/simple;
-	bh=Dfar01OCdaFLlpDzJ964oduX+wvJ/hu2QZx7ly9Z9dQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=I8ziDKmIi/Nvnft1bIwGBg3nll3dnTVsXlFgVOZ1rDOyRdlJcxh5y9mYxhPMqF+FX+IdyIwIFACC4ljPP9WW09B9weoQS4pfN+BuQqvjE5MPF5JrjcZKtzwsWDmLUHCcFB+Md72NtGhH+KVy6JAIMWShoDrcAuqctsf6mfxWQms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 54MDlK5g025212;
-	Thu, 22 May 2025 22:47:20 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 54MDlKKp025206
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 22 May 2025 22:47:20 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <ae7e9800-e395-4b9e-9878-83a5e768cc98@I-love.SAKURA.ne.jp>
-Date: Thu, 22 May 2025 22:47:19 +0900
+	s=arc-20240116; t=1747921677; c=relaxed/simple;
+	bh=Z+6STB0mJB9ZfxXG40/d45IvVbxmdQAgRwvRZ4HssVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mo/ku9R6Ad7//t03Arj0SGbb3vqDofJfN5rjaGa+HuaLjppfm51IecLKnGZrM5keueGZJrQbL6q7hkqMJuSvClXUCS0BgLw7MsaG+yQoE62iniSElWBFTEjal38gQ/XrYF4yEe+R1sKAKbHaVdqakofj4EKQV0SUsA0F+8Lmj6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8V2N1yx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9AD9C4CEE4;
+	Thu, 22 May 2025 13:47:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747921677;
+	bh=Z+6STB0mJB9ZfxXG40/d45IvVbxmdQAgRwvRZ4HssVU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C8V2N1yxhqtKwY9LWQkGqWIAMFxG17rIK8gKEqIXw8oLQJcTVZYl95N31DWBXSvIv
+	 l1FZ0kQ5rswjd1AjCy99mQiR47y6EFx0e7vYGGt9IXJYSoO5ovfIMsPd3fLr7q8O77
+	 hpvx1v2vXQjy5k2ilFeknvmRVnbLaDSXsQyhke875+2yHPCuhYiI7e8jbh8jX59lsf
+	 G7zT9u9OrAOJJGdInwNx88hZKyg3QCXUJq1j7oGxZGtofW7QxiGqQMALunSEZzRbYQ
+	 820QO48eDIMZpZhO3KsUkgXBoKVua5SSx9HmnBLdLfHwveZLcNMJ3uNe0oIpuVh2Yt
+	 5lD25Nb8izyFA==
+Date: Thu, 22 May 2025 14:47:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	kuba@kernel.org, dawid.osuchowski@linux.intel.com,
+	pmenzel@molgen.mpg.de, Kory Maincent <kory.maincent@bootlin.com>,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: Re: [PATCH iwl-next v4 1/2] ice: add link_down_events statistic
+Message-ID: <20250522134753.GE365796@horms.kernel.org>
+References: <20250515105011.1310692-1-martyna.szapar-mudlaw@linux.intel.com>
+ <20250515105011.1310692-2-martyna.szapar-mudlaw@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] team: replace team lock with rtnl lock
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Network Development <netdev@vger.kernel.org>,
-        Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Stanislav Fomichev <stfomichev@gmail.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <d4047311-5644-4884-84c0-059bbb9e98ee@I-love.SAKURA.ne.jp>
- <20250521110024.64f5e422@kernel.org>
- <ec84752c-1e3d-413c-9c2b-6d83e48470ef@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-In-Reply-To: <ec84752c-1e3d-413c-9c2b-6d83e48470ef@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav205.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250515105011.1310692-2-martyna.szapar-mudlaw@linux.intel.com>
 
-On 2025/05/22 10:00, Tetsuo Handa wrote:
-> On 2025/05/22 3:00, Jakub Kicinski wrote:
->> And as he pointed out this patch promptly generates all sort 
->> of locking warnings, please test this properly.
+On Thu, May 15, 2025 at 12:50:09PM +0200, Martyna Szapar-Mudlaw wrote:
+> Introduce a link_down_events counter to the ice driver, incremented
+> each time the link transitions from up to down.
+> This counter can help diagnose issues related to link stability,
+> such as port flapping or unexpected link drops.
 > 
-> I didn't get any compile-time warnings, and
-> https://lkml.kernel.org/r/682e6b1f.a00a0220.2a3337.0007.GAE@google.com didn't
-> get any run-time locking warnings.
+> The value is exposed via ethtool's get_link_ext_stats() interface.
 > 
-> What locking warnings did you get? Is there an automated testing environment
-> (like https://lkml.kernel.org/r/66a4b1a7.050a0220.12c792.8f9e@mx.google.com )
-> which I can use for testing this patch?
-> 
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+> Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
 
-Ah, I got which posts you are referring to. I was failing to receive Jiri's mails
-because my spam filter setting was sending mails from .us domain to trash.
-Now I removed the .us entry.
-
-
-
-Jiri Pirko wrote:
-> Sat, May 17, 2025 at 09:32:20AM +0200, penguin-kernel@I-love.SAKURA.ne.jp wrote:
-> 
-> [..]
-> 
-> >@@ -2319,13 +2301,12 @@ static struct team *team_nl_team_get(struct genl_info *info)
-> > 	}
-> > 
-> > 	team = netdev_priv(dev);
-> >-	mutex_lock(&team->lock);
-> > 	return team;
-> > }
-> 
-> 
-> Why do you think this is safe?
-> 
-> Rtnl is held only for set doit.
-
-I assumed that the caller already held rtnl lock.
-
-> 
-> 
-> > 
-> > static void team_nl_team_put(struct team *team)
-> > {
-> >-	mutex_unlock(&team->lock);
-> >+	ASSERT_RTNL();
-> 
-> Did you test this? How? Howcome you didn't hit this assertion?
-
-Tests using syzbot's reproducer did not hit this assertion.
-
-> 
-> 
-> > 	dev_put(team->dev);
-> > }
-> > 
-
-Anyway, we can't remove team lock. Too bad.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
