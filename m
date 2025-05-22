@@ -1,135 +1,132 @@
-Return-Path: <netdev+bounces-192524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE82AC034D
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:02:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E47AC0361
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 06:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C03864E0684
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 04:02:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1B91BA2752
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 04:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929E2149E13;
-	Thu, 22 May 2025 04:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46CD1531F0;
+	Thu, 22 May 2025 04:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grjSF6bL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QhUGLuTC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D5A184E;
-	Thu, 22 May 2025 04:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACA613C3C2;
+	Thu, 22 May 2025 04:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747886529; cv=none; b=pkCxAt9fAfBg8YuNj/xgO2iTpynkG2OUcG0bOhBhh/k9V+0OvtiVXAqyLKiuOTK5sw4bS2cxActRjWu/zJQpVrVe+/3W8/mkzEVw6uq3MM6rZGx5Djd3NLlLI0MWZJuY9yN7kRTgbrmns8Cf+6ui9ly6UkZ6vrGqf6oKx43NotU=
+	t=1747888495; cv=none; b=XTfWbDwSoGnCWDN5RwuBuUNzFiPb1fwj1Kvr4dA/lPo4aNiLusjhrM9esFGmO3ELVw9PW95J2RY+lT1117Rcje1xjZpUvH02DNIs0FTI8whACj66HcqRYuPoRE+kVF9AuBgY2z6o8u5KRlPnSmQHHFlhiXMS2RwI5lxAsV7DXKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747886529; c=relaxed/simple;
-	bh=VaCm9odT9ZRMdbNFJ0psuY8WZxzOUA90QWzgpSQSWew=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=guuI8wuJcogsNXZWauDeyed6NOiiwhG0c5nAfWrXDH8VZSCkG1CsyY+WoFokIgogBU7OTC+nvX8Xm60/U++c0NK2NM+OF2RUkHgUJHoi4GbcfCQSZajxCdOmpMw7prxFaxXiBC7MQK7G2pjZsHS63RJkkKT5c49w/+CRKNZfSt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grjSF6bL; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1747888495; c=relaxed/simple;
+	bh=maXsqPtGcGxSazJ5XApc+kX6npnd7DTsARU3qhaPnjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lSSZAoI7a9fX71tb1C1zm7bGEMm0TSWvWhEh7aK7kXvs5SrHfUBSAYgG1BtU8VfY5VaFYDJUAK5YldcFnU7pIxJSKf4U1UBtNJZvWtTK/bF07L/JS4TrXc11xYbJfGIUKky/JYIxadXaVefrbNAyFOjP9zk+SD+imin/bz/c3rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QhUGLuTC; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-23211e62204so36694975ad.3;
-        Wed, 21 May 2025 21:02:07 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so6229415b3a.0;
+        Wed, 21 May 2025 21:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747886526; x=1748491326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZhUzfOUEweTXHf5T0hPVYO2QZbak8VcGiB8Zx0TkCQ=;
-        b=grjSF6bLDdJl0xSQUo/0exCd/+roUR2k+yClevT11Ce1OEgqGYE6Lf9mhveAVCVi4q
-         Hmb5tt97JyvojuvWK4NKx8lI7+/ME3xq4q1i6B7IXLy/tUPau7NtRXYhvVXxefljNAYU
-         mtkGQGux1poMOz+4yuZHeT3MI2QdBj31/q6CtlWd+bS+W8zgVfxJHyi7Q/HNByvIPKbT
-         l+qwSH8Bpi9LnTayJU882noMqurQVGC3/6O4rhhcXm/7M7DOPkPRYzIlbH9g/wmcUHa1
-         G69UWG2xjyx/tUfw23P20QgOyV8Sufd/xUM45ibqKLs6xqHzhff1jUVfSE0qRzsQyYYV
-         i6fw==
+        d=gmail.com; s=20230601; t=1747888493; x=1748493293; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dky3FIQgBX8aNP78AifCGTL6ccyTVByog03wzzXO4zc=;
+        b=QhUGLuTCRA9hlvAwKZP96PMj7Wljt4qJC3MHW1BppWwLxyIPLxDoXiT+qdIgeVPQVM
+         A7aAwmkqEZsPgDyvX/xlIQVhv+AxMLPwbNVO2rb9TaitvBzTF7HDjg36qmbuAR7gCi4B
+         mZc51WY9MsPv1ZPWKYcSz4iYFkDDVhv6vQGmZS40gur4AST1mFQAI+uUIaPH3/8iW0v9
+         NRX5Z7JLu99btYJq+wH5d+q6NeJa2acadldymyGSFBmrBG15m3jvvcIbQtJe2H6j6fji
+         AA7l5P4qAR6i2H6RUJ6ylbog4Y1U2jFqZUdWLHW9ebB0LzoQKkC/lpHzBjLAvKZnFevX
+         GzyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747886526; x=1748491326;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PZhUzfOUEweTXHf5T0hPVYO2QZbak8VcGiB8Zx0TkCQ=;
-        b=XYafQb/0BVWDgRgfLMEDJ6/nzVznQ0M4nvw0OaCjEn9E/TdnvKY2+fQSUQ4Kxh7STR
-         wRFqLliePcG1ksv/RbXFZjKBzYPKe51jQak2/bYqCzhzJA7CRLnB9r0lDM6ATW54if0D
-         P93AsGWKG/mlFHLCSm3bhxoAgP56U3WALKJXOyMXYEgHxZE2ANmxAqwfwH4aLPBGdYXP
-         O1UXD/9rFgVO6PCRvUKP1UWJ4L+joK8k3pvXe9maVE/pkYzBSGwWBPHgQ2qPIuDJD7RB
-         V1YTbCg68Wpk1wcW9We8NUisHRptLOx3ztPSSMYIlRWxI76Q/b40lgM8zRCrmPP1YoVd
-         CeJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsxyG46gZ8sOsBseIH0UN1TBq7hq01BrocFeaw7Vn1eMWCGR4DFPXcbvwB2jy2ANkB7kQ=@vger.kernel.org, AJvYcCVg8DU5q/n86XM3Ee2AxOiuG4nud1tE018T144TI/F6+NpVm9uFRGhkYBOIA3q4EkezCFFMvT+AHtJMG5Xf@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCfEETt+Jc6bIHPeGE4RThFEtd883GDUzu1nlee6Ofd5bPLT/D
-	u1BpI8Asc9NS6sKM9w+OMPOSa8ISyPLBlQzgCXAJ/gbK86jtYmXdqPsBv7nGCQ==
-X-Gm-Gg: ASbGnctybxOCYGdlcDaazO/Pxa8MIzoPyR7YQcUOsSHk5kJymjbTJa6GB3QknOizZBN
-	XseHibN9od61UAOkTIDpQwxCEJohTixAS2eCbxI1LTK580uHA/KZ+dGilcpwg7PrSQemmKxTFYK
-	KrP6djho307JwIGcKyrC9qXSyTloXz3KHUSCPF3mWvnDNlQ7dmyrMEXIgpE0HHBt5LB8zXVptA/
-	UeHikpfbee1hV3nGT7vG50qgkeXyBrfxpGkEC7b0sVG855HlBr5VDy6iW9sH/U+heX8mxDjqs+a
-	iBwvEcJtitBeKS0bLhTTBhGqiAy9y4uxHuUAvbOcw+kR+AlLkTuAYw8mLawcZPNRfNM9Ld65EGd
-	g
-X-Google-Smtp-Source: AGHT+IHN4e8t0B8D9y55dtrTUEzkuMGlnFb8gkeKQPNLgOGCM3vx8v2UVamtSCZqaJLxtwmhUS6DIA==
-X-Received: by 2002:a17:902:e74c:b0:231:d0c4:e806 with SMTP id d9443c01a7336-231d459a971mr360062605ad.32.1747886526384;
-        Wed, 21 May 2025 21:02:06 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:e79e:1a85:fe3:abe2])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-30f36364f9asm4532890a91.4.2025.05.21.21.02.02
+        d=1e100.net; s=20230601; t=1747888493; x=1748493293;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dky3FIQgBX8aNP78AifCGTL6ccyTVByog03wzzXO4zc=;
+        b=YYzyYvmxhsRz+AUerImcxZuzcOED+SgMPeaFdV/9p54igiBoPmU6LMD5R30uhtdzwk
+         SBw8la8SjyHLle4jbaiipcXH2W3ojVB3Q1upfw37HKgHQJJPEUJb63q8DMXjdOVoSvVS
+         ZgTXqWwmMcidxhRze0k6BP7i2WP0vTF+pjAT9rkETsH5+mMC2iStofsBx3z6Fd7RCOx2
+         q5PVrZ89N0hblxz2POumgBfRVYmQa069zuEFc7eEDP5wzZ26hP2Tuf8f6BbgV8MbjBOR
+         MMrcAKfCNV14JqVOgVTK2LIp+r4LJ4JMACK96OJwdVe3oxszUtnpVtbxE9aj0IdyKBGo
+         1BGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWgHxE8O/co7S93An9wqPADrOthzZrDnt7WpfZAsa/AjBGF6C7Tg9KrshswVyXflV/uG0FUxPOh9bkemLs=@vger.kernel.org, AJvYcCXh52mFpdhHDLRtomLHV/SMv2PHamXc787sSRrpx8Z4nS6LdZHvtJYsu5XZbULoYTabdsZDLUK/qCsYpzpQPCro@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk1GQU8KIovwPuSrpNUrsTmEHfdslm9A0LelpEVj0pfy8xnC+8
+	X4Dz5WOxvOrUGiehLrvI0XaUjrkEjDLlCOowpSkD/dSFG32UqRndvAld
+X-Gm-Gg: ASbGncsOX0M4dz4PqB095QZ3mpMUHarGeRVGLhVJmTGPqS14E1DHFCtUHd13ybtjl0F
+	nMlcN8UGXfcNkUBhD/rOaoUXL3+gHTA6SltIn986k9dN8CIhOgpBmGjL23fkYYuUdkhV1Y50eWk
+	CWG+vNoywocTLqeT8n5IbpcTZw/OVaXf0jGc14cAeT6Hgs6PRloV+/LdnxRpfh0ZfKrvSi2vyqy
+	zQQxcj99ZVoqh64BZq4GVEessxM00HKKssc5P8x88gkSbES5JEWN7D7jNAODE4e+1w6dcIc1ptY
+	J8cAXimMsnRf5qXiMt7MS97jWyyk7xtEk+vfFIu5GUBhvP+44IhT8tiC
+X-Google-Smtp-Source: AGHT+IGh3Q2clU7Qyx5JWq+TxnZeFNMMnKfZXa7ry6Qxs7rCrVIzwW2jPAJC0kCMqhcqM6mA3QmumQ==
+X-Received: by 2002:a05:6a21:3993:b0:1f5:56fe:b437 with SMTP id adf61e73a8af0-216219b13demr42046834637.32.1747888492887;
+        Wed, 21 May 2025 21:34:52 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eb0a9893sm10518551a12.72.2025.05.21.21.34.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 21:02:05 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
+        Wed, 21 May 2025 21:34:51 -0700 (PDT)
+Date: Thu, 22 May 2025 04:34:44 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH v2 net-next] xsk: add missing virtual address conversion for page
-Date: Thu, 22 May 2025 11:01:15 +0700
-Message-ID: <20250522040115.5057-1-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Simon Horman <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>, Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv6 net-next 0/2] wireguard: selftests: use nftables for
+ testing
+Message-ID: <aC6pZJJn3BiGFVwr@fedora>
+References: <20250408081652.1330-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250408081652.1330-1-liuhangbin@gmail.com>
 
-In commit 7ead4405e06f ("xsk: convert xdp_copy_frags_from_zc() to use
-page_pool_dev_alloc()"), when converting from netmem to page, I missed a
-call to page_address() around skb_frag_page(frag) to get the virtual
-address of the page. This commit uses skb_frag_address() helper to fix
-the issue.
+Hi Jason,
 
-Fixes: 7ead4405e06f ("xsk: convert xdp_copy_frags_from_zc() to use page_pool_dev_alloc()")
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
-Changes in v2:
-- Add Fixes tag
+I just saw this patch set is not applied to wireguard tree. Did I missed
+any change request? Should I repost the patch?
 
- net/core/xdp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+BTW, what prefix should I use when the target is wireguard next?
+[PATCH wireguard-next] ?
 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index e6f22ba61c1e..491334b9b8be 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -709,8 +709,7 @@ static noinline bool xdp_copy_frags_from_zc(struct sk_buff *skb,
- 			return false;
- 		}
- 
--		memcpy(page_address(page) + offset,
--		       skb_frag_page(frag) + skb_frag_off(frag),
-+		memcpy(page_address(page) + offset, skb_frag_address(frag),
- 		       LARGEST_ALIGN(len));
- 		__skb_fill_page_desc_noacc(sinfo, i, page, offset, len);
- 
--- 
-2.43.0
+Thanks
+Hangbin
 
+On Tue, Apr 08, 2025 at 08:16:50AM +0000, Hangbin Liu wrote:
+> This patch set convert the wireguard selftest to nftables, as iptables is
+> deparated and nftables is the default framework of most releases.
+> 
+> v6: fix typo in patch 1/2. Update the description (Phil Sutter)
+> v5: remove the counter in nft rules and link nft statically (Jason A. Donenfeld)
+> v4: no update, just re-send
+> v3: drop iptables directly (Jason A. Donenfeld)
+>     Also convert to using nft for qemu testing (Jason A. Donenfeld)
+> v2: use one nft table for testing (Phil Sutter)
+> 
+> Hangbin Liu (2):
+>   wireguard: selftests: convert iptables to nft
+>   wireguard: selftests: update to using nft for qemu test
+> 
+>  tools/testing/selftests/wireguard/netns.sh    | 29 +++++++++------
+>  .../testing/selftests/wireguard/qemu/Makefile | 36 ++++++++++++++-----
+>  .../selftests/wireguard/qemu/kernel.config    |  7 ++--
+>  3 files changed, 49 insertions(+), 23 deletions(-)
+> 
+> -- 
+> 2.46.0
+> 
 
