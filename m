@@ -1,129 +1,169 @@
-Return-Path: <netdev+bounces-192803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7FFAC11C7
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 19:03:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9ECAC11D1
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 19:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3051174282
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:03:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A2421BA59BC
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 17:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70B816DEB1;
-	Thu, 22 May 2025 17:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E00217A303;
+	Thu, 22 May 2025 17:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eo4NCyb4"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Cx0WBx2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15E41624E1;
-	Thu, 22 May 2025 17:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F95117A2FC;
+	Thu, 22 May 2025 17:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747933379; cv=none; b=G0DmTdma/HivkruGLmQMz+tlZfTWScpY2VsR2rkjwggyScef3AnjPEzkRWOBt1vjWqp4qb0U0UJSuW34zNJhRw87Khfrfwy4ayI7pKhEMK4jfp15by3D6DvUWrviWdRgtCa7GpHeZD4TPRJ70h6CseI4wV0KDE5vg+JOKR/MHBA=
+	t=1747933539; cv=none; b=MxNuR5vdjwrj3y9fV1fDVKMLQ0n0nQjkRiDUWN1Lu7wm0MJjFGiEJ3XSW16JYkZodB0KHhx/ISsAWz/JGyG0fD7Z+EWnOXxWCyKbfU7x4DIxf1rI0JnhHKmvaZCvykw4i+U9KtRDqWt8LMI7H5MVbO7v0/iksuDh/IBCxBcXsIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747933379; c=relaxed/simple;
-	bh=Ok5FoPBP7YEA3ocUoYDRwtdbxy+e04J/22zuDH0YDRQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+Tf2X13HWX6q8hnbk4nKxTDfroZL/bniHI8F7OLTMstiSWZg8FKAAeGPoYodgyvsMIYptoqu96h8qt2vnYFN+HU8ZYVaUaoXPLBnFZjaQxbKMfA6L4khwgFAeG4pquystpJHRz0K9St99/yHtHoEpmh4Lg+ndQYdyzvQXa9Xbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eo4NCyb4; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32805275e90so47187871fa.1;
-        Thu, 22 May 2025 10:02:57 -0700 (PDT)
+	s=arc-20240116; t=1747933539; c=relaxed/simple;
+	bh=mX71Fjsi5h5YpxMRmRhQaF13trpv/g/ePLAHMDd79Hg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wusd5KU5tk5YMKsuMVsGmZ1UDAWZpEUup4V8p8UOqrK4A0Oje+lkNuzqE5+1CVXqO+/W+umWW9LYtfe+QWo6uRd3tzzgG+aKL4oDbL5KDgysUwsibhxpekhnYlgPVXVP3SZAkzcDp5ZSreqdFhj8upww45NjkGVryv9/M5Ecr74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Cx0WBx2r; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747933376; x=1748538176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=We0y5Xpr50zg6HOukRfl3H6GTKBZvhrYRttEs21yp9A=;
-        b=eo4NCyb42CpJJvMqw6KR7qDyPWX6+nyFpEjfkqq8hbSkqJDHB/PvrjZQSOJQRKgrs+
-         0MtEaemjF09HmHi+AL5O0yeqVyEciHaFR7Qe58+6J/kOtvRPe/3S6hp/EJ+m/05LNbq2
-         LbL6qi4JGG9EcCrV0zBr1n8+E/sZWv6DlCuaueZJYP/2awxShKohYYtx+tzvYPm456yY
-         SowkwsZ5g/2To8IdhaEfpRpi4ZMGeuvyh98x6bMcKlqJwkSGF2QNpKEs2NHwK+yFPLQd
-         DSnd2xMS0yHOHEY88VuBCwby6oRJq++VEOOLYSdgVvYlQvQ1rfEJz92PgWbs0raDyjms
-         +MLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747933376; x=1748538176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=We0y5Xpr50zg6HOukRfl3H6GTKBZvhrYRttEs21yp9A=;
-        b=kL62wTt1E0YXY40y5aFzh1ien4PeSFhRsBkMod/cQrcGiq83FF98/x7JMbKLr4V9nj
-         vA1Vro3aIUFT4vwrg517L/1udxxzAqXzmQe7bQ+JE1sm9uPRjDOnNBtvx5KYO2JPV/Y7
-         Qi8ZmTY4M6GtL5EWK2B4qAvuNatOZgjlCHpaFsQ9gq8yulx7LX9MqgHUAmWD4hd7TzOt
-         go9k+8BN9DFGrCDUWYFe7c89F4PK9d4FgL4Bh9dtYlM3HfRmy7gw1b9+s14Yeb3DnCB+
-         OpjgLG1hX4/2AV5gyn7709JnemUlCTAU+rLKDBH2NLiVuHwgIxKOJNxhkB7/QnwgT/Hq
-         UcEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVC0o8GxelUS3sdusC91m96ItZ50ZobE1UAmTd5uj3AZ0I5wmG2CCxU+tK6WS04n1KR7qVnGZsA@vger.kernel.org, AJvYcCVg/nN0E0r6VDflTF1C6xo71i5Kbg6dlugaJI6YCiFk0HvdKsZgcp2GeZk5ZWmkSvyO+HSm+Y0rl9J6yVZl5kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMmH8zRLHtTUpRJKnE+hE2XvpuePzYNdpIds9Uib/kOWfHGeiO
-	jaOJsJjVIBjDcrBoY69O/yvr5sSkKE7l8f3SVpzARg+ik9+iAUtRu+C8NFPhmAR/onow+IEcH3I
-	98sqrFGhWThlXc9Y+4ZxWVOPgGQTvb/mX1ZMq
-X-Gm-Gg: ASbGncv2YzJNZD9xKplY5I8P81TzhXJGGROVxCmbjPfH5Bfn3Nfpca0wJWh5pI3+yB0
-	nyU2QkUmZt5efncpSAoysNdgYdoSAcEtzJKU5b4xMpRBrqrZ4UazwsUrJtHxjE5JoJ1T7UY4HoM
-	57/JLBRuLqXi/2QOputXrQjob0KmI6yF4=
-X-Google-Smtp-Source: AGHT+IEX12HECdGH93UZOr11br0jRtIfJM929AMncDIiway+/8UzdYLy1nWJWoRQ6w9I8kRJ3BAxeYP17kHL8QwM9tM=
-X-Received: by 2002:a05:651c:3041:b0:30b:ca48:1089 with SMTP id
- 38308e7fff4ca-3280969a0e9mr76367091fa.2.1747933375563; Thu, 22 May 2025
- 10:02:55 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747933538; x=1779469538;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Mwf+P23CSKd+lg3vtdZYz0g0GEFKW8pE4MrhtK1epSU=;
+  b=Cx0WBx2r1EkmtVPBa5yBuxeB5DQNL1HUbuRjanu3WXYMfN7KLaekzyXA
+   MQ6lp1vXYBVXIeHA0fu8fjsYef6gCWUIg5YXnPP5gsMImX6bbO7G5NQxl
+   w5zOjnsiEBs38Zyc2IruJQf3aq7IYB/BM0Yb1BtzlZeHL3+ULRk5AdTHJ
+   aCQD2HztiGAKSIx7iPKGKQ2rpC0/39GulkClUNB5mSb9A3aQYCn7W4YWy
+   6teo1StVJ9YPhS1RmzGC4MgLAWoU24RFjq5Rcvh2CokBW5yPAZiUVWegb
+   iKhuC+j6HLEGWY0mSZ7bh28H/OgOvt5uB70sGLnHH2y7OEF8DfTMGqS4Y
+   A==;
+X-IronPort-AV: E=Sophos;i="6.15,306,1739836800"; 
+   d="scan'208";a="96335492"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 17:05:26 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:2008]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.213:2525] with esmtp (Farcaster)
+ id 4433f7e4-b50c-4174-ab14-8accf7c1ba1b; Thu, 22 May 2025 17:05:25 +0000 (UTC)
+X-Farcaster-Flow-ID: 4433f7e4-b50c-4174-ab14-8accf7c1ba1b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 22 May 2025 17:05:25 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 22 May 2025 17:05:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <chuck.lever@oracle.com>
+CC: <axboe@kernel.dk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<hch@lst.de>, <horms@kernel.org>, <jaka@linux.ibm.com>, <jlayton@kernel.org>,
+	<kbusch@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <linux-nfs@vger.kernel.org>,
+	<linux-nvme@lists.infradead.org>, <linux-rdma@vger.kernel.org>,
+	<matttbe@kernel.org>, <mptcp@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <sfrench@samba.org>, <wenjia@linux.ibm.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v1 net-next 4/6] socket: Remove kernel socket conversion except for net/rds/.
+Date: Thu, 22 May 2025 10:04:48 -0700
+Message-ID: <20250522170512.41751-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <44b6a9b5-6bd7-48f3-927d-3188cfd726f1@oracle.com>
+References: <44b6a9b5-6bd7-48f3-927d-3188cfd726f1@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250521144756.3033239-1-luiz.dentz@gmail.com> <20250522095315.158eee1a@kernel.org>
-In-Reply-To: <20250522095315.158eee1a@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 May 2025 13:02:43 -0400
-X-Gm-Features: AX0GCFuLV_mV0Ph1YZlydj_SaaTb6pHzqvMkeviAgRtyttBS5YlErYPEA4Dv0vM
-Message-ID: <CABBYNZKEULqzfjZ9Yoa=h3bT88zx6dM9LHaNddSOYWkjqLBp+w@mail.gmail.com>
-Subject: Re: bluetooth-next 2025-05-21
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Jakub,
+From: Chuck Lever <chuck.lever@oracle.com>
+Date: Thu, 22 May 2025 12:38:03 -0400
+> On 5/22/25 4:55 AM, Paolo Abeni wrote:
+> > On 5/17/25 5:50 AM, Kuniyuki Iwashima wrote:
+> >> Since commit 26abe14379f8 ("net: Modify sk_alloc to not reference
+> >> count the netns of kernel sockets."), TCP kernel socket has caused
+> >> many UAF.
+> >>
+> >> We have converted such sockets to hold netns refcnt, and we have
+> >> the same pattern in cifs, mptcp, nvme, rds, smc, and sunrpc.
+> >>
+> >>   __sock_create_kern(..., &sock);
+> >>   sk_net_refcnt_upgrade(sock->sk);
+> >>
+> >> Let's drop the conversion and use sock_create_kern() instead.
+> >>
+> >> The changes for cifs, mptcp, nvme, and smc are straightforward.
+> >>
+> >> For sunrpc, we call sock_create_net() for IPPROTO_TCP only and still
+> >> call __sock_create_kern() for others.
+> >>
+> >> For rds, we cannot drop sk_net_refcnt_upgrade() for accept()ed
+> >> sockets.
+> >>
+> >> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > 
+> > This LGTM, but is touching a few other subsystems, it would be great to
+> > collect acks from the relevant maintainers: I'm adding a few CCs.
+> > 
+> > Direct link to the series:
+> > 
+> > https://lore.kernel.org/all/20250517035120.55560-1-kuniyu@amazon.com/#t
+> 
+> Thank you, Paolo, for forwarding this series.
+> 
+> For all hunks modifying net/sunrpc/svcsock.c and
+> net/handshake/handshake-test.c:
+> 
+>   Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> 
+> Regarding patch 4/6:
+> 
+> This paragraph in the patch description needs to explain /why/ sunrpc
+> is an exception:
+> 
+> > For sunrpc, we call sock_create_net() for IPPROTO_TCP only and still
+> > call __sock_create_kern() for others.
 
-On Thu, May 22, 2025 at 12:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Wed, 21 May 2025 10:47:55 -0400 Luiz Augusto von Dentz wrote:
-> > The following changes since commit e6b3527c3b0a676c710e91798c2709cc0538=
-d312:
-> >
-> >   Merge branch 'net-airoha-add-per-flow-stats-support-to-hw-flowtable-o=
-ffloading' (2025-05-20 20:00:55 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
-t.git tags/for-net-next-2025-05-21
-> >
-> > for you to fetch changes up to 623029dcc53837d409deb70b65eb7c7b83ab9b9a=
-:
-> >
-> >   Bluetooth: MGMT: iterate over mesh commands in mgmt_mesh_foreach() (2=
-025-05-21 10:31:01 -0400)
->
-> Another bad fixes tag :( Time to automate this on your side?
->
-> Commit: ee1d8d65dffd ("Bluetooth: L2CAP: Fix not checking l2cap_chan secu=
-rity level")
->         Fixes tag: Fixes: 50c1241e6a8a ("Bluetooth: l2cap: Check encrypti=
-on key size on incoming connection")
->         Has these problem(s):
->                 - Target SHA1 does not exist
-> --
-> pw-bot: cr
+Sorry I noticed this sentence was not updated from the previous series.
 
-Will fix it, didn't we apply it to net already though? Seems like
-net-next doesn't have it yet.
+I'll change it as follows
 
---=20
-Luiz Augusto von Dentz
+    For sunrpc, we call sk_net_refcnt_upgrade() for IPPROTO_TCP only
+    so we use sock_create_kern() for TCP and keep __sock_create_kern()
+    for others.
+
+
+> 
+> The below hunk doesn't seem related to the marquee purpose of this
+> series. Should it be a separate patch with its own rationale?
+> 
+> @@ -1541,8 +1544,8 @@ static struct svc_xprt *svc_create_socket(struct
+> svc_serv *serv,
+>  	newlen = error;
+> 
+>  	if (protocol == IPPROTO_TCP) {
+> -		sk_net_refcnt_upgrade(sock->sk);
+
+The part above is related, and the below is not, using the old
+style warned by checkpatch, so I cleaned it up while at it but
+didn't think it's worth a patch.  I'm fine to drop it.
+
+
+> -		if ((error = kernel_listen(sock, 64)) < 0)
+> +		error = kernel_listen(sock, 64);
+> +		if (error < 0)
+>  			goto bummer;
+>  	}
+> 
 
