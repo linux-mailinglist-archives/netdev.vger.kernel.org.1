@@ -1,140 +1,102 @@
-Return-Path: <netdev+bounces-192500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC27AC0190
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 02:53:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FA4AC01A0
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 03:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3177F4A7806
-	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 00:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E933A7F63
+	for <lists+netdev@lfdr.de>; Thu, 22 May 2025 01:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE753CF58;
-	Thu, 22 May 2025 00:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRZEanFv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198FFEEA9;
+	Thu, 22 May 2025 01:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D2447F4A;
-	Thu, 22 May 2025 00:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214CE12B94
+	for <netdev@vger.kernel.org>; Thu, 22 May 2025 01:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747875194; cv=none; b=dujnZ35JUC1pu46C0M8qgaaPBMwFwg+GMtqkt/PFKeuAIUO1IK0W9qYujtVFX9qaBs8gaj4HB1IWxwQSFKWX+ss1oPjl5EvGYfLsouePf6PpYlUwLIn5VqAvVWAyGT2OXwakPmMj0LHNYriHBfmGXlhH0tc/6mRePCnd4p9VAfA=
+	t=1747875665; cv=none; b=DJPlbR3Q6eUpdJHBDZSvAsrntlnjiirOISsYz7xo8aW+WVAw2GDpZCmWqyOP8jf7fKg755I4lnjFdzdKAZODcH5yJmDDzdfa+XDuZNxCgL2sitImMZYBOBQef37M66MQSj3jbpexVhaDaiCfwAzuuveccXez5X2BE2VB7ysL5pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747875194; c=relaxed/simple;
-	bh=4Ft0iMqYoHiOxTAuaJ+NIPNqFRP2dzxn0Szm9BsoXF8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=p4W4jpEEfz96qn14hSupYHMLeba68Rc4sDfTWjrRahzUCybbR8eNLt9qcDz26HBG6O+8qJqkfHZuaOZ/VknLUkXK2prYgoYCO7QV5ssjhH87kBY0Foa69o++rr9GZeydzcsuYNaz9etzlraVA9wpt32LInZQe4CrXuNua/TcDfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TRZEanFv; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32934448e8bso16495371fa.3;
-        Wed, 21 May 2025 17:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747875191; x=1748479991; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=22s7w+Jw98xcNkkntdxAEeVIYsqFGoWrJTkU7tGG5AE=;
-        b=TRZEanFvJoTfOhSEhPF5+KAKpvpnRPzEoSK+KX5zgZ9ebGnkJ29aDOIBVTEJSUVKZP
-         x61Y5zekcOAUtLuWA08KS0lVmsBIjXWwjmbj235vDK+zPAXOyhTr1EsFqHoDyY3s4tGj
-         KeD9R/d8sJXbBqt/343I49GotA2vs7cg0LWU3baRTyNaZLPoHWblXtfUzStmdOWA5sJa
-         rkmBvCSye8Vlt+4XKTUA+v2B0822LLCwGgWmsbCKs1jGAmUtDxThzqPJc2byevsLuWFR
-         OoFVkkvCQLODNW7BNDYmx1ZZDzGpW68DBraBhE7goeYBb6TwcNVWbl9BJk9XNjaG/bNM
-         8xwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747875191; x=1748479991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=22s7w+Jw98xcNkkntdxAEeVIYsqFGoWrJTkU7tGG5AE=;
-        b=ASa9lKJNRDek+/M0MUnX5PB649EoyN2hT1CjVGOSo9hP9FLGGOw738PLlK1VxRvSje
-         I9xEQ3DU04vsAXvhipqmxjVQheOusmsMZzzbY3lxVyCW2lEtEu5qaUNXCzktc13Tk6SV
-         kcJoOP7wKBiBoSupTNLom1gWuo78gENgUOlXbDJNMm6Or5R21o3XXEupKxam09Z520ri
-         arzejLqxbKIJ5DzGL3baQLEKbk4P/c5ytj9ff0sLiBnxJzHI3I6TyqQNHnCA9lmxVpqt
-         bKiNV2VGjeVlZOSggc2XPvs4rHPeQk0TTnZtcNfyq4lWXExVMd+otWFObhC9HYhEDeve
-         yo+g==
-X-Forwarded-Encrypted: i=1; AJvYcCU1ts+gmMfiHDqUDbX0aK38oDzGDZ8cYJlO5vMRXTQxicwwC1gnOxg8sXiJJf8jPgBidivh+2n8@vger.kernel.org, AJvYcCUETTAAH5Xb9WCZlSRWKXHdnOCurf4VaDf5P99vMuV9GmYlN48xN79iD5FJJqHWazNfu7zobskiabHbG+U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB9ey7VQT61GDpd6qo+ebnfYlfeLGtuuiy4mNsr5JNHTrX/lhm
-	RxZSjJYFoO6/LKczttkDW51axaD0tt0KSy/HRq84RQlZHoNRqKntMyYpZ0M8PIEaESiDeJxGDNX
-	pYjZdj3rznAGYhPsMcrJr8FHb4jQBLaQmH1dqog==
-X-Gm-Gg: ASbGncu5nbQ5fXEY8z0hzUFVIPQbFQojDfgxaZ6/aR7G8LA+1ipD907fF2xA1Pggy6T
-	tKXEU0mQgMgd2jv6Yp9tNjN1K+XvLsVfcg2jg9UT3mE9E5PpzA9KYXID89Yq0+8kNcU1MdY9Ers
-	eWuACJSZsiao26LzJ85DtCXqqoZOxE8pPsXlD7q351/VlHS1rihyOClQ==
-X-Google-Smtp-Source: AGHT+IHdO/Lo1DdGl31K71Kd6XggJbdfwGqcFqEZ6CywzQGxdI13guaBbnkMmCbfEutGpbp2PMjLJ9txBQ0y1ux/2uc=
-X-Received: by 2002:a2e:a00e:0:10b0:329:14d3:366e with SMTP id
- 38308e7fff4ca-32914d339ecmr37684151fa.34.1747875190755; Wed, 21 May 2025
- 17:53:10 -0700 (PDT)
+	s=arc-20240116; t=1747875665; c=relaxed/simple;
+	bh=72WJzJACfpPSxvTBob7ClAB1IDFf4x+ZU4cshj01bVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N2KEIlXcgdVrJ2bsuRBUAhDJS2zrK3OOm3IEqIU+hQh2HfXgBKmhWtRTTFCq+xFXmnI8haVP9FNdzdqNUhxFTB8CdixYq4LJS83kV+tHZ+XuRhTUq1vuMI3qTE4Voo5dVkJx7S7VlrFU242++QXG3yv3kKzBp+g9WH7C7hGF4bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 54M110ln077287;
+	Thu, 22 May 2025 10:01:00 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 54M110sH077284
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 22 May 2025 10:01:00 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ec84752c-1e3d-413c-9c2b-6d83e48470ef@I-love.SAKURA.ne.jp>
+Date: Thu, 22 May 2025 10:00:58 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: John <john.cs.hey@gmail.com>
-Date: Thu, 22 May 2025 08:52:57 +0800
-X-Gm-Features: AX0GCFtvV1TlfYG-DgUfe2nrjFzAriSQCZPIinpZyeP4upDImzXjA374n-XivK4
-Message-ID: <CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com>
-Subject: [Bug] "possible deadlock in rtnl_newlink" in Linux kernel v6.13
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] team: replace team lock with rtnl lock
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Network Development <netdev@vger.kernel.org>,
+        Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Stanislav Fomichev <stfomichev@gmail.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <d4047311-5644-4884-84c0-059bbb9e98ee@I-love.SAKURA.ne.jp>
+ <20250521110024.64f5e422@kernel.org>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20250521110024.64f5e422@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav402.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-Dear Linux Kernel Maintainers,
+On 2025/05/22 3:00, Jakub Kicinski wrote:
+> On Wed, 21 May 2025 22:38:55 +0900 Tetsuo Handa wrote:
+>> syzbot is reporting locking order problem between wiphy and team.
+>> As per Jiri Pirko's comment, let's check whether all callers are
+>> already holding rtnl lock. This patch will help simplifying locking
+>> dependency if all callers are already holding rtnl lock.
+>>
+>> Reported-by: syzbot+705c61d60b091ef42c04@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+>> Suggested-by: Jiri Pirko <jiri@resnulli.us>
+> 
+> I don't think Jiri suggested it, he provided a review and asked
+> questions. Suggest means he is the proponent of the patch.
 
-I hope this message finds you well.
+I think Jiri Pirko knows better than I, for Jiri is the maintainer of
+TEAM DRIVER. I just tried what Jiri commented:
 
-I am writing to report a potential vulnerability I encountered during
-testing of the Linux Kernel version v6.13.
+  I wonder, since we already rely on rtnl in lots of team code, perhaps we
+  can remove team->lock completely and convert the rest of the code to be
+  protected by rtnl lock as well
 
-Git Commit: ffd294d346d185b70e28b1a28abe367bbfe53c04 (tag: v6.13)
+> And as he pointed out this patch promptly generates all sort 
+> of locking warnings, please test this properly.
 
-Bug Location: rtnl_newlink+0x86c/0x1dd0 net/core/rtnetlink.c:4011
+I didn't get any compile-time warnings, and
+https://lkml.kernel.org/r/682e6b1f.a00a0220.2a3337.0007.GAE@google.com didn't
+get any run-time locking warnings.
 
-Bug report: https://hastebin.com/share/ajavibofik.bash
+What locking warnings did you get? Is there an automated testing environment
+(like https://lkml.kernel.org/r/66a4b1a7.050a0220.12c792.8f9e@mx.google.com )
+which I can use for testing this patch?
 
-Complete log: https://hastebin.com/share/derufumuxu.perl
-
-Entire kernel config:  https://hastebin.com/share/lovayaqidu.ini
-
-Root Cause Analysis:
-The deadlock warning is caused by a circular locking dependency
-between two subsystems:
-
-Path A (CPU 0):
-Holds rtnl_mutex in rtnl_newlink() =E2=86=92
-Then calls e1000_close() =E2=86=92
-Triggers e1000_down_and_stop() =E2=86=92
-Calls __cancel_work_sync() =E2=86=92
-Tries to flush adapter->reset_task (=E2=86=92 needs work_completion lock)
-
-Path B (CPU 1):
-Holds work_completion lock while running e1000_reset_task() =E2=86=92
-Then calls e1000_down() =E2=86=92
-Which tries to acquire rtnl_mutex
-These two execution paths result in a circular dependency:
-
-CPU 0: rtnl_mutex =E2=86=92 work_completion
-CPU 1: work_completion =E2=86=92 rtnl_mutex
-
-This violates lock ordering and can lead to a deadlock under contention.
-This bug represents a classic case of lock inversion between
-networking core (rtnl_mutex) and a device driver (e1000 workqueue
-reset`).
-It is a design-level concurrency flaw that can lead to deadlocks under
-stress or fuzzing workloads.
-
-At present, I have not yet obtained a minimal reproducer for this
-issue. However, I am actively working on reproducing it, and I will
-promptly share any additional findings or a working reproducer as soon
-as it becomes available.
-
-Thank you very much for your time and attention to this matter. I
-truly appreciate the efforts of the Linux kernel community.
-
-Best regards,
-John
 
