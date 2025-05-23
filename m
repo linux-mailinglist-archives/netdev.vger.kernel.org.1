@@ -1,180 +1,190 @@
-Return-Path: <netdev+bounces-192918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CEEAC1A61
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 05:25:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2177AAC1A68
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 05:26:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED4F8A42CCD
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:25:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 197647B0525
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A007220F20;
-	Fri, 23 May 2025 03:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ql0iWFsD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1EA2222DA;
+	Fri, 23 May 2025 03:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE6B2DCBE7
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 03:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53082DCBE7;
+	Fri, 23 May 2025 03:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747970734; cv=none; b=JrgZuBCjvLIkDfym8gfpqK7qiP1NV3oHU1SFgCC0uczFGd8n1GVlW1RaCiKpmYl2rf+Rg0naSvJpv7k/BNc0I3Rn1bs4rJGgHIawql/soDYi8wND/0Wuk+H5A2vXy7e2VFeLxt7OK9VDDSbB5sZx2RgUuzObjpmull1sMpoA+EY=
+	t=1747970786; cv=none; b=Uqx9VjEXCriEsmAe0SZfMU6eISGO2IO1ufCsPcajGNytWTALKSno8I/bkEjqs2bd+nHrsoMzhw642nUMOHSBFJLFHTw0vzTLUYWFect28IE1OIlZwYXqDXimWXeKTu8uXR7E7KnthH7ZpVkF8HLuADjr31vhfXg+IDRFj+huEBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747970734; c=relaxed/simple;
-	bh=7g7uI4qpyx5pmzUet4Y4XxNBNYzZ6ES55RfzClVS5lU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ILTceuZE+F3By1EhT/sNPnFQqSj+JceE6CKdAVZNV13HkX/LenAwNSqT87AVf3STmC9qod3mgLUF4vjrKCGtpfz9sNO5lAyL+9doj2HZ68R6dsMuXLPyINoXXZiQ6qQtG9arSBWQXszqdFCT0AhA1xhRrEOqe/b6Qi4QN47KgTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ql0iWFsD; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7394772635dso6361011b3a.0
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 20:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747970730; x=1748575530; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AvnmG1muOxMgS8qNju6SA5T467j3gsLgfCM4zNl8E5o=;
-        b=Ql0iWFsDpcPOBJyefnpxzothHlbKDO4l6+Z+YOCoST+79GEEzG4B4YtTnb3fSoBJMY
-         UIgR5dfG80EYRRNxzGk9uRrxFC6oUE41CYjIpCkpInBJYRYXmmmq+5qxGQJT68KI7GHT
-         lfYuNT+oR4W/bnoxzvjEmFVIjWKBQyX/MvvgHwhGi8Ve6rrub808PjDB0kyu1huVVoIv
-         IYl1W5U0TLWqS2t5P+Y2V4StDm40ji4atVyS7j+ppaNj1w7Uczce5hrfb6uUK3RbjjXD
-         8YWpVfpNpBcXnBGV0PQdrxuG/zRgkPmJyHqSQbFJ+lbBM8zXaEjrb12+Bh27rkNqAvAB
-         Kyog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747970730; x=1748575530;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AvnmG1muOxMgS8qNju6SA5T467j3gsLgfCM4zNl8E5o=;
-        b=AK5ZnO7QZ6xZq0tQ146EhqtM6FKada93tohiCrUO3Rz9KcB8t5mEn9wGoKE3d9/bhE
-         ZN51fIgAj2fAL1qTp5hr0pkHF+4SegiDqqYq0ip0d+yVcDEsUYPE7FlvvcMEpJ7O0ow+
-         DrMXQ3VkgbuzRZTXEkBcnCKRgE6nUWoQyQXbwqUGUNi7vaSOCEPv30jFLghfxYCal2ZA
-         TakXjnkPr27sQDDx2D6U4Bo8rMnJb0aBNOKIwNpMcuAL4AQjsdlOxl7VPSUwWVNFL49R
-         30K47kAN6yjelgf5Q4+Y5A6bjmVOA8DgC0JmeLHaJkLqODbyBcMuCV4cn5eFOhe8xfXo
-         NjtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9n16QpYVCRiP0bTDWx7gD+/6/d1zn7hEK6U6Z9C37jZvlr1mKQ51N3OkkWEuHM0laY4Rb+EQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5s9xrmRqeUFZCqt7XKdfE1YDYI96+NNgJNgDESELuUMU47xR4
-	Kr0Nd0ehCZx4xUGPj/MOOvT2dfdkZVTfQCJtB/Eue+OOhqKKmsYhsSKHw++k0e5zA/R30WZT2pS
-	ns8lhNOnvo7s5Tnty+NgLjHjkJQ==
-X-Google-Smtp-Source: AGHT+IFr9sIaedgXmdU+43OMl6m/noUp43/4toQhhKOaWiEmXvU4723s+wg27dvO3gCq2fj2MwCs4AdfzrD0Ad6ZIA==
-X-Received: from pgac20.prod.google.com ([2002:a05:6a02:2954:b0:b1f:8cc1:95c1])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:1807:b0:203:becd:f9ce with SMTP id adf61e73a8af0-2170ce3a504mr38199942637.39.1747970730660;
- Thu, 22 May 2025 20:25:30 -0700 (PDT)
-Date: Fri, 23 May 2025 12:25:18 +0900
+	s=arc-20240116; t=1747970786; c=relaxed/simple;
+	bh=8EVazZ2kGcJ7wRFdcW84b44D5G++w+ZiAUGmm2O42Rk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=AfIxe+mEwPKPUQVuxqez7Lm1/8wbbFHFq9BFG9JupBG+O9qCiJI/VXotpgmYHRMzf2cSDeenE/EzqSO9XZY1zNgYh733sMzKAdfn7w8cJt1rgy9icL1eo9jkziTEev6vgrccgLr2AovwJIaYccMbeQYqou8hzCcXXSO7yv4iDEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-6c-682feadb6dc4
+From: Byungchul Park <byungchul@sk.com>
+To: willy@infradead.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	kernel_team@skhynix.com,
+	kuba@kernel.org,
+	almasrymina@google.com,
+	ilias.apalodimas@linaro.org,
+	harry.yoo@oracle.com,
+	hawk@kernel.org,
+	akpm@linux-foundation.org,
+	davem@davemloft.net,
+	john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch,
+	asml.silence@gmail.com,
+	toke@redhat.com,
+	tariqt@nvidia.com,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	david@redhat.com,
+	lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com,
+	vbabka@suse.cz,
+	rppt@kernel.org,
+	surenb@google.com,
+	mhocko@suse.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: [PATCH 00/18] Split netmem from struct page
+Date: Fri, 23 May 2025 12:25:51 +0900
+Message-Id: <20250523032609.16334-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXRXUhTcRgGcP87Z2dzOThMqZN9SAOphFyKxVtI2VWniz5Au0kwD+7gDm3T
+	pq5ZRmYj0dRCjVIXrTLzYzBd4qb5OecXFppizrTNFL0QM9QcTotyiXc/eJ7nvXmFmMSEBws5
+	dTqrUTNKKSHCRT8CXh+bXJApjk98OgUGs4mAunUdvJu28cFQ24Tgl3dSAKuOPgLevPJgYBjS
+	47Bm3sBgrndGAO6qeRxac60YzDzuJ6BQv4lBjq2aB8NNRXwo3XiLgTV7WgCjLQYCXKa/fJi3
+	F+IwUF6Dg7soBnqNu8EzuIjAYbbywFPwgoCSESMBs3o3gpHuGRwq7hchMLc7+bC5biBiDtGN
+	NRM8urn8m4A2WjLo99VhdL5zBKMttXkEbVkpFtBTX1oJuv/5Jk4321Z5dOGDJYJenvuK0z/b
+	xwja3DiG0x+NDgG9ajl4hbwmipazSk7LamRnEkUK72QXntoWolse4rLRMpWP/IUUGUXlNYzg
+	Oy4bHeT5TJCHKafTi/kcREZQqzN9Wx2RECOX+NScYfN/KXBrsObRI59xMpRyN+r5PovJE1T3
+	kpW3fTSEqqvvxHxjinQJqPz+DrQd7KW6qp34E7TLiPxqkYRTa1UMp4wKV2SqOV14UorKgrZ+
+	WHX3d7wNrQzH2hEpRNIAsU0kU0j4jDYtU2VHlBCTBol75sMVErGcybzNalKuazKUbJod7RPi
+	0j3iSM8tuYRMZtLZGyybymp2Up7QPzgblVZouwqrvekDCczJ8dieP+wzTjWWmSi/eTV53LUQ
+	FxnXUT57Pil6I++AIEr2WZdSbL/3ofIlV3+R8R7VPLU/tF4InS419S9kFZUVV3kcCY++G4cq
+	91MNXFbBkbN+yS2TOZ6SzqnTlyjp5XrXHZLytC0q4zckuQVtdSGB5/ySpHiagokIwzRpzD+o
+	Qvl5vwIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAwGiAl39CAMSjwQaCGludGVybmFsIgYKBApOO4Mt2+ovaDDKpCc4nK+sBjir
+	+Hg4p+C4BTicqrYBOPT52wc488THBjijofYDOJzPhAQ49a/6AzjlxuIHON+m5gQ4vIe3Azji
+	j8gGOI2E+wM4grioAjjDnckFONC2jgU4lPqlAzi3gOAHONO6nAY43qz/BTjmwo0EOMmaqQQ4
+	345AOMagFjj2y+wBOMSvtwI49oydBjiT0qAGOOOE3wE40sPiBDibgY4BOK++2AU4+/icBkAi
+	SLSp2QJIuZrdB0igsnVIs6gqSIrY0gNIsqqJBkiy8pIHSNzWvAZIyJj7BEi5uPMCSI2D7gZI
+	8eXaBEjvvtUGSKPo8AJIr7TVBEjMoMQHUBFaCjxkZWxpdmVyLz5gCmj528EEcL0fePHPaYAB
+	8RiKAQkIGBA0GJnTywKKAQkIBhAnGNjY+QOKAQkIFBAxGPPixwSKAQoIAxDuBRjlnPsCigEJ
+	CBMQNBj19oQBigEJCAQQJRjftIQFigEJCA0QNRjD7rcCigEJCBgQHxirsMADkAEIoAEAqgEU
+	aW52bWFpbDUuc2toeW5peC5jb22yAQYKBKZ9/JG4AfTTR8IBEAgBIgwNKG0vaBIFYXZzeW3C
+	ARgIAyIUDcXmLmgSDWRheXplcm9fcnVsZXPCARsIBCIXDUpXZWASEGdhdGVrZWVwZXJfcnVs
+	ZXPCAQIICRqAAXhzCpXZsJUENZo2iUQIK9C3VerNw271f56ZwvBIm9xQ9/Wzojv55zYahsFI
+	hp8eaPKpqK1POu5au6TwcFJq5MDco5Lh5btTAVLeb1IemYh5+5RL8K+Szqm4vL0Zk+fkEmKK
+	qmdIjnEUtnYhI3fZVCd5ZioI04z96wptHoShF9FVIgRzaGExKgNyc2E0Nn/SogIAAA==
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250523032518.251497-1-yuyanghuang@google.com>
-Subject: [PATCH iproute2] iproute2: bugfix - restore ip monitor backward compatibility.
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	Luca Boccassi <bluca@debian.org>, "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
-	Adel Belhouane <bugs.a.b@free.fr>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-The current ip monitor implementation fails on older kernels that lack
-newer RTNLGRP_* definitions. As ip monitor is expected to maintain
-backward compatibility, this commit updates the code to check if errno
-is not EINVAL when rtnl_add_nl_group() fails. This change restores ip
-monitor's backward compatibility with older kernel versions.
+The MM subsystem is trying to reduce struct page to a single pointer.
+The first step towards that is splitting struct page by its individual
+users, as has already been done with folio and slab.  This patchset does
+that for netmem which is used for page pools.
 
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Luca Boccassi <bluca@debian.org>
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Reported-by: Adel Belhouane <bugs.a.b@free.fr>
-Closes: https://lore.kernel.org/netdev/CADXeF1GgJ_1tee3hc7gca2Z21Lyi3mzxq52=
-sSfMg3mFQd2rGWQ@mail.gmail.com/T/#t
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+Matthew Wilcox tried and stopped the same work, you can see in:
+
+   https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infradead.org/
+
+Mina Almasry already has done a lot fo prerequisite works by luck, he
+said :).  I stacked my patches on the top of his work e.i. netmem.
+
+I focused on removing the page pool members in struct page this time,
+not moving the allocation code of page pool from net to mm.  It can be
+done later if needed.
+
+My rfc version of this work is:
+
+   https://lore.kernel.org/all/20250509115126.63190-1-byungchul@sk.com/
+
+There are still a lot of works to do, to remove the dependency on struct
+page in the network subsystem.  I will continue to work on this after
+this base patchset is merged.
+
 ---
- ip/ipmonitor.c | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/ip/ipmonitor.c b/ip/ipmonitor.c
-index b890b4d0..1f4e860f 100644
---- a/ip/ipmonitor.c
-+++ b/ip/ipmonitor.c
-@@ -5,6 +5,7 @@
-  * Authors:	Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru>
-  */
-=20
-+#include <errno.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <unistd.h>
-@@ -328,38 +329,46 @@ int do_ipmonitor(int argc, char **argv)
-=20
- 	if (lmask & IPMON_LNEXTHOP &&
- 	    rtnl_add_nl_group(&rth, RTNLGRP_NEXTHOP) < 0) {
--		fprintf(stderr, "Failed to add nexthop group to list\n");
--		exit(1);
-+		if (errno !=3D EINVAL) {
-+			fprintf(stderr, "Failed to add nexthop group to list\n");
-+			exit(1);
-+		}
- 	}
-=20
- 	if (lmask & IPMON_LSTATS &&
- 	    rtnl_add_nl_group(&rth, RTNLGRP_STATS) < 0 &&
- 	    nmask & IPMON_LSTATS) {
--		fprintf(stderr, "Failed to add stats group to list\n");
--		exit(1);
-+		if (errno !=3D EINVAL) {
-+			fprintf(stderr, "Failed to add stats group to list\n");
-+			exit(1);
-+		}
- 	}
-=20
- 	if (lmask & IPMON_LMADDR) {
- 		if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
- 		    rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
--			fprintf(stderr,
--				"Failed to add ipv4 mcaddr group to list\n");
--			exit(1);
-+			if (errno !=3D EINVAL) {
-+				fprintf(stderr, "Failed to add ipv4 mcaddr group to list\n");
-+				exit(1);
-+			}
- 		}
- 		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
- 		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
--			fprintf(stderr,
--				"Failed to add ipv6 mcaddr group to list\n");
--			exit(1);
-+			if (errno !=3D EINVAL) {
-+				fprintf(stderr,
-+					"Failed to add ipv6 mcaddr group to list\n");
-+				exit(1);
-+			}
- 		}
- 	}
-=20
- 	if (lmask & IPMON_LACADDR) {
- 		if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
- 		    rtnl_add_nl_group(&rth, RTNLGRP_IPV6_ACADDR) < 0) {
--			fprintf(stderr,
--				"Failed to add ipv6 acaddr group to list\n");
--			exit(1);
-+			if (errno !=3D EINVAL) {
-+				fprintf(stderr, "Failed to add ipv6 acaddr group to list\n");
-+				exit(1);
-+			}
- 		}
- 	}
-=20
---=20
-2.49.0.1204.g71687c7c1d-goog
+Changes from rfc:
+	1. Rebase on net-next's main branch
+	   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
+	2. Fix a build error reported by kernel test robot
+	   https://lore.kernel.org/all/202505100932.uzAMBW1y-lkp@intel.com/
+	3. Add given 'Reviewed-by's, thanks to Mina and Ilias
+	4. Do static_assert() on the size of struct netmem_desc instead
+	   of placing place-holder in struct page, feedbacked by Matthew
+	5. Do struct_group_tagged(netmem_desc) on struct net_iov instead
+	   of wholly renaming it to strcut netmem_desc, feedbacked by
+	   Mina and Pavel
+
+Byungchul Park (18):
+  netmem: introduce struct netmem_desc struct_group_tagged()'ed on
+    struct net_iov
+  netmem: introduce netmem alloc APIs to wrap page alloc APIs
+  page_pool: use netmem alloc/put APIs in __page_pool_alloc_page_order()
+  page_pool: rename __page_pool_alloc_page_order() to
+    __page_pool_alloc_large_netmem()
+  page_pool: use netmem alloc/put APIs in __page_pool_alloc_pages_slow()
+  page_pool: rename page_pool_return_page() to page_pool_return_netmem()
+  page_pool: use netmem put API in page_pool_return_netmem()
+  page_pool: rename __page_pool_release_page_dma() to
+    __page_pool_release_netmem_dma()
+  page_pool: rename __page_pool_put_page() to __page_pool_put_netmem()
+  page_pool: rename __page_pool_alloc_pages_slow() to
+    __page_pool_alloc_netmems_slow()
+  mlx4: use netmem descriptor and APIs for page pool
+  page_pool: use netmem APIs to access page->pp_magic in
+    page_pool_page_is_pp()
+  mlx5: use netmem descriptor and APIs for page pool
+  netmem: use _Generic to cover const casting for page_to_netmem()
+  netmem: remove __netmem_get_pp()
+  page_pool: make page_pool_get_dma_addr() just wrap
+    page_pool_get_dma_addr_netmem()
+  netdevsim: use netmem descriptor and APIs for page pool
+  mm, netmem: remove the page pool members in struct page
+
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c    |  46 ++++----
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c    |   8 +-
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  18 ++--
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  15 ++-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  66 ++++++------
+ drivers/net/netdevsim/netdev.c                |  18 ++--
+ drivers/net/netdevsim/netdevsim.h             |   2 +-
+ include/linux/mm.h                            |   5 +-
+ include/linux/mm_types.h                      |  11 --
+ include/linux/skbuff.h                        |  14 +++
+ include/net/netmem.h                          | 101 ++++++++++--------
+ include/net/page_pool/helpers.h               |  11 +-
+ net/core/page_pool.c                          |  97 +++++++++--------
+ 16 files changed, 221 insertions(+), 201 deletions(-)
+
+
+base-commit: f44092606a3f153bb7e6b277006b1f4a5b914cfc
+-- 
+2.17.1
 
 
