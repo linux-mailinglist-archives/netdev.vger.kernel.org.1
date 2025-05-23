@@ -1,119 +1,156 @@
-Return-Path: <netdev+bounces-192907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B9AC1996
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:19:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB83AC1994
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B3F3BED82
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 01:18:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F25F316D7AB
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 01:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D08121B9C2;
-	Fri, 23 May 2025 01:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AA221767D;
+	Fri, 23 May 2025 01:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+BJI7a9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hjn0PNzF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4971421B9C8;
-	Fri, 23 May 2025 01:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE08207A3A
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 01:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747962792; cv=none; b=Co6h9gHuWO8yLw+ilp1LoCp7wWMFaXzyR9G1ULQFQvm/5SglsB0Z219s/knAQa9hraIe4wfaMvgV5qinGnZgrdFEdnReBGqtPCX78Y513cSp5GmRcgF0mx8TyOkXTDKNTFcy3SWEgQu7bSzcpB7B8KIh4Cvy827WYIdBEHqXfsY=
+	t=1747963088; cv=none; b=W8g/Bs7JfDjaRR/x6edoWvlTYo3OjsCU8ejbNud1RVFLelxKyVxocUB0Oz8Wr16RhXlq59PhfaMaARbNuKmQ0ZBe6bB0WFwvvEw1Piw0ppSxfBq/XIcQ1KB9I6JoAUrjPRkZAr+AgErck0bxqsawE9gzU3wHWBDtPWgqCD9OY0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747962792; c=relaxed/simple;
-	bh=LOvFzs/T3i4wRAI9d7REZh0re65ylVe+GMKFnPVLcoM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mT4u/88G3WDoQjXnzf2PLZ6dThh/GuiZtzAZ1QRUcTZ/cIzHcdPuhMnAY6rYO265gWrA6+gLJrU4QHqmtHGBMWZu+oojWb1OMcZfalJsB71YzzAAhrO7ZxvVR+mZKPBQZzBEa0ceXyKj6BSq0m2BzBm/pOkGG9AkoXPBRUAbsKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f+BJI7a9; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a4bdee0bf7so984773f8f.1;
-        Thu, 22 May 2025 18:13:10 -0700 (PDT)
+	s=arc-20240116; t=1747963088; c=relaxed/simple;
+	bh=6sGa3dgT2uBNY1rfCSQXy/l9xJyuQ/jmpLR+hExcbJM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XrmSN6a9ZxcojkRWHTzU5KDCVSdkPnwHdMfC4TN8CYg7DFEvXZ8eheACcl1ApfmnxS5rrBsIvTtffpUzbIbYC7HJ4AFavsP/DjzKIPRJKtuLg7s9dpS+Lm2F46RGQ9g7W43Q/MPqZDNXJCLr0TUpQOxTAqlsRtm4AI1VPFc/QE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hjn0PNzF; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-550eaf7144cso6e87.0
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 18:18:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747962789; x=1748567589; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LOvFzs/T3i4wRAI9d7REZh0re65ylVe+GMKFnPVLcoM=;
-        b=f+BJI7a9FF7jiyosZQfMe5LS582iBSaGMhoKM4onIVDM5gV2nWUNi3NsRfbASpcLJV
-         ylWJpQkffX30W7Pzcj5yjoXhMfk2H9MBlG9DVKRjANcB16QH0TAePVCiTR/L9JYW3x6y
-         uJLso9WxnBBnsGAHIUlObzaVynRRE/5pfg9Ia/QKNIOTv8f/Hd/m7KMVwUrGJIWqs8LD
-         QwZ22REHE1VGoWMWj6Eb5NjwNHVExjfEuNfb3Lza3R8re/2SOe85qHn4y35bNl72//32
-         imnLQ3fUsz38104UOWqDImzthWMSEgevUTp06HscAeR6NUICSa7JFH48xfM7KDSkvMvp
-         DEmQ==
+        d=google.com; s=20230601; t=1747963084; x=1748567884; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fYVm0Wz/IrzVHcR1HnROuiWFcqay2TxyWPAyn+gfIuM=;
+        b=hjn0PNzFiiR6VJn2oPDTPxUVQOWs21UUxVrS0wB+wJMqz5jtqDubRnteJy+Vn9s9h1
+         GD3j8ceZ7bDZAJVUccavTlyCU34VMm4gObSuLa2h7/J3gm2LTYNCsADoRven1yuVRWE9
+         qNwuNeazC40bNsOva1u7PbzpnweUAyS9qrmSURdXgjwgzvn4EyrnaYIJ8U99dWr4HdOe
+         /C716ioIUgD/3eLo5MWE8VC5sisKkzVXVUVL/n3Yj9i+6QscwO6TEPz2NvDAgB1OUBtc
+         0ElYgT+Gx52zzf7BT94kW0xPEs+CBT44cNwfpPFIE4Gg0HxUH4Gengt5EqIh113V8ANd
+         M89g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747962789; x=1748567589;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOvFzs/T3i4wRAI9d7REZh0re65ylVe+GMKFnPVLcoM=;
-        b=ho8tl0db24kISxIGAHHS/PRKMaLYy40ANg3inGLZ/3Ss6a2Dt4ebDtR01ugtcnFfW/
-         w+PkVittSe/fv7r6bwhisvrfF8bSZFRBQN07lJgVxuUJSK+h2ewZaLxkbCua0nmg5WxP
-         s3LAZ4/36na404I0sRouQAaHyF7uZYHu3xaHi/22nOFalebkcvQD/MQlioHTPVtPn6BQ
-         roob/xk1u62/KMGgxWMygOtuhl4wzv+Xnsl3xEZhqLEhLXxMlxtZ/WPNEW4+V/GJ1ZF6
-         n8bShml2KkXUyt51zOPp9E5LM+9/tluZzlK/WV2wa5m7NSwGLtzlyl/dd8A5rxmthGrT
-         Ellw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+AK8y8cN+fqnxtZqIGfSl1bZaJmwQnlYFTIenFbu9pQdmYFKoTRk5W2vY6isuWKJi3gvti1mtIaY=@vger.kernel.org, AJvYcCVrMFgpbkbm05hBP2bSctJQOrFqwci/7nICiM2r1NjtWHrzllOf4FMlQH+ivYPbAVBhebOsAk1l@vger.kernel.org
-X-Gm-Message-State: AOJu0YySvLeQc5+75lVu1svBADtKAhlzot9SVwgDBgHLMLQpkzavDZw4
-	Jo8hkesNCxqLBk2vFxdjOqkgq4FwGC07xOKeAUWG1TZR4fJ9PvDFuA9F
-X-Gm-Gg: ASbGncuYoplGC0PSnwLiY9ucJ4BAN8mO9KKKQktBODWh/fG+NxPgYezzqa36NC8JX/r
-	TNXCIYkbYnieYuRbeNZBW/xeFE9THLDt8UEdqlymgM7jhVdEQyUNseyNPbL8E20gEu2DzhiS4/Y
-	lBzp9iBrBCNz1WqRsbCQqCXXBtQ4y+/2G4/fzpApcG+5UvDsp/lLSKgf56x6sgAR09LY4M+RSVw
-	Jmw8/8Ye6QOQbHqadtYgQ+xJJoI198GKk7OBpAoiDJqgf5JUbqsoHQ0R+sfvmtiJLFVx9ePoL/F
-	2Byoucp8dvU+jp173YmEg7qAgTrYMVeCCeFTp70qBuJmtnUlWf+S1/MkqLtiz5CZdX+C3daImO9
-	YTKWgDeSR5FFC/5jp+YbBvLtFI+pEaoDuHeQFWfU=
-X-Google-Smtp-Source: AGHT+IFs7eHYoE6Upd6eQ/uC/j0etjkMS2RZvRT3n9sebo7aDeMSJh3A4xPLh8KeonW2Y371C/mcig==
-X-Received: by 2002:a05:6000:2507:b0:3a3:7031:59da with SMTP id ffacd0b85a97d-3a370315bcamr15404329f8f.59.1747962789399;
-        Thu, 22 May 2025 18:13:09 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca8874bsm25088187f8f.67.2025.05.22.18.13.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 May 2025 18:13:09 -0700 (PDT)
-Message-ID: <54f84504-b40b-40a1-ac3e-b6baeec8ec0d@gmail.com>
-Date: Fri, 23 May 2025 02:13:07 +0100
+        d=1e100.net; s=20230601; t=1747963084; x=1748567884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fYVm0Wz/IrzVHcR1HnROuiWFcqay2TxyWPAyn+gfIuM=;
+        b=lGoeWnmvFyxMmytosvYnKjGMKuaR8/VbFm1z03MLmlVGvGnSylvlc8z3JyyHYMGVuD
+         tX1eGMxmuV/fUepfrYNM0RaLql8RCuyAmJOIk+izIU0flvCIi6bHytGkK1CaywxuM0D2
+         fdD331u7w4I4pfj+5rkezXPUcjXRCXNzVZTVsFKqnsruRKLqrx16tqFancoQPoWFD36k
+         d1tdikEc9Fm5FPJgmd4Tbpw0JFH9dZFsY8tyh8iyFmh0fqan6rkvoLE3nHnCAOIYwOBr
+         JFd0QtNwF6zAu2/1PZDgldjXeZx1iSySK3TUmK/SnqY4niJc+TLOg7DB8f0xrKv0eQRb
+         l7iw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfHi2IpW/htUS4IqopIaIqoHcdZSuyM0hepq16ztC+NNNeVqJcEpXljweMim+aViUNupbgNDQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqZIlQKic7jOu/BwM+4dd2XihLbwiYSwoobu4HWJw/EuCeeb8u
+	xHaiwPmLbRy/DJHRIv8sfZdo++r7QBMhZqnlYghfgw3Kt0TDveEzwkstV0LNM3p01mzAz+54UgV
+	DaipGOYNALV4FYFXj9MpwCxDyNGIGL1ei+mRSS/WM1YEtfV5C2D2XE6EVLQw=
+X-Gm-Gg: ASbGncshoiMY2MYjPe9yYw1IwyD1vMcOGRMM09jD5nywJPtZzK9ILK20kxexQbTNCPv
+	MBuAUjV8dOZ8HCPAr5+B5IWZrS+pVXktf1Ak5hrKoc1nmdEZqr6gbc7ig9YnZnUsvaLBShwgGHH
+	wbLIFi3LL3loxaFCwanIquSSwQmqNZUk+BD/v1Al23ci0V+lSWzr7s+UghtAG2mF2OsRDQSW3c
+X-Google-Smtp-Source: AGHT+IG4NBEhuVgLc1g60SsEqIvgjVS8hg/TxrkFg1ZaNJrTdqq8uwqUmNQlqDqAT+KkcvxdLuzHkprq8Jwx6MzEUCk=
+X-Received: by 2002:a19:3855:0:b0:54d:6ccd:4d6b with SMTP id
+ 2adb3069b0e04-552184e77f2mr150e87.0.1747963082028; Thu, 22 May 2025 18:18:02
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 22/22] sfc: support pio mapping based on cxl
-To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20250514132743.523469-1-alejandro.lucero-palau@amd.com>
- <20250514132743.523469-23-alejandro.lucero-palau@amd.com>
- <682e4a2c481d6_1626e1008e@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <682e4a2c481d6_1626e1008e@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <174794271559.992.2895280719007840700.reportbug@localhost>
+ <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
+ <f6475bd4-cf7e-4b96-8486-8c3d084679fc@kernel.org> <CAMw=ZnT7tcjC6z-9xuMbeC5RhDiaPRHaZB_2i_6WYNJ=cm1QVg@mail.gmail.com>
+ <CADXeF1Hmuc2NoA=Dg1n_3Yi-2kzGNZQdotb4HJpE-0X9K9Qf5Q@mail.gmail.com> <CAMw=ZnTLuVjisLhD2nA094gOE2wkTLyr90Do0QidF5nHG_0k9g@mail.gmail.com>
+In-Reply-To: <CAMw=ZnTLuVjisLhD2nA094gOE2wkTLyr90Do0QidF5nHG_0k9g@mail.gmail.com>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Fri, 23 May 2025 10:17:23 +0900
+X-Gm-Features: AX0GCFt2_Iv8NBZStmMMhAOi6Vj0N4nGJhVVTiPChdNxGMIV_bA6OeetMbIIa8I
+Message-ID: <CADXeF1HXAteCQZ6aA2TKEdsSD3-zJx+DA5nKhEzT9v0N64sFiA@mail.gmail.com>
+Subject: Re: Bug#1106321: iproute2: "ip monitor" fails with current trixie's
+ linux kernel / iproute2 combination
+To: Luca Boccassi <bluca@debian.org>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	1106321@bugs.debian.org, Netdev <netdev@vger.kernel.org>, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/05/2025 22:48, Dan Williams wrote:
-> Maybe that would be more obvious to me if I knew what a "PIO buffer" was
-> used for currently, but some more words about the why of all this would
-> help clarify if the design is making the right complexity vs benefit
-> tradeoffs.
+>iproute2 is generally backward compatible with previous kernels yes,
 
-A PIO buffer is a region of device memory to which the driver can write
- packet data for TX, so that when the device handles the transmit
- doorbell it doesn't have to DMA that data across from host memory.
-Essentially it's spending CPU time to save a round-trip across the PCIe
- bus, reducing latency; the driver heuristically decides whether a TX is
- more bandwidth- or latency-sensitive, and in the latter case uses PIO.
-I don't know too much about the CXL side of things (hopefully Alejandro
- will elaborate) but AIUI using CXL instead of PCIe for this reduces the
- latency further.
+Acked, will submit a patch ASAP.
+Could you advise which branch needs the fix?
+Is submitting to iproute2-next and iproute2 enough?
 
-Some of the above information should probably be added to the series
- cover letter or this patch description.
+Thanks,
+
+Yuyang
+
+On Fri, May 23, 2025 at 10:10=E2=80=AFAM Luca Boccassi <bluca@debian.org> w=
+rote:
+>
+> On Fri, 23 May 2025 at 01:58, Yuyang Huang <yuyanghuang@google.com> wrote=
+:
+> >
+> > Backward compatibility is broken due to the exit(1) in the following ch=
+anges.
+> >
+> > ```
+> > + if (lmask & IPMON_LMADDR) {
+> > + if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
+> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
+> > + fprintf(stderr,
+> > + "Failed to add ipv4 mcaddr group to list\n");
+> > + exit(1);
+> > + }
+> > + if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
+> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
+> > + fprintf(stderr,
+> > + "Failed to add ipv6 mcaddr group to list\n");
+> > + exit(1);
+> > + }
+> > + }
+> > +
+> > + if (lmask & IPMON_LACADDR) {
+> > + if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
+> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV6_ACADDR) < 0) {
+> > + fprintf(stderr,
+> > + "Failed to add ipv6 acaddr group to list\n");
+> > + exit(1);
+> > + }
+> > + }
+> > +
+> > ```
+> >
+> > My patches follow the existing code styles, so I also added exit(1).
+> >
+> > Link: https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git=
+/tree/ip/ipmonitor.c#n330
+> >
+> > I thought iproute2 was intentionally not backward compatible, but it
+> > sounds like that's not true.
+> >
+> > I can submit a fix patch to remove the exit(1), which should fix the
+> > backward compatibility issue.
+> >
+> > Shall we proceed with this proposal?
+>
+> iproute2 is generally backward compatible with previous kernels yes,
+> so it would be great to have a fix for this. Thanks!
 
