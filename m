@@ -1,209 +1,127 @@
-Return-Path: <netdev+bounces-193140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E0E9AC2A20
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:00:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D41B5AC2A62
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB7781B68389
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:00:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920174E7186
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E8F29B218;
-	Fri, 23 May 2025 19:00:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F321AAE17;
+	Fri, 23 May 2025 19:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C958QBAN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZjsSgCo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BE629AB0E;
-	Fri, 23 May 2025 19:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2CD19D8B7;
+	Fri, 23 May 2025 19:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748026834; cv=none; b=nLX0t38TLq0TivFHYfSNlWKaHZh/XlM22wOyqmE5LjJqmpYIf5U5DHvhCaxhPoEYXl97FsOPBEBwRsr6QhcVxq4g52huEAmqfG1/AS66MjkI8y/V40AJE6qHwRIub9a/L/3VgHsxgi51fliWBVLbUmad87O8ieumvpzECPc1mas=
+	t=1748028177; cv=none; b=i0wgrW1MPDUg6lYbrjEre9W0TlvJWbevVlDrlRx5FjZaKNjGDaMY0EK3Zt+gZHsCoMtILAAllIiOleFXIJeKU57BegsGjKlVfwoQBWL+3kiUHkBNPg9OIqq2LwzLeXWk/i8mvxxUL/+lYQJ+nA1CyK11vng/Td05EX231uLD8PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748026834; c=relaxed/simple;
-	bh=aPl01hl0HF/y+fjBiqpumEymlqEj6USzOz+MtuzBp60=;
+	s=arc-20240116; t=1748028177; c=relaxed/simple;
+	bh=aXlcNpzad5/yn3h/jgNhYnmF1/tsA8Bo02CTPnSUR08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AVqcTBQ2bsh8cLHMLhfOhxlT7i4NkEBO/AcW1rYDRDNATbmeeYgdUiICAptm1Jycvjc5U31ZeQSEohbj/4uZBfyzwusLxNbeKqs8Btt/Db8vV5HCIhvF8Y1LDatRXYGUiyGQrQuX9U8CPlcSxEMR3UnQZK+pCWUbfGy5+HHmnlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C958QBAN; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748026833; x=1779562833;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aPl01hl0HF/y+fjBiqpumEymlqEj6USzOz+MtuzBp60=;
-  b=C958QBAN42XDWls0C5GdhkQUUWBs1liEMEqankVbyiEuT956TfLBn6Sp
-   xgDQYvhDyF8EB1G05aa7QrAafBu6au6xaNLolNUBHcg5nX38xPi6DKUXT
-   KcKFqABR0vyOPsLxgimdIN86SkCApGL7HvqD6VS2yrBcpodXOI9k7QnNQ
-   Kk4C7N76YHEUV7eRe6iTt96sUluOn8OhtuP3dDPwNWsmyY5E2g8MjJr/U
-   hBeSFAjtQj6jkSSWg0Ce8oFu3Z1fIx8DFZjAnx+ihw94WMIJbejI7LmYA
-   R5O1tyU53OTvCjdwr/FExGsHk5uHTyV/uoIqI2B7wAjNyVxZWT/5/ELb6
-   g==;
-X-CSE-ConnectionGUID: f3nMVAuOSwC3jzkV1Zsegw==
-X-CSE-MsgGUID: Z5xHxySVRkWSdPveEdVZIA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="53886858"
-X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
-   d="scan'208";a="53886858"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 12:00:27 -0700
-X-CSE-ConnectionGUID: IqaW5hpeRy+7lHFzMImncQ==
-X-CSE-MsgGUID: Bo8TqtGAQ/qeIkD7+pv8eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
-   d="scan'208";a="141816157"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 23 May 2025 12:00:23 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uIXcy-000QfE-24;
-	Fri, 23 May 2025 19:00:20 +0000
-Date: Sat, 24 May 2025 02:59:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=XJJZqaxjM4VEaZrSltxATC6Emiggwp1kOdHrCK+WxuzeBsFIs75Gybp1oucYcvYbQmM010FKKfQW0JxPqrMfiolGGgbNUDEaIlwkCkp8NnG4dGdt97L0jkBOaIHFFLhf1tUywkUqR8yt+MHouNQ0mhlLXqeLiAFywdCMyAQQ0dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZjsSgCo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A98C4CEE9;
+	Fri, 23 May 2025 19:22:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748028177;
+	bh=aXlcNpzad5/yn3h/jgNhYnmF1/tsA8Bo02CTPnSUR08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QZjsSgCofwvPBSIjN/m1J3siBoRjWYzCOejdAFvlJv7/04kjNfw4yxmQJ6C/1AUWH
+	 MSocIHO97YIPBocP95O5o2IdeJdyQbuf5rysjTe+Bs5c5QBDoH3Mut4CSnayfihcKy
+	 V1kBBfJkiEUAl18Ai7FJwtBWDek5ZdoEK8n0kU3SnOn1Ja13IyMXfPeyIvYBP8tInw
+	 Xt+eCjiAplQbmKM/5/KviSGyFOOK/sZPnpgiZEXnnLAyiZ7f1paT5v09BmiyIQtMyW
+	 DnnBi+ylVt1ZvDf2Uo6m1ZLoqaMmvEtg+C9jJy1IvcipNooewJFi//l+/kOvjv+E+T
+	 x/X4zpcFlfPLA==
+Date: Fri, 23 May 2025 12:22:55 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Elder <elder@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Marijn Suijten <marijn.suijten@somainline.org>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH 3/3] net: ipa: Grab IMEM slice base/size from DTS
-Message-ID: <202505240200.w0D4DdAY-lkp@intel.com>
-References: <20250523-topic-ipa_imem-v1-3-b5d536291c7f@oss.qualcomm.com>
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next V2 08/11] net/mlx5e: Convert over to netmem
+Message-ID: <aDDLD_JoKJs5iv2q@x130>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+ <1747950086-1246773-9-git-send-email-tariqt@nvidia.com>
+ <CAHS8izNeKdsys4VCEW5F1gDoK7dPJZ6fAew3700TwmH3=tT_ag@mail.gmail.com>
+ <aC-5N9GuwbP73vV7@x130>
+ <CAHS8izNgY3APhLZWjYwEWyq3g=JiCBWFUcnY4nrXpntnp8zKhw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250523-topic-ipa_imem-v1-3-b5d536291c7f@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izNgY3APhLZWjYwEWyq3g=JiCBWFUcnY4nrXpntnp8zKhw@mail.gmail.com>
 
-Hi Konrad,
+On 23 May 10:58, Mina Almasry wrote:
+>On Thu, May 22, 2025 at 4:54 PM Saeed Mahameed <saeed@kernel.org> wrote:
+>> >>  static inline void
+>> >>  mlx5e_copy_skb_header(struct mlx5e_rq *rq, struct sk_buff *skb,
+>> >> -                     struct page *page, dma_addr_t addr,
+>> >> +                     netmem_ref netmem, dma_addr_t addr,
+>> >>                       int offset_from, int dma_offset, u32 headlen)
+>> >>  {
+>> >> -       const void *from = page_address(page) + offset_from;
+>> >> +       const void *from = netmem_address(netmem) + offset_from;
+>> >
+>> >I think this needs a check that netmem_address != NULL and safe error
+>> >handling in case it is? If the netmem is unreadable, netmem_address
+>> >will return NULL, and because you add offset_from to it, you can't
+>> >NULL check from as well.
+>> >
+>>
+>> Nope, this code path is not for GRO_HW, it is always safe to assume this is
+>> not iov_netmem.
+>>
+>
+>OK, thanks for checking. It may be worth it to add
+>DEBUG_NET_WARN_ON_ONCE(netmem_address(netmem)); in these places where
 
-kernel test robot noticed the following build warnings:
+Too ugly and will only be caught in DEBUG env with netmem_iov enabled on a
+somehow broken driver, so if you already doing that I am sure
+you won't mind a crash :) in your debug env.. 
 
-[auto build test WARNING on 460178e842c7a1e48a06df684c66eb5fd630bcf7]
+Also I don't expect any of mlx5 developers to confuse between header data
+split paths and other paths.. but maybe a comment somewhere should cover
+this gap.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Konrad-Dybcio/dt-bindings-sram-qcom-imem-Allow-modem-tables/20250523-071359
-base:   460178e842c7a1e48a06df684c66eb5fd630bcf7
-patch link:    https://lore.kernel.org/r/20250523-topic-ipa_imem-v1-3-b5d536291c7f%40oss.qualcomm.com
-patch subject: [PATCH 3/3] net: ipa: Grab IMEM slice base/size from DTS
-config: xtensa-randconfig-002-20250524 (https://download.01.org/0day-ci/archive/20250524/202505240200.w0D4DdAY-lkp@intel.com/config)
-compiler: xtensa-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250524/202505240200.w0D4DdAY-lkp@intel.com/reproduce)
+>you're assuming the netmem is readable and has a valid address. It
+>would be a very subtle bug later on if someone moves the code or
+>something and suddenly you have unreadable netmem being funnelled
+>through these code paths. But up to you.
+>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505240200.w0D4DdAY-lkp@intel.com/
+Cosmin, let's add comments on the shampo skb functions and the relevant
+lines of code, maybe it will help preventing future mistakes.
 
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ipa/ipa_mem.c: In function 'ipa_mem_init':
->> drivers/net/ipa/ipa_mem.c:623:17: warning: variable 'imem_size' set but not used [-Wunused-but-set-variable]
-     u32 imem_base, imem_size;
-                    ^~~~~~~~~
->> drivers/net/ipa/ipa_mem.c:623:6: warning: variable 'imem_base' set but not used [-Wunused-but-set-variable]
-     u32 imem_base, imem_size;
-         ^~~~~~~~~
-
-
-vim +/imem_size +623 drivers/net/ipa/ipa_mem.c
-
-   616	
-   617	/* Perform memory region-related initialization */
-   618	int ipa_mem_init(struct ipa *ipa, struct platform_device *pdev,
-   619			 const struct ipa_mem_data *mem_data)
-   620	{
-   621		struct device_node *ipa_slice_np;
-   622		struct device *dev = &pdev->dev;
- > 623		u32 imem_base, imem_size;
-   624		struct resource *res;
-   625		int ret;
-   626	
-   627		/* Make sure the set of defined memory regions is valid */
-   628		if (!ipa_mem_valid(ipa, mem_data))
-   629			return -EINVAL;
-   630	
-   631		ipa->mem_count = mem_data->local_count;
-   632		ipa->mem = mem_data->local;
-   633	
-   634		/* Check the route and filter table memory regions */
-   635		if (!ipa_table_mem_valid(ipa, false))
-   636			return -EINVAL;
-   637		if (!ipa_table_mem_valid(ipa, true))
-   638			return -EINVAL;
-   639	
-   640		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-   641		if (ret) {
-   642			dev_err(dev, "error %d setting DMA mask\n", ret);
-   643			return ret;
-   644		}
-   645	
-   646		res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ipa-shared");
-   647		if (!res) {
-   648			dev_err(dev,
-   649				"DT error getting \"ipa-shared\" memory property\n");
-   650			return -ENODEV;
-   651		}
-   652	
-   653		ipa->mem_virt = memremap(res->start, resource_size(res), MEMREMAP_WC);
-   654		if (!ipa->mem_virt) {
-   655			dev_err(dev, "unable to remap \"ipa-shared\" memory\n");
-   656			return -ENOMEM;
-   657		}
-   658	
-   659		ipa->mem_addr = res->start;
-   660		ipa->mem_size = resource_size(res);
-   661	
-   662		ipa_slice_np = of_parse_phandle(dev->of_node, "sram", 0);
-   663		if (ipa_slice_np) {
-   664			ret = of_address_to_resource(ipa_slice_np, 0, res);
-   665			of_node_put(ipa_slice_np);
-   666			if (ret)
-   667				return ret;
-   668	
-   669			imem_base = res->start;
-   670			imem_size = resource_size(res);
-   671		} else {
-   672			/* Backwards compatibility for DTs lacking an explicit reference */
-   673			imem_base = mem_data->imem_addr;
-   674			imem_size = mem_data->imem_size;
-   675		}
-   676	
-   677		ret = ipa_imem_init(ipa, mem_data->imem_addr, mem_data->imem_size);
-   678		if (ret)
-   679			goto err_unmap;
-   680	
-   681		ret = ipa_smem_init(ipa, mem_data->smem_size);
-   682		if (ret)
-   683			goto err_imem_exit;
-   684	
-   685		return 0;
-   686	
-   687	err_imem_exit:
-   688		ipa_imem_exit(ipa);
-   689	err_unmap:
-   690		memunmap(ipa->mem_virt);
-   691	
-   692		return ret;
-   693	}
-   694	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>-- 
+>Thanks,
+>Mina
+>
 
