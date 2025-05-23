@@ -1,266 +1,200 @@
-Return-Path: <netdev+bounces-193166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351A4AC2B35
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 23:03:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E0EAC2B3F
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 23:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0231BA63D0
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:04:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47235A4432F
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CE519F12D;
-	Fri, 23 May 2025 21:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB131EB1B4;
+	Fri, 23 May 2025 21:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="WCw/0Fh/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="I4AMcs+k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1rxmZJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25721607AC;
-	Fri, 23 May 2025 21:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F427482;
+	Fri, 23 May 2025 21:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748034233; cv=none; b=sTC9VLgGwVmQjJn8qTcCb8/lLbmKlq9z6ik/nfc4FTWn0kkO8vGJiWps4QhmXXap8RHBtBO/0K8BWRYTclHFa9HKHnffaSAH6KU00inUhUDC0S/+ul5BfLI8qYxT/rUyHqADFPKTePYGjGNMJ1cOKjpYabU6IvQyFS9jn1ZWMN4=
+	t=1748034863; cv=none; b=KGB4j4S7yJuXrNlIXahESvW3JS3Xqt/BA6W2H1f73beUbtbx7Yg9ICE5VTEdwUeQSLu9mxuATga0hk+/QnHnRcYy4YWJeTrkUHz56o2LQAELl9CCo5jBLQUVKF9BHjVt98cExL81gfX4TcC8/GjfNg6tM4LPXY+KNe0GS1tliME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748034233; c=relaxed/simple;
-	bh=/IiXj3E4+FeSoPsLAsIVemJgDu+JRE0O87UJmqVzfT8=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=bq01BBo6naWpXsJhWyo7RQxAR8iogOxSRZtdZ5DuLzRpxQxMUYvaLgv5NaJgMPwdpjgZqnaQoP0/w+JNw1abBjq/mcX82xJ+iZT5fRR9EOa7zWLP7HSrEZCR/ADFnGZ4QN+zw5ACUBbnr3erTuBpopBSFRGMzXaPkm9SLxLJ/ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=WCw/0Fh/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=I4AMcs+k; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id B15C211400F9;
-	Fri, 23 May 2025 17:03:49 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Fri, 23 May 2025 17:03:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm2; t=1748034229; x=1748120629; bh=iD3kTN8lxZ46QjQ91/6E2
-	NmFqApWChl1pBLEjrMFtw4=; b=WCw/0Fh/7KesMAiI3BHvJouv98em0iRYnujDL
-	gBCC3m/Q2YJKp9LKJ97hTZ7K1ARTI7inZjzC2CTucWoAenpM2UGLgkUYwva33Bmh
-	DgOHm9ItMnJVGYb7tUAKkDOiSan0ZrNzPiPf7Ih8wMVVMzJCKGLUXBtx9n6GJk0B
-	WPkGWECc4w4EcPZh3woGk8kuL56S3SkafLdJZOaOs0j6xo/Yi4RduADWYFhnlwOP
-	GkduhBWZB2hHaj9iCt5/rq+dDyI/2ZVxXdQKblJvjB4M5Gxi3N2y3NfCPn6Fmdyr
-	D/qYRsAeGxcj/mCBb08rq7xy+gnLXnDOLoL52Rb9E77HGAqqw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1748034229; x=1748120629; bh=iD3kTN8lxZ46QjQ91/6E2NmFqApWChl1pBL
-	EjrMFtw4=; b=I4AMcs+kRGtnpFP/cS+DEag58D38tFsZTnnNaatXbWUp6n3dsko
-	oxK8lvDJdbJfr8u1jnZ20C3gVCYIH9ZUgNolDhs8Kge0Lwu5vnGbA/OqPwBon8pH
-	Ry32dyNztX6wsGNX8BQjqKgPG55Fv3pBJgTTAYOt6SOj5ZCo2RvQcw6LyBe1sHd2
-	plnYZyjMo1Pbe3FTJsqd9ZGw9Da9DOnNPtPiQUZa4voszgI+xuStN/vO2Xti9jHp
-	ccilNJ0P/73FFQ/rDTZPz7TiWYC3SxSzfc4gpxfvzpxyKHPqS/lxbmfVMwsuR2de
-	0+ygu5LqdBJExvVRt9Obau8DPo9zL1Fms7w==
-X-ME-Sender: <xms:teIwaJxk5G-wonNWD3Cz9ykwPq72NBXR4kWU_aKh3MFwAC8tBMTqsg>
-    <xme:teIwaJQaaSbZJ_3IoeGymMJTN-kLaC4M0Il_lDCgKsTwdIBQVh1PI-LDeukPfgzYh
-    eqK5vdIQBbRYE5GZzI>
-X-ME-Received: <xmr:teIwaDWhcZiJFdlHZ9OCfTdW9o_dwfUY4ZAjFyug5DF4iusuMTUYVVAA4147UsQpHL0PmA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdelkeekucdltddurdegfedvrddttd
-    dmucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgf
-    nhhsuhgsshgtrhhisggvpdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttd
-    enucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefujghfofgg
-    tgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvh
-    esjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvghrnhepieefvdelfeeljeev
-    tefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeffnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhn
-    vghtpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    eprhgriihorhessghlrggtkhifrghllhdrohhrghdprhgtphhtthhopegurghvvghmsegu
-    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrih
-    hlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgt
-    phhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhn
-    rdgthhdprhgtphhtthhopehlihgrlhhisehrvgguhhgrthdrtghomhdprhgtphhtthhope
-    hprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:teIwaLit9tZmTozAlbJ14qu9X84v9kF2qv8Fnh-evJ1TVsT0PSmKEQ>
-    <xmx:teIwaLAL_xgTWxmBkyf-Jc8b4KtyojP-wenLj-apfKEkJatew3hmfg>
-    <xmx:teIwaEK2PrAOh5fsu4YSsjSFkwRAsrKn1A0Mnx4WYjgMv6Zx22o00w>
-    <xmx:teIwaKB36BUzeAAzu1p1D4xWwNAwYTDMehPYHvs2eg6214OkQaGFHg>
-    <xmx:teIwaB3ZAIScRG_Ytn-2fpPOU2scYblG3Nf2V4Pba3VHjYFA9qksXfiG>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 23 May 2025 17:03:48 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 93E7E9FCA6; Fri, 23 May 2025 14:03:47 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 90EAE9FCA4;
-	Fri, 23 May 2025 14:03:47 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-    Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bonding: fix multicast MAC address synchronization
-In-reply-to: <20250523022313.906-1-liuhangbin@gmail.com>
-References: <20250523022313.906-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 23 May 2025 02:23:13 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1748034863; c=relaxed/simple;
+	bh=hMNht2ITzVXRMNNi8WKcH1SnXd5YaalUM0z6OlrAXCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PjQ/9p8p2MwkArWBBdmvhiVLz3TRvfprbUs78Of3mY9VPlbISiHmzbGdF3Cjhi3/PkZ1ODLagkEh0k4OgDgEOdtPQgvm6yig1k+hhXW52YfnDw0PEXjboBlAuw3w93SFcbMINMz5+lJPdxyBfky6XyOcCLdKpTNRZUss0HW+BFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R1rxmZJC; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43ea40a6e98so2256115e9.1;
+        Fri, 23 May 2025 14:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748034860; x=1748639660; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K4M15ENUe5F7Tt92onDS6a+eZzL9Ufa/rc3FCe0HiWM=;
+        b=R1rxmZJC95gMJPjWyipx3KPfJFTkV0p1B/pRpvfT333LBPgLUBCZYVya2hZEu61tZf
+         dV8Zpe8+7U9exn4oN8B3RPRKfQfPuywoSZ0ycsrDsA8qo/xKW5YC81O4Q3USQhPybb58
+         xphqqvFuChK4iEbl9t+BWmWmOiNyt8uG2Ei7Uo1hRfGyggvSSFAnUXpdebGBbxNeQkwV
+         UBvmd5/5wS6WENNb8FoZ78GhRPQIxeiyGxHN+kTo/Jv5jFs8ED9EKEdG6RmflxLkCZ+v
+         LJd7sFKr6TH1qKNAywB621qjcGgkXySKJy5uuS08uLap/bfH3TrYWXg9sCYUdegtYwhn
+         txFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748034860; x=1748639660;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K4M15ENUe5F7Tt92onDS6a+eZzL9Ufa/rc3FCe0HiWM=;
+        b=MFDLicjgyfFmt2SWRXG4pBgf+aG47ZQjPv6G5pE++oKs+iU3JCO9N1lx/etJL5xFOG
+         m//Wf6yelVbb2/q7QALlOsgn2SOljz1pE2g5CfrBCSoH32ZO+LjKD17Ha0kHT5JRKd/U
+         1FxUrifwmSDpi8mG/RUXamxKUSJMeDz+JET23uWbUq17inDdgFkKydIg2WcLxZnw4+rZ
+         I70+xLKE5DBbIKKWXeMdftoawnJIlLIQA0SzynLGWtoIPw6Sn5j8o0KCkrsNsKbfUYWe
+         eEDdqs1CUlEXVnS40LVJ+fUXHEUbkC0UuvhX2gBVb8IRD9uBcomhvEM12mcKrdc+1yXb
+         TcGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrYtA7bHxpIR0j3ik0OWMIGbb3Gy2tZYMZcOoE+Bwz6yJ51EqCIEVbqiDOXxhl9X5efJGDN6ZG@vger.kernel.org, AJvYcCW6trIVFaI7nFUyL5WDyMC6LLfA9nvscguT39l1gOBWyH60Bvk9NJUpCHdNn9LoiTuxk9Sr7UWvhknw0fQ=@vger.kernel.org, AJvYcCXhnuHCmnJZOjLJhMwKa4AANBnA9KaCbPUutmPEsKHSHJ7W2YYEns4sSbY+SMDFDKvlC2zRqPN/@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQBlm3RWoLIYIryYRtAx2BOZeIUGkg1AMIm2JjBSI4cv1bARmI
+	cuLa8y8RT/WEHE93YcvVMmwASFiV4QpI8T9n5NxiXwhaXcftlBbWaPcY
+X-Gm-Gg: ASbGnctW9cpYcNPCN3woWhjExbm5t42SBhzdVL6m/GUe49j5qIy9Dmo8RXhcZFrLIWe
+	RS2nCfKElynRWweRBsegjvEKu8OwfGIIA6C8WpYrPw2VLIwueDpeF0XFMQpcKHywBIWFASoIA6J
+	Jjcs3G3Q1buGhyhc/H9ocKmVw8DCQlYRQiVU1dnuHtjin2YdmlNPd6WDQDz8r9NcQ+bFR/1u/Ks
+	3227ecmljBaBp4+2IB94bLq4mpIJPZ7aqxIkXjL/JkF1NBU0K2rRXSV/X30IOCKikMmHWO7AdIK
+	nGAz/2Qf/4m24B6BAeSSpQQgc2/d/kVTUb5wBeNV2/SQpDK8NK1fILJwFe7x9MFaE1TjNySWwAN
+	+en5N+Y0GZKCelQ==
+X-Google-Smtp-Source: AGHT+IGPNXHgQPH+t+a7zbToFCeMprVY77XgSiiZZCtrK9j88dVi9oyzaAIdoyF9y6RBaUSD5DnDSw==
+X-Received: by 2002:a05:600c:5286:b0:43b:c0fa:f9cd with SMTP id 5b1f17b1804b1-44c91ad6c06mr4338205e9.7.1748034859750;
+        Fri, 23 May 2025 14:14:19 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d25b8sm160122845e9.17.2025.05.23.14.14.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 14:14:19 -0700 (PDT)
+Date: Fri, 23 May 2025 22:14:18 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Lee Jones <lee@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Christian Brauner <brauner@kernel.org>, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Alexander Mikhalitsyn
+ <aleksandr.mikhalitsyn@canonical.com>, Jens Axboe <axboe@kernel.dk>, Sasha
+ Levin <sashal@kernel.org>, Michal Luczaj <mhal@rbox.co>, Rao Shoaib
+ <Rao.Shoaib@oracle.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH v6.1 05/27] af_unix: Replace BUG_ON() with
+ WARN_ON_ONCE().
+Message-ID: <20250523221418.6de8c601@pumpkin>
+In-Reply-To: <20250521152920.1116756-6-lee@kernel.org>
+References: <20250521152920.1116756-1-lee@kernel.org>
+	<20250521152920.1116756-6-lee@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <302766.1748034227.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 May 2025 14:03:47 -0700
-Message-ID: <302767.1748034227@famine>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Wed, 21 May 2025 16:27:04 +0100
+Lee Jones <lee@kernel.org> wrote:
 
->There is a corner case where the NS (Neighbor Solicitation) target is set=
- to
->an invalid or unreachable address. In such cases, all the slave links are
->marked as down and set to backup. This causes the bond to add multicast M=
-AC
->addresses to all slaves.
->
->However, bond_ab_arp_probe() later tries to activate a carrier on slave a=
-nd
->sets it as active. If we subsequently change or clear the NS targets, the
->call to bond_slave_ns_maddrs_del() on this interface will fail because it
->is still marked active, and the multicast MAC address will remain.
+> From: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> [ Upstream commit d0f6dc26346863e1f4a23117f5468614e54df064 ]
+> 
+> This is a prep patch for the last patch in this series so that
+> checkpatch will not warn about BUG_ON().
 
-	This seems complicated, so, just to make sure I'm clear, the bug
-being fixed here happens when:
+Does any of this actually make any sense?
+Either the BUG_ON() should be just deleted because it can't happen
+(or doesn't matter) or there should be an error path.
+Blindly replacing with WARN_ON_ONCE() can't be right.
 
-(a) ARP monitor is running with NS target(s), all of which do not
-solicit a reply (invalid address or unreachable), resulting in all
-interfaces in the bond being marked down
+The last change (repeated here)
+>  	if (u) {
+> -		BUG_ON(!u->inflight);
+> -		BUG_ON(list_empty(&u->link));
+> +		WARN_ON_ONCE(!u->inflight);
+> +		WARN_ON_ONCE(list_empty(&u->link));
+>  
+>  		u->inflight--;
+>  		if (!u->inflight)
+is clearly just plain wrong.
+If 'inflight' is zero then 'decrementing' it to ~0 is just going
+to 'crash and burn' very badly not much later on.
 
-(b) while in the above state, the ARP monitor will cycle through each
-interface, making them "active" (active-ish, really, just enough for the
-ARP mon stuff to work) in turn to check for a response to a probe
+	David
 
-(c) while the cycling from (b) is occurring, attempts to change a NS
-target will fail on the interface that happens to be quasi-"active" at
-the moment.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Acked-by: Jens Axboe <axboe@kernel.dk>
+> Link: https://lore.kernel.org/r/20240129190435.57228-2-kuniyu@amazon.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> (cherry picked from commit d0f6dc26346863e1f4a23117f5468614e54df064)
+> Signed-off-by: Lee Jones <lee@kernel.org>
+> ---
+>  net/unix/garbage.c | 8 ++++----
+>  net/unix/scm.c     | 8 ++++----
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index 2934d7b68036..7eeaac165e85 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -145,7 +145,7 @@ static void scan_children(struct sock *x, void (*func)(struct unix_sock *),
+>  			/* An embryo cannot be in-flight, so it's safe
+>  			 * to use the list link.
+>  			 */
+> -			BUG_ON(!list_empty(&u->link));
+> +			WARN_ON_ONCE(!list_empty(&u->link));
+>  			list_add_tail(&u->link, &embryos);
+>  		}
+>  		spin_unlock(&x->sk_receive_queue.lock);
+> @@ -224,8 +224,8 @@ static void __unix_gc(struct work_struct *work)
+>  
+>  		total_refs = file_count(sk->sk_socket->file);
+>  
+> -		BUG_ON(!u->inflight);
+> -		BUG_ON(total_refs < u->inflight);
+> +		WARN_ON_ONCE(!u->inflight);
+> +		WARN_ON_ONCE(total_refs < u->inflight);
+>  		if (total_refs == u->inflight) {
+>  			list_move_tail(&u->link, &gc_candidates);
+>  			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
+> @@ -318,7 +318,7 @@ static void __unix_gc(struct work_struct *work)
+>  		list_move_tail(&u->link, &gc_inflight_list);
+>  
+>  	/* All candidates should have been detached by now. */
+> -	BUG_ON(!list_empty(&gc_candidates));
+> +	WARN_ON_ONCE(!list_empty(&gc_candidates));
+>  
+>  	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
+>  	WRITE_ONCE(gc_in_progress, false);
+> diff --git a/net/unix/scm.c b/net/unix/scm.c
+> index 693817a31ad8..6f446dd2deed 100644
+> --- a/net/unix/scm.c
+> +++ b/net/unix/scm.c
+> @@ -50,10 +50,10 @@ void unix_inflight(struct user_struct *user, struct file *fp)
+>  
+>  	if (u) {
+>  		if (!u->inflight) {
+> -			BUG_ON(!list_empty(&u->link));
+> +			WARN_ON_ONCE(!list_empty(&u->link));
+>  			list_add_tail(&u->link, &gc_inflight_list);
+>  		} else {
+> -			BUG_ON(list_empty(&u->link));
+> +			WARN_ON_ONCE(list_empty(&u->link));
+>  		}
+>  		u->inflight++;
+>  		/* Paired with READ_ONCE() in wait_for_unix_gc() */
+> @@ -70,8 +70,8 @@ void unix_notinflight(struct user_struct *user, struct file *fp)
+>  	spin_lock(&unix_gc_lock);
+>  
 
-	Is my summary correct?
-
-	Doesn't the failure scenario also require that arp_validate be
-enabled?  Looking at bond_slave_ns_maddrs_{add,del}, they do nothing if
-arp_validate is off.
-
->To fix this issue, move the NS multicast address add/remove logic into
->bond_set_slave_state() to ensure multicast MAC addresses are updated
->synchronously whenever the slave state changes.
-
-	Ok, but state change calls happen in a lot more places than the
-existing bond_hw_addr_swap(), which is only called during change of
-active for active-backup, balance-alb, and balance-tlb.  Are you sure
-that something goofy like setting arp_validate and an NS target with the
-ARP monitor disabled (or in a mode that disallows it) will behave
-rationally?
-
->Note: The call to bond_slave_ns_maddrs_del() in __bond_release_one() is
->kept, as it is still required to clean up multicast MAC addresses when
->a slave is removed.
->
->Fixes: 8eb36164d1a6 ("bonding: add ns target multicast address to slave d=
-evice")
->Reported-by: Liang Li <liali@redhat.com>
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->---
-> drivers/net/bonding/bond_main.c | 9 ---------
-> include/net/bonding.h           | 7 +++++++
-> 2 files changed, 7 insertions(+), 9 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 8ea183da8d53..6dde6f870ee2 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -1004,8 +1004,6 @@ static void bond_hw_addr_swap(struct bonding *bond,=
- struct slave *new_active,
-> =
-
-> 		if (bond->dev->flags & IFF_UP)
-> 			bond_hw_addr_flush(bond->dev, old_active->dev);
->-
->-		bond_slave_ns_maddrs_add(bond, old_active);
-> 	}
-> =
-
-> 	if (new_active) {
->@@ -1022,8 +1020,6 @@ static void bond_hw_addr_swap(struct bonding *bond,=
- struct slave *new_active,
-> 			dev_mc_sync(new_active->dev, bond->dev);
-> 			netif_addr_unlock_bh(bond->dev);
-> 		}
->-
->-		bond_slave_ns_maddrs_del(bond, new_active);
-> 	}
-> }
-> =
-
->@@ -2350,11 +2346,6 @@ int bond_enslave(struct net_device *bond_dev, stru=
-ct net_device *slave_dev,
-> 	bond_compute_features(bond);
-> 	bond_set_carrier(bond);
-> =
-
->-	/* Needs to be called before bond_select_active_slave(), which will
->-	 * remove the maddrs if the slave is selected as active slave.
->-	 */
->-	bond_slave_ns_maddrs_add(bond, new_slave);
->-
-> 	if (bond_uses_primary(bond)) {
-> 		block_netpoll_tx();
-> 		bond_select_active_slave(bond);
->diff --git a/include/net/bonding.h b/include/net/bonding.h
->index 95f67b308c19..0041f7a2bd18 100644
->--- a/include/net/bonding.h
->+++ b/include/net/bonding.h
->@@ -385,7 +385,14 @@ static inline void bond_set_slave_state(struct slave=
- *slave,
-> 	if (slave->backup =3D=3D slave_state)
-> 		return;
-> =
-
->+	if (slave_state =3D=3D BOND_STATE_ACTIVE)
->+		bond_slave_ns_maddrs_del(slave->bond, slave);
->+
-> 	slave->backup =3D slave_state;
->+
->+	if (slave_state =3D=3D BOND_STATE_BACKUP)
->+		bond_slave_ns_maddrs_add(slave->bond, slave);
-
-	This code pattern kind of makes it look like the slave->backup
-assignment must happen between the two new if blocks.  I don't think
-that's true, and things would work correctly if the slave->backup
-assignment happened first (or last).
-
-	Assuming I'm correct, could you move the assignment so it's not
-in the middle?  If, however, it does need to be in the middle, that
-deserves a comment explaining why.
-
-	-J
-
->+
-> 	if (notify) {
-> 		bond_lower_state_changed(slave);
-> 		bond_queue_slave_event(slave);
->-- =
-
->2.46.0
->
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
