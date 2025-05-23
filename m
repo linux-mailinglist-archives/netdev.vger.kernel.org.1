@@ -1,144 +1,127 @@
-Return-Path: <netdev+bounces-192901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C01AC18C7
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 02:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B191AAC18D0
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 02:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AED334E0E13
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:00:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AAFD5007F3
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 00:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346842D4B60;
-	Thu, 22 May 2025 23:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2347E9;
+	Fri, 23 May 2025 00:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U9q1bbPT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9Rfqgzf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBEA2D1931
-	for <netdev@vger.kernel.org>; Thu, 22 May 2025 23:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39142BA49
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 00:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747958275; cv=none; b=SzgTIxH/CDS/dU4mn5PQabemRA/RCPXnR2UGQttoMjX3WPWcVDnA9dPflI5t4oaarYQSU9Kb1o3POsSOjvwwuidbGP3MOLBxvfM8JNHFSe6HcVsCYdK0pELMi3Sn2KIYkWD+oGuDrxyEyPTP/St+OqEdkR3mgWLRTV1PMDT2ciM=
+	t=1747958441; cv=none; b=ZXVqI3jSQR0hQ+Us56vCN4g9Magdszzhk84ThtoLakHJkcmKr5SbHi8XaNgrJl7GP8qxsRE2obbqxcXPtgcIjOilK4y98u7pJTKDWQjp0xE42LlsvgkXjImzHF7Bavdr4GGEkyAIcpZh5+fmlOk8bVPE+aMKEkVGbI5onYgc1gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747958275; c=relaxed/simple;
-	bh=n7plbbr3BamoK04MEHPsC9Ph7jXzjScsO/2sdM4WRGo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R9yYtjL7Y30oH5OHdx4Zy7c3xtV95MdwDMg+E45+iC9G7snJzgXz+hbhCsdS6Ij5sm1yt/RH8J2z1u6Rqcqf6IL6IpxHMUhPx6dePNWECDCEDZipfdM01bLkCO2Rc4Pd6glYSoLqnNu7XoTPTTAqTjTWciL2ZACzM/stMNDh8Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U9q1bbPT; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-742b6705a52so8684517b3a.1
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 16:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747958273; x=1748563073; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/VPvTyzliorplqyqZgQq6p842HQ3UDgPCj4kwriHPY=;
-        b=U9q1bbPTGydBLtdPmYrMbXhZk7UVEaIDz9tyJvJzUjvSzS1B48hmf5txEEoFmxWFIb
-         as+zcIzZqqnuURF8lRbQmPH0ucMnbvyX//pjlH/S6JZnQJjnwNhLBiJCAX3e5/I1Iz2y
-         B1gkUBt2zw/6yfjjz0Vu0stYP3V614SYe2Wrvg4vMFWGtQ3U44qbqYPZDBgrZ6hp/wdA
-         23NqinWoIITfGzqJsaSf/Gs75QGjqPbxonRHrboTTY7cVJTPh20ybK5isRfTt8wkeHR9
-         Ah4Yz/bumil6oGy8LNhF+gO643lYa3cnd9eumIbw/CFfPobRIoWxvZ/fyJxLlx9Tpkrb
-         nbHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747958273; x=1748563073;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/VPvTyzliorplqyqZgQq6p842HQ3UDgPCj4kwriHPY=;
-        b=pJD/Uj4DbwrOAk88WC+dZ68UISlBQGGHaP0ceApeDogA8N0PRKC+/5gTjC61xIfu/o
-         qWauDH0spvuEbYd0LkzWzJGHSyMXTkwDlJFnX+j6+j2p0mX707AfyU6kgc6TT6O6XN/K
-         jVYjGooQyspHeB5UYTIPfwHJ/am2ZK4Ka25Q+LnUX3oXx29/pH85mKtUlHgJPS/PfddM
-         OMZfMq6zm89AZtAVnLpIiCMjf5Ri7yij0zN3vUdgwYCqKowlU6/wzadhCMudLUgCkuiT
-         Wm/jY1EwSwuW6Krb3pD8oJPfITAzNFb2j9yit4EK07mhRJvGuKRCZXy1Q6ol99KTZe3c
-         d10w==
-X-Gm-Message-State: AOJu0YxxF5j5vewrerq5Ei9wrZtapdjHBHEl2lKbBGZWG95m43DQhZOP
-	WnVtOr5YM46R+N6DugF0WUVrlWnUvKlyqnB182zgZ4ZnDWZ3w4XH2AlHheOd7WiXwACDTAM1vFw
-	x/DxkrlKAhvCWyrFWuZ6QolH+0mh8gfTJ3H50uee61lAWXyVkHkptWWM0pEAUnvSnR04rs2EqKT
-	vXhhI8jU6eLU/abTzzZWMi8t2o2FcIOk+HAeX9AzoSdRCHgCs2MyN5FJ+fqaRtlyc=
-X-Google-Smtp-Source: AGHT+IGRbiFjtwSUPW8s7GKRtSvt9yqUiRl0Vl8/e3DcdCtRazY1SO6dT+VmE+wGSTd34cWUBb/TsuUBtxHTV2eMzA==
-X-Received: from pfhm3.prod.google.com ([2002:a62:f203:0:b0:736:3e92:66d7])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:391a:b0:740:a879:4f7b with SMTP id d2e1a72fcca58-742acd5115amr35613613b3a.18.1747958272916;
- Thu, 22 May 2025 16:57:52 -0700 (PDT)
-Date: Thu, 22 May 2025 23:57:37 +0000
-In-Reply-To: <20250522235737.1925605-1-hramamurthy@google.com>
+	s=arc-20240116; t=1747958441; c=relaxed/simple;
+	bh=wwgwN+X6FgCswo0NVMIOdqq1moMBIqY+x2Fhd2YL7Iw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sjJOIEHtrqHnFijQkPWleiJ5qibTnRN6TaD3PWZ4+X9a3ivKE8uqLcqgutcTlpdsf+Wx03j5AwsJi1tev0EabDE1+cpX0wxN6IJOGUI7E3UZQYQmysPsaIgQyOai8Tx7R3EXqegfJ97HRbaIoW0IeqInCvqWgibTWvLhcaonQR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9Rfqgzf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881D9C4CEE4;
+	Fri, 23 May 2025 00:00:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747958440;
+	bh=wwgwN+X6FgCswo0NVMIOdqq1moMBIqY+x2Fhd2YL7Iw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=o9RfqgzfDObQOm6lWf3RBInZmWeAJPGISII8V+ze0uZkIgkxgQsgi2Pm3l3Nrq0LR
+	 r7GcVogMfMar1be6EmXQR4CKKT8LMTV3jdBqfGbruumfheGlzkh2bJToDY4DOk6I91
+	 yP/mZgfGo2R1GPKjgx+xv2HsIHqCfHN3ztnIxVhr3Eg8jRsWfwhyR6i1T/1nQWj1eP
+	 p6BS1RK5GXxWrGHAKJcT7cl22bTne42GiTXzvCWPEY7YnzrThMufj5AYnyXm++Tok3
+	 Ssh9PxuLaB+jDnvP3ztCDFPQNbfcgjCKUPYnF2U8oTI5Je20kTBEUj9d6QgCutxMf1
+	 NPXz6kga2iY0g==
+Message-ID: <f6475bd4-cf7e-4b96-8486-8c3d084679fc@kernel.org>
+Date: Thu, 22 May 2025 18:00:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250522235737.1925605-1-hramamurthy@google.com>
-X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250522235737.1925605-9-hramamurthy@google.com>
-Subject: [PATCH net-next v3 8/8] gve: Advertise support for rx hardware timestamping
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, jeroendb@google.com, hramamurthy@google.com, 
-	andrew+netdev@lunn.ch, willemb@google.com, ziweixiao@google.com, 
-	pkaligineedi@google.com, yyd@google.com, joshwash@google.com, 
-	shailend@google.com, linux@treblig.org, thostet@google.com, 
-	jfraker@google.com, richardcochran@gmail.com, jdamato@fastly.com, 
-	vadim.fedorenko@linux.dev, horms@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Bug#1106321: iproute2: "ip monitor" fails with current trixie's
+ linux kernel / iproute2 combination
+To: Luca Boccassi <bluca@debian.org>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Yuyang Huang <yuyanghuang@google.com>
+Cc: 1106321@bugs.debian.org, Netdev <netdev@vger.kernel.org>
+References: <174794271559.992.2895280719007840700.reportbug@localhost>
+ <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: John Fraker <jfraker@google.com>
+On 5/22/25 4:55 PM, Luca Boccassi wrote:
+> On Thu, 22 May 2025 at 20:41, Adel Belhouane <bugs.a.b@free.fr> wrote:
+>>
+>> Package: iproute2
+>> Version: 6.14.0-3
+>> Severity: normal
+>> X-Debbugs-Cc: bugs.a.b@free.fr
+>>
+>> Dear Maintainer,
+>>
+>> Having iproute2 >= 6.14 while running a linux kernel < 6.14
+>> triggers this bug (tested using debian-13-nocloud-amd64-daily-20250520-2118.qcow2)
+>>
+>>     root@localhost:~# ip monitor
+>>     Failed to add ipv4 mcaddr group to list
+>>
+>> More specifically this subcommand, which didn't exist in iproute2 6.13
+>> is affected:
+>>
+>>     root@localhost:~# ip mon maddr
+>>     Failed to add ipv4 mcaddr group to list
+>>     root@localhost:~# ip -6 mon maddr
+>>     Failed to add ipv6 mcaddr group to list
+>>
+>> causing the generic "ip monitor" command to fail.
+>>
+>> As trixie will use a 6.12.x kernel, trixie is affected.
+>>
+>> bookworm's iproute2/bookworm-backports is also affected since currently
+>> bookworm's backport kernel is also 6.12.x
+>>
+>> Workarounds:
+>> * upgrade the kernel to experimental's (currently) 6.14.6-1~exp1
+>> * downgrade iproute2 to 6.13.0-1 (using snapshot.d.o)
+>> * on bookworm downgrade (using snapshot.d.o)
+>>   iproute2 backport to 6.13.0-1~bpo12+1
+>>
+>> Details I could gather:
+>>
+>> This appears to come from this iproute2 6.14's commit:
+>>
+>> https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?h=v6.14.0&id=7240e0e40f8332dd9f11348700c0c96b8df4ca5b
+>>
+>> which appears to depend on new kernel 6.14 rtnetlink features as described
+>> in Kernelnewbies ( https://kernelnewbies.org/Linux_6.14#Networking ):
+>>
+>> Add ipv6 anycast join/leave notifications
+>>
+>> with this (kernel 6.14) commit:
+>>
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=33d97a07b3ae6fa713919de4e1864ca04fff8f80
+> 
+> Hi Stephen and David,
+> 
+> It looks like there's a regression in iproute2 6.14, and 'ip monitor'
+> no longer works with kernels < 6.14. Could you please have a look when
+> you have a moment? Thanks!
 
-Expand the get_ts_info ethtool handler with the new gve_get_ts_info
-which advertises support for rx hardware timestamping.
-
-With this patch, the driver now fully supports rx hardware timestamping.
-
-Signed-off-by: John Fraker <jfraker@google.com>
-Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
- drivers/net/ethernet/google/gve/gve_ethtool.c | 20 ++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index d0628e25a82d..043d1959fb9d 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -929,6 +929,24 @@ static int gve_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rx
- 	return 0;
- }
- 
-+static int gve_get_ts_info(struct net_device *netdev,
-+			   struct kernel_ethtool_ts_info *info)
-+{
-+	struct gve_priv *priv = netdev_priv(netdev);
-+
-+	ethtool_op_get_ts_info(netdev, info);
-+
-+	if (priv->nic_timestamp_supported) {
-+		info->so_timestamping |= SOF_TIMESTAMPING_RX_HARDWARE |
-+					 SOF_TIMESTAMPING_RAW_HARDWARE;
-+
-+		info->rx_filters |= BIT(HWTSTAMP_FILTER_NONE) |
-+				    BIT(HWTSTAMP_FILTER_ALL);
-+	}
-+
-+	return 0;
-+}
-+
- const struct ethtool_ops gve_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
- 	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
-@@ -957,5 +975,5 @@ const struct ethtool_ops gve_ethtool_ops = {
- 	.get_priv_flags = gve_get_priv_flags,
- 	.set_priv_flags = gve_set_priv_flags,
- 	.get_link_ksettings = gve_get_link_ksettings,
--	.get_ts_info = ethtool_op_get_ts_info,
-+	.get_ts_info = gve_get_ts_info,
- };
--- 
-2.49.0.1143.g0be31eac6b-goog
-
+were not a lot of changes, so most likely the multiaddress or anycast
+address changes from Yuyang Huang. Please take a look.
 
