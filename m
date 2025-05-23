@@ -1,215 +1,461 @@
-Return-Path: <netdev+bounces-193002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CABBAC21C3
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:07:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D03C1AC21C6
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:07:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BD416741B
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:07:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8200217E90E
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922C822AE41;
-	Fri, 23 May 2025 11:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C4922AE41;
+	Fri, 23 May 2025 11:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpSIwbb0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N8ijAVjh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590761C8631;
-	Fri, 23 May 2025 11:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BE022A4F0
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 11:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747998441; cv=none; b=DZEeVvKmEfl4plKe51kf/iBu1F/+Jwi47JB4GV3PtownUeKo3ZsIFxxdaG3edZjC4b9ctfAxPAKnO3KfwW/pT1ciwuzZ6NIpFK6XMwAAteESSXDwFdClHyKrR1Y0CVEy8YssumZVmk+Y8JXzsNP7u6JEECgC7nvxMvhHugupuxo=
+	t=1747998470; cv=none; b=ccFl1+klSVWJiiQZ3JSUlBIjX86JF0xCj5+NLtV3VBeOszGDxT2eRC3wToyz0EpecHghLE8RExW6KCOobDM/+ZQT1Oq9VgU0tKYMte87iyvJf1FjiEnMIP9vu9lJCzlXQobAH2N7A4fQ03A1nQ4fRgwlIdfnsXc2ZTglz+ukjkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747998441; c=relaxed/simple;
-	bh=ZtulG+GqmTItXJpWf8cI/7ZkLZKWayGN42QGW1nDVfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q01qroXWzYAe5BONzS5Cz+HeLATnjNl6yzqLb1vU/th2rv/6pNtxsIrO6ZMFKDVNDmyR4HXGroSF3Ow3N/dFoYLoJI88LAbX+ADCmumRU2yRDFiTnF8deFvcP+tUWcvRADzb4OBiKvF5jHtQ6h5b3O22Y/HkuBBlsg+EUxMEUt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpSIwbb0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE0EC4CEE9;
-	Fri, 23 May 2025 11:07:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747998440;
-	bh=ZtulG+GqmTItXJpWf8cI/7ZkLZKWayGN42QGW1nDVfA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qpSIwbb0KUSAPiEXVz6Eu1qPzh45BAEMErfL5Y8cbZjXSvlYLuPIzr/crAGWSKRqh
-	 kdmbU0wtTS+rbxvMhiEZlWuEOpIc22PYeg3JoD1dJl2wB7IpL4qrHHB1Dr1AbECQE+
-	 KNex+SPzy1+HsM3x37ljDri1pFVk4YU02odvPc5/h2n21fsRt0l9gMxubobFeytHJc
-	 i20O8vkEyJaRb559fVGWXDB/5vP1+qn4YCUUH4QtHQPQSBXaeb5w6VZexPGEnMFxK3
-	 34RML23GZbgJuJYEXEmehD5UUnwR9b+D2hXu/sY2j+1qum992Mnj20g44WSARuJB28
-	 e1ICZQGgx4TDw==
-Message-ID: <f9b1d13c-aa20-4680-849c-535ea7c476a6@kernel.org>
-Date: Fri, 23 May 2025 13:07:10 +0200
+	s=arc-20240116; t=1747998470; c=relaxed/simple;
+	bh=tiqxC3eZym9ExZwgJUcvLNkmS2z31m2Y/nzQP0S4o8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5MfTZHiL2DhzPZZa5lBKenTn0Swa4mX4E0p0FIV1T9QGnGuxsj/OcUoESrxDDlN/C2/5g4NEOUYtk8Qscbui9Orm6tr2colY2EJbOkdAgCA14IPNucgfKR3eKrxIodIWqn3PhMEiRkJnF4D9D+Dc5xd9dSHwUwa4fJooxmxKlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N8ijAVjh; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747998468; x=1779534468;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=tiqxC3eZym9ExZwgJUcvLNkmS2z31m2Y/nzQP0S4o8Q=;
+  b=N8ijAVjh8nT5u5DEfmrTv0k6wdlXvhJQTeUplDjNJ7326JPkIIJZxv5X
+   Er7TTzpE4ib97l9yG44X2OoTFENrXBN6B3xyocrGFsA8eMe9Z/AEFHqlR
+   6XFvZgPK36uElSaiT4RmtpCkCkCx8wgxaImtfHBefOS/3DFcDmnUU+4xj
+   FkaBZ9ba3Tw/S2IpRK3ODX15zcksMEDfv/TIhc6dOuCduuQ828oNosq6Q
+   VzPrITIibgfh5QzF79IRxulz8dVFJ6Yvdf08PYNpCOsfoH8Bxz6UABo1q
+   SJThIbAru0vtAm4rs4IrPP3dfAOyfBxjdxCoTK33i3e3teEs7seQRQJ/C
+   A==;
+X-CSE-ConnectionGUID: HsovjmS/QnK0k8bx7NJ3xw==
+X-CSE-MsgGUID: 6T1s9nLLTJ+Qlx9Q83uuUg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="72579134"
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="72579134"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 04:07:47 -0700
+X-CSE-ConnectionGUID: QGllusLeTEm/jhLR1hJ+Yw==
+X-CSE-MsgGUID: gFDBOn5QSJmLGv0Cuxj1vg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="141597498"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa010.fm.intel.com with ESMTP; 23 May 2025 04:07:44 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1001)
+	id ADD511F6; Fri, 23 May 2025 14:07:43 +0300 (EEST)
+Date: Fri, 23 May 2025 14:07:43 +0300
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Ricard Bejarano <ricard@bejarano.io>
+Cc: netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Message-ID: <20250523110743.GK88033@black.fi.intel.com>
+References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH bpf-next/net v3 4/5] selftests/bpf: Add mptcp_subflow
- bpf_iter subtest
-Content-Language: en-GB, fr-BE
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-0-9abd22c2a7fd@kernel.org>
- <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-4-9abd22c2a7fd@kernel.org>
- <98348a02-9f8b-4648-8abe-e6b802ae9a63@linux.dev>
- <1621611c-8cf1-4281-986f-cfd8cc0e70f0@kernel.org>
- <0364f8d2-9aa5-4dc0-b7f6-1c8572932814@linux.dev>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <0364f8d2-9aa5-4dc0-b7f6-1c8572932814@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
 
-Hi Martin,
+Hi,
 
-On 21/05/2025 00:18, Martin KaFai Lau wrote:
-> On 5/19/25 3:04 AM, Matthieu Baerts wrote:
->>>> +SEC("cgroup/getsockopt")
->>>> +int iters_subflow(struct bpf_sockopt *ctx)
->>>> +{
->>>> +    struct mptcp_subflow_context *subflow;
->>>> +    struct bpf_sock *sk = ctx->sk;
->>>> +    struct sock *ssk = NULL;
->>>> +    struct mptcp_sock *msk;
->>>> +    int local_ids = 0;
->>>> +
->>>> +    if (ctx->level != SOL_TCP || ctx->optname != TCP_IS_MPTCP)
->>>> +        return 1;
->>>> +
->>>> +    msk = bpf_core_cast(sk, struct mptcp_sock);
->>>> +    if (!msk || msk->pm.server_side || !msk->pm.subflows)
->>>> +        return 1;
->>>> +
->>>> +    bpf_for_each(mptcp_subflow, subflow, (struct sock *)sk) {
->>>> +        /* Here MPTCP-specific packet scheduler kfunc can be called:
->>>> +         * this test is not doing anything really useful, only to
->>>
->>> Lets fold the bpf_iter_mptcp_subflow addition into the future
->>> "mptcp_sched_ops" set (the github link that you mentioned in patch 2).
->>> Post them as one set to have a more practical example.
->>
->> Thank you for this suggestion. We can delay that if needed.
->>
->> Note that we have two struct_ops in preparation: mptcp_sched_ops and
->> mptcp_pm_ops. We don't know which one will be ready first. They are both
->> "blocked" by internal API modifications we would like to do to ease the
->> maintenance later before "exposing" such API's via BPF. That's why we
->> suggested to upstream this common part first as it is ready. But we can
->> of course wait if you prefer.
+On Thu, May 22, 2025 at 07:19:52PM +0200, Ricard Bejarano wrote:
+> Hi all,
 > 
-> This set is useful for discussing the questions you raised in patch 2.
+> Please excuse me if this is not the right place or way to report this, in which case I'd appreciate a pointer to the proper forum. I've CC'd every one who showed up in get_maintainer.pl.
 > 
-> I still don't see it useful to upstream patch 2 alone. The existing
-> selftests/bpf/progs/mptcp_subflow.c has already shown a way to do
-> similar iteration in SEC("cgroup/getsockopt") without patch 2.
+> I'm investigating a performance issue in the bridging of traffic coming in via a Thunderbolt 3/4 (thunderbolt-net driver) network interface. I don't think this is tracked from what I could find online.
+
+Probably nobody tried this before you ;-)
+
+> Summary:
+> When a thunderbolt-net interface is slave to a bridge, traffic in the "other slave interfaces -> bridge -> thunderbolt-net interface" direction approximates maximum line bandwidth (~9Gbps in Thunderbolt 3, ~16Gbps in Thunderbolt 4); but traffic in the opposite "thunderbolt -> bridge -> other" direction drops to ~5Mbps (in my testing). More details below.
+
+What is the performance without bridging?
+
+I have to admit, I don't know much about how bridging works in Linux
+networks stack so it is entirely possible that the thunderbolt-net driver
+misses some important thing.
+
+Anyways it would be good to concentrate on the link with poorest throughput
+and start looking at that setup. After the non-bridged throughput
+measumerement, can you send me full dmesg of both systems with
+"thunderbolt.dyndbg=+p" in the kernel command line, once you have connected
+them?
+
+> I need some pointers on how to proceed.
 > 
-> I would prefer to wait for a fuller picture on the main struct_ops use
-> case first to ensure that we didn't overlook things. iiuc, improving the
-> iteration in SEC("cgroup/getsockopt") is not the main objective.
-
-I understand, that makes sense. When the rest will be ready, we will
-upstream patches from this series, except this one ("useless" selftest),
-and restricting bpf_iter_mptcp_subflow_* and other new kfuncs to
-BPF_PROG_TYPE_STRUCT_OPS only. So not to BPF_PROG_TYPE_CGROUP_SOCKOPT
-any more which was only needed for this new test. I don't think this
-program type requires access to these new kfunc for useful use-cases.
-This can be changed later if required anyway.
-
->>>> +         * verify the iteration works.
->>>> +         */
->>>> +
->>>> +        local_ids += subflow->subflow_id;
->>>> +
->>>> +        /* only to check the following helper works */
->>>> +        ssk = mptcp_subflow_tcp_sock(subflow);
->>>> +    }
->>>> +
->>>> +    if (!ssk)
->>>> +        goto out;
->>>> +
->>>> +    /* assert: if not OK, something wrong on the kernel side */
->>>> +    if (ssk->sk_dport != ((struct sock *)msk)->sk_dport)
->>>> +        goto out;
->>>> +
->>>> +    /* only to check the following kfunc works */
->>>> +    subflow = bpf_mptcp_subflow_ctx(ssk);
->>>
->>> bpf_core_cast should be as good instead of adding a new
->>> bpf_mptcp_subflow_ctx() kfunc, so patch 1 should not be needed.
->>
->> OK, indeed, in this series we don't need it. We will need it later to
->> modify some fields from the "subflow" structure directly. We can do the
+> Thanks,
+> RB
 > 
-> The "ssk" here is not a trusted pointer. Note that in patch 1, the kfunc
-> bpf_mptcp_subflow_ctx() does not specify KF_TRUSTED_ARGS. I suspect it
-> should be KF_TRUSTED_ARGS based on what you described here.
-
-Good point, I think this flag is indeed missing.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+> -- 
+> 
+> ## 1. Setup
+> 
+> Three hosts:
+> - `red`:
+>   - Board: Intel NUC8i5BEH2
+>   - CPU: 1x 4-core x86-64 (Intel Core i5-8259U)
+>   - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+>   - Disk: 1x 120GB SATA SSD (Crucial BX500)
+>   - Relevant interfaces:
+>     - `br0` (`bridge` driver, `10.0.0.1/24` address)
+>     - `tb0` (`thunderbolt-net` driver): maps to the board's Thunderbolt port, slave of `br0`
+> - `blue`:
+>   - Board: Intel NUC8i5BEH2
+>   - CPU: 1x 4-core x86-64 (Intel Core i5-8259U)
+>   - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+>   - Disk: 1x 120GB SATA SSD (Crucial BX500)
+>   - Relevant interfaces:
+>     - `br0` (`bridge` driver, `10.0.0.2/24` address)
+>     - `tb0` (`thunderbolt-net` driver): maps to the board's Thunderbolt port, slave of `br0`
+>     - `eno1` (`e1000e` driver): maps to the board's Ethernet port, slave of `br0`
+> - `purple`:
+>   - Board: Intel NUC8i5BEHS
+>   - CPU: 1x 4-core x86-64 (Intel Core i5-8260U)
+>   - RAM: 2x 8GB DDR4-2666 SODIMM CL19 (Crucial)
+>   - Disk: 1x 240GB M.2 SATA SSD (WD Green)
+>   - Relevant interfaces:
+>     - `br0` (`bridge` driver, `10.0.0.3/24` address)
+>     - `eno1` (`e1000e` driver): maps to the board's Ethernet port, slave of `br0`
+> 
+> Connected with two cables:
+> - Amazon Basics Thunderbolt 3 & 4 cable, connecting `red` (`tb0`) to `blue` (`tb0`).
+> - Monoprice SlimRun Cat6A Ethernet cable, connecting `blue` (`eno1`) to `purple` (`eno1`).
+> 
+> All three running Linux 6.14.7 (built from source) on Ubuntu Server 24.04.2 LTS, running iperf 2.1.9 servers.
+> See "4. References" section for details.
+> 
+> ## 2. The problem
+> 
+> As seen in [4.6.3b], traffic going in the `purple:br0 -> purple:eno1 -> blue:eno1 -> blue:br0 -> blue:tb0 -> red:tb0 -> red:br0` direction approaches line speed (~1Gbps).
+> However, per [4.6.3a], traffic going in the opposite `red:br0 -> red:tb0 -> blue:tb0 -> blue:br0 -> blue:eno1 -> purple:eno1 -> purple:br0` direction is several orders of magnitude slower (~5Mbps).
+> 
+> This is abnormal, given [4.6.1] sets the bidirectional Thunderbolt line speed at ~9Gbps and [4.6.2] sets the bidirectional Ethernet line speed at ~1Gbps.
+> 
+> Per the above, we can safely assume that the problem is localized at `blue`, specifically in how `blue` bridges traffic out of `tb0` and into `eno1`.
+> 
+> From prior undocumented anecdata, we know this also happens in Thunderbolt-to-Thunderbolt bridged traffic, which hints at a problem in how traffic goes out of `tb0` and into `br0`, not with how traffic goes out of `br0` and into `eno1`.
+> This is further consolidated by the fact that Ethernet-to-Ethernet bridging is known to approach line speed in both directions (or otherwise the Internet would be way slower, I suppose).
+> 
+> And finally, hosts are only assuming an IP address at their respective `br0` interfaces, and [4.6.1] shows line speed performance in the `red:br0 -> red:tb0 -> blue:tb0 -> blue:br0` direction (and reverse).
+> Meaning, we can reduce the scope further to how traffic goes out of `tb0` and into some other slave of `br0`, but not `br0` itself.
+> 
+> ## 3. The solution
+> 
+>     ¯\_(;.;)_/¯
+> 
+> ## 4. References
+> 
+> ### 4.1. `uname -a`
+> #### 4.1.1. `red`
+> ```shell
+> # red
+> $ uname -a
+> Linux red 6.14.7 #1 SMP PREEMPT_DYNAMIC Mon May 19 13:38:28 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+> ```
+> #### 4.1.2. `blue`
+> ```shell
+> # blue
+> $ uname -a
+> Linux blue 6.14.7 #1 SMP PREEMPT_DYNAMIC Mon May 19 15:01:20 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+> ```
+> #### 4.1.3. `purple`
+> ```shell
+> # purple
+> $ uname -a
+> Linux purple 6.14.7 #1 SMP PREEMPT_DYNAMIC Tue May 20 09:04:42 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+> ```
+> 
+> ### 4.2. `ip a`
+> #### 4.2.1. `red`
+> ```shell
+> # red
+> $ ip a
+> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+>     inet 127.0.0.1/8 scope host lo
+>        valid_lft forever preferred_lft forever
+>     inet6 ::1/128 scope host noprefixroute
+>        valid_lft forever preferred_lft forever
+> 2: eno1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+>     link/ether 94:c6:91:a3:f5:1a brd ff:ff:ff:ff:ff:ff
+>     altname enp0s31f6
+> 3: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 04:d3:b0:0f:e6:cd brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.10.201/23 metric 600 brd 192.168.11.255 scope global dynamic wlp0s20f3
+>        valid_lft 163sec preferred_lft 163sec
+>     inet6 fd9f:7271:415f:d845:6d3:b0ff:fe0f:e6cd/64 scope global dynamic mngtmpaddr noprefixroute
+>        valid_lft 1724sec preferred_lft 1724sec
+>     inet6 fe80::6d3:b0ff:fe0f:e6cd/64 scope link
+>        valid_lft forever preferred_lft forever
+> 6: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether ce:42:52:00:a0:5b brd ff:ff:ff:ff:ff:ff
+>     inet 10.0.0.1/24 brd 10.0.0.255 scope global br0
+>        valid_lft forever preferred_lft forever
+> 7: tb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br0 state UP group default qlen 1000
+>     link/ether 02:5f:d6:57:71:93 brd ff:ff:ff:ff:ff:ff
+> ```
+> #### 4.2.2. `blue`
+> ```shell
+> # blue
+> $ ip a
+> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+>     inet 127.0.0.1/8 scope host lo
+>        valid_lft forever preferred_lft forever
+>     inet6 ::1/128 scope host noprefixroute
+>        valid_lft forever preferred_lft forever
+> 2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br0 state UP group default qlen 1000
+>     link/ether 1c:69:7a:00:22:99 brd ff:ff:ff:ff:ff:ff
+>     altname enp0s31f6
+> 5: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether d0:c6:37:09:01:5a brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.10.200/23 metric 600 brd 192.168.11.255 scope global dynamic wlp0s20f3
+>        valid_lft 247sec preferred_lft 247sec
+>     inet6 fd9f:7271:415f:d845:d2c6:37ff:fe09:15a/64 scope global dynamic mngtmpaddr noprefixroute
+>        valid_lft 1651sec preferred_lft 1651sec
+>     inet6 fe80::d2c6:37ff:fe09:15a/64 scope link
+>        valid_lft forever preferred_lft forever
+> 6: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 3a:4d:83:e0:ab:3b brd ff:ff:ff:ff:ff:ff
+>     inet 10.0.0.2/24 brd 10.0.0.255 scope global br0
+>        valid_lft forever preferred_lft forever
+> 7: tb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br0 state UP group default qlen 1000
+>     link/ether 02:70:19:dc:92:96 brd ff:ff:ff:ff:ff:ff
+> ```
+> #### 4.2.3. `purple`
+> ```shell
+> # purple
+> $ ip a
+> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+>     inet 127.0.0.1/8 scope host lo
+>        valid_lft forever preferred_lft forever
+>     inet6 ::1/128 scope host noprefixroute
+>        valid_lft forever preferred_lft forever
+> 2: eno1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master br0 state UP group default qlen 1000
+>     link/ether 1c:69:7a:60:d8:69 brd ff:ff:ff:ff:ff:ff
+>     altname enp0s31f6
+> 3: wlp0s20f3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 94:e6:f7:7c:2d:fb brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.10.199/23 metric 600 brd 192.168.11.255 scope global dynamic wlp0s20f3
+>        valid_lft 165sec preferred_lft 165sec
+>     inet6 fd9f:7271:415f:d845:96e6:f7ff:fe7c:2dfb/64 scope global dynamic mngtmpaddr noprefixroute
+>        valid_lft 1640sec preferred_lft 1640sec
+>     inet6 fe80::96e6:f7ff:fe7c:2dfb/64 scope link
+>        valid_lft forever preferred_lft forever
+> 4: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 1a:45:1d:c0:46:02 brd ff:ff:ff:ff:ff:ff
+>     inet 10.0.0.3/24 brd 10.0.0.255 scope global br0
+>        valid_lft forever preferred_lft forever
+> ```
+> 
+> ### 4.3. `ethtool -i br0`
+> #### 4.3.1. `red`
+> ```shell
+> # red
+> $ ethtool -i br0
+> driver: bridge
+> version: 2.3
+> firmware-version: N/A
+> expansion-rom-version:
+> bus-info: N/A
+> supports-statistics: no
+> supports-test: no
+> supports-eeprom-access: no
+> supports-register-dump: no
+> supports-priv-flags: no
+> ```
+> #### 4.3.2. `blue`
+> ```shell
+> # blue
+> $ ethtool -i br0
+> driver: bridge
+> version: 2.3
+> firmware-version: N/A
+> expansion-rom-version:
+> bus-info: N/A
+> supports-statistics: no
+> supports-test: no
+> supports-eeprom-access: no
+> supports-register-dump: no
+> supports-priv-flags: no
+> ```
+> #### 4.3.3. `purple`
+> ```shell
+> # purple
+> $ ethtool -i br0
+> driver: bridge
+> version: 2.3
+> firmware-version: N/A
+> expansion-rom-version:
+> bus-info: N/A
+> supports-statistics: no
+> supports-test: no
+> supports-eeprom-access: no
+> supports-register-dump: no
+> supports-priv-flags: no
+> ```
+> 
+> ### 4.4. `ethtool -i tb0`
+> #### 4.4.1. `red`
+> ```shell
+> # red
+> $ ethtool -i tb0
+> driver: thunderbolt-net
+> version: 6.14.7
+> firmware-version:
+> expansion-rom-version:
+> bus-info: 0-1.0
+> supports-statistics: no
+> supports-test: no
+> supports-eeprom-access: no
+> supports-register-dump: no
+> supports-priv-flags: no
+> ```
+> #### 4.4.2. `blue`
+> ```shell
+> # blue
+> $ ethtool -i tb0
+> driver: thunderbolt-net
+> version: 6.14.7
+> firmware-version:
+> expansion-rom-version:
+> bus-info: 0-1.0
+> supports-statistics: no
+> supports-test: no
+> supports-eeprom-access: no
+> supports-register-dump: no
+> supports-priv-flags: no
+> ```
+> 
+> ### 4.5. `ethtool -i eno1`
+> #### 4.4.1. `blue`
+> ```shell
+> # blue
+> $ ethtool -i eno1
+> driver: e1000e
+> version: 6.14.7
+> firmware-version: 0.4-4
+> expansion-rom-version:
+> bus-info: 0000:00:1f.6
+> supports-statistics: yes
+> supports-test: yes
+> supports-eeprom-access: yes
+> supports-register-dump: yes
+> supports-priv-flags: yes
+> ```
+> #### 4.4.2. `purple`
+> ```shell
+> # purple
+> $ ethtool -i eno1
+> driver: e1000e
+> version: 6.14.7
+> firmware-version: 0.4-4
+> expansion-rom-version:
+> bus-info: 0000:00:1f.6
+> supports-statistics: yes
+> supports-test: yes
+> supports-eeprom-access: yes
+> supports-register-dump: yes
+> supports-priv-flags: yes
+> ```
+> 
+> ### 4.6. `iperf` tests
+> #### 4.6.1a. `red` to `blue`
+> ```shell
+> # red
+> $ iperf -c 10.0.0.2
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.2, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.1 port 38902 connected with 10.0.0.2 port 5001 (icwnd/mss/irtt=14/1448/538)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.0076 sec  11.0 GBytes  9.40 Gbits/sec
+> ```
+> #### 4.6.1b. `blue` to `red`
+> ```shell
+> # blue
+> $ iperf -c 10.0.0.1
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.1, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.2 port 49660 connected with 10.0.0.1 port 5001 (icwnd/mss/irtt=14/1448/464)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.0079 sec  10.8 GBytes  9.26 Gbits/sec
+> ```
+> #### 4.6.2a. `purple` to `blue`
+> ```shell
+> # purple
+> $ iperf -c 10.0.0.2
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.2, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.3 port 56150 connected with 10.0.0.2 port 5001 (icwnd/mss/irtt=14/1448/580)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.0358 sec  1.09 GBytes   933 Mbits/sec
+> ```
+> #### 4.6.2b. `blue` to `purple`
+> ```shell
+> # blue
+> $ iperf -c 10.0.0.3
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.3, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.2 port 37106 connected with 10.0.0.3 port 5001 (icwnd/mss/irtt=14/1448/958)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.0239 sec  1.09 GBytes   934 Mbits/sec
+> ```
+> #### 4.6.3a. `red` to `purple`
+> ```shell
+> # red
+> $ iperf -c 10.0.0.3
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.3, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.1 port 38260 connected with 10.0.0.3 port 5001 (icwnd/mss/irtt=14/1448/1578)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.2234 sec  5.88 MBytes  4.82 Mbits/sec
+> ```
+> #### 4.6.3b. `purple` to `red`
+> ```shell
+> # purple
+> $ iperf -c 10.0.0.1
+> ------------------------------------------------------------
+> Client connecting to 10.0.0.1, TCP port 5001
+> TCP window size: 16.0 KByte (default)
+> ------------------------------------------------------------
+> [  1] local 10.0.0.3 port 48392 connected with 10.0.0.1 port 5001 (icwnd/mss/irtt=14/1448/1243)
+> [ ID] Interval       Transfer     Bandwidth
+> [  1] 0.0000-10.0233 sec  1.09 GBytes   932 Mbits/sec
+> ```
 
