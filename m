@@ -1,87 +1,79 @@
-Return-Path: <netdev+bounces-193147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA10AC2A80
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:39:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D007AC2A7E
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4371B1B679A7
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:39:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C8EE3AB1A5
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2457129DB8D;
-	Fri, 23 May 2025 19:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E832BCF4A;
+	Fri, 23 May 2025 19:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZtyZr2yr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fiIWQR1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9D31B4241
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB63029DB92
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748029157; cv=none; b=mBOw8ayNBQSPJlQdfeDkl1+Hvawp0hMjWVVeTi5CP8RNZTfsBf+5ug3jChyHRFWjevQBxTUwH17N0xxaFNIHC/fzew4FZMBiHyOeneXL5ZkGSZTTABCIwaC/6ZqnzIDTsRhNZ7CEpL93FQ9PSd0ZqHhHi6F0/+RAUtevyrdFDi0=
+	t=1748029150; cv=none; b=ZjfcqM6SLtrX3UCiZKzl2ET7h9Ccx+nOm5rcCu1L9z9SA7MndkuftTxGRTYlYtMhGQ31LNfKXGMZDJyGK44JFM5fG9sRFElbdd/cEX7HsrEy4IHOMI6PW2IErDUOOuNdlws9KVl0J/sOP98x0TJ0fW2R0b9QOnyr5cQZ8v1/QHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748029157; c=relaxed/simple;
-	bh=UwjCwu+hoD5QvbENA5EagwHCA8S9dgr+/m5BQ31GkaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RGC7KFSWEps+3/dEp3mxRrf+ldoHUhHcW9yDIsT9TEME0mh0fwiFKk9vFsh7vRz4xzyhG16XY6LF7VGUcvyNql20x6EWXq6hXSLPKstbxTj59pTvEJgV0bo7IzxUJEx64PuoE7OediAI/uy4D8GcHv9CacL1SAbVNVJHE0ljwJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZtyZr2yr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54NBKmH6020598
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:39:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Z9XB99CT/fAlMSiqksbkH8KqSrgQ0U0y6auihnvVBOU=; b=ZtyZr2yr5RVArOcm
-	8nBdyIX9wsKyw2R0Injxps3ytEooWWxhiMs9+O96j1MSkwXYFYzmkxuitdDjbfYq
-	vYu3FCMcwUipDcbyT8CSYuPHJIHyJLg13YeNNMxQQamR24N1DYo9yeXMgdVJ3Qbb
-	d2UejA9PSFktGRqVc5lf/3xNQxa9x/LwRd6xp8Rl21G6U4SXXNHyYJ0g38eI0VZN
-	6W8nSnQI14TnIubBbB0Zs2eSNyyc/WhvGyAXRduAG8iJoy8t9cEp5Cx+CfE3QYe6
-	DXT562RkCHduDgdsVBFPFZgkaZbpAUIwGj+Qk9JPXHftYKENlLd65Y1f8DU109SU
-	uvKusw==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46s9pb9e5k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:39:14 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4767b8e990fso139631cf.0
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 12:39:14 -0700 (PDT)
+	s=arc-20240116; t=1748029150; c=relaxed/simple;
+	bh=gWz5jt3ZMg0gMVWNLiJwBgZED8XDrwtNUZxKscPKDWo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=SCMTm0rZx/MHCevd5kFweSFF8H5HBJ5y1VsLY1fP1/1ta4QBGa1zvjXYMATZ42fQomcs1odE5Fld2QggFC+gf0lE3RYTKcCUBd96HEcSJvooMsk5hwh9AnuokV2rUISVVar32rmF09xoK6W46ZmQ8qGML48nZ4J9lb/esPwePug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fiIWQR1O; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-442ea341570so1008845e9.1
+        for <netdev@vger.kernel.org>; Fri, 23 May 2025 12:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748029147; x=1748633947; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vjk36lSrR/BZsXAJXIuyctl0mrPRQFWWW71s5CXfOJY=;
+        b=fiIWQR1OULSArLkWqx0C0Nx7pBnA3wEnOl4VPOqd1fJro3b49d5pd9YxlF+YqHrMC9
+         JzJSTUbkpY+/OcLByRXep/eK64OqPyr94AeeiPsDkiT/A2RjgVsY8Zr5+uowYYw48vFf
+         byH7pICyiIQdiC4tnalwQSSyMOob+C1rdt5EqVchhc8lU07gqwtQU0vScvl3HmgT87IB
+         4eqL3Q7JTitpL6vgmLc9C5wv2sXRbHMRy1EDHymkTkAVFobnAMrfSvCrw+js2QYF+vAU
+         H6r4miuATKyCdNX3vWPKO2iiKLnTD246jyZoJVlKR7/IkPh4WbqJ+ZTAyKEQdPPFt0QY
+         3dow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748029153; x=1748633953;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1748029147; x=1748633947;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z9XB99CT/fAlMSiqksbkH8KqSrgQ0U0y6auihnvVBOU=;
-        b=et3pyS6JI2vPcxY3akY33Ir0op56lWUqVIicaCqhNLWNrCLDFt86YTvVgDUnIjJgTa
-         IeoqYoJvZHWg3rKJlIjv5Abu0/WUYaD8FuaziczOcmWtba1ZkAFIi9oQsNpStZAVOaHh
-         +dwgrljJnXnP7kek+wwbYC8dAkXYB/cW7+p7g+fLxvcPPRmL3Yp9z85amc2Odb3/lxtH
-         /nUqNhkasxICzbkjc5CjhwvtpogI6ElrF5NmA6NGjbfM9EG1Penxs/sM7oYfkj0lAZrN
-         H1FXw9Rq3sRv256AmmOj11jhCGsEoUiuZgEAjhppGApA5dubZbFBKc7AzT/+Z1pmJ4XG
-         Us8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUKu4Nc75/alJlTBKcflqUFdKGJ0S/KqQ2/HiIrGtSt3mZKxsUT7su7Pyel5acU1dAWw18SLC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcWuRRhiEDP0PI1nON92bU5nz6yvbxRhmEszRZpXOi/WiW51Rf
-	oYesW+jEhBq4LObnt32HC9BGvcXT0JlfnT8KzpKxadzu2wRP2L3RxVgMEIGLuZHSQ3uET2+I+XW
-	KZVhV/ciTqHYZaZyUjJGCM2qEAKV5cDBi/tRMw4suVyuQsJnwxUWULQLd5hw=
-X-Gm-Gg: ASbGncu80fmwAqd5LXOTD+0pim4432OGAom0O+w+hIjs1nyeMGc9WlTljJlC6xK3c1I
-	lizUu7YWRH2RkSXI2HIRIU2h18y9Itjk6GJqocO18XTuW42XTWmri33tTjCaObF8yapMp3QRfg6
-	OWhpV76HglMc6hyJkvfl6Hc+F1LDiAx4UWyFrObA9ZRdVy9CfaO61Z+D6xLYdeT24kq6kNSzI0j
-	luG89mG1jWN9EEierA5fYDZaZ2N9leRGrNab3dbUHHWH2OHCFA7GCmfCDKv0yURvf/KBMfJK2HK
-	bnzRZfYCbMGMhSaUcW/1ukT8R11apw5p7Eqcmq5CHWxdcw4BcRreW0ydi0Kl9DbPHg==
-X-Received: by 2002:a05:622a:408:b0:472:58b:463f with SMTP id d75a77b69052e-49f4625a717mr2813961cf.3.1748029153108;
-        Fri, 23 May 2025 12:39:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnPTlDiHsFRsc/53DfqBHHewY94m5nSrjK/NZWsZOAvwCTZUQy5z9CnHlIfIbegggC4dKHNQ==
-X-Received: by 2002:a05:622a:408:b0:472:58b:463f with SMTP id d75a77b69052e-49f4625a717mr2813871cf.3.1748029152757;
-        Fri, 23 May 2025 12:39:12 -0700 (PDT)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d438c3csm1266798466b.88.2025.05.23.12.39.11
+        bh=vjk36lSrR/BZsXAJXIuyctl0mrPRQFWWW71s5CXfOJY=;
+        b=Bs2m5iwO3M3un735KMtQLupmTym8ho95H2bI7makU2f1jKGKgehkmyCweI3CIOUe4L
+         Bn6glBMbriLXfMeTbTssYQHpB9iyp3B/P/r9IKs6R05rxrf9mnhZl1oSGC/b+5HU8ENI
+         jPDbfJk4Hlodgf0zK8OJ06RtMLAqieBO9HmEVHSUZaMZhiY92rKnU4B3DsPFUBqjCtP8
+         DlyJVOQtfn8HlkBPF91EvhtjIRTonKzxJVXC7JlAkPQhpd6t/iq93DZOrrYXWoy06C2l
+         baPNrPVw8dUwEgn3E04SKkbxw+NMr9poDJ0XteC4F/AtlvWQaijn86kEXPefg+sWkszN
+         VsIA==
+X-Gm-Message-State: AOJu0Yy8oi8UZYunUJK/ETHHnRPCs/22TyA39Yelyqvz7r69tuNvfjkI
+	sCkXGNG70tSTKFp9y7Osa6nGzVSjFWJgtJM9ImqeV8sSgkggaukPJYBs
+X-Gm-Gg: ASbGncuLPSgN6iEIM2yvwrNRTLrNMEbPkTPXa2s4oKI5racU8VnLVL9mIdaJ2uVsSh9
+	ch7WQJycQZpRdVeq7D09oSOH41cm+z6I20FG1YSQzhGvIOe1rXXwbISErBuVeDmQ35gmnCbxCn0
+	EFHCdN0r+IhaSd5yFUptBgDbE1l4OVCASpWwXo7plBs36Tg/7UraaBpbriryRCJwT8PeG5B4Ccq
+	Idp1psqe7LsV/8Td5Q5zZq8fxcYNj+i7eJaPRgXbstpHRBRjHMCstprxEFb5LREclYU4QkDLUFh
+	ts8m0yzNZ3OdqXxS75WAl4bYxn9KZXyVmuoSo3UJmgZ7jzrtFIMUZWRZ8gnu54JKb5uzXfkRzK6
+	BCGD6NloYxMkMP605nHxaKEsE6rPyWDwO1pmmO9OVZ85cOCg8jIla1Ox6WZVD+qHK/mdooNxzIi
+	EH5yDfNf52QWt/3yYLpxZmEhA=
+X-Google-Smtp-Source: AGHT+IHtDyDzo3kbk2e7lNAe7xvwqAiaaK9u0YiNKfzQvti0WCGVCknri0uRnurRtDzBvOby+VcSBQ==
+X-Received: by 2002:a05:6000:2083:b0:399:71d4:a2 with SMTP id ffacd0b85a97d-3a4cb431fc3mr472091f8f.14.1748029146609;
+        Fri, 23 May 2025 12:39:06 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f47:3100:348b:fd2d:79a:9019? (p200300ea8f473100348bfd2d079a9019.dip0.t-ipconnect.de. [2003:ea:8f47:3100:348b:fd2d:79a:9019])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a35e49262fsm26797485f8f.44.2025.05.23.12.39.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 May 2025 12:39:12 -0700 (PDT)
-Message-ID: <76267be1-1ace-437f-9394-ee56d4e8ffb2@oss.qualcomm.com>
-Date: Fri, 23 May 2025 21:39:10 +0200
+        Fri, 23 May 2025 12:39:06 -0700 (PDT)
+Message-ID: <87b2628b-c87b-4fef-9a29-41a4331d38f8@gmail.com>
+Date: Fri, 23 May 2025 21:39:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,120 +81,131 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: qcm2290: Add IPA nodes
-To: Wojciech Slenska <wojciech.slenska@gmail.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S . Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20241220073540.37631-1-wojciech.slenska@gmail.com>
- <20241220073540.37631-3-wojciech.slenska@gmail.com>
 Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20241220073540.37631-3-wojciech.slenska@gmail.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: assign default match function for non-PHY
+ MDIO devices
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=WJl/XmsR c=1 sm=1 tr=0 ts=6830cee2 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=pGLkceISAAAA:8 a=wQ2JREbYfKbkpeN3qpUA:9
- a=fFxRHlyTGdwQsMLX:21 a=QEXdDO2ut3YA:10 a=uxP6HrT_eTzRwkO_Te1X:22
-X-Proofpoint-ORIG-GUID: KpG0roFJMjBZGxVdYee7bBqCRSG3oG-d
-X-Proofpoint-GUID: KpG0roFJMjBZGxVdYee7bBqCRSG3oG-d
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDE4MCBTYWx0ZWRfX6qzoIEn9fHRS
- SMeY4ktPaunT0viqv/Zm5GqjSp6LYrrF2R5kceuvaKqENf6dXrrnw8/35q5IR/7HhBe66H3jqNS
- ovTw7wanazx+w60LFLoXrFCzvx1ESGCJ7FPrVCtzb/nCt89Or0DEtAJKh1M/5YuhzeDRiE19XzK
- 2xTQJnrVkg72UAKskvP09XgJGI1/OXsbhTOjBRPIwqPqJcqbnAzX5mk0MX/SBk/Q2I9DDHmWcXC
- Y//F7GrhrLM1v8Vlpawyr/9J+Kp0BBFx3uskVUUoTZafGqwR6Gak1wci4LtFcDUMK8UFwbCyvNb
- 20+/x0i6XlSy9mDdax5Tgc2SniVfTtXMnslYi+SAI50gRDKjMqaMLJBSjxb8x95ekDO7xezMPyp
- PuDak/jWj5+6LeTpl80LcGRde9xYyKtmdQbMkEBsyrBFMJYunXMaQXl6wz98YGt8/ep+zG0Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-23_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 bulkscore=0
- malwarescore=0 impostorscore=0 mlxscore=0 adultscore=0 phishscore=0
- mlxlogscore=999 priorityscore=1501 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505230180
 
-On 12/20/24 8:35 AM, Wojciech Slenska wrote:
-> Added IPA nodes and definitions.
-> 
-> Signed-off-by: Wojciech Slenska <wojciech.slenska@gmail.com>
-> ---
->  arch/arm64/boot/dts/qcom/qcm2290.dtsi | 52 +++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/qcm2290.dtsi b/arch/arm64/boot/dts/qcom/qcm2290.dtsi
-> index 79bc42ffb6a1..0d39fd73888a 100644
-> --- a/arch/arm64/boot/dts/qcom/qcm2290.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/qcm2290.dtsi
-> @@ -428,6 +428,17 @@ wlan_smp2p_in: wlan-wpss-to-ap {
->  			interrupt-controller;
->  			#interrupt-cells = <2>;
->  		};
-> +
-> +		ipa_smp2p_out: ipa-ap-to-modem {
-> +			qcom,entry-name = "ipa";
-> +			#qcom,smem-state-cells = <1>;
-> +		};
-> +
-> +		ipa_smp2p_in: ipa-modem-to-ap {
-> +			qcom,entry-name = "ipa";
-> +			interrupt-controller;
-> +			#interrupt-cells = <2>;
-> +		};
->  	};
->  
->  	soc: soc@0 {
-> @@ -1431,6 +1442,47 @@ usb_dwc3_ss: endpoint {
->  			};
->  		};
->  
-> +		ipa: ipa@5840000 {
-> +			compatible = "qcom,qcm2290-ipa", "qcom,sc7180-ipa";
-> +
-> +			iommus = <&apps_smmu 0x140 0x0>;
-> +			reg = <0x0 0x5840000 0x0 0x7000>,
-> +			      <0x0 0x5847000 0x0 0x2000>,
-> +			      <0x0 0x5804000 0x0 0x2c000>;
+Make mdio_device_bus_match() the default match function for non-PHY
+MDIO devices. Benefit is that we don't have to export this function
+any longer. As long as mdiodev->modalias isn't set, there's no change
+in behavior. mdiobus_create_device() is the only place where
+mdiodev->modalias gets set, but this function sets
+mdio_device_bus_match() as match function anyway.
 
-Please pad the address parts to 8 hex digits with leading zeroes
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/mdio_bus_provider.c | 1 -
+ drivers/net/phy/mdio_device.c       | 5 +++--
+ include/linux/mdio.h                | 1 -
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-> +			reg-names = "ipa-reg",
-> +				    "ipa-shared",
-> +				    "gsi";
-> +
-> +			interrupts-extended = <&intc GIC_SPI 257 IRQ_TYPE_EDGE_RISING>,
-> +					      <&intc GIC_SPI 259 IRQ_TYPE_LEVEL_HIGH>,
-> +					      <&ipa_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
-> +					      <&ipa_smp2p_in 1 IRQ_TYPE_EDGE_RISING>;
-> +			interrupt-names = "ipa",
-> +					  "gsi",
-> +					  "ipa-clock-query",
-> +					  "ipa-setup-ready";
-> +
-> +			clocks = <&rpmcc RPM_SMD_IPA_CLK>;
-> +			clock-names = "core";
-> +
-> +			interconnects = <&system_noc MASTER_IPA RPM_ALWAYS_TAG
-> +					 &bimc SLAVE_EBI1 RPM_ALWAYS_TAG>,
-> +					<&system_noc MASTER_IPA RPM_ALWAYS_TAG
-> +					 &system_noc SLAVE_IMEM RPM_ALWAYS_TAG>,
-> +					<&bimc MASTER_APPSS_PROC RPM_ALWAYS_TAG
-> +					 &config_noc SLAVE_IPA_CFG RPM_ALWAYS_TAG>;
+diff --git a/drivers/net/phy/mdio_bus_provider.c b/drivers/net/phy/mdio_bus_provider.c
+index 65850e362..48dc4bf85 100644
+--- a/drivers/net/phy/mdio_bus_provider.c
++++ b/drivers/net/phy/mdio_bus_provider.c
+@@ -152,7 +152,6 @@ static int mdiobus_create_device(struct mii_bus *bus,
+ 
+ 	strscpy(mdiodev->modalias, bi->modalias,
+ 		sizeof(mdiodev->modalias));
+-	mdiodev->bus_match = mdio_device_bus_match;
+ 	mdiodev->dev.platform_data = (void *)bi->platform_data;
+ 
+ 	ret = mdio_device_register(mdiodev);
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index cce3f405d..f64176e0e 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -35,7 +35,8 @@ static void mdio_device_release(struct device *dev)
+ 	kfree(to_mdio_device(dev));
+ }
+ 
+-int mdio_device_bus_match(struct device *dev, const struct device_driver *drv)
++static int mdio_device_bus_match(struct device *dev,
++				 const struct device_driver *drv)
+ {
+ 	struct mdio_device *mdiodev = to_mdio_device(dev);
+ 	const struct mdio_driver *mdiodrv = to_mdio_driver(drv);
+@@ -45,7 +46,6 @@ int mdio_device_bus_match(struct device *dev, const struct device_driver *drv)
+ 
+ 	return strcmp(mdiodev->modalias, drv->name) == 0;
+ }
+-EXPORT_SYMBOL_GPL(mdio_device_bus_match);
+ 
+ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ {
+@@ -59,6 +59,7 @@ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ 	mdiodev->dev.release = mdio_device_release;
+ 	mdiodev->dev.parent = &bus->dev;
+ 	mdiodev->dev.bus = &mdio_bus_type;
++	mdiodev->bus_match = mdio_device_bus_match;
+ 	mdiodev->device_free = mdio_device_free;
+ 	mdiodev->device_remove = mdio_device_remove;
+ 	mdiodev->bus = bus;
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index 3c3deac57..317381c2d 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -98,7 +98,6 @@ void mdio_device_remove(struct mdio_device *mdiodev);
+ void mdio_device_reset(struct mdio_device *mdiodev, int value);
+ int mdio_driver_register(struct mdio_driver *drv);
+ void mdio_driver_unregister(struct mdio_driver *drv);
+-int mdio_device_bus_match(struct device *dev, const struct device_driver *drv);
+ 
+ static inline void mdio_device_get(struct mdio_device *mdiodev)
+ {
+-- 
+2.49.0
 
-this last path should be RPM_ACTIVE_TAG - that makes paths involving the
-CPU automatically collapse (as per the power management uC's decision)
-whenever it's possible
-
-
-Konrad
 
