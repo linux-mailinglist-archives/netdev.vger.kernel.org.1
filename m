@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-193142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69E59AC2A66
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:23:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D3AAC2A67
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 21:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AD755415CA
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:23:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 725A41B65AE3
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46981B4241;
-	Fri, 23 May 2025 19:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8C0225404;
+	Fri, 23 May 2025 19:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hu8+ACfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQlpxyoV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A088319D8B7
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76848204C36
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 19:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748028232; cv=none; b=p2iBlydaj2kgXNFR+5POIxu1ePD1DY/mP7VM8UXSrz9Srn222mJslxCpaKrdZKnoENybFL6JkFAuLSLfTcOj5+v8YPAQPpZrdL1QxnSZz8XXNnfMliI1318NpqAYkq5Jpl2neHvT24DIxVKStCzoPRQnoaDEtvUjzAgxlbDNVV4=
+	t=1748028235; cv=none; b=Iasb1K55lqkX73ftGGayw3FYx8KRuBMGfhLyZoKYLPDGFL6PUx6lOylk7fe75przEpc8MxlHczG5J2GP0Rrr876kW9AdkmXVJvhB8FyTDs+aCi4GggQxHr+HPk3uCjzp7BQ4Gbd/8wBOyMgqhM/Q5MjS50qRoBM4vJ6cscj4/Rk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748028232; c=relaxed/simple;
-	bh=bdiHYolmlYqocA9ieRjL4GeZn3an8qacr7vPZxo9G7g=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ffAm7CO4J/bPWjko2uFDbB0w8LHugYIibzhLsSVakjo2OqpWLOj0OxalFtYhzzON87Q/S1093saUbzU+juphAyRvB+toYq5tNTzmKLt4M2PuhuCifR82xeKTnsLEhZykSOXFO7jTvXERFpZhIUW3M1BprrhvVu+PTa/lgbvtwuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hu8+ACfT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1788C4CEE9;
-	Fri, 23 May 2025 19:23:51 +0000 (UTC)
+	s=arc-20240116; t=1748028235; c=relaxed/simple;
+	bh=JwKn1O3kNUXJMQphDvf1a17ESEWoK4upyuPLEp6UUG0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ueFtAeIIFX5bO+JSpTQl99tioc5UHMtbLASVo0nZPMI6Z8bniwOBWSc51ajXAqWQGmPepHtFYo1Vp9r5whaHJ+pz6Lak3X0JBH9s24Lr8EHU7YzYgZQIhDBSV2T/ouqCz8z6bMYG8C2lpd/vuAunQFyP5sESdlyf4dKSzgN3thQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQlpxyoV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97FB3C4CEE9;
+	Fri, 23 May 2025 19:23:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748028232;
-	bh=bdiHYolmlYqocA9ieRjL4GeZn3an8qacr7vPZxo9G7g=;
-	h=From:Subject:Date:To:Cc:From;
-	b=hu8+ACfTLtm8AVoFaZBwSIcFzZN89A43iMqJM/hk4x9WJ++btChu+YgZtBX7ie5KE
-	 8NUyKhOgSEBREQ2CkyS8KLa3U0NrtkhWQ1Ur2TYh2IXrQY8WO0W51Cyg1/EVMC4BDY
-	 fnUePUTEwNjyWQbaIcFtqSHZiaEprCcKuo2M0qx3FOcWpeJbIA0zSv2dv+0kysiyYY
-	 9fT/cORhmQvMwCEoHEbjJEkWrnKfujrChSmJJNRvBfMQ2YVXkrLOUyr9zO5xn7Xlne
-	 X0QOy5tCzDKEZ7AsZ18fywaTGeO+KAene0JE1SzHwO1nBkL9X8QAn+2F5/+xwzBu9P
-	 L6UMk6pGC5Evw==
+	s=k20201202; t=1748028235;
+	bh=JwKn1O3kNUXJMQphDvf1a17ESEWoK4upyuPLEp6UUG0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=uQlpxyoVHYlh3skX6Bs/mlYYomsoDpTJS6i6Xjikv7EUpl8br5LuhTRBuEZEgBGAz
+	 3KK0BnovzHNpnA6tEZvNwk+C0Nxeq9tLx0ODwI3wgJVfWH8JmqRjVvLdQPhRO8x3qR
+	 7hkSKuF80VZM5189FPC2KA+Lo0Ly0KMytXQ5UM/KQvzVkfRPPt4a6CRKynOzNr7gOu
+	 D4lXEDLWRRVJ2Mp/tBjV7mfz5q+7TTHQsa88ImvNbvEjewH0QRLw+nuwyUiw3cP5+J
+	 p9vxwYj9X+1K2xFTRdsfr4n6wX1q4AebLNncn8zkFeiV3hcl4X8Ux2CN5tD+En22pE
+	 V36DLOO8/3blg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net-next 0/2] net: airoha: Enable hw acceleration for PPPoE
- traffic
-Date: Fri, 23 May 2025 21:23:29 +0200
-Message-Id: <20250523-b4-airoha-flowtable-pppoe-v1-0-8584401568e0@kernel.org>
+Date: Fri, 23 May 2025 21:23:30 +0200
+Subject: [PATCH net-next 1/2] net: airoha: Initialize PPE UPDMEM source-mac
+ table
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,10 +53,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIADHLMGgC/x3MQQqAIBBA0avErBtQy4VdJVpMNdZApGhUEN09a
- fkW/z+QOQln6KoHEp+SJewFuq5gWmlfGGUuBqOMVa1ucGyRJIWV0G/hOmjcGGOMgdFM2jlvlXV
- MUPqY2Mv9v/vhfT+sc81ZawAAAA==
-X-Change-ID: 20250413-b4-airoha-flowtable-pppoe-2c199f5059ea
+Message-Id: <20250523-b4-airoha-flowtable-pppoe-v1-1-8584401568e0@kernel.org>
+References: <20250523-b4-airoha-flowtable-pppoe-v1-0-8584401568e0@kernel.org>
+In-Reply-To: <20250523-b4-airoha-flowtable-pppoe-v1-0-8584401568e0@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -65,26 +64,126 @@ Cc: linux-arm-kernel@lists.infradead.org,
  Lorenzo Bianconi <lorenzo@kernel.org>
 X-Mailer: b4 0.14.2
 
-Initialize PPE UPDMEM source-mac table used during IPv6 traffic hw
-acceleration.
-Introduce flowtable hw acceleration for PPPoE traffic.
+UPDMEM source-mac table is a key-value map used to store devices mac
+addresses according to the port identifier. UPDMEM source mac table is
+used during IPv6 traffic hw acceleration since PPE entries, for space
+constraints, do not contain the full source mac address but just the
+identifier in the UPDMEM source-mac table.
 
+Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-Lorenzo Bianconi (2):
-      net: airoha: Initialize PPE UPDMEM source-mac table
-      net: airoha: Add PPPoE offload support
-
  drivers/net/ethernet/airoha/airoha_eth.c  |  2 ++
  drivers/net/ethernet/airoha/airoha_eth.h  |  1 +
- drivers/net/ethernet/airoha/airoha_ppe.c  | 60 ++++++++++++++++++++++++-------
- drivers/net/ethernet/airoha/airoha_regs.h | 10 ++++++
- 4 files changed, 60 insertions(+), 13 deletions(-)
----
-base-commit: ea15e046263b19e91ffd827645ae5dfa44ebd044
-change-id: 20250413-b4-airoha-flowtable-pppoe-2c199f5059ea
+ drivers/net/ethernet/airoha/airoha_ppe.c  | 25 ++++++++++++++++++++++++-
+ drivers/net/ethernet/airoha/airoha_regs.h | 10 ++++++++++
+ 4 files changed, 37 insertions(+), 1 deletion(-)
 
-Best regards,
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 0d627e511266d94e079e8a87d2f812fb14b4ad07..e4c67c7bbf215d448640f978cd0d9d50abd73644 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -92,6 +92,8 @@ static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *addr)
+ 	val = (addr[3] << 16) | (addr[4] << 8) | addr[5];
+ 	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
+ 	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
++
++	airoha_ppe_init_upd_mem(port);
+ }
+ 
+ static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 531a3c49c1562a986111a1ce1c215c8751c16e09..a951246c0171e14497b510d3029fc0a7f891efe6 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -611,6 +611,7 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
+ int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data);
+ int airoha_ppe_init(struct airoha_eth *eth);
+ void airoha_ppe_deinit(struct airoha_eth *eth);
++void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port);
+ struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
+ 						  u32 hash);
+ void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 2d273937f19cf304ab4b821241fdc3ea93604f0e..1d5a04eb82a6645e2b6a22ff4e694275ef1727d8 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -223,6 +223,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+ 	int dsa_port = airoha_get_dsa_port(&dev);
+ 	struct airoha_foe_mac_info_common *l2;
+ 	u32 qdata, ports_pad, val;
++	u8 smac_id = 0xf;
+ 
+ 	memset(hwe, 0, sizeof(*hwe));
+ 
+@@ -251,6 +252,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+ 		else
+ 			pse_port = 2; /* uplink relies on GDM2 loopback */
+ 		val |= FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, pse_port);
++		smac_id = port->id;
+ 	}
+ 
+ 	if (is_multicast_ether_addr(data->eth.h_dest))
+@@ -285,7 +287,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+ 		hwe->ipv4.l2.src_mac_lo =
+ 			get_unaligned_be16(data->eth.h_source + 4);
+ 	} else {
+-		l2->src_mac_hi = FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID, 0xf);
++		l2->src_mac_hi = FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID, smac_id);
+ 	}
+ 
+ 	if (data->vlan.num) {
+@@ -1232,6 +1234,27 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, struct sk_buff *skb,
+ 	airoha_ppe_foe_insert_entry(ppe, skb, hash);
+ }
+ 
++void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
++{
++	struct airoha_eth *eth = port->qdma->eth;
++	struct net_device *dev = port->dev;
++	const u8 *addr = dev->dev_addr;
++	u32 val;
++
++	val = (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
++	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
++	airoha_fe_wr(eth, REG_UPDMEM_CTRL(0),
++		     FIELD_PREP(PPE_UPDMEM_ADDR_MASK, port->id) |
++		     PPE_UPDMEM_WR_MASK | PPE_UPDMEM_REQ_MASK);
++
++	val = (addr[0] << 8) | addr[1];
++	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
++	airoha_fe_wr(eth, REG_UPDMEM_CTRL(0),
++		     FIELD_PREP(PPE_UPDMEM_ADDR_MASK, port->id) |
++		     FIELD_PREP(PPE_UPDMEM_OFFSET_MASK, 1) |
++		     PPE_UPDMEM_WR_MASK | PPE_UPDMEM_REQ_MASK);
++}
++
+ int airoha_ppe_init(struct airoha_eth *eth)
+ {
+ 	struct airoha_ppe *ppe;
+diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
+index d931530fc96fb00ada36a6ad37fa295865a6f0a8..04187eb40ec674ec5a4ccfc968bb4bd579a53095 100644
+--- a/drivers/net/ethernet/airoha/airoha_regs.h
++++ b/drivers/net/ethernet/airoha/airoha_regs.h
+@@ -313,6 +313,16 @@
+ #define REG_PPE_RAM_BASE(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x320)
+ #define REG_PPE_RAM_ENTRY(_m, _n)		(REG_PPE_RAM_BASE(_m) + ((_n) << 2))
+ 
++#define REG_UPDMEM_CTRL(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x370)
++#define PPE_UPDMEM_ACK_MASK			BIT(31)
++#define PPE_UPDMEM_ADDR_MASK			GENMASK(11, 8)
++#define PPE_UPDMEM_OFFSET_MASK			GENMASK(7, 4)
++#define PPE_UPDMEM_SEL_MASK			GENMASK(3, 2)
++#define PPE_UPDMEM_WR_MASK			BIT(1)
++#define PPE_UPDMEM_REQ_MASK			BIT(0)
++
++#define REG_UPDMEM_DATA(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x374)
++
+ #define REG_FE_GDM_TX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x280)
+ #define REG_FE_GDM_TX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x284)
+ #define REG_FE_GDM_TX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x288)
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.49.0
 
 
