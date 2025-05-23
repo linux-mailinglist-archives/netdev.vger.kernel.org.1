@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-192973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144E7AC1E32
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:04:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD0EAC1E04
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A233B68AB
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 08:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BFF74E7211
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 07:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1A228751B;
-	Fri, 23 May 2025 08:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9460628689E;
+	Fri, 23 May 2025 07:56:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4151F198E9B
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 08:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB931288C2C
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 07:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747987470; cv=none; b=b5ooz6/MinGbxFlZeF1/wCaIFgUhYy0IGyGKrvYIjCKM4ALH7ZoTj9ZErsDMJce2JiQP+NDRNuewOy3gDUpjCBEAifd0rMtWtb3NHIRpscV29+eRIsGHBzX4AHsqQxn2VogBaH34qMvI7ZJSXm3EwGxhb9FevOXmvAPx5LP16qw=
+	t=1747986992; cv=none; b=AhzM6rZOSAXTSTv0RWlfLRlduH0e9Q+0yPHBCNsvIMz3O298icJyNQ2WqpweGnWtkIT42M+BNXZt421ig0cw4TvDagjUs9rv6kHamF3xZo6E0xgRY4JOviVa0S8JAND1feOqRrq7rwz11ZSTMzEEj/h4qy6krI33lce6anyywKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747987470; c=relaxed/simple;
-	bh=QAYxPbwTpMiM4OJlA0HHEBU/J/o3wfB6P/JCd0Es3NA=;
+	s=arc-20240116; t=1747986992; c=relaxed/simple;
+	bh=3PxfJPf3mrqC8N8lPx0qRSWyR7N/neFwRhvTrhDp43s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D1/w9my7jsLKo1EX327mmJJji5pANZm5IzJ2voTg8XmvXQfv5wKLyzl8/M6Hx3ohEm4MYQOz/I87y4I8XEqCaOcvYnMIOccUlkU8rU8VQjqqqBsMHa23yIPB/Pb33CeukcopuvoS0XKkIcdYryCA6yQtIVpkA9Q6mQCM6WAkmyA=
+	 MIME-Version:Content-Type; b=FG/7sHNWqw7MV6t5BHjarg1R2nhp8MUkie1H7Z8Rp7s9zJm+GssfNwYxYndZ8Osfhof5Vedv74g+5rqMmJr1U0LVnLaOTt9W4mhN/t89oaZvGpcvIWzlnKyAOzgDbm5J4X59XW+RHpZdTbXLQbG+kQ0RqrmP2JPGIaczRC/ccuo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 64784208AB;
-	Fri, 23 May 2025 10:04:26 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id 69366208B4;
+	Fri, 23 May 2025 09:56:21 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JOk94zRUblhl; Fri, 23 May 2025 10:04:25 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+ with ESMTP id jH-2CzZB3_vn; Fri, 23 May 2025 09:56:20 +0200 (CEST)
+Received: from EXCH-03.secunet.de (unknown [10.32.0.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 988FD20748;
-	Fri, 23 May 2025 10:04:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 988FD20748
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-01.secunet.de
- (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
+	by mx1.secunet.com (Postfix) with ESMTPS id 43780208A6;
+	Fri, 23 May 2025 09:56:20 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 43780208A6
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-03.secunet.de
+ (10.32.0.183) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 23 May
- 2025 10:04:25 +0200
+ 2025 09:56:19 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 May
- 2025 10:04:25 +0200
+ 2025 09:56:17 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 2FEF431829E7; Fri, 23 May 2025 09:56:17 +0200 (CEST)
+	id 33E293182A22; Fri, 23 May 2025 09:56:17 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 07/12] bonding: Fix multiple long standing offload races
-Date: Fri, 23 May 2025 09:56:06 +0200
-Message-ID: <20250523075611.3723340-8-steffen.klassert@secunet.com>
+Subject: [PATCH 08/12] xfrm: Migrate offload configuration
+Date: Fri, 23 May 2025 09:56:07 +0200
+Message-ID: <20250523075611.3723340-9-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250523075611.3723340-1-steffen.klassert@secunet.com>
 References: <20250523075611.3723340-1-steffen.klassert@secunet.com>
@@ -73,215 +73,161 @@ Content-Type: text/plain
 X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 
-From: Cosmin Ratiu <cratiu@nvidia.com>
+From: Chiachang Wang <chiachangwang@google.com>
 
-Refactor the bonding ipsec offload operations to fix a number of
-long-standing control plane races between state migration and user
-deletion and a few other issues.
+Add hardware offload configuration to XFRM_MSG_MIGRATE
+using an option netlink attribute XFRMA_OFFLOAD_DEV.
 
-xfrm state deletion can happen concurrently with
-bond_change_active_slave() operation. This manifests itself as a
-bond_ipsec_del_sa() call with x->lock held, followed by a
-bond_ipsec_free_sa() a bit later from a wq. The alternate path of
-these calls coming from xfrm_dev_state_flush() can't happen, as that
-needs the RTNL lock and bond_change_active_slave() already holds it.
+In the existing xfrm_state_migrate(), the xfrm_init_state()
+is called assuming no hardware offload by default. Even the
+original xfrm_state is configured with offload, the setting will
+be reset. If the device is configured with hardware offload,
+it's reasonable to allow the device to maintain its hardware
+offload mode. But the device will end up with offload disabled
+after receiving a migration event when the device migrates the
+connection from one netdev to another one.
 
-1. bond_ipsec_del_sa_all() might call xdo_dev_state_delete() a second
-   time on an xfrm state that was concurrently killed. This is bad.
-2. bond_ipsec_add_sa_all() can add a state on the new device, but
-   pending bond_ipsec_free_sa() calls from the old device will then hit
-   the WARN_ON() and then, worse, call xdo_dev_state_free() on the new
-   device without a corresponding xdo_dev_state_delete().
-3. Resolve a sleeping in atomic context introduced by the mentioned
-   "Fixes" commit.
+The devices that support migration may work with different
+underlying networks, such as mobile devices. The hardware setting
+should be forwarded to the different netdev based on the
+migration configuration. This change provides the capability
+for user space to migrate from one netdev to another.
 
-bond_ipsec_del_sa_all() and bond_ipsec_add_sa_all() now acquire x->lock
-and check for x->km.state to help with problems 1 and 2. And since
-xso.real_dev is now a private pointer managed by the bonding driver in
-xfrm state, make better use of it to fully fix problems 1 and 2. In
-bond_ipsec_del_sa_all(), set xso.real_dev to NULL while holding both the
-mutex and x->lock, which makes sure that neither bond_ipsec_del_sa() nor
-bond_ipsec_free_sa() could run concurrently.
-
-Fix problem 3 by moving the list cleanup (which requires the mutex) from
-bond_ipsec_del_sa() (called from atomic context) to bond_ipsec_free_sa()
-
-Finally, simplify bond_ipsec_del_sa() and bond_ipsec_free_sa() by using
-xso->real_dev directly, since it's now protected by locks and can be
-trusted to always reflect the offload device.
-
-Fixes: 2aeeef906d5a ("bonding: change ipsec_lock from spin lock to mutex")
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Test: Tested with kernel test in the Android tree located
+      in https://android.googlesource.com/kernel/tests/
+      The xfrm_tunnel_test.py under the tests folder in
+      particular.
+Signed-off-by: Chiachang Wang <chiachangwang@google.com>
 Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-Tested-by: Hangbin Liu <liuhangbin@gmail.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- drivers/net/bonding/bond_main.c | 82 +++++++++++++++------------------
- include/net/xfrm.h              |  7 ++-
- 2 files changed, 41 insertions(+), 48 deletions(-)
+ include/net/xfrm.h     |  8 ++++++--
+ net/key/af_key.c       |  2 +-
+ net/xfrm/xfrm_policy.c |  4 ++--
+ net/xfrm/xfrm_state.c  |  9 ++++++++-
+ net/xfrm/xfrm_user.c   | 15 ++++++++++++---
+ 5 files changed, 29 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 14f7c9712ad4..8ed8c29659a0 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -545,7 +545,20 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
- 			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
- 			continue;
- 		}
-+
-+		spin_lock_bh(&ipsec->xs->lock);
-+		/* xs might have been killed by the user during the migration
-+		 * to the new dev, but bond_ipsec_del_sa() should have done
-+		 * nothing, as xso.real_dev is NULL.
-+		 * Delete it from the device we just added it to. The pending
-+		 * bond_ipsec_free_sa() call will do the rest of the cleanup.
-+		 */
-+		if (ipsec->xs->km.state == XFRM_STATE_DEAD &&
-+		    real_dev->xfrmdev_ops->xdo_dev_state_delete)
-+			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
-+								    ipsec->xs);
- 		ipsec->xs->xso.real_dev = real_dev;
-+		spin_unlock_bh(&ipsec->xs->lock);
- 	}
- out:
- 	mutex_unlock(&bond->ipsec_lock);
-@@ -560,48 +573,20 @@ static void bond_ipsec_del_sa(struct net_device *bond_dev,
- 			      struct xfrm_state *xs)
- {
- 	struct net_device *real_dev;
--	netdevice_tracker tracker;
--	struct bond_ipsec *ipsec;
--	struct bonding *bond;
--	struct slave *slave;
- 
--	if (!bond_dev)
-+	if (!bond_dev || !xs->xso.real_dev)
- 		return;
- 
--	rcu_read_lock();
--	bond = netdev_priv(bond_dev);
--	slave = rcu_dereference(bond->curr_active_slave);
--	real_dev = slave ? slave->dev : NULL;
--	netdev_hold(real_dev, &tracker, GFP_ATOMIC);
--	rcu_read_unlock();
--
--	if (!slave)
--		goto out;
--
--	if (!xs->xso.real_dev)
--		goto out;
--
--	WARN_ON(xs->xso.real_dev != real_dev);
-+	real_dev = xs->xso.real_dev;
- 
- 	if (!real_dev->xfrmdev_ops ||
- 	    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
- 	    netif_is_bond_master(real_dev)) {
- 		slave_warn(bond_dev, real_dev, "%s: no slave xdo_dev_state_delete\n", __func__);
--		goto out;
-+		return;
- 	}
- 
- 	real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev, xs);
--out:
--	netdev_put(real_dev, &tracker);
--	mutex_lock(&bond->ipsec_lock);
--	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
--		if (ipsec->xs == xs) {
--			list_del(&ipsec->list);
--			kfree(ipsec);
--			break;
--		}
--	}
--	mutex_unlock(&bond->ipsec_lock);
- }
- 
- static void bond_ipsec_del_sa_all(struct bonding *bond)
-@@ -629,9 +614,15 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
- 				   __func__);
- 			continue;
- 		}
-+
-+		spin_lock_bh(&ipsec->xs->lock);
- 		ipsec->xs->xso.real_dev = NULL;
--		real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
--							    ipsec->xs);
-+		/* Don't double delete states killed by the user. */
-+		if (ipsec->xs->km.state != XFRM_STATE_DEAD)
-+			real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
-+								    ipsec->xs);
-+		spin_unlock_bh(&ipsec->xs->lock);
-+
- 		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
- 			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev,
- 								  ipsec->xs);
-@@ -643,34 +634,33 @@ static void bond_ipsec_free_sa(struct net_device *bond_dev,
- 			       struct xfrm_state *xs)
- {
- 	struct net_device *real_dev;
--	netdevice_tracker tracker;
-+	struct bond_ipsec *ipsec;
- 	struct bonding *bond;
--	struct slave *slave;
- 
- 	if (!bond_dev)
- 		return;
- 
--	rcu_read_lock();
- 	bond = netdev_priv(bond_dev);
--	slave = rcu_dereference(bond->curr_active_slave);
--	real_dev = slave ? slave->dev : NULL;
--	netdev_hold(real_dev, &tracker, GFP_ATOMIC);
--	rcu_read_unlock();
--
--	if (!slave)
--		goto out;
- 
-+	mutex_lock(&bond->ipsec_lock);
- 	if (!xs->xso.real_dev)
- 		goto out;
- 
--	WARN_ON(xs->xso.real_dev != real_dev);
-+	real_dev = xs->xso.real_dev;
- 
- 	xs->xso.real_dev = NULL;
--	if (real_dev && real_dev->xfrmdev_ops &&
-+	if (real_dev->xfrmdev_ops &&
- 	    real_dev->xfrmdev_ops->xdo_dev_state_free)
- 		real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs);
- out:
--	netdev_put(real_dev, &tracker);
-+	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-+		if (ipsec->xs == xs) {
-+			list_del(&ipsec->list);
-+			kfree(ipsec);
-+			break;
-+		}
-+	}
-+	mutex_unlock(&bond->ipsec_lock);
- }
- 
- /**
 diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 3d2f6c879311..b7e8f3f49627 100644
+index b7e8f3f49627..466423a1a70a 100644
 --- a/include/net/xfrm.h
 +++ b/include/net/xfrm.h
-@@ -154,8 +154,11 @@ struct xfrm_dev_offload {
- 	 */
- 	struct net_device	*dev;
- 	netdevice_tracker	dev_tracker;
--	/* This is a private pointer used by the bonding driver.
--	 * Device drivers should not use it.
-+	/* This is a private pointer used by the bonding driver (and eventually
-+	 * should be moved there). Device drivers should not use it.
-+	 * Protected by xfrm_state.lock AND bond.ipsec_lock in most cases,
-+	 * except in the .xdo_dev_state_del() flow, where only xfrm_state.lock
-+	 * is held.
- 	 */
- 	struct net_device	*real_dev;
- 	unsigned long		offload_handle;
+@@ -1904,12 +1904,16 @@ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *n
+ 						u32 if_id);
+ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 				      struct xfrm_migrate *m,
+-				      struct xfrm_encap_tmpl *encap);
++				      struct xfrm_encap_tmpl *encap,
++				      struct net *net,
++				      struct xfrm_user_offload *xuo,
++				      struct netlink_ext_ack *extack);
+ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 		 struct xfrm_migrate *m, int num_bundles,
+ 		 struct xfrm_kmaddress *k, struct net *net,
+ 		 struct xfrm_encap_tmpl *encap, u32 if_id,
+-		 struct netlink_ext_ack *extack);
++		 struct netlink_ext_ack *extack,
++		 struct xfrm_user_offload *xuo);
+ #endif
+ 
+ int km_new_mapping(struct xfrm_state *x, xfrm_address_t *ipaddr, __be16 sport);
+diff --git a/net/key/af_key.c b/net/key/af_key.c
+index c56bb4f451e6..efc2a91f4c48 100644
+--- a/net/key/af_key.c
++++ b/net/key/af_key.c
+@@ -2630,7 +2630,7 @@ static int pfkey_migrate(struct sock *sk, struct sk_buff *skb,
+ 	}
+ 
+ 	return xfrm_migrate(&sel, dir, XFRM_POLICY_TYPE_MAIN, m, i,
+-			    kma ? &k : NULL, net, NULL, 0, NULL);
++			    kma ? &k : NULL, net, NULL, 0, NULL, NULL);
+ 
+  out:
+ 	return err;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 143ac3aa7537..7200ba8de936 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -4630,7 +4630,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 		 struct xfrm_migrate *m, int num_migrate,
+ 		 struct xfrm_kmaddress *k, struct net *net,
+ 		 struct xfrm_encap_tmpl *encap, u32 if_id,
+-		 struct netlink_ext_ack *extack)
++		 struct netlink_ext_ack *extack, struct xfrm_user_offload *xuo)
+ {
+ 	int i, err, nx_cur = 0, nx_new = 0;
+ 	struct xfrm_policy *pol = NULL;
+@@ -4663,7 +4663,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
+ 		if ((x = xfrm_migrate_state_find(mp, net, if_id))) {
+ 			x_cur[nx_cur] = x;
+ 			nx_cur++;
+-			xc = xfrm_state_migrate(x, mp, encap);
++			xc = xfrm_state_migrate(x, mp, encap, net, xuo, extack);
+ 			if (xc) {
+ 				x_new[nx_new] = xc;
+ 				nx_new++;
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 3c2e27e5a1e3..1c5fe1b0b6d6 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2120,7 +2120,10 @@ EXPORT_SYMBOL(xfrm_migrate_state_find);
+ 
+ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 				      struct xfrm_migrate *m,
+-				      struct xfrm_encap_tmpl *encap)
++				      struct xfrm_encap_tmpl *encap,
++				      struct net *net,
++				      struct xfrm_user_offload *xuo,
++				      struct netlink_ext_ack *extack)
+ {
+ 	struct xfrm_state *xc;
+ 
+@@ -2136,6 +2139,10 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
+ 	memcpy(&xc->id.daddr, &m->new_daddr, sizeof(xc->id.daddr));
+ 	memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
+ 
++	/* configure the hardware if offload is requested */
++	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
++		goto error;
++
+ 	/* add state */
+ 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) {
+ 		/* a care is needed when the destination address of the
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 0a3d3f3ae5a3..ae8e06573639 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -3069,6 +3069,7 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	int n = 0;
+ 	struct net *net = sock_net(skb->sk);
+ 	struct xfrm_encap_tmpl  *encap = NULL;
++	struct xfrm_user_offload *xuo = NULL;
+ 	u32 if_id = 0;
+ 
+ 	if (!attrs[XFRMA_MIGRATE]) {
+@@ -3099,11 +3100,19 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (attrs[XFRMA_IF_ID])
+ 		if_id = nla_get_u32(attrs[XFRMA_IF_ID]);
+ 
++	if (attrs[XFRMA_OFFLOAD_DEV]) {
++		xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
++			      sizeof(*xuo), GFP_KERNEL);
++		if (!xuo) {
++			err = -ENOMEM;
++			goto error;
++		}
++	}
+ 	err = xfrm_migrate(&pi->sel, pi->dir, type, m, n, kmp, net, encap,
+-			   if_id, extack);
+-
++			   if_id, extack, xuo);
++error:
+ 	kfree(encap);
+-
++	kfree(xuo);
+ 	return err;
+ }
+ #else
 -- 
 2.34.1
 
