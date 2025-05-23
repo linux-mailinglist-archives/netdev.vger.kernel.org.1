@@ -1,112 +1,168 @@
-Return-Path: <netdev+bounces-193074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA443AC268A
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:34:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D116AC26BE
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:48:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB7163AE100
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:34:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1483A7CEB
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1192523C51B;
-	Fri, 23 May 2025 15:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBFC293B67;
+	Fri, 23 May 2025 15:48:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4ErdVDm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XvkjHFJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D882317583;
-	Fri, 23 May 2025 15:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFF821B9F5;
+	Fri, 23 May 2025 15:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748014483; cv=none; b=uQ7spRwSbtDmgGDlLzN+BxJikPMvnRCMvAA1gxjUE1vzHdquOh9/XulDx2DxZ+vWd2me2y+G4CrB0r61SCkOD6mITG4e9NmRF38k19L+Dj3qlQrr6tw0Ilw0CxBBwCljF+idJIJcdFMertrclMsUUdf/m6AqznRWPuu9xKxQ1gw=
+	t=1748015325; cv=none; b=LQgkX4AdDqhotOzMkz61OOmOkcyNqxOs8mOkHNYeqwEehGqS8FridTW9bi5/rpNNnQwfaj0HR8HtkLBo9o3E55k5HI+Vklx9VPYcrseE4Og++F96hFP+mMHJ+73YtFymeEZ3VgQbg0m/0JIuHC/aTUjGcO5ZsWVHWYOtOh+jVNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748014483; c=relaxed/simple;
-	bh=F6Qt9T9axDWKZdW0V8mxJy404waRLPFG48iRbR59dpk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hkP21164nOEQTJVdjSIM1YN/Z71fdrhaniuJESKIwbn5Qu/8qiNS6hcsFfG9Geb72wJCQqbIgG2ASLR3JWJYWgisA5+Jcc7JHc+ALxIFbQzR6RR1uLRNqHUqz43G27d5w8rD/lYyFaC9tBQEXcVP6AdBvNL5pAnW0wFy8C98yYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4ErdVDm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFE6DC4CEE9;
-	Fri, 23 May 2025 15:34:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748014482;
-	bh=F6Qt9T9axDWKZdW0V8mxJy404waRLPFG48iRbR59dpk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B4ErdVDmid5x5FjBT7zdcDcwqvS6y2Zg1cGoX/3VCvsofX4TZd//EdBMLzQDfoEwX
-	 qhe2Gar4rUBt/791S01+eWFT/jBP0/uupI6DLb9sO9R+NgCIWcqATQmf/gXWhcvpKd
-	 ZobWmHRfj0Xl/JTccDihsbnCotdlWkgf1RAQ5Wqoz3FYBA/sH73Xp4nJ7aHjAg1ey1
-	 yASJAJ7xxKpRu0veigdDSC4RMYzVE3q0w2gcul7xQsjqSdFir9Z0yc5QNaV/WJp1/o
-	 x9Ujb4xNuqDZtkN0lG/dP1+x7a2jhFK09WU50SCjyIA+s9NP24yr03zyMsvy4R1En1
-	 zp8nGJZZwyd8Q==
-Date: Fri, 23 May 2025 16:34:35 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next PATCH 1/3] dt-bindings: net: dsa: mediatek,mt7530: Add
- airoha,an7583-switch
-Message-ID: <20250523-poster-suffix-8a15978bc704@spud>
-References: <20250522165313.6411-1-ansuelsmth@gmail.com>
- <20250522165313.6411-2-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1748015325; c=relaxed/simple;
+	bh=I/8nEbZdDKb5iEP+4krl9s5DuMYHU9jALA6PtV9CAmA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g30LtU+3pqsjuGoeORbpr+oSmjeEMdIJSIjKNFZOqQfwdmn/IFaeKuCvSGfUt4MiM19nS1JDWOIkZGDV8A2l16TTlf6I0C9huFpRmgST3R6KoLpJ6DxcTMIfhKqeRZEg5UltYq/jDP2CJX/MpmUpt67KO3ByV6+97DAUBhDboOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XvkjHFJC; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748015323; x=1779551323;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=I/8nEbZdDKb5iEP+4krl9s5DuMYHU9jALA6PtV9CAmA=;
+  b=XvkjHFJC0NcNdx2oyZLVBVpxfMa35XYaeuFaZ/oyS/WbMGzQxa+lvgkc
+   UG/hh3ICl/8qIrPtfYQ/hKUFqHoOhBWL0KyixSJ1/xs9FksQ/1XKjXd71
+   gt8oTcaReNonB55WeGPTN0/p70zcmRo/N97oRsorI3Q9YgZF58loTzCrz
+   12puYsNeV7CgAGe3buuBen4PbhIhQEYp0cpVnzVOvD0hen2NO1lJUsJQr
+   x7LD7FoaiQ+pBahABQt0tCFwJplfL7dIa/fsxwz5MzOUaKuUbVYDyVztP
+   KbWo6bzSxbXvVLAbzpwxOTNIcQd029e5hE83sYL9sWlgz7hvGGt9f681s
+   g==;
+X-CSE-ConnectionGUID: 63ehHIr6T9CpN4fSkT0X9Q==
+X-CSE-MsgGUID: mb8qG4bsRdqD4PCwr8ThhQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49958818"
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="49958818"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 08:48:42 -0700
+X-CSE-ConnectionGUID: xzXPFbmHTNCkrBbRevoqjA==
+X-CSE-MsgGUID: mZisGr7mQe6xVU9d+kMRVA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="141036206"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orviesa009.jf.intel.com with ESMTP; 23 May 2025 08:48:38 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: donald.hunter@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	aleksandr.loktionov@intel.com,
+	milena.olech@intel.com,
+	corbet@lwn.net
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-doc@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v4 0/3]  dpll: add all inputs phase offset monitor
+Date: Fri, 23 May 2025 17:42:21 +0200
+Message-Id: <20250523154224.1510987-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="aKTWQfuzzRjxJz4t"
-Content-Disposition: inline
-In-Reply-To: <20250522165313.6411-2-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+
+Add dpll device level feature: phase offset monitor.
+
+Phase offset measurement is typically performed against the current active
+source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
+the capability to monitor phase offsets across all available inputs.
+The attribute and current feature state shall be included in the response
+message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
+In such cases, users can also control the feature using the
+``DPLL_CMD_DEVICE_SET`` command by setting the ``enum dpll_feature_state``
+values for the attribute.
+
+Implement feature support in ice driver for dpll-enabled devices.
+
+Verify capability:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --dump device-get
+[{'clock-id': 4658613174691613800,
+  'id': 0,
+  'lock-status': 'locked-ho-acq',
+  'mode': 'automatic',
+  'mode-supported': ['automatic'],
+  'module-name': 'ice',
+  'type': 'eec'},
+ {'clock-id': 4658613174691613800,
+  'id': 1,
+  'lock-status': 'locked-ho-acq',
+  'mode': 'automatic',
+  'mode-supported': ['automatic'],
+  'module-name': 'ice',
+  'phase-offset-monitor': 'disable',
+  'type': 'pps'}]
+
+Enable the feature:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do device-set --json '{"id":1, "phase-offset-monitor":"enable"}'
+
+Verify feature is enabled:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --dump device-get
+[
+ [...]
+ {'capabilities': {'all-inputs-phase-offset-monitor'},
+  'clock-id': 4658613174691613800,
+  'id': 1,
+ [...]
+  'phase-offset-monitor': 'enable',
+ [...]]
 
 
---aKTWQfuzzRjxJz4t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Arkadiusz Kubalewski (3):
+  dpll: add phase-offset-monitor feature to netlink spec
+  dpll: add phase_offset_monitor_get/set callback ops
+  ice: add phase offset monitor for all PPS dpll inputs
 
-On Thu, May 22, 2025 at 06:53:09PM +0200, Christian Marangi wrote:
-> Add airoha,an7583-switch additional compatible to the mt7530 DSA Switch
-> Family. This is an exact match of the airoha,en7581-switch (based on
-> mt7988-switch) with the additional requirement of tweak on the
-> GEPHY_CONN_CFG registers to make the internal PHY actually work.
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+ Documentation/driver-api/dpll.rst             |  16 ++
+ Documentation/netlink/specs/dpll.yaml         |  24 +++
+ drivers/dpll/dpll_netlink.c                   |  69 ++++++-
+ drivers/dpll/dpll_nl.c                        |   5 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  20 ++
+ drivers/net/ethernet/intel/ice/ice_common.c   |  26 +++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 191 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |   6 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   4 +
+ include/linux/dpll.h                          |   8 +
+ include/uapi/linux/dpll.h                     |  12 ++
+ 12 files changed, 379 insertions(+), 5 deletions(-)
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
---aKTWQfuzzRjxJz4t
-Content-Type: application/pgp-signature; name="signature.asc"
+base-commit: ea15e046263b19e91ffd827645ae5dfa44ebd044
+-- 
+2.38.1
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaDCViwAKCRB4tDGHoIJi
-0kQPAP9frHNQgSGAHPA5uunYjumQhgnmnzyhTpQjs9+iFOrwaQD/dJcW9+a4KFNn
-9Mou2j6ietaV+/YWiSjzhzjlzbUPAwM=
-=dZL2
------END PGP SIGNATURE-----
-
---aKTWQfuzzRjxJz4t--
 
