@@ -1,121 +1,160 @@
-Return-Path: <netdev+bounces-193089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 100F0AC2780
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 18:22:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F615AC2782
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 18:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 211723B43BA
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:21:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51E217A909
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4F429711D;
-	Fri, 23 May 2025 16:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FFDC296FA0;
+	Fri, 23 May 2025 16:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cRC0UiDN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EcYmAI+s"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82143294A06
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 16:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331A1294A06;
+	Fri, 23 May 2025 16:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748017298; cv=none; b=HZfyWd3Zl7iz8cYNFliZMxImfS+dcv8aYc087LpYQjRo61Z5zGNyWBPVkwm7VILG8yEHOqL3YS1dqUvbG3ayarCeQuMVq7Yjnh1qIdrARq5TxKqsJgfeRF167YIlkkIpLgfmdhk4F5GzVO4uiatLukGPRxfk9hGTWhq4PIJJBwg=
+	t=1748017354; cv=none; b=kQGu2dF7zpSzAQ5UnRiYtwmk1PAAgWjn6co460sOH/NXJAQB9HHLtlbMZH8RspIq2BrAuAx15TeCJ3Xk5EBTpUl0aMdo+A7IqPayVel2xSvplQVwMpvOEpcK+dJVLYnrpY8q35KSST/8hI9wJRXDAIewEUYQ6fBJAlf6ng019bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748017298; c=relaxed/simple;
-	bh=BujhNJcIfJdCrltgcQz6MNassde82rEbsesI1Wbty8U=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=aNvg1rUnDxJg7+LIMknBYV14hP6J2gmGGuy8YByrd04DKUF95g/FTfbxPhfxELaOQlLUN7uTa04XNfIVeMMtPcmjx+Htc9F3eryUMzEfVRIpU7VuKv4IDYe5r8+NQz21RAnoVrRJTSi5cC1nWvsoewKLeo0hSo576RNArF0RM9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cRC0UiDN; arc=none smtp.client-ip=95.215.58.170
+	s=arc-20240116; t=1748017354; c=relaxed/simple;
+	bh=LAkicZJyK/FGZjxwtLmT18YGpM4Dm/qAEb9YYZlSY88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hKoGudRD0tmofexxdLyWTLPFTS/PIOPguY4d9TrNgGYzbKbZAK7w54X0CZAYgU6rtze6LahJrtPGMSPSC9GKS5T4WOMqWsw2ODnuhS2fR8Rcr/wUNxt6fXYydpcMIbTztj+Zfz/lmGcIHJ6tZJQvJldzMLWXCP9pIC2pq9874/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EcYmAI+s; arc=none smtp.client-ip=91.218.175.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b35cdeb3-399e-4ca0-a9a4-66bab45bd7e4@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748017293;
+	t=1748017350;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eXlfdMIujoEWEfC9MCFXNwyGXVaiR+vqx4I+fOV2LpA=;
-	b=cRC0UiDNCqZcN6BiCFcSi7WyBG7RHQ/NaavE5iXAjkOSdJagNosatR+NIg0yTNRHOMRQeJ
-	gsLSdNrIvX8gOYYtmOPHCP6Bc2qPiQ2yeewLyrlzKsYAQMe0DEZoNLwaPpytrw/dHjMfY8
-	fbfnntgHadynhOa0PsMl2BmsNbQsvr8=
-Date: Fri, 23 May 2025 12:21:10 -0400
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=p8BaeXySDEnnoBAKxDxDRFr2nIyJdWCYaT15SV7DAQI=;
+	b=EcYmAI+sjd3M9P4tTqpTRafycWBQZR/9qBIAjVmmsoeTIA2aoyZgGTdS44r+Pukf31wjd5
+	VfR2+BkJPxWJMrj5aJRQM2FOyhW/v5LjiJ5tvBn1SNxDwG0qWJHOs8GG5JAPBFa+HoNPsG
+	ANhWGgqUpZLOM5Yir+Cv2zKH3BrF3yQ=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v1] bpf, sockmap: Fix psock incorrectly pointing to sk
+Date: Sat, 24 May 2025 00:22:19 +0800
+Message-ID: <20250523162220.52291-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: xilinx: axienet: Fix Tx skb circular buffer
- occupancy check in dmaengine xmit
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, michal.simek@amd.com, radhey.shyam.pandey@amd.com,
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
-References: <20250521181608.669554-1-suraj.gupta2@amd.com>
- <57443336-2098-42c9-be6d-468cdbd9b312@linux.dev>
-Content-Language: en-US
-In-Reply-To: <57443336-2098-42c9-be6d-468cdbd9b312@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On 5/23/25 12:20, Sean Anderson wrote:
-> On 5/21/25 14:16, Suraj Gupta wrote:
->> In Dmaengine flow, driver maintains struct skbuf_dma_descriptor rings each
->> element of which corresponds to a skb. In Tx datapath, compare available
->> space in skb ring with number of skbs instead of skb fragments.
->> Replace x * (MAX_SKB_FRAGS) in netif_txq_completed_wake() and
->> netif_txq_maybe_stop() with x * (1 skb) to fix the comparison.
->> 
->> Fixes: 6a91b846af85 ("net: axienet: Introduce dmaengine support")
->> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
->> ---
->>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> index 1b7a653c1f4e..6011d7eae0c7 100644
->> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> @@ -880,7 +880,7 @@ static void axienet_dma_tx_cb(void *data, const struct dmaengine_result *result)
->>  	dev_consume_skb_any(skbuf_dma->skb);
->>  	netif_txq_completed_wake(txq, 1, len,
->>  				 CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX),
->> -				 2 * MAX_SKB_FRAGS);
->> +				 2);
->>  }
->>  
->>  /**
->> @@ -914,7 +914,7 @@ axienet_start_xmit_dmaengine(struct sk_buff *skb, struct net_device *ndev)
->>  
->>  	dma_dev = lp->tx_chan->device;
->>  	sg_len = skb_shinfo(skb)->nr_frags + 1;
->> -	if (CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX) <= sg_len) {
->> +	if (CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX) <= 1) {
->>  		netif_stop_queue(ndev);
->>  		if (net_ratelimit())
->>  			netdev_warn(ndev, "TX ring unexpectedly full\n");
->> @@ -964,7 +964,7 @@ axienet_start_xmit_dmaengine(struct sk_buff *skb, struct net_device *ndev)
->>  	txq = skb_get_tx_queue(lp->ndev, skb);
->>  	netdev_tx_sent_queue(txq, skb->len);
->>  	netif_txq_maybe_stop(txq, CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX),
->> -			     MAX_SKB_FRAGS + 1, 2 * MAX_SKB_FRAGS);
->> +			     1, 2);
->>  
->>  	dmaengine_submit(dma_tx_desc);
->>  	dma_async_issue_pending(lp->tx_chan);
-> 
-> Reviwed-by: Sean Anderson <sean.anderson@linux.dev>
+We observed an issue from the latest selftest: sockmap_redir where
+sk_psock(psock->sk) != psock in the backlog. The root cause is the special
+behavior in sockmap_redir - it frequently performs map_update() and
+map_delete() on the same socket. During map_update(), we create a new
+psock and during map_delete(), we eventually free the psock via rcu_work
+in sk_psock_drop(). However, pending workqueues might still exist and not
+be processed yet. If users immediately perform another map_update(), a new
+psock will be allocated for the same sk, resulting in two psocks pointing
+to the same sk.
 
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+When the pending workqueue is later triggered, it uses the old psock to
+access sk for I/O operations, which is incorrect.
 
-*spelling
+Timing Diagram:
+
+cpu0                        cpu1
+
+map_update(sk):
+    sk->psock = psock1
+    psock1->sk = sk
+map_delete(sk):
+   rcu_work_free(psock1)
+
+map_update(sk):
+    sk->psock = psock2
+    psock2->sk = sk
+                            workqueue:
+                                wakeup with psock1, but the sk of psock1
+                                doesn't belong to psock1
+rcu_handler:
+    clean psock1
+    free(psock1)
+
+Previously, we used reference counting to address the concurrency issue
+between backlog and sock_map_close(). This logic remains necessary as it
+prevents the sk from being freed while processing the backlog. But this
+patch prevents pending backlogs from using a psock after it has been
+freed.
+
+Note: We cannot call cancel_delayed_work_sync() in map_delete() since this
+might be invoked in BPF context by BPF helper, and the function may sleep.
+
+Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+---
+Thanks to Michal Luczaj for providing the sockmap_redir test case, which
+indeed covers almost all sockmap forwarding paths.
+---
+ include/linux/skmsg.h | 1 +
+ net/core/skmsg.c      | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+index 0b9095a281b8..b17221eef2f4 100644
+--- a/include/linux/skmsg.h
++++ b/include/linux/skmsg.h
+@@ -67,6 +67,7 @@ struct sk_psock_progs {
+ enum sk_psock_state_bits {
+ 	SK_PSOCK_TX_ENABLED,
+ 	SK_PSOCK_RX_STRP_ENABLED,
++	SK_PSOCK_DROPPED,
+ };
+ 
+ struct sk_psock_link {
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index 34c51eb1a14f..bd58a693ce9a 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -656,6 +656,9 @@ static void sk_psock_backlog(struct work_struct *work)
+ 	bool ingress;
+ 	int ret;
+ 
++	if (sk_psock_test_state(psock, SK_PSOCK_DROPPED))
++		return;
++
+ 	/* Increment the psock refcnt to synchronize with close(fd) path in
+ 	 * sock_map_close(), ensuring we wait for backlog thread completion
+ 	 * before sk_socket freed. If refcnt increment fails, it indicates
+@@ -867,7 +870,7 @@ void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
+ 	write_unlock_bh(&sk->sk_callback_lock);
+ 
+ 	sk_psock_stop(psock);
+-
++	sk_psock_set_state(psock, SK_PSOCK_DROPPED);
+ 	INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
+ 	queue_rcu_work(system_wq, &psock->rwork);
+ }
+-- 
+2.47.1
+
 
