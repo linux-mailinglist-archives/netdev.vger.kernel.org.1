@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-193181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3D8AC2BFE
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 01:06:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC286AC2C01
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 01:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B76FA402A8
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 23:06:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C24E1BA7CB4
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 23:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A99021D595;
-	Fri, 23 May 2025 23:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83E821FF40;
+	Fri, 23 May 2025 23:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lNUvomD7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vfgZa8iZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF92E21B91D
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 23:05:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C4F21ADB5
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 23:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748041536; cv=none; b=nKY8460/pRZVOcxPyJ+Lpf08QWVhcGFqi+E7w8nciMZxI+0Hn7kmWEC4ZlPfsxJYcNR8ybOywlyyAp0rxBz1gxO6eI7uxqA3tQNKDIR3HEWo6krQMSdX/riO58F7AvCuhQqaB13Xp0Za2QN+apLX6WHuQVa33pCq96C+bir4bxo=
+	t=1748041537; cv=none; b=eNuaiv6t/vJAA97kefoJZUlq56EzSZvJQDIbGW4O0+Rjq8wSbELkHsAoQ6V8L5yySwnEM8CMUilE97VR4PPhC/mE2GH8l+Udf7KR9/Aux0GDKir4EY+1xPZfDR3mTyRdynmhwSsxq0BT9UaKc8A/NDiZS+avBM8VkgL3eW/UqNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748041536; c=relaxed/simple;
-	bh=0WyWdlblD1opyDXTAcioi+FN4eUkunAJc10HflKJZ/c=;
+	s=arc-20240116; t=1748041537; c=relaxed/simple;
+	bh=fIlnjHiVt66jMZHOXCtcWJq9iDhh9E2OfaIuTmFUKBo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O1SspBEiV1q4WUxdicCz7zlavQ5tHHMlWEfO8GqY9qm/VQKdyhCkt5OHjof4giPUNtRdz9lnHA1JdBii8Zw37HxAbLTz29MtnK9AMD3znK6aYEDXA3kNO77cDeprXNMnZEKoxOfhSSxsfwt7XCg3eSHjIEajry+4k3v86mmMDwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lNUvomD7; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=D8gshP5sauc2EUqMjvEjQvmgFU4IeVEMoOOT9dS+PRBuvJ8nS5QB5Fdi2POgUtzMjdmII2fhedrgYGFqQedVmGpKbI6g5AvZeJAf+W8AKwo9Ip7v/MuXefbbkeGb+os8CldFtBSr/5G4kYE638jk1sNLhz6jkGCPpdI+SpIg+f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vfgZa8iZ; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-742cc20e11eso264814b3a.1
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 16:05:34 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2322a7b0735so3493825ad.3
+        for <netdev@vger.kernel.org>; Fri, 23 May 2025 16:05:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748041534; x=1748646334; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748041535; x=1748646335; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YGa5vpAckjVMn+DJyOLrdnNXFOJ4oaSqmPoGO5u/7eQ=;
-        b=lNUvomD7i7tGLs/vaOZUxg6uA6poEZN8LRuzYQd4pL/PAo4Fom3TB3R04f8MBjcyjA
-         N23tYzilqGHH/tRF79eP4vP+MUmxTg7TYp+LeTjxlo9zRaRLVu3SQ+CgUiTaK3KVsth3
-         43YN09MakutY9jpxGqONFlJSkpRniEjzBKINHDT9eEr/MrcU2mIEXMwLeqyXp/4cl+ML
-         gbGTGmWGEu/McnGQypnKZKAowzKwyxUZHXWOQ6zyg7W75upQnprlTuHdN3lw7CceQeGd
-         hoWrjv55FGZ16JYdHhBH5//EeZ91yOIaXy4TXl+5Pkf++CgsdCzPJImXlrse037JqBsR
-         0l1g==
+        bh=e8sdft2buoZW74We3vtEkvC8v0SQ5B0W9UWiowkjja8=;
+        b=vfgZa8iZcpw1VyNThOV6kro0eOHzte7hM6MvCpV0y5ua3l7Oq0zeCnx8XW2eTlJyZW
+         WcAqy0CuTKLE5ZK91l01NtRd3IO7CujKfR2Jx43XgCy7xYRxhQOuzzXL7dIGbnTLGAtN
+         7t8D3tHgcOI7g5ADAthwTqd91JY/B0QZNIVCHgrTPbBy6tNuavzeEiyyPD99ylulG7rU
+         SqmdSEJ0nggzjLongXQ+3PdP6Y8a9kjd3EGphFFF8ZlbHULykEnfd/yegy38rmR82lcn
+         j6rT1WF426ba5sIL/5XJ6RejziwlbnwgeCJ1VxDtlEooxPAu6E1v/v3l5TCUFZQ70pCk
+         9BBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748041534; x=1748646334;
+        d=1e100.net; s=20230601; t=1748041535; x=1748646335;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YGa5vpAckjVMn+DJyOLrdnNXFOJ4oaSqmPoGO5u/7eQ=;
-        b=hH8gr4P3xZpkr8jpp2pQHmofb07Z2g/hAJDsB1V91gR75N5pgPDkQC91ah/6ceTCLV
-         O0+w3/xRVW3f1AxqYFus2/FMOqUo0Znih8WIDzZaMf4iRfQDsByr5aDgq9prWsRSBbNQ
-         TIbopRxjh3ahjrN7MQi5tJXGx3DS0NKmyNOvwTqKyiodBpP30V2daDmnVnkbpDJA2y7X
-         ZlEbs/ehjmpHd1vBtYu1MnjP/vdyDQEPlmAEFibQTIRm5ItPoMoUH4AW/i/8OWD92EJG
-         FcWiv+pANNGIuXwgXXKysLOpVPl2rona/VLdWDB0cD3+5WxpiDZKYn5mASLE0WYd5HKX
-         iaBg==
-X-Gm-Message-State: AOJu0YxkCC/v6uhlBjZaie1zfl1dnmdzhKclTnDfWmGvq3H9P/O8WJBx
-	Ss1g1DG/13UWg8IzscAOGzvhMTte9MlvL7wHadSwJSmoto123w2nCWmFxpX/+hMMD7vAnOJj+1T
-	yFFO8vSw9GNoMLKTPDY9p80yvtW4PkT5SrRpXzy3kN5nEf8LV1iFBJWpPBKqGIiHnt2n5N/7YJP
-	h/dKitN/UpOpj/hSEm5y11K5Y+vGzDTjPlocen0v9MmT/YjJvEPyD3l+r/+vpDyTA=
-X-Google-Smtp-Source: AGHT+IFiPOxxNaYi6AA9Ymvqa8x0QHUR555swbbPaDyHWJAxkZVauCz0orPrUoUSiBGG+ARldTE4WLtzf4erBOqE5w==
-X-Received: from pfpk9.prod.google.com ([2002:aa7:9d09:0:b0:742:a99a:ec59])
+        bh=e8sdft2buoZW74We3vtEkvC8v0SQ5B0W9UWiowkjja8=;
+        b=cnHrPFOFx+S8ToJAieuCRicZSVgAXx+q6TmATq8F3Jn2+QA2QoJUPdXdDbh5AuKhg1
+         KoPUkoeksV5exFaG4X6QTxodzird3sVhwbEHoXQvdDsmlqRAjfkDPdU99W1sOVhV0vd9
+         WOTVIHNIU2A2buOqHTAWKMNHHO1o/oYdNFqUSnOV9lzTKwbePdwPbLxgTWVqW37DTncQ
+         lC+QWCfjdl66BgPtvMRUwMzDbgL5Cv3NtAMFb25qI6RZXqv61bIgAOidp7Eb6A9X7yoJ
+         LQGeUtauy8ZkQDgNPvKx8Z3evQW0RaZ0Na7J96Cy6daZGlJDnCLNZZ44B3TFnrgm9FrS
+         xmXA==
+X-Gm-Message-State: AOJu0YzmdmNkdsCDS+EpG60YOg1fdVMxSm5T+jY2soe98+GRajEf3bp0
+	Qgfkd+PdCwvuAdiejRR4E8oytqMjyEFopj57qafyWf1NK0HIz8OreD6Dbz7uyS3yllPPI+Z8105
+	BSox437Jul2vtODGsAjy/WC6lyEeJWT47s8Uvh6YQajUCwazjIoqbzU9wEOxAvxm+9mxmgjcvuZ
+	hIF6eFcXy1uX75gZm2DQhn8rn0LPKvhEwPudxVJ19ymwwLbPB2IN3klgvHErjR5dM=
+X-Google-Smtp-Source: AGHT+IFJs+ZhchzXRGJVcyEK6P/BPOUVSXu7jFxFlu1YtOZP4EdE+NQsj52iCebn4YmWRq4ge9eEJOy4WdeS3R2Oeg==
+X-Received: from pldt12.prod.google.com ([2002:a17:903:40cc:b0:220:d668:ff81])
  (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:a84:b0:736:6ecd:8e34 with SMTP id d2e1a72fcca58-745fe014bf1mr1931755b3a.18.1748041533972;
- Fri, 23 May 2025 16:05:33 -0700 (PDT)
-Date: Fri, 23 May 2025 23:05:19 +0000
+ 2002:a17:903:acf:b0:22f:9f6a:7cf with SMTP id d9443c01a7336-2341500d143mr15462135ad.52.1748041535501;
+ Fri, 23 May 2025 16:05:35 -0700 (PDT)
+Date: Fri, 23 May 2025 23:05:20 +0000
 In-Reply-To: <20250523230524.1107879-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250523230524.1107879-1-almasrymina@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250523230524.1107879-4-almasrymina@google.com>
-Subject: [PATCH net-next v2 3/8] net: devmem: preserve sockc_err
+Message-ID: <20250523230524.1107879-5-almasrymina@google.com>
+Subject: [PATCH net-next v2 4/8] net: devmem: ksft: add ipv4 support
 From: Mina Almasry <almasrymina@google.com>
 To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-kselftest@vger.kernel.org
@@ -88,88 +88,63 @@ Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.ne
 	ap420073@gmail.com, praan@google.com, shivajikant@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Preserve the error code returned by sock_cmsg_send and return that on
-err.
+ncdevmem supports both ipv4 and ipv6, but the ksft is currently
+ipv6-only. Propagate the ipv4 support to the ksft, so that folks that
+are limited to these networks can also test.
 
 Signed-off-by: Mina Almasry <almasrymina@google.com>
+
 
 ---
 
 v2:
-- Remove unnecessary !! (Stan)
+- Use cfg.addr and cfg.remote_addr instead of doing ipv4 and ipv6
+  special handling (Jakub)
 ---
- net/ipv4/tcp.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ tools/testing/selftests/drivers/net/hw/devmem.py | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index b7b6ab41b496..f64f8276a73c 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1067,7 +1067,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 	int flags, err, copied = 0;
- 	int mss_now = 0, size_goal, copied_syn = 0;
- 	int process_backlog = 0;
--	bool sockc_valid = true;
-+	int sockc_err = 0;
- 	int zc = 0;
- 	long timeo;
+diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+index 7fc686cf47a2..9b3e2c78f457 100755
+--- a/tools/testing/selftests/drivers/net/hw/devmem.py
++++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+@@ -21,30 +21,28 @@ def require_devmem(cfg):
  
-@@ -1075,13 +1075,10 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ @ksft_disruptive
+ def check_rx(cfg) -> None:
+-    cfg.require_ipver("6")
+     require_devmem(cfg)
  
- 	sockc = (struct sockcm_cookie){ .tsflags = READ_ONCE(sk->sk_tsflags) };
- 	if (msg->msg_controllen) {
--		err = sock_cmsg_send(sk, msg, &sockc);
--		if (unlikely(err))
--			/* Don't return error until MSG_FASTOPEN has been
--			 * processed; that may succeed even if the cmsg is
--			 * invalid.
--			 */
--			sockc_valid = false;
-+		sockc_err = sock_cmsg_send(sk, msg, &sockc);
-+		/* Don't return error until MSG_FASTOPEN has been processed;
-+		 * that may succeed even if the cmsg is invalid.
-+		 */
- 	}
+     port = rand_port()
+-    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr_v['6']} -p {port}"
++    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr} -p {port}"
  
- 	if ((flags & MSG_ZEROCOPY) && size) {
-@@ -1092,7 +1089,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 		} else if (sock_flag(sk, SOCK_ZEROCOPY)) {
- 			skb = tcp_write_queue_tail(sk);
- 			uarg = msg_zerocopy_realloc(sk, size, skb_zcopy(skb),
--						    sockc_valid && !!sockc.dmabuf_id);
-+						    !sockc_err && sockc.dmabuf_id);
- 			if (!uarg) {
- 				err = -ENOBUFS;
- 				goto out_err;
-@@ -1102,7 +1099,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 			else
- 				uarg_to_msgzc(uarg)->zerocopy = 0;
+-    with bkg(listen_cmd) as socat:
++    with bkg(listen_cmd) as ncdevmem:
+         wait_port_listen(port)
+-        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:[{cfg.addr_v['6']}]:{port}", host=cfg.remote, shell=True)
++        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP{cfg.addr_ipver}:{cfg.addr}:{port}", host=cfg.remote, shell=True)
  
--			if (sockc_valid && sockc.dmabuf_id) {
-+			if (!sockc_err && sockc.dmabuf_id) {
- 				binding = net_devmem_get_binding(sk, sockc.dmabuf_id);
- 				if (IS_ERR(binding)) {
- 					err = PTR_ERR(binding);
-@@ -1116,7 +1113,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 			zc = MSG_SPLICE_PAGES;
- 	}
+-    ksft_eq(socat.stdout.strip(), "hello\nworld")
++    ksft_eq(ncdevmem.stdout.strip(), "hello\nworld")
  
--	if (sockc_valid && sockc.dmabuf_id &&
-+	if (!sockc_err && sockc.dmabuf_id &&
- 	    (!(flags & MSG_ZEROCOPY) || !sock_flag(sk, SOCK_ZEROCOPY))) {
- 		err = -EINVAL;
- 		goto out_err;
-@@ -1160,9 +1157,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 		/* 'common' sending to sendq */
- 	}
  
--	if (!sockc_valid) {
--		if (!err)
--			err = -EINVAL;
-+	if (sockc_err) {
-+		err = sockc_err;
- 		goto out_err;
- 	}
+ @ksft_disruptive
+ def check_tx(cfg) -> None:
+-    cfg.require_ipver("6")
+     require_devmem(cfg)
+ 
+     port = rand_port()
+-    listen_cmd = f"socat -U - TCP6-LISTEN:{port}"
++    listen_cmd = f"socat -U - TCP{cfg.addr_ipver}-LISTEN:{port}"
+ 
+-    with bkg(listen_cmd, exit_wait=True) as socat:
++    with bkg(listen_cmd) as socat:
+         wait_port_listen(port)
+-        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifname} -s {cfg.addr_v['6']} -p {port}", host=cfg.remote, shell=True)
++        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifname} -s {cfg.addr} -p {port}", host=cfg.remote, shell=True)
+ 
+     ksft_eq(socat.stdout.strip(), "hello\nworld")
  
 -- 
 2.49.0.1151.ga128411c76-goog
