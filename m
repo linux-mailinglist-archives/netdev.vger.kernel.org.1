@@ -1,119 +1,261 @@
-Return-Path: <netdev+bounces-193163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A90AC2B05
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:37:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43626AC2B0B
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:39:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5DE2A402AB
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:37:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 828327A4C74
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D203A21E0A2;
-	Fri, 23 May 2025 20:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA291F1515;
+	Fri, 23 May 2025 20:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EtWai+Rc"
+	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="fJhU9IVT";
+	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="fb6tC34z"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mx0b-0024c301.pphosted.com (mx0b-0024c301.pphosted.com [148.163.153.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AB121D3CD
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 20:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748032495; cv=none; b=P0vXfc8Gs4HfiOrgEBhTbUe2hTOiODORMdusiZDHkoJHfYC/bkh/5z/xnlSWUsdmB+4TlWDSy4j1PIELM+9yEnogF8GO4mLyuAWr2jQFt3WZXShis2vXhF/vwVVlhM5SQekGqXucr0J3bmx/NJiihHXJAqh/066zWCYlZqxJNyA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748032495; c=relaxed/simple;
-	bh=73lc/rPP9eGUfkWT58IBLrpi8r/eruXKFdJ45xDIfH0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pL0fypG8WNmTh6AHu56aP2NeGg27NHqQLRG2N3IcsP3Ys6WooVfhK1aZmLXyhiiUllMZadkaneMny2P2xmSxzdWWyEtdgMm7skG2C1ua0ULY6mROOVELC4M2pwoq3WbLaafvSClPnjLQ3uXHVh9Ln0WqzGk/vPdq+CLu7HA6CY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EtWai+Rc; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748032492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GTViHUqHHL7FVcOYR+13mg8Z5ebv/l3Vzj9gh5nlRwU=;
-	b=EtWai+RcQT0KQtCIhC9XQzd8sYMtaOQuqnbpn3v0YeOMOXcd58IQXG/99tGbwVPRpYPkfA
-	seIRWDPPzRIY/oQhZlduiIosm85YbGT4e7MZB/df0N88aMqf/9RU0+hkV3W8zQLBO9wCBF
-	E0zQa+watqjB+z2o3KQ8FISaCUlJ+sg=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Lei Wei <quic_leiwei@quicinc.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	linux-kernel@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	devicetree@vger.kernel.org
-Subject: [net-next PATCH v5 10/10] of: property: Add device link support for PCS
-Date: Fri, 23 May 2025 16:33:39 -0400
-Message-Id: <20250523203339.1993685-11-sean.anderson@linux.dev>
-In-Reply-To: <20250523203339.1993685-1-sean.anderson@linux.dev>
-References: <20250523203339.1993685-1-sean.anderson@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A041EB36;
+	Fri, 23 May 2025 20:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.153.153
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748032733; cv=fail; b=FZz8XrKfZRIuz1x4m/NT5vYDwmitW4g/GtTYcorF0MLe/2Di7/gLrZzGRre99L9771XD+1Lx6Wn5s2I0UBYFt67se9sjxccx+8RYNUlSZRj61HQiG4kDtF5WWuO+F2wh890FnFNHmhfhApfwyqtrlThtYSm8bDFrQzOJa4wfw6Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748032733; c=relaxed/simple;
+	bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
+	h=Content-Type:Date:Message-Id:Cc:To:From:Subject:References:
+	 In-Reply-To:MIME-Version; b=n1RjPeGPNv6pZgbcy167TEmI3TRAss2EqWywoGkzksNmQUjw4JO61AqyoKBk6Esf/Lrmqw4KWuv5karw7gRLkI/q+rlWcaqbRHQVSmMgTbiXbRLJA/4uOnNd3KD5JXgvWER6ht5Cw57W8GCZ8uhE6Mctr4zmaLvfCrdi0bmtrmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=fJhU9IVT; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=fb6tC34z; arc=fail smtp.client-ip=148.163.153.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=silabs.com
+Received: from pps.filterd (m0101742.ppops.net [127.0.0.1])
+	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54NHOxOq027605;
+	Fri, 23 May 2025 15:38:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps12202023;
+	 bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=; b=fJhU9IVTepT8
+	jZ8yL8CdpDMd8phwk5Nc8KCJmJVmuvb/ymZIceeyVid4gduovifjSlB1shpS2eQl
+	opYo27AKsgWaj02nMOFyRquWZzCuWT+JKe3x9KJPm1m5laAxtlGKtffjPxJJ4WzR
+	5BXbsnw896BntYh2XyIsUWdeg0Htxz9oPqs7MVzMzIiGeZoDAo9tB/V0fUvasuKb
+	JYpQmX5s5Ma5AUpMdheftq7ANVgy5DTSxW4B4L4HQjes7io9YHk1ucJtwzwUnIBJ
+	CIn2yBlHgLzCmQQmOpq733TrI72Gr2d1ogaANeIyHPM2XzhEVeMz33e807iM9dPX
+	qMrtVeL3vg==
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02on2135.outbound.protection.outlook.com [40.107.95.135])
+	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46t54wkamy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 May 2025 15:38:25 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WkBFqblzr8n35snpP+BCVPmqnMFlAI2C+PzXxB0YCmWKbF+dyl7IAiAaIA3SOF5KgajRdfKImvpf+vybP53LF7duVj5YcEfuZOg5eeShoMCsstCvhEYHO5llxvsNQEhVR2b5yRWdVQxkY3hV7Uzy5HyeingO47z/nQw+q3dn1N4+J5RitY/8X/mJI0+Th16aq0Peop7l9ys+BSb+EvQwMYTYeL4L2E7qjF7EhmV0V7uPdPs88l5IH05W/4Mmw0mHGM6+y/OXUhNIaPXkr/aL06ndT9WaqArlwxi4PtWQA8hqAqWJlzmBUd2A15YuIwtTsVxZAz3mmNUq8UD1dMayqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
+ b=f0Gam5LNRLTPeQkHkeYugcNRa7brCYXkNxB0qzF0q9IuaSWSIokbyH7h0cOoRZGbzA5WW5oxc7MFWqQgengCnshgw9WXvQeXWsdSnOiyDZcup5TVEN5e1ll120lYg3/8mDs9/abE3MZQaNbpqG4zYY3WGtZ5+UkRVVpw/oEmK0ONkA0gGb+qgYQi8h+X0HS+Rkh4w4np5rGH9VlLdwP9vAoWiGCSKwUNdhxCY++8kSS4CmFS6tKVF7c74mXTqZvlyie79qpDBSS939sp0ViT3dgAFfZRthPJ4WWhoq+N0GJeCmNf7mJPjxM/Dm5xtpt7mkt90mAVwrl7lGEqHmzslw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=silabs.com; dmarc=pass action=none header.from=silabs.com;
+ dkim=pass header.d=silabs.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
+ b=fb6tC34zv0kBh9kv0SnxgQAuGxbIQX794BAg0EOoBoag6KHZ0ur+r+mlzlcoUFGYeZfirnlLVJ/or1gYJKBKgbh55UPDwp/fq4BfIRPaRXvH1jKrkoCtlbZMEsyvQwtkgx764nNe8zUzyQ6r17xNlmpF0kTgj9TyYDL848ZMNm8=
+Received: from DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17)
+ by PH8PR11MB6829.namprd11.prod.outlook.com (2603:10b6:510:22f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.33; Fri, 23 May
+ 2025 20:38:20 +0000
+Received: from DS0PR11MB8205.namprd11.prod.outlook.com
+ ([fe80::c508:9b04:3351:524a]) by DS0PR11MB8205.namprd11.prod.outlook.com
+ ([fe80::c508:9b04:3351:524a%4]) with mapi id 15.20.8722.031; Fri, 23 May 2025
+ 20:38:20 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 23 May 2025 16:38:17 -0400
+Message-Id: <DA3TVJDZ81YO.1NHRVPOHH9YJU@silabs.com>
+Cc: "Alex Elder" <elder@ieee.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Eric Dumazet"
+ <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>,
+        "Rob Herring" <robh@kernel.org>,
+        "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>,
+        "Conor Dooley" <conor+dt@kernel.org>,
+        "Silicon Labs
+ Kernel Team" <linux-devel@silabs.com>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, "Johan
+ Hovold" <johan@kernel.org>,
+        "Alex Elder" <elder@kernel.org>,
+        "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        <greybus-dev@lists.linaro.org>
+To: "Andrew Lunn" <andrew@lunn.ch>
+From: =?utf-8?q?Damien_Ri=C3=A9gel?= <damien.riegel@silabs.com>
+Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
+X-Mailer: aerc 0.20.1
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
+ <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
+ <D9VCEGBQWBW8.3MJCYYXOZHZNX@silabs.com>
+ <f1a4ab5a-f2ce-4c94-91eb-ab81aea5b413@lunn.ch>
+ <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
+ <65cc6196-7ebe-453f-8148-ecb93e5b69fd@ieee.org>
+ <DA3STV21NQE0.23SODSDP37DI7@silabs.com>
+ <db54fe16-ae7d-410c-817b-edb4faa6656c@lunn.ch>
+In-Reply-To: <db54fe16-ae7d-410c-817b-edb4faa6656c@lunn.ch>
+X-ClientProxiedBy: YQBPR0101CA0177.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:f::20) To DS0PR11MB8205.namprd11.prod.outlook.com
+ (2603:10b6:8:162::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8205:EE_|PH8PR11MB6829:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8954abae-fdc1-4eb4-3a11-08dd9a39c0f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?S3hFUFpwZXZXMjlLR1FvM2RPUGlwN25vM2Y5VXRnSWE2N3pEdndob05zTHU5?=
+ =?utf-8?B?NHVyeHdZRkxXWkRBdFg5MCtjS0JoT1k3Zi80TkJBbUcrdjljMktsakdtSm52?=
+ =?utf-8?B?SkVFKy9KSkhJQ1lvMDlVT1kwOGtZSUJnRGNGUEJocFBIL244RzliT1FtU08y?=
+ =?utf-8?B?Vjk0NTBqZDBUY3B6TmVHaDNRVGJXZ2sxN0l1dDdya2hPd1ZyNUR5MWtlOVZm?=
+ =?utf-8?B?Smd5N2YxV2hBVVB5aG1wbzdJbEc4dnFPQ1Y4eFc2M2hCUEtZbjUrZGxRTHV5?=
+ =?utf-8?B?dzhuWG0vYkdrbHJJdlkyazZtd1VPYXBuNVozRkprR0NObFVLNklwaXk1dTI4?=
+ =?utf-8?B?TU9hTlc0bnlQL1hEejR3M0c0YTJ0VEl1RldZQXhFalBIeHpOK3h5NGU1aUxM?=
+ =?utf-8?B?QmxyVmRGTUpQWUo0a0FjV0hPcEtrTHZSKzBLUXRuQW4zNjc5UHdaandYdG1u?=
+ =?utf-8?B?UlZsS2NZcWdGTUI2UkQ1bUFFMC9vUnVzdTFURG9mMFlKMkxva3VuMjMxaUlr?=
+ =?utf-8?B?SmJGcHozZ0huQXFHUUU5VmUyUUw0WHEzWE1GckwrK21WeWZPakYyeXplU1Nt?=
+ =?utf-8?B?ZmRQcmpaQjFRd2Fac2xVRkhZNytucDZRSno3T1JxNGUzeUNGcFlkQTEraUh4?=
+ =?utf-8?B?MjByL1ViVDdjQXhZRlFqODBCWm5PUzZiWGdqQ0xjQ2ZGb2pCMndITDc0Y2Nt?=
+ =?utf-8?B?RGVQU1lSelJvQWFOcVNoMmZDTUhLZVZCVXBDT0FZczZoTGlCNGNwT3pkVTBV?=
+ =?utf-8?B?T09Wa0E1Z1hTSDdpeisvdUV0bDFuZTRsQktqd2cvNXdzOEpaRFY0ZS9QdHI3?=
+ =?utf-8?B?TlVnVGs1QW02SnpGQUFkT3huU1hKTmI5NnZxOS9qbFFyMkF4eW90eHE5c29m?=
+ =?utf-8?B?RnlGb0lOclY2aitLanVEaTM2empBVXo3SFpNZ0VKbDdwOWV1WExnUXE2QjNF?=
+ =?utf-8?B?dHRVTTh0N1NlZXFJYTZ5OGgwWElwRjZXWEdzQ2tOeStUZkZSL2p3cUo1blFt?=
+ =?utf-8?B?T1pDaDl6T0xyL3lTMHVkdEh2YTh0d2cvNENISlFaQTR5V0plR0pKaTQ3bjhw?=
+ =?utf-8?B?QWdxNk1NVjAzT1RTc3g4dXhhVUVkTTFOUGdMS3Z6V1IrdUhEMG9lYUZCUys2?=
+ =?utf-8?B?TE8yWmZURVZ5WWp5QjYzbzFpbmhKVDErZDA2Vm9HeWd2ZnJJeW5CaVY5L2t2?=
+ =?utf-8?B?cDR4dXp5b3creG84WWRYa0tDc3I2MHNXdFQxMzhIVk9GTndwd0dpTFpDT1Zz?=
+ =?utf-8?B?di9EL3N5V1NZcWF5QXFmdjNXc0plclYydzdWT094YmNBRnMybEYxdCt2UFRJ?=
+ =?utf-8?B?Y0FUQ3JsNlFQZHkvL0VkUmdNei8ycm92WUlya1Q1N1dGMGFrcG4wWHBML2JV?=
+ =?utf-8?B?VkxiWWZiYlYwUFVadE55TDlyQ3dBL0hWRm9CVnNKb1FJMCtnV2JXNlpUeUFB?=
+ =?utf-8?B?STQ0R2Z2VHFNYWZRNHRYUEkwSHVjQUxaT094RDd3aTZlYnBwV2M2SDZrR3FB?=
+ =?utf-8?B?UVF2ZTNmejVQSWdkM1RhRTY0OWF3ZkRvejgvbXhvS1RiTm5hWFhQbE9kNnJM?=
+ =?utf-8?B?NzFiL0YrMmJVVDM0VFdneVpETnNoVm0wU3AwU3VoY1FMMk1RQ0Mxd3BHY3Rz?=
+ =?utf-8?B?RTFXZDdYeDVxeFBzNlhyM0V3dmd1Z0xnYmpuYXNuNzNtY0F3UWM2b0dnVEhV?=
+ =?utf-8?B?NUplTitwOVhoVzZjUjB3S2NGNldEbG5PT3RHL0JUZ3Npb3M1bjlyNVhtWndN?=
+ =?utf-8?B?WmRITzkvaVZmYy9kblhOeEdaRmFCOG0xL0hYV1hwazFuLzFSWGprNTFKbFg2?=
+ =?utf-8?Q?p51sXHNi3ncl+jHyf3cZUomjzoOt0OUMUUNv8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8205.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cVVSNVc0em9YWENjdFFKakpqdTRvamhrTTJDMzhDRGdzSEZnNTNDQjlPQm5v?=
+ =?utf-8?B?VVIxWWRxV3pLKzFOY2NGOXVuSVg4V0pQRVBabnlkK0NGc2RDbVJxK0JaSzc5?=
+ =?utf-8?B?WFUrWFVyWlphN3VWRDN1TVV3UkpucGhwWE5FSGJjY3J1MndWYTBnY3FOYmJl?=
+ =?utf-8?B?T1BZWjEreVUyaERlRUtmcGkxQmt1c01IYThWbzVLT2JmcmxWbUVCS0dyZS9X?=
+ =?utf-8?B?WDZrdDJ1clRXMTdhWHRSbHo0L2tPb2l2Zm8zSE14UUl6Mk1mbGg3TnlVR3J0?=
+ =?utf-8?B?YTZQN3NQekhkZjZVM1Q0dENheUM2VHdWSUkzYjkxdHk1THNTZjhIT3FJT2FO?=
+ =?utf-8?B?QW53VVlFc3lwUmtCbWttNTIvbkl1Smt3TXNaSjh6UnNkb243R2Y1TnI3NkJK?=
+ =?utf-8?B?Z2xhQ2JMWXg5Zjc5RlJPcWpKOXc2b0hoY3VMaTFFT1NqdEZRSXFaNVBneG1D?=
+ =?utf-8?B?U01jcWxXR3JvazZKVzhFTkg2T2QyMzN0blhLR2tUT1R3Ky9mR3NqZm90TThZ?=
+ =?utf-8?B?cmFERDc0TzhIYjNuWk1QdGVSVUxyUTVDMzJhN1RiYTJoamFYYlpqeWFPRDc5?=
+ =?utf-8?B?WVFXaC9ZdnJuMkRFKy9QSlBpT3IySTRCb3FURzA2UVlPNHhzQlo1ZlBLOEU4?=
+ =?utf-8?B?VFFDVDZvbS83SHhYK3ZvaFc5WmUvTDFIYlZEa1p3UEZKKzRraHpld2Y5V0NB?=
+ =?utf-8?B?Q0RYNi9DM1pKQkV1akZvYVB0ai9lMXBabjhtaWh2TCtZWlcxS2RoTW5XNkpl?=
+ =?utf-8?B?QUZRTU8zRklQNXhyOFZQeEFvTUJmejc2Y2dQOU5mVjNHdHBWTE9QcEZtVlNL?=
+ =?utf-8?B?SEVWNnBmaFBScHJTekkzdjdnWS80Q1plajNWWkp4cmJvQUxVY0V2eFY1dVVV?=
+ =?utf-8?B?ZzlSNllxR3JSMWZRSHpERWd6WjJ1RjYvQ3dtRmNwdElpRmcxcFNiQk9zRDFR?=
+ =?utf-8?B?TDRoYXNSOS9GUno2ajdQK1dvRm5DanhqdjVEa3RiL3ZHaFZac1BGOE5naGxE?=
+ =?utf-8?B?b2ZuS012VDhkNzJyL2VPVnFpT25CRnBOeFBqVmRIYnE1SkZHamhTODdnaFFP?=
+ =?utf-8?B?RzdjMEVhR1BadWZCclp0RjFTbjNDUWVHUFNKYWMzNjlWeEE4c2xhZ29BWFNV?=
+ =?utf-8?B?UTB6Rm04WEF6YXpqaWVZZmFheDgzcVV0VnZRWHRYSm5SdTZubXIvVE9JZXFp?=
+ =?utf-8?B?eFY0KzdlclpROHVSemNmZTdqcU5qSUtYUTJPck5hRkVkUktnWE9QQ2Frenlm?=
+ =?utf-8?B?UHgrMVFNTUdsUzZhQk9hSjFpeEE3MzE3OHg4ZzEzSSs4YlNGWWhDZE9LVWkx?=
+ =?utf-8?B?YkNubityWnhIdzY1WUgrYmFLVnpWMTJqMjJZdnRqV3FIbGZCQ2ZDVFA4aUpp?=
+ =?utf-8?B?Y3VoQ0NHOWM0S1psai9BN01jNkM5ekJ2OU45RTlRaTVNVVVkNVFISGM2c3hQ?=
+ =?utf-8?B?NDBLS0Y2MVN6RlZYckpWVlo2ODgzaXFNTjFFZjR1dzBCWUhubVBvcUs3ajlR?=
+ =?utf-8?B?VWM1Mkk5UnVFYWlPRjNFdVcvOC9jc0VPNlNYOFluVG4yQ0NMMVdjZTdGTUpn?=
+ =?utf-8?B?TXk1ODFvU1Zsdmp3T1RsY1dpM0cyZGZ2NUtBYWRubm13ZWkyUm9jUHJ1S2Ft?=
+ =?utf-8?B?T1d0dk9EL2wvQnB0Q1NXNWtxQkVXYXlGU0VpS3d2ZWo5ZE9OWUZGcUNYa3VL?=
+ =?utf-8?B?aUIrTnJnYzcwYm1YSmF3a3JYSnFyd1c5TXVGKzBNRnRpRURrUENxUk95dk42?=
+ =?utf-8?B?WXZNNmxYTVJzZkF3RmI1N0Q4R3huRGxLR0trTjN5VURMdkV2ZUh5OGZISXM5?=
+ =?utf-8?B?eUszQVJubFF0Q3ZYajhUb013MURBMlU4YVliSnMxWXlYL2hVTW1ackJYUjVH?=
+ =?utf-8?B?YStwVXYyS2NOS1VsbWxRbERjclViemx4S2F2VjByVlhCUGl4MHlsRlkwOVF5?=
+ =?utf-8?B?TFRGdUF3em41NmZqTzZPc2pUQ085cEpTKzVvaEptVVF6RHNKWUFBWi9pYS80?=
+ =?utf-8?B?NzQ4bEdGSWdtQWhrQTN4WTllSEdob0VVWWZnTFZpSXJUd2MxR00rWEVIMHVp?=
+ =?utf-8?B?WEkvTkozSVdwdFRGMHdRVEpiRHZydW9OUDhHYU1qbXRYZHJNSysyRVI1VjBy?=
+ =?utf-8?Q?XtIifcyNrb+NY5a5KZmsgq6yc?=
+X-OriginatorOrg: silabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8954abae-fdc1-4eb4-3a11-08dd9a39c0f9
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8205.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2025 20:38:19.9233
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 54dbd822-5231-4b20-944d-6f4abcd541fb
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YOF2ktF3KuZpQz8n7NJzWIzwCPlq9MlX1EXWVyrxONa4Yw9FGPk8gK6eTfHTSxMykBqjMcPzA4o989ngaEUMbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6829
+X-Authority-Analysis: v=2.4 cv=JOc7s9Kb c=1 sm=1 tr=0 ts=6830dcc1 cx=c_pps a=73ZZgQctQage88DP8+znzA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=P-IC7800AAAA:8 a=5Bv2-q0KtQimkH2IRR4A:9 a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-ORIG-GUID: XG-szbRTsgfmSVAPuA_ml9SiyKy0CpmP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDE4OCBTYWx0ZWRfX64mb/z4WQNdV WAz+nq73lFTb6jNxw0cuVf+DzhUn3Plf9uk+QdXnXFucVNuy+yqJAhD1gsv6GD8SE2GaHa9wDWY RIMPkJ3XPkgukGmzkXrOXLpySZ4nP6TrpgcjalRnGwrnb96EZwrmCzzTteyTOzKKuQxVRR6PNfQ
+ LAlhK2evVnnuG6sMZHgH+J7Wk+7Mtcll7DLaxUrMHonOud2pDEw5bVI7b3zrBjvbH1NtRPyQMI5 VsU5aBxT8qexGhFElhEOzcKUuG7hmYgzLrlB6xtgzevLaJMmGJSB6toAk/xcw+mv0tYzdZRifw4 1KNpHNdBILOuNDCDhJiKFN6vG75faK3Q1tfLi22AbdsOyLU9lvVIzBw725/Pj1HHJ8WK6PQNY6j
+ pPLBK5woIaxESLktUdn95yuFp77g7fL2UIL/Cg5aQmgiqOa2ZbV8Vra7xYk9OtN6r65KeiY2
+X-Proofpoint-GUID: XG-szbRTsgfmSVAPuA_ml9SiyKy0CpmP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-23_06,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ clxscore=1015 phishscore=0 suspectscore=0 spamscore=0 priorityscore=1501
+ bulkscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.21.0-2505160000
+ definitions=main-2505230188
 
-This adds device link support for PCS devices, providing
-better probe ordering.
+On Fri May 23, 2025 at 4:06 PM EDT, Andrew Lunn wrote:
+>> I don't really know about UniPro and I'm learning about it as the
+>> discussion goes, but one of the point listed on Wikipedia is
+>> "reliability - data errors detected and correctable via retransmission"
+>>
+>> This is where CPC could come in, probably with a different name and a
+>> reduced scope, as a way to implement reliable transmission over UART,
+>> SPI, SDIO, by ensuring data errors are detected and packets
+>> retransmitted if necessary, and be limited to that.
+>
+> You mentioned HDLC in the past. What is interesting is that HDLC is
+> actually used in Greybus:
+>
+> https://elixir.bootlin.com/linux/v6.15-rc7/source/drivers/greybus/gb-beag=
+leplay.c*L581
+>
+> I've no idea if its just for framing, or if there is also retries on
+> errors, S-frames with flow and error control etc. There might be code
+> you can reuse here.
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Saravana Kannan <saravanak@google.com>
----
+Yeah I've seen it when looking at Greybus, from what I could see it's
+only framing. There is a CRC check though, frames received that don't
+pass that check are not passed to Greybus layer.
 
-(no changes since v2)
+Another aspect we would like to support is buffer management. In our
+implementation, each endpoint has its dedicated pool of RX buffers and
+the number of available buffers is advertised to the remote, so the
+Linux driver can delay transmission of packets if endpoints are out of
+RX buffers.
 
-Changes in v2:
-- Reorder pcs_handle to come before suffix props
-
- drivers/of/property.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/of/property.c b/drivers/of/property.c
-index c1feb631e383..1aa28bfadb12 100644
---- a/drivers/of/property.c
-+++ b/drivers/of/property.c
-@@ -1377,6 +1377,7 @@ DEFINE_SIMPLE_PROP(post_init_providers, "post-init-providers", NULL)
- DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-controller-cells")
- DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
- DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
-+DEFINE_SIMPLE_PROP(pcs_handle, "pcs-handle", NULL)
- DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
- DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
- 
-@@ -1528,6 +1529,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
- 	{ .parse_prop = parse_interrupts, },
- 	{ .parse_prop = parse_interrupt_map, },
- 	{ .parse_prop = parse_access_controllers, },
-+	{ .parse_prop = parse_pcs_handle, },
- 	{ .parse_prop = parse_regulators, },
- 	{ .parse_prop = parse_gpio, },
- 	{ .parse_prop = parse_gpios, },
--- 
-2.35.1.1320.gc452695387.dirty
-
+We decide to implement that mostly because that would get us the best
+throughtput possible. Sending a packet to an endpoint that doesn't have
+room for it means the packet will be dropped and we have to wait for a
+retransmission to occur, which degrades performance.
 
