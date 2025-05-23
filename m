@@ -1,288 +1,218 @@
-Return-Path: <netdev+bounces-192996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B9EAC2122
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:29:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 085B0AC2127
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36AE14A431D
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:29:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D4B67B841C
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3846322839A;
-	Fri, 23 May 2025 10:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83722228C92;
+	Fri, 23 May 2025 10:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SVpGnTvc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bhe+WUrw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01104227E9E;
-	Fri, 23 May 2025 10:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8679422A4D6
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 10:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747996158; cv=none; b=X2DTI7mxzkMkFnfmiICM77Bml3RfNhuIZOnXKeEl8LYv0HFiwhYB7g8vlT55/1RZ63eTDzyb7rb69OhE11bOspcE0CiAR4NYFczWWw8ZgXsuuFpgTZZkf9zZ08IX+tH61Xn8z+1Bbix9kvmmLh3xnoltqbx1IpkDJuqy6KM5hSo=
+	t=1747996251; cv=none; b=UGWWnbHHK2x8xarRWH5CEmXqApGtw/HYFJ60gehl4lPzhER+BY5+IuT5sQZAiRzFoEdQXXK3xehW1gJNq9WtckZ6YoQUoUtbJaOXRGuvr5tdGwXJUyeUfpZ/56YP6MPAjsCjC0xih2k8h3RkxEgovAbBahzch8NOGQhzhHjRKbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747996158; c=relaxed/simple;
-	bh=69dBOB9t5w6+DiXnD4zLoDAgDAyiYK0UYmfZGxLAz/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OHMfYZX/pHtyTi1QOi1yOjhZik/0MzQUnVXsJIBoJtU8e/q9OoKe/PCZha6Bp37EiuuXkr12ep4+fm54MM0UhbtG55m8bzT0F2YcLL3iveK4jOf8+HMmyfPxJoelSfil68oXrPePGxdGn07H3mkqXk5UUgGCvyiyzN7GOQw22Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SVpGnTvc; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54N67iam021071;
-	Fri, 23 May 2025 10:28:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	KDRRLq7VC2NTZWRaWPaOjv8BPHkEbqS5eOTo89pXTfQ=; b=SVpGnTvcUoNo43oV
-	nbAN5tgpBbUIrdI39tY9EmRdXYxUIl58jImYrnfIixKte/dHRnNQw+KbHLhQMUmu
-	f6kq3cayRFgHau5bZzhaN8B/G3+mjZKsMOnzuzaCTuVei8xf+41LW6VEikHSlErz
-	WzlPWyuHpGhUOiOYzR4m/tXnIjDzVtPNltXn0gdHF1/RtNKg5QMie0PGKPWepwi0
-	OyYONarTm+RGdwoa6sWl9eXJFpwq2foI54UocM7Ql3w0lfPgzgaTmclG8TVKV9cH
-	diDU4SwKmc3lgmWkZv3L22BGQVK1qyiyarmll0m00o9yqxjQi7Fz9YsfSJd23kT5
-	MZC9oA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46rwfa1rb1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 10:28:52 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54NASY4W011410
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 10:28:34 GMT
-Received: from [10.253.12.254] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 23 May
- 2025 03:28:28 -0700
-Message-ID: <a182df27-5b0d-42d1-8f58-4e7a913bb12d@quicinc.com>
-Date: Fri, 23 May 2025 18:28:26 +0800
+	s=arc-20240116; t=1747996251; c=relaxed/simple;
+	bh=VPp/mAYQescqqvBHjFXtXRQi1Y3YApV3oqzUfqmJ7As=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LwXqrPe8uDK6UmPb6oE1N9ODYqFFHWCqJyBuCbORPU6VBHCgepGnCBClPAk2kY85e0nTyaj4+daO6wwbip/IgjndHnD9W30qhCGsL3FCaL6oepvSVtgtaUAxBWVFUK/Tr7Hvr6Koqf7f3ipI5j99zm/udKc5U61FdU0fdRXuRO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bhe+WUrw; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-441ab63a415so94867795e9.3
+        for <netdev@vger.kernel.org>; Fri, 23 May 2025 03:30:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747996247; x=1748601047; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kOjxJSYGxT9UhmRJmVkAknXCevMEWqmnm4FKczQ8nEI=;
+        b=Bhe+WUrwgg/vvbBymp+XXz43GNUKZnfAJVDWyWQUt7qcNM/Df6+ZPiv1eAjwioxEdT
+         4Hhi0NLdldfMLAStxi1fLC2Sb4riL9kF2U0SbJK43mOMaAPL3/5XB4kfwXKjYtOR5maJ
+         B2G9GHpJ9/gRRyO9wA2mRLxrScPp5S/PUOeICbwnErBYr+W3v0FatbyiVRbrlHhizK8L
+         2nqCamKxfaa9ozfpo3S69ST2H9LgcdWTFk2vIgCQ5S1c0OZrL/aSQaqgL6B9PJuEXUUm
+         4TU6f6kJcGMAeyU2u2fu4ue2sLgksXa70++eJTJN2pYsgfex7tQF04COKBWaN9VcfSFp
+         vcOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747996247; x=1748601047;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kOjxJSYGxT9UhmRJmVkAknXCevMEWqmnm4FKczQ8nEI=;
+        b=NfFW3iFuq57nbDZ/gDERN2gdUT0EgTvQXWZb3y3m8F9owITIsdgWd9m0WD7w3E3vj0
+         QRjyMtMrdj7WhkC4ve2nLzsj+QeAArX/q/FtX4dF1akWwURmJ2Qrs0IdALyZ2qMjZ8Fo
+         759XTT8nvH/oBut+43R2vpeXidq+XyPJtvrsJCKYULFWa7Rl+MutaQ6x3HKjiZEnCFEI
+         bX3lqPI1zq5sggPYzNrNGKtKVZL2trsbAcLWlLVd6unICLx+rwYu2GXY0i5/k1WzOHJE
+         95Lh5AyCEqEwdqQ3KqE4HSfPJ5bDhrH/Oxuhb6lbupRSgRRqNMN70JtSj/+ZRdg6f7vL
+         hrsA==
+X-Gm-Message-State: AOJu0YxM6L2o6u8VUlqD1LZiZIPc8OcFYr51QqaadoFoUc6wBzIcGwSW
+	oExCrHAUpNri0WmXcqLkfncV3Y1G+u4pyfS8wPJSD+6wi7UA3ZgBSTimUp+Tdw==
+X-Gm-Gg: ASbGncsjBomMMIvMmFKn6TQWPXS5GiRX2tLqeeaE52ktG3HEjYz1w/BuRJwDl/LUmZZ
+	q2l2MEgpG5VbmNid+yE3tD6e9NXUdQkJJv/E5a+5Uglv3q9wvkgZH3WFr9iKo/k0K4OWeWNXq+/
+	RvwQcfa8VmRN5A+iw7Gmqax8Nx5C8PEc9nW6ztXhn4AoouaxzPkesGNiS3kweeN7bH6gjIvg8Og
+	kXZcGD27feuWSNraJswp44AjsXY9lXZue1a3h204tWzABuv/vSqfJAAodZFyEvabV/D7smeVdRR
+	kKRwClF31SsyVqoptLfOeFprYzVcv11gPQGquUlaNq6oS3PwfLYgCVcLMgAcQ4ILoOIV
+X-Google-Smtp-Source: AGHT+IEDpNL4sx4RLs1ngbJLOQyW2q1mq9kqZUoJrS6CYfClgU41sNkPo1R88zqya/h6PelnCebRGQ==
+X-Received: by 2002:a05:6000:4202:b0:3a3:653e:165 with SMTP id ffacd0b85a97d-3a3653e095fmr22454659f8f.39.1747996247277;
+        Fri, 23 May 2025 03:30:47 -0700 (PDT)
+Received: from imac.lan ([2a02:8010:60a0:0:f9df:85fc:d54:1dab])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca88941sm26503818f8f.61.2025.05.23.03.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 03:30:46 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] tools: ynl: parse extack for sub-messages
+Date: Fri, 23 May 2025 11:30:31 +0100
+Message-ID: <20250523103031.80236-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 01/14] dt-bindings: net: Add PPE for Qualcomm
- IPQ9574 SoC
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
- <20250513-qcom_ipq_ppe-v4-1-4fbe40cbbb71@quicinc.com>
- <20250519-garrulous-monumental-shrimp-94ad70@kuoka>
-Content-Language: en-US
-From: Luo Jie <quic_luoj@quicinc.com>
-In-Reply-To: <20250519-garrulous-monumental-shrimp-94ad70@kuoka>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=V9990fni c=1 sm=1 tr=0 ts=68304de4 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=gEfo2CItAAAA:8
- a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=Prh-tzD87P_o6MH7a5AA:9 a=QEXdDO2ut3YA:10
- a=HtAgjdVYPwQA:10 a=sptkURWiP4Gy88Gu7hUp:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: GtcXkqmuuM1ynK2KNuUbAyDpRkW5s3MV
-X-Proofpoint-GUID: GtcXkqmuuM1ynK2KNuUbAyDpRkW5s3MV
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDA5MyBTYWx0ZWRfX5H5lP9vRMAOB
- UDYRnaKYEXzsEh6wm4eFMj0HlpSBRTVspvJ/D1I/3cEq1JCev7eDvasAJwjAlqD20Daj7jTw80L
- W1aGpUAfvAf/m4LdRpvgYg36bVUgnvUlR6QqejYCl1urz8Gdnq196PbY5MuKwDqfaC++s8dY9og
- 9/uEMRfVkDir5PLFvC2UAmfhDfB27JwSlvY4QGG37bGNGCl/n2RRwG1yBdI3FdtUaRiiAf4g+VF
- 3CxCqWZWEQUck3hJoRtB8ka7UrgsiqJNDJpG2mGqKBF530U/vWjploYG1Kzhak1/UqeeQ7AUlmH
- q+O94dLUKTKu2N6YvmVA0X843uqAKLwzCO6XzUTSe+tP/Q6Fcso9+TDv7DY14D75UatWnGOQOW3
- 96V8OhRMJwuwki70TMKVroY4PjcJsF4CZtu+gFUNjnalxeAq6dtgiAACH8hECAzpwQDQvPdl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-23_03,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 bulkscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 spamscore=0 phishscore=0 suspectscore=0
- adultscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505230093
+Content-Transfer-Encoding: 8bit
 
+Extend the Python YNL extack decoding to handle sub-messages in the same
+way that YNL C does. This involves retaining the input values so that
+they are available during extack decoding.
 
+./tools/net/ynl/pyynl/cli.py --family rt-link --do newlink --create \
+    --json '{
+        "linkinfo": {"kind": "netkit", "data": {"policy": 10} }
+    }'
+Netlink error: Invalid argument
+nl_len = 92 (76) nl_flags = 0x300 nl_type = 2
+	error: -22
+	extack: {'msg': 'Provided default xmit policy not supported', 'bad-attr': '.linkinfo.data(netkit).policy'}
 
-On 5/19/2025 4:16 PM, Krzysztof Kozlowski wrote:
-> On Tue, May 13, 2025 at 05:58:21PM GMT, Luo Jie wrote:
->> The PPE (packet process engine) hardware block is available in Qualcomm
->> IPQ chipsets that support PPE architecture, such as IPQ9574. The PPE in
->> the IPQ9574 SoC includes six ethernet ports (6 GMAC and 6 XGMAC), which
->> are used to connect with external PHY devices by PCS. It includes an L2
->> switch function for bridging packets among the 6 ethernet ports and the
->> CPU port. The CPU port enables packet transfer between the ethernet
->> ports and the ARM cores in the SoC, using the ethernet DMA.
->>
->> The PPE also includes packet processing offload capabilities for various
->> networking functions such as route and bridge flows, VLANs, different
->> tunnel protocols and VPN.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->> ---
->>   .../devicetree/bindings/net/qcom,ipq9574-ppe.yaml  | 406 +++++++++++++++++++++
->>   1 file changed, 406 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml b/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
->> new file mode 100644
->> index 000000000000..f36f4d180674
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/qcom,ipq9574-ppe.yaml
->> @@ -0,0 +1,406 @@
->> +# SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/qcom,ipq9574-ppe.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Qualcomm IPQ packet process engine (PPE)
->> +
->> +maintainers:
->> +  - Luo Jie <quic_luoj@quicinc.com>
->> +  - Lei Wei <quic_leiwei@quicinc.com>
->> +  - Suruchi Agarwal <quic_suruchia@quicinc.com>
->> +  - Pavithra R <quic_pavir@quicinc.com>>
-> 
-> Double >>
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/pyynl/lib/ynl.py | 39 ++++++++++++++++++++++------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-Thanks, will fix it.
-
-> 
->> +
->> +description:
-> 
-> You got here comment didn't you?
-> 
-
-Yes. We initially believed the '|' marker may not be required
-since the format of hardware diagram in the description is
-preserved with a specific '|' already. However we relooked
-at this again, and will go ahead will add the marker based
-on the below documentation reference.
-
-https://docs.kernel.org/devicetree/bindings/writing-schema.html#example-schema
-
->> +  The Ethernet functionality in the PPE (Packet Process Engine) is comprised
->> +  of three components, the switch core, port wrapper and Ethernet DMA.
->> +
->> +  The Switch core in the IPQ9574 PPE has maximum of 6 front panel ports and
->> +  two FIFO interfaces. One of the two FIFO interfaces is used for Ethernet
->> +  port to host CPU communication using Ethernet DMA. The other is used
->> +  communicating to the EIP engine which is used for IPsec offload. On the
->> +  IPQ9574, the PPE includes 6 GMAC/XGMACs that can be connected with external
->> +  Ethernet PHY. Switch core also includes BM (Buffer Management), QM (Queue
->> +  Management) and SCH (Scheduler) modules for supporting the packet processing.
-> 
-> ...
-> 
->> +  clock-names:
->> +    items:
->> +      - const: ppe
->> +      - const: apb
->> +      - const: ipe
->> +      - const: btq
->> +
->> +  resets:
->> +    maxItems: 1
->> +    description: PPE reset, which is necessary before configuring PPE hardware
->> +
->> +  interconnects:
->> +    items:
->> +      - description: Clock path leading to PPE switch core function
->> +      - description: Clock path leading to PPE register access
->> +      - description: Clock path leading to QoS generation
->> +      - description: Clock path leading to timeout reference
->> +      - description: Clock path leading to NSS NOC from memory NOC
->> +      - description: Clock path leading to memory NOC from NSS NOC
->> +      - description: Clock path leading to enhanced memory NOC from NSS NOC
->> +
->> +  interconnect-names:
->> +    items:
->> +      - const: ppe
->> +      - const: ppe_cfg
->> +      - const: qos_gen
->> +      - const: timeout_ref
->> +      - const: nssnoc_memnoc
->> +      - const: memnoc_nssnoc
->> +      - const: memnoc_nssnoc_1
->> +
->> +  ethernet-dma:
-> 
-> I don't get why this is a separate node.
-> 
-
-We used a separate node because the EDMA (Ethernet DMA)
-is a separate block within the PPE block, with specific
-functions like ports-to-host-CPU packet transfer and
-hardware packet steering. We felt that a separate node
-would depict the hierarchy more clearly. Could you please
-suggest if a single node is recommended instead?
-
->> +    type: object
->> +    additionalProperties: false
->> +    description:
->> +      EDMA (Ethernet DMA) is used to transmit packets between PPE and ARM
->> +      host CPU. There are 32 TX descriptor rings, 32 TX completion rings,
->> +      24 RX descriptor rings and 8 RX fill rings supported.
->> +
->> +    properties:
->> +      clocks:
->> +        items:
->> +          - description: EDMA system clock from NSS Clock Controller
->> +          - description: EDMA APB (Advanced Peripheral Bus) clock from
->> +              NSS Clock Controller
->> +
->> +      clock-names:
->> +        items:
->> +          - const: sys
->> +          - const: apb
->> +
->> +      resets:
->> +        maxItems: 1
->> +        description: EDMA reset from NSS clock controller
->> +
->> +      interrupts:
->> +        minItems: 29
->> +        maxItems: 57
-> 
-> Why is this flexible on the same SoC?
-
-Thanks for pointing to this. I reviewed this again and agree
-that this need not be a flexible setting. I will fix this in
-the next update by setting 'minItems' and 'maxItems' here to
-the count of all available EDMA interrupts.
-
-> 
-> Best regards,
-> Krzysztof
-> 
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index dcc2c6b298d6..55b59f6c79b8 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -594,7 +594,7 @@ class YnlFamily(SpecFamily):
+             scalar_selector = self._get_scalar(attr, value["selector"])
+             attr_payload = struct.pack("II", scalar_value, scalar_selector)
+         elif attr['type'] == 'sub-message':
+-            msg_format = self._resolve_selector(attr, search_attrs)
++            msg_format, _ = self._resolve_selector(attr, search_attrs)
+             attr_payload = b''
+             if msg_format.fixed_header:
+                 attr_payload += self._encode_struct(msg_format.fixed_header, value)
+@@ -712,10 +712,10 @@ class YnlFamily(SpecFamily):
+             raise Exception(f"No message format for '{value}' in sub-message spec '{sub_msg}'")
+ 
+         spec = sub_msg_spec.formats[value]
+-        return spec
++        return spec, value
+ 
+     def _decode_sub_msg(self, attr, attr_spec, search_attrs):
+-        msg_format = self._resolve_selector(attr_spec, search_attrs)
++        msg_format, _ = self._resolve_selector(attr_spec, search_attrs)
+         decoded = {}
+         offset = 0
+         if msg_format.fixed_header:
+@@ -787,7 +787,7 @@ class YnlFamily(SpecFamily):
+ 
+         return rsp
+ 
+-    def _decode_extack_path(self, attrs, attr_set, offset, target):
++    def _decode_extack_path(self, attrs, attr_set, offset, target, search_attrs):
+         for attr in attrs:
+             try:
+                 attr_spec = attr_set.attrs_by_val[attr.type]
+@@ -801,26 +801,37 @@ class YnlFamily(SpecFamily):
+             if offset + attr.full_len <= target:
+                 offset += attr.full_len
+                 continue
+-            if attr_spec['type'] != 'nest':
++
++            pathname = attr_spec.name
++            if attr_spec['type'] == 'nest':
++                sub_attrs = self.attr_sets[attr_spec['nested-attributes']]
++                search_attrs = SpaceAttrs(sub_attrs, search_attrs.lookup(attr_spec['name']))
++            elif attr_spec['type'] == 'sub-message':
++                msg_format, value = self._resolve_selector(attr_spec, search_attrs)
++                if msg_format is None:
++                    raise Exception(f"Can't resolve sub-message of {attr_spec['name']} for extack")
++                sub_attrs = self.attr_sets[msg_format.attr_set]
++                pathname += f"({value})"
++            else:
+                 raise Exception(f"Can't dive into {attr.type} ({attr_spec['name']}) for extack")
+             offset += 4
+-            subpath = self._decode_extack_path(NlAttrs(attr.raw),
+-                                               self.attr_sets[attr_spec['nested-attributes']],
+-                                               offset, target)
++            subpath = self._decode_extack_path(NlAttrs(attr.raw), sub_attrs,
++                                               offset, target, search_attrs)
+             if subpath is None:
+                 return None
+-            return '.' + attr_spec.name + subpath
++            return '.' + pathname + subpath
+ 
+         return None
+ 
+-    def _decode_extack(self, request, op, extack):
++    def _decode_extack(self, request, op, extack, vals):
+         if 'bad-attr-offs' not in extack:
+             return
+ 
+         msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set), op)
+         offset = self.nlproto.msghdr_size() + self._struct_size(op.fixed_header)
++        search_attrs = SpaceAttrs(op.attr_set, vals)
+         path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
+-                                        extack['bad-attr-offs'])
++                                        extack['bad-attr-offs'], search_attrs)
+         if path:
+             del extack['bad-attr-offs']
+             extack['bad-attr'] = path
+@@ -1012,7 +1023,7 @@ class YnlFamily(SpecFamily):
+         for (method, vals, flags) in ops:
+             op = self.ops[method]
+             msg = self._encode_message(op, vals, flags, req_seq)
+-            reqs_by_seq[req_seq] = (op, msg, flags)
++            reqs_by_seq[req_seq] = (op, vals, msg, flags)
+             payload += msg
+             req_seq += 1
+ 
+@@ -1027,9 +1038,9 @@ class YnlFamily(SpecFamily):
+             self._recv_dbg_print(reply, nms)
+             for nl_msg in nms:
+                 if nl_msg.nl_seq in reqs_by_seq:
+-                    (op, req_msg, req_flags) = reqs_by_seq[nl_msg.nl_seq]
++                    (op, vals, req_msg, req_flags) = reqs_by_seq[nl_msg.nl_seq]
+                     if nl_msg.extack:
+-                        self._decode_extack(req_msg, op, nl_msg.extack)
++                        self._decode_extack(req_msg, op, nl_msg.extack, vals)
+                 else:
+                     op = None
+                     req_flags = []
+-- 
+2.49.0
 
 
