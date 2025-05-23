@@ -1,150 +1,283 @@
-Return-Path: <netdev+bounces-193063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0288EAC2496
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:00:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007AAAC24A2
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:04:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1105AA24549
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 14:00:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF37189CE85
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 14:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C0C481B1;
-	Fri, 23 May 2025 14:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BA029347F;
+	Fri, 23 May 2025 14:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NvSzQtlM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jH5OtQBR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4DA2DCC04
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 14:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C6D248F73;
+	Fri, 23 May 2025 14:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748008838; cv=none; b=Qetr8v3E1pH8/bQpatbkDe/+hwfx4MlPGw1UqaLFzEY+QgCZYS7GroHwo1MU0lHRd+4WRWgJGGLxUBlCVYRft8xW9+/C3qhGFF3VXOLvDiYEWTOB2tMTAc8AQBrQV2XnrAMUfDwIM//lEwoDhbavS7hxKRQ5SxrTZcqiGOJYFIA=
+	t=1748009086; cv=none; b=YIF6LJAZtYO8bGOAtOyoYiSoiUIZjSI7fYosIWzZiy7HIDQwEQ2ct2WjrgTCxP3QDvv4ZUjzwTz4bHYmGtH6vZ50FKV46tUkkeG9GgW7DWlB+OTa2h0Mg0KUcTZ+5xBcw1reJKE598Ql6lS0MOAfAxJ6GH/zPgWlX+gV5xLhepA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748008838; c=relaxed/simple;
-	bh=MhPr9xR9H725Ak+yU7srWo/Hm51G0586MrjNNZJyKKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=exRhHQLTRKmEOmJ2nmhoWGGV6Qvha7IFW63/N4xdS/Q/JiSi4c5wUT+61xI37yRQIm+XEXnzfD9GUud7xxa6gaEYs1GihnHYlVaAnn5jMcXBSaSqPom6Zl4afrdUJhAiqSQNcmMi8Up5srOysuSSBbHSxk/WHLX1yxU59G0WNHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NvSzQtlM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748008835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lcD7juidVWOBiD0EuxyWNh/kEMjw23rL2sWiBeVphdk=;
-	b=NvSzQtlM7OACwyYxaBApre0SlclQVkh+opHiFE/f79R/fbyN/0n5c7c0/IgYDOW1TxaPd2
-	V/UxW6vSLWzHiWsY43DdbTPqhICMw7qpP72BNZ3aCaNkF9L2z2BqTKSYNhsvuvapSAtVBg
-	rcNz4RxuChrGET8E09aag2MHeT7QTiQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-bzhFC6G5PtipNNFEUfU9Lg-1; Fri, 23 May 2025 10:00:34 -0400
-X-MC-Unique: bzhFC6G5PtipNNFEUfU9Lg-1
-X-Mimecast-MFC-AGG-ID: bzhFC6G5PtipNNFEUfU9Lg_1748008833
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-44b1f5b8e9dso5464095e9.2
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 07:00:33 -0700 (PDT)
+	s=arc-20240116; t=1748009086; c=relaxed/simple;
+	bh=6lpWK6Drr5+vgLOx0u+DvG+Bvx3CrrEBBgCjEtzjwkM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=o+mRoC3StdhUJId3QpunhbHZCLdDz9LDYMKpr/V5r21yGBrhWG7JnBJ76yn3HmdGKljZfXeBEMFnujSs9i/Z92/Z9eKcKGMlcdfY+EtmzGWoSk8Rx06cGbvyh4O1VrGebFCuvi4NFgZ4pqDOTUMBnXso3ST3L3/NJThGmNGpCSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jH5OtQBR; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c53b9d66fdso1247588085a.3;
+        Fri, 23 May 2025 07:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748009083; x=1748613883; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6SPYA6KKr4FKQPVcBeIbQ/FN9mi6kl/TZynKGB3TdfU=;
+        b=jH5OtQBRx5200qoamF4fwdIcEYl/uVnROqynsQSWQb2h8/ai4PaXosokboSMAmXwyS
+         CpQqMu+oXyubfCMYn+uaH+a6M32xbrdGZCo+kQ/63g48Na0PV0jBNwS/iMc0PYOVKX9u
+         KfUmgd8lXDw7NNCSBEgsOVWzEBVnVnEOVmQUuaI2CsHBrU33vIUzEO9pTcGYKOyQPB7a
+         S4PUKgNkX4qoUN9lyJ4clAEuYdJ3pibyOrAIDC4fdgcBJpFeoZzlyGITC54fOMRgLMJY
+         mQQF3UzXpM5pPkas3hpVlEybg45b8S/QEzMixyX8UOA46Tz7PvM2GsIjhx3uJZNSro2i
+         hpOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748008833; x=1748613633;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lcD7juidVWOBiD0EuxyWNh/kEMjw23rL2sWiBeVphdk=;
-        b=J5RP0VTq2bvUKsXlAVzcesCCgQDorc4A2ZkKmv4oz9Y9P+F6mmMWhm2ULAxGRcUNHe
-         6yCXOKegIldQfNIvaQN0UJerGEfp1qunxHp/VQbZXkkt6pfPVw/ghNPnejt7EnIC2wlH
-         zxTLv+Hmn2sfB9C5PMeROfolUnPzIiHW4NqLl5Axx60DCQvamq3RVh/lCkwj4qbXYfc8
-         mDUwCzN8M7g/bbyKbj3MniWP6VVcP9PcewUOsdu7Lcx3anXEr1SoTglg7tEJt7dRDw8z
-         Nwebycqdf+WSpDHiEghy/J+cQKz3vbdrCWgb6MYRa1Z4xf7Oe0y5imUfzEw8xjlLKUPh
-         6FKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVi6rYWjaupYrPdGiFV9g2ltpZ74tVc9aKVZwh5DzThpqmEbZhYkY8/PRUNA58x1Q7/Xkxy6nY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyden5xAlMTRbeXG/ZO9g84y4K2tUorgo2J8TZ4crMCgj195GZ1
-	Gp+HYRAr4vKm7U3rciJNefZs2ZwSDMhA+VYe1wcMRvrmyMAFKf+twfJ3K/KxYgHbDthP/qxPpdc
-	XnbXY6RLCCzVfl+483ZJ0tvBNrZ4cVmWPOHT3htW5n/wP455T6Ud8aMvQzw==
-X-Gm-Gg: ASbGnctCvBukKJu4F4jd20xoJROlEs1zvtBY3YacqUcTiYg1+NE9o4891SbGeWlN18k
-	WaTiQe5PE55oHFjWvfvEG4MG9/qR1N0yfh3oY53C0hDF9ekPjOy15LFIK7kiEdi7gXJg3JJecRJ
-	h4kd2MSutvZUwc5804fC9kcNmViu89AKNviRf0XZy9WvtjDo8HqLdtDtOK1BQ62Ej7EuAU42uB5
-	f6P/f06vwSI4JE7QKg/yJ8C8+FXkJf1bHIgDZC7X1ztyatxOC165sEMvIdub1A5HIRFBlu9P602
-	heOo8sN2vVXczm2ITQ8=
-X-Received: by 2002:a05:600c:1e1c:b0:442:f482:c42d with SMTP id 5b1f17b1804b1-442fefef17emr267543035e9.9.1748008832815;
-        Fri, 23 May 2025 07:00:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHBOHR5APVWsXckrhaOg6b3tPiYFSz6Qu956CxEh9WKjcvs/uC4z6onjP4OVJ7XmXobSsw8tw==
-X-Received: by 2002:a05:600c:1e1c:b0:442:f482:c42d with SMTP id 5b1f17b1804b1-442fefef17emr267542615e9.9.1748008832355;
-        Fri, 23 May 2025 07:00:32 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:247a:1010::f39? ([2a0d:3344:247a:1010::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f7baaf2asm142957145e9.34.2025.05.23.07.00.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 May 2025 07:00:31 -0700 (PDT)
-Message-ID: <ca169183-55af-43d2-b78d-db82c33c6643@redhat.com>
-Date: Fri, 23 May 2025 16:00:30 +0200
+        d=1e100.net; s=20230601; t=1748009083; x=1748613883;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6SPYA6KKr4FKQPVcBeIbQ/FN9mi6kl/TZynKGB3TdfU=;
+        b=nBTiJjUek5VTGLaaSNWknxXdoqTfHEcflV4QYgUlXexdxhkIRBqNvsK8aHs9HOYG7a
+         NS4QMpHaPG2XBEMrWeMfLTQirI5EyIQHkl/32orvk90rMzyfCZSkyb1XTbwBPZW125Hk
+         W/C7KaZtej7yB3U8npb801il87qaVd18Mf2LNGz5cPgwnIYyHI4/t7VWQuKTAhQKFC5d
+         huIbJ5rOKD+IhosxbAmpUshbpBZSf9rYQjNC4LSm3R/FLZcQlZfzVv/ajaffYUxMmOAs
+         D1GimRKzueNbNDrpOkpKtnEKQneOOF+y74Wp+Q3h7ME9qmN1OYpyTYqtpipFQuHPFX84
+         xFrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVf4TPV17ffk6RGlBKUyr3sE6ZA4+VV1WnBTGleFE6ZUABLe3bnTjutEh5pSudVRhK5AF/s0gg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfUIo7ID7acH8JzI3JWvT2f/wLN7z2kbzq6u0QcZ36lcl/d6by
+	raUZfc9ka+vhzNZBcmsCtLOy53DwKAxBSlaDS8fTVWq9jqjTK0uOhzpE
+X-Gm-Gg: ASbGncujACRVVU8TvdWEEzVYN4mUhQHPrhpgBIfcxAGyL5XNm3UQaFBGwjASFWGyfGl
+	QMOuGoa4Py5RDKbFwY8b0eFp0A3k7dcqNy7VA8xCgE8aWwaVcDexREd4qac+hzERqFRj4+TdNu2
+	BqoMXUnst56W6vNwUx7QchOyOPM4QEgZcxwS9FcerWsdyC9GpOwk7NkZr1/tf0oodEQA2x6FqxF
+	Gam4ddYXH0SzFS/dh2wkAUCB6C5Vs+0eHYcZ24muDG76CV7gwXCh7Zzh5P50luifQHrKuRLZYAd
+	nA/eJbUq6TYzHX5IIKDCwKvOiFrqVHRVZlfYn0JAV7msKXJ7/07XNsPsRrCuNqUnqtGuVqiqrfN
+	rnGesbAIoqmZs8g9kr1C+Tc+4eg1G2i5R6w==
+X-Google-Smtp-Source: AGHT+IGaymca1YezxsOIulTSN/Q8v3bR9qw2SFi/1IXzriNtN485FsSdroLT5pauvjI/40BAAf6kLw==
+X-Received: by 2002:ad4:404d:0:b0:6fa:9a6a:7d03 with SMTP id 6a1803df08f44-6fa9a6a7db2mr11984946d6.7.1748009083128;
+        Fri, 23 May 2025 07:04:43 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f8b0883ef7sm116259006d6.21.2025.05.23.07.04.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 07:04:42 -0700 (PDT)
+Date: Fri, 23 May 2025 10:04:42 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Shiming Cheng <shiming.cheng@mediatek.com>, 
+ willemdebruijin.kernel@gmail.com, 
+ edumazet@google.com, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ matthias.bgg@gmail.com
+Cc: linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ shiming.cheng@mediatek.com, 
+ lena.wang@mediatek.com
+Message-ID: <6830807a4a4b1_180c78294e7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250522031835.4395-1-shiming.cheng@mediatek.com>
+References: <20250522031835.4395-1-shiming.cheng@mediatek.com>
+Subject: Re: [PATCH] net: fix udp gso skb_segment after pull from frag_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/8] net: implement virtio helpers to handle UDP
- GSO tunneling.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <6e001d160707e1cf87870acee5adc302f8cb39b6.1747822866.git.pabeni@redhat.com>
- <682fa555b2bcc_13d837294a8@willemb.c.googlers.com.notmuch>
- <2ccf883f-17f0-4eda-a851-f640fd2b6e14@redhat.com>
- <68307b4f745df_180c7829493@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <68307b4f745df_180c7829493@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 5/23/25 3:42 PM, Willem de Bruijn wrote:
-> Paolo Abeni wrote:
->> On 5/23/25 12:29 AM, Willem de Bruijn wrote:
->>> Paolo Abeni wrote:
->>>> +#define VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_MAPPED	46
->>>> +#define VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO_CSUM_MAPPED	47
->>>
->>> I don't quite follow this. These are not real virtio bits?
->>
->> This comes directly from the recent follow-up on the virtio
->> specification. While the features space has been extended to 128 bit,
->> the 'guest offload' space is still 64bit. The 'guest offload' are
->> used/defined by the specification for the
->> VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET command, which allows the guest do
->> dynamically enable/disable H/W GRO at runtime.
->>
->> Up to ~now each offload bit corresponded to the feature bit with the
->> same value and vice versa.
->>
->> Due to the limited 'guest offload' space, relevant features in the high
->> 64 bits are 'mapped' to free bits in the lower range. That is simpler
->> than defining a new command (and associated features) to exchange an
->> extended guest offloads set.
->>
->> It's also not a problem from a 'guest offload' space exhaustion PoV
->> because there are a lot of features in the lower 64 bits range that are
->> _not_ guest offloads and could be reused for mapping - among them the
->> 'reserved features' that started this somewhat problematic features
->> space expansion.
-> 
-> That's a great explanation thanks. Can you add it either in the commit
-> message or as a comment at these definitions?
+Shiming Cheng wrote:
+>     Detect invalid geometry due to pull from frag_list, and pass to
+>     regular skb_segment. if only part of the fraglist payload is pulled=
 
-Sure, I'll add it to the commit message.
 
-Thanks,
+This does not match the patch.
 
-Paolo
+This is quoted from another patch that moves skb handling from
+skb_segment_list to skb_segment.
+
+This patch does not do that.
+
+Btw, don't forget to target the right list. [PATCH net]
+
+>     into head_skb, When splitting packets in the skb_segment function,
+>     it will always cause exception as below.
+> =
+
+>     Valid SKB_GSO_FRAGLIST skbs
+>     - consist of two or more segments
+>     - the head_skb holds the protocol headers plus first gso_size
+>     - one or more frag_list skbs hold exactly one segment
+>     - all but the last must be gso_size
+> =
+
+>     Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can=
+
+>     modify fraglist skbs, breaking these invariants.
+> =
+
+>     In extreme cases they pull one part of data into skb linear. For UD=
+P,
+>     this  causes three payloads with lengths of (11,11,10) bytes were
+>     pulled tail to become (12,10,10) bytes.
+> =
+
+>     When splitting packets in the skb_segment function, the first two
+>     packets of (11,11) bytes are split using skb_copy_bits. But when
+>     the last packet of 10 bytes is split, because hsize becomes nagativ=
+e,
+>     it enters the skb_clone process instead of continuing to use
+>     skb_copy_bits. In fact, the data for skb_clone has already been
+>     copied into the second packet.
+> =
+
+>     when hsize < 0,  the payload of the fraglist has already been copie=
+d
+>     (with skb_copy_bits), so there is no need to enter skb_clone to
+>     process this packet. Instead, continue using skb_copy_bits to proce=
+ss
+>     the next packet.
+
+I don't fully follow this. And as always with skb_segment am concerned
+that changing this condition may break other valid uses of this code.
+
+If this is a fraglist gso packet (SKB_GSO_FRAGLIST), I have a mind to
+just flag those that fail to meet the four invariants at the top, and
+in that case take a slow path that linearizes the skb and passes that
+to skb_segment.
+
+That should take care of a whole host of such bad fraglist gso skbs,
+without possibly breaking existing gso skb handling.
+
+>     el1h_64_sync_handler+0x3c/0x90
+>     el1h_64_sync+0x68/0x6c
+>     skb_segment+0xcd0/0xd14
+>     __udp_gso_segment+0x334/0x5f4
+>     udp4_ufo_fragment+0x118/0x15c
+>     inet_gso_segment+0x164/0x338
+>     skb_mac_gso_segment+0xc4/0x13c
+>     __skb_gso_segment+0xc4/0x124
+>     validate_xmit_skb+0x9c/0x2c0
+>     validate_xmit_skb_list+0x4c/0x80
+>     sch_direct_xmit+0x70/0x404
+>     __dev_queue_xmit+0x64c/0xe5c
+>     neigh_resolve_output+0x178/0x1c4
+>     ip_finish_output2+0x37c/0x47c
+>     __ip_finish_output+0x194/0x240
+>     ip_finish_output+0x20/0xf4
+>     ip_output+0x100/0x1a0
+>     NF_HOOK+0xc4/0x16c
+>     ip_forward+0x314/0x32c
+>     ip_rcv+0x90/0x118
+>     __netif_receive_skb+0x74/0x124
+>     process_backlog+0xe8/0x1a4
+>     __napi_poll+0x5c/0x1f8
+>     net_rx_action+0x154/0x314
+>     handle_softirqs+0x154/0x4b8
+>     __do_softirq+0x14/0x20
+> =
+
+>     [  118.376811] [C201134] dpmaif_rxq0_pus: [name:bug&]kernel BUG at =
+net/core/skbuff.c:4278!
+>     [  118.376829] [C201134] dpmaif_rxq0_pus: [name:traps&]Internal err=
+or: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+>     [  118.376858] [C201134] dpmaif_rxq0_pus: [name:mediatek_cpufreq_hw=
+&]cpufreq stop DVFS log done
+>     [  118.470774] [C201134] dpmaif_rxq0_pus: [name:mrdump&]Kernel Offs=
+et: 0x178cc00000 from 0xffffffc008000000
+>     [  118.470810] [C201134] dpmaif_rxq0_pus: [name:mrdump&]PHYS_OFFSET=
+: 0x40000000
+>     [  118.470827] [C201134] dpmaif_rxq0_pus: [name:mrdump&]pstate: 604=
+00005 (nZCv daif +PAN -UAO)
+>     [  118.470848] [C201134] dpmaif_rxq0_pus: [name:mrdump&]pc : [0xfff=
+fffd79598aefc] skb_segment+0xcd0/0xd14
+>     [  118.470900] [C201134] dpmaif_rxq0_pus: [name:mrdump&]lr : [0xfff=
+fffd79598a5e8] skb_segment+0x3bc/0xd14
+>     [  118.470928] [C201134] dpmaif_rxq0_pus: [name:mrdump&]sp : ffffff=
+c008013770
+>     [  118.470941] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x29: ffffff=
+c008013810 x28: 0000000000000040
+>     [  118.470961] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x27: 000000=
+000000002a x26: faffff81338f5500
+>     [  118.470976] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x25: f9ffff=
+800c87e000 x24: 0000000000000000
+>     [  118.470991] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x23: 000000=
+000000004b x22: f4ffff81338f4c00
+>     [  118.471005] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x21: 000000=
+000000000b x20: 0000000000000000
+>     [  118.471019] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x19: fdffff=
+8077db5dc8 x18: 0000000000000000
+>     [  118.471033] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x17: 000000=
+00ad6b63b6 x16: 00000000ad6b63b6
+>     [  118.471047] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x15: ffffff=
+d795aa59d4 x14: ffffffd795aa7bc4
+>     [  118.471061] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x13: f4ffff=
+806d40bc00 x12: 0000000100000000
+>     [  118.471075] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x11: 005400=
+0800000000 x10: 0000000000000040
+>     [  118.471089] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x9 : 000000=
+0000000040 x8 : 0000000000000055
+>     [  118.471104] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x7 : ffffff=
+d7959b0868 x6 : ffffffd7959aeebc
+>     [  118.471118] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x5 : f8ffff=
+8132ac5720 x4 : ffffffc0080134a8
+>     [  118.471131] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x3 : 000000=
+0000000a20 x2 : 0000000000000001
+>     [  118.471145] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x1 : 000000=
+000000000a x0 : faffff81338f5500
+> =
+
+>     BUG_ON=EF=BC=9A
+>          pos +=3D skb_headlen(list_skb);
+>          while (pos < offset + len) {
+>             BUG_ON(i >=3D nfrags);
+>             size =3D skb_frag_size(frag);
+> =
+
+> Fixes: dbd50f238dec ("net: move the hsize check to the else block in sk=
+b_segment")
+> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> ---
+>  net/core/skbuff.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
+
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 6841e61a6bd0..f9888f8dc3fa 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4808,7 +4808,7 @@ struct sk_buff *skb_segment(struct sk_buff *head_=
+skb,
+>  =
+
+>  		hsize =3D skb_headlen(head_skb) - offset;
+>  =
+
+> -		if (hsize <=3D 0 && i >=3D nfrags && skb_headlen(list_skb) &&
+> +		if (hsize =3D=3D 0 && i >=3D nfrags && skb_headlen(list_skb) &&
+>  		    (skb_headlen(list_skb) =3D=3D len || sg)) {
+>  			BUG_ON(skb_headlen(list_skb) > len);
+>  =
+
+> -- =
+
+> 2.45.2
+> =
+
 
 
 
