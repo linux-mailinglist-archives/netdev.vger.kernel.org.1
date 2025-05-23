@@ -1,180 +1,123 @@
-Return-Path: <netdev+bounces-192914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4464DAC1A04
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 04:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC11AC1A23
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 04:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 606C19E46B4
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 02:23:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94F5A3ACB33
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 02:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31325170A0B;
-	Fri, 23 May 2025 02:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBD21C6FF6;
+	Fri, 23 May 2025 02:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPxJLOqu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fhT7GV4I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DC23B7A8;
-	Fri, 23 May 2025 02:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68C72DCBE7
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 02:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747967005; cv=none; b=ejAjiO16IzxmQGXtm41gJbzWFJYnw0P3LWQKD/j976xkkFnFajBTtat1ROFyh69Bstw0dZaAlmRG+p81uYv7MtnRviKi3nPjedYLhT9iUXNS72bgmPZyYtI+J+UNjUVwrvAkMbNysBmC9tVL1dbolIwDbjktKsyEW9lvuHF994I=
+	t=1747967783; cv=none; b=HWJT0+m1CQQEAfxS/gue+TYTqjixR2iFBroIZMRHuqWkGRYS1LJG08TcNXPhrAWa8HX2J2U7WdJIy709YliPY8VeQzOGemBVtg/3IiD9ZSmrxgHIUcIReQKcMiCCkqZce4iqqWOf0JN1zl/5qYdJ7aBhNwofowMM8zEUS1VAxnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747967005; c=relaxed/simple;
-	bh=TF+xokCPhoXV3uQH9vkP5LG3jLW10BUQ6yKU+QJC6Zw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FdW3VDmpMHCpu/Zn0MX5wS9XbkRYpLV4gzm+IS8v0r5NYvfx5ZMjQY0m/b3MNTSyT9Da77M3h6bVB88EgsF4s5LtTCE9EEwee3k2TInnTsmWlhIZwvGYvoza6RW59OIe6/d01GYeXVcv2e3UETLq3X67OWKUB9999YJ3m68Zbi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPxJLOqu; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b1f7357b5b6so5493387a12.0;
-        Thu, 22 May 2025 19:23:23 -0700 (PDT)
+	s=arc-20240116; t=1747967783; c=relaxed/simple;
+	bh=Ku0RG7LIv/nNLun2V1WBNcLw+N63ceUVFHAqHm6z5PU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oWzGBspP/fQSBhe3sT8ON5SkZ84kR9VZ476zvKLjSqYlU1hzStcGP+Q4OzFbuBKQkVWLB5DpQmJXKxLMVySvrrWJblJTg+q4Eo77sHlu5HU0/P7P4uUj4j9bjyEwks1rzNurH6hnt+zE1gtdLGymW51uUOz47+EHnbBGP9LyEAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fhT7GV4I; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-550eaa73a18so9e87.1
+        for <netdev@vger.kernel.org>; Thu, 22 May 2025 19:36:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747967002; x=1748571802; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFQ//U4oIhIXdrjEYifV2TUXSUu8792YPU9aygo692Y=;
-        b=CPxJLOquTLYbzvwUHmvgRBdNYXgtNQcbv23cl8dtX52yuuI4wJ5lwDzNiAZDOktuDx
-         au+eXz7qkns08h51PnxZTFjIyGY0FFZl5SulTloNyj7s9WzjUnhf9KORSd0DFSN7P93U
-         +qNjL9RM7rVoZKR8UW4xU5fo1n5SZ6YpKAGrxw+awdinGNIlBwWGAGtGsImIY6zNiG0O
-         /yrDypL1/ttc/QavjNHZuSHPOzLeQL4NRmFQiQ4Bq8FN+prrVchQo4PCs9Qss/TJmMxo
-         Cj9k7lol2FIgWEOhpJnqI3B3M6PA7KjfWYZdoJGqozFdy5/oWHSlBhRue9JdcdY4Cmdr
-         ZvCQ==
+        d=google.com; s=20230601; t=1747967777; x=1748572577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ku0RG7LIv/nNLun2V1WBNcLw+N63ceUVFHAqHm6z5PU=;
+        b=fhT7GV4IYEPcHwueJ1/rh0NqbHDBm4Mz2pJ6+jwkz77QFZqMSAG309eJE6HCjKdE+u
+         lpS82EGUNZNegVXyFE0BB73Yy/fcmY54IVBVtZE3PLIUdM5uJrhhxh9cO9Jk3AMSLUXw
+         H8pT4AB4kZ/ciyGnBk+IjIx2R72MluyicftG/Q4fCeCKogjtqYusDsx2dvYoIaROkmNt
+         pPXcfncYV0HkY5qJxrdlCdWChjx+g3tA8tqSxOeek7sAQfoLhDt1CKEbnSbM4PFPX8Lz
+         RVGwsHXSrmNsJcbZfNgtryzA0IeENhXKRGnn64cWXJ3i5avCFD1raPr+KBUF/38TtPhL
+         UZaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747967002; x=1748571802;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PFQ//U4oIhIXdrjEYifV2TUXSUu8792YPU9aygo692Y=;
-        b=fZ6skZCYnMS4hxHual4LeBqxWslbokC1wS/ePHGKbOFIHW9kGZ7Fh8Yi7qydSn3AMa
-         c5CPhGnKafg5mEiUq1eoGuQuzFr3ucV7kMUEvxdy2TSwb3iI/pBr3vkU2vKbsMy+8rIO
-         mzlsHw3Z7uFwnyum59MVF05ZPaZsTznDaclA814UEjbqShKMN1CG7YZstsIhMf7AGdhQ
-         E4xT54UfW7CQEQCzauKg4Ubw+F+fm+zS4i5EBJQTI/+yGJZCXxsPcmfNt6r7+0weBz3u
-         ROWelI6H3EDjN1yiXOrIgIDtjVKhabXnC0QyUdf5zg4NORDfjdf42YiFxmZrtv2Id3nq
-         zr7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVYV7Ge0eYsS4ANahXTl30/9/dnUGSvCyQtRlHhhIOkIi69LixgS+QO+2KI1XJ3n2t7yIvcRq02mxHGZMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg+BRajtVVXGqcM77qCwhqdhnyQPRU2EJDasYw+qF6kqKQJB7o
-	l4wB7xHRuf+LWgippOjMj0tJvn+KaAs6y377cm0j7BVS5mTNuWCb55zjPH6+eRwFDAvvxQ==
-X-Gm-Gg: ASbGncv1gtcKU/4iAbvUcHvvmsC/8pCBw2yGOLMuW59Dv7G1K/RKvfbhusAhOo439Xd
-	AE0cC+YgKpVj4+L0L53RD9v0wxARMoWqLJFp9J3VIN9WLUNK96+ikxM3NYEwnShUtXHvcTDYrCI
-	uKL1KqMLuB0j8yRIg+pqwY4oXd5PYD3XgoD5kW6iqa4xFDbV9hU66nE+C30pBHdVnfEPi25W8b6
-	VJN0E3WP1piJevCNte4t1epiV2/tjv8lZ3E0frxyc+ay0g6gOHstWH4HHKz7W9aaW5HnKbFuK/0
-	Ar+VoaVgMhFV5rZVmv3Yes8WkZhjtOqKGpREDAkMKEFBKF8jRqEQbB6fq2ykkTKbeq0Z7XQ=
-X-Google-Smtp-Source: AGHT+IF+vdL+C7aa2hcNhReRVwiOAXc03EchlafM5myjN7kJ5idf22mz1Phve5rX0+oMHMIie71tww==
-X-Received: by 2002:a17:903:1987:b0:223:5e76:637a with SMTP id d9443c01a7336-231d451906dmr410903445ad.23.1747967002497;
-        Thu, 22 May 2025 19:23:22 -0700 (PDT)
-Received: from fedora.dns.podman ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4e988c3sm115034915ad.120.2025.05.22.19.23.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 19:23:21 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Liang Li <liali@redhat.com>
-Subject: [PATCH net] bonding: fix multicast MAC address synchronization
-Date: Fri, 23 May 2025 02:23:13 +0000
-Message-ID: <20250523022313.906-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
+        d=1e100.net; s=20230601; t=1747967777; x=1748572577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ku0RG7LIv/nNLun2V1WBNcLw+N63ceUVFHAqHm6z5PU=;
+        b=hYghkh26mDpIRQYi2itzh6FUgzh2c1bFTLUUz6VyHmsXfPUM3x83fR2pZMV00rXMRA
+         9nhMRb4hV3ybBYPq2UE+k1cHHS2CgJ6wLCsrE9SVFvKHZngzq3O04A6bKbeQWQM7T073
+         LF/czaDHWfiCvvlxPBn0uKKruXODdWxHjhnLfCxwQYs/0SxNYe20RiRj+K46Ut7NCc2T
+         buMcTKzeNXkEKDiC6mLwax31ccpErPTcay3N9pBK6ky3HO7FvqCY8LnYSxKRrO7w4Ran
+         57/OxsLEuKsBVKm1p2iCLH83D6kKGHpXSyJsBMFH0REj3lvwTfvtnT3/m8Un+6ydeOBz
+         6mzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBfyejFGxtmDTDR9gbwTqgdN4K+m2+u6Guj+JEzZiogmayeREDRAKmLXIFuVNWFpOeWvfB3w8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyR1dpmw/RfYUrckd8weLpo4vRBMmb3z934LVwY8dR8otNDhN4
+	xCX6Ks5bk9oXxwBGajKK6AP5PvE/eUdoT38KwGMH7/C7vFOx5t/a/Q4LgzWNnAsgZfbhZ9pOzkj
+	apYODLyjnmii6gEZFCUxEteqrQMgdUCBIGkdY05Y5QxpONbFRQmfxMupp
+X-Gm-Gg: ASbGncsN7nNcUnEHFxOVqnhci4LKR/b3nOFoUuv0JnCtL5D0xHn9vpgTw5dKEIUEBgS
+	RB75CT8OaWQz4yEdkqf+S2+qAnZD+UEf3KlJyy+0pqOPXTZFGMNlX4eev8Frh2u7k05+EHpTGRL
+	6F0CiIY1VlVQ4ddl+JoPgzpakV45VuaTIdQK9ofifkB8TzleWcgZKhr3Q0I7tKp3rx0RKVpWHy
+X-Google-Smtp-Source: AGHT+IGgXvGN7dS1Kxxx5d6BUFyZ6uzh7Mm/k2+/iNWKv+fOVoKBDJOaUyLME12z1zEoUQkgDUYkw7R27WctFzZnUy8=
+X-Received: by 2002:a19:ca16:0:b0:543:b9ff:12e2 with SMTP id
+ 2adb3069b0e04-5521855e016mr240e87.2.1747967773961; Thu, 22 May 2025 19:36:13
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <174794271559.992.2895280719007840700.reportbug@localhost>
+ <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
+ <f6475bd4-cf7e-4b96-8486-8c3d084679fc@kernel.org> <CAMw=ZnT7tcjC6z-9xuMbeC5RhDiaPRHaZB_2i_6WYNJ=cm1QVg@mail.gmail.com>
+ <CADXeF1Hmuc2NoA=Dg1n_3Yi-2kzGNZQdotb4HJpE-0X9K9Qf5Q@mail.gmail.com>
+ <CAMw=ZnTLuVjisLhD2nA094gOE2wkTLyr90Do0QidF5nHG_0k9g@mail.gmail.com>
+ <CADXeF1HXAteCQZ6aA2TKEdsSD3-zJx+DA5nKhEzT9v0N64sFiA@mail.gmail.com> <8f511684-3952-4074-8d97-51f4789f3151@kernel.org>
+In-Reply-To: <8f511684-3952-4074-8d97-51f4789f3151@kernel.org>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Fri, 23 May 2025 11:35:35 +0900
+X-Gm-Features: AX0GCFvtfWFwIamFXukPBrQEa_MbMjTQeOUS4ctL1_t797qJ2q5swgKMA_criD0
+Message-ID: <CADXeF1GgJ_1tee3hc7gca2Z21Lyi3mzxq52sSfMg3mFQd2rGWQ@mail.gmail.com>
+Subject: Re: Bug#1106321: iproute2: "ip monitor" fails with current trixie's
+ linux kernel / iproute2 combination
+To: David Ahern <dsahern@kernel.org>
+Cc: Luca Boccassi <bluca@debian.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	1106321@bugs.debian.org, Netdev <netdev@vger.kernel.org>, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is a corner case where the NS (Neighbor Solicitation) target is set to
-an invalid or unreachable address. In such cases, all the slave links are
-marked as down and set to backup. This causes the bond to add multicast MAC
-addresses to all slaves.
+Acked, will submit a patch to iproute2 main by EOD.
 
-However, bond_ab_arp_probe() later tries to activate a carrier on slave and
-sets it as active. If we subsequently change or clear the NS targets, the
-call to bond_slave_ns_maddrs_del() on this interface will fail because it
-is still marked active, and the multicast MAC address will remain.
+Thanks,
 
-To fix this issue, move the NS multicast address add/remove logic into
-bond_set_slave_state() to ensure multicast MAC addresses are updated
-synchronously whenever the slave state changes.
+Yuyang
 
-Note: The call to bond_slave_ns_maddrs_del() in __bond_release_one() is
-kept, as it is still required to clean up multicast MAC addresses when
-a slave is removed.
-
-Fixes: 8eb36164d1a6 ("bonding: add ns target multicast address to slave device")
-Reported-by: Liang Li <liali@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- drivers/net/bonding/bond_main.c | 9 ---------
- include/net/bonding.h           | 7 +++++++
- 2 files changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 8ea183da8d53..6dde6f870ee2 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1004,8 +1004,6 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
- 
- 		if (bond->dev->flags & IFF_UP)
- 			bond_hw_addr_flush(bond->dev, old_active->dev);
--
--		bond_slave_ns_maddrs_add(bond, old_active);
- 	}
- 
- 	if (new_active) {
-@@ -1022,8 +1020,6 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
- 			dev_mc_sync(new_active->dev, bond->dev);
- 			netif_addr_unlock_bh(bond->dev);
- 		}
--
--		bond_slave_ns_maddrs_del(bond, new_active);
- 	}
- }
- 
-@@ -2350,11 +2346,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 	bond_compute_features(bond);
- 	bond_set_carrier(bond);
- 
--	/* Needs to be called before bond_select_active_slave(), which will
--	 * remove the maddrs if the slave is selected as active slave.
--	 */
--	bond_slave_ns_maddrs_add(bond, new_slave);
--
- 	if (bond_uses_primary(bond)) {
- 		block_netpoll_tx();
- 		bond_select_active_slave(bond);
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 95f67b308c19..0041f7a2bd18 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -385,7 +385,14 @@ static inline void bond_set_slave_state(struct slave *slave,
- 	if (slave->backup == slave_state)
- 		return;
- 
-+	if (slave_state == BOND_STATE_ACTIVE)
-+		bond_slave_ns_maddrs_del(slave->bond, slave);
-+
- 	slave->backup = slave_state;
-+
-+	if (slave_state == BOND_STATE_BACKUP)
-+		bond_slave_ns_maddrs_add(slave->bond, slave);
-+
- 	if (notify) {
- 		bond_lower_state_changed(slave);
- 		bond_queue_slave_event(slave);
--- 
-2.46.0
-
+On Fri, May 23, 2025 at 11:17=E2=80=AFAM David Ahern <dsahern@kernel.org> w=
+rote:
+>
+> On 5/22/25 7:17 PM, Yuyang Huang wrote:
+> >> iproute2 is generally backward compatible with previous kernels yes,
+> >
+> > Acked, will submit a patch ASAP.
+> > Could you advise which branch needs the fix?
+> > Is submitting to iproute2-next and iproute2 enough?
+> >
+> >
+>
+> Thank you for the quick response.
+>
+> I should have caught the exit on lack of support for the feature, so
+> that is on me.
+>
+> Please send a patch based on iproute2 main (though main and next are
+> practically the same right now).
+>
 
