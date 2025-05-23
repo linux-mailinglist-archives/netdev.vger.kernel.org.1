@@ -1,559 +1,287 @@
-Return-Path: <netdev+bounces-193079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6120AC26CB
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:50:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CD0AC26B9
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FC70A468E8
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:49:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 679A1188BFF5
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C2C2957B0;
-	Fri, 23 May 2025 15:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ED5293730;
+	Fri, 23 May 2025 15:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jb6PeN5o"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="JSy241/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2058.outbound.protection.outlook.com [40.107.249.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAD529710A;
-	Fri, 23 May 2025 15:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748015338; cv=none; b=X+ZPaMOZHriUWwcknV0A52yajEov7zJTjJ45Lyc2xEA229VOsxWqTnZuFZgnVmr5rVdn61s9JbhkQS2k4LYDePuei340hxfNPM6IH9JDtCwO+cxtN8Nd1NELGYd4uB5mkbfdAOcrptmOXAaMGWNYHBmydrTK4NJeBMiz9bpyG6Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748015338; c=relaxed/simple;
-	bh=gFs2xH0sksy5QxZhQwfokuxfp+dAuHV5VmfByg0vm3E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eppKBMkcAj8YvFtAdpgKopu5s376gaHF5y5UIlvk8hL6JiCXDO2mddhrzsdMC11c3PRQ1CuUQd7MlJqwwaVQXZCQ7wcQ+lr5ksM4heu/WtAN9SStX4a2I8gKUOjhoQJKbKrU1hPbwVkokSWW54/31RxhgKVqTIGoaVuz6y7fTaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jb6PeN5o; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748015336; x=1779551336;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gFs2xH0sksy5QxZhQwfokuxfp+dAuHV5VmfByg0vm3E=;
-  b=Jb6PeN5oSZWCUTPji3UpO7j99ybNGG3HhP0ON/i/3LYXPO0KTz3fOzB8
-   /9+9dtDu45rbfLxjtrlWtuDAyuFBeBahpmQ+UfvguwGyYcBK9Gm4pbEOg
-   5iCnpKmlTWe9KRR+Zb/WZ8CPNPGy4JmUoqABVa4zEiDN9Bs7/cqrsvA6m
-   RX/44NLDOGpf6FcjPvJ5dmYZc170DR5rlZuRu9ot3fzJdu6KoaoD7O1hd
-   jbvq+pvLY5UPMBheY+98IzrxThFC10WBDlbt2LGUkR6JsQRYr8+GUw0HY
-   fo5F5y+GBpyMaV7mMYMAe9DLDjuRBlXeFDUn9kBC27vpobYpCoVYa3mJ4
-   w==;
-X-CSE-ConnectionGUID: S3AMKMwLTNK6dLnfu/RUdQ==
-X-CSE-MsgGUID: QCqcxUF/R46BqEWqUH020A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49958864"
-X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
-   d="scan'208";a="49958864"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 08:48:56 -0700
-X-CSE-ConnectionGUID: xpHJWnIeQ7aTyhVCnRXb2g==
-X-CSE-MsgGUID: WsvcoQEHS6agudQmEA61ZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
-   d="scan'208";a="141036236"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orviesa009.jf.intel.com with ESMTP; 23 May 2025 08:48:52 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: donald.hunter@gmail.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	aleksandr.loktionov@intel.com,
-	milena.olech@intel.com,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-doc@vger.kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net-next v4 3/3] ice: add phase offset monitor for all PPS dpll inputs
-Date: Fri, 23 May 2025 17:42:24 +0200
-Message-Id: <20250523154224.1510987-4-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250523154224.1510987-1-arkadiusz.kubalewski@intel.com>
-References: <20250523154224.1510987-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE351459F7;
+	Fri, 23 May 2025 15:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748015287; cv=fail; b=tXJK8UsNRXoGJKMLS19Ysu3CIEtorJMUXxdvL9TmX8hPVA6QG8O1EFr6I9nCujW1AlncIAjg38ljozchJ1Z2x30KmXpgV4N7rzzf1TkqnQBZZKj1ZrRCusdg4kL/iB9GP43cTcgZUS61rYuAXR8LnzxPaY0Q0o9LBymL872Om18=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748015287; c=relaxed/simple;
+	bh=N+1UAH7HaLAU89T5llhSQ/Yf4M18Z7XQLfhb0PFJ8Ko=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=RDk05lJQVdVA3Eo6tbZM1hh9pW6s4OPotTvuUtIwoAP4SFoxYGPmRfhFrHw51l8YMEYf4s6CP6f8L4RQHDqN4YzOzGV9f7Ngokp5/DGFUgnqcOf2rGAYMIrjLEGEjCJNjbO9aoTtO6D/JS7RFey2s4jdNbXBfRIyBfDL5ALF5+c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=JSy241/G; arc=fail smtp.client-ip=40.107.249.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NQ2Tt1TBW5uV+flPcdZB7NcF23DDtrABP4fllWaOt+zumI9/rTCGZMUVjGooR8zhxN8fTsNFMtrVbEMUvZPq4FLzuyVYJrGi4217QDFj461XVfv8bl8yD58b0OTDWkzPM2sELVkVOGqIRYpDml53vjCQm45o+WIL71rzCYX+fLGC1Z7ZkNFtwdArZq9adCKpnCUscSdQxBe5SSRex7h1IOIndrj6nD1BpMmrsTtXOiGvF8t7A9bNlIRlGhDiN9NkoUkDppPBx033PJvgNF9JNYKnSWy3w+AuRgYjkPaObElK2TBD5IHh2bQK9P9rWlKqNcF8eY/2CN/PT5Tq3wYQtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e78Z6/eI6up9DS2RmppNPjAhE2n1oqChOB6IHg9F0yU=;
+ b=sn9MjJHumUhHhsJwp4/3FxoVFayH6dkGxnDCBN27UyMoEHH8aWAavy3kz3K6U/RHTAQZ4YSNoa6uOCdir7K5FGZIMPIw0PDpdRpT30Apfx8TTolJiidfXBXQDSPtyYrkDphOYHOQApCGuM2BH+wA16l02fgJelnSvVP9/tRFHcX8ESYWDw14dG2OSzKn0Pq0Li/eJZ82hlXvQtRpD2SOYfyVgdny9QduqLZe0XPh1uEhKS6nQEqNTKAwksBuWYIKkmljUD7smgKzEjhdCUI7Y+vK+JvwKwQWKIggJ8rqHH0L/oLcqrk8M+qrlJN/ssUZHDDSDhxnX9kUNlUsj2oYDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e78Z6/eI6up9DS2RmppNPjAhE2n1oqChOB6IHg9F0yU=;
+ b=JSy241/GCpNyVxoG3qQIwendtL9bk/5zncsdX52unr/oxsrqD5tf1NSWHEDPhwXeDJDKbSuyCqYlcYlZ9k7lY1ktdfsDyb06sOFEQQjBcAEEcfYCzCJhS4Llv7vfnJYsL+gtbNgh5Mz09kgkLHuZLEE5uJOBtAGnkA6rwlE9YhVl6xrbtcvZX79TwastHqItWrgiGAMKriCaUjWbhlt6HJ5TMz7BHm13Qr2xPJqMUYPlx4Qu35vOs98he5haUHY//AjBKeC1e4XtJLJ0NBjYf554atFDIifK4xYrgHOHX6czniQr0fr22CwaQCyadJQlCa+xMAzXxhS+Zd7mpT3RDA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by GVXPR04MB10303.eurprd04.prod.outlook.com (2603:10a6:150:1ea::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.21; Fri, 23 May
+ 2025 15:48:00 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%2]) with mapi id 15.20.8746.030; Fri, 23 May 2025
+ 15:48:00 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Microchip (AT91) SoC support)
+Cc: imx@lists.linux.dev
+Subject: [PATCH 1/1] dt-bindings: ieee802154: Convert at86rf230.txt yaml format
+Date: Fri, 23 May 2025 11:47:39 -0400
+Message-Id: <20250523154743.545245-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR05CA0034.namprd05.prod.outlook.com
+ (2603:10b6:a03:c0::47) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|GVXPR04MB10303:EE_
+X-MS-Office365-Filtering-Correlation-Id: 922b552f-a40e-4e25-fd19-08dd9a113217
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|7416014|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LTYydI0Py6Wb3LUmT9/Bd8Iz7VCfszmFegoJc/15dwFRdMVz3szwImd+w75l?=
+ =?us-ascii?Q?tqUVvLXH1eumbHj2mcdZ5HomG7CdjivwkBY4wMUNexXSg8nGmqr2JZFpsGOO?=
+ =?us-ascii?Q?UWcAje8WzbnSLRwubid/PrFOAifgclK6/3e+PquFFbP1V3x1HcF5SovEA7GI?=
+ =?us-ascii?Q?3gQ4dIe7a5k0M6L+jItbDA9v+Jcxc/bAZpgbV/wdUgV6icE5svVUp8c1/KLe?=
+ =?us-ascii?Q?Uztf/WpqsCllpV03Jiz5nVa5VWsUXJhGFMZb0rTJ4a4Np67Gvsi5nIg1g8Nk?=
+ =?us-ascii?Q?ysuJxYktgvtCfLn3c81qtdfZC70RMckV36XLrm0S4nt0Dx7EYcZQoaM48mNM?=
+ =?us-ascii?Q?2SppLS8ZUPBQdelUSk/5W1OtEI1Y+2Tw4ZAG2ZHgSlZ8s/frmYsjMz4xQ/Rd?=
+ =?us-ascii?Q?VTFTx02aCE5mtHs7IchjgRqAl0z04CTlfqMfgZRimwNmFoAFh2Lvb4kSZrw9?=
+ =?us-ascii?Q?GczhZkBBdcpIaQzJfeYRwfzefhaHgm+mDHTSqSjZeUA6MITAv0WtD2u/UJkJ?=
+ =?us-ascii?Q?/5R9Hv2Gkhg9pCmknwKx/gcKZHJbvm3/KPjYnoRVdzKUwrfFjuoeBbMSDA+N?=
+ =?us-ascii?Q?4Ml0kTqlWLXKj0U6XH/tRNDLpIyDcap7kDeTwgCxhQj8ZE4M+6x9dkzkSmlx?=
+ =?us-ascii?Q?baRG6a2eBdVCIpNM7/Dy91XxRIDtZfGwdQf7VqReMTJ4LV1JeaOs7DWgcOGx?=
+ =?us-ascii?Q?e4bXduw46+EgZXr4ocna/t0Vf+Gq7TCG9BYy8LgXk2xHwC9ESlj1NJyDx3NH?=
+ =?us-ascii?Q?ZUDmets/10uMSaww7ivsBJrKJn52QDLmnbbnd0OsKKA2wAlPlALRis1NB4Ee?=
+ =?us-ascii?Q?hh6rRv1DsIwR2pky+4X8E+OwLA2GiW0ZgB789zMbtXet/3hRgBo8XtOGAqRE?=
+ =?us-ascii?Q?JWWPZuqKxgXhwQv8wjyx9HxlHqrRg2+fg2JrrtuQcPYN5UpLCz5qRaZKwJy+?=
+ =?us-ascii?Q?rt5AcPyxifUnQMLwYA7FsleU3hAzJl9hufvUoX/kYEvfqxLKBknGKXI5ygL4?=
+ =?us-ascii?Q?7mV54NeJzav1m74TSrzOmtoH1gZDvqTKbuHapQuFpR+yWD1eF9X3fF7zvFla?=
+ =?us-ascii?Q?aDvUchYl4mxAZ7pV5VsmTBg+gfKMOdCLNGWDqJE7p8pLShqu1FA97+VEYn/r?=
+ =?us-ascii?Q?AQ1SeSY2HhSPyEq4D7f/RR6X3eVz64RehQD1XzOnjAQk5vXdERSkZ5y+Jss4?=
+ =?us-ascii?Q?pKfgX6clloYckZULX2faGf7n7o7GFbhE/GcdZYEUegdc6g3lNnEMV7LtR/42?=
+ =?us-ascii?Q?TISwqRWRQapTSluS9FKOO5DTTYGONRHsKknCgYviJleuvccQ436O3jLTJ/OO?=
+ =?us-ascii?Q?byFHcUYpwHdCXNvGtPY1/O0rTUM84EmlGgH9Dj6apdHag2u4yd/e0nUF7lGd?=
+ =?us-ascii?Q?lJf0MgUBHAJpGnGeewTSJKOIuU5jvnf4oI/Do3taPlKbfNfQ84wnxtitJf40?=
+ =?us-ascii?Q?RjOCWyM401ghq7I6ZC81up+EYeYTnnQu?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(7416014)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?fMQ+ki6kEXeBOa7nfkWM4ARJNAZiP7AwnDGmiox2GpT0qm+ryh6+79OZ07+p?=
+ =?us-ascii?Q?VzuuJIYuv7qfkNpPdEgSjVQTpUbVtCHnI+r9CdVyV902jzM6o8uBpK5ERWuq?=
+ =?us-ascii?Q?Ezy7xgHFGhRRXLr4bFAxZ4ufutNC07hi7/d9VloL42o8YnJeLb/uLVE+bb7J?=
+ =?us-ascii?Q?VW8h+hQ+IW0lGgjNdKAHXZP0PiZ4hfiprabqroaqpRAIEwPp614Y1wPHnGp/?=
+ =?us-ascii?Q?AiHa5CDsIy0wYGR7kBh7xy4u8SJkMzOKHWXa1yNCCqHDiGb+KYVF0TJwU75t?=
+ =?us-ascii?Q?LwKrSSqYyyESfeYiw3Am0w5DW4Fjljk2tIu8wrjsjinELmrIOBJ7n2HLCEhT?=
+ =?us-ascii?Q?cLDq8qW/7P0645TFjqDTs/BDkKK28wtv6d0I1ZhrKLXPFVce9ofBGMWVeikx?=
+ =?us-ascii?Q?ysUXcP07Xl2f/a9WL5Cq9pKMIUIuMQQXserMieJfmaMwG2tkAmRr8lUVwVSS?=
+ =?us-ascii?Q?SVd2Yhnh2TNhquWUBWO4yHwGPetAgh54XJ3ENYQ5QpCyjEheUVQNss7DUa7S?=
+ =?us-ascii?Q?H4Gd9Cs3C09PQmjG4Racg05LZjIp4o1A8V05ZEyF+eXayj21h3GNIYSqhV03?=
+ =?us-ascii?Q?tvN0tM3PGcV4FvJRmztwntJKh1uavXVQMcbZ5hgj8M12iM98n9Vb/Eho7R2e?=
+ =?us-ascii?Q?4bCl2rZ+cnKTbDo1Ib0s8tP9e5REDKUcQ4yYChOfpX8NhUCFf0NY5M6JbueJ?=
+ =?us-ascii?Q?RtpBPy6nAI1v58kr/KUusZJjXNLfw13wLfsOczbd3qg7CsQCrl3A0L3Zg9a7?=
+ =?us-ascii?Q?JqomKqmWJ0KAW3K5fQSEJ22UbIPPgNxXbJWAAE89AKq9T6QUSINMbM8Um2I+?=
+ =?us-ascii?Q?KwH1NPP6R/0ta5O8xwcsJDE6okGnXGkbKAcsaATAfoAJU/1MzUvjuQUSdUpu?=
+ =?us-ascii?Q?XHVhnTG5JpaVFrtjN4JyFAz0l5Vu+KzuQiWFgZ4x0fG9K2z6vfaWg2dz5Tup?=
+ =?us-ascii?Q?Y+lLLslyax6Xoig9ocPnCsRwZXbF4fDRGDLeiX/HL4zaCp9kl6CUL4ouHv6N?=
+ =?us-ascii?Q?V+q12wPbd0oDNkNJRx5rJ0zjut7eSCu/gzLWuCgXXEGd6C5FcL9tLtYAyZmI?=
+ =?us-ascii?Q?gvscJG4u0no6s+LZwRFcYzw+7zTaAXkuJh+jXpclIAsg0Cs2MBw1iMAYvlVX?=
+ =?us-ascii?Q?xg0y+8ZlFDuJacfRosmWmSgcMoDzpcTtd7gkC1kzqFKW0xCmPp6A/Z4pfsg1?=
+ =?us-ascii?Q?hHIRuuG804w5vXdpxcqOwOU8opYf3u4JNMQ55YQ1Yr1tuoj3q6d3fbofq/Yk?=
+ =?us-ascii?Q?so7GbeqFo6Ib0h4WCcbdOU/LDKmpWEqvg3CKs2uq4FUrq87DCOuDDD9spB+6?=
+ =?us-ascii?Q?xTZ3wo87CqzARRIYV1h8c4P2vcDA36kFPDKVKqqkyFuGHMx8D/srNKdWllSd?=
+ =?us-ascii?Q?7uOJbgFjtEcilxzfDwXmPXp5TDf4rgoXfd56Q4Kfl/0Mq5aW3FKxW2oc1j1e?=
+ =?us-ascii?Q?RXJArDtnPKubmAGEGRztzBINIeV3aB15ursAb7ZB8e5GRy5m8FNz27eH0MNW?=
+ =?us-ascii?Q?p3u+a3YGJvRfFkVxB4I1dQKbwUK+rrW+95VQGtgaoVbVK5r8RzEy73E6/S8O?=
+ =?us-ascii?Q?NhUEX3sDyBL8h1agNLs=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 922b552f-a40e-4e25-fd19-08dd9a113217
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2025 15:48:00.3836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Uk6acTlVRSB2W35sIbzh4c9Hl0NXo2jEbd8EXRiQt2xb9gbHPyrwIQ9hdW6uKtTqKkkeuuNHmk677L0Ujq9zuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10303
 
-Implement a new admin command and helper function to handle and obtain
-CGU measurements for input pins.
+Convert at86rf230.txt yaml format.
 
-Add new callback operations to control the dpll device-level feature
-"phase offset monitor," allowing it to be enabled or disabled. If the
-feature is enabled, provide users with measured phase offsets and
-notifications.
+Additional changes:
+- Add ref to spi-peripheral-props.yaml.
+- Add parent spi node in examples.
 
-Initialize PPS DPLL with new callback operations if the feature is
-supported by the firmware.
-
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
 ---
-v4:
-- update --to= and --cc= with current maintainers.
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  20 ++
- drivers/net/ethernet/intel/ice/ice_common.c   |  26 +++
- drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 191 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_dpll.h     |   6 +
- drivers/net/ethernet/intel/ice/ice_main.c     |   4 +
- 6 files changed, 249 insertions(+), 1 deletion(-)
+ .../bindings/net/ieee802154/at86rf230.txt     | 27 --------
+ .../net/ieee802154/atmel,at86rf233.yaml       | 65 +++++++++++++++++++
+ 2 files changed, 65 insertions(+), 27 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index bdee499f991a..0ae7387e0599 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -2272,6 +2272,22 @@ struct ice_aqc_get_pkg_info_resp {
- 	struct ice_aqc_get_pkg_info pkg_info[];
- };
- 
-+#define ICE_CGU_INPUT_PHASE_OFFSET_BYTES	6
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+deleted file mode 100644
+index 168f1be509126..0000000000000
+--- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
++++ /dev/null
+@@ -1,27 +0,0 @@
+-* AT86RF230 IEEE 802.15.4 *
+-
+-Required properties:
+-  - compatible:		should be "atmel,at86rf230", "atmel,at86rf231",
+-			"atmel,at86rf233" or "atmel,at86rf212"
+-  - spi-max-frequency:	maximal bus speed, should be set to 7500000 depends
+-			sync or async operation mode
+-  - reg:		the chipselect index
+-  - interrupts:		the interrupt generated by the device. Non high-level
+-			can occur deadlocks while handling isr.
+-
+-Optional properties:
+-  - reset-gpio:		GPIO spec for the rstn pin
+-  - sleep-gpio:		GPIO spec for the slp_tr pin
+-  - xtal-trim:		u8 value for fine tuning the internal capacitance
+-			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
+-
+-Example:
+-
+-	at86rf231@0 {
+-		compatible = "atmel,at86rf231";
+-		spi-max-frequency = <7500000>;
+-		reg = <0>;
+-		interrupts = <19 4>;
+-		interrupt-parent = <&gpio3>;
+-		xtal-trim = /bits/ 8 <0x06>;
+-	};
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
+new file mode 100644
+index 0000000000000..275e5e4677a46
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
+@@ -0,0 +1,65 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/ieee802154/atmel,at86rf233.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+struct ice_cgu_input_measure {
-+	u8 phase_offset[ICE_CGU_INPUT_PHASE_OFFSET_BYTES];
-+	__le32 freq;
-+} __packed __aligned(sizeof(__le16));
++title: AT86RF230 IEEE 802.15.4
 +
-+#define ICE_AQC_GET_CGU_IN_MEAS_DPLL_IDX_M	ICE_M(0xf, 0)
++maintainers:
++  - Frank Li <Frank.Li@nxp.com>
 +
-+/* Get CGU input measure command response data structure (indirect 0x0C59) */
-+struct ice_aqc_get_cgu_input_measure {
-+	u8 dpll_idx_opt;
-+	u8 length;
-+	u8 rsvd[6];
-+};
++properties:
++  compatible:
++    enum:
++      - atmel,at86rf212
++      - atmel,at86rf230
++      - atmel,at86rf231
++      - atmel,at86rf233
 +
- #define ICE_AQC_GET_CGU_MAX_PHASE_ADJ	GENMASK(30, 0)
- 
- /* Get CGU abilities command response data structure (indirect 0x0C61) */
-@@ -2721,6 +2737,7 @@ struct ice_aq_desc {
- 		struct ice_aqc_add_get_update_free_vsi vsi_cmd;
- 		struct ice_aqc_add_update_free_vsi_resp add_update_free_vsi_res;
- 		struct ice_aqc_download_pkg download_pkg;
-+		struct ice_aqc_get_cgu_input_measure get_cgu_input_measure;
- 		struct ice_aqc_set_cgu_input_config set_cgu_input_config;
- 		struct ice_aqc_get_cgu_input_config get_cgu_input_config;
- 		struct ice_aqc_set_cgu_output_config set_cgu_output_config;
-@@ -2772,6 +2789,8 @@ enum ice_aq_err {
- 	ICE_AQ_RC_OK		= 0,  /* Success */
- 	ICE_AQ_RC_EPERM		= 1,  /* Operation not permitted */
- 	ICE_AQ_RC_ENOENT	= 2,  /* No such element */
-+	ICE_AQ_RC_ESRCH		= 3,  /* Bad opcode */
-+	ICE_AQ_RC_EAGAIN	= 8,  /* Try again */
- 	ICE_AQ_RC_ENOMEM	= 9,  /* Out of memory */
- 	ICE_AQ_RC_EBUSY		= 12, /* Device or resource busy */
- 	ICE_AQ_RC_EEXIST	= 13, /* Object already exists */
-@@ -2927,6 +2946,7 @@ enum ice_adminq_opc {
- 	ice_aqc_opc_get_pkg_info_list			= 0x0C43,
- 
- 	/* 1588/SyncE commands/events */
-+	ice_aqc_opc_get_cgu_input_measure		= 0x0C59,
- 	ice_aqc_opc_get_cgu_abilities			= 0x0C61,
- 	ice_aqc_opc_set_cgu_input_config		= 0x0C62,
- 	ice_aqc_opc_get_cgu_input_config		= 0x0C63,
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 4fedf0181c4e..48ff515d7c61 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -4970,6 +4970,32 @@ ice_dis_vsi_rdma_qset(struct ice_port_info *pi, u16 count, u32 *qset_teid,
- 	return status;
- }
- 
-+/**
-+ * ice_aq_get_cgu_input_pin_measure - get input pin signal measurements
-+ * @hw: pointer to the HW struct
-+ * @dpll_idx: index of dpll to be measured
-+ * @meas: array to be filled with results
-+ * @meas_num: max number of results array can hold
-+ *
-+ * Get CGU measurements (0x0C59) of phase and frequency offsets for input
-+ * pins on given dpll.
-+ *
-+ * Return: 0 on success or negative value on failure.
-+ */
-+int ice_aq_get_cgu_input_pin_measure(struct ice_hw *hw, u8 dpll_idx,
-+				     struct ice_cgu_input_measure *meas,
-+				     u16 meas_num)
-+{
-+	struct ice_aqc_get_cgu_input_measure *cmd;
-+	struct ice_aq_desc desc;
++  reg:
++    maxItems: 1
 +
-+	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_input_measure);
-+	cmd = &desc.params.get_cgu_input_measure;
-+	cmd->dpll_idx_opt = dpll_idx & ICE_AQC_GET_CGU_IN_MEAS_DPLL_IDX_M;
++  interrupts:
++    maxItems: 1
 +
-+	return ice_aq_send_cmd(hw, &desc, meas, meas_num * sizeof(*meas), NULL);
-+}
++  reset-gpio:
++    maxItems: 1
 +
- /**
-  * ice_aq_get_cgu_abilities - get cgu abilities
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 64c530b39191..c70f56d897dc 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -229,6 +229,9 @@ void ice_replay_post(struct ice_hw *hw);
- struct ice_q_ctx *
- ice_get_lan_q_ctx(struct ice_hw *hw, u16 vsi_handle, u8 tc, u16 q_handle);
- int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flag);
-+int ice_aq_get_cgu_input_pin_measure(struct ice_hw *hw, u8 dpll_idx,
-+				     struct ice_cgu_input_measure *meas,
-+				     u16 meas_num);
- int
- ice_aq_get_cgu_abilities(struct ice_hw *hw,
- 			 struct ice_aqc_get_cgu_abilities *abilities);
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index bce3ad6ca2a6..4aeb5a7168b4 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -11,6 +11,8 @@
- #define ICE_DPLL_RCLK_NUM_PER_PF		1
- #define ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT	25
- #define ICE_DPLL_PIN_GEN_RCLK_FREQ		1953125
-+#define ICE_DPLL_INPUT_REF_NUM			10
-+#define ICE_DPLL_PHASE_OFFSET_PERIOD		2
- 
- /**
-  * enum ice_dpll_pin_type - enumerate ice pin types:
-@@ -587,6 +589,67 @@ static int ice_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
- 	return 0;
- }
- 
-+/**
-+ * ice_dpll_phase_offset_monitor_set - set phase offset monitor state
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @state: feature state to be set
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Enable/disable phase offset monitor feature of dpll.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return: 0 - success
-+ */
-+static int ice_dpll_phase_offset_monitor_set(const struct dpll_device *dpll,
-+					     void *dpll_priv,
-+					     enum dpll_feature_state state,
-+					     struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
++  sleep-gpio:
++    maxItems: 1
 +
-+	mutex_lock(&pf->dplls.lock);
-+	if (state == DPLL_FEATURE_STATE_ENABLE)
-+		d->phase_offset_monitor_period = ICE_DPLL_PHASE_OFFSET_PERIOD;
-+	else
-+		d->phase_offset_monitor_period = 0;
-+	mutex_unlock(&pf->dplls.lock);
++  spi-max-frequency:
++    maximum: 7500000
 +
-+	return 0;
-+}
++  xtal-trim:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: |
++      u8 value for fine tuning the internal capacitance
++      arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
 +
-+/**
-+ * ice_dpll_phase_offset_monitor_get - get phase offset monitor state
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @state: on success holds current state of phase offset monitor
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Provides current state of phase offset monitor
-+ * features on dpll device.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return: 0 - success
-+ */
-+static int ice_dpll_phase_offset_monitor_get(const struct dpll_device *dpll,
-+					     void *dpll_priv,
-+					     enum dpll_feature_state *state,
-+					     struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
++required:
++  - compatible
++  - reg
++  - interrupts
 +
-+	mutex_lock(&pf->dplls.lock);
-+	if (d->phase_offset_monitor_period)
-+		*state = DPLL_FEATURE_STATE_ENABLE;
-+	else
-+		*state = DPLL_FEATURE_STATE_DISABLE;
-+	mutex_unlock(&pf->dplls.lock);
++allOf:
++  - $ref: /schemas/spi/spi-peripheral-props.yaml#
 +
-+	return 0;
-+}
++unevaluatedProperties: false
 +
- /**
-  * ice_dpll_pin_state_set - set pin's state on dpll
-  * @pin: pointer to a pin
-@@ -1093,12 +1156,15 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
- 			  const struct dpll_device *dpll, void *dpll_priv,
- 			  s64 *phase_offset, struct netlink_ext_ack *extack)
- {
-+	struct ice_dpll_pin *p = pin_priv;
- 	struct ice_dpll *d = dpll_priv;
- 	struct ice_pf *pf = d->pf;
- 
- 	mutex_lock(&pf->dplls.lock);
- 	if (d->active_input == pin)
- 		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
-+	else if (d->phase_offset_monitor_period)
-+		*phase_offset = p->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
- 	else
- 		*phase_offset = 0;
- 	mutex_unlock(&pf->dplls.lock);
-@@ -1459,6 +1525,13 @@ static const struct dpll_device_ops ice_dpll_ops = {
- 	.mode_get = ice_dpll_mode_get,
- };
- 
-+static const struct dpll_device_ops ice_dpll_pom_ops = {
-+	.lock_status_get = ice_dpll_lock_status_get,
-+	.mode_get = ice_dpll_mode_get,
-+	.phase_offset_monitor_set = ice_dpll_phase_offset_monitor_set,
-+	.phase_offset_monitor_get = ice_dpll_phase_offset_monitor_get,
-+};
++examples:
++  - |
++    spi {
++        #address-cells = <1>;
++        #size-cells = <0>;
 +
- /**
-  * ice_generate_clock_id - generates unique clock_id for registering dpll.
-  * @pf: board private structure
-@@ -1503,6 +1576,110 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 	}
- }
- 
-+/**
-+ * ice_dpll_is_pps_phase_monitor - check if dpll capable of phase offset monitor
-+ * @pf: pf private structure
-+ *
-+ * Check if firmware is capable of supporting admin command to provide
-+ * phase offset monitoring on all the input pins on PPS dpll.
-+ *
-+ * Returns:
-+ * * true - PPS dpll phase offset monitoring is supported
-+ * * false - PPS dpll phase offset monitoring is not supported
-+ */
-+static bool ice_dpll_is_pps_phase_monitor(struct ice_pf *pf)
-+{
-+	struct ice_cgu_input_measure meas[ICE_DPLL_INPUT_REF_NUM];
-+	int ret = ice_aq_get_cgu_input_pin_measure(&pf->hw, DPLL_TYPE_PPS, meas,
-+						   ARRAY_SIZE(meas));
-+
-+	if (ret && pf->hw.adminq.sq_last_status == ICE_AQ_RC_ESRCH)
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * ice_dpll_pins_notify_mask - notify dpll subsystem about bulk pin changes
-+ * @pins: array of ice_dpll_pin pointers registered within dpll subsystem
-+ * @pin_num: number of pins
-+ * @phase_offset_ntf_mask: bitmask of pin indexes to notify
-+ *
-+ * Iterate over array of pins and call dpll subsystem pin notify if
-+ * corresponding pin index within bitmask is set.
-+ *
-+ * Context: Must be called while pf->dplls.lock is released.
-+ */
-+static void ice_dpll_pins_notify_mask(struct ice_dpll_pin *pins,
-+				      u8 pin_num,
-+				      u32 phase_offset_ntf_mask)
-+{
-+	int i = 0;
-+
-+	for (i = 0; i < pin_num; i++)
-+		if (phase_offset_ntf_mask & (1 << i))
-+			dpll_pin_change_ntf(pins[i].pin);
-+}
-+
-+/**
-+ * ice_dpll_pps_update_phase_offsets - update phase offset measurements
-+ * @pf: pf private structure
-+ * @phase_offset_pins_updated: returns mask of updated input pin indexes
-+ *
-+ * Read phase offset measurements for PPS dpll device and store values in
-+ * input pins array. On success phase_offset_pins_updated - fills bitmask of
-+ * updated input pin indexes, pins shall be notified.
-+ *
-+ * Context: Shall be called with pf->dplls.lock being locked.
-+ * Returns:
-+ * * 0 - success or no data available
-+ * * negative - AQ failure
-+ */
-+static int ice_dpll_pps_update_phase_offsets(struct ice_pf *pf,
-+					     u32 *phase_offset_pins_updated)
-+{
-+	struct ice_cgu_input_measure meas[ICE_DPLL_INPUT_REF_NUM];
-+	struct ice_dpll_pin *p;
-+	s64 phase_offset, tmp;
-+	int i, j, ret;
-+
-+	*phase_offset_pins_updated = 0;
-+	ret = ice_aq_get_cgu_input_pin_measure(&pf->hw, DPLL_TYPE_PPS, meas,
-+					       ARRAY_SIZE(meas));
-+	if (ret && pf->hw.adminq.sq_last_status == ICE_AQ_RC_EAGAIN) {
-+		return 0;
-+	} else if (ret) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"failed to get input pin measurements dpll=%d, ret=%d %s\n",
-+			DPLL_TYPE_PPS, ret,
-+			ice_aq_str(pf->hw.adminq.sq_last_status));
-+		return ret;
-+	}
-+	for (i = 0; i < pf->dplls.num_inputs; i++) {
-+		p = &pf->dplls.inputs[i];
-+		phase_offset = 0;
-+		for (j = 0; j < ICE_CGU_INPUT_PHASE_OFFSET_BYTES; j++) {
-+			tmp = meas[i].phase_offset[j];
-+#ifdef __LITTLE_ENDIAN
-+			phase_offset += tmp << 8 * j;
-+#else
-+			phase_offset += tmp << 8 *
-+				(ICE_CGU_INPUT_PHASE_OFFSET_BYTES - 1 - j);
-+#endif
-+		}
-+		phase_offset = sign_extend64(phase_offset, 47);
-+		if (p->phase_offset != phase_offset) {
-+			dev_dbg(ice_pf_to_dev(pf),
-+				"phase offset changed for pin:%d old:%llx, new:%llx\n",
-+				p->idx, p->phase_offset, phase_offset);
-+			p->phase_offset = phase_offset;
-+			*phase_offset_pins_updated |= (1 << i);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_update_state - update dpll state
-  * @pf: pf private structure
-@@ -1589,14 +1766,19 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	struct ice_pf *pf = container_of(d, struct ice_pf, dplls);
- 	struct ice_dpll *de = &pf->dplls.eec;
- 	struct ice_dpll *dp = &pf->dplls.pps;
-+	u32 phase_offset_ntf = 0;
- 	int ret = 0;
- 
- 	if (ice_is_reset_in_progress(pf->state))
- 		goto resched;
- 	mutex_lock(&pf->dplls.lock);
-+	d->periodic_counter++;
- 	ret = ice_dpll_update_state(pf, de, false);
- 	if (!ret)
- 		ret = ice_dpll_update_state(pf, dp, false);
-+	if (!ret && dp->phase_offset_monitor_period &&
-+	    d->periodic_counter % dp->phase_offset_monitor_period == 0)
-+		ret = ice_dpll_pps_update_phase_offsets(pf, &phase_offset_ntf);
- 	if (ret) {
- 		d->cgu_state_acq_err_num++;
- 		/* stop rescheduling this worker */
-@@ -1611,6 +1793,9 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 	mutex_unlock(&pf->dplls.lock);
- 	ice_dpll_notify_changes(de);
- 	ice_dpll_notify_changes(dp);
-+	if (phase_offset_ntf)
-+		ice_dpll_pins_notify_mask(d->inputs, d->num_inputs,
-+					  phase_offset_ntf);
- 
- resched:
- 	/* Run twice a second or reschedule if update failed */
-@@ -2011,8 +2196,12 @@ ice_dpll_init_dpll(struct ice_pf *pf, struct ice_dpll *d, bool cgu,
- 	}
- 	d->pf = pf;
- 	if (cgu) {
-+		const struct dpll_device_ops *ops = &ice_dpll_ops;
-+
-+		if (type == DPLL_TYPE_PPS && ice_dpll_is_pps_phase_monitor(pf))
-+			ops =  &ice_dpll_pom_ops;
- 		ice_dpll_update_state(pf, d, true);
--		ret = dpll_device_register(d->dpll, type, &ice_dpll_ops, d);
-+		ret = dpll_device_register(d->dpll, type, ops, d);
- 		if (ret) {
- 			dpll_device_put(d->dpll);
- 			return ret;
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index c320f1bf7d6d..290babeef58f 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -19,6 +19,7 @@
-  * @prop: pin properties
-  * @freq: current frequency of a pin
-  * @phase_adjust: current phase adjust value
-+ * @phase_offset: monitored phase offset value
-  */
- struct ice_dpll_pin {
- 	struct dpll_pin *pin;
-@@ -31,6 +32,7 @@ struct ice_dpll_pin {
- 	struct dpll_pin_properties prop;
- 	u32 freq;
- 	s32 phase_adjust;
-+	s64 phase_offset;
- 	u8 status;
- };
- 
-@@ -47,6 +49,7 @@ struct ice_dpll_pin {
-  * @input_prio: priorities of each input
-  * @dpll_state: current dpll sync state
-  * @prev_dpll_state: last dpll sync state
-+ * @phase_offset_monitor_period: period for phase offset monitor read frequency
-  * @active_input: pointer to active input pin
-  * @prev_input: pointer to previous active input pin
-  */
-@@ -64,6 +67,7 @@ struct ice_dpll {
- 	enum dpll_lock_status dpll_state;
- 	enum dpll_lock_status prev_dpll_state;
- 	enum dpll_mode mode;
-+	u32 phase_offset_monitor_period;
- 	struct dpll_pin *active_input;
- 	struct dpll_pin *prev_input;
- };
-@@ -80,6 +84,7 @@ struct ice_dpll {
-  * @num_inputs: number of input pins available on dpll
-  * @num_outputs: number of output pins available on dpll
-  * @cgu_state_acq_err_num: number of errors returned during periodic work
-+ * @periodic_counter: counter of periodic work executions
-  * @base_rclk_idx: idx of first pin used for clock revocery pins
-  * @clock_id: clock_id of dplls
-  * @input_phase_adj_max: max phase adjust value for an input pins
-@@ -97,6 +102,7 @@ struct ice_dplls {
- 	u8 num_inputs;
- 	u8 num_outputs;
- 	int cgu_state_acq_err_num;
-+	u32 periodic_counter;
- 	u8 base_rclk_idx;
- 	u64 clock_id;
- 	s32 input_phase_adj_max;
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 20d3baf955e3..f89167864b34 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7914,6 +7914,10 @@ const char *ice_aq_str(enum ice_aq_err aq_err)
- 		return "ICE_AQ_RC_EPERM";
- 	case ICE_AQ_RC_ENOENT:
- 		return "ICE_AQ_RC_ENOENT";
-+	case ICE_AQ_RC_ESRCH:
-+		return "ICE_AQ_RC_ESRCH";
-+	case ICE_AQ_RC_EAGAIN:
-+		return "ICE_AQ_RC_EAGAIN";
- 	case ICE_AQ_RC_ENOMEM:
- 		return "ICE_AQ_RC_ENOMEM";
- 	case ICE_AQ_RC_EBUSY:
++        zigbee@0 {
++            compatible = "atmel,at86rf231";
++            reg = <0>;
++            spi-max-frequency = <7500000>;
++            interrupts = <19 4>;
++            interrupt-parent = <&gpio3>;
++            xtal-trim = /bits/ 8 <0x06>;
++        };
++    };
 -- 
-2.38.1
+2.34.1
 
 
