@@ -1,157 +1,272 @@
-Return-Path: <netdev+bounces-192982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C1CAC1F21
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:01:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6AAAC1F26
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28AB850544F
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:01:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2299B5057CC
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACECA2236F0;
-	Fri, 23 May 2025 09:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC62222B8;
+	Fri, 23 May 2025 09:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d5Aaz3bF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SO2S6mFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127FA8F5C
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 09:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812391487FE;
+	Fri, 23 May 2025 09:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747990870; cv=none; b=pFxxaLUkIZU9wquqK/EEn7rd7KsFZDxE6XIawPYpjKxMYk+TNI5ISRC653s5nqXIYhI2NE31tX8ZhwuGW7tj8WcnbNHND5Ux9YeahjDSRG2x6ESGHPXcrxW0v+56Cul3JumjhH9HFU8pQPhYsCdSQ24xNB2PHtJDv81KG+edX/w=
+	t=1747990935; cv=none; b=YHUnk2879VhpB0Zm7Gs5daDywvLYqr6K37ZVLk2hDHMAd+HJlmK1lndOtGMwZvv2xAkQxRP3f/Khz6bdQGaIPuLD5owkjU3wy2GQ4pSa0FkyBoLpgOpdzd7yuaKE881+rtzJawXgMRHp0pkkN6uSCBQ5c0JyvYdjYBocNbRaB6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747990870; c=relaxed/simple;
-	bh=6AD71GZ1oJAgToKv63EU9Cvf388e1iJs65ueGm/PeYg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DP8rt6k24emsUIMRd2ZjWFGrbOxEpCRx/GWdzK4cqprGWOGPG8u1NO6GH/zt3dSHQtrZnfgWeobZfqvXzkALlE+NdGrDb6jQTBfSfgIGHUk1DgoeSF/RYSBY0JSax8Z9d5VB0PdHnHkwgLuXDpZuELsKoyrnT7DqI7KfMjqMPoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d5Aaz3bF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747990868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W9137AuC1JXl/uRnv3Q7irr3oyxG/GyI+XTAgsgelrk=;
-	b=d5Aaz3bF4jDpd69DJVwXPTIb75s6NYnTkQbo8cAQXa+/spoVDGxvVNstZO0mzZDAWd6SlV
-	sgAQMN5AVp3a1cMmhTJ1i/tGDJtsU1nJGWyb92zp1pV/Fzr4Aa7H3kGYJ1s/ea2vO/DxIt
-	rk5K/46YR1KecPdLSOLiPfH2dAE+7nc=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-qDRetYYdNhin2WRWbI_9fQ-1; Fri, 23 May 2025 05:01:05 -0400
-X-MC-Unique: qDRetYYdNhin2WRWbI_9fQ-1
-X-Mimecast-MFC-AGG-ID: qDRetYYdNhin2WRWbI_9fQ_1747990864
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-30d6a0309f6so50006691fa.2
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 02:01:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747990864; x=1748595664;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W9137AuC1JXl/uRnv3Q7irr3oyxG/GyI+XTAgsgelrk=;
-        b=qKWgDsCqbasbHEDeEFuoGKf0iClzvyd1Lkf7prnaYnrrY3IbprjWsuhBRsxGUDBEz1
-         XbyI3e5WTsGe/IAPdDVNP5PVBTK6akW1fxGhlYfFIJQnrdTZ7bNe325oWH73Y3RKoimS
-         15d4sSlcURmzW2d369zfRkwo1lOibUPiuWMC/mF4PA+NqAJrrPbqS+G/1/HRDU5h2M0B
-         KMlSrrg/ZAmuqkgcLIEe8uxHSU4JnSL3ZD+aI6dbm7SmDutMP26fBSb6mbiwMHND3G1L
-         fKAUuqXF3px5wtkWRmKiRVOdkq4NCNyHFATOOS6ZH2VAfIvW1JsDfA8+Vx4JFMxqg1hx
-         iUsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWfU2pASGNMJ46j/zfSc5dN5X0+llEQZtt3CTaYgQXSEZUTGaUlMS7uF6ddxtEPXkjpOH1PZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAjnrI1/ge5yjZnc60wwUsgm1zYM4taWbaeC+uLoNavvfvrwTV
-	pRTTp+rROGWJ+U4R4496e7zO0AaaxfQaUBzeJoSvaKRMEYR7YlDYIWwKAJn+RIzPNIvfDqfEcer
-	8nkhojhuKzFH5cdgGmPCrGGoc5imcnC7pXPOnHisC3ywSy+c4+G0ApRTN5Q==
-X-Gm-Gg: ASbGncsiy4RbD1qbupiJ2RxkgszDPjy6EfRj2Rlxv8fbCAXtTnzxPmdqyb0wFtQ8rh2
-	6kVHBfkzGLMIeMHvH39g+XkAIV3OiduLbWXR64voqPnYyU7jsUCi0bdW1rMimw3NXw/jDPzbp2e
-	e/ShvKXBFAslH4B89wgzWvFcvqkoKlqZhU5TO+GNMO4/4U7dsuMe7o91FtRMPlB2EdvJomz8Fpq
-	vDv4IaBMsLVZW3dsbkcN0G6F+w9zY+CVZ6FCJ78JDncWkfh36appXT23GB2ZDcw8aIniTQw9DXm
-	VlI8L5D7
-X-Received: by 2002:a05:6512:3d05:b0:549:4bf7:6463 with SMTP id 2adb3069b0e04-550e98ff25dmr10391816e87.44.1747990863817;
-        Fri, 23 May 2025 02:01:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZQSs+uyNdVjrDhVHs2IglUPHTshvnWvanx+qtFny8cuAL31NdNk4CU+Vw4AmeBNf/utBp3w==
-X-Received: by 2002:a05:6512:3d05:b0:549:4bf7:6463 with SMTP id 2adb3069b0e04-550e98ff25dmr10391773e87.44.1747990863352;
-        Fri, 23 May 2025 02:01:03 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e703f606sm3782184e87.238.2025.05.23.02.01.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 02:01:02 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 957971AA3B8F; Fri, 23 May 2025 11:01:01 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
- ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
- akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
- andrew+netdev@lunn.ch, asml.silence@gmail.com, tariqt@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
- leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-Subject: Re: [PATCH 01/18] netmem: introduce struct netmem_desc
- struct_group_tagged()'ed on struct net_iov
-In-Reply-To: <20250523032609.16334-2-byungchul@sk.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-2-byungchul@sk.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 23 May 2025 11:01:01 +0200
-Message-ID: <87bjrjn1ki.fsf@toke.dk>
+	s=arc-20240116; t=1747990935; c=relaxed/simple;
+	bh=Dzl9IFdwpkzphmorX3MPHRaZcbXOQp1myGl9QI6CyzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NrQR9hbNDmdFuHA1utNBLezAhpPdv6XmxmAHrzUvCnMg2hL6NYJ3naEKykRCGUmDM25JvOVpH/jPQptAtnvE5YI1P6AQ7WmFOYTs90uanNNmaciljnWesxWxg9UJPBzubcGVspzdYpb9/li4Fazkd9ht4h2WztetJAY6wpwwg2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SO2S6mFS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1FEC4CEE9;
+	Fri, 23 May 2025 09:02:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747990934;
+	bh=Dzl9IFdwpkzphmorX3MPHRaZcbXOQp1myGl9QI6CyzA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SO2S6mFSwXeblGzqX9iEYu9fX0ncmNGLIrqWngvPyBmhDg3Wkz0+Fn5khZb5Q30uC
+	 IkiYUrP61FOr9UY6lBXWKuob9jj4Ze7Q1Tjj1oh/plV08Hf7nMW4jVJ/7t7IgPl5H7
+	 GvFhns9q1gjfpLXQysVyBIcRKHs+b1BjgOCG+VxCyJ6G/IGQnPN5Ami366qNjzS70u
+	 mCuddrf7E3vWwhhCMB52hNWRuEw6QHoEstzq6D4FlACW4ROqjkzqQcFmkfQP7RQey9
+	 u+fKW6YF0YH5sTWU+r74CBgmDq7g/NCOt+kvc6J3fqVLA/XWTZY+xRhUy33NVUJAoC
+	 nPSFhZg41q1Lg==
+Date: Fri, 23 May 2025 10:02:07 +0100
+From: Lee Jones <lee@kernel.org>
+To: a0282524688@gmail.com
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v11 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250523090207.GD1378991@google.com>
+References: <20250520020355.3885597-1-tmyu0@nuvoton.com>
+ <20250520020355.3885597-2-tmyu0@nuvoton.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250520020355.3885597-2-tmyu0@nuvoton.com>
 
-Byungchul Park <byungchul@sk.com> writes:
+On Tue, 20 May 2025, a0282524688@gmail.com wrote:
 
-> To simplify struct page, the page pool members of struct page should be
-> moved to other, allowing these members to be removed from struct page.
->
-> Introduce a network memory descriptor to store the members, struct
-> netmem_desc, reusing struct net_iov that already mirrored struct page.
->
-> While at it, relocate _pp_mapping_pad to group struct net_iov's fields.
->
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> From: Ming Yu <tmyu0@nuvoton.com>
+> 
+> The Nuvoton NCT6694 provides an USB interface to the host to
+> access its features.
+> 
+> Sub-devices can use the USB functions nct6694_read_msg() and
+> nct6694_write_msg() to issue a command. They can also request
+> interrupt that will be called when the USB device receives its
+> interrupt pipe.
+> 
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
 > ---
->  include/linux/mm_types.h |  2 +-
->  include/net/netmem.h     | 43 +++++++++++++++++++++++++++++++++-------
->  2 files changed, 37 insertions(+), 8 deletions(-)
->
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 56d07edd01f9..873e820e1521 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -120,13 +120,13 @@ struct page {
->  			unsigned long private;
->  		};
->  		struct {	/* page_pool used by netstack */
-> +			unsigned long _pp_mapping_pad;
->  			/**
->  			 * @pp_magic: magic value to avoid recycling non
->  			 * page_pool allocated pages.
->  			 */
->  			unsigned long pp_magic;
->  			struct page_pool *pp;
-> -			unsigned long _pp_mapping_pad;
->  			unsigned long dma_addr;
->  			atomic_long_t pp_ref_count;
->  		};
+> 
+> Changes since version 10:
+> - Add change log for the patch
+> - Fix mfd_cell to MFD_CELL_NAME()
+> - Remove unnecessary blank line
+> 
+> Changes since version 9:
+> - Add KernelDoc to exported functions
+> 
+> Changes since version 8:
+> - Modify the signed-off-by with my work address
+> - Rename all MFD cell names to "nct6694-xxx"
+> - Fix some comments in nct6694.c and in nct6694.h
+> 
+> Changes since version 7:
+> - Add error handling for devm_mutex_init()
+> 
+> Changes since version 6:
+> 
+> Changes since version 5:
+> - Fix mfd_cell to MFD_CELL_NAME() and MFD_CELL_BASIC()
+> - Drop unnecessary macros
+> 
+> Changes since version 4:
+> - Modify arguments in read/write function to a pointer to cmd_header
+> 
+> Changes since version 3:
+> - Modify array buffer to structure
+> - Fix defines and comments
+> - Add header <linux/bits.h> and use BIT macro
+> - Modify mutex_init() to devm_mutex_init()
+> 
+> Changes since version 2:
+> 
+> Changes since version 1:
+> - Implement IRQ domain to handle IRQ demux
+> - Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API
+> - Add command structure
+> - Fix USB functions
+> - Sort each driver's header files alphabetically
+> 
+>  MAINTAINERS                 |   6 +
+>  drivers/mfd/Kconfig         |  15 ++
+>  drivers/mfd/Makefile        |   2 +
+>  drivers/mfd/nct6694.c       | 387 ++++++++++++++++++++++++++++++++++++
+>  include/linux/mfd/nct6694.h |  98 +++++++++
+>  5 files changed, 508 insertions(+)
+>  create mode 100644 drivers/mfd/nct6694.c
+>  create mode 100644 include/linux/mfd/nct6694.h
 
-The reason that field is called "_pp_mapping_pad" is that it's supposed
-to overlay the page->mapping field, so that none of the page_pool uses
-set a value here. Moving it breaks that assumption. Once struct
-netmem_desc is completely decoupled from struct page this obviously
-doesn't matter, but I think it does today? At least, trying to use that
-field for the DMA index broke things, which is why we ended up with the
-bit-stuffing in pp_magic...
+[...]
 
--Toke
+I was just going to fix this up for you when I applied the set, but
+seeing as it looks like you have to re-submit anyway ...
 
+> +static const struct usb_device_id nct6694_ids[] = {
+> +	{ USB_DEVICE_AND_INTERFACE_INFO(NCT6694_VENDOR_ID, NCT6694_PRODUCT_ID, 0xFF, 0x00, 0x00)},
+
+You need a space before the '}'.
+
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(usb, nct6694_ids);
+> +
+> +static struct usb_driver nct6694_usb_driver = {
+> +	.name		= "nct6694",
+> +	.id_table	= nct6694_ids,
+> +	.probe		= nct6694_usb_probe,
+> +	.disconnect	= nct6694_usb_disconnect,
+> +};
+> +module_usb_driver(nct6694_usb_driver);
+> +
+> +MODULE_DESCRIPTION("Nuvoton NCT6694 core driver");
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/linux/mfd/nct6694.h b/include/linux/mfd/nct6694.h
+> new file mode 100644
+> index 000000000000..5e172609be3f
+> --- /dev/null
+> +++ b/include/linux/mfd/nct6694.h
+> @@ -0,0 +1,98 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2025 Nuvoton Technology Corp.
+> + *
+> + * Nuvoton NCT6694 USB transaction and data structure.
+> + */
+> +
+> +#ifndef __MFD_NCT6694_H
+> +#define __MFD_NCT6694_H
+> +
+> +#define NCT6694_VENDOR_ID	0x0416
+> +#define NCT6694_PRODUCT_ID	0x200B
+> +#define NCT6694_INT_IN_EP	0x81
+> +#define NCT6694_BULK_IN_EP	0x02
+> +#define NCT6694_BULK_OUT_EP	0x03
+> +
+> +#define NCT6694_HCTRL_SET	0x40
+> +#define NCT6694_HCTRL_GET	0x80
+> +
+> +#define NCT6694_URB_TIMEOUT	1000
+> +
+> +enum nct6694_irq_id {
+> +	NCT6694_IRQ_GPIO0 = 0,
+> +	NCT6694_IRQ_GPIO1,
+> +	NCT6694_IRQ_GPIO2,
+> +	NCT6694_IRQ_GPIO3,
+> +	NCT6694_IRQ_GPIO4,
+> +	NCT6694_IRQ_GPIO5,
+> +	NCT6694_IRQ_GPIO6,
+> +	NCT6694_IRQ_GPIO7,
+> +	NCT6694_IRQ_GPIO8,
+> +	NCT6694_IRQ_GPIO9,
+> +	NCT6694_IRQ_GPIOA,
+> +	NCT6694_IRQ_GPIOB,
+> +	NCT6694_IRQ_GPIOC,
+> +	NCT6694_IRQ_GPIOD,
+> +	NCT6694_IRQ_GPIOE,
+> +	NCT6694_IRQ_GPIOF,
+> +	NCT6694_IRQ_CAN0,
+> +	NCT6694_IRQ_CAN1,
+> +	NCT6694_IRQ_RTC,
+> +	NCT6694_NR_IRQS,
+> +};
+> +
+> +enum nct6694_response_err_status {
+> +	NCT6694_NO_ERROR = 0,
+> +	NCT6694_FORMAT_ERROR,
+> +	NCT6694_RESERVED1,
+> +	NCT6694_RESERVED2,
+> +	NCT6694_NOT_SUPPORT_ERROR,
+> +	NCT6694_NO_RESPONSE_ERROR,
+> +	NCT6694_TIMEOUT_ERROR,
+> +	NCT6694_PENDING,
+> +};
+> +
+> +struct __packed nct6694_cmd_header {
+> +	u8 rsv1;
+> +	u8 mod;
+> +	union __packed {
+> +		__le16 offset;
+> +		struct __packed {
+> +			u8 cmd;
+> +			u8 sel;
+> +		};
+> +	};
+> +	u8 hctrl;
+> +	u8 rsv2;
+> +	__le16 len;
+> +};
+> +
+> +struct __packed nct6694_response_header {
+> +	u8 sequence_id;
+> +	u8 sts;
+> +	u8 reserved[4];
+> +	__le16 len;
+> +};
+> +
+> +union __packed nct6694_usb_msg {
+> +	struct nct6694_cmd_header cmd_header;
+> +	struct nct6694_response_header response_header;
+> +};
+> +
+> +struct nct6694 {
+> +	struct device *dev;
+> +	struct irq_domain *domain;
+> +	struct mutex access_lock;
+> +	struct mutex irq_lock;
+> +	struct urb *int_in_urb;
+> +	struct usb_device *udev;
+> +	union nct6694_usb_msg *usb_msg;
+> +	unsigned char *int_buffer;
+> +	unsigned int irq_enable;
+> +};
+> +
+> +int nct6694_read_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
+> +int nct6694_write_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
+> +
+> +#endif
+> -- 
+> 2.34.1
+> 
+
+-- 
+Lee Jones [李琼斯]
 
