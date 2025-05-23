@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-193158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C7EAC2AFD
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:36:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77F2AC2AFC
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5DD77BC6AF
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:34:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D37A545442
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE152139C8;
-	Fri, 23 May 2025 20:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4238A2147F9;
+	Fri, 23 May 2025 20:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AtmqG6fM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YPac1HZI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CBE20F09B
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 20:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991702139B6
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 20:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748032483; cv=none; b=tdG0dbn2YbQqGUJz7bUFvGEE4XQsp2Gvq4HJHN2oTvviyN/gBC6vNsqJU/sRVQkcLio5ACCkleSS29nezMsAx3viKTRsi+jH+xiYVlnb807RKpY297toXJ5J62acoYPCzcvA0RehwoTEZ61FY3BTGCfRNj4jWhvsUGgSpAmg5S4=
+	t=1748032486; cv=none; b=H3rHfBv48SMzZ9VCFb+GkPZi0UoXcl7a8YNxsHJE4yiBqEOBsctxJZfYopVOtkxogQEFWcB6FcBysDiyIj7BTGsDQsjjKfmaV18qIM/Be4afqaInFd52t8/4g4KF1oZkAMH7sg2qYtqVWo/pZM3ju+EplPKSf+/NY596aDQaOLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748032483; c=relaxed/simple;
-	bh=viYdFTRf5zkPD6nrOL5UmiZoEyMaT4H8SQk8Bo37ZSE=;
+	s=arc-20240116; t=1748032486; c=relaxed/simple;
+	bh=fGWwE5D4WRX2P2/H5uaMi431As3BiGvT/S5gIvS+usI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sUWwTmktMnqtaXmF6TM33PuoCIzOA3Vx1WIlqh6ySuOfCcHnMfSkpI4rYrLNA4hAAYOom76Fkld9Ll5Gb7/FACZG/YwpBCSBmj3XkD1isLWOYfpkvbbqZHmgD5484e7O3pjJxwhP6U4z3Wg6/BXyv4FxsGyjnwQC1p65JswkmWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AtmqG6fM; arc=none smtp.client-ip=91.218.175.178
+	 MIME-Version; b=aSlRcsKBwko2qg6OIx2G8IEsTIHIX1BqS0CDaPBfe/sm2Rbc+YqEnO7+ExrGhgWUoCCKwvEUIo69AccaEINQrmYJaeLKz37KnxZFEgWwyDNX5f66kShDdFd0uspnFAnkT3MDgTZfVb+scc8Das0M5DgzlpnlpjjicAQcKVrl+B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YPac1HZI; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748032478;
+	t=1748032481;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dL6+i5QA3yo+v7I6pIkLXzqhTBxoo5/kgLYhQkKFsyM=;
-	b=AtmqG6fM3/fZdst1bPGLcWCXaAd1tTtdQYWIG13gX0aoMjCCuUedki2Y9whcXg06z4zdh2
-	GS2Ho7gAoQZ0jPmHYZ9uMUN31y+Io9bi10idmcDBTYzWwYQ/8g0tFcBbz0oYDJxSZd8cLg
-	bQfEigXkr5508ZAybc8iRlTnlhQp91M=
+	bh=WHgdvN8pGdQlmLrmjmLACo7dbCy+Vqxp5wQbWuxPAqQ=;
+	b=YPac1HZIGNblV+NBxcoFp4qPhJojjcHgWjXyB09PP6i1b8RZKb8Mc3v6KNbI7d80/0OoyT
+	Ceshz0PJB9GXSpBRNt9ME/TUaigWUN7kHWdUQgQ47qeOYYaZhj6P+aJK1ntt/wViKYg9U3
+	7216kqrzd1Rv++YnDS9pNg04LHx9h/8=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -59,13 +59,13 @@ Cc: Lei Wei <quic_leiwei@quicinc.com>,
 	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
 	linux-kernel@vger.kernel.org,
 	Sean Anderson <sean.anderson@linux.dev>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	imx@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [net-next PATCH v5 05/10] net: pcs: lynx: Convert to an MDIO driver
-Date: Fri, 23 May 2025 16:33:34 -0400
-Message-Id: <20250523203339.1993685-6-sean.anderson@linux.dev>
+	Michal Simek <michal.simek@amd.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Robert Hancock <robert.hancock@calian.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: [net-next PATCH v5 06/10] net: pcs: Add Xilinx PCS driver
+Date: Fri, 23 May 2025 16:33:35 -0400
+Message-Id: <20250523203339.1993685-7-sean.anderson@linux.dev>
 In-Reply-To: <20250523203339.1993685-1-sean.anderson@linux.dev>
 References: <20250523203339.1993685-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -77,715 +77,665 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This converts the lynx PCS driver to a proper MDIO driver.
-This allows using a more conventional driver lifecycle (e.g. with a
-probe and remove). It will also make it easier to add interrupt support.
+This adds support for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
+This is a soft device which converts between GMII and either SGMII,
+1000Base-X, or 2500Base-X. If configured correctly, it can also switch
+between SGMII and 1000BASE-X at runtime. Thoretically this is also possible
+for 2500Base-X, but that requires reconfiguring the serdes. The exact
+capabilities depend on synthesis parameters, so they are read from the
+devicetree.
 
-The existing helpers are converted to bind the MDIO driver instead of
-creating the PCS directly. As lynx_pcs_create_mdiodev creates the PCS
-device, we can just set the modalias. For lynx_pcs_create_fwnode, we try
-to get the PCS the usual way, and if that fails we edit the devicetree
-to add a compatible and reprobe the device.
+This device has a c22-compliant PHY interface, so for the most part we can
+just use the phylink helpers. This device supports an interrupt which is
+triggered on autonegotiation completion. I'm not sure how useful this is,
+since we can never detect a link down (in the PCS).
 
-To ensure my contributions remain free software, remove the BSD option
-from the license. This is permitted because the SPDX uses "OR".
+This device supports sharing some logic between different implementations
+of the device. In this case, one device contains the "shared logic" and the
+clocks are connected to other devices. To coordinate this, one device
+registers a clock that the other devices can request.  The clock is enabled
+in the probe function by releasing the device from reset. There are no othe
+software controls, so the clock ops are empty.
+
+Later in this series, we will convert the Xilinx AXI Ethernet driver to use
+this PCS. To help out, we provide a compatibility function to bind this
+driver in the event the MDIO device has no compatible.
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 
 Changes in v5:
+- Export get_phy_c22_id when it is used
+- Expose bind attributes, since there is no issue in doing so
 - Use MDIO_BUS instead of MDIO_DEVICE
 
 Changes in v4:
-- Add a note about the license
-- Convert to dev-less pcs_put
+- Re-add documentation for axienet_xilinx_pcs_get that was accidentally
+  removed
 
 Changes in v3:
+- Adjust axienet_xilinx_pcs_get for changes to pcs_find_fwnode API
 - Call devm_pcs_register instead of devm_pcs_register_provider
 
 Changes in v2:
 - Add support for #pcs-cells
-- Remove unused variable lynx_properties
+- Change compatible to just xlnx,pcs
+- Drop PCS_ALTERA_TSE which was accidentally added while rebasing
+- Rework xilinx_pcs_validate to just clear out half-duplex modes instead
+  of constraining modes based on the interface.
 
- drivers/net/dsa/ocelot/Kconfig                |   4 +
- drivers/net/dsa/ocelot/felix_vsc9959.c        |  11 +-
- drivers/net/dsa/ocelot/seville_vsc9953.c      |  11 +-
- drivers/net/ethernet/altera/Kconfig           |   2 +
- drivers/net/ethernet/altera/altera_tse_main.c |   7 +-
- drivers/net/ethernet/freescale/dpaa/Kconfig   |   2 +-
- drivers/net/ethernet/freescale/dpaa2/Kconfig  |   3 +
- .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  |  11 +-
- drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
- .../net/ethernet/freescale/enetc/enetc_pf.c   |   8 +-
- .../net/ethernet/freescale/enetc/enetc_pf.h   |   1 -
- .../freescale/enetc/enetc_pf_common.c         |   4 +-
- drivers/net/ethernet/freescale/fman/Kconfig   |   4 +-
- .../net/ethernet/freescale/fman/fman_memac.c  |  25 ++--
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   3 +
- .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   6 +-
- drivers/net/pcs/Kconfig                       |  11 +-
- drivers/net/pcs/pcs-lynx.c                    | 110 ++++++++++--------
- include/linux/pcs-lynx.h                      |  13 ++-
- 19 files changed, 128 insertions(+), 110 deletions(-)
+ MAINTAINERS                  |   6 +
+ drivers/net/pcs/Kconfig      |  21 ++
+ drivers/net/pcs/Makefile     |   2 +
+ drivers/net/pcs/pcs-xilinx.c | 484 +++++++++++++++++++++++++++++++++++
+ drivers/net/phy/phy_device.c |   3 +-
+ include/linux/pcs-xilinx.h   |  15 ++
+ include/linux/phy.h          |   1 +
+ 7 files changed, 531 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/pcs/pcs-xilinx.c
+ create mode 100644 include/linux/pcs-xilinx.h
 
-diff --git a/drivers/net/dsa/ocelot/Kconfig b/drivers/net/dsa/ocelot/Kconfig
-index 081e7a88ea02..907c29d61c14 100644
---- a/drivers/net/dsa/ocelot/Kconfig
-+++ b/drivers/net/dsa/ocelot/Kconfig
-@@ -42,7 +42,9 @@ config NET_DSA_MSCC_FELIX
- 	select NET_DSA_TAG_OCELOT_8021Q
- 	select NET_DSA_TAG_OCELOT
- 	select FSL_ENETC_MDIO
-+	select PCS
- 	select PCS_LYNX
-+	select MDIO_BUS
- 	help
- 	  This driver supports the VSC9959 (Felix) switch, which is embedded as
- 	  a PCIe function of the NXP LS1028A ENETC RCiEP.
-@@ -58,7 +60,9 @@ config NET_DSA_MSCC_SEVILLE
- 	select NET_DSA_MSCC_FELIX_DSA_LIB
- 	select NET_DSA_TAG_OCELOT_8021Q
- 	select NET_DSA_TAG_OCELOT
-+	select PCS
- 	select PCS_LYNX
-+	select MDIO_BUS
- 	help
- 	  This driver supports the VSC9953 (Seville) switch, which is embedded
- 	  as a platform device on the NXP T1040 SoC.
-diff --git a/drivers/net/dsa/ocelot/felix_vsc9959.c b/drivers/net/dsa/ocelot/felix_vsc9959.c
-index 087d368a59e0..6feae845af10 100644
---- a/drivers/net/dsa/ocelot/felix_vsc9959.c
-+++ b/drivers/net/dsa/ocelot/felix_vsc9959.c
-@@ -12,6 +12,7 @@
- #include <net/tc_act/tc_gate.h>
- #include <soc/mscc/ocelot.h>
- #include <linux/dsa/ocelot.h>
-+#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
- #include <net/pkt_sched.h>
- #include <linux/iopoll.h>
-@@ -1033,7 +1034,7 @@ static int vsc9959_mdio_bus_alloc(struct ocelot *ocelot)
- 		if (ocelot_port->phy_mode == PHY_INTERFACE_MODE_INTERNAL)
- 			continue;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f098406db6ff..e8e6d3ac77e6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26659,6 +26659,12 @@ L:	netdev@vger.kernel.org
+ S:	Orphan
+ F:	drivers/net/ethernet/xilinx/ll_temac*
  
--		phylink_pcs = lynx_pcs_create_mdiodev(felix->imdio, port);
-+		phylink_pcs = lynx_pcs_create_mdiodev(dev, felix->imdio, port);
- 		if (IS_ERR(phylink_pcs))
- 			continue;
- 
-@@ -1050,12 +1051,8 @@ static void vsc9959_mdio_bus_free(struct ocelot *ocelot)
- 	struct felix *felix = ocelot_to_felix(ocelot);
- 	int port;
- 
--	for (port = 0; port < ocelot->num_phys_ports; port++) {
--		struct phylink_pcs *phylink_pcs = felix->pcs[port];
--
--		if (phylink_pcs)
--			lynx_pcs_destroy(phylink_pcs);
--	}
-+	for (port = 0; port < ocelot->num_phys_ports; port++)
-+		pcs_put(felix->pcs[port]);
- 	mdiobus_unregister(felix->imdio);
- 	mdiobus_free(felix->imdio);
- }
-diff --git a/drivers/net/dsa/ocelot/seville_vsc9953.c b/drivers/net/dsa/ocelot/seville_vsc9953.c
-index 28bcdef34a6c..627c0bd7a777 100644
---- a/drivers/net/dsa/ocelot/seville_vsc9953.c
-+++ b/drivers/net/dsa/ocelot/seville_vsc9953.c
-@@ -10,6 +10,7 @@
- #include <linux/mdio/mdio-mscc-miim.h>
- #include <linux/mod_devicetable.h>
- #include <linux/of_mdio.h>
-+#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
- #include <linux/dsa/ocelot.h>
- #include <linux/iopoll.h>
-@@ -926,7 +927,7 @@ static int vsc9953_mdio_bus_alloc(struct ocelot *ocelot)
- 		if (ocelot_port->phy_mode == PHY_INTERFACE_MODE_INTERNAL)
- 			continue;
- 
--		phylink_pcs = lynx_pcs_create_mdiodev(felix->imdio, addr);
-+		phylink_pcs = lynx_pcs_create_mdiodev(dev, felix->imdio, addr);
- 		if (IS_ERR(phylink_pcs))
- 			continue;
- 
-@@ -943,12 +944,8 @@ static void vsc9953_mdio_bus_free(struct ocelot *ocelot)
- 	struct felix *felix = ocelot_to_felix(ocelot);
- 	int port;
- 
--	for (port = 0; port < ocelot->num_phys_ports; port++) {
--		struct phylink_pcs *phylink_pcs = felix->pcs[port];
--
--		if (phylink_pcs)
--			lynx_pcs_destroy(phylink_pcs);
--	}
-+	for (port = 0; port < ocelot->num_phys_ports; port++)
-+		pcs_put(felix->pcs[port]);
- 
- 	/* mdiobus_unregister and mdiobus_free handled by devres */
- }
-diff --git a/drivers/net/ethernet/altera/Kconfig b/drivers/net/ethernet/altera/Kconfig
-index 4ef819a9a1ad..9b68321e8b86 100644
---- a/drivers/net/ethernet/altera/Kconfig
-+++ b/drivers/net/ethernet/altera/Kconfig
-@@ -5,7 +5,9 @@ config ALTERA_TSE
- 	depends on HAS_IOMEM
- 	select PHYLIB
- 	select PHYLINK
-+	select PCS
- 	select PCS_LYNX
-+	select MDIO_BUS
- 	select MDIO_REGMAP
- 	select REGMAP_MMIO
- 	help
-diff --git a/drivers/net/ethernet/altera/altera_tse_main.c b/drivers/net/ethernet/altera/altera_tse_main.c
-index 3f6204de9e6b..8bd4753a04bc 100644
---- a/drivers/net/ethernet/altera/altera_tse_main.c
-+++ b/drivers/net/ethernet/altera/altera_tse_main.c
-@@ -32,6 +32,7 @@
- #include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-+#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
- #include <linux/phy.h>
- #include <linux/platform_device.h>
-@@ -1412,7 +1413,7 @@ static int altera_tse_probe(struct platform_device *pdev)
- 		goto err_init_pcs;
- 	}
- 
--	priv->pcs = lynx_pcs_create_mdiodev(pcs_bus, 0);
-+	priv->pcs = lynx_pcs_create_mdiodev(&pdev->dev, pcs_bus, 0);
- 	if (IS_ERR(priv->pcs)) {
- 		ret = PTR_ERR(priv->pcs);
- 		goto err_init_pcs;
-@@ -1444,7 +1445,7 @@ static int altera_tse_probe(struct platform_device *pdev)
- 
- 	return 0;
- err_init_phylink:
--	lynx_pcs_destroy(priv->pcs);
-+	pcs_put(priv->pcs);
- err_init_pcs:
- 	unregister_netdev(ndev);
- err_register_netdev:
-@@ -1466,7 +1467,7 @@ static void altera_tse_remove(struct platform_device *pdev)
- 	altera_tse_mdio_destroy(ndev);
- 	unregister_netdev(ndev);
- 	phylink_destroy(priv->phylink);
--	lynx_pcs_destroy(priv->pcs);
-+	pcs_put(priv->pcs);
- 
- 	free_netdev(ndev);
- }
-diff --git a/drivers/net/ethernet/freescale/dpaa/Kconfig b/drivers/net/ethernet/freescale/dpaa/Kconfig
-index 2b560661c82a..bb658f1db129 100644
---- a/drivers/net/ethernet/freescale/dpaa/Kconfig
-+++ b/drivers/net/ethernet/freescale/dpaa/Kconfig
-@@ -3,7 +3,7 @@ menuconfig FSL_DPAA_ETH
- 	tristate "DPAA Ethernet"
- 	depends on FSL_DPAA && FSL_FMAN
- 	select PHYLINK
--	select PCS_LYNX
-+	select MDIO_BUS
- 	help
- 	  Data Path Acceleration Architecture Ethernet driver,
- 	  supporting the Freescale QorIQ chips.
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Kconfig b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-index d029b69c3f18..806931b2b9fa 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Kconfig
-+++ b/drivers/net/ethernet/freescale/dpaa2/Kconfig
-@@ -2,8 +2,11 @@
- config FSL_DPAA2_ETH
- 	tristate "Freescale DPAA2 Ethernet"
- 	depends on FSL_MC_BUS && FSL_MC_DPIO
-+	select OF_DYNAMIC
- 	select PHYLINK
-+	select PCS
- 	select PCS_LYNX
-+	select MDIO_BUS
- 	select FSL_XGMAC_MDIO
- 	select NET_DEVLINK
- 	help
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-index 422ce13a7c94..0dc0a265db51 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-@@ -2,6 +2,7 @@
- /* Copyright 2019 NXP */
- 
- #include <linux/acpi.h>
-+#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
- #include <linux/phy/phy.h>
- #include <linux/property.h>
-@@ -262,7 +263,7 @@ static int dpaa2_pcs_create(struct dpaa2_mac *mac,
- 		return 0;
- 	}
- 
--	pcs = lynx_pcs_create_fwnode(node);
-+	pcs = lynx_pcs_create_fwnode(&mac->mc_dev->dev, node);
- 	fwnode_handle_put(node);
- 
- 	if (pcs == ERR_PTR(-EPROBE_DEFER)) {
-@@ -288,12 +289,8 @@ static int dpaa2_pcs_create(struct dpaa2_mac *mac,
- 
- static void dpaa2_pcs_destroy(struct dpaa2_mac *mac)
- {
--	struct phylink_pcs *phylink_pcs = mac->pcs;
--
--	if (phylink_pcs) {
--		lynx_pcs_destroy(phylink_pcs);
--		mac->pcs = NULL;
--	}
-+	pcs_put(mac->pcs);
-+	mac->pcs = NULL;
- }
- 
- static void dpaa2_mac_set_supported_interfaces(struct dpaa2_mac *mac)
-diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
-index e917132d3714..f3ac430c9d4f 100644
---- a/drivers/net/ethernet/freescale/enetc/Kconfig
-+++ b/drivers/net/ethernet/freescale/enetc/Kconfig
-@@ -30,7 +30,9 @@ config FSL_ENETC
- 	select FSL_ENETC_MDIO
- 	select NXP_ENETC_PF_COMMON
- 	select PHYLINK
-+	select PCS
- 	select PCS_LYNX
-+	select MDIO_BUS
- 	select DIMLIB
- 	help
- 	  This driver supports NXP ENETC gigabit ethernet controller PCIe
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index f63a29e2e031..8d0950c28190 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -34,12 +34,7 @@ static void enetc_pf_set_primary_mac_addr(struct enetc_hw *hw, int si,
- static struct phylink_pcs *enetc_pf_create_pcs(struct enetc_pf *pf,
- 					       struct mii_bus *bus)
- {
--	return lynx_pcs_create_mdiodev(bus, 0);
--}
--
--static void enetc_pf_destroy_pcs(struct phylink_pcs *pcs)
--{
--	lynx_pcs_destroy(pcs);
-+	return lynx_pcs_create_mdiodev(&pf->si->pdev->dev, bus, 0);
- }
- 
- static void enetc_set_vlan_promisc(struct enetc_hw *hw, char si_map)
-@@ -914,7 +909,6 @@ static const struct enetc_pf_ops enetc_pf_ops = {
- 	.set_si_primary_mac = enetc_pf_set_primary_mac_addr,
- 	.get_si_primary_mac = enetc_pf_get_primary_mac_addr,
- 	.create_pcs = enetc_pf_create_pcs,
--	.destroy_pcs = enetc_pf_destroy_pcs,
- 	.enable_psfp = enetc_psfp_enable,
- };
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-index ae407e9e9ee7..be22b036df42 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
-@@ -32,7 +32,6 @@ struct enetc_pf_ops {
- 	void (*set_si_primary_mac)(struct enetc_hw *hw, int si, const u8 *addr);
- 	void (*get_si_primary_mac)(struct enetc_hw *hw, int si, u8 *addr);
- 	struct phylink_pcs *(*create_pcs)(struct enetc_pf *pf, struct mii_bus *bus);
--	void (*destroy_pcs)(struct phylink_pcs *pcs);
- 	int (*enable_psfp)(struct enetc_ndev_priv *priv);
- };
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index edf14a95cab7..1c53036d17df 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -4,6 +4,7 @@
- #include <linux/fsl/enetc_mdio.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-+#include <linux/pcs.h>
- 
- #include "enetc_pf_common.h"
- 
-@@ -248,8 +249,7 @@ static int enetc_imdio_create(struct enetc_pf *pf)
- 
- static void enetc_imdio_remove(struct enetc_pf *pf)
- {
--	if (pf->pcs && pf->ops->destroy_pcs)
--		pf->ops->destroy_pcs(pf->pcs);
-+	pcs_put(pf->pcs);
- 
- 	if (pf->imdio) {
- 		mdiobus_unregister(pf->imdio);
-diff --git a/drivers/net/ethernet/freescale/fman/Kconfig b/drivers/net/ethernet/freescale/fman/Kconfig
-index a55542c1ad65..2b51b223716b 100644
---- a/drivers/net/ethernet/freescale/fman/Kconfig
-+++ b/drivers/net/ethernet/freescale/fman/Kconfig
-@@ -3,10 +3,12 @@ config FSL_FMAN
- 	tristate "FMan support"
- 	depends on FSL_SOC || ARCH_LAYERSCAPE || COMPILE_TEST
- 	select GENERIC_ALLOCATOR
-+	select OF_DYNAMIC
-+	select MDIO_BUS
- 	select PHYLINK
-+	select PCS
- 	select PCS_LYNX
- 	select CRC32
--	default n
- 	help
- 		Freescale Data-Path Acceleration Architecture Frame Manager
- 		(FMan) support
-diff --git a/drivers/net/ethernet/freescale/fman/fman_memac.c b/drivers/net/ethernet/freescale/fman/fman_memac.c
-index 3925441143fa..a6064bc80ce7 100644
---- a/drivers/net/ethernet/freescale/fman/fman_memac.c
-+++ b/drivers/net/ethernet/freescale/fman/fman_memac.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/slab.h>
- #include <linux/io.h>
-+#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
- #include <linux/phy.h>
- #include <linux/phy_fixed.h>
-@@ -972,21 +973,21 @@ static int memac_init(struct fman_mac *memac)
- 	return 0;
- }
- 
--static void pcs_put(struct phylink_pcs *pcs)
-+static void memac_pcs_put(struct phylink_pcs *pcs)
- {
- 	if (IS_ERR_OR_NULL(pcs))
- 		return;
- 
--	lynx_pcs_destroy(pcs);
-+	pcs_put(pcs);
- }
- 
- static int memac_free(struct fman_mac *memac)
- {
- 	free_init_resources(memac);
- 
--	pcs_put(memac->sgmii_pcs);
--	pcs_put(memac->qsgmii_pcs);
--	pcs_put(memac->xfi_pcs);
-+	memac_pcs_put(memac->sgmii_pcs);
-+	memac_pcs_put(memac->qsgmii_pcs);
-+	memac_pcs_put(memac->xfi_pcs);
- 	kfree(memac->memac_drv_param);
- 	kfree(memac);
- 
-@@ -1033,7 +1034,8 @@ static struct fman_mac *memac_config(struct mac_device *mac_dev,
- 	return memac;
- }
- 
--static struct phylink_pcs *memac_pcs_create(struct device_node *mac_node,
-+static struct phylink_pcs *memac_pcs_create(struct device *dev,
-+					    struct device_node *mac_node,
- 					    int index)
- {
- 	struct device_node *node;
-@@ -1043,7 +1045,7 @@ static struct phylink_pcs *memac_pcs_create(struct device_node *mac_node,
- 	if (!node)
- 		return ERR_PTR(-ENODEV);
- 
--	pcs = lynx_pcs_create_fwnode(of_fwnode_handle(node));
-+	pcs = lynx_pcs_create_fwnode(dev, of_fwnode_handle(node));
- 	of_node_put(node);
- 
- 	return pcs;
-@@ -1100,7 +1102,7 @@ int memac_initialization(struct mac_device *mac_dev,
- 
- 	err = of_property_match_string(mac_node, "pcs-handle-names", "xfi");
- 	if (err >= 0) {
--		memac->xfi_pcs = memac_pcs_create(mac_node, err);
-+		memac->xfi_pcs = memac_pcs_create(mac_dev->dev, mac_node, err);
- 		if (IS_ERR(memac->xfi_pcs)) {
- 			err = PTR_ERR(memac->xfi_pcs);
- 			dev_err_probe(mac_dev->dev, err, "missing xfi pcs\n");
-@@ -1112,7 +1114,8 @@ int memac_initialization(struct mac_device *mac_dev,
- 
- 	err = of_property_match_string(mac_node, "pcs-handle-names", "qsgmii");
- 	if (err >= 0) {
--		memac->qsgmii_pcs = memac_pcs_create(mac_node, err);
-+		memac->qsgmii_pcs = memac_pcs_create(mac_dev->dev, mac_node,
-+						     err);
- 		if (IS_ERR(memac->qsgmii_pcs)) {
- 			err = PTR_ERR(memac->qsgmii_pcs);
- 			dev_err_probe(mac_dev->dev, err,
-@@ -1128,11 +1131,11 @@ int memac_initialization(struct mac_device *mac_dev,
- 	 */
- 	err = of_property_match_string(mac_node, "pcs-handle-names", "sgmii");
- 	if (err == -EINVAL || err == -ENODATA)
--		pcs = memac_pcs_create(mac_node, 0);
-+		pcs = memac_pcs_create(mac_dev->dev, mac_node, 0);
- 	else if (err < 0)
- 		goto _return_fm_mac_free;
- 	else
--		pcs = memac_pcs_create(mac_node, err);
-+		pcs = memac_pcs_create(mac_dev->dev, mac_node, err);
- 
- 	if (IS_ERR(pcs)) {
- 		err = PTR_ERR(pcs);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 67fa879b1e52..170ec691d090 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -182,9 +182,12 @@ config DWMAC_SOCFPGA
- 	tristate "SOCFPGA dwmac support"
- 	default ARCH_INTEL_SOCFPGA
- 	depends on OF && (ARCH_INTEL_SOCFPGA || COMPILE_TEST)
-+	select OF_DYNAMIC
- 	select MFD_SYSCON
-+	select MDIO_BUS
- 	select MDIO_REGMAP
- 	select REGMAP_MMIO
-+	select PCS
- 	select PCS_LYNX
- 	help
- 	  Support for ethernet controller on Altera SOCFPGA
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 72b50f6d72f4..325486c06511 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -8,6 +8,7 @@
- #include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_net.h>
-+#include <linux/pcs.h>
- #include <linux/phy.h>
- #include <linux/regmap.h>
- #include <linux/mdio/mdio-regmap.h>
-@@ -414,7 +415,7 @@ static int socfpga_dwmac_pcs_init(struct stmmac_priv *priv)
- 	if (IS_ERR(pcs_bus))
- 		return PTR_ERR(pcs_bus);
- 
--	pcs = lynx_pcs_create_mdiodev(pcs_bus, 0);
-+	pcs = lynx_pcs_create_mdiodev(priv->device, pcs_bus, 0);
- 	if (IS_ERR(pcs))
- 		return PTR_ERR(pcs);
- 
-@@ -424,8 +425,7 @@ static int socfpga_dwmac_pcs_init(struct stmmac_priv *priv)
- 
- static void socfpga_dwmac_pcs_exit(struct stmmac_priv *priv)
- {
--	if (priv->hw->phylink_pcs)
--		lynx_pcs_destroy(priv->hw->phylink_pcs);
-+	pcs_put(priv->hw->phylink_pcs);
- }
- 
- static struct phylink_pcs *socfpga_dwmac_select_pcs(struct stmmac_priv *priv,
++XILINX PCS DRIVER
++M:	Sean Anderson <sean.anderson@linux.dev>
++S:	Maintained
++F:	Documentation/devicetree/bindings/net/xilinx,pcs.yaml
++F:	drivers/net/pcs/pcs-xilinx.c
++
+ XILINX PWM DRIVER
+ M:	Sean Anderson <sean.anderson@seco.com>
+ S:	Maintained
 diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-index 6d19625b696d..f274ebffaae3 100644
+index f274ebffaae3..f18f1d6d0ae5 100644
 --- a/drivers/net/pcs/Kconfig
 +++ b/drivers/net/pcs/Kconfig
-@@ -26,10 +26,15 @@ config PCS_XPCS
- 	  DesignWare XPCS controllers.
+@@ -51,4 +51,25 @@ config PCS_RZN1_MIIC
+ 	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
+ 	  pass-through mode for MII.
  
- config PCS_LYNX
--	tristate
-+	tristate "NXP Lynx PCS driver"
-+	depends on PCS && MDIO_BUS
- 	help
--	  This module provides helpers to phylink for managing the Lynx PCS
--	  which is part of the Layerscape and QorIQ Ethernet SERDES.
-+	  This module provides driver support for the PCSs in Lynx 10g and 28g
-+	  SerDes devices. These devices are present in NXP QorIQ SoCs,
-+	  including the Layerscape series.
++config PCS_XILINX
++	depends on OF
++	depends on GPIOLIB
++	depends on COMMON_CLK
++	depends on PCS
++	select MDIO_BUS
++	select PHYLINK
++	tristate "Xilinx PCS driver"
++	help
++	  PCS driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
++	  This device can either act as a PCS+PMA for 1000BASE-X or 2500BASE-X,
++	  or as a GMII-to-SGMII bridge. It can also switch between 1000BASE-X
++	  and SGMII dynamically if configured correctly when synthesized.
++	  Typical applications use this device on an FPGA connected to a GEM or
++	  TEMAC on the GMII side. The other side is typically connected to
++	  on-device gigabit transceivers, off-device SERDES devices using TBI,
++	  or LVDS IO resources directly.
 +
-+	  If you want to use Ethernet on a QorIQ SoC, say "Y". If compiled as a
-+	  module, it will be called "pcs-lynx".
- 
- config PCS_MTK_LYNXI
- 	tristate
-diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-index 23b40e9eacbb..bacba1dd52e2 100644
---- a/drivers/net/pcs/pcs-lynx.c
-+++ b/drivers/net/pcs/pcs-lynx.c
-@@ -1,11 +1,15 @@
--// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
--/* Copyright 2020 NXP
++	  To compile this driver as a module, choose M here: the module
++	  will be called pcs-xilinx.
++
+ endmenu
+diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
+index 35e3324fc26e..347afd91f034 100644
+--- a/drivers/net/pcs/Makefile
++++ b/drivers/net/pcs/Makefile
+@@ -10,3 +10,5 @@ obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
+ obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
+ obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
+ obj-$(CONFIG_PCS_RZN1_MIIC)	+= pcs-rzn1-miic.o
++obj-$(CONFIG_PCS_ALTERA_TSE)	+= pcs-altera-tse.o
++obj-$(CONFIG_PCS_XILINX)	+= pcs-xilinx.o
+diff --git a/drivers/net/pcs/pcs-xilinx.c b/drivers/net/pcs/pcs-xilinx.c
+new file mode 100644
+index 000000000000..2d96b05d7916
+--- /dev/null
++++ b/drivers/net/pcs/pcs-xilinx.c
+@@ -0,0 +1,484 @@
 +// SPDX-License-Identifier: GPL-2.0+
-+/* Copyright (C) 2022 Sean Anderson <seanga2@gmail.com>
-+ * Copyright 2020 NXP
-  * Lynx PCS MDIO helpers
-  */
- 
- #include <linux/mdio.h>
- #include <linux/phylink.h>
++/*
++ * Copyright 2021-25 Sean Anderson <sean.anderson@seco.com>
++ *
++ * This is the driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
++ * IP. A typical setup will look something like
++ *
++ * MAC <--GMII--> PCS/PMA <--1000BASE-X--> SFP module (PMD)
++ *
++ * The IEEE model mostly describes this device, but the PCS layer has a
++ * separate sublayer for 8b/10b en/decoding:
++ *
++ * - When using a device-specific transceiver (serdes), the serdes handles 8b/10b
++ *   en/decoding and PMA functions. The IP implements other PCS functions.
++ * - When using LVDS IO resources, the IP implements PCS and PMA functions,
++ *   including 8b/10b en/decoding and (de)serialization.
++ * - When using an external serdes (accessed via TBI), the IP implements all
++ *   PCS functions, including 8b/10b en/decoding.
++ *
++ * The link to the PMD is not modeled by this driver, except for refclk. It is
++ * assumed that the serdes (if present) needs no configuration, though it
++ * should be fairly easy to add support. It is also possible to go from SGMII
++ * to GMII (PHY mode), but this is not supported.
++ *
++ * This driver was written with reference to PG047:
++ * https://docs.amd.com/r/en-US/pg047-gig-eth-pcs-pma
++ */
++
++#include <linux/bitmap.h>
++#include <linux/clk.h>
++#include <linux/clk-provider.h>
++#include <linux/gpio/consumer.h>
++#include <linux/iopoll.h>
++#include <linux/mdio.h>
 +#include <linux/of.h>
 +#include <linux/pcs.h>
- #include <linux/pcs-lynx.h>
++#include <linux/pcs-xilinx.h>
 +#include <linux/phylink.h>
- #include <linux/property.h>
- 
- #define SGMII_CLOCK_PERIOD_NS		8 /* PCS is clocked at 125 MHz */
-@@ -343,16 +347,16 @@ static const phy_interface_t lynx_interfaces[] = {
- 	PHY_INTERFACE_MODE_USXGMII,
- };
- 
--static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
-+static int lynx_pcs_probe(struct mdio_device *mdio)
- {
-+	struct device *dev = &mdio->dev;
- 	struct lynx_pcs *lynx;
--	int i;
-+	int i, ret;
- 
--	lynx = kzalloc(sizeof(*lynx), GFP_KERNEL);
-+	lynx = devm_kzalloc(dev, sizeof(*lynx), GFP_KERNEL);
- 	if (!lynx)
--		return ERR_PTR(-ENOMEM);
++#include <linux/property.h>
++
++#include "../phy/phy-caps.h"
++
++/* Vendor-specific MDIO registers */
++#define XILINX_PCS_ANICR 16 /* Auto-Negotiation Interrupt Control Register */
++#define XILINX_PCS_SSR   17 /* Standard Selection Register */
++
++#define XILINX_PCS_ANICR_IE BIT(0) /* Interrupt Enable */
++#define XILINX_PCS_ANICR_IS BIT(1) /* Interrupt Status */
++
++#define XILINX_PCS_SSR_SGMII BIT(0) /* Select SGMII standard */
++
++/**
++ * struct xilinx_pcs - Private data for Xilinx PCS devices
++ * @pcs: The phylink PCS
++ * @mdiodev: The mdiodevice used to access the PCS
++ * @refclk: The reference clock for the PMD
++ * @refclk_out: Optional reference clock for other PCSs using this PCS's shared
++ *              logic
++ * @reset: The reset line for the PCS
++ * @done: Optional GPIO for reset_done
++ * @irq: IRQ, or -EINVAL if polling
++ * @enabled: Set if @pcs.link_change is valid and we can call phylink_pcs_change()
++ */
++struct xilinx_pcs {
++	struct phylink_pcs pcs;
++	struct clk_hw refclk_out;
++	struct clk *refclk;
++	struct gpio_desc *reset, *done;
++	struct mdio_device *mdiodev;
++	int irq;
++	bool enabled;
++};
++
++static inline struct xilinx_pcs *pcs_to_xilinx(struct phylink_pcs *pcs)
++{
++	return container_of(pcs, struct xilinx_pcs, pcs);
++}
++
++static irqreturn_t xilinx_pcs_an_irq(int irq, void *dev_id)
++{
++	struct xilinx_pcs *xp = dev_id;
++
++	if (mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_ANICR,
++				   XILINX_PCS_ANICR_IS, 0) <= 0)
++		return IRQ_NONE;
++
++	/* paired with xilinx_pcs_enable/disable; protects xp->pcs->link_change */
++	if (smp_load_acquire(&xp->enabled))
++		phylink_pcs_change(&xp->pcs, true);
++	return IRQ_HANDLED;
++}
++
++static int xilinx_pcs_enable(struct phylink_pcs *pcs)
++{
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++	struct device *dev = &xp->mdiodev->dev;
++	int ret;
++
++	if (xp->irq < 0)
++		return 0;
++
++	ret = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR, 0,
++			     XILINX_PCS_ANICR_IE);
++	if (ret)
++		dev_err(dev, "could not clear IRQ enable: %d\n", ret);
++	else
++		/* paired with xilinx_pcs_an_irq */
++		smp_store_release(&xp->enabled, true);
++	return ret;
++}
++
++static void xilinx_pcs_disable(struct phylink_pcs *pcs)
++{
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++	struct device *dev = &xp->mdiodev->dev;
++	int err;
++
++	if (xp->irq < 0)
++		return;
++
++	WRITE_ONCE(xp->enabled, false);
++	/* paired with xilinx_pcs_an_irq */
++	smp_wmb();
++
++	err = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR,
++			     XILINX_PCS_ANICR_IE, 0);
++	if (err)
++		dev_err(dev, "could not clear IRQ enable: %d\n", err);
++}
++
++static __ETHTOOL_DECLARE_LINK_MODE_MASK(half_duplex) __ro_after_init;
++
++static int xilinx_pcs_validate(struct phylink_pcs *pcs,
++			       unsigned long *supported,
++			       const struct phylink_link_state *state)
++{
++	linkmode_andnot(supported, supported, half_duplex);
++	return 0;
++}
++
++static void xilinx_pcs_get_state(struct phylink_pcs *pcs,
++				 unsigned int neg_mode,
++				 struct phylink_link_state *state)
++{
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++
++	phylink_mii_c22_pcs_get_state(xp->mdiodev, neg_mode, state);
++}
++
++static int xilinx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
++			     phy_interface_t interface,
++			     const unsigned long *advertising,
++			     bool permit_pause_to_mac)
++{
++	int ret, changed = 0;
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++
++	if (test_bit(PHY_INTERFACE_MODE_SGMII, pcs->supported_interfaces) &&
++	    test_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->supported_interfaces)) {
++		u16 ssr;
++
++		if (interface == PHY_INTERFACE_MODE_SGMII)
++			ssr = XILINX_PCS_SSR_SGMII;
++		else
++			ssr = 0;
++
++		changed = mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_SSR,
++						 XILINX_PCS_SSR_SGMII, ssr);
++		if (changed < 0)
++			return changed;
++	}
++
++	ret = phylink_mii_c22_pcs_config(xp->mdiodev, interface, advertising,
++					 neg_mode);
++	return ret ?: changed;
++}
++
++static void xilinx_pcs_an_restart(struct phylink_pcs *pcs)
++{
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++
++	phylink_mii_c22_pcs_an_restart(xp->mdiodev);
++}
++
++static void xilinx_pcs_link_up(struct phylink_pcs *pcs, unsigned int mode,
++			       phy_interface_t interface, int speed, int duplex)
++{
++	int bmcr;
++	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
++
++	if (phylink_autoneg_inband(mode))
++		return;
++
++	bmcr = mdiodev_read(xp->mdiodev, MII_BMCR);
++	if (bmcr < 0) {
++		dev_err(&xp->mdiodev->dev, "could not read BMCR (err=%d)\n",
++			bmcr);
++		return;
++	}
++
++	bmcr &= ~(BMCR_SPEED1000 | BMCR_SPEED100);
++	switch (speed) {
++	case SPEED_2500:
++	case SPEED_1000:
++		bmcr |= BMCR_SPEED1000;
++		break;
++	case SPEED_100:
++		bmcr |= BMCR_SPEED100;
++		break;
++	case SPEED_10:
++		bmcr |= BMCR_SPEED10;
++		break;
++	default:
++		dev_err(&xp->mdiodev->dev, "invalid speed %d\n", speed);
++	}
++
++	bmcr = mdiodev_write(xp->mdiodev, MII_BMCR, bmcr);
++	if (bmcr < 0)
++		dev_err(&xp->mdiodev->dev, "could not write BMCR (err=%d)\n",
++			bmcr);
++}
++
++static const struct phylink_pcs_ops xilinx_pcs_ops = {
++	.pcs_validate = xilinx_pcs_validate,
++	.pcs_enable = xilinx_pcs_enable,
++	.pcs_disable = xilinx_pcs_disable,
++	.pcs_get_state = xilinx_pcs_get_state,
++	.pcs_config = xilinx_pcs_config,
++	.pcs_an_restart = xilinx_pcs_an_restart,
++	.pcs_link_up = xilinx_pcs_link_up,
++};
++
++static const struct clk_ops xilinx_pcs_clk_ops = { };
++
++static const phy_interface_t xilinx_pcs_interfaces[] = {
++	PHY_INTERFACE_MODE_SGMII,
++	PHY_INTERFACE_MODE_1000BASEX,
++	PHY_INTERFACE_MODE_2500BASEX,
++};
++
++static int xilinx_pcs_probe(struct mdio_device *mdiodev)
++{
++	struct device *dev = &mdiodev->dev;
++	struct fwnode_handle *fwnode = dev->fwnode;
++	int ret, i, j, mode_count;
++	struct xilinx_pcs *xp;
++	const char **modes;
++	u32 phy_id;
++
++	xp = devm_kzalloc(dev, sizeof(*xp), GFP_KERNEL);
++	if (!xp)
 +		return -ENOMEM;
- 
--	mdio_device_get(mdio);
- 	lynx->mdio = mdio;
- 	lynx->pcs.ops = &lynx_pcs_phylink_ops;
- 	lynx->pcs.poll = true;
-@@ -360,32 +364,64 @@ static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
- 	for (i = 0; i < ARRAY_SIZE(lynx_interfaces); i++)
- 		__set_bit(lynx_interfaces[i], lynx->pcs.supported_interfaces);
- 
--	return lynx_to_phylink_pcs(lynx);
-+	ret = devm_pcs_register(dev, &lynx->pcs);
++	xp->mdiodev = mdiodev;
++	dev_set_drvdata(dev, xp);
++
++	xp->irq = fwnode_irq_get_byname(fwnode, "an");
++	/* There's no _optional variant, so this is the best we've got */
++	if (xp->irq < 0 && xp->irq != -EINVAL)
++		return dev_err_probe(dev, xp->irq, "could not get IRQ\n");
++
++	mode_count = fwnode_property_string_array_count(fwnode,
++							"xlnx,pcs-modes");
++	if (!mode_count)
++		mode_count = -ENODATA;
++	if (mode_count < 0) {
++		dev_err(dev, "could not read xlnx,pcs-modes: %d", mode_count);
++		return mode_count;
++	}
++
++	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
++	if (!modes)
++		return -ENOMEM;
++
++	ret = fwnode_property_read_string_array(fwnode, "xlnx,pcs-modes",
++						modes, mode_count);
++	if (ret < 0) {
++		dev_err(dev, "could not read xlnx,pcs-modes: %d\n", ret);
++		kfree(modes);
++		return ret;
++	}
++
++	for (i = 0; i < mode_count; i++) {
++		for (j = 0; j < ARRAY_SIZE(xilinx_pcs_interfaces); j++) {
++			if (!strcmp(phy_modes(xilinx_pcs_interfaces[j]), modes[i])) {
++				__set_bit(xilinx_pcs_interfaces[j],
++					  xp->pcs.supported_interfaces);
++				goto next;
++			}
++		}
++
++		dev_err(dev, "invalid pcs-mode \"%s\"\n", modes[i]);
++		kfree(modes);
++		return -EINVAL;
++next:
++	}
++
++	kfree(modes);
++	if ((test_bit(PHY_INTERFACE_MODE_SGMII, xp->pcs.supported_interfaces) ||
++	     test_bit(PHY_INTERFACE_MODE_1000BASEX, xp->pcs.supported_interfaces)) &&
++	    test_bit(PHY_INTERFACE_MODE_2500BASEX, xp->pcs.supported_interfaces)) {
++		dev_err(dev,
++			"Switching from SGMII or 1000Base-X to 2500Base-X not supported\n");
++		return -EINVAL;
++	}
++
++	xp->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
++	if (IS_ERR(xp->reset))
++		return dev_err_probe(dev, PTR_ERR(xp->reset),
++				     "could not get reset gpio\n");
++
++	xp->done = devm_gpiod_get_optional(dev, "done", GPIOD_IN);
++	if (IS_ERR(xp->done))
++		return dev_err_probe(dev, PTR_ERR(xp->done),
++				     "could not get done gpio\n");
++
++	xp->refclk = devm_clk_get_optional_enabled(dev, "refclk");
++	if (IS_ERR(xp->refclk))
++		return dev_err_probe(dev, PTR_ERR(xp->refclk),
++				     "could not get/enable reference clock\n");
++
++	gpiod_set_value_cansleep(xp->reset, 0);
++	if (xp->done) {
++		if (read_poll_timeout(gpiod_get_value_cansleep, ret, ret, 1000,
++				      100000, true, xp->done))
++			return dev_err_probe(dev, -ETIMEDOUT,
++					     "timed out waiting for reset\n");
++	} else {
++		/* Just wait for a while and hope we're done */
++		usleep_range(50000, 100000);
++	}
++
++	if (fwnode_property_present(fwnode, "#clock-cells")) {
++		const char *parent = "refclk";
++		struct clk_init_data init = {
++			.name = fwnode_get_name(fwnode),
++			.ops = &xilinx_pcs_clk_ops,
++			.parent_names = &parent,
++			.num_parents = 1,
++			.flags = 0,
++		};
++
++		xp->refclk_out.init = &init;
++		ret = devm_clk_hw_register(dev, &xp->refclk_out);
++		if (ret)
++			return dev_err_probe(dev, ret,
++					     "could not register refclk\n");
++
++		ret = devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get,
++						  &xp->refclk_out);
++		if (ret)
++			return dev_err_probe(dev, ret,
++					     "could not register refclk\n");
++	}
++
++	/* Sanity check */
++	ret = get_phy_c22_id(mdiodev->bus, mdiodev->addr, &phy_id);
++	if (ret)
++		return dev_err_probe(dev, ret, "could not read id\n");
++	if ((phy_id & 0xfffffff0) != 0x01740c00)
++		dev_warn(dev, "unknown phy id %x\n", phy_id);
++
++	if (xp->irq < 0) {
++		xp->pcs.poll = true;
++	} else {
++		/* The IRQ is enabled by default; turn it off */
++		ret = mdiodev_write(xp->mdiodev, XILINX_PCS_ANICR, 0);
++		if (ret) {
++			dev_err(dev, "could not disable IRQ: %d\n", ret);
++			return ret;
++		}
++
++		/* Some PCSs have a bad habit of re-enabling their IRQ!
++		 * Request the IRQ in probe so we don't end up triggering the
++		 * spurious IRQ logic.
++		 */
++		ret = devm_request_threaded_irq(dev, xp->irq, NULL, xilinx_pcs_an_irq,
++						IRQF_SHARED | IRQF_ONESHOT,
++						dev_name(dev), xp);
++		if (ret) {
++			dev_err(dev, "could not request IRQ: %d\n", ret);
++			return ret;
++		}
++	}
++
++	xp->pcs.ops = &xilinx_pcs_ops;
++	ret = devm_pcs_register(dev, &xp->pcs);
 +	if (ret)
 +		return dev_err_probe(dev, ret, "could not register PCS\n");
-+	dev_info(dev, "probed\n");
-+	return 0;
- }
- 
--struct phylink_pcs *lynx_pcs_create_mdiodev(struct mii_bus *bus, int addr)
-+static const struct of_device_id lynx_pcs_of_match[] = {
-+	{ .compatible = "fsl,lynx-pcs" },
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(of, lynx_pcs_of_match);
 +
-+static struct mdio_driver lynx_pcs_driver = {
-+	.probe = lynx_pcs_probe,
++	if (xp->irq < 0)
++		dev_info(dev, "probed with irq=poll\n");
++	else
++		dev_info(dev, "probed with irq=%d\n", xp->irq);
++	return 0;
++}
++
++static const struct of_device_id xilinx_pcs_of_match[] = {
++	{ .compatible = "xlnx,pcs", },
++	{},
++};
++MODULE_DEVICE_TABLE(of, xilinx_pcs_of_match);
++
++static struct mdio_driver xilinx_pcs_driver = {
++	.probe = xilinx_pcs_probe,
 +	.mdiodrv.driver = {
-+		.name = "lynx-pcs",
-+		.of_match_table = of_match_ptr(lynx_pcs_of_match),
++		.name = "xilinx-pcs",
++		.of_match_table = of_match_ptr(xilinx_pcs_of_match),
 +	},
 +};
-+mdio_module_driver(lynx_pcs_driver);
 +
-+struct phylink_pcs *lynx_pcs_create_mdiodev(struct device *dev,
-+					    struct mii_bus *bus, int addr)
- {
- 	struct mdio_device *mdio;
- 	struct phylink_pcs *pcs;
-+	int err;
- 
- 	mdio = mdio_device_create(bus, addr);
- 	if (IS_ERR(mdio))
- 		return ERR_CAST(mdio);
- 
--	pcs = lynx_pcs_create(mdio);
--
--	/* lynx_create() has taken a refcount on the mdiodev if it was
--	 * successful. If lynx_create() fails, this will free the mdio
--	 * device here. In any case, we don't need to hold our reference
--	 * anymore, and putting it here will allow mdio_device_put() in
--	 * lynx_destroy() to automatically free the mdio device.
--	 */
--	mdio_device_put(mdio);
-+	mdio->bus_match = mdio_device_bus_match;
-+	strscpy(mdio->modalias, "lynx-pcs");
-+	err = mdio_device_register(mdio);
-+	if (err) {
-+		mdio_device_free(mdio);
-+		return ERR_PTR(err);
-+	}
- 
-+	pcs = pcs_get_by_dev(dev, &mdio->dev);
-+	mdio_device_free(mdio);
- 	return pcs;
- }
- EXPORT_SYMBOL(lynx_pcs_create_mdiodev);
- 
-+static int lynx_pcs_fixup(struct of_changeset *ocs,
-+			  struct device_node *np, void *data)
++static int __init xilinx_pcs_init(void)
++{
++	phy_caps_linkmodes(LINK_CAPA_10HD | LINK_CAPA_100HD | LINK_CAPA_1000HD,
++			   half_duplex);
++	return mdio_driver_register(&xilinx_pcs_driver);
++}
++module_init(xilinx_pcs_init);
++
++static void __exit xilinx_pcs_exit(void)
++{
++	mdio_driver_unregister(&xilinx_pcs_driver);
++}
++module_exit(xilinx_pcs_exit)
++
++static int axienet_xilinx_pcs_fixup(struct of_changeset *ocs,
++				    struct device_node *np, void *data)
 +{
 +#ifdef CONFIG_OF_DYNAMIC
-+	return of_changeset_add_prop_string(ocs, np, "compatible",
-+					    "fsl,lynx-pcs");
++	unsigned int interface, mode_count, mode = 0;
++	const unsigned long *interfaces = data;
++	const char **modes;
++	int ret;
++
++	mode_count = bitmap_weight(interfaces, PHY_INTERFACE_MODE_MAX);
++	WARN_ON_ONCE(!mode_count);
++	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
++	if (!modes)
++		return -ENOMEM;
++
++	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX)
++		modes[mode++] = phy_modes(interface);
++	ret = of_changeset_add_prop_string_array(ocs, np, "xlnx,pcs-modes",
++						 modes, mode_count);
++	kfree(modes);
++	if (ret)
++		return ret;
++
++	return of_changeset_add_prop_string(ocs, np, "compatible", "xlnx,pcs");
 +#else
 +	return -ENODEV;
 +#endif
 +}
 +
- /*
-  * lynx_pcs_create_fwnode() creates a lynx PCS instance from the fwnode
-  * device indicated by node.
-@@ -396,40 +432,12 @@ EXPORT_SYMBOL(lynx_pcs_create_mdiodev);
-  *  -ENOMEM if we fail to allocate memory
-  *  pointer to a phylink_pcs on success
-  */
--struct phylink_pcs *lynx_pcs_create_fwnode(struct fwnode_handle *node)
-+struct phylink_pcs *lynx_pcs_create_fwnode(struct device *dev,
-+					   struct fwnode_handle *node)
- {
--	struct mdio_device *mdio;
--	struct phylink_pcs *pcs;
--
--	if (!fwnode_device_is_available(node))
--		return ERR_PTR(-ENODEV);
--
--	mdio = fwnode_mdio_find_device(node);
--	if (!mdio)
--		return ERR_PTR(-EPROBE_DEFER);
--
--	pcs = lynx_pcs_create(mdio);
--
--	/* lynx_create() has taken a refcount on the mdiodev if it was
--	 * successful. If lynx_create() fails, this will free the mdio
--	 * device here. In any case, we don't need to hold our reference
--	 * anymore, and putting it here will allow mdio_device_put() in
--	 * lynx_destroy() to automatically free the mdio device.
--	 */
--	mdio_device_put(mdio);
--
--	return pcs;
-+	return pcs_get_by_fwnode_compat(dev, node, lynx_pcs_fixup, NULL);
- }
- EXPORT_SYMBOL_GPL(lynx_pcs_create_fwnode);
- 
--void lynx_pcs_destroy(struct phylink_pcs *pcs)
--{
--	struct lynx_pcs *lynx = phylink_pcs_to_lynx(pcs);
--
--	mdio_device_put(lynx->mdio);
--	kfree(lynx);
--}
--EXPORT_SYMBOL(lynx_pcs_destroy);
--
--MODULE_DESCRIPTION("NXP Lynx PCS phylink library");
--MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_DESCRIPTION("NXP Lynx PCS phylink driver");
++/**
++ * axienet_xilinx_pcs_get() - Compatibility function for the AXI Ethernet driver
++ * @dev: The MAC device
++ * @interfaces: The interfaces to use as a fallback
++ *
++ * This is a helper function for the AXI Ethernet driver to ensure backwards
++ * compatibility with device trees which do not include compatible strings for
++ * the PCS. It should not be used by new code.
++ *
++ * Return: a PCS, or an error pointer
++ */
++struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
++					   const unsigned long *interfaces)
++{
++	struct fwnode_handle *fwnode;
++	struct phylink_pcs *pcs;
++
++	fwnode = pcs_find_fwnode(dev_fwnode(dev), NULL, "phy-handle", false);
++	if (IS_ERR(fwnode))
++		return ERR_CAST(fwnode);
++
++	pcs = pcs_get_by_fwnode_compat(dev, fwnode, axienet_xilinx_pcs_fixup,
++				       (void *)interfaces);
++	fwnode_handle_put(fwnode);
++	return pcs;
++}
++EXPORT_SYMBOL_GPL(axienet_xilinx_pcs_get);
++
++MODULE_ALIAS("platform:xilinx-pcs");
++MODULE_DESCRIPTION("Xilinx PCS driver");
 +MODULE_LICENSE("GPL");
-diff --git a/include/linux/pcs-lynx.h b/include/linux/pcs-lynx.h
-index 7958cccd16f2..a95801337205 100644
---- a/include/linux/pcs-lynx.h
-+++ b/include/linux/pcs-lynx.h
-@@ -6,12 +6,13 @@
- #ifndef __LINUX_PCS_LYNX_H
- #define __LINUX_PCS_LYNX_H
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 0f6f86252622..3b57d18ebbed 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -921,7 +921,7 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
+  * valid, %-EIO on bus access error, or %-ENODEV if no device responds
+  * or invalid ID.
+  */
+-static int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
++int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
+ {
+ 	int phy_reg;
  
--#include <linux/mdio.h>
--#include <linux/phylink.h>
+@@ -949,6 +949,7 @@ static int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(get_phy_c22_id);
+ 
+ /* Extract the phy ID from the compatible string of the form
+  * ethernet-phy-idAAAA.BBBB.
+diff --git a/include/linux/pcs-xilinx.h b/include/linux/pcs-xilinx.h
+new file mode 100644
+index 000000000000..28ff65226c3c
+--- /dev/null
++++ b/include/linux/pcs-xilinx.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright 2024 Sean Anderson <sean.anderson@seco.com>
++ */
++
++#ifndef PCS_XILINX_H
++#define PCS_XILINX_H
++
 +struct device;
-+struct mii_bus;
 +struct phylink_pcs;
- 
--struct phylink_pcs *lynx_pcs_create_mdiodev(struct mii_bus *bus, int addr);
--struct phylink_pcs *lynx_pcs_create_fwnode(struct fwnode_handle *node);
--
--void lynx_pcs_destroy(struct phylink_pcs *pcs);
-+struct phylink_pcs *lynx_pcs_create_mdiodev(struct device *dev,
-+					    struct mii_bus *bus, int addr);
-+struct phylink_pcs *lynx_pcs_create_fwnode(struct device *dev,
-+					   struct fwnode_handle *node);
- 
- #endif /* __LINUX_PCS_LYNX_H */
++
++struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
++					   const unsigned long *interfaces);
++
++#endif /* PCS_XILINX_H */
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 32b9da274115..4e6a619e5bf9 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1754,6 +1754,7 @@ int phy_modify_paged(struct phy_device *phydev, int page, u32 regnum,
+ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
+ 				     bool is_c45,
+ 				     struct phy_c45_device_ids *c45_ids);
++int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id);
+ int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id);
+ struct mdio_device *fwnode_mdio_find_device(struct fwnode_handle *fwnode);
+ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode);
 -- 
 2.35.1.1320.gc452695387.dirty
 
