@@ -1,137 +1,142 @@
-Return-Path: <netdev+bounces-192954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CB2AC1D80
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:19:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F4AAC1D87
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BF2D1BA2E49
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 07:19:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FDCC3B8460
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 07:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A46621B9C8;
-	Fri, 23 May 2025 07:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBAB21C197;
+	Fri, 23 May 2025 07:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJ73satF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZRIYEg9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5BE21B8F6;
-	Fri, 23 May 2025 07:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64C721C178;
+	Fri, 23 May 2025 07:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747984755; cv=none; b=JOB+sCKLMPH22ZxJqIAZx/eIuRmyZ2ZfdM4hbiNdmNzSw/ANV/PXnkjs1XQqEVmHHUE3YfcY0OSGtuiWW9ABMbjmMtsUyHKvTkZmGxutH7MeLaTVDu2bX6F8U0efA0k50/26sW4kRDNun3CQqm1LTtnM1QF1aj07rSnnjHqDtxM=
+	t=1747984796; cv=none; b=jONkYGLH/AhPSFOuMxMKXyWxfw75diYza5AzZuMO8tfi9zNGIhmWzsoCgObJOFEAKAK21TLTyGk95CnZsF9X7BPxHGeGXwJgUuoq1W/KtTR5ODAyh4j3aMYazsCf82SmFa8va8WmCcN95OPDQLH40IdjIlL7fazI8/FY87nfTJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747984755; c=relaxed/simple;
-	bh=cF6q0OF3ObaHB4048Y7VWI+YiR+Cr3QfGImat8OqjCc=;
+	s=arc-20240116; t=1747984796; c=relaxed/simple;
+	bh=aEtUCaVHTrmJDEuedumuApTBnp00wSWAxrbB4vvfuSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qQ68lSZ2y3mRcmBUHJ8j3V1pk3DJG/oIcMTfwG0ZMhcMzXnoKh8VlNd9pSfTajk9dYl/KsuTlZEEdJFPHFQmQT2SZPg5wyG4lhfWRXPE6QUTuxK4ecTw8TfCxLHKKeZUsrwLPQ2fNKOOg2A1M8qeOFECGNtdqkT68GMdBv8xwKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJ73satF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55332C4CEE9;
-	Fri, 23 May 2025 07:19:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=AF4xdCsgtdz5gtZzjTo5U++Xnrm6BMX4b1jyjTOr9ZJrBFyzi4sZdBXkcX079En/1V7WO0uIgEgKEOS7HWnN6RY42aecOM035InHQ/zbf2EMqOLWjt28Ws4HdRnO/CAxPf/RKJnmRj6LcwnCAx1Ws21M/7TvFOGlXVWiOJbNSSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZRIYEg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC9AC4CEE9;
+	Fri, 23 May 2025 07:19:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747984754;
-	bh=cF6q0OF3ObaHB4048Y7VWI+YiR+Cr3QfGImat8OqjCc=;
+	s=k20201202; t=1747984796;
+	bh=aEtUCaVHTrmJDEuedumuApTBnp00wSWAxrbB4vvfuSo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HJ73satFuXTVEnH5OOyw4KCJMCaxYOiGZR8TXbSN/JMNLWnpB1UJmybPYUWEWmktx
-	 sssB2YYTB/4C79MWep/M2+eVRjjEn7Yrt/z1+60+jMAE80IUNfTG2tco2a7sWORlpX
-	 rGEfL6OyqpLXLPISo9spiY2n1qucO9tTV0JhrPH+CJUN126EKjcYrzjVdNEEJEm61k
-	 TlhgoETlYeSNm8W3xM8vMuJ+HeVZmbIH7CRPMN2P22cFLgF4LZiv/uY6pGrcDG/Unk
-	 LVe2FjiQmkIAnpz4wJPG97oK1k9BKAlripxiXM+H9Fzc9fJItWvuxWR/5knm3zvlsp
-	 JMaCSY6kgnGVg==
-Date: Fri, 23 May 2025 08:19:09 +0100
+	b=nZRIYEg9qsgPAtly1UXn8khOlwhVwJ+LaiirtAQd1lEtfXDBWImjwIhfM7Ctr06Zx
+	 aPV1gW7rrIZUpc3pkx9JTbEuBnMVRXZdKdl4C5UkgYPVi7zF0QOp01Y9uRtUs3Pzj4
+	 z6XBtTZ2kvFnlYpUCuNDabtv0h+rvqNuQusUVSeYznJCsXsXh46QG/C/SweEh+qJP2
+	 UtgMBaNs3ikjpA5Zd6fSZdEBR/xaaBSA2fk6RUCPlegprwVdTMRezE+WCV3jYzILaw
+	 x3r0/bcrCySpCuML91lS6O6ooSXPbjESvfBR65Hls0bOmh1qSAl0xAmgKy6PiKOsb2
+	 BoVVMfYNb0T/g==
+Date: Fri, 23 May 2025 08:19:50 +0100
 From: Simon Horman <horms@kernel.org>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, darren.kenny@oracle.com
-Subject: Re: [External] : Re: [PATCH] ixgbe: Fix typos and clarify comments
- in X550 driver code
-Message-ID: <20250523071909.GO365796@horms.kernel.org>
-References: <20250522074734.3634633-1-alok.a.tiwari@oracle.com>
- <20250522172108.GK365796@horms.kernel.org>
- <ce71fa5a-32c0-4cc2-b537-5849d9bdea69@oracle.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net 2/2] net/mlx5e: Fix leak of Geneve TLV option object
+Message-ID: <20250523071950.GP365796@horms.kernel.org>
+References: <1747895286-1075233-1-git-send-email-tariqt@nvidia.com>
+ <1747895286-1075233-3-git-send-email-tariqt@nvidia.com>
+ <20250522191651.GL365796@horms.kernel.org>
+ <1a8cb838-d487-4c56-8dfa-8179f305de02@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ce71fa5a-32c0-4cc2-b537-5849d9bdea69@oracle.com>
+In-Reply-To: <1a8cb838-d487-4c56-8dfa-8179f305de02@nvidia.com>
 
-On Thu, May 22, 2025 at 11:41:00PM +0530, ALOK TIWARI wrote:
-> Hi Simon,
-> 
-> Thanks for Your review.
-> 
-> On 22-05-2025 22:51, Simon Horman wrote:
-> > > @@ -1754,7 +1754,7 @@ ixgbe_setup_mac_link_sfp_n(struct ixgbe_hw *hw, ixgbe_link_speed speed,
-> > >   	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
-> > >   	/* If no SFP module present, then return success. Return success since
-> > > -	 * SFP not present error is not excepted in the setup MAC link flow.
-> > > +	 * SFP not present error is not accepted in the setup MAC link flow.
-> > I wonder if "excepted" was supposed to be "expected".
+On Fri, May 23, 2025 at 09:58:57AM +0800, Jianbo Liu wrote:
 > 
 > 
-> Yes, "expected" definitely reads more naturally. However, I noticed that in
-> one place, the comment uses "accepted" instead — perhaps to imply a policy
-> or behavior enforcement.
+> On 5/23/2025 3:16 AM, Simon Horman wrote:
+> > On Thu, May 22, 2025 at 09:28:06AM +0300, Tariq Toukan wrote:
+> > > From: Jianbo Liu <jianbol@nvidia.com>
+> > > 
+> > > Previously, a unique tunnel id was added for the matching on TC
+> > > non-zero chains, to support inner header rewrite with goto action.
+> > > Later, it was used to support VF tunnel offload for vxlan, then for
+> > > Geneve and GRE. To support VF tunnel, a temporary mlx5_flow_spec is
+> > > used to parse tunnel options. For Geneve, if there is TLV option, a
+> > > object is created, or refcnt is added if already exists. But the
+> > > temporary mlx5_flow_spec is directly freed after parsing, which causes
+> > > the leak because no information regarding the object is saved in
+> > > flow's mlx5_flow_spec, which is used to free the object when deleting
+> > > the flow.
+> > > 
+> > > To fix the leak, call mlx5_geneve_tlv_option_del() before free the
+> > > temporary spec if it has TLV object.
+> > > 
+> > > Fixes: 521933cdc4aa ("net/mlx5e: Support Geneve and GRE with VF tunnel offload")
+> > > Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> > > Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> > > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> > > ---
+> > >   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 7 ++++---
+> > >   1 file changed, 4 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> > > index f1d908f61134..b9c1d7f8f05c 100644
+> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> > > @@ -2028,9 +2028,8 @@ mlx5e_tc_add_fdb_flow(struct mlx5e_priv *priv,
+> > >   	return err;
+> > >   }
+> > > -static bool mlx5_flow_has_geneve_opt(struct mlx5e_tc_flow *flow)
+> > > +static bool mlx5_flow_has_geneve_opt(struct mlx5_flow_spec *spec)
+> > >   {
+> > > -	struct mlx5_flow_spec *spec = &flow->attr->parse_attr->spec;
+> > >   	void *headers_v = MLX5_ADDR_OF(fte_match_param,
+> > >   				       spec->match_value,
+> > >   				       misc_parameters_3);
+> > > @@ -2069,7 +2068,7 @@ static void mlx5e_tc_del_fdb_flow(struct mlx5e_priv *priv,
+> > >   	}
+> > >   	complete_all(&flow->del_hw_done);
+> > > -	if (mlx5_flow_has_geneve_opt(flow))
+> > > +	if (mlx5_flow_has_geneve_opt(&attr->parse_attr->spec))
+> > >   		mlx5_geneve_tlv_option_del(priv->mdev->geneve);
+> > >   	if (flow->decap_route)
+> > 
+> > Hi,
+> > 
+> > The lines leading up to the hung below are:
+> > 
+> > 	      err = mlx5e_tc_tun_parse(filter_dev, priv, tmp_spec, f, match_level);
+> >                if (err) {
+> >                          kvfree(tmp_spec);
+> >                          NL_SET_ERR_MSG_MOD(extack, "Failed to parse tunnel attributes");
+> >                          netdev_warn(priv->netdev, "Failed to parse tunnel attributes");
+> > 
+> > I am wondering if the same resource leak described in the patch description
+> > can occur if mlx5e_tc_tun_parse() fails after it successfully calls
+> > tunnel->parse_tunnel().
+> > 
+> 
+> Yes, I missed that. I will fix in next version.
 
-Understood. I did hesitate in writing my previous email as I'm not entirely
-sure what the intention was. I do agree that accepted makes sense.
-And I'm happy to keep that in the absence of more information.
-
-> 
-> ------------------
-> static int
-> ixgbe_setup_mac_link_sfp_x550em(struct ixgbe_hw *hw,
->                                 ixgbe_link_speed speed,
->                                 __always_unused bool
-> autoneg_wait_to_complete)
-> {
->         bool setup_linear = false;
->         u16 reg_slice, reg_val;
->         int status;
-> 
->         /* Check if SFP module is supported and linear */
->         status = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
-> 
->         /* If no SFP module present, then return success. Return success
-> since
->          * there is no reason to configure CS4227 and SFP not present error
-> is
->          * not accepted in the setup MAC link flow.
->          */
->         if (status == -ENOENT)
-> --------------------
-> 
-> > 
-> > >   	 */
-> > >   	if (ret_val == -ENOENT)
-> > >   		return 0;
-> > > @@ -1804,7 +1804,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
-> > >   	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
-> > >   	/* If no SFP module present, then return success. Return success since
-> > > -	 * SFP not present error is not excepted in the setup MAC link flow.
-> > > +	 * SFP not present error is not accepted in the setup MAC link flow.
-> > Ditto.
-> > 
-> > >   	 */
-> > >   	if (ret_val == -ENOENT)
-> > >   		return 0;
-> > The above notwithstanding, this looks good to me.
-> > 
-> > Reviewed-by: Simon Horman<horms@kernel.org>
-> 
-> 
-> Thanks,
-> Alok
-> 
+Thanks, much appreciated.
 
