@@ -1,244 +1,108 @@
-Return-Path: <netdev+bounces-193015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01841AC2325
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 14:55:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441E7AC2346
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 14:59:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A1C9E479B
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:55:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1FF616981D
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D325A86342;
-	Fri, 23 May 2025 12:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2D97404E;
+	Fri, 23 May 2025 12:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZEcDaO+l"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B/0z2ALO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F74F17A31C;
-	Fri, 23 May 2025 12:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70F926ADD;
+	Fri, 23 May 2025 12:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748004913; cv=none; b=Cs4gN+RRnVDObh8O5rB5a7r7IFdvpKMetdqeHznE3iLGF4zX3404rW1tmwpZtpri/8c8IG0RNtz8wBsOGDRvUfMsdpPaTy+afgg1uc1M7Yy4hURfwAGT5sYp9l7TrEu/NGXYSutgh85sRK5zNcD8ueZT0iY0zaXVhTanN8KrYko=
+	t=1748005173; cv=none; b=CJ3PBwkhornJ/VsjkxxPfQNgJUBVbGtR9v1NS2MoudslpSsQ+WbMDZ10fztT1i7Pp1xyc1TOudekjzeA0H4hoUOCnowntZ4avXcsFcJk0w0HtehFCMMnnMX+bouHa67xVJpA3ASCUcJ8v5hkqGP06OWDJOg02BSErg1CLNeJ40A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748004913; c=relaxed/simple;
-	bh=LkNcq2xuHhljWbucXm13VtjJMEsWvLHCeMjsNIOmY+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sQzL//3biu0jtFbVWRUYLUP0ZESDRULs6zIobcA560CUrlZGOVtlPX55h1gtLf3zqeyFgn7rgaYU6zdxZd8/VY09bzHSR65QIm4RPD14l3vWjrnYAnbOyZ42/fcghixyKdyRj0B5aonI/H26qwO9iXOjORUZxHA7faud/WxT8U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZEcDaO+l; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 066BA4399E;
-	Fri, 23 May 2025 12:54:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1748004903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1kgxapgqpqXKaidI+dwQyPPRpZm75jne3m7YkATlzkI=;
-	b=ZEcDaO+l+3Vp/ktqUSPkwm5cuKaiXWUMMNrU2zxBnF0MSE8d5hkLY1smkK1u0miJXbuDwa
-	mdCfeF4zZ9bKTHeZ4VOY3VO6MtPSrAzF7JjRdaxLvwzcjObPrFS+BKXNTOOU17/ZPCx/cG
-	A8lSQNOuJSG11dP7Hbp5VbAlOCG+jEjOEdnEu8U5pVbjesJURt++hfQLazUlWQ+1bn4dPb
-	2kShAqi1PvUmemBXbrlwE7FwvmJySFnBUOuic74F4xH108Yo4rXhtBeEaC0V0pq83E71qG
-	A9bNjuApw8wGun0SuJpw9db90sBuSnwm1arA13qF3Q2sku6QK8AKeBe8NamGeQ==
-Date: Fri, 23 May 2025 14:54:57 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Daniel Golle
- <daniel@makrotopia.org>, Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v6 06/14] net: phy: Introduce generic SFP
- handling for PHY drivers
-Message-ID: <20250523145457.07b1e7db@2a02-8428-0f40-1901-f412-2f85-a503-26ba.rev.sfr.net>
-In-Reply-To: <23936783.6Emhk5qWAg@fw-rgant>
-References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
-	<20250507135331.76021-7-maxime.chevallier@bootlin.com>
-	<23936783.6Emhk5qWAg@fw-rgant>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1748005173; c=relaxed/simple;
+	bh=Eb1XMmvAoG3b/bdCa7Clb4107Xzu4WiZEuKO2Dd96po=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f0I2kqSrY/1ADVD+KPjI26VyPnAqeRMVvmnZi+JIMoJqU9Q6jjapEPqhMS7z8bEhIRVXwuS1/KzefSmsoAPs2jPkYmwrSUYRlf5okvPHexzpVTBFGZ9xz/X/sXLu4iI0+2VUMeS8zqeSD6dF9wGjSVebtQWgAiW0CCmxbz0L2oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B/0z2ALO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yjr54PMpftT4r6okJF9EMmmcVc8lugHm+Sz5gKXMrJ0=; b=B/0z2ALOhvbIUwBk0RPFsBZJC7
+	QWOV+vuQElNZrp0rGSADf5QmCAZxps0jcFG2O/JwdRLWS/gkek5D7GEtWNjM81hO6oHuxa9YE+hha
+	iaMhqEHpOASEy2tLcvluIiuQYv/rzTqOKfovrwn+ZgqqK++6h8OEnm4VIsjft7GOam1Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uIRzN-00Dbsd-I8; Fri, 23 May 2025 14:59:05 +0200
+Date: Fri, 23 May 2025 14:59:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, kory.maincent@bootlin.com,
+	wintera@linux.ibm.com, viro@zeniv.linux.org.uk,
+	quentin.schulz@bootlin.com, atenart@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: mscc: Stop clearing the the UDPv4 checksum
+ for L2 frames
+Message-ID: <13c4a8b2-89a8-428c-baad-a366ff6ab8b0@lunn.ch>
+References: <20250523082716.2935895-1-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdekledtucdltddurdegfedvrddttddmucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtvdemkeegvdekmehfgedtmeduledtudemfheguddvmedvfhekheemrgehtdefmedviegsrgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeegvdekmehfgedtmeduledtudemfheguddvmedvfhekheemrgehtdefmedviegsrgdphhgvlhhopedvrgdtvddqkeegvdekqddtfhegtddqudeltdduqdhfgeduvddqvdhfkeehqdgrhedtfedqvdeisggrrdhrvghvrdhsfhhrrdhnvghtpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedtpdhrtghpthhtoheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmp
- dhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250523082716.2935895-1-horatiu.vultur@microchip.com>
 
-Hi Romain,
-
-On Mon, 12 May 2025 10:38:52 +0200
-Romain Gantois <romain.gantois@bootlin.com> wrote:
-
-> Hi Maxime,
+On Fri, May 23, 2025 at 10:27:16AM +0200, Horatiu Vultur wrote:
+> We have noticed that when PHY timestamping is enabled, L2 frames seems
+> to be modified by changing two 2 bytes with a value of 0. The place were
+> these 2 bytes seems to be random(or I couldn't find a pattern).  In most
+> of the cases the userspace can ignore these frames but if for example
+> those 2 bytes are in the correction field there is nothing to do.  This
+> seems to happen when configuring the HW for IPv4 even that the flow is
+> not enabled.
+> These 2 bytes correspond to the UDPv4 checksum and once we don't enable
+> clearing the checksum when using L2 frames then the frame doesn't seem
+> to be changed anymore.
 > 
-> On Wednesday, 7 May 2025 15:53:22 CEST Maxime Chevallier wrote:
-> > There are currently 4 PHY drivers that can drive downstream SFPs:
-> > marvell.c, marvell10g.c, at803x.c and marvell-88x2222.c. Most of the
-> > logic is boilerplate, either calling into generic phylib helpers (for
-> > SFP PHY attach, bus attach, etc.) or performing the same tasks with a
-> > bit of validation :
-> >  - Getting the module's expected interface mode
-> >  - Making sure the PHY supports it
-> >  - Optionnaly perform some configuration to make sure the PHY outputs
-> >    the right mode
-> > 
-> > This can be made more generic by leveraging the phy_port, and its
-> > configure_mii() callback which allows setting a port's interfaces when
-> > the port is a serdes.
-> > 
-> > Introduce a generic PHY SFP support. If a driver doesn't probe the SFP
-> > bus itself, but an SFP phandle is found in devicetree/firmware, then the
-> > generic PHY SFP support will be used, relying on port ops.
-> > 
-> > PHY driver need to :
-> >  - Register a .attach_port() callback
-> >  - When a serdes port is registered to the PHY, drivers must set
-> >    port->interfaces to the set of PHY_INTERFACE_MODE the port can output
-> >  - If the port has limitations regarding speed, duplex and aneg, the
-> >    port can also fine-tune the final linkmodes that can be supported
-> >  - The port may register a set of ops, including .configure_mii(), that
-> >    will be called at module_insert time to adjust the interface based on
-> >    the module detected.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---
-> >  drivers/net/phy/phy_device.c | 107 +++++++++++++++++++++++++++++++++++
-> >  include/linux/phy.h          |   2 +
-> >  2 files changed, 109 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> > index aaf0eccbefba..aca3a47cbb66 100644
-> > --- a/drivers/net/phy/phy_device.c
-> > +++ b/drivers/net/phy/phy_device.c
-> > @@ -1450,6 +1450,87 @@ void phy_sfp_detach(void *upstream, struct sfp_bus
-> > *bus) }
-> >  EXPORT_SYMBOL(phy_sfp_detach);
-> > 
-> > +static int phy_sfp_module_insert(void *upstream, const struct sfp_eeprom_id
-> > *id) +{
-> > +	struct phy_device *phydev = upstream;
-> > +	struct phy_port *port = phy_get_sfp_port(phydev);
-> > +  
+> Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> ---
+>  drivers/net/phy/mscc/mscc_ptp.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> RCT
+> diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
+> index 6f96f2679f0bf..6b800081eed52 100644
+> --- a/drivers/net/phy/mscc/mscc_ptp.c
+> +++ b/drivers/net/phy/mscc/mscc_ptp.c
+> @@ -946,7 +946,9 @@ static int vsc85xx_ip1_conf(struct phy_device *phydev, enum ts_blk blk,
+>  	/* UDP checksum offset in IPv4 packet
+>  	 * according to: https://tools.ietf.org/html/rfc768
+>  	 */
+> -	val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26) | IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
+> +	val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26);
+> +	if (enable)
+> +		val |= IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
 
-Can't be done here, it won't build if in the other order...
+Is this towards the media, or received from the media?  Have you tried
+sending packets with deliberately broken UDPv4 checksum? Does the PHYs
+PTP engine correctly ignore such packets?
 
-> 
-> > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
-> > +	DECLARE_PHY_INTERFACE_MASK(interfaces);
-> > +	phy_interface_t iface;
-> > +
-> > +	linkmode_zero(sfp_support);
-> > +
-> > +	if (!port)
-> > +		return -EINVAL;
-> > +
-> > +	sfp_parse_support(phydev->sfp_bus, id, sfp_support, interfaces);
-> > +
-> > +	if (phydev->n_ports == 1)
-> > +		phydev->port = sfp_parse_port(phydev->sfp_bus, id,   
-> sfp_support);
-> 
-> As mentionned below, this check looks a bit strange to me. Why are we only 
-> parsing the SFP port if the PHY device only has one registered port?
+I suppose the opposite could also be true. Do you see it ignoring
+frames which are actually O.K? It could be looking in the wrong place
+for the checksum, so the checksum fails.
 
-Because phydev->port is global to the PHY. If we have another port,
-then phydev->port must be handled differently so that SFP insertion /
-removal doesn't overwrite what the other port is.
-
-Handling of phydev->port is still fragile in this state of the series,
-I'll try to improve on that for V7 and document it better.
-
-> > +
-> > +	linkmode_and(sfp_support, port->supported, sfp_support);
-> > +
-> > +	if (linkmode_empty(sfp_support)) {
-> > +		dev_err(&phydev->mdio.dev, "incompatible SFP module   
-> inserted\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	iface = sfp_select_interface(phydev->sfp_bus, sfp_support);
-> > +
-> > +	/* Check that this interface is supported */
-> > +	if (!test_bit(iface, port->interfaces)) {
-> > +		dev_err(&phydev->mdio.dev, "incompatible SFP module   
-> inserted\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (port->ops && port->ops->configure_mii)
-> > +		return port->ops->configure_mii(port, true, iface);  
-> 
-> The name "configure_mii()" seems a bit narrow-scoped to me, as this callback 
-> might have to configure something else than a MII link. For example, if a DAC 
-> SFP module is inserted, the downstream side of the transciever will have to be 
-> configured to 1000Base-X or something similar.
-
-In that regard, you can consider 1000BaseX as a MII mode (we do have
-PHY_INTERFACE_MODE_1000BASEX).
-
-> I'd suggest something like "post_sfp_insert()", please let me know what you 
-> think.
-
-That's not intended to be SFP-specific though. post_sfp_insert() sounds
-lke the narrow-scoped name to me :) Here we are dealing with a PHy that
-has a media-side port that isn't a MDI port, but an MII interface like
-a MAC would usually export. There may be an SFP here, or something else
-entirely :)
-
-One thing though is that this series uses a mix of "is_serdes" and
-"configure_mii" to mean pretty-much the same thing, I'll make the names
-a bit more homogenous.
-
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void phy_sfp_module_remove(void *upstream)
-> > +{
-> > +	struct phy_device *phydev = upstream;
-> > +	struct phy_port *port = phy_get_sfp_port(phydev);
-> > +
-> > +	if (port && port->ops && port->ops->configure_mii)
-> > +		port->ops->configure_mii(port, false, PHY_INTERFACE_MODE_NA);
-> > +
-> > +	if (phydev->n_ports == 1)
-> > +		phydev->port = PORT_NONE;  
-> 
-> This check is a bit confusing to me. Could you please explain why you're only 
-> setting the phydev's SFP port to PORT_NONE if the PHY device only has one 
-> registered port? Shouldn't this be done regardless?
-
-So that we don't overwrite what the other port would have set :) but,
-that's a bit fragile as I said and probably not correct anyways, let me
-double-check that.
-
-Maxime
-
+	Andrew
 
