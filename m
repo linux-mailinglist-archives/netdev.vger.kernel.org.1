@@ -1,287 +1,413 @@
-Return-Path: <netdev+bounces-193075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20CD0AC26B9
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:48:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C0DAC26FB
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 679A1188BFF5
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:48:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA77FA23684
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ED5293730;
-	Fri, 23 May 2025 15:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A63295D90;
+	Fri, 23 May 2025 15:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="JSy241/G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NDPsLn2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2058.outbound.protection.outlook.com [40.107.249.58])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE351459F7;
-	Fri, 23 May 2025 15:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748015287; cv=fail; b=tXJK8UsNRXoGJKMLS19Ysu3CIEtorJMUXxdvL9TmX8hPVA6QG8O1EFr6I9nCujW1AlncIAjg38ljozchJ1Z2x30KmXpgV4N7rzzf1TkqnQBZZKj1ZrRCusdg4kL/iB9GP43cTcgZUS61rYuAXR8LnzxPaY0Q0o9LBymL872Om18=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748015287; c=relaxed/simple;
-	bh=N+1UAH7HaLAU89T5llhSQ/Yf4M18Z7XQLfhb0PFJ8Ko=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=RDk05lJQVdVA3Eo6tbZM1hh9pW6s4OPotTvuUtIwoAP4SFoxYGPmRfhFrHw51l8YMEYf4s6CP6f8L4RQHDqN4YzOzGV9f7Ngokp5/DGFUgnqcOf2rGAYMIrjLEGEjCJNjbO9aoTtO6D/JS7RFey2s4jdNbXBfRIyBfDL5ALF5+c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=JSy241/G; arc=fail smtp.client-ip=40.107.249.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NQ2Tt1TBW5uV+flPcdZB7NcF23DDtrABP4fllWaOt+zumI9/rTCGZMUVjGooR8zhxN8fTsNFMtrVbEMUvZPq4FLzuyVYJrGi4217QDFj461XVfv8bl8yD58b0OTDWkzPM2sELVkVOGqIRYpDml53vjCQm45o+WIL71rzCYX+fLGC1Z7ZkNFtwdArZq9adCKpnCUscSdQxBe5SSRex7h1IOIndrj6nD1BpMmrsTtXOiGvF8t7A9bNlIRlGhDiN9NkoUkDppPBx033PJvgNF9JNYKnSWy3w+AuRgYjkPaObElK2TBD5IHh2bQK9P9rWlKqNcF8eY/2CN/PT5Tq3wYQtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e78Z6/eI6up9DS2RmppNPjAhE2n1oqChOB6IHg9F0yU=;
- b=sn9MjJHumUhHhsJwp4/3FxoVFayH6dkGxnDCBN27UyMoEHH8aWAavy3kz3K6U/RHTAQZ4YSNoa6uOCdir7K5FGZIMPIw0PDpdRpT30Apfx8TTolJiidfXBXQDSPtyYrkDphOYHOQApCGuM2BH+wA16l02fgJelnSvVP9/tRFHcX8ESYWDw14dG2OSzKn0Pq0Li/eJZ82hlXvQtRpD2SOYfyVgdny9QduqLZe0XPh1uEhKS6nQEqNTKAwksBuWYIKkmljUD7smgKzEjhdCUI7Y+vK+JvwKwQWKIggJ8rqHH0L/oLcqrk8M+qrlJN/ssUZHDDSDhxnX9kUNlUsj2oYDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e78Z6/eI6up9DS2RmppNPjAhE2n1oqChOB6IHg9F0yU=;
- b=JSy241/GCpNyVxoG3qQIwendtL9bk/5zncsdX52unr/oxsrqD5tf1NSWHEDPhwXeDJDKbSuyCqYlcYlZ9k7lY1ktdfsDyb06sOFEQQjBcAEEcfYCzCJhS4Llv7vfnJYsL+gtbNgh5Mz09kgkLHuZLEE5uJOBtAGnkA6rwlE9YhVl6xrbtcvZX79TwastHqItWrgiGAMKriCaUjWbhlt6HJ5TMz7BHm13Qr2xPJqMUYPlx4Qu35vOs98he5haUHY//AjBKeC1e4XtJLJ0NBjYf554atFDIifK4xYrgHOHX6czniQr0fr22CwaQCyadJQlCa+xMAzXxhS+Zd7mpT3RDA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by GVXPR04MB10303.eurprd04.prod.outlook.com (2603:10a6:150:1ea::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.21; Fri, 23 May
- 2025 15:48:00 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%2]) with mapi id 15.20.8746.030; Fri, 23 May 2025
- 15:48:00 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Microchip (AT91) SoC support)
-Cc: imx@lists.linux.dev
-Subject: [PATCH 1/1] dt-bindings: ieee802154: Convert at86rf230.txt yaml format
-Date: Fri, 23 May 2025 11:47:39 -0400
-Message-Id: <20250523154743.545245-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR05CA0034.namprd05.prod.outlook.com
- (2603:10b6:a03:c0::47) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F592957B0
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 15:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748015908; cv=none; b=ox7n7YuKKiPHKn+KvfBSvUk5QeD/1t2KCsWbPv03b1mR9VbdaPqi6m/CRkwE6LO/uE/mvKeLuKZsK8tuN/IuvEwF3lTjWIeUOxfFqYRwM1NMJqj5QUsuMs6sX4NAwz/gtxH+A8SABT2f7zNIwRMUVSo7zh0m0UBfconDCCRXzZI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748015908; c=relaxed/simple;
+	bh=0/KlqX53XvV3f7F7VxP4rbK/yjJK+9yLz+lYn5kZSlE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IH6NAFZmOgC0WdpK/aJHoaQS9w63VbwxiWSbrIiYgE57eW6QjMcmqk2fsKpFkeKrEAzKSJHu4+t/LXs4VuMhABSqJcAwFPia13c7nB/hJVjWkjEc+OOq/W2X6EW7qsHV6+BfpeZqOLJBblolLyYZbay4RtuKXl4V8pqeNyDtCPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NDPsLn2L; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748015906; x=1779551906;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0/KlqX53XvV3f7F7VxP4rbK/yjJK+9yLz+lYn5kZSlE=;
+  b=NDPsLn2L4QM55BDyB2B8v4lDQQqeLqoYGYuiYN9p1zkU4Hr9+dmlO6U1
+   hmdcNNEW9LMiybyLRFvCZLMkvP4HmdNlmgMTzfqTYFBure3WcT23SiZOq
+   h+FllRQ2ovec3cqfKaO2goEN3ph0Zqk7VjAL/EM5NDcvqVWt/0F7cqy7S
+   Ci3kverX/WszRw0LMm0W4bwSGnn4evvJxo1YK65D7obYSMdCEQQPTV8z6
+   C3+1RQilMF/j8GGVkD0l0VI9vRPRXiLuKgvsTMoDlK+eVCnzoFuqZdPMX
+   +eTcjPg4q0iRFl+AMgOra7Z3duonov2dIEGYQcz10oI3vSVcr6NgezQvR
+   w==;
+X-CSE-ConnectionGUID: wS2XWfCCT0uX5C9lbe/BHA==
+X-CSE-MsgGUID: tGM55bOISFuV2HpSHa5KmQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="72604728"
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="72604728"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 08:58:25 -0700
+X-CSE-ConnectionGUID: Knz4cXOtTjOB3Xe5+NRyrQ==
+X-CSE-MsgGUID: DgsUZzZaRjmnuTuVO5thMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="145153757"
+Received: from gklab-003-014.igk.intel.com ([10.91.173.44])
+  by fmviesa003.fm.intel.com with ESMTP; 23 May 2025 08:58:23 -0700
+From: Milena Olech <milena.olech@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Milena Olech <milena.olech@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH iwl-next] idpf: add cross timestamping
+Date: Fri, 23 May 2025 17:58:01 +0200
+Message-ID: <20250523155853.14625-1-milena.olech@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|GVXPR04MB10303:EE_
-X-MS-Office365-Filtering-Correlation-Id: 922b552f-a40e-4e25-fd19-08dd9a113217
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|7416014|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LTYydI0Py6Wb3LUmT9/Bd8Iz7VCfszmFegoJc/15dwFRdMVz3szwImd+w75l?=
- =?us-ascii?Q?tqUVvLXH1eumbHj2mcdZ5HomG7CdjivwkBY4wMUNexXSg8nGmqr2JZFpsGOO?=
- =?us-ascii?Q?UWcAje8WzbnSLRwubid/PrFOAifgclK6/3e+PquFFbP1V3x1HcF5SovEA7GI?=
- =?us-ascii?Q?3gQ4dIe7a5k0M6L+jItbDA9v+Jcxc/bAZpgbV/wdUgV6icE5svVUp8c1/KLe?=
- =?us-ascii?Q?Uztf/WpqsCllpV03Jiz5nVa5VWsUXJhGFMZb0rTJ4a4Np67Gvsi5nIg1g8Nk?=
- =?us-ascii?Q?ysuJxYktgvtCfLn3c81qtdfZC70RMckV36XLrm0S4nt0Dx7EYcZQoaM48mNM?=
- =?us-ascii?Q?2SppLS8ZUPBQdelUSk/5W1OtEI1Y+2Tw4ZAG2ZHgSlZ8s/frmYsjMz4xQ/Rd?=
- =?us-ascii?Q?VTFTx02aCE5mtHs7IchjgRqAl0z04CTlfqMfgZRimwNmFoAFh2Lvb4kSZrw9?=
- =?us-ascii?Q?GczhZkBBdcpIaQzJfeYRwfzefhaHgm+mDHTSqSjZeUA6MITAv0WtD2u/UJkJ?=
- =?us-ascii?Q?/5R9Hv2Gkhg9pCmknwKx/gcKZHJbvm3/KPjYnoRVdzKUwrfFjuoeBbMSDA+N?=
- =?us-ascii?Q?4Ml0kTqlWLXKj0U6XH/tRNDLpIyDcap7kDeTwgCxhQj8ZE4M+6x9dkzkSmlx?=
- =?us-ascii?Q?baRG6a2eBdVCIpNM7/Dy91XxRIDtZfGwdQf7VqReMTJ4LV1JeaOs7DWgcOGx?=
- =?us-ascii?Q?e4bXduw46+EgZXr4ocna/t0Vf+Gq7TCG9BYy8LgXk2xHwC9ESlj1NJyDx3NH?=
- =?us-ascii?Q?ZUDmets/10uMSaww7ivsBJrKJn52QDLmnbbnd0OsKKA2wAlPlALRis1NB4Ee?=
- =?us-ascii?Q?hh6rRv1DsIwR2pky+4X8E+OwLA2GiW0ZgB789zMbtXet/3hRgBo8XtOGAqRE?=
- =?us-ascii?Q?JWWPZuqKxgXhwQv8wjyx9HxlHqrRg2+fg2JrrtuQcPYN5UpLCz5qRaZKwJy+?=
- =?us-ascii?Q?rt5AcPyxifUnQMLwYA7FsleU3hAzJl9hufvUoX/kYEvfqxLKBknGKXI5ygL4?=
- =?us-ascii?Q?7mV54NeJzav1m74TSrzOmtoH1gZDvqTKbuHapQuFpR+yWD1eF9X3fF7zvFla?=
- =?us-ascii?Q?aDvUchYl4mxAZ7pV5VsmTBg+gfKMOdCLNGWDqJE7p8pLShqu1FA97+VEYn/r?=
- =?us-ascii?Q?AQ1SeSY2HhSPyEq4D7f/RR6X3eVz64RehQD1XzOnjAQk5vXdERSkZ5y+Jss4?=
- =?us-ascii?Q?pKfgX6clloYckZULX2faGf7n7o7GFbhE/GcdZYEUegdc6g3lNnEMV7LtR/42?=
- =?us-ascii?Q?TISwqRWRQapTSluS9FKOO5DTTYGONRHsKknCgYviJleuvccQ436O3jLTJ/OO?=
- =?us-ascii?Q?byFHcUYpwHdCXNvGtPY1/O0rTUM84EmlGgH9Dj6apdHag2u4yd/e0nUF7lGd?=
- =?us-ascii?Q?lJf0MgUBHAJpGnGeewTSJKOIuU5jvnf4oI/Do3taPlKbfNfQ84wnxtitJf40?=
- =?us-ascii?Q?RjOCWyM401ghq7I6ZC81up+EYeYTnnQu?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(7416014)(921020)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fMQ+ki6kEXeBOa7nfkWM4ARJNAZiP7AwnDGmiox2GpT0qm+ryh6+79OZ07+p?=
- =?us-ascii?Q?VzuuJIYuv7qfkNpPdEgSjVQTpUbVtCHnI+r9CdVyV902jzM6o8uBpK5ERWuq?=
- =?us-ascii?Q?Ezy7xgHFGhRRXLr4bFAxZ4ufutNC07hi7/d9VloL42o8YnJeLb/uLVE+bb7J?=
- =?us-ascii?Q?VW8h+hQ+IW0lGgjNdKAHXZP0PiZ4hfiprabqroaqpRAIEwPp614Y1wPHnGp/?=
- =?us-ascii?Q?AiHa5CDsIy0wYGR7kBh7xy4u8SJkMzOKHWXa1yNCCqHDiGb+KYVF0TJwU75t?=
- =?us-ascii?Q?LwKrSSqYyyESfeYiw3Am0w5DW4Fjljk2tIu8wrjsjinELmrIOBJ7n2HLCEhT?=
- =?us-ascii?Q?cLDq8qW/7P0645TFjqDTs/BDkKK28wtv6d0I1ZhrKLXPFVce9ofBGMWVeikx?=
- =?us-ascii?Q?ysUXcP07Xl2f/a9WL5Cq9pKMIUIuMQQXserMieJfmaMwG2tkAmRr8lUVwVSS?=
- =?us-ascii?Q?SVd2Yhnh2TNhquWUBWO4yHwGPetAgh54XJ3ENYQ5QpCyjEheUVQNss7DUa7S?=
- =?us-ascii?Q?H4Gd9Cs3C09PQmjG4Racg05LZjIp4o1A8V05ZEyF+eXayj21h3GNIYSqhV03?=
- =?us-ascii?Q?tvN0tM3PGcV4FvJRmztwntJKh1uavXVQMcbZ5hgj8M12iM98n9Vb/Eho7R2e?=
- =?us-ascii?Q?4bCl2rZ+cnKTbDo1Ib0s8tP9e5REDKUcQ4yYChOfpX8NhUCFf0NY5M6JbueJ?=
- =?us-ascii?Q?RtpBPy6nAI1v58kr/KUusZJjXNLfw13wLfsOczbd3qg7CsQCrl3A0L3Zg9a7?=
- =?us-ascii?Q?JqomKqmWJ0KAW3K5fQSEJ22UbIPPgNxXbJWAAE89AKq9T6QUSINMbM8Um2I+?=
- =?us-ascii?Q?KwH1NPP6R/0ta5O8xwcsJDE6okGnXGkbKAcsaATAfoAJU/1MzUvjuQUSdUpu?=
- =?us-ascii?Q?XHVhnTG5JpaVFrtjN4JyFAz0l5Vu+KzuQiWFgZ4x0fG9K2z6vfaWg2dz5Tup?=
- =?us-ascii?Q?Y+lLLslyax6Xoig9ocPnCsRwZXbF4fDRGDLeiX/HL4zaCp9kl6CUL4ouHv6N?=
- =?us-ascii?Q?V+q12wPbd0oDNkNJRx5rJ0zjut7eSCu/gzLWuCgXXEGd6C5FcL9tLtYAyZmI?=
- =?us-ascii?Q?gvscJG4u0no6s+LZwRFcYzw+7zTaAXkuJh+jXpclIAsg0Cs2MBw1iMAYvlVX?=
- =?us-ascii?Q?xg0y+8ZlFDuJacfRosmWmSgcMoDzpcTtd7gkC1kzqFKW0xCmPp6A/Z4pfsg1?=
- =?us-ascii?Q?hHIRuuG804w5vXdpxcqOwOU8opYf3u4JNMQ55YQ1Yr1tuoj3q6d3fbofq/Yk?=
- =?us-ascii?Q?so7GbeqFo6Ib0h4WCcbdOU/LDKmpWEqvg3CKs2uq4FUrq87DCOuDDD9spB+6?=
- =?us-ascii?Q?xTZ3wo87CqzARRIYV1h8c4P2vcDA36kFPDKVKqqkyFuGHMx8D/srNKdWllSd?=
- =?us-ascii?Q?7uOJbgFjtEcilxzfDwXmPXp5TDf4rgoXfd56Q4Kfl/0Mq5aW3FKxW2oc1j1e?=
- =?us-ascii?Q?RXJArDtnPKubmAGEGRztzBINIeV3aB15ursAb7ZB8e5GRy5m8FNz27eH0MNW?=
- =?us-ascii?Q?p3u+a3YGJvRfFkVxB4I1dQKbwUK+rrW+95VQGtgaoVbVK5r8RzEy73E6/S8O?=
- =?us-ascii?Q?NhUEX3sDyBL8h1agNLs=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 922b552f-a40e-4e25-fd19-08dd9a113217
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2025 15:48:00.3836
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Uk6acTlVRSB2W35sIbzh4c9Hl0NXo2jEbd8EXRiQt2xb9gbHPyrwIQ9hdW6uKtTqKkkeuuNHmk677L0Ujq9zuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10303
+Content-Transfer-Encoding: 8bit
 
-Convert at86rf230.txt yaml format.
+Add cross timestamp support through virtchnl mailbox messages and directly,
+through PCIe BAR registers. Cross timestamping assumes that both system
+time and device clock time values are cached simultaneously, what is
+triggered by HW. Feature is enabled for both ARM and x86 archs.
 
-Additional changes:
-- Add ref to spi-peripheral-props.yaml.
-- Add parent spi node in examples.
-
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Signed-off-by: Milena Olech <milena.olech@intel.com>
+Reviewed-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- .../bindings/net/ieee802154/at86rf230.txt     | 27 --------
- .../net/ieee802154/atmel,at86rf233.yaml       | 65 +++++++++++++++++++
- 2 files changed, 65 insertions(+), 27 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
- create mode 100644 Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 138 ++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  19 ++-
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  55 ++++++-
+ 3 files changed, 210 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-deleted file mode 100644
-index 168f1be509126..0000000000000
---- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-+++ /dev/null
-@@ -1,27 +0,0 @@
--* AT86RF230 IEEE 802.15.4 *
--
--Required properties:
--  - compatible:		should be "atmel,at86rf230", "atmel,at86rf231",
--			"atmel,at86rf233" or "atmel,at86rf212"
--  - spi-max-frequency:	maximal bus speed, should be set to 7500000 depends
--			sync or async operation mode
--  - reg:		the chipselect index
--  - interrupts:		the interrupt generated by the device. Non high-level
--			can occur deadlocks while handling isr.
--
--Optional properties:
--  - reset-gpio:		GPIO spec for the rstn pin
--  - sleep-gpio:		GPIO spec for the slp_tr pin
--  - xtal-trim:		u8 value for fine tuning the internal capacitance
--			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
--
--Example:
--
--	at86rf231@0 {
--		compatible = "atmel,at86rf231";
--		spi-max-frequency = <7500000>;
--		reg = <0>;
--		interrupts = <19 4>;
--		interrupt-parent = <&gpio3>;
--		xtal-trim = /bits/ 8 <0x06>;
--	};
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-new file mode 100644
-index 0000000000000..275e5e4677a46
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-@@ -0,0 +1,65 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/ieee802154/atmel,at86rf233.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+index cb46185da749..f8d320875eb7 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+@@ -42,6 +42,13 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
+ 							   direct,
+ 							   mailbox);
+ 
++	/* Get the cross timestamp */
++	direct = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME;
++	mailbox = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME_MB;
++	ptp->get_cross_tstamp_access = idpf_ptp_get_access(adapter,
++							   direct,
++							   mailbox);
 +
-+title: AT86RF230 IEEE 802.15.4
+ 	/* Set the device clock time */
+ 	direct = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
+ 	mailbox = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
+@@ -171,6 +178,129 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
+ 	return 0;
+ }
+ 
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER) || IS_ENABLED(CONFIG_X86)
++/**
++ * idpf_ptp_get_sync_device_time_direct - Get the cross time stamp values
++ *					  directly
++ * @adapter: Driver specific private structure
++ * @dev_time: 64bit main timer value
++ * @sys_time: 64bit system time value
++ */
++static void idpf_ptp_get_sync_device_time_direct(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
++{
++	u32 dev_time_lo, dev_time_hi, sys_time_lo, sys_time_hi;
++	struct idpf_ptp *ptp = adapter->ptp;
 +
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
++	spin_lock(&ptp->read_dev_clk_lock);
 +
-+properties:
-+  compatible:
-+    enum:
-+      - atmel,at86rf212
-+      - atmel,at86rf230
-+      - atmel,at86rf231
-+      - atmel,at86rf233
++	idpf_ptp_enable_shtime(adapter);
 +
-+  reg:
-+    maxItems: 1
++	dev_time_lo = readl(ptp->dev_clk_regs.dev_clk_ns_l);
++	dev_time_hi = readl(ptp->dev_clk_regs.dev_clk_ns_h);
 +
-+  interrupts:
-+    maxItems: 1
++	sys_time_lo = readl(ptp->dev_clk_regs.sys_time_ns_l);
++	sys_time_hi = readl(ptp->dev_clk_regs.sys_time_ns_h);
 +
-+  reset-gpio:
-+    maxItems: 1
++	*dev_time = (u64)dev_time_hi << 32 | dev_time_lo;
++	*sys_time = (u64)sys_time_hi << 32 | sys_time_lo;
 +
-+  sleep-gpio:
-+    maxItems: 1
++	spin_unlock(&ptp->read_dev_clk_lock);
++}
 +
-+  spi-max-frequency:
-+    maximum: 7500000
++/**
++ * idpf_ptp_get_sync_device_time_mailbox - Get the cross time stamp values
++ *					   through mailbox
++ * @adapter: Driver specific private structure
++ * @dev_time: 64bit main timer value expressed in nanoseconds
++ * @sys_time: 64bit system time value expressed in nanoseconds
++ *
++ * Return: a pair of cross timestamp values on success, -errno otherwise.
++ */
++static int idpf_ptp_get_sync_device_time_mailbox(struct idpf_adapter *adapter,
++						 u64 *dev_time, u64 *sys_time)
++{
++	struct idpf_ptp_dev_timers cross_time;
++	int err;
 +
-+  xtal-trim:
-+    $ref: /schemas/types.yaml#/definitions/uint8-array
-+    description: |
-+      u8 value for fine tuning the internal capacitance
-+      arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
++	err = idpf_ptp_get_cross_time(adapter, &cross_time);
++	if (err)
++		return err;
 +
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
++	*dev_time = cross_time.dev_clk_time_ns;
++	*sys_time = cross_time.sys_time_ns;
 +
-+allOf:
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
++	return err;
++}
 +
-+unevaluatedProperties: false
++/**
++ * idpf_ptp_get_sync_device_time - Get the cross time stamp info
++ * @device: Current device time
++ * @system: System counter value read synchronously with device time
++ * @ctx: Context provided by timekeeping code
++ *
++ * Return: the device and the system clocks time read simultaneously on success,
++ * -errno otherwise.
++ */
++static int idpf_ptp_get_sync_device_time(ktime_t *device,
++					 struct system_counterval_t *system,
++					 void *ctx)
++{
++	struct idpf_adapter *adapter = ctx;
++	u64 ns_time_dev, ns_time_sys;
++	int err;
 +
-+examples:
-+  - |
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
++	switch (adapter->ptp->get_cross_tstamp_access) {
++	case IDPF_PTP_NONE:
++		return -EOPNOTSUPP;
++	case IDPF_PTP_DIRECT:
++		idpf_ptp_get_sync_device_time_direct(adapter, &ns_time_dev,
++						     &ns_time_sys);
++		break;
++	case IDPF_PTP_MAILBOX:
++		err = idpf_ptp_get_sync_device_time_mailbox(adapter,
++							    &ns_time_dev,
++							    &ns_time_sys);
++		if (err)
++			return err;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
 +
-+        zigbee@0 {
-+            compatible = "atmel,at86rf231";
-+            reg = <0>;
-+            spi-max-frequency = <7500000>;
-+            interrupts = <19 4>;
-+            interrupt-parent = <&gpio3>;
-+            xtal-trim = /bits/ 8 <0x06>;
-+        };
-+    };
++	*device = ns_to_ktime(ns_time_dev);
++
++#if IS_ENABLED(CONFIG_X86)
++	system->cs_id = CSID_X86_ART;
++#else
++	system->cs_id = CSID_ARM_ARCH_COUNTER;
++#endif /* CONFIG_X86 */
++	system->cycles = ns_time_sys;
++	system->use_nsecs = true;
++
++	return 0;
++}
++
++/**
++ * idpf_ptp_get_crosststamp - Capture a device cross timestamp
++ * @info: the driver's PTP info structure
++ * @cts: The memory to fill the cross timestamp info
++ *
++ * Capture a cross timestamp between the system time and the device PTP hardware
++ * clock.
++ *
++ * Return: cross timestamp value on success, -errno on failure.
++ */
++static int idpf_ptp_get_crosststamp(struct ptp_clock_info *info,
++				    struct system_device_crosststamp *cts)
++{
++	struct idpf_adapter *adapter = idpf_ptp_info_to_adapter(info);
++
++	return get_device_system_crosststamp(idpf_ptp_get_sync_device_time,
++					     adapter, NULL, cts);
++}
++#endif /* CONFIG_ARM_ARCH_TIMER || CONFIG_X86 */
++
+ /**
+  * idpf_ptp_gettimex64 - Get the time of the clock
+  * @info: the driver's PTP info structure
+@@ -664,6 +794,14 @@ static void idpf_ptp_set_caps(const struct idpf_adapter *adapter)
+ 	info->verify = idpf_ptp_verify_pin;
+ 	info->enable = idpf_ptp_gpio_enable;
+ 	info->do_aux_work = idpf_ptp_do_aux_work;
++#if IS_ENABLED(CONFIG_ARM_ARCH_TIMER)
++	info->getcrosststamp = idpf_ptp_get_crosststamp;
++#elif IS_ENABLED(CONFIG_X86)
++	if (pcie_ptm_enabled(adapter->pdev) &&
++	    boot_cpu_has(X86_FEATURE_ART) &&
++	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
++		info->getcrosststamp = idpf_ptp_get_crosststamp;
++#endif /* CONFIG_ARM_ARCH_TIMER */
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+index a876749d6116..cd19f65f9fff 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
+@@ -21,6 +21,8 @@ struct idpf_ptp_cmd {
+  * @dev_clk_ns_h: high part of the device clock register
+  * @phy_clk_ns_l: low part of the PHY clock register
+  * @phy_clk_ns_h: high part of the PHY clock register
++ * @sys_time_ns_l: low part of the system time register
++ * @sys_time_ns_h: high part of the system time register
+  * @incval_l: low part of the increment value register
+  * @incval_h: high part of the increment value register
+  * @shadj_l: low part of the shadow adjust register
+@@ -42,6 +44,10 @@ struct idpf_ptp_dev_clk_regs {
+ 	void __iomem *phy_clk_ns_l;
+ 	void __iomem *phy_clk_ns_h;
+ 
++	/* System time */
++	void __iomem *sys_time_ns_l;
++	void __iomem *sys_time_ns_h;
++
+ 	/* Main timer adjustments */
+ 	void __iomem *incval_l;
+ 	void __iomem *incval_h;
+@@ -162,6 +168,7 @@ struct idpf_ptp_vport_tx_tstamp_caps {
+  * @dev_clk_regs: the set of registers to access the device clock
+  * @caps: PTP capabilities negotiated with the Control Plane
+  * @get_dev_clk_time_access: access type for getting the device clock time
++ * @get_cross_tstamp_access: access type for the cross timestamping
+  * @set_dev_clk_time_access: access type for setting the device clock time
+  * @adj_dev_clk_time_access: access type for the adjusting the device clock
+  * @tx_tstamp_access: access type for the Tx timestamp value read
+@@ -182,10 +189,11 @@ struct idpf_ptp {
+ 	struct idpf_ptp_dev_clk_regs dev_clk_regs;
+ 	u32 caps;
+ 	enum idpf_ptp_access get_dev_clk_time_access:2;
++	enum idpf_ptp_access get_cross_tstamp_access:2;
+ 	enum idpf_ptp_access set_dev_clk_time_access:2;
+ 	enum idpf_ptp_access adj_dev_clk_time_access:2;
+ 	enum idpf_ptp_access tx_tstamp_access:2;
+-	u8 rsv;
++	u8 rsv:6;
+ 	struct idpf_ptp_secondary_mbx secondary_mbx;
+ 	spinlock_t read_dev_clk_lock;
+ };
+@@ -264,6 +272,8 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter);
+ bool idpf_ptp_get_txq_tstamp_capability(struct idpf_tx_queue *txq);
+ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 			      struct idpf_ptp_dev_timers *dev_clk_time);
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time);
+ int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter, u64 time);
+ int idpf_ptp_adj_dev_clk_fine(struct idpf_adapter *adapter, u64 incval);
+ int idpf_ptp_adj_dev_clk_time(struct idpf_adapter *adapter, s64 delta);
+@@ -305,6 +315,13 @@ idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int
++idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			struct idpf_ptp_dev_timers *cross_time)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter,
+ 					    u64 time)
+ {
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+index bdcc54a5fb56..4f1fb0cefe51 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+@@ -30,6 +30,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 		.send_buf.iov_len = sizeof(send_ptp_caps_msg),
+ 		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
+ 	};
++	struct virtchnl2_ptp_cross_time_reg_offsets cross_tstamp_offsets;
+ 	struct virtchnl2_ptp_clk_adj_reg_offsets clk_adj_offsets;
+ 	struct virtchnl2_ptp_clk_reg_offsets clock_offsets;
+ 	struct idpf_ptp_secondary_mbx *scnd_mbx;
+@@ -71,7 +72,7 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 
+ 	access_type = ptp->get_dev_clk_time_access;
+ 	if (access_type != IDPF_PTP_DIRECT)
+-		goto discipline_clock;
++		goto cross_tstamp;
+ 
+ 	clock_offsets = recv_ptp_caps_msg->clk_offsets;
+ 
+@@ -90,6 +91,22 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
+ 	temp_offset = le32_to_cpu(clock_offsets.cmd_sync_trigger);
+ 	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
+ 
++cross_tstamp:
++	access_type = ptp->get_cross_tstamp_access;
++	if (access_type != IDPF_PTP_DIRECT)
++		goto discipline_clock;
++
++	cross_tstamp_offsets = recv_ptp_caps_msg->cross_time_offsets;
++
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_l);
++	ptp->dev_clk_regs.sys_time_ns_l = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.sys_time_ns_h);
++	ptp->dev_clk_regs.sys_time_ns_h = idpf_get_reg_addr(adapter,
++							    temp_offset);
++	temp_offset = le32_to_cpu(cross_tstamp_offsets.cmd_sync_trigger);
++	ptp->dev_clk_regs.cmd_sync = idpf_get_reg_addr(adapter, temp_offset);
++
+ discipline_clock:
+ 	access_type = ptp->adj_dev_clk_time_access;
+ 	if (access_type != IDPF_PTP_DIRECT)
+@@ -162,6 +179,42 @@ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
+ 	return 0;
+ }
+ 
++/**
++ * idpf_ptp_get_cross_time - Send virtchnl get cross time message
++ * @adapter: Driver specific private structure
++ * @cross_time: Pointer to the device clock structure where the value is set
++ *
++ * Send virtchnl get cross time message to get the time of the clock and the
++ * system time.
++ *
++ * Return: 0 on success, -errno otherwise.
++ */
++int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
++			    struct idpf_ptp_dev_timers *cross_time)
++{
++	struct virtchnl2_ptp_get_cross_time cross_time_msg;
++	struct idpf_vc_xn_params xn_params = {
++		.vc_op = VIRTCHNL2_OP_PTP_GET_CROSS_TIME,
++		.send_buf.iov_base = &cross_time_msg,
++		.send_buf.iov_len = sizeof(cross_time_msg),
++		.recv_buf.iov_base = &cross_time_msg,
++		.recv_buf.iov_len = sizeof(cross_time_msg),
++		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
++	};
++	int reply_sz;
++
++	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
++	if (reply_sz < 0)
++		return reply_sz;
++	if (reply_sz != sizeof(cross_time_msg))
++		return -EIO;
++
++	cross_time->dev_clk_time_ns = le64_to_cpu(cross_time_msg.dev_time_ns);
++	cross_time->sys_time_ns = le64_to_cpu(cross_time_msg.sys_time_ns);
++
++	return 0;
++}
++
+ /**
+  * idpf_ptp_set_dev_clk_time - Send virtchnl set device time message
+  * @adapter: Driver specific private structure
 -- 
-2.34.1
+2.43.5
 
 
