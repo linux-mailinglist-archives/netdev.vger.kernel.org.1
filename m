@@ -1,160 +1,79 @@
-Return-Path: <netdev+bounces-193090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F615AC2782
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 18:23:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862FFAC2789
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 18:24:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51E217A909
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:22:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E1103A9ADB
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 16:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FFDC296FA0;
-	Fri, 23 May 2025 16:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3A9296FA0;
+	Fri, 23 May 2025 16:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EcYmAI+s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h/5y2yq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331A1294A06;
-	Fri, 23 May 2025 16:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF64296D10;
+	Fri, 23 May 2025 16:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748017354; cv=none; b=kQGu2dF7zpSzAQ5UnRiYtwmk1PAAgWjn6co460sOH/NXJAQB9HHLtlbMZH8RspIq2BrAuAx15TeCJ3Xk5EBTpUl0aMdo+A7IqPayVel2xSvplQVwMpvOEpcK+dJVLYnrpY8q35KSST/8hI9wJRXDAIewEUYQ6fBJAlf6ng019bk=
+	t=1748017492; cv=none; b=eBwnUh2Ipu+yWQ49RdSTHzsJhVVEgrnuZwxKUYYWQ4aCGF5LYgS22Xwu/PcmNW3c46izZS9Se13NpRwxcnYdo838NN3Llsvlegxo0AG+IxGisky0Xj2X6IPwWt1GpXEuJ/lt8FzpEl4PtwrABWLM3wvu8dPIFLBW88pBjZd2wls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748017354; c=relaxed/simple;
-	bh=LAkicZJyK/FGZjxwtLmT18YGpM4Dm/qAEb9YYZlSY88=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hKoGudRD0tmofexxdLyWTLPFTS/PIOPguY4d9TrNgGYzbKbZAK7w54X0CZAYgU6rtze6LahJrtPGMSPSC9GKS5T4WOMqWsw2ODnuhS2fR8Rcr/wUNxt6fXYydpcMIbTztj+Zfz/lmGcIHJ6tZJQvJldzMLWXCP9pIC2pq9874/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EcYmAI+s; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748017350;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=p8BaeXySDEnnoBAKxDxDRFr2nIyJdWCYaT15SV7DAQI=;
-	b=EcYmAI+sjd3M9P4tTqpTRafycWBQZR/9qBIAjVmmsoeTIA2aoyZgGTdS44r+Pukf31wjd5
-	VfR2+BkJPxWJMrj5aJRQM2FOyhW/v5LjiJ5tvBn1SNxDwG0qWJHOs8GG5JAPBFa+HoNPsG
-	ANhWGgqUpZLOM5Yir+Cv2zKH3BrF3yQ=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1748017492; c=relaxed/simple;
+	bh=OMWbik/NljTxLVHitW6Xb4QzUTsQkPmTYT9rwbPrbQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f2sOtgWp9pCH1khRXib+p0j5q7Ee8JvBHA6+50m6MAcLZT3G9+WAyzHzk7bVNWPadzR4W4xoY9q4h7sM/K1utsAYb3heiaT4YjNRwcOosKZj9CVVwnuxaEyXDW8KMKEu44ndhI0Kuf6qVPIfS0NJw+hD1dP4rSc4gLT3FDs7Kpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=h/5y2yq6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hESkZdTC/uPfN133oPdSMXZrn+AWoJwgnuY0gQbq8Z0=; b=h/5y2yq6rqJ+DpodOUjbbUA9UH
+	3FsIPsT9p6sYu3aybA0lNR/jckqqHIVW6GKAGZzJVy6+HmBQ50qdYsqbLNhjUwsitqZBH9jT6GPFG
+	ACLI/0D1scNt4ZAmNxUb9vyv7FDaEQf5xhreyudwHoFuv1VVXatJJT3fA9rWiiTEZkcc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uIVCM-00Dd7D-DB; Fri, 23 May 2025 18:24:42 +0200
+Date: Fri, 23 May 2025 18:24:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v1] bpf, sockmap: Fix psock incorrectly pointing to sk
-Date: Sat, 24 May 2025 00:22:19 +0800
-Message-ID: <20250523162220.52291-1-jiayuan.chen@linux.dev>
+Subject: Re: [PATCH v1 net 1/2] net: lan743x: rename lan743x_reset_phy to
+ lan743x_hw_reset_phy
+Message-ID: <3d701ee7-253a-49a4-8097-0231aacff459@lunn.ch>
+References: <20250523054325.88863-1-thangaraj.s@microchip.com>
+ <20250523054325.88863-2-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250523054325.88863-2-thangaraj.s@microchip.com>
 
-We observed an issue from the latest selftest: sockmap_redir where
-sk_psock(psock->sk) != psock in the backlog. The root cause is the special
-behavior in sockmap_redir - it frequently performs map_update() and
-map_delete() on the same socket. During map_update(), we create a new
-psock and during map_delete(), we eventually free the psock via rcu_work
-in sk_psock_drop(). However, pending workqueues might still exist and not
-be processed yet. If users immediately perform another map_update(), a new
-psock will be allocated for the same sk, resulting in two psocks pointing
-to the same sk.
+On Fri, May 23, 2025 at 11:13:24AM +0530, Thangaraj Samynathan wrote:
+> rename the function to lan743x_hw_reset_phy to better describe it
+> operatioin
 
-When the pending workqueue is later triggered, it uses the old psock to
-access sk for I/O operations, which is incorrect.
+operation.
 
-Timing Diagram:
+With that fixed please add: Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-cpu0                        cpu1
-
-map_update(sk):
-    sk->psock = psock1
-    psock1->sk = sk
-map_delete(sk):
-   rcu_work_free(psock1)
-
-map_update(sk):
-    sk->psock = psock2
-    psock2->sk = sk
-                            workqueue:
-                                wakeup with psock1, but the sk of psock1
-                                doesn't belong to psock1
-rcu_handler:
-    clean psock1
-    free(psock1)
-
-Previously, we used reference counting to address the concurrency issue
-between backlog and sock_map_close(). This logic remains necessary as it
-prevents the sk from being freed while processing the backlog. But this
-patch prevents pending backlogs from using a psock after it has been
-freed.
-
-Note: We cannot call cancel_delayed_work_sync() in map_delete() since this
-might be invoked in BPF context by BPF helper, and the function may sleep.
-
-Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+	Andrew
 
 ---
-Thanks to Michal Luczaj for providing the sockmap_redir test case, which
-indeed covers almost all sockmap forwarding paths.
----
- include/linux/skmsg.h | 1 +
- net/core/skmsg.c      | 5 ++++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 0b9095a281b8..b17221eef2f4 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -67,6 +67,7 @@ struct sk_psock_progs {
- enum sk_psock_state_bits {
- 	SK_PSOCK_TX_ENABLED,
- 	SK_PSOCK_RX_STRP_ENABLED,
-+	SK_PSOCK_DROPPED,
- };
- 
- struct sk_psock_link {
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 34c51eb1a14f..bd58a693ce9a 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -656,6 +656,9 @@ static void sk_psock_backlog(struct work_struct *work)
- 	bool ingress;
- 	int ret;
- 
-+	if (sk_psock_test_state(psock, SK_PSOCK_DROPPED))
-+		return;
-+
- 	/* Increment the psock refcnt to synchronize with close(fd) path in
- 	 * sock_map_close(), ensuring we wait for backlog thread completion
- 	 * before sk_socket freed. If refcnt increment fails, it indicates
-@@ -867,7 +870,7 @@ void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
- 	write_unlock_bh(&sk->sk_callback_lock);
- 
- 	sk_psock_stop(psock);
--
-+	sk_psock_set_state(psock, SK_PSOCK_DROPPED);
- 	INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
- 	queue_rcu_work(system_wq, &psock->rwork);
- }
--- 
-2.47.1
-
+pw-bot: cr
 
