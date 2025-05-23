@@ -1,218 +1,118 @@
-Return-Path: <netdev+bounces-192997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085B0AC2127
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:31:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BEA7AC2133
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D4B67B841C
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:29:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6AB8A243D5
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83722228C92;
-	Fri, 23 May 2025 10:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bhe+WUrw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FF6225A3D;
+	Fri, 23 May 2025 10:36:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8679422A4D6
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 10:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5018C189919
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 10:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747996251; cv=none; b=UGWWnbHHK2x8xarRWH5CEmXqApGtw/HYFJ60gehl4lPzhER+BY5+IuT5sQZAiRzFoEdQXXK3xehW1gJNq9WtckZ6YoQUoUtbJaOXRGuvr5tdGwXJUyeUfpZ/56YP6MPAjsCjC0xih2k8h3RkxEgovAbBahzch8NOGQhzhHjRKbY=
+	t=1747996569; cv=none; b=r0zMtd6Hg7LTM7Q4vXQsauqKIbNJvUfe8u1zFy68st9aY8hJVjg7/Nl38Ymjpn1sZKnHgJhGJI4pTwjkAQEdO+2oBC5L+0DAg5McPDyieoNSQEh1MoCUWN7KlFsxoIYKy7AJUYvbccZ02ySybvVfmf8ZM7iv3C8IUvnCzBOiJpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747996251; c=relaxed/simple;
-	bh=VPp/mAYQescqqvBHjFXtXRQi1Y3YApV3oqzUfqmJ7As=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LwXqrPe8uDK6UmPb6oE1N9ODYqFFHWCqJyBuCbORPU6VBHCgepGnCBClPAk2kY85e0nTyaj4+daO6wwbip/IgjndHnD9W30qhCGsL3FCaL6oepvSVtgtaUAxBWVFUK/Tr7Hvr6Koqf7f3ipI5j99zm/udKc5U61FdU0fdRXuRO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bhe+WUrw; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-441ab63a415so94867795e9.3
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 03:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747996247; x=1748601047; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kOjxJSYGxT9UhmRJmVkAknXCevMEWqmnm4FKczQ8nEI=;
-        b=Bhe+WUrwgg/vvbBymp+XXz43GNUKZnfAJVDWyWQUt7qcNM/Df6+ZPiv1eAjwioxEdT
-         4Hhi0NLdldfMLAStxi1fLC2Sb4riL9kF2U0SbJK43mOMaAPL3/5XB4kfwXKjYtOR5maJ
-         B2G9GHpJ9/gRRyO9wA2mRLxrScPp5S/PUOeICbwnErBYr+W3v0FatbyiVRbrlHhizK8L
-         2nqCamKxfaa9ozfpo3S69ST2H9LgcdWTFk2vIgCQ5S1c0OZrL/aSQaqgL6B9PJuEXUUm
-         4TU6f6kJcGMAeyU2u2fu4ue2sLgksXa70++eJTJN2pYsgfex7tQF04COKBWaN9VcfSFp
-         vcOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747996247; x=1748601047;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kOjxJSYGxT9UhmRJmVkAknXCevMEWqmnm4FKczQ8nEI=;
-        b=NfFW3iFuq57nbDZ/gDERN2gdUT0EgTvQXWZb3y3m8F9owITIsdgWd9m0WD7w3E3vj0
-         QRjyMtMrdj7WhkC4ve2nLzsj+QeAArX/q/FtX4dF1akWwURmJ2Qrs0IdALyZ2qMjZ8Fo
-         759XTT8nvH/oBut+43R2vpeXidq+XyPJtvrsJCKYULFWa7Rl+MutaQ6x3HKjiZEnCFEI
-         bX3lqPI1zq5sggPYzNrNGKtKVZL2trsbAcLWlLVd6unICLx+rwYu2GXY0i5/k1WzOHJE
-         95Lh5AyCEqEwdqQ3KqE4HSfPJ5bDhrH/Oxuhb6lbupRSgRRqNMN70JtSj/+ZRdg6f7vL
-         hrsA==
-X-Gm-Message-State: AOJu0YxM6L2o6u8VUlqD1LZiZIPc8OcFYr51QqaadoFoUc6wBzIcGwSW
-	oExCrHAUpNri0WmXcqLkfncV3Y1G+u4pyfS8wPJSD+6wi7UA3ZgBSTimUp+Tdw==
-X-Gm-Gg: ASbGncsjBomMMIvMmFKn6TQWPXS5GiRX2tLqeeaE52ktG3HEjYz1w/BuRJwDl/LUmZZ
-	q2l2MEgpG5VbmNid+yE3tD6e9NXUdQkJJv/E5a+5Uglv3q9wvkgZH3WFr9iKo/k0K4OWeWNXq+/
-	RvwQcfa8VmRN5A+iw7Gmqax8Nx5C8PEc9nW6ztXhn4AoouaxzPkesGNiS3kweeN7bH6gjIvg8Og
-	kXZcGD27feuWSNraJswp44AjsXY9lXZue1a3h204tWzABuv/vSqfJAAodZFyEvabV/D7smeVdRR
-	kKRwClF31SsyVqoptLfOeFprYzVcv11gPQGquUlaNq6oS3PwfLYgCVcLMgAcQ4ILoOIV
-X-Google-Smtp-Source: AGHT+IEDpNL4sx4RLs1ngbJLOQyW2q1mq9kqZUoJrS6CYfClgU41sNkPo1R88zqya/h6PelnCebRGQ==
-X-Received: by 2002:a05:6000:4202:b0:3a3:653e:165 with SMTP id ffacd0b85a97d-3a3653e095fmr22454659f8f.39.1747996247277;
-        Fri, 23 May 2025 03:30:47 -0700 (PDT)
-Received: from imac.lan ([2a02:8010:60a0:0:f9df:85fc:d54:1dab])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca88941sm26503818f8f.61.2025.05.23.03.30.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 03:30:46 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jan Stancek <jstancek@redhat.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1] tools: ynl: parse extack for sub-messages
-Date: Fri, 23 May 2025 11:30:31 +0100
-Message-ID: <20250523103031.80236-1-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747996569; c=relaxed/simple;
+	bh=8LABh7d/XgbnWK7z2l+q+6ShePWtn6lWb7kmZicD2z4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pBLvyKSaHhli6HO4qoFiGs+59HUt6BgRgw/DtRxlwKHM0V1g1bHtPEL0lDdgjhigXl7X1jsRJkWLcr7rtMZymY5jyBLw6hf5ZfXoSP2smvc85/1+NBpB38fHVOVDp6hemDOPPzdbZXHUHT5LaAcBSi/7ts9PGt4KCQh6X6pn7bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 46E1F208A2;
+	Fri, 23 May 2025 12:36:04 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6ksjesTj4NRZ; Fri, 23 May 2025 12:36:03 +0200 (CEST)
+Received: from EXCH-02.secunet.de (unknown [10.32.0.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id B83BA2082E;
+	Fri, 23 May 2025 12:36:03 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com B83BA2082E
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-02.secunet.de
+ (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 23 May
+ 2025 12:36:03 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 May
+ 2025 12:36:03 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id DC7B131818E9; Fri, 23 May 2025 12:36:02 +0200 (CEST)
+Date: Fri, 23 May 2025 12:36:02 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 0/12] pull request (net-next): ipsec-next 2025-05-23
+Message-ID: <aDBPkpKv+x7YFDWJ@gauss3.secunet.de>
+References: <20250523075611.3723340-1-steffen.klassert@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250523075611.3723340-1-steffen.klassert@secunet.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
 
-Extend the Python YNL extack decoding to handle sub-messages in the same
-way that YNL C does. This involves retaining the input values so that
-they are available during extack decoding.
+On Fri, May 23, 2025 at 09:55:59AM +0200, Steffen Klassert wrote:
+> 1) Remove some unnecessary strscpy_pad() size arguments.
+>    From Thorsten Blum.
+> 
+> 2) Correct use of xso.real_dev on bonding offloads.
+>    Patchset from Cosmin Ratiu.
+> 
+> 3) Add hardware offload configuration to XFRM_MSG_MIGRATE.
+>    From Chiachang Wang.
+> 
+> 4) Refactor migration setup during cloning. This was
+>    done after the clone was created. Now it is done
+>    in the cloning function itself.
+>    From Chiachang Wang.
+> 
+> 5) Validate assignment of maximal possible SEQ number.
+>    Prevent from setting to the maximum sequrnce number
+>    as this would cause for traffic drop.
+>    From Leon Romanovsky.
+> 
+> 6) Prevent configuration of interface index when offload
+>    is used. Hardware can't handle this case.i
+>    From Leon Romanovsky.
+> 
+> 7) Always use kfree_sensitive() for SA secret zeroization.
+>    From Zilin Guan.
+> 
+> Please pull or let me know if there are problems.
+> 
+> Thanks!
 
-./tools/net/ynl/pyynl/cli.py --family rt-link --do newlink --create \
-    --json '{
-        "linkinfo": {"kind": "netkit", "data": {"policy": 10} }
-    }'
-Netlink error: Invalid argument
-nl_len = 92 (76) nl_flags = 0x300 nl_type = 2
-	error: -22
-	extack: {'msg': 'Provided default xmit policy not supported', 'bad-attr': '.linkinfo.data(netkit).policy'}
+I forgot to mention a merge conflict between
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/pyynl/lib/ynl.py | 39 ++++++++++++++++++++++------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+ fd5ef5203ce6 ("ixgbe: wrap netdev_priv() usage")
 
-diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
-index dcc2c6b298d6..55b59f6c79b8 100644
---- a/tools/net/ynl/pyynl/lib/ynl.py
-+++ b/tools/net/ynl/pyynl/lib/ynl.py
-@@ -594,7 +594,7 @@ class YnlFamily(SpecFamily):
-             scalar_selector = self._get_scalar(attr, value["selector"])
-             attr_payload = struct.pack("II", scalar_value, scalar_selector)
-         elif attr['type'] == 'sub-message':
--            msg_format = self._resolve_selector(attr, search_attrs)
-+            msg_format, _ = self._resolve_selector(attr, search_attrs)
-             attr_payload = b''
-             if msg_format.fixed_header:
-                 attr_payload += self._encode_struct(msg_format.fixed_header, value)
-@@ -712,10 +712,10 @@ class YnlFamily(SpecFamily):
-             raise Exception(f"No message format for '{value}' in sub-message spec '{sub_msg}'")
- 
-         spec = sub_msg_spec.formats[value]
--        return spec
-+        return spec, value
- 
-     def _decode_sub_msg(self, attr, attr_spec, search_attrs):
--        msg_format = self._resolve_selector(attr_spec, search_attrs)
-+        msg_format, _ = self._resolve_selector(attr_spec, search_attrs)
-         decoded = {}
-         offset = 0
-         if msg_format.fixed_header:
-@@ -787,7 +787,7 @@ class YnlFamily(SpecFamily):
- 
-         return rsp
- 
--    def _decode_extack_path(self, attrs, attr_set, offset, target):
-+    def _decode_extack_path(self, attrs, attr_set, offset, target, search_attrs):
-         for attr in attrs:
-             try:
-                 attr_spec = attr_set.attrs_by_val[attr.type]
-@@ -801,26 +801,37 @@ class YnlFamily(SpecFamily):
-             if offset + attr.full_len <= target:
-                 offset += attr.full_len
-                 continue
--            if attr_spec['type'] != 'nest':
-+
-+            pathname = attr_spec.name
-+            if attr_spec['type'] == 'nest':
-+                sub_attrs = self.attr_sets[attr_spec['nested-attributes']]
-+                search_attrs = SpaceAttrs(sub_attrs, search_attrs.lookup(attr_spec['name']))
-+            elif attr_spec['type'] == 'sub-message':
-+                msg_format, value = self._resolve_selector(attr_spec, search_attrs)
-+                if msg_format is None:
-+                    raise Exception(f"Can't resolve sub-message of {attr_spec['name']} for extack")
-+                sub_attrs = self.attr_sets[msg_format.attr_set]
-+                pathname += f"({value})"
-+            else:
-                 raise Exception(f"Can't dive into {attr.type} ({attr_spec['name']}) for extack")
-             offset += 4
--            subpath = self._decode_extack_path(NlAttrs(attr.raw),
--                                               self.attr_sets[attr_spec['nested-attributes']],
--                                               offset, target)
-+            subpath = self._decode_extack_path(NlAttrs(attr.raw), sub_attrs,
-+                                               offset, target, search_attrs)
-             if subpath is None:
-                 return None
--            return '.' + attr_spec.name + subpath
-+            return '.' + pathname + subpath
- 
-         return None
- 
--    def _decode_extack(self, request, op, extack):
-+    def _decode_extack(self, request, op, extack, vals):
-         if 'bad-attr-offs' not in extack:
-             return
- 
-         msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set), op)
-         offset = self.nlproto.msghdr_size() + self._struct_size(op.fixed_header)
-+        search_attrs = SpaceAttrs(op.attr_set, vals)
-         path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
--                                        extack['bad-attr-offs'])
-+                                        extack['bad-attr-offs'], search_attrs)
-         if path:
-             del extack['bad-attr-offs']
-             extack['bad-attr'] = path
-@@ -1012,7 +1023,7 @@ class YnlFamily(SpecFamily):
-         for (method, vals, flags) in ops:
-             op = self.ops[method]
-             msg = self._encode_message(op, vals, flags, req_seq)
--            reqs_by_seq[req_seq] = (op, msg, flags)
-+            reqs_by_seq[req_seq] = (op, vals, msg, flags)
-             payload += msg
-             req_seq += 1
- 
-@@ -1027,9 +1038,9 @@ class YnlFamily(SpecFamily):
-             self._recv_dbg_print(reply, nms)
-             for nl_msg in nms:
-                 if nl_msg.nl_seq in reqs_by_seq:
--                    (op, req_msg, req_flags) = reqs_by_seq[nl_msg.nl_seq]
-+                    (op, vals, req_msg, req_flags) = reqs_by_seq[nl_msg.nl_seq]
-                     if nl_msg.extack:
--                        self._decode_extack(req_msg, op, nl_msg.extack)
-+                        self._decode_extack(req_msg, op, nl_msg.extack, vals)
-                 else:
-                     op = None
-                     req_flags = []
--- 
-2.49.0
+from the net-next tree and commit:
 
+  43eca05b6a3b ("xfrm: Add explicit dev to .xdo_dev_state_{add,delete,free}")
+
+from the ipsec-next tree.
+
+It can be solved as done in linux-next.
+
+Thanks!
 
