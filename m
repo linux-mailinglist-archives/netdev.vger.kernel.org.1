@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-192963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D9B4AC1E00
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C41A2AC1E0A
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EF651BC7D0E
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 07:56:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D83051C01951
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 07:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99069286D45;
-	Fri, 23 May 2025 07:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77844289E2A;
+	Fri, 23 May 2025 07:56:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFFC284B29
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 07:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8C5288C22
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 07:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747986989; cv=none; b=lb0WmsOFM4I6Aavx4Q0gnRF9mKL+pkdqRYMjVPV5kmD8tHKJXFAp66nzIVneO+tm93MbmoV70YwJ5F0hIJnDdgoM5uM2n5ChOmh0T/pisPndOQmep1Ka5I1707tZkbOHGRKWfUMheaguxZC0xtFQE22GoepNUsZ/u0klR/ZWi1w=
+	t=1747986993; cv=none; b=KW7rXsEAAxRh924wzsTdyo7Vi0+GWZbmbpCPnXFmzLkEjtWQsLvb+OQKWPezlQVWXl1MbzX8kymHo+QUyDNzWjV7haWVbgZgMk/CR1RpWNXX8nKj57Maaj+q/iUvx/l+wjH9GAS24OY9cyUnhvKK6CZHy0rbR1SpGcowIty95ZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747986989; c=relaxed/simple;
-	bh=S34q7STpq/MgJxmzXrqeTXitYktBMq4H8tI/WECekSI=;
+	s=arc-20240116; t=1747986993; c=relaxed/simple;
+	bh=YSed9229T4tSFNzDLti7PBx/cU3UV9SvO9FkpgbmeV8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kpkMswBCm9Yr32DoO3CNzSQtaalt0O/bmbVx2IPcsEyK4wP09+TqhOaCnhOQlW4ayRiQgsY9HB3xc/hJoNeozxSEIP7EbF2i4kzFKETeEkcp1dPcV7NkEqJLFo4GQbPlb7oW4ZfnZrAqIdKjGS+iUi58wpfLEe8f9IUbtd12RBM=
+	 MIME-Version:Content-Type; b=rB8tPXh7VJt2HDBW57MT57lke4i7ku+HRcL+Bi3D7rtLohwJR/43dIgKo4wwB2p5TRgRkq2rvYW7+EOH7m4Yrf63tJ8EK2RH19aHEm+9sGCGDzeG9ucw3JDAdbQq72PvKbcj+fho+R5Ic7Pr001kke2lzk+bXrtjQcv5PS9C6ZU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id C34DD208AB;
-	Fri, 23 May 2025 09:56:19 +0200 (CEST)
+	by mx1.secunet.com (Postfix) with ESMTP id DA54A208A6;
+	Fri, 23 May 2025 09:56:21 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tvpQjcJ86SRF; Fri, 23 May 2025 09:56:19 +0200 (CEST)
+ with ESMTP id JZSXGS29beL8; Fri, 23 May 2025 09:56:20 +0200 (CEST)
 Received: from EXCH-03.secunet.de (unknown [10.32.0.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 1577420748;
-	Fri, 23 May 2025 09:56:19 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 1577420748
+	by mx1.secunet.com (Postfix) with ESMTPS id 2510220891;
+	Fri, 23 May 2025 09:56:20 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 2510220891
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-03.secunet.de
  (10.32.0.183) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 23 May
- 2025 09:56:18 +0200
+ 2025 09:56:19 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 May
  2025 09:56:17 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 239863181DC7; Fri, 23 May 2025 09:56:17 +0200 (CEST)
+	id 27AA031825B9; Fri, 23 May 2025 09:56:17 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 04/12] xfrm: Remove unneeded device check from validate_xmit_xfrm
-Date: Fri, 23 May 2025 09:56:03 +0200
-Message-ID: <20250523075611.3723340-5-steffen.klassert@secunet.com>
+Subject: [PATCH 05/12] xfrm: Add explicit dev to .xdo_dev_state_{add,delete,free}
+Date: Fri, 23 May 2025 09:56:04 +0200
+Message-ID: <20250523075611.3723340-6-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250523075611.3723340-1-steffen.klassert@secunet.com>
 References: <20250523075611.3723340-1-steffen.klassert@secunet.com>
@@ -70,84 +70,861 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 
 From: Cosmin Ratiu <cratiu@nvidia.com>
 
-validate_xmit_xfrm checks whether a packet already passed through it on
-the master device (xso.dev) and skips processing the skb again on the
-slave device (xso.real_dev).
+Previously, device driver IPSec offload implementations would fall into
+two categories:
+1. Those that used xso.dev to determine the offload device.
+2. Those that used xso.real_dev to determine the offload device.
 
-This check was added in commit [1] to avoid tx packets on a bond device
-pass through xfrm twice and get two sets of headers, but the check was
-soon obsoleted by commit [2], which was added around the same time to
-fix a similar but unrelated problem. Commit [3] set XFRM_XMIT only when
-packets are hw offloaded.
+The first category didn't work with bonding while the second did.
+In a non-bonding setup the two pointers are the same.
 
-xso.dev is usually equal to xso.real_dev, unless bonding is used, in
-which case the bonding driver uses xso.real_dev to manage offloaded xfrm
-states.
+This commit adds explicit pointers for the offload netdevice to
+.xdo_dev_state_add() / .xdo_dev_state_delete() / .xdo_dev_state_free()
+which eliminates the confusion and allows drivers from the first
+category to work with bonding.
 
-Since commit [3], the check added in commit [1] is unused on all cases,
-since packets going through validate_xmit_xfrm twice bail out on the
-check added in commit [2]. Here's a breakdown of relevant scenarios:
-
-1. ESP offload off: validate_xmit_xfrm returns early on !xo.
-2. ESP offload on, no bond: skb->dev == xso.real_dev == xso.dev.
-3. ESP offload on, bond, xs on bond dev: 1st pass adds XFRM_XMIT, 2nd
-   pass returns early on XFRM_XMIT.
-3. ESP offload on, bond, xs on slave dev: 1st pass returns early on
-   !xo, 2nd pass adds XFRM_XMIT.
-4. ESP offload on, bond, xs on both bond AND slave dev: only 1 offload
-   possible in secpath. Either 1st pass adds XFRM_XMIT and 2nd pass returns
-   early on XFRM_XMIT, or 1st pass is sw and returns early on !xo.
-6. ESP offload on, crypto fallback triggered in esp_xmit/esp6_xmit: 1st
-   pass does sw crypto & secpath_reset, 2nd pass returns on !xo.
-
-This commit removes the unnecessary check, so xso.real_dev becomes what
-it is in practice: a private field managed by bonding driver.
-The check immediately below that can be simplified as well.
-
-[1] commit 272c2330adc9 ("xfrm: bail early on slave pass over skb")
-[2] commit 94579ac3f6d0 ("xfrm: Fix double ESP trailer insertion in
-IPsec crypto offload.")
-[3] commit c7dbf4c08868 ("xfrm: Provide private skb extensions for
-segmented and hw offloaded ESP packets")
+xso.real_dev now becomes a private pointer managed by the bonding
+driver.
 
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_device.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ Documentation/networking/xfrm_device.rst      | 10 +++--
+ drivers/net/bonding/bond_main.c               | 33 ++++++++-------
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   | 20 +++++----
+ .../inline_crypto/ch_ipsec/chcr_ipsec.c       | 18 +++++---
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    | 41 +++++++++++--------
+ drivers/net/ethernet/intel/ixgbevf/ipsec.c    | 21 ++++++----
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 18 ++++----
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 12 +++---
+ .../net/ethernet/netronome/nfp/crypto/ipsec.c | 11 +++--
+ drivers/net/netdevsim/ipsec.c                 | 15 ++++---
+ include/linux/netdevice.h                     | 10 +++--
+ include/net/xfrm.h                            |  8 ++++
+ net/xfrm/xfrm_device.c                        |  4 +-
+ net/xfrm/xfrm_state.c                         | 14 ++++---
+ 14 files changed, 136 insertions(+), 99 deletions(-)
 
+diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+index 7f24c09f2694..122204da0fff 100644
+--- a/Documentation/networking/xfrm_device.rst
++++ b/Documentation/networking/xfrm_device.rst
+@@ -65,9 +65,13 @@ Callbacks to implement
+   /* from include/linux/netdevice.h */
+   struct xfrmdev_ops {
+         /* Crypto and Packet offload callbacks */
+-	int	(*xdo_dev_state_add) (struct xfrm_state *x, struct netlink_ext_ack *extack);
+-	void	(*xdo_dev_state_delete) (struct xfrm_state *x);
+-	void	(*xdo_dev_state_free) (struct xfrm_state *x);
++	int	(*xdo_dev_state_add)(struct net_device *dev,
++                                     struct xfrm_state *x,
++                                     struct netlink_ext_ack *extack);
++	void	(*xdo_dev_state_delete)(struct net_device *dev,
++                                        struct xfrm_state *x);
++	void	(*xdo_dev_state_free)(struct net_device *dev,
++                                      struct xfrm_state *x);
+ 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
+ 				       struct xfrm_state *x);
+ 	void    (*xdo_dev_state_advance_esn) (struct xfrm_state *x);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 950d8e4d86f8..4ba525a564c5 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -453,13 +453,14 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
+ 
+ /**
+  * bond_ipsec_add_sa - program device with a security association
++ * @bond_dev: pointer to the bond net device
+  * @xs: pointer to transformer state struct
+  * @extack: extack point to fill failure reason
+  **/
+-static int bond_ipsec_add_sa(struct xfrm_state *xs,
++static int bond_ipsec_add_sa(struct net_device *bond_dev,
++			     struct xfrm_state *xs,
+ 			     struct netlink_ext_ack *extack)
+ {
+-	struct net_device *bond_dev = xs->xso.dev;
+ 	struct net_device *real_dev;
+ 	netdevice_tracker tracker;
+ 	struct bond_ipsec *ipsec;
+@@ -496,7 +497,7 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
+ 	}
+ 
+ 	xs->xso.real_dev = real_dev;
+-	err = real_dev->xfrmdev_ops->xdo_dev_state_add(xs, extack);
++	err = real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs, extack);
+ 	if (!err) {
+ 		ipsec->xs = xs;
+ 		INIT_LIST_HEAD(&ipsec->list);
+@@ -540,7 +541,8 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+ 			continue;
+ 
+ 		ipsec->xs->xso.real_dev = real_dev;
+-		if (real_dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
++		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev,
++							     ipsec->xs, NULL)) {
+ 			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
+ 			ipsec->xs->xso.real_dev = NULL;
+ 		}
+@@ -551,11 +553,12 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+ 
+ /**
+  * bond_ipsec_del_sa - clear out this specific SA
++ * @bond_dev: pointer to the bond net device
+  * @xs: pointer to transformer state struct
+  **/
+-static void bond_ipsec_del_sa(struct xfrm_state *xs)
++static void bond_ipsec_del_sa(struct net_device *bond_dev,
++			      struct xfrm_state *xs)
+ {
+-	struct net_device *bond_dev = xs->xso.dev;
+ 	struct net_device *real_dev;
+ 	netdevice_tracker tracker;
+ 	struct bond_ipsec *ipsec;
+@@ -587,7 +590,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+ 		goto out;
+ 	}
+ 
+-	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
++	real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev, xs);
+ out:
+ 	netdev_put(real_dev, &tracker);
+ 	mutex_lock(&bond->ipsec_lock);
+@@ -624,18 +627,20 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+ 			slave_warn(bond_dev, real_dev,
+ 				   "%s: no slave xdo_dev_state_delete\n",
+ 				   __func__);
+-		} else {
+-			real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
+-			if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+-				real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
++			continue;
+ 		}
++		real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
++							    ipsec->xs);
++		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
++			real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev,
++								  ipsec->xs);
+ 	}
+ 	mutex_unlock(&bond->ipsec_lock);
+ }
+ 
+-static void bond_ipsec_free_sa(struct xfrm_state *xs)
++static void bond_ipsec_free_sa(struct net_device *bond_dev,
++			       struct xfrm_state *xs)
+ {
+-	struct net_device *bond_dev = xs->xso.dev;
+ 	struct net_device *real_dev;
+ 	netdevice_tracker tracker;
+ 	struct bonding *bond;
+@@ -661,7 +666,7 @@ static void bond_ipsec_free_sa(struct xfrm_state *xs)
+ 
+ 	if (real_dev && real_dev->xfrmdev_ops &&
+ 	    real_dev->xfrmdev_ops->xdo_dev_state_free)
+-		real_dev->xfrmdev_ops->xdo_dev_state_free(xs);
++		real_dev->xfrmdev_ops->xdo_dev_state_free(real_dev, xs);
+ out:
+ 	netdev_put(real_dev, &tracker);
+ }
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index 551c279dc14b..51395c96b2e9 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -6480,10 +6480,11 @@ static const struct tlsdev_ops cxgb4_ktls_ops = {
+ 
+ #if IS_ENABLED(CONFIG_CHELSIO_IPSEC_INLINE)
+ 
+-static int cxgb4_xfrm_add_state(struct xfrm_state *x,
++static int cxgb4_xfrm_add_state(struct net_device *dev,
++				struct xfrm_state *x,
+ 				struct netlink_ext_ack *extack)
+ {
+-	struct adapter *adap = netdev2adap(x->xso.dev);
++	struct adapter *adap = netdev2adap(dev);
+ 	int ret;
+ 
+ 	if (!mutex_trylock(&uld_mutex)) {
+@@ -6494,7 +6495,8 @@ static int cxgb4_xfrm_add_state(struct xfrm_state *x,
+ 	if (ret)
+ 		goto out_unlock;
+ 
+-	ret = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_add(x, extack);
++	ret = adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_add(dev, x,
++									extack);
+ 
+ out_unlock:
+ 	mutex_unlock(&uld_mutex);
+@@ -6502,9 +6504,9 @@ static int cxgb4_xfrm_add_state(struct xfrm_state *x,
+ 	return ret;
+ }
+ 
+-static void cxgb4_xfrm_del_state(struct xfrm_state *x)
++static void cxgb4_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
+ {
+-	struct adapter *adap = netdev2adap(x->xso.dev);
++	struct adapter *adap = netdev2adap(dev);
+ 
+ 	if (!mutex_trylock(&uld_mutex)) {
+ 		dev_dbg(adap->pdev_dev,
+@@ -6514,15 +6516,15 @@ static void cxgb4_xfrm_del_state(struct xfrm_state *x)
+ 	if (chcr_offload_state(adap, CXGB4_XFRMDEV_OPS))
+ 		goto out_unlock;
+ 
+-	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_delete(x);
++	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_delete(dev, x);
+ 
+ out_unlock:
+ 	mutex_unlock(&uld_mutex);
+ }
+ 
+-static void cxgb4_xfrm_free_state(struct xfrm_state *x)
++static void cxgb4_xfrm_free_state(struct net_device *dev, struct xfrm_state *x)
+ {
+-	struct adapter *adap = netdev2adap(x->xso.dev);
++	struct adapter *adap = netdev2adap(dev);
+ 
+ 	if (!mutex_trylock(&uld_mutex)) {
+ 		dev_dbg(adap->pdev_dev,
+@@ -6532,7 +6534,7 @@ static void cxgb4_xfrm_free_state(struct xfrm_state *x)
+ 	if (chcr_offload_state(adap, CXGB4_XFRMDEV_OPS))
+ 		goto out_unlock;
+ 
+-	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_free(x);
++	adap->uld[CXGB4_ULD_IPSEC].xfrmdev_ops->xdo_dev_state_free(dev, x);
+ 
+ out_unlock:
+ 	mutex_unlock(&uld_mutex);
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
+index baba96883f48..ecd9a0bd5e18 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c
+@@ -75,9 +75,12 @@ static int ch_ipsec_uld_state_change(void *handle, enum cxgb4_state new_state);
+ static int ch_ipsec_xmit(struct sk_buff *skb, struct net_device *dev);
+ static void *ch_ipsec_uld_add(const struct cxgb4_lld_info *infop);
+ static void ch_ipsec_advance_esn_state(struct xfrm_state *x);
+-static void ch_ipsec_xfrm_free_state(struct xfrm_state *x);
+-static void ch_ipsec_xfrm_del_state(struct xfrm_state *x);
+-static int ch_ipsec_xfrm_add_state(struct xfrm_state *x,
++static void ch_ipsec_xfrm_free_state(struct net_device *dev,
++				     struct xfrm_state *x);
++static void ch_ipsec_xfrm_del_state(struct net_device *dev,
++				    struct xfrm_state *x);
++static int ch_ipsec_xfrm_add_state(struct net_device *dev,
++				   struct xfrm_state *x,
+ 				   struct netlink_ext_ack *extack);
+ 
+ static const struct xfrmdev_ops ch_ipsec_xfrmdev_ops = {
+@@ -223,7 +226,8 @@ static int ch_ipsec_setkey(struct xfrm_state *x,
+  * returns 0 on success, negative error if failed to send message to FPGA
+  * positive error if FPGA returned a bad response
+  */
+-static int ch_ipsec_xfrm_add_state(struct xfrm_state *x,
++static int ch_ipsec_xfrm_add_state(struct net_device *dev,
++				   struct xfrm_state *x,
+ 				   struct netlink_ext_ack *extack)
+ {
+ 	struct ipsec_sa_entry *sa_entry;
+@@ -302,14 +306,16 @@ static int ch_ipsec_xfrm_add_state(struct xfrm_state *x,
+ 	return res;
+ }
+ 
+-static void ch_ipsec_xfrm_del_state(struct xfrm_state *x)
++static void ch_ipsec_xfrm_del_state(struct net_device *dev,
++				    struct xfrm_state *x)
+ {
+ 	/* do nothing */
+ 	if (!x->xso.offload_handle)
+ 		return;
+ }
+ 
+-static void ch_ipsec_xfrm_free_state(struct xfrm_state *x)
++static void ch_ipsec_xfrm_free_state(struct net_device *dev,
++				     struct xfrm_state *x)
+ {
+ 	struct ipsec_sa_entry *sa_entry;
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
+index 07ea1954a276..796e90d741f0 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ipsec.c
+@@ -9,7 +9,7 @@
+ #define IXGBE_IPSEC_KEY_BITS  160
+ static const char aes_gcm_name[] = "rfc4106(gcm(aes))";
+ 
+-static void ixgbe_ipsec_del_sa(struct xfrm_state *xs);
++static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs);
+ 
+ /**
+  * ixgbe_ipsec_set_tx_sa - set the Tx SA registers
+@@ -321,7 +321,7 @@ void ixgbe_ipsec_restore(struct ixgbe_adapter *adapter)
+ 
+ 		if (r->used) {
+ 			if (r->mode & IXGBE_RXTXMOD_VF)
+-				ixgbe_ipsec_del_sa(r->xs);
++				ixgbe_ipsec_del_sa(adapter->netdev, r->xs);
+ 			else
+ 				ixgbe_ipsec_set_rx_sa(hw, i, r->xs->id.spi,
+ 						      r->key, r->salt,
+@@ -330,7 +330,7 @@ void ixgbe_ipsec_restore(struct ixgbe_adapter *adapter)
+ 
+ 		if (t->used) {
+ 			if (t->mode & IXGBE_RXTXMOD_VF)
+-				ixgbe_ipsec_del_sa(t->xs);
++				ixgbe_ipsec_del_sa(adapter->netdev, t->xs);
+ 			else
+ 				ixgbe_ipsec_set_tx_sa(hw, i, t->key, t->salt);
+ 		}
+@@ -417,6 +417,7 @@ static struct xfrm_state *ixgbe_ipsec_find_rx_state(struct ixgbe_ipsec *ipsec,
+ 
+ /**
+  * ixgbe_ipsec_parse_proto_keys - find the key and salt based on the protocol
++ * @dev: pointer to net device
+  * @xs: pointer to xfrm_state struct
+  * @mykey: pointer to key array to populate
+  * @mysalt: pointer to salt value to populate
+@@ -424,10 +425,10 @@ static struct xfrm_state *ixgbe_ipsec_find_rx_state(struct ixgbe_ipsec *ipsec,
+  * This copies the protocol keys and salt to our own data tables.  The
+  * 82599 family only supports the one algorithm.
+  **/
+-static int ixgbe_ipsec_parse_proto_keys(struct xfrm_state *xs,
++static int ixgbe_ipsec_parse_proto_keys(struct net_device *dev,
++					struct xfrm_state *xs,
+ 					u32 *mykey, u32 *mysalt)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	unsigned char *key_data;
+ 	char *alg_name = NULL;
+ 	int key_len;
+@@ -473,11 +474,12 @@ static int ixgbe_ipsec_parse_proto_keys(struct xfrm_state *xs,
+ 
+ /**
+  * ixgbe_ipsec_check_mgmt_ip - make sure there is no clash with mgmt IP filters
++ * @dev: pointer to net device
+  * @xs: pointer to transformer state struct
+  **/
+-static int ixgbe_ipsec_check_mgmt_ip(struct xfrm_state *xs)
++static int ixgbe_ipsec_check_mgmt_ip(struct net_device *dev,
++				     struct xfrm_state *xs)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	struct ixgbe_adapter *adapter = netdev_priv(dev);
+ 	struct ixgbe_hw *hw = &adapter->hw;
+ 	u32 mfval, manc, reg;
+@@ -556,13 +558,14 @@ static int ixgbe_ipsec_check_mgmt_ip(struct xfrm_state *xs)
+ 
+ /**
+  * ixgbe_ipsec_add_sa - program device with a security association
++ * @dev: pointer to device to program
+  * @xs: pointer to transformer state struct
+  * @extack: extack point to fill failure reason
+  **/
+-static int ixgbe_ipsec_add_sa(struct xfrm_state *xs,
++static int ixgbe_ipsec_add_sa(struct net_device *dev,
++			      struct xfrm_state *xs,
+ 			      struct netlink_ext_ack *extack)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	struct ixgbe_adapter *adapter = netdev_priv(dev);
+ 	struct ixgbe_ipsec *ipsec = adapter->ipsec;
+ 	struct ixgbe_hw *hw = &adapter->hw;
+@@ -581,7 +584,7 @@ static int ixgbe_ipsec_add_sa(struct xfrm_state *xs,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (ixgbe_ipsec_check_mgmt_ip(xs)) {
++	if (ixgbe_ipsec_check_mgmt_ip(dev, xs)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "IPsec IP addr clash with mgmt filters");
+ 		return -EINVAL;
+ 	}
+@@ -615,7 +618,7 @@ static int ixgbe_ipsec_add_sa(struct xfrm_state *xs,
+ 			rsa.decrypt = xs->ealg || xs->aead;
+ 
+ 		/* get the key and salt */
+-		ret = ixgbe_ipsec_parse_proto_keys(xs, rsa.key, &rsa.salt);
++		ret = ixgbe_ipsec_parse_proto_keys(dev, xs, rsa.key, &rsa.salt);
+ 		if (ret) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for Rx SA table");
+ 			return ret;
+@@ -724,7 +727,7 @@ static int ixgbe_ipsec_add_sa(struct xfrm_state *xs,
+ 		if (xs->id.proto & IPPROTO_ESP)
+ 			tsa.encrypt = xs->ealg || xs->aead;
+ 
+-		ret = ixgbe_ipsec_parse_proto_keys(xs, tsa.key, &tsa.salt);
++		ret = ixgbe_ipsec_parse_proto_keys(dev, xs, tsa.key, &tsa.salt);
+ 		if (ret) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for Tx SA table");
+ 			memset(&tsa, 0, sizeof(tsa));
+@@ -752,11 +755,11 @@ static int ixgbe_ipsec_add_sa(struct xfrm_state *xs,
+ 
+ /**
+  * ixgbe_ipsec_del_sa - clear out this specific SA
++ * @dev: pointer to device to program
+  * @xs: pointer to transformer state struct
+  **/
+-static void ixgbe_ipsec_del_sa(struct xfrm_state *xs)
++static void ixgbe_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	struct ixgbe_adapter *adapter = netdev_priv(dev);
+ 	struct ixgbe_ipsec *ipsec = adapter->ipsec;
+ 	struct ixgbe_hw *hw = &adapter->hw;
+@@ -841,7 +844,8 @@ void ixgbe_ipsec_vf_clear(struct ixgbe_adapter *adapter, u32 vf)
+ 			continue;
+ 		if (ipsec->rx_tbl[i].mode & IXGBE_RXTXMOD_VF &&
+ 		    ipsec->rx_tbl[i].vf == vf)
+-			ixgbe_ipsec_del_sa(ipsec->rx_tbl[i].xs);
++			ixgbe_ipsec_del_sa(adapter->netdev,
++					   ipsec->rx_tbl[i].xs);
+ 	}
+ 
+ 	/* search tx sa table */
+@@ -850,7 +854,8 @@ void ixgbe_ipsec_vf_clear(struct ixgbe_adapter *adapter, u32 vf)
+ 			continue;
+ 		if (ipsec->tx_tbl[i].mode & IXGBE_RXTXMOD_VF &&
+ 		    ipsec->tx_tbl[i].vf == vf)
+-			ixgbe_ipsec_del_sa(ipsec->tx_tbl[i].xs);
++			ixgbe_ipsec_del_sa(adapter->netdev,
++					   ipsec->tx_tbl[i].xs);
+ 	}
+ }
+ 
+@@ -930,7 +935,7 @@ int ixgbe_ipsec_vf_add_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
+ 	memcpy(xs->aead->alg_name, aes_gcm_name, sizeof(aes_gcm_name));
+ 
+ 	/* set up the HW offload */
+-	err = ixgbe_ipsec_add_sa(xs, NULL);
++	err = ixgbe_ipsec_add_sa(adapter->netdev, xs, NULL);
+ 	if (err)
+ 		goto err_aead;
+ 
+@@ -1034,7 +1039,7 @@ int ixgbe_ipsec_vf_del_sa(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
+ 		xs = ipsec->tx_tbl[sa_idx].xs;
+ 	}
+ 
+-	ixgbe_ipsec_del_sa(xs);
++	ixgbe_ipsec_del_sa(adapter->netdev, xs);
+ 
+ 	/* remove the xs that was made-up in the add request */
+ 	kfree_sensitive(xs);
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ipsec.c b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
+index 8ba037e3d9c2..65580b9cb06f 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ipsec.c
++++ b/drivers/net/ethernet/intel/ixgbevf/ipsec.c
+@@ -201,6 +201,7 @@ struct xfrm_state *ixgbevf_ipsec_find_rx_state(struct ixgbevf_ipsec *ipsec,
+ 
+ /**
+  * ixgbevf_ipsec_parse_proto_keys - find the key and salt based on the protocol
++ * @dev: pointer to net device to program
+  * @xs: pointer to xfrm_state struct
+  * @mykey: pointer to key array to populate
+  * @mysalt: pointer to salt value to populate
+@@ -208,10 +209,10 @@ struct xfrm_state *ixgbevf_ipsec_find_rx_state(struct ixgbevf_ipsec *ipsec,
+  * This copies the protocol keys and salt to our own data tables.  The
+  * 82599 family only supports the one algorithm.
+  **/
+-static int ixgbevf_ipsec_parse_proto_keys(struct xfrm_state *xs,
++static int ixgbevf_ipsec_parse_proto_keys(struct net_device *dev,
++					  struct xfrm_state *xs,
+ 					  u32 *mykey, u32 *mysalt)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	unsigned char *key_data;
+ 	char *alg_name = NULL;
+ 	int key_len;
+@@ -256,13 +257,14 @@ static int ixgbevf_ipsec_parse_proto_keys(struct xfrm_state *xs,
+ 
+ /**
+  * ixgbevf_ipsec_add_sa - program device with a security association
++ * @dev: pointer to net device to program
+  * @xs: pointer to transformer state struct
+  * @extack: extack point to fill failure reason
+  **/
+-static int ixgbevf_ipsec_add_sa(struct xfrm_state *xs,
++static int ixgbevf_ipsec_add_sa(struct net_device *dev,
++				struct xfrm_state *xs,
+ 				struct netlink_ext_ack *extack)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	struct ixgbevf_adapter *adapter;
+ 	struct ixgbevf_ipsec *ipsec;
+ 	u16 sa_idx;
+@@ -310,7 +312,8 @@ static int ixgbevf_ipsec_add_sa(struct xfrm_state *xs,
+ 			rsa.decrypt = xs->ealg || xs->aead;
+ 
+ 		/* get the key and salt */
+-		ret = ixgbevf_ipsec_parse_proto_keys(xs, rsa.key, &rsa.salt);
++		ret = ixgbevf_ipsec_parse_proto_keys(dev, xs, rsa.key,
++						     &rsa.salt);
+ 		if (ret) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for Rx SA table");
+ 			return ret;
+@@ -363,7 +366,8 @@ static int ixgbevf_ipsec_add_sa(struct xfrm_state *xs,
+ 		if (xs->id.proto & IPPROTO_ESP)
+ 			tsa.encrypt = xs->ealg || xs->aead;
+ 
+-		ret = ixgbevf_ipsec_parse_proto_keys(xs, tsa.key, &tsa.salt);
++		ret = ixgbevf_ipsec_parse_proto_keys(dev, xs, tsa.key,
++						     &tsa.salt);
+ 		if (ret) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for Tx SA table");
+ 			memset(&tsa, 0, sizeof(tsa));
+@@ -388,11 +392,12 @@ static int ixgbevf_ipsec_add_sa(struct xfrm_state *xs,
+ 
+ /**
+  * ixgbevf_ipsec_del_sa - clear out this specific SA
++ * @dev: pointer to net device to program
+  * @xs: pointer to transformer state struct
+  **/
+-static void ixgbevf_ipsec_del_sa(struct xfrm_state *xs)
++static void ixgbevf_ipsec_del_sa(struct net_device *dev,
++				 struct xfrm_state *xs)
+ {
+-	struct net_device *dev = xs->xso.real_dev;
+ 	struct ixgbevf_adapter *adapter;
+ 	struct ixgbevf_ipsec *ipsec;
+ 	u16 sa_idx;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+index fc59e50bafce..a6500e3673f2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+@@ -663,10 +663,10 @@ static int cn10k_ipsec_inb_add_state(struct xfrm_state *x,
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static int cn10k_ipsec_outb_add_state(struct xfrm_state *x,
++static int cn10k_ipsec_outb_add_state(struct net_device *dev,
++				      struct xfrm_state *x,
+ 				      struct netlink_ext_ack *extack)
+ {
+-	struct net_device *netdev = x->xso.dev;
+ 	struct cn10k_tx_sa_s *sa_entry;
+ 	struct qmem *sa_info;
+ 	struct otx2_nic *pf;
+@@ -676,7 +676,7 @@ static int cn10k_ipsec_outb_add_state(struct xfrm_state *x,
+ 	if (err)
+ 		return err;
+ 
+-	pf = netdev_priv(netdev);
++	pf = netdev_priv(dev);
+ 
+ 	err = qmem_alloc(pf->dev, &sa_info, pf->ipsec.sa_size, OTX2_ALIGN);
+ 	if (err)
+@@ -700,18 +700,18 @@ static int cn10k_ipsec_outb_add_state(struct xfrm_state *x,
+ 	return 0;
+ }
+ 
+-static int cn10k_ipsec_add_state(struct xfrm_state *x,
++static int cn10k_ipsec_add_state(struct net_device *dev,
++				 struct xfrm_state *x,
+ 				 struct netlink_ext_ack *extack)
+ {
+ 	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
+ 		return cn10k_ipsec_inb_add_state(x, extack);
+ 	else
+-		return cn10k_ipsec_outb_add_state(x, extack);
++		return cn10k_ipsec_outb_add_state(dev, x, extack);
+ }
+ 
+-static void cn10k_ipsec_del_state(struct xfrm_state *x)
++static void cn10k_ipsec_del_state(struct net_device *dev, struct xfrm_state *x)
+ {
+-	struct net_device *netdev = x->xso.dev;
+ 	struct cn10k_tx_sa_s *sa_entry;
+ 	struct qmem *sa_info;
+ 	struct otx2_nic *pf;
+@@ -720,7 +720,7 @@ static void cn10k_ipsec_del_state(struct xfrm_state *x)
+ 	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
+ 		return;
+ 
+-	pf = netdev_priv(netdev);
++	pf = netdev_priv(dev);
+ 
+ 	sa_info = (struct qmem *)x->xso.offload_handle;
+ 	sa_entry = (struct cn10k_tx_sa_s *)sa_info->base;
+@@ -732,7 +732,7 @@ static void cn10k_ipsec_del_state(struct xfrm_state *x)
+ 
+ 	err = cn10k_outb_write_sa(pf, sa_info);
+ 	if (err)
+-		netdev_err(netdev, "Error (%d) deleting SA\n", err);
++		netdev_err(dev, "Error (%d) deleting SA\n", err);
+ 
+ 	x->xso.offload_handle = 0;
+ 	qmem_free(pf->dev, sa_info);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index 0dfbbe21936f..77f61cd28a79 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -689,17 +689,17 @@ static int mlx5e_ipsec_create_dwork(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	return 0;
+ }
+ 
+-static int mlx5e_xfrm_add_state(struct xfrm_state *x,
++static int mlx5e_xfrm_add_state(struct net_device *dev,
++				struct xfrm_state *x,
+ 				struct netlink_ext_ack *extack)
+ {
+ 	struct mlx5e_ipsec_sa_entry *sa_entry = NULL;
+-	struct net_device *netdev = x->xso.real_dev;
+ 	struct mlx5e_ipsec *ipsec;
+ 	struct mlx5e_priv *priv;
+ 	gfp_t gfp;
+ 	int err;
+ 
+-	priv = netdev_priv(netdev);
++	priv = netdev_priv(dev);
+ 	if (!priv->ipsec)
+ 		return -EOPNOTSUPP;
+ 
+@@ -710,7 +710,7 @@ static int mlx5e_xfrm_add_state(struct xfrm_state *x,
+ 		return -ENOMEM;
+ 
+ 	sa_entry->x = x;
+-	sa_entry->dev = netdev;
++	sa_entry->dev = dev;
+ 	sa_entry->ipsec = ipsec;
+ 	/* Check if this SA is originated from acquire flow temporary SA */
+ 	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ)
+@@ -807,7 +807,7 @@ static int mlx5e_xfrm_add_state(struct xfrm_state *x,
+ 	return err;
+ }
+ 
+-static void mlx5e_xfrm_del_state(struct xfrm_state *x)
++static void mlx5e_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
+ {
+ 	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
+ 	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
+@@ -820,7 +820,7 @@ static void mlx5e_xfrm_del_state(struct xfrm_state *x)
+ 	WARN_ON(old != sa_entry);
+ }
+ 
+-static void mlx5e_xfrm_free_state(struct xfrm_state *x)
++static void mlx5e_xfrm_free_state(struct net_device *dev, struct xfrm_state *x)
+ {
+ 	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
+ 	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
+diff --git a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
+index 671af5d4c5d2..9e7c285eaa6b 100644
+--- a/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
++++ b/drivers/net/ethernet/netronome/nfp/crypto/ipsec.c
+@@ -266,17 +266,17 @@ static void set_sha2_512hmac(struct nfp_ipsec_cfg_add_sa *cfg, int *trunc_len)
+ 	}
+ }
+ 
+-static int nfp_net_xfrm_add_state(struct xfrm_state *x,
++static int nfp_net_xfrm_add_state(struct net_device *dev,
++				  struct xfrm_state *x,
+ 				  struct netlink_ext_ack *extack)
+ {
+-	struct net_device *netdev = x->xso.real_dev;
+ 	struct nfp_ipsec_cfg_mssg msg = {};
+ 	int i, key_len, trunc_len, err = 0;
+ 	struct nfp_ipsec_cfg_add_sa *cfg;
+ 	struct nfp_net *nn;
+ 	unsigned int saidx;
+ 
+-	nn = netdev_priv(netdev);
++	nn = netdev_priv(dev);
+ 	cfg = &msg.cfg_add_sa;
+ 
+ 	/* General */
+@@ -546,17 +546,16 @@ static int nfp_net_xfrm_add_state(struct xfrm_state *x,
+ 	return 0;
+ }
+ 
+-static void nfp_net_xfrm_del_state(struct xfrm_state *x)
++static void nfp_net_xfrm_del_state(struct net_device *dev, struct xfrm_state *x)
+ {
+ 	struct nfp_ipsec_cfg_mssg msg = {
+ 		.cmd = NFP_IPSEC_CFG_MSSG_INV_SA,
+ 		.sa_idx = x->xso.offload_handle - 1,
+ 	};
+-	struct net_device *netdev = x->xso.real_dev;
+ 	struct nfp_net *nn;
+ 	int err;
+ 
+-	nn = netdev_priv(netdev);
++	nn = netdev_priv(dev);
+ 	err = nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_IPSEC, &msg,
+ 					   sizeof(msg), nfp_net_ipsec_cfg);
+ 	if (err)
+diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
+index d88bdb9a1717..47cdee5577d4 100644
+--- a/drivers/net/netdevsim/ipsec.c
++++ b/drivers/net/netdevsim/ipsec.c
+@@ -85,11 +85,11 @@ static int nsim_ipsec_find_empty_idx(struct nsim_ipsec *ipsec)
+ 	return -ENOSPC;
+ }
+ 
+-static int nsim_ipsec_parse_proto_keys(struct xfrm_state *xs,
++static int nsim_ipsec_parse_proto_keys(struct net_device *dev,
++				       struct xfrm_state *xs,
+ 				       u32 *mykey, u32 *mysalt)
+ {
+ 	const char aes_gcm_name[] = "rfc4106(gcm(aes))";
+-	struct net_device *dev = xs->xso.real_dev;
+ 	unsigned char *key_data;
+ 	char *alg_name = NULL;
+ 	int key_len;
+@@ -129,17 +129,16 @@ static int nsim_ipsec_parse_proto_keys(struct xfrm_state *xs,
+ 	return 0;
+ }
+ 
+-static int nsim_ipsec_add_sa(struct xfrm_state *xs,
++static int nsim_ipsec_add_sa(struct net_device *dev,
++			     struct xfrm_state *xs,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	struct nsim_ipsec *ipsec;
+-	struct net_device *dev;
+ 	struct netdevsim *ns;
+ 	struct nsim_sa sa;
+ 	u16 sa_idx;
+ 	int ret;
+ 
+-	dev = xs->xso.real_dev;
+ 	ns = netdev_priv(dev);
+ 	ipsec = &ns->ipsec;
+ 
+@@ -174,7 +173,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
+ 		sa.crypt = xs->ealg || xs->aead;
+ 
+ 	/* get the key and salt */
+-	ret = nsim_ipsec_parse_proto_keys(xs, sa.key, &sa.salt);
++	ret = nsim_ipsec_parse_proto_keys(dev, xs, sa.key, &sa.salt);
+ 	if (ret) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Failed to get key data for SA table");
+ 		return ret;
+@@ -200,9 +199,9 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
+ 	return 0;
+ }
+ 
+-static void nsim_ipsec_del_sa(struct xfrm_state *xs)
++static void nsim_ipsec_del_sa(struct net_device *dev, struct xfrm_state *xs)
+ {
+-	struct netdevsim *ns = netdev_priv(xs->xso.real_dev);
++	struct netdevsim *ns = netdev_priv(dev);
+ 	struct nsim_ipsec *ipsec = &ns->ipsec;
+ 	u16 sa_idx;
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d8544f6a680c..88dfb8aeed3c 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1013,9 +1013,13 @@ struct netdev_bpf {
+ 
+ #ifdef CONFIG_XFRM_OFFLOAD
+ struct xfrmdev_ops {
+-	int	(*xdo_dev_state_add) (struct xfrm_state *x, struct netlink_ext_ack *extack);
+-	void	(*xdo_dev_state_delete) (struct xfrm_state *x);
+-	void	(*xdo_dev_state_free) (struct xfrm_state *x);
++	int	(*xdo_dev_state_add)(struct net_device *dev,
++				     struct xfrm_state *x,
++				     struct netlink_ext_ack *extack);
++	void	(*xdo_dev_state_delete)(struct net_device *dev,
++					struct xfrm_state *x);
++	void	(*xdo_dev_state_free)(struct net_device *dev,
++				      struct xfrm_state *x);
+ 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
+ 				       struct xfrm_state *x);
+ 	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x);
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 39365fd2ea17..3d2f6c879311 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -147,8 +147,16 @@ enum {
+ };
+ 
+ struct xfrm_dev_offload {
++	/* The device for this offload.
++	 * Device drivers should not use this directly, as that will prevent
++	 * them from working with bonding device. Instead, the device passed
++	 * to the add/delete callbacks should be used.
++	 */
+ 	struct net_device	*dev;
+ 	netdevice_tracker	dev_tracker;
++	/* This is a private pointer used by the bonding driver.
++	 * Device drivers should not use it.
++	 */
+ 	struct net_device	*real_dev;
+ 	unsigned long		offload_handle;
+ 	u8			dir : 2;
 diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 4f4165ff738d..0be5f7ffd019 100644
+index 0be5f7ffd019..3be0139373f7 100644
 --- a/net/xfrm/xfrm_device.c
 +++ b/net/xfrm/xfrm_device.c
-@@ -145,10 +145,6 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
- 		return NULL;
- 	}
+@@ -309,7 +309,6 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
  
--	/* This skb was already validated on the upper/virtual dev */
--	if ((x->xso.dev != dev) && (x->xso.real_dev == dev))
--		return skb;
--
- 	local_irq_save(flags);
- 	sd = this_cpu_ptr(&softnet_data);
- 	err = !skb_queue_empty(&sd->xfrm_backlog);
-@@ -159,8 +155,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
- 		return skb;
- 	}
+ 	xso->dev = dev;
+ 	netdev_tracker_alloc(dev, &xso->dev_tracker, GFP_ATOMIC);
+-	xso->real_dev = dev;
  
--	if (skb_is_gso(skb) && (unlikely(x->xso.dev != dev) ||
--				unlikely(xmit_xfrm_check_overflow(skb)))) {
-+	if (skb_is_gso(skb) && unlikely(xmit_xfrm_check_overflow(skb))) {
- 		struct sk_buff *segs;
+ 	if (xuo->flags & XFRM_OFFLOAD_INBOUND)
+ 		xso->dir = XFRM_DEV_OFFLOAD_IN;
+@@ -321,11 +320,10 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+ 	else
+ 		xso->type = XFRM_DEV_OFFLOAD_CRYPTO;
  
- 		/* Packet got rerouted, fixup features and segment it. */
+-	err = dev->xfrmdev_ops->xdo_dev_state_add(x, extack);
++	err = dev->xfrmdev_ops->xdo_dev_state_add(dev, x, extack);
+ 	if (err) {
+ 		xso->dev = NULL;
+ 		xso->dir = 0;
+-		xso->real_dev = NULL;
+ 		netdev_put(dev, &xso->dev_tracker);
+ 		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+ 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index d67420e76389..3c2e27e5a1e3 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -767,7 +767,7 @@ void xfrm_dev_state_delete(struct xfrm_state *x)
+ 	struct net_device *dev = READ_ONCE(xso->dev);
+ 
+ 	if (dev) {
+-		dev->xfrmdev_ops->xdo_dev_state_delete(x);
++		dev->xfrmdev_ops->xdo_dev_state_delete(dev, x);
+ 		spin_lock_bh(&xfrm_state_dev_gc_lock);
+ 		hlist_add_head(&x->dev_gclist, &xfrm_state_dev_gc_list);
+ 		spin_unlock_bh(&xfrm_state_dev_gc_lock);
+@@ -789,7 +789,7 @@ void xfrm_dev_state_free(struct xfrm_state *x)
+ 		spin_unlock_bh(&xfrm_state_dev_gc_lock);
+ 
+ 		if (dev->xfrmdev_ops->xdo_dev_state_free)
+-			dev->xfrmdev_ops->xdo_dev_state_free(x);
++			dev->xfrmdev_ops->xdo_dev_state_free(dev, x);
+ 		WRITE_ONCE(xso->dev, NULL);
+ 		xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+ 		netdev_put(dev, &xso->dev_tracker);
+@@ -1551,16 +1551,18 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
+ 		if (pol->xdo.type == XFRM_DEV_OFFLOAD_PACKET) {
+ 			struct xfrm_dev_offload *xdo = &pol->xdo;
+ 			struct xfrm_dev_offload *xso = &x->xso;
++			struct net_device *dev = xdo->dev;
+ 
+ 			xso->type = XFRM_DEV_OFFLOAD_PACKET;
+ 			xso->dir = xdo->dir;
+-			xso->dev = xdo->dev;
++			xso->dev = dev;
+ 			xso->flags = XFRM_DEV_OFFLOAD_FLAG_ACQ;
+-			netdev_hold(xso->dev, &xso->dev_tracker, GFP_ATOMIC);
+-			error = xso->dev->xfrmdev_ops->xdo_dev_state_add(x, NULL);
++			netdev_hold(dev, &xso->dev_tracker, GFP_ATOMIC);
++			error = dev->xfrmdev_ops->xdo_dev_state_add(dev, x,
++								    NULL);
+ 			if (error) {
+ 				xso->dir = 0;
+-				netdev_put(xso->dev, &xso->dev_tracker);
++				netdev_put(dev, &xso->dev_tracker);
+ 				xso->dev = NULL;
+ 				xso->type = XFRM_DEV_OFFLOAD_UNSPECIFIED;
+ 				x->km.state = XFRM_STATE_DEAD;
 -- 
 2.34.1
 
