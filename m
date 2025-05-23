@@ -1,67 +1,56 @@
-Return-Path: <netdev+bounces-192972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C763BAC1E31
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:04:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F64AC1E3B
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E65A63B4FE0
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 08:04:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 757677B8AD0
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 08:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD08628689E;
-	Fri, 23 May 2025 08:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1D8286D6E;
+	Fri, 23 May 2025 08:05:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4158F27FD7D
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 08:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630ED289344
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 08:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747987469; cv=none; b=NTNmeYiAGYYRtsD2SelCzi2hxWQrpFQt9BaqYLMnfKPxOeeo70A6etRyU8J/hy0YRBqVbegXdNJI51oYRFLuG+uvBKaSw3xHvFbgn4SWdIUjcD6pS7Uhkmr+2mNnmXM183oIKepmk36Rp1GIzU0cJkgVuKVLPH1umjs0Uv7hAgo=
+	t=1747987557; cv=none; b=SKXbBi6SOWGwE6vOSlxd+/MERTUJFkrfmbR4YhuAxfa0KR6DOibFyXB2PEzg4vne7Iwrn4R8UVclCDfH2DHOx4Lto9tMzbo3TCuIwj4lpFH+N9P6L52CpTGjuvFWOCq+i+dCk7GjCqDE0d/ZKQX3m8V2J4MWvEXOAFSlDYBbEwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747987469; c=relaxed/simple;
-	bh=esucwVikj1hyyI5PGCMK8Hc9G3LEBZrKgsxdDPzBhs8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZCeKnp6uvkdj9II5bdb5Vf6V3fw70M9fzHPSnD4F3uLfLmk+8rBX0cGpVBPSnXpaNQ+RwrLI7sjydGEJStPNKR3newkRU87ijmnnDIFVqL7RHrYHNSHs9PozyrVpBKYI1eqs0MvbmpgGoALx5qhWxJKMAs7jc7muKIxCt5SrVCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 9336420748;
-	Fri, 23 May 2025 10:04:26 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0ej_6GQVENi8; Fri, 23 May 2025 10:04:25 +0200 (CEST)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id C2EDC20826;
-	Fri, 23 May 2025 10:04:25 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com C2EDC20826
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-01.secunet.de
- (10.32.0.171) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 23 May
- 2025 10:04:25 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 May
- 2025 10:04:24 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 4227A3182B12; Fri, 23 May 2025 09:56:17 +0200 (CEST)
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 12/12] xfrm: use kfree_sensitive() for SA secret zeroization
-Date: Fri, 23 May 2025 09:56:11 +0200
-Message-ID: <20250523075611.3723340-13-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250523075611.3723340-1-steffen.klassert@secunet.com>
-References: <20250523075611.3723340-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1747987557; c=relaxed/simple;
+	bh=m/70Ndmj0aEr6ohUSaKccKLgoLUh2A+tMVysDdEDyIA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A/DjSOgyTxPlmXLPEi+CLZq4dUjiy9vWMFIFqvP8lvTRLAB+paZ1U1MK4PlQEQqVjT05QU36cUV66S7P/pcWGuX7WApwNhUmcjIwrw7dRrImhDs0Lj6xR7hvVu3GZ+EYXSDqrQPMm7m87moYl/bHGQrpn4ML+4yz+e95VegyoH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpsz2t1747987499t645a91fa
+X-QQ-Originating-IP: X6mE/5ZsFJEx6e7pxzfR9XxZZ1BNP4Vhp+Mb4uzLkT0=
+Received: from w-MS-7E16.trustnetic.com ( [125.120.71.166])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 23 May 2025 16:04:53 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 4135908724909295465
+EX-QQ-RecipientCnt: 9
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v2 1/2] net: libwx: Fix statistics of multicast packets
+Date: Fri, 23 May 2025 16:04:37 +0800
+Message-ID: <F70910CFE86C1F6F+20250523080438.27968-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,47 +58,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Nj32X60U+bRE6s12X6LMG6rzuJPDQ7/FTvaYwK/3Lxn0O/NUi9z8Zid1
+	p2l6doovXnpha0MgTJBJqku1kZCPOPTDXSxDk79EyWmGfdCtNF1flmmDl7G+vUhSx+0cSAG
+	R5TN4dVMpLpvXNCPpTFHnUs3UzHvgav2AuJMAXsOstYGsSStU9GS2RGxZBFsjU5n64sAUeD
+	AKTQIDNIsKQTphWjg3GIrVgBDZ5b9HJXIllDSW+jP4gOOMjiuw5+Dv33UbkRKC52TI2dYiR
+	V3o6aTQKf0OVFPc1Uty5ORTOJLdewCQVTHR00QENa99xl0s9qGHmOTtYr+L2EoQs9AQg4Kd
+	3UqJfPGzL6uEB5DAJKli3DBaR04LQ+bAYisrZd44V0ld2KoWn+EtqFrRBUG+iIewIMYQSUe
+	ZUPwjwbsZ8hr8eQLmc23r7pybWQyqMOYSJdLpa3zKS+QPiWKUMVS8WdCVzyBPbiVjoyUJB3
+	qW3LZkUZbG01zs/SPncHVKPcrkJjTcEZpXLD1gEdpwPbmiEZeJ6ijPHsNqJ9ZaXlnlNuzqR
+	4YzF8J3U9glIvH0fr9Xrlt/siZ1FtleXjg/L2ZCrzpq9AC7W/UBFeEdL9RYKe1bDoJeqn2s
+	BOO00WdBk/LsY5et5IbuIqQLMtMK2YzH6DiZ2MZvi4sOvIFr/OT+/F0VqvFrdMR0kjb0I9n
+	vli36V6Gu18K5s+FFt22pu7zHyJ7UGVvgnQng4+2NzThxJ4Kvz2ZJH3i5E2UkAJhfHYJdsn
+	PYucisrMuP1klcvPzurhX1HviIikYPMP3LQpubLlPPGzZ3BmDT/uQxZPp5QarzOWe5zbNG0
+	l39l40PzDk8D6zQj9dapGTkxbOzSrttsSYYEwsGqtZdS1yJj9zGIf81/VymWHBDfRV1ag+n
+	zKXPn0G01TYpo64S+L1mPaehYCf+YCGNqKpWNO7ajct8g4EBMsAynzWlkp8CDWJgcWtMf8A
+	h8s8pAOW5JvPrg7rRU0wNN8tiCp+meKGCQM90XlHYhLFca1syCvrKLZaqYCBL7sr4haL68R
+	iHtONxGjJBEOtZlErJeyNGpmxP9bT2rU34xb99DGudr+sLE8bOZohcV8YK6D8M2WnEZCezc
+	w==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-From: Zilin Guan <zilin@seu.edu.cn>
+When SR-IOV is enabled, the number of multicast packets is mistakenly
+counted starting from queue 0. It would be a wrong count that includes
+the packets received on VF. Fix it to count from the correct offset.
 
-High-level copy_to_user_* APIs already redact SA secret fields when
-redaction is enabled, but the state teardown path still freed aead,
-aalg and ealg structs with plain kfree(), which does not clear memory
-before deallocation. This can leave SA keys and other confidential
-data in memory, risking exposure via post-free vulnerabilities.
-
-Since this path is outside the packet fast path, the cost of zeroization
-is acceptable and prevents any residual key material. This patch
-replaces those kfree() calls unconditionally with kfree_sensitive(),
-which zeroizes the entire buffer before freeing.
-
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Fixes: c52d4b898901 ("net: libwx: Redesign flow when sriov is enabled")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/xfrm/xfrm_state.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 4bf7a4a8f9d4..5e1c736ea708 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -599,9 +599,9 @@ static void ___xfrm_state_destroy(struct xfrm_state *x)
- 		x->mode_cbs->destroy_state(x);
- 	hrtimer_cancel(&x->mtimer);
- 	timer_delete_sync(&x->rtimer);
--	kfree(x->aead);
--	kfree(x->aalg);
--	kfree(x->ealg);
-+	kfree_sensitive(x->aead);
-+	kfree_sensitive(x->aalg);
-+	kfree_sensitive(x->ealg);
- 	kfree(x->calg);
- 	kfree(x->encap);
- 	kfree(x->coaddr);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 143cc1088eea..17ff3c21539a 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -2792,7 +2792,8 @@ void wx_update_stats(struct wx *wx)
+ 		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
+ 	}
+ 
+-	for (i = 0; i < wx->mac.max_rx_queues; i++)
++	for (i = wx->num_vfs * wx->num_rx_queues_per_pool;
++	     i < wx->mac.max_rx_queues; i++)
+ 		hwstats->qmprc += rd32(wx, WX_PX_MPRC(i));
+ }
+ EXPORT_SYMBOL(wx_update_stats);
 -- 
-2.34.1
+2.48.1
 
 
