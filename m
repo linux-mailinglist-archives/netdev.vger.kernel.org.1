@@ -1,261 +1,296 @@
-Return-Path: <netdev+bounces-193164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43626AC2B0B
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:39:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A39AC2B2B
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 22:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 828327A4C74
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:37:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BF516B6C0
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 20:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA291F1515;
-	Fri, 23 May 2025 20:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A82201032;
+	Fri, 23 May 2025 20:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="fJhU9IVT";
-	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="fb6tC34z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T3PvvSX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0024c301.pphosted.com (mx0b-0024c301.pphosted.com [148.163.153.153])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A041EB36;
-	Fri, 23 May 2025 20:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.153.153
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748032733; cv=fail; b=FZz8XrKfZRIuz1x4m/NT5vYDwmitW4g/GtTYcorF0MLe/2Di7/gLrZzGRre99L9771XD+1Lx6Wn5s2I0UBYFt67se9sjxccx+8RYNUlSZRj61HQiG4kDtF5WWuO+F2wh890FnFNHmhfhApfwyqtrlThtYSm8bDFrQzOJa4wfw6Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748032733; c=relaxed/simple;
-	bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
-	h=Content-Type:Date:Message-Id:Cc:To:From:Subject:References:
-	 In-Reply-To:MIME-Version; b=n1RjPeGPNv6pZgbcy167TEmI3TRAss2EqWywoGkzksNmQUjw4JO61AqyoKBk6Esf/Lrmqw4KWuv5karw7gRLkI/q+rlWcaqbRHQVSmMgTbiXbRLJA/4uOnNd3KD5JXgvWER6ht5Cw57W8GCZ8uhE6Mctr4zmaLvfCrdi0bmtrmw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=fJhU9IVT; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=fb6tC34z; arc=fail smtp.client-ip=148.163.153.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=silabs.com
-Received: from pps.filterd (m0101742.ppops.net [127.0.0.1])
-	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54NHOxOq027605;
-	Fri, 23 May 2025 15:38:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps12202023;
-	 bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=; b=fJhU9IVTepT8
-	jZ8yL8CdpDMd8phwk5Nc8KCJmJVmuvb/ymZIceeyVid4gduovifjSlB1shpS2eQl
-	opYo27AKsgWaj02nMOFyRquWZzCuWT+JKe3x9KJPm1m5laAxtlGKtffjPxJJ4WzR
-	5BXbsnw896BntYh2XyIsUWdeg0Htxz9oPqs7MVzMzIiGeZoDAo9tB/V0fUvasuKb
-	JYpQmX5s5Ma5AUpMdheftq7ANVgy5DTSxW4B4L4HQjes7io9YHk1ucJtwzwUnIBJ
-	CIn2yBlHgLzCmQQmOpq733TrI72Gr2d1ogaANeIyHPM2XzhEVeMz33e807iM9dPX
-	qMrtVeL3vg==
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02on2135.outbound.protection.outlook.com [40.107.95.135])
-	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46t54wkamy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 May 2025 15:38:25 -0500 (CDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WkBFqblzr8n35snpP+BCVPmqnMFlAI2C+PzXxB0YCmWKbF+dyl7IAiAaIA3SOF5KgajRdfKImvpf+vybP53LF7duVj5YcEfuZOg5eeShoMCsstCvhEYHO5llxvsNQEhVR2b5yRWdVQxkY3hV7Uzy5HyeingO47z/nQw+q3dn1N4+J5RitY/8X/mJI0+Th16aq0Peop7l9ys+BSb+EvQwMYTYeL4L2E7qjF7EhmV0V7uPdPs88l5IH05W/4Mmw0mHGM6+y/OXUhNIaPXkr/aL06ndT9WaqArlwxi4PtWQA8hqAqWJlzmBUd2A15YuIwtTsVxZAz3mmNUq8UD1dMayqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
- b=f0Gam5LNRLTPeQkHkeYugcNRa7brCYXkNxB0qzF0q9IuaSWSIokbyH7h0cOoRZGbzA5WW5oxc7MFWqQgengCnshgw9WXvQeXWsdSnOiyDZcup5TVEN5e1ll120lYg3/8mDs9/abE3MZQaNbpqG4zYY3WGtZ5+UkRVVpw/oEmK0ONkA0gGb+qgYQi8h+X0HS+Rkh4w4np5rGH9VlLdwP9vAoWiGCSKwUNdhxCY++8kSS4CmFS6tKVF7c74mXTqZvlyie79qpDBSS939sp0ViT3dgAFfZRthPJ4WWhoq+N0GJeCmNf7mJPjxM/Dm5xtpt7mkt90mAVwrl7lGEqHmzslw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=silabs.com; dmarc=pass action=none header.from=silabs.com;
- dkim=pass header.d=silabs.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JcByskGMrZ/9jNLPn7/tiqrvJD1tqSBOlBi5DmWma54=;
- b=fb6tC34zv0kBh9kv0SnxgQAuGxbIQX794BAg0EOoBoag6KHZ0ur+r+mlzlcoUFGYeZfirnlLVJ/or1gYJKBKgbh55UPDwp/fq4BfIRPaRXvH1jKrkoCtlbZMEsyvQwtkgx764nNe8zUzyQ6r17xNlmpF0kTgj9TyYDL848ZMNm8=
-Received: from DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17)
- by PH8PR11MB6829.namprd11.prod.outlook.com (2603:10b6:510:22f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.33; Fri, 23 May
- 2025 20:38:20 +0000
-Received: from DS0PR11MB8205.namprd11.prod.outlook.com
- ([fe80::c508:9b04:3351:524a]) by DS0PR11MB8205.namprd11.prod.outlook.com
- ([fe80::c508:9b04:3351:524a%4]) with mapi id 15.20.8722.031; Fri, 23 May 2025
- 20:38:20 +0000
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 23 May 2025 16:38:17 -0400
-Message-Id: <DA3TVJDZ81YO.1NHRVPOHH9YJU@silabs.com>
-Cc: "Alex Elder" <elder@ieee.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Eric Dumazet"
- <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>,
-        "Rob Herring" <robh@kernel.org>,
-        "Krzysztof Kozlowski"
- <krzk+dt@kernel.org>,
-        "Conor Dooley" <conor+dt@kernel.org>,
-        "Silicon Labs
- Kernel Team" <linux-devel@silabs.com>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, "Johan
- Hovold" <johan@kernel.org>,
-        "Alex Elder" <elder@kernel.org>,
-        "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        <greybus-dev@lists.linaro.org>
-To: "Andrew Lunn" <andrew@lunn.ch>
-From: =?utf-8?q?Damien_Ri=C3=A9gel?= <damien.riegel@silabs.com>
-Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
-X-Mailer: aerc 0.20.1
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
- <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
- <D9VCEGBQWBW8.3MJCYYXOZHZNX@silabs.com>
- <f1a4ab5a-f2ce-4c94-91eb-ab81aea5b413@lunn.ch>
- <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
- <65cc6196-7ebe-453f-8148-ecb93e5b69fd@ieee.org>
- <DA3STV21NQE0.23SODSDP37DI7@silabs.com>
- <db54fe16-ae7d-410c-817b-edb4faa6656c@lunn.ch>
-In-Reply-To: <db54fe16-ae7d-410c-817b-edb4faa6656c@lunn.ch>
-X-ClientProxiedBy: YQBPR0101CA0177.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:f::20) To DS0PR11MB8205.namprd11.prod.outlook.com
- (2603:10b6:8:162::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C5C1FDE02
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 20:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748033753; cv=none; b=tS/3MQmEvDIuYyVscuFCsv6QKh3ozitb3/UQxZiuuV6RvG8sKu6nksJAJ0+yno6+SRcI4k2ycyQEHpRbQhCMVKFwYkASFtS6rIK4mCr92ptvlDHAVd1mszRAZJGL5SSuc/bcmylJ6KPqqtPB1VKFvKUt7uj9ZQm8jQHaiem90Ks=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748033753; c=relaxed/simple;
+	bh=xvMMV6WmxEoh23GJ+q6duoemo37i7bwcj8tiKVd+6ec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z4nzG+mG3Xl5/ZwtXBehhpHwZhVdPa8jYJfPgyVZ098cSRv32VJdLHy7V11ueVSYTUjciFPShQcGZt9ojbV+nSyDhsfdyIlG6VI+VxoWIRtF5Bu71wq6xk1B3yN9VRY8jMf2MzmcDHWx7jbBNn6baBVPBozwL3aigDn06Tbsoug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T3PvvSX6; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748033751; x=1779569751;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xvMMV6WmxEoh23GJ+q6duoemo37i7bwcj8tiKVd+6ec=;
+  b=T3PvvSX6ybd5FH2P+j/kaL1Vgb65WkBJ+8NW2+YhAkG2oUdUfeoPqxxD
+   gZpqroYJnA+sTHHpZQUa7GU4e7vS2McqjhMthLu98H5F+Q4BfKfoQzj7/
+   mWx0FnwgAVo9Vns6AmvYQSpw4sbDGHXi60zCtmOdZ2e3eCDZ0nQv0T+KR
+   JqVmsYJ26BjdeqBdlvwml9AP89wkiUE5bnUXbr5GUAJoJNtwrMiDGqaBp
+   XJeLURyY8bTuVQ/RuyIMaNCf1kGuk0YIbJnUyH0QMNEKdFog4ktCMGlg/
+   c3mr2aF4b7Ny9ElCps+rkOWEZeFPaysDaF7JB+MavDv98F849/ZX8srgy
+   g==;
+X-CSE-ConnectionGUID: PL7XXqZ2TaqiXCsh439thA==
+X-CSE-MsgGUID: JUEjnIE3QhiqGBVLCElDkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="75495687"
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="75495687"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 13:55:50 -0700
+X-CSE-ConnectionGUID: tvYe6MPORKONzjKuBTTpmw==
+X-CSE-MsgGUID: cUt+ii91SAWFfW1T5gncEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="178411628"
+Received: from dhhellew-desk2.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.245.244.196])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 13:55:47 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net] idpf: convert control queue mutex to a spinlock
+Date: Fri, 23 May 2025 14:55:37 -0600
+Message-ID: <20250523205537.161754-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8205:EE_|PH8PR11MB6829:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8954abae-fdc1-4eb4-3a11-08dd9a39c0f9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S3hFUFpwZXZXMjlLR1FvM2RPUGlwN25vM2Y5VXRnSWE2N3pEdndob05zTHU5?=
- =?utf-8?B?NHVyeHdZRkxXWkRBdFg5MCtjS0JoT1k3Zi80TkJBbUcrdjljMktsakdtSm52?=
- =?utf-8?B?SkVFKy9KSkhJQ1lvMDlVT1kwOGtZSUJnRGNGUEJocFBIL244RzliT1FtU08y?=
- =?utf-8?B?Vjk0NTBqZDBUY3B6TmVHaDNRVGJXZ2sxN0l1dDdya2hPd1ZyNUR5MWtlOVZm?=
- =?utf-8?B?Smd5N2YxV2hBVVB5aG1wbzdJbEc4dnFPQ1Y4eFc2M2hCUEtZbjUrZGxRTHV5?=
- =?utf-8?B?dzhuWG0vYkdrbHJJdlkyazZtd1VPYXBuNVozRkprR0NObFVLNklwaXk1dTI4?=
- =?utf-8?B?TU9hTlc0bnlQL1hEejR3M0c0YTJ0VEl1RldZQXhFalBIeHpOK3h5NGU1aUxM?=
- =?utf-8?B?QmxyVmRGTUpQWUo0a0FjV0hPcEtrTHZSKzBLUXRuQW4zNjc5UHdaandYdG1u?=
- =?utf-8?B?UlZsS2NZcWdGTUI2UkQ1bUFFMC9vUnVzdTFURG9mMFlKMkxva3VuMjMxaUlr?=
- =?utf-8?B?SmJGcHozZ0huQXFHUUU5VmUyUUw0WHEzWE1GckwrK21WeWZPakYyeXplU1Nt?=
- =?utf-8?B?ZmRQcmpaQjFRd2Fac2xVRkhZNytucDZRSno3T1JxNGUzeUNGcFlkQTEraUh4?=
- =?utf-8?B?MjByL1ViVDdjQXhZRlFqODBCWm5PUzZiWGdqQ0xjQ2ZGb2pCMndITDc0Y2Nt?=
- =?utf-8?B?RGVQU1lSelJvQWFOcVNoMmZDTUhLZVZCVXBDT0FZczZoTGlCNGNwT3pkVTBV?=
- =?utf-8?B?T09Wa0E1Z1hTSDdpeisvdUV0bDFuZTRsQktqd2cvNXdzOEpaRFY0ZS9QdHI3?=
- =?utf-8?B?TlVnVGs1QW02SnpGQUFkT3huU1hKTmI5NnZxOS9qbFFyMkF4eW90eHE5c29m?=
- =?utf-8?B?RnlGb0lOclY2aitLanVEaTM2empBVXo3SFpNZ0VKbDdwOWV1WExnUXE2QjNF?=
- =?utf-8?B?dHRVTTh0N1NlZXFJYTZ5OGgwWElwRjZXWEdzQ2tOeStUZkZSL2p3cUo1blFt?=
- =?utf-8?B?T1pDaDl6T0xyL3lTMHVkdEh2YTh0d2cvNENISlFaQTR5V0plR0pKaTQ3bjhw?=
- =?utf-8?B?QWdxNk1NVjAzT1RTc3g4dXhhVUVkTTFOUGdMS3Z6V1IrdUhEMG9lYUZCUys2?=
- =?utf-8?B?TE8yWmZURVZ5WWp5QjYzbzFpbmhKVDErZDA2Vm9HeWd2ZnJJeW5CaVY5L2t2?=
- =?utf-8?B?cDR4dXp5b3creG84WWRYa0tDc3I2MHNXdFQxMzhIVk9GTndwd0dpTFpDT1Zz?=
- =?utf-8?B?di9EL3N5V1NZcWF5QXFmdjNXc0plclYydzdWT094YmNBRnMybEYxdCt2UFRJ?=
- =?utf-8?B?Y0FUQ3JsNlFQZHkvL0VkUmdNei8ycm92WUlya1Q1N1dGMGFrcG4wWHBML2JV?=
- =?utf-8?B?VkxiWWZiYlYwUFVadE55TDlyQ3dBL0hWRm9CVnNKb1FJMCtnV2JXNlpUeUFB?=
- =?utf-8?B?STQ0R2Z2VHFNYWZRNHRYUEkwSHVjQUxaT094RDd3aTZlYnBwV2M2SDZrR3FB?=
- =?utf-8?B?UVF2ZTNmejVQSWdkM1RhRTY0OWF3ZkRvejgvbXhvS1RiTm5hWFhQbE9kNnJM?=
- =?utf-8?B?NzFiL0YrMmJVVDM0VFdneVpETnNoVm0wU3AwU3VoY1FMMk1RQ0Mxd3BHY3Rz?=
- =?utf-8?B?RTFXZDdYeDVxeFBzNlhyM0V3dmd1Z0xnYmpuYXNuNzNtY0F3UWM2b0dnVEhV?=
- =?utf-8?B?NUplTitwOVhoVzZjUjB3S2NGNldEbG5PT3RHL0JUZ3Npb3M1bjlyNVhtWndN?=
- =?utf-8?B?WmRITzkvaVZmYy9kblhOeEdaRmFCOG0xL0hYV1hwazFuLzFSWGprNTFKbFg2?=
- =?utf-8?Q?p51sXHNi3ncl+jHyf3cZUomjzoOt0OUMUUNv8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8205.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cVVSNVc0em9YWENjdFFKakpqdTRvamhrTTJDMzhDRGdzSEZnNTNDQjlPQm5v?=
- =?utf-8?B?VVIxWWRxV3pLKzFOY2NGOXVuSVg4V0pQRVBabnlkK0NGc2RDbVJxK0JaSzc5?=
- =?utf-8?B?WFUrWFVyWlphN3VWRDN1TVV3UkpucGhwWE5FSGJjY3J1MndWYTBnY3FOYmJl?=
- =?utf-8?B?T1BZWjEreVUyaERlRUtmcGkxQmt1c01IYThWbzVLT2JmcmxWbUVCS0dyZS9X?=
- =?utf-8?B?WDZrdDJ1clRXMTdhWHRSbHo0L2tPb2l2Zm8zSE14UUl6Mk1mbGg3TnlVR3J0?=
- =?utf-8?B?YTZQN3NQekhkZjZVM1Q0dENheUM2VHdWSUkzYjkxdHk1THNTZjhIT3FJT2FO?=
- =?utf-8?B?QW53VVlFc3lwUmtCbWttNTIvbkl1Smt3TXNaSjh6UnNkb243R2Y1TnI3NkJK?=
- =?utf-8?B?Z2xhQ2JMWXg5Zjc5RlJPcWpKOXc2b0hoY3VMaTFFT1NqdEZRSXFaNVBneG1D?=
- =?utf-8?B?U01jcWxXR3JvazZKVzhFTkg2T2QyMzN0blhLR2tUT1R3Ky9mR3NqZm90TThZ?=
- =?utf-8?B?cmFERDc0TzhIYjNuWk1QdGVSVUxyUTVDMzJhN1RiYTJoamFYYlpqeWFPRDc5?=
- =?utf-8?B?WVFXaC9ZdnJuMkRFKy9QSlBpT3IySTRCb3FURzA2UVlPNHhzQlo1ZlBLOEU4?=
- =?utf-8?B?VFFDVDZvbS83SHhYK3ZvaFc5WmUvTDFIYlZEa1p3UEZKKzRraHpld2Y5V0NB?=
- =?utf-8?B?Q0RYNi9DM1pKQkV1akZvYVB0ai9lMXBabjhtaWh2TCtZWlcxS2RoTW5XNkpl?=
- =?utf-8?B?QUZRTU8zRklQNXhyOFZQeEFvTUJmejc2Y2dQOU5mVjNHdHBWTE9QcEZtVlNL?=
- =?utf-8?B?SEVWNnBmaFBScHJTekkzdjdnWS80Q1plajNWWkp4cmJvQUxVY0V2eFY1dVVV?=
- =?utf-8?B?ZzlSNllxR3JSMWZRSHpERWd6WjJ1RjYvQ3dtRmNwdElpRmcxcFNiQk9zRDFR?=
- =?utf-8?B?TDRoYXNSOS9GUno2ajdQK1dvRm5DanhqdjVEa3RiL3ZHaFZac1BGOE5naGxE?=
- =?utf-8?B?b2ZuS012VDhkNzJyL2VPVnFpT25CRnBOeFBqVmRIYnE1SkZHamhTODdnaFFP?=
- =?utf-8?B?RzdjMEVhR1BadWZCclp0RjFTbjNDUWVHUFNKYWMzNjlWeEE4c2xhZ29BWFNV?=
- =?utf-8?B?UTB6Rm04WEF6YXpqaWVZZmFheDgzcVV0VnZRWHRYSm5SdTZubXIvVE9JZXFp?=
- =?utf-8?B?eFY0KzdlclpROHVSemNmZTdqcU5qSUtYUTJPck5hRkVkUktnWE9QQ2Frenlm?=
- =?utf-8?B?UHgrMVFNTUdsUzZhQk9hSjFpeEE3MzE3OHg4ZzEzSSs4YlNGWWhDZE9LVWkx?=
- =?utf-8?B?YkNubityWnhIdzY1WUgrYmFLVnpWMTJqMjJZdnRqV3FIbGZCQ2ZDVFA4aUpp?=
- =?utf-8?B?Y3VoQ0NHOWM0S1psai9BN01jNkM5ekJ2OU45RTlRaTVNVVVkNVFISGM2c3hQ?=
- =?utf-8?B?NDBLS0Y2MVN6RlZYckpWVlo2ODgzaXFNTjFFZjR1dzBCWUhubVBvcUs3ajlR?=
- =?utf-8?B?VWM1Mkk5UnVFYWlPRjNFdVcvOC9jc0VPNlNYOFluVG4yQ0NMMVdjZTdGTUpn?=
- =?utf-8?B?TXk1ODFvU1Zsdmp3T1RsY1dpM0cyZGZ2NUtBYWRubm13ZWkyUm9jUHJ1S2Ft?=
- =?utf-8?B?T1d0dk9EL2wvQnB0Q1NXNWtxQkVXYXlGU0VpS3d2ZWo5ZE9OWUZGcUNYa3VL?=
- =?utf-8?B?aUIrTnJnYzcwYm1YSmF3a3JYSnFyd1c5TXVGKzBNRnRpRURrUENxUk95dk42?=
- =?utf-8?B?WXZNNmxYTVJzZkF3RmI1N0Q4R3huRGxLR0trTjN5VURMdkV2ZUh5OGZISXM5?=
- =?utf-8?B?eUszQVJubFF0Q3ZYajhUb013MURBMlU4YVliSnMxWXlYL2hVTW1ackJYUjVH?=
- =?utf-8?B?YStwVXYyS2NOS1VsbWxRbERjclViemx4S2F2VjByVlhCUGl4MHlsRlkwOVF5?=
- =?utf-8?B?TFRGdUF3em41NmZqTzZPc2pUQ085cEpTKzVvaEptVVF6RHNKWUFBWi9pYS80?=
- =?utf-8?B?NzQ4bEdGSWdtQWhrQTN4WTllSEdob0VVWWZnTFZpSXJUd2MxR00rWEVIMHVp?=
- =?utf-8?B?WEkvTkozSVdwdFRGMHdRVEpiRHZydW9OUDhHYU1qbXRYZHJNSysyRVI1VjBy?=
- =?utf-8?Q?XtIifcyNrb+NY5a5KZmsgq6yc?=
-X-OriginatorOrg: silabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8954abae-fdc1-4eb4-3a11-08dd9a39c0f9
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8205.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2025 20:38:19.9233
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 54dbd822-5231-4b20-944d-6f4abcd541fb
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YOF2ktF3KuZpQz8n7NJzWIzwCPlq9MlX1EXWVyrxONa4Yw9FGPk8gK6eTfHTSxMykBqjMcPzA4o989ngaEUMbQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6829
-X-Authority-Analysis: v=2.4 cv=JOc7s9Kb c=1 sm=1 tr=0 ts=6830dcc1 cx=c_pps a=73ZZgQctQage88DP8+znzA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=P-IC7800AAAA:8 a=5Bv2-q0KtQimkH2IRR4A:9 a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-ORIG-GUID: XG-szbRTsgfmSVAPuA_ml9SiyKy0CpmP
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDE4OCBTYWx0ZWRfX64mb/z4WQNdV WAz+nq73lFTb6jNxw0cuVf+DzhUn3Plf9uk+QdXnXFucVNuy+yqJAhD1gsv6GD8SE2GaHa9wDWY RIMPkJ3XPkgukGmzkXrOXLpySZ4nP6TrpgcjalRnGwrnb96EZwrmCzzTteyTOzKKuQxVRR6PNfQ
- LAlhK2evVnnuG6sMZHgH+J7Wk+7Mtcll7DLaxUrMHonOud2pDEw5bVI7b3zrBjvbH1NtRPyQMI5 VsU5aBxT8qexGhFElhEOzcKUuG7hmYgzLrlB6xtgzevLaJMmGJSB6toAk/xcw+mv0tYzdZRifw4 1KNpHNdBILOuNDCDhJiKFN6vG75faK3Q1tfLi22AbdsOyLU9lvVIzBw725/Pj1HHJ8WK6PQNY6j
- pPLBK5woIaxESLktUdn95yuFp77g7fL2UIL/Cg5aQmgiqOa2ZbV8Vra7xYk9OtN6r65KeiY2
-X-Proofpoint-GUID: XG-szbRTsgfmSVAPuA_ml9SiyKy0CpmP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-23_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- clxscore=1015 phishscore=0 suspectscore=0 spamscore=0 priorityscore=1501
- bulkscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=999
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.21.0-2505160000
- definitions=main-2505230188
+Content-Transfer-Encoding: 8bit
 
-On Fri May 23, 2025 at 4:06 PM EDT, Andrew Lunn wrote:
->> I don't really know about UniPro and I'm learning about it as the
->> discussion goes, but one of the point listed on Wikipedia is
->> "reliability - data errors detected and correctable via retransmission"
->>
->> This is where CPC could come in, probably with a different name and a
->> reduced scope, as a way to implement reliable transmission over UART,
->> SPI, SDIO, by ensuring data errors are detected and packets
->> retransmitted if necessary, and be limited to that.
->
-> You mentioned HDLC in the past. What is interesting is that HDLC is
-> actually used in Greybus:
->
-> https://elixir.bootlin.com/linux/v6.15-rc7/source/drivers/greybus/gb-beag=
-leplay.c*L581
->
-> I've no idea if its just for framing, or if there is also retries on
-> errors, S-frames with flow and error control etc. There might be code
-> you can reuse here.
+With VIRTCHNL2_CAP_MACFILTER enabled, the following warning is generated
+on module load:
 
-Yeah I've seen it when looking at Greybus, from what I could see it's
-only framing. There is a CRC check though, frames received that don't
-pass that check are not passed to Greybus layer.
+[  324.701677] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:578
+[  324.701684] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1582, name: NetworkManager
+[  324.701689] preempt_count: 201, expected: 0
+[  324.701693] RCU nest depth: 0, expected: 0
+[  324.701697] 2 locks held by NetworkManager/1582:
+[  324.701702]  #0: ffffffff9f7be770 (rtnl_mutex){....}-{3:3}, at: rtnl_newlink+0x791/0x21e0
+[  324.701730]  #1: ff1100216c380368 (_xmit_ETHER){....}-{2:2}, at: __dev_open+0x3f0/0x870
+[  324.701749] Preemption disabled at:
+[  324.701752] [<ffffffff9cd23b9d>] __dev_open+0x3dd/0x870
+[  324.701765] CPU: 30 UID: 0 PID: 1582 Comm: NetworkManager Not tainted 6.15.0-rc5+ #2 PREEMPT(voluntary)
+[  324.701771] Hardware name: Intel Corporation M50FCP2SBSTD/M50FCP2SBSTD, BIOS SE5C741.86B.01.01.0001.2211140926 11/14/2022
+[  324.701774] Call Trace:
+[  324.701777]  <TASK>
+[  324.701779]  dump_stack_lvl+0x5d/0x80
+[  324.701788]  ? __dev_open+0x3dd/0x870
+[  324.701793]  __might_resched.cold+0x1ef/0x23d
+<..>
+[  324.701818]  __mutex_lock+0x113/0x1b80
+<..>
+[  324.701917]  idpf_ctlq_clean_sq+0xad/0x4b0 [idpf]
+[  324.701935]  ? kasan_save_track+0x14/0x30
+[  324.701941]  idpf_mb_clean+0x143/0x380 [idpf]
+<..>
+[  324.701991]  idpf_send_mb_msg+0x111/0x720 [idpf]
+[  324.702009]  idpf_vc_xn_exec+0x4cc/0x990 [idpf]
+[  324.702021]  ? rcu_is_watching+0x12/0xc0
+[  324.702035]  idpf_add_del_mac_filters+0x3ed/0xb50 [idpf]
+<..>
+[  324.702122]  __hw_addr_sync_dev+0x1cf/0x300
+[  324.702126]  ? find_held_lock+0x32/0x90
+[  324.702134]  idpf_set_rx_mode+0x317/0x390 [idpf]
+[  324.702152]  __dev_open+0x3f8/0x870
+[  324.702159]  ? __pfx___dev_open+0x10/0x10
+[  324.702174]  __dev_change_flags+0x443/0x650
+<..>
+[  324.702208]  netif_change_flags+0x80/0x160
+[  324.702218]  do_setlink.isra.0+0x16a0/0x3960
+<..>
+[  324.702349]  rtnl_newlink+0x12fd/0x21e0
 
-Another aspect we would like to support is buffer management. In our
-implementation, each endpoint has its dedicated pool of RX buffers and
-the number of available buffers is advertised to the remote, so the
-Linux driver can delay transmission of packets if endpoints are out of
-RX buffers.
+The sequence is as follows:
+	rtnl_newlink()->
+	__dev_change_flags()->
+	__dev_open()->
+	dev_set_rx_mode() - >  # disables BH and grabs "dev->addr_list_lock"
+	idpf_set_rx_mode() ->  # proceed only if VIRTCHNL2_CAP_MACFILTER is ON
+	__dev_uc_sync() ->
+	idpf_add_mac_filter ->
+	idpf_add_del_mac_filters ->
+	idpf_send_mb_msg() ->
+	idpf_mb_clean() ->
+	idpf_ctlq_clean_sq()   # mutex_lock(cq_lock)
 
-We decide to implement that mostly because that would get us the best
-throughtput possible. Sending a packet to an endpoint that doesn't have
-room for it means the packet will be dropped and we have to wait for a
-retransmission to occur, which degrades performance.
+Fix by converting cq_lock to a spinlock. All operations under the new
+lock are safe except freeing the DMA memory, which may use vunmap(). Fix
+by requesting a contiguous physical memory for the DMA mapping.
+
+Fixes: a251eee62133 ("idpf: add SRIOV support and other ndo_ops")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+---
+ .../net/ethernet/intel/idpf/idpf_controlq.c   | 23 +++++++++----------
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |  2 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 12 ++++++----
+ 3 files changed, 20 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq.c b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+index b28991dd1870..48b8e184f3db 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_controlq.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+@@ -96,7 +96,7 @@ static void idpf_ctlq_init_rxq_bufs(struct idpf_ctlq_info *cq)
+  */
+ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
+ {
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	/* free ring buffers and the ring itself */
+ 	idpf_ctlq_dealloc_ring_res(hw, cq);
+@@ -104,8 +104,7 @@ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
+ 	/* Set ring_size to 0 to indicate uninitialized queue */
+ 	cq->ring_size = 0;
+ 
+-	mutex_unlock(&cq->cq_lock);
+-	mutex_destroy(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ }
+ 
+ /**
+@@ -173,7 +172,7 @@ int idpf_ctlq_add(struct idpf_hw *hw,
+ 
+ 	idpf_ctlq_init_regs(hw, cq, is_rxq);
+ 
+-	mutex_init(&cq->cq_lock);
++	spin_lock_init(&cq->cq_lock);
+ 
+ 	list_add(&cq->cq_list, &hw->cq_list_head);
+ 
+@@ -272,7 +271,7 @@ int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	int err = 0;
+ 	int i;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	/* Ensure there are enough descriptors to send all messages */
+ 	num_desc_avail = IDPF_CTLQ_DESC_UNUSED(cq);
+@@ -332,7 +331,7 @@ int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	wr32(hw, cq->reg.tail, cq->next_to_use);
+ 
+ err_unlock:
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	return err;
+ }
+@@ -364,7 +363,7 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
+ 	if (*clean_count > cq->ring_size)
+ 		return -EBADR;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	ntc = cq->next_to_clean;
+ 
+@@ -397,7 +396,7 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
+ 
+ 	cq->next_to_clean = ntc;
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	/* Return number of descriptors actually cleaned */
+ 	*clean_count = i;
+@@ -435,7 +434,7 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	if (*buff_count > 0)
+ 		buffs_avail = true;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	if (tbp >= cq->ring_size)
+ 		tbp = 0;
+@@ -524,7 +523,7 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 		wr32(hw, cq->reg.tail, cq->next_to_post);
+ 	}
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	/* return the number of buffers that were not posted */
+ 	*buff_count = *buff_count - i;
+@@ -552,7 +551,7 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
+ 	u16 i;
+ 
+ 	/* take the lock before we start messing with the ring */
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	ntc = cq->next_to_clean;
+ 
+@@ -614,7 +613,7 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
+ 
+ 	cq->next_to_clean = ntc;
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	*num_q_msg = i;
+ 	if (*num_q_msg == 0)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+index e8e046ef2f0d..5890d8adca4a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+@@ -99,7 +99,7 @@ struct idpf_ctlq_info {
+ 
+ 	enum idpf_ctlq_type cq_type;
+ 	int q_id;
+-	struct mutex cq_lock;		/* control queue lock */
++	spinlock_t cq_lock;		/* control queue lock */
+ 	/* used for interrupt processing */
+ 	u16 next_to_use;
+ 	u16 next_to_clean;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 2ed801398971..fe96e2057366 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -2329,8 +2329,12 @@ void *idpf_alloc_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem, u64 size)
+ 	struct idpf_adapter *adapter = hw->back;
+ 	size_t sz = ALIGN(size, 4096);
+ 
+-	mem->va = dma_alloc_coherent(&adapter->pdev->dev, sz,
+-				     &mem->pa, GFP_KERNEL);
++	/* The control queue resources are freed under a spinlock, contiguous
++	 * pages will avoid IOMMU remapping and the use vmap (and vunmap in
++	 * dma_free_*() path.
++	 */
++	mem->va = dma_alloc_attrs(&adapter->pdev->dev, sz, &mem->pa,
++				  GFP_KERNEL, DMA_ATTR_FORCE_CONTIGUOUS);
+ 	mem->size = sz;
+ 
+ 	return mem->va;
+@@ -2345,8 +2349,8 @@ void idpf_free_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem)
+ {
+ 	struct idpf_adapter *adapter = hw->back;
+ 
+-	dma_free_coherent(&adapter->pdev->dev, mem->size,
+-			  mem->va, mem->pa);
++	dma_free_attrs(&adapter->pdev->dev, mem->size,
++		       mem->va, mem->pa, DMA_ATTR_FORCE_CONTIGUOUS);
+ 	mem->size = 0;
+ 	mem->va = NULL;
+ 	mem->pa = 0;
+-- 
+2.43.0
+
 
