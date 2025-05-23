@@ -1,142 +1,192 @@
-Return-Path: <netdev+bounces-193105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82167AC285A
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:15:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C410CAC2863
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 19:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44BB25440D2
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:15:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F34441B66673
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 17:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECD4297B74;
-	Fri, 23 May 2025 17:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA842253E4;
+	Fri, 23 May 2025 17:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AwgU7xHF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nrDIlR+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C9B2980BA
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 17:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062552DCBFE;
+	Fri, 23 May 2025 17:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748020509; cv=none; b=RDKWNFmlJojGRF3OqTeWEz1tSO5E1sixbQ8N84NVQxSDKYADTrpSvYXBEDqfyddqyvyL4m++CsHdzmIk5+W19ilzVuzL8T0jXgXXbejJ9Wqj0Uy0nqkE2MY7FTAraVy9y6uucg77Cqad+BYL5APbRdtwjz8zJN69aKxaAPChVtc=
+	t=1748020657; cv=none; b=qlfRGvKDK8FkUijyjQa5G/OqSWFkoWpKLOu5ddCYRfcECMO3wh0NPI3biEgWian2YbcF8+G+niuYrJwEfvXcT4u0Ybb4pA1pckKouiTT6NgPo/a+0RabaATOtzmjdGG1zEOPcylbuT0jwa2wlaxjaPh4ZmzD5jjSS5nNshfMYc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748020509; c=relaxed/simple;
-	bh=IHS8+BmUXeAp3Xzbk8VRC75jhVDLrcvcJDpOGyFT7GU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Prw+Rfo9VlBtuFcAULOo3VKiQZ/gl8qTzMHRFS0cl3WV9Q6lJkdlcpjDUOzVE2PMD4UmejX6K+j+4WMlEiXM5jha6f9cqHb6sB+K2Yjzg4pMDtTifjuHMV558EDhMSsst0mLwDa7dzcOoCCcU1CsZKmMthSIIszO57HHjt89kbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AwgU7xHF; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-231f6c0b692so11415ad.0
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 10:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748020507; x=1748625307; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1L0JjzOjlHgjWZPMHxouS8dOF8m0fP7fyoaNhah9J5s=;
-        b=AwgU7xHFPElDMpaAU2nPAe0detPN0TBDBZo9r3J8vgltoaJUD6xbW+C4kcqpRTU/H+
-         6K4rkF4f2uQt5i+JqWLT0ClCJebaZn20/vB9xGle/iNkNyt8XvReWD6cOdoDCAljwm+s
-         NcRAlv24FvVZW04dVKNX2qK5zQsTS1JmpKRoIlu52XbRWD0uUYR7yPdgITxg4iO/0BK4
-         sYe3wfRTiWIb5dvpWnqNJIbDojNAk1GRbc21Gu3uttpmR659UGJjyU0fQ81iQwHyXOBa
-         DHWBDsexEyVggLoH00S2STn56e0Qy27cIdNRoA4D0baHyJ+ETyoVH5ILg01dG+wF63UD
-         oKlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748020507; x=1748625307;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1L0JjzOjlHgjWZPMHxouS8dOF8m0fP7fyoaNhah9J5s=;
-        b=W5uVE/RDG6QdW4mVE/ZiT2nlsogdjVugMB/MpT9K3MD+ZMZaIo/0JdNl+7WmnSKY8C
-         LfM82hjWL8mT7/PLaRfHoCOq5m/QSyoG0QmpepzWcN8O+zIEmfLS/LOby9vCN11lxnel
-         mgo0mTvoPnh2BOsT+qWUyoNp91TiZ9u6hM2VNufGlm9brVjEtajRppXTImLnNFPGpkmb
-         UqDVTyBZ52c79vJ8CHD0k19hvozDm5SFGUvEpE2rx9F/EHaeBZZozMtW4ReFzi6YAb/q
-         5i1sfo6hUTZalFTA226vY8w4gilFbsBcA1DnNr6ynVJlJkW+i4oEyyUhj+EeLb7yE7AT
-         mrRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXRLMEGZHdS8qPcOcbLOqmvhgK58eq3TXacubTU8lGqMdet/u0aWiOAbSxDqc6RxctAR6v5is=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyV9gcR2bEoohGaaSPKqW6zAv6/QynvTyQv3/Bh8Fpl7HjNQLul
-	XCk961plCxYxRySlp/uZGT7en3w6pDZmWL4zSpCBKrriyJOutlLD0hCbGqy3//WflzSR2wy5Tzk
-	9EUCDURYn4dU4OuQZIcPV7mgXUAfA3/HBCIJFThe/
-X-Gm-Gg: ASbGncvlZ8Jh9mTDZTG8LjnExPqLMjYiXmiGfCufDfNsDZ2XArR1TuQ5J5B9cJRDiTv
-	ImbFkcfPE2f4bZRqHPNzuaD6K+GDH4ApIu04YI1ItteFuZh7tU5yNTIVOLPxriT3cK5RzTfTEg6
-	1afJdF6YUJY1xaLM6dNruhLAxPZq+NTpcrbHazZ/x3X+aVZY+hjtzU4JPbklUtxHjn5e1sRhaL3
-	WUKiur+2Sc+
-X-Google-Smtp-Source: AGHT+IHKY4+eyOTipL+J4QWHEmhi7z98sbn5GuQRI5Ig+KizZC1qpLnfhveOl7CVrrTaKZsQhRy6NnMNBA8jCy7xQ54=
-X-Received: by 2002:a17:903:2348:b0:216:7aaa:4c5f with SMTP id
- d9443c01a7336-233f34df516mr2608055ad.3.1748020506755; Fri, 23 May 2025
- 10:15:06 -0700 (PDT)
+	s=arc-20240116; t=1748020657; c=relaxed/simple;
+	bh=VtqYDADSD+9g4gOpQfp0t5SIzJac5qrHjWQds4iw7C8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d+FafVMkIXaNVSy2KAzNGr7IQgJh1wPMoAewG4gXvCnEQ8iUH+u83ghvAX643FZX6Q+FnTvADuh/gQNWyNrvBoTjw+RsPi6cpuCTe4VcMWDZO6/n41ddn2ebLwv6NLYHyUxrzPAxORcCEmicFvo8kYF/cL2Yx0tWR9NYTMAA/Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nrDIlR+5; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748020656; x=1779556656;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VtqYDADSD+9g4gOpQfp0t5SIzJac5qrHjWQds4iw7C8=;
+  b=nrDIlR+5vaf6LTGy0Ryz+nfn31Ug76cyDo5k44YdKANBJpMg28JYJNDL
+   MVdqxAVH4NbdGks3wSVjWoLwh9RBWAfONd/I3GZGmyjPp7lgzm5NGspKk
+   KUlEYpteHQxSn8ggIsR5jSs+U2kwdxY1GjLeN0/WiDBN+ewGPDkhkobHB
+   hDyzgSB0LqZoI/sGnUqlM474VdltSRucGXyq/QhPSbJlYl1quPNuQIPtO
+   NsQATCS7YjnyfWyIJhmW8sdu5+9Kp7oldhBZPyLTN4I/HV1LDuzvmwjH2
+   Bxm9CVv6T9Hr9Wd5OBdQQ/yVFMEWAfnVf5f+HztLStp0CpcnKhajjTZbY
+   A==;
+X-CSE-ConnectionGUID: aEATL9OISO+z47F85dVVJQ==
+X-CSE-MsgGUID: R3PUfUbETQikCTYOEoqF+g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="50008200"
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="50008200"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 10:17:22 -0700
+X-CSE-ConnectionGUID: qVEhXmnVRtiLQvylOYTIwQ==
+X-CSE-MsgGUID: jyr4rZg6S3+79dGN0sHlfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,309,1739865600"; 
+   d="scan'208";a="146198911"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 23 May 2025 10:17:15 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uIW1B-000Qc0-0b;
+	Fri, 23 May 2025 17:17:13 +0000
+Date: Sat, 24 May 2025 01:16:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
+	almasrymina@google.com, ilias.apalodimas@linaro.org,
+	harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+	davem@davemloft.net, john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com,
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com
+Subject: Re: [PATCH 18/18] mm, netmem: remove the page pool members in struct
+ page
+Message-ID: <202505240152.9ODpQBK0-lkp@intel.com>
+References: <20250523032609.16334-19-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523032609.16334-1-byungchul@sk.com> <20250523032609.16334-15-byungchul@sk.com>
-In-Reply-To: <20250523032609.16334-15-byungchul@sk.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 23 May 2025 10:14:54 -0700
-X-Gm-Features: AX0GCFuS-_ZvIZXs7vWDJYGmbnFNShYZqaEghvfevVpzOFymPJ1-gQ7S9gnP9aI
-Message-ID: <CAHS8izMRDixoLC5p1+h4oxrfVvErXcokR6qC_zuOqBredBBMbA@mail.gmail.com>
-Subject: Re: [PATCH 14/18] netmem: use _Generic to cover const casting for page_to_netmem()
-To: Byungchul Park <byungchul@sk.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
-	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
-	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250523032609.16334-19-byungchul@sk.com>
 
-On Thu, May 22, 2025 at 8:26=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> The current page_to_netmem() doesn't cover const casting resulting in
-> trying to cast const struct page * to const netmem_ref fails.
->
-> To cover the case, change page_to_netmem() to use macro and _Generic.
->
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
+Hi Byungchul,
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+kernel test robot noticed the following build errors:
 
-> ---
->  include/net/netmem.h | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index 29c005d70c4f..c2eb121181c2 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -172,10 +172,9 @@ static inline netmem_ref net_iov_to_netmem(struct ne=
-t_iov *niov)
->         return (__force netmem_ref)((unsigned long)niov | NET_IOV);
->  }
->
-> -static inline netmem_ref page_to_netmem(struct page *page)
-> -{
-> -       return (__force netmem_ref)page;
-> -}
-> +#define page_to_netmem(p)      (_Generic((p),                  \
-> +       const struct page *:    (__force const netmem_ref)(p),  \
-> +       struct page *:          (__force netmem_ref)(p)))
->
->  static inline netmem_ref alloc_netmems_node(int nid, gfp_t gfp_mask,
->                 unsigned int order)
-> --
-> 2.17.1
->
+[auto build test ERROR on f44092606a3f153bb7e6b277006b1f4a5b914cfc]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/netmem-introduce-struct-netmem_desc-struct_group_tagged-ed-on-struct-net_iov/20250523-112806
+base:   f44092606a3f153bb7e6b277006b1f4a5b914cfc
+patch link:    https://lore.kernel.org/r/20250523032609.16334-19-byungchul%40sk.com
+patch subject: [PATCH 18/18] mm, netmem: remove the page pool members in struct page
+config: x86_64-rhel-9.4-kunit (https://download.01.org/0day-ci/archive/20250524/202505240152.9ODpQBK0-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250524/202505240152.9ODpQBK0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505240152.9ODpQBK0-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/net/intel/libie/rx.h:7,
+                    from drivers/net/ethernet/intel/iavf/iavf_txrx.c:5:
+   include/net/libeth/rx.h: In function 'libeth_rx_sync_for_cpu':
+   include/net/libeth/rx.h:140:40: error: 'struct page' has no member named 'pp'
+     140 |         page_pool_dma_sync_for_cpu(page->pp, page, fqe->offset, len);
+         |                                        ^~
+   drivers/net/ethernet/intel/iavf/iavf_txrx.c: In function 'iavf_add_rx_frag':
+>> drivers/net/ethernet/intel/iavf/iavf_txrx.c:1200:33: error: 'struct page' has no member named 'pp'
+    1200 |         u32 hr = rx_buffer->page->pp->p.offset;
+         |                                 ^~
+   drivers/net/ethernet/intel/iavf/iavf_txrx.c: In function 'iavf_build_skb':
+   drivers/net/ethernet/intel/iavf/iavf_txrx.c:1217:33: error: 'struct page' has no member named 'pp'
+    1217 |         u32 hr = rx_buffer->page->pp->p.offset;
+         |                                 ^~
+--
+   In file included from drivers/net/ethernet/intel/idpf/idpf_txrx.c:4:
+   include/net/libeth/rx.h: In function 'libeth_rx_sync_for_cpu':
+   include/net/libeth/rx.h:140:40: error: 'struct page' has no member named 'pp'
+     140 |         page_pool_dma_sync_for_cpu(page->pp, page, fqe->offset, len);
+         |                                        ^~
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c: In function 'idpf_rx_page_rel':
+>> drivers/net/ethernet/intel/idpf/idpf_txrx.c:389:45: error: 'struct page' has no member named 'pp'
+     389 |         page_pool_put_full_page(rx_buf->page->pp, rx_buf->page, false);
+         |                                             ^~
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c: In function 'idpf_rx_add_frag':
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c:3254:30: error: 'struct page' has no member named 'pp'
+    3254 |         u32 hr = rx_buf->page->pp->p.offset;
+         |                              ^~
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c: In function 'idpf_rx_hsplit_wa':
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c:3286:64: error: 'struct page' has no member named 'pp'
+    3286 |         dst = page_address(hdr->page) + hdr->offset + hdr->page->pp->p.offset;
+         |                                                                ^~
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c:3287:64: error: 'struct page' has no member named 'pp'
+    3287 |         src = page_address(buf->page) + buf->offset + buf->page->pp->p.offset;
+         |                                                                ^~
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c: In function 'idpf_rx_build_skb':
+   drivers/net/ethernet/intel/idpf/idpf_txrx.c:3305:27: error: 'struct page' has no member named 'pp'
+    3305 |         u32 hr = buf->page->pp->p.offset;
+         |                           ^~
+--
+   In file included from drivers/net/wireless/mediatek/mt76/mt76x2/../mt76x02.h:12,
+                    from drivers/net/wireless/mediatek/mt76/mt76x2/mt76x2.h:23,
+                    from drivers/net/wireless/mediatek/mt76/mt76x2/eeprom.c:9:
+   drivers/net/wireless/mediatek/mt76/mt76x2/../mt76.h: In function 'mt76_put_page_pool_buf':
+>> drivers/net/wireless/mediatek/mt76/mt76x2/../mt76.h:1788:37: error: 'struct page' has no member named 'pp'
+    1788 |         page_pool_put_full_page(page->pp, page, allow_direct);
+         |                                     ^~
 
 
---=20
-Thanks,
-Mina
+vim +1200 drivers/net/ethernet/intel/iavf/iavf_txrx.c
+
+7f12ad741a4870 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Greg Rose         2013-12-21  1184  
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1185  /**
+56184e01c00d6d drivers/net/ethernet/intel/iavf/iavf_txrx.c   Jesse Brandeburg  2018-09-14  1186   * iavf_add_rx_frag - Add contents of Rx buffer to sk_buff
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1187   * @skb: sk_buff to place the data into
+5fa4caff59f251 drivers/net/ethernet/intel/iavf/iavf_txrx.c   Alexander Lobakin 2024-04-18  1188   * @rx_buffer: buffer containing page to add
+a0cfc3130eef54 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1189   * @size: packet length from rx_desc
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1190   *
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1191   * This function will add the data contained in rx_buffer->page to the skb.
+fa2343e9034ce6 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1192   * It will just attach the page as a frag to the skb.
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1193   *
+fa2343e9034ce6 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1194   * The function will then update the page offset.
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1195   **/
+5fa4caff59f251 drivers/net/ethernet/intel/iavf/iavf_txrx.c   Alexander Lobakin 2024-04-18  1196  static void iavf_add_rx_frag(struct sk_buff *skb,
+5fa4caff59f251 drivers/net/ethernet/intel/iavf/iavf_txrx.c   Alexander Lobakin 2024-04-18  1197  			     const struct libeth_fqe *rx_buffer,
+a0cfc3130eef54 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1198  			     unsigned int size)
+ab9ad98eb5f95b drivers/net/ethernet/intel/i40evf/i40e_txrx.c Jesse Brandeburg  2016-04-18  1199  {
+5fa4caff59f251 drivers/net/ethernet/intel/iavf/iavf_txrx.c   Alexander Lobakin 2024-04-18 @1200  	u32 hr = rx_buffer->page->pp->p.offset;
+efa14c3985828d drivers/net/ethernet/intel/iavf/iavf_txrx.c   Mitch Williams    2019-05-14  1201  
+fa2343e9034ce6 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1202  	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buffer->page,
+5fa4caff59f251 drivers/net/ethernet/intel/iavf/iavf_txrx.c   Alexander Lobakin 2024-04-18  1203  			rx_buffer->offset + hr, size, rx_buffer->truesize);
+9a064128fc8489 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1204  }
+9a064128fc8489 drivers/net/ethernet/intel/i40evf/i40e_txrx.c Alexander Duyck   2017-03-14  1205  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
