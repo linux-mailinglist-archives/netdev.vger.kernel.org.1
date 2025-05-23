@@ -1,156 +1,156 @@
-Return-Path: <netdev+bounces-192908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB83AC1994
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:19:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26C8AC19D2
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 03:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F25F316D7AB
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 01:19:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4367C16EE6A
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 01:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AA221767D;
-	Fri, 23 May 2025 01:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hjn0PNzF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2731D1F4171;
+	Fri, 23 May 2025 01:52:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE08207A3A
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 01:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9B0202C3E;
+	Fri, 23 May 2025 01:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747963088; cv=none; b=W8g/Bs7JfDjaRR/x6edoWvlTYo3OjsCU8ejbNud1RVFLelxKyVxocUB0Oz8Wr16RhXlq59PhfaMaARbNuKmQ0ZBe6bB0WFwvvEw1Piw0ppSxfBq/XIcQ1KB9I6JoAUrjPRkZAr+AgErck0bxqsawE9gzU3wHWBDtPWgqCD9OY0E=
+	t=1747965146; cv=none; b=l1GqPmAcqIHY6zEhHjx7m6nI3q3eQmAs7x7OjVUNVgbYobpXVc9N/L+wIrGwN7MSLDj8Gr/3JfjVxus/SlSmSMYWtHLX8LGRixLQB7PzrFAw9DeXiz76TwFXcZ5P4blj66G+jdsjbZ59xgD+dNYtH8Ax3VUumERQfNjPh1FsK7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747963088; c=relaxed/simple;
-	bh=6sGa3dgT2uBNY1rfCSQXy/l9xJyuQ/jmpLR+hExcbJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XrmSN6a9ZxcojkRWHTzU5KDCVSdkPnwHdMfC4TN8CYg7DFEvXZ8eheACcl1ApfmnxS5rrBsIvTtffpUzbIbYC7HJ4AFavsP/DjzKIPRJKtuLg7s9dpS+Lm2F46RGQ9g7W43Q/MPqZDNXJCLr0TUpQOxTAqlsRtm4AI1VPFc/QE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hjn0PNzF; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-550eaf7144cso6e87.0
-        for <netdev@vger.kernel.org>; Thu, 22 May 2025 18:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747963084; x=1748567884; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fYVm0Wz/IrzVHcR1HnROuiWFcqay2TxyWPAyn+gfIuM=;
-        b=hjn0PNzFiiR6VJn2oPDTPxUVQOWs21UUxVrS0wB+wJMqz5jtqDubRnteJy+Vn9s9h1
-         GD3j8ceZ7bDZAJVUccavTlyCU34VMm4gObSuLa2h7/J3gm2LTYNCsADoRven1yuVRWE9
-         qNwuNeazC40bNsOva1u7PbzpnweUAyS9qrmSURdXgjwgzvn4EyrnaYIJ8U99dWr4HdOe
-         /C716ioIUgD/3eLo5MWE8VC5sisKkzVXVUVL/n3Yj9i+6QscwO6TEPz2NvDAgB1OUBtc
-         0ElYgT+Gx52zzf7BT94kW0xPEs+CBT44cNwfpPFIE4Gg0HxUH4Gengt5EqIh113V8ANd
-         M89g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747963084; x=1748567884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fYVm0Wz/IrzVHcR1HnROuiWFcqay2TxyWPAyn+gfIuM=;
-        b=lGoeWnmvFyxMmytosvYnKjGMKuaR8/VbFm1z03MLmlVGvGnSylvlc8z3JyyHYMGVuD
-         tX1eGMxmuV/fUepfrYNM0RaLql8RCuyAmJOIk+izIU0flvCIi6bHytGkK1CaywxuM0D2
-         fdD331u7w4I4pfj+5rkezXPUcjXRCXNzVZTVsFKqnsruRKLqrx16tqFancoQPoWFD36k
-         d1tdikEc9Fm5FPJgmd4Tbpw0JFH9dZFsY8tyh8iyFmh0fqan6rkvoLE3nHnCAOIYwOBr
-         JFd0QtNwF6zAu2/1PZDgldjXeZx1iSySK3TUmK/SnqY4niJc+TLOg7DB8f0xrKv0eQRb
-         l7iw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfHi2IpW/htUS4IqopIaIqoHcdZSuyM0hepq16ztC+NNNeVqJcEpXljweMim+aViUNupbgNDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqZIlQKic7jOu/BwM+4dd2XihLbwiYSwoobu4HWJw/EuCeeb8u
-	xHaiwPmLbRy/DJHRIv8sfZdo++r7QBMhZqnlYghfgw3Kt0TDveEzwkstV0LNM3p01mzAz+54UgV
-	DaipGOYNALV4FYFXj9MpwCxDyNGIGL1ei+mRSS/WM1YEtfV5C2D2XE6EVLQw=
-X-Gm-Gg: ASbGncshoiMY2MYjPe9yYw1IwyD1vMcOGRMM09jD5nywJPtZzK9ILK20kxexQbTNCPv
-	MBuAUjV8dOZ8HCPAr5+B5IWZrS+pVXktf1Ak5hrKoc1nmdEZqr6gbc7ig9YnZnUsvaLBShwgGHH
-	wbLIFi3LL3loxaFCwanIquSSwQmqNZUk+BD/v1Al23ci0V+lSWzr7s+UghtAG2mF2OsRDQSW3c
-X-Google-Smtp-Source: AGHT+IG4NBEhuVgLc1g60SsEqIvgjVS8hg/TxrkFg1ZaNJrTdqq8uwqUmNQlqDqAT+KkcvxdLuzHkprq8Jwx6MzEUCk=
-X-Received: by 2002:a19:3855:0:b0:54d:6ccd:4d6b with SMTP id
- 2adb3069b0e04-552184e77f2mr150e87.0.1747963082028; Thu, 22 May 2025 18:18:02
- -0700 (PDT)
+	s=arc-20240116; t=1747965146; c=relaxed/simple;
+	bh=uouMkHQJEv9eK/Egv5tzPhNwrlsLTqqkNAi24xHuPlc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iBtnC12rEILquEFov3HmCz47K7uS5/3dgaV/NMDcW1taBFyc0uZ0x5qdXmjRG3xk2uXdewq76k5yjLd+DrZighq1UYEQLNvwJzb9kLf+acDx/w/F+3hCW/O6I7ESkYjRJ9vqDU2+iaM4cMQPXh9+uJfO04DlInL4Bporvr3ndHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4b3SmL4bFmz13LFD;
+	Fri, 23 May 2025 09:50:42 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1B6721400E3;
+	Fri, 23 May 2025 09:52:20 +0800 (CST)
+Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 23 May 2025 09:52:19 +0800
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 23 May 2025 09:52:19 +0800
+Message-ID: <722186ce-174e-4201-acdf-ebf731fff7a3@huawei.com>
+Date: Fri, 23 May 2025 09:52:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174794271559.992.2895280719007840700.reportbug@localhost>
- <CAMw=ZnSsy3t+7uppThVVf2610iCTTSdg+YG5q9FEa=tBn_aLpw@mail.gmail.com>
- <f6475bd4-cf7e-4b96-8486-8c3d084679fc@kernel.org> <CAMw=ZnT7tcjC6z-9xuMbeC5RhDiaPRHaZB_2i_6WYNJ=cm1QVg@mail.gmail.com>
- <CADXeF1Hmuc2NoA=Dg1n_3Yi-2kzGNZQdotb4HJpE-0X9K9Qf5Q@mail.gmail.com> <CAMw=ZnTLuVjisLhD2nA094gOE2wkTLyr90Do0QidF5nHG_0k9g@mail.gmail.com>
-In-Reply-To: <CAMw=ZnTLuVjisLhD2nA094gOE2wkTLyr90Do0QidF5nHG_0k9g@mail.gmail.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Fri, 23 May 2025 10:17:23 +0900
-X-Gm-Features: AX0GCFt2_Iv8NBZStmMMhAOi6Vj0N4nGJhVVTiPChdNxGMIV_bA6OeetMbIIa8I
-Message-ID: <CADXeF1HXAteCQZ6aA2TKEdsSD3-zJx+DA5nKhEzT9v0N64sFiA@mail.gmail.com>
-Subject: Re: Bug#1106321: iproute2: "ip monitor" fails with current trixie's
- linux kernel / iproute2 combination
-To: Luca Boccassi <bluca@debian.org>
-Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
-	1106321@bugs.debian.org, Netdev <netdev@vger.kernel.org>, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG Report] KASAN: slab-use-after-free in
+ page_pool_recycle_in_ring
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Mina Almasry <almasrymina@google.com>, <hawk@kernel.org>,
+	<ilias.apalodimas@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <zhangchangzhong@huawei.com>
+References: <20250513083123.3514193-1-dongchenchen2@huawei.com>
+ <CAHS8izOio0bnLp3+Vzt44NVgoJpmPTJTACGjWvOXvxVqFKPSwQ@mail.gmail.com>
+ <34f06847-f0d8-4ff3-b8a1-0b1484e27ba8@huawei.com>
+ <CAHS8izPh5Z-CAJpQzDjhLVN5ye=5i1zaDqb2xQOU3QP08f+Y0Q@mail.gmail.com>
+ <20250519154723.4b2243d2@kernel.org>
+ <CAHS8izMenFPVAv=OT-PiZ-hLw899JwVpB-8xu+XF+_Onh_4KEw@mail.gmail.com>
+ <20250520110625.60455f42@kernel.org>
+ <29d3e8fa-8cd0-4c93-a685-619758ab5af4@huawei.com>
+ <20250522084759.6cfe3f6d@kernel.org>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <20250522084759.6cfe3f6d@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200002.china.huawei.com (7.202.195.90)
 
->iproute2 is generally backward compatible with previous kernels yes,
 
-Acked, will submit a patch ASAP.
-Could you advise which branch needs the fix?
-Is submitting to iproute2-next and iproute2 enough?
-
-Thanks,
-
-Yuyang
-
-On Fri, May 23, 2025 at 10:10=E2=80=AFAM Luca Boccassi <bluca@debian.org> w=
-rote:
+> On Thu, 22 May 2025 23:17:32 +0800 dongchenchen (A) wrote:
+>> Hi, Jakub
+>> Maybe we can fix the problem as follow:
+> Yes! a couple of minor nit picks below..
 >
-> On Fri, 23 May 2025 at 01:58, Yuyang Huang <yuyanghuang@google.com> wrote=
-:
-> >
-> > Backward compatibility is broken due to the exit(1) in the following ch=
-anges.
-> >
-> > ```
-> > + if (lmask & IPMON_LMADDR) {
-> > + if ((!preferred_family || preferred_family =3D=3D AF_INET) &&
-> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV4_MCADDR) < 0) {
-> > + fprintf(stderr,
-> > + "Failed to add ipv4 mcaddr group to list\n");
-> > + exit(1);
-> > + }
-> > + if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
-> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV6_MCADDR) < 0) {
-> > + fprintf(stderr,
-> > + "Failed to add ipv6 mcaddr group to list\n");
-> > + exit(1);
-> > + }
-> > + }
-> > +
-> > + if (lmask & IPMON_LACADDR) {
-> > + if ((!preferred_family || preferred_family =3D=3D AF_INET6) &&
-> > +     rtnl_add_nl_group(&rth, RTNLGRP_IPV6_ACADDR) < 0) {
-> > + fprintf(stderr,
-> > + "Failed to add ipv6 acaddr group to list\n");
-> > + exit(1);
-> > + }
-> > + }
-> > +
-> > ```
-> >
-> > My patches follow the existing code styles, so I also added exit(1).
-> >
-> > Link: https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git=
-/tree/ip/ipmonitor.c#n330
-> >
-> > I thought iproute2 was intentionally not backward compatible, but it
-> > sounds like that's not true.
-> >
-> > I can submit a fix patch to remove the exit(1), which should fix the
-> > backward compatibility issue.
-> >
-> > Shall we proceed with this proposal?
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index 7745ad924ae2..de3fa33d6775 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -707,19 +707,18 @@ void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
+>>    
+>>    static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
+>>    {
+>> +	bool in_softirq;
+>>    	int ret;
+>> -	/* BH protection not needed if current is softirq */
+>> -	if (in_softirq())
+>> -		ret = ptr_ring_produce(&pool->ring, (__force void *)netmem);
+>> -	else
+>> -		ret = ptr_ring_produce_bh(&pool->ring, (__force void *)netmem);
+>>    
+>> -	if (!ret) {
+>> +	/* BH protection not needed if current is softirq */
+>> +	in_softirq = page_pool_producer_lock(pool);
+>> +	ret = __ptr_ring_produce(&pool->ring, (__force void *)netmem);
+> Maybe we can flip the return value here we won't have to negate it below
+> and at return? Like this:
 >
-> iproute2 is generally backward compatible with previous kernels yes,
-> so it would be great to have a fix for this. Thanks!
+> 	ret = !__ptr_ring_produce(&pool->ring, (__force void *)netmem);
+>
+> and adjust subsequent code
+
+Hi,Jakub
+Thanks for your suggestions!
+
+>> +	if (!ret)
+>>    		recycle_stat_inc(pool, ring);
+>> -		return true;
+>> -	}
+>>    
+>> -	return false;
+>> +	page_pool_producer_unlock(pool, in_softirq);
+>> +
+>> +	return ret ? false : true;
+>>    }
+>>    
+>>    /* Only allow direct recycling in special circumstances, into the
+>>
+>> @@ -1091,10 +1090,16 @@ static void page_pool_scrub(struct page_pool *pool)
+>>    
+>>    static int page_pool_release(struct page_pool *pool)
+>>    {
+>> +	bool in_softirq;
+>>    	int inflight;
+>>    
+>> +	/* Acquire producer lock to make sure we don't race with another thread
+>> +	 * returning a netmem to the ptr_ring.
+>> +	 */
+>> +	in_softirq = page_pool_producer_lock(pool);
+>>    	page_pool_scrub(pool);
+>>    	inflight = page_pool_inflight(pool, true);
+>> +	page_pool_producer_unlock(pool, in_softirq);
+> As I suggested earlier we don't have to lock the consumer, taking both
+> locks has lock ordering implications. My preference would be:
+>
+>    	page_pool_scrub(pool);
+>    	inflight = page_pool_inflight(pool, true);
+> +	/* Acquire producer lock to make sure producers have exited. */
+> +	in_softirq = page_pool_producer_lock(pool);
+> +	page_pool_producer_unlock(pool, in_softirq);
+
+Yes! there is no need to hold lock for page_pool_inflight(). The lock can
+be used as a barrier for the completion of the recycle process.
+I have tested this patch. The patch will be sent later.
+----- Best Regards,
+Dong Chenchen
+
 
