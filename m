@@ -1,272 +1,150 @@
-Return-Path: <netdev+bounces-192983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6AAAC1F26
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:02:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D10FAC1F56
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2299B5057CC
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 429433ADD65
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC62222B8;
-	Fri, 23 May 2025 09:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10EF22422F;
+	Fri, 23 May 2025 09:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SO2S6mFS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7X28vYr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812391487FE;
-	Fri, 23 May 2025 09:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F26D139CFA;
+	Fri, 23 May 2025 09:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747990935; cv=none; b=YHUnk2879VhpB0Zm7Gs5daDywvLYqr6K37ZVLk2hDHMAd+HJlmK1lndOtGMwZvv2xAkQxRP3f/Khz6bdQGaIPuLD5owkjU3wy2GQ4pSa0FkyBoLpgOpdzd7yuaKE881+rtzJawXgMRHp0pkkN6uSCBQ5c0JyvYdjYBocNbRaB6g=
+	t=1747991350; cv=none; b=YmVjBCcUv5sYUoShKLy7AFwQ3v9GXHgvTl+xWHlmpya6y+snkVgj4Ewym09mX3a5IzJvhddcTwt6dJC1P1SzXDbKKMOIAdfeY5PD9LIrhK7mS5J9fR8zvvDDWkD9+1bBh0qUopoA9sRJxMreDMvWDFvleyZlLsTZF/q+0i/kdZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747990935; c=relaxed/simple;
-	bh=Dzl9IFdwpkzphmorX3MPHRaZcbXOQp1myGl9QI6CyzA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NrQR9hbNDmdFuHA1utNBLezAhpPdv6XmxmAHrzUvCnMg2hL6NYJ3naEKykRCGUmDM25JvOVpH/jPQptAtnvE5YI1P6AQ7WmFOYTs90uanNNmaciljnWesxWxg9UJPBzubcGVspzdYpb9/li4Fazkd9ht4h2WztetJAY6wpwwg2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SO2S6mFS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1FEC4CEE9;
-	Fri, 23 May 2025 09:02:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747990934;
-	bh=Dzl9IFdwpkzphmorX3MPHRaZcbXOQp1myGl9QI6CyzA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SO2S6mFSwXeblGzqX9iEYu9fX0ncmNGLIrqWngvPyBmhDg3Wkz0+Fn5khZb5Q30uC
-	 IkiYUrP61FOr9UY6lBXWKuob9jj4Ze7Q1Tjj1oh/plV08Hf7nMW4jVJ/7t7IgPl5H7
-	 GvFhns9q1gjfpLXQysVyBIcRKHs+b1BjgOCG+VxCyJ6G/IGQnPN5Ami366qNjzS70u
-	 mCuddrf7E3vWwhhCMB52hNWRuEw6QHoEstzq6D4FlACW4ROqjkzqQcFmkfQP7RQey9
-	 u+fKW6YF0YH5sTWU+r74CBgmDq7g/NCOt+kvc6J3fqVLA/XWTZY+xRhUy33NVUJAoC
-	 nPSFhZg41q1Lg==
-Date: Fri, 23 May 2025 10:02:07 +0100
-From: Lee Jones <lee@kernel.org>
-To: a0282524688@gmail.com
-Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com,
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
-	Ming Yu <tmyu0@nuvoton.com>
-Subject: Re: [PATCH v11 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250523090207.GD1378991@google.com>
-References: <20250520020355.3885597-1-tmyu0@nuvoton.com>
- <20250520020355.3885597-2-tmyu0@nuvoton.com>
+	s=arc-20240116; t=1747991350; c=relaxed/simple;
+	bh=IZ7gqBrZgtYFnrMGX/kr93mrH6BsXgJrXrzx0q1yJns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iIhpiPYJg1Uv7Nu9EiYNe66/BAcV7zJXUkEOqMr+VRSNk48SM1DTfGDJYoQZH2Z5sHYWrx836RPsOG+p1eV7yaRqDMo0VeDJEqGM5v2tdLr80nZPj9DXok17SZNiOioHK4NxoDe8T8HSkjY8g+6khVqtG3y/Rb5+bJQsW/USQww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7X28vYr; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-70e09e8adc9so14358567b3.2;
+        Fri, 23 May 2025 02:09:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747991348; x=1748596148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IZ7gqBrZgtYFnrMGX/kr93mrH6BsXgJrXrzx0q1yJns=;
+        b=W7X28vYrPyYdWP4JtTq7e9TyfTkU0llyB+dZDHe6jCuwuOgYtSqTVz09xGHwuhXraO
+         YvHaGYWrv/EdMJ3vxsNp9V7S1PxJn+5QBs6gBioU8No6bsJRtXhFX7OLK9HVRest0X8k
+         XjmX8VXDNtzPL0kyLAyYxE0F+PeLLGP6y6saOQuWgPXtGw85Wye+r4hBbSffej8phxL3
+         nG/KrhFXglMbeqy4vGVzHBh0BUwF5kyY9xaoPf6fez+N4hTVhpaFZpPUv9N2MU0h6QoF
+         /I4bDFqyUE8eBB56MeBRfkCDBsjMA3yV6LsrLHkYAJAzN/BB8XOkQesQdxnYFOqqFDXM
+         BGeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747991348; x=1748596148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IZ7gqBrZgtYFnrMGX/kr93mrH6BsXgJrXrzx0q1yJns=;
+        b=JUlwxwE7NDEbq3bTbK+//tffApDmhZkyx27I7+7hSGOk/mL9x4/XybKuWzHeOCIDFW
+         E4XwkfaK/ITxHiRX/eIQd7I/M2Zjpsmlj/TIk0p47wsi8D/Z0kgQq0mKzuJUet9Q/h3P
+         dR6lG6leShP2d1frSWSbjv5rHjUb3SwPy2OlLLVx6c9fO24MN09S5UFiPkLQPwTyjpzS
+         JbZFXbciHuw7sv7TpYb8gmS10lbctgSFpG+wJuPD1OEwoQhHdkbJqJHxzDDaGKUofgBn
+         WcVyoJwPZUyA45uvSkU0axaPdlfZ3Oqov0OJFydinmZXDyOmtB8ZTiYklUfUieW7GVPO
+         OMAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUien6BfxVeEqzW5ePsxxTcjCvmbsk12PjsM/4Kc8RozGb2eoWxVDoWX8lyN2xeaVGZJ3btD/5bG4LmGZc=@vger.kernel.org, AJvYcCUkDtlvXsd8bROf8netzJhfllvPzfq3+RsDsB4ObHxYi5RJX2E+M0GYbak9G4uwEnMPdB5bElC3@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWVmv+XTkvZbh9RfJLuawZq/JnwD86/rOm2KEYp8Gk4/jpNesd
+	aHZDlQkz/1cT00pCSm+go3SjyAJ3KjeuMLo51JmSk5j5rKx2GgbZ71pmHD6Ysto2bMYARcR0FsY
+	1/YQO+r+hMZH8RTNCtEhjemTDclsRiIQ=
+X-Gm-Gg: ASbGnctSUvyO01Ag/G8RkidcV256x8HwsrxuiURikmZMLiYxBy38MiI8+mbjiNWO5c5
+	zkXV8rtxA7TV29QSppNMZkonH42J3hNXfxIn9m6HJe7lIz+KbKyRl84JJIr+msscgowRfu9F8OV
+	NUUB0amiozyH+KAX9Ux5gQhuClBhiP/qHeMKieemK65g==
+X-Google-Smtp-Source: AGHT+IGXaL7QqjDlaDb1GkhvoJFxiwsSoVycNITgF5U4Ia5QqlfCK94bczHMTbWAprkq1FvzTQY4gYXmRzGkMpjUfZA=
+X-Received: by 2002:a05:690c:88e:b0:6ef:652b:91cf with SMTP id
+ 00721157ae682-70ca7c15312mr389216277b3.27.1747991348039; Fri, 23 May 2025
+ 02:09:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250520020355.3885597-2-tmyu0@nuvoton.com>
+References: <20250519174550.1486064-1-jonas.gorski@gmail.com>
+ <20250519174550.1486064-3-jonas.gorski@gmail.com> <ed75677c-c3fb-41d1-a2cd-dd84d224ffe3@lunn.ch>
+ <CAOiHx=nwbs7030GKZHLc6Pc6LA6Hqq0NYfNSt=3zOgnj5zpAYQ@mail.gmail.com>
+ <2e5e16a1-e59e-470d-a1d9-618a1b9efdd4@lunn.ch> <CAOiHx=mQ8z1CO1V-8b=7pjK-Hm9_4-tcvucKXpM1i+eOOB4axg@mail.gmail.com>
+ <e0d25a68-057b-4839-a8cd-affe458bfea3@lunn.ch>
+In-Reply-To: <e0d25a68-057b-4839-a8cd-affe458bfea3@lunn.ch>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Fri, 23 May 2025 11:08:55 +0200
+X-Gm-Features: AX0GCFtnVRfex_9nhQ4cx9PCVZ832oz1Y9t0dDtKGYfJ3JHQmtusGVXqvc2KluY
+Message-ID: <CAOiHx==NzwF3mXfkf+mS0AZzb-FTR0SHwG9n0Hw9nRiR4k-z6w@mail.gmail.com>
+Subject: Re: [PATCH net 2/3] net: dsa: b53: fix configuring RGMII delay on bcm63xx
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vivien Didelot <vivien.didelot@gmail.com>, =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 20 May 2025, a0282524688@gmail.com wrote:
+On Tue, May 20, 2025 at 2:15=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > Without this change no mode/port works, since there is always either a
+> > 0 ns delay or a 4 ns delay in the rx/tx paths (I assume, I have no
+> > equipment to measure).
+> >
+> > With this change all modes/ports work.
+>
+> Which is wrong.
+>
+> > With "rgmii-id" the mac doesn't
+> > configure any delays (and the phy does instead), with "rgmii" it's
+> > vice versa, so there is always the expected 2 ns delay. Same for rxid
+> > and txid.
+>
+> If you read the description of what these four modes mean, you should
+> understand why only one should work. And given the most likely PCB
+> design, the only mode that should work is rgmii-id. You would have to
+> change the PCB design, to make the other modes work.
 
-> From: Ming Yu <tmyu0@nuvoton.com>
-> 
-> The Nuvoton NCT6694 provides an USB interface to the host to
-> access its features.
-> 
-> Sub-devices can use the USB functions nct6694_read_msg() and
-> nct6694_write_msg() to issue a command. They can also request
-> interrupt that will be called when the USB device receives its
-> interrupt pipe.
-> 
-> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
-> ---
-> 
-> Changes since version 10:
-> - Add change log for the patch
-> - Fix mfd_cell to MFD_CELL_NAME()
-> - Remove unnecessary blank line
-> 
-> Changes since version 9:
-> - Add KernelDoc to exported functions
-> 
-> Changes since version 8:
-> - Modify the signed-off-by with my work address
-> - Rename all MFD cell names to "nct6694-xxx"
-> - Fix some comments in nct6694.c and in nct6694.h
-> 
-> Changes since version 7:
-> - Add error handling for devm_mutex_init()
-> 
-> Changes since version 6:
-> 
-> Changes since version 5:
-> - Fix mfd_cell to MFD_CELL_NAME() and MFD_CELL_BASIC()
-> - Drop unnecessary macros
-> 
-> Changes since version 4:
-> - Modify arguments in read/write function to a pointer to cmd_header
-> 
-> Changes since version 3:
-> - Modify array buffer to structure
-> - Fix defines and comments
-> - Add header <linux/bits.h> and use BIT macro
-> - Modify mutex_init() to devm_mutex_init()
-> 
-> Changes since version 2:
-> 
-> Changes since version 1:
-> - Implement IRQ domain to handle IRQ demux
-> - Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API
-> - Add command structure
-> - Fix USB functions
-> - Sort each driver's header files alphabetically
-> 
->  MAINTAINERS                 |   6 +
->  drivers/mfd/Kconfig         |  15 ++
->  drivers/mfd/Makefile        |   2 +
->  drivers/mfd/nct6694.c       | 387 ++++++++++++++++++++++++++++++++++++
->  include/linux/mfd/nct6694.h |  98 +++++++++
->  5 files changed, 508 insertions(+)
->  create mode 100644 drivers/mfd/nct6694.c
->  create mode 100644 include/linux/mfd/nct6694.h
+Since I also have BCM6368 with a BCM53115 connected to one of the
+RGMII ports lying around, I played around with it, and it was
+surprisingly hard to make it *not* work. Only if I enabled delay on
+*both* sides it stopped working, no delay or delay only on one side
+continued working (and I used iperf to try if larger amounts of
+traffic break it).
 
-[...]
+So in way, with BCM6368 enabling no (sampling) delays on its MAC side,
+all four modes work. I understand that they shouldn't, but the reality
+is that they do. Maybe the switches can auto-detect/adapt to (missing)
+delays for a certain amount.
 
-I was just going to fix this up for you when I applied the set, but
-seeing as it looks like you have to re-submit anyway ...
+@Florian, do you know if this is expected? And yes, I even added the
+RGMII delay workaround (change link speed to force the pll to resync)
+to ensure that the delays are applied. Though I guess the way Linux
+works it isn't needed, and only when changing delays while the link is
+up.
 
-> +static const struct usb_device_id nct6694_ids[] = {
-> +	{ USB_DEVICE_AND_INTERFACE_INFO(NCT6694_VENDOR_ID, NCT6694_PRODUCT_ID, 0xFF, 0x00, 0x00)},
+> > The Switch is always integrated into the host SoC, so there is no
+> > (r)gmii cpu port to configure. There's basically directly attached DMA
+> > to/from the buffers of the cpu port. Not sure if there are even
+> > buffers, or if it is a direct to DMA delivery.
+>
+> That makes it a lot simpler. It always plays the MAC side. So i
+> recommend you just hard code it no delay, and let the PHY add the
+> delays as needed.
 
-You need a space before the '}'.
+Sure thing. I saw that there are device tree properties that can be
+used to explicitly enable delays on the MAC side, so in case we ever
+need them we can implement them (e.g. a PHY that can't do delays).
 
-> +	{}
-> +};
-> +MODULE_DEVICE_TABLE(usb, nct6694_ids);
-> +
-> +static struct usb_driver nct6694_usb_driver = {
-> +	.name		= "nct6694",
-> +	.id_table	= nct6694_ids,
-> +	.probe		= nct6694_usb_probe,
-> +	.disconnect	= nct6694_usb_disconnect,
-> +};
-> +module_usb_driver(nct6694_usb_driver);
-> +
-> +MODULE_DESCRIPTION("Nuvoton NCT6694 core driver");
-> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/mfd/nct6694.h b/include/linux/mfd/nct6694.h
-> new file mode 100644
-> index 000000000000..5e172609be3f
-> --- /dev/null
-> +++ b/include/linux/mfd/nct6694.h
-> @@ -0,0 +1,98 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2025 Nuvoton Technology Corp.
-> + *
-> + * Nuvoton NCT6694 USB transaction and data structure.
-> + */
-> +
-> +#ifndef __MFD_NCT6694_H
-> +#define __MFD_NCT6694_H
-> +
-> +#define NCT6694_VENDOR_ID	0x0416
-> +#define NCT6694_PRODUCT_ID	0x200B
-> +#define NCT6694_INT_IN_EP	0x81
-> +#define NCT6694_BULK_IN_EP	0x02
-> +#define NCT6694_BULK_OUT_EP	0x03
-> +
-> +#define NCT6694_HCTRL_SET	0x40
-> +#define NCT6694_HCTRL_GET	0x80
-> +
-> +#define NCT6694_URB_TIMEOUT	1000
-> +
-> +enum nct6694_irq_id {
-> +	NCT6694_IRQ_GPIO0 = 0,
-> +	NCT6694_IRQ_GPIO1,
-> +	NCT6694_IRQ_GPIO2,
-> +	NCT6694_IRQ_GPIO3,
-> +	NCT6694_IRQ_GPIO4,
-> +	NCT6694_IRQ_GPIO5,
-> +	NCT6694_IRQ_GPIO6,
-> +	NCT6694_IRQ_GPIO7,
-> +	NCT6694_IRQ_GPIO8,
-> +	NCT6694_IRQ_GPIO9,
-> +	NCT6694_IRQ_GPIOA,
-> +	NCT6694_IRQ_GPIOB,
-> +	NCT6694_IRQ_GPIOC,
-> +	NCT6694_IRQ_GPIOD,
-> +	NCT6694_IRQ_GPIOE,
-> +	NCT6694_IRQ_GPIOF,
-> +	NCT6694_IRQ_CAN0,
-> +	NCT6694_IRQ_CAN1,
-> +	NCT6694_IRQ_RTC,
-> +	NCT6694_NR_IRQS,
-> +};
-> +
-> +enum nct6694_response_err_status {
-> +	NCT6694_NO_ERROR = 0,
-> +	NCT6694_FORMAT_ERROR,
-> +	NCT6694_RESERVED1,
-> +	NCT6694_RESERVED2,
-> +	NCT6694_NOT_SUPPORT_ERROR,
-> +	NCT6694_NO_RESPONSE_ERROR,
-> +	NCT6694_TIMEOUT_ERROR,
-> +	NCT6694_PENDING,
-> +};
-> +
-> +struct __packed nct6694_cmd_header {
-> +	u8 rsv1;
-> +	u8 mod;
-> +	union __packed {
-> +		__le16 offset;
-> +		struct __packed {
-> +			u8 cmd;
-> +			u8 sel;
-> +		};
-> +	};
-> +	u8 hctrl;
-> +	u8 rsv2;
-> +	__le16 len;
-> +};
-> +
-> +struct __packed nct6694_response_header {
-> +	u8 sequence_id;
-> +	u8 sts;
-> +	u8 reserved[4];
-> +	__le16 len;
-> +};
-> +
-> +union __packed nct6694_usb_msg {
-> +	struct nct6694_cmd_header cmd_header;
-> +	struct nct6694_response_header response_header;
-> +};
-> +
-> +struct nct6694 {
-> +	struct device *dev;
-> +	struct irq_domain *domain;
-> +	struct mutex access_lock;
-> +	struct mutex irq_lock;
-> +	struct urb *int_in_urb;
-> +	struct usb_device *udev;
-> +	union nct6694_usb_msg *usb_msg;
-> +	unsigned char *int_buffer;
-> +	unsigned int irq_enable;
-> +};
-> +
-> +int nct6694_read_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
-> +int nct6694_write_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
-> +
-> +#endif
-> -- 
-> 2.34.1
-> 
-
--- 
-Lee Jones [李琼斯]
+Best regards,
+Jonas
 
