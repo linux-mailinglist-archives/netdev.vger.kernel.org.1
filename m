@@ -1,121 +1,143 @@
-Return-Path: <netdev+bounces-193008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3095DAC220D
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:37:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37791AC2225
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB8641B65817
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:37:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00E0189C3C7
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5687722F75D;
-	Fri, 23 May 2025 11:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796F822A1CD;
+	Fri, 23 May 2025 11:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="aymo7bCQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gQ0QqYFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B183183CC3;
-	Fri, 23 May 2025 11:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A32F1EE02F;
+	Fri, 23 May 2025 11:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748000219; cv=none; b=B41Wdvb7uSXt0VYkPTGEdOauCm3npSGkWjM/hHqBpzNKyet08zHFpJgOGSCzAdMmwqtxS1zL2Vfawc8Pm7i0MYVFenAt9bxPwkeZSGFas2AbsL7BHqA6uF1b2ROYVYGMBr8FkaqSg+8k2PH/nIBXJZ8TH05iiJy90xxb6EQuhNE=
+	t=1748000811; cv=none; b=K0q0eOxhhIfMND8Khi5kp3JhPZiH8bCAk9D92LYt+g5QSVTSpnZYCc65gfrLgX1BCHh7KduzB6SqB6KOm8H/VlZGIWlXODIxngUN1lPb6ibp+Y1MPpfUw2cV0Oi+0FdIKtsILUcoT+KN7y5svYF0+gxMU326TjSBhNg6W12LgAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748000219; c=relaxed/simple;
-	bh=XTCFovV6gRgjPh361438rq+kkBsjg1osqxNg/6PDdUo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p5lNTRyYmwPCNbd77y5a/DgoWMjBSTxVqc99H3nTgpFqpHAnsZqE6f+/+I2H3sLfCdCZvRxbPsUHR6nrHtPtHv7Yy6qOfIEtRevs8VB6FafS1HLY1Shc/kCGynRu96PYK4GhSupw6ujsseiuJusqqVV6+I19SmLsuYFg15iWbf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=aymo7bCQ; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 372bdb7837ca11f082f7f7ac98dee637-20250523
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=tYIiwWGIKoPuKSFob4g15bxKNl60UEjmO24khtCJJDk=;
-	b=aymo7bCQCXfMiJzaZbMrMoftOU10W9ETAUbRAW0iPqwRz7czD75BkIDRSMvQe+EI8AW8BmsTb4XLNuykHINppjG2rSpZJh74aq93uRf9f6m1h38j+Ddglf9rppIuw25Ge2k56tTE0J0FSxMqmAIaqhhPeI1tr8RFAFXSARvowB4=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.2.1,REQID:a360be72-ded3-46cb-bebd-cb8696d30694,IP:0,UR
-	L:0,TC:0,Content:0,EDM:-30,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-30
-X-CID-META: VersionHash:0ef645f,CLOUDID:ae5b35f1-2ded-45ed-94e2-b3e9fa87100d,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:81|82|102,TC:nil,Content:0|50,EDM:2,
-	IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:
-	0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 372bdb7837ca11f082f7f7ac98dee637-20250523
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 475967441; Fri, 23 May 2025 19:36:49 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Fri, 23 May 2025 19:36:46 +0800
-Received: from mtksitap99.mediatek.inc (10.233.130.16) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Fri, 23 May 2025 19:36:46 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: Sky Huang <skylake.huang@mediatek.com>
-Subject: [PATCH net-next 2/2] net: phy: mtk-ge-soc: Fix LED behavior if blinking is not set.
-Date: Fri, 23 May 2025 19:36:01 +0800
-Message-ID: <20250523113601.3627781-3-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250523113601.3627781-1-SkyLake.Huang@mediatek.com>
-References: <20250523113601.3627781-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1748000811; c=relaxed/simple;
+	bh=41ZMNv9DZfWMf6Rr7Dfo1K3B4T7MWWsD7qyxjxJCH+M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=JH3P5G0irCxNGWXVp+cBPP6Fv5i+VYJ1FLE/GjH3naUjXQwGvdd8J0ZwPWk0GFK3eA/fmalvB9LlEVrOi9asvhu5OXC/bR2vH8YsCxKIHnsQGp4IkPByhOGEltUOtERtmRh1hHUUOMB2zoWaLInkaGsWRLhcJw3t8/+EoNVT8m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gQ0QqYFn; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C47C43295;
+	Fri, 23 May 2025 11:46:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1748000801;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mDq6MieyiMr43NuOWTLdL0EFY12TTvHhRagxM34k8EA=;
+	b=gQ0QqYFnk9rZG9v1uNDabbudjF8lmrEkamaDERL3owhT5l1lEXeEeiDLkZWrTlZjIbdftK
+	YhYFaRMlToVaQzQqLkKEUfVckqMZmXJWuyR2gSCCRBvDd1gMvCwD37tEPc0e6XogAOLzU8
+	4QhXenD1cL2qTdRj5oh1MenLyAen378EJQH7AHwYQFEvRTJaf5knDP8/kaWbbEfQM4qr6z
+	456/lDSLnd3+1/ukgP+eVu7UCXooOM76pde0n3pTLTtSSs5O8CV1bneZAGw7cq+BYN1B30
+	naK1UQZHYDz8AT596kQQDR5KZ3EA97lUifpSXFLqmJZtqtfSaU+3azD9v9/afw==
+From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Date: Fri, 23 May 2025 13:46:32 +0200
+Subject: [PATCH] net: stmmac: add explicit check and error on invalid PTP
+ clock rate
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+Message-Id: <20250523-stmmac_tstamp_div-v1-1-bca8a5a3a477@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIABdgMGgC/x3MQQqAIBBA0avErBN0wKCuEhFiY81CC0ciCO+et
+ HyL/18QykwCU/dCppuFz9Rg+g784dJOirdmQI1WW0QlJUbn1yLFxWvd+FbBWmMw6EHjCK27MgV
+ +/ue81PoBTtWoOGMAAAA=
+X-Change-ID: 20250522-stmmac_tstamp_div-f55112f06029
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdekjeejucdltddurdegfedvrddttddmucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkvfevofesthekredtredtjeenucfhrhhomheptehlvgigihhsucfnohhthhhorhoruceorghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeetudekvdffieehueeugfdujefgtddvgeekvddtieffffelvedtgeffjeekjeelgfenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemfhekheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmehfkeehpdhhvghloheplgduledvrdduieekrddurdduleejngdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqshhtmhefvdesshhtqdhmugdqmhgrihhlmhgrnhdrshhtohhrmhhrvghplhihrdgtohhmpdhrtghpthhtohepk
+ hhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepmhgtohhquhgvlhhinhdrshhtmhefvdesghhmrghilhdrtghomh
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-From: Sky Huang <skylake.huang@mediatek.com>
+While some platforms implementing dwmac open-code the clk_ptp_rate
+value, some others dynamically retrieve the value at runtime. If the
+retrieved value happens to be 0 for any reason, it will eventually
+propagate up to PTP initialization when bringing up the interface,
+leading to a divide by 0:
 
-If delay_on==0 and delay_off==0 are passed to
-mt798x_2p5ge_phy_led_blink_set() and mtk_phy_led_num_dly_cfg(),
-blinking is actually not set. So don't clean "LED on" status under
-this circumstance.
+ Division by zero in kernel.
+ CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.12.30-00001-g48313bd5768a #22
+ Hardware name: STM32 (Device Tree Support)
+ Call trace:
+  unwind_backtrace from show_stack+0x18/0x1c
+  show_stack from dump_stack_lvl+0x6c/0x8c
+  dump_stack_lvl from Ldiv0_64+0x8/0x18
+  Ldiv0_64 from stmmac_init_tstamp_counter+0x190/0x1a4
+  stmmac_init_tstamp_counter from stmmac_hw_setup+0xc1c/0x111c
+  stmmac_hw_setup from __stmmac_open+0x18c/0x434
+  __stmmac_open from stmmac_open+0x3c/0xbc
+  stmmac_open from __dev_open+0xf4/0x1ac
+  __dev_open from __dev_change_flags+0x1cc/0x224
+  __dev_change_flags from dev_change_flags+0x24/0x60
+  dev_change_flags from ip_auto_config+0x2e8/0x11a0
+  ip_auto_config from do_one_initcall+0x84/0x33c
+  do_one_initcall from kernel_init_freeable+0x1b8/0x214
+  kernel_init_freeable from kernel_init+0x24/0x140
+  kernel_init from ret_from_fork+0x14/0x28
+ Exception stack(0xe0815fb0 to 0xe0815ff8)
 
-Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+Prevent this division by 0 by adding an explicit check and error log
+about the actual issue.
+
+Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
 ---
- drivers/net/phy/mediatek/mtk-ge-soc.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/phy/mediatek/mtk-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
-index cd0968478..15dcf2046 100644
---- a/drivers/net/phy/mediatek/mtk-ge-soc.c
-+++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -1228,8 +1228,11 @@ static int mt798x_phy_led_blink_set(struct phy_device *phydev, u8 index,
- 	if (err)
- 		return err;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 918d7f2e8ba992208d7d6521a1e9dba01086058f..f68e3ece919cc88d0bf199a394bc7e44b5dee095 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -835,6 +835,11 @@ int stmmac_init_tstamp_counter(struct stmmac_priv *priv, u32 systime_flags)
+ 	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
+ 		return -EOPNOTSUPP;
  
--	return mtk_phy_hw_led_on_set(phydev, index, MTK_GPHY_LED_ON_MASK,
--				     false);
-+	if (blinking)
-+		mtk_phy_hw_led_on_set(phydev, index, MTK_GPHY_LED_ON_MASK,
-+				      false);
++	if (!priv->plat->clk_ptp_rate) {
++		netdev_err(priv->dev, "Invalid PTP clock rate");
++		return -EINVAL;
++	}
 +
-+	return 0;
- }
+ 	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
+ 	priv->systime_flags = systime_flags;
  
- static int mt798x_phy_led_brightness_set(struct phy_device *phydev,
+
+---
+base-commit: e0e2f78243385e7188a57fcfceb6a19f723f1dff
+change-id: 20250522-stmmac_tstamp_div-f55112f06029
+
+Best regards,
 -- 
-2.45.2
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
