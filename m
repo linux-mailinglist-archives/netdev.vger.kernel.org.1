@@ -1,130 +1,354 @@
-Return-Path: <netdev+bounces-192940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0025AC1ADF
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 06:06:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A61BAC1AE4
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 06:09:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12305A251E2
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 04:05:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC5874E6005
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 04:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00BF1FF1CF;
-	Fri, 23 May 2025 04:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407241FF1CF;
+	Fri, 23 May 2025 04:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qteADHn1"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="i9Jq8464"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572E8367;
-	Fri, 23 May 2025 04:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BCC1D555;
+	Fri, 23 May 2025 04:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747973174; cv=none; b=DGHy8RNLIT5lwu5gDPB08gSUAPCD+CIapmej8GpKXdTn3b6qmz52Swnn8uUBB3iN9KgQZAL2gIV8dmXSx1TRLS3owE/bHjT7fjGioh2n1AmdUYIIoNSxwmWHYCmmSYW8dpRxf3zmW+XVYlnQlyJDRkmq6LEtyoR81M8HDx6NBZs=
+	t=1747973366; cv=none; b=dDmrRgHwlmO8GOBH9gj0/86jL1vCAtyjD3DugKcyuOhMGqtZ0mqMfCNPpYzSkoV+L4rt8esZ6nKtBfWKJVnsZc2ApYTJf1ZuyDe0asr2DiY0E490/dOhpT4lxTr6xNTsRNUXEeQQ4dUD+yl15kwNe1yuB5oXrNWcfRkErA09w5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747973174; c=relaxed/simple;
-	bh=Dd6hg5anYs4NDvtjZ+7fjfMWyb/P3mJi/lIxyob4a0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MW0jwiBID1s5SaoEvzWpeaYjuJUR9+YYN6tWP7VSlA4V+5xgEotFPvKr+MlSsrc67+IhBcz/YhrJq+xzBspclIxlP3qHMJ5qqQfu0hn+73i70O+x4epp3aBMii6rWfIxGLyqrae4TWRDiKxboSU+qgo5HjAs1jpfVQxg1juX5pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qteADHn1; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id DD8C5201DB37; Thu, 22 May 2025 21:06:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DD8C5201DB37
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1747973166;
-	bh=NAc+eegSvTa3ay9n8M4zgkCmIydrJCYRiYijS0bKWHY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qteADHn1rWU9VHl2Z/C4U8p+yUZcUHpD1HTu6F5tS2wBexDJ3bi5X9adO6ru9agQ6
-	 3ksSh2+9mxpgeP5AK491vtaBbjHdzBmbrEMLo4D3JEGN1S/gRXNEWItDhKAk1Siuw9
-	 oA+4VyzttcT6utUrI+yZWEe8O2iLUhyLdpZjHBgI=
-Date: Thu, 22 May 2025 21:06:06 -0700
-From: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, sdf@fomichev.me, kuniyu@amazon.com,
-	ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	ssengar@microsoft.com, stable@vger.kernel.org
-Subject: Re: [PATCH net,v2] hv_netvsc: fix potential deadlock in
- netvsc_vf_setxdp()
-Message-ID: <20250523040606.GA25497@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1747823103-3420-1-git-send-email-ssengar@linux.microsoft.com>
- <20250522151346.57390f40@kernel.org>
+	s=arc-20240116; t=1747973366; c=relaxed/simple;
+	bh=qNobk9fgQQSof9lyEmePaCjQ4aZTIP4RbG11zgo+ooo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UsnOqH0Q+LNGudORT8mJbc+AoWz2tTyY9kd7dZ6Ay59WjI+ngOcl9u57g6eV+ZairAVrOm4Qg9asFJaIIIhW2Q7T4pZX8gJfv6QHELayYqMp0jN9/emnZLUAsOAIs66oKZzJARC3XLU3xCo1Kp0Qq1K63h5y58hcd/k+4SbBbEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=i9Jq8464; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54MNV9Tk006044;
+	Thu, 22 May 2025 21:09:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=stIh9YAtiyc/Nx7vz9uRqFTQW
+	vJ8iq/9zHi9YsfcQZY=; b=i9Jq8464rQYAr+NEVPgnSXe3Tc9AOymPG9ENVxrJx
+	8jJiKUGlyA1R+kiokrKjYVactk1KqYBLTHvNPDi2UwkAyVK5guWYcL0hJli6A0s+
+	Dcym2pfqfMx0U8XQJukjs01wl6FHn13Vu7hTgRCm3rmnwM2VbD08kmWUmDL+vtPX
+	d8TT/BSDouABfzqQAXxwzRxsrGicf/s0HdPl8+H4rHnjaxZGqo5Vjx2oOP3M83ZY
+	N9brw5++Gzorj+DuS88N6rg8QRJHoMv7UJRTVvpdGP2aHOxxotCyuscK4pjReC93
+	u4ZM6RqU0zDqUkdW7k93qON5XvKowDQxYUXHsUuFIoKCw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46tdnkrdxn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 May 2025 21:09:01 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 22 May 2025 21:09:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 22 May 2025 21:09:00 -0700
+Received: from optiplex (unknown [10.28.34.253])
+	by maili.marvell.com (Postfix) with SMTP id B08AF3F7079;
+	Thu, 22 May 2025 21:08:52 -0700 (PDT)
+Date: Fri, 23 May 2025 09:38:51 +0530
+From: Tanmay Jagdale <tanmay@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <bbhushan2@marvell.com>, <bhelgaas@google.com>,
+        <pstanner@redhat.com>, <gregkh@linuxfoundation.org>,
+        <peterz@infradead.org>, <linux@treblig.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <rkannoth@marvell.com>, <sumang@marvell.com>,
+        <gcherian@marvell.com>
+Subject: Re: [net-next PATCH v1 14/15] octeontx2-pf: ipsec: Process CPT
+ metapackets
+Message-ID: <aC_003av7qNpNO93@optiplex>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-15-tanmay@marvell.com>
+ <20250507163050.GH3339421@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250522151346.57390f40@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20250507163050.GH3339421@horms.kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIzMDAzNSBTYWx0ZWRfXz00kcWVomhgU ucdwmTeCC3YHN/CZS6Eave1/seKNjkgV4tNPbvgeeR/nCeQ+/dsA1BISbtRFj9WtQm3rNHK8Wo3 VYbOfXN4rLVVG0sH/Cte7FjoMP7niryhcA6aXN3zhMOxxUgA60dFqEjYpPan76f/We8IkJpneg6
+ juNcqhg+5ARkpREPu1EkHCDCkzriN5471PqZAwI8iwO7BNucbuDovoZw5v8A1X2RQtI7i0dveVQ spkzH68HwVjuq1VmWmV+dTlCsdhSemsFosWyQZBO46rqtF4ykayN7G+AVPvBbU/DXtd2+8rhunj 4J1KQ+H6l41yAY0gT4qkMaYsKtwSxAQdDS0XBuQ7CGHwDOBWYTFrLVirDC5oaiJUMr8+uh9aD7A
+ NT5c8eSK+qX0hBHdxnOCcbipHBOcuMCPFkaqJjnkwCOhEzXYuPCzfe/Di3gxpeKDuJ9vak8p
+X-Authority-Analysis: v=2.4 cv=Hst2G1TS c=1 sm=1 tr=0 ts=682ff4dd cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=fxPYiSP9r1EW3jPGSAEA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 60EmdaymcUzhAqO-khgHJeqx9hFuK0yo
+X-Proofpoint-ORIG-GUID: 60EmdaymcUzhAqO-khgHJeqx9hFuK0yo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-23_02,2025-05-22_01,2025-03-28_01
 
-On Thu, May 22, 2025 at 03:13:46PM -0700, Jakub Kicinski wrote:
-> On Wed, 21 May 2025 03:25:03 -0700 Saurabh Sengar wrote:
-> > The MANA driver's probe registers netdevice via the following call chain:
+Hi Simon,
+
+On 2025-05-07 at 22:00:50, Simon Horman (horms@kernel.org) wrote:
+> On Fri, May 02, 2025 at 06:49:55PM +0530, Tanmay Jagdale wrote:
+> > CPT hardware forwards decrypted IPsec packets to NIX via the X2P bus
+> > as metapackets which are of 256 bytes in length. Each metapacket
+> > contains CPT_PARSE_HDR_S and initial bytes of the decrypted packet
+> > that helps NIX RX in classifying and submitting to CPU. Additionally,
+> > CPT also sets BIT(11) of the channel number to indicate that it's a
+> > 2nd pass packet from CPT.
 > > 
-> > mana_probe()
-> >   register_netdev()
-> >     register_netdevice()
+> > Since the metapackets are not complete packets, they don't have to go
+> > through L3/L4 layer length and checksum verification so these are
+> > disabled via the NIX_LF_INLINE_RQ_CFG mailbox during IPsec initialization.
 > > 
-> > register_netdevice() calls notifier callback for netvsc driver,
-> > holding the netdev mutex via netdev_lock_ops().
+> > The CPT_PARSE_HDR_S contains a WQE pointer to the complete decrypted
+> > packet. Add code in the rx NAPI handler to parse the header and extract
+> > WQE pointer. Later, use this WQE pointer to construct the skb, set the
+> > XFRM packet mode flags to indicate successful decryption before submitting
+> > it to the network stack.
 > > 
-> > Further this netvsc notifier callback end up attempting to acquire the
-> > same lock again in dev_xdp_propagate() leading to deadlock.
+> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> > ---
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 61 +++++++++++++++++++
+> >  .../marvell/octeontx2/nic/cn10k_ipsec.h       | 47 ++++++++++++++
+> >  .../marvell/octeontx2/nic/otx2_struct.h       | 16 +++++
+> >  .../marvell/octeontx2/nic/otx2_txrx.c         | 25 +++++++-
+> >  4 files changed, 147 insertions(+), 2 deletions(-)
 > > 
-> > netvsc_netdev_event()
-> >   netvsc_vf_setxdp()
-> >     dev_xdp_propagate()
-> > 
-> > This deadlock was not observed so far because net_shaper_ops was never set,
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> > index 91c8f13b6e48..bebf5cdedee4 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> > @@ -346,6 +346,67 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
+> >  	return ret;
+> >  }
+> >  
+> > +struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
+> > +						     struct nix_rx_sg_s *sg,
+> > +						     struct sk_buff *skb,
+> > +						     int qidx)
+> > +{
+> > +	struct nix_wqe_rx_s *wqe = NULL;
+> > +	u64 *seg_addr = &sg->seg_addr;
+> > +	struct cpt_parse_hdr_s *cptp;
+> > +	struct xfrm_offload *xo;
+> > +	struct otx2_pool *pool;
+> > +	struct xfrm_state *xs;
+> > +	struct sec_path *sp;
+> > +	u64 *va_ptr;
+> > +	void *va;
+> > +	int i;
+> > +
+> > +	/* CPT_PARSE_HDR_S is present in the beginning of the buffer */
+> > +	va = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain, *seg_addr));
+> > +
+> > +	/* Convert CPT_PARSE_HDR_S from BE to LE */
+> > +	va_ptr = (u64 *)va;
 > 
-> The lock is on the VF, I think you meant to say that no device you use
-> in Azure is ops locked?
+> phys_to_virt returns a void *. And there is no need to explicitly cast
+> another pointer type to or from a void *.
 > 
-> There's also the call to netvsc_register_vf() on probe path, please
-> fix or explain why it doesn't need locking in the commit message.
+> So probably this can simply be:
+> 
+> 	va_ptr = phys_to_virt(...);
+ACK.
+> 
+> 
+> > +	for (i = 0; i < (sizeof(struct cpt_parse_hdr_s) / sizeof(u64)); i++)
+> > +		va_ptr[i] = be64_to_cpu(va_ptr[i]);
+> 
+> Please don't use the same variable to hold both big endian and
+> host byte order values. Because tooling can no longer provide
+> information about endian mismatches.
+> 
+> Flagged by Sparse.
+> 
+> Also, isn't only the long word that exactly comprises the
+> wqe_ptr field of cpt_parse_hdr_s used? If so, perhaps
+> only that portion needs to be converted to host byte order?
+Yes I don't need the complete cpt_parse_hdr_s to be converted,
+just wqe_ptr and cookie. So I'll rework this logic.
 
-This patch specifically addresses the netvsc_register_vf() path only.
-I omitted the mention of netvsc_register_vf() in the commit message
-to keep the function path shorter. The full stack trace is provided below:
+> 
+> I'd explore describing the members of struct cpt_parse_hdr_s as __be64.
+> And use FIELD_PREP and FIELD_GET to deal with parts of each __be64.
+> I think that would lead to a simpler implementation.
+ACK. I'll explore defining structure in a big endian format
+and using the FIELD_XX macros.
 
-[   92.542180]  dev_xdp_propagate+0x2c/0x1b0
-[   92.542185]  netvsc_vf_setxdp+0x10d/0x180 [hv_netvsc]
-[   92.542192]  netvsc_register_vf.part.0+0x179/0x200 [hv_netvsc]
-[   92.542196]  netvsc_netdev_event+0x267/0x340 [hv_netvsc]
-[   92.542200]  notifier_call_chain+0x5f/0xc0
-[   92.542203]  raw_notifier_call_chain+0x16/0x20
-[   92.542205]  call_netdevice_notifiers_info+0x52/0xa0
-[   92.542209]  register_netdevice+0x7c8/0xaa0
-[   92.542211]  register_netdev+0x1f/0x40
-[   92.542214]  mana_probe+0x6e2/0x8e0 [mana]
-[   92.542220]  mana_gd_probe+0x187/0x220 [mana]
+> 
+> > +
+> > +	cptp = (struct cpt_parse_hdr_s *)va;
+> > +
+> > +	/* Convert the wqe_ptr from CPT_PARSE_HDR_S to a CPU usable pointer */
+> > +	wqe = (struct nix_wqe_rx_s *)phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
+> > +								    cptp->wqe_ptr));
+> 
+> There is probably no need to cast from void * here either.
+> 
+> 	wqe = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
+> 	                   cptp->wqe_ptr));
+> 
+ACK.
 
-If you prefer I can update the stack trace in commit meesage
-From:
+> > +
+> > +	/* Get the XFRM state pointer stored in SA context */
+> > +	va_ptr = pfvf->ipsec.inb_sa->base +
+> > +		(cptp->cookie * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
+> > +	xs = (struct xfrm_state *)*va_ptr;
+> 
+> Maybe this can be more succinctly written as follows?
+> 
+> 	xs = pfvf->ipsec.inb_sa->base +
+> 		(cptp->cookie * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
+> 
+ACK.
 
-netvsc_netdev_event()
-  netvsc_vf_setxdp()
-    dev_xdp_propagate()
+> > +
+> > +	/* Set XFRM offload status and flags for successful decryption */
+> > +	sp = secpath_set(skb);
+> > +	if (!sp) {
+> > +		netdev_err(pfvf->netdev, "Failed to secpath_set\n");
+> > +		wqe = NULL;
+> > +		goto err_out;
+> > +	}
+> > +
+> > +	rcu_read_lock();
+> > +	xfrm_state_hold(xs);
+> > +	rcu_read_unlock();
+> > +
+> > +	sp->xvec[sp->len++] = xs;
+> > +	sp->olen++;
+> > +
+> > +	xo = xfrm_offload(skb);
+> > +	xo->flags = CRYPTO_DONE;
+> > +	xo->status = CRYPTO_SUCCESS;
+> > +
+> > +err_out:
+> > +	/* Free the metapacket memory here since it's not needed anymore */
+> > +	pool = &pfvf->qset.pool[qidx];
+> > +	otx2_free_bufs(pfvf, pool, *seg_addr - OTX2_HEAD_ROOM, pfvf->rbsize);
+> > +	return wqe;
+> > +}
+> > +
+> >  static int cn10k_inb_alloc_mcam_entry(struct otx2_nic *pfvf,
+> >  				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> >  {
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> > index aad5ebea64ef..68046e377486 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> > @@ -8,6 +8,7 @@
+> >  #define CN10K_IPSEC_H
+> >  
+> >  #include <linux/types.h>
+> > +#include "otx2_struct.h"
+> >  
+> >  DECLARE_STATIC_KEY_FALSE(cn10k_ipsec_sa_enabled);
+> >  
+> > @@ -302,6 +303,41 @@ struct cpt_sg_s {
+> >  	u64 rsvd_63_50	: 14;
+> >  };
+> >  
+> > +/* CPT Parse Header Structure for Inbound packets */
+> > +struct cpt_parse_hdr_s {
+> > +	/* Word 0 */
+> > +	u64 cookie      : 32;
+> > +	u64 match_id    : 16;
+> > +	u64 err_sum     : 1;
+> > +	u64 reas_sts    : 4;
+> > +	u64 reserved_53 : 1;
+> > +	u64 et_owr      : 1;
+> > +	u64 pkt_fmt     : 1;
+> > +	u64 pad_len     : 3;
+> > +	u64 num_frags   : 3;
+> > +	u64 pkt_out     : 2;
+> > +
+> > +	/* Word 1 */
+> > +	u64 wqe_ptr;
+> > +
+> > +	/* Word 2 */
+> > +	u64 frag_age    : 16;
+> > +	u64 res_32_16   : 16;
+> > +	u64 pf_func     : 16;
+> > +	u64 il3_off     : 8;
+> > +	u64 fi_pad      : 3;
+> > +	u64 fi_offset   : 5;
+> > +
+> > +	/* Word 3 */
+> > +	u64 hw_ccode    : 8;
+> > +	u64 uc_ccode    : 8;
+> > +	u64 res3_32_16  : 16;
+> > +	u64 spi         : 32;
+> > +
+> > +	/* Word 4 */
+> > +	u64 misc;
+> > +};
+> > +
+> >  /* CPT LF_INPROG Register */
+> >  #define CPT_LF_INPROG_INFLIGHT	GENMASK_ULL(8, 0)
+> >  #define CPT_LF_INPROG_GRB_CNT	GENMASK_ULL(39, 32)
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> 
+> ...
+> 
+> > @@ -355,8 +359,25 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+> >  	if (unlikely(!skb))
+> >  		return;
+> >  
+> > -	start = (void *)sg;
+> > -	end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
+> > +	if (parse->chan & 0x800) {
+> > +		orig_pkt_wqe = cn10k_ipsec_process_cpt_metapkt(pfvf, sg, skb, cq->cq_idx);
+> > +		if (!orig_pkt_wqe) {
+> > +			netdev_err(pfvf->netdev, "Invalid WQE in CPT metapacket\n");
+> > +			napi_free_frags(napi);
+> > +			cq->pool_ptrs++;
+> > +			return;
+> > +		}
+> > +		/* Switch *sg to the orig_pkt_wqe's *sg which has the actual
+> > +		 * complete decrypted packet by CPT.
+> > +		 */
+> > +		sg = &orig_pkt_wqe->sg;
+> > +		start = (void *)sg;
+> 
+> I don't think this cast is necessary, start is a void *.
+> Likewise below.
+ACK.
 
-To:
+> 
+> > +		end = start + ((orig_pkt_wqe->parse.desc_sizem1 + 1) * 16);
+> > +	} else {
+> > +		start = (void *)sg;
+> > +		end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
+> > +	}
+> 
+> The (size + 1) * 16 calculation seems to be repeated.
+> Perhaps a helper function is appropriate.
+ACK.
 
-netvsc_netdev_event()
-  netvsc_register_vf()
-    netvsc_vf_setxdp()
-      dev_xdp_propagate()
-
-- Saurabh
-
-> -- 
-> pw-bot: cr
+Thanks,
+Tanmay
+> 
+> > +
+> >  	while (start < end) {
+> >  		sg = (struct nix_rx_sg_s *)start;
+> >  		seg_addr = &sg->seg_addr;
+> > -- 
+> > 2.43.0
+> > 
+> > 
 
