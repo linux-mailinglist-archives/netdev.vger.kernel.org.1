@@ -1,98 +1,225 @@
-Return-Path: <netdev+bounces-192987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B518AAC1FA8
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:22:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC3EAC1FB7
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 11:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A4127B8190
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:21:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53886A40DA0
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 09:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32E6224243;
-	Fri, 23 May 2025 09:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C78B1A0731;
+	Fri, 23 May 2025 09:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="FolwvLm4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fkN4RQBQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECD718DF8D;
-	Fri, 23 May 2025 09:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888C7225768;
+	Fri, 23 May 2025 09:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747992153; cv=none; b=CnkRksnCxC9/qqggiyzm9A6Mh/5Kvp3xsKFUqlXKdg/MB5gPxNRSMGcBmAvKztAi0RS5W8LZVhjPVSt0Sy1eTG8Y1VriQI83mAaR2OvMMKa6FAa3wIEFz4C0lJW1AGtmF+tuf1ur5nTmKA68Wa3hyprqvmpzm4t09lmDxA+mbN4=
+	t=1747992342; cv=none; b=IunCNwBg1n+1saM574R0M1TFNOrADYTVoy4o9OuNZRAl1+tfWunfJjnLYxbH0x81uBnEty6H90fu2n1tvXaKs2EIz96OJ5LCXPXfZsRnXSzEJdefvEDCi2HggvzqEHvBqrsXMLm0Ayqc93L3RoDIfAzp2pNUSFyPQxTWkQx48lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747992153; c=relaxed/simple;
-	bh=11mX87hlq1IiTfNULkV+rW2dsQccJjtUKONwS12V25k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ozQkJZARH4Qm8n69tftQ7t3vRbnqtn14sGnqDxxOMZgM7A1U8x0ZPqlZdnfrnC859e6d/QDRvn0WWki7aY6W9+BYVumVrUw+IeQd5h6j9MVhBrK1+l1rhdrUa/0Lm0oJm2eeSHhl56CZ+TllKFhgu8O1LjmYThEKIePXA+Z0SOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=FolwvLm4; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=bR
-	1J39uj1vSGXynasl9DndSnDxH4yAwTdkqFXTcE/RM=; b=FolwvLm4oNVnTrnR4a
-	uSltVDgxiEitRNyuWKystimQEbjL8LASpb34kEEUqcCmy+/azUW3sR8rlf74avPy
-	pVMiQCtDhIjB0IFJJAzTrYv4AdpI7NqWszNb65aMmyw/6zlgw/YnhvouG/xQymEY
-	VzjS/E8AvwqxFUZAC89KPdp/U=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDXUaEaPjBomo+5DQ--.49546S4;
-	Fri, 23 May 2025 17:21:31 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: pablo@netfilter.org
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	xiafei_xupt@163.com
-Subject: Re: [PATCH V6] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Fri, 23 May 2025 17:21:29 +0800
-Message-Id: <20250523092129.98856-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <aC-B1aSmjDvLEisv@calendula>
-References: <aC-B1aSmjDvLEisv@calendula>
+	s=arc-20240116; t=1747992342; c=relaxed/simple;
+	bh=xIx2bwVUtQ3huZmlIbwcfn+SKmsSoHtb+xhBVD3NCgs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LCzvKDDgx0KMjdrd4NlNY9cU1Rgc8fbtpURbJXjJvUsDJ7e0sdENtBuA+bbTBfV3Nmgd8m4im6v5o6Ux5UPq+QGzXMCJDPodr3GGX3hPvY6Vyx0n5aVsfo8rIUBPA9B5MpOCfb478nK1pHfSFT5bRCrRQldQKzX/LnL0eEt175s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fkN4RQBQ; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747992341; x=1779528341;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xIx2bwVUtQ3huZmlIbwcfn+SKmsSoHtb+xhBVD3NCgs=;
+  b=fkN4RQBQfYMZBDO04oNZmdE535oEqER86oZeV7IiroAOUVy1mVet5ZGy
+   XI2jHiffWfq42Euc3NqiJ+rKaBgUes2JVqCjIp3DPRAxcwG6GIZ7YmoFS
+   PhhpdrhY59ZWiEGxSVnITyARt6Xk/oFjZBbpv9K+vqn2ATQ92eZ2SWlAm
+   EKxS6knLiA1YQ0MTdNrDsHyPhHH0u5X3pPEbMTWttys4kwVcCQtjUw9RF
+   vhJHNM4guUpGkwbJsVf/hBxDFUXmtrysEZjaVxQO+UTieDMlbPPhh3Kr9
+   5nTTNiyP1j8pzQWTp732lI7VcJDrTDPOO6xeAeuRbnQK+i7lY4AiipXXZ
+   w==;
+X-CSE-ConnectionGUID: t+vhbWDVTzms+7mzOvfzoQ==
+X-CSE-MsgGUID: il2Bnsd2TTumSvAh+duNIA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49298634"
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="49298634"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 02:25:40 -0700
+X-CSE-ConnectionGUID: 95iuNjHwQEuZE2QF0x84ig==
+X-CSE-MsgGUID: imtu0mmaSreNQztWv5IOWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="145027350"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 23 May 2025 02:25:33 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uIOeh-000QFc-2V;
+	Fri, 23 May 2025 09:25:31 +0000
+Date: Fri, 23 May 2025 17:24:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>,
+	bridge@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, openwrt-devel@lists.openwrt.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, Ivan Vecera <ivecera@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jonathan Corbet <corbet@lwn.net>,
+	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Jan Hoffmann <jan.christian.hoffmann@gmail.com>,
+	Birger Koblitz <git@birger-koblitz.de>,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>
+Subject: Re: [PATCH net-next 5/5] net: dsa: forward bridge/switchdev mcast
+ active notification
+Message-ID: <202505231706.fkxIDjje-lkp@intel.com>
+References: <20250522195952.29265-6-linus.luessing@c0d3.blue>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXUaEaPjBomo+5DQ--.49546S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7GF4DZw15JrWDKr1UCrW8Xrb_yoW3Kwb_uF
-	Wvka1kKw1YkF12g3WDtFnxXws0gr92qFyrG3y8A3sIv34UAF1kWayDWrZ3Aw1Sgr48trnx
-	u3ZIqa4a9r13ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VUbrHUDUUUUU==
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/xtbBMQxWU2gwGE+oBgABsY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250522195952.29265-6-linus.luessing@c0d3.blue>
 
-On Thu, 22 May 2025 21:58:13 +0200, Pablo Neira Ayuso wrote:
+Hi Linus,
 
-> > Wether its time to disallow 0 is a different topic and not related to this patch.
-> >
-> > I would argue: "yes", disallow 0 -- users can still set INT_MAX if they
-> >  want and that should provide enough rope to strangle yourself.
+kernel test robot noticed the following build warnings:
 
-> The question is how to make it without breaking crazy people.
+[auto build test WARNING on net/main]
+[also build test WARNING on linus/master v6.15-rc7 next-20250522]
+[cannot apply to net-next/main horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-It seems that we need a new topic to discuss the maximum value that the system can
-tolerate to ensure safety:
+url:    https://github.com/intel-lab-lkp/linux/commits/Linus-L-ssing/net-bridge-mcast-explicitly-track-active-state/20250523-040914
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250522195952.29265-6-linus.luessing%40c0d3.blue
+patch subject: [PATCH net-next 5/5] net: dsa: forward bridge/switchdev mcast active notification
+config: i386-randconfig-001-20250523 (https://download.01.org/0day-ci/archive/20250523/202505231706.fkxIDjje-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250523/202505231706.fkxIDjje-lkp@intel.com/reproduce)
 
-1. This value is a system limitation, not a user setting
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505231706.fkxIDjje-lkp@intel.com/
 
-2. This value should be calculated based on system resources
+All warnings (new ones prefixed by >>):
 
-3. This value takes precedence over 0 and other larger values that the user sets
+>> net/dsa/user.c:661:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
+     661 |                 const bool *handled = ctx;
+         |                 ^
+   net/dsa/user.c:3770:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
+    3770 |                 struct switchdev_notifier_port_attr_info *item = ptr;
+         |                 ^
+   net/dsa/user.c:3813:3: warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
+    3813 |                 struct switchdev_notifier_port_attr_info *item = ptr;
+         |                 ^
+   3 warnings generated.
 
-4. This value does not affect the value of the user setting, and 0 in the user
-setting can still indicate that the user setting is unlimited, maintaining
-compatibility with historical usage.
 
+vim +661 net/dsa/user.c
+
+   598	
+   599	static int dsa_user_port_attr_set(struct net_device *dev, const void *ctx,
+   600					  const struct switchdev_attr *attr,
+   601					  struct netlink_ext_ack *extack)
+   602	{
+   603		struct dsa_port *dp = dsa_user_to_port(dev);
+   604		int ret;
+   605	
+   606		if (ctx && ctx != dp && attr->id != SWITCHDEV_ATTR_ID_BRIDGE_MC_ACTIVE)
+   607			return 0;
+   608	
+   609		switch (attr->id) {
+   610		case SWITCHDEV_ATTR_ID_PORT_STP_STATE:
+   611			if (!dsa_port_offloads_bridge_port(dp, attr->orig_dev))
+   612				return -EOPNOTSUPP;
+   613	
+   614			ret = dsa_port_set_state(dp, attr->u.stp_state, true);
+   615			break;
+   616		case SWITCHDEV_ATTR_ID_PORT_MST_STATE:
+   617			if (!dsa_port_offloads_bridge_port(dp, attr->orig_dev))
+   618				return -EOPNOTSUPP;
+   619	
+   620			ret = dsa_port_set_mst_state(dp, &attr->u.mst_state, extack);
+   621			break;
+   622		case SWITCHDEV_ATTR_ID_BRIDGE_VLAN_FILTERING:
+   623			if (!dsa_port_offloads_bridge_dev(dp, attr->orig_dev))
+   624				return -EOPNOTSUPP;
+   625	
+   626			ret = dsa_port_vlan_filtering(dp, attr->u.vlan_filtering,
+   627						      extack);
+   628			break;
+   629		case SWITCHDEV_ATTR_ID_BRIDGE_AGEING_TIME:
+   630			if (!dsa_port_offloads_bridge_dev(dp, attr->orig_dev))
+   631				return -EOPNOTSUPP;
+   632	
+   633			ret = dsa_port_ageing_time(dp, attr->u.ageing_time);
+   634			break;
+   635		case SWITCHDEV_ATTR_ID_BRIDGE_MST:
+   636			if (!dsa_port_offloads_bridge_dev(dp, attr->orig_dev))
+   637				return -EOPNOTSUPP;
+   638	
+   639			ret = dsa_port_mst_enable(dp, attr->u.mst, extack);
+   640			break;
+   641		case SWITCHDEV_ATTR_ID_PORT_PRE_BRIDGE_FLAGS:
+   642			if (!dsa_port_offloads_bridge_port(dp, attr->orig_dev))
+   643				return -EOPNOTSUPP;
+   644	
+   645			ret = dsa_port_pre_bridge_flags(dp, attr->u.brport_flags,
+   646							extack);
+   647			break;
+   648		case SWITCHDEV_ATTR_ID_PORT_BRIDGE_FLAGS:
+   649			if (!dsa_port_offloads_bridge_port(dp, attr->orig_dev))
+   650				return -EOPNOTSUPP;
+   651	
+   652			ret = dsa_port_bridge_flags(dp, attr->u.brport_flags, extack);
+   653			break;
+   654		case SWITCHDEV_ATTR_ID_VLAN_MSTI:
+   655			if (!dsa_port_offloads_bridge_dev(dp, attr->orig_dev))
+   656				return -EOPNOTSUPP;
+   657	
+   658			ret = dsa_port_vlan_msti(dp, &attr->u.vlan_msti);
+   659			break;
+   660		case SWITCHDEV_ATTR_ID_BRIDGE_MC_ACTIVE:
+ > 661			const bool *handled = ctx;
+   662	
+   663			if (!dsa_port_offloads_bridge_dev(dp, attr->orig_dev))
+   664				return -EOPNOTSUPP;
+   665	
+   666			ret = dsa_port_bridge_mdb_active(dp, attr->u.mc_active, extack,
+   667							 *handled);
+   668			break;
+   669		default:
+   670			ret = -EOPNOTSUPP;
+   671			break;
+   672		}
+   673	
+   674		return ret;
+   675	}
+   676	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
