@@ -1,211 +1,147 @@
-Return-Path: <netdev+bounces-192979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C203EAC1F05
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:57:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43DF7AC1F0B
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 10:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724FC4A188E
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 08:57:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63D653A49B3
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 08:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA9E1E379B;
-	Fri, 23 May 2025 08:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20D82036ED;
+	Fri, 23 May 2025 08:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="FfmWRDU8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N62MAUSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2064.outbound.protection.outlook.com [40.107.21.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00DF130A73;
-	Fri, 23 May 2025 08:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747990669; cv=fail; b=EO8g7a5ZYEhrjOcwP84gqc2gHnxO5vytWPbucINJE8RBGhr4wt1qu1e10wQirMEdpV4RBHDq/y8CUjZHnbGM7FVDT9Wrs9GUcASJpCDwejNYEoJGQpBhNCV7PBW+/2TFgSVyi6ULWM24hVSAbSVVpztsJfFXuWldOregg/sohdU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747990669; c=relaxed/simple;
-	bh=yuqBqBCgmWq7zcUWeAIoHuYs6cjElm+UK5k51jyVdqA=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=qFLwNEIZm/ZfVx4KEZdAuY3hEkEyjC4zguhIE5ggVvBjHu25TYovKMA6izeUuAZEhxT9TW6TyIDSXK8Ws/MVvD1TUvzm10Rjq7Sa7Fa1026p6vkKd52aeFjrll8GZmXo5GGEOEASTFSWQk58tV/4diUbFq8Z+/W9q2yhLkWZ6BA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=FfmWRDU8; arc=fail smtp.client-ip=40.107.21.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A3pXLnI7StKEKd2Wh+/svIX1nCoKa69ay0nruvqBVJFYyVs+LBF10zGjh2VD98dG0YJg6RVyXhm5Vtv057DCpER4NbrIwdssaj/9ZiJp/46xJA8DUZ5eMz4eB3pODFuRn1xqXmB+XSHPxocupwyyUjkCfK5m/Xqhm1EcjXwOsV0dB4gNXEy1KmET4tbPg7ynxiK392ciyFXVdpmPL/8CK2jBIzt66lCdNA6D7SKJA4vc5HCFfY+drkeCy8AwQjROH1VrNV+7PC5VTqh73Ei2nVyN44a2vOCT3dnmtp311WrjKijS0d9mJST2j8OaUqia6NO61ZQ2LCO4cCAkfB24bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+ijKgcwqE+mwxbSnhP/MsTyOMcOVUyy0JooIE65zp7E=;
- b=RpoUJN2w0ja4j20WchvPeYsGKxSoElX6o4KNiRIwNEob2bySAqRZEjXCYCFu7VZR1uRG4ZEgpfOdSK16C/E8UR6ZJHIXwgfqv5i97/DbQhRutDvky4g6IWrU6yYkVwlGTD0eO/tHv6OMb5+fBw8+/ZXjNiPFDL8tTxMZzFLMKbzpEGXLcBmGGZT7vVOLnwvkv/WXOYAfb3IPEQkYDJh6R5SezTsfYM2C/tO6ArLoKY6KRF4smjzZnvrhcKoHiHgQDdfuZSwiqAkUZtLgnq5lqpTkn0kpItd3NPgkfJeHmSudRnUSpuVNv3DegNPaP+GKgrMJqAypUQZCmFo+UGWBIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+ijKgcwqE+mwxbSnhP/MsTyOMcOVUyy0JooIE65zp7E=;
- b=FfmWRDU89K4iNFjauO2UngIZ2KtWTVeQnZtA/MkZ9wFpLafU2l3Tp9D+ZjJ0BANb/x/7xa5pSk1PCSOu2mnn40bsMMr5MZG7rG/6fUgyGeal3MlbQcljbPHayXGkm2NHNe9glhAtwHmHqlLTXfvS15Jr1WzuEklQgzNNB8jcnIZJqNOT2KBdYDLcosh7Hgvl2VuKge1ge/42PpLYWWX4bd5naOfMoNkm2x3rePVIGidDdkg6j77pJUYYGqT/wakwa3/nNR7T7oHtU/j5FyU2LCKDhJ5DCNzs3AlRLXbGICCgUrdC5zRyFzmE0vL2RZ5qHJLcZT5NFzg/bbZen16OUw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PAXPR04MB9231.eurprd04.prod.outlook.com (2603:10a6:102:2bb::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.22; Fri, 23 May
- 2025 08:57:44 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8769.019; Fri, 23 May 2025
- 08:57:44 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	f.fainelli@gmail.com,
-	xiaolei.wang@windriver.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v2 net] net: phy: clear phydev->devlink when the link is deleted
-Date: Fri, 23 May 2025 16:37:59 +0800
-Message-Id: <20250523083759.3741168-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR04CA0009.apcprd04.prod.outlook.com
- (2603:1096:4:197::8) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409F11DD0F2
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 08:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747990723; cv=none; b=TyYkuc2Vd3G8S4vFemNiSuCZlLLJTvJAIBE+gKvRESnRd/2qN//bSRdUkSq98zvR7z3Cec+aRMt3Uoy/sXGcDqvubyxfM35O3uYzZSPvI99KcAVW0QjuDT32zlOM4RrQIaSMGp3mwx36OSBuWcKogNR6cBogiAZI2d//Whs3qWk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747990723; c=relaxed/simple;
+	bh=zDRzq9Tfty91GtEb71CtKU6V6XsJ8Gw0d9DOAy5jhc8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DbiZv8vFdw5a21tKYcmsNvt/LgwqbO5H6fSkl6qN756XO4EBj8otmTRn1O+PqkCOlRhoJ/GgG3RF1wDVEn0PPcrT3t8RDhmf2iH8ceGU6ziZb7QHTM3xSGNoYeSjC+2W46YE0tRSztRolOJZI1b14sTxWxqUYp4wfsOV69tOOMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N62MAUSW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747990721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6J/RUYS6OBOPvuZyXgo5WgF2pNpessZJIoWwbAcSf0A=;
+	b=N62MAUSWPqMvB9zMaUDQUYlVbYDGBrEmdZc2fcaWsEhRSAPj0XjfRdLFMPFIEHQvoXyz5n
+	OxDDHRTJDRqKaDM2Ax/cQeMjhGlHe7+N74gKmcDVwH3ontyxEotFaycuXqPXem9RUFZKPx
+	xuGQNo0GdfCyLkqHpp/B1HFkA3UvS2k=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-1-DOwRfVTLN76fM6lVQcCcJw-1; Fri, 23 May 2025 04:58:39 -0400
+X-MC-Unique: DOwRfVTLN76fM6lVQcCcJw-1
+X-Mimecast-MFC-AGG-ID: DOwRfVTLN76fM6lVQcCcJw_1747990718
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-551ebc1bf86so3586253e87.3
+        for <netdev@vger.kernel.org>; Fri, 23 May 2025 01:58:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747990717; x=1748595517;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6J/RUYS6OBOPvuZyXgo5WgF2pNpessZJIoWwbAcSf0A=;
+        b=aAANeHRuTsvEi3wkinaaFSbZRfBkC974VuMumbzqDXRIxKucCqIgg98sfmbgW/5A49
+         hHs+dE8Rj1pYQcG12TvcLdA5RGEokyDZmYPShwu3JK0py7TAJLdTCYqjxXdGtBg9joPm
+         i4KmUO7aHerl25p4XjeK2Q6+aMAg/5eXiuQinSLc3HFItUpdCX39wEzajv38JA43Quqg
+         iz+WBx+u/uSqvCI8SRVHjNkffsIF8DNOyi2beebzdyhOu9BJyvvKdseiEGVfe6I2lY7/
+         MzHv6cceTY6hhWxXna9xjs1AsSpVjoXWNL84Viey6xT9UZXzA8JW8WIxhunhNw+eXpG3
+         2nxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdckS2OQlDheeHPrmiDyl9Srv5NUnaFX+ew230WBWlaA+1RTMlEJZ/HUef5yvV11E0FsX5W0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVCgJAqwAfgSNDGBsPjWu+nPaJLN+ekDMeJeSsN9R2euAB4j/J
+	oypTF3ee8PGoRGfZBeM2fA+wHb3mEfoqWWGo58vXZJ7zg7i+LVUru5qnVrD4SzE/KccUxi+KC9F
+	5yGCjWrCuYl0a5+WeN8AMHKTiEgGNvx6lbD8/HLYLqN/f9V8FqVnV9S+y2g==
+X-Gm-Gg: ASbGncvxR8Iwnrllsy2/HjNRK1TJ86DQW6ZZ1vYSegVIagJeE7DtDV6AKHf/MgBWly7
+	y9K6AlXqx5Olr6X8YlQdp59HpOznwMBnKG+w+fTbCjo+DKkVOKb58DuwWk9WmVwSfAW8+JK8Yp8
+	FuVYua0ZlCFCsNe1vkgYVw6CboXCli8ivqpQ5PwvWXq46JX7gzQ6Bbylat4r32azPMnX3Rtrwxe
+	6FzgDG8NHw5MgsaaRLJEMTEz5nQuFyuaz8EJeARa5qoIgwDBNXtspNU+re0oC1LfMD6nfcynHIv
+	5YQVIF8aDaDNlhlPg0UZWQqluwnzDBW4m5ez
+X-Received: by 2002:a05:6512:3083:b0:552:31c:d27f with SMTP id 2adb3069b0e04-55216e18aa5mr550264e87.6.1747990717436;
+        Fri, 23 May 2025 01:58:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGGupqC+46X0tt6Ygg6tbBTVVOo7BQlw5aLij8Bq0jPcx2TjqKILidIf2WS35eedcHMuDdsdg==
+X-Received: by 2002:a05:6512:3083:b0:552:31c:d27f with SMTP id 2adb3069b0e04-55216e18aa5mr550242e87.6.1747990716968;
+        Fri, 23 May 2025 01:58:36 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e702e03dsm3786008e87.195.2025.05.23.01.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 01:58:36 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id D7C101AA3B8A; Fri, 23 May 2025 10:58:33 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+ akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
+ andrew+netdev@lunn.ch, asml.silence@gmail.com, tariqt@nvidia.com,
+ edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+ leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
+ page->pp_magic in page_pool_page_is_pp()
+In-Reply-To: <20250523032609.16334-13-byungchul@sk.com>
+References: <20250523032609.16334-1-byungchul@sk.com>
+ <20250523032609.16334-13-byungchul@sk.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 23 May 2025 10:58:33 +0200
+Message-ID: <87ecwfn1om.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PAXPR04MB9231:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41f3536a-4bca-4f3d-b8dc-08dd99d7e166
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dCK8VKSbT7TzAhZlksJyG+0CSV5oXBYakmbugqbhKcO+ehhW3YLMSISF08eY?=
- =?us-ascii?Q?HN1yg1ibWGq3ZTVg9domWyJJhIVSWRy0PEbNyce1YSaVGJC29/FCrwIO3BAP?=
- =?us-ascii?Q?VRyRZL8oHJxnYuABj0HNJo7YpY0jclXVSxagQo50AXvuJYQlpIutMoCCbrUP?=
- =?us-ascii?Q?rAG4wk7x4pBTw6i2s2+ch/TbtYIr0TKwDkUtRBmYrApco4Bt2GYuVoz/C5M3?=
- =?us-ascii?Q?RN6BULR9pL8HNPhNbgO1XSLbKJ+VR8W6jgG4JJ0yXKeoPCN89Co9xT/89gvx?=
- =?us-ascii?Q?4Pn1+LLofsxeerRKezXayheGRzoNbONTvXbprSLiWc5fKxEfKcgk2tRLD1g5?=
- =?us-ascii?Q?NmWtjgyQ2t+NkyD7q2pguX0fKq8DKqKTDlkvmHJbPwiHYAf1jRVS5bdHffWA?=
- =?us-ascii?Q?I2GqJK+AdTZu91pqHAx2L8Gmq5Ks/Bfs6YITAi/jRBke24gHrtKWuLhBzcbM?=
- =?us-ascii?Q?RCLaff3ADLXiXyQU9O/yxk0mZqNFuvTSVUCiBs96CQxF32tcmvIejwUUCJrR?=
- =?us-ascii?Q?F5cLqnPHpr8WZq6ZdAh+0aJS4ozmF/dgumYtUnczluZq9Dko1byarxqBbgGc?=
- =?us-ascii?Q?K9bFDtFc7AIX/QjPNxqYdAZf979jqMdjNscPKgWyAsT1+Z/0h4yN/+SDp/a4?=
- =?us-ascii?Q?3mGF4tnGjTz8jCZHAZRlJ9QbuXIryhCDiIBAa0JT5iYy9M//AzPTyAjCB6Jb?=
- =?us-ascii?Q?z3F9ZEdbCq0XPmcdmlg7FnZA6cb2ePali9DT1EaQbxAu0fGzwcnLv479nL0Y?=
- =?us-ascii?Q?9H/Ul1vOoevHwXWpsDJtHWyD6jGIPjfy4E5lsHCZ8lcuhKa3jPoUskCRwSxT?=
- =?us-ascii?Q?tx0amjfwxu1WVhsYC0BT8RzdbXzuNP1bOzSdi8/DNkqnUSZxZrCba+NiDKTn?=
- =?us-ascii?Q?GRnY42+BkDJNoPcMdzpeyGxX+07t1NGMNHEuLE1u2eMIEAiqGck1Mv80SR5a?=
- =?us-ascii?Q?LMq1Asp4/R4+HSo77eJdkDz1+5N3xhPB5M9t6AxxD6deu3ea02+rnhRq/JA9?=
- =?us-ascii?Q?CmQ8Huyh9wtL5FScISsMfI5Xs38F31F+wqMQKDJN1rFRmm4CqiRHv86BOIDk?=
- =?us-ascii?Q?SWBkGwQsqM91kGtJSDECu3iks1m0eERelEVBy/2Kt7yyeyV+mkUexEDSOMjW?=
- =?us-ascii?Q?/g+s/DL0qm5UA6SYbYxMUzZbzO1Qcfu7qVPs5ejkkj61/iWAFXbLgaYUvsZM?=
- =?us-ascii?Q?xcNgYWwJDMga6ht645UE6hd92SdtOQZjp7MjGENM8T8HguI0Dwc93pSbDaLe?=
- =?us-ascii?Q?pfwFCkXSJNa2Sny1Hk89uPVg1E/MhTHGx8ihWJjQ6G14ygFIrM9WywsQygNw?=
- =?us-ascii?Q?VQI/qyHR/ue9ub7nCGq9ifQFf51KYECPMW9ZfnbCdtz0J2WhhnhKW8ZG4M2y?=
- =?us-ascii?Q?gq4HpnQd15I+nQDTObloB3l4ruC6sNJ7WEexTdunt4owlTK33KjzMXjJSlzl?=
- =?us-ascii?Q?B0i5z40BV+ra28Uaqvu/zu6snWDTmAiMizj+gwaY7wkIl7SpK4Abqg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ryuw/wuyUbSgbNIU6tKURu9x1dcQsmNTLCaH5N91ddWIyvi6zJT0GTtsOWyc?=
- =?us-ascii?Q?LN726mxpredtbyc+BUhWO7YVZXj8Dx6H7Pi9wx4wSTxxgH+4q0MdMyuP/Pd2?=
- =?us-ascii?Q?6PmY4C2r9LMapGZMQIHeOQoIqWrv/NgfeBdVhI8zM4FUb0QidBhz9VQE0XrZ?=
- =?us-ascii?Q?Vf5fzKaPDNVi1evj2OyI2KgLq1ifEp4BtJ63autAxuqn5CJIR+4twKbDWSjp?=
- =?us-ascii?Q?CxTYljO87BEb4yuxIsALpw8PI8uFXcJl/2Xlb7KdWFdM81WrNXcHSdEmEK92?=
- =?us-ascii?Q?WzzIG0m8jlW2qoFcnFC0t2m+TwO6rwXuaNEO2lqHovNQPVJJ6QS1W4bnEiSu?=
- =?us-ascii?Q?yCyKpSekc2kmfabLq4RAeLEatMUIpkO66HyTWS5Ai3EvQKLnxj4JD0JBZyss?=
- =?us-ascii?Q?8ukbWRjLBoEyfucO0um0BL30+sbNs51Y27IPv3Yv7aBV7cjL3ki+0TG9vYYz?=
- =?us-ascii?Q?jYPhYAA/NnCcnibTlxbio/F0G8Gp9HXhzRPBYxbUfDIr6MxKFfwudfpib2fl?=
- =?us-ascii?Q?MvA/vp8m0UnT8L/anWuT99OuSUQDEUJYKY/u0qAYs3Pnplf+Lu20tPfNPLzq?=
- =?us-ascii?Q?c8hsBXVjxb+7ysRKYqrDHZA7DiTUyVjKnb3FpvwdmAOkMJT6Oe/9QiaYcVNM?=
- =?us-ascii?Q?F5LlE4/p+FfW8dv+IKZGzv5sXv9kTwcgeXIhp7PZvkL14y3WYCAnJ2vfFm2r?=
- =?us-ascii?Q?wKSixxhy/lvn6eph2bsPYUDxChomtZQIyxRSi2qGDzbWKWnuONgK5L1S8fqo?=
- =?us-ascii?Q?bgSx4eJxqCg5guaov7tnuXGhfJwSyKwFV/G7liiikFnqVohOQBcSRwnGNosQ?=
- =?us-ascii?Q?uP7gPRi/AB8fl1cBZPRRrDwUj9iM527kWIlsu1BaIWc6EzaBM6iK2VuRgMm0?=
- =?us-ascii?Q?U7QFTjgFd1udayxDwbR73t8yicDP17cQNfwPIerJj4aEn4f9ViOBSzGvXkCI?=
- =?us-ascii?Q?61akkelaeA6/onX77VomXQ9mEBp+cXkouj/8jEP1fytxhv64gF5Fx7rovR0q?=
- =?us-ascii?Q?rqiEhP4UcAgPhSHl9fMXqbTKgVYNBX90LFQNviTK5Wy8ehd7HuXv/UroBnWV?=
- =?us-ascii?Q?NlbwSyiWNXvl/jsBcFrh47UwhSWRb2zipLNlKH7/6A+CPCEI9hb1GFWFBRz2?=
- =?us-ascii?Q?VApCoZGjKvPtflglujaTf2101NtSjF5qnfefPvaXt9OiAB4l/LresCB/vtCQ?=
- =?us-ascii?Q?0hkUAosqRy3Gnzn31VlM4YTl/o7GZ/6yVFMroe5MdpnxMLvBW7xr8JbxmjkE?=
- =?us-ascii?Q?Ob2B+ie+UL0XV2ac1SY8/mnPvCPfDJxaHCeBKe0z7Xkhp9RfYHDgCq84O/5N?=
- =?us-ascii?Q?ar9h4rEMrAb48FdLeLTnF35rsfx2bBiC5Bo0Fpk9x942cpvjixz0fLUQ8stN?=
- =?us-ascii?Q?NFRGaZxlXs4SRd2Ydx7FdIMcwMLOSikc2WXcrAIeJt9Wp7vvC0EqX2YNUNJw?=
- =?us-ascii?Q?B9X5i0m91mlbhW3aX5uAtiekpgh4FK4XiEGfZxbCUNuuCnFTffGHySTcyKGv?=
- =?us-ascii?Q?i66m3YbjlqjElIyfcca+39obz27sqGvwb6AoR9tw86jiLHrlJ6WGuz192o4Z?=
- =?us-ascii?Q?SwJwPZOySjHi87Eur7ijzSQSjfdWMaPrKq6LOBk9?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41f3536a-4bca-4f3d-b8dc-08dd99d7e166
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2025 08:57:43.9365
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iQjQKsZdnXPIhzi5nV9X+OyGNvO9UMyorZX+cfnw9x0ok44PLBogeV3JCs1qZcEdCXIT4IfXSBrR5stqfBNGCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9231
+Content-Type: text/plain
 
-There is a potential crash issue when disabling and re-enabling the
-network port. When disabling the network port, phy_detach() calls
-device_link_del() to remove the device link, but it does not clear
-phydev->devlink, so phydev->devlink is not a NULL pointer. Then the
-network port is re-enabled, but if phy_attach_direct() fails before
-calling device_link_add(), the code jumps to the "error" label and
-calls phy_detach(). Since phydev->devlink retains the old value from
-the previous attach/detach cycle, device_link_del() uses the old value,
-which accesses a NULL pointer and causes a crash. The simplified crash
-log is as follows.
+Byungchul Park <byungchul@sk.com> writes:
 
-[   24.702421] Call trace:
-[   24.704856]  device_link_put_kref+0x20/0x120
-[   24.709124]  device_link_del+0x30/0x48
-[   24.712864]  phy_detach+0x24/0x168
-[   24.716261]  phy_attach_direct+0x168/0x3a4
-[   24.720352]  phylink_fwnode_phy_connect+0xc8/0x14c
-[   24.725140]  phylink_of_phy_connect+0x1c/0x34
+> To simplify struct page, the effort to seperate its own descriptor from
+> struct page is required and the work for page pool is on going.
+>
+> To achieve that, all the code should avoid accessing page pool members
+> of struct page directly, but use safe APIs for the purpose.
+>
+> Use netmem_is_pp() instead of directly accessing page->pp_magic in
+> page_pool_page_is_pp().
+>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> ---
+>  include/linux/mm.h   | 5 +----
+>  net/core/page_pool.c | 5 +++++
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 8dc012e84033..3f7c80fb73ce 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+>  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+>  
+>  #ifdef CONFIG_PAGE_POOL
+> -static inline bool page_pool_page_is_pp(struct page *page)
+> -{
+> -	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> -}
+> +bool page_pool_page_is_pp(struct page *page);
 
-Therefore, phydev->devlink needs to be cleared when the device link is
-deleted.
+Here you're turning an inline function into a function call, which has
+performance implications. Please try to avoid that.
 
-Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
----
-v2: Improve the commit message.
----
- drivers/net/phy/phy_device.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index cc1bfd22fb81..7d5e76a3db0e 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1727,8 +1727,10 @@ void phy_detach(struct phy_device *phydev)
- 	struct module *ndev_owner = NULL;
- 	struct mii_bus *bus;
- 
--	if (phydev->devlink)
-+	if (phydev->devlink) {
- 		device_link_del(phydev->devlink);
-+		phydev->devlink = NULL;
-+	}
- 
- 	if (phydev->sysfs_links) {
- 		if (dev)
--- 
-2.34.1
+-Toke
 
 
