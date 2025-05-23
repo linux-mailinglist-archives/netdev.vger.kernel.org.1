@@ -1,117 +1,137 @@
-Return-Path: <netdev+bounces-193025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B289AAC23BF
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:24:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 164BDAC23C7
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F00507B21A5
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:23:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B5D31C05F2E
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8A1291863;
-	Fri, 23 May 2025 13:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA21291169;
+	Fri, 23 May 2025 13:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bL4/7YsZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wjL9yVwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C7513D539;
-	Fri, 23 May 2025 13:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547CE1FDD
+	for <netdev@vger.kernel.org>; Fri, 23 May 2025 13:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748006653; cv=none; b=r2kIgzdRh2ktMZKR9MpVM1fUqh/yg+veArbIdF6PpQwi9GTbT5bsvZZ4hp5m6pjgvD7rVsWcakBV8pvVfIgGOcAyVOKMTFI3m+n/AxwM8ZxcwBpGJi7zJkkMOOMCCe5lLPyxQ2zvSoe3tNqaCys3R1Ta8shV7PhhNAX3urwzx5c=
+	t=1748006799; cv=none; b=n7XoE2WQjpUvmiacDK9Jt2mVuE2OKUvh3e7HpLvBYp23tLxEYSQ8Z/+ePEnJmQJiSTWToR36rH7Hfh4lvZCLIZINfgBrqDPj0L83RQCfVK9sI2XgJl+uMkMO8DZXFU6Nz5HYx1wHM+h3UeeP3sPX/3C++hYznrnvPRPg5mSEG20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748006653; c=relaxed/simple;
-	bh=QWwG59g5MU2yUcdEwHwb3pj0woEQNNX3BJXpMdxaGdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TdH8Dl55vPDljzfolteAUjPCGP4OtBC6hzY6MMGW7lmPen4J8aFCGmhDx+uGLBpQYddKWh+lKckr/SDY3gzUd99VE615BkTzBCt12J54S94mNdf6HY0nZkKiC9C7GgMepkqVSHuF4MFrOFUVIS/koyRfbMHymA+NPlZDlxftloM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bL4/7YsZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=9PPnvysXCe7nzpl2dlq+yYzcvu67I28jfeZX7VT12P0=; b=bL
-	4/7YsZC73DTlJZDPOpH6yqzgpyOF3021NjeoxBga9DgVV4B2V1TxU1qUt9ndN6uFuuHpWrZgsBB2z
-	2VPUAUl8WMAh7r+MPq1yg+YSoIdNA+cc668P5Ocohltm5UO7JE5uuPTwLb3LPLeJs60/7BckmpOPO
-	w2jlB6cyGEKXUwg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uISNX-00Dc47-JO; Fri, 23 May 2025 15:24:03 +0200
-Date: Fri, 23 May 2025 15:24:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vivien Didelot <vivien.didelot@gmail.com>,
-	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/3] net: dsa: b53: fix configuring RGMII delay on
- bcm63xx
-Message-ID: <a1197a9b-48c3-4dce-866e-287f5cd30865@lunn.ch>
-References: <20250519174550.1486064-1-jonas.gorski@gmail.com>
- <20250519174550.1486064-3-jonas.gorski@gmail.com>
- <ed75677c-c3fb-41d1-a2cd-dd84d224ffe3@lunn.ch>
- <CAOiHx=nwbs7030GKZHLc6Pc6LA6Hqq0NYfNSt=3zOgnj5zpAYQ@mail.gmail.com>
- <2e5e16a1-e59e-470d-a1d9-618a1b9efdd4@lunn.ch>
- <CAOiHx=mQ8z1CO1V-8b=7pjK-Hm9_4-tcvucKXpM1i+eOOB4axg@mail.gmail.com>
- <e0d25a68-057b-4839-a8cd-affe458bfea3@lunn.ch>
- <CAOiHx==NzwF3mXfkf+mS0AZzb-FTR0SHwG9n0Hw9nRiR4k-z6w@mail.gmail.com>
+	s=arc-20240116; t=1748006799; c=relaxed/simple;
+	bh=hl8X2acmHMO6KmiHT6RV7Az2pRAzxdafh4QMGCM63nI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hhYB64alokvDynjo/CHxbbaaH852YnYZo2Fveachuyj7sbrrpLQYim2datflm46+/zl+UlVqMZb7/9azQhstA7HJ5me7jtGSnZvDtnNXvW61r5tuSmAqF90xkP1j17lq9wrgHfWEl0HLD4zPXUmudADRTytmSSeQLBfxnEyVcIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wjL9yVwj; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748006784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YHM8UbBSJvcdfK4Kdm7M9Q7vGmBWfQnpZzojYQ/jzD4=;
+	b=wjL9yVwj9ja77ckyTqtn5mCZVUWq7/9LfPpZDIEEmqV8GcItBv/JU0iSUlw6wXk3CjrxF1
+	K4f5GfQ2lSxEF5eporHgm6ks2t6EL/kMCDro8wFg20sbyLBAE3blA4z1KPapEAzMfCuqi/
+	7rHpdLpU/+/fxAGnPyjCeHLEy1+kek0=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yajun Deng <yajun.deng@linux.dev>
+Subject: [PATCH net-next] net: phy: Add c45_phy_ids sysfs entry
+Date: Fri, 23 May 2025 21:26:06 +0800
+Message-Id: <20250523132606.2814-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOiHx==NzwF3mXfkf+mS0AZzb-FTR0SHwG9n0Hw9nRiR4k-z6w@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 23, 2025 at 11:08:55AM +0200, Jonas Gorski wrote:
-> On Tue, May 20, 2025 at 2:15 AM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > Without this change no mode/port works, since there is always either a
-> > > 0 ns delay or a 4 ns delay in the rx/tx paths (I assume, I have no
-> > > equipment to measure).
-> > >
-> > > With this change all modes/ports work.
-> >
-> > Which is wrong.
-> >
-> > > With "rgmii-id" the mac doesn't
-> > > configure any delays (and the phy does instead), with "rgmii" it's
-> > > vice versa, so there is always the expected 2 ns delay. Same for rxid
-> > > and txid.
-> >
-> > If you read the description of what these four modes mean, you should
-> > understand why only one should work. And given the most likely PCB
-> > design, the only mode that should work is rgmii-id. You would have to
-> > change the PCB design, to make the other modes work.
-> 
-> Since I also have BCM6368 with a BCM53115 connected to one of the
-> RGMII ports lying around, I played around with it, and it was
-> surprisingly hard to make it *not* work. Only if I enabled delay on
-> *both* sides it stopped working, no delay or delay only on one side
-> continued working (and I used iperf to try if larger amounts of
-> traffic break it).
+The phy_id only shows the PHY ID of the c22 device, and the c45 device
+didn't store the PHY ID in the phy_id.
 
-Interesting. You see the Rockchip people insisting their devices need
-fine tuning, 2ns is not good enough, it needs to be 1.9ns. And then
-they end up in a mess with interpreting what phy-mode actually means.
+Export c45_phy_ids for the c45 device.
 
-In some ways, this just as bad. You can get away with using 'rgmii'
-which is wrong, when it should be 'rgmii-id'. It would be better if
-only just one mode worked, then DT developers would get it correct.
+Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+---
+ .../ABI/testing/sysfs-class-net-phydev         | 10 ++++++++++
+ drivers/net/phy/phy_device.c                   | 18 ++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-	Andrew
+diff --git a/Documentation/ABI/testing/sysfs-class-net-phydev b/Documentation/ABI/testing/sysfs-class-net-phydev
+index ac722dd5e694..f6194fd6927c 100644
+--- a/Documentation/ABI/testing/sysfs-class-net-phydev
++++ b/Documentation/ABI/testing/sysfs-class-net-phydev
+@@ -26,6 +26,16 @@ Description:
+ 		This ID is used to match the device with the appropriate
+ 		driver.
+ 
++What:		/sys/class/mdio_bus/<bus>/<device>/c45_phy_ids
++Date:		May 2025
++KernelVersion:	6.16
++Contact:	netdev@vger.kernel.org
++Description:
++		This attribute contains the 32-bit PHY Identifier as reported
++		by the device during bus enumeration, encoded in hexadecimal.
++		These C45 IDs are used to match the device with the appropriate
++		driver.
++
+ What:		/sys/class/mdio_bus/<bus>/<device>/phy_interface
+ Date:		February 2014
+ KernelVersion:	3.15
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 781dfa6680eb..eecd8273111c 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -581,6 +581,23 @@ phy_id_show(struct device *dev, struct device_attribute *attr, char *buf)
+ }
+ static DEVICE_ATTR_RO(phy_id);
+ 
++static ssize_t
++c45_phy_ids_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct phy_device *phydev = to_phy_device(dev);
++	const int num_ids = ARRAY_SIZE(phydev->c45_ids.device_ids);
++	unsigned int i;
++	size_t len = 0;
++
++	for (i = 1; i < num_ids; i++)
++		len += sysfs_emit_at(buf, len, "0x%.8lx ",
++				(unsigned long)phydev->c45_ids.device_ids[i]);
++	buf[len - 1] = '\n';
++
++	return len;
++}
++static DEVICE_ATTR_RO(c45_phy_ids);
++
+ static ssize_t
+ phy_interface_show(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+@@ -618,6 +635,7 @@ static DEVICE_ATTR_RO(phy_dev_flags);
+ 
+ static struct attribute *phy_dev_attrs[] = {
+ 	&dev_attr_phy_id.attr,
++	&dev_attr_c45_phy_ids.attr,
+ 	&dev_attr_phy_interface.attr,
+ 	&dev_attr_phy_has_fixups.attr,
+ 	&dev_attr_phy_dev_flags.attr,
+-- 
+2.25.1
+
 
