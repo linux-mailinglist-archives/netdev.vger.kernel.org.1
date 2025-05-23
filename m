@@ -1,108 +1,162 @@
-Return-Path: <netdev+bounces-193016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441E7AC2346
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 14:59:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D89C8AC234C
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 15:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1FF616981D
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 12:59:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 544E71BC080B
+	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 13:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2D97404E;
-	Fri, 23 May 2025 12:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD0B18641;
+	Fri, 23 May 2025 13:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B/0z2ALO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LXoqLBym"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70F926ADD;
-	Fri, 23 May 2025 12:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D110579F5;
+	Fri, 23 May 2025 13:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748005173; cv=none; b=CJ3PBwkhornJ/VsjkxxPfQNgJUBVbGtR9v1NS2MoudslpSsQ+WbMDZ10fztT1i7Pp1xyc1TOudekjzeA0H4hoUOCnowntZ4avXcsFcJk0w0HtehFCMMnnMX+bouHa67xVJpA3ASCUcJ8v5hkqGP06OWDJOg02BSErg1CLNeJ40A=
+	t=1748005337; cv=none; b=ONXZ5kMRzPimxsZmWC18JIzOLjr96TjxEEyPtQ2EYpn8p+L5n6Q6A4uHhj3JIKegLoUEOGws/tePeWXuE8LQBQPSaCSfjmqSIZnEFkeTRa7I8ujDZk9oEoIMjMpw+2tbXvBaM+rlzA/Z9ZDXM7WOj0/pbIWpcWXTjBBl62AAclE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748005173; c=relaxed/simple;
-	bh=Eb1XMmvAoG3b/bdCa7Clb4107Xzu4WiZEuKO2Dd96po=;
+	s=arc-20240116; t=1748005337; c=relaxed/simple;
+	bh=SzcwOE3E23QUT821w3cP2dTgX+YTN9bdkHDtA1NsdHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f0I2kqSrY/1ADVD+KPjI26VyPnAqeRMVvmnZi+JIMoJqU9Q6jjapEPqhMS7z8bEhIRVXwuS1/KzefSmsoAPs2jPkYmwrSUYRlf5okvPHexzpVTBFGZ9xz/X/sXLu4iI0+2VUMeS8zqeSD6dF9wGjSVebtQWgAiW0CCmxbz0L2oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B/0z2ALO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yjr54PMpftT4r6okJF9EMmmcVc8lugHm+Sz5gKXMrJ0=; b=B/0z2ALOhvbIUwBk0RPFsBZJC7
-	QWOV+vuQElNZrp0rGSADf5QmCAZxps0jcFG2O/JwdRLWS/gkek5D7GEtWNjM81hO6oHuxa9YE+hha
-	iaMhqEHpOASEy2tLcvluIiuQYv/rzTqOKfovrwn+ZgqqK++6h8OEnm4VIsjft7GOam1Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uIRzN-00Dbsd-I8; Fri, 23 May 2025 14:59:05 +0200
-Date: Fri, 23 May 2025 14:59:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, kory.maincent@bootlin.com,
-	wintera@linux.ibm.com, viro@zeniv.linux.org.uk,
-	quentin.schulz@bootlin.com, atenart@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: mscc: Stop clearing the the UDPv4 checksum
- for L2 frames
-Message-ID: <13c4a8b2-89a8-428c-baad-a366ff6ab8b0@lunn.ch>
-References: <20250523082716.2935895-1-horatiu.vultur@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UsBYmrgnvU1iBidfRUUkmm1bMWBEIhhOsHzcMVB5Tf89DqqaRO5HnRDJMsSFUGLBDvwvrcBSzuVy1ir72+LSDIcpUEird6yQ5JUGTzwZKQk4XB/ECAFvDphk8nhPpHhSvZfUMDO+305xdIiN0PIWRPWsWWP/TMUGZFVhkfA6oWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LXoqLBym; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 023F4C4CEE9;
+	Fri, 23 May 2025 13:02:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748005335;
+	bh=SzcwOE3E23QUT821w3cP2dTgX+YTN9bdkHDtA1NsdHs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LXoqLBympPBWc+7Bj2PHeggW4OphEg3rXoyHRobwvG15KY0qdTxB8xKiodXg8Pr73
+	 Vba5DMZf+xxZA1n1IY966z3m9NgB4M0LHoDQ3Yvmpunlesm3DeIaqpvZuzbwT91KLO
+	 F+72Gbkyg7N8gTfFwpfasY1vVo5Z72BGiw26J3/ukFfsUYLJVUaVSyZb5ChWCDasOK
+	 zU9vfVPJxufsUkZpsMd6cy8E+aF5TfizoEAhbW2dIdVHh4qLwZ5HtVioS35SoGvrY/
+	 YE7kojK5tI64tyQcpSWgU5ZDZSVw96UEwC5NdEtD7/8XQcM+Uj+b2pCWX9NZOS/BzX
+	 LmXeu6azfjJkw==
+Date: Fri, 23 May 2025 14:02:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
+	openwrt-devel@lists.openwrt.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>, Ivan Vecera <ivecera@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Jonathan Corbet <corbet@lwn.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Jan Hoffmann <jan.christian.hoffmann@gmail.com>,
+	Birger Koblitz <git@birger-koblitz.de>,
+	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
+Subject: Re: [PATCH net-next 3/5] net: bridge: mcast: check if snooping is
+ enabled for active state
+Message-ID: <20250523130208.GS365796@horms.kernel.org>
+References: <20250522195952.29265-1-linus.luessing@c0d3.blue>
+ <20250522195952.29265-4-linus.luessing@c0d3.blue>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250523082716.2935895-1-horatiu.vultur@microchip.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250522195952.29265-4-linus.luessing@c0d3.blue>
 
-On Fri, May 23, 2025 at 10:27:16AM +0200, Horatiu Vultur wrote:
-> We have noticed that when PHY timestamping is enabled, L2 frames seems
-> to be modified by changing two 2 bytes with a value of 0. The place were
-> these 2 bytes seems to be random(or I couldn't find a pattern).  In most
-> of the cases the userspace can ignore these frames but if for example
-> those 2 bytes are in the correction field there is nothing to do.  This
-> seems to happen when configuring the HW for IPv4 even that the flow is
-> not enabled.
-> These 2 bytes correspond to the UDPv4 checksum and once we don't enable
-> clearing the checksum when using L2 frames then the frame doesn't seem
-> to be changed anymore.
+On Thu, May 22, 2025 at 09:17:05PM +0200, Linus Lüssing wrote:
+> To be able to use the upcoming SWITCHDEV_ATTR_ID_BRIDGE_MC_ACTIVE
+> as a potential replacement for SWITCHDEV_ATTR_ID_BRIDGE_MC_DISABLED
+> also check and toggle the active state if multicast snooping is enabled
+> or disabled. So that MC_ACTIVE not only checks the querier state, but
+> also if multicast snooping is enabled in general.
 > 
-> Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
 > ---
->  drivers/net/phy/mscc/mscc_ptp.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  include/uapi/linux/if_link.h |  6 ++++--
+>  net/bridge/br_multicast.c    | 35 +++++++++++++++++++++++++++++++++--
+>  2 files changed, 37 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
-> index 6f96f2679f0bf..6b800081eed52 100644
-> --- a/drivers/net/phy/mscc/mscc_ptp.c
-> +++ b/drivers/net/phy/mscc/mscc_ptp.c
-> @@ -946,7 +946,9 @@ static int vsc85xx_ip1_conf(struct phy_device *phydev, enum ts_blk blk,
->  	/* UDP checksum offset in IPv4 packet
->  	 * according to: https://tools.ietf.org/html/rfc768
->  	 */
-> -	val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26) | IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
-> +	val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26);
-> +	if (enable)
-> +		val |= IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 41f6c461ab32..479d039477cb 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -746,12 +746,14 @@ enum in6_addr_gen_mode {
+>   * @IFLA_BR_MCAST_ACTIVE_V4
+>   *   Bridge IPv4 mcast active state, read only.
+>   *
+> - *   1 if an IGMP querier is present, 0 otherwise.
+> + *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an IGMP querier is present,
+> + *   0 otherwise.
+>   *
+>   * @IFLA_BR_MCAST_ACTIVE_V6
+>   *   Bridge IPv4 mcast active state, read only.
+>   *
+> - *   1 if an MLD querier is present, 0 otherwise.
+> + *   1 if *IFLA_BR_MCAST_SNOOPING* is enabled and an MLD querier is present,
+> + *   0 otherwise.
+>   */
+>  enum {
+>  	IFLA_BR_UNSPEC,
+> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+> index b66d2173e321..0bbaa21c1479 100644
+> --- a/net/bridge/br_multicast.c
+> +++ b/net/bridge/br_multicast.c
+> @@ -1150,6 +1150,7 @@ static int br_ip6_multicast_check_active(struct net_bridge_mcast *brmctx,
+>   *
+>   * The multicast active state is set, per protocol family, if:
+>   *
+> + * - multicast snooping is enabled
+>   * - an IGMP/MLD querier is present
+>   * - for own IPv6 MLD querier: an IPv6 address is configured on the bridge
+>   *
+> @@ -1169,6 +1170,13 @@ static int __br_multicast_update_active(struct net_bridge_mcast *brmctx,
+>  
+>  	lockdep_assert_held_once(&brmctx->br->multicast_lock);
+>  
+> +	if (!br_opt_get(brmctx->br, BROPT_MULTICAST_ENABLED))
+> +		force_inactive = true;
+> +
+> +	if (br_opt_get(brmctx->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) &&
+> +	    br_multicast_ctx_vlan_disabled(brmctx))
+> +		force_inactive = true;
+> +
+>  	ip4_active = !force_inactive;
+>  	ip6_active = !force_inactive;
+>  	ip4_changed = br_ip4_multicast_check_active(brmctx, &ip4_active);
+> @@ -1396,6 +1404,22 @@ static struct sk_buff *br_multicast_alloc_query(struct net_bridge_mcast *brmctx,
+>  	return NULL;
+>  }
+>  
+> +static int br_multicast_toggle_enabled(struct net_bridge *br, bool on,
+> +				       struct netlink_ext_ack *extack)
+> +{
+> +	int err, old;
+> +
+> +	br_opt_toggle(br, BROPT_MULTICAST_ENABLED, on);
+> +
+> +	err = br_multicast_update_active(&br->multicast_ctx, extack);
+> +	if (err && err != -EOPNOTSUPP) {
+> +		br_opt_toggle(br, BROPT_MULTICAST_ENABLED, old);
 
-Is this towards the media, or received from the media?  Have you tried
-sending packets with deliberately broken UDPv4 checksum? Does the PHYs
-PTP engine correctly ignore such packets?
+Hi Linus,
 
-I suppose the opposite could also be true. Do you see it ignoring
-frames which are actually O.K? It could be looking in the wrong place
-for the checksum, so the checksum fails.
+Old appears to be used uninitialised here.
 
-	Andrew
+Flagged by allmodconfig builds on x86_64 with clang-20.1.4.
+
+...
 
