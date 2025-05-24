@@ -1,71 +1,59 @@
-Return-Path: <netdev+bounces-193197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF9D8AC2E28
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 09:39:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D61AC2E35
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 09:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C80F1BC40B0
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 07:39:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDD587A3F37
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 07:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9731D7E54;
-	Sat, 24 May 2025 07:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0411DF994;
+	Sat, 24 May 2025 07:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="M2xlF3Eb"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="OTFsLv76"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-78.smtpout.orange.fr [80.12.242.78])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F8E1B6D01;
-	Sat, 24 May 2025 07:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.78
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE261DACB8;
+	Sat, 24 May 2025 07:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748072337; cv=none; b=SEYd+lj9FM02uDtL+yUfQKGZ6fn0jSC27S9RJj0GuAXx4XTQqlFlGpPunT2OFVzxdwt8r+NzyhMwl6tuazFPBdkctRlSjWZSjwi8O/pOSooEGEk7sp5Bp0gQGXpvqhkqe2JG6MBq+F4Ru+jgD30tvMMLmv9I/CJaVI1YVVhCzAc=
+	t=1748073551; cv=none; b=uVcUJfzUT3xx0WJd2BQSDk2VMblNTiD4z8MwhE9iZKl1QPuiVLIX0NeU9UqMoIOTAppGCln89HdBbrL1em0OTGsA8duFkwfxRT2F8JZ5XgEHtSGJalzDJVGmUkw7QdMf/M1E6ed85E4nZNQcNOCqL437hX4Hj+hpf2aBUQDgbkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748072337; c=relaxed/simple;
-	bh=dwddXXfTZ6aOFpQVEBms0LZLfj8vls/D4GgVFgaJB18=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I9vb3uW7HR12kgzJvFeoNpA6tUv8RfTm919Yn1ahhkDYnvsXFVfOuF3jB+JFpFd5WRIHrlW8az6s/7NKvBm/EqjEBWJU1f+1f0i1dJbI8rwZaVs5eGsCVIIbWoLE0BbMSEnK1EC2JX6L0Yr3O6kv+O1GFQHdCpve7mVNVU6t2Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=M2xlF3Eb; arc=none smtp.client-ip=80.12.242.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from localhost.localdomain
- ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id IjJtuiv3wVLIhIjJtu03o1; Sat, 24 May 2025 09:29:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1748071767;
-	bh=Zu3Rr90y+tiM/8UlA4hAOXkaFy8wswdz0HsN6oicuAI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=M2xlF3EbgDjP+m9zcGtmTntP7L6mbLUqQBpHne6e435s2uUnBR3w6T2k2JWT344oO
-	 3UTgq9e0u/oJUn8f66BhmWNQNlgxRR3dWpd60Wc4CdnMPn0QaWLJqUpfVXZxGY7xMR
-	 1WJLsXo/t/EqcQCRgibLgjg2uBiBZT0QTPtGC9CTZdkyaCY7dmvSCEzH+2/Ih1lgLk
-	 OvMv4awXIjtr2HV3iVfPQzCNoDSG/U6AZYIgxHx6Vhf1LNMw3ErvJO4eVDCL2AJjfS
-	 N6A6K73uC2JJBQrC8B4QHNiE0Ihb+qWtyONpWDMmAz8aGkvy9UhY4JXTrXT1TncirF
-	 PPvdEzTZAekVw==
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 24 May 2025 09:29:27 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4 net] net: airoha: Fix an error handling path in airoha_alloc_gdm_port()
-Date: Sat, 24 May 2025 09:29:11 +0200
-Message-ID: <1b94b91345017429ed653e2f05d25620dc2823f9.1746715755.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1748073551; c=relaxed/simple;
+	bh=9jUiIHXZ/mYOiN0HsPPoU1jm3Nz1asDBthDRQBZE+DA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MR5HIshYd9EnJfKlCon77MYQzv3qIqoxMXYlkHSt6jokY2aqe6XKoFBIxmL+FOSRkIDmWnGRyrW+RPlKddY4JdWKvh3QEprQmzYAWRVczfL3Re7DEaUcgCWl6nhpLfAJdJl7OVXchm7daUFZhaC9dd4Wgsr8KEQOmPzFT+g/N60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=OTFsLv76; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=6i
+	/ZtaCjfDaeiMffEFfk5xTWqg3WcPt0s/962umeTPA=; b=OTFsLv76iaWjUqnIgi
+	HnlfXQxD4sx6t1vsw5J14YLrYfWEgoEvHXMM3UtDkuCsLnfqWmRnTx7Cf620dgyy
+	sxEvKQA7zvwyOIVy/MUpA9RUOTzDQCqgfYCWnDPzcDjxuqzbbwrBRxx5Zhh+Fqg9
+	MBU4E5JIlKN8dEMZGu5ZH4Gbw=
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDn7x4ifDFoCLuUDg--.5328S4;
+	Sat, 24 May 2025 15:58:28 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: niklas.soderlund@ragnatech.se,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: ethernet: rtsn: Fix a null pointer dereference in rtsn_probe()
+Date: Sat, 24 May 2025 15:58:25 +0800
+Message-Id: <20250524075825.3589001-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,64 +61,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDn7x4ifDFoCLuUDg--.5328S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JryxZF18GF4fuF4xCw43trb_yoWfZFc_KF
+	12vF4fXr4qyr1qkw18Kw43u34ayr1kXr9YvFsrtrZIqay7ur1rXFZ8ZF9xJr1UWrn5CF9r
+	ZrnIya1xA34avjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNvtCUUUUUU==
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbB0g1XbmgxdoGcTQAAsZ
 
-If register_netdev() fails, the error handling path of the probe will not
-free the memory allocated by the previous airoha_metadata_dst_alloc() call
-because port->dev->reg_state will not be NETREG_REGISTERED.
+Add check for the return value of rcar_gen4_ptp_alloc()
+to prevent potential null pointer dereference.
 
-So, an explicit airoha_metadata_dst_free() call is needed in this case to
-avoid a memory leak.
-
-Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
 ---
-Changes in v4:
-  - Add A-b and R-b tags
-  - Rebase against latest -next (because v3 now gets "Hunk #1 succeeded
-    at 2869 (offset -4 lines)")
+ drivers/net/ethernet/renesas/rtsn.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Changes in v3:
-  - None
-v3: https://lore.kernel.org/all/5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr/
-
-Changes in v2:
-  - New patch
-v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr/
-
-Compile tested only.
-
-In the previous iteration, this patch was part of a serie. But it
-should be related to 'net', while the rest of the serie was for
-'net-next'. So it is resent as a stand-alone patch, as a v4.
-
----
- drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 16c7896f931f..af8c4015938c 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2869,7 +2869,15 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	if (err)
- 		return err;
+diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
+index 6b3f7fca8d15..f5df3374d279 100644
+--- a/drivers/net/ethernet/renesas/rtsn.c
++++ b/drivers/net/ethernet/renesas/rtsn.c
+@@ -1260,6 +1260,10 @@ static int rtsn_probe(struct platform_device *pdev)
+ 	priv->pdev = pdev;
+ 	priv->ndev = ndev;
+ 	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
++	if (!priv->ptp_priv) {
++		ret = -ENOMEM;
++		goto error_free;
++	}
  
--	return register_netdev(dev);
-+	err = register_netdev(dev);
-+	if (err)
-+		goto free_metadata_dst;
-+
-+	return 0;
-+
-+free_metadata_dst:
-+	airoha_metadata_dst_free(port);
-+	return err;
- }
- 
- static int airoha_probe(struct platform_device *pdev)
+ 	spin_lock_init(&priv->lock);
+ 	platform_set_drvdata(pdev, priv);
 -- 
-2.49.0
+2.25.1
 
 
