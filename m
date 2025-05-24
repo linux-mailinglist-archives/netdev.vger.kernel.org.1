@@ -1,138 +1,130 @@
-Return-Path: <netdev+bounces-193227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382CCAC3009
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 16:49:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5148DAC3079
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 18:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49D907A5704
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 14:47:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5131BA02EF
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 16:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDC21DE2A5;
-	Sat, 24 May 2025 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xm+Fntir"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55021E5B95;
+	Sat, 24 May 2025 16:35:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7249444;
-	Sat, 24 May 2025 14:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358523D984;
+	Sat, 24 May 2025 16:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748098140; cv=none; b=u9CiaVyehrq2+j7tuEbi/ESBnBA1W3rr3tpjH5jF4vx7i4Vu4QSVzqGbpjR8MLIHJmB+VoowjVfLCMkE04d0R5KkG6v2cfpG25WSsS3IkArIcNhEXCIbUA7hJ7+ibu/lf9xoB094PTuVZDPT5IelXZiXOk4P+Ds+eBUJKBuLLMQ=
+	t=1748104532; cv=none; b=UFeUyOgABPd4/a2Ld8E+UtjA8013vge7RiYae+gZDqnJdmdeBRjM6V1h5GGoYwNSk4SlZHY23lmZKMPFRcHTdEqo8F3SlFmJjVYMErmX7XQcJu1W9WkSklpv1onr6sEDIWP9PPacaSg+xh7RJmFwcQKsbaLMlOpvEB4GLUYqRMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748098140; c=relaxed/simple;
-	bh=hi0FhnivKthEbtDL/pIRmuxZrvxkLdiF0ueMxA2JKu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMbyd0uGWeJonxEVl54V8L9KtoiTfcgSZFki21f0rr86DuPLKjuS0/uR+P/pw4OE8xK8EjdL4kULTrztRsw6z4ddWB50FA/sX/6tQ3r5D9FD8hrhx29hu1BGFZNk+Dv2dk8TUPpt4ekCMB6dE0fGl1llOiD6stWh3FlO231x5+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xm+Fntir; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=6j+A/wcAjjzOXucCcPrPqRyyoTRY9hnx7kS73VHwOW0=; b=Xm
-	+Fntir9xBjM2MNWbSndaFmwEXhYF9USaPzzlIBnIdtYCNjV4ZIq9s5XoD2o1OaBJXNVmTu9z5TRMd
-	DNKc6sxBSylhkLtYUeHzjykapObNfBt7gPISSXSgjjNCK2lIOsy/V1psSSVvUhRSOwIEWMD8OVuTi
-	VWCCVcoaxKAAdTY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uIqAZ-00DglV-8h; Sat, 24 May 2025 16:48:15 +0200
-Date: Sat, 24 May 2025 16:48:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: lizhe <sensor1010@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, jonas@kwiboo.se,
-	rmk+kernel@armlinux.org.uk, david.wu@rock-chips.com, wens@csie.org,
-	u.kleine-koenig@baylibre.com, an.petrous@oss.nxp.com,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] net: dwmac-rk: MAC clock should be truned off
-Message-ID: <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
-References: <20250523151521.3503-1-sensor1010@163.com>
- <d5325aba-507e-47b6-83fb-b9156c1f351e@lunn.ch>
- <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
+	s=arc-20240116; t=1748104532; c=relaxed/simple;
+	bh=FS0RFh6BU5nRfwod9N2G1Nb4fqqbZi9dSd11mSJYXDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m7FZfzcbWHVXWVY5OMW+XXpksiYg3dY7fWNYUZ1uQKLogMrRdn6ijp6UYhA3xNbN6bjcEmswP05bOJj7stx4keHBo2PNeP27L9w/efi3cVk8uTeY9OViefGON4IdWpX9h50SsaQ6d068FH0EaOcQS76+2MX00DTJ/xUATQG40Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.201.46.250])
+	by APP-01 (Coremail) with SMTP id qwCowADXMBM09TFoXmgZAQ--.23843S2;
+	Sun, 25 May 2025 00:35:06 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH net v5] net/mlx5: Add error handling in mlx5_query_nic_vport_node_guid()
+Date: Sun, 25 May 2025 00:34:25 +0800
+Message-ID: <20250524163425.1695-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
+X-CM-TRANSID:qwCowADXMBM09TFoXmgZAQ--.23843S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr4rCF1DWr1DGF48uw4xXrb_yoW8ArWkpF
+	47tr9rCrWkJa4rX3409FWfZrn5u3yjyay09a47tw43Xr4ktr4qyr4YkF9FgrWUCFW0ka9a
+	yr42y3Z8AFn8C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+	4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+	Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+	WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7Cj
+	xVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsMA2gx4KUkwQAAs7
 
-On Sat, May 24, 2025 at 10:05:47PM +0800, lizhe wrote:
-> Hi， Anerdw
-> The following is the logic for calling this function： 
-> 
-> 
-> rk_gmac_powerup() {
-> 
-> ret = phy_power_on(bsp_priv, true);      // here.
-> 
-> if (ret) {
-> 
-> gmac_clk_enable(bsp_priv, false);
-> 
-> return ret;
-> 
-> }
-> 
-> }
+The function mlx5_query_nic_vport_node_guid() calls the function
+mlx5_query_nic_vport_context() but does not check its return value.
+A proper implementation can be found in mlx5_nic_vport_query_local_lb().
 
-Ah, there is something funny with your patch. Look at the diff:
+Add error handling for mlx5_query_nic_vport_context(). If it fails, free
+the out buffer via kvfree() and return error code.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 700858ff6f7c..036e45be5828 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1648,7 +1648,7 @@  static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+Fixes: 9efa75254593 ("net/mlx5_core: Introduce access functions to query vport RoCE fields")
+Cc: stable@vger.kernel.org # v4.5
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+v5: Remove error tag.
+v4: Fix code error.
+v3: Explicitly mention target branch. Change improper code.
+v2: Remove redundant reassignment. Fix typo error.
 
-This line tells you where in the file you are patching, and the
-function to be patched. This is what i looked at,
-gmac_clk_enable(). And gmac_clk_enable() has a similar structure, ret
-declared at the beginning, return 0 at the end. But the only way to
-that return 0 is without error.
+ drivers/net/ethernet/mellanox/mlx5/core/vport.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-But patch is actually for:
-
- static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+index 0d5f750faa45..c34cd9a1a79b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+@@ -465,19 +465,22 @@ int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
  {
- 	struct regulator *ldo = bsp_priv->regulator;
--	int ret;
-+	int ret = 0;
- 	struct device *dev = &bsp_priv->pdev->dev;
+ 	u32 *out;
+ 	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
++	int err;
  
- 	if (enable) {
-@@ -1661,7 +1661,7 @@  static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
- 			dev_err(dev, "fail to disable phy-supply\n");
- 	}
+ 	out = kvzalloc(outlen, GFP_KERNEL);
+ 	if (!out)
+ 		return -ENOMEM;
+ 
+-	mlx5_query_nic_vport_context(mdev, 0, out);
++	err = mlx5_query_nic_vport_context(mdev, 0, out);
++	if (err)
++		goto out;
+ 
+ 	*node_guid = MLX5_GET64(query_nic_vport_context_out, out,
+ 				nic_vport_context.node_guid);
+-
++out:
+ 	kvfree(out);
  
 -	return 0;
-+	return ret;
++	return err;
  }
+ EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_node_guid);
+ 
+-- 
+2.42.0.windows.2
 
-And agree, the error codes are ignored in phy_power_on().
-
-But i have a few questions:
-
-How did you generate this diff? This is the first time i've made this
-mistake, as far as i know. I trust the context information when
-reviewing patches. Yet here it is wrong. Why? Is this actually normal?
-I know diff gets it wrong for python, i don't trust it at all with
-that language, but i've not noticed such problems with C.
-
-Did you look at the history of phy_power_on()? It looks pretty
-deliberate ignoring errors. Maybe there is a reason why this happens?
-git blame and git log might explain why it is like this.
-
-	Andrew
 
