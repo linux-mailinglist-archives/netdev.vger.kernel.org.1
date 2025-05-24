@@ -1,195 +1,138 @@
-Return-Path: <netdev+bounces-193226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB542AC2FF8
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 16:18:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 382CCAC3009
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 16:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8CD9E1072
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 14:18:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49D907A5704
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 14:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E1C1DE4E7;
-	Sat, 24 May 2025 14:18:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDC21DE2A5;
+	Sat, 24 May 2025 14:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixVvdNT7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xm+Fntir"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978A317B402;
-	Sat, 24 May 2025 14:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7249444;
+	Sat, 24 May 2025 14:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748096317; cv=none; b=MwZB82N1Szp5tjqtZY3PQColHGcioM5Ld6E8U8wn6OsIgt+u8fSemyUY0bOIyOrvm/MNNYz74dxa5KcH062V8PVnFivL30+l+7Y55N3UneM9yrYIbLfJ5i+EXhQngavfh0863/nQL/Rm6B1TXldlreBGXdEYAFvxnDcZaPW/+34=
+	t=1748098140; cv=none; b=u9CiaVyehrq2+j7tuEbi/ESBnBA1W3rr3tpjH5jF4vx7i4Vu4QSVzqGbpjR8MLIHJmB+VoowjVfLCMkE04d0R5KkG6v2cfpG25WSsS3IkArIcNhEXCIbUA7hJ7+ibu/lf9xoB094PTuVZDPT5IelXZiXOk4P+Ds+eBUJKBuLLMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748096317; c=relaxed/simple;
-	bh=Fje1IWkF5DAWqqJlSc71din6EX68HuRRYJLfOd6yges=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=A24FgIAPmLqnVuG+yWBGAMyfU4cL9frWuArr57fFILSMANKRGIrOosa9a3e9GrLMCcEK81RvreToL95ebT84j4+JS3ZCjG2sEGa9mwKPFZ38Iinz1P1cGvCxH17juMvSCOnLBavKmkS0s+rNgzWiVIiBxbErYMUfqnsV5r62eIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixVvdNT7; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4769aef457bso9620011cf.2;
-        Sat, 24 May 2025 07:18:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748096314; x=1748701114; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4FV/c03q8EvdsPIJqLZEm6rPEVvmTmkh9EJsmPCeIoY=;
-        b=ixVvdNT7P2Bqos7RjBQI9QxP6salW/YQav2XaBbc0ltNH2e7P9PzI5wZKJDNAo1DCQ
-         uoBv869Csp/ErXOJheBw9GBlOKLZG/lACFyHKVvOV5xu5PT8m61nafzkH1SlLN6SjjXj
-         pYzf1awN9eECEaCx674DesM+wekYIJrH/7nIeaXHpQOMi8lwRDUGYAfFZsJ51kLWXxpY
-         sNmfeTDrAf3X9d2hyFy7SK+KvzgMLvI2noxZpa/U0I+stUG2c1fMoaAHvNAnVn+reSuh
-         yx9jKyxB6CqOEbqFPFO5pskBoFvDX7LKtbV7tWjsCFVqQwvhbvTXr/qScayMkIBRoXle
-         gf9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748096314; x=1748701114;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4FV/c03q8EvdsPIJqLZEm6rPEVvmTmkh9EJsmPCeIoY=;
-        b=mHCMycb7RAw66eky4lLHFqyIw7xP8IcayTH1Y90Dul6+/C9hQ72/Snr4pcSYopD7RN
-         IO9Ji9G9B31xIiuY9mLPYjcLAaK1aztTJPFPMDIyNfPADvkZWhvkI3rRQISypdVrcIV+
-         rQrmQOns/m2XAgZ7ISbhXCfDVYO9ga7EyZP3Q9Ud8GQYZ01CGF15GLtWbk/FTcjfI703
-         JEfs9ndHeop23q8Xuv3+VrAZFs10rlfKwLtxTiToNi4B/bIGTW9nOwIzeh2MABFmc7BB
-         WrPl9hiAnzVJdr0UAJaV5O/NQfx76m6Q3MrSukHmyqGyfrkmJJBO4JlgdJrZeSw0RYMr
-         eJDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVx6WYGzlBucD0rcPyq1gnJBIbT+/u9o9zws++g/WY5En9BgWmzUgJACZR0wgHfvrHm23Ruo6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz52s1GlsC62YQ2yI8lCXrBcmjWNkZjKaU9XgnTaE4XzHYPkFUy
-	WjLT3UMRQxPTNA/od2DSGYD0gxV4BhuZWNx3NrfY8mi96gEaNcwtUdr2
-X-Gm-Gg: ASbGncv5b4IiJ7FHOn/XAxs4SSW0WA2Wus31ExCLakShiwjdPrswhSvblJhNGcoC2ZK
-	4tQrzY2jbFnD7a7GvDckt8nqMLpXp2hgiMTB4XLPc5pMD3McFkPfTiBS87aMLR/VOBsmIsLVWIt
-	9lyyo0HRiNksF6NmRXDQMcA2drTXD73wp9Ls5kecbqXc6dOaGI4KXeBc8xrxQDLqumYH1eEQJrv
-	Bn4UJYvWOyrBu5YK7jzDyOJYtorqKwyvmTw3AwWIWoTNWrd2gebxmmy1yzp/6qUGHYIg+Y0+2Ui
-	GV0e2uGPr2IXOUrFNWtcJ9pvfv0DGnCRKDWncOqr9tcmCWW4FV/Uoi1Rha7t3Tnkwg3yWjI4en5
-	T4Quz5DOgEbHPEa++XQfFMKk=
-X-Google-Smtp-Source: AGHT+IGdtkpwayNnipXyzxgtiwvqSJW9xN+QrM51O7pgKhdxVswsVQzyFybG2MmmMFSbBoY/+EUDVQ==
-X-Received: by 2002:a05:622a:2449:b0:476:7806:be7e with SMTP id d75a77b69052e-49f46056c9fmr66223761cf.11.1748096314324;
-        Sat, 24 May 2025 07:18:34 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-494ae4277a0sm131998601cf.43.2025.05.24.07.18.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 May 2025 07:18:33 -0700 (PDT)
-Date: Sat, 24 May 2025 10:18:33 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Rafal Bilkowski <rafalbilkowski@gmail.com>, 
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- Rafal Bilkowski <rafalbilkowski@gmail.com>, 
- alex.aring@gmail.com
-Message-ID: <6831d5396ead5_1e734029446@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250524055159.32982-1-rafalbilkowski@gmail.com>
-References: <20250524055159.32982-1-rafalbilkowski@gmail.com>
-Subject: Re: [PATCH]    net: ipv6: sanitize RPL SRH cmpre/cmpre fields to fix
- taint issue
+	s=arc-20240116; t=1748098140; c=relaxed/simple;
+	bh=hi0FhnivKthEbtDL/pIRmuxZrvxkLdiF0ueMxA2JKu0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TMbyd0uGWeJonxEVl54V8L9KtoiTfcgSZFki21f0rr86DuPLKjuS0/uR+P/pw4OE8xK8EjdL4kULTrztRsw6z4ddWB50FA/sX/6tQ3r5D9FD8hrhx29hu1BGFZNk+Dv2dk8TUPpt4ekCMB6dE0fGl1llOiD6stWh3FlO231x5+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xm+Fntir; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=6j+A/wcAjjzOXucCcPrPqRyyoTRY9hnx7kS73VHwOW0=; b=Xm
+	+Fntir9xBjM2MNWbSndaFmwEXhYF9USaPzzlIBnIdtYCNjV4ZIq9s5XoD2o1OaBJXNVmTu9z5TRMd
+	DNKc6sxBSylhkLtYUeHzjykapObNfBt7gPISSXSgjjNCK2lIOsy/V1psSSVvUhRSOwIEWMD8OVuTi
+	VWCCVcoaxKAAdTY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uIqAZ-00DglV-8h; Sat, 24 May 2025 16:48:15 +0200
+Date: Sat, 24 May 2025 16:48:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: lizhe <sensor1010@163.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, jonas@kwiboo.se,
+	rmk+kernel@armlinux.org.uk, david.wu@rock-chips.com, wens@csie.org,
+	u.kleine-koenig@baylibre.com, an.petrous@oss.nxp.com,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH] net: dwmac-rk: MAC clock should be truned off
+Message-ID: <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
+References: <20250523151521.3503-1-sensor1010@163.com>
+ <d5325aba-507e-47b6-83fb-b9156c1f351e@lunn.ch>
+ <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
 
-Rafal Bilkowski wrote:
->    Coverity flagged that the cmpre and cmpri fields in
->    struct ipv6_rpl_sr_hdr are used without proper bounds checking,
->    which may allow tainted values to be used as offsets or divisors,
->    potentially leading to out-of-bounds access or division by zero.
+On Sat, May 24, 2025 at 10:05:47PM +0800, lizhe wrote:
+> Hi， Anerdw
+> The following is the logic for calling this function： 
 > 
->    This patch adds explicit range checks for cmpre and cmpri before
->    using them, ensuring they are within the valid range (0-15) and
->    cmpri is non-zero. Coverity was run loccaly
+> 
+> rk_gmac_powerup() {
+> 
+> ret = phy_power_on(bsp_priv, true);      // here.
+> 
+> if (ret) {
+> 
+> gmac_clk_enable(bsp_priv, false);
+> 
+> return ret;
+> 
+> }
+> 
+> }
 
-No indentation on comment.
+Ah, there is something funny with your patch. Look at the diff:
 
-Also in networking please add target in the subject, here [PATCH net]
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 700858ff6f7c..036e45be5828 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -1648,7 +1648,7 @@  static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+
+This line tells you where in the file you are patching, and the
+function to be patched. This is what i looked at,
+gmac_clk_enable(). And gmac_clk_enable() has a similar structure, ret
+declared at the beginning, return 0 at the end. But the only way to
+that return 0 is without error.
+
+But patch is actually for:
+
+ static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+ {
+ 	struct regulator *ldo = bsp_priv->regulator;
+-	int ret;
++	int ret = 0;
+ 	struct device *dev = &bsp_priv->pdev->dev;
  
->    Fixes:  ("Untrusted value as argument (TAINTED_SCALAR)")
+ 	if (enable) {
+@@ -1661,7 +1661,7 @@  static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+ 			dev_err(dev, "fail to disable phy-supply\n");
+ 	}
+ 
+-	return 0;
++	return ret;
+ }
 
-Invalid Fixes tag. This should here be
+And agree, the error codes are ignored in phy_power_on().
 
-  Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+But i have a few questions:
 
-> 
-> Signed-off-by: Rafal Bilkowski <rafalbilkowski@gmail.com>
-> ---
->  net/ipv6/exthdrs.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 02e9ffb63af1..9646738cb872 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -504,6 +504,15 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->  	}
->  
->  looped_back:
-> +
-> +	if (!pskb_may_pull(skb, skb_transport_offset(skb) + sizeof(struct ipv6_rpl_sr_hdr)))
-> +		goto error;
+How did you generate this diff? This is the first time i've made this
+mistake, as far as i know. I trust the context information when
+reviewing patches. Yet here it is wrong. Why? Is this actually normal?
+I know diff gets it wrong for python, i don't trust it at all with
+that language, but i've not noticed such problems with C.
 
-This check likely is indeed needed before inspecting the header.
+Did you look at the history of phy_power_on()? It looks pretty
+deliberate ignoring errors. Maybe there is a reason why this happens?
+git blame and git log might explain why it is like this.
 
-No need for a goto if only result is a return. Also the skb needs to
-be freed, see other error paths.
-
-> +	// Check if there is enough memory available for the header and hdrlen is in valid range
-> +	if (skb_tailroom(skb) < ((hdr->hdrlen + 1) << 3) ||
-> +	    hdr->hdrlen == 0 ||
-> +	    hdr->hdrlen > U8_MAX)
-
-How is ipv6_rpl_sr_hdr hdrlen defined. I don't immediately see it in
-the struct definition comments or in RFC 6550
-
-> +		goto error;
-> +
->  	hdr = (struct ipv6_rpl_sr_hdr *)skb_transport_header(skb);
->  
->  	if (hdr->segments_left == 0) {
-> @@ -534,7 +543,18 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->  		return 1;
->  	}
->  
-> +	// Check if cmpri and cmpre are valid and do not exceed 15
-> +	if (hdr->cmpri > 15 || hdr->cmpre > 15)
-> +		goto error;
-
-These are 4-bit fields. This cannot happen.
-
-> +	// Check if pad value is valid and does not exceed 15
-> +	if (hdr->pad > 15)
-> +		goto error;
-> +
->  	n = (hdr->hdrlen << 3) - hdr->pad - (16 - hdr->cmpre);
-> +	// Check if n is non-negative
-> +	if (n <= 0)
-> +		goto error;
-> +
->  	r = do_div(n, (16 - hdr->cmpri));
->  	/* checks if calculation was without remainder and n fits into
->  	 * unsigned char which is segments_left field. Should not be
-> @@ -638,6 +658,9 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->  	dst_input(skb);
->  
->  	return -1;
-> +
-> +error:
-> +	return -1;
->  }
->  
->  /********************************
-> -- 
-> 2.43.0
-> 
-
-
+	Andrew
 
