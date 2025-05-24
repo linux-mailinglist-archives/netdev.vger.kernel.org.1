@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-193228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5148DAC3079
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 18:35:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27B1AC312B
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 21:35:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5131BA02EF
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 16:35:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C65B17CEE0
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 19:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55021E5B95;
-	Sat, 24 May 2025 16:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A9823AE95;
+	Sat, 24 May 2025 19:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HAt5yaoD"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358523D984;
-	Sat, 24 May 2025 16:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B138217F24;
+	Sat, 24 May 2025 19:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748104532; cv=none; b=UFeUyOgABPd4/a2Ld8E+UtjA8013vge7RiYae+gZDqnJdmdeBRjM6V1h5GGoYwNSk4SlZHY23lmZKMPFRcHTdEqo8F3SlFmJjVYMErmX7XQcJu1W9WkSklpv1onr6sEDIWP9PPacaSg+xh7RJmFwcQKsbaLMlOpvEB4GLUYqRMs=
+	t=1748115298; cv=none; b=aalLt9GP5A5CW7gO5tdeRLPORfabt7XIchuSPjhzJQSjOF+C6mB1wZvKttBOSIjYFYckR0ByYfBCqUHSLz3/rnnIVYzpdlap0U4TfDnHDjjSTReMcnXwb1a5/AY1RLhNDSZYPj7tWXKJtfxZ26QRJ7tJk9XHsWFkXB+8bV7pYuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748104532; c=relaxed/simple;
-	bh=FS0RFh6BU5nRfwod9N2G1Nb4fqqbZi9dSd11mSJYXDU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m7FZfzcbWHVXWVY5OMW+XXpksiYg3dY7fWNYUZ1uQKLogMrRdn6ijp6UYhA3xNbN6bjcEmswP05bOJj7stx4keHBo2PNeP27L9w/efi3cVk8uTeY9OViefGON4IdWpX9h50SsaQ6d068FH0EaOcQS76+2MX00DTJ/xUATQG40Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.201.46.250])
-	by APP-01 (Coremail) with SMTP id qwCowADXMBM09TFoXmgZAQ--.23843S2;
-	Sun, 25 May 2025 00:35:06 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH net v5] net/mlx5: Add error handling in mlx5_query_nic_vport_node_guid()
-Date: Sun, 25 May 2025 00:34:25 +0800
-Message-ID: <20250524163425.1695-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1748115298; c=relaxed/simple;
+	bh=RcQpM8Qhq03nv1Nk9bPW2HtWKX67vf6WAJ14x+qCfDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nYNELOjWbcDSPAjMF7zAM9V3M225rqRKC2s7vNBUIm65Kt7/+40+xdleK0ij/qbPCidSb7JoBDmFi2gN0jUYeLOPY4QFxg6v3bSWk6+/L4gQ245ocG3rSsqUrle9HVIJgkVioRQ65FpDLKVgWSe0EXsh49Iyi7vsKZAmhDQcnTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HAt5yaoD; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FDzdnEi5TtcfKfjBkwBIU4/mQNamhC7e6P0CVNdVIJw=; b=HAt5yaoD8r1RszUzBbuF8pC43r
+	6oAm8q6za/9fBu8kLaJV/wfUo1mDL9YbJN24T8ehAhOcgv1KvAaRQq9qcls3V1pNhtZ72ypqO4huO
+	T+JQFwB3s23BdF/KqtFLnIcdJhDEQaW72xPKwVhW9bzjbdBXXhj6+O9gLx3mhZhQssUdBJlPvvZS/
+	xK+2bfiQ7CXjruJHi0FeyQqKd9ki4wveUOyeKQxlMug29Mdri9yyYxhwAgn+ri1g5FNf9H9oZeSt4
+	2awXIc4zwtCH2Mt8RLAF6Sd+a134GkvAA/diZAqtSuBDgq65VDnu1BgJ3SjjO/IWyg3/LWvWJgIgE
+	QekY3i3g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59090)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uIudU-0005Al-17;
+	Sat, 24 May 2025 20:34:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uIudJ-00075J-2Z;
+	Sat, 24 May 2025 20:34:13 +0100
+Date: Sat, 24 May 2025 20:34:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: lizhe <sensor1010@163.com>, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	jonas@kwiboo.se, david.wu@rock-chips.com, wens@csie.org,
+	u.kleine-koenig@baylibre.com, an.petrous@oss.nxp.com,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH] net: dwmac-rk: MAC clock should be truned off
+Message-ID: <aDIfNZtSwZ1HwW2l@shell.armlinux.org.uk>
+References: <20250523151521.3503-1-sensor1010@163.com>
+ <d5325aba-507e-47b6-83fb-b9156c1f351e@lunn.ch>
+ <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
+ <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADXMBM09TFoXmgZAQ--.23843S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr4rCF1DWr1DGF48uw4xXrb_yoW8ArWkpF
-	47tr9rCrWkJa4rX3409FWfZrn5u3yjyay09a47tw43Xr4ktr4qyr4YkF9FgrWUCFW0ka9a
-	yr42y3Z8AFn8C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
-	Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
-	WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7Cj
-	xVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsMA2gx4KUkwQAAs7
+In-Reply-To: <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The function mlx5_query_nic_vport_node_guid() calls the function
-mlx5_query_nic_vport_context() but does not check its return value.
-A proper implementation can be found in mlx5_nic_vport_query_local_lb().
+On Sat, May 24, 2025 at 04:48:15PM +0200, Andrew Lunn wrote:
+> On Sat, May 24, 2025 at 10:05:47PM +0800, lizhe wrote:
+> > Hi， Anerdw
+> > The following is the logic for calling this function： 
+> > 
+> > 
+> > rk_gmac_powerup() {
+> > 
+> > ret = phy_power_on(bsp_priv, true);      // here.
+> > 
+> > if (ret) {
+> > 
+> > gmac_clk_enable(bsp_priv, false);
+> > 
+> > return ret;
+> > 
+> > }
+> > 
+> > }
+> 
+> Ah, there is something funny with your patch. Look at the diff:
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 700858ff6f7c..036e45be5828 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1648,7 +1648,7 @@  static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+> 
+> This line tells you where in the file you are patching, and the
+> function to be patched. This is what i looked at,
+> gmac_clk_enable(). And gmac_clk_enable() has a similar structure, ret
+> declared at the beginning, return 0 at the end. But the only way to
+> that return 0 is without error.
+> 
+> But patch is actually for:
+> 
+>  static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
 
-Add error handling for mlx5_query_nic_vport_context(). If it fails, free
-the out buffer via kvfree() and return error code.
+Andrew, this is not a problem. This is how diffs work. If the function
+hasn't actually started at the point the context starts, then the
+previous function will appear in the comment after the line numbers.
 
-Fixes: 9efa75254593 ("net/mlx5_core: Introduce access functions to query vport RoCE fields")
-Cc: stable@vger.kernel.org # v4.5
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
-v5: Remove error tag.
-v4: Fix code error.
-v3: Explicitly mention target branch. Change improper code.
-v2: Remove redundant reassignment. Fix typo error.
-
- drivers/net/ethernet/mellanox/mlx5/core/vport.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-index 0d5f750faa45..c34cd9a1a79b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-@@ -465,19 +465,22 @@ int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
- {
- 	u32 *out;
- 	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
-+	int err;
- 
- 	out = kvzalloc(outlen, GFP_KERNEL);
- 	if (!out)
- 		return -ENOMEM;
- 
--	mlx5_query_nic_vport_context(mdev, 0, out);
-+	err = mlx5_query_nic_vport_context(mdev, 0, out);
-+	if (err)
-+		goto out;
- 
- 	*node_guid = MLX5_GET64(query_nic_vport_context_out, out,
- 				nic_vport_context.node_guid);
--
-+out:
- 	kvfree(out);
- 
--	return 0;
-+	return err;
- }
- EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_node_guid);
- 
 -- 
-2.42.0.windows.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
