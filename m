@@ -1,114 +1,201 @@
-Return-Path: <netdev+bounces-193186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21EB4AC2C11
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 01:08:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5664DAC2C98
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 02:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C07189079A
-	for <lists+netdev@lfdr.de>; Fri, 23 May 2025 23:08:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BF6D4A483A
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 00:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B4A224882;
-	Fri, 23 May 2025 23:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D833D81E;
+	Sat, 24 May 2025 00:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R6iUBZ+9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="s3R3w63k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09F522258E
-	for <netdev@vger.kernel.org>; Fri, 23 May 2025 23:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDE48F66;
+	Sat, 24 May 2025 00:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748041544; cv=none; b=Ma+EUaXHoI/iZIwulB0aMK0GLFgEeqgRvhiUXpgcKA3Y/mOvA1psAGJVT+SH2KcSC9T0moQibMgmJztrodU+zek+atY5egpitSXycwIvW6b7kKoBAsJ3eUFx3+JIVIdkTDi7ZrkVLOvK5G56KjIK4RPk38ONj+Fun5tX1uYu/zw=
+	t=1748045173; cv=none; b=K06syPZ4vWhcTuZqudm+SpuxVw8/AsLgj8nzHeQnOXWa3c8lAm3i9wU6QIvymDOTZFY9/jrGZJQpUbdKYAUt6kdMXycVakz/jHSmqS3h8Xzo99URcjKWK658NlZcHwyQModFjetMBaeBotI1oZVl9skudZGB9ZdnVNfq5QyRxao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748041544; c=relaxed/simple;
-	bh=0JqtZHm1FjwTp/r9FfFXp2DhxiRW0Bdbv5viNa2gMfU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F0WfqBD4HsX5FtijjTLYU+HRiCxt2eRc1sra6jxO5y8Tu0cUvXhFi/vRLuk3wY3GvdjEr/PS6FMOgFkMO5achsif2hexmTusIGZEvKOyJMjdqpiF7v8t2yF36QhdgNEwOCN6NMc7URfPFsHn6pe9MhsBoP54gQD//RyPqIzvDq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R6iUBZ+9; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-231d7f590ffso2179855ad.1
-        for <netdev@vger.kernel.org>; Fri, 23 May 2025 16:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748041542; x=1748646342; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g9027k/STZBsLuLsL7i9IP6pBTVAG0SO2AdEyoxFagU=;
-        b=R6iUBZ+9HVQ0voT5m+RPF6iohB8uARMGrHOt/QAtNhActs24wu0LUZpv9rmD9UQPKA
-         7yYVB/6ZynPCnYCMgYYLn7Xzb3f30iagRVmduoJ/cbrN1WfKN6CkmHINV1xcKHUGHUox
-         HBVz2TmIHqHoxG+JSj+2OjffHWR/6+UjiYQBBuQ8wsQEXGPQ4tMjaGP3Gj87Fy0P+its
-         okRYfbq0gQwBQGOd2rlYAORqCZ2N0mphubNEDbvd+q4ILWY2+28rW6kBOMMWlFAfo/vi
-         B+rahlr0S9MvwlbDetoKWBFcCIX3X191jA+N7EFGLwDkhVO/pYUi6lRRcSH+MT65me9b
-         BFHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748041542; x=1748646342;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g9027k/STZBsLuLsL7i9IP6pBTVAG0SO2AdEyoxFagU=;
-        b=lJnZhDxO4RC6yazUNuZ+m4gUwlaBW18k0qcHQNOUjmtqyWkJ7r/iA5On297nHqE/Uv
-         IGpJ1xjsOypfqwfgHoIN/BjUs+VDPKNY3B0mP/8gCNEOIJIur/yrnT6TMMzic+ecE2Pt
-         tcU//brNIZS6+P8p33DsGeqy8CsISwGvqG/+/plle2JuP1zlG7Mxu1qPEQGZwJUtXLyQ
-         nbs4NuT7GiiHbOam1/6pX66bJlSfDrztmDJh84CrB35CUfVRpTziBvKQqGJWa/rtScam
-         bAVBvpU+CxonXqyqVrlw51KuTg4QipiUlflll7CMx7r+wfKMcn/153Lvl2yIpO4Z0LSE
-         cPUA==
-X-Gm-Message-State: AOJu0Yy3Ryq8+cdA/Wv7cHQXfejfFsBzL3cHqMnM+RRG+cUwXadrDaXk
-	w3SIhAbU0X94jt1//PzwZVgu0KhzRi7HLpfbeNE/wLHThUJfgXzJs1h/FLbVRu0lyyByj2pFqqU
-	FISUfYdX98h/HkQ8bdYbXqjJlp51Jtsc+d88zrepuc5HdN6q3gZgggSy5JthajNHt0e0HBwxHuR
-	te3KUCVvsUn6T6Ww8HHyKIDxu846PIZ9CMUHQ82JB0XXGZXuuuazthRiE+JNTtTzw=
-X-Google-Smtp-Source: AGHT+IHn8TkCdj+ni+aC/DsrAqi9Ur2+n79I6LNfYvaRRRjb46r0pJxbHJPzmzbCwlmXoCzWPkQvZhUhuI8g+DiH4A==
-X-Received: from plbms3.prod.google.com ([2002:a17:903:ac3:b0:223:294f:455a])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:ebc6:b0:224:2175:b0cd with SMTP id d9443c01a7336-23414f689ddmr16906845ad.26.1748041542350;
- Fri, 23 May 2025 16:05:42 -0700 (PDT)
-Date: Fri, 23 May 2025 23:05:24 +0000
-In-Reply-To: <20250523230524.1107879-1-almasrymina@google.com>
+	s=arc-20240116; t=1748045173; c=relaxed/simple;
+	bh=d5tUJSTZcL5Tc4PZdJBl8+x39c8Y4r8OKEODz43Oe80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jsp+MXBpWSQkafLLTwbH1UIv3h/RMLJ+qXuhyEEGYuumH4IQbdzh4lAc3k0CT3lDpzKHI5VnfYi6M4TcNUepzzKslXzC9aZhA/1AiWBlEYd/r6kGjA6IEeUmXv5QyMo7Ku2oyVkFKRKGFT8/E52yUzcg2KtqOd5gHeRGGTttqaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=s3R3w63k; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kJW5yfLMv6KfYajBWSB2+tcy3Ju4PEVFx9kcwqoX2M8=; b=s3R3w63k4JHTq66/JjHB3c/PnR
+	vMXzuY6WQj8bpgPt2kJRuib+GLaM3kYRx3NE8wnMhr0hPrJSI1mp7woYJBtv7bu2fASR5Jnf5lqEH
+	SCPz3nneg3BV/mGEAywVzBnkUk8RmK38w0kCO17zEmHJnLtDtjn2EqA4t2R88SItIlJkco63+uKFk
+	jCn+IGlm5SBzNcb3l+wwDGva82RKj4kWXjHjEm283Om5wVuXxfyCqu0iZ0WciHzyX0fDsXR0339u9
+	NUZ068vY9q1JYl7AYdY+CL+/BNF1weL6y/v6WYU5iimdqX+NwQWLoEGDxWs2pyzWALV8gerYDnKXR
+	vI+1mGNA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54864)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uIcOm-0004BY-32;
+	Sat, 24 May 2025 01:06:01 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uIcOg-0006Ib-04;
+	Sat, 24 May 2025 01:05:54 +0100
+Date: Sat, 24 May 2025 01:05:53 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lei Wei <quic_leiwei@quicinc.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	linux-kernel@vger.kernel.org, Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, imx@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next PATCH v5 05/10] net: pcs: lynx: Convert to an MDIO
+ driver
+Message-ID: <aDENYfL7Hstsswml@shell.armlinux.org.uk>
+References: <20250523203339.1993685-1-sean.anderson@linux.dev>
+ <20250523203339.1993685-6-sean.anderson@linux.dev>
+ <a937e728-d911-4fcc-9af1-9ae6130f96c1@gmail.com>
+ <3a452864-9d02-4fa7-9d7c-a240b611ee74@linux.dev>
+ <e0bd575b-a01b-418f-9d89-b59398e87a48@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250523230524.1107879-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250523230524.1107879-9-almasrymina@google.com>
-Subject: [PATCH net-next v2 8/8] net: devmem: ncdevmem: remove unused variable
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
-	ap420073@gmail.com, praan@google.com, shivajikant@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0bd575b-a01b-418f-9d89-b59398e87a48@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-This variable is unused and can be removed.
+On Fri, May 23, 2025 at 06:07:16PM -0400, Sean Anderson wrote:
+> On 5/23/25 17:39, Sean Anderson wrote:
+> > On 5/23/25 17:33, Heiner Kallweit wrote:
+> >> On 23.05.2025 22:33, Sean Anderson wrote:
+> >>> This converts the lynx PCS driver to a proper MDIO driver.
+> >>> This allows using a more conventional driver lifecycle (e.g. with a
+> >>> probe and remove). It will also make it easier to add interrupt support.
+> >>> 
+> >>> The existing helpers are converted to bind the MDIO driver instead of
+> >>> creating the PCS directly. As lynx_pcs_create_mdiodev creates the PCS
+> >>> device, we can just set the modalias. For lynx_pcs_create_fwnode, we try
+> >>> to get the PCS the usual way, and if that fails we edit the devicetree
+> >>> to add a compatible and reprobe the device.
+> >>> 
+> >>> To ensure my contributions remain free software, remove the BSD option
+> >>> from the license. This is permitted because the SPDX uses "OR".
+> >>> 
+> >>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> >>> ---
+> >>> 
+> >>> Changes in v5:
+> >>> - Use MDIO_BUS instead of MDIO_DEVICE
+> >>> 
+> >>> Changes in v4:
+> >>> - Add a note about the license
+> >>> - Convert to dev-less pcs_put
+> >>> 
+> >>> Changes in v3:
+> >>> - Call devm_pcs_register instead of devm_pcs_register_provider
+> >>> 
+> >>> Changes in v2:
+> >>> - Add support for #pcs-cells
+> >>> - Remove unused variable lynx_properties
+> >>> 
+> >>>  drivers/net/dsa/ocelot/Kconfig                |   4 +
+> >>>  drivers/net/dsa/ocelot/felix_vsc9959.c        |  11 +-
+> >>>  drivers/net/dsa/ocelot/seville_vsc9953.c      |  11 +-
+> >>>  drivers/net/ethernet/altera/Kconfig           |   2 +
+> >>>  drivers/net/ethernet/altera/altera_tse_main.c |   7 +-
+> >>>  drivers/net/ethernet/freescale/dpaa/Kconfig   |   2 +-
+> >>>  drivers/net/ethernet/freescale/dpaa2/Kconfig  |   3 +
+> >>>  .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  |  11 +-
+> >>>  drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
+> >>>  .../net/ethernet/freescale/enetc/enetc_pf.c   |   8 +-
+> >>>  .../net/ethernet/freescale/enetc/enetc_pf.h   |   1 -
+> >>>  .../freescale/enetc/enetc_pf_common.c         |   4 +-
+> >>>  drivers/net/ethernet/freescale/fman/Kconfig   |   4 +-
+> >>>  .../net/ethernet/freescale/fman/fman_memac.c  |  25 ++--
+> >>>  drivers/net/ethernet/stmicro/stmmac/Kconfig   |   3 +
+> >>>  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   6 +-
+> >>>  drivers/net/pcs/Kconfig                       |  11 +-
+> >>>  drivers/net/pcs/pcs-lynx.c                    | 110 ++++++++++--------
+> >>>  include/linux/pcs-lynx.h                      |  13 ++-
+> >>>  19 files changed, 128 insertions(+), 110 deletions(-)
+> >>> 
+> >>> diff --git a/drivers/net/dsa/ocelot/Kconfig b/drivers/net/dsa/ocelot/Kconfig
+> >>> index 081e7a88ea02..907c29d61c14 100644
+> >>> --- a/drivers/net/dsa/ocelot/Kconfig
+> >>> +++ b/drivers/net/dsa/ocelot/Kconfig
+> >>> @@ -42,7 +42,9 @@ config NET_DSA_MSCC_FELIX
+> >>>  	select NET_DSA_TAG_OCELOT_8021Q
+> >>>  	select NET_DSA_TAG_OCELOT
+> >>>  	select FSL_ENETC_MDIO
+> >>> +	select PCS
+> >>>  	select PCS_LYNX
+> >>> +	select MDIO_BUS
+> >> 
+> >> This shouldn't be needed. NET_DSA selects PHYLINK, which selects PHYLIB,
+> >> which selects MDIO_BUS. There are more places in this series where the
+> >> same comment applies.
+> > 
+> > select does not transitively enable dependencies. See the note in
+> > Documentation/kbuild/kconfig-language.rst for details. Therefore we must
+> > select the dependencies of things we select in order to ensure we do not
+> > trip sym_warn_unmet_dep.
+> 
+> OK, I see what you mean here. But of course NET_DSA is missing selects for
+> PHYLIB and MDIO_BUS. And PHYLINK is also missing a select for MDIO_BUS. Actually,
+> this bug is really endemic. Maybe we should just get rid of PHYLIB as a config
+> and just make everything depend on ETHERNET instead.
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
----
- tools/testing/selftests/drivers/net/hw/ncdevmem.c | 1 -
- 1 file changed, 1 deletion(-)
+You're reading the documentation wrongly.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 3c7529de8d48..03f0498cdffb 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -537,7 +537,6 @@ static struct netdev_queue_id *create_queues(void)
- static int do_server(struct memory_buffer *mem)
- {
- 	char ctrl_data[sizeof(int) * 20000];
--	struct netdev_queue_id *queues;
- 	size_t non_page_aligned_frags = 0;
- 	struct sockaddr_in6 client_addr;
- 	struct sockaddr_in6 server_sin;
+Take this example:
+
+config A
+	select B
+
+config B
+	select C
+	depends on E
+
+config C
+	select D
+
+config D
+
+config E
+
+Enabling A leads to B, C and D all being enabled, but it does *not*
+lead to E being enabled - kconfig will issue a warning if E is not
+already enabled.
+
+E is a dependency of B. There are no other dependencies, but there
+are reverse dependencies, and reverse dependencies are propagated.
+
 -- 
-2.49.0.1151.ga128411c76-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
