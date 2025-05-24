@@ -1,138 +1,96 @@
-Return-Path: <netdev+bounces-193200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36FAAC2E48
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 10:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6645AC2E51
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 10:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D1DF1BA7163
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 08:44:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C94ED9E7516
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 08:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4A313AA53;
-	Sat, 24 May 2025 08:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480D413D531;
+	Sat, 24 May 2025 08:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AA9z5PS9"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="sTEdrC0D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-74.smtpout.orange.fr [80.12.242.74])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521D72DCC1C;
-	Sat, 24 May 2025 08:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7FC4C98;
+	Sat, 24 May 2025 08:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748076223; cv=none; b=sKuLenWzTqetFAkkpRm+mfp+JjIOkaj/msdWj2nuJdZbFcS4ec/kPiT1XCv2goCqZtLWQW3FjnGB4ACI8nhPocjy5QnglIzktoaBsqbPSaCGeamTBkMj2zJwXaTCJASxURa14N3/IrJIJqCOOdO7VEl1fbn1eCRiGLez+botQSU=
+	t=1748076946; cv=none; b=P5NJjnxAf6xDCGx4iI5BtXaauVyoaTssw7LDeiKrA6TuJSi4K/jI77feCL3m3nUBFLqiJZBrDT+5DGRIJpTgUSG26nkYS/2ANCq4jEQy8C6pwPJLiT7dhtf2KcxZATHGBBYZ+9TN5QndVCD7QCtf/Cb1++LjJU/TTFgPdS6bWmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748076223; c=relaxed/simple;
-	bh=21TpRITYx8gCPyYtnS7+VMQMKDMX408Ws2PCZEAHMeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ej6f2fwpKZacgXGPnEGj83STP6alGV2lbJV4BRmAaQYZ89HXJL0FZkZs6pmh56s00ExFpOOFbcdwoCW/7u5ekMW/UUMEauZ6aRHLBQn0WUarAIyb9SZNiXvmpX3utv+FOaI4xrFrcW6RS4kaXzY3vgYg1tUDyGIy1szODe6ww/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AA9z5PS9; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748076221; x=1779612221;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=21TpRITYx8gCPyYtnS7+VMQMKDMX408Ws2PCZEAHMeo=;
-  b=AA9z5PS9LMbhc4fnlsMM2jzuCrN7QmWdolHACR97RK1lPQQxvoa07tWV
-   X7XqHAPG7EBVWj5sV+HG6C+DMVETCs51CjLENZQWUm0femuDSVzDZUyfV
-   rQk+FXN7ya+lIh8jooFEv3IOfmafOoEEhjyUBIQRih7xO0cG5Q06Ss9Je
-   d+QNkPYgYbMSwGxQ/1KzX801j834XgILrvWfeA5Pcbom3jF5Cqv2Td8FP
-   RgE11GUp5KgJgmrf8giHXAknpuWGOEUz4fpfYBatU7OM1FjHdSmAAAT6P
-   5rZ9Q4roq8XrO+9kQaPE+QrR4eNfojy1w2sqbUzDZ8TMd9mHew1Mc+cUs
-   w==;
-X-CSE-ConnectionGUID: A4rrmDtqR5SWmrzFxyxTTg==
-X-CSE-MsgGUID: 5+YLrxgzQJmHJO3LUE2jFw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="50273653"
-X-IronPort-AV: E=Sophos;i="6.15,311,1739865600"; 
-   d="scan'208";a="50273653"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2025 01:43:40 -0700
-X-CSE-ConnectionGUID: 7Kqi4AGlTmisIlrL2d3T2Q==
-X-CSE-MsgGUID: J3rguEQXTV68vf3OENoThw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,311,1739865600"; 
-   d="scan'208";a="141403969"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 24 May 2025 01:43:36 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uIkTd-000R3w-2R;
-	Sat, 24 May 2025 08:43:33 +0000
-Date: Sat, 24 May 2025 16:42:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: oe-kbuild-all@lists.linux.dev, Lei Wei <quic_leiwei@quicinc.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	linux-kernel@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, imx@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next PATCH v5 05/10] net: pcs: lynx: Convert to an MDIO
- driver
-Message-ID: <202505241618.qJrsEs8c-lkp@intel.com>
-References: <20250523203339.1993685-6-sean.anderson@linux.dev>
+	s=arc-20240116; t=1748076946; c=relaxed/simple;
+	bh=WMIY4j3Sgu5Ef+S2ioQ76hl0mDTM6xszXJq/KHGWE6g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pNgib2GljiYKR+CW9v+c+nX1ghv9XHHDnzHafF4Zzpz9ZGgZS3+b3+qHGSc7SeDTbTBgfEHjXQQagHotuNOSYu13wf6SF4RgkFdkH2wieTVKBSunbN51tHlglcom6J06FMWsIfc1WVd8IvHtlrsXrBufvSBqDw3Dx2jKb/fG9LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=sTEdrC0D; arc=none smtp.client-ip=80.12.242.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+ ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
+	by smtp.orange.fr with ESMTPA
+	id Ike6uMjyN9ZLlIke7uwbb3; Sat, 24 May 2025 10:54:25 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1748076866;
+	bh=XYBFJ9U8mLqbbc+8f0SAmMzl/oGwiW2pOKW6PfNaUxo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=sTEdrC0DBn7oWtbnLgUXHImJiDKkX1AGajfKV0lWlBMrXZdL6Y3JiD+BcObayhREZ
+	 +SApgEFK+URDi5StLfr88TRbIIEh3kkQSI5ry/c7sSSshkuThg7/LD3URWldrnBa01
+	 boAEBYBhxkqTSXaj0aH3oWnmYJwFKcZO3NuPBjkqd60Yvk/kTRdasyY+KPhtfYpx8p
+	 hBJ0PPowjgqB8tgEEXS+uNtL7LbzNk7AcIAorHKE+3vsa0GsHxxqwwxFQMPkBiYQei
+	 ywwpfpYEEWB9OeW5ATKOOv6uZmG9FGGI1X08HufsOaOdIiFBPpoyEm7hXZDWjCcWpC
+	 r7dlaRNlq9IEA==
+X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Sat, 24 May 2025 10:54:26 +0200
+X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
+Message-ID: <7ae4c256-b14e-4add-b5f1-8b861e853407@wanadoo.fr>
+Date: Sat, 24 May 2025 10:54:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250523203339.1993685-6-sean.anderson@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] net: airoha: Fix an error handling path in
+ airoha_probe()
+To: Simon Horman <horms@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
+ <47910951a3fa3c3bd2a942210e821d9301362128.1746715755.git.christophe.jaillet@wanadoo.fr>
+ <20250516201625.GI3339421@horms.kernel.org>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20250516201625.GI3339421@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Sean,
+Le 16/05/2025 à 22:16, Simon Horman a écrit :
+> On Thu, May 15, 2025 at 09:59:36PM +0200, Christophe JAILLET wrote:
+>> If an error occurs after a successful airoha_hw_init() call,
+>> airoha_ppe_deinit() needs to be called as already done in the remove
+>> function.
+>>
+>> Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
 
-kernel test robot noticed the following build warnings:
+Hi,
 
-[auto build test WARNING on net-next/main]
+I guess, that is patch should also be targeted against -net?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Anderson/dt-bindings-net-Add-Xilinx-PCS/20250524-043901
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250523203339.1993685-6-sean.anderson%40linux.dev
-patch subject: [net-next PATCH v5 05/10] net: pcs: lynx: Convert to an MDIO driver
-config: x86_64-randconfig-074-20250524 (https://download.01.org/0day-ci/archive/20250524/202505241618.qJrsEs8c-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250524/202505241618.qJrsEs8c-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505241618.qJrsEs8c-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/pcs/pcs-lynx.c:374:34: warning: 'lynx_pcs_of_match' defined but not used [-Wunused-const-variable=]
-     374 | static const struct of_device_id lynx_pcs_of_match[] = {
-         |                                  ^~~~~~~~~~~~~~~~~
-
-
-vim +/lynx_pcs_of_match +374 drivers/net/pcs/pcs-lynx.c
-
-   373	
- > 374	static const struct of_device_id lynx_pcs_of_match[] = {
-   375		{ .compatible = "fsl,lynx-pcs" },
-   376		{ },
-   377	};
-   378	MODULE_DEVICE_TABLE(of, lynx_pcs_of_match);
-   379	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+CJ
 
