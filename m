@@ -1,74 +1,58 @@
-Return-Path: <netdev+bounces-193229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27B1AC312B
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 21:35:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D38AC3130
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 22:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C65B17CEE0
-	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 19:35:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0736517D939
+	for <lists+netdev@lfdr.de>; Sat, 24 May 2025 20:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A9823AE95;
-	Sat, 24 May 2025 19:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14EEE23741;
+	Sat, 24 May 2025 20:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HAt5yaoD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="e1uZHz1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B138217F24;
-	Sat, 24 May 2025 19:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFAF2DCC06
+	for <netdev@vger.kernel.org>; Sat, 24 May 2025 20:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748115298; cv=none; b=aalLt9GP5A5CW7gO5tdeRLPORfabt7XIchuSPjhzJQSjOF+C6mB1wZvKttBOSIjYFYckR0ByYfBCqUHSLz3/rnnIVYzpdlap0U4TfDnHDjjSTReMcnXwb1a5/AY1RLhNDSZYPj7tWXKJtfxZ26QRJ7tJk9XHsWFkXB+8bV7pYuE=
+	t=1748117375; cv=none; b=HAFA+EviXz6KrNBchc9I2w01sOi9/TlXGmSRV1NFkj4cYhuErc2uFVAcAy2exKZ4EoDZ6E5ffs3ZekYB0kluFKOvMojtRsNDdlmwm4z+46KJ7vBtZhpeiX6Ps9PVwoWihNbOW2iwrUG1XWcRoadI5tTwM4fcE8R2mF/5WuPGfd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748115298; c=relaxed/simple;
-	bh=RcQpM8Qhq03nv1Nk9bPW2HtWKX67vf6WAJ14x+qCfDQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nYNELOjWbcDSPAjMF7zAM9V3M225rqRKC2s7vNBUIm65Kt7/+40+xdleK0ij/qbPCidSb7JoBDmFi2gN0jUYeLOPY4QFxg6v3bSWk6+/L4gQ245ocG3rSsqUrle9HVIJgkVioRQ65FpDLKVgWSe0EXsh49Iyi7vsKZAmhDQcnTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HAt5yaoD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FDzdnEi5TtcfKfjBkwBIU4/mQNamhC7e6P0CVNdVIJw=; b=HAt5yaoD8r1RszUzBbuF8pC43r
-	6oAm8q6za/9fBu8kLaJV/wfUo1mDL9YbJN24T8ehAhOcgv1KvAaRQq9qcls3V1pNhtZ72ypqO4huO
-	T+JQFwB3s23BdF/KqtFLnIcdJhDEQaW72xPKwVhW9bzjbdBXXhj6+O9gLx3mhZhQssUdBJlPvvZS/
-	xK+2bfiQ7CXjruJHi0FeyQqKd9ki4wveUOyeKQxlMug29Mdri9yyYxhwAgn+ri1g5FNf9H9oZeSt4
-	2awXIc4zwtCH2Mt8RLAF6Sd+a134GkvAA/diZAqtSuBDgq65VDnu1BgJ3SjjO/IWyg3/LWvWJgIgE
-	QekY3i3g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59090)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uIudU-0005Al-17;
-	Sat, 24 May 2025 20:34:25 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uIudJ-00075J-2Z;
-	Sat, 24 May 2025 20:34:13 +0100
-Date: Sat, 24 May 2025 20:34:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: lizhe <sensor1010@163.com>, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	jonas@kwiboo.se, david.wu@rock-chips.com, wens@csie.org,
-	u.kleine-koenig@baylibre.com, an.petrous@oss.nxp.com,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] net: dwmac-rk: MAC clock should be truned off
-Message-ID: <aDIfNZtSwZ1HwW2l@shell.armlinux.org.uk>
-References: <20250523151521.3503-1-sensor1010@163.com>
- <d5325aba-507e-47b6-83fb-b9156c1f351e@lunn.ch>
- <2525c791.3415.197029d3705.Coremail.sensor1010@163.com>
- <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
+	s=arc-20240116; t=1748117375; c=relaxed/simple;
+	bh=c+/+InaJhSyNmGIihD4rbWrbCKtnc39+MWZfRXC5bE8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZxqKLHiQsDMW3eBW6NI6xah09KpiqUO5apGt17WgnfN8gVWyZ2J+Ya+MzmwsqGXR4FG5iE92yfqCHjMP94/1f6aVMpDSRLcE1ySZpHdjcE2E58R1TJJVKuFm10F9YbzTiKl8/jn0wYWd9Id4u+ngNG2oFeYqgPc5FLCs/L233kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=e1uZHz1M; arc=none smtp.client-ip=188.165.51.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1748117356; x=1748376556;
+	bh=c+/+InaJhSyNmGIihD4rbWrbCKtnc39+MWZfRXC5bE8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=e1uZHz1Mk2Zx5b4/mkQKlhukSF267f+fSJ9Z8/UuzAfSDhO903xCjHJWzgmg1VBHA
+	 jS8pGhSFI2PBssf90eoWiJdAet96JYBa94Lo0sRM9TVkGdege0CbTT2o8u4sx/MUo2
+	 SYUjrEiHblFpSXjWVNZgojOcp2lKBu1g+WsEXddazzX9PwNV8ZIcHB+R7c7A96bn8W
+	 DGvpfZkLxw70wqP6uQ0FBTQEczhq4wT/umrBrYKo9a9c4rY1xNkLcLq640e66P1jIQ
+	 2JaJVOxu5a6fYPFn/PptEsgygHbgb0LQtfBZSz3uNYOimdTfn84N6GHI4Jl0n5Qmnv
+	 7P1PZKr/V2DtQ==
+Date: Sat, 24 May 2025 20:09:11 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+Message-ID: <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io>
+In-Reply-To: <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com>
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMmQau9+uXVm-vpuWqYjh=51a_CCS6orS6VrK6qBdddxrQ@mail.gmail.com> <iEqzQsC-O2kAXqH1_58I59DIhBjRgebyGym2ZqyMEI3DaMtgsKSYR0KUsbxj5xqvfzf-4XzpM8dXvATHJhVVw3NedRdL3j1FJaqiXPlNWeE=@willsroot.io> <ggSxq-NP-LDpev4N-rvkgs0Rrd0qOrbwtGRjcu4j4y3SuZth9k5RxTg2tFvhriQu4w_GxRPYjnkKN6VqFP6Q6FCyqWudz7_5iuOV06IEzgY=@willsroot.io> <CAM0EoMkd87-6ZJ5PWsV8K+Pn+dVNEOP9NcfGAjXVrzAH70F4YA@mail.gmail.com> <Ppi6ol0VaHrqJs9Rp0-SGp0J1Y0K8hki_jbNZ8sjNOmtEq0mD4f0IozBxxX-m4535QPJonGFYmiPmB643yd4SOpd1HDDYyMeGQuASuFHl-E=@willsroot.io> <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com> <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io> <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 1cf62111fd09474bfc336ca4d4ec1eba60787fa7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,54 +60,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <112fa3c4-908d-4e31-9288-b3a2949555b0@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 24, 2025 at 04:48:15PM +0200, Andrew Lunn wrote:
-> On Sat, May 24, 2025 at 10:05:47PM +0800, lizhe wrote:
-> > Hi， Anerdw
-> > The following is the logic for calling this function： 
-> > 
-> > 
-> > rk_gmac_powerup() {
-> > 
-> > ret = phy_power_on(bsp_priv, true);      // here.
-> > 
-> > if (ret) {
-> > 
-> > gmac_clk_enable(bsp_priv, false);
-> > 
-> > return ret;
-> > 
-> > }
-> > 
-> > }
-> 
-> Ah, there is something funny with your patch. Look at the diff:
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 700858ff6f7c..036e45be5828 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -1648,7 +1648,7 @@  static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
-> 
-> This line tells you where in the file you are patching, and the
-> function to be patched. This is what i looked at,
-> gmac_clk_enable(). And gmac_clk_enable() has a similar structure, ret
-> declared at the beginning, return 0 at the end. But the only way to
-> that return 0 is without error.
-> 
-> But patch is actually for:
-> 
->  static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+On Saturday, May 24th, 2025 at 1:07 PM, Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 
-Andrew, this is not a problem. This is how diffs work. If the function
-hasn't actually started at the point the context starts, then the
-previous function will appear in the comment after the line numbers.
+> "count =3D=3D 0" seems to be only needed for the loss when a drop decisio=
+n is made.
+> Slight tangent: Looking at init() the setup does allow for both to be
+> on (i.e could be "and" not just "or" as you state above). It feels
+> sensible to me that if the loss function decided the packet is to be
+> dropped then that would override the duplication.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This makes perfect sense to me.
+
+By that, I agree that the count variable is not necessary. However, I think=
+ it's good to introduce a duplicated boolean instead for readablity's sake,=
+ instead of merging all the logic into nest_level. I will get a formal patc=
+h set ready sometime soon to address the bug and the other behavioral quirk=
+s we found here.=20
+
+Thank you for the help so far!
 
