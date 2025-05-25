@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-193284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D01E5AC3690
-	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 21:35:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DBF2AC36A2
+	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 21:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C0AF16EF79
-	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 19:35:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB355173CB4
+	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 19:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A390A25D8FB;
-	Sun, 25 May 2025 19:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3509B25F784;
+	Sun, 25 May 2025 19:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WtzVY/Yx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tRv8tElz"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B9718EAB;
-	Sun, 25 May 2025 19:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2B626AFB;
+	Sun, 25 May 2025 19:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748201733; cv=none; b=UJuYFH4Ka1VKtP2Co8lX1st+6BMLXkpvm67fN/4ez6tBqxLv9EFStbq431vbHyFAH4cPdUEyya77aXJMZLy7GdEBKDNJ9oNg4GtTMJbDNXeT96cJWI2vImNTv3LYKZnXBV6Lair0g0ZqJ0pDkcTT6+9wdUJ/luFYy7+U9lsa5Nc=
+	t=1748202139; cv=none; b=Kx55bvU8SfBBapmwi8PF1yYLFSj62+vXIRFeNdDi98v38EaF9dc9nbi0Ev9wmtoZW7qhxpyPcA7KAVhmn15h406TqmBt6D2HpoxQuSHUXFpclHw0uwKZm2VAGaZLCJUWO95OAs9OYPDWA2K9QK2QSmFTewHN0VyF1UJQHU/dLZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748201733; c=relaxed/simple;
-	bh=JuT6KUnHq81bQuNvZamp268XAyuvKNLy5usnRZv+PA0=;
+	s=arc-20240116; t=1748202139; c=relaxed/simple;
+	bh=9hWHDBpeJtHOsbWUFyhWWQ8ys3+lcEzg/PZcy+7Dr3s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p9jBSJQb2ITILpG8VINtvYInOio64zUWiDKPDjhjXQEAff2CJzNZLLnNNz5VDHtn4I0yrWttKITG+RjB/Zv1XyLrsMrCOoeGN1Xp7ZcY4Ch9g8RoJOKrM94OnwmZs54tDRMMnilgnTCjPdc3OKmPWu+6U7WesFv/luKXEnBJVsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WtzVY/Yx; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=OPQu2/ETwRmNv1P84+imK10OhYR7+OnAdL35pxzgLZHnXfOCaq6uOIk1mxo9rfznbMTQZTfpMlJCQRTeLdP97qdP5WrBV9hmPWu1o2eyEID9O6SyZ6yz0ruoJeF9DSHA+N8/Najfmszdaock5pqdNyu499U6t8q+kzsiGjMELIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tRv8tElz; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hjIoME60xChBfTDIKPKBOiyzN7tmPkpzibcygMvdyuU=; b=WtzVY/YxIqqYb0w69WwEwR1BUL
-	Vlc7WR6jysHBTXv+17l1UGLs91NsIk7KsHxt+H3o8FZThA0gmGSI26lJsyTLEvIBLwojkJYS6nw46
-	p4hwncCWIp2zX0GftQxC3SmxwCuyp0zNRNJGqZFkJ5jjfNJZPN8GhfOnv1eBfqbRC1Cs=;
+	bh=uMNeJr2TyJIxfy/QCHZd2896lqarzp8ruZrKjjxo/WQ=; b=tRv8tElz3u9eGmgkleJV/yI2qU
+	9ck3euwBfQnLLOn5tQPjfnbFazHiCAkEgksYynl6/B7/PWb8BwQWXOCiwMCUHw985MciCM460B0Vc
+	2vi21zoNY2ZwIypc/Lh3zAT2sIazMZpVi5swzuMGC48RWTSwcRa00cyMRxa1ShbjmWWw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uJH7l-00Dx2m-PI; Sun, 25 May 2025 21:35:09 +0200
-Date: Sun, 25 May 2025 21:35:09 +0200
+	id 1uJHEU-00Dx4H-SA; Sun, 25 May 2025 21:42:06 +0200
+Date: Sun, 25 May 2025 21:42:06 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: george.moussalem@outlook.com
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -61,11 +61,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Stephen Boyd <sboyd@kernel.org>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH 1/5] dt-bindings: net: qca,ar803x: Add IPQ5018 Internal
- GE PHY support
-Message-ID: <579b0db7-523c-46fd-897b-58fa0af2a613@lunn.ch>
+Subject: Re: [PATCH 3/5] net: phy: qcom: at803x: Add Qualcomm IPQ5018
+ Internal PHY support
+Message-ID: <40b427b8-b0d0-474b-a7c6-46641d1940b9@lunn.ch>
 References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-1-ddab8854e253@outlook.com>
+ <20250525-ipq5018-ge-phy-v1-3-ddab8854e253@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,53 +74,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250525-ipq5018-ge-phy-v1-1-ddab8854e253@outlook.com>
+In-Reply-To: <20250525-ipq5018-ge-phy-v1-3-ddab8854e253@outlook.com>
 
-On Sun, May 25, 2025 at 09:56:04PM +0400, George Moussalem via B4 Relay wrote:
-> From: George Moussalem <george.moussalem@outlook.com>
-> 
-> Document the IPQ5018 Internal Gigabit Ethernet PHY found in the IPQ5018
-> SoC. Its output pins provide an MDI interface to either an external
-> switch in a PHY to PHY link scenario or is directly attached to an RJ45
-> connector.
-> 
-> In a phy to phy architecture, DAC values need to be set to accommodate
-> for the short cable length. As such, add an optional property to do so.
-> 
-> In addition, the LDO controller found in the IPQ5018 SoC needs to be
-> enabled to driver low voltages to the CMN Ethernet Block (CMN BLK) which
-> the GE PHY depends on. The LDO must be enabled in TCSR by writing to a
-> specific register. So, adding a property that takes a phandle to the
-> TCSR node and the register offset.
-> 
-> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
-> ---
->  .../devicetree/bindings/net/qca,ar803x.yaml        | 23 ++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-> index 3acd09f0da863137f8a05e435a1fd28a536c2acd..a9e94666ff0af107db4f358b144bf8644c6597e8 100644
-> --- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-> +++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
-> @@ -60,6 +60,29 @@ properties:
->      minimum: 1
->      maximum: 255
->  
-> +  qca,dac:
-> +    description:
-> +      Values for MDAC and EDAC to adjust amplitude, bias current settings,
-> +      and error detection and correction algorithm. Only set in a PHY to PHY
-> +      link architecture to accommodate for short cable length.
-> +    $ref: /schemas/types.yaml#/definitions/uint32-array
-> +    items:
-> +      - items:
-> +          - description: value for MDAC. Expected 0x10, if set
-> +          - description: value for EDAC. Expected 0x10, if set
+> +	phy_write_mmd(phydev, MDIO_MMD_PCS, IPQ5018_PHY_MMD3_AZ_CTRL1,
+> +		      IPQ5018_PHY_MMD3_AZ_CTRL1_VAL);
 
-DT is not a collection of magic values to be poked into registers.
+Using MMD3 in the name is a good idea, but PCS would be better. Not
+everybody knows MDIO_MMD_PCS == 3.
+	
+    Andrew
 
-A bias current should be mA, amplitude probably in mV, and error
-detection as an algorithm. 
-
-	Andrew
+---
+pw-bot: cr
 
