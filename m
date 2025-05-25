@@ -1,52 +1,50 @@
-Return-Path: <netdev+bounces-193266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B24AC3589
-	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 17:54:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0108AC35B4
+	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 18:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B12AA1748BF
-	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 15:54:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79F6B1891EF3
+	for <lists+netdev@lfdr.de>; Sun, 25 May 2025 16:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DE21F875A;
-	Sun, 25 May 2025 15:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB99E1EF397;
+	Sun, 25 May 2025 16:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7T/G7zw"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8526712B73;
-	Sun, 25 May 2025 15:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BAD155C97
+	for <netdev@vger.kernel.org>; Sun, 25 May 2025 16:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748188477; cv=none; b=Il/zkvZmuIp/XtWfY2G1j/K+mffNT2bSr4RoFQvFquna1dvh6LZRfp5YQqky8u36WyfaNbglQ+eWfxoZClLZCHAa5XGahsZq7naDMtXXKX+5MSsVpgG8vaa+X24IufBqk9c83Al0jeQsiLk4O28P1isTD/Ih9Xu3vJ2yZF91woQ=
+	t=1748190593; cv=none; b=Rvv7Ykyyx0We6hZrois/Ui/zwSX5MNHNq8tEacFtDBox7XTy+C3zDjMr7ghSbj3b56n7FD8gQmBdZDJ1ZA+mVQMLuArq7n2U0lOcu2RRCYapNzlQpvoyAI7zBQE+Ww8U8n9AQmhn/nRl8iPKNIsVK1UCB7C4N8dsc16y3sd1/UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748188477; c=relaxed/simple;
-	bh=vrH5fpvU7vRjZ/W60VBI3qyQYO/Wlt462x6MyH8dQh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fRNKvp74JiZC7S4MPW04KQzueT8rkW/Uyq6vi/pmo93KGhC+6vPvTGgpX5s0IGk3kdJzJZqNTW6bUMR1bL1DY7hyqTC9R46LT45tRqRZNZlcuRL0CJfUAC+0fNnNW3tJ+KY2ph+D6MqL69wy10LL7jkfnV8yJRYe16AVwgAGZKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.199.70.239])
-	by APP-03 (Coremail) with SMTP id rQCowADHETEfPTNoi+BnAQ--.40252S2;
-	Sun, 25 May 2025 23:54:11 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: af_key: Add error check in set_sadb_address()
-Date: Sun, 25 May 2025 23:53:50 +0800
-Message-ID: <20250525155350.1948-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1748190593; c=relaxed/simple;
+	bh=buKQ91DVa6mfMekbfV41GafTrSLBNM6MUcueVdughRI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Eykf06e6aYCpH0i1XM86igFQfLYHiDLMEYoB9N+NLa0muimCOonrHPeLoI6bqX0oy3vV+pVlg9bLr78GtuoLVu30QlXYQZWe/9GTv4X8ksmxtKOrjQ8l0QsBZKbBsK9Mo9k9utFJfn/9cjfBWCtY00L0aqUmiBshy6j9nw0Mmec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7T/G7zw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031A8C4CEEA;
+	Sun, 25 May 2025 16:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748190593;
+	bh=buKQ91DVa6mfMekbfV41GafTrSLBNM6MUcueVdughRI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p7T/G7zwCDsndiskqcvoaytbaSmt2B+NWbUXhf85yhNnpPLSt9Xqb2WG+z9ELvVSU
+	 nKp2nA1Hd209lMJIdorz3BStIlT1XoFgE/XtN9Acajx9k+tCBZbVlz7yU9KyRlMRby
+	 D6tshsfLuALmOtJBA0dWI9IG2skNwwm5HESqOOibG1vESbzxnr6tNovHJLXQh2/vwc
+	 zdDXxW8ZFSaH2BZFFkLK0qhBpC/JYfh3bMgL6jn1E/rHyLS1fqgrgnudOa8nkpt4hN
+	 T+46AKJXHOr7hTI4lYtNG3R0bypyfHX3mELgXtZUchIp3R49udt31xffRXe1++Gj5n
+	 9IYg5q8BQoBtw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF83380AAFA;
+	Sun, 25 May 2025 16:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,68 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADHETEfPTNoi+BnAQ--.40252S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyDAryDKw4xur1UZrW3GFg_yoW8Gw4Up3
-	W3Gr1fXrn8Jw15ua1fGr1Fg3W5A34kKFyj9rW8KF4YkwsYgr1rZw45Cw4fWa4UJrZ3Xa1x
-	trWYgrZ5GF40vFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkNA2gzMwUSfgAAsB
+Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: Correct spelling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174819062775.4171016.10242834560334242547.git-patchwork-notify@kernel.org>
+Date: Sun, 25 May 2025 16:30:27 +0000
+References: <20250520-mtk-spell-v1-1-2b0d5b4a4528@kernel.org>
+In-Reply-To: <20250520-mtk-spell-v1-1-2b0d5b4a4528@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, lorenzo@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-The function set_sadb_address() calls the function
-pfkey_sockaddr_fill(), but does not check its return value.
-A proper implementation can be found in set_sadb_kmaddress().
+Hello:
 
-Add an error check for set_sadb_address(), return error code
-if the function fails.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Fixes: e5b56652c11b ("key: Share common code path to fill sockaddr{}.")
-Cc: stable@vger.kernel.org # v2.6
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/key/af_key.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+On Tue, 20 May 2025 15:33:33 +0100 you wrote:
+> Correct spelling of platforms, various, and initial.
+> As flagged by codespell.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.h | 4 ++--
+>  drivers/net/ethernet/mediatek/mtk_wed.c     | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index c56bb4f451e6..537c9604e356 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -3474,15 +3474,17 @@ static int set_sadb_address(struct sk_buff *skb, int sasize, int type,
- 	switch (type) {
- 	case SADB_EXT_ADDRESS_SRC:
- 		addr->sadb_address_prefixlen = sel->prefixlen_s;
--		pfkey_sockaddr_fill(&sel->saddr, 0,
--				    (struct sockaddr *)(addr + 1),
--				    sel->family);
-+		if (!pfkey_sockaddr_fill(&sel->saddr, 0,
-+					 (struct sockaddr *)(addr + 1),
-+					 sel->family))
-+			return -EINVAL;
- 		break;
- 	case SADB_EXT_ADDRESS_DST:
- 		addr->sadb_address_prefixlen = sel->prefixlen_d;
--		pfkey_sockaddr_fill(&sel->daddr, 0,
--				    (struct sockaddr *)(addr + 1),
--				    sel->family);
-+		if (!pfkey_sockaddr_fill(&sel->daddr, 0,
-+					 (struct sockaddr *)(addr + 1),
-+					 sel->family))
-+			return -EINVAL;
- 		break;
- 	default:
- 		return -EINVAL;
+Here is the summary with links:
+  - [net-next] net: ethernet: mtk_eth_soc: Correct spelling
+    https://git.kernel.org/netdev/net-next/c/d09a8a4ab578
+
+You are awesome, thank you!
 -- 
-2.42.0.windows.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
