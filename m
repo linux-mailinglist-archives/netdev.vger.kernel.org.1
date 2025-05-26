@@ -1,243 +1,343 @@
-Return-Path: <netdev+bounces-193314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1434BAC3890
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:27:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 658D3AC3896
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C711890356
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:28:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E62A91885829
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B3C1A255C;
-	Mon, 26 May 2025 04:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E911A254C;
+	Mon, 26 May 2025 04:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="tBqepzgc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="TH3bU+iu"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2015.outbound.protection.outlook.com [40.92.40.15])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D38419DF99;
-	Mon, 26 May 2025 04:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.40.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748233660; cv=fail; b=dXCwyNGSssjIBUqhQHraz/PaZo2WVI6iBn0aTggT+F38c/CgNFuUnyNWU3aeNekBo78lBpC53lfC9Y/h2bRMfDyx5oh4fpXTLR5uwP9Etg3vKa3pJkXCpKAecmAGGU4jeYk5JAe3EE93azVesGhV9Rq/PRjumkKH1MWACXcefWk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748233660; c=relaxed/simple;
-	bh=CojLTTkz39DbBLhgt2GEzB/g/fS123wmx1+ojgChZd0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oJPZUzwbp60Ndpk6on7yuRhl7XLY4Rodr9+ZkHl978bCMrmlmbA+RWKWkePa+YVPg2Y1rIew1Hg2nQ6XQ0pDRFb+8xv6EleOfDBaHCWmnfidSAa6fr0/2Q0lUxkwlK5RLBFbrmdLx1NWar2xJD/EwNoURt5f/c+YHN+C8wAjiiU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=tBqepzgc; arc=fail smtp.client-ip=40.92.40.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GVTjHZn3KoFw/H/itQeDNxgLZy3vDH0Dft1C+8lIfIZ6LY1/V5xlFTrsspH1rnHJyQiqxumgIt1oq2Ki3S+EY8414kXWxuxCS8iuBYkUNi2j0HNDDEpMY9UorFu5dTKuwqqLMHFMMhrV1ljAQrrFp5F0GtbR5FUvnFtgOCc9nISYoQuvqmhwj1rbdG081+FFZ/Js4jWW36qIJaVF9uasA9UL8qkixrCiJNxoIpf6LVmti/hZGHtNW8+0Ou9EPEBbdcoEA1OMOyeXrVE+LOdW8NS5s/DRbYn+I4hAoqjcBMDxbOyZ99nPloykwWWBZz64MgNAjEjCIRZFOlhWtWilqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wsRZUcMO9qvNyKBof52DfgsrrcsM0qlMkTKql/kHXvE=;
- b=wo791kRPjBKJZrmUdEAVMf0xoRPM03kmczbv+wGAobE4i8h3thera8WlKNOxMXrHHUHWzOxvMkIIIXATwvH2IuUMoj91PqTrED+dx6l8JpbMRbGp9yyFCXPVqitivvd6Zso2W8O19TarO1ldAJi3LTmO/hzR9EYfkL4Gnv0XoyKy3V4Z5o6PJFEARDyH/rSQeByAZk5LreqGkMxfcTyJ8JLZa7L/QSpuD6MvQuVmfYxbKaYaxsxoPEFh6CeamCeJeC9NYDtFKWrA9DVqN3lQejr5CnQus+c7Pw/bi1qx8u/LpCN9C/JnJpgzeNuju3Qg8wUE+cQXXJws5Tv2JOgBtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wsRZUcMO9qvNyKBof52DfgsrrcsM0qlMkTKql/kHXvE=;
- b=tBqepzgc/rDgpWQNseRpKNwDrA29lf+VoQMMVzXUEgI7JajUdcqGGD+fojpKp6+v8xjBLZt4jbz7CSNqGYgRzj0sEnjFdnthziITXJ3vPxOTXMJHCNHmpXnjARFbqHv1dOekFcocIXTgeuuY+AnUUPYQxbm81UwfH1aP7G+HhoGLvYis86OP1FQaTJu0COB1sYqRouzri0VIt3tXMmACHzr45a/8uNDgPOzQ2KoxXmn38KUTxsUO8tCLbJ7Iy1tSf2EhwT3jbAJThtmoN6qKK3FKd5S66JSgY/ugcgL1uJOsTLa3UjwLr8YPWMvINGgaL+ymK+TuDkqLFL88/aqHUQ==
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com (2603:10b6:8:253::16)
- by SA3PR19MB8260.namprd19.prod.outlook.com (2603:10b6:806:39c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Mon, 26 May
- 2025 04:27:35 +0000
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305]) by DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305%4]) with mapi id 15.20.8769.025; Mon, 26 May 2025
- 04:27:34 +0000
-Message-ID:
- <DS7PR19MB888348A90F59D8FEEBB0A9509D65A@DS7PR19MB8883.namprd19.prod.outlook.com>
-Date: Mon, 26 May 2025 08:27:22 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE
- PHY support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-clk@vger.kernel.org
-References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-1-ddab8854e253@outlook.com>
- <579b0db7-523c-46fd-897b-58fa0af2a613@lunn.ch>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <579b0db7-523c-46fd-897b-58fa0af2a613@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0067.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:59::8) To DS7PR19MB8883.namprd19.prod.outlook.com
- (2603:10b6:8:253::16)
-X-Microsoft-Original-Message-ID:
- <c376b7b4-350a-4047-b48d-9bc4dac5685b@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E2C1C28E
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 04:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748233726; cv=none; b=Mn7scC03ZP8L+q8kC6RpaavnXPW3M7NtTaEvmBe+InCJnpVuWDsX1Ang5UZq/knFj1MY3hFihqR5haGFefDmpKxoH5OTTZldQ25Xf8ClGktn3vjPtT2sVpHqyMByL42khcZtC5zXEewUQ0seLAGR3lBGBz8nAXNmiAu91jQ65HM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748233726; c=relaxed/simple;
+	bh=nvqtjTRgph3Rbug81YYWq2aRjSFdCWB7soib7+/25/4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hX9cEwd/i4gyXsjVdIUhOtWtdK5mYcHlwLj6oq5t9knPPMBDpOnWcfZ+mm/dQBPRMPUkwBL+y6l/JdFvJeRq104hNViytmrQMGR6Qy5moP9IUPvs5mTIbMqsLIM3mPzDTnG25CxJ+4FLwCl+vnIWUKQEw4vIAJGBJO1s+kVuRAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=TH3bU+iu; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=x9qN2Bdb7dkseAwIZaOcxntrUSpbDjWMiwTGskR1Uvw=; t=1748233724; x=1749097724; 
+	b=TH3bU+iuen8uMJ7kjw32px04Qx/k61puXn9ZnYdAINwbwXO1noMgKRAuh67v7unxKkKzh/sh7Ks
+	noTc53gxaI62bZhbXsxqXvBUP/Kw35xJd5ydrX1gDu6PIH0LPYjSE4xy/AxYp6zmgRlJzX63DBK2r
+	YtlUcG9GLfdcpKAiqHjKpoNK/Hzikw8KhQlqe6UeM1/sjp4i5xpjuF1tOhfeG6YZyu/pGZuAzdsye
+	XdqaBm5XPp6z57425PJCZ7uHJc9392hDSU7FgVVF+rDi1EDODD/3O7qhCnklG9WJIQ8CPjd1bwbQw
+	XxsV1vGJuenFcdfHsf/0AWxs2Myc8M6i2l9g==;
+Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:54961 helo=localhost.localdomain)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1uJPS1-0006Qy-24; Sun, 25 May 2025 21:28:38 -0700
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v9 00/15] Begin upstreaming Homa transport protocol
+Date: Sun, 25 May 2025 21:28:02 -0700
+Message-ID: <20250526042819.2526-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR19MB8883:EE_|SA3PR19MB8260:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac88f9fb-9064-4144-af34-08dd9c0da26b
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|19110799006|461199028|15080799009|7092599006|8060799009|6090799003|5072599009|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZmRCY04zSi9hZGZZRHlXWTBMaTVzajZQSi9GY1JKR1YyQ1Iwc1NWejZBSEF2?=
- =?utf-8?B?Q2lsSXY5MzBIWEpIblZOaFo5ZjBXVjFhTHIrVVd3enl0d3pXam5maC9mdFYx?=
- =?utf-8?B?WTJXeFlBQkNDdGZzY1kvQllrZmFTaC9YczhNLzdUZGREc2wxZVZBSzlmNHhX?=
- =?utf-8?B?d3FmOGVJOHp1MlE3WVd0NzNnOVYwSVhkMFdWQVZDZ3JGQUxNRXUrZzZsalYv?=
- =?utf-8?B?akZmcEdKV3A0VGVBNzZ5cnJpdW5YL2hNcC8za1hoYUU4azFCOU8wT0NXeTRS?=
- =?utf-8?B?TXY4dEp3UXNNUGZLRmhRQld3UWt0MmtsZndhNFdlQ0gzaXBycEw5U1dwbHYv?=
- =?utf-8?B?WVhTY2dWaFI2S0czdlN5SXVuYmdDT3hQUk5rYndsSFRITVdzVlBkZGw5UlAy?=
- =?utf-8?B?djlUTkpLV1JXZStxSUNhb1F5YVczU0tKa29NN1dYM0dleG1BTURyeXp6bTBP?=
- =?utf-8?B?WXNlT3lmYTdqMFhBZU9jRmdGcHFDTncwVlBBcUxqanVPS2k2SW9GNEltU28v?=
- =?utf-8?B?ekh2VEx3WW9Xbmt4Vk1MQ0ZjZVNacFRHczlpLzk5QmtnZFJuUk8rVFBuRkVU?=
- =?utf-8?B?NFRWOXB0WjRKd2RxVXdVbjVZZHlXbUYyckJSbk4vSmZFSkRiRml6TUZmV05m?=
- =?utf-8?B?Yk5IQm5Yd1dpTHBHaXZuanBUUklVeFhPTmJUeE56cjEwTDZLQkV0dm96eDlS?=
- =?utf-8?B?dE5zMkI3MW4zZ2oyaHRTbjZIdHlsS1ozdmNkQk9HNXNQMjJML0pVWGVDdjdp?=
- =?utf-8?B?UURjMGFRcDBtUStwZjhQV2x5VjgrdUM5aGdXQ29ENThnbTJwRy9SeXJ4ZnAy?=
- =?utf-8?B?eE1YNkhwMWRuWm11VitDVHJ1N21TWmdqYTA2THozOHY5UnBiNHd0ZnNBeXFy?=
- =?utf-8?B?aWE5Ukw4eVZ0amNLT0xQdWdNSDd6dC9la3JtN256cVBNMWJEWE16aXpZTDho?=
- =?utf-8?B?NGF1WDN6SGxJdkhQbGwvTWdmSDV6MmU1NjJnOHZIckU1MHRDSDhvQmY0L2hK?=
- =?utf-8?B?OVRTV1U5NGlxOStnNDhXcjY1SmhmcGlMOEdPeXhIK2oyNS8yTHFjaXBtU016?=
- =?utf-8?B?aFBjU2VMTitIOXBCb2xwdXYrSWlheTdOWTBtN3B1RHg0dW16bW95ZE5tZmt0?=
- =?utf-8?B?WDBZc1FETHlscjEwYXJwRDQxUm11NXl1M2dRakpYMko2T2lMVVhhNnAydUxI?=
- =?utf-8?B?L3BOUlU0dmlIR2g4cmlrYnhXRHRxRkgzNTJUL0xxOHNOZklKWHU0RUJ1bXYw?=
- =?utf-8?B?U0pjUHFDTmR6OW93eGRoRnQraTdNQ2Q0OWxQZER2TlJvR0lTRzFYbWUrbWZV?=
- =?utf-8?B?WmlBeEJhZ0dOVWtDTjNjclJQU3ZDd3U3dDBjR0lCcUM3RWo4dTRHZ2hyOFpv?=
- =?utf-8?B?bEdCYW5uQ2s5L3RtNDVuV1RGMDhPODRSeVNVc0xnVkpnQk1tQmViTm83VUdL?=
- =?utf-8?B?MmNMbS9ZTkdBWWJtVjZ5djhpU3pVcVR5TDZ1SVRGcFJWUHlWRStGVFJ6YTZs?=
- =?utf-8?B?dVFwVyt5OXBITm9UenUycTRNaytVM0owYitYZUZxZWwzODlLekFJTHBsTXpB?=
- =?utf-8?B?NnFBQT09?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NjFJcjRTZ1NyZ0ROR1VONUVmTXdhb1Z2cVhlMnpFaEZ5U1pWTXd6TGJZNDRK?=
- =?utf-8?B?VGlzckJGdE5ZQ1g5dmliVHkxcTNXOHkvb3oxZHBycDRZSWNDa2RGbDJxblZZ?=
- =?utf-8?B?L0NzT1dxQ1pxTEM5eit2TXB6QVdIb1JiaTc4OW8rbDdacXUyK2VzOEc4dy9N?=
- =?utf-8?B?Q1dQaUwvcGtjUnBURmY1Qy9ZRWJ1Z1N5V240YlROZ1VSYWJ5RzRVaGQyOXph?=
- =?utf-8?B?M21qd3lpY0x0V3dXT0tiZ0JhTXRvNkhWdkd6R1oraUZCU0NobDBGVnlmcVVR?=
- =?utf-8?B?N0V3Q3BwZ3J5eTFjdmZLR3ZRS0N4UnhmYTVCQ2EvcUVBMGZwL29Za1pmVXJP?=
- =?utf-8?B?RDdaVGdmdjNZSGNIZC9rMWVlN2w1ZlFmMmhWbFQwU1FJa0J3cDZhZzhXK1J3?=
- =?utf-8?B?QzYxUGE5UXR0SHc5elBUMjFLVjNDbTdWSEE1MitJbmx0cmZ4VlA0cTBtY3BE?=
- =?utf-8?B?NHI2andmM0xpMTFmbDV5SjdVeXZyME5HTjBINmQzTjJldGx0aXg2aTR3aXRy?=
- =?utf-8?B?bFpQR2VvdmRLL3lVK1l6S04wT0VlVTNuSnY5UUZWRGdLb3J3dGZaUCtROS9H?=
- =?utf-8?B?MWFSWVp4cEJWbUdweGo3UEtuTUJLWWlNWmxoWkNLNW93QVM5TWJORkVjTWp0?=
- =?utf-8?B?RURaUHIzNkNzRGdYSGsxalZHbU1wOE5XRWVEZnhiQTlVZ2lwMVJKUkpBZWxX?=
- =?utf-8?B?NTd6RHhHMFpSak4rSEJ4cE5QWHQ0bDVPZXMzTnBuVVdLcVllbk4wRW5EaE9y?=
- =?utf-8?B?bXJIN2pnSWswQnFJM1REbnVwcnNMNklEOFArTnd3WFA5NlgvdHBUNjhneGJT?=
- =?utf-8?B?VjdORTBGd3o3ZW1lbTBCRitseDFjbW05T3A5KzFFa2V0TlkxQ2xmamNaZW9z?=
- =?utf-8?B?NGFoSmZ0Zzc0WWpLUnV5SWpzRUU0VXR4OXJoTnEvK3JSS3pPQ01TWHNyMlU0?=
- =?utf-8?B?NDk5VGJuMVZCN1ppSGJNbzdzd09ZN3VyOE1vbWVubXJlUEJEd0xHSEJxeGVu?=
- =?utf-8?B?Yk9zcCtFTWlETXRGdy9KNXpEbUxjSmIzdUZ0a3lkR1ZPUlUxbFM5cEpJdVFv?=
- =?utf-8?B?VW5wZmFmUFdXRGRaOGhJVzFYREswOU1MeFE4Y2Z5RVVvbGR0eXFaUjRyUHls?=
- =?utf-8?B?dFIxcVVDZzY2cjRtYnBuL0piNzQ0Uy8vVFhXZ3lYTGViaHlNakZtRnhlRE1W?=
- =?utf-8?B?Q0xGNEpZMlZWTEttUTJyNlVxNXd4OXF0OW9SOWl1aGxKbm1TcWJjMmJsamlh?=
- =?utf-8?B?dzI5WVFQSWt0Y0pZM0NGS0tlUUFvR1dPeGxrQmNXS3lHMG9SNFdPWFN2YnV5?=
- =?utf-8?B?aW1iSUtHZWt6UzczVndtaWNURk9wNXdGN3hXWHJDWWtvWjB2M09nR1Y1V3Y1?=
- =?utf-8?B?UGtOZGpRWVlwWUhwTFRSUFBITU95ejhNY2doc21JQllER0NrSHN0b053REpq?=
- =?utf-8?B?eWFTOGNzbDdiREJwQlVMaWZ3ZEFlQVo5ZE8xalI1ODdYSzBDV2lpZDBlNlB5?=
- =?utf-8?B?Z2JUaHVhNUg2a1NCcm1MSHorRHZqNlliVDYwWUxUWHZTaEdPSHcxdldPMVpF?=
- =?utf-8?B?ZTVBd0lUSnhXbzUwblkxRVl5QjdNM0tUT2h0UHFIZ2VSYUxxMDdhNVJQZ3JO?=
- =?utf-8?B?OUJ6OTI1M0RUU2VrV3pwM21YN0NmcENwcVRHNmdnT0YxT2UrVE1SS28wK2tP?=
- =?utf-8?Q?WkjQyJ50xg7TLIqCOVAz?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac88f9fb-9064-4144-af34-08dd9c0da26b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB8883.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 04:27:34.8004
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR19MB8260
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 1861679024b809957bdd9f6d814fcb5d
 
-Hi Andrew,
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads (Homa uses ~ 1 socket per application, whereas
+TCP requires a separate socket for each peer).
 
-On 5/25/25 23:35, Andrew Lunn wrote:
-> On Sun, May 25, 2025 at 09:56:04PM +0400, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> Document the IPQ5018 Internal Gigabit Ethernet PHY found in the IPQ5018
->> SoC. Its output pins provide an MDI interface to either an external
->> switch in a PHY to PHY link scenario or is directly attached to an RJ45
->> connector.
->>
->> In a phy to phy architecture, DAC values need to be set to accommodate
->> for the short cable length. As such, add an optional property to do so.
->>
->> In addition, the LDO controller found in the IPQ5018 SoC needs to be
->> enabled to driver low voltages to the CMN Ethernet Block (CMN BLK) which
->> the GE PHY depends on. The LDO must be enabled in TCSR by writing to a
->> specific register. So, adding a property that takes a phandle to the
->> TCSR node and the register offset.
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
->>   .../devicetree/bindings/net/qca,ar803x.yaml        | 23 ++++++++++++++++++++++
->>   1 file changed, 23 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
->> index 3acd09f0da863137f8a05e435a1fd28a536c2acd..a9e94666ff0af107db4f358b144bf8644c6597e8 100644
->> --- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
->> +++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
->> @@ -60,6 +60,29 @@ properties:
->>       minimum: 1
->>       maximum: 255
->>   
->> +  qca,dac:
->> +    description:
->> +      Values for MDAC and EDAC to adjust amplitude, bias current settings,
->> +      and error detection and correction algorithm. Only set in a PHY to PHY
->> +      link architecture to accommodate for short cable length.
->> +    $ref: /schemas/types.yaml#/definitions/uint32-array
->> +    items:
->> +      - items:
->> +          - description: value for MDAC. Expected 0x10, if set
->> +          - description: value for EDAC. Expected 0x10, if set
-> 
-> DT is not a collection of magic values to be poked into registers.
-> 
-> A bias current should be mA, amplitude probably in mV, and error
-> detection as an algorithm.
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
 
-I couldn't agree more but I just don't know what these values are 
-exactly as they aren't documented anywhere. I'm working off the 
-downstream QCA-SSDK codelinaro repo. My *best guess* for the MDAC value 
-is that it halves the amplitude and current for short cable length, but 
-I don't know what algorithm is used for error detection and correction.
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
 
-What I do know is that values must be written in a phy to phy link 
-architecture as the 'cable length' is short, a few cm at most. Without 
-setting these values, the link doesn't work.
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 15000 in the complete Homa). The
+remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
 
-With the lack of proper documentation, I could move the values to the 
-driver itself and convert it to a boolean property such as 
-qca,phy-to-phy-dac or something..
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
 
-Any suggestions?
+Note: this implementation of Homa supports both IPv4 and IPv6.
 
-> 
-> 	Andrew
+Major changes for v9 (see individual patches for additional details):
+- Introduce homa_net objects; there is now a single global struct homa
+  shared by all network namespaces, with one homa_net per network namespace
+  with netns-specific information. Most info, including socket table and
+  peer table, is stored in the struct homa.
+- Introduce homa_clock as an abstraction layer for the fine-grain clock.
+- Implement limits on the number of active homa_peer objects. This includes
+  adding reference counts in homa_peers and adding code to release peers
+  where there are too many.
+- Switch to using rhashtable to store homa_peers; the table is shared
+  across all network namespaces, though individual peers are namespace-
+  specific.
 
-Best regards,
-George
+v8 changes:
+- There were no reviews of the v7 patch series, so there are not many changes
+  in this version
+- Pull out pacer code into separate files pacer.h and pacer.c
+- Refactor homa_pool APIs (move allocation/deallocation into homa_pool.c,
+  move locking responsibility out)
+- Fix various problems from sparse, checkpatch, and kernel-doc
+
+v7 changes:
+- Add documentation files reap.txt and sync.txt.
+- Replace __u64 with _u64 (and __s64 with s64) in non-uapi settings.
+- Replace '__aligned(L1_CACHE_BYTES)' with '____cacheline_aligned_in_smp'.
+- Use alloc_percpu_gfp for homa_pool::cores.
+- Extract bool homa_bpage_available from homa_pool_get_pages.
+- Rename homa_rpc_free to homa_rpc_end.
+- Use skb_queue_purge in homa_rpc_reap instead of hand-coding.
+- Clean up RCU usage in several places:
+  - Eliminate unnecessary use of RCU for homa_sock::dead_rpcs.
+  - Eliminate use of RCU for homa::throttled_rpcs (unnecessary, unclear
+    that it would have worked). Added return value from homa_pacer_xmit.
+  - Call rcu_read_lock/unlock in homa_peer_find (just to be safe; probably
+    isn't necessary)
+  - Eliminate extraneous use of RCU in homa_pool_allocate.
+  - Cleaned up RCU usage around homa_sock::active_rpcs.
+  - Change homa_sock_find to take a reference on the returned socket;
+    caller no longer has to worry about RCU issues.
+- Remove "locker" arguments from homa_lock_rpc, homa_lock_sock,
+  homa_rpc_try_lock, and homa_bucket_lock (shouldn't be needed, given
+  CONFIG_PROVE_LOCKING).
+- Use __GFP_ZERO in *alloc calls instead of initializing individual
+  struct fields to zero.
+- Don't use raw_smp_processor_id; use smp_processor_id instead.
+- Remove homa_peertab_get_peers from this patch series (and also fix
+  problems in it related to RCU usage).
+- Add annotation to homa_peertab_gc_dsts requiring write_lock.
+- Remove "lock_slow" functions, which don't add functionality in this patch
+  series.
+- Remove unused fields from homa_peer structs.
+- Reorder fields in homa_rpc_bucket to squeeze out padding.
+- Refactor homa_sock_start_scan etc.
+  - Take a reference on the current socket to keep it from being freed.
+  - No need now for homa_socktab::active_scans or struct homa_socktab_links.
+  - rcu_read_lock/unlock is now entirely in the homa_sock scan methods;
+    no need for callers to worry about this.
+- Add homa_rpc_hold and homa_rpc_put. Replaces several ad-hoc mechanisms,
+  such as RPC_COPYING_FROM_USER and RPC_COPYING_TO_USER, with a single
+  general-purpose mechanism.
+- Use __skb_queue_purge instead of skb_queue_purge (locking isn't needed
+  because Homa has its own locks).
+- Rename UNKNOWN packet type to RPC_UNKNOWN.
+- Add hsk->is_server plus SO_HOMA_SERVER setsockopt: by default, sockets
+  will not accept incoming RPCs unless they have been bound.
+- Refactor waiting mechanism for incoming packets: simplify wait
+  criteria and use standard mechanisms (wait_event_*) for blocking
+  threads. Create homa_interest.c and homa_interest.h.
+* Add memory accounting for outbound messages (e.g. new sysctl value
+  wmem_max); senders now block when memory limit is exceeded.
+* Made Homa a pernet subsystem (a separate Homa transport for each
+  network namespace).
+
+v6 changes:
+- Make hrtimer variable in homa_timer_main static instead of stack-allocated
+  (avoids complaints when in debug mode).
+- Remove unnecessary cast in homa_dst_refresh.
+- Replace erroneous uses of GFP_KERNEL with GFP_ATOMIC.
+- Check for "all ports in use" in homa_sock_init.
+- Refactor API for homa_rpc_reap to incorporate "reap all" feature,
+  eliminate need for callers to specify exact amount of work to do
+  when in "reap a few" mode.
+- Fix bug in homa_rpc_reap (wasn't resetting rx_frees for each iteration
+  of outer loop).
+
+v5 changes:
+- Change type of start in struct homa_rcvbuf_args from void* to __u64;
+  also add more __user annotations.
+- Refactor homa_interest: replace awkward ready_rpc field with two
+  fields: rpc and rpc_ready. Added new functions homa_interest_get_rpc
+  and homa_interest_set_rpc to encapsulate/clarify access to
+  interest->rpc_ready.
+- Eliminate use of LIST_POISON1 etc. in homa_interests (use list_del_init
+  instead of list_del).
+- Remove homa_next_skb function, which is obsolete, unused, and incorrect
+- Eliminate ipv4_to_ipv6 function (use ipv6_addr_set_v4mapped instead)
+- Eliminate is_mapped_ipv4 function (use ipv6_addr_v4mapped instead)
+- Use __u64 instead of uint64_t in homa.h
+- Remove 'extern "C"' from homa.h
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v4 changes:
+- Remove sport argument for homa_find_server_rpc (unneeded). Also
+  remove client_port field from struct homa_ack
+- Refactor ICMP packet handling (v6 was incorrect)
+- Check for socket shutdown in homa_poll
+- Fix potential for memory garbling in homa_symbol_for_type
+- Remove unused ETHERNET_MAX_PAYLOAD declaration
+- Rename classes in homa_wire.h so they all have "homa_" prefixes
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
+
+v2 changes:
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (15):
+  net: homa: define user-visible API for Homa
+  net: homa: create homa_wire.h
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_interest.h and homa_interest.
+  net: homa: create homa_pacer.h and homa_pacer.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_utils.c
+  net: homa: create homa_incoming.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c
+  net: homa: create Makefile and Kconfig
+
+ include/uapi/linux/homa.h |  155 ++++++
+ net/Kconfig               |    1 +
+ net/Makefile              |    1 +
+ net/homa/Kconfig          |   21 +
+ net/homa/Makefile         |   16 +
+ net/homa/homa_impl.h      |  674 +++++++++++++++++++++++
+ net/homa/homa_incoming.c  |  827 ++++++++++++++++++++++++++++
+ net/homa/homa_interest.c  |  120 +++++
+ net/homa/homa_interest.h  |   96 ++++
+ net/homa/homa_outgoing.c  |  570 ++++++++++++++++++++
+ net/homa/homa_pacer.c     |  316 +++++++++++
+ net/homa/homa_pacer.h     |  190 +++++++
+ net/homa/homa_peer.c      |  596 +++++++++++++++++++++
+ net/homa/homa_peer.h      |  373 +++++++++++++
+ net/homa/homa_plumbing.c  | 1071 +++++++++++++++++++++++++++++++++++++
+ net/homa/homa_pool.c      |  483 +++++++++++++++++
+ net/homa/homa_pool.h      |  136 +++++
+ net/homa/homa_rpc.c       |  639 ++++++++++++++++++++++
+ net/homa/homa_rpc.h       |  485 +++++++++++++++++
+ net/homa/homa_sock.c      |  419 +++++++++++++++
+ net/homa/homa_sock.h      |  408 ++++++++++++++
+ net/homa/homa_stub.h      |   91 ++++
+ net/homa/homa_timer.c     |  158 ++++++
+ net/homa/homa_utils.c     |  124 +++++
+ net/homa/homa_wire.h      |  340 ++++++++++++
+ 25 files changed, 8310 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_interest.c
+ create mode 100644 net/homa/homa_interest.h
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_pacer.c
+ create mode 100644 net/homa/homa_pacer.h
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+
+--
+2.43.0
+
 
