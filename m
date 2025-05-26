@@ -1,154 +1,154 @@
-Return-Path: <netdev+bounces-193491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78991AC43B0
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:26:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46269AC43B9
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3DB21898B82
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:26:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC88C18990DF
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948071F6667;
-	Mon, 26 May 2025 18:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E2C23F41D;
+	Mon, 26 May 2025 18:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDRURSTj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="csqnXtbD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D221C5F06;
-	Mon, 26 May 2025 18:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4C823F413;
+	Mon, 26 May 2025 18:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748283958; cv=none; b=EvrJUaZG02MuYAt66ifoLvHQgdm3Gkeiug1ZvRIvEP/Jq1NRY3Q3/4DI4HkD2eKrZn9EuYxYnI68vSgoHPIbXMkwe53xlIYnoZCI08kQqBA3xoINPZV/58YFQoDOUrbcRHrHDqJTAgZr3sCJ/wjqDcEtkw1UK0QAZOWozb380tw=
+	t=1748284214; cv=none; b=Biy8X5IgOjtOCAs+evmyLlsg4oDpzTP8iIcsHD9/+zG4c6AqOYNQ17eJgpOkwGlPhP++aa9UrQPe1eqKcVo6eG84dThWd7Jd6vjL0//BtzKKk88Hf0P45ZSEVZYTjQyYZZQOOP/9BxNqXAAkslEUjUUUeFY3Ooc5W1YjM9kMuig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748283958; c=relaxed/simple;
-	bh=qVtk5mChgiojijgvw+Xacb75bcFr8uUkTPU8GL47QzY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cciBpcIzktUZOsaWv6F0DDQigstAGqiJik82neMQMs5yam6mpvWzenneO54/TVaVTAQQmGm7fLCejuivN1Vj+6LCzzzmT1Gloqucl1I8I+WcZEpO00YiHx41Hsx50IgjWoyPnEEUKuzP+7Qrfo6ji9WrcNxJmjXq0hl/0cYrrpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDRURSTj; arc=none smtp.client-ip=209.85.166.44
+	s=arc-20240116; t=1748284214; c=relaxed/simple;
+	bh=ocL9xN3l5CZIkJMP4iIsK/bvcDmu7NvmAZRKme5JHYE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WityYzORCdFDyDMnUmtz1VmYRzCv9elWBSeqCpECM7RpAhWHCBfkCXhG2VuyXmXBrIrdLIVvAnjukvY0/E/zun+JvprrP3yILlmzyY/LH/iiUOnnP1eBVRrc5j2YeVgi4W0P2GRz12l7k4xBH96uuqQc/kRgTmuXW5Lldba4FsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=csqnXtbD; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-86135af1045so225475139f.1;
-        Mon, 26 May 2025 11:25:56 -0700 (PDT)
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-86a55400913so47269639f.1;
+        Mon, 26 May 2025 11:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748283956; x=1748888756; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bbsso0SUfjZhlcJRFYfaPdijYfCfVggEkuSWqQh3kNw=;
-        b=iDRURSTjiyZA3Au6m5P+stpE9psLelmahPs+8H87wP/Y8/tI+4eXqESgRtwRRbdwC/
-         EOGW/uDpN4ABTXH5SHgwYXrbEL0Oqb757JVKcJMciMrbJaIRTKVMKvuk2zV6y61IpMCf
-         be/z8EmLwFVknETDuLdwIOK2T/Nanh+H+UP68x3DnA5XRVPYwOD08SO2r3O25K+hrJKp
-         tlQYu428tY3vvI/MqTBj4dDC8eUIwIwPxd78xp3gVsgPmFJ6971PaOeLBUPxyw6/YgSb
-         2CU/810Z3AvePbM+YFMBdl+1a7L4XRQXMKcZWaHPFNTny0yUVhoCrjm0P6OdvCkPhrET
-         LrZQ==
+        d=gmail.com; s=20230601; t=1748284211; x=1748889011; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QlxuW8EiAaobylr07WlFl9Wc9Vavh5mNNDPDEO1zHCA=;
+        b=csqnXtbD7h1vC5Uvc+/kZF3Ieeo+8bH+doq0OC8LW+t5BaJtcMBDJZAwfvzbUC6kvi
+         3MHGSz0nDRT0kSqeKP32mtAsNtqQr5i9EA5ZmBQOg/rV3R4ed8QMIWFfxFuFxzme2q3V
+         X2NuW2p0wnm5kebjw3KAOq8ZAUPvmSAFXAMkerMZghsyrbsFy/APx74M4Op0GjHCyPVV
+         CyRhZBvO6zIRUYbrEISMftKsgucFcjN34yk4+fdl0OLIYQANTUeaiXXLAKTBWu9lfQut
+         WGr6Xfnj9fPAG6BynFdOmZkPhJg60JAdsEnjiafDTXDiYw4t+JfGsMHv/O+FJ7HtC/By
+         h1Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748283956; x=1748888756;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bbsso0SUfjZhlcJRFYfaPdijYfCfVggEkuSWqQh3kNw=;
-        b=ulmJamcj5Bu9pBH2G5WYt2q8RAhbwg+0X5bZ7FExNLSAIqQ+GSbcka9UzdDkvmYTLB
-         swU9hPXDyEB3xzY3KoHPJzANhx9v7QrDGxbX0bJVqIGzNifKmPE4HOaYRGypVBQik78V
-         6cOkB/sC4jsgqtqcepzPc3owvaqhZyLL2ooCwmgz6F2/a6emQe+e//8KROnhPSxM4Imn
-         PXJryOPYviuXbGJXB4CqUPdujHd2df99vjEr62efqAzbMw1PZ0jGOU+QMG4/+Lj2KUn0
-         lY5ujTa42WPnMEbexicTEVpt7kM+fpE74ZHJ4Uf1WEpVrKt65pwmuLqWYGJ26zR9TLdQ
-         HDTw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1gxKQ2+qnWX7ft3dV4IVIYB4pZyW4hRhQPsP0ruW0OKKz1w34Id21Yz1Mjjj9BMjScam3z5/MUVMt@vger.kernel.org, AJvYcCXIxXET3uV92zIkJRz8nGAbW9MmHUFJFnBrkI9y3sgy9vFWCMav0rKSdB/zqEiv0JnJ7hswuBNe@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkjEFl3qZMu+jGzhsIuWFIYUJZ9F1BNnBZxo+1ojtXj4tn5LPb
-	UNymAzY2UhRoWGPvajYMLriTa55oDh1vzPNRjC7eigsT6unxunfBiIaMuss2TLpNRVCgBpnijsG
-	pPQnzxhCIYerAGNEVEodg1F3VlFQYdGAUEXjo
-X-Gm-Gg: ASbGncv6g5OowabybQ8JC9K48WTNGkS8au8csK9DQ1sKQ+gHsFTYBD9qtqkvIibwdFJ
-	hn+veeM4T7CtulSaMZ/68ANA6YPNxQMGOAnQ1WhxBdasB3hzOmfrmi21z6q+Wp6e/DDllhF3Y3s
-	QocUSaU7xRBaosVk42bpl3Mh4/7afWZPyfF5I=
-X-Google-Smtp-Source: AGHT+IFieohgpCQZAZgsmFtt/mvdYmvDMniQ31fjQpsebOqSzthcWwv8hqRk3MuHLNVOuc0+pUAiZVvBwTgfAt6sKuw=
-X-Received: by 2002:a05:6e02:743:b0:3dc:8a5f:7cd1 with SMTP id
- e9e14a558f8ab-3dc9b6a9fbemr103026125ab.3.1748283955921; Mon, 26 May 2025
- 11:25:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748284211; x=1748889011;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QlxuW8EiAaobylr07WlFl9Wc9Vavh5mNNDPDEO1zHCA=;
+        b=A5mwPp5IwDIFK3OaOxFwm5asM2OIjZ5l9FlG8otdxnrWZauZM/z2KnDcliPF/Si9GF
+         9XcnjdckSPbNgFjmMluiMhrui2YZ1OA2A6T3464fmWfO1yx062Pxh0C+ZCt3uY7V+DmD
+         +Y9LDO20VNongtDax9yxQQ9Pu4Kpw3/yxVIdldsa9iWcejfSgi2lMZHYLJQqSXwo2p3e
+         gXJEdKpXgM3Q4GRbI6c42mOYtlZUiofXKD6mz0li065nIe2rBtzbBrmhV0GTtpxv3R1g
+         eqCl/JE9rbH8snxIAngzP4Yao+L4DZz7FCIQaF105C1Bom3dYCPr6Xgwru9YCekYeNW+
+         Ojgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZrzVZtjyUC5AECYLGuadJKMrKfwNcE22hR9NmzMPpOYWbmbR3EQM2jpsukN0Bo/BKsefe3TP1QhHTCd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE4wKiN3FW+gcAYD28BPogPn9l+XRP7Y3qfU3N3gspgahmVQg2
+	VRh2x/stIztwUpjPJk0s309fdjk5WMRyIg54KztBtt36DtrjOY5v/OszQbl1n9YlEv8=
+X-Gm-Gg: ASbGncvM+S6xueoupyGqhoHVR3jYtvq4UT0kGVdhJEhL6IO7ScjXezFFv+aVaR8Avpk
+	+O9EDoyjg3Lp8sht+5EzSO979PS6IJFBogLMNxUDFKWvweJIq4zRO2Do4zwQpwJ6ZjWMbcKo8L+
+	W28RnEGjptR3K5pTSARPC8g95t2DRfrohQj1ym4w4ctV+LS8ZFKYg5VBomfvbK0RAwbXbttLZYX
+	IINvivQ1CQP7TBSSw5hAHDUmblH0EQb9e9chjQEcVepapuL5x3ez6H79g+oW6CR3tKr1e7VoULQ
+	cFyPHHhHR2eD3UHNzILs2/upyYDZ7dsQBfmISBwYoQkX/ByRgZhABhnN0S8I1NgT3vVb8jaGCLK
+	NCz72iRR93VsVsWhUeUS1w24YbKa9cA==
+X-Google-Smtp-Source: AGHT+IF1vt1ugwCJCcgD8FLb9pLv6neLoJcOaXY12NIdGkKI+c6RUDeQIjiCz+L7fEf4ThkwNMlUxA==
+X-Received: by 2002:a05:6602:474b:b0:864:48ec:c312 with SMTP id ca18e2360f4ac-86cbb7b86c3mr1087224339f.3.1748284211399;
+        Mon, 26 May 2025 11:30:11 -0700 (PDT)
+Received: from james-x399.localdomain (97-118-146-220.hlrn.qwest.net. [97.118.146.220])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-86a235bff69sm477028639f.8.2025.05.26.11.30.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 11:30:10 -0700 (PDT)
+From: James Hilliard <james.hilliard1@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-sunxi@lists.linux.dev,
+	James Hilliard <james.hilliard1@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Furong Xu <0x1207@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1 1/3] net: stmmac: allow drivers to explicitly select PHY device
+Date: Mon, 26 May 2025 12:29:34 -0600
+Message-Id: <20250526182939.2593553-1-james.hilliard1@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250526054745.2329201-1-hch@lst.de>
-In-Reply-To: <20250526054745.2329201-1-hch@lst.de>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 26 May 2025 14:25:45 -0400
-X-Gm-Features: AX0GCFvbGISRIw2IR9cm-ACqlhaFohJczvUp8YSbofsszI6L5XteWpTcRS96XT8
-Message-ID: <CADvbK_d-dhZB-j9=PtCtsnvdmx980n7m8hEDrPnv+h6g7ijF-w@mail.gmail.com>
-Subject: Re: [PATCH] sctp: mark sctp_do_peeloff static
-To: Christoph Hellwig <hch@lst.de>
-Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 26, 2025 at 1:47=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> sctp_do_peeloff is only used inside of net/sctp/socket.c,
-> so mark it static.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/net/sctp/sctp.h | 2 --
->  net/sctp/socket.c       | 4 ++--
->  2 files changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-> index d8da764cf6de..e96d1bd087f6 100644
-> --- a/include/net/sctp/sctp.h
-> +++ b/include/net/sctp/sctp.h
-> @@ -364,8 +364,6 @@ sctp_assoc_to_state(const struct sctp_association *as=
-oc)
->  /* Look up the association by its id.  */
->  struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)=
-;
->
-> -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket **so=
-ckp);
-> -
->  /* A macro to walk a list of skbs.  */
->  #define sctp_skb_for_each(pos, head, tmp) \
->         skb_queue_walk_safe(head, pos, tmp)
-> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> index 53725ee7ba06..da048e386476 100644
-> --- a/net/sctp/socket.c
-> +++ b/net/sctp/socket.c
-> @@ -5627,7 +5627,8 @@ static int sctp_getsockopt_autoclose(struct sock *s=
-k, int len, char __user *optv
->  }
->
->  /* Helper routine to branch off an association to a new socket.  */
-> -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket **so=
-ckp)
-> +static int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id,
-> +               struct socket **sockp)
->  {
->         struct sctp_association *asoc =3D sctp_id2assoc(sk, id);
->         struct sctp_sock *sp =3D sctp_sk(sk);
-> @@ -5675,7 +5676,6 @@ int sctp_do_peeloff(struct sock *sk, sctp_assoc_t i=
-d, struct socket **sockp)
->
->         return err;
->  }
-> -EXPORT_SYMBOL(sctp_do_peeloff);
->
-I believe sctp_do_peeloff() was exported specifically to allow usage
-outside of the core SCTP code. See:
+Some devices like the Allwinner H616 need the ability to select a phy
+in cases where multiple PHY's may be present in a device tree due to
+needing the ability to support multiple SoC variants with runtime
+PHY selection.
 
-commit 0343c5543b1d3ffa08e6716d82afb62648b80eba
-Author: Benjamin Poirier <benjamin.poirier@gmail.com>
-Date:   Thu Mar 8 05:55:58 2012 +0000
+Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 22 +++++++++++++------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-    sctp: Export sctp_do_peeloff
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 59d07d0d3369..949c4a8a1456 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1210,17 +1210,25 @@ static int stmmac_init_phy(struct net_device *dev)
+ 	 */
+ 	if (!phy_fwnode || IS_ERR(phy_fwnode)) {
+ 		int addr = priv->plat->phy_addr;
+-		struct phy_device *phydev;
++		struct phy_device *phydev = NULL;
+ 
+-		if (addr < 0) {
+-			netdev_err(priv->dev, "no phy found\n");
+-			return -ENODEV;
++		if (priv->plat->phy_node) {
++			phy_fwnode = of_fwnode_handle(priv->plat->phy_node);
++			phydev = fwnode_phy_find_device(phy_fwnode);
++			fwnode_handle_put(phy_fwnode);
+ 		}
+ 
+-		phydev = mdiobus_get_phy(priv->mii, addr);
+ 		if (!phydev) {
+-			netdev_err(priv->dev, "no phy at addr %d\n", addr);
+-			return -ENODEV;
++			if (addr < 0) {
++				netdev_err(priv->dev, "no phy found\n");
++				return -ENODEV;
++			}
++
++			phydev = mdiobus_get_phy(priv->mii, addr);
++			if (!phydev) {
++				netdev_err(priv->dev, "no phy at addr %d\n", addr);
++				return -ENODEV;
++			}
+ 		}
+ 
+ 		ret = phylink_connect_phy(priv->phylink, phydev);
+-- 
+2.34.1
 
-While there=E2=80=99s no known in-tree usage beyond SCTP itself, we can=E2=
-=80=99t be
-sure whether this function has been used by out-of-tree kernel modules.
 
