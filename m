@@ -1,134 +1,89 @@
-Return-Path: <netdev+bounces-193345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06CE3AC394C
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:35:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F97AC3939
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44ABC3AF99A
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 05:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD0531652F1
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 05:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327321CAA62;
-	Mon, 26 May 2025 05:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hurJAwJ6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14DA19D880;
+	Mon, 26 May 2025 05:32:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C5F1B3930;
-	Mon, 26 May 2025 05:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696B372615;
+	Mon, 26 May 2025 05:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748237739; cv=none; b=ZTOZy2a7jqil2wABVbw7QXqhgwCOTXJiqO9uIhSFnojtTyu2X8OdT6vAuMhJxe1Efh0qNLGQQ67uArzH69uGyRTLX+91l7oqqd2P48QJ0KD89cfwq+QkxwijUlYVKbvsxgPFT04IOzhXLN5gXyvy2VuTanC3zUncmxLpQi9BlBA=
+	t=1748237554; cv=none; b=d9S1slyiMrXRxwVCj3/61M7oAwfa72at8lowMW0Md/P4Y/7U5WfwYMSv+DoQo3qG6u9JUzcNW8WBzw1QlZSMWMGD+JKEmGY4Jh0B2irnW++I5t8FDhihWb4zhYR/aO1x4E5ihPNVC1GFyqMLs6e0NX6rccgrPPuPCeMqTV3HLwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748237739; c=relaxed/simple;
-	bh=0pNqoPv8fPVLNxtu59Wp0wSlLX9MZ0Zb+OUFxvPIcKA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nm2ziAXLbksqzM7L4US6MljM2npAhI71Ix6nYOxcTrhvjKW/1czv0+TjGmIOHpaZewGJt+em3yGYveXNalB3XEgHZ2LHoP8nWJl+QSOCIznE6cvTnfq5EaXQrgx+8xXJhLhXkVsFXce5XnGzVvYVCXbQt30DbqAoXp0Qohg58Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hurJAwJ6; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1748237737; x=1779773737;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=0pNqoPv8fPVLNxtu59Wp0wSlLX9MZ0Zb+OUFxvPIcKA=;
-  b=hurJAwJ6QlLm26FjYERejJD66WPdI4bEvhbJsK1+STvweniEohn0cwBm
-   UETjdRpTTolbl81xoRvHMG2VgYIjxbN9f2X3ruvrZ0cgbweTJep3bIWid
-   vLx7nx/OYXTtW40lox9dWcu1NJPT0kM7eomQg1vCo958GDpmizRUHIK2b
-   6tiBfNp+H/VAqf3tyD/a02U8+GXytqaHWgE6IAON4RuFekPjWu6I+2AZb
-   of2OOw0iebeS4Z8ZVYFfNNQYyhLH6BUki8g9cQG6QCmSCs+5a4UMypzbh
-   FyrGWXvGsQC5pO2uiR0UTAoXN2N2/cf3exYmbZkr5zizq0JNBxLRb0iH1
-   w==;
-X-CSE-ConnectionGUID: ZIY/Wzj3Q22sZWvgvBPVZg==
-X-CSE-MsgGUID: pU6mxBHsTDO5iMasIG/dxg==
-X-IronPort-AV: E=Sophos;i="6.15,315,1739862000"; 
-   d="scan'208";a="41602085"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2025 22:35:34 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 25 May 2025 22:35:08 -0700
-Received: from che-dk-ungapp03lx.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Sun, 25 May 2025 22:35:05 -0700
-From: Thangaraj Samynathan <thangaraj.s@microchip.com>
-To: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 net 2/2] net: lan743x: Fix PHY reset handling during initialization and WOL
-Date: Mon, 26 May 2025 11:00:48 +0530
-Message-ID: <20250526053048.287095-3-thangaraj.s@microchip.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250526053048.287095-1-thangaraj.s@microchip.com>
-References: <20250526053048.287095-1-thangaraj.s@microchip.com>
+	s=arc-20240116; t=1748237554; c=relaxed/simple;
+	bh=fMRkF8AfefPrI6NUZxCj3qwHPr4ein4h0Rz3CZPlDAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DTJOcVfnOzBwlyhmpPE6PuQQ6K+XtS0ThuVNnEH9K3MurWh2irflnylYkvgpOLGM6WKArJgR+C+klWusv9M1NNNVw/pYMg1UGnexy4XiQ/si3Iu23BTuJtHPQxzHWz2XElGiX+ARC+WOqQO7z7MjanHGyhr/0YtwrBLvPKMW/4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 494D968AFE; Mon, 26 May 2025 07:32:27 +0200 (CEST)
+Date: Mon, 26 May 2025 07:32:27 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Steve French <sfrench@samba.org>,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v2 net-next 3/7] socket: Restore sock_create_kern().
+Message-ID: <20250526053227.GD11639@lst.de>
+References: <20250523182128.59346-1-kuniyu@amazon.com> <20250523182128.59346-4-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250523182128.59346-4-kuniyu@amazon.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Remove lan743x_phy_init from lan743x_hardware_init as it resets the PHY
-registers, causing WOL to fail on subsequent attempts. Add a call to
-lan743x_hw_reset_phy in the probe function to ensure the PHY is reset
-during device initialization.
+On Fri, May 23, 2025 at 11:21:09AM -0700, Kuniyuki Iwashima wrote:
+> Let's restore sock_create_kern() that holds a netns reference.
+> 
+> Now, it's the same as the version before commit 26abe14379f8 ("net:
+> Modify sk_alloc to not reference count the netns of kernel sockets.").
+> 
+> Back then, after creating a socket in init_net, we used sk_change_net()
+> to drop the netns ref and switch to another netns, but now we can
+> simply use __sock_create_kern() instead.
+> 
+>   $ git blame -L:sk_change_net include/net/sock.h 26abe14379f8~
+> 
+> DEBUG_NET_WARN_ON_ONCE() is to catch a path calling sock_create_kern()
+> from __net_init functions, since doing so would leak the netns as
+> __net_exit functions cannot run until the socket is removed.
 
-Fixes: 23f0703c125be ("lan743x: Add main source files for new lan743x driver")
-Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/microchip/lan743x_main.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index efa569b670cb..9d70b51ca91d 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -1346,11 +1346,6 @@ static int lan743x_hw_reset_phy(struct lan743x_adapter *adapter)
- 				  50000, 1000000);
- }
- 
--static int lan743x_phy_init(struct lan743x_adapter *adapter)
--{
--	return lan743x_hw_reset_phy(adapter);
--}
--
- static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
- {
- 	u32 id_rev;
-@@ -3534,10 +3529,6 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
- 	if (ret)
- 		return ret;
- 
--	ret = lan743x_phy_init(adapter);
--	if (ret)
--		return ret;
--
- 	ret = lan743x_ptp_init(adapter);
- 	if (ret)
- 		return ret;
-@@ -3674,6 +3665,10 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
- 	if (ret)
- 		goto cleanup_pci;
- 
-+	ret = lan743x_hw_reset_phy(adapter);
-+	if (ret)
-+		goto cleanup_pci;
-+
- 	ret = lan743x_hardware_init(adapter, pdev);
- 	if (ret)
- 		goto cleanup_pci;
--- 
-2.25.1
+Is reusing the name as the old sock_create_kern a good idea?  It can
+lead to bugs by people used to the old semantics.  It's also
+not really an all that descriptive name for either variant.  I'm
+not really a net stack or namespace expert, but maybe we can come
+up with more descriptive version for both this new sock_create_kern
+and the old sock_create_kern/__sock_create_kern?
 
 
