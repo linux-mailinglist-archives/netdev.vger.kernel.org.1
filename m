@@ -1,165 +1,133 @@
-Return-Path: <netdev+bounces-193418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2579AC3E34
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 12:57:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16418AC3E3B
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F2283B7472
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:57:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D31C4176DEE
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D39C1F5847;
-	Mon, 26 May 2025 10:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948D15FEE6;
+	Mon, 26 May 2025 11:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nsp1y1tK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qg0sQ4GR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EEE1F4C85
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 10:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1341D10FD;
+	Mon, 26 May 2025 11:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748257050; cv=none; b=ZMkTk+EecQJGXOMNfg0Gue9OOwOmNAn95hDFXNM4todxiYgyuVQqw93/JRHFrDiQWWivUnaZ045he2DSx5ReNn/n4Ll7h2RYS8m0KdnLbV1YD9NqU7U3bXr4/GVnClGYGlj8Iofpcr7AmY7ZjqdkkniFlddyF/Xs3x0bkG2c1eY=
+	t=1748257265; cv=none; b=FAZg6J87QbOFp+p/brjdKWLsrmQiYLg4FNPEblwNYV5gLrEvHN8iUkjV6GJirK5RWGhE2iovWAE+rdUnZDmQY9IXBXHFJtuPBKkxBWmiF+Rg/tGy1pF5j8zxzRfIotF9d3lMuncU+bEjoLLbvcud5OLqSjlVykJcyUpOahcDoNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748257050; c=relaxed/simple;
-	bh=eFpL1xPGcaWudeYz70mekm/B14kslh/U3obPhF+j+3U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z9KuXntHyIiSbtTrbgGFpvqIpF++3kAqY/yOd3zhJyaCwU/FJMm3McpqPMLju0k/oY1i8uxR8vrUbWk3wlPjkQWbk6jXEzje66PRcIFNGgbr865MMl+gnJpETHd1Y6yzxx4kggzzusdq97wDBXYtf6Dil1OmHoI/b7PrXkouKlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nsp1y1tK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748257047;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wolvzxp1hV/cuZJiudij5Q9BWWv9/aEQB/GlRzt4c5o=;
-	b=Nsp1y1tKbyg8DY00mw80OJ4bTECtZ4WFy7ZhIiF/zio00O2jG2zULx2m+Oy+ug+xVhBSgp
-	yeYx/7bU/eRB/e1xnuVWNezNDuEE9XOsFNHMIWkjTor65mWt8Css3qqhBklJnG5J3SXvIL
-	axBpqrOdssyGVtMMcFEY1qhLni39BtI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-6LVkVJYiOnGCH1QCSYuTKw-1; Mon, 26 May 2025 06:57:25 -0400
-X-MC-Unique: 6LVkVJYiOnGCH1QCSYuTKw-1
-X-Mimecast-MFC-AGG-ID: 6LVkVJYiOnGCH1QCSYuTKw_1748257045
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4dcfc375aso295001f8f.2
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 03:57:25 -0700 (PDT)
+	s=arc-20240116; t=1748257265; c=relaxed/simple;
+	bh=P8k5cqwnruQ1x9W80TsUFMMyat57fGLTCZhNMJY7rZY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qoqFAAXTEKjp8i8VbTD41G+NglPnHeNofO+FQ1iKRBiLg5gKY5jB6VCV/SnjF6Ssn4211/NyuC786YqdI1hFOTrXssURga3JX4QW+dDqCHfb5mngzQbDwhBrITIPRVDc8pXQjrsq4yUE5FJh5TV/ZDjTGHc+gWVzJN1mf4aEVdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qg0sQ4GR; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b26c5fd40a9so2149954a12.1;
+        Mon, 26 May 2025 04:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748257263; x=1748862063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=P8k5cqwnruQ1x9W80TsUFMMyat57fGLTCZhNMJY7rZY=;
+        b=Qg0sQ4GRpQyZKmqg5R0xUkr3MoqdyDC6uaF7Uiyj8BHrJzQr9rk6iN/KaMSVzop0YW
+         SbXIOuMZzrs+5pb93KHI0w3q1lZGPVPzY9RvbW2qIVtbiaeWPuUpzbMWI57kh//ibecj
+         +Yw4R5/UaCriy/3N2q3almvQvPpjs+1rpPakJbK1iydkVjn4skEuyf1jvqgKAFjisIZP
+         dFJqqWLVnvswKlPmkItR4l0wGMGJJ8FI7RJN41sa6u0auVZExFfp+LiT0wLQt/8cssqg
+         4q4/dacThcGNo2VpQx4IbkZgrhfpTLNqsMyd37MwzneGaDerBwbOvHbQJ+v3M6WPuf1+
+         Ozfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748257044; x=1748861844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wolvzxp1hV/cuZJiudij5Q9BWWv9/aEQB/GlRzt4c5o=;
-        b=rn6642T2zznRJzzSvA/4dqeykstpapbXIHToEuCf6vOfxzc/GFw4zv2OngzCeYM7j/
-         LOYAiz5lBkVkavyxLZqYUfPvYfKlrdYNLnahiHgdmchY+CangDiK/ngwTIum4cOvttEp
-         Cv8af9IZ7k01fnia+0fqdoYG2SPj45dF/u2s9LftK5Ws+ucblFGunB3K3WEVNtV4CGrj
-         Z8YMUTVLUSrimY+YnBtrbYvePymXpCK/OonBOfo2jo8stK1K0jzvOLLz9Ic4j16Ybm2r
-         FGVQRHM959vNNkiFYJ8PdSPXiu2dWgKJjDwndJ76/S04ZTiWbx/IQr+leIRo9yIeqAtL
-         6A2w==
-X-Gm-Message-State: AOJu0YwIKBVt1wqK7tzl4UOohT6I05vBmeMeJQG25b4kUDacG33QgJyn
-	YAC77wA6Mm+ctsE8TWt+ckkLoPkMb7Ynez1l6jj+zyS9sA2mOzXeRlTVVaTvaEuANAYfEQLT5NK
-	fzeh9PtlhdFuO6coa1xmnVbidP3JapBjk3JGsrb5gwbguyX4TmwThP9d02Q==
-X-Gm-Gg: ASbGncv7JcO9nQbpeyG30nFcFcvNjOBWcsgk/x/Cf+DservDHTdIzTIJ/rDhE+PeAVD
-	TVkPXlEluB2nrbU10LGc7fOlH52NhN7a8w+dQtaDVxoRDqIgMbs2FUVzp9Qa7tZg4denVnDcj+0
-	+ZFJUsMGBANTGLORypQLgSW64SUCYhB7SqScugRu3gFyLwj/erzwC+QXmN/+1yFjBAIbyG9Tciu
-	B+jj91oVKHXI5JGRsnb3b6jcCh+kYj7/RgDC5SUPUTZuEvh8cTWsk1hNIb8fhYlyhfoK6S5M7Uz
-	h1OrIjYXAyUW5zUAnUA=
-X-Received: by 2002:a05:6000:178d:b0:3a3:727d:10e8 with SMTP id ffacd0b85a97d-3a4cb4c5530mr5508886f8f.50.1748257044558;
-        Mon, 26 May 2025 03:57:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG9/rvEp+P8g+UZuIM7v4A3z1WaMgSDx8Hk4OtjRKhoZRKBGG0Gl0z6NDsaVk73gmpPT4s6xw==
-X-Received: by 2002:a05:6000:178d:b0:3a3:727d:10e8 with SMTP id ffacd0b85a97d-3a4cb4c5530mr5508871f8f.50.1748257044159;
-        Mon, 26 May 2025 03:57:24 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d6f9d350sm3580008f8f.73.2025.05.26.03.57.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 03:57:23 -0700 (PDT)
-Message-ID: <df320160-88d4-44fc-92f8-dd7a9efb8569@redhat.com>
-Date: Mon, 26 May 2025 12:57:22 +0200
+        d=1e100.net; s=20230601; t=1748257263; x=1748862063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P8k5cqwnruQ1x9W80TsUFMMyat57fGLTCZhNMJY7rZY=;
+        b=wFZgHN470/SS2vuCRqkAlv/nCVcmnYYHlxBRrnHTm37mcg/kgMS8WQRDthlyrT5FWY
+         +nVXOKQeG9x4LaXaCJIf6tu0WOkCuBRomNudspoNoIg4IsBg32nziKQ7Z9yV177C/DUB
+         E2ZYTEt/EUEzrdkk9T8pzF1+8lFuEBADzPik4G7Ekp/sb2FTM2DFq41ZDPi5CE+7WtKE
+         D4aQwXwvgcUrG+uj7IibmnZInsiB7ECmCelHI4rvH6Y7cyZ1RUL0ts2URyXEzDtqQQcW
+         97xQGlerfqP5mCSbwIyNZL0yWwzrCI691rABZgGisEoPfK5brXwHMphclhrfYki3lEvo
+         5kSA==
+X-Forwarded-Encrypted: i=1; AJvYcCVV9qa7jvlgotMA3Hq7kcakT/JJm03vf+o1JEIw7N+icHbMfacOXSj0ZHpRMzTo3U68uqG+ZSOxnEnX9+Y=@vger.kernel.org, AJvYcCVrozKOgCuZ0L9o8CcLUaNBtuPBUP3GHq5ZXtjc0xZauZJe19Z40Hk/TT1ddQpbh5o5w50SufU5@vger.kernel.org
+X-Gm-Message-State: AOJu0YySmn66TklphZV6BxEeSGv2kpY7gEgGyHJ2xX14m3jHOv+1CfxT
+	syyMxD4N3S8dVk+AsPOiN/x+/O6LqvN4b56gV+TGPOb4cjZK18AGx4hDN5ryyYBJPjLlxqbN7zl
+	s6R3JtIqliXzNGpItWHUktk4uCUjqqgrXH3x2SLQ=
+X-Gm-Gg: ASbGnctA1aXrcqMe5Juhv2dVlGQUqYZWKOjTnzGjYQo4c/tvX0QWzjIP53+QQTUYWJN
+	9TZQO1J85fX02dObFyVU46FnB/Xw0JlvDT85+ku33wuMduW5AEmQKBXi496iBOjwSOSNq+nGH2j
+	S9q6jQXsLD7I+d7qv+/0rovssVhAced/G9cog=
+X-Google-Smtp-Source: AGHT+IFzKALfpHYrl261f5UqzhKbxKXbyaXPEfSZRiUqquUXIhamqnDtqYwWSjn1xlfXmEci9RHW6Yv3ctXFpmAsmu0=
+X-Received: by 2002:a17:90b:4d07:b0:311:1617:5bc4 with SMTP id
+ 98e67ed59e1d1-3111617a102mr11083391a91.12.1748257263138; Mon, 26 May 2025
+ 04:01:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/8] vhost-net: allow configuring extended
- features
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <b1d716304a883a4e93178957defee2c560f5b3d4.1747822866.git.pabeni@redhat.com>
- <CACGkMEuzWGQB=kQeX-bA8jVn=5Sj_MP_Q2zbMS=tvKGYrNmWLw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CACGkMEuzWGQB=kQeX-bA8jVn=5Sj_MP_Q2zbMS=tvKGYrNmWLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250520160717.7350-1-aha310510@gmail.com> <20250522145037.4715a643@kernel.org>
+In-Reply-To: <20250522145037.4715a643@kernel.org>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Mon, 26 May 2025 20:00:53 +0900
+X-Gm-Features: AX0GCFuBtvDmlIQiOi-FLJP0rr1olcYAogKIohBgi9-ICrvKDMnxZu5Hw369nvU
+Message-ID: <CAO9qdTHuDb9Uqu3zqjnV6PdX9ExWv24Q9_JfQ8FbKigipDrN+Q@mail.gmail.com>
+Subject: Re: [PATCH v2] ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, yangbo.lu@nxp.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/26/25 2:47 AM, Jason Wang wrote:
-> On Wed, May 21, 2025 at 6:33 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> Use the extended feature type for 'acked_features' and implement
->> two new ioctls operation to get and set the extended features.
->>
->> Note that the legacy ioctls implicitly truncate the negotiated
->> features to the lower 64 bits range.
->>
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->> ---
->>  drivers/vhost/net.c        | 26 +++++++++++++++++++++++++-
->>  drivers/vhost/vhost.h      |  2 +-
->>  include/uapi/linux/vhost.h |  8 ++++++++
->>  3 files changed, 34 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index 7cbfc7d718b3f..b894685dded3e 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -77,6 +77,10 @@ enum {
->>                          (1ULL << VIRTIO_F_RING_RESET)
->>  };
->>
->> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
->> +#define VHOST_NET_FEATURES_EX VHOST_NET_FEATURES
->> +#endif
->> +
->>  enum {
->>         VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
->>  };
->> @@ -1614,7 +1618,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
->>         return err;
->>  }
->>
->> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
->> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
->>  {
->>         size_t vhost_hlen, sock_hlen, hdr_len;
->>         int i;
->> @@ -1704,6 +1708,26 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>                 if (features & ~VHOST_NET_FEATURES)
->>                         return -EOPNOTSUPP;
->>                 return vhost_net_set_features(n, features);
->> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
-> 
-> Vhost doesn't depend on virtio. But this invents a dependency, and I
-> don't understand why we need to do that.
+Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Wed, 21 May 2025 01:07:17 +0900 Jeongjun Park wrote:
+> > The reason why this is appropriate is that any path that uses
+> > ptp->n_vclocks must unconditionally check if ptp->n_vclocks is greater
+> > than 0 before unregistering vclocks, and all functions are already
+> > written this way. And in the function that uses ptp->n_vclocks, we
+> > already get ptp->n_vclocks_mux before unregistering vclocks.
+>
+> What about ptp_clock_freerun()? We seem to call it for clock ops
+> like settime and it does not check n_vclocks.
 
-What do you mean with "dependency" here? vhost has already a build
-dependency vs virtio, including several virtio headers. It has also a
-logical dependency, using several virtio features.
+ptp_clock_freerun() calls ptp_vclock_in_use() to check n_vclocks.
 
-Do you mean a build dependency? this change does not introduce such a thing.
+>
+> > Therefore, we need to remove the redundant check for ptp->n_vclocks in
+> > ptp_vclock_in_use() to prevent recursive locking.
+>
+> IIUC lockdep is complaining that we are trying to lock the vclock's
+> n_vclocks_mux, while we already hold that lock for the real clock's
+> instance. It doesn't understand that the two are in a fixed hierarchy
+> so the deadlock is not possible.
+>
+> If my understanding is correct could you please clearly state in the
+> commit message that this is a false positive? And if so isn't a better
+> fix to _move_ the !ptp->is_virtual_clock check before the lock in
+> ptp_vclock_in_use()? that way we preserve current behavior for real
+> clocks, but vclocks can return early and avoid confusing lockdep?
+> --
+> pw-bot: cr
 
-/P
+Your right! This deadlock report seems to be a false positive. It seems
+appropriate to add a description of this false positive to the commit
+message.
 
+However, it is not appropriate to move the code that checks
+ptp->is_virtual_clock. If you need to check n_vclocks when checking
+whether ptp virtual clock is in use, it means that caller function has
+already performed work related to n_vclocks, and in this case, it is
+appropriate to perform n_vclocks check and n_vclocks_mux lock in caller
+function.
+
+Therefore, considering the overall structure, it is more appropriate to
+remove unnecessary locks and n_vclocks checks in ptp_vclock_in_use().
 
