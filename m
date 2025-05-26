@@ -1,167 +1,184 @@
-Return-Path: <netdev+bounces-193374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F6FAC3A92
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:25:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B6CAC3AF7
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A25303B1613
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B212172B00
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFE01DF26E;
-	Mon, 26 May 2025 07:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFE51E00A0;
+	Mon, 26 May 2025 07:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FgwTR4Yv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SwnWzcb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF21318DB0D;
-	Mon, 26 May 2025 07:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F9E1876
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 07:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748244344; cv=none; b=TT8Im/Ms9gHbJ4CCYuUqVDOjM3Mai/q5kNkTr86P9mnyaYziFiHLGoXxWvuKsbZaKl5rkUCcl2EIMP3KmSB6iU2aZAsoJWP/mMpUr/gkAO0ch7w2FZdAV6pZd7+BxWAm68AJuNKNYvSSGRwURSjTfBsES+0+B9ixkvQjLLW27SI=
+	t=1748246115; cv=none; b=cU0BvlccMA5y0c8yJ505q5Gl/gXmXQn6b+eZrLdkoWS/bBV9AsclvWGzl1RPHXBc+473R5a/DZhmEqJt0wNCtDgiwnOpzUjagC6cl3P9d2uKsxIRsZawK5WvJKu+zkicqL8jPdVWHZGn4fwfhLCW3UaGTlZj/IFDADdZLS+sXo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748244344; c=relaxed/simple;
-	bh=jI/6QrKDgQw+a5STQCUZbrlMyan64IJNwwcyUgaiJeI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ckG6ZT7gSblfiF4/TlHrRuQX21pZbst4ixZqxI9xxRtnlgNF+SgCPmeUBf8864bESEXeNPfGtZqClj3Ksdy5So4pMGzRVA0LNHzQBU6//ny3xItgeddyUu6AzFXhHyS0CysVamvrp+SftSmUWDKo3a/dCrOTd4AjFOkQE20HEXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FgwTR4Yv; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54PNetJ9018296;
-	Mon, 26 May 2025 07:25:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	sFsCV/DjNz5vL4f4te1C3iQo+A07KiQkSvGfgc9WuHI=; b=FgwTR4YvNw/iNQkX
-	xUTYDKebwmzqI726vHADr5Jtjsv29mpbvMbzoKngMYIUNu0XwW+f38AmMGSO9/ky
-	YBV94NMg0sGOurG47Xwv8QRjOn/M67MeS4dNLW6WxCiNFZt8/0U826He7htqrzmv
-	cWzoeJcWdpYjvsTJGzn1MWNs0PSWmy1WYxQZX4aTdBk+xsRuBSWcvxvVnDJFLm8Z
-	vEPcsO7c3yjFxpenXJyWED38oLsXRcZymsJjE8s/XrNtom4SJq5+gfjq8n1URn6M
-	g9F9dbIKlWe26lfZiY+xvVF4w+qAAQfwmOJVBlPLfqu74fCE4HrumohP990yKxBi
-	kFFE6Q==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46u7dc38wk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 07:25:25 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54Q7PPBK023669
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 07:25:25 GMT
-Received: from [10.253.8.193] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 26 May
- 2025 00:25:16 -0700
-Message-ID: <ce62bdda-b328-4be7-b9d7-1b4bffa039e6@quicinc.com>
-Date: Mon, 26 May 2025 15:25:14 +0800
+	s=arc-20240116; t=1748246115; c=relaxed/simple;
+	bh=ICHW/uN1OvSvaGQ7jIZodYWZnLa0EL03cumMRfWphYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a0Psf2uirLpXR0UgMP0wio7TsGfibreKs6k/OkrkW64tgypOtnLC5lvhpV/nLTo86Xh9Ewk4UL0fyrj8vO1Are1QnqU4pv305QPZG0/5pNKXCO22mnFR2Xe3KgZB5+4VpweCNZzGTWa78tRRECAECwxh2njzsRzKJCb7xMxQaFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SwnWzcb0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748246112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xr52sKmwroB97DOF/8SzXO2IZSVBxqAkPJsvVxhDFw0=;
+	b=SwnWzcb0fGk+azcfRqHwfJROK2gVziSh4Yc+6tY4qSMTizWWE1kXOkt9XGPzFFiEbxJXsm
+	mWyHq7nRTqrf1jAsCrzLqZMCpkAoOzmdzppcj0OrJzw20PUbu4UiShofeZ5MEoa1WTGYRX
+	ptL6odz/oZOMbBq0f1hcZNnpUNohxX4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-TZRfCm08MvShes6o4XT8qA-1; Mon, 26 May 2025 03:54:09 -0400
+X-MC-Unique: TZRfCm08MvShes6o4XT8qA-1
+X-Mimecast-MFC-AGG-ID: TZRfCm08MvShes6o4XT8qA_1748246048
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-acf16746a74so139249566b.0
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 00:54:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748246048; x=1748850848;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xr52sKmwroB97DOF/8SzXO2IZSVBxqAkPJsvVxhDFw0=;
+        b=HHQiPY/UwiDcW6PU1mvdOjM2+VW+Tb5gkQ77OpAozCWej9EQ/gcyJb/fW0VaGnZKHU
+         GZxIS35PPybIndgjAIQPFmFxcO0tV9aJSTCtrhvc855yxpibRcxTDx/wv7LUiKm8cP2s
+         LCHCTBE7B4zzOxYgAoC9z9jaMqNYwFcnRY/+h0b3P02VaGS1vb+JQJjOkFm9eCqbFwZ0
+         IybMIyjjyL6xIWg0SbOu2O/vgLoBcvaWtH4+1Z3h2tU+54SkHQEf9n/cug071IHJ4QrO
+         R88ExplT/Jcp1tZkuH6/QkJjO7YBPAxnF906LXed+cUpUcAE0YJT0aDJNE1KozaITLEU
+         ey+A==
+X-Forwarded-Encrypted: i=1; AJvYcCV9Q8kZtssEHOOmaRO1QBmJ0xYPSivL55MXt/UshPoItyptV/5hp2gx4t4FTlZS0fGL0IyXk2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6bHBVOYFrszeCnRQ3T7Z+9Ukvf3HIQkApHzDVGN/sq0xwpgPN
+	PiCPpAyx5XOWKRzaAiuiOPyBgjLGUeexBeB7cnXeSg2331EdVVD7hzU3xkAMJ21IvYgGgGPlJvW
+	dbMPAmUydm7rK/yOxqDELSTDVSX1bSyOFGIbYqTovKN9yqMFtqh6Kgzw+uVoG9wOrgQ==
+X-Gm-Gg: ASbGncshSxKFnG3AADlI48H0vFrQf7IkxcW0pGpgEys5LtovjQiQ2u3WjqOZUTTRhja
+	RklMg6S/VPTLtJkhO3OxE7p3xeMHyJoA4boU7tiJ7caHONo6prt3ZSj1gnGjF0nBZrza+z1kHrj
+	pIbZhnBNkKz6BPLWJZz22XY+L8QAaMl/Wo5AA6TrTfpH3gVXJ+n2V6bOXt1mx7WLDbPYBZmyof/
+	0HXeUsWztJqYKbLPHqfcuAr/XLVCBxwrMzKCSQYcVs/yzoTQMiF6tRyNXzvOo8wefvJ00z8QV5T
+	HNJBRTack54LQpMGylY92IvNzn8ctzBMVURhgXcjIHR/FagBOEmEk0yrDynq
+X-Received: by 2002:a17:906:dc89:b0:ad2:4e96:ee11 with SMTP id a640c23a62f3a-ad85b03b73dmr652294566b.8.1748246048092;
+        Mon, 26 May 2025 00:54:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXDorcGibcC8mJCNU0lHQiUbuXJHSvC/4551ubBzHRPqBuymTAUbX8ir3OqGUx+Fn5tp1GUA==
+X-Received: by 2002:a17:906:dc89:b0:ad2:4e96:ee11 with SMTP id a640c23a62f3a-ad85b03b73dmr652292866b.8.1748246047597;
+        Mon, 26 May 2025 00:54:07 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d4e8afdsm1652640066b.176.2025.05.26.00.54.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 00:54:07 -0700 (PDT)
+Date: Mon, 26 May 2025 09:54:02 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+Subject: Re: [PATCH net] vsock/test: Fix occasional failure in SOCK_STREAM
+ SHUT_RD test
+Message-ID: <2y6v7vog4dylnnu7j625gkijth7lnznvgcjl4kg2q3xy5ht6fe@uikdt45mmocp>
+References: <20250526043220.897565-1-kshk@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 01/14] dt-bindings: net: Add PPE for Qualcomm
- IPQ9574 SoC
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
- <20250513-qcom_ipq_ppe-v4-1-4fbe40cbbb71@quicinc.com>
- <20250519-garrulous-monumental-shrimp-94ad70@kuoka>
- <a182df27-5b0d-42d1-8f58-4e7a913bb12d@quicinc.com>
- <e9dac160-f90a-48e2-9269-245b36c3aefe@kernel.org>
-Content-Language: en-US
-From: Luo Jie <quic_luoj@quicinc.com>
-In-Reply-To: <e9dac160-f90a-48e2-9269-245b36c3aefe@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ctFXOY6aZXB9Cba_WI4zxGky5WX3pqvO
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDA2MSBTYWx0ZWRfX9SoU85VKL4uu
- BMRnvtaskkMUjU06iumRs8vuh7IPokcNOlBzWmuKhR4xpOUOBQWRC8P3dTWqQ7mUVvyAClrz6y5
- OroKuJM9CdZ7po9NUnCnksMj+nQIucZUUv4n0EjkJf6m22rID+R0sSbqaczAo7ra6c8IIbYMHhq
- m55VToirRUtsNGgtBGmIxRo90P+Vo8p29RNHhAe5Nf6XMo4jPMmBimFxqkemcxDN7/kmYvMqgq7
- F+TTlrTT8mXeaSn9j0UMsnybGbCGs63Yd/uDdhwyLAPwEUqn5bwfYLFBQXGmBjugC6nJhtdSuyb
- wiUYxYHlNvXt9mhIfclS8y95wJ44kVj3gYK97UIExMKmqTsv/hzQVlglskFNM7TFIESTHFauseH
- 9DTBDbIItl67LyP2+SMwseThrSBmtqGWKIKqE4kPByixkq8lFnwVZf1FIOn+N0et8W1HxUKN
-X-Proofpoint-ORIG-GUID: ctFXOY6aZXB9Cba_WI4zxGky5WX3pqvO
-X-Authority-Analysis: v=2.4 cv=Mq5S63ae c=1 sm=1 tr=0 ts=68341765 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10
- a=TRFCqlRPH5gG6gXwlP4A:9 a=QEXdDO2ut3YA:10 a=ZXulRonScM0A:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-26_04,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0 mlxscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 adultscore=0 mlxlogscore=861
- bulkscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505260061
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250526043220.897565-1-kshk@linux.ibm.com>
 
+On Sun, May 25, 2025 at 11:32:20PM -0500, Konstantin Shkolnyy wrote:
+>The test outputs:
+>"SOCK_STREAM SHUT_RD...expected send(2) failure, got 1".
+>
+>It tests that shutdown(fd, SHUT_RD) on one side causes send() to fail on
+>the other side. However, sometimes there is a delay in delivery of the
+>SHUT_RD command, send() succeeds and the test fails, even though the
+>command is properly delivered and send() starts failing several
+>milliseconds later.
+>
+>The delay occurs in the kernel because the used buffer notification
+>callback virtio_vsock_rx_done(), called upon receipt of the SHUT_RD
+>command, doesn't immediately disable send(). It delegates that to
+>a kernel thread (via vsock->rx_work). Sometimes that thread is delayed
+>more than the test expects.
+>
+>Change the test to keep calling send() until it fails or a timeout occurs.
+>
+>Fixes: b698bd97c5711 ("test/vsock: shutdowned socket test")
+>Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+>---
+> tools/testing/vsock/vsock_test.c | 25 +++++++++++++------------
+> 1 file changed, 13 insertions(+), 12 deletions(-)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 613551132a96..c3b90a94a281 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1058,17 +1058,22 @@ static void sigpipe(int signo)
+> 	have_sigpipe = 1;
+> }
+>
+>-static void test_stream_check_sigpipe(int fd)
+>+static void test_for_send_failure(int fd, int send_flags)
+> {
+>-	ssize_t res;
+>+	timeout_begin(TIMEOUT);
+>+	while (true) {
+>+		if (send(fd, "A", 1, send_flags) == -1)
+>+			return;
+>+		timeout_check("expected send(2) failure");
+>+	}
+>+	timeout_end();
+>+}
 
+I'd move this in util.c like we did in 
+https://lore.kernel.org/virtualization/20250522-vsock-linger-v6-3-2ad00b0e447e@rbox.co/
 
-On 5/24/2025 2:25 PM, Krzysztof Kozlowski wrote:
-> On 23/05/2025 12:28, Luo Jie wrote:
->>>> +  interconnect-names:
->>>> +    items:
->>>> +      - const: ppe
->>>> +      - const: ppe_cfg
->>>> +      - const: qos_gen
->>>> +      - const: timeout_ref
->>>> +      - const: nssnoc_memnoc
->>>> +      - const: memnoc_nssnoc
->>>> +      - const: memnoc_nssnoc_1
->>>> +
->>>> +  ethernet-dma:
->>>
->>> I don't get why this is a separate node.
->>>
->>
->> We used a separate node because the EDMA (Ethernet DMA)
->> is a separate block within the PPE block, with specific
->> functions like ports-to-host-CPU packet transfer and
->> hardware packet steering. We felt that a separate node
->> would depict the hierarchy more clearly. Could you please
->> suggest if a single node is recommended instead?
-> Since it is a separate block and it has its own resources, it is fine.
+And I'd rename following the other functions we have there.
 
-OK, thanks for confirmation.
+Thanks,
+Stefano
 
-> 
-> Best regards,
-> Krzysztof
+>
+>+static void test_stream_check_sigpipe(int fd)
+>+{
+> 	have_sigpipe = 0;
+>
+>-	res = send(fd, "A", 1, 0);
+>-	if (res != -1) {
+>-		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>-		exit(EXIT_FAILURE);
+>-	}
+>+	test_for_send_failure(fd, 0);
+>
+> 	if (!have_sigpipe) {
+> 		fprintf(stderr, "SIGPIPE expected\n");
+>@@ -1077,11 +1082,7 @@ static void test_stream_check_sigpipe(int fd)
+>
+> 	have_sigpipe = 0;
+>
+>-	res = send(fd, "A", 1, MSG_NOSIGNAL);
+>-	if (res != -1) {
+>-		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>-		exit(EXIT_FAILURE);
+>-	}
+>+	test_for_send_failure(fd, MSG_NOSIGNAL);
+>
+> 	if (have_sigpipe) {
+> 		fprintf(stderr, "SIGPIPE not expected\n");
+>-- 
+>2.34.1
+>
 
 
