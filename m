@@ -1,85 +1,86 @@
-Return-Path: <netdev+bounces-193474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA49FAC42B8
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F24AC42BC
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7501B177F02
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A2D7178CE4
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420EA211A0C;
-	Mon, 26 May 2025 15:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C163214A7D;
+	Mon, 26 May 2025 16:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TguBwEDd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MCxvVceT"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAAB2566
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 15:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CD021018A
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 16:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748275110; cv=none; b=YQpexX+97NsZohaOYwFUWwnaPj4eVzC6o8NUX+VsGv/j03UsBiLDIx/yc2etYMwIiHutsWn6POv6MOpPJrC5VoHbmVsmX2EIT3jq7uWQbHZaTucu4Hxgrc+ZqwRzKE1oJGErz9Wi/8s7akFHkqIWUya2cynmQ2CdWBtJ8oU4jQQ=
+	t=1748275304; cv=none; b=qfUwxpZm4Em1kIcH+luU2AM3nxxovY2jbsbh3gRi78/iCfbN5RmxqRabnQCI2d3bEnfOMJqzre08EiA3rKDxmaWTCSDVT4U9WBguiRRcFetNHZ+bGz2zBf+W8KQp3xST56+OGpvJsxILG5NFzH+wAZD7ryBydK9/Bl+S1mOdkMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748275110; c=relaxed/simple;
-	bh=LaFEsq0HvB9vr4NaAcRMwoScIc427WLEmDgdNFDZnT0=;
+	s=arc-20240116; t=1748275304; c=relaxed/simple;
+	bh=FTqaI7t8RxcXrVZU9VUNxiCBtuV0no5S+yCRZG/CB3s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ffxYU0XrrQU3xsBEUQWY+O0QUUYG0O5+XMHD6ZfnB+ACScaoMLPi6t5dEFi6plx8Rp4F65p/b9qZHr7sIEbPCG2WYG82DQTssg0Bh7PnF/wD9UA1yk25l7a977tqrukEISwwtW3vvJB8cEcI0Je2pO8c2bNZYja+HMxCthcCmvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TguBwEDd; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=HdMRoWU2o7drXMzz0GQJmjLQen0q8hvfjPKts0OzMGUzsuW1SqVfbFskTjid8SKeRgd7L3GZRy44kmqpHPgO0eIeP5B0aw0qvyTY5IGpsaC57ZiPnFUS1mv1qVJqKbWRUIxd3carzQbopL03EIYlMImGhxQEc57FoBgu/5vjTqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MCxvVceT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748275107;
+	s=mimecast20190719; t=1748275301;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NSybODuSpim2xb5ecUjEV34I5epjrpdilRUFqZmAtNw=;
-	b=TguBwEDdp4S9YGftO0wIto+2l3WPjLzxWKekTxsRYTygFMrSauv+HKhhMgnx0zZu59uRXG
-	uTu4my6sr1V3tvjm16Soz6WW86RjqMacam7h+18iJFms2mSj9b8GICKlAFWYa6k6wrFckA
-	uupHxLcbQuHT/sAAc21H/xPHB6kgiWo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WT8Ho/edJj/b07n6d4X1kH3ehVgioTniu78IFWGtIt8=;
+	b=MCxvVceTxItb/1iyvqqP3kdHVuDx+q5JHEOUTRSU9Zp+3+R6Szta573mG3Mypvlj+/9e1w
+	nYyGDo0eLHZuazTv5be7IUy62M3pPm5dFUQ+8zYWvrvkWNgcM/BeuwTSvJNNOLLUNxif2o
+	9MnR2Ix3gXw0gKRQuqMxKYmuJRcVYW0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-314-oSJ8gfs9Mp-dwqzpEge3vw-1; Mon, 26 May 2025 11:58:26 -0400
-X-MC-Unique: oSJ8gfs9Mp-dwqzpEge3vw-1
-X-Mimecast-MFC-AGG-ID: oSJ8gfs9Mp-dwqzpEge3vw_1748275105
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442ffaa7dbeso17818155e9.3
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:58:25 -0700 (PDT)
+ us-mta-466-gu9O9X93NjG1pCOoegkm2A-1; Mon, 26 May 2025 12:01:40 -0400
+X-MC-Unique: gu9O9X93NjG1pCOoegkm2A-1
+X-Mimecast-MFC-AGG-ID: gu9O9X93NjG1pCOoegkm2A_1748275299
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442ffaa7dbeso17840135e9.3
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:01:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748275105; x=1748879905;
+        d=1e100.net; s=20230601; t=1748275299; x=1748880099;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NSybODuSpim2xb5ecUjEV34I5epjrpdilRUFqZmAtNw=;
-        b=LZ+gFcPRpPMV+1rHxif6EhecWza4pitbReP1L7HJeyz5RudYoQsG9+N2NsRFiAFC7a
-         vQjbvyrcqnDSvi/PabMVFq0n/4IGcROzxqOgsfBOpq4xgenlzGewLYWs7cbBXssi7jGB
-         j/vg0M3syGyBt8W1D5L4CeEYNC7My71WDzkE09gqewZC264au9pemHR1yIPgirRuGGW/
-         itequG6fqnZ4h6sXir24ErgqfoR63SbcLNN9SjhPbUSzzXH+JJs3q6ZlOQrnZhM+8+r+
-         CAB0+SHWW/1JlPBd4bIZnuz0I2TUs+KlvRDnP96FNWKlub/sCDQNp7vY2TYhZu/6hZZM
-         lnfA==
-X-Gm-Message-State: AOJu0Yxp+xd/ZZEpCPI3GDPUm6zQj5PMnG4L2meXmi7rMBiuX0xfj6Ps
-	NE0dXRxk36EYAugIkh5vxFTO0ysq0OrERFbjYmUK9fVeBE4Nkkbu6zxMOyezdz52DFqkwon+TL1
-	Ml5kib2deWlTg6WXNtHImxuNlcfnk2FsuXTl4dUl856IyxA5MTMWdczEOmA==
-X-Gm-Gg: ASbGncuOKZJPJ6gFF8LpkJrWrqTiZpuCBbtRuwh5UKkZohWCCw8jR/mREfQZTOXcWu8
-	CxLd4rspiQt9Ohh0LFzkEcTB3ZnLf0wTsuo+APGL4b0cCuFXDAS9eiR1rw3dYfG5XIjivLG5kZ5
-	P07nts/TCgiBuIOv36KwvdETogjtBgoGACeSVDWACC2n9bl1iGU4SVu+51TUtcrL9AnorXCGI9A
-	1OLxDtn6WR2niEp1btNLoOw7Z/9h3hBFi6zvyw7a2Gs6FIPiXsCeGtFn7qjVIwO2GQppFcyxfzD
-	PIQrWiPGeTiOU8tFluc=
-X-Received: by 2002:a05:600c:1e8e:b0:43d:7588:6688 with SMTP id 5b1f17b1804b1-44c91cd5140mr79858695e9.12.1748275104831;
-        Mon, 26 May 2025 08:58:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaz2/DahdwY7xm9KuhltKb/hfFgL621ZMWkKswp0RZ7mvRzfJ8eI43LuiT7V7CFnuroB3R7Q==
-X-Received: by 2002:a05:600c:1e8e:b0:43d:7588:6688 with SMTP id 5b1f17b1804b1-44c91cd5140mr79858545e9.12.1748275104451;
-        Mon, 26 May 2025 08:58:24 -0700 (PDT)
+        bh=WT8Ho/edJj/b07n6d4X1kH3ehVgioTniu78IFWGtIt8=;
+        b=OGSkUI28LwKmhOk9p+Gl8E7WsdxhjMs0WZF9KwWU16xALETrGSMv1NNsXS1TW0yOxj
+         J2CKXZuUBZCzfuTSypgV+VmFbkCEoXgOFpde0r8v8YEUG/Iwmqr13hRzC4fybywR0LRz
+         Vzqr2WIcq0TBNEviX/BQs/czJBZQ2nPIaQkWH2epkb7ZUEpUqKtrQj77BR6egvnOnRT8
+         u0eaeFUPp1nHZJSMAqVowedn8tetwPtZd4s41ySWqN7+0GH8wwHM16WY50OZmgn7w6Bp
+         seOlNUEc4wQNsMbygRmRI6vkw0eF5ksVP6tlXyVhP8bdP51qRPkTOIqmfn3DL5C+IRTY
+         if2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWgHxEUrA6XEw/7sHt/SATir/bGHCStk3VTPcAhTFb5HDFcpLPKd2nBQoF9KCqJmWL1RwqqKB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXoSUi5DMdp5S2/v5sLJgQnIQgKyUzB9lPswNcGo3WX5f+t7/u
+	0KE5EtFRl4DMqkWz/iYuT/VmeHMbOwCuv4dbJxftKuhQriIeHYRBL4CB0F/gaKmaKWTZhecLuJG
+	9QF+QKlPItp7NEnHQLeRxqPaYXpLJAyFRqa7kz9wjnCt88/ONZmkxjqB5AA==
+X-Gm-Gg: ASbGncvJZgfl+V47HJzP6KwUF9ZjOIChB0/t95v5LRPfpwdnJV2Rgo8Iq6yW9Yrspaf
+	QgT8lR0z8FITV7eg6URL+WgLYeGcSgeYg0nWO8s2ixcvnHg0UO/alQdb0507YzUfBplu2CiaP5i
+	M2lYBpJn6hZ5COCbXjPPWqT/eYRH03wiTAvdr+Xh2OYUPFezgOopYjP5rDqyAsPoyiRd9LcgBI6
+	8Fn19qThOSwSV0XlrZLTodL3L5Y/bd6hZAu+i5d229BS6sHqrvWs5YuSAkmzzTGFEIXqEqCjmO4
+	CCVBqKJIZ8iaWoiR10g=
+X-Received: by 2002:a05:600c:1c27:b0:43c:eeee:b713 with SMTP id 5b1f17b1804b1-44c92f21e2amr65777645e9.20.1748275298238;
+        Mon, 26 May 2025 09:01:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH+50k3T5CMDiIgdqAVfAROx0cJKvW/edB5JJA880McrxNIY+zCPmgbCIcKfpwxoGKBgbrzcg==
+X-Received: by 2002:a05:600c:1c27:b0:43c:eeee:b713 with SMTP id 5b1f17b1804b1-44c92f21e2amr65777155e9.20.1748275297711;
+        Mon, 26 May 2025 09:01:37 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d37498e8sm5450416f8f.16.2025.05.26.08.58.23
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f78aeb56sm236658915e9.27.2025.05.26.09.01.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 08:58:24 -0700 (PDT)
-Message-ID: <3b7aa4be-bfb6-4c31-8f98-96a2d9988f86@redhat.com>
-Date: Mon, 26 May 2025 17:58:22 +0200
+        Mon, 26 May 2025 09:01:37 -0700 (PDT)
+Message-ID: <18051f57-37c7-4994-8859-d0c41ef6fb7d@redhat.com>
+Date: Mon, 26 May 2025 18:01:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,28 +88,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: phy: Add c45_phy_ids sysfs directory
- entry
-To: Yajun Deng <yajun.deng@linux.dev>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250526140539.6457-1-yajun.deng@linux.dev>
+Subject: Re: [PATCH RESEND] selftests: nettest: Fix typo in log and error
+ messages for clarity
+To: Alok Tiwari <alok.a.tiwari@oracle.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, darren.kenny@oracle.com
+References: <20250526151636.1485230-1-alok.a.tiwari@oracle.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250526140539.6457-1-yajun.deng@linux.dev>
+In-Reply-To: <20250526151636.1485230-1-alok.a.tiwari@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/26/25 4:05 PM, Yajun Deng wrote:
-> The phy_id field only shows the PHY ID of the C22 device, and the C45
-> device did not store its PHY ID in this field.
+On 5/26/25 5:16 PM, Alok Tiwari wrote:
+> This patch corrects several logging and error message typos in nettest.c:
+> - Corrects function name in log messages "setsockopt" -> "getsockopt".
+> - Closes missing parentheses in "setsockopt(IPV6_FREEBIND)".
+> - Replaces misleading error text ("Invalid port") with the correct
+>   description ("Invalid prefix length").
+> - remove Redundant wording like "status from status" and clarifies
+>   context in IPC error messages.
 > 
-> Add the new phy_mmd_group, and export the mmd<n>_device_id for the C45
-> device. These files are invisible to the C22 device.
+> These changes improve readability and aid in debugging test output.
 > 
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+> Resending: Previous email used incorrect address for David S. Miller
 
+You should have waited the 24h grace period before resending:
+
+https://elixir.bootlin.com/linux/v6.15/source/Documentation/process/maintainer-netdev.rst#L15
+
+---
 ## Form letter - net-next-closed
 
 The merge window for v6.16 has begun and therefore net-next is closed
