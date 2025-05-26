@@ -1,110 +1,99 @@
-Return-Path: <netdev+bounces-193447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77644AC411D
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:14:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6451CAC4130
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0790162B4C
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:14:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D500D189A08A
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD4720459A;
-	Mon, 26 May 2025 14:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B16720F079;
+	Mon, 26 May 2025 14:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ci1RKDb6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3zgUI6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E0F1A9B24;
-	Mon, 26 May 2025 14:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D3620CCCC;
+	Mon, 26 May 2025 14:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748268857; cv=none; b=ee5GGvc/37YzYNOFX5ee/4cBVlGdj3CR7aMr20b6xMLw72YDwY+ln4Hy0jc4wo1XoT1veP/ppmYZZtyE3ZNijw/hNwa+/V2/R13dlIrXvm0hqG+tGmBs4HrqBmZ/c4sziHRgwAvK3tlL8qx6iC7dOLJzXI5SM7c2USNucWGyBQ8=
+	t=1748269194; cv=none; b=oYsNILOgFTXlEeFedKQQYFSeRAaVhXVrs8F8IZPal3Vk126aSUVDL4s28nOaBVH9MqNnmSHt9FZpGXraE41o+juaKprlfwlgQtyorQxMGvTmv/2S0WRFBbJ0tREmiE0m64LIXwNvp5dmO1zT+4WuxKld5/vSl3xp9uNoRQ6Db48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748268857; c=relaxed/simple;
-	bh=ETTjRBcczpFag2Ns20oIEcNc2E4vGNitf8zIGNoNDaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjcNj2Ou9pKi8vqhDcyUENMnhtzXtJPV1ActAPGhwSBDFedeEHAusHIY+lQCXhEh9DiuHSSwQ1mllNKBWpt6Ixy8jaapvUwslCz5t7slphgZz5Rf8MuxWeNyDoX52+oeZd0fExoOMJjfUhD84pMLC7oyjt5TyUNZlp8LjldFmLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ci1RKDb6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gTUQIv6xtVQdEIhWmKs1GCL0HyslUp2+oj7lqnt+NHQ=; b=Ci1RKDb6871pfBSzyscgJXu0GQ
-	rqWL6a6oZXu1JWVoZrzBArnlLSOMg0jGzEsX9C+54h22e0E79PbXd5vCv/kb/scMxfqVR+0Sy5rkj
-	FTHPaIn1AIf27eudzyyjNlNPfgrVDJ8XFac94nsGGF8cxeHADlC+aoh5itlnIaFaCM44=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uJYad-00E0Oq-Sg; Mon, 26 May 2025 16:14:07 +0200
-Date: Mon, 26 May 2025 16:14:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: James Hilliard <james.hilliard1@gmail.com>, netdev@vger.kernel.org,
-	linux-sunxi@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Feiyang Chen <chenfeiyang@loongson.cn>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Jinjie Ruan <ruanjinjie@huawei.com>,
-	Paul Kocialkowski <paulk@sys-base.io>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: stmmac: dwmac-sun8i: Allow runtime
- AC200/AC300 phy selection
-Message-ID: <4a2c60a2-03a7-43b8-9f40-ea2b0a3c4154@lunn.ch>
-References: <20250526002924.2567843-1-james.hilliard1@gmail.com>
- <20250526002924.2567843-2-james.hilliard1@gmail.com>
- <aDQgmJMIkkQ922Bd@shell.armlinux.org.uk>
+	s=arc-20240116; t=1748269194; c=relaxed/simple;
+	bh=xeJSnqHA0JVNhysIqhxWNknATT0guijmTw8rMyR29DY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L+58AbxRKvKWNIKvEGFLbEL83YEGOyynyPkovbXe+RPh9qqS5vU9Fh/kkTq1z4va0GATEghaC4oNBpyPXCx7pC+SPyKFDx6WSMSrJuZ59qCk76447Lq+VyS2s3lmmu/igzEaThRoOh/uhDC4ams1VGcvoa1QTPbJlWjujlXzYj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3zgUI6n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCCC2C4CEE9;
+	Mon, 26 May 2025 14:19:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748269193;
+	bh=xeJSnqHA0JVNhysIqhxWNknATT0guijmTw8rMyR29DY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G3zgUI6n3NwRmIAVvm8ZHf7np6UTirqaICARVa6YnI+03m8Vk9+MMMAbl5LVsT/oA
+	 tiNxRFdQb6w5a05rJ/YwGt3mfVl3yMspBNyNIfroh5bbdOo1u7DTf0GEvvkqfsRqZn
+	 jr1nvVXWBopiK2tkT8wiPbRzc9at5zQkw+UT/Pyf7L2YtFf2DQLMQkLuUdXoAvUXQz
+	 uRjkdwX7dCsmATU0bktFFOch+R6kep2NXifX17lPpqDZkLB3aYWbixAlx4vlbhzALG
+	 hC4bFgfZe37ZlJTt5JBmT3Wkx6qWv7zsHDxD7ZQnbhZigYK4siiiKwZAQe6TIXPXSZ
+	 KmqvZ32X2rOqQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D8B3805D8E;
+	Mon, 26 May 2025 14:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aDQgmJMIkkQ922Bd@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: usb: aqc111: fix error handling of usbnet read
+ calls
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174826922825.939427.1321439383834289633.git-patchwork-notify@kernel.org>
+Date: Mon, 26 May 2025 14:20:28 +0000
+References: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
+In-Reply-To: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com,
+ lvc-project@linuxtesting.org
 
-On Mon, May 26, 2025 at 09:04:40AM +0100, Russell King (Oracle) wrote:
-> On Sun, May 25, 2025 at 06:29:22PM -0600, James Hilliard wrote:
-> > +	if (!nvmem_cell_read_u16(dev, "ac300", &val)) {
-> > +		const char *phy_name = (val & AC300_KEY) ? "ac300" : "ac200";
-> > +		int index = of_property_match_string(dev->of_node, "phy-names", phy_name);
-> > +		if (index < 0) {
-> > +			dev_err(dev, "PHY name not found in device tree\n");
-> > +			return -EINVAL;
-> > +		}
-> > +
-> > +		plat_dat->phy_node = of_parse_phandle(dev->of_node, "phys", index);
-> > +		if (!plat_dat->phy_node) {
-> > +			dev_err(dev, "Failed to get PHY node from phys property\n");
-> > +			return -EINVAL;
-> > +		}
-> > +	}
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 20 May 2025 14:32:39 +0300 you wrote:
+> Syzkaller, courtesy of syzbot, identified an error (see report [1]) in
+> aqc111 driver, caused by incomplete sanitation of usb read calls'
+> results. This problem is quite similar to the one fixed in commit
+> 920a9fa27e78 ("net: asix: add proper error handling of usb read errors").
 > 
-> 1. You are re-using the drivers/phy binding for ethernet PHYs driven by
->    phylib here.
-> 2. You need to update
->    Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
->    in a separate patch.
+> For instance, usbnet_read_cmd() may read fewer than 'size' bytes,
+> even if the caller expected the full amount, and aqc111_read_cmd()
+> will not check its result properly. As [1] shows, this may lead
+> to MAC address in aqc111_bind() being only partly initialized,
+> triggering KMSAN warnings.
+> 
+> [...]
 
-A real user, i.e. a patch to a .dts file, would also be good.
+Here is the summary with links:
+  - [net-next] net: usb: aqc111: fix error handling of usbnet read calls
+    https://git.kernel.org/netdev/net-next/c/405b0d610745
 
-  Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
