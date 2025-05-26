@@ -1,147 +1,238 @@
-Return-Path: <netdev+bounces-193424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51009AC3ECF
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:47:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C62ABAC3ED6
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19C4A3B0D5E
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:46:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 819FF164D02
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB17A1FF1A0;
-	Mon, 26 May 2025 11:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A761C8601;
+	Mon, 26 May 2025 11:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="Kb0YmD12";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZkjDVazK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A581F7580;
-	Mon, 26 May 2025 11:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387F4158DD4
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 11:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748260005; cv=none; b=d9YDfj9H0dH0Pe4+uInXdS9BW4FoaU7XTS32bYxEfRyCKjpKdyqhk5aF4VPukYw8Ci/e26vBGh6rGtgbMLjDzB5YFxBu/k+BgMSlbHq1noXjUbizaFwvGUdp6NsbFhS8YMEoef6WpiPEfjd5/OG6+6sPhOJC5uqK+gMRbxGJA6o=
+	t=1748260086; cv=none; b=Q6ZdCf8r0sedggZ5Pog86L3p02CtfArPgK045fu95H0e49Xf80aRMyk8rXA4QGUltaggWrEgBkqUHQ2PVH8/3Lt5G67QHVfIcp6NQm2rQnkYvwBIkjmtTuk+boZDlHLSyDyYtUOmf10nn6hKMdVmIw3faw5oIDyrNfncMOWVg7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748260005; c=relaxed/simple;
-	bh=ctdWOqVhw8PP7NozucmroMp+2QHGZHR7hJ6JgXHeR0k=;
-	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=U7/uLWGRMUxxYEV479NZJx/FLc3XVlkae/d6Zrx1kF1FuaEvs68Q7PM+8s/rxNnGp2TO12F4sF/S5MeaxB5L9q60TI2W6IXUo5yst3yk2BIDTV0ReMLupniEc0BQpT5XsLemudf7MVMYZd9dlooCRkBNBc5r6RVCRjGhZBzJdGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4b5YrK5YSBz51SW7;
-	Mon, 26 May 2025 19:46:25 +0800 (CST)
-Received: from njy2app08.zte.com.cn ([10.40.13.206])
-	by mse-fl2.zte.com.cn with SMTP id 54QBkGU1075015;
-	Mon, 26 May 2025 19:46:16 +0800 (+08)
-	(envelope-from jiang.kun2@zte.com.cn)
-Received: from mapi (njb2app05[null])
-	by mapi (Zmail) with MAPI id mid204;
-	Mon, 26 May 2025 19:46:19 +0800 (CST)
-Date: Mon, 26 May 2025 19:46:19 +0800 (CST)
-X-Zmail-TransId: 2afd6834548b4f5-54aaa
-X-Mailer: Zmail v1.0
-Message-ID: <20250526194619126ArX868H3UosA7Jz31tRqF@zte.com.cn>
-In-Reply-To: <CANn89i+C-qk-WhEanMS_tRiYJHHixH33MAO3u-wQVdWGJOjskw@mail.gmail.com>
-References: 20250526162746319JPXpL0xRJ-n7onnZApOiV@zte.com.cn,CANn89i+C-qk-WhEanMS_tRiYJHHixH33MAO3u-wQVdWGJOjskw@mail.gmail.com
+	s=arc-20240116; t=1748260086; c=relaxed/simple;
+	bh=/IOOB8KFr2AThigSN9CiWRGlON+ps3AKfam1f76YkLI=;
+	h=From:Message-Id:Content-Type:Mime-Version:Subject:Date:
+	 In-Reply-To:Cc:To:References; b=dTdlJk1Of5pvKipCPN6QlZrnW90Uf6Wfn/mCCey6V7VXVUcjUWKBDGYJKQ8zERn6DoFy5qXoACs1xCmrdZdC+WGM/XIZm4qGJJBIBeqQ/j19yhFDZQMEQwv0I+35xcZJCt92nLkTc6aCC4/uJ2GyMD7N6LANC2W0ZAARIuV7yow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=Kb0YmD12; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZkjDVazK; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id 30D6D13806DF;
+	Mon, 26 May 2025 07:48:03 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Mon, 26 May 2025 07:48:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1748260083; x=1748346483; bh=r3DDIvCCF4
+	vrldDktj0U7F1dCS9vattSs9NO+WPTcnE=; b=Kb0YmD12ls2+q1SKt4OQ1oVJ8G
+	nBRFwjivb8hMbapGsATqKlIpOAa3ZfAey+O2yYmSFFMHCVx+QGEdsTIzIZdrVAuZ
+	cotc0EX/jPyD8HRexepP4fu6hE00T2hmCTVVtpDNLE/8cUelbRRnsndXoay/UtwT
+	U5LBa0VlYgLznteFYojv3r+C6oxDjMlIs0/k3YoTXR79t1cIY+Cm5BxvPhu/uM2u
+	TT6/lDCJY4kVSdQck1tWz2vXg0O6RypehITyKUlzp0gQN5vTE6zNxvTLH2eZF1hW
+	kqNnOiSivNj945ZRQwCFmR+XOnudkz2FiiT88k4ghHZ7ScqJzXyDxnng9YKA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1748260083; x=1748346483; bh=r3DDIvCCF4vrldDktj0U7F1dCS9vattSs9N
+	O+WPTcnE=; b=ZkjDVazKDajJvDgLuBE9ZMC5bjLPlTP7LyzeDrxX/c1MP7FnoDw
+	QZz2R3XUPaRL/lJ6LOAe2dZnGlIFO8AJVrkw3wHo/sZuDhvETSS9bRkC14Ug8KTd
+	cYk/2CM2rBLCvsR27WJsDuCJkjVD6KT9a1SOc5hnkUGewnWOyqdHC4qrRH/Egmsz
+	CMqwLw1uo5yq+Mu4UpiQLjom8wB6qT+HNjNXNfNj30ZCouonf/bscWU0QT0kBCCF
+	hYyVuvh+toVu6rW7i0lS1XZfF+UPlgBQoL4akgXQWN0kFB+JxpeQMT1ZJ3hVirLD
+	S0RfGUDE92utL5tOohvQPUMTAB5iZ7SRUiw==
+X-ME-Sender: <xms:8lQ0aNTnmij-tY22gs6TGsmC0oYtUIEXRazH7iptSvVTwWSETdtEFA>
+    <xme:8lQ0aGxJo03U4voixAnYLbBUcByV9Wy4aAaO398dEhqOqglOfPzCrw4Hz7b6Mmu8C
+    6KPgEuJR5D0tC5XuCQ>
+X-ME-Received: <xmr:8lQ0aC2jbRHXmvJtpPXsTTKGCpbCReXi0Yyxx9g38uMiy_fK4ZjjIAwUZH1xPiStGtkPQnKUJA8G9OE_KT5-F95UouOAPIgx7YoQgQbdNo4t4A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddujeeggeculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhkfgtggfuffgj
+    vefvfhfosehmtdhmrehhtddvnecuhfhrohhmpeftihgtrghrugcuuegvjhgrrhgrnhhouc
+    eorhhitggrrhgusegsvghjrghrrghnohdrihhoqeenucggtffrrghtthgvrhhnpeffhfek
+    tdejhfeigeffjefgveekueehheehleekheekveelkeegleeifffguefhudenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehrihgtrghrugessggv
+    jhgrrhgrnhhordhiohdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpd
+    hrtghpthhtohepmhhikhgrrdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdr
+    tghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehmihgthhgrvghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthht
+    ohephigvhhgviihkvghlshhhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurh
+    gvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
+    mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
+    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
+    vghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:8lQ0aFBUqKQ0pTfbUI8PLy0hPsp3GXE8bm2Bdz0io69K6r87H0MNKQ>
+    <xmx:8lQ0aGiKb61WwjWDZ_91dX-ZsV1MIdvcDCYEeK84MgxDBcUt-tg9RA>
+    <xmx:8lQ0aJr6nVcZU9OwTQswxFLcnOYCa6gZ-x1dKVoCnEEy0uXQzyYxtA>
+    <xmx:8lQ0aBih_0H_LY-RJH0c6_PiPIfIVmI3oo2oSgTy-UIF6456mJc4-w>
+    <xmx:81Q0aCgX9JwDEYpLw0xhyqZpLFiQWDdmqdvuh0MhFlt35-t3F33yODcC>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 26 May 2025 07:48:01 -0400 (EDT)
+From: Ricard Bejarano <ricard@bejarano.io>
+Message-Id: <4930C763-C75F-430A-B26C-60451E629B09@bejarano.io>
+Content-Type: multipart/mixed;
+	boundary="Apple-Mail=_5D33D6F5-ADF4-4AE3-A528-8DB54853A01B"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <jiang.kun2@zte.com.cn>
-To: <edumazet@google.com>
-Cc: <davem@davemloft.net>, <kuba@kernel.org>, <dsahern@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <xu.xin16@zte.com.cn>,
-        <yang.yang29@zte.com.cn>, <wang.yaxin@zte.com.cn>,
-        <fan.yu9@zte.com.cn>, <he.peilin@zte.com.cn>, <tu.qiang35@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>, <zhang.yunkai@zte.com.cn>,
-        <ye.xingchen@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSCBuZXQtbmV4dF0gbmV0OiBhcnA6IHVzZSBrZnJlZV9za2JfcmVhc29uKCkgaW4gYXJwX3Jjdigp?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl2.zte.com.cn 54QBkGU1075015
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 68345491.000/4b5YrK5YSBz51SW7
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Date: Mon, 26 May 2025 13:47:58 +0200
+In-Reply-To: <20250526092220.GO88033@black.fi.intel.com>
+Cc: netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
+ <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+ <20250526045004.GL88033@black.fi.intel.com>
+ <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
+ <20250526092220.GO88033@black.fi.intel.com>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
 
-
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
-
-
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
-
-
---=====_003_next=====
+--Apple-Mail=_5D33D6F5-ADF4-4AE3-A528-8DB54853A01B
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+	charset=us-ascii
 
-PkFyZSB0aGVzZSBlcnJvcnMgY29tbW9uIGVub3VnaCB0byBnZXQgZGVkaWNhdGVkIGRyb3AgcmVh
-c29ucyA/IE1vc3QNCj5zdGFja3MgaGF2ZSBpbXBsZW1lbnRlZCBBUlAgbW9yZSB0aGFuIDIwIHll
-YXJzIGFnby4NCj4NCj5JIHRoaW5rIHRoYXQgZm9yIHJhcmUgZXZlbnRzIGxpa2UgdGhpcywgdGhl
-IHN0YW5kYXJkIGNhbGwgZ3JhcGggc2hvdWxkDQo+YmUgcGxlbnR5IGVub3VnaC4gKHBlcmYgcmVj
-b3JkIC1hZyAtZSBza2I6a2ZyZWVfc2tiKQ0KPg0KPk90aGVyd2lzZSB3ZSB3aWxsIGdldCAxMDAw
-IGRyb3AgcmVhc29ucywgYW5kIHRoZSBwcm9mdXNpb24gb2YgbmFtZXMNCj5tYWtlcyB0aGVtIHVz
-ZWxlc3MuDQoNClRoYW5rIHlvdSBmb3IgeW91ciBmZWVkYmFjay4NCg0KTWFsaWNpb3VzbHkgY3Jh
-ZnRlZCBBUlAgcGFja2V0cyBvZnRlbiB0cmlnZ2VyIHRoZXNlIHR3byBzY2VuYXJpb3MuIA0KVXNp
-bmcgcGVyZiBjYW5ub3QgZGlyZWN0bHkgZGlzdGluZ3Vpc2ggYmV0d2VlbiB0aGUgdHdvIGNhc2Vz
-OyANCmFkZGl0aW9uYWxseSwgZW5hYmxpbmcgcGVyZiBpbiBlbWJlZGRlZCBlbnZpcm9ubWVudHMg
-bWF5IGxlYWQgdG8gDQpub3RpY2VhYmxlIHBlcmZvcm1hbmNlIG92ZXJoZWFkLg0KDQpNb3JlIGlt
-cG9ydGFudGx5LCBpbiB0aGlzIHBhdGNoLCBJIGJlbGlldmUgcmVwbGFjaW5nIHBza2JfbWF5X3B1
-bGwgd2l0aCANCnBza2JfbWF5X3B1bGxfcmVhc29uIG1ha2VzIHNlbnNlLCBzbyB1c2luZyBrZnJl
-ZV9za2JfcmVhc29uKCkgaW4gDQphcnBfcmN2KCkgaXMgbWVhbmluZ2Z1bC4=
+> Simple peer-to-peer, no routing nothing. Anything else is making =
+things
+> hard to debug. Also note that this whole thing is supposed to be used =
+as
+> peer-to-peer not some full fledged networking solution.
+
+> Let's forget bridges for now and anything else than this:
+>  Host A <- Thunderbolt Cable -> Host B
+
+Right, but that's precisely what I'm digging into: red->blue runs at =
+line speed,
+and so does blue->purple. =46rom what I understand about drivers and =
+networking,
+it doesn't make sense then that the red->blue->purple path drops down so =
+much in
+performance (9Gbps to 5Mbps), especially when the reverse =
+purple->blue->red path
+runs at ~930Mbps (which lines up with the purple->blue link's speed).
+
+> So instead of 40 Gb/s with lane bonding you get 10 Gb/s (although =
+there are
+> some limitations in the DMA side so you don't get the full 40 Gb/s but
+> certainly more than what the 10 Gb/s single lane gives you).
+
+Right, but I'm getting 5Mbps, with an M.
+That's 1800x times slower than the 9Gbps I get on the other way around =
+on direct
+(non-forwarded, non-bridged) traffic. I'm sure I don't have hardware for =
+40Gbps,
+but if I'm getting ~9Gbps one way, why am I not getting similar =
+performance the
+other way.
+
+It's not the absolute performance that bugs me, but the massive =
+assymmetry in
+both ways of the very same ports and cable.
+
+> You missed the attachment?
+
+Yup, sorry. I've attached both the original tblist output and the =
+reversed one.
+
+> Well, if the link is degraded to 10 Gb/s then I'm not sure there is =
+nothing
+> more I can do here.
+
+This I don't understand.
+
+I will see what I can do with the 12/13th NUCs which are TB4 and have =
+certified
+cables.
+
+Thanks, once again,
+Ricard Bejarano
 
 
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+--Apple-Mail=_5D33D6F5-ADF4-4AE3-A528-8DB54853A01B
+Content-Disposition: attachment;
+	filename=tblist-flipped.txt
+Content-Type: text/plain;
+	x-unix-mode=0644;
+	name="tblist-flipped.txt"
+Content-Transfer-Encoding: 7bit
 
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxkaXYgc3R5bGU9ImZvbnQtc2l6ZToxNHB4O2ZvbnQt
-ZmFtaWx5OuW+rui9r+mbhem7kSxNaWNyb3NvZnQgWWFIZWk7bGluZS1oZWlnaHQ6MS41Ij48ZGl2
-IHN0eWxlPSJsaW5lLWhlaWdodDoxLjUiPiZndDtBcmUgdGhlc2UgZXJyb3JzIGNvbW1vbiBlbm91
-Z2ggdG8gZ2V0IGRlZGljYXRlZCBkcm9wIHJlYXNvbnMgPyBNb3N0PC9kaXY+PGRpdiBzdHlsZT0i
-bGluZS1oZWlnaHQ6MS41Ij4mZ3Q7c3RhY2tzIGhhdmUgaW1wbGVtZW50ZWQgQVJQIG1vcmUgdGhh
-biAyMCB5ZWFycyBhZ28uPC9kaXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij4mZ3Q7PC9k
-aXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij4mZ3Q7SSB0aGluayB0aGF0IGZvciByYXJl
-IGV2ZW50cyBsaWtlIHRoaXMsIHRoZSBzdGFuZGFyZCBjYWxsIGdyYXBoIHNob3VsZDwvZGl2Pjxk
-aXYgc3R5bGU9ImxpbmUtaGVpZ2h0OjEuNSI+Jmd0O2JlIHBsZW50eSBlbm91Z2guIChwZXJmIHJl
-Y29yZCAtYWcgLWUgc2tiOmtmcmVlX3NrYik8L2Rpdj48ZGl2IHN0eWxlPSJsaW5lLWhlaWdodDox
-LjUiPiZndDs8L2Rpdj48ZGl2IHN0eWxlPSJsaW5lLWhlaWdodDoxLjUiPiZndDtPdGhlcndpc2Ug
-d2Ugd2lsbCBnZXQgMTAwMCBkcm9wIHJlYXNvbnMsIGFuZCB0aGUgcHJvZnVzaW9uIG9mIG5hbWVz
-PC9kaXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij4mZ3Q7bWFrZXMgdGhlbSB1c2VsZXNz
-LjwvZGl2PjxkaXYgc3R5bGU9ImxpbmUtaGVpZ2h0OjEuNSI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9
-ImxpbmUtaGVpZ2h0OjEuNSI+VGhhbmsgeW91IGZvciB5b3VyIGZlZWRiYWNrLjwvZGl2PjxkaXYg
-c3R5bGU9ImxpbmUtaGVpZ2h0OjEuNSI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9ImxpbmUtaGVpZ2h0
-OjEuNSI+TWFsaWNpb3VzbHkgY3JhZnRlZCBBUlAgcGFja2V0cyBvZnRlbiB0cmlnZ2VyIHRoZXNl
-IHR3byBzY2VuYXJpb3MuJm5ic3A7PC9kaXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij5V
-c2luZyBwZXJmIGNhbm5vdCBkaXJlY3RseSBkaXN0aW5ndWlzaCBiZXR3ZWVuIHRoZSB0d28gY2Fz
-ZXM7Jm5ic3A7PC9kaXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij5hZGRpdGlvbmFsbHks
-IGVuYWJsaW5nIHBlcmYgaW4gZW1iZWRkZWQgZW52aXJvbm1lbnRzIG1heSBsZWFkIHRvJm5ic3A7
-PC9kaXY+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS41Ij5ub3RpY2VhYmxlIHBlcmZvcm1hbmNl
-IG92ZXJoZWFkLjwvZGl2PjxkaXYgc3R5bGU9ImxpbmUtaGVpZ2h0OjEuNSI+PGJyPjwvZGl2Pjxk
-aXYgc3R5bGU9ImxpbmUtaGVpZ2h0OjEuNSI+TW9yZSBpbXBvcnRhbnRseSwgaW4gdGhpcyBwYXRj
-aCwgSSBiZWxpZXZlIHJlcGxhY2luZyBwc2tiX21heV9wdWxsIHdpdGgmbmJzcDs8L2Rpdj48ZGl2
-IHN0eWxlPSJsaW5lLWhlaWdodDoxLjUiPnBza2JfbWF5X3B1bGxfcmVhc29uIG1ha2VzIHNlbnNl
-LCBzbyB1c2luZyBrZnJlZV9za2JfcmVhc29uKCkgaW4mbmJzcDs8L2Rpdj48ZGl2IHN0eWxlPSJs
-aW5lLWhlaWdodDoxLjUiPmFycF9yY3YoKSBpcyBtZWFuaW5nZnVsLjwvZGl2PjwvZGl2Pjxicj48
-YnI+PGJyPjxicj48L2Rpdj4=
+root@blue:~# tbtools-main/target/debug/tblist -Av
+Domain 0
+  Type: Domain
+  Security Level: User
+  Deauthorization: No
+  IOMMU DMA protection: No
 
+Domain 0 Route 0: 8086:6357 Intel Corporation NUC8BEB
+  Type: Router
+  UUID: d1030000-0090-8f18-23c5-b11c6cd30923
+  Generation: Thunderbolt 3
+  NVM version: 33.0
 
---=====_003_next=====--
+Domain 0 Route 1: 8086:0001 Intel Corp. red
+  Type: XDomain
+  Speed (Rx/Tx): 10/10 Gb/s
+  UUID: d7030000-0070-6d18-232c-531042752121
+root@blue:~#
 
---=====_002_next=====--
+--Apple-Mail=_5D33D6F5-ADF4-4AE3-A528-8DB54853A01B
+Content-Disposition: attachment;
+	filename=tblist.txt
+Content-Type: text/plain;
+	x-unix-mode=0644;
+	name="tblist.txt"
+Content-Transfer-Encoding: 7bit
 
---=====_001_next=====--
+root@blue:~/tbtools-main# target/debug/tblist -Av
+Domain 0
+  Type: Domain
+  Security Level: User
+  Deauthorization: No
+  IOMMU DMA protection: No
 
+Domain 0 Route 0: 8086:6357 Intel Corporation NUC8BEB
+  Type: Router
+  UUID: d1030000-0090-8f18-23c5-b11c6cd30923
+  Generation: Thunderbolt 3
+  NVM version: 33.0
+
+Domain 0 Route 1: 8086:0001 Intel Corp. red
+  Type: XDomain
+  Speed (Rx/Tx): 10/10 Gb/s
+  UUID: d7030000-0070-6d18-232c-531042752121
+root@blue:~/tbtools-main#
+
+--Apple-Mail=_5D33D6F5-ADF4-4AE3-A528-8DB54853A01B--
 
