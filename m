@@ -1,144 +1,152 @@
-Return-Path: <netdev+bounces-193304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260BBAC37F1
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8BFAC37F3
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A7D1892689
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:23:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2B91893711
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76509146A72;
-	Mon, 26 May 2025 02:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zekzu02V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F086C1624D5;
+	Mon, 26 May 2025 02:23:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791B529A1
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 02:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6E8146A72;
+	Mon, 26 May 2025 02:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748226188; cv=none; b=hm6PAvIEgO1+G9nY1pkyKpk+In9Av+NsaWj7sL9eQdx3i/oh6iqysxjCFyH05fWWlrQ80uBjLT0OzOWOKpOxzj/P9Q8GpquUadwtoJhuQT/t51vCPHQ3In1vj+025KYIPcR6qSQJyc9P/3ERL/0Jo6Mw0YBpANli5kzMPnEulLY=
+	t=1748226200; cv=none; b=JzB+kelxaq8PL+CZNMKiiJzBBzV4CaUhR6SY4iSIIAVA5zVXWFKYJZpO3OBh7LJxusmuaWu8mShVdMaK8GigK0MUsB1WdjR/p1XkkCYEeAyUtIvviuwx9qEB82dspebV/JwmH/ri5LSEa8uOHV1IvAxjDKiN7I2k278quRBFCDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748226188; c=relaxed/simple;
-	bh=n2SqlytwItWt8/wF4P3nV4tFs422265MYYlBSANWFvM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k5Rsr0gkuMRbkqU2zdIWwamdfXKI8plXnGsBt+JuBJ4vRpV9g5QCPjJ9OGFwm18JWYXU9/ySAyvngOm66nAWbBHpLiweffXdLeR5aJ+HAc8SNSGw/OD54kgxQgJ0Kq/oREc5P+vNxZVsWnAScVoiprBzYforZ0XXb3QoY7eAExQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zekzu02V; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8f1928e5-472e-4140-875c-6b5743be8fd3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748226180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MHrrgO4T8/5vtp/a4llt3X0WdmaU+h5OTxvm6amIygc=;
-	b=Zekzu02VUU4sA5O/Q7hlWJRDia/qU8bJPMeFs2zxqQb1BH6yp6B3EstCyGEgyCb5+PSHyn
-	wh6v/EiZN01xVP96FIKAc8+OXWJ0aGTBTvPbw9lPiGnXDY3lSvOn8lSatgw238V+31C2YK
-	JBEtsP+6KT1Cm55H4qHnrlMTw2x7V2c=
-Date: Mon, 26 May 2025 10:22:47 +0800
+	s=arc-20240116; t=1748226200; c=relaxed/simple;
+	bh=NmqXIV/7Pk3eDXAP9hueFGbWPTqhHGafye3KtB68iuE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SvcfKqZJkhRpiOCTJzDtcAdhKUOsSfE5Hi51L2lmOHPDx4ynIAEZPTlInBxMtPrBhgHQUxtq06Rbffxl2UwB+0UPYyzRChENybcTF8lghvbXHHjQvDvrGDCvy/8+Z7FgE10X/iEF262iOxm+no570RWVr1K0BYZk1AYbJjPl4/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-27-6833d0903008
+Date: Mon, 26 May 2025 11:23:07 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
+ page->pp_magic in page_pool_page_is_pp()
+Message-ID: <20250526022307.GA27145@system.software.com>
+References: <20250523032609.16334-1-byungchul@sk.com>
+ <20250523032609.16334-13-byungchul@sk.com>
+ <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: stmmac: add explicit check and error on invalid PTP
- clock rate
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250523-stmmac_tstamp_div-v1-1-bca8a5a3a477@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <20250523-stmmac_tstamp_div-v1-1-bca8a5a3a477@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHefZe9rpcPU6rJ62khUiC5SXoFBV+qvdDkVFBFKEjX9rMqUwz
+	VxSWg0jU7lFzyUzLeYnR8jJDJJeZVqZo6uzm0mmhVqa1vGW1SeS3H/9zDr//h8NRMiPjz6kS
+	UwVNoiJBzkpoyWfvgtCLbZHKsLy6VWAwl7NQNpEOxQ4rA4bSKgTfJ9+IYbzhKQuFBS4KDK06
+	Gn6YpygYaOwTQ+/dQRpqz1VT0HehiYUc3TQFZ60mEbRV5TJwdeoOBdUZDjF0PDSw8L78NwOD
+	thwamvUlNPTmRkGjcQm4no8gaDBXi8CVfYuFK+1GFvp1vQjaH/fRkHcmF4G5zs7A9ISBjVrF
+	V5T0iPga/Tsxb7Qc4x+YQvgsezvFW0rPs7xl7LKYf9tVy/JNN6ZpvsY6LuJzMr+w/LeB1zT/
+	ta6T5c0VnTT/wtgg5sctK6PxAcnmOCFBlSZo1m2NlSgv3zCiZAdOnxjuYTNQmTQLcRzB68l0
+	fkAW8vLg8PXbjJtpHERM91soN7M4mNjtkx72w2tIUd0lzw6Fexny0hDvZl8cT7Jff2TdLMVA
+	usvOe1iGSxB53hoyl/uQ5ptOeu42mMzkt1PuChQOIMWz3FwcSDIr8zyxF95NWiq2uePFeDV5
+	VPVUlIUkf1ve40jHaKForvIyUm+y0xeRj36eQT/PoP9v0M8zGBFdimSqxDS1QpWwfq1Sm6hK
+	X3s4SW1Bf//m7qmZg1Y01rbHhjCH5N7SWHmkUsYo0lK0ahsiHCX3ky43hCll0jiF9oSgSYrR
+	HEsQUmwogKPlS6URruNxMnxEkSocFYRkQfNvKuK8/DPQisFN2WFPtD4xRbVDs/qNXW9nna/U
+	Q90bRq+H2gsKDzRi54KzURGj9mf++3aZTpX7ftihXKQ1WKMdLmvN15CM8AjHSfOvQ2Nbir9p
+	Qv1atuzfuDNGcNYX/PSejWSSggqdV9do0nSVI5+G2fvGwNPqE7ZuSb9ueyguX7jXqz76Wp6c
+	TlEqwkMoTYriD+mmdEMzAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTcRSA+e0+dh3euC6tWwbCoqShZalwolCDsFvQC6I3uFEXt+WmbWoa
+	GZoT6aG5ih5rxtIyXzFa5raQVSraSJ1MzPWcWVlklKaJj6jcJPK/j++c8/11KEysJxZTSk0m
+	r9XI0ySkCBdtW1cYXdYdq4ipsNFgstSTUDeRA3f67QSYahsRjE2+EsJoazsJlTfHMTC59Tj8
+	tExh8LFtQAi+qkEcmoptGAycf0pCiX4ag1P2agG0lLsI6G4sJeDS1G0MbPn9Quh5aCLhbf0f
+	AgabS3BwGWtw8JUmQZt5AYw/+4qg1WITwPi5chIueswkvNf7EHhaBnC4XlCKwOL0EjA9YSKT
+	JFxDzQsB5zC+EXJmaxZ3v1rKnfF6MM5ae5rkrD8uCLnXz5tI7unVaZxz2EcFXEnhN5Ib+fgS
+	5747e0mu8vOwgLM09OJch7lVuCNkv2j9YT5Nmc1rVyXIRIoLV80oo5/JmRh6QeajOvoMCqJY
+	Jo4dulxB+BlnlrHV9zoxP5NMJOv1TgY4lFnB3nIaAjsY4yPYLpPKz/MZFXvu5SfSzzQDbF/d
+	6QCLmRrEPnNLZ30I67r2AZ+9jWR/3fDMNKkZDmfv/KZmdQRb+OB6QAcxO9nOhmS/DmOWso8b
+	2wVlaJ5xTsg4J2T8HzLOCZkRXotClZpstVyZFr9Sd0SRq1HmrDyUrraimd+oyvtlsKOxnk3N
+	iKGQJJiWSWIVYkKerctVNyOWwiSh9BJTjEJMH5bnHue16SnarDRe14zCKVyykN6yh5eJmVR5
+	Jn+E5zN47b+pgApanI9OdhSE9emKH9+NoA2JVdFR2gix2HW0hTok3bx3u6YgLjOl2zWiyiu6
+	khzl2Bf5Y4Es9lGC+ljf8JBzdHDXtXfB7o1xX7pePfHlG07ELNqqVG44ICw6TwsTjqcuL2s7
+	EUxMFVkd0U8Si0OHUtZ+O9jRtS883n3WHbLGk6wq3+0tr5TgOoV8tRTT6uR/Aallo/wXAwAA
+X-CFilter-Loop: Reflected
 
-在 5/23/25 7:46 PM, Alexis LothorÃ© 写道:
-> While some platforms implementing dwmac open-code the clk_ptp_rate
-> value, some others dynamically retrieve the value at runtime. If the
-> retrieved value happens to be 0 for any reason, it will eventually
-> propagate up to PTP initialization when bringing up the interface,
-> leading to a divide by 0:
+On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
+> On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
+> >
+> > To simplify struct page, the effort to seperate its own descriptor from
+> > struct page is required and the work for page pool is on going.
+> >
+> > To achieve that, all the code should avoid accessing page pool members
+> > of struct page directly, but use safe APIs for the purpose.
+> >
+> > Use netmem_is_pp() instead of directly accessing page->pp_magic in
+> > page_pool_page_is_pp().
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/linux/mm.h   | 5 +----
+> >  net/core/page_pool.c | 5 +++++
+> >  2 files changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 8dc012e84033..3f7c80fb73ce 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+> >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> >
+> >  #ifdef CONFIG_PAGE_POOL
+> > -static inline bool page_pool_page_is_pp(struct page *page)
+> > -{
+> > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > -}
 > 
->   Division by zero in kernel.
->   CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.12.30-00001-g48313bd5768a #22
->   Hardware name: STM32 (Device Tree Support)
->   Call trace:
->    unwind_backtrace from show_stack+0x18/0x1c
->    show_stack from dump_stack_lvl+0x6c/0x8c
->    dump_stack_lvl from Ldiv0_64+0x8/0x18
->    Ldiv0_64 from stmmac_init_tstamp_counter+0x190/0x1a4
->    stmmac_init_tstamp_counter from stmmac_hw_setup+0xc1c/0x111c
->    stmmac_hw_setup from __stmmac_open+0x18c/0x434
->    __stmmac_open from stmmac_open+0x3c/0xbc
->    stmmac_open from __dev_open+0xf4/0x1ac
->    __dev_open from __dev_change_flags+0x1cc/0x224
->    __dev_change_flags from dev_change_flags+0x24/0x60
->    dev_change_flags from ip_auto_config+0x2e8/0x11a0
->    ip_auto_config from do_one_initcall+0x84/0x33c
->    do_one_initcall from kernel_init_freeable+0x1b8/0x214
->    kernel_init_freeable from kernel_init+0x24/0x140
->    kernel_init from ret_from_fork+0x14/0x28
->   Exception stack(0xe0815fb0 to 0xe0815ff8)
-> 
-> Prevent this division by 0 by adding an explicit check and error log
-> about the actual issue.
+> I vote for keeping this function as-is (do not convert it to netmem),
+> and instead modify it to access page->netmem_desc->pp_magic.
 
- From your description, I cannot determine the scope
-of "some platforms". My point is: if there are only
-a few platforms, can we find a way to handle this in
-the directory of the corresponding platform?
+Once the page pool fields are removed from struct page, struct page will
+have neither struct netmem_desc nor the fields..
 
-And there need a Fixes tag.
+So it's unevitable to cast it to netmem_desc in order to refer to
+pp_magic.  Again, pp_magic is no longer associated to struct page.
 
+Thoughts?
 
-Thanks,
-Yanteng
-> 
-> Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 918d7f2e8ba992208d7d6521a1e9dba01086058f..f68e3ece919cc88d0bf199a394bc7e44b5dee095 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -835,6 +835,11 @@ int stmmac_init_tstamp_counter(struct stmmac_priv *priv, u32 systime_flags)
->   	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
->   		return -EOPNOTSUPP;
->   
-> +	if (!priv->plat->clk_ptp_rate) {
-> +		netdev_err(priv->dev, "Invalid PTP clock rate");
-> +		return -EINVAL;
-> +	}
-> +
->   	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
->   	priv->systime_flags = systime_flags;
->   
-> 
-> ---
-> base-commit: e0e2f78243385e7188a57fcfceb6a19f723f1dff
-> change-id: 20250522-stmmac_tstamp_div-f55112f06029
-> 
-> Best regards,
+	Byungchul
 
+> The reason is that page_pool_is_pp() is today only called from code
+> paths we have a page and not a netmem. Casting the page to a netmem
+> which will cast it back to a page pretty much is a waste of cpu
+> cycles. The page_pool is a place where we count cycles and we have
+> benchmarks to verify performance (I pointed you to
+> page_pool_bench_simple on the RFC).
+> 
+> So lets avoid the cpu cycles if possible.
+> 
+> -- 
+> Thanks,
+> Mina
 
