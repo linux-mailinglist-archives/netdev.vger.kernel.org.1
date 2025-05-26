@@ -1,181 +1,147 @@
-Return-Path: <netdev+bounces-193445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A34BAC40F6
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:06:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29269AC40F9
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9F177AAC0F
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:05:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA32F7A4F89
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11F0204F99;
-	Mon, 26 May 2025 14:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34B5192D6B;
+	Mon, 26 May 2025 14:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="geZPHyLb"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QdrvAqEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133343C465
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 14:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DEC3C465
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 14:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748268375; cv=none; b=d67CSRtwzZyeeIQrwfwiIGlzH6CA5yl+wFP3Q9ji93jYlQOEQZv1neuUgKq3o174LrwqaWEszU2rhwUjnf78cIsLo67H9jxl4ftf2+g1oUH+MuhmEf+IXNrJkb6iRa/BWaZS4RPU3aMfpv3P82pR8r1Quv2+g81UOgvxAfVQUEQ=
+	t=1748268415; cv=none; b=UBqowUPYR4lHSVm8NJgXUj3wrbKu3q1YXzCZ90ep0lnU64wjxsGFSFLpqror2VHmCm77Kexu1wpDsFR7781ZnRnTC4GC8ch5FVZtywsDAlaN4MpPhzsXF2wPjpJj4i9bNdbJAZHFkZgsta8wLxvMkoQXVYlBfkPOhIYGDtrpWJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748268375; c=relaxed/simple;
-	bh=KzhaOxqOJsWeZIeq7vo6rI0JW45k0M6z2V5NAlTmR0s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NR77hhLU74eVzV3i+Taq5eEXGa60P0uCRXTPG35JUP8/x0LAV7TTMdvm0Vkwlw8aD3adWt5gilhtBE7q2FUWykpsf6+r9+wY3Kh6Fu8XwqtTtYAn7/hcPHeuB51yJFHc4fgHeB253qdiUWFhO/NhBuZ3Lg/Nj5MKiV1Cbt1OsYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=geZPHyLb; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748268360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=4/sGzOaVUDnFa7JhGT/QLWfv+Pie+2XGZOuEFBnSP9Q=;
-	b=geZPHyLbkIGxuqAKl7X1cdpupmFcJ3Jo7W1sGAfOWtS8+/kIogQu54+Rn4YQzmI69qgHHA
-	Q+qPn7nag/Seu0pu2TIKVEXTAn4CTHEVXo5UUGDt6fxZd7ebMU9iODBsrYds0nX0lQQhfN
-	P4x81ucPmbNSsPJZ5SMPNAwFSM6AsnM=
-From: Yajun Deng <yajun.deng@linux.dev>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yajun Deng <yajun.deng@linux.dev>
-Subject: [PATCH net-next v2] net: phy: Add c45_phy_ids sysfs directory entry
-Date: Mon, 26 May 2025 22:05:39 +0800
-Message-Id: <20250526140539.6457-1-yajun.deng@linux.dev>
+	s=arc-20240116; t=1748268415; c=relaxed/simple;
+	bh=qGTp0UHyfTMgcQ+KuObGkrJPDMheL2EtIN6i9hfGfio=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=govbv6TzMmV93NemLqGNLxoCI1dsJlXkypkedsqbl/U+dZCNQHrIQ/jUXmuRaD95Gne4UV3Fo3F0uxKKyy/zLKQ6t0Pme1ldcMgsmOVmtWKUpGSc8id+z+RB8RkVSp3cv9Zf27iHrIooqbHuYUxux4LyAuwkcB8GBwnsZFtIbzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QdrvAqEp; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54QA4rfC023637
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 14:06:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	qGTp0UHyfTMgcQ+KuObGkrJPDMheL2EtIN6i9hfGfio=; b=QdrvAqEp3ZSusAU5
+	YbOC+P/L6CDWQbcFwctevCZrzXXw9v+Rv3/cqErudbNs5s0P5n6biCl/Hx18SSCV
+	FVgEDuBFPFXuY860HKdG8aq4hX7kcM74PEjhR8o+4spQzAzslMEfa2VwveT+KWH8
+	T+5EiP6lm7Ksv5xLVh12LB8YE3uTxcliKLTxm4t/2BgoeILyPe3N8NrnRcaX0pVz
+	v1SiwPbxYuOGsheJxRRabszvTayCH7Ww+Yk8ojxbnqVx8iPp+P0JvxPF7WdisLVa
+	1Qud8b0uSG/i8GBv5ZT5ECuO8l1urQ3u2KatG0c4YCGdKU4Vh7Lx76uorSNjWrxv
+	QIjPFA==
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46u79p4afr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 14:06:53 +0000 (GMT)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-85b3b781313so448787439f.1
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 07:06:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748268412; x=1748873212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qGTp0UHyfTMgcQ+KuObGkrJPDMheL2EtIN6i9hfGfio=;
+        b=TfxlxvS25ZzuO4GyqkcsLBVMvLspvp+SB+sE2E8LnPYnyJb4WihaGnMtn07d5rroWc
+         t2YnapMEU+uautaMhXqR502Hn+AY39I4hitv5ddCs4wa4lgRTfZkkWvGg38ShWfgKQgo
+         x9Sy8Hm3HPDYE5wiM2BEG1+5I6ENzlNTP5/jMQ1atjh3xr5BgZne6rXn9EBN6cY8TKXf
+         IVd4wudWA1erTyOlaNyRMtZzPw0DRn4ai1WDP/oPpHWGL/vj1zCSJu6YYGKuJutsWRkD
+         FYIxdLJNlJkSS6HpoqGcLddGWxXhkXub7w3Db3Sq2eRi3u4lqEttAHyyoLv1cXdUMih8
+         Bmog==
+X-Forwarded-Encrypted: i=1; AJvYcCVDAk9dRY7vHmXAf7I421Q2YJ6x/rEXWO85xfz5/xHbXmBPMeQO6JaSmFbtlkJ5KZBNvj4HUYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWDmqrIVnKK8XKJMWn5sYu7Y+KrCjCPeWQQW/YLliGivuEbh1B
+	TtNppt4YU4WYeY60A0P5eWSUFluTvXRX4XJkTstZlBX0fnVgnqY3NdIRg1xLlyswf/N27SXjDSc
+	4ONXAQBMwai3/bO0jqxBJEGiBboJRNs/uYW27/mxwi/D+C6DYCYWEPXor3hmjOy/EOJAxTekvhG
+	QVQqytya+JklwCYCn0eY9bu1HDR0Fhf0uV04atebKtVmCf
+X-Gm-Gg: ASbGnctXoc7xKZ0eH3Yit8AjiLckyrIBl1M5K928isbPyvAznF9Y0Og8IA1BFRI8mvu
+	oZyZ03oZ2m9tcZSiqLhoArDbzZVsDEGAcPWIwfvbpU6s605PwAQQghjKC051eSKPO2rmf9ro=
+X-Received: by 2002:a05:6602:4741:b0:861:c758:ec35 with SMTP id ca18e2360f4ac-86cbb893f78mr806283639f.11.1748268412052;
+        Mon, 26 May 2025 07:06:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHH5Obxa3bfZjBKEXg0mVkbndSXFjYUBVhG8rBfcNn1Ifh2rBmHY5vicBI2fFJCR0MkXfiWoHRgPEy92MpFZTM=
+X-Received: by 2002:ac8:5cca:0:b0:477:c04:b512 with SMTP id
+ d75a77b69052e-49f46657f6dmr154531781cf.16.1748268400773; Mon, 26 May 2025
+ 07:06:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250526130519.1604225-1-dnlplm@gmail.com>
+In-Reply-To: <20250526130519.1604225-1-dnlplm@gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Mon, 26 May 2025 16:06:29 +0200
+X-Gm-Features: AX0GCFtP6_19YNJd_Z6Rhdjb3-NTx8jPH9eBW7d3hDCNVyoDxAFcqt8YWRjvxBA
+Message-ID: <CAFEp6-06ATV_rh_KWvjgNoiw67WPvAE-gF_gU-DJdcycDiYVqA@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] net: wwan: mhi_wwan_mbim: use correct mux_id for multiplexing
+To: Daniele Palmas <dnlplm@gmail.com>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Slark Xiao <slark_xiao@163.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-GUID: HlpPuLgbt6-Nua6BcAVWFL9vNox6FjH5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDExOSBTYWx0ZWRfXwdTZ+KsGwduT
+ hvE9yTDTaVRzoH2K8Mz3WtiBGwPYCsP40WuE7j93Qus/seRsI2UjJnyQUWJ5zdehcyTUxHVIMEo
+ i3Eyq6otFVlwjIsWHiwNGf27dcrkiRy/PZH8u/vL6okpdT1WHk7l6blZgZphumvjdf1qFS6wFQ/
+ ijKl63GrUtuzmleYbOX2jN2ILtKj7poziWibm0HtOtxxGt3z8yTxuA3/6i7/QGASYgDqrlPETNK
+ 9CJXyAZxPzs2yFFBx6BQ4S9avCmEQIw0F7Bte6xeEwEiwTAGgw+D+sJTBmGyq33RYfYEpsJIzeS
+ rz1cTFWFHv3pBUCBav0WVjkethTzx2DeHM9KDh1kqZ8HoBMNUqUXbLoT/05KM2pty7lFho2lZvh
+ BaoffFK+vj9EwMbRnuJ+g6RalcL8nEa+Dfv47pMBpXEyw9EzdJUdiOWfs2uQ0OIzw0btLU8L
+X-Authority-Analysis: v=2.4 cv=HNnDFptv c=1 sm=1 tr=0 ts=6834757d cx=c_pps
+ a=uNfGY+tMOExK0qre0aeUgg==:117 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10
+ a=pGLkceISAAAA:8 a=GM3u2P2812537teep8AA:9 a=QEXdDO2ut3YA:10
+ a=61Ooq9ZcVZHF1UnRMGoz:22
+X-Proofpoint-ORIG-GUID: HlpPuLgbt6-Nua6BcAVWFL9vNox6FjH5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-26_07,2025-05-26_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 mlxlogscore=916 phishscore=0 mlxscore=0 spamscore=0
+ bulkscore=0 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505260119
 
-The phy_id field only shows the PHY ID of the C22 device, and the C45
-device did not store its PHY ID in this field.
+Hi Daniele,
 
-Add the new phy_mmd_group, and export the mmd<n>_device_id for the C45
-device. These files are invisible to the C22 device.
+On Mon, May 26, 2025 at 3:19=E2=80=AFPM Daniele Palmas <dnlplm@gmail.com> w=
+rote:
+>
+> When creating a multiplexed netdevice for modems requiring the WDS
+> custom mux_id value, the mux_id improperly starts from 1, while it
+> should start from WDS_BIND_MUX_DATA_PORT_MUX_ID + 1.
+>
+> Fix this by moving the session_id assignment logic to mhi_mbim_newlink.
 
-Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
----
-v2: Only one vale for per file and invisible to the C22 device.
-v1: https://lore.kernel.org/all/20250523132606.2814-1-yajun.deng@linux.dev/
----
- .../ABI/testing/sysfs-class-net-phydev        | 10 +++
- drivers/net/phy/phy_device.c                  | 62 ++++++++++++++++++-
- 2 files changed, 70 insertions(+), 2 deletions(-)
+Currently, the MBIM session ID is identical to the WWAN ID. This
+change introduces a divergence by applying an offset to the WWAN ID
+for certain devices.
 
-diff --git a/Documentation/ABI/testing/sysfs-class-net-phydev b/Documentation/ABI/testing/sysfs-class-net-phydev
-index ac722dd5e694..c97029d77b16 100644
---- a/Documentation/ABI/testing/sysfs-class-net-phydev
-+++ b/Documentation/ABI/testing/sysfs-class-net-phydev
-@@ -26,6 +26,16 @@ Description:
- 		This ID is used to match the device with the appropriate
- 		driver.
- 
-+What:		/sys/class/mdio_bus/<bus>/<device>/c45_phy_ids/mmd<n>_device_id
-+Date:		May 2025
-+KernelVersion:	6.16
-+Contact:	netdev@vger.kernel.org
-+Description:
-+		This attribute contains the 32-bit PHY Identifier as reported
-+		by the device during bus enumeration, encoded in hexadecimal.
-+		These C45 IDs are used to match the device with the appropriate
-+		driver. These files are invisible to the C22 device.
-+
- What:		/sys/class/mdio_bus/<bus>/<device>/phy_interface
- Date:		February 2014
- KernelVersion:	3.15
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 0f6f86252622..5678191fb283 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -645,11 +645,69 @@ static struct attribute *phy_dev_attrs[] = {
- 	&dev_attr_phy_dev_flags.attr,
- 	NULL,
- };
--ATTRIBUTE_GROUPS(phy_dev);
-+
-+static const struct attribute_group phy_dev_group = {
-+	.attrs = phy_dev_attrs,
-+};
-+
-+#define MMD_INDICES \
-+	_(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) \
-+	_(9) _(10) _(11) _(12) _(13) _(14) _(15) _(16) \
-+	_(17) _(18) _(19) _(20) _(21) _(22) _(23) _(24) \
-+	_(25) _(26) _(27) _(28) _(29) _(30) _(31)
-+
-+#define MMD_DEVICE_ID_ATTR(n) \
-+static ssize_t mmd##n##_device_id_show(struct device *dev, \
-+				struct device_attribute *attr, char *buf) \
-+{ \
-+	struct phy_device *phydev = to_phy_device(dev); \
-+	return sysfs_emit(buf, "0x%.8lx\n", \
-+			 (unsigned long)phydev->c45_ids.device_ids[n]); \
-+} \
-+static DEVICE_ATTR_RO(mmd##n##_device_id)
-+
-+#define _(x) MMD_DEVICE_ID_ATTR(x);
-+MMD_INDICES
-+#undef _
-+
-+static struct attribute *phy_mmd_attrs[] = {
-+	#define _(x) &dev_attr_mmd##x##_device_id.attr,
-+	MMD_INDICES
-+	#undef _
-+	NULL
-+};
-+
-+static umode_t phy_mmd_is_visible(struct kobject *kobj,
-+				  struct attribute *attr, int index)
-+{
-+	struct device *dev = kobj_to_dev(kobj);
-+	struct phy_device *phydev = to_phy_device(dev);
-+	const int i = index + 1;
-+
-+	if (!phydev->is_c45)
-+		return 0;
-+	if (i >= ARRAY_SIZE(phydev->c45_ids.device_ids) ||
-+	    phydev->c45_ids.device_ids[i] == 0xffffffff)
-+		return 0;
-+
-+	return attr->mode;
-+}
-+
-+static const struct attribute_group phy_mmd_group = {
-+	.name = "c45_phy_ids",
-+	.attrs = phy_mmd_attrs,
-+	.is_visible = phy_mmd_is_visible,
-+};
-+
-+static const struct attribute_group *phy_device_groups[] = {
-+	&phy_dev_group,
-+	&phy_mmd_group,
-+	NULL,
-+};
- 
- static const struct device_type mdio_bus_phy_type = {
- 	.name = "PHY",
--	.groups = phy_dev_groups,
-+	.groups = phy_device_groups,
- 	.release = phy_device_release,
- 	.pm = pm_ptr(&mdio_bus_phy_pm_ops),
- };
--- 
-2.34.1
+Whether this is acceptable likely depends on how the MBIM control path
+handles session addressing. For example, if mbimcli refers to
+SessionID 1, does that actually control the data session with WWAN ID
+113?
 
+Regards,
+Loic
 
