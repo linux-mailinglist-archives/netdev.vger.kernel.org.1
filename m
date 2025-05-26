@@ -1,96 +1,155 @@
-Return-Path: <netdev+bounces-193508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FE0AC4434
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 22:00:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E3F7AC4451
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 22:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85723189B84E
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1706189B06C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541EF1DF739;
-	Mon, 26 May 2025 19:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1AE2405ED;
+	Mon, 26 May 2025 20:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMermqow"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9DNDbVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2332314830A;
-	Mon, 26 May 2025 19:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E577123ED75;
+	Mon, 26 May 2025 20:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748289596; cv=none; b=OCo5Lcitnopo4gsMthZUuSo2ADI9gBfUWdDAVcjhBdH0DNuXuqIRLb1LmDH0DH5/wetZJFAws8Ool+xO+JD6yvYIkYqBTn6oTN+UCgmijhE6b7VH41aBgvHejpKzNZsH8euUJQWlgpRMft6X20AVH1bZ5Sq24sirbHHL3pn4mjM=
+	t=1748290525; cv=none; b=jshFt4FrrqHkIj1N9wxkLc5SCsX8THSTV8aVJcCXN3Jek9f+g653uAhExbhndmhhwTe/DEtE8cC4vwH/JmMxulPZdomcrZNVF/pWhLye3YUDiyURGGF2ae1R4aA3YDxW6SGFYH0/9QAtGKbycRC6Zz9juYWgfOslg4YYFFzI+5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748289596; c=relaxed/simple;
-	bh=o5410J5V/wER+tLzUSDIkrzGAIb8DMmxc072FNGuheg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=A/v9GhwtCv+wzZWHQK2Lw7u16lefxvKjeOoHcSxlWKtfm9LmN74H2CoLceu2+qcaG2JK26EM/0VQWAMHlxo8aj/Caw1qXMyHkyrHQ/3FedqgegqWv2gBy7kSGFPQBE9foi8ftW97YSUQG+Y9eH4HXU//8BhZtg5Jc+ndPWBYoqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMermqow; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88564C4CEE7;
-	Mon, 26 May 2025 19:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748289594;
-	bh=o5410J5V/wER+tLzUSDIkrzGAIb8DMmxc072FNGuheg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JMermqowHisW8Pjp3O6dbZiZBzGx3nSr4RDUMR80MUczrQK/JeiJPMjYd15hu2NYK
-	 cZs811cdnkemGTlrCQQOL3J2UcZt9uu12Xol4PfvnKKxxSUsj8LfKmvQM8C9WL5Fjm
-	 ubfq87rUvPxlqA7ahP68RN4U3mZybKahi+rUoerzaBDXucvgR6IAvAxirtiJbp4eAX
-	 LYGD/2R2Z9xO7DGQ0Zve1MK6TCvPlkS99wVYEO5GPkbFJ3QZXV1U/7NoJDodcGrQb0
-	 9OWYF4yJHRpvAY7vWyJipCvJVHEq8+Y6o18rlZW0b+9aGiue7zYq6M7RW1nxD7C3PV
-	 9fyunoVzbON3A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3401B3805D8E;
-	Mon, 26 May 2025 20:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748290525; c=relaxed/simple;
+	bh=ohtRGyK05Q4++k9YprJKtDiINTrJ38VxHWprFUmxbjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bQ8zattVoaORx5stu95k3hvG1U2UbF/tOj0RQpIhGVe4Vk6Xu5p/y1Gneiu6fypvWK4MypheO62JUpBF/w37rdXe0zWna6CybbUyJBcsDwvb5zBrw4aTe439tIkutQ8b+T0Vl8Gpgm3rZpc+5M8zYVRe+I8rvHf570SXcH16Agg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9DNDbVK; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54b10594812so3501928e87.1;
+        Mon, 26 May 2025 13:15:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748290522; x=1748895322; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iz3Z0SmA3CH68uW+s2njhq2Ak0+uNQJ+8t0g3Yz/k4k=;
+        b=a9DNDbVKGQBqdaEjKgtw9YCJBVzTBuU7djkQ4IVB6D3AxIVpmGDFReDJw//cik0/US
+         gkeAMRanuNX0cPpR6WYvMZVKrcV3SO+3U0Q/4aYSvJTqYx5kW+AbRPOCJeScvTygRw7j
+         NxyO2f/9u2CkH6KAmoxnLzd/kljAm+zyWPdZ7a7U/TfY3TJaCkZI40mMEZOUnuJ7vaKJ
+         0eFy7hhAnwje2gxLUDnU4/bQvPMfCd4VHPe3m9rl7rX4p4Fe6NhSbO8FSvx2vmGs/kYG
+         g5uDjBjMxKgDVc4uHZUAp0ovxOSDAZTF6ATTCV8rzWh/XoCwhd5ZDkweV63wyhpQyiDB
+         K1Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748290522; x=1748895322;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iz3Z0SmA3CH68uW+s2njhq2Ak0+uNQJ+8t0g3Yz/k4k=;
+        b=Y4hmwNrAa2/9DiK82PGmP049PBXeZ/PY7G0/l5mf9/ud41EhPPIEm/5rz90qJlE7O5
+         MgdpohQaCVIN2TvsDWRz6vU5fS7fmWZNYqn/IYVmcIw+HK9DmeBp+e4yo5LzuqAcbkLr
+         WcEWUsFg105fUJjBjIU5oKvsC/oYyUC7NhNr2O9udLAndx0ATZKUdSaSYMiamgOj0+TP
+         o4Q2p0lU3Ifh13sPnp9A3dfcgATzkkgJXvgNjbaTgTR/3ssaZxqaK6nMtMx0XqlwJop2
+         tcV/3flfw5QuKuebVDkKABPLfdof7n+MsK8eq9DnvmAiQdtpQCmjhQAYrxA2IHZjvR8E
+         K6Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUisb2iFKypYmQz25ZW01AuDR9EmRC6qvs7IiLiom/S0oPvm+jnqSxNmzpPCTyXiRvD8HKQN7U7@vger.kernel.org, AJvYcCUnRZ2AeQgp3bSNwVshFZt73P8PSuDKXHRRn8YuzxLnvBD2TsAXcwVv9suy44mtLaOg1TjyV30E26zmeYk=@vger.kernel.org, AJvYcCWy5Nq5aiNUZbdWNaiSCJbnHoy3bFIuT2UWASG3OXD+m3+eM+4ka9P1Gclb7Vmtzon4WxSrAtgm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsXT6QbhM6ez3PAjR87Er9IlAIYOpMxUJQMAazqH+pxNyMfF7w
+	bYAqBfa0BGrLx6nRTWl+4IW5ipcUj9+ad4NaQSLymRd7MdXU4bXvxi3b
+X-Gm-Gg: ASbGncukH/b8XVoYXbafd6/HNRG6zhC8jRANoouqrXvBkP69ogHAgh9lgUj1hNifEn8
+	SueFimg3i1PQFV8iNqkuOsfbfr9eIC2FqqjnL1C5gIcLU9nvZA6X5MHiRk3aZI+jU6RxxtdzZ1K
+	Lpd2S0s2aR5lGUMgqfw1V8+JARdwRMkU/5+CntNcK+pfh+oSwtty9zkI7+CmPUT/bOeFR+axiSd
+	MRTKWsgyGKoX3sHrf/r0ZIHRryLCqHaVKl5XewuEAeiZ/3rxgfN1W9RZ4DAbIuib05BflbkpAOu
+	TSwrwGRcPO5ibvLHfj49KJGLvTgM7BLeFLtbpAdDWYnbcICLkRwCWpMpTRNuJnvlhg==
+X-Google-Smtp-Source: AGHT+IGycTsl0j5+lha/9zLWk2PFmXfqE+GNYPHs8FfhaZmKI2qkSFlQux6x1txIjajzO9kiHd4gIQ==
+X-Received: by 2002:a05:6512:b9a:b0:549:6759:3979 with SMTP id 2adb3069b0e04-5521c7ade8fmr3277731e87.18.1748290521529;
+        Mon, 26 May 2025 13:15:21 -0700 (PDT)
+Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5532642ee85sm163125e87.138.2025.05.26.13.15.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 13:15:21 -0700 (PDT)
+Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
+	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 54QKFHOQ030107;
+	Mon, 26 May 2025 23:15:18 +0300
+Received: (from paul@localhost)
+	by home.paul.comp (8.15.2/8.15.2/Submit) id 54QKFF40030106;
+	Mon, 26 May 2025 23:15:15 +0300
+Date: Mon, 26 May 2025 23:15:14 +0300
+From: Paul Fertser <fercerpav@gmail.com>
+To: Jerry C Chen/WYHQ/Wiwynn <Jerry_C_Chen@wiwynn.com>
+Cc: "patrick@stwcx.xyz" <patrick@stwcx.xyz>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH v1] net/ncsi: fix buffer overflow in getting version id
+Message-ID: <aDTL0uWIgLRgyu6s@home.paul.comp>
+References: <20250515083448.3511588-1-Jerry_C_Chen@wiwynn.com>
+ <aCWuCPsm+G5EBOt/@home.paul.comp>
+ <SEZPR04MB685354203C242413D1EBE96CB098A@SEZPR04MB6853.apcprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net/mlx5_core: Add error handling
- inmlx5_query_nic_vport_qkey_viol_cntr()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174828962901.1030381.7843371532564989086.git-patchwork-notify@kernel.org>
-Date: Mon, 26 May 2025 20:00:29 +0000
-References: <20250521133620.912-1-vulab@iscas.ac.cn>
-In-Reply-To: <20250521133620.912-1-vulab@iscas.ac.cn>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEZPR04MB685354203C242413D1EBE96CB098A@SEZPR04MB6853.apcprd04.prod.outlook.com>
 
-Hello:
+Hi Jerry,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Fri, May 23, 2025 at 07:32:26AM +0000, Jerry C Chen/WYHQ/Wiwynn wrote:
+> Sorry for late replay, it takes some effort to change company policy of the proprietary.
 
-On Wed, 21 May 2025 21:36:20 +0800 you wrote:
-> The function mlx5_query_nic_vport_qkey_viol_cntr() calls the function
-> mlx5_query_nic_vport_context() but does not check its return value. This
-> could lead to undefined behavior if the query fails. A proper
-> implementation can be found in mlx5_nic_vport_query_local_lb().
-> 
-> Add error handling for mlx5_query_nic_vport_context(). If it fails, free
-> the out buffer via kvfree() and return error code.
-> 
-> [...]
+I can imagine! However it's not necessary to send patches from
+corporate e-mail address via the corporate mail server, you can just
+send from your own personal account with the appropriate From:
+specification to attribute it to your corporate address[0].
 
-Here is the summary with links:
-  - [v3] net/mlx5_core: Add error handling inmlx5_query_nic_vport_qkey_viol_cntr()
-    https://git.kernel.org/netdev/net/c/f0b50730bdd8
+> For the questions:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Please consider just using standard inline method of replying in the
+future, letting your MUA quote the original message for context
+properly.
 
+> 1. What upstream tree did you intend it for and why?
+>  - Linux mainline
+>   We are developing openBMC with kernel-6.6.
+>   For submitting patch to kernel-6.6 stable tree, it should exist in mainline first.
+>   Reference: https://github.com/openbmc/linux/commits/dev-6.6/
 
+Indeed, and the process of submitting to mainline implies that for
+each subsystem there's a tree which subsystem maintainer(s) use for
+the integration and which is later offered as a the pull request for
+the upcoming version, usually it's called {subsystem}-next (also such
+trees get tested together being merged into linux-next regularly). I
+guess in this case you should make sure your patch applies to net-next
+(and makes sense there). Neither the current submission[1] nor the
+previous one[2] were applicable (see "netdev/tree_selection success
+Guessing tree name failed - patch did not apply" and indeed I tried to
+"git am" it manually to what was "net-next" back then and it failed.
+
+> 2. Have you seen such cards in the wild? It wouldn't harm mentioning
+> specific examples in the commit message to probably help people
+> searching for problems specific to them later. You can also consider
+> adding Fixes: and Cc: stable tags if this bugfix solves a real issue
+> and should be backported to stable kernels.
+>  - This NIC is developed by META terminus team and the problematic string is:
+>  The channel Version Str : 24.12.08-000
+>  I will update it to commit message later.
+
+I see, thank you. Sigh, this 12 characters limit doesn't seem to make
+much sense, too restrictive to fit a useful part of "git describe
+--tags" even, but it is what it is...
+
+[0] https://www.kernel.org/doc/html/latest/process/submitting-patches.html#from-line
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/20250515083448.3511588-1-Jerry_C_Chen@wiwynn.com/
+[2] https://patchwork.kernel.org/project/netdevbpf/patch/20250227055044.3878374-1-Jerry_C_Chen@wiwynn.com/
 
