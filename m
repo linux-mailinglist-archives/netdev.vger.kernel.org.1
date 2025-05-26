@@ -1,199 +1,156 @@
-Return-Path: <netdev+bounces-193360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51144AC39C5
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:23:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 046F0AC39D9
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:28:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01A527A41AD
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:22:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE91E7A170D
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F541D5CFB;
-	Mon, 26 May 2025 06:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198141D5CFB;
+	Mon, 26 May 2025 06:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="VJS7P/0M"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="mK/QDqi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE13111BF;
-	Mon, 26 May 2025 06:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930F31C3C18
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748240605; cv=none; b=NFpb+g2UBGp7BY6pOvkDIMfVt0rx6RRGRN1Ugz5z5IrOuriXDub7JGRL2pz3U62NaBqKjup0r5RIKln7XsfVtjE00czGXjR3ZthzcsCvGQJCNnaCG+RYTzqn8GzAlDcYZP2AYox8eExDRqV3OMfGTdIiILXx1lFUxZ5p6l3PLGg=
+	t=1748240904; cv=none; b=HqsMi9STLwYcWMS1o0O3ykdenMzDWJ3TiF2U0lTH0FKOHonLD0ompJnu/dfw0J18/ExrxP95wVJptF8hamUBZs+LxJ7XMihfCGCmSSTUjDmwYCfBk7Aaf7oi9+PiXLxcrb1f9c8ov+KTq1UwMkMcaZ+2zp1P1TVq8iScWXe7egI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748240605; c=relaxed/simple;
-	bh=ObxhfhJO1wqYTPvk9WDT4XkdiXyzg47ND6UAXJH9JL4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=M3bI6mDH+8UslQch2q0pX7SwuqrCVSaal/01DZEqcZsDxvbYJNedwvxmACZ2xNhx80fZtE3wWhe1bw6qUzKf4Jbpm+Rfv4ErB6n951YveYeVySO7KXCEZ6KqVVDjrERrlZ76oYXDcwz0XxeDlmwYjnRSphdZPOZyevYurYuk5lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=VJS7P/0M; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: e9e08ae439f911f082f7f7ac98dee637-20250526
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=/KaboblPNYRpntWTtN9kl7nCr2XNw7RsQhYTZAFwyyw=;
-	b=VJS7P/0MtYw5uWfdSPhc98Z1XzaQXcm7ZVu1elGFu7ta2qZazzbbgEGAJYDlvg9I3pzQuuT67zj9ESwBVSoB06XJLgzXR6xY7Re3BIZzqSNSl+WIeLricdWwho46Vjx062FBHkNYu6rndBavUqR+eFosAmaCF0uT2XwiIgZlRko=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.2.1,REQID:523ca532-28ad-4a51-8eb2-3684f12fcc06,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:0ef645f,CLOUDID:656ef957-abad-4ac2-9923-3af0a8a9a079,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: e9e08ae439f911f082f7f7ac98dee637-20250526
-Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw02.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 213772445; Mon, 26 May 2025 14:23:18 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Mon, 26 May 2025 14:23:16 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Mon, 26 May 2025 14:23:15 +0800
-From: Shiming Cheng <shiming.cheng@mediatek.com>
-To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
-	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<shiming.cheng@mediatek.com>, <lena.wang@mediatek.com>
-Subject: [PATCH v2] t: fix udp gso skb_segment after pull from frag_list
-Date: Mon, 26 May 2025 14:26:31 +0800
-Message-ID: <20250526062638.20539-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1748240904; c=relaxed/simple;
+	bh=0fEu2ww12B0cIwpXsUsdj4Q/dIfImQT955vEb70tZjc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=trfR5CCaHjPJOtb9EaxuHi6wkEaK3b2tbQngJW1yY2xd5lDmWAjqhGu0//Z30wRDvEo8tz1ZOx6sbtMB5OnN3c6zRkStxlpmfZo+2IwCBdmtuqbSSsmiG4Rn0IVlUKaLBLKtpqzIR8QhCQempwvAC3jtgsyZqMZe4wck8lV+Q28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=mK/QDqi7; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 63FD02074F;
+	Mon, 26 May 2025 08:28:12 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BphE7bhS4Qvg; Mon, 26 May 2025 08:28:11 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id C83B8204D9;
+	Mon, 26 May 2025 08:28:11 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com C83B8204D9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1748240891;
+	bh=6pZuzxL9PWxTEEOR/RvRN+eaUxydotYWWBCu+Lm5yCY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=mK/QDqi75ygadtjhqvts1bRv8WRVbzKJisEPn6X1V2RTXIKXeWlGOhyHiOqAS3Bdt
+	 IXIrsOQfFZO68j6y7XbJ+BP2PyyLd27p6NjO9A4rRk1xYHK/Zp5259aGRVh2IpdLqt
+	 8FtRtp4qHIMSIz/TvUC47W1NI+HSeeGYefdNAgK8UNpKQb0jHYSd8SReUSHd0/QYZ2
+	 Dhh4hxEYFoHSxrXQc5tzAAwJH3yNlJLIDGhYrm5EnTki/57VhA5Hejo2F1rkLe5E4Z
+	 tCQJGvwTb8DZ4pklKm0VWOYkOcLR92h2o1Srx9k91e367oDgPJmLUNmOy2hKKXLUq7
+	 1LaAif4JX0/Xw==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 26 May 2025 08:28:11 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 26 May
+ 2025 08:28:11 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 97BC6318174D; Mon, 26 May 2025 08:28:10 +0200 (CEST)
+Date: Mon, 26 May 2025 08:28:10 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, Antony Antony <antony.antony@secunet.com>,
+	Tobias Brunner <tobias@strongswan.org>, Florian Westphal <fw@strlen.de>
+Subject: Re: [PATCH ipsec 2/2] xfrm: state: use a consistent pcpu_id in
+ xfrm_state_find
+Message-ID: <aDQJ+kt5c0trlfo5@gauss3.secunet.de>
+References: <cover.1748001837.git.sd@queasysnail.net>
+ <6d0dd032450372755c629a68e6999c3b317c0188.1748001837.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-MTK: N
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6d0dd032450372755c629a68e6999c3b317c0188.1748001837.git.sd@queasysnail.net>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Detect invalid geometry due to pull from frag_list, and pass to
-regular skb_segment. if only part of the fraglist payload is pulled
-into head_skb, When splitting packets in the skb_segment function,
-it will always cause exception as below.
+On Fri, May 23, 2025 at 05:11:18PM +0200, Sabrina Dubroca wrote:
+> If we get preempted during xfrm_state_find, we could run
+> xfrm_state_look_at using a different pcpu_id than the one
+> xfrm_state_find saw. This could lead to ignoring states that should
+> have matched, and triggering acquires on a CPU that already has a pcpu
+> state.
+> 
+>     xfrm_state_find starts on CPU1
+>     pcpu_id = 1
+>     lookup starts
+>     <preemption, we're now on CPU2>
+>     xfrm_state_look_at pcpu_id = 2
+>        finds a state
+> found:
+>     best->pcpu_num != pcpu_id (2 != 1)
+>     if (!x && !error && !acquire_in_progress) {
+>         ...
+>         xfrm_state_alloc
+>         xfrm_init_tempstate
+>         ...
+> 
+> This can be avoided by passing the original pcpu_id down to all
+> xfrm_state_look_at() calls.
+> 
+> Also switch to raw_smp_processor_id, disabling preempting just to
+> re-enable it immediately doesn't really make sense.
+> 
+> Fixes: 1ddf9916ac09 ("xfrm: Add support for per cpu xfrm state handling.")
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> ---
+>  net/xfrm/xfrm_state.c | 19 ++++++-------------
+>  1 file changed, 6 insertions(+), 13 deletions(-)
+> 
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index ff6813ecc6df..3dc78ef2bf7d 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -1307,14 +1307,8 @@ static void xfrm_hash_grow_check(struct net *net, int have_hash_collision)
+>  static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
+>  			       const struct flowi *fl, unsigned short family,
+>  			       struct xfrm_state **best, int *acq_in_progress,
+> -			       int *error)
+> +			       int *error, unsigned int pcpu_id)
+>  {
+> -	/* We need the cpu id just as a lookup key,
+> -	 * we don't require it to be stable.
+> -	 */
+> -	unsigned int pcpu_id = get_cpu();
+> -	put_cpu();
+> -
+>  	/* Resolution logic:
+>  	 * 1. There is a valid state with matching selector. Done.
+>  	 * 2. Valid state with inappropriate selector. Skip.
+> @@ -1381,8 +1375,7 @@ xfrm_state_find(const xfrm_address_t *daddr, const xfrm_address_t *saddr,
+>  	/* We need the cpu id just as a lookup key,
+>  	 * we don't require it to be stable.
+>  	 */
+> -	pcpu_id = get_cpu();
+> -	put_cpu();
+> +	pcpu_id = raw_smp_processor_id();
 
-Valid SKB_GSO_FRAGLIST skbs
-- consist of two or more segments
-- the head_skb holds the protocol headers plus first gso_size
-- one or more frag_list skbs hold exactly one segment
-- all but the last must be gso_size
+This codepath can be taken from the forwarding path with preemtion
+disabled. raw_smp_processor_id will trigger a warning in that case,
+maybe better to use raw_cpu_ptr?
 
-Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-modify fraglist skbs, breaking these invariants.
-
-In extreme cases they pull one part of data into skb linear. For UDP,
-this  causes three payloads with lengths of (11,11,10) bytes were
-pulled tail to become (12,10,10) bytes.
-
-When splitting packets in the skb_segment function, the first two
-packets of (11,11) bytes are split using skb_copy_bits. But when
-the last packet of 10 bytes is split, because hsize becomes nagative,
-it enters the skb_clone process instead of continuing to use
-skb_copy_bits. In fact, the data for skb_clone has already been
-copied into the second packet.
-
-when hsize < 0,  the payload of the fraglist has already been copied
-(with skb_copy_bits), so there is no need to enter skb_clone to
-process this packet. Instead, continue using skb_copy_bits to process
-the next packet.
-
-BUG_ON here：
-pos += skb_headlen(list_skb);
-while (pos < offset + len) {
-    BUG_ON(i >= nfrags);
-    size = skb_frag_size(frag);
-
-    el1h_64_sync_handler+0x3c/0x90
-    el1h_64_sync+0x68/0x6c
-    skb_segment+0xcd0/0xd14
-    __udp_gso_segment+0x334/0x5f4
-    udp4_ufo_fragment+0x118/0x15c
-    inet_gso_segment+0x164/0x338
-    skb_mac_gso_segment+0xc4/0x13c
-    __skb_gso_segment+0xc4/0x124
-    validate_xmit_skb+0x9c/0x2c0
-    validate_xmit_skb_list+0x4c/0x80
-    sch_direct_xmit+0x70/0x404
-    __dev_queue_xmit+0x64c/0xe5c
-    neigh_resolve_output+0x178/0x1c4
-    ip_finish_output2+0x37c/0x47c
-    __ip_finish_output+0x194/0x240
-    ip_finish_output+0x20/0xf4
-    ip_output+0x100/0x1a0
-    NF_HOOK+0xc4/0x16c
-    ip_forward+0x314/0x32c
-    ip_rcv+0x90/0x118
-    __netif_receive_skb+0x74/0x124
-    process_backlog+0xe8/0x1a4
-    __napi_poll+0x5c/0x1f8
-    net_rx_action+0x154/0x314
-    handle_softirqs+0x154/0x4b8
-    __do_softirq+0x14/0x20
-
-    [  118.376811] [C201134] dpmaif_rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
-    [  118.376829] [C201134] dpmaif_rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-    [  118.376858] [C201134] dpmaif_rxq0_pus: [name:mediatek_cpufreq_hw&]cpufreq stop DVFS log done
-    [  118.470774] [C201134] dpmaif_rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
-    [  118.470810] [C201134] dpmaif_rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
-    [  118.470827] [C201134] dpmaif_rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
-    [  118.470848] [C201134] dpmaif_rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
-    [  118.470900] [C201134] dpmaif_rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
-    [  118.470928] [C201134] dpmaif_rxq0_pus: [name:mrdump&]sp : ffffffc008013770
-    [  118.470941] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x29: ffffffc008013810 x28: 0000000000000040
-    [  118.470961] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x27: 000000000000002a x26: faffff81338f5500
-    [  118.470976] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x25: f9ffff800c87e000 x24: 0000000000000000
-    [  118.470991] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x23: 000000000000004b x22: f4ffff81338f4c00
-    [  118.471005] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x21: 000000000000000b x20: 0000000000000000
-    [  118.471019] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x19: fdffff8077db5dc8 x18: 0000000000000000
-    [  118.471033] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x17: 00000000ad6b63b6 x16: 00000000ad6b63b6
-    [  118.471047] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x15: ffffffd795aa59d4 x14: ffffffd795aa7bc4
-    [  118.471061] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x13: f4ffff806d40bc00 x12: 0000000100000000
-    [  118.471075] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x11: 0054000800000000 x10: 0000000000000040
-    [  118.471089] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x9 : 0000000000000040 x8 : 0000000000000055
-    [  118.471104] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x7 : ffffffd7959b0868 x6 : ffffffd7959aeebc
-    [  118.471118] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x5 : f8ffff8132ac5720 x4 : ffffffc0080134a8
-    [  118.471131] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x3 : 0000000000000a20 x2 : 0000000000000001
-    [  118.471145] [C201134] dpmaif_rxq0_pus: [name:mrdump&]x1 : 000000000000000a x0 : faffff81338f5500
-
-Fixes: a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after pull from frag_list")
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
----
- net/ipv4/udp_offload.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index a5be6e4ed326..ec05bb7d1e22 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -273,6 +273,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 	bool copy_dtor;
- 	__sum16 check;
- 	__be16 newlen;
-+	int ret = 0;
- 
- 	mss = skb_shinfo(gso_skb)->gso_size;
- 	if (gso_skb->len <= sizeof(*uh) + mss)
-@@ -301,6 +302,9 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
- 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
- 
-+		ret = __skb_linearize(gso_skb);
-+		if (ret)
-+			return ERR_PTR(ret);
- 		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
- 		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
- 		gso_skb->csum_offset = offsetof(struct udphdr, check);
--- 
-2.45.2
-
+Thanks!
 
