@@ -1,151 +1,151 @@
-Return-Path: <netdev+bounces-193454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6520BAC41AB
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:43:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3A4AC41B6
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:48:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22BCD3B919D
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:42:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69E9E179AC9
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A1020FAA4;
-	Mon, 26 May 2025 14:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D9720E30F;
+	Mon, 26 May 2025 14:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BELkQeUY"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sTqS0WMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1705B1EF36C;
-	Mon, 26 May 2025 14:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914AB211A2A;
+	Mon, 26 May 2025 14:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748270576; cv=none; b=KrSWGgTIXjkkvyiELVtrKLWRQqvkrvd5HooGruRfF+yt4vrizNkgRDBoaUKv7/A24ul4QZcDckZO3Z2xcwpEq8w512VGEdyke45RIAb37l9uHf7nWmHq0u7rez0WrHpWw9HICrvxZ5nj0076DTt9HV6YTbj2ZrKW6VlrDFQwj6E=
+	t=1748270869; cv=none; b=UgawEyB9L2gqqFWXWPGO9tuCOmaEG4CnfJFIzyDMUZkpCwVhPvg/Gn/9gph4fKesRanEDBZhr/PqY8YJqbqHFmbdm3roM/Wi8j1jflcILYWv/lxUYKkDXe6dZp1r2AkB5H7x7kSgFAEavJxYhVitkZBYTCILrrJnw8Z6yIwZjtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748270576; c=relaxed/simple;
-	bh=2re7boeytqH1ze4jSfdyO/nDEwx8RWmbmO83cuM5XmQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=rAhqFvF/v4KoirZVjfksnfdmNeLkL3bULOWi0qghnkz+UkhVMUk85fvRFUC1+w6nOQSFR2vMG+3FGye9wlKKXfYcLpv2tyyFj5tFbGsEYF1pncahvrbK25EEQDGp+UOLRi0d0lN9Ox6YyZjJqo6FW8pzsziexBcz+Y5uglPlvwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BELkQeUY; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 01A2F439AC;
-	Mon, 26 May 2025 14:42:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1748270565;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mbr5t4PGFq3eJGZHk+DUNUJrzlxkWy9snikx9mhwYS0=;
-	b=BELkQeUY7THmMuVRkP+N4HdC1Lr5zPHIYYHtrR0qFZLRS8sz5Y13t9DjJqM4NG36gR9kQI
-	hCPQ5ualzVOFms+l8O2joDdvzoKzbAyGqrOpi1vPmgQF7/FfHfOVoD3L5F9SLMZoVvOrnz
-	zTSf/qZAuqbFXMm1ydNIwOPZaqFrcmhQO30IZCcve/hH8klVakvpqsQ3ItKUYaEbe63WYy
-	lHNeo3ru3Bpqmk9Bc0Pug8tuoZiEU9BJZEDnUbhq19eD2XAGjGhb7KC3fJH7wTB5lLI0tK
-	3zJwjfkiw0l6JLk+vLi12Xhb9stwbw5+HJi0V5vp0C5EC9/o9p1sfTwkHsG4IQ==
+	s=arc-20240116; t=1748270869; c=relaxed/simple;
+	bh=/d2q2+ybdDcoWjDhaEyMP/HPI7aeq2l6SVEQGCr9WPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c6WEty1ea6ml55V5yYt61NQrJc+nm+iIiFlrGe8RbhlHDueHpG2MyP8YGFrucG3RlTD6FYBoHV7ruorUp219KTmT+A5UNDF/oMDXIm1xiTnuwx+PjKQ+zsda7onp1v8HHVnPFmYxWUTpfLQ3wanjQoRG0WmJQKgqtrwK7Wj2unU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sTqS0WMZ; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q8uIGP010994;
+	Mon, 26 May 2025 14:47:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=bRX6T2Oi34tK2U3V0BzEFIzB+sbVD
+	fg9vFDZDCWgZF4=; b=sTqS0WMZPGA+VIBufhgmjyeKH1T7Rl6LBxSzeo4hVpP/T
+	uV+20Sqw2LSfCsPz/Ev1MTVVJsRqdgVkZsueYP8RZSm/AMx1SN9xUUEyxyg1TvFy
+	0YgTq1bcLiFszkmBjVCuKKmELoPolmH6fdKZ/wk9MjEZJsetArC+QpFr5DEBKZb1
+	0b6qoN6AlfmqZLXq3n6LN7gzzFBPXvRDopvv8J8DtbFSFhlN90SgIZ1OeNOL9xr6
+	3ZXiq3uu6kGmZckssR418gSrfD1xc7CEiWnXDa/tThuYvHfjZz56m+7hLQMcgM4c
+	7OO2/gIFfC7HU7buK9O52WTN2PsvKQl6wMSuP35Uw==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46v21s1h7n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 May 2025 14:47:39 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54QDdofU023148;
+	Mon, 26 May 2025 14:47:39 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46u4j7v79k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 May 2025 14:47:39 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 54QElcYl040639;
+	Mon, 26 May 2025 14:47:38 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 46u4j7v798-1;
+	Mon, 26 May 2025 14:47:38 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: davem@davemloft.ne, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+        linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
+        darren.kenny@oracle.com
+Subject: [PATCH] selftests: nettest: Fix typo in log and error messages for clarity
+Date: Mon, 26 May 2025 07:47:23 -0700
+Message-ID: <20250526144735.1484545-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 26 May 2025 16:42:42 +0200
-Message-Id: <DA666WVCP2OB.300LVHEGH5V4Y@bootlin.com>
-Subject: Re: [PATCH] net: stmmac: add explicit check and error on invalid
- PTP clock rate
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-To: "Yanteng Si" <si.yanteng@linux.dev>, "Alexandre Torgue"
- <alexandre.torgue@foss.st.com>, "Jose Abreu" <joabreu@synopsys.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Maxime
- Coquelin" <mcoquelin.stm32@gmail.com>, "Richard Cochran"
- <richardcochran@gmail.com>
-Cc: "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250523-stmmac_tstamp_div-v1-1-bca8a5a3a477@bootlin.com>
- <8f1928e5-472e-4140-875c-6b5743be8fd3@linux.dev>
-In-Reply-To: <8f1928e5-472e-4140-875c-6b5743be8fd3@linux.dev>
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddujeejleculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepggfgtgffkffuhffvvefofhgjsehtqhertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnheptedugfevhfevueeggedutefhgfevhfeltefgieejjeeijeejveegtdehgeefkefhnecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehlohgtrghlhhhoshhtpdhmrghilhhfrhhomheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopehsihdrhigrnhhtvghngheslhhinhhugidruggvvhdprhgtphhtthhopegrlhgvgigrnhgurhgvrdhtohhrghhuvgesfhhoshhsrdhsthdrtghomhdprhgtphhtthhopehjohgrsghrvghusehshihnohhpshihshdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehlu
- hhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: alexis.lothore@bootlin.com
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-26_07,2025-05-26_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 suspectscore=0 malwarescore=0 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2505260125
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDEyNSBTYWx0ZWRfX/X1Y375yFHtZ 7qEGdMClqKYznAALervWyVBZ1rR4j/Q8Lb4Z0KhjJJNAeuieQh7hbgM7YwcifqLBKgFLuRqFH6d LdXatHZihcLF8ZKkum3wOj1phsBnod92+7M31GGpeZE8AfE6ba4dERjWxbT3l9shJOj6SBUZIQ1
+ xmtTwLnE+GjwM/FP8r8XozHTYS9OGs1cmioQrUzGjMDLOt/swcXQ1Cg9r3JaKP1OtzFu5v9YqJo VbbxzJRVbFbMx9ecHz106Kg4v61H46UXLkeq8TFJ+Mm6YUEDhs95rssvH7bxUyPi7yy9yfeQ+1Q HYRjDHGkT9oLm4ZVEm4edseJMvpa7XialhNwYq7tQDebaLIQQSE8Xo47/INookM7gdi/pjhsrh3
+ 3OFPosKAhMTMUiROq5rBg8KQEeYu0kF7WSVJ/HdDT+ZIEBlAoiUo9Iy+sxjtAg3R9QMVnonn
+X-Proofpoint-GUID: x5SUmlykWc0y0ZPffVdlABWz48YVD9FB
+X-Authority-Analysis: v=2.4 cv=UvhjN/wB c=1 sm=1 tr=0 ts=68347f0b b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=dt9VzEwgFbYA:10 a=yPCof4ZbAAAA:8 a=9X4DUQxQdoZdu0pZ4wIA:9 cc=ntf awl=host:14714
+X-Proofpoint-ORIG-GUID: x5SUmlykWc0y0ZPffVdlABWz48YVD9FB
 
-On Mon May 26, 2025 at 4:22 AM CEST, Yanteng Si wrote:
-> =E5=9C=A8 5/23/25 7:46 PM, Alexis Lothor=C3=83=C2=A9 =E5=86=99=E9=81=93:
->> While some platforms implementing dwmac open-code the clk_ptp_rate
->> value, some others dynamically retrieve the value at runtime. If the
->> retrieved value happens to be 0 for any reason, it will eventually
->> propagate up to PTP initialization when bringing up the interface,
->> leading to a divide by 0:
+This patch corrects several logging and error message typos in nettest.c:
+- Corrects function name in log messages "setsockopt" -> "getsockopt".
+- Closes missing parentheses in "setsockopt(IPV6_FREEBIND)".
+- Replaces misleading error text ("Invalid port") with the correct
+  description ("Invalid prefix length").
+- remove Redundant wording like "status from status" and clarifies
+  context in IPC error messages.
 
-[...]
+These changes improve readability and aid in debugging test output.
 
->  From your description, I cannot determine the scope
-> of "some platforms". My point is: if there are only
-> a few platforms, can we find a way to handle this in
-> the directory of the corresponding platform?
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ tools/testing/selftests/net/nettest.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-From what I can see, it can affect any platform using the stmmac driver as
-the platform driver (except maybe dwmac-qcom-ethqos.c, which enforces an
-open-coded clk_ptp_rate after the stmmac_probe_config_dt call that sets
-the clk_ptp_rate), if the platform declares a dedicated clk_ptp_ref clock.
-So I would rather say that it can affect most of the platforms.
-
-In my case, I have observed the issue with the dwmac-stm32.c driver, on an
-STM32MP157a-dk1 platform.
-
-> And there need a Fixes tag.
-
-Ok, I'll add a relevant Fixes tag.
-
-Alexis
-
->> Signed-off-by: Alexis Lothor=C3=A9 <alexis.lothore@bootlin.com>
->> ---
->>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>=20
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers=
-/net/ethernet/stmicro/stmmac/stmmac_main.c
->> index 918d7f2e8ba992208d7d6521a1e9dba01086058f..f68e3ece919cc88d0bf199a3=
-94bc7e44b5dee095 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> @@ -835,6 +835,11 @@ int stmmac_init_tstamp_counter(struct stmmac_priv *=
-priv, u32 systime_flags)
->>   	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
->>   		return -EOPNOTSUPP;
->>  =20
->> +	if (!priv->plat->clk_ptp_rate) {
->> +		netdev_err(priv->dev, "Invalid PTP clock rate");
->> +		return -EINVAL;
->> +	}
->> +
->>   	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
->>   	priv->systime_flags =3D systime_flags;
->>  =20
->>=20
->> ---
->> base-commit: e0e2f78243385e7188a57fcfceb6a19f723f1dff
->> change-id: 20250522-stmmac_tstamp_div-f55112f06029
->>=20
->> Best regards,
-
-
-
-
---=20
-Alexis Lothor=C3=A9, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index cd8a58097448..250189309e69 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -385,7 +385,7 @@ static int get_bind_to_device(int sd, char *name, size_t len)
+ 	name[0] = '\0';
+ 	rc = getsockopt(sd, SOL_SOCKET, SO_BINDTODEVICE, name, &optlen);
+ 	if (rc < 0)
+-		log_err_errno("setsockopt(SO_BINDTODEVICE)");
++		log_err_errno("getsockopt(SO_BINDTODEVICE)");
+ 
+ 	return rc;
+ }
+@@ -535,7 +535,7 @@ static int set_freebind(int sd, int version)
+ 		break;
+ 	case AF_INET6:
+ 		if (setsockopt(sd, SOL_IPV6, IPV6_FREEBIND, &one, sizeof(one))) {
+-			log_err_errno("setsockopt(IPV6_FREEBIND");
++			log_err_errno("setsockopt(IPV6_FREEBIND)");
+ 			rc = -1;
+ 		}
+ 		break;
+@@ -812,7 +812,7 @@ static int convert_addr(struct sock_args *args, const char *_str,
+ 			sep++;
+ 			if (str_to_uint(sep, 1, pfx_len_max,
+ 					&args->prefix_len) != 0) {
+-				fprintf(stderr, "Invalid port\n");
++				fprintf(stderr, "Invalid prefix length\n");
+ 				return 1;
+ 			}
+ 		} else {
+@@ -1912,7 +1912,7 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
+ 	 * waiting to be told when to continue
+ 	 */
+ 	if (read(fd, &buf, sizeof(buf)) <= 0) {
+-		log_err_errno("Failed to read IPC status from status");
++		log_err_errno("Failed to read IPC status from pipe");
+ 		return 1;
+ 	}
+ 	if (!buf) {
+-- 
+2.47.1
 
 
