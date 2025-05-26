@@ -1,101 +1,97 @@
-Return-Path: <netdev+bounces-193485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3824AC433B
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 19:05:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0511EAC4348
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 19:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C7F31898031
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:05:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93643ADA3C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E64A1DE4E1;
-	Mon, 26 May 2025 17:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DC223D28C;
+	Mon, 26 May 2025 17:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XoUVqXbD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugjP4evT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADEE3595E;
-	Mon, 26 May 2025 17:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38901FAC50;
+	Mon, 26 May 2025 17:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748279138; cv=none; b=jjS7Ktct5r6M5x/N2+MIOQNVpztIbDPpIxxDptCSGZAqN4zaTaK6TYzb8ctruXtat2ZI4oL3UGGoPwJIe89nNqZpLB5DA2+ihnxoT2hVe3e6J2j5QIKzrw7dN27Ui55LuecQNRk3whioOMCuBRZKUV7IEQ+86Kf3/42pSoPsL9Y=
+	t=1748279394; cv=none; b=blAc/ptgcVlJkbSvWm+4S9EGMrIaz8wGZdb11qag3Q2f1D5k6B7LuO7NMUe0ppusG3fLxMPtFiLoBn7+L6MTebDRsm0GtvDYUMbs0gGVd3KDEfK+SY33UVT7hcVesZ3A8UW+xdtZ/vky2IcYY+rtQQAme9ayYPApDHHCxdM0YMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748279138; c=relaxed/simple;
-	bh=2r09ZL1bCTQmL/cpFFMHd1f3HLc1NZRxd6L/oMrN2Kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lkCR5DNb9+m6043w4JuUHYTIADQECdhrnZUq7gPennYyjFlYOPzU31AwNVDeB+E3r80dx9cMQloWjewF4DFnN0z37V7zgsvH2AhJNmSSVG7u3bqNn2Dyaz6dpjMSspdsKYPddZPNxiyN6Plhpnn5fHwLauPpRCcNWotFMlvKZc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XoUVqXbD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=ioFZifM8dRn5AWzFoATN3MruIDugkGoasnnViHSdO4U=; b=Xo
-	UVqXbDL5alO3ZRLdDwEsTqGkuUqfngzF3nvIPtjcGk64MlCq1PrAgzorqFFgRmkQiKcYOWOq+F9v+
-	ciFpZNU1tQJNrb87mAtHPoAgDUVNViOZiyJsZ1wzXvyKB5jZ9Gn4mOqigWuKnuzzpyxAfQtT7WzQM
-	tjqlmt2Gnp+lw+0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uJbG8-00E117-QC; Mon, 26 May 2025 19:05:08 +0200
-Date: Mon, 26 May 2025 19:05:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?5p2O5ZOy?= <sensor1010@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, jonas@kwiboo.se,
-	rmk+kernel@armlinux.org.uk, david.wu@rock-chips.com, wens@csie.org,
-	jan.petrous@oss.nxp.com, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dwmac-rk: No need to check the return value of the
- phy_power_on()
-Message-ID: <e178677c-c8aa-462b-8d12-e0b4b8b6c7b7@lunn.ch>
-References: <20250526161621.3549-1-sensor1010@163.com>
+	s=arc-20240116; t=1748279394; c=relaxed/simple;
+	bh=z4yImdCu2KPkvao83kEmLKDtuR+75PQAGlxugu1dFko=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LIlfDfwJRN+C/rgvUReJGf2PcMx5rOQ9z7Jv+/jSe1XWQAMppYtUi4unZMCke3oJX/ohj+cb6ZTP8Qdi8CfzfKYRlnj6fUxOJH6i6SW5sSowV/UWh3rH/pGOS7T/CL/6id9Wj+kPeMYtrCVL+uP74+eIjujD7hVzEPn+JCE7D+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugjP4evT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42826C4CEED;
+	Mon, 26 May 2025 17:09:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748279394;
+	bh=z4yImdCu2KPkvao83kEmLKDtuR+75PQAGlxugu1dFko=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ugjP4evT0vqT7MCPyw8mNfyAjhttnF5ZTSzjYSxS1UDydhPBXW5g6rUT1AS2Evkjb
+	 AufVW+Atx23BOdOl2pbJqPaBZYOn/9MI0jd1qbnodFsheQXOgSOAxPadas/+bfRWwd
+	 CkLg3pZig086DJ3Af+iG/hVkVUaKMQANCvdMfgWCx41w6jPDIc2gS+ShBGQUlsfnyX
+	 lJI/biAJHnYWltgTifpOpmhL6jOt3/xT8ogG1wrzN+JakrPHMQreVxP8S9MK2wotXq
+	 WefeniBnbvZCB3hXvkyBCNe3VuEUtF2fCu8o2V8PaDUOuA3N4VmrzZ9NKtxAXHT2k/
+	 vF0WdZZUGXjog==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEFB3805D8E;
+	Mon, 26 May 2025 17:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250526161621.3549-1-sensor1010@163.com>
+Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream
+ sockets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174827942876.985160.7017354014266756923.git-patchwork-notify@kernel.org>
+Date: Mon, 26 May 2025 17:10:28 +0000
+References: <20250521121705.196379-1-sgarzare@redhat.com>
+In-Reply-To: <20250521121705.196379-1-sgarzare@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, xuanzhuo@linux.alibaba.com,
+ edumazet@google.com, mst@redhat.com, eperezma@redhat.com,
+ kvm@vger.kernel.org, kuba@kernel.org, avkrasnov@salutedevices.com,
+ jasowang@redhat.com, niuxuewei97@gmail.com, Oxffffaa@gmail.com,
+ horms@kernel.org, davem@davemloft.net, stefanha@redhat.com
 
-On Mon, May 26, 2025 at 09:16:21AM -0700, 李哲 wrote:
-> since the return value of the phy_power_on() function is always 0,
-> checking its return value is redundant.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 21 May 2025 14:17:05 +0200 you wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> Signed-off-by: 李哲 <sensor1010@163.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+> In `struct virtio_vsock_sock`, we maintain two counters:
+> - `rx_bytes`: used internally to track how many bytes have been read.
+>   This supports mechanisms like .stream_has_data() and sock_rcvlowat().
+> - `fwd_cnt`: used for the credit mechanism to inform available receive
+>   buffer space to the remote peer.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 700858ff6f7c..6e8b10fda24d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -1839,11 +1839,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
->  		dev_err(dev, "NO interface defined!\n");
->  	}
->  
-> -	ret = phy_power_on(bsp_priv, true);
-> -	if (ret) {
-> -		gmac_clk_enable(bsp_priv, false);
-> -		return ret;
-> -	}
-> +	phy_power_on(bsp_priv, true);
+> [...]
 
-I suggest you go one step further and turn phy_power_on() into a void
-function.
+Here is the summary with links:
+  - [net] vsock/virtio: fix `rx_bytes` accounting for stream sockets
+    https://git.kernel.org/netdev/net/c/45ca7e9f0730
 
-net-next is closed for the next two week due to the merge window.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	Andrew
+
 
