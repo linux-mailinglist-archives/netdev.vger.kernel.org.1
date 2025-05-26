@@ -1,138 +1,91 @@
-Return-Path: <netdev+bounces-193394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04835AC3C32
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:59:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0664AC3C5E
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C48777A6313
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076AD1892203
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E91D1E9B0B;
-	Mon, 26 May 2025 08:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724EE1E51EA;
+	Mon, 26 May 2025 09:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mo5iOhRd"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="UuhNRbFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9914A2AEFE;
-	Mon, 26 May 2025 08:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14641F09BD
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748249962; cv=none; b=ck/zR01SpHfefEo0woQZKnPzzoLKDQexd99GXnTk5nAAthhjqPUrMkgiiPxpsI4mr1PjDaJJU1hLhQFt2PDIwNuNTBEC/8ktx29v6xBbj130yMO1I4XfG8IVYl/zpliz0inZXNDujNyRye4pdJysnn7Q+8HRf8wXTXSJzTLVL54=
+	t=1748250453; cv=none; b=MO0+BxbMJRqXz3QJl8VyZJEG0tJvUMbwtiBKEOjNHStqSdP+uX1J66J6233SBNYoWoE+hc4bhNzWRfrEYDt+d3ovUO2ahBnNe+mfenh64ifLTewoVHZyARNH3EQ71Gyyntr3yDrlfRObEKilQculaQ1YBPlxKq25LbrgJif9y3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748249962; c=relaxed/simple;
-	bh=BdA9mPuHJ0+Hh9B8jPgulgQ8/U/ggWA26Ja0q9N75E8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JH05zei8wzwxEdg6yiioCxm99hQIk9FdLnFiHD0CtV98zRAnWDjd007Z7nl+9/rTDskedGtOZENRQczF/JvdTbjZQ6Ixxq2N1hK+ooqMJ2YbzIL48l9ASnG2/9aGLklx98snrAfpWckoiV6fu+lsCt/uLwtx5NFn3ma+JAtlN1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mo5iOhRd; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748249961; x=1779785961;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BdA9mPuHJ0+Hh9B8jPgulgQ8/U/ggWA26Ja0q9N75E8=;
-  b=Mo5iOhRd3ecPEG1H8/lATWarZ8Oh/dKjFHad7XeXIO7F3QXzf2if21z2
-   7+hZNHG6E8axiFkIBic9vuCb+f9BZdNNAxEcWfWdc5QhwtXA1Zj9cQRco
-   GubB4UvoRqF67rmOWXdvDLD0J5Nj8cLIk7JrzO7lDDgFUNiXxZ5iUmg6d
-   xyp15rHEeBHkq1qaviGn6eosB+8kmhnYWIkKM7vewGopkgUVYq589i6sc
-   RC3jL3z318xfQadlfXXD7DLOC1mBcL+oPIW55No5LP8NuruNWW9ppGpIi
-   VhWi1lC31mOrkEcVB7Y65Mnp/L2swjqOs3ycrBir0ownek9RH/TC0xKSj
-   g==;
-X-CSE-ConnectionGUID: OQ5JYd+9QhKfx0qm07k4DQ==
-X-CSE-MsgGUID: 2lyc4xocTmO6KKkZ8jUrGg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="60468911"
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="60468911"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 01:59:20 -0700
-X-CSE-ConnectionGUID: BJtMHkLOQhiTL9+A1un3Tg==
-X-CSE-MsgGUID: xx6T1i4oRE6sWLGokSRPsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="165472427"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 01:59:17 -0700
-Date: Mon, 26 May 2025 10:58:39 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] net: af_key: Add error check in set_sadb_address()
-Message-ID: <aDQtPxmS3leVRJew@mev-dev.igk.intel.com>
-References: <20250525155350.1948-1-vulab@iscas.ac.cn>
+	s=arc-20240116; t=1748250453; c=relaxed/simple;
+	bh=ycQ+lOIJ79Z7JT+FWACl4MSQvUOdy7Y52TArxqIOXtE=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=jxmQ4+OypZb4q9TQbezGNwSGKoyRm0PUZC7EpBtlQZAD3KJN4qKK5kWG9i+W1sonSiZz/DqK5WnbpnR6PtkEfmtKdGDPOKZe2CwVLOU7Pdd4Gw3Wzib7nDKkRzEl7LioPC2sXhznozuZPW8CU65jEsjQCuNpQGVVW8+j3DfCzMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=UuhNRbFu; arc=none smtp.client-ip=178.154.239.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d102])
+	by forward203b.mail.yandex.net (Yandex) with ESMTPS id C85656395B
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 12:02:11 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net [IPv6:2a02:6b8:c28:7d5:0:640:285a:0])
+	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 5C88160BFA
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 12:02:03 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 22PYFHkLjiE0-BIhlT0vK;
+	Mon, 26 May 2025 12:02:02 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1748250123; bh=ycQ+lOIJ79Z7JT+FWACl4MSQvUOdy7Y52TArxqIOXtE=;
+	h=Date:To:From:Subject:Message-ID;
+	b=UuhNRbFuxdajxZKAvi+bHiksGvNR38RTpLJ4wACfkH57XYvtvyCTjBNAFE1cH1JvD
+	 8jOFCebStUGD+gLQaFjeoiGfXxq20eRLHrrupk3EVXy0CHpZvnrOz2h+jMbaPQKZtp
+	 sx5y8kpOSTfu5rl4vntlq9c1ibma9qaa1JxI8m5g=
+Authentication-Results: mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <985e79fa5c4ea841cb361458cdcf0114050bfb62.camel@yandex.ru>
+Subject: Does "TCP Fast Open": not work on 6.14.7?
+From: Konstantin Kharlamov <Hi-Angel@yandex.ru>
+To: netdev@vger.kernel.org
+Date: Mon, 26 May 2025 12:02:02 +0300
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250525155350.1948-1-vulab@iscas.ac.cn>
 
-On Sun, May 25, 2025 at 11:53:50PM +0800, Wentao Liang wrote:
-> The function set_sadb_address() calls the function
-> pfkey_sockaddr_fill(), but does not check its return value.
-> A proper implementation can be found in set_sadb_kmaddress().
-> 
-> Add an error check for set_sadb_address(), return error code
-> if the function fails.
-> 
-> Fixes: e5b56652c11b ("key: Share common code path to fill sockaddr{}.")
-> Cc: stable@vger.kernel.org # v2.6
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->  net/key/af_key.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/key/af_key.c b/net/key/af_key.c
-> index c56bb4f451e6..537c9604e356 100644
-> --- a/net/key/af_key.c
-> +++ b/net/key/af_key.c
-> @@ -3474,15 +3474,17 @@ static int set_sadb_address(struct sk_buff *skb, int sasize, int type,
->  	switch (type) {
->  	case SADB_EXT_ADDRESS_SRC:
->  		addr->sadb_address_prefixlen = sel->prefixlen_s;
-> -		pfkey_sockaddr_fill(&sel->saddr, 0,
-> -				    (struct sockaddr *)(addr + 1),
-> -				    sel->family);
-> +		if (!pfkey_sockaddr_fill(&sel->saddr, 0,
-> +					 (struct sockaddr *)(addr + 1),
-> +					 sel->family))
-> +			return -EINVAL;
->  		break;
->  	case SADB_EXT_ADDRESS_DST:
->  		addr->sadb_address_prefixlen = sel->prefixlen_d;
-> -		pfkey_sockaddr_fill(&sel->daddr, 0,
-> -				    (struct sockaddr *)(addr + 1),
-> -				    sel->family);
-> +		if (!pfkey_sockaddr_fill(&sel->daddr, 0,
-> +					 (struct sockaddr *)(addr + 1),
-> +					 sel->family))
-> +			return -EINVAL;
->  		break;
->  	default:
->  		return -EINVAL;
+Hello, I may be missing something, but something seems off.
 
-There are few other calls to pfkey_sockaddr_fill() without checking, but
-family is already checked in such case, so it is fine.
+`/proc/net/netstat` contains TCP Fast Open counters. They are
+undocumented, but `networking/snmp_counter.rst` says for
+`TcpExtTCPFastOpenPassive` it's amount of times fast open connection
+was made, which I presume pertains to `TCPFastOpenPassive` as well.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+So, I
 
-I am not sure if it should be a fix. If family is set there is no
-problem. Probably it is set in all cases. Maybe you should target it to
-net-next, but as I said, I am not sure.
+1. Have set `net.ipv4.tcp_fastopen =3D 3` (enables it for both incoming
+and outgoing connections).
+2. Launch "server" `nc -vkl 8080`
+3. Connect to it with `nc -v localhost 8080`
+4. Check "fast open" counters via `cat /proc/net/netstat | column -t |
+less -Si`
 
-Thanks
+Expected: at least some of the counters increased.
+Actual: every "fast open" counter is 0 (zero).
 
-> -- 
-> 2.42.0.windows.2
+That is on Archlinux, kernel 6.14.7. WDYDW?
+
+P.S. pls keep me in CC, i'm not subscribed.
+P.P.S. slightly offtopic, but am I correct to understand one-liners
+like `cat =E2=80=A6 | column =E2=80=A6` are the only way to read these coun=
+ters? I've
+searched far and wide, and from what I understand none of networking
+utilities (at least not ss, netstat, ntstat) show them.
 
