@@ -1,196 +1,183 @@
-Return-Path: <netdev+bounces-193441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E408AC40B3
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:51:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD475AC40B1
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01C6D7A9B02
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:49:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D61416948C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2287F20C03E;
-	Mon, 26 May 2025 13:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D671FE470;
+	Mon, 26 May 2025 13:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hsHqLega"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aAYHuV4x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6564C1F463C;
-	Mon, 26 May 2025 13:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D29F1F463C
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 13:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748267453; cv=none; b=XEBiCs4jvojT7UnmQf1/LxAVMILDVrNwdCXYok6Ai0SDZnTEK7iARWKbbuYJ4XXBaMN6O0pnM1HQqoUH9HXb7wjmRNVtTbUvf9PDlC4Hb3NpEzsDV3lEvvI98J7xDuVGoYVhvPdwd1k6z2CTqDCX9TGSTLfcqD9ZktvEJPcmc8o=
+	t=1748267443; cv=none; b=J2qSuaQSd8BksKZq5MXN+bJEmATgcsca4u9t+bSWaaO4D/mdTwXRCK81ggQRzRoqoY/Ws8Ay85hKa1YQLEip68jwkAX+1/HVFExQcRVr8Q119bWCM8QxarKN7FuEi0xCjDAHfJgN35NkY+iKAwZZnNaquuW1v/tU/7MJGuzQiNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748267453; c=relaxed/simple;
-	bh=BPzMadv+6y0REco6m/3KTHH6etAqFJH+OU0kdoFoggU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sBMEtUCJ15s39dlp/mEdxgZnoTzzXNQUzJh3ScPv4Rx1GqDOSdCZPs1AHMQHsd36wP8PaMpKMxhJrSgVdCwcKFG6rOutoLIo5kvql6tngcCYvAo+L3LA45+Q7bfCnoZ9mUHEpsgFigHZE1D1lmT7PiRpfdSrBqaCTgkmVXWS0dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hsHqLega; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54QB8SNo002304;
-	Mon, 26 May 2025 13:50:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=3c6hymiUmN+Rg7HCY4QK3LteXbtKZUBJA+lVBNURd
-	7U=; b=hsHqLegazLreSfsez2oGYh2z1tOg89vK55eHDC2rHvnnPRx0hUmVEvIkj
-	CCqjHPZ1ucuQnBoiaww3HmZx2eJ8nU+Mqf8O5mVO81acc6jhKvxtunVt7FFOfodq
-	xrZknecWAkj//e32zDQ4ubPVBcPyIUUOQ4k/xfKxNUh4S9KbZnwp4cJg4mJoxqvM
-	FsJNOf8pLdCDa+AhXGkC6KW0xG139eH/Tq4lSf+Y5q8P29PsEs59CFrRsyMQIOJv
-	/SVMEkpxlE1AgCNWbHRFzDxPesEdkOmM4YvqB6+7oWxgwxc9vyO8WQ4hIr5/eV68
-	3QhdTIikKsva84MYVHerKLC90zhQg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46v0p2d8cd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 13:50:44 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q9Or9C007944;
-	Mon, 26 May 2025 13:50:44 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46uu52x2t7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 13:50:44 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54QDohGH29098502
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 May 2025 13:50:43 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F27158056;
-	Mon, 26 May 2025 13:50:43 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2B4F05805E;
-	Mon, 26 May 2025 13:50:43 +0000 (GMT)
-Received: from WIN-DU0DFC9G5VV.ibm.com (unknown [9.61.242.189])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 26 May 2025 13:50:43 +0000 (GMT)
-From: Konstantin Shkolnyy <kshk@linux.ibm.com>
-To: sgarzare@redhat.com
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
-        Konstantin Shkolnyy <kshk@linux.ibm.com>
-Subject: [PATCH net v2] vsock/test: Fix occasional failure in SOCK_STREAM SHUT_RD test
-Date: Mon, 26 May 2025 08:49:49 -0500
-Message-Id: <20250526134949.907948-1-kshk@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1748267443; c=relaxed/simple;
+	bh=XyxC3/PqrdLJ3qfr9vuQK0F6dSJ6qsr4C43a7JY2NRY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lOwFg1a2GnApnhonb8VMKZDqSI7nSYMRRBJ0kXz71263hl+T1RT2PF/xIvm1tlIkN9LJ3P/sxk5YeKwLZNGwVcCKimOuIEo3/1IQqGZkL4vDe0V2FyByYR+adwisUsWAPNhcceNwvojGp+vEkEQhSzQ5I2tVqp0WeKCoy6mbMhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aAYHuV4x; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-48b7747f881so523051cf.1
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:50:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748267440; x=1748872240; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vka/f+Z/vv4OannEtW8J/eskrPSAg5/7ofUNBbKMlGI=;
+        b=aAYHuV4xCkz+VTvnLf+WSQHyzvtTMh2jWJVvhsejBpl3qgMYKv/PZpvwltVjHVZaqC
+         XG8xXO1HUbI4WnHclryGS8+7508RIx1zRKtPFXt9VT+29K9s0ShN8InPuVa7OX17O+0x
+         9gttfaZcN8eQCk7MoZ8zYMuwTyeudGN1RsJ6qXBFEp9Rd9CdGU97Lrw1th38X9LHrHLJ
+         oAxU89d3Nx/kkULSFVt1KdfqlKId3URGe9jRgu+Hkn9eWcyWYRw+BVS6a2Zm1oWJGhWZ
+         Dpqysv512+/GzrcvJWicH1fQR+5DJWD6belOYD3tbznzMt6BnWeHXRAymPod+dDtYMF5
+         P28A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748267440; x=1748872240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vka/f+Z/vv4OannEtW8J/eskrPSAg5/7ofUNBbKMlGI=;
+        b=cth4ZwmN3DZjt4htJv0s5zgYtAXaxDgbOFIJb29Wr+n6V6Go1lsMuPAWHWNg+UGa4R
+         mmPjr39ZxlAeIC1n20xxepqjpHn7Gaw04kIZWnZcwPepVWGERIPJGlbaJjgjfihe1LiS
+         0+js/XSX19sjZm+NnEQMXb26EZXTec+XwVIHW5KnHHWKuMvftub6eLY/ar7/0D9SYX42
+         pZgrmm6WY5FHjraJE5KQb4vJmI9zw0jxl2ftT4R30U+om48BzzXqA24m3XGs+EL8Ujpu
+         i9AGgJ97enENPXujHTXn9MN79PLdpDdrjcW5s0h2VG8q9NqtVlHjfn0FyGotX+h2KMnU
+         EsnA==
+X-Gm-Message-State: AOJu0YxBJVuI2ezVez+lndzb2//CZrF2tS9SBxWvXrRiY0dS2z19W5VH
+	VC1nc7ecECXe8UTcNy8k0L1jiYooEe5FPvc9pmhaeugoeTq7u/0spIeHko8it1182g3wBwAG1LT
+	1iiOcaIVyPVfAGmJchiygQt4kub9zcGcvh8DOlCsp
+X-Gm-Gg: ASbGnctT+4FDeYeBMFBiNk7ZLaY1WD3y756YbSrOELGnmi49LqN9iw7WmndFcgVrKrI
+	4Hb8HQdICth+vqBYFxUpZAkDJRgoZiw+JAXKwqTU65eTd80aRGy0WzkR9BEhmmrYjKJCPMkZBTt
+	2in3H3kXUrJ/rbTIxaf5WqXTldSHXnVCISuWtPAMI5haM=
+X-Google-Smtp-Source: AGHT+IEjv4Suc4V1qLiMu3iKXdg4HFAopydhUcXgFEN2Oj86j7gvGeezz2NJRZBFck7ypK8gzhr9jTHxh1HQKn1wcko=
+X-Received: by 2002:a05:622a:8b:b0:48a:ba32:370 with SMTP id
+ d75a77b69052e-49f4b3f787bmr6380921cf.10.1748267439888; Mon, 26 May 2025
+ 06:50:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1KLNkpw_zqN2FlZFwL1EjlOzqrFWMiuh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDExNSBTYWx0ZWRfX8uLBm9zuaCCS PtMBhmeQCYiH05VvSB2GPoeM3nP+lXrktzofztIgxl1wp0Xy5+Tmz47AfH3IrTeR02dCVR7tFbB P4X3b/D2UKVKE+THaFri8edpuQycpPvdpvX/61kC8g+VJEjgMQpkQvE3j0515uo9fMEyZL7Oxab
- 70d/BH9OM54BGDv0kjU5vrxhNKSQCCfjl0dSeq6Ej0yPrWSPMGGQinnKLjrDldT2CeQCKCUkFZL /bfWiMEHlm+R4x8/ajW91IADDs5xnVaYQXUd6fuGPZM4XkZuh+IH8jFkRBOvh/4muP6J+t2FKyq /HjQeMq/RfJJFfskmC8snCjYrcYURjW1VTy7s4X/cILIJMvce8TurCody8SqEtlB3n/FjXCQfSY
- M10fXH+86GEfNmOWH3LKrDyn4JHkyPgOeZBfACC0ywPdVcvuokuBm1Kue3HD9bh9Ihsg9aDN
-X-Authority-Analysis: v=2.4 cv=Q7TS452a c=1 sm=1 tr=0 ts=683471b5 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=Qnlq2qKdrR5swm6YVpgA:9
-X-Proofpoint-GUID: 1KLNkpw_zqN2FlZFwL1EjlOzqrFWMiuh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-26_06,2025-05-26_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 mlxlogscore=999 phishscore=0 clxscore=1015
- malwarescore=0 adultscore=0 mlxscore=0 impostorscore=0 spamscore=0
- suspectscore=0 lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505260115
+References: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
+In-Reply-To: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Mon, 26 May 2025 09:50:23 -0400
+X-Gm-Features: AX0GCFv5k7xMJSIGuQ90kC8dkAwpInWC0IhIk4EWuI6MjuEHTpV21EBa6eSBGWY
+Message-ID: <CADVnQykQ+NGdONiK6AwL9CN=nj-8C6rwS4dtf-6p1f+JFyVqug@mail.gmail.com>
+Subject: Re: Issue with delayed segments despite TCP_NODELAY
+To: Dennis Baurichter <dennisba@mail.uni-paderborn.de>
+Cc: netdev@vger.kernel.org, netfilter@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The test outputs:
-"SOCK_STREAM SHUT_RD...expected send(2) failure, got 1".
+On Sun, May 25, 2025 at 9:01=E2=80=AFPM Dennis Baurichter
+<dennisba@mail.uni-paderborn.de> wrote:
+>
+> Hi,
+>
+> I have a question on why the kernel stops sending further TCP segments
+> after the handshake and first 2 (or 3) payload segments have been sent.
+> This seems to happen if the round trip time is "too high" (e.g., over
+> 9ms or 15ms, depending on system). Remaining segments are (apparently)
+> only sent after an ACK has been received, even though TCP_NODELAY is set
+> on the socket.
+>
+> This is happening on a range of different kernels, from Arch Linux'
+> 6.14.7 (which should be rather close to mainline) down to Ubuntu 22.04's
+> 5.15.0-134-generic (admittedly somewhat "farther away" from mainline). I
+> can test on an actual mainline kernel, too, if that helps.
+> I will describe our (probably somewhat uncommon) setup below. If you
+> need any further information, I'll be happy to provide it.
+>
+> My colleague and I have the following setup:
+> - Userland application connects to a server via TCP/IPv4 (complete TCP
+> handshake is performed).
+> - A nftables rule is added to intercept packets of this connection and
+> put them into a netfilter queue.
+> - Userland application writes data into this TCP socket.
+>    - The data is written in up to 4 chunks, which are intended to end up
+> in individual TCP segments.
+>    - The socket has TCP_NODELAY set.
+>    - sysctl net.ipv4.tcp_autocorking=3D0
+> - The above nftables rule is removed.
+> - Userland application (a different part of it) retrieves all packets
+> from the netfilter queue.
+>    - Here it may occur that e.g. only 2 out of 4 segments can be retrieve=
+d.
+>    - Reading from the netfilter queue is attempted until 5 timeouts of
+> 20ms each occured. Even much higher timeout values don't change the
+> results, so it's not a race condition.
+> - Userland application performs some modifications on the intercepted
+> segments and eventually issues verdict NF_ACCEPT.
+>
+> We checked (via strace) that all payload chunks are successfully written
+> to the socket, (via nlmon kernel module) that there are no errors in the
+> netlink communication, and (via nft monitor) that indeed no further
+> segments traverse the netfilter pipeline before the first two payload
+> segments are actually sent on the wire.
+> We dug through the entire list of TCP and IPv4 sysctls (testing several
+> of them), tried loading and using different congestion algorithm
+> modules, toggling TCP_NODELAY off and on between each write to the
+> socket (to trigger an explicit flush), and other things, but to no avail.
+>
+> Modifying our code, we can see that after NF_ACCEPT'ing the first
+> segments, we can retrieve the remaining segments from netfilter queue.
+> In Wireshark we see that this seems to be triggered by the incoming ACK
+> segment from the server.
+>
+> Notably, we can intercept all segments at once when testing this on
+> localhost or in a LAN network. However, on long-distance /
+> higher-latency connections, we can only intercept 2 (sometimes 3) segment=
+s.
+>
+> Testing on a LAN connection from an old laptop to a fast PC, we delayed
+> packets on the latter one with variants of:
+> tc qdisc add dev eth0 root netem delay 15ms
+> We got the following mappings of delay / rtt to number of segments
+> intercepted:
+> below 15ms -> all (up to 4) segments intercepted
+> 15-16ms -> 2-3 segments
+> 16-17ms -> 2 (sometimes 3) segments
+> over 20ms -> 2 segments (tested 20ms, 200ms, 500ms)
+> Testing in the other direction, from fast PC to old laptop (which now
+> has the qdisc delay), we get similar results, just with lower round trip
+> times (15ms becomes more like 8-9ms).
+>
+> We would very much appreciate it if someone could help us on the
+> following questions:
+> - Why are the remaining segments not send out immediately, despite
+> TCP_NODELAY?
+> - Is there a way to change this?
+> - If not, do you have better workarounds than injecting a fake ACK
+> pretending to come "from the server" via a raw socket?
+>    Actually, we haven't tried this yet, but probably will soon.
 
-It tests that shutdown(fd, SHUT_RD) on one side causes send() to fail on
-the other side. However, sometimes there is a delay in delivery of the
-SHUT_RD command, send() succeeds and the test fails, even though the
-command is properly delivered and send() starts failing several
-milliseconds later.
+Sounds like you are probably seeing the effects of TCP Small Queues
+(TSQ) limiting the number of skbs queued in various layers of the
+sending machine. See tcp_small_queue_check() for details.
 
-The delay occurs in the kernel because the used buffer notification
-callback virtio_vsock_rx_done(), called upon receipt of the SHUT_RD
-command, doesn't immediately disable send(). It delegates that to
-a kernel thread (via vsock->rx_work). Sometimes that thread is delayed
-more than the test expects.
+Probably with shorter RTTs the incoming ACKs clear skbs from the rtx
+queue, and thus the tcp_small_queue_check() call to
+tcp_rtx_queue_empty_or_single_skb(sk) returns true and
+tcp_small_queue_check() returns false, enabling transmissions.
 
-Change the test to keep calling send() until it fails or a timeout occurs.
+What is it that you are trying to accomplish with this nftables approach?
 
-Fixes: b698bd97c5711 ("test/vsock: shutdowned socket test")
-Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
----
-Changes in v2:
- - Move the new function to utils.c.
-
- tools/testing/vsock/util.c       | 11 +++++++++++
- tools/testing/vsock/util.h       |  1 +
- tools/testing/vsock/vsock_test.c | 14 ++------------
- 3 files changed, 14 insertions(+), 12 deletions(-)
-
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index de25892f865f..04ac88dc4d3a 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -798,3 +798,14 @@ void enable_so_zerocopy_check(int fd)
- 	setsockopt_int_check(fd, SOL_SOCKET, SO_ZEROCOPY, 1,
- 			     "setsockopt SO_ZEROCOPY");
- }
-+
-+void vsock_test_for_send_failure(int fd, int send_flags)
-+{
-+	timeout_begin(TIMEOUT);
-+	while (true) {
-+		if (send(fd, "A", 1, send_flags) == -1)
-+			return;
-+		timeout_check("expected send(2) failure");
-+	}
-+	timeout_end();
-+}
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index d1f765ce3eee..58c17cfb63d4 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -79,4 +79,5 @@ void setsockopt_int_check(int fd, int level, int optname, int val,
- void setsockopt_timeval_check(int fd, int level, int optname,
- 			      struct timeval val, char const *errmsg);
- void enable_so_zerocopy_check(int fd);
-+void vsock_test_for_send_failure(int fd, int send_flags);
- #endif /* UTIL_H */
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 613551132a96..b68a85a6d929 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1060,15 +1060,9 @@ static void sigpipe(int signo)
- 
- static void test_stream_check_sigpipe(int fd)
- {
--	ssize_t res;
--
- 	have_sigpipe = 0;
- 
--	res = send(fd, "A", 1, 0);
--	if (res != -1) {
--		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
--		exit(EXIT_FAILURE);
--	}
-+	vsock_test_for_send_failure(fd, 0);
- 
- 	if (!have_sigpipe) {
- 		fprintf(stderr, "SIGPIPE expected\n");
-@@ -1077,11 +1071,7 @@ static void test_stream_check_sigpipe(int fd)
- 
- 	have_sigpipe = 0;
- 
--	res = send(fd, "A", 1, MSG_NOSIGNAL);
--	if (res != -1) {
--		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
--		exit(EXIT_FAILURE);
--	}
-+	vsock_test_for_send_failure(fd, MSG_NOSIGNAL);
- 
- 	if (have_sigpipe) {
- 		fprintf(stderr, "SIGPIPE not expected\n");
--- 
-2.34.1
-
+neal
 
