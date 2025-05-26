@@ -1,106 +1,148 @@
-Return-Path: <netdev+bounces-193378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C656AC3B25
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:08:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE65AC3B36
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9474189572F
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:08:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E801174586
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11AE1E04BD;
-	Mon, 26 May 2025 08:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893F71E520C;
+	Mon, 26 May 2025 08:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Ktg+TdPV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NwymsCZ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74226256D
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102773595E
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748246899; cv=none; b=QPOSGBBdYxGzHDhucO/wzNZmRkXTtMaG3x1a91jiEbEinfGSbyeUXhrZKD/GOOXobpH6UsVq/FtV57vqeXzsEFqFrEmnKZf7fla42ZkqmCk7MQpPMSaeavtIFmUFbSxF18koVG/Z4Cq+Vpd2W8JA/9gFJ9A2eu2uyCuJAjNLrXs=
+	t=1748247097; cv=none; b=m0KscbNDXr6G02fMgFIoXFd8qZ2xItkuDLObSXkgzuMY+VtSVAvtw0qPbSVa9X2YLyVJfNjCff8tU+Bc1CpS3tac+9L8hWbQ3M7g6KBTQObIiqsfLhP/KcGOn9H+GSovGs4aVcdMksqP+uiZ7N8H1FT/oMgxhudXkdM4rSeVHpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748246899; c=relaxed/simple;
-	bh=NjrSu41DIqIYC1xoIE1H38UjuFeQ5TXPKvYnDCKxhEs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FKAHC/4XsB3Sb+lG8OqXjHccuypCMV3VfGjesefWx0zhFErI4OkcuGKuM8QxubBpJ2vGy/yxDcr1iGygUqQUbGMTroJz0yleVyoW4U9ILuIxG8gd/y8GgI/BRL1C/Nj+Cb25EQaD9hhPvSqtXjAM0WVO1W3useR0zyVltAUbgvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Ktg+TdPV; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=xLvOKcQLzAxvJjVw+ID0kB4ZGrzFEsUDY1myztbFtYU=; b=Ktg+TdPVBl49F9bMzkKIKy7uep
-	sKDb0jhpBDgStp/RnTtnyLrpJJyBH3+VUIuYmcW2onkTnEnTtx6t1P6SPLXx4h/uHSuejldqSBPYS
-	tTVMUydvQCOxyJoiOYnxjebYdDN696FNsofXwisgnnahi5Xa/QxSrOLhlKGxSFScql7vozxEr/U4g
-	Pqx5PyOPEg96rOs4N+dWHCVJSd5ZNwdRVRzKYJ3dED1Vqvwl7y9HAfX7NNn9B9xZWkM9T6RWxU6hd
-	ZCWWg575BlCjVEU7XEoL5JtjS4c10sVeaOeFE3fy15/Sikw80XglXK9baoitEDHKYXLR/3QV32QaA
-	FM89Aa/Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uJSsR-008zQ7-2T;
-	Mon, 26 May 2025 16:08:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 26 May 2025 16:08:07 +0800
-Date: Mon, 26 May 2025 16:08:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aakash Kumar S <saakashkumar@marvell.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, akamaluddin@marvell.com
-Subject: Re: [PATCH] xfrm: Duplicate =?utf-8?Q?SPI_?=
- =?utf-8?B?SGFuZGxpbmcg4oCT?= IPsec-v3 Compliance Concern
-Message-ID: <aDQhZ_ikHEt_pLn_@gondor.apana.org.au>
-References: <20250526064322.75199-1-saakashkumar@marvell.com>
+	s=arc-20240116; t=1748247097; c=relaxed/simple;
+	bh=SMANpNFuTSfNaRqYgZhkf6SopH9aDDfivDb5cru5GU4=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=mMeMhI3QqnN1GbZhfjO6xoqepsVOMwiuJMCzZjPMgIGgn9w8X008GDUzMJmhQoone8KKDIo+DYVIlczXLM7ip5xhN1FZ3LZQntVLFSNha/ULDUFwOuws3xYTA6KJebOGsSFEzC/zNVBEKXmG9PzkRgPHAZyyaY/ra5Wfe8lbA5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NwymsCZ4; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250526064322.75199-1-saakashkumar@marvell.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748247082;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J2R13Ebv4F2pxOEGG5K0h8rA8GFvT2XDnU+7l2xRuSo=;
+	b=NwymsCZ4pbPB1sXcEso4ZFoqU2vQF7drBm1N0vl/NxTIxRYq6naoHD3V6WHQbOzVpBej38
+	9mvghyT1zleU9+VNnyUq17QlnFqmruMvXc5LcNzFcw/jMm1iW90FJ9396/z90tFUysU2Ya
+	d6LWwP0uORCfyVCOV++iVnp8SnJZmEQ=
+Date: Mon, 26 May 2025 08:11:21 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yajun Deng" <yajun.deng@linux.dev>
+Message-ID: <fad26dc95cbe08a87b30d98a55b7e3d987683589@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next] net: phy: Add c45_phy_ids sysfs entry
+To: "Andrew Lunn" <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <2eec1d17-a6d1-4859-9cc9-43eeac23edbd@lunn.ch>
+References: <20250523132606.2814-1-yajun.deng@linux.dev>
+ <2eec1d17-a6d1-4859-9cc9-43eeac23edbd@lunn.ch>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, May 26, 2025 at 12:13:22PM +0530, Aakash Kumar S wrote:
+May 23, 2025 at 9:55 PM, "Andrew Lunn" <andrew@lunn.ch> wrote:
+
+
+
+>=20
+>=20>=20
+>=20> +What: /sys/class/mdio_bus/<bus>/<device>/c45_phy_ids
+> >=20
+>=20>  +Date: May 2025
+> >=20
+>=20>  +KernelVersion: 6.16
+> >=20
+>=20>  +Contact: netdev@vger.kernel.org
+> >=20
+>=20>  +Description:
+> >=20
+>=20>  + This attribute contains the 32-bit PHY Identifier as reported
+> >=20
+>=20>  + by the device during bus enumeration, encoded in hexadecimal.
+> >=20
+>=20>  + These C45 IDs are used to match the device with the appropriate
+> >=20
+>=20>  + driver.
+> >=20
+>=20
+> https://docs.kernel.org/filesystems/sysfs.html#attributes
+>=20
+>=20 Attributes should be ASCII text files, preferably with only one
+>=20
+>=20 value per file. It is noted that it may not be efficient to contain
+>=20
+>=20 only one value per file, so it is socially acceptable to express an
+>=20
+>=20 array of values of the same type.
+>=20
+>=20These are static values, so efficiency is not an issue.
+>=20
+>=20It might be better to have a directory
+>=20
+>=20/sys/class/mdio_bus/<bus>/<device>/c45_phy_ids and then for each MMD
+>=20
+>=20create a file. I would also suggest using is_visible() =3D=3D 0 for t=
+hose
+>=20
+>=20with an ID =3D=3D 0.
+>=20
+
+is_visible=20only hide files, not directory. It will look like this:
+
+c45 device:
+$ ls /sys/class/net/eth0/phydev/
+attached_dev  driver  of_node         phy_id         power       subsyste=
+m
+c45_phy_ids   hwmon   phy_has_fixups  phy_interface  statistics  uevent
+
+$ ls /sys/class/net/eth0/phydev/c45_phy_ids
+mmd10_device_id  mmd17_device_id  mmd23_device_id  mmd2_device_id   mmd7_=
+device_id
+mmd11_device_id  mmd18_device_id  mmd24_device_id  mmd30_device_id  mmd8_=
+device_id
+mmd12_device_id  mmd19_device_id  mmd25_device_id  mmd31_device_id  mmd9_=
+device_id
+mmd13_device_id  mmd1_device_id   mmd26_device_id  mmd3_device_id
+mmd14_device_id  mmd20_device_id  mmd27_device_id  mmd4_device_id
+mmd15_device_id  mmd21_device_id  mmd28_device_id  mmd5_device_id
+mmd16_device_id  mmd22_device_id  mmd29_device_id  mmd6_device_id
+
+
+c22 device:
+$ ls /sys/class/net/eth0/phydev/
+attached_dev  driver  of_node         phy_id         power       subsyste=
+m
+c45_phy_ids   hwmon   phy_has_fixups  phy_interface  statistics  uevent
+
+$ ls /sys/class/net/eth0/phydev/c45_phy_ids
+
+
+So is that fine?=20
+
+>=20 Andrew
 >
->  static inline unsigned int
-> -__xfrm_spi_hash(const xfrm_address_t *daddr, __be32 spi, u8 proto,
-> -		unsigned short family, unsigned int hmask)
-> +__xfrm_spi_hash(const xfrm_address_t * __maybe_unused daddr, __be32 spi,
-> +		u8 __maybe_unused proto, unsigned short __maybe_unused family,
-> +		unsigned int hmask)
->  {
-> -	unsigned int h = (__force u32)spi ^ proto;
-> -	switch (family) {
-> -	case AF_INET:
-> -		h ^= __xfrm4_addr_hash(daddr);
-> -		break;
-> -	case AF_INET6:
-> -		h ^= __xfrm6_addr_hash(daddr);
-> -		break;
-> -	}
-> +	unsigned int h = (__force u32)spi;
->  	return (h ^ (h >> 10) ^ (h >> 20)) & hmask;
->  }
-
-I don't think this patch is sufficient.  The logic around state
-lookups need to be changed to exclude the destination address
-comparison to achieve your objective.
-
-It's also dangerous to unilaterally do this since existing deployments
-could rely on the old behaviour.  You'd need to add a toggle for
-compatibility.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
