@@ -1,194 +1,175 @@
-Return-Path: <netdev+bounces-193328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4EEAC38A1
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE26AAC38AF
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:32:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745751684B5
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:30:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3FF3170681
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312431CF5C6;
-	Mon, 26 May 2025 04:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150E41A5B93;
+	Mon, 26 May 2025 04:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="RUBpDtEa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OoXew1jd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2049.outbound.protection.outlook.com [40.92.41.49])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662761B4141;
-	Mon, 26 May 2025 04:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.41.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748233755; cv=fail; b=NcWjL3vXCMGLbeNB00FfXvPR1BjQ6E+D9/ZuLx9D/AoKFj9uMMvTLWv1/D/WQuZKL/2GIkjFjOG10vQ2Jc01rNAwVGCxuwXIvPXj8ihXpNHUdn1XbFDavMfA6lqdVDLB9CHkUwwOJMuLk4YQAOwm/0dkv/E4M3azlRqaEND7Big=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748233755; c=relaxed/simple;
-	bh=TleH26UM6X3WsMmlJFQLhOMFwjlS6jT2YOd6xt2y3Pc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mFUJw75KBQp5WqYlcimM8aOvT7z3GPBUJG5Ew+loo8tyLLmWx291yv+/hfZEhrMoOQoc9y0xlthqyiqgZnN54NQEiXznf2elN0sqTyKatCdk41/N4dwwcwmoQTC4h3aMB2vky9S0YUPlTIgoulVeNCaBwbG4rmht+o9BXIjxTGc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=RUBpDtEa; arc=fail smtp.client-ip=40.92.41.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LOBZDy36yM7tSCs8EiAb7dZ8xxaiV5SocgApQPFKfaWdNOCRlbeSt8gTNO2PVqk+5Bps/1tX6kGQ69xdF0Hbw5ZOlZxPzwMuuNarBRf76yqDpFfA8cilOIx8yw4Rj8HS1mx4Fa9tnV5pTwADByhBsUScJgibaW1sDuGP5zmUKAtJfe+SrsQ0tSBs9evcvwFgWcS/E07sKJdEErr6sXRJAeiyyf3UG0OM7EkIYQ3SFJgNKP6Woo1+DApLaftiDKrhvng2eIiYKGdeHkj9+sWhAO9cujs1ydTTW0IeIr9hFBL8nQEgRjgE+qVK4thTidKKIDC9BYH1/Ly35e9ZJl87Jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XDCYH0FFLQiCjsblBG1yilzyPlzQZWpD+RAPT36tyUo=;
- b=GHLQy8zAeHaxb+Akg65jR1mAt+iHGDSbpeVfJcKrZ/5b/qI2My9M2l/EW/zKhVujmHXeGglOAsXObn6kHahn00XZ2+t8uzWCPNRXs/KsePtHIb2ewRwawUtDNzdlSPa2mhrF+q3l4aMpiS4QndKSQbxDT8BTdDiZRxeVwsodJKq2plBlHr8sXUqnE01wldmiJHxeGHQDoapeqaYT38dkzegW5izWv4gLN/sg17Kk7oraVJs/GnHJj+dQMj8dDCJ9NluU3x3rhuQEnxgi4EVW/UhCXT6fhSDQAVBV/gHeeBSvSGq31RNX5LDq+e7KImkzDB44v8mkEln8iUnm08xtjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XDCYH0FFLQiCjsblBG1yilzyPlzQZWpD+RAPT36tyUo=;
- b=RUBpDtEa27ddNh9I7s1tAq0tstEnTVnzmiNH6o4z0JEpaVN0Kr03tqIZad+hT91oeB8w0keNwnS1ZsKgOeHCf+/HKZ99XGun3S+MMlErrXniKtXzvbYVcXw0upjA3mcP7mYmoY1tdZGb2pt6QBomvmVh52BjhuJicGfbP7ksx1dG9lwLU/kEo9NxokXrKtrrLaL2I7roed88ALvP7zfkaH/eyUgQSTzcO9vZI/gfEUdDqXUSkYcgk4aBPGsPmaNySof+Pf+9aiar9rcuIo/9DBhTRpvWpU/e7Nsmy7fgu0BhJkOvpPc6BVTyjCrlNGqo9hBtDTcCuUhi7FoH5WZg3g==
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com (2603:10b6:8:253::16)
- by BY3PR19MB5059.namprd19.prod.outlook.com (2603:10b6:a03:36d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Mon, 26 May
- 2025 04:29:10 +0000
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305]) by DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305%4]) with mapi id 15.20.8769.025; Mon, 26 May 2025
- 04:29:10 +0000
-Message-ID:
- <DS7PR19MB88839F1DBCC15D6BF90B0CE79D65A@DS7PR19MB8883.namprd19.prod.outlook.com>
-Date: Mon, 26 May 2025 08:28:58 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal
- PHY support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-clk@vger.kernel.org
-References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-3-ddab8854e253@outlook.com>
- <40b427b8-b0d0-474b-a7c6-46641d1940b9@lunn.ch>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <40b427b8-b0d0-474b-a7c6-46641d1940b9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0062.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:59::10) To DS7PR19MB8883.namprd19.prod.outlook.com
- (2603:10b6:8:253::16)
-X-Microsoft-Original-Message-ID:
- <1d5acc88-311a-4dd5-bf02-45f4014d617f@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6C81A254C;
+	Mon, 26 May 2025 04:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748233973; cv=none; b=RLALh6hv7Cy9fc56ZQzyVMnwzPXUvdjzmlqfoL50tcItTNaL/NHjO7wqN1ThrXoEze9mu8XoSxVR+WUrPUbtHFrjKzeBu9QDhNDQu2ZqMhs/mws622SSdxMtzFJ9dCh/J3S3kBT8UEL7YMvErpezQ0PJTfJoMQ7mxgsURm0IsMQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748233973; c=relaxed/simple;
+	bh=mn8ba3UTDa4URrSa/YaCqXTzQBlqqLMeOBmtg4InUXg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lS/GVFBEvqAJ/kQaul+c8KakwYl9cqNQKbzILECZXLcPsreAA8BfXJYddZtAAxXMmpUx+ctMj/ybL+36XZSrpxW6qmfYHboWf8GQVNzfSHXYs8a3xBFt2kfnpI2jcZhnuCkDXAA/Q2IPtI8asv1QCpojtSkOZOszF6H0NTJ7QKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OoXew1jd; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54PKe6cS001698;
+	Mon, 26 May 2025 04:32:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=A/2Y9sujCohNMkIn/XEj5QKAxZbDlEiFLj/Bbpg1/
+	Ko=; b=OoXew1jdL3xZ7eMIt2UAVW2XlBkhJdm3DeTka3nnqxBs0QdagSuVT04D2
+	CKOG0CN7S4NHpzDSEXE9WhVaRGZaK6IJ/szAp2Q8a3ugrcx/GPqbdstxEXd5XUaw
+	fthYbkeBjHvvCKmrGtM6uZprex8EtjpyJ+0HIw+MabvWuMuHZFAYh4KWl6jg2LUF
+	raVNsY3tUJIVg/6kxeuThb3OMoEfJmDnVhHpiqPsG2MfwF1C4WcDE/cwqXzpO+95
+	deQwYvmmQ6CtBb7O7MuxjTbjYY11Lws7xueuycJhkVgrM7eVHoDb80jfIEH2MQQ1
+	hUGJ5jx6ZY5IKYochHJD0jfMD1MyQ==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u5mby608-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 May 2025 04:32:45 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q1vueF016644;
+	Mon, 26 May 2025 04:32:44 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46ureu4t1v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 May 2025 04:32:44 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54Q4WglU27198140
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 May 2025 04:32:42 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C5EE358059;
+	Mon, 26 May 2025 04:32:42 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5533E58043;
+	Mon, 26 May 2025 04:32:42 +0000 (GMT)
+Received: from WIN-DU0DFC9G5VV.ibm.com (unknown [9.61.243.103])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 26 May 2025 04:32:42 +0000 (GMT)
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+To: sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com,
+        Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: [PATCH net] vsock/test: Fix occasional failure in SOCK_STREAM SHUT_RD test
+Date: Sun, 25 May 2025 23:32:20 -0500
+Message-Id: <20250526043220.897565-1-kshk@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR19MB8883:EE_|BY3PR19MB5059:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f97c173-e5e1-4dab-a3dd-08dd9c0ddc08
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|19110799006|8060799009|7092599006|5072599009|461199028|6090799003|15080799009|440099028|3412199025;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QkluRW1icHlzUUdnRm1xcVUzSnpDblJkQVRMTjZjRmFkL3k1NjJIVXNYOGxr?=
- =?utf-8?B?c3JMeE5RbndCbFFTNUhkRURtZWUwSS9MVTJ3UzdvMGswa2Q0MFlWanFMQlkw?=
- =?utf-8?B?NXZiSkRoTGxPdWEwUUc4QTRFWHFuUXdrS2hNNENSaFFyV3JKNTJ3S2cxa3Y0?=
- =?utf-8?B?VW5PK1lyTVQra0tZd0l3cHJIUnViaU9seFdnNHo0a3FEeERCcHQ0YjVQQ0Fw?=
- =?utf-8?B?Mm9KaHFrbFpJODFIM2RiYXEzR2pyZElsSU5pTWova240R3R1eHF0ZmRGa29z?=
- =?utf-8?B?TTJUY09nTDZiWVBiMzBEa0xvcGtkUHBXWDZwQlFabmE2ZlF2b2JMTG9UbXBa?=
- =?utf-8?B?L0Vaa3JVUHc3MXpZeUR3Tk9lTVVEc1F2dUI4R3FZemRGSjFIb3FJMzFZVWFE?=
- =?utf-8?B?UUxzeFhYOHRCUVUrcmFhZU11UmlScG5WMWtsa21ld2VXM2xGQmlrS2tFV1RY?=
- =?utf-8?B?cjFKRUpBYlpnYkJXYXJpdjNENWozSXZhajg2QldUaXhxYWV0M3RSVVJDZDZU?=
- =?utf-8?B?VHA1Mi9WZU45VW54Z1puL3FjYWVhUExaalZnbjZOeTFTTnNFUmtzMkVLSE1C?=
- =?utf-8?B?RDZlZ0xlVk1BVldaYWY1QmFkZzBFSU1sZ1dNcm1UbDRMODQxRG5iZ2dVaDVt?=
- =?utf-8?B?NHVzelorN3gvaFFsWHhOTC8zYW9oL3llaE5uTnAwc3phY3lyNHRZbDhET0t1?=
- =?utf-8?B?bzNrNSs5endkVWk1dWF5OWUzTTJOZ2IxQWlib0syWlFpb3Y0NnY2QXM5NDBw?=
- =?utf-8?B?MmFrL0tydFZnbWM4RktBSlN6UW9EcG84a2pYbnRIVVhucGlZaXVpUHhaZ0Z1?=
- =?utf-8?B?QmExY2pwYndmYWVFSWk1MFdIL0FLMjdPeFdzdENEVDlwRkp5ZjAzVkZUTXdl?=
- =?utf-8?B?YUgrN1lyRDZFTVg0WExxeTFrcW5HNzZXNjNCb2JROXNpeXdPQ01QcHczQzkx?=
- =?utf-8?B?ZFA0ZHhOLzVRSk9Sd1B5NU52a2JPM0R3NFE2YWZKL1F1UThzMDJOVnlyYXdl?=
- =?utf-8?B?VWUxMHZHUUNWREVLZFp5dmpxZTFzdUNtWk1zM2VUcFI3QWxqdWkzN1JrTDRj?=
- =?utf-8?B?NkhVRzRhUW5IQitNamM4VHhRcmtSVUhBT3RwbUN6N0NpdW1rMmhDZU9paEdF?=
- =?utf-8?B?emo3czNHTXZXcW9BZHgyZzlUQjFCRlprV0JXenExaFB3QmVDbWFvbnBPR1BB?=
- =?utf-8?B?WEtHc1NtUU92L2Y3bXZVWUtkOU9RSGhMOUNOZ2xmUXpJYmpHdkVVdXJVYmVE?=
- =?utf-8?B?ZkVqOXVRTkttdm9BYjhuRTZvSW53T0VZTjNtTm9janRNU1J6LzJSMllCanZX?=
- =?utf-8?B?aTlzSGtQZUZMTVE5YUM2S2U1d0tpS09FOGFCQzZwR2d0RUh6U0xIV1R0RERy?=
- =?utf-8?B?elhvWE5mUTJQVVh6RkNvcjEzRkZGSU5IbERGMEQvY2ZjUXZNK2U5QXJpbUhj?=
- =?utf-8?B?dm5RczNJM1JoRUk4elFjTGE1ZjBZZXdrWjBaRDVUSVg0R0hYTzA4eklvR2Fm?=
- =?utf-8?B?UWVvQXQ4TEs2QVRDaFNYMkMrYnI3d2pOV3ovejJTVGpqb0g4c3hXT2QvNldy?=
- =?utf-8?B?MjBpZz09?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bVN2bWFnOGVERDUwSFFTR0FYc2txV3EzRjV2ME5CM3FSZEh5cUx2Y2V1UERN?=
- =?utf-8?B?MW1ic2g3dCt6SnM0cjZ3VlRjMHJ2K1o5Y3Rsb05tbkYvNmRtWXVsWlpmNGFU?=
- =?utf-8?B?cTd1R1Z5cTNCaHBYOGVOeUhpYXZoYzZMcWRwQzNzRjBraU13YWlwVHNzK3cz?=
- =?utf-8?B?QWI2R1dQcnZ5blRDVFI2ak9PVWlOVi9JRy8wSitMeDNWSGxUelhwd1pTbEQ2?=
- =?utf-8?B?Y1NkVk5STXhOZ2ZCbHRDUGJrTEpydFhtVmd4ZVJCSGtxREtqaHlveGd1M3BC?=
- =?utf-8?B?bnNSNjNnOTZ5VW41MFlyNTlhSURyVlVOUmdmRUY2cDJuLytTQ1h1UE41dWdT?=
- =?utf-8?B?VUlNdk1VMWFXR3dzREc1bDNTdHJYcG1FV0VlRlhhdEFWalVoZmhoRkxpQWtm?=
- =?utf-8?B?dFFsU0JVeXV5WlJScmllMTVnb2EvMVdKSE1CWnBSUXppQ04veFBPRytKN0Zt?=
- =?utf-8?B?R2xsN3MwU3ZvZFlOY0MzcFIzYkxKUDQ0SE5aVXBDU0c1aEtUUFRNYXFnQTN1?=
- =?utf-8?B?NTlBcmRsSlNSa243VkxpOFJMYWk0SG5hVTFPZmhQcklsUTU4Q0wwS05yTWNB?=
- =?utf-8?B?SmpIWjZ5TkxSRUFyalFwV01uakdoVnpGQmhvWUl0U1lwR21xV1NiRjM0eEdx?=
- =?utf-8?B?S3RXZzNVdHlndFNLaExEUW5YYWhQUHg1Wi9vZms5QjV1YjAyeFVFNi8yS3l1?=
- =?utf-8?B?TWN2MVhvRFJ4NUFOR1p1NGYrWDI5YUdVcFhFMmNJbVhsMTIwbldibWVRVU9X?=
- =?utf-8?B?L1JERXdnWDNNdTBoM0VxUktScU9YYjRqeWpsZ1J1cTBvUzRrOUhOdEJadFll?=
- =?utf-8?B?Y2RiaXJyY3V6QVVpOWhTSUZWT3lrcTNuZmZCNzh5eFFhRlRnN1NCTVo4Zy9o?=
- =?utf-8?B?ZVlWSnE4OEhGVHBrY2Y3UWQ4MStUR2JweXYyUWJIK3RQdURkMjJKR3BBU0VU?=
- =?utf-8?B?NWdXWGkxU3dlY0pwQTFTVUNvQWN0dlVJNmgra21mNU1mRzM1THhya0E0aVp2?=
- =?utf-8?B?Tit5aHh1b0RuRFAwWWZUSytWd3ZkN0lBUEtTczVaQVpWbG5hcXRPMjBrUkJp?=
- =?utf-8?B?NHZLQnpZcmpYeGFJVzB6bmpRM1FYTVBwZWNpcEJHb01kN1FiNEYyQ2Njc0dB?=
- =?utf-8?B?aXJxeUM3MXlIcWphczlqdG9ZR0hSOHNuOHhXTGgzUm1acWlWTExwZXRYVVdQ?=
- =?utf-8?B?b3BqTVlMQnZiWTFmTS8zVXdneWJmSVZaUGdmdlYzcThNcmxvakgvZjNicXV1?=
- =?utf-8?B?bjZ4RHF3NTVvWkVyaEZ4bU9ERW5Qc3djTldiTDNYYUNLUHh5bFY0UUpha0M2?=
- =?utf-8?B?VHkwK2Y0RzkzMkJBeitUVnhEbG54WFVXelhxNHhMaGhVTHFUaU9EVjcxSlJw?=
- =?utf-8?B?SW1yNmJUSFVoNWpUWUtZZzF2WGRsR0FXbjdObEZ4b05ydjA0Q1l4S2h6T0Mr?=
- =?utf-8?B?RWJMSnFGRi9pMElqMWFzTlBSVko4clZDY2FqdjZEbFRPdnAzK0V4cVJwdjJo?=
- =?utf-8?B?cDVaT1E1alk5cmFBQUw1ZWsvU0FFem5JbUdicXFUTlpmd3ZhUGx2TkJCbVFx?=
- =?utf-8?B?OGxzQ3ZtallRRzdMWnlGU05VclVGTmdETS9tNjlLNXJlT2hBSWdJNnlUWEhU?=
- =?utf-8?B?STR6dVJSckMwU0RKalUrWTBuVDZaZ0pWa2dPMUdJTDkzMHRoOVBlM0hUUXJq?=
- =?utf-8?Q?ct42ibblKxo2Q8Df70Ap?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f97c173-e5e1-4dab-a3dd-08dd9c0ddc08
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB8883.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 04:29:10.4169
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR19MB5059
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=E9bNpbdl c=1 sm=1 tr=0 ts=6833eeed cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=HT24iyfb7oJRp2wcDU8A:9
+X-Proofpoint-GUID: -d6ii3Z_t74ZB3IEDtDn0pcimtKEABzh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDAzNSBTYWx0ZWRfX8iLOaLeU+aoC zCzZUz1xaXrsPsXaH9RIfrsYGVqDnqKdW99RAdo8h1uAROKUvvca57wBSCMF4A5Cp/mluyK37ds RjoqKrU53aC4F1wjMCS+RcfsmXxNuR34f5VKsCNrr6mmr9i6xV3y/xF70qv+Zufze0BjvabK71k
+ GPIVGXId1MgrmnxwGQ/6TxOLRDXrvMPi5ywELZqKegF923OKQ09ng5ro/tNcOlSZjm3s2+rBN9S yg3HGbROjESG0GRRV18Tv1osvonYaCrnOW+TnDRThyNemw5T1ESVYK4GoaWqHJCMOyZd59nCL6B zWvuMPWvbKaU/7hUkBSrx36sIhS/s9WXrbR5BPEhyLQotoVABMgtGyIdSVKci0yAlunmRnX5R7w
+ k4/FkzWrgt+sQeYll6M4A6vbGyHoPMmDn1ksMPtA/X+TloRCmeO0P7GI59qXXvMKBDI+HlIE
+X-Proofpoint-ORIG-GUID: -d6ii3Z_t74ZB3IEDtDn0pcimtKEABzh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-26_02,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ mlxscore=0 bulkscore=0 adultscore=0 impostorscore=0 clxscore=1015
+ suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505260035
 
-Hi Andrew,
+The test outputs:
+"SOCK_STREAM SHUT_RD...expected send(2) failure, got 1".
 
-On 5/25/25 23:42, Andrew Lunn wrote:
->> +	phy_write_mmd(phydev, MDIO_MMD_PCS, IPQ5018_PHY_MMD3_AZ_CTRL1,
->> +		      IPQ5018_PHY_MMD3_AZ_CTRL1_VAL);
-> 
-> Using MMD3 in the name is a good idea, but PCS would be better. Not
-> everybody knows MDIO_MMD_PCS == 3.
+It tests that shutdown(fd, SHUT_RD) on one side causes send() to fail on
+the other side. However, sometimes there is a delay in delivery of the
+SHUT_RD command, send() succeeds and the test fails, even though the
+command is properly delivered and send() starts failing several
+milliseconds later.
 
-Will rename all IPQ5018_PHY_MMD3* macros to IPQ5018_PHY_PCS* in next 
-version.
+The delay occurs in the kernel because the used buffer notification
+callback virtio_vsock_rx_done(), called upon receipt of the SHUT_RD
+command, doesn't immediately disable send(). It delegates that to
+a kernel thread (via vsock->rx_work). Sometimes that thread is delayed
+more than the test expects.
 
-> 	
->      Andrew
-> 
-> ---
-> pw-bot: cr
+Change the test to keep calling send() until it fails or a timeout occurs.
 
-Thanks,
-George
+Fixes: b698bd97c5711 ("test/vsock: shutdowned socket test")
+Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+---
+ tools/testing/vsock/vsock_test.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 613551132a96..c3b90a94a281 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -1058,17 +1058,22 @@ static void sigpipe(int signo)
+ 	have_sigpipe = 1;
+ }
+ 
+-static void test_stream_check_sigpipe(int fd)
++static void test_for_send_failure(int fd, int send_flags)
+ {
+-	ssize_t res;
++	timeout_begin(TIMEOUT);
++	while (true) {
++		if (send(fd, "A", 1, send_flags) == -1)
++			return;
++		timeout_check("expected send(2) failure");
++	}
++	timeout_end();
++}
+ 
++static void test_stream_check_sigpipe(int fd)
++{
+ 	have_sigpipe = 0;
+ 
+-	res = send(fd, "A", 1, 0);
+-	if (res != -1) {
+-		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+-		exit(EXIT_FAILURE);
+-	}
++	test_for_send_failure(fd, 0);
+ 
+ 	if (!have_sigpipe) {
+ 		fprintf(stderr, "SIGPIPE expected\n");
+@@ -1077,11 +1082,7 @@ static void test_stream_check_sigpipe(int fd)
+ 
+ 	have_sigpipe = 0;
+ 
+-	res = send(fd, "A", 1, MSG_NOSIGNAL);
+-	if (res != -1) {
+-		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+-		exit(EXIT_FAILURE);
+-	}
++	test_for_send_failure(fd, MSG_NOSIGNAL);
+ 
+ 	if (have_sigpipe) {
+ 		fprintf(stderr, "SIGPIPE not expected\n");
+-- 
+2.34.1
 
 
