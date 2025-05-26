@@ -1,183 +1,187 @@
-Return-Path: <netdev+bounces-193433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E33CAAC3F8B
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:52:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D3AAC3FB8
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40E933AF66A
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 12:51:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1BB018984D8
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 12:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FAA2036E8;
-	Mon, 26 May 2025 12:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6879202C26;
+	Mon, 26 May 2025 12:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cnFqwu23"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KMVJZhag"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7393A202980
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 12:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8971F8AD3;
+	Mon, 26 May 2025 12:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748263912; cv=none; b=i5OidRz3F8uFaE3nNU9aVeCMeY5TfMCBNDmGv3IIG0SNQJLas2mM8kCWJC0IectPr1ZUukPhTV9vzpASligVy6yoiSGME7wCc4/nG7Bs6QkdynChMa8AxjD9K+W5nlpY9QJJstHX1OJD+DV1XXD71B0HHozfb1e2Nn9klauD9no=
+	t=1748264138; cv=none; b=cyA1iZjj54Oys61qUmTtMOXgdQ+lpMQpZsCDDeGa/xdNRSRYnKLAU0JP7Rzx+0IAvbCdjOChcuPeZ3tJb5C8VPnfV5FjvEoFMUTOTi0Pd5RluZAF7OebERrBH9S6YdRiflAXbdkU26mSzvRT/Xte2KuHx9TnYmUcfKtkcvgn8Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748263912; c=relaxed/simple;
-	bh=xGtgOVGl/7+FDUtfK4xwWE1CZC1f6N33ajHG2jCeSsU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=orj/MBSiGVVRlMIuZn1gXf8dP6MculZ1dvNhAeiPtYJ8OFEYIMxmglXuVsUP/1zKYXPdlVB3BykhSp5Zgbo3XMXzCLFEftJBdSm+3YxJdAJFKBXnOP1x57JPlDxodEM6799xGawIBOOrZTE2QlOdjYleP4aVrKm72iYQ7j2r8B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cnFqwu23; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748263909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5h5iun9WeuvV4gJlQiA1mE7zK3XNw6p2G6AruARxVOU=;
-	b=cnFqwu23iW0paQrGc/xvzZZDMwyaHqFd3ju6QonvMBD/D/y6klkb3H7AoQ9+aMlR7rrV8+
-	yhbzjAsBzy98PgDRaG4+ScufqwV59nFF4TzEnSuHdmQWEC6J1ZN40sa2hS+cXvj/d1r4w3
-	6TMr9O3y++k2xuoSsre0htBYJ15lRbk=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-jc-_vbpYOgOKjy9xv8eobw-1; Mon, 26 May 2025 08:51:47 -0400
-X-MC-Unique: jc-_vbpYOgOKjy9xv8eobw-1
-X-Mimecast-MFC-AGG-ID: jc-_vbpYOgOKjy9xv8eobw_1748263906
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-551ec3101c7so1043272e87.2
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 05:51:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748263906; x=1748868706;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5h5iun9WeuvV4gJlQiA1mE7zK3XNw6p2G6AruARxVOU=;
-        b=JekJTa4YyoCkAQe4UPCkTh7APjfokceV+mCvD0+mwDNBFASG1mfqy8jlgoM0rbcb+F
-         Nn5Y+yijozCtWkkEd1IVnw6QYJUTpcqvpy+2JhCOKAtK+MsFyHW9TjKUi9h1XrgZBy7m
-         Hcy2tnhj0I13ZHP1CJEdMWKHtom+SFRTVLZ5WdNnQoKaumNeL/oguDJCSGC1+uk+bcu5
-         2hjcfEykebt4FCvp0FZODcgbnkmXswCLAWLKZxlfD5xoP8/Kw/vgUehiBGHLh6HzClSt
-         25VLqmINw0Fg6S2KWX4qHE/1Ts5Evsdv3cWG08XO0rwWkI8NfWSobBiKCliqRYQka5zU
-         R9yw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2SgZFpAFND17aNktYbAYeI9qDAwT/f691Zhz+acOvF1t9r2XQPKlh281+GueqbEOJtgvJyyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymHo4gyxvtOxk9cF+UuoV5iufuF0izHTmGiyh6FnKjH7HLMI67
-	9JBRdvoj4ZE3DRTmEGdw5Zf7w5v95TqGXX2chOa605pvV+cOQDWZtdEQQB3Q4IUu55r9hYfmOeH
-	4AfA3lX0RnThwKU3vLz8jtV5XStLo0sr59ztPghICTVdf1YdFOmp37AqzYA==
-X-Gm-Gg: ASbGncs61cZQWG64AaLFI1EeR+DVj+dwyAdE762189Vs29ElL09dQ2bgoldDKUD8wM4
-	JYwPqMDDGtXYaJtvfDHKTAmGlLnhhk0/suAk7XVE+cTug1hn3L1TP9rRIBKSGyd257IforEXlIX
-	8o/+W7izvsdjeW1PCMuRRzSAqAI0PiN84oxkKv9WzumxAzH6x341mypQnwyJzL1TvCIWvCMv66k
-	dfnkz638ssc07GUORY9RWBnBwFhTjO6AZm/9RjCHa3dUCtG1EMcCT8QNNCcb52efySSDCPOkk2E
-	/Z3j/ww/
-X-Received: by 2002:a05:6512:4147:b0:553:25e9:7f3a with SMTP id 2adb3069b0e04-55325e97fbdmr160073e87.36.1748263906265;
-        Mon, 26 May 2025 05:51:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEbUYYwfzZb+OGN39N2NMQpTC1fcBTwawJZeg/s6ljgk9Apq9BdD2PbfjdkZ+T1CNXKmlehQQ==
-X-Received: by 2002:a05:6512:4147:b0:553:25e9:7f3a with SMTP id 2adb3069b0e04-55325e97fbdmr160062e87.36.1748263905761;
-        Mon, 26 May 2025 05:51:45 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e702f1desm5129402e87.208.2025.05.26.05.51.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 05:51:45 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 427701AA3F2A; Mon, 26 May 2025 14:51:44 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Mina Almasry <almasrymina@google.com>
-Subject: Re: [PATCH RFC net-next v2] page_pool: import Jesper's page_pool
- benchmark
-In-Reply-To: <20250525034354.258247-1-almasrymina@google.com>
-References: <20250525034354.258247-1-almasrymina@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 26 May 2025 14:51:44 +0200
-Message-ID: <87iklna61r.fsf@toke.dk>
+	s=arc-20240116; t=1748264138; c=relaxed/simple;
+	bh=bExfwfw/4XWLYxbzMhE/s2vE70ANp/mcnfz5QFrmCek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IlFjJYWeyGxtDW+pJlyNgc7c30eaurgr9kT8kBTrUrvAaE6z7Z0g5NQffnZciaVV18KPp6NOM6FGJIw3viKLLJKlB3XFQUtYP9go9OwXZEzdFbNn+Eu6y5IjhFjC14U9GdxywC1er42+dbRGmjB6az9OxtpDs83cIw4pT+xCLAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KMVJZhag; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09AF7C4CEE7;
+	Mon, 26 May 2025 12:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748264138;
+	bh=bExfwfw/4XWLYxbzMhE/s2vE70ANp/mcnfz5QFrmCek=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KMVJZhagqDWLuK7twueF+MZeVg44ZGNrF5jWEgnH7K4epGjF5S0eXGhaeddjJw1ua
+	 beXzya9wCrBY0gI2JUaN3aVHGInII8Q6rg6XTC38o2Uad3UZ5QUNiPIRjX60eief3C
+	 ZmWSiRTNbgLTy91FIAYFeZ8MKW/34tAHzORqMtwoDCTgR5oDaHd52Qq2To0lBJldzU
+	 G54NbcBBEJxCrmmQqDF9QrIsZAMXkLjUtkhKaEM5LcUGc+Kx9xXvdrBBqSwXJlX6Rd
+	 AjDXhpww1+6Yc0EB1e/EQVwqUqV6DolffmhqzI7RgqV5SyEZiN6SdaoSpf8mBKODjF
+	 bnVCcs2Y2+whg==
+Message-ID: <9e00f85e-c000-40c8-b1b3-4ac085e5b9d1@kernel.org>
+Date: Mon, 26 May 2025 14:55:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE
+ PHY support
+To: George Moussalem <george.moussalem@outlook.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-clk@vger.kernel.org
+References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
+ <20250525-ipq5018-ge-phy-v1-1-ddab8854e253@outlook.com>
+ <aa3b2d08-f2aa-4349-9d22-905bbe12f673@kernel.org>
+ <DS7PR19MB888328937A1954DF856C150B9D65A@DS7PR19MB8883.namprd19.prod.outlook.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <DS7PR19MB888328937A1954DF856C150B9D65A@DS7PR19MB8883.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Mina Almasry <almasrymina@google.com> writes:
+On 26/05/2025 08:43, George Moussalem wrote:
+>>> +  qca,dac:
+>>> +    description:
+>>> +      Values for MDAC and EDAC to adjust amplitude, bias current settings,
+>>> +      and error detection and correction algorithm. Only set in a PHY to PHY
+>>> +      link architecture to accommodate for short cable length.
+>>> +    $ref: /schemas/types.yaml#/definitions/uint32-array
+>>> +    items:
+>>> +      - items:
+>>> +          - description: value for MDAC. Expected 0x10, if set
+>>> +          - description: value for EDAC. Expected 0x10, if set
+>>
+>> If this is fixed to 0x10, then this is fully deducible from compatible.
+>> Drop entire property.
+> 
+> as mentioned to Andrew, I can move the required values to the driver 
+> itself, but a property would still be required to indicate that this PHY 
+> is connected to an external PHY (ex. qca8337 switch). In that case, the 
+> values need to be set. Otherwise, not..
+> 
+> Would qcom,phy-to-phy-dac (boolean) do?
 
-> From: Jesper Dangaard Brouer <hawk@kernel.org>
->
-> We frequently consult with Jesper's out-of-tree page_pool benchmark to
-> evaluate page_pool changes.
->
-> Import the benchmark into the upstream linux kernel tree so that (a)
-> we're all running the same version, (b) pave the way for shared
-> improvements, and (c) maybe one day integrate it with nipa, if possible.
->
-> Import bench_page_pool_simple from commit 35b1716d0c30 ("Add
-> page_bench06_walk_all"), from this repository:
-> https://github.com/netoptimizer/prototype-kernel.git
->
-> Changes done during upstreaming:
-> - Fix checkpatch issues.
-> - Remove the tasklet logic not needed.
-> - Move under tools/testing
-> - Create ksft for the benchmark.
-> - Changed slightly how the benchmark gets build. Out of tree, time_bench
->   is built as an independent .ko. Here it is included in
->   bench_page_pool.ko
->
-> Steps to run:
->
-> ```
-> mkdir -p /tmp/run-pp-bench
-> make -C ./tools/testing/selftests/net/bench
-> make -C ./tools/testing/selftests/net/bench install INSTALL_PATH=3D/tmp/r=
-un-pp-bench
-> rsync --delete -avz --progress /tmp/run-pp-bench mina@$SERVER:~/
-> ssh mina@$SERVER << EOF
->   cd ~/run-pp-bench && sudo ./test_bench_page_pool.sh
-> EOF
-> ```
->
-> Output:
->
-> ```
-> (benchmrk dmesg logs)
->
-> Fast path results:
-> no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.368 ns
->
-> ptr_ring results:
-> no-softirq-page_pool02 Per elem: 527 cycles(tsc) 195.187 ns
->
-> slow path results:
-> no-softirq-page_pool03 Per elem: 549 cycles(tsc) 203.466 ns
-> ```
->
-> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
->
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+Seems fine to me.
 
-Back when you posted the first RFC, Jesper and I chatted about ways to
-avoid the ugly "load module and read the output from dmesg" interface to
-the test.
+> 
+>>
+>>> +      - maxItems: 1
+>>> +
+>>> +  qca,eth-ldo-enable:
+>>
+>> qcom,tcsr-syscon to match property already used.
+> 
+> to make sure I understand correctly, rename it to qcom,tcsr-syscon?
 
-One idea we came up with was to make the module include only the "inner"
-functions for the benchmark, and expose those to BPF as kfuncs. Then the
-test runner can be a BPF program that runs the tests, collects the data
-and passes it to userspace via maps or a ringbuffer or something. That's
-a nicer and more customisable interface than the printk output. And if
-they're small enough, maybe we could even include the functions into the
-page_pool code itself, instead of in a separate benchmark module?
+Yes
 
-WDYT of that idea? :)
+> 
+>>
+>>> +    description:
+>>> +      Register in TCSR to enable the LDO controller to supply
+>>> +      low voltages to the common ethernet block (CMN BLK).
+>>> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+>>> +    items:
+>>> +      - items:
+>>> +          - description: phandle of TCSR syscon
+>>> +          - description: offset of TCSR register to enable the LDO controller
+>>> +      - maxItems: 1
+>> You listed two items, but second is just one item? Drop.
+> 
+> What is expected is one item that has two values, in this case: <&tcsr 
+> 0x019475c4>
 
--Toke
+I know.
 
+> 
+> I could move the offset to the driver itself as it's a fixed offset, so 
+> ultimately the property would become:
+> 
+> qcom,tcsr-syscon = <&tscr>;
+> 
+> agreed?
+No. Just fix the syntax.
+
+Best regards,
+Krzysztof
 
