@@ -1,146 +1,154 @@
-Return-Path: <netdev+bounces-193490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A4E2AC4394
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:00:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78991AC43B0
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD14C7AAFAB
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:59:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3DB21898B82
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4569F13D521;
-	Mon, 26 May 2025 18:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948071F6667;
+	Mon, 26 May 2025 18:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f7vNnabh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDRURSTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B185D3D76
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 18:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D221C5F06;
+	Mon, 26 May 2025 18:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748282446; cv=none; b=Zx9G4zVGTvf5pZl+m+9Fs5QJP0/oixY6Qj7JvKAouqGvTuVMqFoIjCKUCHmk0V/mIm5+p6d6G4iJGaA2zYBI+j3B1MEaqA23Gao2IJWPWRM8ARj1LqCxVHTwW8vwIaxxmtyOT4ghmeiFQpYP4kr2LE5VUYj8RLGZ20ZhM0PxCFs=
+	t=1748283958; cv=none; b=EvrJUaZG02MuYAt66ifoLvHQgdm3Gkeiug1ZvRIvEP/Jq1NRY3Q3/4DI4HkD2eKrZn9EuYxYnI68vSgoHPIbXMkwe53xlIYnoZCI08kQqBA3xoINPZV/58YFQoDOUrbcRHrHDqJTAgZr3sCJ/wjqDcEtkw1UK0QAZOWozb380tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748282446; c=relaxed/simple;
-	bh=rI+licYUolL5nhcW9GoIZLfSpbwxMtL6YthxBl22SZU=;
+	s=arc-20240116; t=1748283958; c=relaxed/simple;
+	bh=qVtk5mChgiojijgvw+Xacb75bcFr8uUkTPU8GL47QzY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sHRA8cd7cbY9EDZFW7JJgvkxiu6ehYx+UPpXXyS5xtCDoiTHhhiI66kkADsSY/7/uA5w6ifGaMCgqSbRF5BoKc4OdVf+dyIsc6K4OVcQtKbOCVh9mSbLdn1LlZKQOOseri/DyuhkRP3t5YJi7es4bsXp7RVIDeoM8sqJqEakX8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f7vNnabh; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2349068ebc7so48425ad.0
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 11:00:44 -0700 (PDT)
+	 To:Cc:Content-Type; b=cciBpcIzktUZOsaWv6F0DDQigstAGqiJik82neMQMs5yam6mpvWzenneO54/TVaVTAQQmGm7fLCejuivN1Vj+6LCzzzmT1Gloqucl1I8I+WcZEpO00YiHx41Hsx50IgjWoyPnEEUKuzP+7Qrfo6ji9WrcNxJmjXq0hl/0cYrrpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDRURSTj; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-86135af1045so225475139f.1;
+        Mon, 26 May 2025 11:25:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748282444; x=1748887244; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748283956; x=1748888756; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BE00iNGaQOBcvJTWH1HJdDZjS8vODDdLLtmR/QEPXS8=;
-        b=f7vNnabhvdOz0PP/Pa+YruFib71wohXXIsckWp4N7raMihaWFWdtGU0iwOCFIUuKsp
-         rHDtYtQm8cvpalAzewKWO5Qsu2Ni/Lj388MvKw+8Ubnks0PPr3Bu6WhunmtXo3CrKUTv
-         FEa4NQNNzeBdCLIOcO2Ablmh3WcJ7VDyumAWkhPl2NY1/AHTPrvmAGd25fjGTMsm7xOb
-         OrEVPBJ3NPzLIW5m/zqzTVAZp7HSkx5QIvBX9xBrQ/MifvQxp/reImpMB4t39wpUcN8K
-         HaHm7RrnACuH2U8cWM/prs4K4HStYaQkftkA6T25bScCeeNtaw8zc0UukANCGaMPR19P
-         GySA==
+        bh=bbsso0SUfjZhlcJRFYfaPdijYfCfVggEkuSWqQh3kNw=;
+        b=iDRURSTjiyZA3Au6m5P+stpE9psLelmahPs+8H87wP/Y8/tI+4eXqESgRtwRRbdwC/
+         EOGW/uDpN4ABTXH5SHgwYXrbEL0Oqb757JVKcJMciMrbJaIRTKVMKvuk2zV6y61IpMCf
+         be/z8EmLwFVknETDuLdwIOK2T/Nanh+H+UP68x3DnA5XRVPYwOD08SO2r3O25K+hrJKp
+         tlQYu428tY3vvI/MqTBj4dDC8eUIwIwPxd78xp3gVsgPmFJ6971PaOeLBUPxyw6/YgSb
+         2CU/810Z3AvePbM+YFMBdl+1a7L4XRQXMKcZWaHPFNTny0yUVhoCrjm0P6OdvCkPhrET
+         LrZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748282444; x=1748887244;
+        d=1e100.net; s=20230601; t=1748283956; x=1748888756;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BE00iNGaQOBcvJTWH1HJdDZjS8vODDdLLtmR/QEPXS8=;
-        b=g9sRBIiwUfOp+l1i1dQ6UCvUGfO97Nskcx+tHJ164S5QTA35cOPs/GxXmRCn0XzWtm
-         LgEBcBlJvLPUWR1Pm9aUoJvwwY8zmmCyYuBqQ1dbIRyMGItArDhIx3zMx8xb43VsGyNL
-         efwAaelaK60qVN7bCiif0+M4dVThKqtQcP6/Kw5GBkMFoyXcP2mppmY+YmcDdLvgfc46
-         Xg3kqBHC1xmvwZh0WyoCQTMKCcXc5f509bDxp/dA1ffOamDwLfLEEgpUnjsb1A8pKExQ
-         bvN9tLxycZZ8E5U1ppH4K7ly42kdiask6JiBH6BCEBaXwLsUHTYhawKWOFVggr9DGwpz
-         wDCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoU+5YfvBZNaO334f/UZFANYKfXgUr2CVsxqqA1X5VOsuELQ0y7/gPJ8EVKioydQ1zGYVRwBs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHaUzhUZcnKAqJcRZ5yelXBGxbMgtUZv1vPK0ovHCOZsiLaH4Q
-	kP3Uyk778nRhxL8/iDQGzjP5RDhnWFZNpPJoqULLPtlhYuKw3xwHvg7LKMyaypQKQl/i92tLPWt
-	qdQNo0Xfz4ghGkj+ThzZmsuBs0zQjzfXtjEk/bZnQ
-X-Gm-Gg: ASbGncuKxF8HYdU74cywI8W7KlhD/FoZRsZu3QNjrYhTdrS2laIOsoSF3Sc4qpaZX2j
-	p6GUCWKghEBxiP27lbR8v7bfd/1zrvO0j3N3WKbnTiHMUqw6XhRJ6PuMkFfMEEPOTdhlCQsXdWp
-	WkdKeHzJ3qXdjU8KFYuTgy64Nin1DNcXE24re1T+E45OIX
-X-Google-Smtp-Source: AGHT+IEtmxefPpCTSi1gvHA9a9DIBuanG4oeTpITjr5Cfh4ZkHf1HTV7gnyeYgG8lD3UeMrlJvwRa++zz4aloVbC260=
-X-Received: by 2002:a17:902:ec8d:b0:216:6ecd:8950 with SMTP id
- d9443c01a7336-2341b52771amr4576785ad.19.1748282443435; Mon, 26 May 2025
- 11:00:43 -0700 (PDT)
+        bh=bbsso0SUfjZhlcJRFYfaPdijYfCfVggEkuSWqQh3kNw=;
+        b=ulmJamcj5Bu9pBH2G5WYt2q8RAhbwg+0X5bZ7FExNLSAIqQ+GSbcka9UzdDkvmYTLB
+         swU9hPXDyEB3xzY3KoHPJzANhx9v7QrDGxbX0bJVqIGzNifKmPE4HOaYRGypVBQik78V
+         6cOkB/sC4jsgqtqcepzPc3owvaqhZyLL2ooCwmgz6F2/a6emQe+e//8KROnhPSxM4Imn
+         PXJryOPYviuXbGJXB4CqUPdujHd2df99vjEr62efqAzbMw1PZ0jGOU+QMG4/+Lj2KUn0
+         lY5ujTa42WPnMEbexicTEVpt7kM+fpE74ZHJ4Uf1WEpVrKt65pwmuLqWYGJ26zR9TLdQ
+         HDTw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1gxKQ2+qnWX7ft3dV4IVIYB4pZyW4hRhQPsP0ruW0OKKz1w34Id21Yz1Mjjj9BMjScam3z5/MUVMt@vger.kernel.org, AJvYcCXIxXET3uV92zIkJRz8nGAbW9MmHUFJFnBrkI9y3sgy9vFWCMav0rKSdB/zqEiv0JnJ7hswuBNe@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkjEFl3qZMu+jGzhsIuWFIYUJZ9F1BNnBZxo+1ojtXj4tn5LPb
+	UNymAzY2UhRoWGPvajYMLriTa55oDh1vzPNRjC7eigsT6unxunfBiIaMuss2TLpNRVCgBpnijsG
+	pPQnzxhCIYerAGNEVEodg1F3VlFQYdGAUEXjo
+X-Gm-Gg: ASbGncv6g5OowabybQ8JC9K48WTNGkS8au8csK9DQ1sKQ+gHsFTYBD9qtqkvIibwdFJ
+	hn+veeM4T7CtulSaMZ/68ANA6YPNxQMGOAnQ1WhxBdasB3hzOmfrmi21z6q+Wp6e/DDllhF3Y3s
+	QocUSaU7xRBaosVk42bpl3Mh4/7afWZPyfF5I=
+X-Google-Smtp-Source: AGHT+IFieohgpCQZAZgsmFtt/mvdYmvDMniQ31fjQpsebOqSzthcWwv8hqRk3MuHLNVOuc0+pUAiZVvBwTgfAt6sKuw=
+X-Received: by 2002:a05:6e02:743:b0:3dc:8a5f:7cd1 with SMTP id
+ e9e14a558f8ab-3dc9b6a9fbemr103026125ab.3.1748283955921; Mon, 26 May 2025
+ 11:25:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523032609.16334-1-byungchul@sk.com> <20250523032609.16334-14-byungchul@sk.com>
- <CAHS8izOX0j04=KB-=_kpyR+_HZHk+4hKK-xTEtsGNNHzZFvhKQ@mail.gmail.com>
- <20250526030858.GA56990@system.software.com> <20250526081247.GA47983@system.software.com>
-In-Reply-To: <20250526081247.GA47983@system.software.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 26 May 2025 11:00:30 -0700
-X-Gm-Features: AX0GCFsrsXIO7EOCYLWTkGfVc6XTbNgw4nzAjpdO0g7ysDNdP-dZJFnwMLd86jQ
-Message-ID: <CAHS8izOMkgiWnkixFLhJ1+7OWFbYv+N0am83jV_2cgBecj-jxw@mail.gmail.com>
-Subject: Re: [PATCH 13/18] mlx5: use netmem descriptor and APIs for page pool
-To: Byungchul Park <byungchul@sk.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
-	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
-	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+References: <20250526054745.2329201-1-hch@lst.de>
+In-Reply-To: <20250526054745.2329201-1-hch@lst.de>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 26 May 2025 14:25:45 -0400
+X-Gm-Features: AX0GCFvbGISRIw2IR9cm-ACqlhaFohJczvUp8YSbofsszI6L5XteWpTcRS96XT8
+Message-ID: <CADvbK_d-dhZB-j9=PtCtsnvdmx980n7m8hEDrPnv+h6g7ijF-w@mail.gmail.com>
+Subject: Re: [PATCH] sctp: mark sctp_do_peeloff static
+To: Christoph Hellwig <hch@lst.de>
+Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 26, 2025 at 1:12=E2=80=AFAM Byungchul Park <byungchul@sk.com> w=
-rote:
+On Mon, May 26, 2025 at 1:47=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
 >
-> On Mon, May 26, 2025 at 12:08:58PM +0900, Byungchul Park wrote:
-> > On Fri, May 23, 2025 at 10:13:27AM -0700, Mina Almasry wrote:
-> > > On Thu, May 22, 2025 at 8:26=E2=80=AFPM Byungchul Park <byungchul@sk.=
-com> wrote:
-> > > >
-> > > > To simplify struct page, the effort to seperate its own descriptor =
-from
-> > > > struct page is required and the work for page pool is on going.
-> > > >
-> > > > Use netmem descriptor and APIs for page pool in mlx5 code.
-> > > >
-> > > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > >
-> > > Just FYI, you're racing with Nvidia adding netmem support to mlx5 as
-> > > well. Probably they prefer to take their patch. So try to rebase on
-> > > top of that maybe? Up to you.
-> > >
-> > > https://lore.kernel.org/netdev/1747950086-1246773-9-git-send-email-ta=
-riqt@nvidia.com/
-> > >
-> > > I also wonder if you should send this through the net-next tree, sinc=
-e
-> > > it seem to race with changes that are going to land in net-next soon.
-> > > Up to you, I don't have any strong preference. But if you do send to
-> > > net-next, there are a bunch of extra rules to keep in mind:
-> > >
-> > > https://docs.kernel.org/process/maintainer-netdev.html
+> sctp_do_peeloff is only used inside of net/sctp/socket.c,
+> so mark it static.
 >
-> It looks like I have to wait for net-next to reopen, maybe until the
-> next -rc1 released..  Right?  However, I can see some patches posted now.
-> Hm..
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/net/sctp/sctp.h | 2 --
+>  net/sctp/socket.c       | 4 ++--
+>  2 files changed, 2 insertions(+), 4 deletions(-)
 >
+> diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
+> index d8da764cf6de..e96d1bd087f6 100644
+> --- a/include/net/sctp/sctp.h
+> +++ b/include/net/sctp/sctp.h
+> @@ -364,8 +364,6 @@ sctp_assoc_to_state(const struct sctp_association *as=
+oc)
+>  /* Look up the association by its id.  */
+>  struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)=
+;
+>
+> -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket **so=
+ckp);
+> -
+>  /* A macro to walk a list of skbs.  */
+>  #define sctp_skb_for_each(pos, head, tmp) \
+>         skb_queue_walk_safe(head, pos, tmp)
+> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> index 53725ee7ba06..da048e386476 100644
+> --- a/net/sctp/socket.c
+> +++ b/net/sctp/socket.c
+> @@ -5627,7 +5627,8 @@ static int sctp_getsockopt_autoclose(struct sock *s=
+k, int len, char __user *optv
+>  }
+>
+>  /* Helper routine to branch off an association to a new socket.  */
+> -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket **so=
+ckp)
+> +static int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id,
+> +               struct socket **sockp)
+>  {
+>         struct sctp_association *asoc =3D sctp_id2assoc(sk, id);
+>         struct sctp_sock *sp =3D sctp_sk(sk);
+> @@ -5675,7 +5676,6 @@ int sctp_do_peeloff(struct sock *sk, sctp_assoc_t i=
+d, struct socket **sockp)
+>
+>         return err;
+>  }
+> -EXPORT_SYMBOL(sctp_do_peeloff);
+>
+I believe sctp_do_peeloff() was exported specifically to allow usage
+outside of the core SCTP code. See:
 
-We try to stick to 15 patches, but I've seen up to 20 sometimes get reviewe=
-d.
+commit 0343c5543b1d3ffa08e6716d82afb62648b80eba
+Author: Benjamin Poirier <benjamin.poirier@gmail.com>
+Date:   Thu Mar 8 05:55:58 2012 +0000
 
-net-next just closed unfortunately, so yes you'll need to wait until
-it reopens. RFCs are welcome in the meantime, and if you want to stick
-to mm-unstable that's fine by me too, FWIW.
+    sctp: Export sctp_do_peeloff
 
---=20
-Thanks,
-Mina
+While there=E2=80=99s no known in-tree usage beyond SCTP itself, we can=E2=
+=80=99t be
+sure whether this function has been used by out-of-tree kernel modules.
 
