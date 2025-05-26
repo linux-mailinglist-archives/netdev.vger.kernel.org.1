@@ -1,91 +1,244 @@
-Return-Path: <netdev+bounces-193395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0664AC3C5E
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:07:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BCEDAC3C6D
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076AD1892203
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FE323A8A31
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724EE1E51EA;
-	Mon, 26 May 2025 09:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25081EDA12;
+	Mon, 26 May 2025 09:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="UuhNRbFu"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="JaeZfGIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14641F09BD
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528092CCDB;
+	Mon, 26 May 2025 09:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748250453; cv=none; b=MO0+BxbMJRqXz3QJl8VyZJEG0tJvUMbwtiBKEOjNHStqSdP+uX1J66J6233SBNYoWoE+hc4bhNzWRfrEYDt+d3ovUO2ahBnNe+mfenh64ifLTewoVHZyARNH3EQ71Gyyntr3yDrlfRObEKilQculaQ1YBPlxKq25LbrgJif9y3I=
+	t=1748250631; cv=none; b=E+FXsafoHKlnU9uOs7WKJgFHwI56/br6euQROjPdS15H4vlLW+45EaM8wPsRVgnxUbABJkZ9s/0LYVdwjS7k7IaHFIUXM0DPqGK/Z2NEiAYscR+UqAaGyaI2hlxRhTRo1FRMrrhCrbaN+ozVCXIEAlNdQAlI0kt/Lfhcwnx7v4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748250453; c=relaxed/simple;
-	bh=ycQ+lOIJ79Z7JT+FWACl4MSQvUOdy7Y52TArxqIOXtE=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=jxmQ4+OypZb4q9TQbezGNwSGKoyRm0PUZC7EpBtlQZAD3KJN4qKK5kWG9i+W1sonSiZz/DqK5WnbpnR6PtkEfmtKdGDPOKZe2CwVLOU7Pdd4Gw3Wzib7nDKkRzEl7LioPC2sXhznozuZPW8CU65jEsjQCuNpQGVVW8+j3DfCzMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=UuhNRbFu; arc=none smtp.client-ip=178.154.239.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d102])
-	by forward203b.mail.yandex.net (Yandex) with ESMTPS id C85656395B
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 12:02:11 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net [IPv6:2a02:6b8:c28:7d5:0:640:285a:0])
-	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 5C88160BFA
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 12:02:03 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 22PYFHkLjiE0-BIhlT0vK;
-	Mon, 26 May 2025 12:02:02 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1748250123; bh=ycQ+lOIJ79Z7JT+FWACl4MSQvUOdy7Y52TArxqIOXtE=;
-	h=Date:To:From:Subject:Message-ID;
-	b=UuhNRbFuxdajxZKAvi+bHiksGvNR38RTpLJ4wACfkH57XYvtvyCTjBNAFE1cH1JvD
-	 8jOFCebStUGD+gLQaFjeoiGfXxq20eRLHrrupk3EVXy0CHpZvnrOz2h+jMbaPQKZtp
-	 sx5y8kpOSTfu5rl4vntlq9c1ibma9qaa1JxI8m5g=
-Authentication-Results: mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <985e79fa5c4ea841cb361458cdcf0114050bfb62.camel@yandex.ru>
-Subject: Does "TCP Fast Open": not work on 6.14.7?
-From: Konstantin Kharlamov <Hi-Angel@yandex.ru>
-To: netdev@vger.kernel.org
-Date: Mon, 26 May 2025 12:02:02 +0300
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 
+	s=arc-20240116; t=1748250631; c=relaxed/simple;
+	bh=l44kEIwWSwKZk2saA/tPpEc9ORL7g1am0kb2/0DVjwY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c/gfbf5a9TXcK3qiUqzEO6g1T1AiDByQ4glfXhGJFvxtWVmRwv8txDVLmBwJ59ib0nLhKf/xzYWiQLQt8SJyB6h+ZZX7rcbIIiujwWxLnM/ix71iqunUY+379SkxH9kbiKRFA9drtOhmBGKbH2wbFNDFTbxWPXIfp16cycs8+9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=JaeZfGIb; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 40d9eeb43a1111f0813e4fe1310efc19-20250526
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=vD+KgFhmCpbQl1e5KFyzgc2ojiUjz1Cy2/BTyqcusrI=;
+	b=JaeZfGIbRPIMq9tBcVmmpTdzGxCcTEX1oaOziANYYgD4yXJPWw0aDpMM/jTz15KFv4xVtvTz75bvcBToKLnAzPYOAmKjA9TmX9GaumOqIWu8hHt4yk/1oISLvoXzhH0nKLvXJnBtOTmIx1F3cS47+A0Ba1rD90W3ybJ7aCiUsyo=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:9c4c2ebe-cbd6-42a1-b224-d57bb44b83a7,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:329949f1-2ded-45ed-94e2-b3e9fa87100d,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,
+	LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-UUID: 40d9eeb43a1111f0813e4fe1310efc19-20250526
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+	(envelope-from <skylake.huang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 2137509803; Mon, 26 May 2025 17:10:22 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Mon, 26 May 2025 17:10:20 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Mon, 26 May 2025 17:10:20 +0800
+From: Sky Huang <SkyLake.Huang@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
+	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
+	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: Sky Huang <skylake.huang@mediatek.com>
+Subject: [PATCH net-next] net: phy: mtk-2p5ge: Add LED support for MT7988
+Date: Mon, 26 May 2025 17:10:19 +0800
+Message-ID: <20250526091019.16096-1-SkyLake.Huang@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-Hello, I may be missing something, but something seems off.
+From: Sky Huang <skylake.huang@mediatek.com>
 
-`/proc/net/netstat` contains TCP Fast Open counters. They are
-undocumented, but `networking/snmp_counter.rst` says for
-`TcpExtTCPFastOpenPassive` it's amount of times fast open connection
-was made, which I presume pertains to `TCPFastOpenPassive` as well.
+Add LED support for MT7988's built-in 2.5Gphy. LED hardware has almost
+the same design with MT7981's/MT7988's built-in GbE. So hook the same
+helper function here.
 
-So, I
+Before mtk_phy_leds_state_init(), set correct default values of LED0
+and LED1.
 
-1. Have set `net.ipv4.tcp_fastopen =3D 3` (enables it for both incoming
-and outgoing connections).
-2. Launch "server" `nc -vkl 8080`
-3. Connect to it with `nc -v localhost 8080`
-4. Check "fast open" counters via `cat /proc/net/netstat | column -t |
-less -Si`
+Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+This patch is reviewed already:
+https://www.spinics.net/lists/netdev/msg1094289.html
+---
+ drivers/net/phy/mediatek/mtk-2p5ge.c | 104 +++++++++++++++++++++++++--
+ 1 file changed, 98 insertions(+), 6 deletions(-)
 
-Expected: at least some of the counters increased.
-Actual: every "fast open" counter is 0 (zero).
+diff --git a/drivers/net/phy/mediatek/mtk-2p5ge.c b/drivers/net/phy/mediatek/mtk-2p5ge.c
+index e147eab52..de8a41a18 100644
+--- a/drivers/net/phy/mediatek/mtk-2p5ge.c
++++ b/drivers/net/phy/mediatek/mtk-2p5ge.c
+@@ -249,8 +249,80 @@ static int mt798x_2p5ge_phy_get_rate_matching(struct phy_device *phydev,
+ 	return RATE_MATCH_PAUSE;
+ }
+ 
++static const unsigned long supported_triggers =
++	BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
++	BIT(TRIGGER_NETDEV_LINK)        |
++	BIT(TRIGGER_NETDEV_LINK_10)     |
++	BIT(TRIGGER_NETDEV_LINK_100)    |
++	BIT(TRIGGER_NETDEV_LINK_1000)   |
++	BIT(TRIGGER_NETDEV_LINK_2500)   |
++	BIT(TRIGGER_NETDEV_RX)          |
++	BIT(TRIGGER_NETDEV_TX);
++
++static int mt798x_2p5ge_phy_led_blink_set(struct phy_device *phydev, u8 index,
++					  unsigned long *delay_on,
++					  unsigned long *delay_off)
++{
++	bool blinking = false;
++	int err = 0;
++
++	err = mtk_phy_led_num_dly_cfg(index, delay_on, delay_off, &blinking);
++	if (err < 0)
++		return err;
++
++	err = mtk_phy_hw_led_blink_set(phydev, index, blinking);
++	if (err)
++		return err;
++
++	if (blinking)
++		mtk_phy_hw_led_on_set(phydev, index, MTK_2P5GPHY_LED_ON_MASK,
++				      false);
++
++	return 0;
++}
++
++static int mt798x_2p5ge_phy_led_brightness_set(struct phy_device *phydev,
++					       u8 index,
++					       enum led_brightness value)
++{
++	int err;
++
++	err = mtk_phy_hw_led_blink_set(phydev, index, false);
++	if (err)
++		return err;
++
++	return mtk_phy_hw_led_on_set(phydev, index, MTK_2P5GPHY_LED_ON_MASK,
++				     (value != LED_OFF));
++}
++
++static int mt798x_2p5ge_phy_led_hw_is_supported(struct phy_device *phydev,
++						u8 index, unsigned long rules)
++{
++	return mtk_phy_led_hw_is_supported(phydev, index, rules,
++					   supported_triggers);
++}
++
++static int mt798x_2p5ge_phy_led_hw_control_get(struct phy_device *phydev,
++					       u8 index, unsigned long *rules)
++{
++	return mtk_phy_led_hw_ctrl_get(phydev, index, rules,
++				       MTK_2P5GPHY_LED_ON_SET,
++				       MTK_2P5GPHY_LED_RX_BLINK_SET,
++				       MTK_2P5GPHY_LED_TX_BLINK_SET);
++};
++
++static int mt798x_2p5ge_phy_led_hw_control_set(struct phy_device *phydev,
++					       u8 index, unsigned long rules)
++{
++	return mtk_phy_led_hw_ctrl_set(phydev, index, rules,
++				       MTK_2P5GPHY_LED_ON_SET,
++				       MTK_2P5GPHY_LED_RX_BLINK_SET,
++				       MTK_2P5GPHY_LED_TX_BLINK_SET);
++};
++
+ static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
+ {
++	struct mtk_socphy_priv *priv;
+ 	struct pinctrl *pinctrl;
+ 	int ret;
+ 
+@@ -273,19 +345,34 @@ static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	/* Setup LED */
++	/* Setup LED. On default, LED0 is on/off when link is up/down. As for
++	 * LED1, it blinks as tx/rx transmission takes place.
++	 */
+ 	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_ON_CTRL,
+-			 MTK_PHY_LED_ON_POLARITY | MTK_PHY_LED_ON_LINK10 |
+-			 MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK1000 |
+-			 MTK_PHY_LED_ON_LINK2500);
+-	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
+-			 MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX);
++			 MTK_PHY_LED_ON_POLARITY | MTK_2P5GPHY_LED_ON_SET);
++	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_BLINK_CTRL,
++			   MTK_2P5GPHY_LED_TX_BLINK_SET |
++			   MTK_2P5GPHY_LED_RX_BLINK_SET);
++	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
++			   MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX |
++			   MTK_2P5GPHY_LED_ON_SET);
++	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_BLINK_CTRL,
++			 MTK_2P5GPHY_LED_TX_BLINK_SET |
++			 MTK_2P5GPHY_LED_RX_BLINK_SET);
+ 
+ 	/* Switch pinctrl after setting polarity to avoid bogus blinking */
+ 	pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "i2p5gbe-led");
+ 	if (IS_ERR(pinctrl))
+ 		dev_err(&phydev->mdio.dev, "Fail to set LED pins!\n");
+ 
++	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(struct mtk_socphy_priv),
++			    GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++	phydev->priv = priv;
++
++	mtk_phy_leds_state_init(phydev);
++
+ 	return 0;
+ }
+ 
+@@ -303,6 +390,11 @@ static struct phy_driver mtk_2p5gephy_driver[] = {
+ 		.resume = genphy_resume,
+ 		.read_page = mtk_phy_read_page,
+ 		.write_page = mtk_phy_write_page,
++		.led_blink_set = mt798x_2p5ge_phy_led_blink_set,
++		.led_brightness_set = mt798x_2p5ge_phy_led_brightness_set,
++		.led_hw_is_supported = mt798x_2p5ge_phy_led_hw_is_supported,
++		.led_hw_control_get = mt798x_2p5ge_phy_led_hw_control_get,
++		.led_hw_control_set = mt798x_2p5ge_phy_led_hw_control_set,
+ 	},
+ };
+ 
+-- 
+2.45.2
 
-That is on Archlinux, kernel 6.14.7. WDYDW?
-
-P.S. pls keep me in CC, i'm not subscribed.
-P.P.S. slightly offtopic, but am I correct to understand one-liners
-like `cat =E2=80=A6 | column =E2=80=A6` are the only way to read these coun=
-ters? I've
-searched far and wide, and from what I understand none of networking
-utilities (at least not ss, netstat, ntstat) show them.
 
