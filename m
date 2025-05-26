@@ -1,58 +1,77 @@
-Return-Path: <netdev+bounces-193405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 692C3AC3D22
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:43:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F088AC3D48
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE3317645F
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216663A47F0
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599971F12F8;
-	Mon, 26 May 2025 09:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F283F1E1DEC;
+	Mon, 26 May 2025 09:49:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1411DED51;
-	Mon, 26 May 2025 09:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F73172619
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748252600; cv=none; b=IB8lR4UNIp7A4kVLqMbOgWs+sBYvAzB/BnaN05cVXM7l36LeeNdUVR4BoPo/yzPo7uPEPFGsuqqfZpz88j5RDfrd6x6a2vu830MCKGoxR2fDQ2JadRcvvvmqLU6cty2nxVa5JvBXZv9yT6iwmcPehTl7sGyfa70XWeRmvtwAE2s=
+	t=1748252971; cv=none; b=sv4rYhtcd7N16cMwSBGVlnN1wVUTi9k2U2QeRdyvSLTkCEfbuEWqpik/IuaQ8TpzHw2Yk084VyKA55/FFujDeo1q1Jc7bM+CI1i1DT6ki4r5F2Fwi/L/zGKLfFH2iLpFj55/ACtJZxRxY7DV/cjYemGD6k1K5T3PFjw6rO1AldQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748252600; c=relaxed/simple;
-	bh=RAownFC008qLgAz0i6YGuiM00cnuDux7xgF6Vj1jySM=;
+	s=arc-20240116; t=1748252971; c=relaxed/simple;
+	bh=7ve21rc2dwO31o1Azsco8Wk0jQ5KnyC7a9Zc7PdbQa4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PZG3hOJuy4RH4v1y0E5hjOx9vhEJBZdcxpDMxGdCF/b2qqE3/5mSoYX2YyxiDlX6BjgXuqAKQeeuMFTg11TUgcRtFpXztfx46LR6IxcLbJ2cEn8+gJqAMVQf0MzOa4xn/P+wwKN7jsgapPUl+ZmFCjvFET1F/NWG6MH625w46mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-0e-683437af7710
-Date: Mon, 26 May 2025 18:43:05 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, tariqt@nvidia.com, edumazet@google.com,
-	pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
-	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
- page->pp_magic in page_pool_page_is_pp()
-Message-ID: <20250526094305.GA29080@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-13-byungchul@sk.com>
- <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
- <20250526022307.GA27145@system.software.com>
- <20250526023624.GB27145@system.software.com>
- <87o6vfahoh.fsf@toke.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HoJoRWIXXKenSZIACBVSrsMb+MnI7fzmZScBaCVp08aa0v8qd79UWWenUHQZ8i3d1jrovfu2+9ji/IXprjXUlyF+hSkHjNn3pUgJeVg7bv/nI8c4wjlvAEWwytReL2jJRx2Rjj0AjP3D4P/k4/XJdgSVgrQAQV7VdRCjbmRB/tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uJUSA-0004c3-96; Mon, 26 May 2025 11:49:06 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uJUS7-000E8i-1Z;
+	Mon, 26 May 2025 11:49:03 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uJUS7-00AUml-17;
+	Mon, 26 May 2025 11:49:03 +0200
+Date: Mon, 26 May 2025 11:49:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget evaluation
+ strategy
+Message-ID: <aDQ5D8EFAL6JhMbM@pengutronix.de>
+References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,110 +81,196 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87o6vfahoh.fsf@toke.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRzGe3fOzo7L0XFmvWkoLSQoKithf0rCiOAQFGF0QYMa7eSWc8o0
-	0yjUNMp5zfygc9lUsrUuq2VuRWjpUIdRtlCm5QWvlV28NTSlcpPIbz+e932f3/PhpQlxJT+Q
-	VqqTOY1appJQQlL4zbdqs1kargh7OxIAevN9Cu7NpMKdfhsf9KY6BNOzHwQwZW+hoLrSTYD+
-	bTYJP82/CBhuHhBAX80ICS+uWgkYKGylID97joDLNiMP2usK+FDy6zYB1ox+Abx/rqeg9/4f
-	Pow05pPg0N0loa8gEpoNq8Dd9hWB3WzlgTvvJgU3nAYKBrP7EDibBkgozyxAYK538WFuRk9F
-	rmNr73bx2Ge6HgFrsJxjnxg3slqXk2AtphyKtUwWC9iPnS8otrV0jmSf2aZ4bH7Wd4qdGO4m
-	2R/1HRRrru0g2dcGu4CdsgQfYqKFEXJOpUzhNFt3nxIqSgqPJObgVHfOI14G6hJrkQ+NmXD8
-	OleL/nF7TwPpYZIJxa6rTsLDFLMBu1yzC0zTK5k9uG0mVouENMFM8bFpMt97x585i/O6RykP
-	ixjADY5iby5mqni4q/XEYu6HHWVD3n5ioXO+wuntJJggfOc3vRiH4Kyn5d6nPgsTbk2/8U4L
-	YNbjl3UtPI8XMw9ofH38DbG4eQ1+ZXSRRchPt0ShW6LQ/VfoligMiDQhsVKdEi9TqsK3KNLU
-	ytQtpxPiLWjh49Rcmo+xocn2w42IoZHEV3RKskMh5stSktLiGxGmCclK0Vp9mEIsksvSLnCa
-	hJOacyouqREF0aRktWi7+7xczMTKkrk4jkvkNP9OebRPYAZadWyscLSs6J10LLOyYnXZK1vz
-	nuLQTQe/Fh+Q7vI3lqbaI0L+DPXkxcq/xwSMOTTRn5p7o/afkeyIuFC7z9oWJ093XHNpS1eM
-	T+rnjwfvbeqNCv9y5ejOBwc+n2gZK8odEjGP/SY6VXsHw0o+FUgfjq/A6dWRcRdDS5ZJn9cE
-	UteXS8gkhWzbRkKTJPsL/3bhnjQDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRiA+845OzuuFqel9ZGSsAhLSo2MXqgsf/kVJPWjgpBy5Mktddam
-	okUw20A0L138oXPVTHRm0WyVrpuKiilJycyamhesWT+66lze0LZF5L+H53vfh/fHx9Eyg2gd
-	p1JnCBq1IlXOShhJ/C79VuvOaGWUpQGByXqPhbvT2WAZtYvAVOdV7plBMUy2v2ShqtJDg+mN
-	gYEp6ywNro4xMYzUjDPwPK+RhrGSThaKDHM0XLLXUtB2o0sEPQ3FIiidraahUTcqht6nJhaG
-	7y2KYLy1iIEu4x0GRor3QYd5DXhefUXQbm2kwFN4g4XrDjMLHw0jCBxtYwxU5BYjsDY5RTA3
-	bWL3ycmjO/0UeWIcEhOzLZM8rA0nBU4HTWx1+SyxTVwTkw/vnrOks2yOIU/skxQp0n9nyS/X
-	AEN+NPWxpOrLT4pYH/UxpNvcLj606rhkd5KQqsoSNJExiRJlacmRs/k425NfT+lQv6wABXCY
-	j8Y9Q82Mjxl+I3bmOWgfs3wYdjpnvMxxgXwsfjWdXIAkHM1PinDdRJF/ZjV/BhcOfGZ9LOUB
-	N3dd83sZf5vC/Z0Jf/0q3FX+yd+nvc35mw5/k+aDsWWB+6tDsf5xhX81wHvCLfdr5OMgfgNu
-	aXhJXUErjUtKxiUl4/+ScUnJjJg6FKhSZ6UpVKk7IrQpyhy1KjviVHqaDXn/Rs3F+at25O6N
-	a0U8h+QrpIny7UqZSJGlzUlrRZij5YHSEFOUUiZNUuScFzTpJzWZqYK2FQVzjHyt9MAxIVHG
-	JysyhBRBOCto/r1SXMA6HQq/2b0psayF73Ddnw3ecjkEmpfNr30muXJB4TqcEXE1xPVtc+iE
-	IFuPu5mYwQfvTxzVW8K01l3pNVMnLOVUi7viF3YkDdfXHlx8cTruNLWnOvLngni/u/JUu22b
-	wZ5w5FysK63pcUKeUxcUB9XP7F/eGrRuw/LfOfF7K5WkJlfOaJWKbeG0Rqv4AwzywKAXAwAA
-X-CFilter-Loop: Reflected
+In-Reply-To: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, May 26, 2025 at 10:40:30AM +0200, Toke Høiland-Jørgensen wrote:
-> Byungchul Park <byungchul@sk.com> writes:
+Hi Kory,
+
+A short positive feedback: I partially tested this series and committed
+patches for PSE support and impressed how easy it is now to configure
+and use a switch with PoE support!
+
+For testing I used "Novarq Tactical 1000" switch with Microchip EV14Y36A PSE
+evaluation board attached to it.
+
+I didn't had enough equipment for actual prioritization testing,
+otherwise I would add my Tested-by here :)
+
+Thank you!
+
+On Sat, May 24, 2025 at 12:56:02PM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> > On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
-> >> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
-> >> > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> >> > >
-> >> > > To simplify struct page, the effort to seperate its own descriptor from
-> >> > > struct page is required and the work for page pool is on going.
-> >> > >
-> >> > > To achieve that, all the code should avoid accessing page pool members
-> >> > > of struct page directly, but use safe APIs for the purpose.
-> >> > >
-> >> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
-> >> > > page_pool_page_is_pp().
-> >> > >
-> >> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> >> > > ---
-> >> > >  include/linux/mm.h   | 5 +----
-> >> > >  net/core/page_pool.c | 5 +++++
-> >> > >  2 files changed, 6 insertions(+), 4 deletions(-)
-> >> > >
-> >> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> >> > > index 8dc012e84033..3f7c80fb73ce 100644
-> >> > > --- a/include/linux/mm.h
-> >> > > +++ b/include/linux/mm.h
-> >> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> >> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> >> > >
-> >> > >  #ifdef CONFIG_PAGE_POOL
-> >> > > -static inline bool page_pool_page_is_pp(struct page *page)
-> >> > > -{
-> >> > > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> >> > > -}
-> >> > 
-> >> > I vote for keeping this function as-is (do not convert it to netmem),
-> >> > and instead modify it to access page->netmem_desc->pp_magic.
-> >> 
-> >> Once the page pool fields are removed from struct page, struct page will
-> >> have neither struct netmem_desc nor the fields..
-> >> 
-> >> So it's unevitable to cast it to netmem_desc in order to refer to
-> >> pp_magic.  Again, pp_magic is no longer associated to struct page.
-> >
-> > Options that come across my mind are:
-> >
-> >    1. use lru field of struct page instead, with appropriate comment but
-> >       looks so ugly.
-> >    2. instead of a full word for the magic, use a bit of flags or use
-> >       the private field for that purpose.
-> >    3. do not check magic number for page pool.
-> >    4. more?
+> This series brings support for budget evaluation strategy in the PSE
+> subsystem. PSE controllers can set priorities to decide which ports should
+> be turned off in case of special events like over-current.
 > 
-> I'm not sure I understand Mina's concern about CPU cycles from casting.
-> The casting is a compile-time thing, which shouldn't affect run-time
-
-I didn't mention it but yes.
-
-> performance as long as the check is kept as an inline function. So it's
-> "just" a matter of exposing struct netmem_desc to mm.h so it can use it
-
-Then.. we should expose net_iov as well, but I'm afraid it looks weird.
-Do you think it's okay?
-
-As I told in another thread, embedding strcut netmem_desc into struct
-net_iov will require a huge single patch altering all the users of
-struct net_iov.
-
-	Byungchul
-
-> in the inline definition. Unless I'm missing something?
+> This patch series adds support for two budget evaluation strategy.
+> 1. Static Method:
 > 
-> -Toke
+>    This method involves distributing power based on PD classification.
+>    It’s straightforward and stable, the PSE core keeping track of the
+>    budget and subtracting the power requested by each PD’s class.
+> 
+>    Advantages: Every PD gets its promised power at any time, which
+>    guarantees reliability.
+> 
+>    Disadvantages: PD classification steps are large, meaning devices
+>    request much more power than they actually need. As a result, the power
+>    supply may only operate at, say, 50% capacity, which is inefficient and
+>    wastes money.
+> 
+> 2. Dynamic Method:
+> 
+>    To address the inefficiencies of the static method, vendors like
+>    Microchip have introduced dynamic power budgeting, as seen in the
+>    PD692x0 firmware. This method monitors the current consumption per port
+>    and subtracts it from the available power budget. When the budget is
+>    exceeded, lower-priority ports are shut down.
+> 
+>    Advantages: This method optimizes resource utilization, saving costs.
+> 
+>    Disadvantages: Low-priority devices may experience instability.
+> 
+> The UAPI allows adding support for software port priority mode managed from
+> userspace later if needed.
+> 
+> Patches 1-2: Add support for interrupt event report in PSE core, ethtool
+> 	     and ethtool specs.
+> Patch 3: Adds support for interrupt and event report in TPS23881 driver.
+> Patches 4,5: Add support for PSE power domain in PSE core and ethtool.
+> Patches 6-8: Add support for budget evaluation strategy in PSE core,
+> 	     ethtool and ethtool specs.
+> Patches 9-11: Add support for port priority and power supplies in PD692x0
+> 	      drivers.
+> Patches 12,13: Add support for port priority in TPS23881 drivers.
+> 
+> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> ---
+> Changes in v12:
+> - Rebase on net-next.
+> - Link to v11: https://lore.kernel.org/r/20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com
+> 
+> Changes in v11:
+> - Move the PSE events enum description fully in the ethtool spec.
+> - Remove the first patch which was useless as not used.
+> - Split the second patch to separate the attached_phydev introduction to
+>   the PSE interrupt support.
+> - Link to v10: https://lore.kernel.org/r/20250506-feature_poe_port_prio-v10-0-55679a4895f9@bootlin.com
+> 
+> Changes in v10:
+> - Change patch 2 and 7 due to possible used after free scenario or
+>   deadlock scenario. Move the PSE notification send management to a
+>   workqueue to protect it from the deadlock scenario.
+> - Link to v9: https://lore.kernel.org/r/20250422-feature_poe_port_prio-v9-0-417fc007572d@bootlin.com
+> 
+> Changes in v9:
+> - Add a missing check after skb creation.
+> - Link to v8: https://lore.kernel.org/r/20250416-feature_poe_port_prio-v8-0-446c39dc3738@bootlin.com
+> 
+> Changes in v8:
+> - Rename a few functions for better clarity.
+> - Add missing kref_init in PSE power domain support and a wrong error
+>   check condition.
+> - Link to v7: https://lore.kernel.org/r/20250408-feature_poe_port_prio-v7-0-9f5fc9e329cd@bootlin.com
+> 
+> Changes in v7:
+> - Add reference count and mutex lock for PSE power domain.
+> - Add support to retry enabling port that failed to be powered in case of
+>   port disconnection or priority change.
+> - Use flags definition for pse events in ethtool specs.
+> - Small changes in the TPS23881 driver.
+> - Link to v6: https://lore.kernel.org/r/20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com
+> 
+> Changes in v6:
+> - Few typos.
+> - Use uint instead of bitset for PSE_EVENT.
+> - Remove report of budget evaluation strategy in the uAPI.
+> - Link to v5: https://lore.kernel.org/r/20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com
+> 
+> Changes in v5:
+> - Remove the first part of the patch series which tackled PSE
+>   improvement and already gets merged:
+>   https://lore.kernel.org/netdev/20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com/
+> - Remove the PSE index support which is useless for now. The PSE power
+>   domain ID is sufficient.
+> - Add support for PD692x0 power supplies other than Vmain which was already
+>   in the patch series.
+> - Few other small fixes.
+> - Link to v4: https://lore.kernel.org/r/20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com
+> 
+> Changes in v4:
+> - Remove disconnection policy.
+> - Rename port priority mode to budget evaluation strategy.
+> - Add cosmetic changes in PSE core.
+> - Add support for port priority in PD692x0 driver.
+> - Link to v3: https://lore.kernel.org/r/20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com
+> 
+> Changes in v3:
+> - Move power budget to regulator core.
+> - Add disconnection policies with PIs using the same priority.
+> - Several fixes on the TPS23881 drivers.
+> - Several new cosmetic patches.
+> - Link to v2: https://lore.kernel.org/r/20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com
+> 
+> Changes in v2:
+> - Rethink the port priority management.
+> - Add PSE id.
+> - Add support for PSE power domains.
+> - Add get power budget regulator constraint.
+> - Link to v1: https://lore.kernel.org/r/20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com
+> 
+> ---
+> Kory Maincent (13):
+>       net: pse-pd: Introduce attached_phydev to pse control
+>       net: pse-pd: Add support for reporting events
+>       net: pse-pd: tps23881: Add support for PSE events and interrupts
+>       net: pse-pd: Add support for PSE power domains
+>       net: ethtool: Add support for new power domains index description
+>       net: pse-pd: Add helper to report hardware enable status of the PI
+>       net: pse-pd: Add support for budget evaluation strategies
+>       net: ethtool: Add PSE port priority support feature
+>       net: pse-pd: pd692x0: Add support for PSE PI priority feature
+>       net: pse-pd: pd692x0: Add support for controller and manager power supplies
+>       dt-bindings: net: pse-pd: microchip,pd692x0: Add manager regulator supply
+>       net: pse-pd: tps23881: Add support for static port priority feature
+>       dt-bindings: net: pse-pd: ti,tps23881: Add interrupt description
+> 
+>  .../bindings/net/pse-pd/microchip,pd692x0.yaml     |   22 +-
+>  .../bindings/net/pse-pd/ti,tps23881.yaml           |    8 +
+>  Documentation/netlink/specs/ethtool.yaml           |   76 ++
+>  Documentation/networking/ethtool-netlink.rst       |   49 +
+>  drivers/net/mdio/fwnode_mdio.c                     |   26 +-
+>  drivers/net/pse-pd/pd692x0.c                       |  225 +++++
+>  drivers/net/pse-pd/pse_core.c                      | 1068 +++++++++++++++++++-
+>  drivers/net/pse-pd/tps23881.c                      |  403 +++++++-
+>  include/linux/ethtool_netlink.h                    |    9 +
+>  include/linux/pse-pd/pse.h                         |  108 +-
+>  include/uapi/linux/ethtool_netlink_generated.h     |   40 +
+>  net/ethtool/pse-pd.c                               |   63 ++
+>  12 files changed, 2043 insertions(+), 54 deletions(-)
+> ---
+> base-commit: 573d51a171a9237a8ecd9921d9c69af74cc51ce8
+> change-id: 20240913-feature_poe_port_prio-a51aed7332ec
+> 
+> Best regards,
+> -- 
+> Köry Maincent, Bootlin
+> Embedded Linux and kernel engineering
+> https://bootlin.com
+> 
+> 
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
