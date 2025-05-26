@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-193356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A773AC39B3
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:11:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F780AC39B4
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87B20188F2BA
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:12:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BEFD3A9614
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7BB1D54FA;
-	Mon, 26 May 2025 06:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0011957FC;
+	Mon, 26 May 2025 06:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="C+3YpXg5"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="YfkW5mqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D4513B58C
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC6A7E110
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748239909; cv=none; b=fNUgeTuZN5Aqjq0Nep5q9HjNnjqQxzFLvV7BgYolAios1PvejCVLKJ03Qb5bviiv34Mb/da5ct6G1saGS6J3aFydm3EeW+I/2sBeks87J0IgEVZjyfcLjhcI+x56htEdvfWOznOlaowtivIOLrhB+AmKdVyy4Wb4VSBd+PQyJPU=
+	t=1748239924; cv=none; b=nZPk5U9ZZEWsBpZo8XH7FZ/OyXoa2OW8/fK8hPs8kwOs4sXH3kOli57Ev/Pq8Xxmt9X4sTn6pvmyB2dbeHDX7bK66a5cR/umgorsMImIK6eIAdhaosdQDJuYSJ+dlt/DTnb+Sk8l2t/Cw9CbLHzBezrioG0t1PRE34svO7/pPyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748239909; c=relaxed/simple;
-	bh=laNjRCbUzPrxvB5uB46Sw3GTX3DEidIzVks5cR6ub+Y=;
+	s=arc-20240116; t=1748239924; c=relaxed/simple;
+	bh=IRR/axaqJSB8U6ZdY+vkjVvS2JUVYtosnoHTOV3F8Nw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Iy/+g0yghJxdzliC6Ozhckh53HMCwEql66qfB8BHxIlA2c2+aIdp/vYM/SFSSn1qWNM93MB3OUFah3J3OuAoHslm3zRhaacLmUQ2NPLzwyjH9Nj9TlAfLa5poI920z8cl6vSiPweH7kNJJF1/HS5G4VQ2RqcQImKs4i+tembljE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=C+3YpXg5; arc=none smtp.client-ip=99.78.197.217
+	 MIME-Version:Content-Type; b=BuRya7YFWdmDJfBZ6zAqCq8m2glxUo6THr8Y6p3YTWVzpvyiTSqevj8fnolVlJyhOhbZlTosf19TfBydPReHjC0kyNO8ls7G8z3CNdmlI9uy+TuLjo9FTUI86DqW9dJ379TKbmvOZfxKgYgnEgvrb3dkGhVhQCrSHIymzlqcnF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=YfkW5mqx; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1748239908; x=1779775908;
+  t=1748239922; x=1779775922;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=r0kqXzNukQBdi6oihU8aiXtj9Rpih3nGNxBy8ykQpk0=;
-  b=C+3YpXg5z8kCeGGOz3qj35JlUHcOL1jFiBYye9pJWyjycJjREiH+XOzh
-   +PORVCTO7j8F7ewZB1O22SGMhxXd+bDUUZmbEW7GP0o2O78YhuiOzeCw1
-   VV86Ane7D3rH6vbQMNmIbwyAe9w3W7rW1VrmO0dsU9RwI0tGHPiOJ8gMP
-   NvZLKiZ7MtlbcDnO8tpUMMxnkpQ4PXJGYp2rFoH3QArNxx93pfKFdK66C
-   a8BQcpIWmRTnTuIIdA2ZKkz1I1DNYe+zunG+Ej8S1GKGv3MaDk92DNqtS
-   9r9+F+ezP1htdLUQajLWPDKHMSrCMTMbsXa2+hPpnv4ELp4DseyMGkQ6o
-   w==;
+  bh=PjD3xdTrNY9z67bTqV6P/R/0uiJK8x+0ndOsd7RRhXc=;
+  b=YfkW5mqxBFplHFndiZN4xmuIAhYD8kSFPJQ0X+inCzEa7iQjs9ez/NOd
+   a2RxU37q0F5J/3iM+Wx22PA3Da/OcqJLMsnYHWzZZvP8W3BKxZ2njH3uZ
+   T+s/I+1mteL/IzpwCusYm8ou9wqbGSghH/2nh5bRmoTue4hTTuZlwkpVv
+   wRBZXxMEfa//CUqvZmS/2xLNmmZzqDAeFNraBvTVpxnfs0XV0TFEjQeU/
+   nTSiwMrzAgzXl+IUhzCDHrMcszUJ0swwiOQRzUSkwhRbANtP/6u4OzJpq
+   Sc4+DWrtGSKDtE8rv04M+vH+ENG0XBHPRlaGaVvniBPtLtVIgKmL0CR8x
+   A==;
 X-IronPort-AV: E=Sophos;i="6.15,315,1739836800"; 
-   d="scan'208";a="53864256"
+   d="scan'208";a="200805151"
 Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 06:11:48 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:9148]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.121:2525] with esmtp (Farcaster)
- id 8df69d77-a539-4161-a39c-f88d9e3d155a; Mon, 26 May 2025 06:11:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 8df69d77-a539-4161-a39c-f88d9e3d155a
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 06:12:00 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.43.254:14344]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.135:2525] with esmtp (Farcaster)
+ id cf59ac50-c240-4655-ad81-2b2625078669; Mon, 26 May 2025 06:11:59 +0000 (UTC)
+X-Farcaster-Flow-ID: cf59ac50-c240-4655-ad81-2b2625078669
 Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 26 May 2025 06:11:44 +0000
+ Mon, 26 May 2025 06:11:57 +0000
 Received: from HFA15-G9FV5D3.amazon.com (10.85.143.177) by
  EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 26 May 2025 06:11:33 +0000
+ Mon, 26 May 2025 06:11:46 +0000
 From: David Arinzon <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -79,9 +79,9 @@ CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
 	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
 	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
 	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH v11 net-next 6/8] net: ena: Add debugfs support to the ENA driver
-Date: Mon, 26 May 2025 09:09:16 +0300
-Message-ID: <20250526060919.214-7-darinzon@amazon.com>
+Subject: [PATCH v11 net-next 7/8] net: ena: View PHC stats using debugfs
+Date: Mon, 26 May 2025 09:09:17 +0300
+Message-ID: <20250526060919.214-8-darinzon@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250526060919.214-1-darinzon@amazon.com>
 References: <20250526060919.214-1-darinzon@amazon.com>
@@ -96,162 +96,75 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
  EX19D005EUA002.ant.amazon.com (10.252.50.11)
 
-Adding the base directory of debugfs to the driver.
-In order for the folder to be unique per driver instantiation,
-the chosen name is the device name.
+Add an entry named `phc_stats` to view the PHC statistics.
+If PHC is enabled, the stats are printed, as below:
 
-This commit contains the initialization and the
-base folder.
+phc_cnt: 0
+phc_exp: 0
+phc_skp: 0
+phc_err_dv: 0
+phc_err_ts: 0
 
-The creation of the base folder may fail, but is considered
-non-fatal.
+If PHC is disabled, no statistics will be displayed.
 
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- .../device_drivers/ethernet/amazon/ena.rst    |  1 +
- drivers/net/ethernet/amazon/ena/Makefile      |  2 +-
- drivers/net/ethernet/amazon/ena/ena_debugfs.c | 27 +++++++++++++++++++
- drivers/net/ethernet/amazon/ena/ena_debugfs.h | 27 +++++++++++++++++++
- drivers/net/ethernet/amazon/ena/ena_netdev.c  |  6 +++++
- drivers/net/ethernet/amazon/ena/ena_netdev.h  |  4 +++
- 6 files changed, 66 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/amazon/ena/ena_debugfs.c
- create mode 100644 drivers/net/ethernet/amazon/ena/ena_debugfs.h
+ drivers/net/ethernet/amazon/ena/ena_debugfs.c | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 3cbf9854..347aec34 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -58,6 +58,7 @@ ena_xdp.[ch]        XDP files
- ena_pci_id_tbl.h    Supported device IDs.
- ena_phc.[ch]        PTP hardware clock infrastructure (see `PHC`_ for more info)
- ena_devlink.[ch]    devlink files.
-+ena_debugfs.[ch]    debugfs files.
- =================   ======================================================
- 
- Management Interface:
-diff --git a/drivers/net/ethernet/amazon/ena/Makefile b/drivers/net/ethernet/amazon/ena/Makefile
-index 4b6511db..6d8036bc 100644
---- a/drivers/net/ethernet/amazon/ena/Makefile
-+++ b/drivers/net/ethernet/amazon/ena/Makefile
-@@ -5,4 +5,4 @@
- 
- obj-$(CONFIG_ENA_ETHERNET) += ena.o
- 
--ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o ena_devlink.o
-+ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o ena_devlink.o ena_debugfs.o
 diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.c b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-new file mode 100644
-index 00000000..d9327cd8
---- /dev/null
+index d9327cd8..46ed8098 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_debugfs.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.c
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/* Copyright (c) Amazon.com, Inc. or its affiliates.
-+ * All rights reserved.
-+ */
+@@ -8,6 +8,35 @@
+ #include <linux/seq_file.h>
+ #include <linux/pci.h>
+ #include "ena_debugfs.h"
++#include "ena_phc.h"
 +
-+#ifdef CONFIG_DEBUG_FS
-+
-+#include <linux/seq_file.h>
-+#include <linux/pci.h>
-+#include "ena_debugfs.h"
-+
-+void ena_debugfs_init(struct net_device *dev)
++static int phc_stats_show(struct seq_file *file, void *priv)
 +{
-+	struct ena_adapter *adapter = netdev_priv(dev);
++	struct ena_adapter *adapter = file->private;
 +
-+	adapter->debugfs_base =
-+		debugfs_create_dir(dev_name(&adapter->pdev->dev), NULL);
++	if (!ena_phc_is_active(adapter))
++		return 0;
++
++	seq_printf(file,
++		   "phc_cnt: %llu\n",
++		   adapter->ena_dev->phc.stats.phc_cnt);
++	seq_printf(file,
++		   "phc_exp: %llu\n",
++		   adapter->ena_dev->phc.stats.phc_exp);
++	seq_printf(file,
++		   "phc_skp: %llu\n",
++		   adapter->ena_dev->phc.stats.phc_skp);
++	seq_printf(file,
++		   "phc_err_dv: %llu\n",
++		   adapter->ena_dev->phc.stats.phc_err_dv);
++	seq_printf(file,
++		   "phc_err_ts: %llu\n",
++		   adapter->ena_dev->phc.stats.phc_err_ts);
++
++	return 0;
 +}
 +
-+void ena_debugfs_terminate(struct net_device *dev)
-+{
-+	struct ena_adapter *adapter = netdev_priv(dev);
-+
-+	debugfs_remove_recursive(adapter->debugfs_base);
-+}
-+
-+#endif /* CONFIG_DEBUG_FS */
-diff --git a/drivers/net/ethernet/amazon/ena/ena_debugfs.h b/drivers/net/ethernet/amazon/ena/ena_debugfs.h
-new file mode 100644
-index 00000000..dc61dd99
---- /dev/null
-+++ b/drivers/net/ethernet/amazon/ena/ena_debugfs.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) Amazon.com, Inc. or its affiliates.
-+ * All rights reserved.
-+ */
-+
-+#ifndef __ENA_DEBUGFS_H__
-+#define __ENA_DEBUGFS_H__
-+
-+#include <linux/debugfs.h>
-+#include <linux/netdevice.h>
-+#include "ena_netdev.h"
-+
-+#ifdef CONFIG_DEBUG_FS
-+
-+void ena_debugfs_init(struct net_device *dev);
-+
-+void ena_debugfs_terminate(struct net_device *dev);
-+
-+#else /* CONFIG_DEBUG_FS */
-+
-+static inline void ena_debugfs_init(struct net_device *dev) {}
-+
-+static inline void ena_debugfs_terminate(struct net_device *dev) {}
-+
-+#endif /* CONFIG_DEBUG_FS */
-+
-+#endif /* __ENA_DEBUGFS_H__ */
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 28878a42..5b09f511 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -23,6 +23,8 @@
++DEFINE_SHOW_ATTRIBUTE(phc_stats);
  
- #include "ena_devlink.h"
+ void ena_debugfs_init(struct net_device *dev)
+ {
+@@ -15,6 +44,12 @@ void ena_debugfs_init(struct net_device *dev)
  
-+#include "ena_debugfs.h"
+ 	adapter->debugfs_base =
+ 		debugfs_create_dir(dev_name(&adapter->pdev->dev), NULL);
 +
- MODULE_AUTHOR("Amazon.com, Inc. or its affiliates");
- MODULE_DESCRIPTION(DEVICE_NAME);
- MODULE_LICENSE("GPL");
-@@ -4059,6 +4061,8 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_rss;
- 	}
++	debugfs_create_file("phc_stats",
++			    0400,
++			    adapter->debugfs_base,
++			    adapter,
++			    &phc_stats_fops);
+ }
  
-+	ena_debugfs_init(netdev);
-+
- 	INIT_WORK(&adapter->reset_task, ena_fw_reset_device);
- 
- 	adapter->last_keep_alive_jiffies = jiffies;
-@@ -4138,6 +4142,8 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
- 	ena_dev = adapter->ena_dev;
- 	netdev = adapter->netdev;
- 
-+	ena_debugfs_terminate(netdev);
-+
- 	/* Make sure timer and reset routine won't be called after
- 	 * freeing device resources.
- 	 */
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.h b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-index f48b12ff..41c8e5f0 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-@@ -389,6 +389,10 @@ struct ena_adapter {
- 	u32 xdp_num_queues;
- 
- 	struct devlink *devlink;
-+#ifdef CONFIG_DEBUG_FS
-+
-+	struct dentry *debugfs_base;
-+#endif /* CONFIG_DEBUG_FS */
- };
- 
- void ena_set_ethtool_ops(struct net_device *netdev);
+ void ena_debugfs_terminate(struct net_device *dev)
 -- 
 2.47.1
 
