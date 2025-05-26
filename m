@@ -1,186 +1,258 @@
-Return-Path: <netdev+bounces-193289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F868AC3772
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:31:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A57AC3773
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A2407AA949
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 00:29:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7D33A83CE
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 00:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDFEF7260C;
-	Mon, 26 May 2025 00:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EA835975;
+	Mon, 26 May 2025 00:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjbKuxPv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kBJfRQh0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C86487BE;
-	Mon, 26 May 2025 00:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971EB1BC5C;
+	Mon, 26 May 2025 00:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748219431; cv=none; b=QCjHrimnCJom6V6DGHc9mxrmaj3+/U3KfxEbWxMUGqSNFvUGAxGWzB0DK2UFaoDjkcCNTpZttbuovzw3T48ardKkp1U5R3DqZ1ZQBvk8xVrR8EyMWveXp3ch20qNUWiXNd6vfIiRAo+DGct5a9vmIUL/wTj4UbozKwHXwLtoFvo=
+	t=1748219805; cv=none; b=ixbzgVgoLYootkBUgCosFECBdRjsjnwMkL0Gk9mtvXwKfzF+P7h2EPQZqXNAuZFzqICLVNy7UlNttM9qfUzNru8TSRvIaX4grISN/nCiVtFovw3uzs4pHlLVXZekvGjgTzmI2ZG/WhE382gCAy/F6ba5UIZsd5KHgJ+WbShiA8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748219431; c=relaxed/simple;
-	bh=j/AgqK6sTn7GZhod0s1Zdw40IxV6Jv0f8Ah9CoFUBmI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uwKPJyLmwuBRyXGPR8PSMk4F2/Cb6q887zWWnc4lZC8kkUL+TbOQGk7S/cPXT0Lxy41y6UG5SrkVsPP4+dVN13R9Tvmy8K7ehwCfE+CWlmm5AagjcpfE4MEpkVPT7Ey1y+kPleGxChrBYSFJObF61bH0zfXy4xwifkDlGXmAZo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WjbKuxPv; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3dc6dbb3d58so14845435ab.3;
-        Sun, 25 May 2025 17:30:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748219429; x=1748824229; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hE9h/M7uKcWqMcsxjrPkg3JJriS4MccIRahSsbbNqE8=;
-        b=WjbKuxPvJQO+sUjLBggyvtz6W5sF15lCrvK1IulmZF3lfvQ1/J1Zr2+6IpoaW+T3aC
-         diEZgUU2jCWTUduVDbvr5/eCjWuqeDODkQ36QNsUOOkF/WI4O0phD4w9BW2GwBLuQ4yP
-         n/WjmF7F5l2E8hMa6jP7co49Q8/hnDkPz9avh9KC/e1GtrapupBpukXIyC+F+N71m9Iv
-         C7Z5H5URKb+FMlLCbY6Qn+ym9ugrd87mS/8qM5LZNyO0w7lSG3/K8g1/Qnj+BDkckFQC
-         /Znbalv2KfvVRJmNnjD0gY6fvqlxCNHlYNX7F+FyrphqjUE0lKPv+7EHsQv6oUgeEPYU
-         jyEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748219429; x=1748824229;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hE9h/M7uKcWqMcsxjrPkg3JJriS4MccIRahSsbbNqE8=;
-        b=cScY9DZEID2Hhcjz35SqhDMfUL1w+NtDVXJsFjFn+lv7EzPviLVac0Rb3sr047VV94
-         dxnYSPxAK5wvt2XRmhST4Qd6K0BFZ+lAR9vd0BvRhMVqtmzY18WOEU4+ur9i9c/ETf2q
-         PGnceooaOqiBZOm6AgBrFT6r409eG9X/keF9N5YBHESAnOqLsqTm6yYOh5an1d26xW49
-         R+ZUl5drJW1YyoeV0m4/EPthtGqHKZcBDFP9L8728h821pXOsF9bLtcepOTjvm3gmyug
-         P3IHh3sPyiSX5Jdqq2S81mj1Suk9MWp+N1rUv7hOi7hS0rDtOzQQ5N5p4ooDKXOkyAJ7
-         18Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDFQYuHXsu8angtMEsH/Ey9JyT8viCYAY8+3hVM/vQurUljVrz0VNuP5DhDxF+jSxAJp9I2ZTyvAJvdh4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw79/3wjEieE/gBlv+MKcJReY1kX5tHpMHP6P2Tt4tvwZD799Ie
-	1ThStQxFnAGDqFOuieWUUnf+xvIGg1tbhg3FL7W3apZduWSewxBqROOifJmHawJ2VRg=
-X-Gm-Gg: ASbGncsgW5u7LfMjHL34BDeC+ABrVmq+qd2nFd0woUMLBw0j+sf3IThQfcfqVqCQxqB
-	UQSxYDH7WVv9ASo7sbPgVTU4bavm9zpp7KDuhWAs6YWIT0wYDEMcR6bDQ7qo4b4L2pzakNVdD2i
-	07J99xGqwZeJAmY8mZxTHnMrTDkdF2N2TV4GPFOn2f8SsdkWa6vVO3LfWwMjBdniUNgqJXm0wHL
-	bn8aX3AypE1JCcSD+2q3yo6hIBPA/+jAnfa6slYCcc5owfe6qw81sZIKlWNcROIHWQtOx4MaQ5I
-	ss6xZaW968xSARQ6lDWv43MXI+ScPjEy+m9Hgo5gfJzVwdfBuCKymhAJBBWSEvQDTcr7Kpb+zpP
-	pp6i/okPM0lGa9t4zv0K6UrcofnbFhA==
-X-Google-Smtp-Source: AGHT+IHeprWN0OT6Xq1C608Ko9smpP11pwLwlFe3T1+FZlCl5LSrUPerfPVKNYI6owNKSrybdMvlyA==
-X-Received: by 2002:a05:6e02:2193:b0:3dc:8b57:b759 with SMTP id e9e14a558f8ab-3dc9b7517a5mr74670715ab.21.1748219428699;
-        Sun, 25 May 2025 17:30:28 -0700 (PDT)
-Received: from james-x399.localdomain (97-118-146-220.hlrn.qwest.net. [97.118.146.220])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc85ef07dcsm25532785ab.36.2025.05.25.17.30.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 May 2025 17:30:28 -0700 (PDT)
-From: James Hilliard <james.hilliard1@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-sunxi@lists.linux.dev,
-	James Hilliard <james.hilliard1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Yinggang Gu <guyinggang@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Feiyang Chen <chenfeiyang@loongson.cn>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Jinjie Ruan <ruanjinjie@huawei.com>,
-	Paul Kocialkowski <paulk@sys-base.io>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/2] net: stmmac: dwmac-sun8i: Allow runtime AC200/AC300 phy selection
-Date: Sun, 25 May 2025 18:29:22 -0600
-Message-Id: <20250526002924.2567843-2-james.hilliard1@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250526002924.2567843-1-james.hilliard1@gmail.com>
-References: <20250526002924.2567843-1-james.hilliard1@gmail.com>
+	s=arc-20240116; t=1748219805; c=relaxed/simple;
+	bh=PWmxnlgfXVQMFwih64+oIqpx6GC1/1WEm1ZUh1+lD90=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6bSqgZJyWYffF6+EwvIg3rPp3cSNpipXUCLssUq+59HP5dvO0OT6hFEtVKCZPptvLf7q08k30xGbbhjLpNR4fXaWebi+m0OtGhY/Dl4FtVDS5tLS3rcB+RxmYM8cE0k+syhbQkq7YTSgACkql6KRblBgAd5N4qENr9MYSnAqAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kBJfRQh0; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748219804; x=1779755804;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PWmxnlgfXVQMFwih64+oIqpx6GC1/1WEm1ZUh1+lD90=;
+  b=kBJfRQh0+loaa5T0ceu3/6IaKZhkqhBu3aFlfvUVrHLu4IRaShePm3jL
+   uK4bTg29PwB9plVozCr67m1hCgGwvylHnoJC3omygkeg/kCkASP2mn8Xq
+   wmruw/s3XtkQQRJbT5IJWjgRnnx4H5bLyZ/luWrXvHmhbbizu1r+DhfUn
+   /A4yF5SXW1wCe8n/6J2UouN4OSPJ/BcYZD/Ra4BxeqDOomRW5Wj5SBHHo
+   G41DHmnrkPy2Y7agx7l8wD5+5bLDkLW3btB/X2FxhTbBH+/os5JrPmgGC
+   X5AQzWTdvCb8KO6t09oN2B4+lCZ1Qaxydlt/iowPgdICepQJdWN19BMuv
+   A==;
+X-CSE-ConnectionGUID: fWxzr7KGRce9oSlGf1nYTw==
+X-CSE-MsgGUID: Lq9onlxJQliD4+eNauzD2g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="67739674"
+X-IronPort-AV: E=Sophos;i="6.15,314,1739865600"; 
+   d="scan'208";a="67739674"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2025 17:36:43 -0700
+X-CSE-ConnectionGUID: nxxMPxjcSEOwAFrehzbeGA==
+X-CSE-MsgGUID: B4+C7AphS5OWTk0wdO38Sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,314,1739865600"; 
+   d="scan'208";a="142594031"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 25 May 2025 17:36:39 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uJLpU-000S32-36;
+	Mon, 26 May 2025 00:36:36 +0000
+Date: Mon, 26 May 2025 08:36:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vkoul@kernel.org, michal.simek@amd.com,
+	sean.anderson@linux.dev, radhey.shyam.pandey@amd.com,
+	horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	git@amd.com, harini.katakam@amd.com
+Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report
+ coalesce parameters in DMAengine flow
+Message-ID: <202505260804.Mhztve8t-lkp@intel.com>
+References: <20250525102217.1181104-1-suraj.gupta2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250525102217.1181104-1-suraj.gupta2@amd.com>
 
-The Allwinner H616 ships with two different on-die phy variants, in
-order to determine the phy being used we need to read an efuse and
-then select the appropriate PHY based on the AC300 bit.
+Hi Suraj,
 
-By defining an emac node without a phy-handle we can override the
-default PHY selection logic in stmmac by passing a specific phy_node
-selected based on the ac200 and ac300 names in a phys list.
+kernel test robot noticed the following build errors:
 
-This allows us to have a device tree that defines both PHY variants
-even though only one will actually end up being used at runtime
-based on the ac300 nvmem efuse bit.
+[auto build test ERROR on net-next/main]
 
-Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/Suraj-Gupta/net-xilinx-axienet-Configure-and-report-coalesce-parameters-in-DMAengine-flow/20250525-182400
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250525102217.1181104-1-suraj.gupta2%40amd.com
+patch subject: [PATCH net-next] net: xilinx: axienet: Configure and report coalesce parameters in DMAengine flow
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20250526/202505260804.Mhztve8t-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250526/202505260804.Mhztve8t-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 6c7e8655a7eb..e275f4caa684 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -11,6 +11,7 @@
- #include <linux/mdio-mux.h>
- #include <linux/mfd/syscon.h>
- #include <linux/module.h>
-+#include <linux/nvmem-consumer.h>
- #include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
-@@ -280,6 +281,8 @@ static const struct emac_variant emac_variant_h6 = {
- #define SYSCON_ETCS_EXT_GMII	0x1
- #define SYSCON_ETCS_INT_GMII	0x2
- 
-+#define AC300_KEY		BIT(8)
-+
- /* sun8i_dwmac_dma_reset() - reset the EMAC
-  * Called from stmmac via stmmac_dma_ops->reset
-  */
-@@ -1159,6 +1162,7 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
- 	struct net_device *ndev;
- 	struct regmap *regmap;
- 	int ret;
-+	u16 val;
- 
- 	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
- 	if (ret)
-@@ -1222,6 +1226,21 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
- 	if (IS_ERR(plat_dat))
- 		return PTR_ERR(plat_dat);
- 
-+	if (!nvmem_cell_read_u16(dev, "ac300", &val)) {
-+		const char *phy_name = (val & AC300_KEY) ? "ac300" : "ac200";
-+		int index = of_property_match_string(dev->of_node, "phy-names", phy_name);
-+		if (index < 0) {
-+			dev_err(dev, "PHY name not found in device tree\n");
-+			return -EINVAL;
-+		}
-+
-+		plat_dat->phy_node = of_parse_phandle(dev->of_node, "phys", index);
-+		if (!plat_dat->phy_node) {
-+			dev_err(dev, "Failed to get PHY node from phys property\n");
-+			return -EINVAL;
-+		}
-+	}
-+
- 	/* platform data specifying hardware features and callbacks.
- 	 * hardware features were copied from Allwinner drivers.
- 	 */
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505260804.Mhztve8t-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c: In function 'axienet_init_dmaengine':
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:1524:18: error: 'struct dma_slave_config' has no member named 'coalesce_cnt'
+    1524 |         tx_config.coalesce_cnt = XAXIDMAENGINE_DFT_TX_THRESHOLD;
+         |                  ^
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:1525:18: error: 'struct dma_slave_config' has no member named 'coalesce_usecs'
+    1525 |         tx_config.coalesce_usecs = XAXIDMAENGINE_DFT_TX_USEC;
+         |                  ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:1526:18: error: 'struct dma_slave_config' has no member named 'coalesce_cnt'
+    1526 |         rx_config.coalesce_cnt = XAXIDMAENGINE_DFT_RX_THRESHOLD;
+         |                  ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:1527:18: error: 'struct dma_slave_config' has no member named 'coalesce_usecs'
+    1527 |         rx_config.coalesce_usecs =  XAXIDMAENGINE_DFT_RX_USEC;
+         |                  ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c: In function 'axienet_ethtools_get_coalesce':
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2196:61: error: 'struct dma_slave_caps' has no member named 'coalesce_cnt'
+    2196 |                 ecoalesce->tx_max_coalesced_frames = tx_caps.coalesce_cnt;
+         |                                                             ^
+>> drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2197:55: error: 'struct dma_slave_caps' has no member named 'coalesce_usecs'
+    2197 |                 ecoalesce->tx_coalesce_usecs = tx_caps.coalesce_usecs;
+         |                                                       ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2198:61: error: 'struct dma_slave_caps' has no member named 'coalesce_cnt'
+    2198 |                 ecoalesce->rx_max_coalesced_frames = rx_caps.coalesce_cnt;
+         |                                                             ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2199:55: error: 'struct dma_slave_caps' has no member named 'coalesce_usecs'
+    2199 |                 ecoalesce->rx_coalesce_usecs = rx_caps.coalesce_usecs;
+         |                                                       ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c: In function 'axienet_ethtools_set_coalesce':
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2270:23: error: 'struct dma_slave_config' has no member named 'coalesce_cnt'
+    2270 |                 tx_cfg.coalesce_cnt = ecoalesce->tx_max_coalesced_frames;
+         |                       ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2271:23: error: 'struct dma_slave_config' has no member named 'coalesce_usecs'
+    2271 |                 tx_cfg.coalesce_usecs = ecoalesce->tx_coalesce_usecs;
+         |                       ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2272:23: error: 'struct dma_slave_config' has no member named 'coalesce_cnt'
+    2272 |                 rx_cfg.coalesce_cnt = ecoalesce->rx_max_coalesced_frames;
+         |                       ^
+   drivers/net/ethernet/xilinx/xilinx_axienet_main.c:2273:23: error: 'struct dma_slave_config' has no member named 'coalesce_usecs'
+    2273 |                 rx_cfg.coalesce_usecs = ecoalesce->rx_coalesce_usecs;
+         |                       ^
+
+
+vim +1524 drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+
+  1494	
+  1495	/**
+  1496	 * axienet_init_dmaengine - init the dmaengine code.
+  1497	 * @ndev:       Pointer to net_device structure
+  1498	 *
+  1499	 * Return: 0, on success.
+  1500	 *          non-zero error value on failure
+  1501	 *
+  1502	 * This is the dmaengine initialization code.
+  1503	 */
+  1504	static int axienet_init_dmaengine(struct net_device *ndev)
+  1505	{
+  1506		struct axienet_local *lp = netdev_priv(ndev);
+  1507		struct skbuf_dma_descriptor *skbuf_dma;
+  1508		struct dma_slave_config tx_config, rx_config;
+  1509		int i, ret;
+  1510	
+  1511		lp->tx_chan = dma_request_chan(lp->dev, "tx_chan0");
+  1512		if (IS_ERR(lp->tx_chan)) {
+  1513			dev_err(lp->dev, "No Ethernet DMA (TX) channel found\n");
+  1514			return PTR_ERR(lp->tx_chan);
+  1515		}
+  1516	
+  1517		lp->rx_chan = dma_request_chan(lp->dev, "rx_chan0");
+  1518		if (IS_ERR(lp->rx_chan)) {
+  1519			ret = PTR_ERR(lp->rx_chan);
+  1520			dev_err(lp->dev, "No Ethernet DMA (RX) channel found\n");
+  1521			goto err_dma_release_tx;
+  1522		}
+  1523	
+> 1524		tx_config.coalesce_cnt = XAXIDMAENGINE_DFT_TX_THRESHOLD;
+> 1525		tx_config.coalesce_usecs = XAXIDMAENGINE_DFT_TX_USEC;
+> 1526		rx_config.coalesce_cnt = XAXIDMAENGINE_DFT_RX_THRESHOLD;
+> 1527		rx_config.coalesce_usecs =  XAXIDMAENGINE_DFT_RX_USEC;
+  1528	
+  1529		ret = dmaengine_slave_config(lp->tx_chan, &tx_config);
+  1530		if (ret) {
+  1531			dev_err(lp->dev, "Failed to configure Tx coalesce parameters\n");
+  1532			goto err_dma_release_tx;
+  1533		}
+  1534		ret = dmaengine_slave_config(lp->rx_chan, &rx_config);
+  1535		if (ret) {
+  1536			dev_err(lp->dev, "Failed to configure Rx coalesce parameters\n");
+  1537			goto err_dma_release_tx;
+  1538		}
+  1539	
+  1540		lp->tx_ring_tail = 0;
+  1541		lp->tx_ring_head = 0;
+  1542		lp->rx_ring_tail = 0;
+  1543		lp->rx_ring_head = 0;
+  1544		lp->tx_skb_ring = kcalloc(TX_BD_NUM_MAX, sizeof(*lp->tx_skb_ring),
+  1545					  GFP_KERNEL);
+  1546		if (!lp->tx_skb_ring) {
+  1547			ret = -ENOMEM;
+  1548			goto err_dma_release_rx;
+  1549		}
+  1550		for (i = 0; i < TX_BD_NUM_MAX; i++) {
+  1551			skbuf_dma = kzalloc(sizeof(*skbuf_dma), GFP_KERNEL);
+  1552			if (!skbuf_dma) {
+  1553				ret = -ENOMEM;
+  1554				goto err_free_tx_skb_ring;
+  1555			}
+  1556			lp->tx_skb_ring[i] = skbuf_dma;
+  1557		}
+  1558	
+  1559		lp->rx_skb_ring = kcalloc(RX_BUF_NUM_DEFAULT, sizeof(*lp->rx_skb_ring),
+  1560					  GFP_KERNEL);
+  1561		if (!lp->rx_skb_ring) {
+  1562			ret = -ENOMEM;
+  1563			goto err_free_tx_skb_ring;
+  1564		}
+  1565		for (i = 0; i < RX_BUF_NUM_DEFAULT; i++) {
+  1566			skbuf_dma = kzalloc(sizeof(*skbuf_dma), GFP_KERNEL);
+  1567			if (!skbuf_dma) {
+  1568				ret = -ENOMEM;
+  1569				goto err_free_rx_skb_ring;
+  1570			}
+  1571			lp->rx_skb_ring[i] = skbuf_dma;
+  1572		}
+  1573		/* TODO: Instead of BD_NUM_DEFAULT use runtime support */
+  1574		for (i = 0; i < RX_BUF_NUM_DEFAULT; i++)
+  1575			axienet_rx_submit_desc(ndev);
+  1576		dma_async_issue_pending(lp->rx_chan);
+  1577	
+  1578		return 0;
+  1579	
+  1580	err_free_rx_skb_ring:
+  1581		for (i = 0; i < RX_BUF_NUM_DEFAULT; i++)
+  1582			kfree(lp->rx_skb_ring[i]);
+  1583		kfree(lp->rx_skb_ring);
+  1584	err_free_tx_skb_ring:
+  1585		for (i = 0; i < TX_BD_NUM_MAX; i++)
+  1586			kfree(lp->tx_skb_ring[i]);
+  1587		kfree(lp->tx_skb_ring);
+  1588	err_dma_release_rx:
+  1589		dma_release_channel(lp->rx_chan);
+  1590	err_dma_release_tx:
+  1591		dma_release_channel(lp->tx_chan);
+  1592		return ret;
+  1593	}
+  1594	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
