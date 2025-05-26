@@ -1,134 +1,99 @@
-Return-Path: <netdev+bounces-193380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFAF6AC3B46
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:13:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 732F0AC3B83
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFEEB3A3A68
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B68C1895150
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6211E32D7;
-	Mon, 26 May 2025 08:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8211C5D61;
+	Mon, 26 May 2025 08:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vv6k3Obm"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28ED03595E;
-	Mon, 26 May 2025 08:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7818B13BC3F;
+	Mon, 26 May 2025 08:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748247181; cv=none; b=dmXK3s0juWMx5/Qmu2aQ1aIG8g7RM3oxZfcmxksUqblCjNJYgE0jpoo3IOCkA4BKubUL5QcA6xk5XmS9tPoPLX3ABgD6S49VeyvFHk23iiXmsvxe2JL+YE0VpdwE/THV89+fVLZFnEChcYKAbv/K27OPqogW/j2RTo0KfvrjqUk=
+	t=1748247607; cv=none; b=I+yb0IhGwhvsyE/NPOS0UteFfgGZinjgtulshkQqhhbiOCJyUOjZmPsfEXYXp+Rl+MuQtQqNE+dnHm/SYRa5dUnSj6qcK3hI+IoC5TNTYbGdPuz6K3MZslms27FXJ04v+gmA3Fg7pPJFgMmImTaSczaY1CTY+Ov7byTvjXCQUwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748247181; c=relaxed/simple;
-	bh=oIu84pilcqVfrxlqB16Lsl++65M0QoEeHgcBWV9nGgo=;
+	s=arc-20240116; t=1748247607; c=relaxed/simple;
+	bh=1XBov8LKCCh3CXoBRsiUyshAPN3tdk9qVy0hUvJ1KyI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqWPtL4qhNpHRklQNBAFsP1secfzd09etjjIVRBASoROhpf++f8Gt2OeufEq8S6gwFsR/qYaXCS/jIceIOQLdMWezj7XQ/dWl78OmnYkG8Ig6ZRrdJHXqdaUqkaWsbueiw1pa06zDD7/j6QdVfRNQZCUnEOXkESCeFXkvFzeQQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-61-683422858314
-Date: Mon, 26 May 2025 17:12:47 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 13/18] mlx5: use netmem descriptor and APIs for page pool
-Message-ID: <20250526081247.GA47983@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-14-byungchul@sk.com>
- <CAHS8izOX0j04=KB-=_kpyR+_HZHk+4hKK-xTEtsGNNHzZFvhKQ@mail.gmail.com>
- <20250526030858.GA56990@system.software.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fE+Dn/yt/F+5qT0J10eEzxZh1/JCQKZERLrV5tcQ/tl5vp9S2FksmZDzuVkA/4LgFGfogFcQau0qJE3MdXBEXAUaV1e8teMbLsRgCavKSdq58K9HLHIQRSrhER+AtIlxySLeS/VBOMwDTIUxZvfG9iYuaejKlAqCowictta51k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Vv6k3Obm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RbR8wNWzK8yk4bknHCAW6sX5XZ5jnzKaNd3Odaryp2c=; b=Vv6k3Obm93JVskdS9j3mndnvWB
+	K9UTQyl2EuE2O6dFYef6+u9w4kJ3+H0AkTnRx4tmIT82OjHXqqOZdBNOzdIqUcu2zzXZoqFrU6tDb
+	Sj10hrpXMsTyOBxrBXnbma3ZwOkRf+/lzfQQOin1texHcqz2wdxla/PQRxOTw01M8Quc+FWRd9UDk
+	JW0tbQyzcB/WOM873gicAc2ozW5tf/cMGX7IPTzeOmIQJgQFHN9JhKZzp/4W7gMRHEsxSamXCHCSG
+	+aI1jkdiRvAl0FvwyINr/b3+ERcmcq21gt88QqCQIcV6Y94VohRRPnvmtkMDwPmdUEVua3QYxrMSe
+	ioOkDLfQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56448)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uJT3v-0006WT-1s;
+	Mon, 26 May 2025 09:19:59 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uJT3t-0000HA-2U;
+	Mon, 26 May 2025 09:19:57 +0100
+Date: Mon, 26 May 2025 09:19:57 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: Add c45_phy_ids sysfs entry
+Message-ID: <aDQkLcfeu8zw8CJ_@shell.armlinux.org.uk>
+References: <20250523132606.2814-1-yajun.deng@linux.dev>
+ <2eec1d17-a6d1-4859-9cc9-43eeac23edbd@lunn.ch>
+ <fad26dc95cbe08a87b30d98a55b7e3d987683589@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250526030858.GA56990@system.software.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzo7TwXFavZkVzkwSNUvDJ+j6Jd6oyPBDoR9q5amt5rRZ
-	poFgzagktTRT50lmmvcaLHMzQmx5iy7apFqlzbwhZUZpkhe6TIn89uO5/f4fHpaSl4p9WLX2
-	FK/TKjUKRkpLv3jcCrmgiFCFteq9QDDVMVD7MwUq+6xiEGoaEExMvZfAeEs7A2WlkxQInRk0
-	/DBNUzDU1i8BZ8UwDQ8vWijoz+lgICtjhoLz1ioRdDVki+H69G0KLOl9Euh+IDDwoe63GIZt
-	WTQ8MVTT4MzeBm3GxTD5dBRBi8kigskrNxnIsxsZGMhwIrA/7qeh+Fw2AlOTQwwzPwVmmx+p
-	r34rIo2GXgkxmk+Te1VBJNNhp4i55jJDzN9zJaTn9UOGdBTO0KTROi4iWfoxhnwbekeTr02v
-	GGKqf0WTZ8YWCRk3r4jiYqSb4niNOpnXrd1ySKoayxuhEu+6p4x8DkxHo2wmYlnMRWBDmzYT
-	uc1hWV4G42KaC8B953LmmOECscMxRbnYm1uDy5uuiV1McU4xfiEcd7EXtwdbckZFLpZxgJ3V
-	BX9npKyccyDc22yTzDc88ZOiQXp+ORDPltgpVwaKW4Yrf7Hz5ZVYf794zuXGbcTZE/o51yLO
-	Hzc3tItcNzFXz+LO/FxmPvRS/KjKQV9FnoYFCsMCheG/wrBAYUR0DZKrtcnxSrUmIlSVqlWn
-	hB5JiDejv49TkTYba0Xfu6JtiGORwkN2SBGukouVyUmp8TaEWUrhLfMVwlRyWZwy9SyvSzio
-	O63hk2xoGUsrlsjWT56Jk3PHlKf4EzyfyOv+dUWsm086yqkMDvCtGui4F3xwC8cOkonlhVub
-	Wt+9uRO68xLsW3WDzi0/7IBNQ/c7Nfnba93KE/yMJW/X1OPN0Zb8/oZE7/zdkWkwE2jf8TFZ
-	7/tyOrbYXYiMiovv3pBSEDNxV1HXc9Ta7rVXMIfsejp9snv/p9Xh/iKtx4Min7qYA0s6Ep4r
-	6CSVcl0QpUtS/gHQPK7/NAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHe97b3i0Xr0vtTYNgIZKQFl040QUpqKcoCewC9aGNfGnLOceW
-	NiVL2ySynJZd16yVprnE0bRthojMlUpRoRnrOtMUoWU3k0qxnBL57cf5n/P7fzksKSuiY1m1
-	9rCg1yo1ckZCSVLXmJYUyVeolnaPI7A56xi489MINb1eGmwON4KRX69F8N3fzkDljVESbE/N
-	FPxw/iZh4GGfCILVgxQ0n/SQ0FfawUCJeYyEE97bBLRVdNLwzG2h4fzvWyR4CnpF0H3fxsC7
-	uj80DPpKKOi01lIQtKTAQ3sMjD4KIfA7PQSMnqlgoLzLzkC/OYigq62PgquFFgTOlgANYz9t
-	TIocN9a+JHCT9a0I213ZuOF2Ii4OdJHY5TjFYNe3cyL85kUzgzsuj1G4yfudwCWmYQZ/HXhF
-	4c8tPQyuHPpCYGdjD4Uf2/2iHZF7JWvTBY06R9Anr1dIVMPlQ6SufrZx6GNCAQqxxUjM8twK
-	vrLczISZ4uL53sLSKWa4BD4Q+EWGOYpbzFe1nKXDTHJBmn9iOxTmudx23lMaIsIs5YAP1l6a
-	3JGwMi6A+LetPtF0EMl3XvlATR8n8OPXuial7CTH8TUT7PR4IW+6d3WqS8yt5i0jpqmuaG4R
-	3+puJ8rQHOsMk3WGyfrfZJ1hsiPKgaLU2pxMpVqzMsmQocrVqo1JB7IyXWjyOarzx8960Uj3
-	Zh/iWCSPkCrky1UyWpljyM30IZ4l5VHSBbalKpk0XZmbJ+iz9uuzNYLBh+JYSj5PunWPoJBx
-	B5WHhQxB0An6fynBimMLUNbstu4N7iPR7k951y84zHcmds4dOG43pl00tTxa0Fxd5b25JfX5
-	6YOrlkVsG+8sTpxv9CelvNreHkG8MG40iDVHd+2eo6uKb3+ALbHa/h42dCHeoduXJpJ6oxdZ
-	6vNxdtvCjNS03PvHNlUkNCg+v1+/LnlW5LHjvdSlmCGizH93nZwyqJTLEkm9QfkXuwxA+xgD
-	AAA=
-X-CFilter-Loop: Reflected
+In-Reply-To: <fad26dc95cbe08a87b30d98a55b7e3d987683589@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, May 26, 2025 at 12:08:58PM +0900, Byungchul Park wrote:
-> On Fri, May 23, 2025 at 10:13:27AM -0700, Mina Almasry wrote:
-> > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> > >
-> > > To simplify struct page, the effort to seperate its own descriptor from
-> > > struct page is required and the work for page pool is on going.
-> > >
-> > > Use netmem descriptor and APIs for page pool in mlx5 code.
-> > >
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > 
-> > Just FYI, you're racing with Nvidia adding netmem support to mlx5 as
-> > well. Probably they prefer to take their patch. So try to rebase on
-> > top of that maybe? Up to you.
-> > 
-> > https://lore.kernel.org/netdev/1747950086-1246773-9-git-send-email-tariqt@nvidia.com/
-> > 
-> > I also wonder if you should send this through the net-next tree, since
-> > it seem to race with changes that are going to land in net-next soon.
-> > Up to you, I don't have any strong preference. But if you do send to
-> > net-next, there are a bunch of extra rules to keep in mind:
-> > 
-> > https://docs.kernel.org/process/maintainer-netdev.html
-
-It looks like I have to wait for net-next to reopen, maybe until the
-next -rc1 released..  Right?  However, I can see some patches posted now.
-Hm..
-
-	Byungchul
+On Mon, May 26, 2025 at 08:11:21AM +0000, Yajun Deng wrote:
+> c45 device:
+> $ ls /sys/class/net/eth0/phydev/
+> attached_dev  driver  of_node         phy_id         power       subsystem
+> c45_phy_ids   hwmon   phy_has_fixups  phy_interface  statistics  uevent
 > 
-> I can send to net-next, but is it okay even if it's more than 15 patches?
-> 
-> 	Byungchul
-> > 
-> > -- 
-> > Thanks,
-> > Mina
+> $ ls /sys/class/net/eth0/phydev/c45_phy_ids
+> mmd10_device_id  mmd17_device_id  mmd23_device_id  mmd2_device_id   mmd7_device_id
+> mmd11_device_id  mmd18_device_id  mmd24_device_id  mmd30_device_id  mmd8_device_id
+> mmd12_device_id  mmd19_device_id  mmd25_device_id  mmd31_device_id  mmd9_device_id
+> mmd13_device_id  mmd1_device_id   mmd26_device_id  mmd3_device_id
+> mmd14_device_id  mmd20_device_id  mmd27_device_id  mmd4_device_id
+> mmd15_device_id  mmd21_device_id  mmd28_device_id  mmd5_device_id
+> mmd16_device_id  mmd22_device_id  mmd29_device_id  mmd6_device_id
+
+I suspect you don't have a PHY that defines all these IDs. Are you sure
+your .is_visible() is working properly?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
