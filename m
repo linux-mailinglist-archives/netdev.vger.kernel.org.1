@@ -1,183 +1,141 @@
-Return-Path: <netdev+bounces-193440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD475AC40B1
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:50:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4AC2AC40BC
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D61416948C
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:50:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72CAF177BAE
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 13:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D671FE470;
-	Mon, 26 May 2025 13:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0619020D4E4;
+	Mon, 26 May 2025 13:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aAYHuV4x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQFkxSdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D29F1F463C
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 13:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536F920C487
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 13:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748267443; cv=none; b=J2qSuaQSd8BksKZq5MXN+bJEmATgcsca4u9t+bSWaaO4D/mdTwXRCK81ggQRzRoqoY/Ws8Ay85hKa1YQLEip68jwkAX+1/HVFExQcRVr8Q119bWCM8QxarKN7FuEi0xCjDAHfJgN35NkY+iKAwZZnNaquuW1v/tU/7MJGuzQiNE=
+	t=1748267664; cv=none; b=Yq3eRCSxrT0SJLd4tuG6TbBoRGTB2SDos8T7HQhr91737qeYrczQ6DN8fh/aOEEsiR1/roUA/6v/O+OBh9FbL/brzDxs93lWytOnrw9HbVvwdXBODTi1Vw9wsyOlfHfpKhalH+ADlLX0DEyjSOJ9YCoESnnOyFWOVpZa7bb4c0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748267443; c=relaxed/simple;
-	bh=XyxC3/PqrdLJ3qfr9vuQK0F6dSJ6qsr4C43a7JY2NRY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lOwFg1a2GnApnhonb8VMKZDqSI7nSYMRRBJ0kXz71263hl+T1RT2PF/xIvm1tlIkN9LJ3P/sxk5YeKwLZNGwVcCKimOuIEo3/1IQqGZkL4vDe0V2FyByYR+adwisUsWAPNhcceNwvojGp+vEkEQhSzQ5I2tVqp0WeKCoy6mbMhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aAYHuV4x; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-48b7747f881so523051cf.1
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748267440; x=1748872240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vka/f+Z/vv4OannEtW8J/eskrPSAg5/7ofUNBbKMlGI=;
-        b=aAYHuV4xCkz+VTvnLf+WSQHyzvtTMh2jWJVvhsejBpl3qgMYKv/PZpvwltVjHVZaqC
-         XG8xXO1HUbI4WnHclryGS8+7508RIx1zRKtPFXt9VT+29K9s0ShN8InPuVa7OX17O+0x
-         9gttfaZcN8eQCk7MoZ8zYMuwTyeudGN1RsJ6qXBFEp9Rd9CdGU97Lrw1th38X9LHrHLJ
-         oAxU89d3Nx/kkULSFVt1KdfqlKId3URGe9jRgu+Hkn9eWcyWYRw+BVS6a2Zm1oWJGhWZ
-         Dpqysv512+/GzrcvJWicH1fQR+5DJWD6belOYD3tbznzMt6BnWeHXRAymPod+dDtYMF5
-         P28A==
+	s=arc-20240116; t=1748267664; c=relaxed/simple;
+	bh=cm8VcAMTVaMfQQq25DP6H1KOaETEYG1SmJ2rmGO226g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=itNfW6U0OIoejO0Ih3Jco2GPasjJ3q9/UFNt/4sQv3SImN5anA+mEQXgTQ25SRxSk6mKSuzZDaI4vFYPb+OgYR8SJreeD8V22o7Q7j6w9lsE4Y3evTBYgBuR4T4AD7s4raioDPJLPwsvGaA1veCZn/V1mqAdx0LDyiDdPq+HzTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dQFkxSdp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748267662;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g40krMSI3KPVx/gkHC7ZBGvC36woERbrWjiZZaJNrhc=;
+	b=dQFkxSdpAqqfkfciNIW97iC0qn265oXGN/pj9wZ2FhuWDQqTQrQ8FkywlCkkDfkQW7hiRC
+	hKS6P8whjKOtEYmdrbZzlTPcvW57rEwqVIywNBoObUtx40I2aD5pw8VFQFpf8p+US1aARH
+	CqIE6rNCyHwrtsM2N+AAlYgTEWqe5ug=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-F9fSMiPkO8mXKOMEKYTNtQ-1; Mon, 26 May 2025 09:54:20 -0400
+X-MC-Unique: F9fSMiPkO8mXKOMEKYTNtQ-1
+X-Mimecast-MFC-AGG-ID: F9fSMiPkO8mXKOMEKYTNtQ_1748267659
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4cceb558aso903865f8f.3
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:54:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748267440; x=1748872240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vka/f+Z/vv4OannEtW8J/eskrPSAg5/7ofUNBbKMlGI=;
-        b=cth4ZwmN3DZjt4htJv0s5zgYtAXaxDgbOFIJb29Wr+n6V6Go1lsMuPAWHWNg+UGa4R
-         mmPjr39ZxlAeIC1n20xxepqjpHn7Gaw04kIZWnZcwPepVWGERIPJGlbaJjgjfihe1LiS
-         0+js/XSX19sjZm+NnEQMXb26EZXTec+XwVIHW5KnHHWKuMvftub6eLY/ar7/0D9SYX42
-         pZgrmm6WY5FHjraJE5KQb4vJmI9zw0jxl2ftT4R30U+om48BzzXqA24m3XGs+EL8Ujpu
-         i9AGgJ97enENPXujHTXn9MN79PLdpDdrjcW5s0h2VG8q9NqtVlHjfn0FyGotX+h2KMnU
-         EsnA==
-X-Gm-Message-State: AOJu0YxBJVuI2ezVez+lndzb2//CZrF2tS9SBxWvXrRiY0dS2z19W5VH
-	VC1nc7ecECXe8UTcNy8k0L1jiYooEe5FPvc9pmhaeugoeTq7u/0spIeHko8it1182g3wBwAG1LT
-	1iiOcaIVyPVfAGmJchiygQt4kub9zcGcvh8DOlCsp
-X-Gm-Gg: ASbGnctT+4FDeYeBMFBiNk7ZLaY1WD3y756YbSrOELGnmi49LqN9iw7WmndFcgVrKrI
-	4Hb8HQdICth+vqBYFxUpZAkDJRgoZiw+JAXKwqTU65eTd80aRGy0WzkR9BEhmmrYjKJCPMkZBTt
-	2in3H3kXUrJ/rbTIxaf5WqXTldSHXnVCISuWtPAMI5haM=
-X-Google-Smtp-Source: AGHT+IEjv4Suc4V1qLiMu3iKXdg4HFAopydhUcXgFEN2Oj86j7gvGeezz2NJRZBFck7ypK8gzhr9jTHxh1HQKn1wcko=
-X-Received: by 2002:a05:622a:8b:b0:48a:ba32:370 with SMTP id
- d75a77b69052e-49f4b3f787bmr6380921cf.10.1748267439888; Mon, 26 May 2025
- 06:50:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748267659; x=1748872459;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g40krMSI3KPVx/gkHC7ZBGvC36woERbrWjiZZaJNrhc=;
+        b=CvVmcCpqdnW8TKNcCc+OG6Nehb8BTLhiepU8aR/zFVuzvrr+otCz4qGBW+VQhIjZQv
+         Wzpxh1aeRWNQbBgVnsrD599B7pV9vA4f5pP72QjakHOM4VN1NJrGgL+Z0rjjJthg9rbB
+         X5FWGhrdjBu1gqfoNIouVBS9s+OXMqWDeRgiDIyGTr9iBKeFMLZf0gZ2K7Oc8U3c7h7Q
+         mlr+0ShldViUdKt55IN4DjAk8w8bt+HLSB0SJkeBOz2hiHWOuruVeeps3b2kk2knlQwx
+         eP3wncaj6OlDnYOh42RJAiXYqigeMcd1sNsI1hH5DMBhdAHOK+aY8QDPQditCF0J/EJ7
+         ueLw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSt1Rcd7LfZjZRgIvyexhGfmmtuCirAIhRpTQGJ1UH0n0RZT/FyVU55EJtSzaeidyV1tpbrCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysEyJIMlKDfpdn7Km9tU4h5KJe/d5T8SRS9PraxwQkHCyo/OVQ
+	CDWHrMu7egYkgFrTjGR/jt+sRwdD7VK3wbvxM5HZHc9FtuiV6863JObfnM2azFcDbpXr1803EYu
+	Fue+GIruHJrd1+pyfnHFHoNC9xJXW1rAqxY9n+t5gsz0FtYD+3m3xZNwufi7YTSWj0CFB
+X-Gm-Gg: ASbGncsOQXLJTrp0zmvEl3hLIC87xEC6XwDP2N8vPs/A5xlV0+fwBHyqHatbvo8h3mL
+	e5nu9AN2pqZuwSFrk0LnqsFBVLjaUgYY1nNkHazjIhFvxGoYJkOziX7M7CAYFyzIAXUyAF47yNp
+	3iQnUoAqAXHjqWUtyTqNLF9f8UR4RxV3Up5GL3f1KyMNOOVVBbmlPQURvZ/OIH2UHlcTCIl9TEr
+	jocjwSThGSgpUgoREwCaIEdN51uibts06f6LSso0rQFCyy+rWjP1D0h6Ies7+Zf1HyhmXUJkzMY
+	o21dhdUq9RcTEbZE8pA=
+X-Received: by 2002:a5d:5848:0:b0:3a4:de27:e00f with SMTP id ffacd0b85a97d-3a4de27e06emr1531849f8f.7.1748267659273;
+        Mon, 26 May 2025 06:54:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiG7FOfv6b9WqOpalfP4cWB+fgbGZlYPID5TImsza1uAaoWfWRUes4loK7bwCNhatMHGPwNg==
+X-Received: by 2002:a5d:5848:0:b0:3a4:de27:e00f with SMTP id ffacd0b85a97d-3a4de27e06emr1531832f8f.7.1748267658891;
+        Mon, 26 May 2025 06:54:18 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d9982c96sm2814709f8f.64.2025.05.26.06.54.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 May 2025 06:54:18 -0700 (PDT)
+Message-ID: <dab3eb18-dc98-45bf-a81a-56cec78eaac0@redhat.com>
+Date: Mon, 26 May 2025 15:54:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
-In-Reply-To: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 26 May 2025 09:50:23 -0400
-X-Gm-Features: AX0GCFv5k7xMJSIGuQ90kC8dkAwpInWC0IhIk4EWuI6MjuEHTpV21EBa6eSBGWY
-Message-ID: <CADVnQykQ+NGdONiK6AwL9CN=nj-8C6rwS4dtf-6p1f+JFyVqug@mail.gmail.com>
-Subject: Re: Issue with delayed segments despite TCP_NODELAY
-To: Dennis Baurichter <dennisba@mail.uni-paderborn.de>
-Cc: netdev@vger.kernel.org, netfilter@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: usb: aqc111: fix error handling of usbnet
+ read calls
+To: Andrew Lunn <andrew@lunn.ch>,
+ Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com,
+ lvc-project@linuxtesting.org
+References: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
+ <39e2951b-6e57-4003-b1c7-c68947f579be@lunn.ch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <39e2951b-6e57-4003-b1c7-c68947f579be@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, May 25, 2025 at 9:01=E2=80=AFPM Dennis Baurichter
-<dennisba@mail.uni-paderborn.de> wrote:
->
-> Hi,
->
-> I have a question on why the kernel stops sending further TCP segments
-> after the handshake and first 2 (or 3) payload segments have been sent.
-> This seems to happen if the round trip time is "too high" (e.g., over
-> 9ms or 15ms, depending on system). Remaining segments are (apparently)
-> only sent after an ACK has been received, even though TCP_NODELAY is set
-> on the socket.
->
-> This is happening on a range of different kernels, from Arch Linux'
-> 6.14.7 (which should be rather close to mainline) down to Ubuntu 22.04's
-> 5.15.0-134-generic (admittedly somewhat "farther away" from mainline). I
-> can test on an actual mainline kernel, too, if that helps.
-> I will describe our (probably somewhat uncommon) setup below. If you
-> need any further information, I'll be happy to provide it.
->
-> My colleague and I have the following setup:
-> - Userland application connects to a server via TCP/IPv4 (complete TCP
-> handshake is performed).
-> - A nftables rule is added to intercept packets of this connection and
-> put them into a netfilter queue.
-> - Userland application writes data into this TCP socket.
->    - The data is written in up to 4 chunks, which are intended to end up
-> in individual TCP segments.
->    - The socket has TCP_NODELAY set.
->    - sysctl net.ipv4.tcp_autocorking=3D0
-> - The above nftables rule is removed.
-> - Userland application (a different part of it) retrieves all packets
-> from the netfilter queue.
->    - Here it may occur that e.g. only 2 out of 4 segments can be retrieve=
-d.
->    - Reading from the netfilter queue is attempted until 5 timeouts of
-> 20ms each occured. Even much higher timeout values don't change the
-> results, so it's not a race condition.
-> - Userland application performs some modifications on the intercepted
-> segments and eventually issues verdict NF_ACCEPT.
->
-> We checked (via strace) that all payload chunks are successfully written
-> to the socket, (via nlmon kernel module) that there are no errors in the
-> netlink communication, and (via nft monitor) that indeed no further
-> segments traverse the netfilter pipeline before the first two payload
-> segments are actually sent on the wire.
-> We dug through the entire list of TCP and IPv4 sysctls (testing several
-> of them), tried loading and using different congestion algorithm
-> modules, toggling TCP_NODELAY off and on between each write to the
-> socket (to trigger an explicit flush), and other things, but to no avail.
->
-> Modifying our code, we can see that after NF_ACCEPT'ing the first
-> segments, we can retrieve the remaining segments from netfilter queue.
-> In Wireshark we see that this seems to be triggered by the incoming ACK
-> segment from the server.
->
-> Notably, we can intercept all segments at once when testing this on
-> localhost or in a LAN network. However, on long-distance /
-> higher-latency connections, we can only intercept 2 (sometimes 3) segment=
-s.
->
-> Testing on a LAN connection from an old laptop to a fast PC, we delayed
-> packets on the latter one with variants of:
-> tc qdisc add dev eth0 root netem delay 15ms
-> We got the following mappings of delay / rtt to number of segments
-> intercepted:
-> below 15ms -> all (up to 4) segments intercepted
-> 15-16ms -> 2-3 segments
-> 16-17ms -> 2 (sometimes 3) segments
-> over 20ms -> 2 segments (tested 20ms, 200ms, 500ms)
-> Testing in the other direction, from fast PC to old laptop (which now
-> has the qdisc delay), we get similar results, just with lower round trip
-> times (15ms becomes more like 8-9ms).
->
-> We would very much appreciate it if someone could help us on the
-> following questions:
-> - Why are the remaining segments not send out immediately, despite
-> TCP_NODELAY?
-> - Is there a way to change this?
-> - If not, do you have better workarounds than injecting a fake ACK
-> pretending to come "from the server" via a raw socket?
->    Actually, we haven't tried this yet, but probably will soon.
+On 5/21/25 2:34 PM, Andrew Lunn wrote:
+> On Tue, May 20, 2025 at 02:32:39PM +0300, Nikita Zhandarovich wrote:
+>> Syzkaller, courtesy of syzbot, identified an error (see report [1]) in
+>> aqc111 driver, caused by incomplete sanitation of usb read calls'
+>> results. This problem is quite similar to the one fixed in commit
+>> 920a9fa27e78 ("net: asix: add proper error handling of usb read errors").
+>>
+>> For instance, usbnet_read_cmd() may read fewer than 'size' bytes,
+>> even if the caller expected the full amount, and aqc111_read_cmd()
+>> will not check its result properly. As [1] shows, this may lead
+>> to MAC address in aqc111_bind() being only partly initialized,
+>> triggering KMSAN warnings.
+> 
+> It looks like __ax88179_read_cmd() has the same issue? Please could
+> you have a look around and see if more of the same problem exists.
+> 
+> Are there any use cases where usbnet_read_cmd() can actually return
+> less than size and it not being an error? Maybe this check for ret !=
+> size can be moved inside usbnet_read_cmd()?
 
-Sounds like you are probably seeing the effects of TCP Small Queues
-(TSQ) limiting the number of skbs queued in various layers of the
-sending machine. See tcp_small_queue_check() for details.
+Judging from __usbnet_read_cmd() implementation, it's actually expected
+that such helper could return a partial copy. The centralized check
+could possibly break some users, I think check the return value on a
+per-device basis is safer.
 
-Probably with shorter RTTs the incoming ACKs clear skbs from the rtx
-queue, and thus the tcp_small_queue_check() call to
-tcp_rtx_queue_empty_or_single_skb(sk) returns true and
-tcp_small_queue_check() returns false, enabling transmissions.
+Side note: the patch should have targeted the 'net' tree as the blamed
+commit is present there, given we are now in the merge window and
+net-next PR is somewhat upcoming, applying it to net-next will yield the
+same result.
 
-What is it that you are trying to accomplish with this nftables approach?
+/P
 
-neal
 
