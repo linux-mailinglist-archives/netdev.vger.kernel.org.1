@@ -1,125 +1,143 @@
-Return-Path: <netdev+bounces-193364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC438AC3A02
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:39:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B23AC3A13
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A943E7A26F9
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:38:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 821AF3AF2BE
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0E61DCB09;
-	Mon, 26 May 2025 06:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F395A1DC07D;
+	Mon, 26 May 2025 06:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDqEj3Fa"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O3g34XiA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F5B1D8E01
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E044139E
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 06:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748241553; cv=none; b=PeiFcy/0CEByscf3szNLPtME2EJ3Upt4QQ4jaeA92hAAqoCSt591ij3QtYMfRy/1jctCBCP73u7Vqr8B127UEjAWdyLi/2Cb0vBIOiMA3oWwphWYHRnUU18G787HVUmkH9m3KVdpMbAs4/hOcLhSs1ENU2GbR5UdBwBSUBhxBlc=
+	t=1748241745; cv=none; b=qhhp/IbVFGMIGT0D+zj0Juk9JkdEhOGVsQST7WT0IUMiTVknZIz9lcCOGKxmg4tFqHikyMYo438K8Yj4zAv98/MUI26C+roHS9fF/vcSlwbbJBipafnr0jroE/LvFWEh/ecfW41U0tJeVa95/SNzWmJ/05Wzbr5ThTOtDHx8pNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748241553; c=relaxed/simple;
-	bh=Ae4tSg4kmOccm2miOn6Vld2T7LyPE4HZAwLWC/VQ3jI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XMtrnSWxdUtP15pE9EikTprvTx+HC7V3NA16VioByPXsHp9iXKpQfdNqJ0xd1qw0v7wshlZuuF3to4sb5B6xx4VM5B6zE4tJwFzSjzoL2wAPKceP0DmOM/5R2QaSVnVxktD1ZzcJFFxmx/fTiUMejd9SLr+XKTnSEGnr4Stbo3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDqEj3Fa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748241550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nm4c9M80Q1z8j97S6rw42ru1/YFOaWVgzS3+rocsC18=;
-	b=YDqEj3FaEqAccdU/zIcliXGqWWcH4yrrHaLbauoWY69KCfbx5mguAWntFsf8JNfgPLgY0b
-	4BlNloKIPV2eqH1tvnQxpxsmV5bIbeBWzgGsajQhLV0tNKpcj595G0EOqBwMsSNOtW5sbr
-	hh+yBJCQ4p3RJfV6NQN/omB7bXM9aHA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-7mpi9VMGPc2tp2SCLeLv7w-1; Mon, 26 May 2025 02:39:09 -0400
-X-MC-Unique: 7mpi9VMGPc2tp2SCLeLv7w-1
-X-Mimecast-MFC-AGG-ID: 7mpi9VMGPc2tp2SCLeLv7w_1748241548
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d0830c3f7so14287715e9.2
-        for <netdev@vger.kernel.org>; Sun, 25 May 2025 23:39:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748241547; x=1748846347;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nm4c9M80Q1z8j97S6rw42ru1/YFOaWVgzS3+rocsC18=;
-        b=EupPUztnevQBYBVDmj87b3ks5S6Avza0v189TJrSZUHRpP9APRbnRVXfSb6xSp/QCZ
-         IPhcPHmHLYoIQzLNAG1N1/9PwX/BnwtnChUObd8XQoFigoszvETpYik1Ah8lxSv6iIu+
-         XXoSiJLXa9oARPYUpf/yXfR19fftnjNOuiErA/Alb+3ctZduO717T/XyFSR9UJuGVAFB
-         KoGCViN1vLAUX2aOt1J7vUZDoXde4wCs4iGanBfDRXz8zFREsb7TeCoE7gfLV/QqNJY5
-         vYhgXGS38LxKcUSHz4m9l4HklDgIruY4xzrJ4ZGotMRlYKdn9uPlfr15OYa++cccVDl3
-         w5OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIUzv13XMhB1w9Qb7JecUUzVKyY9d3KTx8my/lpBs61ysx4XDoNi2eaHVPxHhld1TEku1lzIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoYZuAbzByu9WA3VroCh71ONN+mSnJsv5wg/mDf1TSS3GwNsHd
-	3yQ0UNo7Cr9MKnV0KhOzXXM6OsFzomOiFWebCh6myi9+RgAxSfuVfAhZ6Bmh57qEhWsnkX8U5yK
-	/yOkMog0DFfrEZrhO8RlGtn2yNqAU1xVlhFw8AnbSQDACimAWd5PSy0wHqw==
-X-Gm-Gg: ASbGncsZbFgvEhUah/62H4H+GADL3bPa77NFcFdmRLmWdo7ShJhDvdX+I0KhuLSiJTi
-	f6eVaUpabLQLFZcDRUm1D0/BeiFtFTx/YQ42efW6huLBD8ojd9K/wKNkHjyjE8w38yXyCKnQfG9
-	s6uh30pK8PNY07TXbYbabCwraaUquaT8oO7JsrUvbX80RyBgj1BqEI8IjampojCGZeUKqqPkEFR
-	wqN5ufHQD5L/dMWdFzM6YEg/Jo27vTygvVC+Uo8GaU+VWm2QjoCANhe2DKNCRz17mMN5Iemh/Ol
-	Ib0fsJ+R/8U5i3uQTng=
-X-Received: by 2002:a05:6000:2507:b0:3a4:dc32:6cba with SMTP id ffacd0b85a97d-3a4dc326effmr712393f8f.4.1748241547629;
-        Sun, 25 May 2025 23:39:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHndZUEepyKYMwEo5a/tkf0IiFhlmHejT7ojvDBOeg+h7FMmR/yDqdIddZzGS2LYqvecgN7Sw==
-X-Received: by 2002:a05:6000:2507:b0:3a4:dc32:6cba with SMTP id ffacd0b85a97d-3a4dc326effmr712375f8f.4.1748241547256;
-        Sun, 25 May 2025 23:39:07 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f0552esm223589205e9.11.2025.05.25.23.39.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 May 2025 23:39:06 -0700 (PDT)
-Message-ID: <be4c5d3d-f2c9-4a09-96ec-0b25470ef9f7@redhat.com>
-Date: Mon, 26 May 2025 08:39:04 +0200
+	s=arc-20240116; t=1748241745; c=relaxed/simple;
+	bh=2kQp/LguXrEt3grrIG+CpzIR0XkMpTObFcnULUyRxmc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eEXmzcFMRZTZaHETxRZE1LdBuFPke10IXatmKYfHDbJePvZZFt2w5uPt4F2Xd+UEna2QBRBFqhEiwdGGtNU4gqLXLMyTZxBhWHel6Xt2227gyJOhJMjLkgbJxfQbD3WDx/n7Uhbw2KkrLSF2NnB6e2h0MtnP/1aQIdcTo/pfEhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O3g34XiA; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q57Bne017694;
+	Sun, 25 May 2025 23:42:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=G9rdg20e9Ykg8dg10NWx1T7
+	+K85TK1valHTulAtX+/0=; b=O3g34XiAu8TJCI3UU4IO8CxYvIrQrcczGesHHGb
+	JZ/IEHIViKjdVbEFbCA2ylIUBu5od9opi6OTZnW5o3Ygxssl79/SPqFVjjAhhRrC
+	zwHrzCKh1SCsfnd8DuHUcREaxcqT+cMSa0WiG6hHULzzYYhOXp0vFO+RfK68CnuO
+	5ZCK3lKuVSrN3nTCL8eCykNsv0Hefd+Ql9DY/BR+9FZHnVuqKGM6KGWtjyBAT3fk
+	ARNe4rUB8+tljeO32IAM1BF/iE+VvVAI4SMIQ5De1l5VnyL3ZJaQwoj2NHRBTOPJ
+	kKSz42LHHWFwxsUg/q089OEoYv9kUPGtT9AdoYd0WqtyEVg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46vhv1052k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 25 May 2025 23:42:02 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 25 May 2025 23:42:01 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 25 May 2025 23:42:01 -0700
+Received: from cavium-System-i9-11 (unknown [10.28.35.33])
+	by maili.marvell.com (Postfix) with ESMTP id 3CDEF3F705C;
+	Sun, 25 May 2025 23:41:57 -0700 (PDT)
+From: Aakash Kumar S <saakashkumar@marvell.com>
+To: <netdev@vger.kernel.org>
+CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
+        <akamluddin@marvell.com>
+Subject: [PATCH] =?UTF-8?q?xfrm:=20Duplicate=20SPI=20Handling=20=E2=80=93?= =?UTF-8?q?=20IPsec-v3=20Compliance=20Concern?=
+Date: Mon, 26 May 2025 12:11:55 +0530
+Message-ID: <20250526064155.75189-1-saakashkumar@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] net/mlx5: HWS, make sure the uplink is the
- last destination
-To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>,
- Yevgeny Kliteynik <kliteyn@nvidia.com>, Gal Pressman <gal@nvidia.com>
-References: <1748171710-1375837-1-git-send-email-tariqt@nvidia.com>
- <1748171710-1375837-3-git-send-email-tariqt@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <1748171710-1375837-3-git-send-email-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=B8W50PtM c=1 sm=1 tr=0 ts=68340d3a cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=5KLPUuaC_9wA:10 a=M5GUcnROAAAA:8 a=A28M-VhkntV8-xi-p34A:9 a=QEXdDO2ut3YA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 47FFAyyWIAxdfMibXRaN48y6Pwj-Fs8S
+X-Proofpoint-ORIG-GUID: 47FFAyyWIAxdfMibXRaN48y6Pwj-Fs8S
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDA1NSBTYWx0ZWRfX3VFgv2V4eP1+ pb1wgtk3mOBSl3rl6Vo9SgrI2Fq5+ned6Mts7FakupL4XCfh4cozif0Ccp4rKGbUq4etoXNUKGt NOjg3kJcFTXHS+rRxfaDxxiPnlG4qSgBC1oJxibUZIp/8WrL/NptQu8uJkNA0iSOMnLaP7vpKrO
+ 8Ig110aIM+pdlOH0EnnM7oouvL7aAkO+ZBbIjRJUHxWBSjOt7IjoHG6GKMk14amrSm5zIgL4/39 KmH/fYOCR0FsrGFz5P3EOQz5uEOVDGdjFYERX3rauDN+W7NfWxVig/56jw9ozemduhNVo+03HuD S2E32Ple1IU9kORSuJiQmrKWio2e+11579EQ+mSRe6R7XNksTRH89QfboReURjUcnuj3i9orb07
+ FROhusFli5SmuZ0jv6jo733yEf/rrORHraBGRhDsG2gkRVUXiXRPTwp9KUyRPmUIKPs5fii+
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-26_03,2025-05-22_01,2025-03-28_01
 
-On 5/25/25 1:15 PM, Tariq Toukan wrote:
-> @@ -1429,6 +1426,14 @@ mlx5hws_action_create_dest_array(struct mlx5hws_context *ctx,
->  		}
->  	}
->  
-> +	if (last_dest_idx != -1) {
-> +		struct mlx5hws_cmd_set_fte_dest tmp;
-> +
-> +		tmp = dest_list[last_dest_idx];
-> +		dest_list[last_dest_idx] = dest_list[num_dest - 1];
-> +		dest_list[num_dest - 1] = tmp;
+The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
+Netlink message, which triggers the kernel function xfrm_alloc_spi().
+This function is expected to ensure uniqueness of the Security Parameter
+Index (SPI) for inbound Security Associations (SAs). However, it can
+return success even when the requested SPI is already in use, leading
+to duplicate SPIs assigned to multiple inbound SAs, differentiated
+only by their destination addresses.
 
-Here you can use swap()
+This behavior causes inconsistencies during SPI lookups for inbound packets.
+Since the lookup may return an arbitrary SA among those with the same SPI,
+packet processing can fail, resulting in packet drops.
 
-/P
+According to RFC 6071, in IPsec-v3, a unicast SA is uniquely identified
+by the SPI alone. Therefore, relying on additional fields
+(such as destination addresses, proto) to disambiguate SPIs contradicts
+the RFC and undermines protocol correctness.
+
+Hence, the change is necessary to enforce strict SPI uniqueness for inbound SAs,
+ensuring deterministic lookup behavior and compliance with the IPsec specification.
+
+Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
+---
+ net/xfrm/xfrm_hash.h | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/net/xfrm/xfrm_hash.h b/net/xfrm/xfrm_hash.h
+index d12bb906c9c9..a71b6dbdf532 100644
+--- a/net/xfrm/xfrm_hash.h
++++ b/net/xfrm/xfrm_hash.h
+@@ -116,18 +116,11 @@ static inline unsigned int __xfrm_src_hash(const xfrm_address_t *daddr,
+ }
+ 
+ static inline unsigned int
+-__xfrm_spi_hash(const xfrm_address_t *daddr, __be32 spi, u8 proto,
+-		unsigned short family, unsigned int hmask)
++__xfrm_spi_hash(const xfrm_address_t * __maybe_unused daddr, __be32 spi,
++		u8 __maybe_unused proto, unsigned short __maybe_unused family,
++		unsigned int hmask)
+ {
+-	unsigned int h = (__force u32)spi ^ proto;
+-	switch (family) {
+-	case AF_INET:
+-		h ^= __xfrm4_addr_hash(daddr);
+-		break;
+-	case AF_INET6:
+-		h ^= __xfrm6_addr_hash(daddr);
+-		break;
+-	}
++	unsigned int h = (__force u32)spi;
+ 	return (h ^ (h >> 10) ^ (h >> 20)) & hmask;
+ }
+ 
+-- 
+2.48.1
 
 
