@@ -1,232 +1,234 @@
-Return-Path: <netdev+bounces-193390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811D2AC3BFD
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:50:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E82AC3C01
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 280A47A8CFA
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:49:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA651896727
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF47F1E9B0B;
-	Mon, 26 May 2025 08:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0E21E990E;
+	Mon, 26 May 2025 08:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="BC2p1f9f";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="e/VS0awA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2984E1E32D3
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259911D799D
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748249431; cv=none; b=h8hlIbRtw02t/Zn0nL5qe6BQKvS4zpyab8/IKeeMlqpHObsdyvyyCb7eQK8zqHEu17ZJFfk/Lmq/4fhB5fd3c9Ug1lYjHFW5jZdAz5CFWXypyYuoxQK6JGCbMxcYO1Dux1ZvH6d0o5wUcLhyu6mAP+87BoXVHZc1jLonh79Dlvk=
+	t=1748249451; cv=none; b=lTWMoi3ycvsZ7fmQFs8Id3Is/scalDYwKajp5i2afeN5nay9iE7R2IgmKyDCrlKwu/s9zs+K6Pmnn8KwiIqGmpe399tS6u1NpqwSOjotTR57U3DKlSFU5o5AAuA/gwoDErFni9BiDgdqp6dOAiaj0hp35hsuB9EwGz+pX4ttlIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748249431; c=relaxed/simple;
-	bh=ES/5VMJTP0/Z8pCLa0ZMn49fZz2+QHoH8ccAMIZSAvM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HwBWz/vWSM8/rsbGE9wodgRNY0BsyT45CtH4CYFRBb7ivjvIn3CVrlQfBK1YEWiBSE+P+RP6fFvIJ35X+FF5iLQGQUX8LLvKl7OQwBlfvJCY3OvyDx3sf1nEiLL5MXGPVcRwy+FdTvq/cucig6pHatbjdDsqfcEIJgHu5o/46VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85e318dc464so359107739f.1
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 01:50:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748249429; x=1748854229;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w9c7v6E+/GQRM3UlZ2T/jgFX7EYWeznAGMdtx6v4y64=;
-        b=gxS1sHRW1s+HuVQZlw8NTFefOHhQPOR06OKTOVsqK8OuFTJ5E6mw+CdEGLH3+bv8fo
-         yA7jH8T4RxY9nAWhPxbL8/IcAgp8HouVnO9YZUDHv/T5VHHoBzUT9mDYcnU328M2/yEc
-         ntjFqJ+TyN6UC6K+PThx5qhM3Ad0zd1na1Dg0+xO8NayUppODPk2N0Sf7Ku+YVNL2Meq
-         knsrIp4gbjo66oVmyn8UiBQxRvsMUoNz8MBu3TZzFIey4iUjcvvOkRogvOG12kkl0t6E
-         OHXL18dwjWC377Qa8BRk6lhdAMZBrZ8m7KRWU0dBe1BQY3fEAyfBvMsDQxyNNp8Nk0M9
-         rAEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrMujJoiDV43VUU0MGdbADLwXolnn5m0JcKfvSk+6/tbNfG4IjYihgNrwlZOy5N2y4+Hs6UW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF/mSYz6XEBVT4Rb3FlXZQMWkySLNLtVtZLobney/GF6i0LeG+
-	zuXQFDcqBqpsAmvQ//rfLbUNQNE1zIQoSdTgKDWkLED8/ooW1aeUSaJDo0EUMXyxzD4NVxhHRiE
-	HHen94ur0jG34hPi4sRPe+hJrfOnRhrh7EqVZIjmGoI2FR4OzPaPw2EGO//s=
-X-Google-Smtp-Source: AGHT+IGvIUT1xTNpT2S4TzLOsjICT6VfN3kGiDfl4z4bFL9GGjdt2D0AnhMoDSq8jPM5Zp0BG/b77PAQqHdAho7pF93TUN66OS1n
+	s=arc-20240116; t=1748249451; c=relaxed/simple;
+	bh=XVhR17W9nCEMs6dlPUsZlQ8fqzGAlp94LcoGZtcQhno=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=b6JYwU+ic0G2p6unghpGKxane8dl+pDtmKIdqFPQRf8BUHqj0gKDuLKP3Lsup0vqo5hbN6aA8ig1pR82XcT/4O9ZQOzypmIW9ON3cI2/UJ5vAsBg/zkYxTWfLSd/PcRtyFUOTv04r8MOpIKXqml1RdKuzmSiFy9If7AUjfmNUYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=BC2p1f9f; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=e/VS0awA; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1B95913804A0;
+	Mon, 26 May 2025 04:50:48 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Mon, 26 May 2025 04:50:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1748249448;
+	 x=1748335848; bh=cMuVAw+qhzwZiUPSpjSsaZyQ5uNP7lZyk8DPF+M3miA=; b=
+	BC2p1f9fXY3KOCZWacG50GusPyg0eNLHW8qq2oDtyyBaC3VPz5ITIE+VlG84L9y1
+	kDHzCE/r1DjUwHJ632G97xskNFBx1Ar7d4074yLXEUuSOkMSrrCl1QJ7DrWFj0mw
+	/WvwYD8dueU87iAYTK0QkbdFeav8HBxnoqYNbzsost5KF/PgBUctPsr9X+8BC+tp
+	xPIkTFplNHRVWJmgaZLHrzVPnYTyZfPx1jqqtuvgnZWNfeV/RrfxufEROQ4A4iIR
+	5HHKBRBqUFrn5sCG6AvWkNYCtMOBPr2OwxoUVwzdqOgqK6l2qCP84tNNQ6bqTxNU
+	0mJZz8w9RvFs9a8qzxME0g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748249448; x=
+	1748335848; bh=cMuVAw+qhzwZiUPSpjSsaZyQ5uNP7lZyk8DPF+M3miA=; b=e
+	/VS0awANLVoc4qmVIJ4TcucdgjCt0GF6DVnzULxTHReevQFsjh4Ow+077r3iHpE4
+	W/tBStoEyGUuc4x+ppNPCRkvJ0ZR4MgsIk2Yf9N5tdztQfoWDwrzUjiLcQTc2BwT
+	Xrsgo+I5tehqYQhK0qd3lqyZtUw+pEKFDritPsFjh/FOdrHOyn4CUUqE/Sco/gZZ
+	AEf30gHkdZQDsZFwMxODCfnH71DRitchykT2R9y7knPBFp0MTvVgZjUO3akyVcWs
+	qVvoL+2Wnmf8vxhMJJhDD6d/woxQRn7aoBQap2UPNPOg/wBM5LYZ2YATclrJKytM
+	EiI8QwRlRSwgBUMIRJziQ==
+X-ME-Sender: <xms:Zys0aJoja-VPe1bvpE-58J8fTFGnQXCaBWTtu8lxG-X1jnqV_ngxkA>
+    <xme:Zys0aLqgiJb0ZrAyFo_nke13bWi1uDxHf46STuZPVU05qgYW-X1JcsK9Mev1xExDS
+    z83q_-vDu1wM6oExh4>
+X-ME-Received: <xmr:Zys0aGPja0dH_4yzPmaMijazc8Mlb9cVsWyOhek3ZRGnomnt9k2pkYkDYwCqxNpsCX1pJbBG2DEl3wKcV8sRdB9rZqi5pXtNi-kCbBgP7VY4VQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddujedtleculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
+    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
+    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnhepuedu
+    vdeuudegieeffeeiudffjeevjeethedutdefhedvtdfhtedtkeekueeggeegnecuffhomh
+    grihhnpegrmhgriihonhdrvghsnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghm
+    pehmrghilhhfrhhomheprhhitggrrhgusegsvghjrghrrghnohdrihhopdhnsggprhgtph
+    htthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmihhkrgdrfigvshht
+    vghrsggvrhhgsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohepnhgvthguvg
+    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhitghhrggvlhdrjhgr
+    mhgvthesihhnthgvlhdrtghomhdprhgtphhtthhopeihvghhvgiikhgvlhhshhgssehgmh
+    grihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgt
+    hhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:Zys0aE4vYhVT6R-5oruUSKg9-31TdT81_VRgFilLjTHtOtPjqLYWoA>
+    <xmx:Zys0aI78ec0sIBENcaIaXlplVJA_ZJzk9gRIjqezbg6VrjSvGZg9Ig>
+    <xmx:Zys0aMi4po1eWx58HDVYrhf75BE-fy1o07gVT9RTZY6boCC2EbWbKg>
+    <xmx:Zys0aK7u_VSRU9Z0QiY2FgCEYvwg299WNNmVnibSErMYSxrgSDmJaQ>
+    <xmx:aCs0aMb9QGPHXnsfFlrMtAnOu7fY0SAk25vtsKAJ2hrYksI_3FJTpiHs>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 26 May 2025 04:50:46 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3817:b0:85d:f316:fabc with SMTP id
- ca18e2360f4ac-86cbb8a2d4amr767738939f.8.1748249429183; Mon, 26 May 2025
- 01:50:29 -0700 (PDT)
-Date: Mon, 26 May 2025 01:50:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68342b55.a70a0220.253bc2.0091.GAE@google.com>
-Subject: [syzbot] [tipc?] WARNING: refcount bug in tipc_crypto_xmit
-From: syzbot <syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jmaloy@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net, wangliang74@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+From: Ricard Bejarano <ricard@bejarano.io>
+In-Reply-To: <20250526045004.GL88033@black.fi.intel.com>
+Date: Mon, 26 May 2025 10:50:43 +0200
+Cc: netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
+References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
+ <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+ <20250526045004.GL88033@black.fi.intel.com>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-Hello,
+Hey, thanks again for looking into this.
 
-syzbot found the following issue on:
+Yes, these are 8th generation Intel NUCs with Thunderbolt 3, not 4. And =
+yes, the
+cable I have used so far is Thunderbolt "compatible" not "certified", =
+and it
+doesn't have the lightning logo[1].
 
-HEAD commit:    b1427432d3b6 Merge tag 'iommu-fixes-v6.15-rc7' of git://gi..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17ba35f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
-dashboard link: https://syzkaller.appspot.com/bug?extid=f0c4a4aba757549ae26c
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161ee170580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=164328e8580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/48a582dac9f0/disk-b1427432.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/94ad5463a7f5/vmlinux-b1427432.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4d0af31b0b08/bzImage-b1427432.xz
-
-The issue was bisected to:
-
-commit e279024617134c94fd3e37470156534d5f2b3472
-Author: Wang Liang <wangliang74@huawei.com>
-Date:   Tue May 20 10:14:04 2025 +0000
-
-    net/tipc: fix slab-use-after-free Read in tipc_aead_encrypt_done
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10018df4580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12018df4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14018df4580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com
-Fixes: e27902461713 ("net/tipc: fix slab-use-after-free Read in tipc_aead_encrypt_done")
-
-------------[ cut here ]------------
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 1 PID: 36 at lib/refcount.c:25 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
-Modules linked in:
-CPU: 1 UID: 0 PID: 36 Comm: kworker/u8:2 Not tainted 6.15.0-rc7-syzkaller-00144-gb1427432d3b6 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Workqueue: netns cleanup_net
-RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
-Code: 00 00 e8 79 f6 06 fd 5b 41 5e e9 81 6c a0 06 cc e8 6b f6 06 fd c6 05 06 3c b0 0a 01 90 48 c7 c7 80 aa c1 8b e8 e7 52 cb fc 90 <0f> 0b 90 90 eb d7 e8 4b f6 06 fd c6 05 e7 3b b0 0a 01 90 48 c7 c7
-RSP: 0018:ffffc90000a08668 EFLAGS: 00010246
-RAX: bb5b0788a28fc300 RBX: 0000000000000002 RCX: ffff888142681e00
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
-RBP: ffffc90000a087e8 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bba984 R12: ffff88807df80000
-R13: dffffc0000000000 R14: ffff88807df8016c R15: ffff888033397800
-FS:  0000000000000000(0000) GS:ffff8881261c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555569a1e878 CR3: 000000007b8fc000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- __refcount_add include/linux/refcount.h:-1 [inline]
- __refcount_inc include/linux/refcount.h:366 [inline]
- refcount_inc include/linux/refcount.h:383 [inline]
- get_net include/net/net_namespace.h:268 [inline]
- tipc_aead_encrypt net/tipc/crypto.c:821 [inline]
- tipc_crypto_xmit+0x1820/0x22c0 net/tipc/crypto.c:1761
- tipc_crypto_clone_msg+0x90/0x170 net/tipc/crypto.c:1656
- tipc_crypto_xmit+0x1998/0x22c0 net/tipc/crypto.c:1717
- tipc_bearer_xmit_skb+0x245/0x400 net/tipc/bearer.c:572
- tipc_disc_timeout+0x580/0x6d0 net/tipc/discover.c:338
- call_timer_fn+0x17b/0x5f0 kernel/time/timer.c:1789
- expire_timers kernel/time/timer.c:1840 [inline]
- __run_timers kernel/time/timer.c:2414 [inline]
- __run_timer_base+0x61a/0x860 kernel/time/timer.c:2426
- run_timer_base kernel/time/timer.c:2435 [inline]
- run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2445
- handle_softirqs+0x286/0x870 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- invoke_softirq kernel/softirq.c:453 [inline]
- __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_acquire+0x175/0x360 kernel/locking/lockdep.c:5870
-Code: 00 00 00 00 9c 8f 44 24 30 f7 44 24 30 00 02 00 00 0f 85 cd 00 00 00 f7 44 24 08 00 02 00 00 74 01 fb 65 48 8b 05 8b 9f d7 10 <48> 3b 44 24 58 0f 85 f2 00 00 00 48 83 c4 60 5b 41 5c 41 5d 41 5e
-RSP: 0018:ffffc90000ad7378 EFLAGS: 00000206
-RAX: bb5b0788a28fc300 RBX: 0000000000000000 RCX: bb5b0788a28fc300
-RDX: 0000000000000000 RSI: ffffffff8d939072 RDI: ffffffff8bc1f600
-RBP: ffffffff8171ca05 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffffff8171ca05 R12: 0000000000000002
-R13: ffffffff8df3dee0 R14: 0000000000000000 R15: 0000000000000246
- rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- rcu_read_lock include/linux/rcupdate.h:841 [inline]
- class_rcu_constructor include/linux/rcupdate.h:1155 [inline]
- unwind_next_frame+0xc2/0x2390 arch/x86/kernel/unwind_orc.c:479
- arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
- kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:548
- __call_rcu_common kernel/rcu/tree.c:3082 [inline]
- call_rcu+0x142/0x990 kernel/rcu/tree.c:3202
- inet_release+0x187/0x210 net/ipv4/af_inet.c:435
- __sock_release net/socket.c:647 [inline]
- sock_release+0x85/0x150 net/socket.c:675
- wg_netns_pre_exit+0xd6/0x1d0 drivers/net/wireguard/device.c:423
- ops_pre_exit_list net/core/net_namespace.c:162 [inline]
- cleanup_net+0x594/0xbd0 net/core/net_namespace.c:634
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	00 00                	add    %al,(%rax)
-   2:	00 00                	add    %al,(%rax)
-   4:	9c                   	pushf
-   5:	8f 44 24 30          	pop    0x30(%rsp)
-   9:	f7 44 24 30 00 02 00 	testl  $0x200,0x30(%rsp)
-  10:	00
-  11:	0f 85 cd 00 00 00    	jne    0xe4
-  17:	f7 44 24 08 00 02 00 	testl  $0x200,0x8(%rsp)
-  1e:	00
-  1f:	74 01                	je     0x22
-  21:	fb                   	sti
-  22:	65 48 8b 05 8b 9f d7 	mov    %gs:0x10d79f8b(%rip),%rax        # 0x10d79fb5
-  29:	10
-* 2a:	48 3b 44 24 58       	cmp    0x58(%rsp),%rax <-- trapping instruction
-  2f:	0f 85 f2 00 00 00    	jne    0x127
-  35:	48 83 c4 60          	add    $0x60,%rsp
-  39:	5b                   	pop    %rbx
-  3a:	41 5c                	pop    %r12
-  3c:	41 5d                	pop    %r13
-  3e:	41 5e                	pop    %r14
+I am not convinced, though.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Part I: Thunderbolt 3
+---------------------
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+I first ran into this issue a few months ago with a set of 3 12/13th =
+generation
+Intel NUCs, each of which has 2 Thunderbolt 4 ports, directly connected =
+to each
+other so as to form a ring network. When hopping through one of them, =
+bandwidth
+dropped from ~16Gbps to ~5Mbps. Both in routing and bridging. These 3 =
+NUCs are
+in "production" so I didn't want to use them as my test bench. They are =
+rocking
+"Thunderbolt 4 certified" cables with the lightning logo[2].
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+I could justify running any one of the following disruptive tests if you =
+think
+they would be helpful:
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Note: A is connected to B, B to C, and C to A (to form a ring).
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+1) Configure A and C to route to each other via B if the A<->C link is =
+down,
+   then disconnect A<->C and run iperfs in all directions, like in =
+[4.6].
+   If they run at ~16Gbps when hopping via B, then TB3 was (at least =
+part of)
+   the problem; otherwise it must be something wrong with the driver.
+   I am very confident speed will drop when hopping via B, because this =
+is how I
+   first came across this issue. I wanted nodes of the ring to use the =
+other way
+   around if the direct path wasn't up, but that wasn't possible due to =
+the huge
+   bandwidth drop.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+2) Same as #1 but configure B to bridge both of its Thunderbolt =
+interfaces.
 
-If you want to undo deduplication, reply with:
-#syz undup
+3) While pulling the A<->C cable for running one of the above, test that =
+cable
+   in the 8th gen test bench. This cable is known to run at ~16Gbps when
+   connecting A and C via their Thunderbolt 4 ports.
+   While very unlikely, if this somehow solves the red->purple =
+bandwidth, then
+   we know the current cable was to blame.
+
+These 12/13th gen NUCs are running non-upstream kernels, however, and =
+while I
+can justify playing around a bit with their connections, I can't justify =
+pulling
+them out of production to install upstream kernels and make them our =
+test bench.
+
+Do you think anyone of these tests would be helpful?
+
+
+Part II: the cable
+------------------
+
+You also point to the cable as the likely culprit.
+
+1) But then, why does iperf between red<->blue[4.6.1] show ~9Gbps both =
+ways, but
+   red->blue->purple[4.6.3a] drops to ~5Mbps? If the cable were to =
+blame,
+   wouldn't red->blue[4.6.1a] also drop to about the same?
+
+2) Also, if the problem were the cable's bandwidth in the red->blue =
+direction,
+   flipping the cable around should show a similar bandwidth drop in the =
+(now)
+   blue->red direction, right?
+   I have tested this and it doesn't hold true, iperfs in all directions =
+after
+   flipping the cable around gave about the same results as in [4.6], =
+further
+   pointing at something else other than the cable itself.
+
+I've attached the output of 'tblist -Av'. It shows negotiated speed at =
+10Gb/s in
+both Rx/Tx, which lines up with the red<->blue iperf bandwidth tests of =
+[4.6.1].
+
+
+How shall we proceed?
+
+I reckon all my statements about the 12/13th gen NUCs are anecdata and =
+not as
+scientific as my 8th gen NUC results, but I'm happy to perform any one =
+of the
+three tests above.
+
+
+Thanks again,
+Ricard Bejarano
+
+--
+[1] https://www.amazon.es/-/en/dp/B0C93G2M83
+[2] https://www.amazon.es/-/en/dp/B095KSL2B9
+
 
