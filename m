@@ -1,166 +1,140 @@
-Return-Path: <netdev+bounces-193306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 902BDAC3808
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:36:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A2EAC380F
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F38D03A478D
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:36:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C03E43B4AFD
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18AC1684B0;
-	Mon, 26 May 2025 02:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C29C17332C;
+	Mon, 26 May 2025 02:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="UvByZA9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB2C35979;
-	Mon, 26 May 2025 02:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030201684B0;
+	Mon, 26 May 2025 02:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748226997; cv=none; b=qxDSpv4O0brolEVwejmCdzjbzHrtQEJ8Lc/Na1Jy3O2sFJ2YURZDOloLaY8rgH8cvQCy3Lfx4C6Uz7GAt/cmNbbZlAHGa0apbf37iLlNsE3W6XWw5eSZKnuwJm6oeP0NAonT0J/tJSieznKoB2nBRs5h2n4jbPU7g+yINIG7m+A=
+	t=1748227028; cv=none; b=ieBU9iqW67dgclvwjupJMMUy+SkAf5kxxipPha8bF5ojlorYkoi6doQLWpRRmGVwE5x9NL3Ru92Y/9AQAwoNHr+Oq2AwevXhY6Dv+YSG/Eh8ySbPJ6opIoFPfrx4P3Rlwz8VFNy520/ARQCPsrKP5JR2f7r7PubhBn6kBXDxjK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748226997; c=relaxed/simple;
-	bh=rB8e59f9DCmVM7INNnSN9zJLulQqCsUj1n2FnpHMHzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C+fL+8dr6zzcsXUGo/8Z0CxP9o0WXhQw3FT7Ghi30Ffh+OeEX9BkwY5gPJKYkk49cMKpyAy8qcU+THR0PHpPFjrV9Gpp3eP88yAfwN6P1c2Of3TnS0GnVfgYzqxSkqGDMEw6Gwuxf4tNx+u1kL3444bnFKxYackrAoDynlGol+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-fe-6833d3ade381
-Date: Mon, 26 May 2025 11:36:24 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
- page->pp_magic in page_pool_page_is_pp()
-Message-ID: <20250526023624.GB27145@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-13-byungchul@sk.com>
- <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
- <20250526022307.GA27145@system.software.com>
+	s=arc-20240116; t=1748227028; c=relaxed/simple;
+	bh=fULEnYkOybJaMF+q9MHZhS8Kp6AqrJAzRf0iQC9jV/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=YSXMg0EnqITmQK+S/DOBlAtb+U9FTKH8O8lpvmjNGxXL3kbZ2LXgoPR25RL8h1IMVbPcjClq20ljIgjWw0m0HTBipXpVcAVKkWzFskfKB4+zXY6i0iL3pOCFRkQT+B1j0/F0sdUAU0r8OagzC8iq50Q+VfTSWkVjzJBeFxgJL4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=UvByZA9d; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1748227022;
+	bh=MSgBsbhjopG/rJnEv9Yg3cH8BSoSdlSokua/t8EAc6I=;
+	h=Date:From:To:Cc:Subject:From;
+	b=UvByZA9dSua4l6ctX/Tbq76CXX6YyipO0ohiYAyq4eEyknx6FPA08tQgdJt56lSyh
+	 Yw83vW+L3RnCAHvL3YsYdVY1jbr+tfcpyRp2C6b9oVZGFmUIl2VncwSUdhpNGEZf5/
+	 kgfeumFM0M7SkLMydsYyyOcVF1r0y/6PC8RcwrTgFN4I47Tr38jg1d6QqYvxKBwmUi
+	 nQqET1fjeJ1ua/OEnH2MmpKCYE0NSgAUF4GQuqyeeeGQnTqPo20j9eRnnMyr3DXZeM
+	 GYqKUldbc+faADJjc8PPGsmNCUHuU6ICxPMCaDK+VoT+5EiKnBpzXwZJj1hUefhDCr
+	 hQtR4DlC6EO9Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b5KfQ3y3wz4wy6;
+	Mon, 26 May 2025 12:37:01 +1000 (AEST)
+Date: Mon, 26 May 2025 12:37:01 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
+ Christian Brauner <brauner@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the vfs-brauner
+ tree
+Message-ID: <20250526123701.01aec1c4@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250526022307.GA27145@system.software.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa2yLURjHnb6np+9qjeM1nLpGRYS4bC7JI5HxQTgScQkhcV2tb7SsJd3M
-	Ji6dzW3ZhhGXrqyY3YxG1VYsC7ObEKZCOkaXYhLX2GaZbRm6RezbL8+T5//7f3hEQbqkHCGa
-	LAmy1aKP0xE1Vn8Nvzj1+vOZxsjU1wQcrhICVzuSoKDJqwRHcSmCtl+vVdBaVUvg8sV2ARxP
-	0zD8dHUK8KEmqIJAfjOG8sNlAgSP1RHITOsS4IC3UAH1pVlKONV5RYAyW5MKnt9xEHhb8lsJ
-	zZWZGB7aizAEsuZDjXMYtD/6gqDKVaaA9ozzBE76nATepQUQ+B4EMeSkZCFwVfiV0NXhIPPH
-	cU9Rg4Lftr9Rcad7J79ZOJmn+30CdxcfJdzdkq3ijS/LCa8724X5bW+rgmemfiP8x4dXmH+v
-	eEG4y/MC88fOKhVvdY9ZTteq5xrkOFOibJ0eHaM2lraV4B0NEUmdp08SG0qh6UgUGZ3Fau/G
-	pKOwXizJ7lGFGNMJzOsLoBATOpH5/b+EEEfQSSyv4oQyxAINKNkTx9YQD6FbWcarjyTEGgqs
-	uqDqb45alKgfsY68VNy3GMwennuP+44nsu4LPiHUQaAjWUGP2Dcey1Jv5fS6wugcduRMT2+H
-	oXQ8u1daqwhlMuoVWW5mHukrrWX3C/34OBps76ew91PY/yvs/RROhIuRZLIkmvWmuFnTjMkW
-	U9K02O1mN/r7Ofl7u9d5UUv9ykpERaQL18ToZholpT4xPtlciZgo6CI0oxyRRklj0Cfvlq3b
-	N1l3xsnxlWikiHXDNTPadxkkukWfIG+T5R2y9d9WIYaNsCHpZVBb8/kQt8VGf8p7pl4wPPrr
-	zyujqwcm1O/3KKZEeRbrb7UVZQfN42szGj0F5rSpKcuaNuxeuyR3k1YbvmRj47Vvawz5C6Wm
-	jUMsqw6u2BWJpYWfuw3BMTmxsxcsutHSsL56z0Bt84AjS+vKk2wevP736qjEjBP76OllmwfN
-	24sUOhxv1EdNFqzx+j/0dYZGNQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRiH+e9cdhwujmvmQYtiIZKkJZa8oZgJ0aHA6kNlftGlh7acU7Yp
-	WmQzLS+oXZSsOWuipZkyMJ3TRMK7GCqTclk5m7c+WGpe8IbllMhvD++P3/O+H14KE90n3Cm5
-	UsOplFKFhBTggrDAdJ+aQX/ZUfsLH9Abq0l4s5wMFaNmAvRVJgQLK1/4MN/eRUJZ6RIG+v4M
-	HBaNqxhMdNr5YHs1iUNzZgMG9gfdJORlrGFw11zJg7aSHgIGTPkEFK6+xKBBO8qHwSY9CSPV
-	fwiYbM3DoUf3Ggdbfgh0GvbAUu80gnZjAw+WcktIKLAYSBjLsCGwtNlxKE7LR2BssRKwtqwn
-	QyRs3evPPLZR943PGmoT2beV3myO1YKxtVXZJFv7+zGf/fqpmWS7n67hbKN5nsfmpf8i2bmJ
-	YZydaflIsmU/Znmsse4jzn4wtPMvuEQIgmI4hTyJUx0JjhLITAvVeMJncfLqkwJSi9LoHORE
-	MfQxpvrxBt/BOO3JmC025GCS9mKs1hXMwWL6EFPe8ohwMEbbCKZPf8PBu+kbTO7wFOlgIQ1M
-	R0X7pkdAiWgrYpbL0/HtwIXpeTaOb5e9mPXnlk0ptckeTMUGtT3ez6TXF2/tcqJPMFlFG1s3
-	uNIHmfemLt5DtEu3w6TbYdL9N+l2mAwIr0JiuTIpTipXHPdVx8pSlPJk3+j4uFq0+R2vbq8/
-	MqOFwTOtiKaQxFkYJfGXiQhpkjolrhUxFCYRC/fqj8pEwhhpyk1OFR+pSlRw6lbkQeESN+HZ
-	K1yUiL4u1XCxHJfAqf6lPMrJXYtG6sOuHQgKdx87Nz57KiA69WJ2d7Lfikt5iaLGdWjx8FXn
-	Kf6doTpP7ck56rRmGolHPX2EkTNDwUpS+L3DnFDUH0+7FWtiTE0BWRvh/iE/u0MH7iWdD/UM
-	jMg9GOQyD077Mit7YwLlhZThnSZ+1n7ZOLvUN3kr69LcQmxqqLxUgqtlUj9vTKWW/gUiqudE
-	GQMAAA==
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; boundary="Sig_/Edb.vmf1a8O2sEIpdK4PS+I";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
-> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
-> > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> > >
-> > > To simplify struct page, the effort to seperate its own descriptor from
-> > > struct page is required and the work for page pool is on going.
-> > >
-> > > To achieve that, all the code should avoid accessing page pool members
-> > > of struct page directly, but use safe APIs for the purpose.
-> > >
-> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
-> > > page_pool_page_is_pp().
-> > >
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > ---
-> > >  include/linux/mm.h   | 5 +----
-> > >  net/core/page_pool.c | 5 +++++
-> > >  2 files changed, 6 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > > index 8dc012e84033..3f7c80fb73ce 100644
-> > > --- a/include/linux/mm.h
-> > > +++ b/include/linux/mm.h
-> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> > >
-> > >  #ifdef CONFIG_PAGE_POOL
-> > > -static inline bool page_pool_page_is_pp(struct page *page)
-> > > -{
-> > > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > > -}
-> > 
-> > I vote for keeping this function as-is (do not convert it to netmem),
-> > and instead modify it to access page->netmem_desc->pp_magic.
-> 
-> Once the page pool fields are removed from struct page, struct page will
-> have neither struct netmem_desc nor the fields..
-> 
-> So it's unevitable to cast it to netmem_desc in order to refer to
-> pp_magic.  Again, pp_magic is no longer associated to struct page.
+--Sig_/Edb.vmf1a8O2sEIpdK4PS+I
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Options that come across my mind are:
+Hi all,
 
-   1. use lru field of struct page instead, with appropriate comment but
-      looks so ugly.
-   2. instead of a full word for the magic, use a bit of flags or use
-      the private field for that purpose.
-   3. do not check magic number for page pool.
-   4. more?
+Today's linux-next merge of the net-next tree got a conflict in:
 
-	Byungchul
-> 
-> Thoughts?
-> 
-> 	Byungchul
-> 
-> > The reason is that page_pool_is_pp() is today only called from code
-> > paths we have a page and not a netmem. Casting the page to a netmem
-> > which will cast it back to a page pretty much is a waste of cpu
-> > cycles. The page_pool is a place where we count cycles and we have
-> > benchmarks to verify performance (I pointed you to
-> > page_pool_bench_simple on the RFC).
-> > 
-> > So lets avoid the cpu cycles if possible.
-> > 
-> > -- 
-> > Thanks,
-> > Mina
+  net/unix/af_unix.c
+
+between commit:
+
+  fd0a109a0f6b ("net, pidfs: prepare for handing out pidfds for reaped sk->=
+sk_peer_pid")
+
+from the vfs-brauner tree and commit:
+
+  3f84d577b79d ("af_unix: Inherit sk_flags at connect().")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc net/unix/af_unix.c
+index 59a64b2ced6e,bd507f74e35e..000000000000
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@@ -1711,10 -1627,12 +1705,12 @@@ restart
+  	/* The way is open! Fastly set all the necessary fields... */
+ =20
+  	sock_hold(sk);
+- 	unix_peer(newsk)	=3D sk;
+- 	newsk->sk_state		=3D TCP_ESTABLISHED;
+- 	newsk->sk_type		=3D sk->sk_type;
++ 	unix_peer(newsk) =3D sk;
++ 	newsk->sk_state =3D TCP_ESTABLISHED;
++ 	newsk->sk_type =3D sk->sk_type;
++ 	newsk->sk_scm_recv_flags =3D other->sk_scm_recv_flags;
+ -	init_peercred(newsk);
+ +	init_peercred(newsk, &peercred);
++=20
+  	newu =3D unix_sk(newsk);
+  	newu->listener =3D other;
+  	RCU_INIT_POINTER(newsk->sk_wq, &newu->peer_wq);
+
+--Sig_/Edb.vmf1a8O2sEIpdK4PS+I
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgz080ACgkQAVBC80lX
+0GzCRwf/URgqf1W8RCrZ2RHotHnryHTDfpTQPQLpjLxWnDW68sDAtH26mJbsRx6K
+V5RjJiKA+0eDFeGt4Bfct7BacN1mx+G4UHFUuhijaGc5CkS6cIRjtVQiQUAphPcP
+ClDo5d3gDQeRY6F78LjWC4tniLSj+yo+Alwth0XWQpnxGBAQqf0ZLXk6iW9IOrqw
+/DGh67Ecj4/u8xMZ54+GMbOVIBxp9USlccymfysaU7SdXDQlFELzRKc8r64kGev3
+Vxgy7e3zTi4Mm7kGu+XafIwiwyC9eBBGvc9evV+gK22JA+727baRN2LZtvG2dviF
+nB/K7tq4nxn8X/pz7aZi0uBIMC17jA==
+=Ykql
+-----END PGP SIGNATURE-----
+
+--Sig_/Edb.vmf1a8O2sEIpdK4PS+I--
 
