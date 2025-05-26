@@ -1,158 +1,91 @@
-Return-Path: <netdev+bounces-193495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0264CAC43D8
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:38:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B2F4AC43DF
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 20:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76DE83BC9C9
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:37:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7FF13A3759
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 18:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122E91DD9AD;
-	Mon, 26 May 2025 18:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8k3OiDN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D3A212B2B;
+	Mon, 26 May 2025 18:41:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181F919E971;
-	Mon, 26 May 2025 18:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BC819D087
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 18:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748284588; cv=none; b=IVkhtid/gar+Bo77QVFStabla/hYnnX+38j9v1Eov9vZDAtFvdS7E6O6kAvekvQLoBrvd652CejLcZWpo8pBRh99pNP2K+RGP5/qC3MPSHFNHdnpQWvTYtxoX/KdpLvXtOy0dsaiIe5B+xPJHBmkfj0q2sg9vxDp6svy/EKEb3Y=
+	t=1748284864; cv=none; b=ne5w6nDL4r6BtiZKhU2TTvGcDh3jjfPpsO3CTW3jJeL+TpGHlDhcnSrOMQKyogsuE/H+t0U2+FmgG5QkA1y3H6TF5kHE242BJGwl+GDmzPNIJc4V1e8IgBD4xJzwLKgiotJ9yAapvnhn0Qf92ICs/Ds0ML9N1KSDYrdtkaP8WVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748284588; c=relaxed/simple;
-	bh=q10F3cETSwxHPo+W25Xi3CXG0HKkYq2iJA0XWQp5co4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E8cDh2na+/Lh684e3K5BMKngDxzzZk5wPeVMLZ9OTA/yjZGIS8ICcrNnSwfx5kiREjUFvGk+OpegYTVl7voXptmJoLN4tK71zYy8AQdB3YrJj2D7u5yzFOXpwRvigqMHcPfSrCb5auIoPXW/htlnEnkhJZS26iu5dG8VIwfFYTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F8k3OiDN; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-acae7e7587dso322553366b.2;
-        Mon, 26 May 2025 11:36:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748284585; x=1748889385; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9muOFUpKTfactT/mG7l0xE7US6PC03AM4GydaczuLhQ=;
-        b=F8k3OiDNoA7CCzf9MvOqOuh9ewaEIjvTjyWR5oVk1ZX/n8zeN4OxDYxFj7YF0w7Vaz
-         yaRnHTvEksEdNsfzWj7wtmo0V5xz+yT8FWcWzMNl31hFFtprNQoMc6CKNBaML8qDYU1X
-         l2gwBLtXaQhLPd3CzkUC7tlS2Rb6ivb/eiFD+lUSEJ4zjRfRpXMuc0Cz5nyU1yCpMhSD
-         HxTvPmIBErdSlMeU2NsR/lPC0LAeASdf6NGVYYyYWuJ66uPQmqNTg1TTzGKx/scQosFP
-         x2paDBhDK+STtj58Zr5N/wH6a2eC9BJWMwFxk+4FqetzooBlJQtMI6qW/n0cq5U2P5Pr
-         4/Og==
+	s=arc-20240116; t=1748284864; c=relaxed/simple;
+	bh=4MBI4QO0e293H7noLQoz6P5dBJwn2LMrwVmWKAE5s04=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=oxpI0BSJYWYpQheYAUPGJVAXPV7A5a0rSGMrU7y8SZuK7WwOZ+wkm1y0KFYYnsB7Smz0QCYMZqvu9znOBifTl5XdT3rU1oQYzM4/mNtkfRTt+9yc7OtVSUGXL6ii3JGwX5VuCiu3kXP4tKgo/lXLfVwZTl3eZmUJKEJmA6VeN3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85b3b781313so497578139f.1
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 11:41:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748284585; x=1748889385;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9muOFUpKTfactT/mG7l0xE7US6PC03AM4GydaczuLhQ=;
-        b=HlSJCJXrCKFbHWqhfyEym+pXud3kJ7/MuVt6YC2ifjjfAGz0wnsZQ8UEA4caJdnPnN
-         sTssmc6D4ZXhyJEEq+Bah33hyDQHI4JuuX3M2tyQe7rh2d8+/4UyNeIH66Bh+gRaInun
-         V18ff6z8w+bTdR8tAbEV/77KIS/Dx5xPkKB53em2yytT5ZEvihbmDvJR37u5DLCbNrvc
-         8L3tfzSE7Qqa8tRYRBOLp5dz+FkuHVLVv3gT8soI8RnLdA7QUrBYjKHctDnaX00I6Or6
-         f8guwujwMVXfbH0bV7QUZPWigTXbHdgJirDtItY/Q8yCRbCrhA34s/m/FbXMTVUNTIJT
-         A82Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUPFoavBWeS3FgyU5EisGWOq79SW8uW+Up1QEBnUHgWZOE/gG53oBKSh1GfDL6FBg9geE/AC4Gfmv4m4sI=@vger.kernel.org, AJvYcCVKfBZkousOxdv41PwOBn4aAR8/s0/BUJdcUSU+8GCyavEnset0oipncTGTm+4NlYNIhny2Qgez@vger.kernel.org, AJvYcCVzdtJYC+Td0qyIvY7SFzXi1WGpQHoBQDpjhAKIIxGE3ZY4rjuXFflqBrShwyp1ZXPMxnF3Jwq6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYBVY2pUdPJ7Li7fwk9KQr2aHmXOSVEFviGpT7H0gsLwQQmyMx
-	70EZiKH13B8Z3h4vrBcbkroSTjnwFPrrNsDkkc4OO/HSep+CIkiINEAj
-X-Gm-Gg: ASbGncvcEXJAxlSpuzYWDL0p5zbe9P3ktwBTkCmA7bgee2bzzH78MCAIiXoQgQWqTkM
-	RctzjXdg04hbq56mouy5fNHlj1n9kYS0n40KpGx8WPoIA2jJoaqNbLgsQROYk239NZsfMMWZmGM
-	fCdqS8vjyQ2jpdyuCRAWnJdqnrMJVxa4L/vpLKG79toDhVXvqTkAJ58Vg0TKf1hqvyKe9mSzqjZ
-	6lpX85cTopUl9TPSPgTHs/qlkLoJlocs0SGe1p7LRCa4M/3iAyogQ3IgrcQ2O1ju4U7RvqeZ/+V
-	B8SXz1zxUsDBiCm8GgcR4+lKFctk9ZvpvqLmzx9JOeI6I53yBtOB
-X-Google-Smtp-Source: AGHT+IEOKVdrt+VcdboFlylKhffAnkFRPdnnoYVuUBHMRj1bIdOtygbWy7OQqXFYlZN0q4NyUQf+Mw==
-X-Received: by 2002:a17:907:7e93:b0:ad5:520a:8e02 with SMTP id a640c23a62f3a-ad85b1de69bmr818638466b.39.1748284585097;
-        Mon, 26 May 2025 11:36:25 -0700 (PDT)
-Received: from qasdev.Home ([2a02:c7c:6696:8300:8814:6671:65ae:f9dd])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad889738174sm25419066b.140.2025.05.26.11.36.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 11:36:24 -0700 (PDT)
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: ch9200: fix uninitialised access during mii_nway_restart
-Date: Mon, 26 May 2025 19:36:07 +0100
-Message-Id: <20250526183607.66527-1-qasdev00@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        d=1e100.net; s=20230601; t=1748284862; x=1748889662;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sANgMpkFwYeHTrhiuhnnFxkTIiQM3rzX2qKXmUr0/18=;
+        b=VXZ5rpKkB6XFkpdbk2tFWTkBIg61fsfCfp2e8lhHh3+oQn/mjOilr79Dr06NZewcYp
+         mMcmyxJlSGotKtmKHLj1rm9GaDfnfDEQjfS8ey/iO8dZeCjxduS4EQGr2U5Afg3mjS9A
+         cEtRimD4So+7+FZCeuENP1fmkc2U+yxYDnVofCnEU4kVCnrvyembM8p8OwYq31fOFFaK
+         pCnrOK3qL9ZkokG6v8AQp3eSJRBxjWgf8NMOFvSNikHeWlKmqQzUAAdiFPYVdPlduNkB
+         6bA0xXfeckYsnPAZ6ZjwkZ9db6Q/cvJsushCzNmVz4toSJMVwu02m/4Lq4NjMNBeyFnI
+         5YoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwa4KAmHZZ9w/p1V8b/iO2sO4OFilK+hkK8VR/cjD7u2Z98Hp611L2Pz/gkXRi3gbFAMaO4tA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU00h4ai0yDdvsthUY3LaZrkd2Ya+kKmUzz0wdprwWtz3fXJhD
+	OpvNnQX7Fuph0ZCZvW8WHmZQszzPV1pcEeq/4pNaIkPfC/jdheue74LCqgc002eRIbHdByzNWTN
+	RaiLmxlH9dcHQPNpSf18CJZr1k9S4ubYBUkvY1nY83x16K6PH7FOmh2u0ASs=
+X-Google-Smtp-Source: AGHT+IHRJsvNtQ+zTrI31so/FnEBD39zhnMae+3fgekqUVucYEztyvYDcfcX84YX5ySL0/x+WxuW+mPR+3BhY8lNxlIYPI9F5gTg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:389a:b0:85d:b7a3:b84d with SMTP id
+ ca18e2360f4ac-86cbb8bee3emr795868839f.13.1748284862621; Mon, 26 May 2025
+ 11:41:02 -0700 (PDT)
+Date: Mon, 26 May 2025 11:41:02 -0700
+In-Reply-To: <87msazftff.fsf@posteo.net>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6834b5be.a70a0220.253bc2.009a.GAE@google.com>
+Subject: Re: [syzbot] [tipc?] WARNING: refcount bug in tipc_crypto_xmit
+From: syzbot <syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com>
+To: charmitro@posteo.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jmaloy@redhat.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net, 
+	wangliang74@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-In mii_nway_restart() the code attempts to call
-mii->mdio_read which is ch9200_mdio_read(). ch9200_mdio_read()
-utilises a local buffer called "buff", which is initialised
-with control_read(). However "buff" is conditionally
-initialised inside control_read():
+Hello,
 
-        if (err == size) {
-                memcpy(data, buf, size);
-        }
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-If the condition of "err == size" is not met, then
-"buff" remains uninitialised. Once this happens the
-uninitialised "buff" is accessed and returned during
-ch9200_mdio_read():
+Reported-by: syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com
+Tested-by: syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com
 
-        return (buff[0] | buff[1] << 8);
+Tested on:
 
-The problem stems from the fact that ch9200_mdio_read()
-ignores the return value of control_read(), leading to
-uinit-access of "buff".
+commit:         d72ee421 net: tipc: fix refcount warning in tipc_aead_..
+git tree:       https://github.com/charmitro/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=10369df4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
+dashboard link: https://syzkaller.appspot.com/bug?extid=f0c4a4aba757549ae26c
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
 
-To fix this we should check the return value of
-control_read() and return early on error.
-
-Reported-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
-Closes: https://syzkaller.appspot.com/bug?extid=3361c2d6f78a3e0892f9
-Tested-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
-Fixes: 4a476bd6d1d9 ("usbnet: New driver for QinHeng CH9200 devices")
-Cc: stable@vger.kernel.org
-Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
----
- drivers/net/usb/ch9200.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/ch9200.c b/drivers/net/usb/ch9200.c
-index f69d9b902da0..a206ffa76f1b 100644
---- a/drivers/net/usb/ch9200.c
-+++ b/drivers/net/usb/ch9200.c
-@@ -178,6 +178,7 @@ static int ch9200_mdio_read(struct net_device *netdev, int phy_id, int loc)
- {
- 	struct usbnet *dev = netdev_priv(netdev);
- 	unsigned char buff[2];
-+	int ret;
- 
- 	netdev_dbg(netdev, "%s phy_id:%02x loc:%02x\n",
- 		   __func__, phy_id, loc);
-@@ -185,8 +186,10 @@ static int ch9200_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	if (phy_id != 0)
- 		return -ENODEV;
- 
--	control_read(dev, REQUEST_READ, 0, loc * 2, buff, 0x02,
--		     CONTROL_TIMEOUT_MS);
-+	ret = control_read(dev, REQUEST_READ, 0, loc * 2, buff, 0x02,
-+			   CONTROL_TIMEOUT_MS);
-+	if (ret < 0)
-+		return ret;
- 
- 	return (buff[0] | buff[1] << 8);
- }
--- 
-2.39.5
-
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
 
