@@ -1,155 +1,111 @@
-Return-Path: <netdev+bounces-193525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE98BAC453B
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 00:31:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C759AC454D
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 00:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9218A18996C9
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 22:31:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CF0C3BC390
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 22:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EE323E344;
-	Mon, 26 May 2025 22:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530121E5B64;
+	Mon, 26 May 2025 22:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AcAgsPHj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IubjOqNG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C628F84D13;
-	Mon, 26 May 2025 22:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6225E6D17;
+	Mon, 26 May 2025 22:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748298696; cv=none; b=n9C8PIxtOgRlwHBblT6xlaasLcKIUbzzJI1uVwX2RUU+AbqWXI3/pXRhK1DCzaisC2Z6agJMyVd1bXUtMb20sUjnxu7fVUGMEzNxFQ2tiWzh7CB4xj+E7XTsgQk6sFfLfpsmFKxirjUYwDL5sYOiSSJ9X6eR6jUY4NZ3I5kaIDs=
+	t=1748299104; cv=none; b=GqPTvxDeLPWFM5bkwBzGuuRi/4Gn6aK8HWU9Cly7aSQXLUhA6rL87JhSKWeH8t446zYgZQCn4043qWnErr7/p+TGTcjX1P410TOBwmQV2f35+X0WkUjkpXEEv2CaDpkwuTlWpKGhe6scQSirWYv0BS7RTOR3vIl3uhEoEwOBgnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748298696; c=relaxed/simple;
-	bh=P4mDwunV/VK6ZdqBCM8ixj0ovsAxRm+C2bbqZqX2aJA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yfb5zkfnj9Gw+zpJhS09Djz9pMTHYiaCc2qp3gwRTzXYVP7yrKXbYd3EB4VJTiX8ZxOpQfTVn3ylq1HUr3FNo7WuCDHljLgBnncRty2Wn7ZemRuX8Ltmgoj/ezBDKQMRa9UT79YEuEWUIAb7/f/atkaabpenn+aZuVmVU1auTFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AcAgsPHj; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32a6b34acd9so2923251fa.1;
-        Mon, 26 May 2025 15:31:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748298692; x=1748903492; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jvLHYVJDLL1tRu00kxb4TV63RHH86AdnGIzbeTcCyBM=;
-        b=AcAgsPHj7WP76AIqzvXSp6uRTWeh7NPFbmeKMMKeLuWmxHiyDa5+dbhf+M6UcaLim/
-         hj53dMETzpAuyUDEJzI6TE2J8A/2UV6huxDEhpp1bsY5lTZYurfXpFNJJal4nRJDEqPj
-         jMnH+YA9YcRaFMKZx4oSotzPdCV90C/0VqftOfK883os6Q9cHothq5Zkc6RsjVSkMjRU
-         5xewyPpdVoJuE/YhKxiDW+l1ORFz5gzzpUrnCCBdapJOSGpzvQqqML7k8ViuWXgRQCp8
-         lgyubdoDQGStJliX88dzLdt4Ad6bmtwIvT9F9NYE0vA9tk+PR5UyFt0o6LSaZDP+yS/S
-         kZJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748298692; x=1748903492;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jvLHYVJDLL1tRu00kxb4TV63RHH86AdnGIzbeTcCyBM=;
-        b=tcE0IVBMV8pSHETOSW3NB+IZybTsWReuH334zZXTzEGkamuZcBii9YYg4nyFECOUcl
-         DABZhiC1B+epV7COaHjWU7CzI990W8UbGNpcOBpi8CLykIgK8vChSiRwSu3QKedamwHI
-         G4EKPiBQ6Fs+M/2V2VMXDaO2nCxPTYc75hSEFc1CJcyf74PNSN4xBig60Sb7qh8gdYnn
-         llRO5DpWLuZW9yPc14DezWdER/7rzWnNfT0ep87gqu0ufLwWxmZX44q66E2UF+ENHu3l
-         aCKlvW+yIdzzx+l60QZak0rpdAFm19Wun2ndXy0LUSHbQAece4U+pIIwEO8qEh37eWZd
-         qImw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeSY8OyXvRCasiezCs/U9ZU/JcDqoW9IRsRCxJh86+IE84fuNvt9amilkfckQyF3QRFhYBMmHN1+ukLEG+@vger.kernel.org, AJvYcCV/1GJYMqO0GeJzYTqc+PGocFztV/ntvtlvGaA5WZZZnwro5ewu33vxYJ5ZFPTZPDuYBxY/XcXG9wLOS0ID4Q7V@vger.kernel.org, AJvYcCVRUb2lq6LOX9Ax8eiMEy14LtSt2pyt3GBMIVwVDD2I9NkNvcaMy6Sg4qszyVJmlbcUlrVpykKGMUTV@vger.kernel.org, AJvYcCWE0ywH+0A2EqrYDTdmUJq9CyTjwmi9Dw5WarLv4S5mowkIjtuRX9rLEenqeFoB9qIozFQ1KQ0qcLbliOU=@vger.kernel.org, AJvYcCWQcSNs4uhL75v/KhIC9jUAHO3icBGc9maJaYMlH/msGAmVN/BhZRk4MlNUIm6zqhM4R9PbPqmjMwm0HQAGYmw=@vger.kernel.org, AJvYcCWh/5nW/Km/FlGS61HVyt8Lj2zwmYK5hTfN+q7D5Jwkn9aHrvFAZxLO1v6DgLpg78jqvG5XVs7ug6KG@vger.kernel.org, AJvYcCXu/478++46yTY51naKwSQu133M5keYOrrL7hLQ+1ioc0lQakZki+FQpIi3oJQpuQXa7iHx9j5d@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUoumvWkyesBhZwc22yUNIp3WvxU3UQDuYwboFC6Y7KUOsG54x
-	SFC1o63Gb1MR1nT2/YmEEZZ/mAR8HOVxwcyWlnT+9xA341p/1rkJb+bEiXhZ//00jBoTM9G31f0
-	kNhNcz2H47rNpEmtery5aD89D20JkLKY=
-X-Gm-Gg: ASbGncvoiPWGbGzKrK4qPQAtzeyeYhc3i4+2MJ2K60uozvCMVfo/loLDntPwPyPPLuP
-	rcySQNwojswBGiZKkY0ciYV+hSjBnke2wQu773/G3Q4RgujxU5HQEfn2JEPNXy94RZvCvTMEPzG
-	D3RBygZAseA1+U7w07szrxQcdu1AONKS6alZ4tma/fZ0BOK9c410KdNPrqUnzwL9bH2i8=
-X-Google-Smtp-Source: AGHT+IEJfWzc6VPUDuyUq0aTn+WE4sTfnbgvmOYP1K86Po8lb+CyhSBKVylPu7Ej7IoVB3uFqztWGvTQz/dCfNqAd+Q=
-X-Received: by 2002:a05:651c:f01:b0:32a:664e:a923 with SMTP id
- 38308e7fff4ca-32a664ea9e0mr10313091fa.22.1748298691742; Mon, 26 May 2025
- 15:31:31 -0700 (PDT)
+	s=arc-20240116; t=1748299104; c=relaxed/simple;
+	bh=v3ZRDAtj5YcQbpSBqOF+FI4njniS2m/8ePwB5QwfiT8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HqdqM1qoYjQKwI64vGiF8ajFBDGZH6/qDCdzWfuuAdaG7CSlO2rTff7FgSWNPXF08wwWPktMsyDcz0CXa5jEAkZrziWzL5+x0VvEJ/ERY+kIAlC9BUQN6g9H4JYiyqUcwuv+Vwo4oC7GiZf/sPq9qqlwIGpkENGmT7w2Az0T4DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IubjOqNG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=rvGrGQY6GrI5CIu+KGfqk3UB3L4We71OJCOlHdzEnqc=; b=Iu
+	bjOqNGBqi7kZdOZUsIJmfdxJSh5dGZvTn81tqDWY+m5F8tpYrCLHOSNWmdRrhhWhYu18TI7T9Xa5Q
+	dVCCViWCC272L+Bca8cL6c7py3tGDApC58mmSZPYX4HwK+Z+5p9dwK/hpweJHtk628kDuIYpX8sEZ
+	eiCGgfQiQX6Zdbg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uJgSV-00E1z3-K7; Tue, 27 May 2025 00:38:15 +0200
+Date: Tue, 27 May 2025 00:38:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: James Hilliard <james.hilliard1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Maxime Ripard <mripard@kernel.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 3/3] dt-bindings: net: sun8i-emac: Add AC300 EMAC1
+ nvmem phy selection
+Message-ID: <d4109cc5-83d5-4acd-b0fb-39a50043060b@lunn.ch>
+References: <20250526182939.2593553-1-james.hilliard1@gmail.com>
+ <20250526182939.2593553-3-james.hilliard1@gmail.com>
+ <959e576e-bf36-4d01-9ffb-023931b61574@lunn.ch>
+ <CADvTj4oqjCkMeK0p8ZBa8PQmctc77hpiFK2pqgBJaxRFDgQoDQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-5-6412a94d9d75@gmail.com> <DA66OFXQCWUK.31LM78DIVABZV@kernel.org>
-In-Reply-To: <DA66OFXQCWUK.31LM78DIVABZV@kernel.org>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Mon, 26 May 2025 18:30:55 -0400
-X-Gm-Features: AX0GCFuHGuPmwsi9tWeeUypjxRW1UrvRCX_LVo0C-ggOVzUmGabC1z1bBuoaiZU
-Message-ID: <CAJ-ks9m=okC9_K2MJU80xbnO+3+Z0hvC_FYzCtzW9pD=WA_xqQ@mail.gmail.com>
-Subject: Re: [PATCH v10 5/5] rust: remove core::ffi::CStr reexport
-To: Benno Lossin <lossin@kernel.org>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvTj4oqjCkMeK0p8ZBa8PQmctc77hpiFK2pqgBJaxRFDgQoDQ@mail.gmail.com>
 
-On Mon, May 26, 2025 at 11:05=E2=80=AFAM Benno Lossin <lossin@kernel.org> w=
-rote:
->
-> On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
-> > Clean up references to `kernel::str::CStr`.
+On Mon, May 26, 2025 at 03:32:03PM -0600, James Hilliard wrote:
+> On Mon, May 26, 2025 at 1:36 PM Andrew Lunn <andrew@lunn.ch> wrote:
 > >
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > ---
-> >  drivers/gpu/drm/drm_panic_qr.rs   |  3 ++-
-> >  drivers/gpu/nova-core/firmware.rs |  2 +-
-> >  drivers/net/phy/ax88796b_rust.rs  |  1 +
-> >  drivers/net/phy/qt2025.rs         |  1 +
-> >  rust/kernel/device.rs             |  3 +--
-> >  rust/kernel/driver.rs             |  4 ++--
-> >  rust/kernel/error.rs              |  6 ++----
-> >  rust/kernel/faux.rs               |  5 ++++-
-> >  rust/kernel/firmware.rs           | 15 ++++-----------
-> >  rust/kernel/kunit.rs              |  6 +++---
-> >  rust/kernel/lib.rs                |  2 +-
-> >  rust/kernel/miscdevice.rs         |  3 +--
-> >  rust/kernel/net/phy.rs            |  4 +++-
-> >  rust/kernel/of.rs                 |  3 ++-
-> >  rust/kernel/pci.rs                |  2 +-
-> >  rust/kernel/platform.rs           |  2 +-
-> >  rust/kernel/prelude.rs            |  5 +----
-> >  rust/kernel/str.rs                | 22 ++++++++++------------
-> >  rust/kernel/sync/condvar.rs       |  4 ++--
-> >  rust/kernel/sync/lock.rs          |  4 ++--
-> >  rust/kernel/sync/lock/global.rs   |  5 +++--
-> >  rust/kernel/sync/poll.rs          |  1 +
-> >  rust/kernel/workqueue.rs          |  1 +
-> >  rust/macros/module.rs             |  2 +-
-> >  24 files changed, 51 insertions(+), 55 deletions(-)
->
-> Haven't compile tested this series yet, but this commit seems to suggest
-> to me that some of the previous commits introduced code that doesn't
-> compile or emits warnings? If so that needs to be fixed.
+> > > +        phy-mode = "rgmii";
+> >
+> > Does the PCB have extra long clock lines?
+> 
+> I'm not sure, it's a copackaged(maybe on-die is the wrong terminology)
+> PHY I think so I assume the clock lines are internal, in the device specific
+> dts we set something like this on the emac1 node:
+> allwinner,rx-delay-ps = <3100>;
+> allwinner,tx-delay-ps = <700>;
 
-That's not the case. There are no warnings and no compilation failures
-in prior commits.
+Those values are just weird. The RGMII delay should be 2000ps. 3100 is
+way too big, and 700 is way too small.
+
+I think phy-mode = "internal" would be better, and just hard code the
+delays either in the MAC or PHY driver.
+
+Thanks for the link to the old thread, which was 5 years
+ago. Hopefully since then, a bit more has been learnt. Quickly reading
+through that thread, i don't think an MFD is not the correct solution.
+In the last 5 years we have had to deal with more chicken/egg problems
+with PHYs. It has now become pretty much standard practice to put the
+ID values in DT, to get the driver probed when the device does not
+respond on the bus. The DT node can then use phandles to the reset and
+clock controller to configure them as needed, the core will probably
+do that. I2C is a bit messier, you probably want a phandle pointing to
+the i2c_adapter, so you can use i2c_transfer() on it in the probe()
+function.
+
+	Andrew
 
