@@ -1,142 +1,153 @@
-Return-Path: <netdev+bounces-193295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBBDAC3783
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 03:01:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 719BAAC377D
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 02:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF413A5406
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 01:01:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CF0C7A9A7C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 00:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C191ABE67;
-	Mon, 26 May 2025 01:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652EE224F6;
+	Mon, 26 May 2025 00:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=uni-paderborn.de header.i=@uni-paderborn.de header.b="SzF+5mCn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDkpqPg0"
 X-Original-To: netdev@vger.kernel.org
-Received: from nylar.uni-paderborn.de (nylar.uni-paderborn.de [131.234.189.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5462DCBF0;
-	Mon, 26 May 2025 01:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.234.189.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E89D367
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 00:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748221295; cv=none; b=YwEtcrHzZSeIA4HjmjMKlp/IgkYMIV+5YmHmceLDUEg6G4aSShcN8h1S+9TOp9dpomaXkdfw6czjDmMO129WqCA+jkrluqp7BtOgudUek5p5uCOOXf4a6avpMpL6NrMMYE78MXXS9raoUbl13sSEGMIXVGBO6oNOqTR3ahlwP5E=
+	t=1748220492; cv=none; b=Uk9IA09VdUxe7A5sfN4PgzL1vBEb4TY7x/gqlU4NYuJ9lNkzfGQy8s45om6qfRaPODPwzJta5D2IWu0OJpNc0cwyPOGVgksaHMIVuOP7s23uwceacyq/oBsoJSKQqjf5m/glhqn4ht+pYRYZRx++hz7IBQtCRSKb65peLJZpNpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748221295; c=relaxed/simple;
-	bh=LRM7BnJhSjj/CeR9D5WBTiFvdWmDy4pJ2oIQNJPU+HQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=Bd0bxXa7GwqzclYZkNnzRbdHHWy0lf4KST0yowaUBfzj1TAmEbAskDWiDkQNDD30BjSM15Tbc287vcPTkyWqntwyg65rb1fATxdNFka2WsdnZeT5oFcwLEx+WUfUnR1cwc5nboVboqRkpy4CsBoIzi5ABzzObbFFEGUp0ag3iDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de; spf=pass smtp.mailfrom=mail.uni-paderborn.de; dkim=pass (1024-bit key) header.d=uni-paderborn.de header.i=@uni-paderborn.de header.b=SzF+5mCn; arc=none smtp.client-ip=131.234.189.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.uni-paderborn.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type:To:
-	Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nupreO2nEhnaPNp/sEl4UWJ1Rv6ILga1aeXZ27Lpev4=; b=SzF+5mCn0cMJUWA7AFZfr/aWHO
-	yFFD8Hjw68vYFm3hW67nixC65FIL21hJHRIUbeSPXzrzaaUz1u1efLPe9oh1fjClhFPtgnoCDtoUD
-	LPJD0bUw8Z44M4Y2ka0Vc5isTR3QljWCD6iOqs1SwCPpAZEkhRHi6i6qJU8aSLEAfG7I=;
-Message-ID: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
-Date: Mon, 26 May 2025 02:44:10 +0200
+	s=arc-20240116; t=1748220492; c=relaxed/simple;
+	bh=xM/iR15NZuSeqhFzoNkNCjbhqGCrEEn+F3fWA3e/VnA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SG/HExM0ggWRow/6nnFWEUvdTRMuXUQlzcKPA2sHffGOoatJ7vtiY5MKAcKAgLSOHEiTNUNel1fT/sJTOMPVhR5kSP/07hah9BTzN2LqChAUplbi0j5OSZniwqq3jHGTwORleaqPzOQ3q56pH5eWBTHWQfHJgGi7ttamNMuvJdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VDkpqPg0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748220488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EKZQ9RDyPUHUt9K+kBTS/mKPQs4MxH93OOxZ42An7cU=;
+	b=VDkpqPg0B2mjsgpIDyZchPIjM841y2EK0QaqVvdkkksvLpKTwN2vOP8YOwXMFJKPP6grcO
+	imrMwABXYCuG4HCuQXF/OOGDoBWTtTdAadRUDhdOYVodE5viEva55noE6Y1aYrSGwYTc74
+	9F77kZdEeTbl2LmUlLxdKVw8WfUgjqU=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-683-zvO9sb96OuaDKoPAsk6Snw-1; Sun, 25 May 2025 20:48:07 -0400
+X-MC-Unique: zvO9sb96OuaDKoPAsk6Snw-1
+X-Mimecast-MFC-AGG-ID: zvO9sb96OuaDKoPAsk6Snw_1748220486
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b00e4358a34so857281a12.0
+        for <netdev@vger.kernel.org>; Sun, 25 May 2025 17:48:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748220486; x=1748825286;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EKZQ9RDyPUHUt9K+kBTS/mKPQs4MxH93OOxZ42An7cU=;
+        b=ILvEN9IVBGHBC8OIOzv26xW5PteMZhXztiL6E93DSw5pgrtxAxQjKpYUFkvFahw9zO
+         IFYyX76gp4/S8jQds5i1p/4r5CKn0IO086vawlHjDvhwayWAI3tS4yx9H54DzCvuPoPl
+         IdKk8jJRAj5g5rqyImhFbSt4/d4T+4RsMzbfZ8jiVuqISmq3KHZYpX4jW1A9MReB3mv1
+         m7rvU70QodEgxGszjCuX0EbpkqT+tFOBJn/9+uZEcnji3Cqe9i8WDmtHYR0TURTJU2vq
+         AtqlVL5BBQfb6UOPkc1pCegvgCjGsmwDF1aR5ddKu2jTzgi4E2lvEilTZSmzXuRCNRTx
+         MgsA==
+X-Gm-Message-State: AOJu0YwZAZ6OVWqbGk3F99csWKUoVEGclXrobTnwYQG+X2CWNI5iKG4P
+	XFagyQiB2YaDgedjnEqZW7AEPgzUXJ0Mhc0C3S2HeRosXME/RuiobkZRdgDF/6uIcpZuJd1TFri
+	ZqxNcAL1X1FsROhwHMckfG63rZzke8SphJMD8kPwxr+erQxE3Dg+ufSK7Brlp6V4bT0/JM1OVjx
+	ZS322vXRFhElKN4MmG7whhuQNG0ZaUis0/WR9UYpM7mZA=
+X-Gm-Gg: ASbGncuTZL5XxigGW2kRirX/QE4BAXhFfZgJ/nBy5roOKnD3/6CLhOTRShaD/JKP+6a
+	UefKxAmgOX6BplGSGVVgqHAhxxZVUL3l6EW747UKOe5P8q+nbs5CnUEg3V8ZOs2SHOsFYJA==
+X-Received: by 2002:a05:6a21:3387:b0:1f3:1d13:96b3 with SMTP id adf61e73a8af0-2188c20e104mr9100485637.5.1748220485783;
+        Sun, 25 May 2025 17:48:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGSktKuyktUz0NByxvqH70/TtFI1h3C9TaL5TEXaxXcIhO9tMd2Tuc6a4bsS+X96YLTZXbX81oTtyzu+rDLN7I=
+X-Received: by 2002:a05:6a21:3387:b0:1f3:1d13:96b3 with SMTP id
+ adf61e73a8af0-2188c20e104mr9100457637.5.1748220485390; Sun, 25 May 2025
+ 17:48:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: de-DE, en-GB-large
-From: Dennis Baurichter <dennisba@mail.uni-paderborn.de>
-Subject: Issue with delayed segments despite TCP_NODELAY
-To: netdev@vger.kernel.org, netfilter@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-IMT-Source: Extern
-X-IMT-rspamd-score: -5
-X-UPB-Report: Action: no action, RCVD_TLS_ALL(0.00), FROM_HAS_DN(0.00), FROM_EQ_ENVFROM(0.00), BAYES_HAM(-0.42), TO_DN_NONE(0.00), TO_MATCH_ENVRCPT_ALL(0.00), MIME_GOOD(-0.10), NEURAL_HAM(0.00), RCPT_COUNT_TWO(0.00), MID_RHS_MATCH_FROM(0.00), RCVD_VIA_SMTP_AUTH(0.00), ARC_NA(0.00), ASN(0.00), RCVD_COUNT_ONE(0.00), MIME_TRACE(0.00), Message-ID: 1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de
-X-IMT-Spam-Score: 0.0 ()
-X-IMT-Authenticated-Sender: uid=dennisba,ou=People,o=upb,c=de
+References: <cover.1747822866.git.pabeni@redhat.com> <b1d716304a883a4e93178957defee2c560f5b3d4.1747822866.git.pabeni@redhat.com>
+In-Reply-To: <b1d716304a883a4e93178957defee2c560f5b3d4.1747822866.git.pabeni@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 26 May 2025 08:47:53 +0800
+X-Gm-Features: AX0GCFuJRD34ohulPEfKcwx-CcwrHInnhUkxaj1CTxrdFkC_I7IWEpZuZ10KT4o
+Message-ID: <CACGkMEuzWGQB=kQeX-bA8jVn=5Sj_MP_Q2zbMS=tvKGYrNmWLw@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/8] vhost-net: allow configuring extended features
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, May 21, 2025 at 6:33=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Use the extended feature type for 'acked_features' and implement
+> two new ioctls operation to get and set the extended features.
+>
+> Note that the legacy ioctls implicitly truncate the negotiated
+> features to the lower 64 bits range.
+>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  drivers/vhost/net.c        | 26 +++++++++++++++++++++++++-
+>  drivers/vhost/vhost.h      |  2 +-
+>  include/uapi/linux/vhost.h |  8 ++++++++
+>  3 files changed, 34 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 7cbfc7d718b3f..b894685dded3e 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -77,6 +77,10 @@ enum {
+>                          (1ULL << VIRTIO_F_RING_RESET)
+>  };
+>
+> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
+> +#define VHOST_NET_FEATURES_EX VHOST_NET_FEATURES
+> +#endif
+> +
+>  enum {
+>         VHOST_NET_BACKEND_FEATURES =3D (1ULL << VHOST_BACKEND_F_IOTLB_MSG=
+_V2)
+>  };
+> @@ -1614,7 +1618,7 @@ static long vhost_net_reset_owner(struct vhost_net =
+*n)
+>         return err;
+>  }
+>
+> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
+> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t=
+ features)
+>  {
+>         size_t vhost_hlen, sock_hlen, hdr_len;
+>         int i;
+> @@ -1704,6 +1708,26 @@ static long vhost_net_ioctl(struct file *f, unsign=
+ed int ioctl,
+>                 if (features & ~VHOST_NET_FEATURES)
+>                         return -EOPNOTSUPP;
+>                 return vhost_net_set_features(n, features);
+> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
 
-I have a question on why the kernel stops sending further TCP segments 
-after the handshake and first 2 (or 3) payload segments have been sent. 
-This seems to happen if the round trip time is "too high" (e.g., over 
-9ms or 15ms, depending on system). Remaining segments are (apparently) 
-only sent after an ACK has been received, even though TCP_NODELAY is set 
-on the socket.
+Vhost doesn't depend on virtio. But this invents a dependency, and I
+don't understand why we need to do that.
 
-This is happening on a range of different kernels, from Arch Linux' 
-6.14.7 (which should be rather close to mainline) down to Ubuntu 22.04's 
-5.15.0-134-generic (admittedly somewhat "farther away" from mainline). I 
-can test on an actual mainline kernel, too, if that helps.
-I will describe our (probably somewhat uncommon) setup below. If you 
-need any further information, I'll be happy to provide it.
+Thanks
 
-My colleague and I have the following setup:
-- Userland application connects to a server via TCP/IPv4 (complete TCP 
-handshake is performed).
-- A nftables rule is added to intercept packets of this connection and 
-put them into a netfilter queue.
-- Userland application writes data into this TCP socket.
-   - The data is written in up to 4 chunks, which are intended to end up 
-in individual TCP segments.
-   - The socket has TCP_NODELAY set.
-   - sysctl net.ipv4.tcp_autocorking=0
-- The above nftables rule is removed.
-- Userland application (a different part of it) retrieves all packets 
-from the netfilter queue.
-   - Here it may occur that e.g. only 2 out of 4 segments can be retrieved.
-   - Reading from the netfilter queue is attempted until 5 timeouts of 
-20ms each occured. Even much higher timeout values don't change the 
-results, so it's not a race condition.
-- Userland application performs some modifications on the intercepted 
-segments and eventually issues verdict NF_ACCEPT.
-
-We checked (via strace) that all payload chunks are successfully written 
-to the socket, (via nlmon kernel module) that there are no errors in the 
-netlink communication, and (via nft monitor) that indeed no further 
-segments traverse the netfilter pipeline before the first two payload 
-segments are actually sent on the wire.
-We dug through the entire list of TCP and IPv4 sysctls (testing several 
-of them), tried loading and using different congestion algorithm 
-modules, toggling TCP_NODELAY off and on between each write to the 
-socket (to trigger an explicit flush), and other things, but to no avail.
-
-Modifying our code, we can see that after NF_ACCEPT'ing the first 
-segments, we can retrieve the remaining segments from netfilter queue.
-In Wireshark we see that this seems to be triggered by the incoming ACK 
-segment from the server.
-
-Notably, we can intercept all segments at once when testing this on 
-localhost or in a LAN network. However, on long-distance / 
-higher-latency connections, we can only intercept 2 (sometimes 3) segments.
-
-Testing on a LAN connection from an old laptop to a fast PC, we delayed 
-packets on the latter one with variants of:
-tc qdisc add dev eth0 root netem delay 15ms
-We got the following mappings of delay / rtt to number of segments 
-intercepted:
-below 15ms -> all (up to 4) segments intercepted
-15-16ms -> 2-3 segments
-16-17ms -> 2 (sometimes 3) segments
-over 20ms -> 2 segments (tested 20ms, 200ms, 500ms)
-Testing in the other direction, from fast PC to old laptop (which now 
-has the qdisc delay), we get similar results, just with lower round trip 
-times (15ms becomes more like 8-9ms).
-
-We would very much appreciate it if someone could help us on the 
-following questions:
-- Why are the remaining segments not send out immediately, despite 
-TCP_NODELAY?
-- Is there a way to change this?
-- If not, do you have better workarounds than injecting a fake ACK 
-pretending to come "from the server" via a raw socket?
-   Actually, we haven't tried this yet, but probably will soon.
-
-Regards,
-Dennis
 
