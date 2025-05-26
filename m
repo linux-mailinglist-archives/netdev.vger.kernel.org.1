@@ -1,133 +1,130 @@
-Return-Path: <netdev+bounces-193458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D995EAC41EB
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 16:56:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA412AC4200
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80D647AAF24
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 14:55:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAE623A9EB4
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 15:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6501020F098;
-	Mon, 26 May 2025 14:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2u6SKz5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE028248C;
+	Mon, 26 May 2025 15:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205DB28373;
-	Mon, 26 May 2025 14:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02B43A1BA;
+	Mon, 26 May 2025 15:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748271404; cv=none; b=F0M46PCbyWZH1EVTpPXuGmv8OyoiQoD46GWkYpjKgiQPq7FQomI290PvoNWWZg6qcv3z/DJDeSb8Eazzj66iJq9ZxPZ/o1Sq+Zr5Of7wUBt9cW/L7Z5tA6qIMrIoIiCgzssuhWhEvwhyq/rw6p7jS/GrOaRYvmaaHF9RSVzRXac=
+	t=1748271751; cv=none; b=oQ7gBwg6IiPS/DHTyZY5vux7gHamlDC2x6gKxAYpkG0ymiaRa5E0Ljl4Cpmam85A8mPtbnUYGe3XL5x1zosnB9bQ1aO9C9xG+MkQsJfN9N6WqZ1Raz7yFfn5WhRTftRdNyure4Zm3CPcNfRBITQqBEkNLNhuNaaasa9GsIOHxSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748271404; c=relaxed/simple;
-	bh=FquHezFUc7DH27pfpWI+rH+kmjgYOsLlioRhkjrQCPs=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=eZ+rDGAlPyYpAGcFbCGh/kzVQz7MkJ5SfFpf6pXMJOOrIf3c0+wPd3IeyykE3yxmvr/5hFKRXRcUKws7x4Fdmrtk3JAYyILz6QHLfX7+WEBOZ+02+jS5BnPsQPDk3SATvednedYM2vwG0dBil2RoePhOS48hcInoHnhWMkjFDAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I2u6SKz5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51704C4CEE9;
-	Mon, 26 May 2025 14:56:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748271403;
-	bh=FquHezFUc7DH27pfpWI+rH+kmjgYOsLlioRhkjrQCPs=;
-	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
-	b=I2u6SKz5k5kaCxDX4uSlRUIJZbwixl2yhSR3XLFBE1J++2X4FAsCXkSjofc1VlCY7
-	 VBLN0Cl5HvPpWt6CG9iBzCDfaCicBR3fVmTroqdFJGSpPQFkB4XK860J2Jn/XKO6a4
-	 OatOQ6AjrmPficieHssNFE4Oo3mKqgwHkX7Yr/177vz7FGGPCvChV1QslpsSyp8HtW
-	 vpT2b5LtdSsWlRdKEPvRqeCaaZLo6wUiyh/IJP1vRFyoZwcfP+/nA1wx3usYofjEez
-	 fzu1dW2zgTZTJFsZ/IOYU5QtABXcSKFywKh2XyLJ6wExrlEe3sQIbfsVMMixELYon/
-	 Z0ruliGT49S9g==
+	s=arc-20240116; t=1748271751; c=relaxed/simple;
+	bh=uV9HuOSDtAY9Z+lGW1n6jg1EdBI5E33YVHDoJQ8iefY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=i3nMxFuLNC89O2FbhxN85+anwC24VDAlOZhwsMjx9OSEWEEubjE/bnkXOMWr19McKwyVLG5d+ar5CBU25XLbG2jfEYEmpIipsgRLi0sfWjmJVaOhUtjnAVgmbxV8pkiRDUR6MFK1X9IEQJ6b7KJ5acoFef5eeCzMowgnWArEZXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4b5f8X1cQnz13LxB;
+	Mon, 26 May 2025 23:00:44 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 46E2F1401E9;
+	Mon, 26 May 2025 23:02:26 +0800 (CST)
+Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 26 May 2025 23:02:26 +0800
+Received: from [10.174.177.223] (10.174.177.223) by
+ kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 26 May 2025 23:02:25 +0800
+Message-ID: <7d632b35-2a37-452f-9604-848d4145eab6@huawei.com>
+Date: Mon, 26 May 2025 23:02:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 26 May 2025 16:56:31 +0200
-Message-Id: <DA66HHUA8ANF.BI2FH7POFSRJ@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>, "Michal Rostecki"
- <vadorovsky@protonmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex
- Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary
- Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Danilo Krummrich"
- <dakr@kernel.org>, "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
- "Maxime Ripard" <mripard@kernel.org>, "Thomas Zimmermann"
- <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, "Luis Chamberlain"
- <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will Deacon"
- <will@kernel.org>, "Waiman Long" <longman@redhat.com>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt"
- <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, "Arnd Bergmann" <arnd@arndb.de>, "Jens
- Axboe" <axboe@kernel.dk>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
- <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
- <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v10 3/5] rust: replace `CStr` with `core::ffi::CStr`
-From: "Benno Lossin" <lossin@kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-3-6412a94d9d75@gmail.com>
-In-Reply-To: <20250524-cstr-core-v10-3-6412a94d9d75@gmail.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] page_pool: Fix use-after-free in
+ page_pool_recycle_in_ring
+To: Paolo Abeni <pabeni@redhat.com>, <hawk@kernel.org>,
+	<ilias.apalodimas@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <horms@kernel.org>, <almasrymina@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<zhangchangzhong@huawei.com>,
+	<syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com>
+References: <20250523064524.3035067-1-dongchenchen2@huawei.com>
+ <af41c789-9e0d-4310-ae28-055beef73f10@redhat.com>
+From: "dongchenchen (A)" <dongchenchen2@huawei.com>
+In-Reply-To: <af41c789-9e0d-4310-ae28-055beef73f10@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200002.china.huawei.com (7.202.195.90)
 
-On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
-> `std::ffi::CStr` was moved to `core::ffi::CStr` in Rust 1.64. Replace
-> `kernel::str::CStr` with `core::ffi::CStr` now that we can.
 
-What's this supposed to mean?
-
-> C-String literals were added in Rust 1.77. Opportunistically replace
-> instances of `kernel::c_str!` with C-String literals where other code
-> changes were already necessary; the rest will be done in a later commit.
-
-Similarly this, the message should explain the motivation for the
-change, the change itself and can include additional information.
-
+在 2025/5/23 21:31, Paolo Abeni 写道:
+> On 5/23/25 8:45 AM, Dong Chenchen wrote:
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index 7745ad924ae2..08f1b000ebc1 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -707,19 +707,16 @@ void page_pool_return_page(struct page_pool *pool, netmem_ref netmem)
+>>   
+>>   static bool page_pool_recycle_in_ring(struct page_pool *pool, netmem_ref netmem)
+>>   {
+>> +	bool in_softirq;
+>>   	int ret;
+>>   	/* BH protection not needed if current is softirq */
+>> -	if (in_softirq())
+>> -		ret = ptr_ring_produce(&pool->ring, (__force void *)netmem);
+>> -	else
+>> -		ret = ptr_ring_produce_bh(&pool->ring, (__force void *)netmem);
+>> -
+>> -	if (!ret) {
+>> +	in_softirq = page_pool_producer_lock(pool);
+>> +	ret = !__ptr_ring_produce(&pool->ring, (__force void *)netmem);
+>> +	if (ret)
+>>   		recycle_stat_inc(pool, ring);
+>> -		return true;
+>> -	}
+> Does not build in our CI:
 >
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  drivers/gpu/drm/drm_panic_qr.rs |   2 +-
->  rust/kernel/device.rs           |   4 +-
->  rust/kernel/error.rs            |   4 +-
->  rust/kernel/firmware.rs         |  11 +-
->  rust/kernel/kunit.rs            |   6 +-
->  rust/kernel/miscdevice.rs       |   2 +-
->  rust/kernel/net/phy.rs          |   2 +-
->  rust/kernel/of.rs               |   2 +-
->  rust/kernel/prelude.rs          |   5 +-
->  rust/kernel/seq_file.rs         |   4 +-
->  rust/kernel/str.rs              | 358 +++++++++-------------------------=
-------
->  rust/kernel/sync/condvar.rs     |   2 +-
->  rust/kernel/sync/lock.rs        |   2 +-
->  rust/kernel/sync/lock/global.rs |   2 +-
->  14 files changed, 112 insertions(+), 294 deletions(-)
+> net/core/page_pool.c: In function ‘page_pool_recycle_in_ring’:
+> net/core/page_pool.c:750:45: error: suggest braces around empty body in
+> an ‘if’ statement [-Werror=empty-body]
+>    750 |                 recycle_stat_inc(pool, ring);
+>        |                                             ^
+>
+> /P
+>
+I am sorry for this mistake.
+recycle_stat_inc() is empty when CONFIG_PAGE_POOL_STATS is not enabled.
+Maybe we can fix it as:
 
-I'm a bit confused by some of the diffs here, they seem pretty messy,
-any chance that they can be improved?
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 08f1b000ebc1..19c1505ec40f 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -154,8 +154,8 @@ EXPORT_SYMBOL(page_pool_ethtool_stats_get);
+  
+  #else
+  #define alloc_stat_inc(pool, __stat)
+-#define recycle_stat_inc(pool, __stat)
+-#define recycle_stat_add(pool, __stat, val)
++#define recycle_stat_inc(pool, __stat)         do { } while (0)
++#define recycle_stat_add(pool, __stat, val)    do { } while (0)
+  #endif
 
----
-Cheers,
-Benno
+Thanks a lot!
+
+Dong Chenchen
+
 
