@@ -1,144 +1,144 @@
-Return-Path: <netdev+bounces-193487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29511AC434F
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 19:10:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8FA7AC4379
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 19:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEA0A7A6E82
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF9717956C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 17:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7730823D2B7;
-	Mon, 26 May 2025 17:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A13E23F405;
+	Mon, 26 May 2025 17:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HC9WtjLm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j5+6Fx9T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9F1F9F73;
-	Mon, 26 May 2025 17:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBCF1A5BA0
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 17:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748279430; cv=none; b=fzQLwQxRXWBJWyDk3ELsQXoqIVDqlvZLLJ5cV2VfUwsjK+U7QHrVVOyzT9Vc//CAVpG/4Sxw9yYlHtzXlhOmc3Ial5nzedepSKoE1ZDnjRmSz1JolvWl/XgDyGqunc4ATFxw07qi6H5YOhKHVT39lSgLJHhuZbpN2WuR6g5jWj0=
+	t=1748280849; cv=none; b=f55mzs/TwR9Fi2X1FQHvm2kpplBCHOYtpQpE7pDgAELbNuf8RNs/THm0SJtbO8zW3Bfe2/2HIf0vuz2/MOsii5dMXqEvgEiXYALKtiAUCRTbet3dMKKw2k/45gzX0cgHlxaVEwbbtfrKDeJ+9tUCnMnnJMU39X+effZLjIw+qHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748279430; c=relaxed/simple;
-	bh=c56hYC398RkvcabqIe4ipVU6vYAy+sVHiMui9bPlZHk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KoU+/aChW5mWC1nWurkGuBABG+Ejqs9CdFrpFzZwQiT0idSoq//4zO1GqxTJV3TkYcgMGLcLZd0rAI4IBmIvU1DhRXDWGR+qYioJSO5sDKtL5h57ukjXWHt8YThTffwu0y5+8MlgaDLOosUpq355utHVPOpMPoGhileRNIyLHz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HC9WtjLm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7975C4CEE7;
-	Mon, 26 May 2025 17:10:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748279429;
-	bh=c56hYC398RkvcabqIe4ipVU6vYAy+sVHiMui9bPlZHk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HC9WtjLmk1xVsMYXBsUthSkKUdVa55bs89QqmmaabcAqt+/PRw3UIvnGp8z8sHs+G
-	 jfaPZ5F4h+erzw7hb6RmYkOhIsGHJfH98IB1IRjGjq+izTinPNQNahnNP8V77tBY3y
-	 zha2+Ddnvj2h8oQtuLdto1CIkiczU7fRG4pvqGs8V4cvvvNXg5EszAln0HBn9QaooH
-	 0PebmMxafsXcnM7qnaG4vpU+6MP4Nn08G1UHV2q8BFmoS/1kxD2k5mFhNMzdJqqewh
-	 bdCw4bdVuDJxS+U32COw3FzANDAdme/3qOOr66Y7j86r197rTSNxesBn9ZRW/zffou
-	 b82cD1IlJYAMQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DE03805D8E;
-	Mon, 26 May 2025 17:11:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748280849; c=relaxed/simple;
+	bh=iLUd1Atl7F2XhGCO4Taa7I7wq59LVRkty/S6nhFd6J8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uC5iOBjoQJNieOdaP6icsqIyiV6Tm8fyGYzG6tRTJNAdtSXctvX6/SgYiRx9bNOb6QY5C6IBWowH0NrJ7QxkMNQN6kOLI6AR8nVEJSz2teFOfuk+L06vXBnCU5jYC2X86NmBHjgskMJGj87P35l7rId+ckrbaa0/dCUH6fBON90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j5+6Fx9T; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2349068ebc7so45435ad.0
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 10:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748280847; x=1748885647; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hgxk+Us9mQiW48CfwTTJ3SbvDd6vhg6S6WT+88w+Zks=;
+        b=j5+6Fx9T1x0ZI0mXrTN9DCk2lDY6v3exbploQnxTq4Shoum7qJArG4mv+L6xSe5myG
+         AI/Wq7eKLYlnP5ytjU4YIc/w3WNgmuHFCaY5LxW+59rVsApSrLm2CahADnCID+dY9Vm+
+         icVSo5zTkg9tQqifdNdi4hDrf8oLEkZFDsyLjuXWhYTDaHQQgkqywbUer9uE6LUrddrd
+         T0wJa8R/TFW+Gx3b1m2dc9Qmc1+LRrwllg5MFkYUqmShzhMglH0McTDwoXgwwg+qX+aw
+         FewAQt1YS6C8krImANDYY465dELMaqwB4CYYC4g+/e2gH5iKfGsrN2YtSvcesa8LRZ/b
+         ELHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748280847; x=1748885647;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hgxk+Us9mQiW48CfwTTJ3SbvDd6vhg6S6WT+88w+Zks=;
+        b=Il7ZpcdKxgjtXVuuKdzFKXHW38EHkB9nADCJP7u1cXyrsQ0w2gJtvkiwUjf8/Bclk9
+         e9ysMjP3cb0iFWsvzZrJ6GGh6MVbsYoam70iJTL801DKbjsv9Z1jXQ3GKv6h3ecsW8Tg
+         6KKnEWgY1OcVG7igR+2GOTFtpYJDl8cROG76Ma1Ge/kxMoqO5ZIcRhj2JPUiVrNiE3oK
+         tcuh0Gu4hHFQedWAo+o8nLfUd9E1jb5VlEJYn9MKkq8IVHOWfNssPWXyU31jmuti4fon
+         QwxBZDxA+oqphCmJtcnvhplxU8HnwM9anMxqsCEq5/TrHpOrESRU77latIKdlm31olAc
+         YYkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/qF6Ua37iZCwM2RDLqmbBNtc7INR0ySeEHOOKFBKf5+x8NpM7eYUj/U11yx3gC2EafoQRLzE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxizUM3cBCaasVzNriyI/DOBE+Kk90A/dBpapK8TC+yB9VJmrxe
+	yb5JMJHVzuF7Yb2sG2nbDy43Uk50TEvxU3vqeaEOeW5IQmH6BKQyHAT6GqKyAsg9l24U+86LhHw
+	5g1zmFFaV2nb6aYPcWmihB+QRHAjBnEtovuM5mHFp
+X-Gm-Gg: ASbGncuge4qP7xjRxsxmQz8VIs6yGmwFdlUkM0YuiZKCENM4pYt6Ohl24GpN5dfbXqd
+	Psab+U6pCmN5gxbLHdHiI3y486Rc6zCgQkfOfGY/I8YDrlfvJcL8c/JqpF5aYM4zMXSJ91ffQsD
+	/+pHTNWYkb13h5WzqT7FMvWhOSzL+oWmx4VG+g+AjgTm4f
+X-Google-Smtp-Source: AGHT+IFQ3dUetNFfbOk0QYXpICwB0ij6uIvhORtrNLO5srstLqnDueoHgPjQ8gqgOvQXudMrOUcM53NL7t+iY+hfgmI=
+X-Received: by 2002:a17:903:234e:b0:22c:3cda:df11 with SMTP id
+ d9443c01a7336-2341807dc84mr4471365ad.10.1748280846532; Mon, 26 May 2025
+ 10:34:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/26] selftests: netfilter: nft_concat_range.sh: add
- coverage for 4bit group representation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174827946424.985160.18100606742772677450.git-patchwork-notify@kernel.org>
-Date: Mon, 26 May 2025 17:11:04 +0000
-References: <20250523132712.458507-2-pablo@netfilter.org>
-In-Reply-To: <20250523132712.458507-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+References: <20250523032609.16334-1-byungchul@sk.com> <20250523032609.16334-19-byungchul@sk.com>
+ <CAHS8izM-ee5C8W2D2x9ChQz667PQEaYFOtgKZcFCMT4HRHL0fQ@mail.gmail.com>
+ <20250526013744.GD74632@system.software.com> <cae26eaa-66cf-4d1f-ae13-047fb421824a@gmail.com>
+In-Reply-To: <cae26eaa-66cf-4d1f-ae13-047fb421824a@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 26 May 2025 10:33:52 -0700
+X-Gm-Features: AX0GCFvbcQEfDXG3A2E85eQ0suvZ9QGF79i6mkSHWdI2UWVhJN8XZ-nz6-kdVFg
+Message-ID: <CAHS8izM5xd=cBRuUpAUNtcFzZ3hMwmseyh6rsV+WPRAvdzv4cA@mail.gmail.com>
+Subject: Re: [PATCH 18/18] mm, netmem: remove the page pool members in struct page
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com, 
+	kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com, 
+	hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com, 
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, May 26, 2025 at 9:57=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+> >> Removing these asserts is actually a bit dangerous. Functions like
+> >> netmem_or_pp_magic() rely on the fact that the offsets are the same
+> >> between struct page and struct net_iov to access these fields without
+> >
+> > Worth noting this patch removes the page pool fields from struct page.
+>
+> static inline struct net_iov *__netmem_clear_lsb(netmem_ref netmem)
+> {
+>         return (struct net_iov *)((__force unsigned long)netmem & ~NET_IO=
+V);
+> }
+>
+> static inline atomic_long_t *netmem_get_pp_ref_count_ref(netmem_ref netme=
+m)
+> {
+>         return &__netmem_clear_lsb(netmem)->pp_ref_count;
+> }
+>
+> That's a snippet of code after applying the series. So, let's say we
+> take a page, it's casted to netmem, then the netmem (as it was before)
+> is casted to net_iov. Before it relied on net_iov and the pp's part of
+> the page having the same layout, which was checked by static asserts,
+> but now, unless I'm mistaken, it's aligned in the exactly same way but
+> points to a seemingly random offset of the page. We should not be doing
+> that.
+>
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Agreed.
 
-On Fri, 23 May 2025 15:26:47 +0200 you wrote:
-> From: Florian Westphal <fw@strlen.de>
-> 
-> Pipapo supports a more compact '4 bit group' format that is chosen when
-> the memory needed for the default exceeds a threshold (2mb).
-> 
-> Add coverage for those code paths, the existing tests use small sets that
-> are handled by the default representation.
-> 
-> [...]
+> Just to be clear, I think casting pages to struct net_iov *, as it
+> currently is, is quite ugly, but that's something netmem_desc and this
+> effort can help with.
+>
 
-Here is the summary with links:
-  - [net-next,01/26] selftests: netfilter: nft_concat_range.sh: add coverage for 4bit group representation
-    https://git.kernel.org/netdev/net-next/c/d31c1cafc4a7
-  - [net-next,02/26] netfilter: xtables: support arpt_mark and ipv6 optstrip for iptables-nft only builds
-    https://git.kernel.org/netdev/net-next/c/c38eb2973c18
-  - [net-next,03/26] selftests: netfilter: nft_fib.sh: add 'type' mode tests
-    https://git.kernel.org/netdev/net-next/c/839340f7c7bb
-  - [net-next,04/26] selftests: netfilter: move fib vrf test to nft_fib.sh
-    https://git.kernel.org/netdev/net-next/c/98287045c979
-  - [net-next,05/26] netfilter: nf_tables: nft_fib_ipv6: fix VRF ipv4/ipv6 result discrepancy
-    https://git.kernel.org/netdev/net-next/c/8b53f46eb430
-  - [net-next,06/26] netfilter: nf_tables: nft_fib: consistent l3mdev handling
-    https://git.kernel.org/netdev/net-next/c/9a119669fb19
-  - [net-next,07/26] selftests: netfilter: nft_fib.sh: add type and oif tests with and without VRFs
-    https://git.kernel.org/netdev/net-next/c/996d62ece031
-  - [net-next,08/26] netfilter: nft_tunnel: fix geneve_opt dump
-    https://git.kernel.org/netdev/net-next/c/22a9613de4c2
-  - [net-next,09/26] netfilter: nf_dup{4, 6}: Move duplication check to task_struct
-    https://git.kernel.org/netdev/net-next/c/a1f1acb9c5db
-  - [net-next,10/26] netfilter: nft_inner: Use nested-BH locking for nft_pcpu_tun_ctx
-    https://git.kernel.org/netdev/net-next/c/ba36fada9ab4
-  - [net-next,11/26] netfilter: nf_dup_netdev: Move the recursion counter struct netdev_xmit
-    https://git.kernel.org/netdev/net-next/c/f37ad9127039
-  - [net-next,12/26] netfilter: conntrack: make nf_conntrack_id callable without a module dependency
-    https://git.kernel.org/netdev/net-next/c/90869f43d06d
-  - [net-next,13/26] netfilter: nf_tables: add packets conntrack state to debug trace info
-    https://git.kernel.org/netdev/net-next/c/7e5c6aa67e6f
-  - [net-next,14/26] netfilter: nf_tables: Introduce functions freeing nft_hook objects
-    https://git.kernel.org/netdev/net-next/c/75e20bcdce24
-  - [net-next,15/26] netfilter: nf_tables: Introduce nft_hook_find_ops{,_rcu}()
-    https://git.kernel.org/netdev/net-next/c/e225376d78fb
-  - [net-next,16/26] netfilter: nf_tables: Introduce nft_register_flowtable_ops()
-    https://git.kernel.org/netdev/net-next/c/21aa0a03eb53
-  - [net-next,17/26] netfilter: nf_tables: Pass nf_hook_ops to nft_unregister_flowtable_hook()
-    https://git.kernel.org/netdev/net-next/c/91a089d0569d
-  - [net-next,18/26] netfilter: nf_tables: Have a list of nf_hook_ops in nft_hook
-    https://git.kernel.org/netdev/net-next/c/73319a8ee18b
-  - [net-next,19/26] netfilter: nf_tables: Prepare for handling NETDEV_REGISTER events
-    https://git.kernel.org/netdev/net-next/c/104031ac8980
-  - [net-next,20/26] netfilter: nf_tables: Respect NETDEV_REGISTER events
-    https://git.kernel.org/netdev/net-next/c/a331b78a5525
-  - [net-next,21/26] netfilter: nf_tables: Wrap netdev notifiers
-    https://git.kernel.org/netdev/net-next/c/9669c1105b16
-  - [net-next,22/26] netfilter: nf_tables: Handle NETDEV_CHANGENAME events
-    https://git.kernel.org/netdev/net-next/c/7b4856493d78
-  - [net-next,23/26] netfilter: nf_tables: Sort labels in nft_netdev_hook_alloc()
-    https://git.kernel.org/netdev/net-next/c/6f670935b470
-  - [net-next,24/26] netfilter: nf_tables: Support wildcard netdev hook specs
-    https://git.kernel.org/netdev/net-next/c/6d07a289504a
-  - [net-next,25/26] netfilter: nf_tables: Add notifications for hook changes
-    https://git.kernel.org/netdev/net-next/c/465b9ee0ee7b
-  - [net-next,26/26] selftests: netfilter: Torture nftables netdev hooks
-    https://git.kernel.org/netdev/net-next/c/73db1b5dab6f
+Agreed it's quite ugly. It was done in the name of optimizing the page
+pool benchmark to the extreme as far as I can remember. We could use
+page pool benchmark numbers on this series to make sure these new
+changes aren't regressing the fast path.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+Thanks,
+Mina
 
