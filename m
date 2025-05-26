@@ -1,229 +1,194 @@
-Return-Path: <netdev+bounces-193398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 607C5AC3C88
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:21:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5670EAC3C93
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:22:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06EBD17569B
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:21:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FEE8174AE2
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EA11E261F;
-	Mon, 26 May 2025 09:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116741E47C7;
+	Mon, 26 May 2025 09:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K/RK9+gR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MCANz7P9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A6619DF8B
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748251304; cv=fail; b=SqZoLO8o16UH6zcznpFL3c/RDfBu/nwCMiPV3b3RwWov6PajTmA0n+iuLYLOvFlr1mLsxiaTVpCm5kinJqolR3Evg3CON/I/E0a2sXC64aFDA3tmEdBZt5Y0I93tg1gOLLAwe17SKwbvapUTF6SDCmI6C0zLKeeEICWcpZtyZ+c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748251304; c=relaxed/simple;
-	bh=n+bYBWOEf0NbZhbTCK2d64QuT6M9DLGpWJMHNFXl2Ro=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LPaZ09DjonS8boeNA6YCSGYn2n+1ipB10Pb4WTr9010EEMAYPG4Pm4r/keCe5hsbO/XAI+tTWQfDReY5qbT0cfGkFgMP6VsjpuyeGuF+2JZy+g0PIUyBBXPVoVhmvr/6srztU/aP8x7tywPZYI06RfNA4nTQL558koTLF0oqqxQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K/RK9+gR; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC541EF0A6
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748251358; cv=none; b=nn+e5sNYoRjEZqVKdnVT4fsXhw6z01E4NaQxI9u8Rp9XvaNaFJ4ahA8EixTtUjtYB38LQENoBpeDnHtehMv4kuoJlccSyBzGnX9CMMDwyfDG5DXtqGsmcZlwAqzc2vxUiGpx5sEqCEDRLvU7G8BrfKbwS/kAw3S3fiYQy4OhvAs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748251358; c=relaxed/simple;
+	bh=Kvfl2K0AGpUibx6yxr8eyF6+wHlRK1PTUrTrsumOftM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UwJW6s/TAHYgLT9zKTW+JmMwrxrHV1ABQhM2rIGuDMGN0DDjH87Q4Szuf2nSTFkowFy/rfeWl2+tSR3I5yTd+4Tc8vrV5LfUsRNDuk049yrux55pke4pGG307MnKujBQLune4xn8ZDeWYlI3LNeIf/Oc41wMZyMVibGJgJhRu6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MCANz7P9; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748251303; x=1779787303;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=n+bYBWOEf0NbZhbTCK2d64QuT6M9DLGpWJMHNFXl2Ro=;
-  b=K/RK9+gR+5AbzOkynY7eglNdfTh8IOaCsAu5rOv4nMS13cUy1yet55jd
-   XdgPuaURXx94/DAczTNfDKAmQIOMOJO2ivcgNNWGw6xiw8RWYzTv4vQxs
-   I5jzpMSAQoCDregiJTQswDrLSAk7s5zBTGux+FXgqrZXY9D4XjE0LuCi6
-   Qq+ZFQc1DJiCqttHAnaNqpAEu66euezq2AwUOzUAHfSqYjADqRKfwcuqc
-   vgBmaPT3hdjhJ3C/AHcAh5AsjN7O7ne9Yf6Zh0BLPLWTxj1Jmn98GaAas
-   agMTz3l0uXWPwP/K4QlkAZxdmKThtQ57tVx40bIiUGAah085j+qhFqxSN
+  t=1748251357; x=1779787357;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Kvfl2K0AGpUibx6yxr8eyF6+wHlRK1PTUrTrsumOftM=;
+  b=MCANz7P9rpYHDH40YAxn3cnH7p4BvQLpY03t6OM04C3V+5PzVueGrFLb
+   Dbq8z6fCYxVMeANHyl1CDS+GoweVQHV8PviUSiPiVk5263KUO8KgkquYt
+   kX72d+xhoR8RANduiAPWDl/BUXmRZIpG73ePN5472ME4zRcXdqNehtvV2
+   Et1mc3oIptbdJlEjZXTmm+s4jmXW9F/ExOD60ORRTNe9Szqr/+2/+vBXM
+   huMxBGTD0V8xt9GwiUzROswZ5ZqXZIOulcOMtMtuOvl7CVAXP861riAXF
+   Xsww2PhYRH4OTHb2XfcjpBuRsz4QCAupxfFgVG1oEVH1gpLsPmC1JcFA8
    Q==;
-X-CSE-ConnectionGUID: 2kBiTHJ2TbqVJ7NZSuis4A==
-X-CSE-MsgGUID: l0Aq/mS9St+d28mYRyxxNg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="50375697"
+X-CSE-ConnectionGUID: w+GBn/ASSQe31QiRSZCQdQ==
+X-CSE-MsgGUID: /mi7ue5BT2m81S/v9fwvwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="50101229"
 X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="50375697"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 02:21:42 -0700
-X-CSE-ConnectionGUID: UVcThzApRaCWkgf9LJmE/g==
-X-CSE-MsgGUID: zA5rvSx9TNiBuOdE3MEdQQ==
+   d="scan'208";a="50101229"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 02:22:26 -0700
+X-CSE-ConnectionGUID: NMfEL1aMRXa0AQunRHb6gQ==
+X-CSE-MsgGUID: zZ6XwOijSGSfLhL0sRAwqw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="147056759"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 02:21:42 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 26 May 2025 02:21:41 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 26 May 2025 02:21:41 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.40)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Mon, 26 May 2025 02:21:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=K6+qZUKbtssGMgT3/PgnTb6aabgmxddXlFkNjRVgqQe+O9wNzG4qUA8YZ+idAOHjfF5vLqY2CsKhGwC94l+oDt9JrC8qYF5GhIt5D6qlh8mhLVYonVYL/feesE7hOwN72RyJcpwui7a+4nhuHzlsGf2wAV3JVMGblUaC173my/zSnFqknMcJIAtTq1+5f3KkzWYPg1hjp6E5PQHP90VRy2eGRzDrk/g7dzwh4MaDnCTOBaj1aj2m2tZut9/wGjPs0dlV47jPPMTwjUwxwq6mstmywcF2OJmQWRrg4qWVrbNhk4oAKqHouS9VsBKMEGqv27LgERnfHPvAjIJTNb0RwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LeHncI9SAMWezTkFy/byYTZVyJBfaLrGsFkCO95a96Q=;
- b=GtjSLT5W8sfM7kjKE3iYc+Vj3k586ArWD4AhquTRldh+UPxFb+ZpehYOOP9YKopglz7QiwE1aB8wb9jVxnk1HGAVKRPeOBSEvaRp5dN0gAd5a1PiCo4Usb2JJ+ys7jgJXdDz1mDZ7q7E9DaXbFbPZWmBaZ6lca5hP0qHNzt517SSojfJlURFyPCSKkRyfZuelygq2k8Vh5uBafc/+tNU7kHk85rWBXS4B7cqc7ci0VX9iw+6lwRMmr6+KbQO1JqVNNWGcS6jnqKo3TYpIsELTEmlVSCXUejRwG2JBk618G8e0VRKdwN00cScPeP4N26BxNVLmlFN783Sx4VrYnHvHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5934.namprd11.prod.outlook.com (2603:10b6:303:189::7)
- by SN7PR11MB7993.namprd11.prod.outlook.com (2603:10b6:806:2e5::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Mon, 26 May
- 2025 09:21:39 +0000
-Received: from MW4PR11MB5934.namprd11.prod.outlook.com
- ([fe80::96ae:ce0:2a38:7408]) by MW4PR11MB5934.namprd11.prod.outlook.com
- ([fe80::96ae:ce0:2a38:7408%6]) with mapi id 15.20.8746.030; Mon, 26 May 2025
- 09:21:39 +0000
-Message-ID: <d53c8ad5-069a-4e5c-8dc8-3b2d8618b510@intel.com>
-Date: Mon, 26 May 2025 12:21:32 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 2/5] igc: convert to
- ndo_hwtstamp_get() and ndo_hwtstamp_set()
-To: Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Jacob Keller
-	<jacob.e.keller@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"Przemek Kitszel" <przemyslaw.kitszel@intel.com>, Vinicius Costa Gomes
-	<vinicius.gomes@intel.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>
-References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
- <20250513101132.328235-3-vladimir.oltean@nxp.com>
- <20250516122611.GA3339421@horms.kernel.org>
-Content-Language: en-US
-From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-In-Reply-To: <20250516122611.GA3339421@horms.kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0029.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::19) To MW4PR11MB5934.namprd11.prod.outlook.com
- (2603:10b6:303:189::7)
+   d="scan'208";a="173191296"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa001.fm.intel.com with ESMTP; 26 May 2025 02:22:22 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1001)
+	id 19E1E165; Mon, 26 May 2025 12:22:20 +0300 (EEST)
+Date: Mon, 26 May 2025 12:22:20 +0300
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Ricard Bejarano <ricard@bejarano.io>
+Cc: netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Message-ID: <20250526092220.GO88033@black.fi.intel.com>
+References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
+ <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+ <20250526045004.GL88033@black.fi.intel.com>
+ <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5934:EE_|SN7PR11MB7993:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e2cb316-42cc-46c9-f1ed-08dd9c36b7ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VXI5UHBBN1htaTRuanpQeTdZREhDcEhRWXZoVVdLeHlUNGFCZEkrbk4xWjJj?=
- =?utf-8?B?SzRXZ3VjOWFRd2FjbEpoZzJjU2didEFiOFZ5bTV1WFE3dmNBRkQvd0JFdVlz?=
- =?utf-8?B?UndEc3dyZHRDNW9OYWtCc0s1dEY4MjNxenRzdXJ4cE1lWnE1QXV1T2c3eDlx?=
- =?utf-8?B?dS9TMGRUTFB5MTdqbWJyb3RQak5yZW1oY2F2YUprZWFsbzhZVFZaL05zQ1k4?=
- =?utf-8?B?YmRGODhnUlMyeHdUQmhxNXNpbWt3dkVBNTgyTVNEVGp1aHBXcFZBQVd1WHVL?=
- =?utf-8?B?ZGx5Ni9jZ1VOSjhxY3RFV2NEcUx5N3ZuVDVKQTJsRXVKa2xmVkEzVi95cUdR?=
- =?utf-8?B?QTZObkpjSVZnYStXNm0rbHdwMmNTbk5WUk1JWlljMXN5ZUlGbHlFODdMS1Z2?=
- =?utf-8?B?QlVqVXIxTVp0RjcweHJnU2lVSDQ0bGwyVlJjc3AzQ093aHM3ZG5ZaEFyTUN0?=
- =?utf-8?B?U1N5SzBsZGFjRHEzUld1b0FtZVhpWGRiYnVRdTBiU3lGdStUc1lmbFNtU0lB?=
- =?utf-8?B?OW5LQzVrNWhaa3FPWGZPdzVZdjVESDU4cDR4aHNqTjJoeTRlVmZiZmxSbFFv?=
- =?utf-8?B?RTd0d1ZDTzlLTzRxN1gyVnhRUllCZjhtalJtNDVQUjk1VlpYSDlLY1UvZHNH?=
- =?utf-8?B?NU5qdDNoRVRxdVQxSjk4SnlVTlAzTHhiWVhPWXZuTllqOTlTUVphWHo4NHF0?=
- =?utf-8?B?YjJUYmI2VG9kK0VpUURyOTYra3VpOVVNMmFjRnh0SzNQWCsrZ0Ftc0g2L1A1?=
- =?utf-8?B?bEsvOFMrYTFjYUx1YWMzQXk3Q1lFTWJuWU5UVHJZL3draUpUZVlITGhQQStx?=
- =?utf-8?B?VFN6NkdhclJRa3V0U01yMTdlalk3THhEeHFMa2l0WU9ueHFobUxWRW1Rei9M?=
- =?utf-8?B?cDRZbHRYekFPWGhOcDk4TzZyQ2Q4a2s2K0lDWkFMRU9FcHJqS0txdzY1SzRz?=
- =?utf-8?B?aGlhQnBrNFBrS3huWTBuT1ZZM011NzF6VjFkTVFmZmd2azZwWTFQMWs0V2FL?=
- =?utf-8?B?eWsyNW1GUDd1NkVYajBkbEE1YmhNdEpEd0J5WjJYa2ZOWGowazFtL2k1cDVr?=
- =?utf-8?B?VWJTdXFDVHdwSXlRTDFtMkRWREwzT2o3UGlKd3k0SlpWYUp3ckVuOXZQbWFU?=
- =?utf-8?B?cU1Oc1FWMWsrUE1lRDNVeW5kemdaSktqNlo0dE9mMTU5YVhhbVFkUTAvQU8y?=
- =?utf-8?B?emNxeTI5YlV6U25JcUZxQ3VaUVA3bFF5WkVNTUt2Uk13THVBcjRnbmRSZ3Jo?=
- =?utf-8?B?NEx2UlE3Y1NBNUZITXpDUnVXemUveWJ0US8wN2ozcWNseEVIbVE2ZjVBdDRk?=
- =?utf-8?B?cU1yaCtpRHUrcWg2NE1FRXhsTWNqK1VGaFdOUEVpbStraXJQV2tiS2xpNDFY?=
- =?utf-8?B?OXpnYm9oRjZSeWtOSzZLNEpyTi9Ga09kN2lia2dvVmN6cGpZRERCaW9pZmR6?=
- =?utf-8?B?MVJKOXMyOGgrRkxmd21RdVIrdDdJWmF1cVdaYjBML0RSK2ZJaUREZG0xczZw?=
- =?utf-8?B?eGpDblhWbWFIN3FENHBxOTFkSWpmQmV5NHU1RUh5MEh2djl3dnp3bU9MTXp2?=
- =?utf-8?B?ZGtqdEZvZVZIVlkzTXM1TU9zc1o4TGVLZHFCY3NrTmI3d25xcDZXbjc5L1Fm?=
- =?utf-8?B?Vi9BTkFvMDRSQi83eHJ6dHhVSG1vcHoxRUFOcW14cEhLeGFNTFZWc0pBY201?=
- =?utf-8?B?Q256N3FJb2QzQnluSVdubGVPVU0zQjVXWEQzaVdBdzFSQ2RQaDkzZ3h3eWNL?=
- =?utf-8?B?MXVodUZaOXFZRTVBMTFwNVd4SlZrM2tHMTdwbnB3VWgwSTlhcGNrZFNDOVRx?=
- =?utf-8?B?cXloODdzK3UzSnlDMmg2VUtxU1ZKMSsxMSs5VGdTYkpkeXZOSkZsTHFMWE5Q?=
- =?utf-8?B?aEYwTW1SalRQYXFYaHdWbmtlajg4WU9sRXNwU2Q2ZGowcWRVb01ZTWRuQmZp?=
- =?utf-8?Q?ckANNIJjDYU=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5934.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RFVEQWhpNDl1RHBPdVJHbGNlMW9BNUR3cmh4RGR2R3hwaWk2d1l5RWNidExo?=
- =?utf-8?B?OUlFUDcxS1lISVY2TTlyTnNVaVNKSHZCVVZ6ckt0NHJjZzlVQlpjM0ZLSm9x?=
- =?utf-8?B?SmVTeExadEJickZPREdOeEYxNisrdTMyZFBmYk9WRXJ3Nk1QK1VZT1pIQUhQ?=
- =?utf-8?B?OWNrbGh0bFlGelNPRkxOMjhxK2R3QVlBWFQrR3IzalRBM3dhL2Fsay9aT1ZG?=
- =?utf-8?B?ckVKdm53ZnhqYXBPa0JYbE1xUzBNUmRLcUVxdU13ck1nVXJRVmtXUW54M21Z?=
- =?utf-8?B?UGoyUFU1QVhDUHVoa0FoZWFuVEtTdm85VGZvTmt5OEl0dzZwaXF3Rml2WmRT?=
- =?utf-8?B?eS9NMmZDKzBJdlBoU1RQZU9NNytZUCtWejBzcE1YT2h6YUx3Nkp2aVlhd2Q2?=
- =?utf-8?B?TERDTnBJcEZhTDBXcE1xUzRERS9SR0cxNDVsQ0FMRXlVSzV2R2ROVjJvWFBl?=
- =?utf-8?B?R0wyY2hwT0dUZkQ3Q1VBSk9Qay9yeWxMMVJhZzVLR3NlYUpLaWNFTS8zOGta?=
- =?utf-8?B?OHVHd2JTSVdpRWJUZW9nZjE5ejhrUXQrV0V4NW96UDNlR2p1djdaSVEwRkFz?=
- =?utf-8?B?NmFYSUEwSUtpRlRmWVZIc3d2eENQT1Y0K3U5emREaXlnOU0xUmRxWXFYUk95?=
- =?utf-8?B?aEFwZzlibHF6SHVIZDYvd2NyY2l3V3BwMlBuUUhYOTR5K2ZwRXY2M0RKem0r?=
- =?utf-8?B?elViQzNUYkhyYlBTTDRzaTBkQ2gyY2dqUmtKbnBhQUdDTkRqS3d3R1FHNUp6?=
- =?utf-8?B?NEdMSDNFOWlzaWxlZkJ4RHZzV0NaZ1lDc2ZDWmdqVzg4YjhFQnBYZTJPaENV?=
- =?utf-8?B?THlZY2Q2V0tHOUtTQnkzdnhHT3hNV1hVWW9sUW8vVUdhdFRyRkJHT1pIKzFj?=
- =?utf-8?B?UlhtRVVmU0xrMjh6eFNGL3o4WDhsMW83a3N0ZVdiVjBvWUxxRzlSMkdoekFH?=
- =?utf-8?B?aElOUTlCbWpxVUkxQmRJdGlia055ZlAvbmVRSE9BbGM5U3g1ZE9ZckpiLzRi?=
- =?utf-8?B?b2l1czNXenNyVzNLT1dpQ1A1RlVxNUQyK2l6ZU56eWJ1bHNXTkxVTi9xOTQw?=
- =?utf-8?B?Q1l4M0Y0V3Z6TE9TMVdLMTJxeWtueXFrMyt5OFlqTC9nOFRucjg3N2NjWVY4?=
- =?utf-8?B?dE9vdkx4cExYUEpxK2JGUFlRWnFVSXJldWtxSndNSk0xUkRwZG1lS0JUa1NK?=
- =?utf-8?B?c1U1ZUJ1S0NQNUozUkRraC9EZ1EwSXV3NTdsNEV3dzdJV3lCMkVTTjA4cWNH?=
- =?utf-8?B?dGcvdnlXSmdxZjZMUlBTam1QVXFjNDJOQlZ1elRncmZOalNLOHVncHpERnVZ?=
- =?utf-8?B?Qng4VkhUVEYzUUZkUE5leXl4MDlCZEVQWWlzMFNCL3Brdi8xY0ZTSHRqL3h2?=
- =?utf-8?B?anUxVXFCQnFVRlIxWXo1aTBGUWhyMHpJV29QVFdwbWorWElzeGRMQWpXRkVW?=
- =?utf-8?B?UVE4UDJvNFpyUk5WbjY5RURWVkhkbERCYm9WRTMwMkNYTkNlS2xGRmlkWGgr?=
- =?utf-8?B?RzVBaW93MnB5YStWWXdoOUZkTmRnZ25ySmo4ZHIyYjc3RkZMa2s5VjA1V2dP?=
- =?utf-8?B?Wk5oZ2JUa252MGYrQ3FvWTI4bHkvaEhRZmpxSmxPbks3dW9XeUtqbEE2ZUcz?=
- =?utf-8?B?SVMxNnpYMWRZaTZaZ05LLzJYTEM4bFAwMnorZ3NQVmJUbUpMMDVzTmdYdith?=
- =?utf-8?B?eXFmcEx0UlovMUtLOGNpdzRlVkJ5dGlBUVVxSHp5TEZwcVhRZzJyN2JTUlhJ?=
- =?utf-8?B?RFNOeU11WmJzZ1lqa3Q0QWowYzJiR2hRcFZPWTFBcDZ3Tk9pdVlBRS9OYjZs?=
- =?utf-8?B?NGIwb1Z3aEJuMUhFcUl6bVpzdVVXM281aGN5ekhhOVArZ3NKM2dqZmJuOTVx?=
- =?utf-8?B?ZkN0U0V1cTB2UUlpSkZ4WXZUVFBjTFRZWlJDak90eFNFNXZwSEF5OWJBSFZ5?=
- =?utf-8?B?eVpxOW1wL0xlSzNHZzB0QjRJNFpjcDVlbmlMRGhiTFVZWGthZTVNcXp2c1Yy?=
- =?utf-8?B?QVh2cTgyaGFDbi9qcDc5eXVHZHRGcDJpMEJSdDFxK21xWEUxZFpKbjgwTGdl?=
- =?utf-8?B?UDRKSUdNOXlNeG9pVlB3dmRDLzBDakNva1M3dlladHRNVTVrL1FreHMrenUx?=
- =?utf-8?B?QzgwWllGd3FibnZ6YTlpQkZlMnBmbHMxUGk4VE1rSXN6YWZPTmRSS2NqTlhw?=
- =?utf-8?B?NGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e2cb316-42cc-46c9-f1ed-08dd9c36b7ff
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5934.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 09:21:38.8876
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fVu5NPJd08LgyMIOOn3ks/7wbC1OQlf6t+1ZPaA19yCBUXU6IItH8hnqiZyAtG7ahfbkOqGc2Ha7zWlGjgHbGswnleSytDHEkYswqp3JCKk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7993
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
 
+On Mon, May 26, 2025 at 10:50:43AM +0200, Ricard Bejarano wrote:
+> Hey, thanks again for looking into this.
 
+No problem.
 
-On 5/16/2025 3:26 PM, Simon Horman wrote:
-> On Tue, May 13, 2025 at 01:11:29PM +0300, Vladimir Oltean wrote:
->> New timestamping API was introduced in commit 66f7223039c0 ("net: add
->> NDOs for configuring hardware timestamping") from kernel v6.6.
->>
->> It is time to convert the Intel igc driver to the new API, so that
->> timestamping configuration can be removed from the ndo_eth_ioctl() path
->> completely.
->>
->> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Yes, these are 8th generation Intel NUCs with Thunderbolt 3, not 4. And yes, the
+> cable I have used so far is Thunderbolt "compatible" not "certified", and it
+> doesn't have the lightning logo[1].
 > 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+> I am not convinced, though.
 > 
+> Part I: Thunderbolt 3
+> ---------------------
+> 
+> I first ran into this issue a few months ago with a set of 3 12/13th generation
+> Intel NUCs, each of which has 2 Thunderbolt 4 ports, directly connected to each
+> other so as to form a ring network. When hopping through one of them, bandwidth
+> dropped from ~16Gbps to ~5Mbps. Both in routing and bridging. These 3 NUCs are
+> in "production" so I didn't want to use them as my test bench. They are rocking
+> "Thunderbolt 4 certified" cables with the lightning logo[2].
+> 
+> I could justify running any one of the following disruptive tests if you think
+> they would be helpful:
+> 
+> Note: A is connected to B, B to C, and C to A (to form a ring).
 
-Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+I suggest keeping the "test case" as simple as possible.
+
+Simple peer-to-peer, no routing nothing. Anything else is making things
+hard to debug. Also note that this whole thing is supposed to be used as
+peer-to-peer not some full fledged networking solution.
+
+> 1) Configure A and C to route to each other via B if the A<->C link is down,
+>    then disconnect A<->C and run iperfs in all directions, like in [4.6].
+>    If they run at ~16Gbps when hopping via B, then TB3 was (at least part of)
+>    the problem; otherwise it must be something wrong with the driver.
+>    I am very confident speed will drop when hopping via B, because this is how I
+>    first came across this issue. I wanted nodes of the ring to use the other way
+>    around if the direct path wasn't up, but that wasn't possible due to the huge
+>    bandwidth drop.
+> 
+> 2) Same as #1 but configure B to bridge both of its Thunderbolt interfaces.
+> 
+> 3) While pulling the A<->C cable for running one of the above, test that cable
+>    in the 8th gen test bench. This cable is known to run at ~16Gbps when
+>    connecting A and C via their Thunderbolt 4 ports.
+>    While very unlikely, if this somehow solves the red->purple bandwidth, then
+>    we know the current cable was to blame.
+> 
+> These 12/13th gen NUCs are running non-upstream kernels, however, and while I
+> can justify playing around a bit with their connections, I can't justify pulling
+> them out of production to install upstream kernels and make them our test bench.
+> 
+> Do you think anyone of these tests would be helpful?
+
+Let's forget bridges for now and anything else than this:
+
+  Host A <- Thunderbolt Cable -> Host B
+
+> Part II: the cable
+> ------------------
+> 
+> You also point to the cable as the likely culprit.
+> 
+> 1) But then, why does iperf between red<->blue[4.6.1] show ~9Gbps both ways, but
+>    red->blue->purple[4.6.3a] drops to ~5Mbps? If the cable were to blame,
+>    wouldn't red->blue[4.6.1a] also drop to about the same?
+
+I'm saying two things that will for sure limit the maximum throughput you
+get for a fact:
+
+ 1. You use non-certified cables, so your are limited to 10 Gb/s per lane
+    instead of 20 Gb/s per lane.
+
+ 2. Your system has firmware connection manager which does not support lane
+    bonding so instead of your 2 x 10 Gb/s = 20 Gb/s you only get the 1 x 10
+    Gb/s.
+
+It is enough if one of the hosts has these limitations it will affect the
+whole link. So instead of 40 Gb/s with lane bonding you get 10 Gb/s
+(although there are some limitations in the DMA side so you don't get the
+full 40 Gb/s but certainly more than what the 10 Gb/s single lane gives
+you).
+
+> 2) Also, if the problem were the cable's bandwidth in the red->blue direction,
+>    flipping the cable around should show a similar bandwidth drop in the (now)
+>    blue->red direction, right?
+>    I have tested this and it doesn't hold true, iperfs in all directions after
+>    flipping the cable around gave about the same results as in [4.6], further
+>    pointing at something else other than the cable itself.
+
+You can check the link speed using the tool I referred. It may be that
+sometimes it manages to negotiate the 20 Gb/s link but sometimes not.
+
+> I've attached the output of 'tblist -Av'. It shows negotiated speed at 10Gb/s in
+> both Rx/Tx, which lines up with the red<->blue iperf bandwidth tests of [4.6.1].
+
+You missed the attachment? But anyways as I suspected it shows the same.
+
+> How shall we proceed?
+
+Well, if the link is degraded to 10 Gb/s then I'm not sure there is
+nothing more I can do here.
+
+If it is not the case, e.g you see that the link is 40 Gb/s but you still
+see crappy throughput the we need to investigate (but keep the topology as
+simple as possible). Note in this case please provide full dmesg (with
+thunderbolt.dyndbg=+p) on both sides of the link and I can take a look.
 
