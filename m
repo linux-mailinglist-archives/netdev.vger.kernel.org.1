@@ -1,168 +1,207 @@
-Return-Path: <netdev+bounces-193411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B960FAC3D58
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:53:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C1FAC3D64
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:54:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7695F3B8DE7
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:53:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B237A1707FB
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360861A4F0A;
-	Mon, 26 May 2025 09:53:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A451F4295;
+	Mon, 26 May 2025 09:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TfYnXwRb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8ceGO8y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4572566
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A66D2BB13
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748253201; cv=none; b=SkOTk4HlBUcdfiwDVQo3J4GUj6F6DgF1yDpUwO4AbfbCb7BA/eeZM8WVUQYYrJXWFelZ72VvGeVJSZYdbbHyWP6OSH4x5lDtxxxtrRVilwi03DAH6ZVeGQgdM+VXNuGoSA/h+piSEsslyGTVPSZM5zYo10FSZWH8MwVeuajXZiQ=
+	t=1748253282; cv=none; b=rOlWSYM+CBmqcK2ZWvKVw345ayaSmGF2m24sKq0oVpMl7snkBfOHZ5lcHv4liQ2kN0Q6Wpt5teSUbFW0Js2vQ9TjW2nbooRSMjfJss+Vv+OfBB8tSZIEDEJqtiaPz2ka7dQ+DUZkTgcrtpD/MT6PPZWRKWRAa6sEeIYGMQjYrr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748253201; c=relaxed/simple;
-	bh=e+DfFhgOBSJtuw2zo2ARXXf8M66qPnicImFZ8qM8/WI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YvWgko6BA4edush1HZdLiz7vCmNzaqlO5PO6xO+MXFDTvD+zZY7A0MYPO2yxDIQbgEHxCzYtao1NYRHrt7ixN44ihnhRx+ph/6vo6q3ri2+i9VzbfJOMJhZP54H3tthD1OIeyWMZSRMwC8XDoFT7Aq0nZSY65Umzs1/FXjXbArQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=TfYnXwRb; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-441d437cfaaso12185105e9.1
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 02:53:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1748253198; x=1748857998; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvtjkWTFpxX0l5YExlhc5815tcEgJnDVqTj5UPyY0DU=;
-        b=TfYnXwRbCjJRJWOiET0G54ldzbfnJ+VLyBlhAOtGMFSfYlRjchPkQh25KnueRhEtSp
-         zsgrLxtNS/OBTmGiWXfBBhV0tNL01gI4prP06NvWbVF/O8fLGeN9H5LZaYGfnD80zB72
-         PWrZUOm8Ji+JxQ7NsvDPuY5rn7GiNIPkc8OMHO5TY3UKJSNWl7AlyA0JFokfbeQ0hu9Q
-         1KzwXyM3Mmb6gR+IRn40pGF9XyzFuzvL9Nux5tnF+5nYrUGfZ6woVvgQehzmQEvUMN68
-         uN7vNueqiq46fg8yvXCbsCf/3GWwuyXXaLALi2L6cNldjmnRlxseL8CslJgy5KRMYE1A
-         pt/g==
+	s=arc-20240116; t=1748253282; c=relaxed/simple;
+	bh=kD211Oy2EHW/gbr+iQCEUkM/lwARmu9Fp6jVXRBFF74=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LAQNyQ1OzzWG97GH3AF/5pRQtg5yMPaKkGLDZRTVNi+zHNJxLz9w5H0FsI3LANu6oabFFhlhOyI7Nx2prvdlG5FVqoyVAj4KeGoYL9EZL5CSzxKmeCIT/oj/nJZ8wO7q3ieV9AX6KhhwN+RbHLCmLyNx0kGn2vsmGQxYLDmnrro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G8ceGO8y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748253279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rbkf5SXMEt07fFLjzJMCpshPrtgBoRho3TpNiZRvX78=;
+	b=G8ceGO8yUeTK7smI23EMaY43TYqWTOrYshsnH5WY3crGjAbIsg8CXkVEtRRNBR5si6UmWa
+	WawQTibg5vQQjJHSda1vSfQOtFMgTz8LbLgcSsxRAazRZmDjnasN4c4lG3Q6rmE5/FqKd6
+	tu0tN0pXS/0pcwmcH/7xj1cC1QRGPdo=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-440-Hb0TeZ5fO_unNf6-jQ4CuQ-1; Mon, 26 May 2025 05:54:37 -0400
+X-MC-Unique: Hb0TeZ5fO_unNf6-jQ4CuQ-1
+X-Mimecast-MFC-AGG-ID: Hb0TeZ5fO_unNf6-jQ4CuQ_1748253276
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5520a19daaeso942162e87.3
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 02:54:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748253198; x=1748857998;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WvtjkWTFpxX0l5YExlhc5815tcEgJnDVqTj5UPyY0DU=;
-        b=Gs9FqwbRtsBw7NISgvKST5lczd7cRI54fQNoCnFK/4aJyBstFyUiWAQ0vNsj8JQyoH
-         9Djxi3VeumMiUovZEYyCrdEKkruuxYc8Qdr5zQh8xGYdyO/nnTqmVPSWZ66VHo8HUe39
-         SNOpt5ZyvfCOB+i+gc1slcNfmX5PEUErKLXtJBWpHQQY+5Zml/jg6I5vL7tqaWVaUW1n
-         EmwkMi4O5x991Od+W1ADP9m2mFOJZqRiVayl8mko5Gc0zq7MYSg4caT3MvZO3A4Jr1Gn
-         G8dDOfdoICwIXBwPaupSnGLaqcjAiYCOfxFj1ha+W88gQfIhKgATrqYB91w38vrR+hnt
-         z4lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUamj5o9PEyTJJl8uTMPwngvCCDaB6qmdmjlNzSNqDQY+3g5TZOnLlnJOy1renZoLLn1uO9Gd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkG1U9OwSFJP0VUin4zcFZ12s4FgyVRAoKmJztFlzltj9RWC0E
-	YVZEbkaHMPVd8XAaUHQZ7rz8+9GEGYUAMqVjw0FOlH0LIXtqc91QmUpPFWrECAfc9hI=
-X-Gm-Gg: ASbGncsc0OuaQFPIYjl9Hcz/DgCj92OAHLXxOSSiOPItPq0MC7rH2oziR/F3V6qqEVw
-	NXxMzT57D/LbzeREGai8Ep0+T0E0yrsWzZ0dFuh1j2bwhFLUV9YSh4SPb22DUXLNzLxIkUGPa7R
-	EqrI6tNRU6qZkQRRVagtx2rxv/kYm9r0D1kWPsLDGLnJkl/oWFxnQFbHeNR3SNTSQeji0YFmB5z
-	E2ZdZuU6uspPb4ZhUYe4GxCFvG0Ci36jQjE5HTs/rvf/zjO02s+xZ/ODM+718Yn2XvzibD3+dmu
-	Da0Qep+FMxAf3b/n9rp1z7yEOoSV0073zGb+eZENYqVVflUiCAAm7hIU4WnYY/3+KbTtG0If9bS
-	B7Q8oIhp38M0eBw==
-X-Google-Smtp-Source: AGHT+IGnGKWV9KxYKawiemLctSpzuHD3Soaf9JzsXUDImngcbBtPIcnV5dWSUtTd1jWAfxc854Aqag==
-X-Received: by 2002:a05:600c:64ca:b0:43d:46de:b0eb with SMTP id 5b1f17b1804b1-44c935dcaecmr68966865e9.12.1748253197720;
-        Mon, 26 May 2025 02:53:17 -0700 (PDT)
-Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d25b8sm238460235e9.17.2025.05.26.02.53.15
+        d=1e100.net; s=20230601; t=1748253276; x=1748858076;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rbkf5SXMEt07fFLjzJMCpshPrtgBoRho3TpNiZRvX78=;
+        b=lO4wmM4micLOF9iGE+FrkfwKYfLDI3yoxuMSw+CzWclbqX3X8iSoU0lsMTDqzEC8bG
+         V+YnhGqHeuU+tvN78HEn3rYvp2Ddm2RUqcRGdBaanPNn+RvdIZQszmaHiNQH8v0+fAoy
+         vL1tFRYrI0zoSRfcqjn8IJFzB8IRYyUJMVGY85XAeZD9v0htfFHr7CP1H4CghB90xYvY
+         yE/I70pCK4xzSbATBUk9EXHrAUx7haWjtyLV6b22/8DmRvV4pGXVWBFYf+BHCWmq5NZS
+         vYDTVCJEYZd8d7jdU/ac7uz5aGmuETuFtUCluDsdiD18v9QNfWneE/lxN1+Lkr9WC9+R
+         EWwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaz90CcoJxaW9hmd0EQcwSoHLqNIbs+lyC4xf1PHfc+k6QK4O8jIehxXm4i5jMEGUgoloAFk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWBvYNmxGOspfjR35llA0UHcXfbK7AxUez6xxlfeiB35zRqleF
+	+oRCUbYJWyVQhFrICYmNmmDRYIaTyt9moWZtmyDaBzZVOr+MXEdycSuylx0gj/PRo8Q/iHKkVrf
+	ApkjQheM+40tY01H3XkptSGqNaOnUA4J0SHm5PmWb6QeuXJ7ZBn+WMkdz2g==
+X-Gm-Gg: ASbGncteGGKhUd1B+39B412+DDwPuFUy8VzMtKYqb+n6zn1NCaga5kFEINElCsNbD0r
+	Df0p2neWPk/ZBeRu8vqhh0JCHE/lTiqhmWURQVbYdU70FrPMEBOM4h7PT305I7gxVyahaQWl9PQ
+	SoFI1wXKx8VSF/jKHjjWjvoEDxgvY7XkgDE00+Dnw3cmuryI98+yASMhyKpmenba+K7fhECETHt
+	VWfvy4UVSjCf37fipfllj/6M4rHgw2aGdnhMKX3CoBPhTzgwwtGnHIJGNhtLXo8dO9hxDEdBzmZ
+	cEqKf4V9
+X-Received: by 2002:a05:6512:4150:b0:552:20e1:ee25 with SMTP id 2adb3069b0e04-55220e1ef6amr937494e87.55.1748253275974;
+        Mon, 26 May 2025 02:54:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFkPECe1NVeXWiPUcDqM4DGhgBrZ5f5uYScFTI8314epzyCSBb2KXwKVqpiQCkibcuen2wvqA==
+X-Received: by 2002:a05:6512:4150:b0:552:20e1:ee25 with SMTP id 2adb3069b0e04-55220e1ef6amr937461e87.55.1748253275480;
+        Mon, 26 May 2025 02:54:35 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5532503cd79sm84170e87.207.2025.05.26.02.54.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 02:53:17 -0700 (PDT)
-Date: Mon, 26 May 2025 11:53:14 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>, 
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, 
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, 
-	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, 
-	"Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, 
-	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>, 
-	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, 
-	"Bernstein, Amit" <amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, 
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, 
-	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
-	Gal Pressman <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH v11 net-next 0/8] PHC support in ENA driver
-Message-ID: <jdkiblbwiut4x7t7gtpiatdbiueehvhuqdhn5caoj2ijiil2yr@6xof3oyhruxa>
-References: <20250526060919.214-1-darinzon@amazon.com>
+        Mon, 26 May 2025 02:54:34 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id BF6291AA3EFC; Mon, 26 May 2025 11:54:33 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Byungchul Park <byungchul@sk.com>
+Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org,
+ harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+ davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+ asml.silence@gmail.com, tariqt@nvidia.com, edumazet@google.com,
+ pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+ surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
+ page->pp_magic in page_pool_page_is_pp()
+In-Reply-To: <20250526094305.GA29080@system.software.com>
+References: <20250523032609.16334-1-byungchul@sk.com>
+ <20250523032609.16334-13-byungchul@sk.com>
+ <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
+ <20250526022307.GA27145@system.software.com>
+ <20250526023624.GB27145@system.software.com> <87o6vfahoh.fsf@toke.dk>
+ <20250526094305.GA29080@system.software.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 26 May 2025 11:54:33 +0200
+Message-ID: <87ldqjae92.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250526060919.214-1-darinzon@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Mon, May 26, 2025 at 08:09:10AM +0200, darinzon@amazon.com wrote:
->Changes in v11
->- Change PHC enablement devlink parameter to be generic instead of device specific
->
->Changes in v10 (https://lore.kernel.org/netdev/20250522134839.1336-1-darinzon@amazon.com/):
->- Remove error checks for debugfs calls
->
->Changes in v9 (https://lore.kernel.org/netdev/20250521114254.369-1-darinzon@amazon.com/):
->- Use devlink instead of sysfs for PHC enablement
->- Use debugfs instead of sysfs for PHC stats
->- Add PHC error flags and break down phc_err into two errors
->- Various style changes
->
->Changes in v8 (https://lore.kernel.org/netdev/20250304190504.3743-1-darinzon@amazon.com/):
->- Create a sysfs entry for each PHC stat
->
->Changes in v7 (https://lore.kernel.org/netdev/20250218183948.757-1-darinzon@amazon.com/):
->- Move PHC stats to sysfs
->- Add information about PHC enablement
->- Remove unrelated style changes
->
->Changes in v6 (https://lore.kernel.org/netdev/20250206141538.549-1-darinzon@amazon.com/):
->- Remove PHC error bound
->
->Changes in v5 (https://lore.kernel.org/netdev/20250122102040.752-1-darinzon@amazon.com/):
->- Add PHC error bound
->- Add PHC enablement and error bound retrieval through sysfs
->
->Changes in v4 (https://lore.kernel.org/netdev/20241114095930.200-1-darinzon@amazon.com/):
->- Minor documentation change (resolution instead of accuracy)
->
->Changes in v3 (https://lore.kernel.org/netdev/20241103113140.275-1-darinzon@amazon.com/):
->- Resolve a compilation error
->
->Changes in v2 (https://lore.kernel.org/netdev/20241031085245.18146-1-darinzon@amazon.com/):
->- CCd PTP maintainer
->- Fixed style issues
->- Fixed documentation warning
->
->v1 (https://lore.kernel.org/netdev/20241021052011.591-1-darinzon@amazon.com/)
->
->This patchset adds the support for PHC (PTP Hardware Clock)
->in the ENA driver. The documentation part of the patchset
->includes additional information, including statistics,
->utilization and invocation examples through the testptp
->utility.
->
->David Arinzon (8):
->  net: ena: Add PHC support in the ENA driver
->  net: ena: PHC silent reset
->  net: ena: Add device reload capability through devlink
->  devlink: Add new "enable_phc" generic device param
->  net: ena: Control PHC enable through devlink
->  net: ena: Add debugfs support to the ENA driver
->  net: ena: View PHC stats using debugfs
->  net: ena: Add PHC documentation
+Byungchul Park <byungchul@sk.com> writes:
 
-Could you please add very simple devlink_port instance of flavour
-PHYSICAL and link it with netdev? Having devlink instance without the
-port related to the netdev looks a bit odd.
+> On Mon, May 26, 2025 at 10:40:30AM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
+n wrote:
+>> Byungchul Park <byungchul@sk.com> writes:
+>>=20
+>> > On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
+>> >> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
+>> >> > On Thu, May 22, 2025 at 8:26=E2=80=AFPM Byungchul Park <byungchul@s=
+k.com> wrote:
+>> >> > >
+>> >> > > To simplify struct page, the effort to seperate its own descripto=
+r from
+>> >> > > struct page is required and the work for page pool is on going.
+>> >> > >
+>> >> > > To achieve that, all the code should avoid accessing page pool me=
+mbers
+>> >> > > of struct page directly, but use safe APIs for the purpose.
+>> >> > >
+>> >> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
+>> >> > > page_pool_page_is_pp().
+>> >> > >
+>> >> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
+>> >> > > ---
+>> >> > >  include/linux/mm.h   | 5 +----
+>> >> > >  net/core/page_pool.c | 5 +++++
+>> >> > >  2 files changed, 6 insertions(+), 4 deletions(-)
+>> >> > >
+>> >> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> >> > > index 8dc012e84033..3f7c80fb73ce 100644
+>> >> > > --- a/include/linux/mm.h
+>> >> > > +++ b/include/linux/mm.h
+>> >> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct t=
+ask_struct *t, unsigned long status);
+>> >> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+>> >> > >
+>> >> > >  #ifdef CONFIG_PAGE_POOL
+>> >> > > -static inline bool page_pool_page_is_pp(struct page *page)
+>> >> > > -{
+>> >> > > -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATU=
+RE;
+>> >> > > -}
+>> >> >=20
+>> >> > I vote for keeping this function as-is (do not convert it to netmem=
+),
+>> >> > and instead modify it to access page->netmem_desc->pp_magic.
+>> >>=20
+>> >> Once the page pool fields are removed from struct page, struct page w=
+ill
+>> >> have neither struct netmem_desc nor the fields..
+>> >>=20
+>> >> So it's unevitable to cast it to netmem_desc in order to refer to
+>> >> pp_magic.  Again, pp_magic is no longer associated to struct page.
+>> >
+>> > Options that come across my mind are:
+>> >
+>> >    1. use lru field of struct page instead, with appropriate comment b=
+ut
+>> >       looks so ugly.
+>> >    2. instead of a full word for the magic, use a bit of flags or use
+>> >       the private field for that purpose.
+>> >    3. do not check magic number for page pool.
+>> >    4. more?
+>>=20
+>> I'm not sure I understand Mina's concern about CPU cycles from casting.
+>> The casting is a compile-time thing, which shouldn't affect run-time
+>
+> I didn't mention it but yes.
+>
+>> performance as long as the check is kept as an inline function. So it's
+>> "just" a matter of exposing struct netmem_desc to mm.h so it can use it
+>
+> Then.. we should expose net_iov as well, but I'm afraid it looks weird.
+> Do you think it's okay?
 
-Thanks!
+Well, it'll be ugly, I grant you that :)
+
+Hmm, so another idea could be to add the pp_magic field to the inner
+union that the lru field is in, and keep the page_pool_page_is_pp()
+as-is. Then add an assert for offsetof(struct page, pp_magic) =3D=3D
+offsetof(netmem_desc, pp_magic) on the netmem side, which can be removed
+once the two structs no longer shadow each other?
+
+That way you can still get rid of the embedded page_pool struct in
+struct page, and the pp_magic field will just be a transition thing
+until things are completely separated...
+
+-Toke
+
 
