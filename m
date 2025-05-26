@@ -1,207 +1,138 @@
-Return-Path: <netdev+bounces-193412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C1FAC3D64
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:54:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99209AC3D72
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 11:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B237A1707FB
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:54:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCA88189840B
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A451F4295;
-	Mon, 26 May 2025 09:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B13E2566;
+	Mon, 26 May 2025 09:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8ceGO8y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cu05q3jt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A66D2BB13
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 09:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4141EFFB2;
+	Mon, 26 May 2025 09:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748253282; cv=none; b=rOlWSYM+CBmqcK2ZWvKVw345ayaSmGF2m24sKq0oVpMl7snkBfOHZ5lcHv4liQ2kN0Q6Wpt5teSUbFW0Js2vQ9TjW2nbooRSMjfJss+Vv+OfBB8tSZIEDEJqtiaPz2ka7dQ+DUZkTgcrtpD/MT6PPZWRKWRAa6sEeIYGMQjYrr0=
+	t=1748253397; cv=none; b=n5eW+DrVzemFJMVj/U0ubDp+KtJ+DMWBZDcdbZZDGW5y3Eoe4CnptXb3xmA8gry6+rgRK1SpF0vKqcNbVNY6SktSxoNqSdED+JJ2C+TzNjfJQLKyDrVyfDB3vve9it9ipIeidgyFQo0B8t0S3AHuv678ekINuvCuDrGzj9CButU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748253282; c=relaxed/simple;
-	bh=kD211Oy2EHW/gbr+iQCEUkM/lwARmu9Fp6jVXRBFF74=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LAQNyQ1OzzWG97GH3AF/5pRQtg5yMPaKkGLDZRTVNi+zHNJxLz9w5H0FsI3LANu6oabFFhlhOyI7Nx2prvdlG5FVqoyVAj4KeGoYL9EZL5CSzxKmeCIT/oj/nJZ8wO7q3ieV9AX6KhhwN+RbHLCmLyNx0kGn2vsmGQxYLDmnrro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G8ceGO8y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748253279;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rbkf5SXMEt07fFLjzJMCpshPrtgBoRho3TpNiZRvX78=;
-	b=G8ceGO8yUeTK7smI23EMaY43TYqWTOrYshsnH5WY3crGjAbIsg8CXkVEtRRNBR5si6UmWa
-	WawQTibg5vQQjJHSda1vSfQOtFMgTz8LbLgcSsxRAazRZmDjnasN4c4lG3Q6rmE5/FqKd6
-	tu0tN0pXS/0pcwmcH/7xj1cC1QRGPdo=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-440-Hb0TeZ5fO_unNf6-jQ4CuQ-1; Mon, 26 May 2025 05:54:37 -0400
-X-MC-Unique: Hb0TeZ5fO_unNf6-jQ4CuQ-1
-X-Mimecast-MFC-AGG-ID: Hb0TeZ5fO_unNf6-jQ4CuQ_1748253276
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5520a19daaeso942162e87.3
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 02:54:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748253276; x=1748858076;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rbkf5SXMEt07fFLjzJMCpshPrtgBoRho3TpNiZRvX78=;
-        b=lO4wmM4micLOF9iGE+FrkfwKYfLDI3yoxuMSw+CzWclbqX3X8iSoU0lsMTDqzEC8bG
-         V+YnhGqHeuU+tvN78HEn3rYvp2Ddm2RUqcRGdBaanPNn+RvdIZQszmaHiNQH8v0+fAoy
-         vL1tFRYrI0zoSRfcqjn8IJFzB8IRYyUJMVGY85XAeZD9v0htfFHr7CP1H4CghB90xYvY
-         yE/I70pCK4xzSbATBUk9EXHrAUx7haWjtyLV6b22/8DmRvV4pGXVWBFYf+BHCWmq5NZS
-         vYDTVCJEYZd8d7jdU/ac7uz5aGmuETuFtUCluDsdiD18v9QNfWneE/lxN1+Lkr9WC9+R
-         EWwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVaz90CcoJxaW9hmd0EQcwSoHLqNIbs+lyC4xf1PHfc+k6QK4O8jIehxXm4i5jMEGUgoloAFk4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWBvYNmxGOspfjR35llA0UHcXfbK7AxUez6xxlfeiB35zRqleF
-	+oRCUbYJWyVQhFrICYmNmmDRYIaTyt9moWZtmyDaBzZVOr+MXEdycSuylx0gj/PRo8Q/iHKkVrf
-	ApkjQheM+40tY01H3XkptSGqNaOnUA4J0SHm5PmWb6QeuXJ7ZBn+WMkdz2g==
-X-Gm-Gg: ASbGncteGGKhUd1B+39B412+DDwPuFUy8VzMtKYqb+n6zn1NCaga5kFEINElCsNbD0r
-	Df0p2neWPk/ZBeRu8vqhh0JCHE/lTiqhmWURQVbYdU70FrPMEBOM4h7PT305I7gxVyahaQWl9PQ
-	SoFI1wXKx8VSF/jKHjjWjvoEDxgvY7XkgDE00+Dnw3cmuryI98+yASMhyKpmenba+K7fhECETHt
-	VWfvy4UVSjCf37fipfllj/6M4rHgw2aGdnhMKX3CoBPhTzgwwtGnHIJGNhtLXo8dO9hxDEdBzmZ
-	cEqKf4V9
-X-Received: by 2002:a05:6512:4150:b0:552:20e1:ee25 with SMTP id 2adb3069b0e04-55220e1ef6amr937494e87.55.1748253275974;
-        Mon, 26 May 2025 02:54:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkPECe1NVeXWiPUcDqM4DGhgBrZ5f5uYScFTI8314epzyCSBb2KXwKVqpiQCkibcuen2wvqA==
-X-Received: by 2002:a05:6512:4150:b0:552:20e1:ee25 with SMTP id 2adb3069b0e04-55220e1ef6amr937461e87.55.1748253275480;
-        Mon, 26 May 2025 02:54:35 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5532503cd79sm84170e87.207.2025.05.26.02.54.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 02:54:34 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id BF6291AA3EFC; Mon, 26 May 2025 11:54:33 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Byungchul Park <byungchul@sk.com>
-Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org,
- harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
- davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
- asml.silence@gmail.com, tariqt@nvidia.com, edumazet@google.com,
- pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
- surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
- page->pp_magic in page_pool_page_is_pp()
-In-Reply-To: <20250526094305.GA29080@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-13-byungchul@sk.com>
- <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
- <20250526022307.GA27145@system.software.com>
- <20250526023624.GB27145@system.software.com> <87o6vfahoh.fsf@toke.dk>
- <20250526094305.GA29080@system.software.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 26 May 2025 11:54:33 +0200
-Message-ID: <87ldqjae92.fsf@toke.dk>
+	s=arc-20240116; t=1748253397; c=relaxed/simple;
+	bh=InKrliOxA419G5GRSK3MtNB+5MDBGLDnUFFqYKshanc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xz/IRpFhOC7UouINKM/y1gKNxgQob0NlzhK3iCFF1TNA3RWNcCy+wJNxx7LFTKu+YEcpz0QYH5anJ/7d3eBypYDKOshrgObKMse3CW+Q9jNpiEjgFuhTstvD26k2SKxJDFubB7zZmQ9wD+4XWMNBFBavnJiL0ON5zZz5p7h9mv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cu05q3jt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62073C4CEE7;
+	Mon, 26 May 2025 09:56:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748253396;
+	bh=InKrliOxA419G5GRSK3MtNB+5MDBGLDnUFFqYKshanc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Cu05q3jtPCd0yl8GDMycEECc+PYFmxK4F8SQmoQZYpM95F3zN7SlZVgrg+1Z+7TyG
+	 6IUtO3y/FO4czYALZcjRIOHkzifoFFmcNaUjSubOG297QhfLN8w/818BkBPEni5esi
+	 KXEqZdPhFfR6VsTS3gcOx3Zn2chQKM4fJdTzemtQymdiwCwp7h9U9IOVJ76uxeX3HJ
+	 z7MrFZtIGK7yV880T28+HqqMkXRqhreMjZVtcfeKktljoTlt7ORzPxKbLywuqfNBOI
+	 BAlQ0ppmfkOi0f2EGSlaleajgtBUsi9WOjMHyhEa7nLUvLeKBP2NfOzsAOGEVuU7Ov
+	 vyw/BujB2b6RA==
+Message-ID: <66cedd9e-e296-4d82-a623-aa4ad5435b3d@kernel.org>
+Date: Mon, 26 May 2025 11:56:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCHv2 net-next] selftests: net: move wait_local_port_listen to
+ lib.sh
+Content-Language: en-GB, fr-BE
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, mptcp@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+References: <20250526014600.9128-1-liuhangbin@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250526014600.9128-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Byungchul Park <byungchul@sk.com> writes:
+Hi Hangbin,
 
-> On Mon, May 26, 2025 at 10:40:30AM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
-n wrote:
->> Byungchul Park <byungchul@sk.com> writes:
->>=20
->> > On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
->> >> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
->> >> > On Thu, May 22, 2025 at 8:26=E2=80=AFPM Byungchul Park <byungchul@s=
-k.com> wrote:
->> >> > >
->> >> > > To simplify struct page, the effort to seperate its own descripto=
-r from
->> >> > > struct page is required and the work for page pool is on going.
->> >> > >
->> >> > > To achieve that, all the code should avoid accessing page pool me=
-mbers
->> >> > > of struct page directly, but use safe APIs for the purpose.
->> >> > >
->> >> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
->> >> > > page_pool_page_is_pp().
->> >> > >
->> >> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
->> >> > > ---
->> >> > >  include/linux/mm.h   | 5 +----
->> >> > >  net/core/page_pool.c | 5 +++++
->> >> > >  2 files changed, 6 insertions(+), 4 deletions(-)
->> >> > >
->> >> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
->> >> > > index 8dc012e84033..3f7c80fb73ce 100644
->> >> > > --- a/include/linux/mm.h
->> >> > > +++ b/include/linux/mm.h
->> >> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct t=
-ask_struct *t, unsigned long status);
->> >> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->> >> > >
->> >> > >  #ifdef CONFIG_PAGE_POOL
->> >> > > -static inline bool page_pool_page_is_pp(struct page *page)
->> >> > > -{
->> >> > > -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATU=
-RE;
->> >> > > -}
->> >> >=20
->> >> > I vote for keeping this function as-is (do not convert it to netmem=
-),
->> >> > and instead modify it to access page->netmem_desc->pp_magic.
->> >>=20
->> >> Once the page pool fields are removed from struct page, struct page w=
-ill
->> >> have neither struct netmem_desc nor the fields..
->> >>=20
->> >> So it's unevitable to cast it to netmem_desc in order to refer to
->> >> pp_magic.  Again, pp_magic is no longer associated to struct page.
->> >
->> > Options that come across my mind are:
->> >
->> >    1. use lru field of struct page instead, with appropriate comment b=
-ut
->> >       looks so ugly.
->> >    2. instead of a full word for the magic, use a bit of flags or use
->> >       the private field for that purpose.
->> >    3. do not check magic number for page pool.
->> >    4. more?
->>=20
->> I'm not sure I understand Mina's concern about CPU cycles from casting.
->> The casting is a compile-time thing, which shouldn't affect run-time
->
-> I didn't mention it but yes.
->
->> performance as long as the check is kept as an inline function. So it's
->> "just" a matter of exposing struct netmem_desc to mm.h so it can use it
->
-> Then.. we should expose net_iov as well, but I'm afraid it looks weird.
-> Do you think it's okay?
+On 26/05/2025 03:46, Hangbin Liu wrote:
+> The function wait_local_port_listen() is the only function defined in
+> net_helper.sh. Since some tests source both lib.sh and net_helper.sh,
+> we can simplify the setup by moving wait_local_port_listen() to lib.sh.
+> 
+> With this change, net_helper.sh becomes redundant and can be removed.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> 
+> v2: remove net_helper in selftests/drivers (Matthieu Baerts)
 
-Well, it'll be ugly, I grant you that :)
+Thank you for the update!
 
-Hmm, so another idea could be to add the pp_magic field to the inner
-union that the lru field is in, and keep the page_pool_page_is_pp()
-as-is. Then add an assert for offsetof(struct page, pp_magic) =3D=3D
-offsetof(netmem_desc, pp_magic) on the netmem side, which can be removed
-once the two structs no longer shadow each other?
+The new version looks good to me:
 
-That way you can still get rid of the embedded page_pool struct in
-struct page, and the pp_magic field will just be a transition thing
-until things are completely separated...
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
--Toke
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
