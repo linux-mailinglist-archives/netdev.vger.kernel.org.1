@@ -1,237 +1,162 @@
-Return-Path: <netdev+bounces-193300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE8FAAC37BD
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 03:38:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 362E7AC37C2
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 03:39:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79BCA7A398A
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 01:36:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04AF9170A7C
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 01:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEDA86349;
-	Mon, 26 May 2025 01:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72ACE86337;
+	Mon, 26 May 2025 01:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SRmnfHNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293B8171A1;
-	Mon, 26 May 2025 01:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6394A1DDD1
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 01:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748223477; cv=none; b=aPz8oiBkqSPRlSJGHCYOCxDPh+X5Yw2bBcB/ki2THtoZ9d/SMq26Zia46dgtL6WcRSAVkY0l/f7afJhLOxTda9/F2tq452FZ6kUfk99DbWiAUqEXscWCW6PnUW1bVY0S4aBXzAAFJ7sw6+UACd0qCrmy11miA6xiAA4zpp/4wW4=
+	t=1748223545; cv=none; b=HfZFQtNNfZWnlLJR9UnGX8/ct4aF1RVCywK7gS7u8uAHzx6UdoB6ppqqCp8FK3Lpf+qaJM/0tKlkmJ5vGmtueh3oCLIdIqOW6LYgNUQ/1NxDfxnEke7Fm3c2mrYkSxeEIK6lgZgaFt2DwYBX+du8MqMDS2wE2nK8YZW7w5Au7tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748223477; c=relaxed/simple;
-	bh=CRkglTFzeN4mS0UL21XGK1rVp2NKgKPLfbhZx7oMuiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BKQ/tgVWf3JRC2htKO/duJf8cjR5E+94K4AsqL43mv4XZBBGSthAUiXcA4GXUm7rdeGnFdpYuS4e4lzJ6l4OYumk/evxR2lKm+oiw0/g/P9Ew0lpJ95yx05UlltdtANmdLfAWCX+qPl6YgYR//8hNiZbvHGuBpE9J1WIQWYYqsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-23-6833c5ed816f
-Date: Mon, 26 May 2025 10:37:44 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 18/18] mm, netmem: remove the page pool members in struct
- page
-Message-ID: <20250526013744.GD74632@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-19-byungchul@sk.com>
- <CAHS8izM-ee5C8W2D2x9ChQz667PQEaYFOtgKZcFCMT4HRHL0fQ@mail.gmail.com>
+	s=arc-20240116; t=1748223545; c=relaxed/simple;
+	bh=VIW94w16yOpBMokEAjRnl0da6S/B+huTLDB0mXI095c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FtgnnoUMZXT3yfbtGlKtlEkTr0BBFcxb2w2QJPUN/HMCJSNZhhck8FBfATzMwZ5eb+wi+CYX2zliIEPw2aF/0locW4NXTiNG0o1bvQN3gg5sZJCWFbAagMcyT5shReXUSrmKCKm6gBW+ntipbwhD3DQ/uobG/pc6WKzNyP5r6Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SRmnfHNI; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7a42e9d1-93ce-4666-b7e7-3c0b4e2c0c99@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748223531;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2hFUsN/K02BBP5aa1d+e+JjhSauhkH1OuFe7JHH5P4E=;
+	b=SRmnfHNINkkKfSn8W6N3pK4Z32Bvd80Uh08Q+VdxonIAirvRyyHDvIwm8ANYNOvux0/JLO
+	0U2c1dWTONVN/nJbFvjAgwMBItF9uxzGpG/L5ch0SkuohWyu1lMmpHsVjDjvtxMxO1S6Z2
+	TyB5xx15aOYf1UA8YhwNyYLwFBVbGo0=
+Date: Mon, 26 May 2025 09:38:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: [RFC PATCH 2/2] net: stmmac: dwmac-sun8i: Allow runtime
+ AC200/AC300 phy selection
+To: James Hilliard <james.hilliard1@gmail.com>, netdev@vger.kernel.org
+Cc: linux-sunxi@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Feiyang Chen <chenfeiyang@loongson.cn>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Jinjie Ruan <ruanjinjie@huawei.com>, Paul Kocialkowski <paulk@sys-base.io>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-kernel@vger.kernel.org
+References: <20250526002924.2567843-1-james.hilliard1@gmail.com>
+ <20250526002924.2567843-2-james.hilliard1@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250526002924.2567843-2-james.hilliard1@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izM-ee5C8W2D2x9ChQz667PQEaYFOtgKZcFCMT4HRHL0fQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sf0yMcRzHfZ/nueeebh1P59e3H0pniSKR2WdGzvzzbJYx/KFsdatn7rjS
-	7pI7P7aoaaJUGJ3DCf2S3XZd3YWFin6wnFCHKFHZUn7EVVdDVzP999r783m/358/PgwpKRT4
-	MMqkFF6dJFdJaRElGvAsXD7wKEIR7ipYDAZTOQ23RrRQ3GUTgKGsCsHP0bdCGKpvoOH6NScJ
-	hmcZFPwyuUjoedwthM6iXgruZVpJ6D7TSEN2xhgJx20lBNircgRwznWTBGtalxBe3DHQ8L78
-	jwB6a7MpaNKXUtCZI4PHxnngfPIFQb3JSoDz9GUazrYaafiY0Ymgta6bgkvHchCYahwCGBsx
-	0LJAzlL6muCq9e+EnNF8gKsoCeGyHK0kZy47SXPmH/lCrqPtHs01XhyjuGrbEMFlpw/S3Pee
-	NxT3teYVzZksryjuqbFeyA2Z/bey0aJ1CbxKmcqrV0TGiRQt9yvo5PNh2pO5w3QaehSYhTwY
-	zK7GZ4sHBP/45XCf0M0UG4TzmysJN9NsMHY4Rkk3z2GX4hs1eZP7JNspwC2GvW6eze7ALz8U
-	THrFLOAO0zjKQiJGwpYi3G8pIKYGXrip4BM1ZQ7G41daJ0KZCfbFxb+ZKTkAp1dempQ92G3Y
-	WSRzy3PZRfhBVQPhjsSshcF1w6+FUzd744clDioXeemnNeinNej/N+inNRgRVYYkyqTURLlS
-	tTpMoUtSasPi9yea0cTnFB0dj7GhH/bttYhlkNRTHCeNUEgE8lSNLrEWYYaUzhH7GcIVEnGC
-	XHeIV++PVR9Q8Zpa5MtQ0vniVc6DCRJ2jzyF38fzybz635RgPHzSkF/jpjL7Olu095qG5vFl
-	5apdzxcFv/gg8/P3fpNZtzO0r/Jwig8R/ylAezvUcqTrgmu3b2BMs89djf3USjrg15Z5X+Py
-	Ykc8549uXj+s8/vGW6PTP0dtgMwZC6L2zUo+ro25ao9vnxkpO7Z9xpITg+0bq2v2LizVtQUG
-	Wdfq+1lXvb+U0ijkK0NItUb+F/ggX2Q1AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX9P9+vm7Nc5fCePZ57a5JmPMfIHvvOHsRmWTd3qN3d0lTt3
-	ykQpw03JYXRddp5Ksd12UsduV65nTCnZUSpFWKXoWQ2dZvrvtfd779dfb56Wn2Gn85qoo6Iu
-	ShWp5KSMdMf6pCWdpSvVy9yXFWC1P+Dg/mAsZDc7WbDm5iPoHaqXQE9JOQe3b/bTYK1KZqDP
-	/pOGT2UtEmjKamPAdbaAhpaLFRykJA/TcNp5j4LizEoWqvNTWbjy8y4NBQnNEqh9YuWg8cFv
-	Fto8KQxUWnIYaEoNhjLbVOh/3oGgxF5AQf+FTA4u19g4aE1uQlBT3MJARmIqArvby8LwoJUL
-	VpK8nLcUeWx5LyE2h4E8vBdITN4amjhyz3PE8cMsIQ1vXBypuD7MkMfOHoqkJH3jyPdP7xjS
-	5a7jyO0v3RSx59Ux5IWtRLLTP0S6IUKM1BhF3dKNYVL1y8KHXMzVoNjzaQNcAiqda0J+PBZW
-	4dcDnyU+ZoT52PzsEeVjTliIvd4h2scKYTG+477E+pgWmlj80nrIx5OF3fj1h/S/W5kAuME+
-	gkxIysuFHITb89KpscIfV6Z/ZMbGC/HIjZpRKT/KATj7Fz8Wz8ZJjzL+xn7CLtyfFeyLpwjz
-	cFF+OZWGJlnGiSzjRJb/Iss4kQ0xuUihiTJqVZrI1UH6w+q4KE1sUHi01oFGz5EVP3LJiXpr
-	t3mQwCPlRFmYcqVazqqM+jitB2GeVipkM6zL1HJZhCruuKiLDtUZIkW9BwXwjHKabPteMUwu
-	HFQdFQ+LYoyo+9dSvN/0BGSaoE05HT0xbc9657p6177WmY2JinNV2Uf8R9aWmdacKmyfHR/t
-	H1Kt7TwUvsi9et0xV9WJW7Hm6lmtDTO6Q9FW44Gia1uKSId1gUH61Gx437wgPt5R+LXPu2bt
-	RVrcP6fNUyukmjedmR8aM+nVRjy4uWDTdUOXqruVORkiXdHYZ1IyerVqeSCt06v+AH/V+y0Y
-	AwAA
-X-CFilter-Loop: Reflected
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 23, 2025 at 10:55:54AM -0700, Mina Almasry wrote:
-> On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> >
-> > Now that all the users of the page pool members in struct page have been
-> > gone, the members can be removed from struct page.
-> >
-> > However, since struct netmem_desc might still use the space in struct
-> > page, the size of struct netmem_desc should be checked, until struct
-> > netmem_desc has its own instance from slab, to avoid conficting with
-> > other members within struct page.
-> >
-> > Remove the page pool members in struct page and add a static checker for
-> > the size.
-> >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > ---
-> >  include/linux/mm_types.h | 11 -----------
-> >  include/net/netmem.h     | 28 +++++-----------------------
-> >  2 files changed, 5 insertions(+), 34 deletions(-)
-> >
-> > diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> > index 873e820e1521..5a7864eb9d76 100644
-> > --- a/include/linux/mm_types.h
-> > +++ b/include/linux/mm_types.h
-> > @@ -119,17 +119,6 @@ struct page {
-> >                          */
-> >                         unsigned long private;
-> >                 };
-> > -               struct {        /* page_pool used by netstack */
-> > -                       unsigned long _pp_mapping_pad;
-> > -                       /**
-> > -                        * @pp_magic: magic value to avoid recycling non
-> > -                        * page_pool allocated pages.
-> > -                        */
-> > -                       unsigned long pp_magic;
-> > -                       struct page_pool *pp;
-> > -                       unsigned long dma_addr;
-> > -                       atomic_long_t pp_ref_count;
-> > -               };
-> >                 struct {        /* Tail pages of compound page */
-> >                         unsigned long compound_head;    /* Bit zero is set */
-> >                 };
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index c63a7e20f5f3..257c22398d7a 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -77,30 +77,12 @@ struct net_iov_area {
-> >         unsigned long base_virtual;
-> >  };
-> >
-> > -/* These fields in struct page are used by the page_pool and net stack:
-> > - *
-> > - *        struct {
-> > - *                unsigned long _pp_mapping_pad;
-> > - *                unsigned long pp_magic;
-> > - *                struct page_pool *pp;
-> > - *                unsigned long dma_addr;
-> > - *                atomic_long_t pp_ref_count;
-> > - *        };
-> > - *
-> > - * We mirror the page_pool fields here so the page_pool can access these fields
-> > - * without worrying whether the underlying fields belong to a page or net_iov.
-> > - *
-> > - * The non-net stack fields of struct page are private to the mm stack and must
-> > - * never be mirrored to net_iov.
-> > +/* XXX: The page pool fields in struct page have been removed but they
-> > + * might still use the space in struct page.  Thus, the size of struct
-> > + * netmem_desc should be under control until struct netmem_desc has its
-> > + * own instance from slab.
-> >   */
-> > -#define NET_IOV_ASSERT_OFFSET(pg, iov)             \
-> > -       static_assert(offsetof(struct page, pg) == \
-> > -                     offsetof(struct net_iov, iov))
-> > -NET_IOV_ASSERT_OFFSET(pp_magic, pp_magic);
-> > -NET_IOV_ASSERT_OFFSET(pp, pp);
-> > -NET_IOV_ASSERT_OFFSET(dma_addr, dma_addr);
-> > -NET_IOV_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-> > -#undef NET_IOV_ASSERT_OFFSET
-> > +static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
-> >
-> 
-> Removing these asserts is actually a bit dangerous. Functions like
-> netmem_or_pp_magic() rely on the fact that the offsets are the same
-> between struct page and struct net_iov to access these fields without
 
-Worth noting this patch removes the page pool fields from struct page.
+在 5/26/25 8:29 AM, James Hilliard 写道:
+> The Allwinner H616 ships with two different on-die phy variants, in
+> order to determine the phy being used we need to read an efuse and
+> then select the appropriate PHY based on the AC300 bit.
+>
+> By defining an emac node without a phy-handle we can override the
+> default PHY selection logic in stmmac by passing a specific phy_node
+> selected based on the ac200 and ac300 names in a phys list.
+>
+> This allows us to have a device tree that defines both PHY variants
+> even though only one will actually end up being used at runtime
+> based on the ac300 nvmem efuse bit.
+>
+> Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
+> ---
+>   .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 19 +++++++++++++++++++
+>   1 file changed, 19 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> index 6c7e8655a7eb..e275f4caa684 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> @@ -11,6 +11,7 @@
+>   #include <linux/mdio-mux.h>
+>   #include <linux/mfd/syscon.h>
+>   #include <linux/module.h>
+> +#include <linux/nvmem-consumer.h>
+>   #include <linux/of.h>
+>   #include <linux/of_mdio.h>
+>   #include <linux/of_net.h>
+> @@ -280,6 +281,8 @@ static const struct emac_variant emac_variant_h6 = {
+>   #define SYSCON_ETCS_EXT_GMII	0x1
+>   #define SYSCON_ETCS_INT_GMII	0x2
+>   
 
-However, yes, I will keep necessary assertions with some changes applied
-so that it can work even after removing the page pool fields like:
+> +#define AC300_KEY		BIT(8)
+> +
 
-NET_IOV_ASSERT_OFFSET(lru, pp_magic);
-NET_IOV_ASSERT_OFFSET(mapping, _pp_mapping_pad);
+I have observed all the BIT macros in this file, and they all
 
-> worrying about the type of the netmem. What we do in these helpers is
-> we we clear the least significant bit of the netmem, and then  access
-> the field. This works only because we verified at build time that the
-> offset is the same.
-> 
-> I think we have 3 options here:
-> 
-> 1. Keep the asserts as-is, then in the follow up patch where we remove
-> netmem_desc from struct page, we update the asserts to make sure
-> struct page and struct net_iov can grab the netmem_desc in a uniform
+have a line of comments. I think a comment is also needed here.
 
-Ah.  It's worth noting that I'm removing the page pool fields all the
-way from strcut page, instead of placing a place-holder that I did in
-RFC as Matthew requested.
+>   /* sun8i_dwmac_dma_reset() - reset the EMAC
+>    * Called from stmmac via stmmac_dma_ops->reset
+>    */
+> @@ -1159,6 +1162,7 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+>   	struct net_device *ndev;
+>   	struct regmap *regmap;
+>   	int ret;
+> +	u16 val;
+>   
+>   	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+>   	if (ret)
+> @@ -1222,6 +1226,21 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+>   	if (IS_ERR(plat_dat))
+>   		return PTR_ERR(plat_dat);
+>   
+> +	if (!nvmem_cell_read_u16(dev, "ac300", &val)) {
+> +		const char *phy_name = (val & AC300_KEY) ? "ac300" : "ac200";
+> +		int index = of_property_match_string(dev->of_node, "phy-names", phy_name);
+> +		if (index < 0) {
+> +			dev_err(dev, "PHY name not found in device tree\n");
+> +			return -EINVAL;
+> +		}
+> +
+> +		plat_dat->phy_node = of_parse_phandle(dev->of_node, "phys", index);
+> +		if (!plat_dat->phy_node) {
+> +			dev_err(dev, "Failed to get PHY node from phys property\n");
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+How about preparing a separate function for it?  Then call it in probe().
 
-> way.
-> 
-> 2. We remove the asserts, but all the helpers that rely on
-> __netmem_clear_lsb need to be modified to do custom handling of
-> net_iov vs page. Something like:
-> 
-> static inline void netmem_or_pp_magic(netmem_ref netmem, unsigned long pp_magic)
-> {
->   if (netmem_is_net_iov(netmem)
->      netmem_to_net_iov(netmem)->pp_magic |= pp_magic;
->   else
->     netmem_to_page(netmem)->pp_magic |= pp_magic;
+If you are willing to do so, remember to write a code comment.
 
-struct page should not have pp_magic field once the page pool fields are
-gone.
 
-	Byungchul
-> }
-> 
-> Option #2 requires extra checks, which may affect the performance
-> reported by page_pool_bench_simple that I pointed you to before.
-> 
-> 3. We could swap out all the individual asserts for one assert, if
-> both page and net_iov have a netmem_desc subfield. This will also need
-> to be reworked when netmem_desc is eventually moved out of struct page
-> and is slab allocated:
-> 
-> NET_IOV_ASSERT_OFFSET(netmem_desc, netmem_desc);
-> 
-> -- 
-> Thanks,
-> Mina
+Thanks,
+
+Yanteng
+
+
 
