@@ -1,147 +1,130 @@
-Return-Path: <netdev+bounces-193371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF76AC3A46
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:57:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A56EAC3A63
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 09:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30C2C3AE558
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:56:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A870B1891E1A
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D323E1D63E8;
-	Mon, 26 May 2025 06:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8511DD9AD;
+	Mon, 26 May 2025 07:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="goLW3uCB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtJeO9/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E383FD1;
-	Mon, 26 May 2025 06:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D37F19B5B1;
+	Mon, 26 May 2025 07:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748242627; cv=none; b=o9hQksmp59yYkBNZrzkOS3HBSd9tvZY39PRTuj5wmICERMoOZ4rIn4MhUhKKIJ3hu0u5O3rbH6d8uUnStGT3xCSe9c/MKpgOXUGPQYykDr96hASn/nndmKvkmrOMgkdj7MBkbLdkJ2xsD+K8Nyhj7d6cg1npFLfO8v/ccKfCM1Q=
+	t=1748243489; cv=none; b=WsALZoXPsRV+KXx75Cp4siEoOgPuXWNAChgQKhpDmyueG2XxAwPXc+iz3SpOq9dTI+pbXHHCOjFwR55VY0tOq3xMp9iHmmpxKFywsX43Ct+n9uQ3+vsEx39ZAUQ9z7D3c9rnXk+X2P+83eQHDHdkI6pYn4EXM3j1bOuo/Wzac3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748242627; c=relaxed/simple;
-	bh=oZQN+ug918+BLKQ/ARQBkx0CRSMO2V0v/6JWUiYv6pA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYCUeF8HE24ZmTeXGNv8H27247MTO9GxsL9GybYVS8Yxk1zudiOV+b5/JoVMsJUL5gh+L2ne671PgFGm+2X/zQlG4XHli1t70FwnFB/vFaIRdeaJ0PgutfeyaZt5h3jLr8AoUn5SI2ImhKCyZZnMClPb62Ce5hcFREv39f6sKck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=goLW3uCB; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1748242625; x=1779778625;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oZQN+ug918+BLKQ/ARQBkx0CRSMO2V0v/6JWUiYv6pA=;
-  b=goLW3uCBiDLvaieT8tyCtiggBP0E8CnXS+nIy761A5bXitV7yTVsyFe5
-   kEYoj/0dYPQKNBhjJRuw7CCOHPjWnZDOiR+Dgqy2hz5MurLMDzP5sXb8z
-   CGtLCScp+vpGQJ3FO+ri2xNtd7nZre6tkVuAgDWknKaVxdPbmiALMBATw
-   KoRP86Cw6fxrAtNwM4rzFHu72ipZ71v87rEYaQv2mduMq6oFZDDXJiYZs
-   RidlMb4Y3Bs/gSUxGKfXydcBdLiT16oJNSGI4NLyEXsNLYu//NUZlCawk
-   nuaveUv5r3VxOzJ/ZuBt0HtKdoVfUn3uA8N6EvqO9tXAJTQyWGPi1zaSU
-   A==;
-X-CSE-ConnectionGUID: 2ChXxIHBTJS4QRZjcLK3sQ==
-X-CSE-MsgGUID: H9vU0z7vRy2ybCEZXv41MQ==
-X-IronPort-AV: E=Sophos;i="6.15,315,1739862000"; 
-   d="scan'208";a="46897844"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2025 23:56:58 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 25 May 2025 23:56:28 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Sun, 25 May 2025 23:56:28 -0700
-Date: Mon, 26 May 2025 08:54:45 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <kory.maincent@bootlin.com>,
-	<wintera@linux.ibm.com>, <viro@zeniv.linux.org.uk>,
-	<quentin.schulz@bootlin.com>, <atenart@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: phy: mscc: Stop clearing the the UDPv4 checksum
- for L2 frames
-Message-ID: <20250526065445.o7pchn5tilq7izmx@DEN-DL-M31836.microchip.com>
-References: <20250523082716.2935895-1-horatiu.vultur@microchip.com>
- <13c4a8b2-89a8-428c-baad-a366ff6ab8b0@lunn.ch>
+	s=arc-20240116; t=1748243489; c=relaxed/simple;
+	bh=j9vcmJ4bsZVYfNqI2zJH02TBZ9pju+nhGbTNH9bRCyM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=dKV/wTmyATyxpGZ1r3nUAGvZzqOFVaDgKzXayx8XUGMdCLbadwIgP++7RQnquabq/6bgWc6c/mfThITVJLL9OaVNPdX9e6RiEZ/+q2LTQW8C3nSilxL1f04mXl8KkwDjNjX7jFkaBG2//71DrdELyPuoL7g9IqySoRxeH+o+u0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XtJeO9/N; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-553245cad29so277979e87.1;
+        Mon, 26 May 2025 00:11:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748243486; x=1748848286; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cBY907wiCnUkLWJScXJ1dfdiQqTjZmqM/QrU/G8NFQg=;
+        b=XtJeO9/NJ8cYStzn51OCEVJt48Vx881oHgdKJ+JlocS43LMULxQYzMc5PRIq09Vl+m
+         Ul+80b2/8jIQTggmWp4XwVrzZ6nhRAH56Zyu+maJjen5sDtbRD1d53GX7dQK9TC1pD2r
+         DyS0Ow9TwQnkFUv0nBoesJLwczmYyUJI8V0VbHBF/4ybj4KuO09SxUNa9bgpOp+uYN10
+         lBDM1NlS0K9rA9WH5WNu9xHKQzE8Ph8zUJxTlGDXNyLWdSI3mTqNf0Ia4g2Sq1P8wPog
+         mdHe3ID/LYylvY3Ifg40ZTBPavRcRHTPllfrmtTzlqaE8lKzYIwRzNYuHfYzyxMK4UBy
+         W+bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748243486; x=1748848286;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cBY907wiCnUkLWJScXJ1dfdiQqTjZmqM/QrU/G8NFQg=;
+        b=KdXLv3a4cvV0lL94Bk8yluvET8GyZNUgPQPQwMLMMJ5aqzc7sIFJIcDTZnaChBsazy
+         cA2gUMe1Yq07m5cRKN0nTttLnuZtxC/6Egt1C4o2m9DlIOZRsmKVhI0tMhLt/kPGDDir
+         mSROJSKKXnk+O2o+cZZ3kqg0blvOyT+k1CzfAJeHVLx93n37U9qNurxzvuOPGfndIKuw
+         hkW0BHqA4NDsnPziwLHcIY7xBbHd9Ne8I/gzRJQpEdhArvQ7HUiQ4RCOTDsNxa+wrfhE
+         eWaRzsOwN71aNAvhVgu64eRLi2e6M7zGqp9/W/ZBumugkfQKcj6PqmgBOAvybsdB07H/
+         l4SA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcGSmYPjCqfTw83nDVYkmlT3xCcoSZLOSUkusgt7svdwwGP2kpahWfVMSYdSl2jvjmLXKYCI/h@vger.kernel.org, AJvYcCXaFvPWGNkoUta+/2GJgPIhtbcNOuisNq65zWnJ/ycZbcbHR95KDeIRxLCGGPnECgeZsNQFtPjw2Q9LaJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7l4MUpuruLXpQOrcn4TOlUheuedTRhrcdZH01aFTH2U7Sih3Q
+	UfVaZPpzOgBDjKdsZMo/G+jXnlsrjUtyIklEt6EA6iQaGEGd9YyU+y8YgXTrtYNI3LQguGvA2OF
+	4SKSksdFjvPAIB2Ks9Avehdlt2SoUyA==
+X-Gm-Gg: ASbGncvWyYTI9eyUp81xM4jvzGjb2T52J+T+UJMMVTOMG/JoHLZFaFQuPJWL6hzko1A
+	pgMyLSO2MbLbWiq+lsqdXbGuhW8uagEI4ODkRjLPoW2ewrrx1IpdDmcXJmpsDxvgm7wCCGb4NPy
+	0xHat2GC21ULBJA9HDihVOet2lPVLOWBJwBA==
+X-Google-Smtp-Source: AGHT+IFDrcQK3O9mjDh0NUrjn5bbVXF7lgII1LyYTyZlH1zUdfBqg5XfANH+K2Bre26zHgfOTxSALvBFJZX3MqJ7PWk=
+X-Received: by 2002:a05:6512:3c8e:b0:54f:c4e0:e147 with SMTP id
+ 2adb3069b0e04-5521c7ba2f0mr1848364e87.34.1748243485302; Mon, 26 May 2025
+ 00:11:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <13c4a8b2-89a8-428c-baad-a366ff6ab8b0@lunn.ch>
+From: John <john.cs.hey@gmail.com>
+Date: Mon, 26 May 2025 15:11:13 +0800
+X-Gm-Features: AX0GCFsUEWv4bUdJ_o3X0732kjLFE8YPM6w_Hf9J5wloJw-OHOmaPZcJDYFpBPI
+Message-ID: <CAP=Rh=MXN2U7ydg2f9k1cywF8Q1qpizXmcBg6mmzwpt86=PaWw@mail.gmail.com>
+Subject: [Bug] "WARNING in corrupted" in Linux Kernel v6.15-rc5
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The 05/23/2025 14:59, Andrew Lunn wrote:
+Dear Linux Kernel Maintainers,
 
-Hi Andrew,
+I hope this message finds you well.
 
-> 
-> On Fri, May 23, 2025 at 10:27:16AM +0200, Horatiu Vultur wrote:
-> > We have noticed that when PHY timestamping is enabled, L2 frames seems
-> > to be modified by changing two 2 bytes with a value of 0. The place were
-> > these 2 bytes seems to be random(or I couldn't find a pattern).  In most
-> > of the cases the userspace can ignore these frames but if for example
-> > those 2 bytes are in the correction field there is nothing to do.  This
-> > seems to happen when configuring the HW for IPv4 even that the flow is
-> > not enabled.
-> > These 2 bytes correspond to the UDPv4 checksum and once we don't enable
-> > clearing the checksum when using L2 frames then the frame doesn't seem
-> > to be changed anymore.
-> >
-> > Fixes: 7d272e63e0979d ("net: phy: mscc: timestamping and PHC support")
-> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > ---
-> >  drivers/net/phy/mscc/mscc_ptp.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/phy/mscc/mscc_ptp.c b/drivers/net/phy/mscc/mscc_ptp.c
-> > index 6f96f2679f0bf..6b800081eed52 100644
-> > --- a/drivers/net/phy/mscc/mscc_ptp.c
-> > +++ b/drivers/net/phy/mscc/mscc_ptp.c
-> > @@ -946,7 +946,9 @@ static int vsc85xx_ip1_conf(struct phy_device *phydev, enum ts_blk blk,
-> >       /* UDP checksum offset in IPv4 packet
-> >        * according to: https://tools.ietf.org/html/rfc768
-> >        */
-> > -     val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26) | IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
-> > +     val |= IP1_NXT_PROT_UDP_CHKSUM_OFF(26);
-> > +     if (enable)
-> > +             val |= IP1_NXT_PROT_UDP_CHKSUM_CLEAR;
-> 
-> Is this towards the media, or received from the media?
+I am writing to report a potential vulnerability I encountered during
+testing of the Linux Kernel version v6.15-rc5.
 
-It is when the vsc85xx PHY receives frames from the link partner.
+Git Commit: 92a09c47464d040866cf2b4cd052bc60555185fb (tag: v6.15-rc5)
 
->Have you tried sending packets with deliberately broken UDPv4 checksum?
->Does the PHYs PTP engine correctly ignore such packets?
+Bug Location: 20628 at net/ipv4/ipmr.c:440 ipmr_free_table
+net/ipv4/ipmr.c:440 [inline]
 
-No, I have not done that. What I don't understand is why should I send
-UDPv4 frames when we enable to timestamp only L2 frames.
+Bug report: https://hastebin.com/share/idudaveten.yaml
 
-> 
-> I suppose the opposite could also be true. Do you see it ignoring
-> frames which are actually O.K? It could be looking in the wrong place
-> for the checksum, so the checksum fails.
+Complete log: https://hastebin.com/share/ojonatucos.perl
 
-I have not seen any frames being ignored by HW. The HW is configured to
-set the nanosecond part of the RX timestamp into the frame. And it is
-always doing that, the problem is that sometimes on top of this change
-it also replaces 2 bytes in the frame with 0. And it is the userspace
-(ptp4l) who ignores those frames because the are corrupted.
+Entire kernel config:  https://hastebin.com/share/padecilimo.ini
 
-> 
->         Andrew
+Root Cause Analysis:
+A kernel warning is triggered during the execution of
+ipmr_rules_exit() at line 440 of net/ipv4/ipmr.c, when attempting to
+free a multicast routing (mr) table that may have already been
+released or was never correctly initialized.
+This function is called as part of the ipmr_net_exit_batch() logic
+when a network namespace is being torn down (copy_net_ns() =E2=86=92
+create_new_namespaces() =E2=86=92 unshare() syscall).
+The crash is accompanied by a FAULT_INJECTION trace involving
+copy_from_user_iter, suggesting this might be a fuzzing-induced fault
+where the data passed via netlink_sendmsg() is malformed.
+However, the primary issue lies in ipmr_free_table() dereferencing a
+potentially invalid pointer=E2=80=94either due to a race condition during
+namespace teardown or improper error handling during netns
+initialization.
 
--- 
-/Horatiu
+At present, I have not yet obtained a minimal reproducer for this
+issue. However, I am actively working on reproducing it, and I will
+promptly share any additional findings or a working reproducer as soon
+as it becomes available.
+
+Thank you very much for your time and attention to this matter. I
+truly appreciate the efforts of the Linux kernel community.
+
+Best regards,
+John
 
