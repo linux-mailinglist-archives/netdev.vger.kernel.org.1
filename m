@@ -1,131 +1,223 @@
-Return-Path: <netdev+bounces-193336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF89AC38D0
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:50:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA4FAC38DE
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 07:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C85E170C91
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:50:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 884BB7A1729
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 05:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF841C4A2D;
-	Mon, 26 May 2025 04:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCA71AF0A4;
+	Mon, 26 May 2025 05:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BkM6Mnv7"
+	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="Ic1RnCGr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F70A1C2437
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 04:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224B6320F
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 05:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748235026; cv=none; b=tACXCf93pH84mwnMXz2wDNnd9FDdKnR6U0Gu3Hd4dd2tUReP2zfQly0iK+p4suIYzLOfdR/NK6BTxq10kTS085Im/Ja7btLp2rdayarx++ULAKyRXaFsLz9vd4TzoUEI8QLYY3KY5j/5vY7Onfc/nKEvptRVRPL9pd+Vv12Z/ms=
+	t=1748236097; cv=none; b=Hqw2E9+mh95hU1nEIBtDysEC3g+OFB1nw5z1e6lMkmMnz00L5UeVfC3as1MvgeDK/iFYsuu/CiPSNwfI7L4iO4cf9MIkmizTh8jL7UiXvQftFFmQlte0L5k3rAT9GIAfbO6fBIjGWGYyJfZSjdsjpDqbnycorDtcQv2GOLf/gz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748235026; c=relaxed/simple;
-	bh=1qtOHnj9cZDZ1SLPicu9+HbB0wK3+BH4r85M66/sAbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fUNdoE3dLVSUrU8duOpv1ZRmi2SRuaWnOPgyW+aCnCw9jwfeoRIatpmIPWJ6HYBJno5IuhhST2EAkIHEEt8MDiWMQu0vkZXkaX7ZtiVa9+lHnhn4b0uBXI5x5nHWPbVHgoISybK9AGoXcCgZjEV6wbW/WKlXjmV4T74Av0bHAco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BkM6Mnv7; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748235025; x=1779771025;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1qtOHnj9cZDZ1SLPicu9+HbB0wK3+BH4r85M66/sAbc=;
-  b=BkM6Mnv7WDzQZit7Gmqjho94RtABqZB0Ycz9/Xxea6xW/wNWmjwC0bK0
-   /SGo2I7ooe1u3Mnqu0+JavwK3T8GqaiUex10ce8HGZl4RjW9sCzR5j4bC
-   GV7sdGh4qCmSqgKR798uudHRzQ6fkNR4vBN8NLU6YG2PsR2V7d8Bng/LQ
-   hqM8WlQN/gmZH6VEy/niNe/hWK804PX8XnTUDm5lDA19pPlg9JXxvshbF
-   5Ny8QRKDw/7mPD0w8iVZTRz1ol2bo5VIQ9ynwG77kqQ7Yf0jhsX9HoY1n
-   EY1wir8G5lShmRrzjkEb9MAjduNg25q405d5bCVQXZqIvIF3lyJk4edHS
-   A==;
-X-CSE-ConnectionGUID: YHAtjip2Ro+gUsaW7AdWrg==
-X-CSE-MsgGUID: X7O82TeqRFy9zrQUbAyYEw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="67607761"
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="67607761"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2025 21:50:10 -0700
-X-CSE-ConnectionGUID: DA394MNFSiKTDcvh4S/l3g==
-X-CSE-MsgGUID: QFiqzujWRIiTcrBD8tSmCA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="142788444"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa007.jf.intel.com with ESMTP; 25 May 2025 21:50:06 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-	id 35D1413A; Mon, 26 May 2025 07:50:04 +0300 (EEST)
-Date: Mon, 26 May 2025 07:50:04 +0300
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Ricard Bejarano <ricard@bejarano.io>
-Cc: netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-Message-ID: <20250526045004.GL88033@black.fi.intel.com>
-References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
- <20250523110743.GK88033@black.fi.intel.com>
- <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+	s=arc-20240116; t=1748236097; c=relaxed/simple;
+	bh=VN3uKbL1JqOpb7xEOcPjFAJ2oOJbhSAV/lt65qfGpCY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=eGNRdGoRgVoR1a+fgP5GMjZ3T2betDcGiSsu0FvnNqtXWHRa8qoanlc5NVPwqKqaZOf+RaE1qQ9K2/f8RW1CcjUk7pG5uK13F6khHlonyLdpVJ+1zpzIJxiQHqnhJzo6pHjaMCq5v86UZMTChkYaIpv5LHpwON5y19UeaTmwrgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=Ic1RnCGr; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-441ab63a415so21290465e9.3
+        for <netdev@vger.kernel.org>; Sun, 25 May 2025 22:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmo-cybersecurity.com; s=google; t=1748236092; x=1748840892; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ywmyN/RiFF7WteRQHUKPH3zi5cyGT7RpRE4XhtfXD3Q=;
+        b=Ic1RnCGrmbto5he7xm8ingV94/4jNJ3MimwhNbJRNn01noUCtwTKxh+0gsQ7niSgNn
+         ZldYlZOm8YjokVNwrbjzCWz3ITuAhNokqMWbLz0S3cEOqEOcekXePPe84b530wSNyd/s
+         aIFsH7dSjiCX8fXI9xKnhfV2+qLQXWc/ksBH3ran1kJ597x1SpuyJp0FLg4uL0R+gRsp
+         sE1H8ytDQhRS6suc486V+4n7YaroVXJUiOCSOXSQ8uL5QHjOt50T7oE3Pj4P7CoX7wbl
+         TCU4tkmU22gOQzlPGdxb4jK/iVpW34fj3N/FPFeFxLOVyn5HiFpUjXK4i8HIMbAaLHvq
+         79Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748236092; x=1748840892;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ywmyN/RiFF7WteRQHUKPH3zi5cyGT7RpRE4XhtfXD3Q=;
+        b=k/9GYRHSqSmO+yjgyXzIqjP2QznQOdT6G5WGzdf8hCBhsyJiZVMJX73otJ51AyZqjC
+         nF9kpy+UWcK5zB08rFMxIBpl/zffmZmu4empV7pKeKQKwGd57Xy2Rz+JDUGBiQzFOdsi
+         SlxD3GkJ6SPOkrF5lDFE7IVz5BeRqHtaqsj6y2Mm96gPG+VcxRdCKIDlBlN9nW3Y8dK6
+         YBsNL0th7vXr7lylWumu6qDKxKx9rOrxuuD1SW2x8Eh4QIoU2YBp/Sq+uEqRHE1HIcOV
+         pibo9D0Mishpg3Pc9FaBl+1srjVLvON4i72X7sgXcLDWzfbf/8ma8y0oFA1ZKs6wd1NT
+         p+eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVTi3oZxmed6kTm1p4WefHQk5DYqa26HPvRxdy+KfWUezuFhs+oZfWsC99ouN6OjXbk/jnIIMk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwByzPDii6D+znUFAMBMcuSM9CQlE3LocFlniQyLV7yhrNTb0Gt
+	3Qyd1ZZdpKSmYHYzJI5KOkw7Z8Nwj7+WnReJ1RYG5Bq4AcWTfdtwoXymjJY/URnbe1eBaqDRCmk
+	fpjBcb5wBfqWhQHPJugxMmZ6VR0wcmSghwDyEEjV6KQ==
+X-Gm-Gg: ASbGncuxQPBO0FYHyxnwomnRjuiPi49ry8cEoPHML712i8xIy4wLc+8D0tqB/HH/l5d
+	UHWeDtEjoJQpw2G1qqfaDwLO5JLvVzHQTHUzXm7qhFNtjlY5oYc33RnID3+yM0nqLXDAtV92F/s
+	EBoBQ+8CK7fxBxn3ZG8OCTrPauOjvUjqM+bANVA6Cfynf2rRaYUbPReiVuwfyPPhJe8FuAMArIt
+	F+U
+X-Google-Smtp-Source: AGHT+IHQtcTKnTqIqu1AWfIXts75t/CEdk2U0zHZsJFQRNgEtFrrICKZ1gNLvc7nyaNDbGUkXhq5BKtnb5bMzcgZXLo=
+X-Received: by 2002:a05:600c:6215:b0:43d:40b0:5b with SMTP id
+ 5b1f17b1804b1-44c932f9411mr60425455e9.25.1748236092265; Sun, 25 May 2025
+ 22:08:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+From: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Date: Mon, 26 May 2025 14:08:01 +0900
+X-Gm-Features: AX0GCFsCp7T-RWT5r2wyD3bTuMWuFueQJ7SnXQQHT4ejrzVyXl82yc9Vvz4Q4nc
+Message-ID: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
+Subject: [PATCH net] bonding: Fix header_ops type confusion
+To: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Cc: =?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, 
+	edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+In bond_setup_by_slave(), the slave=E2=80=99s header_ops are unconditionall=
+y
+copied into the bonding device. As a result, the bonding device may invoke
+the slave-specific header operations on itself, causing
+netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpreted
+as the slave's private-data type.
 
-On Fri, May 23, 2025 at 05:07:02PM +0200, Ricard Bejarano wrote:
-> > What is the performance without bridging?
-> 
-> I actually tested this as soon as I sent my original message. Interestingly
-> enough, performance without bridging is about the same: ~930Mbps in the
-> purple->red direction, ~5Mbps in red->purple.
-> 
-> I also tested running eBPF/XDP programs attached to both eno1 and tb0 to
-> immediately XDP_REDIRECT to each other. This worked, as confirmed by successful
-> ping/iperf even after bringing br0 down, and I could see the XDP program
-> invocation counts growing in 'bpftool prog list'.
-> But all I got was maybe (IMO falls within measurement error margin) a ~1Mbps
-> average increase in throughput in the red->purple direction.
-> But I guess we've now isolated the problem out of the bridge completely, right?
-> 
-> As instructured, I've attached the full 'dmesg' output after setting the
-> 'thunderbolt.dyndbg=+p' kernel command line flag.
+This type-confusion bug can lead to out-of-bounds writes into the skb,
+resulting in memory corruption.
 
-Thanks for the logs. See below my analysis.
+This patch adds two members to struct bonding, bond_header_ops and
+header_slave_dev, to avoid type-confusion while keeping track of the
+slave's header_ops.
 
-> [    4.144711] thunderbolt 0000:04:00.0: using firmware connection manager
+Fixes: 1284cd3a2b740 (bonding: two small fixes for IPoIB support)
+Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+Co-Developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+Reviewed-by: Paolo Abeni <pabeni@redhat.com>
+Reported-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+---
+ drivers/net/bonding/bond_main.c | 61
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ include/net/bonding.h           |  5 +++++
+ 2 files changed, 65 insertions(+), 1 deletion(-)
 
-This means the tunnels are controlled by firmware not the kernel driver.
-E.g this is an older non-USB4 system. The firmware connection manager does
-not support lane bonding whic means your link only can use the 20 Gb/s
-single lane. However, there is even more to this:
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_mai=
+n.c
+index 8ea183da8d53..690f3e0971d0 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1619,14 +1619,65 @@ static void bond_compute_features(struct bonding *b=
+ond)
+     netdev_change_features(bond_dev);
+ }
 
-> [    5.497037] thunderbolt 0-1: current link speed 10.0 Gb/s
-> [    5.497049] thunderbolt 0-1: current link width symmetric, single lane
++static int bond_hard_header(struct sk_buff *skb, struct net_device *dev,
++        unsigned short type, const void *daddr,
++        const void *saddr, unsigned int len)
++{
++    struct bonding *bond =3D netdev_priv(dev);
++    struct net_device *slave_dev;
++
++    slave_dev =3D bond->header_slave_dev;
++
++    return dev_hard_header(skb, slave_dev, type, daddr, saddr, len);
++}
++
++static void bond_header_cache_update(struct hh_cache *hh, const
+struct net_device *dev,
++        const unsigned char *haddr)
++{
++    const struct bonding *bond =3D netdev_priv(dev);
++    struct net_device *slave_dev;
++
++    slave_dev =3D bond->header_slave_dev;
++
++    if (!slave_dev->header_ops || !slave_dev->header_ops->cache_update)
++        return;
++
++    slave_dev->header_ops->cache_update(hh, slave_dev, haddr);
++}
++
+ static void bond_setup_by_slave(struct net_device *bond_dev,
+                 struct net_device *slave_dev)
+ {
++    struct bonding *bond =3D netdev_priv(bond_dev);
+     bool was_up =3D !!(bond_dev->flags & IFF_UP);
 
-This one shows that the link was trained only to gen2. That's instead of 20
-Gb/s you get only 10 Gb/s.  Now since this if firmware the driver only logs
-these but I suggest to check this by running:
+     dev_close(bond_dev);
 
-  # tblist -Av
+-    bond_dev->header_ops        =3D slave_dev->header_ops;
++    /* Some functions are given dev as an argument
++     * while others not. When dev is not given, we cannot
++     * find out what is the slave device through struct bonding
++     * (the private data of bond_dev). Therefore, we need a raw
++     * header_ops variable instead of its pointer to const header_ops
++     * and assign slave's functions directly.
++     * For the other case, we set the wrapper functions that pass
++     * slave_dev to the wrapped functions.
++     */
++    bond->bond_header_ops.create =3D bond_hard_header;
++    bond->bond_header_ops.cache_update =3D bond_header_cache_update;
++    if (slave_dev->header_ops) {
++        bond->bond_header_ops.parse =3D slave_dev->header_ops->parse;
++        bond->bond_header_ops.cache =3D slave_dev->header_ops->cache;
++        bond->bond_header_ops.validate =3D slave_dev->header_ops->validate=
+;
++        bond->bond_header_ops.parse_protocol =3D
+slave_dev->header_ops->parse_protocol;
++    } else {
++        bond->bond_header_ops.parse =3D NULL;
++        bond->bond_header_ops.cache =3D NULL;
++        bond->bond_header_ops.validate =3D NULL;
++        bond->bond_header_ops.parse_protocol =3D NULL;
++    }
++
++    bond->header_slave_dev      =3D slave_dev;
++    bond_dev->header_ops        =3D &bond->bond_header_ops;
 
-You can get tbtools here [1].
+     bond_dev->type            =3D slave_dev->type;
+     bond_dev->hard_header_len   =3D slave_dev->hard_header_len;
+@@ -2676,6 +2727,14 @@ static int bond_release_and_destroy(struct
+net_device *bond_dev,
+     struct bonding *bond =3D netdev_priv(bond_dev);
+     int ret;
 
-Reason for this typically is bad cable. The ones that has the small
-ligthning logo should work the best. If you use something else then the
-link may get degraded. You can check the negotiated link speed running the
-above command. I think this explains why you see the "low" throughput. Hope
-this helps.
-
-[1] https://github.com/intel/tbtools/wiki/Useful-Commands#list-all-devices-including-other-hosts-and-retimers
++    /* If slave_dev is the earliest registered one, we must clear
++     * the variables related to header_ops to avoid dangling pointer.
++     */
++    if (bond->header_slave_dev =3D=3D slave_dev) {
++        bond->header_slave_dev =3D NULL;
++        bond_dev->header_ops =3D NULL;
++    }
++
+     ret =3D __bond_release_one(bond_dev, slave_dev, false, true);
+     if (ret =3D=3D 0 && !bond_has_slaves(bond) &&
+         bond_dev->reg_state !=3D NETREG_UNREGISTERING) {
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 95f67b308c19..cf8206187ce9 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -215,6 +215,11 @@ struct bond_ipsec {
+  */
+ struct bonding {
+     struct   net_device *dev; /* first - useful for panic debug */
++    struct   net_device *header_slave_dev;  /* slave net_device for
+header_ops */
++    /* maintained as a non-const variable
++     * because bond's header_ops should change depending on slaves.
++     */
++    struct   header_ops bond_header_ops;
+     struct   slave __rcu *curr_active_slave;
+     struct   slave __rcu *current_arp_slave;
+     struct   slave __rcu *primary_slave;
 
