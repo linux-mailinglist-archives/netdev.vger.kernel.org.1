@@ -1,256 +1,232 @@
-Return-Path: <netdev+bounces-193389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC8C2AC3BE2
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:42:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811D2AC3BFD
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 10:50:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B10093A45D0
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:42:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 280A47A8CFA
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 08:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6631E5B88;
-	Mon, 26 May 2025 08:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b="rzIVY1n6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF47F1E9B0B;
+	Mon, 26 May 2025 08:50:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44B82AEFE
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:42:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2984E1E32D3
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 08:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748248956; cv=none; b=oAyza1rHUje/95Lbnjn9fadCwCTsBXvYZ08qTb0zxIoJ3iK3BjVp7nm/9X3ISPDUbBLCZZtzmc0uGy7yemM2dxtYa0kJE7bl5s3h7ZokQDsGH2NDtv+8laFruoNo72qkeWHT1VrYeZue7IoYSUvbI7cvg4BzcU3hREBju6fUTxc=
+	t=1748249431; cv=none; b=h8hlIbRtw02t/Zn0nL5qe6BQKvS4zpyab8/IKeeMlqpHObsdyvyyCb7eQK8zqHEu17ZJFfk/Lmq/4fhB5fd3c9Ug1lYjHFW5jZdAz5CFWXypyYuoxQK6JGCbMxcYO1Dux1ZvH6d0o5wUcLhyu6mAP+87BoXVHZc1jLonh79Dlvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748248956; c=relaxed/simple;
-	bh=/1xN60Z/a+3aRQBwEskRT6CPFPk//+bjzxKTJ6v9ngA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tD7pbCQUmdbomf71N3Q4skKVRvp7ugcgB8ApWTkc4ybyH3C85zHNgQoL1csqVWMJ9inEJ8VQudDmMtYZq4sfvePEf6MfAKUdJU9JqrFoFYyZx7zyhxF5ScDSBd4+GhQf5kA9zITeMYjWWFf+3t/mqJ7ZD0iHHQsBQ5X4/PpGUHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b=rzIVY1n6; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-328114b262aso19626261fa.3
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 01:42:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bell-sw-com.20230601.gappssmtp.com; s=20230601; t=1748248952; x=1748853752; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yYw8tg6P7wN29q3bWWjh87GXBSsui1vsmZC9VYdDMvA=;
-        b=rzIVY1n6MZ9aGDp9c08quU7h9zsp3lTv54wKCif4jwyNkNrp4Z2sDo3RIWg5gJefzn
-         pqjohuDh2UE/bOV278o21IjZgEHOXEkjMD81/QB/fJbc17R38MPJ+ZUzBWR9va/y6F/M
-         nHilVjGSh4CksjbbDxh3wlbmnPJMyF36lTAhy/aQBZqr6mpzzmLd5qq12+/SuctBQ7Xv
-         YIZRYF+/TdK9E7f1yXGfq+sXDExzYwTIWBF+N6U19GDbp5T+y/4JuygpAzrniWCxs5UP
-         WoVYufq+D7onSFVNSa8rTx5K0QHnhMSHoWY6Q0BzHCRtcq/nnM6RhvO6GFUUwxG8YQ3T
-         lpLg==
+	s=arc-20240116; t=1748249431; c=relaxed/simple;
+	bh=ES/5VMJTP0/Z8pCLa0ZMn49fZz2+QHoH8ccAMIZSAvM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HwBWz/vWSM8/rsbGE9wodgRNY0BsyT45CtH4CYFRBb7ivjvIn3CVrlQfBK1YEWiBSE+P+RP6fFvIJ35X+FF5iLQGQUX8LLvKl7OQwBlfvJCY3OvyDx3sf1nEiLL5MXGPVcRwy+FdTvq/cucig6pHatbjdDsqfcEIJgHu5o/46VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85e318dc464so359107739f.1
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 01:50:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748248952; x=1748853752;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yYw8tg6P7wN29q3bWWjh87GXBSsui1vsmZC9VYdDMvA=;
-        b=G3pBwKWy37LbqTsM3CN/9ihzoJBYKqqkhnxS7PL3+0SJuE0UMMAlOM1A7c7rfWy8KE
-         zmJ2o3PqWUWMaGMvuOvhuvQoTOGjC2/2iqmpdLUuVeQn7ibWY3Lv58SQqoAAW6EI2k23
-         vAd557tBKp0q5NRO4kEb56aC8XlKY4OwD0l+RKWAE/22A6IQdoEH/398NsMyN6zdsXBb
-         v7O6hFAD1/nckBanOR0XpvmtDauhguLALEMBYjbzbomZXmjku/uwo2Nwmdef/RoH+dHr
-         NWSL9d1t7KqkyvDRKx478Cvz2k/1EWLCqYbuEcgvBr8kI+fGacjbKP2t3oDMFmL4HSis
-         Iivw==
-X-Forwarded-Encrypted: i=1; AJvYcCWRgX2jVo6cKvaXx5f9e+13RtdSh38bUw2sfdKmCCYtw+Oiyud1SPCw8YrmEIh40BXHOTLxafE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0boA0yDlVKnSr9ujp0khF2fYg78Sq3Ej0y+ksRQRM8kTFnBXH
-	kqZZ3SJT0Y93WvifeSx7odK32/Ddc9FJ1e+lup42M4xUIadG9S4GW4GRYIjtQ1gvdg==
-X-Gm-Gg: ASbGncuceySLQgGcci0uPAbGxcLzDCpuRc5k9sLWRv3yylfXmjJ73dLZLmzFAjUx6Oo
-	pJ3A03Sf35RkvDzy+F5BeAfUHlONWHTkDeIdGOSPgV43xC7AAAppc/GFXDCeGIQKs5UTDfyqo7n
-	cD47ntmv2o+7kF5ktPJz3Mo92UNwsBeZnbllJjslVzK5ZkDFm6GMPWSDox/LUvo5ox+5y5he1Kz
-	G6ZqiTdWTXbV4ySMiBO9QsgtpPFdRPfe0ZrdcmjWViuiWd+tGm9C/1yikAMrpsB/xwcvgPZ9oJ8
-	n97OwPBzNKHMyagAgl+DgNJm3Nf3JYz7udFHMkF6Ifwt1AkOVYNjtMvZrIZ+/g==
-X-Google-Smtp-Source: AGHT+IGNIBbsxaN3nrFZfhKFkfehHzZGXJ0BcTVbmHBvOYfgUEOm61DWqo7NA6gNrnv+HXfWyxaMkg==
-X-Received: by 2002:a05:651c:b13:b0:30c:514c:55d4 with SMTP id 38308e7fff4ca-3295ba24d52mr18420461fa.16.1748248951704;
-        Mon, 26 May 2025 01:42:31 -0700 (PDT)
-Received: from [192.168.1.54] ([91.247.149.7])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3280fe585cdsm44495121fa.71.2025.05.26.01.42.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 01:42:31 -0700 (PDT)
-Message-ID: <52d96554-23f6-4bde-84d9-e0a7a40b0bc3@bell-sw.com>
-Date: Mon, 26 May 2025 08:42:30 +0000
+        d=1e100.net; s=20230601; t=1748249429; x=1748854229;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w9c7v6E+/GQRM3UlZ2T/jgFX7EYWeznAGMdtx6v4y64=;
+        b=gxS1sHRW1s+HuVQZlw8NTFefOHhQPOR06OKTOVsqK8OuFTJ5E6mw+CdEGLH3+bv8fo
+         yA7jH8T4RxY9nAWhPxbL8/IcAgp8HouVnO9YZUDHv/T5VHHoBzUT9mDYcnU328M2/yEc
+         ntjFqJ+TyN6UC6K+PThx5qhM3Ad0zd1na1Dg0+xO8NayUppODPk2N0Sf7Ku+YVNL2Meq
+         knsrIp4gbjo66oVmyn8UiBQxRvsMUoNz8MBu3TZzFIey4iUjcvvOkRogvOG12kkl0t6E
+         OHXL18dwjWC377Qa8BRk6lhdAMZBrZ8m7KRWU0dBe1BQY3fEAyfBvMsDQxyNNp8Nk0M9
+         rAEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXrMujJoiDV43VUU0MGdbADLwXolnn5m0JcKfvSk+6/tbNfG4IjYihgNrwlZOy5N2y4+Hs6UW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF/mSYz6XEBVT4Rb3FlXZQMWkySLNLtVtZLobney/GF6i0LeG+
+	zuXQFDcqBqpsAmvQ//rfLbUNQNE1zIQoSdTgKDWkLED8/ooW1aeUSaJDo0EUMXyxzD4NVxhHRiE
+	HHen94ur0jG34hPi4sRPe+hJrfOnRhrh7EqVZIjmGoI2FR4OzPaPw2EGO//s=
+X-Google-Smtp-Source: AGHT+IGvIUT1xTNpT2S4TzLOsjICT6VfN3kGiDfl4z4bFL9GGjdt2D0AnhMoDSq8jPM5Zp0BG/b77PAQqHdAho7pF93TUN66OS1n
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Subject: Re: [PATCH net-next] net: lan743x: fix 'channel' index check before
- writing ptp->extts[]
-To: Rengarajan.S@microchip.com, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, Bryan.Whitehead@microchip.com,
- davem@davemloft.net, Raju.Lakkaraju@microchip.com, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, UNGLinuxDriver@microchip.com,
- richardcochran@gmail.com
-References: <20250522141357.295240-1-aleksei.kodanev@bell-sw.com>
- <ae5090d780d6214311f030818f47b48a9b04fe4a.camel@microchip.com>
-Content-Language: en-US
-Autocrypt: addr=aleksei.kodanev@bell-sw.com; keydata=
- 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
- SKzhlhbWzHw=
-In-Reply-To: <ae5090d780d6214311f030818f47b48a9b04fe4a.camel@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6602:3817:b0:85d:f316:fabc with SMTP id
+ ca18e2360f4ac-86cbb8a2d4amr767738939f.8.1748249429183; Mon, 26 May 2025
+ 01:50:29 -0700 (PDT)
+Date: Mon, 26 May 2025 01:50:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68342b55.a70a0220.253bc2.0091.GAE@google.com>
+Subject: [syzbot] [tipc?] WARNING: refcount bug in tipc_crypto_xmit
+From: syzbot <syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jmaloy@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tipc-discussion@lists.sourceforge.net, wangliang74@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Rengarajan!
-On 23.05.2025 20:21, Rengarajan.S@microchip.com wrote:
-> Hi Alexey,
-> 
-> On Thu, 2025-05-22 at 14:13 +0000, Alexey Kodanev wrote:
->> EXTERNAL EMAIL: Do not click links or open attachments unless you
->> know the content is safe
->>
->> Before calling lan743x_ptp_io_event_clock_get(), the 'channel' value
->> is checked against the maximum value of
->> PCI11X1X_PTP_IO_MAX_CHANNELS(8).
->> This seems correct at first and aligns with the PTP interrupt status
->> register (PTP_INT_STS) specifications.
->>
->> However, lan743x_ptp_io_event_clock_get() writes to ptp->extts[] with
->> only LAN743X_PTP_N_EXTTS(4) elements, using channel as an index:
->>
->>     lan743x_ptp_io_event_clock_get(..., u8 channel,...)
->>     {
->>         ...
->>         /* Update Local timestamp */
->>         extts = &ptp->extts[channel];
->>         extts->ts.tv_sec = sec;
->>         ...
->>     }
->>
-> 
-> As per the PTP_INT_STS definition, there are 8 sets of capture
-> registers that can be configured as GPIO inputs. However, using
-> LAN743X_PTP_N_EXTTS (4) restricts processing to only 4 GPIOs. Would it
-> be more appropriate to update LAN743X_PTP_N_EXTTS to 8? This would
-> ensure that extts = &ptp->extts[channel]; remains valid for all 8
-> potential channel indices. 
-> 
+Hello,
 
-Yes, thought about the same, but I'm not sure why it was initially
-limited to using only 4 channels in LAN743X_PTP_N_EXTTS.
+syzbot found the following issue on:
 
-Would it be okay to add the following to the patch?
+HEAD commit:    b1427432d3b6 Merge tag 'iommu-fixes-v6.15-rc7' of git://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17ba35f4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
+dashboard link: https://syzkaller.appspot.com/bug?extid=f0c4a4aba757549ae26c
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161ee170580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=164328e8580000
 
---- a/drivers/net/ethernet/microchip/lan743x_ptp.h
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.h
-@@ -18,9 +18,8 @@
-  */
- #define LAN743X_PTP_N_EVENT_CHAN       2
- #define LAN743X_PTP_N_PEROUT           LAN743X_PTP_N_EVENT_CHAN
--#define LAN743X_PTP_N_EXTTS            4
-+#define LAN743X_PTP_N_EXTTS            8       /* supports 8 GPIOs */
- #define LAN743X_PTP_N_PPS              0
--#define PCI11X1X_PTP_IO_MAX_CHANNELS   8
- #define PTP_CMD_CTL_TIMEOUT_CNT                50
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/48a582dac9f0/disk-b1427432.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/94ad5463a7f5/vmlinux-b1427432.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4d0af31b0b08/bzImage-b1427432.xz
+
+The issue was bisected to:
+
+commit e279024617134c94fd3e37470156534d5f2b3472
+Author: Wang Liang <wangliang74@huawei.com>
+Date:   Tue May 20 10:14:04 2025 +0000
+
+    net/tipc: fix slab-use-after-free Read in tipc_aead_encrypt_done
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10018df4580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12018df4580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14018df4580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f0c4a4aba757549ae26c@syzkaller.appspotmail.com
+Fixes: e27902461713 ("net/tipc: fix slab-use-after-free Read in tipc_aead_encrypt_done")
+
+------------[ cut here ]------------
+refcount_t: addition on 0; use-after-free.
+WARNING: CPU: 1 PID: 36 at lib/refcount.c:25 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
+Modules linked in:
+CPU: 1 UID: 0 PID: 36 Comm: kworker/u8:2 Not tainted 6.15.0-rc7-syzkaller-00144-gb1427432d3b6 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: netns cleanup_net
+RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:25
+Code: 00 00 e8 79 f6 06 fd 5b 41 5e e9 81 6c a0 06 cc e8 6b f6 06 fd c6 05 06 3c b0 0a 01 90 48 c7 c7 80 aa c1 8b e8 e7 52 cb fc 90 <0f> 0b 90 90 eb d7 e8 4b f6 06 fd c6 05 e7 3b b0 0a 01 90 48 c7 c7
+RSP: 0018:ffffc90000a08668 EFLAGS: 00010246
+RAX: bb5b0788a28fc300 RBX: 0000000000000002 RCX: ffff888142681e00
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: ffffc90000a087e8 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bba984 R12: ffff88807df80000
+R13: dffffc0000000000 R14: ffff88807df8016c R15: ffff888033397800
+FS:  0000000000000000(0000) GS:ffff8881261c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000555569a1e878 CR3: 000000007b8fc000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ __refcount_add include/linux/refcount.h:-1 [inline]
+ __refcount_inc include/linux/refcount.h:366 [inline]
+ refcount_inc include/linux/refcount.h:383 [inline]
+ get_net include/net/net_namespace.h:268 [inline]
+ tipc_aead_encrypt net/tipc/crypto.c:821 [inline]
+ tipc_crypto_xmit+0x1820/0x22c0 net/tipc/crypto.c:1761
+ tipc_crypto_clone_msg+0x90/0x170 net/tipc/crypto.c:1656
+ tipc_crypto_xmit+0x1998/0x22c0 net/tipc/crypto.c:1717
+ tipc_bearer_xmit_skb+0x245/0x400 net/tipc/bearer.c:572
+ tipc_disc_timeout+0x580/0x6d0 net/tipc/discover.c:338
+ call_timer_fn+0x17b/0x5f0 kernel/time/timer.c:1789
+ expire_timers kernel/time/timer.c:1840 [inline]
+ __run_timers kernel/time/timer.c:2414 [inline]
+ __run_timer_base+0x61a/0x860 kernel/time/timer.c:2426
+ run_timer_base kernel/time/timer.c:2435 [inline]
+ run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2445
+ handle_softirqs+0x286/0x870 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:lock_acquire+0x175/0x360 kernel/locking/lockdep.c:5870
+Code: 00 00 00 00 9c 8f 44 24 30 f7 44 24 30 00 02 00 00 0f 85 cd 00 00 00 f7 44 24 08 00 02 00 00 74 01 fb 65 48 8b 05 8b 9f d7 10 <48> 3b 44 24 58 0f 85 f2 00 00 00 48 83 c4 60 5b 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90000ad7378 EFLAGS: 00000206
+RAX: bb5b0788a28fc300 RBX: 0000000000000000 RCX: bb5b0788a28fc300
+RDX: 0000000000000000 RSI: ffffffff8d939072 RDI: ffffffff8bc1f600
+RBP: ffffffff8171ca05 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: ffffffff8171ca05 R12: 0000000000000002
+R13: ffffffff8df3dee0 R14: 0000000000000000 R15: 0000000000000246
+ rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ class_rcu_constructor include/linux/rcupdate.h:1155 [inline]
+ unwind_next_frame+0xc2/0x2390 arch/x86/kernel/unwind_orc.c:479
+ arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
+ kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
+ kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:548
+ __call_rcu_common kernel/rcu/tree.c:3082 [inline]
+ call_rcu+0x142/0x990 kernel/rcu/tree.c:3202
+ inet_release+0x187/0x210 net/ipv4/af_inet.c:435
+ __sock_release net/socket.c:647 [inline]
+ sock_release+0x85/0x150 net/socket.c:675
+ wg_netns_pre_exit+0xd6/0x1d0 drivers/net/wireguard/device.c:423
+ ops_pre_exit_list net/core/net_namespace.c:162 [inline]
+ cleanup_net+0x594/0xbd0 net/core/net_namespace.c:634
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	00 00                	add    %al,(%rax)
+   2:	00 00                	add    %al,(%rax)
+   4:	9c                   	pushf
+   5:	8f 44 24 30          	pop    0x30(%rsp)
+   9:	f7 44 24 30 00 02 00 	testl  $0x200,0x30(%rsp)
+  10:	00
+  11:	0f 85 cd 00 00 00    	jne    0xe4
+  17:	f7 44 24 08 00 02 00 	testl  $0x200,0x8(%rsp)
+  1e:	00
+  1f:	74 01                	je     0x22
+  21:	fb                   	sti
+  22:	65 48 8b 05 8b 9f d7 	mov    %gs:0x10d79f8b(%rip),%rax        # 0x10d79fb5
+  29:	10
+* 2a:	48 3b 44 24 58       	cmp    0x58(%rsp),%rax <-- trapping instruction
+  2f:	0f 85 f2 00 00 00    	jne    0x127
+  35:	48 83 c4 60          	add    $0x60,%rsp
+  39:	5b                   	pop    %rbx
+  3a:	41 5c                	pop    %r12
+  3c:	41 5d                	pop    %r13
+  3e:	41 5e                	pop    %r14
 
 
->> To avoid a potential out-of-bounds write, let's use the maximum
->> value actually defined for the timestamp array to ensure valid
->> access to ptp->extts[channel] within its actual bounds.
->>
->> Detected using the static analysis tool - Svace.
->> Fixes: 60942c397af6 ("net: lan743x: Add support for PTP-IO Event
->> Input External Timestamp (extts)")
->> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
->> ---
->>
->> Note that PCI11X1X_PTP_IO_MAX_CHANNELS will be unused after this
->> patch.
->> Could it perhaps be used to define LAN743X_PTP_N_EXTTS to support
->> size 8?
->>
->>  drivers/net/ethernet/microchip/lan743x_ptp.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c
->> b/drivers/net/ethernet/microchip/lan743x_ptp.c
->> index 0be44dcb3393..1ef7978e768b 100644
->> --- a/drivers/net/ethernet/microchip/lan743x_ptp.c
->> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
->> @@ -1121,7 +1121,7 @@ static long lan743x_ptpci_do_aux_work(struct
->> ptp_clock_info *ptpci)
->>                                                         PTP_INT_IO_FE
->> _MASK_) >>
->>                                                         PTP_INT_IO_FE
->> _SHIFT_);
->>                                 if (channel >= 0 &&
->> -                                   channel <
->> PCI11X1X_PTP_IO_MAX_CHANNELS) {
->> +                                   channel < LAN743X_PTP_N_EXTTS) {
->>                                         lan743x_ptp_io_event_clock_ge
->> t(adapter,
->>                                                                      
->>   true,
->>                                                                      
->>   channel,
->> @@ -1154,7 +1154,7 @@ static long lan743x_ptpci_do_aux_work(struct
->> ptp_clock_info *ptpci)
->>                                                        PTP_INT_IO_RE_
->> MASK_) >>
->>                                                        PTP_INT_IO_RE_
->> SHIFT_);
->>                                 if (channel >= 0 &&
->> -                                   channel <
->> PCI11X1X_PTP_IO_MAX_CHANNELS) {
->> +                                   channel < LAN743X_PTP_N_EXTTS) {
->>                                         lan743x_ptp_io_event_clock_ge
->> t(adapter,
->>                                                                      
->>   false,
->>                                                                      
->>   channel,
->> --
->> 2.25.1
->>
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
