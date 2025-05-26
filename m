@@ -1,159 +1,131 @@
-Return-Path: <netdev+bounces-193335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65DDAAC38C0
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:41:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF89AC38D0
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 06:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07929170467
-	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:41:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C85E170C91
+	for <lists+netdev@lfdr.de>; Mon, 26 May 2025 04:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC111A725A;
-	Mon, 26 May 2025 04:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF841C4A2D;
+	Mon, 26 May 2025 04:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtFYPujy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BkM6Mnv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548DF1BCA07
-	for <netdev@vger.kernel.org>; Mon, 26 May 2025 04:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F70A1C2437
+	for <netdev@vger.kernel.org>; Mon, 26 May 2025 04:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748234467; cv=none; b=DMvEIG8gNGhJ+U88PvUGhcIRWdVrgJgnX5cv6DuqkFAZhMe1H9uCJPxFP1pzWFX4VwwmbGwiM3KxX/B9rSS6CjZAAXPZPg9OX2Fs4rHDQJ2yk976Kp6wSx1urcEsRUFmq51/nSTCw3MZRlHPkE3NURKPtZiMN5AfS7apryK9Gls=
+	t=1748235026; cv=none; b=tACXCf93pH84mwnMXz2wDNnd9FDdKnR6U0Gu3Hd4dd2tUReP2zfQly0iK+p4suIYzLOfdR/NK6BTxq10kTS085Im/Ja7btLp2rdayarx++ULAKyRXaFsLz9vd4TzoUEI8QLYY3KY5j/5vY7Onfc/nKEvptRVRPL9pd+Vv12Z/ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748234467; c=relaxed/simple;
-	bh=G5oHeKCA4GUjC8Ddzh/HQtxJlTKTYo2cMTESzd/FMAQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FMb64j6NTG/AuddxDL2x5gYHARuWSLh6aMEeL0t0AlH4ubpXwRmoZQplst9/MOcs33EUz9hcwwjeiDwyFL79vgYnIwb7geyP+jNGjW15ATp0WpXRFcmI8PnkhYz4Vp6qscdQ+ShepvdEVPTbeWMCKDsISskrumeqvCRBs1GeWrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AtFYPujy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748234464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ucwg/e5o3VRwWOTQ7CVJZymUSW9w77nfmYr0aVm0tkY=;
-	b=AtFYPujyb5gtuSKiMCZXa9U1Yq12z42jb5W5rj2M/JiyetYzuxmKZF9vYer+RH65wgjHDk
-	LSE7zETtKPNFONukTJISMXJwX8MZKVryOr9ln17JdWYKMT5CT/rc0QamY75iSYzw/p1n+1
-	Wg5pg4DuEkYVNtrjeXeB+CDXsi3f6no=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-SA4InLEyOxqzNDuo_xmcUg-1; Mon, 26 May 2025 00:41:02 -0400
-X-MC-Unique: SA4InLEyOxqzNDuo_xmcUg-1
-X-Mimecast-MFC-AGG-ID: SA4InLEyOxqzNDuo_xmcUg_1748234462
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-742951722b3so1526883b3a.2
-        for <netdev@vger.kernel.org>; Sun, 25 May 2025 21:41:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748234462; x=1748839262;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ucwg/e5o3VRwWOTQ7CVJZymUSW9w77nfmYr0aVm0tkY=;
-        b=LXPL/41fMhtzp1Dg+FUSntX/Vj4IoqK/sVWa3vuFjDY19NKupntsqq8HEZ/avCZJAZ
-         3t0M0ehw9FhvaihddCQgdWdqrQK01FD+mO1b/64wqQp/w2rlc3YdLFekf/9THUbGk6N7
-         KS0nloWc9I+1S/BeGVdu1x4VYyQaNMaAwBtIViGu3ELUzFnDb3llQo7FKJgAJCfBlZok
-         UtTzJ+HTFwW6cV4vh+C2W0cA3QbYoC7qK/j0z2F6b1Vy7kFmvR8fhGimQKW2wDJvwbCP
-         WKfHH25qHTLWSIW3KNagd00+zoeAaRZAflpKqTr4EX6am7U2SY9PRKAhJVV7hwxCrpE9
-         81Jg==
-X-Gm-Message-State: AOJu0YxtyntSx8nSLAbmaz88MPjzfSsYQPuoGNtxqcS8LPPp3bKpJ3x3
-	4qrgWlIOb16cMxI0pwQusWqkYMSLTb6oaNRAvDcMdLDa3LKbkb6AplqFovgVq8RXKfVj0iDkYTZ
-	xODJb4UjaNPE6SWHgYTFJnz+REZ3FKQBqvpFipc3CtL8ZtiYzkfZHJMdwbvsx3LHeOcFwjM7lGq
-	Optf/R6WuKi9e0glDe61iVWDBJWhSROhag
-X-Gm-Gg: ASbGncs2emEO02uJe9o2sax/Ybl3MrDsPRkdTBIhB8e1rvfhJ2tjJkqCWlBt5Wf9FRv
-	Akk3Emzxkvs9zyzYIRrkWB1K33ISQpJ8RrxMO/70duBeqd5H9ifXoMMYUoLGLv+ZeZfwSBw==
-X-Received: by 2002:a05:6a00:4601:b0:740:a52f:a126 with SMTP id d2e1a72fcca58-745fde9f2bamr11820065b3a.9.1748234461771;
-        Sun, 25 May 2025 21:41:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAK04zIQSIc1WBcTNJ28AKULM2W0amti2j695ihtddTt5xZz3xBerHbQGpvAoIxB8BBeZ5QTO7mUTZSidqrrA=
-X-Received: by 2002:a05:6a00:4601:b0:740:a52f:a126 with SMTP id
- d2e1a72fcca58-745fde9f2bamr11820046b3a.9.1748234461410; Sun, 25 May 2025
- 21:41:01 -0700 (PDT)
+	s=arc-20240116; t=1748235026; c=relaxed/simple;
+	bh=1qtOHnj9cZDZ1SLPicu9+HbB0wK3+BH4r85M66/sAbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fUNdoE3dLVSUrU8duOpv1ZRmi2SRuaWnOPgyW+aCnCw9jwfeoRIatpmIPWJ6HYBJno5IuhhST2EAkIHEEt8MDiWMQu0vkZXkaX7ZtiVa9+lHnhn4b0uBXI5x5nHWPbVHgoISybK9AGoXcCgZjEV6wbW/WKlXjmV4T74Av0bHAco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BkM6Mnv7; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748235025; x=1779771025;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1qtOHnj9cZDZ1SLPicu9+HbB0wK3+BH4r85M66/sAbc=;
+  b=BkM6Mnv7WDzQZit7Gmqjho94RtABqZB0Ycz9/Xxea6xW/wNWmjwC0bK0
+   /SGo2I7ooe1u3Mnqu0+JavwK3T8GqaiUex10ce8HGZl4RjW9sCzR5j4bC
+   GV7sdGh4qCmSqgKR798uudHRzQ6fkNR4vBN8NLU6YG2PsR2V7d8Bng/LQ
+   hqM8WlQN/gmZH6VEy/niNe/hWK804PX8XnTUDm5lDA19pPlg9JXxvshbF
+   5Ny8QRKDw/7mPD0w8iVZTRz1ol2bo5VIQ9ynwG77kqQ7Yf0jhsX9HoY1n
+   EY1wir8G5lShmRrzjkEb9MAjduNg25q405d5bCVQXZqIvIF3lyJk4edHS
+   A==;
+X-CSE-ConnectionGUID: YHAtjip2Ro+gUsaW7AdWrg==
+X-CSE-MsgGUID: X7O82TeqRFy9zrQUbAyYEw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="67607761"
+X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
+   d="scan'208";a="67607761"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 May 2025 21:50:10 -0700
+X-CSE-ConnectionGUID: DA394MNFSiKTDcvh4S/l3g==
+X-CSE-MsgGUID: QFiqzujWRIiTcrBD8tSmCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
+   d="scan'208";a="142788444"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa007.jf.intel.com with ESMTP; 25 May 2025 21:50:06 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1001)
+	id 35D1413A; Mon, 26 May 2025 07:50:04 +0300 (EEST)
+Date: Mon, 26 May 2025 07:50:04 +0300
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Ricard Bejarano <ricard@bejarano.io>
+Cc: netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Message-ID: <20250526045004.GL88033@black.fi.intel.com>
+References: <C0407638-FD77-4D21-A262-A05AD7428012@bejarano.io>
+ <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1747822866.git.pabeni@redhat.com> <f95716aed2c65d079cdb10518431088f3e103899.1747822866.git.pabeni@redhat.com>
-In-Reply-To: <f95716aed2c65d079cdb10518431088f3e103899.1747822866.git.pabeni@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 26 May 2025 12:40:48 +0800
-X-Gm-Features: AX0GCFsc7pbMV2Pm82eQdVZsmwv8Jm8o61uwkDNBcYWusVARPl8WTMMp-oMDzoA
-Message-ID: <CACGkMEvFRdgStxGxUjkCyUqn055bvL80bkH-kncvv=E+sLVymw@mail.gmail.com>
-Subject: Re: [PATCH net-next 8/8] vhost/net: enable gso over UDP tunnel support.
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
 
-On Wed, May 21, 2025 at 6:34=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Vhost net need to know the exact virtio net hdr size to be able
-> to copy such header correctly. Teach it about the newly defined
-> UDP tunnel-related option and update the hdr size computation
-> accordingly.
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  drivers/vhost/net.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index b894685dded3e..985f9662a9003 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -78,7 +78,9 @@ enum {
->  };
->
->  #ifdef VIRTIO_HAS_EXTENDED_FEATURES
-> -#define VHOST_NET_FEATURES_EX VHOST_NET_FEATURES
-> +#define VHOST_NET_FEATURES_EX (VHOST_NET_FEATURES | \
-> +                       (VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO)) |=
- \
-> +                       (VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO)))
->  #endif
->
->  enum {
-> @@ -1621,12 +1623,16 @@ static long vhost_net_reset_owner(struct vhost_ne=
-t *n)
->  static int vhost_net_set_features(struct vhost_net *n, virtio_features_t=
- features)
->  {
->         size_t vhost_hlen, sock_hlen, hdr_len;
-> +       bool has_tunnel;
->         int i;
->
->         hdr_len =3D (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
->                                (1ULL << VIRTIO_F_VERSION_1))) ?
->                         sizeof(struct virtio_net_hdr_mrg_rxbuf) :
->                         sizeof(struct virtio_net_hdr);
-> +       has_tunnel =3D !!(features & (VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_T=
-UNNEL_GSO) |
-> +                                   VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNN=
-EL_GSO)));
-> +       hdr_len +=3D has_tunnel ? sizeof(struct virtio_net_hdr_tunnel) : =
-0;
+Hi,
 
-Same as patch 7, this seems to ignore the hash report fields.
+On Fri, May 23, 2025 at 05:07:02PM +0200, Ricard Bejarano wrote:
+> > What is the performance without bridging?
+> 
+> I actually tested this as soon as I sent my original message. Interestingly
+> enough, performance without bridging is about the same: ~930Mbps in the
+> purple->red direction, ~5Mbps in red->purple.
+> 
+> I also tested running eBPF/XDP programs attached to both eno1 and tb0 to
+> immediately XDP_REDIRECT to each other. This worked, as confirmed by successful
+> ping/iperf even after bringing br0 down, and I could see the XDP program
+> invocation counts growing in 'bpftool prog list'.
+> But all I got was maybe (IMO falls within measurement error margin) a ~1Mbps
+> average increase in throughput in the red->purple direction.
+> But I guess we've now isolated the problem out of the bridge completely, right?
+> 
+> As instructured, I've attached the full 'dmesg' output after setting the
+> 'thunderbolt.dyndbg=+p' kernel command line flag.
 
-Thanks
+Thanks for the logs. See below my analysis.
 
+> [    4.144711] thunderbolt 0000:04:00.0: using firmware connection manager
 
->         if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
->                 /* vhost provides vnet_hdr */
->                 vhost_hlen =3D hdr_len;
-> --
-> 2.49.0
->
+This means the tunnels are controlled by firmware not the kernel driver.
+E.g this is an older non-USB4 system. The firmware connection manager does
+not support lane bonding whic means your link only can use the 20 Gb/s
+single lane. However, there is even more to this:
 
+> [    5.497037] thunderbolt 0-1: current link speed 10.0 Gb/s
+> [    5.497049] thunderbolt 0-1: current link width symmetric, single lane
+
+This one shows that the link was trained only to gen2. That's instead of 20
+Gb/s you get only 10 Gb/s.  Now since this if firmware the driver only logs
+these but I suggest to check this by running:
+
+  # tblist -Av
+
+You can get tbtools here [1].
+
+Reason for this typically is bad cable. The ones that has the small
+ligthning logo should work the best. If you use something else then the
+link may get degraded. You can check the negotiated link speed running the
+above command. I think this explains why you see the "low" throughput. Hope
+this helps.
+
+[1] https://github.com/intel/tbtools/wiki/Useful-Commands#list-all-devices-including-other-hosts-and-retimers
 
