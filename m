@@ -1,113 +1,165 @@
-Return-Path: <netdev+bounces-193587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5F1AC4AE0
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 10:58:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91315AC4B5A
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B25E3B90AE
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA7517C83A
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A884724DCE3;
-	Tue, 27 May 2025 08:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA0424DCF7;
+	Tue, 27 May 2025 09:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mikaelkw.online header.i=@mikaelkw.online header.b="AY6F70ne"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y75tqTOl"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.132.181.8])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58D324A066;
-	Tue, 27 May 2025 08:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.181.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F282B1DF26E
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 09:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748336294; cv=none; b=dwpPVceh3uKiTPBDaK/b5KCqQGHeN53FiixaejTDz9p/P4W9LR1k3A+tgV/DNS5oqt9DZGRgVwYr9jgl6GbVZHLDZZgieH3fmg4qh5A+QKzmzgmnddSjc+YieXm4AShlKuPL2huIzm64b0pwUtpXq31Ov0rzCBi6DqEchXOghoE=
+	t=1748337542; cv=none; b=nuManA+cdoArt3dkRdwHfPg/o3QQdAnsQgwAAcuRn0w35KYEK2NYQtymitgvx9YvQupOVQ4M3x7oKt+UU7KUkENDFo8EVhfAM86v8NmsocTl+wzmWfRYN1ILEN+6hEMVEXqTyYswEgu+uXpNGJmxHzLD+kj/+w7z7u1gFhMP/ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748336294; c=relaxed/simple;
-	bh=fIznW0zf7tRzozO0jQVRIS3oEoNRlp1hVjIZ4iMGIJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHowdOlpAaDkDajYFfEKMJFaFv1a+4EmiwwOfaDteqK2fHr8mrixOpiwV0XvAzX6Kx4pE9cfnn5w/3xKJQ00KTQNusJ7bIdFhdJ2EGTJ0Rz3LHAD9J92a8/NBGajNmOA3E/KcpDlHVaIDk2I33J1IuZ9lus23hyFuP6l8lCJM+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mikaelkw.online; spf=pass smtp.mailfrom=mikaelkw.online; dkim=pass (2048-bit key) header.d=mikaelkw.online header.i=@mikaelkw.online header.b=AY6F70ne; arc=none smtp.client-ip=185.132.181.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mikaelkw.online
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mikaelkw.online
-Received: from dispatch1-eu1.ppe-hosted.com (ip6-localhost [127.0.0.1])
-	by dispatch1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 3DFB9345840;
-	Tue, 27 May 2025 08:58:11 +0000 (UTC)
-Received: from engine.ppe-hosted.com (unknown [10.70.45.136])
-	by dispatch1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 0E706600B8;
-	Tue, 27 May 2025 08:58:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mikaelkw.online;
- h=cc:cc:content-transfer-encoding:content-transfer-encoding:date:date:from:from:in-reply-to:in-reply-to:message-id:message-id:mime-version:mime-version:references:references:subject:subject:to:to;
- s=pp-selector; bh=FfwiLz0qMLCe8pRJ2Xqblg8YMQN3QxXuQ0AQptgDjjY=;
- b=AY6F70neblY6M/62p9wx6POO9G2QYcyS2bxwQpTmGOCDMKMUGK01krhicplC+C8WC2C0sj0zi+t+RUN/cpVyYd+Kl5UuHs4zcLevmaxw734KQLTsuFDPgnMLODFCE6rJNG+B29C9jDIcH8yXpZ9SJZvaJxCCmGXB1t3/HxSLRxrhke6I6dMHEfY7qyJ/SAQiuJtcIYPupuTRJzLqJ7/SVvzia3VERwN5eiDLj92l6IJqqDhMAreURoswcrKRI2H+ZR8XQOlAvpdR0/BfPVX+Zk74iHxHQubJGiclCbwc+mBvxVFmjwZdTxAHKHyFQRgqV4pOn/qn9mqpkcpuf7sSLg==
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from test-ubuntu-rev3.. (78-26-16-15.network.trollfjord.no [78.26.16.15])
-	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 5454DB00056;
-	Tue, 27 May 2025 08:58:01 +0000 (UTC)
-From: Mikael Wessel <post@mikaelkw.online>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	torvalds@linuxfoundation.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew@lunn.ch,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	security@kernel.org,
-	stable@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	Mikael Wessel <post@mikaelkw.online>
-Subject: [PATCH v2 1/1] e1000e: fix heap overflow in e1000_set_eeprom()
-Date: Tue, 27 May 2025 10:56:12 +0200
-Message-ID: <20250527085612.11354-2-post@mikaelkw.online>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250527085612.11354-1-post@mikaelkw.online>
-References: <20250527085612.11354-1-post@mikaelkw.online>
+	s=arc-20240116; t=1748337542; c=relaxed/simple;
+	bh=ZcsiE8VsJGY/SJgauAXul2G1y5iuid8pqouGSPzQaOM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=t04nCchBgXlWicXj7fX4LWgj4ycM5tKjj21t8pLpzUWx4CFDXriHBKcfYzw8BDUMQhrYEFG1lsoqw5Y+4QN2lwUbz8uSzsxzYRJv6tbfonMfuZ/AMmbrSO12jd9ybmvSH8eifURRNi/ju44mlr8lX3jNWwVNQWAhM/BpA5NZT2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y75tqTOl; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3110462b463so3367754a91.1
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 02:19:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748337540; x=1748942340; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5+6sb9vR4ahmHqnY0N3Qi6sQkZ9rrv10CM4PGUMbiSo=;
+        b=y75tqTOl3L7sMt7z8IJAZ8pl8dQMAAgt92wXANWZt3h2cA2dWqb3d1h9jT40Yv/8zw
+         HcPVrrNvuBDosv0ZWFYt1eke2wcaWoJAewwmz8d/0dv3//bUQWVm4z4rNM3IyeKTLr4W
+         2khLrZoSH8rYtJeVHxMHjR7rPeZ39tGDXN0rig34fEvMavirvjAgoVCNUBect0UIBvcw
+         ryhNdTz3yB6r7xoZtoPa+ic0vnq5N31HYeb73i77GS6owlXbiIXwe9EUDkbOy8k/H3uW
+         Iq6SGZhUkRNdqcE6uUI0XWQbB316x1viI0dzpl17RAVsukawduwvHfG7xZ8+etTJKowA
+         Q53w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748337540; x=1748942340;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5+6sb9vR4ahmHqnY0N3Qi6sQkZ9rrv10CM4PGUMbiSo=;
+        b=WH+9OLngEM1ZC/cpT8Z0sPJa8deEkjkytGDNFm/yatzawaUONn+fcNdFXguHKCjYO8
+         ixTYdOXlv2fWbD5boNfW6Fxi3e87LcfyYcxHT1JQCl9XSqPuKY7ciO34z2foQdCLqouZ
+         6Ti1zwSpzRBQUDfdQsC74mclyUcoGeRvIL44JlXRieGDMa1MEs95zT6Z0KcsXG3Oug0c
+         VpTfK6/bVPxY6xN0DkpjSJTzu4QDbOkJkl5aFE6ZpphmBPKlcmYPGU6CFyVSrDAZECwH
+         nigpOBF20NgEWg5QmwFEYbl683/yUFU6cF5AuCfMMAxCeTe6TfwjU8EgUfSXlb5B//Hg
+         8FcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlT/Oj5oBdbxFMKDjr6wxnaGef/4k8/G6LbTmFrE0qcsmOunfbZ8nhUW4H7Fw+rdxEaUUqPQ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOeWNaqT9F4r4K8JsMZOu1LVsY//N1OUKvxEALYLwVCS8QMarU
+	2P83XWSVBVufBzidG1vRGAjMzNTJV6euTCmLOigvefwj9RQ92BSUb0lCQ+KoC13WMThXaojlfRR
+	x5EuIYIgQOWD3FyzXoZECcW3ETQ==
+X-Google-Smtp-Source: AGHT+IEKkHTv4glwErR8dVXArbvKUI6+TJ+cA7jQ653G2DWqcR73lUfYneMuq9cYAAq8g6aexkFnA+JWaq+2vaSkJA==
+X-Received: from pjqq6.prod.google.com ([2002:a17:90b:5846:b0:311:4c94:2910])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3f0d:b0:2f5:88bb:118 with SMTP id 98e67ed59e1d1-31111657d33mr16592647a91.22.1748337540290;
+ Tue, 27 May 2025 02:19:00 -0700 (PDT)
+Date: Tue, 27 May 2025 18:18:55 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MDID: 1748336282-23qMi_kDexex
-X-PPE-STACK: {"stack":"eu1"}
-X-MDID-O:
- eu1;fra;1748336282;23qMi_kDexex;<post@mikaelkw.online>;7544ea0f74a3697a45f5192d6efff48c
-X-PPE-TRUSTED: V=1;DIR=OUT;
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
+Message-ID: <20250527091855.340837-1-yuyanghuang@google.com>
+Subject: [PATCH net-next] selftest: Add selftest for multicast address notifications
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The ETHTOOL_SETEEPROM ioctl copies user data into a kmalloc'ed buffer
-without validating eeprom->len and eeprom->offset.  A CAP_NET_ADMIN
-user can overflow the heap and crash the kernel or gain code execution.
+This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
+and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
+removing a dummy interface and then confirming that the system
+correctly receives join and removal notifications for the 224.0.0.1
+and ff02::1 multicast addresses.
 
-Validate length and offset before memcpy().
+The test relies on the iproute2 version to be 6.13+.
 
-Fixes: bc7f75fa9788 ("[E1000E]: New pci-express e1000 driver (currently for ICH9 devices only)")
-Reported-by: Mikael Wessel <post@mikaelkw.online>
-Signed-off-by: Mikael Wessel <post@mikaelkw.online>
-Cc: stable@vger.kernel.org
+Tested by the following command:
+$ vng -v --user root --cpus 16 -- \
+make -C tools/testing/selftests TARGETS=3Dnet TEST_PROGS=3Drtnetlink.sh \
+TEST_GEN_PROGS=3D"" run_tests
+
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 ---
- drivers/net/ethernet/intel/e1000e/ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/testing/selftests/net/rtnetlink.sh | 34 ++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 9364bc2b4eb1..98e541e39730 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -596,6 +596,9 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 	for (i = 0; i < last_word - first_word + 1; i++)
- 		le16_to_cpus(&eeprom_buff[i]);
- 
-+        if (eeprom->len > max_len ||
-+            eeprom->offset > max_len - eeprom->len)
-+                return -EINVAL;
- 	memcpy(ptr, bytes, eeprom->len);
- 
- 	for (i = 0; i < last_word - first_word + 1; i++)
--- 
-2.48.1
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selft=
+ests/net/rtnetlink.sh
+index 2e8243a65b50..9dbcaaeaf8cd 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -21,6 +21,7 @@ ALL_TESTS=3D"
+ 	kci_test_vrf
+ 	kci_test_encap
+ 	kci_test_macsec
++	kci_test_mcast_addr_notification
+ 	kci_test_ipsec
+ 	kci_test_ipsec_offload
+ 	kci_test_fdb_get
+@@ -1334,6 +1335,39 @@ kci_test_mngtmpaddr()
+ 	return $ret
+ }
+=20
++kci_test_mcast_addr_notification()
++{
++	local tmpfile
++	local monitor_pid
++	local match_result
++
++	tmpfile=3D$(mktemp)
++
++	ip monitor maddr > $tmpfile &
++	monitor_pid=3D$!
++	sleep 1
++
++	run_cmd ip link add name test-dummy1 type dummy
++	run_cmd ip link set test-dummy1 up
++	run_cmd ip link del dev test-dummy1
++	sleep 1
++
++	match_result=3D$(grep -cE "test-dummy1.*(224.0.0.1|ff02::1)" $tmpfile)
++
++	kill $monitor_pid
++	rm $tmpfile
++	# There should be 4 line matches as follows.
++	# 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=C2=A0
++	# 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=C2=A0
++	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=
+=C2=A0
++	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=
+=C2=A0
++	if [ $match_result -ne 4 ];then
++		end_test "FAIL: mcast addr notification"
++		return 1
++	fi
++	end_test "PASS: mcast addr notification"
++}
++
+ kci_test_rtnl()
+ {
+ 	local current_test
+--=20
+2.49.0.1204.g71687c7c1d-goog
 
 
