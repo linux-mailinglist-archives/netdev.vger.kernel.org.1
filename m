@@ -1,234 +1,206 @@
-Return-Path: <netdev+bounces-193612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF8EAC4CF6
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:15:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08EF2AC4D0C
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F3C189F946
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEBB5165FAE
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB1E25EF9C;
-	Tue, 27 May 2025 11:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781BD258CDC;
+	Tue, 27 May 2025 11:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="g3neIP8P"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="IJUp31k+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2037.outbound.protection.outlook.com [40.92.22.37])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5900524887A;
-	Tue, 27 May 2025 11:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.22.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748344481; cv=fail; b=T1uKjXoEt/dYMG4atCPj0SBsO2TcnBOKn9ra0KyVZRquKzv8nGjbZuRE+3t/mGUcC4hSSzXEglr4LHWELm7MrU3U57uX4DyfD0UprasHOGAvYy3jVTtbod7sQVcTGyw8CH7VBzbmYx+HTdAYAMQppA2bnxxKTCRpQzepha/fMZk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748344481; c=relaxed/simple;
-	bh=QtRen8pK3Xo0GkjNZeyple8dNo5s6WFRb1daK3tvOXk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=etCEeCDMgfD5a1cwFaUb75XyCTIag3b6g7uGBE1l856fdBA+lhjPSuX0sbGHbIKhJTfkyoiCKIisZtA/8lNGATZfCdbtFrBHIugLXC2+E1Mq3wZKHn0UV6/vEEnCFCMTAbQ026qh7t0JODOsT4x0aQsdD/dYrP4Z+6e8CFqghDg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=g3neIP8P; arc=fail smtp.client-ip=40.92.22.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zRwDyR/HsJaA5QD/1J0hJ/cI8DYN8ryKfVWZmLsym98K9BI3p0fx81rAUG1gg+Pj76ZngI1ZWpOVR6x3TSogRdcJVUYojLO1Y/eOVq/K9eSRRlSk58R6If+atIW1D1CdG8QvzDL65P+eFkHiFZkPEQxU+XQeaBCQ3dombcdZfaFR1aKZugsXvpCnOkpgR2N8gOVxTGJii/VBpIQGbkUNdg1l+8WQPe4r6oJNSywTYxwlRTN+e/gpqVIqjtS62yYJy2UAQ15u8FxrN3WZtGMVETzeYUMOi8+5JLl4Qd3Wmzg+AjV6NyLmAAnvqdYquHY9harw3HcvcrweumYUksS1PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G0apB1l3eIgjWYBvSnLv+O8YTFrPinzwLXU1TgD2NtI=;
- b=VZTTmc0Ikif9KdM25euBZ/Knr9rqo8jsc7HXwKvm+PjyLTsIiuY+inUOwRR0DOVNcHebdm4IjCsQkROj37z+d4+pL6nJ3Oz0i3dp+Nhw2WCNv0a7W8WjSD3dYRWbAKajA2pk5PVH6/qNxgoDVF1cDoMjndAKJjrkM2rBekiYYsI43+fo6gk+sC4VUaH6ePC236D8xz6tyBohGI7KbLtO5yfEU1z2niIdv01XlE1dV65gkyG74jxMyzo3u2tkkmR0MekdpFP9WF/KVTte/jzhDMPn2TztNKddtCdYtOkpDIlE/tVWx+U0VZlQ0wE8osH03th7/2c7QIuU893VxWcEsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G0apB1l3eIgjWYBvSnLv+O8YTFrPinzwLXU1TgD2NtI=;
- b=g3neIP8PTjzzyvi6EBt3NaXFDHi5bQLT8OvVUw7tLkWxT5qDuBAxVjax4Tnmin1M5KC7PmH/m8GOfGHRWNYsweAIWNYuD216BEfGoMT8yFlY4XnUDeYHMR1oohzXp3j6gNheHMMRXu7N/7zglOY/+/rFmsUunJ07YGn/cSlPlFpDB6UpKwCfUg+TA0oriOA9ifNj/FtcRqJENqF8DsmkwHKRRDOwqsYJzrNKbuKzaMcU69fKXdFFgUxABPJgxw0UeupoF8rkxkJgLh3Vbj1J94a+Pqw8F1uXegZk5twkznj/RrsQVpfO+fMemEKV7LQG3G/JujJ50wCBwxbRpzcCZQ==
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com (2603:10b6:8:253::16)
- by BY3PR19MB5202.namprd19.prod.outlook.com (2603:10b6:a03:36a::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Tue, 27 May
- 2025 11:14:35 +0000
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305]) by DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305%4]) with mapi id 15.20.8769.025; Tue, 27 May 2025
- 11:14:35 +0000
-Message-ID:
- <DS7PR19MB8883BE13166F7CD5DCA777DB9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
-Date: Tue, 27 May 2025 15:14:23 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] clk: qcom: gcc-ipq5018: fix GE PHY reset
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-clk@vger.kernel.org
-References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-2-ddab8854e253@outlook.com>
- <337068fa-adc2-478e-8f3f-ec93af0bb1c6@oss.qualcomm.com>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <337068fa-adc2-478e-8f3f-ec93af0bb1c6@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-ClientProxiedBy: DX0P273CA0090.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:5d::17) To DS7PR19MB8883.namprd19.prod.outlook.com
- (2603:10b6:8:253::16)
-X-Microsoft-Original-Message-ID:
- <c23b3fc8-fac6-4dd2-b42b-7cd5ccc0054e@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBFD1EF0A6
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 11:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748344775; cv=none; b=L+LOHhEhtdhXBGAhL5dMrLZpiSIVMWOJXuTxG9OZmlwFe2jGrEPYSc0X3qBtVjMt2pDb9O0FId4o762/B+n4X93eWjDYb6TomcW/7URtUfyG6iwr73GTrUQPnEkQFLRQeX2ym5uq99c+0kr6K0N4tx0zzX9NS+q391ezEqqa8Hk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748344775; c=relaxed/simple;
+	bh=19feJZZTbb+km5oSmqKqxCaJrNvkXHMQEj7v3RsRCgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qla9eIH5sYkNWqdxjq9hd7o/NuTbUvfRvPHauby36Jq6fy/DdEjoGBsPK7fIxu+0jCpNh0W/0MT8SavCWThS7Dfs0fHUY3FrgRjAxBZaglAxanU0LtrlUtL0d+LePpDhaCFiyFSY5EJduBVwAZgfBONbwD0FLY8ag/PhKMEsuu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=IJUp31k+; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54R3umuO003683
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 11:19:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	sGGnr2Cf6uz/5zgl9H9llVxN13njxFiPARnslx3OyQY=; b=IJUp31k+8iZ8fZ75
+	0IwkgnNKcfWG8ZX6uBxvXyY1Pmba9MTgMyJ9hqR/1Gcp+7OmWHv9LA8JhHQdA7i3
+	0aP3cvkaobNyLO6lUXfZI/r5rOmMnNC/Kk4VIT7VLVcFNxBQNaWwqTUs1p6XoQXu
+	IkRafdp2EyegDVWCus8pQ8A/XQAfHuBaonnhptNyzYVipO5H13DaAsEqum0kSqCE
+	S9gCjy/EmPKtHuvimd1LZxt4GPWzAXaZ8NGenBMk9FQtlRDoAVv8iw9IKr4P63V0
+	0KwSVQQfRuSO+4HlfdQGBD5BkolkRSTbb8/iuv3xdX0bX/NX11e5MtPohfZTLmUE
+	AS6T4g==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46u5ejxkcm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 11:19:31 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c5466ca3e9so44637085a.2
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 04:19:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748344771; x=1748949571;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sGGnr2Cf6uz/5zgl9H9llVxN13njxFiPARnslx3OyQY=;
+        b=qAPIpfsisJzMUmciAqh7m7hA+qnH+XUtn+U2qv8myHWUsQGoWSLI5n+M46hauLbuDN
+         rJ6ZRaXR5kshgH96/ssp9sxQFLio/ox6hFniXlXFa8VkR82Ujr+kEGQL1eT32N8xJJZH
+         lpJwzvV1cHTS8lrYFA9/uLb5+sahTLAK9wjkdyFnc7bSHmautyxbzslFgbhQL1+jb6wY
+         pETa29NjaGiSBggxmnxD1bCfrUodJc2E9hl2V47OCGeVmrT4mqDpfPZOp8dD7P1F71qb
+         Q08olyoDMnJFDbY/raJ0JA+hTkDQMuRLK5hP1mWCmAeJRbp1HIYDMw5Gy4Y//shCn+KT
+         UnOQ==
+X-Gm-Message-State: AOJu0Yz9FcISUJD33tN9ENQ2WAj+wyZBfsr6ut1A7PgMVD8jhg2kM4JQ
+	7EnFglocopbWWVKS/E2kMmDdizhKCLcBEgDfFcgAANYtvOm+AVTswqu1K6S1+U5uQNt76puPVj2
+	x+8v5DSh4cLu3TMurWb8xcfOs83yg5Z4k6M3yk6i4O8SDOecGPSqXoNY/VmQ=
+X-Gm-Gg: ASbGncvM1grCizsUfcUqcdAxkrJk13KvPPGpVIOdCycVrA1o8NA3rf71//BX3mq/BkC
+	HBrJM3Z9mWQ1tNAYoISAwQp+2hZHPzSf3AQK8d0UeO0c4EhocM1RNnlsJp+JMXGL3f+HKvakBQW
+	fjpzMmSRZ1ppRsweMnIPytspvsT6O+TIF4gx/jgWiQ/VkmlLZFRWr7JWXdUuEl21hcW7ZxWnLh0
+	33q6c7nf+0sdtl058CWFxVEsahyQCtVhRWcbzIceimfIE/lTmrM11mceR2az0HAeWWdjL4y/Ugo
+	qthylRrJHzWhumercO0YVplcX/3PYjv6pSLQQWS1PKjSH9lp2DtG1GozTIF6tNmoZA==
+X-Received: by 2002:a05:6214:2124:b0:6f8:e438:6a31 with SMTP id 6a1803df08f44-6fa9d38a281mr84868936d6.9.1748344770692;
+        Tue, 27 May 2025 04:19:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEVX0YQa52wzPt5zotLH02+4Oq1iIQcnbNqEa0aCHbsQCwGP7XhMmeQ5L88JOR1OO1b3BhmMA==
+X-Received: by 2002:a05:6214:2124:b0:6f8:e438:6a31 with SMTP id 6a1803df08f44-6fa9d38a281mr84868616d6.9.1748344770315;
+        Tue, 27 May 2025 04:19:30 -0700 (PDT)
+Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6049fe0e94fsm3125097a12.26.2025.05.27.04.19.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 04:19:29 -0700 (PDT)
+Message-ID: <99fd4103-97e0-486d-9e6c-66c8adb70b3b@oss.qualcomm.com>
+Date: Tue, 27 May 2025 13:19:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR19MB8883:EE_|BY3PR19MB5202:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6631bd72-0a66-48ca-6914-08dd9d0fa8ee
-X-MS-Exchange-SLBlob-MailProps:
-	/UmSaZDmfYCV7gMu87/GtwOd6jzNwNFltboDOuONhDWeadRUwjWxNIGlFmrIBpwKDSAb35yWOmp/3qFYCDAGicJodze7Jn98XgYyC/ghS9Wz7OQHI4tNFO6M0ikIjFD8dEv/JjXCdx80ZUoISomEAFQTqStxrX5jbpEdrQvmwuM5vlaIEvCu3YcFyxVUS4PveziEhlymut823+zRScWcjrO2eJQO2pM1MtLFVDtntgj9+G4bAWng5Uv/g6nt8fHsrB79nBs7FtzhZmCrClziPS5QsIVpwrGqbrFG9aSyC2RUhgF2O5wtS1M3gT01vJtrpZPcC6WT5Fx0MBF3lVEaoaehhBE28jDsI+duTyru+7iju7OmP09ofpvZXpP6RNtiSAOE9nHZ7yXIALu3sMcJP/ZZklKXMfEl8fp+H5CEsVyRFxYaOVLsyT1l7NbXFSHLUht6USnNLGS40xvBoQZpn+Ecnkq2pSKbqYYNjj2/PCrFGLNYIXieQJXC8m7k+MuWywqfIFAK24mEZ/+QxfIZAAD9D10qeUlBOMk9mPZL3Xc5XJNUvpBti8J5sj8bCwpLw9pVlES5ue1FdtrV4ef9BQTGwqe3TG8Tw8hky3MpeYwHT8uM/RxMnUzCGSgWnA1l43aniId8dMgp1aP4lwtmswPmWZrxtutDkZaQxj7UvpseyJ4bGf4IWj1NReEK+h+HuKfz3R2qvQ3hjCIrrQQS9tkAfTQrPUAW1/dx8Mr88hsavcX+CcS4A1jC0FTeh2F3pxSC0whKhXkG9z1e7rLzYSgIinDSi9knPWlYrn4jNJhaB4PSlNNBDB+OEeJrK30Yx6SLOXoCtY8OOJxS66knZA==
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|6090799003|8060799009|7092599006|15080799009|19110799006|21061999006|5072599009|1602099012|440099028|3412199025|4302099013|10035399007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?c3RUYkZaK3A1MXhrT2tudzYyMjBqMVRsdE5IRzhmQzhjMnZJMEpyMk1vT2Fv?=
- =?utf-8?B?ckg3NFltbVJwRnJlR0VrQnhidkI5TFpMTXBBTStZaU9pQWlqMWZSMmJiRDZq?=
- =?utf-8?B?UlNkNGFydVVlSzZFeEVzVk14S1BqMnBhWjdmVlZXUU9mb3ljTEpISTh1bDla?=
- =?utf-8?B?M2hERDg0VHdWd0gvWENmbE9JelFuTXkvWm9rT0VqcDJlN05SUnZpN1VtcVlk?=
- =?utf-8?B?OUtPTXFBU1JnSDZtV2dhclU5NkhuUlFsQ1YyajVJR1dBeHlqZlU4WGZOd1h1?=
- =?utf-8?B?V29nVEQ3bTQyL3B2MHAvVVF6U2luZW1QMjMxai9sNTI2MXZnZ05kRm5UeU1l?=
- =?utf-8?B?SWlLQ0J0NnBlQUpqZnpING1HRkxleHYxSGkxNGVwTjdTaWNkUnc5cThMMzZL?=
- =?utf-8?B?QWp4Y0lwWXlVditpRkpEeTVScHlxZlVOOEs5MkYydG91Tm8wZWpCNVJoR2d2?=
- =?utf-8?B?UlA5a0NjZFVHTmEwRWVqZmVuWmdlRWZvUnMzRmVhUCt4dHJpdDFYRDZFVWVq?=
- =?utf-8?B?a3Zya3hrRFJhVTc2dVJibXJnQiszQTFSTzFsRXp2R0xvR0l1WnBrRGFSbW8w?=
- =?utf-8?B?b2lEZkJZcFd2T05FRWZUaHB0V0pEaGsrVm5MeStDTDlJZDM1UCtKVHQvWjVK?=
- =?utf-8?B?dEpEQzkrTWFSQkNDZEZ0cXFkUWVEdmNMUHJ1UEtUMVhmTkxaNFd5Q3hQTjBJ?=
- =?utf-8?B?U0VSTjVyQVZSY1RzK1h2bE1wemlxVE4rVHpnSGNoZ3MzTzN1Y3F3azFzUXpk?=
- =?utf-8?B?UkRpYUdHUWNEbVBDSnBDdCt4U3ozL0tSS1NYOFhMU056a2Z3ek5TZm5haXdh?=
- =?utf-8?B?MmpvRkF5cXlmYVdQTzlBcS9NQm5ha1NnTE4xMUxEanVrVXp3YUpycUNiUmU5?=
- =?utf-8?B?aVdDU0xwUHdtY2ZqeWhtRmY3STh1OUgxQk9VUWZzNncrUEdJZVBBbmh2MmpE?=
- =?utf-8?B?V0FuL0Z1STNTVWxuR0t4a1N5YnF3akhhdXFERzBhVjdXNHFseEZ6bWZrVG8z?=
- =?utf-8?B?QXVkOTNINkY4bmVTdHN5SmNSY3QrRURuT05zWlJZU292VVFEbGJHS0JaaXBW?=
- =?utf-8?B?SElOTlpReitXaWQxQWVEdmlqalE3STRLVG5NaFBCQXljeVNjanN3anVnQVlD?=
- =?utf-8?B?WXI0V2s0T3Qva290a0ZTc3puRjNLRGdIUWNJVGFmbEJUOUttNFdpdHdPMlpG?=
- =?utf-8?B?Y3c4SUo0ZmZ1azQ4YzlEMkRjOGhYc0RBYUhWZ3Fkb0xBOGlRamJ2TTJQNTZM?=
- =?utf-8?B?czV2b2F1cFUyZ3BZVVppTzBELzBhOFhSTlBBNWhoR2ExYUJlV3RTZk9yalpB?=
- =?utf-8?B?WlUvWUUvVFg0R09qSkFTUkFiNXU4SzdyZThzK1N0Tm5OV0dtRzZGNzY4NGtI?=
- =?utf-8?B?T1Q1RElTZE8xSXR4bS9sYXJzck9BRGNoUXY2ZVhqYU9xN2t4TUx0L2R0REFh?=
- =?utf-8?B?Ry9Sb01EVTNYbE5MQkUxSWw3WVNGWEM5M2VXbHIyK1AvSUxJVHF4MFVUWFBw?=
- =?utf-8?B?c2FYNVBQRzlidDIwZmxJTnVqZmY2T2QwU2ZUbGVSK1hiSUlldGovM3VqaTAr?=
- =?utf-8?B?MXYyZXBPNTl1ZzFYNVIrU1VteFJTdklBSmhFcjAxcVlmQ3p6akR4aU9hYjR6?=
- =?utf-8?B?QlFwMTZVZlcyaU5iY3cyTUltempIcGtMTVFqNU51a2cxNDhvNHNrQmUwS3Q3?=
- =?utf-8?B?UTlIS1UzOEN4WkxMWm5hMlhHSW5BZldCYlhFZVovaWlLMURTNWFCVFF3c3hL?=
- =?utf-8?Q?G5tI+mqmvNDwXWxGsI=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OXZlTzd2bDA2VVFKOXFqOFpQdGRTVkRvWkpGdVFTZFB5Mk4vMkhQamEvV0dZ?=
- =?utf-8?B?Z3Axd2xFYkt2RGdUTmtab3RiRlJGbnRnLzNpZ2R6NHZLTWk1VUl6SE5ROFNt?=
- =?utf-8?B?MEZzUmpwZDczMXhZYUs0NjZ2STNpZzJxakZjOTlSWDJ3N2pKSC9TdDNNclox?=
- =?utf-8?B?SHRXNHFoeGZoODJLRDVGNWZNREdTaC9Nd0hVMkpTMXVOQWR1K0F2eGV0YWJZ?=
- =?utf-8?B?cGZqbVRsbEJSc0RKc0tpeDBvTWdjaXYwellxcnZCWURQSWNZVVVMYVdYWU5w?=
- =?utf-8?B?NHN3SzM4VE9ZdUg0ZkN3U0pJYzdnejhteGlLeUc3MUNydWtxN1cyU2pxQlY1?=
- =?utf-8?B?Q3dMUUdick9Bb01EUDdqNEZydFdKMExhTmVzcnhMSVlTRXJ5ZEZhZEI0UEVw?=
- =?utf-8?B?WWdvUzltUzV3MzFZUUp4MEIwbmxOREpmRzlYS0dmY25PMjJSZm1GemdxNnRu?=
- =?utf-8?B?Qi9tMUt0eWwrbERKOFMvckNUT2l3bWdzYTVrNFk3U0RFQ3dlRVBlNHhaZW9E?=
- =?utf-8?B?bjNWeU9nV0ZXSG5Jb3MzemVuOGpydmRtTWd0dTlFNGZtd2Z6bXhpWEpLM0cy?=
- =?utf-8?B?SStXVk9BNkFsUDNWNy9sZGFxTmVOWm12QnNjZExaTnl2SGNMRndkSnRBM3k3?=
- =?utf-8?B?d1hsbmZRVjZ1UkRCRHBHQW9VTTNYbzVGbWY0b3Z0VHptWlVadmJyZ2tYclJk?=
- =?utf-8?B?SFFKOFhsS2VHbE5kTmZ0OEpaUmN2ZEdiUEt1T2pEeThuTFVET0tBUkpLRkow?=
- =?utf-8?B?cVd1Y3VJRTVxcXptcHZNc3J3a0I2dlVwN2FxWnd3MFJBTUJQQlF2NXRhRklV?=
- =?utf-8?B?eWxtM2VkMnNjWVl0NG9pOEY5UGxseEpHNC8rYUlmd0JLVkRxTU1uMkNqNjBM?=
- =?utf-8?B?clhZbVNxOWwrbStONm43S0RHbUh6UDFyU0NFdjRoWE1MbGpKWWJHOHBIQnBB?=
- =?utf-8?B?aVIxM0F5VzNNV0l2NnV3QlFqZHovZWl2b2YyeVduMldtR3FsRnkvZER4ZUM4?=
- =?utf-8?B?bDFtclJyem80dFRNZzc1L01JOWJPZ0ZicUVJK28wK3d3WTVuTVlxRVB3RTBt?=
- =?utf-8?B?a0ozVFdIZFo5TEpvVEQ1bnBRaFNiZ2lYaHBabmRVbEpGUGovVjIrY1k1Q3JV?=
- =?utf-8?B?cTJKTi9PdDA3R1ZYL25SaExVQmRlajFCWkgxMnhhWGNhcVlIZnN5dVZMdlhy?=
- =?utf-8?B?NG10M3FIcnlSb1Y0MTRJeVl5TUhUbTRzWTRybE5YVjNvMXZiSG11Z0dWZUwr?=
- =?utf-8?B?TkVUdXVkN1I2cDZ6OXNqdjlHSHFiR2p1aGVRTEloSkJlMGNqY0ttRVoyUG02?=
- =?utf-8?B?NUV1WlQwZXY2VmdxRjVuVmRJeUtFY3QyZmEzU1BPSmM2bHhCVzBJblkrZDZK?=
- =?utf-8?B?VXVBZTJYalFocW5kd05ISGVJdjlvT2JQcDB3b2hlL09mUFhyNFVYTDdEakdR?=
- =?utf-8?B?Y1d5dlh5NDU3TjVaMTZUQmUySU81aGE1UmZnT2R1R1JqQzVraFA0TjhxbEho?=
- =?utf-8?B?RUMyZlFTUmdsNDZFYnhQQzA1NDJYUGhrWHpIQkhpdDN0cVhzOG1CbVo1enpX?=
- =?utf-8?B?UEJaWnZjVDI1cm90dkdhcWpjRVZxUUpJYmpPT1VzRGxPN1FFczlDVDRqMnc1?=
- =?utf-8?B?V3dyT2VsbU5IQ1lYNHlYRWwvWDdFWFg3OHFkdGNWckVFQlpKRmJxZSt5SUpq?=
- =?utf-8?Q?RU4OPm1UuFJuS6gtDsjh?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6631bd72-0a66-48ca-6914-08dd9d0fa8ee
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB8883.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2025 11:14:34.8475
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR19MB5202
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] clk: qcom: gcc-ipq5018: fix GE PHY reset
+To: George Moussalem <george.moussalem@outlook.com>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd
+ <sboyd@kernel.org>,
+        Kathiravan Thirumoorthy <kathiravan.thirumoorthy@oss.qualcomm.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-clk@vger.kernel.org
+References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
+ <20250525-ipq5018-ge-phy-v1-2-ddab8854e253@outlook.com>
+ <337068fa-adc2-478e-8f3f-ec93af0bb1c6@oss.qualcomm.com>
+ <DS7PR19MB8883BE13166F7CD5DCA777DB9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <DS7PR19MB8883BE13166F7CD5DCA777DB9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=GIgIEvNK c=1 sm=1 tr=0 ts=68359fc3 cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=qC_FGOx9AAAA:8 a=UqCG9HQmAAAA:8
+ a=2jJET5DcvFRXXXsR3agA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=PEH46H7Ffwr30OY-TuGO:22 a=fsdK_YakeE02zTmptMdW:22
+X-Proofpoint-ORIG-GUID: DkY3C5n0Tu5ovBcfXOXtXu_fm9HzIYfh
+X-Proofpoint-GUID: DkY3C5n0Tu5ovBcfXOXtXu_fm9HzIYfh
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDA5MyBTYWx0ZWRfX32ytFG7mLCgg
+ SfGBpsY2jq767jH689T+kv/0cEvV9nil9FGvVr57USmWYUlybiiAvTsur01RnZ2sLmEpcMTWG6Y
+ TFqvVPdr6+EhCtikdE3a7DXSZfWY7lrT8JZGC2l9fMUsEzNv/ZmeJHUZigCENBWIH4LjvXOKFzU
+ MkpzTnhq0h4anCVT/MS8HZqaR8t9aHu5qUCFNccxAc1jP9fJIgEw2qNQRigYeap+HznpF5ej3C1
+ 5Q872hVq9ZtPnlc7QO+GPiFLwdspKms5dsJv8YJkhq4aOBOHD7YilXW2L9wC65sYltHMg2CNudv
+ rLzNSetw0W+9fHr7NIRVOXFSSd3LRS1zM0ndR5Zv3CjS6BEB06WwIT3HmWCkYH8nDYxeHZm9pfk
+ S8d4VQlfCevtZPPIq8ij6DCjdJCv+8Ui0MXLLY3mJBz3XqQ7anRkWVXzSU66FZmt1UIue8LN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-27_05,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 phishscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505270093
 
-Hi Konrad,
-
-On 5/27/25 15:00, Konrad Dybcio wrote:
-> On 5/25/25 7:56 PM, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> The MISC reset is supposed to trigger a resets across the MDC, DSP, and
->> RX & TX clocks of the IPQ5018 internal GE PHY. So let's set the bitmask
->> of the reset definition accordingly in the GCC as per the downstream
->> driver.
->>
->> Link: https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/commit/00743c3e82fa87cba4460e7a2ba32f473a9ce932
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
->>   drivers/clk/qcom/gcc-ipq5018.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/clk/qcom/gcc-ipq5018.c b/drivers/clk/qcom/gcc-ipq5018.c
->> index 70f5dcb96700f55da1fb19fc893d22350a7e63bf..02d6f08f389f24eccc961b9a4271288c6b635bbc 100644
->> --- a/drivers/clk/qcom/gcc-ipq5018.c
->> +++ b/drivers/clk/qcom/gcc-ipq5018.c
->> @@ -3660,7 +3660,7 @@ static const struct qcom_reset_map gcc_ipq5018_resets[] = {
->>   	[GCC_WCSS_AXI_S_ARES] = { 0x59008, 6 },
->>   	[GCC_WCSS_Q6_BCR] = { 0x18004, 0 },
->>   	[GCC_WCSSAON_RESET] = { 0x59010, 0},
->> -	[GCC_GEPHY_MISC_ARES] = { 0x56004, 0 },
->> +	[GCC_GEPHY_MISC_ARES] = { 0x56004, .bitmask = 0xf },
+On 5/27/25 1:14 PM, George Moussalem wrote:
+> Hi Konrad,
 > 
-> The computer tells me there aren't any bits beyond this mask..
+> On 5/27/25 15:00, Konrad Dybcio wrote:
+>> On 5/25/25 7:56 PM, George Moussalem via B4 Relay wrote:
+>>> From: George Moussalem <george.moussalem@outlook.com>
+>>>
+>>> The MISC reset is supposed to trigger a resets across the MDC, DSP, and
+>>> RX & TX clocks of the IPQ5018 internal GE PHY. So let's set the bitmask
+>>> of the reset definition accordingly in the GCC as per the downstream
+>>> driver.
+>>>
+>>> Link: https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/commit/00743c3e82fa87cba4460e7a2ba32f473a9ce932
+>>>
+>>> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+>>> ---
+>>>   drivers/clk/qcom/gcc-ipq5018.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/clk/qcom/gcc-ipq5018.c b/drivers/clk/qcom/gcc-ipq5018.c
+>>> index 70f5dcb96700f55da1fb19fc893d22350a7e63bf..02d6f08f389f24eccc961b9a4271288c6b635bbc 100644
+>>> --- a/drivers/clk/qcom/gcc-ipq5018.c
+>>> +++ b/drivers/clk/qcom/gcc-ipq5018.c
+>>> @@ -3660,7 +3660,7 @@ static const struct qcom_reset_map gcc_ipq5018_resets[] = {
+>>>       [GCC_WCSS_AXI_S_ARES] = { 0x59008, 6 },
+>>>       [GCC_WCSS_Q6_BCR] = { 0x18004, 0 },
+>>>       [GCC_WCSSAON_RESET] = { 0x59010, 0},
+>>> -    [GCC_GEPHY_MISC_ARES] = { 0x56004, 0 },
+>>> +    [GCC_GEPHY_MISC_ARES] = { 0x56004, .bitmask = 0xf },
+>>
+>> The computer tells me there aren't any bits beyond this mask..
+>>
+>> Does this actually fix anything?
 > 
-> Does this actually fix anything?
-
-The mask is documented in the referenced downstream driver and allows 
-for consolidating:
-
-resets = <&gcc GCC_GEPHY_MDC_SW_ARES>,
-	 <&gcc GCC_GEPHY_DSP_HW_ARES>,
-	 <&gcc GCC_GEPHY_RX_ARES>,
-	 <&gcc GCC_GEPHY_TX_ARES>;
-to:
-
-resets = <&gcc GCC_MISC_ARES>;
-
-to conform to this bindings restriction in ethernet-phy.yaml
-
-   resets:
-     maxItems: 1
-
-Effectively, there's no functional change. So we can also list all the 
-resets in the device tree, whatever is preferred.
-
+> The mask is documented in the referenced downstream driver and allows for consolidating:
 > 
-> Konrad
+> resets = <&gcc GCC_GEPHY_MDC_SW_ARES>,
+>      <&gcc GCC_GEPHY_DSP_HW_ARES>,
+>      <&gcc GCC_GEPHY_RX_ARES>,
+>      <&gcc GCC_GEPHY_TX_ARES>;
+> to:
+> 
+> resets = <&gcc GCC_MISC_ARES>;
+> 
+> to conform to this bindings restriction in ethernet-phy.yaml
+> 
+>   resets:
+>     maxItems: 1
+> 
+> Effectively, there's no functional change. So we can also list all the resets in the device tree, whatever is preferred.
 
-Thanks,
-George
++ Kathiravan
 
+are there any recommendations from the hw team on which one to use?
+As far as I can tell, the _MISC one simply pulls all the aforementioned
+resets, like George described.. it seems weird that it would be designed
+like this
+
+Konrad
 
