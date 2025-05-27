@@ -1,115 +1,197 @@
-Return-Path: <netdev+bounces-193584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5BDAC4A62
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 10:39:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DACDAC4A68
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 10:41:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77BA3188F2E0
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:39:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B88F03A5234
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BD323F431;
-	Tue, 27 May 2025 08:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87DC2494F5;
+	Tue, 27 May 2025 08:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="um1qFVVn";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="aLKZ/u4z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHym42bi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A143E8462;
-	Tue, 27 May 2025 08:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C3224A049
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 08:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748335179; cv=none; b=LcaxI5ahkG4JUWA3/Ca67bom2sYSvTCh19BgMjhoPfcRgnpZNBM/yYwRl2p3leD5wF15A/Qe4BT31Hoae/TdHtlsWZzA4CmaNwe3zQWEZl5luwIKML6sHjIP3jetpXKyTW1hp27VDSPGyfv/JpqCBWF48/5UoOwAlRkwJxjEs+w=
+	t=1748335277; cv=none; b=JRvY9Mi8c9swA448dP+7XR/215sD2RD7zfA+LIK0mat1svT1Nd8jR7z0aj031qwwl6vtPM7Bqmt0mi31cOKmQllSke1tJzlTBrgwtDXw9SKcDU8+6noOLc1OabTXXWFQEvnikCzzqlS43yKGxB5uUdx6XIZd4gUy3UJ3wLzQaMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748335179; c=relaxed/simple;
-	bh=Re3Yx7JTF1c4kme+WYkagTZehdSNECJd6NR0+FrhHEg=;
+	s=arc-20240116; t=1748335277; c=relaxed/simple;
+	bh=9/4frAyuK+mH4dCPcWolggSSGYIz8T6fceKUO2hSxFA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EpvGkT7MNqsecr2A+rUv0xfsafIiwxbZXY7tAlnOa8Zcs1bL5Cz7lhjJHaXd0rFQbtk9w39mv1WSGJKIKiVnPQXhF8lcKg9NjLEJBM3zapHLQmQ+dqwfTwINNLDQ7dcM7TMl2ZEUxv8VP8TEyCB1Y1+MjA/AqlUC8GIOBc6siq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=um1qFVVn; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=aLKZ/u4z; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 136D260265; Tue, 27 May 2025 10:39:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1748335169;
-	bh=ciYO4DJNid9E6dHNDc6tQsQnGaxiAdeOt4weTE9QMMQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=um1qFVVnL8MIieJYPllb8fqzzWWjwqyV+Toj3Vvoc9gXiy+eiP0ShjZe2kybRevoi
-	 P26K+PoSP+RbKYIyN4IvVVxcEubI0iHov3itWz0mQUlHsNmu6jg4OF8W6qS+NsfHUp
-	 Jv7EjYYQooCdQE8DCG/ysAkKDqXuM5KWBCRaV8KiI2xev6Nw/vlMY4oKa/gUn8qmG6
-	 Bjlq9nCqoHHc7ee3aNMM4wE1cmfAGQnUUTU/fdRt5OpUVo9/BgXEZ82Au/HxplPoBf
-	 Z3DK21LjU5n61aOmc2s9VHh4JKdeqBmFkgagl9T/8cPNBDc6vHa4q/HATzMR4FLAKp
-	 kwHZCqORnjPXg==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 80EDD60263;
-	Tue, 27 May 2025 10:39:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1748335163;
-	bh=ciYO4DJNid9E6dHNDc6tQsQnGaxiAdeOt4weTE9QMMQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aLKZ/u4zeVeUhuo54aQ9QbX/zSBxX6da+IkAtXTyY1A6j6C+oDdQwQv9hLVaytYa+
-	 JpPWSfEhKYCKC1io5oUeB8kB7jiPy141IxWeTjZ/9S5rGgwtE94HZxrkgEaXfoxcCl
-	 i+iW4rQlc41UL87zQGS7KT8knEO+ZN4qJyTFsDC79xZHm2b6qjvkmF/06Zcg9j90tS
-	 B0b8XR0Rm0Lu9YOeLOc7jcNv2JAt/XLmiRmQ1HVYtrqxSgZW/pXMQB4FTESA4TumTu
-	 kHpqk06v0P7WdhhsuCJltK7Zkx/6mFoOg59X43UjhjzVsyJLna20fG40DtBsbEdKmE
-	 uVmRnVeBjC6ww==
-Date: Tue, 27 May 2025 10:39:20 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netfilter-devel@vger.kernel.org, Phil Sutter <phil@nwl.cc>,
-	davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	edumazet@google.com, fw@strlen.de, horms@kernel.org
-Subject: Re: [PATCH net-next 26/26] selftests: netfilter: Torture nftables
- netdev hooks
-Message-ID: <aDV6OA2G99L4Xvuk@calendula>
-References: <20250523132712.458507-1-pablo@netfilter.org>
- <20250523132712.458507-27-pablo@netfilter.org>
- <12b16f0b-8ba8-4077-9a13-0bc514e1cd44@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxevTkhPGRP+VnNV82Q/uGLbpEsuLGpR2KEzOnzTxyt8s/+LBJ0TWK9ZExGWzqVKf/R2k8DEOPpOCqOnBeumKJAkUgixisr+CDEL7t9kGpJRVYO2lkI8FwKMiL3kC8ujB4UJ0TzpuIf0go7uMkSER0FZg7PgZW06El6EMb18Fek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XHym42bi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748335274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=otnLpqmsUXmp5NS65WlS5qhIeAcyrstq9DF1BYfQqbs=;
+	b=XHym42bibaLAyOz3Yj1OfME8tZO+TixE2ho/3og18d8n6NqlTPn5seapyWg5FbkqGpM/ak
+	gQPMsx5jrTlbqtmdKbz+Izr5OpNvizcA9gkKCBfdJaHK721Ezk8loRAqF+cbP5l0x9TYLB
+	JeCTCDUcHhkn1PWrotNnbvnrOOuzI9s=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-tK3Sl1hwOpOjhk_e9z0IuA-1; Tue, 27 May 2025 04:41:12 -0400
+X-MC-Unique: tK3Sl1hwOpOjhk_e9z0IuA-1
+X-Mimecast-MFC-AGG-ID: tK3Sl1hwOpOjhk_e9z0IuA_1748335271
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ad5697c4537so250973066b.0
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 01:41:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748335271; x=1748940071;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=otnLpqmsUXmp5NS65WlS5qhIeAcyrstq9DF1BYfQqbs=;
+        b=S/uz/n7W+XBfV5IfIu7uXHnAzWojjDL9lClg+mytO83whQ/GiDgbSrhotG+GdJ4MvJ
+         9KDF7G0UHO1MMKE9xLbp5dXsBMDfvObWJe6Xyw2NVGD8Agk+SzVm5U8O+U3aYR0TNA05
+         g448PTHMC2kLDidg329EB/Xy98x7MG0LgokVPVTnfYI+qJ6ZAbi34PiJqQvPu8K7xXu9
+         FzYkX1BwxRGm3MBUC21HFXYVbLC1ty+BgclPS4yBdQDOFy+0s6TN8ViQRlcEKvR0UnJW
+         2PprCWKhcY7/N9hqvNps+nCRGHJuTM1vl+kuDkGrgJmBv0yssT+CNnIIxYkzJCgPwxAG
+         yCJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWwcGVExyl4i+dPb6DXq+dyEs1KlJQ5Fl7LztbbRfCJXssiPY8Ni1MjGcMWtiwoo91v3qmOz64=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/8giIgtui9/DiPXDYV+uS5JvEOgtbpXPrUPTjDAosAvKWcsOQ
+	TEWxRh7sLqZ1xj+NgzoAHN84VaUhZKq6oX7Y1GKKXP005nE/jIqLzqZB2ChzZuf+Svr6NWFgHCS
+	E3tkMIU2UdVNg/QcwiWECUM5BdIWuBuLBJ0xZhvZ0Cd0aouKOkGuQINb8hjHJqO3EXQ==
+X-Gm-Gg: ASbGncvLxDRSKLhJ5gcp6Co3nJOEybRCUHI3xFPcmg3k5iU6KvU5Divpd67mUgDnY6N
+	i7S+x69ABLQomtCKqWS+ueKpAppHXtY6a59X51s+J7FTYOdlhd6euRv7lrXzvjEE+0hmSceEd2g
+	04msl1mbJSWqn9jAaO3buqNDfG1xX5YbtqGqTPb6eW6ginCn14WgUIl5uWhgBXCu81EH/Ht9e0T
+	wyBkyjIhBMupbBbK0jpXGWitmIXDNXjXw/HLiKz/E/4/N7OxENIvk8/8UFuRyD7aOqWD8WqylEW
+	uI3zvtERQl1NUiuyceVFAdd5AfXhBV2DvguQamuWbm5to8ino5mIMO362RRB
+X-Received: by 2002:a17:907:3f9c:b0:ad5:d6b3:5cd5 with SMTP id a640c23a62f3a-ad8596d9843mr1170685766b.5.1748335271011;
+        Tue, 27 May 2025 01:41:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEMIKp0vFl+Prf74hN6X8U5dcoTMgJ4VBfKwNEdm/vm6CaEpdolph/x3lK/ErbdGrfTaaYqSg==
+X-Received: by 2002:a17:907:3f9c:b0:ad5:d6b3:5cd5 with SMTP id a640c23a62f3a-ad8596d9843mr1170682866b.5.1748335270353;
+        Tue, 27 May 2025 01:41:10 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad892d47536sm43991366b.12.2025.05.27.01.41.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 01:41:09 -0700 (PDT)
+Date: Tue, 27 May 2025 10:41:05 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] vsock/test: Cover more CIDs in transport_uaf
+ test
+Message-ID: <skvayogoenhntikkdnqrkkjvqesmpnukjlil6reubrouo45sat@j7zw6lfthfrd>
+References: <20250523-vsock-test-inc-cov-v1-1-fa3507941bbd@rbox.co>
+ <limbmrszio42lvkmalapooflj5miedlszkmnnm4ckmy2upfghw@24vxuhgdji2z>
+ <1f5cc46a-de4c-4361-a706-fc7fe06a7068@rbox.co>
+ <gfmoupl72tjyymhwxcstwpgaabbfaz6f4v6vj4lwwzwssg577c@urkmgn7rapnj>
+ <151bf5fe-c9ca-4244-aa21-8d7b8ff2470f@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <12b16f0b-8ba8-4077-9a13-0bc514e1cd44@redhat.com>
+In-Reply-To: <151bf5fe-c9ca-4244-aa21-8d7b8ff2470f@rbox.co>
 
-Hi Paolo,
+On Mon, May 26, 2025 at 10:44:05PM +0200, Michal Luczaj wrote:
+>On 5/26/25 16:39, Stefano Garzarella wrote:
+>> On Mon, May 26, 2025 at 02:51:18PM +0200, Michal Luczaj wrote:
+>>> On 5/26/25 10:25, Stefano Garzarella wrote:
+>>>> On Fri, May 23, 2025 at 12:31:16AM +0200, Michal Luczaj wrote:
+>>>>> Increase the coverage of test for UAF due to socket unbinding, and losing
+>>>>> transport in general. It's a follow up to commit 301a62dfb0d0 ("vsock/test:
+>>>>> Add test for UAF due to socket unbinding") and discussion in [1].
+>>>>>
+>>>>> The idea remains the same: take an unconnected stream socket with a
+>>>>> transport assigned and then attempt to switch the transport by trying (and
+>>>>> failing) to connect to some other CID. Now do this iterating over all the
+>>>>> well known CIDs (plus one).
+>>>>>
+>>>>> Note that having only a virtio transport loaded (without vhost_vsock) is
+>>>>> unsupported; test will always pass. Depending on transports available, a
+>>>>
+>>>> Do you think it might make sense to print a warning if we are in this
+>>>> case, perhaps by parsing /proc/modules and looking at vsock
+>>>> dependencies?
+>>>
+>>> That'd nice, but would parsing /proc/modules work if a transport is
+>>> compiled-in (not a module)?
+>>
+>> Good point, I think not, maybe we can see something under /sys/module,
+>> though, I would say let's do best effort without going crazy ;-)
+>
+>Grepping through /proc/kallsyms would do the trick. Is this still a sane
+>ground?
 
-On Tue, May 27, 2025 at 09:17:30AM +0200, Paolo Abeni wrote:
-> On 5/23/25 3:27 PM, Pablo Neira Ayuso wrote:
-> > +ip netns exec $nsr nft -f - <<EOF
-> > +table ip t {
-> > +	flowtable ft_wild {
-> > +		hook ingress priority 0
-> > +		devices = { wild* }
-> > +	}
-> > +}
-> > +EOF
-> 
-> The above is causing CI failures:
-> 
-> # selftests: net/netfilter: nft_interface_stress.sh
-> # /dev/stdin:4:15-19: Error: syntax error, unexpected string with a
-> trailing asterisk, expecting string or quoted string or '$'
-> # devices = { wild* }
-> #             ^^^^^
-> not ok 1 selftests: net/netfilter: nft_interface_stress.sh # exit=1
-> 
-> For some reasons (likely PEBKAC here...) I did not catch that before
-> merging the PR, please try to follow-up soon. Thanks,
+It also depends on a config right?
+I see CONFIG_KALLSYMS, CONFIG_KALLSYMS_ALL, etc. but yeah, if it's 
+enabled, it should work for both modules and built-in transports.
 
-This needs userspace updates in libnftnl and nftables.
+>
+>>> And I've just realized feeding VMADDR_CID_HYPERVISOR to bind() doesn't make
+>>> sense at all. Will fix.
+>>
+>> Yeah, we don't support it for now and maybe it makes sense only in the
+>> VMM code (e.g. QEMU), but it's a test, so if you want to leave to stress
+>> it more, I don't think it's a big issue.
+>
+>All right, I'll keep it then. Fails quickly and politely anyway.
+>
+>>>>> +static void test_stream_transport_uaf_client(const struct test_opts *opts)
+>>>>> +{
+>>>>> +	bool tested = false;
+>>>>> +	int cid;
+>>>>> +
+>>>>> +	for (cid = VMADDR_CID_HYPERVISOR; cid <= VMADDR_CID_HOST + 1; ++cid)
+>>>>
+>>>>> +		tested |= test_stream_transport_uaf(cid);
+>>>>> +
+>>>>> +	if (!tested)
+>>>>> +		fprintf(stderr, "No transport tested\n");
+>>>>> +
+>>>>> 	control_writeln("DONE");
+>>>>
+>>>> While we're at it, I think we can remove this message, looking at
+>>>> run_tests() in util.c, we already have a barrier.
+>>>
+>>> Ok, sure. Note that console output gets slightly de-synchronised: server
+>>> will immediately print next test's prompt and wait there.
+>>
+>> I see, however I don't have a strong opinion, you can leave it that way
+>> if you prefer.
+>
+>How about adding a sync point to run_tests()? E.g.
 
-I am looking at the best way to address this.
+Yep, why not, of course in another series :-)
 
-Q: is CI getting a fresh clone from netfilter git repositories?
+And if you like, you can remove that specific sync point in that series 
+and check also other tests, but I think we have only that one.
 
-Thanks.
+Thanks,
+Stefano
+
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index de25892f865f..79a02b52dc19 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -451,6 +451,9 @@ void run_tests(const struct test_case *test_cases,
+> 			run(opts);
+>
+> 		printf("ok\n");
+>+
+>+		control_writeln("RUN_TESTS_SYNC");
+>+		control_expectln("RUN_TESTS_SYNC");
+> 	}
+> }
+>
+
 
