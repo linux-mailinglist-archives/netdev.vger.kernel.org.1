@@ -1,143 +1,115 @@
-Return-Path: <netdev+bounces-193740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 983ADAC5A8D
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:17:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DC4AC5A94
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 318F68A6399
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:17:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BF3A7A37FD
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4D92868A6;
-	Tue, 27 May 2025 19:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA252882BD;
+	Tue, 27 May 2025 19:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="e0mYc2QI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="D9qqSx+z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dj9RlTSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E34B28642A
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 19:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF2C27FD6F;
+	Tue, 27 May 2025 19:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748373473; cv=none; b=J2haQuOYOzAErfsUrGLBdWlwfAYB/USnH47kNYaUJpTEi65J9FcfvmSzC4Qzozy0vMVOfTq5UYQIhuZBvrRRztXPgz65xZf/kL8MvLbhUQfw4M+stytrZc7n8mrEMdkt8L1hlUUm5H12W3naUTmb3HVFiro2EBbFOMrIcG5bvI4=
+	t=1748373695; cv=none; b=BxCkk7dKPbYfZ7KN9amsVDMCFBWn4GsO9P+iKi9hSQgwfb4spmBJ7wJalul0xh2k8bPhz83vMmIQ6RF+SsoD6DoSJhVAVfaZd/5QjMjEY+jiA5aPZIlrXWrPYHF05WPR9HrGN2OWOEScjuom28CjWuje9lU7plZKMmAWXMlF/C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748373473; c=relaxed/simple;
-	bh=25tpI+G7zxaVDqba9mEfmGiDjXFbaC+SAXmjbdkpyoM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=D0l7/zU/OIiq+8Il/ZlRL3V3ip+EV+c3GQc3ZPm4InZTqIKKa3RwqwmARwzXT5mdAQuuyEKZB0Z0ekIKlC754AS0epNiCQq2LGxlhjhG0ijNnqFCbwo+vlJcDFqvfPW/PXk2TQFA1IKibEAlV3x72mo1tIsqj4pl7Khy9qz05PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=e0mYc2QI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=D9qqSx+z; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 9D9AC114017A;
-	Tue, 27 May 2025 15:17:50 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 27 May 2025 15:17:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1748373470;
-	 x=1748459870; bh=6FUP4OVzop2Z24pkmfHjCKQpouz2rCJPZ5qqu5FDfOo=; b=
-	e0mYc2QI78buxOj8HWdF74s2oCMTsBUWwPqS5FcBfIEUVD5SfP12t2TWJk3cAwoW
-	La+U7nP+88m0ULS9MJyTIjUu0tLKi3AN0NAu4+/aL8G2NACAka/hGQd8BMOpPQRC
-	GO6dBa67DO/I0wSZHMKXXtyGnARJ16zENh6GwQmqW/Y9Ysq1tnpfh291jq1GVdZd
-	zZy7VCqoGxpEvOyofR/vzfWib+v4sldQBymYa8L5yBxgjQb8bY1giFYlrnYptNYc
-	EDR+OoJR8bvhh3Mgz2pZGNj1JSd9k9augrBLDI+bOf4J2GKw/a118T3T4mymwOIr
-	6/53QT5RCmhCNERpsUs6Bg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748373470; x=
-	1748459870; bh=6FUP4OVzop2Z24pkmfHjCKQpouz2rCJPZ5qqu5FDfOo=; b=D
-	9qqSx+zms4Ad2Vx5OWrwhwo0tXvhgfs1K4WBvjf76rlqtY5C6DTcyioYnvcTCjXo
-	XoHqL7eXJcSG6YphSGzGHKN8QjNiKxvfvL6oFqUIA3CN1aH7jdELMo3rkB1BEmo+
-	xf+prSYECXO5bXIJd6C/RBhuqk3SvnQibx4bcaoT4eVC8dOpaVwlzBxeEPCaTJLK
-	VpROGM/SK+TeqD/xa37aoYoJBCIy43eAIDSqksTjw2PsZsDBNUZq93E2sBzWDruK
-	qv9ImEE4Ip7AQ9jbEceBfHLknyr9IXurE+5rjXtR+fatc9LAcKDSHDBIFkqxIPZc
-	/HElwMr/UNMMbCUFaUqlQ==
-X-ME-Sender: <xms:3g82aKY3qDDO0fIFTO-x9kNWIg8T8i1-YXLruRCwhy2fTOlGIrvB-A>
-    <xme:3g82aNbxnGJibaR_aM2nylmjr7JlCcNM8ufKwJEr89HegH-RANozH3aAdcLQO8pSF
-    4_VHLWmR9DT4VLBr8A>
-X-ME-Received: <xmr:3g82aE-UwXqvsROZUmUgzlwGTRwfFcbo44VzTvRbnJRC7Opd2uA_DFllKXY8qWwsImWICB0aW0IBRfd1tOeQSporp8gFejfwl3OJGWdXjr3T_g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvuddvtdculddtuddrgeefvddrtd
-    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
-    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
-    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
-    gffkfhfvofesthejmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
-    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnhepvdev
-    vdehffehleelgfejhfeitdelfeeuvddttdfgiefgvedtgffgkeejgeffffetnecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
-    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
-    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
-    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
-    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
-    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
-    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
-    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
-    sggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:3g82aMqLYq8YuqD2dKZCv9hZ_5letzxlheDQKGFViHom0RYGSRl05g>
-    <xmx:3g82aFrFCH1K3xMekb_8H5qR28L_HkYwOWyx0V60ywAHGp9mu9einQ>
-    <xmx:3g82aKR_6ZlTvf41VSfCKU1OVu8qw8L57H4Nm1V8nldi4LJhnta2yg>
-    <xmx:3g82aFpC5qZZu12iYZZms_r43xtMjEWU9BjYBz6bIbqKC0cdhgS2IQ>
-    <xmx:3g82aJz_Suv9nxQ-YHsXSWDriN0q5uPz_8I0k-w2Cezet5IsDlarjMNz>
-Feedback-ID: i583147b9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 27 May 2025 15:17:48 -0400 (EDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1748373695; c=relaxed/simple;
+	bh=ZOx7q4xf87k1jEIxa4jfUnotqYzGDRVn6aOkwlFU9qs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u7eWi6A4giUo0CVnRcavUwFLGyU7iBANUltdvWlVx+tRLcHJVjwcsaqf96pH1F4IiDnc280NYEFRMXDu/LVI5BB34gvZR3gb4H1awp9TSxBOHw8TksFW0OEDC31uuEXowLpg9NqAtoqRDMlqBmqMgyOMdwEpcrZNTYyLjqqad3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dj9RlTSF; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-52eea8111easo999012e0c.2;
+        Tue, 27 May 2025 12:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748373693; x=1748978493; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aWXT/WupRqW0CupybvTkEKLCMDuWAmD/tW/zMc48HoA=;
+        b=dj9RlTSFfkqtxFT4IfLLgg3yBZXDcxzLATwwDB0jthKsCCYOz9SXCpjc2w6kNV5LnK
+         pwcQJDliDj3enWcoWQig9pwpucES4hHOSnclEp9/sfuna8mpo2GZEzJkWGa3tOPKSWPN
+         UNKuowRlUqqYyFXEFFwvvvoxetf9KrK8xIE9ZUyjx6uFNkxdvUCzYYDgV2GPIKIfs/Vk
+         aosHyyAF98QVU7fKchgwYZjRIYZm4G4R6RRFHN+Fwl44ZieW9d74Vibw3LoqmySAyW//
+         cXPXj5I9TZHgcpOwY6+loerRue3nv6ugbZlaStS0gofY7vqpiwM0jTCe3YEYmrUYvY8C
+         1GXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748373693; x=1748978493;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aWXT/WupRqW0CupybvTkEKLCMDuWAmD/tW/zMc48HoA=;
+        b=DmJeXw2r1tmgYxlgwwusUT1X2z+JwX2P+Z2qLEkjMNM5awY67VydasyHWVaC5tvZpP
+         ggQuRHfIb1wBT6nckNv70Q+d6MoblxP/YPzTW/5tajJve8DzkzmkgH19nAoLP/b3bxPs
+         Zb1P93ywchSaVn9jVulX8ZJPhVGsfb3yIkhDd0FUYI1EoA/sKcC389gabJkheO9a1NpU
+         c/cntNj8oyaG3BfYVOLuIT39z7YI2SbTIcb4m1Ur5q1vierm7VgDiS8aBxC7EkzYDKge
+         FEjCVxkwi39ZNIBSsnl5lpMXAW2vh1wdD8VfWznwBCAVSPxnkdM4dmhjD9th3k/o7jCa
+         xykA==
+X-Forwarded-Encrypted: i=1; AJvYcCVNdzgeH9E2CvxDceUzRs3sLckh7PEh9VAgM8uWRDd90rxab5x/74kH5ISG+6XH1rrOYP5bqwN/Br073us=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB/SK/Y2E8fXhmw0Pj4Z/+iROYOzUzQIhx3diiYmpfxr67NtF1
+	k5BH0pPDvs8IEGT9nKFHZaEpoTVip2gV+iKJvz8jKz3jPGN7tIL1okLTIxc2O5pmjLv7fjoxflm
+	H4/XRmG0/LCBvQzfnD4P1p8TrW1Lvz3I=
+X-Gm-Gg: ASbGncvAVKJisZ2gEPw6ucQyvwZj0JHNsVJbTOD/5I9n9p8uoJH0Ej/OQhj12gPdp5X
+	kWEVEoYaLxDwwS/Adkt9mw6cuzBpVusTer97W/D1GCU54bWfH/qtKOGl8LKXXEuXFovz2Z6vmKE
+	fTXsi9vozCxsLUKHvw38VmsBqA9JDDDhIEgA==
+X-Google-Smtp-Source: AGHT+IEChjVJAaQHlGSjHa9hTKxCJFyJzR7c9+aL/0QxNkhj4bg8SHCtIwSUXtZJZi5/vjBpZfQlumATcldCYDUWxqA=
+X-Received: by 2002:a05:6102:290c:b0:4e5:9c06:39d6 with SMTP id
+ ada2fe7eead31-4e59c063ae6mr471806137.2.1748373693026; Tue, 27 May 2025
+ 12:21:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-From: Ricard Bejarano <ricard@bejarano.io>
-In-Reply-To: <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
-Date: Tue, 27 May 2025 21:17:47 +0200
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
- netdev@vger.kernel.org,
- michael.jamet@intel.com,
- YehezkelShB@gmail.com,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <AB7F8F0D-7D56-4CF9-BCE9-690A61EDED74@bejarano.io>
-References: <20250526092220.GO88033@black.fi.intel.com>
- <4930C763-C75F-430A-B26C-60451E629B09@bejarano.io>
- <f2ca37ef-e5d0-4f3e-9299-0f1fc541fd03@lunn.ch>
- <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
- <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
- <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
- <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
- <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
+MIME-Version: 1.0
+References: <20250527175558.2738342-1-james.hilliard1@gmail.com> <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch>
+In-Reply-To: <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch>
+From: James Hilliard <james.hilliard1@gmail.com>
+Date: Tue, 27 May 2025 13:21:21 -0600
+X-Gm-Features: AX0GCFvF6Ti9-VC-WdHc6MfKeYhf1F3qOQDDP4BI4jj848sa9rzAvWhhkHP0KPs
+Message-ID: <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
 To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
+Cc: netdev@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Russell King <linux@armlinux.org.uk>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Furong Xu <0x1207@gmail.com>, 
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> So, another idea, just to see if skb with frags are an
-> issue. Somewhere need the beginning of tbnet_start_xmit() add:
-> 
->   if (skb_is_nonlinear(skb))
->     skb = skb_linearize(skb);
-> 
-> That should convert an skb with fragments to a skb without
-> fragments. It will be bad for performance, so if it does work it is
-> not a fix, but it will confirm we are in the right area.
+On Tue, May 27, 2025 at 1:14=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, May 27, 2025 at 11:55:54AM -0600, James Hilliard wrote:
+> > Some devices like the Allwinner H616 need the ability to select a phy
+> > in cases where multiple PHY's may be present in a device tree due to
+> > needing the ability to support multiple SoC variants with runtime
+> > PHY selection.
+>
+> I'm not convinced about this yet. As far as i see, it is different
+> variants of the H616. They should have different compatibles, since
+> they are not actually compatible, and you should have different DT
+> descriptions. So you don't need runtime PHY selection.
 
-That would be on the tx side, right? On red, not blue.
+Different compatibles for what specifically? I mean the PHY compatibles
+are just the generic "ethernet-phy-ieee802.3-c22" compatibles.
 
-RB
+>
+>         Andrew
 
