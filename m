@@ -1,182 +1,196 @@
-Return-Path: <netdev+bounces-193650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE9DAC4F71
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 15:16:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E79CEAC4F78
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 15:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 716A117D8C1
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:16:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D67AB17ED1F
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052FF271453;
-	Tue, 27 May 2025 13:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="HucSr9AH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1A127146D;
+	Tue, 27 May 2025 13:16:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5019F26563B
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 13:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF8525C6FF
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 13:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748351758; cv=none; b=to/QgrUELs9H3BN9tbFeamCKvrM+qVbYpbaHWqzL7qYfIIqXR5eD6aJmed5aT/LZqvnP0FqqS2jqV4JUliM/9RQ3E8ikevI1gH43y0ucNhgR4EfEIzP4uHTeNqCxANnmKPfHFtqXTvlMfzt4EbnxKa0UxGSrQIzftfAaYLJFir8=
+	t=1748351802; cv=none; b=Zdsg66EO/PUo3YjHLwbXc6pnfGkGU1PHRAzEsN20hqKpLA+TQLbg4X4NI4xu0+6A4cnHQf2bYO7ACOFTMkpTAYuUvvFiZaWAJsdUGT+pho+mplNwohPjtyubLOrXndomNTnpN8hWzh75KlfBPglpRxIbib3h10DkpVMdnIoUZno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748351758; c=relaxed/simple;
-	bh=d5W3GX0X7g3UXissjAjd6tzKPlXKQx+avpna/bRC4og=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gHTSbWMOu9tlqL0zFVmPKp6jvyE0ivZDiXtbJ5LR0WRLEe2VYWFkIfCgUDlgNdl5PFIiy4gbHlQBfkGtGE2LyTFoDaSrPtUFmR3dOZ2J2iQ32cJRoWlpsd/H1NPryulDC3eEZ+KyKCly29hkHRktdw65ZaC58ndRwSC67HEWtgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=HucSr9AH; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54RCqNxg013982
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 13:15:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	haI88HCttPlaimE5g5HZVq6U+tyuHSX3H7yH1gCwk+c=; b=HucSr9AHQ0oqedkk
-	WQfCGc46c6oUBBd4ZTTElr9y7QkAWdeLenxWA459TAr1ezvg0CRxm1wU4VsbXL3w
-	fyOkOYUSOGQfQe6UWjn3orWikMe+fCYvA/2Zjazht51JDLRxS0g66/F99meK0i6g
-	L9HeEzZu1i0SkFUytu7W4iGoPbnkzPfdnkZm5tiYBm0Mei6EQRcmkqsxN/BSEt4F
-	loh0XFLXeCHyzTc50e5L0tZ2rk4IJk0D+2TdDq+PyYp4CrcV/WC/7sU6j0ekDkeF
-	XaV9qqDAwat9eLeJzCHbo5VnSpPlQWNZYXwidZzGXypHevOSUdcpq+pJ1WowNtCn
-	22XO3A==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46u5ejxx7x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 13:15:56 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6faaa088820so5137926d6.1
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 06:15:55 -0700 (PDT)
+	s=arc-20240116; t=1748351802; c=relaxed/simple;
+	bh=toUL8kVmIYUpj+yHbWybTCF9PrGAGvHavC8vMENX1Lc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BqDxgb5be0v2owmShVb6/i1d3Te9gio9DkoZdFwFm39pijQjhsEtLmwOFyDVY/vg2m7SA42o2J60mKY8CymkrbRJEqTI9zL0OzMoExIqWivWVMjjs2e1CnaSvIPH9P6EokpXjPSZmVr283cNwYVIrxPuQQz1U8Lzf6uroijDdnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-85e6b977ef2so503848939f.2
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 06:16:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748351755; x=1748956555;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=haI88HCttPlaimE5g5HZVq6U+tyuHSX3H7yH1gCwk+c=;
-        b=iBuyX0jXWEXlp9QDPu54VNTPSk3gEuraCsz3lKSexjwDBZ6W+xXomM/KPaGTqmUV2e
-         L+OuTDW49mVmPSZ9bPBeBEMm9iOSaXoJcCeDYCpR5FxddVU7+46co6tlgqq6h2WCZMm9
-         xJZcHNjUX/AzS7M8CjWhlx20aZfUDUkkz3PFD4sIMN5ea1agBTCE3slhJVodxbp+rixZ
-         K721arCFRpZzycL8TYjD80Keasacad9W871CHQf8ggpzTWTYm7ZbKZuRHyntcD2HGVfP
-         AESVWwHyVo14xuwJxQlhFXuNqeysf7g4lH7ZJml8BYN2msorILps+kk9egUZZLTAxJ/7
-         sEiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKrtxTJ4EIVj1Pr7UhfOYNGvpLMHAAb+LIVK9ITHwhZqU3QYPCGLaBdAkuvZR0ZrpBxgqxwFY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo3A0nWGmH5vuKnVjuxm5G0BcLV6N2ccmeUetAKzo6MSZBZDvh
-	g43pTqIgCoM2Q4HFmplyq224TKAtADCV7TlnLgGf9c5IridO0xKusXrhIpxzS/I+Md5Y83j5aOk
-	ESWpFc8r7gENDWlOPjka63entEzMpm1D1JShr0L062bJ7YPiXutYYFe2LnEM=
-X-Gm-Gg: ASbGnct6rfuU/tCxS478jeEw54BhUN0+J2ThikcC7heTxo9yaBBrJ7GFzllj0CKv5h7
-	hQ29U5nks+bRsamqwR1Ig3I47ycVrX9WAs6moN+jdG6bgUyfzUgnYWyRk/ynuO5Lh9sd0iJrDAW
-	9ttokmH4OqZRBN9qY/koGvSiNmPCEtDLXjSleKA3EZshR9vO6ODdFs33JprNyxwqVRY0qtsY18l
-	6QXx2tkr4FDVs7VFU+w7E5j8GYGUwFyTLu1RDSIhgcQVMh2MVEohbJ2cUdMx2JxLKfdG/T3DxLD
-	x5+hu6/KN3rbjfuMs5SgIN9HIy+wJP8LASTKxUhp1izaFakyOCs6qXHBEgAht7OJ+Q==
-X-Received: by 2002:ad4:5ecf:0:b0:6e8:fd2b:1801 with SMTP id 6a1803df08f44-6fa9cfea442mr81664886d6.2.1748351755260;
-        Tue, 27 May 2025 06:15:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGyBKkeXUxc/NTG8gSl5izgYWO1GVIxceH278WuDF/J5QwQZVTgHu/6Sllwpaohx59JNw9hoQ==
-X-Received: by 2002:ad4:5ecf:0:b0:6e8:fd2b:1801 with SMTP id 6a1803df08f44-6fa9cfea442mr81664516d6.2.1748351754721;
-        Tue, 27 May 2025 06:15:54 -0700 (PDT)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad8888dc22fsm155534966b.101.2025.05.27.06.15.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 May 2025 06:15:54 -0700 (PDT)
-Message-ID: <061032a4-5774-482e-ba2e-96c3c81c0e3a@oss.qualcomm.com>
-Date: Tue, 27 May 2025 15:15:50 +0200
+        d=1e100.net; s=20230601; t=1748351799; x=1748956599;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3fs5dnMU+gfL+8rHwXU1x0X13W7OhQWWELJjNHVdrCg=;
+        b=R6yx7r8hAVyDUXJBBH4Mepm2FPHcREt33hqI8wcGa8q0y2NylGhY07A7nONXKBpWUW
+         ksThS9a3Lnv3gauQGv5zxhq1G8NUDC2tmXZv/TsYuiWpr4BJNnBF2XKAqcuXgF2nRfCl
+         DOTMB5g6gre2uWhjcyFk8KYjedKK1RdjSgryWigNBv2DviMr/P/Bjog3CJA0igNgB6JP
+         XnlBikMGphftPur6v0dnS3K8S7Y4LEKMlRbYIh7euaCDOGuoxbcBHJ/dSAmlcvPzFYlU
+         5Fv/eM4UOQcw5QiZqc0zQGHVLHm2yDNl0A/em/OmuHc0vNgqQYlYqK+2y+cxJVRplI4E
+         Zkgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyQE9hU3jl6vuoG3x/H4u/Dj7vVKMPRDdrHO6SQbpCdXMrYGngYeUgJkuhXgRe4kNm8tEuPUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWIsFnCLO1U5UatvttFMClIdXjg3VV2OTf0+biZu36y3K8eOpr
+	8O3pxk5SZ6LWQGdHnzZly9KwTdqkELOd9dV6pLCbzxOAVrL/izFz62rA8sUnxWgdfkbSiQ7X0Z8
+	0r4WQ0GgkAqzu7r4avj7/pXCkwOujbo6OwmRqAr4iDZFliuVL7aXS+aTlFn8=
+X-Google-Smtp-Source: AGHT+IHGRO3kfgMQ7ar84SSI3p4GXHmcWFk1okctqv4PnTzlS/IVJ68utuAAcATo9JvhtFOp2pFWI5TrCwJ/6xpePsNeqY2hvqL1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE
- PHY support
-To: Andrew Lunn <andrew@lunn.ch>,
-        George Moussalem <george.moussalem@outlook.com>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Heiner Kallweit
- <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd
- <sboyd@kernel.org>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
-References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-1-ddab8854e253@outlook.com>
- <aa3b2d08-f2aa-4349-9d22-905bbe12f673@kernel.org>
- <DS7PR19MB888328937A1954DF856C150B9D65A@DS7PR19MB8883.namprd19.prod.outlook.com>
- <9e00f85e-c000-40c8-b1b3-4ac085e5b9d1@kernel.org>
- <df414979-bdd2-41dc-b78b-b76395d5aa35@oss.qualcomm.com>
- <DS7PR19MB88834D9D5ADB9351E40EBE5A9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
- <82484d59-df1c-4d0a-b626-2320d4f63c7e@oss.qualcomm.com>
- <DS7PR19MB88838F05ADDD3BDF9B08076C9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
- <0c57cff8-c730-49cd-b056-ce8fd17c5253@lunn.ch>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <0c57cff8-c730-49cd-b056-ce8fd17c5253@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=GIgIEvNK c=1 sm=1 tr=0 ts=6835bb0c cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=c7V_mG7Cw8Ydp4GSWmcA:9
- a=QEXdDO2ut3YA:10 a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-ORIG-GUID: pI9ozFZWoVEkiyTyCflmo25rQ9oFCQq9
-X-Proofpoint-GUID: pI9ozFZWoVEkiyTyCflmo25rQ9oFCQq9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDEwNyBTYWx0ZWRfX3VNJJIrvtVmN
- 2hINH9dTg0/9x7deJGRPe1fnL3y874ev9ep5uBp/lZbHgwDTK78rdH5KsE8n9CGII1Nm9C0Y+yI
- x0HCaURTAmx85OBOlsEFYpgnMav2iQdnF+qsSV3Kia7dOjX3rU8u9DGjisj+NeQI76wxAb/kwTT
- uSx3b918EDEKBnFYGi/iO7JwSsDSRsB4aIZMoC/MQio5GGHqjgnPqcCSrWfzHgIn2cXt+Ilw3/+
- N1tJQhOqbbfuGenLbWxPjrApuKOWRCsGD1Cg0x5c+fEQ+TP5tdcElA1BmXoUvMKFFTBJOkZJH+5
- cAmLo1VOpnEU1WA+VHq0EYETYyLSgYeigWT9Oabh7mYUzloT7NznYll2zS4HF2Y6jW68sbHtzK7
- J/yesrt0gr0pOwFsqssoj7zmK2w7azSC/2nukeMXRkuYPwu/rsTJ7gU4DqHt88NVhyjsmdkh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-27_06,2025-05-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 phishscore=0 spamscore=0
- suspectscore=0 mlxlogscore=915 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505270107
+X-Received: by 2002:a05:6602:7211:b0:864:a1e9:f07 with SMTP id
+ ca18e2360f4ac-86cbb80a7ecmr1620366539f.8.1748351799241; Tue, 27 May 2025
+ 06:16:39 -0700 (PDT)
+Date: Tue, 27 May 2025 06:16:39 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6835bb37.a70a0220.253bc2.00b4.GAE@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in ieee80211_amsdu_to_8023s (2)
+From: syzbot <syzbot+3d9e2c65bdd43a254924@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/27/25 3:08 PM, Andrew Lunn wrote:
->>>>>>> Would qcom,phy-to-phy-dac (boolean) do?
->>>>>>
->>>>>> Seems fine to me.
->>>>>
->>>>> Can the driver instead check for a phy reference?
->>>>
->>>> Do you mean using the existing phy-handle DT property or create a new DT property called 'qcom,phy-reference'? Either way, can add it for v2.
->>>
->>> I'm not sure how this is all wired up. Do you have an example of a DT
->>> with both configurations you described in your reply to Andrew?
-> 
-> When a SoC interface is connected to a switch, the SoC interface has
-> no real knowledge it is actually connected to a switch. All it knows
-> is it has a link peer, and it does not know if that peer is 1cm away
-> or 100m. It does nothing different.
-> 
-> The switch has a phandle to the SoC interface, so it knows a bit more,
-> but it would be a bit around about for the SoC interface to search the
-> whole device tree to see if there is a switch with a phandle pointing
-> to it. So for me, a bool property indicating a short 'cable' is the
-> better solution.
+Hello,
 
-OK
+syzbot found the following issue on:
 
-does this sound like a generic enough problem to contemplate something
-common, or should we go with something like qcom,dac-preset-short-cable
+HEAD commit:    94305e83eccb Merge tag 'pmdomain-v6.15-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16c9c170580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a423536a47898618
+dashboard link: https://syzkaller.appspot.com/bug?extid=3d9e2c65bdd43a254924
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+userspace arch: i386
 
-Konrad
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/82a518437203/disk-94305e83.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e1b8b32ab132/vmlinux-94305e83.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1743502cacb0/bzImage-94305e83.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3d9e2c65bdd43a254924@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee80211_get_8023_tunnel_proto net/wireless/util.c:543 [inline]
+BUG: KMSAN: uninit-value in ieee80211_amsdu_to_8023s+0x2226/0x2a40 net/wireless/util.c:897
+ ieee80211_get_8023_tunnel_proto net/wireless/util.c:543 [inline]
+ ieee80211_amsdu_to_8023s+0x2226/0x2a40 net/wireless/util.c:897
+ __ieee80211_rx_h_amsdu+0x902/0x1400 net/mac80211/rx.c:3078
+ ieee80211_rx_h_amsdu net/mac80211/rx.c:3164 [inline]
+ ieee80211_rx_handlers+0x5b21/0x12440 net/mac80211/rx.c:4146
+ ieee80211_invoke_rx_handlers net/mac80211/rx.c:4190 [inline]
+ ieee80211_prepare_and_rx_handle+0x4c39/0x9ce0 net/mac80211/rx.c:5040
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5245 [inline]
+ ieee80211_rx_list+0x5f20/0x6120 net/mac80211/rx.c:5416
+ ieee80211_rx_napi+0x84/0x400 net/mac80211/rx.c:5439
+ ieee80211_rx include/net/mac80211.h:5179 [inline]
+ ieee80211_handle_queued_frames+0x14f/0x350 net/mac80211/main.c:441
+ ieee80211_tasklet_handler+0x25/0x30 net/mac80211/main.c:460
+ tasklet_action_common+0x362/0xd70 kernel/softirq.c:829
+ tasklet_action+0x2d/0x40 kernel/softirq.c:855
+ handle_softirqs+0x169/0x6e0 kernel/softirq.c:579
+ __do_softirq+0x14/0x1b kernel/softirq.c:613
+ do_softirq+0x99/0x100 kernel/softirq.c:480
+ __local_bh_enable_ip+0xa1/0xb0 kernel/softirq.c:407
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
+ __dev_queue_xmit+0x2e5d/0x5e20 net/core/dev.c:4656
+ dev_queue_xmit include/linux/netdevice.h:3350 [inline]
+ __netlink_deliver_tap_skb net/netlink/af_netlink.c:307 [inline]
+ __netlink_deliver_tap+0x93b/0xdd0 net/netlink/af_netlink.c:325
+ netlink_deliver_tap net/netlink/af_netlink.c:338 [inline]
+ __netlink_sendskb net/netlink/af_netlink.c:1256 [inline]
+ netlink_sendskb+0x224/0x270 net/netlink/af_netlink.c:1265
+ netlink_unicast+0x746/0x1290 net/netlink/af_netlink.c:1354
+ nlmsg_unicast include/net/netlink.h:1162 [inline]
+ netlink_ack+0xacc/0xf80 net/netlink/af_netlink.c:2496
+ netlink_rcv_skb+0x3f9/0x680 net/netlink/af_netlink.c:2540
+ genl_rcv+0x41/0x60 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0xed8/0x1290 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x10b3/0x1250 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+ __sys_sendto+0x590/0x710 net/socket.c:2180
+ __do_compat_sys_socketcall net/compat.c:-1 [inline]
+ __se_compat_sys_socketcall net/compat.c:423 [inline]
+ __ia32_compat_sys_socketcall+0xa89/0x1af0 net/compat.c:423
+ ia32_sys_call+0x41be/0x42c0 arch/x86/include/generated/asm/syscalls_32.h:103
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4153 [inline]
+ slab_alloc_node mm/slub.c:4196 [inline]
+ kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4248
+ kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:577
+ __alloc_skb+0x347/0x7d0 net/core/skbuff.c:668
+ __netdev_alloc_skb+0x124/0x6a0 net/core/skbuff.c:732
+ netdev_alloc_skb include/linux/skbuff.h:3413 [inline]
+ dev_alloc_skb include/linux/skbuff.h:3426 [inline]
+ __ieee80211_amsdu_copy net/wireless/util.c:757 [inline]
+ ieee80211_amsdu_to_8023s+0xcfa/0x2a40 net/wireless/util.c:885
+ __ieee80211_rx_h_amsdu+0x902/0x1400 net/mac80211/rx.c:3078
+ ieee80211_rx_h_amsdu net/mac80211/rx.c:3164 [inline]
+ ieee80211_rx_handlers+0x5b21/0x12440 net/mac80211/rx.c:4146
+ ieee80211_invoke_rx_handlers net/mac80211/rx.c:4190 [inline]
+ ieee80211_prepare_and_rx_handle+0x4c39/0x9ce0 net/mac80211/rx.c:5040
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5245 [inline]
+ ieee80211_rx_list+0x5f20/0x6120 net/mac80211/rx.c:5416
+ ieee80211_rx_napi+0x84/0x400 net/mac80211/rx.c:5439
+ ieee80211_rx include/net/mac80211.h:5179 [inline]
+ ieee80211_handle_queued_frames+0x14f/0x350 net/mac80211/main.c:441
+ ieee80211_tasklet_handler+0x25/0x30 net/mac80211/main.c:460
+ tasklet_action_common+0x362/0xd70 kernel/softirq.c:829
+ tasklet_action+0x2d/0x40 kernel/softirq.c:855
+ handle_softirqs+0x169/0x6e0 kernel/softirq.c:579
+ __do_softirq+0x14/0x1b kernel/softirq.c:613
+
+CPU: 1 UID: 0 PID: 20119 Comm: syz.6.1299 Tainted: G        W           6.15.0-rc7-syzkaller-00099-g94305e83eccb #0 PREEMPT(undef) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
