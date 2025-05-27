@@ -1,221 +1,166 @@
-Return-Path: <netdev+bounces-193541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CED2AC461D
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 04:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6A17AC461A
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 04:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57C9B17484A
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 02:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F20C1746BE
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 02:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9F215624D;
-	Tue, 27 May 2025 02:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1106E14D70E;
+	Tue, 27 May 2025 02:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fqL1KUYK"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="nCZOxiq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380C2CCDB
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 02:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1FF3BBF2;
+	Tue, 27 May 2025 02:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748312040; cv=none; b=K2qe5mqvarO4Vc62lTt+baK6vVjSCEStQqIGmWihmujpT9SVOme/X4ziPx82NBcoLy2FHaJAhsQtSsfgmNh4tQ6lH/8Kc5BYTa5LIL26p+CTCaMbHL4LRIKAGYc/JwgS4rb0Gav0XwD7rGReksCETzhnVh47PyzCLJ/fSf+hy50=
+	t=1748311976; cv=none; b=CjnesIcfUaX0tNtEIpgxwUBDrdZGVS9urU3ZhENsTp/nDsHGl/ac7HNZSy1l0lkbjLEh6aR/Oofxzb8ikOMbymM6PBAL8coP6g0TzAWswuWcTORq8qTOuY2iBtfMFpxobr8PivRWRgFgOKFrXpt2NIoJX/6qEdrAzNRprsSUm9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748312040; c=relaxed/simple;
-	bh=ahC/kd+J2092JsB6/ArDG+ZFk82XKoLZ2QwLtucY7FE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OV43gEYh4f9eK+fFynMR5QzGf2lqPsW2z+iGH6oQJBxhFTq4yEtZkXqdCrIrrPzaZOKBacc/e1LYKbGTnEaqQ3X22U8UheGxyogoQPftXvLI7/g4waUOYXOUUQ2OIKh20U3s8TRth7e4oOqsoAaHS8EcXy3Zt/24P+OpWfiqAgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fqL1KUYK; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2349068ebc7so98835ad.0
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 19:13:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748312038; x=1748916838; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1ZNoI7qsadxWOPLLG4KHlskcQxZNedj0B1MDBOI68s=;
-        b=fqL1KUYKCAVUB9f15PQ2yjDrNUihKBa+liF7WtPNoX5INInzX61J7HIJ8oMIhwKjhG
-         sCgLrPEz/3abe8tZmeycPgmLLeu3paDukLEy2e886YW+iMN4lc9Y3evCYCbnYoifYBNF
-         svAF5H4+4mLLEJpTDsER9EM6Hn141Wu0YR1OIgyaQrLvPVOkQldJzSkGz1kvBZV/zhKG
-         t9hZ9Bo7Je3aY0jk0Lz9PYrys/Kwlk1Amxsuenj8KexB5XUywpb0DKGAL2r+o/rDFGN4
-         HkRlVkD0uzUQsGbrWkm5zduNyOZpuld4TZv/qMCMG95O0L5F1UTqwwWO757kMKWWXusS
-         d6hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748312038; x=1748916838;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g1ZNoI7qsadxWOPLLG4KHlskcQxZNedj0B1MDBOI68s=;
-        b=jFnFgKMbCwWl3dtrNtTmpg88afBb9lV1RTHpvonINz9obliuQtvJV+7xjxeAKEIPpG
-         reHdkPi675B41Mh8HWE3SSI77C26qiRa4enbY6Qdgff2VGPFYqQf+/I+k3Ut/51btPRV
-         AnW/hIyaR/+3HVu/q96rDMHtmx3VjGpiE+1Ci7ZqKByruj8V8km076JhEWQh5ON4doiS
-         22VsxOA7GMLwUS452DAmok5cOye1mdgn08+8Czdbj+sff6qhfynYNX2u5odixy3KGvyi
-         PXYg+voaHMj4Zg1PHgMoDBxFQHEgrMh1ItiWVfFc5cJPLIshD2EiLw6Q9tsN98Lzkr4V
-         nAoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVildfrHvkuVe56Sn8tCO8uNoDiTys1wpKGMoMl6Ysucm4r9e5DJVRJATMSMD+n2WwikuqDiME=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOnPZZ4tQ+hhGiP5PRMumSHegPPuNvUA+zF28MUwfDepSpcvde
-	O43zmvVF0RhanYV7yynXvLWgM4T8CL7B6NfaGIS0i3Iz0Ckgy9Kbe0Kh8YXbRZKG0rnz99nSD+y
-	S148xvebw4NSjGsUXASBBxhtor1Hrr4oRrYjNQrhw
-X-Gm-Gg: ASbGnctbgvXsrmaUqSyAWlYRqgWcEnMOWV6VkDe9pcx7R1Jonx9lzfROnnftYMY0PR8
-	o9t7kizFi6XJ3KDvh7Re1ZZQ+Kg/+A/SP3fl59a/dLBLz7xRONbTn+JhHBLk8eyG/P6Lau0orFG
-	kbYi54z8/8+pYS7orG3oM/LqlQ33Wi4gIqMn2uLFv9hgf0
-X-Google-Smtp-Source: AGHT+IGbiAy6Z7VdqYFRXgQS+MG05F5Dg/vRxVWf99c9CXesKANWlp3c35h7PzSTSZIMNMhb9pqCXMZXUBP2ymOZBhM=
-X-Received: by 2002:a17:902:ccc2:b0:231:e069:6188 with SMTP id
- d9443c01a7336-234593bef04mr3337865ad.0.1748312037710; Mon, 26 May 2025
- 19:13:57 -0700 (PDT)
+	s=arc-20240116; t=1748311976; c=relaxed/simple;
+	bh=lVbYnc3aORFwAR2thA4ZyWVY4Gb7NMvj+BaiCpe6tok=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A+jELKLmNK7IvEgbgU5Gauw3mSaBFxeCMCk1lHjNb6GCDZF6qjzpRhEihmYngyOiJ/kMeRroQCusb64jSyEzm4RDhhgsF0uOKx1/8H8gftlc75eYdpKmuJ5dmPpGqnEs3RwYv+cCY3149Vp13f8aAtYwzaa2rwkwxlLJHoBdyso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=nCZOxiq4; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 15aca2243aa011f0813e4fe1310efc19-20250527
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=39oY+EqTrg+DjuuiSY4guCZe6xayDWOMD5dz4cNUHLo=;
+	b=nCZOxiq4K1QUr9S9dvPTts/z5WTdPNnlnLBya5AEe7vUCdfZFPngIofLwOL9ueoFZJQEQ6BoyaAx9X46Ww/LH0ucPzz2XbdvjXcOOuK91u8XCTF4aLwblTkf/VW6dHJwbYUQAey4htRgNecVlCTKoUd7edEQMqbVRG+m39eS/Jk=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:09912d76-31a4-411e-86c3-4b535cd831f1,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:b66c0158-abad-4ac2-9923-3af0a8a9a079,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 15aca2243aa011f0813e4fe1310efc19-20250527
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1889938853; Tue, 27 May 2025 10:12:48 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Tue, 27 May 2025 10:12:45 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Tue, 27 May 2025 10:12:44 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
+	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<shiming.cheng@mediatek.com>, <lena.wang@mediatek.com>
+Subject: [PATCH net v3] t: fix udp gso skb_segment after pull from frag_list
+Date: Tue, 27 May 2025 10:15:47 +0800
+Message-ID: <20250527021611.23846-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523064524.3035067-1-dongchenchen2@huawei.com>
- <a5cc7765-0de2-47ca-99c4-a48aaf6384d2@huawei.com> <CAHS8izP=AuPbV6N=c05J2kJLJ16-AmRzu983khXaR91Pti=cNw@mail.gmail.com>
- <5305c0d1-c7eb-4c79-96ae-67375f6248f1@huawei.com> <CAHS8izPY9BYWzAVR9LNdSP4+-0TsgOoMXvD658i22VFWHZfvfA@mail.gmail.com>
- <72efaa08-807f-4f6b-87c9-6ce07988797a@huawei.com>
-In-Reply-To: <72efaa08-807f-4f6b-87c9-6ce07988797a@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 26 May 2025 19:13:44 -0700
-X-Gm-Features: AX0GCFt0qT7uzXDBWL1VmdjA3Pj7lsZsYKiXMNz5ZJl74d0V4Btn4kR_s0379d0
-Message-ID: <CAHS8izPTDmBKkwdhE3niaKgh_qd9y-Nd2JcjG4-P59erKTCTLQ@mail.gmail.com>
-Subject: Re: [PATCH net] page_pool: Fix use-after-free in page_pool_recycle_in_ring
-To: "dongchenchen (A)" <dongchenchen2@huawei.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhangchangzhong@huawei.com, 
-	syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-On Mon, May 26, 2025 at 6:53=E2=80=AFPM dongchenchen (A)
-<dongchenchen2@huawei.com> wrote:
->
->
-> > )
-> >
-> > On Mon, May 26, 2025 at 7:47=E2=80=AFAM dongchenchen (A)
-> > <dongchenchen2@huawei.com> wrote:
-> >>
-> >>> On Fri, May 23, 2025 at 1:31=E2=80=AFAM Yunsheng Lin <linyunsheng@hua=
-wei.com> wrote:
-> >>>> On 2025/5/23 14:45, Dong Chenchen wrote:
-> >>>>
-> >>>>>    static bool page_pool_recycle_in_ring(struct page_pool *pool, ne=
-tmem_ref netmem)
-> >>>>>    {
-> >>>>> +     bool in_softirq;
-> >>>>>         int ret;
-> >>>> int -> bool?
-> >>>>
-> >>>>>         /* BH protection not needed if current is softirq */
-> >>>>> -     if (in_softirq())
-> >>>>> -             ret =3D ptr_ring_produce(&pool->ring, (__force void *=
-)netmem);
-> >>>>> -     else
-> >>>>> -             ret =3D ptr_ring_produce_bh(&pool->ring, (__force voi=
-d *)netmem);
-> >>>>> -
-> >>>>> -     if (!ret) {
-> >>>>> +     in_softirq =3D page_pool_producer_lock(pool);
-> >>>>> +     ret =3D !__ptr_ring_produce(&pool->ring, (__force void *)netm=
-em);
-> >>>>> +     if (ret)
-> >>>>>                 recycle_stat_inc(pool, ring);
-> >>>>> -             return true;
-> >>>>> -     }
-> >>>>> +     page_pool_producer_unlock(pool, in_softirq);
-> >>>>>
-> >>>>> -     return false;
-> >>>>> +     return ret;
-> >>>>>    }
-> >>>>>
-> >>>>>    /* Only allow direct recycling in special circumstances, into th=
-e
-> >>>>> @@ -1091,10 +1088,14 @@ static void page_pool_scrub(struct page_poo=
-l *pool)
-> >>>>>
-> >>>>>    static int page_pool_release(struct page_pool *pool)
-> >>>>>    {
-> >>>>> +     bool in_softirq;
-> >>>>>         int inflight;
-> >>>>>
-> >>>>>         page_pool_scrub(pool);
-> >>>>>         inflight =3D page_pool_inflight(pool, true);
-> >>>>> +     /* Acquire producer lock to make sure producers have exited. =
-*/
-> >>>>> +     in_softirq =3D page_pool_producer_lock(pool);
-> >>>>> +     page_pool_producer_unlock(pool, in_softirq);
-> >>>> Is a compiler barrier needed to ensure compiler doesn't optimize awa=
-y
-> >>>> the above code?
-> >>>>
-> >>> I don't want to derail this conversation too much, and I suggested a
-> >>> similar fix to this initially, but now I'm not sure I understand why
-> >>> it works.
-> >>>
-> >>> Why is the existing barrier not working and acquiring/releasing the
-> >>> producer lock fixes this issue instead? The existing barrier is the
-> >>> producer thread incrementing pool->pages_state_release_cnt, and
-> >>> page_pool_release() is supposed to block the freeing of the page_pool
-> >>> until it sees the
-> >>> `atomic_inc_return_relaxed(&pool->pages_state_release_cnt);` from the
-> >>> producer thread. Any idea why this barrier is not working? AFAIU it
-> >>> should do the exact same thing as acquiring/dropping the producer
-> >>> lock.
-> >> Hi, Mina
-> >> As previously mentioned:
-> >> page_pool_recycle_in_ring
-> >>     ptr_ring_produce
-> >>       spin_lock(&r->producer_lock);
-> >>       WRITE_ONCE(r->queue[r->producer++], ptr)
-> >>         //recycle last page to pool, producer + release_cnt =3D hold_c=
-nt
-> > This is not right. release_cnt !=3D hold_cnt at this point.
->
-> Hi,Mina!
-> Thanks for your review!
-> release_cnt !=3D hold_cnt at this point. producer inc r->producer
-> and release_cnt will be incremented by page_pool_empty_ring() in
-> page_pool_release().
->
-> > Release_cnt is only incremented by the producer _after_ the
-> > spin_unlock and the recycle_stat_inc have been done. The full call
-> > stack on the producer thread:
-> >
-> > page_pool_put_unrefed_netmem
-> >      page_pool_recycle_in_ring
-> >          ptr_ring_produce(&pool->ring, (__force void *)netmem);
-> >               spin_lock(&r->producer_lock);
-> >               __ptr_ring_produce(r, ptr);
-> >               spin_unlock(&r->producer_lock);
-> >          recycle_stat_inc(pool, ring);
->
-> If page_ring is not full, page_pool_recycle_in_ring will return true.
-> The release cnt will be incremented by page_pool_empty_ring() in
-> page_pool_release(), and the code as below will not be executed.
->
-> page_pool_put_unrefed_netmem
->    if (!page_pool_recycle_in_ring(pool, netmem)) //return true
->        page_pool_return_page(pool, netmem);
->
+Detect invalid geometry due to pull from frag_list, and pass to
+regular skb_segment. If only part of the fraglist payload is pulled
+into head_skb, it will always cause exception when splitting
+skbs by skb_segment. For detailed call stack information, see below.
 
-Oh! Thanks! I see the race now.
+Valid SKB_GSO_FRAGLIST skbs
+- consist of two or more segments
+- the head_skb holds the protocol headers plus first gso_size
+- one or more frag_list skbs hold exactly one segment
+- all but the last must be gso_size
 
-page_pool_recycle_in_ring in the producer can return the page to the
-ring. Then the consumer will see the netmem in the ring, free it,
-increment release_cnt, and free the page_pool. Then the producer
-continues executing and hits a UAF. Very subtle race indeed. Thanks
-for the patient explanation.
+Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+modify fraglist skbs, breaking these invariants.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+In extreme cases they pull one part of data into skb linear. For UDP,
+this  causes three payloads with lengths of (11,11,10) bytes were
+pulled tail to become (12,10,10) bytes.
 
---=20
-Thanks,
-Mina
+The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
+payload was pulled into head_skb, it needs to be linearized before pass
+to regular skb_segment.
+
+    skb_segment+0xcd0/0xd14
+    __udp_gso_segment+0x334/0x5f4
+    udp4_ufo_fragment+0x118/0x15c
+    inet_gso_segment+0x164/0x338
+    skb_mac_gso_segment+0xc4/0x13c
+    __skb_gso_segment+0xc4/0x124
+    validate_xmit_skb+0x9c/0x2c0
+    validate_xmit_skb_list+0x4c/0x80
+    sch_direct_xmit+0x70/0x404
+    __dev_queue_xmit+0x64c/0xe5c
+    neigh_resolve_output+0x178/0x1c4
+    ip_finish_output2+0x37c/0x47c
+    __ip_finish_output+0x194/0x240
+    ip_finish_output+0x20/0xf4
+    ip_output+0x100/0x1a0
+    NF_HOOK+0xc4/0x16c
+    ip_forward+0x314/0x32c
+    ip_rcv+0x90/0x118
+    __netif_receive_skb+0x74/0x124
+    process_backlog+0xe8/0x1a4
+    __napi_poll+0x5c/0x1f8
+    net_rx_action+0x154/0x314
+    handle_softirqs+0x154/0x4b8
+
+    [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
+    [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+    [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
+    [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
+    [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
+    [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
+    [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
+    [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
+
+Fixes: a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after pull from frag_list")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+---
+ net/ipv4/udp_offload.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index a5be6e4ed326..ec05bb7d1e22 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -273,6 +273,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	bool copy_dtor;
+ 	__sum16 check;
+ 	__be16 newlen;
++	int ret = 0;
+ 
+ 	mss = skb_shinfo(gso_skb)->gso_size;
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+@@ -301,6 +302,9 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+ 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+ 
++		ret = __skb_linearize(gso_skb);
++		if (ret)
++			return ERR_PTR(ret);
+ 		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+ 		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+ 		gso_skb->csum_offset = offsetof(struct udphdr, check);
+-- 
+2.45.2
+
 
