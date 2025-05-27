@@ -1,159 +1,116 @@
-Return-Path: <netdev+bounces-193563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE98AC47B7
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:42:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62D1AC47C0
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 927477A2189
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 05:41:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A106C1893412
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 05:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BB81D5145;
-	Tue, 27 May 2025 05:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B551917F4;
+	Tue, 27 May 2025 05:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V/FBWR68"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="RuqfKSZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF213C13B;
-	Tue, 27 May 2025 05:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E718D3594A;
+	Tue, 27 May 2025 05:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748324552; cv=none; b=s8FmR91PysjRiP93JGskCUv6kqXm9HDnYVts1u5AcVQIpUU8lsT/pEgU+wd6csFdPSIkfUHDyDHJfcNKH03hYmBSAslmMxRz0ixTsZ9swvVX5FraszHnhGX0AQ57QBsptIPJUBGJwpxHp+DWwbk8NzP13qyc8gPMu563Ei01ykk=
+	t=1748324722; cv=none; b=qBVgI2p4dBExH4qbAn7EbA3jpdRrhECD7RygUMHnB+mkmZMu5ZF4hW4wbVnGrTttaewK3R508Ho2Fftx0YIe9kFiPgxjDr8J4xKPqAEvYd+0nzhyz6C/ClFRzzKh0HiUpiwz/8An9gi7P1tJe0TuxZ9muVHHFgDwQ9C4HjuGCgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748324552; c=relaxed/simple;
-	bh=LSN+JZs62AFH8k+p7KoqWLl+5lo1kiXD5xF9uP2he0U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O3x6+b9iT6UKCams5/SW1ClAqFfGj1IAA8tRtez71kQ9RxDxbGVnmzP1SnoYAoBbUQEIqgBC8CgjYtdh5dY40BsgStoqQo4vs7hvdocYK8E8DH++tCxCBccjrJc8+Sr7GE+g10k7pEcsu1JbLVLaewrKOBbReu2KL4hLso/MqIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V/FBWR68; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54R5FfiB015958;
-	Tue, 27 May 2025 05:41:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=GB88/zUggTdqQf1vImnha+8Sk12HP4jhUFUL0qn4Z
-	vU=; b=V/FBWR68q7U5PJamO7/+CQq+tyxlawzMoIkWkG/nRZ9+uewlSxq8Q8Ztr
-	m7A1OpVNv56X8JSogwuQgOSjj8j52Z5KfouU0jQr4AAiPcQWAq+ld62QBIFquQmS
-	X0h07LxZzYsuPoyqeJ8QPJHB10r6vLKp+fw4U6nOkpsh5eHRFXlpTvTCk/iWEVeL
-	PTB0g6Dn8cnZ6wRJgtK/2PGKIpXorIkexRxwijT5YpX3OFuHVO6u+O4jUVAtddwR
-	oO97vUl3NdHSk6R18WIUM0g1nCeFK9rlIEsgGHoTqtCLBHEqyZAklPp46YZOggAH
-	GMS9iN88u4s/CWHadl1fOc6+9xhsA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46v0p2g75u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 05:41:52 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 54R5RbJ8032740;
-	Tue, 27 May 2025 05:41:51 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46v0p2g75r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 05:41:51 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54R2pSY1009847;
-	Tue, 27 May 2025 05:41:51 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46usxms7bm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 05:41:50 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54R5fkgp47841684
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 27 May 2025 05:41:46 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C934A2004B;
-	Tue, 27 May 2025 05:41:46 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F9C420040;
-	Tue, 27 May 2025 05:41:41 +0000 (GMT)
-Received: from li-621bac4c-27c7-11b2-a85c-c2bf7c4b3c07.ibm.com.com (unknown [9.43.24.30])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 27 May 2025 05:41:41 +0000 (GMT)
-From: Saket Kumar Bhaskar <skb99@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-        hbathini@linux.ibm.com, maddy@linux.ibm.com, venkat88@linux.ibm.com,
-        sfr@canb.auug.org.au, alexei.starovoitov@gmail.com,
-        daniel@iogearbox.net, mykolal@fb.com, yoong.siang.song@intel.com,
-        martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
-        john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-        haoluo@google.com, jolsa@kernel.org, shuah@kernel.org
-Subject: [PATCH net-next] selftests/bpf: Fix bpf selftest build warning
-Date: Tue, 27 May 2025 11:11:38 +0530
-Message-ID: <20250527054138.1086006-1-skb99@linux.ibm.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1748324722; c=relaxed/simple;
+	bh=UwirAYtlq4PYk8TsYpItR7qKlQL3pnxC3ACBwNJOxXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iBwqh9UUkqMerWQgisLqeSbxJaU8lkiCFOqAMgNw9LYn7W1js4IoNoUWhVYfHKfGoRA9sNGx0z7YyXlSssdVreBLojJ5kRV+N5UWyD9Q/j1ZgjmUusPer2kMGKtW+R6uc/oBUPJFGpxwU6SnrTC/Ff0EJNUxCKxIjdZwvb5LqDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=RuqfKSZE; arc=none smtp.client-ip=80.12.242.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+ ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
+	by smtp.orange.fr with ESMTPA
+	id Jn6TuvW38K8x9Jn6TuJ1uT; Tue, 27 May 2025 07:44:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1748324645;
+	bh=XaSDramaQ4ealF19zsjhv/7XrCvZ3oUf+OpS7nGNI+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=RuqfKSZEr3CG4BWdedgN5eVB3GxhSwHwxSTbYH9h7RUR5j4mU7wXvS51e1Eh7spnr
+	 VZEt6ixH2w73IfHBCz5gbF34YZwiMMuv7x1QVLLUUCUT+p7r4eF18zjdglLAoJjfde
+	 DueN8tNY+/fcyYDpvtdPpXgf5+K7jCKExyhWjWb1DJe+Zn0X2ljOpOrEXOib0oNTwO
+	 ssnhI8HZFd+1ocoiNCg7SDPLh4//RcuYV9+AUWMlULPgxE8SC60zHwDLXa0DJMeCDe
+	 ZT6vkRllvZ0LUWkTBi4kM1dsd1X72xNeKq97GF7SJ1LGiThP56Rytoh3UjKmXv3Ycd
+	 LAW+0luDsoOxQ==
+X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Tue, 27 May 2025 07:44:05 +0200
+X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
+Message-ID: <be687d2d-4c16-46d6-8828-b0e4866d91de@wanadoo.fr>
+Date: Tue, 27 May 2025 07:43:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dwmac-rk: No need to check the return value of the
+ phy_power_on()
+To: =?UTF-8?B?5p2O5ZOy?= <sensor1010@163.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ jonas@kwiboo.se, rmk+kernel@armlinux.org.uk, david.wu@rock-chips.com,
+ wens@csie.org, jan.petrous@oss.nxp.com
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250526161621.3549-1-sensor1010@163.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20250526161621.3549-1-sensor1010@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hniIQAKNbKaMz0m7uRoeVVGmN4blMz1r
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDA0MiBTYWx0ZWRfX2KH/YZ+IXrD+ xEwRJfReATiRs31NWV8AHzlO+alRQxKzjNz03su/4PdjDwFwCMnMclWmCbI8sOigQtx/uiisz94 wpKFdDXu5QFUsnQcjZ7a3KX3p4tuznFhguhpQHkI0B8CIMGy7LB2el/unBH+vCfMq9BFtj+PCLg
- v7pmMp9dqtjyTSSuXI+zw925ImeqPR171eKx5d+LLwLpMfqpLFrVG70b5mqx0DucYAEOixRxVu2 P+/v7k5Otum5E0CBJa7vVTDZXr6TObLh5Y/Tc22YICRzPfMINs9h1TnThZywBfTlY7JcJL3ZkZi X+yrPf32qcMZNXLmguE/5vJvplY+gaFnjDHhHZohduGQUJtLxVlRNWzrZ99+tkUnDxM45JLornJ
- aevHuUXaYlaHN6RkOy4ICEgssJHEzd+IbjKgqHtR3KnQJkTfKexMqq5gfk+JgKxQZE7GuPka
-X-Authority-Analysis: v=2.4 cv=Q7TS452a c=1 sm=1 tr=0 ts=683550a0 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=QyXUC8HyAAAA:8 a=rV7urDwo7b39epbSBP8A:9
-X-Proofpoint-GUID: kUl06Ny2CnDbsd5iHLU-MPR7ppgJ17oC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-27_03,2025-05-26_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 mlxlogscore=695 phishscore=0 clxscore=1015
- malwarescore=0 adultscore=0 mlxscore=0 impostorscore=0 spamscore=0
- suspectscore=0 lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505270042
 
-On linux-next, build for bpf selftest displays a warning:
+Le 26/05/2025 à 18:16, 李哲 a écrit :
+> since the return value of the phy_power_on() function is always 0,
+> checking its return value is redundant.
 
-Warning: Kernel ABI header at 'tools/include/uapi/linux/if_xdp.h'
-differs from latest version at 'include/uapi/linux/if_xdp.h'.
+Can you elaborate why?
 
-Commit 8066e388be48 ("net: add UAPI to the header guard in various network headers")
-changed the header guard from _LINUX_IF_XDP_H to _UAPI_LINUX_IF_XDP_H
-in include/uapi/linux/if_xdp.h.
+Looking at  (1], I think that it is obvious that non-0 values can be 
+returned.
 
-To resolve the warning, update tools/include/uapi/linux/if_xdp.h
-to align with the changes in include/uapi/linux/if_xdp.h
 
-Fixes: 8066e388be48 ("net: add UAPI to the header guard in various network headers")
-Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Closes: https://lore.kernel.org/all/c2bc466d-dff2-4d0d-a797-9af7f676c065@linux.ibm.com/
-Tested-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Signed-off-by: Saket Kumar Bhaskar <skb99@linux.ibm.com>
----
- tools/include/uapi/linux/if_xdp.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+CJ
 
-diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
-index 42869770776e..44f2bb93e7e6 100644
---- a/tools/include/uapi/linux/if_xdp.h
-+++ b/tools/include/uapi/linux/if_xdp.h
-@@ -7,8 +7,8 @@
-  *	      Magnus Karlsson <magnus.karlsson@intel.com>
-  */
- 
--#ifndef _LINUX_IF_XDP_H
--#define _LINUX_IF_XDP_H
-+#ifndef _UAPI_LINUX_IF_XDP_H
-+#define _UAPI_LINUX_IF_XDP_H
- 
- #include <linux/types.h>
- 
-@@ -180,4 +180,4 @@ struct xdp_desc {
- /* TX packet carries valid metadata. */
- #define XDP_TX_METADATA (1 << 1)
- 
--#endif /* _LINUX_IF_XDP_H */
-+#endif /* _UAPI_LINUX_IF_XDP_H */
--- 
-2.43.5
+[1]: 
+https://elixir.bootlin.com/linux/v6.15/source/drivers/phy/phy-core.c#L305
+
+> 
+> Signed-off-by: 李哲 <sensor1010@163.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 6 +-----
+>   1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index 700858ff6f7c..6e8b10fda24d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1839,11 +1839,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
+>   		dev_err(dev, "NO interface defined!\n");
+>   	}
+>   
+> -	ret = phy_power_on(bsp_priv, true);
+> -	if (ret) {
+> -		gmac_clk_enable(bsp_priv, false);
+> -		return ret;
+> -	}
+> +	phy_power_on(bsp_priv, true);
+>   
+>   	pm_runtime_get_sync(dev);
+>   
 
 
