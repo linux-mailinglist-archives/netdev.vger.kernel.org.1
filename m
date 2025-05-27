@@ -1,164 +1,156 @@
-Return-Path: <netdev+bounces-193671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B423AC5094
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:14:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86ED2AC50A0
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C2AF176986
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:14:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 889973B94D3
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A49278E53;
-	Tue, 27 May 2025 14:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2669615A858;
+	Tue, 27 May 2025 14:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itjyUriX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cC07RlYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C6BD277808
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 14:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBD34C7F
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 14:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748355263; cv=none; b=m1+haGdWMZOTuDT35juShx0ZJtEuhhFqAcZoPjMRGumL4lu0BLafw2svi93rsIMB9oGaJhPaG4kD3K2LHhWNj5u4BQ+CxPGA4WqcyvrR8gglgSrOcG1ShYyn37m1lk3zlA9yvyRlfHGz9oftgw4dER8UV5KZcswQqmQNI671E0A=
+	t=1748355362; cv=none; b=abr8Xb3GdDRnwVjkHuqu/jCT7muWj0Ygo5JtAFaOL5uGBRuWRTBFezyyMTpCmPaPHIP3Zr7+VnNXdIY4xI72AxLxydX7uVk+eqgWWUk8q102UP/t8QQzfCv5m6nwfxREKPTwJ+ysxJC1uFQihs0xov2QJyo3dTSkjOM6uULkx4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748355263; c=relaxed/simple;
-	bh=uGDxL6NoOAWqEVaEuf37LGjdZ3OBf8FaUrRF5Pz5lAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRKqHr9mBsrDk+dmBs/2epbDgzpZsV0wVEMq5MDK9AXGGmfkMkLEul6hCeSN6W6tOd9j96HkUVnPkZJsDoac5VXDarpjvPcxopKhJbyXG0ZqEuMfSicipCDpAKgwHdYDNz9J+E5+sARjwsnevB37wXMLtLZW8EquvE2TeK+oixk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itjyUriX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748355260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PJboAKDayZ+nUPKd/wLjGeoCMi+C4va3WlmfVaYSkrY=;
-	b=itjyUriX+lchTIEAU+DfcA3NxeA0HdIkYcAyjR0in/k8SJVvY0UQPkY4fMuchmYASmHPiY
-	tPeF2UuubT2CQ/u6hYfCEOYP+1nhQuVOIvrHXyzITi11hqZOuZC6Sej8pZCRXvmjwxIt0j
-	grFuzJNCZkeSbCCnYffa+Op+c65oaFU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-IXHlEhuMMPGc_9d5_rx7YQ-1; Tue, 27 May 2025 10:14:15 -0400
-X-MC-Unique: IXHlEhuMMPGc_9d5_rx7YQ-1
-X-Mimecast-MFC-AGG-ID: IXHlEhuMMPGc_9d5_rx7YQ_1748355254
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-442d472cf7fso28687225e9.3
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:14:15 -0700 (PDT)
+	s=arc-20240116; t=1748355362; c=relaxed/simple;
+	bh=RyXzkfH82uIofZcjPH9xbahHgmhNvJRlVehT4lcCMKE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kAr1+IcnAQ6yyd/cc7tFIgjfjeFnprIy8kifO+ckbalbun/mnqr/pt62Jh85kkmuUsSdmvaGmB8bMkNmCQuQ75MA+ye9Z8IJ42r/4Y3P03OZ+Do46Q0R0iFwydRI7/1GfatET2qUlFE/UK7QBqARN7bD48rv21KbRu6shp3cMVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cC07RlYt; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf680d351so27181785e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:15:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748355358; x=1748960158; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RyXzkfH82uIofZcjPH9xbahHgmhNvJRlVehT4lcCMKE=;
+        b=cC07RlYtt7iLyP1dJ7z84IToI9mmO2bf5ZFnK330LsCYipTaZTauKFiJram04DmZCd
+         qSC/znr12yxud2CkA5JTPsxXvZCi7thkWJwU75i38p23/qcPFSpEC70+gN7y+UXEPpU0
+         Cj2+DSUg0883AzQKRKDVMZR1/cpktN3D5Mxqgsj86jL8rX7rs/nbSoMHiXZAZ/sDp+vZ
+         luTlUbhuqSOEppWqbo/IsZWK0kb42B6BcmDuDrw2Y889m88xw806itaDNP7EFW+i1gwJ
+         +VnhHk3A+1cKqEzNuZyCDQJRfPLX89mPqSX+w0JJWgIJPtQwu/IM5eDREx7r3lIb7+NM
+         2w1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748355254; x=1748960054;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJboAKDayZ+nUPKd/wLjGeoCMi+C4va3WlmfVaYSkrY=;
-        b=UU79f7p6Erz8X9d6jF8aGICHtd7btyVmLYFqWtJM0Ben6oYm3MaVUugEtKyH9/J4mS
-         Fj0L5wAAL+VSQAjvLQpULLFwgaOjxo91JzY908xYLEtSk4UPA7H3YfRqwvRFsp66zB6G
-         tFuooKy+lTFwXYSheC+0dPUfQdVuvtEgSzLhNkz6ae4riH5L7/q6nuiwnDcans681IVf
-         U8NtxXCYWEZmHBzbPGZmlP5OpuTKRgj0m0hXAxP8PL3NjItvxGGKqfuJTvkJOa9VpTmb
-         0Emphwz9GzpzJ528F76656m+K3COIV5dZ3tGGP5CRzyQCv7L35SDvBjagl1yf/OWHGAd
-         WC4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXhtUb6TLZZeFLIUU44rjLHXZezj4G6YS85bo5WzqBPJkjcX/SK3bfP/A5QLnc2aiFO6jQLp6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwJi3OJP+qSqkdw6dtaZVNyZ2KUi010NxTngvEfji72moTb0Aa
-	0IH5e91BAU/oHCtyfy33xFLZSk8vuroSwZ9mgjhdQ7cETaZoivaq7w3sE99C4TQPqMpzvSsLc+G
-	5oSwDqRy+dF49J0EtYe7UkUuyIx+bgJowfcVfFI7A5SDht8R9fnVm0bK0bQ==
-X-Gm-Gg: ASbGncv8oyNpdbqhdoCaD/tRdhAJDoJ0hyGrO39AhswebHy/5egwXTdBSAfhuRsVDUT
-	SBGdEkjRJCCNAFCQ0lCVDIxaoUfE7kdmexTnPdc6LWcYR9ZWcwFNAwor01dkGXX3mL5cJIsk5JG
-	ztIKEMYEjKhqLC4wNMYNvkxpBB9I6gpLmbw7mHtdzNZtGSMRxw5SH+AGKHQi5cvEkGVKR6cRcZj
-	TKv7aTe6PeBuQB4IIFRPfrnsWIA2yf1UW7y7B/VhMc8e/kM4dU+urzqrxpXJd0F9JAFmj+SE+Xj
-	kIPeHw==
-X-Received: by 2002:a05:600c:c1c8:10b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-44cc0725a12mr65102145e9.27.1748355254399;
-        Tue, 27 May 2025 07:14:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAoXhx4gZIoeK91icwDDWTluoykbi1Qz6GgjYz88NE8Ydk1cFgciKX/AoC/psNetPTRi8NFw==
-X-Received: by 2002:a05:600c:c1c8:10b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-44cc0725a12mr65101895e9.27.1748355253919;
-        Tue, 27 May 2025 07:14:13 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f0556bsm268010055e9.12.2025.05.27.07.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 07:14:13 -0700 (PDT)
-Date: Tue, 27 May 2025 10:14:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>
-Subject: Re: [PATCH net-next 1/8] virtio: introduce virtio_features_t
-Message-ID: <20250527101312-mutt-send-email-mst@kernel.org>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <9a1c198245370c3ec403f14d118cd841df0fcfee.1747822866.git.pabeni@redhat.com>
- <CACGkMEtGRK-DmonOfqLodYVqYhUHyEZfrpsZcp=qH7GMCTDuQg@mail.gmail.com>
- <2119d432-5547-4e0b-b7fc-42af90ec6b7a@redhat.com>
+        d=1e100.net; s=20230601; t=1748355358; x=1748960158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RyXzkfH82uIofZcjPH9xbahHgmhNvJRlVehT4lcCMKE=;
+        b=hSWhBs2l0xhyo+odYkPZBAVjegbKHpMFeApBPztuYhn30EAN0luojDcliabx0/NYT6
+         xZskBXEvX0YqK0mEes1Q6NTR4hcvkgc6fsa5DdYfSxCqymwJowv/K0+Vfm4YFHcib+nY
+         DBeIU4xsSbSTA4r5DD82jyZhT4RG8Xsn7q9+ik88uRT9avbjZbrGm6iZ2q2oTfeUT4YG
+         vpwnZQy0/DWaMahOi3ONh5UgUu+jepR5lhUeOMKG32UaZ/Av+yq6z6JjGov6Jh5TyjZF
+         2fslB2fxCLw1ng4cMwHIK7lWdPljTfQaLngQSErNr/aipIg94juXfs2ORtmIncj0EAWI
+         johQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHNWKPeCLZ5X6AYj9w1AfFtU4fO5SOv020mlK7ofsO4Smb5Xfh5z+RU2WQWvCbqn/u1yQULlk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPypl82+j+HL+duWUo7P0NHvago7u+zdNv2aNaXpKxQ7ndtwk8
+	lDVSPXOK9TYlSrtYySjbbuuR34CriGnucB5rJ7DQjQflEKMfQ1WNat+Xbi6A6vM7rveUVlE+8ba
+	DqI9/2HnE2zIWUEseldIU4/sT0HBrgNU=
+X-Gm-Gg: ASbGncuNI5/OjQ1RZH4c0Vu4N5Jy+PGn91nXRJ3+i9vndepHEp/22u0ekcOPcoUKh2I
+	fdAb8bCbPOtjjw+EgTU8HsdBbny0Aq9XaqXAjZHbiv33KOppYOOXScWOCpMwmWc0bE/kTpsC9g/
+	m3MrbifeUD9btu9wEH0hJ27QCwi+nuAQ==
+X-Google-Smtp-Source: AGHT+IHR8nhDcR83cYg9wFlCkdA4biWNxveUq5ABiuYYwj//nEYLhbh5UTRgXpB5h0COzQa36DPMuTBtBJbed9is/iU=
+X-Received: by 2002:a05:6000:4008:b0:3a3:6478:e08 with SMTP id
+ ffacd0b85a97d-3a4e5ebbae8mr895338f8f.23.1748355358296; Tue, 27 May 2025
+ 07:15:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2119d432-5547-4e0b-b7fc-42af90ec6b7a@redhat.com>
+References: <20250526130519.1604225-1-dnlplm@gmail.com> <CAFEp6-06ATV_rh_KWvjgNoiw67WPvAE-gF_gU-DJdcycDiYVqA@mail.gmail.com>
+ <CAGRyCJGESxV2M9e34dJw89=0NFt0+hrXCOCW=MaYdVfn42DZTw@mail.gmail.com> <CAFEp6-1nB-hiJb+W3zmnCSy9XaNfgbW7AqMeJ3LKa4+St-AqJg@mail.gmail.com>
+In-Reply-To: <CAFEp6-1nB-hiJb+W3zmnCSy9XaNfgbW7AqMeJ3LKa4+St-AqJg@mail.gmail.com>
+From: Daniele Palmas <dnlplm@gmail.com>
+Date: Tue, 27 May 2025 16:05:33 +0200
+X-Gm-Features: AX0GCFt3N0ajXkqlT5FHwW0LcoW5EQofUNBSUp8gTn3Q3A_5ErqpiPCGClcRx2Q
+Message-ID: <CAGRyCJE+SGqiC6PsNnguN7sM1s48bEkfBeMeQaeBBZr9Hs-b0w@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] net: wwan: mhi_wwan_mbim: use correct mux_id for multiplexing
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Slark Xiao <slark_xiao@163.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 26, 2025 at 09:20:50AM +0200, Paolo Abeni wrote:
-> On 5/26/25 2:43 AM, Jason Wang wrote:
-> > On Wed, May 21, 2025 at 6:33 PM Paolo Abeni <pabeni@redhat.com> wrote:
-> >> diff --git a/include/linux/virtio_features.h b/include/linux/virtio_features.h
-> >> new file mode 100644
-> >> index 0000000000000..2f742eeb45a29
-> >> --- /dev/null
-> >> +++ b/include/linux/virtio_features.h
-> >> @@ -0,0 +1,23 @@
-> >> +/* SPDX-License-Identifier: GPL-2.0 */
-> >> +#ifndef _LINUX_VIRTIO_FEATURES_H
-> >> +#define _LINUX_VIRTIO_FEATURES_H
-> >> +
-> >> +#include <linux/bits.h>
-> >> +
-> >> +#if IS_ENABLED(CONFIG_ARCH_SUPPORTS_INT128)
-> >> +#define VIRTIO_HAS_EXTENDED_FEATURES
-> >> +#define VIRTIO_FEATURES_MAX    128
-> >> +#define VIRTIO_FEATURES_WORDS  4
-> >> +#define VIRTIO_BIT(b)          _BIT128(b)
-> >> +
-> >> +typedef __uint128_t            virtio_features_t;
-> > 
-> > Consider:
-> > 
-> > 1) need the trick for arch that doesn't support 128bit
-> > 2) some transport (e.g PCI) allows much more than just 128 bit features
-> > 
-> >  I wonder if it's better to just use arrays here.
-> 
-> I considered that, it has been discussed both on the virtio ML and
-> privatelly, and I tried a resonable attempt with such implementation.
-> 
-> The diffstat would be horrible, touching a lot of the virtio/vhost code.
-> Such approach will block any progress for a long time (more likely
-> forever, since I will not have the capacity to complete it).
-> 
-> Also the benefit are AFAICS marginal, as 32 bits platform with huge
-> virtualization deployments on top of it (that could benefit from GSO
-> over UDP tunnel) are IMHO unlikely, and transport features space
-> exhaustion is AFAIK far from being reached (also thanks to reserved
-> features availables).
-> 
-> TL;DR: if you consider a generic implementation for an arbitrary wide
-> features space blocking, please LMK, because any other consideration
-> would be likely irrelevant otherwise.
-> 
-> /P
+Hi Loic,
 
-Let's just say, I'm fine with starting with this, and
-we can move to an array later. The nice thing here
-is that there's this typedef, it can later be changed to be
-any struct at all.
+Il giorno lun 26 mag 2025 alle ore 22:38 Loic Poulain
+<loic.poulain@oss.qualcomm.com> ha scritto:
+>
+> On Mon, May 26, 2025 at 4:19=E2=80=AFPM Daniele Palmas <dnlplm@gmail.com>=
+ wrote:
+> >
+> > Hi Loic,
+> >
+> > Il giorno lun 26 mag 2025 alle ore 16:06 Loic Poulain
+> > <loic.poulain@oss.qualcomm.com> ha scritto:
+> > >
+> > > Hi Daniele,
+> > >
+> > > On Mon, May 26, 2025 at 3:19=E2=80=AFPM Daniele Palmas <dnlplm@gmail.=
+com> wrote:
+> > > >
+> > > > When creating a multiplexed netdevice for modems requiring the WDS
+> > > > custom mux_id value, the mux_id improperly starts from 1, while it
+> > > > should start from WDS_BIND_MUX_DATA_PORT_MUX_ID + 1.
+> > > >
+> > > > Fix this by moving the session_id assignment logic to mhi_mbim_newl=
+ink.
+> > >
+> > > Currently, the MBIM session ID is identical to the WWAN ID. This
+> > > change introduces a divergence by applying an offset to the WWAN ID
+> > > for certain devices.
+> > >
+> > > Whether this is acceptable likely depends on how the MBIM control pat=
+h
+> > > handles session addressing. For example, if mbimcli refers to
+> > > SessionID 1, does that actually control the data session with WWAN ID
+> > > 113?
+> > >
+> >
+> > yes, quoting from a QC case we had:
+> >
+> > "There was a change in QBI on SDX75/72 to map sessionid from MBIM to
+> > muxids in the range (0x70-0x8F) for the PCIE tethered use.
+> > So, if you are bringing up data call using MBIM sessionId=3D1, QBI will
+> > bind that port to MuxId=3D113. So, the IP data packets are also expecte=
+d
+> > to come from host on MuxId=3D113."
+>
+> Ack, could you please include that information in the commit message?
 
+Sure.
+
+> Also, we should consider renaming the mux-id macro/function to make
+> its purpose clearer.
+>
+
+Ok, let me see if I'm able to find a better name.
+
+I'll wait a few days to see if more comments are coming, then resend.
+
+Thanks,
+Daniele
+
+> Regards,
+> Loic
 
