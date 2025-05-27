@@ -1,142 +1,141 @@
-Return-Path: <netdev+bounces-193732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53E6BAC5A01
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:20:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2044AC5A2C
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22EC61BA591B
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:20:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AD203AD1AF
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CC6276051;
-	Tue, 27 May 2025 18:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBA628032E;
+	Tue, 27 May 2025 18:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kB7Lm1ZJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAJg/lTs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A19B189B80
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 18:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CDF27C854;
+	Tue, 27 May 2025 18:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748370001; cv=none; b=cRb7CYMz+OdpDkZBt3eKeGFMxJZOE5S+wBMUBEX6NsJLTNBti4V4Qc1YQeFl5sXTwl04l4z8SFxiv3WNRicRxIost4SF6trB9MyYyfPcpTjBW66+Y5t3S3I4YfVxE1TZckcmZv9IkOse367UU+GDEp2wdbeTYWv36uRGwKmquZw=
+	t=1748371392; cv=none; b=RUWDeZlQUqpCC++jbTqovwYlNKI6HMjdEpYe0pCKLNrK2kHaAtAhT7hiVB3Pdm+6OhJosNOSB2s+0KxLp5bLC015sUOPWp2CkkKUtpxEIFHuBSS66q/2RXHyuhoOXQqXp+bQP8fBDSDabkxFDNEuOk1E9Iwntvu1dyD3ToFayu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748370001; c=relaxed/simple;
-	bh=4157WNDPmaLRh9FoaDL4mzKslAOw6dhMPTfXyXQt0zw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DgaAOfq8rYVMXBpl4iFOOM//p2t16oJRd5JvvOr9BHsnsZeBWasNwSK5zCLucDiJuhlvjYsmPLUtWkUtUBHMvlVvsFchWQ0LGf+BXkwD1VCI0NSO0daafjbtLr2NurVEaBlUmIqmJbmN90k6c5wceoV7crVRSYxZ2rSiJqgOrhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kB7Lm1ZJ; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <21f4f0e6-58a5-48b4-8ccd-37f79f9b8241@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748369987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mpbr6+yvoAeCVple+mGNixeYL4agEPADgVUkkelLgHw=;
-	b=kB7Lm1ZJ5ka0o4aTenPVaiIRyQiiwNmyJSto0QN4oRE40VThzyLxbkyLMSFpQgR36rzVDh
-	rUpl+J/oWKm8ymjBlVBDfQAOpBQXoIUmvozHtM6DvuCe/vxUd4BU7wkaf3QcGtWnBfb9aV
-	HqHLSHKLZFumFHHBwHSRjq1S/BANm0o=
-Date: Tue, 27 May 2025 11:19:43 -0700
+	s=arc-20240116; t=1748371392; c=relaxed/simple;
+	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mfV8VJxNi/USAC+PEZeRUtNWnRYUO4jmF+ImjSIVibgz88fh9BeTUWJtpk9tP4U1A9FIosoix8bCpgwOY3HF8tTM5yS0BxCrsBSNSorpnIeJXBxo8oNH0BfDl7//Hbjpbr88kcZ/DmkJujm7JNlB1hv11DcmMHK5zWx/6RYhcmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAJg/lTs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1049DC4CEEA;
+	Tue, 27 May 2025 18:43:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748371392;
+	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SAJg/lTsHFPpMmZvVmP+0XJugy76N/WOctdJIssWWs7qNHSBbzmSYg8xkWQak4g5C
+	 LfZgHKgxVCZb8p0qamVGEV/1YiZTk2afQEafhl37cp97dLgGRdjvi7trKjD2XXdMuP
+	 LbrGzfua9UHyhqt54e4WAAnlTo1NpBqK2l+IKnh1JQUdMKF4EbO60uwu4lUOeBUiiD
+	 wKIfF3Uo87tWndWoi9LDxjhMwmt61Lxnq3QWSMVbr06JAV1rHQ9XUs10fwb75pWBr3
+	 anGW5bNZOirMCaMIcgBCgcjqJ5Vcm09HGhEIuw7KuVAzISErwpzi7uyi2a2hStymIg
+	 Mw76bx9c3WLMA==
+Date: Tue, 27 May 2025 11:43:08 -0700
+From: Kees Cook <kees@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxim Georgiev <glipus@gmail.com>, netdev@vger.kernel.org,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Maurizio Lombardi <mlombard@redhat.com>,
+	Dmitry Bogdanov <d.bogdanov@yadro.com>,
+	Mingzhe Zou <mingzhe.zou@easystack.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Lei Yang <leiyang@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	Paul Fertser <fercerpav@gmail.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Hayes Wang <hayeswang@realtek.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Grant Grundler <grundler@chromium.org>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Philipp Hahn <phahn-oss@avm.de>, Eric Biggers <ebiggers@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xiao Liang <shaw.leon@gmail.com>, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v2 8/8] net: core: Convert
+ dev_set_mac_address_user() to use struct sockaddr_storage
+Message-ID: <202505271142.EA78EAB04@keescook>
+References: <20250521204310.it.500-kees@kernel.org>
+ <20250521204619.2301870-8-kees@kernel.org>
+ <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next 03/10] bpf: tcp: Get rid of st_bucket_done
-To: Jordan Rife <jordan@jrife.io>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexei.starovoitov@gmail.com,
- bpf@vger.kernel.org, daniel@iogearbox.net, netdev@vger.kernel.org,
- willemdebruijn.kernel@gmail.com
-References: <wxqtnfk2nkwfd3lybyyitawusswohp7hkaoszfxpfdsiuluilr@g3zlc3ojxjkv>
- <20250522204443.78455-1-kuniyu@amazon.com>
- <495201b0-36b9-4a97-8eb3-aedd57e039a9@linux.dev>
- <bfey2fu3e74d52wjnoimu5ra7wqox2idnc2syzlrvsyjzezdli@lhywkrucesbf>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <bfey2fu3e74d52wjnoimu5ra7wqox2idnc2syzlrvsyjzezdli@lhywkrucesbf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
 
-On 5/24/25 2:09 PM, Jordan Rife wrote:
-> On Fri, May 23, 2025 at 03:07:32PM -0700, Martin KaFai Lau wrote:
->> On 5/22/25 1:42 PM, Kuniyuki Iwashima wrote:
->>> From: Jordan Rife <jordan@jrife.io>
->>> Date: Thu, 22 May 2025 11:16:13 -0700
->>>>>>>    static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
->>>>>>>    {
->>>>>>> -	while (iter->cur_sk < iter->end_sk)
->>>>>>> -		sock_gen_put(iter->batch[iter->cur_sk++]);
->>>>>>> +	unsigned int cur_sk = iter->cur_sk;
->>>>>>> +
->>>>>>> +	while (cur_sk < iter->end_sk)
->>>>>>> +		sock_gen_put(iter->batch[cur_sk++]);
->>>>>>
->>>>>> Why is this chunk included in this patch ?
->>>>>
->>>>> This should be in patch 5 to keep cur_sk for find_cookie
->>>>
->>>> Without this, iter->cur_sk is mutated when iteration stops, and we lose
->>>> our place. When iteration resumes and we call bpf_iter_tcp_batch the
->>>> iter->cur_sk == iter->end_sk condition will always be true, so we will
->>>> skip to the next bucket without seeking to the offset.
->>>>
->>>> Before, we relied on st_bucket_done to tell us if we had remaining items
->>>> in the current bucket to process but now need to preserve iter->cur_sk
->>>> through iterations to make the behavior equivalent to what we had before.
->>>
->>> Thanks for explanation, I was confused by calling tcp_seek_last_pos()
->>> multiple times, and I think we need to preserve/restore st->offset too
->>> in patch 2 and need this change.
->>>
->>> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
->>> index ac00015d5e7a..0816f20bfdff 100644
->>> --- a/net/ipv4/tcp_ipv4.c
->>> +++ b/net/ipv4/tcp_ipv4.c
->>> @@ -2791,6 +2791,7 @@ static void *tcp_seek_last_pos(struct seq_file *seq)
->>>    			break;
->>>    		st->bucket = 0;
->>>    		st->state = TCP_SEQ_STATE_ESTABLISHED;
->>> +		offset = 0;
->>
->> This seems like an existing bug not necessarily related to this set.
+On Tue, May 27, 2025 at 09:02:28AM +0200, Paolo Abeni wrote:
+> On 5/21/25 10:46 PM, Kees Cook wrote:
+> > diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+> > index fff13a8b48f1..616479e71466 100644
+> > --- a/net/core/dev_ioctl.c
+> > +++ b/net/core/dev_ioctl.c
+> > @@ -572,9 +572,11 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
+> >  		return dev_set_mtu(dev, ifr->ifr_mtu);
+> >  
+> >  	case SIOCSIFHWADDR:
+> > -		if (dev->addr_len > sizeof(struct sockaddr))
+> > +		if (dev->addr_len > sizeof(ifr->ifr_hwaddr))
+> >  			return -EINVAL;
+> > -		return dev_set_mac_address_user(dev, &ifr->ifr_hwaddr, NULL);
+> > +		return dev_set_mac_address_user(dev,
+> > +						(struct sockaddr_storage *)&ifr->ifr_hwaddr,
+> > +						NULL);
 > 
-> Agree that this is more of an existing bug.
-> 
->> The patch 5 has also removed the tcp_seek_last_pos() dependency, so I think
->> it can be a standalone fix on its own.
-> 
-> With the tcp_seq_* ops there are also other corner cases that can lead
-> to skips, since they rely on st->offset to seek to the last position.
-> 
-> In the scenario described above, sockets disappearing from the last lhash
-> bucket leads to skipped sockets in the first ehash bucket, but you could
-> also have a scenario where, for example, the current lhash bucket has 6
-> sockets, iter->offset is currently 3, 3 sockets disappear from the start
-> of the current lhash bucket then tcp_seek_last_pos skips the remaining 3
-> sockets and goes to the next bucket.
-> 
-> I'm not sure it's worth fixing just this one case without also
-> overhauling the tcp_seq_* logic to prevent these other cases. Otherwise,
-> it seems more like a Band-aid fix. Perhaps a later series could explore
-> a more comprehensive solution there.
+> Side note for a possible follow-up: the above pattern is repeated a
+> couple of times: IMHO consolidating it into an helper would be nice.
 
-It is arguable that the missing "offset = 0;" here is a programmer’s error 
-rather than the limitation of the offset approach itself. Adding it could be a 
-quick fix for this corner case.
+Yeah, I will look at that.
 
-That said, it is a very rare case, given there is a "while (... && bucket == 
-st->bucket)" condition, and the bug has probably existed since 2010 in commit 
-a8b690f98baf. If there is a plan for a long-term fix in /proc/net/tcp[6], I 
-think it is reasonable to wait also. I do not have a strong opinion either way. 
-I am just unsure if any users care about the skip improvement in /proc/net/tcp[6].
+> Also such helper could/should explicitly convert ifr->ifr_hwaddr to
+> sockaddr_storage and avoid the cast.
 
+It's UAPI, so it looked verrrry painful to change.
+
+-- 
+Kees Cook
 
