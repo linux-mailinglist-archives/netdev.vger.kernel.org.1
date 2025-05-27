@@ -1,235 +1,177 @@
-Return-Path: <netdev+bounces-193673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8FAAC50C4
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:23:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8572AC50C8
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:24:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5443E1766F7
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:23:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 520D91BA0B67
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E29527603C;
-	Tue, 27 May 2025 14:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F98927700B;
+	Tue, 27 May 2025 14:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2KpXxov"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDkruEgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBB6253F3D
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 14:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EE319CD16;
+	Tue, 27 May 2025 14:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748355780; cv=none; b=JAHkexySFKhORGva22qxajKWFsPPlUOsRvalzqvqhSIdk7lZlZQw0RAWMdj3wYFqZMOp8mr3+pCTFTm2MLz9oH5RxUWqcv6pz6D/1j6D7ToMO3B1y4g7GQ64lnALRLKRSvVKOeVtPCAPKsTaBrZUrb50DkkE9hfjVAHheCoE2Ys=
+	t=1748355831; cv=none; b=gKC8XCdPfJdB6IgZKOcWH5PB2Av4wIndQcKthx1BVEILjR5+0bZj2l6fwVq1F/HUq4zYUUBThvaQ2eojW9p4KUDlbnQ4WJ4E4hZWI6IDRneYfwAVbOfmDzM3WuPWQfHSNh6c1xVDgL21Wxqa2mzlULGv/b2DsFWNADT/kz+l8vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748355780; c=relaxed/simple;
-	bh=FTRjtFm93P0KQ7qrms/1aW3ZWlXiAEbfWfEaTo73AOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qznGE1PSTI4VKz8Z+y843RfEkMtxJq0pqmck0UcJ+vG5L76T2lEQ9LIVa8BucHY6C68crFN/go7N0p1blj6Kz0M+brOAiHQuA4PlJu8Crm7owPiN9SoHzhZHpQnMeH8orKJNxPIpRozyMxx2Foozy9PbxdaCGGVVTyqfiX8vXsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C2KpXxov; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3F6FC4CEE9;
-	Tue, 27 May 2025 14:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748355780;
-	bh=FTRjtFm93P0KQ7qrms/1aW3ZWlXiAEbfWfEaTo73AOo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C2KpXxovOHbdFffxTKk6y0JwaVTknk+0Vmb+U1wwwq//xVDXM6ob3T6ST9OBzn35c
-	 abkZh2XGxN9Ev+Q5Md7hEbLnepZ8J39C6mSWGLLpiYlwfcZVdfT94eiBvisVKyZ/ln
-	 Fj4bgoImmD3kxJ4ugp7S0ND9e5jUymrnnO1th57+/YgT1shyjTeuADrnSLEOlktgm2
-	 AYhzoVsfnMWwehkxT1+A3CFsh+EBFf4cA8z+PmuZen0P+s1/7bmb4pVdN01h23QZLF
-	 l/8fadcc6YO+13Nq8Af5KPX6G/mHuTvWOzh4ZA8SUeK0FerDVYgd5Vp9PHdgi9b6bA
-	 zf3ggdY3kaoJA==
-Date: Tue, 27 May 2025 16:22:57 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: airoha: Initialize PPE UPDMEM
- source-mac table
-Message-ID: <aDXKwWzmE1YSg67u@lore-desk>
-References: <20250523-b4-airoha-flowtable-pppoe-v1-0-8584401568e0@kernel.org>
- <20250523-b4-airoha-flowtable-pppoe-v1-1-8584401568e0@kernel.org>
+	s=arc-20240116; t=1748355831; c=relaxed/simple;
+	bh=xEvAthQl04RfIia9XZaGNG0pijIVN4yQy6i+18RddsI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iBliVQNO4qXyP3B9bZUAkvTO0HVmyWUj2MyD5tHLXlIqxnIrfzRUwQ/0zGA/1+FtouC4TBIEYB6D5Olz7bdE2C4WU2Quu6beGq3te4kayUR7TU0iL5JfYEFob6gruRpjDXf2B9O6ueUr+DZOoHfffgLgVAtxjkk575s0CsHsYCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDkruEgR; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86a52889f45so80500639f.3;
+        Tue, 27 May 2025 07:23:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748355828; x=1748960628; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xmTjDT2LiyYwF2wR/qWfUuuEJKevqGe/HgmBHDb7hgI=;
+        b=CDkruEgRZ+MZTVeuxgiq8mRSRpmWDP49Y/vovQ+X5QFGas35g44Ioj22kq2HpfUMtn
+         /NWGpWnf5GFsJTdXWd/WRg3PPQhQ4S3qKXk9HV3d1jCDvFXxVvK25iygUrIEMoMbsxiE
+         4QXDeKYmNzXnddbCvy/RIWO+fXT2DfrrXgNK9Yjw/dt01neRnTk29bJvAcuJKHrrSwq+
+         S7B9MAquFxLhJ5qjE5fWIfERkA8zso7bl5YY4DPkXGewePiANTOtoBv4PVFkRBCxst1m
+         IjI97BYf/I8iwEKho6MUG2gwIEbbc/qNfoMkAVmAQMdfnf7brG7lHiFrY328xJzoOM91
+         gFqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748355828; x=1748960628;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xmTjDT2LiyYwF2wR/qWfUuuEJKevqGe/HgmBHDb7hgI=;
+        b=vZHMX98FhKtbbp9QDE2nkILTgkslsdi0giFmIFSySv64LcJrZGmJ3zTx7Yz1E+gBtF
+         5ojc6FsDxNR1kazL+Sj2AkbcaHaSpITfL/iiexVuTiqG8EdqnwKjK2C8MExgGAuODIUt
+         uJADs8GwycoWmX8AimO0LP1LxtipLKKaI+yaMAGwVydJjE5tMzWzh7xnrw9HyRc0Tgji
+         KYvQTvzX1TlbFa3bxqGYgSrMhtuJVFOU+Q0u1qKkZzxqDCajZyaoZNr+XX7ZPqyhLSgY
+         srxv7nDtUI96MLxU52N0/mq4JhiFSxidFDGnukYU3a7yPIoBLyddMRDZrradYwXOF4L4
+         lhrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWm6hDOLrxiH/nGCA6wnUOBpuxSNyBKexRg5reEV15xYsaUrFm3dQwefgSE159jzYSSoFwkrSkfvPI@vger.kernel.org, AJvYcCWjqeFl97XwTqYOcQiiR0TlcH9Ddi9xqP70BwQs1nz347on3CHT+3qgRP0qmKpPqhhxfihMNsXc@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBv03pm/K0xvcgZW53s/HIkprgNJPfsRx/dMPhxnQPuz1QqeT/
+	RUfg9dMpUA1Mrpf2oyVIZPp7FDsimdhKroyH0QySisUlYapMVlcXSi3gFSZOaJmVqAME6NKzWoE
+	NdX4WoWwyPCLrOZGqbJ6NnChEqZvTITjjTRr7
+X-Gm-Gg: ASbGncuzIpjEyDcm4NzsGreLcEl2ZlvV88mP59gxqE2M7BiFC3/F1qsbbmH5ajgx1ZU
+	iOZtJOaPwql+JMa2+tdd89fgSsN1WSmYkzlyU/KRlUhRJxuqHlr2ibamrTh6sLjlbHuO6KUer+d
+	HnVB4ZgjOMVgg+JWVT+QjvDnOwDLh83gY=
+X-Google-Smtp-Source: AGHT+IH7SsEHzLIjf82CLttgDNusdzC3nK2flv09oI166QJqd/Na89p4fl/qYeMiT+DyrfRaMRKeRM7Gq3YGwE0nIek=
+X-Received: by 2002:a05:6e02:2307:b0:3dc:88ca:5ea9 with SMTP id
+ e9e14a558f8ab-3dc9b69abe2mr102343175ab.10.1748355828452; Tue, 27 May 2025
+ 07:23:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hGlac84VtnE2zXGM"
-Content-Disposition: inline
-In-Reply-To: <20250523-b4-airoha-flowtable-pppoe-v1-1-8584401568e0@kernel.org>
-
-
---hGlac84VtnE2zXGM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250526054745.2329201-1-hch@lst.de> <CADvbK_d-dhZB-j9=PtCtsnvdmx980n7m8hEDrPnv+h6g7ijF-w@mail.gmail.com>
+ <aDTDOgqCrVryvr0_@f4>
+In-Reply-To: <aDTDOgqCrVryvr0_@f4>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 27 May 2025 10:23:37 -0400
+X-Gm-Features: AX0GCFs56UMPA4XnZrQcO6bX4-CWh7fuN5QGdKyDYNTtGOxk1zR6_0Jj2cgEnQw
+Message-ID: <CADvbK_d_3YQh0s_aOts3YiyHu_uxUxO4okCZDdi=+F4xbVnmKg@mail.gmail.com>
+Subject: Re: [PATCH] sctp: mark sctp_do_peeloff static
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, marcelo.leitner@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> UPDMEM source-mac table is a key-value map used to store devices mac
-> addresses according to the port identifier. UPDMEM source mac table is
-> used during IPv6 traffic hw acceleration since PPE entries, for space
-> constraints, do not contain the full source mac address but just the
-> identifier in the UPDMEM source-mac table.
+On Mon, May 26, 2025 at 3:38=E2=80=AFPM Benjamin Poirier
+<benjamin.poirier@gmail.com> wrote:
+>
+> On 2025-05-26 14:25 -0400, Xin Long wrote:
+> > On Mon, May 26, 2025 at 1:47=E2=80=AFAM Christoph Hellwig <hch@lst.de> =
+wrote:
+> > >
+> > > sctp_do_peeloff is only used inside of net/sctp/socket.c,
+> > > so mark it static.
+> > >
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > > ---
+> > >  include/net/sctp/sctp.h | 2 --
+> > >  net/sctp/socket.c       | 4 ++--
+> > >  2 files changed, 2 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
+> > > index d8da764cf6de..e96d1bd087f6 100644
+> > > --- a/include/net/sctp/sctp.h
+> > > +++ b/include/net/sctp/sctp.h
+> > > @@ -364,8 +364,6 @@ sctp_assoc_to_state(const struct sctp_association=
+ *asoc)
+> > >  /* Look up the association by its id.  */
+> > >  struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t=
+ id);
+> > >
+> > > -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket =
+**sockp);
+> > > -
+> > >  /* A macro to walk a list of skbs.  */
+> > >  #define sctp_skb_for_each(pos, head, tmp) \
+> > >         skb_queue_walk_safe(head, pos, tmp)
+> > > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > > index 53725ee7ba06..da048e386476 100644
+> > > --- a/net/sctp/socket.c
+> > > +++ b/net/sctp/socket.c
+> > > @@ -5627,7 +5627,8 @@ static int sctp_getsockopt_autoclose(struct soc=
+k *sk, int len, char __user *optv
+> > >  }
+> > >
+> > >  /* Helper routine to branch off an association to a new socket.  */
+> > > -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket =
+**sockp)
+> > > +static int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id,
+> > > +               struct socket **sockp)
+> > >  {
+> > >         struct sctp_association *asoc =3D sctp_id2assoc(sk, id);
+> > >         struct sctp_sock *sp =3D sctp_sk(sk);
+> > > @@ -5675,7 +5676,6 @@ int sctp_do_peeloff(struct sock *sk, sctp_assoc=
+_t id, struct socket **sockp)
+> > >
+> > >         return err;
+> > >  }
+> > > -EXPORT_SYMBOL(sctp_do_peeloff);
+> > >
+> > I believe sctp_do_peeloff() was exported specifically to allow usage
+> > outside of the core SCTP code. See:
+> >
+> > commit 0343c5543b1d3ffa08e6716d82afb62648b80eba
+> > Author: Benjamin Poirier <benjamin.poirier@gmail.com>
+> > Date:   Thu Mar 8 05:55:58 2012 +0000
+> >
+> >     sctp: Export sctp_do_peeloff
+> >
+>
+> Thanks for digging that up. The purpose was of course for the commit
+> that followed:
+> 2f2d76cc3e93 dlm: Do not allocate a fd for peeloff (v3.4-rc1)
+>
+> Since that usage was removed in
+> ee44b4bc054a dlm: use sctp 1-to-1 API (v4.3-rc1)
+>
+> I don't see a problem with marking sctp_do_peeloff() static again.
+>
+> > While there=E2=80=99s no known in-tree usage beyond SCTP itself, we can=
+=E2=80=99t be
+> > sure whether this function has been used by out-of-tree kernel modules.
+>
+> The mainline kernel does not need to cater to out-of-tree users.
+Thank you for chiming in.
 
-This patch has now a conflict with the following commit:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/=
-?id=3Dc683e378c0907e66cee939145edf936c254ff1e3
+I didn't know it was exported for the in-tree kernel dlm, and this
+patch should be applied to net-next.
 
-Since this is actually a fix, I can repost targeting net tree as soon as
-it is aligned to net-next.
-
-Regards,
-Lorenzo
-
->=20
-> Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c  |  2 ++
->  drivers/net/ethernet/airoha/airoha_eth.h  |  1 +
->  drivers/net/ethernet/airoha/airoha_ppe.c  | 25 ++++++++++++++++++++++++-
->  drivers/net/ethernet/airoha/airoha_regs.h | 10 ++++++++++
->  4 files changed, 37 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 0d627e511266d94e079e8a87d2f812fb14b4ad07..e4c67c7bbf215d448640f978c=
-d0d9d50abd73644 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -92,6 +92,8 @@ static void airoha_set_macaddr(struct airoha_gdm_port *=
-port, const u8 *addr)
->  	val =3D (addr[3] << 16) | (addr[4] << 8) | addr[5];
->  	airoha_fe_wr(eth, REG_FE_MAC_LMIN(reg), val);
->  	airoha_fe_wr(eth, REG_FE_MAC_LMAX(reg), val);
-> +
-> +	airoha_ppe_init_upd_mem(port);
->  }
-> =20
->  static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
-net/airoha/airoha_eth.h
-> index 531a3c49c1562a986111a1ce1c215c8751c16e09..a951246c0171e14497b510d30=
-29fc0a7f891efe6 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.h
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
-> @@ -611,6 +611,7 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, str=
-uct sk_buff *skb,
->  int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data=
-);
->  int airoha_ppe_init(struct airoha_eth *eth);
->  void airoha_ppe_deinit(struct airoha_eth *eth);
-> +void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port);
->  struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
->  						  u32 hash);
->  void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
-> diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ether=
-net/airoha/airoha_ppe.c
-> index 2d273937f19cf304ab4b821241fdc3ea93604f0e..1d5a04eb82a6645e2b6a22ff4=
-e694275ef1727d8 100644
-> --- a/drivers/net/ethernet/airoha/airoha_ppe.c
-> +++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-> @@ -223,6 +223,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha=
-_eth *eth,
->  	int dsa_port =3D airoha_get_dsa_port(&dev);
->  	struct airoha_foe_mac_info_common *l2;
->  	u32 qdata, ports_pad, val;
-> +	u8 smac_id =3D 0xf;
-> =20
->  	memset(hwe, 0, sizeof(*hwe));
-> =20
-> @@ -251,6 +252,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha=
-_eth *eth,
->  		else
->  			pse_port =3D 2; /* uplink relies on GDM2 loopback */
->  		val |=3D FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, pse_port);
-> +		smac_id =3D port->id;
->  	}
-> =20
->  	if (is_multicast_ether_addr(data->eth.h_dest))
-> @@ -285,7 +287,7 @@ static int airoha_ppe_foe_entry_prepare(struct airoha=
-_eth *eth,
->  		hwe->ipv4.l2.src_mac_lo =3D
->  			get_unaligned_be16(data->eth.h_source + 4);
->  	} else {
-> -		l2->src_mac_hi =3D FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID, 0xf);
-> +		l2->src_mac_hi =3D FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID, smac_id);
->  	}
-> =20
->  	if (data->vlan.num) {
-> @@ -1232,6 +1234,27 @@ void airoha_ppe_check_skb(struct airoha_ppe *ppe, =
-struct sk_buff *skb,
->  	airoha_ppe_foe_insert_entry(ppe, skb, hash);
->  }
-> =20
-> +void airoha_ppe_init_upd_mem(struct airoha_gdm_port *port)
-> +{
-> +	struct airoha_eth *eth =3D port->qdma->eth;
-> +	struct net_device *dev =3D port->dev;
-> +	const u8 *addr =3D dev->dev_addr;
-> +	u32 val;
-> +
-> +	val =3D (addr[2] << 24) | (addr[3] << 16) | (addr[4] << 8) | addr[5];
-> +	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
-> +	airoha_fe_wr(eth, REG_UPDMEM_CTRL(0),
-> +		     FIELD_PREP(PPE_UPDMEM_ADDR_MASK, port->id) |
-> +		     PPE_UPDMEM_WR_MASK | PPE_UPDMEM_REQ_MASK);
-> +
-> +	val =3D (addr[0] << 8) | addr[1];
-> +	airoha_fe_wr(eth, REG_UPDMEM_DATA(0), val);
-> +	airoha_fe_wr(eth, REG_UPDMEM_CTRL(0),
-> +		     FIELD_PREP(PPE_UPDMEM_ADDR_MASK, port->id) |
-> +		     FIELD_PREP(PPE_UPDMEM_OFFSET_MASK, 1) |
-> +		     PPE_UPDMEM_WR_MASK | PPE_UPDMEM_REQ_MASK);
-> +}
-> +
->  int airoha_ppe_init(struct airoha_eth *eth)
->  {
->  	struct airoha_ppe *ppe;
-> diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethe=
-rnet/airoha/airoha_regs.h
-> index d931530fc96fb00ada36a6ad37fa295865a6f0a8..04187eb40ec674ec5a4ccfc96=
-8bb4bd579a53095 100644
-> --- a/drivers/net/ethernet/airoha/airoha_regs.h
-> +++ b/drivers/net/ethernet/airoha/airoha_regs.h
-> @@ -313,6 +313,16 @@
->  #define REG_PPE_RAM_BASE(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x320)
->  #define REG_PPE_RAM_ENTRY(_m, _n)		(REG_PPE_RAM_BASE(_m) + ((_n) << 2))
-> =20
-> +#define REG_UPDMEM_CTRL(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x370)
-> +#define PPE_UPDMEM_ACK_MASK			BIT(31)
-> +#define PPE_UPDMEM_ADDR_MASK			GENMASK(11, 8)
-> +#define PPE_UPDMEM_OFFSET_MASK			GENMASK(7, 4)
-> +#define PPE_UPDMEM_SEL_MASK			GENMASK(3, 2)
-> +#define PPE_UPDMEM_WR_MASK			BIT(1)
-> +#define PPE_UPDMEM_REQ_MASK			BIT(0)
-> +
-> +#define REG_UPDMEM_DATA(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x374)
-> +
->  #define REG_FE_GDM_TX_OK_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x280)
->  #define REG_FE_GDM_TX_OK_BYTE_CNT_H(_n)		(GDM_BASE(_n) + 0x284)
->  #define REG_FE_GDM_TX_ETH_PKT_CNT_H(_n)		(GDM_BASE(_n) + 0x288)
->=20
-> --=20
-> 2.49.0
->=20
-
---hGlac84VtnE2zXGM
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaDXKwQAKCRA6cBh0uS2t
-rAStAP9d6qm3yavT7uFyhvXqBsppqY4+mIOCmQftJeQnbv+ASAEA2sncemBOaV+m
-rG6+clC+zzEMS1rmvqitt1wgxFMLfQs=
-=Rkzf
------END PGP SIGNATURE-----
-
---hGlac84VtnE2zXGM--
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
