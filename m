@@ -1,64 +1,94 @@
-Return-Path: <netdev+bounces-193757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CF30AC5C10
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:13:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCA2FAC5C3D
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 418F41BA6DE4
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B47F3B50C5
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0D921146C;
-	Tue, 27 May 2025 21:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D50213E89;
+	Tue, 27 May 2025 21:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mikaelkw.online header.i=@mikaelkw.online header.b="FqgwUhoh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLNDKE9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-eu1.ppe-hosted.com (dispatch1-eu1.ppe-hosted.com [185.132.181.7])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6FD7260B;
-	Tue, 27 May 2025 21:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.181.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C63C12B93;
+	Tue, 27 May 2025 21:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748380422; cv=none; b=Bzx++KSL3SLhiH9MIwM9r3YRTjmPdryYE5qtNYj/IAjs94wf5UxpHZ+GvjZsiuPnv0PqYDlEC62WHv0W4nOnbKLfhNJCIj9t8t62BPlNxS21wKEk3H6Fbs/gpV3/9dlbAiC4iHfQ0+Txz66hobBgmNIU1UUde8G7WZ3/y7fHyxs=
+	t=1748381734; cv=none; b=d3kdR0YSJq0qsNZFP/OExhz2Mn/sr0oAN1PtEUHgECK5Bt9TwuR27Sl7vIHWYldrD1bFjJ8PqOCULjdsRM9SNL/hz6G82xV88wMvnEl+CYKfDWpQf5ZAHdH3EdqnuB1FwYdtwz3Ust/7gSAeTuEB28lHzSPZ1UQAMd0bwV3cPO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748380422; c=relaxed/simple;
-	bh=Nl3slm3ORyXM24Jp136yutmN0T+7Y9mG0+TrxTs37VM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=itggiVpe94oXhWsbTHut9FDT9TY7QQrRCtS5BOqhKd3RQ7oAPdhuI7yE/R7gADa2L8nk60aBtODTzG/8vaQGq2uRHw3ANfNIzkc7G/G8yXlAAJkxoUoFR4aspsCj7XpmeTBa8TP25dxvVt6bFSowm+qxkhTUleFkoaVlP2akTdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mikaelkw.online; spf=pass smtp.mailfrom=mikaelkw.online; dkim=pass (2048-bit key) header.d=mikaelkw.online header.i=@mikaelkw.online header.b=FqgwUhoh; arc=none smtp.client-ip=185.132.181.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mikaelkw.online
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mikaelkw.online
-Received: from engine.ppe-hosted.com (unknown [10.70.45.172])
-	by dispatch1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 2B536200A3;
-	Tue, 27 May 2025 21:13:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mikaelkw.online;
- h=cc:cc:content-transfer-encoding:content-transfer-encoding:date:date:from:from:message-id:message-id:mime-version:mime-version:subject:subject:to:to;
- s=pp-selector; bh=lwjcejsgwEmNYg9nHk4XBk4Rx/Y1yysKSIvGN1YC2j4=;
- b=FqgwUhohgsOkn4WR3lqS0LrQ7GIsqQrMYaREKDemPQ8N7Zsmds+g0D8VI19XEjK+MZtD96LFPcBYOGF2dHecLUIKsiQtU8NXTBaJW29U8qwY5xCC28kEKdadKhIboZxQm4wZYOFGQV0Y66dIirfp4lCjc4l2lAwFSDn7l6ER8r6d5RZapoiXkz9DEerO5cXufTlVedPjuZ1JJI+CR6lNm1CSwxU+rF8Kq+BCbTtcptfFYmsqPwP/aPt0C9hQQnJAnfF9NXS1KycPc4kBQppWLOjVlDXjqcoszlCV7Ilt/ao2yCZuI8fI+LIrpjC82AuS8OnWr3T25rgXOp6ZhXeF9Q==
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from test-ubuntu-rev3.. (78-26-16-15.network.trollfjord.no [78.26.16.15])
-	by mx1-eu1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 2FD35B0005D;
-	Tue, 27 May 2025 21:13:35 +0000 (UTC)
-From: Mikael Wessel <post@mikaelkw.online>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	torvalds@linuxfoundation.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew@lunn.ch,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	security@kernel.org,
-	stable@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	Mikael Wessel <post@mikaelkw.online>
-Subject: [PATCH] e1000e: fix heap overflow in e1000_set_eeprom()
-Date: Tue, 27 May 2025 23:13:32 +0200
-Message-ID: <20250527211332.50455-1-post@mikaelkw.online>
+	s=arc-20240116; t=1748381734; c=relaxed/simple;
+	bh=Z7Bl/YNaGSfvAgSx3PTLMkr8IM9olOBYAL6p1ul+YOs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HeIDx9+w+cyHt0bXLY/7PP6wnuHDEdkOjLUPsjb7qPupsUy63VLx74pE8okvnLQrbm0DVWNPZlgF3PDkmzK+P7QOa1XZMICoSTnIrib+DIc34pm1ipxO/26rNtKoq1izW3zedCHdmoMBygC8xfBAhQDlMxuAkfedF8dyjCDWdos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JLNDKE9u; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a4c95fc276so2135557f8f.3;
+        Tue, 27 May 2025 14:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748381731; x=1748986531; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Arg/9Cw6SGE8N326LAp3C57EtyZUmN4Wr4OqxUcOTAg=;
+        b=JLNDKE9udHm8toTvfrXJJpblmOzK0QSWcyDziizs6XLwFbM2fGed018dm/fA9GVtbz
+         /JApxcbVFw2XSpbUv7Dxa3+byn1dA/5UcqNTt5I5lfF3hyejJiuh/KhfPXb3L5JMkVJk
+         c8w1Lm7ds15nDZvqwr1e9rKGjx00wrG3ziI20zrEGJwXZoSv9xil5Qtpf2Ea4oKzvE8a
+         LaXLqkyo0TZxQX3DbM5IKVytRGtSYL3EAG5cC/QkuDnTsvSNZM14wRD9l2LoGpp8aBIR
+         oWEneJ50FTXGEHywJDHQ7KJPd3dI1bP5JoDddTT9Rs89HGQ1exboH4gQ8ask9U2+K5r+
+         5WyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748381731; x=1748986531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Arg/9Cw6SGE8N326LAp3C57EtyZUmN4Wr4OqxUcOTAg=;
+        b=FKkH3MWmPfDi4E3oAXJfofAX+CmX3tX5qs+o3f7VWQmFLI56g4A/bzve4enlUZqum+
+         GGpzsmcwkWGf2p4ui5kOXb3OMYz6Lqa5l3AMiLGwlIHf7nQlqdbcY+thozZWWTOWRepX
+         bkq01yHXy0LKcbV8uQZvIjCw5SLup9fNih5T3zcItTNX9YzOFe0yRExEl7BvJ0zn3Xno
+         BAw7l83M1uh3WUy3zyru6R2r8PnixOtzKPvcTyGlOot0DRSqDNML9rwhS1PbpQzi/VRS
+         wMbK6BKKtPpU1urKJR+msT3YwlC4Vz2u+AtpKrhJKI9GKsR2Px6Nmgilnhc7Q9sXOco5
+         ZS9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU8fkspd+W4Q0XQ6k4pkKqBm2wQLTV3GQYjYpV3SH05OqcI3wKv80y8BYjaIuTBUGKTosl0kvI4@vger.kernel.org, AJvYcCUOW5JIK/rSYpbms3xUXhB9feIUhnNINQYB23XDaEeIhiQbhNG2dmgX1VQeEGAtgjGndXj82xj2DhYr@vger.kernel.org, AJvYcCUn/9gXjpBHGHTRHS6wrwmNPrsfxDktKrWhZcXXqhcRQYPTFcJHISjzlKxh7Zp1MDWjFVQCoNJdKjDOwURP@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0xUVdA71bwruN7YO7WC1ZR99vzCimnbvYL2o1FzeP2UQUHifS
+	ZIt4JKIuimhtKhaBI7htqgTmtzByDle/0ONf4SNT8LINuqly29vgBZGgegioxg==
+X-Gm-Gg: ASbGncurZA0+JxbvyM8XptxB/aZZSEkYlD2fERWQ6YNVjhEsNvJc7VbVTruikZgOu94
+	+P3rzIa3vBEXTEKpdOd46B5olS4yoA6tnBdzYSPK/iTxonx7s8l2wSTXtaCAcSRTycRc1ntk2qF
+	4v7orEPf/NRnA+LNl4O7Lv/adVDQ9cjpvJrYiWLmZZWjc82vWh8WRYhQTBuFcm6lVbbzdBQhWgT
+	pMl6pBW1kWo1qIuZjQhQy/ez+493gKUJQY8qjr9tx+ZTY7yS1oCb9Z8WgzTtRJPlZ1nlL3rrrKy
+	1+oNIB/Z8K4pz3SfbcGBpVD9NkCf2y5GbtNziMpxu8VJkEefilFVTwSLDZeuT7mwIn6WCNF10Sp
+	3gfiKIiaCw1i5zAenCgRL
+X-Google-Smtp-Source: AGHT+IGhQHQqaj95E6fuBpFOajcotVNDs1UVszp9NIpRNs8lvcg7mtrkmIkOtdwGtHQUX4n9xF3rpw==
+X-Received: by 2002:a05:6000:2888:b0:3a4:dff9:e6aa with SMTP id ffacd0b85a97d-3a4dff9e824mr4175946f8f.55.1748381730491;
+        Tue, 27 May 2025 14:35:30 -0700 (PDT)
+Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a4e8b9a7adsm165671f8f.57.2025.05.27.14.35.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 14:35:29 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH 1/2] dt-bindings: net: Document support for Airoha AN7583 MDIO Controller
+Date: Tue, 27 May 2025 23:34:42 +0200
+Message-ID: <20250527213503.12010-1-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -67,60 +97,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-MDID: 1748380417-IY5a2VRwpn3R
-X-PPE-STACK: {"stack":"eu1"}
-X-MDID-O:
- eu1;fra;1748380417;IY5a2VRwpn3R;<post@mikaelkw.online>;7544ea0f74a3697a45f5192d6efff48c
-X-PPE-TRUSTED: V=1;DIR=OUT;
 
-The ETHTOOL_SETEEPROM ioctl copies user data into a kmalloc'ed buffer
-without validating eeprom->len and eeprom->offset. A CAP_NET_ADMIN
-user can overflow the heap and crash the kernel or gain code execution.
+Airoha AN7583 SoC have 3 different MDIO Controller. One comes from
+the intergated Switch based on MT7530. The other 2 live under the SCU
+register and expose 2 dedicated MDIO controller.
 
-Validate length and offset before kmalloc() to avoid leaking eeprom_buff.
+Document the schema that expose the 2 dedicated MDIO controller.
+Each MDIO controller can be independently reset with the SoC reset line.
 
-Fixes: bc7f75fa9788 ("[E1000E]: New pci-express e1000 driver (currently for ICH9 devices only)")
-Reported-by: Mikael Wessel <post@mikaelkw.online>
-Signed-off-by: Mikael Wessel <post@mikaelkw.online>
-Cc: stable@vger.kernel.org
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/ethernet/intel/e1000e/ethtool.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ .../bindings/net/airoha,an7583-mdio.yaml      | 78 +++++++++++++++++++
+ 1 file changed, 78 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/airoha,an7583-mdio.yaml
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 98e541e39730..d04e59528619 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -561,7 +561,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 		return -EOPNOTSUPP;
- 
- 	if (eeprom->magic !=
--	    (adapter->pdev->vendor | (adapter->pdev->device << 16)))
-+		(adapter->pdev->vendor | (adapter->pdev->device << 16)))
- 		return -EFAULT;
- 
- 	if (adapter->flags & FLAG_READ_ONLY_NVM)
-@@ -569,6 +569,10 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 
- 	max_len = hw->nvm.word_size * 2;
- 
-+	/* bounds check: offset + len must not exceed EEPROM size */
-+	if (eeprom->offset + eeprom->len > max_len)
-+		return -EINVAL;
+diff --git a/Documentation/devicetree/bindings/net/airoha,an7583-mdio.yaml b/Documentation/devicetree/bindings/net/airoha,an7583-mdio.yaml
+new file mode 100644
+index 000000000000..2375f1bf85a2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,an7583-mdio.yaml
+@@ -0,0 +1,78 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,an7583-mdio.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- 	first_word = eeprom->offset >> 1;
- 	last_word = (eeprom->offset + eeprom->len - 1) >> 1;
- 	eeprom_buff = kmalloc(max_len, GFP_KERNEL);
-@@ -596,9 +600,6 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 	for (i = 0; i < last_word - first_word + 1; i++)
- 		le16_to_cpus(&eeprom_buff[i]);
- 
--        if (eeprom->len > max_len ||
--            eeprom->offset > max_len - eeprom->len)
--                return -EINVAL;
- 	memcpy(ptr, bytes, eeprom->len);
- 
- 	for (i = 0; i < last_word - first_word + 1; i++)
++title: Airoha AN7583 Dedicated MDIO Controller
++
++maintainers:
++  - Christian Marangi <ansuelsmth@gmail.com>
++
++description:
++  Airoha AN7583 SoC have 3 different MDIO Controller.
++
++  One comes from the intergated Switch based on MT7530.
++
++  The other 2 (that this schema describe) live under the SCU
++  register supporting both C22 and C45 PHYs.
++
++properties:
++  compatible:
++    const: airoha,an7583-mdio
++
++  "#address-cells":
++    const: 1
++
++  "#size-cells":
++    const: 0
++
++patternProperties:
++  '^mdio(-(bus|external))@[0-1]$':
++    type: object
++
++    $ref: mdio.yaml#
++
++    properties:
++      reg:
++        minimum: 0
++        maximum: 1
++
++      resets:
++        maxItems: 1
++
++    required:
++      - reg
++
++    unevaluatedProperties: false
++
++required:
++  - compatible
++  - "#address-cells"
++  - "#size-cells"
++
++additionalProperties: false
++
++examples:
++  - |
++    mdio-controller {
++        compatible = "airoha,an7583-mdio";
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        mdio-bus@0 {
++            reg = <0>;
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            ethernet-phy@1f {
++                reg = <31>;
++            };
++        };
++
++        mdio-bus@1 {
++            reg = <1>;
++            #address-cells = <1>;
++            #size-cells = <0>;
++        };
++    };
 -- 
 2.48.1
 
