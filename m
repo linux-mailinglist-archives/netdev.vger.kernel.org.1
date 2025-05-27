@@ -1,100 +1,116 @@
-Return-Path: <netdev+bounces-193743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B088AC5AB5
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:29:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E080AC5ADE
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 21:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE92E3A9F29
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:29:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B7408A49CF
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45060288C34;
-	Tue, 27 May 2025 19:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/DQK3SC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0AC2701D6;
+	Tue, 27 May 2025 19:38:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from weierstrass.telenet-ops.be (weierstrass.telenet-ops.be [195.130.137.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189CE1E1C1A;
-	Tue, 27 May 2025 19:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21DE28A3E2
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 19:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748374155; cv=none; b=mIMTxLXxXUEVIM6rBBLTL2MkJc52VU71jCuBrsaKC5ldoPLdIl5+0GOIYd0JrWIKb0E6ZG2h8/QsNCD216on79oKx8wyOtPKnI6YPkVHhm0FU422DdsS3Xw9XO293GOxI/vk1bvZAa+S74JKlYz+nq0MGMe8L3X4TD8CnL/csb0=
+	t=1748374700; cv=none; b=kcK9CGe9G4IHHjZi2F35ObnhT8u+vbupQBijuHmCPsq/2ekk8cW0ElMZ5R/lmpX8pGm+7anUEgHpes/PdjB1aXNM/ugRYMWkONO4msRLdlMMEvus9PGwOygAG7w6Bq4GL/8zMjrIh/zMVBgiAnBPtWZ2yj8aC0xq086hQOWb4QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748374155; c=relaxed/simple;
-	bh=KARBt7V80dw1XzTrK5gyR4MyC6WRf9x90HmxHAgt/tY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gjLU0S/0SXrT8rKNFL61narvpwC2fqJEGmq5fIgmnS2utG4kys4c8vWocNkpCk5Nyry4cSb9YlvEFycsSpqAofshvlM4gJa5Bob5e/7bfpulDemlc83VvmRsPROwFPuiIAEkmOvN0ZeOIroTosG0Op9nxMH/r73inTqO7YSEQ68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/DQK3SC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63EBBC4CEE9;
-	Tue, 27 May 2025 19:29:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748374153;
-	bh=KARBt7V80dw1XzTrK5gyR4MyC6WRf9x90HmxHAgt/tY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y/DQK3SCftLvg27nD3SbPiFtBNHZ3FRWUj3S4hc4ChHoL8l80dysUcxZXMMzeThma
-	 fouJ7OoEgi5bEDbKKEbwUYc8fe+B6j5hpHlp7QjxPh5Mf8HANBgd704ZtOQr4vWvNp
-	 GZnmxS7JTjNrTdY5kUsXKA9DPErJ6SB1N5tZH7dAoue2z62bz3Mj8yYKfq2soojL+M
-	 L7qWran14kF9Pci5zZUQPUYQOGP+06FjLgqYcL08lKg+jy33RZEsWKZ5wlFoNN7OIJ
-	 XCHzS/XpunLpHZs33rpUMfGRyfEqmw6EK0cYgJY6AZE8X3NLal9R0OaVFEEg0SM5WU
-	 LPde+tHeqWsLQ==
-Date: Tue, 27 May 2025 14:29:11 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: netdev@vger.kernel.org, Sean Wang <sean.wang@mediatek.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
+	s=arc-20240116; t=1748374700; c=relaxed/simple;
+	bh=QpNV285BTS/KBng6Vcq4utezeQCjGo6G6reZO+F6LiE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ol0TyHPAXeAWrmF0H2n2VRMGcraqO/3RRUtDB90KmOK4qrIr7fjobmB2Qhzixe+6y5LpZxDXKMxUYXRANjBdRqiLOeKhHBEBGIKvSKSo5UZuHrRLiVvi09Amg9eljRvz656nCqw/ybT45HVQgN1l/kRjshvj2rz2V4GNBcCZejY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
+	by weierstrass.telenet-ops.be (Postfix) with ESMTPS id 4b6N5L414tz4x3d3
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 21:30:30 +0200 (CEST)
+Received: from ramsan2 ([IPv6:2a02:1810:ac12:ed80:9962:836e:244b:c4d7])
+	by albert.telenet-ops.be with cmsmtp
+	id uKWM2E0050Y7Yez06KWM4k; Tue, 27 May 2025 21:30:23 +0200
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan2 with esmtp (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1uK00C-00000003oHh-1fbh;
+	Tue, 27 May 2025 21:30:20 +0200
+Received: from geert by rox.of.borg with local (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1uK00C-00000003Wf4-1DCX;
+	Tue, 27 May 2025 21:30:20 +0200
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	linux-mediatek@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 03/14] dt-bindings: net: dsa: mediatek,mt7530: add
- internal mdio bus
-Message-ID: <174837415111.1091232.14774319774329934407.robh@kernel.org>
-References: <20250516180147.10416-1-linux@fw-web.de>
- <20250516180147.10416-5-linux@fw-web.de>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH] [net-next] hns3: Demote load and progress messages to debug level
+Date: Tue, 27 May 2025 21:30:15 +0200
+Message-ID: <0df556d6b5208e4e5f0597c66e196775b45dac60.1748357693.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250516180147.10416-5-linux@fw-web.de>
+Content-Transfer-Encoding: 8bit
 
+From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-On Fri, 16 May 2025 20:01:34 +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Mt7988 buildin switch has own mdio bus where ge-phys are connected.
-> Add related property for this.
-> 
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
-> v2:
-> - change from patternproperty to property
-> - add unevaluatedProperties and mediatek,pio subproperty
-> ---
->  .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml   | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
+No driver should spam the kernel log when merely being loaded.
+The message in hclge_init() is clearly a debug message.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+Alternatively, the printing in hns3_init_module() could be removed
+completely, but that would make hns3_driver_string[] and
+hns3_copyright[] unused, which HiSilicon legal may object against?
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c         | 4 ++--
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index b03b8758c7774ec2..5c8c62ea6ac0429f 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -5961,8 +5961,8 @@ static int __init hns3_init_module(void)
+ {
+ 	int ret;
+ 
+-	pr_info("%s: %s - version\n", hns3_driver_name, hns3_driver_string);
+-	pr_info("%s: %s\n", hns3_driver_name, hns3_copyright);
++	pr_debug("%s: %s - version\n", hns3_driver_name, hns3_driver_string);
++	pr_debug("%s: %s\n", hns3_driver_name, hns3_copyright);
+ 
+ 	client.type = HNAE3_CLIENT_KNIC;
+ 	snprintf(client.name, HNAE3_CLIENT_NAME_LENGTH, "%s",
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index 3e28a08934abd2e1..6bfff77ea7e67e8d 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -12904,7 +12904,7 @@ static struct hnae3_ae_algo ae_algo = {
+ 
+ static int __init hclge_init(void)
+ {
+-	pr_info("%s is initializing\n", HCLGE_NAME);
++	pr_debug("%s is initializing\n", HCLGE_NAME);
+ 
+ 	hclge_wq = alloc_workqueue("%s", WQ_UNBOUND, 0, HCLGE_NAME);
+ 	if (!hclge_wq) {
+-- 
+2.43.0
 
 
