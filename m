@@ -1,705 +1,180 @@
-Return-Path: <netdev+bounces-193719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C0BAC52F5
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:20:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54BA5AC530B
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 702AE1BA345A
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:20:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E558A1BA31B5
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8606827E1CA;
-	Tue, 27 May 2025 16:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282A027CB35;
+	Tue, 27 May 2025 16:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lp4gAHip"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IhRDeJrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B24427F72C;
-	Tue, 27 May 2025 16:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6EF269827;
+	Tue, 27 May 2025 16:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362785; cv=none; b=Ap5tTun0M+6jJRxpOQdE2PABJ4+2BZd1HS0Ystepd+5Zh1R6x+l256SYNqYAiCqEwQqm5qqt9yyIarb2TD4oSWBN2nqqUpYBG614rXEhFrpSmM5bI2cn3zBLMhLq1oanb+g4oLhtbBsAN+M+Tid2vaTzg1P7sy6KKaR/ZMpZiNg=
+	t=1748363475; cv=none; b=QXm51u8NzmVevEiMEsIHib59hWg7w75dGNdfyOr+wa0kRucjKUERFitFnZ8/M0NhRambP9GM4WLisyOFBC55wTP+CxGAM6anGzUz1LGDBDIkJ7BLckXKxw4HFCu6JvRZHuoiOt3vbyhuGnZLp/NVGotaVhIi7x0yV0TbdtxprzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362785; c=relaxed/simple;
-	bh=GxJnCoCywSfj04E5CZqm/ZtgXqq8qJEOhMHdpE4tz0I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ovVcAllsaOxlv5Xa/RMerP8tXfSM5nWOyL4/WF5FoZLDiDs4oByVc9ba99McGtAjS+9ePLGSzszSQE6gvnsfS2RyEcIgiEo4WnyO8rIFoUZKDbDrc0e30ebcxDm8be+Iw9U4j6xAI3hC8/rsgUAaQDdYei3TwzIFVXLQy8wKKYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lp4gAHip; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-73bf5aa95e7so2524536b3a.1;
-        Tue, 27 May 2025 09:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748362781; x=1748967581; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=90R6A++gtPZWq67DZypChaSVtDu+EZq/m8b2334jUgI=;
-        b=Lp4gAHip5qU5A+t6zbORQVPryjxWqfay5KzZywGFnDznMgJUWZhhaRXQMGyi2OlcNs
-         18tULon7QPrz9KdkBqq6RDSYBkptSWaESN+28gAaXSF0G7BeSDTigNRsz+RbQf41SMwD
-         c7d8rQw6Jxw/J3IOt8qyub9MzDWjwqRw6OuoN1fCaxThsz4rNu+TkN7U1Ifmobca8W2e
-         68tClmFOaRYHR/8ZLtkcvAOkpiwoBGK5gy1fDrHdqaIRraAokRdmuwXqSC20nFMish3H
-         7WduUpXfxvJgy7veyfETk7SBvYDwsQTKwsIgqHQtj74F1IlJoDmzLNoN22OdgPOijHpS
-         n+Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748362781; x=1748967581;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=90R6A++gtPZWq67DZypChaSVtDu+EZq/m8b2334jUgI=;
-        b=NWxpPXls7BQ86C+Y6JhT6QAv1AF4qPbL0rpnyWED605vvVpCSA3XRKMCPWt+d1yg9i
-         CnIIz1TvuCyavM6ZYvMlZAeytqfCLeURlreU7hWNvmqNdGD938t2n0xVJt8pwojk7nmd
-         tN2UwE60myB9TfiqQoGCq/5JwXILAhLnBn7tbmC07sBiIlgWjAzjep4ioQBZe4rMm4Ff
-         97ZNXmqrx6PMnKxGqICZ6pUtM1h2wFcYLfVPl/JIG7CJOqaZJ8nPAtWDh9BLN0vI7SeU
-         U/UBHOIYoe/AOrW0fzvZkJoOM8skidc+GexqLdlxOtIJEDHd5MeiO7oBwW3udipOK6zt
-         Zxjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWB6e+KwRGn9yodc98fljqaoi4pDVODniv/bofp/1TS6zMN9rhGOmtSKZVzxSb8JQr46D+XnZWCgoVgYfWk@vger.kernel.org, AJvYcCXfZAiadJJI+awk84v5xROxBb1t6fuds7ybSGS1svgjprflzVBMdoVRL2pXZ9ifcoSP/oQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCjyt+7RQDD3VUP5aEpeG/yMlWE52cmIFP8CsqV8FCylzoC/vs
-	g+1rR5OqOQgsSYrc5zU4VxWndhDKU4OJ0qU99XyVSzXzDAXwz1lDLLpGtThv2BOU32k=
-X-Gm-Gg: ASbGncs5BLrE0KQST4oXUvwFRUyTILtfIBzaSyQxTEs9P+HEWgeFxPZSYhn2OfFlgeM
-	4jeY0tcOh+eb/AYn6ia0WskBaCbSAzkgSKV8pP7cNfhDPs4AafwGEsZ8CpjsFUxDezAiZm73Vvn
-	k29zY7lvOKEhiWSZLKeUI+kp+dloR8Y5Rf1sVtRlSmR+6VBLDjaZzB90qUXsmIy7kWhmVRnbieU
-	xTct2KFeKWw/wATbxfdiu1AObIKl3VfU4cBUAmuleDmHjvfIN4OPYTx5KWmhMHqT0rCZo3Zg6eK
-	DUS2gw6bIcMus5Xn2BL4KPCwMDVtbdCld3/K8yWpStoKAgf9c4Kftb0jpivX9KBv+GM=
-X-Google-Smtp-Source: AGHT+IH2t382sXXANLRskfg4maHJpEmaHwmnBsYZa8bvr+4T4Mg80xVzehbmSdLKZjYSSBfMJg+QRA==
-X-Received: by 2002:a05:6a00:1148:b0:740:9abe:4d94 with SMTP id d2e1a72fcca58-745fe0c7e82mr20582541b3a.21.1748362780825;
-        Tue, 27 May 2025 09:19:40 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:52e0:fc81:ee8a:bb3f])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7462aefb414sm1118121b3a.34.2025.05.27.09.19.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 09:19:40 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [RFC PATCH net-next v2 2/2] selftests: net: add XDP socket tests for virtio-net
-Date: Tue, 27 May 2025 23:19:04 +0700
-Message-ID: <20250527161904.75259-3-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250527161904.75259-1-minhquangbui99@gmail.com>
-References: <20250527161904.75259-1-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1748363475; c=relaxed/simple;
+	bh=JKIBHO1WBEk2DpCG4CViKibfgUWTWKWdTlFL7XeRaf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U7n59ICQRr/t0oJBj8ur8DOgOXGNEIz8dszxDaSkF2fB98KcZjE1+oLnouZf+/AmNsInnVkmOwxFFdTCmiPIZwYsNopz/oZ9DDPTx4AwPxN9MBiWo4BYDJVo1BpbuXTKQOD3nQRewyjlvrGs0syr98tJcldd6ie095IB5GdxTe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IhRDeJrS; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 538A81FCF2;
+	Tue, 27 May 2025 16:31:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1748363469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UZYLROFC13QWr0WtIHITpKv2k/IYMUKl/Ik95XSzStc=;
+	b=IhRDeJrS9jEMuIKBecnBJriiCigzhovdLdAo8PcxOnxSCbLHAg2pE5zE5zYVmw1R4+039U
+	CK8W6lC0U0n5puU297QfUE5VkxhETbk9T+KybDCrRlalPEUgCI6a0740UOxd5Sbwd3cSL2
+	mYH8HJ8au6B/lR5hCQcIYrJhJye69OOHxk3cD3dKL0RXz7SNYbNHAEaaoAxe5DOl+XHiNp
+	hu2gde3xzMIE+FeM8/T8HK4PBLAbR+2FWXws0XHzYk8mKOP1L7b/Qv0aa9Dm4dU5Z6Me3B
+	0gtdejge1087acIokX/hgKqRFBJKeJRrdTYh4v+2O5SPx6Mj07/+3K8M5YqlMg==
+Date: Tue, 27 May 2025 18:31:05 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexis =?UTF-8?B?TG90aG9yw6k=?= <alexis.lothore@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, Phil Reid <preid@electromag.com.au>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: add explicit check and error on invalid
+ PTP clock rate
+Message-ID: <20250527183105.7c4bad49@device-24.home>
+In-Reply-To: <20250527-stmmac_tstamp_div-v2-1-663251b3b542@bootlin.com>
+References: <20250527-stmmac_tstamp_div-v2-1-663251b3b542@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvtdekieculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeekheegieejkeetfffhleehteffgefhfffhueefieefffejfeethfevudetudeuueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeeltddrjeeirdeivddrudejudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrjeeirdeivddrudejuddphhgvlhhopeguvghvihgtvgdqvdegrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrlhgvgigrnhgurhgvrdhtohhrghhuvgesfhhoshhsrdhsthdrtghomhdprhgtphhtthhopehjohgrsghrvghusehshihnohhpshihshdrtghomhdprhgtphhtt
+ hhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-This adds a test to test the virtio-net rx when there is a XDP socket
-bound to it. There are tests for both copy mode and zerocopy mode, both
-cases when XDP program returns XDP_PASS and XDP_REDIRECT to a XDP socket.
+Hi Alexis,
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- .../selftests/drivers/net/hw/.gitignore       |   3 +
- .../testing/selftests/drivers/net/hw/Makefile |  12 +-
- .../drivers/net/hw/xsk_receive.bpf.c          |  43 ++
- .../selftests/drivers/net/hw/xsk_receive.c    | 398 ++++++++++++++++++
- .../selftests/drivers/net/hw/xsk_receive.py   |  75 ++++
- 5 files changed, 530 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/drivers/net/hw/xsk_receive.bpf.c
- create mode 100644 tools/testing/selftests/drivers/net/hw/xsk_receive.c
- create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_receive.py
+On Tue, 27 May 2025 08:33:44 +0200
+Alexis Lothor=C3=A9 <alexis.lothore@bootlin.com> wrote:
 
-diff --git a/tools/testing/selftests/drivers/net/hw/.gitignore b/tools/testing/selftests/drivers/net/hw/.gitignore
-index 6942bf575497..c32271faecff 100644
---- a/tools/testing/selftests/drivers/net/hw/.gitignore
-+++ b/tools/testing/selftests/drivers/net/hw/.gitignore
-@@ -1,3 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- iou-zcrx
- ncdevmem
-+xsk_receive.skel.h
-+xsk_receive
-+tools
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index df2c047ffa90..964edbb3b79f 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -1,6 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0+ OR MIT
- 
--TEST_GEN_FILES = iou-zcrx
-+TEST_GEN_FILES = \
-+	iou-zcrx \
-+	xsk_receive \
-+	#
- 
- TEST_PROGS = \
- 	csum.py \
-@@ -20,6 +23,7 @@ TEST_PROGS = \
- 	rss_input_xfrm.py \
- 	tso.py \
- 	xsk_reconfig.py \
-+	xsk_receive.py \
- 	#
- 
- TEST_FILES := \
-@@ -48,3 +52,9 @@ include ../../../net/ynl.mk
- include ../../../net/bpf.mk
- 
- $(OUTPUT)/iou-zcrx: LDLIBS += -luring
-+
-+$(OUTPUT)/xsk_receive.skel.h: xsk_receive.bpf.o
-+	bpftool gen skeleton xsk_receive.bpf.o > xsk_receive.skel.h
-+
-+$(OUTPUT)/xsk_receive: xsk_receive.skel.h
-+$(OUTPUT)/xsk_receive: LDLIBS += -lbpf
-diff --git a/tools/testing/selftests/drivers/net/hw/xsk_receive.bpf.c b/tools/testing/selftests/drivers/net/hw/xsk_receive.bpf.c
-new file mode 100644
-index 000000000000..462046d95bfe
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xsk_receive.bpf.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+#include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/in.h>
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_XSKMAP);
-+	__uint(max_entries, 1);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+} xsk_map SEC(".maps");
-+
-+SEC("xdp.frags")
-+int dummy_prog(struct xdp_md *ctx)
-+{
-+	return XDP_PASS;
-+}
-+
-+SEC("xdp.frags")
-+int redirect_xsk_prog(struct xdp_md *ctx)
-+{
-+	void *data_end = (void *)(long)ctx->data_end;
-+	void *data = (void *)(long)ctx->data;
-+	struct ethhdr *eth = data;
-+	struct iphdr *iph;
-+
-+	if (data + sizeof(*eth) + sizeof(*iph) > data_end)
-+		return XDP_PASS;
-+
-+	if (bpf_htons(eth->h_proto) != ETH_P_IP)
-+		return XDP_PASS;
-+
-+	iph = data + sizeof(*eth);
-+	if (iph->protocol != IPPROTO_UDP)
-+		return XDP_PASS;
-+
-+	return bpf_redirect_map(&xsk_map, 0, XDP_DROP);
-+}
-+
-+char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/drivers/net/hw/xsk_receive.c b/tools/testing/selftests/drivers/net/hw/xsk_receive.c
-new file mode 100644
-index 000000000000..96213ceeda5c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xsk_receive.c
-@@ -0,0 +1,398 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <error.h>
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <poll.h>
-+#include <stdatomic.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <net/if.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
-+#include <linux/if_xdp.h>
-+
-+#include "xsk_receive.skel.h"
-+
-+#define load_acquire(p) \
-+	atomic_load_explicit((_Atomic typeof(*(p)) *)(p), memory_order_acquire)
-+
-+#define store_release(p, v) \
-+	atomic_store_explicit((_Atomic typeof(*(p)) *)(p), v, \
-+			      memory_order_release)
-+
-+#define UMEM_CHUNK_SIZE 0x1000
-+#define BUFFER_SIZE 0x2000
-+
-+#define SERVER_PORT 8888
-+#define CLIENT_PORT 9999
-+
-+const int num_entries = 256;
-+const char *pass_msg = "PASS";
-+
-+int cfg_client;
-+int cfg_server;
-+char *cfg_server_ip;
-+char *cfg_client_ip;
-+int cfg_ifindex;
-+int cfg_redirect;
-+int cfg_zerocopy;
-+
-+struct xdp_sock_context {
-+	int xdp_sock;
-+	void *umem_region;
-+	void *rx_ring;
-+	void *fill_ring;
-+	struct xdp_mmap_offsets off;
-+};
-+
-+struct xdp_sock_context *setup_xdp_socket(int ifindex)
-+{
-+	struct xdp_mmap_offsets off;
-+	void *rx_ring, *fill_ring;
-+	struct xdp_umem_reg umem_reg = {};
-+	int optlen = sizeof(off);
-+	int umem_len, sock, ret, i;
-+	void *umem_region;
-+	uint32_t *fr_producer;
-+	uint64_t *addr;
-+	struct sockaddr_xdp sxdp = {
-+		.sxdp_family = AF_XDP,
-+		.sxdp_ifindex = ifindex,
-+		.sxdp_queue_id = 0,
-+		.sxdp_flags = XDP_USE_SG,
-+	};
-+	struct xdp_sock_context *ctx;
-+
-+	ctx = malloc(sizeof(*ctx));
-+	if (!ctx)
-+		error(1, 0, "malloc()");
-+
-+	if (cfg_zerocopy)
-+		sxdp.sxdp_flags |= XDP_ZEROCOPY;
-+	else
-+		sxdp.sxdp_flags |= XDP_COPY;
-+
-+	umem_len = UMEM_CHUNK_SIZE * num_entries;
-+	umem_region = mmap(0, umem_len, PROT_READ | PROT_WRITE,
-+			   MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-+	if (umem_region == MAP_FAILED)
-+		error(1, errno, "mmap() umem");
-+	ctx->umem_region = umem_region;
-+
-+	sock = socket(AF_XDP, SOCK_RAW, 0);
-+	if (sock < 0)
-+		error(1, errno, "socket() XDP");
-+	ctx->xdp_sock = sock;
-+
-+	ret = setsockopt(sock, SOL_XDP, XDP_RX_RING, &num_entries,
-+			 sizeof(num_entries));
-+	if (ret < 0)
-+		error(1, errno, "setsockopt() XDP_RX_RING");
-+
-+	ret = setsockopt(sock, SOL_XDP, XDP_UMEM_COMPLETION_RING, &num_entries,
-+			 sizeof(num_entries));
-+	if (ret < 0)
-+		error(1, errno, "setsockopt() XDP_UMEM_COMPLETION_RING");
-+
-+	ret = setsockopt(sock, SOL_XDP, XDP_UMEM_FILL_RING, &num_entries,
-+			 sizeof(num_entries));
-+	if (ret < 0)
-+		error(1, errno, "setsockopt() XDP_UMEM_FILL_RING");
-+
-+	ret = getsockopt(sock, SOL_XDP, XDP_MMAP_OFFSETS, &off, &optlen);
-+	if (ret < 0)
-+		error(1, errno, "getsockopt()");
-+	ctx->off = off;
-+
-+	rx_ring = mmap(0, off.rx.desc + num_entries * sizeof(struct xdp_desc),
-+		       PROT_READ | PROT_WRITE, MAP_SHARED, sock,
-+		       XDP_PGOFF_RX_RING);
-+	if (rx_ring == (void *)-1)
-+		error(1, errno, "mmap() rx-ring");
-+	ctx->rx_ring = rx_ring;
-+
-+	fill_ring = mmap(0, off.fr.desc + num_entries * sizeof(uint64_t),
-+			 PROT_READ | PROT_WRITE, MAP_SHARED, sock,
-+			 XDP_UMEM_PGOFF_FILL_RING);
-+	if (fill_ring == (void *)-1)
-+		error(1, errno, "mmap() fill-ring");
-+	ctx->fill_ring = fill_ring;
-+
-+	umem_reg.addr = (unsigned long long)ctx->umem_region;
-+	umem_reg.len = umem_len;
-+	umem_reg.chunk_size = UMEM_CHUNK_SIZE;
-+	ret = setsockopt(sock, SOL_XDP, XDP_UMEM_REG, &umem_reg,
-+			 sizeof(umem_reg));
-+	if (ret < 0)
-+		error(1, errno, "setsockopt() XDP_UMEM_REG");
-+
-+	i = 0;
-+	while (1) {
-+		ret = bind(sock, (const struct sockaddr *)&sxdp, sizeof(sxdp));
-+		if (!ret)
-+			break;
-+
-+		if (errno == EBUSY && i < 3) {
-+			i++;
-+			sleep(1);
-+		} else {
-+			error(1, errno, "bind() XDP");
-+		}
-+	}
-+
-+	/* Submit all umem entries to fill ring */
-+	addr = fill_ring + off.fr.desc;
-+	for (i = 0; i < umem_len; i += UMEM_CHUNK_SIZE) {
-+		*addr = i;
-+		addr++;
-+	}
-+	fr_producer = fill_ring + off.fr.producer;
-+	store_release(fr_producer, num_entries);
-+
-+	return ctx;
-+}
-+
-+void setup_xdp_prog(int sock, int ifindex, int redirect)
-+{
-+	struct xsk_receive_bpf *bpf;
-+	int key, ret;
-+
-+	bpf = xsk_receive_bpf__open_and_load();
-+	if (!bpf)
-+		error(1, 0, "open eBPF");
-+
-+	key = 0;
-+	ret = bpf_map__update_elem(bpf->maps.xsk_map, &key, sizeof(key),
-+				   &sock, sizeof(sock), 0);
-+	if (ret < 0)
-+		error(1, errno, "eBPF map update");
-+
-+	if (redirect) {
-+		ret = bpf_xdp_attach(ifindex,
-+				bpf_program__fd(bpf->progs.redirect_xsk_prog),
-+				0, NULL);
-+		if (ret < 0)
-+			error(1, errno, "attach eBPF");
-+	} else {
-+		ret = bpf_xdp_attach(ifindex,
-+				     bpf_program__fd(bpf->progs.dummy_prog),
-+				     0, NULL);
-+		if (ret < 0)
-+			error(1, errno, "attach eBPF");
-+	}
-+}
-+
-+void send_pass_msg(int sock)
-+{
-+	int ret;
-+	struct sockaddr_in addr = {
-+		.sin_family = AF_INET,
-+		.sin_addr = inet_addr(cfg_client_ip),
-+		.sin_port = htons(CLIENT_PORT),
-+	};
-+
-+	ret = sendto(sock, pass_msg, sizeof(pass_msg), 0,
-+		     (const struct sockaddr *)&addr, sizeof(addr));
-+	if (ret < 0)
-+		error(1, errno, "sendto()");
-+}
-+
-+void server_recv_xdp(struct xdp_sock_context *ctx, int udp_sock)
-+{
-+	int ret;
-+	struct pollfd fds = {
-+		.fd = ctx->xdp_sock,
-+		.events = POLLIN,
-+	};
-+
-+	ret = poll(&fds, 1, -1);
-+	if (ret < 0)
-+		error(1, errno, "poll()");
-+
-+	if (fds.revents & POLLIN) {
-+		uint32_t *producer_ptr = ctx->rx_ring + ctx->off.rx.producer;
-+		uint32_t *consumer_ptr = ctx->rx_ring + ctx->off.rx.consumer;
-+		uint32_t producer, consumer;
-+		struct xdp_desc *desc;
-+
-+		producer = load_acquire(producer_ptr);
-+		consumer = load_acquire(consumer_ptr);
-+
-+		printf("Receive %d XDP buffers\n", producer - consumer);
-+
-+		store_release(consumer_ptr, producer);
-+	} else {
-+		error(1, 0, "unexpected poll event: %d", fds.revents);
-+	}
-+
-+	send_pass_msg(udp_sock);
-+}
-+
-+void server_recv_udp(int sock)
-+{
-+	char *buffer;
-+	int i, ret;
-+
-+	buffer = mmap(0, BUFFER_SIZE, PROT_READ | PROT_WRITE,
-+		      MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-+	if (buffer == MAP_FAILED)
-+		error(1, errno, "mmap() send buffer");
-+
-+	ret = recv(sock, buffer, BUFFER_SIZE, 0);
-+	if (ret < 0)
-+		error(1, errno, "recv()");
-+
-+	if (ret != BUFFER_SIZE)
-+		error(1, errno, "message is truncated, expected: %d, got: %d",
-+		      BUFFER_SIZE, ret);
-+
-+	for (i = 0; i < BUFFER_SIZE; i++)
-+		if (buffer[i] != 'a' + (i % 26))
-+			error(1, 0, "message mismatches at %d", i);
-+
-+	send_pass_msg(sock);
-+}
-+
-+int setup_udp_sock(const char *addr, int port)
-+{
-+	int sock, ret;
-+	struct sockaddr_in saddr = {
-+		.sin_family = AF_INET,
-+		.sin_addr = inet_addr(addr),
-+		.sin_port = htons(port),
-+	};
-+
-+	sock = socket(AF_INET, SOCK_DGRAM, 0);
-+	if (sock < 0)
-+		error(1, errno, "socket() UDP");
-+
-+	ret = bind(sock, (const struct sockaddr *)&saddr, sizeof(saddr));
-+	if (ret < 0)
-+		error(1, errno, "bind() UDP");
-+
-+	return sock;
-+}
-+
-+void run_server(void)
-+{
-+	int udp_sock;
-+	struct xdp_sock_context *ctx;
-+
-+	ctx = setup_xdp_socket(cfg_ifindex);
-+	setup_xdp_prog(ctx->xdp_sock, cfg_ifindex, cfg_redirect);
-+	udp_sock = setup_udp_sock(cfg_server_ip, SERVER_PORT);
-+
-+	if (cfg_redirect)
-+		server_recv_xdp(ctx, udp_sock);
-+	else
-+		server_recv_udp(udp_sock);
-+}
-+
-+void run_client(void)
-+{
-+	char *buffer;
-+	int sock, ret, i;
-+	struct sockaddr_in addr = {
-+		.sin_family = AF_INET,
-+		.sin_addr = inet_addr(cfg_server_ip),
-+		.sin_port = htons(SERVER_PORT),
-+	};
-+
-+	buffer = mmap(0, BUFFER_SIZE, PROT_READ | PROT_WRITE,
-+		      MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
-+	if (buffer == MAP_FAILED)
-+		error(1, errno, "mmap() send buffer");
-+
-+	for (i = 0; i < BUFFER_SIZE; i++)
-+		buffer[i] = 'a' + (i % 26);
-+
-+	sock = setup_udp_sock(cfg_client_ip, CLIENT_PORT);
-+
-+	ret = sendto(sock, buffer, BUFFER_SIZE, 0,
-+		     (const struct sockaddr *)&addr, sizeof(addr));
-+	if (ret < 0)
-+		error(1, errno, "sendto()");
-+
-+	if (ret != BUFFER_SIZE)
-+		error(1, 0, "sent buffer is truncated, expected: %d got: %d",
-+		      BUFFER_SIZE, ret);
-+
-+	ret = recv(sock, buffer, BUFFER_SIZE, 0);
-+	if (ret < 0)
-+		error(1, errno, "recv()");
-+
-+	if ((ret != sizeof(pass_msg)) || strcmp(buffer, pass_msg))
-+		error(1, 0, "message mismatches, expected: %s, got: %s",
-+		      pass_msg, buffer);
-+}
-+
-+void print_usage(char *prog)
-+{
-+	fprintf(stderr, "Usage: %s (-c|-s) -r<server_ip> -l<client_ip>"
-+		" -i<server_ifname> [-d] [-z]\n", prog);
-+}
-+
-+void parse_opts(int argc, char **argv)
-+{
-+	int opt;
-+	char *ifname = NULL;
-+
-+	while ((opt = getopt(argc, argv, "hcsr:l:i:dz")) != -1) {
-+		switch (opt) {
-+		case 'c':
-+			if (cfg_server)
-+				error(1, 0, "Pass one of -s or -c");
-+
-+			cfg_client = 1;
-+			break;
-+		case 's':
-+			if (cfg_client)
-+				error(1, 0, "Pass one of -s or -c");
-+
-+			cfg_server = 1;
-+			break;
-+		case 'r':
-+			cfg_server_ip = optarg;
-+			break;
-+		case 'l':
-+			cfg_client_ip = optarg;
-+			break;
-+		case 'i':
-+			ifname = optarg;
-+			break;
-+		case 'd':
-+			cfg_redirect = 1;
-+			break;
-+		case 'z':
-+			cfg_zerocopy = 1;
-+			break;
-+		case 'h':
-+		default:
-+			print_usage(argv[0]);
-+			exit(1);
-+		}
-+	}
-+
-+	if (!cfg_client && !cfg_server)
-+		error(1, 0, "Pass one of -s or -c");
-+
-+	if (ifname) {
-+		cfg_ifindex = if_nametoindex(ifname);
-+		if (!cfg_ifindex)
-+			error(1, errno, "Invalid interface %s", ifname);
-+	}
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	parse_opts(argc, argv);
-+	if (cfg_client)
-+		run_client();
-+	else if (cfg_server)
-+		run_server();
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/drivers/net/hw/xsk_receive.py b/tools/testing/selftests/drivers/net/hw/xsk_receive.py
-new file mode 100755
-index 000000000000..f32cb4477b75
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/xsk_receive.py
-@@ -0,0 +1,75 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This a test for virtio-net rx when there is a XDP socket bound to it. The test
-+# is expected to be run in the host side.
-+#
-+# The run example:
-+#
-+# export NETIF=tap0
-+# export LOCAL_V4=192.168.31.1
-+# export REMOTE_V4=192.168.31.3
-+# export REMOTE_TYPE=ssh
-+# export REMOTE_ARGS='root@192.168.31.3'
-+# ./ksft-net-drv/run_kselftest.sh -t drivers/net/hw:xsk_receive.py
-+#
-+# where:
-+# - 192.168.31.1 is the IP of tap device in the host
-+# - 192.168.31.3 is the IP of virtio-net device in the guest
-+#
-+# The Qemu command to setup virtio-net
-+# -netdev tap,id=hostnet1,vhost=on,script=no,downscript=no
-+# -device virtio-net-pci,netdev=hostnet1,iommu_platform=on,disable-legacy=on
-+#
-+# The MTU of tap device can be adjusted to test more cases:
-+# - 1500: single buffer XDP
-+# - 9000: multi-buffer XDP
-+
-+from lib.py import ksft_exit, ksft_run
-+from lib.py import KsftSkipEx, KsftFailEx
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, cmd, wait_port_listen
-+from os import path
-+
-+SERVER_PORT = 8888
-+CLIENT_PORT = 9999
-+
-+def test_xdp_pass(cfg, server_cmd, client_cmd):
-+    with bkg(server_cmd, host=cfg.remote, exit_wait=True):
-+        wait_port_listen(SERVER_PORT, proto="udp", host=cfg.remote)
-+        cmd(client_cmd)
-+
-+def test_xdp_pass_zc(cfg, server_cmd, client_cmd):
-+    server_cmd += " -z"
-+    with bkg(server_cmd, host=cfg.remote, exit_wait=True):
-+        wait_port_listen(SERVER_PORT, proto="udp", host=cfg.remote)
-+        cmd(client_cmd)
-+
-+def test_xdp_redirect(cfg, server_cmd, client_cmd):
-+    server_cmd += " -d"
-+    with bkg(server_cmd, host=cfg.remote, exit_wait=True):
-+        wait_port_listen(SERVER_PORT, proto="udp", host=cfg.remote)
-+        cmd(client_cmd)
-+
-+def test_xdp_redirect_zc(cfg, server_cmd, client_cmd):
-+    server_cmd += " -d -z"
-+    with bkg(server_cmd, host=cfg.remote, exit_wait=True):
-+        wait_port_listen(SERVER_PORT, proto="udp", host=cfg.remote)
-+        cmd(client_cmd)
-+
-+def main():
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+        cfg.bin_local = path.abspath(path.dirname(__file__)
-+                            + "/../../../drivers/net/hw/xsk_receive")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+        server_cmd = f"{cfg.bin_remote} -s -i {cfg.remote_ifname} "
-+        server_cmd += f"-r {cfg.remote_addr_v["4"]} -l {cfg.addr_v["4"]}"
-+        client_cmd = f"{cfg.bin_local} -c -r {cfg.remote_addr_v["4"]} "
-+        client_cmd += f"-l {cfg.addr_v["4"]}"
-+
-+        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, server_cmd, client_cmd))
-+    ksft_exit()
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.0
+> The stmmac platform drivers that do not open-code the clk_ptp_rate value
+> after having retrieved the default one from the device-tree can end up
+> with 0 in clk_ptp_rate (as clk_get_rate can return 0). It will
+> eventually propagate up to PTP initialization when bringing up the
+> interface, leading to a divide by 0:
+>=20
+>  Division by zero in kernel.
+>  CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.12.30-00001-g48313bd5=
+768a #22
+>  Hardware name: STM32 (Device Tree Support)
+>  Call trace:
+>   unwind_backtrace from show_stack+0x18/0x1c
+>   show_stack from dump_stack_lvl+0x6c/0x8c
+>   dump_stack_lvl from Ldiv0_64+0x8/0x18
+>   Ldiv0_64 from stmmac_init_tstamp_counter+0x190/0x1a4
+>   stmmac_init_tstamp_counter from stmmac_hw_setup+0xc1c/0x111c
+>   stmmac_hw_setup from __stmmac_open+0x18c/0x434
+>   __stmmac_open from stmmac_open+0x3c/0xbc
+>   stmmac_open from __dev_open+0xf4/0x1ac
+>   __dev_open from __dev_change_flags+0x1cc/0x224
+>   __dev_change_flags from dev_change_flags+0x24/0x60
+>   dev_change_flags from ip_auto_config+0x2e8/0x11a0
+>   ip_auto_config from do_one_initcall+0x84/0x33c
+>   do_one_initcall from kernel_init_freeable+0x1b8/0x214
+>   kernel_init_freeable from kernel_init+0x24/0x140
+>   kernel_init from ret_from_fork+0x14/0x28
+>  Exception stack(0xe0815fb0 to 0xe0815ff8)
+>=20
+> Prevent this division by 0 by adding an explicit check and error log
+> about the actual issue.
+>=20
+> Fixes: 19d857c9038e ("stmmac: Fix calculations for ptp counters when cloc=
+k input =3D 50Mhz.")
+> Signed-off-by: Alexis Lothor=C3=A9 <alexis.lothore@bootlin.com>
+> ---
+> Changes in v2:
+> - Add Fixes tag
+> - Reword commit message to clarify the triggering cause of the issue
+> - Link to v1: https://lore.kernel.org/r/20250523-stmmac_tstamp_div-v1-1-b=
+ca8a5a3a477@bootlin.com
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/=
+net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 918d7f2e8ba992208d7d6521a1e9dba01086058f..f68e3ece919cc88d0bf199a39=
+4bc7e44b5dee095 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -835,6 +835,11 @@ int stmmac_init_tstamp_counter(struct stmmac_priv *p=
+riv, u32 systime_flags)
+>  	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
+>  		return -EOPNOTSUPP;
+> =20
+> +	if (!priv->plat->clk_ptp_rate) {
+> +		netdev_err(priv->dev, "Invalid PTP clock rate");
+> +		return -EINVAL;
+> +	}
+> +
+>  	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
+>  	priv->systime_flags =3D systime_flags;
 
+This may be some nitpick that can be addressed at a later point, but we
+now have a guarantee that when stmmac_ptp_register() gets called,
+priv->ptp_clk_rate is non-zero, right ? If so, we can drop the test in
+said function :
+
+	if (priv->plat->has_gmac4 && priv->plat->clk_ptp_rate)
+		priv->plat->cdc_error_adj =3D (2 * NSEC_PER_SEC) / priv->plat->clk_ptp_ra=
+te;
+
+There is another spot in the code, like in the EST handling, where we
+divide by priv->plat->ptp_clk_rate :
+
+stmmac_adjust_time(...)
+	stmmac_est_configure(priv, priv, priv->est,
+			     priv->plat->clk_ptp_rate)
+		.est_configure()
+			ctrl |=3D ((NSEC_PER_SEC / ptp_rate) [...]
+
+Maybe we should fail EST configuration as well if ptp_clk_rate is 0
+(probably in stmmac_tc.c's tc_taprio_configure or in the
+.est_configure). That can be a step for later as well, as I don't know
+if the setup you found this bug on even supports taprio/EST, and setups
+that do didn't seem to encounter the bug yet.
+
+Besides all that,
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Thanks,
+
+Maxime
 
