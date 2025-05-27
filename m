@@ -1,222 +1,129 @@
-Return-Path: <netdev+bounces-193593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CBCAC4BB8
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:47:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14403AC4BBB
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1468D16F471
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9A0E188E71A
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DBB1F4CBE;
-	Tue, 27 May 2025 09:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B971FECDF;
+	Tue, 27 May 2025 09:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sf0H2jut"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIKuJYXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EDE1E3DF2;
-	Tue, 27 May 2025 09:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9082475E3;
+	Tue, 27 May 2025 09:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748339220; cv=none; b=TQr49hemw0EiA92kE7VLzjgDxelkSC44GWXXETuLBl6He+tnhEZ/hxQEJXFC4OTb2u9zalqAKjeW258zHfUHmwaIAB6lyn7e+HUyQa6tYEovo/gZx8XCZXgy3/PucQshR6TocxUtaPUDNi/KVWB8ZAvAsC9Y5iUR8SzSLlsA1QA=
+	t=1748339259; cv=none; b=aJertq3buDiZ2xyDHbqcUjUYsDqACV/DvdqAPM4spPLOgiTdsMUqIMyek4pXTrfSqlOW9PjlPn859ht+Yj70o6Sl/tlFKgeHAuxh9Ue2S/5v9qP9mqmZlN4M8aSt1XA5hQfZ2+QOjoObH0xDA2Jf3fud3IBWK0C1DoQEjfOsscM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748339220; c=relaxed/simple;
-	bh=Ec8dq61GVd2iWwihDdYv8LezbdVHrMZqfCBS0md7hS0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n1cL2Gd981GvGjunaYKdbjV5U/E0ZCw3W4/Y3Ii6K/rwJigqGEJNJyX5WUCXBZk/mvtdwoyR8ZRag5z28QFkEadetCzxmDN6LpRU27tODHo//IYHCoZjUyW4Mqay9y0G0xpvTJVWqMyPl/quTXwH5VThayT2fEmcEiPxgQczoJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sf0H2jut; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3a0cbaf2-4da8-466c-9e00-54a141e67f38@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748339214;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W2mToIyIa5Ja0YaaEHQEF3YpU/0epNXWQBEOE7nzIqI=;
-	b=sf0H2jutzm+M6Kewo8aEN82uyhjWN2Cy7AQjNbz3gsYy9718T7noxdgiyaAQMzuovju2Mq
-	/hI2hQ9BfEwJUTDq/TCF/XzG2SMO13rKEYk55du1CQBT8ixog/9/tOFxD0m4TPKB+rQI4+
-	Y5KjB0kw+JLuxGzJCjmesXDL/QguquI=
-Date: Tue, 27 May 2025 17:46:46 +0800
+	s=arc-20240116; t=1748339259; c=relaxed/simple;
+	bh=ZsPin+K2mtI/KUrLFJKqVhO3swVqLydjccPtBeJ+MAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=SHy2jLeYSiyJIi1hbQ3R3muat6MqRHXlxpkUyLkWL4kWWVFB8aRe949gkwdhsj6LkI24NeDyevDX/cI6Vl84VTDFC5WbQ3YHpvOUxkrNf/pLVnfmjxEyfL5VZkSaqVESNtxQ/LywVyWF6bCMy0X7vgZZtUZnGQ5M0rBsOd3JSBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JIKuJYXN; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a4dba2c767so1215795f8f.1;
+        Tue, 27 May 2025 02:47:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748339256; x=1748944056; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c0CxjOcM5ja+NTdUtvuvYQPI3PuggwbDposRudOjRPI=;
+        b=JIKuJYXNPl0a5Syfn3ZlwNnAncjdgPW+0vZRlBEmyw9+bq+1JFpCXa8DgymK+mvFf5
+         XYnYJVl5vM0IEpgXBUcRTDcDTYrqSaJUsbatF3Zd2NDuivndfwXj1tSsWk3ffb+Qq+TC
+         5/vBFHVq5Gn3xXT7JEniSNnOwoczDyAjbgYkP2vx6DEobnFGN6qckhhl7feqiMZMUD8X
+         DuiB3scfUKBWDpPngUVGkYzh/Rg+8BNTsLA6bPjtYTf2HjVwXbSUKk9JyqQOH+SYfQ1W
+         LOw3XZDPPEZHjlEB1DqLeb3iF6phQsd3DCzz/202kMQ7Eo1dZi/UbCnEafAznt1Wa/Se
+         fuYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748339256; x=1748944056;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c0CxjOcM5ja+NTdUtvuvYQPI3PuggwbDposRudOjRPI=;
+        b=AhaR+xnkjjz0PY20ybzJBCsoclYSx99qJgJmACWQDq+EzPnyZ1Fj//jiH1h2GX8y+x
+         xyenwVt0+eds7h7SwwOA5A0yxh4iP617/jEdPUiJhVcXQTvcbjD8pC0T7PFe5g8MMS8+
+         +DvIvi/3binKbOCDZHvtuqtRWqD91Lo4RTQjZKqIX4CR9NlWHseiXteHb760xsqvdPVd
+         HvrdPahjscXRIZbfrC5jG1uWoCdSKL9jqu4em77RLTfhyCFwHwZYEjyUHDfIGpiNvc04
+         TQp96zgv/722YvyiVbxM0BHV4SU/JIntvg14U8JQQrHGEwodY+6NFTmIAPVLeiamn26C
+         UNoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNF5Qdpat15SORXMqJPbgYcaVgdiz7X+4NoE7h8DDTzVmoa78unKSU5QwdiGDhcJ+XWjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlcwXRvUoTeV1iiLGbgZa5ga9+OZP5zQNMphEoOAvQYJ/mAnnC
+	rqKIefVLodmR3XTPOwcLn9g59PFprAzzcVeCbsfC3V9xLd3A0MMeZRWCDHuL6XiK
+X-Gm-Gg: ASbGncthpxnViM/3l+meP1Y76GXxHWV2S+K/Hb4K/jfiidNn5z9cC0GH70lwbTfNpXj
+	0xINLBJ1M6Uxh+sHey8DD1IFraRKo0iLwvc3DpUxA2O6+eHg54vmi4YKkDzTlEP512sp3LS+fCJ
+	b99NIsxPvlwpFsh8xfkTxQnbr0gIt//8YED995fbyprFEeeqBMyTC7tSku0RRLBD4b7fWgtgYpC
+	OkpCXNpX2c8tw/51TKCW3MxCjFJZ4MCjUbmu5RL1xXBYc3L17MdrWWCck6IOg8jxIZdaXxqjFIy
+	7+wqU0+X35l/z4k8gS4MSGGZRlMMfpyHosGoIvpV0h2pha7241Y4zQi402ZeYANjwhywCjZ/EO+
+	7mWafuoMFed78EihiHM3D87mzzzdwiDjKC05lSkaoX/OXLj1J
+X-Google-Smtp-Source: AGHT+IHb19+UT7TOz0T2Qt6LXfP+LKceFYMw0c6xw9gLy5w5+e29NLGpTnoYjdLIm5/+jmQt3/4GEw==
+X-Received: by 2002:a05:6000:2401:b0:3a4:de01:ff2b with SMTP id ffacd0b85a97d-3a4de01ff83mr4312691f8f.14.1748339256092;
+        Tue, 27 May 2025 02:47:36 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e00f6e2550003dabfc0.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:f6e2:5500:3da:bfc0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d4a3csm269599945e9.22.2025.05.27.02.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 02:47:35 -0700 (PDT)
+Date: Tue, 27 May 2025 11:47:33 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, Tom Herbert <tom@herbertland.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Subject: [PATCH net v2 0/2] net: Fix inet_proto_csum_replace_by_diff for IPv6
+Message-ID: <cover.1748337614.git.paul.chaignon@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: stmmac: set multicast filter to zero if feature is
- unsupported
-To: Nikunj Kela <nikunj.kela@sima.ai>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com
-Cc: rmk+kernel@armlinux.org.uk, 0x1207@gmail.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250523221938.2980773-1-nikunj.kela@sima.ai>
- <e0552940-9fbe-4375-a9a9-e26cd425591a@linux.dev>
- <93ae82e6-44f4-4f2f-b3b6-71240f84500c@sima.ai>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <93ae82e6-44f4-4f2f-b3b6-71240f84500c@sima.ai>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+This patchset fixes a bug that causes skb->csum to hold an incorrect
+value when calling inet_proto_csum_replace_by_diff for an IPv6 packet
+in CHECKSUM_COMPLETE state. This bug affects BPF helper
+bpf_l4_csum_replace and IPv6 ILA in adj-transport mode.
 
-在 5/27/25 12:17 AM, Nikunj Kela 写道:
->
-> On 5/25/25 7:09 PM, Yanteng Si wrote:
->> 在 5/24/25 6:19 AM, Nikunj Kela 写道:
->>> Hash based multicast filtering is an optional feature. Currently,
->>> driver overrides the value of multicast_filter_bins based on the hash
->>> table size. If the feature is not supported, hash table size reads 0
->>> however the value of multicast_filter_bins remains set to default
->>> HASH_TABLE_SIZE which is incorrect. Let's override it to 0 if the
->>> feature is unsupported.
->>>
->>> Signed-off-by: Nikunj Kela <nikunj.kela@sima.ai>
->>> ---
->>>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
->>>   1 file changed, 3 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c 
->>> b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> index 085c09039af4..ccea9f811a05 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> @@ -7241,6 +7241,9 @@ static int stmmac_hw_init(struct stmmac_priv 
->>> *priv)
->>>                       (BIT(priv->dma_cap.hash_tb_sz) << 5);
->>>               priv->hw->mcast_bits_log2 =
->>> ilog2(priv->hw->multicast_filter_bins);
->>> +        } else {
->>> +            priv->hw->multicast_filter_bins = 0;
->>> +            priv->hw->mcast_bits_log2 = 0;
->>>           }
->>
->> I didn't read the code carefully, just did a simple search：
->>
->> ❯ grep -rn multicast_filter_bins drivers/net/
->> drivers/net/ethernet/stmicro/stmmac/common.h:611:    unsigned int 
->> multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c:26: 
->> plat_dat->multicast_filter_bins = 0;
->> ***
->> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:512: 
->> plat->multicast_filter_bins = HASH_TABLE_SIZE;
->> ***
->> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:536: 
->> &plat->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:541: 
->> plat->multicast_filter_bins = dwmac1000_validate_mcast_bins(
->> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:542: 
->> &pdev->dev, plat->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:523: 
->> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:527:    if 
->> (mac->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:528: 
->> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:516: 
->> (netdev_mc_count(dev) > hw->multicast_filter_bins)) {
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1527: 
->> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1531:    if 
->> (mac->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1532: 
->> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1568: 
->> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1572:    if 
->> (mac->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1573: 
->> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:543: if 
->> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:633: if 
->> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:679: if 
->> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:31: 
->> plat->multicast_filter_bins = HASH_TABLE_SIZE;
->> drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:84: 
->> plat->multicast_filter_bins = HASH_TABLE_SIZE;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:98: 
->> plat->multicast_filter_bins = 256;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:365: 
->> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:369:    if 
->> (mac->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:370: 
->> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:7240: 
->> priv->hw->multicast_filter_bins =
->> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:7243: 
->> ilog2(priv->hw->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:570: 
->> plat->multicast_filter_bins = HASH_TABLE_SIZE;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:707: 
->> plat->multicast_filter_bins = HASH_TABLE_SIZE;
->> drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c:479: 
->> plat_dat->multicast_filter_bins = 0;
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:456:    int 
->> numhashregs = (hw->multicast_filter_bins >> 5);
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:485: 
->> (netdev_mc_count(dev) > hw->multicast_filter_bins)) {
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1057: 
->> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1061:    if 
->> (mac->multicast_filter_bins)
->> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1062: 
->> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->> drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c:43: 
->> plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
->>
->> and
->>
->> drivers/net/ethernet/stmicro/stmmac/common.h:265:#define 
->> HASH_TABLE_SIZE 64
->>
->>
->> From the search results, the default value of multicast_filter_bins
->> may be meaningful. And I think that even if some hardware does not
->> support this feature, it should still be overridden in its own 
->> directory.
->
-> There is a DT property 'snps,multicast-filter-bins' available to 
-> override the default value for a platform however this property is not 
-> taken into consideration in case of xgmac. That being said, 
-> stmmac_platform.c logic can be modified to extend the property use for 
-> xgmac also however the value will be overridden later based on hash 
-> table size read from the HW Feature register. So only zero value will 
-> be usable via DT in that case. Hence I thought of setting it to 0 in 
-> the else part of the code I 
+In those cases, inet_proto_csum_replace_by_diff updates the L4 checksum
+field after an IPv6 address change. These two changes cancel each other
+in terms of checksum, so skb->csum shouldn't be updated.
 
-> modified in this patch. If you think I should extend the DT property 
-> for xgmac, I can modify the patch too. 
+Changes in v2:
+  - For BPF, pass the new flag is_ipv6 to
+    inet_proto_csum_replace_by_diff directly instead of calling
+    inet_proto_csum_replace16.
+  - Document the new BPF helper flag.
+  - Fix the usage of inet_proto_csum_replace_by_diff in ILA in a
+    separate patch.
+  - Rebase on net tree.
+  - Link: https://lore.kernel.org/bpf/aCz84JU60wd8etiT@mail.gmail.com/
 
-Thanks for your reply. I think this is better.
+Paul Chaignon (2):
+  net: Fix checksum update for ILA adj-transport
+  bpf: Fix L4 csum update on IPv6 in CHECKSUM_COMPLETE
 
+ include/net/checksum.h         | 2 +-
+ include/uapi/linux/bpf.h       | 4 +++-
+ net/core/filter.c              | 5 +++--
+ net/core/utils.c               | 4 ++--
+ net/ipv6/ila/ila_common.c      | 6 +++---
+ tools/include/uapi/linux/bpf.h | 4 +++-
+ 6 files changed, 15 insertions(+), 10 deletions(-)
 
-Thanks,
+-- 
+2.43.0
 
-Yanteng
-
-
->
-> Thanks,
->
-> -Nikunj
->
->>
->>
->> Thanks,
->> Yanteng
->>
 
