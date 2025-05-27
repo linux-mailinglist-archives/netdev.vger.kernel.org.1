@@ -1,80 +1,58 @@
-Return-Path: <netdev+bounces-193536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90877AC45DD
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 03:23:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24006AC45E9
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 03:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352231897CA9
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 01:23:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB77A17A9BA
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 01:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4130484D13;
-	Tue, 27 May 2025 01:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dDlVTPWS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AC684039;
+	Tue, 27 May 2025 01:31:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603432CA9
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 01:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397C88F58;
+	Tue, 27 May 2025 01:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748308992; cv=none; b=ZLmjrQJ+ZVbngtvEEhYXhuQWIOEyNE96JzR6HdBU1AdTt6UNWhnClPo6GJfHtKUbc5IshUnA9lOFMkVJkL/HuuoRqp2qHszQs31ej4WZ1bhT7HEDjKzt3ATMMpQk4Tumv4Abm2J9dp6qgRhKHKON7hEx5SaveQl7qD16aOc90rw=
+	t=1748309489; cv=none; b=HQRF03dTym5aJeICQi3AY/8L/JBWeib5pjgFkMQ3wpb8cJsZx24M1KJhsKai7ilqhx9q1IKv+Ad1ZHXnJrbP5HZxaHqE+J5FkJJ3wWR+4Bl3mi6eBtT/dS7Ax5AYA2r3ME3ZFx1ojH3ECL8XCWCE2sW5YiUYzK7UM8eF+KJFIVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748308992; c=relaxed/simple;
-	bh=V6+53TGRbaY13qQpLbT62lVQ1KrJgP5UhOGbZ87q4vU=;
+	s=arc-20240116; t=1748309489; c=relaxed/simple;
+	bh=pm3Pc32Zf4LoF+JccJiR/o/mHSX4HrNhTRUfRVe+RHw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkUarocSnGbzzeyySd5m/iuFs9VrokVrzLcnyKzAAa9ZBMijIhbzIhFD5S+rIQMti+oMFOQPD829j3WN4TLQJGlQR8c9RxKcRnMzXAr0jYLCr/qUGo95T8tuxpCbdWGCKneG/SJgFyp83YNm0tvWD7K3NO0q3hweWVNGOagIJ2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDlVTPWS; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748308991; x=1779844991;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=V6+53TGRbaY13qQpLbT62lVQ1KrJgP5UhOGbZ87q4vU=;
-  b=dDlVTPWSaYvA/MMJRwqvvUAhTCIRXCSj1DhwhDuG/WO0T0Qiiuqk177D
-   8BgYBOq5LufaPQiQ3tl39EBYzNV4q8NnhbB85tT+YsNeNnCKHZXa7IZFN
-   0tlMk7quVzIImiFMixdw84hlIefJ3gSFDN/3jQ+OtK2x+XNv0jlb97TgD
-   DCKgCN8ai/sRbc5ZaV7GquRrk/P7lDRskLU9KAjUM3UQDMTPcQKzhOoq1
-   u+s5asyAZgpZ1knSBMRhYVkx9FgGibRc/SyBTpirVMRytcgnncJPyx8yy
-   q4YH5mDFbVJAN9NDKUBoTtKWy2HOST7JkLY2Zlb4nPOulmizUevCFlTjo
-   g==;
-X-CSE-ConnectionGUID: S5wW99UvSX+1FHD5MSGliw==
-X-CSE-MsgGUID: IMcwSgECSHOfBO/C50ibbg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11445"; a="50332955"
-X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
-   d="scan'208";a="50332955"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 18:23:10 -0700
-X-CSE-ConnectionGUID: HaVu3naQQpSISTceqEZbKQ==
-X-CSE-MsgGUID: dWvFHSgvTnqILb6eJEZmNA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
-   d="scan'208";a="143546099"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 26 May 2025 18:23:06 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uJj1z-000Sn2-1P;
-	Tue, 27 May 2025 01:23:03 +0000
-Date: Tue, 27 May 2025 09:22:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, saikrishnag@marvell.com,
-	gakula@marvell.com, hkelam@marvell.com, sgoutham@marvell.com,
-	lcherian@marvell.com, bbhushan2@marvell.com, jerinj@marvell.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: Re: [net PATCH] octeontx2-pf: Avoid typecasts by simplifying
- otx2_atomic64_add macro
-Message-ID: <202505270941.xkydqqTv-lkp@intel.com>
-References: <1748274232-20835-1-git-send-email-sbhatta@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XjOXV+EnVn0Q3Ssp/dbVYEmmuUUOddEq/TgIWRXEFIDP+n5NxfspkZdqo/WUpJR9ArEHqrNXubuyqhT196gbowKroJO/2bp1AayMYaOtYGCMDpjKJYIW78SgWFcNGrc2+VT0EVwuhgJmf+eNphB0awAmdGvWr7rutyt3wAf80Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-dc-683515e91fbd
+Date: Tue, 27 May 2025 10:31:16 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [PATCH 18/18] mm, netmem: remove the page pool members in struct
+ page
+Message-ID: <20250527013116.GA37906@system.software.com>
+References: <20250523032609.16334-1-byungchul@sk.com>
+ <20250523032609.16334-19-byungchul@sk.com>
+ <CAHS8izM-ee5C8W2D2x9ChQz667PQEaYFOtgKZcFCMT4HRHL0fQ@mail.gmail.com>
+ <20250526013744.GD74632@system.software.com>
+ <cae26eaa-66cf-4d1f-ae13-047fb421824a@gmail.com>
+ <20250527010226.GA19906@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,222 +61,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1748274232-20835-1-git-send-email-sbhatta@marvell.com>
+In-Reply-To: <20250527010226.GA19906@system.software.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX/PHWdfh3w9jDkzW1YeVvNB0sbmN6OhZsOGW/3W3XQnV1Ia
+	OzQPTQnN6hy7hh5OHCfXSaITMm2uQ64HHaXGlKe49WDFjxn/vfd6vz/vz+ePj0CrjrFTBJ0h
+	VTIaNElqTsEoescUhb6fGKGdX5u3GCz2cg4u96dDyWsXCxabE8G3gVYe+uoecXChKECD5WkW
+	A9/tgzR0PezgwV/czUD1kUoaOk7Uc5CTNUTDQVcpBR5nLgv5g5doqDS95uFZlYWD9vIRFrrd
+	OQw8Npcx4M+NhofWYAg86UFQZ6+kIHD8HAenvVYOOrP8CLz3Oxg4eyAXgb3Gx8JQv4WLnilW
+	lDVT4i3zK160OnaLN0pDxGyflxYdtmOc6Ph6ihfbmqo5sb5giBFvufooMefQR0780tXCiJ9q
+	XnCiveIFIzZY63ixzzF9Hd6siEyQknRpknFe1HaF1tv1jk8+ODa9p6WVM6ECRTYKEggOJx6T
+	g/6rXfmNKBsJAoNnk6rueBlzeA7x+QZ+RybgueTDSzefjRQCjXtYYj/iZGRjPI4jz98U8vKs
+	EgN52TlJxipcRZGTz1bLWonHkceFb3/HaRxCfMPvKTlO46mkZFiQcRBeTPxfrlGynohnkXvO
+	R5S8iuAygdy2nWP/nDmZ1Jb6mDyEzf/Vmv+rNf+rtSLahlQ6Q5peo0sKD9NmGHTpYfE79Q70
+	60GK9/3Y4kJfPbFuhAWkHqP0SOFaFatJS8nQuxERaPUEpTPvF1ImaDL2Ssad24y7k6QUN5oq
+	MOpJyoWBPQkqnKhJlXZIUrJk/OtSQtAUE8rt71iUHHq1qLOeWw8bYjwRnRvHVZx5Hhdt6L9T
+	aDilDH41eobfuSTqYtPdFdfDE1d1bz0/EvM5ZAE3LWxtvu16cGZ7E7MrbfNN7/5lzcMx+uTY
+	4Ss7apT32xoyFx1tPTr28Nrm6KVsVuiam/wWZk3jHp4Ki2wctSnSsfxBIK7h7cpeNZOi1SwI
+	oY0pmp98m5tjHAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRzGe885O+e4nLya1sGCYt01rcjqH4pYBL34IRICTSJdemijeWkz
+	06AwlURT06zQtWIlZS5jsWROEaklXkjQNGtlNdPUiVLZxWqa1gmivj38nuf37eFpv0kmkNek
+	Zoi6VJVWycoZ+d7wvJDxgK3qTZWzQWC01LFw53sW1AzaZWA02xB8+THAwefWdhaqr0/TYOzO
+	Z+CrxUPDSNsQB65boww0FzTQMHS+g4WS/Bkacu23KXh0tVMGPbZSGVz03KShIWeQg74mIwtv
+	6uZlMOooYaDTUMuAqzQK2kyLYfrxJIJWSwMF08VXWajoNbEwnO9C0PtoiIErZ0oRWFqcMpj5
+	bmSjlKS+9gVFGg2vOWKyHif3bweRImcvTazmQpZYP13gyKtnzSzpqJxhSKP9M0VK8t6zZGrk
+	JUM+tPSzpNr9kSKW+n6GdJlauX2+8fKIZFGryRR1GyMT5ereETeXnuuTNflygM1BlfIi5MUL
+	OEywX3yCihDPM3i10DSaJGEWrxWczh+0lP1xsDDx3MEVITlP40mZYCmwMVKxCO8Xnr6t4iRX
+	gUF4PrxEwn64iRLK+6KlrMC+QmfVuz9zGgcJzrlxSprTeKlQM8dL2AvvEFxT9ygpB+CVwgNb
+	O1WGFIb/bMN/tuGfbUK0GflrUjNTVBrt1lD9UXV2qiYrNCktxYp+f+DWqdlyO/rSt8eBMI+U
+	3ooeMUztJ1Nl6rNTHEjgaaW/wlb2GymSVdknRV1agu64VtQ70FKeUS5RRMeKiX74iCpDPCqK
+	6aLub0vxXoE5qLu9Yx0T820ivC0mPinMa316hPemhws+1B4ez9f3b/vp9ozvOqZNDunJqVm+
+	/dyaWX/vhupY7PmadmPKThIix2Kjg6sqggfVyV3vWqoPHpk3R3iu+caNXfZ5srtwC05bZU+w
+	3l3sCkiRxw2c3nCoeNlY+E732UsrWFn9AfeJXJ+JhUpGr1ZtDqJ1etUvF08Tpf8CAAA=
+X-CFilter-Loop: Reflected
 
-Hi Subbaraya,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Subbaraya-Sundeep/octeontx2-pf-Avoid-typecasts-by-simplifying-otx2_atomic64_add-macro/20250526-234505
-base:   net/main
-patch link:    https://lore.kernel.org/r/1748274232-20835-1-git-send-email-sbhatta%40marvell.com
-patch subject: [net PATCH] octeontx2-pf: Avoid typecasts by simplifying otx2_atomic64_add macro
-config: x86_64-buildonly-randconfig-006-20250527 (https://download.01.org/0day-ci/archive/20250527/202505270941.xkydqqTv-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250527/202505270941.xkydqqTv-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505270941.xkydqqTv-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c:10:
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_ptp.c:451:14: warning: shift count >= width of type [-Wshift-count-overflow]
-     451 |                 cc->mask = CYCLECOUNTER_MASK(64);
-         |                            ^~~~~~~~~~~~~~~~~~~~~
-   include/linux/timecounter.h:14:59: note: expanded from macro 'CYCLECOUNTER_MASK'
-      14 | #define CYCLECOUNTER_MASK(bits) (u64)((bits) < 64 ? ((1ULL<<(bits))-1) : -1)
-         |                                                           ^ ~~~~~~
-   2 warnings and 1 error generated.
---
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c:13:
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   1 warning and 1 error generated.
---
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:17:
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:34:17: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-      34 |         stats->bytes = otx2_atomic64_add(incr, ptr);
-         |                        ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:34:17: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-      34 |         stats->bytes = otx2_atomic64_add(incr, ptr);
-         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:37:16: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-      37 |         stats->pkts = otx2_atomic64_add(incr, ptr);
-         |                       ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:37:16: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-      37 |         stats->pkts = otx2_atomic64_add(incr, ptr);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:47:17: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-      47 |         stats->bytes = otx2_atomic64_add(incr, ptr);
-         |                        ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:47:17: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-      47 |         stats->bytes = otx2_atomic64_add(incr, ptr);
-         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:50:16: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-      50 |         stats->pkts = otx2_atomic64_add(incr, ptr);
-         |                       ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:50:16: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-      50 |         stats->pkts = otx2_atomic64_add(incr, ptr);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:873:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     873 |                 val = otx2_atomic64_add(incr, ptr);
-         |                       ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:873:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     873 |                 val = otx2_atomic64_add(incr, ptr);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   6 warnings and 6 errors generated.
---
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:11:
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h:11:
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:159:8: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     159 |         val = otx2_atomic64_add(incr, ptr);
-         |               ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:159:8: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     159 |         val = otx2_atomic64_add(incr, ptr);
-         |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   2 warnings and 2 errors generated.
---
-   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:22:
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^                       ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-     804 |         return otx2_atomic64_add(incr, ptr);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1314:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-    1314 |                 val = otx2_atomic64_add((qidx << 44), ptr);
-         |                       ^                               ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1314:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-    1314 |                 val = otx2_atomic64_add((qidx << 44), ptr);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1353:9: warning: ISO C does not allow indirection on operand of type 'void *' [-Wvoid-ptr-dereference]
-    1353 |                 val = otx2_atomic64_add((qidx << 44), ptr);
-         |                       ^                               ~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:42: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ^~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1353:9: error: invalid operands to binary expression ('void' and 'u64' (aka 'unsigned long long'))
-    1353 |                 val = otx2_atomic64_add((qidx << 44), ptr);
-         |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:47: note: expanded from macro 'otx2_atomic64_add'
-     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
-         |                                                    ~~~~ ^  ~~~~
-   3 warnings and 3 errors generated.
-
-
-vim +804 drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-
-4c236d5dc8b8622 Geetha sowjanya   2021-02-11  797  
-caa2da34fd25a37 Sunil Goutham     2020-01-27  798  /* Alloc pointer from pool/aura */
-caa2da34fd25a37 Sunil Goutham     2020-01-27  799  static inline u64 otx2_aura_allocptr(struct otx2_nic *pfvf, int aura)
-caa2da34fd25a37 Sunil Goutham     2020-01-27  800  {
-22f5790bc6ba331 Subbaraya Sundeep 2025-05-26  801  	void __iomem *ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_ALLOCX(0));
-caa2da34fd25a37 Sunil Goutham     2020-01-27  802  	u64 incr = (u64)aura | BIT_ULL(63);
-caa2da34fd25a37 Sunil Goutham     2020-01-27  803  
-caa2da34fd25a37 Sunil Goutham     2020-01-27 @804  	return otx2_atomic64_add(incr, ptr);
-caa2da34fd25a37 Sunil Goutham     2020-01-27  805  }
-caa2da34fd25a37 Sunil Goutham     2020-01-27  806  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Tue, May 27, 2025 at 10:02:26AM +0900, Byungchul Park wrote:
+> On Mon, May 26, 2025 at 05:58:10PM +0100, Pavel Begunkov wrote:
+> > struct net_iov {
+> > 	unsigned long flags_padding;
+> > 	union {
+> > 		struct {
+> > 			// same layout as in page + build asserts;
+> > 			...
+> > 			struct page_pool *pp;
+> > 			...
+> > 		};
+> > 		struct netmem_desc desc;
+> > 	};
+> > };
+> > 
+> > struct netmem_desc *page_to_netmem_desc(struct page *page)
+> > {
+> > 	return &page->netmem_desc;
+> 
+> page will not have any netmem things in it after this, that matters.
+						   ^
+						   this patch series
+	Byungchul
+> 
+> > }
+> > 
+> > struct netmem_desc *netmem_to_desc(netmem_t netmem)
+> > {
+> > 	if (netmem_is_page(netmem))
+> > 		return page_to_netmem_desc(netmem_to_page(netmem);
+> > 	return &netmem_to_niov(netmem)->desc;
+> > }
+> > 
+> > The compiler should be able to optimise the branch in netmem_to_desc(),
+> > but we might need to help it a bit.
+> > 
+> > 
+> > Then, patch 2 ... N convert page pool and everyone else accessing
+> > those page fields directly to netmem_to_desc / etc.
+> > 
+> > And the final patch replaces the struct group in the page with a
+> > new field:
+> > 
+> > struct netmem_desc {
+> > 	struct page_pool *pp;
+> > 	...
+> > };
+> > 
+> > struct page {
+> > 	unsigned long flags_padding;
+> > 	union {
+> > 		struct netmem_desc desc;
+> 		^
+> 		should be gone.
+> 
+> 	Byungchul
+> > 		...
+> > 	};
+> > };
+> > 
+> > net_iov will drop its union in a later series to avoid conflicts.
+> > 
+> > btw, I don't think you need to convert page pool to netmem for this
+> > to happen, so that can be done in a separate unrelated series. It's
+> > 18 patches, and netdev usually requires it to be no more than 15.
+> > 
+> > -- 
+> > Pavel Begunkov
 
