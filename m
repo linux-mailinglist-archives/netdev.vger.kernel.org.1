@@ -1,125 +1,129 @@
-Return-Path: <netdev+bounces-193573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEACAC490C
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB5ADAC4927
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22EB3B9C0B
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:09:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F6BA3AEFF3
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59431FBE8C;
-	Tue, 27 May 2025 07:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2619E1FE455;
+	Tue, 27 May 2025 07:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrgbPE5q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DEpe7VGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778DB1F582A;
-	Tue, 27 May 2025 07:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3D21F1905
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748329802; cv=none; b=I7ZraOQPgK/6ZrkTYCDFZQh+j16WLFHrIjDcSlWT0jagLx1EZQ223qDviulneK/1rcChj3UbU4YC3RYx3FHkfnfFVFmztF2F07LyEogJFAElW9MwqSoh7als3gPD0drlzShhg6gcSZiKkaY9BbpfEbp6x9uvRy32PnFiXAnbcn4=
+	t=1748330258; cv=none; b=tv+fdWyvPJ9prMGP+KHvrie5IZBpehRUQ6FOWWDy0dlLlweduCY2wbTRrtzJR7M5II0TA0Cga0ORUK4F4bOGjyIAX+7F4SVhcsdiKj+FkQo4RqkJ2C0l1CNGvil+Z1XBQQ+XlfbQy4khct1i67sT5zLcNIwcqiwHquhHXTX8wVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748329802; c=relaxed/simple;
-	bh=xzocwWaxsjqNHkYeqf5FJ8YRMOeK+a1p789rrCvbcaI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a5b7USDQk5JlzMOoAKyo2MlPbOaD4RqQzJ5PzHtS7KOYu0L0yUaBrZg+AaA+vorsECI0OLepHkR/N7ougQOqm2+JMen3B3NrnI3ym4kmKr9TT78+SWUE+07ychReITS2gfKrWfpAyOBjx555DPzxxVrG90S7WruaSjqVREd3FAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrgbPE5q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2C58C4CEEA;
-	Tue, 27 May 2025 07:10:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748329801;
-	bh=xzocwWaxsjqNHkYeqf5FJ8YRMOeK+a1p789rrCvbcaI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UrgbPE5q4jkBMJPBz0vBsgfEVAEjT8rQtASyZM66x7/l2vsgjoMEDe4YFAyOw2/Fp
-	 MYFicSzJNkJQPk13KM7yMcj34YPqaP9hbPhluW66y0Q7O17srHfP2Tun7T5CVpbYve
-	 C7RK0i5ryfbfDxL4v2+e/lvDC3x1SVtXtlAbOQit4jH/c5Hj8R+cE0cUWFR28YwGUN
-	 IidlV185WTMCyWB2ReejMkcYX05KWvxhPJvpL2VH73QkrMNvRFtsM2aADgK2g9Y01J
-	 N+hsNnfYc4LXpAhl/NnN01iegKwJzty3MQVJGETldQvNIRcTj350ps34FPuwKVTiS/
-	 3WU2iphe/13Iw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D18380AAE2;
-	Tue, 27 May 2025 07:10:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748330258; c=relaxed/simple;
+	bh=c7fLyJFyUEsXGupJPUcA5deevABmi1JPgUKpiDGU38s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rjcu8ZtrrgRNSx1Jwa+mdtkGXLh3W+i6jW6VYKiTzJxTFf+dWG6s+5wgQ5EEojLqHBq5e5KzTZqTOEyIO2ybfSXzA+IdidJ3PqrJtzpk9I0zLIYtC+jf1kypR773bBzWZIJ6oHq6e7w6itgKdtmZFSzLN6toB2Y1eiOgu2hMtRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DEpe7VGI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748330255;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uFoZttK1qFQLLWq/vRTqOPjL4JDl9U9JL7VK0ppo1m8=;
+	b=DEpe7VGIjiW3Gs9XOhpDpJZRe6WUQyUHOPyfKH8PpIE/plFOVyKkLP//pjWWiWeoebUQwb
+	r/z9wrSrk/hMCuXuMPmlE6qOMMVLeYuce4FCPmyT4EuHLimh9eGIfK1BNE7crUNiD/7Ulk
+	5HIqXuKzUQQAPlo1bU6VlCS6zT396uY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-439-mYrGTIvvMX6kL9U5YIrQhg-1; Tue, 27 May 2025 03:17:33 -0400
+X-MC-Unique: mYrGTIvvMX6kL9U5YIrQhg-1
+X-Mimecast-MFC-AGG-ID: mYrGTIvvMX6kL9U5YIrQhg_1748330252
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ce8f82e66so15414755e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 00:17:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748330252; x=1748935052;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uFoZttK1qFQLLWq/vRTqOPjL4JDl9U9JL7VK0ppo1m8=;
+        b=EmqKhP9PivJJpO46OTedOfjNKA9sPC+05Dq/I++j5zN2NWRpb30qt1p1aqCsNG+byT
+         rfVkmfC2W97mcCs+BEtkzJASdAT5DEjTE+nH1MLAvuqB9jUyFNME10jjb1E/J45A3RRW
+         NlVN7wRxGZHQLcchPZ/OfuXBtb1F3YQLhU1jQE7SvRiiMA+c4v+WR0Wl/JD4ot1OLwRE
+         iKsKta7FJ+UjOfiiF46qoQ8xR7Fe8/r5eZ70sorA4cQDKrMyMgbbTVGzj9QSv2x6t0cW
+         lhvWtFxvMFLnXzp3H2ESneD7huaQKQphHm3yORGb/tbjrop7UxnYT5BKb9X3J49p496v
+         iE4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWUgnu6BKICoUFqtoCI8VeZxKG3wIwsDzoK7tATS9+q9ARbehVoXxc9uaE+QtH3SPTgAyLBx5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNanZWccVc7rize1fuVY91F3F/K4vIBN0sjdtYq0OzG5butDqb
+	vK7EatchJJ7FRontLGRJdzeb1RDwfhdoVcUCUJtjV6pW4jJDV4zy7LbKHFVZBTGl47FtSSzLV7Z
+	gVij4WGm9UBPtLT0z0PaXgL5TWio827akYKeoMazRr7FRoFb9wRE2G3DpubVGLLB3kw==
+X-Gm-Gg: ASbGncskp1JW9LiUbzAJucx/yifYSuc4b/bCD5MSoItFFlNbTr3JbbAsVMFFykJp8XC
+	WhpycS5On84oGq5paGlbPrOYAqK9VmH4P/xAaB7e06PkqLpIDCSrxa07PAO8IKglkITquT0/Y8C
+	FfPp2WA88h9/7TVGBOPuJcv91K0rhS6INnc4lIp/VGZyZE/ccbvprkm1xXNWxC2Fiue8IxLsUWM
+	CKEzXsQrKOlqZALGczqZLbvoyoRTVr1FUYnmvqPsb/UOKhHaFj2+fmf2fpETVkmrY0AXIh0RPjp
+	WVTPeyQFh86/IYJ/tMirxL0XNn4pXMdn+5lVlBFMpfQ2SqaeYKlieB7RfPI=
+X-Received: by 2002:a05:600c:4e45:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-44c919e13ddmr134348865e9.10.1748330252214;
+        Tue, 27 May 2025 00:17:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE6rjaM4MrEBKpkWOooZj5HtKU+xPTWzAblyNoOT7GHD0DA87EDlFyvauURgtKhnloJkF0iXg==
+X-Received: by 2002:a05:600c:4e45:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-44c919e13ddmr134348585e9.10.1748330251888;
+        Tue, 27 May 2025 00:17:31 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810:827d:a191:aa5f:ba2f? ([2a0d:3344:2728:e810:827d:a191:aa5f:ba2f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d66a2de7sm6100565f8f.3.2025.05.27.00.17.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 00:17:31 -0700 (PDT)
+Message-ID: <12b16f0b-8ba8-4077-9a13-0bc514e1cd44@redhat.com>
+Date: Tue, 27 May 2025 09:17:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/8] net: Convert dev_set_mac_address() to struct
- sockaddr_storage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174832983626.1188942.1099978775563244121.git-patchwork-notify@kernel.org>
-Date: Tue, 27 May 2025 07:10:36 +0000
-References: <20250521204310.it.500-kees@kernel.org>
-In-Reply-To: <20250521204310.it.500-kees@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: kuniyu@amazon.com, willemdebruijn.kernel@gmail.com,
- martin.petersen@oracle.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- michael.christie@oracle.com, mgurtovoy@nvidia.com, mlombard@redhat.com,
- d.bogdanov@yadro.com, mingzhe.zou@easystack.cn, christophe.leroy@csgroup.eu,
- horms@kernel.org, linux@treblig.org, gustavoars@kernel.org,
- andrew+netdev@lunn.ch, sdf@fomichev.me, cratiu@nvidia.com,
- leiyang@redhat.com, idosch@nvidia.com, sam@mendozajonas.com,
- fercerpav@gmail.com, alex.aring@gmail.com, stefan@datenfreihafen.org,
- miquel.raynal@bootlin.com, hayeswang@realtek.com, dianders@chromium.org,
- grundler@chromium.org, jv@jvosburgh.net, kys@microsoft.com,
- haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
- jiri@resnulli.us, jasowang@redhat.com, vladimir.oltean@nxp.com,
- florian.fainelli@broadcom.com, kory.maincent@bootlin.com, glipus@gmail.com,
- olek2@wp.pl, phahn-oss@avm.de, ebiggers@google.com, ardb@kernel.org,
- viro@zeniv.linux.org.uk, ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
- shaw.leon@gmail.com, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- target-devel@vger.kernel.org, netdev@vger.kernel.org,
- linux-wpan@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-hardening@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 26/26] selftests: netfilter: Torture nftables
+ netdev hooks
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
+ Phil Sutter <phil@nwl.cc>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
+References: <20250523132712.458507-1-pablo@netfilter.org>
+ <20250523132712.458507-27-pablo@netfilter.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250523132712.458507-27-pablo@netfilter.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 5/23/25 3:27 PM, Pablo Neira Ayuso wrote:
+> +ip netns exec $nsr nft -f - <<EOF
+> +table ip t {
+> +	flowtable ft_wild {
+> +		hook ingress priority 0
+> +		devices = { wild* }
+> +	}
+> +}
+> +EOF
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+The above is causing CI failures:
 
-On Wed, 21 May 2025 13:46:08 -0700 you wrote:
-> v2:
->   - add conversion of dev_set_mac_address_user() (kuniyu)
->   - fix missed sockaddr/sockaddr_storage conversion (kuba)
->  v1: https://lore.kernel.org/all/20250520222452.work.063-kees@kernel.org/
-> 
-> Hi,
-> 
-> [...]
+# selftests: net/netfilter: nft_interface_stress.sh
+# /dev/stdin:4:15-19: Error: syntax error, unexpected string with a
+trailing asterisk, expecting string or quoted string or '$'
+# devices = { wild* }
+#             ^^^^^
+not ok 1 selftests: net/netfilter: nft_interface_stress.sh # exit=1
 
-Here is the summary with links:
-  - [net-next,v2,1/8] net: core: Convert inet_addr_is_any() to sockaddr_storage
-    (no matching commit)
-  - [net-next,v2,2/8] net: core: Switch netif_set_mac_address() to struct sockaddr_storage
-    https://git.kernel.org/netdev/net-next/c/161972650d67
-  - [net-next,v2,3/8] net/ncsi: Use struct sockaddr_storage for pending_mac
-    https://git.kernel.org/netdev/net-next/c/db586cad6f45
-  - [net-next,v2,4/8] ieee802154: Use struct sockaddr_storage with dev_set_mac_address()
-    https://git.kernel.org/netdev/net-next/c/7da6117ea144
-  - [net-next,v2,5/8] net: usb: r8152: Convert to use struct sockaddr_storage internally
-    https://git.kernel.org/netdev/net-next/c/79deac8d538d
-  - [net-next,v2,6/8] net: core: Convert dev_set_mac_address() to struct sockaddr_storage
-    (no matching commit)
-  - [net-next,v2,7/8] rtnetlink: do_setlink: Use struct sockaddr_storage
-    https://git.kernel.org/netdev/net-next/c/6b12e0a3c3c9
-  - [net-next,v2,8/8] net: core: Convert dev_set_mac_address_user() to use struct sockaddr_storage
-    (no matching commit)
+For some reasons (likely PEBKAC here...) I did not catch that before
+merging the PR, please try to follow-up soon. Thanks,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Paolo
 
 
