@@ -1,103 +1,63 @@
-Return-Path: <netdev+bounces-193733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2044AC5A2C
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:43:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13F3AAC5A4C
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AD203AD1AF
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:42:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A60201BA8189
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBA628032E;
-	Tue, 27 May 2025 18:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D001F27E7C6;
+	Tue, 27 May 2025 18:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAJg/lTs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OLqN274I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CDF27C854;
-	Tue, 27 May 2025 18:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FFC1CD0C;
+	Tue, 27 May 2025 18:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748371392; cv=none; b=RUWDeZlQUqpCC++jbTqovwYlNKI6HMjdEpYe0pCKLNrK2kHaAtAhT7hiVB3Pdm+6OhJosNOSB2s+0KxLp5bLC015sUOPWp2CkkKUtpxEIFHuBSS66q/2RXHyuhoOXQqXp+bQP8fBDSDabkxFDNEuOk1E9Iwntvu1dyD3ToFayu4=
+	t=1748372130; cv=none; b=MVVzd7nklDTl+EE/GUyAJ9Fc+oBb24kF8Htvefue04NShsubpfrHsOffJiFD2/BTGTljqR8Gyvxez28mYDT7dFP1SsYbKs4j0ELylbkQWJuKrBJEgyrxsmW0u3C9CaOfB90cT8854VXL3721mEJSljlnYhLxnT3yfWDMeo2ZpP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748371392; c=relaxed/simple;
-	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
+	s=arc-20240116; t=1748372130; c=relaxed/simple;
+	bh=HDXaCTsUxEdeY81YLhMA8pdmocB2sFdW0FN8Boejtr4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mfV8VJxNi/USAC+PEZeRUtNWnRYUO4jmF+ImjSIVibgz88fh9BeTUWJtpk9tP4U1A9FIosoix8bCpgwOY3HF8tTM5yS0BxCrsBSNSorpnIeJXBxo8oNH0BfDl7//Hbjpbr88kcZ/DmkJujm7JNlB1hv11DcmMHK5zWx/6RYhcmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAJg/lTs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1049DC4CEEA;
-	Tue, 27 May 2025 18:43:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=aea6C1HJ3W5ONA4ds/hc/Thya1JTeHbaB+H2r2cmqdBNVWnFPmFJ8UF67H7hjQ3G9rwVlfddJBM52T2tO4W9o8u0C4URcEsbcSzbVPFuJIhyihMnjBzZcVQO/WEv0rtlqYtTceTCnqhv2zcbNRe4qrQ7nWsQ1MnYN5O+Avb7N7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OLqN274I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF64EC4CEE9;
+	Tue, 27 May 2025 18:55:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748371392;
-	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
+	s=k20201202; t=1748372130;
+	bh=HDXaCTsUxEdeY81YLhMA8pdmocB2sFdW0FN8Boejtr4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SAJg/lTsHFPpMmZvVmP+0XJugy76N/WOctdJIssWWs7qNHSBbzmSYg8xkWQak4g5C
-	 LfZgHKgxVCZb8p0qamVGEV/1YiZTk2afQEafhl37cp97dLgGRdjvi7trKjD2XXdMuP
-	 LbrGzfua9UHyhqt54e4WAAnlTo1NpBqK2l+IKnh1JQUdMKF4EbO60uwu4lUOeBUiiD
-	 wKIfF3Uo87tWndWoi9LDxjhMwmt61Lxnq3QWSMVbr06JAV1rHQ9XUs10fwb75pWBr3
-	 anGW5bNZOirMCaMIcgBCgcjqJ5Vcm09HGhEIuw7KuVAzISErwpzi7uyi2a2hStymIg
-	 Mw76bx9c3WLMA==
-Date: Tue, 27 May 2025 11:43:08 -0700
-From: Kees Cook <kees@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=OLqN274IqOQEL6R+W3wIgKDhhrztXA7SN+u5J3uyZ3Er3XRnvdAhTcbq73OTp2+kE
+	 +9H+RR/ftd5da6wd6nPZP1iRFT9MwsSXJj152DmolnR5v5PsYfqq5AFs/VRmVia/Q0
+	 zdt9jrgL9SKAZg5ew6artpcDLlyGjw5pmwm4A8kbNLQlKcq1+jmEtsqOiVpfWSeOK2
+	 rZNrTFtTJrsP5J8i/zp/pPqssAzvLmotHU5aWdVuquDWNQ941T2VnX8m2hDwaUis5q
+	 cI/8m8IUZogR+LIyO54IvHz/q52mBsUcNmYfe6Aa/6ND0lr0cSB7RqowXXuXaQPDiH
+	 T5R03iVy5pXKw==
+Date: Tue, 27 May 2025 08:55:28 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
+	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
+	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
+	kernel-team@meta.com, Eric Dumazet <edumazet@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Maxim Georgiev <glipus@gmail.com>, netdev@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>,
-	Maurizio Lombardi <mlombard@redhat.com>,
-	Dmitry Bogdanov <d.bogdanov@yadro.com>,
-	Mingzhe Zou <mingzhe.zou@easystack.cn>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Lei Yang <leiyang@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	Paul Fertser <fercerpav@gmail.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Hayes Wang <hayeswang@realtek.com>,
-	Douglas Anderson <dianders@chromium.org>,
-	Grant Grundler <grundler@chromium.org>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Philipp Hahn <phahn-oss@avm.de>, Eric Biggers <ebiggers@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xiao Liang <shaw.leon@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v2 8/8] net: core: Convert
- dev_set_mac_address_user() to use struct sockaddr_storage
-Message-ID: <202505271142.EA78EAB04@keescook>
-References: <20250521204310.it.500-kees@kernel.org>
- <20250521204619.2301870-8-kees@kernel.org>
- <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH 6/8] net: tcp: tsq: Convert from tasklet to BH workqueue
+Message-ID: <aDYKoA8lpX_Zxrhh@slm.duckdns.org>
+References: <20240130091300.2968534-1-tj@kernel.org>
+ <20240130091300.2968534-7-tj@kernel.org>
+ <CAL+tcoCKqs1m4bAWTWv9aoQKs7ZpC5PXtMS2ooi6xEB6CbxN1w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,36 +66,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
+In-Reply-To: <CAL+tcoCKqs1m4bAWTWv9aoQKs7ZpC5PXtMS2ooi6xEB6CbxN1w@mail.gmail.com>
 
-On Tue, May 27, 2025 at 09:02:28AM +0200, Paolo Abeni wrote:
-> On 5/21/25 10:46 PM, Kees Cook wrote:
-> > diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-> > index fff13a8b48f1..616479e71466 100644
-> > --- a/net/core/dev_ioctl.c
-> > +++ b/net/core/dev_ioctl.c
-> > @@ -572,9 +572,11 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
-> >  		return dev_set_mtu(dev, ifr->ifr_mtu);
-> >  
-> >  	case SIOCSIFHWADDR:
-> > -		if (dev->addr_len > sizeof(struct sockaddr))
-> > +		if (dev->addr_len > sizeof(ifr->ifr_hwaddr))
-> >  			return -EINVAL;
-> > -		return dev_set_mac_address_user(dev, &ifr->ifr_hwaddr, NULL);
-> > +		return dev_set_mac_address_user(dev,
-> > +						(struct sockaddr_storage *)&ifr->ifr_hwaddr,
-> > +						NULL);
-> 
-> Side note for a possible follow-up: the above pattern is repeated a
-> couple of times: IMHO consolidating it into an helper would be nice.
+Hello,
 
-Yeah, I will look at that.
+On Sun, May 25, 2025 at 11:51:55AM +0800, Jason Xing wrote:
+> Sorry to revive the old thread! I noticed this change because I've
+> been doing an investigation around TSQ recently. I'm very cautious
+> about the change in the core/sensitive part of the networking area
+> because it might affect some corner cases beyond our limited test,
+> even though I've tested many rounds and no regression results
+> (including the latency between tcp_wfree and tcp_tsq_handler) show up.
+> My main concern is what the exact benefit/improvement it could bring
+> with the change applied since your BH workqueue commit[1] says the
+> tasklet mechanism has some flaws. I'd like to see if I can
+> reproduce/verify it.
 
-> Also such helper could/should explicitly convert ifr->ifr_hwaddr to
-> sockaddr_storage and avoid the cast.
+There won't be any behavioral benefits. It's mostly that it'd be great to
+get rid of tasklets with something which is more generic, so if BH workqueue
+doesn't regress, we want to keep moving users to BH workqueue until all
+tasklet users are gone and then remove tasklet.
 
-It's UAPI, so it looked verrrry painful to change.
+Thanks.
 
 -- 
-Kees Cook
+tejun
 
