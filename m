@@ -1,128 +1,222 @@
-Return-Path: <netdev+bounces-193592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65081AC4BB6
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:46:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CBCAC4BB8
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FCB53A1F20
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:46:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1468D16F471
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FC424DD15;
-	Tue, 27 May 2025 09:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DBB1F4CBE;
+	Tue, 27 May 2025 09:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="nkYzepnj";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="q4cc8D7g"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sf0H2jut"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9451F4CB7;
-	Tue, 27 May 2025 09:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EDE1E3DF2;
+	Tue, 27 May 2025 09:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748339189; cv=none; b=cHqoAh538KrSqkPKT99PHFKKGpJ5t2OIyOofzZTu0sUAUt+wwrGQUj14C/US1omI232FZ4JNtK02akz+yUhl8H7eKgV+IIW31EyViDJ/IGs1STwfVugvGDzeX4xM2h9Im7apFiuVk8dnVVOAXLEF95ym/tpLu9gW72YI2vhnPZ8=
+	t=1748339220; cv=none; b=TQr49hemw0EiA92kE7VLzjgDxelkSC44GWXXETuLBl6He+tnhEZ/hxQEJXFC4OTb2u9zalqAKjeW258zHfUHmwaIAB6lyn7e+HUyQa6tYEovo/gZx8XCZXgy3/PucQshR6TocxUtaPUDNi/KVWB8ZAvAsC9Y5iUR8SzSLlsA1QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748339189; c=relaxed/simple;
-	bh=TfFXZn1dpHStIOf7lIR/pkhMML543UI/3a9XGnlT5A8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TcwV0EnC79iDHSnN9+DsVI4t5wgouwm83AwDQNQ+U/lJswuUrfVBdFsFZeuQklLbxt+d4YiV4SxBQuo6c/IFQ82QCmE3XTRKqRMIPqJMfOz0zJNCdGL92MiM1dh5xJ3YPa3tith4FGvUt/cvINfY0Uca+nFqJ4J7b/2Qht8n3HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=nkYzepnj; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=q4cc8D7g; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id EA8046075B; Tue, 27 May 2025 11:46:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1748339183;
-	bh=wF8+725t9IjvreKoJRB1cw+hQ1FFw/9YT1HOity+xK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nkYzepnjfWHqMvpMsJMuoGZKNpXatdSQ+nknUhMmq+xyh8OAyP/9+kSEUN7k+oKZp
-	 l5Mq9tEU3yIXJ8QO/x0UoldsAMB+ANyqNH323KGKyfD6M9NCyNVvgK/59iMsDXwA/E
-	 0aCqUyD3nSUWSyvKKqXkoIBY0a+dPWrAFMDOp5jRWS+HdAB/cU7NnNNTEYvyadRlyU
-	 Q6opkIMV409rjnh793dkudYOXMsV3Juw2mnZypEcfzfSaY1lcyb/VwaqJIGEjnDdfK
-	 L6fUap9aVGw31RC/DtiU4f9AtZQVCCgIv7Ib+nDlUIswPC6h69ven9hdOYocpLnFZQ
-	 mKTn6tzNSGhUA==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id F222C60272;
-	Tue, 27 May 2025 11:46:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1748339182;
-	bh=wF8+725t9IjvreKoJRB1cw+hQ1FFw/9YT1HOity+xK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q4cc8D7g3M7INkK1mkvp+K9Us8ysAJ4YBLFitV8UK01f8CW++CzHfSfHy5ZryjVvr
-	 3/biMTOrvc+YPt+z/Sh5xNrWQ8fkxmhFRnNHLf4ahFEj6KV8mE4Za0CkGEoDZI0mbP
-	 SmARPgWZVVV7SAdROTAWrm+SVLDPgfHzAf86g0xwcMgX3O9kSrE7ZGKDN+SfV9zPf8
-	 x22y/WN7E7NuIuVgRh4Rth9077ekscMoP1fo+ERsO+8icFgZApE6BT2gYEo/xs952C
-	 CV+2V2QU6czEMocIrsq3A+au41+cl/K8sxgU52DC9nI7JpO4Lwjxzjt1iMdtmTwEtC
-	 wGtgb6W+1N50Q==
-Date: Tue, 27 May 2025 11:46:20 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Phil Sutter <phil@nwl.cc>
-Cc: Paolo Abeni <pabeni@redhat.com>, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	edumazet@google.com, fw@strlen.de, horms@kernel.org
-Subject: Re: [net-next PATCH] selftests: netfilter: Fix skip of wildcard
- interface test
-Message-ID: <aDWJ7DyVyt3Rq-Gc@calendula>
-References: <20250527094117.18589-1-phil@nwl.cc>
+	s=arc-20240116; t=1748339220; c=relaxed/simple;
+	bh=Ec8dq61GVd2iWwihDdYv8LezbdVHrMZqfCBS0md7hS0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n1cL2Gd981GvGjunaYKdbjV5U/E0ZCw3W4/Y3Ii6K/rwJigqGEJNJyX5WUCXBZk/mvtdwoyR8ZRag5z28QFkEadetCzxmDN6LpRU27tODHo//IYHCoZjUyW4Mqay9y0G0xpvTJVWqMyPl/quTXwH5VThayT2fEmcEiPxgQczoJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sf0H2jut; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3a0cbaf2-4da8-466c-9e00-54a141e67f38@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748339214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W2mToIyIa5Ja0YaaEHQEF3YpU/0epNXWQBEOE7nzIqI=;
+	b=sf0H2jutzm+M6Kewo8aEN82uyhjWN2Cy7AQjNbz3gsYy9718T7noxdgiyaAQMzuovju2Mq
+	/hI2hQ9BfEwJUTDq/TCF/XzG2SMO13rKEYk55du1CQBT8ixog/9/tOFxD0m4TPKB+rQI4+
+	Y5KjB0kw+JLuxGzJCjmesXDL/QguquI=
+Date: Tue, 27 May 2025 17:46:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250527094117.18589-1-phil@nwl.cc>
+Subject: Re: [PATCH] net: stmmac: set multicast filter to zero if feature is
+ unsupported
+To: Nikunj Kela <nikunj.kela@sima.ai>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com
+Cc: rmk+kernel@armlinux.org.uk, 0x1207@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250523221938.2980773-1-nikunj.kela@sima.ai>
+ <e0552940-9fbe-4375-a9a9-e26cd425591a@linux.dev>
+ <93ae82e6-44f4-4f2f-b3b6-71240f84500c@sima.ai>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <93ae82e6-44f4-4f2f-b3b6-71240f84500c@sima.ai>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 27, 2025 at 11:41:17AM +0200, Phil Sutter wrote:
-> The script is supposed to skip wildcard interface testing if unsupported
-> by the host's nft tool. The failing check caused script abort due to
-> 'set -e' though. Fix this by running the potentially failing nft command
-> inside the if-conditional pipe.
 
-Thanks Phil, this is an easy fix for this.
+在 5/27/25 12:17 AM, Nikunj Kela 写道:
+>
+> On 5/25/25 7:09 PM, Yanteng Si wrote:
+>> 在 5/24/25 6:19 AM, Nikunj Kela 写道:
+>>> Hash based multicast filtering is an optional feature. Currently,
+>>> driver overrides the value of multicast_filter_bins based on the hash
+>>> table size. If the feature is not supported, hash table size reads 0
+>>> however the value of multicast_filter_bins remains set to default
+>>> HASH_TABLE_SIZE which is incorrect. Let's override it to 0 if the
+>>> feature is unsupported.
+>>>
+>>> Signed-off-by: Nikunj Kela <nikunj.kela@sima.ai>
+>>> ---
+>>>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
+>>>   1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c 
+>>> b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> index 085c09039af4..ccea9f811a05 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>>> @@ -7241,6 +7241,9 @@ static int stmmac_hw_init(struct stmmac_priv 
+>>> *priv)
+>>>                       (BIT(priv->dma_cap.hash_tb_sz) << 5);
+>>>               priv->hw->mcast_bits_log2 =
+>>> ilog2(priv->hw->multicast_filter_bins);
+>>> +        } else {
+>>> +            priv->hw->multicast_filter_bins = 0;
+>>> +            priv->hw->mcast_bits_log2 = 0;
+>>>           }
+>>
+>> I didn't read the code carefully, just did a simple search：
+>>
+>> ❯ grep -rn multicast_filter_bins drivers/net/
+>> drivers/net/ethernet/stmicro/stmmac/common.h:611:    unsigned int 
+>> multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c:26: 
+>> plat_dat->multicast_filter_bins = 0;
+>> ***
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:512: 
+>> plat->multicast_filter_bins = HASH_TABLE_SIZE;
+>> ***
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:536: 
+>> &plat->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:541: 
+>> plat->multicast_filter_bins = dwmac1000_validate_mcast_bins(
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:542: 
+>> &pdev->dev, plat->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:523: 
+>> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:527:    if 
+>> (mac->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c:528: 
+>> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:516: 
+>> (netdev_mc_count(dev) > hw->multicast_filter_bins)) {
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1527: 
+>> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1531:    if 
+>> (mac->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1532: 
+>> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1568: 
+>> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1572:    if 
+>> (mac->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:1573: 
+>> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:543: if 
+>> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:633: if 
+>> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_selftests.c:679: if 
+>> (netdev_mc_count(priv->dev) >= priv->hw->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:31: 
+>> plat->multicast_filter_bins = HASH_TABLE_SIZE;
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:84: 
+>> plat->multicast_filter_bins = HASH_TABLE_SIZE;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:98: 
+>> plat->multicast_filter_bins = 256;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:365: 
+>> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:369:    if 
+>> (mac->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:370: 
+>> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:7240: 
+>> priv->hw->multicast_filter_bins =
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:7243: 
+>> ilog2(priv->hw->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:570: 
+>> plat->multicast_filter_bins = HASH_TABLE_SIZE;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:707: 
+>> plat->multicast_filter_bins = HASH_TABLE_SIZE;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c:479: 
+>> plat_dat->multicast_filter_bins = 0;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:456:    int 
+>> numhashregs = (hw->multicast_filter_bins >> 5);
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:485: 
+>> (netdev_mc_count(dev) > hw->multicast_filter_bins)) {
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1057: 
+>> mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1061:    if 
+>> (mac->multicast_filter_bins)
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c:1062: 
+>> mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c:43: 
+>> plat_dat->multicast_filter_bins = HASH_TABLE_SIZE;
+>>
+>> and
+>>
+>> drivers/net/ethernet/stmicro/stmmac/common.h:265:#define 
+>> HASH_TABLE_SIZE 64
+>>
+>>
+>> From the search results, the default value of multicast_filter_bins
+>> may be meaningful. And I think that even if some hardware does not
+>> support this feature, it should still be overridden in its own 
+>> directory.
+>
+> There is a DT property 'snps,multicast-filter-bins' available to 
+> override the default value for a platform however this property is not 
+> taken into consideration in case of xgmac. That being said, 
+> stmmac_platform.c logic can be modified to extend the property use for 
+> xgmac also however the value will be overridden later based on hash 
+> table size read from the HW Feature register. So only zero value will 
+> be usable via DT in that case. Hence I thought of setting it to 0 in 
+> the else part of the code I 
 
-> Fixes: 73db1b5dab6f ("selftests: netfilter: Torture nftables netdev hooks")
-> Signed-off-by: Phil Sutter <phil@nwl.cc>
+> modified in this patch. If you think I should extend the DT property 
+> for xgmac, I can modify the patch too. 
 
-Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Thanks for your reply. I think this is better.
 
-Paolo, you can take this now to calm down CI. Thanks
 
-> ---
->  .../selftests/net/netfilter/nft_interface_stress.sh        | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/netfilter/nft_interface_stress.sh b/tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-> index 11d82d11495e..5ff7be9daeee 100755
-> --- a/tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-> +++ b/tools/testing/selftests/net/netfilter/nft_interface_stress.sh
-> @@ -97,7 +97,8 @@ kill $nft_monitor_pid
->  kill $rename_loop_pid
->  wait
->  
-> -ip netns exec $nsr nft -f - <<EOF
-> +wildcard_prep() {
-> +	ip netns exec $nsr nft -f - <<EOF
->  table ip t {
->  	flowtable ft_wild {
->  		hook ingress priority 0
-> @@ -105,7 +106,9 @@ table ip t {
->  	}
->  }
->  EOF
-> -if [[ $? -ne 0 ]]; then
-> +}
-> +
-> +if ! wildcard_prep; then
->  	echo "SKIP wildcard tests: not supported by host's nft?"
->  else
->  	for ((i = 0; i < 100; i++)); do
-> -- 
-> 2.49.0
-> 
+Thanks,
+
+Yanteng
+
+
+>
+> Thanks,
+>
+> -Nikunj
+>
+>>
+>>
+>> Thanks,
+>> Yanteng
+>>
 
