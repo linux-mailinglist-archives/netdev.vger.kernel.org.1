@@ -1,151 +1,355 @@
-Return-Path: <netdev+bounces-193569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E57ADAC4872
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:34:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2E3AC489C
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:47:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C8CA3B14C9
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 06:33:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 460D07A24CA
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 06:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7A11A8412;
-	Tue, 27 May 2025 06:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AF81F582A;
+	Tue, 27 May 2025 06:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iTT/ha7J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dRhTprsx"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082E31FDA;
-	Tue, 27 May 2025 06:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6838823A6
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 06:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748327644; cv=none; b=I+qobeysZqcIvEcSGs1BFeL3zQbrs22eTX/nTBXuUuN0HTslOwFwalrjhG+po7I1va60M2/fIQLaeQCC4+TKbHSzIpfJf+W3hyxwvPLmW+s1WaqxcxW/Vip4wNgDT7fwpua/CTLXd+7s08wV343zHUhjCfgwSZ2fR+55eX5p3dY=
+	t=1748328464; cv=none; b=geEtTUGWCP7NiVf6v41iL50q8fC6y9K4ApUIk44Ue+pp6iyvXk2FAOxbBrBAHGJ3K3AXIRnbaoGUj/W6MGSDZJtLYJx/pG9RqChbkEcxXbekPn6KccKc51M14qN1bujfE6oi6oshNYO9yu+NBzJGbxj3vKCXPR2Eofow9fX5mJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748327644; c=relaxed/simple;
-	bh=JV9uwfMeqS5yo5RlpTRU1f6m93bVKCkDBbcdJfcgAzU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HGGU9WsQyKXaqUn+N5WPhCNhsDn5QqHOMjuz1feMsbz7pLNO6Q/OiQ/f3zS4LL6qxaCXL5HsXIXoLfzffE4PWsudV1NwS97jnbvmk2kzFGLNHWtLv0Co86ZuII8l6o131zRZITkQgKY0saQucBMTS9Q7gzTM6YwDcsPb7DPxDeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iTT/ha7J; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C8FF0439C2;
-	Tue, 27 May 2025 06:33:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1748327632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=SFColjhD+ZIQe8shEgoNm7cyd5RsBR22PLT/iSw2KnI=;
-	b=iTT/ha7JeUVtvvaV4TC0Yo2Iun82pKT2PWEea29/lNy8pcP+X/gsT258u8YZurLw9vXbwe
-	ZxRJuBpfJ4MGd6c/dakV2MjDrfSi+2h24j+PLtkCqdB4ypuoBe52ryvYoK4qhsKaLa8Djn
-	fhh7q8NLLpcMb9c5Jp4Vqx6418Ro9wZhFFe3pcP5NngrDg8UIewPys25oVfqWpD8us0Erg
-	FdPZvXa5ogYrFzIXoEBQNlB5NIEW7xVZWc/vzpRF8dKWIMysZLAqYECEbp1gHTWktF/UZu
-	BBstWqjtJawASZAU0RcV4+sN6oZstRMO8ikf2whqRrnQOvY5yuLRurA+pYbNdQ==
-From: =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Date: Tue, 27 May 2025 08:33:44 +0200
-Subject: [PATCH v2] net: stmmac: add explicit check and error on invalid
- PTP clock rate
+	s=arc-20240116; t=1748328464; c=relaxed/simple;
+	bh=I4wzHzDJ+8zZKxQvV9AlV/3OFAijXL/3idDMRGdsPps=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ahrN+E87VA3aL3Yw4YtNzco3+dI63cHEoxgcL8PVzWzG4qr4UWvjpNFVFR7fSce1LIOAHWrhURNT9X6ucGBfmeqdCyeF4ajiMqIl8KElHxqhmE5jvN9ewjH3QV1WgGqTdp7xk+a/hwyWOS36OR35wGUvOK5KaHTi7rcbmw/k+Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dRhTprsx; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748328462; x=1779864462;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I4wzHzDJ+8zZKxQvV9AlV/3OFAijXL/3idDMRGdsPps=;
+  b=dRhTprsxluo5a7j4+RAAGFlePZGM/7qYFtG54xar2yXI8bVxOHOoaJ4Y
+   0DQAmaYwE+4IfJhc3l3v6odhVJ0m2SRCj9rpCyGCADuwBrfrXWpYWokd+
+   Rce3W1XISHUbjnpH5w7eHci24Z/5CHmDaphGjQnGN7Hxp7cuWVPEXEOh3
+   QlrlSYdjImWkLkI3fJ/dO6rlAu++b4QnHoE9dXmMcAPEtnu60sl/ojO+s
+   a9nNc3QaDwRfUr2zR+axv2wttIqHk52mGw/WNTKJXYzY9xcKYd3mybjdg
+   Jxk44SE72jxOC+7D8l/OZPOBSa/w9/Sjlt+JBpkbQdaKjAKPOGPKjJVXV
+   w==;
+X-CSE-ConnectionGUID: YlRnB0MVQRe0UHsShxo4ow==
+X-CSE-MsgGUID: lP2AxKgoTkaeXu28JTPfSA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11445"; a="53958187"
+X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
+   d="scan'208";a="53958187"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 23:47:42 -0700
+X-CSE-ConnectionGUID: 1hBslaCfT9C9WHYXTGbumw==
+X-CSE-MsgGUID: EgBudyivS7SiG4jfkgBRVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
+   d="scan'208";a="179862687"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 26 May 2025 23:47:38 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uJo63-000Sym-0W;
+	Tue, 27 May 2025 06:47:35 +0000
+Date: Tue, 27 May 2025 14:46:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saikrishnag@marvell.com,
+	gakula@marvell.com, hkelam@marvell.com, sgoutham@marvell.com,
+	lcherian@marvell.com, bbhushan2@marvell.com, jerinj@marvell.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: Re: [net PATCH] octeontx2-pf: Avoid typecasts by simplifying
+ otx2_atomic64_add macro
+Message-ID: <202505271459.ZZab1GQF-lkp@intel.com>
+References: <1748274232-20835-1-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250527-stmmac_tstamp_div-v2-1-663251b3b542@bootlin.com>
-X-B4-Tracking: v=1; b=H4sIAMdcNWgC/22NQQrCMBBFryKzNpJMjVVX3kNKmaapHTBNSUJQS
- u9uLLhz+R789xeINrCNcN0tEGzmyH4qgPsdmJGmhxXcFwaUqKVGFDE5R6ZNMZGb256zGLRWCgd
- 5kniBspuDHfi1Ne9N4ZFj8uG9XWT1tb9a9aeWlVCiM3QmTRUd6/rWeZ+ePB2Md9Cs6/oB1TS4B
- 7QAAAA=
-X-Change-ID: 20250522-stmmac_tstamp_div-f55112f06029
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Phil Reid <preid@electromag.com.au>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.14.2
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdduleeikeculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkffvvefosehtkeertdertdejnecuhfhrohhmpeetlhgvgihishcunfhothhhohhrrocuoegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudekveeftdeifedvfefgvdfgjeduieevudeltdeulefhhefgiedvhfethffgffegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepvdgrtddvmeekgedvkeemfhelgegtmegvtddtmeemugeiheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeegvdekmehfleegtgemvgdttdemmeguieehpdhhvghloheplgduledvrdduieekrddurddvtdekngdpmhgrihhlfhhrohhmpegrlhgvgihishdrlhhothhhohhrvgessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhop
- egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrlhgvgigrnhgurhgvrdhtohhrghhuvgesfhhoshhsrdhsthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepjhhorggsrhgvuhesshihnhhophhshihsrdgtohhmpdhrtghpthhtohepphhrvghiugesvghlvggtthhrohhmrghgrdgtohhmrdgruh
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1748274232-20835-1-git-send-email-sbhatta@marvell.com>
 
-The stmmac platform drivers that do not open-code the clk_ptp_rate value
-after having retrieved the default one from the device-tree can end up
-with 0 in clk_ptp_rate (as clk_get_rate can return 0). It will
-eventually propagate up to PTP initialization when bringing up the
-interface, leading to a divide by 0:
+Hi Subbaraya,
 
- Division by zero in kernel.
- CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.12.30-00001-g48313bd5768a #22
- Hardware name: STM32 (Device Tree Support)
- Call trace:
-  unwind_backtrace from show_stack+0x18/0x1c
-  show_stack from dump_stack_lvl+0x6c/0x8c
-  dump_stack_lvl from Ldiv0_64+0x8/0x18
-  Ldiv0_64 from stmmac_init_tstamp_counter+0x190/0x1a4
-  stmmac_init_tstamp_counter from stmmac_hw_setup+0xc1c/0x111c
-  stmmac_hw_setup from __stmmac_open+0x18c/0x434
-  __stmmac_open from stmmac_open+0x3c/0xbc
-  stmmac_open from __dev_open+0xf4/0x1ac
-  __dev_open from __dev_change_flags+0x1cc/0x224
-  __dev_change_flags from dev_change_flags+0x24/0x60
-  dev_change_flags from ip_auto_config+0x2e8/0x11a0
-  ip_auto_config from do_one_initcall+0x84/0x33c
-  do_one_initcall from kernel_init_freeable+0x1b8/0x214
-  kernel_init_freeable from kernel_init+0x24/0x140
-  kernel_init from ret_from_fork+0x14/0x28
- Exception stack(0xe0815fb0 to 0xe0815ff8)
+kernel test robot noticed the following build warnings:
 
-Prevent this division by 0 by adding an explicit check and error log
-about the actual issue.
+[auto build test WARNING on net/main]
 
-Fixes: 19d857c9038e ("stmmac: Fix calculations for ptp counters when clock input = 50Mhz.")
-Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
----
-Changes in v2:
-- Add Fixes tag
-- Reword commit message to clarify the triggering cause of the issue
-- Link to v1: https://lore.kernel.org/r/20250523-stmmac_tstamp_div-v1-1-bca8a5a3a477@bootlin.com
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/Subbaraya-Sundeep/octeontx2-pf-Avoid-typecasts-by-simplifying-otx2_atomic64_add-macro/20250526-234505
+base:   net/main
+patch link:    https://lore.kernel.org/r/1748274232-20835-1-git-send-email-sbhatta%40marvell.com
+patch subject: [net PATCH] octeontx2-pf: Avoid typecasts by simplifying otx2_atomic64_add macro
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250527/202505271459.ZZab1GQF-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250527/202505271459.ZZab1GQF-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 918d7f2e8ba992208d7d6521a1e9dba01086058f..f68e3ece919cc88d0bf199a394bc7e44b5dee095 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -835,6 +835,11 @@ int stmmac_init_tstamp_counter(struct stmmac_priv *priv, u32 systime_flags)
- 	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
- 		return -EOPNOTSUPP;
- 
-+	if (!priv->plat->clk_ptp_rate) {
-+		netdev_err(priv->dev, "Invalid PTP clock rate");
-+		return -EINVAL;
-+	}
-+
- 	stmmac_config_hw_tstamping(priv, priv->ptpaddr, systime_flags);
- 	priv->systime_flags = systime_flags;
- 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505271459.ZZab1GQF-lkp@intel.com/
 
----
-base-commit: e0e2f78243385e7188a57fcfceb6a19f723f1dff
-change-id: 20250522-stmmac_tstamp_div-f55112f06029
+All warnings (new ones prefixed by >>):
 
-Best regards,
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:22:
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                    ^
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_q_intr_handler':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1314:23: note: in expansion of macro 'otx2_atomic64_add'
+    1314 |                 val = otx2_atomic64_add((qidx << 44), ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1314:23: note: in expansion of macro 'otx2_atomic64_add'
+    1314 |                 val = otx2_atomic64_add((qidx << 44), ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1353:23: note: in expansion of macro 'otx2_atomic64_add'
+    1353 |                 val = otx2_atomic64_add((qidx << 44), ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:1353:23: note: in expansion of macro 'otx2_atomic64_add'
+    1353 |                 val = otx2_atomic64_add((qidx << 44), ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+--
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:17:
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                    ^
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c: In function 'otx2_nix_rq_op_stats':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:34:24: note: in expansion of macro 'otx2_atomic64_add'
+      34 |         stats->bytes = otx2_atomic64_add(incr, ptr);
+         |                        ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:34:24: note: in expansion of macro 'otx2_atomic64_add'
+      34 |         stats->bytes = otx2_atomic64_add(incr, ptr);
+         |                        ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:37:23: note: in expansion of macro 'otx2_atomic64_add'
+      37 |         stats->pkts = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:37:23: note: in expansion of macro 'otx2_atomic64_add'
+      37 |         stats->pkts = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c: In function 'otx2_nix_sq_op_stats':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:47:24: note: in expansion of macro 'otx2_atomic64_add'
+      47 |         stats->bytes = otx2_atomic64_add(incr, ptr);
+         |                        ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:47:24: note: in expansion of macro 'otx2_atomic64_add'
+      47 |         stats->bytes = otx2_atomic64_add(incr, ptr);
+         |                        ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:50:23: note: in expansion of macro 'otx2_atomic64_add'
+      50 |         stats->pkts = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:50:23: note: in expansion of macro 'otx2_atomic64_add'
+      50 |         stats->pkts = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c: In function 'otx2_sqb_flush':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:873:23: note: in expansion of macro 'otx2_atomic64_add'
+     873 |                 val = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c:873:23: note: in expansion of macro 'otx2_atomic64_add'
+     873 |                 val = otx2_atomic64_add(incr, ptr);
+         |                       ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:805:1: warning: control reaches end of non-void function [-Wreturn-type]
+     805 | }
+         | ^
+--
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c:18:
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                    ^
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+--
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h:11,
+                    from drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:11:
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                    ^
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c: In function 'otx2_qos_sqb_flush':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+   drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:159:15: note: in expansion of macro 'otx2_atomic64_add'
+     159 |         val = otx2_atomic64_add(incr, ptr);
+         |               ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c:159:15: note: in expansion of macro 'otx2_atomic64_add'
+     159 |         val = otx2_atomic64_add(incr, ptr);
+         |               ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:805:1: warning: control reaches end of non-void function [-Wreturn-type]
+     805 | }
+         | ^
+--
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c:13:
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h: In function 'otx2_aura_allocptr':
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:52: warning: dereferencing 'void *' pointer
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                    ^
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:751:57: error: invalid use of void expression
+     751 | #define otx2_atomic64_add(incr, ptr)            ({ *ptr += incr; })
+         |                                                         ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:804:16: note: in expansion of macro 'otx2_atomic64_add'
+     804 |         return otx2_atomic64_add(incr, ptr);
+         |                ^~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:805:1: warning: control reaches end of non-void function [-Wreturn-type]
+     805 | }
+         | ^
+
+
+vim +751 drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+
+caa2da34fd25a3 Sunil Goutham     2020-01-27  748  
+caa2da34fd25a3 Sunil Goutham     2020-01-27  749  #else
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  750  #define otx2_write128(lo, hi, addr)		writeq((hi) | (lo), addr)
+caa2da34fd25a3 Sunil Goutham     2020-01-27 @751  #define otx2_atomic64_add(incr, ptr)		({ *ptr += incr; })
+caa2da34fd25a3 Sunil Goutham     2020-01-27  752  #endif
+caa2da34fd25a3 Sunil Goutham     2020-01-27  753  
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  754  static inline void __cn10k_aura_freeptr(struct otx2_nic *pfvf, u64 aura,
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  755  					u64 *ptrs, u64 num_ptrs)
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  756  {
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  757  	struct otx2_lmt_info *lmt_info;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  758  	u64 size = 0, count_eot = 0;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  759  	u64 tar_addr, val = 0;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  760  
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  761  	lmt_info = per_cpu_ptr(pfvf->hw.lmt_info, smp_processor_id());
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  762  	tar_addr = (__force u64)otx2_get_regaddr(pfvf, NPA_LF_AURA_BATCH_FREE0);
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  763  	/* LMTID is same as AURA Id */
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  764  	val = (lmt_info->lmt_id & 0x7FF) | BIT_ULL(63);
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  765  	/* Set if [127:64] of last 128bit word has a valid pointer */
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  766  	count_eot = (num_ptrs % 2) ? 0ULL : 1ULL;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  767  	/* Set AURA ID to free pointer */
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  768  	ptrs[0] = (count_eot << 32) | (aura & 0xFFFFF);
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  769  	/* Target address for LMTST flush tells HW how many 128bit
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  770  	 * words are valid from NPA_LF_AURA_BATCH_FREE0.
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  771  	 *
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  772  	 * tar_addr[6:4] is LMTST size-1 in units of 128b.
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  773  	 */
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  774  	if (num_ptrs > 2) {
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  775  		size = (sizeof(u64) * num_ptrs) / 16;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  776  		if (!count_eot)
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  777  			size++;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  778  		tar_addr |=  ((size - 1) & 0x7) << 4;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  779  	}
+c5d731c54a1767 Geetha sowjanya   2022-01-21  780  	dma_wmb();
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  781  	memcpy((u64 *)lmt_info->lmt_addr, ptrs, sizeof(u64) * num_ptrs);
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  782  	/* Perform LMTST flush */
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  783  	cn10k_lmt_flush(val, tar_addr);
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  784  }
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  785  
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  786  static inline void cn10k_aura_freeptr(void *dev, int aura, u64 buf)
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  787  {
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  788  	struct otx2_nic *pfvf = dev;
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  789  	u64 ptrs[2];
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  790  
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  791  	ptrs[1] = buf;
+55ba18dc62deff Kevin Hao         2023-01-18  792  	get_cpu();
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  793  	/* Free only one buffer at time during init and teardown */
+ef6c8da71eaffe Geetha sowjanya   2021-09-01  794  	__cn10k_aura_freeptr(pfvf, aura, ptrs, 2);
+55ba18dc62deff Kevin Hao         2023-01-18  795  	put_cpu();
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  796  }
+4c236d5dc8b862 Geetha sowjanya   2021-02-11  797  
+caa2da34fd25a3 Sunil Goutham     2020-01-27  798  /* Alloc pointer from pool/aura */
+caa2da34fd25a3 Sunil Goutham     2020-01-27  799  static inline u64 otx2_aura_allocptr(struct otx2_nic *pfvf, int aura)
+caa2da34fd25a3 Sunil Goutham     2020-01-27  800  {
+22f5790bc6ba33 Subbaraya Sundeep 2025-05-26  801  	void __iomem *ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_ALLOCX(0));
+caa2da34fd25a3 Sunil Goutham     2020-01-27  802  	u64 incr = (u64)aura | BIT_ULL(63);
+caa2da34fd25a3 Sunil Goutham     2020-01-27  803  
+caa2da34fd25a3 Sunil Goutham     2020-01-27 @804  	return otx2_atomic64_add(incr, ptr);
+caa2da34fd25a3 Sunil Goutham     2020-01-27 @805  }
+caa2da34fd25a3 Sunil Goutham     2020-01-27  806  
+
 -- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
