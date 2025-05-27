@@ -1,203 +1,198 @@
-Return-Path: <netdev+bounces-193582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3CB6AC49A6
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:52:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949D7AC4A5E
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 10:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42330170E75
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:52:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BAE97A5CF3
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E2222655B;
-	Tue, 27 May 2025 07:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FAE248F52;
+	Tue, 27 May 2025 08:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJJeJXzs"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="L/Wu17Ru"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBEC22A4D8
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B8F50F;
+	Tue, 27 May 2025 08:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748332367; cv=none; b=K3kq0x+kIaVoIO8Pi7YxFWfblTMCcPrKbiAJoES04fA0T8b3eb0CmRHHnJuxe4kjiDCM/fc9wyiQp5hN3JdFEKvrqTiSIf1gich1UWKQuw+CgmKPvN9P51LM0iBSkqTYJ4Qss6hZOoejg4EUxRN1Qr9Vv72yRrDO/snHB66p2pY=
+	t=1748335085; cv=none; b=Av4EKeWmmGTcjYZBW813EVVC19S8mXFnIPIJ/Pg1fI7ER+00pLmSKNT4sJH8Hy77TRCj30zQbNKwzzp3DiIwck4I6C4Dx29yqgzY7EQazToGJ1qgyqglPcOOdYQ91g/jWT0AAi2ccDtxnmei3KylNvubek9O5+8ZQPXzxdCLhtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748332367; c=relaxed/simple;
-	bh=qw2GQkeeIzLG3xGCKSEEhPdpbiheGul2TtZ2WVSNqQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQArNMu2c0QYuvGiZNa2ZjDKTv2NfiJsTXGtjhi7GVyIEBNTFu93GADhdimKdZN7Iu2ZWguj71hIOa71Z6E0xwvsFGk6oc6h6LUOKvYt0KW/16YWkQHEi27OWszOYp5C9L2xtax6upjMLHyXcmv7W9Y3BW5XE49fV4B79XfGe+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LJJeJXzs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748332365;
+	s=arc-20240116; t=1748335085; c=relaxed/simple;
+	bh=fYlFSLt2vWp0kd5ClMXYMsn4v04SxfbL1CjlQ6KQMfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O0tMqF8QX5hev8FcLfsaRxR9JyR91Hg1LJj6wiuQu5zhr5psGP0ToA1Vsiw9zRKNVIyUrxjdIPY1l7POylXjoODTCBXKzz5GdRajozSbhe+BioYtens60B7q1xV87uPlldJ/PL9PZ23lylYsyqZx/dyZhmGwtHfJc3GkZi9N6vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=L/Wu17Ru; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 02F214396A;
+	Tue, 27 May 2025 08:37:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1748335075;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hxOeHEx725HLRHiV81cg5rWLcCbolT3s1LsCnjE9wGo=;
-	b=LJJeJXzse6hFFXGjpyGwrXFEnRLD4dqy6cknlDShyI6xrUTuTMv57WAvivt9qHlvo0gCe+
-	qFQW+6FNGGBcOWE2rcnwDM2MuOuk8yrdaCJiFnmhhc+YZJM5p2+Xx17f7h/REqV9EPso9c
-	hnSjJYxyFBfkYaoTxIhN8I61kqTpmX8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-b14wBGEQPk6xiMfk2G3S_g-1; Tue, 27 May 2025 03:52:42 -0400
-X-MC-Unique: b14wBGEQPk6xiMfk2G3S_g-1
-X-Mimecast-MFC-AGG-ID: b14wBGEQPk6xiMfk2G3S_g_1748332362
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442dc6f0138so14323795e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 00:52:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748332361; x=1748937161;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hxOeHEx725HLRHiV81cg5rWLcCbolT3s1LsCnjE9wGo=;
-        b=NnaDSEww13Wvbu5mUxHgOso+XJ3Etiob2RnJhl02kqkYwUE1v0fhwT0f/qHyEK/u8l
-         tImSdawCE91jjD/5uD0a4uudd2uU4NbanNHcKiqVY3/PDyh3Bol9dAyQI+w8BNoL2zVq
-         oU0fzskas9g7qnaKLoINq3wBBCtLmfbcEG8gHdkDKGHEbeuKQOlteV23Ih9lvqfUgtXz
-         orTfMwszNTR5GYcS3a9xSNV1NVopbwgCAa0WyYczrQ/4xDm3C14uNSbjT9MBs8BHmmE3
-         nd307NYs4BJVogz7pv1VBtskrwWGTdlG6NJj3cpeaEqZXdOwtMb1PXhM6mIviRihnEeF
-         Mf+g==
-X-Gm-Message-State: AOJu0YxYZNyY+4ZKS/bkbtB9zcAv0IB25yop6JzYDcuTKbRKTAP2i7td
-	dSi8fGlw+/erKILmG20TDO2YEJW2ap+fd1Pdq3QQ/tnvYmzIlUxGskVIMFIsRsFXDvqqMRF9z4G
-	JUAnH7rY3CHCzwvvRCwUamFxgBtT/dL/oUi65T1CXFoE5710SESxCivxGMA==
-X-Gm-Gg: ASbGncuW9l6C5lQMF1bVgKCr9l1SspgrIWvk5S8zi2Bn1nJ2qvdUzzErEYabmGTnPuf
-	ZiJ5Ey5usYaBSs3CR6hcXPYQI8UbaMjJHuvgRhVw8xrpMf+OY9/akqp5MJctbQQicvovvDsd/HL
-	mkmgQPtWd3cPKvzQFrqPS6hlShL0785r6P4GNfsM5NCWNaTplG+Sti6bgw0jle+Ap7uKdPHx9g7
-	h7HWc+yyWgefh7p58pYFAwmqvJM0ea9twTm0xQFSgj1MnRVU+OAS7HQyNtJ45lB8v5W7mtDtqsT
-	D5D2IQcGd4e4jXJUrF/DTMhyk6kzOKLSd8WTSdTw1bCBtoY5Co1HxOoJy7M=
-X-Received: by 2002:a05:600c:218b:b0:442:f44f:65b with SMTP id 5b1f17b1804b1-44c930191b1mr61322695e9.32.1748332361551;
-        Tue, 27 May 2025 00:52:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERmPsXwH93AqVjalbGse8xoO6q6eKOT6A8auaWUx7r1bzC6CSRXPraUYdfDDcfgwx9575l8Q==
-X-Received: by 2002:a05:600c:218b:b0:442:f44f:65b with SMTP id 5b1f17b1804b1-44c930191b1mr61322545e9.32.1748332361061;
-        Tue, 27 May 2025 00:52:41 -0700 (PDT)
-Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f1ef0ab8sm257981885e9.13.2025.05.27.00.52.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 00:52:40 -0700 (PDT)
-Date: Tue, 27 May 2025 09:52:39 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Marios Makassikis <mmakassikis@freebox.fr>
-Cc: netdev@vger.kernel.org, lorenzo@kernel.org, mcroce@microsoft.com,
-	marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [REPOST PATCH] drivers: net: mvpp2: attempt to refill rx before
- allocating skb
-Message-ID: <aDVvR8XXPMEUzztC@lore-desk>
-References: <20250515080039.12c47bd3@kernel.org>
- <20250521171021.2978273-2-mmakassikis@freebox.fr>
+	bh=OpM/KDvQBRopReoEwTUtRipcq4oHwuOqxwS8jNYE+N4=;
+	b=L/Wu17RuqmXs2iCJTa6K4FkUaFxFVCNWTU0ikfQjdsDA5jeQUShmeA+w007rzYIrlWOxer
+	B7k/TE5akU9QTTeEFmPF+gSxCb9h4kH7lioU6oZJVYVaWm12xTPyhHFlfxPIlxhEiAO++e
+	crltFxBXlCoiOODANBDPV/gcGUZFlpu5U3j92Ku4cg8zq8LmiONFVy256H9HRXRqlhuJKL
+	8CEJ8x8XA5dsLBZaf3tzQtk//pYU9pARY8KJsU+bL6KZoQl4GUDbckkpqPpH8rEaT1J6X4
+	koyzY6gP6IcGAo41o9xB9uVq65nCx7bqisT4i1BXiH4K1LgsTteJJwCoYW9iRQ==
+Date: Tue, 27 May 2025 10:37:49 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: lan966x: Make sure to insert the vlan tags
+ also in host mode
+Message-ID: <20250527103749.66505756@2a02-8440-d111-2026-8d50-1f4f-0da2-e170.rev.sfr.net>
+In-Reply-To: <20250527070850.3504582-1-horatiu.vultur@microchip.com>
+References: <20250527070850.3504582-1-horatiu.vultur@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="v5CvJe1XMYPGtXSg"
-Content-Disposition: inline
-In-Reply-To: <20250521171021.2978273-2-mmakassikis@freebox.fr>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdduleelvdculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejfedtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeehteevfeeivdekjeefkeekffefgfdtudetjeehkeegieelheekgfefgfevveffhfenucfkphepledvrdekkedrudejtddriedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledvrdekkedrudejtddriedtpdhhvghlohepvdgrtddvqdekgeegtddqugduudduqddvtddviedqkeguhedtqddufhegfhdqtdgurgdvqdgvudejtddrrhgvvhdrshhfrhdrnhgvthdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeelpdhrtghpthhtohephhhorhgrthhiuhdrvhhulhhtuhhrsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohepfgfpiffnihhnuhigffhrihhvvghrsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtoheprghnughrvgifo
+ dhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello Horatiu,
 
---v5CvJe1XMYPGtXSg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, 27 May 2025 09:08:50 +0200
+Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
 
-> on mvpp2_rx_refill() failure, the freshly allocated skb is freed,
-> the rx error counter is incremented and the descriptor currently
-> being processed is rearmed through mvpp2_bm_pool_put().
->=20
-> the logic is that the system is low on memory so it's not possible
-> to allocate both a rx descriptor and an skb, so we might as well
-> drop the skb and return the descriptor to the rx pool to avoid
-> draining it (and preventing any future packet reception).
-
-Hi Marios,
-
-Can we just run the mvpp2_rx_refill() when the skb has been already
-successfully sent to the networking stack? Doing so, if the skb allocation
-fails, we will refill the in-flight rx descriptor (the one consumed by the
-skb) to the descriptor ring, reducing the pressure on it.
-What do you think?
-
-Regards,
-Lorenzo
-
->=20
-> the skb freeing is unfortunate, as build_skb() takes ownership
-> of the 'data' buffer:
->  - build_skb() calls  __finalize_skb_around() which sets skb->head
->  and skb->data to point to 'data'
->  - dev_free_skb_any() may call skb_free_frag() on skb->head
->=20
-> thus, the final mvpp2_bm_pool_put() rearms a descriptor that was
-> just freed.
->=20
-> call mvpp2_rx_refill() first, so there's no skb to free.
->=20
-> incidentally, doing rx refill prior to skb allocation is what is
-> done in marvell's mvneta driver for armada 370 (mvneta_rx_hwbm() in
-> mvneta.c)
->=20
-> Fixes: d6526926de739 ("net: mvpp2: fix memory leak in mvpp2_rx")
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+> When running these commands on DUT (and similar at the other end)
+> ip link set dev eth0 up
+> ip link add link eth0 name eth0.10 type vlan id 10
+> ip addr add 10.0.0.1/24 dev eth0.10
+> ip link set dev eth0.10 up
+> ping 10.0.0.2/24
+> 
+> The ping will fail.
+> 
+> The reason why is failing is because, the network interfaces for lan966x
+> have a flag saying that the HW can insert the vlan tags into the
+> frames(NETIF_F_HW_VLAN_CTAG_TX). Meaning that the frames that are
+> transmitted don't have the vlan tag inside the skb data, but they have
+> it inside the skb. We already get that vlan tag and put it in the IFH
+> but the problem is that we don't configure the HW to rewrite the frame
+> when the interface is in host mode.
+> The fix consists in actually configuring the HW to insert the vlan tag
+> if it is different than 0.
+> 
+> Fixes: 6d2c186afa5d ("net: lan966x: Add vlan support.")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 > ---
->  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/ne=
-t/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 416a926a8281..e13055ec4483 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -4003,6 +4003,12 @@ static int mvpp2_rx(struct mvpp2_port *port, struc=
-t napi_struct *napi,
->  			metasize =3D xdp.data - xdp.data_meta;
->  		}
-> =20
-> +		err =3D mvpp2_rx_refill(port, bm_pool, pp, pool);
-> +		if (err) {
-> +			netdev_err(port->dev, "failed to refill BM pools\n");
-> +			goto err_drop_frame;
-> +		}
+>  .../ethernet/microchip/lan966x/lan966x_main.c |  1 +
+>  .../ethernet/microchip/lan966x/lan966x_main.h |  1 +
+>  .../microchip/lan966x/lan966x_switchdev.c     |  1 +
+>  .../ethernet/microchip/lan966x/lan966x_vlan.c | 21 +++++++++++++++++++
+>  4 files changed, 24 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> index 427bdc0e4908c..7001584f1b7a6 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+> @@ -879,6 +879,7 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
+>  	lan966x_vlan_port_set_vlan_aware(port, 0);
+>  	lan966x_vlan_port_set_vid(port, HOST_PVID, false, false);
+>  	lan966x_vlan_port_apply(port);
+> +	lan966x_vlan_port_rew_host(port);
+>  
+>  	return 0;
+>  }
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> index 1f9df67f05044..4f75f06883693 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+> @@ -497,6 +497,7 @@ void lan966x_vlan_port_apply(struct lan966x_port *port);
+>  bool lan966x_vlan_cpu_member_cpu_vlan_mask(struct lan966x *lan966x, u16 vid);
+>  void lan966x_vlan_port_set_vlan_aware(struct lan966x_port *port,
+>  				      bool vlan_aware);
+> +void lan966x_vlan_port_rew_host(struct lan966x_port *port);
+>  int lan966x_vlan_port_set_vid(struct lan966x_port *port,
+>  			      u16 vid,
+>  			      bool pvid,
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c b/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
+> index 1c88120eb291a..bcb4db76b75cd 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
+> @@ -297,6 +297,7 @@ static void lan966x_port_bridge_leave(struct lan966x_port *port,
+>  	lan966x_vlan_port_set_vlan_aware(port, false);
+>  	lan966x_vlan_port_set_vid(port, HOST_PVID, false, false);
+>  	lan966x_vlan_port_apply(port);
+> +	lan966x_vlan_port_rew_host(port);
+>  }
+>  
+>  int lan966x_port_changeupper(struct net_device *dev,
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> index fa34a739c748e..f158ec6ab10cc 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+> @@ -149,6 +149,27 @@ void lan966x_vlan_port_set_vlan_aware(struct lan966x_port *port,
+>  	port->vlan_aware = vlan_aware;
+>  }
+>  
+> +/* When the interface is in host mode, the interface should not be vlan aware
+> + * but it should insert all the tags that it gets from the network stack.
+> + * The tags are no in the data of the frame but actually in the skb and the ifh
+                   not
+> + * is confiured already to get this tag. So what we need to do is to update the
+         configured
+> + * rewriter to insert the vlan tag for all frames which have a vlan tag
+> + * different than 0.
+
+Just to be extra clear, the doc seems to say that
+
+	REW_TAG_CFG_TAG_CFG_SET(1);
+
+means "Tag all frames, except when VID=PORT_VLAN_CFG.PORT_VID or
+VID=0."
+
+Another setting for these bits are "Tag all frames except when VID=0",
+which is what you document in the above comment.
+
+In this case, is there any chance that it would make a difference ?
+
+> + */
+> +void lan966x_vlan_port_rew_host(struct lan966x_port *port)
+> +{
+> +	struct lan966x *lan966x = port->lan966x;
+> +	u32 val;
 > +
->  		if (frag_size)
->  			skb =3D build_skb(data, frag_size);
->  		else
-> @@ -4021,13 +4027,6 @@ static int mvpp2_rx(struct mvpp2_port *port, struc=
-t napi_struct *napi,
->  					 skb_hwtstamps(skb));
->  		}
-> =20
-> -		err =3D mvpp2_rx_refill(port, bm_pool, pp, pool);
-> -		if (err) {
-> -			netdev_err(port->dev, "failed to refill BM pools\n");
-> -			dev_kfree_skb_any(skb);
-> -			goto err_drop_frame;
-> -		}
-> -
->  		if (pp)
->  			skb_mark_for_recycle(skb);
->  		else
-> --=20
-> 2.49.0
->=20
->=20
+> +	/* Tag all frames except when VID == DEFAULT_VLAN */
+> +	val = REW_TAG_CFG_TAG_CFG_SET(1);
+> +
+> +	/* Update only some bits in the register */
+> +	lan_rmw(val,
+> +		REW_TAG_CFG_TAG_CFG,
+> +		lan966x, REW_TAG_CFG(port->chip_port));
+> +}
+> +
+>  void lan966x_vlan_port_apply(struct lan966x_port *port)
+>  {
+>  	struct lan966x *lan966x = port->lan966x;
 
---v5CvJe1XMYPGtXSg
-Content-Type: application/pgp-signature; name=signature.asc
+Sorry for the typo nitpicking, but with that :
 
------BEGIN PGP SIGNATURE-----
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaDVvRwAKCRA6cBh0uS2t
-rGAsAP4juNM2CCGS4mpdTIUDn8UqB+xKBicm9RMTsgyg4rfDOwEA0WoSzG9mkygB
-rOtmVdC/ktPn36v84yVnmg0MJQxLfAg=
-=g54o
------END PGP SIGNATURE-----
-
---v5CvJe1XMYPGtXSg--
-
+Maxime
 
