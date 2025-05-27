@@ -1,109 +1,87 @@
-Return-Path: <netdev+bounces-193680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFCCCAC5122
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:44:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C17AC5121
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14DB416BAB7
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:44:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9990B1BA15C8
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F11278153;
-	Tue, 27 May 2025 14:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4787A2798E5;
+	Tue, 27 May 2025 14:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSHoFZqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED698279784;
-	Tue, 27 May 2025 14:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2257C279795
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 14:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748357063; cv=none; b=AKQboBMtdgGXEe8+W9Z4vyyAuPDHKNvWb53UX+uAHXIb+oJ8V9eZWPQ4yUuwZQkcZ65ojz3Ch/nGksm9Bszfgvov4IJxF21hKwLzpPyBC2WdC2i4S1yE/NYdvSxX+9ggEPuqN753FkKLgrAEmITDR6fQnoZHZLmAecpXf0z1izk=
+	t=1748357062; cv=none; b=N71Zf2cYwcBw+Q/zXy7IAX+FDQc5KcFnwYnV6IJ3XBAEFSYF2Pfbu+eC3XZNrFgLTzwiAc7EevS1+5ynfL1FKc66vpgsXq50LB630+du5z35yeiaEsZLQwecwhyCHv/HdOZaIaZdVYeDn8M6zUEkUvitHhoPhdhGS3MFagwd/54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748357063; c=relaxed/simple;
-	bh=hz3Joq1a64C61g0VvccWACRwidc8dzga+FzFmgtuxhM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=apFTk4dfL+k6ZxZB485HcVTNttYqxUS/zE+FSp1giSMgX/O06jmbIFeH2zKcCXObQQKWjBF1nFBq1Dad69bHLLlbsKzN1+LaRAMgli/raCdDb/+GCaAIksZA+xG99Y2mMVzHu4FtkhYzs8NRDuuv5c5xfLZjbnP4EHoM94Lptis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 65C8A61E6478F;
-	Tue, 27 May 2025 16:43:23 +0200 (CEST)
-Message-ID: <7eed2cf1-5d54-4669-9e31-96707a116f01@molgen.mpg.de>
-Date: Tue, 27 May 2025 16:43:22 +0200
+	s=arc-20240116; t=1748357062; c=relaxed/simple;
+	bh=RN0PjJnKPOqD8+uhDQW64JmPn2YyPexaHPC5FUhbnd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WlxZTT7Xn/U6hpT7+BKEYaujhK64+kdJL5u0RLog6+D/PRInIdAcFnHOAzxS4XxIcOWTKkWyjD26Rhd4OnRPmosNHwevvCpCUiKO1xNh99pd1CVT8mtdwNMabC/KlMxtMe6Yzj/tbtRvBlfBGHnz7A35pxlny36fO5ezJxxLaW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSHoFZqL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30AE1C4CEE9;
+	Tue, 27 May 2025 14:44:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748357061;
+	bh=RN0PjJnKPOqD8+uhDQW64JmPn2YyPexaHPC5FUhbnd0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JSHoFZqLLaorccC12Td6uKe+9AIgbRsx3RRF5o/o8qheH/pBQoLSxw4cxGny3gfB2
+	 /UX5EwsZ87ZM/fafmCxoobiZ7lEb0Pfj6Kxom7usb353hbe7vJvyd+ODJE81NK/BCz
+	 D7AFpT88osK3L2DNlEYzbeZhC2hPIPfa7EIZB0oQa+u2hVXMvIuBm98b7Sph66pcav
+	 VL/Bby7Jb2gYDV+DGG4zJBpf82VobTeF2EVo31YjDEX7ybemdb7qYfjG/BLF/MQ96J
+	 qkZEflbgGsWq7+WHDjDwgaINwQVxN7b64PKIef0ryYorz/rMB0Iv9SRxrEb9kW6MBv
+	 p/Yo4W1fUke8Q==
+Date: Tue, 27 May 2025 07:44:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
+ <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
+ "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+ <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
+ <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+ <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+ "Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+ <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+ <amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky,
+ Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
+ "Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
+ <leon@kernel.org>
+Subject: Re: [PATCH v11 net-next 0/8] PHC support in ENA driver
+Message-ID: <20250527074419.40163789@kernel.org>
+In-Reply-To: <jdkiblbwiut4x7t7gtpiatdbiueehvhuqdhn5caoj2ijiil2yr@6xof3oyhruxa>
+References: <20250526060919.214-1-darinzon@amazon.com>
+	<jdkiblbwiut4x7t7gtpiatdbiueehvhuqdhn5caoj2ijiil2yr@6xof3oyhruxa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 1/1] e1000e: fix heap overflow in
- e1000_set_eeprom()
-To: Mikael Wessel <post@mikaelkw.online>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- torvalds@linuxfoundation.org, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, andrew@lunn.ch, kuba@kernel.org,
- pabeni@redhat.com, security@kernel.org, stable@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, linux-kernel@vger.kernel.org
-References: <20250527085612.11354-1-post@mikaelkw.online>
- <20250527085612.11354-2-post@mikaelkw.online>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250527085612.11354-2-post@mikaelkw.online>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Dear Mikael,
+On Mon, 26 May 2025 11:53:14 +0200 Jiri Pirko wrote:
+> Could you please add very simple devlink_port instance of flavour
+> PHYSICAL and link it with netdev? Having devlink instance without the
+> port related to the netdev looks a bit odd.
 
-
-Thank you for your patch.
-
-Am 27.05.25 um 10:56 schrieb Mikael Wessel:
-> The ETHTOOL_SETEEPROM ioctl copies user data into a kmalloc'ed buffer
-> without validating eeprom->len and eeprom->offset.  A CAP_NET_ADMIN
-> user can overflow the heap and crash the kernel or gain code execution.
-> 
-> Validate length and offset before memcpy().
-> 
-> Fixes: bc7f75fa9788 ("[E1000E]: New pci-express e1000 driver (currently for ICH9 devices only)")
-> Reported-by: Mikael Wessel <post@mikaelkw.online>
-> Signed-off-by: Mikael Wessel <post@mikaelkw.online>
-> Cc: stable@vger.kernel.org
-> ---
->   drivers/net/ethernet/intel/e1000e/ethtool.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-> index 9364bc2b4eb1..98e541e39730 100644
-> --- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-> +++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-> @@ -596,6 +596,9 @@ static int e1000_set_eeprom(struct net_device *netdev,
->   	for (i = 0; i < last_word - first_word + 1; i++)
->   		le16_to_cpus(&eeprom_buff[i]);
->   
-> +        if (eeprom->len > max_len ||
-> +            eeprom->offset > max_len - eeprom->len)
-> +                return -EINVAL;
-
-I think you used spaces instead of tabs for indentation. It’d be great 
-if you could fix this, and send v3 tomorrow. Running 
-`scripts/checkpatch.pl` with the patch as an argument, should catch 
-these things.
-
->   	memcpy(ptr, bytes, eeprom->len);
->   
->   	for (i = 0; i < last_word - first_word + 1; i++)
-
-
-Kind regards,
-
-Paul
+'Physical' seems inappropriate for a "host side of an IPU".
+PCI PF if anything, but also I disagree that we need every devlink
+instance to have a port. PTP clocks use devlink and are not networking
+devices at all.
 
