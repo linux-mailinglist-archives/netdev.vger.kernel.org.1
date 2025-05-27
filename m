@@ -1,165 +1,145 @@
-Return-Path: <netdev+bounces-193589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91315AC4B5A
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:19:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DEDAC4B89
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:29:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA7517C83A
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:19:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47ECA7A6BB7
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA0424DCF7;
-	Tue, 27 May 2025 09:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0542505CE;
+	Tue, 27 May 2025 09:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y75tqTOl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcnF3O2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F282B1DF26E
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 09:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28D924BD1F
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 09:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748337542; cv=none; b=nuManA+cdoArt3dkRdwHfPg/o3QQdAnsQgwAAcuRn0w35KYEK2NYQtymitgvx9YvQupOVQ4M3x7oKt+UU7KUkENDFo8EVhfAM86v8NmsocTl+wzmWfRYN1ILEN+6hEMVEXqTyYswEgu+uXpNGJmxHzLD+kj/+w7z7u1gFhMP/ok=
+	t=1748338139; cv=none; b=ovwyhPTkcg6xYmxERmecGCYae6Yha/nkQh3RtpH1HSSuKC3/0Th7NqAzP+4Ao4O/tIJZKgcDIv+Y2aISdaun6pWk12sAd/RaCJrs5de/AN3VNeSwUH+SHwXRGhmIko9H+yVp1v7Ud2zREa41LBDnXmRCDutvgheKRtVIbuavBsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748337542; c=relaxed/simple;
-	bh=ZcsiE8VsJGY/SJgauAXul2G1y5iuid8pqouGSPzQaOM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=t04nCchBgXlWicXj7fX4LWgj4ycM5tKjj21t8pLpzUWx4CFDXriHBKcfYzw8BDUMQhrYEFG1lsoqw5Y+4QN2lwUbz8uSzsxzYRJv6tbfonMfuZ/AMmbrSO12jd9ybmvSH8eifURRNi/ju44mlr8lX3jNWwVNQWAhM/BpA5NZT2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y75tqTOl; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3110462b463so3367754a91.1
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 02:19:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748337540; x=1748942340; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+6sb9vR4ahmHqnY0N3Qi6sQkZ9rrv10CM4PGUMbiSo=;
-        b=y75tqTOl3L7sMt7z8IJAZ8pl8dQMAAgt92wXANWZt3h2cA2dWqb3d1h9jT40Yv/8zw
-         HcPVrrNvuBDosv0ZWFYt1eke2wcaWoJAewwmz8d/0dv3//bUQWVm4z4rNM3IyeKTLr4W
-         2khLrZoSH8rYtJeVHxMHjR7rPeZ39tGDXN0rig34fEvMavirvjAgoVCNUBect0UIBvcw
-         ryhNdTz3yB6r7xoZtoPa+ic0vnq5N31HYeb73i77GS6owlXbiIXwe9EUDkbOy8k/H3uW
-         Iq6SGZhUkRNdqcE6uUI0XWQbB316x1viI0dzpl17RAVsukawduwvHfG7xZ8+etTJKowA
-         Q53w==
+	s=arc-20240116; t=1748338139; c=relaxed/simple;
+	bh=jYEhg75W17+LrrRp5ozft0smLaCDvCUlIDdgZkc8Maw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JhvNwvfhRIXFAauGQNR0SfFuuwuVkaNewVTIPIABOd3uQzIOyw4cXtUie1LwyTx3w0iEgTrDafeC8pARynWKPHVcI3Ytb2j5iI36CdWEJj5s5hhVJYQea+isKurT2oZEfq0fG1Hp2L0T1Z82gCfP+yiCkoDup4bjyRGt0sEFUV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GcnF3O2+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748338136;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d2VX9MfL1HCTriT+S3B9Z1XwLwg3XDZQ+O6lDXv3bE4=;
+	b=GcnF3O2+DhFxEc9GW8lAH0adS9eRHDdbK9qujz628jaSAOdvosEvbho12Xw395xCiZK7QJ
+	ZuNvrRLEIXoPnMFelBvsL+tT5Epk9WZA2rq5QV+0bRaQpSPM57k+CDAgKIDNfHrL9rZLNk
+	bbO6XtMt6TTIrBsKgyVLTUpUr6ZXJ8c=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-195-zmhPnEVFNgmV-ngq6aMtVg-1; Tue, 27 May 2025 05:28:54 -0400
+X-MC-Unique: zmhPnEVFNgmV-ngq6aMtVg-1
+X-Mimecast-MFC-AGG-ID: zmhPnEVFNgmV-ngq6aMtVg_1748338134
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43ceeaf1524so14282905e9.1
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 02:28:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748337540; x=1748942340;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5+6sb9vR4ahmHqnY0N3Qi6sQkZ9rrv10CM4PGUMbiSo=;
-        b=WH+9OLngEM1ZC/cpT8Z0sPJa8deEkjkytGDNFm/yatzawaUONn+fcNdFXguHKCjYO8
-         ixTYdOXlv2fWbD5boNfW6Fxi3e87LcfyYcxHT1JQCl9XSqPuKY7ciO34z2foQdCLqouZ
-         6Ti1zwSpzRBQUDfdQsC74mclyUcoGeRvIL44JlXRieGDMa1MEs95zT6Z0KcsXG3Oug0c
-         VpTfK6/bVPxY6xN0DkpjSJTzu4QDbOkJkl5aFE6ZpphmBPKlcmYPGU6CFyVSrDAZECwH
-         nigpOBF20NgEWg5QmwFEYbl683/yUFU6cF5AuCfMMAxCeTe6TfwjU8EgUfSXlb5B//Hg
-         8FcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlT/Oj5oBdbxFMKDjr6wxnaGef/4k8/G6LbTmFrE0qcsmOunfbZ8nhUW4H7Fw+rdxEaUUqPQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOeWNaqT9F4r4K8JsMZOu1LVsY//N1OUKvxEALYLwVCS8QMarU
-	2P83XWSVBVufBzidG1vRGAjMzNTJV6euTCmLOigvefwj9RQ92BSUb0lCQ+KoC13WMThXaojlfRR
-	x5EuIYIgQOWD3FyzXoZECcW3ETQ==
-X-Google-Smtp-Source: AGHT+IEKkHTv4glwErR8dVXArbvKUI6+TJ+cA7jQ653G2DWqcR73lUfYneMuq9cYAAq8g6aexkFnA+JWaq+2vaSkJA==
-X-Received: from pjqq6.prod.google.com ([2002:a17:90b:5846:b0:311:4c94:2910])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3f0d:b0:2f5:88bb:118 with SMTP id 98e67ed59e1d1-31111657d33mr16592647a91.22.1748337540290;
- Tue, 27 May 2025 02:19:00 -0700 (PDT)
-Date: Tue, 27 May 2025 18:18:55 +0900
+        d=1e100.net; s=20230601; t=1748338133; x=1748942933;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d2VX9MfL1HCTriT+S3B9Z1XwLwg3XDZQ+O6lDXv3bE4=;
+        b=bTWtneuWbR1TaNtwcvDpTS3/pWSqKuDCOowWwXFaRKDLvimHXWVhR9Z6Eu2xroeQKz
+         Cdg+cgzrWiWaP/UB9iJ4jExCsYwU3Es+gYJhoKp0L8KuWXZ1cyr66Pt/PnjVkKJWfPsS
+         +IZmQ7iTVh0lfvVNM07fBxIUpah0T/tQRV1dVgFV0GG7UR5w8sqDrHASV6JEOevlQJ9o
+         bVVdjpUN10YHp6//1WWYd0jIIJ4Ke1Eqf+B0h6ycDMX/8Yn/G7r7qTnnIQ1q95d1vH78
+         eDjBI/kqGq441LyNrcLEO5hKQlylUu3ugMAQwgxSoy2VfaNXM//PtCAnGXWWhZ82J1y7
+         EFRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXyZjQQFSZI0xNlPCayoFqufeOZhPjTbInG1U+nd8qfr5LVM4rDL9mrROwOc+R2s7eGIuv56X8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAQX4zxhOQbqEh//h7Bx3yVgLK0qfPwkMtB3peQP2pqupiyVQt
+	5z65DF8HH2RsvSCJ4eqr7Rp/m7A3lHDeQ0QaIuDvoacJskkOGIEky5fZZemh9e9xtF2VVSWXO44
+	ZBnheTDr6p0iT+YJv6nur6LTWhvw7XLJ98YTDjHt0T1V1XHfJ3edR1AJUUQ==
+X-Gm-Gg: ASbGncuZ/GwvGE/YLXZCIwnU+8Ka27M+2A8f9q3eVqtm6H0eL1fxnWO0wrDLUTqGirO
+	JvxUwI9WNPUqi8/JGDFUCdBWKZ3fez18VVZt6LDwdjYv8n3n5lx3Kapf1VHmSJwSawQcbMqXglg
+	0MNLB5WChxhhhGpiSvwXujY7PxOi/pTzWFJdwPyHb4MYcaviQ43NQIJJufKeIcMvRoutgrA1oqW
+	UfJSE8QE/QxgTAXm7YAWadAalvWxn1ByV5SOBwBXcKEH8IVYqt3ZVcz9gOY2DlQZZzXVPLswuTg
+	RiQ2dcF8NZKRKLog84U=
+X-Received: by 2002:a05:600c:1d0a:b0:43d:186d:a4bf with SMTP id 5b1f17b1804b1-44c77bf3aa2mr98283945e9.0.1748338133537;
+        Tue, 27 May 2025 02:28:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFW/XvOutq354S3u3kVQy6maNZpndfNYmmZuqtvnQwyMkFCqY+qleAw2OpAQBAisEp90oBu4Q==
+X-Received: by 2002:a05:600c:1d0a:b0:43d:186d:a4bf with SMTP id 5b1f17b1804b1-44c77bf3aa2mr98283485e9.0.1748338133127;
+        Tue, 27 May 2025 02:28:53 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4e4c4739csm290454f8f.0.2025.05.27.02.28.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 02:28:52 -0700 (PDT)
+Message-ID: <ea6b8065-76e4-45c8-a51f-858abab4d639@redhat.com>
+Date: Tue, 27 May 2025 11:28:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250527091855.340837-1-yuyanghuang@google.com>
-Subject: [PATCH net-next] selftest: Add selftest for multicast address notifications
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next,v5] net: mana: Add handler for hardware servicing
+ events
+To: Haiyang Zhang <haiyangz@microsoft.com>, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+ paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+ davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+ kuba@kernel.org, leon@kernel.org, longli@microsoft.com,
+ ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+ kotaranov@microsoft.com, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <1747873343-3118-1-git-send-email-haiyangz@microsoft.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <1747873343-3118-1-git-send-email-haiyangz@microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
-and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
-removing a dummy interface and then confirming that the system
-correctly receives join and removal notifications for the 224.0.0.1
-and ff02::1 multicast addresses.
+On 5/22/25 2:22 AM, Haiyang Zhang wrote:
+> @@ -400,6 +448,33 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+>  		eq->eq.callback(eq->eq.context, eq, &event);
+>  		break;
+>  
+> +	case GDMA_EQE_HWC_FPGA_RECONFIG:
+> +		dev_info(gc->dev, "Recv MANA service type:%d\n", type);
+> +
+> +		if (gc->in_service) {
+> +			dev_info(gc->dev, "Already in service\n");
+> +			break;
+> +		}
+> +
+> +		if (!try_module_get(THIS_MODULE)) {
+> +			dev_info(gc->dev, "Module is unloading\n");
+> +			break;
+> +		}
+> +
+> +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> +		if (!mns_wk) {
+> +			module_put(THIS_MODULE);
+> +			break;
+> +		}
+> +
+> +		dev_info(gc->dev, "Start MANA service type:%d\n", type);
+> +		gc->in_service = true;
+> +		mns_wk->pdev = to_pci_dev(gc->dev);
+> +		pci_dev_get(mns_wk->pdev);
 
-The test relies on the iproute2 version to be 6.13+.
+Acquiring both the device and the module reference is confusing and
+likely unnecessary. pci_dev_get() should suffice.
 
-Tested by the following command:
-$ vng -v --user root --cpus 16 -- \
-make -C tools/testing/selftests TARGETS=3Dnet TEST_PROGS=3Drtnetlink.sh \
-TEST_GEN_PROGS=3D"" run_tests
-
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
- tools/testing/selftests/net/rtnetlink.sh | 34 ++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
-
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selft=
-ests/net/rtnetlink.sh
-index 2e8243a65b50..9dbcaaeaf8cd 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -21,6 +21,7 @@ ALL_TESTS=3D"
- 	kci_test_vrf
- 	kci_test_encap
- 	kci_test_macsec
-+	kci_test_mcast_addr_notification
- 	kci_test_ipsec
- 	kci_test_ipsec_offload
- 	kci_test_fdb_get
-@@ -1334,6 +1335,39 @@ kci_test_mngtmpaddr()
- 	return $ret
- }
-=20
-+kci_test_mcast_addr_notification()
-+{
-+	local tmpfile
-+	local monitor_pid
-+	local match_result
-+
-+	tmpfile=3D$(mktemp)
-+
-+	ip monitor maddr > $tmpfile &
-+	monitor_pid=3D$!
-+	sleep 1
-+
-+	run_cmd ip link add name test-dummy1 type dummy
-+	run_cmd ip link set test-dummy1 up
-+	run_cmd ip link del dev test-dummy1
-+	sleep 1
-+
-+	match_result=3D$(grep -cE "test-dummy1.*(224.0.0.1|ff02::1)" $tmpfile)
-+
-+	kill $monitor_pid
-+	rm $tmpfile
-+	# There should be 4 line matches as follows.
-+	# 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=C2=A0
-+	# 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=C2=A0
-+	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet mcast 224.0.0.1 scope global=
-=C2=A0
-+	# Deleted 13: test-dummy1=C2=A0 =C2=A0 inet6 mcast ff02::1 scope global=
-=C2=A0
-+	if [ $match_result -ne 4 ];then
-+		end_test "FAIL: mcast addr notification"
-+		return 1
-+	fi
-+	end_test "PASS: mcast addr notification"
-+}
-+
- kci_test_rtnl()
- {
- 	local current_test
---=20
-2.49.0.1204.g71687c7c1d-goog
+/P
 
 
