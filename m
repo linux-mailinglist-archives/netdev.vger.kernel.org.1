@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-193751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65AEAC5B3C
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 22:08:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1F7AC5B47
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 22:16:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1FD71BC0231
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:08:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DAFF1BA7955
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 20:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D299207A08;
-	Tue, 27 May 2025 20:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241022AF10;
+	Tue, 27 May 2025 20:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eRskudMV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxIdKA1G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AC12A1D8
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 20:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8022F5E;
+	Tue, 27 May 2025 20:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748376485; cv=none; b=o/isa6NLfmiCIe6wH4o5WZhFe9vPnNdNBWO1mmuNhqvMcaHhi7BTIRQaL8lhseP7JrI31Key2ECCLPxCAY+iOmfc2rgc0PujqaxMtA0BIy7LL9F8s+rI5014QwslcFD27Bgz54pzymn2v7U/Ub2/SgZ36qKBScj/ucqNGe6CoAg=
+	t=1748377000; cv=none; b=kYfdI94Ko+pXS/+qWM6MjuWr+TbLShZqD3L9N11LXD7+UPU1us+yCsj0mKNzwbC8nKcn47VUb237EgcUbzDGxQ+anu70j+pM+MOuW52Dspfig0hdjNA65w7nWzZwWP4dfVYOr+O97OXCZqBwqtUPvAG95qXgV1+Bs6x86cXcxDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748376485; c=relaxed/simple;
-	bh=U5E9Y7YFfBzvgbjRUlIX9zJOdtM1nVXJwtwZF42H3Go=;
+	s=arc-20240116; t=1748377000; c=relaxed/simple;
+	bh=FGqF7J9hCkWnDPN2ywa1l4c3bPKUIJ2p39BiR4jVq3s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gi8DfbVpdmi7Q6dPFyj1wUFKzfeRTou+pE2qkfeygeOCvW7PExIEP1C20a7L5NgY/1IfEXI/mUnQ8DAV1n7qJ3i/bcBmgKWdxRQaoZ13RZFQLORRdKTNB8lonDMzLHKdx6yln2f5QMqUwrVDOJuho3p7peh49TIMshG046VQSrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eRskudMV; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2349068ebc7so60655ad.0
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 13:08:02 -0700 (PDT)
+	 To:Cc:Content-Type; b=izq3HzuGkHM0X4DZXhsApOvJ1eQCPqV0mrWhU7zoZRWQmIf5xe/XQRuktyKxbivFdL9yc+s2lviiI68KzoR4NnxY5gqNVt145erlpAsoj+ifWfOKClhFjuet/CbvZtR+aXthDdeSf6mm/N01D5EUkmP98eponhOoW1aKVeiX/P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxIdKA1G; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-52b2290e290so2119066e0c.1;
+        Tue, 27 May 2025 13:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748376482; x=1748981282; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748376997; x=1748981797; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U5E9Y7YFfBzvgbjRUlIX9zJOdtM1nVXJwtwZF42H3Go=;
-        b=eRskudMVZu227FGzmxKQ8tztSaNPfs4bju7iK4CtCfUrCVanjpShBFvZARf4WZ+8V+
-         KmL6uf/ZjmJ5WtDaiBmhlrd64nYH6Lr4z/sqqWQ0Cl7RPTjYUwBCwS506V08mMjY0ZBU
-         G16RHDLOIAoCS58jXZ/Aws10EYpQXs48t3UTljgUKyqKVJF4yyqsjxURlaHh4TUXB5si
-         HsYcw3d45KYgOQh0nPMBFkpulF6MA7/r7i8Run9P7YyN4mzaruhaFci24RrYWYuNtckY
-         gthbC1JNceq76vuMAw0xUdiPMTMKTLsq0NR3iGHaYRYf5mfMKrf9KRXIirOxrWGLkT2d
-         4sZQ==
+        bh=FGqF7J9hCkWnDPN2ywa1l4c3bPKUIJ2p39BiR4jVq3s=;
+        b=mxIdKA1GBbiMVpDg9u5AFbTsZhJgVxFyw2U/IJjL2DgQa0sdz+DFv85jkJHSbfGkeO
+         QLmDJ+Ps18wl8OEDOts6m0fXgpJqHERxbLTAf7q3xWFTCUgTbX+jVu2o+RLg9NsGT8fr
+         MV9WMoxh5vbKUiwsrokrJKctWSx2LTC6NB1aW2/hinuIdlTxpwKto4Air/2U9bokumer
+         AaW6yF7wxoB9jFjhp6KhQi+AhYAgT5Z00GEtiWpf11tfCDSUkwiOQLeUoZlOms59nwsT
+         uIhPajPbxrTK+PlbnKcUO+FHBSByz03D/EqeRFjCIudbJx23Hn6hBSaQ4iABK1Pa36v0
+         1qSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748376482; x=1748981282;
+        d=1e100.net; s=20230601; t=1748376997; x=1748981797;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U5E9Y7YFfBzvgbjRUlIX9zJOdtM1nVXJwtwZF42H3Go=;
-        b=FHRUt3pVoirTUl5wGOGzVKof+0fgGugz3AXEtCJEW9cP8dXoSw49bxxNSN3SARbAT0
-         QxIWW/1/+28Xf2BvGW2taUi7R3+QTQD+sLYlxxsXJe1IiqbI8+KIUABsgA2CbG6nqQMp
-         obSsnXZtrcqXbdb7hL1LG0gWNtz0ha/GhVTaywjZg2BuGgsiaJDXJNhsXZ84v6b5DMvD
-         nqBmLe3Ff8ZkwJkEJO7ZLRCWDYV4Cif4sYUGor8BvkOScFSu26VdhhDLcQYZ/akNv7Xa
-         ZUSycbY6dPNr7EupFcZA1sGgUWGef3ALAdmFMCR0cTYHZDSlkgjGijUeTDi1Rx9t/TY9
-         einw==
-X-Gm-Message-State: AOJu0Yz2YJ+JVo73z0zWJn3k+gM4FuK3O/zUveZhrY34H0yYkxfGSjEO
-	qFIHX15akSXd7raerzrg851FQtWceSNFrGEZ6QkQqxTicYnUhdTEiWeCXfENnk9CJyYQPYcnWLQ
-	mcnV5uuMbyN+QYkH+isKYt9SXQDswIUHCEqHrYdLU
-X-Gm-Gg: ASbGncsM4VxHDBmRuKQ44CdXlDtEwEK09sztvdpUFtxj05sRYjLxcs6TVpkm9975ITs
-	mM+Rj6AKUrCPgexbH4VGayMLBCYuOm64GjRFFsGEZ2S5awBiGEsdmsgBY4KH/8G3mrB69iM0myb
-	qJIdMluvDxuhT/GiiL23weOgwGKldcLDqwuWbpGJtr1+WgAVOSzGEf2LM3tSDW1zQXXEPCV2602
-	g==
-X-Google-Smtp-Source: AGHT+IGkksaBooqtyoLi0h0zbqgwk0m49F+wUiRh3q8PerUzfyMbLUuwbPeqqBpDHQZd+5MoPYnpNgSU69W0vPhsPIA=
-X-Received: by 2002:a17:902:e80f:b0:223:2630:6b86 with SMTP id
- d9443c01a7336-234c5b78342mr438645ad.7.1748376481594; Tue, 27 May 2025
- 13:08:01 -0700 (PDT)
+        bh=FGqF7J9hCkWnDPN2ywa1l4c3bPKUIJ2p39BiR4jVq3s=;
+        b=vkFgBTs1S5lJTsJrmOaZ3Wigp7Ph7iRnmOc8ag74nEgaGeOnwzHDFMVB9qhyHjWXi1
+         K2JnlIrOq3R9Vpqnyw+ARIebvIdiOorAtccYB/rHK320UVV8e25sPUfqDaNr0Qr62/Mo
+         dcxDzWJdmPt+O05zfM3F3i77BEyM4KForR+a4NmoUMdyW1jIjbC4HkIjlCxwEGoBRloY
+         ffnMGuU4/j0qVTs0TVMDNLnTQ1JqmEa5i7uNil+zcA0rkrvutgS7buwXUginuoJvHFvK
+         BeHki69uBIs6kM87fuCFt44Qc5hev9YdiR0Dx5sWDWFzpAZhoK9El/iziTVXh5IzaTZ+
+         iFFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUyZy5fa+Rsq1bukSQL5ueK2JXRnujrGWPs6OMKEy8t/DAEXM1UhfMpdPNP3Sy/SrLyPwwDRijI4sjzhJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7CRrRJGpESPNqyYZKHZDprED12cHl9qF7CC1DRrWVrDOUWLb2
+	QZXK4JgK7Iz1/3oAJZBtIDftMKq9F3dohDvUysgYV3CqCSP0sCiwi/G9OTNrXi4xykA6XTbBbhG
+	GbqysWvfTNYMXq/1qDdDkOICL8f634Ys=
+X-Gm-Gg: ASbGncunkTpIFSnwNmWhakXRO/UwjEcnGAgITBciceShphisJLVcwDEtfc5hYHMwrMx
+	mwuiTBqsQ0qXHrXS02cgOWeQvUOxJd72q9sNHCYFaNEEP0h7s8ZDnaQEg925xUjWkzttWzyPmXS
+	DGIiq/wEdHpBwN4KcOG/HwKRzUp2l0+RrPew==
+X-Google-Smtp-Source: AGHT+IETycDNDAJyxv3VLNHb+TIrTja35S1519qoE+Q/rK9pDA/sheHZNaSXrhFkGJah8hc3P6ff0SwCLKvwf9KpQ8o=
+X-Received: by 2002:a05:6122:3d0d:b0:52f:204d:4752 with SMTP id
+ 71dfb90a1353d-52f2c5ca414mr12169837e0c.11.1748376997259; Tue, 27 May 2025
+ 13:16:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250525034354.258247-1-almasrymina@google.com> <87iklna61r.fsf@toke.dk>
-In-Reply-To: <87iklna61r.fsf@toke.dk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 27 May 2025 13:07:48 -0700
-X-Gm-Features: AX0GCFtk6BmtDKkeA00CJ8TO1O4CCWb8DlWKhk21t95JSGv9G_O1oWaIzTt0dpg
-Message-ID: <CAHS8izOSW8dZpqgKT=ZxqpctVE3Y9AyR8qXyBGvdW0E8KFgonA@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v2] page_pool: import Jesper's page_pool benchmark
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
+References: <20250527175558.2738342-1-james.hilliard1@gmail.com>
+ <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch> <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
+ <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch>
+In-Reply-To: <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch>
+From: James Hilliard <james.hilliard1@gmail.com>
+Date: Tue, 27 May 2025 14:16:26 -0600
+X-Gm-Features: AX0GCFv4cap4ZOGqZcta-siDQMwW0SvAemE-pnT7ig2Oyj0apu2kFeIEsXbam6w
+Message-ID: <CADvTj4qRmjUQJnhamkWNpHGNAtvFyOJnbaQ5RZ6NYYqSNhxshA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Russell King <linux@armlinux.org.uk>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Furong Xu <0x1207@gmail.com>, 
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 26, 2025 at 5:51=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
-> > Fast path results:
-> > no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.368 ns
-> >
-> > ptr_ring results:
-> > no-softirq-page_pool02 Per elem: 527 cycles(tsc) 195.187 ns
-> >
-> > slow path results:
-> > no-softirq-page_pool03 Per elem: 549 cycles(tsc) 203.466 ns
-> > ```
-> >
-> > Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> > Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+On Tue, May 27, 2025 at 2:02=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> Back when you posted the first RFC, Jesper and I chatted about ways to
-> avoid the ugly "load module and read the output from dmesg" interface to
-> the test.
+> On Tue, May 27, 2025 at 01:21:21PM -0600, James Hilliard wrote:
+> > On Tue, May 27, 2025 at 1:14=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > On Tue, May 27, 2025 at 11:55:54AM -0600, James Hilliard wrote:
+> > > > Some devices like the Allwinner H616 need the ability to select a p=
+hy
+> > > > in cases where multiple PHY's may be present in a device tree due t=
+o
+> > > > needing the ability to support multiple SoC variants with runtime
+> > > > PHY selection.
+> > >
+> > > I'm not convinced about this yet. As far as i see, it is different
+> > > variants of the H616. They should have different compatibles, since
+> > > they are not actually compatible, and you should have different DT
+> > > descriptions. So you don't need runtime PHY selection.
+> >
+> > Different compatibles for what specifically? I mean the PHY compatibles
+> > are just the generic "ethernet-phy-ieee802.3-c22" compatibles.
 >
+> You at least have a different MTD devices, exporting different
+> clocks/PWM/Reset controllers.
 
-I agree the existing interface is ugly.
+I assume you mean MFD not MTD devices here.
 
-> One idea we came up with was to make the module include only the "inner"
-> functions for the benchmark, and expose those to BPF as kfuncs. Then the
-> test runner can be a BPF program that runs the tests, collects the data
-> and passes it to userspace via maps or a ringbuffer or something. That's
-> a nicer and more customisable interface than the printk output. And if
-> they're small enough, maybe we could even include the functions into the
-> page_pool code itself, instead of in a separate benchmark module?
->
-> WDYT of that idea? :)
+> That should have different compatibles,
+> since they are not compatible.
 
-...but this sounds like an enormous amount of effort, for something
-that is a bit ugly but isn't THAT bad. Especially for me, I'm not that
-much of an expert that I know how to implement what you're referring
-to off the top of my head. I normally am open to spending time but
-this is not that high on my todolist and I have limited bandwidth to
-resolve this :(
+I agree with that for the MFD devices, but we still need a way
+to choose the correct one at runtime otherwise initialization
+won't succeed AFAIU.
 
-I also feel that this is something that could be improved post merge.
-I think it's very beneficial to have this merged in some form that can
-be improved later. Byungchul is making a lot of changes to these mm
-things and it would be nice to have an easy way to run the benchmark
-in tree and maybe even get automated results from nipa. If we could
-agree on mvp that is appropriate to merge without too much scope creep
-that would be ideal from my side at least.
+> You then need phandles to these
+> different clocks/PWM/Reset controllers, and for one of the PHYs you
+> need a phandle to the I2C bus, so the PHY driver can do the
+> initialisation.
 
---=20
-Thanks,
-Mina
+Well this would be an indirect reference to the i2c bus right?
+I mean the phy would reference a reset controller which would
+in turn reference the I2C bus right?
+
+> So i think in the end you know what PHY you have on
+> the board, so there is no need to do runtime detection.
+
+But we still need to somehow runtime select the correct phy
+which in turn references the phandle to the correct reset
+controller right?
+
+> What you might want however is to validate the MTD device compatible
+> against the fuse and return -ENODEV if the compatible is wrong for the
+> fuse.
+
+Sure, that may make sense to do as well, but I still don't see
+how that impacts the need to runtime select the PHY which
+is configured for the correct MFD.
 
