@@ -1,230 +1,116 @@
-Return-Path: <netdev+bounces-193614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FBC9AC4D16
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:24:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6524AC4D43
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 13:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C894217CACD
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:24:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80A9A17DC25
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 11:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FF7257440;
-	Tue, 27 May 2025 11:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A463F258CF0;
+	Tue, 27 May 2025 11:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="YVRd2HsG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThpUArp+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2036.outbound.protection.outlook.com [40.92.22.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961FA3C30;
-	Tue, 27 May 2025 11:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.22.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748345040; cv=fail; b=D6Ws3c+kA63HuyfnRpougeJjt8iYBlsiE2vaCfnGyrPYPH7sC4DuHqjWG59S7bLXiRogmatMNhIDxFDYrbOPg88fwpF/u//kDEO0lE7jx/A9mN1jXSe3eXUaVgn7N/Sf3zynHTLHKjRxyci2yPP1eTiAu3BUQrClGGL8jPH9YWg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748345040; c=relaxed/simple;
-	bh=Ns+hiOHrEk25HgOddSgA3KCpzEeqtugeKb3NsLb/JNg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hFxULCYtzru8hERLc+q64GTmKtQ4iSrN6Dv20aypSXlFP39BDGK9a7QCE4/jfrrCUzHKdhjf2tUz9wAozfGGxTIsz9GZ6almdADQrSLOEaEng0XECCX30aoCOjbz1LrNBl0ZBWrhtp+baVpSzgtdkpjx1k6TM6tF1D5fzEPAK6Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=YVRd2HsG; arc=fail smtp.client-ip=40.92.22.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Oj3NWWJZzZpEFiQr82NBwqr73N7GIJgoCWj+D8Oin9WoWh5Finw2Y9o5xMJY18RgmWjHG2pvw9VDauNbObbK4/TLNRaq7goRAWFUlhzjOP5l5vQiS+XmKg8E3EMNuhPPDYd4GO3vNHiRJecQoPiUuZOmsbxIh8g2jFJRYVZOxWXtnDhWC1qv9x34SVS30hC6jB6GnccLeL8vrbY99u8QjSFVrvDBeXQHAvOVDL/xNTwGXubVK94baDPidi/L2M3iNPne+lZnVcr9AlOq9HCYeM8jCHVITAb3dR44kPtJR3NCtYvm4C6R8bAe70caafxgSTr/p7QSJESp1qvbqQQClA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1UR3BS3ghMjBAwaJ6Jt+YDBWc3Wf/qvrf6QVrazotvA=;
- b=ALjoMHHJ5dlA3ZclzeqIGLIKR9XHAbOWbFBh7K21ur9vqm4H+MzDqlO0NJznKsdeAvtzyiEg45wNi7/P6WSZd3ec8rb0316ResWnyr6g7OJdscCLwoBXJuuthLQ/g0/9Nrf1FCXHbKRtX8yb7KUsMlskkYlL+yJWpmyEfYgj2hglwSiJPt0wMOPwZELGFKFHPq1UMtc4ek7eRPRtPtXP06MF1F/D0Hk995K1Oybd3SJSdIrl/aVkCrijllJPT1HsfEvL6GZMdT4ndlifnJa9tMvD7u0AlionSaMo9r/Ol5TZndk3P9FzYfx88QBihRzFXsupSBYvHdN2enIRPH0C+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1UR3BS3ghMjBAwaJ6Jt+YDBWc3Wf/qvrf6QVrazotvA=;
- b=YVRd2HsGdxL6Ln49QeHeWNEwl5UcgJxkJb6XYQFPEgNkp29LkWALiWv/BcvLswGIE0A5SRJuNvP3mzn2nhiO74MHEX8TKA19l43Z9f/2GUHWJjV86l8LaqJuuShHJMnb91+GELCB9wd7/MNjTqnRsw4KLrWSzgonDSJS0tf2KfOAh5oRwldfnoNmuk8+7MJMQmdRV+NBW0K3zIHGG0omrFiwA3De40tUAGlIvBZdRK1Ae/Z8UMtqwJG5qMjOyk1Cj7LZStY9e1zmApprrPVzK81qQJ0QB8YUMAczil+OIW3qcw51lNsMsfBL6HJ+d9UI5DFaAEyQGk/Qp3mHLP7x6g==
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com (2603:10b6:8:253::16)
- by CY8PR19MB6940.namprd19.prod.outlook.com (2603:10b6:930:5f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.20; Tue, 27 May
- 2025 11:23:55 +0000
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305]) by DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305%4]) with mapi id 15.20.8769.025; Tue, 27 May 2025
- 11:23:55 +0000
-Message-ID:
- <DS7PR19MB88838E2C42CF1EF29AD266BB9D64A@DS7PR19MB8883.namprd19.prod.outlook.com>
-Date: Tue, 27 May 2025 15:23:42 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] arm64: dts: qcom: ipq5018: add MDIO buses
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-clk@vger.kernel.org
-References: <20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com>
- <20250525-ipq5018-ge-phy-v1-4-ddab8854e253@outlook.com>
- <9e471d88-1ace-47ea-b1c0-cfb088626199@oss.qualcomm.com>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <9e471d88-1ace-47ea-b1c0-cfb088626199@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0008.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::12) To DS7PR19MB8883.namprd19.prod.outlook.com
- (2603:10b6:8:253::16)
-X-Microsoft-Original-Message-ID:
- <de6517e4-234c-4292-905a-78d23bd4fd9b@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC6B1D90DF;
+	Tue, 27 May 2025 11:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748345216; cv=none; b=JFJpDyinu52dL0UV8NN1s3iIJRuUsPI9LrUxZDfU8HQooFtt0RuMj5finVWqPQLIMhWWHL8x53SpH9zH/NtN1Q/8GboRG4YTNRdPoY+KEh72CX0ZOaSs8Q+wU1Tqcmw7AMPcIac7JENzfBv7TaliFqdaqDA2akPXwctkU87/cVA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748345216; c=relaxed/simple;
+	bh=2KpYEmamx/I9j9PlojgCvsZMpP5T/inQoOXe2bcXrmw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uHj4Cvzeu3np9kUXigfAm/a5TC2S46ORQnPoccOp91cCdbdxoEA6PaVR65QIHDcz2PDnte90MPGRrM3ADiGcxoyx6m/crFkEA35RM0T9rtfNJ4oJxJwGcrO0+w8do8LibqGwD8+JDhWPnAAzgyVJapmB2+5EJpAl8KfZYewZkVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThpUArp+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5738C4CEF3;
+	Tue, 27 May 2025 11:26:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748345215;
+	bh=2KpYEmamx/I9j9PlojgCvsZMpP5T/inQoOXe2bcXrmw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ThpUArp+46Di00Yo84iAx0Hj5yL9CW5/L22pa44Kaa5B8Ly9PatPcuWZvZiinHHeU
+	 cUS6v5kWULgxzkwMKt+fxErJlY4imnOdD+B+ef/kU9b4aqdmbkC+4tpDaHseYNO/qU
+	 oXWi4+ltLTe5Ptv4v5OfYaw+pFXpzOiNWMWXm99Gt7twcY7wJrmlXNEnNWkGzlbbhj
+	 HdtvwwjbWPFaGN4PEdE3zQ1w8+7zfzv/t/nVOk3ULDtpWBMMPZy2d95FshsXk121mW
+	 dQeLC0c091iE6s1YYC2vUHl0NRgZLOIgh5/mCSKwbxfp1udJcs0b87Z8lVz+Tlp7Oq
+	 pKuS4TFNqa38A==
+From: Konrad Dybcio <konradybcio@kernel.org>
+Subject: [net-next PATCH v2 0/3] Grab IPA IMEM slice through DT
+Date: Tue, 27 May 2025 13:26:40 +0200
+Message-Id: <20250527-topic-ipa_imem-v2-0-6d1aad91b841@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR19MB8883:EE_|CY8PR19MB6940:EE_
-X-MS-Office365-Filtering-Correlation-Id: b211064c-03e9-4942-b06a-08dd9d10f6b9
-X-MS-Exchange-SLBlob-MailProps:
-	znQPCv1HvwVu6ov8hlKZu5ytU8AWxKlxOH7qI4NO56RN0VWu/oHBfs9Lq9BoAJtgfLKmLMQ2Z3lwTzcZ4UWnbjT+osvZHv4itIknUxOh0+j2jhlQIDh5aGh06QcICdc2Her6bh/cZLe27LlftD7Kx5KCgG2qBJXd/GXjjFOqDKadewxGmv8RCM/dqT1tQRyaCg23rlbIUdr4u/aysYowcC/gpcnbX9vvlBmMaohqxkahZf3gspdXjHOCNIeCk/CS6OJGKvF5lprHPCft/D/yN8pCj5R93jlYHiA2Z+VyMRR9lrE8MF7AOL6MZKDF7/6cKROO9lI0MlETlZsSSsz/ByILJcVhxoJ7XbISJpmO6HIN5MSY/NwWqjSQLzTER+lIzV74YegmigoBc1xqo6Vk8OsqG7ZVRiNr2Bx8xdQVLpmp6SzVNatExe13vp1xCptkKDX42ZWTSLOn+BEi9mSGN2IjJ7h5yip9DNTq2Qyyoheu0xc87JVyZz/pyu4u96FKUeCRGpRumt2gux2u4VNjgtQkyslb61fp1KA7tRLj0AIPzh+ekoDe+4ZqoamcEH7K6SOYcYnoTO1z5b9cajC02wjbPsBXl8Tfle4euxandnqVJ3aWoZqLBHOe0jB7Kv9vcYeR7ygkVCtNK8Modymomnsd/CQZaFz1hh9YOM7lzDXbvhoQv7TZsT7kwT3pKx243LIfHGV0Bep18KMC/g+fsgv5vZ4qFuzspnDO0xPkDhtqM0ik8AaS4dFj5wKb13IZlPQI+fEOer8=
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|6090799003|5072599009|15080799009|19110799006|461199028|8060799009|7092599006|41001999006|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UXpOSjFUY292dCtWSnhFZE9zMUZpQ2p6aldhV09DV1QrWU45YlQ3NStGcDd1?=
- =?utf-8?B?RHVqb3lSZ3hMcUQ3MlF3VjR0TVNWOEU3OXZtdFZwbVZ3RTI0UWw0Z3F1Vjcw?=
- =?utf-8?B?KzU5OC9PUW9QaXZ3K2hJWThCUVdpY25kWUxXbll0VDQ5RGN0NjFBVTlDc3di?=
- =?utf-8?B?elJLaGduYUNVWjV0aUgvekVSN0txZ3FJaFptMmZVdVZHdUlLU3dMOCtLYWdj?=
- =?utf-8?B?YjhsV0VsVjJMYkxqR0g4YnhSQlhKLzVIa2xzTU0xYTNIQjN5VGdOVHBIbGdG?=
- =?utf-8?B?RnYxd0xEL2VwQmJ2NTdQakZXajY5QmordUU0c014M25zYU9kTU50Z1NBRy8x?=
- =?utf-8?B?cG56V0ZnYzhMUllYOTRFZVdhaUdManQ0a2orYXRDWVVuMHpLMWpxWFVyQUJF?=
- =?utf-8?B?b2ZjbGFjZnB1K2xsZ3ZoWnlBVzE1dW1vaU1OQnV2bEtLZ3FocEpvSVVGVllv?=
- =?utf-8?B?Z242VzlVRFRMOGtFM09rbWtTaHNYNFdwRDR5S2N2UDVLVVBZYURjWHN4YXdR?=
- =?utf-8?B?eElqZ3M5MlBOK3RUeTZJZGpKUXh4L0NkbkFkZXZubEVNalQ3NkFuY0xMb3A2?=
- =?utf-8?B?eEd0eXliTS9KQ3EwUDRvaHhJdVF0Y2IxdjJKUnRacis5VEJpOTBzUjJHaFlv?=
- =?utf-8?B?bDZpMTVhbTF5bUJiMWtKV282SU81djhrcDFEcWRCbXgxL2ZNb1l1Q1hjdFcw?=
- =?utf-8?B?VGVrbUM0RVRBbXhTR0hmbGJtcjNWdXVCeTB5TkdDWHM5eFFucUZMMWJwaGRX?=
- =?utf-8?B?NkUvY3hHMTZPd2VOazluQmFOTE1YOFpqKzlEaE5FZTJHUHRoTXk3ei8wbnkv?=
- =?utf-8?B?clNzVU1IUHdySmYwaVp2c0ZKbU1JQ0trWGVlbHVtcCtGdVdUVzF3OWlrU2No?=
- =?utf-8?B?QWtDNmltRmU1L3pZOXlvbXMwY2RSUDkzUitCc2V5WmR6M3RqOXZMTDJuQnpi?=
- =?utf-8?B?blhWeCsvWUhFS0RZT2NyVUFUWWdUVXNtZE1XbFZnV0Q0MEZ3dUlzL3IwV1Fk?=
- =?utf-8?B?akNyZUp3SlVhMm9tQlFndEMyMzFDNkp3TmNOdWZhWDZxVGpadWpjaVoyOTF6?=
- =?utf-8?B?VkdzcjhacUIvTE1yelhjRTI5Q0tJTExTR2Y1c0lWUmpiNExzSGFyMXJtejRL?=
- =?utf-8?B?VUFsR1FFdkYrLzFDRXJQUVp0S2hQUVcwbXlBdTJWSDdEM0wvQUdYNGZqMTZL?=
- =?utf-8?B?M2w4UzdiZGNHNHJuNDN4aU1sODhhY01CMHQzbTNFbC8rZWFpSCt0R0lxNWNQ?=
- =?utf-8?B?VFFoT1M1WHhjUDVPZ2srRVpCNTdXWDkxWDE1L1AxK2lXbDhkQlM5eVVzbkFo?=
- =?utf-8?B?am5hTW90czloWTZrRXBJM1FmSWxkU2JQMncwRFN4VXRMVU02M3l3Sjl4di8y?=
- =?utf-8?B?bzYzNzJLSTZiUzVpcmVPQ1hPK0UzTlpNejVQWWY1SVBoK0JBQkowMmdCNWNG?=
- =?utf-8?B?dW5JNU5yMFFodVBCNjYyYUJMWWo3SjFiVjVpTmtsbFo1Y3FpREdHWHRnRWVi?=
- =?utf-8?B?aUdtenF4Tm4raUlxOGR1WkV4TDF5VkJwV3dXTHk3dEVXVXlpS1IvaHQ0K3Vo?=
- =?utf-8?B?R2lNRDdtZ1JVNnBEeEJ5bzNjTDJqOHF6N1ppYzJJTUNLRU9KVWNnb1RUY3lV?=
- =?utf-8?B?K1YyeGdseGtzb0NVTlNPNkpuUnVHcjZhR2pxT0oweFdXbVhzTUpJblFEenR0?=
- =?utf-8?B?aFJNTlRuWWVhRWc2V0FEZHdqd1Jqcm1reUpqbHdhOVFXRGtFcUJWOFVjYXQr?=
- =?utf-8?B?dkNKdUdzTFdJMXVHaUxqWHU1ajBGb2lpUXZBL25pajNGelN4SjAvQnN5MFNr?=
- =?utf-8?B?aGR0OTZaMXFuNXA2eEMwaFEvNVQreDRWUDB1Q0xod0QrZUhUMm4vWFdWdnF0?=
- =?utf-8?B?ZUdWb1VkZkw4MGlUeVRibWNNa09PUHplcVZRUm1WVDVEeHFGTmIvQy91Q0xx?=
- =?utf-8?B?WHY5K1V0YzdmQytjcjdwRThNd1NtV1dGUHZ4QVJLVUhnVVp3Vm1RVlk2Z3RC?=
- =?utf-8?B?d2FXVXNDMk1nPT0=?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RHdlUURMbzcwbE9IUGxGZXpkQWFMTGpMWlB0U2RwVWZza2N2UEVXdWRsSXFO?=
- =?utf-8?B?eGVTb3pOSUFWa004eGFBeS9LTGYvL1lERmVxOUJkR3d5WkZqUDUxRTFKYk1Y?=
- =?utf-8?B?ZkhUeGNOYXFzUDkzaUtwMFR5bHdYUlFlcGlWWHh2U3lhZGh6SldKMGlYZjNV?=
- =?utf-8?B?VjdqZDRWSGpxcmxKVEZ5eUVVWWxVRkNUdDVpakZKVVlzTmY0TmRxMFAzd084?=
- =?utf-8?B?NTY4a3FXL1VDQnlidE56OUxJVlgyVEFWREJRZEJoZCtjMWZicGZydlZlSjR3?=
- =?utf-8?B?MEtNMFBDWGZtejAzWjd6cGx0QkF6WTVpcUJSUjA0Wjk0VFRMWXMzSEtxckl6?=
- =?utf-8?B?ODBxOXZMUjVjeHlIcjVQVnFMbVNteGM5b1ZmY29IblNWY1dma0ZzTUgwUk45?=
- =?utf-8?B?azg3ODZEZkxwcXRlRjVMWXRQVTFoTTZrM21KQ0NWY1U4anJ1NFJTVkpjU0NE?=
- =?utf-8?B?ZlJkYURIY0hkWldpc1BkZWFPbjlNVWdweUNaRlJ6aldwQ3k5cVdwbHRtOGVw?=
- =?utf-8?B?SjlIdUVSMisvMlR3WEYrMW9KUlU1N0FKeHFpY1RHeFR4YnNmZnhpS2tQUlZ2?=
- =?utf-8?B?YytpbW9sUUlHVXhXb3RHM3dNTHdyU2pLY1FEak9LdGJjdUd3dzgrbHBrTmtt?=
- =?utf-8?B?WGpjWXpmZUxreEVTK1ptT1dmSUp0T3J3V1ltV2l1MHVXdXBINVNzTDkySUlE?=
- =?utf-8?B?LzZqZHdlVVZYR2I5VCtXaHNzdVBLYTFCdC9iTTlzU0lWQ3hWeitmUURrY1Ir?=
- =?utf-8?B?MmxPcHgydVpOUUxMYWI2VFEzMDVTdkhYUG82Zmk0S3ozZlR4VHRuZ2N3bFI1?=
- =?utf-8?B?S25DZVF6eHpleUVWQU54YnA2bTh4SzBYeS9LRDJVZGhvSXhuald0dTMrWDMz?=
- =?utf-8?B?N2RNZ2tacmJkeHVhUFlJOW1pN0tQdkFsMnlwS2dqYTRqQXRjYUxjVHBMVlFE?=
- =?utf-8?B?bGhOQjhJYmVERWhGSjdwWUxkZ01KSEEzWVVwUm1UaFZ0YVdXUGlkRnlRWXU4?=
- =?utf-8?B?VkplWWxIUk1sM0RGQjBiRllDcXJ4Z1FWeVZ0MzJ3dEVrQ3ZSN0ZkS3hHTjNo?=
- =?utf-8?B?SnB0azJPenI1VTIzbW4zZ1dIREFJMExvSEh6MEZnWFNtOSt6MjB1V09VN1lo?=
- =?utf-8?B?RzZBSEZ3K2trVFhhQTUzTEJSS0VYOE1DdE9mN1NQcWVxZ1dxSDFJakZ0NXF1?=
- =?utf-8?B?K2RuT1I2cTg0Q2dkNG03YUtKYXdocWdrWjlwMFQ2NFFYOWVaV0F1UzluaUZK?=
- =?utf-8?B?aS9nWE1xYlR1aXgxcVZkbmMzVHR3YlE5VXdGVHVjVE80U3BoZTU1bFE5aytY?=
- =?utf-8?B?TTF4bWYxRGFNUEQySklURnZkMzJwaXZPdVgrMEVubXQrUDg1c1NyOVpaQytn?=
- =?utf-8?B?SGNXNG9ubnZ3NXg5c3RDK1MxNmovcXM1bDQ1aXRkMWxyYkQ4ZE8yTUg1T2JT?=
- =?utf-8?B?dXl1UzRybWYzd0hXTHVGdkcvRmNLZzRxOTJYa2NBU3pKRVowOURQQnMyS1dC?=
- =?utf-8?B?QzgxVVVQZDNGMGFsMEswSW1KU3c2Ris1aVhidVY2bmpKNyswa0wwZ1I1WUt2?=
- =?utf-8?B?K05BSXFiSStocEpoazVHd1BHekh1WkppVTRTYXBVdUFLTWszOU40RGtzbW1T?=
- =?utf-8?B?Q3pvNU96dnlTREdIZnhoRmRwcURDZlhaQjNjUmZhbko3TXhuUm9iQlQ3RVVB?=
- =?utf-8?Q?vHPUUsaXGOmQwB0VrWnX?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b211064c-03e9-4942-b06a-08dd9d10f6b9
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB8883.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2025 11:23:54.6380
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR19MB6940
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHChNWgC/3WMQQ6CMBBFr0JmbUkpKaIr7mGIqe0gk1haO0g0h
+ Ltb2bv5yfvJeyswJkKGc7FCwoWYwpRBHQqwo5nuKMhlBiWVllrVYg6RrKBoruTRC4dD01hr2hY
+ 1ZCkmHOi9By995pF4Dumz95fq9/5NLZWQ4qadrht1quxx6AJz+XyZhw3el3mg37btC0gcePizA
+ AAA
+X-Change-ID: 20250523-topic-ipa_imem-def66cca88e5
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alex Elder <elder@kernel.org>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>, 
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+ Alex Elder <elder@riscstar.com>, 
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1748345210; l=1361;
+ i=konrad.dybcio@oss.qualcomm.com; s=20230215; h=from:subject:message-id;
+ bh=2KpYEmamx/I9j9PlojgCvsZMpP5T/inQoOXe2bcXrmw=;
+ b=ADlSLa2NYN65cBFpf3Qksz58t8CDgKYOr9rkGp4ZXkcZIM9guW3opbzotlQbnh9QDYIAX+H5L
+ BFBw7cwTvZ6Bt2OdLnYMiqsRbFLl9tQ1LPu4uDLqUnVcRhyxIj1fi8V
+X-Developer-Key: i=konrad.dybcio@oss.qualcomm.com; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
-Hi Konrad
+This adds the necessary driver change to migrate over from
+hardcoded-per-IPA-version-but-varying-per-implementation numbers, while
+unfortunately keeping them in there for backwards compatibility.
 
-On 5/27/25 15:07, Konrad Dybcio wrote:
-> On 5/25/25 7:56 PM, George Moussalem via B4 Relay wrote:
->> From: George Moussalem <george.moussalem@outlook.com>
->>
->> IPQ5018 contains two mdio buses of which one bus is used to control the
->> SoC's internal GE PHY, while the other bus is connected to external PHYs
->> or switches.
->>
->> There's already support for IPQ5018 in the mdio-ipq4019 driver, so let's
->> simply add the mdio nodes for them.
->>
->> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
->> ---
->>   arch/arm64/boot/dts/qcom/ipq5018.dtsi | 24 ++++++++++++++++++++++++
->>   1 file changed, 24 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->> index 130360014c5e14c778e348d37e601f60325b0b14..03ebc3e305b267c98a034c41ce47a39269afce75 100644
->> --- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
->> @@ -182,6 +182,30 @@ pcie0_phy: phy@86000 {
->>   			status = "disabled";
->>   		};
->>   
->> +		mdio0: mdio@88000 {
->> +			compatible = "qcom,ipq5018-mdio";
->> +			reg = <0x00088000 0x64>;
->> +			#address-cells = <1>;
->> +			#size-cells = <0>;
->> +
->> +			clocks = <&gcc GCC_MDIO0_AHB_CLK>;
->> +			clock-names = "gcc_mdio_ahb_clk";
-> 
-> I see there's resets named GCC_MDIO[01]_BCR - are they related to
-> these hosts?
+The DT changes will be submitted in a separate series, this one is OK
+to merge independently.
 
-Yes, they are specific to these mdio buses, yet not required for 
-operation, just like ipq8074 and ipq6018 don't list this reset in their 
-respective nodes in the dtsi.
+Signed-off-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+---
+Changes in v2:
+- Actually pass the retrieved data to the target function
+- Re-wrap comments to match net/ style
+- Mention next-next in the mail subjects
+- Pick up tags
+- Link to v1: https://lore.kernel.org/r/20250523-topic-ipa_imem-v1-0-b5d536291c7f@oss.qualcomm.com
 
-> 
-> fwiw the addressses look good
-> 
-> Konrad
+---
+Konrad Dybcio (3):
+      dt-bindings: sram: qcom,imem: Allow modem-tables
+      dt-bindings: net: qcom,ipa: Add sram property for describing IMEM slice
+      net: ipa: Grab IMEM slice base/size from DTS
+
+ Documentation/devicetree/bindings/net/qcom,ipa.yaml |  7 +++++++
+ .../devicetree/bindings/sram/qcom,imem.yaml         |  3 +++
+ drivers/net/ipa/ipa_data.h                          |  4 ++++
+ drivers/net/ipa/ipa_mem.c                           | 21 ++++++++++++++++++++-
+ 4 files changed, 34 insertions(+), 1 deletion(-)
+---
+base-commit: 460178e842c7a1e48a06df684c66eb5fd630bcf7
+change-id: 20250523-topic-ipa_imem-def66cca88e5
 
 Best regards,
-George
+-- 
+Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+
 
