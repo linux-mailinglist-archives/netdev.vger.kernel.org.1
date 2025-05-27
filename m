@@ -1,119 +1,183 @@
-Return-Path: <netdev+bounces-193641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE178AC4ECC
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:40:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1EE2AC4ED4
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F643ACAEC
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 12:40:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4476D189F765
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 12:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1472269CF6;
-	Tue, 27 May 2025 12:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B260526FA4F;
+	Tue, 27 May 2025 12:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nEfYdvd9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XcvoRoLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174DDC2ED;
-	Tue, 27 May 2025 12:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1887C26C38C
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 12:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748349627; cv=none; b=bTnCwfM/QTstw5nfgB4aodZ5jM3VG3ZsuAayMRsm8qlWIVgXyBnvoNVjgS6Hr3wR0mJBVYFX5jsxQjGQ2DRTYOo7MncEvJ5fnwFuq7wDMXJ+75DtrRUvW4Wj2FDT9r/RMNoZtfoYOXMcgA1vhVROzs3ceDsxb//+fTmBNL7y4Nk=
+	t=1748349885; cv=none; b=S177kELBIZHz8Xnnwcc7VjmHZixhhyhhbP1rTS/jQAzk+NMbM809ng30ocflyjSstOtQatd6JTbxldsLJ4Q6cZZbS0ZLk7P987oGa1O8jHX8JMhgGPVTieSOuoPz1z4h9SfIqIV5fGHsRksLhF2AltR3LFgF9tDqY/HTD13Q/qA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748349627; c=relaxed/simple;
-	bh=UFYxLvLXnz2b6nESN++qfyBWIUKQClun0peTMmDwm4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CZbn5lnFD7kzkzsCqO15LQtulLIVVQk+7sjRE1VHRE8w1lJMZNYcyFUM5RTNtOciK8mNLnB640s1VmwyTNXUyiRTSC/NGXhGu69//+wd8sdIyT+uxrGWEkneyyEfwDMIUvZ9TMHSq8Ttyrz3Z1sIQ7MqexhHgT/HZUw6759y7vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nEfYdvd9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54RCErA0029147;
-	Tue, 27 May 2025 12:40:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=HPoY8V
-	vbbzKkHM55bPaoXsYcK2nwbz0DzoWdBYk8FiU=; b=nEfYdvd9y4fHCpqa/hYK5f
-	y84+euZcXJCUgpRNXUgIYP2U1VECSjAGNe/1XC3VSSqSD185subKufGT0Wn+PuQn
-	nOLxY2sJc9iw/LUraAg+ZmE7cayjdOTMrj3l5JRz84fdHTje7G1hzJkOxVUeDuAn
-	bjOY4TJaGK54js8rshP1XPuzhju9OTLmMCM7DbDkhRTY8sW03kWuA6opm978LW34
-	Ivl8QDyiaOab6f+7yIUHT6HbyU1wXap1tO/YU+EMUMM2hS8EyOgmdgjNbn2xUSrb
-	BfUgAiAStaFCAA/97p6WSNw6/q9mypZGpXP2v9CRFOtUFM1nvvR0AUhCNSMY8gtQ
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u5t0p8tp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 12:40:20 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54R8u2GK007979;
-	Tue, 27 May 2025 12:40:19 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46uu532ade-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 12:40:19 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54RCeJVg27525720
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 27 May 2025 12:40:19 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0828258058;
-	Tue, 27 May 2025 12:40:19 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A904C5805C;
-	Tue, 27 May 2025 12:40:18 +0000 (GMT)
-Received: from [9.61.246.68] (unknown [9.61.246.68])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 27 May 2025 12:40:18 +0000 (GMT)
-Message-ID: <4d23f536-bea1-49c9-98a9-b237e6aa0d9c@linux.ibm.com>
-Date: Tue, 27 May 2025 07:40:19 -0500
+	s=arc-20240116; t=1748349885; c=relaxed/simple;
+	bh=10pm6SoapnDJvi5UUh+zwz2m9mE3i07P8POT8yLYzj8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S5Zlau3RmzrXxlDYfGTHpgya4wzFO1+r5ap1H8M5jBFY9kdptIIbPy3OW0hA3plHKd7xUJUd3CZnBmVrd/fx+C+FrMs42/KfhJYAo4+ISdfKvtbKPEUEOQY10scUfPlpHVxHijNHqAcVKJOrFAXZInA1pkZTfWAVeM4iXfV2+uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XcvoRoLc; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-442f4a3a4d6so22649945e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 05:44:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748349881; x=1748954681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
+        b=XcvoRoLcCtVUPvy65xJfk1KQG529kbbSSLET2kD3LxtcR1OWq+EO0wGuefGCcCSZvP
+         BNkVRWIgQQi+aqSu2GroQ3HnyNVDr1o5sT8K4drSuez10Cp+jklozf+9UWipo21l4irS
+         Ma2BNmBAcmiDt8Ogc8QFesXS+QX9MIPRtHNZEjrSVXNv1tRyFSsKH1Pt/Djwpyb9QrDc
+         CH0JPjnO8SiZcbllaKVbeQomjd67TgzU8YWdlEtHrWAw7lLMgGJaaHXmMD2SxiiaofTx
+         1psySLAkisHF3Bk1w1auUZvbfqPsPNDbLWPepopvnenbtJNSBxFfDM/t5s4JEffG/ORa
+         2z9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748349881; x=1748954681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
+        b=L8aSWFJRrIFvl5XIuYLRoNbNoRMPhMegIpBzAOtYgO2CQq+YaMlg5YRU/A2rDc7Qpr
+         9sLstUBh+RlSe2bbHaW0obSjkvmmAFxJ6BnXIpKeXXlTGcY+U3xLl7s44zFhnKStuX66
+         8mfCfTDpLZ3h3CEVbJoAjL0II7i7Zn0ltWX70h1Fg7oSX+Srjmsy0mtKyOyux66a5GMH
+         qnwOGxnVqeZlc0VWHu5IGipvk4XM9tjDJWRT0SJBT76vsLyx7wU/1iI4ppundk/kqVFN
+         cilWOvKhnRndLLVsSSVJJhzZQIESM9LgQwZv2h9A51swd8hX9Os6hb9UilrzeCjRze37
+         LK6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUlbYKIUhwb8ukTrCQLgNTz0+RN1Im/lDkfIx56W1vuteiCLZIov1Q3Dtuxyk8PAxM8UhFlo8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpJsJazZd3KPqMFbgLTpX8quTVSy4rs0HsaOz1Bq7wnbRh5y4o
+	60mfOaM6YUS/2XyivXlixaz/OPp5lsY77gobsNftBOBdeoGCjheI2Yk1Yx2GZUBJt/4wXWcb1mW
+	T9afDAhHc2tXcuyOxHHi1p5cXswxQpDpQeAfT4/uK
+X-Gm-Gg: ASbGncu775yZaWKBcjhC+C6kqsNEEoPWvlF34eag1FNuR53ID2m2EJdVlWza7il6MY+
+	2Ens1zcmlinEaT/w/5sugK0tSWWsQw7tK2deYFa8NfcdMoOvlHJjtK92Yr1DAhW7DBxQpk6TDOS
+	F0FwZA41ev6kfeB3BOLJjIk4y3dkg00WmpNuATjFqFI1YGbI+TgvAkxi2HIUdfudCkvvx0lQkk
+X-Google-Smtp-Source: AGHT+IEky1d5meo1qHzcDPYMKOo6itgabi6xnmNH55BIUhfTHja5jzKInw1nb+GfsRVDFZjoQp10Sz6+0092+zxkyU8=
+X-Received: by 2002:a05:600c:54cc:b0:442:ea3b:9d72 with SMTP id
+ 5b1f17b1804b1-44fd1a229demr3814135e9.5.1748349881244; Tue, 27 May 2025
+ 05:44:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] vsock/test: Fix occasional failure in SOCK_STREAM
- SHUT_RD test
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
-References: <20250526134949.907948-1-kshk@linux.ibm.com>
- <CAGxU2F40O3xDSwA4m6r+O5bWoTJgRXqGfyMiLH_sMij+YmE5aw@mail.gmail.com>
-Content-Language: en-US
-From: Konstantin Shkolnyy <kshk@linux.ibm.com>
-In-Reply-To: <CAGxU2F40O3xDSwA4m6r+O5bWoTJgRXqGfyMiLH_sMij+YmE5aw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDEwMyBTYWx0ZWRfXxJq5a+Ieb7OR K1DPtGUmMnP5rw5omznXdrOJri1ZNXVLxbmB85jXmChD3kDIRJs/QOK3uSK2bpKGk6Q3ZtD1s25 ZMTUzvlx0mJi8XMmTt7w/F/if4TgfWcaiIXDHIszoixrKVcaTyyu5KCz5BuChiuqnOGaVK/PY7d
- KyvBbp+66/RmAQWaII2x6UE0UtQX+MkUTuAw1MMfYjmGi3fRTYSJmDgA1U9wxIJZ9l8pXpDODqX 5coC1GPXElNyqKomtlvTcO1I5QzQcdjCargnuzrsh+yw2JonM/eDlXh3sw8bGVklmYgsxOFFdbd rKE0Re2BCMd5i1t2i6DoEeXT8PE1wMGGsRBExr2ceq9fKWyxDx1euaT0iEuwXp7lqYvziF8CP/W
- VauKklbzPIzIP9diIHX3WxzB9i8p+BuHJKaDjPfwZtLwz+ee7IVlL13yj+92ynwvN3pwgird
-X-Authority-Analysis: v=2.4 cv=INACChvG c=1 sm=1 tr=0 ts=6835b2b4 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=4tGWxnr0_xZ9uz3X2MUA:9 a=QEXdDO2ut3YA:10
- a=0TW8CM1oYAoA:10
-X-Proofpoint-ORIG-GUID: SQyfJiGMA-0kCPEk9ODezwVjLrGlcJ58
-X-Proofpoint-GUID: SQyfJiGMA-0kCPEk9ODezwVjLrGlcJ58
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-27_06,2025-05-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- clxscore=1015 phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 adultscore=0 mlxlogscore=555 priorityscore=1501
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505270103
+References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
+ <20250524-cstr-core-v10-2-6412a94d9d75@gmail.com> <DA66BBX1PDGI.10NHLG3D4CIT7@kernel.org>
+ <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
+In-Reply-To: <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Tue, 27 May 2025 14:44:27 +0200
+X-Gm-Features: AX0GCFs41915HXTpfqcCKH3n_1X5KqqnwxYwkDK8S1yQqomTcDJwCXbrNKkuqdo
+Message-ID: <CAH5fLgiUhvp9P7oSf4Rtv5jK1SNebW9-r5YFHVzCZjEwaR=Mjg@mail.gmail.com>
+Subject: Re: [PATCH v10 2/5] rust: support formatting of foreign types
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Benno Lossin <lossin@kernel.org>, Michal Rostecki <vadorovsky@protonmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 26-May-25 08:55, Stefano Garzarella wrote:
-> 
-> BTW I think I already fixed the same issue in this series:
-> https://lore.kernel.org/netdev/20250514141927.159456-1-sgarzare@redhat.com/
-> 
-> Can you check it?
+On Tue, May 27, 2025 at 12:18=E2=80=AFAM Tamir Duberstein <tamird@gmail.com=
+> wrote:
+> > > +}
+> > > +
+> > > +fn make_ident<'a, T: IntoIterator<Item =3D &'a str>>(
+> > > +    span: Span,
+> > > +    names: T,
+> > > +) -> impl Iterator<Item =3D TokenTree> + use<'a, T> {
+> > > +    names.into_iter().flat_map(move |name| {
+> > > +        [
+> > > +            TokenTree::Punct(Punct::new(':', Spacing::Joint)),
+> > > +            TokenTree::Punct(Punct::new(':', Spacing::Alone)),
+> > > +            TokenTree::Ident(Ident::new(name, span)),
+> > > +        ]
+> > > +    })
+> > > +}
+> > > diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
+> > > index d31e50c446b0..fa956eaa3ba7 100644
+> > > --- a/rust/macros/lib.rs
+> > > +++ b/rust/macros/lib.rs
+> > > @@ -10,6 +10,7 @@
+> > >  mod quote;
+> > >  mod concat_idents;
+> > >  mod export;
+> > > +mod fmt;
+> > >  mod helpers;
+> > >  mod kunit;
+> > >  mod module;
+> > > @@ -196,6 +197,24 @@ pub fn export(attr: TokenStream, ts: TokenStream=
+) -> TokenStream {
+> > >      export::export(attr, ts)
+> > >  }
+> > >
+> > > +/// Like [`core::format_args!`], but automatically wraps arguments i=
+n [`kernel::fmt::Adapter`].
+> > > +///
+> > > +/// This macro allows generating `core::fmt::Arguments` while ensuri=
+ng that each argument is wrapped
+> > > +/// with `::kernel::fmt::Adapter`, which customizes formatting behav=
+ior for kernel logging.
+> > > +///
+> > > +/// Named arguments used in the format string (e.g. `{foo}`) are det=
+ected and resolved from local
+> > > +/// bindings. All positional and named arguments are automatically w=
+rapped.
+> > > +///
+> > > +/// This macro is an implementation detail of other kernel logging m=
+acros like [`pr_info!`] and
+> > > +/// should not typically be used directly.
+> > > +///
+> > > +/// [`kernel::fmt::Adapter`]: ../kernel/fmt/struct.Adapter.html
+> > > +/// [`pr_info!`]: ../kernel/macro.pr_info.html
+> > > +#[proc_macro]
+> > > +pub fn fmt(input: TokenStream) -> TokenStream {
+> >
+> > I'm wondering if we should name this `format_args` instead in order to
+> > better communicate that it's a replacement for `core::format_args!`.
+>
+> Unfortunately that introduces ambiguity in cases where
+> kernel::prelude::* is imported because core::format_args is in core's
+> prelude.
 
-Yes, it looks like the same issue.
+I'm pretty sure that glob imports are higher priority than the core
+prelude? Or is this because there are macros that now incorrectly use
+kernel::prelude::format_args when they should use the one from core?
 
+Alice
 
