@@ -1,177 +1,160 @@
-Return-Path: <netdev+bounces-193674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8572AC50C8
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:24:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2984AC50DC
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 520D91BA0B67
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:24:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15EBB1BA189B
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F98927700B;
-	Tue, 27 May 2025 14:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D015627700B;
+	Tue, 27 May 2025 14:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDkruEgR"
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="a/JbTGWY";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iHxbwaSD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EE319CD16;
-	Tue, 27 May 2025 14:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E571419CD16
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 14:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748355831; cv=none; b=gKC8XCdPfJdB6IgZKOcWH5PB2Av4wIndQcKthx1BVEILjR5+0bZj2l6fwVq1F/HUq4zYUUBThvaQ2eojW9p4KUDlbnQ4WJ4E4hZWI6IDRneYfwAVbOfmDzM3WuPWQfHSNh6c1xVDgL21Wxqa2mzlULGv/b2DsFWNADT/kz+l8vQ=
+	t=1748355924; cv=none; b=Pb3wzoL/hDxy/BWRRTM+aZDVEzCFav6Eh1hMGMeai2QqAM4G7ye2jCil4aOwl3MIjw74IhfsIPAMaZnR14k4/Y/OqU0fg5EjUH39V+IbPSkUdKTp4Dcpy8FfrvBhpWhh45q/2NdKA/vPhFqx7USIG8vl0TJPmZI1yszNqgkQjVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748355831; c=relaxed/simple;
-	bh=xEvAthQl04RfIia9XZaGNG0pijIVN4yQy6i+18RddsI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iBliVQNO4qXyP3B9bZUAkvTO0HVmyWUj2MyD5tHLXlIqxnIrfzRUwQ/0zGA/1+FtouC4TBIEYB6D5Olz7bdE2C4WU2Quu6beGq3te4kayUR7TU0iL5JfYEFob6gruRpjDXf2B9O6ueUr+DZOoHfffgLgVAtxjkk575s0CsHsYCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDkruEgR; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-86a52889f45so80500639f.3;
-        Tue, 27 May 2025 07:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748355828; x=1748960628; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xmTjDT2LiyYwF2wR/qWfUuuEJKevqGe/HgmBHDb7hgI=;
-        b=CDkruEgRZ+MZTVeuxgiq8mRSRpmWDP49Y/vovQ+X5QFGas35g44Ioj22kq2HpfUMtn
-         /NWGpWnf5GFsJTdXWd/WRg3PPQhQ4S3qKXk9HV3d1jCDvFXxVvK25iygUrIEMoMbsxiE
-         4QXDeKYmNzXnddbCvy/RIWO+fXT2DfrrXgNK9Yjw/dt01neRnTk29bJvAcuJKHrrSwq+
-         S7B9MAquFxLhJ5qjE5fWIfERkA8zso7bl5YY4DPkXGewePiANTOtoBv4PVFkRBCxst1m
-         IjI97BYf/I8iwEKho6MUG2gwIEbbc/qNfoMkAVmAQMdfnf7brG7lHiFrY328xJzoOM91
-         gFqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748355828; x=1748960628;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xmTjDT2LiyYwF2wR/qWfUuuEJKevqGe/HgmBHDb7hgI=;
-        b=vZHMX98FhKtbbp9QDE2nkILTgkslsdi0giFmIFSySv64LcJrZGmJ3zTx7Yz1E+gBtF
-         5ojc6FsDxNR1kazL+Sj2AkbcaHaSpITfL/iiexVuTiqG8EdqnwKjK2C8MExgGAuODIUt
-         uJADs8GwycoWmX8AimO0LP1LxtipLKKaI+yaMAGwVydJjE5tMzWzh7xnrw9HyRc0Tgji
-         KYvQTvzX1TlbFa3bxqGYgSrMhtuJVFOU+Q0u1qKkZzxqDCajZyaoZNr+XX7ZPqyhLSgY
-         srxv7nDtUI96MLxU52N0/mq4JhiFSxidFDGnukYU3a7yPIoBLyddMRDZrradYwXOF4L4
-         lhrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWm6hDOLrxiH/nGCA6wnUOBpuxSNyBKexRg5reEV15xYsaUrFm3dQwefgSE159jzYSSoFwkrSkfvPI@vger.kernel.org, AJvYcCWjqeFl97XwTqYOcQiiR0TlcH9Ddi9xqP70BwQs1nz347on3CHT+3qgRP0qmKpPqhhxfihMNsXc@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBv03pm/K0xvcgZW53s/HIkprgNJPfsRx/dMPhxnQPuz1QqeT/
-	RUfg9dMpUA1Mrpf2oyVIZPp7FDsimdhKroyH0QySisUlYapMVlcXSi3gFSZOaJmVqAME6NKzWoE
-	NdX4WoWwyPCLrOZGqbJ6NnChEqZvTITjjTRr7
-X-Gm-Gg: ASbGncuzIpjEyDcm4NzsGreLcEl2ZlvV88mP59gxqE2M7BiFC3/F1qsbbmH5ajgx1ZU
-	iOZtJOaPwql+JMa2+tdd89fgSsN1WSmYkzlyU/KRlUhRJxuqHlr2ibamrTh6sLjlbHuO6KUer+d
-	HnVB4ZgjOMVgg+JWVT+QjvDnOwDLh83gY=
-X-Google-Smtp-Source: AGHT+IH7SsEHzLIjf82CLttgDNusdzC3nK2flv09oI166QJqd/Na89p4fl/qYeMiT+DyrfRaMRKeRM7Gq3YGwE0nIek=
-X-Received: by 2002:a05:6e02:2307:b0:3dc:88ca:5ea9 with SMTP id
- e9e14a558f8ab-3dc9b69abe2mr102343175ab.10.1748355828452; Tue, 27 May 2025
- 07:23:48 -0700 (PDT)
+	s=arc-20240116; t=1748355924; c=relaxed/simple;
+	bh=5azk2O4rIieZoEA26VHjIlb1KbIw3a0WOAAWIZQ8IGA=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=RpUrmT4EAgUDkL7SrCwVd3jLmWu8I6RFc5Qq1/EDcW5DX7jma2kVN5pfEnZ9m7C6dxXk4Sl8KcXfUhL4Ui2i1cJD1M+iRpMdXRrwaDCtpiQPyP3NUODH9ANjrjgWQmeYfv7vvw3PxSifTDlzqWNozQgba4gTuFBgE5NGE/MVLiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=a/JbTGWY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iHxbwaSD; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 923311140104;
+	Tue, 27 May 2025 10:25:21 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Tue, 27 May 2025 10:25:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1748355921;
+	 x=1748442321; bh=IqXp/VffkKWEbVJWizqAt22KX3AyhqcrasP5fBVrBNM=; b=
+	a/JbTGWYHxIX3gmoNj3YFzgEZqiWBNjiSmmJJnelYgUxv+DV2Ogl40GBdQy7NInb
+	EhCeP9PB5r5hhVHvZEbRRLGisQWfEi+ScibETx+6nvICtXvqHwzKOz+XZdBT1onO
+	BXB3+pkB4OoenExTKOJAzlNb0ulYW1LOfb8bW1z7Z4gMZH8TEKlS3+7RsTH35hiE
+	ryhGa9o/on//Fo4uYqYA9eRSgzTgFWImpJ0PXI5CH++bJlbaadXfh+MUc20fpKKv
+	auXs9Tj15v1dEeX5t7MGDcioFzoQU5/aiJgdc9N4dGzkMo3ye43MT6TsxnTLBQfS
+	Mu11B7J9DDZXSm9tIkjJcA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748355921; x=
+	1748442321; bh=IqXp/VffkKWEbVJWizqAt22KX3AyhqcrasP5fBVrBNM=; b=i
+	HxbwaSD9otLq+avnx2j1XUvgulVL1p0eSygQMcyASa8SOEGaRf5rvVps6xohkDl9
+	2eAFrT0RO7uxGkYkU2I5Ql52iNuDmDngOYv+TDFPYX17S4V4as4Vu33Ad7bNUZSJ
+	sMg0IEDymXgZ3AAV9nPfEL3n46LZEFjdIwJT3XxjK0Ege5YpPkuRkMvo5Cx91ThJ
+	3gJHRvcsWffVB+PZclUkEthIc5ELF1QcrJzloUI800gxl70vqQ8LJPCMhAdAbr+P
+	OMKDNqLVeQ9WWqDu0SZWtMYkAF5+hFFsobYydWxQgO6hfLILXBGlu6GxLCrxxmns
+	CoMDyvSUErnO28Pimd69w==
+X-ME-Sender: <xms:UMs1aKxL7hXy71REMmS_x2g_qd6yeiy8F29LZ7jKGSP06YscweVZTw>
+    <xme:UMs1aGTc-KBywKc_iCUtvikekS6IeVc-Q3BTzVrSStKJUug8aC10NFA8VfatDgs6_
+    umBakarbYQ6hWmYqOw>
+X-ME-Received: <xmr:UMs1aMUGiPshsWff_dpApQ9Sn2wyzHEaCTC70g9xslhtZO3bj7OMzc8qm0vAcwQfgV0q-ldxfDaNauHKEzE2FyQkX-iytj05d6jvRFJ6l1EmoA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvtdeiudculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
+    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
+    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnheptefh
+    leekteffhedtgeekudeivefhgfevtedvgedtjefhffejteelgeethfevhfdunecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
+    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
+    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
+    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
+    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
+    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:UMs1aAhMf6eNFJhFQGmA3GyAeMMHFSvVloFq4wtlhCdEwYuKP_J3NQ>
+    <xmx:UMs1aMBTJvPpuxR4h-VbG7GlqNyliENfE-LxhQ9cyY7k2itNUftliQ>
+    <xmx:UMs1aBLFdixk1LH9aX4kScMBFoZewZEBvDTIWLyymCu2HLhunLZPBw>
+    <xmx:UMs1aDCm1V7y42EGN2ZFV3zd_3VuhwzA_95MXt2AgDFHrXpXLpZwwQ>
+    <xmx:Ucs1aCINRNayKiKQ0U-nIOZrpGrdzZsp4HG5n0mpSA0WPcEDIPrRswx6>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 27 May 2025 10:25:18 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250526054745.2329201-1-hch@lst.de> <CADvbK_d-dhZB-j9=PtCtsnvdmx980n7m8hEDrPnv+h6g7ijF-w@mail.gmail.com>
- <aDTDOgqCrVryvr0_@f4>
-In-Reply-To: <aDTDOgqCrVryvr0_@f4>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 27 May 2025 10:23:37 -0400
-X-Gm-Features: AX0GCFs56UMPA4XnZrQcO6bX4-CWh7fuN5QGdKyDYNTtGOxk1zR6_0Jj2cgEnQw
-Message-ID: <CADvbK_d_3YQh0s_aOts3YiyHu_uxUxO4okCZDdi=+F4xbVnmKg@mail.gmail.com>
-Subject: Re: [PATCH] sctp: mark sctp_do_peeloff static
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, marcelo.leitner@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+From: Ricard Bejarano <ricard@bejarano.io>
+In-Reply-To: <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
+Date: Tue, 27 May 2025 16:25:16 +0200
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+ netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
+References: <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+ <20250526045004.GL88033@black.fi.intel.com>
+ <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
+ <20250526092220.GO88033@black.fi.intel.com>
+ <4930C763-C75F-430A-B26C-60451E629B09@bejarano.io>
+ <f2ca37ef-e5d0-4f3e-9299-0f1fc541fd03@lunn.ch>
+ <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
+ <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
+ <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
+ <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-On Mon, May 26, 2025 at 3:38=E2=80=AFPM Benjamin Poirier
-<benjamin.poirier@gmail.com> wrote:
->
-> On 2025-05-26 14:25 -0400, Xin Long wrote:
-> > On Mon, May 26, 2025 at 1:47=E2=80=AFAM Christoph Hellwig <hch@lst.de> =
-wrote:
-> > >
-> > > sctp_do_peeloff is only used inside of net/sctp/socket.c,
-> > > so mark it static.
-> > >
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > >  include/net/sctp/sctp.h | 2 --
-> > >  net/sctp/socket.c       | 4 ++--
-> > >  2 files changed, 2 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
-> > > index d8da764cf6de..e96d1bd087f6 100644
-> > > --- a/include/net/sctp/sctp.h
-> > > +++ b/include/net/sctp/sctp.h
-> > > @@ -364,8 +364,6 @@ sctp_assoc_to_state(const struct sctp_association=
- *asoc)
-> > >  /* Look up the association by its id.  */
-> > >  struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t=
- id);
-> > >
-> > > -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket =
-**sockp);
-> > > -
-> > >  /* A macro to walk a list of skbs.  */
-> > >  #define sctp_skb_for_each(pos, head, tmp) \
-> > >         skb_queue_walk_safe(head, pos, tmp)
-> > > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> > > index 53725ee7ba06..da048e386476 100644
-> > > --- a/net/sctp/socket.c
-> > > +++ b/net/sctp/socket.c
-> > > @@ -5627,7 +5627,8 @@ static int sctp_getsockopt_autoclose(struct soc=
-k *sk, int len, char __user *optv
-> > >  }
-> > >
-> > >  /* Helper routine to branch off an association to a new socket.  */
-> > > -int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id, struct socket =
-**sockp)
-> > > +static int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id,
-> > > +               struct socket **sockp)
-> > >  {
-> > >         struct sctp_association *asoc =3D sctp_id2assoc(sk, id);
-> > >         struct sctp_sock *sp =3D sctp_sk(sk);
-> > > @@ -5675,7 +5676,6 @@ int sctp_do_peeloff(struct sock *sk, sctp_assoc=
-_t id, struct socket **sockp)
-> > >
-> > >         return err;
-> > >  }
-> > > -EXPORT_SYMBOL(sctp_do_peeloff);
-> > >
-> > I believe sctp_do_peeloff() was exported specifically to allow usage
-> > outside of the core SCTP code. See:
-> >
-> > commit 0343c5543b1d3ffa08e6716d82afb62648b80eba
-> > Author: Benjamin Poirier <benjamin.poirier@gmail.com>
-> > Date:   Thu Mar 8 05:55:58 2012 +0000
-> >
-> >     sctp: Export sctp_do_peeloff
-> >
->
-> Thanks for digging that up. The purpose was of course for the commit
-> that followed:
-> 2f2d76cc3e93 dlm: Do not allocate a fd for peeloff (v3.4-rc1)
->
-> Since that usage was removed in
-> ee44b4bc054a dlm: use sctp 1-to-1 API (v4.3-rc1)
->
-> I don't see a problem with marking sctp_do_peeloff() static again.
->
-> > While there=E2=80=99s no known in-tree usage beyond SCTP itself, we can=
-=E2=80=99t be
-> > sure whether this function has been used by out-of-tree kernel modules.
->
-> The mainline kernel does not need to cater to out-of-tree users.
-Thank you for chiming in.
+Ok, I was going mad trying to find CRC stats for blue's tb0.
 
-I didn't know it was exported for the in-tree kernel dlm, and this
-patch should be applied to net-next.
+'ethtool -S' returns "no stats available".
+'netstat' and 'ss' aren't much better than 'ip -s link show dev'.
+CRC verification is done by the driver so 'tcpdump' won't see those (I =
+do see loss, however).
 
-Acked-by: Xin Long <lucien.xin@gmail.com>
+But, I do see the thunderbolt-net driver exposes rx_crc_errors.
+And then I found 'ip -s -s' (double -s):
+
+root@blue:~# ip -s -s link show dev tb0
+5: tb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel master =
+br0 state UP mode DEFAULT group default qlen 1000
+    link/ether 02:70:19:dc:92:96 brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast          =20
+    9477191497 6360635  16763       0       0       0=20
+    RX errors:  length    crc   frame    fifo overrun
+                     0  16763       0       0       0=20
+    TX:  bytes packets errors dropped carrier collsns          =20
+          8861     100      0       0       0       0=20
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       2=20
+root@blue:~#=20
+
+Bingo! CRC errors.
+
+How can we proceed?
+
+Thanks,
+RB=
 
