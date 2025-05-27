@@ -1,183 +1,131 @@
-Return-Path: <netdev+bounces-193642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1EE2AC4ED4
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:44:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF68BAC4EE8
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 14:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4476D189F765
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 12:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7A33A85F7
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 12:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B260526FA4F;
-	Tue, 27 May 2025 12:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5459025B67D;
+	Tue, 27 May 2025 12:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XcvoRoLc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZV6J6sL+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1887C26C38C
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 12:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB5EC2ED
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 12:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748349885; cv=none; b=S177kELBIZHz8Xnnwcc7VjmHZixhhyhhbP1rTS/jQAzk+NMbM809ng30ocflyjSstOtQatd6JTbxldsLJ4Q6cZZbS0ZLk7P987oGa1O8jHX8JMhgGPVTieSOuoPz1z4h9SfIqIV5fGHsRksLhF2AltR3LFgF9tDqY/HTD13Q/qA=
+	t=1748350301; cv=none; b=QlvPMaWEteSyMh2WmAhIozl4lPPfpUsNZulbv3xW1N9744nukOgRI41T3dsXrooXvM1uMZJ4nE5cPS+LAhoLr5pfESyhGIrlyts7VO/MTak81QibSLc08O2z0qgLiQMK+Kiyf+GYL5lGZ9Mnek2rRMLXI36UofxKQG9s8x0c/GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748349885; c=relaxed/simple;
-	bh=10pm6SoapnDJvi5UUh+zwz2m9mE3i07P8POT8yLYzj8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S5Zlau3RmzrXxlDYfGTHpgya4wzFO1+r5ap1H8M5jBFY9kdptIIbPy3OW0hA3plHKd7xUJUd3CZnBmVrd/fx+C+FrMs42/KfhJYAo4+ISdfKvtbKPEUEOQY10scUfPlpHVxHijNHqAcVKJOrFAXZInA1pkZTfWAVeM4iXfV2+uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XcvoRoLc; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-442f4a3a4d6so22649945e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 05:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748349881; x=1748954681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
-        b=XcvoRoLcCtVUPvy65xJfk1KQG529kbbSSLET2kD3LxtcR1OWq+EO0wGuefGCcCSZvP
-         BNkVRWIgQQi+aqSu2GroQ3HnyNVDr1o5sT8K4drSuez10Cp+jklozf+9UWipo21l4irS
-         Ma2BNmBAcmiDt8Ogc8QFesXS+QX9MIPRtHNZEjrSVXNv1tRyFSsKH1Pt/Djwpyb9QrDc
-         CH0JPjnO8SiZcbllaKVbeQomjd67TgzU8YWdlEtHrWAw7lLMgGJaaHXmMD2SxiiaofTx
-         1psySLAkisHF3Bk1w1auUZvbfqPsPNDbLWPepopvnenbtJNSBxFfDM/t5s4JEffG/ORa
-         2z9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748349881; x=1748954681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/+1ORexpCal/yWarvUklj5P7KVERu3osu4+FfJ0CMj4=;
-        b=L8aSWFJRrIFvl5XIuYLRoNbNoRMPhMegIpBzAOtYgO2CQq+YaMlg5YRU/A2rDc7Qpr
-         9sLstUBh+RlSe2bbHaW0obSjkvmmAFxJ6BnXIpKeXXlTGcY+U3xLl7s44zFhnKStuX66
-         8mfCfTDpLZ3h3CEVbJoAjL0II7i7Zn0ltWX70h1Fg7oSX+Srjmsy0mtKyOyux66a5GMH
-         qnwOGxnVqeZlc0VWHu5IGipvk4XM9tjDJWRT0SJBT76vsLyx7wU/1iI4ppundk/kqVFN
-         cilWOvKhnRndLLVsSSVJJhzZQIESM9LgQwZv2h9A51swd8hX9Os6hb9UilrzeCjRze37
-         LK6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUlbYKIUhwb8ukTrCQLgNTz0+RN1Im/lDkfIx56W1vuteiCLZIov1Q3Dtuxyk8PAxM8UhFlo8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpJsJazZd3KPqMFbgLTpX8quTVSy4rs0HsaOz1Bq7wnbRh5y4o
-	60mfOaM6YUS/2XyivXlixaz/OPp5lsY77gobsNftBOBdeoGCjheI2Yk1Yx2GZUBJt/4wXWcb1mW
-	T9afDAhHc2tXcuyOxHHi1p5cXswxQpDpQeAfT4/uK
-X-Gm-Gg: ASbGncu775yZaWKBcjhC+C6kqsNEEoPWvlF34eag1FNuR53ID2m2EJdVlWza7il6MY+
-	2Ens1zcmlinEaT/w/5sugK0tSWWsQw7tK2deYFa8NfcdMoOvlHJjtK92Yr1DAhW7DBxQpk6TDOS
-	F0FwZA41ev6kfeB3BOLJjIk4y3dkg00WmpNuATjFqFI1YGbI+TgvAkxi2HIUdfudCkvvx0lQkk
-X-Google-Smtp-Source: AGHT+IEky1d5meo1qHzcDPYMKOo6itgabi6xnmNH55BIUhfTHja5jzKInw1nb+GfsRVDFZjoQp10Sz6+0092+zxkyU8=
-X-Received: by 2002:a05:600c:54cc:b0:442:ea3b:9d72 with SMTP id
- 5b1f17b1804b1-44fd1a229demr3814135e9.5.1748349881244; Tue, 27 May 2025
- 05:44:41 -0700 (PDT)
+	s=arc-20240116; t=1748350301; c=relaxed/simple;
+	bh=3cU+dY0wVq4aj/o20gjFrN7S9DaDhmMGo7hP4cjZvPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fMptB1vwRIvuzXcyNKy9Mjl+jWREHy6IwJ0g7RLKdIg9/sgtHedderMFWdPsji6rLt+eVXr1mdcZLcPH5gBhK6d+sgGWhFdKr+yCidqvR5LuFXem2Rspmhb19yIe1cWJDNLKcChynlijql3M0Gg+ihFF0/8vwrWC/rIiP4ULV4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZV6J6sL+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6LClWmzPGP6R51f0eFDPpf34+b052ldRdb+oa5TATqU=; b=ZV6J6sL+e8j+CxulpG5MKHoW72
+	SunHsrbmgTgQIJfOSu/DPVSgs14ffY35JeUoVKj0FTUEXnG4Enbn7L13GHI+7mVH63St3IQS4nvKC
+	kevyml1rlePwPREXxr1wFLkU9/xUpFx/VvZPBdluuwDr/JpGjHjly01Ef5JWW9lvATdg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uJtmD-00E4lA-DQ; Tue, 27 May 2025 14:51:29 +0200
+Date: Tue, 27 May 2025 14:51:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ricard Bejarano <ricard@bejarano.io>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+	netdev@vger.kernel.org, michael.jamet@intel.com,
+	YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+Message-ID: <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
+References: <20250523110743.GK88033@black.fi.intel.com>
+ <353118D9-E9FF-4718-A33A-54155C170693@bejarano.io>
+ <20250526045004.GL88033@black.fi.intel.com>
+ <5DE64000-782A-492C-A653-7EB758D28283@bejarano.io>
+ <20250526092220.GO88033@black.fi.intel.com>
+ <4930C763-C75F-430A-B26C-60451E629B09@bejarano.io>
+ <f2ca37ef-e5d0-4f3e-9299-0f1fc541fd03@lunn.ch>
+ <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
+ <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
+ <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-2-6412a94d9d75@gmail.com> <DA66BBX1PDGI.10NHLG3D4CIT7@kernel.org>
- <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
-In-Reply-To: <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Tue, 27 May 2025 14:44:27 +0200
-X-Gm-Features: AX0GCFs41915HXTpfqcCKH3n_1X5KqqnwxYwkDK8S1yQqomTcDJwCXbrNKkuqdo
-Message-ID: <CAH5fLgiUhvp9P7oSf4Rtv5jK1SNebW9-r5YFHVzCZjEwaR=Mjg@mail.gmail.com>
-Subject: Re: [PATCH v10 2/5] rust: support formatting of foreign types
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Benno Lossin <lossin@kernel.org>, Michal Rostecki <vadorovsky@protonmail.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
 
-On Tue, May 27, 2025 at 12:18=E2=80=AFAM Tamir Duberstein <tamird@gmail.com=
-> wrote:
-> > > +}
-> > > +
-> > > +fn make_ident<'a, T: IntoIterator<Item =3D &'a str>>(
-> > > +    span: Span,
-> > > +    names: T,
-> > > +) -> impl Iterator<Item =3D TokenTree> + use<'a, T> {
-> > > +    names.into_iter().flat_map(move |name| {
-> > > +        [
-> > > +            TokenTree::Punct(Punct::new(':', Spacing::Joint)),
-> > > +            TokenTree::Punct(Punct::new(':', Spacing::Alone)),
-> > > +            TokenTree::Ident(Ident::new(name, span)),
-> > > +        ]
-> > > +    })
-> > > +}
-> > > diff --git a/rust/macros/lib.rs b/rust/macros/lib.rs
-> > > index d31e50c446b0..fa956eaa3ba7 100644
-> > > --- a/rust/macros/lib.rs
-> > > +++ b/rust/macros/lib.rs
-> > > @@ -10,6 +10,7 @@
-> > >  mod quote;
-> > >  mod concat_idents;
-> > >  mod export;
-> > > +mod fmt;
-> > >  mod helpers;
-> > >  mod kunit;
-> > >  mod module;
-> > > @@ -196,6 +197,24 @@ pub fn export(attr: TokenStream, ts: TokenStream=
-) -> TokenStream {
-> > >      export::export(attr, ts)
-> > >  }
-> > >
-> > > +/// Like [`core::format_args!`], but automatically wraps arguments i=
-n [`kernel::fmt::Adapter`].
-> > > +///
-> > > +/// This macro allows generating `core::fmt::Arguments` while ensuri=
-ng that each argument is wrapped
-> > > +/// with `::kernel::fmt::Adapter`, which customizes formatting behav=
-ior for kernel logging.
-> > > +///
-> > > +/// Named arguments used in the format string (e.g. `{foo}`) are det=
-ected and resolved from local
-> > > +/// bindings. All positional and named arguments are automatically w=
-rapped.
-> > > +///
-> > > +/// This macro is an implementation detail of other kernel logging m=
-acros like [`pr_info!`] and
-> > > +/// should not typically be used directly.
-> > > +///
-> > > +/// [`kernel::fmt::Adapter`]: ../kernel/fmt/struct.Adapter.html
-> > > +/// [`pr_info!`]: ../kernel/macro.pr_info.html
-> > > +#[proc_macro]
-> > > +pub fn fmt(input: TokenStream) -> TokenStream {
-> >
-> > I'm wondering if we should name this `format_args` instead in order to
-> > better communicate that it's a replacement for `core::format_args!`.
->
-> Unfortunately that introduces ambiguity in cases where
-> kernel::prelude::* is imported because core::format_args is in core's
-> prelude.
+> root@red:~# iperf3 -c 10.0.0.2 -u -b 1100M -t 5  # blue
+> Connecting to host 10.0.0.2, port 5201
+> [  5] local 10.0.0.1 port 46140 connected to 10.0.0.2 port 5201
+> [ ID] Interval           Transfer     Bitrate         Total Datagrams
+> [  5]   0.00-1.00   sec   131 MBytes  1.10 Gbits/sec  94897
+> [  5]   1.00-2.00   sec   131 MBytes  1.10 Gbits/sec  94959
+> [  5]   2.00-3.00   sec   131 MBytes  1.10 Gbits/sec  94959
+> [  5]   3.00-4.00   sec   131 MBytes  1.10 Gbits/sec  94959
+> [  5]   4.00-5.00   sec   131 MBytes  1.10 Gbits/sec  94951
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+> [  5]   0.00-5.00   sec   656 MBytes  1.10 Gbits/sec  0.000 ms  0/474725 (0%)  sender
+> [  5]   0.00-5.00   sec   597 MBytes  1.00 Gbits/sec  0.004 ms  42402/474725 (8.9%)  receiver
+> root@red:~#
+> 
+> Here are the stat diffs for each interface:
+> 
+> 1) red's br0 (10.0.0.1)
+>     RX:    bytes  packets errors dropped  missed   mcast
+>            +1055      +14      -       -       -       -
+>     TX:    bytes  packets errors dropped carrier collsns
+>       +707341722  +474740      -       -       -       -
+> 
+> 2) red's tb0
+>     RX:    bytes  packets errors dropped  missed   mcast
+>            +1251      +14      -       -       -       -
+>     TX:    bytes  packets errors dropped carrier collsns
+>       +707341722  +474740      -       -       -       -
+> 
+> 3) blue's tb0
+>     RX:    bytes  packets errors dropped  missed   mcast
+>       +707028822  +474530     +5       -       -       -
+>     TX:    bytes  packets errors dropped carrier collsns
+>            +1251      +14      -       -       -       -
+> 
+> 4) blue's br0 (10.0.0.2)
+>     RX:    bytes  packets errors dropped  missed   mcast
+>       +700385402  +474530      -       -       -       -
+>     TX:    bytes  packets errors dropped carrier collsns
+>            +1251      +14      -       -       -       -
+> 
+> So, if I'm reading this right, loss happens at blue tb0 RX.
+> We have 5 errors there and lost 210 packets.
+> 
+> Also, why does iperf3 report 42402 lost packets, though?
 
-I'm pretty sure that glob imports are higher priority than the core
-prelude? Or is this because there are macros that now incorrectly use
-kernel::prelude::format_args when they should use the one from core?
+210 lost is probably not enough to cause the TCP issue. The difference
+between 210 and 42402 probably means the loss is happening higher up
+the stack. But the majority are reaching blue, and then getting
+dropped. So maybe look at IP and UDP statistics, are the packets
+corrupt, failing CRC errors? netstat(1) and ss(1) will help you.
 
-Alice
+Another thing to try is run tcpdump on blue can capture some of the
+packets to a file. Feed the file to wireshark. Unlike tcpdump,
+wireshark checks all the CRCs and will tell you if they are wrong.
+
+	Andrew
 
