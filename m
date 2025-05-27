@@ -1,136 +1,141 @@
-Return-Path: <netdev+bounces-193577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26FABAC4959
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:32:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C36AC495D
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0438F3AEBAB
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:31:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D67F16B915
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D233E2475E3;
-	Tue, 27 May 2025 07:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E745C24888D;
+	Tue, 27 May 2025 07:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GyJpuDkM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzGdjdbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C7E2AF10;
-	Tue, 27 May 2025 07:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC1D242D69
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748331118; cv=none; b=YLelvytPFHfWA85tUml7D4w0dfl7THCYhKoD9M9Tx2bxR0WVCHy/k06db5cZKrjLSnfsNR/mPIfDViFbFuKiCTarbjkSpZn60A+vidTFcl6cBoNeOPftr5KeVqymOnFKlirH64TaKAlKqDTkF2dv6GVabRxAs1PFE97IjtHwLpQ=
+	t=1748331204; cv=none; b=ivIm55gl9y/Cozb4Ba4+ePsQIsoLEXr5x8JApLj+WswMaT3oOii6LOEaegjRQD679DKP3/1X6wh2h49YRQ/ytBdB53IBs4cxnVwg89QRUlrQuZjXe4cMqhnDP0Vsyr6LnmQK2leGFchoMRTWYtBWkA/NtfC+C+y6ZiUodpYAANc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748331118; c=relaxed/simple;
-	bh=uy90iF9tw2vE7SuCekeLDjRKm5mERvQ9+H/+C4NqjAg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Di8RQhG28DIuDX3VAfifRRH/HNNJmzq7pcnr7PiGEKanDXyczHo+/RkGXdjk5U8eZPCLfPoDWYXASJ9bXsuuPPSQPnQ/u/KffNlRn6+aUVG9uSdyHdQzNYLP6hVJsivQmgS+ovDHAQhOtsk4RDJqyLQMgioFfYeSpqddgyGaBXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GyJpuDkM; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54R6Xngw024975;
-	Tue, 27 May 2025 00:31:30 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=vgQ26jFz3G6RHRSYpIBIZXSpK
-	H7CT5B/4mriOoW1rt0=; b=GyJpuDkMTOL4AMUon/eHNL2C6iCov4jsnLZy7lIKv
-	lEsmeMhQcZF1ZAWW2qSjV3465ZDE9bJWipBvsxTScfpIvUW2aTyiHbGZm/3yfIsu
-	hN26bJ/q/qG/pMSKbX1io6dnNJIu76nXeUFzIfFBupQCQ/NECCYUjEdD7czgqlkF
-	idmlTbEiTLPgbZPXe0Y3Jd8UT1WcgjZe+HvIPDRzgLHnYr0YdDoUfhcavZNUIjRK
-	4yEWqGMqJG6CDUygP4b5MT0mEFMRAPfdm20kIPkOpHx/j+5k33kER/T3VyK+2Tor
-	8VYvBzjnfk2OWnV6/ozZ5sDrRYVp74xuZNSXiagnIohyQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46w880031h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 May 2025 00:31:30 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 27 May 2025 00:31:29 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 27 May 2025 00:31:29 -0700
-Received: from b570aef45a5c (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id 60B0E3F706A;
-	Tue, 27 May 2025 00:31:24 -0700 (PDT)
-Date: Tue, 27 May 2025 07:31:22 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Eugenia Emantayev <eugenia@mellanox.com>,
-        Tariq Toukan
-	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Or Gerlitz
-	<ogerlitz@mellanox.com>,
-        Matan Barak <matanb@mellanox.com>, <netdev@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH net] net/mlx4_en: Prevent potential integer overflow
- calculating Hz
-Message-ID: <aDVqSjcpG3kvl-0g@b570aef45a5c>
-References: <aDVS6vGV7N4UnqWS@stanley.mountain>
+	s=arc-20240116; t=1748331204; c=relaxed/simple;
+	bh=Q5exNgIPZ3rcCXxGY7JdPG10hbHpapVoeEeX30T1eXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L9wmFVECWSVK4jxghok6GKjox9FbiKM1LOKlzUVk2CzQYw6AEusghP9xL2LhhUw9U3E4nvx/Xca8+j+ls86kx0ApVChvnLu0jcFTreON5CDTRbyyr2lVTAUAJl/VobkKQNmW9686XZaa0vN70PIVzL6hBOvL+vRWCabAUViooAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FzGdjdbT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748331201;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cunzgH7S+aLdgPq0k81WwhGwjgYto2/OQbbZ283U668=;
+	b=FzGdjdbTDMJvRnfzABiT54n0xWrGxx2+LUlJkFpPPWKzukBVga2nWsdeRHFrDuddEUZKpm
+	WrBE/UHLtqZzoOyht50WNMsKCJ14zs4Rs3ejLp9TMNQsHt8wdp+FoAgqkp5emdiPO6E4T+
+	zEc/Z45gIL/fYsAuSqN1BFcm8irTzwo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-613-Cumz0UP2NLGxltSL1K5sww-1; Tue, 27 May 2025 03:33:17 -0400
+X-MC-Unique: Cumz0UP2NLGxltSL1K5sww-1
+X-Mimecast-MFC-AGG-ID: Cumz0UP2NLGxltSL1K5sww_1748331196
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ad5271a051eso276242066b.1
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 00:33:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748331196; x=1748935996;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cunzgH7S+aLdgPq0k81WwhGwjgYto2/OQbbZ283U668=;
+        b=jZDRF6matnKcHkMvt6YZA318JcuO0+KnINENcsHzZoOrQ2JBhMjAoTTNAG9l6uPWMk
+         7J5XQVE9XjdesxQ9FYUJBBEi9z3HyRzC6gu4yRtVlmYH/6T2ZzhZ5WAhsgfW3bik6y7b
+         FwuQ/lTB+Osz1JW5tqPloYpTj4jhKxgheKe4d5+/JwPxF4vZ5o2FOmt/20yGO4J6/I5O
+         nNVt7j0lUNBhjSWHHTw9gfSMLj1gLf291tAyD+ny0eAwbw1QSC4L1sQa87PqQL4TNpIF
+         Tt0CpkOnEyjTAwa/2l8IhDhLm9h84gwz4mRAyWHDsefwdrVy0V9EmXgpHnDiaThBoQhE
+         kCoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbGCTLoEWqqup9+6bUjPPsXVMhn08ZxyooQ7LL85kQzo0Myb0PApSKVx4xfnudjSD6npNb+Gw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUUirgdakafN9eaBfwH4op/iq10rLgKrnhjusHFnA/k4TxFhKM
+	JPEDpkd5Q8WKjo57JmCvSopdf5qPU89+YQQO6mgTaFId/pR7lGZUR/3K7QYp+pAt6Dz9IRW9sjG
+	wXQgfCQr2+Tor2s2E+y3YyhlT5csDsUX5gSyZ6wSb13623pBMSgSKaqDVnzHomn+jxnz5qaMrjX
+	zievvFlN8u7v/FgQ/c1mFmjtFXBW9gFpT0
+X-Gm-Gg: ASbGncuihm7r2aISrcPBNjteU4elcecDEKGRxYalSJro5fCrNkI2PJd2bYc0QlQq0/L
+	gLk9lXMHcjs5sRgsLZ22XFT6Nm8KvgiBcFO99+CkxfKWnRlQpig0hBX7EnHcgSVS2j92HtQ==
+X-Received: by 2002:a17:907:2d06:b0:ad8:91e4:a939 with SMTP id a640c23a62f3a-ad891e4ab88mr90913366b.31.1748331196133;
+        Tue, 27 May 2025 00:33:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHE+yREw9Xt70cyZxJq0TzH4IO2hkS3lRZlAYZQR0TOm58NlaFFrIin3Tp0JuOk9uXg1wuPKl8my3Y4oIddiFk=
+X-Received: by 2002:a17:907:2d06:b0:ad8:91e4:a939 with SMTP id
+ a640c23a62f3a-ad891e4ab88mr90911466b.31.1748331195805; Tue, 27 May 2025
+ 00:33:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aDVS6vGV7N4UnqWS@stanley.mountain>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDA1OSBTYWx0ZWRfX4lfaHFGFwyn1 OIeJ7vSbaFna/eFE9Oxg7Vuzb1+woWDzkdDy3IN4FJvrZagiyWlKSIeDdfYdZ0E4dNwQLGMRr97 qRWrve/pEVTBsytl0JCjfCmA+F3QyozL2CDW0TMabzap0lcUdUi0PdWdXqq5PdlsqCnCLLi251S
- cZVFP4Cx4GC35deZgAqlse9oT6rI8X56upi1LxgZNYA4FybFp7/AK1sJZFa8q+KqfQjCkZy64L2 opOUsRv1uDJorYYKDn8wjWLHuCYrlo8gMqiaUBnuT7YRXoPKBASRucBnUYLRX8gFO39dpmuMJST TlALcRrh5IZ9Cq5bPPDfe+CMhui09H0O8Fj3v8f5f+JqOCk63a9pQzlajdgFYV98kxHtBH9zPlT
- J0nOZ7wMLhWIIOCJV7oB0LNS00IECzNerkwaYWgIFoC2t3YqE5CniYICL++1603ewdmPe9I1
-X-Authority-Analysis: v=2.4 cv=LZ086ifi c=1 sm=1 tr=0 ts=68356a52 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=KKAkSRfTAAAA:8 a=aPZOCdfHzjhHKCp-osAA:9 a=CjuIK1q_8ugA:10
- a=cvBusfyB2V15izCimMoJ:22 a=yGmsW_zf-WRfUAWRrVPH:22
-X-Proofpoint-ORIG-GUID: goaZm1hBinGupUf6L5h1VAf4KJaIbQjj
-X-Proofpoint-GUID: goaZm1hBinGupUf6L5h1VAf4KJaIbQjj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-27_04,2025-05-26_02,2025-03-28_01
+References: <20250521092236.661410-1-lvivier@redhat.com>
+In-Reply-To: <20250521092236.661410-1-lvivier@redhat.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Tue, 27 May 2025 15:32:39 +0800
+X-Gm-Features: AX0GCFu3yaPuYSMtDazhp-Ne51miEA8ZjlwJwMW50oQSQAStMU3hnrGf9ypWHq0
+Message-ID: <CAPpAL=ytK4SA-m0ZWvByVJrTNTGzvqkpiC-yGvDB7KBBXWwm=g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] virtio: Fixes for TX ring sizing and resize error reporting
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: linux-kernel@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Tested pass this series of patches with virtio-net regression tests,
+everything works fine.
 
-On 2025-05-27 at 05:51:38, Dan Carpenter (dan.carpenter@linaro.org) wrote:
-> The "freq" variable is in terms of MHz and "max_val_cycles" is in terms
-> of Hz.  The fact that "max_val_cycles" is a u64 suggests that support
-> for high frequency is intended but the "freq_khz * 1000" would overflow
-> the u32 type if we went above 4GHz.  Use unsigned long type for the
-> mutliplication to prevent that.
-> 
-> Fixes: 31c128b66e5b ("net/mlx4_en: Choose time-stamping shift value according to HW frequency")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/net/ethernet/mellanox/mlx4/en_clock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-> index cd754cd76bde..7abd6a7c9ebe 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-> @@ -249,7 +249,7 @@ static const struct ptp_clock_info mlx4_en_ptp_clock_info = {
->  static u32 freq_to_shift(u16 freq)
->  {
->  	u32 freq_khz = freq * 1000;
-> -	u64 max_val_cycles = freq_khz * 1000 * MLX4_EN_WRAP_AROUND_SEC;
-> +	u64 max_val_cycles = freq_khz * 1000UL * MLX4_EN_WRAP_AROUND_SEC;
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-1000ULL would be better then.
+On Wed, May 21, 2025 at 5:23=E2=80=AFPM Laurent Vivier <lvivier@redhat.com>=
+ wrote:
+>
+> This patch series contains two fixes and a cleanup for the virtio subsyst=
+em.
+>
+> The first patch fixes an error reporting bug in virtio_ring's
+> virtqueue_resize() function. Previously, errors from internal resize
+> helpers could be masked if the subsequent re-enabling of the virtqueue
+> succeeded. This patch restores the correct error propagation, ensuring th=
+at
+> callers of virtqueue_resize() are properly informed of underlying resize
+> failures.
+>
+> The second patch does a cleanup of the use of '2+MAX_SKB_FRAGS'
+>
+> The third patch addresses a reliability issue in virtio_net where the TX
+> ring size could be configured too small, potentially leading to
+> persistently stopped queues and degraded performance. It enforces a
+> minimum TX ring size to ensure there's always enough space for at least o=
+ne
+> maximally-fragmented packet plus an additional slot.
+>
+> v2: clenup '2+MAX_SKB_FRAGS'
+>
+> Laurent Vivier (3):
+>   virtio_ring: Fix error reporting in virtqueue_resize
+>   virtio_net: Cleanup '2+MAX_SKB_FRAGS'
+>   virtio_net: Enforce minimum TX ring size for reliability
+>
+>  drivers/net/virtio_net.c     | 14 ++++++++++----
+>  drivers/virtio/virtio_ring.c |  8 ++++++--
+>  2 files changed, 16 insertions(+), 6 deletions(-)
+>
+> --
+> 2.49.0
+>
+>
+>
 
-Thanks,
-Sundeep
-
->  	u64 max_val_cycles_rounded = 1ULL << fls64(max_val_cycles - 1);
->  	/* calculate max possible multiplier in order to fit in 64bit */
->  	u64 max_mul = div64_u64(ULLONG_MAX, max_val_cycles_rounded);
-> -- 
-> 2.47.2
-> 
 
