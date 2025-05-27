@@ -1,100 +1,136 @@
-Return-Path: <netdev+bounces-193576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65707AC4954
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:30:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26FABAC4959
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19C4E188F89B
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:30:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0438F3AEBAB
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B76822756A;
-	Tue, 27 May 2025 07:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D233E2475E3;
+	Tue, 27 May 2025 07:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVP4FJke"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GyJpuDkM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3F226D1A
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 07:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C7E2AF10;
+	Tue, 27 May 2025 07:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748331002; cv=none; b=s/lGRi3Ye8i5CTzBW7J6WXhtqZIBQfnQvHpytEv/RoJwiorCNSu2WiKsEO1YgyjzDOyggoyDfn7qCaEWhAB1e1U1afwIvWEIpdjYtHWS1owiQ9F+u+GBOWHA+HAMxRLkNP3JeUXU6FfRwWyEHy4tLEl99groksWJu85XEZ3qKXU=
+	t=1748331118; cv=none; b=YLelvytPFHfWA85tUml7D4w0dfl7THCYhKoD9M9Tx2bxR0WVCHy/k06db5cZKrjLSnfsNR/mPIfDViFbFuKiCTarbjkSpZn60A+vidTFcl6cBoNeOPftr5KeVqymOnFKlirH64TaKAlKqDTkF2dv6GVabRxAs1PFE97IjtHwLpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748331002; c=relaxed/simple;
-	bh=AWI9kLnuT1AtAxgKH1AkVSteeqPunoTZVDJNBNfOALw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kt98hNsj5gKE/uPC6V3zYkSjx5T8EMbUlPsrzaVo61WRybA9B0Jk7XMeVxma3e/tCAdhbkzAa90Kv56m/F1UeajNczpTRVlOX9on25O4w2pTDv8hawGA3Yb1FJBcYUzKAkUOvOgp1Og3e6QL7GK0O0QfglxrLRrkv+dSSRhqOzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVP4FJke; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D96C4CEE9;
-	Tue, 27 May 2025 07:30:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748331000;
-	bh=AWI9kLnuT1AtAxgKH1AkVSteeqPunoTZVDJNBNfOALw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lVP4FJkelbIVpXLfcuGze4rmAknEq4bCjVL8jtFLJqrrkOjLT7G5xgyj9bNj5Zexz
-	 HvP0nPwcYtXt/maJhJIoRuzlQ+l1TBjXtL7W+ngqMWmtdnZ5VM8H5VNOQGoWmfwPjF
-	 ieUfHTatBEz3jFY7p3SQYi1n+bWnQNYuV/nDvXg0Y6Jmd0ZexJ6uuU0f7UXnO6nY8p
-	 0RHuAjUkkOyi6+h/BCLce4AgolBwg0YSBGN137GR7IGJYFaosFsw+rUXx83Y+nMgz/
-	 e77Ndt5ftoxdF7fndY2osuA3yTvhfmN2/NHYjYQlsa59GdzTjZ6u2J79sdzj8S4q1H
-	 OiXDEwTz0DwTA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E06380AAE2;
-	Tue, 27 May 2025 07:30:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748331118; c=relaxed/simple;
+	bh=uy90iF9tw2vE7SuCekeLDjRKm5mERvQ9+H/+C4NqjAg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Di8RQhG28DIuDX3VAfifRRH/HNNJmzq7pcnr7PiGEKanDXyczHo+/RkGXdjk5U8eZPCLfPoDWYXASJ9bXsuuPPSQPnQ/u/KffNlRn6+aUVG9uSdyHdQzNYLP6hVJsivQmgS+ovDHAQhOtsk4RDJqyLQMgioFfYeSpqddgyGaBXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GyJpuDkM; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54R6Xngw024975;
+	Tue, 27 May 2025 00:31:30 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=vgQ26jFz3G6RHRSYpIBIZXSpK
+	H7CT5B/4mriOoW1rt0=; b=GyJpuDkMTOL4AMUon/eHNL2C6iCov4jsnLZy7lIKv
+	lEsmeMhQcZF1ZAWW2qSjV3465ZDE9bJWipBvsxTScfpIvUW2aTyiHbGZm/3yfIsu
+	hN26bJ/q/qG/pMSKbX1io6dnNJIu76nXeUFzIfFBupQCQ/NECCYUjEdD7czgqlkF
+	idmlTbEiTLPgbZPXe0Y3Jd8UT1WcgjZe+HvIPDRzgLHnYr0YdDoUfhcavZNUIjRK
+	4yEWqGMqJG6CDUygP4b5MT0mEFMRAPfdm20kIPkOpHx/j+5k33kER/T3VyK+2Tor
+	8VYvBzjnfk2OWnV6/ozZ5sDrRYVp74xuZNSXiagnIohyQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46w880031h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 May 2025 00:31:30 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 27 May 2025 00:31:29 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 27 May 2025 00:31:29 -0700
+Received: from b570aef45a5c (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 60B0E3F706A;
+	Tue, 27 May 2025 00:31:24 -0700 (PDT)
+Date: Tue, 27 May 2025 07:31:22 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: Eugenia Emantayev <eugenia@mellanox.com>,
+        Tariq Toukan
+	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Or Gerlitz
+	<ogerlitz@mellanox.com>,
+        Matan Barak <matanb@mellanox.com>, <netdev@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+Subject: Re: [PATCH net] net/mlx4_en: Prevent potential integer overflow
+ calculating Hz
+Message-ID: <aDVqSjcpG3kvl-0g@b570aef45a5c>
+References: <aDVS6vGV7N4UnqWS@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] wireguard updates for 6.16
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174833103500.1194728.8228604988048864577.git-patchwork-notify@kernel.org>
-Date: Tue, 27 May 2025 07:30:35 +0000
-References: <20250521212707.1767879-1-Jason@zx2c4.com>
-In-Reply-To: <20250521212707.1767879-1-Jason@zx2c4.com>
-To: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aDVS6vGV7N4UnqWS@stanley.mountain>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDA1OSBTYWx0ZWRfX4lfaHFGFwyn1 OIeJ7vSbaFna/eFE9Oxg7Vuzb1+woWDzkdDy3IN4FJvrZagiyWlKSIeDdfYdZ0E4dNwQLGMRr97 qRWrve/pEVTBsytl0JCjfCmA+F3QyozL2CDW0TMabzap0lcUdUi0PdWdXqq5PdlsqCnCLLi251S
+ cZVFP4Cx4GC35deZgAqlse9oT6rI8X56upi1LxgZNYA4FybFp7/AK1sJZFa8q+KqfQjCkZy64L2 opOUsRv1uDJorYYKDn8wjWLHuCYrlo8gMqiaUBnuT7YRXoPKBASRucBnUYLRX8gFO39dpmuMJST TlALcRrh5IZ9Cq5bPPDfe+CMhui09H0O8Fj3v8f5f+JqOCk63a9pQzlajdgFYV98kxHtBH9zPlT
+ J0nOZ7wMLhWIIOCJV7oB0LNS00IECzNerkwaYWgIFoC2t3YqE5CniYICL++1603ewdmPe9I1
+X-Authority-Analysis: v=2.4 cv=LZ086ifi c=1 sm=1 tr=0 ts=68356a52 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=KKAkSRfTAAAA:8 a=aPZOCdfHzjhHKCp-osAA:9 a=CjuIK1q_8ugA:10
+ a=cvBusfyB2V15izCimMoJ:22 a=yGmsW_zf-WRfUAWRrVPH:22
+X-Proofpoint-ORIG-GUID: goaZm1hBinGupUf6L5h1VAf4KJaIbQjj
+X-Proofpoint-GUID: goaZm1hBinGupUf6L5h1VAf4KJaIbQjj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-27_04,2025-05-26_02,2025-03-28_01
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 21 May 2025 23:27:02 +0200 you wrote:
-> Hi Jakub,
+On 2025-05-27 at 05:51:38, Dan Carpenter (dan.carpenter@linaro.org) wrote:
+> The "freq" variable is in terms of MHz and "max_val_cycles" is in terms
+> of Hz.  The fact that "max_val_cycles" is a u64 suggests that support
+> for high frequency is intended but the "freq_khz * 1000" would overflow
+> the u32 type if we went above 4GHz.  Use unsigned long type for the
+> mutliplication to prevent that.
 > 
-> This small series contains mostly cleanups and one new feature:
+> Fixes: 31c128b66e5b ("net/mlx4_en: Choose time-stamping shift value according to HW frequency")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/ethernet/mellanox/mlx4/en_clock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> 1) Kees' __nonstring annotation comes to wireguard.
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+> index cd754cd76bde..7abd6a7c9ebe 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+> @@ -249,7 +249,7 @@ static const struct ptp_clock_info mlx4_en_ptp_clock_info = {
+>  static u32 freq_to_shift(u16 freq)
+>  {
+>  	u32 freq_khz = freq * 1000;
+> -	u64 max_val_cycles = freq_khz * 1000 * MLX4_EN_WRAP_AROUND_SEC;
+> +	u64 max_val_cycles = freq_khz * 1000UL * MLX4_EN_WRAP_AROUND_SEC;
+
+1000ULL would be better then.
+
+Thanks,
+Sundeep
+
+>  	u64 max_val_cycles_rounded = 1ULL << fls64(max_val_cycles - 1);
+>  	/* calculate max possible multiplier in order to fit in 64bit */
+>  	u64 max_mul = div64_u64(ULLONG_MAX, max_val_cycles_rounded);
+> -- 
+> 2.47.2
 > 
-> 2) Two selftest fixes, one to help with compilation on gcc 15, and one
->    removing stale config options.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/5] wireguard: selftests: cleanup CONFIG_UBSAN_SANITIZE_ALL
-    https://git.kernel.org/netdev/net-next/c/e74e9ee2c800
-  - [net-next,2/5] wireguard: global: add __nonstring annotations for unterminated strings
-    https://git.kernel.org/netdev/net-next/c/71e5da46e78c
-  - [net-next,3/5] wireguard: netlink: use NLA_POLICY_MASK where possible
-    https://git.kernel.org/netdev/net-next/c/c8529020070c
-  - [net-next,4/5] wireguard: allowedips: add WGALLOWEDIP_F_REMOVE_ME flag
-    https://git.kernel.org/netdev/net-next/c/ba3d7b93dbe3
-  - [net-next,5/5] wireguard: selftests: specify -std=gnu17 for bash
-    https://git.kernel.org/netdev/net-next/c/ca8bf8f38334
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
 
