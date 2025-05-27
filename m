@@ -1,126 +1,124 @@
-Return-Path: <netdev+bounces-193565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9F7AC47D0
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:51:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA014AC4819
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 08:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 251C43A9536
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 05:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 773693A5968
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 06:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB7B1DB551;
-	Tue, 27 May 2025 05:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC421E3DF4;
+	Tue, 27 May 2025 06:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bHBTFXVq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ach95SFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839372AEED
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 05:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A6119E96D
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 06:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748325108; cv=none; b=aSB61djZ5O3JGSFsT9Q5WAU4RuHeaQ7lso0sfydavSFfZUtS2xu0IOrX/aXhQvKf96/uEqoSbJ2ZT5cX3RsDY8//Zu6+0mQ4arUpg96cuPctmApQCiXl6Aw+mLw7u74o/3zi9jCCFvh8vHkOt5j5ZmLAnLv8gXoty9D1yXi9EXE=
+	t=1748326139; cv=none; b=KSkO0z/IjA/a7r8AWNKWQt78s/ZfSOuPiLgidR+xJ2cTaqbgIqQyii24nLN4s2GvoLWefZDhT5t6I/FwFe5VlnB5P/NSJ6kU1vi9uYJfFuI7CBTZ2pe5DQlqhZ0YTIcn6JgnJZ3zYCkCwruPzbcTY5TrxeSinUOyJ86GnjBxMRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748325108; c=relaxed/simple;
-	bh=FRU9W1+DS8rfpo6UNzEN6UMBg1u0Yz12fF9f8ZKM/kE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=VOU1Gl6/3BGRkzwHNWJP4Mjtc8tpRZ/HCLfYtr4/Zbeoc2C9FIcCZfBndG+yjOf4EFdyWYUbbGR6IdK8/Vq3l9auKqaM3X8E+3XxDgZlz43VZTZ29SQSv2qcxE18qYpgGI+hJta5OPmODYRcYS9ZoTU834TOl/CJBLr9L9fMBLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bHBTFXVq; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ad56cbc7b07so447401466b.0
-        for <netdev@vger.kernel.org>; Mon, 26 May 2025 22:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748325105; x=1748929905; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVp2NY7FohPgZU2Typ+0h2uamFavzqINb4M9GCUjHoM=;
-        b=bHBTFXVq7lydwB0QzS+hm0UM3cfkRYU8KwUkLGuYw2TcnPaOUTR13DvGMIXmoqNmW0
-         HA2S3B579S0TlaPnpVn6T31o4VgrKCs2yJXpOTDGwxNxKNBh5Hffe+Bp5do0pn+GjdgR
-         MpY0S9SaXpe5RFJEbnAdlLvQMlEKhCGG4bEzvW+a0/HC0o8ikkSUFjzTH1VKlodI4J1C
-         l5Q4C7TJGoPgeNKaJqg3pzlnzd0+cs0RzloH7ZxFCOrwLaQs4p6zoG21ZdvrPMWPYWyE
-         xmLtJaE+wHldpnrw3Y5Z2cJpuNTp3EJ3H5Aiz4sZGlXTfu8IaEpkray8s4svhPcYmgfv
-         +5Hw==
+	s=arc-20240116; t=1748326139; c=relaxed/simple;
+	bh=61jbQ6fa6Y3o4tynXM0JiWhjtIWbokyFgJb882cjQfI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rf9tRkblBY1FhHacLHgNkuFjhS1YeSMsqzAdC6V/f88fKDi9JdITir2DLKAQbXJ2Is37NPHVZlGLpq2cAa4n5OFsBgzcltzvtNBeeYqMG3lgHSteXb3SOFF1wYO2ge2dXj7hPZLnV91asYqbjIjtDTtEluUpnTA3Y64/+tgbDWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ach95SFY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748326136;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yr/iHE42lciAZJuWsNNhCZ1eCfByYTSyjML/1uGKARw=;
+	b=Ach95SFYnS3eIkGgZIbMS6atkt736gFRaCxPhMDka9hikYMCPg8pIc/FcY5Y/AWxlxAvAR
+	MnCdcI9BZkT4MCjaicMk0L8eF4AUFbf5HllTl9oUzey5OAH1vXMpzbuI+TXoVaH5tjdSsc
+	HAen6N+/nJngO50VeB2VDIA/a9hZq0Y=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-EDuOqcqONYaGEja1Y4uZVw-1; Tue, 27 May 2025 02:08:55 -0400
+X-MC-Unique: EDuOqcqONYaGEja1Y4uZVw-1
+X-Mimecast-MFC-AGG-ID: EDuOqcqONYaGEja1Y4uZVw_1748326134
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-440667e7f92so15216515e9.3
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 23:08:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748325105; x=1748929905;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1748326134; x=1748930934;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVp2NY7FohPgZU2Typ+0h2uamFavzqINb4M9GCUjHoM=;
-        b=qrBMB2Mx9Q7AE3TYG8cF2uGKWkgZtT/cxnki8Bn2bjD+3MyazD1WxkvXR7xTCU/hHx
-         8hkPqdbk5OVhBnZCM6EAp69298S/QtDfMnHN0RuC2DX8ZHGFZdsGSH2ZSpuN2+A+kvA2
-         w7k4NdUMi41fZGsgXpMFftsrTkZyavjPJn+fO0MhTvhATl1csQyfWFbG449nPVE4t+Bx
-         KStslidN1f1rMA8RFGzEbHEL1JXPm1ktciq6ba9bVVCo4HSETOmLdWDNHx0/hkqmBbX9
-         Wp44XbcvUY4ht7oA9vs7lesQmYukv6TK87Hl1nLALY8lRV/J6C4ieSkVaxRpCVPf1IYc
-         loSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKcnSHyV0kpQ3L3i6ihpzo9osyARgquPf8MOtvAi879IFvdoeoHItvhzGMNRyJqb+a/F0+VMY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkbykuNIq5ve/UVB9rz9SL1RR5a04QmTD2TTaGwL4S0EvGzCm+
-	6kJg6CQByVHEfhINYsoBj0OygB+eC9ZmP4L0phS4M+sRXAfW09rPZgnIFj+XhefGsy0=
-X-Gm-Gg: ASbGncv+HFs0tfX28JLw9KZ6freLAbtZgEXZ3Nagj3ZFNJE6Nr2q8VKgPgtwnN0dD/u
-	ZD+KD7znVBkHCYQn5Zx2yDK73DZ5Oi8M9xx2CQQIH6DmJW005KdUZ6AgagRUeWQOqpQt+y4YarJ
-	H9dHNfpwjk90I8WCdxkzfnmwXkGYI91guUUXac/KoNgGfcGmSciUIG541cOistsYBr6sOaRdrcS
-	oxQSswxmbg/TdhHKF19Esbz/oEM+tePrdZyKN5JbZtRzYtff96pfsRBpYLcxFJiSEMkNT/HLKTF
-	9uMkmsZDyDuPtYFr00YhpnocJs1NsnG4+uNs9rJ5kaqWjSv0k6OozusoAVSwDNHzPMWB3pBAGM8
-	=
-X-Google-Smtp-Source: AGHT+IHjsxqs/6jcL8C7UZ6kgwo4G0JpqJqenkT3mjexlsQRl4jPPZvuq7A6WGfuQrzvXuOSfE1M6A==
-X-Received: by 2002:a17:906:b84c:b0:ad8:883b:f10d with SMTP id a640c23a62f3a-ad8883bf140mr176024766b.34.1748325104785;
-        Mon, 26 May 2025 22:51:44 -0700 (PDT)
-Received: from localhost (hf94.n1.ips.mtn.co.ug. [41.210.143.148])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ad8908a54f8sm40467266b.63.2025.05.26.22.51.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 22:51:44 -0700 (PDT)
-Date: Tue, 27 May 2025 08:51:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Eugenia Emantayev <eugenia@mellanox.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Or Gerlitz <ogerlitz@mellanox.com>,
-	Matan Barak <matanb@mellanox.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net/mlx4_en: Prevent potential integer overflow
- calculating Hz
-Message-ID: <aDVS6vGV7N4UnqWS@stanley.mountain>
+        bh=Yr/iHE42lciAZJuWsNNhCZ1eCfByYTSyjML/1uGKARw=;
+        b=ncNoEDrZloZOsUMAE52ONH9YsLv4BAUQ2qsKyKfOQzRMFTb7R60Gx3iboa1zFESkyR
+         bVHG3z73nxno2rmavmK9GOqO38AbLf3kIp9wCT4mfRO25h/eD1ux3JU+SJhOmcYZdCop
+         eTJehF51ouXQW4kSJZ2X0Y2UDOvcWZ0r0RfEt1AT1cixadeap9OttiAjD2nbeSF9wy4p
+         LlCtbtbmEUoA3+ulT7AoarrPeb+CWgqYZJICN7Y/mgn1n2qwPmKATvzniHayc8s6E7db
+         OSMHoTr5qLki3KqNyYcRlkStza6Nj9EL6V0PRCMPku2+q/EjitI1TIdQkDPSBfcMLgog
+         DYlg==
+X-Gm-Message-State: AOJu0YzMz0oj+VyP4D2nuVerth3q0FqI6gvwyJ5F1f74FB7IRrvl1Xq/
+	x23GpB2q9MN3eeD7HRBOtBnp0coKsKo5YeC7gHR1doBWTMa1ik+v3RrjCtUlNocKbDqY1kEge/R
+	+Lm8si4f1qYLtYoOS7ErJfKhwVkgfT6qFi3VThrsU1zaRM1PbdhiPjME0uzPASws3zw==
+X-Gm-Gg: ASbGnctjfUfKp3JAiKYSfL/rbpkw47vPUNloymgAatIcsG1I2r9K2MVVSbdVN9cY4qj
+	hGBdcl5SkO1tQU/ZhMh+jeSGKHuzSESBRmlSnfZAkMY3EERoeQdfRokrBJXNSAvjZnXWJMyxIG4
+	4RrvZoWoBcRqv750rLZ3zCXjLhW5M5aWeDIqIzhwyUR0UVmm8tbJ/VWCPNWxd6e9dpnKeuieOc3
+	XBDbD3qU5QCroprZ/qgx5kXtl0BalcfCK1vRYG3ZIiKLHGACeLd9m2ZItVz1ebxfgOR/UGyoeuZ
+	imNRGUcTASB0zV6KNuUG2V+eubOlXOJIIGW1QrHWCTwhFGN+FyCZ33qGSiI=
+X-Received: by 2002:a05:600c:8012:b0:43d:45a:8fbb with SMTP id 5b1f17b1804b1-44c92d3516cmr97440695e9.22.1748326133815;
+        Mon, 26 May 2025 23:08:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHtEENZYkJ7PmbK5PzUATkfuQAjGiCkwpYW0D71exXRVvHMfIITt9n4VT6TFIbYDLgAOtnPFg==
+X-Received: by 2002:a05:600c:8012:b0:43d:45a:8fbb with SMTP id 5b1f17b1804b1-44c92d3516cmr97440385e9.22.1748326133458;
+        Mon, 26 May 2025 23:08:53 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810:827d:a191:aa5f:ba2f? ([2a0d:3344:2728:e810:827d:a191:aa5f:ba2f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f062fcsm253027875e9.15.2025.05.26.23.08.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 May 2025 23:08:52 -0700 (PDT)
+Message-ID: <10a15ca4-ff93-4e62-9953-cbd3ba2c3f53@redhat.com>
+Date: Tue, 27 May 2025 08:08:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: sysfs: Implement is_visible for
+ phys_(port_id, port_name, switch_id)
+To: Yajun Deng <yajun.deng@linux.dev>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250521140824.3523-1-yajun.deng@linux.dev>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250521140824.3523-1-yajun.deng@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The "freq" variable is in terms of MHz and "max_val_cycles" is in terms
-of Hz.  The fact that "max_val_cycles" is a u64 suggests that support
-for high frequency is intended but the "freq_khz * 1000" would overflow
-the u32 type if we went above 4GHz.  Use unsigned long type for the
-mutliplication to prevent that.
+On 5/21/25 4:08 PM, Yajun Deng wrote:
+> phys_port_id_show, phys_port_name_show and phys_switch_id_show would
+> return -EOPNOTSUPP if the netdev didn't implement the corresponding
+> method.
+> 
+> There is no point in creating these files if they are unsupported.
+> 
+> Put these attributes in netdev_phys_group and implement the is_visible
+> method. make phys_(port_id, port_name, switch_id) invisible if the netdev
+> dosen't implement the corresponding method.
+> 
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
 
-Fixes: 31c128b66e5b ("net/mlx4_en: Choose time-stamping shift value according to HW frequency")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/mellanox/mlx4/en_clock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I fear that some orchestration infra depends on the files existence -
+i.e. scripts don't tolerate the files absence, deal only with I/O errors
+after open.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-index cd754cd76bde..7abd6a7c9ebe 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
-@@ -249,7 +249,7 @@ static const struct ptp_clock_info mlx4_en_ptp_clock_info = {
- static u32 freq_to_shift(u16 freq)
- {
- 	u32 freq_khz = freq * 1000;
--	u64 max_val_cycles = freq_khz * 1000 * MLX4_EN_WRAP_AROUND_SEC;
-+	u64 max_val_cycles = freq_khz * 1000UL * MLX4_EN_WRAP_AROUND_SEC;
- 	u64 max_val_cycles_rounded = 1ULL << fls64(max_val_cycles - 1);
- 	/* calculate max possible multiplier in order to fit in 64bit */
- 	u64 max_mul = div64_u64(ULLONG_MAX, max_val_cycles_rounded);
--- 
-2.47.2
+It feel a bit too dangerous to merge a change that could break
+user-space this late. Let's defer it to the beginning of the next cycle.
+
+Paolo
 
 
