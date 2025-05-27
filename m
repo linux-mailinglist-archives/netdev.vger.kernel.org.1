@@ -1,135 +1,111 @@
-Return-Path: <netdev+bounces-193766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66EF9AC5D66
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:48:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 371ACAC5DBD
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:18:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B32847B1850
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 22:46:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B133A4FE5
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0F92153D8;
-	Tue, 27 May 2025 22:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A238217F34;
+	Tue, 27 May 2025 23:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMbXdhY2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OIEzCcHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8FD213E89;
-	Tue, 27 May 2025 22:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE491D5145;
+	Tue, 27 May 2025 23:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748386064; cv=none; b=qsNz5Och/RHzlhAD3dBtJ4IdR6nd1xXE0X+O/k73zHmTIgH+deRAWztrJ/RmTyuVEYNvcMDNCj8nopd4tuzYAxLqHE/Sy2f6IUl4SIdeGTr4ed6juDqRo8osPdHq0jjvNXGcZFRJWYYeJTebAuY5sugF8X9kwB/XvZ9CbyyUCZY=
+	t=1748387923; cv=none; b=nFqaLsQ7EOQ5dWha3mBGLjy7LbYKzhWn0SmFjf697LtL5diYugkIzLIYd30ajtf6CdpJknZnHPNoaXNaTo6Eom7z5NclzE74Z9i06vpraZ6DstJAU1cQPACK0COig9kD6FUGHLTe8YPaWwbFyNtsYnNCA0wfgqgHNuEwx0D3iG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748386064; c=relaxed/simple;
-	bh=nxxTE8N1NiBs4G5g2I9AK/16Q2IKP+a3RuAqB4TehIU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nlgjO7CVceWVWmHyIt9gtdY9HenllYG/lFiaCu2P79zR7TTtNXPvJSe5Tlb53CmtFNe1KAF58CRsCwha1gvL2XvtX17HMfuXhE+Vuzj3oF5GekU9iYxmYe3z7SuYdbH1bvVFI8iA+yw/ZULbHTyV+inDKWzjTkAucbZdCld8DIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EMbXdhY2; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-5259331b31eso1293373e0c.0;
-        Tue, 27 May 2025 15:47:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748386061; x=1748990861; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nxxTE8N1NiBs4G5g2I9AK/16Q2IKP+a3RuAqB4TehIU=;
-        b=EMbXdhY2fT2nXo6Ak0tX8MszVdyYz9i1k0BTxDo79bG3SAuY5S8CGceUP/vXx2DPCh
-         uKhvskQEaOJK2cYH1+nd1FIVfvIJOMngbheqv8/VOfUcERCA6IAvun0X9sCv7+YkZN5C
-         zsU51x5NHRLs46W/MA82PKnPZ5Y43gr6F4iKsK/uCZoHotiwNuNggE50ZkeeycaeCtRA
-         Ie2P0F+8OMvH18pBXBsjmb/IkwQhbiGIbH6w8wUSiXk7u8IdRCQlVHjMGBAp9nGK0bal
-         PRNlIIIfJRnHjba/KUtM/4yMXT1jxXEfH/CdVnVOuIKsTVBg1jXP65oity5KhRZI0R42
-         apcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748386061; x=1748990861;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nxxTE8N1NiBs4G5g2I9AK/16Q2IKP+a3RuAqB4TehIU=;
-        b=iSWHFltzTdhihuFOuNKMq7MdbJAGYF9fuU3F3aJktpVcfE1FAc3Pb9tty4f7dG/K3k
-         pK4uIGJnKd/M72//CAyXJHOorTiJhrh4mlLmAlbZAAPUS24jJxDMRrYFyaxoSDZgdseH
-         Gxnblo1x6PVWjfWR1uG5YiBhTiDxRDCaIO2Ki6FU0u+hFheNGoIBcKQKRKHs4kRWQotl
-         3/KNKkbKQXIp9Xezp8hgA4uEouqJMoFi9Qv5pVhotLYXNMsU3krqpMWSekFXECip3dOK
-         jwwuGfXshlcx1ckmm3wbwiq0ApuTWle9hQZi4n/CzDaDndyNRhepJHBfYkJ/l8X2yzVT
-         CXHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzcgsdHes8f6D3aBnsu5nrexD+zy37vU4DBOo8NItDdYuZtU8BEYUw0Mz9eHlY0t1GGx9zVZcLibN89LE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/jmiRn5rr93GmfYH14PYoZPXYHcx9sHF4+sg1tgitTI1HLmML
-	DV3+pelh/OFSqGkUNg6atWOg1Q6a2poZPjuyYSdKYmHamTAPZjfIAW5K1zU/r8RL0kLbOSLxNPY
-	bGjIUWBMUBu0Hwh7K6nSAv9KNOS02MHQ=
-X-Gm-Gg: ASbGncsSgVZ0sn2dm6h5Uie0KP4zMFkkbfuxTcRhevQL7TdunImRMw3eVJqSOcfoOX5
-	jc2wPf8s4C6CFIYFvICHCDsTuspd+A0jnOYvPp1lY74odHtDEGnoR3dKW8iwS3pongpsBrCp3Jn
-	FTCg6x9dnCb4lL9uVt1pGI+i6xelxJtBVHmA==
-X-Google-Smtp-Source: AGHT+IEIHMkdlH/en+uXp0oVsAoqX5M/MWpWjcwQtNcI4RUU/vNIUEP2JP+Exp7QavSYY/Cs2DChtfMhjj8/xUWGVBU=
-X-Received: by 2002:a05:6122:3087:b0:530:63d9:115a with SMTP id
- 71dfb90a1353d-53063d913a6mr831217e0c.4.1748386061291; Tue, 27 May 2025
- 15:47:41 -0700 (PDT)
+	s=arc-20240116; t=1748387923; c=relaxed/simple;
+	bh=6SsMt8kv8bB9+DxdMnJRB0CnbK4lJ2b+4OehbD0omzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBmCyrLu1lmqT788+Hbxgg5ewCGLbxN2kZHGTR4YBropZ356/cIHQFyWQuAAykCclsXt32/ICxHW7iCOBhSZO+T3xrRqGyeZJsfJ+tnbadZVdLZXdWggMc6vDiSoBswDYIWuWRgfYML8kRTXCrFrdo+b2nSMkemt3qzxg0YFHOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OIEzCcHs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7uNa+E5E1Fz2rSYeLmBtivbWjxVm5r8CjbbWJNdovR8=; b=OIEzCcHshhevfPGrJRPuYwDYYn
+	8iXyQC76t4Wfu/2IX3lgZKMRkiDoqAs/Z1tBPRvonm6i8VnqjeaiLgkGQ1wc7ADu0v3YQLM7kOyv1
+	csS2sXr2Eeo/LDU/fGxaScGrLkt7OGh0RY0Ht5Ytipc70Je1ODGslRrGZ9OHqFjNsYY0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uK3Yz-00E7FI-Iu; Wed, 28 May 2025 01:18:29 +0200
+Date: Wed, 28 May 2025 01:18:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH 2/2] net: mdio: Add MDIO bus controller for
+ Airoha AN7583
+Message-ID: <922a7c99-8acf-4b88-8e1a-b7c952e50811@lunn.ch>
+References: <20250527213503.12010-1-ansuelsmth@gmail.com>
+ <20250527213503.12010-2-ansuelsmth@gmail.com>
+ <e289d26e-9453-45f5-bfa6-f53f9e4647af@lunn.ch>
+ <68363f34.050a0220.351f97.06f7@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527175558.2738342-1-james.hilliard1@gmail.com>
- <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch> <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
- <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch> <CADvTj4qRmjUQJnhamkWNpHGNAtvFyOJnbaQ5RZ6NYYqSNhxshA@mail.gmail.com>
- <014d8d63-bfb1-4911-9ea6-6f4cdabc46e5@lunn.ch> <CADvTj4oVj-38ohw7Na9rkXLTGEEFkLv=4S40GPvHM5eZnN7KyA@mail.gmail.com>
- <93bfec74-c679-400f-8ce4-3bc84d6d803f@lunn.ch>
-In-Reply-To: <93bfec74-c679-400f-8ce4-3bc84d6d803f@lunn.ch>
-From: James Hilliard <james.hilliard1@gmail.com>
-Date: Tue, 27 May 2025 16:47:30 -0600
-X-Gm-Features: AX0GCFtPGtsaGbTe2C2G-Irv_0PosK6COEhRkyls49G6hbvQpWVi2Nid9Q5gamo
-Message-ID: <CADvTj4oF4UOnDUvVUtuaM6U5RR4WF02qmheqg8fEafev2En3eQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
- PHY device
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Russell King <linux@armlinux.org.uk>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Furong Xu <0x1207@gmail.com>, 
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <68363f34.050a0220.351f97.06f7@mx.google.com>
 
-On Tue, May 27, 2025 at 3:48=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Tue, May 27, 2025 at 02:37:03PM -0600, James Hilliard wrote:
-> > On Tue, May 27, 2025 at 2:30=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > > Sure, that may make sense to do as well, but I still don't see
-> > > > how that impacts the need to runtime select the PHY which
-> > > > is configured for the correct MFD.
-> > >
-> > > If you know what variant you have, you only include the one PHY you
-> > > actually have, and phy-handle points to it, just as normal. No runtim=
-e
-> > > selection.
+On Wed, May 28, 2025 at 12:39:45AM +0200, Christian Marangi wrote:
+> On Wed, May 28, 2025 at 12:36:46AM +0200, Andrew Lunn wrote:
+> > > +#define AN7583_MDIO_PHY				0xd4
+> > > +#define   AN7583_MDIO1_SPEED_MODE		BIT(11)
+> > > +#define   AN7583_MDIO0_SPEED_MODE		BIT(10)
+> > 
+> > Is there any documentation about what these bits do? The bus should
+> > default to 2.5Mhz.
 > >
-> > Oh, so here's the issue, we have both PHY variants, older hardware
-> > generally has AC200 PHY's while newer ships AC300 PHY's, but
-> > when I surveyed our deployed hardware using these boards many
-> > systems of similar age would randomly mix AC200 and AC300 PHY's.
->
-> Are they pin compatible?
+> 
+> No but I can ask. In theory tho these MDIO controller are used for 10g
+> or 2.5g PHY that all require a firmware to load so 2.5MHz makes the boot
+> time of 2+ minute.
+> 
+> The documentation say...
+> 
+> 1: fast mode
+> 0: normal mode
+> 
+> Very useful I guess :D
 
-From my understanding they are entirely pin compatible.
+Can you put an oscilloscope on the clock line and measure it?
 
-> But i assume none of these boards .dts files are actually in mainline?
-> So they need to go through review, and are likely to be horribly
-> broken and need fixing? So you can fix up the PHY node as part of the
-> cleanup.
+We have the DT property:
 
-The specific board I'm working with is not in mainline, however there
-are boards in mainline that will have the exact same issue. They simply
-do not currently have any hardline ethernet support in mainline at the
-moment and have to rely on wifi for internet connectivity unless using
-out of tree patches.
+  clock-frequency:
+    description:
+      Desired MDIO bus clock frequency in Hz. Values greater than IEEE 802.3
+      defined 2.5MHz should only be used when all devices on the bus support
+      the given clock speed.
+
+It would be good to default to normal mode, but allow fast to be
+selected, once we know what it actually is.
+
+	Andrew
 
