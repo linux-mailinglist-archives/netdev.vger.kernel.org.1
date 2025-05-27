@@ -1,126 +1,135 @@
-Return-Path: <netdev+bounces-193769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AEC6AC5DD3
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:44:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D88A8AC5DD9
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE9A316B0FB
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:44:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C77C189BBB2
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85A52192F1;
-	Tue, 27 May 2025 23:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A5121883F;
+	Tue, 27 May 2025 23:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m64dDdD7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vJyGp2LD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C3DB667;
-	Tue, 27 May 2025 23:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6858420E6E6
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 23:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748389435; cv=none; b=kxc8eyggnyY/2yjE3vtDzaK4U4tz0MJ9bPGD9fkWJR6L0Y/PLJmGBP7Q64lPEAn6z0tCfOSEo+cPrW/5UX9W0AAlkaaHZJKZwHjOs/aYOYkhV4u1nS7cE13lNodD63xOl9MTtXh+GZusw0c5u2RsAWpIuPLZFekcpvEq+1//FSQ=
+	t=1748389613; cv=none; b=pDcAokzBt9d19X3pyFYR82d7I78p3I4KFN8k2z7nZpErLCJR5S7bb1/juvwpX/9xw4sM+QXHJJm2gyuhz1dxAPOaesq5JtBmk0ES6Qy1Afclf20ewppByrPPwaFopJXR4UpAb6Ettj7+Uxa7li1ANF/Kt5KsGQ1d2xtUG0Mkm/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748389435; c=relaxed/simple;
-	bh=f08em9DA6QU6JbQhqbKs8TXBg5LZ+UoUHjXE6+ZDNPI=;
+	s=arc-20240116; t=1748389613; c=relaxed/simple;
+	bh=WKcX2GjjarLw7YZjkROB1mJZ0w5M0D7LiFn1aBDa1zo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NZl4IHrFPFnM25XAtFJAf6AgukrthNYPhG1Ut2idCvufCVQqOjyepMUZm7j/Jl3bl+XmJStS+uJ2XG+EB9PVaBRrwCF5tkES0tVxQc+V0ompmO5QzOMWgXKQ83CUcxWm0R49NhUMWIIPydfGslzfoG5W+vbLR+40vZYuMdi939k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m64dDdD7; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3dd87b83302so2759315ab.0;
-        Tue, 27 May 2025 16:43:53 -0700 (PDT)
+	 To:Cc:Content-Type; b=g9DqFRHBILH3xp25J/qvTIhVDw5jUs2GyhIm6E3cGAxtBCvItK0gNwY4Pgi1JLUD7dMzSU95UxiVKcvaD9qmBVL/pM0PNwzTWcjPvXuBwIhqfaDafwyyo8c+eNK6uIKd6ebMMVT+XqjVQGrYZnW5jEYpS6lziPNF0vdy4dSzh6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vJyGp2LD; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2348ac8e0b4so39005ad.1
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 16:46:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748389433; x=1748994233; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748389612; x=1748994412; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f08em9DA6QU6JbQhqbKs8TXBg5LZ+UoUHjXE6+ZDNPI=;
-        b=m64dDdD7AuhbOnPBfPDHbYHZNmDYloy4oSqRK55+IutZmL7y0zMOOPWs0fku7Wd2Ea
-         uGmQMPSq3RhY4k0/+7mIff9O6dlCfxqb3P+RsM3mwNjRnZ022EhAZMPQz1GRGz6yJvGx
-         dz4uHpT4QbSDKv2CiNTdMydO+Z0JL6i5kyVDdky0mM1qwiAY9y4V68GQgCZWbR7oEyD9
-         ksWgdgAgwnP2Hhg4PtWesE5mc0d6GeYbWlY4gVfe77vIA049Z8qt2pVNle292Worr2kd
-         +Kv3cmBWiMr7jQbhfDV07GubC7pCJOLquyb8xb8BPQZtVJA/6c/Ll93ydr4me0N5d/aD
-         k7iQ==
+        bh=VghbsdFVO3iyQV5woos45bPNqNZDe5XkDtH9YacJi2g=;
+        b=vJyGp2LDoULMeslodgMCkKrXBBhbaxCLTxtFxjoe/bA9Zv/8yvYAQuPm8122PiDnIF
+         wdylvL3No06kOxZRvdZbozV03i8RrkMlZJURJlPRyL/xDhfZp8i7POMzhzo//sA6F49v
+         xWwQBHhiB3TV5l+qwnmKtF0+DCxEA0BX+NCJ3zZtAGbgNrFTuiCz/Ch5z0ZrxU4U0i1W
+         9smqRENtm+EZ11COm9ReRwPvil17pCBXGc+7bmLomWUW20rT8BEokvjN7ECe4gcqiKaM
+         SgHD10ETdOYTu6ljXNXrhhWFqPb55k9vNUjkPiIZ1wh/FSBJOEV5u9Qs0el/k1sRT3qL
+         WvuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748389433; x=1748994233;
+        d=1e100.net; s=20230601; t=1748389612; x=1748994412;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f08em9DA6QU6JbQhqbKs8TXBg5LZ+UoUHjXE6+ZDNPI=;
-        b=SArzN1keURlwUqlm78ZxHCzne6KXAFOy/TnHBpEklh8IuzToXIMXxM0mTU1iyBoV/j
-         1cqk8v2ImEUiz6jEDmFsResjWx8WjS8PXGuLtiJnOqVNGeYqoKTpMLlMUqi04Xzx2miq
-         6cyiZlN7tpxsd5/8O9WnA559/2NDPfZ9mL8V8li7I+Ka+Bl0fU/m7i5WkeB0Tha0UjaP
-         LOYfn38bzLeIB2PWh7+UHPDJpMb5sdzNvY1sUXkV1Pl2VSsF92jx8Udxkg01Kq5pfATW
-         Kt5rWubqarC9MV3VJn/C8YE3n18XoQXWi69amkN9fsOS3FL3Rham3QYR3YE3ooaiEcGF
-         MMOg==
-X-Forwarded-Encrypted: i=1; AJvYcCU033EwOIp/WBCP4oVF055USjAUy2G0jBdh5KGjXxQ/LCgGOzHD0HzUtAqqmShI+biAPiBEwMUt@vger.kernel.org, AJvYcCVLc8enwhKzGJwkkEpohft71wDHgoY1zqPFokRaZ5U6shJHW9PIy8vBBkRFaj/pJYEaf1dPqC2vBuoKRfo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3jY5ivlzF7FIzyESUt7EOQEdVaCqJhPHviorh3kKq+9COc9/b
-	47DnPqe9QEWlM8FbquBe/KVzGh2oflBrgvzYG8tkvPVHF5F04PGlD0ebhwkaH15e57tm5orQ3cM
-	7PRchZGYW9D33jSJQ4RR9YSqyDOs5oZc=
-X-Gm-Gg: ASbGncumYPZ4vHRpH4LhZYM4QoYl6YZ4tRkSk2aIttUY0tjNv4HLZahWlNetqg3knWf
-	2HQPqPaZwyA+iXxJSDqjGSqA0Ja8S+z7sdJbIZKi0+JGhQrOEEgeei09MfgdUBU4sBc7eCvATRN
-	UqsbcZwyqz2jz8J7nWimjleONZrUiV2f8=
-X-Google-Smtp-Source: AGHT+IFNQN4+WL6glmxs8lAJDLu8MmuG4dogdioqikdxkZTzmQFS3OIBQSPDH+mrcAEyBGGegg4u6eiOYwHdcptWq+8=
-X-Received: by 2002:a05:6e02:348f:b0:3dc:76ad:7990 with SMTP id
- e9e14a558f8ab-3dc9b706abbmr145701725ab.15.1748389433167; Tue, 27 May 2025
- 16:43:53 -0700 (PDT)
+        bh=VghbsdFVO3iyQV5woos45bPNqNZDe5XkDtH9YacJi2g=;
+        b=lOkd33o2pXBI8aE6TaFhHGXHAPa2uTGNkVtjUAbmcpxGMeLTw0g8uBxsqfQELeP1Yy
+         Etg6ocXEZis6+kqEHw/WW/I5/dNrOE+ItB3xNqLaUy7o30I7mJP9U/d4JgqO+cDG8eEF
+         yjBzvQFKK+mtHGSe7jc/K/gvPPAQFY9Y2ozNfh0s9gzc4hcNSgN9xDeCm0mdUU9TUBs8
+         wOtHJf7fJjPMNn3dik5VkSaDnXqvvtHYpJXLA6Mir9f6d0SFIsHyMalwpKxWNkb7Wmym
+         fhI6tUCM0ouGps2zFMYuZ05gMFUPBYAHfvy0z5xu412Me/urnKFjdTRPu9oRP9jYvhxq
+         vOqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4qf2yKdpi6xRCOiYxsA+hripcLMRir0LYmoPxELnlp1ZUUhcTQILjNki9SSPBf2udTtE686o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9BrxyWMFhvVxyHJmQgG8eStJPwfSFlyle6GwL+rnbywMvicP5
+	mTJqTerke6Pkd0X+mG8dme7idum3pQldbsaB+hXgduYPm8T9vvqYUN9dL55Jm3I8Dz5Ijxbeo1g
+	tRBFgFmMbEnz0PvzBUj8SDS7FJbRMq5WD2ZWrqnmy
+X-Gm-Gg: ASbGncuKE/nz58MIasx/9V7cXzS5xWU889xciqDEsvhx+W7Yk81ehFpxjAjsBtIXmOR
+	o8NHMI3HzHpXSRc0bHEkJlwM+qGuEeyoDkxHMncOaTH/zmd7xzkGW+Eyd2MzwIwWPdD9irepJhF
+	e/5AZqBnQ9ZdWZby1QhC/DnSaaxcvEN7qZ8fzITTjIdihnfKOcnXcLlAdLJy0VkIo73pv1kwsqv
+	4rCangxvRe8
+X-Google-Smtp-Source: AGHT+IFhVvQBS2s72jadYmZiV/4h4fh2gLaYB8UmxGcpXTK6Oa8dyDrO/A8UAzbuwGSFKflOIeEMssY6jTFGnCAgx0U=
+X-Received: by 2002:a17:902:cf12:b0:231:f3a3:17c6 with SMTP id
+ d9443c01a7336-234c55ab59fmr1383225ad.20.1748389611470; Tue, 27 May 2025
+ 16:46:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-7-tj@kernel.org>
- <CAL+tcoCKqs1m4bAWTWv9aoQKs7ZpC5PXtMS2ooi6xEB6CbxN1w@mail.gmail.com> <aDYKoA8lpX_Zxrhh@slm.duckdns.org>
-In-Reply-To: <aDYKoA8lpX_Zxrhh@slm.duckdns.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 28 May 2025 07:43:16 +0800
-X-Gm-Features: AX0GCFsb4ySh9tHeNVChD-RPYFuj3Sh8LOL_jgy3hcYZQuZgVtS4GposQzjOWkg
-Message-ID: <CAL+tcoCjaq=CxXdFtCqF4LdwCfenrHi7Nu-XHm+u--phuoC+EA@mail.gmail.com>
-Subject: Re: [PATCH 6/8] net: tcp: tsq: Convert from tasklet to BH workqueue
-To: Tejun Heo <tj@kernel.org>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com, 
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, msnitzer@redhat.com, 
-	ignat@cloudflare.com, damien.lemoal@wdc.com, bob.liu@oracle.com, 
-	houtao1@huawei.com, peterz@infradead.org, mingo@kernel.org, 
-	netdev@vger.kernel.org, allen.lkml@gmail.com, kernel-team@meta.com, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20250527130830.1812903-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250527130830.1812903-1-alok.a.tiwari@oracle.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Tue, 27 May 2025 16:46:39 -0700
+X-Gm-Features: AX0GCFvYovlr20SM8ijf0L9FsoJRDmqYdfr78B7dTpS3CyYkJAMfh-_9uNOXneM
+Message-ID: <CAEAWyHfES0EepFr7Bm+BO6KXw1rNy9_7zv+Jk+rJadkGvdYgqg@mail.gmail.com>
+Subject: Re: [PATCH] gve: Fix RX_BUFFERS_POSTED stat to report per-queue fill_cnt
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: ziweixiao@google.com, joshwash@google.com, willemb@google.com, 
+	pkaligineedi@google.com, pabeni@redhat.com, kuba@kernel.org, 
+	jeroendb@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	darren.kenny@oracle.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 28, 2025 at 2:55=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
+On Tue, May 27, 2025 at 6:08=E2=80=AFAM Alok Tiwari <alok.a.tiwari@oracle.c=
+om> wrote:
 >
-> Hello,
+> Previously, the RX_BUFFERS_POSTED stat incorrectly reported the
+> fill_cnt from RX queue 0 for all queues, resulting in inaccurate
+> per-queue statistics.
+> Fix this by correctly indexing priv->rx[idx].fill_cnt for each RX queue.
 >
-> On Sun, May 25, 2025 at 11:51:55AM +0800, Jason Xing wrote:
-> > Sorry to revive the old thread! I noticed this change because I've
-> > been doing an investigation around TSQ recently. I'm very cautious
-> > about the change in the core/sensitive part of the networking area
-> > because it might affect some corner cases beyond our limited test,
-> > even though I've tested many rounds and no regression results
-> > (including the latency between tcp_wfree and tcp_tsq_handler) show up.
-> > My main concern is what the exact benefit/improvement it could bring
-> > with the change applied since your BH workqueue commit[1] says the
-> > tasklet mechanism has some flaws. I'd like to see if I can
-> > reproduce/verify it.
->
-> There won't be any behavioral benefits. It's mostly that it'd be great to
-> get rid of tasklets with something which is more generic, so if BH workqu=
-eue
-> doesn't regress, we want to keep moving users to BH workqueue until all
-> tasklet users are gone and then remove tasklet.
+> Fixes: 24aeb56f2d38 ("gve: Add Gvnic stats AQ command and ethtool show/se=
+t-priv-flags.")
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I see. So far I haven't see any side effect especially with testing
-bulk transfer/multi-thread transfer, so if you're willing to repost it
-after the merge window, please feel free to add:
-
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Patch looks okay, but it needs to be prefixed with [PATCH net] since
+it's a fix.
 
 Thanks,
-Jason
+Harshitha
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
+ernet/google/gve/gve_main.c
+> index c3791cf23c87..d561d45021a5 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -2153,7 +2153,7 @@ void gve_handle_report_stats(struct gve_priv *priv)
+>                         };
+>                         stats[stats_idx++] =3D (struct stats) {
+>                                 .stat_name =3D cpu_to_be32(RX_BUFFERS_POS=
+TED),
+> -                               .value =3D cpu_to_be64(priv->rx[0].fill_c=
+nt),
+> +                               .value =3D cpu_to_be64(priv->rx[idx].fill=
+_cnt),
+>                                 .queue_id =3D cpu_to_be32(idx),
+>                         };
+>                 }
+> --
+> 2.47.1
+>
 
