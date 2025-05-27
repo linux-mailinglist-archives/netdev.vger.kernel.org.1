@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-193724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C91EAC56B5
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:24:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714E2AC57C2
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48BA34A02F5
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:24:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A42887AC664
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FBF27FD4A;
-	Tue, 27 May 2025 17:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE9327FD49;
+	Tue, 27 May 2025 17:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbuRwfHQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkaAaqZ7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983DE27EC73;
-	Tue, 27 May 2025 17:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ACA2798F8;
+	Tue, 27 May 2025 17:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748366659; cv=none; b=NpVWU0LMHjh0NIkadd1CHZ70PmJSxQ17AeTZrjfrHj8vH+lKAv+R4ZmVRt0k33eey6HsCeFuEw7gcF/XO6KQpA2mjLY5bnpybM+4O6hTKLcBwLnY7/8Z02EcuON4/Fi5IRDf2du7cc3IpnG1XA4vRFdpUCahOS06oWTkDWscmKU=
+	t=1748367424; cv=none; b=kteyTQGZ8KM85WGxVy/u+VEmqp+Oz8WNzbIw7jOOJ2mvSvGG02GadbmvYoAw63rPQhshdAVCd/7ttY1CNVanX+Wgn5j2i6xReNRf/1YrNGwwEz0krqWHQ0o2a7DkueSm4tO/eDi5jUxkZstW8Z2iZQlAY1cTfvxeesj9cCmeE4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748366659; c=relaxed/simple;
-	bh=LPpmYGHaeuXbmsjn+skQ/1ouICPGUsFjyAV7RQufhw4=;
+	s=arc-20240116; t=1748367424; c=relaxed/simple;
+	bh=Z8sw1IP6GlLz+yzRKqHDFExn7bimm2pAyd30vmmjub8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mE2NMMXVd2BYcbtQBemSkm4VC2QgSGa+ltPFCYwush+sORs1jfzgJzAdX1RrL4HNI4gmVH0MG/uDO614Xq63GUd7HlkO4qMljB4OeY8vtSGuL6sFC0XKRcqsVc+R+OH0a+jYfUkCk0ejIZBncOWSDwBeaAqX37lH2yynHY/QjsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbuRwfHQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46626C4CEEA;
-	Tue, 27 May 2025 17:24:15 +0000 (UTC)
+	 Content-Type:MIME-Version; b=X4OzETYPHdCQVoAaBZ+OH05/oSkaPuVq3NMoqBSqOw5OWwWXH9T5TgMqgTyGAJNg1nl67LyTnfdY9k5JXgJgrkc9jBQUbNPGVLfDre9PfwJTKVRwdAVRN5WKPnxixRwCetc+zbCTVv48IFJ1ZN8hI179d+uDMs6Pdz9vvqZIOz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkaAaqZ7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04B8BC4CEEA;
+	Tue, 27 May 2025 17:37:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748366657;
-	bh=LPpmYGHaeuXbmsjn+skQ/1ouICPGUsFjyAV7RQufhw4=;
+	s=k20201202; t=1748367423;
+	bh=Z8sw1IP6GlLz+yzRKqHDFExn7bimm2pAyd30vmmjub8=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=CbuRwfHQ65UqdoUTnRUqLPuPGKZEKFEA/4cGSXnuH85yvKmVQcs/9UOUYFB6Ft84C
-	 VwST7OgiXd3MDEUT0UHgoXZzqZdczEKLcCqxHhXTipjcJzL1jBP+U4ztp9bEe1t3Hx
-	 gi2gQV934nNNh08zAPuaqPpE6bguTGnHFAZxHsmRsbvzfRD2751xDImVWLRymePRCX
-	 PkBdVBIKgCCMRDGAPU7MpQQvP7jYOSAhhAfeo8tCST52Vk0vs/TZEgqP5Xw2EXQE+v
-	 BCXsPlULmCEy4tpAPoHCdDnBcWcEbR1UnNLCN9ORzBHF9haBZdfVyivsfUVmhUsoo7
-	 Zk0DsYzr8f+Gw==
-Message-ID: <40891c67a9243d673fa2143006dcfa60c20dac2f.camel@kernel.org>
-Subject: Re: [PATCH v10 9/9] ref_tracker: eliminate the ref_tracker_dir name
- field
+	b=FkaAaqZ7BagJazbPRh0LxCBSusAQoW9wZkL/eBtO4GfVyZCSNWtj/Gwwmn85FBLom
+	 a9IItePrmuL3fxPNEc3lstfVjhbiNu94YfqiB50ljj0nrlQEs4iobXYArFr1bkonP7
+	 8ml4FsOYfnMUDz+F0hv8ZJjEadGJGfw7MTIBQycLukWcmWD/rWJv5SOiP1r88cnwqu
+	 c16M+bkSK/y4mxHaVS1qdl1pbGRyHl/lJX8gja20vXSUMjiTLCoecxprIfns0yCl8Z
+	 k7bJmvk/74+AzDRdIqbmGbF49nmUBkLeVQv4J2auh8XA4LVZXK2kWWDYbpQ87yOYV3
+	 Ox+0BJjW6v6Ag==
+Message-ID: <318169535afd9f11bc9f48316a95f9e0b2780f17.camel@kernel.org>
+Subject: Re: [PATCH v10 8/9] net: add symlinks to ref_tracker_dir for netns
 From: Jeff Layton <jlayton@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
- <horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
- <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,  Simona Vetter
- <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, Joonas
- Lahtinen	 <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>,  Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor	 <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+To: Eric Dumazet <edumazet@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maarten Lankhorst	
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+ Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jani Nikula	
+ <jani.nikula@linux.intel.com>, Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>,  Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki Iwashima	
+ <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor	
+ <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
  linux-kernel@vger.kernel.org, 	netdev@vger.kernel.org,
  dri-devel@lists.freedesktop.org, 	intel-gfx@lists.freedesktop.org
-Date: Tue, 27 May 2025 13:24:14 -0400
-In-Reply-To: <20250527-reftrack-dbgfs-v10-9-dc55f7705691@kernel.org>
+Date: Tue, 27 May 2025 13:37:00 -0400
+In-Reply-To: <CANn89i+qv8SsgdDv9PUG=Yuw1KMUyZC=_KqWdYOBL4p3nmcd1g@mail.gmail.com>
 References: <20250527-reftrack-dbgfs-v10-0-dc55f7705691@kernel.org>
-	 <20250527-reftrack-dbgfs-v10-9-dc55f7705691@kernel.org>
+	 <20250527-reftrack-dbgfs-v10-8-dc55f7705691@kernel.org>
+	 <CANn89i+PFJguSKfbiX1nWSvPA2S8O-pb7HxVT4+zkjMdD3meqg@mail.gmail.com>
+	 <CANn89i+qv8SsgdDv9PUG=Yuw1KMUyZC=_KqWdYOBL4p3nmcd1g@mail.gmail.com>
 Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
  keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxw
  n8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1Wv
@@ -146,236 +148,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2025-05-27 at 07:33 -0400, Jeff Layton wrote:
-> Now that we have dentries and the ability to create meaningful symlinks
-> to them, don't keep a name string in each tracker. Switch the output
-> format to print "class@address", and drop the name field.
+On Tue, 2025-05-27 at 06:37 -0700, Eric Dumazet wrote:
+> On Tue, May 27, 2025 at 6:35=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >=20
+> > On Tue, May 27, 2025 at 4:34=E2=80=AFAM Jeff Layton <jlayton@kernel.org=
+> wrote:
+> > >=20
+> > > After assigning the inode number to the namespace, use it to create a
+> > > unique name for each netns refcount tracker with the ns.inum and
+> > > net_cookie values in it, and register a symlink to the debugfs file f=
+or
+> > > it.
+> > >=20
+> > > init_net is registered before the ref_tracker dir is created, so add =
+a
+> > > late_initcall() to register its files and symlinks.
+> > >=20
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  net/core/net_namespace.c | 30 +++++++++++++++++++++++++++++-
+> > >  1 file changed, 29 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> > > index 8708eb975295ffb78de35fcf4abef7cc281f5a51..39b01af90d240df48827e=
+5c3159c3e2253e0a44d 100644
+> > > --- a/net/core/net_namespace.c
+> > > +++ b/net/core/net_namespace.c
+> > > @@ -791,12 +791,40 @@ struct net *get_net_ns_by_pid(pid_t pid)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
+> > >=20
+> > > +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
+> > > +static void net_ns_net_debugfs(struct net *net)
+> > > +{
+> > > +       ref_tracker_dir_symlink(&net->refcnt_tracker, "netns--%lx-%u-=
+refcnt",
+> > > +                               net->net_cookie, net->ns.inum);
+> >=20
+> > With proper annotations, you should be able to catch format error as in=
+:
+> >=20
+> > warning: format =E2=80=98%lx=E2=80=99 expects argument of type =E2=80=
+=98long unsigned int=E2=80=99,
+> > but argument x has type =E2=80=98u64=E2=80=99 {aka =E2=80=98long long u=
+nsigned int=E2=80=99}
+> > [-Wformat=3D]
 >=20
-> Also, add a kerneldoc header for ref_tracker_dir_init().
+> Reference:
 >=20
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
->  drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
->  drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
->  include/linux/ref_tracker.h             | 20 ++++++++++++++------
->  lib/ref_tracker.c                       |  6 +++---
->  lib/test_ref_tracker.c                  |  2 +-
->  net/core/dev.c                          |  2 +-
->  net/core/net_namespace.c                |  4 ++--
->  8 files changed, 24 insertions(+), 16 deletions(-)
->=20
-> diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/di=
-splay/drm_dp_tunnel.c
-> index b9c12b8bf2a3e400b6d8e9d184145834c603b9e1..1205a4432eb4142344fb6eed1=
-cb5ba5b21ec6953 100644
-> --- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-> +++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-> @@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, in=
-t max_group_count)
->  	}
-> =20
->  #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
-> -	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-> +	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
->  #endif
-> =20
->  	for (i =3D 0; i < max_group_count; i++) {
-> diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i9=
-15/intel_runtime_pm.c
-> index 3fdab3b44c08cea16ac2f73aafc2bea2ffbb19e7..c12b5d0e16fa363f3caede372=
-e7a2031676aa7b5 100644
-> --- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-> +++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-> @@ -60,7 +60,7 @@ static struct drm_i915_private *rpm_to_i915(struct inte=
-l_runtime_pm *rpm)
->  static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
->  {
->  	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
-> -			     "intel_runtime_pm", dev_name(rpm->kdev));
-> +			     "intel_runtime_pm");
->  }
-> =20
-
-I got a warning from the intel graphics CI that this was causing these
-warnings:
-
-<3> [513.235988] debugfs: File 'intel_runtime_pm@ff110001461f98a8' in direc=
-tory 'ref_tracker' already present!
-<4> [513.236073] ref_tracker: ref_tracker: unable to create debugfs file fo=
-r intel_runtime_pm@ff110001461f98a8: -EEXIST
-<3> [513.242646] debugfs: File 'intel_wakeref@ff1100016ee7d790' in director=
-y 'ref_tracker' already present!
-<4> [513.242724] ref_tracker: ref_tracker: unable to create debugfs file fo=
-r intel_wakeref@ff1100016ee7d790: -EEXIST
-
-I suspect these are existing bugs which are causing these ref_trackers
-to be initialized more than once. If there were references taken
-between these two initializations, then that could leak memory (or
-worse). I think we need to ensure that these ref_trackers are only
-initialized once.
-
-I'll see if I can make a patch that does that, but if the i915 devs
-want to do fix this up instead, I won't complain.
+> include/linux/compiler_attributes.h:158:#define __printf(a, b)
+>          __attribute__((__format__(printf, a, b)))
 
 
->  static intel_wakeref_t
-> diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/=
-intel_wakeref.c
-> index 5269e64c58a49884f5d712557546272bfdeb8417..615fb77809291be34d94600fd=
-d4d919461a22720 100644
-> --- a/drivers/gpu/drm/i915/intel_wakeref.c
-> +++ b/drivers/gpu/drm/i915/intel_wakeref.c
-> @@ -114,7 +114,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
->  			 "wakeref.work", &key->work, 0);
-> =20
->  #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
-> -	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wake=
-ref", name);
-> +	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wake=
-ref");
->  #endif
->  }
-> =20
-> diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-> index ddc5a7b2bd84692bbc1e1ae67674ec2c6857e1ec..5878e7fce712930700054033f=
-f5f21547e75224f 100644
-> --- a/include/linux/ref_tracker.h
-> +++ b/include/linux/ref_tracker.h
-> @@ -24,7 +24,6 @@ struct ref_tracker_dir {
->  	struct dentry		*dentry;
->  	struct dentry		*symlink;
->  #endif
-> -	char			name[32];
->  #endif
->  };
-> =20
-> @@ -48,10 +47,21 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *=
-dir, const char *fmt, ...)
-> =20
->  #endif /* CONFIG_DEBUG_FS */
-> =20
-> +/**
-> + * ref_tracker_dir_init - initialize a ref_tracker dir
-> + * @dir: ref_tracker_dir to be initialized
-> + * @quarantine_count: max number of entries to be tracked
-> + * @class: pointer to static string that describes object type
-> + *
-> + * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-> + * will also be created for it under the top-level ref_tracker debugfs
-> + * directory.
-> + *
-> + * Note that @class must point to a static string.
-> + */
->  static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
->  					unsigned int quarantine_count,
-> -					const char *class,
-> -					const char *name)
-> +					const char *class)
->  {
->  	INIT_LIST_HEAD(&dir->list);
->  	INIT_LIST_HEAD(&dir->quarantine);
-> @@ -65,7 +75,6 @@ static inline void ref_tracker_dir_init(struct ref_trac=
-ker_dir *dir,
->  	dir->dentry =3D NULL;
->  	dir->symlink =3D NULL;
->  #endif
-> -	strscpy(dir->name, name, sizeof(dir->name));
->  	ref_tracker_dir_debugfs(dir);
->  	stack_depot_init();
->  }
-> @@ -90,8 +99,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
-> =20
->  static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
->  					unsigned int quarantine_count,
-> -					const char *class,
-> -					const char *name)
-> +					const char *class)
->  {
->  }
-> =20
-> diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-> index 5e84e5fd78e147a036d4adb511e657da07866a55..5fb384dd919e1f1ad632eaf59=
-5b954118bcfddab 100644
-> --- a/lib/ref_tracker.c
-> +++ b/lib/ref_tracker.c
-> @@ -123,7 +123,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *=
-dir,
->  	stats =3D ref_tracker_get_stats(dir, display_limit);
->  	if (IS_ERR(stats)) {
->  		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
-> -			   s->prefix, dir->name, dir, stats);
-> +			   s->prefix, dir->class, dir, stats);
->  		return;
->  	}
-> =20
-> @@ -134,14 +134,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir=
- *dir,
->  		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
->  			sbuf[0] =3D 0;
->  		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
-> -			   dir->name, dir, stats->stacks[i].count,
-> +			   dir->class, dir, stats->stacks[i].count,
->  			   stats->total, sbuf);
->  		skipped -=3D stats->stacks[i].count;
->  	}
-> =20
->  	if (skipped)
->  		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
-> -			   s->prefix, dir->name, dir, skipped, stats->total);
-> +			   s->prefix, dir->class, dir, skipped, stats->total);
-> =20
->  	kfree(sbuf);
-> =20
-> diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-> index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e=
-6fec0072e78ef79 100644
-> --- a/lib/test_ref_tracker.c
-> +++ b/lib/test_ref_tracker.c
-> @@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
->  {
->  	int i;
-> =20
-> -	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-> +	ref_tracker_dir_init(&ref_dir, 100, "selftest");
-> =20
->  	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
->  	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index bac9d29486556023cd99f5101b96b052acb9ba70..a062912525ee573504a9cc252=
-f71aed22693d24f 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -11713,7 +11713,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_pr=
-iv, const char *name,
-> =20
->  	dev->priv_len =3D sizeof_priv;
-> =20
-> -	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-> +	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
->  #ifdef CONFIG_PCPU_DEV_REFCNT
->  	dev->pcpu_refcnt =3D alloc_percpu(int);
->  	if (!dev->pcpu_refcnt)
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index 39b01af90d240df48827e5c3159c3e2253e0a44d..c03757e39c8a334d307fa1b5c=
-c8f03ad3a8df0e0 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -403,8 +403,8 @@ static __net_init void preinit_net(struct net *net, s=
-truct user_namespace *user_
->  {
->  	refcount_set(&net->passive, 1);
->  	refcount_set(&net->ns.count, 1);
-> -	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refc=
-nt");
-> -	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "ne=
-t_notrefcnt");
-> +	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-> +	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
-> =20
->  	get_random_bytes(&net->hash_mix, sizeof(u32));
->  	net->dev_base_seq =3D 1;
+I have __printf annotations on that function:
 
+    #define __ostream_printf __printf(2, 3)
+
+    void __ostream_printf ref_tracker_dir_symlink(struct ref_tracker_dir *d=
+ir, const char *fmt, ...)
+
+That warning is complaining that I'm trying to pass off a u64 as a
+long. I guess that means that the format needs to be=20
+"netns-%llx-%u-refcnt" ?
+
+I'll fix that and send in the next version, once I sort out the i915
+mess.
 --=20
 Jeff Layton <jlayton@kernel.org>
 
