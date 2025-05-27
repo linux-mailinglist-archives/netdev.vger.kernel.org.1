@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-193546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD449AC4653
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 04:39:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCDFDAC465B
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 04:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C79E1898819
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 02:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A7723B8BBA
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 02:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AEB1F7098;
-	Tue, 27 May 2025 02:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFF2204680;
+	Tue, 27 May 2025 02:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+2wR/81"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HhQdToHM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8361917F4;
-	Tue, 27 May 2025 02:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EADC20409A;
+	Tue, 27 May 2025 02:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748313475; cv=none; b=L+lPFvAePRdX0Rr2AietREB47StgoFQrfYPLGMo61rZbhsq/L/8wuaN7+pfnTS/boRPSQuD7vbN2gJt/RE5T4mJPbMrqS8At9A2Li5c8cpi3XoBP4T+U6Oj42wzdYpzVt3jukKW2ScqiURslle+MkTpU3wcxaH8QJXnOB45AB0s=
+	t=1748313483; cv=none; b=XcHvMh1FUJy3Oe44NsrFJMom/jgtup7RIG/KWPYAGnXNgNPzLZbsqSHoGwGvuT4UhwlpoeHy4DYeXFCP1zXMYns7qEalnUKalx3ZvCEA/u6Y1VpEHcjnwb2YzxEW6HgH56xSi9LQhJHWdF1hkeTaPNgnLoyx24g8cwmvGCU6i7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748313475; c=relaxed/simple;
-	bh=kIRuaEhuQ3RL20AjvrHTCG8H0uPTnQyPtIC4tWHNvx0=;
+	s=arc-20240116; t=1748313483; c=relaxed/simple;
+	bh=MpHIJl4Skd66AmQMjmb122pJJVSuewLE5MMH7G1YrpY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Rsmc6xoN1E+OR7S5rpMypeUAjyrnULonu4hEFS5PPyaFVdQERr1kFTkO0gXx0ObBhkcjof8CjFMY8tOk7iAnktASK9yNQ+GkyI8ldeLp9ojmBveOAuA199MFI19Hz8A3NZ9he8K57Owzp/Q2YgSTnxPm0r2m35cxO/+9aaCuofg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+2wR/81; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58351C4CEF5;
-	Tue, 27 May 2025 02:37:53 +0000 (UTC)
+	 MIME-Version; b=eBf9kyo0PntiBh9MaaoqzUroj5r7uPE2CG0wVpYWwbkLwIdmbUCvMZcFlixYfoHBiRvulpJEHdSX2qWE4jilclux9iIUfRx0O+t80hRjyZxcH86clvcCa802KtleB6VnZQvfxJGNoCC8Y7BXxBLTR07ODiFGXzNdRVRF6zZzA8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HhQdToHM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 650BBC4CEED;
+	Tue, 27 May 2025 02:38:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748313474;
-	bh=kIRuaEhuQ3RL20AjvrHTCG8H0uPTnQyPtIC4tWHNvx0=;
+	s=k20201202; t=1748313482;
+	bh=MpHIJl4Skd66AmQMjmb122pJJVSuewLE5MMH7G1YrpY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P+2wR/81tMwpHjlcG8ellSYlikttXgG3qsCkTEn0n64iCCvmbMAL56XvsqI++qEZr
-	 OzzeB6q1au1PVJ/BBNmQVw+FkX0BYojrwQPVRtYAZSvVr6FZBla2t8EybuPkbqnrWs
-	 wUmnLnSOV0BvZWyjLwdoNTtRmpGVHcJ6sXruDn3AmOeiVQ8jp5KD0Wsb7Ffved9hRi
-	 q7FhIG5GrUBq0Yjg64QXy/VwYChK+yYNpZm9qvtvtxqImdQeolQCNj7Pzx0U/fIVvu
-	 ZiDmATxuPpNDzAgGPBlPsksjbT7//0Skq3TYw7FfQ9cVeRK9jUnXhKMyBzDx8aSlGy
-	 /b0+kiN6BetGg==
+	b=HhQdToHMKkK0sQqzI6RULythZ8rshv9e2QBMsD7LcMXA2x6f5F6y0d5Ew+QuQhV8h
+	 A8siWC50IwEzs2kHyvOcPAA01S0GH0IQC+FA5u7ZZ8sJyT//0EGJz49AT8NkmVnnFv
+	 wT/4dkELJBy9NYLvTM+fQGEofnbDsTYkYvDHTO6uCzYzhIBnnKoJlHf8gA7uyRSjyx
+	 m7IaZY/fktk+uZxQCU4WTyDMnFeOUuxZf1MM7Wim+FM606M9pNfxHbR6G5vWfgcJyT
+	 C6fhUE+HPKyuxKm+AzgnTeXfR9RE6VwPFeznNMpZKwbFnf/qXKARPTEEQijlEJuQt2
+	 M/YQtP+gQkz5g==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -57,12 +57,12 @@ Cc: Nishanth Menon <nm@ti.com>,
 	dan.carpenter@linaro.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 4/5] net: ethernet: ti: am65-cpsw: Lower random mac address error print to info
-Date: Mon, 26 May 2025 22:37:44 -0400
-Message-Id: <20250527023745.1017153-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 3/4] net: ethernet: ti: am65-cpsw: Lower random mac address error print to info
+Date: Mon, 26 May 2025 22:37:55 -0400
+Message-Id: <20250527023756.1017237-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250527023745.1017153-1-sashal@kernel.org>
-References: <20250527023745.1017153-1-sashal@kernel.org>
+In-Reply-To: <20250527023756.1017237-1-sashal@kernel.org>
+References: <20250527023756.1017237-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.30
+X-stable-base: Linux 6.6.92
 Content-Transfer-Encoding: 8bit
 
 From: Nishanth Menon <nm@ti.com>
@@ -94,10 +94,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index a21e7c0afbfdc..61788a43cb861 100644
+index 9c8376b271891..c379a958380ce 100644
 --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
 +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2699,7 +2699,7 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+@@ -2095,7 +2095,7 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
  							port->slave.mac_addr);
  			if (!is_valid_ether_addr(port->slave.mac_addr)) {
  				eth_random_addr(port->slave.mac_addr);
@@ -105,7 +105,7 @@ index a21e7c0afbfdc..61788a43cb861 100644
 +				dev_info(dev, "Use random MAC address\n");
  			}
  		}
- 
+ 	}
 -- 
 2.39.5
 
