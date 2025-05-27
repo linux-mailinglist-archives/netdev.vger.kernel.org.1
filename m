@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-193730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F13AC5984
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:58:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF59AC5990
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 19:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AEB117161E
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:57:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F2B79E2312
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FD22882D9;
-	Tue, 27 May 2025 17:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87180288C97;
+	Tue, 27 May 2025 17:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LExC9gpP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+xJ/HEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80F9281512;
-	Tue, 27 May 2025 17:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7332280337;
+	Tue, 27 May 2025 17:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748368593; cv=none; b=sWSt21+Sjk3xO0lhKOFYaNZsQM86D5KnDbT8YTKGMIwEv8iLYWk3fX29dWckgCs92ojPZ7RJWyTVswpK1MvLOU88HUH1Ck+JFEy6upmeGeSlcatfKR7DYoiRwknvLzqyy4sin3S6kwXsNE6VPtbkvEQ1Ei+8ocaLNmFYlIj6edc=
+	t=1748368597; cv=none; b=cMwwhAkJGAEg+FrVkm4IA4uIg2K7uZejOZCGZRxxLqDYgLnUySscAj9oNagVVgbcSqXTgYjhU6K9Po01g31+e3u0Pg3kR9AxpBvEEzOPUz7Wj9nWNRUA3PdhPkKDNZI8vlxPZ2BJ86POdNGA57w5tH1JxsrH/wHIOWGHfW5dR9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748368593; c=relaxed/simple;
-	bh=ocL9xN3l5CZIkJMP4iIsK/bvcDmu7NvmAZRKme5JHYE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BAbfv8Kfs8LUlwZsSEXQAjd56WIHCa5ilF/grbf+V+zyKd0+OX1UHt/CuNNU1GYRmQ66R4etbEBWPM3HmHXyBEV2g7+yR9PaS96DHbXaXfvggVLnlrtNi8iHDmZHF6kPcwiI+sDcBV/XC/MgJ72xLA5sBaxAtfzkBNNJAdY79vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LExC9gpP; arc=none smtp.client-ip=209.85.222.173
+	s=arc-20240116; t=1748368597; c=relaxed/simple;
+	bh=tex/uD0w2dWBw2SvdbOmRsdYC71bPLdJZ97hYpxcaSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CJJSa5OSBHskfHgEEXPrGaQVSMjZGEtn3Ld9fjZYW+HBxkVu40FQ/sTFMamkBW5qDlw3sLUpGUwyCRi2ehDLEFNUFx5bff5QtEm7q8PjxjsQgA9po5MePCSRaosUPgJlllv5K+8y/caSmMHZi7iEoHdZMq6tXnDBV70e979YY8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+xJ/HEV; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c58974ed57so344065485a.2;
-        Tue, 27 May 2025 10:56:31 -0700 (PDT)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7cadd46eb07so349094285a.3;
+        Tue, 27 May 2025 10:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748368590; x=1748973390; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlxuW8EiAaobylr07WlFl9Wc9Vavh5mNNDPDEO1zHCA=;
-        b=LExC9gpPlv88DAYFxW2F6YSjeEZBuXAFpk8/TPqQgs9EIsjOwl/Lg00vW++LhkYYej
-         RysQfOQ2R9ACXGi2ptOJTQeyUPUE3Jrdw1Ms1DWWkDUxz3DVkrvd4laBuexuGG4Av+fe
-         TF/G/cZwbIPbGYuX0BtIvMUa8YSD1LHmNsD872PAhg7FbssCZGH5LYyFoOpPoB1rUK6X
-         deVKg6QT0deSaLFUYjQBM3uodAYmrYqsW0Ck7iC9cM20xZzw5eZHz09NIcBUdQ4/Jqsi
-         YZCNVP8YrT0RJCLKiRs7q8EjpfeyWc6XMFSw6LOP5iKIYkNTsx6UMNfBZNOiOjrNmKpt
-         Xbbg==
+        d=gmail.com; s=20230601; t=1748368593; x=1748973393; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CPM8Cvieqz5nNvWINKg7DvU/92uvEyS4n24d/iV9dr0=;
+        b=U+xJ/HEVwIGqEhyoeFcDuxVyBPWROTVjUkLD2vLzo6+Rax5yJVAoc7vXAOfxp+H+3V
+         pFkAwWMVnrefAUc7Odw7kiYgE5HGXFH9QDopAkGJaTcbiY/y+ukNQihIrYr9P6CmLO25
+         cvVKdyeJDbwd1vylvNod9ouE0I/N/Njp6PKXZ+XANRiYdgKNLao9uYZzFfVnzoXNK134
+         SNikNrYCWr0+q2ipU9fdGyXp/LUNAzGxvbflOCKpKrRnrGsGMng2bDlnIlfCHr3AGg33
+         x48TQh8DkC6RTZjGG9foEC+3afqEglTzHcYATPHmgXaYPehxgKjfUNwZKxMqd1TzmOEB
+         PweQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748368590; x=1748973390;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QlxuW8EiAaobylr07WlFl9Wc9Vavh5mNNDPDEO1zHCA=;
-        b=cuUq+27OLK8ObbOk6gX7K/XZCh4RucktxwukIKNtJNN9kl6RbdFtOUj0mVj2jjSO5m
-         m1P+I7SX89o2MJGI0khSvKstjFzKLuyodfNltVUxNJxUDB1tczUgKRnCGzeW64ZTszqQ
-         ECXMIcIkOV6ryW/lQ9g4CARSh9waXwUWldh4x8rFZrL099FUrAfcRjyBmICLn37NcYPH
-         TFjLFrBW91nuNAL2wXtPHvz+HKco0sic2h1hAPM925bPMKzp4HImWfSpyEu4Ccdjue14
-         n6CY6fPSotxB+hv6LuwA6PSNuAiXOGgna/aUhyz5aVFURcMVZ6xZAaP0qUKw3gI40p4s
-         lPsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMBpOlQ68dSrtQ54oFsRlT8ZvJGfqbjlWVYAchH5VnIjt2QZoXBvt+RzgLuvbvFYYpfPWfiQ6ypYssm6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEdgi4g/WJIgt8ZqG8zRG/q0R6y0XRaLNrFl1aRVN7qufOoWhX
-	FqRxKYeRGn51v5J1wzaauFmwP5sGIVVc4YA8HSy8YHmk8bjClUHaKqVXLovn25FRiu0=
-X-Gm-Gg: ASbGncvDmqVSUY236Hc6x44HrhBsAIDeKwb/jZwA0jgrKkkCVyP1UUSoPpZuiCVEPAR
-	+j+ML9cDSvQxCXnZiRzv2yasfKU0FeblN7JjD7dV7JMb6kLApPAD50hz3ESQoy6YXAR84ya88io
-	Ku2EiSdgQhOVN2W2EOfI/0Qs9HeMpjmDd+tu//vFe2ppiTqTzhtv0gk3ON1tbevnZaPgBJVq2I0
-	bi6g5OS6z6CltQTWZI59riZspqy+loRIcFlMH6eO3ZEqpUdD0mYtcDA2DS0t0r6pFoO2aHo0k44
-	StJ42oeF+qy7r7VlwyUlvo4O7s7h9Q9CID5ME5LX/+vy5ALWwbWwpkyjRo9fsiw8EkaMk1zw0/d
-	hk1b64TsOuVFsiEbMsqjmC9LO25h6Tw==
-X-Google-Smtp-Source: AGHT+IFLIO0D64jUevJ/lz7zQvSZw2ntrY7H7wTTGXZU+ByFDYJ39AXVKInapU4LgwZEqDykU4orhg==
-X-Received: by 2002:a05:6e02:154e:b0:3dc:87c7:a5b5 with SMTP id e9e14a558f8ab-3dc9b67fdd9mr138337085ab.3.1748368579606;
-        Tue, 27 May 2025 10:56:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748368593; x=1748973393;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CPM8Cvieqz5nNvWINKg7DvU/92uvEyS4n24d/iV9dr0=;
+        b=bp2i1PMLHNyPGqfiKb6TQXVWSy47SdhtEbnNGe8WH7HCQ1ovzueodXktfHHOWFRn8v
+         9jebxof7jz/9EXEiwG9ue7nd1TAeoMvtltdn3ebN5a7f2LzfrgnsUyPeLgITwrWjDBSQ
+         jZn6QMjobLEwJgy5ASPV4jTaen1zPftGd2t6dM8V9zNFV6WW+apmU7CWvTHxF3NRLI2P
+         N9M3LqlllSDZZJ3VHQVrn0sIkcNTCOdnLucrl8jCjLm9k7its/3xnMxm3S/kxtsUUjPV
+         x07Uj9UvJj6xW18e/zJLulCHfPAxV7MXxC9b28fiOm0XIWDIKEAOLuh6iqqiRKrpHTYG
+         ytMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDhX7GUyCNGmI/HgyJs0Z2zwcwLy8BV7PcI3/HKcyCA1ZMVOZxb/2CayzKFdgkBcvEVChJxv5XzvGpmKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziJd79fQroYHG9M46w+fuacnp0crJ4GUcAW8YKUomfv4V58D2L
+	q/RfVk83f7m9JfiZLld9EP9F/h9GWUkIrqW/tVA0RI33dIqNhVndMPJLcB9IL70/1J8=
+X-Gm-Gg: ASbGnct/4/WDAiDCswOQMORj430uEGkpYoLGV0DVBm28e4QMjS7lw6w+VPn5jqQr+sD
+	qyAX+H3eqdR1sQg0v7sAwrvlh+UvYc0g1Aqkvrc2cRTaaulTP0BBhM+kzEOpNelVHSK2v+KaxBl
+	b3qpMNW/+QxF/jawoeiE1b59xhExhEzOYJvjXAbyTGrfO06R0SHHNWdLN7swceEWobzGz+FV+/V
+	PaBGXQ0kQ6rGoawJClovwC4fDi1zW4SVCjpD/BaCttuN+9KanL1eYHK6NgtjnUYjB7OUIg7n9+i
+	CvyIO3N86zESFY2qbbpGXt0yVGX0vN70+otXvjx1Fxml2gV0M4VpBl5uCHK5p9XbYmNCRqkhDrT
+	Ub+C9zFU52uEgyFssgmoh5Jl7VQiUDjqR71ko7Y9Z
+X-Google-Smtp-Source: AGHT+IGb7ZAkz0DXl6pr3hb3Rtl1mnfnjPXpzgihCk3W+jtxghNllqAVA4MuKf6P/Nz/db42HhLmew==
+X-Received: by 2002:a05:6e02:1b05:b0:3dc:7563:c3d7 with SMTP id e9e14a558f8ab-3dc9b6a1250mr157952185ab.12.1748368582436;
+        Tue, 27 May 2025 10:56:22 -0700 (PDT)
 Received: from james-x399.localdomain (97-118-146-220.hlrn.qwest.net. [97.118.146.220])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc82e014f4sm38082275ab.40.2025.05.27.10.56.18
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc82e014f4sm38082275ab.40.2025.05.27.10.56.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 May 2025 10:56:19 -0700 (PDT)
+        Tue, 27 May 2025 10:56:22 -0700 (PDT)
 From: James Hilliard <james.hilliard1@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux-sunxi@lists.linux.dev,
@@ -80,19 +82,27 @@ Cc: linux-sunxi@lists.linux.dev,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>,
 	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Jinjie Ruan <ruanjinjie@huawei.com>,
+	Paul Kocialkowski <paulk@sys-base.io>,
 	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select PHY device
-Date: Tue, 27 May 2025 11:55:54 -0600
-Message-Id: <20250527175558.2738342-1-james.hilliard1@gmail.com>
+Subject: [PATCH v2 2/3] net: stmmac: dwmac-sun8i: Allow runtime AC200/AC300 phy selection
+Date: Tue, 27 May 2025 11:55:55 -0600
+Message-Id: <20250527175558.2738342-2-james.hilliard1@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250527175558.2738342-1-james.hilliard1@gmail.com>
+References: <20250527175558.2738342-1-james.hilliard1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,53 +111,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some devices like the Allwinner H616 need the ability to select a phy
-in cases where multiple PHY's may be present in a device tree due to
-needing the ability to support multiple SoC variants with runtime
-PHY selection.
+The Allwinner H616 ships with two different copackaged phy variants,
+in order to determine the phy being used we need to read an efuse and
+then select the appropriate PHY based on the AC300 bit.
+
+By defining an emac node without a phy-handle we can override the
+default PHY selection logic in stmmac by passing a specific phy_node
+selected based on the ac200 and ac300 names in a phys list.
+
+This allows us to have a device tree that defines both PHY variants
+even though only one will actually end up being used at runtime
+based on the ac300 nvmem efuse bit.
 
 Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 22 +++++++++++++------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 36 +++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 59d07d0d3369..949c4a8a1456 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1210,17 +1210,25 @@ static int stmmac_init_phy(struct net_device *dev)
- 	 */
- 	if (!phy_fwnode || IS_ERR(phy_fwnode)) {
- 		int addr = priv->plat->phy_addr;
--		struct phy_device *phydev;
-+		struct phy_device *phydev = NULL;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index 6c7e8655a7eb..50d37876fabf 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -11,6 +11,7 @@
+ #include <linux/mdio-mux.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/module.h>
++#include <linux/nvmem-consumer.h>
+ #include <linux/of.h>
+ #include <linux/of_mdio.h>
+ #include <linux/of_net.h>
+@@ -280,6 +281,8 @@ static const struct emac_variant emac_variant_h6 = {
+ #define SYSCON_ETCS_EXT_GMII	0x1
+ #define SYSCON_ETCS_INT_GMII	0x2
  
--		if (addr < 0) {
--			netdev_err(priv->dev, "no phy found\n");
--			return -ENODEV;
-+		if (priv->plat->phy_node) {
-+			phy_fwnode = of_fwnode_handle(priv->plat->phy_node);
-+			phydev = fwnode_phy_find_device(phy_fwnode);
-+			fwnode_handle_put(phy_fwnode);
- 		}
- 
--		phydev = mdiobus_get_phy(priv->mii, addr);
- 		if (!phydev) {
--			netdev_err(priv->dev, "no phy at addr %d\n", addr);
--			return -ENODEV;
-+			if (addr < 0) {
-+				netdev_err(priv->dev, "no phy found\n");
-+				return -ENODEV;
-+			}
++#define AC300_KEY		BIT(8) /* 1: AC300 PHY, 0: AC200 PHY */
 +
-+			phydev = mdiobus_get_phy(priv->mii, addr);
-+			if (!phydev) {
-+				netdev_err(priv->dev, "no phy at addr %d\n", addr);
-+				return -ENODEV;
-+			}
- 		}
+ /* sun8i_dwmac_dma_reset() - reset the EMAC
+  * Called from stmmac via stmmac_dma_ops->reset
+  */
+@@ -1149,6 +1152,35 @@ static struct regmap *sun8i_dwmac_get_syscon_from_dev(struct device_node *node)
+ 	return regmap;
+ }
  
- 		ret = phylink_connect_phy(priv->phylink, phydev);
++/* H616 SoCs can contain either an AC200 PHY (needs i2c init) or an AC300
++ * PHY (no i2c). The silicon variant is flagged by the AC300_KEY efuse.
++ */
++static int sun8i_dwmac_get_ac300_phy(struct device *dev,
++				     struct plat_stmmacenet_data *plat_dat)
++{
++	u16 val;
++
++	/* If the nvmem cell is absent, use normal phy selection. */
++	if (nvmem_cell_read_u16(dev, "ac300", &val))
++		return 0;
++
++	const char *phy_name = (val & AC300_KEY) ? "ac300" : "ac200";
++	int index = of_property_match_string(dev->of_node, "phy-names",
++					     phy_name);
++	if (index < 0) {
++		dev_err(dev, "PHY name not found in device tree\n");
++		return -EINVAL;
++	}
++
++	plat_dat->phy_node = of_parse_phandle(dev->of_node, "phys", index);
++	if (!plat_dat->phy_node) {
++		dev_err(dev, "Failed to get PHY node from phys property\n");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ static int sun8i_dwmac_probe(struct platform_device *pdev)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
+@@ -1222,6 +1254,10 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+ 	if (IS_ERR(plat_dat))
+ 		return PTR_ERR(plat_dat);
+ 
++	ret = sun8i_dwmac_get_ac300_phy(dev, plat_dat);
++	if (ret)
++		return ret;
++
+ 	/* platform data specifying hardware features and callbacks.
+ 	 * hardware features were copied from Allwinner drivers.
+ 	 */
 -- 
 2.34.1
 
