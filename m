@@ -1,182 +1,122 @@
-Return-Path: <netdev+bounces-193690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B44B0AC51C8
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:14:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43C2AC51E6
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 17:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 574AC3AD618
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 15:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B73165688
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 15:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3075727A139;
-	Tue, 27 May 2025 15:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD30714AD2B;
+	Tue, 27 May 2025 15:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="HU9PFWgJ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ua+wDP1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E606E2798EA;
-	Tue, 27 May 2025 15:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD21C3C465
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 15:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748358863; cv=none; b=cuwalWRPJ85prqfXr6XbsrhLrCcfEfXOHJBXvpkjdrUC8kPJWa+aTV1xYIMn+3GOA0BQYX/Duc57HGvVwc9lgdsbIPdCpaiFDFaMX6hOk5p1tvJ8QEdOx1dk20M3S48wtalEb6kDVOLJrsQKLddCzBMVzzFXAg65ViWXu/l3Htk=
+	t=1748359400; cv=none; b=RGw83rpyVNEUJkNsAtRz8opbjJC9XmA9tMd29FEfTZ8i6LoySly2B+Eu1X+RtxqAkGN0aYK4HNdxNmHQWIY2EzpovQpv3HOSUroHWsep1gk1/WZUZYwrUfaKXLA6IKDpgdDiLOTsQVAOzuZ0k19qVH52nUKPfOlK/q0He5LItIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748358863; c=relaxed/simple;
-	bh=QsoWPcV73QWcu7HU8/pl6BOv+BVHUlw1kEb2JklOYfM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EfaIV4galgu4IbVyl/wHF4WtUpZ+d5Vlor6v+an9nGcp40/hkB3EVp+E2OoFe27/U51ymeP/D7QjPPjfs9lAlkKok8FOx1q/QsK1qk9GGnrtyJiCTtrEh0L1lf6RA+jKd0WOQJrZ0YVvqLCTjbVrtZ1bdvS5EyDDs7rTbsPGXDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=HU9PFWgJ; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=RmHGGS3y8Q/k8hp3rM4Xuzfh083IGBKoSwvQoX92ncE=; b=HU9PFWgJbhxdqFYCh5zHEsfaOk
-	S6nstMplCaDK+IhP+WJIv8e/XEpgrrqPZawtWIP/gx+dfrY+TUiaPI9vMmknxqF4MoypcC6vdehJJ
-	C8RWyIgADItyDS2iuAH6HFAoyfc7/27QwNP8O3vzpnyJN3ikqH+3V3cCCYsMMPaOGyAZOcbVYiU9b
-	NdRwYRaoU59ESFzTXOV0L1PNvj0D4l8zUg45gcnlvJH8SnPCdW2hzHAo+eSg7Aadv4MKiZ/K/PHMV
-	LXWGFXBcupOksajAf0aszO1SobBYN8mXmrd6mYPx9ROcn9ayg7vyHDA1jXHZppNdNtX72jMhF34Nz
-	lWJMNGWg==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1uJw0N-000GOW-1g;
-	Tue, 27 May 2025 17:14:15 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1uJw0M-0003Gt-2y;
-	Tue, 27 May 2025 17:14:14 +0200
-Message-ID: <040e674d-7854-426f-b466-63dc36cccb98@iogearbox.net>
-Date: Tue, 27 May 2025 17:14:14 +0200
+	s=arc-20240116; t=1748359400; c=relaxed/simple;
+	bh=RrW9Vp6jByN3ukHBhVbFI1Z3VSTH7gZOrqieR/+esik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W67Nh8m+4QrIjQhFZ2rVAyX22e4LI2pWHXwTBifJ0/XRsJT4ZoU+sQNtCneRImEd74BCfHZjSXGBsRujj9G/nxNmEvnZZlo9BjrPq98/Cl4C4uC2wvwCGBUjAhQp9UsgEIWfpn+Q3D85DROHi6dRODA824w5Sx7goN6IN/jC8+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ua+wDP1f; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-445b11306abso21862675e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 08:23:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1748359396; x=1748964196; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gkNV2b4GsC190w6aBvVu3RRrMYJ3LAoxWvUxcWbyVwQ=;
+        b=Ua+wDP1f8Cxx0VQV6XxfyZ5DLCKUtfnxpf4XXhVpTAgms5qPGGl08a7pqCoeeFNFEy
+         uMrpqOmQzKgP+1GRhFnjma+Ys/MAddNHhfk9nM/FnIqVLeysZIvAYKCy18G+p90MlgTC
+         tzvgWI8YUz7qyUu9gGHbRn4t1Cowo3+3EwWCFfNsBjrfU2Pe7RWkFUJJRKx+oHi8bvMK
+         sG0cgFH3OflLWBn9oCSQj3Q+SC7V4nCDkDwFFjj9/dFkAK6/C+JrVM57FWRMdwf73Law
+         iW/HvSbjfvgIh7rkMYHr/QAGESump7EjJ1VqfhsQglELECZZrNIxZui4SrBoXKB9SnHy
+         59Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748359396; x=1748964196;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gkNV2b4GsC190w6aBvVu3RRrMYJ3LAoxWvUxcWbyVwQ=;
+        b=mtQEUCuuJptyn9Zbf0NOaa3GAATh6qastcqryGNkXJNQvpr7k0Aw4tIu5OGy3BM7dZ
+         xFb9HBW2wr/7xQZvyCC3tyhIbGa1YZ5x8i9vfrGHxqQEB1UjdzRb+Q/XPKyOmkmmZ/Po
+         KooCH9wdQ75VIenvbBOnqd2zn+Hi5qhtzOIchz0/RcXW0C6+GlBGf8XJSxX3MxG8oclc
+         ByU0ywJOx/NwXY5Q1gnu3orughjKwwucaltWiHde8OVTHQIzkQ0I5GYxiZPSiHxvcj9Q
+         n2IBh9BCb4ugdLmzH3lwETy5UUhjcDYIjaL7jiWSnGC2tu+ZyY7qE//Yy0k2rwIsBgYp
+         YBpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVO3YXxTwAhkmURewhxJfcs4tck1U0bItDdYEv0z3YMuFvEsh2yXNceArZJtzU/Ujis7px6+Ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmCzHMhnaEJgRIRRq7K2N2OMXs3R/eIrUkZPXL+JeX4/Zd5W/a
+	vQbvDVQI/1eGmYrMqpTI69Z6rLpqluVECCoQF566UgO34pbRhaKPoXmD3k1ednI/3gM=
+X-Gm-Gg: ASbGncug4+0N7RR91VSlz3mRVHnGPl+1sJ3csEmQ10w5N5RAgwpTN+YgsIJzzpscfzv
+	2m2/O0xzFtJ+MbM6PJh9C/aoXkBMXv/uCaQisiIpjLnUkzz100fsOxb8a/azcEpqbMBpqLajmNU
+	OaI23JHd/PLgqPQzYksgFLqu8oS5ml/28R9caS/QJeKYOVSSlnBHwDaWrNOlGWEi7ew6cmeKeZC
+	2yQhClWtFIk2L1udYlGI7I7EBNf5tjvkQZOyxuC6RYEaw5UryzFBte2QFGRL42MbWl9QLqqBNGZ
+	YzU0AEUi3fw8e27oaeWG25f+ajPw0O3T6uXK+/f0V3Omqu9vWu5IBEQcUKj5DROSaDrlT8cK3pV
+	qduY=
+X-Google-Smtp-Source: AGHT+IHGbk9pahxUaJo22PGKpwqXK2/4eW8RJNAHiDt+ZDzmDHRNj3SyM/0B3tpzypHLST2RnOmmjQ==
+X-Received: by 2002:a05:600c:5011:b0:43d:fa58:8378 with SMTP id 5b1f17b1804b1-44c94c2afbbmr114781765e9.33.1748359395627;
+        Tue, 27 May 2025 08:23:15 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f74cce5bsm266937635e9.24.2025.05.27.08.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 08:23:15 -0700 (PDT)
+Date: Tue, 27 May 2025 17:23:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Arinzon <darinzon@amazon.com>, 
+	David Miller <davem@davemloft.net>, netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>, 
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, 
+	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, 
+	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, 
+	"Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, 
+	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>, 
+	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, 
+	"Bernstein, Amit" <amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, 
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, 
+	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH v11 net-next 0/8] PHC support in ENA driver
+Message-ID: <rvulfy3bl3htcp2r3kbpzourftvgcu7647dw6msxc363qe4khi@kbl4bevmrkq7>
+References: <20250526060919.214-1-darinzon@amazon.com>
+ <jdkiblbwiut4x7t7gtpiatdbiueehvhuqdhn5caoj2ijiil2yr@6xof3oyhruxa>
+ <20250527074419.40163789@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] bpf: Fix L4 csum update on IPv6 in
- CHECKSUM_COMPLETE
-To: Paul Chaignon <paul.chaignon@gmail.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
- Tom Herbert <tom@herbertland.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <cover.1748337614.git.paul.chaignon@gmail.com>
- <458dd94a6f546156fcf2ec325424cd43be3e8862.1748337614.git.paul.chaignon@gmail.com>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <458dd94a6f546156fcf2ec325424cd43be3e8862.1748337614.git.paul.chaignon@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27650/Tue May 27 10:36:31 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250527074419.40163789@kernel.org>
 
-On 5/27/25 11:48 AM, Paul Chaignon wrote:
-> In Cilium, we use bpf_csum_diff + bpf_l4_csum_replace to, among other
-> things, update the L4 checksum after reverse SNATing IPv6 packets. That
-> use case is however not currently supported and leads to invalid
-> skb->csum values in some cases. This patch adds support for IPv6 address
-> changes in bpf_l4_csum_update via a new flag.
-> 
-> When calling bpf_l4_csum_replace in Cilium, it ends up calling
-> inet_proto_csum_replace_by_diff:
-> 
->      1:  void inet_proto_csum_replace_by_diff(__sum16 *sum, struct sk_buff *skb,
->      2:                                       __wsum diff, bool pseudohdr)
->      3:  {
->      4:      if (skb->ip_summed != CHECKSUM_PARTIAL) {
->      5:          csum_replace_by_diff(sum, diff);
->      6:          if (skb->ip_summed == CHECKSUM_COMPLETE && pseudohdr)
->      7:              skb->csum = ~csum_sub(diff, skb->csum);
->      8:      } else if (pseudohdr) {
->      9:          *sum = ~csum_fold(csum_add(diff, csum_unfold(*sum)));
->      10:     }
->      11: }
-> 
-> The bug happens when we're in the CHECKSUM_COMPLETE state. We've just
-> updated one of the IPv6 addresses. The helper now updates the L4 header
-> checksum on line 5. Next, it updates skb->csum on line 7. It shouldn't.
-> 
-> For an IPv6 packet, the updates of the IPv6 address and of the L4
-> checksum will cancel each other. The checksums are set such that
-> computing a checksum over the packet including its checksum will result
-> in a sum of 0. So the same is true here when we update the L4 checksum
-> on line 5. We'll update it as to cancel the previous IPv6 address
-> update. Hence skb->csum should remain untouched in this case.
-> 
-> The same bug doesn't affect IPv4 packets because, in that case, three
-> fields are updated: the IPv4 address, the IP checksum, and the L4
-> checksum. The change to the IPv4 address and one of the checksums still
-> cancel each other in skb->csum, but we're left with one checksum update
-> and should therefore update skb->csum accordingly. That's exactly what
-> inet_proto_csum_replace_by_diff does.
-> 
-> This special case for IPv6 L4 checksums is also described atop
-> inet_proto_csum_replace16, the function we should be using in this case.
-> 
-> This patch introduces a new bpf_l4_csum_replace flag, BPF_F_IPV6,
-> to indicate that we're updating the L4 checksum of an IPv6 packet. When
-> the flag is set, inet_proto_csum_replace_by_diff will skip the
-> skb->csum update.
-> 
-> Fixes: 7d672345ed295 ("bpf: add generic bpf_csum_diff helper")
-> Signed-off-by: Paul Chaignon <paul.chaignon@gmail.com>
+Tue, May 27, 2025 at 04:44:19PM +0200, kuba@kernel.org wrote:
+>On Mon, 26 May 2025 11:53:14 +0200 Jiri Pirko wrote:
+>> Could you please add very simple devlink_port instance of flavour
+>> PHYSICAL and link it with netdev? Having devlink instance without the
+>> port related to the netdev looks a bit odd.
+>
+>'Physical' seems inappropriate for a "host side of an IPU".
+>PCI PF if anything, but also I disagree that we need every devlink
+>instance to have a port. PTP clocks use devlink and are not networking
+>devices at all.
 
-Great catch!
-
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Sure, but here there is netdev. That's why I think it would be good to
+have the related devlink object created as well, for the sake of model
+completeness. 
 
