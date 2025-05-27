@@ -1,220 +1,144 @@
-Return-Path: <netdev+bounces-193716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C352AC52DE
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:16:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E605AC52EB
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 18:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0C4716D0E8
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:16:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 180B09E0C07
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 16:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FD71A5BBF;
-	Tue, 27 May 2025 16:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6717D27EC78;
+	Tue, 27 May 2025 16:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lJ76ReqC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLreZqh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BC3367
-	for <netdev@vger.kernel.org>; Tue, 27 May 2025 16:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D507D27AC41;
+	Tue, 27 May 2025 16:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748362606; cv=none; b=TmGNEEfO9uZo06LanUJWYjI/CRkpRYpO6dfrfmRnD4p5xWgme/UGYeGqUfSTlqX2zL+qod9EafQ1T8VYB2ysEXoykrKMn+u9CiWEI6jRVazEjj40nq21a1krsg0Upou5cvzrt2bdkSkkglYb2ygLxHRb+Ytscn7K0gNdRcBAH4M=
+	t=1748362771; cv=none; b=PpRuDGZsu/PmMj15T4Q1+FbTB6teGbvwqL4AxM8j5q1NqIZegyZiFQE2P+JE9pBmgyA3oO4ZFy2lD7Mkn97JagMT0AHY94DUf4I7Ili5/Vuq6KKwsdxCMK22DS4LcU/wM/384rkIHIqkK60BkiAtkTq+MjhaXx7lHK1OKA8WBiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748362606; c=relaxed/simple;
-	bh=LKZzSd4b8vDI3Z6hVkBihe5JHNwscioW3xfjEEQDhuQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EqeO87iAy8x+lisxfq99R0OoPZYI84HBDG6Cqd5vWIf0e3kOoXMoRJe5/kR5WRNZP7yTLRnyCnr8V6Vw5f/SvBOaax+7OHY7TNoJsZlXqMuJG2AEYS4uOcu3NkW/xggV2q2BSywEB4eWmjtfCT3M0ez8p2cXrWJJ92shv8R4WeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lJ76ReqC; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <679d6810-9e76-425c-9d4e-d4b372928cc3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748362598;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j3LFQ0ieKQpaqxJLyJ9iyNsYYxmUvLgA8cPK/4ZnBaA=;
-	b=lJ76ReqCndDsN2ac38Fwh/jWjcCo2hpONkdcTz62+a+81d9l4G453nftIx12FEoP1sN/3h
-	jcdKYutfgp+F/fQLwpRhQULLtaCY0bF39U1clrBcTwRBngWggAwVjiVkUeLjdY15PUm/0v
-	ny5lqbRvcqcxSHnoT9BeHyefrJImKFw=
-Date: Tue, 27 May 2025 12:16:33 -0400
+	s=arc-20240116; t=1748362771; c=relaxed/simple;
+	bh=MYkd9moW5U5NY01cRCmj+VZ39AjPIlCw1sHRRMBFGIM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVazmjqr4Hj5FoZnjwjlGaBZaROFjCTRrm561wBvrjF4q1XgakBZsYJf17A2jAQVHJiNWXZXRvbz16NVtsrYgpXIKLp+zuM9sLGK2iZ19BP/MH8FqXaeR7GlDKcfmpmV1TgSl2l/HZE2WU+cpjydsUckiG6yAXC563/nPAwuIYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLreZqh9; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-73972a54919so2863806b3a.3;
+        Tue, 27 May 2025 09:19:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748362769; x=1748967569; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JbK8myrrInjlPOn0ULLUSRCNxSgmfdtmIhscGDFMnz4=;
+        b=HLreZqh95zElkDtm6k9uGPrfEpCG9zlNUK/3US+F31Hbuu0ilDXdGPDx6C/2VTGaNn
+         epx5OOGnoxjLBH7Siy+uF+fCJR+IW1kKn/MJUgbgvk8wuo3MO9rD8RhkUMI977liCk0Y
+         W9BGl2teVnaY10qjm7kyH4qw52eWzMw3w7EejP/gxrzNawXY/EmUD4Xmcy/oOCyin0sj
+         HcHgjGdKix4NSvtb8OOxdjZp9CGQp5+0M83lqaP6GTEm51Oi9/DblTKrH2tVaHfuKpMN
+         jv0D7J/ke3qkJrDyngqwXq0R0gTqZi6h0Dlp+sLkyF6fkc3VILrL/4g0+LQXgoNh1VF1
+         X4vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748362769; x=1748967569;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JbK8myrrInjlPOn0ULLUSRCNxSgmfdtmIhscGDFMnz4=;
+        b=mBo8/4wMmcv41e9yGrfWnUGR6YxV5haj9bmoNxRVzkpp/B20Lu4ZkvrwTvZWyt9TGg
+         U/tXclEVQN0DZW/Yctx1GCfah8MyjPKpcQ+NGhCCCH0onUhQLFvVwUCm0fG1BNOo79zW
+         m73gCaxV1Elwvj5+/DBCs7xsrydo16k/sP57AQzWHJIS+Ba3encwcUsMBMJuuTNJeviJ
+         4NrFOCYEB0BpnjqH72YdqRSwjR6l3rZn4TsI2pKZwh3LrfaV726fiz3JyNyD7z7IlSI1
+         sGaFGPGKLeklatwEmSexHv0RVMtVkyBVfh6hGGjZR+lkR6ahBDl9+umxKFQpvRxjxHgL
+         ni5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWc29S8eJzqpsYQEzquGYDke0Q5PyJPCI6lOO0ei/HgP92FYyU+TR/uCcWY10MYIy0dGZ6x/ui8qHRGCDHs@vger.kernel.org, AJvYcCXsmfEmMEI0zDyIl6WgaFDzelw7/MmrtIBw+FTjndrEyvuCndooiHkyqqHH5dL6pDjdshM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yznu8ITteJOCwzGyepPpAQ0Pn1zkURbNbZqpsudeQHoSryWyVPk
+	2RJUATljbmIy2oWCSnoMZkNENPVbrDEecqz01BP49vy7C5FiaXMtvzrBb9MDjd4fvMo=
+X-Gm-Gg: ASbGncuEBhCaYIjQQPGHXc7mmQJmO6u5Vwj0TZ233fFbsQdaLjyTaolo/fPQFGZOYWV
+	wAPMrst2gzFxXJ+mXdua/XXZ0myTLmWQdS7QKbGEyWouiCmG6q+DgtnSvg1Z7jwAzGbNfWwFIuA
+	r3fCZZG/JhGJnDo3PeUGl/vOrFe3w3Pw8fMvn8YVmMFWne/xiUUkQIHf4bqXgnADAs7Rh9/HfSS
+	bls7Q/VzzpBS4nhMl1G0BFWmlPkaVXl4zBaL/o7+GxyEAEhyJAuSFYc2CUWxDnO8d8NtJTf9Gp4
+	hPANxGHPP8KfXXM10brgQuazrhNweWOCifg7WUPciq3jQz22E5xdYfpaXTJTMjvc4+xlySx9tPR
+	Jbj7wRPUtNN4K
+X-Google-Smtp-Source: AGHT+IGKmD2Zh5VhkMaiEIal6sHXDxc0tkPGQBPjYF8Im8Ox4Lf/IgC3904Py2SWs7grtFnUZ9zcQQ==
+X-Received: by 2002:a05:6a00:1747:b0:730:75b1:7219 with SMTP id d2e1a72fcca58-745fdf4b8a4mr20489480b3a.12.1748362768405;
+        Tue, 27 May 2025 09:19:28 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:52e0:fc81:ee8a:bb3f])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7462aefb414sm1118121b3a.34.2025.05.27.09.19.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 09:19:27 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [RFC PATCH net-next v2 0/2] virtio-net: support zerocopy multi buffer XDP in mergeable
+Date: Tue, 27 May 2025 23:19:02 +0700
+Message-ID: <20250527161904.75259-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report
- coalesce parameters in DMAengine flow
-To: Suraj Gupta <suraj.gupta2@amd.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, vkoul@kernel.org, michal.simek@amd.com,
- radhey.shyam.pandey@amd.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
-References: <20250525102217.1181104-1-suraj.gupta2@amd.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250525102217.1181104-1-suraj.gupta2@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 5/25/25 06:22, Suraj Gupta wrote:
-> Add support to configure / report interrupt coalesce count and delay via
-> ethtool in DMAEngine flow.
-> Netperf numbers are not good when using non-dmaengine default values,
-> so tuned coalesce count and delay and defined separate default
-> values in dmaengine flow.
-> 
-> Netperf numbers and CPU utilisation change in DMAengine flow after
-> introducing coalescing with default parameters:
-> coalesce parameters:
->    Transfer type	  Before(w/o coalescing)  After(with coalescing)
-> TCP Tx, CPU utilisation%	925, 27			941, 22
-> TCP Rx, CPU utilisation%	607, 32			741, 36
-> UDP Tx, CPU utilisation%	857, 31			960, 28
-> UDP Rx, CPU utilisation%	762, 26			783, 18
-> 
-> Above numbers are observed with 4x Cortex-a53.
+Currently, in zerocopy mode with mergeable receive buffer, virtio-net
+does not support multi buffer but a single buffer only. This commit adds
+support for multi mergeable receive buffer in the zerocopy XDP path by
+utilizing XDP buffer with frags. This happens when the MTU of tap device
+is set to 9000 so that a packet can exceed a single XDP buffer. As a
+result, that packet will be split into multi buffer XDP.
 
-How does this affect latency? I would expect these RX settings to
-increase latency around 5-10x. I only use these settings with DIM since
-it will disable coalescing during periods of light load for better
-latency.
+This series also adds the test for virtio-net rx when an XDP socket is
+bound to the interface. The test exercises both copy and zerocopy mode. We
+can adjust the tap device's MTU to test both single buffer and multi
+buffer XDP.
 
-(of course the way to fix this in general is RSS or some other method
-involving multiple queues).
+Changes in RFC v2:
+- Return XDP_DROP when receiving multi-buffer XDP but BPF program does not
+support it
+- Add selftest
+- Link to RFC v1: https://lore.kernel.org/netdev/20250426082752.43222-1-minhquangbui99@gmail.com/
 
-> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
-> ---
-> This patch depend on following AXI DMA dmengine driver changes sent to
-> dmaengine mailing list as pre-requisit series:
-> https://lore.kernel.org/all/20250525101617.1168991-1-suraj.gupta2@amd.com/ 
-> ---
->  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  6 +++
->  .../net/ethernet/xilinx/xilinx_axienet_main.c | 53 +++++++++++++++++++
->  2 files changed, 59 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> index 5ff742103beb..cdf6cbb6f2fd 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> @@ -126,6 +126,12 @@
->  #define XAXIDMA_DFT_TX_USEC		50
->  #define XAXIDMA_DFT_RX_USEC		16
->  
-> +/* Default TX/RX Threshold and delay timer values for SGDMA mode with DMAEngine */
-> +#define XAXIDMAENGINE_DFT_TX_THRESHOLD	16
-> +#define XAXIDMAENGINE_DFT_TX_USEC	5
-> +#define XAXIDMAENGINE_DFT_RX_THRESHOLD	24
-> +#define XAXIDMAENGINE_DFT_RX_USEC	16
-> +
->  #define XAXIDMA_BD_CTRL_TXSOF_MASK	0x08000000 /* First tx packet */
->  #define XAXIDMA_BD_CTRL_TXEOF_MASK	0x04000000 /* Last tx packet */
->  #define XAXIDMA_BD_CTRL_ALL_MASK	0x0C000000 /* All control bits */
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 1b7a653c1f4e..f9c7d90d4ecb 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -1505,6 +1505,7 @@ static int axienet_init_dmaengine(struct net_device *ndev)
->  {
->  	struct axienet_local *lp = netdev_priv(ndev);
->  	struct skbuf_dma_descriptor *skbuf_dma;
-> +	struct dma_slave_config tx_config, rx_config;
->  	int i, ret;
->  
->  	lp->tx_chan = dma_request_chan(lp->dev, "tx_chan0");
-> @@ -1520,6 +1521,22 @@ static int axienet_init_dmaengine(struct net_device *ndev)
->  		goto err_dma_release_tx;
->  	}
->  
-> +	tx_config.coalesce_cnt = XAXIDMAENGINE_DFT_TX_THRESHOLD;
-> +	tx_config.coalesce_usecs = XAXIDMAENGINE_DFT_TX_USEC;
-> +	rx_config.coalesce_cnt = XAXIDMAENGINE_DFT_RX_THRESHOLD;
-> +	rx_config.coalesce_usecs =  XAXIDMAENGINE_DFT_RX_USEC;
+Thanks,
+Quang Minh.
 
-I think it would be clearer to just do something like
+Bui Quang Minh (2):
+  virtio-net: support zerocopy multi buffer XDP in mergeable
+  selftests: net: add XDP socket tests for virtio-net
 
-	struct dma_slave_config tx_config = {
-		.coalesce_cnt = 16,
-		.coalesce_usecs = 5,
-	};
+ drivers/net/virtio_net.c                      | 123 +++---
+ .../selftests/drivers/net/hw/.gitignore       |   3 +
+ .../testing/selftests/drivers/net/hw/Makefile |  12 +-
+ .../drivers/net/hw/xsk_receive.bpf.c          |  43 ++
+ .../selftests/drivers/net/hw/xsk_receive.c    | 398 ++++++++++++++++++
+ .../selftests/drivers/net/hw/xsk_receive.py   |  75 ++++
+ 6 files changed, 596 insertions(+), 58 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/xsk_receive.bpf.c
+ create mode 100644 tools/testing/selftests/drivers/net/hw/xsk_receive.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_receive.py
 
-since these are only used once. And this ensures that you initialize the
-whole struct.
+-- 
+2.43.0
 
-But what tree are you using? I don't see these members on net-next or
-dmaengine.
-
-> +	ret = dmaengine_slave_config(lp->tx_chan, &tx_config);
-> +	if (ret) {
-> +		dev_err(lp->dev, "Failed to configure Tx coalesce parameters\n");
-> +		goto err_dma_release_tx;
-> +	}
-> +	ret = dmaengine_slave_config(lp->rx_chan, &rx_config);
-> +	if (ret) {
-> +		dev_err(lp->dev, "Failed to configure Rx coalesce parameters\n");
-> +		goto err_dma_release_tx;
-> +	}
-> +
->  	lp->tx_ring_tail = 0;
->  	lp->tx_ring_head = 0;
->  	lp->rx_ring_tail = 0;
-> @@ -2170,6 +2187,19 @@ axienet_ethtools_get_coalesce(struct net_device *ndev,
->  	struct axienet_local *lp = netdev_priv(ndev);
->  	u32 cr;
->  
-> +	if (lp->use_dmaengine) {
-> +		struct dma_slave_caps tx_caps, rx_caps;
-> +
-> +		dma_get_slave_caps(lp->tx_chan, &tx_caps);
-> +		dma_get_slave_caps(lp->rx_chan, &rx_caps);
-> +
-> +		ecoalesce->tx_max_coalesced_frames = tx_caps.coalesce_cnt;
-> +		ecoalesce->tx_coalesce_usecs = tx_caps.coalesce_usecs;
-> +		ecoalesce->rx_max_coalesced_frames = rx_caps.coalesce_cnt;
-> +		ecoalesce->rx_coalesce_usecs = rx_caps.coalesce_usecs;
-> +		return 0;
-> +	}
-> +
->  	ecoalesce->use_adaptive_rx_coalesce = lp->rx_dim_enabled;
->  
->  	spin_lock_irq(&lp->rx_cr_lock);
-> @@ -2233,6 +2263,29 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
->  		return -EINVAL;
->  	}
->  
-> +	if (lp->use_dmaengine)	{
-> +		struct dma_slave_config tx_cfg, rx_cfg;
-> +		int ret;
-> +
-> +		tx_cfg.coalesce_cnt = ecoalesce->tx_max_coalesced_frames;
-> +		tx_cfg.coalesce_usecs = ecoalesce->tx_coalesce_usecs;
-> +		rx_cfg.coalesce_cnt = ecoalesce->rx_max_coalesced_frames;
-> +		rx_cfg.coalesce_usecs = ecoalesce->rx_coalesce_usecs;
-> +
-> +		ret = dmaengine_slave_config(lp->tx_chan, &tx_cfg);
-> +		if (ret) {
-> +			NL_SET_ERR_MSG(extack, "failed to set tx coalesce parameters");
-> +			return ret;
-> +		}
-> +
-> +		ret = dmaengine_slave_config(lp->rx_chan, &rx_cfg);
-> +		if (ret) {
-> +			NL_SET_ERR_MSG(extack, "failed to set rx coalesce parameters");
-> +			return ret;
-> +		}
-> +		return 0;
-> +	}
-> +
->  	if (new_dim && !old_dim) {
->  		cr = axienet_calc_cr(lp, axienet_dim_coalesce_count_rx(lp),
->  				     ecoalesce->rx_coalesce_usecs);
 
