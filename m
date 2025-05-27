@@ -1,116 +1,126 @@
-Return-Path: <netdev+bounces-193564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E62D1AC47C0
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9F7AC47D0
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A106C1893412
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 05:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 251C43A9536
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 05:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B551917F4;
-	Tue, 27 May 2025 05:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB7B1DB551;
+	Tue, 27 May 2025 05:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="RuqfKSZE"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bHBTFXVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E718D3594A;
-	Tue, 27 May 2025 05:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839372AEED
+	for <netdev@vger.kernel.org>; Tue, 27 May 2025 05:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748324722; cv=none; b=qBVgI2p4dBExH4qbAn7EbA3jpdRrhECD7RygUMHnB+mkmZMu5ZF4hW4wbVnGrTttaewK3R508Ho2Fftx0YIe9kFiPgxjDr8J4xKPqAEvYd+0nzhyz6C/ClFRzzKh0HiUpiwz/8An9gi7P1tJe0TuxZ9muVHHFgDwQ9C4HjuGCgQ=
+	t=1748325108; cv=none; b=aSB61djZ5O3JGSFsT9Q5WAU4RuHeaQ7lso0sfydavSFfZUtS2xu0IOrX/aXhQvKf96/uEqoSbJ2ZT5cX3RsDY8//Zu6+0mQ4arUpg96cuPctmApQCiXl6Aw+mLw7u74o/3zi9jCCFvh8vHkOt5j5ZmLAnLv8gXoty9D1yXi9EXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748324722; c=relaxed/simple;
-	bh=UwirAYtlq4PYk8TsYpItR7qKlQL3pnxC3ACBwNJOxXE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iBwqh9UUkqMerWQgisLqeSbxJaU8lkiCFOqAMgNw9LYn7W1js4IoNoUWhVYfHKfGoRA9sNGx0z7YyXlSssdVreBLojJ5kRV+N5UWyD9Q/j1ZgjmUusPer2kMGKtW+R6uc/oBUPJFGpxwU6SnrTC/Ff0EJNUxCKxIjdZwvb5LqDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=RuqfKSZE; arc=none smtp.client-ip=80.12.242.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
- ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id Jn6TuvW38K8x9Jn6TuJ1uT; Tue, 27 May 2025 07:44:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1748324645;
-	bh=XaSDramaQ4ealF19zsjhv/7XrCvZ3oUf+OpS7nGNI+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=RuqfKSZEr3CG4BWdedgN5eVB3GxhSwHwxSTbYH9h7RUR5j4mU7wXvS51e1Eh7spnr
-	 VZEt6ixH2w73IfHBCz5gbF34YZwiMMuv7x1QVLLUUCUT+p7r4eF18zjdglLAoJjfde
-	 DueN8tNY+/fcyYDpvtdPpXgf5+K7jCKExyhWjWb1DJe+Zn0X2ljOpOrEXOib0oNTwO
-	 ssnhI8HZFd+1ocoiNCg7SDPLh4//RcuYV9+AUWMlULPgxE8SC60zHwDLXa0DJMeCDe
-	 ZT6vkRllvZ0LUWkTBi4kM1dsd1X72xNeKq97GF7SJ1LGiThP56Rytoh3UjKmXv3Ycd
-	 LAW+0luDsoOxQ==
-X-ME-Helo: [IPV6:2a01:cb10:785:b00:8347:f260:7456:7662]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Tue, 27 May 2025 07:44:05 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-Message-ID: <be687d2d-4c16-46d6-8828-b0e4866d91de@wanadoo.fr>
-Date: Tue, 27 May 2025 07:43:57 +0200
+	s=arc-20240116; t=1748325108; c=relaxed/simple;
+	bh=FRU9W1+DS8rfpo6UNzEN6UMBg1u0Yz12fF9f8ZKM/kE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VOU1Gl6/3BGRkzwHNWJP4Mjtc8tpRZ/HCLfYtr4/Zbeoc2C9FIcCZfBndG+yjOf4EFdyWYUbbGR6IdK8/Vq3l9auKqaM3X8E+3XxDgZlz43VZTZ29SQSv2qcxE18qYpgGI+hJta5OPmODYRcYS9ZoTU834TOl/CJBLr9L9fMBLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bHBTFXVq; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ad56cbc7b07so447401466b.0
+        for <netdev@vger.kernel.org>; Mon, 26 May 2025 22:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1748325105; x=1748929905; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVp2NY7FohPgZU2Typ+0h2uamFavzqINb4M9GCUjHoM=;
+        b=bHBTFXVq7lydwB0QzS+hm0UM3cfkRYU8KwUkLGuYw2TcnPaOUTR13DvGMIXmoqNmW0
+         HA2S3B579S0TlaPnpVn6T31o4VgrKCs2yJXpOTDGwxNxKNBh5Hffe+Bp5do0pn+GjdgR
+         MpY0S9SaXpe5RFJEbnAdlLvQMlEKhCGG4bEzvW+a0/HC0o8ikkSUFjzTH1VKlodI4J1C
+         l5Q4C7TJGoPgeNKaJqg3pzlnzd0+cs0RzloH7ZxFCOrwLaQs4p6zoG21ZdvrPMWPYWyE
+         xmLtJaE+wHldpnrw3Y5Z2cJpuNTp3EJ3H5Aiz4sZGlXTfu8IaEpkray8s4svhPcYmgfv
+         +5Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748325105; x=1748929905;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZVp2NY7FohPgZU2Typ+0h2uamFavzqINb4M9GCUjHoM=;
+        b=qrBMB2Mx9Q7AE3TYG8cF2uGKWkgZtT/cxnki8Bn2bjD+3MyazD1WxkvXR7xTCU/hHx
+         8hkPqdbk5OVhBnZCM6EAp69298S/QtDfMnHN0RuC2DX8ZHGFZdsGSH2ZSpuN2+A+kvA2
+         w7k4NdUMi41fZGsgXpMFftsrTkZyavjPJn+fO0MhTvhATl1csQyfWFbG449nPVE4t+Bx
+         KStslidN1f1rMA8RFGzEbHEL1JXPm1ktciq6ba9bVVCo4HSETOmLdWDNHx0/hkqmBbX9
+         Wp44XbcvUY4ht7oA9vs7lesQmYukv6TK87Hl1nLALY8lRV/J6C4ieSkVaxRpCVPf1IYc
+         loSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKcnSHyV0kpQ3L3i6ihpzo9osyARgquPf8MOtvAi879IFvdoeoHItvhzGMNRyJqb+a/F0+VMY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkbykuNIq5ve/UVB9rz9SL1RR5a04QmTD2TTaGwL4S0EvGzCm+
+	6kJg6CQByVHEfhINYsoBj0OygB+eC9ZmP4L0phS4M+sRXAfW09rPZgnIFj+XhefGsy0=
+X-Gm-Gg: ASbGncv+HFs0tfX28JLw9KZ6freLAbtZgEXZ3Nagj3ZFNJE6Nr2q8VKgPgtwnN0dD/u
+	ZD+KD7znVBkHCYQn5Zx2yDK73DZ5Oi8M9xx2CQQIH6DmJW005KdUZ6AgagRUeWQOqpQt+y4YarJ
+	H9dHNfpwjk90I8WCdxkzfnmwXkGYI91guUUXac/KoNgGfcGmSciUIG541cOistsYBr6sOaRdrcS
+	oxQSswxmbg/TdhHKF19Esbz/oEM+tePrdZyKN5JbZtRzYtff96pfsRBpYLcxFJiSEMkNT/HLKTF
+	9uMkmsZDyDuPtYFr00YhpnocJs1NsnG4+uNs9rJ5kaqWjSv0k6OozusoAVSwDNHzPMWB3pBAGM8
+	=
+X-Google-Smtp-Source: AGHT+IHjsxqs/6jcL8C7UZ6kgwo4G0JpqJqenkT3mjexlsQRl4jPPZvuq7A6WGfuQrzvXuOSfE1M6A==
+X-Received: by 2002:a17:906:b84c:b0:ad8:883b:f10d with SMTP id a640c23a62f3a-ad8883bf140mr176024766b.34.1748325104785;
+        Mon, 26 May 2025 22:51:44 -0700 (PDT)
+Received: from localhost (hf94.n1.ips.mtn.co.ug. [41.210.143.148])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ad8908a54f8sm40467266b.63.2025.05.26.22.51.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 22:51:44 -0700 (PDT)
+Date: Tue, 27 May 2025 08:51:38 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Eugenia Emantayev <eugenia@mellanox.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Or Gerlitz <ogerlitz@mellanox.com>,
+	Matan Barak <matanb@mellanox.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net/mlx4_en: Prevent potential integer overflow
+ calculating Hz
+Message-ID: <aDVS6vGV7N4UnqWS@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: dwmac-rk: No need to check the return value of the
- phy_power_on()
-To: =?UTF-8?B?5p2O5ZOy?= <sensor1010@163.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- jonas@kwiboo.se, rmk+kernel@armlinux.org.uk, david.wu@rock-chips.com,
- wens@csie.org, jan.petrous@oss.nxp.com
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250526161621.3549-1-sensor1010@163.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20250526161621.3549-1-sensor1010@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Le 26/05/2025 à 18:16, 李哲 a écrit :
-> since the return value of the phy_power_on() function is always 0,
-> checking its return value is redundant.
+The "freq" variable is in terms of MHz and "max_val_cycles" is in terms
+of Hz.  The fact that "max_val_cycles" is a u64 suggests that support
+for high frequency is intended but the "freq_khz * 1000" would overflow
+the u32 type if we went above 4GHz.  Use unsigned long type for the
+mutliplication to prevent that.
 
-Can you elaborate why?
+Fixes: 31c128b66e5b ("net/mlx4_en: Choose time-stamping shift value according to HW frequency")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/mellanox/mlx4/en_clock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looking at  (1], I think that it is obvious that non-0 values can be 
-returned.
-
-
-CJ
-
-[1]: 
-https://elixir.bootlin.com/linux/v6.15/source/drivers/phy/phy-core.c#L305
-
-> 
-> Signed-off-by: 李哲 <sensor1010@163.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> index 700858ff6f7c..6e8b10fda24d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-> @@ -1839,11 +1839,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
->   		dev_err(dev, "NO interface defined!\n");
->   	}
->   
-> -	ret = phy_power_on(bsp_priv, true);
-> -	if (ret) {
-> -		gmac_clk_enable(bsp_priv, false);
-> -		return ret;
-> -	}
-> +	phy_power_on(bsp_priv, true);
->   
->   	pm_runtime_get_sync(dev);
->   
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+index cd754cd76bde..7abd6a7c9ebe 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+@@ -249,7 +249,7 @@ static const struct ptp_clock_info mlx4_en_ptp_clock_info = {
+ static u32 freq_to_shift(u16 freq)
+ {
+ 	u32 freq_khz = freq * 1000;
+-	u64 max_val_cycles = freq_khz * 1000 * MLX4_EN_WRAP_AROUND_SEC;
++	u64 max_val_cycles = freq_khz * 1000UL * MLX4_EN_WRAP_AROUND_SEC;
+ 	u64 max_val_cycles_rounded = 1ULL << fls64(max_val_cycles - 1);
+ 	/* calculate max possible multiplier in order to fit in 64bit */
+ 	u64 max_mul = div64_u64(ULLONG_MAX, max_val_cycles_rounded);
+-- 
+2.47.2
 
 
