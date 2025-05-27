@@ -1,103 +1,108 @@
-Return-Path: <netdev+bounces-193768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7B4AC5DC5
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:28:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3716AC5DED
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99BA04A4ABD
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:28:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672DD3BB676
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 23:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E463A218E99;
-	Tue, 27 May 2025 23:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A738218ADE;
+	Tue, 27 May 2025 23:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNSOgs0D"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=uni-paderborn.de header.i=@uni-paderborn.de header.b="EhO4lNuz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from collins.uni-paderborn.de (collins.uni-paderborn.de [131.234.189.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0E172634;
-	Tue, 27 May 2025 23:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D4F136347;
+	Tue, 27 May 2025 23:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=131.234.189.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748388497; cv=none; b=FlhN2xitXB+gfJaauUoW+dgBgLbrvEYPdfIhYKxWmzrUr48VdlezCkFh2u55ebmeu4Uar7GPW+fZyD+S9QL1lx3WZfokWOGC0fqs+7rc/uG/+R/LRfeChXponQDXgfsbqOvrnUokwHGdsc9n3l3E/TlqWi6VQ7S9WLl40ijSlZY=
+	t=1748390233; cv=none; b=PU/M6EMcvRM79YEiU+tHGh+mpywzpq4YgnFBmdUuElfQeCinnjQqO21fvIJ9qQaOcujcaGTdcRIQ9z+7+O2aEJWjP2vkHiNPK29Q8jSMICQkVLsZNpjMtK1lCYMUi4mY31cMFTX9nBforTd12e4rWhQO9UkTsy7C6GNbYdw7tbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748388497; c=relaxed/simple;
-	bh=/tKIbBRB4eqwFsfNPxWxDMJxIv2XgaVy/w9RvaSEf4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GK6yeLOJHxGVKAn/2s9tAVwVYtaQLSASfc6Pi2y/QE8wyfmBcc+hfyOLeu476CTjktFdyS84dRDGghFTPpr6gKmbOaYnfaWK6trWyS3LfPNiMVfpRhDhKOgI983gtcxQA9Ylo0aSxCemXmsgB0/kijVHbK0FxBuau+ezYOfCu+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNSOgs0D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A8BDC4CEE9;
-	Tue, 27 May 2025 23:28:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748388497;
-	bh=/tKIbBRB4eqwFsfNPxWxDMJxIv2XgaVy/w9RvaSEf4g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rNSOgs0DZT0Du8doPtxLVzrzsv02CWrDt6hanqP1BN8bcl5gRqbZQkx7Wqt+VZKC/
-	 tRKu4BEZ2lvp4BD7DO8o8BxZrAYpEyoOVKelNCIdWWxQNAr64tPU/0GQ8k2+FfFqGr
-	 MJqgO7k93yAOt6QuaLZJki2y1+zxoWTOxqL+bejw4X/4EQEWosncOe+2epaCp/8mLm
-	 k1HEnH/8QabOAXcwLwHiBagKkAuNf3QAifjSL54fy1D+N1Z/Di9ykLyyi2+SWEAuLX
-	 Wo/WeJUE1I2bk1X0JnQ9VIeh7UTylgxxyaGCJ8SY1Khe4hkdhvOn/EefD+1RTlW/TG
-	 iYUfiYuipdSaA==
-Date: Tue, 27 May 2025 16:28:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Jiri Pirko
- <jiri@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, Mark
- Bloch <mbloch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next V10 1/6] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-Message-ID: <20250527162815.7c73d945@kernel.org>
-In-Reply-To: <3dddb35c-d3cb-453d-8e60-70f241abd018@nvidia.com>
-References: <1747766287-950144-1-git-send-email-tariqt@nvidia.com>
-	<1747766287-950144-2-git-send-email-tariqt@nvidia.com>
-	<20250520155301.5217dd81@kernel.org>
-	<3dddb35c-d3cb-453d-8e60-70f241abd018@nvidia.com>
+	s=arc-20240116; t=1748390233; c=relaxed/simple;
+	bh=ZUdQt8YUVALIAqMoPfALlwyKIw3UpPZQqcPVLIa5wOA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mdl171EAdi+vPQGuWMY2PNjTm9XUL0SUStOvrPhR8jHuo0jNqzZxYIUeIzwR4lNdqbbOQI1r0E6NVCEDNhz0eln3mTdp3qrsGhbrjH3va0ZJPXcRhuz9Yt9Y9AGgucWjylcd0QyiaHB8/9SQVLr8HCuwTz5Tu8VRyj77xMZV1oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de; spf=pass smtp.mailfrom=mail.uni-paderborn.de; dkim=pass (1024-bit key) header.d=uni-paderborn.de header.i=@uni-paderborn.de header.b=EhO4lNuz; arc=none smtp.client-ip=131.234.189.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.uni-paderborn.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.uni-paderborn.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=uni-paderborn.de; s=20170601; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pqHwz0Yoroh0bzMAo75DrYnG8a29XVtEnbOq8H9QAYI=; b=EhO4lNuzmzi8wzGx9y2ATGF2lB
+	tXJeNOQzAFly1tpAD6moRr08YI5VsBURkfgFreTbzSXn8miTG5gk4tpk5Rt8HMKu01G+Fr1xz83em
+	sRJeGY3bjS5E4FKIM1iq7A4531gsfgbCbouGOx/Cnf3PZOxGPod0UVSzKO4l/8pzikfM=;
+Message-ID: <7a32cbad-ea81-49a1-970d-faa731a6041e@mail.uni-paderborn.de>
+Date: Wed, 28 May 2025 01:40:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Issue with delayed segments despite TCP_NODELAY
+To: Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org, netfilter@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>
+References: <1dbe0f24-1076-4e91-b2c2-765a0e28b017@mail.uni-paderborn.de>
+ <CADVnQykQ+NGdONiK6AwL9CN=nj-8C6rwS4dtf-6p1f+JFyVqug@mail.gmail.com>
+Content-Language: de-DE, en-GB-large
+From: Dennis Baurichter <dennisba@mail.uni-paderborn.de>
+In-Reply-To: <CADVnQykQ+NGdONiK6AwL9CN=nj-8C6rwS4dtf-6p1f+JFyVqug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-IMT-Source: Extern
+X-IMT-rspamd-score: -19
+X-UPB-Report: Action: no action, RCVD_TLS_ALL(0.00), FROM_HAS_DN(0.00), FROM_EQ_ENVFROM(0.00), BAYES_HAM(-1.85), TO_MATCH_ENVRCPT_ALL(0.00), MIME_GOOD(-0.10), NEURAL_HAM(0.00), MID_RHS_MATCH_FROM(0.00), RCVD_VIA_SMTP_AUTH(0.00), ARC_NA(0.00), ASN(0.00), RCVD_COUNT_ONE(0.00), MIME_TRACE(0.00), TO_DN_SOME(0.00), RCPT_COUNT_THREE(0.00), Message-ID: 7a32cbad-ea81-49a1-970d-faa731a6041e@mail.uni-paderborn.de
+X-IMT-Spam-Score: 0.0 ()
+X-IMT-Authenticated-Sender: uid=dennisba,ou=People,o=upb,c=de
 
-On Sun, 25 May 2025 17:57:28 +0300 Carolina Jubran wrote:
-> >> +      -
-> >> +        name: rate-tc-bw
-> >> +        type: u32
-> >> +        doc: |
-> >> +             Specifies the bandwidth allocation for the Traffic Class=
- as a
-> >> +             percentage.
-> >> +        checks:
-> >> +          min: 0
-> >> +          max: 100 =20
-> >=20
-> > Why in percentage? I don't think any existing param in devlink rate
-> > or net shapers is in percentage right? Not according to what i can
-> > grok about the uAPI.
-> >  =20
->=20
-> I thought percentage might fit better here because it lets users clearly=
-=20
-> set the bandwidth share for each traffic class. While this isn=E2=80=99t =
-the=20
-> same as tx_weight in devlink-rate, the idea is related since both use=20
-> relative values. If there isn=E2=80=99t a strong reason against it, I=E2=
-=80=99d like to=20
-> keep using percentages here.
+Hi neal,
 
-The existing APIs use absolute values for b/w limits.
-If you want to diverge please provide clear and realistic use cases.=20
+Am 26.05.25 um 15:50 schrieb Neal Cardwell:
+>> We would very much appreciate it if someone could help us on the
+>> following questions:
+>> - Why are the remaining segments not send out immediately, despite
+>> TCP_NODELAY?
+>> - Is there a way to change this?
+>> - If not, do you have better workarounds than injecting a fake ACK
+>> pretending to come "from the server" via a raw socket?
+>>     Actually, we haven't tried this yet, but probably will soon.
+> 
+> Sounds like you are probably seeing the effects of TCP Small Queues
+> (TSQ) limiting the number of skbs queued in various layers of the
+> sending machine. See tcp_small_queue_check() for details.
+
+thank you so much! I compiled v6.15 with a tcp_small_queue_check() that 
+I patched to always return false and things just worked (again)! Now I 
+wrote a small module using kretprobe and regs_set_return_value() to 
+allow us to apply this change a bit more selectively (and without 
+recompiling the entire kernel). That's probably not optimal for anything 
+that should be widely deployed, but since we are currently just 
+experimenting and don't even know what might be actually used later on, 
+it seems good enough for now.
+
+> Probably with shorter RTTs the incoming ACKs clear skbs from the rtx
+> queue, and thus the tcp_small_queue_check() call to
+> tcp_rtx_queue_empty_or_single_skb(sk) returns true and
+> tcp_small_queue_check() returns false, enabling transmissions.
+
+Honestly, I still don't quite understand why this works the way it does. 
+We intercept all outgoing (initial) payload segments before we NF_ACCEPT 
+any of them (i.e., collect all first, then release), so after the 
+handshake itself there shouldn't be any skb clearing triggered by new 
+ACKs from our server... Oh well. In any case, it does work, and I'm 
+happy with that.
+
+Thanks again,
+Dennis
 
