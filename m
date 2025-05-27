@@ -1,103 +1,125 @@
-Return-Path: <netdev+bounces-193572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E57C5AC4906
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:09:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FEACAC490C
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 09:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C60A3B8A11
-	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22EB3B9C0B
+	for <lists+netdev@lfdr.de>; Tue, 27 May 2025 07:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00C01F473C;
-	Tue, 27 May 2025 07:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59431FBE8C;
+	Tue, 27 May 2025 07:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vZtNggNM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrgbPE5q"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBED72614;
-	Tue, 27 May 2025 07:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778DB1F582A;
+	Tue, 27 May 2025 07:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748329759; cv=none; b=jip/EsnpDHdGCiD6tiWZe3siw16LJhUMpZcPMd4p9L/a+1WgdVpcM3Q4dLkLMCaNxuUhYDho8uMHypep+4HvWQjNSWyhL0KldvE+t5zFYD3Ksvbq0ahfmBL2uWakvnqXY1kzw3NZVVY/yQawulF358tW8DyGfKacTUFGeIx3Lyo=
+	t=1748329802; cv=none; b=I7ZraOQPgK/6ZrkTYCDFZQh+j16WLFHrIjDcSlWT0jagLx1EZQ223qDviulneK/1rcChj3UbU4YC3RYx3FHkfnfFVFmztF2F07LyEogJFAElW9MwqSoh7als3gPD0drlzShhg6gcSZiKkaY9BbpfEbp6x9uvRy32PnFiXAnbcn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748329759; c=relaxed/simple;
-	bh=mwUc9fpakFITf3u5u5B+KtIIJZ8HBMz/j48CCZchD1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fPpA3jtcA0SJ3osy6nTqGCupYRlPUsjwoMlylwtlpmhpWeFgqOfKS3Ja6swDTZhbUyd+uw+3UcQmmmdnvaM8Hx6q/T0Pp0lj8krom+zHc4qQWwiLccDZPJPvdtuYHBsKu87LyFMOKh9XNbxxNIlRrEsFbBGJVaelrhEfKMf3jyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vZtNggNM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=TM1ZXgxDnV1AOy6fTMiX6DNJTsvGab4tXjhYp/X1Q60=; b=vZtNggNM5ysO3ta5geJEq9GbkG
-	nUv8Y619M35gIcy/eoOftwMaKcbe/fXPe6mPy/LggdXEV46mrqRiGEGN3fHO0hdf7GNdhGAI7P7mv
-	eOpzwG8lEsgkEyLFehAQCrJ67L/jhiCJ56CiILCGG0VYv1H/uOAqPw9v5jBMfxt1cNasxsnaXqLev
-	MDL8q+jMYR8mOwsrID1rvveW8gQgjVdU1+vdiZJ37fMCfJoCcBhs1AqB2oNx+rZL8PyFLHc2PaRDw
-	KtH5eWNsQ8ga2fxU5liydXvM/pF8rD38xJnbYCN1u+LdgCikEcGZMZ8z22bBoOKt2Jt/mTeHg/5jA
-	+P0qZMyw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45038)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uJoQv-0007LH-2O;
-	Tue, 27 May 2025 08:09:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uJoQr-0001EZ-0x;
-	Tue, 27 May 2025 08:09:05 +0100
-Date: Tue, 27 May 2025 08:09:05 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: James Hilliard <james.hilliard1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sunxi@lists.linux.dev,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Maxime Ripard <mripard@kernel.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 3/3] dt-bindings: net: sun8i-emac: Add AC300 EMAC1
- nvmem phy selection
-Message-ID: <aDVlEWZlprYpN3FE@shell.armlinux.org.uk>
-References: <20250526182939.2593553-1-james.hilliard1@gmail.com>
- <20250526182939.2593553-3-james.hilliard1@gmail.com>
+	s=arc-20240116; t=1748329802; c=relaxed/simple;
+	bh=xzocwWaxsjqNHkYeqf5FJ8YRMOeK+a1p789rrCvbcaI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=a5b7USDQk5JlzMOoAKyo2MlPbOaD4RqQzJ5PzHtS7KOYu0L0yUaBrZg+AaA+vorsECI0OLepHkR/N7ougQOqm2+JMen3B3NrnI3ym4kmKr9TT78+SWUE+07ychReITS2gfKrWfpAyOBjx555DPzxxVrG90S7WruaSjqVREd3FAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrgbPE5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2C58C4CEEA;
+	Tue, 27 May 2025 07:10:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748329801;
+	bh=xzocwWaxsjqNHkYeqf5FJ8YRMOeK+a1p789rrCvbcaI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UrgbPE5q4jkBMJPBz0vBsgfEVAEjT8rQtASyZM66x7/l2vsgjoMEDe4YFAyOw2/Fp
+	 MYFicSzJNkJQPk13KM7yMcj34YPqaP9hbPhluW66y0Q7O17srHfP2Tun7T5CVpbYve
+	 C7RK0i5ryfbfDxL4v2+e/lvDC3x1SVtXtlAbOQit4jH/c5Hj8R+cE0cUWFR28YwGUN
+	 IidlV185WTMCyWB2ReejMkcYX05KWvxhPJvpL2VH73QkrMNvRFtsM2aADgK2g9Y01J
+	 N+hsNnfYc4LXpAhl/NnN01iegKwJzty3MQVJGETldQvNIRcTj350ps34FPuwKVTiS/
+	 3WU2iphe/13Iw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D18380AAE2;
+	Tue, 27 May 2025 07:10:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250526182939.2593553-3-james.hilliard1@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] net: Convert dev_set_mac_address() to struct
+ sockaddr_storage
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174832983626.1188942.1099978775563244121.git-patchwork-notify@kernel.org>
+Date: Tue, 27 May 2025 07:10:36 +0000
+References: <20250521204310.it.500-kees@kernel.org>
+In-Reply-To: <20250521204310.it.500-kees@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: kuniyu@amazon.com, willemdebruijn.kernel@gmail.com,
+ martin.petersen@oracle.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ michael.christie@oracle.com, mgurtovoy@nvidia.com, mlombard@redhat.com,
+ d.bogdanov@yadro.com, mingzhe.zou@easystack.cn, christophe.leroy@csgroup.eu,
+ horms@kernel.org, linux@treblig.org, gustavoars@kernel.org,
+ andrew+netdev@lunn.ch, sdf@fomichev.me, cratiu@nvidia.com,
+ leiyang@redhat.com, idosch@nvidia.com, sam@mendozajonas.com,
+ fercerpav@gmail.com, alex.aring@gmail.com, stefan@datenfreihafen.org,
+ miquel.raynal@bootlin.com, hayeswang@realtek.com, dianders@chromium.org,
+ grundler@chromium.org, jv@jvosburgh.net, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ jiri@resnulli.us, jasowang@redhat.com, vladimir.oltean@nxp.com,
+ florian.fainelli@broadcom.com, kory.maincent@bootlin.com, glipus@gmail.com,
+ olek2@wp.pl, phahn-oss@avm.de, ebiggers@google.com, ardb@kernel.org,
+ viro@zeniv.linux.org.uk, ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ shaw.leon@gmail.com, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+ target-devel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wpan@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-hardening@vger.kernel.org
 
-On Mon, May 26, 2025 at 12:29:36PM -0600, James Hilliard wrote:
-> The Allwinner H616 EMAC1 can be connected to an on-die AC200 or AC300
-> PHY depending upon the silicon variant.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 21 May 2025 13:46:08 -0700 you wrote:
+> v2:
+>   - add conversion of dev_set_mac_address_user() (kuniyu)
+>   - fix missed sockaddr/sockaddr_storage conversion (kuba)
+>  v1: https://lore.kernel.org/all/20250520222452.work.063-kees@kernel.org/
 > 
-> Add a new allwinner,sun50i-h616-emac1 compatible and example, support
-> for the allwinner,sun50i-h616-emac1 will be added later on.
+> Hi,
 > 
-> Add nvmem-cells and nvmem-cell-names properties for the ac300 efuse
-> based phy selection.
+> [...]
 
-You also need to mention the non-standard usage of phys and phy-names,
-which is the whole reason I suggested you need to patch the binding.
+Here is the summary with links:
+  - [net-next,v2,1/8] net: core: Convert inet_addr_is_any() to sockaddr_storage
+    (no matching commit)
+  - [net-next,v2,2/8] net: core: Switch netif_set_mac_address() to struct sockaddr_storage
+    https://git.kernel.org/netdev/net-next/c/161972650d67
+  - [net-next,v2,3/8] net/ncsi: Use struct sockaddr_storage for pending_mac
+    https://git.kernel.org/netdev/net-next/c/db586cad6f45
+  - [net-next,v2,4/8] ieee802154: Use struct sockaddr_storage with dev_set_mac_address()
+    https://git.kernel.org/netdev/net-next/c/7da6117ea144
+  - [net-next,v2,5/8] net: usb: r8152: Convert to use struct sockaddr_storage internally
+    https://git.kernel.org/netdev/net-next/c/79deac8d538d
+  - [net-next,v2,6/8] net: core: Convert dev_set_mac_address() to struct sockaddr_storage
+    (no matching commit)
+  - [net-next,v2,7/8] rtnetlink: do_setlink: Use struct sockaddr_storage
+    https://git.kernel.org/netdev/net-next/c/6b12e0a3c3c9
+  - [net-next,v2,8/8] net: core: Convert dev_set_mac_address_user() to use struct sockaddr_storage
+    (no matching commit)
 
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
