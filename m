@@ -1,143 +1,154 @@
-Return-Path: <netdev+bounces-193862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAEFAC6132
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:25:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C02AC613E
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C3A4A1338
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:25:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005F73BF593
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E009E1FDA9E;
-	Wed, 28 May 2025 05:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PzUgQz4U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E4E20A5F2;
+	Wed, 28 May 2025 05:27:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7E41FBCB2;
-	Wed, 28 May 2025 05:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CBC1FFC41;
+	Wed, 28 May 2025 05:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748409898; cv=none; b=Cr7sbIwNQuq7oyPMPa/bv/9OkN9zI3MBFZWUSUbm8gDi+TvcR/qO4w8QcHrh6S/4z7rB8pwVPh5lAv6MxmZtiSZh2tpywI5nMR+M2VuojtCoakCEWGrqficIRVajz4qOwqnWOsMibkaLmSjXgS5u0AT0/cmfSEV1I9G7P/Hor1Q=
+	t=1748410023; cv=none; b=BIxhm9QOFbBimhTGodS2MHDFekpf0EZniSY3ulo0+bszljYYI/fN92bLvt0yegxiFYYnT/CklJUV8z3qiXrwb2MUcX0GuqL/YxEf5QAAbwhuT11psCp+i4PK9U/HvtXVT2iU8YRkm8xKTOap09f0TOJ63s5N5XPLKGv3nuPccbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748409898; c=relaxed/simple;
-	bh=17rSp5U/xGeglZ8H7tF6/G2owk/7blSgg3sqoGfP+0U=;
+	s=arc-20240116; t=1748410023; c=relaxed/simple;
+	bh=vlDhKjejOD4pBwO+Mqai5sYH1ZPgWIOBUfvckYb9ao0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XlquwTCY5x6EnSwJF9Z9NJzzepLQZqgx+VUbaM+mc9016YhUyKQn1xD11Ww5Y8Lujp0Lhxjs5u+mSNI7JCuzwrp13esC43pN+i+VSfX+jlzoEAwGqOrqvefDgGiJz3sNo7VK1heYC7y2dPY2pVf6IZQW2Vk86r5n30YoGVAFGK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PzUgQz4U; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748409897; x=1779945897;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=17rSp5U/xGeglZ8H7tF6/G2owk/7blSgg3sqoGfP+0U=;
-  b=PzUgQz4UDGxfMrdLkkgOuYKNRqSJ6qEdO3IbvPgfhLQJCivJtnHGhset
-   AxScILfjThtgkX3c1/7bp/WGYQa4qUJtwfFu9Wtmco8auhNsAvz7JRYWE
-   FhP6KVf0MLJxh6iqKd12HmEmIP5P49HQgPW8oCnqHSUJktvAWdyWUMVrm
-   /yPwq2M4pCFHU36CZm+V+wh2Wh8u0R6ifX5e0lHGShL9mLcBzIqZBjd4e
-   LhQAR4OBL04A5ulH7424RjNgwzBB5n01WYp5oQ+2O/6YQsfWYk2M7BbKV
-   b9vMmPZ2boet4xVXqIlQQRdoTmHpAI895DzfkMPSFyE4IjEbCpBwcB2tg
-   A==;
-X-CSE-ConnectionGUID: V+9exAmDTUmSLGT8exmKRw==
-X-CSE-MsgGUID: smPf+JPhT9+E6vtb/OubsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="50576507"
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="50576507"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 22:24:56 -0700
-X-CSE-ConnectionGUID: 43PRHqaxS/iGGHO6XHx9aA==
-X-CSE-MsgGUID: 9VBCuzvETsG4GSy2PbL5cg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="142947801"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 22:24:50 -0700
-Date: Wed, 28 May 2025 07:24:11 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: weishangjuan@eswincomputing.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	vladimir.oltean@nxp.com, rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	jan.petrous@oss.nxp.com, jszhang@kernel.org, p.zabel@pengutronix.de,
-	0x1207@gmail.com, boon.khai.ng@altera.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, lizhi2@eswincomputing.com
-Subject: Re: [PATCH v2 0/2] Add driver support for Eswin eic7700 SoC ethernet
- controller
-Message-ID: <aDad+8YHEFdOIs38@mev-dev.igk.intel.com>
-References: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nyNrAGQtFwWO8jWuCvlL0pfkWTb4e1lm0XruCVqVdtehfPiVENSywWaB6UUObwcIBGh93C2LiIeIAL1NfddGcIylQSwyGvTos9fVG/RjYQ/587/vpEPzI2f2drSui2esSilaIKC1RneES4OWDZmJTDZMjvFnxTvTEUq41Y+mlm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-e8-68369e9f1f62
+Date: Wed, 28 May 2025 14:26:50 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [PATCH v2 02/16] netmem: introduce netmem alloc APIs to wrap
+ page alloc APIs
+Message-ID: <20250528052650.GA9346@system.software.com>
+References: <20250528022911.73453-1-byungchul@sk.com>
+ <20250528022911.73453-3-byungchul@sk.com>
+ <CAHS8izOkr96_i1B8o_AWQGgfWSWZVVjHhOShReLZozsxZB6WdQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izOkr96_i1B8o_AWQGgfWSWZVVjHhOShReLZozsxZB6WdQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA03SWUxTQRSA4czdemmoXirqCIlLxaAk1AXR82AU3sb44h4jMdjIja0skqJY
+	XEJliUoE90RKhSICZYklFUrdUJAA7ohoCgg1ICQqimwNUKNS0MjblzmZ88/D8LS8gPXjNXFH
+	RG2cKkbBSRnpN+/84LzcdepVjmwlGC3lHJSN6aD4o50FY6kNwch4hwSG6xs5KMh30WB8ncbA
+	qGWCht6Gbgk4i/oYeHCmmobuC00cZKa5aUixmylotmWxcHWikIZq/UcJvL1n5KCr/DcLfXWZ
+	DDw1lDDgzAqDBtM8cD3vR1BvqabAdf4GB1daTBz0pDkRtDzpZiDndBYCS42DBfeYkQtbQipL
+	2ihy19ApISbrUXLHHEQyHC00sZae44h16LKEfHj/gCNN190MuWsfpkhm6neODPa2M2Sg5h1H
+	LJXvGPLCVC8hw9aFW4W90g1RYowmUdSu3Lhfqu5sv0bFt83WpZtrkR6leWcgLx4La3Ht2VLq
+	nxszh6fMCMtwW2sP7TEnBGKHY3zKvsIKfKvmEusxLThZ/Mp4yOM5QgRO/1rGeCwT1mPnuYco
+	A0l5uWBG2KFvpaYHPvhp9idm+nIg/pnbMrmUn7Q/Lv7FTx8vwqlVOVMtL2Eb1t+3T3musBQ/
+	tjVSnp1YsPP4c03X30cvwLVmB3MR+RhmJAwzEob/CcOMhAkxpUiuiUuMVWli1irVSXEanfLA
+	4Vgrmvw6Rad+RtjRUPOOOiTwSOEtIxWhajmrSkxIiq1DmKcVvrKUTevUclmUKum4qD0cqT0a
+	IybUIX+eUcyXrXEdi5ILB1VHxGhRjBe1/6YU7+WnR8EhO1N06cv3JV8O2MLmKH4NuZexSlvk
+	saiOD9EO97aAxcntIW9Wjuw7EJ99LfVzf17XzV2PTuQuLNpq3WxX5qUOmuZa/QdstReedTnH
+	d0sUbyqCqrZA6LfWWS+2j42G64rDC1/PCbxk113NfX47rG1PydeOwuYA19vwlyeL/cZ7fnxR
+	MAlq1eogWpug+gPFO8XlNgMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA03SW0iTYRjAcd/vtM/h8nNZfmhQTUM0O5L2QCepoJcuwuhCqItc+dlmbspm
+	Q4Ng6exgadkBak5bWToPMDHTZSY1JdOiQi2nVqt5JtM8ohmVUyLvfrwP7/+5eVhSeo72Z5Xq
+	ZEGjlifIGDElPrAtfd2d/AjFxtnBFWCyljFQOp0CRV9sNJhKqhBMzHSJYLyhkYGCu1MkmN4a
+	KJi0/iSh94VLBM7CPgpqz1eT4LrykoEswywJaTYLAfV5TTS8q8qm4cbPByRU67+IoLXGxMDn
+	sj809NmzKGgyFlPgzI6EF+blMPVqCEGDtZqAqct5DFxvMTPQbXAiaKl3UZB7NhuBtc5Bw+y0
+	iYmU4criDgI/Nn4SYXPFKfzQEoozHS0krii5yOCKsWsi/PFDLYNf3pql8GPbOIGz0ocZPNrb
+	SeGRuvcMLhj4QWBr5XsKvzY3iKJ8Dou3xwoJSp2g2bAzRqz41HmTSOrwTsmwPEd6ZPDKRJ4s
+	z23hG7PGCbcpbg3f0dZNus1wwbzDMTNvXy6Ev1+XQ7tNck6af2OKd3spd4TP+FZKuS3htvLO
+	i09RJhKzUs6CeIe+jVgY+PBNt3uohc/B/K/8lrkoO+cAvug3u/C8kk9/lDu/y5M7yOuf2Oa9
+	jAvkn1U1ElfREuOiknFRyfi/ZFxUMiOqBPkq1TqVXJkQvl57UpGqVqasP56oqkBz11F45leO
+	DU207rMjjkUyLwkuD1dIablOm6qyI54lZb6StF0RCqkkVp56WtAkHtWcShC0dhTAUjI/yf5o
+	IUbKnZAnCycFIUnQ/JsSrKe/HgWO3q/c1L9770hQHO416XJUQ+XtbQX3QgaFmIJQdfj1Hb+P
+	1W0I7Apu9vMQHXrjZ8kL8i7sj3oUYv3jkg+Hh6l0fdPfu8ZWx9uj2yNSktcO+aXe3TMmRQEu
+	37C4QTM1uFm33f/C3qhJ56r0gZqvKLLVo37FmfPVse+aL63MizP0yCitQr4plNRo5X8B5kAK
+	NhkDAAA=
+X-CFilter-Loop: Reflected
 
-On Wed, May 28, 2025 at 12:14:42PM +0800, weishangjuan@eswincomputing.com wrote:
-> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+On Tue, May 27, 2025 at 08:11:58PM -0700, Mina Almasry wrote:
+> On Tue, May 27, 2025 at 7:29 PM Byungchul Park <byungchul@sk.com> wrote:
+> >
+> > To eliminate the use of struct page in page pool, the page pool code
+> > should use netmem descriptor and APIs instead.
+> >
+> > As part of the work, introduce netmem alloc APIs allowing the code to
+> > use them rather than the existing APIs for struct page.
+> >
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/net/netmem.h | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> >
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index a721f9e060a2..37d0e0e002c2 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -177,6 +177,19 @@ static inline netmem_ref page_to_netmem(struct page *page)
+> >         return (__force netmem_ref)page;
+> >  }
+> >
+> > +static inline netmem_ref alloc_netmems_node(int nid, gfp_t gfp_mask,
+> > +               unsigned int order)
+> > +{
+> > +       return page_to_netmem(alloc_pages_node(nid, gfp_mask, order));
+> > +}
+> > +
+> > +static inline unsigned long alloc_netmems_bulk_node(gfp_t gfp, int nid,
+> > +               unsigned long nr_netmems, netmem_ref *netmem_array)
+> > +{
+> > +       return alloc_pages_bulk_node(gfp, nid, nr_netmems,
+> > +                       (struct page **)netmem_array);
+> > +}
+> > +
+> >  /**
+> >   * virt_to_netmem - convert virtual memory pointer to a netmem reference
+> >   * @data: host memory pointer to convert
 > 
-> Updates:
-> 
->   dt-bindings: ethernet: eswin: Document for EIC7700 SoC
->   v1 -> v2:
->     1. Remove the code related to PHY LED configuration from the MAC driver.
->     2. Use phylib instead of the GPIO API in the driver to implement the PHY reset function.
->     3. Align with the latest stmmac API, use the API provided by stmmac helper to refactor the driver,
->        and replace or remove duplicate code.
->     4. Adjust the code format and driver interfaces, such as replacing kzalloc with devm_kzalloc, etc.
-> 
->   ethernet: eswin: Add eic7700 ethernet driver
->   v1 -> v2:
->     1. Significant errors have been corrected in the email reply for version v1.
->     2. Add snps,dwmac.
->     3. Chang the names of reset-names and phy-mode.
->     4. Add descriptions of eswin, hsp_sp_csr, eswin, syscrg.csr, eswin, dly_hsp.reg.
-> 
->   Regarding the question about delay parameters in the previous email reply, the explanation is as follows:
->     Dly_hsp_reg: Configure the delay compensation register between MAC/PHY;
->     Dly_param_ *: The value written to the dly_hsp_reg register at a rate of 1000/100/10, which varies due 
->                   to the routing of the board;
-> 
->   In addition, your bot found errors running 'make dt_binding_check' on our patch about yamllint warnings/errors,
->   it looks like the validation failure is because missing eswin entry in vendor-prefixes.yaml. 
->   When we run "make dt_binding_check", we get the same error. We have already added 'eswin' in the vendor-prefixes.yaml 
->   file before, and the code has mentioned the community, but you have not yet integrated it.
+> Code looks fine to me, but I'm not sure we want to export these
+> helpers in include/net where they're available to the entire kernel
+> and net stack. Can we put these helpers in net/core/page_pool.c or at
+> least net/core/netmem_priv.h?
 
-Usualy description is above the changelog. Please try to follow 72 line
-length rule.
+Thanks.  I will.
 
-net-next is closed, you should resend it when open (after June 9th) [1]
+> Also maybe the helpers aren't needed anyway. AFAICT there is only 1
+> call site in page_pool.c for each, so maybe we can implement this
+> inline.
 
-[1] https://lore.kernel.org/netdev/20250527191710.7d94a61c@kernel.org/T/#m0bc90575288f5f1bcf5e50ecff59fb904b79505c
+Sure.
 
-> 
-> Shangjuan Wei (2):
->   dt-bindings: ethernet: eswin: Document for EIC7700 SoC
->   ethernet: eswin: Add eic7700 ethernet driver
-> 
->  .../bindings/net/eswin,eic7700-eth.yaml       | 200 +++++++++
->  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
->  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
->  .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 410 ++++++++++++++++++
->  4 files changed, 622 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+	Byungchul
 > 
 > -- 
-> 2.17.1
+> Thanks,
+> Mina
 
