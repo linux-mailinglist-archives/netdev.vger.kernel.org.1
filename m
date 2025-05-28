@@ -1,91 +1,75 @@
-Return-Path: <netdev+bounces-194085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207B5AC7491
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2C4AC7495
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2029167F2E
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 23:47:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C73716CFD7
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 23:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF4A2206B5;
-	Wed, 28 May 2025 23:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B024D221DAD;
+	Wed, 28 May 2025 23:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E+2jftug"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o6hlCw7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F1E1FBCAD;
-	Wed, 28 May 2025 23:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A058A1FBCAD;
+	Wed, 28 May 2025 23:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748476025; cv=none; b=aYAqwOIdL+SoI5iQ4JStvq/2IgJTUJ25u1z1MKHJdOHpE26TqcIaPJF9NdgVukisciHS/tIRVCM2VjfPwtNA6pF2rzyy3hCJ+U3Me3M88p7pS2IIu1xIrLc1tg1ev4i9VbbT2xyiKDZrKurNUfj+bf/fel+oKEabHVjRTqDyHAg=
+	t=1748476040; cv=none; b=G1tNrvi9ocUSIaUqWUzqN6M8NB/53gxIhwzchu+dKfxqC596D8pLrFa7+I9ePRIKKEx/4LaeWaT1cwp2uQGVs9Wg0OOF4+g5GWZs6mqab4llznzUYSkA2J01DOGoR0WqDXyk5DlgyqtP3Jgb2biB879FmZj0LWQORyz3f3LeN40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748476025; c=relaxed/simple;
-	bh=HXvJVjfC3VHKIy7BoJyYz+B80KYy5YwcIHOBuvSf298=;
+	s=arc-20240116; t=1748476040; c=relaxed/simple;
+	bh=LFoWHYcE2Gk1LHYov5wjtLUX2xeOzIToMTaMzE7i65k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d+30ygTIkn1X9sG8Oh7WfcBjoDSeH2Z4vO5nE3c7GXCrvGTgwbHf04bN/UnUb7bImWhx+MfBFK+Df34BToHFBZgPpcsVlghEm5yTQNyLqv2k5nKXaESS4L/zu+umVoKNpDDGhT01+Cqrswo40XgwbD+3j9qWHPMRGVdVH8DzUl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E+2jftug; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-234b9dfb842so3702535ad.1;
-        Wed, 28 May 2025 16:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748476023; x=1749080823; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ahVgHGY0syVgqDW38oPCFVl25F/0o5MeCR1HJluHpBg=;
-        b=E+2jftugAmd/kOxFHpCsO8PUWyGgpjCsuul2ItZ2jFyB5kxlRH94PIcDWC7yF9rngj
-         g48WEtt6Hyl1cxSskRy6OZYPw2mSDhfInYwTgDd+4PeIsUVXgJvuhgw/gNrUCOpbtkg2
-         5c8kbXD7j/Qaq0JrdHuvQLCCho25RDGoU4LNnaRz2Q3f9gQ/UxE5nkVKohE45gH5nVLA
-         pzkwmy5Qip1D9vR8UZHNzwd7nH6FhttP8QLnL3lugHcTriARKD/mnavDZnwBzssfTW7N
-         zHuZjLa+us9WFOI6LmoDCOzTD5taBTWHxLRV31W1/GKf68a88FlDRLAB0e63Kk3v0X+p
-         UWqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748476023; x=1749080823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ahVgHGY0syVgqDW38oPCFVl25F/0o5MeCR1HJluHpBg=;
-        b=wMmJd7z+rvzNk51nGGYlQ8h9EGyum6NMe2K37mr8XgB/9O+6H/vV4Mc2p1YoSCucNq
-         PzwTX8RFjb0FHPPEVfVfcpvayC11pOesedZLggkHBgzGN+rEkXFBQqR04HJkv44ZF9an
-         VJqwgYB+t43FMH8s8W/l2/3ZLpfNC7cC+SG0NS+VPrcNkOdH7CaCaiFpsY1sGGffBWh7
-         iyQVLEUc7RxwQTkuNDAaAoBBbySjQHvg5odQbMMeBByqV/eNjol00pDAPZKTDn5JRkqz
-         V8PZfHWz5tejvuYmQT8N57C+eGL9620rqmPjUDvBme6QWynoBwKILJGGHVrKUkQ8s/MU
-         vUag==
-X-Forwarded-Encrypted: i=1; AJvYcCUzyLymslQaqrd27Z22caQHRjIoML2mfbU1+N93+2Q6A/JtJkVLfQYAIO2tca7IixDqOnnK/Q3ItVn+HUM=@vger.kernel.org, AJvYcCXYHFgvNg8nk0vErzpCA71VonN8X51hzLMvqhYCSLN9NRFadnEaSRwW5wHXkaoZMCQCUp06Iq1h@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzmkxd7OnenqNpPrQSByHG8f/ko6TZyziJTviTt0TiujbNTJyn9
-	M+0jGhc/31Y5wkbCEyPSt5GkyejvWbmiWg+2pgDSunBi2GD+K2rBb0q+
-X-Gm-Gg: ASbGncsuuvWhe88//4oM1f7Vq5AOYzwhqIVAXL0ARY8RGK55SOqxvVeYUQOxlJ60tQt
-	Q3M+erRhAn2c3jh/5C3RQscXbee8nmvQChE7h5E2UNva6xAajwhpaaeKPiiwnqPdlvyNqwg4DsC
-	kUseUTA/MGTZ0SFFfoJ/FVBYtjIruLyRyOqnow5Oe9N4PLYhibA9X4xgIPKfhHLdSn+TonORdCT
-	JfAW6ToqQsaUOj1QN2IqAJQAGDWBrpYTCg6vzKPPqf1YoM+IVw5nUY+havIwWsmzB98Oet7aix+
-	PCKkBNsAWgxYjTed8YrgVY3/6bRW4x4IfussDKszchtO5iQFwl59
-X-Google-Smtp-Source: AGHT+IGb0oVtLFxfTVNkGEYvNAOhNxmeHvVh3eQFioRnpv5ZABaotkNw72x+Sj5c/pKlIAPGw3vBTg==
-X-Received: by 2002:a17:902:f786:b0:234:a734:4ab1 with SMTP id d9443c01a7336-234a7344c4cmr105474015ad.3.1748476023327;
-        Wed, 28 May 2025 16:47:03 -0700 (PDT)
-Received: from gmail.com ([98.97.34.246])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bc8607sm1465935ad.42.2025.05.28.16.47.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 16:47:02 -0700 (PDT)
-Date: Wed, 28 May 2025 16:46:50 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZL6WqPKf4d8zisBVB6NfZoRihZ4bNo/yiq3jLiPe39o9OhTM5jREJcwpRYt6eDHShc5zVrpJbXz5N2U8tDlCqz3AlDjnLCCwvIdvdhEx2UbZLUiMUYDCkOHWZl4PdinkTdrKOOvBds6sL58TiX+/VLaHtZEAHwusbP0gktY1gQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o6hlCw7m; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9A6NOAoXkPb4medfypRE/loheYUcbcMxOqq+Oi8Kdr0=; b=o6hlCw7mvqwNkor+nhEqb5a8iW
+	WGypf7rK2YXmDxrWO2N/pFUYHNgiw9AFnEJnMusiQo7Y+NUbi612SxuzM4kgkjdlEXrw2JL0odRHk
+	ivMxyEAm0Ujad0H5cs0aX/A4wL6xceHx0gEfSi1J7N2tYdsvl3lmwpRLhqIwaLr38SAE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uKQUF-00EDZZ-M2; Thu, 29 May 2025 01:47:07 +0200
+Date: Thu, 29 May 2025 01:47:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: James Hilliard <james.hilliard1@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, wens@csie.org,
+	netdev@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Fix psock incorrectly pointing
- to sk
-Message-ID: <20250528234650.n5orke2yq55qnoen@gmail.com>
-References: <20250523162220.52291-1-jiayuan.chen@linux.dev>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
+Message-ID: <0c7a1602-61d3-4840-83f2-72a74ffd52b8@lunn.ch>
+References: <CAGb2v66PEA4OJxs2rHrYFAxx8bw4zab7TUXQr+DM-+ERBO-UyQ@mail.gmail.com>
+ <CADvTj4qyRRCSnvvYHLvTq73P0YOjqZ=Z7kyjPMm206ezMePTpQ@mail.gmail.com>
+ <aDdXRPD2NpiZMsfZ@shell.armlinux.org.uk>
+ <CADvTj4pKsAYsm6pm0sgZgQ+AxriXH5_DLmF30g8rFd0FewGG6w@mail.gmail.com>
+ <8306dac8-3a0e-4e79-938a-10e9ee38e325@lunn.ch>
+ <CADvTj4rWvEaFyOm2HdNonASE4y1qoPoNgP_9n_ZbLCqAo1gGYw@mail.gmail.com>
+ <1e6e4a44-9d2b-4af4-8635-150ccc410c22@lunn.ch>
+ <CADvTj4r1VvjiK4tj3tiHYVJtLDWtMSJ3GFQgYyteTnLGsQQ2Eg@mail.gmail.com>
+ <0bf48878-a3d0-455c-9110-5c67d29073c9@lunn.ch>
+ <CADvTj4qab272xTpZGRoPnCstufK_3e9CY99Og+2mey2co6u5dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,113 +78,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250523162220.52291-1-jiayuan.chen@linux.dev>
+In-Reply-To: <CADvTj4qab272xTpZGRoPnCstufK_3e9CY99Og+2mey2co6u5dg@mail.gmail.com>
 
-On 2025-05-24 00:22:19, Jiayuan Chen wrote:
-> We observed an issue from the latest selftest: sockmap_redir where
-> sk_psock(psock->sk) != psock in the backlog. The root cause is the special
-> behavior in sockmap_redir - it frequently performs map_update() and
-> map_delete() on the same socket. During map_update(), we create a new
-> psock and during map_delete(), we eventually free the psock via rcu_work
-> in sk_psock_drop(). However, pending workqueues might still exist and not
-> be processed yet. If users immediately perform another map_update(), a new
-> psock will be allocated for the same sk, resulting in two psocks pointing
-> to the same sk.
+> > Or, as Russell suggested, you give the bootloader both .dtb blobs, and
+> > it can pick the correct one to pass to the kernel. Or the bootloader
+> > can patch the .dtb blob to make it fit the hardware.
 > 
-> When the pending workqueue is later triggered, it uses the old psock to
-> access sk for I/O operations, which is incorrect.
-> 
-> Timing Diagram:
-> 
-> cpu0                        cpu1
-> 
-> map_update(sk):
->     sk->psock = psock1
->     psock1->sk = sk
-> map_delete(sk):
->    rcu_work_free(psock1)
-> 
-> map_update(sk):
->     sk->psock = psock2
->     psock2->sk = sk
->                             workqueue:
->                                 wakeup with psock1, but the sk of psock1
->                                 doesn't belong to psock1
-> rcu_handler:
->     clean psock1
->     free(psock1)
-> 
-> Previously, we used reference counting to address the concurrency issue
-> between backlog and sock_map_close(). This logic remains necessary as it
-> prevents the sk from being freed while processing the backlog. But this
-> patch prevents pending backlogs from using a psock after it has been
-> freed.
+> This is what I'm really trying to avoid since it requires special
+> handling in the bootloader and therefore will result in a lot of broken
+> systems since most people doing ports to H616 based boards will only
+> ever test against one PHY variant.
 
-Nit, its not that psock would be freed because we do have the
-cancel_delayed_work_sync() before the kfree(psock). But this
-is not a good state with two psocks referenceing the same sk.
+Which in some ways is good. They will then issue four letter words at
+Allwinner, and go find a better SoC vendor.
 
+> > > > Do you have examples of boards where the SoC variant changed during
+> > > > the boards production life?
+> > >
+> > > Yes, the boards I'm working for example, but this is likely an issue for
+> > > other boards as well(vendor BSP auto detects PHY variants):
+> > > https://www.zeusbtc.com/ASIC-Miner-Repair/Parts-Tools-Details.asp?ID=1139
+> >
+> > Mainline generally does not care what vendors do, because they often
+> > do horrible things. Which is O.K, it is open source, they can do what
+> > they want in their fork of the kernel.
 > 
-> Note: We cannot call cancel_delayed_work_sync() in map_delete() since this
-> might be invoked in BPF context by BPF helper, and the function may sleep.
+> That's not really true IMO, mainline implements all sorts of workarounds
+> for various vendor hardware quicks/weirdness.
 > 
-> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> > But for Mainline, we expect a high level of quality, and a uniform way
+> > of doing things.
 > 
-> ---
-> Thanks to Michal Luczaj for providing the sockmap_redir test case, which
-> indeed covers almost all sockmap forwarding paths.
-> ---
->  include/linux/skmsg.h | 1 +
->  net/core/skmsg.c      | 5 ++++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
+> Sure, and I'm trying to do that here rather than do some super hacky
+> unmaintainable bootloader based device tree selector.
 > 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index 0b9095a281b8..b17221eef2f4 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -67,6 +67,7 @@ struct sk_psock_progs {
->  enum sk_psock_state_bits {
->  	SK_PSOCK_TX_ENABLED,
->  	SK_PSOCK_RX_STRP_ENABLED,
-> +	SK_PSOCK_DROPPED,
->  };
->  
->  struct sk_psock_link {
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index 34c51eb1a14f..bd58a693ce9a 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -656,6 +656,9 @@ static void sk_psock_backlog(struct work_struct *work)
->  	bool ingress;
->  	int ret;
->  
-> +	if (sk_psock_test_state(psock, SK_PSOCK_DROPPED))
-> +		return;
-
-
-Could we use the SK_PSOCK_TX_ENABLED bit here? Its already used to
-ensure we wont requeue work after the psock has started being
-removed. Seems like we don't need two flags? wdyt?
-
-> +
->  	/* Increment the psock refcnt to synchronize with close(fd) path in
->  	 * sock_map_close(), ensuring we wait for backlog thread completion
->  	 * before sk_socket freed. If refcnt increment fails, it indicates
-> @@ -867,7 +870,7 @@ void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
->  	write_unlock_bh(&sk->sk_callback_lock);
->  
->  	sk_psock_stop(psock);
-
-Can we add this to sk_psock_stop where we have the TX_ENABLED bit
-cleared.
-
-> -
-> +	sk_psock_set_state(psock, SK_PSOCK_DROPPED);
->  	INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
->  	queue_rcu_work(system_wq, &psock->rwork);
->  }
-> -- 
-> 2.47.1
+> > This can also act as push back on SoC vendors, for doing silly things
+> > like changing the PHY within a SoC without changing its name/number.
 > 
+> It won't here, because Allwinner doesn't care about non-BSP kernels.
+
+It can be indirect pressure. There are some OEMs which care about
+Mainline. They will do their due diligence, find that user report
+Mainline if flaky on these devices, and go find a different
+vendor. There will be some OEM which get burnt by this mess, and when
+they come to their second generation device, they will switch vendor
+and tell the old vendor why. It could well be Allwinner can support
+their bottom line without caring about Mainline, so really don't
+care. But Mainline can help point OEMs away from them to those which
+are more Mainline friendly.
+
+We also need to think about this as a two way street. What does this
+SoC bring to Mainline? Why should Mainline care about it? It has some
+major design issues, do we want to say that is O.K? Do we want other
+vendors to think we are O.K. with bad designs? Worse still, this is
+stmmac, which lots of vendors already abuse in lots of different
+ways. Russell has put in a lot of effort recently to clean up some of
+that abuse, and we are pushing back hard on new abusers.
+
+If you can hide this mess away in the bootloader, it just looks like a
+regular device, we are likely to accept it. If you try to do something
+different to the normal for PHYs, we are very likely to reject it.
+
+	Andrew
 
