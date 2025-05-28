@@ -1,95 +1,82 @@
-Return-Path: <netdev+bounces-193787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A079AAC5E98
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:00:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F905AC5EA1
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376773A58DC
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:59:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56D9A7A5633
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B91154BE2;
-	Wed, 28 May 2025 00:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA30F80C02;
+	Wed, 28 May 2025 01:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzPaQ71N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tw/2meI3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBFB10FD;
-	Wed, 28 May 2025 00:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB373EA63;
+	Wed, 28 May 2025 01:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748393997; cv=none; b=eDOfqbn9Novy66B6qnqsiGzi6X4UKqFMJsiDLwzeBvdOz6XD8+P3hXaO4sgeeBg6KZI2YpaW3RV5Dm+uZMxM4LdRucL4vJ2tFokryfp5WKEchK8LxSvSs1bo3BaBvq6v0KkYQl7MmA/T3xnkYA69OGh2P4gzUOqIJdHd3Yfm3BU=
+	t=1748394555; cv=none; b=QZDshWBGGCHZEKdYX/ShfkLCfpOmxAidI2c1EWgCTrpRjO7gZg+wiUNtiUfg99wDv9sF6Hi2uBOkYevIwa6DOr0K6xYhaCM8gAK6KUq7HnBKfjVRp9XKLohwgl3AlGjm6w8RBh+dM/yt+jph8muhX0AeMicvAkEZmjuCXqqnIqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748393997; c=relaxed/simple;
-	bh=XlID4LzREOELOZp/bI7Bjb9nl5T3UEA/2HALcUJr4AE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Sz3Tpi2Nwv/Va9r21zf4l5llcszcHRlA8l6BGYycDQXy5EV2wP9b1UL9Nkt12ljMchohSz3Bx1o9KYByPlMlMgzpPvj9JXBz7406EYmkkTijZ0ZjcXVasE/l4/uqMvPYKHmKwHhyuaJnUDSRFmk2kT3dqXuqtp23bgMvRv0Z+gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzPaQ71N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1085C4CEE9;
-	Wed, 28 May 2025 00:59:56 +0000 (UTC)
+	s=arc-20240116; t=1748394555; c=relaxed/simple;
+	bh=35XjSUZ1CLasS93y/XIvP6USHJ5NBDcHU5gRAqN38EQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YBAc9ZTUK4Xtf0FTd+DgRa+2/apBU2V5f3tFCDCW3LVmc7CDP7PHj9ETf46ZG8gtsey2+8nroANQy5cmaNXBYoHwK3pqh7cCsngjpZAYXuWwvG7thZ5nPsFK7XkRX9BYBj7SRnM/zj5a79UvUkeJVePQ7Ow28GVSp5N6nIajFzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tw/2meI3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4109DC4CEE9;
+	Wed, 28 May 2025 01:09:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748393996;
-	bh=XlID4LzREOELOZp/bI7Bjb9nl5T3UEA/2HALcUJr4AE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VzPaQ71N7/fHj9hP2SGA2YZrFv9PNJ9QSEDshsebFpZnqny4BBBOW06q6ANNRurSl
-	 J2a2ZT0ibYRXryd7hGFZrgg3BFBfkvaoYr18STZ1KdsgNcTsXIKezT9bVALb25LQUS
-	 fuwZC2QqHXDHuZKno082yGlGk7hQiDwmzYRWYtvKiaNKx6Ti/nd1sV1sDF2xe8E+xu
-	 XZ6yhcCSmMO/x3gBbopmTYKs7yQnsrWHeHhZ+dSIO4Iga7itIVaxX77TyA9tlaYKFy
-	 jTrhtbqVOHOZYI2QdekfDqZCRwvBbMS9wQhJB0phwnwNeWJ6n/7dqwzduiWnOP3SI9
-	 BtQct/Eb3Ic9Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C52380AAE2;
-	Wed, 28 May 2025 01:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1748394555;
+	bh=35XjSUZ1CLasS93y/XIvP6USHJ5NBDcHU5gRAqN38EQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tw/2meI3n8e3VUJUR9stBe4zbkS18uBc0q61loxZEZoYGbGhPVOo9ziwx4tDt2Q1Q
+	 Yr2i9oxewjuqISg1uP03BYezc+BizdeRsD3UQZkV3bK6Wz9H67GAOmrwFIq889K0An
+	 eGLyyKY9WHTMPI1Z5IThRp9ig4bU66CJoi9MSz/JJLQ691E5VkDTCkcismq+zLElv8
+	 yfiAilSshr8AVfK0HeaLxj4TWGkHq9iuIRlCZBQbo4CadxiHEiVSUQSCJ6qo1z1zxP
+	 Ryos+UJQuwhRqxSLrjfqTB1EW0uKI0OOc5/NJ0vDM9lNYWwc7TntzECIn6srrXhPIq
+	 VBYTOzbxL3Cyg==
+Date: Tue, 27 May 2025 18:09:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: <jiang.kun2@zte.com.cn>
+Cc: <horms@kernel.org>, <kuniyu@amazon.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <fan.yu9@zte.com.cn>, <gnaaman@drivenets.com>,
+ <he.peilin@zte.com.cn>, <leitao@debian.org>,
+ <linux-kernel@vger.kernel.org>, <lizetao1@huawei.com>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>, <qiu.yutan@zte.com.cn>,
+ <tu.qiang35@zte.com.cn>, <wang.yaxin@zte.com.cn>, <xu.xin16@zte.com.cn>,
+ <yang.yang29@zte.com.cn>, <ye.xingchen@zte.com.cn>,
+ <zhang.yunkai@zte.com.cn>
+Subject: Re: [PATCH linux next v2] net: neigh: use kfree_skb_reason() in
+ neigh_resolve_output() and neigh_connected_output()
+Message-ID: <20250527180913.4b9f1027@kernel.org>
+In-Reply-To: <20250521101408902uq7XQTEF6fr3v5HKWT2GO@zte.com.cn>
+References: <20250521101408902uq7XQTEF6fr3v5HKWT2GO@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net 0/2] Refactor PHY reset handling and
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174839403100.1846337.7897415854786709434.git-patchwork-notify@kernel.org>
-Date: Wed, 28 May 2025 01:00:31 +0000
-References: <20250526053048.287095-1-thangaraj.s@microchip.com>
-In-Reply-To: <20250526053048.287095-1-thangaraj.s@microchip.com>
-To: Thangaraj Samynathan <thangaraj.s@microchip.com>
-Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 26 May 2025 11:00:46 +0530 you wrote:
-> This patch series refines the PHY reset and initialization logic in the
-> lan743x driver. It includes the following changes
+On Wed, 21 May 2025 10:14:08 +0800 (CST) jiang.kun2@zte.com.cn wrote:
+> From: Qiu Yutan <qiu.yutan@zte.com.cn>
 > 
-> Rename lan743x_reset_phy to lan743x_hw_reset_phy
-> Clarifies the functions purpose as performing a hardware-level PHY
-> reset, improving naming consistency and readability.
+> Replace kfree_skb() used in neigh_resolve_output() and
+> neigh_connected_output() with kfree_skb_reason().
 > 
-> [...]
+> Following new skb drop reason is added:
+> /* failed to fill the device hard header */
+> SKB_DROP_REASON_NEIGH_HH_FILLFAIL
 
-Here is the summary with links:
-  - [v2,net,1/2] net: lan743x: rename lan743x_reset_phy to lan743x_hw_reset_phy
-    https://git.kernel.org/netdev/net/c/68927eb52d0a
-  - [v2,net,2/2] net: lan743x: Fix PHY reset handling during initialization and WOL
-    https://git.kernel.org/netdev/net/c/82d1096ca8b5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Looks like this got applied already but can you explain for which
+protocol you see these drops? I checked random few and none of them
+can fail in ->create().
 
