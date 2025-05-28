@@ -1,117 +1,171 @@
-Return-Path: <netdev+bounces-193973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1A3AC6AFE
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:50:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C80AC6ADC
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D41264E5480
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 13:50:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 145773AFBA6
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 13:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3792882D1;
-	Wed, 28 May 2025 13:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8281E2882A6;
+	Wed, 28 May 2025 13:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="IXiTzO5i"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O8iQQ/V8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8DC2853EB;
-	Wed, 28 May 2025 13:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E623D561;
+	Wed, 28 May 2025 13:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748440232; cv=none; b=SAe6lk9rAF/G9jjQ/aZXKtTl93B3gv1eeABUUvKOKIgzMfyEEiHVkIkcl7lLQzyiv0zdmaemT2W/h9daXcVEYe9DpA5X613Vhebt2XhGbkIs41VkAKl+ixg1NqvDBYYFodGie61f2RZeGaUqpng3A24l2IQZ9KBU7wRv6f/0qac=
+	t=1748439881; cv=none; b=WHgA/ER/+0jHzVbI8IeeCKnV3PmFqYdeTxmKZj2b7TuatlApPHR5S1052xS01ieqrcRLEJQuTfEQkTbnTSZ39K4tDCxC3DeIu0smtu1DxBPNRbiQPNCgrub3JZUS0Y5LL2iX5pLTi9kNE4fdjCo7mT0Z4HQOAOE8Qvne/Ow7uiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748440232; c=relaxed/simple;
-	bh=LhTAubIh/5Hl+CIcaPgophp5ZeXXrXTUiUkisse0S+8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZOXrLcwSWE4PgZ/UXCjtbnQunoJHT9SD99zltYbiK6sRhge/BYwdPffeH3+hFnVhGIOFMnFBpq/W44nAC9G/Rm6f1y58IHSb378lbtkyyEH3n9SH9i9liVJ6LOPxaxgYSYVM8metTQxPMR7zgTbs/ltOmiqAhQbWX2Va4lf2/zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=IXiTzO5i; arc=none smtp.client-ip=148.6.0.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp1.kfki.hu (Postfix) with ESMTP id CC9A15C001C8;
-	Wed, 28 May 2025 15:41:51 +0200 (CEST)
-Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
- reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1748439709; x=1750254110; bh=/fG8h8umIg
-	Qf40nj8YywHmoTEtPnasUPoFQqus8jBP8=; b=IXiTzO5iaeYL9q7PkhRaFysSgs
-	hS9M2kyI5eChYASXA82JeUJszt0TltYhlv/o8/gkWGIHtECXjJCUT3gNSmEtXDoj
-	F/VUwbusekwlwpktWUYQjBTcayTroVlZtpvq/kBx7y6n65554Lcso4yM9MK2p4cR
-	0gXh4zL5hhWepBsc8=
-X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
-Received: from smtp1.kfki.hu ([127.0.0.1])
- by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id eU4Vi8ytn2d6; Wed, 28 May 2025 15:41:49 +0200 (CEST)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp1.kfki.hu (Postfix) with ESMTP id 6E60A5C001C0;
-	Wed, 28 May 2025 15:41:49 +0200 (CEST)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id F1D4234316A; Wed, 28 May 2025 15:41:48 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id EFBAD343169;
-	Wed, 28 May 2025 15:41:48 +0200 (CEST)
-Date: Wed, 28 May 2025 15:41:48 +0200 (CEST)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: ying chen <yc1082463@gmail.com>
-cc: Florian Westphal <fw@strlen.de>, pablo@netfilter.org, kadlec@netfilter.org, 
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [bug report, linux 6.15-rc4] A large number of connections in
- the SYN_SENT state caused the nf_conntrack table to be full.
-In-Reply-To: <CAN2Y7hzKd+VxWy56q9ad8xwCcHPy5qoEaswZapnF87YkyYMcsA@mail.gmail.com>
-Message-ID: <a752bbbf-08c0-3885-65ba-79577a1ad5a8@blackhole.kfki.hu>
-References: <CAN2Y7hxscai7JuC0fPE8DZ3QOPzO_KsE_AMCuyeTYRQQW_mA2w@mail.gmail.com> <aDcLIh2lPkAWOVCI@strlen.de> <CAN2Y7hzKd+VxWy56q9ad8xwCcHPy5qoEaswZapnF87YkyYMcsA@mail.gmail.com>
+	s=arc-20240116; t=1748439881; c=relaxed/simple;
+	bh=E15IkgiQNik1xTR6jnoo1aTBBTDqNYSMkDv5a0E6euk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kwQFB83XEbvUEZPY4sRrjF99KrArG6PV0LNkAfO579VkxggBmytLag8GX17zL50as65LmNZ1JfHCJ1qrwsOyI1Oi5R6Q5niyXicmZrXmuO4jxJ5LU47nESU3VsAVMKsmOzmQ9RBUf70/7OEEdY9jubaAFj8ZqwO5AUe92RSIaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O8iQQ/V8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MBbrn7eQDWJVCAKImqv3Knw41beS2cHZDNUxETDEwfM=; b=O8iQQ/V8bHl6lOCEVTlkgRjo44
+	gcgAFR2K9InA3NJSn5okPeS35of+VlF+V2w7viINNPtJbrMNDgEsU6GQ4isK4scegHzenw8YdCiSd
+	nVUaAEytpdXsvMKdXFQTmALESkOqOSgRjHyrC+sjcGoTmnR9KapDaflyr9RjgT+u0MrU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uKH55-00EBEE-SV; Wed, 28 May 2025 15:44:31 +0200
+Date: Wed, 28 May 2025 15:44:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: weishangjuan@eswincomputing.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	vladimir.oltean@nxp.com, rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
+	jan.petrous@oss.nxp.com, jszhang@kernel.org, p.zabel@pengutronix.de,
+	0x1207@gmail.com, boon.khai.ng@altera.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, lizhi2@eswincomputing.com
+Subject: Re: [PATCH v2 2/2] =?iso-8859-1?Q?ethernet?=
+ =?iso-8859-1?B?OqBlc3dpbjqgQWRkoGVpYzc3MDCgZXRoZXJuZXSgZHJpdmVy?=
+Message-ID: <2c2dc4cb-57aa-476a-8668-c0b358f0ee0c@lunn.ch>
+References: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+ <20250528041634.912-1-weishangjuan@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-2043345281-1748439708=:6759"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250528041634.912-1-weishangjuan@eswincomputing.com>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+> +/* PHY default addr in mdio*/
+> +#define PHY_ADDR				-1
 
---110363376-2043345281-1748439708=:6759
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+PHY addresses are 0 to 31. How can -1 be a default?
 
-On Wed, 28 May 2025, ying chen wrote:
+> +static struct clk *dwc_eth_find_clk(struct plat_stmmacenet_data *plat_dat,
+> +				    const char *name)
+> +{
+> +	for (int i = 0; i < plat_dat->num_clks; i++)
+> +		if (strcmp(plat_dat->clks[i].id, name) == 0)
+> +			return plat_dat->clks[i].clk;
+> +
+> +	return NULL;
+> +}
 
-> On Wed, May 28, 2025 at 9:10=E2=80=AFPM Florian Westphal <fw@strlen.de>=
- wrote:
->>
->> ying chen <yc1082463@gmail.com> wrote:
->>> Hello all,
->>>
->>> I encountered an "nf_conntrack: table full" warning on Linux 6.15-rc4=
-.
->>> Running cat /proc/net/nf_conntrack showed a large number of
->>> connections in the SYN_SENT state.
->>> As is well known, if we attempt to connect to a non-existent port, th=
-e
->>> system will respond with an RST and then delete the conntrack entry.
->>> However, when we frequently connect to non-existent ports, the
->>> conntrack entries are not deleted, eventually causing the nf_conntrac=
-k
->>> table to fill up.
->>
->> Yes, what do you expect to happen?
-> I understand that the conntrack entry should be deleted immediately=20
-> after receiving the RST reply.
+Please look at the cleanup work Russell King has been doing the last
+couple of months. Is this still needed?
 
-No, the conntrack entry will be in the CLOSE state with the timeout value=
-=20
-of /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_close
+> +static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
+> +				   struct plat_stmmacenet_data *plat_dat)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	u32 burst_map = 0;
+> +	u32 bit_index = 0;
+> +	u32 a_index = 0;
+> +
+> +	if (!plat_dat->axi) {
+> +		plat_dat->axi = devm_kzalloc(&pdev->dev, sizeof(struct stmmac_axi), GFP_KERNEL);
+> +
+> +		if (!plat_dat->axi)
+> +			return -ENOMEM;
+> +	}
+> +
+> +	plat_dat->axi->axi_lpi_en = device_property_read_bool(dev,
+> +							      "snps,en-lpi");
+> +	if (device_property_read_u32(dev, "snps,write-requests",
+> +				     &plat_dat->axi->axi_wr_osr_lmt)) {
+> +		/**
+> +		 * Since the register has a reset value of 1, if property
+> +		 * is missing, default to 1.
+> +		 */
 
-Best regards,
-Jozsef
---110363376-2043345281-1748439708=:6759--
+Is that described in the binding? Please fully describe all the DT
+properties, including what happens when they are not present.
+
+> +	ret = of_property_read_u32_index(pdev->dev.of_node, "eswin,phyaddr", 0,
+> +					 &dwc_priv->phyaddr);
+> +	if (ret)
+> +		dev_warn(&pdev->dev, "can't get phyaddr (%d)\n", ret);
+
+Are we talking about the Ethernet PHY here or a generic PHY? You
+should not need any vendor properties for an Ethernet phy, phy-handle
+points to the PHY on an MDIO bus.
+
+> +	ret = of_property_read_variable_u32_array(pdev->dev.of_node, "dly-param-1000m",
+> +						  &dwc_priv->dly_param_1000m[0], 3, 0);
+> +	if (ret != 3) {
+> +		dev_err(&pdev->dev, "can't get delay param for 1Gbps mode (%d)\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_variable_u32_array(pdev->dev.of_node, "dly-param-100m",
+> +						  &dwc_priv->dly_param_100m[0], 3, 0);
+> +	if (ret != 3) {
+> +		dev_err(&pdev->dev, "can't get delay param for 100Mbps mode (%d)\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	ret = of_property_read_variable_u32_array(pdev->dev.of_node, "dly-param-10m",
+> +						  &dwc_priv->dly_param_10m[0], 3, 0);
+> +	if (ret != 3) {
+> +		dev_err(&pdev->dev, "can't get delay param for 10Mbps mode (%d)\n", ret);
+> +		return ret;
+> +	}
+
+        rx-internal-delay-ps:
+          description:
+            RGMII Receive Clock Delay defined in pico seconds. This is used for
+            controllers that have configurable RX internal delays. If this
+            property is present then the MAC applies the RX delay.
+        tx-internal-delay-ps:
+          description:
+            RGMII Transmit Clock Delay defined in pico seconds. This is used for
+            controllers that have configurable TX internal delays. If this
+            property is present then the MAC applies the TX delay.
+
+The RGMII standard only talks about 2ns delay. There is no delay per
+link speed. This is something specific to your hardware. Please figure
+out how you can map these standard properties to what you need for
+100Mbps and 10Mbps.
+
+    Andrew
+
+---
+pw-bot: cr
 
