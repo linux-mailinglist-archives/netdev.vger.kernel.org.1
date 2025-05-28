@@ -1,185 +1,184 @@
-Return-Path: <netdev+bounces-193934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD441AC660C
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 11:33:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1554FAC6621
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 11:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D1C2A230FF
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B7023A97CF
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AA327584C;
-	Wed, 28 May 2025 09:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502192777FE;
+	Wed, 28 May 2025 09:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HvUQP+Gj"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C9D1DF27D;
-	Wed, 28 May 2025 09:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6AB1EB193;
+	Wed, 28 May 2025 09:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748424797; cv=none; b=Qgi/DRcuy9Qb8RWvfq3sEhQo2yVeFd46LsBvBxeut0UHl+qircv1QrgrLSzh5nKNru+XzIWHp6WkuDGwc6xm4CI3xRu2egukjl63fFMV1jQ/e09vs6iC5ek+IYX9HsTAre+TZTqfCFZuvlLnM+xt1GmeJ5VHdn+4RbGenx2hx5U=
+	t=1748425162; cv=none; b=MK2aFRUUqX46Zw8MhD8Lq1x7siLQJmffZ5F5UQQw083W3Qpx+EUCONc8S2q8kC4FKOmLSgSeYCybEcsgqv5idMcSDZYT+xeZ34Rx4iGuKhLd4DwsEQQb44VSg2GQuzHAHhFuD4tC4rKD1/MIeUtx4kraP7mCr7dnVYkBOG9TMks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748424797; c=relaxed/simple;
-	bh=CfPnfHr9W94nu2DOrAYlWE0gmLEjs2BufMiWiQgXfQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WzfSjXEageBDoiaSIoSJ/+CAhb04droElvPH+HI0EIzyksd3FMRNQwIqLrW9Su0FsIrVk8njFbDWue96N4PyQiIUCkafqrkIVT+XnGFAE5eULaCeD0a4cbEuF9dkArzxn6w0i4EmoEGHUqXrtPqjRDGXyjrESjvWFpPX8Y/a7qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-ab-6836d855b221
-Date: Wed, 28 May 2025 18:33:03 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
-	saeedm@nvidia.com, leon@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
- page->pp_magic in page_pool_page_is_pp()
-Message-ID: <20250528093303.GB54984@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-13-byungchul@sk.com>
- <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
- <20250526022307.GA27145@system.software.com>
- <a4ff25cb-e31f-4ed7-a3b9-867b861b17bd@gmail.com>
- <20250528081403.GA28116@system.software.com>
- <06fca2f8-39f6-4abb-8e0d-bef373d9be0f@gmail.com>
- <20250528091416.GA54984@system.software.com>
- <b7efa56b-e9fd-4ca6-9ecf-0d5f15b8d0c1@gmail.com>
+	s=arc-20240116; t=1748425162; c=relaxed/simple;
+	bh=6LD09DYS/0kYn1kkjqpbETm1/pEymJDs2xvRz8uJ0/A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QpeDIRFezXOyZwk00QpIIBPLW4U57nr+VTHmE7XLTQ2a0YHJ3ATZiKsGu8YPwTHh8HhhhB5MHedeaFNgUYXgvjATUEWd1h9ekDgbYQcwAxB4B6LmAEmK4tanbvpAY2aIECEAhwcdsQ2E6pVmoLsSBgBrAuHERhf8UhizOjgQnt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HvUQP+Gj; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1748425161; x=1779961161;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6LD09DYS/0kYn1kkjqpbETm1/pEymJDs2xvRz8uJ0/A=;
+  b=HvUQP+GjjGMx3X0dHUqSSFTW0231s8ofvj/IrHl3hgv6T7fuQ1WTsznM
+   ie/qCBZ3vPK0/FlnXOTwcVEn/g2D3LrwdSCrztmBQa5JzwpT9fDgNEqHp
+   1xiyUTMBkeP1KCkzfe8wcqhGU0Ozg9uJBAYQd+QlD/gcxu4HISAuU7M5Q
+   invkOJLcwGftd2mczMHZkyz4y+fuq0ChRN2OBcs7MxK0BNtMgPgEM5Vxx
+   h8DtYSeJgYC7xKlURw7so/5BkOJim1adiD9eXcev5u7CC4opXgzezlSf3
+   NSmTmgxMY6yMEsnLugNlJfqBmw/63NtinR4ViXowYqhL/CqiUaG37B+WG
+   g==;
+X-CSE-ConnectionGUID: 7lF291wvQn+FgAjIRLT7Iw==
+X-CSE-MsgGUID: wkNj7d69SDqxvKOXLpOy7A==
+X-IronPort-AV: E=Sophos;i="6.15,320,1739862000"; 
+   d="scan'208";a="42157104"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 May 2025 02:39:13 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 28 May 2025 02:38:34 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Wed, 28 May 2025 02:38:32 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>
+Subject: [PATCH net v2] net: lan966x: Make sure to insert the vlan tags also in host mode
+Date: Wed, 28 May 2025 11:36:19 +0200
+Message-ID: <20250528093619.3738998-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b7efa56b-e9fd-4ca6-9ecf-0d5f15b8d0c1@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX+/3/3u163bfk7xVebhEMsIUR/P/WXffzyMsWHi6Dd3XFeu
-	B6WxpEm3inka1+EwerJdTt1dHhrnUi1LzuIilZBZqZRu1UXcNdN/773fn8/79fnjw9Gym6Ig
-	TqVJFLQahVrOShjJd/+bC7e5IpSLSzMngcF0l4WSwRQoaLOJwFBsQfBz6L0Y+h3VLNy64abB
-	8DKTgQHTMA1fnreLofVOBwOPsqw0tJ+pYSE300NDhq2QggZLngguDN+mwZreJobXDwwstNwd
-	FUGHPZeBWn0RA615UfDcOBncdV0IHCYrBe6cqyycdxpZ+JTZisD5rJ2B/BN5CEyVLhF4Bg1s
-	1CxSVtREkQr9BzExmpPI/cJQonM5aWIuzmaJue+cmDS/ecSSmssehlTY+imSe7KbJT++vGNI
-	T2UjS0xljQx5YXSISb95+mZ+p2R1jKBWJQvasLV7JcqazhYqvmp6SkH1JZSO+ifrkB+H+WV4
-	OLee1iHOp/t6k7w2w8/FlT0DlFez/Dzscg3RXh3AL8Cdb+1iHZJwNN8lwqYsC+MNJvEHcc67
-	r6xXS3nA9qwnviEZ/5LG1tJaaiyYiGuvfPYt0H9bR645fWCaD8YFv7kxewY+WZ7vs/34Nbjo
-	nr/XDuRn4yeWaspbiXkbhyselrBj90/FTwtdzFk0UT+OoB9H0P8n6McRjIgpRjKVJjlWoVIv
-	W6RM1ahSFu2PizWjv59z59jILhvqa9hqRzyH5P5SUrpcKRMpkhNSY+0Ic7Q8QJqxLkIpk8Yo
-	Uo8K2rg92iS1kGBHwRwjnyJd6j4SI+MPKBKFQ4IQL2j/pRTnF5SONox+i4z8mV4b9hhZi2Sn
-	dqd1WBx7n10MDKei6+uT963fsWvHrwnz3y/fkBGlSimPdrocHu2mLaUhh0NLqjRDoWpnQaTH
-	PfO4vqrBVtinnTMtJLyuV9d8MckZZwtpf9WWVrFiXfbHK4FNaXOur7r9dTRt++mm04buPSup
-	W69nyDdG3JMzCUrFklBam6D4Ax8ZkRg1AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe885OzsOZ8dlekowWEhilBVqD9j9iy8R0ZewJNBRh7byxqai
-	RXjNkaStC5FzyiLyDjM1NyXUpnlJSZ1oK0tNmwaad815qZwS+e3P//c8v+fLw5CSu4LdjCIq
-	lldGySKktIgSnQ9KO3DRGig/VPiQAJ2hjIbSpQQoHDIJQFdSjWDe3i+EuaYWGl48XyRB15lO
-	wYJhmQRb87AQBgtGKXijNpIw/KCVhqz0FRJSTUUENOa1CaCrOlsAT5ZfkmBMHhJCT62OhoGy
-	PwIYNWdR0KYtpmAw+xQ0691hsX0CQZPBSMDi/TwaHlv0NIykDyKwNA5TkJuSjcBQZxXAypKO
-	PiXFVcWfCFyj/SrE+oo4XFnkizOtFhJXlNyjccXsIyH+0veGxq3PVihcY5ojcFbaJI1nbJ8p
-	PFXXS+MXP6YJbKjqpXCHvkl4wTVUdOwaH6GI55V+J8JF8tbxASLmnVdCYctTlIzm3DMRw3Cs
-	Pzc7HZeJnBiK9ebqphYIR6bZfZzVaicd2Y3dz41/NAszkYgh2QkBZ1BXUw6wg73B3f88Rjuy
-	mAXOrG7YGJKwnSRnLG8jNoEr15bzfWOBXLeu5ltIx2GS9eQKfzOb9R4u7XXuRu3EHueKXzk7
-	6p3sXq6huoXQIBftFpF2i0j7X6TdItIjqgS5KaLiI2WKiICDqpvyxChFwsGr0ZEVaP05Cu6s
-	PjSh+Z5gM2IZJHUW4/IAuUQgi1clRpoRx5BSN3HqyUC5RHxNlniLV0aHKeMieJUZeTKU1EN8
-	NoQPl7DXZbH8TZ6P4ZX/KME47U5G52pH8lI0tqCq0G9r6HRMQvlPe0+ID6/xudSV4moN8u62
-	5FROX5kKztPVj9FDBuRT6nHGfOdo/Yz7bPpbYtw/6cj7XX1rS2H2krSMqe02Ineho/P2tsDT
-	4mCvXx014S6u/SuT3caMXV6rRXv9SmfaNR8YWwB99NPl9qR8F3WRUUqp5LLDvqRSJfsLmbvC
-	rxgDAAA=
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 
-On Wed, May 28, 2025 at 10:20:29AM +0100, Pavel Begunkov wrote:
-> On 5/28/25 10:14, Byungchul Park wrote:
-> > On Wed, May 28, 2025 at 10:07:52AM +0100, Pavel Begunkov wrote:
-> > > On 5/28/25 09:14, Byungchul Park wrote:
-> > > > On Wed, May 28, 2025 at 08:51:47AM +0100, Pavel Begunkov wrote:
-> > > > > On 5/26/25 03:23, Byungchul Park wrote:
-> > > > > > On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
-> > > > > > > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> > > > > > > > 
-> > > > > > > > To simplify struct page, the effort to seperate its own descriptor from
-> > > > > > > > struct page is required and the work for page pool is on going.
-> > > > > > > > 
-> > > > > > > > To achieve that, all the code should avoid accessing page pool members
-> > > > > > > > of struct page directly, but use safe APIs for the purpose.
-> > > > > > > > 
-> > > > > > > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
-> > > > > > > > page_pool_page_is_pp().
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > > > > > > ---
-> > > > > > > >     include/linux/mm.h   | 5 +----
-> > > > > > > >     net/core/page_pool.c | 5 +++++
-> > > > > > > >     2 files changed, 6 insertions(+), 4 deletions(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > > > > > > > index 8dc012e84033..3f7c80fb73ce 100644
-> > > > > > > > --- a/include/linux/mm.h
-> > > > > > > > +++ b/include/linux/mm.h
-> > > > > > > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> > > > > > > >     #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> > > > > > > > 
-> > > > > > > >     #ifdef CONFIG_PAGE_POOL
-> > > > > > > > -static inline bool page_pool_page_is_pp(struct page *page)
-> > > > > > > > -{
-> > > > > > > > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > > > > > > > -}
-> > > > > > > 
-> > > > > > > I vote for keeping this function as-is (do not convert it to netmem),
-> > > > > > > and instead modify it to access page->netmem_desc->pp_magic.
-> > > > > > 
-> > > > > > Once the page pool fields are removed from struct page, struct page will
-> > > > > > have neither struct netmem_desc nor the fields..
-> > > > > > 
-> > > > > > So it's unevitable to cast it to netmem_desc in order to refer to
-> > > > > > pp_magic.  Again, pp_magic is no longer associated to struct page.
-> > > > > > 
-> > > > > > Thoughts?
-> > > > > 
-> > > > > Once the indirection / page shrinking is realized, the page is
-> > > > > supposed to have a type field, isn't it? And all pp_magic trickery
-> > > > > will be replaced with something like
-> > > > > 
-> > > > > page_pool_page_is_pp() { return page->type == PAGE_TYPE_PP; }
-> > > > 
-> > > > Agree, but we need a temporary solution until then.  I will use the
-> > > > following way for now:
-> > > 
-> > > The question is what is the problem that you need another temporary
-> > > solution? If, for example, we go the placeholder way, page_pool_page_is_pp()
-> > 
-> > I prefer using the place-holder, but Matthew does not.  I explained it:
-> > 
-> >     https://lore.kernel.org/all/20250528013145.GB2986@system.software.com/
-> > 
-> > Now, I'm going with the same way as the other approaches e.g. ptdesc.
-> 
-> Sure, but that doesn't change my point
+When running these commands on DUT (and similar at the other end)
+ip link set dev eth0 up
+ip link add link eth0 name eth0.10 type vlan id 10
+ip addr add 10.0.0.1/24 dev eth0.10
+ip link set dev eth0.10 up
+ping 10.0.0.2
 
-What's your point?  The other appoaches do not use place-holders.  I
-don't get your point.
+The ping will fail.
 
-As I told you, I will introduce a new struct, netmem_desc, instead of
-struct_group_tagged() on struct net_iov, and modify the static assert on
-the offsets to keep the important fields between struct page and
-netmem_desc.
+The reason why is failing is because, the network interfaces for lan966x
+have a flag saying that the HW can insert the vlan tags into the
+frames(NETIF_F_HW_VLAN_CTAG_TX). Meaning that the frames that are
+transmitted don't have the vlan tag inside the skb data, but they have
+it inside the skb. We already get that vlan tag and put it in the IFH
+but the problem is that we don't configure the HW to rewrite the frame
+when the interface is in host mode.
+The fix consists in actually configuring the HW to insert the vlan tag
+if it is different than 0.
 
-Then, is that following your point?  Or could you explain your point in
-more detail?  Did you say other points than these?
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Fixes: 6d2c186afa5d ("net: lan966x: Add vlan support.")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+v1->v2:
+- fix typos
+- set REW_TAG_CFG_TAG_CFG_SET to a value of 2 to match the comments
+---
+ .../ethernet/microchip/lan966x/lan966x_main.c |  1 +
+ .../ethernet/microchip/lan966x/lan966x_main.h |  1 +
+ .../microchip/lan966x/lan966x_switchdev.c     |  1 +
+ .../ethernet/microchip/lan966x/lan966x_vlan.c | 21 +++++++++++++++++++
+ 4 files changed, 24 insertions(+)
 
-	Byungchul
-> 
-> -- 
-> Pavel Begunkov
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 427bdc0e4908c..7001584f1b7a6 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -879,6 +879,7 @@ static int lan966x_probe_port(struct lan966x *lan966x, u32 p,
+ 	lan966x_vlan_port_set_vlan_aware(port, 0);
+ 	lan966x_vlan_port_set_vid(port, HOST_PVID, false, false);
+ 	lan966x_vlan_port_apply(port);
++	lan966x_vlan_port_rew_host(port);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+index 1f9df67f05044..4f75f06883693 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+@@ -497,6 +497,7 @@ void lan966x_vlan_port_apply(struct lan966x_port *port);
+ bool lan966x_vlan_cpu_member_cpu_vlan_mask(struct lan966x *lan966x, u16 vid);
+ void lan966x_vlan_port_set_vlan_aware(struct lan966x_port *port,
+ 				      bool vlan_aware);
++void lan966x_vlan_port_rew_host(struct lan966x_port *port);
+ int lan966x_vlan_port_set_vid(struct lan966x_port *port,
+ 			      u16 vid,
+ 			      bool pvid,
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c b/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
+index 1c88120eb291a..bcb4db76b75cd 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_switchdev.c
+@@ -297,6 +297,7 @@ static void lan966x_port_bridge_leave(struct lan966x_port *port,
+ 	lan966x_vlan_port_set_vlan_aware(port, false);
+ 	lan966x_vlan_port_set_vid(port, HOST_PVID, false, false);
+ 	lan966x_vlan_port_apply(port);
++	lan966x_vlan_port_rew_host(port);
+ }
+ 
+ int lan966x_port_changeupper(struct net_device *dev,
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+index fa34a739c748e..7da22520724ce 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c
+@@ -149,6 +149,27 @@ void lan966x_vlan_port_set_vlan_aware(struct lan966x_port *port,
+ 	port->vlan_aware = vlan_aware;
+ }
+ 
++/* When the interface is in host mode, the interface should not be vlan aware
++ * but it should insert all the tags that it gets from the network stack.
++ * The tags are not in the data of the frame but actually in the skb and the ifh
++ * is configured already to get this tag. So what we need to do is to update the
++ * rewriter to insert the vlan tag for all frames which have a vlan tag
++ * different than 0.
++ */
++void lan966x_vlan_port_rew_host(struct lan966x_port *port)
++{
++	struct lan966x *lan966x = port->lan966x;
++	u32 val;
++
++	/* Tag all frames except when VID=0*/
++	val = REW_TAG_CFG_TAG_CFG_SET(2);
++
++	/* Update only some bits in the register */
++	lan_rmw(val,
++		REW_TAG_CFG_TAG_CFG,
++		lan966x, REW_TAG_CFG(port->chip_port));
++}
++
+ void lan966x_vlan_port_apply(struct lan966x_port *port)
+ {
+ 	struct lan966x *lan966x = port->lan966x;
+-- 
+2.34.1
+
 
