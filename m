@@ -1,153 +1,176 @@
-Return-Path: <netdev+bounces-194039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8A3AC70F0
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 20:32:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBCF5AC70FF
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 20:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39AE17AA01B
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:30:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9185F1C0175B
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BC9283C90;
-	Wed, 28 May 2025 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C2428DF44;
+	Wed, 28 May 2025 18:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="mPrPz57+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Wosndm3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFB0210F65
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 18:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE9D2AD00;
+	Wed, 28 May 2025 18:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748457131; cv=none; b=MWtlJjIXuC5DQj6bY+uuSaDdWlCNiqviXmbub4d0tgsnni1AtlGKM6GFkGEMHWx6TOzlqb1o4USm7w1qofthrqm81lqQiafb7TJihnrRkZXsExjSibj9EPEkGwN5U0xZkxONZpF9330QyBOgviAAz1EfUrUnnkQ2uBCPBfD1fxg=
+	t=1748457303; cv=none; b=fDQgaXJ6YlooQVqjjaVU+ZmoLl7oO/AtAdbgc9kXZiJ/p2oTHQ20c+1rAKE0huPFvBk5Js0Re3QuIrZTe5bXGZYDQzw0rx+zdoRNYENqcTXFzG1ZPjJ1rz7TOvOIOwysRYIOG0O7zt/T+gFv9PGYDXDZyopYHsyxqK6g7Qlw/rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748457131; c=relaxed/simple;
-	bh=j6Sexigi7Ko8moPzmdhRrHMZjcpmS5XcMWzEaea4Ivk=;
+	s=arc-20240116; t=1748457303; c=relaxed/simple;
+	bh=o9psRuqLrZuh6dkcqaKQG63amKvh7ilq2Ah+aLkz5sM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PKLZLk0js2cWQORvXS2YHbn4wHXBWH/sYlGOPZ6nMMv3zwdy/zV2ZOErMV1n9ihbfgLZLHqpmWDOSfqDO2P9e3X9zMvfvaUhZmMhmjwTQx2f/4RBfPzkfR4dHFJgIH6LCRzp8LACpjrrrsMHOsNJYd+LOdc5dcYhzUiD8IG1New=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=mPrPz57+; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-742a018da9cso4080b3a.1
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 11:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1748457129; x=1749061929; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rSXXxUU0J9wn1C2a0Hb2G3HBJn5qgVk3D5sCsbBOtWY=;
-        b=mPrPz57+xsZkqxYvcGK/e6GR7BikkRse3aibLL3zI0hqsnkPZgWsOMoBU9CzUsY9Rt
-         A3zMq0aRUIOCt9zrGJodKznjCCndlJ0AXmBvqMXWHY2nxB/h4KUPX54j6OWDEzwM2sQW
-         RG6wTyBQLmGgipastNfdcDdtFqn+poNWZq+TnsBZAIpAk4wJVEJGtP1E0TJ3aRLOs7cX
-         mMdEX6nVQtvulwPCHjZUYEnaCTNg7uLOMYwASFkQQjmvaXy1t2stAAYY9D9CpUDgF7zy
-         8byxANbDWbirFSG/RCVtg1KyHPiKLcXU8JSNd6mQSwPHaL/Nn98uaWwQpH/tZ7LUxSAL
-         rFkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748457129; x=1749061929;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rSXXxUU0J9wn1C2a0Hb2G3HBJn5qgVk3D5sCsbBOtWY=;
-        b=ZNGeVCQGx4hD0lSm+N9M7SSYECqop2tFMUnm6K7WkgyJGghRrwACYxYTWfHMHWoL9P
-         CobXzpt8gSpVVHWn8FMUlIPNpZ/rsumyT5y9gr3kMymzPAl9Y8SYf2Zvgy9RVmlM/+bR
-         31RG7aQrGVytoDs87yQjJiwQYaGXn0YPvGzRGIPRj+/xvQfeqj4YLv0JJ7Hf/1Q0/N13
-         9NmyOcGOANQLphKGfYpU6LAIy73f42VXgsQj2QO0IZRm8cAt0OQUQ9zo0lt79EOwL6MA
-         +4H/EH8ZJfdbUj7FcQULD2Ht/rx/ELqsFz7+obonnWD4RytfwcZkb9/i84QTqeHQ+R8o
-         Dq3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUOAFzOclQ/2T4YIBS0p1qFiRUCi7SQg8T1D36+enSISPfzFCeNGq3BtdjG/FJr4fF6ZS0dtaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXtgK73+uTgtqPB6satdhfglSQ3mE7PFI7vZGXbHJdxy2V4cE9
-	Aw5+yI3XpLOvj+l6DmYfBJXKAEHNW9oUOizA0lAE+qo12G0ZWo8+IA5MCPSp3gU75sjroLznRoB
-	5TH0Dhcw=
-X-Gm-Gg: ASbGncsHEAiv15p18hmQcExG7DSMRHdM9UJF76C3hRS2WUhTQfhWT66K94cDJGy6Bmb
-	X8CdSANuhmzuoER0SRk93Kq3d13s7Y7x5wra9smadZGkM1auaJ1xhVhdANyB9Hy3EfRUSWPBZ8X
-	ksZC6RS0TwP8aSHpsm/IhmpiS0vFSurAg5/bCNodVsMhZ7mjLky9kjCM0xtv+HFnuuuu5o0Zd0l
-	ACJe6IP1XxUv/Y6r4bVtmH1SGHVoIh/1hiNAlcNkWVoHtHzX1Zp26v7WXqklYMjO91knaxXkp9h
-	+ylPmplXTGF2O/OMPLRIwTm1YoDe9OjnO/cx3w==
-X-Google-Smtp-Source: AGHT+IGIvTZszuSKTVNXSfZS/0V+U2FZDA/JF4Wke2bpKg+9jHyjK0gIBkU5hxpFhN3ydqkarK4Hdg==
-X-Received: by 2002:a17:902:ecd1:b0:234:ef42:5d52 with SMTP id d9443c01a7336-234ef426080mr6415835ad.6.1748457128699;
-        Wed, 28 May 2025 11:32:08 -0700 (PDT)
-Received: from t14 ([2001:5a8:4528:b100:3166:3eaf:6a29:60e0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-234d2dd18dcsm15077255ad.0.2025.05.28.11.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 11:32:08 -0700 (PDT)
-Date: Wed, 28 May 2025 11:32:06 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v1 bpf-next 10/10] selftests/bpf: Add tests for bucket
- resume logic in established sockets
-Message-ID: <oqnwzaemu6agvwqt6vgcjygklzhcvxghbzzi7x65dqapzsjsxh@rif4xe655t4u>
-References: <20250520145059.1773738-1-jordan@jrife.io>
- <20250520145059.1773738-11-jordan@jrife.io>
- <ae95a774-2218-4ddc-b2e0-d7bac2b731fd@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bu8p+KFWL1NfXLxdpz2xYWVwyp9nqqxo9vPcQSuZ54Z4Ty94oZjy+CfndDkCSws7YTuVlLtGnnVkS+bSgR3vUXolNqcHYzi4+VOHRVe0JYxfFjHa/TTl6IclQpIcHbaLKEg8pz4v0G4ai9GP/FvgZhV8GmlPTUBWUbuDMG7bBJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Wosndm3Q; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oEfLgoqZZlV3CauhRyPut9aS8+kFBL6RAy2mXOuaG1k=; b=Wosndm3QpTZVvNqtddTO/EUoXb
+	G2aSMfofpfTs0Lj9HH36ZoGLLfL29XW2NdZptgFMhsLa4HiLJmIRkdeqv7/651xgC0r0P/ve6nFjK
+	QFQxC/4Ql5Bi0PD/gU1UHyqdJMizemvlygAL97MKyKy/l31HXEXeKcuTqXtchmTqSG3u7BbvuNwUl
+	wR4TI0dfDpSr3+Keyxz27/QnzYt/qxEsxU02bJbw0JG54MYdZwnf6PKG2ee1/3m98EsDkdlnl5nGy
+	wu5BiJNG0PHlg6yVdKWTnIIuO7RJ8l0+gdQCwwtIoYJo7bvIaE1s1Cqc1C9Mg9iX9fpnKBjlFABZS
+	jcD17Cog==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50888)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uKLc2-0000ci-1Y;
+	Wed, 28 May 2025 19:34:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uKLbx-0002d3-0P;
+	Wed, 28 May 2025 19:34:45 +0100
+Date: Wed, 28 May 2025 19:34:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: James Hilliard <james.hilliard1@gmail.com>
+Cc: wens@csie.org, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-sunxi@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
+Message-ID: <aDdXRPD2NpiZMsfZ@shell.armlinux.org.uk>
+References: <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
+ <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch>
+ <CADvTj4qRmjUQJnhamkWNpHGNAtvFyOJnbaQ5RZ6NYYqSNhxshA@mail.gmail.com>
+ <014d8d63-bfb1-4911-9ea6-6f4cdabc46e5@lunn.ch>
+ <CADvTj4oVj-38ohw7Na9rkXLTGEEFkLv=4S40GPvHM5eZnN7KyA@mail.gmail.com>
+ <aDbA5l5iXNntTN6n@shell.armlinux.org.uk>
+ <CADvTj4qP_enKCG-xpNG44ddMOJj42c+yiuMjV_N9LPJPMJqyOg@mail.gmail.com>
+ <f915a0ca-35c9-4a95-8274-8215a9a3e8f5@lunn.ch>
+ <CAGb2v66PEA4OJxs2rHrYFAxx8bw4zab7TUXQr+DM-+ERBO-UyQ@mail.gmail.com>
+ <CADvTj4qyRRCSnvvYHLvTq73P0YOjqZ=Z7kyjPMm206ezMePTpQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ae95a774-2218-4ddc-b2e0-d7bac2b731fd@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADvTj4qyRRCSnvvYHLvTq73P0YOjqZ=Z7kyjPMm206ezMePTpQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> > +
-> > +		close(iter_fd);
-> > +
-> > +		if (!exists)
-> > +			break;
-> > +
-> > +		usleep(100 * us_per_ms);
+On Wed, May 28, 2025 at 11:25:20AM -0600, James Hilliard wrote:
+> On Wed, May 28, 2025 at 8:12 AM Chen-Yu Tsai <wens@csie.org> wrote:
+> >
+> > On Wed, May 28, 2025 at 9:25 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > >
+> > > On Wed, May 28, 2025 at 05:57:38AM -0600, James Hilliard wrote:
+> > > > On Wed, May 28, 2025 at 1:53 AM Russell King (Oracle)
+> > > > <linux@armlinux.org.uk> wrote:
+> > > > >
+> > > > > On Tue, May 27, 2025 at 02:37:03PM -0600, James Hilliard wrote:
+> > > > > > On Tue, May 27, 2025 at 2:30 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > > > > > >
+> > > > > > > > Sure, that may make sense to do as well, but I still don't see
+> > > > > > > > how that impacts the need to runtime select the PHY which
+> > > > > > > > is configured for the correct MFD.
+> > > > > > >
+> > > > > > > If you know what variant you have, you only include the one PHY you
+> > > > > > > actually have, and phy-handle points to it, just as normal. No runtime
+> > > > > > > selection.
+> > > > > >
+> > > > > > Oh, so here's the issue, we have both PHY variants, older hardware
+> > > > > > generally has AC200 PHY's while newer ships AC300 PHY's, but
+> > > > > > when I surveyed our deployed hardware using these boards many
+> > > > > > systems of similar age would randomly mix AC200 and AC300 PHY's.
+> > > > > >
+> > > > > > It appears there was a fairly long transition period where both variants
+> > > > > > were being shipped.
+> > > > >
+> > > > > Given that DT is supposed to describe the hardware that is being run on,
+> > > > > it should _describe_ _the_ _hardware_ that the kernel is being run on.
+> > > > >
+> > > > > That means not enumerating all possibilities in DT and then having magic
+> > > > > in the kernel to select the right variant. That means having a correct
+> > > > > description in DT for the kernel to use.
+> > > >
+> > > > The approach I'm using is IMO quite similar to say other hardware
+> > > > variant runtime detection DT features like this:
+> > > > https://github.com/torvalds/linux/commit/157ce8f381efe264933e9366db828d845bade3a1
+> > >
+> > > That is for things link a HAT on a RPi. It is something which is easy
+> > > to replace, and is expected to be replaced.
+> >
+> > Actually it's for second sourced components that are modules _within_
+> > the device (a tablet or a laptop) that get swapped in at the factory.
+> > Definitely not something easy to replace and not expected to be replaced
+> > by the end user.
 > 
-> Instead of retrying with the bpf_iter_tcp to confirm the sk is gone from the
-> ehash table, I think the bpf_sock_destroy() can help here.
-
-Sure, I will explore this. I was a little worried about having a sleep
-here, since it may introduce some flakiness into CI at some point, so
-it would be good to have something more deterministic.
-
+> Yeah, to me it seems like the PHY situation is similar, it's not replaceable
+> due to being copackaged, it seems the vendor just switched over to a
+> second source for the PHY partway through the production run without
+> distinguishing different SoC variants with new model numbers.
 > 
-> > +	}
-> > +
-> > +	return !exists;
-> > +}
-> > +
-> >   static int get_seen_count(int fd, struct sock_count counts[], int n)
-> >   {
-> >   	__u64 cookie = socket_cookie(fd);
-> > @@ -241,6 +279,43 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
-> >   			       counts_len);
-> >   }
-> > +static void remove_seen_established(int family, int sock_type, const char *addr,
-> > +				    __u16 port, int *listen_socks,
-> > +				    int listen_socks_len, int *established_socks,
-> > +				    int established_socks_len,
-> > +				    struct sock_count *counts, int counts_len,
-> > +				    struct bpf_link *link, int iter_fd)
-> > +{
-> > +	int close_idx;
-> > +
-> > +	/* Iterate through all listening sockets. */
-> > +	read_n(iter_fd, listen_socks_len, counts, counts_len);
-> > +
-> > +	/* Make sure we saw all listening sockets exactly once. */
-> > +	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-> > +			       counts, counts_len);
-> > +
-> > +	/* Leave one established socket. */
-> > +	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
-> 
-> hmm... In the "SEC("iter/tcp") int iter_tcp_soreuse(...)" bpf prog, there is
-> a "sk->sk_state != TCP_LISTEN" check and the established sk should have been
-> skipped. Does it have an existing bug? I suspect it is missing a "()" around
-> "sk->sk_family == AF_INET6 ? !ipv6_addr_loopback(...) : ...".
+> Keep in mind stmmac itself implements mdio PHY scanning already,
+> which is a form of runtime PHY autodetection, so I don't really see
+> how doing nvmem/efuse based PHY autodetection is all that different
+> from that as both are forms of PHY runtime autodetection.
 
-Agh, yeah it looks like it's the "()". Adding these around the ternary
-operation leads to the expected result with all established sockets
-being skipped. I will fix that in the next spin.
+What is different is using "phys" and "phy-names" which historically
+has never been used for ethernet PHYs. These have been used for serdes
+PHYs (e.g. multi-protocol PHYs that support PCIe, SATA, and ethernet
+protocols but do not provide ethernet PHY capability).
 
-Jordan
+Historically, "phys" and "phy-names" have been the domain of
+drivers/phy and not drivers/net/phy. drivers/net/phy PHYs have
+been described using "phy-handle".
+
+So, you're deviating from the common usage pattern, and I'm not sure
+whether that has been made clear to the DT maintainers that that is
+what is going on in this patch series.
+
+As for the PHY scanning is a driver implementation issue; it doesn't
+have any effect on device tree, it doesn't "abuse" DT properties to
+do so. The PHY scanning is likely historical, probably from times
+where the stmmac platform data was provided by board files (thus
+having the first detected PHY made things simpler.) Therefore, I
+don't think using it as a justification for more "autodetection"
+stands up.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
