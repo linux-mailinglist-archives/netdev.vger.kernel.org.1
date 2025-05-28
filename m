@@ -1,184 +1,173 @@
-Return-Path: <netdev+bounces-193889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CD2AC62F7
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:27:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DCB8AC630D
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4B5616342B
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:27:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E084188F73F
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA538244697;
-	Wed, 28 May 2025 07:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C494F2459E5;
+	Wed, 28 May 2025 07:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UodbTcyN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqX/HIQm"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BBF125DF
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 07:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AAC24469C
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 07:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748417253; cv=none; b=r19Id1BYi5YYaQfUcraGpzyAjbpqiLt6d7FH2FJ2HIxOOnUi9sGxzzJmBxS9S1dckNDEM5LezKK/8cDTy9CHO+2XKn86OQi1B8lqWaCNnzDMZiNV+Igl/RpyKHG6uIFLyEB3Mz+RrKJ53kqnE4zSAuEB7rckJJrb2bxX5pv7dv4=
+	t=1748417492; cv=none; b=lNg34/4cH9I9ysVfwCCalF9CwhKdcPnIoP1MaP47TTp/QkTgoxYESAWsvXdwX7IAjLS1StLfSnBy0qpX1zaSgV8NiRz+wwM6mcBJYACFqMqTXs8CQAolt5x0Pjhn5WKV9lOwEgKgpsZHoIm0Tla6vzmPbp/62SvsxUwWCAIvffw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748417253; c=relaxed/simple;
-	bh=4d2Rvh5/049QiSFiG8HqsMtGYGDNAUWELzNpSKTOFQk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=YoVRumk2VdXHcDoQVoPr4KTCiTIHFEYtSOMoWqslJf5FSBaKkMY5bALp8CqwCqQPb+LXpbXHo720OqEog3+feNJ5jBXTF583iggol5cQdFfmJ15jDAf1i9dingY3qi6A0oEfZ05jfKZdf3dyG3txq9hFzwJkpqbDhy5lREP5NB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UodbTcyN; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1748417492; c=relaxed/simple;
+	bh=UvIexZRUn+BGBcUY9tnDQQ7cZOqImj0Tt0QmErOJPf4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ukkv27zffLAMWOi7ht8I2+XpdK/N+3gQObSjIKRuKqnQIFK5ytdeCcfLkebfiYWcC1Fd/mo7fdrohBi5DxON+BQ6YgjO9N7qGMlJDUaGiwDoiPk64OUfr79Gex0X0Wg9Wv44w8qmfV1wmlRh3qeOz6r7X8gBl2k4jeh28sQ54iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JqX/HIQm; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748417250;
+	s=mimecast20190719; t=1748417490;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=u7w+oFgheV8aZ4x33cyzyZZ5cNI/GkUhBQCV4X7SdIs=;
-	b=UodbTcyNOHCaPYjY0DBJYwqkttxSTSsApqgOAmNC/CeR/j+kL+UioPbCSXxlIzWoVYVfT6
-	fT1cwn0woZvXVB6ATugi9XdfPqns5KMOHz4PecUICd10WGMFGLmmmr79dUOwv8Q/nZBZqk
-	fTkm0WB3AyjMoLAHU2gpYw7h+ecWnWE=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NnNK+PMtqB0rA55xSs019Lt6frpG94moy6NPZkqGYPI=;
+	b=JqX/HIQmPgJ+CPURIHMMcjV2lPvriESRIhZa2UTD+9xZojq3ZFka4JhiB+PoQzPFovPP8m
+	lgQZeQLFeo7PrzS30S2NgdCvNfgsH75NjwKdwOrQrwgR4DnWagtQtTNb4wH97NuZek2Xq6
+	Om7bptF5rfffHyruuEFPt85vx3Z79zU=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-266-zD7gxWMePJG6qK7xXs42kA-1; Wed, 28 May 2025 03:27:29 -0400
-X-MC-Unique: zD7gxWMePJG6qK7xXs42kA-1
-X-Mimecast-MFC-AGG-ID: zD7gxWMePJG6qK7xXs42kA_1748417248
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so23941075e9.0
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 00:27:28 -0700 (PDT)
+ us-mta-382-lOrXdiCFNuy79pXMQrDsyw-1; Wed, 28 May 2025 03:31:25 -0400
+X-MC-Unique: lOrXdiCFNuy79pXMQrDsyw-1
+X-Mimecast-MFC-AGG-ID: lOrXdiCFNuy79pXMQrDsyw_1748417484
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442ffaa7dbeso31558605e9.3
+        for <netdev@vger.kernel.org>; Wed, 28 May 2025 00:31:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748417248; x=1749022048;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1748417484; x=1749022284;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7w+oFgheV8aZ4x33cyzyZZ5cNI/GkUhBQCV4X7SdIs=;
-        b=jmCXrHUAcdNnnzdK+i22TsevLbqYzF54Xvhd7aoHldvcwMbhejih9cGN6h6k+PqvF7
-         NX/F47xEVst6TPUQme3hjnP3k5zCeAakJHR6yVUyK0NYsUdi3E0wxY5Vn7XulDMsy6LF
-         +AGXsvlmHGzKqV5dNY/2T/IZ7xOmiTQB10f2oggbUlTy55DL8scl5Aks0983xoWZkEBe
-         MlmpzWW7PJSXxmtHyda8OOJGZLJQeepqPPrHO1nOsqS1hsy9QvG1mbB/ebdLIDLKlt0J
-         3ZpxVE22Z7oTkBYYkT+D2HQ54FWLKYdJk+8Mnmcn10jEpdC5OyFrmpYCMz6SxeM27bFu
-         zaDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLykl6+BJ7pmIBPlJs6+bdGWsC4lQ/bTTOu7zpq59uWkjHAbxAT62ce8H/zW2cbhTmy6OU79A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywKgkhAA0TWH+ewXHaBONITF+nLvMykTU1SCIqf8SidG40MA68
-	si91nyJWXbR1Dl5joOMnYDLR/aB/VZoUDt2IuEEOE+NL7PbYYrhzrseIlySVrKNAFcqJsmzDkcH
-	k1L2iumkcStp1SuWfjdcgIbesUjuABfZxdS9x5voNDUV+3cgDs0JgOydGSw==
-X-Gm-Gg: ASbGncvkBkRUJ7B0HQANl8Jkt7QZVeRodJF3AQmlLy54JoYQnmFNsFx1ylxdvR+pNdv
-	zJywD/GqGmCJ6J6zLALIBp345hzzzdKLyoF/UWlhbnYYypRKBVZNw9VE7iGyUzIW5Qp1RPmvhav
-	S94CRZqSce2SD7z1Hk8oen9KyHck7Nix1NJZTwg1tyEs/jJyQY+lR+HD4JmtmaPfE02AWcj+uLe
-	+lF+PAeZuUqcllQeF7kvS0aJBBmvhy5lk9RMHrD8rNZTaaaQkRUJxducv5A3U1DGcla1k8Y3b25
-	nq+nSQ==
-X-Received: by 2002:a05:600c:4e45:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-44c919e13ddmr185732435e9.10.1748417247873;
-        Wed, 28 May 2025 00:27:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEltm4UmhdICUHUpMHmQNZNYzagk6xfrMPG1SMAdHiF25jVtOn4A91e8E91qUEsAR8QkJYhDQ==
-X-Received: by 2002:a05:600c:4e45:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-44c919e13ddmr185732135e9.10.1748417247448;
-        Wed, 28 May 2025 00:27:27 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450064ae775sm12042235e9.22.2025.05.28.00.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 00:27:26 -0700 (PDT)
-Date: Wed, 28 May 2025 03:27:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	alexandre.belloni@bootlin.com, dongli.zhang@oracle.com, hch@lst.de,
-	israelr@nvidia.com, kees@kernel.org, leiyang@redhat.com,
-	mst@redhat.com, phasta@kernel.org, quic_philber@quicinc.com,
-	sami.md.ko@gmail.com, vattunuru@marvell.com
-Subject: [GIT PULL] virtio, vhost: features, fixes
-Message-ID: <20250528032724-mutt-send-email-mst@kernel.org>
+        bh=NnNK+PMtqB0rA55xSs019Lt6frpG94moy6NPZkqGYPI=;
+        b=O1efOyyLe2Dc0znso7TSs9JnrnA+Y8je4WyU2t8/55qZIWPUU2huYYVQaLVLQ8xWxJ
+         eLAapH8NMQq0QywpL112+nz8smnbEGb4D6sQSFrnstl03/UY3+jZZqqoiPPvsYwfszvj
+         nyjc5USJPAZfHfXmQmL/TvwEGEvRQ3gPHcDwxP8jlRYgQXaFjNZjIF3aP+1/6nB77OMz
+         DwHHU72P9psuvRX9YkK841uldl16R+13ZkWpYFFQtYdhU/iXw0DXIl/5m4G8gNF4MxLF
+         ibi5RZLEO9wax5uO6WOgffuIDNLEm5ne38FCYoWud2VOy/seBgLkwhCAONL3i84z/Cwt
+         nJBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXl6VA7u8lstAUvnD1WP+zwco4TJ86cjTZIjLB/VmGJXVcUETxEIIjyuO/n1CqkwHrwbopDN8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF+t/s7ptDGdc9ypTSR9UAyXB5sR2fZkc56JbNuje0+Pn1ovC8
+	A8m23CeEPodZocdJ/b7+sRLO+dW4bO0WAXKwbQ/8Jn6uiJbM4Y0RIMYoWPvQW1cdv2vjUBSQ+mr
+	QQ0WEvOOtgMPgsU4adzzdcDF0c0jKsS0BdMXWY7g8QmnFD598/LSNIuAmxg==
+X-Gm-Gg: ASbGncvZRSJc/iaMvBq8LpRXRvdiIxK3G8SwgeTCVJa25v853zxnLK+XuXyirQGcT/2
+	JZ088W+QOYBu40X+M5Q28SZo0xEkvWg4Uh5iUStefVDf5yMppNIXTSjameKzNumE+hfdnXwqANB
+	NaR3wq1U3P13wTxXHIRzDbit7wiwzH3gNowQBTSqwELUJkqXkTzBWkgmikEw1lFvqrErqXgYK+O
+	S5RMm8cn9WsHUZSdhEv3uGiZDORai3Ps9Wa5hQ/yQxbf2LHLe7XR710ryT+kdXKIzStCf3vvQjH
+	vWZG7xPl6vnofP160oszZvpnr2zrdT18MbGW5xMH3rCEEZd8d2w/GCV3aFk=
+X-Received: by 2002:a05:600c:4fd6:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-44c91cc3dc0mr138588645e9.8.1748417484112;
+        Wed, 28 May 2025 00:31:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdJu619yR1tj683v5lEJt4BlhCq4Yc5mhZCTSaskqgJ5HAGUteqarVvWl0xRjxTsnjM5kpEw==
+X-Received: by 2002:a05:600c:4fd6:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-44c91cc3dc0mr138588065e9.8.1748417483603;
+        Wed, 28 May 2025 00:31:23 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810:827d:a191:aa5f:ba2f? ([2a0d:3344:2728:e810:827d:a191:aa5f:ba2f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45006498c83sm12303485e9.5.2025.05.28.00.31.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 May 2025 00:31:23 -0700 (PDT)
+Message-ID: <8b3cdc35-8bcc-41f6-84ec-aee50638b929@redhat.com>
+Date: Wed, 28 May 2025 09:31:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget evaluation
+ strategy
+To: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Linus,
-There are several bugfixes I'm testing for post rc1 on top of this, but they
-are pretty minor.
+On 5/24/25 12:56 PM, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> This series brings support for budget evaluation strategy in the PSE
+> subsystem. PSE controllers can set priorities to decide which ports should
+> be turned off in case of special events like over-current.
+> 
+> This patch series adds support for two budget evaluation strategy.
+> 1. Static Method:
+> 
+>    This method involves distributing power based on PD classification.
+>    It’s straightforward and stable, the PSE core keeping track of the
+>    budget and subtracting the power requested by each PD’s class.
+> 
+>    Advantages: Every PD gets its promised power at any time, which
+>    guarantees reliability.
+> 
+>    Disadvantages: PD classification steps are large, meaning devices
+>    request much more power than they actually need. As a result, the power
+>    supply may only operate at, say, 50% capacity, which is inefficient and
+>    wastes money.
+> 
+> 2. Dynamic Method:
+> 
+>    To address the inefficiencies of the static method, vendors like
+>    Microchip have introduced dynamic power budgeting, as seen in the
+>    PD692x0 firmware. This method monitors the current consumption per port
+>    and subtracts it from the available power budget. When the budget is
+>    exceeded, lower-priority ports are shut down.
+> 
+>    Advantages: This method optimizes resource utilization, saving costs.
+> 
+>    Disadvantages: Low-priority devices may experience instability.
+> 
+> The UAPI allows adding support for software port priority mode managed from
+> userspace later if needed.
+> 
+> Patches 1-2: Add support for interrupt event report in PSE core, ethtool
+> 	     and ethtool specs.
+> Patch 3: Adds support for interrupt and event report in TPS23881 driver.
+> Patches 4,5: Add support for PSE power domain in PSE core and ethtool.
+> Patches 6-8: Add support for budget evaluation strategy in PSE core,
+> 	     ethtool and ethtool specs.
+> Patches 9-11: Add support for port priority and power supplies in PD692x0
+> 	      drivers.
+> Patches 12,13: Add support for port priority in TPS23881 drivers.
+> 
+> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
+I'm sorry, even if this has been posted (just) before the merge window,
+I think an uAPI extension this late is a bit too dangerous, please
+repost when net-next will reopen after the merge window.
 
-The following changes since commit a5806cd506af5a7c19bcd596e4708b5c464bfd21:
+Thanks,
 
-  Linux 6.15-rc7 (2025-05-18 13:57:29 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 206cc44588f72b49ad4d7e21a7472ab2a72a83df:
-
-  virtio: reject shm region if length is zero (2025-05-28 03:19:03 -0400)
-
-----------------------------------------------------------------
-virtio, vhost: features, fixes
-
-A new virtio RTC driver.
-
-vhost scsi now logs write descriptors so migration works.
-
-Some hardening work in virtio core.
-
-An old spec compliance issue fixed in vhost net.
-
-A couple of cleanups, fixes in vringh, virtio-pci, vdpa.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      vringh: use bvec_kmap_local
-
-Dongli Zhang (5):
-      vhost: modify vhost_log_write() for broader users
-      vhost-scsi: adjust vhost_scsi_get_desc() to log vring descriptors
-      vhost-scsi: log I/O queue write descriptors
-      vhost-scsi: log control queue write descriptors
-      vhost-scsi: log event queue write descriptors
-
-Israel Rukshin (1):
-      virtio-pci: Fix result size returned for the admin command completion
-
-Kees Cook (1):
-      vhost: vringh: Use matching allocation type in resize_iovec()
-
-Peter Hilber (4):
-      virtio_rtc: Add module and driver core
-      virtio_rtc: Add PTP clocks
-      virtio_rtc: Add Arm Generic Timer cross-timestamping
-      virtio_rtc: Add RTC class driver
-
-Philipp Stanner (1):
-      vdpa/octeon_ep: Control PCI dev enabling manually
-
-Sami Uddin (1):
-      virtio: reject shm region if length is zero
-
- MAINTAINERS                              |    7 +
- drivers/vdpa/octeon_ep/octep_vdpa_main.c |   17 +-
- drivers/vhost/scsi.c                     |  190 +++-
- drivers/vhost/vhost.c                    |   28 +-
- drivers/vhost/vringh.c                   |   19 +-
- drivers/virtio/Kconfig                   |   64 ++
- drivers/virtio/Makefile                  |    5 +
- drivers/virtio/virtio_pci_modern.c       |   13 +-
- drivers/virtio/virtio_rtc_arm.c          |   23 +
- drivers/virtio/virtio_rtc_class.c        |  262 ++++++
- drivers/virtio/virtio_rtc_driver.c       | 1407 ++++++++++++++++++++++++++++++
- drivers/virtio/virtio_rtc_internal.h     |  122 +++
- drivers/virtio/virtio_rtc_ptp.c          |  347 ++++++++
- include/linux/virtio_config.h            |    2 +
- include/uapi/linux/virtio_rtc.h          |  237 +++++
- 15 files changed, 2707 insertions(+), 36 deletions(-)
- create mode 100644 drivers/virtio/virtio_rtc_arm.c
- create mode 100644 drivers/virtio/virtio_rtc_class.c
- create mode 100644 drivers/virtio/virtio_rtc_driver.c
- create mode 100644 drivers/virtio/virtio_rtc_internal.h
- create mode 100644 drivers/virtio/virtio_rtc_ptp.c
- create mode 100644 include/uapi/linux/virtio_rtc.h
+Paolo
 
 
