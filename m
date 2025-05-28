@@ -1,157 +1,137 @@
-Return-Path: <netdev+bounces-193850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D95AC6085
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:57:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF41BAC6094
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 06:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E66E162A43
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:57:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3B11BA0C4F
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:16:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726C51EF0A6;
-	Wed, 28 May 2025 03:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="FN3Y0tJt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7C71B87C0;
+	Wed, 28 May 2025 04:15:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B7979FE;
-	Wed, 28 May 2025 03:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475BFBA53;
+	Wed, 28 May 2025 04:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748404581; cv=none; b=b+wo3zpyXht2pxDAirqmENE+ipN3odtnoBOoM/En7AdJmCSDkFzBw1Jnhbhwz72CDlLiD/00RO16uMfEgzAdpVJIVj2zyI42L3+EIQy4RZMv+i2pfJ21+Fa5s3qzVL3HGVOFU8tKA//lBoy8qkYN7A57lSNk4mxzrR1H4swCJiY=
+	t=1748405756; cv=none; b=tSl/Fm0Nidkwgzgoe4vm4MvcQgtwjSQuyohyoXtUy+xNem1urdiXKpjQCf0mtIEoYTtRP7HA/Np6p6Vd4GSZl/wcsuBat+bm6K3SyAln4wh2LBgefAD3FQ2QtNaI8pkQdlnaLYqyF+wAnVo4GXHqepqlrzH0K4MSaBlr8o3Dnio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748404581; c=relaxed/simple;
-	bh=jL4VPElyTefmk4ZCL4VMvLlTjYydInTlUtnDRPmZCPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y0/5A1z34W2Yk0+/vvzmz2lL9e0gUaukXxC3assMUghwJpUtHH/ixpOODdRsFYfh446BUVubCCUlgMCA8ke6vZbE9IElYXqWULYOvH4TSYmAQbrCvVu1gMWG9rAqbaOnZfy7RoH+2IVoh9iy4oECTi1GSpl3CjMKBFF8TUncUfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=FN3Y0tJt; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1748404577;
-	bh=rUoOsao8Qz143i7ETAaq8VYqNMJ3ULeqCMUNoMALvIU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FN3Y0tJtmdMD6PUf+8AKXdf65u85qv41kN5XGcl5dGktHYS7Q7xBeCkGc4qfYLvzp
-	 GnH2XXNn87li45dJKKSfZL2hgwZcnTKu/PnAaB/cpgHxaWuH1X1Iuw6oPLpRgFSg5s
-	 1TjPEEcKA/AwaXlZjDyTYkycSRcFsXTKm7K+iDp3zCQ7zH4cgO96WQ1cMCxcljCuLb
-	 WMK3ff/FeqWI2fjBgT2lQlvQf4ToRGikm2PIMIXNqyKylDcPi46Ai1XSv57dIIOl/P
-	 vys4UTjE0t79AreFcV74+q9ptARqlpuszxekKMzZzmjkhrJYD/QEabC/tT5rGyIkIh
-	 EQ9WVSmxFxzTg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b6bJw4t0Wz4wcQ;
-	Wed, 28 May 2025 13:56:16 +1000 (AEST)
-Date: Wed, 28 May 2025 13:56:16 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Raju Rangoju <Raju.Rangoju@amd.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the tip tree
-Message-ID: <20250528135616.6b14a725@canb.auug.org.au>
-In-Reply-To: <20250514152318.52714b39@canb.auug.org.au>
-References: <20250514152318.52714b39@canb.auug.org.au>
+	s=arc-20240116; t=1748405756; c=relaxed/simple;
+	bh=/I/sCH3HYYMfI7pUcDNfIom6DhGMCZFJGmPYmZ2Jix4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XC2mO5sibFPbQOoldLQZ6DVKEYWJRcCxES/mOg8Q4A/Zeb4tA/+EBJHQ4FX5tX5564j3/zVG/OSXoVTvag+7ckPOR3lGY5x632XhUG13pk4s6tR5DF+9EOAST5EbjD10OQgrlpP6nHUg2Dk+g4Hkz6N6PQ4eyF6frsNQnSphcNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=209.97.181.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from E0005182DT.eswin.cn (unknown [10.12.97.162])
+	by app1 (Coremail) with SMTP id TAJkCgD3DQ_DjTZoOQuVAA--.6922S2;
+	Wed, 28 May 2025 12:15:04 +0800 (CST)
+From: weishangjuan@eswincomputing.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	vladimir.oltean@nxp.com,
+	rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	inochiama@gmail.com,
+	jan.petrous@oss.nxp.com,
+	jszhang@kernel.org,
+	p.zabel@pengutronix.de,
+	0x1207@gmail.com,
+	boon.khai.ng@altera.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	lizhi2@eswincomputing.com,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>
+Subject: [PATCH v2 0/2] Add driver support for Eswin eic7700 SoC ethernet controller
+Date: Wed, 28 May 2025 12:14:42 +0800
+Message-ID: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+X-Mailer: git-send-email 2.49.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/bGCc7O8++WWcF07aEOe8uzk";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:TAJkCgD3DQ_DjTZoOQuVAA--.6922S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4UZFy3KFy5ZFykGF4DArb_yoW8tr1kpa
+	yDGFy5trn5Jr1xXws3Aa18KF95Xa97Kr43KFyfJwn3Xan8A34ktwn8KFyY9F97Cr48X3Wa
+	qF1Yk343CFyqy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBq14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw2
+	8IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4l
+	x2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrw
+	CI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI
+	42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z2
+	80aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRifHU3UUUUU==
+X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
 
---Sig_/bGCc7O8++WWcF07aEOe8uzk
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-Hi all,
+Updates:
 
-On Wed, 14 May 2025 15:23:18 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> After merging the tip tree, today's linux-next build (x86_64 allmodconfig)
-> failed like this:
->=20
-> In file included from drivers/net/ethernet/amd/xgbe/xgbe-dev.c:18:
-> drivers/net/ethernet/amd/xgbe/xgbe-smn.h:15:10: fatal error: asm/amd_nb.h=
-: No such file or directory
->    15 | #include <asm/amd_nb.h>
->       |          ^~~~~~~~~~~~~~
->=20
-> Caused by commit
->=20
->   bcbb65559532 ("x86/platform/amd: Move the <asm/amd_nb.h> header to <asm=
-/amd/nb.h>")
->=20
-> interacting with commit
->=20
->   e49479f30ef9 ("amd-xgbe: add support for new XPCS routines")
->=20
-> from the net-next tree.
->=20
-> I have applied the following merge resolution for today.
->=20
-> From: Stephen Rothwell <sfr@canb.auug.org.au>
-> Date: Wed, 14 May 2025 14:49:31 +1000
-> Subject: [PATCH] fix up for "x86/platform/amd: Move the <asm/amd_nb.h> he=
-ader
->  to <asm/amd/nb.h>"
->=20
-> interacting with "amd-xgbe: add support for new XPCS routines" from the
-> net-next tree.
->=20
-> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> ---
->  drivers/net/ethernet/amd/xgbe/xgbe-smn.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-smn.h b/drivers/net/ether=
-net/amd/xgbe/xgbe-smn.h
-> index 3fd03d39c18a..c6ae127ced03 100644
-> --- a/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-> @@ -12,7 +12,7 @@
-> =20
->  #ifdef CONFIG_AMD_NB
-> =20
-> -#include <asm/amd_nb.h>
-> +#include <asm/amd/nb.h>
-> =20
->  #else
-> =20
-> --=20
-> 2.47.2
+  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
+  v1 -> v2:
+    1. Remove the code related to PHY LED configuration from the MAC driver.
+    2. Use phylib instead of the GPIO API in the driver to implement the PHY reset function.
+    3. Align with the latest stmmac API, use the API provided by stmmac helper to refactor the driver,
+       and replace or remove duplicate code.
+    4. Adjust the code format and driver interfaces, such as replacing kzalloc with devm_kzalloc, etc.
 
-This is now a semantic conflict between the net-next tree and Linus' tree.
+  ethernet: eswin: Add eic7700 ethernet driver
+  v1 -> v2:
+    1. Significant errors have been corrected in the email reply for version v1.
+    2. Add snps,dwmac.
+    3. Chang the names of reset-names and phy-mode.
+    4. Add descriptions of eswin, hsp_sp_csr, eswin, syscrg.csr, eswin, dly_hsp.reg.
 
---=20
-Cheers,
-Stephen Rothwell
+  Regarding the question about delay parameters in the previous email reply, the explanation is as follows:
+    Dly_hsp_reg: Configure the delay compensation register between MAC/PHY;
+    Dly_param_ *: The value written to the dly_hsp_reg register at a rate of 1000/100/10, which varies due 
+                  to the routing of the board;
 
---Sig_/bGCc7O8++WWcF07aEOe8uzk
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+  In addition, your bot found errors running 'make dt_binding_check' on our patch about yamllint warnings/errors,
+  it looks like the validation failure is because missing eswin entry in vendor-prefixes.yaml. 
+  When we run "make dt_binding_check", we get the same error. We have already added 'eswin' in the vendor-prefixes.yaml 
+  file before, and the code has mentioned the community, but you have not yet integrated it.
 
------BEGIN PGP SIGNATURE-----
+Shangjuan Wei (2):
+  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
+  ethernet: eswin: Add eic7700 ethernet driver
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg2iWAACgkQAVBC80lX
-0Gx/Zgf9FNsF1UPfHTNvhtq4lZLTEkn1aO5FqB//Yy+JlUIgPdDrrdLk7VUZj4IV
-pHt0SdsCqlTJkzcexZIZUAZzg2Fqnd4Xmfdv9QeQBkIL0bvPFTpmWBW3SwPYXIGo
-nYvzr0jFbAUWH+aNZgMgr7trijSxUF/7EsYJZSfxo0iNjdvfG8hsh/pSePKP3ZeL
-YSHe0DGfezMPs6q2CboyXU+Oov8Y4kD6hl3T2yc2aRXibR0je3cXN0zP+kG9Cbm/
-haB4aAewmRHBGVlTCrNwfnXWwy3MsgfSER0DYxrlEq9WClrcz1QeME/5HCU9KSTY
-7NdF4+Fe2vjbalE1rnwTZPCAV5ROpA==
-=piY2
------END PGP SIGNATURE-----
+ .../bindings/net/eswin,eic7700-eth.yaml       | 200 +++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 410 ++++++++++++++++++
+ 4 files changed, 622 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
 
---Sig_/bGCc7O8++WWcF07aEOe8uzk--
+-- 
+2.17.1
+
 
