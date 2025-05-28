@@ -1,197 +1,177 @@
-Return-Path: <netdev+bounces-193859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE3BAC6117
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:15:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C3FAC611B
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E939317ED46
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:15:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78F2C1BC28B3
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A161FBEA8;
-	Wed, 28 May 2025 05:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5371DF26E;
+	Wed, 28 May 2025 05:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="MCzifsri"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2949BF9E8;
-	Wed, 28 May 2025 05:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E47382
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 05:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748409306; cv=none; b=jlQfXMsLckKzLBkAw/LA7kXKfOEqxVd1y90OwHmYH1bhlUEETFL1Gy/2Zh/GjQSSyqkEljoJb3g1iDi+tri2MGi3pmt9M1M+uNWfmCdMQ3W5UsFQ4rHrAHCYJFLSOph9Tew3YVCRb1ykR91QHgXwN5cAB0boXprRca6yp8Aqt9E=
+	t=1748409347; cv=none; b=I0wY8G8F9IenoH1rq6EACPi0zj6n1d1DCgvQfuyt0iL99EmBV0OBwvsPNtAgb5hBHnh21x57Cg60VOrAz4Ux00RiSsD1boDH51RoA4e553Z+DEoMk5oRIgsM2sPm9fCSjyWL38Iz3Bf9rnuSZ2umZyWFtMlM/1W4VieifTl6TTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748409306; c=relaxed/simple;
-	bh=qg77Jn1t4n4pNDkgYzcnrL0En4dAcJZgYyt5l8GZ3uE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YrMcHUE/o1DfIjsZOn2XpUhxuxHSTo2pKiNKU1ARar0aEDUTaAg6M/PPgTZsSfEL8nJ0d3YWnQ8IRoWonfAxLFaGKMaPASDhKs6Z3DTbSXPkeW44VG3fn3USzwHON/KKQT93CPsONOw/S3R7pxUAqLf6U6CVkdy9NJPprx3F1pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-b5-68369bd1e143
-Date: Wed, 28 May 2025 14:14:52 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, tariqt@nvidia.com, edumazet@google.com,
-	pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
-	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
- page->pp_magic in page_pool_page_is_pp()
-Message-ID: <20250528051452.GB59539@system.software.com>
-References: <20250523032609.16334-1-byungchul@sk.com>
- <20250523032609.16334-13-byungchul@sk.com>
- <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
- <20250526022307.GA27145@system.software.com>
- <20250526023624.GB27145@system.software.com>
- <87o6vfahoh.fsf@toke.dk>
- <20250526094305.GA29080@system.software.com>
- <87ldqjae92.fsf@toke.dk>
+	s=arc-20240116; t=1748409347; c=relaxed/simple;
+	bh=n8F9SNznn8uKcP4Hfgc77XgkszbpA9NZQ7cQSBT0ZR0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hXxSAvA9ovC8+KCbs1w4/LydHvbIE6X++ZoH45RUb5mAZrY6U7KSJxwLBBa0QvO6bIbgYrILXM7TXSPV9WzcGcSiyAz+fz1gjIGVHj4GGQxxKf+dppffTsUAJn+IkOIcNdDlnFBwhH2HQCQmLFNmQqiNf0iWJ0JhvRwvJXxWIFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=MCzifsri; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54S4wmRP002425;
+	Tue, 27 May 2025 22:15:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=FyAEp/NmtX1W3qq+z6Szv7Il1goIly8Avi4ckAThKqM=; b=MCz
+	ifsriy4yUUBLvwvzdwMzYLIZJ26muKn1vrhCjpXhYy/S4AFcexbG4n3lOvo+ulZI
+	Yc5QHIohxLU96LAPIBa8W9ynlpxtGHq+IhBL8QoY111MIyBea6BLCpd0nYVxA4Dl
+	hE9r0YN8mb6SjjDkt7tZ6MyGPm+puhGz3SgLENkWhTfHatbGuYciuj75AYl0Z3lk
+	dlniHrkbt+v1IaYyoOpkjfTKN5M152xn1qPWn5fksdQHVbt0OQGQuHYd9CAG7iSK
+	0xMfPsJftGHs8vs5vPmPxZ2qgzaaJkf6JXH/jNCi2V3gOY98dT3+XukDtEh7PUy0
+	XL8guh9SCE3AhZJ85Hg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46wux8g0y7-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 May 2025 22:15:36 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 27 May 2025 22:15:34 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 27 May 2025 22:15:34 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id AA09F3F704B;
+	Tue, 27 May 2025 22:15:29 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <saikrishnag@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <bbhushan2@marvell.com>, <jerinj@marvell.com>
+CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [net PATCH] octeontx2: Annotate mmio regions as __iomem
+Date: Wed, 28 May 2025 10:45:27 +0530
+Message-ID: <1748409327-25648-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87ldqjae92.fsf@toke.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRzGec85e3ccjU7L6k3p4iIKya5a/w9djL68EN3IoMuHGnlwq6k1
-	0zRIZgrhULMb1Zwxu82WsZqlM0zWMtMMUlObVk7ULGgaaY2ZUnmUyG8Pv//D8zwf/jyrKpGF
-	8bqkE6IhSaNXYwWnGJh2I6q5aK12pd27DiyOMgz3gulg63bJwGKvQPBj5L0chmtfYrhZEmDB
-	8iaHg5+OXyx8quuRg+9OPwfVZytZ6DlXjyE/Z5SFM65SBpoqCmRw6ddtFiqN3XJ4+8SCoavs
-	jwz6PfkcNJjvcuAriIU662wINPoR1DoqGQjkFWO42GLF0JvjQ9DyvIeDoqwCBI4arwxGgxYc
-	G0Ef3e1gaJX5o5xanam0vDSSmrwtLHXaczF1Dl2Q0w/t1ZjWXx3laJVrmKH52YOYfv/UydFv
-	NW2YOh61cfS1tVZOh53zdwr7FevjRb0uTTSs2HhIoe1sGOCOlUWkd1nfYyPqn2tCITwRokmN
-	rQObED+hs9rjJMwJi8mVagsjaSwsIV7vCCtZQoXNpDGYYEIKnhWGZcQ+lM9KnpnCEZLX+RlL
-	WikA6S10YsmkEvwMafTXyScPM0jDtT5O0ux46Nj1lolQVggntt/8JF5Ash8XTeCQ8Q3N7l0S
-	niUsIu6Kl4wUSQQXTwLPupnJ+XPJs1IvV4hmmKc0mKc0mP83mKc0WBFnRypdUlqiRqePXq7N
-	SNKlLz+cnOhE449z5/TYARcaatrtQQKP1NOU9EGMViXTpKVkJHoQ4Vl1qPLMprValTJek3FK
-	NCQfNKTqxRQPCuc59Rzl6sDJeJWQoDkhHhXFY6Lh35XhQ8KMyPal/Hzcsr1x8vqR3K0x8yMv
-	39vru22pZN58jFp4LtN4oC87199qVMX63b1X6J5r75buO+7e4Uu+PnC/0NXU4Ajed7+IKtkW
-	n8Dnedd81Ze7S9r3tRXneX6+6szmZ221mTIfb6trHZreFx5R2GExbyg+v2XLdsPr+uDg03kP
-	byVsH1NzKVrNqkjWkKL5C6HTqFw0AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTYRjG+c7l23G5OC2rU0aXRSRCWpHyllZWhB8RkRgUFeQpD245p21l
-	WgnzEpE4u4I5ZyxETRMW07whEkvMZZQuMlNzprkK7Ool08icEvnfw/P8+PH+8XK0Motdxml0
-	ZyS9TtSqsJyR7w/LXN9eEKreMJqxFiy2Cgz3x1OgtK+WBUt5NYKRX90yGG56gqHo7hgNlhdZ
-	DIzaJmgYbO6XgbvEw0DD5Roa+q+2YDBlTdKQUXuPgseFThbaqnNZuDVRTEONsU8GL+stGHor
-	pljwOEwMOM1lDLhzI6DZuhjGWocQNNlqKBjLKcRw02XFMJDlRuB63M9AQXouAltjJwuT4xYc
-	oSJVZW8oUmd+KyNW+1lSeS+QZHe6aGIvv4KJ/ccNGenpaMCk5fYkQ+pqhyliyvyCyffBLoZ8
-	bXyFSdHHbxSxVb1iyDNrk+zAgiPy8FhJq0mW9MHbY+TqLudnJqlidUqvtRsbkWdpNuI4gd8s
-	pHcczEY+HMOvFfIaLJQ3Y36d0Nn5i/YifvxOoXU8LhvJOZofZoXyHybayyzkTwk5XR+wNyt4
-	EAau2bEXUvJDlNA61CybHRYIzvz3jDfT09Lfd1wzUpr3F0r/cLP1SiHzYcFM7TN9Q/ujKG+9
-	iF8jPKp+Ql1D881zROY5IvN/kXmOyIqYcuSn0SUniBptSJAhXp2q06QEnUxMsKPp3yhJ+329
-	Fo28jHQgnkMqXwV5EKJWsmKyITXBgQSOVvkpMnaEqpWKWDH1vKRPPK4/q5UMDuTPMaolir2H
-	pBglHyeekeIlKUnS/1spzmeZEe0pmZePRup357aJRcujexz7KrUBNe6n7Ie6SV37rhNRiREt
-	DbFTdFiEafB1y3L8fs+mpAvBvc/d5475BrlCD+c8095dsWihylOsxHmN3+quhpxeJV40fnL+
-	jNblh1OXjnJXfgaGWhJCPgaggsh35yq3TG1FaaNlbfrr23x9DxnvqBiDWtwYSOsN4l8K1Aqb
-	FwMAAA==
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDA0NSBTYWx0ZWRfX+zwW2COrFXIG 7g7IuYYSgE/YieJoCPWtHc7obbqKtKIRb5iUnjL6y+ok0xllqkxLPZIuxOdfAr9jYMigFLq2Mto YOledgfDco1+059IFK+YNQF0m2Gx5oJnmY16pGjopqvb5Sdt4BpJubTrTEmtu+qANBYKVbUj4k6
+ /cVgul6g/H1utz53SjZJr2M2n8drKNyGYiWxILGasNWCpZZbKYgal9hLMgxIFmTY31a3GV/BedC D5r66AoSRAEW5djHuF+JpaKfrUbpX9GSrsFFmbBxn9QpHs/nE4VIVV4BMFyVRwSO6K6rUeNgalO azbPXGK1tbfuFrsxrQBKOp+vxuShWg/FUSB58moErAt5u2b7lbZri2CKB2rbn7qmyBQZrVsIQ2P
+ ap8QVVbBrI3ugE7sZejdGyu19vh9uYbrmT9+ZbU9oZeNLHE1TnNnA+6ejKicq4y0WXs7pk6/
+X-Authority-Analysis: v=2.4 cv=CcII5Krl c=1 sm=1 tr=0 ts=68369bf8 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=pCkVVIg8AwnW8QNEWxUA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: DHskEMQBAkCeNFwzLp5_sr2fmclrZ3gH
+X-Proofpoint-GUID: DHskEMQBAkCeNFwzLp5_sr2fmclrZ3gH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-28_02,2025-05-27_01,2025-03-28_01
 
-On Mon, May 26, 2025 at 11:54:33AM +0200, Toke Høiland-Jørgensen wrote:
-> Byungchul Park <byungchul@sk.com> writes:
-> 
-> > On Mon, May 26, 2025 at 10:40:30AM +0200, Toke Høiland-Jørgensen wrote:
-> >> Byungchul Park <byungchul@sk.com> writes:
-> >> 
-> >> > On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
-> >> >> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
-> >> >> > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
-> >> >> > >
-> >> >> > > To simplify struct page, the effort to seperate its own descriptor from
-> >> >> > > struct page is required and the work for page pool is on going.
-> >> >> > >
-> >> >> > > To achieve that, all the code should avoid accessing page pool members
-> >> >> > > of struct page directly, but use safe APIs for the purpose.
-> >> >> > >
-> >> >> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
-> >> >> > > page_pool_page_is_pp().
-> >> >> > >
-> >> >> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> >> >> > > ---
-> >> >> > >  include/linux/mm.h   | 5 +----
-> >> >> > >  net/core/page_pool.c | 5 +++++
-> >> >> > >  2 files changed, 6 insertions(+), 4 deletions(-)
-> >> >> > >
-> >> >> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> >> >> > > index 8dc012e84033..3f7c80fb73ce 100644
-> >> >> > > --- a/include/linux/mm.h
-> >> >> > > +++ b/include/linux/mm.h
-> >> >> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> >> >> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> >> >> > >
-> >> >> > >  #ifdef CONFIG_PAGE_POOL
-> >> >> > > -static inline bool page_pool_page_is_pp(struct page *page)
-> >> >> > > -{
-> >> >> > > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> >> >> > > -}
-> >> >> > 
-> >> >> > I vote for keeping this function as-is (do not convert it to netmem),
-> >> >> > and instead modify it to access page->netmem_desc->pp_magic.
-> >> >> 
-> >> >> Once the page pool fields are removed from struct page, struct page will
-> >> >> have neither struct netmem_desc nor the fields..
-> >> >> 
-> >> >> So it's unevitable to cast it to netmem_desc in order to refer to
-> >> >> pp_magic.  Again, pp_magic is no longer associated to struct page.
-> >> >
-> >> > Options that come across my mind are:
-> >> >
-> >> >    1. use lru field of struct page instead, with appropriate comment but
-> >> >       looks so ugly.
-> >> >    2. instead of a full word for the magic, use a bit of flags or use
-> >> >       the private field for that purpose.
-> >> >    3. do not check magic number for page pool.
-> >> >    4. more?
-> >> 
-> >> I'm not sure I understand Mina's concern about CPU cycles from casting.
-> >> The casting is a compile-time thing, which shouldn't affect run-time
-> >
-> > I didn't mention it but yes.
-> >
-> >> performance as long as the check is kept as an inline function. So it's
-> >> "just" a matter of exposing struct netmem_desc to mm.h so it can use it
-> >
-> > Then.. we should expose net_iov as well, but I'm afraid it looks weird.
-> > Do you think it's okay?
-> 
-> Well, it'll be ugly, I grant you that :)
-> 
-> Hmm, so another idea could be to add the pp_magic field to the inner
-> union that the lru field is in, and keep the page_pool_page_is_pp()
-> as-is. Then add an assert for offsetof(struct page, pp_magic) ==
-> offsetof(netmem_desc, pp_magic) on the netmem side, which can be removed
-> once the two structs no longer shadow each other?
-> 
-> That way you can still get rid of the embedded page_pool struct in
-> struct page, and the pp_magic field will just be a transition thing
-> until things are completely separated...
+This patch removes unnecessary typecasts by marking the
+mbox_regions array as __iomem since it is used to store
+pointers to memory-mapped I/O (MMIO) regions. Also simplified
+the call to readq() in PF driver by removing redundant type casts.
 
-Or what about to do that as mm folks did in page_is_pfmemalloc()?
+Fixes: 98c561116360 ("octeontx2-af: cn10k: Add mbox support for CN10K platform")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c      | 12 ++++++------
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c |  3 +--
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-static inline bool page_pool_page_is_pp(struct page *page)
-{
-	/*
-	 * XXX: The space of page->lru.next is used as pp_magic in
-	 * struct netmem_desc overlaying on struct page temporarily.
-	 * This API will be unneeded shortly.  Let's use the ugly but
-	 * temporal way to access pp_magic until struct netmem_desc has
-	 * its own instance.
-	 */
-        return (((unsigned long)page->lru.next) & PP_MAGIC_MASK) == PP_SIGNATURE;
-}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 6575c42..5e0cc3a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -2359,7 +2359,7 @@ static inline void rvu_afvf_mbox_up_handler(struct work_struct *work)
+ 	__rvu_mbox_up_handler(mwork, TYPE_AFVF);
+ }
+ 
+-static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
++static int rvu_get_mbox_regions(struct rvu *rvu, void __iomem **mbox_addr,
+ 				int num, int type, unsigned long *pf_bmap)
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+@@ -2384,7 +2384,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 				bar4 = rvupf_read64(rvu, RVU_PF_VF_BAR4_ADDR);
+ 				bar4 += region * MBOX_SIZE;
+ 			}
+-			mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++			mbox_addr[region] = ioremap_wc(bar4, MBOX_SIZE);
+ 			if (!mbox_addr[region])
+ 				goto error;
+ 		}
+@@ -2407,7 +2407,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 					  RVU_AF_PF_BAR4_ADDR);
+ 			bar4 += region * MBOX_SIZE;
+ 		}
+-		mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++		mbox_addr[region] = ioremap_wc(bar4, MBOX_SIZE);
+ 		if (!mbox_addr[region])
+ 			goto error;
+ 	}
+@@ -2415,7 +2415,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 
+ error:
+ 	while (region--)
+-		iounmap((void __iomem *)mbox_addr[region]);
++		iounmap(mbox_addr[region]);
+ 	return -ENOMEM;
+ }
+ 
+@@ -2425,10 +2425,10 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
+ 			 void (mbox_up_handler)(struct work_struct *))
+ {
+ 	int err = -EINVAL, i, dir, dir_up;
++	void __iomem **mbox_regions;
+ 	void __iomem *reg_base;
+ 	struct rvu_work *mwork;
+ 	unsigned long *pf_bmap;
+-	void **mbox_regions;
+ 	const char *name;
+ 	u64 cfg;
+ 
+@@ -2451,7 +2451,7 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
+ 
+ 	mutex_init(&rvu->mbox_lock);
+ 
+-	mbox_regions = kcalloc(num, sizeof(void *), GFP_KERNEL);
++	mbox_regions = kcalloc(num, sizeof(void __iomem *), GFP_KERNEL);
+ 	if (!mbox_regions) {
+ 		err = -ENOMEM;
+ 		goto free_bitmap;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index b303a03..cd818d2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -596,8 +596,7 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
+ 		base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
+ 		       MBOX_SIZE;
+ 	else
+-		base = readq((void __iomem *)((u64)pf->reg_base +
+-					      RVU_PF_VF_BAR4_ADDR));
++		base = readq(pf->reg_base + RVU_PF_VF_BAR4_ADDR);
+ 
+ 	hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
+ 	if (!hwbase) {
+-- 
+2.7.4
 
-	Byungchul
-> 
-> -Toke
 
