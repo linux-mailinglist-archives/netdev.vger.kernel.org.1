@@ -1,154 +1,167 @@
-Return-Path: <netdev+bounces-193864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D12AC614C
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:41:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3264AC6156
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA0B11BA3737
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:41:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AFC81BC284B
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964CF202C49;
-	Wed, 28 May 2025 05:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60432063E7;
+	Wed, 28 May 2025 05:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="OKpEdFge"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42641C84B2;
-	Wed, 28 May 2025 05:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652D120296A;
+	Wed, 28 May 2025 05:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748410875; cv=none; b=MO3bqGj47vqCOsWZTidK0LZ1dJWWtwOQ60vwzU7wVYYgKaZ+oKsXJtoD09OChj80c9CnuOUqtcexcirFk8H7GZlHjw9nnRFQK5SZlnQkq6k9Eeb2+92vRI8GEBEJV/dMvSri+jUmJuVQhxPO9xOSRADZgpKnsAUDSXsu7luBp+0=
+	t=1748411037; cv=none; b=FIQxD60nx8L+4fZDJ5nCcA+kjVHgng25tOwssPrcSL+L984b+iH6GSWECbjUqdyzkgkp9As+bel8VUMqBuVEed52ETBGmdeeaiJaYaTKBfPxOnpIu/ngQp6kaG9o5lChuwO+kEqAFJ1B77QUqdvd9h3DMSO+R5VV4Ao7QWDb8OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748410875; c=relaxed/simple;
-	bh=wN8sYZl/mz8uDPrAXCUTTNFLSJM4kxH7HqZEgJtHnQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=izi5OEGQyKabOK+o4fKc5eTAWIFrNlaDfbL3hq8BYganxCmLVWOaFYSEjRx7rG9+B3MWjPyNwpzS+fvT8VrTZQMDXTSTvuw9YGPXd3sDtUbXXyd9/0fpdy2mksOBwSQT/BzEScG9n1f3HUBL/mHNo8ddoUU8lNqJzJ9EEo/Mfqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-bb-6836a1f3d4ed
-Date: Wed, 28 May 2025 14:41:00 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH v2 02/16] netmem: introduce netmem alloc APIs to wrap
- page alloc APIs
-Message-ID: <20250528054100.GB9346@system.software.com>
-References: <20250528022911.73453-1-byungchul@sk.com>
- <20250528022911.73453-3-byungchul@sk.com>
- <CAHS8izOkr96_i1B8o_AWQGgfWSWZVVjHhOShReLZozsxZB6WdQ@mail.gmail.com>
+	s=arc-20240116; t=1748411037; c=relaxed/simple;
+	bh=BjhYdU8zIsDfSu5tKkeASlKHUT4Q53Q1G1X0YfnzDh4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B121WhTJr0KYNrlGUAJqtf/DbI3MDHFXtUgntQbwbExAGbVfAzKN1/X2deZ6wjsQ2TFbkcPEAuMdICKcTc6R5knoYz5YwmNrgx2/NKUdzap8nfP+RgNjjqSegK7jQpX7c7abLRtowT1DcK9CVXcfedf7zNW4etCXV3VX7sWAplc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=OKpEdFge; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: bba0d6aa3b8611f0813e4fe1310efc19-20250528
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=qDqcO+1lT1CdVZbL9zzydevEmoh/kdOll60G7116BHU=;
+	b=OKpEdFger6mJk8dF4y/beTkkfUsGwlANtMvuk2DQqxKY8DXonmpBhLrGoTmNnJZu3SmnVstFNx5HpSOwkcbqAjoetwUdID8HlzNPLNOlVttp+BU0SBuZMYxv43PKnLXbRCBq4+B3gVbg9cSUGRUeg9Mzz0MzZHxKz+EVzrbMFzU=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:2052d81e-d4d7-4f7b-a52d-50c428ed460b,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:86be3159-eac4-4b21-88a4-d582445d304a,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: bba0d6aa3b8611f0813e4fe1310efc19-20250528
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 744441040; Wed, 28 May 2025 13:43:50 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Wed, 28 May 2025 13:43:49 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Wed, 28 May 2025 13:43:48 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
+	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<shiming.cheng@mediatek.com>, <lena.wang@mediatek.com>
+Subject: [PATCH net v4] net: fix udp gso skb_segment after pull from frag_list
+Date: Wed, 28 May 2025 13:46:28 +0800
+Message-ID: <20250528054715.32063-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izOkr96_i1B8o_AWQGgfWSWZVVjHhOShReLZozsxZB6WdQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe3fec3YcDo4r603JaBVSlFZYPkWU9CFfuoBd6EPSZbRDW+mS
-	maZ2YakhWpp2o9a0aTfTbLZsrpJRZl4qTDRjXa2VGmSlLsUblXNEfvvx3H7/Dw/PKIrYAF6r
-	2y/qdaoYJSfDsu++hfPdhUs0Cwa7/cFkuclB6UASXP9oZ8FUYkPwa/CtFNw1dRxcLuxnwPQi
-	HUOfZYiB9lqXFNqudWCoyqhkwHWynoPs9GEGUu3FEmiy5bBwZugqA5WGj1JouW/i4MPNPyx0
-	VGdjaDDewNCWEwG15snQ/6wLQY2lUgL9J/I5ON1s5uBzehuC5scuDBeP5iCwOJwsDA+YuIgZ
-	tOLGawm9Z3wvpWZrAr1TPJdmOZsZai3J5Ki195SUvntVxdH688OY3rO7JTQ77QdHe9rfYPrT
-	0cpRS0Urps/NNVLqtgZFCVtly9VijDZR1Ieu2CnTVHSZUNw5vyTHuc0GlC/PQj48EcKIu9HO
-	/OOMTofEw1iYTV4OH8ce5oRg4nQOjs1MEuaQK4481sOM0MaSRtMeD08Uosmxb6Vj83IhnNzN
-	7eaykIxXCMWIOA0vJd6GH2m48AV7l4PJSEHz6FF+lAPJ9d+8tzydpN29OObyETYQwwNvNn9h
-	Jnloq5N4bhLBzpMLmSVSb+ip5FGxE+ciP+M4hXGcwvhfYRynMCNcghRaXWKsShsTFqJJ1mmT
-	Qnbti7Wi0c+5dngk2o56mzZVI4FHSl85LV+sUbCqxPjk2GpEeEY5SZ66colGIVerklNE/b4d
-	+oQYMb4aBfJYOUW+qP+AWiHsVu0X94pinKj/15XwPgEGlLA7v9FGLlXeGjh0RNM+ryM0xbl5
-	4cEo2ZazloJZm1KiPq17Hvy7aPvnh4bwrV0tE62rtBPa16qjy5+Erk1IU8f+CFo6OVwmKrSB
-	6G3u+U5/TVMq9t3WFVlU0JO3pjYzz16vjrzfs7iMnaY73JpRGmaLWL2+deTr02Vxqze2uMpu
-	9ylxvEa1cC6jj1f9BdCSIPI1AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHe97Ls9fR4nVZvWURLUoSNKO0I0VJH+oh6AaVlB9q6VubTq2t
-	hnahlYZkza6IrSkbVpoKS1s6S0ZMMS1JmxrrOrNSu1CWF9TZxSmR336c///8zpfD0fIz7BxO
-	nXJY1KYoNQosZaSbV2WE9VmjVBH2HgxmWxmG0qE0KOpwsGAuqUTQP/xKAn11jzAUWgdpMDdn
-	MjBgG6HhY32nBLy3uhioyaqiofNCAwZjpo+G045iCmrzG1loqcxh4erITRqqDB0SaL1vxvC2
-	7A8LXS4jA42m2wx4c2Kg3jITBp98RVBnq6Jg8Hw+hituC4b3mV4E7tpOBq6fykFgc3pY8A2Z
-	cYyC2G+/oEi16Y2EWCqOkLvFoSTb46ZJRclZTCp+XpaQ189rMGnI8zGk2tFHEWPGN0x+fHzJ
-	kO/OdkwKe3opYrO3M6TJUifZGrhbujpB1Kj1onbpmr1Slf2rGR3MDUxz5m43oHxZNgrgBH6F
-	kNXtpPzM8IuENt85xs+YDxE8nmHaz0H8EuGG8xLrZ5r3ssJTc6Kfp/NxwpkvpeN9Gb9SuHex
-	F2cjKSfni5HgMbRRE0Gg0HjtAzOxHCKMFrjHpNwYBwtFv7mJ8Xwh49718VsB/DbB8MAxzjP4
-	hcLDykfURTTNNMlkmmQy/TeZJpksiClBQeoUfbJSrYkM1yWp0lPUaeHxqckVaOw5bp0YveRA
-	/a0bXIjnkGKqjNyJVMlZpV6XnuxCAkcrgmSn10ap5LIEZfpRUZu6R3tEI+pcKJhjFLNkG2PF
-	vXL+gPKwmCSKB0Xtv5TiAuYYEN6pbY7O+60Peay24uAtzXnPD/xq8U2Pal9YfihhwTrrwLv3
-	DUM5YTfvZG0ILvgT/fjYSOywcf/SUztSazYldu8wjS5IzTRGSDSfenZN2Rwv2bczd1vTwPdw
-	e2HY8bKB5vIt63lpnPtkYn3pPN+12YuD5hU/C9VY53421EbLXK7lMfsUjE6lXBZKa3XKvxHZ
-	eCsYAwAA
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-MTK: N
 
-On Tue, May 27, 2025 at 08:11:58PM -0700, Mina Almasry wrote:
-> On Tue, May 27, 2025 at 7:29 PM Byungchul Park <byungchul@sk.com> wrote:
-> >
-> > To eliminate the use of struct page in page pool, the page pool code
-> > should use netmem descriptor and APIs instead.
-> >
-> > As part of the work, introduce netmem alloc APIs allowing the code to
-> > use them rather than the existing APIs for struct page.
-> >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > ---
-> >  include/net/netmem.h | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> >
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index a721f9e060a2..37d0e0e002c2 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -177,6 +177,19 @@ static inline netmem_ref page_to_netmem(struct page *page)
-> >         return (__force netmem_ref)page;
-> >  }
-> >
-> > +static inline netmem_ref alloc_netmems_node(int nid, gfp_t gfp_mask,
-> > +               unsigned int order)
-> > +{
-> > +       return page_to_netmem(alloc_pages_node(nid, gfp_mask, order));
-> > +}
-> > +
-> > +static inline unsigned long alloc_netmems_bulk_node(gfp_t gfp, int nid,
-> > +               unsigned long nr_netmems, netmem_ref *netmem_array)
-> > +{
-> > +       return alloc_pages_bulk_node(gfp, nid, nr_netmems,
-> > +                       (struct page **)netmem_array);
-> > +}
-> > +
-> >  /**
-> >   * virt_to_netmem - convert virtual memory pointer to a netmem reference
-> >   * @data: host memory pointer to convert
-> 
-> Code looks fine to me, but I'm not sure we want to export these
-> helpers in include/net where they're available to the entire kernel
-> and net stack. Can we put these helpers in net/core/page_pool.c or at
-> least net/core/netmem_priv.h?
-> 
-> Also maybe the helpers aren't needed anyway. AFAICT there is only 1
-> call site in page_pool.c for each, so maybe we can implement this
-> inline.
+Detect invalid geometry due to pull from frag_list, and pass to
+regular skb_segment. If only part of the fraglist payload is pulled
+into head_skb, it will always cause exception when splitting
+skbs by skb_segment. For detailed call stack information, see below.
 
-Ah.  I recalled the reason why I added these APIs this way, that is, to
-make the allocation method easier to be altered in the future.  I will
-move it to net/core/netmem_priv.h but keep it in the header anyway.
+Valid SKB_GSO_FRAGLIST skbs
+- consist of two or more segments
+- the head_skb holds the protocol headers plus first gso_size
+- one or more frag_list skbs hold exactly one segment
+- all but the last must be gso_size
 
-	Byungchul
-> 
-> -- 
-> Thanks,
-> Mina
+Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+modify fraglist skbs, breaking these invariants.
+
+In extreme cases they pull one part of data into skb linear. For UDP,
+this  causes three payloads with lengths of (11,11,10) bytes were
+pulled tail to become (12,10,10) bytes.
+
+The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
+payload was pulled into head_skb, it needs to be linearized before pass
+to regular skb_segment.
+
+    skb_segment+0xcd0/0xd14
+    __udp_gso_segment+0x334/0x5f4
+    udp4_ufo_fragment+0x118/0x15c
+    inet_gso_segment+0x164/0x338
+    skb_mac_gso_segment+0xc4/0x13c
+    __skb_gso_segment+0xc4/0x124
+    validate_xmit_skb+0x9c/0x2c0
+    validate_xmit_skb_list+0x4c/0x80
+    sch_direct_xmit+0x70/0x404
+    __dev_queue_xmit+0x64c/0xe5c
+    neigh_resolve_output+0x178/0x1c4
+    ip_finish_output2+0x37c/0x47c
+    __ip_finish_output+0x194/0x240
+    ip_finish_output+0x20/0xf4
+    ip_output+0x100/0x1a0
+    NF_HOOK+0xc4/0x16c
+    ip_forward+0x314/0x32c
+    ip_rcv+0x90/0x118
+    __netif_receive_skb+0x74/0x124
+    process_backlog+0xe8/0x1a4
+    __napi_poll+0x5c/0x1f8
+    net_rx_action+0x154/0x314
+    handle_softirqs+0x154/0x4b8
+
+    [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
+    [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+    [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
+    [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
+    [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
+    [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
+    [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
+    [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
+
+Fixes: a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after pull from frag_list")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+---
+ net/ipv4/udp_offload.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index a5be6e4ed326..59ddb85c858c 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -273,6 +273,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	bool copy_dtor;
+ 	__sum16 check;
+ 	__be16 newlen;
++	int ret = 0;
+ 
+ 	mss = skb_shinfo(gso_skb)->gso_size;
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+@@ -301,6 +302,10 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+ 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+ 
++		ret = __skb_linearize(gso_skb);
++		if (ret)
++			return ERR_PTR(ret);
++
+ 		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+ 		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+ 		gso_skb->csum_offset = offsetof(struct udphdr, check);
+-- 
+2.45.2
+
 
