@@ -1,129 +1,102 @@
-Return-Path: <netdev+bounces-194012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B86BAC6CE4
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:35:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F5EAC6D14
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFBF94E32E4
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:35:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EA27A25502
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705FF28C2C8;
-	Wed, 28 May 2025 15:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA0428C5A9;
+	Wed, 28 May 2025 15:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVPnqshC"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="dE2NzvrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward200a.mail.yandex.net (forward200a.mail.yandex.net [178.154.239.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251212750E8;
-	Wed, 28 May 2025 15:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2C428C2C6
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 15:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748446506; cv=none; b=HGyuyk4sxvMcSIledlf903uwqXotRZ3eLj7cNyIT1nWHPAlcjcQhgx0Rjus7VEic/Nl2PruKBE08X6u1uamcEIX7kDX/i4W6WuCr1MqTpI/BRRtmaf4OOih5tMhw0yeosR8omN9WwvOlT0GfcP/DFbF3HpzOWu+mIlVypCfJ20A=
+	t=1748446961; cv=none; b=CwehtfQ0w19obQmzXgnH5uuHK8WQuqqrezjj2RYfrGe5tCh+0id1O/Z0lmmSNDb2g+qMlEO0YW3iC6+R7wnBAMs/z9yrvmVR1UXkBrhRb0FqAhCkPMFA3ep3EQqgZNIl+zpgci3ATrC343xUcTXJqLv0edOo7PJs6yuIJx6s0iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748446506; c=relaxed/simple;
-	bh=zB7eSGVJ68Jl0gMC9+d7mPya9pfNddYzQqEMb7NDisM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=bfP+XXmzZwosfYyV1htHeT21FYHH7Gu4L91xrysMa0SMI71/hWzz5AGNs03PY+24WJ+ffjMfEdFUILt5FsY6lqTkBxhy2pGs3tF7sBC4zS6q2YjkEw6/qlBFQGH9V6JuobNfGRoXbnvw8AmBJE7SB1fr0saBHYeim9Rh1NfJc9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVPnqshC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B031C4CEE3;
-	Wed, 28 May 2025 15:34:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748446506;
-	bh=zB7eSGVJ68Jl0gMC9+d7mPya9pfNddYzQqEMb7NDisM=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=kVPnqshCxEe5Da+hatugp5jpRO+YqdxnSK8hHV9/MuHaeYogJc8HUNfD+v7Y7oNnd
-	 ajTOOvKZaF0AWykZCZmwO7rAa8WJYeT6DIdhhnZOGCLAyadkSOftnheVVRR4FwmZLb
-	 wINaZlL/et1WxglyVXp6Bdc2km89Q4hZ8nTMOxo7LZNYnc6ZSms6wti8wzmuvtyWSz
-	 Ytq92scLm0QqesXBybdXA+fa1nRyGQudkluYwUXFNmEW9Vvt+RNGG7P+2+BjFDmGjt
-	 0jtso4IYLC52ByJ/P3KhBshux6a8WckGKiCjTxpDWhMHWsCdgKZeCnAhtK1FWUAVGf
-	 4ZiszX0mmUL+w==
+	s=arc-20240116; t=1748446961; c=relaxed/simple;
+	bh=0npsLd/6pFeEZup/Yh3eJaGZUNzviGnNc7rt69TQhiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=okOfj9xdf3D1SVLFvAuNcCBVQCH/SwjD+UtCL5YW7ExDdnei33m9dWwTlpAA7WactcpUJLkSH/Ghsl1J6yba3Sc+Ybi9mvg1WAqwhbefAnTp/IrVigD36ECClAB8ShDGxYLtLQU9sNacYkmrhbxdwh2qSfGk3MU6DiT/ACVV+e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=dE2NzvrH; arc=none smtp.client-ip=178.154.239.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d101])
+	by forward200a.mail.yandex.net (Yandex) with ESMTPS id D34BF67792
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 18:36:52 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:5b1c:0:640:ee42:0])
+	by forward101a.mail.yandex.net (Yandex) with ESMTPS id 7B9BA60D1C;
+	Wed, 28 May 2025 18:36:45 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id iaXN4rELj0U0-qdatur7l;
+	Wed, 28 May 2025 18:36:44 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1748446604; bh=cSKubfbGT1GLAXRbLdQih6MQJBQ/UfRuwYW3g6Ku7yQ=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=dE2NzvrH0q3xfr+bySTSCO9xXyBubsAig7E6L2WKJbtrwycl89SDpGmnIBIapAfiw
+	 7HXZXRH3RZ+6U2Iil7ocgzLwFWmLWRmmvDGdBmbjOMgmWxBbkQnsASG3mq2A4n441Q
+	 5hvrrs3Duf4L9gK+ycGstXDrJNFYv7A8rKHMTqkU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-60.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] netlink: avoid extra pskb_expand_head() in netlink_trim()
+Date: Wed, 28 May 2025 18:36:28 +0300
+Message-ID: <20250528153628.249631-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 28 May 2025 17:34:53 +0200
-Message-Id: <DA7WJYNAN5AI.2HE6B953GR16A@kernel.org>
-Subject: Re: [PATCH v10 4/5] rust: replace `kernel::c_str!` with C-Strings
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Alice Ryhl" <aliceryhl@google.com>, "Tamir Duberstein"
- <tamird@gmail.com>
-Cc: "Michal Rostecki" <vadorovsky@protonmail.com>, "Miguel Ojeda"
- <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
- <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
- Hindborg" <a.hindborg@kernel.org>, "Trevor Gross" <tmgross@umich.edu>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Danilo Krummrich"
- <dakr@kernel.org>, "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
- "Maxime Ripard" <mripard@kernel.org>, "Thomas Zimmermann"
- <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, "Luis Chamberlain"
- <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will Deacon"
- <will@kernel.org>, "Waiman Long" <longman@redhat.com>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt"
- <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, "Arnd Bergmann" <arnd@arndb.de>, "Jens
- Axboe" <axboe@kernel.dk>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, <rust-for-linux@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kunit-dev@googlegroups.com>, <dri-devel@lists.freedesktop.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <llvm@lists.linux.dev>, <linux-pci@vger.kernel.org>,
- <nouveau@lists.freedesktop.org>, <linux-block@vger.kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-4-6412a94d9d75@gmail.com>
- <DA66NJXU86M4.1HU12P6E79JLO@kernel.org>
- <CAJ-ks9nd6_iGK+ie-f+F0x4kwpyEGJ-kQiQGt-ffdbVN5S6kOg@mail.gmail.com>
- <aDbnLzPIGiAZISOq@google.com>
-In-Reply-To: <aDbnLzPIGiAZISOq@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed May 28, 2025 at 12:36 PM CEST, Alice Ryhl wrote:
-> On Mon, May 26, 2025 at 06:29:46PM -0400, Tamir Duberstein wrote:
->> On Mon, May 26, 2025 at 11:04=E2=80=AFAM Benno Lossin <lossin@kernel.org=
-> wrote:
->> >
->> > On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
->> > > +macro_rules! c_str_avoid_literals {
->> >
->> > I don't like this name, how about `concat_to_c_str` or
->> > `concat_with_nul`?
->> >
->> > This macro also is useful from macros that have a normal string litera=
-l,
->> > but can't turn it into a `c""` one.
->>=20
->> Uh, can you give an example? I'm not attached to the name.
->
-> I also think it should be renamed. Right now it sounds like it creates a
-> c string while avoiding literals in the input ... whatever that means.
+When 'netlink_trim()' processes shared skb, using 'skb_clone()' with
+following 'pskb_expand_head()' looks suboptimal, and it's expected to
+be a bit faster to do 'skb_copy_expand()' with desired tailroom instead.
 
-Yeah that's a good way to put why the name is weird.
-
-> I like Benno's suggestions, but str_to_cstr! could also work?
-
-Hmm, I think then people won't know that it can also concat? I don't
-think it matters too much, the macro probably won't be used that often
-and if someone needs to use it, they probably wouldn't fine it by name
-alone.
-
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-Cheers,
-Benno
+ net/netlink/af_netlink.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index e8972a857e51..efb360433339 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -1285,11 +1285,15 @@ static struct sk_buff *netlink_trim(struct sk_buff *skb, gfp_t allocation)
+ 		return skb;
+ 
+ 	if (skb_shared(skb)) {
+-		struct sk_buff *nskb = skb_clone(skb, allocation);
++		struct sk_buff *nskb;
++
++		nskb = skb_copy_expand(skb, skb_headroom(skb),
++				       skb_tailroom(skb) - delta,
++				       allocation);
+ 		if (!nskb)
+ 			return skb;
+ 		consume_skb(skb);
+-		skb = nskb;
++		return nskb;
+ 	}
+ 
+ 	pskb_expand_head(skb, 0, -delta,
+-- 
+2.49.0
+
 
