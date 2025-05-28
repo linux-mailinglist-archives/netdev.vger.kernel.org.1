@@ -1,63 +1,56 @@
-Return-Path: <netdev+bounces-193811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E374AC5F22
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:16:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01B53AC5F26
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B423A5EF2
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:15:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F04F7B0C92
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D6B35942;
-	Wed, 28 May 2025 02:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB56A2D052;
+	Wed, 28 May 2025 02:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qi/oVwOv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BA3TIGTW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E304F382;
-	Wed, 28 May 2025 02:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DE718EB0
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 02:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748398559; cv=none; b=BmTIdyg7NCBFKwXPvt+xnULXSW+Z5UM94VUGdx6xyw3fDNM7aWaf2uxPnJXDgAYlG7h412MhYuqhaCp+k+2sB0cDpvou2dKHK3MeteDKVGcStHgY+YF1vVooQMag5Ucl6JL341zZtGfiBAzYJctjZWdsXlYq/M6vPB+3ZPPpQU0=
+	t=1748398577; cv=none; b=QIaRvJfBb9NIxWA+f6zDYlswqbLAfl7XM5t3JeSOrfzBjnkDGVbR0CfZMTxQZR/gNB+IrcwT6X8+oLzWu7sE2EZjIuFwxYXT2l/UZRc6hwDqmrM2gDadH0beCuWxtr/UDOyfvqVhwyPXR0yLyHRiuGpM+UdUieqQhApgRRCYl8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748398559; c=relaxed/simple;
-	bh=oxYH+gkFPjL0vF9T4oxhzs3SiBbk2xtkclWFIPJ7sR4=;
+	s=arc-20240116; t=1748398577; c=relaxed/simple;
+	bh=BALfMBic2w3dWyLxkpvTFdKEzpTc82+wXIbasgQEg5k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D+qUH/mX/bivtzbsIMIxbTU6wB3efTNlpoqe0ACv82ScoNpm4AWw70BYlTp+N/fUvqFGFQvVl6ik0xDj1rSUOJ/lYLf4yfVY9dDGB/UN49vxR6fNBA24r3cvESNifaEJKFOd3Evy0nNS1MjO4tUkBXTuJ9iI5oLMDY7NJWr7Juo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qi/oVwOv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4047BC4CEED;
-	Wed, 28 May 2025 02:15:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LCROfrCKpn86p9NoGmqpa3xTtyW7HgHNnIZJujZG0y4VZTAWEYXokX+43bz5cFuaZx5ASk5koLUjWJWIW/pLMb1DrH84ibq+ayrlQZSa9Vw0dolI1LFf7mBJDmJyp3DvuXI1NrqhAD1QkgqFabXTZlAXbK9vjIxNbwbpr0lpgeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BA3TIGTW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64E1C4CEE9;
+	Wed, 28 May 2025 02:16:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748398558;
-	bh=oxYH+gkFPjL0vF9T4oxhzs3SiBbk2xtkclWFIPJ7sR4=;
+	s=k20201202; t=1748398577;
+	bh=BALfMBic2w3dWyLxkpvTFdKEzpTc82+wXIbasgQEg5k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qi/oVwOvn6DbS2f4MxjxHwwoVq/k6Yvcy8mF5c79UaAwN1MihGzjTMYgwRmHoQo8v
-	 hGsCYrnu/eSqCnp7zjk+dSHK6IkU/9OpKt97WAgag7Tu+jI7eS540pgsEh+7elWmSt
-	 DdfRmH6/9uLksw2qINyZ0rRyPiNispW69f1aghQWYFHQeBWFvkpu3T1gM3fNC2QwgE
-	 sccOVvKXk4MOx7gXol8V6R7yvE0QpwdFY3Pbp1jIvqkS1KWf2MOpUvz4Js7yOh/XQa
-	 K+Wb7itl49X2ZMxJ+jlu/jVj/LA7uTPCDnBZYErZQXylz5QCHscDCR6iJCGsLSCkbC
-	 B49RU57ac5JFQ==
-Date: Tue, 27 May 2025 19:15:56 -0700
+	b=BA3TIGTW56LnA61E7bpwVLKAw5zeCT1D7FlldW0JgJz+9Hl81jOWOs2NKhDBL8tvC
+	 TmAbt1DlPzcMCkeUusm0eFnvnhhL+hD1Fms1VRJHi8g/sTkPerSZALcplFESXR5xJD
+	 jXxu/G/WcCtkntHfr6iT26IxPtE5RSwVulxIwrZWzw7xEtqG8pw4h13FxRfkC1Fy8A
+	 d5oTIs9Z72WJd4S/PbreMmcALb1NivlVqybxeZYriot4KuKdRicpCbjXfmEeBKvLHF
+	 pTV9Ltu5VHCmpeIFhtDHJCeRpKFnCRWpv0K6MJ+kFkdbL95uBCAE41CXhe29YKokfZ
+	 zxQn/8RRXpioQ==
+Date: Tue, 27 May 2025 19:16:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: horms@kernel.org, donald.hunter@gmail.com, xandfury@gmail.com,
- netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
- jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- andrew+netdev@lunn.ch, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Subject: Re: [PATCH v17 net-next 0/5] DUALPI2 patch
-Message-ID: <20250527191556.50958768@kernel.org>
-In-Reply-To: <20250525171924.15603-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250525171924.15603-1-chia-yu.chang@nokia-bell-labs.com>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ horms@kernel.org
+Subject: Re: [PATCH net-next v9 00/15] Begin upstreaming Homa transport
+ protocol
+Message-ID: <20250527191615.57502235@kernel.org>
+In-Reply-To: <20250526042819.2526-1-ouster@cs.stanford.edu>
+References: <20250526042819.2526-1-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,18 +60,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 25 May 2025 19:19:19 +0200 chia-yu.chang@nokia-bell-labs.com
-wrote:
->   Please find the DualPI2 patch v17.
-> 
->   This patch serise adds DualPI Improved with a Square (DualPI2) with following features:
-> * Supports congestion controls that comply with the Prague requirements in RFC9331 (e.g. TCP-Prague)
-> * Coupled dual-queue that separates the L4S traffic in a low latency queue (L-queue), without harming remaining traffic that is scheduled in classic queue (C-queue) due to congestion-coupling using PI2 as defined in RFC9332
-> * Configurable overload strategies
-> * Use of sojourn time to reliably estimate queue delay
-> * Supports ECN L4S-identifier (IP.ECN==0b*1) to classify traffic into respective queues
-> 
-> For more details of DualPI2, please refer IETF RFC9332 (https://datatracker.ietf.org/doc/html/rfc9332).
+On Sun, 25 May 2025 21:28:02 -0700 John Ousterhout wrote:
+> This patch series begins the process of upstreaming the Homa transport
+> protocol. Homa is an alternative to TCP for use in datacenter
+> environments. It provides 10-100x reductions in tail latency for short
+> messages relative to TCP. Its benefits are greatest for mixed workloads
+> containing both short and long messages running under high network loads.
+> Homa is not API-compatible with TCP: it is connectionless and message-
+> oriented (but still reliable and flow-controlled). Homa's new API not
+> only contributes to its performance gains, but it also eliminates the
+> massive amount of connection state required by TCP for highly connected
+> datacenter workloads (Homa uses ~ 1 socket per application, whereas
+> TCP requires a separate socket for each peer).
 
 ## Form letter - net-next-closed
 
