@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-193784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 333E6AC5E87
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:52:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C371AC5E89
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:52:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32AA53AEC70
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:51:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0360C18874EE
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA1B1EF092;
-	Wed, 28 May 2025 00:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062D31F874C;
+	Wed, 28 May 2025 00:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ohzwb4ss"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tBmGrA0v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407741EDA1A;
-	Wed, 28 May 2025 00:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62601F5833
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 00:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748393403; cv=none; b=ADyzDNURhOHl9rLAvAizxIFzG02c5l5LrV8dXXl3kuUGcuTKzFb1C9oLPtB6Nwra5OQ7ziTxFnWCOTIMNDnNEnCEkK2sEQfPM/SRbBQJ0/Q6Ap8ccUTfcCoxBXCZP/zQZEx+hmhceK5JQi8R0c5ErbfDBRtm2MDpZIUOiKsWyac=
+	t=1748393404; cv=none; b=PmB46tW24OA52MoFBUIdQOK1mgiRA/fcab1u/gvgx8TuQBXePubrBRevpNWE0lOS755WWCYTPohPyMzyAs8/wFvEoKIu2fVLjCuue7tpDk4X/G59DVewqPZRCfOubqcXnMNkPR+wkIdidrEW9ekuVElBWB9VlFD3q5hh3RYHajs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748393403; c=relaxed/simple;
-	bh=BMCmWb2ynIXZqRnDMx69qdloJH8+yrmhOU04LrvIXjY=;
+	s=arc-20240116; t=1748393404; c=relaxed/simple;
+	bh=pq3qZTSWC3S+D4ehlP6t/LNSP/jBlyNWrw++sa4C3d0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u7mjZdzSoUHCTTqMcvhtyEYe7ilMk1XzhFGdbUz2aMpZ3VS6Y6onbRzFKS1qovByt5pugVjozGdbDQgDZLd5yN0cg9VVoHNFuwJtdGl2QbNKgTA9jmctlpNGRyDckgu/dKNojnq1Dh16OK6mGK5RyGOxRxY+L5xzDsiPzMsT/p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ohzwb4ss; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A901C4CEEF;
-	Wed, 28 May 2025 00:50:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YBwozKYOC94msR6fdBSGVtHJqqF3v2m/xRrH+XGMlcIRwa+V2VMTmd8HMgONmXfLZJ0Ho3hHNWYcv6sNAEyNgeYKLikO8/ge7QS819plXd9hR9tjEkrhBFjbriyluret6sgHydwkIxtYKGn7PWKmbzVeUC+gcia8qHh6hGBt7SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tBmGrA0v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F3C3C4CEE9;
+	Wed, 28 May 2025 00:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748393403;
-	bh=BMCmWb2ynIXZqRnDMx69qdloJH8+yrmhOU04LrvIXjY=;
+	s=k20201202; t=1748393404;
+	bh=pq3qZTSWC3S+D4ehlP6t/LNSP/jBlyNWrw++sa4C3d0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ohzwb4ssaJXThawsCmHOB7ANabKE32WukfoMPN7a/JadOevWTOic5DqTO1zvl/bm9
-	 JJv362eA3diAtkwpm2hJTuA6xXHP30tQqvksOSdbwJFz6MuI9dv2MAr6DzasEc2Rwk
-	 P/GxOZKVpSyzwncZzBkfFEGBBpTWux8cPbsG65YItUMtyY1j6sPNzkiQsvtG/N2KWj
-	 T1+Sq/quFdek4HoVuXzAMqdIbbwa9axiF3qurn9lZP35mg/q8I0afoj7K6032imGdN
-	 vbQ7ytNllhZ/8AOjzagaDbpPE+cB2TKLstzXX4906qqh92qBmcVofERy4nSySVXNcy
-	 mVfVtTmJuZs1A==
+	b=tBmGrA0vfFydc/Rk1/eU7eu3G9BzqJ2evaezlmL0cQm18X1HJZ4kWHSKYiV00fHTL
+	 QakQ8uewPQ1uYfSCEM/YUDjKwsEtfvXRSnKxtt2TEz2Rl6o7xbXsGYIJKMsANT+v4q
+	 E1dWt0t/femwFSADAxoh25FMIdBYaR5xbwxyUzQRqSIhqXytDjCsJOEjoW8iDyU6pQ
+	 0GO/aPxD838A1B/PNjlFBgf/BV0s7oNuL76JO61j0n3qOx8ApzZXyltxAtrJSTXPuy
+	 0fVi2nhXD9LfN4gf+o1ADVpL3i4RaH2ujPmc8p0Xqi16JQ34CRwHxca/JiQTizw3uv
+	 uCYrUbAoiDPNg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714A3380AAE2;
-	Wed, 28 May 2025 00:50:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE65380AAE2;
+	Wed, 28 May 2025 00:50:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] net/mlx5: Add error handling in
- mlx5_query_nic_vport_node_guid()
+Subject: Re: [PATCH net] net: mctp: start tx queue on netdev open
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174839343724.1843884.1696625892386200258.git-patchwork-notify@kernel.org>
-Date: Wed, 28 May 2025 00:50:37 +0000
-References: <20250524163425.1695-1-vulab@iscas.ac.cn>
-In-Reply-To: <20250524163425.1695-1-vulab@iscas.ac.cn>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <174839343849.1843884.5252612531483158148.git-patchwork-notify@kernel.org>
+Date: Wed, 28 May 2025 00:50:38 +0000
+References: <20250526-dev-mctp-usb-v1-1-c7bd6cb75aa0@codeconstruct.com.au>
+In-Reply-To: <20250526-dev-mctp-usb-v1-1-c7bd6cb75aa0@codeconstruct.com.au>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: matt@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nitsingh@nvidia.com,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 25 May 2025 00:34:25 +0800 you wrote:
-> The function mlx5_query_nic_vport_node_guid() calls the function
-> mlx5_query_nic_vport_context() but does not check its return value.
-> A proper implementation can be found in mlx5_nic_vport_query_local_lb().
+On Mon, 26 May 2025 10:44:33 +0800 you wrote:
+> We stop queues in ndo_stop, so they need to be restarted in ndo_open.
+> This allows us to resume tx after a link down/up cycle.
 > 
-> Add error handling for mlx5_query_nic_vport_context(). If it fails, free
-> the out buffer via kvfree() and return error code.
+> Suggested-by: Nitin Singh <nitsingh@nvidia.com>
+> Fixes: 0791c0327a6e ("net: mctp: Add MCTP USB transport driver")
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v5] net/mlx5: Add error handling in mlx5_query_nic_vport_node_guid()
-    https://git.kernel.org/netdev/net/c/c6bb8a21cdad
+  - [net] net: mctp: start tx queue on netdev open
+    https://git.kernel.org/netdev/net/c/126cd7852a62
 
 You are awesome, thank you!
 -- 
