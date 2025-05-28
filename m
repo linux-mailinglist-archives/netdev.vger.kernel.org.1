@@ -1,110 +1,117 @@
-Return-Path: <netdev+bounces-193906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2B2AC637D
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:58:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D934AC63A0
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 10:05:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80659E7695
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0612D3A60ED
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 08:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7182E246326;
-	Wed, 28 May 2025 07:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="evO/lKUw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BA7244677;
+	Wed, 28 May 2025 08:05:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042283C01;
-	Wed, 28 May 2025 07:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B4E2A1BA;
+	Wed, 28 May 2025 08:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748419109; cv=none; b=i7Nyz41Ro0DpSt79nFRjiR2fpCcaJR0NgU55D+VllbQBiC/hL8PEaucF/NCjsAyv5t6nPd9n0+hw2exazf7zpCMl77IYhC5O95WhI+xbmnf9oWk2iShsy1i59ZE9bqiHZLMlIXmWB6b743NoaPVNTPIJ5/e+WuldMGaK1ltGbpU=
+	t=1748419532; cv=none; b=qelZ6LqqpZTLBOHHGsjeZw/kcBvlXBkK0zsi4EJlUamiFapc/kO9sw1YAIymHm1jYtrkHgSOyfxVW5gqyysS7vmI0oUmZV4NEerFYSjzmYtMYF5oYvHcfNloDqgUZDWkEodWlGxyBopvfBTwCSlUnlMbPMcFfB0dqL1FPXaFLpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748419109; c=relaxed/simple;
-	bh=EhB0hPfGz22xprRM8wkMV43cCAg/VXZ3QzUsu3SMRdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D0uO688b8a67swKaZObZNFcF31dTjmBWGoGiPAdhg2EjxSz1J4JJb+qqwgtJVpi7eNlRItc3G4RAWE6GV9thkwNFs+XIeMu00Iw40y5pm6mKY6aOUk63cbCnhkebA4VhPNtxCcKEWUXIOTfbT65ZeZ9/PSPZDMlEYG/+ck2/owE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=evO/lKUw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IFyA/Ev6J4dUYbbORf9U6czVrOpgGxA4vABlRFXcEts=; b=evO/lKUw5MnJ7tsXnKrD9jnoqg
-	b+PYF3g+tT3s31UjYVEVLUGD4QbVFxAfDe3jTt6zSBYs+BqcW7L4o5H/4lV7IAFO87k6z8drWy5fa
-	+vScF2jVlpn9cLiY4WYiOtgEi5WgKmCMIPgwHxusoT7b3o06F4DVQjoJZe9dfpVaBHibLWbrJd6IW
-	Gu1oxMalrZustOdJN5UvUSgvwrh1CdrLPzbN+K2eLneCuzGPxEUMaOW3MhnK4aFdt455xrGh5qZC7
-	Zo/NTYKwb6lkek7YVLTY6lXsIjJqz+8AwcuyThkWfOmH+M4By7TooetgF5MUQQ5zdFOoTXrpTeUEt
-	P7lO75mA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41916)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uKBg3-0008Nv-1S;
-	Wed, 28 May 2025 08:58:19 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uKBfw-0002GD-2Q;
-	Wed, 28 May 2025 08:58:12 +0100
-Date: Wed, 28 May 2025 08:58:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, fancer.lancer@gmail.com,
-	ahalaney@redhat.com, xiaolei.wang@windriver.com,
-	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
-	horms@kernel.org, florian.fainelli@broadcom.com,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for
- BCM8958x
-Message-ID: <aDbCFGIi09h1irho@shell.armlinux.org.uk>
-References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
- <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
- <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
- <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
- <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com>
+	s=arc-20240116; t=1748419532; c=relaxed/simple;
+	bh=ZDPLgkg3MtN9+MqqFoZLuB0esX0Y9CnOOIuDP2Tdf48=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=AM09Inz88WedF44FoxiXENwyhK945wQzLHkn79szKycRBmZ0NP1O+xzt2K4PgVMBnkid6IUdGXlISW4d5d7Jn1GaxDEE9d4a+Sw+lDTybyYyTFTTsNu55i8X0lMaBjyQUF+NT1kvYihkfWVAw4Xol8btB3wle6eB9uO6fKODXa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4b6hnZ5HvZz1d0ym;
+	Wed, 28 May 2025 16:02:58 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id D24BE18007F;
+	Wed, 28 May 2025 16:04:42 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 28 May 2025 16:04:42 +0800
+Message-ID: <012a9ce8-bc38-4b0b-b344-2e4a7a9a344e@huawei.com>
+Date: Wed, 28 May 2025 16:04:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH] [net-next] hns3: Demote load and progress messages to
+ debug level
+To: Geert Uytterhoeven <geert@linux-m68k.org>, Jian Shen
+	<shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+References: <0df556d6b5208e4e5f0597c66e196775b45dac60.1748357693.git.geert+renesas@glider.be>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <0df556d6b5208e4e5f0597c66e196775b45dac60.1748357693.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On Tue, May 27, 2025 at 05:04:52PM -0700, Abhishek Chauhan (ABC) wrote:
-> Thanks Jitendra, I am sorry but just a follow up. 
-> 
-> Do we know if stmmac maintainer are identified now ?
-> 
-> Andrew/Russell - Can you please help us ? 
 
-My mainline work is in abayence at the moment (apart from occasionally
-replying to a few emails from time to time) as I have other commitments
-at the moment. I still have my own patches from before the previous
-merge window that I didn't get around to submitting.
+on 2025/5/28 3:30, Geert Uytterhoeven wrote:
+> From: Geert Uytterhoeven <geert+renesas@glider.be>
+>
+> No driver should spam the kernel log when merely being loaded.
+> The message in hclge_init() is clearly a debug message.
+>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Sorry, I'm not in a position to help right now.
+Thanks,
+Reviewed-by: Jijie Shao<shaojijie@huawei.com>
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> ---
+> Alternatively, the printing in hns3_init_module() could be removed
+> completely, but that would make hns3_driver_string[] and
+> hns3_copyright[] unused, which HiSilicon legal may object against?
+> ---
+>   drivers/net/ethernet/hisilicon/hns3/hns3_enet.c         | 4 ++--
+>   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> index b03b8758c7774ec2..5c8c62ea6ac0429f 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+> @@ -5961,8 +5961,8 @@ static int __init hns3_init_module(void)
+>   {
+>   	int ret;
+>   
+> -	pr_info("%s: %s - version\n", hns3_driver_name, hns3_driver_string);
+> -	pr_info("%s: %s\n", hns3_driver_name, hns3_copyright);
+> +	pr_debug("%s: %s - version\n", hns3_driver_name, hns3_driver_string);
+> +	pr_debug("%s: %s\n", hns3_driver_name, hns3_copyright);
+>   
+>   	client.type = HNAE3_CLIENT_KNIC;
+>   	snprintf(client.name, HNAE3_CLIENT_NAME_LENGTH, "%s",
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index 3e28a08934abd2e1..6bfff77ea7e67e8d 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -12904,7 +12904,7 @@ static struct hnae3_ae_algo ae_algo = {
+>   
+>   static int __init hclge_init(void)
+>   {
+> -	pr_info("%s is initializing\n", HCLGE_NAME);
+> +	pr_debug("%s is initializing\n", HCLGE_NAME);
+>   
+>   	hclge_wq = alloc_workqueue("%s", WQ_UNBOUND, 0, HCLGE_NAME);
+>   	if (!hclge_wq) {
 
