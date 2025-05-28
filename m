@@ -1,50 +1,81 @@
-Return-Path: <netdev+bounces-193903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5A5AC636A
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:53:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61935AC6370
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4056188CE00
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEE113B03B4
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74A42459D8;
-	Wed, 28 May 2025 07:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8392459E1;
+	Wed, 28 May 2025 07:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKWxF4kP"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="O6A6Vlst"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF58E24469C;
-	Wed, 28 May 2025 07:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8868C1DE4F1;
+	Wed, 28 May 2025 07:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748418760; cv=none; b=oDEF75YIh0m616Emobx/iaTNA3fr5UEDc4Uzyf4iLndjbvMATeAQjh/AKiNDa2me0/2k/RN34w+3NTR+HCkwzK8DyCbLIzGS3S5Arsr0XEUtoDfuvcwMv3noLW9rud+s8sva/w4AZER/v7Gadv8O6YY2xHuPnJ3+jaxzoD18yLA=
+	t=1748418869; cv=none; b=srIGJiVUufTyZB/lVmkvcAdvHcNoXGEACwybhJ7vDAEf62K0NrNqC1IYXOxhObJJOnfKr7ucWsLTE1OByEGSTLZBe1X/W9JVmJ1e3PXtaed3geHswcX3DnoYMInm+4qqnCoKbjeVDmxAdGfk5VTS1Bl7czYFcU8Of+bSUGB3XnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748418760; c=relaxed/simple;
-	bh=rt+7JeKmps68fMndKUlV1+BUdpX6FKpnBJ3SldOugZ0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QCQiM46ZfD4n1LRZfPOIFvDbiyeSjZjofb+qBiNZSHYwn6G0gogVTtdxnszzTnQRM623YeF+ibjcfy/3zzXjEJKlmrJzk9EqLc29z2Vn/NYxUNdFI7ky+R/NnSwhrqDY7vnDjO1C4jTiw3b0iak0DStVdyJ0oGIwP6cbVL4uMfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKWxF4kP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2312FC4CEE7;
-	Wed, 28 May 2025 07:52:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748418760;
-	bh=rt+7JeKmps68fMndKUlV1+BUdpX6FKpnBJ3SldOugZ0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sKWxF4kPBysp6z9SIsIfDiIxyLKPUslSs8qIcLNZlf+R/UYp8wizEJ2BJ8hqW6cn8
-	 CuWAQ4++DqFkQ07texPmQW2R0wcTH0kID97ufsbDw828xZHWEibITUGFFFDwXnV6D7
-	 aul3Do+OQ1ak8/yD7UdD+t2c1V+RI6rxbpvUtxUMvt0EP4ieB+SMIuy4mWs4bTB5td
-	 O4u/PsBs7DdCCkYU1/cNKJ2NEnd9C3teOFMqrPFIbLe+A9DRGaQEoSFt2wubcIrSY8
-	 uhO5xRy6pSp8CFDQ0amZ4ccNJRtgMISdza1gQE2SKnWe/cB7aTydKBGkuFxF8SENxf
-	 HzyVXOhs9LTtQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7107039F1DE4;
-	Wed, 28 May 2025 07:53:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748418869; c=relaxed/simple;
+	bh=1eKx/Xcp7Zw3JeZhrqVfQkMnweqpNr9X4J/fm8KiB4w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BR++rjyl4c7frODnrjlKOHETCVmtlQfYWqZk4BeZCmn55kayoV9cN2J9HggYPHRcOvdrVuKP4lYcenguuYA24zd35VAAD5yxj9EXrwXvJCGYMzqodKep1d0iYyjQN/e5k3wTB5pkRT0BGLdokZyYRLdjhWurt805i++OjRMrvN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=O6A6Vlst; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: f73d93c63b9811f0813e4fe1310efc19-20250528
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=7FlhNB9pTksMToqSnpWt6CkAE6AWRUfjH5SfzBJw+bk=;
+	b=O6A6VlstJHZBqAaw4fXeBxoQgB5x6+o5NkPiAijVhBLASkCS/pi4rxBEuD0wsoh8/j3WYgcuyjKSLE/HXayoE81y+AfmXFo30y3xi5v15ZgXtnIMcsSFiU4CT3YLWIlAgypMcW7KV0VdJFo+uy0ugU5ZmBUx94tckeJfJaiTa7k=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:99757d0d-af35-4114-9419-b3566a63de74,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:cf251058-abad-4ac2-9923-3af0a8a9a079,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: f73d93c63b9811f0813e4fe1310efc19-20250528
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1576526437; Wed, 28 May 2025 15:54:21 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Wed, 28 May 2025 15:54:19 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Wed, 28 May 2025 15:54:19 +0800
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Bartosz Golaszewski
+	<brgl@bgdev.pl>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Ramax Lo <ramax.lo@mediatek.com>, Macpaul Lin <macpaul.lin@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, <stable@vger.kernel.org>, MediaTek
+ Chromebook Upstream <Project_Global_Chrome_Upstream_Group@mediatek.com>,
+	Yanqing Wang <ot_yanqing.wang@mediatek.com>, Biao Huang
+	<biao.huang@mediatek.com>
+Subject: [PATCH] driver: net: ethernet: mtk_star_emac: fix suspend/resume issue
+Date: Wed, 28 May 2025 15:53:51 +0800
+Message-ID: <20250528075351.593068-1-macpaul.lin@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,43 +83,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH] selftests: netfilter: Fix skip of wildcard interface
- test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174841879424.2284365.14495950610695273901.git-patchwork-notify@kernel.org>
-Date: Wed, 28 May 2025 07:53:14 +0000
-References: <20250527094117.18589-1-phil@nwl.cc>
-In-Reply-To: <20250527094117.18589-1-phil@nwl.cc>
-To: Phil Sutter <phil@nwl.cc>
-Cc: pabeni@redhat.com, pablo@netfilter.org, netfilter-devel@vger.kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+Content-Type: text/plain
+X-MTK: N
 
-Hello:
+From: Yanqing Wang <ot_yanqing.wang@mediatek.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Identify the cause of the suspend/resume hang: netif_carrier_off()
+is called during link state changes and becomes stuck while
+executing linkwatch_work().
 
-On Tue, 27 May 2025 11:41:17 +0200 you wrote:
-> The script is supposed to skip wildcard interface testing if unsupported
-> by the host's nft tool. The failing check caused script abort due to
-> 'set -e' though. Fix this by running the potentially failing nft command
-> inside the if-conditional pipe.
-> 
-> Fixes: 73db1b5dab6f ("selftests: netfilter: Torture nftables netdev hooks")
-> Signed-off-by: Phil Sutter <phil@nwl.cc>
-> 
-> [...]
+To resolve this issue, call netif_device_detach() during the Ethernet
+suspend process to temporarily detach the network device from the
+kernel and prevent the suspend/resume hang.
 
-Here is the summary with links:
-  - [net-next] selftests: netfilter: Fix skip of wildcard interface test
-    https://git.kernel.org/netdev/net-next/c/6da5f1b4b4a0
+Fixes: 8c7bd5a454ff ("net: ethernet: mtk-star-emac: new driver")
+Signed-off-by: Yanqing Wang <ot_yanqing.wang@mediatek.com>
+Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
+Signed-off-by: Biao Huang <biao.huang@mediatek.com>
+---
+ drivers/net/ethernet/mediatek/mtk_star_emac.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/mediatek/mtk_star_emac.c b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+index b175119a6a7d..b83886a41121 100644
+--- a/drivers/net/ethernet/mediatek/mtk_star_emac.c
++++ b/drivers/net/ethernet/mediatek/mtk_star_emac.c
+@@ -1463,6 +1463,8 @@ static __maybe_unused int mtk_star_suspend(struct device *dev)
+ 	if (netif_running(ndev))
+ 		mtk_star_disable(ndev);
+ 
++	netif_device_detach(ndev);
++
+ 	clk_bulk_disable_unprepare(MTK_STAR_NCLKS, priv->clks);
+ 
+ 	return 0;
+@@ -1487,6 +1489,8 @@ static __maybe_unused int mtk_star_resume(struct device *dev)
+ 			clk_bulk_disable_unprepare(MTK_STAR_NCLKS, priv->clks);
+ 	}
+ 
++	netif_device_attach(ndev);
++
+ 	return ret;
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2
 
 
