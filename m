@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-194020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA252AC6D98
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:12:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7D4AC6DDF
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974091BC7E82
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:13:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DBF21884F57
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5888828C859;
-	Wed, 28 May 2025 16:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6521A28D83B;
+	Wed, 28 May 2025 16:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHml+0Ha"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Hc85KsCc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23418288C03;
-	Wed, 28 May 2025 16:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81816283C8E;
+	Wed, 28 May 2025 16:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748448777; cv=none; b=hhLCtuNd5sy6YVr6xRl77yJWwMELpCOMprads1O8qZ83rBtTKfUciKgU25cL3tgKPm3SJyF1KZ0O+SlkEwqMLoNNcvqq2MSGsnLrbQkIZ6FX689+GtAZlD1LqbI2EMl6SkF8rVgChesPFqw7Od5dT2PW4m/iNGtMZf89i/2rRi0=
+	t=1748449196; cv=none; b=Bq0F3i8jfIEJwbdZw4URTBsx7u4ffKdo4cUL1vA2LaiU9EqNqCO/8VDA0VJMjFp6/dH1ZPFk++4JvGirvNf7/RV/ieGzQ1k4VrjLa/pzCrazY1ZaX6ot7GsALGVDRRr7OEWL59q87cQhFU3ElnG+SF/Y05V+cIfPJikgfxAzgCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748448777; c=relaxed/simple;
-	bh=fpi71ToKhzI4Ih0RsP1jwKepkejd8JqAFlfm4lSaG00=;
+	s=arc-20240116; t=1748449196; c=relaxed/simple;
+	bh=qXJ+IqF7/m//76C8fW+mrTCbhGzi0qHG48chXP0zz94=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=co4kDXyYan99l1tRN7a4B/UnhNZtDfYoqNYT/051+TEs1Xh0PTAq/rZR9Sut3ha/JPdnWpmKDGTY2CTmmswzBLWlgwUvjahI86dphRFnsYx1dHoOg4NvoAkGYVo7QWVyFdDjn186B2N+HYy1bbTYMLkZfRul6ITLmbHF2vnkNe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHml+0Ha; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C52AC4CEE3;
-	Wed, 28 May 2025 16:12:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748448776;
-	bh=fpi71ToKhzI4Ih0RsP1jwKepkejd8JqAFlfm4lSaG00=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rHml+0HaqUcY9UrUHjk+viHrLfRKcPDgWPT5GKYfY3635zzgS4jydPVsZ3YIk4vsu
-	 OxwZDw9XNvoW5fIhEPZ7OpVLSKaxF0AkY70oHc/tdtbcmW/SVAd/agOb+tGeVaauVU
-	 oZfW1h1OAyBHt/ScLR4+SOj2bv8TyKYsaAEbR97TXQu3Ak/htIc3iMcOol4h3upiuj
-	 sq8zzSGeyujGxUqFI8Irqn7+RzWLrEuZW22criHBa3uiE+hfg8zHBdCYkjPxfhDN0H
-	 9u+rB+GdOLELUr7J3ovntiXCYTlNDcZm9eBK7FKO9oRw196ml3AuUhZG5YSliJ+39M
-	 gaTpVE4liakIA==
-Date: Wed, 28 May 2025 17:12:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: saikrishnag@marvell.com, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix swapped TX stats for MII
- interfaces.
-Message-ID: <20250528161250.GE1484967@horms.kernel.org>
-References: <20250527121325.479334-1-m-malladi@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I90EvDYROxhb+1NMTk4qjIQyaZfT0/8Z4kCFYc7cEZCY5GgFzWJ5QQ71B7EZE5/KAnIjU5/Fbez8/CbB021WKdWHHAp+//m+ZIVVAspiOPkxh2gzQwbxORHz7nltoYB24gNIJKy+O8dQeOWk28+inkdSVe6j66KkR1TsC7OxRZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Hc85KsCc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HBGgu+PfumtYHtFWP6ldbnKLzKxWqLSqPhfinDYGxe0=; b=Hc85KsCcSxtr3DnRBNcInCYQgN
+	kYsvXqr6Nbn3E83MCxyzvZvoeaMyy7CeREfC2jEeEka4CKYj2v4vdvmVrVpc/hDGwG1GR5+39tjLR
+	+kHLu7mBmDBE+BXlq2gzNhC5I7Ebf+VyNt8kRBrEa0/Fa4YhRtOm6ahiUHsglAv9HFO4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uKJVE-00EC2y-Ga; Wed, 28 May 2025 18:19:40 +0200
+Date: Wed, 28 May 2025 18:19:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Matthew Gerlach <matthew.gerlach@altera.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, richardcochran@gmail.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mun Yew Tham <mun.yew.tham@altera.com>
+Subject: Re: [PATCH v2] dt-bindings: net: Convert socfpga-dwmac bindings to
+ yaml
+Message-ID: <c8ba074c-c689-44f0-9513-59661b12e232@lunn.ch>
+References: <20250528144650.48343-1-matthew.gerlach@altera.com>
+ <20250528170650.2357ea07@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,45 +65,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250527121325.479334-1-m-malladi@ti.com>
+In-Reply-To: <20250528170650.2357ea07@fedora.home>
 
-On Tue, May 27, 2025 at 05:43:25PM +0530, Meghana Malladi wrote:
-> In MII mode, Tx lines are swapped for port0 and port1, which means
-> Tx port0 receives data from PRU1 and the Tx port1 receives data from
-> PRU0. This is an expected hardware behavior and reading the Tx stats
-> needs to be handled accordingly in the driver. Update the driver to
-> read Tx stats from the PRU1 for port0 and PRU0 for port1.
+> > +  phy-mode:
+> > +    enum:
+> > +      - rgmii
 > 
-> Fixes: c1e10d5dc7a1 ("net: ti: icssg-prueth: Add ICSSG Stats")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
->  drivers/net/ethernet/ti/icssg/icssg_stats.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-> index 6f0edae38ea2..0b77930b2f08 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-> @@ -29,6 +29,10 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
->  	spin_lock(&prueth->stats_lock);
->  
->  	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++) {
+> You're missing rgmii-id, rgmii-rxid and rgmii-txid
 
-Hi Meghana,
+And it is unlikely anybody actually needs rgmii. rgmii-id should be
+the most used rgmii variant.
 
-Perhaps it would be nice to include a comment here.
-
-> +		if (emac->phy_if == PHY_INTERFACE_MODE_MII &&
-> +		    icssg_all_miig_stats[i].offset >= ICSSG_TX_PACKET_OFFSET &&
-> +		    icssg_all_miig_stats[i].offset <= ICSSG_TX_BYTE_OFFSET)
-> +			base = stats_base[slice ^ 1];
->  		regmap_read(prueth->miig_rt,
->  			    base + icssg_all_miig_stats[i].offset,
->  			    &val);
-> 
-> base-commit: 32374234ab0101881e7d0c6a8ef7ebce566c46c9
-> -- 
-> 2.43.0
-> 
-> 
+	Andrew
 
