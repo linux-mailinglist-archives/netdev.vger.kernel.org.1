@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-193843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D34BAC6001
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:22:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50DC1AC6005
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA56618931AE
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:22:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AE3A163E3E
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB031E3DD7;
-	Wed, 28 May 2025 03:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5301E3DC8;
+	Wed, 28 May 2025 03:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iWx9Ie6A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p0vwD/5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E7E1DF273
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 03:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA1A1DC997
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 03:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748402540; cv=none; b=JpYX9c9nHlH+/NF+EnFsVbzBBiNtRgzZ1z+KDLklz0bnI84LW5VcENHprokoG0ziLz2c4LTcpzzniP0ljakBgnDn5yoF4/5T3haY7XQzCNJkRr7xuj3zoFMymQLin74SHuOeCQcwgynWijjoBVx8GdlSr6mxS9aScIYGBU+EAMw=
+	t=1748402631; cv=none; b=hbowlyPOWKeznhOSchWQfm0uqRqPKmpZfd4HRhaSgHBPmQXgStxZpRH2ZKTyjLhwyfCSwCqeBweWbaRaTbRKmPpeDy7rDXjF04VdnkypGi4E1KtSrzg5pxSw8HpJZruUK6PUAK6zkMtLgenVVFmi5TXag1szmR7ESI4Ku2hoeIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748402540; c=relaxed/simple;
-	bh=TlL6ea7agKcozcBW85BEZTQlNOOs8G4N0oj9OW3+jEw=;
+	s=arc-20240116; t=1748402631; c=relaxed/simple;
+	bh=vqO+Pm/HwIo5j2bH5VUANxqKXpi6ZB2hEzbeH28UmWo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=snXTMwtEkvbbIcg0p63TwY0Uqet1zJGFL6nFgbX/tR1iY/XyukqeFA6PCSh9JivFLepG2RzLXAoIbUTHYsiaCHoF1BtaY0Rf1cEC9YrIIQPriFh8ktJSr1FRXLym10PxKmBGgBIpy+xPm1yhE8Egkd16UFxM0bmsLLm11ORMIq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iWx9Ie6A; arc=none smtp.client-ip=209.85.214.180
+	 To:Cc:Content-Type; b=l07FwUOANzEr0oWpPFcR+wJqEwOFHGtIZJ9r/XSa6P7l0c6NVc9IPnAWsxSiZQHc80O1Xt1Hka7Y4LkiuDMW+7IC4sPUuREJVA40yrnbkJk9QPfBH/JbHV+jN9l/brxGy3WhtWNHD6PI+21Y1md0beRpHyDad8qCiTA2qkEqjlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p0vwD/5X; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2348ac8e0b4so71205ad.1
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 20:22:19 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2349068ebc7so135755ad.0
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 20:23:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748402538; x=1749007338; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748402629; x=1749007429; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TlL6ea7agKcozcBW85BEZTQlNOOs8G4N0oj9OW3+jEw=;
-        b=iWx9Ie6AAtxQaXvZupLegK0Od2jG4TBVJ2TZV8Va+YXZwev52fTAueV172U0+04hSy
-         jWoX9qLmbwg1RU4v4e/I9qbtOYzxc3Yb16vuI/zeBoVdK7GjIghsofIkVcjgm+bSziPq
-         8h/wddHbUu00eW0KBYY3W5GExQcFQNze/XqRanOe1t/ffe8mYMyqdQwmuuHxWFAFUu+9
-         V4+vWjErzGKfKG6LlxFfEH8YTwt0IUyT5K0i0La0gi5O4EOc4RcXox+3vgrYObcOLIuQ
-         1Es23UHs0cyJkaNTJKRv5nij28d04+PxsRxjDIAY38EZ5gosItgvCU34aMtD9NEFHUqa
-         UHBg==
+        bh=vqO+Pm/HwIo5j2bH5VUANxqKXpi6ZB2hEzbeH28UmWo=;
+        b=p0vwD/5XFh5llZYeWqF0PTmm2GwywM3CMo5XuibxGx4z5aBU+feF/KYJw7NsnDeLKK
+         Q8ySWDV47zStZCcEkuEjvESRXvcFONuczH+Q5Hh1E8UB4mmMUR7Pbi+pRz1/3lLIg0+A
+         mrls/9KvgpIOVPva4ETMsqimq0vZCy332ZaY5METQoTcARwUV90jGo9o8h6jxtBk4rLO
+         9bpRLtFTPoeFFbBPc27xnmUpcJoiqKJXU6vJwcjxcsLQChvcKJzCzVBN/smFSZYqdO/Z
+         NEUQChhzzsoPCxSSHexqktR1BvduQAIcTgGSIXCHGOU1qGxdJkC9hDQrOAqo+/qz13rj
+         7ojw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748402538; x=1749007338;
+        d=1e100.net; s=20230601; t=1748402629; x=1749007429;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TlL6ea7agKcozcBW85BEZTQlNOOs8G4N0oj9OW3+jEw=;
-        b=GijxWltm3NuSNfV93Zsu7zm4s8zfsW51lHNUf9KlMujMILUT+O8re187Ri/eGBxix7
-         91pXUiKgXh6pUlWRdGCE1+MA1iJLvfdejExR8jP0g1uu7+3T89HA9j2RLGpcbIHXXD3B
-         tRPExoXdjGK9O1YYEgGdiBrBUyKihDjIytvOsM5zT8+eqqxuVBMkz04jyDbN3aABSsl/
-         J5mqFflkMSXSkfJPujJWXrxhkwePERV8MADErrUVDIVx8ahCpjYawsszrO83onEQy2v5
-         pwsiy10nmtJ6wwTR1WdWErYau4MC+DKGWohpnCED5gAig97dvmIOlJ+VwSPYSdW09HKd
-         9Y/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXFswjxkduEFIHSB8R2uS1cnkDupB0EPvJOO0BTbpTulwZvWL0lLGJb7rlHcX5SJ38EbeMFzvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYkfPzMRGnBWDoHK8btARoM6RIbRhydpb+97I2/LYBOG+VgLm3
-	qe7Sqm56ucx7d2TMB+A6IxW3u78SIDCD52c6q75UbfQFwcAyUdzqyea1QDfY1V53nyqhOkR/u2e
-	0OFJhibaReL+cgWUSoqFPymuPp61YHT552xhA9lyR
-X-Gm-Gg: ASbGncs+C5tE6D7Iw8mN4z0T9evQyB/vf9M7XvAMhikxuy1UcE3pWY7LPuJ4krwtXnp
-	5IdoLSNcguL+2CvViYZqGyw0k/Y3KYjPEdgmDRQnr5hg35fMQhPgDlm9akAiZN5vKBTOP0pYg+J
-	otPV876EzY92I9sx/ywN7Rj6NgSrReYKRlT0fhCCqWy/s2
-X-Google-Smtp-Source: AGHT+IFjWMsFjxHEWSd8svaJEVsREhu8uWRJJnik1FgFnC7f0wirbtl0vmRI9Jco+Bo3khu2tiMHY3Xc/icJ/DCXCgg=
-X-Received: by 2002:a17:902:d48b:b0:215:9ab0:402 with SMTP id
- d9443c01a7336-234c55ab922mr1985015ad.18.1748402538236; Tue, 27 May 2025
- 20:22:18 -0700 (PDT)
+        bh=vqO+Pm/HwIo5j2bH5VUANxqKXpi6ZB2hEzbeH28UmWo=;
+        b=APoStcFpujVsh0XNi9RQR0llZWEFkzbM7PUL4cegfqNCE36+RRoR8erhhW7aKJJl0D
+         cP2akFikOiIerAHKWMgfWDSRB0uCLz8cnH7169a42DXu+Op21RTbi8J5cZzmSRdS9tua
+         /olUkrUFsjoV/vtjEXFM2L+t35nYpZvV9UaEFGh/NMDUGt49Peq8ApWkOw3ksWixNyGr
+         UUWHCJxQUohkb9/GY7g9cyL/as0wkcqanzpjdr+Zd3Npq/PN0o3q7+9l+LgYt2MyOesQ
+         2oHGb5JhJCQF/AsxGs/rXxGPpQ+j4v8nPBHRrBM+nPW/Aqr5GIJKmo850OM28fWwzIQ0
+         cmMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTjWRru1V/GaFQv4LmUmJCIUR5rTi+gR8t4cJebHl9L3xRonzmv80ilip+/JV77rvuRra638g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVBpCxNIKxQMTV41F9Qb09J6VCQCzf+UQWIzkJUs0VLBBrDm/V
+	/IgfHZ6a1ANucRa/QYvDd8YA1y5EZg7+VkBRmPQ0STtSIkObKO4lEVSajbgM3GHYJ8kuHAzINTt
+	Th16LMtVABMOOwE1KCm4I9PYV9UZ9D2bl182DLdJi
+X-Gm-Gg: ASbGncu8Dz0TylpcRrUl6XweWAPecPLrW+SvpJQlmMXmdDKATMHuJZVYj4lY3J/1zQ7
+	m0SWQ9icoqyJZsUuqp4ikDWhN+wFQsGcmz0xviNoWIXNY6utvWU4+DTjLE3pnL5jXioL4MozSYI
+	Owrvz3A4hwu7gyp3RFEDuirABqU1c9RO3M+L2OlMFUzC/I
+X-Google-Smtp-Source: AGHT+IHrCaCboVb+mYd6VODPHySRh2UlXAVZ/QOay+nn+pjpJ//L1jegP3WSxBTh/9vzWlfdXpQUzy+19mVRhyBPxn0=
+X-Received: by 2002:a17:903:1b63:b0:21f:2ded:bfc5 with SMTP id
+ d9443c01a7336-234c55ab5aamr1578395ad.28.1748402629057; Tue, 27 May 2025
+ 20:23:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250528022911.73453-1-byungchul@sk.com> <20250528022911.73453-10-byungchul@sk.com>
-In-Reply-To: <20250528022911.73453-10-byungchul@sk.com>
+References: <20250528022911.73453-1-byungchul@sk.com> <20250528022911.73453-11-byungchul@sk.com>
+In-Reply-To: <20250528022911.73453-11-byungchul@sk.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 27 May 2025 20:22:05 -0700
-X-Gm-Features: AX0GCFtRcX_EC4PBnTs2d4ZNLeICGbCHPwkYh58-YwsRhc80hGZv7-czylYZ2vw
-Message-ID: <CAHS8izP2f8oLFRZ=_NC=W3Ky9fqXJpszNNAiXN_CBYADfz4UwA@mail.gmail.com>
-Subject: Re: [PATCH v2 09/16] page_pool: rename __page_pool_put_page() to __page_pool_put_netmem()
+Date: Tue, 27 May 2025 20:23:35 -0700
+X-Gm-Features: AX0GCFsppSqNuMrfRURYgwM0eiForkoo7rTRScW8zc9A7vZ7d83h17DCjG3kLl0
+Message-ID: <CAHS8izMWhqJacD2UKJWGOEFoqcSbeaiEYkkQsiHPKkCNwnOmHw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/16] page_pool: rename __page_pool_alloc_pages_slow()
+ to __page_pool_alloc_netmems_slow()
 To: Byungchul Park <byungchul@sk.com>
 Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
@@ -98,8 +99,9 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, May 27, 2025 at 7:29=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
 rote:
 >
-> Now that __page_pool_put_page() puts netmem, not struct page, rename it
-> to __page_pool_put_netmem() to reflect what it does.
+> Now that __page_pool_alloc_pages_slow() is for allocating netmem, not
+> struct page, rename it to __page_pool_alloc_netmems_slow() to reflect
+> what it does.
 >
 > Signed-off-by: Byungchul Park <byungchul@sk.com>
 
