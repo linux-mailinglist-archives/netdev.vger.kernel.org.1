@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-193836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F72AC5FDC
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:12:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E4CAC5FE0
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 05:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33F6B7AF01F
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:11:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B9101BA341A
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFB41DDC33;
-	Wed, 28 May 2025 03:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAA41DE4C4;
+	Wed, 28 May 2025 03:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qLuGLAzF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZWyu1Vbv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A5858210
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 03:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E4F3F9D2
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 03:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748401934; cv=none; b=Y9t3nVn4vmQkvE8noN0eE/biNVRhB8SL6l8r0w/eeWIgwIDHEJDPN6WaOGrur9jqLjZW8QRrlDgpryvgAPvcem4Er6Rgupv41nfZU9+AJjxHN7l5U8D5/yUyl/P6ASsIim6JjkRD5JXl3lcWvzaTJTVia97zhACwi2WRXMy8e6k=
+	t=1748401992; cv=none; b=guQUUWreIGjv2uehBceV4fG/7j6GRUom/cLYNyE8cfoRGgUfCTmVjTwPMiYmLGJBhkFXr+nDG90DH1dvcRWGLW9E4s0oXdU2iSh8/dweF996k+QashXxOicfBrCYZ34X0H4UJ7lNT57FEL2Uo87sPIyoMUO0JtAEx/6yAPJIXi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748401934; c=relaxed/simple;
-	bh=45wv2D7qTveHvG++liQk1FdgOdvStQgyo7K7EgLBQ20=;
+	s=arc-20240116; t=1748401992; c=relaxed/simple;
+	bh=zzZKAu+ekb5wfUFWFWxFj7mtfUTDEeQOhI9SgqQhXNE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AVKGXBChrwbbEUEHE7kv64Ee+gK88NSnvpQLCyfCaK8LpMi15CD+J+HLZHqpgzdZkBnh486Ba0yBzCWlja5OGigip2yiLn9tnJZpeVq82HPxjrrf8JCIjVrUiLZRgLDgjsC7P69KLrJh/y2x1O0cYDEjszlV52vJvIE2/sxWUkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qLuGLAzF; arc=none smtp.client-ip=209.85.214.169
+	 To:Cc:Content-Type; b=nyZb7WTkzhq4PZQMxPpq8yIgJPo0K4d0SrpG6m3r1rqDnXUp5ONjMiA/AM+gmSyKiLT1OX5M85T8UbTUusTfBLbzzZtaY/jsrPOOLNy++hOzlXtnC/zXhotFqwJrhuX5M46xvc4o/D/LBg8chCIssQyYEG+yTVyPSZOfkyzhz7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZWyu1Vbv; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-231ba6da557so80075ad.1
-        for <netdev@vger.kernel.org>; Tue, 27 May 2025 20:12:12 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2349068ebc7so134035ad.0
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 20:13:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748401932; x=1749006732; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748401990; x=1749006790; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hi54XJvxzTpbX0StT38uQRnU2/zb/XVmDK+caARZGHA=;
-        b=qLuGLAzFri0ELQo4ug0igeikL8LmDPPfEQYrCmNbU56Tg8RjWHOo8GCx63KdOLC5fb
-         94Jn31FyUqWmxqXyNLqYUmxnmjRwO2pQqa0ZZalBFrASW/1pctyQD2t7UllpFpmvNYrt
-         y0mwJnzWgd4jTwRFf8njjTLsyOLvIvcxHIQ/Ul0eHEV0u33HJa1R9v7DUTEol/dfaCv9
-         XsolPSH5bhIV+A8Xda5ar5qQR1g4R9BqKe9EK8B+ouo8AwtvnLFwFJerameKYWZLZJpd
-         1L1CiVHn/Ix2rwsqKjvMl2SmHlnZz0Uz/gvRtZMV1+LLu2nmlHPBrASFWAikRAlKP3AO
-         IjhA==
+        bh=zzZKAu+ekb5wfUFWFWxFj7mtfUTDEeQOhI9SgqQhXNE=;
+        b=ZWyu1Vbv2ejyjuwmvqu1s5LfjEB+ZlDCoQcWYYNoKJEIHuwynv37TA4DSBtp1UaZ0S
+         zuJRuTA+hcMV3KHX4mCcQuBv+9ATmxDFcW1KDMbqI3vgmdVEBlR3+86X/gnC/kjumIqo
+         hpUv4Z8VF64uiEztKO29w91LCXXBm7SB4I/vRih3EVRgbicfFWwMWAnptFa45ZrwtrwA
+         3Vkq3epp/y39JSoFZA72R55fuSQflQs7VGkORFX/afLDoMqhcUcxbL+A3PXGw+R8XuYt
+         ehXEjMr3F8JgaNKtCttMdDn0q/wht2A2DHeROq5FlhKDhmnDC1MRv7OnIiWcp7MKB8g9
+         uv2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748401932; x=1749006732;
+        d=1e100.net; s=20230601; t=1748401990; x=1749006790;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hi54XJvxzTpbX0StT38uQRnU2/zb/XVmDK+caARZGHA=;
-        b=biMx2IHqm7efaW63gmCGFt4kify6AUWdCn4zUaL9vost3aym/CApBxjcU08CDXba3x
-         EkGJcJVhsdq01FZ85i6P8hx1QR6WsAaxKw5essO3nNd1o06Zy71b1LIiYW8JWaEGLeUm
-         QNBohWEhKv0TfFjzJJCDh5q3ht9UYqPQGWyAgMSCDMvkU3eakamY1YQZSo+rww2XIb06
-         81lLHKT6QuV/0VDqZPQ+FhyrOgAxrLEiJtnGe3qqj+keUkT0Bx5FLgK74H6MCcnTcUAY
-         LO8hATSsue8/1AVKZqbsKbxj9J3YIlnD/R5tYm7cC2kY/g6KHgaxPuo/wBIgyBM//Wkg
-         0LOw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Bwt4PBn9xjnYS/cnjIa7jmMAZOMK1qIugWQ+ZlL4bJXgJugbAjGh+2/ih1FZMbsOgGxKpcs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9Ef+862zTOLcwTfsptBkfFKABBut9IoqK2ejsNsbInKBQ5Kqu
-	QUDIsnM21oNLpynzP3D3KqwE+7K6NgUUBrIll4sBqY1JrZmFmPXAD47/OYSz0VrnrcnoWwD8fY8
-	nQ+yHRz0A5s+M4tqsOyo8VG/DnVFSe+tgWEwd4RW3
-X-Gm-Gg: ASbGncv/mD3CRr87z02Jb2B+s5p6MnApKt97eOrEAOgt+cxpki8rmUto0iipTtKWHmb
-	+8ZJ0Nll82k/nPJ44DoqOiKLUp2CUExqEF+mF83+9lJf4D1yQLVCE2mP0hANwdMUHIl8wjfha24
-	v+WeoQN2kpE5tJ1PI2/OD/BEk8xhdPacWoQEyaS37vnnh+
-X-Google-Smtp-Source: AGHT+IGdqjyzoDtqYIHx/y7YKWzz/qyhFs2l//e3GArH1hU2e1HUWggvHASce0D05SKLzqIW3p6xmhC7Nwpq0Q6Hybk=
-X-Received: by 2002:a17:902:d2c7:b0:234:b2bf:e676 with SMTP id
- d9443c01a7336-234cbe28862mr1141045ad.11.1748401931545; Tue, 27 May 2025
- 20:12:11 -0700 (PDT)
+        bh=zzZKAu+ekb5wfUFWFWxFj7mtfUTDEeQOhI9SgqQhXNE=;
+        b=BNxarHG6QqK2ss5nKc+ryHXZapx0XurcGCqW6sOyko2H+dHvYXG1nz73SGELTJ8apE
+         HP+ByPNEeN+b/nLvRMCHmWM5X7m5Ht2+HIpnW4XkNe1pG/jbhPozMDtZGoc/QV7BON8r
+         MiucOrjZ+kg6NEebgkU7BQIrPbO5OMtaLrM3lxnrVX3+QWkpJeG/T+VgLLwwY2r4D2Lh
+         HWBuMYrmyFsDTKNhNUrEbzSOlIoLv9u8z3nbgBZMS9yVVqs5JijkDNFdfb1EkkothvcA
+         BzrolvbhzAEn02YnOE/h/hH62Gu/SAttLQhe5aI4eXsVRgr1m1fHobX6AJSZkCGbqUGn
+         EEDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWqC45nhV61wtOyCtxjD9JNAdDvLVCqAOJvB0yRbXm94a36iUw8Ht9+3RDNr8QPMs3YTBo4XU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwEAQL58jH9egFDMp8+JR4ICUcKYYcLgxjmx3q2iiEUvH9JT0w
+	8Ofw7fIU/fr79JSUYcarcUD3xD7Eb8Tq+onda2Nd9vsVgLSBwlJGJwX6TTy1pc0SkqQeUYaPO+s
+	hLvhKKLT9onVDGcMHkDtAIWRx0POsoOvhKniMcaMF
+X-Gm-Gg: ASbGncv9m2CSEr4oqHFnJeH9zayh9Lnoh3EHda9OLTG7m+P5i9jtWsxIzgayhCUVuGc
+	QrdoYEP5WHLECe+W+vwiEr9vjj807Iod8YIHed5OXKiDcefpywQ4xRGJIBVxGFQTtnx0iaD8EPJ
+	8N1dbk5a9zfrb7e81+ELqgt3x2+NtZ34hvl5rA81sbp93x
+X-Google-Smtp-Source: AGHT+IEDUY7riFOOR08zN+pI5SwQ05vmhq98GyByeU8awQ87xrmYDNUTemcQa8sUY7rtO1VWlklZOkyX7GAf8CRHf1k=
+X-Received: by 2002:a17:902:f785:b0:22e:766f:d66e with SMTP id
+ d9443c01a7336-234c5256552mr1833575ad.12.1748401989824; Tue, 27 May 2025
+ 20:13:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250528022911.73453-1-byungchul@sk.com> <20250528022911.73453-3-byungchul@sk.com>
-In-Reply-To: <20250528022911.73453-3-byungchul@sk.com>
+References: <20250528022911.73453-1-byungchul@sk.com> <20250528022911.73453-4-byungchul@sk.com>
+In-Reply-To: <20250528022911.73453-4-byungchul@sk.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 27 May 2025 20:11:58 -0700
-X-Gm-Features: AX0GCFvbRHta6TyJPe_xr_2KYS1z9gGCeokku76odClbu09MqRPDqhx2_Gv1QJ4
-Message-ID: <CAHS8izOkr96_i1B8o_AWQGgfWSWZVVjHhOShReLZozsxZB6WdQ@mail.gmail.com>
-Subject: Re: [PATCH v2 02/16] netmem: introduce netmem alloc APIs to wrap page
- alloc APIs
+Date: Tue, 27 May 2025 20:12:56 -0700
+X-Gm-Features: AX0GCFstQ8TSymZiP1u3KsDOqDNDhSVZvkeBqi3jCf2XyHkp_VooW3rcyXYh7Xo
+Message-ID: <CAHS8izO_ypBm4htYOZ6mDqn5hge5S_3DBKHHTdEW7ay86MsSZg@mail.gmail.com>
+Subject: Re: [PATCH v2 03/16] page_pool: use netmem alloc/put APIs in __page_pool_alloc_page_order()
 To: Byungchul Park <byungchul@sk.com>
 Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
@@ -99,51 +98,13 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, May 27, 2025 at 7:29=E2=80=AFPM Byungchul Park <byungchul@sk.com> w=
 rote:
 >
-> To eliminate the use of struct page in page pool, the page pool code
-> should use netmem descriptor and APIs instead.
->
-> As part of the work, introduce netmem alloc APIs allowing the code to
-> use them rather than the existing APIs for struct page.
+> Use netmem alloc/put APIs instead of page alloc/put APIs and make it
+> return netmem_ref instead of struct page * in
+> __page_pool_alloc_page_order().
 >
 > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> ---
->  include/net/netmem.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index a721f9e060a2..37d0e0e002c2 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -177,6 +177,19 @@ static inline netmem_ref page_to_netmem(struct page =
-*page)
->         return (__force netmem_ref)page;
->  }
->
-> +static inline netmem_ref alloc_netmems_node(int nid, gfp_t gfp_mask,
-> +               unsigned int order)
-> +{
-> +       return page_to_netmem(alloc_pages_node(nid, gfp_mask, order));
-> +}
-> +
-> +static inline unsigned long alloc_netmems_bulk_node(gfp_t gfp, int nid,
-> +               unsigned long nr_netmems, netmem_ref *netmem_array)
-> +{
-> +       return alloc_pages_bulk_node(gfp, nid, nr_netmems,
-> +                       (struct page **)netmem_array);
-> +}
-> +
->  /**
->   * virt_to_netmem - convert virtual memory pointer to a netmem reference
->   * @data: host memory pointer to convert
 
-Code looks fine to me, but I'm not sure we want to export these
-helpers in include/net where they're available to the entire kernel
-and net stack. Can we put these helpers in net/core/page_pool.c or at
-least net/core/netmem_priv.h?
-
-Also maybe the helpers aren't needed anyway. AFAICT there is only 1
-call site in page_pool.c for each, so maybe we can implement this
-inline.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
 --=20
 Thanks,
