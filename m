@@ -1,202 +1,149 @@
-Return-Path: <netdev+bounces-194015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B01AC6D2D
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:48:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B99DAC6D32
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4CB2A22F02
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:47:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0965E1C0078A
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463162798EB;
-	Wed, 28 May 2025 15:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F290028C2BD;
+	Wed, 28 May 2025 15:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ac76xMaz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkB/QMIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868961C860C
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 15:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FF028A415;
+	Wed, 28 May 2025 15:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748447283; cv=none; b=Vz39m/urw75s5CGOSthYorIiEZiHmsYD41ZQsELnkTButz729tPS/L0blVhfZjQUp1b51nr8l04CZ+c8chn1inPSZrZf4T8YQp6PdjdofaEDed0QpsfDk0Z6E2hDSK0QurSDMBI5pGwWQKKKF6iOmri+biARdMKZDzF9k2x76SI=
+	t=1748447352; cv=none; b=FSntAryQeb9Hj/gAg/eHE1QanQlY6ojhw7TEU0qINta+8i8fPELv9s2GpSpimeeKOrm8ZbB3+SJ0VgrO7G6Z91k0/FuZgN8wJ7NCucZjshmV5D/EFhxMGnrUMX6z5AB+9XmdwObppRqo1x9X0VUkbBOeydIgrwOnm4UinFsMYPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748447283; c=relaxed/simple;
-	bh=GK2S36QTN3Nh4IWhbg8RxsJgGLCZ3sVVlxu7y8BBk0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aVU4VCyTKJsK1rCIaiOgkjE8ffweQqXanXAdMwGSwG2NaTBeSB3otMu6CchGmtAOu9RySmjanqBGFXThJDhALEi1Pq5S4uOZbUAWCO/5zRSfCVMHyQrebmJiiNEwXwXlMG/+WlQoSOYsRMRLRlWxpbak+nGo873T82GiG1FouWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ac76xMaz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748447280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pENshd8fJdbrAl1ktbn4RRSGUUMrg9nhqmtdO02uNko=;
-	b=ac76xMazrc4rxGPe7ZWNBOws7h35Nip6TMiqWzIzKxApY+bNqU/qJ0WOp9sJrWEOwEw+xa
-	kPq3hGeDEEg275OxA3yJmEL6T4A0b7UYNzeAOmJvyrZFMokF5D/mEA8sRE6nPymTB1EyX1
-	FCvYFifeVn6TTun6KNoYir2fjq6BEKc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-12-t3r1b3S3PAinCV5cLuuX6A-1; Wed, 28 May 2025 11:47:58 -0400
-X-MC-Unique: t3r1b3S3PAinCV5cLuuX6A-1
-X-Mimecast-MFC-AGG-ID: t3r1b3S3PAinCV5cLuuX6A_1748447276
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39ee4b91d1cso522466f8f.0
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 08:47:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748447276; x=1749052076;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pENshd8fJdbrAl1ktbn4RRSGUUMrg9nhqmtdO02uNko=;
-        b=M3DwJ7f4jAS1TIjVpqwEids6ud5luGcuB3p3FcQ2Z/BicFcRQ+Q/CCTYMmCUJEDRg6
-         JOfCBxidckEbzhIekltXY146CKOTSVYX4vuZHUo0YHj+/mEL105uSnKm+GjnVpW79gsc
-         cVSeMTZPGT6s5Yxw2qlxKvwOZUDa5QFTBr3yQ97bGACvtwxLnG3xp1FrCKeqXn2YYv6d
-         hOUZyDZH1ojJqOacfCSQ0LKNhg3KQJIxv53vlkTHpED+kzk/61bK1Q6kOz/ITDVaQpl9
-         H2vSoBpHxcvCMdNfK7FYQXOaTxal+QiyQDHGxIkLSZ15jQTtesuAnCfQs8lUPgQitpqh
-         bMxw==
-X-Gm-Message-State: AOJu0Yyntl0b+VMX7MaSJRff+9IXAoDmNPh/99CugomjC9iHVXkDtr8Y
-	6r3t06zq0PbQr0FC6RzirvAERQnbidgQoPjMr+7lBDSXw9SCMuQfmuXlQgqLQ3Hdt1iybo8hBNv
-	t2+m6mghmzutJHn9oMwKGPl+TLyo9zySoxZ9itCKq7Q8K4aGrvpqkZJY09g==
-X-Gm-Gg: ASbGnctvEQV0ybfYkoL0x+EVOxa6Y6qdRm9kkOpcqOttlokkhDi1eeKD6rCUgtOPZ6z
-	9hS0cwwr8MG7Zyver27/ZT5IaI6I1gjIf2sZenIc4UK3iB6BNAO2G5YYZLJt5zRYgWtOj1VzCIV
-	LQ9lRhGST2uXvMA/ybttNSdHzCGJ91vRyp8v8I40SEFaslxUE1ql1cKp5ScEkmMsdBimvrItOgv
-	dzTV5kWRI4WGp8fdaMVk82TCLqZA2ledXMGpmv4odp4dIUVBg0+C9ha+05VdU5xyBbA3O/rRX2k
-	mFPS7Ew+xJL/XrDmbkU=
-X-Received: by 2002:a05:6000:22c6:b0:3a3:7117:1bba with SMTP id ffacd0b85a97d-3a4eedae9eamr18609f8f.24.1748447275803;
-        Wed, 28 May 2025 08:47:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfe5mU+8sYz2bs9Uc7MqVa9kiKwrhfenTU2kWd1rbGnnelJswvX5D667Fl6g18WH0MpriPCQ==
-X-Received: by 2002:a05:6000:22c6:b0:3a3:7117:1bba with SMTP id ffacd0b85a97d-3a4eedae9eamr18585f8f.24.1748447275395;
-        Wed, 28 May 2025 08:47:55 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4eac8a85asm1790366f8f.48.2025.05.28.08.47.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 May 2025 08:47:54 -0700 (PDT)
-Message-ID: <3ae72579-7259-49ba-af37-a2eaba719e7e@redhat.com>
-Date: Wed, 28 May 2025 17:47:53 +0200
+	s=arc-20240116; t=1748447352; c=relaxed/simple;
+	bh=aJ2WMLCSX44iSStAIMvDDspDN9X8UmDN8ucWqh9qNTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nw5GNmploN/yvOOitb13B9bGv3aq36S+LOqrkiy2wDswkqU3ulvDZkb/4cTJn6vsAb3Dn5GwXJucmiGK3Lb8ObPbbemkE2xNf+mcJo8U3OrvG8vjIJ5UUxpFur2l0d/o05BBaYYs6FvY1YAFQfjHJm7JbZBrijmDdtp77Vzwb6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkB/QMIv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E65C4CEE3;
+	Wed, 28 May 2025 15:49:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748447352;
+	bh=aJ2WMLCSX44iSStAIMvDDspDN9X8UmDN8ucWqh9qNTY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UkB/QMIvCRG8lhyTHK4ZClCcPcCOR6kEHf5wFQNBU6hJOGSgUvDPGLtf+EGP8KbII
+	 3o3rUT7WyQaPv6DfnJYq4U8sVPFaM6ghiMyttbOd9gLmK0TofcmDhTQNV+XSHD5vdx
+	 GiXyH4uXXTaZdJD/44uHqlHVeGaUU8UTl5iOdS3HstyLslqDx2UV2gm0rxG5fD3y3D
+	 R2MVm9e01uI+s82RF6OG+sloU2pENCEAD7zhXKvo/jHy6VJEC8hAU5kkvSJqe2hZps
+	 ZOp/00ejMeb3KK/FECAtiu1Bl+CPvO3Vbduvow6HWIGovD3zx/yC7cEl9PskvQYhx/
+	 2n4QUWBCx6m1A==
+Date: Wed, 28 May 2025 16:49:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>
+Subject: Re: [PATCH net-next] selftest: Add selftest for multicast address
+ notifications
+Message-ID: <20250528154906.GD1484967@horms.kernel.org>
+References: <20250527091855.340837-1-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/8] virtio: introduce virtio_features_t
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <9a1c198245370c3ec403f14d118cd841df0fcfee.1747822866.git.pabeni@redhat.com>
- <CACGkMEtGRK-DmonOfqLodYVqYhUHyEZfrpsZcp=qH7GMCTDuQg@mail.gmail.com>
- <2119d432-5547-4e0b-b7fc-42af90ec6b7a@redhat.com>
- <CACGkMEsHn7q8BvfkaiknQTW9=WONLC_eB9DV0bcqL=oLa62Dxg@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CACGkMEsHn7q8BvfkaiknQTW9=WONLC_eB9DV0bcqL=oLa62Dxg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250527091855.340837-1-yuyanghuang@google.com>
 
-On 5/27/25 5:51 AM, Jason Wang wrote:
-> On Mon, May 26, 2025 at 3:20 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 5/26/25 2:43 AM, Jason Wang wrote:
->>> On Wed, May 21, 2025 at 6:33 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>>> diff --git a/include/linux/virtio_features.h b/include/linux/virtio_features.h
->>>> new file mode 100644
->>>> index 0000000000000..2f742eeb45a29
->>>> --- /dev/null
->>>> +++ b/include/linux/virtio_features.h
->>>> @@ -0,0 +1,23 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0 */
->>>> +#ifndef _LINUX_VIRTIO_FEATURES_H
->>>> +#define _LINUX_VIRTIO_FEATURES_H
->>>> +
->>>> +#include <linux/bits.h>
->>>> +
->>>> +#if IS_ENABLED(CONFIG_ARCH_SUPPORTS_INT128)
->>>> +#define VIRTIO_HAS_EXTENDED_FEATURES
->>>> +#define VIRTIO_FEATURES_MAX    128
->>>> +#define VIRTIO_FEATURES_WORDS  4
->>>> +#define VIRTIO_BIT(b)          _BIT128(b)
->>>> +
->>>> +typedef __uint128_t            virtio_features_t;
->>>
->>> Consider:
->>>
->>> 1) need the trick for arch that doesn't support 128bit
->>> 2) some transport (e.g PCI) allows much more than just 128 bit features
->>>
->>>  I wonder if it's better to just use arrays here.
->>
->> I considered that, it has been discussed both on the virtio ML and
->> privatelly, and I tried a resonable attempt with such implementation.
->>
->> The diffstat would be horrible, touching a lot of the virtio/vhost code.
+On Tue, May 27, 2025 at 06:18:55PM +0900, Yuyang Huang wrote:
+> This commit adds a new kernel selftest to verify RTNLGRP_IPV4_MCADDR
+> and RTNLGRP_IPV6_MCADDR notifications. The test works by adding and
+> removing a dummy interface and then confirming that the system
+> correctly receives join and removal notifications for the 224.0.0.1
+> and ff02::1 multicast addresses.
 > 
-> Let's start with the driver. For example, driver had already used
-> array for features:
+> The test relies on the iproute2 version to be 6.13+.
 > 
->         const unsigned int *feature_table;
->         unsigned int feature_table_size;
+> Tested by the following command:
+> $ vng -v --user root --cpus 16 -- \
+> make -C tools/testing/selftests TARGETS=net TEST_PROGS=rtnetlink.sh \
+> TEST_GEN_PROGS="" run_tests
 > 
-> For vhost, we need new ioctls anyhow:
-> 
-> /* Features bitmask for forward compatibility.  Transport bits are used for
->  * vhost specific features. */
-> #define VHOST_GET_FEATURES      _IOR(VHOST_VIRTIO, 0x00, __u64)
-> #define VHOST_SET_FEATURES      _IOW(VHOST_VIRTIO, 0x00, __u64)
-> 
-> As we can't change uAPI for existing ioctls.
-> 
->> Such approach will block any progress for a long time (more likely
->> forever, since I will not have the capacity to complete it).
->>
-> 
-> Well, could we at least start from using u64[2] for virtio_features_t?
-> 
->> Also the benefit are AFAICS marginal, as 32 bits platform with huge
->> virtualization deployments on top of it (that could benefit from GSO
->> over UDP tunnel) are IMHO unlikely,
-> 
-> I think it's better to not have those architecture specific assumptions since:
-> 
-> 1) need to prove the assumption is correct or
-> 2) we may also create blockers for 64 bit archs that don't support
-> ARCH_SUPPORTS_INT128.
-> 
->> and transport features space
->> exhaustion is AFAIK far from being reached (also thanks to reserved
->> features availables).
-> 
-> I wouldn't be worried if a straightforward switch to int128 worked,
-> but it looks like that is not the case:
-> 
-> 1) ARCH_SUPPORTS_INT128 dependency
-> 2) new uAPI
-> 3) we might want a new virtio config ops as well as most of transport
-> can only return 64 bit now
->>
->> TL;DR: if you consider a generic implementation for an arbitrary wide
->> features space blocking, please LMK, because any other consideration
->> would be likely irrelevant otherwise.
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
 
-I read your comments above as the only way forward is abandoning the
-uint128_t usage. Could you please confirm that?
+...
 
-Side note: new uAPI will be required by every implementation of
-feature-space extension, as the current ones are 64-bits bound.
+> +kci_test_mcast_addr_notification()
+> +{
+> +	local tmpfile
+> +	local monitor_pid
+> +	local match_result
+> +
+> +	tmpfile=$(mktemp)
+> +
+> +	ip monitor maddr > $tmpfile &
+> +	monitor_pid=$!
 
-Thanks,
+Hi Yuyang Huang,
 
-Paolo
+Other tests in this file seem to warn if the ip command is too old
+to support the test. Perhaps we can achieve that here something like this
+(completely untested!):
 
+	if [ ! -e "/proc/$monitor_pid" ]; then
+		end_test "SKIP: mcast addr notification: iproute2 too old"
+		rm $tmpfile
+		return $ksft_skip
+	fi
+
+> +	sleep 1
+> +
+> +	run_cmd ip link add name test-dummy1 type dummy
+> +	run_cmd ip link set test-dummy1 up
+> +	run_cmd ip link del dev test-dummy1
+> +	sleep 1
+> +
+> +	match_result=$(grep -cE "test-dummy1.*(224.0.0.1|ff02::1)" $tmpfile)
+> +
+> +	kill $monitor_pid
+> +	rm $tmpfile
+> +	# There should be 4 line matches as follows.
+> +	# 13: test-dummy1    inet6 mcast ff02::1 scope global 
+> +	# 13: test-dummy1    inet mcast 224.0.0.1 scope global 
+> +	# Deleted 13: test-dummy1    inet mcast 224.0.0.1 scope global 
+> +	# Deleted 13: test-dummy1    inet6 mcast ff02::1 scope global 
+> +	if [ $match_result -ne 4 ];then
+> +		end_test "FAIL: mcast addr notification"
+> +		return 1
+> +	fi
+> +	end_test "PASS: mcast addr notification"
+> +}
+> +
+
+...
+
+## Form letter - net-next-closed
+
+The merge window for v6.16 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations. We are
+currently accepting bug fixes only.
+
+Please repost when net-next reopens after June 8th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+pw-bot: deffer
 
