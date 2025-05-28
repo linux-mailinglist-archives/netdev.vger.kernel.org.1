@@ -1,175 +1,106 @@
-Return-Path: <netdev+bounces-194019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9436AC6D66
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:03:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA252AC6D98
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 18:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F881BC4EBA
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:03:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 974091BC7E82
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC5028B7E4;
-	Wed, 28 May 2025 16:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5888828C859;
+	Wed, 28 May 2025 16:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjXag/zX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHml+0Ha"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670B2288C9B
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 16:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23418288C03;
+	Wed, 28 May 2025 16:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748448174; cv=none; b=Q8eHESb6oskatldEWuFqNNpo9aYdo/oGsSA1n5N5nO6PD/UorCJwT0MG9BlhjwNm9p7ajnXGpbbFzdWvZGwFWQoAtDbZzszLnGfvhoNFLiXYTp/boGBJL6rJlEF4hhOsLV73ahwhO12H6aXCwu8K1IMEvphbD1Kl9W8d23kt600=
+	t=1748448777; cv=none; b=hhLCtuNd5sy6YVr6xRl77yJWwMELpCOMprads1O8qZ83rBtTKfUciKgU25cL3tgKPm3SJyF1KZ0O+SlkEwqMLoNNcvqq2MSGsnLrbQkIZ6FX689+GtAZlD1LqbI2EMl6SkF8rVgChesPFqw7Od5dT2PW4m/iNGtMZf89i/2rRi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748448174; c=relaxed/simple;
-	bh=5dMNkyAkkKCHQ8nk96nUpCIg8aNDTpHpWOanPItI2W0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nhH6awblIaVcFew2TlyYj5JE9eTi9NobjJEChKah2ZwDxdudoq8mZaj9EIlmuSgXRO2Ia24OqWSa8xTWVVdEI+ZmqpNj1ann42Ja/thc+sIDU5SDM2I32yamj7uszQykixe/pCING8AqfsyvlvVOU8YesK/uAVh59nzUu55Bwhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IjXag/zX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748448171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qPZcTDbaHEgC6QA8pqKhITUMnEMQXbUu1Yd8hb8N/98=;
-	b=IjXag/zXkqerKRV4SFcCIaTEAT4HtV3JmDhkJOmFTppQJo2OLK/q8iIDpYGc7RnW/hbFZo
-	Laj8IQ5r123qVeU8rKX6DSEpXvfStE+y8nSIDvrKwmydxwceAzDKXQSZAGatzs+MgPeduk
-	ZpFh8cmyaIJ2UkHRbcy3s6dwId0gQpU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-108-mJuoMB1_OCmaU8pTaI2bBg-1; Wed, 28 May 2025 12:02:49 -0400
-X-MC-Unique: mJuoMB1_OCmaU8pTaI2bBg-1
-X-Mimecast-MFC-AGG-ID: mJuoMB1_OCmaU8pTaI2bBg_1748448168
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43f251dc364so26795e9.2
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 09:02:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748448168; x=1749052968;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPZcTDbaHEgC6QA8pqKhITUMnEMQXbUu1Yd8hb8N/98=;
-        b=BsoiC5sgnBXWa9ZSX6oei5HXzMPcWfypbYdA82B/eflWYieF/yln/zZUquqmgvzoQc
-         xNKeH7DwNFi6M/FE2s74kRfo1x0tciJkF9GvSDx4QXk1MfSrzmoyyXw3v1vKh8RLzTyK
-         1rd5fRDCkXPPcHOjpTBYane5kW98rqx9VXBdDb4t1shX9QUhoHRHkNpOBlhw/S1xeU6l
-         orLa/E9CHhiYZ04A4x/bnuZoNbZJe6bndeX4AH/BNThGQMWbu9J+QG/1vy1LpWLiOLlR
-         nE8GCh6ooHDM8x/a6YFhRXztXlha4z+c01DXXRAEOU1pCH5MeaLXq2AqI2wRfCYZ7NI6
-         95zA==
-X-Gm-Message-State: AOJu0YxOjZvez5qM1aivRYBD1dO3JVVPNNAJQc20riN/rTrSguLu33mu
-	ZLBHNhs90ZWRU2Z7CjWa5W9w1uQ1nnv0lrSAqGnTEH8EmykyUXYhbK2QM94gGkIff8LYZjEGlK5
-	q1iBcBMosfGKXzZOoEU/DRfxp+vBCN8ut9qGImTFIJ2NWB63w8AP348qtvQ==
-X-Gm-Gg: ASbGnct5aeCX215u2x3y5nLCydIv4eAuohWGm5Ns/KyqvjBBlfVCM6HZGrGSan4XGgu
-	zF+kcAVYMrEm5VSyQAhlGKvfcaitEsMKcccF+6ublIOjO1lutKDn4B10SSbo4t8k8+/h8m+0tlo
-	TCxMJrgbJWFDMr1ID43vQ1jaRtFYNIW5yjulducXaLXL/en4+6VkGMKMsEUMCqFL48/xEcLo5Zj
-	Is8yTnv+XIa5VsaZ2m0ZoVBq7q6v47CzKIBVKM+DUrtdtzLUgJYB/9MPsdJVsAQb2So0jBd83aa
-	0JyDKlH9jd38wcPs+j4=
-X-Received: by 2002:a05:600c:4e0c:b0:442:faa3:fadb with SMTP id 5b1f17b1804b1-44c917f3ea8mr186028995e9.2.1748448166128;
-        Wed, 28 May 2025 09:02:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7J6z6bavS14nGuTd5J+LOu471BlIGeD4kc+EtOhpJRpu75fQN+EuXQJm2iH3/KDZIwEcUTg==
-X-Received: by 2002:a05:600c:4e0c:b0:442:faa3:fadb with SMTP id 5b1f17b1804b1-44c917f3ea8mr186028285e9.2.1748448165617;
-        Wed, 28 May 2025 09:02:45 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2728:e810::f39? ([2a0d:3344:2728:e810::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450787d418dsm22351825e9.40.2025.05.28.09.02.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 May 2025 09:02:45 -0700 (PDT)
-Message-ID: <3d5c65e0-d458-4a56-8c93-c0b5d37420b5@redhat.com>
-Date: Wed, 28 May 2025 18:02:43 +0200
+	s=arc-20240116; t=1748448777; c=relaxed/simple;
+	bh=fpi71ToKhzI4Ih0RsP1jwKepkejd8JqAFlfm4lSaG00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=co4kDXyYan99l1tRN7a4B/UnhNZtDfYoqNYT/051+TEs1Xh0PTAq/rZR9Sut3ha/JPdnWpmKDGTY2CTmmswzBLWlgwUvjahI86dphRFnsYx1dHoOg4NvoAkGYVo7QWVyFdDjn186B2N+HYy1bbTYMLkZfRul6ITLmbHF2vnkNe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHml+0Ha; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C52AC4CEE3;
+	Wed, 28 May 2025 16:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748448776;
+	bh=fpi71ToKhzI4Ih0RsP1jwKepkejd8JqAFlfm4lSaG00=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rHml+0HaqUcY9UrUHjk+viHrLfRKcPDgWPT5GKYfY3635zzgS4jydPVsZ3YIk4vsu
+	 OxwZDw9XNvoW5fIhEPZ7OpVLSKaxF0AkY70oHc/tdtbcmW/SVAd/agOb+tGeVaauVU
+	 oZfW1h1OAyBHt/ScLR4+SOj2bv8TyKYsaAEbR97TXQu3Ak/htIc3iMcOol4h3upiuj
+	 sq8zzSGeyujGxUqFI8Irqn7+RzWLrEuZW22criHBa3uiE+hfg8zHBdCYkjPxfhDN0H
+	 9u+rB+GdOLELUr7J3ovntiXCYTlNDcZm9eBK7FKO9oRw196ml3AuUhZG5YSliJ+39M
+	 gaTpVE4liakIA==
+Date: Wed, 28 May 2025 17:12:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: saikrishnag@marvell.com, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix swapped TX stats for MII
+ interfaces.
+Message-ID: <20250528161250.GE1484967@horms.kernel.org>
+References: <20250527121325.479334-1-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/8] virtio_pci_modern: allow setting configuring
- extended features
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <f85bc2d08dfd1a686b1cd102977f615aa07b3190.1747822866.git.pabeni@redhat.com>
- <CACGkMEv=XnqKDXCEitEOs-AL1g=H=7WiHEaHrMUN-RfKN1JCRg@mail.gmail.com>
- <53242a04-ef11-4d5b-9c7e-7a34f7ad4274@redhat.com>
- <CACGkMEtZZbN8vj-V-PSwAmQKCP=gDN5sDz4TOXcOhNXGPLp_yQ@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CACGkMEtZZbN8vj-V-PSwAmQKCP=gDN5sDz4TOXcOhNXGPLp_yQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250527121325.479334-1-m-malladi@ti.com>
 
-On 5/27/25 5:04 AM, Jason Wang wrote:
-> On Mon, May 26, 2025 at 6:53 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 5/26/25 2:49 AM, Jason Wang wrote:
->>> On Wed, May 21, 2025 at 6:33 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>>>
->>>> The virtio specifications allows for up to 128 bits for the
->>>> device features. Soon we are going to use some of the 'extended'
->>>> bits features (above 64) for the virtio_net driver.
->>>>
->>>> Extend the virtio pci modern driver to support configuring the full
->>>> virtio features range, replacing the unrolled loops reading and
->>>> writing the features space with explicit one bounded to the actual
->>>> features space size in word.
->>>>
->>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->>>> ---
->>>>  drivers/virtio/virtio_pci_modern_dev.c | 39 +++++++++++++++++---------
->>>>  1 file changed, 25 insertions(+), 14 deletions(-)
->>>>
->>>> diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
->>>> index 1d34655f6b658..e3025b6fa8540 100644
->>>> --- a/drivers/virtio/virtio_pci_modern_dev.c
->>>> +++ b/drivers/virtio/virtio_pci_modern_dev.c
->>>> @@ -396,12 +396,16 @@ EXPORT_SYMBOL_GPL(vp_modern_remove);
->>>>  virtio_features_t vp_modern_get_features(struct virtio_pci_modern_device *mdev)
->>>>  {
->>>>         struct virtio_pci_common_cfg __iomem *cfg = mdev->common;
->>>> -       virtio_features_t features;
->>>> +       virtio_features_t features = 0;
->>>> +       int i;
->>>>
->>>> -       vp_iowrite32(0, &cfg->device_feature_select);
->>>> -       features = vp_ioread32(&cfg->device_feature);
->>>> -       vp_iowrite32(1, &cfg->device_feature_select);
->>>> -       features |= ((u64)vp_ioread32(&cfg->device_feature) << 32);
->>>> +       for (i = 0; i < VIRTIO_FEATURES_WORDS; i++) {
->>>> +               virtio_features_t cur;
->>>> +
->>>> +               vp_iowrite32(i, &cfg->device_feature_select);
->>>> +               cur = vp_ioread32(&cfg->device_feature);
->>>> +               features |= cur << (32 * i);
->>>> +       }
->>>
->>> No matter if we decide to go with 128bit or not. I think at the lower
->>> layer like this, it's time to allow arbitrary length of the features
->>> as the spec supports.
->>
->> Is that useful if the vhost interface is not going to support it?
+On Tue, May 27, 2025 at 05:43:25PM +0530, Meghana Malladi wrote:
+> In MII mode, Tx lines are swapped for port0 and port1, which means
+> Tx port0 receives data from PRU1 and the Tx port1 receives data from
+> PRU0. This is an expected hardware behavior and reading the Tx stats
+> needs to be handled accordingly in the driver. Update the driver to
+> read Tx stats from the PRU1 for port0 and PRU0 for port1.
 > 
-> I think so, as there are hardware virtio devices that can benefit from this.
+> Fixes: c1e10d5dc7a1 ("net: ti: icssg-prueth: Add ICSSG Stats")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_stats.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> index 6f0edae38ea2..0b77930b2f08 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> @@ -29,6 +29,10 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
+>  	spin_lock(&prueth->stats_lock);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++) {
 
-Let me look at the question from another perspective. Let's suppose that
-the virtio device supports an arbitrary wide features space, and the
-uAPI allows passing to/from the kernel an arbitrary high number of features.
+Hi Meghana,
 
-How could the kernel stop the above loop? AFAICS the virtio spec does
-not define any way to detect the end of the features space. An arbitrary
-bound is actually needed.
+Perhaps it would be nice to include a comment here.
 
-If 128 looks too low (why?) it can be raised to say 256 (why?). But
-AFAICS the only visible effect would be slower configuration due to
-larger number of unneeded I/O operations.
-
-/P
-
+> +		if (emac->phy_if == PHY_INTERFACE_MODE_MII &&
+> +		    icssg_all_miig_stats[i].offset >= ICSSG_TX_PACKET_OFFSET &&
+> +		    icssg_all_miig_stats[i].offset <= ICSSG_TX_BYTE_OFFSET)
+> +			base = stats_base[slice ^ 1];
+>  		regmap_read(prueth->miig_rt,
+>  			    base + icssg_all_miig_stats[i].offset,
+>  			    &val);
+> 
+> base-commit: 32374234ab0101881e7d0c6a8ef7ebce566c46c9
+> -- 
+> 2.43.0
+> 
+> 
 
