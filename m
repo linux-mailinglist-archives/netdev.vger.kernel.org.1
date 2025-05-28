@@ -1,83 +1,103 @@
-Return-Path: <netdev+bounces-193790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF041AC5EA8
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:18:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A025AC5EAB
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 03:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2A104A4667
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1AD49E3343
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 01:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0961624FE;
-	Wed, 28 May 2025 01:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E041F170826;
+	Wed, 28 May 2025 01:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uwa1K1NH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QwsOZrth"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4787B652;
-	Wed, 28 May 2025 01:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C3474BE1;
+	Wed, 28 May 2025 01:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748395121; cv=none; b=NVcMCwhfsEWkXBXDOVRDUD8Xq8tQCwPuU//HpbDyM82TB+H0ICc7raI1krHSpWNR4KvElQle6DJ+U9GgZPjSqvUM7JzpS1BUevL529P+WTI7NDKb2NMeFePfjSzNriiBlzl3ViOY85Z/CVdCPU7pzXrv2ujhkyXXNf6cYENjezs=
+	t=1748395209; cv=none; b=YdGDt2sixV5vgubYRvv4g5wOfHPLK6bWSBV+E9qf/IyF8UKU0PlTqfQWS4hrOSilFkepipqKU+xhWTuhB3XGNEY+wRYvZy52obpF0q0UVvFGo7kMqFFBKgqs6Jr5YD9HQDRyzG6u46/7KmrIbnQs5NFOVnNLB2do/F9T5xtwfDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748395121; c=relaxed/simple;
-	bh=p5QWRdhWaODG9aKY5tA69PeV91P0Vrp+Cj4FSE5f6hw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D9eB2yas5exIV8CoHCyNQeN3PAlbJ49dj+94tGp2vohlRbO/kxpZJjEnGdXwcyWWwgDS+rClIe47RLHOg1OHypXpeWr8Mz+utZH/opLqnQfaDjJe//qayhOX4xYC/O3I/0l9EqW+Fb1JOf1TFAqodBq9IL8QN0cUNyKrn0zdmEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uwa1K1NH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87E20C4CEE9;
-	Wed, 28 May 2025 01:18:39 +0000 (UTC)
+	s=arc-20240116; t=1748395209; c=relaxed/simple;
+	bh=m3QrveW3xV5EfuvOTv2NxE5UGUIv1X8HYHGlnoy2QMU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Dwqf23WZHx5mLCDDb6WyTAXqX48rSVaYTNRGBk/VeLXuhGfH+dlivA3AxwK1Pf51veOGwMddkOfsg1PeVHZnAZFYY6vPsE3k/U7TjY441h+iR6bN4IUXOnBKdbrtREmi6aRY+Qe70M0JCCgOAOfJIQPrE0OAsiZT+b2SgrbyK+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QwsOZrth; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6D02C4CEE9;
+	Wed, 28 May 2025 01:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748395120;
-	bh=p5QWRdhWaODG9aKY5tA69PeV91P0Vrp+Cj4FSE5f6hw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uwa1K1NHzWm2IchSeYUR4fykOGrge/eVf2zfPNLzePfqn3/x9t3hLl5WqznVPEfPF
-	 7bj9XlA+KJHDUGz/MpZFgTQsNEfOW90u2Vx2E/xYRzt+3sYtLBc2m7VAr646Ez6uxj
-	 +q+5Vzke5jloJj65BsZiNwqNjnAwNLAb+MAp+XlbuQpmK7QvbQWP2CYF0wrEgypfmN
-	 V0SPSKlMuwaY8CpRZZKclRy45Kg/suOBhrlj5Xse6wXnDvyg1VACx1+dBSZxWUTlsN
-	 Az8ytsZi9dwKkJnMylk1H8ns2J6Lz4tU5sZMIDx2ibnWO+BFTp7PVb9vj2pfV9E5RE
-	 lPi6WZ7GfRT+w==
-Date: Tue, 27 May 2025 18:18:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Praveen Balakrishnan <praveen.balakrishnan@magd.ox.ac.uk>
-Cc: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
- <edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
- <shuah@kernel.org>, <aconole@redhat.com>, <echaudro@redhat.com>,
- <i.maximets@ovn.org>, <netfilter-devel@vger.kernel.org>,
- <coreteam@netfilter.org>, <netdev@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <skhan@linuxfoundation.org>, <linux-kernel-mentees@lists.linux.dev>
-Subject: Re: [PATCH v2] selftests: net: fix spelling and grammar mistakes
-Message-ID: <20250527181838.05cccdb3@kernel.org>
-In-Reply-To: <20250523022242.3518-1-praveen.balakrishnan@magd.ox.ac.uk>
-References: <4f0d5c19-8358-4e5b-a8f0-3adcee34ffd4@linuxfoundation.org>
-	<20250523022242.3518-1-praveen.balakrishnan@magd.ox.ac.uk>
+	s=k20201202; t=1748395207;
+	bh=m3QrveW3xV5EfuvOTv2NxE5UGUIv1X8HYHGlnoy2QMU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QwsOZrthoiRtdDSxr2+iS+ztsOZjpmXeZQIs2HLNItofnDBw59If+rNh8T1ORTBaH
+	 njXmfi9yyOcQZJCKJbx7YGs7sY9ehLoOkuOrnLSYsInRkwwDJAnRDApbutBU0VC2Ii
+	 LNOoKB6chb5g0qF1bj3Bqd0QEsZPDY6DgjDl16L9rWLrsOor+p9mjAxMtB9l9ilyh0
+	 JB13zUXSI5KWAwfhUt+HkjcpRnP86ebVFdtfgcRhH9xmOinxIFrFBcnmD1RSfFtUBN
+	 LqNbpKfqteHCGyo3SbrYVhE7W/HmlZNNXNbIdRlXiF91/aDgCMQxistoMfeFiNNeF5
+	 wmko1C89JBhdQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F25380AAE2;
+	Wed, 28 May 2025 01:20:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH 0/3] net: dsa: mt7530: Add AN7583 support + PHY
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174839524201.1849945.3988099260497875532.git-patchwork-notify@kernel.org>
+Date: Wed, 28 May 2025 01:20:42 +0000
+References: <20250522165313.6411-1-ansuelsmth@gmail.com>
+In-Reply-To: <20250522165313.6411-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, chester.a.unal@arinc9.com,
+ daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ SkyLake.Huang@mediatek.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ arinc.unal@arinc9.com, Landen.Chao@mediatek.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-On Fri, 23 May 2025 03:22:42 +0100 Praveen Balakrishnan wrote:
-> Fix several spelling and grammatical mistakes in output messages from
-> the net selftests to improve readability.
-> 
-> Only the message strings for the test output have been modified. No
-> changes to the functional logic of the tests have been made.
-> 
-> Signed-off-by: Praveen Balakrishnan <praveen.balakrishnan@magd.ox.ac.uk>
+Hello:
 
-This does not apply cleanly any more.
-Please wait until net-next re-opens after the merge window, 
-rebase and repost:
-https://netdev.bots.linux.dev/net-next.html
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 22 May 2025 18:53:08 +0200 you wrote:
+> This small series add the required changes to make Airoha AN7583
+> Switch and Internal PHY work due to strange default configuration.
+> 
+> Christian Marangi (3):
+>   dt-bindings: net: dsa: mediatek,mt7530: Add airoha,an7583-switch
+>   net: dsa: mt7530: Add AN7583 support
+>   net: phy: mediatek: Add Airoha AN7583 PHY support
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/3] dt-bindings: net: dsa: mediatek,mt7530: Add airoha,an7583-switch
+    https://git.kernel.org/netdev/net-next/c/fef184880923
+  - [net-next,2/3] net: dsa: mt7530: Add AN7583 support
+    https://git.kernel.org/netdev/net-next/c/d76556db10bf
+  - [net-next,3/3] net: phy: mediatek: Add Airoha AN7583 PHY support
+    https://git.kernel.org/netdev/net-next/c/8bc3c234dcb6
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
