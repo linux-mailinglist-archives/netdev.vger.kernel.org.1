@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-193833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86634AC5F95
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:35:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3378FAC5F98
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 912694C1A83
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08ADE1BC4B7F
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FBE1DE4EF;
-	Wed, 28 May 2025 02:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386591E0E14;
+	Wed, 28 May 2025 02:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8w1BoSR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hR9nGtMS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D98F1DE3A4;
-	Wed, 28 May 2025 02:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBD51C5D4B;
+	Wed, 28 May 2025 02:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748399403; cv=none; b=mYrX2ur86lW+8/AOsjcfWeCIOAbCMNwXbgEjpRSAt2lPofDbaiIFMWLw9BGPP83rP+aoIRG2txM109b7KbfDUMogj/3aWSo+sZfM02JRZh8xVk42jjYSy0je9xg+yXeK/EQ8j3seFjUYAIAZWouC/AEUuymEnwLl3YGhbAHgmyg=
+	t=1748399418; cv=none; b=L3immMBKuBmTj7RxzVkoOMH924MJM/A82WarLA8GS/Ct/X4YDA65t3kbjENHdfDc4WdiY9MJzDDb15Xih9uEtp0y+ZYOzImzuobtN1M/CwNkF4oke4xrKokhgOR4u5+mfrufu8Dz6YR1dRr1pdzXDWKVt6iS6r3VIugskTVwN2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748399403; c=relaxed/simple;
-	bh=4aOTZR6sBzl1F4lchzxw3b6kURa/QodcelE0rGzK69I=;
+	s=arc-20240116; t=1748399418; c=relaxed/simple;
+	bh=BWCthmiI/S2MepvgN2bdm2wAp5bX/8wGlKNy+opLH+U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gBgLzK7hiSjyPQ7VfWPiI1JGXsXkqKIebRXRDtggIAhdo8LO4DfHuIsRbkIDJxC2Sy2M6bvFrUtaP1i5clJrjPsM45hNIGnI+eflEEsdf6a8eeMG4YxxU2QylFqwsKaz67V2osou+I0cvE2FZR2hNWN1c7etzaIBwn8ullB9Oa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8w1BoSR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8FEDC4CEEA;
-	Wed, 28 May 2025 02:30:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iPmwk9z6y6KbYHSZjZolqF4/VUWBgSEn6U6p4shKmLosSaBqKi6CYq+9G7tTysU9kylBcXgIv/w3lSZPCEfdbwSy9D6CnqJr59IrlL/9VRngxrr+hJAYarhg95CniAgyxt4Xg+li9EaUqGoyWGNl5TKo2o3vruChOKBl7YSidSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hR9nGtMS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63605C4CEE9;
+	Wed, 28 May 2025 02:30:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748399402;
-	bh=4aOTZR6sBzl1F4lchzxw3b6kURa/QodcelE0rGzK69I=;
+	s=k20201202; t=1748399417;
+	bh=BWCthmiI/S2MepvgN2bdm2wAp5bX/8wGlKNy+opLH+U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H8w1BoSRwYbyinQ4snWfjt6MLnfTnubr2sRn1nNS6bT0OGjgjZQyJNEp452llfxMj
-	 JN7LEs1IW3DSKOOq2d8DIA0XlWHQ7hPgQmr23lTElAEg15dG3BkDh4wJqMhagPigTM
-	 jAtRFhoFNALPv8OhjTEereUpOesbUUcxktQO4ddpNfy7pxt4i2ptwLF6QB8lAsZwPR
-	 F7xvoaDBteEUICMx5LKypuRw2xgiQOUd06lj9I6XNAhrlVpZ8pYcK6gJjXpa82GLOM
-	 dBKkhy97/f7ENg/DHOYPgmlsOZoa+gqnNaNpcpLW+y238U2CKkuzyN30bBQWkkh8tx
-	 1OpjODI3juvLw==
+	b=hR9nGtMSbjWhXxGLl5Kab7PjG50Wkd8+gcZLY1aGEA66MWPgVyxSb7njj9WWn2PDw
+	 XUaeGN1ZQHRibQum7KJR0A4FVXW23bA6c+VPDaFyuLJw+vK7OQ3rbwyS992ULTthbC
+	 jXkAH5niCg09K/FKTYoJC0OVtrKUQaQWeXl9sqJKQgiiCMqmM4uYYcChRyeqJVudV7
+	 UqWKo04HJLnJ/6X0ePU6HilOnSdChZX3mwTqtlkpC08+k573trmVeJA5DlHMHpoZRh
+	 38d7ENzOgJeOo3uMlRXhPEJx0t3B6l/FfqGqaOTpTpNCaXm42BY0KIdQ1mzwmy0WOw
+	 kfA8Y4IoSNr5Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D3C3822D1A;
-	Wed, 28 May 2025 02:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDC23822D1A;
+	Wed, 28 May 2025 02:30:52 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: phy: mscc: Fix memory leak when using one step
- timestamping
+Subject: Re: [PATCH net-next v2 0/8] Devmem TCP minor cleanups and ksft
+ improvements
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174839943674.1866481.1704860946542275477.git-patchwork-notify@kernel.org>
-Date: Wed, 28 May 2025 02:30:36 +0000
-References: <20250522115722.2827199-1-horatiu.vultur@microchip.com>
-In-Reply-To: <20250522115722.2827199-1-horatiu.vultur@microchip.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, kory.maincent@bootlin.com, shannon.nelson@amd.com,
- rrameshbabu@nvidia.com, viro@zeniv.linux.org.uk, quentin.schulz@bootlin.com,
- atenart@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <174839945148.1866481.123828149281878670.git-patchwork-notify@kernel.org>
+Date: Wed, 28 May 2025 02:30:51 +0000
+References: <20250523230524.1107879-1-almasrymina@google.com>
+In-Reply-To: <20250523230524.1107879-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, ncardwell@google.com, kuniyu@amazon.com,
+ dsahern@kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org, sdf@fomichev.me,
+ ap420073@gmail.com, praan@google.com, shivajikant@google.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 22 May 2025 13:57:22 +0200 you wrote:
-> Fix memory leak when running one-step timestamping. When running
-> one-step sync timestamping, the HW is configured to insert the TX time
-> into the frame, so there is no reason to keep the skb anymore. As in
-> this case the HW will never generate an interrupt to say that the frame
-> was timestamped, then the frame will never released.
-> Fix this by freeing the frame in case of one-step timestamping.
+On Fri, 23 May 2025 23:05:16 +0000 you wrote:
+> v2: https://lore.kernel.org/netdev/20250519023517.4062941-1-almasrymina@google.com/
+> 
+> Changelog:
+> - Collect acks and tested-bys (Thanks!)
+> - Drop the patch that removed ksft_disruptive. That seems to not have
+>   any relation to behavior when test fails.
+> - Address comments.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: phy: mscc: Fix memory leak when using one step timestamping
-    https://git.kernel.org/netdev/net/c/846992645b25
+  - [net-next,v2,1/8] net: devmem: move list_add to net_devmem_bind_dmabuf.
+    https://git.kernel.org/netdev/net-next/c/88e47c93b3a2
+  - [net-next,v2,2/8] page_pool: fix ugly page_pool formatting
+    https://git.kernel.org/netdev/net-next/c/170ebc60b79a
+  - [net-next,v2,3/8] net: devmem: preserve sockc_err
+    https://git.kernel.org/netdev/net-next/c/85cea17d15c9
+  - [net-next,v2,4/8] net: devmem: ksft: add ipv4 support
+    https://git.kernel.org/netdev/net-next/c/12d31142e63a
+  - [net-next,v2,5/8] net: devmem: ksft: add exit_wait to make rx test pass
+    https://git.kernel.org/netdev/net-next/c/57605ae8e1b6
+  - [net-next,v2,6/8] net: devmem: ksft: add 5 tuple FS support
+    https://git.kernel.org/netdev/net-next/c/243d47a5e1e4
+  - [net-next,v2,7/8] net: devmem: ksft: upgrade rx test to send 1K data
+    https://git.kernel.org/netdev/net-next/c/baa18bc5353f
+  - [net-next,v2,8/8] net: devmem: ncdevmem: remove unused variable
+    https://git.kernel.org/netdev/net-next/c/affffcbb8726
 
 You are awesome, thank you!
 -- 
