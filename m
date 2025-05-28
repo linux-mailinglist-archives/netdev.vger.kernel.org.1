@@ -1,279 +1,251 @@
-Return-Path: <netdev+bounces-193992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1823EAC6BEF
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B96FAC6BF3
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3352C9E496C
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:37:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8C49A230BC
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F40528C5C6;
-	Wed, 28 May 2025 14:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EFA288C92;
+	Wed, 28 May 2025 14:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KsmplJWI"
+	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="Iyn9wVTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682CE28C5C1;
-	Wed, 28 May 2025 14:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DF3193077
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 14:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748442909; cv=none; b=F075R7ScQpT/mWqglNjqPi0P5MVI/XvNbaARjbk0Vy7EmjvGEhWqlIosu08bhalwTLG1FdppDAHFwyertEmkQ9Qlz6PdnmuV4gi79Z/bNKXLQlTxFI6xUWQ2DZszTlFRlZqG0lxmyPgx7aGxgSXS/T/kpCgN02xKQeeaBy+tnlc=
+	t=1748442976; cv=none; b=rYUtvA6bUlPFAhSuY7LhZWFidqBypv8e8Mnkpo4yq6LW+w5Ohq3gkIWzGwSADlqvgv5kw46SjNwWLbzyw2e2+avdqE8VuiomHLJgMs90hihcNoX1K9F2B0mq9oWm1RDD3fW5vrYuDZI8p1CxA0lOB1inL+uFlK/5Gg/99GExoIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748442909; c=relaxed/simple;
-	bh=AKX4FDPj3rW/ap6FeR0RTU27EfheF4Zl72HxiGiuS/M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BJliUuriAz0CXKCPLfeJZoDHaDlvYx7anaM2Hr11UDzgY+3z3HxTac7bsfbwJRfrNbL+FQaP8eQ4Z/B46cDwMw6qShx7aIXamf/66k59N0zIdQprFdQxlOOYnAysM8GSOrK8lMIuBtMLyg9dJ2T1BY/U8YGQCjpJ3TkkIRrqOYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KsmplJWI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14400C4CEEE;
-	Wed, 28 May 2025 14:35:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748442908;
-	bh=AKX4FDPj3rW/ap6FeR0RTU27EfheF4Zl72HxiGiuS/M=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KsmplJWIe6eBjKs2ARkYqjXvZwSJSqvbEtq/5plylP8xAw+qAbbZcbLPl5JOnplgC
-	 Ko9Aq0v0JiWMtRyuAXdRautc+ae4QJ11jFResDh5FxURw7NMFc/tHEyetpPy7C8BeL
-	 itcRbCQMILfrlSVD+k5SpuCeRrGEFoxf+xL/p5GmfIfzx22hMaQGxIWFNhoLA/GDBL
-	 UwGXKfmeYTGqp6MG2l8cz/g1MG2HUAXNTjNXwDPZ+ktH6YuYEYdt8L5UJ3OwiL4F3k
-	 yHUqYP2/eY2SSWXoxwp4kR4WflKuO1Pi+S38f8F9SnROB2E9ZjRc5lBMGrgUl79PU/
-	 ZVzyaOEXcerlA==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 28 May 2025 10:34:42 -0400
-Subject: [PATCH v11 10/10] ref_tracker: eliminate the ref_tracker_dir name
- field
+	s=arc-20240116; t=1748442976; c=relaxed/simple;
+	bh=kZdtPLtiwt1WDJ8IbtVBanoaZhX6emGAKLby7L4oq3Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GIQ1xvz8w9FPaWUdES8QZosn+RnmyV/cmnCvw3mg4RAI4v2B77Z0a5tEW8MXOzH70VfYqSf6s2u/JH2lLwZ7Vce2X9InQgmFpstxjh7Njd1ZZ/jahTk7bXwqkGIVj1tnaLHiNu9Jk6GUZeOiDNrcVcmogJK9KFJASeFVcoU4ID8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=Iyn9wVTe; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a36f26584bso2830891f8f.0
+        for <netdev@vger.kernel.org>; Wed, 28 May 2025 07:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmo-cybersecurity.com; s=google; t=1748442972; x=1749047772; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i3u1tiLuHtSwquV3XWda37V0Wy2peP3hAf6J/XwOj40=;
+        b=Iyn9wVTe/uux7zmHD7vNNJmrk5KOZM2Z98BfCWPUCWbI1+T1mAsGArG0KL3WWtayQC
+         SxiPAh2Pz/4+OsG5Eees+zu71BrWCsRyV21YQZfjwMUzTin/Zt7ixd50mbAHzanxHxG+
+         D5E8olt00yq+6v+55Jv2Lfaea3CNujEXVZixyp95+2Kz/u3k8Nvs0x98A5MvF8Wl9Dgb
+         oOenxmwxaSQmLnt+TdSST2/3AyifKxwor8cPGUEW23LhYLlk0yf1o35TyAW5pS7EvgJK
+         vSWIgQxeN0x4xGiBPCgFreu+GOHxm1mJ09uVvYufa83sCF1BcmZuI6PgBuqEwGbqpWqb
+         QC5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748442972; x=1749047772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i3u1tiLuHtSwquV3XWda37V0Wy2peP3hAf6J/XwOj40=;
+        b=t9h/Wek6D01j2YPz4vzRzuWGGOyEjty72g47ckZJfiLChiVe2IiU1cD3LtYhq7ywfY
+         +JZtcvZn9izKP7/34g6n+4KmvJpOkPMgvPCqNBa//KXeQpSctb80JIdegWfq1bnRJePP
+         E+G37xQjIr/TBiCo3RccSqlFCPsfuZGbNFInxn5emByyRGrLin8960lGpHTE8wpV7xJU
+         LSeEurEjeehSnP5y6WUMPkBubjmHp3oDdCB8NWMG7tzFUA0564WrRsXN4EUPR9ME6bCX
+         cFSbN8KMVrNeOqalkqvsFfIxGqVbL2GJPjKiWRe61yfQbyrw+1JIVOc/Gp0WymuB4HXV
+         3CSA==
+X-Gm-Message-State: AOJu0YwtmL6uz6xVC36hTFvPLOSzMVKXuTLbynET5i+NV3ocCd0IIyaq
+	0wmZLrm3dSCkvqIt1vltMcKkefupRKNW4EhjnoMSkpEXzhSpSLklFO6a6UqEa4csmJrDVcCjxi8
+	N6kFGZAYZYMknoSt/XeUviK6fDWMFAq93OOlLwt+GJWHzoH3xw+UZFLRlCg==
+X-Gm-Gg: ASbGncv01RaAJSC0hExackEN75tGHrdKm2b8K7y4kppjvQRq9/tHm/FyDG5PPlg9ePa
+	qZaMEC+Ubha2e8xdIkdv55Av7kY7I1GprSvyD+paOJuJrUQIAtnzbWKoc8re8bvFz2pZo0zYkrg
+	W1+qGu3/VnGsG5VXHhyVJrtzjDcULkjh/0ZEA=
+X-Google-Smtp-Source: AGHT+IH7yF1AuOcjbaAOHuQ3ZEWVAuHmuJDzgC0s0JkYyOYDFPU6CteR3EjlyEPVIQtcXYyc1ihSJZMaHl1DL1yvv50=
+X-Received: by 2002:a5d:5648:0:b0:3a4:ea40:4d46 with SMTP id
+ ffacd0b85a97d-3a4ea404f84mr1792896f8f.28.1748442971361; Wed, 28 May 2025
+ 07:36:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250528-reftrack-dbgfs-v11-10-94ae0b165841@kernel.org>
-References: <20250528-reftrack-dbgfs-v11-0-94ae0b165841@kernel.org>
-In-Reply-To: <20250528-reftrack-dbgfs-v11-0-94ae0b165841@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Jani Nikula <jani.nikula@linux.intel.com>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7441; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=AKX4FDPj3rW/ap6FeR0RTU27EfheF4Zl72HxiGiuS/M=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoNx8GUbNe0u/9+9+eE7tgiRVcVreJlMB6qUWTK
- YYte8dlDn2JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaDcfBgAKCRAADmhBGVaC
- FZwJD/4wTMXd3CKNRCdy4SCb43tF0jNLN6JTuCLLf5Bc9AMN+mmv7hKG50iBaC7ntaOM2LNfCJo
- 9p2qOlsHHA/E0I+cBlmh9TrY+novMQNP5P4pCUTYzUedZQRW8/mZXrNkIIllcXH6luuKvVDu/YW
- SedDu47Vd7lWfER699RoPt02Zh6NKSA3MFGKOkxJw2UYIx6yN7s/aoCgwtUdjwWXOBSpbsXBs2k
- dV8lU7N/aJu5oleDQ8eU3BBlJDfyoiDjcLvJxcPJeHVieoyMjlDm8ZAkofJAKfWR5+/QvdW7BJq
- NmPXu9y0NPfCHlKde5I5LIknE8Vs3CRXAqgRbUfHVEPWJnRvc3CzBAjxtfJJB9Su38S7YyXz9V0
- yGg0NtpVsBAqFyqDbG/2cLFiy5UxsMA6xBNllEVMJr0va274Mr3D9MzZ36ltVh6UJqidzN24WYN
- iVE4R34xDvqZbQa7wyhIhLfjAn6/JxZZbllWuyJljw9o1CJeZ5y3veWem0/PxjXth+gTx/Nlgot
- eZXxptUbrPEec4ZMb0Mu06NHacjxqeSsn6sEncdujnWsKj368Q81EDilGlVUy3Y7YUpawHrrFiL
- CADngVBvEZO0k/8jaFXP2FBOZX8K8yZVU8RHlzS7yLhuBKCqLqDYdv9tbpUNA9JlrCY+zty6DWm
- 48eNtT2ri4usDWA==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
+ <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
+In-Reply-To: <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
+From: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
+Date: Wed, 28 May 2025 23:35:59 +0900
+X-Gm-Features: AX0GCFt8IHdrgw66Ok-mDEgqM1lC1lAB5ev1oiemIeLCWaTRnSWwrFQQ1YK1Koc
+Message-ID: <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com>
+Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, 
+	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Now that we have dentries and the ability to create meaningful symlinks
-to them, don't keep a name string in each tracker. Switch the output
-format to print "class@address", and drop the name field.
+Thank you for your review.
 
-Also, add a kerneldoc header for ref_tracker_dir_init().
-
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
- include/linux/ref_tracker.h             | 20 ++++++++++++++------
- lib/ref_tracker.c                       |  6 +++---
- lib/test_ref_tracker.c                  |  2 +-
- net/core/dev.c                          |  2 +-
- net/core/net_namespace.c                |  4 ++--
- 8 files changed, 24 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index b9c12b8bf2a3e400b6d8e9d184145834c603b9e1..1205a4432eb4142344fb6eed1cb5ba5b21ec6953 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
- 
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 90d90145a1890bf788e789858ddad3b3d8e3b978..7ce3e6de0c1970697e0e58198e1e3852975ee7bc 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -61,7 +61,7 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
- 	if (!rpm->debug.class)
- 		ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
--				     "intel_runtime_pm", dev_name(rpm->kdev));
-+				     "intel_runtime_pm");
- }
- 
- static intel_wakeref_t
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 21dcee7c9a659ac1fb0aa19f3018647be3bda754..080535fc71d8c25dcc848eefd063361bbe21b305 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -115,7 +115,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
- 	if (!wf->debug.class)
--		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-+		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref");
- #endif
- }
- 
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index ddc5a7b2bd84692bbc1e1ae67674ec2c6857e1ec..5878e7fce712930700054033ff5f21547e75224f 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -24,7 +24,6 @@ struct ref_tracker_dir {
- 	struct dentry		*dentry;
- 	struct dentry		*symlink;
- #endif
--	char			name[32];
- #endif
- };
- 
-@@ -48,10 +47,21 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
- 
- #endif /* CONFIG_DEBUG_FS */
- 
-+/**
-+ * ref_tracker_dir_init - initialize a ref_tracker dir
-+ * @dir: ref_tracker_dir to be initialized
-+ * @quarantine_count: max number of entries to be tracked
-+ * @class: pointer to static string that describes object type
-+ *
-+ * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-+ * will also be created for it under the top-level ref_tracker debugfs
-+ * directory.
-+ *
-+ * Note that @class must point to a static string.
-+ */
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- 	INIT_LIST_HEAD(&dir->list);
- 	INIT_LIST_HEAD(&dir->quarantine);
-@@ -65,7 +75,6 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dentry = NULL;
- 	dir->symlink = NULL;
- #endif
--	strscpy(dir->name, name, sizeof(dir->name));
- 	ref_tracker_dir_debugfs(dir);
- 	stack_depot_init();
- }
-@@ -90,8 +99,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- }
- 
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index 5e84e5fd78e147a036d4adb511e657da07866a55..5fb384dd919e1f1ad632eaf595b954118bcfddab 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -123,7 +123,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 	stats = ref_tracker_get_stats(dir, display_limit);
- 	if (IS_ERR(stats)) {
- 		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
--			   s->prefix, dir->name, dir, stats);
-+			   s->prefix, dir->class, dir, stats);
- 		return;
- 	}
- 
-@@ -134,14 +134,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
- 			sbuf[0] = 0;
- 		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
--			   dir->name, dir, stats->stacks[i].count,
-+			   dir->class, dir, stats->stacks[i].count,
- 			   stats->total, sbuf);
- 		skipped -= stats->stacks[i].count;
- 	}
- 
- 	if (skipped)
- 		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
--			   s->prefix, dir->name, dir, skipped, stats->total);
-+			   s->prefix, dir->class, dir, skipped, stats->total);
- 
- 	kfree(sbuf);
- 
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e6fec0072e78ef79 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index bac9d29486556023cd99f5101b96b052acb9ba70..a062912525ee573504a9cc252f71aed22693d24f 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11713,7 +11713,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index b2fd9c5635ecf8fccd48f1d5b967a5c6c41cfec4..8d21c8f4eb83597ddee5fd345b5e38b308ce0335 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -403,8 +403,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
-
--- 
-2.49.0
-
+2025=E5=B9=B45=E6=9C=8826=E6=97=A5(=E6=9C=88) 17:23 Eric Dumazet <edumazet@=
+google.com>:
+>
+> On Sun, May 25, 2025 at 10:08=E2=80=AFPM =E6=88=B8=E7=94=B0=E6=99=83=E5=
+=A4=AA <kota.toda@gmo-cybersecurity.com> wrote:
+> >
+> > In bond_setup_by_slave(), the slave=E2=80=99s header_ops are unconditio=
+nally
+> > copied into the bonding device. As a result, the bonding device may inv=
+oke
+> > the slave-specific header operations on itself, causing
+> > netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpreted
+> > as the slave's private-data type.
+> >
+> > This type-confusion bug can lead to out-of-bounds writes into the skb,
+> > resulting in memory corruption.
+> >
+> > This patch adds two members to struct bonding, bond_header_ops and
+> > header_slave_dev, to avoid type-confusion while keeping track of the
+> > slave's header_ops.
+> >
+> > Fixes: 1284cd3a2b740 (bonding: two small fixes for IPoIB support)
+> > Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+> > Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+> > Co-Developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
+> > Reviewed-by: Paolo Abeni <pabeni@redhat.com>
+> > Reported-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
+> > ---
+> >  drivers/net/bonding/bond_main.c | 61
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  include/net/bonding.h           |  5 +++++
+> >  2 files changed, 65 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
+_main.c
+> > index 8ea183da8d53..690f3e0971d0 100644
+> > --- a/drivers/net/bonding/bond_main.c
+> > +++ b/drivers/net/bonding/bond_main.c
+> > @@ -1619,14 +1619,65 @@ static void bond_compute_features(struct bondin=
+g *bond)
+> >      netdev_change_features(bond_dev);
+> >  }
+> >
+> > +static int bond_hard_header(struct sk_buff *skb, struct net_device *de=
+v,
+> > +        unsigned short type, const void *daddr,
+> > +        const void *saddr, unsigned int len)
+> > +{
+> > +    struct bonding *bond =3D netdev_priv(dev);
+> > +    struct net_device *slave_dev;
+> > +
+> > +    slave_dev =3D bond->header_slave_dev;
+> > +
+> > +    return dev_hard_header(skb, slave_dev, type, daddr, saddr, len);
+> > +}
+> > +
+> > +static void bond_header_cache_update(struct hh_cache *hh, const
+> > struct net_device *dev,
+> > +        const unsigned char *haddr)
+> > +{
+> > +    const struct bonding *bond =3D netdev_priv(dev);
+> > +    struct net_device *slave_dev;
+> > +
+> > +    slave_dev =3D bond->header_slave_dev;
+>
+> I do not see any barrier ?
+>
+> > +
+> > +    if (!slave_dev->header_ops || !slave_dev->header_ops->cache_update=
+)
+> > +        return;
+> > +
+> > +    slave_dev->header_ops->cache_update(hh, slave_dev, haddr);
+> > +}
+> > +
+> >  static void bond_setup_by_slave(struct net_device *bond_dev,
+> >                  struct net_device *slave_dev)
+> >  {
+> > +    struct bonding *bond =3D netdev_priv(bond_dev);
+> >      bool was_up =3D !!(bond_dev->flags & IFF_UP);
+> >
+> >      dev_close(bond_dev);
+> >
+> > -    bond_dev->header_ops        =3D slave_dev->header_ops;
+> > +    /* Some functions are given dev as an argument
+> > +     * while others not. When dev is not given, we cannot
+> > +     * find out what is the slave device through struct bonding
+> > +     * (the private data of bond_dev). Therefore, we need a raw
+> > +     * header_ops variable instead of its pointer to const header_ops
+> > +     * and assign slave's functions directly.
+> > +     * For the other case, we set the wrapper functions that pass
+> > +     * slave_dev to the wrapped functions.
+> > +     */
+> > +    bond->bond_header_ops.create =3D bond_hard_header;
+> > +    bond->bond_header_ops.cache_update =3D bond_header_cache_update;
+> > +    if (slave_dev->header_ops) {
+> > +        bond->bond_header_ops.parse =3D slave_dev->header_ops->parse;
+> > +        bond->bond_header_ops.cache =3D slave_dev->header_ops->cache;
+> > +        bond->bond_header_ops.validate =3D slave_dev->header_ops->vali=
+date;
+> > +        bond->bond_header_ops.parse_protocol =3D
+> > slave_dev->header_ops->parse_protocol;
+>
+> All these updates probably need WRITE_ONCE(), and corresponding
+> READ_ONCE() on reader sides, at a very minimum ...
+>
+> RCU would even be better later.
+>
+I believe that locking is not necessary in this patch. The update of
+`header_ops` only happens when a slave is newly enslaved to a bond.
+Under such circumstances, members of `header_ops` are not called in
+parallel with updating. Therefore, there is no possibility of race
+conditions occurring.
+>
+> > +    } else {
+> > +        bond->bond_header_ops.parse =3D NULL;
+> > +        bond->bond_header_ops.cache =3D NULL;
+> > +        bond->bond_header_ops.validate =3D NULL;
+> > +        bond->bond_header_ops.parse_protocol =3D NULL;
+> > +    }
+> > +
+> > +    bond->header_slave_dev      =3D slave_dev;
+> > +    bond_dev->header_ops        =3D &bond->bond_header_ops;
+> >
+> >      bond_dev->type            =3D slave_dev->type;
+> >      bond_dev->hard_header_len   =3D slave_dev->hard_header_len;
+> > @@ -2676,6 +2727,14 @@ static int bond_release_and_destroy(struct
+> > net_device *bond_dev,
+> >      struct bonding *bond =3D netdev_priv(bond_dev);
+> >      int ret;
+> >
+> > +    /* If slave_dev is the earliest registered one, we must clear
+> > +     * the variables related to header_ops to avoid dangling pointer.
+> > +     */
+> > +    if (bond->header_slave_dev =3D=3D slave_dev) {
+> > +        bond->header_slave_dev =3D NULL;
+> > +        bond_dev->header_ops =3D NULL;
+> > +    }
+> > +
+> >      ret =3D __bond_release_one(bond_dev, slave_dev, false, true);
+> >      if (ret =3D=3D 0 && !bond_has_slaves(bond) &&
+> >          bond_dev->reg_state !=3D NETREG_UNREGISTERING) {
+> > diff --git a/include/net/bonding.h b/include/net/bonding.h
+> > index 95f67b308c19..cf8206187ce9 100644
+> > --- a/include/net/bonding.h
+> > +++ b/include/net/bonding.h
+> > @@ -215,6 +215,11 @@ struct bond_ipsec {
+> >   */
+> >  struct bonding {
+> >      struct   net_device *dev; /* first - useful for panic debug */
+> > +    struct   net_device *header_slave_dev;  /* slave net_device for
+> > header_ops */
+> > +    /* maintained as a non-const variable
+> > +     * because bond's header_ops should change depending on slaves.
+> > +     */
+> > +    struct   header_ops bond_header_ops;
+> >      struct   slave __rcu *curr_active_slave;
+> >      struct   slave __rcu *current_arp_slave;
+> >      struct   slave __rcu *primary_slave;
 
