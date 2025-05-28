@@ -1,234 +1,211 @@
-Return-Path: <netdev+bounces-194034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4386AC6F3D
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 19:26:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7023FAC6F3E
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 19:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF5D4503807
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:21:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9ADE18826B3
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 17:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEB328C2A9;
-	Wed, 28 May 2025 17:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9176127A110;
+	Wed, 28 May 2025 17:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RoiYCpYt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DD91DE881;
-	Wed, 28 May 2025 17:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CF11EE7B7;
+	Wed, 28 May 2025 17:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748452836; cv=none; b=c8LMTf8Esa9n/vAgXnzQ9kna2leZvAXvnzdPtQRkhesfaVO3Qvj8zZrA94/DVtA58CFfQqXQnbrbfhoPYa6i/u5Sh989h6oK/gw0XVG2THB5OVTmEyqFAFdbF8zhhpqA7jDvs/9b/OYAU/RovoO/kuRJJtGCbhnktmMW/S/LVuQ=
+	t=1748453136; cv=none; b=PrHOsGr4A50p6DBJH/q54pXaS0OEBZlQI9mTBNQU5sl4F6VAHCwD6g3Am3XwloLXrfWOgP2aVIu/Omv0zzCwdslzcGlTiSkQ3f9bOco/jZ584arM2auSS1quxsYWeNcAaOma0U+u1rbYEYF6x3QcxF+p4xQwGr0RNDkNsVPmL00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748452836; c=relaxed/simple;
-	bh=Nc/nMZeliRv4e8jKOEEg08tp355xW3KIhShYLVQJYh0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Z6+WZBirNmeXCy7flqpXFhAijtNP/mjwzY/A9XaW3xGswjSk4b/f+gjcVlMXPjqhZK35rwRWxB0Ga9eQbc5ZwdF/ElOSK4yhNJcFvd2a4US1wRq43EhiwLqDgto89CUIYd8CQADaAxVoYbQ1go7K7d9a70UzWXccJFVocQSlwng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1748453136; c=relaxed/simple;
+	bh=/OzUyuVqnOB7miLFV37uZy05en+YqG3p0V1Vv2/8lTk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JqvKphxCs1HEdDEuelCY7LbSpv/Hbnbz3bD5g4inxmkmg4YVuWwfYBVwpCWv9Mz8/R5z88x8gjDeODRRAK1+AV6ox8Qomk5s6gfQHDQEvGX0AOnB/a2HzyhI6isnoKo4bn4XGZwnVdXeVoDt21cBN6khTBXPcTEaFwByC/EfMe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RoiYCpYt; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ad1a87d93f7so791715266b.0;
-        Wed, 28 May 2025 10:20:33 -0700 (PDT)
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6f5365bdbaeso926686d6.3;
+        Wed, 28 May 2025 10:25:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748453134; x=1749057934; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/OzUyuVqnOB7miLFV37uZy05en+YqG3p0V1Vv2/8lTk=;
+        b=RoiYCpYt9dX/nmBRfRsDFN8/QyIo61MOVV1xymizxstQ9HK4murJufDE9NxDw5bj/N
+         DfNHKPF9IH3tVSeSrP3FUvQZYNJlAzJZqcgN9E7RsthTQywnC2Yr27MqDmLkONzXqZvx
+         TtobWHmtDzvh6dGuvOlary7ATwxGMpM+TqXk2SYXAw7+QBU6v763WJBZcmkgHwDVTSU3
+         QSM0Gs0aGwxwxET/QRjO8vjiFYbjKF07cUpK8/R665jsUAe7WHBSs/QwB9HReWNP+c3W
+         fe5krBdphLuyEG/TcyFfxAmgBI3lW6lhTYcLm6WYfBckLWQ/uA2jl5QPivCIKUvvIUMS
+         VCPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748452832; x=1749057632;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gD88t2eyCZO/5777P2Z9x2ty4BaqKSaCKMsGFXhbCbg=;
-        b=jfLYKGxvq1ZtTAkOAnjIyUsa/B7JMUoYisSHSlx3KhksEfMTB4vLfIuY/X/c7xGAsq
-         nfF3SxI9DWT/+13cUX7b6F8JpboNyesMEH2XBl7HFC8GNdn6BRDIvBpVma1klSA22/ZF
-         SFeIv+5r2rxgyW267f8UpkVC0m9S7zUyV5j31j90xLEP8X1fOR+XRrocdSvXQLgssoXC
-         8myj5BoMKFqWRasfjShi919h83St0A59DSDy2CBjWBj9s3itncOXWOYRFOPdDIqGTuHT
-         /lMDX0UfN5rH+bX5SArLzlaaipyd8a7/QGPKgA0M2PpcY8MahWDGgpGs2dF9ZHXTV609
-         y50w==
-X-Forwarded-Encrypted: i=1; AJvYcCXMB/cLd5x3ZCB4j6M0zP/+XmQBifRQuSHz0aBovuG8CGdWOcX1KwZ326Ofn0bQ9G0di0CheIOL4q/OFLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPAQI2+mnd5tV+n2sh55G01DmKPEqCKpGCWQkewaRUFGVtuIwI
-	9V1jMytobQHfwosdaxRfOFDI8Jh2s6bSEqoGKY1lbKlsPgfQbRCjqi5I
-X-Gm-Gg: ASbGncsZdFmkQjWL1iJWgy0FW9Yo8dcxGSppzc2/hf5eUH3Y05xLHzwtdWvXItVdFMU
-	VqIZfl+EZ8PTzZCNcvUkcZW973E2A9/PE6ph64fCz1su5NSDiDEIgBjaLglhasu1aoRhBw9qxC1
-	S+1lfpcgV+dkcLOwk96MVFS2zjOXMMSpT8ya91+2mezsGrpA4ModVEdAQYbb/e/XL7zEJYj1Snr
-	WKQkfFgAxgdLkcYu2b2xi7d6gJe7MhijYi9yzMaVONtWjUgeE8uyoS4mxdp29hZHqG2U7xvV1JD
-	vQ/jUnoGvpiKYNIU1sD3nN+wzOO/bugYHtqbnv+LEnQ=
-X-Google-Smtp-Source: AGHT+IH1tkNhloKTswvNP9DznVd3mozAf84F0gu9cP+flXKpKwwxdMdXhMPeKnfVoe/0jGfVPsY4Hw==
-X-Received: by 2002:a17:907:80b:b0:ac6:fc40:c996 with SMTP id a640c23a62f3a-ad85b1844eemr1504769566b.23.1748452832051;
-        Wed, 28 May 2025 10:20:32 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:45::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad8a19ca429sm141030066b.64.2025.05.28.10.20.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 10:20:31 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 28 May 2025 10:20:19 -0700
-Subject: [PATCH net] netconsole: Only register console drivers when targets
- are configured
+        d=1e100.net; s=20230601; t=1748453134; x=1749057934;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/OzUyuVqnOB7miLFV37uZy05en+YqG3p0V1Vv2/8lTk=;
+        b=ih1O9HkdA/2PaGM+1F+cgvH+FAkDwCn2SqOTPPMJ8RWLtTtY/9PM8TOVTjkLJ5oFB1
+         QpWXDPjsvrpaDNLuh0qT3V+DrN0GW59sWHkUzNDb98nBgRvANPcOsWl/o/RaHMV32NHc
+         xKH4/T2uZUyBNYGDfOvL4WOiJ5CJYp9j7gA0A9+kiR+XlgBtafcQlB5G/cc/LGwtEPrN
+         UIu/c6bNV0zfv6oU376+H3hbafl4+XoxfnhJsTy8zQF5AZ4Az+joTPIN/j1t3yaDQz7L
+         wuXJWgeP4ECMET2SA9J2BE4pO6JQExcwqc9mYKnuoSBJz8jDPOoKujP9BIp4s3qR49qy
+         AB1g==
+X-Forwarded-Encrypted: i=1; AJvYcCU5IS96gb2s5UjeXQ1IfiFgtZAe1p+LZ5RuNgHtQ6Md/0zZWl3zt0wybrnNnH/qmbwbBo7/eqavWanTofk=@vger.kernel.org, AJvYcCVop4KJYAxpaNmCNlGikX8OSCxhaXGOF6DxnMgKyLCjntb6oDQjuiNZ0bwLlM7gzTAiySooXioZ@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywny9iw6NBgVu5/ON5FUgjmVdZDc/FobUW1z3ttveN8ZE9UKz9i
+	B64BQQJuBMp1LPVe0t9WREOLXT08GeYN697t5xEONXjY3c5Aw2a5WB86WcU1aAH2F/PSfh4CXpn
+	mxJms7xku7aPpvY/99JEK3IXMbfipCJw=
+X-Gm-Gg: ASbGncvv08Dy4EGzgBLHp/SmpAiN3X4hhQBox5imPWGftiYZ20qqiCEO5L4zWrrIRGT
+	USAbl/QZ+TL8OWNB4Eg6RwTk6SlSNA347I/B0ti/izHrkR2bg4djyYnXAiYH507Dmmps+hWB6KR
+	QTTm5ThMmIFRuqkKmqGbITwYh1wa1NcHuP6A==
+X-Google-Smtp-Source: AGHT+IER5qx1DwG+fJoBcyq/OD8RJi4KmfX7CsQR2aaR2iNxoMBecCu9w8+lxoiC4pk7miaSH11257NF0qW83P2oVoA=
+X-Received: by 2002:a05:6214:20e5:b0:6e8:9dc9:1c03 with SMTP id
+ 6a1803df08f44-6fa9d290768mr317566926d6.21.1748453133588; Wed, 28 May 2025
+ 10:25:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250528-netcons_ext-v1-1-69f71e404e00@debian.org>
-X-B4-Tracking: v=1; b=H4sIANNFN2gC/x3MQQqDMBAF0KsMf21AB9JqrlJKUfursxlLEoog3
- r3gO8A7UJiNBUkOZP6s2OZI0jWCeR19YbA3kkBbjW3UPjjrvHl5ca8h3nXo9dYNE0c0gm/mx/Z
- re8BZ8TzPP0Dcx8NiAAAA
-X-Change-ID: 20250528-netcons_ext-572982619bea
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
- horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4911; i=leitao@debian.org;
- h=from:subject:message-id; bh=Nc/nMZeliRv4e8jKOEEg08tp355xW3KIhShYLVQJYh0=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoN0XeUHRF9BbXK9TkDn+MghzEG8ir18PoMRFF0
- WtMaqyu5CmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaDdF3gAKCRA1o5Of/Hh3
- bSlCD/9OW/IgYOGk0zptuLACY8gb/eF9pcglRbFEdqa5ANhZs6mVEo5uu45h7r572e3BR70K1Le
- SHhxmsBO/XXNbwLYlrcoR9Q3yBUZxxFHOJ0ZYqQU6doBYbFg0JRAO5qSXc6wART8YvQHtiVwZEI
- sw2PjyaSpSmPEfdGJf2h9ZbleLPGpzL6hDLRWt4nfP+rF6w8KNs9k12120jPFw2Iyohn/OuyyFv
- i+AmUFYkFPljMs5wF9Z7hDm7vcZyT9hEtoewMtMUBUYlE7Xilb5l2mCfALgoMs4ggawGggWj/ks
- 8BHRcIHSK4Bi83jqZAyG04j/vj/7svS1Czd3EhIKLgPM2dH2TVJHHAjxoM/Yh7/n3uDq4Ad2omf
- VK8/F+vlAC5FLPaIYYJBhhSJ6kd237hY6YADGYd4l0fVsChglCVBr6KgwzM93KSG/J51qDnIEEH
- JJR3492yJqgDjPKnaOHqtEKY7BA5RcAe+iWG/MB3kBLMvuFvnHnVPCRZRj2TcvMNJ/2ZGIbA3Zx
- NsrNUfunO/GkaVz/Jly2AiOX0X0wsRtuiOJh3IU96WhP7ZTYnnfYakUMRMOkltUoMg1QbK1TxoO
- Pr1mkK+rbir+io+6jJq7M93KnAkqACg3saIw/+t6UrzyYKod1QYxsgtlyMNhflYmcyXiWm4oHJf
- KejWOSURJ0jRUqg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250527175558.2738342-1-james.hilliard1@gmail.com>
+ <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch> <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
+ <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch> <CADvTj4qRmjUQJnhamkWNpHGNAtvFyOJnbaQ5RZ6NYYqSNhxshA@mail.gmail.com>
+ <014d8d63-bfb1-4911-9ea6-6f4cdabc46e5@lunn.ch> <CADvTj4oVj-38ohw7Na9rkXLTGEEFkLv=4S40GPvHM5eZnN7KyA@mail.gmail.com>
+ <aDbA5l5iXNntTN6n@shell.armlinux.org.uk> <CADvTj4qP_enKCG-xpNG44ddMOJj42c+yiuMjV_N9LPJPMJqyOg@mail.gmail.com>
+ <f915a0ca-35c9-4a95-8274-8215a9a3e8f5@lunn.ch> <CAGb2v66PEA4OJxs2rHrYFAxx8bw4zab7TUXQr+DM-+ERBO-UyQ@mail.gmail.com>
+In-Reply-To: <CAGb2v66PEA4OJxs2rHrYFAxx8bw4zab7TUXQr+DM-+ERBO-UyQ@mail.gmail.com>
+From: James Hilliard <james.hilliard1@gmail.com>
+Date: Wed, 28 May 2025 11:25:20 -0600
+X-Gm-Features: AX0GCFveR1vAlsAT85LmMrDh-cWJLkLNiCTzyzcFYtPEIKrvDRjHUdM3zbS3iJQ
+Message-ID: <CADvTj4qyRRCSnvvYHLvTq73P0YOjqZ=Z7kyjPMm206ezMePTpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
+To: wens@csie.org, Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-sunxi@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Furong Xu <0x1207@gmail.com>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The netconsole driver currently registers the basic console driver
-unconditionally during initialization, even when only extended targets
-are configured. This results in unnecessary console registration and
-performance overhead, as the write_msg() callback is invoked for every
-log message only to return early when no matching targets are found.
+On Wed, May 28, 2025 at 8:12=E2=80=AFAM Chen-Yu Tsai <wens@csie.org> wrote:
+>
+> On Wed, May 28, 2025 at 9:25=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrot=
+e:
+> >
+> > On Wed, May 28, 2025 at 05:57:38AM -0600, James Hilliard wrote:
+> > > On Wed, May 28, 2025 at 1:53=E2=80=AFAM Russell King (Oracle)
+> > > <linux@armlinux.org.uk> wrote:
+> > > >
+> > > > On Tue, May 27, 2025 at 02:37:03PM -0600, James Hilliard wrote:
+> > > > > On Tue, May 27, 2025 at 2:30=E2=80=AFPM Andrew Lunn <andrew@lunn.=
+ch> wrote:
+> > > > > >
+> > > > > > > Sure, that may make sense to do as well, but I still don't se=
+e
+> > > > > > > how that impacts the need to runtime select the PHY which
+> > > > > > > is configured for the correct MFD.
+> > > > > >
+> > > > > > If you know what variant you have, you only include the one PHY=
+ you
+> > > > > > actually have, and phy-handle points to it, just as normal. No =
+runtime
+> > > > > > selection.
+> > > > >
+> > > > > Oh, so here's the issue, we have both PHY variants, older hardwar=
+e
+> > > > > generally has AC200 PHY's while newer ships AC300 PHY's, but
+> > > > > when I surveyed our deployed hardware using these boards many
+> > > > > systems of similar age would randomly mix AC200 and AC300 PHY's.
+> > > > >
+> > > > > It appears there was a fairly long transition period where both v=
+ariants
+> > > > > were being shipped.
+> > > >
+> > > > Given that DT is supposed to describe the hardware that is being ru=
+n on,
+> > > > it should _describe_ _the_ _hardware_ that the kernel is being run =
+on.
+> > > >
+> > > > That means not enumerating all possibilities in DT and then having =
+magic
+> > > > in the kernel to select the right variant. That means having a corr=
+ect
+> > > > description in DT for the kernel to use.
+> > >
+> > > The approach I'm using is IMO quite similar to say other hardware
+> > > variant runtime detection DT features like this:
+> > > https://github.com/torvalds/linux/commit/157ce8f381efe264933e9366db82=
+8d845bade3a1
+> >
+> > That is for things link a HAT on a RPi. It is something which is easy
+> > to replace, and is expected to be replaced.
+>
+> Actually it's for second sourced components that are modules _within_
+> the device (a tablet or a laptop) that get swapped in at the factory.
+> Definitely not something easy to replace and not expected to be replaced
+> by the end user.
 
-Optimize the driver by conditionally registering console drivers based
-on the actual target configuration. The basic console driver is now
-registered only when non-extended targets exist, same as the extended
-console. The implementation also handles dynamic target creation through
-the configfs interface.
+Yeah, to me it seems like the PHY situation is similar, it's not replaceabl=
+e
+due to being copackaged, it seems the vendor just switched over to a
+second source for the PHY partway through the production run without
+distinguishing different SoC variants with new model numbers.
 
-This change eliminates unnecessary console driver registrations,
-redundant write_msg() callbacks for unused console types, and associated
-lock contention and target list iterations. The optimization is
-particularly beneficial for systems using only the most common extended
-console type.
+Keep in mind stmmac itself implements mdio PHY scanning already,
+which is a form of runtime PHY autodetection, so I don't really see
+how doing nvmem/efuse based PHY autodetection is all that different
+from that as both are forms of PHY runtime autodetection.
 
-Fixes: e2f15f9a79201 ("netconsole: implement extended console support")
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-I also have two other associated changes that will following this change, but,
-I will keep them for net-next, keeping this patch simple and more
-suitable for 'net'. These are the patches that I will be be proposing
-once/if this one gets accepted:
+https://github.com/torvalds/linux/blob/v6.15/drivers/net/ethernet/stmicro/s=
+tmmac/stmmac_mdio.c#L646-L673
 
-1) Expanding selftest to test basic and extended targets. This is
-   a simple test, but, it requires some rework in the netconsole
-   framework, which is more suitable for net-next I _think_.
+> The other thing is that there are no distinguishing identifiers for a
+> device tree match for the swap-in variants at the board / device level.
+> Though I do have something that does DT fixups in the kernel for IDs
+> passed over by the firmware. There are other reasons for this arrangement=
+,
+> one being that the firmware is not easily upgradable.
+>
+> ChenYu
+>
+> > You are talking about some form of chiplet like component within the
+> > SoC package. It is not easy to replace, and not expected to be
+> > replaced.
+> >
+> > Different uses cases altogether.
+> >
+> > What i think we will end up with is the base SoC .dtsi file, and two
+> > additional .dtsi files describing the two PHY variants.
 
-2) Disable console if all targets of the same type are disabled
----
- drivers/net/netconsole.c | 30 ++++++++++++++++++++++--------
- 1 file changed, 22 insertions(+), 8 deletions(-)
+I think having a single PHY .dtsi for both here is ideal if we can
+do runtime detection, since it's difficult to know which potential
+variants of PHY various devices shipped with, in our case we
+have access to enough hardware to determine that we have
+both variants but for other devices most developers will likely
+only have access to one PHY variant even if hardware at various
+points in time may have shipped with both variants.
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 4289ccd3e41bf..01baa45221b4b 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -86,10 +86,10 @@ static DEFINE_SPINLOCK(target_list_lock);
- static DEFINE_MUTEX(target_cleanup_list_lock);
- 
- /*
-- * Console driver for extended netconsoles.  Registered on the first use to
-- * avoid unnecessarily enabling ext message formatting.
-+ * Console driver for netconsoles.  Register only consoles that have
-+ * an associated target of the same type.
-  */
--static struct console netconsole_ext;
-+static struct console netconsole_ext, netconsole;
- 
- struct netconsole_target_stats  {
- 	u64_stats_t xmit_drop_count;
-@@ -97,6 +97,11 @@ struct netconsole_target_stats  {
- 	struct u64_stats_sync syncp;
- };
- 
-+enum console_type {
-+	CONS_BASIC = BIT(0),
-+	CONS_EXTENDED = BIT(1),
-+};
-+
- /* Features enabled in sysdata. Contrary to userdata, this data is populated by
-  * the kernel. The fields are designed as bitwise flags, allowing multiple
-  * features to be set in sysdata_fields.
-@@ -491,6 +496,12 @@ static ssize_t enabled_store(struct config_item *item,
- 		if (nt->extended && !console_is_registered(&netconsole_ext))
- 			register_console(&netconsole_ext);
- 
-+		/* User might be enabling the basic format target for the very
-+		 * first time, make sure the console is registered.
-+		 */
-+		if (!nt->extended && !console_is_registered(&netconsole))
-+			register_console(&netconsole);
-+
- 		/*
- 		 * Skip netpoll_parse_options() -- all the attributes are
- 		 * already configured via configfs. Just print them out.
-@@ -1691,8 +1702,8 @@ static int __init init_netconsole(void)
- {
- 	int err;
- 	struct netconsole_target *nt, *tmp;
-+	u32 console_type_needed = 0;
- 	unsigned int count = 0;
--	bool extended = false;
- 	unsigned long flags;
- 	char *target_config;
- 	char *input = config;
-@@ -1708,9 +1719,10 @@ static int __init init_netconsole(void)
- 			}
- 			/* Dump existing printks when we register */
- 			if (nt->extended) {
--				extended = true;
-+				console_type_needed |= CONS_EXTENDED;
- 				netconsole_ext.flags |= CON_PRINTBUFFER;
- 			} else {
-+				console_type_needed |= CONS_BASIC;
- 				netconsole.flags |= CON_PRINTBUFFER;
- 			}
- 
-@@ -1729,9 +1741,10 @@ static int __init init_netconsole(void)
- 	if (err)
- 		goto undonotifier;
- 
--	if (extended)
-+	if (console_type_needed & CONS_EXTENDED)
- 		register_console(&netconsole_ext);
--	register_console(&netconsole);
-+	if (console_type_needed & CONS_BASIC)
-+		register_console(&netconsole);
- 	pr_info("network logging started\n");
- 
- 	return err;
-@@ -1761,7 +1774,8 @@ static void __exit cleanup_netconsole(void)
- 
- 	if (console_is_registered(&netconsole_ext))
- 		unregister_console(&netconsole_ext);
--	unregister_console(&netconsole);
-+	if (console_is_registered(&netconsole))
-+		unregister_console(&netconsole);
- 	dynamic_netconsole_exit();
- 	unregister_netdevice_notifier(&netconsole_netdev_notifier);
- 
+IMO without runtime detection this will likely be a major footgun
+for anyone trying to add ethernet support to H616 boards as they
+will have difficulty testing on hardware they don't have. If we provide
+a single .dtsi that implements the autodetection correctly then they
+will simply be able to include that and the hardware will then likely
+function on both variants automatically by including the single .dtsi
+file.
 
----
-base-commit: 09f3b8c9790e29e70c9c3e0d4a9a4bc70a625b60
-change-id: 20250528-netcons_ext-572982619bea
-
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
-
+Requiring the bootloader to modify the DT adds a good bit of
+complexity and will be difficult for most developers to test as
+many will not have access to hardware with both PHY variants.
 
