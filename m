@@ -1,120 +1,196 @@
-Return-Path: <netdev+bounces-193981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490DAC6BB5
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE16AC6BBE
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40BE189EB95
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:33:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F7E7189E989
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3F8288C1F;
-	Wed, 28 May 2025 14:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7992874F5;
+	Wed, 28 May 2025 14:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0g0dZYmb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmjn/eJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBF8548EE;
-	Wed, 28 May 2025 14:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0419D193077;
+	Wed, 28 May 2025 14:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748442762; cv=none; b=WCedmAtR84Y7ZhNRJnvuKaiqnLYWYwE8+dNgzcvct/Gmaggq+Onk7eUrwwEkplL6KWshIqvzkji81KB823BxA4/qFgSWtwGzau3tzhOCVPhoNq62siSnGo6rkOTWlg98MbCwkNsMuuVcoM2kpNkqNgB3xBuIMHEn36mKeGv1uyg=
+	t=1748442889; cv=none; b=oK5xfaN5K0pAsz+ubuASzf3UgQrrzgnM6yXMTqaZSe8JVPM7YRHGHAp1BAP8f8Q3jfJunlwymgEjLxvaZFXD4OVEOuM/q5vbbhuw6ty2BSfdRAJ7kYtKkYvQimF31DuHWid3U8Ws9kBXEqbEEjPVjc8cmCMWS72LLRFA7pCrfMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748442762; c=relaxed/simple;
-	bh=1vSCO5vTiinfXc1wGmDJEIBv6Q5jDE79VgZ6H2zNW6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cz/13QY+huomBUoVAINd9RIn4Ep+nG5bQpXf4ZBj9kwnbe9RhYCDDaQNuJEe/MhpgN1+UYfExxm/Ch2aaVGrwaILBfn6lJ3BhmKZQ1heAMNGPLeTxRrtDzPK0PYFDQnGlWBfUwI4RLOE29Rlv3N5Ch0vaybY2RQ0fIUPw1mZyZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0g0dZYmb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=U+FDShjpx6kGEUB2/dQKTjU6xdyCNeX5trpYm619UV4=; b=0g0dZYmb7qFGfQ6Gt46nLap1SM
-	L54LEYGcitbtYKGtm9Fz/qwyr1CXW4N6f2R0fuO8qrUfCyopQMDIvPocpm79WXDEZ6nYQVga+Dxli
-	tsnaCIBD9NDb0B3YXnWZ5FFmDWioIi3kERl1fFLstxdirVcevQWSL3slMVX/xcjm6J5fzLvljyKX6
-	DuK4Lq/+Zgs3yg0vnTiIurv7ny7d2x+Y9Ynr+4A6DwvY/9aZcbAAWJkLUC6TfjccvbKpNqTSjRuog
-	bu18UN9MXxuWyUJKrjjFyQjmJRpewfpkHUvev73LP6t2aRCste0h1QQmVmxs7Gwy0RQL8nQ5uYkcl
-	GCfODJSw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38612)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uKHpN-0000Ns-0k;
-	Wed, 28 May 2025 15:32:21 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uKHpF-0002UB-2v;
-	Wed, 28 May 2025 15:32:13 +0100
-Date: Wed, 28 May 2025 15:32:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: weishangjuan@eswincomputing.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	vladimir.oltean@nxp.com, yong.liang.choong@linux.intel.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	jan.petrous@oss.nxp.com, jszhang@kernel.org, p.zabel@pengutronix.de,
-	0x1207@gmail.com, boon.khai.ng@altera.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, lizhi2@eswincomputing.com
-Subject: Re: [PATCH v2 2/2] =?iso-8859-1?Q?ethernet?=
- =?iso-8859-1?B?OqBlc3dpbjqgQWRkoGVpYzc3MDCgZXRoZXJuZXSgZHJpdmVy?=
-Message-ID: <aDcebRguDnM7sqVk@shell.armlinux.org.uk>
-References: <20250528041455.878-1-weishangjuan@eswincomputing.com>
- <20250528041634.912-1-weishangjuan@eswincomputing.com>
+	s=arc-20240116; t=1748442889; c=relaxed/simple;
+	bh=la70WX+ZHL0nPCFtUsmvxU0TbQDjoteqMB0xVg2UTpo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Hqh/4kpAGLoOCKJ43ne+A3ZZwoNdStpG2W3XbT+NavwV2UPhQbbZr1P6lWjRvLfMFyjBTwSK7MJiFGaKZC7mks03aj6aAiyT8Iq7/Bv/bfse9ugFGYN2FbXAwvE/V/kgWaIw5BqQtPTD7BrXAFGCQmGnYr57WnnYwc6CDn1/pao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmjn/eJ8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC51C4CEE3;
+	Wed, 28 May 2025 14:34:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748442888;
+	bh=la70WX+ZHL0nPCFtUsmvxU0TbQDjoteqMB0xVg2UTpo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=qmjn/eJ8MyNPMizk1BpxNT4BSJ5d8cWdaFq1rS427rcoeOpAmw7i4Ooxu45hBdelx
+	 xDD3IaO6jOgfoYgjkxOhCrq6yRuCKhK158MJWgGwRu6AIsebHZhm+xK+TXht41ldqx
+	 m3LWt+2BXGqM+V5v6SnrPZiC4wFULOsmdsQJu6RP+k8xoVPGo9J7RhWR54/+07foML
+	 MVyMX1BSaVj2ZYuR4Hf2Xz+agj9RJCQaG21o3lpl2muq/IWeBkGwjXZp9XtQ6WJUtz
+	 hbhk/oxhQFD15hnqUYPcCvvPDtnRyeWbLXcl87e35p269vfMUoedaIrflxIGdDnn7Y
+	 NLA9Q0g3KcdoQ==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v11 00/10] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Date: Wed, 28 May 2025 10:34:32 -0400
+Message-Id: <20250528-reftrack-dbgfs-v11-0-94ae0b165841@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250528041634.912-1-weishangjuan@eswincomputing.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPgeN2gC/2XQS2oDMQwG4KuEWXeKXxrJXfUepQs/kyElCZ4wt
+ ITcvZpAqVvhlWy+35Juw1LaXJbhZXcbWlnnZT6fuND6aTekQzjtyzhnvhiMMqCctmMr9dpCOo4
+ 57usyWpwwWmWLqWFgdOH3+fOR+PbO9WFeruf29fhg1dvtT5T7H7XqUY1VWSAga4yyr8fSTuXj+
+ dz2w5a1mt6D8IZ91JRciFkbU4W3vUfhLftkNXhnKFGNwrvek/COPaQACcl7cE546LyRHtjrFGO
+ uPDzFLPzUeauEn9jThMn4UHmPQXj89XyEx23/SAmyx5iS9NR7uT9iPylEjdnG6El433svvN/6D
+ 5GIggPj5PxadQFGNqAVJ+QEUBEVTF7/Sbjf798wo54L8AIAAA==
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4580; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=la70WX+ZHL0nPCFtUsmvxU0TbQDjoteqMB0xVg2UTpo=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoNx7/6/eA3upt3zeE4DWP2UU17Ec+usxykPRIq
+ ef5IGth2byJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaDce/wAKCRAADmhBGVaC
+ FT1WD/4hg4MqOVwhf66jaDEuhZ+DfRLZx83XT+w0cGXI5pG4f3e9TndsQV38W5/Kxrpdgk2Ni2Z
+ Qye+uNd/Ww93OBsrB57zk4oMD2qzStmB9fCm3MzOEn57/+/zV64UEoUgFU+jEywVyTgF+sWqW0s
+ cbKH5JvnSsY8v480OMPPV/i3P5XjUeiIdCvMQLF3cMvFoVOCxNgBATH/6JRrVxN880H9UqO298h
+ 4AnOyicPD3xwzP7CwbHXtoUKlSgD9g0TGwYmEFY5+SUA3cFBVODGI8Q/Q3XWLMeTzSbRmnl0Spq
+ 8Pgae+GF9lqD34HF8+EAEpig3Hq1iatLSl0nXzY9Av+XfPc7dsS0UgWdy12lMCjtoEd6j/P0wUW
+ BcUNW0cVF4OrmGUR6ihEpjbl2LIyL3UUV/fGXTQb+pcpfS3XPRDqUuquuAmzbANoujA3kdfhfQ+
+ 8CKcHLt9K7Gs3l/S8vTOedKx4+bFmQZYXiRja+K7C71+fcTqwY52EJKj928jor+bnYbi5bslxOI
+ JoetmyOxsaG0jAcLsXzAvwKY49bdWH4FQWijTEI/Ai2fvV4jD7z/rtxxLsM5zJmcS02zjZUqPjH
+ HfgI4qsS6X7ZqMx4eZSp6vdmszjqoHxLRJIHXkHiYnfWDK/JbBjKoji/tBwXOalABiHKaCMJoTl
+ nzY+9z8sSlGvQKg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Wed, May 28, 2025 at 12:16:25PM +0800, weishangjuan@eswincomputing.com wrote:
-> +static struct clk *dwc_eth_find_clk(struct plat_stmmacenet_data *plat_dat,
-> +				    const char *name)
-> +{
-> +	for (int i = 0; i < plat_dat->num_clks; i++)
-> +		if (strcmp(plat_dat->clks[i].id, name) == 0)
-> +			return plat_dat->clks[i].clk;
-> +
-> +	return NULL;
-> +}
+More CI reports [1]. This time it showed what I consider to be an
+existing bug in the i915 driver. It can call ref_tracker_dir_init() more
+than once on the same dir object, which could cause reference tracking
+objects to leak.
 
-Okay, I think this driver is mindless copying of dwmac-dwc-qos-eth.c
-between 24th February and 9th April 2025. I can say this because I added
-this function to that driver and later removed it.
+The first patch in the series ensures that this doesn't happen. The rest
+is basically identical to v10 aside from a small format cleanup.
 
-Looking at the rest of the code, I doubt this even does anything useful
-(hence "mindless copying") as you're not fetching any clocks into this
-array, and plat_dat->num_clks will be zero here. Thus, this will return
-NULL. Therefore, you haven't thought about whether you need this or not,
-but have just copied dwmac-dwc-qos-eth.c and then modified it until it
-works for you.
+[1]: https://intel-gfx-ci.01.org/tree/drm-tip/Patchwork_148490v6/index.html
 
-You haven't acknowledged where you derived this code from - you've cut
-the header of your source file out, and basically are claiming it to be
-all your own work. I know this is rubbish for the reason I've stated
-above. This is quite simply plagiarism. I am not impressed.
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v11:
+- don't call ref_tracker_dir_init() more than once for same i915 objects
+- use %llx in format for net_cookie in symlink name
+- Link to v10: https://lore.kernel.org/r/20250527-reftrack-dbgfs-v10-0-dc55f7705691@kernel.org
 
-Thus I will end the review here, and simply state that this is not
-acceptable.
+Changes in v10:
+- drop the i915 symlink patch
+- Link to v9: https://lore.kernel.org/r/20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org
 
+Changes in v9:
+- fix typo in ref_tracker_dir_init() kerneldoc header
+- Link to v8: https://lore.kernel.org/r/20250507-reftrack-dbgfs-v8-0-607717d3bb98@kernel.org
+
+Changes in v8:
+- fix up compiler warnings that the KTR warned about
+- ensure builds with CONFIG_DEBUG_FS=n and CONFIG_REF_TRACKER=y work
+- Link to v7: https://lore.kernel.org/r/20250505-reftrack-dbgfs-v7-0-f78c5d97bcca@kernel.org
+
+Changes in v7:
+- include net->net_cookie in netns symlink name
+- add __ostream_printf to ref_tracker_dir_symlink() stub function
+- remove unneeded #include of seq_file.h
+- Link to v6: https://lore.kernel.org/r/20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org
+
+Changes in v6:
+- clean up kerneldoc comment for ref_tracker_dir_debugfs()
+- add missing stub function for ref_tracker_dir_symlink()
+- temporary __maybe_unused on ref_tracker_dir_seq_print() to silence compiler warning
+- Link to v5: https://lore.kernel.org/r/20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org
+
+Changes in v5:
+- add class string to each ref_tracker_dir
+- auto-register debugfs file for every tracker in ref_tracker_dir_init
+- add function to allow adding a symlink for each tracker
+- add patches to create symlinks for netns's and i915 entries
+- change output format to print class@%p instead of name@%p
+- eliminate the name field in ref_tracker_dir
+- fix off-by-one bug when NULL terminating name string
+- Link to v4: https://lore.kernel.org/r/20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org
+
+Changes in v4:
+- Drop patch to widen ref_tracker_dir_.name, use NAME_MAX+1 (256) instead since this only affects dentry name
+- Link to v3: https://lore.kernel.org/r/20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org
+
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
+
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+
+---
+Jeff Layton (10):
+      i915: only initialize struct ref_tracker_dir once
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: add a static classname string to each ref_tracker_dir
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: automatically register a file in debugfs for a ref_tracker_dir
+      ref_tracker: add a way to create a symlink to the ref_tracker_dir debugfs file
+      net: add symlinks to ref_tracker_dir for netns
+      ref_tracker: eliminate the ref_tracker_dir name field
+
+ drivers/gpu/drm/display/drm_dp_tunnel.c |   2 +-
+ drivers/gpu/drm/i915/intel_runtime_pm.c |   4 +-
+ drivers/gpu/drm/i915/intel_wakeref.c    |   3 +-
+ include/linux/ref_tracker.h             |  58 +++++++++-
+ lib/ref_tracker.c                       | 190 +++++++++++++++++++++++++++++---
+ net/core/dev.c                          |   2 +-
+ net/core/net_namespace.c                |  34 +++++-
+ 7 files changed, 267 insertions(+), 26 deletions(-)
+---
+base-commit: fefff2755f2aa4125dce2a1edfe7e545c7c621f2
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jeff Layton <jlayton@kernel.org>
+
 
