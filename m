@@ -1,281 +1,209 @@
-Return-Path: <netdev+bounces-193913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E2EAC6433
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 10:21:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 193A0AC6437
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 10:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC86E4E2C38
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 08:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53CD016E8BB
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 08:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8EB253F12;
-	Wed, 28 May 2025 08:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GmmKet9p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1398C247285;
+	Wed, 28 May 2025 08:15:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB786253B67;
-	Wed, 28 May 2025 08:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A492B213253;
+	Wed, 28 May 2025 08:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748420082; cv=none; b=XuddlnJKLaSeIy4q2u2SxNSxV+Y9SnSY4dLKrr3u8+uPZ2Us988m6OPpFx1GmCVXxa22myaZx7ImpAn83ohj66zcQOWb3gJIijsUy9DRoRYXvbh44ubdx2CFPoEXiMcB9ZpgQUImzuU7Zna4bE1VZjU53kg5TNAQoLTXQFCi1Yw=
+	t=1748420150; cv=none; b=qESdBs2dAyvpWkEYS2vll8ovQhXifYDTIs+41pAn4RTNYPYPhy64wytfZj6wjfYXgGHuNQrnsyoXNcTR+sEDpRsnGzZ9xIMfZmman7TZ11wiyLtSEVCyK4YQJOuA03XIeSgBxJNK8fnH2TIg1dQjWEyw4kDspG/hQgEi4tGsKLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748420082; c=relaxed/simple;
-	bh=wt48bzl9Te9AiJKom6zAeexyDvlkvDseB24S8SUK4Gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=saT5mbmvtXZT24QuepZG2PxQYkP/EFX5/9C9u6AbYdi3SBCYbqEex4lmJF9hzhsSfhE3oCXgvB2p6vGmQu2JtxKI16MYS6Yh7MB4cSYRMM5VKKKBH/tw1ahDoe0obFpdA7CEvSoTG5XNkQ6/Zl8+Y6kLTHtUL1M+JCgYeOx7nt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GmmKet9p; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1870B433B8;
-	Wed, 28 May 2025 08:14:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1748420077;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VmfTvvPStnYNFbapNxW0qFHGxJZE9z8RXtIY6Yccn4A=;
-	b=GmmKet9pX4CZPw9vI2RkFp/fskWOZW5hzm+5bATRMs6c2CGqeUyOozqvUoX/cRCytBBJeF
-	RYIKU/EbxzcFCEvO8+961dKMO0gU8QgqDzL9HTYRldcw0qvKx/FUDBQQZhSFXtjn5yycYy
-	c0bv7PZO0Aztx2iSYbXaazwJ/y3hhG0X7AKwiWIM2LPaUKyOo+2i+fem4AdyJ8D0n0z3uR
-	HNpQr1YzhybeV/vq5eZUrWDI1u7t12V7euX9kUmuLmMeLPTiKkBcxEsqvLvTHDOGkFrAL/
-	TyPLnZFmGsQXo54XMeOVOxdAR0stbcp/o8qD9dJeHbwgpXd2GbtI1R8cL6L5Pw==
-Date: Wed, 28 May 2025 10:14:33 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Daniel Golle
- <daniel@makrotopia.org>, Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v6 06/14] net: phy: Introduce generic SFP
- handling for PHY drivers
-Message-ID: <20250528101433.138b2f31@device-24.home>
-In-Reply-To: <13770694.uLZWGnKmhe@fw-rgant>
-References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
-	<23936783.6Emhk5qWAg@fw-rgant>
-	<20250523145457.07b1e7db@2a02-8428-0f40-1901-f412-2f85-a503-26ba.rev.sfr.net>
-	<13770694.uLZWGnKmhe@fw-rgant>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1748420150; c=relaxed/simple;
+	bh=I92/m063vrwtrEq8+KAWK3SpIzJrOw6l+0LO4duztWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Izst7nBg7a4BP/VpdC9hqZ6XcYtdYAdovw8/q3eF2n+vDsaVGzZtfrJN7EFEaMZuwu29wyYuDD7IMX3RwVX2aaAp9Exy5PU5KSxIwh2y0pO6RtmS9+4xqqydmsFzD+wcR1k0odF1OEZvB+7n9yQiPvH6F1pLZkqLqiaioU0qTqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-4c-6836c63082fb
+Date: Wed, 28 May 2025 17:15:39 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, tariqt@nvidia.com, edumazet@google.com,
+	pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access
+ page->pp_magic in page_pool_page_is_pp()
+Message-ID: <20250528081539.GB28116@system.software.com>
+References: <20250523032609.16334-1-byungchul@sk.com>
+ <20250523032609.16334-13-byungchul@sk.com>
+ <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
+ <20250526022307.GA27145@system.software.com>
+ <20250526023624.GB27145@system.software.com>
+ <87o6vfahoh.fsf@toke.dk>
+ <20250526094305.GA29080@system.software.com>
+ <87ldqjae92.fsf@toke.dk>
+ <20250528051452.GB59539@system.software.com>
+ <87sekpmbmg.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvvdejheculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepuggvvhhitggvqddvgedrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedtpdhrtghpthhtoheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhop
- ehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87sekpmbmg.fsf@toke.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRzGe3fenR2Xg+PSelXSWmUkpBYVfylSP0hvH4KoICihhju0lU7Z
+	1FSozKRoNQuNqDljFqUuZbFMV6nlJS8UKJa2zJxpWkFZXpmXLk6J/Pbw+z88z/PhzzHyInEA
+	p9GmCDqtMkHBSrH0u3fRxoimbeqI8w0KMNvKWLjvTofiPocYzNZKBONT7yUw1tjMwp2iSQbM
+	bTkYJmzTDAw29UvAdW8IQ/WFKgb6r7SwYMyZYSDbUSKC9spcMVybvstAVVafBF4/MbPQW/ZH
+	DEP1RgytplIMrtxoaLIsh8mX3xA02qpEMHm5kIX8DgsLAzkuBB0N/RgKzuYisNU6xTDjNrPR
+	q2lF6TsRfWz6IKEWeyp9WBJKDc4OhtqtF1lqH82T0J6uapa23JjB9LFjTESN54ZZOjLYjemP
+	2k6W2io6MX1laZTQMXvQXv6QdIdKSNCkCbrwnUel6ilnjzj5fUh6Rek4k4UGVhqQF0f4LaSv
+	9CYyIG5el4yc9GDMryPG4l8ij2b59cTpnGI8Fl8+hrx0HzMgKcfwY2JiHTUyHs8y/ji53P2Z
+	9WgZD6TuTZXEY5LzlQzJv/EVLxx8SOvNT/OamQudvdUxH8rwgaT4N7eAg8m5RwXz2GtuQ9uP
+	DA/249eQ55XNIk8k4R0ccT/Lxgvz/UldiRNfRT6mRQ2mRQ2m/w2mRQ0WhK1IrtGmJSo1CVvC
+	1BlaTXpYfFKiHc09zr1Ts4cdaLR9fz3iOaTwltEHW9VysTJNn5FYjwjHKHxl2VHb1HKZSpmR
+	KeiSjuhSEwR9PQrksGKFbPPkSZWcP6ZMEU4IQrKg+3cVcV4BWUiGbq8M/hj7wvb2tP+wpqam
+	+Lq50NVVO3CwfHvcEiEmM/JXX+edwQjNl0B9yMNgHBYVP+TKIpegu/fKrqU7NrSU0/3b97x6
+	1nzGFZMTGKkNUu3DbYNbVS2dQVGrgj9/SNlt9ePPP/3pjos40zgdMB2bGbt2ycSB8F3Dhryg
+	a3bbWgXWq5WbQhmdXvkXND3YEjQDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+5/bjqvVcVkdtKhOZCSkBhlvWmqf+hMV0oeEQnLlwS2nxaam
+	QWUqaMNpZoTNFSuvM2Fl5maYmC4vmRlbxlLTsOwiUXnFWxdnRH57eJ4fP94PL0vKM2lvVpWQ
+	KGoSFGqBkVLSQyEZ2wJbdioDnT9WgNFSxcDdqRQof2ejwVhZi2B8ulcCY/ZWBopvT5Jg7Mqk
+	YMIyQ8JQy6AEBso+UlCfZSVhMK+NAX3mLAnptgoCmm+20/CyNpeGazOlJFjT3knA+cjIQH/V
+	bxo+NukpaDeYKRjIDYcW02qY7PiKwG6xEjCZc5OBAoeJgfeZAwgczYMUFF3KRWBpcNEwO2Vk
+	wgVcY35D4DrDWwk2VSfhBxV+WOdykLi68jKDq0evSnDf63oGtxXOUrjONkZgfcY3Bo8M9VD4
+	e0M3g4s//yCwpaabws9NdkmE51Hp7hhRrUoWNQGh0VLltKuPPtPrm1JjHifT0Pt1OsSyPLeD
+	rxg5q0MeLMVt5vXlPwl3ZrgtvMs1TboRL24v3zEVq0NSluTGaL5yVE+6mZXcKT6n5xPjzjIO
+	+CevrBI3JOdqSb6g8Av1d/Dk2298WMjkvHTulmNBSnI+fPkv9m+9ns94WLRQe8zf0PU91V2v
+	4jbxjbWtxBW03LBIZFgkMvwXGRaJTIiqRF6qhOR4hUod5K+NU6YmqFL8T56Or0bzv1F2fi7f
+	hsad+5oQxyJhmQzfC1LKaUWyNjW+CfEsKXjJ0sN2KuWyGEXqOVFz+rgmSS1qm5APSwlrZPsj
+	xWg5F6tIFONE8Yyo+bcSrId3GmLOBVv4D/ZuX+HA2pJvF9bpnhZdu1GycTidSiwYOWJ2bkhe
+	n5gSnHGnM9vWmWVPUp8QYlcfK+xPi7N4DU+ZYettZ1ZkXViHrzX3S1ThzJ6LSxz3x69nNx7O
+	Whs8E7A3Kjr2UESIXqoS7EsPDpfOvSBsfXmyidDH4r38Qfxsl0wvUFqlYrsfqdEq/gAGYQaT
+	FwMAAA==
+X-CFilter-Loop: Reflected
 
-Hi Romain
-
-On Wed, 28 May 2025 09:35:35 +0200
-Romain Gantois <romain.gantois@bootlin.com> wrote:
-
-> On Friday, 23 May 2025 14:54:57 CEST Maxime Chevallier wrote:
-> > Hi Romain,
-> > 
-> > On Mon, 12 May 2025 10:38:52 +0200
-> > 
-> > Romain Gantois <romain.gantois@bootlin.com> wrote:  
-> > > Hi Maxime,
-> > > 
-> > > On Wednesday, 7 May 2025 15:53:22 CEST Maxime Chevallier wrote:  
-> > > > There are currently 4 PHY drivers that can drive downstream SFPs:
-> > > > marvell.c, marvell10g.c, at803x.c and marvell-88x2222.c. Most of the
-> > > > logic is boilerplate, either calling into generic phylib helpers (for
-> > > > SFP PHY attach, bus attach, etc.) or performing the same tasks with a
-> > > > 
-> > > > bit of validation :
-> > > >  - Getting the module's expected interface mode
-> > > >  - Making sure the PHY supports it
-> > > >  - Optionnaly perform some configuration to make sure the PHY outputs
-> > > >  
-> > > >    the right mode
-> > > > 
-> > > > This can be made more generic by leveraging the phy_port, and its
-> > > > configure_mii() callback which allows setting a port's interfaces when
-> > > > the port is a serdes.
-> > > > 
-> > > > Introduce a generic PHY SFP support. If a driver doesn't probe the SFP
-> > > > bus itself, but an SFP phandle is found in devicetree/firmware, then the
-> > > > generic PHY SFP support will be used, relying on port ops.
-> > > > 
-> > > > PHY driver need to :
-> > > >  - Register a .attach_port() callback
-> > > >  - When a serdes port is registered to the PHY, drivers must set
-> > > >  
-> > > >    port->interfaces to the set of PHY_INTERFACE_MODE the port can output
-> > > >  
-> > > >  - If the port has limitations regarding speed, duplex and aneg, the
-> > > >  
-> > > >    port can also fine-tune the final linkmodes that can be supported
-> > > >  
-> > > >  - The port may register a set of ops, including .configure_mii(), that
-> > > >  
-> > > >    will be called at module_insert time to adjust the interface based on
-> > > >    the module detected.
-> > > > 
-> > > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > > ---
-> > > > 
-> > > >  drivers/net/phy/phy_device.c | 107 +++++++++++++++++++++++++++++++++++
-> > > >  include/linux/phy.h          |   2 +
-> > > >  2 files changed, 109 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> > > > index aaf0eccbefba..aca3a47cbb66 100644
-> > > > --- a/drivers/net/phy/phy_device.c
-> > > > +++ b/drivers/net/phy/phy_device.c
-> > > > @@ -1450,6 +1450,87 @@ void phy_sfp_detach(void *upstream, struct
-> > > > sfp_bus
-> > > > *bus) }
-> > > > 
-> > > >  EXPORT_SYMBOL(phy_sfp_detach);
-> > > > 
-> > > > +static int phy_sfp_module_insert(void *upstream, const struct
-> > > > sfp_eeprom_id *id) +{
-> > > > +	struct phy_device *phydev = upstream;
-> > > > +	struct phy_port *port = phy_get_sfp_port(phydev);
-> > > > +  
-> > > 
-> > > RCT  
-> > 
-> > Can't be done here, it won't build if in the other order...
-> >   
+On Wed, May 28, 2025 at 09:35:03AM +0200, Toke Høiland-Jørgensen wrote:
+> Byungchul Park <byungchul@sk.com> writes:
 > 
-> You could always separate the declaration from the assignment, I've seen that 
-> done quite a lot to keep things in RCT.
+> > On Mon, May 26, 2025 at 11:54:33AM +0200, Toke Høiland-Jørgensen wrote:
+> >> Byungchul Park <byungchul@sk.com> writes:
+> >> 
+> >> > On Mon, May 26, 2025 at 10:40:30AM +0200, Toke Høiland-Jørgensen wrote:
+> >> >> Byungchul Park <byungchul@sk.com> writes:
+> >> >> 
+> >> >> > On Mon, May 26, 2025 at 11:23:07AM +0900, Byungchul Park wrote:
+> >> >> >> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
+> >> >> >> > On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
+> >> >> >> > >
+> >> >> >> > > To simplify struct page, the effort to seperate its own descriptor from
+> >> >> >> > > struct page is required and the work for page pool is on going.
+> >> >> >> > >
+> >> >> >> > > To achieve that, all the code should avoid accessing page pool members
+> >> >> >> > > of struct page directly, but use safe APIs for the purpose.
+> >> >> >> > >
+> >> >> >> > > Use netmem_is_pp() instead of directly accessing page->pp_magic in
+> >> >> >> > > page_pool_page_is_pp().
+> >> >> >> > >
+> >> >> >> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> >> >> >> > > ---
+> >> >> >> > >  include/linux/mm.h   | 5 +----
+> >> >> >> > >  net/core/page_pool.c | 5 +++++
+> >> >> >> > >  2 files changed, 6 insertions(+), 4 deletions(-)
+> >> >> >> > >
+> >> >> >> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> >> >> >> > > index 8dc012e84033..3f7c80fb73ce 100644
+> >> >> >> > > --- a/include/linux/mm.h
+> >> >> >> > > +++ b/include/linux/mm.h
+> >> >> >> > > @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+> >> >> >> > >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> >> >> >> > >
+> >> >> >> > >  #ifdef CONFIG_PAGE_POOL
+> >> >> >> > > -static inline bool page_pool_page_is_pp(struct page *page)
+> >> >> >> > > -{
+> >> >> >> > > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> >> >> >> > > -}
+> >> >> >> > 
+> >> >> >> > I vote for keeping this function as-is (do not convert it to netmem),
+> >> >> >> > and instead modify it to access page->netmem_desc->pp_magic.
+> >> >> >> 
+> >> >> >> Once the page pool fields are removed from struct page, struct page will
+> >> >> >> have neither struct netmem_desc nor the fields..
+> >> >> >> 
+> >> >> >> So it's unevitable to cast it to netmem_desc in order to refer to
+> >> >> >> pp_magic.  Again, pp_magic is no longer associated to struct page.
+> >> >> >
+> >> >> > Options that come across my mind are:
+> >> >> >
+> >> >> >    1. use lru field of struct page instead, with appropriate comment but
+> >> >> >       looks so ugly.
+> >> >> >    2. instead of a full word for the magic, use a bit of flags or use
+> >> >> >       the private field for that purpose.
+> >> >> >    3. do not check magic number for page pool.
+> >> >> >    4. more?
+> >> >> 
+> >> >> I'm not sure I understand Mina's concern about CPU cycles from casting.
+> >> >> The casting is a compile-time thing, which shouldn't affect run-time
+> >> >
+> >> > I didn't mention it but yes.
+> >> >
+> >> >> performance as long as the check is kept as an inline function. So it's
+> >> >> "just" a matter of exposing struct netmem_desc to mm.h so it can use it
+> >> >
+> >> > Then.. we should expose net_iov as well, but I'm afraid it looks weird.
+> >> > Do you think it's okay?
+> >> 
+> >> Well, it'll be ugly, I grant you that :)
+> >> 
+> >> Hmm, so another idea could be to add the pp_magic field to the inner
+> >> union that the lru field is in, and keep the page_pool_page_is_pp()
+> >> as-is. Then add an assert for offsetof(struct page, pp_magic) ==
+> >> offsetof(netmem_desc, pp_magic) on the netmem side, which can be removed
+> >> once the two structs no longer shadow each other?
+> >> 
+> >> That way you can still get rid of the embedded page_pool struct in
+> >> struct page, and the pp_magic field will just be a transition thing
+> >> until things are completely separated...
+> >
+> > Or what about to do that as mm folks did in page_is_pfmemalloc()?
+> >
+> > static inline bool page_pool_page_is_pp(struct page *page)
+> > {
+> > 	/*
+> > 	 * XXX: The space of page->lru.next is used as pp_magic in
+> > 	 * struct netmem_desc overlaying on struct page temporarily.
+> > 	 * This API will be unneeded shortly.  Let's use the ugly but
+> > 	 * temporal way to access pp_magic until struct netmem_desc has
+> > 	 * its own instance.
+> > 	 */
+> >         return (((unsigned long)page->lru.next) & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > }
 > 
-> > > > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
-> > > > +	DECLARE_PHY_INTERFACE_MASK(interfaces);
-> > > > +	phy_interface_t iface;
-> > > > +
-> > > > +	linkmode_zero(sfp_support);
-> > > > +
-> > > > +	if (!port)
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	sfp_parse_support(phydev->sfp_bus, id, sfp_support, interfaces);
-> > > > +
-> > > > +	if (phydev->n_ports == 1)
-> > > > +		phydev->port = sfp_parse_port(phydev->sfp_bus, id,  
-> > > 
-> > > sfp_support);
-> > > 
-> > > As mentionned below, this check looks a bit strange to me. Why are we only
-> > > parsing the SFP port if the PHY device only has one registered port?  
-> > 
-> > Because phydev->port is global to the PHY. If we have another port,
-> > then phydev->port must be handled differently so that SFP insertion /
-> > removal doesn't overwrite what the other port is.
-> >   
+> Sure, that can work as a temporary solution (maybe with a static assert
+> somewhere that pp_magic and lru have the same offsetof())?
+
+Sure.  I will do that as I posted in the cover letter:
+
+   https://lore.kernel.org/all/20250528022911.73453-1-byungchul@sk.com/
+
+	Byungchul
 > 
-> Okay, I see, thanks for explaining.
-> 
-> > Handling of phydev->port is still fragile in this state of the series,
-> > I'll try to improve on that for V7 and document it better.
-> >   
-> > > > +
-> > > > +	linkmode_and(sfp_support, port->supported, sfp_support);
-> > > > +
-> > > > +	if (linkmode_empty(sfp_support)) {
-> > > > +		dev_err(&phydev->mdio.dev, "incompatible SFP module  
-> > > 
-> > > inserted\n");
-> > >   
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > > +	iface = sfp_select_interface(phydev->sfp_bus, sfp_support);
-> > > > +
-> > > > +	/* Check that this interface is supported */
-> > > > +	if (!test_bit(iface, port->interfaces)) {
-> > > > +		dev_err(&phydev->mdio.dev, "incompatible SFP module  
-> > > 
-> > > inserted\n");
-> > >   
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > > +	if (port->ops && port->ops->configure_mii)
-> > > > +		return port->ops->configure_mii(port, true, iface);  
-> > > 
-> > > The name "configure_mii()" seems a bit narrow-scoped to me, as this
-> > > callback might have to configure something else than a MII link. For
-> > > example, if a DAC SFP module is inserted, the downstream side of the
-> > > transciever will have to be configured to 1000Base-X or something
-> > > similar.  
-> > 
-> > In that regard, you can consider 1000BaseX as a MII mode (we do have
-> > PHY_INTERFACE_MODE_1000BASEX).
-> >   
-> 
-> Ugh, the "1000BaseX" terminology never ceases to confuse me, but yes you're 
-> right.
-> 
-> > > I'd suggest something like "post_sfp_insert()", please let me know what
-> > > you
-> > > think.  
-> > 
-> > That's not intended to be SFP-specific though. post_sfp_insert() sounds
-> > lke the narrow-scoped name to me :) Here we are dealing with a PHy that
-> > has a media-side port that isn't a MDI port, but an MII interface like
-> > a MAC would usually export. There may be an SFP here, or something else
-> > entirely :)
-> >   
-> 
-> Is that callback really not meant to be SFP-specific? It's only called from 
-> phy_sfp_module_insert() though.
-
-Well for now yeah as this is the only user now, but ports are meant to
-be about more than drving SFPs.
-
-This series as of today is quite long but doesn't cover the other
-classes of use-cases which are non-phy-driven ports.
-
-Taking the example of the Turris Omnia, we have something like that :
-
-      +------------------+ 
-      | MUX  +--------+  |
-      |    +-| port 1 | --- SGMII - PHY
-      |    | +--------+  |
-MAC -------+             |
-      |    | +--------+  |
-      |    +-| port 2 | ---- SGMII/1000BaseX - SFP
-      |      +--------+  |
-      +------------------+
-
-Here we have 1 mac that drives 2 ports through a MUX. So the ports here
-would be driven by the mux driver (which I have a framewrok for ready to
-send once this series lands). The goal would be to use the same
-phy_port representation for these 2 ports, the .configure_mii()
-callback will be used to switch between ports (so, perform the muxing),
-then the rest of the stack takes over through the usual means (phylink,
-phylib and all that). So here, the .configure_mii() ops doesn't
-necessarily drives an SFP :)
-
-Maxime
+> -Toke
 
