@@ -1,90 +1,155 @@
-Return-Path: <netdev+bounces-193950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E073AC68A7
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 13:57:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50674AC68B0
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 13:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FA2F1BC601F
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 11:58:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2F8A4E2EE9
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 11:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88B8283FE1;
-	Wed, 28 May 2025 11:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028F3284674;
+	Wed, 28 May 2025 11:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4uIVbUOt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADsZGmb5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB80283CB3
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 11:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F84283FCD;
+	Wed, 28 May 2025 11:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748433464; cv=none; b=lIdXbMX7QIRgaPAnfxBFTdqFoVmMygudNWDiNHbgfrAMbnQQ7onpoQUrqDQqg+TCEisNgb7SijwbSI8ndTIKKIL1mrNNRv2ac26zy9RdKT3GF/PElU82jmrO7MGqtBSsUDbGUcBkITAVcDlKbjMa+HPmMRQcw5qD5blCgIg1udY=
+	t=1748433472; cv=none; b=ZU89BykBW5YpSGqAJN4TV0GOeaCQRDfmkWdHUTmYIXXhOaNVJf36ZMckKq3bY5h5Va/8iXKn+1KsmO3Q5RxinH9QR8mOtuV+BPGpyCsireMEmftLbXScn6h01TJiBnxiO+NE6hbfzYPRZZ3wDByDfpAIbqujF1NipIt/sDGPYRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748433464; c=relaxed/simple;
-	bh=ESWFLUOM1NGM+Vv7/L2i6g1wtrKqJXlYZX0TvKMCcoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KC3PVd5Odyy+NZxZcIWUk53AeaX9+7FQVrPlox+ihz6oAnh2nNzVZEMvCkHUcIBAjrj6wqImbCeqTp6r6a8/Lez674e8VNaIGxarJWX9FRkpjO/Vtn32uD7ucRP8MKSEc1jh0aS3Xd5RRoZbrcAoYrksAj48Ztg8VMx95vy92wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4uIVbUOt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=OmmrYOiKIfV78PACAfvYm2ILQY/uIG5QzwP5hSwag6U=; b=4uIVbUOtRy+HOJuNUtYTF41g3F
-	AbWHT/R9uFI6u5iGeKqBvZ36DCYjgOc9tLDQNS1YYShpumI7HlZfCOX9o6IeRsxD827fIj9h9mElw
-	Qylk+WcfRB8qr/Tbfy+Wp11G21TY6C+tk3LgNXItMMdzXi8K4Jm+zUqS0b4S/qCCUCjA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uKFPX-00EAhB-FX; Wed, 28 May 2025 13:57:31 +0200
-Date: Wed, 28 May 2025 13:57:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ricard Bejarano <ricard@bejarano.io>
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
-	netdev@vger.kernel.org, michael.jamet@intel.com,
-	YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-Message-ID: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
-References: <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
- <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
- <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
- <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
- <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
- <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
- <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
+	s=arc-20240116; t=1748433472; c=relaxed/simple;
+	bh=DM2QbUzIiVq1oAO1zYgkeLSN01UQu1uYF+2linnaY0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZH8p2wpy3yTJsXCfu3wmVsMK1mmxMAA+CzwJj1cL1jEt8dKuSkJ9UjzgSV+xm9/kJHs+Z/ZOqtOGNqYfwxQqvIwBQ0xu3z/8VY53wgyJ8he+v/4WlMsl+8iE1xopMqyDL4a4FPO+NkAZpu6FTRXrQMZvX7EKnRyatjh6cwKNMOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ADsZGmb5; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4e282b9a2b9so584422137.1;
+        Wed, 28 May 2025 04:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748433470; x=1749038270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DM2QbUzIiVq1oAO1zYgkeLSN01UQu1uYF+2linnaY0w=;
+        b=ADsZGmb5TfzP2K3Bs3iGTuT4VigoVV3nofBzLaDtMpbKDek8OJwpMJGIZYnOdobAC8
+         nLSe9h9dQ9nNqgOiq4p1oTmLBc/B3n+Rm1is14K+GfBsk86CoXywv99UB4sGzpUO4ZDp
+         ntM4vgCYsjBK+/+uzh5f4n1HBNey95evKd3U3ehSqUeyY5bPZ/9jEE4rK6KmaBg+l/RZ
+         8kkXuv5H5BYfqWzaR5upM9z8qMK1sPN8hDSjOGbtlwQe6IS/vNqm+TyK8G/x+pILj5iq
+         wkh/jehU5VdwZkcR+dklAf6YyVWCy8eVOh4cM8nXmV4TYVIwUKedcbfbhUPMzFt+NJ6P
+         TD/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748433470; x=1749038270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DM2QbUzIiVq1oAO1zYgkeLSN01UQu1uYF+2linnaY0w=;
+        b=HaBf3Ys3vCtNFGDeSrMwmxHfpvABXAwzcye6D/QzGj7J7cu6D5+33Avvy3ZxeMX5dU
+         KlEQtX6ZEs0vRlQIFGryf2jG/U5VtgxPnNMvR7Z4DOlNIiF/UxlEkb9Fg324estvHAnI
+         MvDxSqAFFph3E6B3VV+2UnCKVhuvczJeUBABQmkYOWsWscArOc3FAlfWT0YH+s4Kf0Mi
+         /oK0v7B86u9bA5MLDkO/4ojEy3ar0ue3VHyTn1NhP4Nnh3+kOCWB5/e1q9w3r+seSvRh
+         9gBw/E5o2FTfqrN8NMDl0iKQC9Gne8qttlbTTmj5QspOeSHc5G0WHJQjTjc6LF8cAjxR
+         dbvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPDpy0XMCoiVgnxFAm4MbfxGc3HZwNflAjSFWidfIWN2bbRMsno+OUYnLH1reD3583bM8P4tB1@vger.kernel.org, AJvYcCWiqVYu7ovhxBek3XBGRaOxSIeR3v62Rk1XJanitP73Td3t08CT9y8C+nIXKcspypeiLH8oWzqcnYeACRA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzs2X8k/EJcXVC5QY2geXltZd9LesxC3ae/yFrmM8Kl5tzXjC5
+	EillFyErOjO3v4GuWBJFofUIO4H+w9f+Cni2AXsdJiBcug+F0xzfRzjQdX+JOo7xWvseAnseS1K
+	oxKwkQ9fLjpkvGhv4SAYB/9G/hQdNjrw=
+X-Gm-Gg: ASbGnctTNyppSSurucXKjcVwJ0JfgeNduVhz1thdRVI6wkcXuUWDA8XxRtLrGZUtLmh
+	2VlUMimZJcqcwz+F+aRE6hPkDI6JDC8AEU/1K+eS92IEOdmz0o/4hYYEDZsDueuEzUB2eQ5YiY7
+	BLj1yv8puLq8uV5NJEOJohoUingkWcvXsU5A==
+X-Google-Smtp-Source: AGHT+IHccZ6u3wYBlr61chnbgjUWRM+9FVRKkSPAvmULH6YUlgEgMZxUk6AOBWwMA6JVLhM/7o4896YpQLK4HFLW4VU=
+X-Received: by 2002:a67:e70d:0:b0:4e4:1d6d:56cc with SMTP id
+ ada2fe7eead31-4e597dee6afmr4608606137.12.1748433470075; Wed, 28 May 2025
+ 04:57:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
+References: <20250527175558.2738342-1-james.hilliard1@gmail.com>
+ <631ed4fe-f28a-443b-922b-7f41c20f31f3@lunn.ch> <CADvTj4rGdb_kHV_gjKTJNkzYEPMzqLcHY_1xw7wy5r-ryqDfNQ@mail.gmail.com>
+ <fe8fb314-de99-45c2-b71e-5cedffe590b0@lunn.ch> <CADvTj4qRmjUQJnhamkWNpHGNAtvFyOJnbaQ5RZ6NYYqSNhxshA@mail.gmail.com>
+ <014d8d63-bfb1-4911-9ea6-6f4cdabc46e5@lunn.ch> <CADvTj4oVj-38ohw7Na9rkXLTGEEFkLv=4S40GPvHM5eZnN7KyA@mail.gmail.com>
+ <aDbA5l5iXNntTN6n@shell.armlinux.org.uk>
+In-Reply-To: <aDbA5l5iXNntTN6n@shell.armlinux.org.uk>
+From: James Hilliard <james.hilliard1@gmail.com>
+Date: Wed, 28 May 2025 05:57:38 -0600
+X-Gm-Features: AX0GCFvRg1G8o6RHpRasEA3gbglv1Max4m9hoMAbkTOqRd30AqyfzVMQn3V1-wU
+Message-ID: <CADvTj4qP_enKCG-xpNG44ddMOJj42c+yiuMjV_N9LPJPMJqyOg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] net: stmmac: allow drivers to explicitly select
+ PHY device
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Furong Xu <0x1207@gmail.com>, Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 28, 2025 at 08:38:29AM +0200, Ricard Bejarano wrote:
-> This impacts performance so much that I can't even test it.
-> 
-> iperf3 doesn't even start and ping shows >1s latency:
-> 
-> root@red:~# ping 10.0.0.2
-> PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
-> 64 bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=1041 ms
-> 64 bytes from 10.0.0.2: icmp_seq=2 ttl=64 time=1024 ms
-> 64 bytes from 10.0.0.2: icmp_seq=3 ttl=64 time=1025 ms
+On Wed, May 28, 2025 at 1:53=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, May 27, 2025 at 02:37:03PM -0600, James Hilliard wrote:
+> > On Tue, May 27, 2025 at 2:30=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > > Sure, that may make sense to do as well, but I still don't see
+> > > > how that impacts the need to runtime select the PHY which
+> > > > is configured for the correct MFD.
+> > >
+> > > If you know what variant you have, you only include the one PHY you
+> > > actually have, and phy-handle points to it, just as normal. No runtim=
+e
+> > > selection.
+> >
+> > Oh, so here's the issue, we have both PHY variants, older hardware
+> > generally has AC200 PHY's while newer ships AC300 PHY's, but
+> > when I surveyed our deployed hardware using these boards many
+> > systems of similar age would randomly mix AC200 and AC300 PHY's.
+> >
+> > It appears there was a fairly long transition period where both variant=
+s
+> > were being shipped.
+>
+> Given that DT is supposed to describe the hardware that is being run on,
+> it should _describe_ _the_ _hardware_ that the kernel is being run on.
+>
+> That means not enumerating all possibilities in DT and then having magic
+> in the kernel to select the right variant. That means having a correct
+> description in DT for the kernel to use.
 
-That is something else. The slightly larger than 1000ms, means ping #2
-is kicking ping #1 onto the wire. The transmit is not starting for
-some reason until the next packet is queued for transmission.
+The approach I'm using is IMO quite similar to say other hardware
+variant runtime detection DT features like this:
+https://github.com/torvalds/linux/commit/157ce8f381efe264933e9366db828d845b=
+ade3a1
 
-	Andrew
+There's already a good bit of mdio autodetection code like
+that which scans mdio buses for PHY ID's in stmmac. To me
+this is just allowing for device specific autodetection logic, it's
+not like we don't already have a good bit of generic PHY auto
+detection code in the kernel already.
+
+> I don't think that abusing "phys" is a good idea.
+>
+> It's quite normal for the boot loader to fix up the device tree
+> according to the hardware - for example, adding the actual memory
+> location and sizes that are present, adding reserved memory regions,
+> etc. I don't see why you couldn't detect the differences and have
+> the boot loader patch the device tree appropriately.
+
+I mean, sure, that's technically possible, it just seems like it's
+not the best fit option here since there seems to be no real
+reason this sort of autodetection can't be handled in the
+kernel itself.
 
