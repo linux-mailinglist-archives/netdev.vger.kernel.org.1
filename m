@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-193957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5306AC69E9
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:59:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB90AC6A00
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 15:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FA0F7A2770
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 12:58:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A16A3B5E72
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 13:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684E62857E9;
-	Wed, 28 May 2025 12:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0065A2857E6;
+	Wed, 28 May 2025 13:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E2hOF5uy"
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="P1ntpBmU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lX0N1t+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3099246774
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 12:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA6A28540B
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 13:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748437191; cv=none; b=uE33N7VVJTgktLrnKucy5Ek+pkpdmrS2bYI7zBwkZ18zI+Ze2Y5tTRmgTkC9cXvtAvmuaNpiBdrqK4obireKf1/kRsZrbsgtMuZuXRx0QmV7yIYL7smRumamarD7P760P1QwnFp2iNssWt2xDDSHwUtAR3T4Uuqw7TS40v73A8s=
+	t=1748437701; cv=none; b=AnjDj4m6igBLB3FbAbzI7Sh+GUp4wlcNkWEgwLiDEBNcYFOWzPfodTz1bTpJt40YdPs/4XSymFrtqBwMOxirp/8JaND9vlPcgxhdPBRP5r+gZ12EM0IbEZ4434pN0RSBdDpo6B7rT92qvLNPytCNchi7ZhW9p0G/7L+uN5iW5dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748437191; c=relaxed/simple;
-	bh=C0NmBaW0ATR+BjEQEZWGSFa+sfjvBIIHXFfmCizBQV8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TUqLop4wD75a1pCaIIsBrKPwaSeWoXs07XSdI0p8H7Qf5XtP816DktMzQRy5ogdttSaCBh+jYycJaRlvrntclVSeI9HLrIBTi2AeJRvyxHwePKd9vC0dy8ombE7WUlcDvJNP8YL9QgaarTrUlzwqNtD1AOqswRu2qF6KPEa6tSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E2hOF5uy; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-47691d82bfbso86046791cf.0
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 05:59:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748437188; x=1749041988; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mh3KYFguc08WUp3HQG/e3NOwLqhhclGw8CBRTTOw3xk=;
-        b=E2hOF5uyCYaFXLK3QY9yHNIuPk9SUOYJMKyVoeum8fZWf28pRvz+yGCaCAh0uTmMP1
-         XazinLmHV98caDDOhInckm9MLVURIyaxdQrGOtS71bmbeZ/TovcclOODD6hY0XeprTrl
-         hn0jKnv9mLhw0fuYbKWlSyJ45qlThQJEYEX4yan3lbhf8VcGNZiCvstgvJH5HvjH9hSi
-         LLVXqo1OC9vprxNx40wGa3rHrXEYfJH+U+WAoATWbD/g1PN6YmoglWNmPCnni5CIrIDY
-         DyET9POZX0Kismg6eNLFhFWGtl5LWZlqOIp1fde3Hf2XHrmbpaChA9Ej9iP+xbLRLTJM
-         Pxdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748437188; x=1749041988;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mh3KYFguc08WUp3HQG/e3NOwLqhhclGw8CBRTTOw3xk=;
-        b=QkvVpYY57CCCj8Hc9Vh9KRqr6S0wLp9yeNzZ3bVpYOxstvbrRLgQw8TBYsT+vM/puF
-         aqBvNbtK5ZJPVpJLDe1Xb12uqKpKc9Cnw66tB2MqUEHy2Q0n8KT3tR1AoqykbRS6DxwH
-         kyy9E7XEq+aAvXS8uAW2mUP9kXbNNC5NBH5V97/xfY/RRSmNWaSo6NzD1OaVEuip1rz2
-         WJ/hS1uZdYv69o7wwQ7hCIaWmlIU/UDqtLgQNuxOzTukHbTrtnZySd7fbIdskPy050uR
-         A68eGlSk0gF1SVhIQJSAZC9A9ZCb8oxrlA4hoMMIynJefKCM+DhIJ5i6utzWOxkMJ5u8
-         +oHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0MHNoiBisupCII4CRy22JUAylp1MKKm51JlnKLkeihH3Gub0U+yJAreg9Dmzej1+UKgo6+fc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+V3etmNFjHrab7/+3NHZFEAwXMeQKyv+jTOAc3bqZqhU4DRrN
-	yNmVdS06DldWPElfec+ODL7S6VB1X/1z+zW4TJ24KOSvkSHo461dBPCdhzNO/U+WoitpIil+h5U
-	6rj2W2vbsmshXHTMPU1wTR9SxPs8wEDtWGKhzhq0K
-X-Gm-Gg: ASbGncvnooEN0WRPLvPlcoWkU2VFM8R2BLcxMA2bamwel1Uoq3izB3vTL4ATAkVW8WE
-	XMudgesWSzEXbvnB5JJA5iACeak+QDSINw0yS8ila2Im/GUhKXIe05ZJg9g5BIML8jEbLiRwHFZ
-	HcNhgRv7s6X3rq3nMYTTIX483N30UJte9TAIvwYRY3Ql8=
-X-Google-Smtp-Source: AGHT+IFAJntWLEM+jLIr7N9mWP3wVZkrJg6XEkO/SEN/9+02OAMFuE/XmC+xS/0WBbR3yG/snqITFeF03Is/SbZOa1Q=
-X-Received: by 2002:a05:622a:540c:b0:477:1edc:baaa with SMTP id
- d75a77b69052e-49f46154670mr281543701cf.6.1748437188237; Wed, 28 May 2025
- 05:59:48 -0700 (PDT)
+	s=arc-20240116; t=1748437701; c=relaxed/simple;
+	bh=rnsgtl+6En7l9FXSdKsKDMcpyToI/pRozDI707SaGM0=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Y83sF0WTZGbG78Dc4cE0L78PRH1MkiB/AFgUryPosSJlNVFJmXJqdGAi+dbsVzTh4KAo7Wm8bitH+efKaO9fhs0YdFTzvGgHiWMo93RQbGQJ96Tlmex1r4n/s7EQ1HYHzWYnPdCKNvDU+b7sQUEqfFNCuHlJ7HrdgUuVBTGhXjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=P1ntpBmU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lX0N1t+W; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 988742540138;
+	Wed, 28 May 2025 09:08:18 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Wed, 28 May 2025 09:08:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1748437698;
+	 x=1748524098; bh=hMedc1Zc+k7/rjLSpbVYzOtOw/X+uoI1KrqaQAXFYk8=; b=
+	P1ntpBmULprNjELhPKh/15l728/8G8PS9WJYA9N6ijH4/DAQTUmhHedzKf+rVRW8
+	W0OQhpBs9q8xecDo36j9TqAFUJvHEF9fNfGquFLGu5IXFPzRVh3hNiSTLeV2bQ/n
+	yM2uYUp25scWtWyuAwn5aULCef0gFQi2K6QLo0qNoZt7uhpdlGE8P6Kk1L3MqAxZ
+	ig4ttU6M4rmoxPXFm7n49IpVz7otD33fvLrZSXjf4o8ltRodX1M3jl4y+3vfu9xi
+	BXS54pvbDPkl3wz0ZxJ6zSZa3dz6ptlvyjvQndQ+L26K4hoMWXG3nRdkxKIQ6hUM
+	rUlE8BzOvtH0idgbHfDrhQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748437698; x=
+	1748524098; bh=hMedc1Zc+k7/rjLSpbVYzOtOw/X+uoI1KrqaQAXFYk8=; b=l
+	X0N1t+WwzwYbBSIyrs1PAHh2dnlyFfObOibHi/wh2UPaxk3WDqauzKNA6VphNRgU
+	tzcl7N7tJuKacVa3xEpR1HjltDrVXXtlkDtLtAw2VEpjgmO/gUVJA2TC/RvUEZr5
+	Stq9lMFDIoDoXgt9jSiv0VhCJfHmku2n6+woaY6vMLFcIulFvDModUxMdKj2Jtn6
+	nU0y5Yz+IZpzV1D97H8xaVqlk4b5m6topFEsNbP4t15PNvEfnng/Qj5FIib/Lc1m
+	AGC1DqsYRGmIk1VBoFjAqTl/+ikcWR9yPa/I/xQ3VHPIEo6HHH3opIJ1pAVtz3ha
+	QLPmSaqcEJYJpxQzLasFg==
+X-ME-Sender: <xms:wQo3aLU1zDvwVU28QJ_bwIxh1MsXP9sTPNjzjuS-Ya8NS6PLh3V_RQ>
+    <xme:wQo3aDmYBa-Zz1630mIbFJmO7mZr4o26S-xO3S140rxaZA-v-7XP-unKDJRln2KpV
+    lPDJd0RZefuWEfdadM>
+X-ME-Received: <xmr:wQo3aHZeEUbwMnYAJSW-0x-E9l5z8x5nwQnnOGyJLYCJVBg2FupEGQjFZcsAxfxyDLWS0aSEcKJAiNeLNwThpCYS5lFH9G5Ma_rszXhksw4-jg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvfeefgeculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
+    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
+    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnheptefh
+    leekteffhedtgeekudeivefhgfevtedvgedtjefhffejteelgeethfevhfdunecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
+    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
+    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
+    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
+    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
+    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:wQo3aGWo7h3c13KhZwYDJiwWB5vapj1IR6G0P5hfGLzSgvfi1lu7bg>
+    <xmx:wQo3aFk1SDlpQqCEWs0Zs7tJvqG5mO3r3QX59BZkxTDH8sVVynBLWw>
+    <xmx:wQo3aDdJnyB2SPP6-tfK2MpFo13C969WDSy5kwZpOZHPI34E1XPxrg>
+    <xmx:wQo3aPEn66Lhfj9Ir30yJS2XxpgyUuKCBZqmy4qvAlmf-r9Iy0dQwg>
+    <xmx:wgo3aGtt0YzXFukQCvsBD0yxSgaezqHAHj5OsIS5mU-05chWKRxdlFB3>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 28 May 2025 09:08:16 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAN2Y7hxscai7JuC0fPE8DZ3QOPzO_KsE_AMCuyeTYRQQW_mA2w@mail.gmail.com>
-In-Reply-To: <CAN2Y7hxscai7JuC0fPE8DZ3QOPzO_KsE_AMCuyeTYRQQW_mA2w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 28 May 2025 05:59:36 -0700
-X-Gm-Features: AX0GCFv6GDabW9ltrrqADmuYBvRnrtFJ8jrQAKBbibiNhMSdO8QJCQSrZAN03og
-Message-ID: <CANn89iLB39WjshWbDesxK_-oY1xaJ-bR4p+tRC1pPU=W+9L=sw@mail.gmail.com>
-Subject: Re: [bug report, linux 6.15-rc4] A large number of connections in the
- SYN_SENT state caused the nf_conntrack table to be full.
-To: ying chen <yc1082463@gmail.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+From: Ricard Bejarano <ricard@bejarano.io>
+In-Reply-To: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+Date: Wed, 28 May 2025 15:08:14 +0200
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+ netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
+References: <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
+ <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
+ <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
+ <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
+ <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
+ <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
+ <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
+ <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
+ <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
+ <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
+ <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-On Wed, May 28, 2025 at 5:52=E2=80=AFAM ying chen <yc1082463@gmail.com> wro=
-te:
->
-> Hello all,
->
-> I encountered an "nf_conntrack: table full" warning on Linux 6.15-rc4.
-> Running cat /proc/net/nf_conntrack showed a large number of
-> connections in the SYN_SENT state.
-> As is well known, if we attempt to connect to a non-existent port, the
-> system will respond with an RST and then delete the conntrack entry.
-> However, when we frequently connect to non-existent ports, the
-> conntrack entries are not deleted, eventually causing the nf_conntrack
-> table to fill up.
->
-> The problem can be reproduced using the following command:
-> hping3 -S -V -p 9007 --flood xx.x.xxx.xxx
->
-> ~$ cat /proc/net/nf_conntrack
-> ipv4     2 tcp      6 112 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D2642 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D90=
-07
-> dport=3D2642 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 111 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D11510 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D9=
-007
-> dport=3D11510 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 111 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D28611 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D9=
-007
-> dport=3D28611 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 112 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D62849 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D9=
-007
-> dport=3D62849 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 111 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D3410 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D90=
-07
-> dport=3D3410 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 111 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D44185 dport=3D9007 [UNREPLIED] src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.x=
-xx
-> sport=3D9007 dport=3D44185 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 111 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D51099 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D9=
-007
-> dport=3D51099 mark=3D0 zone=3D0 use=3D2
-> ipv4     2 tcp      6 112 SYN_SENT src=3Dxx.x.xxx.xxx dst=3Dxx.xx.xx.xx
-> sport=3D23609 dport=3D9007 src=3Dxx.xx.xx.xx dst=3Dxx.x.xxx.xxx sport=3D9=
-007
-> dport=3D23609 mark=3D0 zone=3D0 use=3D2
+> That is something else. The slightly larger than 1000ms, means ping #2
+> is kicking ping #1 onto the wire. The transmit is not starting for
+> some reason until the next packet is queued for transmission.
 
-The default timeout is 120 seconds.
+You were right once again, sir.
 
-/proc/sys/net/netfilter/nf_conntrack_tcp_timeout_syn_sent
+I've not been able to replicate the 1000ms delays after starting from a =
+clean
+6.14.8 install. Ping is fast again.
+
+However, there's still a performance problem.
+
+The iperf3 client (red) hangs forever.
+
+The server (blue) throws this error:
+iperf3: error - unable to receive cookie at server:
+
+And red's dmesg shows:
+[  399.534149] workqueue: output_poll_execute hogged CPU for >10000us 19 =
+times, consider switching to WQ_UNBOUND
+[  399.572109] workqueue: i915_hpd_poll_init_work [i915] hogged CPU for =
+>10000us 19 times, consider switching to WQ_UNBOUND
+
+Anything else I might be missing?
+
+RB=
 
