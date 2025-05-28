@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-193834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3378FAC5F98
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:36:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EEDBAC5F9B
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08ADE1BC4B7F
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:35:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D11E31BC56B5
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386591E0E14;
-	Wed, 28 May 2025 02:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FDC1E8337;
+	Wed, 28 May 2025 02:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hR9nGtMS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EzjmqezS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBD51C5D4B;
-	Wed, 28 May 2025 02:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BBC1E8326
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 02:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748399418; cv=none; b=L3immMBKuBmTj7RxzVkoOMH924MJM/A82WarLA8GS/Ct/X4YDA65t3kbjENHdfDc4WdiY9MJzDDb15Xih9uEtp0y+ZYOzImzuobtN1M/CwNkF4oke4xrKokhgOR4u5+mfrufu8Dz6YR1dRr1pdzXDWKVt6iS6r3VIugskTVwN2I=
+	t=1748399419; cv=none; b=fS4ezJgDBI1OyLsVgyNTAhdpEoZwd/RoMPV+ku59wtyBHaW/QG27OXV7jsxBJB9EmCHbpXqL6ZOng0yBnfJ+DiCML6zCbyPZmsoW5ZYAcVXowei4c+Tb8LmMWOA8NlP0UNSYOCrS0jpbfzxXhulmwE21XGmqy5agXNKvQkpqZNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748399418; c=relaxed/simple;
-	bh=BWCthmiI/S2MepvgN2bdm2wAp5bX/8wGlKNy+opLH+U=;
+	s=arc-20240116; t=1748399419; c=relaxed/simple;
+	bh=O8HN9nO2jfwiqu7gBQqP9xTYKsa18Ye/ezfqOBxDZiw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iPmwk9z6y6KbYHSZjZolqF4/VUWBgSEn6U6p4shKmLosSaBqKi6CYq+9G7tTysU9kylBcXgIv/w3lSZPCEfdbwSy9D6CnqJr59IrlL/9VRngxrr+hJAYarhg95CniAgyxt4Xg+li9EaUqGoyWGNl5TKo2o3vruChOKBl7YSidSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hR9nGtMS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63605C4CEE9;
-	Wed, 28 May 2025 02:30:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nPOsEd6fsNkdxrQAK0Ynz9r1m2jqh9/RvsSgUyFXm4q14viJHZDU6ULBOxQMYFVl6jy5s6BiHsy9xUbAwmAC0KCIBThjFHRjFo5A5YS/hwlmxphse0OxEHRCkeQzz+ai2ArDdK54Tr/IKJ9IIeRnYOPR0pKTkI9F/XUEonDV9d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EzjmqezS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2FE1C4CEE9;
+	Wed, 28 May 2025 02:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748399417;
-	bh=BWCthmiI/S2MepvgN2bdm2wAp5bX/8wGlKNy+opLH+U=;
+	s=k20201202; t=1748399418;
+	bh=O8HN9nO2jfwiqu7gBQqP9xTYKsa18Ye/ezfqOBxDZiw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hR9nGtMSbjWhXxGLl5Kab7PjG50Wkd8+gcZLY1aGEA66MWPgVyxSb7njj9WWn2PDw
-	 XUaeGN1ZQHRibQum7KJR0A4FVXW23bA6c+VPDaFyuLJw+vK7OQ3rbwyS992ULTthbC
-	 jXkAH5niCg09K/FKTYoJC0OVtrKUQaQWeXl9sqJKQgiiCMqmM4uYYcChRyeqJVudV7
-	 UqWKo04HJLnJ/6X0ePU6HilOnSdChZX3mwTqtlkpC08+k573trmVeJA5DlHMHpoZRh
-	 38d7ENzOgJeOo3uMlRXhPEJx0t3B6l/FfqGqaOTpTpNCaXm42BY0KIdQ1mzwmy0WOw
-	 kfA8Y4IoSNr5Q==
+	b=EzjmqezSUJtL2oYp5S3+eq7rcyvLIMnLI1huZOsEUC+IF5vDJUU1YCyMuD45zC8aX
+	 Yvg/F6Xcms/j/mgZHseit3TdKakEylwcAtCjFIqBmHwQ8V6/UErFyrYScxvNOYYd9S
+	 Mg6Dd+1jyyrDUgB3yvr1uM23Jf5+hXo8ZZyHPKp+k6RgmWW6jNnju/2vGsnhVjF2M+
+	 2X/EWI9ODIsfjQPpZJXm2087gz5YyqYE41K+DuAYMoFzoZgVLiHC1mDzZ5OP0MVo5e
+	 nOuhj5QVO03W6KFngdpmhrgW1tJzYCwN2qmrQ9XmYTQjjkRc5M8j7EwIRDGzA5LbTr
+	 7ZZHY3wNr+2ag==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDC23822D1A;
-	Wed, 28 May 2025 02:30:52 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DD73822D1A;
+	Wed, 28 May 2025 02:30:54 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,55 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/8] Devmem TCP minor cleanups and ksft
- improvements
+Subject: Re: [PATCH net-next v2] selftests: netfilter: nft_queue.sh: include file
+ transfer duration in log message
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174839945148.1866481.123828149281878670.git-patchwork-notify@kernel.org>
-Date: Wed, 28 May 2025 02:30:51 +0000
-References: <20250523230524.1107879-1-almasrymina@google.com>
-In-Reply-To: <20250523230524.1107879-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, hawk@kernel.org,
- ilias.apalodimas@linaro.org, ncardwell@google.com, kuniyu@amazon.com,
- dsahern@kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org, sdf@fomichev.me,
- ap420073@gmail.com, praan@google.com, shivajikant@google.com
+ <174839945274.1866481.12543091323838837455.git-patchwork-notify@kernel.org>
+Date: Wed, 28 May 2025 02:30:52 +0000
+References: <20250523121700.20011-1-fw@strlen.de>
+In-Reply-To: <20250523121700.20011-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 23 May 2025 23:05:16 +0000 you wrote:
-> v2: https://lore.kernel.org/netdev/20250519023517.4062941-1-almasrymina@google.com/
+On Fri, 23 May 2025 14:16:57 +0200 you wrote:
+> Paolo Abeni says:
+>  Recently the nipa CI infra went through some tuning, and the mentioned
+>  self-test now often fails.
 > 
-> Changelog:
-> - Collect acks and tested-bys (Thanks!)
-> - Drop the patch that removed ksft_disruptive. That seems to not have
->   any relation to behavior when test fails.
-> - Address comments.
+> The failing test is the sctp+nfqueue one, where the file transfer takes
+> too long and hits the timeout (1 minute).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/8] net: devmem: move list_add to net_devmem_bind_dmabuf.
-    https://git.kernel.org/netdev/net-next/c/88e47c93b3a2
-  - [net-next,v2,2/8] page_pool: fix ugly page_pool formatting
-    https://git.kernel.org/netdev/net-next/c/170ebc60b79a
-  - [net-next,v2,3/8] net: devmem: preserve sockc_err
-    https://git.kernel.org/netdev/net-next/c/85cea17d15c9
-  - [net-next,v2,4/8] net: devmem: ksft: add ipv4 support
-    https://git.kernel.org/netdev/net-next/c/12d31142e63a
-  - [net-next,v2,5/8] net: devmem: ksft: add exit_wait to make rx test pass
-    https://git.kernel.org/netdev/net-next/c/57605ae8e1b6
-  - [net-next,v2,6/8] net: devmem: ksft: add 5 tuple FS support
-    https://git.kernel.org/netdev/net-next/c/243d47a5e1e4
-  - [net-next,v2,7/8] net: devmem: ksft: upgrade rx test to send 1K data
-    https://git.kernel.org/netdev/net-next/c/baa18bc5353f
-  - [net-next,v2,8/8] net: devmem: ncdevmem: remove unused variable
-    https://git.kernel.org/netdev/net-next/c/affffcbb8726
+  - [net-next,v2] selftests: netfilter: nft_queue.sh: include file transfer duration in log message
+    https://git.kernel.org/netdev/net-next/c/429d410bf9ef
 
 You are awesome, thank you!
 -- 
