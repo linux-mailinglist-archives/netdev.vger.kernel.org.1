@@ -1,147 +1,125 @@
-Return-Path: <netdev+bounces-193872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF48AC61B9
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 08:14:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158CEAC61D6
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 08:24:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 072274A51F2
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 06:14:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D899B1BC1959
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 06:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F2A215767;
-	Wed, 28 May 2025 06:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC357229B02;
+	Wed, 28 May 2025 06:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="cfNZ+ABh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmuwslO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3762F211A0E;
-	Wed, 28 May 2025 06:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E643595D
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 06:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748412838; cv=none; b=P7oSRNFoknMc0a0gfXv/RBdSrlme0cBWLIKtFXpl4Gp8FO3pm3fxXloypXM5fub0JTwz76VdIlaLxXFoiV6QFSpSX3mbcVS/ff9U4rjCkpx+AREuMXvOScrKrZQlzD/agHDDLPSBEedUdwZxGkawlqNawUM8uIfakNXdSlS5h+E=
+	t=1748413480; cv=none; b=JKFkcWL/YM3uDSWCiNB4JlH4UQi2p6QPrL0wz9gjZLWYrWAtVEfGp4JRV3ZWYvDfV6+Cyrb7gsN+ae/WGt/F4UHlzhclLXlkJ5f/9/HTe4gv+DQ0L2P7QOccaYmIkHeAd7n5wbZROBDp+nHlNGSsl+f8sddQaHYYyIEa+55Xlaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748412838; c=relaxed/simple;
-	bh=eiT/vSc22rEGiAvVFZ5/ZWqinHH0e3XtVZ+udxaTsIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bR1khq8CNaOCRe6Agiq5fMu2D3dcUnd7jXxpFcIH0eC2a6nkX151ph0FPWAaQQMjsPy2wCtYiPG3GaWcpMzrYd4+lEYM/a/0ubegsMFqxu4y0o+3JC8R3Ptf389Bav2RqyvwLKS15cbTU7GFosmgh1FgZ+I1XR0Gds/M5YJ38/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=cfNZ+ABh; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1748412827;
-	bh=AifmlD6epwaraxjcxUJRxGnsd49Asu8Er1vCXQcUTVs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cfNZ+ABhXc53YvuOrV8s6xuFkbs26dgv/UxojMQSBtdcfkgdl4dF6EeJsPGMDFsZS
-	 b1WyVHDeLSnqhZuyUHncTsZY2npJUWbqkzGg2gzGSsUSzhmuN8JvTsusQcj6sJ5klL
-	 KyVvP6zCoXvfuV+d15KrgsLC7QMBt886kX5j1QThBuP4wkJ9OgmSaItXw933htYMSS
-	 RZ4edILUd/QHqiNz6WRkWEaQzx38lxtvy7E9ONZOMoVEhBxaLnHbt0x3yaFU79nfo8
-	 haf8cFR+p+P6F4791/+gd0GsmBEzKY2Xhg2y2giUcHi2Y3sTMZ/1M0sYrQANFPzk3D
-	 HiylG6yLTSfCA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b6fMY1sm1z4wcg;
-	Wed, 28 May 2025 16:13:45 +1000 (AEST)
-Date: Wed, 28 May 2025 16:13:44 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- "Jiri Slaby (SUSE)" <jirislaby@kernel.org>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, Networking <netdev@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the tip tree with the net-next tree
-Message-ID: <20250528161344.0533ae6b@canb.auug.org.au>
-In-Reply-To: <20250507124900.4dad50d4@canb.auug.org.au>
-References: <20250507124900.4dad50d4@canb.auug.org.au>
+	s=arc-20240116; t=1748413480; c=relaxed/simple;
+	bh=kTVvThaepVpjwYf+NroDpxcy/+LSdRi3RXkZGjHWijU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=djk49R1LrvPV5NcDx5OJho6EbMudnqWVpyQjbEHq3wVlc4sXZ3Scx+JEOk+EyBMr4LSHgnhVoSaPXOEmHCo8lnQGEjMH789dNl65T3sRXra2/uZSkwP6vACE7i5dFJAW1ycuPb1yVxYOGe4qBbEfM2I+nheBh3oRr2Lk0S9QADE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hmuwslO4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748413477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=754vc2wjDI7HXePVLvdpk2rAWv3hYor0wtSkoWf1dhE=;
+	b=hmuwslO4a9x3F2dgw0eA35ahYmukZzd5RPbbRwQncZaAYflfFhmmi7OCUJ8PkdjNm0LclT
+	AKUQ8JwmlaBiWlCDONdVWERM6G7CR+9nZEcf+QZ9kgQdRc8p3JVJEeL5FrF8AgVH+OEIio
+	DLdhBzhz6PpsfjO3DPawAaM9XZiKLoQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-EPo0Q1T8Mk6_nqq0HKNNUQ-1; Wed, 28 May 2025 02:24:35 -0400
+X-MC-Unique: EPo0Q1T8Mk6_nqq0HKNNUQ-1
+X-Mimecast-MFC-AGG-ID: EPo0Q1T8Mk6_nqq0HKNNUQ_1748413475
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cfda30a3cso23162585e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 May 2025 23:24:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748413474; x=1749018274;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=754vc2wjDI7HXePVLvdpk2rAWv3hYor0wtSkoWf1dhE=;
+        b=jLoA0MaJB+9yjbUvZ3GLpxSJgcLRb62dsyqHa5DgrDqjLi/Psl7TSHzZ/EDPrKh1LP
+         HpbFrmwR4D8lxPGE7QpRG+hG1xRiPozz5QEtPt66VnFWhdue17esqY3oxGtOHyLEStd2
+         FY/DgCQs2a5uznuMsqapcnFdmLdqGpmVH3rDJUwJs/8xCxnuXtJj785aTHzdPHqaL/AF
+         FWxASIc9pIkG/RWh1FsgApDRsU8wnrCrjETbU5TGXizX9qHGBUo3BXLWBAKDlUtnKS6l
+         rUe7Vc9FY1WiU9kkhoc7tx5fk+PvjG5T4BUOKJIPxlu6fhMrOqTPrh2j5vaegmmVNsTx
+         EOxg==
+X-Gm-Message-State: AOJu0YwBXfFSlp6ZPvth1dh0R45OLn1r6mWqIGo4WhYMHeoYG0Sqst0u
+	AciedaiY742dLuULMa5qhWu5ILmy/AREGIFpRfissbhFKy02D44Ixvtl/55PV+aBU1RG+zeJ/Wl
+	R/wp0f7spvd031BVF3KrIY5IScIuZqycOEtejiyCzrKm1GGJEUCeIFGfQoQ==
+X-Gm-Gg: ASbGnctx47fdOQbV8F9vTpxrDsk9tjF3i3H3LSEtmGz1ffC+4xWkfWWj8m0eVtV96NP
+	Hv8kuYw+hmTttQ0AvxxlXU1iLAa7CkczFSG8GExJ+cMR54Q4s4RskOLuegOi0rL8w+6WjZm8WfS
+	PbWJE13VKNgIRpbngo9btu8pq6Nko+lfMJvXRXnNEWGNcVkh4bEoVkx9+Fq0nFX/uCuDOY2u9bC
+	yx72R0giiT1WsfNfPOfKtoS69skP1+HDYU8CCIzPioh45vfygFzi0+lABHhIgO9zPhXoLzD+z9v
+	1yDBzBtDhjpFXsArvj6wOjEWvYaa1FHyPSMAqJJRWCY+1IQqmGnwUZL8TCc=
+X-Received: by 2002:a05:600c:5395:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-44c90a7d192mr145123915e9.0.1748413474625;
+        Tue, 27 May 2025 23:24:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTGyxwzn4y7CuSci4QeX+QzVGzuRFKJU+ecJ07NbBvlyTkZlPDD/iB7UoMAp4+3o8jBBb6bw==
+X-Received: by 2002:a05:600c:5395:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-44c90a7d192mr145123695e9.0.1748413474243;
+        Tue, 27 May 2025 23:24:34 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2728:e810:827d:a191:aa5f:ba2f? ([2a0d:3344:2728:e810:827d:a191:aa5f:ba2f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4507254b82esm7053935e9.9.2025.05.27.23.24.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 May 2025 23:24:33 -0700 (PDT)
+Message-ID: <7974cae6-d4d9-41cc-bc71-ffbc9ce6e593@redhat.com>
+Date: Wed, 28 May 2025 08:24:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/o+MW=vr2532+4g+j=5kq6Tm";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] virtio: Fixes for TX ring sizing and resize error
+ reporting
+To: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, linux-kernel@vger.kernel.org
+References: <20250521092236.661410-1-lvivier@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250521092236.661410-1-lvivier@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---Sig_/o+MW=vr2532+4g+j=5kq6Tm
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 5/21/25 11:22 AM, Laurent Vivier wrote:
+> This patch series contains two fixes and a cleanup for the virtio subsystem.
+> 
+> The first patch fixes an error reporting bug in virtio_ring's
+> virtqueue_resize() function. Previously, errors from internal resize
+> helpers could be masked if the subsequent re-enabling of the virtqueue
+> succeeded. This patch restores the correct error propagation, ensuring that
+> callers of virtqueue_resize() are properly informed of underlying resize
+> failures.
+> 
+> The second patch does a cleanup of the use of '2+MAX_SKB_FRAGS'
+> 
+> The third patch addresses a reliability issue in virtio_net where the TX
+> ring size could be configured too small, potentially leading to
+> persistently stopped queues and degraded performance. It enforces a
+> minimum TX ring size to ensure there's always enough space for at least one
+> maximally-fragmented packet plus an additional slot.
 
-Hi all,
+@Michael: it's not clear to me if you prefer take this series via your
+tree or if it should go via net. Please LMK, thanks!
 
-On Wed, 7 May 2025 12:49:00 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->=20
-> Today's linux-next merge of the tip tree got a conflict in:
->=20
->   drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
->=20
-> between commit:
->=20
->   a9843689e2de ("net: txgbe: add sriov function support")
->=20
-> from the net-next tree and commit:
->=20
->   567b0a520912 ("net: Switch to irq_domain_create_*()")
->=20
-> from the tip tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
->=20
-> diff --cc drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> index 3b9e831cf0ef,f2c2bd257e39..000000000000
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-> @@@ -198,9 -183,9 +198,9 @@@ int txgbe_setup_misc_irq(struct txgbe *
->   	if (wx->mac.type =3D=3D wx_mac_aml)
->   		goto skip_sp_irq;
->  =20
->  -	txgbe->misc.nirqs =3D 1;
->  +	txgbe->misc.nirqs =3D TXGBE_IRQ_MAX;
-> - 	txgbe->misc.domain =3D irq_domain_add_simple(NULL, txgbe->misc.nirqs, =
-0,
-> - 						   &txgbe_misc_irq_domain_ops, txgbe);
-> + 	txgbe->misc.domain =3D irq_domain_create_simple(NULL, txgbe->misc.nirq=
-s, 0,
-> + 						      &txgbe_misc_irq_domain_ops, txgbe);
->   	if (!txgbe->misc.domain)
->   		return -ENOMEM;
->  =20
+Paolo
 
-This is now a conflict between the net-next tree and Linus' tree/
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/o+MW=vr2532+4g+j=5kq6Tm
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg2qZgACgkQAVBC80lX
-0GwT7wf/fWQAj8OZZMVbej4HGWoEpYR1tA0t1tacM6TqEUm8ooLO0mCWNos1RlSq
-OYcABZyMkEa+86zzL45PubNi+KKrAGQU2pphTVztZ12zYh18OcPgNWU8xasuL+TF
-XSxrswGyAmPpN/YV+VJs3NNY5ALaPgd3gPkgUhXH3PAN21V027vZsrE5qCMCHz3D
-zlXYd09X0tSVIej7BFUTJMCvNF+RxH2AtiGi+s//HgGqimfqiRI7iKzOESAfWlPF
-w4VDOQGyLoOGJIcE1mpedhcYzbYGRHJ/T6UY4S/IC3oEF9Gt524oh0S2aHXcYxQA
-4jyAx8u+NbG/A83VqPivI025yGBlLw==
-=cjmD
------END PGP SIGNATURE-----
-
---Sig_/o+MW=vr2532+4g+j=5kq6Tm--
 
