@@ -1,169 +1,87 @@
-Return-Path: <netdev+bounces-193775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761F3AC5E13
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:13:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DF7AAC5E1C
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17001BA7004
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:13:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25D081BA1BC5
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13084548EE;
-	Wed, 28 May 2025 00:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338A23596D;
+	Wed, 28 May 2025 00:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBkz54W8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ah6XU11J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF89F41C72;
-	Wed, 28 May 2025 00:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABA31367;
+	Wed, 28 May 2025 00:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748391181; cv=none; b=PRHLRiZe4Ex7WY5ZA+WdmqbqJYsqPXj6izCZPw0pcKLJ7OAVGnhjAuHxecPov6V6g4nrBePhHN5ZqVvqKJpF56aXgtKQ6kajLEfK3nwNeZ0Mt/gvu4ZF0uSvPcXKS5sWHrj63KmNzBxRfunSSWOJCrTOrLpCEQinbjKMO5RqhTE=
+	t=1748391505; cv=none; b=N/87IykWJh4fVk1FZY6CiV5Bf6LYwsX84A6HNz98ArtLZEKSJ0QCZ4hqsI22pZ3FrE4mJMnKZAxPDc9uZYXhLv6v4r8NOv5ce1S5CtVJeWpONXQ8xFsElLZwTzNTI+RqCmeKg392G4gBL1KMt7huD4rFQ2g9lO3VJw6A1mltCko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748391181; c=relaxed/simple;
-	bh=cxW4SaBd30d71b+XTGQnQOrd3RoXiIa9IXf9TAX8wcI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DbuXQeCXgO+BaF6eGfsvpP81VAAJxHjZGQfB6YDtexrtlAsg3VCKmSYjNw3uHlmufMVUlXE1xpNYZjTHkJ8lnsko2EFNm2QGDlceX1RwMplx5QxKk1DYqZjm9nAOPwoDATzPTtb6u5FNvgEej3KrDtCtKR/gUImSVCF9sbqz9W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBkz54W8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBF2C4CEEF;
-	Wed, 28 May 2025 00:12:58 +0000 (UTC)
+	s=arc-20240116; t=1748391505; c=relaxed/simple;
+	bh=Zs8uQKqxwJbVdtpTXsEg+cPJoFnswCd10V7z0IyIKSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=djp3Bb0ZrBZ/G8IrBrzn7h0Kuj4BWG7Boh/vIdBF3+3+Q89QcCk1ZgEqVKvcnoedTSu+TjqQ4Rn8UB79MXoEcNKwTY6SJpynvGZsRoekOErofmOFVNsWubw5hHKDbATRApZyktWamPS0H9kzD6oSPiGiFGEZvP6GaIm6Lz26CLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ah6XU11J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E395CC4CEE9;
+	Wed, 28 May 2025 00:18:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748391180;
-	bh=cxW4SaBd30d71b+XTGQnQOrd3RoXiIa9IXf9TAX8wcI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=cBkz54W8rb4B9VA3IK0gsi5vhlq4TR9Nk6IYfIJ8ieIOB82bRTHHZwP/wzy3PutwT
-	 +aYkkOxxDPRC6NNy9FQWNIos68XuOhkSxHXInCwmbox7leypTgcdxAHS/Uq/OGh2WE
-	 Od/joQd8ZgHwypznwJDpQzzhzV9mfw9Gv1fQ9oy/E0u93TRWJFeVHSjy+DwBFjwdXY
-	 PMx8ANiem1VbCAyNswZmYW98QRp+857CqCWjwCjKxN5iBFEtXVAnArTCVmC1d4w1lD
-	 cios5kOGfl1CDxHnlwEdioTNDw/chS+uWSgCAIFo+50fTFIYyMuK+RuehsDE8eKU5a
-	 AOhbX6XrVv8WA==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Tue, 27 May 2025 20:12:48 -0400
-Subject: [PATCH 2/2] sunrpc: new tracepoints around svc thread wakeups
+	s=k20201202; t=1748391504;
+	bh=Zs8uQKqxwJbVdtpTXsEg+cPJoFnswCd10V7z0IyIKSM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ah6XU11JTyh6TDuXNTD+goGar9xokzda4C4ytVGtPZ2607zWLZafdRSirvISFAx1H
+	 SJGMj/+aTkHwvpn/jIhWk50/x+iefV0zgkAW8bXIEDQDyMSCimvE43e0THvNoWEbHN
+	 f9nRjzdsKriTzMSNKN93iYBgq5Zyu+K5GEflc30zBoo7oxmSqNjYcD06pIj+xHeK9n
+	 3eYe72GlNmzMDAdmuPQuIVWnQ+q/0dyXKDDQR47joRuuNxlI/ph3AyILnL5X7s3WOQ
+	 bXIpovru6BbWBJbZYi39a4ALGgt6RJlUvPwK1mnMA6IR3rjZEhyrBcy8hgJzddiNWn
+	 N6ozpiLsXOQZw==
+Date: Tue, 27 May 2025 17:18:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sunil Goutham
+ <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Bharat Bhushan <bbhushan2@marvell.com>
+Subject: Re: [net-next PatchV2] octeontx2-pf: ethtool: Display "Autoneg" and
+ "Port" fields
+Message-ID: <20250527171822.030f5f75@kernel.org>
+In-Reply-To: <20250523112638.1574132-1-hkelam@marvell.com>
+References: <20250523112638.1574132-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250527-rpc-numa-v1-2-fa1d98e9a900@kernel.org>
-References: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
-In-Reply-To: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Mike Snitzer <snitzer@kernel.org>, linux-nfs@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2475; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=cxW4SaBd30d71b+XTGQnQOrd3RoXiIa9IXf9TAX8wcI=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoNlUGnW4tgC8sVfVgHbdTgLn8V08NG8CkTE+ob
- BFqhAKcGoGJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaDZVBgAKCRAADmhBGVaC
- FUZUD/9BxN8EbQJyaMr+oPKZt5N1nr44RjHQy1scup+4Oq61Z07x8RkeHzVlc5cXFpS6u59licC
- VnbnpVSaR2MpagNnU18dcj6qjstz+RkQYcdKFSV35D2gGd/YX5S0PexNB4Hs9Kbp+1LHrBPfKAR
- pi26BBmC8OBL2ZH/eBeQlTcOC10VdwzMv4NWwuUU6nvbGcaW30/06z2fM30Pf7oQ6Pecm0Lyouw
- sET9h2mMdF4iSBeslSVqz0QpK4uz0x5oBaAjmId/8/7J7hH3nZSl4mN1MQcX2pXbKoXc3WlN0rI
- 8n2PerX+GAfLOag/sKdrzH1Q/d0ZouO0Tsopu/41kXMY9EAJRNig1NKzyn5604WfDcTMSJbncBO
- oQUPdcl5Dt5LgFUQdts0bVOHGnIHO/sf6XmHzR7l4SWBgBdDOV6iE6gaJjtmbweEraTV+8hAyAm
- KRMnQfT96DbZ7oIJvO44MjbDQZRZ4FUfr8l8NVerRgZk+05Z350/fcGYGssZctqGEw++5tVz9Z6
- 38M7SKEgPRxlKHSGWAaASwS78Kdf/6foihD0URiL6lB2GGfWvUEsfxtuLnOCfvAY1vbMxZQFx5p
- LGR14NTuEV/ubtIgqHbK510RC9k1okcxMstGyZAaUMZ/hS2zCH4bF+hi7q1n1WAm6PJwucE1kBn
- QWSM4+U8fPJW8Dg==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Convert the svc_wake_up tracepoint into svc_pool_thread_event class.
-Have it also record the pool id, and add new tracepoints for when the
-thread is already running and for when there are no idle threads.
+On Fri, 23 May 2025 16:56:38 +0530 Hariprasad Kelam wrote:
+> +	case PORT_TP:
+> +	case PORT_AUI:
+> +		cmd->base.port = rsp->fwdata.port;
+> +		break;
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- include/trace/events/sunrpc.h | 23 ++++++++++++++++++-----
- net/sunrpc/svc.c              |  5 ++++-
- 2 files changed, 22 insertions(+), 6 deletions(-)
+You're running 10g Ethernet over a 15 pin serial port? :/
+AFAIU PORT_AUI refers to 30 year old, 10Mbps connectors.
+You probably mean PORT_DA (Direct Attached [Copper]) ?
 
-diff --git a/include/trace/events/sunrpc.h b/include/trace/events/sunrpc.h
-index 5d331383047b79b9f6dcd699c87287453c1a5f49..d23009b4dc979fd7eebcfb6bc3164608f74ab23b 100644
---- a/include/trace/events/sunrpc.h
-+++ b/include/trace/events/sunrpc.h
-@@ -2124,22 +2124,35 @@ TRACE_EVENT(svc_xprt_accept,
- 	)
- );
- 
--TRACE_EVENT(svc_wake_up,
--	TP_PROTO(int pid),
-+DECLARE_EVENT_CLASS(svc_pool_thread_event,
-+	TP_PROTO(const struct svc_pool *pool, pid_t pid),
- 
--	TP_ARGS(pid),
-+	TP_ARGS(pool, pid),
- 
- 	TP_STRUCT__entry(
--		__field(int, pid)
-+		__field(unsigned int, pool_id)
-+		__field(pid_t, pid)
- 	),
- 
- 	TP_fast_assign(
-+		__entry->pool_id = pool->sp_id;
- 		__entry->pid = pid;
- 	),
- 
--	TP_printk("pid=%d", __entry->pid)
-+	TP_printk("pool=%u pid=%d", __entry->pool_id, __entry->pid)
- );
- 
-+#define DEFINE_SVC_POOL_THREAD_EVENT(name) \
-+	DEFINE_EVENT(svc_pool_thread_event, svc_pool_thread_##name, \
-+			TP_PROTO( \
-+				const struct svc_pool *pool, pid_t pid \
-+			), \
-+			TP_ARGS(pool, pid))
-+
-+DEFINE_SVC_POOL_THREAD_EVENT(wake);
-+DEFINE_SVC_POOL_THREAD_EVENT(running);
-+DEFINE_SVC_POOL_THREAD_EVENT(noidle);
-+
- TRACE_EVENT(svc_alloc_arg_err,
- 	TP_PROTO(
- 		unsigned int requested,
-diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
-index e7f9c295d13c03bf28a5eeec839fd85e24f5525f..de80d3683350dc86bee3413719797dcf7a4562e8 100644
---- a/net/sunrpc/svc.c
-+++ b/net/sunrpc/svc.c
-@@ -749,13 +749,16 @@ void svc_pool_wake_idle_thread(struct svc_pool *pool)
- 		WRITE_ONCE(rqstp->rq_qtime, ktime_get());
- 		if (!task_is_running(rqstp->rq_task)) {
- 			wake_up_process(rqstp->rq_task);
--			trace_svc_wake_up(rqstp->rq_task->pid);
-+			trace_svc_pool_thread_wake(pool, rqstp->rq_task->pid);
- 			percpu_counter_inc(&pool->sp_threads_woken);
-+		} else {
-+			trace_svc_pool_thread_running(pool, rqstp->rq_task->pid);
- 		}
- 		rcu_read_unlock();
- 		return;
- 	}
- 	rcu_read_unlock();
-+	trace_svc_pool_thread_noidle(pool, rqstp->rq_task->pid);
- 
- }
- EXPORT_SYMBOL_GPL(svc_pool_wake_idle_thread);
+If that's right and the FW gets it wrong just fix it up in the driver?
 
+	case PORT_AUI: /* FW uses the wrong ID for DA */
+		cmd->base.port = PORT_DA;
+		break;
+
+? Please note that net-next is now closed for 2 weeks of the merge
+window.
 -- 
-2.49.0
-
+pw-bot: cr
 
