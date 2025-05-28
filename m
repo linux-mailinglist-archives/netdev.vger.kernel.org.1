@@ -1,175 +1,115 @@
-Return-Path: <netdev+bounces-193772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A3FAC5DFE
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:05:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB393AC5E0D
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1409A7AEA99
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:04:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924BC1BA6E64
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 00:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE93136A;
-	Wed, 28 May 2025 00:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B03BA4A;
+	Wed, 28 May 2025 00:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KPa9xkJn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFvazXEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5038AA2D;
-	Wed, 28 May 2025 00:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCF41862;
+	Wed, 28 May 2025 00:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748390747; cv=none; b=kJnPJysUI6O7bK8aKPSfXhR11EupY/4DlrxThmUvXnaRkwsxaY3RUCO2V/+SFQn+8/rtEw0a8GL2McOaqQ9+ByF4su59Yql0mQ/BM2JukVDs/KQlqJMle4kRE4LyNgf72BcVYTdee0Hu8MU/y2yzbiMmv/yPYfhIvQm8D6OxoFU=
+	t=1748391177; cv=none; b=fqXqN2v9t5RWzuI1soEgDfKSX0y0Of6VYHrzW+Stmtw+cS0mH475etU8alyL8aewNzN1oAJaxzVNkf8IMluI3Q6RCaehn4BVd883O8A1RYwYJnHYhrM+sBhfKbzV/9pwOYC1AIjQZf4/aqEPOFUjbPr24fEjzh7xgLmTCOdxIZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748390747; c=relaxed/simple;
-	bh=IpRdMgsILcpdxAO7E2U3/J/paPCQk9L6dsR5uiOHUGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YzhsGyPD6ZUjGHFHttxKSZEhsgphrcjMoM1jZrMyhhp9YRf4gwlGjOvljoS4c2lphRPqQ8k5yYkgMTKWqnTLu4MzBTtTdWJgN21hSzTVRgyTh+pDqmP8BtBD46LUvoAPDrDIzPWJ0lb7rRC2IJEnB66g/q83b00QzQoGBN3WyhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KPa9xkJn; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54RHTw0m029872;
-	Wed, 28 May 2025 00:04:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	aDUNQStuy0jRMfLgtZNwbSDgWxeyT3CWPdpJ9IflsOA=; b=KPa9xkJnirrwzekO
-	bDz3gfL44EL6qyKyMqf8l+ZazG8GyQ+Pp+Q2VEW9BJK+Hrk++Vnco1Ch3P2Hr6aj
-	y2+1FGK/8JQE4sOUa6aIl6dR9BS14FycJvUHzIdKiuiEu/YMnJ/6gVoj8dyIxNud
-	PYmG99yMkuEOC4P5YhenxRTbg9f+g/1xMcxnKgdP8pqwpyWCROVfg3cvS6lmNWyu
-	aRsgre5v8zia5HJlWjSrPuBgQ+32tmg2ZTiKhniIdKp8mCAKdezQVe3lPMEVo29/
-	YcsC2kt0lYQFYlgVT5A5/oBiI8U8KSWMIuuAXsXOdYdlOY0+/PgK+rdGNxne2Ulg
-	yPZZuA==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46whuf0v68-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 00:04:59 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54S04wpi029950
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 00:04:58 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 27 May
- 2025 17:04:58 -0700
-Message-ID: <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com>
-Date: Tue, 27 May 2025 17:04:52 -0700
+	s=arc-20240116; t=1748391177; c=relaxed/simple;
+	bh=aLnwkTjNl2st21XOB21RJcHshrEuyKkjIXdiF3ekx1c=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hTdHSr09eZo5EF3TAtePhYcMAp521/9TUxH5R7YQ5CGdVbGuyn7GFGTY9fp1i6e0nTj3tfiHR0tS+9D1Pdc6vxfvM4QFxnihvkcVm0VkXog0VCcoUBq8UXQj+hBU0DTFQ2NxwTwR1Ayhk/hbsydh+JwtxcxaFpKPfrtgEcls/4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFvazXEs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1FBC4CEE9;
+	Wed, 28 May 2025 00:12:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748391176;
+	bh=aLnwkTjNl2st21XOB21RJcHshrEuyKkjIXdiF3ekx1c=;
+	h=From:Subject:Date:To:Cc:From;
+	b=oFvazXEsXPKxDdk8jYnLwYlku8QDJRWE9jrZ9usnDXC3U1+08LDlABNB2lzqeG8YP
+	 pOHv9kHzqOg0v40SbPQPe23duraEzg/+hUa8UONCG8MyWEjH6yN2rE3+qmuTJeV32q
+	 yzvctpYtCj5HmjoYIMZ5i+jay/rDk1+d4+p9eq6M1dMBng1kjWk2lZbqutyhkloq1g
+	 hgbxS6TKCGdV7CwewDNsgHziroqczflrSHEmdf1SoNm+6i25iWXMNfm5L+/SbKx9ht
+	 pDT1BMKndp2Y7MAg8Y1+hZxlqrChGx2TYIh/vJhFUhXDKDDVAePpNjVTiLZx64eg64
+	 vmNNpZL2jDR/g==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 0/2] nfsd: use threads array as-is in netlink thread set
+ interface
+Date: Tue, 27 May 2025 20:12:46 -0400
+Message-Id: <20250527-rpc-numa-v1-0-fa1d98e9a900@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for
- BCM8958x
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>,
-        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <alexandre.torgue@foss.st.com>,
-        <joabreu@synopsys.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
-        <bcm-kernel-feedback-list@broadcom.com>, <richardcochran@gmail.com>,
-        <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
-        <john.fastabend@gmail.com>, <fancer.lancer@gmail.com>,
-        <rmk+kernel@armlinux.org.uk>, <ahalaney@redhat.com>,
-        <xiaolei.wang@windriver.com>, <rohan.g.thomas@intel.com>,
-        <Jianheng.Zhang@synopsys.com>, <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <bpf@vger.kernel.org>,
-        <andrew@lunn.ch>, <linux@armlinux.org.uk>, <horms@kernel.org>,
-        <florian.fainelli@broadcom.com>,
-        Sagar Cheluvegowda
-	<quic_scheluve@quicinc.com>
-References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
- <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
- <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
- <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
-Content-Language: en-US
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=OslPyz/t c=1 sm=1 tr=0 ts=6836532b cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=COk6AnOGAAAA:8
- a=Q-fNiiVtAAAA:8 a=GcoI09lhNaN5Dz-92OEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-ORIG-GUID: zpgw-8AFVHvXHtIYfQ8he9X3VaAn-d9R
-X-Proofpoint-GUID: zpgw-8AFVHvXHtIYfQ8he9X3VaAn-d9R
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDIwNSBTYWx0ZWRfX8H1fR9ASfCTa
- ZlnZzyxxTeEKKwpoBS+icLkuaoKXs4Azv6NRGJGyRSh+Ov1Dgd8gUpITWQcc8f917X6MsQWXJq8
- DNiWojEgXqeKeMQ4jEMgKanGjYrxyECFJlj77JL2zanB+lj6nZJBW95l4BphnN2vvIlMiVmgwiG
- AqJX7RuCgI6rc+kZzA731mkW4JFsWNk7eazg4sZGM9zNctL3mnh3Es4qQD9rOEXN+PfGop+t8YK
- 4PQvT7toq/X8Cuj+P45Z4i+lAXRLvdR/ZQJvDfl3uAXazTazV/Z/vG6s6ytO7h6LH0anFkC4EMp
- 0bzre8YvTRSTEe/CQ5IcStqOjxZeBE6zyiQnvZzPxlrc58QS/arf2cuUmTGcfBvpuN5lQDEPlRC
- FRBsxV9WT+kO5VYpNEo/kls+YIB6bYXc3PQOoGZWTk6jxeRYgVk8T+OpApL1UpiHg9e822RW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-27_11,2025-05-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 phishscore=0 mlxlogscore=999 adultscore=0 malwarescore=0
- bulkscore=0 priorityscore=1501 clxscore=1011 mlxscore=0 lowpriorityscore=0
- spamscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505270205
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP5UNmgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDUyNz3aKCZN280txEXTMDg5TEtDTjNGOzVCWg8oKi1LTMCrBR0bG1tQB
+ YqzOrWgAAAA==
+X-Change-ID: 20250527-rpc-numa-600daff3f36e
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Mike Snitzer <snitzer@kernel.org>, linux-nfs@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=834; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=aLnwkTjNl2st21XOB21RJcHshrEuyKkjIXdiF3ekx1c=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoNlUGEPUHxMqZYyOZph1A0j/HCDOZDaUE/yu+4
+ 887FpKaudCJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaDZVBgAKCRAADmhBGVaC
+ FdBoD/4qbV+lGvpcYvQeANGzRz3Wjk7FTqOZQ4K77XhypkhdgBotED0UfLZQ/YGduJoZrTzfKAn
+ uPZ8ztZhoCaumXOEHzHrmdn8NrQ/+mvajdLAN9ABqUNYMGk+Kw2Qx7ID8BRDSrQIkV+sAJYfgOP
+ W6DalpVgjTPvA2r1hF9MS2HsD2DFBEp1rgImjgMpd+iE3JgdtG+Ijb5XqSMlBxOKuqk+baF8O2v
+ udUTPl5HE2FR/1Q20GSRsFu3ylaZCO0fvnV6PcLkymbrc8F83yHm93szuT0jlDgDYN3+H0Ru41U
+ kMjNEP1FQqHbzeX5qEJVrWBdXsZpoQIrfwo5E1jVo5UUqvmf5MEnsd5UJP07itxXj+ppB9I+HUW
+ QEWkp9NFBZB0FssmXccDz5/xJuaVBoPbhXFhliyLlATz8RTiImxqOlWExUvoYvZzJ1mES5MD0cM
+ i6mZ1q9kNmLVTh0YnnG7HanQ1Etlft1Le96pHtZDUpOAfrtk70QUj8zeqI/Kz32xjChiT32TG+S
+ i23IIWfay6lFMj7eOANXQnvWDhhd7kLm41eWvwWXOmMtBbY2mmBj7EsHRZ4NCyYvYG+lg7K71s5
+ cK9eTCGnsXawiOVBT9xUDam8T7+w84l20ff/Cy9LNYIQG9Nh5By5H/246k1d6F/QFfyodKd+Mxd
+ jjqN4ARqYWF20sw==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
+The first patch is probably appropriate for stable. It should fix
+problems when someone sets the pool_mode to pernode, without userland
+sending down a fully-populated thread array.
 
+The second patch just adds a couple of new tracepoints that I ended up
+using to track this down.
 
-On 2/7/2025 3:18 PM, Jitendra Vegiraju wrote:
-> Hi Abhishek,
-> 
-> On Fri, Feb 7, 2025 at 10:21 AM Abhishek Chauhan (ABC) <
-> quic_abchauha@quicinc.com> wrote:
-> 
->>
->>
->> On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
->>> Hi netdev team,
->>>
->>> On Fri, Oct 18, 2024 at 1:53 PM <jitendra.vegiraju@broadcom.com> wrote:
->>>>
->>>> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
->>>>
->>>> This patchset adds basic PCI ethernet device driver support for Broadcom
->>>> BCM8958x Automotive Ethernet switch SoC devices.
->>>>
->>>
->>> I would like to seek your guidance on how to take this patch series
->> forward.
->>> Thanks to your feedback and Serge's suggestions, we made some forward
->>> progress on this patch series.
->>> Please make any suggestions to enable us to upstream driver support
->>> for BCM8958x.
->>
->> Jitendra,
->>          Have we resent this patch or got it approved ? I dont see any
->> updates after this patch.
->>
->>
-> Thank you for inquiring about the status of this patch.
-> As stmmac driver is going through a maintainer transition, we wanted to
-> wait until a new maintainer is identified.
-> We would like to send the updated patch as soon as possible.
-> Thanks,
-> Jitendra
-Thanks Jitendra, I am sorry but just a follow up. 
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (2):
+      nfsd: use threads array as-is in netlink interface
+      sunrpc: new tracepoints around svc thread wakeups
 
-Do we know if stmmac maintainer are identified now ?
+ fs/nfsd/nfsctl.c              |  5 ++---
+ include/trace/events/sunrpc.h | 23 ++++++++++++++++++-----
+ net/sunrpc/svc.c              |  5 ++++-
+ 3 files changed, 24 insertions(+), 9 deletions(-)
+---
+base-commit: 914873bc7df913db988284876c16257e6ab772c6
+change-id: 20250527-rpc-numa-600daff3f36e
 
-Andrew/Russell - Can you please help us ? 
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
-Best regards
-ABC
-
-> 
 
