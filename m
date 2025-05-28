@@ -1,797 +1,218 @@
-Return-Path: <netdev+bounces-193946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F3EAC67C4
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 12:54:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7F1AC67BC
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 12:53:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4E4C9E3A6B
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 10:53:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01F153A7A8C
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 10:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D1327A10D;
-	Wed, 28 May 2025 10:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F792798FD;
+	Wed, 28 May 2025 10:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="gOYQmi76"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYTjBW9f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765AE2472AD;
-	Wed, 28 May 2025 10:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBDE24469C;
+	Wed, 28 May 2025 10:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748429627; cv=none; b=F+dy3kK8n+MC+spbl5mOchwxn/neU/x+dojBfk6o3MlzeTjMbavqskvMm0MGRxqhPJOpL6z7YlbwESQX/K3Mr7sMZoZuSu1cMhgyrXjFeKIkR2GaU7niBSZ3LLpZvfafFdNzrYxt1A8QGNgslHY6UDT4Cs8AitZyspkZJXdDGeU=
+	t=1748429605; cv=none; b=PM5MwgPH5r+kVF18IJG1911vRChLSKIJP364Rk6lofqPJjQxrIaF8yWrCM21MgnHbac2C/Mucba5OYbv2kFO8zBmQev/waEgvtmrUMQgLk27DiRByMzb4jMUsCrGqfETNIuITzDX8Upa0GTwomWcYHOpOV9y/5UpEBHJl08RlIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748429627; c=relaxed/simple;
-	bh=U05qBBMBZ+zkfz9YMSbX9w+3mmO246ooiae3gxS+BUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r5OZhARuJqGNaLPHuvtPbH1rXYXGDEznxLycX1BN9zNnGXwre4Ilzhabii7VhMdRb+3ppxBTtqFildERH+kJgXOmcwzALaGV0NjnBnbnD+PUQ9ESejIoB7gHsccBQZhW6pXN6QFhnESZlDXskOvvBMGFV0qtpHVtkLAr+h4eBRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=gOYQmi76; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BFFD2103972A7;
-	Wed, 28 May 2025 12:53:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1748429616; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=Rnlpm1rJuu9LugndshFdGeKyJZbgjRbA1UmZOD2hgzU=;
-	b=gOYQmi76dOC4pVrK0GAyK3s57luwOkQ2slpAqPEpVBuO1ysUf6/hGc+wz1OPbAYnpftvif
-	kMhuBBLGKVc1x9CCnqzb5gTkc41XK0rjoGSv/7XCIkWiu+s8O/Hr5xp+IvbohDx3oO7eo5
-	RIY9Nk79yHpdupcA+chi3PlWYPVydXo3sf8T05BfAHiOvR5TYjtkuW4Jj2s8lovnwQN6Sz
-	+EdXMZaSHhFia50Oo5DpffWSKzi2Xirs+TGIHU/ViuBjJWw03ZwitB9rU6THWNJswnujLP
-	5dW1zX/Cl4cY2YCTN6wmvFssgxfOpvasOE7wwgmYiGsha5xV31RQHPN4o554BA==
-Date: Wed, 28 May 2025 12:53:29 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v12 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250528125329.084ab649@wsk>
-In-Reply-To: <f738d1ed-7ade-4a37-b8fd-25178f7c1dee@redhat.com>
-References: <20250522075455.1723560-1-lukma@denx.de>
-	<20250522075455.1723560-5-lukma@denx.de>
-	<f738d1ed-7ade-4a37-b8fd-25178f7c1dee@redhat.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1748429605; c=relaxed/simple;
+	bh=0DTV0Ky9bIM8bS7kyApFrZI3E0D6TUzFXijk1QKkznk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CwGFXtaMHtWe7WfeCQq7gmYR5O+gAnWQc5/npWzzi8sspLKXxxQXR33nHS+oOmOdoTRzveEjiK48fAcAhyJ8ryFpGU3QEQS5TQI2ynqY0tgSE0oC0NLTIReacBuEQ3hJNffqnhz8FM4tQEJj0YTx4FCdgQd6C4Jll5dyyDvMJ2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYTjBW9f; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ad89333d603so282503166b.2;
+        Wed, 28 May 2025 03:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748429601; x=1749034401; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NOl96J3LmgA6Ak3DKn38V5XEN+41BOvGEplgp1Zan1A=;
+        b=FYTjBW9fNBdmYWit21d1zPTcLE1M1ZmRFzcNUNnKR7L7kGBUpBJqQ04NOcyZVfnCvD
+         KQCPAATQJGi97uw8iv9rilOcf/M9kDqPkhVoQkw7Kgs+dnNBVq3oitXPzZ7Aj8YBv7ej
+         CVZamFh0936Rr/mXgEzXpXIUUSv5j2SdGWzZ1Wf2z+xcGaQ9vrg9g5Wi4jfGZVLoxHv+
+         DBN/7pmyufk6KMBA26n7RGYLdCcTH89d+G53r+ZEOQVkIkPpHTHlxcbCSFeW1ZGfw62Y
+         5E4VjNGQ68JR9E9Eu8iExnC0dy2U1DyMFkB61WT9OuiPQRAUPkom0u05SHqQO2S/6L/+
+         pQsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748429601; x=1749034401;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NOl96J3LmgA6Ak3DKn38V5XEN+41BOvGEplgp1Zan1A=;
+        b=RvgVpcIeley+nKR6wApVqa3UUlr7Qstk/rxHWWinnnz3BAq9EEm/kQhA4lSnLvaR7U
+         1hOhrHtZ2/2l1B9+wkYi6o8iCA1SjrmkzRpdp6HZ2aBbpPUPYizawo0zbsB8hAyCeW5p
+         GLyGq932+ADaZ3+oOkKY2btCmddP1OmAHGo3pV1Xngx6hQ/ZsVUNHplQuCwuzltI+62t
+         qqnwzxmP25e8rN5ZRfPM/VAXeDvy9h/YQVHCLrLmLkGTFdYcLvRTM05zzr99CHeAwVzn
+         7YneWhzYUlh4sqPVdjIeB1Nwf8WUZzNYqezid03zrwQ7mufUMjW4uPfaE842QD6vEQVN
+         NvoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7e2eNDS1S4gEQ50iSR2j5du9rfgf88HVnA/hvSDwVI+M9VtEPFwjGq0eluIIlQEdI1O3FcJd3wgBTYQ==@vger.kernel.org, AJvYcCVImI3Kh+50Kpy2lZJ8QwJKpAWVE6Dmn6ouziBnacuouTyy7lUwJCbLa0VafGfBm9vNp4g+6hsOn708qNS0@vger.kernel.org, AJvYcCVXIrcYb8LBOids6pAHwyOjyDSgjbWxTAAo/DmGMXd2oXuaKHY8DC0hqNYiXIbyBOMtbOY=@vger.kernel.org, AJvYcCWavx4uumLVoZ5CAP1z1zgfXFDuk/kN29Hdp+yBQd9xi7U8aTS+mPFz0tAvURIz/h52GygYSyvu@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCYOjzEHVr73bNve4IGz0MKOU6G8TUtKSGvgZQIU6OLNBVij/j
+	mAZNksPE/BIVQaRjmdo4Shr/KJztLSdukkkoHcSZXgczYb/IpYHSiXF8
+X-Gm-Gg: ASbGncvA3WujFl53HTHaP9M+YthJ53Tp9/3xhHRAgN42wnuOPXTC/byHQSGRMpwLgmP
+	wp+GaNRCtIbmahxgSTpOT2d9Y7SntxG1ruotuUkx5bS0e2cE1jO9M6NB531a9m5Hnsth0kc0ZHv
+	5+QcQ/RLKMUiJpnMhz/vLm7Hj0UeyFIXxUf9kChynuC3mA3s/penEtzNTn5SmK4ITvU7SVikDKg
+	vIbBXoeh87ldxCht/1wD3xdmRGMSs0fj8k8C1WgCVN+bRpsD0/lalg4JJJ4SIAWDi+a+HPqD2Hz
+	6u41XP0NxKRUEkgwqfr8Hf2s01b19urwNWYGNovohRMy/ucr/TnsifRmmoXkKwWZUbESpO2WsA=
+	=
+X-Google-Smtp-Source: AGHT+IGGeaG2q6yiRCGKlMaEsjWEAbQ2Wph3QFfKs9+YPs2wDpdHuzbueeZ4on9DqutvyWs9sW0vQg==
+X-Received: by 2002:a17:907:c0d:b0:ad8:8ac5:c75e with SMTP id a640c23a62f3a-ad88ac5c8efmr521637866b.60.1748429601091;
+        Wed, 28 May 2025 03:53:21 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::6f? ([2620:10d:c092:600::1:c447])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad8a1b477bfsm86531666b.129.2025.05.28.03.53.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 May 2025 03:53:20 -0700 (PDT)
+Message-ID: <11568ebd-4c00-463e-a2ca-5c75dbd625ef@gmail.com>
+Date: Wed, 28 May 2025 11:54:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9ZmmnzXWe89Ci6PNTA0eE1a";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/18] page_pool: use netmem APIs to access page->pp_magic
+ in page_pool_page_is_pp()
+To: Byungchul Park <byungchul@sk.com>
+Cc: Mina Almasry <almasrymina@google.com>, willy@infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org,
+ harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+ davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+ toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+ saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+ horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ vishal.moola@gmail.com
+References: <20250523032609.16334-13-byungchul@sk.com>
+ <CAHS8izN6QAcAr-qkFSYAy0JaTU+hdM56r-ug-AWDGGqLvHkNuQ@mail.gmail.com>
+ <20250526022307.GA27145@system.software.com>
+ <a4ff25cb-e31f-4ed7-a3b9-867b861b17bd@gmail.com>
+ <20250528081403.GA28116@system.software.com>
+ <06fca2f8-39f6-4abb-8e0d-bef373d9be0f@gmail.com>
+ <20250528091416.GA54984@system.software.com>
+ <b7efa56b-e9fd-4ca6-9ecf-0d5f15b8d0c1@gmail.com>
+ <20250528093303.GB54984@system.software.com>
+ <5494b37d-1af0-488e-904b-2d3cbd0e7dcf@gmail.com>
+ <20250528104440.GA13050@system.software.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250528104440.GA13050@system.software.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+On 5/28/25 11:44, Byungchul Park wrote:
+> On Wed, May 28, 2025 at 10:51:29AM +0100, Pavel Begunkov wrote:
+>> On 5/28/25 10:33, Byungchul Park wrote:
+>>> On Wed, May 28, 2025 at 10:20:29AM +0100, Pavel Begunkov wrote:
+>>>> On 5/28/25 10:14, Byungchul Park wrote:
+>>>>> On Wed, May 28, 2025 at 10:07:52AM +0100, Pavel Begunkov wrote:
+>>>>>> On 5/28/25 09:14, Byungchul Park wrote:
+>>>>>>> On Wed, May 28, 2025 at 08:51:47AM +0100, Pavel Begunkov wrote:
+>>>>>>>> On 5/26/25 03:23, Byungchul Park wrote:
+>>>>>>>>> On Fri, May 23, 2025 at 10:21:17AM -0700, Mina Almasry wrote:
+>>>>>>>>>> On Thu, May 22, 2025 at 8:26 PM Byungchul Park <byungchul@sk.com> wrote:
+>>>>>>>>>>>
+>>>>>>>>>>> To simplify struct page, the effort to seperate its own descriptor from
+>>>>>>>>>>> struct page is required and the work for page pool is on going.
+>>>>>>>>>>>
+>>>>>>>>>>> To achieve that, all the code should avoid accessing page pool members
+>>>>>>>>>>> of struct page directly, but use safe APIs for the purpose.
+>>>>>>>>>>>
+>>>>>>>>>>> Use netmem_is_pp() instead of directly accessing page->pp_magic in
+>>>>>>>>>>> page_pool_page_is_pp().
+>>>>>>>>>>>
+>>>>>>>>>>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+>>>>>>>>>>> ---
+>>>>>>>>>>>       include/linux/mm.h   | 5 +----
+>>>>>>>>>>>       net/core/page_pool.c | 5 +++++
+>>>>>>>>>>>       2 files changed, 6 insertions(+), 4 deletions(-)
+>>>>>>>>>>>
+>>>>>>>>>>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>>>>>>>>>>> index 8dc012e84033..3f7c80fb73ce 100644
+>>>>>>>>>>> --- a/include/linux/mm.h
+>>>>>>>>>>> +++ b/include/linux/mm.h
+>>>>>>>>>>> @@ -4312,10 +4312,7 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+>>>>>>>>>>>       #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+>>>>>>>>>>>
+>>>>>>>>>>>       #ifdef CONFIG_PAGE_POOL
+>>>>>>>>>>> -static inline bool page_pool_page_is_pp(struct page *page)
+>>>>>>>>>>> -{
+>>>>>>>>>>> -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+>>>>>>>>>>> -}
+>>>>>>>>>>
+>>>>>>>>>> I vote for keeping this function as-is (do not convert it to netmem),
+>>>>>>>>>> and instead modify it to access page->netmem_desc->pp_magic.
+>>>>>>>>>
+>>>>>>>>> Once the page pool fields are removed from struct page, struct page will
+>>>>>>>>> have neither struct netmem_desc nor the fields..
+>>>>>>>>>
+>>>>>>>>> So it's unevitable to cast it to netmem_desc in order to refer to
+>>>>>>>>> pp_magic.  Again, pp_magic is no longer associated to struct page.
+>>>>>>>>>
+>>>>>>>>> Thoughts?
+>>>>>>>>
+>>>>>>>> Once the indirection / page shrinking is realized, the page is
+>>>>>>>> supposed to have a type field, isn't it? And all pp_magic trickery
+>>>>>>>> will be replaced with something like
+>>>>>>>>
+>>>>>>>> page_pool_page_is_pp() { return page->type == PAGE_TYPE_PP; }
+>>>>>>>
+>>>>>>> Agree, but we need a temporary solution until then.  I will use the
+>>>>>>> following way for now:
+>>>>>>
+>>>>>> The question is what is the problem that you need another temporary
+>>>>>> solution? If, for example, we go the placeholder way, page_pool_page_is_pp()
+>>>>>
+>>>>> I prefer using the place-holder, but Matthew does not.  I explained it:
+>>>>>
+>>>>>       https://lore.kernel.org/all/20250528013145.GB2986@system.software.com/
+>>>>>
+>>>>> Now, I'm going with the same way as the other approaches e.g. ptdesc.
+>>>>
+>>>> Sure, but that doesn't change my point
+>>>
+>>> What's your point?  The other appoaches do not use place-holders.  I
+>>> don't get your point.
+>>>
+>>> As I told you, I will introduce a new struct, netmem_desc, instead of
+>>> struct_group_tagged() on struct net_iov, and modify the static assert on
+>>> the offsets to keep the important fields between struct page and
+>>> netmem_desc.
+>>>
+>>> Then, is that following your point?  Or could you explain your point in
+>>> more detail?  Did you say other points than these?
+>>
+>> Then please read the message again first. I was replying to th
+>> aliasing with "lru", and even at the place you cut the message it
+>> says "for example", which was followed by "You should be able to
+>> do the same with the overlay option.".
+> 
+> With struct_group_tagged() on struct net_iov, no idea about how to.
+> However, it's doable with a new separate struct, struct netmem_desc.
+
+static inline bool page_pool_page_is_pp(struct page *page)
+{
+	pp_magic = page_to_netdesc(page)->pp_magic;
+	return pp_magic == ...;
+}
+
+page_to_netdesc() is either casting directly in case of full page
+overlays, or "&page->netdesc" for the placeholder option.
+
+-- 
+Pavel Begunkov
 
---Sig_/9ZmmnzXWe89Ci6PNTA0eE1a
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Paolo,
-
-> On 5/22/25 9:54 AM, Lukasz Majewski wrote:
-> > +/* dynamicms MAC address table learn and migration */
-> > +static void
-> > +mtip_atable_dynamicms_learn_migration(struct switch_enet_private
-> > *fep,
-> > +				      int curr_time, unsigned char
-> > *mac,
-> > +				      u8 *rx_port)
-> > +{
-> > +	u8 port =3D MTIP_PORT_FORWARDING_INIT;
-> > +	struct mtip_port_info *port_info;
-> > +	u32 rx_mac_lo =3D 0, rx_mac_hi =3D 0;
-> > +	unsigned long flags;
-> > +	int index;
-> > +
-> > +	spin_lock_irqsave(&fep->learn_lock, flags); =20
->=20
-> AFAICS this is called by napi context and by a plain thread context,
-> spin_lock_bh() should be sufficient.
-
-Ok
-
->=20
-> > +
-> > +	if (mac && is_valid_ether_addr(mac)) {
-> > +		rx_mac_lo =3D (u32)((mac[3] << 24) | (mac[2] << 16) |
-> > +				  (mac[1] << 8) | mac[0]);
-> > +		rx_mac_hi =3D (u32)((mac[5] << 8) | (mac[4]));
-> > +	}
-> > +
-> > +	port_info =3D mtip_portinfofifo_read(fep);
-> > +	while (port_info) {
-> > +		/* get block index from lookup table */
-> > +		index =3D GET_BLOCK_PTR(port_info->hash);
-> > +		mtip_update_atable_dynamic1(port_info->maclo,
-> > port_info->machi,
-> > +					    index, port_info->port,
-> > +					    curr_time, fep);
-> > +
-> > +		if (mac && is_valid_ether_addr(mac) &&
-> > +		    port =3D=3D MTIP_PORT_FORWARDING_INIT) {
-> > +			if (rx_mac_lo =3D=3D port_info->maclo &&
-> > +			    rx_mac_hi =3D=3D port_info->machi) {
-> > +				/* The newly learned MAC is the
-> > source of
-> > +				 * our filtered frame.
-> > +				 */
-> > +				port =3D (u8)port_info->port;
-> > +			}
-> > +		}
-> > +		port_info =3D mtip_portinfofifo_read(fep);
-> > +	}
-> > +
-> > +	if (rx_port)
-> > +		*rx_port =3D port;
-> > +
-> > +	spin_unlock_irqrestore(&fep->learn_lock, flags);
-> > +}
-> > +
-> > +static void mtip_aging_timer(struct timer_list *t)
-> > +{
-> > +	struct switch_enet_private *fep =3D from_timer(fep, t,
-> > timer_aging); +
-> > +	fep->curr_time =3D mtip_timeincrement(fep->curr_time);
-> > +
-> > +	mod_timer(&fep->timer_aging,
-> > +		  jiffies +
-> > msecs_to_jiffies(LEARNING_AGING_INTERVAL)); +} =20
->=20
-> It's unclear to me why you need to maintain a timer just to update a
-> timestamp?!?
->=20
-
-This timestamp is afterwards used in:
-mtip_atable_dynamicms_learn_migration(), which in turn manages the
-entries in switch "dynamic" table (it is one of the fields in the
-record.
-
-> (jiffies >> msecs_to_jiffies(LEARNING_AGING_INTERVAL)) & ((1 <<
-> AT_DENTRY_TIMESTAMP_WIDTH) - 1)
->=20
-
-If I understood you correctly - I shall remove the timer and then just
-use the above line (based on jiffies) when
-mtip_atable_dynamicms_learn_migration() is called (and it requires the
-timestamp)?
-
-Otherwise the mtip_timeincrement() seems like a nice wrapper on
-incrementing the timestamp.
-
-> should yield the same value (and possibly define a bitmask as a
-> shortcut)
->=20
-> > +static netdev_tx_t mtip_start_xmit_port(struct sk_buff *skb,
-> > +					struct net_device *dev,
-> > int port) +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	unsigned short	status;
-> > +	unsigned long flags;
-> > +	struct cbd_t *bdp;
-> > +	void *bufaddr;
-> > +
-> > +	spin_lock_irqsave(&fep->hw_lock, flags); =20
->=20
-> AFAICS this lock is acquired only by napi and thread context the _bh
-> variant should be sufficient.
-
-Ok.
-
->=20
-> > +
-> > +	if (!fep->link[0] && !fep->link[1]) {
-> > +		/* Link is down or autonegotiation is in progress.
-> > */
-> > +		netif_stop_queue(dev);
-> > +		spin_unlock_irqrestore(&fep->hw_lock, flags);
-> > +		return NETDEV_TX_BUSY; =20
->=20
-> Intead you should probably stop the queue when such events happen
-
-Please correct me if I'm wrong - the netif_stop_queue(dev); is called
-before return. Shall something different be also done?
-
->=20
-> > +	}
-> > +
-> > +	/* Fill in a Tx ring entry */
-> > +	bdp =3D fep->cur_tx;
-> > +
-> > +	status =3D bdp->cbd_sc;
-> > +
-> > +	if (status & BD_ENET_TX_READY) {
-> > +		/* All transmit buffers are full. Bail out.
-> > +		 * This should not happen, since dev->tbusy should
-> > be set.
-> > +		 */
-> > +		dev_err(&fep->pdev->dev, "%s: tx queue full!.\n",
-> > dev->name);
-> > +		spin_unlock_irqrestore(&fep->hw_lock, flags);
-> > +		return NETDEV_TX_BUSY; =20
->=20
-> Instead you should use
-> netif_txq_maybe_stop()/netif_subqueue_maybe_stop() to stop the queue
-> eariler.
-
-As I don't manage queues - maybe the netif_txq_maybe_stop() seems to be
-an overkill. In the earlier code the netif_stop_queue() is used.
-
->=20
-> > +	}
-> > +
-> > +	/* Clear all of the status flags */
-> > +	status &=3D ~BD_ENET_TX_STATS;
-> > +
-> > +	/* Set buffer length and buffer pointer */
-> > +	bufaddr =3D skb->data;
-> > +	bdp->cbd_datlen =3D skb->len;
-> > +
-> > +	/* On some FEC implementations data must be aligned on
-> > +	 * 4-byte boundaries. Use bounce buffers to copy data
-> > +	 * and get it aligned.
-> > +	 */
-> > +	if ((unsigned long)bufaddr & MTIP_ALIGNMENT) {
-> > +		unsigned int index;
-> > +
-> > +		index =3D bdp - fep->tx_bd_base;
-> > +		memcpy(fep->tx_bounce[index],
-> > +		       (void *)skb->data, skb->len);
-> > +		bufaddr =3D fep->tx_bounce[index];
-> > +	}
-> > +
-> > +	if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
-> > +		swap_buffer(bufaddr, skb->len); =20
->=20
-> Ouch, the above will kill performances.
-
-This unfortunately must be done in such a way (the same approach is
-present on fec_main.c) as the IP block is implemented in such a way
-(explicit conversion from big endian to little endian).
-
-> Also it looks like it will
-> access uninitialized memory if skb->len is not 4 bytes aligned.
->=20
-
-There is a few lines above a special code to prevent from such a
-situation ((unsigned long)bufaddr & MTIP_ALIGNMENT).
-
-> > +
-> > +	/* Save skb pointer. */
-> > +	fep->tx_skbuff[fep->skb_cur] =3D skb;
-> > +
-> > +	dev->stats.tx_bytes +=3D skb->len; =20
->=20
-> It looks like this start is incremented too early, as tx could still
-> fail later.
-
-Ok.
-
->=20
-> > +	fep->skb_cur =3D (fep->skb_cur + 1) & TX_RING_MOD_MASK;
-> > +
-> > +	/* Push the data cache so the CPM does not get stale memory
-> > +	 * data.
-> > +	 */
-> > +	bdp->cbd_bufaddr =3D dma_map_single(&fep->pdev->dev, bufaddr,
-> > +					  MTIP_SWITCH_TX_FRSIZE,
-> > +					  DMA_TO_DEVICE);
-> > +	if (unlikely(dma_mapping_error(&fep->pdev->dev,
-> > bdp->cbd_bufaddr))) {
-> > +		dev_err(&fep->pdev->dev,
-> > +			"Failed to map descriptor tx buffer\n");
-> > +		dev->stats.tx_errors++;
-> > +		dev->stats.tx_dropped++;
-> > +		dev_kfree_skb_any(skb);
-> > +		goto err;
-> > +	}
-> > +
-> > +	/* Send it on its way.  Tell FEC it's ready, interrupt
-> > when done,
-> > +	 * it's the last BD of the frame, and to put the CRC on
-> > the end.
-> > +	 */
-> > + =20
->=20
-> Likely you need some memory barrier here to ensure the descriptor
-> status update is seen by the device after the buffer addr update.
->=20
-> > +	status |=3D (BD_ENET_TX_READY | BD_ENET_TX_INTR
-> > +			| BD_ENET_TX_LAST | BD_ENET_TX_TC);
-
-I will add wmb() here.
-
-> > +	bdp->cbd_sc =3D status;
-> > +
-> > +	netif_trans_update(dev);
-> > +	skb_tx_timestamp(skb);
-> > +
-> > +	/* For port separation - force sending via specified port
-> > */
-> > +	if (!fep->br_offload && port !=3D 0)
-> > +		mtip_forced_forward(fep, port, 1);
-> > +
-> > +	/* Trigger transmission start */
-> > +	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR); =20
->=20
-> Possibly you should check skb->xmit_more to avoid ringing the doorbell
-> when not needed.
-
-I couldn't find skb->xmit_more in the current sources. Instead, there
-is netdev_xmit_more().
-
-However, the TX code just is supposed to setup one frame transmission
-and hence there is no risk that we trigger "empty" transmission.
-
->=20
-> > +static void mtip_timeout(struct net_device *dev, unsigned int
-> > txqueue) +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	struct cbd_t *bdp;
-> > +	int i;
-> > +
-> > +	dev->stats.tx_errors++;
-> > +
-> > +	if (IS_ENABLED(CONFIG_SWITCH_DEBUG)) {
-> > +		dev_info(&dev->dev, "%s: transmit timed out.\n",
-> > dev->name);
-> > +		dev_info(&dev->dev,
-> > +			 "Ring data: cur_tx %lx%s, dirty_tx %lx
-> > cur_rx: %lx\n",
-> > +			 (unsigned long)fep->cur_tx,
-> > +			 fep->tx_full ? " (full)" : "",
-> > +			 (unsigned long)fep->dirty_tx,
-> > +			 (unsigned long)fep->cur_rx);
-> > +
-> > +		bdp =3D fep->tx_bd_base;
-> > +		dev_info(&dev->dev, " tx: %u buffers\n",
-> > TX_RING_SIZE);
-> > +		for (i =3D 0; i < TX_RING_SIZE; i++) {
-> > +			dev_info(&dev->dev, "  %08lx: %04x %04x
-> > %08x\n",
-> > +				 (kernel_ulong_t)bdp, bdp->cbd_sc,
-> > +				 bdp->cbd_datlen,
-> > (int)bdp->cbd_bufaddr);
-> > +			bdp++;
-> > +		}
-> > +
-> > +		bdp =3D fep->rx_bd_base;
-> > +		dev_info(&dev->dev, " rx: %lu buffers\n",
-> > +			 (unsigned long)RX_RING_SIZE);
-> > +		for (i =3D 0 ; i < RX_RING_SIZE; i++) {
-> > +			dev_info(&dev->dev, "  %08lx: %04x %04x
-> > %08x\n",
-> > +				 (kernel_ulong_t)bdp,
-> > +				 bdp->cbd_sc, bdp->cbd_datlen,
-> > +				 (int)bdp->cbd_bufaddr);
-> > +			bdp++;
-> > +		}
-> > +	}
-> > +
-> > +	rtnl_lock(); =20
->=20
-> This is called in atomic scope, you can't acquire a mutex here.
-> Instead you could schedule a work and do the reset in such scope.
->=20
-
-Yes, you are right. I will rewrite it.
-
-> > +	if (netif_device_present(dev) || netif_running(dev)) {
-> > +		napi_disable(&fep->napi);
-> > +		netif_tx_lock_bh(dev);
-> > +		mtip_switch_restart(dev, fep->full_duplex[0],
-> > +				    fep->full_duplex[1]);
-> > +		netif_tx_wake_all_queues(dev);
-> > +		netif_tx_unlock_bh(dev);
-> > +		napi_enable(&fep->napi);
-> > +	}
-> > +	rtnl_unlock();
-> > +} =20
->=20
-> > +
-> > +/* During a receive, the cur_rx points to the current incoming
-> > buffer.
-> > + * When we update through the ring, if the next incoming buffer has
-> > + * not been given to the system, we just set the empty indicator,
-> > + * effectively tossing the packet.
-> > + */
-> > +static int mtip_switch_rx(struct net_device *dev, int budget, int
-> > *port) +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	u8 *data, rx_port =3D MTIP_PORT_FORWARDING_INIT;
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	unsigned short status, pkt_len;
-> > +	struct net_device *pndev;
-> > +	struct ethhdr *eth_hdr;
-> > +	int pkt_received =3D 0;
-> > +	struct sk_buff *skb;
-> > +	unsigned long flags;
-> > +	struct cbd_t *bdp;
-> > +
-> > +	spin_lock_irqsave(&fep->hw_lock, flags);
-> > +
-
-It is also called in the NAPI context, so I will change
-spin_lock_irqsave() to spin_lock_bh().
-
-> > +	/* First, grab all of the stats for the incoming packet.
-> > +	 * These get messed up if we get called due to a busy
-> > condition.
-> > +	 */
-> > +	bdp =3D fep->cur_rx;
-> > +
-> > +	while (!((status =3D bdp->cbd_sc) & BD_ENET_RX_EMPTY)) {
-> > +		if (pkt_received >=3D budget)
-> > +			break;
-> > +
-> > +		pkt_received++;
-> > +		/* Since we have allocated space to hold a
-> > complete frame,
-> > +		 * the last indicator should be set.
-> > +		 */
-> > +		if ((status & BD_ENET_RX_LAST) =3D=3D 0)
-> > +			dev_warn_ratelimited(&dev->dev,
-> > +					     "SWITCH ENET: rcv is
-> > not +last\n"); +
-> > +		if (!fep->usage_count)
-> > +			goto rx_processing_done;
-> > +
-> > +		/* Check for errors. */
-> > +		if (status & (BD_ENET_RX_LG | BD_ENET_RX_SH |
-> > BD_ENET_RX_NO |
-> > +			      BD_ENET_RX_CR | BD_ENET_RX_OV)) {
-> > +			dev->stats.rx_errors++;
-> > +			if (status & (BD_ENET_RX_LG |
-> > BD_ENET_RX_SH)) {
-> > +				/* Frame too long or too short. */
-> > +				dev->stats.rx_length_errors++;
-> > +			}
-> > +			if (status & BD_ENET_RX_NO)	/*
-> > Frame alignment */
-> > +				dev->stats.rx_frame_errors++;
-> > +			if (status & BD_ENET_RX_CR)	/* CRC
-> > Error */
-> > +				dev->stats.rx_crc_errors++;
-> > +			if (status & BD_ENET_RX_OV)	/* FIFO
-> > overrun */
-> > +				dev->stats.rx_fifo_errors++;
-> > +		}
-> > +
-> > +		/* Report late collisions as a frame error.
-> > +		 * On this error, the BD is closed, but we don't
-> > know what we
-> > +		 * have in the buffer.  So, just drop this frame
-> > on the floor.
-> > +		 */
-> > +		if (status & BD_ENET_RX_CL) {
-> > +			dev->stats.rx_errors++;
-> > +			dev->stats.rx_frame_errors++;
-> > +			goto rx_processing_done;
-> > +		}
-> > +
-> > +		/* Process the incoming frame */
-> > +		pkt_len =3D bdp->cbd_datlen;
-> > +		data =3D (__u8 *)__va(bdp->cbd_bufaddr);
-> > +
-> > +		dma_unmap_single(&fep->pdev->dev, bdp->cbd_bufaddr,
-> > +				 bdp->cbd_datlen,
-> > DMA_FROM_DEVICE); =20
->=20
-> I have read your explaination WRT unmap/map. Actually you don't need
-> to do any mapping here,=20
-
-There are 16 cbd_t descriptors allocated (as dma_alloc_coherent). Those
-descriptors contain pointer to data (being read in this case).
-
-Hence the need to perform dma_map_single() for each descriptor, so I
-would hold the correct pointer. However, initially this is done in
-mtip_alloc_buffers().
-
-> since you are unconditionally copying the
-> whole buffer (why???)
-
-Only the value of=20
-pkt_len =3D bdp->cbd_datlen; is copied to SKB (after byte swap_buffer()).
-
-> and re-using it.
->=20
-> Still you need a dma_sync_single() to ensure the CPUs see the correct
-> data.
-
-The descriptors - i.e. struct cbd_t fields are allocated with
-dma_alloc_coherent(), so this is OK.
-
-The pointer, which is provided by dma_map_single(), is then used by
-cbd_t descriptor to store data read by MTIP IP block.
-
->=20
-> > +
-> > +		if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
-> > +			swap_buffer(data, pkt_len);
-> > +
-> > +		if (data) {
-> > +			eth_hdr =3D (struct ethhdr *)data;
-> > +			mtip_atable_get_entry_port_number(fep,
-> > +
-> > eth_hdr->h_source,
-> > +
-> > &rx_port);
-> > +			if (rx_port =3D=3D MTIP_PORT_FORWARDING_INIT)
-> > +
-> > mtip_atable_dynamicms_learn_migration(fep,
-> > +
-> >    fep->curr_time,
-> > +
-> >    eth_hdr->h_source,
-> > +
-> >    &rx_port);
-> > +		}
-> > +
-> > +		if (!fep->br_offload && (rx_port =3D=3D 1 || rx_port
-> > =3D=3D 2))
-> > +			pndev =3D fep->ndev[rx_port - 1];
-> > +		else
-> > +			pndev =3D dev;
-> > +
-> > +		*port =3D rx_port;
-> > +		pndev->stats.rx_packets++;
-> > +		pndev->stats.rx_bytes +=3D pkt_len; =20
->=20
-> It looks like the stats are incremented too early, as the packets
-> could still be dropped a few lines later
-
-+1
-
->=20
-> > +
-> > +		/* This does 16 byte alignment, exactly what we
-> > need.
-> > +		 * The packet length includes FCS, but we don't
-> > want to
-> > +		 * include that when passing upstream as it messes
-> > up
-> > +		 * bridging applications.
-> > +		 */
-> > +		skb =3D netdev_alloc_skb(pndev, pkt_len +
-> > NET_IP_ALIGN);
-> > +		if (unlikely(!skb)) {
-> > +			dev_dbg(&fep->pdev->dev,
-> > +				"%s: Memory squeeze, dropping
-> > packet.\n",
-> > +				pndev->name);
-> > +			pndev->stats.rx_dropped++;
-> > +			goto err_mem;
-> > +		} else {
-> > +			skb_reserve(skb, NET_IP_ALIGN);
-> > +			skb_put(skb, pkt_len);      /* Make room */
-> > +			skb_copy_to_linear_data(skb, data,
-> > pkt_len);
-> > +			skb->protocol =3D eth_type_trans(skb, pndev);
-> > +			napi_gro_receive(&fep->napi, skb);
-> > +		}
-> > +
-> > +		bdp->cbd_bufaddr =3D dma_map_single(&fep->pdev->dev,
-> > data,
-> > +						  bdp->cbd_datlen,
-> > +						  DMA_FROM_DEVICE);
-> > +		if (unlikely(dma_mapping_error(&fep->pdev->dev,
-> > +					       bdp->cbd_bufaddr)))
-> > {
-> > +			dev_err(&fep->pdev->dev,
-> > +				"Failed to map descriptor rx
-> > buffer\n");
-> > +			pndev->stats.rx_errors++;
-> > +			pndev->stats.rx_dropped++;
-> > +			dev_kfree_skb_any(skb); =20
->=20
-> The above statement is wrong even if you intend to keep the
-> dma_unmap/dma_map pair (and please, don't do that! ;).
-
-It looks like the in the mtip_alloc_buffers() the area to provide
-pointer for bdp->cbd_bufaddr is allocated.
-
-Then in the mtip_switch_rx() (if data is received) - the data (from
-bdp->cbd_bufaddr) is read and the dma_unmap_single() is called.
-
-When the data is "passed" via SKB to upper "layers" of network stack,
-then the dma_map_single() is call (with the same bdp->cbd_datlen
-parameter) to allocate pointer for bdp->cbd_bufaddr.
-
-Indeed, it looks like not optimal solution (maybe there are some side
-effects to cover from this IP block?).=20
-
-I will check if dma_sync_single_for_cpu() can be used instead (so we can
-re-use the descriptors' pointers from the initial allocation).
-
-> At this point
-> the skb ownership has been handed to the stack by the previous
-> napi_gro_receive(), freeing it here will cause UaF and double free.
->=20
-
-I will remove the call to dev_kfree_skb_any(skb);
-
-> > +			goto err_mem;
-> > +		}
-> > +
-> > + rx_processing_done:
-> > +		/* Clear the status flags for this buffer */
-> > +		status &=3D ~BD_ENET_RX_STATS; =20
->=20
-> With the dma map/unmap in place, you likely need a memory barrier to
-> ensure the device will see the descriptor status update after
-> bufferptr update.
-
-I will add wmb() here.
-
->=20
-> > +static int mtip_alloc_buffers(struct net_device *dev)
-> > +{
-> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > +	struct switch_enet_private *fep =3D priv->fep;
-> > +	struct sk_buff *skb;
-> > +	struct cbd_t *bdp;
-> > +	int i;
-> > +
-> > +	bdp =3D fep->rx_bd_base;
-> > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > +		skb =3D netdev_alloc_skb(dev, MTIP_SWITCH_RX_FRSIZE);
-> > +		if (!skb)
-> > +			goto err;
-> > +
-> > +		fep->rx_skbuff[i] =3D skb;
-> > +
-> > +		bdp->cbd_bufaddr =3D dma_map_single(&fep->pdev->dev,
-> > skb->data,
-> > +
-> > MTIP_SWITCH_RX_FRSIZE,
-> > +						  DMA_FROM_DEVICE);
-> > +		if (unlikely(dma_mapping_error(&fep->pdev->dev,
-> > +					       bdp->cbd_bufaddr)))
-> > {
-> > +			dev_err(&fep->pdev->dev,
-> > +				"Failed to map descriptor rx
-> > buffer\n");
-> > +			dev_kfree_skb_any(skb); =20
->=20
-> At this point fep->rx_skbuff[i] is still not NULL, and later
-> mtip_free_buffers() will try to free it again. You should remove the
-> above dev_kfree_skb_any(skb).
-
-+1
-
->=20
-> > +static const struct ethtool_ops mtip_ethtool_ops =3D {
-> > +	.get_link_ksettings     =3D phy_ethtool_get_link_ksettings,
-> > +	.set_link_ksettings     =3D phy_ethtool_set_link_ksettings,
-> > +	.get_drvinfo            =3D mtip_get_drvinfo,
-> > +	.get_link               =3D ethtool_op_get_link,
-> > +	.get_ts_info		=3D ethtool_op_get_ts_info,
-> > +};
-> > +
-> > +static const struct net_device_ops mtip_netdev_ops =3D {
-> > +	.ndo_open		=3D mtip_open,
-> > +	.ndo_stop		=3D mtip_close,
-> > +	.ndo_start_xmit	=3D mtip_start_xmit,
-> > +	.ndo_set_rx_mode	=3D mtip_set_multicast_list,
-> > +	.ndo_tx_timeout	=3D mtip_timeout,
-> > +	.ndo_set_mac_address	=3D mtip_set_mac_address,
-> > +};
-> > +
-> > +bool mtip_is_switch_netdev_port(const struct net_device *ndev)
-> > +{
-> > +	return ndev->netdev_ops =3D=3D &mtip_netdev_ops;
-> > +}
-> > +
-> > +static int mtip_switch_dma_init(struct switch_enet_private *fep)
-> > +{
-> > +	struct cbd_t *bdp, *cbd_base;
-> > +	int ret, i;
-> > +
-> > +	/* Check mask of the streaming and coherent API */
-> > +	ret =3D dma_set_mask_and_coherent(&fep->pdev->dev,
-> > DMA_BIT_MASK(32));
-> > +	if (ret < 0) {
-> > +		dev_err(&fep->pdev->dev, "No suitable DMA
-> > available\n");
-> > +		return ret;
-> > +	}
-> > +
-> > +	/* Allocate memory for buffer descriptors */
-> > +	cbd_base =3D dma_alloc_coherent(&fep->pdev->dev, PAGE_SIZE,
-> > &fep->bd_dma,
-> > +				      GFP_KERNEL);
-> > +	if (!cbd_base)
-> > +		return -ENOMEM;
-> > +
-> > +	/* Set receive and transmit descriptor base */
-> > +	fep->rx_bd_base =3D cbd_base;
-> > +	fep->tx_bd_base =3D cbd_base + RX_RING_SIZE;
-> > +
-> > +	/* Initialize the receive buffer descriptors */
-> > +	bdp =3D fep->rx_bd_base;
-> > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > +		bdp->cbd_sc =3D 0;
-> > +		bdp++;
-> > +	}
-> > +
-> > +	/* Set the last buffer to wrap */
-> > +	bdp--;
-> > +	bdp->cbd_sc |=3D BD_SC_WRAP; =20
->=20
-> This is a recurring pattern, you should use an helper for it.
->=20
-
-Ok.
-
-> > +/* FEC MII MMFR bits definition */
-> > +#define FEC_MMFR_ST             BIT(30)
-> > +#define FEC_MMFR_OP_READ        BIT(29)
-> > +#define FEC_MMFR_OP_WRITE       BIT(28)
-> > +#define FEC_MMFR_PA(v)          (((v) & 0x1F) << 23)
-> > +#define FEC_MMFR_RA(v)          (((v) & 0x1F) << 18) =20
->=20
-> Here and elsewhere it looks like you could use FIELD_PREP and friends
-
-Ok, I will adjust the code.
-
->=20
-> This patch is really too big, I'm pretty sure I missed some relevant
-> issues. You should split it in multiple ones: i.e. initialization and
-> h/w access, rx/tx, others ndos.
-
-It is quite hard to "scatter" this patch as:
-
-1. I've already split it to several files (which correspond to
-different "logical" entities - like mtipl2sw_br.c).
-2. The mtipl2sw.c file is the smallest part of the "core" of the
-driver.
-3. If I split it, then at some point I would break bisectability for
-imx28.
-
->=20
-> /P
->=20
-
-Big thanks for your comments.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/9ZmmnzXWe89Ci6PNTA0eE1a
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmg26ykACgkQAR8vZIA0
-zr3NqQgAg/Wms6Es7gJIi5Y1I4OGda037cT9BtwVJAq8YpjkdZSDZ9+t/xbkIx58
-Em4XhPq6hlDM1KLo6kKVqbP55CVYou8Rnen1U6viL9kukWYRNStymTWdfQt0rp7z
-HaBQlTruWw4P2FOSMoica9A28yl37oBtk6Qnf3t9bdgKgJkj/B6eq4sRCAqJFe8E
-UA0OjNcowsMWoI8rUqx5/bxC26Nm/oLdgJL8qVc8KzZNJPOci3TKOswk9So7+Pb8
-fplwy0ynrnnopl4ur4ufHcJa0cchJev202fvyhyt7jIbhsi8MyNOw7fd1ucVRmxx
-Pyx/sTv38i2fGb9DLp0q40ZTXbPl7A==
-=uAU+
------END PGP SIGNATURE-----
-
---Sig_/9ZmmnzXWe89Ci6PNTA0eE1a--
 
