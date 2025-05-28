@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-193809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9172BAC5F0A
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:03:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C7EAC5F1A
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 04:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B78188E8C0
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:03:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8403A3BE9
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 02:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D7D1991CD;
-	Wed, 28 May 2025 02:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01EE1B0F1E;
+	Wed, 28 May 2025 02:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQoOz927"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5ZakYgH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BDEFC0E;
-	Wed, 28 May 2025 02:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F6D1E4AB;
+	Wed, 28 May 2025 02:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748397792; cv=none; b=kw5b8qE3Tn0aNcp7lPlW3tfkjfJQfpA7d0olpXVMam4s6ZzgiB3d5aBc3lxxk3kar0lbhWIgJArpT8nTegD7EeBpum3dcD1t3m2gXlV3TVTSx1HgHMU1B8cAbEFC8yuyvWeB6oveAQ49h80f0XzpxaLdLF4tNgOE/s98emIA1Io=
+	t=1748398362; cv=none; b=kv1u75Ne6yuStp7m2xsLjAxVy1qUSadlIoHp+O32hggnvq0heDR9d/Irg2BVvrBTbD60QGW98ro2RJ+6RznpIglaTsPGcTaY4dtDwLk4xtK1cn07nh2/FVxWMDA7LgHiF6fvihOvA6QttM06zT292oAjsBGZ6zzWhSr5lT1HM9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748397792; c=relaxed/simple;
-	bh=4bNcE+GOAtdNFHh9ntSssHO+eAymso7Znpvgf96aQGY=;
+	s=arc-20240116; t=1748398362; c=relaxed/simple;
+	bh=/DgyCXDm/zjEkdZ0UTFXz24tKe/bEPo/EjDQtTDjDg8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L9lInRR2Hp2J5u2RFUKfNjZFhSd0/Eq6q71gasKNasSKT3fOaDarRh+Bh8xVMoadSTrHVbxcIo1f2YMmo8Bx2Ek+sltnRAsKKxsoUw6+tJAMEMpUZ8XRBtaBda+5+xUiQJXv9A/8o78dAkXwjjg7cNR+mCxNs3jP/+sJ8+BMWOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQoOz927; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACA62C4CEE9;
-	Wed, 28 May 2025 02:03:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DhHj788nKmL1ZKoD4MOm50HKjsEZk35InUkm0SAck7EFXRmPxXSjMpKZ2+9fhUY+7F7eNXohVRMx11/p8evrxmmjtvr1OhgFqiZERRGdMQNomGkHcn69oZ7xUFypEEDAXzMfhz+I4GJRDIWxviNF1f8D2NNgIi49Lm1upoAsjhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5ZakYgH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A883C4CEE9;
+	Wed, 28 May 2025 02:12:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748397791;
-	bh=4bNcE+GOAtdNFHh9ntSssHO+eAymso7Znpvgf96aQGY=;
+	s=k20201202; t=1748398362;
+	bh=/DgyCXDm/zjEkdZ0UTFXz24tKe/bEPo/EjDQtTDjDg8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mQoOz927XJBb7vAnobFLu30P8GTg7L69jJbi7Qv4YgAum6hsn65W3n4l2lNF6cHGb
-	 iNwycAL/06AFFtjWmE9r2rvoiHHqc0Ei25IjALsYxwFEhTawnG18P9AwT3hYohENhf
-	 WcFTp30zHKjkKSizstag88hrkwmWpnFHeKDKSwHYUPhC8369+ubKMsipHwpS4uWHBQ
-	 XZtWl+bP+Mi/GkgnFGJqtnUeIthcfTjgrjKm03UbAYZNRLkfrfapLQlQRNWeUXYU04
-	 +ddSuW/knhCuxBjkGaJiXG+W+p9qTIH9UiKknUP39JyL/PrmjziMtf56x9exEGs2Dd
-	 KN3875FXKuatQ==
-Date: Tue, 27 May 2025 19:03:09 -0700
+	b=Z5ZakYgHUC0+ERKgG1JC/pAaxs+Fm1QkpIYa4yCHh4FpCtsiWQxRMT5dCmzvQJu2X
+	 AtkFh6580uW2oP/KajcC9EPJQAOJ4+gEwAYE+6EahI5hEhoQBBoeKemq2aSXuvCWAD
+	 Bef08rXkFn01aII0mGztS8L6Liu1yDgp6sIl9XyvqEmROU+8F+vlm/ZPcn9pXEgFxr
+	 U7cYFQUtaqW7J4bhmJn7gsNIydTD+//9veG3t4w9TJqowg4viwVfH1hwXZlCzofpoJ
+	 mUDdZ/scxHoY/TPwLVi/x4GaPhQY4e0Nlx0U7MCYSfC47rFet8NNmFDErWKoCm0KoD
+	 XDiLo8sHRQzcw==
+Date: Tue, 27 May 2025 19:12:40 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, netdev@vger.kernel.org, Alexander Lobakin
- <aleksander.lobakin@intel.com>, maciej.fijalkowski@intel.com,
- magnus.karlsson@intel.com, michal.kubiak@intel.com,
- przemyslaw.kitszel@intel.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 03/16] libeth: xdp: add XDP_TX buffers sending
-Message-ID: <20250527190309.156f3047@kernel.org>
-In-Reply-To: <20250520205920.2134829-4-anthony.l.nguyen@intel.com>
-References: <20250520205920.2134829-1-anthony.l.nguyen@intel.com>
-	<20250520205920.2134829-4-anthony.l.nguyen@intel.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, jeroendb@google.com, andrew+netdev@lunn.ch,
+ willemb@google.com, ziweixiao@google.com, pkaligineedi@google.com,
+ yyd@google.com, joshwash@google.com, shailend@google.com,
+ linux@treblig.org, thostet@google.com, jfraker@google.com,
+ richardcochran@gmail.com, jdamato@fastly.com, vadim.fedorenko@linux.dev,
+ horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 5/8] gve: Add support to query the nic clock
+Message-ID: <20250527191240.455b6752@kernel.org>
+In-Reply-To: <20250522235737.1925605-6-hramamurthy@google.com>
+References: <20250522235737.1925605-1-hramamurthy@google.com>
+	<20250522235737.1925605-6-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,13 +65,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 20 May 2025 13:59:04 -0700 Tony Nguyen wrote:
-> +	if (sinfo || !netmem_is_net_iov(netmem)) {
-> +		const struct page_pool *pp = __netmem_get_pp(netmem);
+On Thu, 22 May 2025 23:57:34 +0000 Harshitha Ramamurthy wrote:
+> +	err = gve_ptp_init(priv);
+> +	if (err)
+> +		return err;
 > +
-> +		dma_sync_single_for_device(pp->p.dev, desc.addr, desc.len,
-> +					   DMA_BIDIRECTIONAL);
-> +	}
+> +	priv->nic_ts_report =
+> +		dma_alloc_coherent(&priv->pdev->dev,
+> +				   sizeof(struct gve_nic_ts_report),
+> +				   &priv->nic_ts_report_bus,
+> +				   GFP_KERNEL);
+> +	if (!priv->nic_ts_report) {
+> +		dev_err(&priv->pdev->dev, "%s dma alloc error\n", __func__);
 
-How can we get an unreadable netmem into the XDP Tx path?
+missing a call to gve_ptp_release() on this error path?
+
+> +		return -ENOMEM;
+> +	}
+-- 
+pw-bot: cr
 
