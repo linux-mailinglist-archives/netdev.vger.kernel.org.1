@@ -1,173 +1,168 @@
-Return-Path: <netdev+bounces-193890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DCB8AC630D
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:32:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC40AC6316
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 09:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E084188F73F
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:32:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 750C53A6388
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 07:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C494F2459E5;
-	Wed, 28 May 2025 07:31:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FFD0245014;
+	Wed, 28 May 2025 07:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqX/HIQm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWm/2isP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AAC24469C
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 07:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548A0244690
+	for <netdev@vger.kernel.org>; Wed, 28 May 2025 07:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748417492; cv=none; b=lNg34/4cH9I9ysVfwCCalF9CwhKdcPnIoP1MaP47TTp/QkTgoxYESAWsvXdwX7IAjLS1StLfSnBy0qpX1zaSgV8NiRz+wwM6mcBJYACFqMqTXs8CQAolt5x0Pjhn5WKV9lOwEgKgpsZHoIm0Tla6vzmPbp/62SvsxUwWCAIvffw=
+	t=1748417646; cv=none; b=RJvrOEfISrK7L1aYVh9fkiFehjYyKof6/mOTUAZkoWYBQlt0J5MmXGyonoIqxWH4oVl5zfHKIb5Z4qQFAb8/7DT7oS7mRcGbdkuRrBWzHyrm2iboEZ2Z3qdchvKgT9DHwF5rrG9IvZIXjHuRsM5pQz8cr4HvY+BBlB/F0o5vsb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748417492; c=relaxed/simple;
-	bh=UvIexZRUn+BGBcUY9tnDQQ7cZOqImj0Tt0QmErOJPf4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ukkv27zffLAMWOi7ht8I2+XpdK/N+3gQObSjIKRuKqnQIFK5ytdeCcfLkebfiYWcC1Fd/mo7fdrohBi5DxON+BQ6YgjO9N7qGMlJDUaGiwDoiPk64OUfr79Gex0X0Wg9Wv44w8qmfV1wmlRh3qeOz6r7X8gBl2k4jeh28sQ54iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JqX/HIQm; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1748417646; c=relaxed/simple;
+	bh=wp7LdqPedvDYAse+G9tNyEO6oCgaUn6A7pd+gyrV7qM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BZIkUnmdcVs6O8FR6g/ftmkCIaMhpKThf89uvoU4NejIzIUcfmEHI5e3+Uoi8z8Wli32lg/iMgMsprC3f23bCFbrLoX1zFhUKZQ/767M/d1wi3zttIHrbxJ6ZHbG5X3nmG+gDPxB/w2DetAJgmNEjYMpIikEzK1Nr1yXyLaUUek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWm/2isP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748417490;
+	s=mimecast20190719; t=1748417644;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NnNK+PMtqB0rA55xSs019Lt6frpG94moy6NPZkqGYPI=;
-	b=JqX/HIQmPgJ+CPURIHMMcjV2lPvriESRIhZa2UTD+9xZojq3ZFka4JhiB+PoQzPFovPP8m
-	lgQZeQLFeo7PrzS30S2NgdCvNfgsH75NjwKdwOrQrwgR4DnWagtQtTNb4wH97NuZek2Xq6
-	Om7bptF5rfffHyruuEFPt85vx3Z79zU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cx1/E7n8px2Cn8C9YEuMbUpQQvtYPWoNjC2S1QtM08s=;
+	b=ZWm/2isPLI88Ez7yVz2bG4zFSK+W4MYs4EyLR9YVVh65TOpDLL2qHqBcuRoNE/HnXF8oq7
+	5a1KsUDCCAYclCgIuiBrjv2OklDVhB9wYSRL223hzRt3zo7yfc+REqlPTsp2tDeUiakvyM
+	wNJrWg9MZg7lkIsBX9r/9rrCf5xO5IU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-382-lOrXdiCFNuy79pXMQrDsyw-1; Wed, 28 May 2025 03:31:25 -0400
-X-MC-Unique: lOrXdiCFNuy79pXMQrDsyw-1
-X-Mimecast-MFC-AGG-ID: lOrXdiCFNuy79pXMQrDsyw_1748417484
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442ffaa7dbeso31558605e9.3
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 00:31:25 -0700 (PDT)
+ us-mta-567-z0LDJSlZPXGeQmZTMtOJvg-1; Wed, 28 May 2025 03:34:02 -0400
+X-MC-Unique: z0LDJSlZPXGeQmZTMtOJvg-1
+X-Mimecast-MFC-AGG-ID: z0LDJSlZPXGeQmZTMtOJvg_1748417641
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-acbbb000796so298895866b.2
+        for <netdev@vger.kernel.org>; Wed, 28 May 2025 00:34:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748417484; x=1749022284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NnNK+PMtqB0rA55xSs019Lt6frpG94moy6NPZkqGYPI=;
-        b=O1efOyyLe2Dc0znso7TSs9JnrnA+Y8je4WyU2t8/55qZIWPUU2huYYVQaLVLQ8xWxJ
-         eLAapH8NMQq0QywpL112+nz8smnbEGb4D6sQSFrnstl03/UY3+jZZqqoiPPvsYwfszvj
-         nyjc5USJPAZfHfXmQmL/TvwEGEvRQ3gPHcDwxP8jlRYgQXaFjNZjIF3aP+1/6nB77OMz
-         DwHHU72P9psuvRX9YkK841uldl16R+13ZkWpYFFQtYdhU/iXw0DXIl/5m4G8gNF4MxLF
-         ibi5RZLEO9wax5uO6WOgffuIDNLEm5ne38FCYoWud2VOy/seBgLkwhCAONL3i84z/Cwt
-         nJBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXl6VA7u8lstAUvnD1WP+zwco4TJ86cjTZIjLB/VmGJXVcUETxEIIjyuO/n1CqkwHrwbopDN8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxF+t/s7ptDGdc9ypTSR9UAyXB5sR2fZkc56JbNuje0+Pn1ovC8
-	A8m23CeEPodZocdJ/b7+sRLO+dW4bO0WAXKwbQ/8Jn6uiJbM4Y0RIMYoWPvQW1cdv2vjUBSQ+mr
-	QQ0WEvOOtgMPgsU4adzzdcDF0c0jKsS0BdMXWY7g8QmnFD598/LSNIuAmxg==
-X-Gm-Gg: ASbGncvZRSJc/iaMvBq8LpRXRvdiIxK3G8SwgeTCVJa25v853zxnLK+XuXyirQGcT/2
-	JZ088W+QOYBu40X+M5Q28SZo0xEkvWg4Uh5iUStefVDf5yMppNIXTSjameKzNumE+hfdnXwqANB
-	NaR3wq1U3P13wTxXHIRzDbit7wiwzH3gNowQBTSqwELUJkqXkTzBWkgmikEw1lFvqrErqXgYK+O
-	S5RMm8cn9WsHUZSdhEv3uGiZDORai3Ps9Wa5hQ/yQxbf2LHLe7XR710ryT+kdXKIzStCf3vvQjH
-	vWZG7xPl6vnofP160oszZvpnr2zrdT18MbGW5xMH3rCEEZd8d2w/GCV3aFk=
-X-Received: by 2002:a05:600c:4fd6:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-44c91cc3dc0mr138588645e9.8.1748417484112;
-        Wed, 28 May 2025 00:31:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGdJu619yR1tj683v5lEJt4BlhCq4Yc5mhZCTSaskqgJ5HAGUteqarVvWl0xRjxTsnjM5kpEw==
-X-Received: by 2002:a05:600c:4fd6:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-44c91cc3dc0mr138588065e9.8.1748417483603;
-        Wed, 28 May 2025 00:31:23 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2728:e810:827d:a191:aa5f:ba2f? ([2a0d:3344:2728:e810:827d:a191:aa5f:ba2f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45006498c83sm12303485e9.5.2025.05.28.00.31.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 May 2025 00:31:23 -0700 (PDT)
-Message-ID: <8b3cdc35-8bcc-41f6-84ec-aee50638b929@redhat.com>
-Date: Wed, 28 May 2025 09:31:20 +0200
+        d=1e100.net; s=20230601; t=1748417641; x=1749022441;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cx1/E7n8px2Cn8C9YEuMbUpQQvtYPWoNjC2S1QtM08s=;
+        b=cud4Ijk75uJikKoRJ779NJbk7JB1WXeaAx0llQhIyOOieuanHz6aT3wpgvRAMyq2E7
+         dbvhCYLthICmrUlnqSbUc/1exUv7Tc9pYT8RcI/fyspKSfL1p6C6sIxLKp7Ww2yS1HJY
+         CUR3sLptxOJyHJc2yJrTT7JrY+s1bM8xuq+QaTGGkeKpj224vN1du0yCMu9a7OMG1e1d
+         0x+42On1jucy7BiJRN54H4yLdbDb0Tq9i9EL/MPLsF0DQdWB3mXgNPCf56G1sALpW1dy
+         B0BDxFqoSabsWRgZRe+G/xmCieM79Jb9Qgqskn57WbR4m9GHji5MrxLid4+c5h+1GuQE
+         YRuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWssNN1AqsGJQ9lR/doUg6xecVxIi682nj/9SafecyQOMSdbkT+w0PfZG6F9XoKdDrQ1NlmBNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW6Pjgl0cDmjlRZ37au4IrudjwPG32sawZZyoTv3+ubvCnjMHv
+	OBrAWI8wKbirjtaJJ4CqRS7CP+fu+YedSI4Wug40cHwGBUBY3YdoXuwf7/cxpUgy8rB51tL3lsT
+	/6auMzgH/7Rhr19VW/BlEilNf3ItvsZ+ahpHaV4oF3PysD01lvp90sALUlA==
+X-Gm-Gg: ASbGncvmBHOMY8gd9a+aLKGCrR5sPKeb4UVEsNsVJA1OYQb3kfLLZWR0Zk0UcBsSTZq
+	o5PTDpXIGDsRdQ9n+f73xLzB/pbeS1Nu4svC3iyGLd6gsyEvo4lmVjjqa5Iv+sUTwsi5Nh5lwH/
+	RunPTSFDdJPvxRwea72NSnZEEuDbi57CpkBytuMQnUCvI0m+O1i9v6AdiZ3kaFjuJ/RIDDeB9TR
+	my5W41jbo1gOSENSJVpteLoOfdVsgK76lA6CXWjmUQDEBh+TNeBpnvGW1spaUpn39qS36rFNsYk
+	sNq2OWc6TYlxHdDX5Z7Cfgz5E/JabOO+1EIj
+X-Received: by 2002:a17:907:9715:b0:ad8:8841:b393 with SMTP id a640c23a62f3a-ad88841b3a0mr601918766b.6.1748417641412;
+        Wed, 28 May 2025 00:34:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9KtaRBWywvd7zEOcu9IyROxtjjzZhhygOMCxeJM4DbxyWYXeOrAIlAA0NCDwD/ITwJYGxIQ==
+X-Received: by 2002:a17:907:9715:b0:ad8:8841:b393 with SMTP id a640c23a62f3a-ad88841b3a0mr601916266b.6.1748417640996;
+        Wed, 28 May 2025 00:34:00 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad8a1b5d89bsm59534966b.183.2025.05.28.00.33.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 May 2025 00:34:00 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id E72221AA87CA; Wed, 28 May 2025 09:33:58 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+ akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
+ andrew+netdev@lunn.ch, asml.silence@gmail.com, tariqt@nvidia.com,
+ edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+ leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Subject: Re: [PATCH v2 16/16] mt76: use netmem descriptor and APIs for page
+ pool
+In-Reply-To: <20250528060715.GE9346@system.software.com>
+References: <20250528022911.73453-1-byungchul@sk.com>
+ <20250528022911.73453-17-byungchul@sk.com>
+ <20250528060715.GE9346@system.software.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 28 May 2025 09:33:58 +0200
+Message-ID: <87v7plmbo9.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget evaluation
- strategy
-To: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Donald Hunter <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 5/24/25 12:56 PM, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> This series brings support for budget evaluation strategy in the PSE
-> subsystem. PSE controllers can set priorities to decide which ports should
-> be turned off in case of special events like over-current.
-> 
-> This patch series adds support for two budget evaluation strategy.
-> 1. Static Method:
-> 
->    This method involves distributing power based on PD classification.
->    It’s straightforward and stable, the PSE core keeping track of the
->    budget and subtracting the power requested by each PD’s class.
-> 
->    Advantages: Every PD gets its promised power at any time, which
->    guarantees reliability.
-> 
->    Disadvantages: PD classification steps are large, meaning devices
->    request much more power than they actually need. As a result, the power
->    supply may only operate at, say, 50% capacity, which is inefficient and
->    wastes money.
-> 
-> 2. Dynamic Method:
-> 
->    To address the inefficiencies of the static method, vendors like
->    Microchip have introduced dynamic power budgeting, as seen in the
->    PD692x0 firmware. This method monitors the current consumption per port
->    and subtracts it from the available power budget. When the budget is
->    exceeded, lower-priority ports are shut down.
-> 
->    Advantages: This method optimizes resource utilization, saving costs.
-> 
->    Disadvantages: Low-priority devices may experience instability.
-> 
-> The UAPI allows adding support for software port priority mode managed from
-> userspace later if needed.
-> 
-> Patches 1-2: Add support for interrupt event report in PSE core, ethtool
-> 	     and ethtool specs.
-> Patch 3: Adds support for interrupt and event report in TPS23881 driver.
-> Patches 4,5: Add support for PSE power domain in PSE core and ethtool.
-> Patches 6-8: Add support for budget evaluation strategy in PSE core,
-> 	     ethtool and ethtool specs.
-> Patches 9-11: Add support for port priority and power supplies in PD692x0
-> 	      drivers.
-> Patches 12,13: Add support for port priority in TPS23881 drivers.
-> 
-> Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+Byungchul Park <byungchul@sk.com> writes:
 
-I'm sorry, even if this has been posted (just) before the merge window,
-I think an uAPI extension this late is a bit too dangerous, please
-repost when net-next will reopen after the merge window.
+> On Wed, May 28, 2025 at 11:29:11AM +0900, Byungchul Park wrote:
+>> To simplify struct page, the effort to separate its own descriptor from
+>> struct page is required and the work for page pool is on going.
+>> 
+>> Use netmem descriptor and APIs for page pool in mt76 code.
+>> 
+>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+>> ---
+>>  drivers/net/wireless/mediatek/mt76/dma.c      |  6 ++---
+>>  drivers/net/wireless/mediatek/mt76/mt76.h     | 12 +++++-----
+>>  .../net/wireless/mediatek/mt76/sdio_txrx.c    | 24 +++++++++----------
+>>  drivers/net/wireless/mediatek/mt76/usb.c      | 10 ++++----
+>>  4 files changed, 26 insertions(+), 26 deletions(-)
+>> 
+>> diff --git a/drivers/net/wireless/mediatek/mt76/dma.c b/drivers/net/wireless/mediatek/mt76/dma.c
+>> index 35b4ec91979e..cceff435ec4a 100644
+>> --- a/drivers/net/wireless/mediatek/mt76/dma.c
+>> +++ b/drivers/net/wireless/mediatek/mt76/dma.c
+>> @@ -820,10 +820,10 @@ mt76_add_fragment(struct mt76_dev *dev, struct mt76_queue *q, void *data,
+>>  	int nr_frags = shinfo->nr_frags;
+>>  
+>>  	if (nr_frags < ARRAY_SIZE(shinfo->frags)) {
+>> -		struct page *page = virt_to_head_page(data);
+>> -		int offset = data - page_address(page) + q->buf_offset;
+>> +		netmem_ref netmem = netmem_compound_head(virt_to_netmem(data));
+>> +		int offset = data - netmem_address(netmem) + q->buf_offset;
+>>  
+>> -		skb_add_rx_frag(skb, nr_frags, page, offset, len, q->buf_size);
+>> +		skb_add_rx_frag_netmem(skb, nr_frags, netmem, offset, len, q->buf_size);
+>>  	} else {
+>>  		mt76_put_page_pool_buf(data, allow_direct);
+>>  	}
+>> diff --git a/drivers/net/wireless/mediatek/mt76/mt76.h b/drivers/net/wireless/mediatek/mt76/mt76.h
+>> index 5f8d81cda6cd..f075c1816554 100644
+>> --- a/drivers/net/wireless/mediatek/mt76/mt76.h
+>> +++ b/drivers/net/wireless/mediatek/mt76/mt76.h
+>> @@ -1795,21 +1795,21 @@ int mt76_rx_token_consume(struct mt76_dev *dev, void *ptr,
+>>  int mt76_create_page_pool(struct mt76_dev *dev, struct mt76_queue *q);
+>>  static inline void mt76_put_page_pool_buf(void *buf, bool allow_direct)
+>>  {
+>> -	struct page *page = virt_to_head_page(buf);
+>> +	netmem_ref netmem = netmem_compound_head(virt_to_netmem(buf));
+>>  
+>> -	page_pool_put_full_page(page->pp, page, allow_direct);
+>
+> To Mina,
+>
+> They touch ->pp field.  That's why I thought they use page pool.  Am I
+> missing something?
 
-Thanks,
+It does, since commit: 2f5c3c77fc9b ("wifi: mt76: switch to page_pool allocator")
 
-Paolo
+-Toke
 
 
