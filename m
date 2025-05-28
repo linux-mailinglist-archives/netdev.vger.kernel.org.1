@@ -1,114 +1,205 @@
-Return-Path: <netdev+bounces-194069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 387C2AC730F
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 23:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06BF5AC7323
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 23:58:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BECB8189DEEC
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 21:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ECA31C031CC
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 21:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D431C221273;
-	Wed, 28 May 2025 21:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE98224AE9;
+	Wed, 28 May 2025 21:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x2C+2CcU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nC0sWeVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA9022069A
-	for <netdev@vger.kernel.org>; Wed, 28 May 2025 21:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4747D2248AF;
+	Wed, 28 May 2025 21:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748469230; cv=none; b=mntqpqGc84g0KQbRkuqteLcVjXvOao4HdQJZICRW2wsgLNkTmj9mBJ6prQrmddDCpGIzoBLO+inHFTmKm9R6Dgb5dLhDTvGV5HrrV52+WcUetxOzskuMg27elKAI6uQgDZiW+lXLhpjxuxSh4NFJ/PrJkS7QLf/oyYtK/5LcApo=
+	t=1748469370; cv=none; b=XzmgQJ9nTaf+o9lEPP1UVty5BJ97fn0N9OMUxbq9by4js0zWSaxs1ZDGyjXq+xgeYwy0TBnqwLvoX+iAwJKMIbjcUOKxmP4aok7XQnAdO+BB7xr9c8N1e/JhfScGcmR4RD803CMIMva/P4XiNKCA3OzfghaUPc+r8GtXQxuVLFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748469230; c=relaxed/simple;
-	bh=tdBL4OiCynGHS5/1GtWDlewdITtZoeyQQd0rZF5zWFQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jGpioXaXGOjiWFJwFOxQkm52n+uC13CNuXHURaZ2SVmt3dHpEHA2oQYGEiOir8AuRBt1uYINlZixA1x4kDrfSI39An0pbPlBJ6oTRZ2IcpoMsSRZP2ux6eXPIGSjSB6U7JIy0AYBKzWXX9iezkf3cpeZK/GrQgBhha0mDho4fpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x2C+2CcU; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2348a45fc73so61975ad.0
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 14:53:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748469229; x=1749074029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tdBL4OiCynGHS5/1GtWDlewdITtZoeyQQd0rZF5zWFQ=;
-        b=x2C+2CcU0IuvJK0AS3AaXmDxQnTVzpTipjmpeEu4Uc2Xs5Lxa8DaNrTC5/952yDt+L
-         uHcY72aHEgrPtLB3mmscmG8p1E5hdtxJNg4Wu2MScluGc3IrZbXujNoGKbthnRf81pzl
-         6mH5Fbl5cKIpCMuCPhT7U+Gla1xfkIOL3dKP3H1A3flxA+ZGB0ar287r04AwyXyfQMy8
-         jLVU3OZSoZJoi+Hqvse6PCe0yuKKnY4L9CXZ9vrqIIOF5jkPaMqNKrQ3wptBt2CZGDtA
-         DgCUcFApZL3Kj4xgew8kcNtuLCAdoYMGeaLVG3XjNCkjnz8T8NOXftIiKUYyzpeKrJOK
-         I96g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748469229; x=1749074029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tdBL4OiCynGHS5/1GtWDlewdITtZoeyQQd0rZF5zWFQ=;
-        b=hZ0NmTjTehpCE4QTiA0XIoyEkzj/jC1BrcyB7PzlY6xlNKTl22TwdRd/HKkWLSmjS8
-         16IbaQf+2/e5trTQrVOAwMnECs7YsiMVRHVV1ejAansfqrvyL5JHfopjgXT/eT21HcyA
-         xS93obpt+s54+pUY0keNlALcv+eXoOyTvW8Fwi0zHDwKP1c2hbfZghmfyblc77K5FetT
-         6757u3p/tNQohEmokUbrC0EyMxHrG5C8xFlNn4CfFmIW207W6sWEcjZ63r3HcE3/w3mt
-         2V+mslVYg+1ilHGZiBFQIbO+HTjURN3cFka5KNfOEMWC6bXUOO50rdAfJ9V0a6D8doR+
-         NJWg==
-X-Gm-Message-State: AOJu0Yx6Bo3d38kUITMTp9GDxmJJ9/+AiU/oGfpxywjwnPN6uQ9JYLMh
-	ZtmaJa2noJirHCB3nB25eT+OdVYhTWydp1W7laRoOU1jvcGDvT51x+m0u0NMn22m3GOygr4Zl1/
-	nyaNpXU8rc1elaknukJZ9lG6yhRUdnXhyAleQK+U8
-X-Gm-Gg: ASbGnctaPdIHdDxKTUpxafh47aO5x77vyBzOks+Uc8nKjiJlQ9NsMmld2NwroXJ8siu
-	GlY/tQSpZ8pksWGo/Y+f+/7mRgaSHyxVMfc0GIacqeGlx08+r/k58MAhg27b3RxP6sqYzVpU5fZ
-	T6hDuYWMg+Y068f3Nx2gZez2RwB5qOrFAg49HkPXCoV9xzeZMSJKzN9dueUVAcvLpwZOsvArh6i
-	tPinNXeAObZ
-X-Google-Smtp-Source: AGHT+IFjd2gU4UQSJCjlqIvJwy4nwFdqLPkwcqaX2VVHjyCIXWweHec6ZUWh6KkIdhJ5YTxoolAdZ0V8xYb7cMsPXo0=
-X-Received: by 2002:a17:902:f60d:b0:234:c37:85a with SMTP id
- d9443c01a7336-23501b91c53mr1061405ad.24.1748469228461; Wed, 28 May 2025
- 14:53:48 -0700 (PDT)
+	s=arc-20240116; t=1748469370; c=relaxed/simple;
+	bh=OLr+lHLF1b6leX+yACQ6obVgGCNqcRl/H9Y7AcITMvA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YHknn+vq5J+EZa698sdeCuiM3kF8OuBrnxJYDIXyg5PY7SgDAJHSEvu2mM/30nkF3seLMEcYxh7o+1haL5P93o727nD7w9mbMmbqCI4lM6zebJWtOClRel+Vo3GdEYGb2sNuncwQSdI9YVlXpvxykWpTrqAB6yD7qz2B/qThCfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nC0sWeVD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C80C4CEE3;
+	Wed, 28 May 2025 21:56:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748469369;
+	bh=OLr+lHLF1b6leX+yACQ6obVgGCNqcRl/H9Y7AcITMvA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nC0sWeVD0fHisq/7MJjoFr41TR61GiXvqn/w4o/GZFlSSjiOdbQxlvMADKoGUz57k
+	 J0Sd2546EjRjmnRdi7/EABCcrQwFs5pdAdxxrCbb7sWCdYlnLysCNVfPwWKDe8ckO7
+	 bW7SerFhUEXsbP6gm7A5aUKWjjpEGzO//S2jBa7xE/cAHbfjbhELznJ5F0rM91GrMl
+	 2q9bL5DHCKCpxeqpNtrYjVxsBt8Nfv9dw3eYaZE+1b6a04fJ3X9Ne964z3uoFs1wOM
+	 FGuZFOMixj31o7WxZTux45SM1k5V1TCq3lkkYGUAyw5d9FLFubRNnuIhLAmVJVb2Vu
+	 wN/PxudwbqFsQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Peter Zijlstra <peterz@infradead.org>,
+	Ravi Bangoria <ravi.bangoria@amd.com>,
+	Sasha Levin <sashal@kernel.org>,
+	mingo@redhat.com,
+	acme@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 8/9] perf: Ensure bpf_perf_link path is properly serialized
+Date: Wed, 28 May 2025 17:55:58 -0400
+Message-Id: <20250528215559.1983214-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250528215559.1983214-1-sashal@kernel.org>
+References: <20250528215559.1983214-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250528211058.1826608-1-praan@google.com>
-In-Reply-To: <20250528211058.1826608-1-praan@google.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 28 May 2025 14:53:35 -0700
-X-Gm-Features: AX0GCFucimbYCQDn2ZRqylxWQl2lDmqEMcsSf1WKh40OYjWwm8mU_thgbFVewl4
-Message-ID: <CAHS8izO=64PCgs7mjobznH0D7sQ76fBXjWoTTNxzO-Or+hqhcQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Fix net_devmem_bind_dmabuf for non-devmem configs
-To: Pranjal Shrivastava <praan@google.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 28, 2025 at 2:11=E2=80=AFPM Pranjal Shrivastava <praan@google.c=
-om> wrote:
->
-> Fix the signature of the net_devmem_bind_dmabuf API for
-> CONFIG_NET_DEVMEM=3Dn.
->
-> Fixes: bd61848900bf ("net: devmem: Implement TX path")
-> Signed-off-by: Pranjal Shrivastava <praan@google.com>
+From: Peter Zijlstra <peterz@infradead.org>
 
-Patch itself looks good to me, but currently net-next is closed.
+[ Upstream commit 7ed9138a72829d2035ecbd8dbd35b1bc3c137c40 ]
 
-I've looked at the maintainer docs:
-https://www.kernel.org/doc/Documentation/process/maintainer-netdev.rst
+Ravi reported that the bpf_perf_link_attach() usage of
+perf_event_set_bpf_prog() is not serialized by ctx->mutex, unlike the
+PERF_EVENT_IOC_SET_BPF case.
 
-I'm unsure whether this needs to be resent to net now or wait for the
-merge window to reopen. I think net is for fixes to code in mainline
-linux, but the devmem TX path has not made it there yet (and is not
-even in the net tree yet). My guess is that this patch should be
-reposted to net-next once net-next reopens.
+Reported-by: Ravi Bangoria <ravi.bangoria@amd.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Ravi Bangoria <ravi.bangoria@amd.com>
+Link: https://lkml.kernel.org/r/20250307193305.486326750@infradead.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
---=20
-Thanks,
-Mina
+Based on my analysis of the commit and the kernel tree context, here is
+my evaluation: **YES** This commit should be backported to stable kernel
+trees. Here's my detailed analysis: ## Bug Analysis The commit fixes a
+**race condition and security vulnerability** in the BPF perf event
+attachment path. Specifically: 1. **Race Condition**: The
+`bpf_perf_link_attach()` function calls `perf_event_set_bpf_prog()`
+without holding the `ctx->mutex`, while the equivalent ioctl path
+(`PERF_EVENT_IOC_SET_BPF`) properly acquires this mutex before calling
+the same function. 2. **Inconsistent Locking**: The fix shows two
+different code paths accessing the same critical section with different
+locking semantics: - **ioctl path** (line 2309): Acquires `ctx->mutex`
+via `_perf_ioctl()` → `__perf_event_set_bpf_prog()` -
+**bpf_perf_link_attach path**: Called `perf_event_set_bpf_prog()`
+directly without mutex protection ## Code Changes Analysis The fix
+introduces proper serialization by: 1. **Creating
+`__perf_event_set_bpf_prog()`**: An internal version that doesn't
+acquire locks 2. **Modifying `perf_event_set_bpf_prog()`**: Now acquires
+`ctx->mutex` before calling the internal version 3. **Updating ioctl
+path**: Uses the internal version since it already holds the mutex ##
+Why This Should Be Backported 1. **Security Impact**: Race conditions in
+BPF attachment can lead to use-after-free or other memory corruption
+issues that could be exploited 2. **Bug Fix Nature**: This is clearly a
+bug fix that addresses inconsistent locking semantics rather than adding
+new features 3. **Minimal Risk**: The change is small, contained, and
+follows existing patterns - it simply ensures consistent locking across
+both code paths 4. **Critical Subsystem**: This affects the BPF
+subsystem and perf events, both critical kernel components where race
+conditions can have serious security implications 5. **Similar
+Historical Precedent**: Looking at the reference commits, commit #5 with
+"Backport Status: YES" was backported for fixing a similar type
+validation issue in BPF perf events, showing that BPF perf-related fixes
+are appropriate for stable trees The commit addresses the exact type of
+concurrency bug that stable trees are designed to fix - it's a clear
+bugfix with minimal regression risk that addresses a potential security
+vulnerability in a critical kernel subsystem.
+
+ kernel/events/core.c | 34 ++++++++++++++++++++++++++++++----
+ 1 file changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 95e703891b24f..eaa9588eb968d 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6239,6 +6239,9 @@ static int perf_event_set_output(struct perf_event *event,
+ static int perf_event_set_filter(struct perf_event *event, void __user *arg);
+ static int perf_copy_attr(struct perf_event_attr __user *uattr,
+ 			  struct perf_event_attr *attr);
++static int __perf_event_set_bpf_prog(struct perf_event *event,
++				     struct bpf_prog *prog,
++				     u64 bpf_cookie);
+ 
+ static long _perf_ioctl(struct perf_event *event, unsigned int cmd, unsigned long arg)
+ {
+@@ -6301,7 +6304,7 @@ static long _perf_ioctl(struct perf_event *event, unsigned int cmd, unsigned lon
+ 		if (IS_ERR(prog))
+ 			return PTR_ERR(prog);
+ 
+-		err = perf_event_set_bpf_prog(event, prog, 0);
++		err = __perf_event_set_bpf_prog(event, prog, 0);
+ 		if (err) {
+ 			bpf_prog_put(prog);
+ 			return err;
+@@ -11069,8 +11072,9 @@ static inline bool perf_event_is_tracing(struct perf_event *event)
+ 	return false;
+ }
+ 
+-int perf_event_set_bpf_prog(struct perf_event *event, struct bpf_prog *prog,
+-			    u64 bpf_cookie)
++static int __perf_event_set_bpf_prog(struct perf_event *event,
++				     struct bpf_prog *prog,
++				     u64 bpf_cookie)
+ {
+ 	bool is_kprobe, is_uprobe, is_tracepoint, is_syscall_tp;
+ 
+@@ -11108,6 +11112,20 @@ int perf_event_set_bpf_prog(struct perf_event *event, struct bpf_prog *prog,
+ 	return perf_event_attach_bpf_prog(event, prog, bpf_cookie);
+ }
+ 
++int perf_event_set_bpf_prog(struct perf_event *event,
++			    struct bpf_prog *prog,
++			    u64 bpf_cookie)
++{
++	struct perf_event_context *ctx;
++	int ret;
++
++	ctx = perf_event_ctx_lock(event);
++	ret = __perf_event_set_bpf_prog(event, prog, bpf_cookie);
++	perf_event_ctx_unlock(event, ctx);
++
++	return ret;
++}
++
+ void perf_event_free_bpf_prog(struct perf_event *event)
+ {
+ 	if (!event->prog)
+@@ -11130,7 +11148,15 @@ static void perf_event_free_filter(struct perf_event *event)
+ {
+ }
+ 
+-int perf_event_set_bpf_prog(struct perf_event *event, struct bpf_prog *prog,
++static int __perf_event_set_bpf_prog(struct perf_event *event,
++				     struct bpf_prog *prog,
++				     u64 bpf_cookie)
++{
++	return -ENOENT;
++}
++
++int perf_event_set_bpf_prog(struct perf_event *event,
++			    struct bpf_prog *prog,
+ 			    u64 bpf_cookie)
+ {
+ 	return -ENOENT;
+-- 
+2.39.5
+
 
