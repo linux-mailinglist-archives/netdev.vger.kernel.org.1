@@ -1,141 +1,120 @@
-Return-Path: <netdev+bounces-193980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-193981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09974AC6B8E
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:18:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D490DAC6BB5
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 16:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39A173A5675
-	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:18:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40BE189EB95
+	for <lists+netdev@lfdr.de>; Wed, 28 May 2025 14:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0635D280A4E;
-	Wed, 28 May 2025 14:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3F8288C1F;
+	Wed, 28 May 2025 14:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="InFNyCxO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0g0dZYmb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB05919B3CB;
-	Wed, 28 May 2025 14:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBF8548EE;
+	Wed, 28 May 2025 14:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748441912; cv=none; b=ragr9AO8dzirnoF3oNkkWquf+3u0xkaKp+X8jKwviR4UlsDng9jH4yX/uTnoXSM+HCn47xRTC5cyACxYlTmlWxllT7NL7VsY2d9GHWYRTPRzc7eGt+uaaepsTPhAZylpHpx2xxbeYqQIDDUoY15JgMh4pVIIFfcBfaDq6S336DU=
+	t=1748442762; cv=none; b=WCedmAtR84Y7ZhNRJnvuKaiqnLYWYwE8+dNgzcvct/Gmaggq+Onk7eUrwwEkplL6KWshIqvzkji81KB823BxA4/qFgSWtwGzau3tzhOCVPhoNq62siSnGo6rkOTWlg98MbCwkNsMuuVcoM2kpNkqNgB3xBuIMHEn36mKeGv1uyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748441912; c=relaxed/simple;
-	bh=6M/v2fzkiyJF+7ss0mIkL0h8Qze2igYDZv1WDkBUazM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=C7SVmnp6cAj5iq4OTILXwEj0GiHF7rZlZkD+6QDy5QUk3zdxJ1c1/a5OuBFL9gXAIJp6/IT/KCVD6hDCqXVOmQuoSsujOqJzHWVAkXMz2GO+WlTU9pIINFxLSd7/zBMGRXR5fbd+/B6FJjJMmpRX4awUewo7MxaLmZi1DAE2YK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=InFNyCxO; arc=none smtp.client-ip=148.6.0.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp1.kfki.hu (Postfix) with ESMTP id D54315C001C8;
-	Wed, 28 May 2025 16:18:27 +0200 (CEST)
-Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
- reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=content-id:mime-version:references
-	:message-id:in-reply-to:from:from:date:date:received:received
-	:received:received; s=20151130; t=1748441906; x=1750256307; bh=N
-	4WEikdHsV0G9jD6Juw+YqI0CSAD7KKrObbmYIgn/Z4=; b=InFNyCxO+uwwuOkK6
-	PqFvwU3qeI/DLV1AFD3T5q7T25ujO6H7mgik6SI8+/p7jN5WDS3tzd21A7hiAxkF
-	5e9RVZYw5OcomMYf7R1mk6rj1r9xIRnmFMCvkB34TZxMQrF8JHauogac7OxPwmdl
-	GmF8QJ6Mrxhd9DKEyonje9UZko=
-X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
-Received: from smtp1.kfki.hu ([127.0.0.1])
- by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id OcjPxtQOXhh1; Wed, 28 May 2025 16:18:26 +0200 (CEST)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [IPv6:2001:738:5001:1::240:2])
-	by smtp1.kfki.hu (Postfix) with ESMTP id DFE855C001C0;
-	Wed, 28 May 2025 16:18:25 +0200 (CEST)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id 98F6F34316A; Wed, 28 May 2025 16:18:25 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id 97B8A343169;
-	Wed, 28 May 2025 16:18:25 +0200 (CEST)
-Date: Wed, 28 May 2025 16:18:25 +0200 (CEST)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: ying chen <yc1082463@gmail.com>
-cc: Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>, 
-    pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net, 
-    kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [bug report, linux 6.15-rc4] A large number of connections in
- the SYN_SENT state caused the nf_conntrack table to be full.
-In-Reply-To: <CAN2Y7hxZdWLfd34LPzhUPZJ-oMksajLMVt5K8B6Gy70e9TXMpw@mail.gmail.com>
-Message-ID: <c9255252-3b6a-886a-5959-d59d0bb4640e@blackhole.kfki.hu>
-References: <CAN2Y7hxscai7JuC0fPE8DZ3QOPzO_KsE_AMCuyeTYRQQW_mA2w@mail.gmail.com> <aDcLIh2lPkAWOVCI@strlen.de> <CAN2Y7hzKd+VxWy56q9ad8xwCcHPy5qoEaswZapnF87YkyYMcsA@mail.gmail.com> <CANn89iLG4mgzHteS7ARwafw-5KscNv7vBD3zM9J6yZwDq+RbcQ@mail.gmail.com>
- <5611b12b-d560-cbb8-1d74-d935f60244dd@blackhole.kfki.hu> <CAN2Y7hxZdWLfd34LPzhUPZJ-oMksajLMVt5K8B6Gy70e9TXMpw@mail.gmail.com>
+	s=arc-20240116; t=1748442762; c=relaxed/simple;
+	bh=1vSCO5vTiinfXc1wGmDJEIBv6Q5jDE79VgZ6H2zNW6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cz/13QY+huomBUoVAINd9RIn4Ep+nG5bQpXf4ZBj9kwnbe9RhYCDDaQNuJEe/MhpgN1+UYfExxm/Ch2aaVGrwaILBfn6lJ3BhmKZQ1heAMNGPLeTxRrtDzPK0PYFDQnGlWBfUwI4RLOE29Rlv3N5Ch0vaybY2RQ0fIUPw1mZyZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0g0dZYmb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=U+FDShjpx6kGEUB2/dQKTjU6xdyCNeX5trpYm619UV4=; b=0g0dZYmb7qFGfQ6Gt46nLap1SM
+	L54LEYGcitbtYKGtm9Fz/qwyr1CXW4N6f2R0fuO8qrUfCyopQMDIvPocpm79WXDEZ6nYQVga+Dxli
+	tsnaCIBD9NDb0B3YXnWZ5FFmDWioIi3kERl1fFLstxdirVcevQWSL3slMVX/xcjm6J5fzLvljyKX6
+	DuK4Lq/+Zgs3yg0vnTiIurv7ny7d2x+Y9Ynr+4A6DwvY/9aZcbAAWJkLUC6TfjccvbKpNqTSjRuog
+	bu18UN9MXxuWyUJKrjjFyQjmJRpewfpkHUvev73LP6t2aRCste0h1QQmVmxs7Gwy0RQL8nQ5uYkcl
+	GCfODJSw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38612)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uKHpN-0000Ns-0k;
+	Wed, 28 May 2025 15:32:21 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uKHpF-0002UB-2v;
+	Wed, 28 May 2025 15:32:13 +0100
+Date: Wed, 28 May 2025 15:32:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: weishangjuan@eswincomputing.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	vladimir.oltean@nxp.com, yong.liang.choong@linux.intel.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
+	jan.petrous@oss.nxp.com, jszhang@kernel.org, p.zabel@pengutronix.de,
+	0x1207@gmail.com, boon.khai.ng@altera.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com, lizhi2@eswincomputing.com
+Subject: Re: [PATCH v2 2/2] =?iso-8859-1?Q?ethernet?=
+ =?iso-8859-1?B?OqBlc3dpbjqgQWRkoGVpYzc3MDCgZXRoZXJuZXSgZHJpdmVy?=
+Message-ID: <aDcebRguDnM7sqVk@shell.armlinux.org.uk>
+References: <20250528041455.878-1-weishangjuan@eswincomputing.com>
+ <20250528041634.912-1-weishangjuan@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-1127963621-1748441824=:6759"
-Content-ID: <d964ed54-d089-1618-352e-efd16b44b2df@blackhole.kfki.hu>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250528041634.912-1-weishangjuan@eswincomputing.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Wed, May 28, 2025 at 12:16:25PM +0800, weishangjuan@eswincomputing.com wrote:
+> +static struct clk *dwc_eth_find_clk(struct plat_stmmacenet_data *plat_dat,
+> +				    const char *name)
+> +{
+> +	for (int i = 0; i < plat_dat->num_clks; i++)
+> +		if (strcmp(plat_dat->clks[i].id, name) == 0)
+> +			return plat_dat->clks[i].clk;
+> +
+> +	return NULL;
+> +}
 
---110363376-1127963621-1748441824=:6759
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-ID: <c7035ed8-91a2-96cf-8334-b403f81ddcd1@blackhole.kfki.hu>
-Content-Transfer-Encoding: quoted-printable
+Okay, I think this driver is mindless copying of dwmac-dwc-qos-eth.c
+between 24th February and 9th April 2025. I can say this because I added
+this function to that driver and later removed it.
 
-On Wed, 28 May 2025, ying chen wrote:
+Looking at the rest of the code, I doubt this even does anything useful
+(hence "mindless copying") as you're not fetching any clocks into this
+array, and plat_dat->num_clks will be zero here. Thus, this will return
+NULL. Therefore, you haven't thought about whether you need this or not,
+but have just copied dwmac-dwc-qos-eth.c and then modified it until it
+works for you.
 
-> On Wed, May 28, 2025 at 9:45=E2=80=AFPM Jozsef Kadlecsik
-> <kadlec@blackhole.kfki.hu> wrote:
->>
->> On Wed, 28 May 2025, Eric Dumazet wrote:
->>
->>> On Wed, May 28, 2025 at 6:26=E2=80=AFAM ying chen <yc1082463@gmail.co=
-m> wrote:
->>>>
->>>> On Wed, May 28, 2025 at 9:10=E2=80=AFPM Florian Westphal <fw@strlen.=
-de> wrote:
->>>>>
->>>>> ying chen <yc1082463@gmail.com> wrote:
->>>>>> Hello all,
->>>>>>
->>>>>> I encountered an "nf_conntrack: table full" warning on Linux 6.15-=
-rc4.
->>>>>> Running cat /proc/net/nf_conntrack showed a large number of
->>>>>> connections in the SYN_SENT state.
->>>>>> As is well known, if we attempt to connect to a non-existent port,=
- the
->>>>>> system will respond with an RST and then delete the conntrack entr=
-y.
->>>>>> However, when we frequently connect to non-existent ports, the
->>>>>> conntrack entries are not deleted, eventually causing the nf_connt=
-rack
->>>>>> table to fill up.
->>>>>
->>>>> Yes, what do you expect to happen?
->>>> I understand that the conntrack entry should be deleted immediately
->>>> after receiving the RST reply.
->>>
->>> Then it probably hints that you do not receive RST for all your SYN
->>> packets.
->>
->> And Eric has got right: because the states are in SYN_SENT then either=
- the
->> RST packets were not received or out of the window or invalid from oth=
-er
->> reasons.
-> I also suspect it's due to being "out of the window", but I'm not sure =
-why.
+You haven't acknowledged where you derived this code from - you've cut
+the header of your source file out, and basically are claiming it to be
+all your own work. I know this is rubbish for the reason I've stated
+above. This is quite simply plagiarism. I am not impressed.
 
-tcpdump of the traffic from the targeted machine with both the SYN and RS=
-T=20
-packets could help (raw pcap or at least the output with absolute seqs).
+Thus I will end the review here, and simply state that this is not
+acceptable.
 
-Best regards,
-Jozsef
---110363376-1127963621-1748441824=:6759--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
