@@ -1,151 +1,126 @@
-Return-Path: <netdev+bounces-194210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F00AC7DC2
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 14:33:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7825AC7E1A
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 14:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 928891BC5B0E
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:33:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F799E79C2
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3BE223DF5;
-	Thu, 29 May 2025 12:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AB9224B0C;
+	Thu, 29 May 2025 12:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfcfmGIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D388D221FBD
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 12:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73B92248AB;
+	Thu, 29 May 2025 12:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748522008; cv=none; b=f3r3XaO/tUoAtDwUurzinIKeDF3smV0/bqrG87Q9DWNU7RQJgwO+b4dctsvfGkI+s1Lz1pvUkwpJ/5xL89I3aYbMGhjjHUeZfnBc1lSYeIXty70sVFKVfT41S/d9hm6d1yIEh9MV74nZpaAUuKIFrSOnb4rWRfPh5+TK29U4ucA=
+	t=1748522653; cv=none; b=f7Fiza4bGuLBC9HT4oT1OLwLU6gMIAnpHouJ8dAU0HqBs1MPTCe7+spYtPAQgAcEjqqIGmgF/4V9FZO6AV0GxpD0ZW1pEoRh7iq51U/2Iwa7R/Lc1izALhKL+VHpLKza+sTgdvwPGVxiPIy5ALxA5Ut80mHdsRJCjZRnbin1+Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748522008; c=relaxed/simple;
-	bh=kIkmKcaPV98XKhRwOTAvnQhINvi2n4gSAdVyCSaFabU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FlG4+3SzyyogQTWQKGB01radbWsvVQ/j1tkGJ8A9+xpZH2pVU2Og7PnbXMl6jrmypZMaqFCqqCIvLqYFsfOPrT8UyClYFhjM/cMOsrg70s1f9e/7kRPYAtuEyfS6bOUxd+fxa+C/+OHnaXAHLBkJB9135vuoZn/K/7E3yDY43WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b41b906b3so72127539f.0
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 05:33:26 -0700 (PDT)
+	s=arc-20240116; t=1748522653; c=relaxed/simple;
+	bh=DU0IJ0+/nwSm/K9hGP4DcuS6ep/cTHu1pVRhL43vVBs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=YI+S1HnZPekuMvQoape8p63/LKKNIzZ0S2CJ9tufLvBhKMWTbhN85eXxEU2yxktbhq68PPaSdrEmc9ACJqeSoFcsFNgQaYqJDhaeV864kGla9cVyppAJ6Jc1gKJs9FjrMhuhDLkW7G536WhBNEuqW3/oOp5vp+oV3+XNisam3II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfcfmGIR; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-450cf214200so7074665e9.1;
+        Thu, 29 May 2025 05:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748522650; x=1749127450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xy9+1WxqxPkcvDSbf/PL1XyrGbcJDd9HZLFKhqLgSaA=;
+        b=OfcfmGIRaxkKqM63wYjLsLfLiy464mxreNY/d0yOFqNe9IUqWYsQj1FwQXS8Njtvra
+         LYbj7R9tUii4jRFpk2gmKdBqcFtwOWnUXJ9TKFptX8cy00foj5oEE/q3afopEuYvZ1vi
+         mGEtEzcDBIbR6l4F4JH7uy5ZOOmdJ9mMDkK4c2RkXSw6OgMMqLEQp3xL5cBwO3GgyUq7
+         IDAxEDkyjwpeUIfoSp0RkXmXjinGoAe4EL/ApkP6sjcdLb1l54ob2SFrWBOJ8iq8L8W0
+         jfs+rp4bBySElS1nagAETKZlRhrZN+5rMD9N1S+31EO65LK/tHXtV6DPTAPwrl+MLgkH
+         e8OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748522006; x=1749126806;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5bml+Lhlb/ESJB7OB397E+URQXQmoC/VYahWRyI1KaM=;
-        b=LwWFunHlCez6obLTPg2d6VMeNltudL7EVjLB61tAH+sZI+fxk52Is5Ph49MzX9KO+j
-         iwDrKUkBBd5J4YASUJTNNHNEMQRwJh0EuKzgQt0Y2YfdH706YuVNRUKQ0I+Uy5U5Zrlm
-         NE+BRRRDFICQLKjlkobZgP8yGnXs47VSEFGYH3akh5meTpeez7RZ/jhQEd7J+dDuzpnw
-         uzB4x05+riqzcdxvIqcoDVrV9B7d0SVp4Qgs48XxJJTH9J+s5obBES4Uhu0PtP8VZtAa
-         bnnfiV9wJ9LLn6bHcvsCmUmNoORKoIXUwsS23KpBN8JjitwkOYhJtmpzM9iU+beQwzc+
-         QzAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBgYA4NZpvo3uCTCuhBwtRHJtlJVAAjvl7/0W0z7OIbWk1JZQdNWNECrVqbJLeNFxB3My/g3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRgH7y1UDuK8nIzJxuyBDiFpK/3Z5kNbLxi0BsFpNa7SCcrE1m
-	tavlP4M3VsZHDxDSzNWineG9NrvSY3LceN05lzOF7t/3uotG8VEP06F4OcjSnReBWwlLhha5cqt
-	KJkvmx/0st1JhzWC4Ub4PjmIpkP9Xa/09FOok7gNhuAI60FTG0joeut+03hM=
-X-Google-Smtp-Source: AGHT+IHxHOKcAfW53VhsEwfYQe28Edle9Xwc641YqhY2if7TdOjOHCstkntXRFjfL61vR74DgjPJZSP093ib53p+cgjjwt7thbwV
+        d=1e100.net; s=20230601; t=1748522650; x=1749127450;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xy9+1WxqxPkcvDSbf/PL1XyrGbcJDd9HZLFKhqLgSaA=;
+        b=QIp/RdDb44BawYm05cqNgBBbc6L4Sc/NBn+e7QnmhXv3l2V1v4ASjgKxvuyP2WkpTY
+         YfRwvte9D4xVJBXZ+bKWMxh2z4JxNnmlqwf9exgYzzABh0P3rC58acu6aI0HgSEeEIVd
+         rBIVuwAOQpg7UEN7xE20oR2X1FPmfXJJysQAR+UGCK4msYsyBhw5iXltkE3mTFhe4Y02
+         04WOglgNqcxpIpnZWPEQdQOcH1/eF5IAXKUh6fQjERYUjhKK77fkY7IUxGzJxlTNMRva
+         uQr4JDVc5eEn0f6wEC07+P4oJpXVsK5/EvGoEeCV1vmrDZds+X72Y5Wjiprvj6yTz1ZP
+         dZLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVt3uOowbVtDj2gQu63t8i7SizPWk8QgD4Gy0MPeLs6tHT9Z8w/nPpb/fl/mcEbo+SXk4lxvSrY@vger.kernel.org, AJvYcCWPJxLD249a6MAf8j3AhkSUL+Tl0U01HNFen/+ho/0aoyTiwv265zlYEi49CMY4PL5ftJLOCiZt/PJ0VXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1MqwaJcM9BbIwRZ8DVkP81IUXv/AfVdQfsG2AJ33cpNs5Njcp
+	10e12/Opy000+7LzVuFVZ0kEZrADu9/8fkxuqG85QqJ37XCTOz0xGrh6
+X-Gm-Gg: ASbGncv2O30L3mClnxYsJFOvdHsAdKTisJ8SIhq9dNMwvzljvx171FJnFKoyt/8ccVB
+	5dSuK4N29uGiq0eUQvsv7FGA+QzxTkbfXEETpA0YoSu+gd1G9nOkDP9UOyeu/6qzzDVq+uvk54l
+	GCOG4P+ttU4WBXLLICh6I6td6E4NTpCO4C7rpek/s7NIl2kglnqCR/i+TjO2dniwK8jaYqVRj2z
+	Djk58nmvhpZp3lSLCNAQpQuzoU63OdwECHIMZGr22v0I9k8XXdOjd2A0Da+ZOLJTA2IGEBHs74+
+	v0loO91Y5B2lRewJISPj6XuO48PhSdk/DSWnuaVjTZCgK3vCqEhreqK4xQL+xltYV0eXeFOPUKF
+	9Rk6rKcjCC3CsyAn4DY8QqeQ+d6yNpZwSzWRCeAiIgQ/CJiRMn7/W
+X-Google-Smtp-Source: AGHT+IFm45df0BWkQmTyGVJH2ytFPDLC0UF5D4hMKR1QOL/2DurqQM0+1Q3vJcgPQRfZYQwJ3uQOng==
+X-Received: by 2002:a05:600c:6216:b0:43c:fa52:7d2d with SMTP id 5b1f17b1804b1-44c955dbdddmr159836115e9.20.1748522649482;
+        Thu, 29 May 2025 05:44:09 -0700 (PDT)
+Received: from skynet.lan (2a02-9142-4580-1200-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1200::8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-44fcbe5c4edsm55146915e9.2.2025.05.29.05.44.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 05:44:08 -0700 (PDT)
+From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+To: florian.fainelli@broadcom.com,
+	jonas.gorski@gmail.com,
+	dgcbueu@gmail.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+Subject: [PATCH] net: dsa: tag_brcm: legacy: fix pskb_may_pull length
+Date: Thu, 29 May 2025 14:44:06 +0200
+Message-Id: <20250529124406.2513779-1-noltari@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9f50:0:b0:86c:ee8b:c089 with SMTP id
- ca18e2360f4ac-86cee8bc1bbmr560370739f.3.1748522005946; Thu, 29 May 2025
- 05:33:25 -0700 (PDT)
-Date: Thu, 29 May 2025 05:33:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68385415.a70a0220.29d4a0.082e.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_tx_h_rate_ctrl
-From: syzbot <syzbot+0d516b33238bd97ee864@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+BRCM_LEG_PORT_ID was incorrectly used for pskb_may_pull length.
+The correct check is BRCM_LEG_TAG_LEN + VLAN_HLEN, or 10 bytes.
 
-syzbot found the following issue on:
-
-HEAD commit:    5cdb2c77c4c3 Merge tag 'net-6.15-rc8' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=14784df4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
-dashboard link: https://syzkaller.appspot.com/bug?extid=0d516b33238bd97ee864
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d90a868e19ee/disk-5cdb2c77.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3c5ff2a5a972/vmlinux-5cdb2c77.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f6a0db04ca42/bzImage-5cdb2c77.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0d516b33238bd97ee864@syzkaller.appspotmail.com
-
-wlan1: Created IBSS using preconfigured BSSID 50:50:50:50:50:50
-wlan1: Creating new IBSS network, BSSID 50:50:50:50:50:50
-------------[ cut here ]------------
-wlan1: Dropped data frame as no usable bitrate found while scanning and associated. Target station: 08:02:11:00:00:00 on 5 GHz band
-WARNING: CPU: 1 PID: 1111 at net/mac80211/tx.c:756 ieee80211_tx_h_rate_ctrl+0xc87/0x1780 net/mac80211/tx.c:749
-Modules linked in:
-CPU: 1 UID: 0 PID: 1111 Comm: kworker/u8:6 Not tainted 6.15.0-rc7-syzkaller-00082-g5cdb2c77c4c3 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_tx_h_rate_ctrl+0xc87/0x1780 net/mac80211/tx.c:749
-Code: 31 f6 83 e6 07 41 0f 95 c6 31 ff e8 03 26 ea f6 43 8d 0c 76 83 c1 02 48 c7 c7 60 8b 8c 8c 48 89 de 4c 89 fa e8 3a 7e ae f6 90 <0f> 0b 90 90 41 bf 01 00 00 00 e9 eb 02 00 00 e8 95 21 ea f6 e9 6a
-RSP: 0018:ffffc90003c9f460 EFLAGS: 00010246
-RAX: caae12da654acc00 RBX: ffff888078a69738 RCX: ffff888026951e00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
-RBP: ffffc90003c9f5d0 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bba984 R12: dffffc0000000000
-R13: ffffc90003c9f788 R14: 0000000000000001 R15: ffff888059534d44
-FS:  0000000000000000(0000) GS:ffff8881261c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055557d9f3588 CR3: 0000000031484000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- invoke_tx_handlers_late+0xb6/0x1820 net/mac80211/tx.c:1850
- ieee80211_tx+0x2ac/0x420 net/mac80211/tx.c:1971
- __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6107
- ieee80211_tx_skb_tid_band net/mac80211/ieee80211_i.h:2338 [inline]
- ieee80211_send_scan_probe_req net/mac80211/scan.c:655 [inline]
- ieee80211_scan_state_send_probe+0x59a/0xa10 net/mac80211/scan.c:683
- ieee80211_scan_work+0x5b1/0x1ce0 net/mac80211/scan.c:1143
- cfg80211_wiphy_work+0x2dc/0x460 net/wireless/core.c:435
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
+Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
+Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/dsa/tag_brcm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
+index 8c3c068728e5..fe75821623a4 100644
+--- a/net/dsa/tag_brcm.c
++++ b/net/dsa/tag_brcm.c
+@@ -257,7 +257,7 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
+ 	int source_port;
+ 	u8 *brcm_tag;
+ 
+-	if (unlikely(!pskb_may_pull(skb, BRCM_LEG_PORT_ID)))
++	if (unlikely(!pskb_may_pull(skb, BRCM_LEG_TAG_LEN + VLAN_HLEN)))
+ 		return NULL;
+ 
+ 	brcm_tag = dsa_etype_header_pos_rx(skb);
+-- 
+2.39.5
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
