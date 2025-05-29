@@ -1,89 +1,76 @@
-Return-Path: <netdev+bounces-194218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3320AC7EA3
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:23:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 929A9AC7EBB
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C653A5C88
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:23:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B22A26F88
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07564225A38;
-	Thu, 29 May 2025 13:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36386226193;
+	Thu, 29 May 2025 13:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HV2UtNB2"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="U5Z9toWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D4B647;
-	Thu, 29 May 2025 13:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B139917BA5;
+	Thu, 29 May 2025 13:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748525020; cv=none; b=nhNSyTGLnihuDhh1xwTQ8o4ShJMN6KMpToTsYhd3AWikJngSCqeByj+Td8VBfWweYs1QPOiuWBDcBRn7wJrCfvkDS8taUbbUqArcLNDT6l96x6ZwyK9VOeBHuTLZ95nUGBhPDf2414Y9aCJNlPAFK5Y8Dsn2xiQvCMDwEzf6Lnk=
+	t=1748525327; cv=none; b=hBGRIiPTvCzJ5rj+WStOtqxHDqIfMN9LYWhH/savQ98xKxqlH1Q4OFGlUYoxO3Bgvh0U6ubNOIsZoEWkPiyvczu1wE5oet2sRxYha46skGz0FW6bHY2BuDcTWAG5PV7F79ly98yrdCHfX+ZQMsXyV2xrGzuvCdOrS+OZWSdZGCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748525020; c=relaxed/simple;
-	bh=dDGVAlh58IXITtv4zoQJHm8V6+hjmVhqg6ZkAI+a+ks=;
+	s=arc-20240116; t=1748525327; c=relaxed/simple;
+	bh=HjdeBbhhYpiTDQNeuKjppa/6OR8mdX2tAmkwgCAGDzw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qxQZ9cLFgEdM5EM7COzIy4G7tcf2x52b4i/w0+b1LZEK64Bb0YqTSQbjgiMYVJiCSkYGxOkZIct5rQKqpUkd7fiqpKSW3WjPBG+pFPb7e2lIVlKOJYeVoSs71D/Xt0AxKwf9dUuOc2ArSswwPXSAihDM+2x/JN1fMzTuyWbTEpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HV2UtNB2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zBTL/STJmtvp2VqDgiDgK4iklSQ0paUUUgoWg/0K4tc=; b=HV2UtNB2S1YdQPm65D3plaVeJJ
-	rS8dbZCmEBE8hNa2SKqutR8/LSMMDcPJCzrBeKp7x9VeDvjUE8kZAiefsXQgFAYOyPLvpbJLscpb7
-	hsUlRtD+mvZ7xh5a58YHxqMIL0Edd26bJ513M5L6iHeoHzpJdmLiktSVODuAfOXtH6Yoj7aKBP9rf
-	bpFmXHijHgT4dfAYYFX+T1wiE+fxLo12DRGJOZJFDCAt//iquqt3pEiLLE4JnuwQkNeVIS1tJRC+K
-	ZaGnGtO/q++vAZWrS88u3tU0udE6CGIc+ctokgqA56J/0xF3HrI3DYNHi8u4kDZzY/9jIx5DhK9l5
-	UxuuEzjg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43512)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uKdEG-0001Qi-0z;
-	Thu, 29 May 2025 14:23:28 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uKdEA-0003Ti-1O;
-	Thu, 29 May 2025 14:23:22 +0100
-Date: Thu, 29 May 2025 14:23:22 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v6 06/14] net: phy: Introduce generic SFP
- handling for PHY drivers
-Message-ID: <aDhfyiSOnyA709oX@shell.armlinux.org.uk>
-References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
- <23936783.6Emhk5qWAg@fw-rgant>
- <20250523145457.07b1e7db@2a02-8428-0f40-1901-f412-2f85-a503-26ba.rev.sfr.net>
- <13770694.uLZWGnKmhe@fw-rgant>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HGwuDRZMzd0EUkeaBf5SodFuSaY21L+Z3iwjc5zjP9s9Ols8Wz19koKf2m1pKv56mXHM3/nSjac4seJ1xSfbPXUe6iVH9l8/QMrgTARU/sOqPLM7VVFzO3tc094eCpXibcrZiBC8PazbuJkgQvYYhi3i4wVkRHSZ50/cr2WLlvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=U5Z9toWh; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 3E20D207861D; Thu, 29 May 2025 06:28:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3E20D207861D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1748525325;
+	bh=PowdyksgFeNGxjaYVXgfZt/agyGLy3RtEinohZnn13E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U5Z9toWhiQyAo1P5uORvpzDiRyD2tsbluG5TtPDUU+lIZr434j4ewrazjfeVR6bvL
+	 zBCbVW/l38UkV2MLvalZYHb4PQdNFUlG1Ze+c+LI1tFU3cgRGk/G99bYfsZ4JtA80F
+	 y5dMttkHk65rX2EpVWi2yfWUprYKKhKMxk2gM7lg=
+Date: Thu, 29 May 2025 06:28:45 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Simon Horman <horms@kernel.org>
+Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
+	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof Wilczy???~Dski <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v4 0/5] Allow dyn MSI-X vector allocation of MANA
+Message-ID: <20250529132845.GE27681@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1748361453-25096-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20250528185508.GK1484967@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,28 +79,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <13770694.uLZWGnKmhe@fw-rgant>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250528185508.GK1484967@horms.kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, May 28, 2025 at 09:35:35AM +0200, Romain Gantois wrote:
-> > In that regard, you can consider 1000BaseX as a MII mode (we do have
-> > PHY_INTERFACE_MODE_1000BASEX).
+On Wed, May 28, 2025 at 07:55:08PM +0100, Simon Horman wrote:
+> On Tue, May 27, 2025 at 08:57:33AM -0700, Shradha Gupta wrote:
+> > In this patchset we want to enable the MANA driver to be able to
+> > allocate MSI-X vectors in PCI dynamically.
 > > 
+> > The first patch exports pci_msix_prepare_desc() in PCI to be able to
+> > correctly prepare descriptors for dynamically added MSI-X vectors.
+> > 
+> > The second patch adds the support of dynamic vector allocation in
+> > pci-hyperv PCI controller by enabling the MSI_FLAG_PCI_MSIX_ALLOC_DYN
+> > flag and using the pci_msix_prepare_desc() exported in first patch.
+> > 
+> > The third patch adds a detailed description of the irq_setup(), to
+> > help understand the function design better.
+> > 
+> > The fourth patch is a preparation patch for mana changes to support
+> > dynamic IRQ allocation. It contains changes in irq_setup() to allow
+> > skipping first sibling CPU sets, in case certain IRQs are already
+> > affinitized to them.
+> > 
+> > The fifth patch has the changes in MANA driver to be able to allocate
+> > MSI-X vectors dynamically. If the support does not exist it defaults to
+> > older behavior.
 > 
-> Ugh, the "1000BaseX" terminology never ceases to confuse me, but yes you're 
-> right.
+> Hi Shradha,
+> 
+> It's unclear what the target tree for this patch-set is.
+> But if it is net-next, which seems likely given the code under
+> drivers/net/, then:
+> 
+> Please include that target in the subject of each patch in the patch-set.
+> 
+> 	Subject: [PATCH v5 net-next 0/5] ...
+> 
+> And, moreover, ...
+> 
+> ## Form letter - net-next-closed
+> 
+> The merge window for v6.16 has begun and therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations. We are
+> currently accepting bug fixes only.
+> 
+> Please repost when net-next reopens after June 8th.
+> 
+> RFC patches sent for review only are obviously welcome at any time.
 
-1000BASE-X is exactly what is described in IEEE 802.3. It's a PHY
-interface mode because PHYs that use SerDes can connect to the host
-using SGMII or 1000BASE-X over the serial link.
+Thank you Simon.
 
-1000BASE-X's purpose in IEEE 802.3 is as a protocol for use over
-fibre links, as the basis for 1000BASE-SX, 1000BASE-LX, 1000BASE-EX
-etc where the S, L, E etc are all to do with the properties of the
-medium that the electrical 1000BASE-X is sent over. It even includes
-1000BASE-CX which is over copper cable.
+While posting this patchset I was a bit confused about what should be
+the target tree. That's why in the cover letter of the V1 for this
+series, I had requested more clarity on the same (since there are patches
+from PCI and net-next both).
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In such cases how do we decide which tree to target?
+
+Also, noted about the next merge window for net-next :-)
+
+Regards,
+Shradha.
 
