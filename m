@@ -1,76 +1,175 @@
-Return-Path: <netdev+bounces-194105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2B5BAC758D
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 03:53:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E54BAC7591
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 03:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD4DA209D3
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:53:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 370C21C0449B
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C6522CBF6;
-	Thu, 29 May 2025 01:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E634221D86;
+	Thu, 29 May 2025 01:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwch8cnm"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="QfCk+LRw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D6515A864;
-	Thu, 29 May 2025 01:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34873221282;
+	Thu, 29 May 2025 01:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748483628; cv=none; b=bAokiDKjoxf9X5JGB/cviG0zlljS3rQ5+S4Skz+cdC1mTAgbMo2pPVfDuWSr1ekFZontq2YCENUkXKyEAyD6x2eNinfwXTgYqQRJt2mJeR8FW1GWX1aFligqOL+sg1Bypa3rUhZrpsORb59ZqAcbdbKYNLQTiZS5xdzagCyjIjg=
+	t=1748483744; cv=none; b=dFW6VunVaQIOeVRfeRBx6nIvJDkF0JkFKhFXsxuzfoLzkbznEutAmrFfAs+7481Cyuth/taZ2zeDVGaZlIiJQpioaeOPXR+Tvil1XQabxlHPmS+JKmSCTrgf7jk/ecK1Fkk0AukmNWKZlu7jQSI3boiD7el3B6c6t7niDqpNGhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748483628; c=relaxed/simple;
-	bh=KbS5YpI6Hxz3Dv49Grl7b1ocLTnHAPwnQ/RggobBFJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gUWC8rMcpgJBkcxY9jQFqHaZQem9GNFEv0ZnhIl7gacp9Vpyc3/fYVWoCT4WITeJ2NmB95XuQm+QeQC7RnihhuOLXkQy1vCusX5rKMebttX4m9sM72wSRzuGA9JvqujBWFSFeIPl5BAtSbm62d6oWYQnR8LfYwnoY04Bpx33ur8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwch8cnm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE40EC4CEED;
-	Thu, 29 May 2025 01:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748483627;
-	bh=KbS5YpI6Hxz3Dv49Grl7b1ocLTnHAPwnQ/RggobBFJA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gwch8cnmsBUOlC9WkCTTd1Pd09oywUw889rUW6Xma9vK8UL8+LUYQCQLMVaEwp8++
-	 8cc6bTEB0H3eyRuluHG62LuuRGljgHX16TS4TYhpa2Puz3hItqNJ9RmkUdaS1XSDiN
-	 9KheFvV3QdXiul88MSr5tTTsGrHyBMhTcJH6pVNQmaaSwLDSiQK+cZoLAcVUNGpNAo
-	 IGnz9HW+P5k7R/jyKwO8/E0tRspNlbmbx/vVH+G4zzxfzPbctJSxzqHdi2mvbx5NQf
-	 9ElQmH/1gEE5wlFXM3EjzpFu8eC/EXExdvmvTl+6XT2gAwJYtB7llRR7JN/P333bkN
-	 DwyjkMD/HuZOQ==
-Date: Wed, 28 May 2025 18:53:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH] net: af_key: Add error check in set_sadb_address()
-Message-ID: <20250528185346.4eebf434@kernel.org>
-In-Reply-To: <20250525155350.1948-1-vulab@iscas.ac.cn>
-References: <20250525155350.1948-1-vulab@iscas.ac.cn>
+	s=arc-20240116; t=1748483744; c=relaxed/simple;
+	bh=2f3kjvWeAd20nfuwqqUZcCAzBN5Ws0T9JFZD87GbyPg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QdYpWPhs3OFvztIyqHt+Si+uG9t3phLNB6fqX1qawBeMLkSi/mIX5fKahhbUaUj3m5iwgflkzXYcrYxSggUcrsWGBAnjaMsTK8OkvrYvwziDAavWScZPnZWHImW+9l+MGJvDGyrtAQyc98cwSPOs5ofv5l/j3ky5KEMrZa9zEcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=QfCk+LRw; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 02d79d983c3011f0813e4fe1310efc19-20250529
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=XGdCMb97AOaJQbILqnVuvTpYQ1ygZZt8YRJIz6NBzos=;
+	b=QfCk+LRwcbXGiYlOKW2HbUrbEhLXgR7VDZco87xkW2w37L3TBaF6DwhVwXB0par5QhTOQJKlLuztUs1H8SgXs/1muYYT0ZCpRuHJzewraeAua6crfM+lJ4t1YxjzBHmcMb1khZ8zPiHvT4LCAvmpGcGrK8/AoreN5cuwm96xYbI=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:3727f5cc-5f4f-4237-9d2b-8e2681082e4a,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:633e65f1-2ded-45ed-94e2-b3e9fa87100d,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 02d79d983c3011f0813e4fe1310efc19-20250529
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1667375727; Thu, 29 May 2025 09:55:35 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ MTKMBS14N2.mediatek.inc (172.21.101.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.39; Thu, 29 May 2025 09:55:32 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.39 via Frontend Transport; Thu, 29 May 2025 09:55:31 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
+	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<shiming.cheng@mediatek.com>, <lena.wang@mediatek.com>
+Subject: [PATCH net v5] net: fix udp gso skb_segment after pull from frag_list
+Date: Thu, 29 May 2025 09:58:56 +0800
+Message-ID: <20250529015901.3814-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-On Sun, 25 May 2025 23:53:50 +0800 Wentao Liang wrote:
-> The function set_sadb_address() calls the function
-> pfkey_sockaddr_fill(), but does not check its return value.
-> A proper implementation can be found in set_sadb_kmaddress().
-> 
-> Add an error check for set_sadb_address(), return error code
-> if the function fails.
+Commit a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after
+pull from frag_list") detected invalid geometry in frag_list skbs and
+redirects them from skb_segment_list to more robust skb_segment. But some
+packets with modified geometry can also hit bugs in that code. We don't
+know how many such cases exist. Addressing each one by one also requires
+touching the complex skb_segment code, which risks introducing bugs for
+other types of skbs. Instead, linearize all these packets that fail the
+basic invariants on gso fraglist skbs. That is more robust.
 
-Please look at the callers, and you'll find out that the family has
-already been validated.
+If only part of the fraglist payload is pulled into head_skb, it will
+always cause exception when splitting skbs by skb_segment. For detailed
+call stack information, see below.
+
+Valid SKB_GSO_FRAGLIST skbs
+- consist of two or more segments
+- the head_skb holds the protocol headers plus first gso_size
+- one or more frag_list skbs hold exactly one segment
+- all but the last must be gso_size
+
+Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+modify fraglist skbs, breaking these invariants.
+
+In extreme cases they pull one part of data into skb linear. For UDP,
+this  causes three payloads with lengths of (11,11,10) bytes were
+pulled tail to become (12,10,10) bytes.
+
+The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
+payload was pulled into head_skb, it needs to be linearized before pass
+to regular skb_segment.
+
+    skb_segment+0xcd0/0xd14
+    __udp_gso_segment+0x334/0x5f4
+    udp4_ufo_fragment+0x118/0x15c
+    inet_gso_segment+0x164/0x338
+    skb_mac_gso_segment+0xc4/0x13c
+    __skb_gso_segment+0xc4/0x124
+    validate_xmit_skb+0x9c/0x2c0
+    validate_xmit_skb_list+0x4c/0x80
+    sch_direct_xmit+0x70/0x404
+    __dev_queue_xmit+0x64c/0xe5c
+    neigh_resolve_output+0x178/0x1c4
+    ip_finish_output2+0x37c/0x47c
+    __ip_finish_output+0x194/0x240
+    ip_finish_output+0x20/0xf4
+    ip_output+0x100/0x1a0
+    NF_HOOK+0xc4/0x16c
+    ip_forward+0x314/0x32c
+    ip_rcv+0x90/0x118
+    __netif_receive_skb+0x74/0x124
+    process_backlog+0xe8/0x1a4
+    __napi_poll+0x5c/0x1f8
+    net_rx_action+0x154/0x314
+    handle_softirqs+0x154/0x4b8
+
+    [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
+    [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+    [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
+    [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
+    [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
+    [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
+    [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
+    [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
+
+Fixes: a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after pull from frag_list")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+---
+ net/ipv4/udp_offload.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index a5be6e4ed326..59ddb85c858c 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -273,6 +273,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	bool copy_dtor;
+ 	__sum16 check;
+ 	__be16 newlen;
++	int ret = 0;
+ 
+ 	mss = skb_shinfo(gso_skb)->gso_size;
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+@@ -301,6 +302,10 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+ 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+ 
++		ret = __skb_linearize(gso_skb);
++		if (ret)
++			return ERR_PTR(ret);
++
+ 		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+ 		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+ 		gso_skb->csum_offset = offsetof(struct udphdr, check);
 -- 
-pw-bot: reject
+2.45.2
+
 
