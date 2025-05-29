@@ -1,307 +1,155 @@
-Return-Path: <netdev+bounces-194273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E08D9AC83E4
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:08:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1140AAC83F7
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBFE11BA5DA5
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 22:08:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8E6E1BA25EC
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 22:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2603121C9F9;
-	Thu, 29 May 2025 22:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E3221CC79;
+	Thu, 29 May 2025 22:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eiXfxJ6W"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="f7IeD/da"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED1C1AF0C8;
-	Thu, 29 May 2025 22:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD6F54F81;
+	Thu, 29 May 2025 22:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748556515; cv=none; b=HymqUhZVzE24jicSVuuQgLwVY/GTbi4EKqvgMJ7P8lPyz0O2j+JDTT4tHY88LPBZ1kiIdap+qkVkzSNyR0bwPl4T/mdXtlmwhChMczcPXN4zE03NEKG5pl6tg/LiF8DbA3TEi/nHoZYxXbrrxvofqOCXQWmPm829f1q4oIS+M4E=
+	t=1748557046; cv=none; b=imr2STPXzTosAzOeLZ8Q7WBD5sIILhOZItUOIbwAXLfgyUtszll1Astvh3/ushraS8EC5HCz05MLPDO7aMmY0hmCE4p8qukQxFsJLwCEsN0I7pj64c3EtNSG8w7yrwCOuyai9PZBGXf7fU6o37NAwQWHhEE/2lWtGh9Yzo8LiaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748556515; c=relaxed/simple;
-	bh=M0tbtdLApdJAq/4ogJahNv+Hgt/JeFqIHwEJhoEDBdQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BXnLimkf8PpBuMa5tcDgyuZuX1fxQuRHU+/BWMoS4VqhuCHYUAbwAWyhvTE5BwKHBHmQ/72cx8staZLAJ6GJ0jcXJ++aiGImOD88AfTNTZsSt7bb7hLxmQo/tYlTfbVf4jLo0CaLoxDLBizaUSyEkXgBWF5i8KL7jKZZCYM5ZMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eiXfxJ6W; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32a63ff3bdfso10096961fa.3;
-        Thu, 29 May 2025 15:08:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748556510; x=1749161310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rpJVcptDcpTpszgwiBlbfF17mFy9KW509xkzZ9NUjik=;
-        b=eiXfxJ6WeQcEoq232QqFmHB4GXmoObkb0md3lMdmOpYB+3XoubUPt0JSJ5KRnnPkIO
-         tEB0EGwYqgvch37afi+h4w+yLUfIg10Az7chHl87igpdpNtiUB2Anb1t1Wp7fDWE6bDI
-         haGvJWfINY18JtyjOCpAvZEGjCgHWcNr7BGHIM/durFQVA1/DUQJPomMY3HFwvuZTtpZ
-         ZO/OfjYUGp9Dne5SIbYYbadJ2mO4xeDbg24RxW/21glAVMMMKSogUYdD0zp/DKVyFg4u
-         pdx8OpuDKc0TTOjWjpBlSCzf1MkUjZof/cMMvrEHWFJ+L63Rhcyu7RmhezAMAPZloHC7
-         W4fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748556510; x=1749161310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rpJVcptDcpTpszgwiBlbfF17mFy9KW509xkzZ9NUjik=;
-        b=nOMd6SiZO1z4Tu7tRuirb0lXgZx1jd1jO5CyU2eAvbINkg7CaSLu3dRdnFNipu04Me
-         TNPAyBFeoCis5aUg/3XgZi2hQlISAwfFsTZLvL/Q+pWm99dhSepGxpdHEjBYExK1V/YV
-         dKaFowQs9z/OoGBzqmKkSuS4ennjObXp6iNR0whKztRcLwCympG0f062TVBN6rwpFlCY
-         S19+NWuuSXe6D2fnXe9OUiwWahNqeVD+YH7HLkUWKa4lLhE3GnBcB5TpTgrZA3VdzqV1
-         lGV9b+DEjgCnLUcSaKadurPKZIMzxk05mAH8AuB45DKSQGzIEAiYbimf5ZDJpEUKPcL3
-         Is/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUAQ8pbkFrAk07zJeQHBTkSsF+xnRBvRxRaDHGEXPoksGXZuRkyo2HEnK2BEndz4E32nbXm3MFfaPWOfAoB@vger.kernel.org, AJvYcCULq+o+pmpGHDjuVcwRPZ2Q9zlYGCx+UDw2N38vuHaIB/Cmfskpmi2CbfVZ1goUVPFrEa1YaNne7NVKxYQ=@vger.kernel.org, AJvYcCVQaDcgmS+9wYmzVw7Sskysn0iJir/OJJ03QQ92rSV2bg8ZOAOgOOD32aQYeiELheZaCpSPXVAy@vger.kernel.org, AJvYcCVjSgH9eZZ4bBxaaHurmGPO+TnsM1BO9HpSCwqdHxeUBXwynSKWpmM/NIt8QClHLdW0+YR2PudOZWp0K4dY6bKm@vger.kernel.org, AJvYcCVjcrECEaFBdZtolDUYuXDList+ZPWGUhGarBqPksaFr8ZTxXYFA7SeEfHKWBAi6+LOBwnSP193amY1/y1hXh8=@vger.kernel.org, AJvYcCXGcqIlnB0yF0pk27+sMe4aTiQ5hEjQrBPhEvVA4F1vW0CQcjSOZ5BnKxnC7chlzoPWwVvPB7CEgyp7@vger.kernel.org, AJvYcCXWYhrxbZ2M4QQkbMFx6EVTSC9NiZcdMMdSc+7bpD3hAtFK2hEEbtccub7NmsHae1oirLtmo3mpqVDe@vger.kernel.org
-X-Gm-Message-State: AOJu0Yylq/AdtOfHquUclaUDVUua7ynrBUy++jS57qF6FgD43kH2FjaF
-	/5PoqUU2H4CMnJeXBrxOKeW3FiskNQYH8LDDTOCAWaCv1DzmfvMebWGDo/CiCTnQUWl4+hfeTkt
-	HvY6OwG81Eh+Lh8t67zQjixgPX5uq78E=
-X-Gm-Gg: ASbGnctRZrHEbWRJum7HsqC0X96HB/oIBVp9ZHjuLOCGdGZ6Kxtnhrh/l42atafjbdt
-	JyiCEhInG3f4XZ1/mvHGI6Z0pr6Nrxwzwa+fYqA9DuLS3A0Soau663FJChqoWa9vA28NBPVxgts
-	DSrFx5BVGfsgOTZGd53lVAGuDxNV3yEIPjkjBGtFGhpHjh1s662pSmwop7F2DnTyWgXQ==
-X-Google-Smtp-Source: AGHT+IF7xscUHJvyGi+GvuMMKxSnSgP5AcyU3GpJtxmnO/5KSLUzYGntXscHYyM85fadDL0Kyjmy6YDgmBtNFpFE8dI=
-X-Received: by 2002:a2e:b8c6:0:b0:32a:8916:55a1 with SMTP id
- 38308e7fff4ca-32a8cd3fd89mr5150041fa.7.1748556509725; Thu, 29 May 2025
- 15:08:29 -0700 (PDT)
+	s=arc-20240116; t=1748557046; c=relaxed/simple;
+	bh=1hPrky66e3/pBa2VvJJm5Vz5kZ6x0TfV2He5hjvv2i4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=irPRC8BrV7E/q3bpnAuCUIX5mQUWTB6NZD0QDW1HySQj21Dfm2/uMr4deD22RzaOPgSiMyWlAH0c4ljIwF2AA3jUF5/ijBvgrNGnfCKlslv2NjoYEEAohgXspEtHObHFlpOm+B4uMxOa7amzBH54CUTSYJ/OQvjvznxLC9EeJh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=f7IeD/da; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54TC1OZc008024;
+	Thu, 29 May 2025 22:16:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	RJKYMfEYo39cQ3cuix/WIloDpQr/TS3nEp+iZYVSY6Y=; b=f7IeD/da0mGGcCho
+	3u8f7QYMyt6vzYB9xiLpMztMJTeHHn8p82byWpVvlYQ+dlnU93FqKanlRG+0OgOF
+	v/5uXlAVdtR4ZVgrNfoHfWZ2yBIzSP05hJ4ggA55X37p9Uym3syX473AlXbk/kSs
+	xH1+9rgQ6oviFMXBeWgfhe2kARliN2iZane+9hk6ZFATJrT10EplY1QNA8P7m7jF
+	fG0TYhkGoYNDdFusrUpP5Ebzj+oCOw4gTlTrZsHbre6bndwr04n7Eb+ybssBZ2UA
+	0l5MVn/XwcG1US6eGWdJwmYl7WfHHPAUMJ98WNj6uUXgRMUmESQEdpntmbp22Mk+
+	VWk0Og==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46whuf7f91-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 May 2025 22:16:55 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54TMGsIR005982
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 May 2025 22:16:55 GMT
+Received: from [10.110.61.81] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 29 May
+ 2025 15:16:54 -0700
+Message-ID: <090efb05-eb2b-4412-aa85-16df05ac9fb5@quicinc.com>
+Date: Thu, 29 May 2025 15:16:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250524-cstr-core-v10-0-6412a94d9d75@gmail.com>
- <20250524-cstr-core-v10-2-6412a94d9d75@gmail.com> <DA66BBX1PDGI.10NHLG3D4CIT7@kernel.org>
- <CAJ-ks9m48gmar0WWP9WknV2JLqkKNU0X4nwXaQ+JdG+b-EcVxA@mail.gmail.com>
- <DA6GSMHMLRFM.YH9RGZWLY2X4@kernel.org> <CAJ-ks9nTf4dCoDdg4+YSkXM1sJsZ-0vuSC7wybc2JMAoGemhXQ@mail.gmail.com>
- <DA78MDRNCNB8.X69904APMYCB@kernel.org>
-In-Reply-To: <DA78MDRNCNB8.X69904APMYCB@kernel.org>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 29 May 2025 18:07:52 -0400
-X-Gm-Features: AX0GCFu41pC0z7_KQ2CYQPyB1pil2qNhuH6L70S1ECJZkmQT9P0P8s6oLTTUl3c
-Message-ID: <CAJ-ks9=OsopMhr6Ui3PLD-ZkBo736ha9Ltkw=0ZaBzrQLC60Eg@mail.gmail.com>
-Subject: Re: [PATCH v10 2/5] rust: support formatting of foreign types
-To: Benno Lossin <lossin@kernel.org>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: platform: guarantee uniqueness of bus_id
+To: Paolo Abeni <pabeni@redhat.com>, Quentin Schulz <foss+kernel@0leil.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>
+CC: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>,
+        Heiko Stuebner
+	<heiko@sntech.de>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Quentin Schulz <quentin.schulz@cherry.de>
+References: <20250521-stmmac-mdio-bus_id-v1-1-918a3c11bf2c@cherry.de>
+ <b3e3293a-3220-4540-9c8b-9aa9a2ef6427@redhat.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <b3e3293a-3220-4540-9c8b-9aa9a2ef6427@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=OslPyz/t c=1 sm=1 tr=0 ts=6838dcd7 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8
+ a=8b9GpE9nAAAA:8 a=BsutULhaAlByaH852usA:9 a=QEXdDO2ut3YA:10
+ a=T3LWEMljR5ZiDmsYVIUa:22
+X-Proofpoint-ORIG-GUID: FqXj9uShaarui7_r20XQ1taVyCNbjujz
+X-Proofpoint-GUID: FqXj9uShaarui7_r20XQ1taVyCNbjujz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI5MDIxNyBTYWx0ZWRfXxQnPZ4KrEtMi
+ 76F7Sye4rfTbUzYzlmMcrx5NFjMyGgl+4zUIl6J3ExIeoP1EdZDIfYkuBzGb/AUIfAqn6s21Zjo
+ N3rQn0f+KbaEjzBV9paCw7neiRe3Y4ngAemXFP7L0AcZ0VhXxSyc6omd6Qkr8CYXI35MUmzjRwh
+ VgiE3aIvoBdKQBXupHH1ybtJqigHrds/hytCA8ZTCmDpLm0dqFlTbdGzQ6BpSThnAe0cYRea1hI
+ fsuiWSdO9j9uhfx+8KEHqlp9KF3E1SAWZi3LP8rP19Ing9hOYkNmaoi+v9ZMPCIWJhKP2uWZg4x
+ RZBInWDOqtwReudghgt8YugHkhfQrSyuz5skcFI2TbEyCyMmsus8E8Ic4aBjkAfvpHSeyv3hCrh
+ sdNfCEGkf9wNrt8wGpcKIkDCwza6Pl5L8AQnBrfFSywCeGZRy3X9l5p7Pzov4nGD50rai/aN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-29_10,2025-05-29_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 phishscore=0 mlxlogscore=969 adultscore=0 malwarescore=0
+ bulkscore=0 priorityscore=1501 clxscore=1011 mlxscore=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505290217
 
-On Tue, May 27, 2025 at 4:49=E2=80=AFPM Benno Lossin <lossin@kernel.org> wr=
-ote:
->
-> On Tue May 27, 2025 at 5:02 PM CEST, Tamir Duberstein wrote:
-> > On Mon, May 26, 2025 at 7:01=E2=80=AFPM Benno Lossin <lossin@kernel.org=
-> wrote:
-> >> On Tue May 27, 2025 at 12:17 AM CEST, Tamir Duberstein wrote:
-> >> > On Mon, May 26, 2025 at 10:48=E2=80=AFAM Benno Lossin <lossin@kernel=
-.org> wrote:
-> >> >> On Sat May 24, 2025 at 10:33 PM CEST, Tamir Duberstein wrote:
-> >> >> > +impl_display_forward!(
-> >> >> > +    bool,
-> >> >> > +    char,
-> >> >> > +    core::panic::PanicInfo<'_>,
-> >> >> > +    crate::str::BStr,
-> >> >> > +    fmt::Arguments<'_>,
-> >> >> > +    i128,
-> >> >> > +    i16,
-> >> >> > +    i32,
-> >> >> > +    i64,
-> >> >> > +    i8,
-> >> >> > +    isize,
-> >> >> > +    str,
-> >> >> > +    u128,
-> >> >> > +    u16,
-> >> >> > +    u32,
-> >> >> > +    u64,
-> >> >> > +    u8,
-> >> >> > +    usize,
-> >> >> > +    {<T: ?Sized>} crate::sync::Arc<T> {where crate::sync::Arc<T>=
-: fmt::Display},
-> >> >> > +    {<T: ?Sized>} crate::sync::UniqueArc<T> {where crate::sync::=
-UniqueArc<T>: fmt::Display},
-> >> >> > +);
-> >> >>
-> >> >> If we use `{}` instead of `()`, then we can format the contents
-> >> >> differently:
-> >> >>
-> >> >>     impl_display_forward! {
-> >> >>         i8, i16, i32, i64, i128, isize,
-> >> >>         u8, u16, u32, u64, u128, usize,
-> >> >>         bool, char, str,
-> >> >>         crate::str::BStr,
-> >> >>         fmt::Arguments<'_>,
-> >> >>         core::panic::PanicInfo<'_>,
-> >> >>         {<T: ?Sized>} crate::sync::Arc<T> {where Self: fmt::Display=
-},
-> >> >>         {<T: ?Sized>} crate::sync::UniqueArc<T> {where Self: fmt::D=
-isplay},
-> >> >>     }
-> >> >
-> >> > Is that formatting better? rustfmt refuses to touch it either way.
-> >>
-> >> Yeah rustfmt doesn't touch macro parameters enclosed in `{}`. I think
-> >> it's better.
-> >
-> > OK, but why? This seems entirely subjective.
->
-> If more types are added to the list, it will grow over one screen size.
-> With my formatting, leaving related types on a single line, that will
-> only happen much later.
->
-> >> >> > +/// Please see [`crate::fmt`] for documentation.
-> >> >> > +pub(crate) fn fmt(input: TokenStream) -> TokenStream {
-> >> >> > +    let mut input =3D input.into_iter();
-> >> >> > +
-> >> >> > +    let first_opt =3D input.next();
-> >> >> > +    let first_owned_str;
-> >> >> > +    let mut names =3D BTreeSet::new();
-> >> >> > +    let first_lit =3D {
-> >> >> > +        let Some((mut first_str, first_lit)) =3D (match first_op=
-t.as_ref() {
-> >> >> > +            Some(TokenTree::Literal(first_lit)) =3D> {
-> >> >> > +                first_owned_str =3D first_lit.to_string();
-> >> >> > +                Some(first_owned_str.as_str()).and_then(|first| =
-{
-> >> >> > +                    let first =3D first.strip_prefix('"')?;
-> >> >> > +                    let first =3D first.strip_suffix('"')?;
-> >> >> > +                    Some((first, first_lit))
-> >> >> > +                })
-> >> >> > +            }
-> >> >> > +            _ =3D> None,
-> >> >> > +        }) else {
-> >> >> > +            return first_opt.into_iter().chain(input).collect();
-> >> >> > +        };
-> >> >>
-> >> >> This usage of let-else + match is pretty confusing and could just b=
-e a
-> >> >> single match statement.
-> >> >
-> >> > I don't think so. Can you try rewriting it into the form you like?
-> >>
-> >>     let (mut first_str, first_lit) match first_opt.as_ref() {
-> >>         Some(TokenTree::Literal(lit)) if lit.to_string().starts_with('=
-"') =3D> {
-> >>             let contents =3D lit.to_string();
-> >>             let contents =3D contents.strip_prefix('"').unwrap().strip=
-_suffix('"').unwrap();
-> >>             ((contents, lit))
-> >>         }
-> >>         _ =3D> return first_opt.into_iter().chain(input).collect(),
-> >>     };
-> >
-> > What happens if the invocation is utterly malformed, e.g.
-> > `fmt!("hello)`? You're unwrapping here, which I intentionally avoid.
->
-> That example won't even survive lexing (macros always will get valid
-> rust tokens as input). If a literal begins with a `"`, it also will end
-> with one AFAIK.
->
-> >> Yes it will error like that, but if we do the replacement only when th=
-e
-> >> syntax is correct, there also will be compile errors because of a
-> >> missing `Display` impl, or is that not the case?
-> >
-> > I'm not sure - I would guess syntax errors "mask" typeck errors.
->
-> I checked and it seems to be so, that's good.
 
-=F0=9F=91=8D
 
->
-> >> >> > +                    first_str =3D rest;
-> >> >> > +                    continue;
-> >> >> > +                }
-> >> >> > +                let name =3D name.split_once(':').map_or(name, |=
-(name, _)| name);
-> >> >> > +                if !name.is_empty() && !name.chars().all(|c| c.i=
-s_ascii_digit()) {
-> >> >> > +                    names.insert(name);
-> >> >> > +                }
-> >> >> > +                break;
-> >> >> > +            }
-> >> >> > +        }
-> >> >> > +        first_lit
-> >> >>
-> >> >> `first_lit` is not modified, so could we just the code above it int=
-o a
-> >> >> block instead of keeping it in the expr for `first_lit`?
-> >> >
-> >> > As above, can you suggest the alternate form you like better? The
-> >> > gymnastics here are all in service of being able to let malformed
-> >> > input fall through to core::format_args which will do the hard work =
-of
-> >> > producing good diagnostics.
-> >>
-> >> I don't see how this is hard, just do:
-> >>
-> >>     let (first_str, first_lit) =3D ...;
-> >
-> > It requires you to unwrap, like you did above, which is what I'm
-> > trying to avoid.
->
-> How so? What do you need to unwrap?
+On 5/26/2025 1:26 PM, Paolo Abeni wrote:
+> On 5/21/25 5:21 PM, Quentin Schulz wrote:
+>> From: Quentin Schulz <quentin.schulz@cherry.de>
+>>
+>> bus_id is currently derived from the ethernetX alias. If one is missing
+>> for the device, 0 is used. If ethernet0 points to another stmmac device
+>> or if there are 2+ stmmac devices without an ethernet alias, then bus_id
+>> will be 0 for all of those.
+>>
+>> This is an issue because the bus_id is used to generate the mdio bus id
+>> (new_bus->id in drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+>> stmmac_mdio_register) and this needs to be unique.
+>>
+>> This allows to avoid needing to define ethernet aliases for devices with
+>> multiple stmmac controllers (such as the Rockchip RK3588) for multiple
+>> stmmac devices to probe properly.
+>>
+>> Obviously, the bus_id isn't guaranteed to be stable across reboots if no
+>> alias is set for the device but that is easily fixed by simply adding an
+>> alias if this is desired.
+>>
+>> Signed-off-by: Quentin Schulz <quentin.schulz@cherry.de>
+> 
+> I think no need to CC stable here, but you need to provide a suitable
+> fixes tag, thanks!
+> 
+Quentin to make your life easy. 
+It fixes this patch 
+https://lore.kernel.org/lkml/1372930541-19409-1-git-send-email-srinivas.kandagatla@st.com/
+dt:net:stmmac: Add support to dwmac version 3.610 and 3.710
+It goes back in time to 2013 when this bus_id was introduced through dts
 
-I was referring to your unwraps above.
-
-> >> >> > +    };
-> >> >> > +
-> >> >> > +    let first_span =3D first_lit.span();
-> >> >> > +    let adapt =3D |expr| {
-> >> >> > +        let mut borrow =3D
-> >> >> > +            TokenStream::from_iter([TokenTree::Punct(Punct::new(=
-'&', Spacing::Alone))]);
-> >> >> > +        borrow.extend(expr);
-> >> >> > +        make_ident(first_span, ["kernel", "fmt", "Adapter"])
-> >> >> > +            .chain([TokenTree::Group(Group::new(Delimiter::Paren=
-thesis, borrow))])
-> >> >>
-> >> >> This should be fine with using `quote!`:
-> >> >>
-> >> >>     quote!(::kernel::fmt::Adapter(&#expr))
-> >> >
-> >> > Yeah, I have a local commit that uses quote_spanned to remove all th=
-e
-> >> > manual constructions.
-> >>
-> >> I don't think that you need `quote_spanned` here at all. If you do, th=
-en
-> >> let me know, something weird with spans is going on then.
-> >
-> > You need to give idents a span, so each of `kernel`, `fmt`, and
-> > `adapter` need a span. I *could* use `quote!` and get whatever span it
-> > uses (mixed_site) but I'd rather retain control.
->
-> Please use `quote!` if it works. No need to make this more complex than
-> it already is. If it doesn't work then that's another story.
-
-Let's adjudicate that on v11, where you can see the code.
+> Paolo
+> 
+> 
 
