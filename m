@@ -1,183 +1,212 @@
-Return-Path: <netdev+bounces-194182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416DBAC7B8F
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:06:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12C3AC7B92
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F5603BF0BB
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:06:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4556B9E776F
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9692192FC;
-	Thu, 29 May 2025 10:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371ED26C39F;
+	Thu, 29 May 2025 10:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="Vy/UBudZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NpXCFFNd"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="VkvV1raF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313FC126BFA
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 10:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C0FA55
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 10:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748513213; cv=none; b=AvCTIDsjiVazGSlc2LIfUJPKJ3gBPA9UX2QLgIjgTznO9ho2+xCl0ncuYE4RBNJd3Ri+61xQXcJSkql7vdt2gJL6ghkcl6oUXKpy1ZtlKg9IoiSChNCJMqQlwChTcoAf5Oi9LRK+l/X5a5M3PwC7N+SgINb5Iwomab5YsZxpttQ=
+	t=1748513276; cv=none; b=WP0/sS4RokwIYsfEAyWuxwDcRlBgrceHbuAYbDCv7BFn4svkEpia/LWS6js0NurxrLBbQZZZDAZn9z5BSVt/gVLMBv9Z6SH8QD1xSlmhIcJkcCBa7aC0aOTQCGPh++qTuak8iyxXMCpguJdNRQtvodd+FKGrPY1zslywocYyQY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748513213; c=relaxed/simple;
-	bh=0G/ILYB2PqMFDGErO2U9mjJXhAorxEsFDGkVKcaJvJ8=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Q8PF39kXkjmBKdkLxb1x6H2u/LgAuQHC/lCbOoyPvhPUqOotQ4ZjNd9lSGVF5wWbeACHdL35UimbPwnnh5uQADKbGrffpXafzoX/eOj6oAN+jVSwftfSfThdNc9HswHp4hdVVmxilJ1FgscTwY9HeKlPtsfikIQW6qU2T6MFDGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=Vy/UBudZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NpXCFFNd; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id D2F712540123;
-	Thu, 29 May 2025 06:06:49 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 29 May 2025 06:06:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1748513209;
-	 x=1748599609; bh=NkIXmjzuG7XBINeCIJ1Liayu2reOgNOH0xcQA7X0zbk=; b=
-	Vy/UBudZWyc6c7E5/IiWs2/8LblKg03se0xQyE9pmRsTv0ftloA42Olll7HB/LhG
-	rtyq7tsG/K28zCCdb26cmqBfz/GqB+xwJ4EF1ROParzP95uOdBSuymmqXs/Fki4n
-	lKW/2zKwowJAMKRPt8HzQqv0uo2dXi+m0BlPUE+QSRlzI44MmEf3QoXp/sJe6flR
-	QCx2sT6qATtC+StZ73POsGEsSdo3/FDFQrnDFO6PcdQM0T9s1nUaGyTjKt+eA1EN
-	uGv+D2PIkQ4KiTRBHMUzzYhbamAOW94mVuM80Uek91PycnKcwfVZOosrN+qU2dJ3
-	8DA5uoD7rEJRVjUbQO0OFA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748513209; x=
-	1748599609; bh=NkIXmjzuG7XBINeCIJ1Liayu2reOgNOH0xcQA7X0zbk=; b=N
-	pXCFFNdQgAqwo8rPNqK79G9AkkmXwB7T7cB0APOcArUdbclygqjQPO9t0ZuuZTKZ
-	/rZCJclqo1CwX/bXsXL+KjwIq2qAodRD9MkfYIelLe0cYxTEEoAZZmzzyA9N+RPn
-	SobXYtF8ZKRP4NUf9uFqmTy6H2zN73oQ1Dw4riebUFjsaTck+ZRcBft+cIgi2sl0
-	paxUm71rv3BQLnHOBn3S8dipc93YI6tUl7Fu3JkbDsGWXQW3DbB4xhlXBnntZd1A
-	9m1OJiaWFvW1m0Mj43V6bo7jMFtWEdug41Xm3nJneX0Py66Bm3DdpKbNlVDvnp5K
-	TtM0sZ6i4KTOsFLnBlpsw==
-X-ME-Sender: <xms:uTE4aKUoq3xNz4s9HIweJWmP_yTQRRS1LeHJAgZQgvZdk_y1kkVxHw>
-    <xme:uTE4aGmodrGgP3Jg4Vf9qMGK2ZnRTPP803FxWo8XmWI54b5UaJsDfQ8n5H8PDvqg3
-    cY9mc2o-Tuzf1AnD7w>
-X-ME-Received: <xmr:uTE4aOZiAHFFcYzUhiVHJXByHycZSIz71Q-ToJEPZ_ZCv1aiE7OEfwohWBCgGg9vWjzLHRLEYp4Wkk0Das6gOs81-aSBJhvEHWxyLUckp6cI3A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvheekheculddtuddrgeefvddrtd
-    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
-    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
-    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
-    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
-    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnheptefh
-    leekteffhedtgeekudeivefhgfevtedvgedtjefhffejteelgeethfevhfdunecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
-    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
-    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
-    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
-    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
-    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
-    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
-    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
-    sggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:uTE4aBUs8FoZpKaMf-C4eUJNAG8Y2yq5SbprcdeufzDy6NRq5NG0OA>
-    <xmx:uTE4aElnfZWPfXNmQMEbCg557y5bKcCa274LXyXOX4xRlbvVwSruSg>
-    <xmx:uTE4aGcsY1edgPgv8xk63s_hPo1AkfVBv3e5hvLlj5Rm9yiYDn8FRA>
-    <xmx:uTE4aGEDsALlSRckp_PkHmX4yl609HzS5BvZKgB4QtOTGmNq2SO-dA>
-    <xmx:uTE4aFvcg-E8MS6Pw-g7N_-LDIwBVo_8HVFXHWwZzt8Y_dGoWocRTrGW>
-Feedback-ID: i583147b9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 29 May 2025 06:06:47 -0400 (EDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1748513276; c=relaxed/simple;
+	bh=vX0MYWr9lXGTyMmatholoQSj4K1CgBawIO/sPx0uxtQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cEuLwJ0ML/uwUbr9olgW5ju+wwFrz6qiuCsM0bkw15f+FBSJnb7CX/7lU8RbTVbCrM1KETvoK5Zj6GlRwl1814JN0XPinAI8tGSLEISrgAdZLWC9NeT9J25KySfCCEwMjID88DrlNYh1iTCi8Rksm72W/RMKxpgKXm8IAuv5u5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VkvV1raF; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac34257295dso127394466b.2
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 03:07:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1748513271; x=1749118071; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MJXdIsXIXQV46lIrJRlHtK1bHIDmLx8yks1lM3bDqro=;
+        b=VkvV1raF0SBbBdPrwYWiSHG2ChiHWJ60jVRoQyS5p/s8wkSSUKjVWCceHF4qo+3Gb5
+         Q1YMukTtoH/yFVHqCI0CEkALDcHt19qz7Eq7nHbc4vF4ub+trN8OPVlv2M0w3g/Ctn/y
+         3UWn3V5FPO3I9Yfnfna7t7t0d21cvxP8uSlC9cnJH7FmIQ/bZ4O+ethKL4jwqLUjyirq
+         tY+GXTkciklp8EtkJi5yvHaNZkkCtnpoRyl+LVymXchXlAfIS6cKIQpRuo3iz/JXEyjs
+         F4vhT104dDSoVj69HoQTTyyU5wPGRe6abITvt8PRqOBQDhUiruhZVQsanT9PU6tE4koy
+         XrXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748513271; x=1749118071;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MJXdIsXIXQV46lIrJRlHtK1bHIDmLx8yks1lM3bDqro=;
+        b=hu6y1DKvyg8gjrvNlm6vEsS+PuD4rwA8u8dRJiTB84Zidrot3zsmlBxlLZkAFojXbP
+         whoM/3WdlDtm4BBnk8yWYl/9XAhgp5xzCWIb8k/FUMgYpCVfv58qZGf16UUG7TJGLY4j
+         KC2v2S6tSs4DPTT9Sb47iaXb4kmz0PLa/+aocNpWm+9wDL+hyJGjkE9SLTFmWCe2V0iB
+         GyofVc/yJXShn0c1389gA66Tt0jFt69H2tHpXdKnM1G/+W4JPSxOAY56u4fzmmYale6O
+         9O4md24OYszr2UV3AVVr0Avv/0pyUn1JupTCyf4DRRbO7pYKQdemWLo6T2wHPmOEFBKZ
+         hcHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+bw2iNdq64dyHvPtnt0xaeCE5948AEnurBoHXce62T1X1TVLzuoZUpoRfhaQ4Hen7g5Fw6oU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziOn/IGISmQP2/mfvhhdn3JdC5QaJxE6t0EvVbdZ6LLPMY+1mN
+	LdipOW9HK60Tg4kc2u8P3NwzqNQ0IDDhfa7EtxOX3ckDri2gn5EJSZ5rgWjpys4ByBkEjJ+X386
+	A9P50rjGUEHxfKo4NaCVbkKRhJLDK8q/+PuHNcnGIsgXAct5+PY4=
+X-Gm-Gg: ASbGncuqM8JTADBQTVdJTCX84xDio0PAcsqxLniXDBQ2quj/hAD7btXw+DWanft3/ZG
+	RV7+6M691bf99l7P82k5lpVec58a2FWZftcGKUNx/qkwOgRnXEYDjuHjkn7VBWYUsAzf/ik4DsL
+	AhOHwfhXNO8IGf1vNiS9t+QJ//MlgQaVlePXiXhCKsK6Dp3rNzfA+TlAtDwAmMZOPNwOVkX4EVl
+	KyYeSjOAvkD0oKvhLxKYgC98M6oFK3cOT2unsCP941/wX54wbtGIJm7zDBiWUWkJViItulmBa67
+	gfW7OIvj56fv7ZYZ/+qiyu1uxegArWhcFVdcX0AZXQR6V7YcmvIHvbfGDE6QiW4OMRWjBqariuO
+	GGqN0GFclXwis1A==
+X-Google-Smtp-Source: AGHT+IGsgK6Poz5ttfZaCo7JuuXDz65rHWteHyROA0tk2+PFgZ5fVhwrSw3cK5PTyyZumTevGjYptA==
+X-Received: by 2002:a17:907:f1d1:b0:ad8:9e80:6b9f with SMTP id a640c23a62f3a-ad89e8079fbmr645790966b.15.1748513270764;
+        Thu, 29 May 2025 03:07:50 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:d079:e260:1678:9b60? ([2001:67c:2fbc:1:d079:e260:1678:9b60])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d7febffsm114278266b.2.2025.05.29.03.07.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 May 2025 03:07:50 -0700 (PDT)
+Message-ID: <736d1f6d-1b07-4671-857d-a0841828fce1@openvpn.net>
+Date: Thu, 29 May 2025 12:07:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-From: Ricard Bejarano <ricard@bejarano.io>
-In-Reply-To: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
-Date: Thu, 29 May 2025 12:06:45 +0200
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
- netdev@vger.kernel.org,
- michael.jamet@intel.com,
- YehezkelShB@gmail.com,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <48EE4097-8685-47D1-8C20-EE18A147A020@bejarano.io>
-References: <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
- <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
- <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
- <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
- <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
- <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
- <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
- <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] ovpn: ensure sk is still valid during
+ cleanup
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Qingfang Deng <dqfext@gmail.com>, Gert Doering <gert@greenie.muc.de>
+References: <20250527134625.15216-1-antonio@openvpn.net>
+ <20250527134625.15216-3-antonio@openvpn.net>
+ <d9cbe73c-1895-42d7-8c21-70487773c94f@redhat.com>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <d9cbe73c-1895-42d7-8c21-70487773c94f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-So here's what I've observed about tbnet_xmit_csum_and_map after =
-sprinkling
-counters all over it and running various tests:
+On 29/05/2025 11:44, Paolo Abeni wrote:
+> On 5/27/25 3:46 PM, Antonio Quartulli wrote:
+>> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+>> index bea03913bfb1..1dd7e763c168 100644
+>> --- a/drivers/net/ovpn/netlink.c
+>> +++ b/drivers/net/ovpn/netlink.c
+>> @@ -423,9 +423,14 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
+>>   	ovpn_sock = ovpn_socket_new(sock, peer);
+>>   	/* at this point we unconditionally drop the reference to the socket:
+>>   	 * - in case of error, the socket has to be dropped
+>> -	 * - if case of success, the socket is configured and let
+>> +	 * - if case of success, the socket is configured and we let
+>>   	 *   userspace own the reference, so that the latter can
+>> -	 *   trigger the final close()
+>> +	 *   trigger the final close().
+>> +	 *
+>> +	 * NOTE: at this point ovpn_socket_new() has acquired a reference
+>> +	 * to sock->sk. That's needed especially to avoid race conditions
+>> +	 * during cleanup, where sock may still be alive, but sock->sk may be
+>> +	 * getting released concurrently.
+> 
+> This comment duplicate some wording from commit message contents and
+> don't add much value IMHO. It could be dropped.
 
-1. skb->ip_summed is never !=3D CHECKSUM_PARTIAL, so we never execute =
-L1004-L1014.
+ACK
 
-2. protocol is always =3D=3D htons(ETH_P_IP), so we:
-     2.1. Never execute L1021-L1027.
-     2.2. Always execute L1036-L1051. And specifically, we execute L1045 =
-N+1
-          times per iperf3 test (where N is the total packets sent as =
-reported
-          by iperf3), meaning those are ip_hdr(skb)->protocol =3D=3D =
-IPPROTO_UDP;
-          and L1043 a total of 14 times (2 times 7, interesting), =
-meaning those
-          are ip_hdr(skb)->protocol =3D=3D IPPROTO_TCP. =46rom other =
-iperf3 UDP test
-          packet captures I'm confident these 14 TCP packets are iperf3 =
-control
-          plane things, like the cookie, a couple JSONs with test =
-metadata, etc.
-     2.3. Never execute L1052-L1064.
+> 
+>> @@ -192,19 +189,30 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
+>>   		rcu_read_unlock();
+>>   	}
+>>   
+>> +	/* increase sk refcounter as we'll store a reference in
+>> +	 * ovpn_socket.
+>> +	 * ovpn_socket_release() will decrement the refcounter.
+>> +	 */
+>> +	if (!refcount_inc_not_zero(&sk->sk_refcnt)) {
+> 
+> How could sk_refcnt be zero here? likely just sock_hold() is sufficient.
+> Also I think the reference could be acquired a little later, avoiding at
+> least the following chunk.
 
-3. Once again, both lossless and lossy tests share the same execution =
-pattern.
-   There's not a single logic branch of tbnet_xmit_csum_and_map that is =
-only
-   executed when there's loss.
+I just wanted to be safe.
+But as you point out I don't see any reason why sk_refcnt would be 0 at 
+this point in time.
 
-It's interesting, however, that the number of TCP packets is exactly =
-twice that
-of the number of non-linear sk_buffs we saw in tbnet_start_xmit. Not =
-that it's
-suspicious, if anything (and because we see those TCP packets in blue) =
-it tells
-us that the handling of non-linear skbs is not the problem in =
-tbnet_start_xmit.
-But why twice? Or is this a red herring?
+If we don't have to check the return value, I can definitely postpone 
+the sock_hold() a bit more.
+
+> 
+> Also IMHO the comment is not very clear. I think it should state
+> explicitly which entity is retaining the reference (AFAICS the peer hash
+> table).
+
+Ok, I will elaborate a bit more.
+Essentially: sk -> ovpn_socket -> ovpn_peer -> peer hash
 
 
-I'm running out of ideas, tbnet_xmit_csum_and_map looks good to me, and =
-so do
-tbnet_kmap_frag and tbnet_start_xmit. I'm going to explore a bit of the =
-Rx side
-instead.
+Thanks a lot!
+Regards,
 
-Any suggestions?
+> 
+> /P
+> 
 
-Thanks,
-RB
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
