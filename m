@@ -1,185 +1,134 @@
-Return-Path: <netdev+bounces-194090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50DCAC74CA
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:04:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8198AC74CC
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96902188BF1A
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 00:04:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F522188BAC4
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 00:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4931D1362;
-	Thu, 29 May 2025 00:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468811362;
+	Thu, 29 May 2025 00:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yq05mI+E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtBcq3Uf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD48810E4;
-	Thu, 29 May 2025 00:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212C6647
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 00:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748477053; cv=none; b=Gl/2oxQw4vYDU7z5NE+wVe9VCfVwD5u20iUZ13x6Ou93EZCGq6jKdQTo82id3mZTKGotTrX3uc/w4xsIYeZlR+jHebQnZQIeO23YrIreXiRTcGM4xcCzwOah4AwqPohIqAWb650m69FToVGG/IJgd/3aGLJZcgCRguVwCDpDZqs=
+	t=1748477085; cv=none; b=aXeb6GGOXUyx2qvbgLDtUrqVHNl/JZmp1m3S9xoduxiQ4Owqz1/+vjMu5MYHL+uYdd/VxcWCOiRF75WbRAtpAsdB5SfK62Shg/+7vGpgGr/N0o07IwZiC7Yh6Pm21XrpgAhzDxjFhEyIRnBUTifA7uPg9e0TdGa6i/TTK1Cetws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748477053; c=relaxed/simple;
-	bh=oSSHNpPzsj1rOzfn00+b1MZqPrYhvc+fMQvVQmUS18o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GT6rh2eTUtX8gNUwpfEenPA7hX2yN5uUNs/AllAeElIhV7+fNDdJtbWiD8jpT/G05srwaAMTPlla9FkSZ8F+ZjtJmfaB5VY5mSyAkA/LbGoPW3YYZcSLRuIdgoRVdiTkDsiV7j2esONTtIJA4YaFGATXnVZmhQJWnUmqV3Nww30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yq05mI+E; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-231e98e46c0so3629905ad.3;
-        Wed, 28 May 2025 17:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748477051; x=1749081851; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i+ZfYC+HxLPw3qSKUcJstolHkzilJWLIqOV2x8aXzBY=;
-        b=Yq05mI+E6sO92cQ0Y/sEDXBiaHoGtzHT4FNhO4PMV/a2sAa1S9R3+nfBz1BHW1Y4OS
-         5hYgAPLKVAr1OrgqDglxQAM9R0V44MINnzNTI7Q3TEKbI4sLsFuZlCUY6igswqK4qvrm
-         N3eGdn4JlxODV7BbZyX3v+4MEp+UNvcfdaLOjo/kQseVM0n0x+N1oOjj/60s3wKgfQfC
-         osW50EUwIbt+SD6h5X9Qg8KmielvzB9DoIZ4QOPAOBTKJ6oBA0UiyWhrNKq2WLHF5CAm
-         MefeYSmF+A8YKI8snu5fzgjbsuSlHWixHLNfn8zMBdXFUn4oZ+2lafDLAxLDECOgkDy+
-         oAfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748477051; x=1749081851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i+ZfYC+HxLPw3qSKUcJstolHkzilJWLIqOV2x8aXzBY=;
-        b=dCu8Ke4P1pJTSAEORqgRxZyaF/orAG9MjIgZVbl3Qmob3kXFbRAKPhhyK/tHTFmVYd
-         1pryQeLQED2IuqNBdsYg4NcjIArsJgWN+jORiK8v6pKFrhuof+Ka9K2HnbAnRDE5Idht
-         yzMD2NRnNA2sFlvppt57KXQWFRdehzR8uFK4iM8J1i036k+GQfX58ZJ+jXCqZn8T3wyz
-         KCzjroGMlADlJPVUDLJSoumtxFppWjiEWkEpDGwfys9QeKKYPRjp10UvcciMA7Cct6bE
-         67tUvLOJburxc9vdMk8biEoBmcQTssw6uLrnPXrC0g5MkJm3Shrkoqtb9m2O6CN+lloJ
-         7dAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUceWSew3fyvT6y73TeLe/ZgpEAoaPAU88JPSCtCepQEYreObvuLUdYozcwDIfYUtYpUMo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb2FykQF4z53EF6F95h8u13RX6ILWL9x2XIRWxipDOKBRRSEpT
-	U8vOcPJwwL8t1Z1ezN/H2jXy+5jC7oZ0d6Ujs34yxT8/2ARksVPm7RAdXo2CcA==
-X-Gm-Gg: ASbGnctUBGGwcyYh346nOBXziVZPEm/1ONOh8nWaKu2siQQ+OXmHB8QEDVekXH6PMgH
-	Z28WqMLsyRV4U2rOHIWxcZ4QFTDREbRc5M+v4XnumNWSqo+VrBRQdodKfKyc7LnJ2W1IrTmr7eJ
-	boO74C07zBzcbLCAfhrkjWUVzK4tr5Ge20LiWsiJqPfJCRtDOf2UyO6uCc9e3+E05J8AT0fPOUU
-	RBDLgUUkejFCFxwsM1nENJdEyFwsckzkIPXseOnUc514uZpRCxrj73DYsAnh2HlC7F/j1prMNaf
-	HSFRzxZO6gJUe3xgQh4bxbqh7DT8UE0mv1wAXlwPwQvup+uj3diy
-X-Google-Smtp-Source: AGHT+IFIsUJXzE6cpHqD9iAzsUlj4Z9xIb0cR6MAJH+p4Bq6pd53TrwevVEtUuSFDeR4I7Zaa/H3Zw==
-X-Received: by 2002:a17:903:1b6d:b0:231:f064:aae8 with SMTP id d9443c01a7336-23414fc7276mr285356495ad.45.1748477050862;
-        Wed, 28 May 2025 17:04:10 -0700 (PDT)
-Received: from gmail.com ([98.97.34.246])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bc86c2sm1587855ad.43.2025.05.28.17.04.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 17:04:10 -0700 (PDT)
-Date: Wed, 28 May 2025 17:04:05 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
-	jakub@cloudflare.com, zijianzhang@bytedance.com,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [Patch bpf-next v3 2/4] skmsg: implement slab allocator cache
- for sk_msg
-Message-ID: <20250529000348.upto3ztve36ccamv@gmail.com>
-References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
- <20250519203628.203596-3-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1748477085; c=relaxed/simple;
+	bh=s+opDjxwmv4wxDImpo5hlVGcKr2jceGq14J6mRgLkwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S14sMoNpcIDKVvFCsuCOxlTx+Pz/bF/MiTah9zbxYZThKLbOmRGexHO5uQBfjp4GH/VGyorpRcyvIu696QiGSwDZ4+1YmSKREH/Z7p5lbKG//7CbSavbdLknl8wPMr110P4XwBM6492is6EsSJgQvvAxtbfvkvXUldz4n03k/qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtBcq3Uf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DDD0C4CEE3;
+	Thu, 29 May 2025 00:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748477083;
+	bh=s+opDjxwmv4wxDImpo5hlVGcKr2jceGq14J6mRgLkwE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gtBcq3Uf6xE18ycwntj73OG+KYl0yGYkigOjLl4L0MeJljKlDGTWht40pgIxda30Q
+	 BRpohIc3SAxHcfeK71vX+KL7iKQqef7Kr2zhaPw0tpNcmlc/Ow+SN/cY3T25Ku82uN
+	 h0khjYXcwcTInnxDzJOk80QxI05lEBm5BCHrkbOFuneTHG4y9VCLNWsHBlYsZUTHyR
+	 0p2VfKdNHFhhkPBqoIG7mMztwsU6vAmZTkXIxWJTjX7lBMDUGt/87F3a+ctMFUSrm0
+	 go/5jIStmcqSHislFourfnUmBbvxdxjuWMyZC2EatOohm1XNtQQk0o+p3IetdWxqSm
+	 bl2lb2eYN68LQ==
+Date: Wed, 28 May 2025 17:04:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Wei Wang <weiwan@google.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, jdamato@fastly.com,
+ mkarsten@uwaterloo.ca, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: stop napi kthreads when THREADED napi
+ is disabled
+Message-ID: <20250528170442.160f6f99@kernel.org>
+In-Reply-To: <CAAywjhScfevLxYho-wxU6WNF+0VpwngW8MzZjpx1HQ83NTXUDw@mail.gmail.com>
+References: <20250519224325.3117279-1-skhawaja@google.com>
+	<20250520190941.56523ded@kernel.org>
+	<CAEA6p_BxSA16cMXr5NaJCLZ+KWD2YVVwEdvVX_QG=_gyvNCP=w@mail.gmail.com>
+	<CAAywjhR4znr9fsAdBKmYAwcyP8JgoesLkuS8p9D0goJBFFePWg@mail.gmail.com>
+	<CAAywjhTjdgjz=oD0NUtp-k7Lccek-4e9wCJfMG-p0AGpDHwJiQ@mail.gmail.com>
+	<20250521152147.077f1cb0@kernel.org>
+	<CAAywjhScfevLxYho-wxU6WNF+0VpwngW8MzZjpx1HQ83NTXUDw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250519203628.203596-3-xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025-05-19 13:36:26, Cong Wang wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
+On Wed, 21 May 2025 15:50:19 -0700 Samiullah Khawaja wrote:
+> > Just to be clear - the stopping of the thread has to be after the
+> > proposed loop, so kthread_should_stop() does not come into play.  
+> Wait, the thread will unset STATE_THREADED if kthread_should_stop is
+> true. right? Otherwise how would thread know that it has to unset the
+> bit and stop?
 > 
-> Optimizing redirect ingress performance requires frequent allocation and
-> deallocation of sk_msg structures. Introduce a dedicated kmem_cache for
-> sk_msg to reduce memory allocation overhead and improve performance.
+> As I understand, we should be doing something like following:
 > 
-> Reviewed-by: Cong Wang <cong.wang@bytedance.com>
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> ---
->  include/linux/skmsg.h | 21 ++++++++++++---------
->  net/core/skmsg.c      | 28 +++++++++++++++++++++-------
->  net/ipv4/tcp_bpf.c    |  5 ++---
->  3 files changed, 35 insertions(+), 19 deletions(-)
+> while (true) {
+>    state = READ_ONCE()
+>    can_stop = false;
 > 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index d6f0a8cd73c4..bf28ce9b5fdb 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -121,6 +121,7 @@ struct sk_psock {
->  	struct rcu_work			rwork;
->  };
->  
-> +struct sk_msg *sk_msg_alloc(gfp_t gfp);
->  int sk_msg_expand(struct sock *sk, struct sk_msg *msg, int len,
->  		  int elem_first_coalesce);
->  int sk_msg_clone(struct sock *sk, struct sk_msg *dst, struct sk_msg *src,
-> @@ -143,6 +144,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
->  		   int len, int flags);
->  bool sk_msg_is_readable(struct sock *sk);
->  
-> +extern struct kmem_cache *sk_msg_cachep;
-> +
->  static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
->  {
->  	WARN_ON(i == msg->sg.end && bytes);
-> @@ -319,6 +322,13 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
->  	kfree_skb(skb);
->  }
->  
-> +static inline void kfree_sk_msg(struct sk_msg *msg)
-> +{
-> +	if (msg->skb)
-> +		consume_skb(msg->skb);
-> +	kmem_cache_free(sk_msg_cachep, msg);
-> +}
-> +
->  static inline bool sk_psock_queue_msg(struct sk_psock *psock,
->  				      struct sk_msg *msg)
->  {
-> @@ -330,7 +340,7 @@ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
->  		ret = true;
->  	} else {
->  		sk_msg_free(psock->sk, msg);
-> -		kfree(msg);
-> +		kfree_sk_msg(msg);
+>    if (kthread_should_stop) {
+>        if (SCHED_THREADED || !SCHED) {
+>            state &= !THREADED
+>        } else {
+>            msleep(1);
+>            continue;
+>        }
+> 
+>         if (try_cmpxchg) {
+>             can_stop = true;
+>             if (!SCHED_THREADED)
+>                 break;
+>         }
+>    }
+> 
+>    if (SCHED_THREADED)
+>        poll()
+> 
+>    if (can_stop))
+>        break;
+> }
 
-Isn't this a potential use after free on msg->skb? The sk_msg_free() a
-line above will consume_skb() if it exists and its not nil set so we would
-consume_skb() again?
+So moving the stopping logic into the polling thread? I don't think this
+helps anything. 
 
->  		ret = false;
->  	}
->  	spin_unlock_bh(&psock->ingress_lock);
-> @@ -378,13 +388,6 @@ static inline bool sk_psock_queue_empty(const struct sk_psock *psock)
->  	return psock ? list_empty(&psock->ingress_msg) : true;
->  }
->  
-> -static inline void kfree_sk_msg(struct sk_msg *msg)
-> -{
-> -	if (msg->skb)
-> -		consume_skb(msg->skb);
-> -	kfree(msg);
-> -}
-> -
->  static inline void sk_psock_report_error(struct sk_psock *psock, int err)
->  {
->  	struct sock *sk = psock->sk;
-> @@ -441,7 +444,7 @@ static inline void sk_psock_cork_free(struct sk_psock *psock)
->  {
->  	if (psock->cork) {
->  		sk_msg_free(psock->sk, psock->cork);
-> -		kfree(psock->cork);
-> +		kfree_sk_msg(psock->cork);
+Once we unset the THREADED bit we should wait for the thread to clear
+SCHED_THREADED (before trying to stop it). SCHED_THREADED going away
+is our signal that it's safe to reap the thread.
 
-Same here.
+If you're afraid that the thread will not terminate (because packets
+continue to flow in) - we probably want something like:
 
->  		psock->cork = NULL;
->  	}
->  }
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 2b514d95c528..33d4b726395b 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -7548,6 +7548,13 @@ static void napi_threaded_poll_loop(struct napi_struct *napi)
+                if (!repoll)
+                        break;
+ 
++               /* Thread is going away, give up the ownership */
++               if (!likely(READ_ONCE(napi->state) & NAPIF_STATE_THREADED)) {
++                       clear_bit(NAPI_STATE_SCHED_THREADED, &napi->state);
++                       __napi_schedule(napi);
++                       break;
++               }
++
+                rcu_softirq_qs_periodic(last_qs);
+                cond_resched();
+        }
 
