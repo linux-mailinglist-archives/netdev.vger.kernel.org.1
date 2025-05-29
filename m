@@ -1,144 +1,176 @@
-Return-Path: <netdev+bounces-194213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A92AC7E21
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 14:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C81AC7E78
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7009A42067
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9DDA3A9DB3
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1872122A4C5;
-	Thu, 29 May 2025 12:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4931813BC0C;
+	Thu, 29 May 2025 13:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="EVKOxJgZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nKz488em"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="isufujcA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901B34A06
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 12:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 937D4647;
+	Thu, 29 May 2025 13:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748522742; cv=none; b=j3yj1AihpLOFKhgj1lfjvf4V67MoFnwJfIT+7lWdiQbLoqkV1DI783anD+hMhbXSpf3yl1atKAmXmbxVmhdcK5FzQ9WOD0pqlwHy9NE9TiyGr9AOb5U3594xFmZ/kAU/6gKfshcjeucPq814ojwRvDQwFMEu1bqjguwacZCznDc=
+	t=1748524525; cv=none; b=L9NbPNKAypb+HqKV9dC7Bz2Jsqee2ntvNXnXTD8KN+y5IAqDgx+4XCWV8WjhRNQAhZ4ipkwg2UgReFE3gTepGFipwLehoa2pWalXaJr/3SbRBChQxfoUi6KnPwbZqjo09dv1cnxRETLIAjvs5cqxmxV/xDg6DwRVc8UoO2aE9TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748522742; c=relaxed/simple;
-	bh=ygyzvz1iJiz73Tgi2evP5cN7Yw0aVq6NuYCUauEmqfM=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=LBXm0J5KsCkrG8XtuWpCscVWgMliN004x3bxtoEaN6NUE2oSM2ZdHdMQlbQP2DYVqAgE07IkPss9B315TGgEg6qjveAiEoUGN7GfPi3H7WhPVMWoELCi2IDfeChyqUUHMO+wNNLLteRH9TA77wpKkx4YkVsgxyqyY0y47W1p1SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=EVKOxJgZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nKz488em; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfout.stl.internal (Postfix) with ESMTP id 4FF07114014D;
-	Thu, 29 May 2025 08:45:38 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Thu, 29 May 2025 08:45:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1748522738;
-	 x=1748609138; bh=ygyzvz1iJiz73Tgi2evP5cN7Yw0aVq6NuYCUauEmqfM=; b=
-	EVKOxJgZjnRc4CrL8IK3Ud2xTCoEGQLFlif3LbBSmlDjhodLsyjZZp1RBDHGTVX1
-	vgJDrSTIgQkyC9iipTtg/p+Lgw6kqzQACFSYCP4a+d4N01VZOrni2cBwdJzzudAn
-	itxztZsiIePpbLcFPbpPiBkPqTYxC3sAcv201VAjMoyDVx0K+++uLC7gU9/s029j
-	dx32eJqGYuCJJ6y/IhfH/Zvqtq89f+f8JQbJqc/HGMnW3Pmb1nt/ZAA901qMv/Ma
-	ypE0aLfRVywXHX5op+R6qDzaGe7TYvCMxsRISKeb/lz8AAGIP7jZI/pcZKLOa+rN
-	pm222wmOBHzE/0wMdz/cvQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748522738; x=
-	1748609138; bh=ygyzvz1iJiz73Tgi2evP5cN7Yw0aVq6NuYCUauEmqfM=; b=n
-	Kz488emP0DyhUOTPyn4I8utMnpeYWY2dZTU7dkk1kSFYhw0rGHI2zZQUqzQv76Ts
-	0INCHZ9v2hswdkWIS7ATIV9cyhUj/k4TZG9pHgbmZAyk8EHCB+ZzXHOpWHRV/seg
-	a80KAQc+cb/xoE9ISnIf8GzzHUrYZpy6fxqF+1EUTUH5lOpkT5OYY8wR7H7JIm4P
-	eG7Q8tCAWdWHHTHe5oYICSt93nDJIHHk5piF1gCNiMh8JMN7QFFzh7ofAPCxm5Zo
-	rLnf/xV92iRXocK0SZcJB9DxvpXL0rVH7DVZjPzKdvFZCfBB0oJsz8xRq6S3pEXy
-	mToZcCxzhQRgtKoii6uUQ==
-X-ME-Sender: <xms:8VY4aMInJkGZ5-IKPEUrJnZ-_v7EnHITN-jX0rkoHzXQdBTBVyFOgA>
-    <xme:8VY4aMJVxS9S1dzfk5vOffkI7eYfIcMyPHCNn9r8zwTKRzoNBRhl-BmJ_8E-XMazM
-    NgMxqnO-r9ZOx1yF_4>
-X-ME-Received: <xmr:8VY4aMsnSuRQ1W-ACHRtQ78erGZLsCh1D5BFsJFQFSihi8yQq8axQPbWgI18FflvwPfTb2NY8oDJMvWy0jrKY_rvW9Pt8RusIHERcrI0g4s-XQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddviedujeculddtuddrgeefvddrtd
-    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
-    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
-    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
-    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
-    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnheptefh
-    leekteffhedtgeekudeivefhgfevtedvgedtjefhffejteelgeethfevhfdunecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
-    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
-    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
-    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
-    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
-    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
-    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
-    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
-    sggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:8VY4aJa_WtHZtCP936qs_Ov6JGo9xSojazkz4dATziwl9rCmkMT6gQ>
-    <xmx:8VY4aDYbUJry5ZBNZ09uH7FeK4Ipsns4XfsyRbh8vRjRglfez4DBbg>
-    <xmx:8VY4aFC2PBddA0V7-giWQmBG030g93b_70xJ7Y4sMhYoszdrWlw7Ng>
-    <xmx:8VY4aJYRA1UE2BigHd6SQft2OMQpXmSOldiPW_wY2JSvUdA5fN8egQ>
-    <xmx:8lY4aLgm5qLP8WP_vy1u_v75vAH9MW80S6suEI_TcP9_-dx479UXzErJ>
-Feedback-ID: i583147b9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 29 May 2025 08:45:36 -0400 (EDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1748524525; c=relaxed/simple;
+	bh=+aU5coUTqdWc4L2KpPHN9OKmnhKhXyOVMxJInCN/ebk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EN8T/+tu6tK1s6v2zfyRcBPeSU7yInYJG80VntWGM4HRO6tQCX4WKlc/Q0eGpFEYcFcm2bixZ3FH7WZwWBVG0GFWjdXugZ4DUQ8ptdF/dJdTi18vPbHs6WymvxNWNk7vQIM7AW7pbAvLxZoKngiZ9UYTtrUPaie6WaiX07Qn8pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=isufujcA; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id E6D682078611; Thu, 29 May 2025 06:15:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E6D682078611
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1748524522;
+	bh=Ezqk5Ddjq2iKkVzyKUvJjsCMCcife5igRAcu3O9LX2A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=isufujcARZKa+Tr14FliUe/xB/VXxC27m1DAqmnuRWKLOm2Ltgy1mZ0cGbFwcGGyU
+	 CeK09cu9hOkaT2ru0eM9004OXeAe/E755bELXTHgo3EFO2Gpf2v+4BBDo8U0+On3rq
+	 MZl0wrfeUcVcIg9nivDlyfHFM9TTy7SiFqLxk7Yk=
+Date: Thu, 29 May 2025 06:15:22 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Michael Kelley <mhklinux@outlook.com>, linux-hyperv@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Nipun Gupta <nipun.gupta@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof Wilczy???~Dski <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v4 3/5] net: mana: explain irq_setup() algorithm
+Message-ID: <20250529131522.GA27681@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1748361453-25096-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <1748361505-25513-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <aDYOFzQrfDFcti-u@yury>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Re: Poor thunderbolt-net interface performance when bridged
-From: Ricard Bejarano <ricard@bejarano.io>
-In-Reply-To: <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
-Date: Thu, 29 May 2025 14:45:34 +0200
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
- netdev@vger.kernel.org,
- michael.jamet@intel.com,
- YehezkelShB@gmail.com,
- andrew+netdev@lunn.ch,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <71C2308A-0E9C-4AD3-837A-03CE8EA4CA1D@bejarano.io>
-References: <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
- <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
- <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
- <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
- <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
- <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
- <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
- <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
- <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
- <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
- <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
- <A206060D-C73B-49B9-9969-45BF15A500A1@bejarano.io>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aDYOFzQrfDFcti-u@yury>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-> It's interesting, however, that the number of TCP packets is exactly =
-twice
-> that of the number of non-linear sk_buffs we saw in tbnet_start_xmit. =
-Not that
-> it's suspicious, if anything (and because we see those TCP packets in =
-blue) it
-> tells us that the handling of non-linear skbs is not the problem in
-> tbnet_start_xmit.
-> But why twice? Or is this a red herring?
+On Tue, May 27, 2025 at 03:10:15PM -0400, Yury Norov wrote:
+> So now git will think that you're the author of the patch.
+> 
+> If author and sender are different people, the first line in commit
+> message body should state that. In this case, it should be:
+> 
+> From: Yury Norov <yury.norov@gmail.com>
+> 
+> Please consider this one example
+> 
+> https://patchew.org/linux/20250326-fixed-type-genmasks-v8-0-24afed16ca00@wanadoo.fr/20250326-fixed-type-genmasks-v8-6-24afed16ca00@wanadoo.fr/
+> 
+> Thanks,
+> Yury
+>
 
-I've confirmed that all UDP skb's we transmit are linear.
-All non-linear skb's are TCP.
+Understood, Thank you Yury. I'll make this change in the next version
 
+Regards,
+Shradha. 
+> On Tue, May 27, 2025 at 08:58:25AM -0700, Shradha Gupta wrote:
+> > Commit 91bfe210e196 ("net: mana: add a function to spread IRQs per CPUs")
+> > added the irq_setup() function that distributes IRQs on CPUs according
+> > to a tricky heuristic. The corresponding commit message explains the
+> > heuristic.
+> > 
+> > Duplicate it in the source code to make available for readers without
+> > digging git in history. Also, add more detailed explanation about how
+> > the heuristics is implemented.
+> > 
+> > Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > ---
+> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 41 +++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index 4ffaf7588885..f9e8d4d1ba3a 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > @@ -1288,6 +1288,47 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+> >  	r->size = 0;
+> >  }
+> >  
+> > +/*
+> > + * Spread on CPUs with the following heuristics:
+> > + *
+> > + * 1. No more than one IRQ per CPU, if possible;
+> > + * 2. NUMA locality is the second priority;
+> > + * 3. Sibling dislocality is the last priority.
+> > + *
+> > + * Let's consider this topology:
+> > + *
+> > + * Node            0               1
+> > + * Core        0       1       2       3
+> > + * CPU       0   1   2   3   4   5   6   7
+> > + *
+> > + * The most performant IRQ distribution based on the above topology
+> > + * and heuristics may look like this:
+> > + *
+> > + * IRQ     Nodes   Cores   CPUs
+> > + * 0       1       0       0-1
+> > + * 1       1       1       2-3
+> > + * 2       1       0       0-1
+> > + * 3       1       1       2-3
+> > + * 4       2       2       4-5
+> > + * 5       2       3       6-7
+> > + * 6       2       2       4-5
+> > + * 7       2       3       6-7
+> > + *
+> > + * The heuristics is implemented as follows.
+> > + *
+> > + * The outer for_each() loop resets the 'weight' to the actual number
+> > + * of CPUs in the hop. Then inner for_each() loop decrements it by the
+> > + * number of sibling groups (cores) while assigning first set of IRQs
+> > + * to each group. IRQs 0 and 1 above are distributed this way.
+> > + *
+> > + * Now, because NUMA locality is more important, we should walk the
+> > + * same set of siblings and assign 2nd set of IRQs (2 and 3), and it's
+> > + * implemented by the medium while() loop. We do like this unless the
+> > + * number of IRQs assigned on this hop will not become equal to number
+> > + * of CPUs in the hop (weight == 0). Then we switch to the next hop and
+> > + * do the same thing.
+> > + */
+> > +
+> >  static int irq_setup(unsigned int *irqs, unsigned int len, int node)
+> >  {
+> >  	const struct cpumask *next, *prev = cpu_none_mask;
+> > -- 
+> > 2.34.1
 
