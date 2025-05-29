@@ -1,106 +1,94 @@
-Return-Path: <netdev+bounces-194220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 124ECAC7EC3
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:34:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D3CAC7F66
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 16:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCD011BC60A3
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:34:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDCF7ABA07
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB1E15B102;
-	Thu, 29 May 2025 13:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E990227E8E;
+	Thu, 29 May 2025 13:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rVD9jU2v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nN4a3muX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9B42110;
-	Thu, 29 May 2025 13:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D0C227E82;
+	Thu, 29 May 2025 13:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748525669; cv=none; b=kPVOPu3DUqD3JFUdrvNbbyVGga1VYUGw6nnrFVqA+qwQ3DFRVf/HZd0VZs3vvH0L5yZyVpLzotanGj5Tm9X9n/S+zVJ8WLv4UxZYL+JdR/F2fllihe/y4FYo8AbPpt3hAfqXhv9mWdwEaJ+1ifGV3PwZDNPek6K/Rdt0yNFF3N8=
+	t=1748527196; cv=none; b=tsFpFz2JhdLZ5+Imb5ev1s+qUMc6eSAFXB2uD0qXoMsbpKH7XueKkBSjlSrEG/4bTlQ16GTNWLdnfV9nnlCHWdniYKJA1NbuqJF1/SZBwcyc3WANburYTr5E3ne6942MB8zahFu+mmWfEFaqJzFcDEs1MTBQtYgt/Pe/S4lPz8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748525669; c=relaxed/simple;
-	bh=qSwHf/0hRR8r8l/aqMBLXHUG5kVyzYMtHPPbws4VCPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KQJ4nMeSgdGYeZ+5P7Agl5lKzmq6dCwbEwb2gCxASG1tRrMBvAmT2iOSOzQGGbhuLJrHJ8SGZhKEOCWjLqeJOZzPXnDCK5P5eMP4aisrbhgCrvHtK7rmV8uJ8DSjkZX+/1Vnu3v1a5ouXBPxlowztLz6BWZNCfy7CCKLSHtXino=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rVD9jU2v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11428C4CEEB;
-	Thu, 29 May 2025 13:34:26 +0000 (UTC)
+	s=arc-20240116; t=1748527196; c=relaxed/simple;
+	bh=r0b1+y3vdwo65g0qxEBrgxzfef0IiHmph8xg0c/0v6w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oeKPXnGEXBRuyeFxibwCI1wU8BXtbvmrTAt0wci3yr1djc9xideBnZ+T+KUCvWNTOZATnAu0Fk5770DRtyOHr+MP/sJ5pCIGz9K/iOSK5Bdq0iHjqX4oiuaTDm9pwFIAW+oZfhYULVBHXCNTdkp5kign/QKD+OigFJWEG5QPTcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nN4a3muX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75523C4CEE7;
+	Thu, 29 May 2025 13:59:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748525669;
-	bh=qSwHf/0hRR8r8l/aqMBLXHUG5kVyzYMtHPPbws4VCPo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rVD9jU2vkC5O+czjI4YNGVu7mT3WJ5l1e8/AxzP6UA78OhmfsRKWvsKfnCNug9wVm
-	 665A+5vCLR02gv2qgOxgF12Ad1OAN6sZEzJbOYkWnUdX4SXtLLMgHoE8x6KQ2Ggnvp
-	 UB2n+u/Unx1LZ/wbOVqWdXvCE6oDWlaeiCOPRZ9r7M0fBUIO39cpLshrREGZ+wn80M
-	 GgI9qLMHuEcxeNLNzq/T0ZB//UfNv53r9WOlbmJwtkcuhwvsvjF+PLUbW31eGH8dOc
-	 yx+zDOBM/1ZW0i3UevmBnKgTmd6y4Dd0xcthdYHJQEZzIz0WSOwcD2L6+NGhtjp4cw
-	 mnEwWjryD3D1Q==
-Date: Thu, 29 May 2025 14:34:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Philip Li <philip.li@intel.com>, oliver.sang@intel.com,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net: build net/lib dependency in all
- target
-Message-ID: <20250529133424.GP1484967@horms.kernel.org>
-References: <20250529070536.84491-1-minhquangbui99@gmail.com>
- <20250529103221.GN1484967@horms.kernel.org>
- <da0339d6-b6a3-44d8-8ed4-b99249fa0fd1@gmail.com>
+	s=k20201202; t=1748527195;
+	bh=r0b1+y3vdwo65g0qxEBrgxzfef0IiHmph8xg0c/0v6w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nN4a3muXqtndXSdwmPJquvbh7jXtnrrft4DbwHbY7KMReaDbfndzcsYngBRUyjnmP
+	 Mw2P1XhY5GULPvlnONKygY6bMoWJlpcxaKvlWTvfu4VcKWV3NVRH1zSY/5JXpgjSif
+	 D7fjvRnL0Ex2O79lE1hPMo9gYhJS8mieH7OkB7MeS/vS7eoc81uiuC6qnFDedIrODH
+	 twf6WDXPAEQFcJivBfBYupM71U1MSiNK03w4skwehkSYkopSbP8P5CUZrDTrscYltK
+	 T6WwVJOuMK6kbqifkArTnK2KeTo/r2ava4rPUo7jO8cyzYjAS1mYtIJ/9CVlWOzH8L
+	 dVJr7Fpe2m8bg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D46380664F;
+	Thu, 29 May 2025 14:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <da0339d6-b6a3-44d8-8ed4-b99249fa0fd1@gmail.com>
+Subject: Re: [PATCH net v2] net: lan966x: Make sure to insert the vlan tags also
+ in host mode
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174852722925.3275782.13189601985927931052.git-patchwork-notify@kernel.org>
+Date: Thu, 29 May 2025 14:00:29 +0000
+References: <20250528093619.3738998-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20250528093619.3738998-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ maxime.chevallier@bootlin.com
 
-On Thu, May 29, 2025 at 06:04:17PM +0700, Bui Quang Minh wrote:
-> On 5/29/25 17:32, Simon Horman wrote:
-> > On Thu, May 29, 2025 at 02:05:36PM +0700, Bui Quang Minh wrote:
-> > > Currently, we only build net/lib dependency in install target. This
-> > > commit moves that to all target so that net/lib is included in in-tree
-> > > build and run_tests.
-> > Hi,
-> > 
-> > The above describes what is being done.
-> > I think it would be good to also describe why.
-> 
-> Hi,
-> 
-> Currently, when building net related selftests, we need to
-> 
->     make install
-> 
-> so that the net/lib is compiled. In case we do
-> 
->     make
-> 
-> or
-> 
->     make run_tests
-> 
-> the net/lib is not compiled. So I move the INSTALL_DEP_TARGETS which is
-> net/lib if the selftests is net related to all. As a result, all make/make
-> install/make run_tests will have the net/lib compiled.
+Hello:
 
-Thanks for the explanation, it is much appreciated.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-I think it would be good to include something along those lines
-in the commit message of the patch.
+On Wed, 28 May 2025 11:36:19 +0200 you wrote:
+> When running these commands on DUT (and similar at the other end)
+> ip link set dev eth0 up
+> ip link add link eth0 name eth0.10 type vlan id 10
+> ip addr add 10.0.0.1/24 dev eth0.10
+> ip link set dev eth0.10 up
+> ping 10.0.0.2
+> 
+> [...]
 
-Please note, that if you post a v2, before doing so you should allow 24h to
-elapse since the posting of v1.
+Here is the summary with links:
+  - [net,v2] net: lan966x: Make sure to insert the vlan tags also in host mode
+    https://git.kernel.org/netdev/net/c/27eab4c64423
 
-https://docs.kernel.org/process/maintainer-netdev.html
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
