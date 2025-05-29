@@ -1,381 +1,151 @@
-Return-Path: <netdev+bounces-194209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63164AC7DB5
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 14:28:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F00AC7DC2
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 14:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 904C5A276BB
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:28:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 928891BC5B0E
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A2522423B;
-	Thu, 29 May 2025 12:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0wc9nBh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3BE223DF5;
+	Thu, 29 May 2025 12:33:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BAD382;
-	Thu, 29 May 2025 12:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D388D221FBD
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 12:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748521705; cv=none; b=Ztw6R1PHUgVoWmFLcekfjdC6ne6d+Rdd4sP8UAT7QYJyjYnG3sHFWtycpDNLIi5Q0MDRbh/S4ccjSF7vtm2j5tlQMcgm+h42IPyBwtIby2X1ir2oVrGdWOmjzIBMzaAs5+gAL6BZxeTAu5Wxg154eEa3zpuYM3416PIwMdZIe4w=
+	t=1748522008; cv=none; b=f3r3XaO/tUoAtDwUurzinIKeDF3smV0/bqrG87Q9DWNU7RQJgwO+b4dctsvfGkI+s1Lz1pvUkwpJ/5xL89I3aYbMGhjjHUeZfnBc1lSYeIXty70sVFKVfT41S/d9hm6d1yIEh9MV74nZpaAUuKIFrSOnb4rWRfPh5+TK29U4ucA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748521705; c=relaxed/simple;
-	bh=eFlK4O/ApEpvXiMbnGQqkL7zGwcgDaXwX/hfmY0HsC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=USfjFSfg7TSUgBUDIi8dpi6xSO9W0WjZLckL8kdXqsHSmaruYPwzdyucx0lNLy5Og4v2w5HsJ+xjKF0mn8YmDx/kYkJXZkVPXQATKU4MTRjxGYYPvlGEYQg+elA8wq7/2yDF2okqBftNjjHSdhdS6BgjIbkhEhCzcKsOLUUzF4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m0wc9nBh; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7425bd5a83aso624874b3a.0;
-        Thu, 29 May 2025 05:28:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748521702; x=1749126502; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GbRXSySOkeoAFSH1xoRdqp69bz3wjXg4GCHZGd5gC70=;
-        b=m0wc9nBh4DTpFIILv6TNC3wJLQdVZ/wGyGZJIuxMBSN9kKraCFwdCbD8TgWJuHsRdQ
-         nZtzZQLKzFLH/RTAZvqQ2Ybg50K6ESFCCRTkcvVY3qVa2xaBsBDBLgqgE6JLSNscUErh
-         uudWJNqcxbVjx2dZh9l1ZMHBBNwZgSmnUd5Ft1x0uLsOVfy5SjGqSrWob/DoCg2o4vBM
-         Ji6timcAPC/wFP/lqEJZeKYkk7qu3ahWuBd3PFzL4DHIWBppWm+IBrQA6or7PSuLEzPr
-         tcN45MQXw3EkojtMOgi4Buwf+KqjfcFCaNkxLlemdPjhdkeqNFEVL24Az/GYfJ9OPQsl
-         nkWw==
+	s=arc-20240116; t=1748522008; c=relaxed/simple;
+	bh=kIkmKcaPV98XKhRwOTAvnQhINvi2n4gSAdVyCSaFabU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FlG4+3SzyyogQTWQKGB01radbWsvVQ/j1tkGJ8A9+xpZH2pVU2Og7PnbXMl6jrmypZMaqFCqqCIvLqYFsfOPrT8UyClYFhjM/cMOsrg70s1f9e/7kRPYAtuEyfS6bOUxd+fxa+C/+OHnaXAHLBkJB9135vuoZn/K/7E3yDY43WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b41b906b3so72127539f.0
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 05:33:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748521702; x=1749126502;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GbRXSySOkeoAFSH1xoRdqp69bz3wjXg4GCHZGd5gC70=;
-        b=sEG7L8sEzDnbtZaNUdNa08aKLm1NI91n+pKOSmxCNogC+a0R1QTFi8nHKA2UIPEX/Q
-         zXHuwq/hAwi7oNXBylcQ7yyAy2xnyHNh1JonC2yVAwA0c2IHKD5s8t9VKZHW0+3TmAhH
-         QhYAqHadJPhoVjUn2OTfIAXWj6Jb40YAlC9ZS7zZXg/G+3J+VJzQW5+R3iksi9G94Run
-         U13mEplh/SsEZwuFJ1yjKmWz82mlucfGfB1KXDTVvWTQufMvVnmfi7I+jBd4+LjYdDbZ
-         vXPpyWDoQBDr64GUZ/CjRpMLBFKjA0U4zAxIa5kOU/XSTJDeBmnNKUfWh8/80lr10B6o
-         tqOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0xVqcwt71Ky68VG0DdV8TNzLT+uGpbllTi9wBS7U0E/7mvHZyvfVvq15SANzn9+FJaZs=@vger.kernel.org, AJvYcCXcVe0GLZ5vB4JliGMjJwITwUgrE6osmSEq0b69mI9YvJePEDBC33tG05xTdpS+SoMEbcWKPn2ltIOSRQpE@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq7ngKV9cGKHHMSpOw/p6gtKmX1wMCNISICdtb3JNqNVfWXGYE
-	YcNROwOhxj7CF2g/kPpgTmYrSvg5IK0VFpNeo78O+UU9f9t6fq9Yg4Htpq9EekRkxIg=
-X-Gm-Gg: ASbGncuZSnrckgaITKIDM4sOOtnYbKF9qKkl0qUEYoX3Wu+JJnXyrm5f7HtWHQm3ste
-	fjHBbjqh2Hfk26StiJDcHqr0FgNAMt9Lrt6yG2TPcNoftlbI7PkGBrBDSnZ3azoNVLER3KkW+Gi
-	D6fCknUX8k1f0VsR71j/xGL+zOaER4ujnuNR0bM9teLX1C8qYJjyUtzQF7497Btc+ziYFGQ/3wJ
-	sdh6aP7Ef+yuS8ufMHQdOoRqc5l2Sx0RfDjMPUSuyHPfTeREt8P0HeRKDTDspkafTJSm9GcWJk0
-	05LD5VO4Rx26p5ry8uMu+E8/f/yMdeMmPyeWpgX0ZalwtuFsPm8OcddMjoUw96UQwFfLhGw/WG2
-	BPGUQ/eofiitFv1gWBn+nNqQQO/PQLg==
-X-Google-Smtp-Source: AGHT+IF9EI5HiLoMgWWyXHJIS/JBoJHldzFEQe2we+Bla5wTXSK4xuPJ45x9JQ5aUvtdEyKotaw9fQ==
-X-Received: by 2002:a05:6a21:1089:b0:216:6060:971d with SMTP id adf61e73a8af0-2188c3b49bemr33306179637.37.1748521702136;
-        Thu, 29 May 2025 05:28:22 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f0e:fb30:d434:b1b6:e451:f5d9? ([2001:ee0:4f0e:fb30:d434:b1b6:e451:f5d9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed34fdsm1216650b3a.75.2025.05.29.05.28.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 May 2025 05:28:21 -0700 (PDT)
-Message-ID: <d572e8b6-e25c-480e-9d05-8c7eeb396b12@gmail.com>
-Date: Thu, 29 May 2025 19:28:13 +0700
+        d=1e100.net; s=20230601; t=1748522006; x=1749126806;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5bml+Lhlb/ESJB7OB397E+URQXQmoC/VYahWRyI1KaM=;
+        b=LwWFunHlCez6obLTPg2d6VMeNltudL7EVjLB61tAH+sZI+fxk52Is5Ph49MzX9KO+j
+         iwDrKUkBBd5J4YASUJTNNHNEMQRwJh0EuKzgQt0Y2YfdH706YuVNRUKQ0I+Uy5U5Zrlm
+         NE+BRRRDFICQLKjlkobZgP8yGnXs47VSEFGYH3akh5meTpeez7RZ/jhQEd7J+dDuzpnw
+         uzB4x05+riqzcdxvIqcoDVrV9B7d0SVp4Qgs48XxJJTH9J+s5obBES4Uhu0PtP8VZtAa
+         bnnfiV9wJ9LLn6bHcvsCmUmNoORKoIXUwsS23KpBN8JjitwkOYhJtmpzM9iU+beQwzc+
+         QzAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBgYA4NZpvo3uCTCuhBwtRHJtlJVAAjvl7/0W0z7OIbWk1JZQdNWNECrVqbJLeNFxB3My/g3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRgH7y1UDuK8nIzJxuyBDiFpK/3Z5kNbLxi0BsFpNa7SCcrE1m
+	tavlP4M3VsZHDxDSzNWineG9NrvSY3LceN05lzOF7t/3uotG8VEP06F4OcjSnReBWwlLhha5cqt
+	KJkvmx/0st1JhzWC4Ub4PjmIpkP9Xa/09FOok7gNhuAI60FTG0joeut+03hM=
+X-Google-Smtp-Source: AGHT+IHxHOKcAfW53VhsEwfYQe28Edle9Xwc641YqhY2if7TdOjOHCstkntXRFjfL61vR74DgjPJZSP093ib53p+cgjjwt7thbwV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v2 1/2] virtio-net: support zerocopy multi
- buffer XDP in mergeable
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250527161904.75259-1-minhquangbui99@gmail.com>
- <20250527161904.75259-2-minhquangbui99@gmail.com>
- <CACGkMEvAJziO3KW3Nk9+appXmR92ixcTeWY_XEZz4Qz1MwrhYA@mail.gmail.com>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <CACGkMEvAJziO3KW3Nk9+appXmR92ixcTeWY_XEZz4Qz1MwrhYA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a5d:9f50:0:b0:86c:ee8b:c089 with SMTP id
+ ca18e2360f4ac-86cee8bc1bbmr560370739f.3.1748522005946; Thu, 29 May 2025
+ 05:33:25 -0700 (PDT)
+Date: Thu, 29 May 2025 05:33:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68385415.a70a0220.29d4a0.082e.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_tx_h_rate_ctrl
+From: syzbot <syzbot+0d516b33238bd97ee864@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/29/25 12:59, Jason Wang wrote:
-> On Wed, May 28, 2025 at 12:19 AM Bui Quang Minh
-> <minhquangbui99@gmail.com> wrote:
->> Currently, in zerocopy mode with mergeable receive buffer, virtio-net
->> does not support multi buffer but a single buffer only. This commit adds
->> support for multi mergeable receive buffer in the zerocopy XDP path by
->> utilizing XDP buffer with frags.
->>
->> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->> ---
->>   drivers/net/virtio_net.c | 123 +++++++++++++++++++++------------------
->>   1 file changed, 66 insertions(+), 57 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index e53ba600605a..a9558650f205 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -45,6 +45,8 @@ module_param(napi_tx, bool, 0644);
->>   #define VIRTIO_XDP_TX          BIT(0)
->>   #define VIRTIO_XDP_REDIR       BIT(1)
->>
->> +#define VIRTNET_MAX_ZC_SEGS    8
->> +
->>   /* RX packet size EWMA. The average packet size is used to determine the packet
->>    * buffer size when refilling RX rings. As the entire RX ring may be refilled
->>    * at once, the weight is chosen so that the EWMA will be insensitive to short-
->> @@ -1232,65 +1234,53 @@ static void xsk_drop_follow_bufs(struct net_device *dev,
->>          }
->>   }
->>
->> -static int xsk_append_merge_buffer(struct virtnet_info *vi,
->> -                                  struct receive_queue *rq,
->> -                                  struct sk_buff *head_skb,
->> -                                  u32 num_buf,
->> -                                  struct virtio_net_hdr_mrg_rxbuf *hdr,
->> -                                  struct virtnet_rq_stats *stats)
->> +static int virtnet_build_xsk_buff_mrg(struct virtnet_info *vi,
->> +                                     struct receive_queue *rq,
->> +                                     u32 num_buf,
->> +                                     struct xdp_buff *xdp,
->> +                                     struct virtnet_rq_stats *stats)
->>   {
->> -       struct sk_buff *curr_skb;
->> -       struct xdp_buff *xdp;
->> -       u32 len, truesize;
->> -       struct page *page;
->> +       unsigned int len;
->>          void *buf;
->>
->> -       curr_skb = head_skb;
->> +       if (num_buf < 2)
->> +               return 0;
->> +
->> +       while (num_buf > 1) {
->> +               struct xdp_buff *new_xdp;
->>
->> -       while (--num_buf) {
->>                  buf = virtqueue_get_buf(rq->vq, &len);
->> -               if (unlikely(!buf)) {
->> -                       pr_debug("%s: rx error: %d buffers out of %d missing\n",
->> -                                vi->dev->name, num_buf,
->> -                                virtio16_to_cpu(vi->vdev,
->> -                                                hdr->num_buffers));
->> +               if (!unlikely(buf)) {
->> +                       pr_debug("%s: rx error: %d buffers missing\n",
->> +                                vi->dev->name, num_buf);
->>                          DEV_STATS_INC(vi->dev, rx_length_errors);
->> -                       return -EINVAL;
->> -               }
->> -
->> -               u64_stats_add(&stats->bytes, len);
->> -
->> -               xdp = buf_to_xdp(vi, rq, buf, len);
->> -               if (!xdp)
->> -                       goto err;
->> -
->> -               buf = napi_alloc_frag(len);
->> -               if (!buf) {
->> -                       xsk_buff_free(xdp);
->> -                       goto err;
->> +                       return -1;
->>                  }
->>
->> -               memcpy(buf, xdp->data - vi->hdr_len, len);
->> -
->> -               xsk_buff_free(xdp);
->> +               new_xdp = buf_to_xdp(vi, rq, buf, len);
->> +               if (!new_xdp)
->> +                       goto drop_bufs;
->>
->> -               page = virt_to_page(buf);
->> +               /* In virtnet_add_recvbuf_xsk(), we ask the host to fill from
->> +                * xdp->data - vi->hdr_len with both virtio_net_hdr and data.
->> +                * However, only the first packet has the virtio_net_hdr, the
->> +                * following ones do not. So we need to adjust the following
-> Typo here.
+Hello,
 
-I'm sorry, could you clarify which word contains the typo?
+syzbot found the following issue on:
 
->
->> +                * packets' data pointer to the correct place.
->> +                */
-> I wonder what happens if we don't use this trick? I meant we don't
-> reuse the header room for the virtio-net header. This seems to be fine
-> for a mergeable buffer and can help to reduce the trick.
+HEAD commit:    5cdb2c77c4c3 Merge tag 'net-6.15-rc8' of git://git.kernel...
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=14784df4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
+dashboard link: https://syzkaller.appspot.com/bug?extid=0d516b33238bd97ee864
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
 
-I don't think using the header room for virtio-net header creates this 
-case handling. In my opinion, it comes from the slightly difference in 
-the recvbuf between single buffer and multi-buffer. When we have n 
-single-buffer packets, each buffer will have its own virtio-net header. 
-But when we have 1 multi-buffer packet (which spans across n buffers), 
-only the first buffer has virtio-net header, the following buffers do not.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-There 2 important pointers here. The pointer we announce to the vhost 
-side to fill the data, let's call it announced_addr, and xdp_buff->data 
-which is expected to point the the start of Ethernet frame. Currently,
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d90a868e19ee/disk-5cdb2c77.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3c5ff2a5a972/vmlinux-5cdb2c77.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f6a0db04ca42/bzImage-5cdb2c77.xz
 
-     announced_addr = xdp_buff->data - hdr_len
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0d516b33238bd97ee864@syzkaller.appspotmail.com
 
-The host side will write the virtio-net header to announced_addr then 
-the Ethernet frame's data in the first buffer. In case of multi-buffer 
-packet, in the following buffers, host side writes the Ethernet frame's 
-data to the announced_addr no virtio-net header. So in the virtio-net, 
-we need to subtract xdp_buff->data, otherwise, we lose some Ethernet 
-frame's data.
+wlan1: Created IBSS using preconfigured BSSID 50:50:50:50:50:50
+wlan1: Creating new IBSS network, BSSID 50:50:50:50:50:50
+------------[ cut here ]------------
+wlan1: Dropped data frame as no usable bitrate found while scanning and associated. Target station: 08:02:11:00:00:00 on 5 GHz band
+WARNING: CPU: 1 PID: 1111 at net/mac80211/tx.c:756 ieee80211_tx_h_rate_ctrl+0xc87/0x1780 net/mac80211/tx.c:749
+Modules linked in:
+CPU: 1 UID: 0 PID: 1111 Comm: kworker/u8:6 Not tainted 6.15.0-rc7-syzkaller-00082-g5cdb2c77c4c3 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:ieee80211_tx_h_rate_ctrl+0xc87/0x1780 net/mac80211/tx.c:749
+Code: 31 f6 83 e6 07 41 0f 95 c6 31 ff e8 03 26 ea f6 43 8d 0c 76 83 c1 02 48 c7 c7 60 8b 8c 8c 48 89 de 4c 89 fa e8 3a 7e ae f6 90 <0f> 0b 90 90 41 bf 01 00 00 00 e9 eb 02 00 00 e8 95 21 ea f6 e9 6a
+RSP: 0018:ffffc90003c9f460 EFLAGS: 00010246
+RAX: caae12da654acc00 RBX: ffff888078a69738 RCX: ffff888026951e00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: ffffc90003c9f5d0 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bba984 R12: dffffc0000000000
+R13: ffffc90003c9f788 R14: 0000000000000001 R15: ffff888059534d44
+FS:  0000000000000000(0000) GS:ffff8881261c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055557d9f3588 CR3: 0000000031484000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ invoke_tx_handlers_late+0xb6/0x1820 net/mac80211/tx.c:1850
+ ieee80211_tx+0x2ac/0x420 net/mac80211/tx.c:1971
+ __ieee80211_tx_skb_tid_band+0x50f/0x680 net/mac80211/tx.c:6107
+ ieee80211_tx_skb_tid_band net/mac80211/ieee80211_i.h:2338 [inline]
+ ieee80211_send_scan_probe_req net/mac80211/scan.c:655 [inline]
+ ieee80211_scan_state_send_probe+0x59a/0xa10 net/mac80211/scan.c:683
+ ieee80211_scan_work+0x5b1/0x1ce0 net/mac80211/scan.c:1143
+ cfg80211_wiphy_work+0x2dc/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-I think a slightly better solution is that we set announced_addr = 
-xdp_buff->data then we only need to xdp_buff->data += hdr_len for the 
-first buffer and do need to adjust xdp_buff->data of the following buffers.
 
->
->> +               new_xdp->data -= vi->hdr_len;
->> +               new_xdp->data_end = new_xdp->data + len;
->>
->> -               truesize = len;
->> +               if (!xsk_buff_add_frag(xdp, new_xdp))
->> +                       goto drop_bufs;
->>
->> -               curr_skb  = virtnet_skb_append_frag(head_skb, curr_skb, page,
->> -                                                   buf, len, truesize);
->> -               if (!curr_skb) {
->> -                       put_page(page);
->> -                       goto err;
->> -               }
->> +               num_buf--;
->>          }
->>
->>          return 0;
->>
->> -err:
->> +drop_bufs:
->>          xsk_drop_follow_bufs(vi->dev, rq, num_buf, stats);
->> -       return -EINVAL;
->> +       return -1;
->>   }
->>
->>   static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *dev, struct virtnet_info *vi,
->> @@ -1307,23 +1297,42 @@ static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *dev, struct
->>          num_buf = virtio16_to_cpu(vi->vdev, hdr->num_buffers);
->>
->>          ret = XDP_PASS;
->> +       if (virtnet_build_xsk_buff_mrg(vi, rq, num_buf, xdp, stats))
->> +               goto drop;
->> +
->>          rcu_read_lock();
->>          prog = rcu_dereference(rq->xdp_prog);
->> -       /* TODO: support multi buffer. */
->> -       if (prog && num_buf == 1)
->> -               ret = virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, stats);
-> Without this patch it looks like we had a bug:
->
->          ret = XDP_PASS;
->          rcu_read_lock();
->          prog = rcu_dereference(rq->xdp_prog);
->          /* TODO: support multi buffer. */
->          if (prog && num_buf == 1)
->                  ret = virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, stats);
->          rcu_read_unlock();
->
-> This implies if num_buf is greater than 1, we will assume XDP_PASS?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Yes, I think XDP_DROP should be returned in that case.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
->
->> +       if (prog) {
->> +               /* We are in zerocopy mode so we cannot copy the multi-buffer
->> +                * xdp buff to a single linear xdp buff. If we do so, in case
->> +                * the BPF program decides to redirect to a XDP socket (XSK),
->> +                * it will trigger the zerocopy receive logic in XDP socket.
->> +                * The receive logic thinks it receives zerocopy buffer while
->> +                * in fact, it is the copy one and everything is messed up.
->> +                * So just drop the packet here if we have a multi-buffer xdp
->> +                * buff and the BPF program does not support it.
->> +                */
->> +               if (xdp_buff_has_frags(xdp) && !prog->aux->xdp_has_frags)
->> +                       ret = XDP_DROP;
-> Could we move the check before trying to build a multi-buffer XDP buff?
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Yes, I'll fix this in next version.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
->
->> +               else
->> +                       ret = virtnet_xdp_handler(prog, xdp, dev, xdp_xmit,
->> +                                                 stats);
->> +       }
->>          rcu_read_unlock();
->>
->>          switch (ret) {
->>          case XDP_PASS:
->> -               skb = xsk_construct_skb(rq, xdp);
->> +               skb = xdp_build_skb_from_zc(xdp);
-> Is this better to make this change a separate patch?
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Okay, I'll create a separate patch to convert the current XDP_PASS 
-handler to use xdp_build_skb_from_zc helper.
-
->
->>                  if (!skb)
->> -                       goto drop_bufs;
->> +                       break;
->>
->> -               if (xsk_append_merge_buffer(vi, rq, skb, num_buf, hdr, stats)) {
->> -                       dev_kfree_skb(skb);
->> -                       goto drop;
->> -               }
->> +               /* Later, in virtnet_receive_done(), eth_type_trans()
->> +                * is called. However, in xdp_build_skb_from_zc(), it is called
->> +                * already. As a result, we need to reset the data to before
->> +                * the mac header so that the later call in
->> +                * virtnet_receive_done() works correctly.
->> +                */
->> +               skb_push(skb, ETH_HLEN);
->>
->>                  return skb;
->>
->> @@ -1332,14 +1341,11 @@ static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *dev, struct
->>                  return NULL;
->>
->>          default:
->> -               /* drop packet */
->> -               xsk_buff_free(xdp);
->> +               break;
->>          }
->>
->> -drop_bufs:
->> -       xsk_drop_follow_bufs(dev, rq, num_buf, stats);
->> -
->>   drop:
->> +       xsk_buff_free(xdp);
->>          u64_stats_inc(&stats->drops);
->>          return NULL;
->>   }
->> @@ -1396,6 +1402,8 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue
->>                  return -ENOMEM;
->>
->>          len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
->> +       /* Reserve some space for skb_shared_info */
->> +       len -= SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->>
->>          for (i = 0; i < num; ++i) {
->>                  /* Use the part of XDP_PACKET_HEADROOM as the virtnet hdr space.
->> @@ -6734,6 +6742,7 @@ static int virtnet_probe(struct virtio_device *vdev)
->>          dev->netdev_ops = &virtnet_netdev;
->>          dev->stat_ops = &virtnet_stat_ops;
->>          dev->features = NETIF_F_HIGHDMA;
->> +       dev->xdp_zc_max_segs = VIRTNET_MAX_ZC_SEGS;
->>
->>          dev->ethtool_ops = &virtnet_ethtool_ops;
->>          SET_NETDEV_DEV(dev, &vdev->dev);
->> --
->> 2.43.0
->>
-> Thanks
->
-
+If you want to undo deduplication, reply with:
+#syz undup
 
