@@ -1,132 +1,87 @@
-Return-Path: <netdev+bounces-194101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97DB2AC756B
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 03:36:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88B5AC757B
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 03:49:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C46BAA410E0
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:35:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88D3F1BA3F09
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 01:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B337F1B78F3;
-	Thu, 29 May 2025 01:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5841DA617;
+	Thu, 29 May 2025 01:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SI9oJffr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCRMWkYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F06119E97B
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 01:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E434515A864;
+	Thu, 29 May 2025 01:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748482572; cv=none; b=VjqrBO0+xAh4v30vOtP98wdrwCBd1R2EJ4qAjcIvdlaS+Z/+Ym1MAdCYdZRuZcO0hRoNu+JpyLXdAqljT8jn79kvV16QYgMpKLHecBH/KYBw3sYVCnL0hkKTR2OMdcQS/kGqbcD8f0i6i+3ssl3NfuGbWs42cK83YD7YMqkcv/c=
+	t=1748483390; cv=none; b=TfHtf5Shg0odSbIW/Xg18P8guh6oxCC7KsSXJoQ7lEsLWCRBkpO3BQ8Ku2KgX2AOBuXI43GDVGS3GyyMU0wsPf13awByl5+O/j5jnd4plX14Ltd4635VyTWFXYd4pY6KWu1e/9q7aPk06CtPd/0ms23IegWXR3cDhdXERhJet9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748482572; c=relaxed/simple;
-	bh=vqlhIQ+CCmN9RLqe0/Tyd2Y7ZpgweKpBe0mtM3DcFc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oRSWj5TdgbTAp28Px2tDO31RCT5iYMEz4vI1osJFAO40HNujE4DjQF528rP+m76Z/bukiT07x91N+LbzELMc2FEdNWzXyZScYvJkeY30tDhEtwz4i+nbwmFqb+CsGz9tl9en+6enDL1jMWQMLY1FGJY/QdPY5PO4A9JI4TCAZ5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SI9oJffr; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <51768fa6-007e-4f30-ac1f-eed01ae1a3c5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748482557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZPvO5ea4bJ3AEPNPYkVWBmgC2/crRwDDiQRw7JYiRc0=;
-	b=SI9oJffrQhJFzwVRI6hy+E981adGUz2hteYYf8fv/sQWmJIRMo03ZeEUEayJQ+OSmrRmQF
-	aL9NacS00yCzFi3hTqHqhiFDvIg6tNPvYNsbL6ljM5L9GHmyrx+Ck8QTLLd5LilVp/5q6n
-	PVLBXK9IeoWaseY3eISs0IaVaHE3LY4=
-Date: Thu, 29 May 2025 09:35:36 +0800
+	s=arc-20240116; t=1748483390; c=relaxed/simple;
+	bh=8UXi52Hu7/EOK2HSKr7C26i/8h14iAHN2ueX5MKbWdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ea6/vmRI3WszfRlx/NjnarCWVneciBj5tfBRkzb35rTY2/OiCKZYSipI9cHVxaLhS0evx6AOLTQABTmOzoo/+HyzMwi55kK3K5/Jw5vkGdc8J3RKe8bW4y6iobRb8YHECKARsFvV9rra35RS1dl54RcBn6rRHbonX0nffJL4bEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCRMWkYq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58606C4CEE3;
+	Thu, 29 May 2025 01:49:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748483389;
+	bh=8UXi52Hu7/EOK2HSKr7C26i/8h14iAHN2ueX5MKbWdg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pCRMWkYqu4o5fJZkfp5KjFhX6etlAcDhMk/3dm2acnyLm2IKvBFjAk1fW1vg9QwuY
+	 DZE0yXRIrENiLzkiUcAEOd0sUPmgu0tQNK3l6CDnqEPRzOWDy2p2BhUIf56fJw7MGz
+	 4RyuO3UNb+NTvlJk4XaCYqHc7j9AmiyblQnAJmXrBLPb13p9t9CjuydxAxZN1JtTKQ
+	 QWegiVGD/73BFuWaGhQ1bt1rYVEAdvZ0MzWQPSbpaj+T49lmHYcTwNgdK60+/UVY4l
+	 uv/q2NmxOZDLElTuUUxUD2iOOu3xEA1Gm7sjrYacNsD9G8kvVc0sUPipR2hbrPFPmJ
+	 HiAHHHeBZ4KBw==
+Date: Wed, 28 May 2025 18:49:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sunil Goutham
+ <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Ratheesh Kannoth <rkannoth@marvell.com>, Simon
+ Horman <horms@kernel.org>
+Subject: Re: [net] Octeontx2-af: Skip overlap check for SPI field
+Message-ID: <20250528184948.5d85f0cc@kernel.org>
+In-Reply-To: <20250525095854.1612196-1-hkelam@marvell.com>
+References: <20250525095854.1612196-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for
- BCM8958x
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
- Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, fancer.lancer@gmail.com, ahalaney@redhat.com,
- xiaolei.wang@windriver.com, rohan.g.thomas@intel.com,
- Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
- linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com,
- Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
- <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
- <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
- <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
- <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-在 5/28/25 8:04 AM, Abhishek Chauhan (ABC) 写道:
+On Sun, 25 May 2025 15:28:54 +0530 Hariprasad Kelam wrote:
+> Currently, the AF driver scans the mkex profile to identify all
+> supported features. This process also involves checking for any
+> fields that might overlap with each other.
 > 
+> For example, NPC_TCP_SPORT field offset within the key should
+> not overlap with NPC_DMAC/NPC_SIP_IPV4 or any other field.
 > 
-> On 2/7/2025 3:18 PM, Jitendra Vegiraju wrote:
->> Hi Abhishek,
->>
->> On Fri, Feb 7, 2025 at 10:21 AM Abhishek Chauhan (ABC) <
->> quic_abchauha@quicinc.com> wrote:
->>
->>>
->>>
->>> On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
->>>> Hi netdev team,
->>>>
->>>> On Fri, Oct 18, 2024 at 1:53 PM <jitendra.vegiraju@broadcom.com> wrote:
->>>>>
->>>>> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
->>>>>
->>>>> This patchset adds basic PCI ethernet device driver support for Broadcom
->>>>> BCM8958x Automotive Ethernet switch SoC devices.
->>>>>
->>>>
->>>> I would like to seek your guidance on how to take this patch series
->>> forward.
->>>> Thanks to your feedback and Serge's suggestions, we made some forward
->>>> progress on this patch series.
->>>> Please make any suggestions to enable us to upstream driver support
->>>> for BCM8958x.
->>>
->>> Jitendra,
->>>           Have we resent this patch or got it approved ? I dont see any
->>> updates after this patch.
->>>
->>>
->> Thank you for inquiring about the status of this patch.
->> As stmmac driver is going through a maintainer transition, we wanted to
->> wait until a new maintainer is identified.
->> We would like to send the updated patch as soon as possible.
->> Thanks,
->> Jitendra
-> Thanks Jitendra, I am sorry but just a follow up.
-> 
-> Do we know if stmmac maintainer are identified now ?
+> However, there are situations where some overlap is unavoidable.
+> For instance, when extracting the SPI field, the same key offset might
+> be used by both the AH and ESP layers. This patch addresses this
+> specific scenario by skipping the overlap check and instead, adds
+> a warning message to the user.
 
-I'm curious why such a precondition is added？
-
-
-Thanks,
-Yanteng
+The commit message doesn't really explain what the implications for
+field overlap are. The warning is also very uninformative. The user
+will see the warning, find the commit which added it, and should be
+able to more or less figure out what the implications are.
+-- 
+pw-bot: cr
 
