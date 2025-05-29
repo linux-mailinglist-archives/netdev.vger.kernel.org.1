@@ -1,134 +1,92 @@
-Return-Path: <netdev+bounces-194246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA7ACAC804E
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:30:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D2BAC8084
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:53:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7519A4A24FC
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:30:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE78B1BC34B5
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC181D63E1;
-	Thu, 29 May 2025 15:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25E622B8D4;
+	Thu, 29 May 2025 15:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkXmtQZx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCV2Z42y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87503193062
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7E6193062
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748532655; cv=none; b=LIj9r4Iw8OY/SAgMs68/JSGBdLbMfMWbFjl3bHMOHXlLutGLJmfAxvGVf90ABnKXgusDtL9KcQz+E/gNX57+6/bJ36KZHjzjHcHHUSzfjkJSTh83Ds9oLn7oFjj4CFD54QM5JsMBAaEiw0v35V17cE/oUqJ0+BRmyU4lXmf4FsA=
+	t=1748533975; cv=none; b=Ml8QzkGXUvqP6H4DfrYAr6dk1kqArFf4NnrRyu/lLsTcYnmW39mEdWw+8N2cBJoCoUAdfvko/BXClQ1LR7LkMQOAXM1aKKQ9SBAvph5u/aV7PYuHYkSM6R4Cwd0Jo3gt3Nh2ZPdo+k6f27sREk4f5NmG6NSpf0tD4NC+19EHLIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748532655; c=relaxed/simple;
-	bh=yXmp9K+013p9LLuzzuH3yxFdzNG5YsJQez5mslbvnco=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W2v6Jddbum4UJ67uUdj4cZ3mK22fwM47/W9lkD7mM4qgpW8iDv7+M22lYNsLNN7w2DkwGfTKnVwPTxyfy38vO3lmgGhLbUs6FLh9T/CEyedwGNrlEiMWCia2A6got0slelupapCJLHZF3yKsfxIkLIRT/iKbUO9YXaC12yoTzZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TkXmtQZx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748532651;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=90X/e10Xiz+GjbdOMX8hvB8ApZWLNBhEVzTpn7CBFHU=;
-	b=TkXmtQZxf9tMlOUmnGbSib5jsJl8PCDPUPu4nzdL7Geqv6i/2ZBshiW7aIDkObS78RllI3
-	hwvcs6dC3PrBgj4K6oS9mrqPujrAYoIf41AVP681l0XzmKmoNKkJdOXO3hIv0UXTwN0mRx
-	yrhPEQ8y6Ifq+z/gXihIVFCdI9/qD7A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-LjzTwwHkP7G5VxfTa38pDQ-1; Thu, 29 May 2025 11:30:48 -0400
-X-MC-Unique: LjzTwwHkP7G5VxfTa38pDQ-1
-X-Mimecast-MFC-AGG-ID: LjzTwwHkP7G5VxfTa38pDQ_1748532647
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4eb6fcd88so632593f8f.1
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 08:30:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748532647; x=1749137447;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=90X/e10Xiz+GjbdOMX8hvB8ApZWLNBhEVzTpn7CBFHU=;
-        b=TKACAD++hgbkBIeCTdiDouLwTzDSLOMp4y6o0FQ4Sp+gRpc6a3qI+ucb/o+/kzODcW
-         p2zYFVORI2UkQlaaAYr1VYq5jtZfeZKO2Qk/7s8ldJQfml4KAK32OHhgIEhXmWHoZFTK
-         HPYp8l/oDJ5XCPQqKfgHjhx8b+Ayp0PNnRIVabvou4RXSTB57HVjXVsfFX/bGaH4QX0f
-         qcBIw1Q45EBRhx+wa3lEl+LRY6tn2rK4yrjiJVuc0/hhY77gw3WO0UPAF6V3qZZHDJC7
-         Ze9AcUrok9JhFVytpByuEEvqozBn55OfTKQIvT0Ri8PuSL5unSgcihEWK1cROzB1R/w1
-         ct9A==
-X-Gm-Message-State: AOJu0YyXF3InP633PmWgR/9OgEtfZfZNtECx9a2d5EGRu7Yx24fktThh
-	q8BI+jSUjsOvP+qYa0PbF5yweD1bscQrTrypZfmp3PTdmDjc+Nd1q5s1MlZtVP2aKoyK7oJmqxJ
-	5YRgbDQuQ4buFZCHLIPBf9Jci64IwekOi8jWwnp3aEA+N0rp/vF8dt083Uw==
-X-Gm-Gg: ASbGncv3JxliMQ7oiJifJw7iMyaR4dVl1rBjUeTIQy6uTjeAEdg030vaoic4uNcmyfm
-	u4p0g6UIOnOurzY1nxN5JvuiwXmiuVt+4O192/ROgs667x6fpAFjhZjpDxdWK5+AgvebFs0NOaS
-	Z1gNfjKR5au08s5dNjoWk99gffbuV+R2TUUmoqHz4OgiFwvMcN2mVfqY1vu6N768JcJQSkG2rho
-	WUVRoz4Kn1Tzp+aBVEkc7XAPCTXmnr79zH82MjHYQHWVvfXIIjnjvnYW00O3DWxK+kBLz6KIYbE
-	nYZzXfWuGYaNuEfTy+A=
-X-Received: by 2002:a05:6000:1a8e:b0:3a4:e706:530c with SMTP id ffacd0b85a97d-3a4e70654d3mr7159470f8f.48.1748532646755;
-        Thu, 29 May 2025 08:30:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHR1Kldf3lsgro3dy9ynfDXT3CbuGyXEkBFU7Pb1dYF+M1q5LT58zP4UnWxibx+2c7UVLCd+A==
-X-Received: by 2002:a05:6000:1a8e:b0:3a4:e706:530c with SMTP id ffacd0b85a97d-3a4e70654d3mr7159438f8f.48.1748532646320;
-        Thu, 29 May 2025 08:30:46 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cce5:2e10::f39? ([2a0d:3341:cce5:2e10::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe6c43asm2275112f8f.21.2025.05.29.08.30.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 May 2025 08:30:45 -0700 (PDT)
-Message-ID: <1f852603-5585-4c3d-9689-b89daba8fee1@redhat.com>
-Date: Thu, 29 May 2025 17:30:43 +0200
+	s=arc-20240116; t=1748533975; c=relaxed/simple;
+	bh=hl2EGsrGA6DGqbMtlfQBtSfBMc1FbsIADq0RXh96ZlM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cJwjZVzw5ms7yscpWoXZW/maKEGTFIawAtFQy2wjw5MaIdYSNMCW01gbC8IAHbumDyk5+PEfZE36tGot4gCLdq1kbhSi5MZtlpywhNCRz84BU3D6CowLw6sqBJjFu+DEnBbWcVeGetkWztLJXmCqi/yLuEciEieoh0pz+8o7m04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kCV2Z42y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79AC8C4CEE7;
+	Thu, 29 May 2025 15:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748533975;
+	bh=hl2EGsrGA6DGqbMtlfQBtSfBMc1FbsIADq0RXh96ZlM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=kCV2Z42yGt0npy4Ex2G+oPRP+thc3Fkcwhd8enV06PV5M8H2VwCiYZesrJFsBUQQT
+	 qgL9LkWnJfGIJMZRbuXBJixkUSLqwMDDV/T3tTKZEMwKleSgfTuCFTWRUOLVtkO5Lp
+	 WA/SDlmfskrmgbGIQYBcBMEoYiCcF+i5PNz6yiduLgHy4oJBvZ+VpXg2wmHUAmOIRm
+	 LttEO5uOCgA8Qe/7PwyCSEJ8/wBb07GbWbGkODIAGVCbARJ9zhhNe3wwFu0JedvdCA
+	 58CWZMz01/lvXOjYEd85XmjNIxFQV7KThwR5bvqc8vJJsVs8nf/vb4FH152iRoFLXw
+	 jlRuFHa9LKWaw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net 0/2] net: airoha: Fix IPv6 hw acceleration
+Date: Thu, 29 May 2025 17:52:36 +0200
+Message-Id: <20250529-airoha-flowtable-ipv6-fix-v1-0-7c7e53ae0854@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/8] net: implement virtio helpers to handle UDP
- GSO tunneling.
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <6e001d160707e1cf87870acee5adc302f8cb39b6.1747822866.git.pabeni@redhat.com>
- <CACGkMEtkbx8VZ2HAuDUbO9LStzoM6JQVcmA+6e+jM1o=r9wKow@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CACGkMEtkbx8VZ2HAuDUbO9LStzoM6JQVcmA+6e+jM1o=r9wKow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMSCOGgC/x2MSwqAMAwFryJZG6gF6+cq4iJqqgGx0ooK4t0NL
+ ucNbx5IHIUTtNkDkU9JEjaFIs9gXGibGWVSBmtsaUrbIEkMC6Ffw3XQsKrfT4debmwqR8XIteF
+ qAv3vkXX+213/vh9poXh1awAAAA==
+X-Change-ID: 20250529-airoha-flowtable-ipv6-fix-976a1ce80e7d
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-On 5/26/25 6:40 AM, Jason Wang wrote:
-> On Wed, May 21, 2025 at 6:34 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> @@ -242,4 +249,158 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
->>         return 0;
->>  }
->>
->> +static inline unsigned int virtio_l3min(bool is_ipv6)
->> +{
->> +       return is_ipv6 ? sizeof(struct ipv6hdr) : sizeof(struct iphdr);
->> +}
->> +
->> +static inline int virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
->> +                                           const struct virtio_net_hdr *hdr,
->> +                                           unsigned int tnl_hdr_offset,
->> +                                           bool tnl_csum_negotiated,
->> +                                           bool little_endian)
-> 
-> Considering tunnel gso requires VERSION_1, I think there's no chance
-> for little_endian to be false here.
+Fix IPv6 hw acceleration in bridge mode resolving ib2 and
+airoha_foe_mac_info_common overwrite in
+airoha_ppe_foe_commit_subflow_entry routine.
+Introduce UPDMEM source-mac table used to set source mac address for
+L3 IPv6 hw accelerated traffic.
 
-If tnl_hdr_offset == 0, tunnel gso has not been negotiated, and
-little_endian could be false. I can assume little_endian is true in the
-!!tnl_hdr_offset branch.
+---
+Lorenzo Bianconi (2):
+      net: airoha: Initialize PPE UPDMEM source-mac table
+      net: airoha: Fix IPv6 hw acceleration in bridge mode
 
-/P
+ drivers/net/ethernet/airoha/airoha_eth.c  |  2 ++
+ drivers/net/ethernet/airoha/airoha_eth.h  |  1 +
+ drivers/net/ethernet/airoha/airoha_ppe.c  | 52 ++++++++++++++++++++++++-------
+ drivers/net/ethernet/airoha/airoha_regs.h | 10 ++++++
+ 4 files changed, 53 insertions(+), 12 deletions(-)
+---
+base-commit: 27eab4c644236a9324084a70fe79e511cbd07393
+change-id: 20250529-airoha-flowtable-ipv6-fix-976a1ce80e7d
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
