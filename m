@@ -1,191 +1,112 @@
-Return-Path: <netdev+bounces-194165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D1DAC79E2
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 09:38:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684ABAC79F1
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 09:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9524188D648
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 07:38:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0E127AB806
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 07:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF21B217722;
-	Thu, 29 May 2025 07:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVCCQMg8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE2A205513;
+	Thu, 29 May 2025 07:53:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDFC20E70F
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 07:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6711EF0BB
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 07:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748504307; cv=none; b=IP7JYH23CD1/MBbz/9JGFxslM67EnMp6bvdzhbBimjI4j3GLqFTXeN1nyP/dNCN8d1F+X5lhWyXbpCgAJ9xwzHhSlcooeFXhq/PTOEtMsy3ASC+VQhbgoVT8wVEzEzIaSiR3nQlUNxGHdoKQRIEaXy1cCGecBuiWUWUAP/4wduM=
+	t=1748505212; cv=none; b=pydcXurVuoMKT5DAthtSYLiJ9sbQIRW/u2QO0xYtj00u5teEZiMWKqD5xGfBZxW5ZHJJnRPm2UKm2WWFz0rG4wDsJ57cxPVUaYhexe85o3lnpIOcZ9GPRjQ3h81sIweICKXAZ6NAMY+gPQD3VSaKDPiOcOrMrMYak3iftiivOls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748504307; c=relaxed/simple;
-	bh=7JYqNlaM+z6Zp+0u7TikFBdCRQA4T3c1mTtgN0EnUCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q3f6dI0hE4rnCi9PTqfX68ARnzwYz/tGqRQ/w+uTojByS+J9IAOCnnAwDDG97UDaFyFnsiC29iybDRqR3XY4TTeMx5dKz4GRic2BBET7hooBHC4N6R5vYGVnwPHOTc5lRBCBuz3H36R4M+weuZlFWVOzmcKAeh3tS+Zu484iXN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VVCCQMg8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748504304;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=blXWwpJ0S+trZnzM7At1CLgsyWQnrAAvxFebkGVwfyM=;
-	b=VVCCQMg8nqiPVux1hz8jFdNlFW5MXgFKfRd3Y0ctwkzXZ3YqB44PoprP6WZwnmgnGuwONq
-	r7dRHziHEdGN2/wOoV0XsMMqikLUfB3SRxuE4KMr62QxzdeSNaUjtiaog9u5/RG48G1qcV
-	PepPOXru9j/dKyA10Mf3m4gQSv0aRu0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-u5a4dWQFO7agm_DQt0xSNA-1; Thu, 29 May 2025 03:38:22 -0400
-X-MC-Unique: u5a4dWQFO7agm_DQt0xSNA-1
-X-Mimecast-MFC-AGG-ID: u5a4dWQFO7agm_DQt0xSNA_1748504301
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cfda30a3cso3399105e9.3
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 00:38:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748504301; x=1749109101;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=blXWwpJ0S+trZnzM7At1CLgsyWQnrAAvxFebkGVwfyM=;
-        b=bIwgeEwj2onXoIVAIq3R7n0KUprRq5AGJq91k+RxUppVPfVzWrmFWeyNj3Dl2KdszR
-         itT4/s8nof1ghEPcUZqROO0jsB4tZDezufNnsyXDx92t01huMXp+Vf2Shf3rgjOjvlEx
-         AaK3ZDeQuqZzl60GQkfgqGNFXqpqKegfeBg1JV2NmrxZ1dbL09FGoaOVWaIQ/8Q0g01R
-         Lu1b7fojtm3hFyjigfdqRvOoOLkrGkPVMbLcuT0QzG2LQMASMnTTq7Oy11Fq017xm1fs
-         Rqypla/bCycUtZFuvH3LbURU0BoB5ackiNrzHrUStlGa0xbcyNOKloKuiqOtH0zqG21P
-         gT3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUdyP4BGFmJ7pS2XGB9hbctuIPgbJ1/e1sVGcn5bZ5FU7qKAMfLf7ViWm/B9VFh1RmwX2mENcI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy98urk9cPTRb3jFIDxCCXEr3Y6Q9ErNejFi6zwLjxbsRZ0+Rm
-	P5/QWDBDfjRP8wJqbttF+wyxmQESsLBWMgV82LldWJTKIi96CgEhIB3fEPzWDZ6YLsZCfXsmwqe
-	OXZNzjpdbVdZCvSzTdgtuL9yd0cb4Zt1NmLdVMalomNA/BUyPAb3RohnyQIX+UUaKyA==
-X-Gm-Gg: ASbGncuP/X1ck+ncKbsEyKID97Q1JD325lwURE8DtUgOq3UqafgPv0++WN5H7s5fIp7
-	X0awJyLvRc09l6/u3NQ+f7hYr6LzVRc6hT+UhSoSptMHrtrXSqNi0mpxKenNBFgUX1FgEgFaKAn
-	77fEM1twK+1GBktjEWhva+aXDBhaaTn+FbzdHy6O1yU9DZep5PQZMBSEeIy2Sk93FwQiDVCeeqr
-	ZhYO5aPuGlwC5AB+0y6L0BGbLBGiN4x6EemJU0F+gD8OaNTZd41rMc6t5yGkc7fW6lWVv3dnz2w
-	Gu4Qa6cQ6bwV1Nrh1PDdZcE0QKxyu0PQys5MsYy3u6UFmesZyewmNQAto3g=
-X-Received: by 2002:a05:6000:128c:b0:3a4:e6b4:9c4b with SMTP id ffacd0b85a97d-3a4e6b49cdbmr4972166f8f.1.1748504300633;
-        Thu, 29 May 2025 00:38:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF7cb2kxX141BOz6JcKz1zN+umEGKrnVlgqYHtuQmbfM8gGa0/+JigyP07V6fPF+YqrDlOuLA==
-X-Received: by 2002:a05:6000:128c:b0:3a4:e6b4:9c4b with SMTP id ffacd0b85a97d-3a4e6b49cdbmr4972149f8f.1.1748504300182;
-        Thu, 29 May 2025 00:38:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cce5:2e10:5e9b:1ef6:e9f3:6bc4? ([2a0d:3341:cce5:2e10:5e9b:1ef6:e9f3:6bc4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4f00972d9sm1154767f8f.64.2025.05.29.00.38.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 May 2025 00:38:19 -0700 (PDT)
-Message-ID: <ea2e4ba3-4dd6-4bee-ad26-2ed541f4aeaf@redhat.com>
-Date: Thu, 29 May 2025 09:38:18 +0200
+	s=arc-20240116; t=1748505212; c=relaxed/simple;
+	bh=6ISgwnkjRIxL/WaKp/MlO1eF4oug1b2X2N1MXZwf95M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DGHfY+OYUR6FSNSKAgtLKCvhHIJI04YITkoDT7oamaSQqbZuAakV0mbTZmFcvCXUCse6nr2NiLV8ryUx7pK5r/48HuCKnUsYaV57+PS6NB7Dh8pYpntI7rLCzV/ZIQvPD1l6mBXkrBNSsQdbBjlbsMuBlJwqAp41VPTscqnUz54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uKY4t-0006Et-ML
+	for netdev@vger.kernel.org; Thu, 29 May 2025 09:53:27 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uKY4t-000ig0-1c
+	for netdev@vger.kernel.org;
+	Thu, 29 May 2025 09:53:27 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 3022B41BF09
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 07:53:27 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 75B3F41BF04;
+	Thu, 29 May 2025 07:53:24 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 5f28ef04;
+	Thu, 29 May 2025 07:53:21 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/1] pull-request: can 2025-05-29
+Date: Thu, 29 May 2025 09:49:29 +0200
+Message-ID: <20250529075313.1101820-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] net: Fix checksum update for ILA adj-transport
-To: Paul Chaignon <paul.chaignon@gmail.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Ahern <dsahern@kernel.org>, Tom Herbert <tom@herbertland.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <cover.1748337614.git.paul.chaignon@gmail.com>
- <3735f3bd86717bb22507a05f40b1432ec362138c.1748337614.git.paul.chaignon@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <3735f3bd86717bb22507a05f40b1432ec362138c.1748337614.git.paul.chaignon@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 5/27/25 11:48 AM, Paul Chaignon wrote:
-> During ILA address translations, the L4 checksums can be handled in
-> different ways. One of them, adj-transport, consist in parsing the
-> transport layer and updating any found checksum. This logic relies on
-> inet_proto_csum_replace_by_diff and produces an incorrect skb->csum when
-> in state CHECKSUM_COMPLETE.
-> 
-> This bug can be reproduced with a simple ILA to SIR mapping, assuming
-> packets are received with CHECKSUM_COMPLETE:
-> 
->   $ ip a show dev eth0
->   14: eth0@if15: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
->       link/ether 62:ae:35:9e:0f:8d brd ff:ff:ff:ff:ff:ff link-netnsid 0
->       inet6 3333:0:0:1::c078/64 scope global
->          valid_lft forever preferred_lft forever
->       inet6 fd00:10:244:1::c078/128 scope global nodad
->          valid_lft forever preferred_lft forever
->       inet6 fe80::60ae:35ff:fe9e:f8d/64 scope link proto kernel_ll
->          valid_lft forever preferred_lft forever
->   $ ip ila add loc_match fd00:10:244:1 loc 3333:0:0:1 \
->       csum-mode adj-transport ident-type luid dev eth0
-> 
-> Then I hit [fd00:10:244:1::c078]:8000 with a server listening only on
-> [3333:0:0:1::c078]:8000. With the bug, the SYN packet is dropped with
-> SKB_DROP_REASON_TCP_CSUM after inet_proto_csum_replace_by_diff changed
-> skb->csum. The translation and drop are visible on pwru [1] traces:
-> 
->   IFACE   TUPLE                                                        FUNC
->   eth0:9  [fd00:10:244:3::3d8]:51420->[fd00:10:244:1::c078]:8000(tcp)  ipv6_rcv
->   eth0:9  [fd00:10:244:3::3d8]:51420->[fd00:10:244:1::c078]:8000(tcp)  ip6_rcv_core
->   eth0:9  [fd00:10:244:3::3d8]:51420->[fd00:10:244:1::c078]:8000(tcp)  nf_hook_slow
->   eth0:9  [fd00:10:244:3::3d8]:51420->[fd00:10:244:1::c078]:8000(tcp)  inet_proto_csum_replace_by_diff
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     tcp_v6_early_demux
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     ip6_route_input
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     ip6_input
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     ip6_input_finish
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     ip6_protocol_deliver_rcu
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     raw6_local_deliver
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     ipv6_raw_deliver
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     tcp_v6_rcv
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     __skb_checksum_complete
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     kfree_skb_reason(SKB_DROP_REASON_TCP_CSUM)
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     skb_release_head_state
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     skb_release_data
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     skb_free_head
->   eth0:9  [fd00:10:244:3::3d8]:51420->[3333:0:0:1::c078]:8000(tcp)     kfree_skbmem
-> 
-> This is happening because inet_proto_csum_replace_by_diff is updating
-> skb->csum when it shouldn't. The L4 checksum is updated such that it
-> "cancels" the IPv6 address change in terms of checksum computation, so
-> the impact on skb->csum is null.
-> 
-> Note this would be different for an IPv4 packet since three fields
-> would be updated: the IPv4 address, the IP checksum, and the L4
-> checksum. Two would cancel each other and skb->csum would still need
-> to be updated to take the L4 checksum change into account.
-> 
-> This patch fixes it by passing an ipv6 flag to
-> inet_proto_csum_replace_by_diff, to skip the skb->csum update if we're
-> in the IPv6 case. Note the behavior of the only other user of
-> inet_proto_csum_replace_by_diff, the BPF subsystem, is left as is in
-> this patch and fixed in the subsequent patch.
-> 
-> With the fix, using the reproduction from above, I can confirm
-> skb->csum is not touched by inet_proto_csum_replace_by_diff and the TCP
-> SYN proceeds to the application after the ILA translation.
-> 
-> 1 - https://github.com/cilium/pwru
-> Fixes: 65d7ab8de582 ("net: Identifier Locator Addressing module")
-> Signed-off-by: Paul Chaignon <paul.chaignon@gmail.com>
+Hello netdev-team,
 
-Patch 2 does not apply cleanly anymore, please rebase. While at it,
-please also replace:
+this is a pull request of 1 patch for net/main.
 
-1 - https://github.com/cilium/pwru
+The patch is by Fedor Pchelkin and fixes a slab-out-of-bounds access
+in the kvaser_pciefd driver.
 
-with a more customary tag:
+regards,
+Marc
 
-Link: https://github.com/cilium/pwru [1]
+---
 
-Thanks,
+The following changes since commit 271683bb2cf32e5126c592b5d5e6a756fa374fd9:
 
-Paolo
+  page_pool: Fix use-after-free in page_pool_recycle_in_ring (2025-05-28 19:19:36 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.16-20250529
+
+for you to fetch changes up to 54ec8b08216f3be2cc98b33633d3c8ea79749895:
+
+  can: kvaser_pciefd: refine error prone echo_skb_max handling logic (2025-05-29 09:45:27 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.16-20250529
+
+----------------------------------------------------------------
+Fedor Pchelkin (1):
+      can: kvaser_pciefd: refine error prone echo_skb_max handling logic
+
+ drivers/net/can/kvaser_pciefd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 
