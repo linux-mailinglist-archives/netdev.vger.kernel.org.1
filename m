@@ -1,278 +1,262 @@
-Return-Path: <netdev+bounces-194256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75139AC80CA
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 18:18:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1911AC80D3
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 18:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 167C94A1093
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 16:18:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93B9E18992CF
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 16:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8AE1C1F22;
-	Thu, 29 May 2025 16:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1EF22CBE2;
+	Thu, 29 May 2025 16:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fRZLaRWG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rn7QQvI7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2055.outbound.protection.outlook.com [40.107.244.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1291362
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 16:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748535486; cv=none; b=fOIWL0B8MEOMYT5VP30RF6vGxTi6UVKHLyzdZfeOMRd1f3ak0TOHvOjP+IV+UTlKYloN80fpy6V5GYz1k6/08zm1PEYCpaSJGhXqlGp4JB/htAD22Dd4y3TeSbJznNqFltRbEcq8R09XQe6bCTIGq9DhkqTSHDZ3O7wafOCudKE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748535486; c=relaxed/simple;
-	bh=e5f/RdHUmFxGvGsAcNxaI7dckvX/o0m+rw9GHxwBUhA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fnh/K44JwSV3Q0W58Ah3NR2Dn7GpfMSjh5iYcxNUX14mTtE2ipmm1/2nz0YOQzlRlW1XG7lnUV1wG2ovG/fQqUkkvgfWDtP8IKT0m+KilbSg7k7zbXbxAv3h+lBBCit6SedHHjlZYZzW1M8RnxkuMFuVNng1zoBxbJPCeE1N5Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fRZLaRWG; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d5be7218-8ec1-4208-ac24-94d4831bfdb6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748535480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1tSel3scbAebqAGaqx0WAdDuK59jgb/Kgus0RNUA+zc=;
-	b=fRZLaRWG0s9LorTzK+I2Z89Vbphji7APvt/VS0CeeHvrPpv+E8wYcxtcXhT4liPtTHaBxU
-	j9YC6A2GgoX81qroo8JCpr2wkLW0H/LoQWveGpUnUDK6an2phNi/uxLLgE+oNDbKffOuV5
-	QYYN/2OjYhEGS1mnJzxGPsmyCfOAyEQ=
-Date: Thu, 29 May 2025 12:17:55 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76C619AD90;
+	Thu, 29 May 2025 16:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748535870; cv=fail; b=Ek6XXm04StnUrdRP+MksGsdb/qR3J+zvlvbioAO4vdOAQHaxD/qqH6H1HyGis5S70X9+T9brYnO/bXR+Wg51XuviEatEb/30Qn24PD+OnwQDyFTAPpxLPFAcef+W2U3lWin1NevoN0Ooo3lq7WjDVaskxWpPYvHiELNUzhqkmhQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748535870; c=relaxed/simple;
+	bh=/9LWGQFLUthHBbC5RmWiUEU0VJ5/jcXjrK9Btfl3P7M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RtP/6xnsjHvrT/yc6hom18dFTdyjS3miUgNO0tmb7coPkyDq7hjsNOHcvXr71iHkfp3+1NWEBuuM2vC4lfroVr++99PXThXzylHMMXXyHkWU7hV4cUKLD1yB+uo8G2smY7n2/zDCCBDGnNNtdbbBfyZ/OJi5OIPG9C29myuGvMk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rn7QQvI7; arc=fail smtp.client-ip=40.107.244.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oO3K15NVKeCM+ZgRpNzpX7hmi/JM3lLnSzH0GWYFH0P8UsOov/dAvkVRr0CX+jko9F0/JZQkbeO4cxcn4x0a0Ke2ts6GAi0DgjVOPzWVDyyNfmtFWmXsrGk0nQpjabx+dr5Jq9He1Gg+zDyKJValJ8gd/CsmG4sG1VdSIIDvR0EfLYdRefrloG/3c1wkNQoPIqZm/yfIf1YPwXh7VPFiWtpuPnjPVkTurY2B6c7y6e8g+bnrg+CxTHKKjjd+F5v1cm6G0Lqhk61ISGU98aUDBd5lDG5wIqgt1cJI5nxAaHzWNgeZIq35vDUGBjkjmMMTRgO8TwommWm0lP29FdQ1Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qqMIQRvjXHZr/dxOUCPcsFi5tYQOlDJ9Uds42tUfRqU=;
+ b=pW/x1wP/jmzQkBQx+iJRy5IJhw3CDV1minUBY82xY/0ecaRCkcoBaHKdVq65MQ23mBhn9e8d8lvV6VhTqV1p3+YgEpTBF231qp+Ott8v1JKLpeEGlKUqFZ+ZZ9VDAA9tTh9XJTAV7t6cxQZypgESPo8xEs7vxSBkXyO99anjegkL9XkztlKg1c+tPoV9YHcxaZwKj7lyXNNRakG2kDrqex+7IwLEGCAJpQTunqoP6Qhw1LUh6s8rd8sl30/deqZd+rKBY+QfNzKbSvFLvOKlaT83R4KJ6kyObclE3Z87FpOQag+VTNziYaAuF9K42UnVjb1J6vP/KVF0RXgp78InZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kylinos.cn smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qqMIQRvjXHZr/dxOUCPcsFi5tYQOlDJ9Uds42tUfRqU=;
+ b=rn7QQvI7J77lyoXU8A3G6+aTHHoJT9Pp7QmN+08nHU44mVVzO8tqgjWe8m2TZj/UZ7oE9B7d2qeYlWaLjjxrnPtjzs5GPKbXnQ4+amRNyTFq8o/IT9E6f9gixb1TTxda838gyaSuQ5YAsqefvfCEjp3kypwfrT6CMFPqfeJ+wPEnEvaBqKX0VKqFSkI5qMaRQqrc63VV1jntypM4YzOyTD/3jRzTSgmEL4w7NUr9QdrJWzaJutn4g2A876NTYBRuNxsVSbbHOHCetcF+IjRCPkQUoCvIUj5qDFlT5q38sgTUrvc3j8fFSEpJFx83ETJgbns+u9hHHrVuFz+VELKwaQ==
+Received: from SN7PR04CA0173.namprd04.prod.outlook.com (2603:10b6:806:125::28)
+ by CY8PR12MB8339.namprd12.prod.outlook.com (2603:10b6:930:7e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.24; Thu, 29 May
+ 2025 16:24:26 +0000
+Received: from SA2PEPF00001506.namprd04.prod.outlook.com
+ (2603:10b6:806:125:cafe::40) by SN7PR04CA0173.outlook.office365.com
+ (2603:10b6:806:125::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8746.31 via Frontend Transport; Thu,
+ 29 May 2025 16:24:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SA2PEPF00001506.mail.protection.outlook.com (10.167.242.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8769.18 via Frontend Transport; Thu, 29 May 2025 16:24:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 29 May
+ 2025 09:24:11 -0700
+Received: from [172.27.21.18] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 29 May
+ 2025 09:24:07 -0700
+Message-ID: <b8c300f8-bb3b-421f-81c5-f493984f922d@nvidia.com>
+Date: Thu, 29 May 2025 19:24:00 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report
- coalesce parameters in DMAengine flow
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "vkoul@kernel.org" <vkoul@kernel.org>,
- "Simek, Michal" <michal.simek@amd.com>,
- "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
- "horms@kernel.org" <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "git (AMD-Xilinx)" <git@amd.com>, "Katakam, Harini" <harini.katakam@amd.com>
-References: <20250525102217.1181104-1-suraj.gupta2@amd.com>
- <679d6810-9e76-425c-9d4e-d4b372928cc3@linux.dev>
- <BL3PR12MB6571ABA490895FDB8225CAEBC967A@BL3PR12MB6571.namprd12.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/mlx5: Flag state up only after cmdif is ready
+To: Chenguang Zhao <zhaochenguang@kylinos.cn>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
+References: <20250529075849.243096-1-zhaochenguang@kylinos.cn>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <BL3PR12MB6571ABA490895FDB8225CAEBC967A@BL3PR12MB6571.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <20250529075849.243096-1-zhaochenguang@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001506:EE_|CY8PR12MB8339:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bc78dcd-8e61-46f7-d7c8-08dd9ecd46e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RHhQcDNRazhValV3ZkVJaSt2Sjk4VkUrTlQ5K0M3b2Z6NUtJZGlTMHdIazVZ?=
+ =?utf-8?B?REtpOGVwNU5DMlg5OEJxQ3orSEZTZDRoYTFYV1l6MHdKWjVQMnUxbjJQN2ZX?=
+ =?utf-8?B?a05Qd3MyUTBTS1QvWjJQN29aY1MzME1hV2FpUCtpa3FnN0drcXZ6eVhxVDRx?=
+ =?utf-8?B?VnJaWFZuUlFsdE1wU05jZ0wraUpaU0NlbEVzUnRQMGVqV1ROY2FRMXMxTlo0?=
+ =?utf-8?B?Zzl5ZUNBQ2ord24wWTJLOTRQVjZwMHczaExVVUhZdTlGazlTWmpJSU5BOG1n?=
+ =?utf-8?B?RWQ4WElUQ1NWeitWUG5RRXJFekgrWW0zTGxLYVBUQXJSWXBqZGNIZ0NQUmY2?=
+ =?utf-8?B?TGE4MzZ2UWxVaUkrOWVpK3dvdnZIbjljR1dqc0xTcU1ta3dnNDQ1cVJhUERH?=
+ =?utf-8?B?YUQwSWFxSnFFdHN2Vk9kR29ia0NpUXVmTUhDVEtZMExlSnRNRlVzek43RXVI?=
+ =?utf-8?B?ZGUrSDZhcGZFNVkwL3VSNHZjWURpRGNiUTlSV0dzMWxQalNBNUxkaTArY3Fk?=
+ =?utf-8?B?bFVFTktBeFMvMDFhSWNGTXRHRHRleEwrUUU3YzRTS3hlTi9FdlpWZjFuSzA2?=
+ =?utf-8?B?YVA0UHovcjkvbG9FbXpQRDNrL3JuNkxER3JmM0pWWDJWSzRsVnRLT09sY1FF?=
+ =?utf-8?B?QXJQWEV0V09FWDZ5UlpVdFFvSEJuQ2VaR2pLTElvNWs2VGxNeUNHV2RJemxH?=
+ =?utf-8?B?LzZ1emJKMzI2eDFETTgwczNhRWtyRVE5bHd5QllyWUdTOWJoMGtpYUxPb0Fs?=
+ =?utf-8?B?WTVpbi9tTFBvZXhlWHlEMjhpczJjYjY2bGE4WmRWRUtkNTNyRjQwdUlWMlIw?=
+ =?utf-8?B?MzNtK1JrVmVYMkpRa0cyQjVIZys4TlNBeFc1VGZETXZiUzU1QWxzUXQwY2Mw?=
+ =?utf-8?B?b0VtWm1CY3k4VEs4ZmRRcVFteHZJdDFoNkh2eFY0aURnSGRnN0tLM3RnZ3BX?=
+ =?utf-8?B?cSs1UjE5dVQ4T1h6Zm9NdmhCK2NxK0xYQWZCY3pWQlArdEt4cHhGOU0wYWNi?=
+ =?utf-8?B?ZWJXRFhUWlhHMzhMTXRnTHdHWm1zUnFrejBYTkVteVgzUGlyZzIxdms3TDND?=
+ =?utf-8?B?N0xFaTRPaDhIa2xiRWw1ME5HeEpHSTZVbWtlYTIycmYvN1pjNEExOG9ZWXc5?=
+ =?utf-8?B?TzM2NzNEUHRMU1ZqOGJMYy8vcUZDWms0TWFHdUpIYzNndHVZWXA5U0lpeEJh?=
+ =?utf-8?B?NEZueDU1WU1KS0VQb3lTUm5rOXRnN2d5bzFVNTdqUHhhV1pOVWpRaGtBc1ZZ?=
+ =?utf-8?B?amEvbnBsSVJHc2x3S1pWWGU1VGNZUWtZSGx0NkI4RmJKVm9Dc1NTNmN2MTZX?=
+ =?utf-8?B?cjBFUlVXOU93WTRKV0FzYzZGV2dMY2MvMXYxa3MwVlRnSFFXR3gyV2Q2L0lo?=
+ =?utf-8?B?V0hhY3ptKzlwdHZ3dFNNNXNEYVpkZ2VMVTI2V1VzeGRFMG16TXZMVFFzSzFW?=
+ =?utf-8?B?dlhzWmMrUTJyVXhFcWhFdTJrb3JPZktqN3RxcVdhTDhLYkxUdGlqQlZiQ21x?=
+ =?utf-8?B?SzR2REh6aksxTlYyVm1Qb0lXSUZXSUZwYWFGQ3BXMUd1QkFvS3lkUWJxalVz?=
+ =?utf-8?B?dDYvUVF5eGg3WDJHNW1BZU1LNlkxTkZ1Rk4vUkJ5SGk1cG9GZmQyMDZzWnRM?=
+ =?utf-8?B?RGREVzlkaHR0WUU3ZVV1VWxPQ1grMU9CSzdUZElveFRVZkxkV1Mra3l4R21q?=
+ =?utf-8?B?RjNKQkI0NUlpOUtYQ1Y3RzF3WFYvMlpFZm5mTXdyZVNldkx2d2tRR1pONUgr?=
+ =?utf-8?B?SklyUy93eDc0YVJQbEFENDdNbEpLRDhDUnNVdkdzS1RTNmpZOGNLOTE5UGY4?=
+ =?utf-8?B?dFFXeGd3SlhTOVdvMCtZQ2htRUNrUUdPcGJaak1xY2lNd3M2V3p6M3BBV2pY?=
+ =?utf-8?B?UVZ1SkxJZXRwa3FnUmMveTY3VUw4d2ZZdXZhSU1mU09FeDJzVlIyNTE0NEZI?=
+ =?utf-8?B?NU52ZnhJQjVWaWhLaWdmUXZCWEdJVjNWSG52aktYcVJnWGthWUVma0FXdnZJ?=
+ =?utf-8?B?S0UyRjFxMzI4NHRaUkJPdm1palVFVUVIVi81bnNQRE9ZdEZjOG84aU53YTBr?=
+ =?utf-8?Q?pe1Ypw?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 16:24:24.9981
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bc78dcd-8e61-46f7-d7c8-08dd9ecd46e6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001506.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8339
 
-On 5/28/25 08:00, Gupta, Suraj wrote:
-> [AMD Official Use Only - AMD Internal Distribution Only]
+
+
+On 5/29/2025 10:58 AM, Chenguang Zhao wrote:
+> When driver is reloading during recovery flow, it can't get new commands
+> till command interface is up again. Otherwise we may get to null pointer
+> trying to access non initialized command structures.
 > 
->> -----Original Message-----
->> From: Sean Anderson <sean.anderson@linux.dev>
->> Sent: Tuesday, May 27, 2025 9:47 PM
->> To: Gupta, Suraj <Suraj.Gupta2@amd.com>; andrew+netdev@lunn.ch;
->> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
->> pabeni@redhat.com; vkoul@kernel.org; Simek, Michal <michal.simek@amd.com>;
->> Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; horms@kernel.org
->> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
->> kernel@vger.kernel.org; git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
->> <harini.katakam@amd.com>
->> Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report coalesce
->> parameters in DMAengine flow
->>
->> Caution: This message originated from an External Source. Use proper caution
->> when opening attachments, clicking links, or responding.
->>
->>
->> On 5/25/25 06:22, Suraj Gupta wrote:
->> > Add support to configure / report interrupt coalesce count and delay
->> > via ethtool in DMAEngine flow.
->> > Netperf numbers are not good when using non-dmaengine default values,
->> > so tuned coalesce count and delay and defined separate default values
->> > in dmaengine flow.
->> >
->> > Netperf numbers and CPU utilisation change in DMAengine flow after
->> > introducing coalescing with default parameters:
->> > coalesce parameters:
->> >    Transfer type        Before(w/o coalescing)  After(with coalescing)
->> > TCP Tx, CPU utilisation%      925, 27                 941, 22
->> > TCP Rx, CPU utilisation%      607, 32                 741, 36
->> > UDP Tx, CPU utilisation%      857, 31                 960, 28
->> > UDP Rx, CPU utilisation%      762, 26                 783, 18
->> >
->> > Above numbers are observed with 4x Cortex-a53.
->>
->> How does this affect latency? I would expect these RX settings to increase latency
->> around 5-10x. I only use these settings with DIM since it will disable coalescing
->> during periods of light load for better latency.
->>
->> (of course the way to fix this in general is RSS or some other method involving
->> multiple queues).
->>
+> The issue can be reproduced using the following script:
 > 
-> I took values before NAPI addition in legacy flow (rx_threshold: 24, rx_usec: 50) as reference. But netperf numbers were low with them, so tried tuning both and selected the pair which gives good numbers.
-
-Yeah, but the reason is that you are trading latency for throughput.
-There is only one queue, so when the interface is saturated you will not
-get good latency anyway (since latency-sensitive packets will get
-head-of-line blocked). But when activity is sparse you can good latency
-if there is no coalescing. So I think coalescing should only be used
-when there is a lot of traffic. Hence why I only adjusted the settings
-once I implemented DIM. I think you should be able to implement it by
-calling net_dim from axienet_dma_rx_cb, but it will not be as efficient
-without NAPI.
-
-Actually, if you are looking into improving performance, I think lack of
-NAPI is probably the biggest limitation with the dmaengine backend.
-
->> > Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
->> > ---
->> > This patch depend on following AXI DMA dmengine driver changes sent to
->> > dmaengine mailing list as pre-requisit series:
->> > https://lore.kernel.org/all/20250525101617.1168991-1-suraj.gupta2@amd.
->> > com/
->> > ---
->> >  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  6 +++
->> > .../net/ethernet/xilinx/xilinx_axienet_main.c | 53 +++++++++++++++++++
->> >  2 files changed, 59 insertions(+)
->> >
->> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> > b/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> > index 5ff742103beb..cdf6cbb6f2fd 100644
->> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> > @@ -126,6 +126,12 @@
->> >  #define XAXIDMA_DFT_TX_USEC          50
->> >  #define XAXIDMA_DFT_RX_USEC          16
->> >
->> > +/* Default TX/RX Threshold and delay timer values for SGDMA mode with
->> DMAEngine */
->> > +#define XAXIDMAENGINE_DFT_TX_THRESHOLD       16
->> > +#define XAXIDMAENGINE_DFT_TX_USEC    5
->> > +#define XAXIDMAENGINE_DFT_RX_THRESHOLD       24
->> > +#define XAXIDMAENGINE_DFT_RX_USEC    16
->> > +
->> >  #define XAXIDMA_BD_CTRL_TXSOF_MASK   0x08000000 /* First tx packet */
->> >  #define XAXIDMA_BD_CTRL_TXEOF_MASK   0x04000000 /* Last tx packet */
->> >  #define XAXIDMA_BD_CTRL_ALL_MASK     0x0C000000 /* All control bits */
->> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> > b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> > index 1b7a653c1f4e..f9c7d90d4ecb 100644
->> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> > @@ -1505,6 +1505,7 @@ static int axienet_init_dmaengine(struct
->> > net_device *ndev)  {
->> >       struct axienet_local *lp = netdev_priv(ndev);
->> >       struct skbuf_dma_descriptor *skbuf_dma;
->> > +     struct dma_slave_config tx_config, rx_config;
->> >       int i, ret;
->> >
->> >       lp->tx_chan = dma_request_chan(lp->dev, "tx_chan0"); @@ -1520,6
->> > +1521,22 @@ static int axienet_init_dmaengine(struct net_device *ndev)
->> >               goto err_dma_release_tx;
->> >       }
->> >
->> > +     tx_config.coalesce_cnt = XAXIDMAENGINE_DFT_TX_THRESHOLD;
->> > +     tx_config.coalesce_usecs = XAXIDMAENGINE_DFT_TX_USEC;
->> > +     rx_config.coalesce_cnt = XAXIDMAENGINE_DFT_RX_THRESHOLD;
->> > +     rx_config.coalesce_usecs =  XAXIDMAENGINE_DFT_RX_USEC;
->>
->> I think it would be clearer to just do something like
->>
->>         struct dma_slave_config tx_config = {
->>                 .coalesce_cnt = 16,
->>                 .coalesce_usecs = 5,
->>         };
->>
->> since these are only used once. And this ensures that you initialize the whole struct.
->>
->> But what tree are you using? I don't see these members on net-next or dmaengine.
+> 1)Use following script to trigger PCI error.
 > 
-> These changes are proposed in separate series in dmaengine https://lore.kernel.org/all/20250525101617.1168991-2-suraj.gupta2@amd.com/ and I described it here below my SOB.
+> for((i=1;i<1000;i++));
+> do
+> echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+> echo “pci reset test $i times”
+> done
+> 
+> 2) Use following script to read speed.
+> 
+> while true; do cat /sys/class/net/eth0/speed &> /dev/null; done
+> 
+> task: ffff885f42820fd0 ti: ffff88603f758000 task.ti: ffff88603f758000
+> RIP: 0010:[] [] dma_pool_alloc+0x1ab/0×290
+> RSP: 0018:ffff88603f75baf0 EFLAGS: 00010046
+> RAX: 0000000000000246 RBX: ffff882f77d90c80 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: 00000000000080d0 RDI: ffff882f77d90d10
+> RBP: ffff88603f75bb20 R08: 0000000000019ba0 R09: ffff88017fc07c00
+> R10: ffffffffc0a9c384 R11: 0000000000000246 R12: ffff882f77d90d00
+> R13: 00000000000080d0 R14: ffff882f77d90d10 R15: ffff88340b6c5ea8
+> FS: 00007efce8330740(0000) GS:ffff885f4da00000(0000) knlGS:0000000000000000
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 0000003454fc6000 CR4: 00000000003407e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call trace:
+>   mlx5_alloc_cmd_msg+0xb4/0×2a0 [mlx5_core]
+>   mlx5_alloc_cmd_msg+0xd3/0×2a0 [mlx5_core]
+>   cmd_exec+0xcf/0×8a0 [mlx5_core]
+>   mlx5_cmd_exec+0x33/0×50 [mlx5_core]
+>   mlx5_core_access_reg+0xf1/0×170 [mlx5_core]
+>   mlx5_query_port_ptys+0x64/0×70 [mlx5_core]
+>   mlx5e_get_link_ksettings+0x5c/0×360 [mlx5_core]
+>   __ethtool_get_link_ksettings+0xa6/0×210
+>   speed_show+0x78/0xb0
+>   dev_attr_show+0x23/0×60
+>   sysfs_read_file+0x99/0×190
+>   vfs_read+0x9f/0×170
+>   SyS_read+0x7f/0xe0
+>   tracesys+0xe3/0xe8
+> 
+> Fixes: a80d1b68c8b7a0 ("net/mlx5: Break load_one into three stages")
+> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+> ---
+> v2:
+>   - Add net subject prefix as Paolo suggested
+>   - Add Fixes tag
+>   - Add issus reproduction script and call trace
+> 
+> v1:
+>   https://lore.kernel.org/all/20250527013723.242599-1-zhaochenguang@kylinos.cn/
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/main.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+> index 41e8660c819c..713f1f4f2b42 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+> @@ -1210,6 +1210,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
+>   	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
 
-I think you should post those patches with this series to allow them to
-be reviewed appropriately.
+Up to this point cmd state should be down or uninitialized and that 
+seems to be the issue reached in the trace above
 
---Sean
+>   	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
+>   
+> +	/* remove any previous indication of internal error */
+> +	dev->state = MLX5_DEVICE_STATE_UP;
+> +
+>   	err = mlx5_core_enable_hca(dev, 0);
+>   	if (err) {
+>   		mlx5_core_err(dev, "enable hca failed\n");
+> @@ -1602,8 +1605,6 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
+>   		mlx5_core_warn(dev, "interface is up, NOP\n");
+>   		goto out;
+>   	}
 
->>
->> > +     ret = dmaengine_slave_config(lp->tx_chan, &tx_config);
->> > +     if (ret) {
->> > +             dev_err(lp->dev, "Failed to configure Tx coalesce parameters\n");
->> > +             goto err_dma_release_tx;
->> > +     }
->> > +     ret = dmaengine_slave_config(lp->rx_chan, &rx_config);
->> > +     if (ret) {
->> > +             dev_err(lp->dev, "Failed to configure Rx coalesce parameters\n");
->> > +             goto err_dma_release_tx;
->> > +     }
->> > +
->> >       lp->tx_ring_tail = 0;
->> >       lp->tx_ring_head = 0;
->> >       lp->rx_ring_tail = 0;
->> > @@ -2170,6 +2187,19 @@ axienet_ethtools_get_coalesce(struct net_device
->> *ndev,
->> >       struct axienet_local *lp = netdev_priv(ndev);
->> >       u32 cr;
->> >
->> > +     if (lp->use_dmaengine) {
->> > +             struct dma_slave_caps tx_caps, rx_caps;
->> > +
->> > +             dma_get_slave_caps(lp->tx_chan, &tx_caps);
->> > +             dma_get_slave_caps(lp->rx_chan, &rx_caps);
->> > +
->> > +             ecoalesce->tx_max_coalesced_frames = tx_caps.coalesce_cnt;
->> > +             ecoalesce->tx_coalesce_usecs = tx_caps.coalesce_usecs;
->> > +             ecoalesce->rx_max_coalesced_frames = rx_caps.coalesce_cnt;
->> > +             ecoalesce->rx_coalesce_usecs = rx_caps.coalesce_usecs;
->> > +             return 0;
->> > +     }
->> > +
->> >       ecoalesce->use_adaptive_rx_coalesce = lp->rx_dim_enabled;
->> >
->> >       spin_lock_irq(&lp->rx_cr_lock);
->> > @@ -2233,6 +2263,29 @@ axienet_ethtools_set_coalesce(struct net_device
->> *ndev,
->> >               return -EINVAL;
->> >       }
->> >
->> > +     if (lp->use_dmaengine)  {
->> > +             struct dma_slave_config tx_cfg, rx_cfg;
->> > +             int ret;
->> > +
->> > +             tx_cfg.coalesce_cnt = ecoalesce->tx_max_coalesced_frames;
->> > +             tx_cfg.coalesce_usecs = ecoalesce->tx_coalesce_usecs;
->> > +             rx_cfg.coalesce_cnt = ecoalesce->rx_max_coalesced_frames;
->> > +             rx_cfg.coalesce_usecs = ecoalesce->rx_coalesce_usecs;
->> > +
->> > +             ret = dmaengine_slave_config(lp->tx_chan, &tx_cfg);
->> > +             if (ret) {
->> > +                     NL_SET_ERR_MSG(extack, "failed to set tx coalesce parameters");
->> > +                     return ret;
->> > +             }
->> > +
->> > +             ret = dmaengine_slave_config(lp->rx_chan, &rx_cfg);
->> > +             if (ret) {
->> > +                     NL_SET_ERR_MSG(extack, "failed to set rx coalesce
->> parameters");
->> > +                     return ret;
->> > +             }
->> > +             return 0;
->> > +     }
->> > +
->> >       if (new_dim && !old_dim) {
->> >               cr = axienet_calc_cr(lp, axienet_dim_coalesce_count_rx(lp),
->> >                                    ecoalesce->rx_coalesce_usecs);
+So preferred instead of moving the dev->state change, add here: 
+mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_DOWN);
+
+
+> -	/* remove any previous indication of internal error */
+> -	dev->state = MLX5_DEVICE_STATE_UP;
+
+Please try this change instead.
+Thanks !
+
+>   
+>   	if (recovery)
+>   		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_ON_RECOVERY_TIMEOUT);
+
+
 
