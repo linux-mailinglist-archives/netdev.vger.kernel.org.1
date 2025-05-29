@@ -1,102 +1,89 @@
-Return-Path: <netdev+bounces-194263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B00AC8205
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 20:16:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 052D6AC8240
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 20:38:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E24D7A42A6C
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 18:15:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42096A276A2
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 18:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAA222B8BF;
-	Thu, 29 May 2025 18:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F11231836;
+	Thu, 29 May 2025 18:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvqwBrdI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpUAHXJZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542ED2AD31;
-	Thu, 29 May 2025 18:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540F622D4F0;
+	Thu, 29 May 2025 18:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748542576; cv=none; b=q4/0VdAzoUODohX/dGXAgybQFIGwt2SfcQeEB53OVJsgoRPx5ATFE2ffrcTljW/x7GWcVooVdPnBOrZl/0lk8i3fquqnaSPv+yxexU4eL8z6GO0+JvBr6fXSnpNuE9bJihX68RC41j5AquGu1lP8zwW3ffLlUmI0V48GOPOXwhs=
+	t=1748543902; cv=none; b=Z0CI85ORl/8qMMiRrXRBocIuptbaGI/0w+mu7uLHKQgh9hKwbmzB5dI/Rggypl1LfsieC8jJCgLM77UMCBaIKRo9EvjtybtGMXGBXAOlS0J+0nvzGIPuvt/Ds1HObx5zYHM2OSYcmlDopVhx+hdemPbi/0PWNu9U2OCD/Y2yoV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748542576; c=relaxed/simple;
-	bh=Ndkxafaee8/iJXBR/9wIrvk3wAPeoCIY5F3xoJ8MQeQ=;
+	s=arc-20240116; t=1748543902; c=relaxed/simple;
+	bh=J7oa/5hP27LugL5IgPi1bvQAwOS2h2/7Si531ggOGYg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P2Z0eXdv/udoD7ZFXYPZHbwLbR8dci5IPsLab39amjSretCTFeBIfDbz9rCoR2gf1CAlsRaEoJ5fr3j87z/C1pa5koGvQFR8wKsEKQ5ivgh3//HPbVC+EPkB0U5xXm3MQxt59DCJZJaP9hUkp+L/z5HTBDaRxa7BLSkBvaoUtNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fvqwBrdI; arc=none smtp.client-ip=209.85.210.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=qZA1Yko5asTTcRlWJ+5Oi2OwYC0+HEf/m88Q25fmGkOpgr7cAAOp6juXCb3/XO/zvqpbt32RepcbxDad3qfqxO7OzhJIejCgWqxWPwngcH+s4DyXY8r8XkT5COZ9icn6TmfP+02LKU9FYUesjKlvPDE79xLgF9WzJJrUFblU4oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpUAHXJZ; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-745fe311741so1335429b3a.0;
-        Thu, 29 May 2025 11:16:13 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2351ffb669cso5544955ad.2;
+        Thu, 29 May 2025 11:38:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748542573; x=1749147373; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748543900; x=1749148700; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLWFabGjnu2pjZUWCnlpH8NuxluCsu9GKNAcPMcaZ8M=;
-        b=fvqwBrdIzu3TLGhXH/iIadXVzkROACE+4svgiCk+BlyTO1YrSePeGwswJYcVQPCXpT
-         RfsIo+vo5wf10wdKlPvQyVLJ23Oj1tVoeCeAirUc1kwsHMIn38tdCZQUCegBUgiBtpSV
-         zddMFLJLyax5t6pBPuqkri8MdfqFd8pcYu9Qu1eetMKMzUksP5G8P3jmjzi8q3/OZ05L
-         iG70tfL4mvrELwVLetFusX7kEXti8Z19jct46BEpSjqFh+EQwEh25fm25Nn+Qcnpu4cV
-         B32FsLpxXTWfoJH/O/WA0b9tWizHoyVlK+9+blct44qpzec2Ggu3/FybUbzF30c/Qylz
-         P/Kg==
+        bh=xovIQZn3YQTyYV3/H7wuOXp388nJWq7YYeTeqG5/Sl4=;
+        b=GpUAHXJZ55gxKjKNSocqB4HFWPXDciyBztkD9ZeS1iFF+1Re5mldd2CVjRb5fUo2F9
+         Fr7SrqHOWK1/JCpGZ/Wjk7JHuo9AZeaz1rl9zqZ3IytzmJEy77FIabhhqsadQsJQx6I6
+         uBWVG7QTQ5hWQT06yncJH/Bf7kVMIaXuI/P9o1suFqCCz4TWaqA/HhaQCXULhNiXKBag
+         ilnaO5aAUnQ2Y+MDeo8ZIWhxnm/p7V6csbWej/Eo1aMk/hhcD9vIsd+R4wSViJ74bB1C
+         nsmxLX1nZ98UthAm8lNLQqLIk0QnzewZs2O3lUg9aWWJue2mNdwVII8PrrGyceQxsqtV
+         7Kjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748542573; x=1749147373;
+        d=1e100.net; s=20230601; t=1748543900; x=1749148700;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wLWFabGjnu2pjZUWCnlpH8NuxluCsu9GKNAcPMcaZ8M=;
-        b=k/8nIgsfmgpS0g7cjN59o5SLc7LrXOWjwTjIpGTDPS9a80tj97Rb6jfVKfRGGevqrs
-         Z+q4EcFJNWxjISLJ6mMujB7CMvgwSidN28UQOZD+mE5sAh+H63ZkQNttJNsNy6j8eJEL
-         iekfC4zseNGBWq/UUKyEJp0fRXBCuyM5B1RLg91xWBcoQxIKf57RUAvqJrdH6F7CILDZ
-         4zhmozCQTrm9RxGLCxddn8aAqcNpvcM1io6BuRLakw0doYOWHNNq/YR3ih8MxIdW1yiE
-         qgciETwoz14qgwFjLX9irivuQRczjUWJ1drosNj/qqqbvZNxvT89YYqle9NyUPfuM3Ha
-         vtOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUkGm35seAoYUDC0EXNnFmVP20Sf4BAwyiRNE9OAuHq/RyXaJiTQxgysSjP6mi8wwZY7NpXKi8M@vger.kernel.org, AJvYcCW5gBVhXhR/B1WJ/1I1hsEcDkYdUUDu1NEikJBpBW2wMvwrEAiu2kAU5aGqGXUvKg+vtplnHa4OUndtk6mPRXKv@vger.kernel.org, AJvYcCWXN0hbrhBqN+0uOWZHv42k3iHdHBweTTedNIuPKg+Rx3E+ZOiEWQLogVSGI531LoL2cF19RJLlnh1Sw88=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBGSn11nQ42/niDtu2X7j3cmEjfoXXi0OjU00ySo44I1pV+453
-	mY2OU6PRSF4Hqmn3bGHD8wSq2e8iPnNuB1m3xaV7NYhhWCztXhb5et5r
-X-Gm-Gg: ASbGncs91nPD3h1fEWAXU3lO/w409YREEHOeVVHFVhf4m2Pm6uUrbmCzOEWwmJ6K8ya
-	IPAd0dJEyVDnPBVcZ0OXKLCsD4Zit3c/Xz1wPXPX+dsuup9T7/cphKY4KlxgCn2YTk6/KRThi+K
-	NVHkHXrNouRjHYg+nXf6lKYKEdhEH3VPloq6iaJHPIwODlD12PP9cLp6NsnZHpf/ADSyc6vHr5+
-	D4k4xA4L2ODy1hCVuEorQZPrfHlA1CuW2zStuji6KRTVxwy04iXlUuNvHBUwNOepvmOtGfn+1I3
-	YcJD4EoTdGq4G97YcDU387icMz1JcCTq0WBFQSRN/WakQqWxV3He+0g=
-X-Google-Smtp-Source: AGHT+IHJe1nExEO/Gk3fjmlnSLJlBBab7HsdJ5qF4WOhLnq5aGIP+ewfPH1xG2NndfuxJCuOLv8QZA==
-X-Received: by 2002:a05:6a00:847:b0:740:a52f:9652 with SMTP id d2e1a72fcca58-747bd969f9cmr491255b3a.6.1748542573505;
-        Thu, 29 May 2025 11:16:13 -0700 (PDT)
+        bh=xovIQZn3YQTyYV3/H7wuOXp388nJWq7YYeTeqG5/Sl4=;
+        b=tTsqv7VHbkFtd/tD/XkmRf5/7p4wBwcTf7N/oKpmv8TT3Kkz29fQ0nmq+C/FEL3UNo
+         3yvOOJh7rZbots61vhTlwfA3R3TL4WZx5t9qelR2R4IKEdR8779uC1Nvoc+6djLIz3Qh
+         cu3brDAXpK59kIIKN5tO0SYcFbydKkNz0do99G8S3fESQLbbDseXTu/30L1HaEJNJ4Mq
+         0FiAGCuofoAdKugJMQ/Ioo6pDG6eC2ueP0jkV+H2vhubAUDOiZX48MoysxvCvxQtIOCr
+         GeEpbMM2M/l/H+czP4m92SKKE1js97TqhXn4n93jPjdh78Lh7Hb1ko4wn3MYAQBJvMOJ
+         Hqzg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/X93gU8DbhPKpbaTwy0TE4KUEupHzvfezffMAQdlFJNDeZu7o0fIQCTIDvpQZnUc6u0hDmNn9@vger.kernel.org, AJvYcCUM7A5wZhpPIEpucJz8KBSSWMGMr/KIPc4vsZubW1K0N1tirrmPoEnT1D1C/5JmFCEkXJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyjj7cguwmHOLWcS5m9HSOtKec83jP4RrVSOPj9r4D4wab3Fyzr
+	cvmQBamOQYjbPFyJ2ogpTRxgFzPPK9PhRB/xn5a6AMgRwqw2Ihr0nvyV
+X-Gm-Gg: ASbGncv+nfqyASt1q3QzMYXXI8Vz04rsotZrTu+d5me09NpwfdxVDvvlxKU/Vr9ScCY
+	eulYbSR3LrzP4F7IYgl4tFYVpHWg+OXU1zMclcsblOZWw5xUoA8pwDVsBBekiTonHSbh46qn599
+	N4WYSomlZa1GzPoOYaL7BMvR5sgZgHZWfLT4LlpZAjB9pqWu352sSat+aE4z9BWGcgRqw/Bkkmi
+	WdefBjM4zwtSJadOyTFizfZ0uOpreQn0eTimFARh/giLweMW4K6WbVbR75z4cNENoV3Yf63mmbe
+	U6bs7RA9nzDrkFuqckMg16JTi7GYP/443Kc8gFk0zSiK0t3Q/n92ysY=
+X-Google-Smtp-Source: AGHT+IGY0XduAU+L9wttkINgVF16jQYQl+QvqQmcL7EkRupXJEb0+P/UxaSztaLkg2NzNGo9Qr0FJA==
+X-Received: by 2002:a17:902:ec88:b0:234:adce:3ebc with SMTP id d9443c01a7336-2352a17fa26mr7265705ad.52.1748543900443;
+        Thu, 29 May 2025 11:38:20 -0700 (PDT)
 Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afe96781sm1630018b3a.29.2025.05.29.11.16.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cd75e1sm15326985ad.112.2025.05.29.11.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 11:16:12 -0700 (PDT)
-Date: Thu, 29 May 2025 11:16:11 -0700
+        Thu, 29 May 2025 11:38:19 -0700 (PDT)
+Date: Thu, 29 May 2025 11:38:19 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, Ihor Solodrai <isolodrai@meta.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v1 1/2] bpf,ktls: Fix data corruption when using
- bpf_msg_pop_data() in ktls
-Message-ID: <aDika2FRd4n+VRmZ@pop-os.localdomain>
-References: <20250523131915.19349-1-jiayuan.chen@linux.dev>
- <20250523131915.19349-2-jiayuan.chen@linux.dev>
+To: Zijian Zhang <zijianzhang@bytedance.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
+	jakub@cloudflare.com, Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next v3 2/4] skmsg: implement slab allocator cache
+ for sk_msg
+Message-ID: <aDipm6P+RWGD8j4M@pop-os.localdomain>
+References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
+ <20250519203628.203596-3-xiyou.wangcong@gmail.com>
+ <20250529000348.upto3ztve36ccamv@gmail.com>
+ <c66ac1f6-1626-47d6-9132-1aeedf771032@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,66 +92,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250523131915.19349-2-jiayuan.chen@linux.dev>
+In-Reply-To: <c66ac1f6-1626-47d6-9132-1aeedf771032@bytedance.com>
 
-On Fri, May 23, 2025 at 09:18:58PM +0800, Jiayuan Chen wrote:
-> When sending plaintext data, we initially calculated the corresponding
-> ciphertext length. However, if we later reduced the plaintext data length
-> via socket policy, we failed to recalculate the ciphertext length.
+On Wed, May 28, 2025 at 05:49:22PM -0700, Zijian Zhang wrote:
+> On 5/28/25 5:04 PM, John Fastabend wrote:
+> > On 2025-05-19 13:36:26, Cong Wang wrote:
+> > > From: Zijian Zhang <zijianzhang@bytedance.com>
+> > > 
+> > > Optimizing redirect ingress performance requires frequent allocation and
+> > > deallocation of sk_msg structures. Introduce a dedicated kmem_cache for
+> > > sk_msg to reduce memory allocation overhead and improve performance.
+> > > 
+> > > Reviewed-by: Cong Wang <cong.wang@bytedance.com>
+> > > Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> > > ---
+> > >   include/linux/skmsg.h | 21 ++++++++++++---------
+> > >   net/core/skmsg.c      | 28 +++++++++++++++++++++-------
+> > >   net/ipv4/tcp_bpf.c    |  5 ++---
+> > >   3 files changed, 35 insertions(+), 19 deletions(-)
+> > > 
+> > > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> > > index d6f0a8cd73c4..bf28ce9b5fdb 100644
+> > > --- a/include/linux/skmsg.h
+> > > +++ b/include/linux/skmsg.h
+> > > @@ -121,6 +121,7 @@ struct sk_psock {
+> > >   	struct rcu_work			rwork;
+> > >   };
+> > > +struct sk_msg *sk_msg_alloc(gfp_t gfp);
+> > >   int sk_msg_expand(struct sock *sk, struct sk_msg *msg, int len,
+> > >   		  int elem_first_coalesce);
+> > >   int sk_msg_clone(struct sock *sk, struct sk_msg *dst, struct sk_msg *src,
+> > > @@ -143,6 +144,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+> > >   		   int len, int flags);
+> > >   bool sk_msg_is_readable(struct sock *sk);
+> > > +extern struct kmem_cache *sk_msg_cachep;
+> > > +
+> > >   static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
+> > >   {
+> > >   	WARN_ON(i == msg->sg.end && bytes);
+> > > @@ -319,6 +322,13 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+> > >   	kfree_skb(skb);
+> > >   }
+> > > +static inline void kfree_sk_msg(struct sk_msg *msg)
+> > > +{
+> > > +	if (msg->skb)
+> > > +		consume_skb(msg->skb);
+> > > +	kmem_cache_free(sk_msg_cachep, msg);
+> > > +}
+> > > +
+> > >   static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+> > >   				      struct sk_msg *msg)
+> > >   {
+> > > @@ -330,7 +340,7 @@ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+> > >   		ret = true;
+> > >   	} else {
+> > >   		sk_msg_free(psock->sk, msg);
+> > > -		kfree(msg);
+> > > +		kfree_sk_msg(msg);
+> > 
+> > Isn't this a potential use after free on msg->skb? The sk_msg_free() a
+> > line above will consume_skb() if it exists and its not nil set so we would
+> > consume_skb() again?
+> > 
 > 
-> This results in transmitting buffers containing uninitialized data during
-> ciphertext transmission.
+> Thanks to sk_msg_free, after consuming the skb, it invokes sk_msg_init
+> to make msg->skb NULL to prevent further double free.
 > 
-> This causes uninitialized bytes to be appended after a complete
-> "Application Data" packet, leading to errors on the receiving end when
-> parsing TLS record.
+> To avoid the confusion, we can replace kfree_sk_msg here with
+> kmem_cache_free.
 > 
-> Fixes: d3b18ad31f93 ("tls: add bpf support to sk_msg handling")
-> Reported-by: Cong Wang <xiyou.wangcong@gmail.com>
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->  net/tls/tls_sw.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index fc88e34b7f33..b23a4655be6a 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -872,6 +872,21 @@ static int bpf_exec_tx_verdict(struct sk_msg *msg, struct sock *sk,
->  		delta = msg->sg.size;
->  		psock->eval = sk_psock_msg_verdict(sk, psock, msg);
->  		delta -= msg->sg.size;
-> +
-> +		if ((s32)delta > 0) {
-> +			/* It indicates that we executed bpf_msg_pop_data(),
-> +			 * causing the plaintext data size to decrease.
-> +			 * Therefore the encrypted data size also needs to
-> +			 * correspondingly decrease. We only need to subtract
-> +			 * delta to calculate the new ciphertext length since
-> +			 * ktls does not support block encryption.
-> +			 */
-> +			if (!WARN_ON_ONCE(!ctx->open_rec)) {
 
-I am wondering if we need to WARN here? Because the code below this
-handles it gracefully:
+Right, the re-initialization in sk_msg_free() is indeed confusing, maybe
+it is time to clean up its logic? For example, separate sk_msg_init()
+out from sk_msg_free().
 
- 931                 bool reset_eval = !ctx->open_rec;
- 932 
- 933                 rec = ctx->open_rec;
- 934                 if (rec) {
- 935                         msg = &rec->msg_plaintext;
- 936                         if (!msg->apply_bytes)
- 937                                 reset_eval = true;
- 938                 }
- 939                 if (reset_eval) {
- 940                         psock->eval = __SK_NONE;
- 941                         if (psock->sk_redir) {
- 942                                 sock_put(psock->sk_redir);
- 943                                 psock->sk_redir = NULL;
- 944                         }
- 945                 }
+I can add a separate patch for this in next update, if people prefer.
 
-
-Thanks for fixing it!
-Cong
+Thanks!
 
