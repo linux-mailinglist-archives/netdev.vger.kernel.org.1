@@ -1,83 +1,159 @@
-Return-Path: <netdev+bounces-194196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D4CAC7BD5
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:35:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9EECAC7BE7
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DF847AFF94
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:34:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9E2F1BC6BFB
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056CF274FCE;
-	Thu, 29 May 2025 10:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B4928D8FB;
+	Thu, 29 May 2025 10:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ew0s0ZO2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D05mXGGd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8DC26B2D7;
-	Thu, 29 May 2025 10:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313E6288C8D
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 10:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748514916; cv=none; b=pMNTBGvxcyeJZpYAIbJYLNB7U5ykJqMSplz94D5bqRlmbxXmpe8D3GRE5nSD8KxUqLaRdrgi5IVQjbPzggpcu9+i8UGR6WmvbwzBSVtkSgRPsNAfoGpskv9c+TqQQLF96lzyudAvweNPZHHH+lpOPTFn0dLEX+PGnVHyTaBkW3M=
+	t=1748515495; cv=none; b=YOEzPQo/ce5lcewB59KV9Si0Fr0EIN+YD/4YumO9YNTaWIVxGXJV+KcXikUGj/FWRYuL5X0FbCIrdL2pfFUuIOZS95Ja/PIvl+XfojtUxRJCijMyRHzuR2GF03BlFD8je+LovXQl4qR+3N0RDPWevWUvJDt/BQZldinQyxsmL7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748514916; c=relaxed/simple;
-	bh=hB4q6DbdzCPTadexTJ+gJgVNRa0VS7ElVWA1w8+W7As=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X4uLunVwIDTTZUFo5XaQGD+vXb7ELe9zaf/QhR97q2/vGlharn5GWdzgUv7aMhM0ktmsMpk76jnS3d5e6kmi6e3POrsv10C+ThjujCotAi5CyuDArM1iqwrj756QwlChxEpHCnLSWPaYr4SObsbX/rNN8jrvfeZcBSJA/+gX1l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ew0s0ZO2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03284C4CEE7;
-	Thu, 29 May 2025 10:35:13 +0000 (UTC)
+	s=arc-20240116; t=1748515495; c=relaxed/simple;
+	bh=UpzTEZtoEfD/SFauD8A7W9NMB8qjXlZ8Fhb/jak8vhU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h3S++G8au7zEAI5z7VpZfHD9HOudsxZ08RvzwlwSZ3EnAE38DAFhRlCV45FufZGDJlhBCI8DlcRgpBVxHjiNgu6nzuCMYDNCNC9TAqiKpe5CIIChmZE4sGtXaqmt3WbXOzlU3PU//ExbIrWGwEYOBHddfkDEdDwbjrJIHLZVtg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D05mXGGd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A631C4CEE7;
+	Thu, 29 May 2025 10:44:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748514916;
-	bh=hB4q6DbdzCPTadexTJ+gJgVNRa0VS7ElVWA1w8+W7As=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ew0s0ZO2G7P5uoFmPJeKrzjjTlhaa3PAclowyFXYt1AOF32x9wQF6XTp5l3mROQjV
-	 N26phEsrOanKkp3o7sPHuy9g6A5wfcVm4lE1izS4tAu5viLugH2geL1vDedz0Ob8A1
-	 fUenCb+cmuscrMFAuoDZKaIFEpXLZb/kuHPURL0ng5DF7nMtnt0PUtPB4OF9X/3uBB
-	 XsWNNJfYl5cwRZnX5DI2Up5tEKX6DGjExo+fGWxnZMHOdTx/mlL52nEiKr7EVTjDaG
-	 OWTWn69FJdIAxtYJKNuQkA9LL/7y2YHoS7EkVCdES2ZDz0myBdtneMg3ctH2Q+WzrC
-	 wki+c4eM4GPJw==
-Date: Thu, 29 May 2025 11:35:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-Subject: Re: [PATCH net-next] ppp: convert to percpu netstats
-Message-ID: <20250529103511.GO1484967@horms.kernel.org>
-References: <20250529092109.2303441-1-dqfext@gmail.com>
+	s=k20201202; t=1748515494;
+	bh=UpzTEZtoEfD/SFauD8A7W9NMB8qjXlZ8Fhb/jak8vhU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=D05mXGGd5i8Kl2WiJk59mLxfk8nAaNCXKVHz3kYSRwxZyBDJb2OgvxJzJ9zcOcxbX
+	 aErIkJbte04vaIkk6pL0F7BbDBhDRarBr8CHqt17a9HEBH66idxnukWYwZ1VIYoi/L
+	 Inm2HKXS7y0rlu3ZB/x4pMdh51EDUGI5VB14EXmCpNLRqYwoo8OygemkPa/IFHf6Hl
+	 Dxwyc7TTMHB+rQ5fZBHSG3fTYVbwuJH98y4efiAXHNtNOqmRSObbUKDyexujn9D+Ij
+	 WEjFIQtHeL4bUlu4/jAp5XzyJcjFV+HFwwgIYT3s0jAGv2C9eXh3dbUR+Pf51K//gJ
+	 csrDes7zrz2Ew==
+From: Christian Brauner <brauner@kernel.org>
+To: Eric Dumazet <edumazet@google.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	netdev@vger.kernel.org
+Cc: Christian Brauner <brauner@kernel.org>,
+	Lennart Poettering <lennart@poettering.net>,
+	David Rheinsberg <david@readahead.eu>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: af-unix: ECONNRESET with fully consumed out-of-band data
+Date: Thu, 29 May 2025 12:37:54 +0200
+Message-ID: <20250529-sinkt-abfeuern-e7b08200c6b0@brauner>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250529092109.2303441-1-dqfext@gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2846; i=brauner@kernel.org; h=from:subject:message-id; bh=UpzTEZtoEfD/SFauD8A7W9NMB8qjXlZ8Fhb/jak8vhU=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRYWM05ci+5rPyX594zK/YZ92TqnZTnymANTT94btaZ6 mPfIgsmdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEyEL5Lhf6Tjwu1Twl7HdjCW rfDhmaV8eNaZm/ZuPkFMszqtfOIrchgZ/v6f+vjdxm/JMbELeRxjrzv+ttpi3VV9bYrxA/2FR9b LcgAA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 29, 2025 at 05:21:08PM +0800, Qingfang Deng wrote:
-> Convert to percpu netstats avoid lock contention when reading netstats.
-> 
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+Hey,
 
-## Form letter - net-next-closed
+I've played with out-of-band data on unix sockets and I'm observing strange
+behavior. Below is a minimal reproducer.
 
-The merge window for v6.16 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
+This is sending exactly one byte of out-of-band data from the client to the
+server. The client shuts down the write side aftewards and issues a blocking
+read waiting for the server to sever the connection.
 
-Please repost when net-next reopens after June 8th.
+The server consumes the single byte of out-of-band data sent by the client and
+closes the connection.
 
-RFC patches sent for review only are obviously welcome at any time.
+The client should see a zero read as all data has been consumed but instead it
+sees ECONNRESET indicating an unclean shutdown.
 
--- 
-pw-bot: defer
+But it's even stranger. If the server issues a regular data read() after
+consuming the single out-of-band byte it will get a zero read indicating EOF as
+the child shutdown the write side. The fun part is that this zero read in the
+parent also makes the child itself see a zero read/EOF after the client severs
+the connection indicating a clean shutdown. Which makes no sense to me
+whatsoever.
+
+In contrast, when sending exactly one byte of regular data the client sees a
+zero read aka EOF correctly indicating a clean shutdown.
+
+It seems a bug to me that a single byte of out-of-band data leads to an unclean
+shutdown even though it has been correctly consumed and there's no more data
+left in the socket.
+
+Maybe that's expected and there's a reasonable explanation but that's very
+unexpected behavior.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <errno.h>
+#include <sys/wait.h>
+
+int main(void) {
+	int sv[2];
+	pid_t pid;
+	char buf[16];
+	ssize_t n;
+
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
+		_exit(EXIT_FAILURE);
+
+	pid = fork();
+	if (pid < 0)
+		_exit(EXIT_FAILURE);
+
+	if (pid == 0) {
+		close(sv[0]);
+
+		/* Send OOB data to the server. */
+		printf("child: %zd\n", send(sv[1], "1", 1, MSG_OOB));
+
+		/* We're done sending data so shutdown the write side. */
+		shutdown(sv[1], SHUT_WR);
+
+		/* We expect to see EOF here, but we see ECONNRESET instead. */
+		if (read(sv[1], buf, 1) != 0) {
+			fprintf(stderr, "%d => %m - Child read did not return EOF\n", errno);
+			_exit(EXIT_FAILURE);
+		}
+
+		_exit(EXIT_SUCCESS);
+	}
+
+	/* The parent acts as a client here. */
+	close(sv[1]);
+
+	/* Hack: MSG_OOB doesn't block, so we need to make sure the OOB data has arrived. */
+	sleep(2);
+	
+	/* Read the OOB data. */
+	printf("%zd\n", recv(sv[0], buf, sizeof(buf), MSG_OOB));
+
+	/* If you uncomment the following code you can make the child see a zero read/EOF: */
+	// printf("%zd\n", read(sv[0], buf, sizeof(buf)));
+
+	/*
+	 * Close the connection. The child should see EOF but sees ECONNRESET instead...
+	 * Try removing MSG_OOB and see how the child sees EOF instead.
+	 */
+	close(sv[0]);
+
+	waitpid(pid, NULL, 0);
+	_exit(EXIT_SUCCESS);
+}
 
