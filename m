@@ -1,100 +1,50 @@
-Return-Path: <netdev+bounces-194269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEAFAC8397
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 23:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABA8AC83A8
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 23:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAB881BC4D42
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 21:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 811853AECE5
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 21:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334BE292932;
-	Thu, 29 May 2025 21:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D762327A7;
+	Thu, 29 May 2025 21:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4wYWuhr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hsb1pmrT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75BFA230264;
-	Thu, 29 May 2025 21:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088831D63D8;
+	Thu, 29 May 2025 21:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748554156; cv=none; b=jzN3Z9i96SVHsw/aYDcwMHQ2SeL1wx0uBrLbtQ0NuewannmxZZEj8hOBWwbYhx6//4C5jKanEt2Qtz4FWDOStgLcQd/v2sE9ihZqm4KKFuvDpgxURp3HFlJE6Km0IQuVjQCiWsbKQ8uHS5DtutEd7ZdVeBz5vf1XRwUoYbe2Z8g=
+	t=1748555036; cv=none; b=KwFnTXa3xWSR1LOklBV057lLx99axo4ySZ4DdIsLpSMKn/AiuDz06DTeFEGEPO53ynKd+KzOZstR2t726BUbsWnLIOG5oXXA8QG+fhqu6MsQFhktwc0H8yttYbs+oystQVVwo9W3RNJfWrjDuk8/gIfzQwJHePrcaf71sQ4EDio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748554156; c=relaxed/simple;
-	bh=Z7YYvdU8l1NsqGFyiGTHFFAwNt4oUnYsGMlfLS7rMhk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TWtKSsuy/SuSWwW/+7qFQ6+2T5MWkZqPxk0ESKoBNSupzBvUGBWXq2cfJ+RmlaMR1PtEMgs91F9q9oiwQ2pa3R3K+QgmOxsXvLYTtMXy8pFnswx/R7zCvGR+9H8r7zLju6xhj6Evq345ShRey0lSlkoypQqyLdNTtgNhU6GxS5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4wYWuhr; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a36748920cso1414027f8f.2;
-        Thu, 29 May 2025 14:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748554153; x=1749158953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U85oeX4MkrW5FWx8nWXUgVEfSLqp8ilr+jmCQrjfSfs=;
-        b=C4wYWuhrt0uewTtpmTW87GPsruB/S2f+rv6CTYkIOwcmRCF9Ce96H9v68kXVRSbY6A
-         smbch16wLpQgozjxvf8qksUuaPcXEaGaiV0b0Dw6vD0rWEK9QnpQ+Ml0L+fMPv2MJocP
-         q7/tgUqzmhrMaRW7IVHFSwIk46aCtmk5wl9Tgl9jrXy5fx4r304gaw0FPTabBovK9VRh
-         RubCg4lIxDsory6uv+YRfWh+oOKh58YZXjJZdKa2V9Z3djHOX/090UBPBDCsn/zCl4ST
-         nc14HSUj1TybXAsYc6foSXBleye5S+UOynmBo/LDdb/h10X7mDIJIN/IrXVu55rVGhsB
-         PUVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748554153; x=1749158953;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U85oeX4MkrW5FWx8nWXUgVEfSLqp8ilr+jmCQrjfSfs=;
-        b=SbKpd9DfSDJvxIkSUbh/uqOM7lu0lUrmcG/s3Vjh22IcxlweNuNIh5kwHIEShOHPBd
-         2BY9ct41U5b8pnAzfkdVG2HmtkcAk8pSGUEp5ABjqlaEHSWNB6NjsEr5ITDAvDzebbOl
-         fmj9RbEDGVhEwAa84GR8NlytlLilw9tJs7+zcBeX+SvrFMtbkjjlAMizoyz/Xtx2Onab
-         nDRZAboG+K7DSTtZktF5o8CEO9i4dgwZsBBRy6MsU50ZoCLFVee01Kbax30ba3Sz82cV
-         iQFE4sz9JXCFum4BRM4XRkAWD1MOoXzeDSDYZ0J/CD35tTBozI5DR0mha39PCNCkwNZW
-         w6Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuAuL5dqzPVtewpqKLJabCzDIZ0CTm8X7rgGKJ4Vruo2mLEGkLL/sJOSTE+81c994pufodPfsP6tMInA==@vger.kernel.org, AJvYcCVsojNxnrisAxDrL6HIFLWkTZkqokIyjL6Zm3ei1GTzJJAXZ+ibONtIIHbuxljssITejNIsm23lg8E=@vger.kernel.org, AJvYcCXSE3lp0fd5Y8k6xOeMVw7jJH+3R4yvEyRTs+Llw2dxbVQTdAI3TiLOejeXgkfCLwa6uSPDJeug@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDlNFvu3SLv2Nf5dIfL4rLxdN1p2zANk/8jbE2HoMI8M+3eM/q
-	Nb1tLzpnWmVAkBSqenNWSXXWjuoTIJsEb+BHDC2QfDZ0hduIqC5ktIvA
-X-Gm-Gg: ASbGncvaDiYU5dTr4SzuOW52OTlMUZ8/HviCm7pLvbufzIVqBkl0OU8IQvNxa157BeZ
-	jXDIs/n7IAaYUIAen3KR0kfj/3iFRzwv4mKCq+xT4tqNuPTMOG0gHCNksgQ66m4piX4xngzHOei
-	zN54PUSkF74CHIM413CwHLH7WpF/1gRU/zAc9UQ0PXVD8carFTJt1X4Vihs4bZ8Hsn/UIaUO0TY
-	aQvV5K66xQXRvRjeeHI0ApS8CNLNntKgGf3FNHyTaFePANkPeUrOT1gUc1DKEwAtll5h9F2T4Xm
-	byZJoZEyWPafFe6ROk9L1/aEYQ1hNhDBnZDWv/psstNJgIs1R9p9IP0WonH/VCLIhercJ3vUlWF
-	19AhZ/Ck8W12ZZQ==
-X-Google-Smtp-Source: AGHT+IGT6Wwf7gVpUfM1Nqzr6escLgno2IMcSQrRw0Uy2H2YCSoD17fP2R1YZIFdVF1bLqkmaXgCqw==
-X-Received: by 2002:a05:6000:2891:b0:3a4:e706:5326 with SMTP id ffacd0b85a97d-3a4f7a23e5cmr643811f8f.3.1748554152539;
-        Thu, 29 May 2025 14:29:12 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4f00972b5sm3085052f8f.76.2025.05.29.14.29.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 14:29:12 -0700 (PDT)
-Date: Thu, 29 May 2025 22:29:11 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
- <willemb@google.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
- <jlayton@kernel.org>, Matthieu Baerts <matttbe@kernel.org>, Keith Busch
- <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Wenjia Zhang
- <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, Steve French
- <sfrench@samba.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2 net-next 2/7] socket: Rename sock_create_kern() to
- __sock_create_kern().
-Message-ID: <20250529222911.37dc04f3@pumpkin>
-In-Reply-To: <20250526053013.GC11639@lst.de>
-References: <20250523182128.59346-1-kuniyu@amazon.com>
-	<20250523182128.59346-3-kuniyu@amazon.com>
-	<20250526053013.GC11639@lst.de>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1748555036; c=relaxed/simple;
+	bh=RzCq13qVUqhaAnooGFRb1EFnQxfVj6kzQo+aqwWQN2k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=Mss6Bz3WxB0SPAo294y5ZEKiLMa7fnb525/6llO0hXOVk/Pfuf7tUOWg8Yd3Hd1CQwZ/IUM/vVw3YI1j5g3RXq+3tXlMd3R2V8GfXVdundkgMz69NpDlOs0Ej6qX1S1UDDjlbOPMkRAwNEAf5NT1ltNQNYAKooLOjK4F4e1LOHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hsb1pmrT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E42FC4CEE7;
+	Thu, 29 May 2025 21:43:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748555035;
+	bh=RzCq13qVUqhaAnooGFRb1EFnQxfVj6kzQo+aqwWQN2k=;
+	h=Date:From:To:Subject:From;
+	b=Hsb1pmrT1rnK0vvKPycmQI3m8T3oi2Clnkcd6q6K9vUWMyhz9jdzO0A0Gq+x1REQE
+	 cAyyy8XnHiyZkBw+z6su8PmYQ1izLFLmYCExnckd2f0nqZamTjwxFfOSwCLX4hSu/Z
+	 Hai8e9IBIzynwslKwv/udcomBveCd/iRK4Cdmt27QNb/06FcUvwOlorFZjUdfctHgT
+	 gNsjXCMHzNbfyWv7ZS5JhsaOzPby6jdzXqngVhweHifwv24Y4445OxGjXnDQOH263n
+	 M6fn0XnZLE26Hsd+XBK1lM7fYyhkU/pB57VzPjHQ7mxGtEydR7NuCo5UQTGMmhiBRe
+	 /yafcfwcMhcNw==
+Date: Thu, 29 May 2025 14:43:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] netdev development stats for 6.16
+Message-ID: <20250529144354.4ca86c77@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,20 +54,139 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 26 May 2025 07:30:13 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+Intro
+-----
 
-> On Fri, May 23, 2025 at 11:21:08AM -0700, Kuniyuki Iwashima wrote:
-> > Let's rename sock_create_kern() to __sock_create_kern() as a special
-> > API and add a fat documentation.
-> > 
-> > The next patch will add sock_create_kern() that holds netns refcnt.  
-> 
-> Maybe do this before patch 1 to reduce the churn of just touching a
-> lot of the same callers again?
+As is tradition here are the development statistics based on mailing
+list traffic on netdev@vger.
 
-You also really want untouched source files to fail to compile.
-If nothing else it'll stop backports going badly awry.
+These stats are somewhat like LWN stats: https://lwn.net/Articles/1004998/
+but more focused on mailing list participation. And by participation
+we mean reviewing code more than producing patches.
 
-	David
+Previous 3 reports:
+ - for 6.13: https://lore.kernel.org/20241119191608.514ea226@kernel.org
+ - for 6.14: https://lore.kernel.org/20250121200710.19126f7d@kernel.org
+ - for 6.15: https://lore.kernel.org/20250326140948.18a7da36@kernel.org
+
+General stats
+-------------
+
+This release was around 10% smaller for us than usual, at 20
+patches committed by the maintainers a day. The cross-company
+review percentage increased, 64.4% of changes were reviewed 
+by someone from a different company. Other metrics are quite stable.
+
+Testing
+-------
+
+https://netdev.bots.linux.dev/devices.html now shows the matrix
+of which tests pass on which driver. For now it only shows virtio
+as we don't have any results for real HW.
+
+Top contributions to selftests:
+   1 [ 11] Jakub Kicinski
+   2 [ 10] Cong Wang
+   3 [  8] David Wei
+   4 [  7] Hangbin Liu
+   5 [  6] Mina Almasry
+   6 [  5] Gang Yan
+   7 [  4] Stanislav Fomichev
+   8 [  4] Geliang Tang
+   9 [  4] Matthieu Baerts
+  10 [  4] Vladimir Oltean
+
+Developer rankings
+------------------
+
+Top reviewers (cs):                  Top reviewers (msg):                
+   1 (   ) [26] Jakub Kicinski          1 (   ) [61] Jakub Kicinski      
+   2 (   ) [24] Simon Horman            2 (   ) [46] Simon Horman        
+   3 (   ) [14] Andrew Lunn             3 (   ) [41] Andrew Lunn         
+   4 (   ) [13] Paolo Abeni             4 ( +2) [25] Paolo Abeni         
+   5 ( +8) [ 5] Jacob Keller            5 (+17) [16] Jacob Keller        
+   6 ( +1) [ 5] Kuniyuki Iwashima       6 ( +2) [15] Kuniyuki Iwashima   
+   7 ( +1) [ 4] Stanislav Fomichev      7 ( +3) [13] Stanislav Fomichev  
+   8 ( -2) [ 4] Russell King            8 ( -3) [12] Russell King        
+   9 ( +1) [ 4] Willem de Bruijn        9 ( -5) [11] Willem de Bruijn    
+  10 (+19) [ 3] Vadim Fedorenko        10 (***) [10] Donald Hunter       
+  11 ( -2) [ 3] Michal Swiatkowski     11 (+12) [ 9] Mina Almasry        
+  12 ( -7) [ 3] Eric Dumazet           12 ( +5) [ 9] Krzysztof Kozlowski 
+  13 ( +2) [ 2] Krzysztof Kozlowski    13 (+12) [ 7] Stefano Garzarella  
+  14 (+11) [ 2] Maxime Chevallier      14 ( -3) [ 6] Joe Damato          
+  15 ( -3) [ 2] Rob Herring            15 (+30) [ 5] Vadim Fedorenko     
+
+Jacob and Vadim climb up the ranks, reviewing PTP changes but also
+other driver patches. Maxime stepped up participation on embedded
+system reviews which is very much appreciated. Mina reviews netmem,
+devmem and page pool patches. Stefano actively maintains vsock,
+and Donald - YNL.
+
+Thank you to all the reviewers for their invaluable work!
+
+Top authors (cs):                    Top authors (msg):                  
+   1 (   ) [6] Jakub Kicinski           1 (   ) [28] Jakub Kicinski      
+   2 ( +1) [3] Russell King             2 ( +7) [25] Kuniyuki Iwashima   
+   3 (***) [3] Vladimir Oltean          3 ( +9) [18] Tony Nguyen         
+   4 ( +2) [2] Kuniyuki Iwashima        4 (+19) [17] Chia-Yu Chang       
+   5 ( -1) [2] Heiner Kallweit          5 (***) [16] Byungchul Park      
+   6 (+17) [2] Wentao Liang             6 (+36) [16] Christian Marangi (Ansuel)
+   7 ( +5) [2] Stanislav Fomichev       7 (+26) [13] Alejandro Lucero Palau
+   8 ( +9) [2] Lorenzo Bianconi         8 (***) [11] Jeff Layton         
+   9 (+12) [1] Jiayuan Chen             9 (***) [11] Pablo Neira Ayuso   
+  10 (+29) [1] Kees Cook               10 ( -7) [11] Russell King        
+
+Top scores (positive):               Top scores (negative):              
+   1 (   ) [356] Simon Horman           1 (+11) [68] Chia-Yu Chang       
+   2 (   ) [347] Jakub Kicinski         2 (***) [64] Byungchul Park      
+   3 (   ) [252] Andrew Lunn            3 (+27) [60] Christian Marangi (Ansuel)
+   4 (   ) [185] Paolo Abeni            4 ( +5) [55] Tony Nguyen         
+   5 ( +6) [ 68] Jacob Keller           5 (+17) [52] Alejandro Lucero Palau
+   6 ( -1) [ 61] Willem de Bruijn       6 (***) [44] Ivan Vecera         
+   7 (***) [ 57] Stanislav Fomichev     7 (***) [44] Jeff Layton         
+   8 ( +1) [ 49] Krzysztof Kozlowski    8 ( -7) [38] Antonio Quartulli   
+   9 (+15) [ 44] Vadim Fedorenko        9 (***) [35] Lukasz Majewski     
+  10 ( -4) [ 40] Rob Herring           10 (***) [35] Christian Brauner   
+
+Company rankings
+----------------
+
+Top reviewers (cs):                  Top reviewers (msg):                
+   1 (   ) [40] RedHat                  1 (   ) [104] RedHat             
+   2 (   ) [31] Meta                    2 (   ) [ 87] Meta               
+   3 (   ) [17] Intel                   3 (   ) [ 52] Intel              
+   4 (   ) [14] Andrew Lunn             4 ( +1) [ 41] Andrew Lunn        
+   5 (   ) [11] Google                  5 ( -1) [ 37] Google             
+   6 (   ) [ 7] nVidia                  6 (   ) [ 16] nVidia             
+   7 (   ) [ 6] Oracle                  7 (   ) [ 16] Oracle              
+
+Top authors (cs):                    Top authors (msg):                  
+   1 ( +1) [13] Meta                    1 (   ) [72] Intel               
+   2 ( -1) [ 9] RedHat                  2 (   ) [58] Meta                
+   3 ( +1) [ 8] Intel                   3 (   ) [52] RedHat              
+   4 ( -1) [ 6] Google                  4 ( +1) [44] Google              
+   5 (   ) [ 5] nVidia                  5 ( +3) [28] Amazon              
+   6 (   ) [ 4] Oracle                  6 ( -2) [28] nVidia              
+   7 (+29) [ 3] Marvell                 7 ( +6) [25] AMD              
+
+Top scores (positive):               Top scores (negative):              
+   1 (   ) [488] RedHat                 1 ( +8) [70] AMD                 
+   2 (   ) [356] Meta                   2 ( +8) [68] Nokia               
+   3 (   ) [252] Andrew Lunn            3 (***) [64] SK Hynix            
+   4 ( +1) [ 64] Linaro                 4 (+18) [60] Christian Marangi (Ansuel)
+   5 ( +5) [ 54] Enfabrica              5 (+13) [52] Linutronix          
+   6 (   ) [ 45] ARM                    6 (***) [50] Microsoft           
+   7 (   ) [ 45] Oracle                 7 ( -5) [38] OpenVPN      
+   8 ( -4) [ 42] Google
+
+The companies which support reviewers are quite stable.
+
+Any company on the "negative score" side is a net consumer of code
+reviews and should prioritize truly participating in the community.
+
+Google's drop to 8th position is somewhat interesting, I think it's
+primarily due to lower activity from Eric, and increase in gve patches.
+-- 
+Code: https://github.com/kuba-moo/ml-stat
+Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.16/stdout
 
