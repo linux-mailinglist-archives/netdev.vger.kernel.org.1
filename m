@@ -1,160 +1,122 @@
-Return-Path: <netdev+bounces-194138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5739FAC76F0
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 06:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 029EBAC76F3
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 06:10:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FDA47AEE7B
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:05:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 493207A5AEB
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD7E1EF36E;
-	Thu, 29 May 2025 04:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5EC21ADC7;
+	Thu, 29 May 2025 04:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="luibVPOt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/b+JBhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD9810785
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 04:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AF41D5CFE;
+	Thu, 29 May 2025 04:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748491584; cv=none; b=eMTPFU8JeOGHuQat7aCfcLVZxEIR7xTNOMWqAUy773NnUP6GtnC9s8D5kbdCsGjWmaqqFweNMzHoDpjsDWbGcgHatahRty0zSvdUPWErKskmIl4fKPEIVz2XpLem/SF+cVS4i/HKxRD1mniDJ9c+soTlafEBZlkW29MwcqgM+0g=
+	t=1748491797; cv=none; b=WhvCTiSOwQmQ5m6oD0D7+JDzW63wqdUhFWiY8YfaR5xrmpKUyIhDQEJ2Mj/3LZeO79ZoXosgjITdXRVypCC+dedLfiaphRfoWTh3rdF8tadQdVx3NuKOQ2XdnpGQSwRDG9KVWdPTcI3vPE4omnW6GnlsF5T57kYInDl+Zf9OoaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748491584; c=relaxed/simple;
-	bh=TF3rbKEr7u8TwhjkYuhhiy3ax+5w+OH9QRtAVzF7xco=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nqkgQw0UjhLHdxadH8C4P+3KGYwwJsYm2sLwBU1jYB9pcIFuXoemKdC1sRRyp+9sYpHpaJ/jsHxK8RTLOuLP1iRMoCZN44H92jpW6CgoWNw9rPDqKG7sAnonOUjfBhIgksdUxSVudemqeQEu/gUjsszDOjk8E+I8f+Z62PKSYKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=luibVPOt; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7376e311086so397450b3a.3
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 21:06:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748491582; x=1749096382; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=en1TuzA2jcDXl6/d8Wq7yY92hh5djDIHVZnzRgKkq4I=;
-        b=luibVPOtbP35VYBi6PKFgXKNQoPP1BkqKOKbc5PjkztjYjhwEsUIHBu+NX8snLb7Cx
-         hwAR1EwN4qp+ZaiaIk+R/tNTEtc9AFNoAk9ltnQaZ0hy1O4Z69PAAV0smNn0dIDKKTjr
-         N6Q1MyfHz57Ge3t1SeMulY8WkEkddc6QlyG8gpknDfsZdZY6nxihlYPDz2FTquCWE7pj
-         G+45soIiUsLMuNL2kJCGg6HjrSU7ULhU9cHYUSxiGJm2LR+CFEjyXUAtzvDXj91NjlA3
-         2Kb/qQVPdtBOd9xBvWfi4kLJWrLmhvOIqrvl4hua/gA1MEkiEvKviMfQ3R+MPnLY48EA
-         eZ6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748491582; x=1749096382;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=en1TuzA2jcDXl6/d8Wq7yY92hh5djDIHVZnzRgKkq4I=;
-        b=HFGDESJevKPCUEKmDNtkm+qzYM0X7LSYV8JVObPuUO4cK6QYJpE6oWkDtBRtjIFlsw
-         JNvN1kOD9TQfWmAllffBy61K22RWpsrWUKvOAGKCGArG83vCQHH8J43Iu16PuPiL0amU
-         1I+yR0rv8FOmCtFLNVmJnYrRjvpGxF4BPfh6SqOza/dK5TKJ48QfxpBaDCp0R8hJcSac
-         y0nju3SNeJJXi7iM2gfglbE1eHsua9pJu7lOsP2HXhk1WxkpUI/r1QpFyIIdcr8aS36M
-         qKWS6g4ofVNYO+HdxswhtU9ejm869XaGNX7G5cw3+JAaqa5iAbn5SjDQh40YE0p3i7LY
-         tv1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXfnsu8bYaijfCxtblFEkSEKlzWty6AH4MPdNfuVD6pXMRQXbhbzr0NqcqEf1xngafeEWei5hI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUt59Xt3CJzrVWiv6chkHD08EXLZBN91b11sEUseAwl9wovPyN
-	qOV7iaNNgOx4qOQVWdIDJUu4guD7VcYyPuSqIB1CJoxhx+vg/RnQfpJN
-X-Gm-Gg: ASbGnctVAynmoEWnI+QojgQInoBksabLTqlnbMh33Ygi94SYsVOtPuuUr2ju8m0iI07
-	HySo6RR35u1KbBrLKHEtbVD2V71PffsKGvZ6P7HTBV0Wh+4eZfp7ApBwmgi7MJBYARUNtdVCnhL
-	6PIma0QlvVDwZZCB1iY+GcNc5Jd+wjCZd2nScBWGExnTGMB+SyaX1Vm6uQ6pUA5gG0vTV8ljgYk
-	Dvk4ekzNOKEQrKYZwxgKmW+ohQ6Ki8MdIcEYnoW/GySuY6nzDkHVtDdveNL9uBKi+latcgEhF8H
-	Enj2HTFCfF+NSAqSf/EmJcahsw+qIFhUiXFlCyAl8SSEYK8ivgKv5awGXklskNTe2socpp3DPsL
-	gYihswI9BcxSM+fWpE052oUK8YkQ=
-X-Google-Smtp-Source: AGHT+IGAJwA5Vw2P7enkBsL7PjKwvi8TvszQaTChXH2WOuL99LPZ256zzf6KFJ70blpyA9/DySgTBQ==
-X-Received: by 2002:a05:6a00:22cd:b0:73e:970:731 with SMTP id d2e1a72fcca58-745fe035f23mr26544577b3a.16.1748491581701;
-        Wed, 28 May 2025 21:06:21 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f0e:fb30:76aa:9d32:607:b042? ([2001:ee0:4f0e:fb30:76aa:9d32:607:b042])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747affafa42sm406123b3a.92.2025.05.28.21.06.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 May 2025 21:06:21 -0700 (PDT)
-Message-ID: <bf24709c-41a0-4975-98cd-651181d33b75@gmail.com>
-Date: Thu, 29 May 2025 11:06:17 +0700
+	s=arc-20240116; t=1748491797; c=relaxed/simple;
+	bh=EvTXQV/V9BLYoQXJAAARdV+vxG/Xp6Gp0ol3AVyRpEs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ONp3uN2u0Ligo4bQ1MpAqZunY8H7ezS7YiI0ZL/4ocjQzOXV1HmL6njGRPlZpJF9d/Wm5fr7uPrLmuCDAJvrmNokRkRh4WR00rsgJz7g41z42VAL+mUCRrqW4vRheqAz4kKqZbK8esYfgP8JOCrmuEk95A9+IlBigAoaHndW7L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/b+JBhT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30FDBC4CEEB;
+	Thu, 29 May 2025 04:09:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748491797;
+	bh=EvTXQV/V9BLYoQXJAAARdV+vxG/Xp6Gp0ol3AVyRpEs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=B/b+JBhTOnxpOeXBdagtlLMPVArmNWSInftX4nOXBAavf5QHQNN1IyB3xYyLuDGPn
+	 W5tBQx4HuE3QjSHZ3G/m7jRzLyOuaR/5Bj1YIK2NBpolsnV/Q3M9KrDrd3ju+VR4X/
+	 iEsraZGAF1pzUtuCmX9xkItHdoDldsXVW7rkblONO65Y5lhavkh6iNLrq7qw+9VbtD
+	 MsWyr86sga9bUTHb6synZuuWj3hsars+T2YE9kTYWbu4QrgMBMYItXgFs1JluIUQyt
+	 KRRRZRxE+pRIbBxwkr2NMRZldcWqkyc0FLdatogHFNUt5ViYvnFH/eaDgXMPlXYcs2
+	 4ctWWl01285kQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E3E3822D1A;
+	Thu, 29 May 2025 04:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [linux-next:master] [selftests] 59dd07db92:
- kernel-selftests.drivers/net.queues.py.fail
-To: Jakub Kicinski <kuba@kernel.org>,
- kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, "Michael S. Tsirkin"
- <mst@redhat.com>, netdev@vger.kernel.org
-References: <202505281004.6c3d0188-lkp@intel.com>
- <0bcbab9b-79c7-4396-8eb4-4ca3ebe274bc@gmail.com>
- <20250528175811.5ff14ab0@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20250528175811.5ff14ab0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] page_pool: Fix use-after-free in
+ page_pool_recycle_in_ring
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174849183100.2759302.4461849519042994301.git-patchwork-notify@kernel.org>
+Date: Thu, 29 May 2025 04:10:31 +0000
+References: <20250527114152.3119109-1-dongchenchen2@huawei.com>
+In-Reply-To: <20250527114152.3119109-1-dongchenchen2@huawei.com>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: hawk@kernel.org, ilias.apalodimas@linaro.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ almasrymina@google.com, linyunsheng@huawei.com, toke@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ zhangchangzhong@huawei.com,
+ syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com
 
-On 5/29/25 07:58, Jakub Kicinski wrote:
-> On Wed, 28 May 2025 15:43:17 +0700 Bui Quang Minh wrote:
->>> If you fix the issue in a separate patch/commit (i.e. not just a new version of
->>> the same patch/commit), kindly add following tags
->>> | Reported-by: kernel test robot <oliver.sang@intel.com>
->>> | Closes: https://lore.kernel.org/oe-lkp/202505281004.6c3d0188-lkp@intel.com
->>>
->>>
->>>
->>> # timeout set to 300
->>> # selftests: drivers/net: queues.py
->>> # TAP version 13
->>> # 1..4
->>> # ok 1 queues.get_queues
->>> # ok 2 queues.addremove_queues
->>> # ok 3 queues.check_down
->>> # # Exception| Traceback (most recent call last):
->>> # # Exception|   File "/usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/net/lib/py/ksft.py", line 223, in ksft_run
->>> # # Exception|     case(*args)
->>> # # Exception|   File "/usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/drivers/net/./queues.py", line 33, in check_xsk
->>> # # Exception|     raise KsftFailEx('unable to create AF_XDP socket')
->>> # # Exception| net.lib.py.ksft.KsftFailEx: unable to create AF_XDP socket
->>> # not ok 4 queues.check_xsk
->>> # # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
->>> not ok 7 selftests: drivers/net: queues.py # exit=1
->>>
->>>
->>>
->>> The kernel config and materials to reproduce are available at:
->>> https://download.01.org/0day-ci/archive/20250528/202505281004.6c3d0188-lkp@intel.com
->> Looking at the log file, it seems like the xdp_helper in net/lib is not
->> compiled so calling this helper from the test fails. There is similar
->> failures where xdp_dummy.bpf.o in net/lib is not compiled either.
->>
->> Error opening object
->> /usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/net/lib/xdp_dummy.bpf.o:
->> No such file or directory
->>
->> I'm still not sure what the root cause is. On my machine, these files
->> are compiled correctly.
-> Same here. The get built and installed correctly for me.
-> Oliver Sang, how does LKP build the selftests? I've looked at the
-> artifacts and your repo for 10min, I can't find it.
-> The net/lib has a slightly special way of getting included, maybe
-> something goes wrong with that.
+Hello:
 
-I understand why now. Normally, this command is used to run test
-pwd: tools/testing/selftests
-make TARGETS="drivers/net" run_tests
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The LKP instead runs this
-make quicktest=1 run_tests -C drivers/net
+On Tue, 27 May 2025 19:41:52 +0800 you wrote:
+> syzbot reported a uaf in page_pool_recycle_in_ring:
+> 
+> BUG: KASAN: slab-use-after-free in lock_release+0x151/0xa30 kernel/locking/lockdep.c:5862
+> Read of size 8 at addr ffff8880286045a0 by task syz.0.284/6943
+> 
+> CPU: 0 UID: 0 PID: 6943 Comm: syz.0.284 Not tainted 6.13.0-rc3-syzkaller-gdfa94ce54f41 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>  print_address_description mm/kasan/report.c:378 [inline]
+>  print_report+0x169/0x550 mm/kasan/report.c:489
+>  kasan_report+0x143/0x180 mm/kasan/report.c:602
+>  lock_release+0x151/0xa30 kernel/locking/lockdep.c:5862
+>  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:165 [inline]
+>  _raw_spin_unlock_bh+0x1b/0x40 kernel/locking/spinlock.c:210
+>  spin_unlock_bh include/linux/spinlock.h:396 [inline]
+>  ptr_ring_produce_bh include/linux/ptr_ring.h:164 [inline]
+>  page_pool_recycle_in_ring net/core/page_pool.c:707 [inline]
+>  page_pool_put_unrefed_netmem+0x748/0xb00 net/core/page_pool.c:826
+>  page_pool_put_netmem include/net/page_pool/helpers.h:323 [inline]
+>  page_pool_put_full_netmem include/net/page_pool/helpers.h:353 [inline]
+>  napi_pp_put_page+0x149/0x2b0 net/core/skbuff.c:1036
+>  skb_pp_recycle net/core/skbuff.c:1047 [inline]
+>  skb_free_head net/core/skbuff.c:1094 [inline]
+>  skb_release_data+0x6c4/0x8a0 net/core/skbuff.c:1125
+>  skb_release_all net/core/skbuff.c:1190 [inline]
+>  __kfree_skb net/core/skbuff.c:1204 [inline]
+>  sk_skb_reason_drop+0x1c9/0x380 net/core/skbuff.c:1242
+>  kfree_skb_reason include/linux/skbuff.h:1263 [inline]
+>  __skb_queue_purge_reason include/linux/skbuff.h:3343 [inline]
+> 
+> [...]
 
-So the Makefile in tools/testing/selftests is not triggered and net/lib 
-is not included either.
+Here is the summary with links:
+  - [net,v2] page_pool: Fix use-after-free in page_pool_recycle_in_ring
+    https://git.kernel.org/netdev/net/c/271683bb2cf3
 
-Thanks,
-Quang Minh.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
