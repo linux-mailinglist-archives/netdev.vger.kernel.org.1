@@ -1,279 +1,227 @@
-Return-Path: <netdev+bounces-194244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32FAEAC803A
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:25:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C76FAC803D
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA2CA40B90
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:23:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE2231C06E30
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE9B2367C1;
-	Thu, 29 May 2025 15:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4741022D4C1;
+	Thu, 29 May 2025 15:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hML2oM17"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="x7WN4q5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2132367B6;
-	Thu, 29 May 2025 15:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCD222CBFE
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748532094; cv=none; b=mBBVfrxzt9d5tG7mixiY2WcsIN6J7eebGxhhEyTT+xHUoaXCX2dCPsJWmQ6s78oXazSOaq1hiMWTX0uGDLkBCHWidgZurpacwrDjblk5j5kwQhRV0EDYtXcogN7kcAzQkjhBvaVA7XVki15b7Q9+1VYT4iJ3T+8yUcoAvqvHD+8=
+	t=1748532193; cv=none; b=dG9sj3sjwakRY5a7MbVTF+kCDVlZfAPfun2pqSsZYwfqnrWeerSkFszCoqsvVDnGynCgKd0/vrjVCimeEBxfEGQn7Mms+vE7j3ZoxLqLm+Mg7yYhDwQGuspH4Q5uWnuJIL1C3vsNHhGE/fiafFgXcRBHo/1bTQle9oABm8ueXp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748532094; c=relaxed/simple;
-	bh=FwR5EhI8xrwtPj1Jun0AMgnQF8ISLd14Opp265Plpv8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jLYuHHm4ern2GhsTSUzkhsNfBi6EPKfZYoOojjH3Vii4YxZMJZAgDSfKDhPSRt7G3ivkCUFkeJs5+yBSb5Td0N9JFuqrtshOxBTCnYb50oiiVgypj9BwonW3poEjPRWDzKGBpYkKJG2xjFen1oHWY5Rzly0bijMLandsm+w8WT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hML2oM17; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D96C4CEF3;
-	Thu, 29 May 2025 15:21:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748532094;
-	bh=FwR5EhI8xrwtPj1Jun0AMgnQF8ISLd14Opp265Plpv8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hML2oM178RlHw1oKhAtMumRJAxcFj9Uabw3ERlxuNYVU4gX/dw778C5qEZcYi5iJs
-	 N4UgCbGVJQrlaEqnAScfFFZQhmS1o4AD/j6bryqaMTgBGPcX91umcO2os8RD74ACA/
-	 sICVg+lf1hC0IG5i41gakZx5kbnrnjbgOX91k0LHGz9nxxB/bIQkv51Dn87fgAPGvn
-	 5wrwClySble5OZZXtTV2pBQWQvzCemFfl+CANPdvxQ3jEOn9jAfHj/1/m86C3L3ldb
-	 +yEuvIb9uL98S/0VG+kYnoXcA9L0J88EM0srk5gHB52K7d5x1EpxI+9U1n9sBXGnya
-	 AoTbu9du8vCvg==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Thu, 29 May 2025 11:20:46 -0400
-Subject: [PATCH v12 10/10] ref_tracker: eliminate the ref_tracker_dir name
- field
+	s=arc-20240116; t=1748532193; c=relaxed/simple;
+	bh=KzIBy0LROxu6zIykfaalt5YYcA4mzJ/uWj3TWW3TXhY=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gALhzkrSBzQYTuFPI54f1Gfr77vV90fXOh5ZBmFXPPiIKKTe/wLtut2sOI4mM6HU97eUWJbM5Dstjj9PUJuFN18srKbiE7LBSuWQInjzlEa31wL6QZrExQK9n43ZI82CNfa79YCl/W5nMbr2LvMFL4BDjdtVqiNA6JyPnNClgOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=x7WN4q5X; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1748532186; x=1748791386;
+	bh=psJOtspO9QE9T6NvgCRDOTwVi7IGLKw/6Ze5XA78KhE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=x7WN4q5Xb26BB0kDfAJQHkw4U1y71ZQkulN7ikHwIsZ+kMAisabJowuYgsvHcDSQN
+	 R8WVWBmPkF+Ki+6endmAEqyUFH/pOudYyn9FGxQ4dwAgmPmYVEA7UnWLc5kjNc/iNW
+	 3iWBy7H/DFMFOZem7CB4VgOsz93qhL8UaNUctnXCc1EinRAStthdFM8coGOQws7kxa
+	 r4/9QIJzmfvXTvuNn3TPUi26FQYSSCyJYdILERhR9mPfCxqXdSM7jQW83Zuj6b6KPz
+	 I3MGiVbJU+l0U0dNBlsewUaaOe+8RRF425AKk+zK6jqj1XJpP+ufEpwS90YV5LWOkb
+	 fl7VhVW9Gu2rg==
+Date: Thu, 29 May 2025 15:23:04 +0000
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+From: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+Message-ID: <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
+In-Reply-To: <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMkd87-6ZJ5PWsV8K+Pn+dVNEOP9NcfGAjXVrzAH70F4YA@mail.gmail.com> <Ppi6ol0VaHrqJs9Rp0-SGp0J1Y0K8hki_jbNZ8sjNOmtEq0mD4f0IozBxxX-m4535QPJonGFYmiPmB643yd4SOpd1HDDYyMeGQuASuFHl-E=@willsroot.io> <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com> <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io> <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com> <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io> <q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=@willsroot.io> <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 126175be933af01f7b20546bdef0f7dc121bc372
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250529-reftrack-dbgfs-v12-10-11b93c0c0b6e@kernel.org>
-References: <20250529-reftrack-dbgfs-v12-0-11b93c0c0b6e@kernel.org>
-In-Reply-To: <20250529-reftrack-dbgfs-v12-0-11b93c0c0b6e@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Jani Nikula <jani.nikula@linux.intel.com>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7441; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=FwR5EhI8xrwtPj1Jun0AMgnQF8ISLd14Opp265Plpv8=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoOHtn4IJ7SURX8BQCD8ZYnwubCl+5SbqMsQ325
- M7qhoOOnv2JAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaDh7ZwAKCRAADmhBGVaC
- FS1nEADXabjBb2oDwftNBnUg/O2eeC5R7JfyM9oTyEp3hl/hNYdp6KrZUEQBpu/jWMb3Rq99zwS
- 4JlewudUzqNKwp0TPIXQ54uQzwHBIMtRt0OSo1YPbb/obrQqzQlgef9j13XmaGU3rvR3xRcAM4x
- jtShncPnygCZbRj7EZzAKgYTFss8I+7cnJ9orBkLLAsa42I63DJVE+fXuhqxYOD7cALUkSfAqSq
- tU6yWjYc0x0Vlsmz2yhyLHwFAvm0aW0UePHgcgVD71Q6wxEceqAKuVXnPVZpxBtIcRrgjd9sC5N
- 6UCXagSaF42ZEHbvI+81Ej/3IsgmuBPT7Y9EJlIAvGk8PUBMAU5Vi4olmj3LAN8bPno82/W2qbF
- JPYfEsq1drxLqJw86ZtWR8ZBqgJJjdXKmiEIjPVVto5JngM22wIX+yUl6khpFi3Q7e+1+2IwHes
- 9xI3d7Wn9SSDzv0o6D8YUp1lIkM8hfQXgdInBLA06sYpT3ZGUArSdIrHctc4uDV8dGKXlIW/3nC
- SLFbvZTAxHM+/10WNDr2mLAJ2G+tE0timR/+/b3zdkTGO8f9QePcbPK0MF0s+nvFtr5b4lg4Eut
- K8yX6taCuIRmbnJGt1ElyzDr7BDjeHHYWNtOmwXue+B6ySEq5s5WNDjfKrVomN763a5Mj9nei/d
- pspT0IXdb+kJKzw==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Now that we have dentries and the ability to create meaningful symlinks
-to them, don't keep a name string in each tracker. Switch the output
-format to print "class@address", and drop the name field.
+On Wednesday, May 28th, 2025 at 10:00 PM, Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
 
-Also, add a kerneldoc header for ref_tracker_dir_init().
+>=20
+>=20
+> Hi,
+> Sorry for the latency..
+>=20
+> On Sun, May 25, 2025 at 4:43=E2=80=AFPM William Liu will@willsroot.io wro=
+te:
+>=20
+> > I did some more testing with the percpu approach, and we realized the f=
+ollowing problem caused now by netem_dequeue.
+> >=20
+> > Recall that we increment the percpu variable on netem_enqueue entry and=
+ decrement it on exit. netem_dequeue calls enqueue on the child qdisc - if =
+this child qdisc is a netem qdisc with duplication enabled, it could duplic=
+ate a previously duplicated packet from the parent back to the parent, caus=
+ing the issue again. The percpu variable cannot protect against this case.
+>=20
+>=20
+> I didnt follow why "percpu variable cannot protect against this case"
+> - the enqueue and dequeue would be running on the same cpu, no?
+> Also under what circumstances is the enqueue back to the root going to
+> end up in calling dequeue? Did you test and hit this issue or its just
+> theory? Note: It doesnt matter what the source of the skb is as long
+> as it hits the netem enqueue.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
- include/linux/ref_tracker.h             | 20 ++++++++++++++------
- lib/ref_tracker.c                       |  6 +++---
- lib/test_ref_tracker.c                  |  2 +-
- net/core/dev.c                          |  2 +-
- net/core/net_namespace.c                |  4 ++--
- 8 files changed, 24 insertions(+), 16 deletions(-)
+Yes, I meant that just using the percpu variable in enqueue will not protec=
+t against the case for when dequeue calls enqueue on the child. Because of =
+the child netem with duplication enabled, packets already involved in dupli=
+cation will get sent back to the parent's tfifo queue, and then the current=
+ dequeue will remain stuck in the loop before hitting an OOM - refer to the=
+ paragraph starting with "In netem_dequeue, the parent netem qdisc's t_len"=
+ in the first email for additional clarification. We need to know whether a=
+ packet we dequeue has been involved in duplication - if it has, we increme=
+nt the percpu variable to inform the children netem qdiscs.
 
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index b9c12b8bf2a3e400b6d8e9d184145834c603b9e1..1205a4432eb4142344fb6eed1cb5ba5b21ec6953 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
- 
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 90d90145a1890bf788e789858ddad3b3d8e3b978..7ce3e6de0c1970697e0e58198e1e3852975ee7bc 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -61,7 +61,7 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
- 	if (!rpm->debug.class)
- 		ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
--				     "intel_runtime_pm", dev_name(rpm->kdev));
-+				     "intel_runtime_pm");
- }
- 
- static intel_wakeref_t
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 21dcee7c9a659ac1fb0aa19f3018647be3bda754..080535fc71d8c25dcc848eefd063361bbe21b305 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -115,7 +115,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
- 	if (!wf->debug.class)
--		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-+		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref");
- #endif
- }
- 
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index ddc5a7b2bd84692bbc1e1ae67674ec2c6857e1ec..5878e7fce712930700054033ff5f21547e75224f 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -24,7 +24,6 @@ struct ref_tracker_dir {
- 	struct dentry		*dentry;
- 	struct dentry		*symlink;
- #endif
--	char			name[32];
- #endif
- };
- 
-@@ -48,10 +47,21 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
- 
- #endif /* CONFIG_DEBUG_FS */
- 
-+/**
-+ * ref_tracker_dir_init - initialize a ref_tracker dir
-+ * @dir: ref_tracker_dir to be initialized
-+ * @quarantine_count: max number of entries to be tracked
-+ * @class: pointer to static string that describes object type
-+ *
-+ * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-+ * will also be created for it under the top-level ref_tracker debugfs
-+ * directory.
-+ *
-+ * Note that @class must point to a static string.
-+ */
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- 	INIT_LIST_HEAD(&dir->list);
- 	INIT_LIST_HEAD(&dir->quarantine);
-@@ -65,7 +75,6 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dentry = NULL;
- 	dir->symlink = NULL;
- #endif
--	strscpy(dir->name, name, sizeof(dir->name));
- 	ref_tracker_dir_debugfs(dir);
- 	stack_depot_init();
- }
-@@ -90,8 +99,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- }
- 
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index d778820bea952d96c9a1c280dfd6531135bd85e0..897c5b4aedf7393aca45ed10b5617c81e6f7e6bf 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -123,7 +123,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 	stats = ref_tracker_get_stats(dir, display_limit);
- 	if (IS_ERR(stats)) {
- 		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
--			   s->prefix, dir->name, dir, stats);
-+			   s->prefix, dir->class, dir, stats);
- 		return;
- 	}
- 
-@@ -134,14 +134,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
- 			sbuf[0] = 0;
- 		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
--			   dir->name, dir, stats->stacks[i].count,
-+			   dir->class, dir, stats->stacks[i].count,
- 			   stats->total, sbuf);
- 		skipped -= stats->stacks[i].count;
- 	}
- 
- 	if (skipped)
- 		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
--			   s->prefix, dir->name, dir, skipped, stats->total);
-+			   s->prefix, dir->class, dir, skipped, stats->total);
- 
- 	kfree(sbuf);
- 
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e6fec0072e78ef79 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index eeb6aab16987dde277314d1a6b5bd32eaabab893..c7c25278267adb338f99407abe4a62d2a9cc3d33 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11714,7 +11714,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index b2fd9c5635ecf8fccd48f1d5b967a5c6c41cfec4..8d21c8f4eb83597ddee5fd345b5e38b308ce0335 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -403,8 +403,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
+Hopefully the following diagram can help elucidate the problem:
 
--- 
-2.49.0
+Step 1: Initial enqueue of Packet A:
+
+    +----------------------+
+    |     Packet A         |
+    +----------------------+
+              |
+              v
+    +-------------------------+
+    |     netem_enqueue       |
+    +-------------------------+
+              |
+              v
+    +-----------------------------------+
+    | Duplication Logic (percpu OK):   |
+    |   =3D> Packet A, Packet B (dup)    |
+    +-----------------------------------+
+              | <- percpu variable for netem_enqueue
+              v    prevents duplication of B
+        +-------------+=20
+        | tfifo queue |
+        |   [A, B]    |
+        +-------------+
+
+Step 2: netem_dequeue processes Packet B (or A)
+
+        +-------------+
+        | tfifo queue |
+        |   [A]       |
+        +-------------+
+              |
+              v
+    +----------------------------------------+
+    | netem_dequeue pops B in tfifo_dequeue  |
+    +----------------------------------------+
+              |
+              v
+    +--------------------------------------------+
+    | netem_enqueue to child qdisc (netem w/ dup)|
+    +--------------------------------------------+
+              | <- percpu variable in netem_enqueue prologue
+              |    and epilogue does not stop this dup,
+              v    does not know about previous dup involvement
+    +--------------------------------------------------------+
+    | Child qdisc duplicates B to root (original netem) as C |
+    +--------------------------------------------------------+
+              |
+              v
+
+Step 3: Packet C enters original root netem again
+
+    +-------------------------+
+    | netem_enqueue (again)   |
+    +-------------------------+
+              |
+              v
+    +-------------------------------------+
+    | Duplication Logic (percpu OK again) |
+    |   =3D> Packet C, Packet D             |
+    +-------------------------------------+
+              |=20
+              v=20
+            .....
+
+If you increment a percpu variable in enqueue prologue and decrement in enq=
+ueue epilogue, you will notice that our original repro will still trigger a=
+ loop because of the scenario I pointed out above - this has been tested.=
+=20
+
+From a current view of the codebase, netem is the only qdisc that calls enq=
+ueue on its child from its dequeue. The check we propose will only work if =
+this invariant remains.
+
+
+> > However, there is a hack to address this. We can add a field in netem_s=
+kb_cb called duplicated to track if a packet is involved in duplicated (bot=
+h the original and duplicated packet should have it marked). Right before w=
+e call the child enqueue in netem_dequeue, we check for the duplicated valu=
+e. If it is true, we increment the percpu variable before and decrement it =
+after the child enqueue call.
+>=20
+>=20
+> is netem_skb_cb safe really for hierarchies? grep for qdisc_skb_cb
+> net/sched/ to see what i mean
+
+We are not using it for cross qdisc hierarchy checking. We are only using i=
+t to inform a netem dequeue whether the packet has partaken in duplication =
+from its corresponding netem enqueue. That part seems to be private data fo=
+r the sk_buff residing in the current qdisc, so my understanding is that it=
+'s ok.
+
+> > This only works under the assumption that there aren't other qdiscs tha=
+t call enqueue on their child during dequeue, which seems to be the case fo=
+r now. And honestly, this is quite a fragile fix - there might be other edg=
+e cases that will cause problems later down the line.
+> >=20
+> > Are you aware of other more elegant approaches we can try for us to tra=
+ck this required cross-qdisc state? We suggested adding a single bit to the=
+ skb, but we also see the problem with adding a field for a one-off use cas=
+e to such a vital structure (but this would also completely stomp out this =
+bug).
+>=20
+>=20
+> It sounds like quite a complicated approach - i dont know what the
+> dequeue thing brings to the table; and if we really have to dequeue to
+
+Did what I say above help clarify what the problem is? Feel free to let me =
+know if you have more questions, this bug is quite a nasty one.
+
+> reinject into enqueue then i dont think we are looping anymore..
+>=20
+
+We are still duplicating packets that have already partaken in duplication =
+all the way back to root, so the tfifo dequeue loop in netem_dequeue won't =
+stop.
+
+> cheers,
+> jamal
+>=20
+
+Best,
+Will
 
 
