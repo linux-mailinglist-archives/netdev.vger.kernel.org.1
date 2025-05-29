@@ -1,332 +1,283 @@
-Return-Path: <netdev+bounces-194111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EBFAC75E9
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:42:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12845AC75F8
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:57:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 125529E4F6B
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1CD71BA3E8C
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4CD24468C;
-	Thu, 29 May 2025 02:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E4C2459DC;
+	Thu, 29 May 2025 02:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GwbTNOWG"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Lh8EAOFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE5B2F872;
-	Thu, 29 May 2025 02:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D9F24469E
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 02:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748486550; cv=none; b=Nuy3YeaEpLZQ4T5pCv2GMy9I99NaYQnkn7Vyj1LKrp9rEz6igXMJsiuGGDIAO4Zd6oP3ERIaWhvaE26KCN/z7KH5pawGqczUmaPam4V28QVT5jA3bz753TsXux3tAT5gV2ntKRJLDxryiFk5atXOsGsMCSSoRLMyCapmB+0K6/o=
+	t=1748487420; cv=none; b=TCbj9ZtR8pbBf57J4xekdpJnBOD6CZWxSFmWZu7XFOidFV95pyWfeKsvR5fEtJ3nB19bEwVGtgj/pJ8mSHzfmCjmDgJBqiX9qiuIHgRum8DOmi9pJ8XcU/H5KNIKAT+Gsr3SjDccgNim4f+IhW3deApgDc3DiQIyTTx3uZfuMSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748486550; c=relaxed/simple;
-	bh=GNLRYQUJcKmHRLXQoGd5L1xafjjvL1agDYEiwlM6VJw=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=tKdz0hmAN7UfY65U9MhjoKgw8EG6mCOErsy6serLPSf638/ODrVMcMOGP7Zo3CZqXFdorq0UM1JbxF80H+z01x4+ai+T/CvrYX9LVBObJB21UigoEi+jg+kEYL2wg9P4SHBtS0Nbj3CpFLcVgpmh7voYIdYR8SCdTrtMmiXgg74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GwbTNOWG; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1748487420; c=relaxed/simple;
+	bh=sdzXkG0VQ/Z1BAccWiaYyMCYuMjWxqYkkJneut7o65c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WyjM6Msb1I4w8GIEaXoI6gl9vEl251c6wWo0OKNHWs48TsTyf+uQHxOMP6tAUtgquHAnnYxBw6RHC/lDv4j4BI/V2HxVAx707potJDSBfOypUS8DsXocFkII6ywYF3SOoHPUQGdtUTiHaBe2LBgFcCj+ecavgA9ENzYp0f52kv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Lh8EAOFb; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b0b2d0b2843so425953a12.2
+        for <netdev@vger.kernel.org>; Wed, 28 May 2025 19:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1748487418; x=1749092218; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sscf3LKzW/JQ+jagJvdm0CEZpYqsyDwPcnFWt8S8dbY=;
+        b=Lh8EAOFbRVH3Y4XkTe4ndosIv4XHik7oGbjjtuL7WV1Kpr/lX8y7B31Xlv9/IjxzMB
+         Ps97/L17GrOVmP+ZsjJuwc2oZJH+/rjov9AReKpJDIvNIJiFVOI6WgwUiq9VBlJTztOK
+         juvjiHard6WcHw7bAz+YGsMJwBCPZVwaixdEI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748487418; x=1749092218;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sscf3LKzW/JQ+jagJvdm0CEZpYqsyDwPcnFWt8S8dbY=;
+        b=IPvY8m4BXlpYwubOrPEioRNQEcLZPsBDIPcYLVVUNWgxF2VOK4Zb0+i+O3Y4jDpjCR
+         +780+NHJTOqDUqsdoe6JbvzdkVDrVDUCDtUOEsqq/gnL8JS5siErdaCf8l65i66QYnuf
+         I1yOUOQSn2ZcTFrh+pG93vDLxMKV8Z7Hmjq4wzjXpmwYW5mltaBAzZPN8A//AQRfs+Ju
+         MBDXcKfbTSz/5qSmgn6TW5pljLZPXMZhnALYx7IwVTZ8E/06fjZOdAj0HPwGvgfONDOn
+         ItjdX/gruzzf47FwXL2IiMubjlsz5k4XRroqt+VXjitIPWLhw0FFPkW1aeQX2ZHfGSjo
+         CFDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUf4WyQVB7tlhOqkfMLOj/O0nmXPLHFNHcbsOkqrYixkovZTBZ4fkkoUJBQbbIvtqmyrjnNNLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxjaNKdLKhQJ6Kh9b8lZBFm6p5fzl9kL+3XZULQ+u0ZGMWFXvF
+	YWDw86EB3LiNGDANgmFo0ZOp4EkFTS1Wk3jhG3lyyYe+lnh8Z+dDqFtBgpEruPrPAHNOoIpuwPe
+	a4aM39KwJYbo/Ip6Ichd692bZ+BDTCUh3CYhNrRe5
+X-Gm-Gg: ASbGncuCfraPPP1NGFqad0QgMPWbk2WWVNgG8k9+OMUMGhgTV9NllJ/+hR2ErLLD0Si
+	UtaJrJGGyt3llf5L9rh/roFqnuP09rmJj7ssZGb/zYuIrw0+TC3jjli9W0/PiLGNtcdsAbrbpk0
+	M9EVqzZR9uouOgXKtJDb9S/Ikjavw8gb2pTg==
+X-Google-Smtp-Source: AGHT+IFuGPXAClT9ED5vKwdCpxiy4g+H/pyfvH9nuikO/EisHRGYk+JJweLUS9BYUjAslq3NHNzA9gx5OAhyDWW3Lj4=
+X-Received: by 2002:a17:90b:3e81:b0:30e:9349:2da2 with SMTP id
+ 98e67ed59e1d1-311e73db541mr7138078a91.4.1748487417932; Wed, 28 May 2025
+ 19:56:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748486544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f7vrs6bHYMJbGrO5/ULBT0VnsxBQ4VzjvKqhI3ES3E4=;
-	b=GwbTNOWGRLn5YQ0S+STemjaPdr+AT42nVc0pOwx0hrMCbgHWoX/XDdHTyjB8NyTL6QqNW8
-	NJSqned0g1KAMapS4YSvovRSpXCv6zwK0lrKYYrw4OSO/hcdFCEzohoy2qVKrxSiaX7vR6
-	XBm8UiNt/yUzJLF/4S97A30uWboAu1c=
-Date: Thu, 29 May 2025 02:42:14 +0000
-Content-Type: text/plain; charset="utf-8"
+References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+ <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
+ <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com> <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
+ <7ac5c034-9e6d-45c4-b20a-2a386b4d9117@quicinc.com> <51768fa6-007e-4f30-ac1f-eed01ae1a3c5@linux.dev>
+In-Reply-To: <51768fa6-007e-4f30-ac1f-eed01ae1a3c5@linux.dev>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Wed, 28 May 2025 19:56:44 -0700
+X-Gm-Features: AX0GCFs7nO7Ek5qGHccnCOiDAB6gA5K5glWzqriW3_xcRyt9xcpYHgFycts9UYs
+Message-ID: <CAMdnO-KNfH79PG1=21Dbyaart2JN_e1XcF+tTG93BG5BobX+Gg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for BCM8958x
+To: Yanteng Si <si.yanteng@linux.dev>
+Cc: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>, Andrew Lunn <andrew@lunn.ch>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, netdev@vger.kernel.org, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
+	ahalaney@redhat.com, xiaolei.wang@windriver.com, rohan.g.thomas@intel.com, 
+	Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com, 
+	Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000075f7c606363d73cd"
+
+--00000000000075f7c606363d73cd
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <fefe50c6ec558074ec7de944175cec82bb426f10@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Fix psock incorrectly pointing
- to sk
-To: "John Fastabend" <john.fastabend@gmail.com>
-Cc: bpf@vger.kernel.org, "Jakub Sitnicki" <jakub@cloudflare.com>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-In-Reply-To: <20250528234650.n5orke2yq55qnoen@gmail.com>
-References: <20250523162220.52291-1-jiayuan.chen@linux.dev>
- <20250528234650.n5orke2yq55qnoen@gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-May 29, 2025 at 07:46, "John Fastabend" <john.fastabend@gmail.com> wrote:
+Hi Yanteng,
 
-
-
->=20
->=20On 2025-05-24 00:22:19, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> We observed an issue from the latest selftest: sockmap_redir where
-> >=20
->=20>  sk_psock(psock->sk) !=3D psock in the backlog. The root cause is t=
-he special
-> >=20
->=20>  behavior in sockmap_redir - it frequently performs map_update() an=
-d
-> >=20
->=20>  map_delete() on the same socket. During map_update(), we create a =
-new
-> >=20
->=20>  psock and during map_delete(), we eventually free the psock via rc=
-u_work
-> >=20
->=20>  in sk_psock_drop(). However, pending workqueues might still exist =
-and not
-> >=20
->=20>  be processed yet. If users immediately perform another map_update(=
-), a new
-> >=20
->=20>  psock will be allocated for the same sk, resulting in two psocks p=
-ointing
-> >=20
->=20>  to the same sk.
-> >=20
->=20>=20=20
->=20>=20
->=20>  When the pending workqueue is later triggered, it uses the old pso=
-ck to
-> >=20
->=20>  access sk for I/O operations, which is incorrect.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Timing Diagram:
-> >=20
->=20>=20=20
->=20>=20
->=20>  cpu0 cpu1
-> >=20
->=20>=20=20
->=20>=20
->=20>  map_update(sk):
-> >=20
->=20>  sk->psock =3D psock1
-> >=20
->=20>  psock1->sk =3D sk
-> >=20
->=20>  map_delete(sk):
-> >=20
->=20>  rcu_work_free(psock1)
-> >=20
->=20>=20=20
->=20>=20
->=20>  map_update(sk):
-> >=20
->=20>  sk->psock =3D psock2
-> >=20
->=20>  psock2->sk =3D sk
-> >=20
->=20>  workqueue:
-> >=20
->=20>  wakeup with psock1, but the sk of psock1
-> >=20
->=20>  doesn't belong to psock1
-> >=20
->=20>  rcu_handler:
-> >=20
->=20>  clean psock1
-> >=20
->=20>  free(psock1)
-> >=20
->=20>=20=20
->=20>=20
->=20>  Previously, we used reference counting to address the concurrency =
-issue
-> >=20
->=20>  between backlog and sock_map_close(). This logic remains necessary=
- as it
-> >=20
->=20>  prevents the sk from being freed while processing the backlog. But=
- this
-> >=20
->=20>  patch prevents pending backlogs from using a psock after it has be=
-en
-> >=20
->=20>  freed.
-> >=20
->=20
-> Nit, its not that psock would be freed because we do have the
->=20
->=20cancel_delayed_work_sync() before the kfree(psock). But this
->=20
->=20is not a good state with two psocks referenceing the same sk.
->=20
->=20>=20
->=20> Note: We cannot call cancel_delayed_work_sync() in map_delete() sin=
-ce this
-> >=20
->=20>  might be invoked in BPF context by BPF helper, and the function ma=
-y sleep.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg inte=
-rface")
-> >=20
->=20>  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> >=20
->=20>=20=20
->=20>=20
->=20>  ---
-> >=20
->=20>  Thanks to Michal Luczaj for providing the sockmap_redir test case,=
- which
-> >=20
->=20>  indeed covers almost all sockmap forwarding paths.
-> >=20
->=20>  ---
-> >=20
->=20>  include/linux/skmsg.h | 1 +
-> >=20
->=20>  net/core/skmsg.c | 5 ++++-
-> >=20
->=20>  2 files changed, 5 insertions(+), 1 deletion(-)
-> >=20
->=20>=20=20
->=20>=20
->=20>  diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> >=20
->=20>  index 0b9095a281b8..b17221eef2f4 100644
-> >=20
->=20>  --- a/include/linux/skmsg.h
-> >=20
->=20>  +++ b/include/linux/skmsg.h
-> >=20
->=20>  @@ -67,6 +67,7 @@ struct sk_psock_progs {
-> >=20
->=20>  enum sk_psock_state_bits {
-> >=20
->=20>  SK_PSOCK_TX_ENABLED,
-> >=20
->=20>  SK_PSOCK_RX_STRP_ENABLED,
-> >=20
->=20>  + SK_PSOCK_DROPPED,
-> >=20
->=20>  };
-> >=20
->=20>=20=20
->=20>=20
->=20>  struct sk_psock_link {
-> >=20
->=20>  diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> >=20
->=20>  index 34c51eb1a14f..bd58a693ce9a 100644
-> >=20
->=20>  --- a/net/core/skmsg.c
-> >=20
->=20>  +++ b/net/core/skmsg.c
-> >=20
->=20>  @@ -656,6 +656,9 @@ static void sk_psock_backlog(struct work_struc=
-t *work)
-> >=20
->=20>  bool ingress;
-> >=20
->=20>  int ret;
-> >=20
->=20>=20=20
->=20>=20
->=20>  + if (sk_psock_test_state(psock, SK_PSOCK_DROPPED))
-> >=20
->=20>  + return;
-> >=20
->=20
-> Could we use the SK_PSOCK_TX_ENABLED bit here? Its already used to
->=20
->=20ensure we wont requeue work after the psock has started being
->=20
->=20removed. Seems like we don't need two flags? wdyt?
->=20
->=20>=20
->=20> +
-> >=20
->=20>  /* Increment the psock refcnt to synchronize with close(fd) path i=
-n
-> >=20
->=20>  * sock_map_close(), ensuring we wait for backlog thread completion
-> >=20
->=20>  * before sk_socket freed. If refcnt increment fails, it indicates
-> >=20
->=20>  @@ -867,7 +870,7 @@ void sk_psock_drop(struct sock *sk, struct sk_=
-psock *psock)
-> >=20
->=20>  write_unlock_bh(&sk->sk_callback_lock);
-> >=20
->=20>=20=20
->=20>=20
->=20>  sk_psock_stop(psock);
-> >=20
->=20
-> Can we add this to sk_psock_stop where we have the TX_ENABLED bit
->=20
->=20cleared.
-
-
-
-Thanks, I just add SK_PSOCK_TX_ENABLED checking at the start of sk_psock_=
-backlog().
-Every works fine, and truly no more flag needed !
-
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 34c51eb1a14f..83c78379932e 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -656,6 +656,13 @@ static void sk_psock_backlog(struct work_struct *wor=
-k)
-        bool ingress;
-        int ret;
-
-+       /* If sk is quickly removed from the map and then added back, the=
- old
-+        * psock should not be scheduled, because there are now two psock=
-s
-+        * pointing to the same sk.
-+        */
-+       if (!sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
-+               return;
-+
-        /* Increment the psock refcnt to synchronize with close(fd) path =
-in
-         * sock_map_close(), ensuring we wait for backlog thread completi=
-on
-         * before sk_socket freed. If refcnt increment fails, it indicate=
-s
-
-
-
-> >=20
->=20> -
-> >=20
->=20>  + sk_psock_set_state(psock, SK_PSOCK_DROPPED);
-> >=20
->=20>  INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
-> >=20
->=20>  queue_rcu_work(system_wq, &psock->rwork);
-> >=20
->=20>  }
-> >=20
->=20>  --=20
->=20>=20
->=20>  2.47.1
-> >
+On Wed, May 28, 2025 at 6:36=E2=80=AFPM Yanteng Si <si.yanteng@linux.dev> w=
+rote:
 >
+> =E5=9C=A8 5/28/25 8:04 AM, Abhishek Chauhan (ABC) =E5=86=99=E9=81=93:
+> >
+> >
+> > On 2/7/2025 3:18 PM, Jitendra Vegiraju wrote:
+> >> Hi Abhishek,
+> >>
+> >> On Fri, Feb 7, 2025 at 10:21=E2=80=AFAM Abhishek Chauhan (ABC) <
+> >> quic_abchauha@quicinc.com> wrote:
+> >>
+> >>>
+> >>>
+> >>> On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
+> >>>> Hi netdev team,
+> >>>>
+> >>>> On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM <jitendra.vegiraju@broadcom.=
+com> wrote:
+> >>>>>
+> >>>>> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> >>>>>
+> >>>>> This patchset adds basic PCI ethernet device driver support for Bro=
+adcom
+> >>>>> BCM8958x Automotive Ethernet switch SoC devices.
+> >>>>>
+> >>>>
+> >>>> I would like to seek your guidance on how to take this patch series
+> >>> forward.
+> >>>> Thanks to your feedback and Serge's suggestions, we made some forwar=
+d
+> >>>> progress on this patch series.
+> >>>> Please make any suggestions to enable us to upstream driver support
+> >>>> for BCM8958x.
+> >>>
+> >>> Jitendra,
+> >>>           Have we resent this patch or got it approved ? I dont see a=
+ny
+> >>> updates after this patch.
+> >>>
+> >>>
+> >> Thank you for inquiring about the status of this patch.
+> >> As stmmac driver is going through a maintainer transition, we wanted t=
+o
+> >> wait until a new maintainer is identified.
+> >> We would like to send the updated patch as soon as possible.
+> >> Thanks,
+> >> Jitendra
+> > Thanks Jitendra, I am sorry but just a follow up.
+> >
+> > Do we know if stmmac maintainer are identified now ?
+>
+> I'm curious why such a precondition is added=EF=BC=9F
+>
+It's not a precondition. Let me give some context.
+This patch series adds support for a new Hyper DMA(HDMA) MAC from Synopsis.
+Many of the netdev community members reviewed the patches at that time.
+Being the module maintainer at that time, Serge took the initiative to
+guide us through integrating the new MAC into the stmmac driver.
+We addressed all the review comments and submitted the last patch series.
+Without an official maintainer, we didn't get feedback on the last patch se=
+ries.
+Because of this, we wanted to wait until a new maintainer is assigned
+to this module.
+As Abhishek expressed in his email, it appears the HDMA MAC is
+becoming more mainstream.
+We are hoping to rebase the patch series and resubmit for review if
+netdev team members show interest.
+Thanks,
+Jitendra
+>
+> Thanks,
+> Yanteng
+
+--00000000000075f7c606363d73cd
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGbTCCBFWg
+AwIBAgIMGHX6KxYK3WW2YyprMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI0MDkyNTEzNTAzMVoXDTI2MDkyNjEzNTAzMVowgbMxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzEWMBQGA1UEChMNQlJPQURDT00gSU5DLjEaMBgGA1UEAxMRSml0ZW5kcmEgVmVnaXJhanUx
+LTArBgkqhkiG9w0BCQEWHmppdGVuZHJhLnZlZ2lyYWp1QGJyb2FkY29tLmNvbTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAKWV+9PYvG4njqRsbQas79f8Q46VL7b1ZxvWT6ik6VMbdRZx
+tfpfZalVXksqcb02/N1H7UA9V04cV2q97FkSr/KxeFLMetPb3cVJZICg23IRO2NTPdmgPFzwkPTo
+35h9h/OYLgh3/9a1nTsC2xqJa8GtohD5+42rsskGcI57U4n1r1L4R5IL9ypSqDxX/xVEAdGI5FTj
+VgvoZC6iuEbnez+yO8TT3wun9b/PQowOB5P0CwIFv7ERW0S1s6B8yrbsoaTrz0vQaEA786k1pZkg
+ykC1+zXq/iTyZuPP4B4RkzFd43Pw+GAH0Tt2nx5V4rNisJHeAVNU92Gj01cEg0I+FnsCAwEAAaOC
+Ad8wggHbMA4GA1UdDwEB/wQEAwIFoDCBkwYIKwYBBQUHAQEEgYYwgYMwRgYIKwYBBQUHMAKGOmh0
+dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZzbWltZWNhMjAyMy5jcnQw
+OQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAy
+MzBlBgNVHSAEXjBcMAkGB2eBDAEFAwEwCwYJKwYBBAGgMgEoMEIGCisGAQQBoDIKAwIwNDAyBggr
+BgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIw
+ADBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWlt
+ZWNhMjAyMy5jcmwwKQYDVR0RBCIwIIEeaml0ZW5kcmEudmVnaXJhanVAYnJvYWRjb20uY29tMBMG
+A1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1Ud
+DgQWBBRq5Jlxz3MqC+zEgUxK566xEc2g3DANBgkqhkiG9w0BAQsFAAOCAgEARXrmeeWA31pp9Tr0
+M6mOlMv+Pr2raES4GzPSyftvxf6tBQCBNaqi6LSbyusDYOj3mG9bp6VeVn+68OxNY9iNAk+ujtId
+f3+30BlZOQ1v8z9u2peUOUtWI60y2MxhdH0X0n2H+BCGvUOFqs5z440jqqy1HsscZTXHB7FEZmVP
+fyD+0Z6cxyh7WNC6+BgLiFwf8iqmAbu7Yb1sGTUGyS5gfYEjJbF2PJfwNUcJDd7eS4w5Ju5mK5y7
+spgjH2/JmDgbkpSk9JyuWfjGZIg4ah/q2nb6UMd1XJb6gLQZuzPOI3SgXPvd8MHGjKZrX2BHOBSC
+bJJ8rp4w4a9QMS6dde2MFObusxkZAft4tUnwo+ProchHs7iA85sL7sWEZhAmjmKKCpECpEfZm0+/
+hpvKQV3AZp5vBstb4IVL8QmLj8beDVHYnNhEicsSiG1wW7zSYyBnmGbFRrFQIJnJDWPjTZOlVEyp
+T1ShrXRCtqJpOt6rgg+rFEY3D8j6/bAkJXnmKnE2LZ0YyrrKk7eC6UfNNimx38w3NWchtcGY8zJn
+Y/1/C9Jv/mWm/2lK8nvusOFxhKmbG83Hx8toQdZ5F1kYk6zAWjfB7lwXr/En9mCmLieJ18hen9EK
+qbYyUkmCmuoLi5GXFMJy+iQv6DgMVQ7CACagybU6FUrmL9lVa+A6caBEEh4xggJXMIICUwIBATBi
+MFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9i
+YWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwYdforFgrdZbZjKmswDQYJYIZIAWUDBAIBBQCg
+gccwLwYJKoZIhvcNAQkEMSIEIJJrBufWxV0R5MKdjS9jr6tsiQnUVV3R8QR2g1VJDeHEMBgGCSqG
+SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDUyOTAyNTY1OFowXAYJKoZI
+hvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
+9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAAJ/e0uKX167
+Lh7qfbb/jrbXZ9YVUefyEoOhgnSSHxT+DukeUlQMd87hARBnskep0C/AFnI098yqX5IH1Quqv91v
+bGt756coz020oV19OCFtRBb5SAVPGptH4OorY4BJoLc/h7u2f/3jpZVjnkXNAjXUmLymLa+4SfPW
+Okn+t+uGoxF41yHNAVSzRNjSnqadTZya6FrZWoW3LxBdjhv4Eq/ijnCOquwG55DxqLyXqzAJmmqj
+xpIZASNxb5GqZxQ/1NfOmKqWhnBQa6FrSWANF2DVPI6ZEBYor5jo1ueZxqdEX5qReRzG0NPIy5Ro
+bmvTAMp6U2bE8F3h/txFAa148oc=
+--00000000000075f7c606363d73cd--
 
