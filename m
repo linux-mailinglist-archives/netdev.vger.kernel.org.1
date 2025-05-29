@@ -1,173 +1,252 @@
-Return-Path: <netdev+bounces-194168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F053AC79FF
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 09:59:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EEFCAC7A4C
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8A7A24F77
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 07:58:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA6561BC4E87
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 08:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1DB218EBF;
-	Thu, 29 May 2025 07:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8884C217722;
+	Thu, 29 May 2025 08:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b="ZfoA4+TX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NLXobMza"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B9A215F48;
-	Thu, 29 May 2025 07:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D0E21ABB4
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 08:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748505547; cv=none; b=Q/vzGfoMFpmS9uvwMgLG/bZqmdP10slAqUX/QICEzEsgl5cdPW2hXxNexe9MLgByTqgHj4mUv8W/o6oFeNqR/NgTjO/347LQzoO5F43KducDuyBj2ipBUQ3Ag7GxanWIYckkbHyx2TY21ColXR3oUXwWCqWv7sWmUTWrAeqmcxs=
+	t=1748507906; cv=none; b=O32ZSUZabBUVh3H++oY9gGrus6w9ilp/aLfr0Gdfl+J61mFlvwv5nb9VjAHuWGtYxJW4hCUa6H6JHHxduIKIvLfre/4ItG8cSF8ar4389CqTD/g9ysaOB3EFq0bUOzFCgqnSS9fOLUvp5gl/6Z9RiSawMUnJHulJwaMOMT6Kogk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748505547; c=relaxed/simple;
-	bh=Wqy/FDsp5bWWI3oEfTRpmfQFG898Jzzy1TADAX/Wars=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EyLm31wkIIxNpYP1luZJ7aHlG8vncMAHgca5drgUGL4Jo4NQpcs/lQY21a1PF+kV0imPRRu4VjXW6VqEq1jeqn5qfFaRgBwv/hoYKgNbrorAaCCdvvmZ/JNC1W9DixYgNq0uVNfWQqot6D55DZw0fTN+aYfUDvflyWixbI4SiGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c49cf0cc3c6211f0b29709d653e92f7d-20250529
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_TXT, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, UD_TRUSTED
-	CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_T1, AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:3df438d5-7283-44c2-a233-e93b6b20ed43,IP:10,
-	URL:0,TC:0,Content:-25,EDM:-30,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,A
-	CTION:release,TS:-50
-X-CID-INFO: VERSION:1.1.45,REQID:3df438d5-7283-44c2-a233-e93b6b20ed43,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:-30,RT:0,SF:-5,FILE:0,BULK:0,RULE:EDM_GN8D19FE,AC
-	TION:release,TS:-50
-X-CID-META: VersionHash:6493067,CLOUDID:bd503cf46284c5e6937e188a2f6aea97,BulkI
-	D:250529155858ZTUX9W41,BulkQuantity:0,Recheck:0,SF:19|24|38|44|66|72|78|10
-	2,TC:nil,Content:0|50,EDM:2,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil
-	,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
-X-UUID: c49cf0cc3c6211f0b29709d653e92f7d-20250529
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1406889021; Thu, 29 May 2025 15:58:55 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net v2] net/mlx5: Flag state up only after cmdif is ready
-Date: Thu, 29 May 2025 15:58:49 +0800
-Message-Id: <20250529075849.243096-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1748507906; c=relaxed/simple;
+	bh=ozMl+Mw/EdGA0GLQXZF2ephaOPbJcG3lJ6h9Z+6J8mo=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=M7rfeOI1CBoT0Gqg2CyUMmRuAckKUywoakCqb/89MfWM+gELMR8RBoPPIR5TAYqoJgUyAZoEtGCa5UvaU+URYQK1IkXSt2/Y0TwFWHxwthhPlBNG2iBdzs3Ma7EKF3MIkP7Exbz26erSoesuUD+rJGKADfxnA++uoWU+2aLY2Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io; spf=pass smtp.mailfrom=bejarano.io; dkim=pass (2048-bit key) header.d=bejarano.io header.i=@bejarano.io header.b=ZfoA4+TX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NLXobMza; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bejarano.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bejarano.io
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id A6E5A11400D3;
+	Thu, 29 May 2025 04:38:22 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Thu, 29 May 2025 04:38:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bejarano.io; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1748507902;
+	 x=1748594302; bh=/Dsp2zqq6PdJdh0xEXGsNbkmU4aPykRpxGwlWaOb7LE=; b=
+	ZfoA4+TXcyzWtC68Ffol4nN4kd+My27m98ec9DaLi1jn/7i4gt3w/dra1AgT5ny1
+	4D1h7dcR+Yfp6wtM+spoc7FaXB98TYnqZjuLh8X8kBfOd0VaX9duW603gJJID2CG
+	2L1cDg12ZusFmiK0Xst1x/y9XwZ/m3N0EXcRPhIaENsFoaXCnAQlzRODOvdK4C0b
+	9F/EUlzseoPZXBVKBYAtayxi8usU2pNxADFUt91p6z2Sp7h0yybLCuzSLEShNkI1
+	eBr8I+j1sqpBLABIpabxguULknjehqNFZ+CWOP9stQjd/k4q8u++/u1v/XLpTKX2
+	Jlm+ZMuKGrYk+/xgSE+51w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1748507902; x=
+	1748594302; bh=/Dsp2zqq6PdJdh0xEXGsNbkmU4aPykRpxGwlWaOb7LE=; b=N
+	LXobMza+O1qRh5nEGPijr+yHwgBlCgUjdB8A2Ga0EGzt4QqtjCANStuP215dY/6S
+	EKVUw+vACB3Opy2iDdggDTt6vmqDCnnZoFp7HPjQXiOI6/y1PvUtdwBDRPJb0Uyu
+	k+FXoSrMg4QT6Qbye11EQPXbPM+xVj3cf6gCNpYu0gaYahMiT0fqrYHRBkRuKPkA
+	0zArfznYzRTmq47+mZoCKJ1lZ6cshYAuznB5TLs5Z27UtgBWbIbLaA6Lgbd6vpP9
+	zL7tJRBWaVdIQ9whiCTHGNY2o+ml7nXMdR9kFLG1R8G2mDlQUD0EP9T7hwWB/1rm
+	MadsVwzjE/fE2MlxkrHOA==
+X-ME-Sender: <xms:_Rw4aDRpuplUpRhhV8Pu5Q5URwFxKtNjMObzzA_yNcsLhKCrKFndrw>
+    <xme:_Rw4aEyfyUphf1lofLzT3PEzLK_iUfU0r6hSXCCwNVVBRxjXa6vzG-jyLpPYfhFMk
+    ivTZhNI1wnYlFJpHmk>
+X-ME-Received: <xmr:_Rw4aI1zZ7aMjl0lBdNAHiigdj6N6O9RtrQsN6MaFBwFXghebZasz8SKJJm_3embC2p7rlkiWggiS7cJfFHAhY_8xTCCC46QJefFd4ZVqXdotQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvheeijeculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegtggfuhfgjffev
+    gffkfhfvofesthhqmhdthhdtvdenucfhrhhomheptfhitggrrhguuceuvghjrghrrghnoh
+    cuoehrihgtrghrugessggvjhgrrhgrnhhordhioheqnecuggftrfgrthhtvghrnheptefh
+    leekteffhedtgeekudeivefhgfevtedvgedtjefhffejteelgeethfevhfdunecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprhhitggrrhgusegs
+    vghjrghrrghnohdrihhopdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouh
+    htpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepmhhikhgr
+    rdifvghsthgvrhgsvghrgheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmihgthhgr
+    vghlrdhjrghmvghtsehinhhtvghlrdgtohhmpdhrtghpthhtohephigvhhgviihkvghlsh
+    hhsgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:_Rw4aDBNvKzs1f94XpFVb2tl1NaU9CaSM9L3LDX_LK5Dxy7QepvAbA>
+    <xmx:_Rw4aMjBCb7mIoltcf2UtGbsw6vUbtd8OU3Jw1F4MytF5ln8Ye7KIw>
+    <xmx:_Rw4aHrOh0NWnBSBISdWA07-y9k9AfdwXcC7SPgNL6rYiGCPs4xJKw>
+    <xmx:_Rw4aHgXaluxxDlaJKMYzqf4Uau-RbDNJ-emVRBm4Z6SZ8XOhcZOtQ>
+    <xmx:_hw4aKosmMJg8y-GG-wXNftTNrSEFX0kbIUCa8mp7Q1wXAf8BNhY7Dir>
+Feedback-ID: i583147b9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 May 2025 04:38:19 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
+Subject: Re: Poor thunderbolt-net interface performance when bridged
+From: Ricard Bejarano <ricard@bejarano.io>
+In-Reply-To: <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+Date: Thu, 29 May 2025 10:38:17 +0200
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+ netdev@vger.kernel.org,
+ michael.jamet@intel.com,
+ YehezkelShB@gmail.com,
+ andrew+netdev@lunn.ch,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ pabeni@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <048AD01E-BCB0-447D-A0BB-A1D9074B9D2D@bejarano.io>
+References: <29E840A2-D4DB-4A49-88FE-F97303952638@bejarano.io>
+ <9a5f7f4c-268f-4c7c-b033-d25afc76f81c@lunn.ch>
+ <63FE081D-44C9-47EC-BEDF-2965C023C43E@bejarano.io>
+ <0b6cf76d-e64d-4a35-b006-20946e67da6e@lunn.ch>
+ <8672A9A1-6B32-4F81-8DFA-4122A057C9BE@bejarano.io>
+ <c1ac6822-a890-45cd-b710-38f9c7114272@lunn.ch>
+ <38B49EF9-4A56-4004-91CF-5A2D591E202D@bejarano.io>
+ <09f73d4d-efa3-479d-96b5-fd51d8687a21@lunn.ch>
+ <CD0896D8-941E-403E-9DA9-51B13604A449@bejarano.io>
+ <78AA82DB-92BE-4CD5-8EC7-239E6A93A465@bejarano.io>
+ <11d6270e-c4c9-4a3a-8d2b-d273031b9d4f@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.500.181.1.5)
 
-When driver is reloading during recovery flow, it can't get new commands
-till command interface is up again. Otherwise we may get to null pointer
-trying to access non initialized command structures.
+Okay, so in my ignorance of better ways to keep pulling this thread, =
+I've been
+sprinkling net->stats increases (of error types we know aren't =
+happening) all
+over tbnet_start_xmit on the tx side (red), to figure out what pieces of =
+it
+execute during various tests.
 
-The issue can be reproduced using the following script:
+And after various tests, I've found:
 
-1)Use following script to trigger PCI error.
+1. Both lossy and lossless tests follow the same execution patterns, =
+which rules
+   out any specific branch of tbnet_start_xmit that might've only =
+executed in
+   lossy tests. In other words, it must be something wrong with logic =
+common to
+   both lossy and lossless scenarios.
 
-for((i=1;i<1000;i++));
-do
-echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
-echo “pci reset test $i times”
-done
+2. We never run out of buffers, so we never execute L1123-L1124.
 
-2) Use following script to read speed.
+3. tbnet_get_tx_buffer never fails, so we never execute L1129.
 
-while true; do cat /sys/class/net/eth0/speed &> /dev/null; done
+4. data_len is never > TBNET_MAX_PAYLOAD_SIZE, so we never execute the =
+while
+   loop at L1135-L1183.
 
-task: ffff885f42820fd0 ti: ffff88603f758000 task.ti: ffff88603f758000
-RIP: 0010:[] [] dma_pool_alloc+0x1ab/0×290
-RSP: 0018:ffff88603f75baf0 EFLAGS: 00010046
-RAX: 0000000000000246 RBX: ffff882f77d90c80 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 00000000000080d0 RDI: ffff882f77d90d10
-RBP: ffff88603f75bb20 R08: 0000000000019ba0 R09: ffff88017fc07c00
-R10: ffffffffc0a9c384 R11: 0000000000000246 R12: ffff882f77d90d00
-R13: 00000000000080d0 R14: ffff882f77d90d10 R15: ffff88340b6c5ea8
-FS: 00007efce8330740(0000) GS:ffff885f4da00000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000003454fc6000 CR4: 00000000003407e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call trace:
- mlx5_alloc_cmd_msg+0xb4/0×2a0 [mlx5_core]
- mlx5_alloc_cmd_msg+0xd3/0×2a0 [mlx5_core]
- cmd_exec+0xcf/0×8a0 [mlx5_core]
- mlx5_cmd_exec+0x33/0×50 [mlx5_core]
- mlx5_core_access_reg+0xf1/0×170 [mlx5_core]
- mlx5_query_port_ptys+0x64/0×70 [mlx5_core]
- mlx5e_get_link_ksettings+0x5c/0×360 [mlx5_core]
- __ethtool_get_link_ksettings+0xa6/0×210
- speed_show+0x78/0xb0
- dev_attr_show+0x23/0×60
- sysfs_read_file+0x99/0×190
- vfs_read+0x9f/0×170
- SyS_read+0x7f/0xe0
- tracesys+0xe3/0xe8
+5. In 7 sk_buffs per iperf3 test (out of tens of thousands), I've =
+observed the
+   following three differences:
+     4.1. skb->data_len is > 0, so len is < data_len, so we go into the =
+loop at
+          L1192-L1208, which we only execute once, so len must be >=3D =
+data_len at
+          the end of its first iteration.
+     4.2. frag is < skb_shinfo(skb)->nr_frags, so we execute =
+L1203-L1204.
+     4.3. unmap is true after L1204, so we also execute L1213 when that =
+runs.
+   Yes, seven. In both 10Mbps (0/4316 lost packets) and 1.1Gbps =
+(43715/474724
+   lost packets). Also, from other tests, I'm somewhat sure the very =
+first
+   sk_buff in each iperf3 is non-linear.
 
-Fixes: a80d1b68c8b7a0 ("net/mlx5: Break load_one into three stages")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
-v2:
- - Add net subject prefix as Paolo suggested
- - Add Fixes tag
- - Add issus reproduction script and call trace
+6. tbnet_xmit_csum_and_map never fails, meaning we never execute L1216.
 
-v1:
- https://lore.kernel.org/all/20250527013723.242599-1-zhaochenguang@kylinos.cn/
----
- drivers/net/ethernet/mellanox/mlx5/core/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+7. frame_index is never > 0, meaning we only execute L1219 once, we only =
+put one
+   frame on the Tx ring per tbnet_start_xmit invocation.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 41e8660c819c..713f1f4f2b42 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1210,6 +1210,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
- 	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
- 	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
- 
-+	/* remove any previous indication of internal error */
-+	dev->state = MLX5_DEVICE_STATE_UP;
-+
- 	err = mlx5_core_enable_hca(dev, 0);
- 	if (err) {
- 		mlx5_core_err(dev, "enable hca failed\n");
-@@ -1602,8 +1605,6 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
- 		mlx5_core_warn(dev, "interface is up, NOP\n");
- 		goto out;
- 	}
--	/* remove any previous indication of internal error */
--	dev->state = MLX5_DEVICE_STATE_UP;
- 
- 	if (recovery)
- 		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_ON_RECOVERY_TIMEOUT);
--- 
-2.25.1
+8. net->svc->prtcstns & TBNET_MATCH_FRAGS_ID is always true, meaning we =
+always
+   execute L1222. Makes sense, the Rx end also supports =
+TBNET_MATCH_FRAGS_ID.
+
+
+I'm slightly confused about the following:
+
+skb has three lengths we care about:
+  - skb->len is the total length of the payload (linear + non-linear).
+  - skb_headlen(skb) is the length of the linear portion of the payload.
+  - skb->data_len is the length of the non-linear portion of the =
+payload.
+
+At the beginning of tbnet_start_xmit, we define the following 2 local =
+variables:
+  - len =3D skb_headlen(skb)  // which is skb->len - skb->data_len
+  - data_len =3D skb->len
+As a side note, this is confusing in and of itself because we're =
+renaming skb's
+headlen to len and len to data_len, both of which mean something else =
+outside of
+this function. I'm missing the "why", but it makes the code harder to =
+read.
+
+data_len and len are only modified at L1194 and L1203, respetively, in =
+those few
+occasions when skb is non-linear, otherwise they remain untouched =
+throughout
+tbnet_start_xmit's execution. And since we see non-linear skb's in both =
+lossy
+and lossless tests, I doubt data_len miscalculations or tbnet_kmap_frag =
+are to
+blame for an unaligned memcpy later in L1210, though I'm not discarding =
+it.
+
+
+I also found this confusing in main.c:L1316:
+
+>    /* ThunderboltIP takes advantage of TSO packets but instead of
+>     * segmenting them we just split the packet into Thunderbolt
+>     * frames (maximum payload size of each frame is 4084 bytes) and
+>     * calculate checksum over the whole packet here.
+>     *
+>     * The receiving side does the opposite if the host OS supports
+>     * LRO, otherwise it needs to split the large packet into MTU
+>     * sized smaller packets.
+>     *
+>     * In order to receive large packets from the networking stack,
+>     * we need to announce support for most of the offloading
+>     * features here.
+>     */
+
+This looks weird to me. This driver does not support LRO, why would we =
+rely on
+having it? For peers running other operating systems?
+
+
+So my next best candidate is tbnet_xmit_csum_and_map, but not for any =
+particular
+reason, I just haven't had time to understand it yet. =46rom the looks =
+of it, it's
+the one place where checksums are calculated right before we put the =
+frames on
+the Tx ring, so if there is something wrong with checksums it should be =
+there.
+
+
+Any ideas?
+
+RB
 
 
