@@ -1,132 +1,110 @@
-Return-Path: <netdev+bounces-194249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30A8AAC8086
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:53:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76048AC8087
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02BA44E4206
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:53:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECEAD1BC3AD9
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5843222CBC1;
-	Thu, 29 May 2025 15:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5B31D63E1;
+	Thu, 29 May 2025 15:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yw+rhh/7"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m3bOh6Yr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7C193062
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501CB22D4E7
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748533981; cv=none; b=fO1gvDKW52u8CyCnmG9rhtNFBv769M7f5Di+j75xfb/jF4ZU9PHSLi9DHxhKI8pn04noLYyskRuO22szZaLR21Ru8MZntYGhLeHIy46wzdAOsakkcWdWDN1UAPaB6W037pklpIDYDaq3aUqA8Xh7JvP9ETJiMGOmE54Yb7pxh7w=
+	t=1748533988; cv=none; b=HFZZws2kxpMJCuIb5wzG4rSJcQapHh6Rj2sIqN2YGkCYA7H1OIIg6F3QwWp+bf3Tg5Qim2s+LZT0mnJTYJJkLWDJt5jsfwvzmJwBt3dMuxgr8wPXXmOAI87LO2mkJ+GssxOTpQ4ZIcCukGsDJbkmMv1m8uf+7wcVYKYYTLwME7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748533981; c=relaxed/simple;
-	bh=dBrwp1lSjo0/zOXj6+oiqnIpBPI1NPg/5I0TXg2hVv8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L3nXppIuDkWdRkAPUH0ao5sQjqUjmPZ0ZNIa1QsUqLBB9kJyOBSsANQB9CoozZ+owZBxS6ESXd9+WRN9Awm5rvuoY81RyV6q2MkqmcaTUdBFwmfOz/yQ5m+/21WgCC8tPym6M8RrfGC4lCqxExSe/6dtovmZCEDBs12XzY/uBKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yw+rhh/7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25163C4CEE7;
-	Thu, 29 May 2025 15:52:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748533980;
-	bh=dBrwp1lSjo0/zOXj6+oiqnIpBPI1NPg/5I0TXg2hVv8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Yw+rhh/7vLdzy29EEq4xkty36nZuNp/uVPHljZW42ReP4ZM0WRx5x00cuKa8nKoWW
-	 cehhCWZD2qR5mAB9p7IPwFaxZ57fAMxlQdZbMmPU65C+9U9vwNu7pX2j58pUoNappk
-	 5IffxJ5eBVEc3ui9eV7Yy1bZQWajrtJTvZcrLaS672kA1Q4lMxXddS7BFJ03sF7Yi9
-	 seAOrSV0ZVz4riIGZjG133mrmxPWWox+J6l3T+6Ht0uBdtQXB6eYr80J2wQTqaT0Qj
-	 5hzRAllPMLyk2rjcCIeb3KtkrzyJjisjwW7tesfif8Bj4v/B/NKPoEZqQJ/6nUorL0
-	 JxVVdPWvO1hGQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 29 May 2025 17:52:38 +0200
-Subject: [PATCH net 2/2] net: airoha: Fix IPv6 hw acceleration in bridge
- mode
+	s=arc-20240116; t=1748533988; c=relaxed/simple;
+	bh=5NBNUD8Yuoq8lxj/n4qt71xK6wDjxPIEP+J+WXOYk50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YqfZeT4c9f3H7abJhdI86ZsG8UwOhZreM6NeVX0vkx6m+0MDc/FJioB2ualll66V4QxHhptpeGI5+AgsPC0FFyTmieFb4SREQgVRGGDTJ/id0pe49up735U7DKUQZcDuFxGJgZ5dtnFlv51ZoyO+Jc4vIHQjhF9wOYIRa2M+gX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m3bOh6Yr; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 67FAE114015D;
+	Thu, 29 May 2025 11:53:05 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Thu, 29 May 2025 11:53:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1748533985; x=1748620385; bh=YlNk9d5xPdKQnWaorT1Jwz0iCHGgQam8U8C
+	fiBJHEGc=; b=m3bOh6Yrg0G1zfH1VtRxnbzIoY7DTRuhhsUAejoivniNif1/njI
+	A9CpTqDFj0xnUpRIYfzyEXGP2uHTQxoBxXKWLvysMSo0HIcJbrKMDE0XCV6ReTRb
+	GTRCRTq4zAxHm7dWughjwhiRrgaoc5rP/qRdyvqmxYq6SeXdCcleCNcswuJyfes4
+	8mCVvQhZCIRUYmF1OMZ70hNzQU/ni1OtkFIc+V/KG93bn48LKxVpqUxd23MbGRf/
+	8NYrMgWgihFUmE1MPyFajSk9PRB1PtGH6q5Pu7u31Uoec750L7krCBHYjzp+6z10
+	nl89f6GJ4GNatWC5bmiBfz9EVaWmtAyVhlg==
+X-ME-Sender: <xms:4II4aHMwipX4STIEkxcciksn3dl1zJui4AdmcXWThoe4zJmRCUnWCQ>
+    <xme:4II4aB8PWH8y70KnIUkt5lI0KfbAvGuZaXFu63x-5o1E1HtiXs0Pmf_cLMgL9NBm9
+    r8CKU12Nvbqiwg>
+X-ME-Received: <xmr:4II4aGSiCCBzT13-5A2sqxUwPht90Xx2q7V_LolS3mDfMaj_v7JcgpGEK03h>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvieehfeculddtuddrgeefvddrtd
+    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
+    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
+    dtnecunecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhep
+    kfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeel
+    geejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepgedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehmkhhusggvtggvkhesshhushgvrdgtiidprhgtphhtthhopegurghnihgv
+    lhhlvghrsehnvhhiughirgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrd
+    hkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:4II4aLtophac_r8P6IHPeGvCCkCquhwkKIDvYkW8h7YcQdRJMVJu_w>
+    <xmx:4II4aPddmhlPw-SEvGs6P3SJZ-pzXB3tQL1kxODwm0YJAIvTE_CvuA>
+    <xmx:4II4aH2IwOk52wXGL3YHli3K1UbrSnIogM4knx_AY4LaKmmU-Hw14w>
+    <xmx:4II4aL_8cy0BxMGVJ2H8DKXjw48LgIbeLZBtKc2m8-GEM55A7PtiJQ>
+    <xmx:4YI4aF6Ic_sZcxacxYrLC5DXNrwchH8HMit4g6z7ZsruezLhvwWFo5br>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 May 2025 11:53:04 -0400 (EDT)
+Date: Thu, 29 May 2025 18:53:01 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: mkubecek@suse.cz, danieller@nvidia.com, netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool 1/2] module_common: always print per-lane status
+ in JSON
+Message-ID: <aDiC3ZTHzSwZGCXl@shredder>
+References: <20250529142033.2308815-1-kuba@kernel.org>
+ <20250529142033.2308815-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250529-airoha-flowtable-ipv6-fix-v1-2-7c7e53ae0854@kernel.org>
-References: <20250529-airoha-flowtable-ipv6-fix-v1-0-7c7e53ae0854@kernel.org>
-In-Reply-To: <20250529-airoha-flowtable-ipv6-fix-v1-0-7c7e53ae0854@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Michal Kubiak <michal.kubiak@intel.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250529142033.2308815-2-kuba@kernel.org>
 
-ib2 and airoha_foe_mac_info_common have not the same offsets in
-airoha_foe_bridge and airoha_foe_ipv6 structures. Fix IPv6 hw
-acceleration in bridge mode resolving ib2 and airoha_foe_mac_info_common
-overwrite in airoha_ppe_foe_commit_subflow_entry routine. Moreover, set
-AIROHA_FOE_MAC_SMAC_ID to 0xf in airoha_ppe_foe_commit_subflow_entry()
-to configure the PPE module to keep original source mac address of the
-bridged packets.
+On Thu, May 29, 2025 at 07:20:32AM -0700, Jakub Kicinski wrote:
+> The JSON output type changes when loss of signal / fault is
+> detected. When there is no problem we print single bool, eg:
+> 
+>   "rx_loss_of_signal": false,
+> 
+> but when there's a problem we print an array:
+> 
+>   "rx_loss_of_signal": ["No", "Yes", "No", "No"],
+> 
+> This appears to be a mirror of the human-readable output,
+> but it's a pain to parse / unmarshall for user space.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Fixes: cd53f622611f ("net: airoha: Add L2 hw acceleration support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_ppe.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index a783f16980e6b7fdb69cec7ff09883a9c83d42d5..d5dbcb556f2b10b23ebbdd32a66a3c4f32cfb460 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -639,7 +639,6 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
- 	u32 mask = AIROHA_FOE_IB1_BIND_PACKET_TYPE | AIROHA_FOE_IB1_BIND_UDP;
- 	struct airoha_foe_entry *hwe_p, hwe;
- 	struct airoha_flow_table_entry *f;
--	struct airoha_foe_mac_info *l2;
- 	int type;
- 
- 	hwe_p = airoha_ppe_foe_get_entry(ppe, hash);
-@@ -656,18 +655,23 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
- 
- 	memcpy(&hwe, hwe_p, sizeof(*hwe_p));
- 	hwe.ib1 = (hwe.ib1 & mask) | (e->data.ib1 & ~mask);
--	l2 = &hwe.bridge.l2;
--	memcpy(l2, &e->data.bridge.l2, sizeof(*l2));
- 
- 	type = FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe.ib1);
--	if (type == PPE_PKT_TYPE_IPV4_HNAPT)
--		memcpy(&hwe.ipv4.new_tuple, &hwe.ipv4.orig_tuple,
--		       sizeof(hwe.ipv4.new_tuple));
--	else if (type >= PPE_PKT_TYPE_IPV6_ROUTE_3T &&
--		 l2->common.etype == ETH_P_IP)
--		l2->common.etype = ETH_P_IPV6;
--
--	hwe.bridge.ib2 = e->data.bridge.ib2;
-+	if (type >= PPE_PKT_TYPE_IPV6_ROUTE_3T) {
-+		memcpy(&hwe.ipv6.l2, &e->data.bridge.l2, sizeof(hwe.ipv6.l2));
-+		hwe.ipv6.ib2 = e->data.bridge.ib2;
-+		/* keep origianl source mac address */
-+		hwe.ipv6.l2.src_mac_hi = FIELD_PREP(AIROHA_FOE_MAC_SMAC_ID,
-+						    0xf);
-+	} else {
-+		memcpy(&hwe.bridge.l2, &e->data.bridge.l2,
-+		       sizeof(hwe.bridge.l2));
-+		hwe.bridge.ib2 = e->data.bridge.ib2;
-+		if (type == PPE_PKT_TYPE_IPV4_HNAPT)
-+			memcpy(&hwe.ipv4.new_tuple, &hwe.ipv4.orig_tuple,
-+			       sizeof(hwe.ipv4.new_tuple));
-+	}
-+
- 	hwe.bridge.data = e->data.bridge.data;
- 	airoha_ppe_foe_commit_entry(ppe, &hwe, hash);
- 
-
--- 
-2.49.0
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
