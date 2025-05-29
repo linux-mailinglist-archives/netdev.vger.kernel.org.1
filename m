@@ -1,197 +1,304 @@
-Return-Path: <netdev+bounces-194203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37BFAC7C68
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:10:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E9D1AC7C6A
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:12:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74245169814
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 11:10:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C498F3AA088
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 11:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADD9288C8D;
-	Thu, 29 May 2025 11:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A526228DF4C;
+	Thu, 29 May 2025 11:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+58N/XL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BbMK8Uot"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2052.outbound.protection.outlook.com [40.107.236.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0331925AB
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 11:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748517052; cv=none; b=lIycFr7YZrd0AXkUf0lffRHBTQTUGuLg3NGhF2HvlfMSllaCGPVKtK+uHBZr8Nr1d0k12nm5RKJGsqdXtEHEqRX+JTaQGTFTFVYbDFIKAd4nCHV5SOvPBfhSKpkJNY51Umg82wuHqsR2zlX+6ky4rVBJQqO2xYWSqTCT/CP72to=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748517052; c=relaxed/simple;
-	bh=OVYnlfBgOtZMqaNA1uwXppafaXaUpBsogZkXrxBzals=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dXLrqJ9WNTHWlCx0Opg/FljItpq+ZiCQKBqhkOoIeCnJ+JkLC5q/L4ImDP+wiFIIzndAsYk47jSYkKZ51oOzjMWt7dazTUzRv/HWo23DwimgWkQzop/4N7sLvfB5Xa4bRtRf8XBYb+FPKFBuWy0j4lS+jI/uYDjRKnSY0Px6B7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+58N/XL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748517049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CCtHDPUqSgUkQ4Z2iph91ACxz9kuBADISGFVISCaMUo=;
-	b=C+58N/XLyXa9rbhZoxjjgC5Tpi0mfG6BOCXwC+7VTexrkUOYHuZ7yUN/HxYU7Nn5LuLnuS
-	pyiesg6HbMr39M8nnwB+TLOexUmd4N9p2MHNjtg+sjHpoH6nVnDlQRBS9P4bjThGPbYTAy
-	FqMmA4DyEuVVJtGtSSH7/N47AlJ10II=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-EF-F0Ex2PyuYhf2mGBRy5w-1; Thu, 29 May 2025 07:10:46 -0400
-X-MC-Unique: EF-F0Ex2PyuYhf2mGBRy5w-1
-X-Mimecast-MFC-AGG-ID: EF-F0Ex2PyuYhf2mGBRy5w_1748517045
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-445135eb689so3913235e9.2
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 04:10:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748517045; x=1749121845;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CCtHDPUqSgUkQ4Z2iph91ACxz9kuBADISGFVISCaMUo=;
-        b=HjjztzwnkvZY8W0eqOsdTDEGGWYeHJP3Pq5BEvq6Lsyv2U1CT0QOj2MsExkDWoROU3
-         br1OdXoDceSVu/JYCopaooUAz/tSDUEArNFNKICJPTkr9ppo8WOuMpkyseBtyNaPNwcu
-         8CZGSzYyqSWC7U2nm5HTnJ5RHDgaJgjb41BziyITq3G3kQ+/uvTcZdXmX/BJQxNWppMB
-         lXo81OHq8tBS4HvO73N0nPpRzKfsZH7daJ0jyS56pOzZAmmZzAAB5SrGnxs9xyha60hP
-         VOOb9IpqWWz4ZO4uJKfDq8pokSjxFOu0s+ZUQsjaA2C9HsDFVlNqbuKwdfxJe9LpnPPM
-         TeQA==
-X-Gm-Message-State: AOJu0YxFl9lUwpWbtl0tg2eqjlMRyF1ZAMupzTgfblo2XdQJB5hXGF4Q
-	v+tp1oKjoM0Ei+WqYTiyTQSPihu1nejlAnV410VlhbFE4L8UJ82LPJhya69huLojyYSjz1J1eHt
-	XQWMkriWnrfFUUEqFrHSmhTSejT52draZSaP6PU6AitHUyWYzHXuxO6rwjw==
-X-Gm-Gg: ASbGncuL2v1YEPMLX2NbRC5lDgrBTGepx5ibUYx4VN3oONC54nLB0pvhKvha26KhA4u
-	1w4UZDDqzy1P1VG59F9AkPRrN8ImX1/T5mixRBoCdjQ4OJIJq0uu1wTJLil9/j7m/L7/kBII5Vd
-	xW50VZnmJuCK+Atqj+V9ZaVjnLLnrr0rMhoElte1zQznrwz9ikdgaxMqhkmzHc99deZiv6W50rq
-	gxhFjxsUIIlQ7qYHDDE84FDKGnfib+w6lgtiegClp0b4GNHg4wbVVg/h7zX0Xgz4BTaGBxmvi+4
-	9f+1HlAHf26Bz+tXbSI0goto6E80Cn5m8dfytwCgc3qKKJ1vt9MHS2jv23o=
-X-Received: by 2002:a05:600c:34cb:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-450725539f8mr71964575e9.10.1748517045289;
-        Thu, 29 May 2025 04:10:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG8/ZcoA56EBOAiim/L1SeUuQnQyCSQxeHwbb/Xdp0vRhXDOE24Vs6T7bjywvBYFCStPytLQA==
-X-Received: by 2002:a05:600c:34cb:b0:43c:ec4c:25b4 with SMTP id 5b1f17b1804b1-450725539f8mr71964225e9.10.1748517044817;
-        Thu, 29 May 2025 04:10:44 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cce5:2e10:5e9b:1ef6:e9f3:6bc4? ([2a0d:3341:cce5:2e10:5e9b:1ef6:e9f3:6bc4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450cfbf498bsm17423515e9.1.2025.05.29.04.10.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 May 2025 04:10:44 -0700 (PDT)
-Message-ID: <546a1ee3-7003-4acf-879f-d67f65b534c2@redhat.com>
-Date: Thu, 29 May 2025 13:10:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A83014E2F2;
+	Thu, 29 May 2025 11:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748517114; cv=fail; b=e65fcXb4XyGtfhQbjCCDcv3lUnJv65oibLGLuHPj42nDEhABiplm+A0qAtL+eg2ORONJLj2zq8KtBoDUpO+xnUSZIt5NyHjsRQiV3B6DE2KZZZK4V90KxADuXFa6Z5ED1Xb22i7uBe+AUM3t/T+fUykR57c2+9S4onNlvVGgrKs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748517114; c=relaxed/simple;
+	bh=HtnSi5NOQkKLthtL4oDSXHuVN/QLyk9v8VIIRSyzw8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TLKwGezntzJmEEBVi2qGt/G7tggjAu0KTTcEyHB7TrXlVCBHYQxbbY8JDZcVcFYUc2uIKggjurrMUceoi9rEySaRcohanIWj/0uGPJ9GFx11Bn47bKTCcyJ7PnVpYP8ASstaKXNQQWDXfKYnZMkG6fLOeUTDTfZPXB+5gzO92tQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BbMK8Uot; arc=fail smtp.client-ip=40.107.236.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CbsZCfUImagc2eOCYtLFM5JezdD11FnFRtf9BlZieRGCmu5SejOkqL8resmDMgeUxf5Trs16olYIOK7NI2DrL1/umbYZITIG0dTi7ibHqaooB+1tWkuQB9frfFnfwBHz7ueU9MEyEMEKgYd1eWKZSLr/bpjB8xO+n5prRbooghNKjvd2+HkVpwUhoMxoGrqde5nkk0N6iLXD2SgE1EWt4+ofxJ6+NmBtjE46WkPeGs5K66yHKAv69bBJTtFlkm73mdQEHiw+PdNe5vLjdu8Bl5o38lXNNd60KxbvnlX1Y6w9MF5Q3OnuE7Ly1eQapGB5Olqm2Y2HVcSIDWnZPfNJEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9KMT7OOhCo/E67mkAVo1CdLy0xx6KI9GU9rNGsWn12I=;
+ b=oBfl55UfZi1wsHUplkKs2uG4jxwHn69YBsTMJiNJAMvm99EnE0WGZxb2XVh+SyGeqzRKwkjcgKh103tvIkZ+q6yuEd01cmzpcWSOgxdpPDekg9aY81Lnyhl1JJC1AAoptcHHTdJTK0tu7Ydauv4MsjUfvutjgX73ex0+2o9n6k4noAzrVZ+vrxAchoVyQ2QjHG5159pLy+fSV5WwLJXudHk3AdMbgaZvBlUB801/VywxVEqJDhbQo2ZACnaufNFepShItnqItPyW4j/sYcTW55WzZmFnNQXWUmmlK3PwMrCxdEfsUPamFCvPVxbudG8X+WNIe+iOKFDiOanYTyrPhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9KMT7OOhCo/E67mkAVo1CdLy0xx6KI9GU9rNGsWn12I=;
+ b=BbMK8UotjtTLnT6G77MKISaEHv1eP7Tq/e1YQZQcKqDLGwWMUqbKTsLt4k58FtOSRpI+077Hg49XN8c/fKqvXAbpDi1Kmy6lY97Vm9c7nj9nTuxaurYsPyh7bVYARiqLiKN8YUyKdhW8ZG+Pm4FmGzSgtKnhqNi99Av625Ji7oFPLTP8N6Q/Zgx6uNOFouIaQnS7Z2uPZQUI4flruC3WIFwNNS075Zba2QoKKDGZOlX/HefMRXAk9r5AxaeEwnLV3nxMIQcqUcimu/PKpsMyLBa+8LMN3w1oLCVe7TREr1FlLOuObqAzYuYY9/UNeJwjxPIEyQXzgZnhuq78h+eJ2Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+ by MN0PR12MB5932.namprd12.prod.outlook.com (2603:10b6:208:37f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.29; Thu, 29 May
+ 2025 11:11:49 +0000
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c%5]) with mapi id 15.20.8769.022; Thu, 29 May 2025
+ 11:11:48 +0000
+Date: Thu, 29 May 2025 11:11:44 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>, 
+	Mina Almasry <almasrymina@google.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next V2 00/11] net/mlx5e: Add support for devmem and
+ io_uring TCP zero-copy
+Message-ID: <phuigc2himixvyaxydukgupqy2oxpobj6qo4m4hb6vsr5qenfd@7q4ct2c5gjdq>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+ <aDXi3VpAOPHQ576e@mini-arch>
+ <izjshibliwhxfqiidy24xmxsq6q6te4ydmcffucwrhikaokqgg@l5tn6arxiwgo>
+ <aDcvfvLMN2y5xkbo@mini-arch>
+ <CAHS8izMhCm1+UzmWK2Ju+hbA5U-7OYUcHpdd8yEuQEux3QZ74A@mail.gmail.com>
+ <aDeWcntZgm7Je8TZ@mini-arch>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aDeWcntZgm7Je8TZ@mini-arch>
+X-ClientProxiedBy: TLZP290CA0009.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:9::18) To IA1PR12MB9031.namprd12.prod.outlook.com
+ (2603:10b6:208:3f9::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/8] vhost-net: allow configuring extended
- features
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>
-References: <cover.1747822866.git.pabeni@redhat.com>
- <b1d716304a883a4e93178957defee2c560f5b3d4.1747822866.git.pabeni@redhat.com>
- <CACGkMEuzWGQB=kQeX-bA8jVn=5Sj_MP_Q2zbMS=tvKGYrNmWLw@mail.gmail.com>
- <df320160-88d4-44fc-92f8-dd7a9efb8569@redhat.com>
- <CACGkMEsrPVYzva_EOHMnoqYWajqiRsMoXsfUrPfuimvG=8EKsQ@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CACGkMEsrPVYzva_EOHMnoqYWajqiRsMoXsfUrPfuimvG=8EKsQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|MN0PR12MB5932:EE_
+X-MS-Office365-Filtering-Correlation-Id: b143d0f3-a332-42be-3d25-08dd9ea19b13
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?L1hoa2xYOVFLS2srOHh3NGlCcWRIUHowK3VJVTRNQzVHcmx6dVJwWnU3am1V?=
+ =?utf-8?B?WDQ4d1h5OFg4cTdGcHE4d2g1SWlhTDVIOU5rem9IaU11OVdqb3pIdlVWTjky?=
+ =?utf-8?B?d1YydU5tTVhLVUVMWk9zNXRjQklkb21vdHYrOXlwMURMNUVwMjBOTmF3QmhP?=
+ =?utf-8?B?bVlCRVlQbTRkcWxVUFl0ZEY2OXoyVTZuMytBdGFNUkhJSW5HZXVKdVhKejBi?=
+ =?utf-8?B?bCtQTk9NTHhhcm9zV2hnR3NjcUlTWDQxU2tmbnpiNEFLWmF6YnN1L3d0VEJu?=
+ =?utf-8?B?ZnA3MitQNnJ6dWNWQ0NKanZrOEpaQzI2MzBBUGVzWDNkTGM0TXc1bE1VT0ta?=
+ =?utf-8?B?Z0NmZEpKVHdKdk44VklLSktsRkwrRnFGK3daN09veWFMNkJDTVdSMlJTRlVa?=
+ =?utf-8?B?ZDl0U1FQSXhFRXZ5Qjg2MnFsUmpzZGFzR1FsVDJqd3NTbWpvOW5FWXNTVzNr?=
+ =?utf-8?B?Y0ZHbkt5Y0lKUDhpYWZ2bXVmN1JmM0MxR1VqU3dFa05nU3VSNnBBd0grMW12?=
+ =?utf-8?B?ZDdqbVFlUjd6QW01UlE3K3pHRjJRU1NFTmJ5REE2aXFnY1FJaHpLaDA2a0FZ?=
+ =?utf-8?B?UlowMFpmb1dzVEJwU2d5dWRGZUdIV1VxSlQxUUhCVWllTXVpN0tYaVJpOXVv?=
+ =?utf-8?B?akFYTzU5U21YMFRjWmtvNUEwTDY0b3I3MWJOc2Z0U3NVQ2F0VWVXYkJvL2RC?=
+ =?utf-8?B?OXhOWVAyRENvNk43NVl4M1RkMjZnUkpzZGxLVlNXeklOVXpEVnk3K2pGSDh1?=
+ =?utf-8?B?eW9mOXVnbWF2RHZCaGxtTmNERnYyUW9TTnljZjg3OXlGaUhLcWwzUUJhc3Bh?=
+ =?utf-8?B?V0RjVEx5MUwzbDBDVm9DVTRoaW1hMFd2elZzZ3c5NGM1U1RHTE5tOUtkWG05?=
+ =?utf-8?B?a0xnOVFNMklXM0VmVnRvMFpBMU0wdjhiVzlYczAvRnhreTJWb0JPS1pNcHZi?=
+ =?utf-8?B?M2FpbXpxYWE4Mm1raUlHb2xTNUZaR0tQbDJuNzd1UXVCRVAzOCtVZFYwdjFP?=
+ =?utf-8?B?aEJPQ1pEMWVKa1ZLTm03bEh5RHV5cFVVeHRlclhHYkxMYTk3SU1OUkFha1dU?=
+ =?utf-8?B?QmJ0VTcwYmJUUVUrenE4L2p3d2J4bTZ5L3NjMFJ2dkZNV1V4NVJ5NDBqZWtK?=
+ =?utf-8?B?Mm45b3diZXYxM1l5aXQyalEvL05qUGdtSXRzenNVczFyZWNrTDRzY3ZyTmQz?=
+ =?utf-8?B?bmpiN0hIOC9OZEhrSHI3UDQxTC9pUitUZEtEdm5rSUJmemIrUEFHb1RTaGk2?=
+ =?utf-8?B?YStlVTVBRjgvbmNoZlBVaVFaQTdERExsbVlGeWVycHRUbzQrd3duU3c0Y3hu?=
+ =?utf-8?B?cGVNeHg2Z1ppd1lwMWNCVk9PVHlKV2JzZHN5N1owalh5dkRIQ3JXZHRYS1Rw?=
+ =?utf-8?B?UitqaVI3QTBPVGIrbGlkdE9oWlBLL0g5VkxOTDU3S1BPeURuK0FIMmlFRHNm?=
+ =?utf-8?B?d0Y1VGdySkNVVUlDRXBCNHlzRkIvYzlvNm5ZaTBuNFdVQzVkeUVmRnZVUkpq?=
+ =?utf-8?B?dk4reGtNd0VpVkhwYjN2djhGSUIxbCtRODY0UCtVNkRjb0VvYzRZaVVuMGtO?=
+ =?utf-8?B?bHpsZ0tZemh2UWxadVBtN08yRGdObmlaRDBZUFRyV2pFRk4zRkhCbG5NVjIw?=
+ =?utf-8?B?eWhEaGhnQnpPTW5HTzExdnROYXh6cERqNXNhRzhvcWdBR2JPTmQ0RXFPd0lB?=
+ =?utf-8?B?OEsvTXhFbytnUzZPcDVkdlQ1dGdndDVwa01nbVh5ZEVic2RkakUxR0QzZzlS?=
+ =?utf-8?B?YVYxc1ZzQnVjbWhzRFBNOWxnTlhwWGttNnJBK3RmcW1Gd01jR2hoMWQrSGh2?=
+ =?utf-8?B?cHVXdFh6dU44S3JvakJUNGdYYTFKT2hjUVU3QXVxUlRnd05zV0RUREdyazZS?=
+ =?utf-8?B?cktkOWJFajc5UUpHVWc4Rnh6OW5yQmFxSVBpVWRHWmlMbnN0N0lkdkpPaUN0?=
+ =?utf-8?Q?i71c+jT6s/U=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?a3Q1QS93T3dMNDJSaXA0Nk44MDFzWXU4VFl5cnhlaWZKWHRPY0hwUXhNT2ZV?=
+ =?utf-8?B?UWNIVUY2c1haalNzTUl1cHZYMVNUZnRvbFRYNWZZeWpxUFF4YVJmNjhaZXRy?=
+ =?utf-8?B?b2ZRNXV1ZFBVK3JOMWZLTmxRU3FCSzcrK0FZa3RjTXhTZTA0ZHkyTXVCeHpZ?=
+ =?utf-8?B?KzUrak1aK3JFaTNBTkFJRzFMUk91SU1raFpSc0tRZFc5d0o3SDZZZkY3bXpk?=
+ =?utf-8?B?TndEcXUxWmFiV2syYVF3WDJzcWlUNS9zWHQ0cTgxVUFUNUg2SnFuai9GNHRj?=
+ =?utf-8?B?d0Y3U2pJTExDODRWNjVCc0VlMnhZRm5wUTY1UVloY3VlNjhqc1J6a3JINCt4?=
+ =?utf-8?B?Sm9sZEZPYjJLZTl3NzNZalBNQ05tMXYrb1ZDWHFOT2NWN1Y1dGVGZU13QlFC?=
+ =?utf-8?B?clZrNjJ5ZjZxamt4Ulo0TkR0Nnd0M1ZUU2hwMnpYeDFRSkZLeCs0YXZWZnNZ?=
+ =?utf-8?B?N2dOQW1WTDJhdldtaGtaZnRqSklUZWd1UTY5WnpQQkc5TnY4ZmJ3OEU2ckJ1?=
+ =?utf-8?B?U3JoczhOTDNGM0N0eXYzK1hyUm4rSUhSNjJXQ1BHZkxqT2xtNmFkV0dBQlJX?=
+ =?utf-8?B?NTV2SkFaVjUybFlETFpKbmJWK01OeUcyeFF3QjFsYXN6NnkrM0xqQXJJVVJQ?=
+ =?utf-8?B?em1EWVhOOHFUMmhjNGhtOER3ZWJFYXZvNDc3WEUxQ1FEb3FKY2ZwZUVyRnhr?=
+ =?utf-8?B?R0F4SkhwdEFlS2ZlWHdnczFScFJGQzdpOUpVSGtac0hUbzZCUngvUUJVM0lI?=
+ =?utf-8?B?ekJIZ1RZdGM1TDh4TFBYYmlETTZ1Y3pieWJwVklDRHloUTc4dUk3UFlId1BS?=
+ =?utf-8?B?REk4MUdLNG1NSVZYcHNnanBRejQyeTRPZzJFbEFxMS8xeHlIc0Yza0ZXS2Jm?=
+ =?utf-8?B?TnVuT1dUSTBYOG1jaWI2UXlDbXZQNjM5TjBvdWlxWDdLYTZRb1h6YitacUJy?=
+ =?utf-8?B?WCsrVnVLQ2VMM0RXOHFCdjZTQWhrREovemtkS3RBRHc0Ymg3S0V3bXQzUmtG?=
+ =?utf-8?B?eWRWZHBGMnQrWlFDa1FCc1I0cU02d1F4QU5Bc0dGSGE3bTVzNmpKUWxwVGlM?=
+ =?utf-8?B?a1pIdk1jWlhzMHM5Y21QanRqMXRQNGNLaEo5ODhXUjZ3ZlByc0FYY3pmRVdh?=
+ =?utf-8?B?TC9OMy9xbDR5cXBUT1dkY0F1Y1pnYjRMN2Rkaml1aTliMGNxd1J3YkV2MEVT?=
+ =?utf-8?B?cTNlcUpGNFpOVUFsc1VzZVZ4OEZpODU1Z0RhTEVMaHBxVm5vVWVReVE1UW1O?=
+ =?utf-8?B?NW5xa2xSeWtyeGU5YXp1STVvSHkxeEFSdVpBMmJ0UXNRc3ZoSHBSTkZvOWNZ?=
+ =?utf-8?B?MW5Va3B2dnB1Ty9OVlJCQzRoRHA4NzUrV3lveUZPclFZSVg1WERqdWszTGt2?=
+ =?utf-8?B?NHBxWHZ2R09kWkJoamQrN0U4VWtyOHBIMTk5UXNFQVNiVUkrSlBrbkp3aWxT?=
+ =?utf-8?B?K1VlZzhCd0xlUWp0cXV6dGdVa0xXYTV4YWxtazF0TGh6RjNieitWVkFhQk42?=
+ =?utf-8?B?a1ZhNlN2eVVrbDhTVWtPcnZnRWx5anhHZ1cxb3lkUVl0RWY1L3ZtMmt2b216?=
+ =?utf-8?B?bjJhQ3VDMzAxdlViYjFON043YmlqSU82Skx0cHdHQ0swY3MzVTNGMk94ZUlO?=
+ =?utf-8?B?eUdsdHR1MlVoK1JkdmN3VkpmdzRXTHZKTGJ1SXplRGl6K3FKand5KzZZdlNo?=
+ =?utf-8?B?MTBqdEdPdjZjTnpJaXJjRGg4aXV2TkpjT1RQWmlxZ1dKUW5nUzl1VjV2ZitE?=
+ =?utf-8?B?d2pMaTIxTkdRR21BQkxvVUF1bWNVK090U3FHZDB5dVFIUGVwczN1YVVwTnYx?=
+ =?utf-8?B?a3YxRjBxdUlFM25CbDFNbnZ1bmJwZVcrTTRLR1YxNUx3ekdUNno5dlJyN0ts?=
+ =?utf-8?B?Y0Z0KzZRZVN0R3hHWTVpTkJxNEdTNTJFT29ZNjdCZ1RMNVNwOGQ0d2NrV2Jm?=
+ =?utf-8?B?YnRhWU9ONTR0TWRVaFBYdnNUWEdtRkRHODVZa2NGbG1sa3B2cFpidERmaVVu?=
+ =?utf-8?B?c2MyRlMzTXpBb0RNcHZMdDhOaFNWcExTTFd6dXpoam5sSnU1bGNwclp5M3Q1?=
+ =?utf-8?B?NGY3OVFvWVpGaWdRekYyb0k1L0t3c0Y0aVRjejJ3YVRCQzRLd24rRDVlVFh1?=
+ =?utf-8?Q?ntM0ljUcMh0+S0RFjXs96Q3bg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b143d0f3-a332-42be-3d25-08dd9ea19b13
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 11:11:48.7866
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HteyY1PhPexkb/7y7IIXE78SbPR1KW3sy+ksB9CRmLpMGBS486UXHCQtIr10atlAu2OkuuN7iKBck3fm4PkX+g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5932
 
-On 5/27/25 5:56 AM, Jason Wang wrote:
-> On Mon, May 26, 2025 at 6:57 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 5/26/25 2:47 AM, Jason Wang wrote:
->>> On Wed, May 21, 2025 at 6:33 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>>>
->>>> Use the extended feature type for 'acked_features' and implement
->>>> two new ioctls operation to get and set the extended features.
->>>>
->>>> Note that the legacy ioctls implicitly truncate the negotiated
->>>> features to the lower 64 bits range.
->>>>
->>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->>>> ---
->>>>  drivers/vhost/net.c        | 26 +++++++++++++++++++++++++-
->>>>  drivers/vhost/vhost.h      |  2 +-
->>>>  include/uapi/linux/vhost.h |  8 ++++++++
->>>>  3 files changed, 34 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>> index 7cbfc7d718b3f..b894685dded3e 100644
->>>> --- a/drivers/vhost/net.c
->>>> +++ b/drivers/vhost/net.c
->>>> @@ -77,6 +77,10 @@ enum {
->>>>                          (1ULL << VIRTIO_F_RING_RESET)
->>>>  };
->>>>
->>>> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
->>>> +#define VHOST_NET_FEATURES_EX VHOST_NET_FEATURES
->>>> +#endif
->>>> +
->>>>  enum {
->>>>         VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
->>>>  };
->>>> @@ -1614,7 +1618,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
->>>>         return err;
->>>>  }
->>>>
->>>> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
->>>> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
->>>>  {
->>>>         size_t vhost_hlen, sock_hlen, hdr_len;
->>>>         int i;
->>>> @@ -1704,6 +1708,26 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>>>                 if (features & ~VHOST_NET_FEATURES)
->>>>                         return -EOPNOTSUPP;
->>>>                 return vhost_net_set_features(n, features);
->>>> +#ifdef VIRTIO_HAS_EXTENDED_FEATURES
->>>
->>> Vhost doesn't depend on virtio. But this invents a dependency, and I
->>> don't understand why we need to do that.
->>
->> What do you mean with "dependency" here? vhost has already a build
->> dependency vs virtio, including several virtio headers. It has also a
->> logical dependency, using several virtio features.
->>
->> Do you mean a build dependency? this change does not introduce such a thing.
+On Wed, May 28, 2025 at 04:04:18PM -0700, Stanislav Fomichev wrote:
+> On 05/28, Mina Almasry wrote:
+> > On Wed, May 28, 2025 at 8:45 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> > >
+> > > On 05/28, Dragos Tatulea wrote:
+> > > > On Tue, May 27, 2025 at 09:05:49AM -0700, Stanislav Fomichev wrote:
+> > > > > On 05/23, Tariq Toukan wrote:
+> > > > > > This series from the team adds support for zerocopy rx TCP with devmem
+> > > > > > and io_uring for ConnectX7 NICs and above. For performance reasons and
+> > > > > > simplicity HW-GRO will also be turned on when header-data split mode is
+> > > > > > on.
+> > > > > >
+> > > > > > Find more details below.
+> > > > > >
+> > > > > > Regards,
+> > > > > > Tariq
+> > > > > >
+> > > > > > Performance
+> > > > > > ===========
+> > > > > >
+> > > > > > Test setup:
+> > > > > >
+> > > > > > * CPU: Intel(R) Xeon(R) Platinum 8380 CPU @ 2.30GHz (single NUMA)
+> > > > > > * NIC: ConnectX7
+> > > > > > * Benchmarking tool: kperf [1]
+> > > > > > * Single TCP flow
+> > > > > > * Test duration: 60s
+> > > > > >
+> > > > > > With application thread and interrupts pinned to the *same* core:
+> > > > > >
+> > > > > > |------+-----------+----------|
+> > > > > > | MTU  | epoll     | io_uring |
+> > > > > > |------+-----------+----------|
+> > > > > > | 1500 | 61.6 Gbps | 114 Gbps |
+> > > > > > | 4096 | 69.3 Gbps | 151 Gbps |
+> > > > > > | 9000 | 67.8 Gbps | 187 Gbps |
+> > > > > > |------+-----------+----------|
+> > > > > >
+> > > > > > The CPU usage for io_uring is 95%.
+> > > > > >
+> > > > > > Reproduction steps for io_uring:
+> > > > > >
+> > > > > > server --no-daemon -a 2001:db8::1 --no-memcmp --iou --iou_sendzc \
+> > > > > >         --iou_zcrx --iou_dev_name eth2 --iou_zcrx_queue_id 2
+> > > > > >
+> > > > > > server --no-daemon -a 2001:db8::2 --no-memcmp --iou --iou_sendzc
+> > > > > >
+> > > > > > client --src 2001:db8::2 --dst 2001:db8::1 \
+> > > > > >         --msg-zerocopy -t 60 --cpu-min=2 --cpu-max=2
+> > > > > >
+> > > > > > Patch overview:
+> > > > > > ================
+> > > > > >
+> > > > > > First, a netmem API for skb_can_coalesce is added to the core to be able
+> > > > > > to do skb fragment coalescing on netmems.
+> > > > > >
+> > > > > > The next patches introduce some cleanups in the internal SHAMPO code and
+> > > > > > improvements to hw gro capability checks in FW.
+> > > > > >
+> > > > > > A separate page_pool is introduced for headers. Ethtool stats are added
+> > > > > > as well.
+> > > > > >
+> > > > > > Then the driver is converted to use the netmem API and to allow support
+> > > > > > for unreadable netmem page pool.
+> > > > > >
+> > > > > > The queue management ops are implemented.
+> > > > > >
+> > > > > > Finally, the tcp-data-split ring parameter is exposed.
+> > > > > >
+> > > > > > Changelog
+> > > > > > =========
+> > > > > >
+> > > > > > Changes from v1 [0]:
+> > > > > > - Added support for skb_can_coalesce_netmem().
+> > > > > > - Avoid netmem_to_page() casts in the driver.
+> > > > > > - Fixed code to abide 80 char limit with some exceptions to avoid
+> > > > > > code churn.
+> > > > >
+> > > > > Since there is gonna be 2-3 weeks of closed net-next, can you
+> > > > > also add a patch for the tx side? It should be trivial (skip dma unmap
+> > > > > for niovs in tx completions plus netdev->netmem_tx=1).
+> > > > >
+> > > > Seems indeed trivial. We will add it.
+> > > >
+> > > > > And, btw, what about the issue that Cosmin raised in [0]? Is it addressed
+> > > > > in this series?
+> > > > >
+> > > > > 0: https://lore.kernel.org/netdev/9322c3c4826ed1072ddc9a2103cc641060665864.camel@nvidia.com/
+> > > > We wanted to fix this afterwards as it needs to change a more subtle
+> > > > part in the code that replenishes pages. This needs more thinking and
+> > > > testing.
+> > >
+> > > Thanks! For my understanding: does the issue occur only during initial
+> > > queue refill? Or the same problem will happen any time there is a burst
+> > > of traffic that might exhaust all rx descriptors?
+> > >
+> > 
+> > Minor: a burst in traffic likely won't reproduce this case, I'm sure
+> > mlx5 can drive the hardware to line rate consistently. It's more if
+> > the machine is under extreme memory pressure, I think,
+> > page_pool_alloc_pages and friends may return ENOMEM, which reproduces
+> > the same edge case as the dma-buf being extremely small which also
+> > makes page_pool_alloc_netmems return -ENOMEM.
 > 
-> I mean vhost can be built without virtio drivers. So old vhost can run
-> new virtio drivers on top. So I don't see why vhost needs to check if
-> virtio of the same source tree supports 128 bit or not.
-> 
-> We can just accept an array of features now as
-> 
-> 1) the changes are limited to vhost so it wouldn't be too much
-> 2) we don't have to have VHOST_GET_FEATURES_EX2 in the future.
+> What I want to understand is whether the kernel/driver will oops when dmabuf
+> runs out of buffers after initial setup. Either traffic burst and/or userspace
+> being slow on refill - doesn't matter.
+There is no OOPS but the queue can't handle more traffic because it
+can't allocate more buffers and it can't release old buffers either.
 
-AFAICS the ioctl() interface code wise only impacts on the device
-implementing extended features support, I guess it could be changed to
-to something alike:
+AFAIU from Cosmin the condition happened on initial queue fill when
+there are no buffers to be released for the current WQE.
 
-struct vhost_virtio_features {
-	__u64 count;
-	__u64 features[];
-};
-
-#define VHOST_GET_FEATURES_VECTOR _IOR(VHOST_VIRTIO, 0x83, struct
-vhost_virtio_features)
-#define VHOST_SET_FEATURES_VECTOR _IOW(VHOST_VIRTIO, 0x83, struct
-vhost_virtio_features)
-
-I could drop the above #ifdef, and the implementation would copy in/out
-only the known/supported number of features.
-
-WDYT?
-
-/P
-
+Thanks,
+Dragos
 
