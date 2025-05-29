@@ -1,227 +1,134 @@
-Return-Path: <netdev+bounces-194245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C76FAC803D
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:26:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA7ACAC804E
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 17:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE2231C06E30
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:24:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7519A4A24FC
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4741022D4C1;
-	Thu, 29 May 2025 15:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC181D63E1;
+	Thu, 29 May 2025 15:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="x7WN4q5X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkXmtQZx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCD222CBFE
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87503193062
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 15:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748532193; cv=none; b=dG9sj3sjwakRY5a7MbVTF+kCDVlZfAPfun2pqSsZYwfqnrWeerSkFszCoqsvVDnGynCgKd0/vrjVCimeEBxfEGQn7Mms+vE7j3ZoxLqLm+Mg7yYhDwQGuspH4Q5uWnuJIL1C3vsNHhGE/fiafFgXcRBHo/1bTQle9oABm8ueXp8=
+	t=1748532655; cv=none; b=LIj9r4Iw8OY/SAgMs68/JSGBdLbMfMWbFjl3bHMOHXlLutGLJmfAxvGVf90ABnKXgusDtL9KcQz+E/gNX57+6/bJ36KZHjzjHcHHUSzfjkJSTh83Ds9oLn7oFjj4CFD54QM5JsMBAaEiw0v35V17cE/oUqJ0+BRmyU4lXmf4FsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748532193; c=relaxed/simple;
-	bh=KzIBy0LROxu6zIykfaalt5YYcA4mzJ/uWj3TWW3TXhY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gALhzkrSBzQYTuFPI54f1Gfr77vV90fXOh5ZBmFXPPiIKKTe/wLtut2sOI4mM6HU97eUWJbM5Dstjj9PUJuFN18srKbiE7LBSuWQInjzlEa31wL6QZrExQK9n43ZI82CNfa79YCl/W5nMbr2LvMFL4BDjdtVqiNA6JyPnNClgOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=x7WN4q5X; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1748532186; x=1748791386;
-	bh=psJOtspO9QE9T6NvgCRDOTwVi7IGLKw/6Ze5XA78KhE=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=x7WN4q5Xb26BB0kDfAJQHkw4U1y71ZQkulN7ikHwIsZ+kMAisabJowuYgsvHcDSQN
-	 R8WVWBmPkF+Ki+6endmAEqyUFH/pOudYyn9FGxQ4dwAgmPmYVEA7UnWLc5kjNc/iNW
-	 3iWBy7H/DFMFOZem7CB4VgOsz93qhL8UaNUctnXCc1EinRAStthdFM8coGOQws7kxa
-	 r4/9QIJzmfvXTvuNn3TPUi26FQYSSCyJYdILERhR9mPfCxqXdSM7jQW83Zuj6b6KPz
-	 I3MGiVbJU+l0U0dNBlsewUaaOe+8RRF425AKk+zK6jqj1XJpP+ufEpwS90YV5LWOkb
-	 fl7VhVW9Gu2rg==
-Date: Thu, 29 May 2025 15:23:04 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
-In-Reply-To: <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <CAM0EoMkd87-6ZJ5PWsV8K+Pn+dVNEOP9NcfGAjXVrzAH70F4YA@mail.gmail.com> <Ppi6ol0VaHrqJs9Rp0-SGp0J1Y0K8hki_jbNZ8sjNOmtEq0mD4f0IozBxxX-m4535QPJonGFYmiPmB643yd4SOpd1HDDYyMeGQuASuFHl-E=@willsroot.io> <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com> <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io> <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com> <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io> <q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=@willsroot.io> <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 126175be933af01f7b20546bdef0f7dc121bc372
+	s=arc-20240116; t=1748532655; c=relaxed/simple;
+	bh=yXmp9K+013p9LLuzzuH3yxFdzNG5YsJQez5mslbvnco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W2v6Jddbum4UJ67uUdj4cZ3mK22fwM47/W9lkD7mM4qgpW8iDv7+M22lYNsLNN7w2DkwGfTKnVwPTxyfy38vO3lmgGhLbUs6FLh9T/CEyedwGNrlEiMWCia2A6got0slelupapCJLHZF3yKsfxIkLIRT/iKbUO9YXaC12yoTzZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TkXmtQZx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748532651;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=90X/e10Xiz+GjbdOMX8hvB8ApZWLNBhEVzTpn7CBFHU=;
+	b=TkXmtQZxf9tMlOUmnGbSib5jsJl8PCDPUPu4nzdL7Geqv6i/2ZBshiW7aIDkObS78RllI3
+	hwvcs6dC3PrBgj4K6oS9mrqPujrAYoIf41AVP681l0XzmKmoNKkJdOXO3hIv0UXTwN0mRx
+	yrhPEQ8y6Ifq+z/gXihIVFCdI9/qD7A=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-LjzTwwHkP7G5VxfTa38pDQ-1; Thu, 29 May 2025 11:30:48 -0400
+X-MC-Unique: LjzTwwHkP7G5VxfTa38pDQ-1
+X-Mimecast-MFC-AGG-ID: LjzTwwHkP7G5VxfTa38pDQ_1748532647
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4eb6fcd88so632593f8f.1
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 08:30:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748532647; x=1749137447;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=90X/e10Xiz+GjbdOMX8hvB8ApZWLNBhEVzTpn7CBFHU=;
+        b=TKACAD++hgbkBIeCTdiDouLwTzDSLOMp4y6o0FQ4Sp+gRpc6a3qI+ucb/o+/kzODcW
+         p2zYFVORI2UkQlaaAYr1VYq5jtZfeZKO2Qk/7s8ldJQfml4KAK32OHhgIEhXmWHoZFTK
+         HPYp8l/oDJ5XCPQqKfgHjhx8b+Ayp0PNnRIVabvou4RXSTB57HVjXVsfFX/bGaH4QX0f
+         qcBIw1Q45EBRhx+wa3lEl+LRY6tn2rK4yrjiJVuc0/hhY77gw3WO0UPAF6V3qZZHDJC7
+         Ze9AcUrok9JhFVytpByuEEvqozBn55OfTKQIvT0Ri8PuSL5unSgcihEWK1cROzB1R/w1
+         ct9A==
+X-Gm-Message-State: AOJu0YyXF3InP633PmWgR/9OgEtfZfZNtECx9a2d5EGRu7Yx24fktThh
+	q8BI+jSUjsOvP+qYa0PbF5yweD1bscQrTrypZfmp3PTdmDjc+Nd1q5s1MlZtVP2aKoyK7oJmqxJ
+	5YRgbDQuQ4buFZCHLIPBf9Jci64IwekOi8jWwnp3aEA+N0rp/vF8dt083Uw==
+X-Gm-Gg: ASbGncv3JxliMQ7oiJifJw7iMyaR4dVl1rBjUeTIQy6uTjeAEdg030vaoic4uNcmyfm
+	u4p0g6UIOnOurzY1nxN5JvuiwXmiuVt+4O192/ROgs667x6fpAFjhZjpDxdWK5+AgvebFs0NOaS
+	Z1gNfjKR5au08s5dNjoWk99gffbuV+R2TUUmoqHz4OgiFwvMcN2mVfqY1vu6N768JcJQSkG2rho
+	WUVRoz4Kn1Tzp+aBVEkc7XAPCTXmnr79zH82MjHYQHWVvfXIIjnjvnYW00O3DWxK+kBLz6KIYbE
+	nYZzXfWuGYaNuEfTy+A=
+X-Received: by 2002:a05:6000:1a8e:b0:3a4:e706:530c with SMTP id ffacd0b85a97d-3a4e70654d3mr7159470f8f.48.1748532646755;
+        Thu, 29 May 2025 08:30:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHR1Kldf3lsgro3dy9ynfDXT3CbuGyXEkBFU7Pb1dYF+M1q5LT58zP4UnWxibx+2c7UVLCd+A==
+X-Received: by 2002:a05:6000:1a8e:b0:3a4:e706:530c with SMTP id ffacd0b85a97d-3a4e70654d3mr7159438f8f.48.1748532646320;
+        Thu, 29 May 2025 08:30:46 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:cce5:2e10::f39? ([2a0d:3341:cce5:2e10::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe6c43asm2275112f8f.21.2025.05.29.08.30.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 May 2025 08:30:45 -0700 (PDT)
+Message-ID: <1f852603-5585-4c3d-9689-b89daba8fee1@redhat.com>
+Date: Thu, 29 May 2025 17:30:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/8] net: implement virtio helpers to handle UDP
+ GSO tunneling.
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>
+References: <cover.1747822866.git.pabeni@redhat.com>
+ <6e001d160707e1cf87870acee5adc302f8cb39b6.1747822866.git.pabeni@redhat.com>
+ <CACGkMEtkbx8VZ2HAuDUbO9LStzoM6JQVcmA+6e+jM1o=r9wKow@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CACGkMEtkbx8VZ2HAuDUbO9LStzoM6JQVcmA+6e+jM1o=r9wKow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wednesday, May 28th, 2025 at 10:00 PM, Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
+On 5/26/25 6:40 AM, Jason Wang wrote:
+> On Wed, May 21, 2025 at 6:34 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>> @@ -242,4 +249,158 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
+>>         return 0;
+>>  }
+>>
+>> +static inline unsigned int virtio_l3min(bool is_ipv6)
+>> +{
+>> +       return is_ipv6 ? sizeof(struct ipv6hdr) : sizeof(struct iphdr);
+>> +}
+>> +
+>> +static inline int virtio_net_hdr_tnl_to_skb(struct sk_buff *skb,
+>> +                                           const struct virtio_net_hdr *hdr,
+>> +                                           unsigned int tnl_hdr_offset,
+>> +                                           bool tnl_csum_negotiated,
+>> +                                           bool little_endian)
+> 
+> Considering tunnel gso requires VERSION_1, I think there's no chance
+> for little_endian to be false here.
 
->=20
->=20
-> Hi,
-> Sorry for the latency..
->=20
-> On Sun, May 25, 2025 at 4:43=E2=80=AFPM William Liu will@willsroot.io wro=
-te:
->=20
-> > I did some more testing with the percpu approach, and we realized the f=
-ollowing problem caused now by netem_dequeue.
-> >=20
-> > Recall that we increment the percpu variable on netem_enqueue entry and=
- decrement it on exit. netem_dequeue calls enqueue on the child qdisc - if =
-this child qdisc is a netem qdisc with duplication enabled, it could duplic=
-ate a previously duplicated packet from the parent back to the parent, caus=
-ing the issue again. The percpu variable cannot protect against this case.
->=20
->=20
-> I didnt follow why "percpu variable cannot protect against this case"
-> - the enqueue and dequeue would be running on the same cpu, no?
-> Also under what circumstances is the enqueue back to the root going to
-> end up in calling dequeue? Did you test and hit this issue or its just
-> theory? Note: It doesnt matter what the source of the skb is as long
-> as it hits the netem enqueue.
+If tnl_hdr_offset == 0, tunnel gso has not been negotiated, and
+little_endian could be false. I can assume little_endian is true in the
+!!tnl_hdr_offset branch.
 
-Yes, I meant that just using the percpu variable in enqueue will not protec=
-t against the case for when dequeue calls enqueue on the child. Because of =
-the child netem with duplication enabled, packets already involved in dupli=
-cation will get sent back to the parent's tfifo queue, and then the current=
- dequeue will remain stuck in the loop before hitting an OOM - refer to the=
- paragraph starting with "In netem_dequeue, the parent netem qdisc's t_len"=
- in the first email for additional clarification. We need to know whether a=
- packet we dequeue has been involved in duplication - if it has, we increme=
-nt the percpu variable to inform the children netem qdiscs.
-
-Hopefully the following diagram can help elucidate the problem:
-
-Step 1: Initial enqueue of Packet A:
-
-    +----------------------+
-    |     Packet A         |
-    +----------------------+
-              |
-              v
-    +-------------------------+
-    |     netem_enqueue       |
-    +-------------------------+
-              |
-              v
-    +-----------------------------------+
-    | Duplication Logic (percpu OK):   |
-    |   =3D> Packet A, Packet B (dup)    |
-    +-----------------------------------+
-              | <- percpu variable for netem_enqueue
-              v    prevents duplication of B
-        +-------------+=20
-        | tfifo queue |
-        |   [A, B]    |
-        +-------------+
-
-Step 2: netem_dequeue processes Packet B (or A)
-
-        +-------------+
-        | tfifo queue |
-        |   [A]       |
-        +-------------+
-              |
-              v
-    +----------------------------------------+
-    | netem_dequeue pops B in tfifo_dequeue  |
-    +----------------------------------------+
-              |
-              v
-    +--------------------------------------------+
-    | netem_enqueue to child qdisc (netem w/ dup)|
-    +--------------------------------------------+
-              | <- percpu variable in netem_enqueue prologue
-              |    and epilogue does not stop this dup,
-              v    does not know about previous dup involvement
-    +--------------------------------------------------------+
-    | Child qdisc duplicates B to root (original netem) as C |
-    +--------------------------------------------------------+
-              |
-              v
-
-Step 3: Packet C enters original root netem again
-
-    +-------------------------+
-    | netem_enqueue (again)   |
-    +-------------------------+
-              |
-              v
-    +-------------------------------------+
-    | Duplication Logic (percpu OK again) |
-    |   =3D> Packet C, Packet D             |
-    +-------------------------------------+
-              |=20
-              v=20
-            .....
-
-If you increment a percpu variable in enqueue prologue and decrement in enq=
-ueue epilogue, you will notice that our original repro will still trigger a=
- loop because of the scenario I pointed out above - this has been tested.=
-=20
-
-From a current view of the codebase, netem is the only qdisc that calls enq=
-ueue on its child from its dequeue. The check we propose will only work if =
-this invariant remains.
-
-
-> > However, there is a hack to address this. We can add a field in netem_s=
-kb_cb called duplicated to track if a packet is involved in duplicated (bot=
-h the original and duplicated packet should have it marked). Right before w=
-e call the child enqueue in netem_dequeue, we check for the duplicated valu=
-e. If it is true, we increment the percpu variable before and decrement it =
-after the child enqueue call.
->=20
->=20
-> is netem_skb_cb safe really for hierarchies? grep for qdisc_skb_cb
-> net/sched/ to see what i mean
-
-We are not using it for cross qdisc hierarchy checking. We are only using i=
-t to inform a netem dequeue whether the packet has partaken in duplication =
-from its corresponding netem enqueue. That part seems to be private data fo=
-r the sk_buff residing in the current qdisc, so my understanding is that it=
-'s ok.
-
-> > This only works under the assumption that there aren't other qdiscs tha=
-t call enqueue on their child during dequeue, which seems to be the case fo=
-r now. And honestly, this is quite a fragile fix - there might be other edg=
-e cases that will cause problems later down the line.
-> >=20
-> > Are you aware of other more elegant approaches we can try for us to tra=
-ck this required cross-qdisc state? We suggested adding a single bit to the=
- skb, but we also see the problem with adding a field for a one-off use cas=
-e to such a vital structure (but this would also completely stomp out this =
-bug).
->=20
->=20
-> It sounds like quite a complicated approach - i dont know what the
-> dequeue thing brings to the table; and if we really have to dequeue to
-
-Did what I say above help clarify what the problem is? Feel free to let me =
-know if you have more questions, this bug is quite a nasty one.
-
-> reinject into enqueue then i dont think we are looping anymore..
->=20
-
-We are still duplicating packets that have already partaken in duplication =
-all the way back to root, so the tfifo dequeue loop in netem_dequeue won't =
-stop.
-
-> cheers,
-> jamal
->=20
-
-Best,
-Will
+/P
 
 
