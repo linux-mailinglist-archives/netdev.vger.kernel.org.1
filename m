@@ -1,144 +1,106 @@
-Return-Path: <netdev+bounces-194219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929A9AC7EBB
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:28:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124ECAC7EC3
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 15:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B22A26F88
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:28:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCD011BC60A3
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 13:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36386226193;
-	Thu, 29 May 2025 13:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB1E15B102;
+	Thu, 29 May 2025 13:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="U5Z9toWh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rVD9jU2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B139917BA5;
-	Thu, 29 May 2025 13:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9B42110;
+	Thu, 29 May 2025 13:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748525327; cv=none; b=hBGRIiPTvCzJ5rj+WStOtqxHDqIfMN9LYWhH/savQ98xKxqlH1Q4OFGlUYoxO3Bgvh0U6ubNOIsZoEWkPiyvczu1wE5oet2sRxYha46skGz0FW6bHY2BuDcTWAG5PV7F79ly98yrdCHfX+ZQMsXyV2xrGzuvCdOrS+OZWSdZGCA=
+	t=1748525669; cv=none; b=kPVOPu3DUqD3JFUdrvNbbyVGga1VYUGw6nnrFVqA+qwQ3DFRVf/HZd0VZs3vvH0L5yZyVpLzotanGj5Tm9X9n/S+zVJ8WLv4UxZYL+JdR/F2fllihe/y4FYo8AbPpt3hAfqXhv9mWdwEaJ+1ifGV3PwZDNPek6K/Rdt0yNFF3N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748525327; c=relaxed/simple;
-	bh=HjdeBbhhYpiTDQNeuKjppa/6OR8mdX2tAmkwgCAGDzw=;
+	s=arc-20240116; t=1748525669; c=relaxed/simple;
+	bh=qSwHf/0hRR8r8l/aqMBLXHUG5kVyzYMtHPPbws4VCPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HGwuDRZMzd0EUkeaBf5SodFuSaY21L+Z3iwjc5zjP9s9Ols8Wz19koKf2m1pKv56mXHM3/nSjac4seJ1xSfbPXUe6iVH9l8/QMrgTARU/sOqPLM7VVFzO3tc094eCpXibcrZiBC8PazbuJkgQvYYhi3i4wVkRHSZ50/cr2WLlvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=U5Z9toWh; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 3E20D207861D; Thu, 29 May 2025 06:28:45 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3E20D207861D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1748525325;
-	bh=PowdyksgFeNGxjaYVXgfZt/agyGLy3RtEinohZnn13E=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=KQJ4nMeSgdGYeZ+5P7Agl5lKzmq6dCwbEwb2gCxASG1tRrMBvAmT2iOSOzQGGbhuLJrHJ8SGZhKEOCWjLqeJOZzPXnDCK5P5eMP4aisrbhgCrvHtK7rmV8uJ8DSjkZX+/1Vnu3v1a5ouXBPxlowztLz6BWZNCfy7CCKLSHtXino=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rVD9jU2v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11428C4CEEB;
+	Thu, 29 May 2025 13:34:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748525669;
+	bh=qSwHf/0hRR8r8l/aqMBLXHUG5kVyzYMtHPPbws4VCPo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U5Z9toWhiQyAo1P5uORvpzDiRyD2tsbluG5TtPDUU+lIZr434j4ewrazjfeVR6bvL
-	 zBCbVW/l38UkV2MLvalZYHb4PQdNFUlG1Ze+c+LI1tFU3cgRGk/G99bYfsZ4JtA80F
-	 y5dMttkHk65rX2EpVWi2yfWUprYKKhKMxk2gM7lg=
-Date: Thu, 29 May 2025 06:28:45 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof Wilczy???~Dski <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v4 0/5] Allow dyn MSI-X vector allocation of MANA
-Message-ID: <20250529132845.GE27681@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1748361453-25096-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20250528185508.GK1484967@horms.kernel.org>
+	b=rVD9jU2vkC5O+czjI4YNGVu7mT3WJ5l1e8/AxzP6UA78OhmfsRKWvsKfnCNug9wVm
+	 665A+5vCLR02gv2qgOxgF12Ad1OAN6sZEzJbOYkWnUdX4SXtLLMgHoE8x6KQ2Ggnvp
+	 UB2n+u/Unx1LZ/wbOVqWdXvCE6oDWlaeiCOPRZ9r7M0fBUIO39cpLshrREGZ+wn80M
+	 GgI9qLMHuEcxeNLNzq/T0ZB//UfNv53r9WOlbmJwtkcuhwvsvjF+PLUbW31eGH8dOc
+	 yx+zDOBM/1ZW0i3UevmBnKgTmd6y4Dd0xcthdYHJQEZzIz0WSOwcD2L6+NGhtjp4cw
+	 mnEwWjryD3D1Q==
+Date: Thu, 29 May 2025 14:34:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Philip Li <philip.li@intel.com>, oliver.sang@intel.com,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: build net/lib dependency in all
+ target
+Message-ID: <20250529133424.GP1484967@horms.kernel.org>
+References: <20250529070536.84491-1-minhquangbui99@gmail.com>
+ <20250529103221.GN1484967@horms.kernel.org>
+ <da0339d6-b6a3-44d8-8ed4-b99249fa0fd1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250528185508.GK1484967@horms.kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <da0339d6-b6a3-44d8-8ed4-b99249fa0fd1@gmail.com>
 
-On Wed, May 28, 2025 at 07:55:08PM +0100, Simon Horman wrote:
-> On Tue, May 27, 2025 at 08:57:33AM -0700, Shradha Gupta wrote:
-> > In this patchset we want to enable the MANA driver to be able to
-> > allocate MSI-X vectors in PCI dynamically.
+On Thu, May 29, 2025 at 06:04:17PM +0700, Bui Quang Minh wrote:
+> On 5/29/25 17:32, Simon Horman wrote:
+> > On Thu, May 29, 2025 at 02:05:36PM +0700, Bui Quang Minh wrote:
+> > > Currently, we only build net/lib dependency in install target. This
+> > > commit moves that to all target so that net/lib is included in in-tree
+> > > build and run_tests.
+> > Hi,
 > > 
-> > The first patch exports pci_msix_prepare_desc() in PCI to be able to
-> > correctly prepare descriptors for dynamically added MSI-X vectors.
-> > 
-> > The second patch adds the support of dynamic vector allocation in
-> > pci-hyperv PCI controller by enabling the MSI_FLAG_PCI_MSIX_ALLOC_DYN
-> > flag and using the pci_msix_prepare_desc() exported in first patch.
-> > 
-> > The third patch adds a detailed description of the irq_setup(), to
-> > help understand the function design better.
-> > 
-> > The fourth patch is a preparation patch for mana changes to support
-> > dynamic IRQ allocation. It contains changes in irq_setup() to allow
-> > skipping first sibling CPU sets, in case certain IRQs are already
-> > affinitized to them.
-> > 
-> > The fifth patch has the changes in MANA driver to be able to allocate
-> > MSI-X vectors dynamically. If the support does not exist it defaults to
-> > older behavior.
+> > The above describes what is being done.
+> > I think it would be good to also describe why.
 > 
-> Hi Shradha,
+> Hi,
 > 
-> It's unclear what the target tree for this patch-set is.
-> But if it is net-next, which seems likely given the code under
-> drivers/net/, then:
+> Currently, when building net related selftests, we need to
 > 
-> Please include that target in the subject of each patch in the patch-set.
+>     make install
 > 
-> 	Subject: [PATCH v5 net-next 0/5] ...
+> so that the net/lib is compiled. In case we do
 > 
-> And, moreover, ...
+>     make
 > 
-> ## Form letter - net-next-closed
+> or
 > 
-> The merge window for v6.16 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations. We are
-> currently accepting bug fixes only.
+>     make run_tests
 > 
-> Please repost when net-next reopens after June 8th.
-> 
-> RFC patches sent for review only are obviously welcome at any time.
+> the net/lib is not compiled. So I move the INSTALL_DEP_TARGETS which is
+> net/lib if the selftests is net related to all. As a result, all make/make
+> install/make run_tests will have the net/lib compiled.
 
-Thank you Simon.
+Thanks for the explanation, it is much appreciated.
 
-While posting this patchset I was a bit confused about what should be
-the target tree. That's why in the cover letter of the V1 for this
-series, I had requested more clarity on the same (since there are patches
-from PCI and net-next both).
+I think it would be good to include something along those lines
+in the commit message of the patch.
 
-In such cases how do we decide which tree to target?
+Please note, that if you post a v2, before doing so you should allow 24h to
+elapse since the posting of v1.
 
-Also, noted about the next merge window for net-next :-)
-
-Regards,
-Shradha.
+https://docs.kernel.org/process/maintainer-netdev.html
 
