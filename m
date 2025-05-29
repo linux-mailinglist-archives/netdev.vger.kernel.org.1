@@ -1,173 +1,195 @@
-Return-Path: <netdev+bounces-194109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0594AC75CD
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:18:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C86AC75D8
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 04:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59D831887E12
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:18:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240DE1748D5
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899E9242D9C;
-	Thu, 29 May 2025 02:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EBA2441A6;
+	Thu, 29 May 2025 02:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrzrajQp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cab38P1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5598221282;
-	Thu, 29 May 2025 02:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1402B19E968
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 02:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748485092; cv=none; b=Igxx3geGVN9Eq+Q+WI97yvGDBqguFrUlbKkMq4Gn0uYaunWCQk1PnvSSIocnDA3PNrdLtwKDc8GgunB9/stDh6IrmJYRRD9XMBeumduqq/a5Qi2NiOHsfaLZtm/hQlYy44bLWdFGMDGF4u8Ea5KKZGuGg+F6rm67wTeIGcCTaeg=
+	t=1748485378; cv=none; b=Ojl0MruxHuKU3s5BXSTMIsuQK9cbuSe9C7T1b81O46EC69Ruaiy/qbyibW3VUdgiBRos4CR5qtsN0zBsdFSNBVd5SLA77sCns8X3eSZ3aN2nxWfq039Nb6/AN2Yvqe91PFIr9PJX5yGHGk1PTu3Cmj/DTAEuwxvR0EltE9kU12c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748485092; c=relaxed/simple;
-	bh=wzXTPhnaf8UnOSiDczkX4nqVWczs/b3zKCpq50MEHvU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=K+IX1gxay2u2w+GfNeXJfDJpDiX8H8K9O7aBnOYDsaD5U4MBWUIT7oRj0ShK+zCAQCiqCIkjxQqI/FkUVmSy32+gOzyHXb/6Af7hEWa6/AtDVzyZ197a0vQRR8/cJeJrmqHVRFjPNDYwK5iwaWgOVO1kGSPahJGFI7AqgyBfFrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrzrajQp; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c5675dec99so40167485a.0;
-        Wed, 28 May 2025 19:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748485089; x=1749089889; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AsVHBqp0MlQW6nz5AgO2rzoOSJPH8levSMCbfCpQoLc=;
-        b=DrzrajQp6WY9/TtiCCcrnvGsyVrSUj4CtIUIaiHmkCrOrZeE/O213Rgd/VCR4OTOcC
-         4yT1mrrjugwu/rX9eCp0NuGdAXFCpeLccvf76Rjix7HTFVWrB4BX5r4yt0seZ5J1fjrD
-         3Vr/ucRzeIiJDxm23vsC5EFN9SRS5B7yUJkhsgsLnJyuA7kF/3q547Ur4Bz9d5NH7Y4Q
-         X1HiHCr4JbFRF5XTzWa5RqIYMiIe+aGavgKudLEd5kYC2lZHqbfHuSb2O7sKQuQ3fnXE
-         Pqp3W4J8B8cMKfPAdcI81ADcDjakmHMY0BZK0dBTnWGlAzEJRS2FpZAC68ClIyeAow0c
-         vAFw==
+	s=arc-20240116; t=1748485378; c=relaxed/simple;
+	bh=l20XhqXTvOsFpczVAt7IfGpCVqj1+02YFqH0iMqEr4M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=flfk4wy5v8+5Cw80DBtUInAXQO7ZaVwIukTRas26XwPqLfv55GYHxCcvsqdQhxkLRv3c1xg2OOw5R9QXXy0jlwSl4R33KlUdBZJ3+eorbbXtxvwzD4PF3EYSNUlSHCCfDXfsKMGg/wgP7POpRQfeSb2Q8Jg8YGlihBP4TY7yIQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cab38P1l; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748485374;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pD+lpHG7PSW+C8uubrji1uTcQf759HAEgtP2Ipc4Mrk=;
+	b=Cab38P1lsbZ9mTuZZ3umfz0Au5lUZLRHyNqrEqJ1xDkn1IjmoAOSdo3f3zZxoyBqJM5Pf/
+	hj4B2kHhkNhEOYLTXHTLms2ZhnMxPVKf3aODuEgXXVO/83SSymoiY5PTcJqzOrXQhqj9j6
+	p4/UqF5VPrFejbr/0vx2kHlxREggASg=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-327-4Jhgo3DSNGSOj-K_A5Ylbg-1; Wed, 28 May 2025 22:22:53 -0400
+X-MC-Unique: 4Jhgo3DSNGSOj-K_A5Ylbg-1
+X-Mimecast-MFC-AGG-ID: 4Jhgo3DSNGSOj-K_A5Ylbg_1748485372
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-311e7337f26so296663a91.3
+        for <netdev@vger.kernel.org>; Wed, 28 May 2025 19:22:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748485089; x=1749089889;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AsVHBqp0MlQW6nz5AgO2rzoOSJPH8levSMCbfCpQoLc=;
-        b=j4qr7J7vfVblYrsyyO23zHDGc/BOFMlc0qp1cISIE+NnkdPQ/Pd12y/UAxnU5WhTkc
-         Z+7DTFlHPIHuXjWBK0iq+FedjF+ZpUqjZ1C3dMN8g5t3gnKv0L8izg+KNZqjBJkCuT41
-         WiW48zK+3istZeP3GuGFS/JkSKkxKHChz9hjCQGND+KihAUlR6GgfLMRMs+eOgR7Rc4Q
-         KG0fcJyAwhsEDACb3raNT54vu2Di+n6tlfOAs5+bA+YVUhWkPsEzQqjyuIOkqJ+6q6/a
-         fF845FcUMTU13M3gH2uvNZDiC5wtie0E3UFwLYCeCBynpQSF4PKxtUaWok0zUR3Zoi/1
-         QPvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXnRCW8jJUiqBPGNakzoic86xJ9qWPtzRvjB5R5OYeXesCQ0BxMosjWbVfs7ptIKG/WONm0QR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqFKdj/BNHrN4AzIGFmtWnbxE3AJKceIe1sd8Z9743GRQHR+Mz
-	pnATmK2BOHZ/HjYemM4QO2py0nlTyIufWZkR+jJKfgRgxd31NGqvPnFX
-X-Gm-Gg: ASbGncszAmpgWo19x3nKsUb5Ug1noHGN0xb8Mg8kZSN5CnQ7JXnwPwq02r22vw0db5d
-	S9QHSNJ95YzCdx8spcFxkRDz7Kgm8BcTXwy6q8Jr2avgVb6erLj264+t1myjU0XeUrMTwasdYTq
-	GKg19Q691bRCOa4nseltTf8iR6j7zlpL1/FVg2KL2E9KdFxtkfNrpKP4rMt4OS0wEutZCzj4oON
-	TbXqZS+KWR3aJyQ9Ext357FTq1J0soVsEbaxFNOeBdS0acNNrfwFqOQ4XNmw7Q3A75OZjIc4TYU
-	ipuFnwL3CgpiWVLRnLwv2Unt1ViQCIdQxPyI97rQZVQW2CKpAlg+WY5v4Lhg/K8wbMbyQxnsubm
-	5BQe1e7L6IeZvqbAuxvihk0U=
-X-Google-Smtp-Source: AGHT+IHlLxi1rKlpmZcTkimlqtP3oGzbm3q4GPcwSk66cc4lAJEYgh8leLsJ2ZzRFVn1HK9DkGZ1sQ==
-X-Received: by 2002:a05:620a:1922:b0:7ca:c9cb:ac1 with SMTP id af79cd13be357-7ceecba454amr2628073085a.4.1748485088562;
-        Wed, 28 May 2025 19:18:08 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7d09a1a7663sm31476185a.92.2025.05.28.19.18.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 19:18:07 -0700 (PDT)
-Date: Wed, 28 May 2025 22:18:07 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Shiming Cheng <shiming.cheng@mediatek.com>, 
- willemdebruijn.kernel@gmail.com, 
- willemb@google.com, 
- edumazet@google.com, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- matthias.bgg@gmail.com
-Cc: linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- shiming.cheng@mediatek.com, 
- lena.wang@mediatek.com
-Message-ID: <6837c3df6b1a7_39fc9c29492@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250529015901.3814-1-shiming.cheng@mediatek.com>
-References: <20250529015901.3814-1-shiming.cheng@mediatek.com>
-Subject: Re: [PATCH net v5] net: fix udp gso skb_segment after pull from
- frag_list
+        d=1e100.net; s=20230601; t=1748485372; x=1749090172;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pD+lpHG7PSW+C8uubrji1uTcQf759HAEgtP2Ipc4Mrk=;
+        b=wMW1GAV+ulvSTO3v5+PIcANYfVlJa4SGu9tW000ssIfinMGnG6u/hreI6DE8uExKmB
+         I99FLQQP3h1IYdQs4nkqSI/QjhhL31BJp7YkiuG6eSA7TM+dQzZRsLx6d+NHW57Cxrjh
+         HQwkkKvg6cve2ck7dstllhUyopQ/vrLGXoD1xjucmRXCHN1HnYPM22hie9p1Gy/80gii
+         f+fxEWNp9DdfEg6ERw1VLu2mizTQZEW5Kchzs0XzKTwebmTF7YBTVWRqOU+UzLnunu8r
+         fsxo1pFn6fF/GUBhKYW37UlMvVTtranbY04kyUhRJFc4emTRd2Oa91N7wO/r7Cfd0Qba
+         lq9A==
+X-Gm-Message-State: AOJu0YyRX9j5/oudC++dwDYQFPmqcdGgp3PdjZEAqcYCCtdAY/Tovc0q
+	Z4Z8wSLgJjgz/XI/CCm3KbiRRVEvevPbkp6KhkzuTRGGqUfOTg7+3UYJGYa31pplw9vHFXyi8kQ
+	lZj74gcMAIAgaBm7be57tI9Nk8QYFehV6mAAFm7OtOGk0nzXWEInsTTAxgk7Rrwz9VSovQSl48s
+	C24sLwK5PHQQg4SLOCvC1yu5f5HWLIhrF8
+X-Gm-Gg: ASbGnctZJqRbSlsrdlUD6mqJfLoB1KSrDBRWS2Ol16plBAbXGtWpVfITb/xDI/zu5OF
+	FemYz2PexWq0o+6ad6rAQdCzZppyKypyCA+og/pJj3n4+7lOWdh+jSE+YFkLaO39bd5mWJA==
+X-Received: by 2002:a17:90b:1d44:b0:312:1b53:5ea8 with SMTP id 98e67ed59e1d1-3121dcb69b3mr834014a91.24.1748485372391;
+        Wed, 28 May 2025 19:22:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQYoHj2g2JZQtV+7md3QI6V130SJ+CULzKmqLF+k04tNBCtHn50Z/94nSDOgrkZcKDTr6UEZdCWRu02+4E530=
+X-Received: by 2002:a17:90b:1d44:b0:312:1b53:5ea8 with SMTP id
+ 98e67ed59e1d1-3121dcb69b3mr833977a91.24.1748485371934; Wed, 28 May 2025
+ 19:22:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <cover.1747822866.git.pabeni@redhat.com> <f85bc2d08dfd1a686b1cd102977f615aa07b3190.1747822866.git.pabeni@redhat.com>
+ <CACGkMEv=XnqKDXCEitEOs-AL1g=H=7WiHEaHrMUN-RfKN1JCRg@mail.gmail.com>
+ <53242a04-ef11-4d5b-9c7e-7a34f7ad4274@redhat.com> <CACGkMEtZZbN8vj-V-PSwAmQKCP=gDN5sDz4TOXcOhNXGPLp_yQ@mail.gmail.com>
+ <3d5c65e0-d458-4a56-8c93-c0b5d37420b5@redhat.com>
+In-Reply-To: <3d5c65e0-d458-4a56-8c93-c0b5d37420b5@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 29 May 2025 10:22:40 +0800
+X-Gm-Features: AX0GCFtobMk9UNoK1uAbcerm8Ezs-5uEzsO9f19R8VB5r7ulKy2m6-TOIvcW_CA
+Message-ID: <CACGkMEuBrzozRYqrgu8pM-+Ke2-NhCbFRHr8NeVpP15Qo0RZGg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/8] virtio_pci_modern: allow setting configuring
+ extended features
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Shiming Cheng wrote:
-> Commit a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after
-> pull from frag_list") detected invalid geometry in frag_list skbs and
-> redirects them from skb_segment_list to more robust skb_segment. But some
-> packets with modified geometry can also hit bugs in that code. We don't
-> know how many such cases exist. Addressing each one by one also requires
-> touching the complex skb_segment code, which risks introducing bugs for
-> other types of skbs. Instead, linearize all these packets that fail the
-> basic invariants on gso fraglist skbs. That is more robust.
-> 
-> If only part of the fraglist payload is pulled into head_skb, it will
-> always cause exception when splitting skbs by skb_segment. For detailed
-> call stack information, see below.
-> 
-> Valid SKB_GSO_FRAGLIST skbs
-> - consist of two or more segments
-> - the head_skb holds the protocol headers plus first gso_size
-> - one or more frag_list skbs hold exactly one segment
-> - all but the last must be gso_size
-> 
-> Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-> modify fraglist skbs, breaking these invariants.
-> 
-> In extreme cases they pull one part of data into skb linear. For UDP,
-> this  causes three payloads with lengths of (11,11,10) bytes were
-> pulled tail to become (12,10,10) bytes.
-> 
-> The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
-> payload was pulled into head_skb, it needs to be linearized before pass
-> to regular skb_segment.
-> 
->     skb_segment+0xcd0/0xd14
->     __udp_gso_segment+0x334/0x5f4
->     udp4_ufo_fragment+0x118/0x15c
->     inet_gso_segment+0x164/0x338
->     skb_mac_gso_segment+0xc4/0x13c
->     __skb_gso_segment+0xc4/0x124
->     validate_xmit_skb+0x9c/0x2c0
->     validate_xmit_skb_list+0x4c/0x80
->     sch_direct_xmit+0x70/0x404
->     __dev_queue_xmit+0x64c/0xe5c
->     neigh_resolve_output+0x178/0x1c4
->     ip_finish_output2+0x37c/0x47c
->     __ip_finish_output+0x194/0x240
->     ip_finish_output+0x20/0xf4
->     ip_output+0x100/0x1a0
->     NF_HOOK+0xc4/0x16c
->     ip_forward+0x314/0x32c
->     ip_rcv+0x90/0x118
->     __netif_receive_skb+0x74/0x124
->     process_backlog+0xe8/0x1a4
->     __napi_poll+0x5c/0x1f8
->     net_rx_action+0x154/0x314
->     handle_softirqs+0x154/0x4b8
-> 
->     [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
->     [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
->     [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
->     [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
->     [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
->     [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
->     [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
->     [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
-> 
-> Fixes: a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after pull from frag_list")
-> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+On Thu, May 29, 2025 at 12:02=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 5/27/25 5:04 AM, Jason Wang wrote:
+> > On Mon, May 26, 2025 at 6:53=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >> On 5/26/25 2:49 AM, Jason Wang wrote:
+> >>> On Wed, May 21, 2025 at 6:33=E2=80=AFPM Paolo Abeni <pabeni@redhat.co=
+m> wrote:
+> >>>>
+> >>>> The virtio specifications allows for up to 128 bits for the
+> >>>> device features. Soon we are going to use some of the 'extended'
+> >>>> bits features (above 64) for the virtio_net driver.
+> >>>>
+> >>>> Extend the virtio pci modern driver to support configuring the full
+> >>>> virtio features range, replacing the unrolled loops reading and
+> >>>> writing the features space with explicit one bounded to the actual
+> >>>> features space size in word.
+> >>>>
+> >>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >>>> ---
+> >>>>  drivers/virtio/virtio_pci_modern_dev.c | 39 +++++++++++++++++------=
+---
+> >>>>  1 file changed, 25 insertions(+), 14 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio=
+/virtio_pci_modern_dev.c
+> >>>> index 1d34655f6b658..e3025b6fa8540 100644
+> >>>> --- a/drivers/virtio/virtio_pci_modern_dev.c
+> >>>> +++ b/drivers/virtio/virtio_pci_modern_dev.c
+> >>>> @@ -396,12 +396,16 @@ EXPORT_SYMBOL_GPL(vp_modern_remove);
+> >>>>  virtio_features_t vp_modern_get_features(struct virtio_pci_modern_d=
+evice *mdev)
+> >>>>  {
+> >>>>         struct virtio_pci_common_cfg __iomem *cfg =3D mdev->common;
+> >>>> -       virtio_features_t features;
+> >>>> +       virtio_features_t features =3D 0;
+> >>>> +       int i;
+> >>>>
+> >>>> -       vp_iowrite32(0, &cfg->device_feature_select);
+> >>>> -       features =3D vp_ioread32(&cfg->device_feature);
+> >>>> -       vp_iowrite32(1, &cfg->device_feature_select);
+> >>>> -       features |=3D ((u64)vp_ioread32(&cfg->device_feature) << 32)=
+;
+> >>>> +       for (i =3D 0; i < VIRTIO_FEATURES_WORDS; i++) {
+> >>>> +               virtio_features_t cur;
+> >>>> +
+> >>>> +               vp_iowrite32(i, &cfg->device_feature_select);
+> >>>> +               cur =3D vp_ioread32(&cfg->device_feature);
+> >>>> +               features |=3D cur << (32 * i);
+> >>>> +       }
+> >>>
+> >>> No matter if we decide to go with 128bit or not. I think at the lower
+> >>> layer like this, it's time to allow arbitrary length of the features
+> >>> as the spec supports.
+> >>
+> >> Is that useful if the vhost interface is not going to support it?
+> >
+> > I think so, as there are hardware virtio devices that can benefit from =
+this.
+>
+> Let me look at the question from another perspective. Let's suppose that
+> the virtio device supports an arbitrary wide features space, and the
+> uAPI allows passing to/from the kernel an arbitrary high number of featur=
+es.
+>
+> How could the kernel stop the above loop? AFAICS the virtio spec does
+> not define any way to detect the end of the features space. An arbitrary
+> bound is actually needed.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I think this is a good question ad we have something that could work:
+
+1) current driver has drv->feature_table_size, so the driver knows
+it's meaningless to read above the size
+
+and
+
+2) we can extend the spec, e.g add a transport specific field to let
+the driver to know the feature size
+
+>
+> If 128 looks too low (why?) it can be raised to say 256 (why?). But
+> AFAICS the only visible effect would be slower configuration due to
+> larger number of unneeded I/O operations.
+
+See above.
+
+>
+> /P
+>
+
+Thanks
+
 
