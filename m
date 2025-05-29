@@ -1,373 +1,262 @@
-Return-Path: <netdev+bounces-194148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC63AC787F
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 07:59:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F33AC789E
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 08:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AEE11652D2
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 05:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F6A4E8349
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 06:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDAD2417D9;
-	Thu, 29 May 2025 05:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB30C254874;
+	Thu, 29 May 2025 06:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYZiHjrt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QyMCfrP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE9519E97A
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 05:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748498383; cv=none; b=HLKEAORBQEWifZUtVqbI5Wlo3TCOmL/ZJZ5+YEQV0KtMlvzzBq+8pI8sAuwYxFs/w6NETiBjFbLlTWrc9ZDK2+dMHeYgj2zZDJeqmv5VDttBSduB1UlIHXLIRmT26gyR3O0HozyhQI4LS//NUNUCfLTsWMC1Hdz+Ljf1Cet0lg0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748498383; c=relaxed/simple;
-	bh=iPaSHY988H9Kcx23HvxF8liBMTdsJZ0pejD77+6Ls1o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fN53gFk/Nd9JG9ByK/PilSXTJ75+561KfWR9GCBSE1rv+ihBXL7rF5xkBKV72kj2XFZRVUT/goikPIvsSEhOugH8QO9g3rVzejjuBvef5gCglL4RDAzjBAAqrLMtEMok1eSt/QPsJx8Qo2tUUK0O9JB4Xzo7/sywgCF57UtVMS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eYZiHjrt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748498380;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Hrp8Tsg3gq4eYqgZHBaMCj3lwesK/mHoylipYTBhHT4=;
-	b=eYZiHjrt03XhHOKyd2BKeyl5EGu/Bh2h+Lz9UfJwjr7mY5azsmOfXN5GYFR3bZlyUfKy55
-	PcGMjktjBsLD7eGKdCme/SS61vd/MTR02FCNq+7Ewa+hbuwaK1zI+NrkpszKL0FVkfAkf9
-	R90aEABmp0NqLJupbKqc9BWgpEetXNk=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-mmGthmN_P8WOmkj014I04g-1; Thu, 29 May 2025 01:59:37 -0400
-X-MC-Unique: mmGthmN_P8WOmkj014I04g-1
-X-Mimecast-MFC-AGG-ID: mmGthmN_P8WOmkj014I04g_1748498377
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-73c09e99069so637718b3a.0
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 22:59:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748498377; x=1749103177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hrp8Tsg3gq4eYqgZHBaMCj3lwesK/mHoylipYTBhHT4=;
-        b=ZpMCMLAHqf6d5pGhSDfgiCPiQyTlTBnaqSMRMiYeT4l4q2PTAKpsRbwJeD72fHEY9V
-         CfoYExS+OdBCAjN04AclMEzOnPhYm3JhOV6MZBrSsz973ssw/i3wDYT3c9VuKGDUJ5Lk
-         gCnzJJf+3syOia7E4ZzvxSqUiMJk079fiveIQUimGJFfmgEwmxpUYa1+9ItVcvrZyYJp
-         3eeJgMuhxqiuyWHYQ2z6g0pmnNTzgTjq21gi4JfxLy5vTnvc+boNw2PUYYSgRctnLl16
-         UiqsTlQVaAOkKEmHLvQxT+dpQpV2IA4F+fFweFLPuV+FG8azCWzBLyofZQCsy7DKvoHT
-         7D5Q==
-X-Gm-Message-State: AOJu0YzdqHBA/NBtxj9Ed7OErSVTSLT+cIre2z/6rzgto6kvo7blxzD4
-	bmyuZicC1eVaoJp7ZEq0NVVoWq0+BXQ7zwVrhn3+4+nIp5JGlfMK14XpmxWHip3poraw3mkU+gU
-	kTLDBE74qLwVS6UOoVmRzMKcB0Shks5eH4yQZrBbB9yILBAmefqpo667mxd6nd27UuCgcBq6P7q
-	CVVPLOqYO1q5hD4plc4POnAS+f2/a45BTK
-X-Gm-Gg: ASbGncsiOzbKnbfwwQrI7vswTOD+SbPyfZV010U4eyCErurPpomWTpMBKZe7/3TcGNx
-	+HTMIJ/oI55iAdWzsaNlcSmeJrMWZSpowHqI+xuR6DQOU/bLEhl7hib/NPLIE+4jQ5DzvfQ==
-X-Received: by 2002:a05:6a20:3d8c:b0:1f5:8cc8:9cc5 with SMTP id adf61e73a8af0-2188c37d595mr36238828637.34.1748498376640;
-        Wed, 28 May 2025 22:59:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEppiK3rECq3UScHTVDpF9H46LDpf7/Vz/aWHze9R2mzgO7X7xwc6pTEtfOfbZZgHKK1Ng9NbkbRd3EdjgJ4k8=
-X-Received: by 2002:a05:6a20:3d8c:b0:1f5:8cc8:9cc5 with SMTP id
- adf61e73a8af0-2188c37d595mr36238802637.34.1748498376235; Wed, 28 May 2025
- 22:59:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6411C8638
+	for <netdev@vger.kernel.org>; Thu, 29 May 2025 06:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748499715; cv=fail; b=JpCS31TfqXEoPEsUEQG/HE9Nqd/87gkMYStfHz40OCfhwUBLgAVB0B3nwy1FHowuwWUAZleeNHGwkoNqZPbdn/qPsTQAcPQFMk6vUSif7xdwIaWLt13rin+TErhKJ1yEXZfUPtBEdQu0qQefcoQQtO1FDxVTMy/UL8V3GOvuiao=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748499715; c=relaxed/simple;
+	bh=n9ykgAPv+pli/C3SE21cUK6LB1mLlURsBvr3ZpgGwVg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HcLDfKhjTWD9wyQf3ojUgJecRdimmiyPfgiRaUVH2vj1LZRxg3ARdp9Fn+FBuS9+LKLvtUnnwQMmNXmjdh922gY30qSFeSocKYvid7xplybZUuc7vDiKfQO5KQzEN8hqWygV50IsOX7F6by/4uVlHy2/FXpE8sqQPvvaUk2j6aw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QyMCfrP2; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748499714; x=1780035714;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=n9ykgAPv+pli/C3SE21cUK6LB1mLlURsBvr3ZpgGwVg=;
+  b=QyMCfrP2evG1HfWlu3iBXexNn9QwFF6s8W515qR6MDUnTqssHq6+dMxY
+   GnaDxWWAOZmteyKvMhJ/08LFeC6f+6Hstcp6lxaL3iRR0VVzE2k0ILI9Q
+   PWpWneLMsBBFFQijiAx2cs3EOo1sn+SetlO3Yr1PkfuUK9hQov0y8USZ1
+   tbLSbPrJVGgKrzSRWp10XJXY0iRzaYKZwy6ebZWdAJcfVjz4/3XHb1Eud
+   CKYPkLeWzbpF4gNHbb2Tp9G8RzEAsW2M/ln8/A1VPwz24INAykQfvImTy
+   w/hVJ/4sCIq6fIHHIPjlOjyTieD5Wn7OP/PJfoalhYkfEGeMddaIqvvA6
+   A==;
+X-CSE-ConnectionGUID: Foa6YRcQQVKH3Co92HFwIw==
+X-CSE-MsgGUID: BHSjO0A3QaqaEFylU7yACA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11447"; a="50701516"
+X-IronPort-AV: E=Sophos;i="6.15,323,1739865600"; 
+   d="scan'208";a="50701516"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 23:21:53 -0700
+X-CSE-ConnectionGUID: SOd8KxXGRhOQhvmQ7DnJgQ==
+X-CSE-MsgGUID: WBvNk0YDTIKC2lQd9kalDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,323,1739865600"; 
+   d="scan'208";a="143797769"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 23:21:53 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 28 May 2025 23:21:52 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 28 May 2025 23:21:52 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (40.107.92.81) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Wed, 28 May 2025 23:21:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mpvpJ8Fx2lLAvSPdoiGSoFVv7It57C+r1F7DURnv7c7ov9MlYY1Y1U1cDEIgYLb86G4FPKkYxF7z6BqWsbrkTZkaT2a+7guSmD70Wn/Hw0ZXM8miTtSBMSgexMsmpqJsoy6hZVsqhzNcv05U5xJo81ZYMG5lj+Ok1H8zjuypo8IgsiKD6eMWGe63JNkDmL6AjPQOPCJg/Rr3YzmBLfs4xjfVCMN1IK0LDozzxpEW/CfkRTkBBBIzorzssKGUG6DJgpbUehYZUqTkqxZFI7JvN/729Uj1ETPy7/f5tPtCaJGROCP2kYWfFtW9nd0rQmMufsCdznkCDF3fuVW4MLxmpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8lh1F/exQneysvkM9tai8qBRBQrPJsuLrD/jnVt/dTU=;
+ b=KYLegJb8K1fVUhoYgJq9kw7SGvPLfwe0MjDRXtE0mcKujkrUzKMWc9u8HXMUQ3UAnt/i3pIFQB3Ml2oEnudeOcvEulYvy48Ni94NQyezw5FMbtQkUkmL3WN5IlwICbnSI68IhQ5U7Pmkl0hUhxRvi9g2UJj7iGiwrOMkv4mPhgDQieGnS5Q1LmcRclV885cCJz6dxeILsckOd8EUyB41LzEKSj16+FTLzhx6hTUHwr+cj97/7ebjAvvvCCTmLezMmF9TWxLdBbbPE/qbSWzJy4oErVDKz0YKYgl0FaNX0jnRBBBnHv4kEcSiEugkgXEOyRUaPFPp6H0QT28HFTcRbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5674.namprd11.prod.outlook.com (2603:10b6:510:ec::10)
+ by SA1PR11MB5778.namprd11.prod.outlook.com (2603:10b6:806:23f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Thu, 29 May
+ 2025 06:21:49 +0000
+Received: from PH0PR11MB5674.namprd11.prod.outlook.com
+ ([fe80::77d3:dfb2:3bd:e02a]) by PH0PR11MB5674.namprd11.prod.outlook.com
+ ([fe80::77d3:dfb2:3bd:e02a%4]) with mapi id 15.20.8769.029; Thu, 29 May 2025
+ 06:21:49 +0000
+Date: Thu, 29 May 2025 14:21:41 +0800
+From: Philip Li <philip.li@intel.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+CC: Jakub Kicinski <kuba@kernel.org>, kernel test robot
+	<oliver.sang@intel.com>, <oe-lkp@lists.linux.dev>, <lkp@intel.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, <netdev@vger.kernel.org>
+Subject: Re: [linux-next:master] [selftests] 59dd07db92:
+ kernel-selftests.drivers/net.queues.py.fail
+Message-ID: <aDf89YA4rHGfOUvF@rli9-mobl>
+References: <202505281004.6c3d0188-lkp@intel.com>
+ <0bcbab9b-79c7-4396-8eb4-4ca3ebe274bc@gmail.com>
+ <20250528175811.5ff14ab0@kernel.org>
+ <bf24709c-41a0-4975-98cd-651181d33b75@gmail.com>
+ <aDfiTYmW1mHBEjg6@rli9-mobl>
+ <0b86612e-591b-46c3-adbe-538a1f1b0cba@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <0b86612e-591b-46c3-adbe-538a1f1b0cba@gmail.com>
+X-ClientProxiedBy: SG2PR04CA0166.apcprd04.prod.outlook.com (2603:1096:4::28)
+ To PH0PR11MB5674.namprd11.prod.outlook.com (2603:10b6:510:ec::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527161904.75259-1-minhquangbui99@gmail.com> <20250527161904.75259-2-minhquangbui99@gmail.com>
-In-Reply-To: <20250527161904.75259-2-minhquangbui99@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 29 May 2025 13:59:24 +0800
-X-Gm-Features: AX0GCFvV4SMxVeAp88dfab7cgPBX-hOf80WPlNoWi1BcZpIXiRmPygKp4JwIjWk
-Message-ID: <CACGkMEvAJziO3KW3Nk9+appXmR92ixcTeWY_XEZz4Qz1MwrhYA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v2 1/2] virtio-net: support zerocopy multi
- buffer XDP in mergeable
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5674:EE_|SA1PR11MB5778:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8598248f-9286-45e2-4f57-08dd9e791867
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?7grU35UL1t1GWOATW47AjriOEDfP5lsA5xvVcsItXzzizZRJwORYdkg75HBg?=
+ =?us-ascii?Q?vXi2psa0nAkkf0tmx8XJQ/ER3Z8dU7/kqdjPzIMQ/cQnDNVMw5kNnW/JBpkW?=
+ =?us-ascii?Q?vXMCOoWkAHgXCwtB3e/BUpqAqLQ+r6ZWUnt535A5YjrHgE74R79vEBDw/veP?=
+ =?us-ascii?Q?FaPeP1qJANoCO5FLScmGwEUIM8rCUbIL3f4+yNyZ0By5lhbG62KJKLgC4/lC?=
+ =?us-ascii?Q?YPHuTuYpGG6KI/kDLvcRgQBdTjhEVVuXbdUg8cikmOta8QXbHyy1iiZWfzFU?=
+ =?us-ascii?Q?6u/Ck3k0ywLoIRc8Xf12XrUqsTKT26m3XopHW1b6uo/qloU4AdQqG+nw56sL?=
+ =?us-ascii?Q?O3ozxWBrjj3hG6+yK64HouXxtRSOpUgSqgny+6r8M2iPyu7wII8RjQy+oYZH?=
+ =?us-ascii?Q?u2oCOlscb8QCY9CTKy0ulsUjfllCD5qnqa7sIs/l9SJcSop/4yoBlpwzdob1?=
+ =?us-ascii?Q?HSG8QyPlVxBTOCYrhZRwH03ww7GCxWR9qTP2HiFEDg9A7KzWNDfMjA4XN2dl?=
+ =?us-ascii?Q?c05SPhcg0x/A6F8AoPRNQsuhe7uzCj9G+QxX+1IG74x3gY2izxIwsCFmWPTN?=
+ =?us-ascii?Q?C+AXP1PIacLRV+MZ7K/wN92jJFC9hQnTtUdTZqFNeExs+aPfqEXgHXpWr9i5?=
+ =?us-ascii?Q?J+8YJpZeJ70DTOXhmsRneoSL55G3fDHmAAPwZrgmZTvRAuapNmQkP5y/63R8?=
+ =?us-ascii?Q?88ysuTvFMc5eBoIvIAYBksgWc1N661galE8vZWzGC/B2EGTslCdLecGls/zT?=
+ =?us-ascii?Q?pkIaIIsfU6CZg6AOtC+ix3f4mThLKbCxRiDgy89vICW6DiKRcYD3ziJXSXL2?=
+ =?us-ascii?Q?f+soVLOWEYRDw6JheXQ431kB+5CCjEWCXz3TbOUz8ahPK6KgPC/lU3GJcmLm?=
+ =?us-ascii?Q?p+AOnSL3Dp7OedhklPSAEgcBR3pgRprvLDHk1umSDyfzFCN3BSnhKjZCESzf?=
+ =?us-ascii?Q?J1n6lLALz67DXHVyH3oGXpEwuDeqi7riNquWIBD8t2J5ExJl0Bnes50bAYlG?=
+ =?us-ascii?Q?/lONFFOnH0zpkVSnYraICaVjdTsQ71PmCVQbrXs2TZTGOAqFJrwx6GNmu6ZT?=
+ =?us-ascii?Q?zujmkaTZWhbfi/Kmu1zqyavhYDxW5zhWNZKNVX4I1KAYWOd569QawE+LF00t?=
+ =?us-ascii?Q?upvZRcOVLySWjyE/FvSEd74+Vvg4HrrcNKwGO2nVWqRvDZmpCDBqZLyYFMlr?=
+ =?us-ascii?Q?3cM5Ji5c3rBIL5uO/ROFCArP1AhsghXYB18bWZSozTIvoPPiYwQd5XxMzSoH?=
+ =?us-ascii?Q?CoTNvMd7SlRjID9ChXU1vgf2IHNzqk5TL6beOCW4UNB+ZooXk06pHseNxrB3?=
+ =?us-ascii?Q?PfbTojf39z4EbCGIb0+XT8BdxmtuSN73mp4QZ66Op81u6qxFuZjY6bAJuw+u?=
+ =?us-ascii?Q?nU9Kt0bWOsq70PT2EYrvQeGFV5wk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5674.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wI0kN72gMOJ3pA5jap+Qk9W4IylK0tBXbQt+CDoGkJ740j4SOAjRpdYsGW6N?=
+ =?us-ascii?Q?h8T1VNn/4lmaIg3KF49XLTy4+mV9SGPU26p/edGDTZKfPtRQ0L9a1I/OgLtd?=
+ =?us-ascii?Q?JzYclIWAOjNR/2UcJODxqgTvgJBmxV8ODZLYzp3UY5aFcdIkdBm+GeQf51V2?=
+ =?us-ascii?Q?LhV5cX6cgCHGoviqX1pe2FLVPsO5W+3rKOBAY46I4VPswxJCED0O50MbYZLc?=
+ =?us-ascii?Q?7nSBvBh2b1VEd/Ev2Oi+L2sHom2Nlj1AAWwW62udfPridzCPQsBiYKeVp2TM?=
+ =?us-ascii?Q?yebWAqC4j48+nIwcTdS9TrRmih4mAJNbsLRRmq/iZ/Hf3U6ActQWxyp7GPqm?=
+ =?us-ascii?Q?VwZIV+befxMSOQ/5NrwdMYSA/GL/NKLEq9XgOgf4qz0MOvx/s4CuqTxf3mA0?=
+ =?us-ascii?Q?cfaP9U4m+0BS+XSLJFkL7KmUc5BDs4lctGfluO0riBcLw3L6opUqvuNAosYP?=
+ =?us-ascii?Q?fmuD3JrH5vtAMKjg56cBvscKBwhCnv+pW+O6SbmzgQp/zPtnEaC4JhUQyOI4?=
+ =?us-ascii?Q?4ZZ5OlqLjpqYpyiYGYIDOlFE2eLrhO65KSd006IvNEDVyie7VbSup5w7Avpr?=
+ =?us-ascii?Q?6uok6qmWUnOjoGQlPj6rNIv5Fhx/AA3OlqFfSwKj9LJFWj/pksfjjL3SH+vJ?=
+ =?us-ascii?Q?/XZ3FoGjipxeSmpGvoRef1gKiyWXzTjmQ5/A+26zSBJUrC4z2SaZKoJWfhNt?=
+ =?us-ascii?Q?MhH/EeBrsDK0NLN0uerjHA36F8ZlgaN/XpPtSBCinCAX6NHuETJNs7Y7vdXE?=
+ =?us-ascii?Q?mLwoySKTbmLWJw1j7EoVLCLUR4fE0IHxGwB3pmLJvyHFEWumzYsCmD6p55Tc?=
+ =?us-ascii?Q?Wsmqiyfqn5L3wVTzQYG/4ef9DIlPUvlJRjfwJ28qzvoNvO8LW8em/PW+SYGg?=
+ =?us-ascii?Q?k6254OjiUf74s+cbeOpCc7LDX6XunC3GHitkVeOUl/hEVOF5BVMwn5BLUx8q?=
+ =?us-ascii?Q?CIOiJn1GYAjv22eTkYBeQiQXsCzvEqvuW5062n0uUyCvW3VBp2Xe5Wa7RN3w?=
+ =?us-ascii?Q?3Ac/irGHXDv90ehJBJdpm9/ub9jhe1Bx8//0XA9bHUXRTCPuT4vwAwd1hIuz?=
+ =?us-ascii?Q?v13X/Db3ToZ/rgg2BU7GOuPoJmmmzv93aIUYTliHu7Rphv0UmadMZLhuH1yZ?=
+ =?us-ascii?Q?0OEAG/3/n/nuEADpRE5fi2GHvTUKkCZ2kHCZSphV71DLw+d+1YGnunWmTqfe?=
+ =?us-ascii?Q?rpISPZ7I2gL1xVuL2z3tCEJhiEaAgEPpUlpmSiMztzANJMNxtD5ED/G8vupq?=
+ =?us-ascii?Q?du2rF3UcPzQ8Pjj82nbbcB0WYgHew7DEI7d7zRVZqusDmvpDB9Bhfd/KM3Zt?=
+ =?us-ascii?Q?nAWGDgqWxbXgEcawwycTc2jGEUgvnSE1hFOmVwbxEchBmkwExgT19p/NXJ/W?=
+ =?us-ascii?Q?NO1oe3iDhOsqGL7vHbn2Zkom7ci9Sx3ro5i9+4nDL4nmw720t9y42l7whcwH?=
+ =?us-ascii?Q?BDqPCKczxrycdUvAAB1vqTj9UGS9DGNg+RkA0XN++skajPGVxEFX0XizhtRK?=
+ =?us-ascii?Q?8FMvH+HkRdznENixt8N9dyscsrtLg4SaG8wu0NroWZuKO4hAUwqxkkaky5Ri?=
+ =?us-ascii?Q?RjLILFFgZDxKcE7Cp/cyQb+dZiXqGULv93lXLLb5?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8598248f-9286-45e2-4f57-08dd9e791867
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5674.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 06:21:49.6873
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JCnogs4uKfe3hGbdoHxd69I/h4QWf3T0igRlBWDjwVWXxwH9aYiAebLXxN3GQAeoDtoH9es+AIM+6qY4nnWdXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5778
+X-OriginatorOrg: intel.com
 
-On Wed, May 28, 2025 at 12:19=E2=80=AFAM Bui Quang Minh
-<minhquangbui99@gmail.com> wrote:
->
-> Currently, in zerocopy mode with mergeable receive buffer, virtio-net
-> does not support multi buffer but a single buffer only. This commit adds
-> support for multi mergeable receive buffer in the zerocopy XDP path by
-> utilizing XDP buffer with frags.
->
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
->  drivers/net/virtio_net.c | 123 +++++++++++++++++++++------------------
->  1 file changed, 66 insertions(+), 57 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index e53ba600605a..a9558650f205 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -45,6 +45,8 @@ module_param(napi_tx, bool, 0644);
->  #define VIRTIO_XDP_TX          BIT(0)
->  #define VIRTIO_XDP_REDIR       BIT(1)
->
-> +#define VIRTNET_MAX_ZC_SEGS    8
-> +
->  /* RX packet size EWMA. The average packet size is used to determine the=
- packet
->   * buffer size when refilling RX rings. As the entire RX ring may be ref=
-illed
->   * at once, the weight is chosen so that the EWMA will be insensitive to=
- short-
-> @@ -1232,65 +1234,53 @@ static void xsk_drop_follow_bufs(struct net_devic=
-e *dev,
->         }
->  }
->
-> -static int xsk_append_merge_buffer(struct virtnet_info *vi,
-> -                                  struct receive_queue *rq,
-> -                                  struct sk_buff *head_skb,
-> -                                  u32 num_buf,
-> -                                  struct virtio_net_hdr_mrg_rxbuf *hdr,
-> -                                  struct virtnet_rq_stats *stats)
-> +static int virtnet_build_xsk_buff_mrg(struct virtnet_info *vi,
-> +                                     struct receive_queue *rq,
-> +                                     u32 num_buf,
-> +                                     struct xdp_buff *xdp,
-> +                                     struct virtnet_rq_stats *stats)
->  {
-> -       struct sk_buff *curr_skb;
-> -       struct xdp_buff *xdp;
-> -       u32 len, truesize;
-> -       struct page *page;
-> +       unsigned int len;
->         void *buf;
->
-> -       curr_skb =3D head_skb;
-> +       if (num_buf < 2)
-> +               return 0;
-> +
-> +       while (num_buf > 1) {
-> +               struct xdp_buff *new_xdp;
->
-> -       while (--num_buf) {
->                 buf =3D virtqueue_get_buf(rq->vq, &len);
-> -               if (unlikely(!buf)) {
-> -                       pr_debug("%s: rx error: %d buffers out of %d miss=
-ing\n",
-> -                                vi->dev->name, num_buf,
-> -                                virtio16_to_cpu(vi->vdev,
-> -                                                hdr->num_buffers));
-> +               if (!unlikely(buf)) {
-> +                       pr_debug("%s: rx error: %d buffers missing\n",
-> +                                vi->dev->name, num_buf);
->                         DEV_STATS_INC(vi->dev, rx_length_errors);
-> -                       return -EINVAL;
-> -               }
-> -
-> -               u64_stats_add(&stats->bytes, len);
-> -
-> -               xdp =3D buf_to_xdp(vi, rq, buf, len);
-> -               if (!xdp)
-> -                       goto err;
-> -
-> -               buf =3D napi_alloc_frag(len);
-> -               if (!buf) {
-> -                       xsk_buff_free(xdp);
-> -                       goto err;
-> +                       return -1;
->                 }
->
-> -               memcpy(buf, xdp->data - vi->hdr_len, len);
-> -
-> -               xsk_buff_free(xdp);
-> +               new_xdp =3D buf_to_xdp(vi, rq, buf, len);
-> +               if (!new_xdp)
-> +                       goto drop_bufs;
->
-> -               page =3D virt_to_page(buf);
-> +               /* In virtnet_add_recvbuf_xsk(), we ask the host to fill =
-from
-> +                * xdp->data - vi->hdr_len with both virtio_net_hdr and d=
-ata.
-> +                * However, only the first packet has the virtio_net_hdr,=
- the
-> +                * following ones do not. So we need to adjust the follow=
-ing
+On Thu, May 29, 2025 at 11:49:17AM +0700, Bui Quang Minh wrote:
+> On 5/29/25 11:27, Philip Li wrote:
+> > On Thu, May 29, 2025 at 11:06:17AM +0700, Bui Quang Minh wrote:
+> > > On 5/29/25 07:58, Jakub Kicinski wrote:
+> > > > On Wed, 28 May 2025 15:43:17 +0700 Bui Quang Minh wrote:
+> > > > > > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > > > > > the same patch/commit), kindly add following tags
+> > > > > > | Reported-by: kernel test robot <oliver.sang@intel.com>
+> > > > > > | Closes: https://lore.kernel.org/oe-lkp/202505281004.6c3d0188-lkp@intel.com
+> > > > > > 
+> > > > > > 
+> > > > > > 
+> > > > > > # timeout set to 300
+> > > > > > # selftests: drivers/net: queues.py
+> > > > > > # TAP version 13
+> > > > > > # 1..4
+> > > > > > # ok 1 queues.get_queues
+> > > > > > # ok 2 queues.addremove_queues
+> > > > > > # ok 3 queues.check_down
+> > > > > > # # Exception| Traceback (most recent call last):
+> > > > > > # # Exception|   File "/usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/net/lib/py/ksft.py", line 223, in ksft_run
+> > > > > > # # Exception|     case(*args)
+> > > > > > # # Exception|   File "/usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/drivers/net/./queues.py", line 33, in check_xsk
+> > > > > > # # Exception|     raise KsftFailEx('unable to create AF_XDP socket')
+> > > > > > # # Exception| net.lib.py.ksft.KsftFailEx: unable to create AF_XDP socket
+> > > > > > # not ok 4 queues.check_xsk
+> > > > > > # # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
+> > > > > > not ok 7 selftests: drivers/net: queues.py # exit=1
+> > > > > > 
+> > > > > > 
+> > > > > > 
+> > > > > > The kernel config and materials to reproduce are available at:
+> > > > > > https://download.01.org/0day-ci/archive/20250528/202505281004.6c3d0188-lkp@intel.com
+> > > > > Looking at the log file, it seems like the xdp_helper in net/lib is not
+> > > > > compiled so calling this helper from the test fails. There is similar
+> > > > > failures where xdp_dummy.bpf.o in net/lib is not compiled either.
+> > > > > 
+> > > > > Error opening object
+> > > > > /usr/src/perf_selftests-x86_64-rhel-9.4-kselftests-59dd07db92c166ca3947d2a1bf548d57b7f03316/tools/testing/selftests/net/lib/xdp_dummy.bpf.o:
+> > > > > No such file or directory
+> > > > > 
+> > > > > I'm still not sure what the root cause is. On my machine, these files
+> > > > > are compiled correctly.
+> > > > Same here. The get built and installed correctly for me.
+> > > > Oliver Sang, how does LKP build the selftests? I've looked at the
+> > > > artifacts and your repo for 10min, I can't find it.
+> > > > The net/lib has a slightly special way of getting included, maybe
+> > > > something goes wrong with that.
+> > > I understand why now. Normally, this command is used to run test
+> > > pwd: tools/testing/selftests
+> > > make TARGETS="drivers/net" run_tests
+> > > 
+> > > The LKP instead runs this
+> > > make quicktest=1 run_tests -C drivers/net
+> > > 
+> > > So the Makefile in tools/testing/selftests is not triggered and net/lib is
+> > > not included either.
+> > hi Jakub and Quang Minh, sorry for the false positive report. And thanks for
+> > helping root cause the issue in LKP side. We will fix the bot asap to avoid
+> > missing the required dependencies during the kselftest.
+> 
+> I've created a pull request, please help me to review it:
+> https://github.com/intel/lkp-tests/pull/514.
 
-Typo here.
+Got it, I have merged the PR, thanks a lot
 
-> +                * packets' data pointer to the correct place.
-> +                */
-
-I wonder what happens if we don't use this trick? I meant we don't
-reuse the header room for the virtio-net header. This seems to be fine
-for a mergeable buffer and can help to reduce the trick.
-
-> +               new_xdp->data -=3D vi->hdr_len;
-> +               new_xdp->data_end =3D new_xdp->data + len;
->
-> -               truesize =3D len;
-> +               if (!xsk_buff_add_frag(xdp, new_xdp))
-> +                       goto drop_bufs;
->
-> -               curr_skb  =3D virtnet_skb_append_frag(head_skb, curr_skb,=
- page,
-> -                                                   buf, len, truesize);
-> -               if (!curr_skb) {
-> -                       put_page(page);
-> -                       goto err;
-> -               }
-> +               num_buf--;
->         }
->
->         return 0;
->
-> -err:
-> +drop_bufs:
->         xsk_drop_follow_bufs(vi->dev, rq, num_buf, stats);
-> -       return -EINVAL;
-> +       return -1;
->  }
->
->  static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *dev,=
- struct virtnet_info *vi,
-> @@ -1307,23 +1297,42 @@ static struct sk_buff *virtnet_receive_xsk_merge(=
-struct net_device *dev, struct
->         num_buf =3D virtio16_to_cpu(vi->vdev, hdr->num_buffers);
->
->         ret =3D XDP_PASS;
-> +       if (virtnet_build_xsk_buff_mrg(vi, rq, num_buf, xdp, stats))
-> +               goto drop;
-> +
->         rcu_read_lock();
->         prog =3D rcu_dereference(rq->xdp_prog);
-> -       /* TODO: support multi buffer. */
-> -       if (prog && num_buf =3D=3D 1)
-> -               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, sta=
-ts);
-
-Without this patch it looks like we had a bug:
-
-        ret =3D XDP_PASS;
-        rcu_read_lock();
-        prog =3D rcu_dereference(rq->xdp_prog);
-        /* TODO: support multi buffer. */
-        if (prog && num_buf =3D=3D 1)
-                ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, stats=
-);
-        rcu_read_unlock();
-
-This implies if num_buf is greater than 1, we will assume XDP_PASS?
-
-> +       if (prog) {
-> +               /* We are in zerocopy mode so we cannot copy the multi-bu=
-ffer
-> +                * xdp buff to a single linear xdp buff. If we do so, in =
-case
-> +                * the BPF program decides to redirect to a XDP socket (X=
-SK),
-> +                * it will trigger the zerocopy receive logic in XDP sock=
-et.
-> +                * The receive logic thinks it receives zerocopy buffer w=
-hile
-> +                * in fact, it is the copy one and everything is messed u=
-p.
-> +                * So just drop the packet here if we have a multi-buffer=
- xdp
-> +                * buff and the BPF program does not support it.
-> +                */
-> +               if (xdp_buff_has_frags(xdp) && !prog->aux->xdp_has_frags)
-> +                       ret =3D XDP_DROP;
-
-Could we move the check before trying to build a multi-buffer XDP buff?
-
-> +               else
-> +                       ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_x=
-mit,
-> +                                                 stats);
-> +       }
->         rcu_read_unlock();
->
->         switch (ret) {
->         case XDP_PASS:
-> -               skb =3D xsk_construct_skb(rq, xdp);
-> +               skb =3D xdp_build_skb_from_zc(xdp);
-
-Is this better to make this change a separate patch?
-
->                 if (!skb)
-> -                       goto drop_bufs;
-> +                       break;
->
-> -               if (xsk_append_merge_buffer(vi, rq, skb, num_buf, hdr, st=
-ats)) {
-> -                       dev_kfree_skb(skb);
-> -                       goto drop;
-> -               }
-> +               /* Later, in virtnet_receive_done(), eth_type_trans()
-> +                * is called. However, in xdp_build_skb_from_zc(), it is =
-called
-> +                * already. As a result, we need to reset the data to bef=
-ore
-> +                * the mac header so that the later call in
-> +                * virtnet_receive_done() works correctly.
-> +                */
-> +               skb_push(skb, ETH_HLEN);
->
->                 return skb;
->
-> @@ -1332,14 +1341,11 @@ static struct sk_buff *virtnet_receive_xsk_merge(=
-struct net_device *dev, struct
->                 return NULL;
->
->         default:
-> -               /* drop packet */
-> -               xsk_buff_free(xdp);
-> +               break;
->         }
->
-> -drop_bufs:
-> -       xsk_drop_follow_bufs(dev, rq, num_buf, stats);
-> -
->  drop:
-> +       xsk_buff_free(xdp);
->         u64_stats_inc(&stats->drops);
->         return NULL;
->  }
-> @@ -1396,6 +1402,8 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_i=
-nfo *vi, struct receive_queue
->                 return -ENOMEM;
->
->         len =3D xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
-> +       /* Reserve some space for skb_shared_info */
-> +       len -=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->
->         for (i =3D 0; i < num; ++i) {
->                 /* Use the part of XDP_PACKET_HEADROOM as the virtnet hdr=
- space.
-> @@ -6734,6 +6742,7 @@ static int virtnet_probe(struct virtio_device *vdev=
-)
->         dev->netdev_ops =3D &virtnet_netdev;
->         dev->stat_ops =3D &virtnet_stat_ops;
->         dev->features =3D NETIF_F_HIGHDMA;
-> +       dev->xdp_zc_max_segs =3D VIRTNET_MAX_ZC_SEGS;
->
->         dev->ethtool_ops =3D &virtnet_ethtool_ops;
->         SET_NETDEV_DEV(dev, &vdev->dev);
-> --
-> 2.43.0
->
-
-Thanks
-
+> 
+> Thanks,
+> Quang Minh.
+> 
+> 
 
