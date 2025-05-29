@@ -1,95 +1,173 @@
-Return-Path: <netdev+bounces-194185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E5CBAC7B9E
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:10:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8DF8AC7BAB
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 12:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67CDC9E6948
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:09:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15D7C9E7F80
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 10:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDFF28DF22;
-	Thu, 29 May 2025 10:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E39321ABB1;
+	Thu, 29 May 2025 10:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WTqoxso4"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GBcKC/4A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C5628DEE5;
-	Thu, 29 May 2025 10:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5301F1527;
+	Thu, 29 May 2025 10:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748513397; cv=none; b=u10Obdlej5vSQIjFDTjuB6Ax/Czxb6bRPUPkfkCl+XwixbmMDRnFn3Jmz8rCtiaQa3vEHjWyBqhrbk0wnVgFudZIwXc4y5WKcCwddTs01gS+A2nU7u5jDpoOCylK+m83Fk8z1ARUGUZ43wbBi4O2c1bVgBej1zSszNb9PEDPLrM=
+	t=1748513915; cv=none; b=sLMSstEwDQdCYIKLRKyYZ1A8joLkpA73uKEe7TAkX3K63ukgO47g6im9DkAIP5Dyxi73HfK8qdZwnVD0nFNQWmV2CK1T8MSa843/Txjbrdv5UBRyRssvu49DUnzMjJaW2QvuwwU1zKqUew7KLV9sX5eDSA63v1hu/SlXixEenlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748513397; c=relaxed/simple;
-	bh=tDDF14MUq91tGPd3QEjRGe6rfJ9pvL7KTNIk3v2tUmc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qd1PjlEhEGNfJBrdEmT/bhm0lCm9IzamuYlAVL4kRSzpstT5NSAeex7v0SzIS2lS0MKj3ipelnCgr7Ngi5fi4pXqGW6NaHBZrwAa0ELMM78IkSkovqiusnB/H8mmPGh4PdCtJEf8GfYdlHo6ZfToamPtqHm6jkNP/p9eXEPu/C4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WTqoxso4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74749C4CEED;
-	Thu, 29 May 2025 10:09:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748513396;
-	bh=tDDF14MUq91tGPd3QEjRGe6rfJ9pvL7KTNIk3v2tUmc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WTqoxso4CTKBegMHxZdxpUhIEORX2gnMGe/DvfocfRGm9lhjh1wktihYM6YhcBePa
-	 KxKPMkU4HPOOUP7MGu2G8RkFIJ3dkx1tYB9TfGw+c+DBaGChd30oKeKSKhyXiW0KcU
-	 jWVXHjNbbmk92p/hk8IP83FKzvapVUWJLpQFggpOamRYMCyk64aECgAvrALdgVddTE
-	 0pwTQNj525am3wvtiGKHMd5BN1C8rCR5xpj4f16p6xLXO3bXcVfNm/4zXLPP+fiYs2
-	 NgbtBcBJUTQAIINGWFWd8Z1/M6Z5rUqCs6KR8DNE8cKw67hBkPkdGEEOWeSsp41z43
-	 lTKqsDMikMb5w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D0439F1DEE;
-	Thu, 29 May 2025 10:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748513915; c=relaxed/simple;
+	bh=5i/hDAQBSkwYVpOy1/ZC5ugPq70Hq06cHWW43vLth00=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=UHjHod6qxaQOXN5ze9mT3KrVzCDxmz/gIdC4xl8q1tfCMhH7Zu9uvEO50WWSS3uSYUywBULld6hfH9kzA3saE7+GCOLaUaWq2hV8JzI2RTIOeEsiNyfyLg/rE5GpIHRV9AkRvnBh0OsXYXUJFnJjS+1RM45JVO/RP5FOevMrK5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GBcKC/4A; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1127)
+	id 2D5F5203EE15; Thu, 29 May 2025 03:18:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2D5F5203EE15
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1748513913;
+	bh=3O+r7rjK0Z7UCd5rC/P3E0rsfGqbO+aPvR8Qk26+QUU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GBcKC/4AzpGsK248NlSiWI82KViX/AHEk9rigBc6HF17A3Q59wNP1ftlJb6RkegXr
+	 n5YUu8SzNBuSBpIt4GxR5JwrzOlscEvU0Z3WbR1rTpeI9vmPQvD+1n5J5O3ujcnjxl
+	 VScqEuM3b7tiTTm4VjykXBgs2Lm0R93H9en+I+zc=
+From: Saurabh Sengar <ssengar@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	kuniyu@amazon.com,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: ssengar@microsoft.com,
+	stable@vger.kernel.org,
+	Saurabh Sengar <ssengar@linux.microsoft.com>
+Subject: [PATCH net,v3] hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
+Date: Thu, 29 May 2025 03:18:30 -0700
+Message-Id: <1748513910-23963-1-git-send-email-ssengar@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] rxrpc: Fix return from none_validate_challenge()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174851343024.3214659.15855442080815222301.git-patchwork-notify@kernel.org>
-Date: Thu, 29 May 2025 10:10:30 +0000
-References: <10720.1748358103@warthog.procyon.org.uk>
-In-Reply-To: <10720.1748358103@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, dan.carpenter@linaro.org,
- marc.dionne@auristor.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
 
-Hello:
+The MANA driver's probe registers netdevice via the following call chain:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+mana_probe()
+  register_netdev()
+    register_netdevice()
 
-On Tue, 27 May 2025 16:01:43 +0100 you wrote:
-> Fix the return value of none_validate_challenge() to be explicitly true
-> (which indicates the source packet should simply be discarded) rather than
-> implicitly true (because rxrpc_abort_conn() always returns -EPROTO which
-> gets converted to true).
-> 
-> Note that this change doesn't change the behaviour of the code (which is
-> correct by accident) and, in any case, we *shouldn't* get a CHALLENGE
-> packet to an rxnull connection (ie. no security).
-> 
-> [...]
+register_netdevice() calls notifier callback for netvsc driver,
+holding the netdev mutex via netdev_lock_ops().
 
-Here is the summary with links:
-  - [net-next] rxrpc: Fix return from none_validate_challenge()
-    https://git.kernel.org/netdev/net/c/fd579a2ebbe4
+Further this netvsc notifier callback end up attempting to acquire the
+same lock again in dev_xdp_propagate() leading to deadlock.
 
-You are awesome, thank you!
+netvsc_netdev_event()
+  netvsc_vf_setxdp()
+    dev_xdp_propagate()
+
+This deadlock was not observed so far because net_shaper_ops was never set,
+and thus the lock was effectively a no-op in this case. Fix this by using
+netif_xdp_propagate() instead of dev_xdp_propagate() to avoid recursive
+locking in this path.
+
+And, since no deadlock is observed on the other path which is via
+netvsc_probe, add the lock exclusivly for that path.
+
+Also, clean up the unregistration path by removing the unnecessary call to
+netvsc_vf_setxdp(), since unregister_netdevice_many_notify() already
+performs this cleanup via dev_xdp_uninstall().
+
+Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
+Cc: stable@vger.kernel.org
+Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
+Tested-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+[V3]
+- Add the lock for netvsc probe path
+
+[V2]
+ - Modified commit message
+
+ drivers/net/hyperv/netvsc_bpf.c | 2 +-
+ drivers/net/hyperv/netvsc_drv.c | 4 ++--
+ net/core/dev.c                  | 1 +
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
+index e01c5997a551..1dd3755d9e6d 100644
+--- a/drivers/net/hyperv/netvsc_bpf.c
++++ b/drivers/net/hyperv/netvsc_bpf.c
+@@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
+ 	xdp.command = XDP_SETUP_PROG;
+ 	xdp.prog = prog;
+ 
+-	ret = dev_xdp_propagate(vf_netdev, &xdp);
++	ret = netif_xdp_propagate(vf_netdev, &xdp);
+ 
+ 	if (ret && prog)
+ 		bpf_prog_put(prog);
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index 14a0d04e21ae..c41a025c66f0 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2462,8 +2462,6 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
+ 
+ 	netdev_info(ndev, "VF unregistering: %s\n", vf_netdev->name);
+ 
+-	netvsc_vf_setxdp(vf_netdev, NULL);
+-
+ 	reinit_completion(&net_device_ctx->vf_add);
+ 	netdev_rx_handler_unregister(vf_netdev);
+ 	netdev_upper_dev_unlink(vf_netdev, ndev);
+@@ -2631,7 +2629,9 @@ static int netvsc_probe(struct hv_device *dev,
+ 			continue;
+ 
+ 		netvsc_prepare_bonding(vf_netdev);
++		netdev_lock_ops(vf_netdev);
+ 		netvsc_register_vf(vf_netdev, VF_REG_IN_PROBE);
++		netdev_unlock_ops(vf_netdev);
+ 		__netvsc_vf_setup(net, vf_netdev);
+ 		break;
+ 	}
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 2b514d95c528..a388f459a366 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9968,6 +9968,7 @@ int netif_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
+ 
+ 	return dev->netdev_ops->ndo_bpf(dev, bpf);
+ }
++EXPORT_SYMBOL_GPL(netif_xdp_propagate);
+ 
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
+ {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
