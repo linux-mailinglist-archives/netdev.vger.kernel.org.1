@@ -1,94 +1,87 @@
-Return-Path: <netdev+bounces-194089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05516AC74C5
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:01:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E50DCAC74CA
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 02:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2509E3A7CFA
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 00:01:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96902188BF1A
+	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 00:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526461E492;
-	Thu, 29 May 2025 00:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4931D1362;
+	Thu, 29 May 2025 00:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="DV50x740"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yq05mI+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21277BA3D
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 00:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD48810E4;
+	Thu, 29 May 2025 00:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748476906; cv=none; b=cTgGpoDgICyWRsfwer/zjr6/M6OP2cnwBgs3ShBd/Wg9wmIKUSIvk7B+7LoYJs6Ff0lorrIhx/+AZ8Gg0CQoMuPXahSZxaQK3QCh9ypCE3TGQTmxoufVrdc00Nv50PD/ypje73AWRMHc1BVskZ1UxLdYwTC+MpS8HWJ85q+h8XA=
+	t=1748477053; cv=none; b=Gl/2oxQw4vYDU7z5NE+wVe9VCfVwD5u20iUZ13x6Ou93EZCGq6jKdQTo82id3mZTKGotTrX3uc/w4xsIYeZlR+jHebQnZQIeO23YrIreXiRTcGM4xcCzwOah4AwqPohIqAWb650m69FToVGG/IJgd/3aGLJZcgCRguVwCDpDZqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748476906; c=relaxed/simple;
-	bh=T3juE1hOUm6DFe5iT/pHd3UmRK7XfYewH+PUs5EwYN8=;
+	s=arc-20240116; t=1748477053; c=relaxed/simple;
+	bh=oSSHNpPzsj1rOzfn00+b1MZqPrYhvc+fMQvVQmUS18o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rKJcXggNpbjd79DmadLE+r1mgwwwO7LJDhGOUSiOWOktUd6WgnQPUY8h5EmceFkK8elmX2fIuM26wXY50vMiwAWMyAV4c580ztc8ij3OxUw3ZNeO5zWu06pFSuFTgHlB0T8DgBPcxYOKU0NFkd/YRObBrWZ7vOrkpFgpczNFSYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=DV50x740; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-742c27df0daso225870b3a.1
-        for <netdev@vger.kernel.org>; Wed, 28 May 2025 17:01:43 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GT6rh2eTUtX8gNUwpfEenPA7hX2yN5uUNs/AllAeElIhV7+fNDdJtbWiD8jpT/G05srwaAMTPlla9FkSZ8F+ZjtJmfaB5VY5mSyAkA/LbGoPW3YYZcSLRuIdgoRVdiTkDsiV7j2esONTtIJA4YaFGATXnVZmhQJWnUmqV3Nww30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yq05mI+E; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-231e98e46c0so3629905ad.3;
+        Wed, 28 May 2025 17:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1748476903; x=1749081703; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HHrYl8KlTDJV9fZehVT6wNYFoGVLZmH/YM7SP1Otey4=;
-        b=DV50x740ZiLdVCWqwMXcv60Mn8RJ2GTIDm9RssFMLLKlsTVJ7qvZwzKSQvTUMFKcDm
-         pX9NFcvIoO6gQTqCB/XXC+I4YTZDJf2DJaP1h2NtUzIB009Rr8fxhRLWX0mbOhsFihZJ
-         Ipefk4NVQBOSKfNa6+g3fpZlkts8X2YOoSY5s=
+        d=gmail.com; s=20230601; t=1748477051; x=1749081851; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i+ZfYC+HxLPw3qSKUcJstolHkzilJWLIqOV2x8aXzBY=;
+        b=Yq05mI+E6sO92cQ0Y/sEDXBiaHoGtzHT4FNhO4PMV/a2sAa1S9R3+nfBz1BHW1Y4OS
+         5hYgAPLKVAr1OrgqDglxQAM9R0V44MINnzNTI7Q3TEKbI4sLsFuZlCUY6igswqK4qvrm
+         N3eGdn4JlxODV7BbZyX3v+4MEp+UNvcfdaLOjo/kQseVM0n0x+N1oOjj/60s3wKgfQfC
+         osW50EUwIbt+SD6h5X9Qg8KmielvzB9DoIZ4QOPAOBTKJ6oBA0UiyWhrNKq2WLHF5CAm
+         MefeYSmF+A8YKI8snu5fzgjbsuSlHWixHLNfn8zMBdXFUn4oZ+2lafDLAxLDECOgkDy+
+         oAfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748476903; x=1749081703;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HHrYl8KlTDJV9fZehVT6wNYFoGVLZmH/YM7SP1Otey4=;
-        b=eDZTs9ffVbgSkW4qaapRYfwDy2NoTyW9/YXyEOhCoDlqNaNwJgfwuiXwitW134hSEr
-         z9KB74CRvj1T+IdasKHLbgGq40A6mg2BDuZ/+y/HO5RwCCcPXW6AgCjm/sVy+eUY+EAE
-         JGZsXS5c0QIbWORcl5W7gZJbUPKzLhIkCxZjaCOobbFQbFzIPDan4onzAJJ1aFzdu6HK
-         OYvlP+N953735iy9n8ffV+LmzO38QCUEFot4K5eL5Q1RmgzBa7Ur2tvV4OrYI5hOpzc/
-         I4B0U/RUJFV+gFK7d9RZKJWMjcio2+Y0vvr1MbfVjOfDqj1zvX8Y/8gMClCjm29j/eZF
-         WsIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVv1VnMzSce0Nd1egj1mBmnPKQiLduzuKmUMGZN9dmeper5eAGO2KgpZDrQDxNl+kbdGUQQgdg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHbGSyoGwRK7A2LH+WCrlm87bvvF9Xz55t1a6MF9w5E5QPbnYm
-	6eReMXvFAYBLmD4w+teAz07Mg/OXxc9SnMJlIoOQLqn7VYnsd3aunhZjm2m/73/qxBI=
-X-Gm-Gg: ASbGncutotib9hu2DNnA22hN5ne2ZiLYCnr/lZVxSaq9OdobobbzTCiaRDLIV4QXEIr
-	Mzq1xdLXgmtsI6/d+funGwwEeYtjqCVIR/uQylfUpXUOHf/tSwZDLxla/h/vhgmCY8zEyVZIR5B
-	0ezO3q0zkm75Azy+BFleNdk7yyV85XFyLbOf/HqfPsbNTBrOI2eADHqRryKnS/4PVHAQEdQyRTm
-	cTsSyKmszWNGxYQNJ6j4l+CUIdHhtq+jfX1aBArUHJmK58tNTibxVtJJG4LxzAWfE7YkezeRXqD
-	Ln94SpRT4p/31mPTt+jP2Mrd5vIMAM1nKiJFFW6MrCcKpX+LKHTO9MkUkTzFd24R65P17uCp/4C
-	EaHL/lPB/on3Pfw6sfQZ4vvA=
-X-Google-Smtp-Source: AGHT+IGh6QFynq+YuUMFZqTG/73Ufan/2rkYRYNy6qC4rW91iir86PkvuJN/O02OksGF7UPuPg4WFQ==
-X-Received: by 2002:a05:6a00:1407:b0:742:a77b:8c3 with SMTP id d2e1a72fcca58-747b0c72ba6mr275550b3a.4.1748476901844;
-        Wed, 28 May 2025 17:01:41 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747affafaebsm165546b3a.87.2025.05.28.17.01.40
+        d=1e100.net; s=20230601; t=1748477051; x=1749081851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+ZfYC+HxLPw3qSKUcJstolHkzilJWLIqOV2x8aXzBY=;
+        b=dCu8Ke4P1pJTSAEORqgRxZyaF/orAG9MjIgZVbl3Qmob3kXFbRAKPhhyK/tHTFmVYd
+         1pryQeLQED2IuqNBdsYg4NcjIArsJgWN+jORiK8v6pKFrhuof+Ka9K2HnbAnRDE5Idht
+         yzMD2NRnNA2sFlvppt57KXQWFRdehzR8uFK4iM8J1i036k+GQfX58ZJ+jXCqZn8T3wyz
+         KCzjroGMlADlJPVUDLJSoumtxFppWjiEWkEpDGwfys9QeKKYPRjp10UvcciMA7Cct6bE
+         67tUvLOJburxc9vdMk8biEoBmcQTssw6uLrnPXrC0g5MkJm3Shrkoqtb9m2O6CN+lloJ
+         7dAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUceWSew3fyvT6y73TeLe/ZgpEAoaPAU88JPSCtCepQEYreObvuLUdYozcwDIfYUtYpUMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb2FykQF4z53EF6F95h8u13RX6ILWL9x2XIRWxipDOKBRRSEpT
+	U8vOcPJwwL8t1Z1ezN/H2jXy+5jC7oZ0d6Ujs34yxT8/2ARksVPm7RAdXo2CcA==
+X-Gm-Gg: ASbGnctUBGGwcyYh346nOBXziVZPEm/1ONOh8nWaKu2siQQ+OXmHB8QEDVekXH6PMgH
+	Z28WqMLsyRV4U2rOHIWxcZ4QFTDREbRc5M+v4XnumNWSqo+VrBRQdodKfKyc7LnJ2W1IrTmr7eJ
+	boO74C07zBzcbLCAfhrkjWUVzK4tr5Ge20LiWsiJqPfJCRtDOf2UyO6uCc9e3+E05J8AT0fPOUU
+	RBDLgUUkejFCFxwsM1nENJdEyFwsckzkIPXseOnUc514uZpRCxrj73DYsAnh2HlC7F/j1prMNaf
+	HSFRzxZO6gJUe3xgQh4bxbqh7DT8UE0mv1wAXlwPwQvup+uj3diy
+X-Google-Smtp-Source: AGHT+IFIsUJXzE6cpHqD9iAzsUlj4Z9xIb0cR6MAJH+p4Bq6pd53TrwevVEtUuSFDeR4I7Zaa/H3Zw==
+X-Received: by 2002:a17:903:1b6d:b0:231:f064:aae8 with SMTP id d9443c01a7336-23414fc7276mr285356495ad.45.1748477050862;
+        Wed, 28 May 2025 17:04:10 -0700 (PDT)
+Received: from gmail.com ([98.97.34.246])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bc86c2sm1587855ad.43.2025.05.28.17.04.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 17:01:41 -0700 (PDT)
-Date: Wed, 28 May 2025 17:01:38 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: niklas.soderlund@ragnatech.se, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: rtsn: Fix a null pointer dereference in
- rtsn_probe()
-Message-ID: <aDej4pD_ZzB8ZQdP@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Haoxiang Li <haoxiang_li2024@163.com>,
-	niklas.soderlund@ragnatech.se, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-References: <20250524075825.3589001-1-haoxiang_li2024@163.com>
+        Wed, 28 May 2025 17:04:10 -0700 (PDT)
+Date: Wed, 28 May 2025 17:04:05 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
+	jakub@cloudflare.com, zijianzhang@bytedance.com,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next v3 2/4] skmsg: implement slab allocator cache
+ for sk_msg
+Message-ID: <20250529000348.upto3ztve36ccamv@gmail.com>
+References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
+ <20250519203628.203596-3-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,39 +90,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250524075825.3589001-1-haoxiang_li2024@163.com>
+In-Reply-To: <20250519203628.203596-3-xiyou.wangcong@gmail.com>
 
-On Sat, May 24, 2025 at 03:58:25PM +0800, Haoxiang Li wrote:
-> Add check for the return value of rcar_gen4_ptp_alloc()
-> to prevent potential null pointer dereference.
-
-Was the null deref observed in the wild? Asking because I am
-wondering if this is clean up instead of a Fixes ?
-
-> Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+On 2025-05-19 13:36:26, Cong Wang wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+> 
+> Optimizing redirect ingress performance requires frequent allocation and
+> deallocation of sk_msg structures. Introduce a dedicated kmem_cache for
+> sk_msg to reduce memory allocation overhead and improve performance.
+> 
+> Reviewed-by: Cong Wang <cong.wang@bytedance.com>
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
 > ---
->  drivers/net/ethernet/renesas/rtsn.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  include/linux/skmsg.h | 21 ++++++++++++---------
+>  net/core/skmsg.c      | 28 +++++++++++++++++++++-------
+>  net/ipv4/tcp_bpf.c    |  5 ++---
+>  3 files changed, 35 insertions(+), 19 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-> index 6b3f7fca8d15..f5df3374d279 100644
-> --- a/drivers/net/ethernet/renesas/rtsn.c
-> +++ b/drivers/net/ethernet/renesas/rtsn.c
-> @@ -1260,6 +1260,10 @@ static int rtsn_probe(struct platform_device *pdev)
->  	priv->pdev = pdev;
->  	priv->ndev = ndev;
->  	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
-> +	if (!priv->ptp_priv) {
-> +		ret = -ENOMEM;
-> +		goto error_free;
-> +	}
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index d6f0a8cd73c4..bf28ce9b5fdb 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -121,6 +121,7 @@ struct sk_psock {
+>  	struct rcu_work			rwork;
+>  };
 >  
->  	spin_lock_init(&priv->lock);
->  	platform_set_drvdata(pdev, priv);
-> -- 
-> 2.25.1
-> 
-> 
+> +struct sk_msg *sk_msg_alloc(gfp_t gfp);
+>  int sk_msg_expand(struct sock *sk, struct sk_msg *msg, int len,
+>  		  int elem_first_coalesce);
+>  int sk_msg_clone(struct sock *sk, struct sk_msg *dst, struct sk_msg *src,
+> @@ -143,6 +144,8 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>  		   int len, int flags);
+>  bool sk_msg_is_readable(struct sock *sk);
+>  
+> +extern struct kmem_cache *sk_msg_cachep;
+> +
+>  static inline void sk_msg_check_to_free(struct sk_msg *msg, u32 i, u32 bytes)
+>  {
+>  	WARN_ON(i == msg->sg.end && bytes);
+> @@ -319,6 +322,13 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+>  	kfree_skb(skb);
+>  }
+>  
+> +static inline void kfree_sk_msg(struct sk_msg *msg)
+> +{
+> +	if (msg->skb)
+> +		consume_skb(msg->skb);
+> +	kmem_cache_free(sk_msg_cachep, msg);
+> +}
+> +
+>  static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+>  				      struct sk_msg *msg)
+>  {
+> @@ -330,7 +340,7 @@ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+>  		ret = true;
+>  	} else {
+>  		sk_msg_free(psock->sk, msg);
+> -		kfree(msg);
+> +		kfree_sk_msg(msg);
+
+Isn't this a potential use after free on msg->skb? The sk_msg_free() a
+line above will consume_skb() if it exists and its not nil set so we would
+consume_skb() again?
+
+>  		ret = false;
+>  	}
+>  	spin_unlock_bh(&psock->ingress_lock);
+> @@ -378,13 +388,6 @@ static inline bool sk_psock_queue_empty(const struct sk_psock *psock)
+>  	return psock ? list_empty(&psock->ingress_msg) : true;
+>  }
+>  
+> -static inline void kfree_sk_msg(struct sk_msg *msg)
+> -{
+> -	if (msg->skb)
+> -		consume_skb(msg->skb);
+> -	kfree(msg);
+> -}
+> -
+>  static inline void sk_psock_report_error(struct sk_psock *psock, int err)
+>  {
+>  	struct sock *sk = psock->sk;
+> @@ -441,7 +444,7 @@ static inline void sk_psock_cork_free(struct sk_psock *psock)
+>  {
+>  	if (psock->cork) {
+>  		sk_msg_free(psock->sk, psock->cork);
+> -		kfree(psock->cork);
+> +		kfree_sk_msg(psock->cork);
+
+Same here.
+
+>  		psock->cork = NULL;
+>  	}
+>  }
 
