@@ -1,434 +1,297 @@
-Return-Path: <netdev+bounces-194398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F31DAC9371
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:22:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B49B2AC93B3
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF3E3A570A
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:22:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89DC41C2117D
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA501AE877;
-	Fri, 30 May 2025 16:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1FF7080C;
+	Fri, 30 May 2025 16:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ivGrwFXI"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="n0+a853q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3390D258A
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 16:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A713B258A
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 16:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748622153; cv=none; b=V67b7weqNaCsf20l1YykDtKSBX7OJas0Cb7Rtc3oh70UWT3TbR7yGNyu6WIRIaBfBTf8GGzLLRrJFWyHluMt7cPKBSqli2ciiqpdoFCtJy9msTxcCW/BEIuBcDPo/x8lu7QkYViYxWoD7bbJGNVEHwlFNz5uRMREh/xO4QophPA=
+	t=1748623030; cv=none; b=myrRHjHY+X3EX0AtCbwqQrkvt4EskIjzyHaSqOp/ckg48gYRRrqjGo2BEYJlH7HURKeJerjQGtzxokk1G5sD+8hKXXzT8JvvcmZbsn1jJHbvL81PLQ+Q54o4b5kfK+lHb/AM2baFz02ZbEgBJmpSQ2mKYxPUFNqk1UF7BnOG8n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748622153; c=relaxed/simple;
-	bh=ZBGTax/rLGYBtNFTsE9QQBLSrJoNOS5o8XO3INA0fdY=;
+	s=arc-20240116; t=1748623030; c=relaxed/simple;
+	bh=g7fkwLGMv+mzhppO+BHfSVjA5l2VvhsaNP50/Zxs2mI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LWsclWzjfUuUxlWp+BW4jX7SX/DEHCdGJtAAw6at9nvsLXP6AAyOcCU2NZOjI9nAMgLziPeuk0dfvSFV+9pEihgZkQZLF3qTDNj1u+5HnncKCWQ2CPfTPJXHGraB9LQX9mJADNy3Kt+CDp9xPlR0+Vgb83YoIFRx+N5ukNbOkrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ivGrwFXI; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2348ac8e0b4so183975ad.1
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 09:22:30 -0700 (PDT)
+	 To:Cc:Content-Type; b=ANVlW3KIgiizu72mvTcNBhpm8dskeKF5pavaUOI81QnLWaDtrF8SoQ1dn8uc3HioIEsnr4gGmEQgVxgD7WRFs1yFMTeQ+SroUa1g3RTEwcJNr/C24o8J0kQQJV/Bpr18medrOoMbDV7ILFFCa3a61igqcB/zqcFcbXcNQ4SlBrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=n0+a853q; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af51596da56so1694203a12.0
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 09:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748622150; x=1749226950; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1748623028; x=1749227828; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vf6Yud61p5FojbXNBMIgSMyrP3LQYQ4cOutBnHeT7EE=;
-        b=ivGrwFXIrSY9qKABLSoGm7ITyeJOsXL0RdoD36abLhdWnKia+pH+YIsdTOXXie8UtO
-         POVKVg3KMlbj9fzknILIutDZC0DuHHs3wvo7XilgvhR8fFKyFd3IpMhImEqAnXxaOAUR
-         kIPF9lthSo9X2z9nUNFzEu2nuQ5gtI86SO8kEnd9+BiZfQqL4eV8IfnMS0U7ufAIXuEm
-         Bknv8BMjNAbTwOfJaUEbYqfF7sIXxllSS/ZkG+DtFYeU8Fc8k/q1JuueaxQdp3NMmxUs
-         gIxR4yNtD+B5mbfZkFZt38E07xVJjKzSG0DOum59YUkZE2sYxQNBBm77d2Wx0NgLHFCm
-         1KEw==
+        bh=JRJcsm1AScvW7I5Z5uTYqr6HQx1FJeXQJB12M7RkdIc=;
+        b=n0+a853qzwYELz8t3diJouRtaFywIJhXQsBHY/gVOy1BW0Y9iJkmKfKrd8LsyDuylO
+         Ubplus+9GjLpX+q0PyhPunskP0GlKCPSUVceixPNv5LO6nuoM9OomHFaMtCfLGFxp02Y
+         TxOJ7bg6QifXEssalPoswJqRG5/u9MAfnlnOPR2ARSi4Bs0Yn1tV2F+OzOcJHPDVUva4
+         IEfukC9rnOYxEdr4xZ0s2mcL+AOD6t6Jj1pAUXDnTeCvoogt9epdoQDKd38tF9YW//Jh
+         x7bIJc93ZXjttL/5SM1aXlz1s9ejCQqyLA14zUY5il1UNOcDHXXAPgroKeV1gebCbZSV
+         y2ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748622150; x=1749226950;
+        d=1e100.net; s=20230601; t=1748623028; x=1749227828;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vf6Yud61p5FojbXNBMIgSMyrP3LQYQ4cOutBnHeT7EE=;
-        b=djGxHaOtDfqU2oSlhTIP0XNGT8KXecmrq0xNM07eJkdEo8LTO22NLwqahFvQqbG4kF
-         QdPhtSMXAMpAqdJkY6bbkzkkyMJLDDSofo2/PuKZW6KmB+HKyGNQUlYgVxJTPM57Gv5u
-         wLMK5yv+XnXjl+ohFsFYM7KjV+OVV9+gN3v262AYryZUbUKnpSuzw1PH8RXR/43CYrzC
-         +yrsaiQITekzm8cGAzHZLH612xK94sNNI6PJjdq9gotsP7xHFIUqnECpr79bWpNqP3mI
-         kWtvrq1qnpe83LW1a4hxiw19WjWWdDXqlUV7oSXWsPzb6mB0mgNtQnaw7bmvgQJtDA0K
-         9IOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXP9/YFGRA43u7lQTPTA2zMfqCMLO703rzK+wsn0lozVUy8bHPRbbAT4OXbgvDHLOiXAKM+aH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKz5HENWIaOtHsINvPg6mL5Xr0GM20Fvq5jndsScUacpQ0joK7
-	2Wfxloq+BD7xp8lXm0x//PO/Mxg5UDvGFu1SSM71Er6aYV0+gjwU5prPs1Yjo0O9GUlhL4+vscv
-	dFF8gFLY9/gV6xHh4bpUZCp48A5Ia4mRsT3cns1ko
-X-Gm-Gg: ASbGncsgV/8N23rowfgwjUs6TiH0gq7+pGwmbNd8Al49qUfIaihOOdQ/juYRBcFacOG
-	WoBfTalmW3Vfik5boUSoi6HNmNzilnoSQ7quVXyOaB5bBJFYdaqg4Mq0DjscdYlcyfREserh8Ad
-	K8gYV+idrerb81/R9KGD6vxlKD8CKMNOnBJAxOouw5JD4Ch2/Qjf6l1bM=
-X-Google-Smtp-Source: AGHT+IEtiJzkhMrbT4HUzOjYjtF5aql9Xb8hdrSN3Cti84xfY4Vb6+gwtO/xOvIq6bw5m4mFgqm8TBezlJPtYjT+ba0=
-X-Received: by 2002:a17:903:32c2:b0:215:f0c6:4dbf with SMTP id
- d9443c01a7336-2352dfcade3mr3925465ad.14.1748622149915; Fri, 30 May 2025
- 09:22:29 -0700 (PDT)
+        bh=JRJcsm1AScvW7I5Z5uTYqr6HQx1FJeXQJB12M7RkdIc=;
+        b=d8rlpj5o5zgnKNru4UEbfQqPWdvTemrjVXndCsAkojb97nkBDG6HA+25RYpoP4LMV5
+         nMT20BxhtRiPM5uinxCaG68ta6wkaEWFlk/upxPuFQVGncYQcrO82JiXNmAdYaogLfaU
+         dqh6qOosXpYQOPNs3dOERN6T8lqQm4YURNND861TSYSKePlK23D3P7VHpApVO8XlKUqu
+         BSmu1MufjVb1cl3cnrya+Osza2DAnbCQe9G4IPMdbKHqT4byudxbzj/MDcy6gDZy1DQH
+         u4kULbsem5hR01Rk6qc013b1zQkNFwQcRWKNJAjPaAm6WltjucvIxTElZS3glyb3pmw/
+         Lp/Q==
+X-Gm-Message-State: AOJu0YwkvyyNtZ8e1FlCPSiIzgtn2Gn/PERFv5d2MpasrlDOx5xIp76r
+	slQ2oUxHBtibypuv9G16e7Fah0AVyYTQ10CXPaPo3n5TVPnhUdqcqJQcF5g/NCt2B6q8JA7a6fq
+	TYpJaR5Uc6geQ5VqA+1Ci8qit9h8UTs1bz9fDlvSN
+X-Gm-Gg: ASbGnctwac9NRQ5vsJy5NO+GuylDfNhNGbgLn5T/5jwh9BNGPokcW9fJUhFv3o+VdQc
+	9lJPHjbsFESiYqnMikdz6vsTT/kZwVf0skrsesHJihDzGainmz2EO89rKg59MQHa3V5KY5G3aYd
+	nYi9gyoW4ygzdlQANMFdjNLKgvQzW5yO4=
+X-Google-Smtp-Source: AGHT+IGshS70tGTv8p/qrzUJDfqSYWtOSG7beL7J4ThTs08zZcaHpeERUmGBvrqVTqAkRK5PTc3ANA6BfaAsjdcImkg=
+X-Received: by 2002:a05:6a21:6d86:b0:210:1c3a:6804 with SMTP id
+ adf61e73a8af0-21ad9764680mr7766829637.31.1748623027720; Fri, 30 May 2025
+ 09:37:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <770012.1748618092@warthog.procyon.org.uk>
-In-Reply-To: <770012.1748618092@warthog.procyon.org.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 30 May 2025 09:22:17 -0700
-X-Gm-Features: AX0GCFv_9CblvKqE59Fn0enXIWdu9lK-Q9GgqjjgMg5PEL2NBfaZtCi1kNaSC5g
-Message-ID: <CAHS8izMMU8QZrvXRiDjqwsBg_34s+dhvSyrU7XGMBuPF6eWyTA@mail.gmail.com>
-Subject: Re: Device mem changes vs pinning/zerocopy changes
-To: David Howells <dhowells@redhat.com>
-Cc: willy@infradead.org, hch@infradead.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
+ <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com>
+ <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io>
+ <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com>
+ <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io>
+ <q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=@willsroot.io>
+ <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
+ <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
+ <CAM0EoMke7ar8O=aJeZy7_XYMGbgES-X2B19R83Qcihxv4OeG8g@mail.gmail.com>
+ <0x7zdcWIGm0NWid6NxFLpYOtO0Z1g6UCzrNnyVZ6hRvWr5rU6b6hi5Yz8dD7_dyUOmvJfkR8LV2_TrDf7uACFgGshyfxiRWgxjWer41EZVY=@willsroot.io>
+ <CAM0EoM=wfobw0DQbOYx+QDmDEpQKT-WFjdiBkbquUNP1G2==9A@mail.gmail.com>
+In-Reply-To: <CAM0EoM=wfobw0DQbOYx+QDmDEpQKT-WFjdiBkbquUNP1G2==9A@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 30 May 2025 12:36:56 -0400
+X-Gm-Features: AX0GCFuDVBugH9MyJemzAgGUJ0s1jkoD9a4S7xPaIZGKfCdIqv_Y8eUpOQSttPE
+Message-ID: <CAM0EoMnsPkXCh6xfT4Cvv4jFoO0LkCHGewt5O+EWh=WZAFTVWw@mail.gmail.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+To: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Davide Caratti <dcaratti@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 30, 2025 at 8:15=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
+On Fri, May 30, 2025 at 11:50=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
 >
-> Hi Mina,
->
-> I've seen your transmission-side TCP devicemem stuff has just gone in and=
- it
-> conflicts somewhat with what I'm trying to do.  I think you're working on=
- the
-> problem bottom up and I'm working on it top down, so if you're willing to
-> collaborate on it...?
->
-
-Hi David! Yes, very happy to collaborate. FWIW, my initial gut feeling
-is that the work doesn't conflict that much. The tcp devmem
-netmem/net_iov stuff is designed to follow the page stuff, and as the
-usage of struct page changes we're happy moving net_iovs and netmems
-to do the same thing. My read is that it will take a small amount of
-extra work, but there are no in-principle design conflicts, at least
-AFAICT so far.
-
-> So, to summarise what we need to change (you may already know all of this=
-):
->
->  (*) The refcount in struct page is going to go away.  The sk_buff fragme=
-nt
->      wrangling code, however, occasionally decides to override the zeroco=
-py
->      mode and grab refs on the pages pointed to by those fragments.  sk_b=
-uffs
->      *really* want those page refs - and it does simplify memory handling=
-.
->      But.
->
-
-I believe the main challenge here is that there are many code paths in
-the net stack that expect to be able to grab a ref on skb frags. See
-all the callers of skb_frag_ref/skb_frag_unref:
-
-tcp_grow_skb, __skb_zcopy_downgrade_managed, __pskb_copy_fclone,
-pskb_expand_head, skb_zerocopy, skb_split, pksb_carve_inside_header,
-pskb_care_inside_nonlinear, tcp_clone_payload, skb_segment.
-
-I think to accomplish what you're describing we need to modify
-skb_frag_ref to do something else other than taking a reference on the
-page or net_iov. I think maybe taking a reference on the skb itself
-may be acceptable, and the skb can 'guarantee' that the individual
-frags underneath it don't disappear while these functions are
-executing.
-
-But devmem TCP doesn't get much in the way here, AFAICT. It's really
-the fact that so many of the networking code paths want to obtain page
-refs via skb_frag_ref so there is potentially a lot of code to touch.
-
->      Anyway, we need to stop taking refs where possible.  A fragment may =
-in
->      future point to a sequence of pages and we would only be getting a r=
-ef on
->      one of them.
->
->  (*) Further, the page struct is intended to be slimmed down to a single =
-typed
->      pointer if possible, so all the metadata in the net_iov struct will =
-have
->      to be separately allocated.
->
-
-Yes, I'm already collaborating with Byungchul on this, and we're
-making great progress. I think this may be close to getting fully
-reviewed:
-
-https://lore.kernel.org/netdev/20250509115126.63190-1-byungchul@sk.com/
-
-According to his cover letter, he's actually finding the work that I
-did with netmem/net_iovs useful for him.
-
->  (*) Currently, when performing MSG_ZEROCOPY, we just take refs on the us=
-er
->      pages specified by the iterator but we need to stop doing that.  We =
-need
->      to call GUP to take a "pin" instead (and must not take any refs).  T=
-he
->      pages we get access to may be folio-type, anon-type, some sort of de=
-vice
->      type.
->
-
-This also doesn't conflict with devmem changes, AFAICT. Currently in
-devmem we take references on the user devmem only because pages also
-take a reference on the user pages (we mirror devmem and pages to keep
-the netstack uniform without excessive mem-type checks). If the code
-path for  zerocopy_fill_skb_from_iter doesn't need to take ref on the
-pages, we'll just migrate  zerocopy_fill_skb_from_devmem to do the
-same thing.
-
->  (*) It would be good to do a batch lookup of user buffers to cut down on=
- the
->      number of page table trawls we do - but, on the other hand, that mig=
-ht
->      generate more page faults upfront.
->
->  (*) Splice and vmsplice.  If only I could uninvent them...  Anyway, they=
- give
->      us buffers from a pipe - but the buffers come with destructors and s=
-hould
->      not have refs taken on the pages we might think they have, but use t=
-he
->      destructor instead.
->
-
-The above 2 points are orthogonal to devmem. There is no page table
-walks, splice, or vmsplice with devmem. We just have to make sure that
-the generic changes you're implementing also work with the devmem
-paths. I can test your changes and point if I see any issue, but I
-don't see a conflict in-principle.
-
->  (*) The intention is to change struct bio_vec to be just physical addres=
-s and
->      length, with no page pointer.  You'd then use, say, kmap_local_phys(=
-) or
->      kmap_local_bvec() to access the contents from the cpu.  We could the=
-n
->      revert the fragment pointers to being bio_vecs.
->
-
-Ok, this part conflicts a bit, maybe. skb_frag_ref no longer uses
-struct bio_vec. I merged that change before 6.12 kernel, it's not a
-very recent change:
-
-https://lore.kernel.org/netdev/20240214223405.1972973-3-almasrymina@google.=
-com/
-
-But, AFAICT, skb_frag_t needs a struct page inside of it, not just a
-physical address. skb_frags can mmap'd into userspace for TCP
-zerocopy, see tcp_zerocopy_vm_insert_batch (which is a very old
-feature, it's not a recent change). There may be other call paths in
-the net stack that require a full page and just a physical address
-will do. (unless somehow we can mmap a physical address to the
-userspace).
-
->  (*) Kernel services, such as network filesystems, can't pass kmalloc()'d=
- data
->      to sendmsg(MSG_SPLICE_PAGES) because slabs don't have refcounts and,=
- in
->      any case, the object lifetime is not managed by refcount.  However, =
-if we
->      had a destructor, this restriction could go away.
->
-
-This also sounds orthogonal to devmem.
-
->
-> So what I'd like to do is:
->
->  (1) Separate fragment lifetime management from sk_buff.  No more wanglin=
-g of
->      refcounts in the skbuff code.  If you clone an skb, you stick an ext=
-ra
->      ref on the lifetime management struct, not the page.
->
-
-Agreed, and AFAICT devmem doesn't get in the way. Let me know if you
-disagree or are seeing something different.
-
->  (2) Create a chainable 'network buffer' struct, e.g.:
->
->         enum net_txbuf_type {
->                 NET_TXBUF_BUFFERED,     /* Buffered copy of data */
->                 NET_TXBUF_ZCOPY_USER,   /* Zerocopy of user buffers */
->                 NET_TXBUF_ZCOPY_KERNEL, /* Zerocopy of kernel buffers */
->         };
->
->         struct net_txbuf {
->                 struct net_txbuf        next;
->                 struct mmpin            mm_pin;
->                 unsigned int            start_pos;
->                 unsigned int            end_pos;
->                 unsigned int            extracted_to;
->                 refcount_t              ref;
->                 enum net_txbuf_type     type;
->                 u8                      nr_used;
->                 bool                    wmem_charged;
->                 bool                    got_copied;
->                 union {
->                         /* For NET_TXBUF_BUFFERED: */
->                         struct {
->                                 void            *bufs[16];
->                                 u8              bufs_orders[16];
->                                 bool            last_buf_freeable;
->                         };
->                         /* For NET_TXBUF_ZCOPY_*: */
->                         struct {
->                                 struct sock     *sk;
->                                 struct sk_buff  *notify;
->                                 msg_completion_t completion;
->                                 void            *completion_data;
->                                 struct bio_vec  frags[12];
->                         };
->                 };
->         };
->
->      (Note this is very much still a WiP and very much subject to change)
->
->      So how I envision it working depends on the type of flow in the sock=
-et.
->      For the transmission side of streaming sockets (e.g. TCP), the socke=
-t
->      maintains a single chain of these.  Each txbuf is of a single type, =
-but
->      multiple types can be interleaved.
->
->      For non-ZC flow, as data is imported, it's copied into pages attache=
-d to
->      the current head txbuf of type BUFFERED, with more pages being attac=
-hed
->      as we progress.  Successive writes just keep adding to the space in =
-the
->      latest page added and each skbuff generated pins the txbuf it starts=
- at
->      and each txbuf pins its successor.
->
->      As skbuffs are consumed, they unpin the root txbuf.  However, this c=
-ould
->      leave an awful lot of memory pinned for a long time, so I would miti=
-gate
->      this in two ways: firstly, where possible, keep track of the transmi=
-tted
->      byte position and progressively destruct the txbuf; secondly, if we
->      completely use up a partially filled txbuf then reset the queue.
->
->      An skbuff's frag list then has a bio_vec[] that refers to fragments =
-of
->      the buffers recorded in the txbuf chain.  An skbuff may span multipl=
+> On Fri, May 30, 2025 at 10:49=E2=80=AFAM William Liu <will@willsroot.io> =
+wrote:
+> >
+> > On Friday, May 30th, 2025 at 2:14 PM, Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > >
+> > >
+> > > On Thu, May 29, 2025 at 11:23=E2=80=AFAM William Liu will@willsroot.i=
+o wrote:
+> > >
+> > > > On Wednesday, May 28th, 2025 at 10:00 PM, Jamal Hadi Salim jhs@moja=
+tatu.com wrote:
+> > > >
+> > > > > Hi,
+> > > > > Sorry for the latency..
+> > > > >
+> > > > > On Sun, May 25, 2025 at 4:43=E2=80=AFPM William Liu will@willsroo=
+t.io wrote:
+> > > > >
+> > > > > > I did some more testing with the percpu approach, and we realiz=
+ed the following problem caused now by netem_dequeue.
+> > > > > >
+> > > > > > Recall that we increment the percpu variable on netem_enqueue e=
+ntry and decrement it on exit. netem_dequeue calls enqueue on the child qdi=
+sc - if this child qdisc is a netem qdisc with duplication enabled, it coul=
+d duplicate a previously duplicated packet from the parent back to the pare=
+nt, causing the issue again. The percpu variable cannot protect against thi=
+s case.
+> > > > >
+> > > > > I didnt follow why "percpu variable cannot protect against this c=
+ase"
+> > > > > - the enqueue and dequeue would be running on the same cpu, no?
+> > > > > Also under what circumstances is the enqueue back to the root goi=
+ng to
+> > > > > end up in calling dequeue? Did you test and hit this issue or its=
+ just
+> > > > > theory? Note: It doesnt matter what the source of the skb is as l=
+ong
+> > > > > as it hits the netem enqueue.
+> > > >
+> > > > Yes, I meant that just using the percpu variable in enqueue will no=
+t protect against the case for when dequeue calls enqueue on the child. Bec=
+ause of the child netem with duplication enabled, packets already involved =
+in duplication will get sent back to the parent's tfifo queue, and then the=
+ current dequeue will remain stuck in the loop before hitting an OOM - refe=
+r to the paragraph starting with "In netem_dequeue, the parent netem qdisc'=
+s t_len" in the first email for additional clarification. We need to know w=
+hether a packet we dequeue has been involved in duplication - if it has, we=
+ increment the percpu variable to inform the children netem qdiscs.
+> > > >
+> > > > Hopefully the following diagram can help elucidate the problem:
+> > > >
+> > > > Step 1: Initial enqueue of Packet A:
+> > > >
+> > > > +----------------------+
+> > > > | Packet A |
+> > > > +----------------------+
+> > > > |
+> > > > v
+> > > > +-------------------------+
+> > > > | netem_enqueue |
+> > > > +-------------------------+
+> > > > |
+> > > > v
+> > > > +-----------------------------------+
+> > > > | Duplication Logic (percpu OK): |
+> > > > | =3D> Packet A, Packet B (dup) |
+> > > > +-----------------------------------+
+> > > > | <- percpu variable for netem_enqueue
+> > > > v prevents duplication of B
+> > > > +-------------+
+> > > > | tfifo queue |
+> > > > | [A, B] |
+> > > > +-------------+
+> > > >
+> > > > Step 2: netem_dequeue processes Packet B (or A)
+> > > >
+> > > > +-------------+
+> > > > | tfifo queue |
+> > > > | [A] |
+> > > > +-------------+
+> > > > |
+> > > > v
+> > > > +----------------------------------------+
+> > > > | netem_dequeue pops B in tfifo_dequeue |
+> > > > +----------------------------------------+
+> > > > |
+> > > > v
+> > > > +--------------------------------------------+
+> > > > | netem_enqueue to child qdisc (netem w/ dup)|
+> > > > +--------------------------------------------+
+> > > > | <- percpu variable in netem_enqueue prologue
+> > > > | and epilogue does not stop this dup,
+> > > > v does not know about previous dup involvement
+> > > > +--------------------------------------------------------+
+> > > > | Child qdisc duplicates B to root (original netem) as C |
+> > > > +--------------------------------------------------------+
+> > > > |
+> > > > v
+> > > >
+> > > > Step 3: Packet C enters original root netem again
+> > > >
+> > > > +-------------------------+
+> > > > | netem_enqueue (again) |
+> > > > +-------------------------+
+> > > > |
+> > > > v
+> > > > +-------------------------------------+
+> > > > | Duplication Logic (percpu OK again) |
+> > > > | =3D> Packet C, Packet D |
+> > > > +-------------------------------------+
+> > > > |
+> > > > v
+> > > > .....
+> > > >
+> > > > If you increment a percpu variable in enqueue prologue and decremen=
+t in enqueue epilogue, you will notice that our original repro will still t=
+rigger a loop because of the scenario I pointed out above - this has been t=
+ested.
+> > > >
+> > > > From a current view of the codebase, netem is the only qdisc that c=
+alls enqueue on its child from its dequeue. The check we propose will only =
+work if this invariant remains.
+> > > >
+> > > > > > However, there is a hack to address this. We can add a field in=
+ netem_skb_cb called duplicated to track if a packet is involved in duplica=
+ted (both the original and duplicated packet should have it marked). Right =
+before we call the child enqueue in netem_dequeue, we check for the duplica=
+ted value. If it is true, we increment the percpu variable before and decre=
+ment it after the child enqueue call.
+> > > > >
+> > > > > is netem_skb_cb safe really for hierarchies? grep for qdisc_skb_c=
+b
+> > > > > net/sched/ to see what i mean
+> > > >
+> > > > We are not using it for cross qdisc hierarchy checking. We are only=
+ using it to inform a netem dequeue whether the packet has partaken in dupl=
+ication from its corresponding netem enqueue. That part seems to be private=
+ data for the sk_buff residing in the current qdisc, so my understanding is=
+ that it's ok.
+> > > >
+> > > > > > This only works under the assumption that there aren't other qd=
+iscs that call enqueue on their child during dequeue, which seems to be the=
+ case for now. And honestly, this is quite a fragile fix - there might be o=
+ther edge cases that will cause problems later down the line.
+> > > > > >
+> > > > > > Are you aware of other more elegant approaches we can try for u=
+s to track this required cross-qdisc state? We suggested adding a single bi=
+t to the skb, but we also see the problem with adding a field for a one-off=
+ use case to such a vital structure (but this would also completely stomp o=
+ut this bug).
+> > > > >
+> > > > > It sounds like quite a complicated approach - i dont know what th=
 e
->      txbufs and a txbuf may provision multiple skbuffs.
+> > > > > dequeue thing brings to the table; and if we really have to deque=
+ue to
+> > > >
+> > > > Did what I say above help clarify what the problem is? Feel free to=
+ let me know if you have more questions, this bug is quite a nasty one.
+> > >
+> > >
+> > > The text helped a bit, but send a tc reproducer of the issue you
+> > > described to help me understand better how you end up in the tfifo
+> > > which then calls the enqueu, etc, etc.
+> >
+> > The reproducer is the same as the original reproducer we reported:
+> > tc qdisc add dev lo root handle 1: netem limit 1 duplicate 100%
+> > tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 1=
+00% delay 1us reorder 100%
+> > ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
+> >
+> > We walked through the issue in the codepath in the first email of this =
+thread at the paragraph starting with "The root cause for this is complex. =
+Because of the way we setup the parent qdisc" - please let me know if any a=
+dditional clarification is needed for any part of it.
+> >
 >
->      For the transmission side of datagram sockets (e.g. UDP) where the
->      messages may complete out of order, I think I would give each datagr=
-am
->      its own series of txbufs, but link the tails together to manage the
->      SO_EE_ORIGIN_ZEROCOPY notification generation if dealing with usersp=
-ace.
->      If dealing with the kernel, there's no need to link them together as=
- the
->      kernel can provide a destructor for each datagram.
->
+> Ok, thanks - I thought it was something different. I actually did run
+> that one but didnt notice the infinite requeueing you mention but
+> perhaps i wasnt paying attention to the stats closely.
+> Let me just run it again in about an hour -  it will provide me clarity.
 
-To be honest, I didn't follow the entirety of point #2 here, but the
-problem is not related to devmem.
+Sorry - a little distracted but will get to it before the end of the day.
+Can you test if possible with something like:
 
-Is struct net_txbuf intended to replace struct sk_buff in the tx path
-only? If so, I'm not sure that works. Currently TX and RX memory share
-a single data structure (sk_buff), and I believe that is critical.
-Because RX skbs can be forwarded to TX and vice-versa. You will need
-to implement an net_txbuf_to_skb helper and vice versa if you go this
-route, no? So I think, maybe, instead of introducing a new struct, you
-have to make the modifications you envision to struct sk_buff itself?
+|-+ netem as root duplicating
+|--+ something like cake or fq
+|----+ netem duplication here
 
- >  (3) When doing zerocopy from userspace, do calls to GUP to get batches =
-of
->      non-contiguous pages into a bio_vec array.
->
->  (4) Because AF_UNIX and the loopback driver transfer packets from the
->      transmission queue of one socket down into the reception queue of
->      another, the use of txbufs would also need to extend onto the receiv=
-e
->      side (and so "txbufs" would be a misnomer).
->
-
-OK, you realize that TX packets can be forwarded to RX. The opposite
-is true, RX can be forwarded to TX. And it's not just AF_UNIX and
-loopback. Packets can be forwarded via ip forwarding, and tc, and
-probably another half dozen features in the net stack I don't know
-about. I think you need to modify the existing sk_buff. I think adding
-a new struct and migrating the entire net stack to use that is a bit
-too ambitious. But up to you. Just my 2 cents here.
-
->      When receiving a packet, a txbuf would need to be allocated and the
->      received buffers attached to it.  The pages wouldn't necessarily nee=
-d
->      refcounts as the txbuf holds them.  The skbuff holds a ref on the tx=
-buf.
->
->  (5) Cloning an skbuff would involve just taking an extra ref on the firs=
-t
->      txbuf.  Splitting off part of an skbuff would involve fast-forwardin=
-g the
->      txbuf chain for the second part and pinning that.
->
->  (6) I have a chained-bio_vec array concept with iov_iter type for it tha=
-t
->      might make it easier to string together the fragments in a reassembl=
-ed
->      packet and represent it as an iov_iter, thereby allowing us to use c=
-ommon
->      iterator routines for things like ICMP and packet crypto.
->
->  (7) We need to separate net_iov from struct page, and it might make thin=
-gs
->      easier if we do that now, allocating net_iov from a slab.
->
-
-net_iov is already separate from struct page. The only commonality
-they share is that we static_assert the offset of some page pool
-fields are the same in struct page and struct net_iov, but that's it.
-Byungchul is already handling the entire
-netmem_desc-shrink-struct-page in the series I linked to earlier and I
-would say his work is going well.
-
->  (8) Reference the txbuf in a splice and provide a destructor that drops =
-that
->      reference.  For small splices, I'd be very tempted to simply copy th=
-e
->      data.  For splice-out of data that was spliced into an AF_UNIX socke=
-t or
->      zerocopy data that passed through a loopback device, I'm also very
->      tempted to make splice copy at that point.  There's a potential DoS
->      attack whereby someone can endlessly splice tiny bits of a message o=
-r
->      just sit on them, preventing the original provider from recovering i=
-ts
->      memory.
->
->  (9) Make it easy for a network filesystem to create an entire compound
->      message and present it to the socket in a single sendmsg() with a
->      destructor.
->
-> I've pushed my current changes (very incomplete as they are) to:
->
->         https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs=
-.git/log/?h=3Diov-experimental
->
-> I'm writing functions to abstract out the loading of data into the txbuf =
-chain
-> and attach to skbuff.  These can be found in skbuff.c as net_txbuf_*().  =
-I've
-> modified the TCP sendmsg to use them.
->
-
-
---=20
-Thanks,
-Mina
+cheers,
+jamal
 
