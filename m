@@ -1,454 +1,343 @@
-Return-Path: <netdev+bounces-194443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC29AC971E
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:33:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B542AC9741
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9AB517B586
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 326F89E3C75
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B4428467B;
-	Fri, 30 May 2025 21:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8BD28B514;
+	Fri, 30 May 2025 21:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="SC33JufI"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fQFWLOYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEFA283FD5
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A23428A700
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748640731; cv=none; b=AaKHepBICLSMs8AcWPoTsttkU+bxA6njvo7kEWIpKsInPTvs3RPz9Zff3REEU98tnsJHwG3rSEOVLao8J+s3AEkjJp0ck5fVIqaiEr9lHbWFY6RLvnzGTc3nMOr12+GI9Yk8WVjTnzbmhJieLDlcLLl13nd8AA3ntk9Lwhgz/Vs=
+	t=1748641266; cv=none; b=FUiesSi4vn3KU0UkWCUo5LgIy/oRNzLOfiZUtLmw6sEOWkLSKxMM5mlFSLEr9V/oqVCNTsXArfC/UQWWTG1AR4zKKn+8TEeM9Z83ck30/OIQDUI9YCcrli02GQTSfjwy8URRmfDSO5EC5w2CSAK7EsIpyGjLVXNUfTfKxuZZR8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748640731; c=relaxed/simple;
-	bh=o9a+xNCjgudJ5tH89dUv/DqSsAKhhnP8ps7WmXupWJE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SDLCJYIsaye9DirJAbMXxee5zeBy67DYDD5FH81RD+rHxLvJ1sr1u7p7pGnZqZl5hX4E+uadEwkV7a/sTNRmYUCv/XvVVUTc7PGxhkRqhjIa8lYxWTfNLdgquuPR1qxOxrsAupg5WMu38CUgVbT77LG2ASg/dS4vCnZSsHsCuKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=SC33JufI; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b26fabda6d9so250445a12.1
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:32:09 -0700 (PDT)
+	s=arc-20240116; t=1748641266; c=relaxed/simple;
+	bh=ozHE81qJj1rmIelhRBQ5DRKURWfmzq6zSFDX7IJB5xc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CqKXvCPIGlzCNBGqoRBFPD2DSxeKEZowusK1C5qXkxgiIAbpTc05H6c5DftQcTHtr82cygCxDJnZwb+ELTVPxhaT+zjWvVfIn3ePr4DK97LHYkr0JdxAGQoNy6/nFzpSSUDmhYn3FC96ntUbeiaKpOUeFBnaqI46G7g3qUIbq8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fQFWLOYq; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-742b0840d98so1780415b3a.1
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1748640729; x=1749245529; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jsg1Imq3Iaqqerb9v4F36jn+cpZ0N/qMBNajvolmUVA=;
-        b=SC33JufIm42U5Jnwq2PY18GqZtBoycYV0A7Y6PZdBrkqxXVeHvz17b4h37h/TWF5xR
-         ZMzMHItlW2xa+a4+lZAMEY0rLYoW3xAqI2C/LtPuZAssADOVzi7SNeeVLv/7ozA+jfg/
-         uOfq1yGvJbNjLbYXAn0orIvTIlIL4JPApvGku3PJDJiGNJ6/e75jjNLoJ3f6PWuruDKu
-         5SpJ2To3BiWcc//fKXjuv6zvIBBJEKSQGIv1nCLZw8A/y53psC/qUeZEzyn6ZMWFlvfF
-         67doEBVWSo6k42lM7SWW6ltolDcL2o2vfNtAqV3U38o1j/cjM8WnVPcj2WnZqe706F6W
-         5hAg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1748641263; x=1749246063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ozHE81qJj1rmIelhRBQ5DRKURWfmzq6zSFDX7IJB5xc=;
+        b=fQFWLOYqeMAndg/yw/H4fMQb5Di+KpCllNjCePFWP6z4tll0mzW0qlp7XPPpAqW8O4
+         kW/tuL1Oe3II7pAWplAdMRg45+WTFM6tH/QyVoJX9+18tPaO1nGgBhrx/MhK/mJhRHQK
+         V/mSb0iWDu9VbQFe4pYDaoaNmGyLJq+lKY2VwlifEsTHcwUE1U9JIYkePeA55I+FFrD2
+         mjWAxooHXtE4kuw9yrHuKlODL//Vww9SB3FrUp2+y1vZVnjTs3yT2ZW35Wu+MUCf4YW3
+         Unl4CNsErMdsguHPyi6vepzCSMA7RtHey6viPx40L/b6dXkWSRDhfHH6JIumFDuvBpqK
+         s3Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748640729; x=1749245529;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jsg1Imq3Iaqqerb9v4F36jn+cpZ0N/qMBNajvolmUVA=;
-        b=ZTDE0XZPx96YL3O2rqZwgXcurd6XYFODdmxwgnOeA4rIBkDOrFCTcClIwY+TNiWvzF
-         FaxeLf5OYnJCGOZ14JFiKD/gzubQvCzUsvUZLAiGy+h/XHzQhwQDWGqy/GJRuy4AAYKd
-         S/LKEHdwxVJmq3+krIh9Y/h8mhemJNteyOTbXuTGEsziN8ooEAYdXafec9mtkoh9KUhw
-         qFBBLTVQUj5rQhjID5wkiztoRb0a0tIZOWuolOWpi+GJFaB/hH2zG3mVLUVmBNmfp9kJ
-         mJZ4RKn/UU06D9W9mFrAGO3sGw6izNm3d5+Xcu3/9Y+FBTf4xLaU9w/gEGYqkd29r8yl
-         jVUw==
-X-Gm-Message-State: AOJu0YxSx9KDX925fK1BMRoVyASo80BGQTHfbAla0x5iH9yjVQpCutwZ
-	qGnxvfZESajGzLELb5yEVAUt9rv3HqErHl7oO0xg7JO4z+FURnHRl2Em8uKivmbh3ozzz+hSAuM
-	8jFLEDEU=
-X-Gm-Gg: ASbGnct9pVpFp+CEDT95AXz94UoegPnfHOl7xc8W5rtjbpdqaFbu8DyYE+s22Ikp929
-	5STFCAWNfRHUULo5xMqLgLZ+i1Fpjy3wyZEO4m1lpVWGfjfmyddzqIAVHnETC19yqdxp2nbKuGZ
-	I6eve+JZopj0IJqAP+6DSv9p9V4Isg5m4s/03qJaHxDXP1yKsFWnxbl1C4sw+1Y6SqYhO/wVj3E
-	7dzZhRtTZ8jxiizSc7zpbYS7OGU4WI/AW3AFImSjuYBh4DHqVeXWgAFu+7H81Oyo3D9iOA1cPJT
-	NJgW5dHJPv8dhmR2FhNakxlBPGHwfFuiIkMXkLCE
-X-Google-Smtp-Source: AGHT+IFA2JfZoC//C7qhevrM9EbhzF5EmCG2A7zuhT3O1iq4jpBXxysmanJCOku1AKmC/37DD/Qb8Q==
-X-Received: by 2002:a05:6a00:464e:b0:736:6ecd:8e39 with SMTP id d2e1a72fcca58-747bd965a13mr2519893b3a.2.1748640729203;
-        Fri, 30 May 2025 14:32:09 -0700 (PDT)
-Received: from t14.. ([2607:fb91:20c7:44b2:2a24:2057:271e:f269])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed4399sm3496763b3a.77.2025.05.30.14.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 14:32:08 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: [PATCH v2 bpf-next 12/12] selftests/bpf: Add tests for bucket resume logic in established sockets
-Date: Fri, 30 May 2025 14:30:54 -0700
-Message-ID: <20250530213059.3156216-13-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250530213059.3156216-1-jordan@jrife.io>
-References: <20250530213059.3156216-1-jordan@jrife.io>
+        d=1e100.net; s=20230601; t=1748641263; x=1749246063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ozHE81qJj1rmIelhRBQ5DRKURWfmzq6zSFDX7IJB5xc=;
+        b=faJH6PyLFYWFOXWIGgQnFpo2/8i3iGiP3vOhZR6mn2uiO612kG2nq0l/A57xtbrdEf
+         UQTnxIjVsh4t06EYePXDrB1g8D22S9rivGZftNYFDnaLaPCTEMuXGdm3qxrLM8AqB44u
+         Ke7UndiR+rM6eBXZqNwfsHb65x6luXTYdagKkGXCfiDkU3azDquoka/pjxAkZDyp63z7
+         xab65hwXrBDt8JsoB1Xb5nyvrbe3FP/jXsC3MVSUs1UK+MkP8t475G38e6RlEACKalzf
+         pCL9g69TBRnJCSocafWR0eEM4Wr54Mwjs9YGUsg2nWZ1wbRxGgQ9rS4r92fb9lx+83Qq
+         Btiw==
+X-Gm-Message-State: AOJu0YzvMLJE2BcW3XSRoohGlSZM+X56d/YHulLzSVqo1Ceqgz3aKBV3
+	HDFBjbfEXp8sj4FYyNDZc7SaeFhlzCgjnMHLsMbPKzh7fWZaUQnaSuR+4eYhWwplAS923S+i77F
+	Mw4auuWtMpHZTUxWmweqgacNoWvxh1JI01SMk1eq/
+X-Gm-Gg: ASbGnctzoDcJ+IhzVopw3dvxvSFDOnw6JyXubBmOPlm4+AL3iw57zwrVdOpAqHEU4GL
+	ERnapd3fQuZXF7o5OkfQlGyOLEFZm0Ia3z3T0vORJrwdExW363wE8vOjrdzRJLw0bEz/Xw8L7CY
+	xbAnzPHS0xCcF2VXmMnTq2zwJtTs6nFwA=
+X-Google-Smtp-Source: AGHT+IH/JSqdKYAmCarpHIh3eJPKxGTR0CrjI6YJ1HA1riERLWst73jdOFOJVYBajKmZgQh6mmcoFogQkVdQr1ihxUo=
+X-Received: by 2002:a05:6a00:2305:b0:736:34ca:deee with SMTP id
+ d2e1a72fcca58-747c1a83b48mr5024033b3a.7.1748641263280; Fri, 30 May 2025
+ 14:41:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
+ <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com>
+ <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io>
+ <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com>
+ <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io>
+ <q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=@willsroot.io>
+ <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com>
+ <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
+ <CAM0EoMke7ar8O=aJeZy7_XYMGbgES-X2B19R83Qcihxv4OeG8g@mail.gmail.com> <0x7zdcWIGm0NWid6NxFLpYOtO0Z1g6UCzrNnyVZ6hRvWr5rU6b6hi5Yz8dD7_dyUOmvJfkR8LV2_TrDf7uACFgGshyfxiRWgxjWer41EZVY=@willsroot.io>
+In-Reply-To: <0x7zdcWIGm0NWid6NxFLpYOtO0Z1g6UCzrNnyVZ6hRvWr5rU6b6hi5Yz8dD7_dyUOmvJfkR8LV2_TrDf7uACFgGshyfxiRWgxjWer41EZVY=@willsroot.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 30 May 2025 17:40:51 -0400
+X-Gm-Features: AX0GCFvgye0Hene8aLX_bWuqJLnb6hwZ6o3-CVBNqLYsfnz-SrgVqv96telw02g
+Message-ID: <CAM0EoMmns+rSyg4h-WGAMewqYWx0-MYC1DtRyJe4=rbgZN2UKQ@mail.gmail.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+To: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Davide Caratti <dcaratti@redhat.com>
+Content-Type: multipart/mixed; boundary="0000000000005696de0636614578"
 
-Replicate the set of test cases used for UDP socket iterators to test
-similar scenarios for TCP established sockets.
+--0000000000005696de0636614578
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 292 ++++++++++++++++++
- 1 file changed, 292 insertions(+)
+Hi Will,
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index 2b0504cb127b..2cb1b1896332 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -119,6 +119,44 @@ static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
- 	return nth_sock_idx;
- }
- 
-+static void destroy(int fd)
-+{
-+	struct sock_iter_batch *skel = NULL;
-+	__u64 cookie = socket_cookie(fd);
-+	struct bpf_link *link = NULL;
-+	int iter_fd = -1;
-+	int nread;
-+	__u64 out;
-+
-+	skel = sock_iter_batch__open();
-+	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
-+		goto done;
-+
-+	skel->rodata->destroy_cookie = cookie;
-+
-+	if (!ASSERT_OK(sock_iter_batch__load(skel), "sock_iter_batch__load"))
-+		goto done;
-+
-+	link = bpf_program__attach_iter(skel->progs.iter_tcp_destroy, NULL);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		goto done;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+		goto done;
-+
-+	/* Delete matching socket. */
-+	nread = read(iter_fd, &out, sizeof(out));
-+	ASSERT_GE(nread, 0, "nread");
-+	if (nread)
-+		ASSERT_EQ(out, cookie, "cookie matches");
-+done:
-+	if (iter_fd >= 0)
-+		close(iter_fd);
-+	bpf_link__destroy(link);
-+	sock_iter_batch__destroy(skel);
-+}
-+
- static int get_seen_count(int fd, struct sock_count counts[], int n)
- {
- 	__u64 cookie = socket_cookie(fd);
-@@ -241,6 +279,43 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
- 			       counts_len);
- }
- 
-+static void remove_seen_established(int family, int sock_type, const char *addr,
-+				    __u16 port, int *listen_socks,
-+				    int listen_socks_len, int *established_socks,
-+				    int established_socks_len,
-+				    struct sock_count *counts, int counts_len,
-+				    struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Leave one established socket. */
-+	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
-+
-+	/* Close a socket we've already seen to remove it from the bucket. */
-+	close_idx = get_nth_socket(established_socks, established_socks_len,
-+				   link, listen_socks_len + 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	destroy(established_socks[close_idx]);
-+	established_socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the last socket wasn't skipped and that there were no
-+	 * repeats.
-+	 */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+}
-+
- static void remove_unseen(int family, int sock_type, const char *addr,
- 			  __u16 port, int *socks, int socks_len,
- 			  int *established_socks, int established_socks_len,
-@@ -274,6 +349,51 @@ static void remove_unseen(int family, int sock_type, const char *addr,
- 			       counts_len);
- }
- 
-+static void remove_unseen_established(int family, int sock_type,
-+				      const char *addr, __u16 port,
-+				      int *listen_socks, int listen_socks_len,
-+				      int *established_socks,
-+				      int established_socks_len,
-+				      struct sock_count *counts, int counts_len,
-+				      struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw one established socks. */
-+	check_n_were_seen_once(established_socks, established_socks_len, 1,
-+			       counts, counts_len);
-+
-+	/* Close what would be the next socket in the bucket to exercise the
-+	 * condition where we need to skip past the first cookie we remembered.
-+	 */
-+	close_idx = get_nth_socket(established_socks, established_socks_len,
-+				   link, listen_socks_len + 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+
-+	destroy(established_socks[close_idx]);
-+	established_socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the remaining sockets were seen exactly once and that we
-+	 * didn't repeat the socket that was already seen.
-+	 */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+}
-+
- static void remove_all(int family, int sock_type, const char *addr,
- 		       __u16 port, int *socks, int socks_len,
- 		       int *established_socks, int established_socks_len,
-@@ -303,6 +423,54 @@ static void remove_all(int family, int sock_type, const char *addr,
- 	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
- }
- 
-+static void remove_all_established(int family, int sock_type, const char *addr,
-+				   __u16 port, int *listen_socks,
-+				   int listen_socks_len, int *established_socks,
-+				   int established_socks_len,
-+				   struct sock_count *counts, int counts_len,
-+				   struct bpf_link *link, int iter_fd)
-+{
-+	int *close_idx = NULL;
-+	int i;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw one established socks. */
-+	check_n_were_seen_once(established_socks, established_socks_len, 1,
-+			       counts, counts_len);
-+
-+	/* Close all remaining sockets to exhaust the list of saved cookies and
-+	 * exit without putting any sockets into the batch on the next read.
-+	 */
-+	close_idx = malloc(sizeof(int) * (established_socks_len - 1));
-+	if (!ASSERT_OK_PTR(close_idx, "close_idx malloc"))
-+		return;
-+	for (i = 0; i < established_socks_len - 1; i++) {
-+		close_idx[i] = get_nth_socket(established_socks,
-+					      established_socks_len, link,
-+					      listen_socks_len + i);
-+		if (!ASSERT_GE(close_idx[i], 0, "close_idx"))
-+			return;
-+	}
-+
-+	for (i = 0; i < established_socks_len - 1; i++) {
-+		destroy(established_socks[close_idx[i]]);
-+		established_socks[close_idx[i]] = -1;
-+	}
-+
-+	/* Make sure there are no more sockets returned */
-+	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
-+	free(close_idx);
-+}
-+
- static void add_some(int family, int sock_type, const char *addr, __u16 port,
- 		     int *socks, int socks_len, int *established_socks,
- 		     int established_socks_len, struct sock_count *counts,
-@@ -333,6 +501,49 @@ static void add_some(int family, int sock_type, const char *addr, __u16 port,
- 	free_fds(new_socks, socks_len);
- }
- 
-+static void add_some_established(int family, int sock_type, const char *addr,
-+				 __u16 port, int *listen_socks,
-+				 int listen_socks_len, int *established_socks,
-+				 int established_socks_len,
-+				 struct sock_count *counts,
-+				 int counts_len, struct bpf_link *link,
-+				 int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established_socks_len - 1 sockets. */
-+	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw established_socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+
-+	/* Double the number of established sockets in the bucket. */
-+	new_socks = connect_to_server(family, sock_type, addr, port,
-+				      established_socks_len / 2, listen_socks,
-+				      listen_socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "connect_to_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each of the original sockets was seen exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len, counts, counts_len);
-+done:
-+	free_fds(new_socks, established_socks_len);
-+}
-+
- static void force_realloc(int family, int sock_type, const char *addr,
- 			  __u16 port, int *socks, int socks_len,
- 			  int *established_socks, int established_socks_len,
-@@ -362,6 +573,24 @@ static void force_realloc(int family, int sock_type, const char *addr,
- 	free_fds(new_socks, socks_len);
- }
- 
-+static void force_realloc_established(int family, int sock_type,
-+				      const char *addr, __u16 port,
-+				      int *listen_socks, int listen_socks_len,
-+				      int *established_socks,
-+				      int established_socks_len,
-+				      struct sock_count *counts, int counts_len,
-+				      struct bpf_link *link, int iter_fd)
-+{
-+	/* Iterate through all sockets to trigger a realloc. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each socket was seen exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len, counts, counts_len);
-+}
-+
- struct test_case {
- 	void (*test)(int family, int sock_type, const char *addr, __u16 port,
- 		     int *socks, int socks_len, int *established_socks,
-@@ -471,6 +700,69 @@ static struct test_case resume_tests[] = {
- 		.family = AF_INET6,
- 		.test = force_realloc,
- 	},
-+	{
-+		.description = "tcp: resume after removing a seen socket (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_seen_established,
-+	},
-+	{
-+		.description = "tcp: resume after removing one unseen socket (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_unseen_established,
-+	},
-+	{
-+		.description = "tcp: resume after removing all unseen sockets (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_all_established,
-+	},
-+	{
-+		.description = "tcp: resume after adding a few sockets (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = add_some_established,
-+	},
-+	{
-+		.description = "tcp: force a realloc to occur (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		/* Bucket size will need to double when going from listening to
-+		 * established sockets.
-+		 */
-+		.connections = init_batch_size,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse + (init_batch_size * 2),
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = force_realloc_established,
-+	},
- };
- 
- static void do_resume_test(struct test_case *tc)
--- 
-2.43.0
+On Fri, May 30, 2025 at 10:49=E2=80=AFAM William Liu <will@willsroot.io> wr=
+ote:
+>
+> On Friday, May 30th, 2025 at 2:14 PM, Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> >
+> >
+> > On Thu, May 29, 2025 at 11:23=E2=80=AFAM William Liu will@willsroot.io =
+wrote:
+> >
+> > > On Wednesday, May 28th, 2025 at 10:00 PM, Jamal Hadi Salim jhs@mojata=
+tu.com wrote:
+> > >
+> > > > Hi,
+> > > > Sorry for the latency..
+> > > >
+> > > > On Sun, May 25, 2025 at 4:43=E2=80=AFPM William Liu will@willsroot.=
+io wrote:
+> > > >
+> > > > > I did some more testing with the percpu approach, and we realized=
+ the following problem caused now by netem_dequeue.
+> > > > >
+> > > > > Recall that we increment the percpu variable on netem_enqueue ent=
+ry and decrement it on exit. netem_dequeue calls enqueue on the child qdisc=
+ - if this child qdisc is a netem qdisc with duplication enabled, it could =
+duplicate a previously duplicated packet from the parent back to the parent=
+, causing the issue again. The percpu variable cannot protect against this =
+case.
+> > > >
+> > > > I didnt follow why "percpu variable cannot protect against this cas=
+e"
+> > > > - the enqueue and dequeue would be running on the same cpu, no?
+> > > > Also under what circumstances is the enqueue back to the root going=
+ to
+> > > > end up in calling dequeue? Did you test and hit this issue or its j=
+ust
+> > > > theory? Note: It doesnt matter what the source of the skb is as lon=
+g
+> > > > as it hits the netem enqueue.
+> > >
+> > > Yes, I meant that just using the percpu variable in enqueue will not =
+protect against the case for when dequeue calls enqueue on the child. Becau=
+se of the child netem with duplication enabled, packets already involved in=
+ duplication will get sent back to the parent's tfifo queue, and then the c=
+urrent dequeue will remain stuck in the loop before hitting an OOM - refer =
+to the paragraph starting with "In netem_dequeue, the parent netem qdisc's =
+t_len" in the first email for additional clarification. We need to know whe=
+ther a packet we dequeue has been involved in duplication - if it has, we i=
+ncrement the percpu variable to inform the children netem qdiscs.
+> > >
+> > > Hopefully the following diagram can help elucidate the problem:
+> > >
+> > > Step 1: Initial enqueue of Packet A:
+> > >
+> > > +----------------------+
+> > > | Packet A |
+> > > +----------------------+
+> > > |
+> > > v
+> > > +-------------------------+
+> > > | netem_enqueue |
+> > > +-------------------------+
+> > > |
+> > > v
+> > > +-----------------------------------+
+> > > | Duplication Logic (percpu OK): |
+> > > | =3D> Packet A, Packet B (dup) |
+> > > +-----------------------------------+
+> > > | <- percpu variable for netem_enqueue
+> > > v prevents duplication of B
+> > > +-------------+
+> > > | tfifo queue |
+> > > | [A, B] |
+> > > +-------------+
+> > >
+> > > Step 2: netem_dequeue processes Packet B (or A)
+> > >
+> > > +-------------+
+> > > | tfifo queue |
+> > > | [A] |
+> > > +-------------+
+> > > |
+> > > v
+> > > +----------------------------------------+
+> > > | netem_dequeue pops B in tfifo_dequeue |
+> > > +----------------------------------------+
+> > > |
+> > > v
+> > > +--------------------------------------------+
+> > > | netem_enqueue to child qdisc (netem w/ dup)|
+> > > +--------------------------------------------+
+> > > | <- percpu variable in netem_enqueue prologue
+> > > | and epilogue does not stop this dup,
+> > > v does not know about previous dup involvement
+> > > +--------------------------------------------------------+
+> > > | Child qdisc duplicates B to root (original netem) as C |
+> > > +--------------------------------------------------------+
+> > > |
+> > > v
+> > >
+> > > Step 3: Packet C enters original root netem again
+> > >
+> > > +-------------------------+
+> > > | netem_enqueue (again) |
+> > > +-------------------------+
+> > > |
+> > > v
+> > > +-------------------------------------+
+> > > | Duplication Logic (percpu OK again) |
+> > > | =3D> Packet C, Packet D |
+> > > +-------------------------------------+
+> > > |
+> > > v
+> > > .....
+> > >
+> > > If you increment a percpu variable in enqueue prologue and decrement =
+in enqueue epilogue, you will notice that our original repro will still tri=
+gger a loop because of the scenario I pointed out above - this has been tes=
+ted.
+> > >
+> > > From a current view of the codebase, netem is the only qdisc that cal=
+ls enqueue on its child from its dequeue. The check we propose will only wo=
+rk if this invariant remains.
+> > >
+> > > > > However, there is a hack to address this. We can add a field in n=
+etem_skb_cb called duplicated to track if a packet is involved in duplicate=
+d (both the original and duplicated packet should have it marked). Right be=
+fore we call the child enqueue in netem_dequeue, we check for the duplicate=
+d value. If it is true, we increment the percpu variable before and decreme=
+nt it after the child enqueue call.
+> > > >
+> > > > is netem_skb_cb safe really for hierarchies? grep for qdisc_skb_cb
+> > > > net/sched/ to see what i mean
+> > >
+> > > We are not using it for cross qdisc hierarchy checking. We are only u=
+sing it to inform a netem dequeue whether the packet has partaken in duplic=
+ation from its corresponding netem enqueue. That part seems to be private d=
+ata for the sk_buff residing in the current qdisc, so my understanding is t=
+hat it's ok.
+> > >
+> > > > > This only works under the assumption that there aren't other qdis=
+cs that call enqueue on their child during dequeue, which seems to be the c=
+ase for now. And honestly, this is quite a fragile fix - there might be oth=
+er edge cases that will cause problems later down the line.
+> > > > >
+> > > > > Are you aware of other more elegant approaches we can try for us =
+to track this required cross-qdisc state? We suggested adding a single bit =
+to the skb, but we also see the problem with adding a field for a one-off u=
+se case to such a vital structure (but this would also completely stomp out=
+ this bug).
+> > > >
+> > > > It sounds like quite a complicated approach - i dont know what the
+> > > > dequeue thing brings to the table; and if we really have to dequeue=
+ to
+> > >
+> > > Did what I say above help clarify what the problem is? Feel free to l=
+et me know if you have more questions, this bug is quite a nasty one.
+> >
+> >
+> > The text helped a bit, but send a tc reproducer of the issue you
+> > described to help me understand better how you end up in the tfifo
+> > which then calls the enqueu, etc, etc.
+>
+> The reproducer is the same as the original reproducer we reported:
+> tc qdisc add dev lo root handle 1: netem limit 1 duplicate 100%
+> tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100=
+% delay 1us reorder 100%
+> ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
+>
+> We walked through the issue in the codepath in the first email of this th=
+read at the paragraph starting with "The root cause for this is complex. Be=
+cause of the way we setup the parent qdisc" - please let me know if any add=
+itional clarification is needed for any part of it.
+>
 
+Ok, so I tested both your approach and a slight modification of the
+variant I sent you. They both fix the issue. TBH, I still find your
+approach complex. While i hate to do this to you, my preference is
+that you use the attached version - i dont need the credit, so just
+send it formally after testing.
+
+cheers,
+jamal
+
+--0000000000005696de0636614578
+Content-Type: application/octet-stream; name="netem_fix.patchlet"
+Content-Disposition: attachment; filename="netem_fix.patchlet"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mbbbsufp0>
+X-Attachment-Id: f_mbbbsufp0
+
+ZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfbmV0ZW0uYyBiL25ldC9zY2hlZC9zY2hfbmV0ZW0u
+YwppbmRleCBmZGQ3OWQzY2NkOGMuLmU1NWE2OGU1YjY0OSAxMDA2NDQKLS0tIGEvbmV0L3NjaGVk
+L3NjaF9uZXRlbS5jCisrKyBiL25ldC9zY2hlZC9zY2hfbmV0ZW0uYwpAQCAtMTY3LDYgKzE2Nyw4
+IEBAIHN0cnVjdCBuZXRlbV9za2JfY2IgewogCXU2NAkgICAgICAgIHRpbWVfdG9fc2VuZDsKIH07
+CiAKK3N0YXRpYyBERUZJTkVfUEVSX0NQVSh1bnNpZ25lZCBpbnQsIGVucXVldWVfbmVzdF9sZXZl
+bCk7CisKIHN0YXRpYyBpbmxpbmUgc3RydWN0IG5ldGVtX3NrYl9jYiAqbmV0ZW1fc2tiX2NiKHN0
+cnVjdCBza19idWZmICpza2IpCiB7CiAJLyogd2UgYXNzdW1lIHdlIGNhbiB1c2Ugc2tiIG5leHQv
+cHJldi90c3RhbXAgYXMgc3RvcmFnZSBmb3IgcmJfbm9kZSAqLwpAQCAtNDQ4LDYgKzQ1MCw3IEBA
+IHN0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqbmV0ZW1fc2VnbWVudChzdHJ1Y3Qgc2tfYnVmZiAqc2ti
+LCBzdHJ1Y3QgUWRpc2MgKnNjaCwKIHN0YXRpYyBpbnQgbmV0ZW1fZW5xdWV1ZShzdHJ1Y3Qgc2tf
+YnVmZiAqc2tiLCBzdHJ1Y3QgUWRpc2MgKnNjaCwKIAkJCSBzdHJ1Y3Qgc2tfYnVmZiAqKnRvX2Zy
+ZWUpCiB7CisJdW5zaWduZWQgaW50IG5lc3RfbGV2ZWwgPSBfX3RoaXNfY3B1X2luY19yZXR1cm4o
+ZW5xdWV1ZV9uZXN0X2xldmVsKTsKIAlzdHJ1Y3QgbmV0ZW1fc2NoZWRfZGF0YSAqcSA9IHFkaXNj
+X3ByaXYoc2NoKTsKIAkvKiBXZSBkb24ndCBmaWxsIGNiIG5vdyBhcyBza2JfdW5zaGFyZSgpIG1h
+eSBpbnZhbGlkYXRlIGl0ICovCiAJc3RydWN0IG5ldGVtX3NrYl9jYiAqY2I7CkBAIC00NTUsNiAr
+NDU4LDE3IEBAIHN0YXRpYyBpbnQgbmV0ZW1fZW5xdWV1ZShzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBz
+dHJ1Y3QgUWRpc2MgKnNjaCwKIAlzdHJ1Y3Qgc2tfYnVmZiAqc2VncyA9IE5VTEw7CiAJdW5zaWdu
+ZWQgaW50IHByZXZfbGVuID0gcWRpc2NfcGt0X2xlbihza2IpOwogCWludCBjb3VudCA9IDE7CisJ
+aW50IHJldHZhbDsKKworCWlmICh1bmxpa2VseShuZXN0X2xldmVsID4gMSkpIHsKKwkJbmV0X3dh
+cm5fcmF0ZWxpbWl0ZWQoIkV4Y2VlZGVkIG5ldGVtIHJlY3Vyc2lvbiAlZCA+IDEgb24gZGV2ICVz
+XG4iLAorCQkJCSAgICAgbmVzdF9sZXZlbCwgbmV0ZGV2X25hbWUoc2tiLT5kZXYpKTsKKwkJcWRp
+c2NfcXN0YXRzX292ZXJsaW1pdChzY2gpOyAvKiBGYWlyIHRvIGFzc3VtZSBvdmVybGltaXQ/PyAq
+LworCQlxZGlzY19xc3RhdHNfZHJvcChzY2gpOyAvKiBGYWlyIHRvIGFzc3VtZSBvdmVybGltaXQ/
+PyAqLworCQlyZXR2YWwgPSBORVRfWE1JVF9EUk9QOworCQlfX3FkaXNjX2Ryb3Aoc2tiLCB0b19m
+cmVlKTsKKwkJZ290byBkZWNfbmVzdF9sZXZlbDsKKwl9CiAKIAkvKiBEbyBub3QgZm9vbCBxZGlz
+Y19kcm9wX2FsbCgpICovCiAJc2tiLT5wcmV2ID0gTlVMTDsKQEAgLTQ3Myw3ICs0ODcsOCBAQCBz
+dGF0aWMgaW50IG5ldGVtX2VucXVldWUoc3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IFFkaXNj
+ICpzY2gsCiAJaWYgKGNvdW50ID09IDApIHsKIAkJcWRpc2NfcXN0YXRzX2Ryb3Aoc2NoKTsKIAkJ
+X19xZGlzY19kcm9wKHNrYiwgdG9fZnJlZSk7Ci0JCXJldHVybiBORVRfWE1JVF9TVUNDRVNTIHwg
+X19ORVRfWE1JVF9CWVBBU1M7CisJCXJldHZhbCA9IE5FVF9YTUlUX1NVQ0NFU1MgfCBfX05FVF9Y
+TUlUX0JZUEFTUzsKKwkJZ290byBkZWNfbmVzdF9sZXZlbDsKIAl9CiAKIAkvKiBJZiBhIGRlbGF5
+IGlzIGV4cGVjdGVkLCBvcnBoYW4gdGhlIHNrYi4gKG9ycGhhbmluZyB1c3VhbGx5IHRha2VzCkBA
+IC01MjgsNyArNTQzLDggQEAgc3RhdGljIGludCBuZXRlbV9lbnF1ZXVlKHN0cnVjdCBza19idWZm
+ICpza2IsIHN0cnVjdCBRZGlzYyAqc2NoLAogCQlxZGlzY19kcm9wX2FsbChza2IsIHNjaCwgdG9f
+ZnJlZSk7CiAJCWlmIChza2IyKQogCQkJX19xZGlzY19kcm9wKHNrYjIsIHRvX2ZyZWUpOwotCQly
+ZXR1cm4gTkVUX1hNSVRfRFJPUDsKKwkJcmV0dmFsID0gTkVUX1hNSVRfRFJPUDsKKwkJZ290byBk
+ZWNfbmVzdF9sZXZlbDsKIAl9CiAKIAkvKgpAQCAtNjQyLDkgKzY1OCwxNCBAQCBzdGF0aWMgaW50
+IG5ldGVtX2VucXVldWUoc3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IFFkaXNjICpzY2gsCiAJ
+CS8qIFBhcmVudCBxZGlzY3MgYWNjb3VudGVkIGZvciAxIHNrYiBvZiBzaXplIEBwcmV2X2xlbiAq
+LwogCQlxZGlzY190cmVlX3JlZHVjZV9iYWNrbG9nKHNjaCwgLShuYiAtIDEpLCAtKGxlbiAtIHBy
+ZXZfbGVuKSk7CiAJfSBlbHNlIGlmICghc2tiKSB7Ci0JCXJldHVybiBORVRfWE1JVF9EUk9QOwor
+CQlyZXR2YWwgPSBORVRfWE1JVF9EUk9QOworCQlnb3RvIGRlY19uZXN0X2xldmVsOwogCX0KLQly
+ZXR1cm4gTkVUX1hNSVRfU1VDQ0VTUzsKKwlyZXR2YWwgPSBORVRfWE1JVF9TVUNDRVNTOworCitk
+ZWNfbmVzdF9sZXZlbDoKKwlfX3RoaXNfY3B1X2RlYyhlbnF1ZXVlX25lc3RfbGV2ZWwpOworCXJl
+dHVybiByZXR2YWw7CiB9CiAKIC8qIERlbGF5IHRoZSBuZXh0IHJvdW5kIHdpdGggYSBuZXcgZnV0
+dXJlIHNsb3Qgd2l0aCBhCg==
+--0000000000005696de0636614578--
 
