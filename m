@@ -1,184 +1,224 @@
-Return-Path: <netdev+bounces-194331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE64AC8A76
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 11:09:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1442AC8BCC
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 12:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E61927A21C8
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 09:07:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C2D74E65D9
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 10:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFE921C9F2;
-	Fri, 30 May 2025 09:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03154223705;
+	Fri, 30 May 2025 10:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZB1U/Pdf"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="n4pFlyZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420D91EB5D8;
-	Fri, 30 May 2025 09:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCE42222C7
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748596134; cv=none; b=U9XQdV9YYkAgBBWSWwV/f25KFGrKgMHyo3oZQF5oA7HVrTEFS79SW2swJKSYGbaCV0rI3ADubUsaN+lrSa23dNNgEAaVFPntMEfFmp2wQM6z7kxCtLpwaGFHIRpZjzzS5su5S7eMpJ+M7LDzU1/VdGL/olGBTBOC0B9ElRYiRUE=
+	t=1748599263; cv=none; b=kRE6MCqLV3ZPpjKVf5LXctOZtLgZU8f26t4AfBTHkApLZ37kz5/pYC6DvWwm1ChynYJmOEH9aS7gknzD0TsbBAMzDEjP7O+O+R6DyBtf5Wnc3ffgSY78mLi40MrUn+sDUMucLc/mEMuOg2pT3Pj9gp4T0nI+nbhNEEsxmHfzVDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748596134; c=relaxed/simple;
-	bh=kyXdt8s0xKz4LjroE2u3gSZ0qK9QnI9kcAdnHQnzJj8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UpT09/elycHJ4rE5KgttTEhX+isDEivw5H1K+MZFqg7K+ISSIKJVGQdu/DHdZfqhgCcHaLxXM8mbkqCYo94qYBHZGnuLnVOWshCk1PWgXRNzF831Xbfh9HaNrsSR9RK5ds3gJrmi5WrUf9OQuZVXOQl8WFNF6e+ZemD9w2yWsBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZB1U/Pdf; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D06D643349;
-	Fri, 30 May 2025 09:08:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1748596129;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YDcQoFFC4NqCXcyobvRRuP1Ua4ytiuIE7XjIkD34fbk=;
-	b=ZB1U/Pdfi7HtDnqYB1OWNlxulO3P8Fzu1T1afPYQ754WfHDNuOCqhr37hUY6ZczMdot6mN
-	iKfgB57p8ne86qqiVAZL4T0zsuD2oXjkNi9Lx3+FRbgiijwLmb9ZSxZ3KK2eC8Xqd9CioZ
-	yzOYPApcG7YNnNy58ZNYVwhc7L78+lx/W8BrCXo2NEU35lMAFE1SSpZx26hyQJVZ3Nrnmb
-	w6+mG5x8R8W7GNQ2s81ezwluiyStYudEhpPnKiYruUKX3GhapRbICKk4/l3DWhZDNjo9ME
-	QUFFW58toUQT05s34GNXa92rPdx7Bu+JwK3kC06Yh9cWmK4T9/7lyc5QvFJqLA==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
- Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Rob Herring <robh@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject:
- Re: [PATCH net-next v6 06/14] net: phy: Introduce generic SFP handling for
- PHY drivers
-Date: Fri, 30 May 2025 11:08:41 +0200
-Message-ID: <12687918.O9o76ZdvQC@fw-rgant>
-In-Reply-To: <aDliS9uMFaLf2lCV@shell.armlinux.org.uk>
-References:
- <20250507135331.76021-1-maxime.chevallier@bootlin.com>
- <6159237.lOV4Wx5bFT@fw-rgant> <aDliS9uMFaLf2lCV@shell.armlinux.org.uk>
+	s=arc-20240116; t=1748599263; c=relaxed/simple;
+	bh=NorrkePffBzwUUGIvwnAem9aujHkQ+vw9WO/qgC8D/Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=QN7mqLpSfWQHUZdV5KxOzWH6QTCw5y2HHENhR4xh+TfgAU9iudRX5PEiV/9VHghe+z1/066pXFbJcAexAkC79mCuX6dw6K6DRpyzZgAnkI6AsqoA7DD5/U2IJf+pc4AwnBnFx7A6iUDcuKu/uYURUStFVOa9mY8oF3gMKqcCR9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=n4pFlyZg; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250530100058euoutp02e9f316f27846c0e650ed365414320e07~ERcLqEIE01314313143euoutp02a
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:00:58 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250530100058euoutp02e9f316f27846c0e650ed365414320e07~ERcLqEIE01314313143euoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1748599258;
+	bh=fnfYVNxfL0DHQ1U8EdAdmg35bYdFSv3S7ReuuQVXUXA=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=n4pFlyZgXMvspCg1s+71PlK18cKVuR0wWjpkzwQqYYtrBJWZR7LlYILS06QKmwbNf
+	 Dna38vSGIUllRaa6REhLCjWjQmvefmZAFq6AJWcWVjYWyLc94hx6agDl02WXd+wMKi
+	 WK32BEaUPlwM3wnnk0zAFKTmnmnyCPDYge5XzP5E=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250530100058eucas1p18554bf19ac9f302a8c3636d091448582~ERcLWn2781752417524eucas1p1B;
+	Fri, 30 May 2025 10:00:58 +0000 (GMT)
+Received: from localhost.localdomain (unknown [106.210.135.126]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250530100058eusmtip24f64e7b8835dcc02dd4e605e2b87339b~ERcK-Bwjr1946319463eusmtip2i;
+	Fri, 30 May 2025 10:00:58 +0000 (GMT)
+From: "e.kubanski" <e.kubanski@partner.samsung.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, "e.kubanski"
+	<e.kubanski@partner.samsung.com>
+Subject: [PATCH bpf] xsk: Fix out of order segment free in
+ __xsk_generic_xmit()
+Date: Fri, 30 May 2025 11:59:57 +0200
+Message-Id: <20250530095957.43248-1-e.kubanski@partner.samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart5904461.DvuYhMxLoT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvkeeiudculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkjghfgggtsehgtderredttdejnecuhfhrohhmpeftohhmrghinhcuifgrnhhtohhishcuoehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfdvleekvefgieejtdduieehfeffjefhleegudeuhfelteduiedukedtieehlefgnecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehffidqrhhgrghnthdrlhhotggrlhhnvghtpdhmrghilhhfrhhomheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeeftddprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvg
- hgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthh
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20250530100058eucas1p18554bf19ac9f302a8c3636d091448582
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250530100058eucas1p18554bf19ac9f302a8c3636d091448582
+X-EPHeader: CA
+X-CMS-RootMailID: 20250530100058eucas1p18554bf19ac9f302a8c3636d091448582
+References: <CGME20250530100058eucas1p18554bf19ac9f302a8c3636d091448582@eucas1p1.samsung.com>
 
---nextPart5904461.DvuYhMxLoT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Date: Fri, 30 May 2025 11:08:41 +0200
-Message-ID: <12687918.O9o76ZdvQC@fw-rgant>
-In-Reply-To: <aDliS9uMFaLf2lCV@shell.armlinux.org.uk>
-MIME-Version: 1.0
+Move xsk completion queue descriptor write-back to destructor.
 
-On Friday, 30 May 2025 09:46:19 CEST Russell King (Oracle) wrote:
-> On Fri, May 30, 2025 at 09:28:11AM +0200, Romain Gantois wrote:
-> > On Thursday, 29 May 2025 15:23:22 CEST Russell King (Oracle) wrote:
-> > > On Wed, May 28, 2025 at 09:35:35AM +0200, Romain Gantois wrote:
-> > > > > In that regard, you can consider 1000BaseX as a MII mode (we do have
-> > > > > PHY_INTERFACE_MODE_1000BASEX).
-> > > > 
-> > > > Ugh, the "1000BaseX" terminology never ceases to confuse me, but yes
-> > > > you're
-> > > > right.
-> > > 
-> > > 1000BASE-X is exactly what is described in IEEE 802.3. It's a PHY
-> > > interface mode because PHYs that use SerDes can connect to the host
-> > > using SGMII or 1000BASE-X over the serial link.
-> > > 
-> > > 1000BASE-X's purpose in IEEE 802.3 is as a protocol for use over
-> > > fibre links, as the basis for 1000BASE-SX, 1000BASE-LX, 1000BASE-EX
-> > > etc where the S, L, E etc are all to do with the properties of the
-> > > medium that the electrical 1000BASE-X is sent over. It even includes
-> > > 1000BASE-CX which is over copper cable.
-> > 
-> > Ah makes sense, thanks for the explanation. I guess my mistake was
-> > assuming
-> > that MAC/PHY interface modes were necessarily strictly at the
-> > reconciliation sublayer level, and didn't include PCS/PMA functions.
-> 
-> When a serdes protocol such as SGMII, 1000BASE-X, or 10GBASE-R is being
-> used with a PHY, the IEEE 802.3 setup isn't followed exactly - in
-> effect there are more layers.
-> 
-> On the SoC:
-> 
-> 	MAC
-> 	Reconciliation (RS)
-> 	PCS
-> 	SerDes (part of the PMA layer)
-> 
-> On the PHY side of the SerDes host-to-phy link:
-> 
-> 	SerDes
-> 	PCS (which may or may not be exposed in the PHY register set,
-> 	     and is normally managed by the PHY itself)
-> 	(maybe other layers, could include MACs	back-to-back)
-> 	PCS
-> 	PMA
-> 	PMD
-> 
-> Hope that helps explain what's going on a little more.
+Fix xsk descriptor management in completion queue. Descriptor
+management mechanism didn't take care of situations where
+completion queue submission can happen out-of-order to
+descriptor write-back.
 
-Definitely helps a lot, thanks.
+__xsk_generic_xmit() was assigning descriptor to slot right
+after completion queue slot reservation. If multiple CPUs
+access the same completion queue after xmit, this can result
+in out-of-order submission of invalid descriptor batch.
+SKB destructor call can submit descriptor batch that is
+currently in use by other CPU, instead of correct transmitted
+ones. This could result in User-Space <-> Kernel-Space data race.
 
+Forbid possible out-of-order submissions:
+CPU A: Reservation + Descriptor Write
+CPU B: Reservation + Descriptor Write
+CPU B: Submit (submitted first batch reserved by CPU A)
+CPU A: Submit (submitted second batch reserved by CPU B)
+
+Move Descriptor Write to submission phase:
+CPU A: Reservation (only moves local writer)
+CPU B: Reservation (only moves local writer)
+CPU B: Descriptor Write + Submit
+CPU A: Descriptor Write + Submit
+
+This solves potential out-of-order free of xsk buffers.
+
+Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+Fixes: e6c4047f5122 ("xsk: Use xsk_buff_pool directly for cq functions")
+---
+ include/linux/skbuff.h |  2 ++
+ net/xdp/xsk.c          | 17 +++++++++++------
+ net/xdp/xsk_queue.h    | 11 +++++++++++
+ 3 files changed, 24 insertions(+), 6 deletions(-)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index bb2b751d274a..6785faec0699 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -622,6 +622,8 @@ struct skb_shared_info {
+ 		void		*destructor_arg;
+ 	};
+ 
++	u64 xsk_descs[MAX_SKB_FRAGS];
++
+ 	/* must be last field, see pskb_expand_head() */
+ 	skb_frag_t	frags[MAX_SKB_FRAGS];
+ };
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index a2249fd2048a..f822393907da 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -526,24 +526,24 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
+ 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
+ }
+ 
+-static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 addr)
++static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
+ {
+ 	unsigned long flags;
+ 	int ret;
+ 
+ 	spin_lock_irqsave(&pool->cq_lock, flags);
+-	ret = xskq_prod_reserve_addr(pool->cq, addr);
++	ret = xskq_prod_reserve(pool->cq);
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+ 
+ 	return ret;
+ }
+ 
+-static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
++static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u64 *descs, u32 n)
+ {
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&pool->cq_lock, flags);
+-	xskq_prod_submit_n(pool->cq, n);
++	xskq_prod_write_submit_addr_n(pool->cq, descs, n);
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+ }
+ 
+@@ -570,7 +570,9 @@ static void xsk_destruct_skb(struct sk_buff *skb)
+ 		*compl->tx_timestamp = ktime_get_tai_fast_ns();
+ 	}
+ 
+-	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(skb));
++	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool,
++			     skb_shinfo(skb)->xsk_descs,
++			     xsk_get_num_desc(skb));
+ 	sock_wfree(skb);
+ }
+ 
+@@ -749,7 +751,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 	skb->priority = READ_ONCE(xs->sk.sk_priority);
+ 	skb->mark = READ_ONCE(xs->sk.sk_mark);
+ 	skb->destructor = xsk_destruct_skb;
++
+ 	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
++	skb_shinfo(skb)->xsk_descs[xsk_get_num_desc(skb)] = desc->addr;
+ 	xsk_set_destructor_arg(skb);
+ 
+ 	return skb;
+@@ -760,6 +764,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 
+ 	if (err == -EOVERFLOW) {
+ 		/* Drop the packet */
++		skb_shinfo(xs->skb)->xsk_descs[xsk_get_num_desc(xs->skb)] = desc->addr;
+ 		xsk_set_destructor_arg(xs->skb);
+ 		xsk_drop_skb(xs->skb);
+ 		xskq_cons_release(xs->tx);
+@@ -802,7 +807,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 		 * if there is space in it. This avoids having to implement
+ 		 * any buffering in the Tx path.
+ 		 */
+-		if (xsk_cq_reserve_addr_locked(xs->pool, desc.addr))
++		if (xsk_cq_reserve_locked(xs->pool))
+ 			goto out;
+ 
+ 		skb = xsk_build_skb(xs, &desc);
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 46d87e961ad6..06ce89aae217 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -436,6 +436,17 @@ static inline void xskq_prod_submit_n(struct xsk_queue *q, u32 nb_entries)
+ 	__xskq_prod_submit(q, q->ring->producer + nb_entries);
+ }
+ 
++static inline void xskq_prod_write_submit_addr_n(struct xsk_queue *q, u64 *addrs, u32 nb_entries)
++{
++	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
++	u32 prod = q->ring->producer;
++
++	for (u32 i = 0; i < nb_entries; ++i)
++		ring->desc[prod++ & q->ring_mask] = addrs[i];
++
++	__xskq_prod_submit(q, prod);
++}
++
+ static inline bool xskq_prod_is_empty(struct xsk_queue *q)
+ {
+ 	/* No barriers needed since data is not accessed */
 -- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart5904461.DvuYhMxLoT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmg5dZkACgkQ3R9U/FLj
-285M0g/+Nz1A6obdeKee0RLc6MA2gBvM/EmqYPQ6ZduN6VFL2D6J4NATyQRqu/VW
-u4d0pjD2ZOe44w6eAeRcWHsC0LJYfnHPPMhxekF2l+qqggkvZDGp9BmWJZd5UUe0
-dDxur4qI6XF2WlWDXyf9auZ3iGvqOUnWYK7VsLu/1hMYeC8M0Q+5dwy72//aAGnH
-9lyBU77a7sd3Qhlnd5Flg5f9ZuQmfqcD7Hyjp0OXdSJr7TlXLPJ+4FffNTivOQMK
-WonmDnfUOSPfxukMd0ozR7Z2BdvUeKPrlQq6yvcC5aS+9WZvVWCZzLOLrlBylu50
-wtEnYLpXd8QVehLsZGfE8mB4u+IuJICnEKhhrQ7YSLdjmXkj4VHCZHjl28WrI5rP
-wMCczhfYk4tDM83L2TBDVX5DTvcIcBawWlGxwzOdZ8WbipSVt5LZMtAkICE9TZzz
-j0oJ6+4xxi8mXGVduWD7kztOgXFl+UAx9GG8RsWoSPE0+t1f2nO0YV55UTW5RhEA
-/hNR+P1Z8pB9SHjHM9TskW6LC4Z/NEIBnI0N98BacAdjSc/KX4uHSH01ANVHRyEs
-wD5PJQKAj705h81tvNA4RzUkqC+UAa9bjtE3gtqj0KnusZhSiPBtIRe55sJ3W9aU
-uYNbFO3CW8dD+WMqYm9fQrWtbqX/tOWRCOzdM5KMSNpbVyBWNDs=
-=r0Tf
------END PGP SIGNATURE-----
-
---nextPart5904461.DvuYhMxLoT--
-
-
+2.34.1
 
 
