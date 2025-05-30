@@ -1,86 +1,88 @@
-Return-Path: <netdev+bounces-194430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 186FEAC96EB
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 052A6AC970A
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 614EE1C0317D
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:13:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A67991C06C87
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1D2283FCA;
-	Fri, 30 May 2025 21:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5D4218ACA;
+	Fri, 30 May 2025 21:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lO2XG1b2"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="iYnByFLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF602836A3
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46368211A27
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748639551; cv=none; b=ancKU3ebrFjOAYNHDrS+J7gzv3BeNIV3xlzcU22MUCdFn5Ew+0E8UYk2+EN/jNoD1uS4me2InLHtMFn+mK2FU/l0JdsFBphLTZLUO+UHV+FIvjgJI9nFYhIXeJcee1xujlzfxBF5kfkmGWguKzDkVDQ0fXOSihFI075YCMtsYXQ=
+	t=1748640677; cv=none; b=KYNuGatsQQO4gtuPzkJpgtpGYjIRdJw9X9nfpDxQqHZLf0O4z0IDhw1BVrTKHEc7FbXxBCaQfu7vU6iIfG29FaAHIhTFg8bkB8g6gstG8EB5QgQ8Ok+HG1wWKQEaMPfA+DVBRjSUeB1ytk5SlDS5iFPj1szppVO4BUwyTWXe/3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748639551; c=relaxed/simple;
-	bh=P/YMCbwrpBbxLG+PWll5gP6eQ2Z8LW87NIhljRLyZaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DZYdJ6YTFof/nX07/R3yh/6vo2M8uDPi1cem8jSZijDJPbOo6873mAPtrUvjwdRUKKNvSNUZiuse10iaRK0nuRIukVhqLp2UcrGR5jBDA1yrJ5brbto/qpqsEtPsCdYVm9BKl0OUplvMNX3f0ZNHXBt53kDD0iOue6hcMTs/Qwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lO2XG1b2; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748639550; x=1780175550;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=P/YMCbwrpBbxLG+PWll5gP6eQ2Z8LW87NIhljRLyZaI=;
-  b=lO2XG1b21NtJl6QwtOSMJLl6AMGrv9r/wsWyJWLh+uHWuLttAvif76Im
-   i45LHzw2z+gIZOLWdp0vMucB7kYqMshOCEPBSSyD2m0t56CLHUrBjLekL
-   c3AcGZedqHwhTMRSSLZHyUqX3sIey6j1Eh3MXWILbWaF73Wbx0rqfzds/
-   /EgUa4WasCx487zNIiZjmV5LL7BJcQbJTkroHyxGpXGe2AS4gFjpGVlNN
-   UTtORiYTZciShXh26vbfPau3rr10GvuKOs89vqTySSp1SubJt6edt/rvo
-   022J2FWhsZUYots/+zeIt/fNjyh+BpC6M52Rw2dtwdYDQS4RK3YM+FhPp
-   Q==;
-X-CSE-ConnectionGUID: l4sF4wvLSseGjmDXfsn2PA==
-X-CSE-MsgGUID: m0xQ/oSsQNGE4YUKwGp3+g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11449"; a="49862625"
-X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
-   d="scan'208";a="49862625"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 14:12:25 -0700
-X-CSE-ConnectionGUID: OHon1pO9T7SsxI77U38aNw==
-X-CSE-MsgGUID: 8YofVLytQsWr5H+uSQSVRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
-   d="scan'208";a="144621687"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa007.jf.intel.com with ESMTP; 30 May 2025 14:12:26 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Emil Tantilov <emil.s.tantilov@intel.com>,
-	anthony.l.nguyen@intel.com,
-	willemb@google.com,
-	decot@google.com,
-	madhu.chittim@intel.com,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 5/5] idpf: avoid mailbox timeout delays during reset
-Date: Fri, 30 May 2025 14:12:19 -0700
-Message-ID: <20250530211221.2170484-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250530211221.2170484-1-anthony.l.nguyen@intel.com>
-References: <20250530211221.2170484-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1748640677; c=relaxed/simple;
+	bh=Xt7U1x3SkNTaDSR5L1DVqg/uyQUndXVGHRE3Zd14eVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Sy/CvJSI2ezVjEdLRhG1+y5rRSilvf3Z68XBp/GD7YtFf7SeSTSDX8y2GtGBz8eLxvoeaWkqESOrFwPpMWPEn3cmvMIHC/+6OrvddNmMIoq8FX2KV5IaP+L0uMtimlKkV50ZBGBH5ot530dKTd5r+uHNzNZS8SXxoSnGJZbN4TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=iYnByFLp; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b2c43cbce41so333815a12.2
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1748640674; x=1749245474; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=81pEAwXmixuxAF0u6MPMjW9qRqViI6uiK6RzRIZYnIg=;
+        b=iYnByFLpQ2unbJPdd+hbFJY48Jsm9x5z7mAgEAvr9e/BN+D5vAE41rPIQv1a3lyeK7
+         KtDenp5sBOnH7P2n0nN7WjKZbDsGnwDCIRoAUdrQj+I9iO6G6HPgz567wa/IEb1p4+SW
+         ENZe0m31OrNtVZ2zAa0VZtMMzpxp4cIHEZsCgO8wIPhIejyOPRCiIqJ4LvPdfFVn5IK5
+         CK7CycN/FCowU75GCoatFJAT3/kqOg1RTMFBcKrPmSfXzplS1EXq8NGcdOcDtpgj1WP9
+         gb818z1L1/7fH29ftWUv8wfui/uN0euMCahFf/slemETdAFegf/2G0t/AWNamJQ2sv6h
+         jgWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748640674; x=1749245474;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=81pEAwXmixuxAF0u6MPMjW9qRqViI6uiK6RzRIZYnIg=;
+        b=T6bQFhPbiwF6NhVNXd4Kz5+UN6JSySj6kME/DBynhhHIzSaKYkQ7ElhtxCUzGUSlQF
+         WrxQ0t8UbgYNyaWX69CHRI7/Z1zv2oPaUISoWQojboHzFTfypEQiVJljvFujB7OmHQRS
+         A5lT4mgjCreVj1ng8Y0a2WRrVhEC7vdgO7VdAyH1EKkrROBPYIZRMCX7a666LIruw4oI
+         gUs+Se0BoHo8gyPJYpROHzTxPwgKVEeKo5AX5B9FTmnOvIarLXncJ2Z62Cs48bll7679
+         IQhrLyoSReegNMkj7AaLf6BDUTJCRmU9TtY8c3BKlZmYftGgWeRw+011WkL+KraPDDN/
+         JiJQ==
+X-Gm-Message-State: AOJu0Yx48360j2ruaLpRJkWLIi5lF/yLmG/WnhIkTZkPfV21UBFJ6XNF
+	+EJCJyzA4biN9Pzx6GN7O638jYgDvZnUDPcjeDBY73UB3vWr+HxD4gJzd12DEI33D1ZoZ72PUTy
+	92tJ7938=
+X-Gm-Gg: ASbGncthLZuvbQBqlNmGsmTaWf1+/BIulP0ca4Q4BYC6BmuBuc80wD2GtswttXMU+9K
+	CrrbwJDwKNo84an9tq1YAm/jzwEVoWV6JDBoHTcYm3K/lcg1t+cCTE1khNFqx1hgu0OMWLYUdId
+	ONFj+HSt42hVwAlVjeDEhlQ5jWRLmuOzFtX1Y2MuWyqYrFRNl8sjWDgcidO38UJ/tuTHuN0KpRy
+	6fPXalAvy2YRlbItyiKVDgBPq8nIYzMrDjiC/kyOIlg6n+k+NxwlguJ07AeOwYCpGHEtdXb8R1Y
+	l19lZHaefJkc/fO0klZ9FyDvSqt31U3AO/N8KEFS
+X-Google-Smtp-Source: AGHT+IGInKghMC3FVP3+MvP9tl2QdYAbj0QI/SPMlxBeXh7/RCRQhPksSTBDIon4fv0NeHdAXgzyGw==
+X-Received: by 2002:a05:6a20:12c4:b0:1ee:e1a4:2b4a with SMTP id adf61e73a8af0-21adea18fddmr2143955637.2.1748640674106;
+        Fri, 30 May 2025 14:31:14 -0700 (PDT)
+Received: from t14.. ([2607:fb91:20c7:44b2:2a24:2057:271e:f269])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed4399sm3496763b3a.77.2025.05.30.14.31.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 May 2025 14:31:13 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: [PATCH v2 bpf-next 00/12] bpf: tcp: Exactly-once socket iteration
+Date: Fri, 30 May 2025 14:30:42 -0700
+Message-ID: <20250530213059.3156216-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,97 +91,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Emil Tantilov <emil.s.tantilov@intel.com>
+TCP socket iterators use iter->offset to track progress through a
+bucket, which is a measure of the number of matching sockets from the
+current bucket that have been seen or processed by the iterator. On
+subsequent iterations, if the current bucket has unprocessed items, we
+skip at least iter->offset matching items in the bucket before adding
+any remaining items to the next batch. However, iter->offset isn't
+always an accurate measure of "things already seen" when the underlying
+bucket changes between reads which can lead to repeated or skipped
+sockets. Instead, this series remembers the cookies of the sockets we
+haven't seen yet in the current bucket and resumes from the first cookie
+in that list that we can find on the next iteration.
 
-Mailbox operations are not possible while the driver is in reset.
-Operations that require MBX exchange with the control plane will result
-in long delays if executed while a reset is in progress:
+This is a continuation of the work started in [1]. This series largely
+replicates the patterns applied to UDP socket iterators, applying them
+instead to TCP socket iterators.
 
-ethtool -L <inf> combined 8& echo 1 > /sys/class/net/<inf>/device/reset
-idpf 0000:83:00.0: HW reset detected
-idpf 0000:83:00.0: Device HW Reset initiated
-idpf 0000:83:00.0: Transaction timed-out (op:504 cookie:be00 vc_op:504 salt:be timeout:2000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:508 cookie:bf00 vc_op:508 salt:bf timeout:2000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:512 cookie:c000 vc_op:512 salt:c0 timeout:2000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:510 cookie:c100 vc_op:510 salt:c1 timeout:2000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:509 cookie:c200 vc_op:509 salt:c2 timeout:60000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:509 cookie:c300 vc_op:509 salt:c3 timeout:60000ms)
-idpf 0000:83:00.0: Transaction timed-out (op:505 cookie:c400 vc_op:505 salt:c4 timeout:60000ms)
-idpf 0000:83:00.0: Failed to configure queues for vport 0, -62
+CHANGES
+=======
+v1 -> v2:
+* In patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration"), remove unnecessary bucket bounds checks in
+  bpf_iter_tcp_resume. In either case, if st->bucket is outside the
+  current table's range then bpf_iter_tcp_resume_* calls *_get_first
+  which immediately returns NULL anyway and the logic will fall through.
+  (Martin)
+* Add a check at the top of bpf_iter_tcp_resume_listening and
+  bpf_iter_tcp_resume_established to see if we're done with the current
+  bucket and advance it immediately instead of wasting time finding the
+  first matching socket in that bucket with
+  (listening|established)_get_first. In v1, we originally discussed
+  adding logic to advance the bucket in bpf_iter_tcp_seq_next and
+  bpf_iter_tcp_seq_stop, but after trying this the logic seemed harder
+  to track. Overall, keeping everything inside bpf_iter_tcp_resume_*
+  seemed a bit clearer. (Martin)
+* Instead of using a timeout in the last patch ("selftests/bpf: Add
+  tests for bucket resume logic in established sockets") to wait for
+  sockets to leave the ehash table after calling close(), use
+  bpf_sock_destroy to deterministically destroy and remove them. This
+  introduces one more patch ("selftests/bpf: Create iter_tcp_destroy
+  test program") to create the iterator program that destroys a selected
+  socket. Drive this through a destroy() function in the last patch
+  which, just like close(), accepts a socket file descriptor. (Martin)
+* Introduce one more patch ("selftests/bpf: Allow for iteration over
+  multiple states") to fix a latent bug in iter_tcp_soreuse where the
+  sk->sk_state != TCP_LISTEN check was ignored. Add the "ss" variable to
+  allow test code to configure which socket states to allow.
 
-Disable mailbox communication in case of a reset, unless it's done during
-a driver load, where the virtchnl operations are needed to configure the
-device.
+[1]: https://lore.kernel.org/bpf/20250502161528.264630-1-jordan@jrife.io/
 
-Fixes: 8077c727561aa ("idpf: add controlq init and reset checks")
-Co-developed-by: Joshua Hay <joshua.a.hay@intel.com>
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c     | 18 +++++++++++++-----
- .../net/ethernet/intel/idpf/idpf_virtchnl.c    |  2 +-
- .../net/ethernet/intel/idpf/idpf_virtchnl.h    |  1 +
- 3 files changed, 15 insertions(+), 6 deletions(-)
+Jordan Rife (12):
+  bpf: tcp: Make mem flags configurable through
+    bpf_iter_tcp_realloc_batch
+  bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
+  bpf: tcp: Get rid of st_bucket_done
+  bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch
+    items
+  bpf: tcp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Add tests for bucket resume logic in listening sockets
+  selftests/bpf: Allow for iteration over multiple ports
+  selftests/bpf: Allow for iteration over multiple states
+  selftests/bpf: Make ehash buckets configurable in socket iterator
+    tests
+  selftests/bpf: Create established sockets in socket iterator tests
+  selftests/bpf: Create iter_tcp_destroy test program
+  selftests/bpf: Add tests for bucket resume logic in established
+    sockets
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index bab12ecb2df5..4eb20ec2accb 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1801,11 +1801,19 @@ void idpf_vc_event_task(struct work_struct *work)
- 	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
- 		return;
- 
--	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags) ||
--	    test_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
--		set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
--		idpf_init_hard_reset(adapter);
--	}
-+	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags))
-+		goto func_reset;
-+
-+	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags))
-+		goto drv_load;
-+
-+	return;
-+
-+func_reset:
-+	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
-+drv_load:
-+	set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
-+	idpf_init_hard_reset(adapter);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 07a9f5ae34fd..24febaaa8fbb 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -347,7 +347,7 @@ static void idpf_vc_xn_init(struct idpf_vc_xn_manager *vcxn_mngr)
-  * All waiting threads will be woken-up and their transaction aborted. Further
-  * operations on that object will fail.
-  */
--static void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr)
-+void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr)
- {
- 	int i;
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-index 3522c1238ea2..77578206bada 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
-@@ -150,5 +150,6 @@ int idpf_send_get_stats_msg(struct idpf_vport *vport);
- int idpf_send_set_sriov_vfs_msg(struct idpf_adapter *adapter, u16 num_vfs);
- int idpf_send_get_set_rss_key_msg(struct idpf_vport *vport, bool get);
- int idpf_send_get_set_rss_lut_msg(struct idpf_vport *vport, bool get);
-+void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr);
- 
- #endif /* _IDPF_VIRTCHNL_H_ */
+ net/ipv4/tcp_ipv4.c                           | 263 +++++++---
+ .../bpf/prog_tests/sock_iter_batch.c          | 450 +++++++++++++++++-
+ .../selftests/bpf/progs/sock_iter_batch.c     |  37 +-
+ 3 files changed, 668 insertions(+), 82 deletions(-)
+
 -- 
-2.47.1
+2.43.0
 
 
