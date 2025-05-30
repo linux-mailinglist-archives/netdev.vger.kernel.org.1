@@ -1,134 +1,158 @@
-Return-Path: <netdev+bounces-194287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D19AC85CA
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:56:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5199DAC85D4
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 738FE1BC3323
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:56:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3711E7B5235
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81C5537E9;
-	Fri, 30 May 2025 00:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2953405F7;
+	Fri, 30 May 2025 01:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5yTMsUX"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GYwn9aM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F68AD5E;
-	Fri, 30 May 2025 00:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E238749C;
+	Fri, 30 May 2025 01:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748566589; cv=none; b=VMsPbteKLiaclB44YiADWoblI/tTxZ2/yC+Yg4glal7KCM8tjC3iNcHToZ3yCPG9mrOeqr9I5YBj3wfF8GwRUr7Xgedfyzj/FoPKLu2w8QHBBD3NJZd+htZcCOYEnFAm168K3pUqm8MU2mKM9y1zk+bPVNd8NmFJfAeaoWzm9Gg=
+	t=1748567001; cv=none; b=c3glvR2Z/S8cpXCisHSgjtdUvLKjT9zdur0mdmebL6q3TRonIbH3vlHOpE4UscCwsSHquxhlJemg3N2MZjFUmTk/AHqL5c1dQQ2pvPoHYgjoJiW8OOOqOyPB2xhaH7wl2d23LhHWO+MtC2R8OQrDgkywb2ekd/H2ukp02rfU9fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748566589; c=relaxed/simple;
-	bh=yg6Wh8XDP53XOaEfOboKxLKTBHVS/nUo2gmPowtLxbo=;
+	s=arc-20240116; t=1748567001; c=relaxed/simple;
+	bh=8lg9tcjmyDPHmeMi3irqoS0NZTO/egGFWJG0MSTAeEg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fY9x/DbKqMFpWfvtpuXq8fsC0a6PvNmX1YlLQFvA3MIpQ1qZzfDSKcNOR0kSThWfvgex26A9wAmFr1CXFarHk23DaqlQ+TFRjj32OEM/L8hIw663pcWNVxqm9Xxi0rqMXQES/51qFu3GVy+OPl8aztxE3ZLaueholW7wa+ypCoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5yTMsUX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51CDEC4CEE7;
-	Fri, 30 May 2025 00:56:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748566589;
-	bh=yg6Wh8XDP53XOaEfOboKxLKTBHVS/nUo2gmPowtLxbo=;
+	 MIME-Version:Content-Type; b=DJOZFdv/E8mDTCiqNcPUZ8/xGFtc/ta20rZTiiOJEhqB78bNLPgK7tAXAqFwOcQnWrGlVumrlAvuOGJkA8Nwl0ptNM+VNj5anavGKXHa5/fGb/sfus6KO38EzhSBrHRungilFlXmojZVWcTXxLjg07B4VJ/QoSEbmEcA9MntQDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GYwn9aM2; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1748566992;
+	bh=KFsDZftR4B6MnKOTyovSysgE8zvgQdPlPTpypjZ3vYs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D5yTMsUXYJkXKA/3AcLLVZtYKMkrbG7yBjq6Hz2CnCLmzDpTU+WuwJY/phWaP7LWK
-	 DH4sGRZP5sNjiuZI2lbzQ42iNVCv7M0Lqom0Yvd9yfFjLlLPun+tW5laqn3p8EPiO6
-	 VhGLVjm8KUzTfHtQPYo9eDBQnBW6wmwRx5MTcO3HPFAmIWG/wBR2Tn7rVV4fgCHfUF
-	 buiRCeXTUvQPm9FWsgGuzQBy2kAfzGJAMk+NYCX5cWZivNmpmV7UDFhsAFL+3BQwo6
-	 gsjjyQFKCMLAJ0P8cRIkGgi58XLvnhBBxXbrTn0iq0kNZELtg4Aj+XGs1NTiEORLZN
-	 Cx4g/jqxeB+WA==
-Date: Thu, 29 May 2025 17:56:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
- jiri@resnulli.us, anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, aleksandr.loktionov@intel.com, corbet@lwn.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
- linux-doc@vger.kernel.org, Milena Olech <milena.olech@intel.com>
-Subject: Re: [PATCH net-next v4 2/3] dpll: add reference sync get/set
-Message-ID: <20250529175627.4e6a3b07@kernel.org>
-In-Reply-To: <20250523172650.1517164-3-arkadiusz.kubalewski@intel.com>
-References: <20250523172650.1517164-1-arkadiusz.kubalewski@intel.com>
-	<20250523172650.1517164-3-arkadiusz.kubalewski@intel.com>
+	b=GYwn9aM2pL8l5gIcaYkirTaiB8gbp0L78Zi217/yDsV9ZsH2YLy+rQBki8bSu5YOK
+	 ASsc7eIO1mVcouIje5YbVePzf8rzlGlt5CWAMwx+RsYF6m8icq1ryxvUBM0n+JU5gb
+	 AO3DjOH8HFkF7vX7PZuVNNEjeUyf+F0gchYRZrKJmUW5Uw5fgHZ9MczhMSFZsOXwM5
+	 ujngdo4GK0fNem0D8RzTtOdUvfjTmJn9xo00qL9qcBGNrKO6FNjIYVW2Cy6IXEwwg8
+	 h+e3a7398aolewWN8N52TFIpt1NdkZHeMrXMgslDRI8AE48d/dgJ8bBVnBxaTRz5RD
+	 exQQTqavG2z8A==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b7lNF0RNjz4x5Y;
+	Fri, 30 May 2025 11:03:08 +1000 (AEST)
+Date: Fri, 30 May 2025 11:03:07 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: linux-next: manual merge of the net-next tree with the reset
+ tree
+Message-ID: <20250530110307.1eb48635@canb.auug.org.au>
+In-Reply-To: <20250506112554.3832cd40@canb.auug.org.au>
+References: <20250506112554.3832cd40@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; boundary="Sig_/dgk32W/+5/HDY1_RY9Za7rs";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/dgk32W/+5/HDY1_RY9Za7rs
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 23 May 2025 19:26:49 +0200 Arkadiusz Kubalewski wrote:
-> +static int
-> +dpll_pin_ref_sync_state_set(struct dpll_pin *pin,
-> +			    unsigned long ref_sync_pin_idx,
-> +			    const enum dpll_pin_state state,
-> +			    struct netlink_ext_ack *extack)
-> +
-> +{
-> +	struct dpll_pin_ref *ref, *failed;
-> +	const struct dpll_pin_ops *ops;
-> +	enum dpll_pin_state old_state;
-> +	struct dpll_pin *ref_sync_pin;
-> +	struct dpll_device *dpll;
-> +	unsigned long i;
-> +	int ret;
-> +
-> +	ref_sync_pin =3D xa_find(&pin->ref_sync_pins, &ref_sync_pin_idx,
-> +			       ULONG_MAX, XA_PRESENT);
-> +	if (!ref_sync_pin) {
-> +		NL_SET_ERR_MSG(extack, "reference sync pin not found");
-> +		return -EINVAL;
-> +	}
-> +	if (!dpll_pin_available(ref_sync_pin)) {
-> +		NL_SET_ERR_MSG(extack, "reference sync pin not available");
-> +		return -EINVAL;
-> +	}
-> +	ref =3D dpll_xa_ref_dpll_first(&pin->dpll_refs);
-> +	ASSERT_NOT_NULL(ref);
+Hi all,
 
-why the assert? The next line will crash very.. "informatively"
-if ref is NULL =F0=9F=A4=B7=EF=B8=8F
+On Tue, 6 May 2025 11:25:54 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>
+> Today's linux-next merge of the net-next tree got a conflict in:
+>=20
+>   MAINTAINERS
+>=20
+> between commit:
+>=20
+>   57dfdfbe1a03 ("MAINTAINERS: Add entry for Renesas RZ/V2H(P) USB2PHY Por=
+t Reset driver")
+>=20
+> from the reset tree and commit:
+>=20
+>   326976b05543 ("MAINTAINERS: Add entry for Renesas RZ/V2H(P) DWMAC GBETH=
+ glue layer driver")
+>=20
+> from the net-next tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+>=20
+> diff --cc MAINTAINERS
+> index c056bd633983,5c31814c9687..000000000000
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@@ -20827,14 -20699,14 +20829,22 @@@ S:	Maintaine
+>   F:	Documentation/devicetree/bindings/usb/renesas,rzn1-usbf.yaml
+>   F:	drivers/usb/gadget/udc/renesas_usbf.c
+>  =20
+> + RENESAS RZ/V2H(P) DWMAC GBETH GLUE LAYER DRIVER
+> + M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> + L:	netdev@vger.kernel.org
+> + L:	linux-renesas-soc@vger.kernel.org
+> + S:	Maintained
+> + F:	Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
+> + F:	drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> +=20
+>  +RENESAS RZ/V2H(P) USB2PHY PORT RESET DRIVER
+>  +M:	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+>  +M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>  +L:	linux-renesas-soc@vger.kernel.org
+>  +S:	Supported
+>  +F:	Documentation/devicetree/bindings/reset/renesas,rzv2h-usb2phy-reset.=
+yaml
+>  +F:	drivers/reset/reset-rzv2h-usb2phy.c
+>  +
+>   RENESAS RZ/V2M I2C DRIVER
+>   M:	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+>   L:	linux-i2c@vger.kernel.org
 
-> +static int
-> +dpll_pin_ref_sync_set(struct dpll_pin *pin, struct nlattr *nest,
-> +		      struct netlink_ext_ack *extack)
-> +{
-> +	struct nlattr *tb[DPLL_A_PIN_MAX + 1];
-> +	enum dpll_pin_state state;
-> +	u32 sync_pin_id;
-> +
-> +	nla_parse_nested(tb, DPLL_A_PIN_MAX, nest,
-> +			 dpll_reference_sync_nl_policy, extack);
-> +	if (!tb[DPLL_A_PIN_ID]) {
+This is now a conflict between the arm-soc tree and Linus' tree.
 
-NL_REQ_ATTR_CHECK(), please
+--=20
+Cheers,
+Stephen Rothwell
 
-	if (NL_REQ_ATTR_CHECK(extack, nest, tb, DPLL_A_PIN_ID) ||
-	    NL_REQ_ATTR_CHECK(extack, nest, tb, DPLL_A_PIN_STATE))
-		return -EINVAL;
+--Sig_/dgk32W/+5/HDY1_RY9Za7rs
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-it will set ATTR_MISS metadata for you. Not 100% sure if Python YNL
-can decode miss attrs in nests but that's a SMOP :) C YNL can do it.
+-----BEGIN PGP SIGNATURE-----
 
-> +		NL_SET_ERR_MSG(extack, "sync pin id expected");
-> +		return -EINVAL;
-> +	}
-> +	sync_pin_id =3D nla_get_u32(tb[DPLL_A_PIN_ID]);
-> +
-> +	if (!tb[DPLL_A_PIN_STATE]) {
-> +		NL_SET_ERR_MSG(extack, "sync pin state expected");
-> +		return -EINVAL;
-> +	}
-> +	state =3D nla_get_u32(tb[DPLL_A_PIN_STATE]);
-> +
-> +	return dpll_pin_ref_sync_state_set(pin, sync_pin_id, state, extack);
-> +}
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg5A8sACgkQAVBC80lX
+0Gy5awf/TVPywlTaI7enDzkgErfmCiQkSYcadqY8FSfKDhsuQZK25S2o+9IWu1Wx
+rHxCcEYFFxrPSIPjXmurxEcq/C8qoODSB1YTn4VjoYU/nF2M5Ar5vOOH7vqrobUK
+VFjgNyyygGi7SvPV4PDF4vI3SYn2EaqQw/0av92AhC97gDOUPzOX+9cLW17peegG
+KAmwbchzGlspI3el238rhbg7IpuRycHVDzQ1UK59FGu19RhLUcuY3gP9fytw0eWE
+MMt3LGu/EbIQYxIaR04j38Yy1uGAGwDz7GFRv0SFb70R0gSAkWlxQ4Lvg0f4pvZn
+QGDg+Sw5VHcT84FE3kbKQ1qgrqOTHg==
+=D5jt
+-----END PGP SIGNATURE-----
+
+--Sig_/dgk32W/+5/HDY1_RY9Za7rs--
 
