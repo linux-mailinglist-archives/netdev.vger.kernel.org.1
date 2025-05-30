@@ -1,105 +1,132 @@
-Return-Path: <netdev+bounces-194353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548B1AC8D3C
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 13:56:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E34CAC8D6C
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 14:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 154DB4E6169
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 11:56:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C753B4F0C
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 12:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C160B22A811;
-	Fri, 30 May 2025 11:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C43225412;
+	Fri, 30 May 2025 12:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="JPTQ4/y2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAzOuNG/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52948224AFE
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 11:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2E838DF9;
+	Fri, 30 May 2025 12:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748606199; cv=none; b=ZImMgeC2KHZ2xuszS+r5pSjqQwMTRJCo6+znXs8KDB7XGojJrE6SYp8cNSOeeOq/hJnzbXmf8VFoTcAtq3S+dJUmmcuC3cJX6VrI13npb9m/Sp+0lnOy9U+qgRFDZU9i+0zVvmo9It0CPxZDvA2S4tlpJpnUR6GpKZKipz2D0Uk=
+	t=1748607439; cv=none; b=p9FVcvSAe6bVh3GIHa1ldSbQbOPyOXyJtjg6jiZXC8cg3262qFg2YM8kzdhATddAubg+7duIgM0ngxJj6Ug37uBxAI9cXn4cs1gj/6XEPbKLHKMee2FN9x37KUnHKvoPPyrYop8iRuqAKEcNqwhuSWna02ENkHCn4UipMSEnoO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748606199; c=relaxed/simple;
-	bh=TgIyGIIOuLpJxK/0mNRaPvdDf1D8N2z4h+Hm2SzufqU=;
-	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
-	 Content-Type:References; b=Hstq4e4rhHuPvy9RNdlhNdPdn4ro3APsloOO9bREVYhg4Wi8PeTQ6mD/7SaMWbGRaXcc13PVbKwpSbofDqqDu0alZEdf5IMsYPyGAK0K9rA0CpXzZj4eXU5GTiHW234Yf+JTn0TdCpzUAdkBF8tE2UWcE1PV4zFzeOJIbU8KS3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=JPTQ4/y2; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250530115635euoutp01b103f877b3ef7e3e06fbc6da1430617c~ETBIDnNJw1023410234euoutp01R
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 11:56:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250530115635euoutp01b103f877b3ef7e3e06fbc6da1430617c~ETBIDnNJw1023410234euoutp01R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1748606195;
-	bh=TgIyGIIOuLpJxK/0mNRaPvdDf1D8N2z4h+Hm2SzufqU=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=JPTQ4/y2PuLMNh6igXoJ0WI8Ybyy6IirYc2wCbexf3QyQmgdCbUly1NT77wTNWn+N
-	 xWcELr4XlzPccrDdJ70b1SOxSu4AKyUay7V2HZhx7czk6T2QtHcI2p0ZO4sTgFHcj2
-	 W45v5zp71Sqy9TJWoqOQV/zAMhNG+lTZBvqclbNw=
+	s=arc-20240116; t=1748607439; c=relaxed/simple;
+	bh=Dl0or4c6Uc3Qr21hPBlAdyjFLBBjiTCbqz/trLFGue0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mu6OGJuipfBL5qe8h6G+ooWLoodzqI1yj8F+mHInrIa7CeifhoeLqkcTZbXh9E0/i/YcqWf3EdrAqyaevr3s5a5RjiXqNYFS8CTrXptWJ6MqObnir0P9PsK7PDbaRkZTaOroTq6q8w09xwUw0oAHIycr7t0lRccoUtnSIK/5ZIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAzOuNG/; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ad69e4f2100so299671866b.2;
+        Fri, 30 May 2025 05:17:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748607434; x=1749212234; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=00AEb2KGuYMJCeS8MDt+GUEv6nAsvPAvD/wXq4V+AfY=;
+        b=EAzOuNG//SUANJ03Sm8eE2F8dG7fSUV2WVwQrCoJ+uc/nAhL89G6lB+DSadGBWHsyG
+         7iLfrwyIONbIyYVyAk5BasZ+yIAw9/SZ6X29UPVWbQcJJYd9XC00NO/HFNKLawsk2tTj
+         4krwMmg6BTW/lFdH17+auQfkqmh64XXNmduRMi6uauI8ORUh2f1k8KwFPE/L5ylF52d4
+         wCpi5K5bRc3Nj/kGN60f9ILBZh9BG9xor1xU+xZnqHMGmCDI1Pm/BgWYrvPNhiHuzUC8
+         aQ/g2zJhO3PVAk5JK2ZCc0xmMpdbTUsM0BkZhDE5x98tVn1i9mUn5oiIUeuKDnYaRrVx
+         rxQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748607434; x=1749212234;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=00AEb2KGuYMJCeS8MDt+GUEv6nAsvPAvD/wXq4V+AfY=;
+        b=OEcB8uvKEZNQsDyWoPICyrOOnb9yZX0jvp/3sOfN5hdCr+hS0UXKSLElVDtUC4UL0R
+         xF0YSdhpEUFXvME+eu5KcMEg6mOmxuGjNr5R8RK9CD9XgwXNLzZjVcg/iZklF7WhqjH/
+         i1bnScZHMK6SDvNwpS1q3PGbaJmKoXYdUhTdSAs3Ma7r2JxGKwchs8ovcgPxU9FLpTVF
+         231CKxYJ/Mdzplmg6nOdpeQhlEYo/ers40ZxPQyIJVOSLuoiTKnKSgIPeSz7m5qHVCGX
+         cY0uhNzJ7Q2FsOFvT6KbU+So8ndvpRZORyaXodIwgo5rejB21FbFn2nvDQ+zv72mGlbv
+         /1Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJgTMkUCjAPyI+ZJERSaAPob3Tn5TT4wE/xYmEgO00Ux2ucCAayDW4FQV995g5oUY5Hj++27w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFkhE6x3PlbXMvwszTKjkFwZ+lXsdZSZfOecWI0EpxLj2qU5PR
+	4Pcttrv9rglBfqHKPhTpAg1gh5S1Bqk9YRR375rcAUm6Iy6G28Iud1PQrst8aQ==
+X-Gm-Gg: ASbGncswLvO/5a7RCiHFrHyOLTX3VYH4wpMH2nZDNX5B6gyKiZUSEyxAKCsCzaKJ7xx
+	xz/qZ2OQvLrwbdYpL5MoLxY/DigbchTXHwvbjyGBsBT3is4EqKwUq0C08V32PLqo/9QJHKQDjJa
+	nslaGw8N+Q/lNhvu/ZcA6iw6V+KbjQLcqWGc+2hJQ2Z0vpcauicnytbmZ9vQn3czhm+XShCZq2d
+	nK5mr8deuXxiNSoPUGdRwKGWGG/9bwpmJjqbU/upIKr0hY/BVXtdmICl+beVvE0GBdbOeNrwJx7
+	kfaJr4PC9bMfIHFBXmv6RCoC+2F6zwkg9VY=
+X-Google-Smtp-Source: AGHT+IGmvUgZU38AqfgxvmUConGqJIqYwbVNECpMz9O2ddRpTlNYS0WVxMM+6GOEUb0d+2sVW/a3bw==
+X-Received: by 2002:a17:907:db03:b0:ad2:28be:9a16 with SMTP id a640c23a62f3a-adb36c117ffmr178979666b.51.1748607433613;
+        Fri, 30 May 2025 05:17:13 -0700 (PDT)
+Received: from 127.com ([2620:10d:c092:600::1:a320])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d82ccedsm318566966b.48.2025.05.30.05.17.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 May 2025 05:17:12 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: asml.silence@gmail.com,
+	netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH io_uring-next 0/5] io_uring cmd for tx timestamps
+Date: Fri, 30 May 2025 13:18:18 +0100
+Message-ID: <cover.1748607147.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE: [PATCH bpf v2] xsk: Fix out of order segment free in
- __xsk_generic_xmit()
-Reply-To: e.kubanski@partner.samsung.com
-Sender: Eryk Kubanski <e.kubanski@partner.samsung.com>
-From: Eryk Kubanski <e.kubanski@partner.samsung.com>
-To: Eryk Kubanski <e.kubanski@partner.samsung.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com"
-	<magnus.karlsson@intel.com>, "maciej.fijalkowski@intel.com"
-	<maciej.fijalkowski@intel.com>, "jonathan.lemon@gmail.com"
-	<jonathan.lemon@gmail.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20250530103456.53564-1-e.kubanski@partner.samsung.com>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20250530115635eucms1p43454c8aa2f2215d2b86bc41ee9d1085e@eucms1p4>
-Date: Fri, 30 May 2025 13:56:35 +0200
-X-CMS-MailID: 20250530115635eucms1p43454c8aa2f2215d2b86bc41ee9d1085e
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-X-EPHeader: Mail
-X-ConfirmMail: N,general
-X-CMS-RootMailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-References: <20250530103456.53564-1-e.kubanski@partner.samsung.com>
-	<CGME20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009@eucms1p4>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-It seems that CI tests have failed:
+Vadim Fedorenko suggested to add an alternative API for receiving
+tx timestamps through io_uring. The series introduces io_uring socket
+cmd for fetching tx timestamps, which is a polled multishot request,
+i.e. internally polling the socket for POLLERR and posts timestamps
+when they're arrives. For the API description see Patch 5.
 
-First test_progs failure (test_progs-aarch64-gcc-14):
-#610/3 xdp_adjust_tail/xdp_adjust_tail_grow2
-...
-test_xdp_adjust_tail_grow2:FAIL:case-128 retval unexpected case-128 retval: actual 1 != expected 3
-test_xdp_adjust_tail_grow2:FAIL:case-128 data_size_out unexpected case-128 data_size_out: actual 128 != expected 3520
-test_xdp_adjust_tail_grow2:FAIL:case-128-data cnt unexpected case-128-data cnt: actual 0 != expected 3392
-test_xdp_adjust_tail_grow2:FAIL:case-128-data data_size_out unexpected case-128-data data_size_out: actual 128 != expected 3520
-...
-#620 xdp_do_redirect
-...
-test_max_pkt_size:FAIL:prog_run_max_size unexpected error: -22 (errno 22)
+It reuses existing timestamp infra and takes them from the socket's
+error queue. For networking people the important parts are Patch 1,
+and io_uring_cmd_timestamp() from Patch 5 walking the error queue.
 
-But Im not sure why?
+It should be reasonable to take it through the io_uring tree once
+we have consensus, but let me know if there are any concerns.
 
-My changes impact only AF_XDP generic_xmit functions, these bpf tests don't touch
-AF_XDP sockets xmit path. Changes should impact only sendmsg socket syscall.
-Most of changes are Translation Unit local to xsk module.
-The only thing i think could impact that is skb_shared_info, but why?
+Pavel Begunkov (5):
+  net: timestamp: add helper returning skb's tx tstamp
+  io_uring/poll: introduce io_arm_apoll()
+  io_uring/cmd: allow multishot polled commands
+  io_uring: add mshot helper for posting CQE32
+  io_uring/netcmd: add tx timestamping cmd support
 
-xsk tests didn't fail. Could you help me figure it out?
-Should I be worried? Maybe tests are broken?
+ include/net/sock.h            |  4 ++
+ include/uapi/linux/io_uring.h |  6 +++
+ io_uring/cmd_net.c            | 77 +++++++++++++++++++++++++++++++++++
+ io_uring/io_uring.c           | 40 ++++++++++++++++++
+ io_uring/io_uring.h           |  1 +
+ io_uring/poll.c               | 43 +++++++++++--------
+ io_uring/poll.h               |  1 +
+ io_uring/uring_cmd.c          | 34 ++++++++++++++++
+ io_uring/uring_cmd.h          |  7 ++++
+ net/socket.c                  | 49 ++++++++++++++++++++++
+ 10 files changed, 245 insertions(+), 17 deletions(-)
+
+-- 
+2.49.0
+
 
