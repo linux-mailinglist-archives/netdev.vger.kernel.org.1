@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-194435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FF7AC9712
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:31:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EE02AC9715
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 23:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C794A7947
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:31:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 003B14A7AC3
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388C8283CA7;
-	Fri, 30 May 2025 21:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4AF2836A4;
+	Fri, 30 May 2025 21:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="H1ekHiW/"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="UGX3FGdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B554422AE5D
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975A227815C
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 21:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748640695; cv=none; b=laadTeqTtvexZZZsTFsZCTtfj4kIj0UdprKGtoIooavq6JwSsXo47rw3clFsySGClPyoLk4eAAHAdwOc88+EBiG6dJs+TvST0mAPmEkVY8XnVDrKx9gPRr11uDzl+skLuSG+HQLMbTpf8wp5PfmnMgd7zQJahj8cOpsfDEIUCw0=
+	t=1748640700; cv=none; b=Q/5JmQi3AdDWTUvieCtEEKZ1891S0rY/IUuh4uprot+U5DwGurPhi7D6kRU0nQcYQF19jkAdFCWNt4VNb4zInjFIpgVDzIrQZBpa7fW870jSc6TCdW2mn1/AghavvgT6SXq1kOhlTfzj/qyTTf4YpFX+jMv1bYYXiKo1s9G6n2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748640695; c=relaxed/simple;
-	bh=J9WHRyvRODERSUE/XtH3ualLiF0NfpgkyfMoaf1Ef5Q=;
+	s=arc-20240116; t=1748640700; c=relaxed/simple;
+	bh=FOcUHNTpKxanwjKC5eDfYqm4hOoO4sD1M81ThFNCU5A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rm93Rq6rz81l54C+VNl0UlIXoIVBKiVDQhiOrYsiQaEC6KL9Qpy5xQZXo7bbvsVU3uGZs9aAUfHi/WUUmgcI0CdtxVe521S8pt9aQD3KoU8pLLkYffXAB+29AlgRKeohHEIrhpMmSRV14kIjDnOEviIMjpzYGbDvxsFLRt+kmsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=H1ekHiW/; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=GPhoxgnNRd6n09V/6IG7CPiWlGS9kPmNRr76xc998+lIsCdVOg2vixG/9zfwDlNigGGEMmMqO/fBnvlKQIPklZw1TQqneHjlqxZzhn/TJyO+vcWNwVwFuIo7JaRu+pa0StqkFUySu9+vSZJOZwvKHHxMVLccF0PLBiYOY9CM6gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=UGX3FGdS; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-311f6be42f1so417973a91.0
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:31:33 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b07698318ebso254024a12.2
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:31:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1748640693; x=1749245493; darn=vger.kernel.org;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1748640698; x=1749245498; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lrPFMR4OHikyTVTJ8EtBy3d62qMwlWrkmeEZ+t0fDVs=;
-        b=H1ekHiW/D6rmw+E5kMQMKtGPOTCLQUxK8DQHOViCRsB5q6kKEofVvm3+PTeNCW4gJt
-         HFHCCSmEZ4sYmHgeckr1er6bw3vX876KavDNUe+Iy9GQP/opLvUX2ZO4MxsdUpddEJp9
-         BQUhYwjCKNR0XOKIiaB9X/bMwjChxDOgQleEvuICCw5r3Ab93mVKFEYCWeAJTahAkzyr
-         9U07Oprf+povqvtEp9znIKXAG1I0wWnGuu3py9FaYoIApg7PpxuikVpU2N23GnTqD9u4
-         h2uyKzRZ3DVRvvIdLOH2boJPnoQYwsdaOm5rvrUl2fMc2o1EoWCdaMudedKMGP5+tX7i
-         p73A==
+        bh=DAuMzqm0JIrbgbPTkm58pDclP9IWfOkAF/9DsG83V1U=;
+        b=UGX3FGdSQB0ZcGIpAl6a+wQIJtFMwQYWB3GLu6jPsMyLEfiTHTwpotqmvVHG/fLUTp
+         PZEwYhHyEAWC5rnGcNeX8b5yles6APPUTgya/3XWrflmUETDHqynBrF3VImO4VUfvgkM
+         RkJn4BxMtOhlnn8OHNq/Y5tCKB+/xVhDcVQmRQ/EwWZVhIjwuOS7O4CJeQLA5gtDX+Yf
+         CcLHfvT+iudaF0CBMijLM8wieVy5se4NGyIHK6NA9xguqALyH4yXgmqwZqWjxHs+OUS5
+         USc9dR5frRvGr/rthu7tX1Nr1C/QUrNrXyNI0sZqxh3drXA+X4WSRq9ptbjba37/JQMV
+         1fHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748640693; x=1749245493;
+        d=1e100.net; s=20230601; t=1748640698; x=1749245498;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lrPFMR4OHikyTVTJ8EtBy3d62qMwlWrkmeEZ+t0fDVs=;
-        b=iiSSD3dvm8+KRbcV1a3pXXfZPnRQXzYmTABFt2DJSVbsRuhjGjYINC69d7n1tpc5sV
-         4WaDx75fmd906aSv4+1HRI6+sKXGpGDB5F5uyfUMx6smqSbN3gsFi/QAku0NuXBvLImF
-         dVt4+AxnmrBhZaX0ZgcH/g4eMxeHLrbJ4UXl79u9pi1uPZBSkTBjkU9HVNuN7BfPTChv
-         Skvg/SlUpXYLW+cl4HYE2jbV4LWSaAlNqZ/sTqFaACDFALEicsxkOMD3NeEkKOW4PLf6
-         TMaTBAr77GBlHmngLkQ13Q7ZHqWiJ5MwiW9V10RExv021wEbzKSLw6ISbjmIraVngvpM
-         3AtQ==
-X-Gm-Message-State: AOJu0YxZAB/Ss35xHSY6K4PrHzpn/ZDyYA/oBPVKVatEerLTomuiAUCp
-	cRrzrjSr/bwz/MFx2ECULOjY+PJER8yXox5HpmqFvSFaboBYY4oEkgM3c1dXuDY4cm81Gqmgdvg
-	7HltmITQ=
-X-Gm-Gg: ASbGncvGUvX6YfkKW4mTXRNQfjO50cJWYgMvtl9yIuAwLtkGtMNkQanyZKMzV6FGBPT
-	F8pBP1EUcLkM3KWjGu/eyi+79yFw/5aeQbp64Rpa+hlm/fkkB/O7r61UbB+y6cNmyUmsvb9UMRy
-	xX6ALEzybEU0+avsCA82o1BrEBb3qM/SaWoZf/9ZpBtCI3Rr1ONKvMMhX0pQSwZRf6L8+qDn9sw
-	eAjF0gKAaRBxFeWAwHNHCT/sr9yn08n1hduKNs/XgtomdH8dLK1VlUelFnt9nwMH1Gj+uQOcnlM
-	ol7wVAuovrodBSYzhkpE0EsNFmORs3z+pndgWQZ3v9hnA2fa8bc=
-X-Google-Smtp-Source: AGHT+IFo8QSMR5x70ZxacAYiDsgqN5V0KAJHsYDI4igY7kQSKbZjsJ+CS8YlcTb1rMB3LWCWyCrbOg==
-X-Received: by 2002:a05:6a00:1702:b0:736:355b:5df6 with SMTP id d2e1a72fcca58-747bda36189mr2383978b3a.6.1748640692712;
-        Fri, 30 May 2025 14:31:32 -0700 (PDT)
+        bh=DAuMzqm0JIrbgbPTkm58pDclP9IWfOkAF/9DsG83V1U=;
+        b=uR3FFBSQSrfUCuRw1rqBNaH9ktoMTARE3YUOKRukhNKJmPzC8GMiorD22TtkXqUvNI
+         E32J9mZ9whp1YdrUVa/H1MG6O6TIbPsloHXqon0jGmCe/oXlTATw6LnXEPPcimSOIHXl
+         i1LMzUkcPqrJnLmZ1OtXuuDpKxPy0l1Za2UGeWxAUmfLevQhzYsuwkH2tsNZ1rhSdIPv
+         Jp07NFgWb+iKj6UroqDJlKXdWFFQLXdOIYo9Or4wl+yeb5ywQZaKPcbNeHvOW3ZAT+8x
+         m3nQuLA1kYD6JyLWLtiXL6Pt79kDjpjd7QpjPP59nVj+8ATERrU+pi9FhumTX3bIl7jI
+         S+cA==
+X-Gm-Message-State: AOJu0YzABONtNfMFs3HerA2ZRjuYZoulKnZFHBbdfrD46p7VDfjph7Ot
+	jpiADkip+zxe1kom766q/5lfzundJ20KvAEFPpZok7PwJlN2aun+pezlnSkbPfUmA5XZPQ74OqS
+	FIsezQqU=
+X-Gm-Gg: ASbGncu1/c3f/jmY940HpjxL8WAKMOQDmtGXKGPATOlddIKUQ9Ge/OvB1aL6PRCEfDW
+	HzSy3vTWgALmrW+ei5s5eHZK4YpK7dP99fklQjYSmv2xW0SKUIDJd/c2zyCZNVwMTfgJoKzLJ+F
+	hgJwsHJEosU/Ai4rzvMbFwyWajjGedLrxSJKa/h/QF94OK+CdvsYZWO9q9icTCYKmlMwf/t4Hge
+	RVeySOdV8KedlFhzBHH7eNCgRpk+87UBuEPrHDVhxnI/4OlfqOM3OsHjW7/3zvLxs87CY6lxTeX
+	x7UIunXzOoEGjsl9kYsbv0qMLtQKdxrTQ2lK4rsRWmJOsl1dbgg=
+X-Google-Smtp-Source: AGHT+IGshsPyEOoWsXyOdXlzAJMIQj+RTcFf8IsiQ9hJ8hrwBshnt9FodASwItJPDM5O3eiKgMemKg==
+X-Received: by 2002:a05:6a00:1815:b0:742:938a:3eca with SMTP id d2e1a72fcca58-747bda0937cmr2671386b3a.3.1748640697646;
+        Fri, 30 May 2025 14:31:37 -0700 (PDT)
 Received: from t14.. ([2607:fb91:20c7:44b2:2a24:2057:271e:f269])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed4399sm3496763b3a.77.2025.05.30.14.31.28
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed4399sm3496763b3a.77.2025.05.30.14.31.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 14:31:32 -0700 (PDT)
+        Fri, 30 May 2025 14:31:37 -0700 (PDT)
 From: Jordan Rife <jordan@jrife.io>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org
@@ -81,9 +81,9 @@ Cc: Jordan Rife <jordan@jrife.io>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: [PATCH v2 bpf-next 04/12] bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch items
-Date: Fri, 30 May 2025 14:30:46 -0700
-Message-ID: <20250530213059.3156216-5-jordan@jrife.io>
+Subject: [PATCH v2 bpf-next 05/12] bpf: tcp: Avoid socket skips and repeats during iteration
+Date: Fri, 30 May 2025 14:30:47 -0700
+Message-ID: <20250530213059.3156216-6-jordan@jrife.io>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250530213059.3156216-1-jordan@jrife.io>
 References: <20250530213059.3156216-1-jordan@jrife.io>
@@ -95,112 +95,222 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prepare for the next patch that tracks cookies between iterations by
-converting struct sock **batch to union bpf_tcp_iter_batch_item *batch
-inside struct bpf_tcp_iter_state.
+Replace the offset-based approach for tracking progress through a bucket
+in the TCP table with one based on socket cookies. Remember the cookies
+of unprocessed sockets from the last batch and use this list to
+pick up where we left off or, in the case that the next socket
+disappears between reads, find the first socket after that point that
+still exists in the bucket and resume from there.
+
+This approach guarantees that all sockets that existed when iteration
+began and continue to exist throughout will be visited exactly once.
+Sockets that are added to the table during iteration may or may not be
+seen, but if they are they will be seen exactly once.
 
 Signed-off-by: Jordan Rife <jordan@jrife.io>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/tcp_ipv4.c | 24 ++++++++++++++----------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+ net/ipv4/tcp_ipv4.c | 142 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 114 insertions(+), 28 deletions(-)
 
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index ac00015d5e7a..c51ac10fc351 100644
+index c51ac10fc351..f32adf0b7cf5 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
-@@ -3014,12 +3014,16 @@ static int tcp4_seq_show(struct seq_file *seq, void *v)
- }
+@@ -58,6 +58,7 @@
+ #include <linux/times.h>
+ #include <linux/slab.h>
+ #include <linux/sched.h>
++#include <linux/sock_diag.h>
  
+ #include <net/net_namespace.h>
+ #include <net/icmp.h>
+@@ -3016,6 +3017,7 @@ static int tcp4_seq_show(struct seq_file *seq, void *v)
  #ifdef CONFIG_BPF_SYSCALL
-+union bpf_tcp_iter_batch_item {
-+	struct sock *sk;
-+};
-+
- struct bpf_tcp_iter_state {
- 	struct tcp_iter_state state;
- 	unsigned int cur_sk;
- 	unsigned int end_sk;
- 	unsigned int max_sk;
--	struct sock **batch;
-+	union bpf_tcp_iter_batch_item *batch;
+ union bpf_tcp_iter_batch_item {
+ 	struct sock *sk;
++	__u64 cookie;
  };
  
- struct bpf_iter__tcp {
-@@ -3045,13 +3049,13 @@ static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
- 	unsigned int cur_sk = iter->cur_sk;
+ struct bpf_tcp_iter_state {
+@@ -3046,10 +3048,19 @@ static int tcp_prog_seq_show(struct bpf_prog *prog, struct bpf_iter_meta *meta,
  
- 	while (cur_sk < iter->end_sk)
--		sock_gen_put(iter->batch[cur_sk++]);
-+		sock_gen_put(iter->batch[cur_sk++].sk);
+ static void bpf_iter_tcp_put_batch(struct bpf_tcp_iter_state *iter)
+ {
++	union bpf_tcp_iter_batch_item *item;
+ 	unsigned int cur_sk = iter->cur_sk;
++	__u64 cookie;
+ 
+-	while (cur_sk < iter->end_sk)
+-		sock_gen_put(iter->batch[cur_sk++].sk);
++	/* Remember the cookies of the sockets we haven't seen yet, so we can
++	 * pick up where we left off next time around.
++	 */
++	while (cur_sk < iter->end_sk) {
++		item = &iter->batch[cur_sk++];
++		cookie = sock_gen_cookie(item->sk);
++		sock_gen_put(item->sk);
++		item->cookie = cookie;
++	}
  }
  
  static int bpf_iter_tcp_realloc_batch(struct bpf_tcp_iter_state *iter,
- 				      unsigned int new_batch_sz, gfp_t flags)
- {
--	struct sock **new_batch;
-+	union bpf_tcp_iter_batch_item *new_batch;
- 
- 	new_batch = kvmalloc(sizeof(*new_batch) * new_batch_sz,
- 			     flags | __GFP_NOWARN);
-@@ -3078,7 +3082,7 @@ static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
- 	struct sock *sk;
- 
- 	sock_hold(*start_sk);
--	iter->batch[iter->end_sk++] = *start_sk;
-+	iter->batch[iter->end_sk++].sk = *start_sk;
- 
- 	sk = sk_nulls_next(*start_sk);
- 	*start_sk = NULL;
-@@ -3086,7 +3090,7 @@ static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
- 		if (seq_sk_match(seq, sk)) {
- 			if (iter->end_sk < iter->max_sk) {
- 				sock_hold(sk);
--				iter->batch[iter->end_sk++] = sk;
-+				iter->batch[iter->end_sk++].sk = sk;
- 			} else if (!*start_sk) {
- 				/* Remember where we left off. */
- 				*start_sk = sk;
-@@ -3107,7 +3111,7 @@ static unsigned int bpf_iter_tcp_established_batch(struct seq_file *seq,
- 	struct sock *sk;
- 
- 	sock_hold(*start_sk);
--	iter->batch[iter->end_sk++] = *start_sk;
-+	iter->batch[iter->end_sk++].sk = *start_sk;
- 
- 	sk = sk_nulls_next(*start_sk);
- 	*start_sk = NULL;
-@@ -3115,7 +3119,7 @@ static unsigned int bpf_iter_tcp_established_batch(struct seq_file *seq,
- 		if (seq_sk_match(seq, sk)) {
- 			if (iter->end_sk < iter->max_sk) {
- 				sock_hold(sk);
--				iter->batch[iter->end_sk++] = sk;
-+				iter->batch[iter->end_sk++].sk = sk;
- 			} else if (!*start_sk) {
- 				/* Remember where we left off. */
- 				*start_sk = sk;
-@@ -3211,7 +3215,7 @@ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
- 	bpf_iter_tcp_unlock_bucket(seq);
- 
- 	WARN_ON_ONCE(iter->end_sk != expected);
--	return iter->batch[0];
-+	return iter->batch[0].sk;
+@@ -3073,6 +3084,106 @@ static int bpf_iter_tcp_realloc_batch(struct bpf_tcp_iter_state *iter,
+ 	return 0;
  }
  
- static void *bpf_iter_tcp_seq_start(struct seq_file *seq, loff_t *pos)
-@@ -3246,11 +3250,11 @@ static void *bpf_iter_tcp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 		 * st->bucket.  See tcp_seek_last_pos().
- 		 */
- 		st->offset++;
--		sock_gen_put(iter->batch[iter->cur_sk++]);
-+		sock_gen_put(iter->batch[iter->cur_sk++].sk);
- 	}
++static struct sock *bpf_iter_tcp_resume_bucket(struct sock *first_sk,
++					       union bpf_tcp_iter_batch_item *cookies,
++					       int n_cookies)
++{
++	struct hlist_nulls_node *node;
++	struct sock *sk;
++	int i;
++
++	for (i = 0; i < n_cookies; i++) {
++		sk = first_sk;
++		sk_nulls_for_each_from(sk, node) {
++			if (cookies[i].cookie == atomic64_read(&sk->sk_cookie))
++				return sk;
++		}
++	}
++
++	return NULL;
++}
++
++static struct sock *bpf_iter_tcp_resume_listening(struct seq_file *seq)
++{
++	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
++	struct bpf_tcp_iter_state *iter = seq->private;
++	struct tcp_iter_state *st = &iter->state;
++	unsigned int find_cookie = iter->cur_sk;
++	unsigned int end_cookie = iter->end_sk;
++	int resume_bucket = st->bucket;
++	struct sock *sk;
++
++	if (end_cookie && find_cookie == end_cookie)
++		++st->bucket;
++
++	sk = listening_get_first(seq);
++	iter->cur_sk = 0;
++	iter->end_sk = 0;
++
++	if (sk && st->bucket == resume_bucket && end_cookie) {
++		sk = bpf_iter_tcp_resume_bucket(sk, &iter->batch[find_cookie],
++						end_cookie - find_cookie);
++		if (!sk) {
++			spin_unlock(&hinfo->lhash2[st->bucket].lock);
++			++st->bucket;
++			sk = listening_get_first(seq);
++		}
++	}
++
++	return sk;
++}
++
++static struct sock *bpf_iter_tcp_resume_established(struct seq_file *seq)
++{
++	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
++	struct bpf_tcp_iter_state *iter = seq->private;
++	struct tcp_iter_state *st = &iter->state;
++	unsigned int find_cookie = iter->cur_sk;
++	unsigned int end_cookie = iter->end_sk;
++	int resume_bucket = st->bucket;
++	struct sock *sk;
++
++	if (end_cookie && find_cookie == end_cookie)
++		++st->bucket;
++
++	sk = established_get_first(seq);
++	iter->cur_sk = 0;
++	iter->end_sk = 0;
++
++	if (sk && st->bucket == resume_bucket && end_cookie) {
++		sk = bpf_iter_tcp_resume_bucket(sk, &iter->batch[find_cookie],
++						end_cookie - find_cookie);
++		if (!sk) {
++			spin_unlock_bh(inet_ehash_lockp(hinfo, st->bucket));
++			++st->bucket;
++			sk = established_get_first(seq);
++		}
++	}
++
++	return sk;
++}
++
++static struct sock *bpf_iter_tcp_resume(struct seq_file *seq)
++{
++	struct bpf_tcp_iter_state *iter = seq->private;
++	struct tcp_iter_state *st = &iter->state;
++	struct sock *sk = NULL;
++
++	switch (st->state) {
++	case TCP_SEQ_STATE_LISTENING:
++		sk = bpf_iter_tcp_resume_listening(seq);
++		if (sk)
++			break;
++		st->bucket = 0;
++		st->state = TCP_SEQ_STATE_ESTABLISHED;
++		fallthrough;
++	case TCP_SEQ_STATE_ESTABLISHED:
++		sk = bpf_iter_tcp_resume_established(seq);
++	}
++
++	return sk;
++}
++
+ static unsigned int bpf_iter_tcp_listening_batch(struct seq_file *seq,
+ 						 struct sock **start_sk)
+ {
+@@ -3145,7 +3256,6 @@ static void bpf_iter_tcp_unlock_bucket(struct seq_file *seq)
  
- 	if (iter->cur_sk < iter->end_sk)
--		sk = iter->batch[iter->cur_sk];
-+		sk = iter->batch[iter->cur_sk].sk;
- 	else
- 		sk = bpf_iter_tcp_batch(seq);
+ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
+ {
+-	struct inet_hashinfo *hinfo = seq_file_net(seq)->ipv4.tcp_death_row.hashinfo;
+ 	struct bpf_tcp_iter_state *iter = seq->private;
+ 	struct tcp_iter_state *st = &iter->state;
+ 	int prev_bucket, prev_state;
+@@ -3154,29 +3264,10 @@ static struct sock *bpf_iter_tcp_batch(struct seq_file *seq)
+ 	struct sock *sk;
+ 	int err;
+ 
+-	/* The st->bucket is done.  Directly advance to the next
+-	 * bucket instead of having the tcp_seek_last_pos() to skip
+-	 * one by one in the current bucket and eventually find out
+-	 * it has to advance to the next bucket.
+-	 */
+-	if (iter->end_sk && iter->cur_sk == iter->end_sk) {
+-		st->offset = 0;
+-		st->bucket++;
+-		if (st->state == TCP_SEQ_STATE_LISTENING &&
+-		    st->bucket > hinfo->lhash2_mask) {
+-			st->state = TCP_SEQ_STATE_ESTABLISHED;
+-			st->bucket = 0;
+-		}
+-	}
+-
+ again:
+-	/* Get a new batch */
+-	iter->cur_sk = 0;
+-	iter->end_sk = 0;
+-
+ 	prev_bucket = st->bucket;
+ 	prev_state = st->state;
+-	sk = tcp_seek_last_pos(seq);
++	sk = bpf_iter_tcp_resume(seq);
+ 	if (!sk)
+ 		return NULL; /* Done */
+ 	if (st->bucket != prev_bucket || st->state != prev_state)
+@@ -3245,11 +3336,6 @@ static void *bpf_iter_tcp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ 		 * meta.seq_num is used instead.
+ 		 */
+ 		st->num++;
+-		/* Move st->offset to the next sk in the bucket such that
+-		 * the future start() will resume at st->offset in
+-		 * st->bucket.  See tcp_seek_last_pos().
+-		 */
+-		st->offset++;
+ 		sock_gen_put(iter->batch[iter->cur_sk++].sk);
+ 	}
  
 -- 
 2.43.0
