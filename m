@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-194419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD754AC95E2
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:00:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD8BAC95FB
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:14:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5061C214DF
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B3CF504F6F
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E97D27702A;
-	Fri, 30 May 2025 19:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A354278768;
+	Fri, 30 May 2025 19:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2ytXwcq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DIGW7bet"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF69143736;
-	Fri, 30 May 2025 19:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD0C23E35B;
+	Fri, 30 May 2025 19:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748631602; cv=none; b=lCc5cxnQ9cJz2/WB0fzwwnHayy51CoDn3pHZxcO8Z7jtFF0AZKPlbKSX6s9eyQqo09axK8CT8x67nBOgli7q4dxXL39mItB5PUmhWiCV+ZewTUG93N5WTpBs8K0Nl/ir0Q4V6AnzwvGIjTse4Vccvwi1/ooLyYL9/b3NUSHrHvs=
+	t=1748632494; cv=none; b=TiwJPyQHFKJZTsKMA5b6ThE/1uUDZYUDVBdUslUPt0FNMBlV4SJ9mtrciabKoxtI+lZQuQkpEx2PYJqMJo32ixTCoNK2Pxj2pv4dbUx2Mo6T1RxO9yMhIlvdSZXfg7WcvjAUz8pTmiaZUUV9A7Vy7PKeYVtXkqrgq7eumrR4PN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748631602; c=relaxed/simple;
-	bh=R/1ttUhwWL20tO3Oj72nIul8lSsN8Vi4gj6eFjy4uvk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=VWN7Cf+cLlc65i28LEuC+X+gGmInwCe6J+YXIR4xqPW7zSkYuy+n9tO2YHYfkZleWU0s7rcICjH86KyS4ufFVHx5g1s6Ts/Scz/WtMfK+l+QcKWULYz2UoVTxwBbE0mUnU0SiQX18yzErWK9zkzK8fCn12e9xTQziCctsazGag8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2ytXwcq; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6f0ad74483fso24461356d6.1;
-        Fri, 30 May 2025 12:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748631599; x=1749236399; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VlSkcnxW3G6p+It/B2UidZpyAR61Usu9SZ3iGbjjQoo=;
-        b=U2ytXwcqz7iPQjluGDB7eizWTatHauLU5BGvGegwzIrp0QvN6Lyqrns7ClW52y1wqr
-         U288xA3nPjcb8NwWnU/zn+MB9hQoo6ZmpoQYTnGq8eT4ZCcca3NCQPU7awMHYxHwer2a
-         BZs8R3CLBb9W+wnziHLwbwDN7uH8V5Uzq2KMiqwt1E4XB2iPIGTyyeuv3NPeyXh1e2si
-         bEtNuJR3JeHcwaXIVKwrkqcD1LYISP3YZAo6QpbfheXkInU4BtxKElzpjG5bl2OtOjLG
-         Yze6iL2wygrCHeUwbLk3xF3dL3gjSrCzDSaI6r88GPcg0kOTosDtrTeOX1Lb9eL7aPOl
-         jK7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748631599; x=1749236399;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VlSkcnxW3G6p+It/B2UidZpyAR61Usu9SZ3iGbjjQoo=;
-        b=d9bWqsQxUbhjryUB2OcaN79S0RSxsnTijo+WJiG9MbhrvW0j8MXmCMuSyIiiGw2yBf
-         Ae4UQ+VSv3tDMG923+g3M0lBhHkgHfJoTZe9fz0N6WvDp2DTcl0F/hC2RJdGascs+kF6
-         GVOeu/RpwFxD9hPsS6rkXDhO5wBOGFu8BLrUvQ4x0D8zsf9txjF6mTldXqByRwkVC3/D
-         zEVRFyvPu2PtAJEaYMMUX0W/ACgtaCHuFj26J5YA6htHd3uWHL6wWZiK99xK544pOJ7a
-         X02GmSeDfkUSCYOGXgSvHGah/0x3HfZf/pKGsdo3qIeThj9FhNzERTjkiFBNWDDDmGZS
-         F/cg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPfH+qdPKCTHo29pFYeukWdXTNSybWI0fGeFkTiK20E8ap5NFeHPYhUwO9WQ8wUHQgXpi6roe3UAD7tOo=@vger.kernel.org, AJvYcCWFK6Ma14GaQppdT+cOXl2sw1lG0+KWnOnfPxEeom1iHr49VuD3RTGy04PCJxqxAsYHStuu7UJ7@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu/s/9ml4m8DCYDTD0IlKY4/oqYEu2q1frS2kvMyoT9O3OIdOF
-	B2TL0QyeRlraZJ3NYKE1giSF/hnULOae92kAqeiixIzbDTGBmStQ+4Hq
-X-Gm-Gg: ASbGnctmvaTjr7H9I6qXomiIcr2xYaCouKFViRxNNthkXtraKgkJqf42hG1ycVe1XSX
-	pDaQjMa6sfIrlxm+Zgzfvi86utbbKS8JVFBzvCFBNlkMYEbpJoF8baBxNMkQ8PyH/oP1kCGehy6
-	pEqHPoOOdfR0u3ilHdIp4apykv3rUYPNUlLQb4CQ3n0bvBTlYPTDtMl3+6VZxOT+3ZTWWMpVS0t
-	8cE+epmIAtb836hmPy49bZ6NACLH1HS0zw2lq0qnOyoKyJw4xWkdBAr0oOwO3mEpN08uHKz+Xx6
-	QUvP5TTkGL8EpvpveMe+T/HnsM5J+b9FLz5eJyMin/BU0nt8rSLKsb5xW2WCteNZPrVA66OYwZk
-	KvI0MhAlJpT+Q4ejSpy6Rvpw=
-X-Google-Smtp-Source: AGHT+IFx8IyTKo5TZ833fVfIeZTnexMvd1NFwxQvRRS1nv0eUFRm+lGvfllz96odl8pQhvtQnBlihg==
-X-Received: by 2002:a05:6214:d02:b0:6fa:c5be:dac7 with SMTP id 6a1803df08f44-6facebcf4bdmr90062106d6.18.1748631599419;
-        Fri, 30 May 2025 11:59:59 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6fac6d5b144sm27523856d6.55.2025.05.30.11.59.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 11:59:58 -0700 (PDT)
-Date: Fri, 30 May 2025 14:59:58 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Shiming Cheng <shiming.cheng@mediatek.com>, 
- willemb@google.com, 
- edumazet@google.com, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- matthias.bgg@gmail.com, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- lena.wang@mediatek.com
-Message-ID: <683a002e73efd_14767f294d6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250530183706.GV1484967@horms.kernel.org>
-References: <20250530012622.7888-1-shiming.cheng@mediatek.com>
- <6839a707f1b14_1003de2943b@willemb.c.googlers.com.notmuch>
- <20250530183706.GV1484967@horms.kernel.org>
-Subject: Re: [PATCH net v6] net: fix udp gso skb_segment after pull from
- frag_list
+	s=arc-20240116; t=1748632494; c=relaxed/simple;
+	bh=o94uNCWV71Npa/D7DFRsizf1ZwcH4B1mlc/EOztA0Kw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h6LpffOtx/qZ8FWjRQyY+b5trOY51FPuTf0eyDuuxGbyx+hu5vhFJxqNWHjuwh5aL/Pv4bUkmNDgjSUCP1dAiaplwklv/XTDdJUdoVfgOlPZ9iIJn6XmqNXYun0M/viUClDw9ApbaPCbPVfBaI0EYPZ76hIvekcTrReibH1Syd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DIGW7bet; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748632493; x=1780168493;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=o94uNCWV71Npa/D7DFRsizf1ZwcH4B1mlc/EOztA0Kw=;
+  b=DIGW7betdw4A7LfDhL/nZ09cFVNkcL3zzyxQv6c0eaho2zAMwdbjvV41
+   jpWx87BBaIXP4ON9hnj3FPhlNc3jxYDjXCWPLbQyDsrvxe9hL4Ia8eCVn
+   Ao8NKm8zC4ZIv4qwgVUe7f77kKO+VZ2CnUhV+73IrfROMM6o9mzcGutG/
+   nEHndllsdpCIscCl2duuPtU9EdQaEmkFnf7DQUDToYQlLdUsQBwGxq3RM
+   DeF6YI/94uWGLFKmjaIdiOpSjHKFo89H5TB6ZHnSjcU9lPckqWA6YYXIA
+   a7zOVOINoyBCd65xKAZHr52ke4McGizgkTZQaqJhWCbwFrpg+p3hzsVUZ
+   g==;
+X-CSE-ConnectionGUID: i/ug7soHTxmnwREaFCyxcA==
+X-CSE-MsgGUID: du7oQRH6RJym+M7YAgcjPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11449"; a="60991991"
+X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
+   d="scan'208";a="60991991"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 12:14:53 -0700
+X-CSE-ConnectionGUID: eS2mBj5fQZS6qe3p2T0onQ==
+X-CSE-MsgGUID: y9qpQ4EUTiiGK7G8smW0bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
+   d="scan'208";a="147843228"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 30 May 2025 12:14:50 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uL5Bm-000Xtw-2y;
+	Fri, 30 May 2025 19:14:46 +0000
+Date: Sat, 31 May 2025 03:14:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: =?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	jonas.gorski@gmail.com, florian.fainelli@broadcom.com,
+	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev,
+	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>
+Subject: Re: [PATCH] net: dsa: b53: support legacy FCS tags
+Message-ID: <202505310308.8veTfz2G-lkp@intel.com>
+References: <20250530155618.273567-4-noltari@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250530155618.273567-4-noltari@gmail.com>
 
-Simon Horman wrote:
-> On Fri, May 30, 2025 at 08:39:35AM -0400, Willem de Bruijn wrote:
-> > Shiming Cheng wrote:
-> > > Commit a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after
-> > > pull from frag_list") detected invalid geometry in frag_list skbs and
-> > > redirects them from skb_segment_list to more robust skb_segment. But some
-> > > packets with modified geometry can also hit bugs in that code. We don't
-> > > know how many such cases exist. Addressing each one by one also requires
-> > > touching the complex skb_segment code, which risks introducing bugs for
-> > > other types of skbs. Instead, linearize all these packets that fail the
-> > > basic invariants on gso fraglist skbs. That is more robust.
-> > > 
-> > > If only part of the fraglist payload is pulled into head_skb, it will
-> > > always cause exception when splitting skbs by skb_segment. For detailed
-> > > call stack information, see below.
-> > > 
-> > > Valid SKB_GSO_FRAGLIST skbs
-> > > - consist of two or more segments
-> > > - the head_skb holds the protocol headers plus first gso_size
-> > > - one or more frag_list skbs hold exactly one segment
-> > > - all but the last must be gso_size
-> > > 
-> > > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-> > > modify fraglist skbs, breaking these invariants.
-> > > 
-> > > In extreme cases they pull one part of data into skb linear. For UDP,
-> > > this  causes three payloads with lengths of (11,11,10) bytes were
-> > > pulled tail to become (12,10,10) bytes.
-> > > 
-> > > The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
-> > > payload was pulled into head_skb, it needs to be linearized before pass
-> > > to regular skb_segment.
-> > > 
-> > >     skb_segment+0xcd0/0xd14
-> > >     __udp_gso_segment+0x334/0x5f4
-> > >     udp4_ufo_fragment+0x118/0x15c
-> > >     inet_gso_segment+0x164/0x338
-> > >     skb_mac_gso_segment+0xc4/0x13c
-> > >     __skb_gso_segment+0xc4/0x124
-> > >     validate_xmit_skb+0x9c/0x2c0
-> > >     validate_xmit_skb_list+0x4c/0x80
-> > >     sch_direct_xmit+0x70/0x404
-> > >     __dev_queue_xmit+0x64c/0xe5c
-> > >     neigh_resolve_output+0x178/0x1c4
-> > >     ip_finish_output2+0x37c/0x47c
-> > >     __ip_finish_output+0x194/0x240
-> > >     ip_finish_output+0x20/0xf4
-> > >     ip_output+0x100/0x1a0
-> > >     NF_HOOK+0xc4/0x16c
-> > >     ip_forward+0x314/0x32c
-> > >     ip_rcv+0x90/0x118
-> > >     __netif_receive_skb+0x74/0x124
-> > >     process_backlog+0xe8/0x1a4
-> > >     __napi_poll+0x5c/0x1f8
-> > >     net_rx_action+0x154/0x314
-> > >     handle_softirqs+0x154/0x4b8
-> > > 
-> > >     [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
-> > >     [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> > >     [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
-> > >     [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
-> > >     [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
-> > >     [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
-> > >     [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
-> > >     [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
-> > > 
-> > > Fixes: a1e40ac5b5e9 ("gso: fix udp gso fraglist segmentation after pull from frag_list")
-> > > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Hi Álvaro,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+kernel test robot noticed the following build errors:
 
-> > 
-> > Is this effectively a repost of v5?
-> > 
-> > I think Simon suggested changing the subject line from starting with
-> > "net:" to starting with "gso:", but this revision does not make such
-> > a change.
-> 
-> FTR, my suggestion was to correct the subject embedded in the Fixes tag.
-> And that appears to be addressed in this revision (v6).
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.15 next-20250530]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Oh, your comment was on the Fixes tag. I misunderstood. Good catch, thanks.
+url:    https://github.com/intel-lab-lkp/linux/commits/lvaro-Fern-ndez-Rojas/net-dsa-b53-support-legacy-FCS-tags/20250530-235844
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250530155618.273567-4-noltari%40gmail.com
+patch subject: [PATCH] net: dsa: b53: support legacy FCS tags
+config: sparc-randconfig-001-20250531 (https://download.01.org/0day-ci/archive/20250531/202505310308.8veTfz2G-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250531/202505310308.8veTfz2G-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505310308.8veTfz2G-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/dsa/b53/b53_common.c: In function 'b53_get_tag_protocol':
+>> drivers/net/dsa/b53/b53_common.c:2267:23: error: 'DSA_TAG_PROTO_BRCM_LEGACY_FCS' undeclared (first use in this function); did you mean 'DSA_TAG_PROTO_BRCM_LEGACY'?
+      dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
+                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                          DSA_TAG_PROTO_BRCM_LEGACY
+   drivers/net/dsa/b53/b53_common.c:2267:23: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +2267 drivers/net/dsa/b53/b53_common.c
+
+  2254	
+  2255	enum dsa_tag_protocol b53_get_tag_protocol(struct dsa_switch *ds, int port,
+  2256						   enum dsa_tag_protocol mprot)
+  2257	{
+  2258		struct b53_device *dev = ds->priv;
+  2259	
+  2260		if (!b53_can_enable_brcm_tags(ds, port, mprot)) {
+  2261			dev->tag_protocol = DSA_TAG_PROTO_NONE;
+  2262			goto out;
+  2263		}
+  2264	
+  2265		/* Older models require different 6 byte tags */
+  2266		if (is5325(dev) || is5365(dev)) {
+> 2267			dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
+  2268			goto out;
+  2269		} else if (is63xx(dev)) {
+  2270			dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY;
+  2271			goto out;
+  2272		}
+  2273	
+  2274		/* Broadcom BCM58xx chips have a flow accelerator on Port 8
+  2275		 * which requires us to use the prepended Broadcom tag type
+  2276		 */
+  2277		if (dev->chip_id == BCM58XX_DEVICE_ID && port == B53_CPU_PORT) {
+  2278			dev->tag_protocol = DSA_TAG_PROTO_BRCM_PREPEND;
+  2279			goto out;
+  2280		}
+  2281	
+  2282		dev->tag_protocol = DSA_TAG_PROTO_BRCM;
+  2283	out:
+  2284		return dev->tag_protocol;
+  2285	}
+  2286	EXPORT_SYMBOL(b53_get_tag_protocol);
+  2287	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
