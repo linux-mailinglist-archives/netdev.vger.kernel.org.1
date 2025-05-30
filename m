@@ -1,190 +1,206 @@
-Return-Path: <netdev+bounces-194422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3B9AC9658
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 22:07:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 144ADAC96A8
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 22:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C8C93AB504
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:07:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E0C1C00DE9
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214E227AC30;
-	Fri, 30 May 2025 20:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09C27AC30;
+	Fri, 30 May 2025 20:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nniwo4Mi"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="c2sjHzJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEC523815C;
-	Fri, 30 May 2025 20:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF7115990C
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 20:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748635672; cv=none; b=pnRrLUiPH/AZz11ft3g8kr4YS7aMkGF0mT/vUGie6DAIbFidPiI5IhOr6y1mLfZFUgz1/ps6GQYQtoibWPpeI354KS8iCIkoJlrphl8EU+y/x5HSELZhUxoFlAjgK8r47zER4bOYpgElnqYdjr9VaPxvQ3kcokuCYnt4OxNXcjM=
+	t=1748637464; cv=none; b=eqSmSsRxrU2p0pqnKrtGT3QY9IIT+N8O0j9L3UNn9mFps6DapNUU6R7n1Wv/rfWbC2ppPRF07elPFNjFczDFPlOyi+9BnacfAs23pC9wUbp4kERn9vZ2JdQ2Krx02AKRLjcnHuzGLmZZWnamNnkS13SBKfnpfnPABd0D7HK5B9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748635672; c=relaxed/simple;
-	bh=ct6SQwoevQtBGTGnt34VdrBpbpGOKC4SFkv6MHopodI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QtHBKV66XXy0JBpkhssazu7yP8BtnKzBZHHPQ3sXDIkOV+BEySg0x6wCJEy6I/gSVJAI4UvdJuHDj+JULrzxukl0rtFg4PXc9Wg/fZQ/ZWS7duzEoGYKSITckCNEsdRxuIpKGN+O1wY4Xeu44mfoxpuJCYa+gA7Ufz8qeigKubo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nniwo4Mi; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22c33677183so21430235ad.2;
-        Fri, 30 May 2025 13:07:50 -0700 (PDT)
+	s=arc-20240116; t=1748637464; c=relaxed/simple;
+	bh=09yRdOfHBBD74x72EqLl8KAykD8f9mVnzkSL5l54rpc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r654LGFTUoc/IAPvp/u6niv02X93TBxROFfSprXzi77j7ekNt/Ng+/8go5MsonZsrsXYmpmXdo4Sz032VfCFR5E+LeQDq/iJRXF4Y/1v3UJWbimlHse9A91gewUn29v5Aawd80z/7W/w8ptQBuwOH26ICmFFq8QDBKIje+u8Yts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=c2sjHzJ4; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d094d1fd7cso328862285a.3
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 13:37:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748635670; x=1749240470; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3qrAgajVEjl6XH/LWK60rQI6fj3/gwI++K2zKdM+P6M=;
-        b=Nniwo4MiTz1vHtWo8xk629bk72iPsCDfh2DIzGCFOEm7o7oJWBSpePBgCVKyH6iMRU
-         R1kpp9XE9Km48zvkgZlc9YlZhnAW469UYO2PbrZSGXEurDU++qxz4Am3Wftt0M9kH18z
-         /pv+w+Ufs4h/43RnxZWUW9zlbpIm3PWoaSRY1jba4azUa3rUWGjtGr+6nHq93++pDbXh
-         rSc9pqG175kBYyMP3lZ2ve/sMGTqOGV8bDrGpWCS3CaVaQpaSrxrjRvFW+ch+U0PY9RI
-         wlKmHOYFISOjXJ8Plv5gQeTOGm39rdNfHucj1zcVeo7X6jYOylkpsnZZNrsBHrCqmA4v
-         OrHg==
+        d=bytedance.com; s=google; t=1748637461; x=1749242261; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s72Ujra1dO1NPQly4HIiBu9QKTze5HeShyxVLbJudtM=;
+        b=c2sjHzJ4s0dBEI6hRzOHCmVa9MhGbPmygDaOCJgrRrtC+sYxRQlm5V1nb3vE6R/CYE
+         oqu9GO6nYsoEqhjuxW3VG+g1IUDJcyB0ObbwGj6TqoESQkCMBR6mIj4pU4EQxUxAvlRT
+         tU1NJ8ek6CdLMmusfs9udNKonTzfGBPg2WRg9NjuXMV+s+fSzAgrlUlnC1+e3hRkOzAG
+         RkvrX8KEdpR/BBkUdCAccbXlTPis8q0cHFhrA6Hp/IQsccAZLzWlzbm3bJprSNUt0U6h
+         7Zc73g8p1DnEu0lPrMejOARNOGUEB9XMgqAq4GrL5dIy7QTjAvXWoqVHK7wJW7d7XhgP
+         Vf9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748635670; x=1749240470;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3qrAgajVEjl6XH/LWK60rQI6fj3/gwI++K2zKdM+P6M=;
-        b=fv+iEbGM2uqmSADfoUjJUAbqdDJGZt1IDM85O0xmTtJwBrrs2KLVk8rAXJW6Cu9wNl
-         NPP4LU9ahp6FB5H8C/aikNfHRxdDkz1cwGzJD+pyAaXtEX/73Bu0cE6XzFXB3veIjGVv
-         l6hqAh7LFcf0WWPzXIezDlb/pQZKBJk+GmcgyFT2h27FSkpgwh1eytwWMb6KcuQPzcpw
-         jZD/+kBb6WQzjuDO4n8Iw2APL6zwjbW+HXzyjhDSSTSEzo11vxBKuGvyxuSlppq+da1k
-         yHGXows8QI7aso4von/kR+wn5Bp1n4bJDY6vf4gcfH2vA5ZC5FvixI7l5K67ZRwnksEd
-         CGBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkBjRgu3WyWGeB05/MoprjpYJ50W7dgqgTizqBf2v69H+3v8GAfqYlKIX7tyKhWuMK9hk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3bETX2I0P2HvVdCEJXQ2lTJtunO7SkkMsJfq1KxBf9jVlfcis
-	cMLGnh9CMUv5sekGAx05coZLBZrzulbsz5GZwWMISw1HyJB5cAZ54lU48ERCx1jG
-X-Gm-Gg: ASbGnctGducuXCAG7lnPDukBLaXKLrU/dyCjp7vuAN9oAoSS6EhH0eIqq0oBqd3DPZ4
-	iLPrRAGbYpKA7BoWndr9k2gsv98zi6YoHlfWo1g0WItlpKtt5WiULl7rhEek9lTlCfAuhCQSWd/
-	k4LfQnSSN6Pd9DLTpXoD0YUIIpeWE+2GgQAoWE5RFXXqCedamlAteejkFmooseGn54mNhAwWP0o
-	mK6QYZuWcRsKCvXPGK9nzV0iXbNxval8RSLBG6n2K5ieRaNc0gMtYoRxQIoxoPZJnfzfRkV6GEq
-	QlOuBGrKDrtBCZsDY/VlSrd40pnDQil4DDk0O7iRVb1uhX+r7B9f2kngZEWwTCs=
-X-Google-Smtp-Source: AGHT+IExqgS+QiIQaRgj6w2lMgt6QAD99sUUI7RmE+T/GB4UUMprWxGVBVKpKwR+Nz7Wap5PPwNzrg==
-X-Received: by 2002:a17:902:f54a:b0:234:d292:be84 with SMTP id d9443c01a7336-23538ed9508mr54534975ad.10.1748635669584;
-        Fri, 30 May 2025 13:07:49 -0700 (PDT)
-Received: from gmail.com ([98.97.39.137])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506d14cb0sm32114995ad.218.2025.05.30.13.07.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 13:07:49 -0700 (PDT)
-Date: Fri, 30 May 2025 13:07:35 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
-	jakub@cloudflare.com, zijianzhang@bytedance.com,
-	Amery Hung <amery.hung@bytedance.com>,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [Patch bpf-next v3 4/4] tcp_bpf: improve ingress redirection
- performance with message corking
-Message-ID: <20250530200735.hhzeicomnb7mbwdl@gmail.com>
-References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
- <20250519203628.203596-5-xiyou.wangcong@gmail.com>
+        d=1e100.net; s=20230601; t=1748637461; x=1749242261;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s72Ujra1dO1NPQly4HIiBu9QKTze5HeShyxVLbJudtM=;
+        b=WpGutEXy6v2LTWvHEZuPpR0wuZaFHzr36fk9eQBjJB5lamwrfKS9ojbcFu5RwnlVqu
+         HOtWGPAo1+MxV+0L++EsKBL2j9u4aHlmjT0YZD4rKUrYvPD8Gr03SLN4P4KB2oWc6Tgh
+         Q/6s3BpfREVcwUYmuBaY7eWGdZBPck57NGvCLR65MKeQm7pj5KWvZe5i6iu+l+yeAI+r
+         5l7uz0QB16pb32P+26kFiZzkv29574fmaotbO9LU06DRlIBS1NQAqUzE7mBUwIepO7/T
+         xwU3qmZ6Pcg6wusHf4TkxTOAgLav3r3SvYHm0XcdaUzKfIJjCS2BD04AMkGXDzEJpRCT
+         S25w==
+X-Gm-Message-State: AOJu0YxL4uwuu53RRCXcQPB74XASiuqdImbCEVGKTNCgrPBUm8UPQqW8
+	PbRpmRC9XRqiazY7AAW3V3mthaDz92mbO9QJchkR5ImN9m3t0oeBNEPk9H/RsPqFOx4=
+X-Gm-Gg: ASbGncu7QeMI7I6UmEUzjqRhnWWBPtYqgMC4UdmDnYuARiMi2+JGrTJsHQvja/98Rq1
+	UB0br4adUMBMu1C9TbVhTAtTYN+1+m5lOXMuAbdTdO9BP6NHT8ZtB/6q9/2yZ7dlI3iUtTSEFqS
+	air6VAshmEeAV8MD0lvyC19SmUzOs1J/3JajZGkAlBObdQwNxDFy+GqKEeTXtPx3oKyWAE9fY+m
+	PQBn0hEuSBYpJvW4Dflzn0YAcNTBJp5l/3zAb6coWtpabfjKF1j5Sb3RTOzhmyzG/OifANsQ+il
+	xwgSfxstE2J+gaWCcAaiG3IDug2BsYCycwFv7BrydCy4bATrA3fD1+mRG4YfcF6lF3sRd4r/3mM
+	vhhvbJg==
+X-Google-Smtp-Source: AGHT+IGZyi5LZ/JJwRsDNg0g5DsqwCg5tBuBsCGwJaLgYtecTvK77ooayzvoj9wwz0v5+xfUDGtuJw==
+X-Received: by 2002:a05:620a:2996:b0:7c9:4d4d:206e with SMTP id af79cd13be357-7d0a49e68c6mr559805085a.6.1748637460855;
+        Fri, 30 May 2025 13:37:40 -0700 (PDT)
+Received: from [10.200.180.213] ([130.44.212.152])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d09a115a38sm291574585a.59.2025.05.30.13.37.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 May 2025 13:37:40 -0700 (PDT)
+Message-ID: <9e167af1-1265-4427-806e-67eac349cbf3@bytedance.com>
+Date: Fri, 30 May 2025 13:37:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250519203628.203596-5-xiyou.wangcong@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch bpf-next v3 4/4] tcp_bpf: improve ingress redirection
+ performance with message corking
+To: John Fastabend <john.fastabend@gmail.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
+ jakub@cloudflare.com, Amery Hung <amery.hung@bytedance.com>,
+ Cong Wang <cong.wang@bytedance.com>
+References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
+ <20250519203628.203596-5-xiyou.wangcong@gmail.com>
+ <20250530200735.hhzeicomnb7mbwdl@gmail.com>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <20250530200735.hhzeicomnb7mbwdl@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2025-05-19 13:36:28, Cong Wang wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
+On 5/30/25 1:07 PM, John Fastabend wrote:
+> On 2025-05-19 13:36:28, Cong Wang wrote:
+>> From: Zijian Zhang <zijianzhang@bytedance.com>
+>>
+>> The TCP_BPF ingress redirection path currently lacks the message corking
+>> mechanism found in standard TCP. This causes the sender to wake up the
+>> receiver for every message, even when messages are small, resulting in
+>> reduced throughput compared to regular TCP in certain scenarios.
+>>
+>> This change introduces a kernel worker-based intermediate layer to provide
+>> automatic message corking for TCP_BPF. While this adds a slight latency
+>> overhead, it significantly improves overall throughput by reducing
+>> unnecessary wake-ups and reducing the sock lock contention.
+>>
+>> Reviewed-by: Amery Hung <amery.hung@bytedance.com>
+>> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
+>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+>> ---
+>>   include/linux/skmsg.h |  19 ++++
+>>   net/core/skmsg.c      | 139 ++++++++++++++++++++++++++++-
+>>   net/ipv4/tcp_bpf.c    | 197 ++++++++++++++++++++++++++++++++++++++++--
+>>   3 files changed, 347 insertions(+), 8 deletions(-)
 > 
-> The TCP_BPF ingress redirection path currently lacks the message corking
-> mechanism found in standard TCP. This causes the sender to wake up the
-> receiver for every message, even when messages are small, resulting in
-> reduced throughput compared to regular TCP in certain scenarios.
+> [...]
 > 
-> This change introduces a kernel worker-based intermediate layer to provide
-> automatic message corking for TCP_BPF. While this adds a slight latency
-> overhead, it significantly improves overall throughput by reducing
-> unnecessary wake-ups and reducing the sock lock contention.
+>> +	/* At this point, the data has been handled well. If one of the
+>> +	 * following conditions is met, we can notify the peer socket in
+>> +	 * the context of this system call immediately.
+>> +	 * 1. If the write buffer has been used up;
+>> +	 * 2. Or, the message size is larger than TCP_BPF_GSO_SIZE;
+>> +	 * 3. Or, the ingress queue was empty;
+>> +	 * 4. Or, the tcp socket is set to no_delay.
+>> +	 * Otherwise, kick off the backlog work so that we can have some
+>> +	 * time to wait for any incoming messages before sending a
+>> +	 * notification to the peer socket.
+>> +	 */
 > 
-> Reviewed-by: Amery Hung <amery.hung@bytedance.com>
-> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> ---
->  include/linux/skmsg.h |  19 ++++
->  net/core/skmsg.c      | 139 ++++++++++++++++++++++++++++-
->  net/ipv4/tcp_bpf.c    | 197 ++++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 347 insertions(+), 8 deletions(-)
+> 
+> OK this series looks like it should work to me. See one small comment
+> below. Also from the perf numbers in the cover letter is the latency
+> difference reduced/removed if the socket is set to no_delay?
+> 
 
-[...]
+Even if the socket is set to no_delay, we still have minor latency diff.
+The main reason is that we now have dynamic allocation for skmsg and
+kworker in the middle, the path is more complex now.
 
-> +	/* At this point, the data has been handled well. If one of the
-> +	 * following conditions is met, we can notify the peer socket in
-> +	 * the context of this system call immediately.
-> +	 * 1. If the write buffer has been used up;
-> +	 * 2. Or, the message size is larger than TCP_BPF_GSO_SIZE;
-> +	 * 3. Or, the ingress queue was empty;
-> +	 * 4. Or, the tcp socket is set to no_delay.
-> +	 * Otherwise, kick off the backlog work so that we can have some
-> +	 * time to wait for any incoming messages before sending a
-> +	 * notification to the peer socket.
-> +	 */
+>> +	nonagle = tcp_sk(sk)->nonagle;
+>> +	if (!sk_stream_memory_free(sk) ||
+>> +	    tot_size >= TCP_BPF_GSO_SIZE || ingress_msg_empty ||
+>> +	    (!(nonagle & TCP_NAGLE_CORK) && (nonagle & TCP_NAGLE_OFF))) {
+>> +		release_sock(sk);
+>> +		psock->backlog_work_delayed = false;
+>> +		sk_psock_backlog_msg(psock);
+>> +		lock_sock(sk);
+>> +	} else {
+>> +		sk_psock_run_backlog_work(psock, false);
+>> +	}
+>> +
+>> +error:
+>> +	sk_psock_put(sk_redir, psock);
+>> +	return ret;
+>> +}
+>> +
+>>   static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>>   				struct sk_msg *msg, int *copied, int flags)
+>>   {
+>> @@ -442,18 +619,24 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>>   			cork = true;
+>>   			psock->cork = NULL;
+>>   		}
+>> -		release_sock(sk);
+>>   
+>> -		origsize = msg->sg.size;
+>> -		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+>> -					    msg, tosend, flags);
+>> -		sent = origsize - msg->sg.size;
+>> +		if (redir_ingress) {
+>> +			ret = tcp_bpf_ingress_backlog(sk, sk_redir, msg, tosend);
+>> +		} else {
+>> +			release_sock(sk);
+>> +
+>> +			origsize = msg->sg.size;
+>> +			ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+>> +						    msg, tosend, flags);
+> 
+> nit, we can drop redir ingress at this point from tcp_bpf_sendmsg_redir?
+> It no longer handles ingress? A follow up patch would probably be fine.
+> 
 
+Indeed, we will do this in a follow up patch.
 
-OK this series looks like it should work to me. See one small comment
-below. Also from the perf numbers in the cover letter is the latency
-difference reduced/removed if the socket is set to no_delay?
+>> +			sent = origsize - msg->sg.size;
+>> +
+>> +			lock_sock(sk);
+>> +			sk_mem_uncharge(sk, sent);
+>> +		}
+>>   
+>>   		if (eval == __SK_REDIRECT)
+>>   			sock_put(sk_redir);
+> 
+> Thanks.
 
-> +	nonagle = tcp_sk(sk)->nonagle;
-> +	if (!sk_stream_memory_free(sk) ||
-> +	    tot_size >= TCP_BPF_GSO_SIZE || ingress_msg_empty ||
-> +	    (!(nonagle & TCP_NAGLE_CORK) && (nonagle & TCP_NAGLE_OFF))) {
-> +		release_sock(sk);
-> +		psock->backlog_work_delayed = false;
-> +		sk_psock_backlog_msg(psock);
-> +		lock_sock(sk);
-> +	} else {
-> +		sk_psock_run_backlog_work(psock, false);
-> +	}
-> +
-> +error:
-> +	sk_psock_put(sk_redir, psock);
-> +	return ret;
-> +}
-> +
->  static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->  				struct sk_msg *msg, int *copied, int flags)
->  {
-> @@ -442,18 +619,24 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->  			cork = true;
->  			psock->cork = NULL;
->  		}
-> -		release_sock(sk);
->  
-> -		origsize = msg->sg.size;
-> -		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
-> -					    msg, tosend, flags);
-> -		sent = origsize - msg->sg.size;
-> +		if (redir_ingress) {
-> +			ret = tcp_bpf_ingress_backlog(sk, sk_redir, msg, tosend);
-> +		} else {
-> +			release_sock(sk);
-> +
-> +			origsize = msg->sg.size;
-> +			ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
-> +						    msg, tosend, flags);
+Thanks for the review!
 
-nit, we can drop redir ingress at this point from tcp_bpf_sendmsg_redir?
-It no longer handles ingress? A follow up patch would probably be fine.
-
-> +			sent = origsize - msg->sg.size;
-> +
-> +			lock_sock(sk);
-> +			sk_mem_uncharge(sk, sent);
-> +		}
->  
->  		if (eval == __SK_REDIRECT)
->  			sock_put(sk_redir);
-
-Thanks.
 
