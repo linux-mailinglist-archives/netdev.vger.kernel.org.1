@@ -1,169 +1,94 @@
-Return-Path: <netdev+bounces-194414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AEDDAC9585
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:14:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698F4AC958B
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E472118913EC
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:14:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9DB3B9B0E
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7742356B8;
-	Fri, 30 May 2025 18:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A552235360;
+	Fri, 30 May 2025 18:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8JWaHTF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcPViu+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FA223BCF2;
-	Fri, 30 May 2025 18:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541DF1A239D;
+	Fri, 30 May 2025 18:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748628877; cv=none; b=ESOOrGmK4E3C2Boi8JCktGiTd/3UQr8V0WJzHB5Dm8E3nxGooh6CGczkdD+dCSafqjYeXYf/as2z/j15o9MpnAFJQWOEs9VWdPtU7QvvIF88kWRvsNpHeMA+KcFHhqoZjSCYsOGaA0veiCDrqLxLujQDzks95SSRTLZZ1sHPoqI=
+	t=1748629054; cv=none; b=KW9vi2/NIYlHRvfaGmmKRAu9rVpwbtm/DyjOUmahW2j/l+/9qDOPySFkkSxDRghG3Cit9q9TI0SAHoWQU1rkgbDvWZGwJfVdTKug5OQgMQduOJgqcOutyqp36aznqmM0qtV+7Ep+UocCdUPPU1Xfe3oCUQG6ISupvFvSeGt7bm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748628877; c=relaxed/simple;
-	bh=0/LJdMMBFZufeWFQpLvRMZf0W/wvKpXrJD93YvQZzlY=;
+	s=arc-20240116; t=1748629054; c=relaxed/simple;
+	bh=4NxsrPzw8oTEz9kqY00yHMFjULiR+Y78cPyCS5CldZ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kis+iannJuoq2SDDrm6BX66TWIz1ZKvA1jjVX62pX5a7bwZUCBkvLidMpR8go7n2RX6Vb5p3iLF1gqp2n8/VIUhtTuTmIJo6W3YZT4QGiu6I3ZkJQ7sgwCfPoaG922TC9JR9OjYAq0w9iLeh9sPstKiHD/PqoLvE4l9D3t/J+p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A8JWaHTF; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47692b9d059so32714701cf.3;
-        Fri, 30 May 2025 11:14:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748628874; x=1749233674; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2mlu/cFEAP71vZoW0SmXluLf/QnE9T/XdYy82QnTAHU=;
-        b=A8JWaHTF6W2qNl3htkvUexoGU4NuA+TUt0fE6mSmdgLegwHGUTb3ZSNzTaoYLekMkA
-         sjYtF5Sohegchj14KaWpokj7KmyCfUAiY74JM2Eo+HIBem12Y64XVpIHLgdaU5U1afnc
-         eJy4ICflkgQSfyQhT0wcF1EkLJtlufAeTC5JooUq2tCFpeOl483GnLw1bwtXgI2sgoYI
-         hS6bS6DGv+GG5Ix15lebaAGPA3zMzu6ug5+VGAY69x/MVXq2DmNqNUj5Yu6WlORtWD6z
-         M+I/vc9KOt9BKDhcDtAPXeLmExoVCMeApL+w2Un9HQG0g5DXZVJ1YZav3FZnYb0RgFIy
-         diIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748628874; x=1749233674;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2mlu/cFEAP71vZoW0SmXluLf/QnE9T/XdYy82QnTAHU=;
-        b=RVZqY6Z/tlzjf6U5Hx6NzxKVlFQXgfM2GTJ9i/AyasqEblb1nYBVs2Tfs9Iv3Et6Jp
-         kzQlwyK6XfbuMSKBtlP7prrOeL14xtZ2k23LuQRcADg4afvh980IpWGXWTnI7HNX2h/O
-         tDHksPEo3B5H2CGzIRxpq+tBrgftHEA2PWcKlXH/a2tWdOXL0yIgn1wdrpKZa3dTlpPQ
-         w/KkFUSuj6rg4MmBGITNAG+JASFXkv0Z16g3o/WMbup/94QX5uYc8eYfQ2OvyjFaSSHp
-         vmilahM/RPll84zgoC/GqUBZGFTTlMe8Q+fy7KxS2WUkzDiTfEgcJ32lQI2MZeAdE4na
-         +48w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPMrlgbsJjY9pvPo4kZCDzF6LGCaPaNZBwqRHnjiXhYPGdgtaDiJwgmJP5UaMHfQfMWl6drxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC+8gnNxaQSTKPn/jfcjwNpOHEy8g1Cs5d1FPm5OycQjHN5niz
-	Gq/VSR1LnmxvtPNqNdvB5wDmoUYTVMW3leS5Mp3TGU7O0nlB3vUnXq3IZXTN
-X-Gm-Gg: ASbGnctcqMcu34hiC2n79BhaLe0gGSIWZeSn/8/xDeIJ06hnc+yhJoUu3t4pUKuJ4r2
-	e3HTNcphh1BlTLeQxXQdvbTR4rg6zhs8INe2IJOp1emlRIbThpjYHP/M3HGVBJa49Ze1uUix3gO
-	rqtLd3d2yIOrYvxyszFXvcwkFGYuYVBctzUJq/nEQCCRGphybA0paDQkrgRd+NB0TtljhOkPehE
-	m5Xl7QQrOdSxSvaFjA1ePsOfsP4ZaccvD3tJ4WLXi4yuyl7kbg9JrDLO13URFhvZ312XsjrpJ1l
-	MbprNNYFBSQAl//qOotc4EykwewvnmoWIMlqHAI1kHoA5q5zmvpYt2/zMo2slrCsr6dPhWLcb7C
-	uQSHdKOdOcmbz
-X-Google-Smtp-Source: AGHT+IEVaptM4qGrZCEQ0mrpIX9BWZ9v5bJXKqGZDzSaNDTnshPS1NrrfjUBGZzefc011ClT6EG6Bg==
-X-Received: by 2002:a17:903:4404:b0:234:f4a3:f737 with SMTP id d9443c01a7336-235395bff87mr50633305ad.34.1748628863927;
-        Fri, 30 May 2025 11:14:23 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23506bc85fcsm31363575ad.38.2025.05.30.11.14.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 11:14:23 -0700 (PDT)
-Date: Fri, 30 May 2025 11:14:21 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH 1/5] net: timestamp: add helper returning skb's tx tstamp
-Message-ID: <aDn1fV8D2G90mztp@mini-arch>
-References: <cover.1748607147.git.asml.silence@gmail.com>
- <6e83dc97b172c2adb2b167f2eda5c3ec2063abfe.1748607147.git.asml.silence@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xr2PMDgwyaL6tTASDVzxiMrnd1ETCvuC4lCYRyvfsULt5hsOZ/bte/UHksM9KmHwley74sTXHY/WxRnRAbHk+0ut4KIxTSF2gAlFiqcLeNHfbwASkKJ57vndS9I8//PyhbprCqu0BirbisokYxb/Bi9TmMWveRexDLKPZmM/8Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcPViu+F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8026C4CEE9;
+	Fri, 30 May 2025 18:17:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748629053;
+	bh=4NxsrPzw8oTEz9kqY00yHMFjULiR+Y78cPyCS5CldZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BcPViu+F42gjYU+hGT7cxDnq5riWZgw2++DvOu8NyrIVPR8bHZmnO5RW0DmVXWVd1
+	 ILl7W5TclLK36SDfFmU3dNwl1kJAq4jpIbe6hAMnUgoMhRK9wuoyTM6CgntaulRj9j
+	 UjBPXCByoQ0CP90PniKiOL0YlCY/qIeR/5D0o+L39eNAGn0qQ9KsvWBTAgg6E9tWOA
+	 Yp2G05NqlzGdN+kf1uTmILsEsbSmSw75Ns16kYHSomxss1Cvwebzuh76FzMkiiZ410
+	 NhUxdLv5dG2HHMKFm/19PSh9brniYoTVajHunO7otFUhfApYAqzBXli4wWgNPFof5J
+	 qOe64niRBxWCg==
+Date: Fri, 30 May 2025 19:17:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Li Jun <lijun01@kylinos.cn>
+Cc: davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ppp: remove error variable
+Message-ID: <20250530181730.GU1484967@horms.kernel.org>
+References: <20250530025040.379064-1-lijun01@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6e83dc97b172c2adb2b167f2eda5c3ec2063abfe.1748607147.git.asml.silence@gmail.com>
+In-Reply-To: <20250530025040.379064-1-lijun01@kylinos.cn>
 
-On 05/30, Pavel Begunkov wrote:
-> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
-> associated with an skb from an queue queue.
+On Fri, May 30, 2025 at 10:50:40AM +0800, Li Jun wrote:
+> the error variable did not function as a variable.
+> so remove it.
 > 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  include/net/sock.h |  4 ++++
->  net/socket.c       | 49 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 53 insertions(+)
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 92e7c1aae3cc..b0493e82b6e3 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2677,6 +2677,10 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
->  void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
->  			     struct sk_buff *skb);
->  
-> +bool skb_has_tx_timestamp(struct sk_buff *skb, struct sock *sk);
-> +bool skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
-> +			  struct timespec64 *ts);
-> +
->  static inline void
->  sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
->  {
-> diff --git a/net/socket.c b/net/socket.c
-> index 9a0e720f0859..d1dc8ab28e46 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -843,6 +843,55 @@ static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
->  		 sizeof(ts_pktinfo), &ts_pktinfo);
->  }
->  
-> +bool skb_has_tx_timestamp(struct sk_buff *skb, struct sock *sk)
-> +{
-> +	u32 tsflags = READ_ONCE(sk->sk_tsflags);
-> +	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
-> +
-> +	if (serr->ee.ee_errno != ENOMSG ||
-> +	   serr->ee.ee_origin != SO_EE_ORIGIN_TIMESTAMPING)
-> +		return false;
-> +
-> +	/* software time stamp available and wanted */
-> +	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) && skb->tstamp)
-> +		return true;
-> +	/* hardware time stamps available and wanted */
-> +	return (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
-> +		skb_hwtstamps(skb)->hwtstamp;
-> +}
-> +
-> +bool skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
-> +			  struct timespec64 *ts)
-> +{
-> +	u32 tsflags = READ_ONCE(sk->sk_tsflags);
-> +	bool false_tstamp = false;
-> +	ktime_t hwtstamp;
-> +	int if_index = 0;
-> +
+> Signed-off-by: Li Jun <lijun01@kylinos.cn>
 
-[..]
+Hi Li Jun,
 
-> +	if (sock_flag(sk, SOCK_RCVTSTAMP) && skb->tstamp == 0) {
-> +		__net_timestamp(skb);
-> +		false_tstamp = true;
-> +	}
+Overall your patch looks good to me but as a cleanup for Networking
+code it would be best to explicitly target net-next like this:
 
-The place it was copy-pasted from (__sock_recv_timestamp) has a comment
-about a race between packet rx and enabling the timestamp. Does the same
-race happen here? Worth keeping the comment?
+	Subject: [PATCH net-next] ...
+
+But more importantly, net-next is currently closed, so please
+repost your patch once it re-opens.
+
+For reference, information on the development process can be found here.
+https://docs.kernel.org/process/maintainer-netdev.html
+
+
+## Form letter - net-next-closed
+
+The merge window for v6.16 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations. We are
+currently accepting bug fixes only.
+
+Please repost when net-next reopens after June 8th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+-- 
+pw-bot: defer
 
