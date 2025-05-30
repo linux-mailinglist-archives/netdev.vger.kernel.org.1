@@ -1,206 +1,272 @@
-Return-Path: <netdev+bounces-194423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144ADAC96A8
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 22:37:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB055AC96BD
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 22:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E0C1C00DE9
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:38:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 343604A775F
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 20:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09C27AC30;
-	Fri, 30 May 2025 20:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D62C148850;
+	Fri, 30 May 2025 20:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="c2sjHzJ4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wgTv7ZFz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF7115990C
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 20:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D286211706
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 20:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748637464; cv=none; b=eqSmSsRxrU2p0pqnKrtGT3QY9IIT+N8O0j9L3UNn9mFps6DapNUU6R7n1Wv/rfWbC2ppPRF07elPFNjFczDFPlOyi+9BnacfAs23pC9wUbp4kERn9vZ2JdQ2Krx02AKRLjcnHuzGLmZZWnamNnkS13SBKfnpfnPABd0D7HK5B9s=
+	t=1748637915; cv=none; b=Wazprz1KW2eq7thdCzmClULVWhWfxQEHaPjJLV6wC9G5FhN8dxsmHEdUipEIqXn9u6z/E4FYzEudz/VeKZg40J2htfFj1qvD/RJ0QNPI/qqLIBsHAqTh7UhG+v02dp1qN4zFmAvXwVMe9uAiUdvaENGLHlU8zrfHo5JSBqPgPKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748637464; c=relaxed/simple;
-	bh=09yRdOfHBBD74x72EqLl8KAykD8f9mVnzkSL5l54rpc=;
+	s=arc-20240116; t=1748637915; c=relaxed/simple;
+	bh=cll4mXUzms/0nywiTQVSWPQQUD9+MUxrsSZXKKnTxAw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r654LGFTUoc/IAPvp/u6niv02X93TBxROFfSprXzi77j7ekNt/Ng+/8go5MsonZsrsXYmpmXdo4Sz032VfCFR5E+LeQDq/iJRXF4Y/1v3UJWbimlHse9A91gewUn29v5Aawd80z/7W/w8ptQBuwOH26ICmFFq8QDBKIje+u8Yts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=c2sjHzJ4; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d094d1fd7cso328862285a.3
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 13:37:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1748637461; x=1749242261; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s72Ujra1dO1NPQly4HIiBu9QKTze5HeShyxVLbJudtM=;
-        b=c2sjHzJ4s0dBEI6hRzOHCmVa9MhGbPmygDaOCJgrRrtC+sYxRQlm5V1nb3vE6R/CYE
-         oqu9GO6nYsoEqhjuxW3VG+g1IUDJcyB0ObbwGj6TqoESQkCMBR6mIj4pU4EQxUxAvlRT
-         tU1NJ8ek6CdLMmusfs9udNKonTzfGBPg2WRg9NjuXMV+s+fSzAgrlUlnC1+e3hRkOzAG
-         RkvrX8KEdpR/BBkUdCAccbXlTPis8q0cHFhrA6Hp/IQsccAZLzWlzbm3bJprSNUt0U6h
-         7Zc73g8p1DnEu0lPrMejOARNOGUEB9XMgqAq4GrL5dIy7QTjAvXWoqVHK7wJW7d7XhgP
-         Vf9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748637461; x=1749242261;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s72Ujra1dO1NPQly4HIiBu9QKTze5HeShyxVLbJudtM=;
-        b=WpGutEXy6v2LTWvHEZuPpR0wuZaFHzr36fk9eQBjJB5lamwrfKS9ojbcFu5RwnlVqu
-         HOtWGPAo1+MxV+0L++EsKBL2j9u4aHlmjT0YZD4rKUrYvPD8Gr03SLN4P4KB2oWc6Tgh
-         Q/6s3BpfREVcwUYmuBaY7eWGdZBPck57NGvCLR65MKeQm7pj5KWvZe5i6iu+l+yeAI+r
-         5l7uz0QB16pb32P+26kFiZzkv29574fmaotbO9LU06DRlIBS1NQAqUzE7mBUwIepO7/T
-         xwU3qmZ6Pcg6wusHf4TkxTOAgLav3r3SvYHm0XcdaUzKfIJjCS2BD04AMkGXDzEJpRCT
-         S25w==
-X-Gm-Message-State: AOJu0YxL4uwuu53RRCXcQPB74XASiuqdImbCEVGKTNCgrPBUm8UPQqW8
-	PbRpmRC9XRqiazY7AAW3V3mthaDz92mbO9QJchkR5ImN9m3t0oeBNEPk9H/RsPqFOx4=
-X-Gm-Gg: ASbGncu7QeMI7I6UmEUzjqRhnWWBPtYqgMC4UdmDnYuARiMi2+JGrTJsHQvja/98Rq1
-	UB0br4adUMBMu1C9TbVhTAtTYN+1+m5lOXMuAbdTdO9BP6NHT8ZtB/6q9/2yZ7dlI3iUtTSEFqS
-	air6VAshmEeAV8MD0lvyC19SmUzOs1J/3JajZGkAlBObdQwNxDFy+GqKEeTXtPx3oKyWAE9fY+m
-	PQBn0hEuSBYpJvW4Dflzn0YAcNTBJp5l/3zAb6coWtpabfjKF1j5Sb3RTOzhmyzG/OifANsQ+il
-	xwgSfxstE2J+gaWCcAaiG3IDug2BsYCycwFv7BrydCy4bATrA3fD1+mRG4YfcF6lF3sRd4r/3mM
-	vhhvbJg==
-X-Google-Smtp-Source: AGHT+IGZyi5LZ/JJwRsDNg0g5DsqwCg5tBuBsCGwJaLgYtecTvK77ooayzvoj9wwz0v5+xfUDGtuJw==
-X-Received: by 2002:a05:620a:2996:b0:7c9:4d4d:206e with SMTP id af79cd13be357-7d0a49e68c6mr559805085a.6.1748637460855;
-        Fri, 30 May 2025 13:37:40 -0700 (PDT)
-Received: from [10.200.180.213] ([130.44.212.152])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d09a115a38sm291574585a.59.2025.05.30.13.37.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 May 2025 13:37:40 -0700 (PDT)
-Message-ID: <9e167af1-1265-4427-806e-67eac349cbf3@bytedance.com>
-Date: Fri, 30 May 2025 13:37:37 -0700
+	 In-Reply-To:Content-Type; b=ocmDAFZotuc3p9+Qd6f0HYxjuemiQP2qe5sQ0tVtjih141HjBpXz0qIkoQ2L0ZzqkgQAe1TR9tratxsGrJ3zP0dJqmQgDkwEW2gFvPaWHr5Igw0nUUhyhzrmlqQpslE3l9JU4HPQCM/hNvwCzo0qrIwUNe40xh489A6t3LighdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wgTv7ZFz; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e6f20d3c-65fb-4809-a105-36ad8f2b2645@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748637900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V/7Rjw+WopmTa1vaLvNS1VCjRXs+bdi21LWvZ4+BSm4=;
+	b=wgTv7ZFzuDrEitYZ5MS8IP+Z11ysmO775gDIsE9WW/aQp24Xv8kAr0htlnYVlgzDMWkUM/
+	WypaObQwodd5JfdOeavCTx6Vh+ez9+1uYfsXIcCfsKLmpa622ZEGqjC8gkeYKwH8XDSTIn
+	BF4TbEDqLaAkP4lK4Jue+2ttGk1rMNA=
+Date: Fri, 30 May 2025 16:44:56 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch bpf-next v3 4/4] tcp_bpf: improve ingress redirection
- performance with message corking
-To: John Fastabend <john.fastabend@gmail.com>,
- Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
- jakub@cloudflare.com, Amery Hung <amery.hung@bytedance.com>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
- <20250519203628.203596-5-xiyou.wangcong@gmail.com>
- <20250530200735.hhzeicomnb7mbwdl@gmail.com>
+Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report
+ coalesce parameters in DMAengine flow
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "vkoul@kernel.org" <vkoul@kernel.org>,
+ "Simek, Michal" <michal.simek@amd.com>,
+ "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+ "horms@kernel.org" <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "git (AMD-Xilinx)" <git@amd.com>, "Katakam, Harini" <harini.katakam@amd.com>
+References: <20250525102217.1181104-1-suraj.gupta2@amd.com>
+ <679d6810-9e76-425c-9d4e-d4b372928cc3@linux.dev>
+ <BL3PR12MB6571ABA490895FDB8225CAEBC967A@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <d5be7218-8ec1-4208-ac24-94d4831bfdb6@linux.dev>
+ <BL3PR12MB6571A48E5FD0092231D0B0A5C961A@BL3PR12MB6571.namprd12.prod.outlook.com>
 Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <20250530200735.hhzeicomnb7mbwdl@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <BL3PR12MB6571A48E5FD0092231D0B0A5C961A@BL3PR12MB6571.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 5/30/25 1:07 PM, John Fastabend wrote:
-> On 2025-05-19 13:36:28, Cong Wang wrote:
->> From: Zijian Zhang <zijianzhang@bytedance.com>
+On 5/30/25 06:18, Gupta, Suraj wrote:
+> [AMD Official Use Only - AMD Internal Distribution Only]
+> 
+>> -----Original Message-----
+>> From: Sean Anderson <sean.anderson@linux.dev>
+>> Sent: Thursday, May 29, 2025 9:48 PM
+>> To: Gupta, Suraj <Suraj.Gupta2@amd.com>; andrew+netdev@lunn.ch;
+>> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+>> pabeni@redhat.com; vkoul@kernel.org; Simek, Michal <michal.simek@amd.com>;
+>> Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; horms@kernel.org
+>> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
+>> kernel@vger.kernel.org; git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
+>> <harini.katakam@amd.com>
+>> Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and report coalesce
+>> parameters in DMAengine flow
 >>
->> The TCP_BPF ingress redirection path currently lacks the message corking
->> mechanism found in standard TCP. This causes the sender to wake up the
->> receiver for every message, even when messages are small, resulting in
->> reduced throughput compared to regular TCP in certain scenarios.
+>> Caution: This message originated from an External Source. Use proper caution
+>> when opening attachments, clicking links, or responding.
 >>
->> This change introduces a kernel worker-based intermediate layer to provide
->> automatic message corking for TCP_BPF. While this adds a slight latency
->> overhead, it significantly improves overall throughput by reducing
->> unnecessary wake-ups and reducing the sock lock contention.
 >>
->> Reviewed-by: Amery Hung <amery.hung@bytedance.com>
->> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
->> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
->> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
->> ---
->>   include/linux/skmsg.h |  19 ++++
->>   net/core/skmsg.c      | 139 ++++++++++++++++++++++++++++-
->>   net/ipv4/tcp_bpf.c    | 197 ++++++++++++++++++++++++++++++++++++++++--
->>   3 files changed, 347 insertions(+), 8 deletions(-)
+>> On 5/28/25 08:00, Gupta, Suraj wrote:
+>> > [AMD Official Use Only - AMD Internal Distribution Only]
+>> >
+>> >> -----Original Message-----
+>> >> From: Sean Anderson <sean.anderson@linux.dev>
+>> >> Sent: Tuesday, May 27, 2025 9:47 PM
+>> >> To: Gupta, Suraj <Suraj.Gupta2@amd.com>; andrew+netdev@lunn.ch;
+>> >> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+>> >> pabeni@redhat.com; vkoul@kernel.org; Simek, Michal
+>> >> <michal.simek@amd.com>; Pandey, Radhey Shyam
+>> >> <radhey.shyam.pandey@amd.com>; horms@kernel.org
+>> >> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+>> >> linux- kernel@vger.kernel.org; git (AMD-Xilinx) <git@amd.com>;
+>> >> Katakam, Harini <harini.katakam@amd.com>
+>> >> Subject: Re: [PATCH net-next] net: xilinx: axienet: Configure and
+>> >> report coalesce parameters in DMAengine flow
+>> >>
+>> >> Caution: This message originated from an External Source. Use proper
+>> >> caution when opening attachments, clicking links, or responding.
+>> >>
+>> >>
+>> >> On 5/25/25 06:22, Suraj Gupta wrote:
+>> >> > Add support to configure / report interrupt coalesce count and
+>> >> > delay via ethtool in DMAEngine flow.
+>> >> > Netperf numbers are not good when using non-dmaengine default
+>> >> > values, so tuned coalesce count and delay and defined separate
+>> >> > default values in dmaengine flow.
+>> >> >
+>> >> > Netperf numbers and CPU utilisation change in DMAengine flow after
+>> >> > introducing coalescing with default parameters:
+>> >> > coalesce parameters:
+>> >> >    Transfer type        Before(w/o coalescing)  After(with coalescing)
+>> >> > TCP Tx, CPU utilisation%      925, 27                 941, 22
+>> >> > TCP Rx, CPU utilisation%      607, 32                 741, 36
+>> >> > UDP Tx, CPU utilisation%      857, 31                 960, 28
+>> >> > UDP Rx, CPU utilisation%      762, 26                 783, 18
+>> >> >
+>> >> > Above numbers are observed with 4x Cortex-a53.
+>> >>
+>> >> How does this affect latency? I would expect these RX settings to
+>> >> increase latency around 5-10x. I only use these settings with DIM
+>> >> since it will disable coalescing during periods of light load for better latency.
+>> >>
+>> >> (of course the way to fix this in general is RSS or some other method
+>> >> involving multiple queues).
+>> >>
+>> >
+>> > I took values before NAPI addition in legacy flow (rx_threshold: 24, rx_usec: 50) as
+>> reference. But netperf numbers were low with them, so tried tuning both and
+>> selected the pair which gives good numbers.
+>>
+>> Yeah, but the reason is that you are trading latency for throughput.
+>> There is only one queue, so when the interface is saturated you will not get good
+>> latency anyway (since latency-sensitive packets will get head-of-line blocked). But
+>> when activity is sparse you can good latency if there is no coalescing. So I think
+>> coalescing should only be used when there is a lot of traffic. Hence why I only
+>> adjusted the settings once I implemented DIM. I think you should be able to
+>> implement it by calling net_dim from axienet_dma_rx_cb, but it will not be as efficient
+>> without NAPI.
+>>
 > 
-> [...]
-> 
->> +	/* At this point, the data has been handled well. If one of the
->> +	 * following conditions is met, we can notify the peer socket in
->> +	 * the context of this system call immediately.
->> +	 * 1. If the write buffer has been used up;
->> +	 * 2. Or, the message size is larger than TCP_BPF_GSO_SIZE;
->> +	 * 3. Or, the ingress queue was empty;
->> +	 * 4. Or, the tcp socket is set to no_delay.
->> +	 * Otherwise, kick off the backlog work so that we can have some
->> +	 * time to wait for any incoming messages before sending a
->> +	 * notification to the peer socket.
->> +	 */
-> 
-> 
-> OK this series looks like it should work to me. See one small comment
-> below. Also from the perf numbers in the cover letter is the latency
-> difference reduced/removed if the socket is set to no_delay?
-> 
+> Ok, got it. I'll keep default values used before NAPI in legacy flow (coalesce count: 24, delay: 50) for both Tx and Rx and remove perf comparisons.
 
-Even if the socket is set to no_delay, we still have minor latency diff.
-The main reason is that we now have dynamic allocation for skmsg and
-kworker in the middle, the path is more complex now.
+Those settings are actually probably even worse for latency. I'd leave
+the settings at 0/0 (coalescing disabled) to match the existing
+behavior. I think the perf comparisons are helpful, especially for
+people who know they are going to be throughput-limited.
 
->> +	nonagle = tcp_sk(sk)->nonagle;
->> +	if (!sk_stream_memory_free(sk) ||
->> +	    tot_size >= TCP_BPF_GSO_SIZE || ingress_msg_empty ||
->> +	    (!(nonagle & TCP_NAGLE_CORK) && (nonagle & TCP_NAGLE_OFF))) {
->> +		release_sock(sk);
->> +		psock->backlog_work_delayed = false;
->> +		sk_psock_backlog_msg(psock);
->> +		lock_sock(sk);
->> +	} else {
->> +		sk_psock_run_backlog_work(psock, false);
->> +	}
->> +
->> +error:
->> +	sk_psock_put(sk_redir, psock);
->> +	return ret;
->> +}
->> +
->>   static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->>   				struct sk_msg *msg, int *copied, int flags)
->>   {
->> @@ -442,18 +619,24 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->>   			cork = true;
->>   			psock->cork = NULL;
->>   		}
->> -		release_sock(sk);
->>   
->> -		origsize = msg->sg.size;
->> -		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
->> -					    msg, tosend, flags);
->> -		sent = origsize - msg->sg.size;
->> +		if (redir_ingress) {
->> +			ret = tcp_bpf_ingress_backlog(sk, sk_redir, msg, tosend);
->> +		} else {
->> +			release_sock(sk);
->> +
->> +			origsize = msg->sg.size;
->> +			ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
->> +						    msg, tosend, flags);
+My main point is that I think extending the dmaengine API to allow for
+DIM will have practical benefits in reduced latency.
+
+>> Actually, if you are looking into improving performance, I think lack of NAPI is
+>> probably the biggest limitation with the dmaengine backend.
+>>
+> Yes, I agree. NAPI for DMAEngine implementation is underway and will be sent to mainline soon.
+
+Looking forward to it.
+
+>> >> > Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+>> >> > ---
+>> >> > This patch depend on following AXI DMA dmengine driver changes sent
+>> >> > to dmaengine mailing list as pre-requisit series:
+>> >> > https://lore.kernel.org/all/20250525101617.1168991-1-suraj.gupta2@amd.
+>> >> > com/
+>> >> > ---
+>> >> >  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  6 +++
+>> >> > .../net/ethernet/xilinx/xilinx_axienet_main.c | 53
+>> >> > +++++++++++++++++++
+>> >> >  2 files changed, 59 insertions(+)
+>> >> >
+>> >> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> >> > b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> >> > index 5ff742103beb..cdf6cbb6f2fd 100644
+>> >> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> >> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> >> > @@ -126,6 +126,12 @@
+>> >> >  #define XAXIDMA_DFT_TX_USEC          50
+>> >> >  #define XAXIDMA_DFT_RX_USEC          16
+>> >> >
+>> >> > +/* Default TX/RX Threshold and delay timer values for SGDMA mode
+>> >> > +with
+>> >> DMAEngine */
+>> >> > +#define XAXIDMAENGINE_DFT_TX_THRESHOLD       16
+>> >> > +#define XAXIDMAENGINE_DFT_TX_USEC    5
+>> >> > +#define XAXIDMAENGINE_DFT_RX_THRESHOLD       24
+>> >> > +#define XAXIDMAENGINE_DFT_RX_USEC    16
+>> >> > +
+>> >> >  #define XAXIDMA_BD_CTRL_TXSOF_MASK   0x08000000 /* First tx packet
+>> */
+>> >> >  #define XAXIDMA_BD_CTRL_TXEOF_MASK   0x04000000 /* Last tx packet
+>> */
+>> >> >  #define XAXIDMA_BD_CTRL_ALL_MASK     0x0C000000 /* All control bits */
+>> >> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> >> > b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> >> > index 1b7a653c1f4e..f9c7d90d4ecb 100644
+>> >> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> >> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> >> > @@ -1505,6 +1505,7 @@ static int axienet_init_dmaengine(struct
+>> >> > net_device *ndev)  {
+>> >> >       struct axienet_local *lp = netdev_priv(ndev);
+>> >> >       struct skbuf_dma_descriptor *skbuf_dma;
+>> >> > +     struct dma_slave_config tx_config, rx_config;
+>> >> >       int i, ret;
+>> >> >
+>> >> >       lp->tx_chan = dma_request_chan(lp->dev, "tx_chan0"); @@
+>> >> > -1520,6
+>> >> > +1521,22 @@ static int axienet_init_dmaengine(struct net_device
+>> >> > +*ndev)
+>> >> >               goto err_dma_release_tx;
+>> >> >       }
+>> >> >
+>> >> > +     tx_config.coalesce_cnt = XAXIDMAENGINE_DFT_TX_THRESHOLD;
+>> >> > +     tx_config.coalesce_usecs = XAXIDMAENGINE_DFT_TX_USEC;
+>> >> > +     rx_config.coalesce_cnt = XAXIDMAENGINE_DFT_RX_THRESHOLD;
+>> >> > +     rx_config.coalesce_usecs =  XAXIDMAENGINE_DFT_RX_USEC;
+>> >>
+>> >> I think it would be clearer to just do something like
+>> >>
+>> >>         struct dma_slave_config tx_config = {
+>> >>                 .coalesce_cnt = 16,
+>> >>                 .coalesce_usecs = 5,
+>> >>         };
+>> >>
+>> >> since these are only used once. And this ensures that you initialize the whole
+>> struct.
+>> >>
+>> >> But what tree are you using? I don't see these members on net-next or
+>> dmaengine.
+>> >
+>> > These changes are proposed in separate series in dmaengine
+>> https://lore.kernel.org/all/20250525101617.1168991-2-suraj.gupta2@amd.com/ and I
+>> described it here below my SOB.
+>>
+>> I think you should post those patches with this series to allow them to be reviewed
+>> appropriately.
+>>
+>> --Sean
 > 
-> nit, we can drop redir ingress at this point from tcp_bpf_sendmsg_redir?
-> It no longer handles ingress? A follow up patch would probably be fine.
-> 
+> DMAengine series functionality depends on commit
+> (https://git.kernel.org/pub/scm/linux/kernel/git/vkoul/dmaengine.git/commit/drivers/dma/xilinx?h=next&id=7e01511443c30a55a5ae78d3debd46d4d872517e)
+> in dmaengine which is currently not there in net-next. So I sent that
+> to dmaengine only. Please let me know if any way to send as single
+> series.
 
-Indeed, we will do this in a follow up patch.
+It looks like this won't cause any conflicts, so I think you can just
+send the whole series with a note in the cover letter like
 
->> +			sent = origsize - msg->sg.size;
->> +
->> +			lock_sock(sk);
->> +			sk_mem_uncharge(sk, sent);
->> +		}
->>   
->>   		if (eval == __SK_REDIRECT)
->>   			sock_put(sk_redir);
-> 
-> Thanks.
+| This series depends on commit 7e01511443c3 ("dmaengine: xilinx_dma:
+| Set dma_device directions") currently in dmaengine/next.
 
-Thanks for the review!
-
+--Sean
 
