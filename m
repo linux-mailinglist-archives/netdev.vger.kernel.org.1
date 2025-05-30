@@ -1,97 +1,109 @@
-Return-Path: <netdev+bounces-194285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE63AC85BF
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:49:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E2E8AC85C2
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68C934E19A9
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:49:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C2CE9E3C20
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E912B9B9;
-	Fri, 30 May 2025 00:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244B92C18A;
+	Fri, 30 May 2025 00:51:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/1oTXcJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T8pa/qxT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8C2FBF0;
-	Fri, 30 May 2025 00:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68AFFAD5E
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 00:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748566159; cv=none; b=RWJLU7bB0Xg1k/NIYUd8VFmR78WxhYT7wXajzhhuwCI5vz1oqjNcfkPIX2ZgwHf6OiuRPyTJGvHFpA8G2/ecdhcCcZGXV56FRkgxnuPMmqHsTuybAc7N5c4UBEouNTcrKxI0MQsdK5B0WpQmUoUDpcXIZx0ah1IwrdmuuImfPfw=
+	t=1748566262; cv=none; b=NR5DBqjAKt6smrwZW3PkP+63Q8Q+8XTr3W+D1LrFDTz49OOIH30yHxHZvlUWuC/xDu54VW4Q7DU2izzG4oITvkTDyFFwD61uxucTy9eLun8nkX+ZPOfIE3Vp9oqS80pN/IjBupVJPgfABuUUJo7hkcJradl52RQoUkzbaKwBVFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748566159; c=relaxed/simple;
-	bh=8Bl71w9e4E6Qo6rtxryDax3y08LU+Nx9kHzGp2J0tEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KqCnpl9L8ZHC9rcJxwxzaSjeA7taBRLa9I3cXlzijBoN02ua+to4kDSykMajx9wRpy9epw+y5xb1xz81ahZ2Fvq/7tvRxfUV2+8HeAQqD5mJxpyh5x2u0yrqXZkNcngzOln9TzHuBy48kWL4rIR1npMn+huByg+br6GUyrrQsa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/1oTXcJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D524C4CEE7;
-	Fri, 30 May 2025 00:49:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748566156;
-	bh=8Bl71w9e4E6Qo6rtxryDax3y08LU+Nx9kHzGp2J0tEk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G/1oTXcJfmrJCGtkYZhcTh5rIRqFiCd1irrdkiqp+Y9mefG/2ac0qSvw0Siko8rua
-	 nkWTbjqN2s0i9vCAzlyfo9hgqUVVST/i0soLWxMWm4yQjizSGOXk60eYH6ZwA9gJo6
-	 msmtC3+9MnNrYGQlmDNGHFCkGVQQGq8RIj0S5Yda/uLOFsYE213XkUgtCGmPje2a/i
-	 nJd9uNugpY/u0gfYejO2l96XH7tkBD1HPcsSg/Db/NMqAqynIl3Osi86IwwxKaHs/C
-	 O4wBg4PoQsi8v2s94WAEuZbI5Pi3nUZx9xV0csl4K6W3CCPBHPZxn0r9/DU8BDQdqh
-	 /pMKhYRPE4aHg==
-Date: Thu, 29 May 2025 17:49:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
- jiri@resnulli.us, anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, aleksandr.loktionov@intel.com, corbet@lwn.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
- linux-doc@vger.kernel.org, Milena Olech <milena.olech@intel.com>
-Subject: Re: [PATCH net-next v4 1/3] dpll: add reference-sync netlink
- attribute
-Message-ID: <20250529174914.179c1a34@kernel.org>
-In-Reply-To: <20250523172650.1517164-2-arkadiusz.kubalewski@intel.com>
-References: <20250523172650.1517164-1-arkadiusz.kubalewski@intel.com>
-	<20250523172650.1517164-2-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1748566262; c=relaxed/simple;
+	bh=j90FZmy4DEJrDVtS1gLkiRde5vGGcByNWPeqa/Z3bcI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=err896yd3VIW2LEsV4en3VBKMBrigAlSOBaP+9Ayswi6bE3k280kgsKtuPoRCqK+dbgQpGW+rCnrnVNWfgG/lWhYtv3YSWODEfSo6emhSZfw32fZ40FMiVAG5dc7Gm2bvIgeU9romWPAiob0JD2kCoUiEWJbL2shNx5kObWhFz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T8pa/qxT; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30c416cdcc0so12462101fa.2
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 17:51:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1748566258; x=1749171058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j90FZmy4DEJrDVtS1gLkiRde5vGGcByNWPeqa/Z3bcI=;
+        b=T8pa/qxTV1FUDiglExhT0uccCsYa8Akq17rDEsZ1yVwPYsCO1HFPGnePoX08l1B1Cv
+         PY0YDwKiIuktxs/1AXkp/8IXOhljxyJ4SZIb7UJMXdvDWYRvEDDiRfqyY8WfZY3CLRVw
+         fXJFIyRgwFHT3PvSOFnGxrohHwCdBOtbv5CfA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748566258; x=1749171058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j90FZmy4DEJrDVtS1gLkiRde5vGGcByNWPeqa/Z3bcI=;
+        b=fx8bUQggSD487ZP08JBAW6zytC6LMZ/6WZGNPE/E0uOqRpP0ZQ8Rcagfte9fcWR4Gz
+         i1wzD8zb54/LRP1NgnpyFLPu+UcK2iT/uigoFu3Ck+iy31NOBMnFgBm+bZP3iknYpJHD
+         U1qZhTpWf+kgFel/hOSL24etNsfFaB8+MnF5oPeGzUUPRiib0TEC3lMijeQK5j30iA4s
+         Ciq4S/+dBkGamT3Tzc4YMVVdOiQBXb6mVMPVit2v/0Bp5z6qgqlVwrvZa+/moLYoo4WI
+         QXorRyLMYhxmodxZYnRdFoLqg6JaFGbj5TTitRNAMDX08C0NHd4iKchY4kYUFl2MefTL
+         Hlwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUH/sWLBf3J3f2gYgV5SJ5cX5rGuGWGP2x64kjSsVXJVJ2HSQmxvWUgrKRZ4Q4OWJWKeBfpZ9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzDb7B2jMsZ+Dy4X8tXzyfY/qK5Awzo8p+cUguA6C1nJc+DPYh
+	1QyMWA0+MWrh4YOjY4CaDurjEvpF6hD7DhOlaW4Cv+79lGYShYqKTmayjzivAVV7FWfhilg1wBn
+	zTOKVR+goDaaIZsSFN/9fdgmi/DNcLzNOol04BvZE
+X-Gm-Gg: ASbGncv+E95+MOOWH8tXPSrWyIk2ueSqTbbAMnS86Q/V/QEPNAGThLpcBdZC3LyMmQU
+	4UlGw+UkynVBOxEbSda174bL1MP64EELHi6a71LbrBAjFykVgo+8hDcN8PitP1s7UYBEfqe9kTD
+	4SJ7dT+6KMt+Uqpl4k/7SAIzBECQt4VYHoqZ7BV25AD33w
+X-Google-Smtp-Source: AGHT+IE2OMsxzwQzeTrwgN2Hez064UFdOpids0WCZHGQIRmxCVKPL8Xl/szjSGwe1gyhi+KhbeBt7vwdg9fn04v1Gmc=
+X-Received: by 2002:a05:651c:1477:b0:32a:8614:4623 with SMTP id
+ 38308e7fff4ca-32a90691f96mr864261fa.16.1748566258461; Thu, 29 May 2025
+ 17:50:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250513210504.1866-1-ronak.doshi@broadcom.com>
+ <20250515070250.7c277988@kernel.org> <71d0fbf8-00f7-4e0b-819d-d0b6efb01f03@redhat.com>
+ <CAP1Q3XTLbk0XgAJOUSGv03dXfPxcUR=VFt=mXiqP9rjc9yhVrw@mail.gmail.com>
+ <CAP1Q3XQcYD3nGdojPWS7K4fczNYsNzv0S0O4P8DJvQtRM9Ef1g@mail.gmail.com> <20250529163354.1d85c025@kernel.org>
+In-Reply-To: <20250529163354.1d85c025@kernel.org>
+From: Ronak Doshi <ronak.doshi@broadcom.com>
+Date: Thu, 29 May 2025 17:50:40 -0700
+X-Gm-Features: AX0GCFsRGySz0X3WjPXoBvDLDY3cvim3BsfdsBIzJvAllSe41uk0HX-0g9guY-g
+Message-ID: <CAP1Q3XR1j77BBJ3aNm_YKo7gPdR+hdKcDHGNz0CBTuKFccuK5A@mail.gmail.com>
+Subject: Re: [PATCH net] vmxnet3: correctly report gso type for UDP tunnels
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Guolin Yang <guolin.yang@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 23 May 2025 19:26:48 +0200 Arkadiusz Kubalewski wrote:
-> +The device may support the Reference SYNC feature, which allows the combination
-> +of two inputs into a Reference SYNC pair. In this configuration, clock signals
-> +from both inputs are used to synchronize the dpll device. The higher frequency
-> +signal is utilized for the loop bandwidth of the DPLL, while the lower frequency
-> +signal is used to syntonize the output signal of the DPLL device. This feature
-> +enables the provision of a high-quality loop bandwidth signal from an external
-> +source.
+On Thu, May 29, 2025 at 4:33=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> You put Paolo in the To: field, so I assumed your messages are directed
+> to him. I'm not entirely sure what you're proposing, to apply this
+> patch as is? Whether your driver supports segmentation or not - it
+> should not send mangled skbs into the stack. Maybe send a v2 and
+> explain next steps in the commit message, less guessing the better..
 
-I'm uninitiated into the deeper arts of time sync, but to me this
-sounds like a reference clock. Are you trying not to call it clock
-because in time clock means a ticker, and this is an oscillator?
+Sure, let me send a v2 patch to get this patch applied first and
+explain next steps
+to get the inner fields fixed in a future patch.
 
-> +A capable input provides a list of inputs that can be paired to create a
-> +Reference SYNC pair. To control this feature, the user must request a desired
-> +state for a target pin: use ``DPLL_PIN_STATE_CONNECTED`` to enable or
-> +``DPLL_PIN_STATE_DISCONNECTED`` to disable the feature. Only two pins can be
-> +bound to form a Reference SYNC pair at any given time.
 
-Mostly I got confused by the doc saying "Reference SYNC pair".
-I was expecting that you'll have to provide 2 ref sync signals.
-But IIUC the first signal is still the existing signal we lock
-into, so the pair is of a reference sync + an input pin?
-Not a pair of two reference syncs.
-
-IOW my reading of the doc made me expect 2 pins to always be passed in
-as ref sync, but the example from the cover letter shows only adding
-one.
+Thanks,
+Ronak
 
