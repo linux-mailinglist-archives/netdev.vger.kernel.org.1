@@ -1,87 +1,133 @@
-Return-Path: <netdev+bounces-194397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EAA9AC933B
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:15:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BF8AC9374
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE7481C043A1
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:15:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B73D13A739A
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCE8132103;
-	Fri, 30 May 2025 16:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82521C6FE8;
+	Fri, 30 May 2025 16:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bgOHFXZ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCC215DBB3;
-	Fri, 30 May 2025 16:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E1819ABC2;
+	Fri, 30 May 2025 16:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748621736; cv=none; b=ADKhzBrrGhg2/+0DjuCrL+dIABUZOr9F0pKBN3g1Bwwvc5D7PMv9T5QGKnO8UDCCCG9E/lOVhxphvQiembFA+QyV0IGpiPGvZJdJ/FWN9DkfNzkKcicp5wzVK1K1w1oVjP/Gv6gCagNVDOTNurDvPd3I8eA55z5oVlaHGJJlH4A=
+	t=1748622163; cv=none; b=V7ri+zByXm9p0GCQKqV+ukffzfEICm/x/0C4YSivOVk/ygQWqg0q2s2ZL1zSUfWeOBBlN3mQvSvrXEloncN2cVaiTmVNWoMEQlZEoiZJcdBRo/T87z/ck+JHhRtGVLq7AApAAEnROZ31Y5wUkUmEitrFlH99cTX3zy+fdFAOn94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748621736; c=relaxed/simple;
-	bh=Y4x6fYGEYAzeTlrb0R6vK1rGm7UNFgAxajOHrxpHWjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aEgPDLFChXg6Mhbqxu21yuOOxMSZKtHEBiTdR9q1cFiHBC56LIHkSX5KqZ12C2uvDq1K4OjLooFuNeNQHml39CazVEDb6iq81Vq+692u1E6s9Tgx3sZcoQdLdEAbFf2Oj3doZu23xfpxXPlxgieZWWk4QHr/P3cgxlMRVb+Dw94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33EE7C4CEE9;
-	Fri, 30 May 2025 16:15:34 +0000 (UTC)
-Date: Fri, 30 May 2025 12:16:38 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
- bpf@vger.kernel.org, Jonathan Lemon <jonathan.lemon@gmail.com>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, Masami Hiramatsu
- <mhiramat@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH] xdp: Remove unused mem_return_failed event
-Message-ID: <20250530121638.35106c15@gandalf.local.home>
-In-Reply-To: <696364e6-5eb1-4543-b9f4-60fba10623fc@kernel.org>
-References: <20250529160550.1f888b15@gandalf.local.home>
-	<696364e6-5eb1-4543-b9f4-60fba10623fc@kernel.org>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1748622163; c=relaxed/simple;
+	bh=IvKiI2GS2Dj5Eans+fFHm32EoVrfpQ50Wh/C4X/ZLK4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fjTqjIIXPUZ/vqj9kEHhhX2AeBdTGc8bHlDXojWivkKiNbacQB+GIKcaglDxWdJhAD+B9LVmAlEfyEpT2PO32TF9mczj4g6qUTwZVf/y04AvkUeecbI6lMelPQyRkMsdXuhbno0AVT1Zjf7NvTSBED51pJ0lhaf84BAN+3aaBCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=bgOHFXZ6; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=jCdzSFwYnDZECKuJL2W/gBgula6jQ6d53Xso4SG8qwc=;
+	b=bgOHFXZ6AOcPgSn6ym7msrP48dbWljzcAVEwnjzBO7/oXxAHAUULqJD6I27cdv
+	h+u3PCaPWVgo99D0n4WzIDBoN/1HO8nONEPPv8U6LLdUdo510JQnPBbYoAPTlnF+
+	DdEOs9elr2f1D+e77+cMf8c5O3YO7kQv3r+rMGeFbQ+18=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wCXjDDH2jlouf2RFA--.37484S2;
+	Sat, 31 May 2025 00:20:31 +0800 (CST)
+From: =?UTF-8?q?=E6=9D=8E=E5=93=B2?= <sensor1010@163.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	jonas@kwiboo.se,
+	rmk+kernel@armlinux.org.uk,
+	david.wu@rock-chips.com,
+	jan.petrous@oss.nxp.com,
+	detlev.casanova@collabora.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?=E6=9D=8E=E5=93=B2?= <sensor1010@163.com>
+Subject: [PATCH] net: dwmac-rk: No need to check the return value of the phy_power_on()
+Date: Fri, 30 May 2025 09:20:17 -0700
+Message-Id: <20250530162017.3661-1-sensor1010@163.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wCXjDDH2jlouf2RFA--.37484S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Ww4xKw1fAF1rZF13ArWDArb_yoW8Ww47p3
+	9xCF92yr1kXryxGa17trsrZa45uayxtFy0qF1xt3yfu3WfCF1Dtry8tr4FvF109rykXF1a
+	yr4UAF1fCFn8Wr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0ziFfO5UUUUU=
+X-CM-SenderInfo: 5vhq20jurqiii6rwjhhfrp/xtbBMQldq2g502LCbgAAsC
 
-On Fri, 30 May 2025 08:51:12 +0200
-Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+phy_power_on() is a local scope one within the driver, since the return
+value of the phy_power_on() function is always 0, checking its return
+value is redundant.
 
-> > The change to allow page_poll to handle its own page destruction instead  
->                             ^^^^
-> You miss-spelled page_pool as "page_poll"
+Signed-off-by: 李哲 <sensor1010@163.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
-Oops!
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+index 700858ff6f7c..f7c32934f8a4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+@@ -1645,23 +1645,18 @@ static int gmac_clk_enable(struct rk_priv_data *bsp_priv, bool enable)
+ 	return 0;
+ }
+ 
+-static int phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
++static void phy_power_on(struct rk_priv_data *bsp_priv, bool enable)
+ {
+ 	struct regulator *ldo = bsp_priv->regulator;
+-	int ret;
+ 	struct device *dev = &bsp_priv->pdev->dev;
+ 
+ 	if (enable) {
+-		ret = regulator_enable(ldo);
+-		if (ret)
++		if (regulator_enable(ldo))
+ 			dev_err(dev, "fail to enable phy-supply\n");
+ 	} else {
+-		ret = regulator_disable(ldo);
+-		if (ret)
++		if (regulator_disable(ldo))
+ 			dev_err(dev, "fail to disable phy-supply\n");
+ 	}
+-
+-	return 0;
+ }
+ 
+ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
+@@ -1839,11 +1834,7 @@ static int rk_gmac_powerup(struct rk_priv_data *bsp_priv)
+ 		dev_err(dev, "NO interface defined!\n");
+ 	}
+ 
+-	ret = phy_power_on(bsp_priv, true);
+-	if (ret) {
+-		gmac_clk_enable(bsp_priv, false);
+-		return ret;
+-	}
++	phy_power_on(bsp_priv, true);
+ 
+ 	pm_runtime_get_sync(dev);
+ 
+-- 
+2.17.1
 
-> 
-> > of relying on XDP removed the trace_mem_return_failed() tracepoint caller,
-> > but did not remove the mem_return_failed trace event. As trace events take
-> > up memory when they are created regardless of if they are used or not,
-> > having this unused event around wastes around 5K of memory.
-> > 
-> > Remove the unused event.
-> > 
-> > Link: https://lore.kernel.org/all/20250529130138.544ffec4@gandalf.local.home/
-> > 
-> > Fixes: c3f812cea0d7 ("page_pool: do not release pool until inflight == 0.")
-> > Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-> > ---
-> >   include/trace/events/xdp.h | 26 --------------------------
-> >   1 file changed, 26 deletions(-)  
-> 
-> With above spelling fixed:
-> 
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-Thanks. Will this go through the networking tree or should I just take it?
-
--- Steve
 
