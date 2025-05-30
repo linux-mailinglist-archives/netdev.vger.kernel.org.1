@@ -1,524 +1,258 @@
-Return-Path: <netdev+bounces-194369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65C5AC90CF
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 15:58:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CCCAC9149
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 720B916B12C
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 13:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E4FCA205DF
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 14:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6DF21FF4C;
-	Fri, 30 May 2025 13:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF0F22ACD1;
+	Fri, 30 May 2025 14:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqCDNICy"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SELhWJ2T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CED14F9F7;
-	Fri, 30 May 2025 13:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30790219A70
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 14:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748613516; cv=none; b=O3J8z/+139GEkapOej4jAaOgGk5U8ycUpawCwgU0SfpsdO1wJb3/A8vXqEuiSRVnVn/zFxTwIiWtFnCuJGGyjrg85sEmGYZEGQhIdHQi0VdnASz2frUvhvzvVztB+Nna9HCa0AJHIMFiRBviiGlu+PtTn5Y+PIMAfwajr5/BCFg=
+	t=1748614452; cv=none; b=CXgNcjSS8CD40MnSXPaN6VU9td0UjJbv2AHdKgbWlVzV70vQBivX5UgjbeSr1fe3Fs+jd4cLBcnnrEFwQ+5d6bWD/z/Odv0jrk3l6OynMuQuLy4N0F/xyIJvniRuHNDKI54BfgjDblbrUxeDeD438t7uXAxL3g8RTeHxDzggCe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748613516; c=relaxed/simple;
-	bh=bn9bOI4KLJ0v58+6kBKDkQIFVYcKcuu1OXXfIFkPJ4w=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=bLvy8EDvrDjFZpkYNXW3txi5+4fTA+DIx39F0RguN8yT6Nxun33V8JrS+Dl+q/83y5bDcXCUTssUE14KO94SjWsmHPp/TIv+qqQ79A0aINioUMlU3MboqU38cEjdHkEsbiKkGm/6cttdx81sxBwl93gBpHe5HKBV+FXrAn8TJfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqCDNICy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53906C4CEE9;
-	Fri, 30 May 2025 13:58:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748613514;
-	bh=bn9bOI4KLJ0v58+6kBKDkQIFVYcKcuu1OXXfIFkPJ4w=;
-	h=Subject:From:To:Cc:Date:From;
-	b=ZqCDNICyjzTKN4sgq/G+WkHnqetRj3YN3tI+tzxi85aLRJXouxRZGRwJW06AvSHae
-	 cOXWa6Dlv6qfQvPRTtk+BmIXGOpAw3L/vVrOSsHVZOPiB01ka3XP/TY57dX8ar65VA
-	 6ebaqkjMTZFUh/3KBqpHSE1j8ezAOvxj8kXilExr0MrPnClqC8zqg4/D2z5TpAtCJG
-	 bPKYOoS/pSi0b+ppHmw86oGgAW5gdSVbNaQcaAFj0XqyAZQG+CiS0b8yKHg0uJGMjS
-	 ZuKT43+V29GOTVCga7aBK6vBsU4KToaf9/2u1U1BhB+cpE+/VDrejs27kgVQ/uiyjx
-	 nsvaFsHygGhoQ==
-Subject: [PATCH net-next V3] net: track pfmemalloc drops via
- SKB_DROP_REASON_PFMEMALLOC
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- kernel-team@cloudflare.com, mfleming@cloudflare.com
-Date: Fri, 30 May 2025 15:58:30 +0200
-Message-ID: <174861348802.1621620.12023807708034587582.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1748614452; c=relaxed/simple;
+	bh=RCSmOz6XY4aungb99Z3P324ymwDZUfWL9DiXCo8QTCw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UGa6b7mTvpWizO0RUtjyG1r/7t71s5uytd2qIgzvPq1DGfdaufJAGq8tRAxMzUy7tvFhjsuXsh5uOVXU4jjlvXk45R5OUI2m4xjmrv3GJ1jGA7iHLINo1ov9UxOJ1yaADTVCHBc2VJ5Pz86bHHvpzSsRIfFRttApHiQc7792fms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=SELhWJ2T; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7398d65476eso1514078b3a.1
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 07:14:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1748614449; x=1749219249; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=01yP4erw9BznWzN1Kp36axN+Cy+MbQkWnzs+vb6KWtM=;
+        b=SELhWJ2TAG+REeAXJL9QpDsR8lrzC5qdG2+RMdK0sZEM6jid1WsApT7z/f/TTwMnsY
+         6iwDdiZp11wWRdUYVjiQgvnVK3m6ACv3dcHP9gLwEHPX1n5NhuT6nipGWLQ9jsKXXRRj
+         j6afqeYYHVVr/7foshiJgKFImX+nVhq3f7jOqTMT7FFAPQF1athKGQr/Mtob8haJqJV+
+         jLQslR275kFO2iImx4GBkJhVBs9e9k5w6N7t2bNi5h47i047bNtBuuCCPhWogbs3HDAg
+         8FAfbEEqdyjkKUEucaMNv/LzIq/GbLIwzBBuOe7gV2t9xV47oNHve3o6aRiul1pFurNX
+         iMdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748614449; x=1749219249;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=01yP4erw9BznWzN1Kp36axN+Cy+MbQkWnzs+vb6KWtM=;
+        b=Bxbrh9aex1DaNwZXdnxbskE79mKIL5SLJIF7e81SelA738TbakeN+LsUsM9J+I2qgU
+         Qg8lTChjim0m2NtWsEqf1voUc7xsqjUGV/J+gSw0Gt+KL1/NErC0JVsDjDIzUTZUsxYK
+         Pkys31EOP0BrT47znbfxglNB0UAbsIiaK6F6sRJsr7xYaJstruB1I1NVf/YqW5zDVEMH
+         DkXYw8VVRuGQVMIH+Z3CXL5xiCasFyaSCEDRMXvEidjNSO0t3auGIpTx1O/KmBBci00t
+         J1L1+Uln1rw5UA8R+T/C3Ro9E4lwA+zEzyuvc9ToZ30YEnAX1ue/ZM9pVZ5p9bJRsKgz
+         FeDA==
+X-Gm-Message-State: AOJu0YyH20/0+WVxJe8S43zWE1MS8KPjKbtBd3EDzNdhVGOxTsduTrAE
+	qSnDiD6zvYzrH1Bs/WypU1yAexaYdOzjZ1dsfRAWHdoaa85CqOm6aSgwP7sWq7AC+oN8B87vbSc
+	/jSjQOWCCf110V1rzjcA192ZMwoANDuM8dBILgwX7
+X-Gm-Gg: ASbGncv30bPUoijQE7rcW+fusNjv+v8/OwTjXZ025krvxcQQXgpfToqvZUVgL+KtBqs
+	5qGXPEfSaPGJXjqFEyHn/FicqjH9Qj7kSQTBrmVXHouVi5qUz/c7tPVlrPEZrAZvwi6C3KJijaA
+	ReX6Eq5L4BeIzmJ86K+UMa0j/2IejKW4W9S6xRK7vvGQ==
+X-Google-Smtp-Source: AGHT+IGj4XrgKCxytO8kRchT9S3wwMzYemtc7IDRUd+KktyZrYjKV5u58yCIRKB87bEy8EY37OwbR00Q83U+34erFWo=
+X-Received: by 2002:a05:6a00:c95:b0:73d:f9d2:9c64 with SMTP id
+ d2e1a72fcca58-747bdda14bfmr4423475b3a.10.1748614449088; Fri, 30 May 2025
+ 07:14:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
+ <CAM0EoMkd87-6ZJ5PWsV8K+Pn+dVNEOP9NcfGAjXVrzAH70F4YA@mail.gmail.com>
+ <Ppi6ol0VaHrqJs9Rp0-SGp0J1Y0K8hki_jbNZ8sjNOmtEq0mD4f0IozBxxX-m4535QPJonGFYmiPmB643yd4SOpd1HDDYyMeGQuASuFHl-E=@willsroot.io>
+ <CAM0EoM==m_f3_DNgSEKODQzHgE_zyRpXKweNGw1mxz-e3u6+Hg@mail.gmail.com>
+ <8fcsX7qgyK6tCGCqfi8RN7a-hMGfmh0K2wOpqXayxNM0lKgbjttNfpYkZHA29D0SN5WJ5h3-auiaClAq1nGw5BulC8wOzfa_lqR4bx73phM=@willsroot.io>
+ <CAM0EoMkO0vZ4ZtODLJEBP5FiA0+ofVNOSf-BxCOGOyWAZDHdTg@mail.gmail.com>
+ <FiSC_W4LweZiirPYQVe8p7CvUePHrufeDOQgkDT07zh-uy5s6eah-a8Vtr_lPrW73PAF51p6PPIrJITwrJ5vspk99wI5uZELnJijU5ILMUQ=@willsroot.io>
+ <q7G0Z7oMR2x9TWwNHOiPNsZ8lHzAuXuVgrZgGmAgkH8lkIYyTgeqXwcDrelE_fdS9OdJ4TlfS96px6O9SvnmKigNKFkiaFlStvAGPIJ3b84=@willsroot.io>
+ <CAM0EoMnmpjGVU2XyrH=p=-BY6JGU44qsqyfEik4g5E2M8rMMOQ@mail.gmail.com> <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
+In-Reply-To: <DISZZlS5CdbUKITzkIyT3jki3inTWSMecT6FplNmkpYs9bJizbs0iwRbTGMrnqEXrL3-__IjOQxdULPdZwGdKFSXJ1DZYIj6xmWPBZxerdk=@willsroot.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 30 May 2025 10:13:57 -0400
+X-Gm-Features: AX0GCFvwAedY74JLi0vyCY3Lx5hmIerzEg4R_8Mvk0YlwAN-dqU30Zpvw1cOtEg
+Message-ID: <CAM0EoMke7ar8O=aJeZy7_XYMGbgES-X2B19R83Qcihxv4OeG8g@mail.gmail.com>
+Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
+To: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Savy <savy@syst3mfailure.io>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Davide Caratti <dcaratti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
-dropped due to memory pressure. In production environments, we've observed
-memory exhaustion reported by memory layer stack traces, but these drops
-were not properly tracked in the SKB drop reason infrastructure.
+On Thu, May 29, 2025 at 11:23=E2=80=AFAM William Liu <will@willsroot.io> wr=
+ote:
+>
+> On Wednesday, May 28th, 2025 at 10:00 PM, Jamal Hadi Salim <jhs@mojatatu.=
+com> wrote:
+>
+> >
+> >
+> > Hi,
+> > Sorry for the latency..
+> >
+> > On Sun, May 25, 2025 at 4:43=E2=80=AFPM William Liu will@willsroot.io w=
+rote:
+> >
+> > > I did some more testing with the percpu approach, and we realized the=
+ following problem caused now by netem_dequeue.
+> > >
+> > > Recall that we increment the percpu variable on netem_enqueue entry a=
+nd decrement it on exit. netem_dequeue calls enqueue on the child qdisc - i=
+f this child qdisc is a netem qdisc with duplication enabled, it could dupl=
+icate a previously duplicated packet from the parent back to the parent, ca=
+using the issue again. The percpu variable cannot protect against this case=
+.
+> >
+> >
+> > I didnt follow why "percpu variable cannot protect against this case"
+> > - the enqueue and dequeue would be running on the same cpu, no?
+> > Also under what circumstances is the enqueue back to the root going to
+> > end up in calling dequeue? Did you test and hit this issue or its just
+> > theory? Note: It doesnt matter what the source of the skb is as long
+> > as it hits the netem enqueue.
+>
+> Yes, I meant that just using the percpu variable in enqueue will not prot=
+ect against the case for when dequeue calls enqueue on the child. Because o=
+f the child netem with duplication enabled, packets already involved in dup=
+lication will get sent back to the parent's tfifo queue, and then the curre=
+nt dequeue will remain stuck in the loop before hitting an OOM - refer to t=
+he paragraph starting with "In netem_dequeue, the parent netem qdisc's t_le=
+n" in the first email for additional clarification. We need to know whether=
+ a packet we dequeue has been involved in duplication - if it has, we incre=
+ment the percpu variable to inform the children netem qdiscs.
+>
+> Hopefully the following diagram can help elucidate the problem:
+>
+> Step 1: Initial enqueue of Packet A:
+>
+>     +----------------------+
+>     |     Packet A         |
+>     +----------------------+
+>               |
+>               v
+>     +-------------------------+
+>     |     netem_enqueue       |
+>     +-------------------------+
+>               |
+>               v
+>     +-----------------------------------+
+>     | Duplication Logic (percpu OK):   |
+>     |   =3D> Packet A, Packet B (dup)    |
+>     +-----------------------------------+
+>               | <- percpu variable for netem_enqueue
+>               v    prevents duplication of B
+>         +-------------+
+>         | tfifo queue |
+>         |   [A, B]    |
+>         +-------------+
+>
+> Step 2: netem_dequeue processes Packet B (or A)
+>
+>         +-------------+
+>         | tfifo queue |
+>         |   [A]       |
+>         +-------------+
+>               |
+>               v
+>     +----------------------------------------+
+>     | netem_dequeue pops B in tfifo_dequeue  |
+>     +----------------------------------------+
+>               |
+>               v
+>     +--------------------------------------------+
+>     | netem_enqueue to child qdisc (netem w/ dup)|
+>     +--------------------------------------------+
+>               | <- percpu variable in netem_enqueue prologue
+>               |    and epilogue does not stop this dup,
+>               v    does not know about previous dup involvement
+>     +--------------------------------------------------------+
+>     | Child qdisc duplicates B to root (original netem) as C |
+>     +--------------------------------------------------------+
+>               |
+>               v
+>
+> Step 3: Packet C enters original root netem again
+>
+>     +-------------------------+
+>     | netem_enqueue (again)   |
+>     +-------------------------+
+>               |
+>               v
+>     +-------------------------------------+
+>     | Duplication Logic (percpu OK again) |
+>     |   =3D> Packet C, Packet D             |
+>     +-------------------------------------+
+>               |
+>               v
+>             .....
+>
+> If you increment a percpu variable in enqueue prologue and decrement in e=
+nqueue epilogue, you will notice that our original repro will still trigger=
+ a loop because of the scenario I pointed out above - this has been tested.
+>
+> From a current view of the codebase, netem is the only qdisc that calls e=
+nqueue on its child from its dequeue. The check we propose will only work i=
+f this invariant remains.
+>
+>
+> > > However, there is a hack to address this. We can add a field in netem=
+_skb_cb called duplicated to track if a packet is involved in duplicated (b=
+oth the original and duplicated packet should have it marked). Right before=
+ we call the child enqueue in netem_dequeue, we check for the duplicated va=
+lue. If it is true, we increment the percpu variable before and decrement i=
+t after the child enqueue call.
+> >
+> >
+> > is netem_skb_cb safe really for hierarchies? grep for qdisc_skb_cb
+> > net/sched/ to see what i mean
+>
+> We are not using it for cross qdisc hierarchy checking. We are only using=
+ it to inform a netem dequeue whether the packet has partaken in duplicatio=
+n from its corresponding netem enqueue. That part seems to be private data =
+for the sk_buff residing in the current qdisc, so my understanding is that =
+it's ok.
+>
+> > > This only works under the assumption that there aren't other qdiscs t=
+hat call enqueue on their child during dequeue, which seems to be the case =
+for now. And honestly, this is quite a fragile fix - there might be other e=
+dge cases that will cause problems later down the line.
+> > >
+> > > Are you aware of other more elegant approaches we can try for us to t=
+rack this required cross-qdisc state? We suggested adding a single bit to t=
+he skb, but we also see the problem with adding a field for a one-off use c=
+ase to such a vital structure (but this would also completely stomp out thi=
+s bug).
+> >
+> >
+> > It sounds like quite a complicated approach - i dont know what the
+> > dequeue thing brings to the table; and if we really have to dequeue to
+>
+> Did what I say above help clarify what the problem is? Feel free to let m=
+e know if you have more questions, this bug is quite a nasty one.
+>
 
-While most network code paths now properly report pfmemalloc drops, some
-protocol-specific socket implementations still use sk_filter() without
-drop reason tracking:
-- Bluetooth L2CAP sockets
-- CAIF sockets
-- IUCV sockets
-- Netlink sockets
-- SCTP sockets
-- Unix domain sockets
+The text helped a bit, but send a tc reproducer of the issue you
+described to help me understand better how you end up in the tfifo
+which then calls the enqueu, etc, etc.
 
-These remaining cases represent less common paths and could be converted
-in a follow-up patch if needed. The current implementation provides
-significantly improved observability into memory pressure events in the
-network stack, especially for key protocols like TCP and UDP, helping to
-diagnose problems in production environments.
-
-Reported-by: Matt Fleming <mfleming@cloudflare.com>
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
-V3:
- - Add some whilespace lines to please checkpatch
- - Don't correct skb_drop_reason type in __udp4_lib_rcv
- - drop_reason variable in RX-handler (__netif_receive_skb_core)
-V2:
- - link: https://lore.kernel.org/all/174680137188.1282310.4154030185267079690.stgit@firesoul/
-V1:
- - link: https://lore.kernel.org/all/174619899817.1075985.12078484570755125058.stgit@firesoul/
-
- drivers/net/tun.c             |    6 ++----
- include/linux/filter.h        |   14 ++++++++++++--
- include/net/dropreason-core.h |    4 ++++
- include/net/tcp.h             |    2 +-
- net/core/dev.c                |   12 +++++++++---
- net/core/filter.c             |   15 ++++++++++++---
- net/core/sock.c               |   20 +++++++++++++-------
- net/ipv4/tcp_ipv4.c           |   25 ++++++++++++++-----------
- net/ipv4/udp.c                |    6 ++----
- net/ipv6/tcp_ipv6.c           |    9 +++------
- net/ipv6/udp.c                |    4 +---
- net/rose/rose_in.c            |    3 ++-
- 12 files changed, 75 insertions(+), 45 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 7babd1e9a378..bc47b6d112c3 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1000,8 +1000,8 @@ static unsigned int run_ebpf_filter(struct tun_struct *tun,
- /* Net device start xmit */
- static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- {
-+	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	struct tun_struct *tun = netdev_priv(dev);
--	enum skb_drop_reason drop_reason;
- 	int txq = skb->queue_mapping;
- 	struct netdev_queue *queue;
- 	struct tun_file *tfile;
-@@ -1030,10 +1030,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
- 	}
- 
- 	if (tfile->socket.sk->sk_filter &&
--	    sk_filter(tfile->socket.sk, skb)) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	    (sk_filter_reason(tfile->socket.sk, skb, &drop_reason)))
- 		goto drop;
--	}
- 
- 	len = run_ebpf_filter(tun, skb, len);
- 	if (len == 0) {
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index f5cf4d35d83e..4e82332afe03 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -1073,10 +1073,20 @@ bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
- 	return set_memory_rox((unsigned long)hdr, hdr->size >> PAGE_SHIFT);
- }
- 
--int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap);
-+int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap,
-+		       enum skb_drop_reason *reason);
-+
- static inline int sk_filter(struct sock *sk, struct sk_buff *skb)
- {
--	return sk_filter_trim_cap(sk, skb, 1);
-+	enum skb_drop_reason ignore_reason;
-+
-+	return sk_filter_trim_cap(sk, skb, 1, &ignore_reason);
-+}
-+
-+static inline int sk_filter_reason(struct sock *sk, struct sk_buff *skb,
-+				   enum skb_drop_reason *reason)
-+{
-+	return sk_filter_trim_cap(sk, skb, 1, reason);
- }
- 
- struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err);
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index bea77934a235..f33dfc93c759 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -570,6 +570,10 @@ enum skb_drop_reason {
- 	 * ingress bridge port does not allow frames to be forwarded.
- 	 */
- 	SKB_DROP_REASON_BRIDGE_INGRESS_STP_STATE,
-+	/**
-+	 * @SKB_DROP_REASON_PFMEMALLOC: dropped when under memory pressure
-+	 */
-+	SKB_DROP_REASON_PFMEMALLOC,
- 	/**
- 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 5078ad868fee..b6d72e1b4362 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1560,7 +1560,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
- 		     enum skb_drop_reason *reason);
- 
- 
--int tcp_filter(struct sock *sk, struct sk_buff *skb);
-+int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason);
- void tcp_set_state(struct sock *sk, int state);
- void tcp_done(struct sock *sk);
- int tcp_abort(struct sock *sk, int err);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 03d20a98f8b7..847adba3795b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5711,6 +5711,7 @@ static inline int nf_ingress(struct sk_buff *skb, struct packet_type **pt_prev,
- static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 				    struct packet_type **ppt_prev)
- {
-+	enum skb_drop_reason drop_reason = SKB_DROP_REASON_UNHANDLED_PROTO;
- 	struct packet_type *ptype, *pt_prev;
- 	rx_handler_func_t *rx_handler;
- 	struct sk_buff *skb = *pskb;
-@@ -5802,8 +5803,10 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- #endif
- 	skb_reset_redirect(skb);
- skip_classify:
--	if (pfmemalloc && !skb_pfmemalloc_protocol(skb))
-+	if (pfmemalloc && !skb_pfmemalloc_protocol(skb)) {
-+		drop_reason = SKB_DROP_REASON_PFMEMALLOC;
- 		goto drop;
-+	}
- 
- 	if (skb_vlan_tag_present(skb)) {
- 		if (pt_prev) {
-@@ -5901,8 +5904,10 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 	}
- 
- 	if (pt_prev) {
--		if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC)))
-+		if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC))) {
-+			drop_reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
- 			goto drop;
-+		}
- 		*ppt_prev = pt_prev;
- 	} else {
- drop:
-@@ -5910,7 +5915,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 			dev_core_stats_rx_dropped_inc(skb->dev);
- 		else
- 			dev_core_stats_rx_nohandler_inc(skb->dev);
--		kfree_skb_reason(skb, SKB_DROP_REASON_UNHANDLED_PROTO);
-+
-+		kfree_skb_reason(skb, drop_reason);
- 		/* Jamal, now you will not able to escape explaining
- 		 * me how you were going to use this. :-)
- 		 */
-diff --git a/net/core/filter.c b/net/core/filter.c
-index bc6828761a47..4ae299dc2eb7 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -122,6 +122,7 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
-  *	@sk: sock associated with &sk_buff
-  *	@skb: buffer to filter
-  *	@cap: limit on how short the eBPF program may trim the packet
-+ *	@reason: record drop reason on errors (negative return value)
-  *
-  * Run the eBPF program and then cut skb->data to correct size returned by
-  * the program. If pkt_len is 0 we toss packet. If skb->len is smaller
-@@ -130,7 +131,8 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
-  * be accepted or -EPERM if the packet should be tossed.
-  *
-  */
--int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
-+int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb,
-+		       unsigned int cap, enum skb_drop_reason *reason)
- {
- 	int err;
- 	struct sk_filter *filter;
-@@ -142,15 +144,20 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
- 	 */
- 	if (skb_pfmemalloc(skb) && !sock_flag(sk, SOCK_MEMALLOC)) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
-+		*reason = SKB_DROP_REASON_PFMEMALLOC;
- 		return -ENOMEM;
- 	}
- 	err = BPF_CGROUP_RUN_PROG_INET_INGRESS(sk, skb);
--	if (err)
-+	if (err) {
-+		*reason = SKB_DROP_REASON_SOCKET_FILTER;
- 		return err;
-+	}
- 
- 	err = security_sock_rcv_skb(sk, skb);
--	if (err)
-+	if (err) {
-+		*reason = SKB_DROP_REASON_SECURITY_HOOK;
- 		return err;
-+	}
- 
- 	rcu_read_lock();
- 	filter = rcu_dereference(sk->sk_filter);
-@@ -162,6 +169,8 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
- 		pkt_len = bpf_prog_run_save_cb(filter->prog, skb);
- 		skb->sk = save_sk;
- 		err = pkt_len ? pskb_trim(skb, max(cap, pkt_len)) : -EPERM;
-+		if (err)
-+			*reason = SKB_DROP_REASON_SOCKET_FILTER;
- 	}
- 	rcu_read_unlock();
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index b64df2463300..8cb6254cc56a 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -524,11 +524,10 @@ int sock_queue_rcv_skb_reason(struct sock *sk, struct sk_buff *skb,
- 	enum skb_drop_reason drop_reason;
- 	int err;
- 
--	err = sk_filter(sk, skb);
--	if (err) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	err = sk_filter_reason(sk, skb, &drop_reason);
-+	if (err)
- 		goto out;
--	}
-+
- 	err = __sock_queue_rcv_skb(sk, skb);
- 	switch (err) {
- 	case -ENOMEM:
-@@ -551,15 +550,18 @@ EXPORT_SYMBOL(sock_queue_rcv_skb_reason);
- int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
- 		     const int nested, unsigned int trim_cap, bool refcounted)
- {
-+	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	int rc = NET_RX_SUCCESS;
-+	int err;
- 
--	if (sk_filter_trim_cap(sk, skb, trim_cap))
-+	if (sk_filter_trim_cap(sk, skb, trim_cap, &reason))
- 		goto discard_and_relse;
- 
- 	skb->dev = NULL;
- 
- 	if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
- 		atomic_inc(&sk->sk_drops);
-+		reason = SKB_DROP_REASON_SOCKET_RCVBUFF;
- 		goto discard_and_relse;
- 	}
- 	if (nested)
-@@ -575,8 +577,12 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
- 		rc = sk_backlog_rcv(sk, skb);
- 
- 		mutex_release(&sk->sk_lock.dep_map, _RET_IP_);
--	} else if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
-+	} else if ((err = sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf)))) {
- 		bh_unlock_sock(sk);
-+		if (err == -ENOMEM)
-+			reason = SKB_DROP_REASON_PFMEMALLOC;
-+		if (err == -ENOBUFS)
-+			reason = SKB_DROP_REASON_SOCKET_BACKLOG;
- 		atomic_inc(&sk->sk_drops);
- 		goto discard_and_relse;
- 	}
-@@ -587,7 +593,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
- 		sock_put(sk);
- 	return rc;
- discard_and_relse:
--	kfree_skb(skb);
-+	sk_skb_reason_drop(sk, skb, reason);
- 	goto out;
- }
- EXPORT_SYMBOL(__sk_receive_skb);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index d5b5c32115d2..d0cf144b9bd5 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2025,6 +2025,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
- 	u32 gso_size;
- 	u64 limit;
- 	int delta;
-+	int err;
- 
- 	/* In case all data was pulled from skb frags (in __pskb_pull_tail()),
- 	 * we can fix skb->truesize to its real value to avoid future drops.
-@@ -2135,21 +2136,26 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
- 
- 	limit = min_t(u64, limit, UINT_MAX);
- 
--	if (unlikely(sk_add_backlog(sk, skb, limit))) {
-+	if (unlikely((err = sk_add_backlog(sk, skb, limit)))) {
- 		bh_unlock_sock(sk);
--		*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
--		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
-+		if (err == -ENOMEM) {
-+			*reason = SKB_DROP_REASON_PFMEMALLOC;
-+			__NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
-+		} else {
-+			*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
-+			__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
-+		}
- 		return true;
- 	}
- 	return false;
- }
- EXPORT_IPV6_MOD(tcp_add_backlog);
- 
--int tcp_filter(struct sock *sk, struct sk_buff *skb)
-+int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason)
- {
- 	struct tcphdr *th = (struct tcphdr *)skb->data;
- 
--	return sk_filter_trim_cap(sk, skb, th->doff * 4);
-+	return sk_filter_trim_cap(sk, skb, th->doff * 4, reason);
- }
- EXPORT_IPV6_MOD(tcp_filter);
- 
-@@ -2276,14 +2282,12 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 		}
- 		refcounted = true;
- 		nsk = NULL;
--		if (!tcp_filter(sk, skb)) {
-+		if (!tcp_filter(sk, skb, &drop_reason)) {
- 			th = (const struct tcphdr *)skb->data;
- 			iph = ip_hdr(skb);
- 			tcp_v4_fill_cb(skb, iph, th);
- 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
- 					    &drop_reason);
--		} else {
--			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
- 		}
- 		if (!nsk) {
- 			reqsk_put(req);
-@@ -2339,10 +2343,9 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 
- 	nf_reset_ct(skb);
- 
--	if (tcp_filter(sk, skb)) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	if (tcp_filter(sk, skb, &drop_reason))
- 		goto discard_and_relse;
--	}
-+
- 	th = (const struct tcphdr *)skb->data;
- 	iph = ip_hdr(skb);
- 	tcp_v4_fill_cb(skb, iph, th);
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index f9f5b92cf4b6..ad3ca2d2e3fc 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2345,7 +2345,7 @@ static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
-  */
- static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- {
--	int drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
-+	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	struct udp_sock *up = udp_sk(sk);
- 	int is_udplite = IS_UDPLITE(sk);
- 
-@@ -2434,10 +2434,8 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- 	    udp_lib_checksum_complete(skb))
- 			goto csum_error;
- 
--	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
- 		goto drop;
--	}
- 
- 	udp_csum_pull_header(skb);
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 7dcb33f879ee..6af7a08f510c 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1832,14 +1832,12 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 		}
- 		refcounted = true;
- 		nsk = NULL;
--		if (!tcp_filter(sk, skb)) {
-+		if (!tcp_filter(sk, skb, &drop_reason)) {
- 			th = (const struct tcphdr *)skb->data;
- 			hdr = ipv6_hdr(skb);
- 			tcp_v6_fill_cb(skb, hdr, th);
- 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
- 					    &drop_reason);
--		} else {
--			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
- 		}
- 		if (!nsk) {
- 			reqsk_put(req);
-@@ -1895,10 +1893,9 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 
- 	nf_reset_ct(skb);
- 
--	if (tcp_filter(sk, skb)) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	if (tcp_filter(sk, skb, &drop_reason))
- 		goto discard_and_relse;
--	}
-+
- 	th = (const struct tcphdr *)skb->data;
- 	hdr = ipv6_hdr(skb);
- 	tcp_v6_fill_cb(skb, hdr, th);
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 7317f8e053f1..ffef09631832 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -893,10 +893,8 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
- 	    udp_lib_checksum_complete(skb))
- 		goto csum_error;
- 
--	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
--		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
-+	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
- 		goto drop;
--	}
- 
- 	udp_csum_pull_header(skb);
- 
-diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
-index 4d67f36dce1b..4603a9385a61 100644
---- a/net/rose/rose_in.c
-+++ b/net/rose/rose_in.c
-@@ -101,6 +101,7 @@ static int rose_state2_machine(struct sock *sk, struct sk_buff *skb, int framety
-  */
- static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype, int ns, int nr, int q, int d, int m)
- {
-+	enum skb_drop_reason dr; /* ignored */
- 	struct rose_sock *rose = rose_sk(sk);
- 	int queued = 0;
- 
-@@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
- 		rose_frames_acked(sk, nr);
- 		if (ns == rose->vr) {
- 			rose_start_idletimer(sk);
--			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
-+			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) == 0 &&
- 			    __sock_queue_rcv_skb(sk, skb) == 0) {
- 				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
- 				queued = 1;
-
-
+cheers,
+jamal
 
