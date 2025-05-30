@@ -1,218 +1,262 @@
-Return-Path: <netdev+bounces-194348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C311AC8D09
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 13:39:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E53F8AC8D11
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 13:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EC903B13E6
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 11:39:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2BA97A930A
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 11:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F0621CC6C;
-	Fri, 30 May 2025 11:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tCzzF4mm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4A6225788;
+	Fri, 30 May 2025 11:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F318433D1;
-	Fri, 30 May 2025 11:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBEE15E97;
+	Fri, 30 May 2025 11:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748605180; cv=none; b=ipRO3XEz2vRK8z1BoeWA6x9U3wEAUnfC3Nhfwg9pD86EawsF0S6sX89xIvKBkk72TVHkQR9BGn8nZ8kNOPWeoF4mj8T/gO7dTST1cdt8uOWEg+PBg2Wwy0p9At0hPDZFRV6UXuEmEY5hRkTloNrOcAew5qJpBfJsXLPxJmIu5wA=
+	t=1748605491; cv=none; b=RJUFk6d+D0mB2m241n/ilsBQ63RFcKBdyvKS8HXI/3t8shYWYGBdbn5XdmgLcaT0mhqSikuUFtrs874DYeB565hC1jEeplmY1acAO81lRdt51QskJAP6KzIcg4W684cykvyIUq4WsbFzTwlmfiJK8+HH0E9JldUGKrV0ZAGHH+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748605180; c=relaxed/simple;
-	bh=jiQCGx0YSXrjA7NcSI86rhOwbwWT7bvgPuL9HsaO1e4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=k4tqbaKbvdRda9ZAk/KydviQKXCX/Jc4OplW53/rjNRRhCDLPdnCwKZbCcaTW8E6CIJqddMN0q74L8y/8VSMjjAHLWqWbX4/549kVEnaGTiHx8wfEw8wbZKId7KhTGcV3bYT0RNYvEymnY8QNp5PfTG9pwJMKuOCDsApJMVn26Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tCzzF4mm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAA2AC4CEE9;
-	Fri, 30 May 2025 11:39:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748605179;
-	bh=jiQCGx0YSXrjA7NcSI86rhOwbwWT7bvgPuL9HsaO1e4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=tCzzF4mm7yxD6Jbk4/3PzRo+HCSmKNujXmH0ycSLDDNnmnayVIWiJv6bMHwDOUQ1c
-	 LU5S1Q2J/G47csOds18pPbG1yX/JP2yaK2k3Caqt+FDiCAZdejAq0ALtEiK1zXuBNq
-	 /ZsGfnIRf12HfEU52/UEuk1q5nu5VkZLNW9Qp4rgLs+FbbweoWRA4RL3WMsVf3QgTx
-	 jAS4erw//R/4aZgnihD+AJveLU1T8MoVXOmnAVmkZvWSiTgCVcwZ6dPlqHcshA/NkJ
-	 7wH3Sd3RQHPtk+iIUe8gpJ+2Qsth6orOljjR0TrRed2jBPO8THEouYd6JDReuHxPid
-	 ZCH5g5Rh8/Xqw==
-Message-ID: <0ae02bf15487f3e5703ce1f5d3107b6dc00477f1.camel@kernel.org>
-Subject: Re: [PATCH v12 01/10] i915: only initialize struct ref_tracker_dir
- once
-From: Jeff Layton <jlayton@kernel.org>
-To: Krzysztof Karas <krzysztof.karas@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
- <horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
- <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,  Simona Vetter
- <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>, Joonas
- Lahtinen	 <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>,  Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki
- Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,  Nathan
- Chancellor	 <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, 	netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, 	intel-gfx@lists.freedesktop.org
-Date: Fri, 30 May 2025 07:39:36 -0400
-In-Reply-To: <bcc3aaschdk64nieucfllygsqjvtvpffgxf7mjamabkeofangr@tmbkssauvg2d>
-References: <20250529-reftrack-dbgfs-v12-0-11b93c0c0b6e@kernel.org>
-	 <20250529-reftrack-dbgfs-v12-1-11b93c0c0b6e@kernel.org>
-	 <bcc3aaschdk64nieucfllygsqjvtvpffgxf7mjamabkeofangr@tmbkssauvg2d>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1748605491; c=relaxed/simple;
+	bh=3KZT6EuKeuDfW7cLfZy5fE/Lzu0QMbUr0cevKUAXE5I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o9yf9whsbSUkXa3rezIIrdC10nwTxqmbvBY1/li36xZBMxdmrNlF/2BtJbcgvgYmi5B0fAGb/5xBus3vPwsdQrduoPAzXRTkKZZU8pjSkMTfjy3gmqtc/2DSF3afJSRbvDJdlXke1CFFj+zZU5HoKJD5dcBoikKdHG5sx3lw2i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-4e6d911daeaso481977137.1;
+        Fri, 30 May 2025 04:44:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748605487; x=1749210287;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jurH4uEOoGm6SgCAAR3znTp1A0aowVKifdiPl5JtH/E=;
+        b=WrxKyFVRCXNM3rzCkiS8Vsdx2Oo9t4bX0uwGpSLK3f11tSjAEtgSVV08DleIHTdkVL
+         HzWPLWDm7Uq0yiE0r9Urr47DEuAhgrgYsqTcth3iYQSTf0I4tBceoIdz03kKoRtuiTsW
+         5669ADAi2ixWWNgskk1cCqqLOsV3l7FeCnQoD+MFj3GMlfU/9frDD13sxZWywxZ2RPZR
+         CHuiWzpr3MaRe9gMROwTC+Xuihk6OsFq8HxA1RlIKcN4ffJrWpVDxp5zL0DoRB7o6hXv
+         aacgiBZyNrNZKQ5svNbffy/tN35EmBtH4u2iHEgi9SWwIft72tlkgk6dYjkXLmExOp6Y
+         cUiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULDNCnA9wWAJ7fYb/ee87tIf+NE8R1jd81Ru/XsflA1uaSGnd85TvXZIUEg4VKZAy+B64gRscCgn85e/vk@vger.kernel.org, AJvYcCWfFwOUAu8btUPUVozhNSZ/6Sy2Vl4ON/T6ra3fm751+NvqIq+G+BlSlecqnqFolaKKB9VkIi09ym4=@vger.kernel.org, AJvYcCWp76nL5hgcnYYRJ5uusEayRijM8RxMHG9npFjx/espKWx7dTbPTpKw+yNr8HoN1QUy9RyJC3n8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5ziQYUoFPablibPlkKWDM/WMiNzdj/WLfFnT3EnEgG8Mm6BAP
+	RnVtn4kLC0F4zl/oPXQLR1DbIJ+b2GI+Vo5/ihGD6akQrtEbKoAHlcy3LJMcJqMc
+X-Gm-Gg: ASbGncvKbUWg1KGE6A14C5lWHLn6fvvbTh/8iFpq/8OzyK0zPxEMqVcGgp4Pb5KbgD/
+	SuxlPk3wPI93Fd2iSzCFflkoK/t2p8zbDByMh+pbdNHfi2kJso9d968/CnsAkX8pTB1Snf51K7z
+	frxj/Q/4d2nCr8PRNfQxsO3bLV7fP19lLpwaRE2dSLjibNH7l43WMVDyzX2VcVvp0Ja2R3TZsbZ
+	dr3+2LDnFxStMoprvcVcR5KuPLlhY3A+eAXwuGGTrcEY4B1A6MONl3pvW/J4uPI7HrdYT0Awd1f
+	hj5pOSTe0GNVMPd34nAb6MQyutolgX3tsojGTTEsLOLvFnLVjyz0H/M0KUpXqZndZ0cIEBHAYEJ
+	dMDPns8G3AP/wFiV0PNp/Vwfv
+X-Google-Smtp-Source: AGHT+IHntCHsWMbq6L1uH4dOIgVxLDH6k8m+RoyqnWuPiE/wDrOeTlhA59KgtQ/iOTalsxfsoc6ppw==
+X-Received: by 2002:a05:6102:509f:b0:4e6:d9f2:957c with SMTP id ada2fe7eead31-4e6e41b3a02mr2823155137.23.1748605486891;
+        Fri, 30 May 2025 04:44:46 -0700 (PDT)
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com. [209.85.217.52])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4e6444be9b5sm2651218137.18.2025.05.30.04.44.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 May 2025 04:44:44 -0700 (PDT)
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4e6d911daeaso481954137.1;
+        Fri, 30 May 2025 04:44:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUgGCWWqQwLUr6sItyhKeyFA0eBPuOgt7RieBOn0v0QyA/9816jce80NWsCT2o2l7PS9PYNDOALft7iPpGz@vger.kernel.org, AJvYcCWYG+vLBGFasXKaZxfcimNplTT83qs1Aup+SdcLc8HoPqOx+v7ROwu6HWX0oSi0OsN5hgxhDRML@vger.kernel.org, AJvYcCWkgDsv+P6lHx5j4MIcpJ1lNJgtcam700lM7W2oJQ4BIk5OGSTa/IRkGMKD2YdzOu+ZFYwXj5HmAaY=@vger.kernel.org
+X-Received: by 2002:a05:6102:4194:b0:4da:fc9d:efc with SMTP id
+ ada2fe7eead31-4e6e40faaefmr2758272137.11.1748605483371; Fri, 30 May 2025
+ 04:44:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20210918095637.20108-1-mailhol.vincent@wanadoo.fr> <20210918095637.20108-5-mailhol.vincent@wanadoo.fr>
+In-Reply-To: <20210918095637.20108-5-mailhol.vincent@wanadoo.fr>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 30 May 2025 13:44:31 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
+X-Gm-Features: AX0GCFvGT51bFh809Rtads-Nhj4H7apb8FFVpNZoBSShAwHBH29ORnrUKKAIiRk
+Message-ID: <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
+Subject: Re: [PATCH v6 4/6] can: netlink: add interface for CAN-FD Transmitter
+ Delay Compensation (TDC)
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, =?UTF-8?Q?Stefan_M=C3=A4tje?= <Stefan.Maetje@esd.eu>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2025-05-30 at 11:01 +0000, Krzysztof Karas wrote:
-> Hi Jeff,
->=20
-> > I got some warnings from the i915 CI with the ref_tracker debugfs
-> > patches applied, that indicated that these ref_tracker_dir_init() calls
-> > were being called more than once. If references were held on these
-> > objects between the initializations, then that could lead to leaked ref
-> > tracking objects.
-> >=20
-> > Since these objects are zalloc'ed, ensure that they are only initialize=
-d
-> > once by testing whether the first byte of the name field is 0.
->=20
-> Are you referring to these warnings?
-> <3> [314.043410] debugfs: File 'intel_wakeref@ffff88815111a308' in direct=
-ory 'ref_tracker' already present!
-> <4> [314.043427] ref_tracker: ref_tracker: unable to create debugfs file =
-for intel_wakeref@ffff88815111a308: -EEXIST
->=20
-> I think those might be caused by introduction of:
-> "ref_tracker: automatically register a file in debugfs for a ref_tracker_=
-dir".
->=20
-> Current version of "ref_tracker: add a static classname string
-> to each ref_tracker_dir" further in this series should prevent
-> multiple calls to "ref_tracker_dir_init()", so this patch could
-> be dropped I think.
-> If my reasoning is wrong however, then please add a note to the
-> commit message which explains why this is needed in more detail
-> or/and move this patch right before it is necessary. Otherwise
-> it looks like a vague workaround.
->=20
+Hi Vincent,
 
-I'm fine with dropping this patch.
+Thanks for your patch, which is now commit d99755f71a80df33
+("can: netlink: add interface for CAN-FD Transmitter Delay
+Compensation (TDC)") in v5.16.
 
-Those are the messages that demonstrate the problem, but the problem is
-potentially bigger than those messages. ref_tracker_dir_init() is being
-called (at least) twice:
+On Sat, 18 Sept 2021 at 20:23, Vincent Mailhol
+<mailhol.vincent@wanadoo.fr> wrote:
+> Add the netlink interface for TDC parameters of struct can_tdc_const
+> and can_tdc.
+>
+> Contrary to the can_bittiming(_const) structures for which there is
+> just a single IFLA_CAN(_DATA)_BITTMING(_CONST) entry per structure,
+> here, we create a nested entry IFLA_CAN_TDC. Within this nested entry,
+> additional IFLA_CAN_TDC_TDC* entries are added for each of the TDC
+> parameters of the newly introduced struct can_tdc_const and struct
+> can_tdc.
+>
+> For struct can_tdc_const, these are:
+>         IFLA_CAN_TDC_TDCV_MIN
+>         IFLA_CAN_TDC_TDCV_MAX
+>         IFLA_CAN_TDC_TDCO_MIN
+>         IFLA_CAN_TDC_TDCO_MAX
+>         IFLA_CAN_TDC_TDCF_MIN
+>         IFLA_CAN_TDC_TDCF_MAX
+>
+> For struct can_tdc, these are:
+>         IFLA_CAN_TDC_TDCV
+>         IFLA_CAN_TDC_TDCO
+>         IFLA_CAN_TDC_TDCF
+>
+> This is done so that changes can be applied in the future to the
+> structures without breaking the netlink interface.
+>
+> The TDC netlink logic works as follow:
+>
+>  * CAN_CTRLMODE_FD is not provided:
+>     - if any TDC parameters are provided: error.
+>
+>     - TDC parameters not provided: TDC parameters unchanged.
+>
+>  * CAN_CTRLMODE_FD is provided and is false:
+>      - TDC is deactivated: both the structure and the
+>        CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
+>
+>  * CAN_CTRLMODE_FD provided and is true:
+>     - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
+>       can_calc_tdco() to automatically decide whether TDC should be
+>       activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
+>       calculated tdco value.
 
-struct ref_tracker_dir {                                             =20
-#ifdef CONFIG_REF_TRACKER                                            =20
-        spinlock_t              lock;                                =20
-        unsigned int            quarantine_avail;                    =20
-        refcount_t              untracked;                           =20
-        refcount_t              no_tracker;                          =20
-        bool                    dead;                                =20
-        struct list_head        list; /* List of active trackers */  =20
-        struct list_head        quarantine; /* List of dead trackers */
-        const char              *class; /* object classname */       =20
-#ifdef CONFIG_DEBUG_FS                                               =20
-        struct dentry           *dentry;                             =20
-        struct dentry           *symlink;                            =20
-#endif                                                               =20
-#endif                                                               =20
-};=C2=A0
+This is not reflected in the code (see below).
 
-This structure contains two list_heads that can contain ref_tracker
-objects. If that list was populated when ref_tracker_dir_init() is
-called the second time, then those objects will now be sitting on a
-corrupt list. At best they'll just leak, but with them sitting on a
-now-corrupt list, they could cause a panic too.
+By default, a CAN-FD interface comes up in TDC-AUTO mode (if supported),
+using a calculated tdco value.  However, enabling "tdc-mode auto"
+explicitly from userland requires also specifying an explicit tdco
+value.  I.e.
 
-It may be that there can be no objects on that list when it's called
-the second time. But with this patchset initializing it twice will
-cause dentry leaks at least.
---=20
-Jeff Layton <jlayton@kernel.org>
+    ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
+
+gives "can <FD,TDC-AUTO>" and "tdcv 0 tdco 3", while
+
+    ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
+tdc-mode auto
+
+gives:
+
+    tdc-mode auto: RTNETLINK answers: Operation not supported
+
+unless I add an explicit "tdco 3".
+
+According to your commit description, this is not the expected behavior?
+Thanks!
+
+>
+>     - CAN_CTRLMODE_TDC_AUTO and tdco provided: set
+>       CAN_CTRLMODE_TDC_AUTO and use the provided tdco value. Here,
+>       tdcv is illegal and tdcf is optional.
+>
+>     - CAN_CTRLMODE_TDC_MANUAL and both of tdcv and tdco provided: set
+>       CAN_CTRLMODE_TDC_MANUAL and use the provided tdcv and tdco
+>       value. Here, tdcf is optional.
+>
+>     - CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive. Whenever
+>       one flag is turned on, the other will automatically be turned
+>       off. Providing both returns an error.
+>
+>     - Combination other than the one listed above are illegal and will
+>       return an error.
+>
+> N.B. above rules mean that whenever CAN_CTRLMODE_FD is provided, the
+> previous TDC values will be overwritten. The only option to reuse
+> previous TDC value is to not provide CAN_CTRLMODE_FD.
+>
+>
+> All the new parameters are defined as u32. This arbitrary choice is
+> done to mimic the other bittiming values with are also all of type
+> u32. An u16 would have been sufficient to hold the TDC values.
+>
+> This patch completes below series (c.f. [1]):
+>   - commit 289ea9e4ae59 ("can: add new CAN FD bittiming parameters:
+>     Transmitter Delay Compensation (TDC)")
+>   - commit c25cc7993243 ("can: bittiming: add calculation for CAN FD
+>     Transmitter Delay Compensation (TDC)")
+>
+> [1] https://lore.kernel.org/linux-can/20210224002008.4158-1-mailhol.vincent@wanadoo.fr/T/#t
+>
+> Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+
+> --- a/drivers/net/can/dev/netlink.c
+> +++ b/drivers/net/can/dev/netlink.c
+
+> @@ -37,8 +52,43 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
+>
+>         if (data[IFLA_CAN_CTRLMODE]) {
+>                 struct can_ctrlmode *cm = nla_data(data[IFLA_CAN_CTRLMODE]);
+> +               u32 tdc_flags = cm->flags & CAN_CTRLMODE_TDC_MASK;
+>
+>                 is_can_fd = cm->flags & cm->mask & CAN_CTRLMODE_FD;
+> +
+> +               /* CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive */
+> +               if (tdc_flags == CAN_CTRLMODE_TDC_MASK)
+> +                       return -EOPNOTSUPP;
+> +               /* If one of the CAN_CTRLMODE_TDC_* flag is set then
+> +                * TDC must be set and vice-versa
+> +                */
+> +               if (!!tdc_flags != !!data[IFLA_CAN_TDC])
+> +                       return -EOPNOTSUPP;
+
+CAN_CTRLMODE_TDC_{AUTO,MANUAL} and none of tdc{v,o,f} provided is
+rejected.
+
+> +               /* If providing TDC parameters, at least TDCO is
+> +                * needed. TDCV is needed if and only if
+> +                * CAN_CTRLMODE_TDC_MANUAL is set
+> +                */
+> +               if (data[IFLA_CAN_TDC]) {
+> +                       struct nlattr *tb_tdc[IFLA_CAN_TDC_MAX + 1];
+> +                       int err;
+> +
+> +                       err = nla_parse_nested(tb_tdc, IFLA_CAN_TDC_MAX,
+> +                                              data[IFLA_CAN_TDC],
+> +                                              can_tdc_policy, extack);
+> +                       if (err)
+> +                               return err;
+> +
+> +                       if (tb_tdc[IFLA_CAN_TDC_TDCV]) {
+> +                               if (tdc_flags & CAN_CTRLMODE_TDC_AUTO)
+> +                                       return -EOPNOTSUPP;
+> +                       } else {
+> +                               if (tdc_flags & CAN_CTRLMODE_TDC_MANUAL)
+> +                                       return -EOPNOTSUPP;
+> +                       }
+> +
+> +                       if (!tb_tdc[IFLA_CAN_TDC_TDCO])
+> +                               return -EOPNOTSUPP;
+
+CAN_CTRLMODE_TDC_AUTO and tdco not provided is rejected.
+
+> +               }
+>         }
+>
+>         if (is_can_fd) {
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
