@@ -1,93 +1,94 @@
-Return-Path: <netdev+bounces-194294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3297BAC8611
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:50:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A3CAC863C
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 04:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C064A4959
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:50:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0974F1BC258B
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1DD155A4E;
-	Fri, 30 May 2025 01:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30B61519BA;
+	Fri, 30 May 2025 02:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ezXJMaqs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXcs2ox/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DE04C8E
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 01:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDE71D554
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 02:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748569802; cv=none; b=eW9WXv08SnBA4dehG5vi70MRt2lhIY8fmgmtWBOZRhcgbfbih+9q7SBKZDteQftrXZz0QJG+7nRbJM9jRiL2gE4D2xbF96RVuslYjU7HA4/o7q7Ux3bkuymK3CoJAt5Pz1LsnvBUiMDTTfIUHgHMGFEwUX2q4d9SaMQSizY0Sow=
+	t=1748571794; cv=none; b=arjSdm5JTAtDeqtYU0xLDrKQ6vTKIBnPU34UyfWQPIpP/z+CA5iynScSVzqNRi0IAtbHrS4Ga43GbOeLNH7vIXtC1CQyMpj+6BMM123iq55+V60MI36BS5ESBwsBseLXQWe9KBF7UZSrISdcKxCPHqvmXlx8ZurSd8Jj9NLintE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748569802; c=relaxed/simple;
-	bh=CveUHtuP1DptHh8ecfltHD6hRz2GDjqnTk2DrPj0YRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iwlfNjqTd+6ra/Ju4qU8S4dLDaLH+nLAi/iw5efg0AO2NNOEOpV81aXhSfUSpW8d8QE/B+acFLXV22pCc0wtu+FpeSIWcgFewuY1P5VNZhZ6l/0aYjIuYMAkFPbcxWva3YiqPsk/CuH7KUFscIz/DiQHSK3nOuXKQapaaIhamps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ezXJMaqs; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2353a2bc210so462915ad.2
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 18:50:00 -0700 (PDT)
+	s=arc-20240116; t=1748571794; c=relaxed/simple;
+	bh=lMt7jaCJ/51s2Sr4vLNC+dqD/u0JUZSzzWHmINW4s/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hZG4Kih2pvMO9TQ9uE8YAz9lN9e1720D8qb7C7YK6QTc/vw/FFNAK/K6OAhfPHmifbRgmYwbTYuBOVy36gGjQouXOHA/fsGQWDBBOcU1GBNTL54OPEkjSvbdvNxIWYX2yyqlM8+fUBMGJDwMWvxvqie155SjSc5yRlACY8G4zvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NXcs2ox/; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-74264d1832eso1593571b3a.0
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 19:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1748569800; x=1749174600; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=USkdCPHF2PH5TA65vT+omww+14Kmrvo8xr4kQydMtxQ=;
-        b=ezXJMaqslCLlNKM9i1+hOJzpaK/oN8rAv3zj43+6OkTaW3WUtBnHQIDndjbejVB+l+
-         aYrFR9mG0PhlrRM8QiZJxU77NEefx+Tx+I6L32AC+jZbpbn75hRsuE4/OWNbQElVC/LN
-         kowRAtStycOV8YEzN3ooyAkDhJtUK0T0hkHDg=
+        d=gmail.com; s=20230601; t=1748571792; x=1749176592; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hAl7qIBoj+j5A+aHWFBY+3TAAA6XYFo/PG1KLmBiuk8=;
+        b=NXcs2ox/b+/CzbClmFOm6subMVJJPmxPs9w0+Kcgo6KoH8Yt1HDcPMQmae+CGfNHf9
+         qLyTn4qTzLm9653JUEM9dHpGjV1RsRNHji8C2o2AwBPwqr4rmXDzAIv1ttGP3DGFBXr6
+         Qk4HTZ6XJ7riJdPVYmijEJJ4K3RcxXKUp3rm/5/ge8Jsa7dTs4xJ0bLr4+bKit3+aM0A
+         xvGfYgBCH1IK9L4uvNs3NHofROINJ4cv86zaZiAYgyUSHxALuYFGF8eWXoPU9pzczM+6
+         V/ctGAuB3KTIAcgtYENd+oXVR9v8EFDDNYxmhZohKTP9OXiAG4rwjvurtlS0cD+Lmq+f
+         KPSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748569800; x=1749174600;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=USkdCPHF2PH5TA65vT+omww+14Kmrvo8xr4kQydMtxQ=;
-        b=YPUZmhEZCvFU8SVInihry0MMAyvjnSPsR6BFuyuDDunKAWU4nU8vkLLBC85uKNK+Oj
-         wvRhJUeuu9aIb3wc+RNblYmZP+qFgVyb6nDFt8XyZDo/6gKZ5CAw34LN3i5DwAtc0QFn
-         fqjfkkjo0ENRHXzCZZuwvRjqIC08iPQv0iTuPEmOyLhJmrTPXZLEDnV+SI1tKQglU3uN
-         TQ7py7aLTFBoGCa9aFhaBpJFM+TCiUTCjkbLSGpXgLpF88/uDRWPzOuATAbjuK8cozGl
-         EEr7FJW9QdTwTBYJC/S1zt/+iPcl1AkC9DGD0tlkwvHnDWrfH14VGyOfMcJWJ7cFzz3z
-         X+qQ==
-X-Gm-Message-State: AOJu0YwM6lUd7VmSQJCs4P73ZHz8eEhBsiIBpzjl19v58owSQJ5/EdL8
-	tQWYpWQCdFy1WsaIY/7fY7rIqDdK83OGJ0UAb7cnv2Ge+dOphcjcXdf6g8FuaHpgmEfPlojYTvy
-	/Gnhf6EFnZMMkMWa0Ich8TJuJC8cXY4/iBjI4BfTXRKfTKw0j/NLNZmX8ZTSCFZ/qreeqWVoceO
-	H4OJ9VirXc33vytk+wB8s26mCSM0m7rsFOVOscl/4=
-X-Gm-Gg: ASbGncu8nJbdWwCbcSznclr/JiaoJ4gTuJeqwFNolGEhLKOJl4SSS1vEjrztlQyBvWO
-	Q3F28mtvJnJVrEUmZRAtVtfrgUvAinGUQtemCl3Lzo2i5TlVPRl2QZIDYWU6AOrUzpj1dzEC93a
-	xZL5xcUoimLkhDHR1ujjnlCVXII1D85zCbPOnQXYfIQc+uk/gDQTkP/GtqM2aCmo/NNMiXYjDMe
-	EL4M2hSWKUWIj/ptVMbtc9CEVDcghxrfVw+ZZ5/+DAwsECh5vAP+t1FyeNB3Sy5cMeHSa1ixQPe
-	Vu1Cw8Y3YGWjEqCUl4FuDximBAMosbaZ2gCP4MfCoHBpwjjDvDwT3E0QIfs=
-X-Google-Smtp-Source: AGHT+IF30dyRi/lEN79RRLEUtNpNXnDs814PCaa5b5ybHznKzvJuCfgL1TejPuzA/dDpqBg0EpC+zQ==
-X-Received: by 2002:a17:903:2f89:b0:234:eb6:a35b with SMTP id d9443c01a7336-235396e2b3amr5777265ad.44.1748569800003;
-        Thu, 29 May 2025 18:50:00 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cd8c35sm18316405ad.154.2025.05.29.18.49.58
+        d=1e100.net; s=20230601; t=1748571792; x=1749176592;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hAl7qIBoj+j5A+aHWFBY+3TAAA6XYFo/PG1KLmBiuk8=;
+        b=klqGME1btADe/nQUfbjKhM9Eg7bdYN9nABszOaXUXEIPcdTCu3aSSuOG0rvP9Y36Tl
+         p3p6m+moWUXp7zTbmsaqI5t5g00b2Q6RylULuoIKajsw2SYUKipzp54UamEvklhCOR1m
+         a1efkUNX37DdvVEDsT1FRXPWoTuo4Osx9QAyMpPB1RtG/aLCrhoYx5ZNCTTUZ8zO7Ow9
+         4b3TxgdcwkiBr71Mjec1TE3cYKxt5EE62zdLoQENhVErSCqPO+TQq7rST+FB4UCkOOUN
+         1yF6BRTAz8WFS92Qd2/YFcbasA6hSrkAkjgcZDmuJfWgcheYAkcSXhw+76pU2rRxnfkY
+         EaDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBX7s96lIG4HdX4XpxWBKUP2mCFgjRoEaSDwBpc9jhybJWfEqFf4WR23SgKzDpfLmt6lde/2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh7o0fjHKfyV/LTWBZytnROaSD6JIegLFFLI9AXsUuHx/jpKh9
+	BX5SbMs5Dr0mwSR97CPoYJmnROO2rV0e5nEFmiJketZmDkBdsYZxfbg=
+X-Gm-Gg: ASbGncsH5iOiH2xWWL+xzN6tcB9ZasFp5PrpefuoE6Q3xE5zKt2cnz5IFa/oJec3E8B
+	ffZzqbMZg4YaCgpssVbtp+VWBHX6/r6bvgIR0Y/OvH8oHu8XQllg+7QNAbIEK0wRCN2/f5Xnb72
+	N3K7kj/WFE0ODLeOHaOLnJXXw3/tiU/hSLMcX65ei0HspoOCy3tAS6AVHkMir4h2w3ALyB13+Pw
+	GZuZwdWmY048oHCMGxxAbjCw9EN/SiNmpla/HnkfThWCG+dA8WfjdbtC4wSn2/X5bgHdLCXdPpv
+	f5wN26j1nkKTvEP4xfM8hs1aNi/b
+X-Google-Smtp-Source: AGHT+IHCVse2YuDKpaB2AjhrKmna+kLiSxGax0FrVLALuv/ep+ONe6GiKeH71N6FT9fge/XYtEP69A==
+X-Received: by 2002:a05:6a21:68f:b0:206:a9bd:a186 with SMTP id adf61e73a8af0-21ad94f8c68mr2572218637.3.1748571792265;
+        Thu, 29 May 2025 19:23:12 -0700 (PDT)
+Received: from fedora.. ([2601:647:6700:3390::c8d1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2eceb9d1cbsm516126a12.56.2025.05.29.19.23.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 18:49:59 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	stfomichev@gmail.com,
-	john.cs.hey@gmail.com,
-	jacob.e.keller@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] e1000: Move cancel_work_sync to avoid deadlock
-Date: Fri, 30 May 2025 01:49:48 +0000
-Message-ID: <20250530014949.215112-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
+        Thu, 29 May 2025 19:23:04 -0700 (PDT)
+From: Kuniyuki Iwashima <kuni1840@gmail.com>
+To: brauner@kernel.org
+Cc: daniel@iogearbox.net,
+	david@readahead.eu,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kuniyu@amazon.com,
+	lennart@poettering.net,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	kuni1840@gmail.com
+Subject: Re: af-unix: ECONNRESET with fully consumed out-of-band data
+Date: Thu, 29 May 2025 19:21:29 -0700
+Message-ID: <20250530022303.3189981-1-kuni1840@gmail.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250529-sinkt-abfeuern-e7b08200c6b0@brauner>
+References: <20250529-sinkt-abfeuern-e7b08200c6b0@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,65 +97,153 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Previously, e1000_down called cancel_work_sync for the e1000 reset task
-(via e1000_down_and_stop), which takes RTNL.
+From: Christian Brauner <brauner@kernel.org>
+Date: Thu, 29 May 2025 12:37:54 +0200
+> Hey,
+> 
+> I've played with out-of-band data on unix sockets and I'm observing strange
+> behavior. Below is a minimal reproducer.
+> 
+> This is sending exactly one byte of out-of-band data from the client to the
+> server. The client shuts down the write side aftewards and issues a blocking
+> read waiting for the server to sever the connection.
+> 
+> The server consumes the single byte of out-of-band data sent by the client and
+> closes the connection.
+> 
+> The client should see a zero read as all data has been consumed but instead it
+> sees ECONNRESET indicating an unclean shutdown.
+> 
+> But it's even stranger. If the server issues a regular data read() after
+> consuming the single out-of-band byte it will get a zero read indicating EOF as
+> the child shutdown the write side. The fun part is that this zero read in the
+> parent also makes the child itself see a zero read/EOF after the client severs
+> the connection indicating a clean shutdown. Which makes no sense to me
+> whatsoever.
+> 
+> In contrast, when sending exactly one byte of regular data the client sees a
+> zero read aka EOF correctly indicating a clean shutdown.
+> 
+> It seems a bug to me that a single byte of out-of-band data leads to an unclean
+> shutdown even though it has been correctly consumed and there's no more data
+> left in the socket.
 
-As reported by users and syzbot, a deadlock is possible due to lock
-inversion in the following scenario:
+Thanks for the report!
 
-CPU 0:
-  - RTNL is held
-  - e1000_close
-  - e1000_down
-  - cancel_work_sync (takes the work queue mutex)
-  - e1000_reset_task
+This is definitely a bug.  Even after reading the OOB data, skb holding
+the 1 byte must stay in the recv queue to mark the OOB boundary.
 
-CPU 1:
-  - process_one_work (takes the work queue mutex)
-  - e1000_reset_task (takes RTNL)
+So, we need to consider that when close()ing a socket like:
 
-To remedy this, avoid calling cancel_work_sync from e1000_down
-(e1000_reset_task does nothing if the device is down anyway). Instead,
-call cancel_work_sync for e1000_reset_task when the device is being
-removed.
-
-Fixes: e400c7444d84 ("e1000: Hold RTNL when e1000_down can be called")
-Reported-by: syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/683837bf.a00a0220.52848.0003.GAE@google.com/
-Reported-by: John <john.cs.hey@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com/
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 3f089c3d47b2..d8595e84326d 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -477,10 +477,6 @@ static void e1000_down_and_stop(struct e1000_adapter *adapter)
- 
- 	cancel_delayed_work_sync(&adapter->phy_info_task);
- 	cancel_delayed_work_sync(&adapter->fifo_stall_task);
--
--	/* Only kill reset task if adapter is not resetting */
--	if (!test_bit(__E1000_RESETTING, &adapter->flags))
--		cancel_work_sync(&adapter->reset_task);
+---8<---
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index bd507f74e35e..13d5d53c0e53 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -654,6 +654,11 @@ static void unix_sock_destructor(struct sock *sk)
+ #endif
  }
  
- void e1000_down(struct e1000_adapter *adapter)
-@@ -1266,6 +1262,10 @@ static void e1000_remove(struct pci_dev *pdev)
- 
- 	unregister_netdev(netdev);
- 
-+	/* Only kill reset task if adapter is not resetting */
-+	if (!test_bit(__E1000_RESETTING, &adapter->flags))
-+		cancel_work_sync(&adapter->reset_task);
++static unsigned int unix_skb_len(const struct sk_buff *skb)
++{
++	return skb->len - UNIXCB(skb).consumed;
++}
 +
- 	e1000_phy_hw_reset(hw);
+ static void unix_release_sock(struct sock *sk, int embrion)
+ {
+ 	struct unix_sock *u = unix_sk(sk);
+@@ -681,6 +686,11 @@ static void unix_release_sock(struct sock *sk, int embrion)
+ 	unix_state_unlock(sk);
  
- 	kfree(adapter->tx_ring);
--- 
-2.43.0
+ #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
++	skb = skb_peek(&sk->sk_receive_queue);
++	if (skb && !unix_skb_len(skb)) {
++		__skb_unlink(skb, &sk->sk_receive_queue);
++		consume_skb(skb);
++	}
+ 	u->oob_skb = NULL;
+ #endif
+ 
+@@ -2569,11 +2579,6 @@ static long unix_stream_data_wait(struct sock *sk, long timeo,
+ 	return timeo;
+ }
+ 
+-static unsigned int unix_skb_len(const struct sk_buff *skb)
+-{
+-	return skb->len - UNIXCB(skb).consumed;
+-}
+-
+ struct unix_stream_read_state {
+ 	int (*recv_actor)(struct sk_buff *, int, int,
+ 			  struct unix_stream_read_state *);
+---8<---
 
+I'll post an official patch later.
+
+
+> 
+> Maybe that's expected and there's a reasonable explanation but that's very
+> unexpected behavior.
+> 
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+> #include <unistd.h>
+> #include <sys/socket.h>
+> #include <errno.h>
+> #include <sys/wait.h>
+> 
+> int main(void) {
+> 	int sv[2];
+> 	pid_t pid;
+> 	char buf[16];
+> 	ssize_t n;
+> 
+> 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
+> 		_exit(EXIT_FAILURE);
+> 
+> 	pid = fork();
+> 	if (pid < 0)
+> 		_exit(EXIT_FAILURE);
+> 
+> 	if (pid == 0) {
+> 		close(sv[0]);
+> 
+> 		/* Send OOB data to the server. */
+> 		printf("child: %zd\n", send(sv[1], "1", 1, MSG_OOB));
+> 
+> 		/* We're done sending data so shutdown the write side. */
+> 		shutdown(sv[1], SHUT_WR);
+> 
+> 		/* We expect to see EOF here, but we see ECONNRESET instead. */
+> 		if (read(sv[1], buf, 1) != 0) {
+> 			fprintf(stderr, "%d => %m - Child read did not return EOF\n", errno);
+> 			_exit(EXIT_FAILURE);
+> 		}
+> 
+> 		_exit(EXIT_SUCCESS);
+> 	}
+> 
+> 	/* The parent acts as a client here. */
+> 	close(sv[1]);
+> 
+> 	/* Hack: MSG_OOB doesn't block, so we need to make sure the OOB data has arrived. */
+> 	sleep(2);
+> 	
+> 	/* Read the OOB data. */
+> 	printf("%zd\n", recv(sv[0], buf, sizeof(buf), MSG_OOB));
+> 
+> 	/* If you uncomment the following code you can make the child see a zero read/EOF: */
+> 	// printf("%zd\n", read(sv[0], buf, sizeof(buf)));
+> 
+> 	/*
+> 	 * Close the connection. The child should see EOF but sees ECONNRESET instead...
+> 	 * Try removing MSG_OOB and see how the child sees EOF instead.
+> 	 */
+> 	close(sv[0]);
+> 
+> 	waitpid(pid, NULL, 0);
+> 	_exit(EXIT_SUCCESS);
+> }
+> 
 
