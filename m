@@ -1,106 +1,72 @@
-Return-Path: <netdev+bounces-194297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5805FAC8657
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 04:45:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC11AC865B
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 04:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DFB53BA495
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:45:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 095281BA5CB0
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3060213E898;
-	Fri, 30 May 2025 02:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NdgOcePV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E312CCC9;
+	Fri, 30 May 2025 02:49:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC13B2CCC9;
-	Fri, 30 May 2025 02:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E692DCBE6
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 02:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748573132; cv=none; b=TX+ESxuKzK1fFNkDLikiSi1Kg/VqPiiV5Yq0d5rhjM/Kn1DJCE3SjQTXS9/kEF9lIg5fO2WX8dlZ+t3GXa8uiNDAnLh0gdF0D5SLubqhDjp/Dgs07cjDG5cncfjva3VQD8oY/01f53l1Zt/ag3doYi3+mTnFQiCSUV789NVBc+s=
+	t=1748573355; cv=none; b=a/CnQ+wZLnI5b6zjrevsbRaJDjBacFrevH7AICcxdWB3NDoZXk280MYQZ72fys71GwujPThbogAj1IkRz9kMySMSUq2vfXBvlocXX69NSEmN88NMDUp5QQUg5w+RZ7YjSipwfoXZISlUfrCOa4eVM1fnjVgyD5bLdeZ0GdibXo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748573132; c=relaxed/simple;
-	bh=x18HnVhVbRhIWKpmltEGD1wKR/IEN2lra4oEUH168vw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J+CC3Fp/iLEYxcwipsEUVPP6MOCnWuJ3WiwDiSS3gG0QXnlb6fJOg+3L2vwT8o5xbj3bgGMQ/61FAfoUa0nwxmBLifZfM6WqCvwSlLycS86K5hF2jJYoRlYKh7dWTx5rKcMiMhUK9alJlWfKHl74EZ6WTKJCgvuto08n19BG1RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NdgOcePV; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2351ffb669cso8502975ad.2;
-        Thu, 29 May 2025 19:45:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748573130; x=1749177930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KoOjhXLY+ZNHRcoN2faE2b66e3GkcsBbU+4gzMj9KqY=;
-        b=NdgOcePVWex7lYBd6mm9ioSKYVsCCN/BB0yDPYfhoiKzjscBiQQ5b1T4B8Dq1Z+iAO
-         a+UNL1yBbho2Ic9w8tiQW0iX7Kc3pZl0qb3SbHjg7NcGM4jEyeJXXKBlGoOQQFqJXi+p
-         LwaFeWGJ8mSMxb/aWQJP5hQvdf8yb9xstT+PwxheOmk9tuHJnLXoOI4rD7qLCUrKHw5e
-         MmYFJ6acFrU/i95KPz/DnKinzX5H6V7nNbzjOF2ByHR9hrRqOE5PTgfJKK3aedPWInwV
-         7UdbZrfIexAMFTqDOfQuK8hKal6Gq7tdTKDbb4wnNJJYsTTMFy1GPgE01x08Sn9I/TIF
-         BHxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748573130; x=1749177930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KoOjhXLY+ZNHRcoN2faE2b66e3GkcsBbU+4gzMj9KqY=;
-        b=EtLlhyEw0NXzoi/R8dgBiPoOrC2EHKMP0E34j+CNBnbEwmG5cM99UaCYyQgVEvtOYl
-         LoEuzSuxg71OHnmUk9rI3gewXA6T3OA8pzOyjOAH3dVAt8sh2RcwZbEX+2zlamLzDnWp
-         lB1fZnqJu/OeASGuQp7wu3+z5ar1fTEaogKvHZTWF4A4D1ik6tDf/qBcgZwuKg4t2MiK
-         MGFH0CwTWEtnda07QaxcOrjXWLNm71iVZ5Ymfyn0qv5knvqeaNkEfCRTCkg+FvCZWVHt
-         dLHqPcN/pb6aakr5h2cFurJBIZEw86lcMJ6rAMMJS9+PT9aiwih1ZBMKDvyvpM9ZmqlK
-         6XHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV60aSkNT5+2QfD6x7GJMS7g/zkKG+2MVQWcBoa4RAIO8s0PYBF4dkIUC/3n0RH63K0Dgi6WQbVLPQ=@vger.kernel.org, AJvYcCWDJ16BV7BlYergudNuUV8oXaotK01pn0AuK0Xw9xjV0xNb8u5UYoki+zFojP6yxspkZTkZ5asY@vger.kernel.org, AJvYcCWxVzAV7S7Rnt9dJxaRDXWVuTrmFV1P9eJRFvVTx3WxO/MDgjHyUSg3gZ6l8ZRKfiyIj+yzpcP7Gj4ueA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/vMR67MoKnUfj6oH42XoePJL1ARuvrl6vm9G7NZIKglW3Hi3n
-	A8rL4QPu4oTibNMfFMPk+kHWrXOx0kp65hKFwE3RhenlXO9RI1VxnYU=
-X-Gm-Gg: ASbGnctRbrU+HFjTofN4ZWSwBOYjwrEp3b2DgqAFqpPGQF3HNySHkb+aV+aRuXyEq4G
-	2e5hqE5mIFv21nz5ns/NRb+qOrj6m3SiESrZS/iDKQi/qgJTgswOGuWbMnMPNoFVwW7E1/jqcF7
-	q7FHUGYQnpzXTXKkGZg6TiRlFkKieCfoC6cbgXmcdrSeKtTgmPTrfAYiN0YE1ZvjJRPDTvKrbX1
-	XOShHgiC687hB5cFvQPHsaUbLKyIcJ7YYjdCxfTMrti4k2WKFRcmeXrtsLqCsSgohN0ulq9k6rE
-	VCX/AMPjE6S5hrIWsGZ68OljwTW/
-X-Google-Smtp-Source: AGHT+IGmhneqjdBylW4JYpgbPUNRknu2JzSpNlC2hWsZcakXdR7Ir8On6/7pieVXkB9LlKcYsiVkBw==
-X-Received: by 2002:a17:903:3ac8:b0:234:bfe3:c4a5 with SMTP id d9443c01a7336-235298ef7bfmr26925495ad.2.1748573129870;
-        Thu, 29 May 2025 19:45:29 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cf504asm18767775ad.178.2025.05.29.19.45.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 19:45:29 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: hch@lst.de
-Cc: axboe@kernel.dk,
-	chuck.lever@oracle.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1748573355; c=relaxed/simple;
+	bh=5W400MBZ1HThTvR3ckF00N8iEWaCB3X849eX1DGODzg=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=c3JTvFP9/e7dsSbyEMhBssYRfLURtd2Oppmq8qliOCOfhepYxcMCstn+qwZq45p7QQsPoe9HssKee4B+TGvwyEo6ym/9QN5UMaaXGi0187W9KOClotkr33XSxjK9UNwPbYEe1jQJcyYTmOKdz04F3NRw2GKGDa3JkAo0XjO759E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: a6489ad83d0011f0b29709d653e92f7d-20250530
+X-CTIC-Tags:
+	HR_CTE_8B, HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE
+	HR_FROM_DIGIT_LEN, HR_FROM_NAME, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER
+	HR_SJ_NOR_SYM, HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT
+	HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED
+	SA_TRUSTED, SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS
+	DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_T1, AMN_GOOD, AMN_C_TI
+	AMN_C_BU, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:e749e42d-d3a6-43dd-8710-aea0136158b2,IP:10,
+	URL:0,TC:0,Content:-5,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,A
+	CTION:release,TS:-35
+X-CID-INFO: VERSION:1.1.45,REQID:e749e42d-d3a6-43dd-8710-aea0136158b2,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:-25,RT:0,SF:-15,FILE:0,BULK:0,RULE:EDM_GE969F26,AC
+	TION:release,TS:-35
+X-CID-META: VersionHash:6493067,CLOUDID:83699f22e4d7182ca7599630c796c4f1,BulkI
+	D:2505291639197H8C8EDO,BulkQuantity:4,Recheck:0,SF:17|19|24|38|44|66|78|10
+	2,TC:nil,Content:0|50,EDM:1,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC
+	:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: a6489ad83d0011f0b29709d653e92f7d-20250530
+X-User: lijun01@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <lijun01@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 370220807; Fri, 30 May 2025 10:49:04 +0800
+From: Li Jun <lijun01@kylinos.cn>
+To: davem@davemloft.net,
 	edumazet@google.com,
-	horms@kernel.org,
-	jaka@linux.ibm.com,
-	jlayton@kernel.org,
-	kbusch@kernel.org,
-	kuba@kernel.org,
-	kuni1840@gmail.com,
-	kuniyu@amazon.com,
-	linux-nfs@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	matttbe@kernel.org,
-	mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sfrench@samba.org,
-	wenjia@linux.ibm.com,
-	willemb@google.com
-Subject: Re: [PATCH v2 net-next 2/7] socket: Rename sock_create_kern() to __sock_create_kern().
-Date: Thu, 29 May 2025 19:45:26 -0700
-Message-ID: <20250530024527.3206724-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250526053013.GC11639@lst.de>
-References: <20250526053013.GC11639@lst.de>
+	lijun01@kylinos.cn,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: ppp: remove error variable
+Date: Fri, 30 May 2025 10:48:50 +0800
+Message-Id: <20250530024850.378749-1-lijun01@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,16 +75,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Christoph Hellwig <hch@lst.de>
-Date: Mon, 26 May 2025 07:30:13 +0200
-> On Fri, May 23, 2025 at 11:21:08AM -0700, Kuniyuki Iwashima wrote:
-> > Let's rename sock_create_kern() to __sock_create_kern() as a special
-> > API and add a fat documentation.
-> > 
-> > The next patch will add sock_create_kern() that holds netns refcnt.
-> 
-> Maybe do this before patch 1 to reduce the churn of just touching a
-> lot of the same callers again?
+the error variable did not function as a variable.
+so remove it.
 
-Makes sense, will do.
+Signed-off-by: Li Jun <lijun01@kylinos.cn>
+---
+ drivers/net/ppp/pptp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
+index 5feaa70b5f47..67239476781e 100644
+--- a/drivers/net/ppp/pptp.c
++++ b/drivers/net/ppp/pptp.c
+@@ -501,7 +501,6 @@ static int pptp_release(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct pppox_sock *po;
+-	int error = 0;
+ 
+ 	if (!sk)
+ 		return 0;
+@@ -526,7 +525,7 @@ static int pptp_release(struct socket *sock)
+ 	release_sock(sk);
+ 	sock_put(sk);
+ 
+-	return error;
++	return 0;
+ }
+ 
+ static void pptp_sock_destruct(struct sock *sk)
+-- 
+2.25.1
+
 
