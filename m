@@ -1,172 +1,419 @@
-Return-Path: <netdev+bounces-194388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD597AC92AF
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 17:44:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C963AC928F
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 17:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EF3416440B
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 15:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65422173E74
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 15:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D0B235360;
-	Fri, 30 May 2025 15:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525E322D9E5;
+	Fri, 30 May 2025 15:32:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JPZwV0MS"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="bhIqo7QZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C33519F10A
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 15:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748619888; cv=none; b=eyiZx/o2fP3mTIHvuijY2VM/wI2AUtNWjZ+eEGZqTvYpDB9/1F5Xe5fmwZgFFNCL+U4Ltqo1NQYrSc/YIRajlVqfeOgL5DMamiUmxgwsRr9OTIANnyb/+Rd6VpqIB672cSlgRwkiHUme2enf0JBYQo9nJugBpQLbInBFlvJBDf0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748619888; c=relaxed/simple;
-	bh=tShNz1F8ZqHyMCW3gy3LmKwe14b90b0cKvfiiQiedF4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pgDsfu+59cdciXliRjfkuEkM4HchOmBXoWKAgLflR37dDNrAGpjBCe5pg9jJykywlvTLiZN1zrxCMfsAynNyLC2vwuKTmgzwEDz7qpXLn0Ti3ljSvBTorApYMs6fNrl3qgawtWkSEnpqlLbxxIt0EUDB6kdzubQWchknbZxg9u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JPZwV0MS; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-742c2ed0fe1so2052012b3a.1
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 08:44:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1748619886; x=1749224686; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SryMm32kuymojhHrK4V1xjurKm1RRnj6DaabgF0M4vY=;
-        b=JPZwV0MSQKpX15o+jHjUMMGmtb9iFG8glz6eqYd5ZygErrCA1IpKOEm6nLwcdMah32
-         J4rBi03f0G995EwV+R595fNCg/IWwFB5AWRnBn2OPEr9OfyML3w73Lbezl2Afn4T7Gdf
-         X8n27Xg7q+LNQ6EPk877NXAXdUMH/1dGaQAwc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748619886; x=1749224686;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SryMm32kuymojhHrK4V1xjurKm1RRnj6DaabgF0M4vY=;
-        b=nS+aumr9KnuaarBRIfWsDfCvS9dMSv6O/EcZbZnT8rAP23/24Adkf0U8bUnj7z6Ev1
-         fEK4slMjPxK1/lewLqyKdKs2XkPO+kA33uJdH83T2HOixxTj2TLXNuZhtSgnj6za47h4
-         leCtrwv+kPUUUvIr0Ub+RhamzONjpSrrokNW38NPyI25cpfVGmpGIAJskPgpp0QEUZP3
-         hl/adP8Y8enL+J01oF6EJ3uE92uqawEHaWYq7VLt8sRqwvuzK3Swen6R45w3PUUs0uRu
-         5JisTaY6VGV9kRrX1wYXFZBm1JblaWwoVAwzbbriDJjOtOAasYOexrKOEP/Kwt+jiTRh
-         +ooA==
-X-Gm-Message-State: AOJu0YyP5y3+mG3VSAd6UJi5QcuHpVahIl51N48TQJmUqchq2YRbLgXV
-	RSHGWa7Fxf1oZAdmI4bEZx9Ltn9qVGhgl2QK8wl1Sp3mAxPt5sBFEdY1uke7NhUbRvTXVX9OziE
-	B+/1N6P/nFUm8TGCnHxnFLX9W5m+BQxbioSqVZFsvkWDNenVrjGYfftNSkWBcZ5Bf4qGMHceVND
-	ISfWupKJIWG0vg/Bm6qDZ0/tGUrXi+ddKQwO4ZKjMEk84=
-X-Gm-Gg: ASbGncskWwvn9SmYmMAzrUNLgy2tpD9KD66za9Quvg96lT5TteugPuYTIAlCeL96vAL
-	Dk9xA3nvKQGxj/Mfss7UPxg6d/LJP3pzel+mPj2l0erTX45T5vCrmZeoiSsnHStCz0WKyJF4Fm9
-	jisCTofCAv2wV2AFpY9TuMCn+AG+kBYNJ6ixXNkzMGYVrjXXXxh6LmHKAEmwUXU7X5cHpWG4Rzc
-	RxlovNNe+PP17pcKeQokq9G0lqbodfPdoIH0IOTLatefwVDKqPoDXAj39MbaIrJnI3Q8AdUjU6A
-	/qRcF304SImdimeJ6ngywLVt1tn8IoZH2C92VyFeh6aYHu+L6+si7YHt+77aoixip9Ok/is5ut2
-	t5OwjsPrXP2o8+LhoYbq1RA==
-X-Google-Smtp-Source: AGHT+IGAK8o+8Ua0lXjHXGjY94JIpgJscQVIy88WZ6WB5EqaxsbE1cmu3G6Ju41EdiRl90z+RRovCA==
-X-Received: by 2002:a05:6a00:2305:b0:746:3040:4da2 with SMTP id d2e1a72fcca58-747bd96b918mr6023716b3a.8.1748619885949;
-        Fri, 30 May 2025 08:44:45 -0700 (PDT)
-Received: from ubuntu.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afe9645dsm3208018b3a.7.2025.05.30.08.44.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 08:44:45 -0700 (PDT)
-From: Ronak Doshi <ronak.doshi@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Ronak Doshi <ronak.doshi@broadcom.com>,
-	Guolin Yang <guolin.yang@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v4] vmxnet3: correctly report gso type for UDP tunnels
-Date: Fri, 30 May 2025 15:27:00 +0000
-Message-ID: <20250530152701.70354-1-ronak.doshi@broadcom.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F64623182E;
+	Fri, 30 May 2025 15:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748619172; cv=fail; b=bekMkkTB1XQLhoSsprLS4Eoztvi6KBLLXHfSl2POhqic1XLvP8RJMj/2haX2oyEpVKt9nLucMvX6HTT6pPTivMSoR3M8+60o4P9WvMnvHdYcKO0+0IxQQC1qFFJEp0j+sFA6uhTh6Ff5ZDVLOZcapR6J7+3i1irneloPxxJITKg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748619172; c=relaxed/simple;
+	bh=1ZMtpaoGVi0B3LsE1zeazNWFmpFBh4/s7jLs5/fbN4c=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=WZ7OcikKZRWj+LXft6V52/cxolV28yU5hffzYJOJlBSC+skNy+U9oPe3TG95Ls9aWJI7TB5tsZMlDqrY3DGDP2oiM3QISFsnjK6G2gqIwXRmaY/qTxzNHqXKxFmxWNEb0SNj+adklLHQrTEE5mIruxHxMzlITucoGK4weeQFVsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=bhIqo7QZ; arc=fail smtp.client-ip=40.107.220.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZFELXhPLB7JDB2L4ikgn4aNDxbQT/cbEHvvS97MjZJREqGKsBVdgwgKj/ikf8P5rAQHDWHyWPI9l4NJ4xbWeb7gR5bO9c2u3BmiN2xIAVTY2vcuFQnQKxfb6p1ACfU1z+it4jDtDyG2/HXlBmNdkTJQBWOW+kJ5kGK/KnRryA+b9V4KJ2MNvv01FXcHIBsImjrT7ZQbEKDXJR6Au+Q68yrThp0XthFBHxQrwZ4mIkG6VazuTOQB7L3zQkxFHkOvheRzL65tKo431i10OV7oTV50n0fZl1TO+CnuXzx2QBn2Vabb7iEE3QEc/WtqplcBN+mbIpPZYN+Zn8zO/MnRSbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PRcaumTjv7pyTCE7O1y8g+p3ac/vuGWzQY05TZ1gpYI=;
+ b=ZWollFdssvxmCc9gRe7MmSQAoX/4YZGAN5UHxlRg7u5mYpx35iZYzUFCR9TxxGn4w65lWBErhIIkoiZ3WdLSWflJ8YRqlDS7q7noaEUFr2n7InGjkoYUwpA8xY9AQ7oc/irMlu2QjYglrRIlhDBKaGpuGvzkSYl00cC07JhTvs8QbqPN6i+ngWRwj8pjw4lZFQPA529E0auTX2CRhqAUwUzsFycCuTi/CJPmOprgPTVcpAF5GXT2pZ+CUZqpDn3+otS8aN3R+S0qhrgSLgFDCsnL5atG6x0O3JJSX3lxLnQS9CNZGk6d8/fRpK+3Vwr5nVFNSD+Wphea04WYcRQCzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PRcaumTjv7pyTCE7O1y8g+p3ac/vuGWzQY05TZ1gpYI=;
+ b=bhIqo7QZd0FTae0F3bgA2snMad3YntOXGRZevfzcbheXrvFh204w4zEM+gwdwwtpdIWghISBXQBZjI7q6l+VyrijaZkX9wphS4xIigoVuPBplM7IqUG+qKBatMZcSoEiK4uEN7QKEhta+4PjHXUK9r1lfJh+hnAZyxEXiYSyamB9atgk4Hzqzyc4TmzWyw+s+ETOSnEsKvI9wT0cn1dcDlKNH7fpPWyNpDvJKRlkffRPG5nT0ax0wZqJJSOCSIViAwMMJ27zcW7hySLYfiuDmsAw75+2quq4hcE/t4EQC9QZNgZEVOxoO8ceOzfq1NcScesGSGKf50HNrTWwhEaVOg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com (2603:10b6:a02:b4::23)
+ by DM4PR03MB6126.namprd03.prod.outlook.com (2603:10b6:5:395::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.27; Fri, 30 May
+ 2025 15:32:48 +0000
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c]) by BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c%4]) with mapi id 15.20.8769.029; Fri, 30 May 2025
+ 15:32:48 +0000
+From: Matthew Gerlach <matthew.gerlach@altera.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	maxime.chevallier@bootlin.com,
+	richardcochran@gmail.com,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Mun Yew Tham <mun.yew.tham@altera.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>
+Subject: [PATCH v3] dt-bindings: net: Convert socfpga-dwmac bindings to yaml
+Date: Fri, 30 May 2025 08:32:41 -0700
+Message-Id: <20250530153241.8737-1-matthew.gerlach@altera.com>
+X-Mailer: git-send-email 2.35.3
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY3PR03CA0019.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::24) To BYAPR03MB3461.namprd03.prod.outlook.com
+ (2603:10b6:a02:b4::23)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR03MB3461:EE_|DM4PR03MB6126:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f5b49f2-7752-4922-ec19-08dd9f8f3b12
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eb5E1p8WbJtFcu0uPPpwUdTnZNI2CO3yLaF2If2pTzK9YyziF7VcgWrWgr9o?=
+ =?us-ascii?Q?e3L2HFBTooGvqBbEvUm6aMQbMzMDCwjAJlKYVcxeT0tMWZuu7G2BJNdYaqS8?=
+ =?us-ascii?Q?Cbi7IbGT1o7ENz5fpswDrhj2CcbOmDZKJhagWS8XS0uHt1eh6y4Nn/rBninD?=
+ =?us-ascii?Q?rABnsFgJXUd7PUS2/eGTYZpsX7aPsGD+YAzBvfAP2EICJ0/MdufoatKNo4/1?=
+ =?us-ascii?Q?1yl/CIoeIA/qEZ697hvApQqzWRQ7PiL2EhL1Y+lrNr1RM+wm6QSF729XjKlw?=
+ =?us-ascii?Q?+K3Ln1gpISIk67mT2uheFUmG0B12agx6mhlRrkFEj1RE5mgyY52JxcCOmqQQ?=
+ =?us-ascii?Q?dz8Ul3jhpNu1Jm5Vqz9M5bnqfQeiz7Eo6VpqHOBxtWPBmM4WzOwbqfXCf8H6?=
+ =?us-ascii?Q?gqxP4aXGf5iJ6za4Dd10uhd1KNpACru2pAkmKBHx+4RE3qbJvFu8dT0waHmH?=
+ =?us-ascii?Q?j5dPlEHqljDj72Gf/ysJYiH21ibkkhfUU7nyDzjHov4NK10oe910m2u8UAOF?=
+ =?us-ascii?Q?TpfhSOwfav/GM580bGSJM2Gc6pof9G8SxITXTzG4FHkzUh8xNOHRPVVszdcN?=
+ =?us-ascii?Q?aONvkn6KYRnM3qjOmOyLNqMOiNQB4I2ibWpB/YcK80IoS6Ehnhr8b3J1axor?=
+ =?us-ascii?Q?N1bFhJysxNBR6uuV9Ps/vg23/MLhXDhnCpPfnCS+58OcV86XheWJF8ADPZgv?=
+ =?us-ascii?Q?EfqWbpa4tvWKMwJB1vd/swbPTxxBvimA8HF10Ea3XPwdfkf4SAaif0TZZD6r?=
+ =?us-ascii?Q?6OrBs2AYiTaAYwJejig2QEZMU+hMk/rV5hFERvipmcFwuFBkHDK9+Xdpbh3T?=
+ =?us-ascii?Q?N8c++8v6nwYqrSYSGJ6SFXe30WlPqjNaULjmhmlNjYUeu20vSB03cSHfDXUm?=
+ =?us-ascii?Q?gSUZrfJtLZEDQhNImEnNpV0ZnaEFU/bgQvKsxWNKYpiyBKe0RKQg5lTKlqsi?=
+ =?us-ascii?Q?leoQ4K8BSpgLMRgSKtO53tdnUjNNy+v2gDCydoj6nby5Elw9CCNba2kgrfjF?=
+ =?us-ascii?Q?c/oaneCbjZh96ZYfKsUQd/ue6lOyCui97AmaYdIDNH7Tppwaw7sPPCH7eizz?=
+ =?us-ascii?Q?6QUFU8FCiPBcU7nGuZ/99idVdaNG3+iqg2QmAL4mQInqX6M+fo82Xk7OaahX?=
+ =?us-ascii?Q?TE/U4o68WSwzSQn66Wq2WhlrfuxuYR8nG5mZZXj5KFsOGivIYKiyksjYE9IP?=
+ =?us-ascii?Q?12dNikq9eY+lx7b0mVpZvJQiwpKU1fT0bR/JuBmmcwpC8tyf35QOZCIAu5dP?=
+ =?us-ascii?Q?2yohZU45HO5iRSaOPxdZBE+u//asx2Bc+4tVgcJbB9EwJsL9FynvjLnAQ4MN?=
+ =?us-ascii?Q?kGMXXNvtQ8xLAcXijNX6Kr11AfDiskBFevagOQgc0Iyly2A+lkGYBVzQzKq8?=
+ =?us-ascii?Q?g9li1zdRzTOTbpgcz16fasuc2ElUzszDG5d39+KsM2NLjCUIVw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR03MB3461.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UfyHe2KClBA6GvRWyBfw3t0vafeGjkfANqYk65mmBUCknJRjIrFdZXxVzHwi?=
+ =?us-ascii?Q?MzZYwVzUBYgHW0MG1Lc/4KaocDcY8k45qYhZfsYMINzGaphf7zheW+Spdq/a?=
+ =?us-ascii?Q?nKHsD82lkOQ2AqM8AP15tIe0yKWEfKRjJCoXsmaFDjlF2vBlPFoB8UFrFQU3?=
+ =?us-ascii?Q?en3vjIzagg+LkftTdWnPTu516lmE7F7xIM6hxz5ZFzZjNe5m45aF4Qzw3NaX?=
+ =?us-ascii?Q?gfq9+LRkGBtHezSkZIDIO+xSffxjER/YNMdpR6st4J1YKfKniaxdyMQCPoNo?=
+ =?us-ascii?Q?E65eYRIiITwDEaBacFEEeuoQeogU987Mx7veYuLyySNpMbHm3cZlk2fvY8O2?=
+ =?us-ascii?Q?YUGrmaV367Rh2W5jfNqzUWVo6f+4m7dkLjeuiZN+qyOxTGTvrPGshDVqjgJH?=
+ =?us-ascii?Q?gUfMgA2LdRK6oY11HiuzqhMC2yDCApBDegSPDj8Lp9IyDcVO+IY4o/ZE2I2b?=
+ =?us-ascii?Q?Qi7iJ9yI0q/kKSOuDoeZZ99Nj0Mem2w9O0zpPpaAPVNnuLm3sKr09HqjKbrd?=
+ =?us-ascii?Q?Mg0acLaQy5z0SlbSnVZKPwX1pemKnTfzxv/lImHiJh+wjMCSpP6QAyA2aElH?=
+ =?us-ascii?Q?wVzSFJJ5k7eJBLTbmTEZS4/p0SXeo/LqQXk26/yTSeuCvIvPvJXGmVzHF3lt?=
+ =?us-ascii?Q?TVLnPvlJ8WY3+D9qDa/OcZ+yRaLlBmRBQXkJcRIsfcTpM7qJBxGrCj6o65rw?=
+ =?us-ascii?Q?g3si24t1CDGU1oaZB1nCJMa2O1UjR4gHnJHZnjP/CBNSu4X0B9DwKcsN+2hX?=
+ =?us-ascii?Q?WzeQRs/FRihe79joMnkXZwJg2R3Qpa4JKIJh5UD/L2BqS9uGlwHZxLIE1KY/?=
+ =?us-ascii?Q?C5G5jwmI1bgjKUSWvdq4KuzX44X1KVw3wAJmuIPWjsYjphAbpjwub/bU9//U?=
+ =?us-ascii?Q?dGVtcSji6V3kPIUxPHa7I92pobP6Rr1YarannK2tPTI2ZNabuwbjijEXNVHh?=
+ =?us-ascii?Q?6IA6P5dgR3d5QovT5HJn3CnucYLH18GBv/1Ws5ZI8RRVdvaBjtoPs5eFHhhE?=
+ =?us-ascii?Q?LdmUtRrgK1vh1IKkE0zXrvtTrd4TOd28LkTNBBUZz7kmswirJCjaVQcUNNKI?=
+ =?us-ascii?Q?QKhlT4ilkqaC7gNkiNKavF+efEFzi4rkcxLAbzwOPoRuGc1hMhGD7y7sCX73?=
+ =?us-ascii?Q?65ETsHNfHwEpo6lmzGoWtdUxUA3ENFMg229ht9DgmzNjgRngRAdaAdyxTBYZ?=
+ =?us-ascii?Q?cGqq8lNIZbH3GdANWSWZJPzL7QnRfKM4aUNahl/6/dW/gvGRc1V0NR9P++Mb?=
+ =?us-ascii?Q?fruPOYxbkJ0FF3Pz/N8n5NmFPXRkm9ZBU5IPIHTbWYl2CNI3EdakYQLlB2SB?=
+ =?us-ascii?Q?B6VGUf7CuEZM47PnvEv3rwIrrJo0QSlwwSTyzJ2sAjJqdPj4PFIaNTTcAazY?=
+ =?us-ascii?Q?Kl293QaXhUd0bkDCICkzf7hx5k4uwWCnpjaeALyhKreRIU6xpkHGkOptfxhc?=
+ =?us-ascii?Q?GBayfmsRne1cE+Ep2xC1ECMsyUXD1hwcB9n5oXOndFG+jyzefSDootqvJaYt?=
+ =?us-ascii?Q?VflZvI5JigXxU114fKOgVWw0zxsNo38UacPmvq0CE89tu262BNXipTaFuNz2?=
+ =?us-ascii?Q?QWgZ9FQRshvBAtQX3sKq/28XSPXF00WQGMIGS+HOkILkat4uswvd3qbAXcsG?=
+ =?us-ascii?Q?7w=3D=3D?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f5b49f2-7752-4922-ec19-08dd9f8f3b12
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB3461.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2025 15:32:48.1243
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ibjwhgo8gRcPYxxBDu1FCPvS03c0dbN1hKI0zwWO6he/jdwMxJTl2vZM40SfshZXgVSFekxs2n2L5/Zuqye8BqHPWKcbBFgWz1IaljfnjAg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR03MB6126
 
-Commit 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing
-in a tunnel") added checks in linux stack to not accept non-tunnel
-GRO packets landing in a tunnel. This exposed an issue in vmxnet3
-which was not correctly reporting GRO packets for tunnel packets.
+From: Mun Yew Tham <mun.yew.tham@altera.com>
 
-This patch fixes this issue by setting correct GSO type for the
-tunnel packets.
+Convert the bindings for socfpga-dwmac to yaml.
 
-Currently, vmxnet3 does not support reporting inner fields for LRO
-tunnel packets. The issue is not seen for egress drivers that do not
-use skb inner fields. The workaround is to enable tnl-segmentation
-offload on the egress interfaces if the driver supports it. This
-problem pre-exists this patch fix and can be addressed as a separate
-future patch.
-
-Fixes: dacce2be3312 ("vmxnet3: add geneve and vxlan tunnel offload support")
-Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
-Acked-by: Guolin Yang <guolin.yang@broadcom.com>
-
-Changes v1-->v2:
-  Do not set encapsulation bit as inner fields are not updated
-Changes v2-->v3:
-  Update the commit message explaining the next steps to address
-  segmentation issues that pre-exists this patch fix.
-Changes v3->v4:
-  Update the commit message to clarify the workaround.
+Signed-off-by: Mun Yew Tham <mun.yew.tham@altera.com>
+Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
 ---
- drivers/net/vmxnet3/vmxnet3_drv.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+v3:
+ - Add missing supported phy-modes.
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index c676979c7ab9..287b7c20c0d6 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -1568,6 +1568,30 @@ vmxnet3_get_hdr_len(struct vmxnet3_adapter *adapter, struct sk_buff *skb,
- 	return (hlen + (hdr.tcp->doff << 2));
- }
- 
-+static void
-+vmxnet3_lro_tunnel(struct sk_buff *skb, __be16 ip_proto)
-+{
-+	struct udphdr *uh = NULL;
+v2:
+ - Add compatible to required.
+ - Add descriptions for clocks.
+ - Add clock-names.
+ - Clean up items: in altr,sysmgr-syscon.
+ - Change "additionalProperties: true" to "unevaluatedProperties: false".
+ - Add properties needed for "unevaluatedProperties: false".
+ - Fix indentation in examples.
+ - Drop gmac0: label in examples.
+ - Exclude support for Arria10 that is not validating.
+---
+ .../bindings/net/socfpga,dwmac.yaml           | 153 ++++++++++++++++++
+ .../devicetree/bindings/net/socfpga-dwmac.txt |  57 -------
+ 2 files changed, 153 insertions(+), 57 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+
+diff --git a/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+new file mode 100644
+index 000000000000..29dad0b58e1a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+@@ -0,0 +1,153 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/socfpga,dwmac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+	if (ip_proto == htons(ETH_P_IP)) {
-+		struct iphdr *iph = (struct iphdr *)skb->data;
++title: Altera SOCFPGA SoC DWMAC controller
 +
-+		if (iph->protocol == IPPROTO_UDP)
-+			uh = (struct udphdr *)(iph + 1);
-+	} else {
-+		struct ipv6hdr *iph = (struct ipv6hdr *)skb->data;
++maintainers:
++  - Matthew Gerlach <matthew.gerlach@altera.com>
 +
-+		if (iph->nexthdr == IPPROTO_UDP)
-+			uh = (struct udphdr *)(iph + 1);
-+	}
-+	if (uh) {
-+		if (uh->check)
-+			skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL_CSUM;
-+		else
-+			skb_shinfo(skb)->gso_type |= SKB_GSO_UDP_TUNNEL;
-+	}
-+}
++description:
++  This binding describes the Altera SOCFPGA SoC implementation of the
++  Synopsys DWMAC for the Cyclone5, Arria5, Stratix10, and Agilex7 families
++  of chips.
++  # TODO: Determine how to handle the Arria10 reset-name, stmmaceth-ocp, that
++  # does not validate against net/snps,dwmac.yaml.
 +
- static int
- vmxnet3_rq_rx_complete(struct vmxnet3_rx_queue *rq,
- 		       struct vmxnet3_adapter *adapter, int quota)
-@@ -1881,6 +1905,8 @@ vmxnet3_rq_rx_complete(struct vmxnet3_rx_queue *rq,
- 			if (segCnt != 0 && mss != 0) {
- 				skb_shinfo(skb)->gso_type = rcd->v4 ?
- 					SKB_GSO_TCPV4 : SKB_GSO_TCPV6;
-+				if (encap_lro)
-+					vmxnet3_lro_tunnel(skb, skb->protocol);
- 				skb_shinfo(skb)->gso_size = mss;
- 				skb_shinfo(skb)->gso_segs = segCnt;
- 			} else if ((segCnt != 0 || skb->len > mtu) && !encap_lro) {
++select:
++  properties:
++    compatible:
++      oneOf:
++        - items:
++            - const: altr,socfpga-stmmac
++            - const: snps,dwmac-3.70a
++            - const: snps,dwmac
++        - items:
++            - const: altr,socfpga-stmmac-a10-s10
++            - const: snps,dwmac-3.74a
++            - const: snps,dwmac
++
++  required:
++    - compatible
++    - altr,sysmgr-syscon
++
++properties:
++  clocks:
++    minItems: 1
++    items:
++      - description: GMAC main clock
++      - description:
++          PTP reference clock. This clock is used for programming the
++          Timestamp Addend Register. If not passed then the system
++          clock will be used and this is fine on some platforms.
++
++  clock-names:
++    minItems: 1
++    maxItems: 2
++    contains:
++      enum:
++        - stmmaceth
++        - ptp_ref
++
++  iommus:
++    maxItems: 1
++
++  phy-mode:
++    enum:
++      - gmii
++      - mii
++      - rgmii
++      - rgmii-id
++      - rgmii-rxid
++      - rgmii-txid
++      - sgmii
++      - 1000base-x
++
++  rxc-skew-ps:
++    description: Skew control of RXC pad
++
++  rxd0-skew-ps:
++    description: Skew control of RX data 0 pad
++
++  rxd1-skew-ps:
++    description: Skew control of RX data 1 pad
++
++  rxd2-skew-ps:
++    description: Skew control of RX data 2 pad
++
++  rxd3-skew-ps:
++    description: Skew control of RX data 3 pad
++
++  rxdv-skew-ps:
++    description: Skew control of RX CTL pad
++
++  txc-skew-ps:
++    description: Skew control of TXC pad
++
++  txen-skew-ps:
++    description: Skew control of TXC pad
++
++  altr,emac-splitter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Should be the phandle to the emac splitter soft IP node if DWMAC
++      controller is connected an emac splitter.
++
++  altr,f2h_ptp_ref_clk:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Phandle to Precision Time Protocol reference clock. This clock is
++      common to gmac instances and defaults to osc1.
++
++  altr,gmii-to-sgmii-converter:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Should be the phandle to the gmii to sgmii converter soft IP.
++
++  altr,sysmgr-syscon:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    description:
++      Should be the phandle to the system manager node that encompass
++      the glue register, the register offset, and the register shift.
++      On Cyclone5/Arria5, the register shift represents the PHY mode
++      bits, while on the Arria10/Stratix10/Agilex platforms, the
++      register shift represents bit for each emac to enable/disable
++      signals from the FPGA fabric to the EMAC modules.
++    items:
++      - items:
++          - description: phandle to the system manager node
++          - description: offset of the control register
++          - description: shift within the control register
++
++patternProperties:
++  "^mdio[0-9]$":
++    type: object
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++unevaluatedProperties: false
++
++examples:
++
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++    soc {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        ethernet@ff700000 {
++            compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a",
++            "snps,dwmac";
++            altr,sysmgr-syscon = <&sysmgr 0x60 0>;
++            reg = <0xff700000 0x2000>;
++            interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
++            interrupt-names = "macirq";
++            mac-address = [00 00 00 00 00 00]; /* Filled in by U-Boot */
++            clocks = <&emac_0_clk>;
++            clock-names = "stmmaceth";
++            phy-mode = "sgmii";
++        };
++    };
+diff --git a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+deleted file mode 100644
+index 612a8e8abc88..000000000000
+--- a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
++++ /dev/null
+@@ -1,57 +0,0 @@
+-Altera SOCFPGA SoC DWMAC controller
+-
+-This is a variant of the dwmac/stmmac driver an inherits all descriptions
+-present in Documentation/devicetree/bindings/net/stmmac.txt.
+-
+-The device node has additional properties:
+-
+-Required properties:
+- - compatible	: For Cyclone5/Arria5 SoCs it should contain
+-		  "altr,socfpga-stmmac". For Arria10/Agilex/Stratix10 SoCs
+-		  "altr,socfpga-stmmac-a10-s10".
+-		  Along with "snps,dwmac" and any applicable more detailed
+-		  designware version numbers documented in stmmac.txt
+- - altr,sysmgr-syscon : Should be the phandle to the system manager node that
+-   encompasses the glue register, the register offset, and the register shift.
+-   On Cyclone5/Arria5, the register shift represents the PHY mode bits, while
+-   on the Arria10/Stratix10/Agilex platforms, the register shift represents
+-   bit for each emac to enable/disable signals from the FPGA fabric to the
+-   EMAC modules.
+- - altr,f2h_ptp_ref_clk use f2h_ptp_ref_clk instead of default eosc1 clock
+-   for ptp ref clk. This affects all emacs as the clock is common.
+-
+-Optional properties:
+-altr,emac-splitter: Should be the phandle to the emac splitter soft IP node if
+-		DWMAC controller is connected emac splitter.
+-phy-mode: The phy mode the ethernet operates in
+-altr,sgmii-to-sgmii-converter: phandle to the TSE SGMII converter
+-
+-This device node has additional phandle dependency, the sgmii converter:
+-
+-Required properties:
+- - compatible	: Should be altr,gmii-to-sgmii-2.0
+- - reg-names	: Should be "eth_tse_control_port"
+-
+-Example:
+-
+-gmii_to_sgmii_converter: phy@100000240 {
+-	compatible = "altr,gmii-to-sgmii-2.0";
+-	reg = <0x00000001 0x00000240 0x00000008>,
+-		<0x00000001 0x00000200 0x00000040>;
+-	reg-names = "eth_tse_control_port";
+-	clocks = <&sgmii_1_clk_0 &emac1 1 &sgmii_clk_125 &sgmii_clk_125>;
+-	clock-names = "tse_pcs_ref_clk_clock_connection", "tse_rx_cdr_refclk";
+-};
+-
+-gmac0: ethernet@ff700000 {
+-	compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a", "snps,dwmac";
+-	altr,sysmgr-syscon = <&sysmgr 0x60 0>;
+-	reg = <0xff700000 0x2000>;
+-	interrupts = <0 115 4>;
+-	interrupt-names = "macirq";
+-	mac-address = [00 00 00 00 00 00];/* Filled in by U-Boot */
+-	clocks = <&emac_0_clk>;
+-	clock-names = "stmmaceth";
+-	phy-mode = "sgmii";
+-	altr,gmii-to-sgmii-converter = <&gmii_to_sgmii_converter>;
+-};
 -- 
-2.45.2
+2.35.3
 
 
