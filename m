@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-194338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A76AC8BF4
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 12:13:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0BEAC8BF6
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 12:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27305189D80C
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 10:13:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EAA27B1DEF
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 10:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5878223DF9;
-	Fri, 30 May 2025 10:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FBA225412;
+	Fri, 30 May 2025 10:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ZrN3PvFw"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="F+X3gTY1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78283223324
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5BE21B9D6
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748599990; cv=none; b=dl6JnfKI7yPZ0URyqrbXdzSGSg7J/qZWJ2iCaoLS+3gIgUuys2d/eX9VVAAYH90gJjhFR72h8HLqNUvsaXR4Adg0AGWft78Yqy1uSBrAGFW9DHbQktUhtntBmrZ9jBYqRKWt0q7DIONQXBwzfcHDf+l2+COgoKJTBMJvURuZT44=
+	t=1748599991; cv=none; b=H6HN4dxlNUFAuUc5uOzJrN7e+1Cgj40PzL946JpifNUFy2GAfhos4rcRWaDbGTxV+nZwMuKjmvvsgFyUl9/hjUTfoRl+IJjQKUiTAsdRwNWLB5n80qJ6k5uZ16NaEpN3UOAjssepP+zftqmpubWdOljzSajWAvrB9GmytARcn2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748599990; c=relaxed/simple;
-	bh=Ox0MtGkzh3nh7CLtFL5qX0KHPLfrIGtHILG1V0i/ZZc=;
+	s=arc-20240116; t=1748599991; c=relaxed/simple;
+	bh=RoPceCT88U9UnP5VGLnqcUBCCk5LAoemdIA1BgFYcG8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pZGVA3vWWIrCV2qHpqVuYC06i05ZXKZC+5ITzw/AyvL5vQxQwwqjRhKjAPTtfO3B+NWj1UafxfjBMZJy7SOESSrX9FAhNER2GApzGAmYCAB810vgGpK4Mj7LK6tqdMsixJILQr8f2DobSaQ5bBA00pSAk7i9kki4yp/b75Nk7Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ZrN3PvFw; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=siY5/9DPNhHOD5cnePaw4iYVxf3mhOg/BRaRjLTd1R4btdqhWS8jbwJX0dIO1loovq6jPGWPFxb1pol2iFdAJHryib18IyODkGRaqERufBrS3g0SNcWyALfFq8nQUuiq4zWhi0Yv8+Q35fX0Ssbvx0CwM+TYAxj0cNVS8+uzp5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=F+X3gTY1; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-442ea341570so12600925e9.1
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 03:13:08 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-450cfb6a794so10151755e9.1
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 03:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1748599986; x=1749204786; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1748599987; x=1749204787; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XuVvTyh2APuGKpkLmwx6DA+/7wBgxkM/Jz4/PX6rhhQ=;
-        b=ZrN3PvFwADKIe2gjnOGQbpqgBaIpFxCoeemNAxVBJTKcZhOXonf59c35wDDcDixvpm
-         KiTbIunPifWXlh2qW6k0qh0le9oPBRL483Qhtp0KFyM3gbsk7o3kkGAuup6a7KKZCFXD
-         oVuG7aT5T4mZIIrZLQ/PXJzZ0/Ha3tDi8V2JUDt4tQHlINFMhq/rGqx6KmrcTwLMAyy6
-         IXXZ+ffQyLfHupKNS6dF1AYIO2OTw4nfgXdd1IXtVyS/U978naBs4ar0BE3vaBpdrkkV
-         Z7+bGsZhlq5FFgHYPIYDCJpipskDKVaVQN7MbvOID2tnc+p61X2BSA+EvUjOEGSO4IzJ
-         d+iA==
+        bh=JT37SzU2UDYv3hG1XNn8rxWE6AIau0jZtc71Lj9N8OU=;
+        b=F+X3gTY1XYqgR4qCbZUmUinJsKIyIPbjwYFs9+fhDemHe7joY9mhpE6ysPM75PCaFH
+         gmnnI5uFHY3BSty1kffG61pWRsUw6hj88MZg4UCoe+08tmn/g4IOMVhUAoHN/ZNvUbMm
+         uuCaYLKxSocFbAMz57wI2S2SELISEHXWqOjF3sf2kar0L/zDgDIuryqCT57GPlK4RFsr
+         WmISLJJadzQzAQmxjgD6rCIrYH3JeQ0kC7+lFFMkRHiqvcuq/uRgTsj9etF5lQzgwelf
+         W3D35bOOHchkLZG18wuG56Z+SijCzSzjYai/9XmvXiaUxbemXCSs0RhPGIE9C4/n1RA5
+         VwYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748599986; x=1749204786;
+        d=1e100.net; s=20230601; t=1748599987; x=1749204787;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XuVvTyh2APuGKpkLmwx6DA+/7wBgxkM/Jz4/PX6rhhQ=;
-        b=HcdPASoYCMSqejJwXOpo4jSeIlpIEJdPVZz+9gaKfx8miOsO15PLui+/3CdO4arCyD
-         i9eoaLlqzgRx8D0PkNGEoE9X4kyuDKspfo8+w0zgSjduOXAe8K76G9QTnWkgf2jahSjp
-         8pi/2cJxxNcnOUgwt1W/Yk/3aW0k6PAVwWxR5mVSgAz+DhvMIqLZMu6RmnWV7z/MxSHR
-         39MsmrCwlW3KLJTA5Zu3+vGN5chL/08yIAW4K19rzlqjdi4T8Mh8aIDLEICvz7zJ+3/7
-         Et76Jj5bV/MYOvrifn0zopQULvH5DoI49GKx5SJTLdYJ82XLjfI4K/rklWLqTnWMF/76
-         R4Fw==
-X-Gm-Message-State: AOJu0YzhzYiNnuTLBsS996grwpmN6stTqyEb1ZDK62T3nk3Fc9/hMiP0
-	BvdscvS3ikkZZ4SydRzDA8CEXfNlavC8w+NWeU/s5vskWmaAsrb9Uw0K6+ineEEKsKZ1xAvbVvg
-	VSdUcKAhLsvB5W1BB7eqsIdql/ktX56ds+0ehYc3eDGWpih0BwZs26MwCcKY/j9Tr
-X-Gm-Gg: ASbGncuyZCH+zHIdpdWw+y1E/RGEVftTZALPTQom8bgQwwh3dstQB7vdpXNUHq8zdsU
-	3rA3uMyEc2lk6RdwGHRtf3S+2ppt4eOjVGsRUFx9bGy3Qz5wTAkAMf73zG17R1u7Zeb+/fipk0p
-	769aSc65t5sVLcNKQE3Ihw6NHMOU3t04roLgJaAWqG4wlx1xjOuveENMeq9xyCmJ5g5FN8aYmZ1
-	65X9Q941jiM/Xp2l3GTqEzRLKj6j+yGie8YMTRtDOd3HvcqDZ4fdFMJu5in3etP+tKCC92JtQEC
-	F2+lo9kqY/wumEClJ+Nedi9h0WAhkehPVMI1qfg+Bl8lijDYdw83Ppl0BgNqiWug4+JvC6B/Yg=
-	=
-X-Google-Smtp-Source: AGHT+IGmTQXg8kLGE7y8E+DBgx/+Hh7pL76UfHhJxpRtTVQTVIrhI/SVVD+J6FKUlQyIC6gqzH0Ndw==
-X-Received: by 2002:a05:600c:1553:b0:442:f482:c42d with SMTP id 5b1f17b1804b1-450d884316fmr14742065e9.9.1748599986359;
-        Fri, 30 May 2025 03:13:06 -0700 (PDT)
+        bh=JT37SzU2UDYv3hG1XNn8rxWE6AIau0jZtc71Lj9N8OU=;
+        b=MgayrOIZJP5UMYgn2LbSFkthvPswF6UmJiX3cTj5+KWGH9hjjvrDPDU3c827Jioypp
+         WQ4VsGTJ9+6nZgQsyECDJd7aaWm9ddKegd1DebzU0rR8ytqnfjZBqiEVXUvIvNbjWPWK
+         rHjTjU49WZehGWMZz9n8AAEnZEKKNToLCYbEygR0ZFJzivGby0djQIq2ymAgZOPrLOS9
+         sCOS7rKmwKImXgGG7EdE+IklPxwIs/tklyy38Enye7u2S7F1qsfXsQcI5p/Qo36BvZlx
+         CnRqI8bOWTncNTMqS3xlliBajmujFVR5qa0y3RvBubkJXrmYmixXDNZaw1IMz6VWriTa
+         KTNw==
+X-Gm-Message-State: AOJu0YxzioVawA/xzKLjdSPsr+X0ln924r9VW24eKbL2MbcNKnNscE7N
+	4J7vMrVEYbLCQGS66aVnNiWkgFoXO/B8fSKNc06AHhLOqsoxCEN7tBHVrjmtKIeVhfxql4eJSYT
+	XNTeuj3AXsChdlWAcWzXt75tL5qJzzp44p3NXjdfUP6frDRiWheg8AQZIUSbGGgdS
+X-Gm-Gg: ASbGncubuBh1X0n0RbadpKXbIUarwNZJv/zVWWu6H1ZCJB87l4t6vbX9pf03zg4yfbF
+	/qebr7tpvqyGKTBzyz3lsTxtzAe4bGK6Eq4ppw9bX5YJyoRc4wXv7yOa6krOZPeznUp9KEkzEmg
+	+dN9+Pxht4jb+D6MJH9KeGNGU9mWCQOvpiscLDbemUcweGcH8IaPew4u/jy/+dpjrpfMW3icRnb
+	yip55kNQaWjWt/VTSSmz0Kx7Z7Q4abZR3C9YpHCluvXJUfxqPEbUtcab4ZlciWQ+im4u7VnN3YU
+	jnZmKyfcGcEQwIb4KBafTmp/Z03PLe1tQeHExwZR8ofLLD3+SGmxS4WsSik5gsv3cQet8QKwDK0
+	cEdBXpWUJJi+I0O5gz6c=
+X-Google-Smtp-Source: AGHT+IGjQ9t821hLc04mQ/wYcu/xzdYsPiK7T6dogxiymKCOq+8ED/L/Id/mNBhMYLm+CRbN+H+ORA==
+X-Received: by 2002:a05:600c:8207:b0:43c:f0ae:da7 with SMTP id 5b1f17b1804b1-450d64c31b3mr25672745e9.7.1748599987359;
+        Fri, 30 May 2025 03:13:07 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:cdbd:204e:842c:3e7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe5b892sm4480956f8f.17.2025.05.30.03.13.05
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe5b892sm4480956f8f.17.2025.05.30.03.13.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 03:13:05 -0700 (PDT)
+        Fri, 30 May 2025 03:13:06 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Antonio Quartulli <antonio@openvpn.net>,
@@ -81,9 +81,9 @@ Cc: Antonio Quartulli <antonio@openvpn.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 4/5] selftest/net/ovpn: fix TCP socket creation
-Date: Fri, 30 May 2025 12:12:53 +0200
-Message-ID: <20250530101254.24044-5-antonio@openvpn.net>
+Subject: [PATCH net 5/5] selftest/net/ovpn: fix missing file
+Date: Fri, 30 May 2025 12:12:54 +0200
+Message-ID: <20250530101254.24044-6-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250530101254.24044-1-antonio@openvpn.net>
 References: <20250530101254.24044-1-antonio@openvpn.net>
@@ -95,34 +95,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TCP sockets cannot be created with AF_UNSPEC, but
-one among the supported family must be used.
+test-large-mtu.sh is referenced by the Makefile
+but does not exist.
 
-Since commit 944f8b6abab6 ("selftest/net/ovpn: extend
-coverage with more test cases") the default address
-family for all tests was changed from AF_INET to AF_UNSPEC,
-thus breaking all TCP cases.
-
-Restore AF_INET as default address family for TCP listeners.
+Add it along the other scripts.
 
 Fixes: 944f8b6abab6 ("selftest/net/ovpn: extend coverage with more test cases")
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- tools/testing/selftests/net/ovpn/ovpn-cli.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/testing/selftests/net/ovpn/test-large-mtu.sh | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100755 tools/testing/selftests/net/ovpn/test-large-mtu.sh
 
-diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-index de9c26f98b2e..9201f2905f2c 100644
---- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
-+++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-@@ -2166,6 +2166,7 @@ static int ovpn_parse_cmd_args(struct ovpn_ctx *ovpn, int argc, char *argv[])
- 
- 		ovpn->peers_file = argv[4];
- 
-+		ovpn->sa_family = AF_INET;
- 		if (argc > 5 && !strcmp(argv[5], "ipv6"))
- 			ovpn->sa_family = AF_INET6;
- 		break;
+diff --git a/tools/testing/selftests/net/ovpn/test-large-mtu.sh b/tools/testing/selftests/net/ovpn/test-large-mtu.sh
+new file mode 100755
+index 000000000000..ce2a2cb64f72
+--- /dev/null
++++ b/tools/testing/selftests/net/ovpn/test-large-mtu.sh
+@@ -0,0 +1,9 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2025 OpenVPN, Inc.
++#
++#  Author:	Antonio Quartulli <antonio@openvpn.net>
++
++MTU="1500"
++
++source test.sh
 -- 
 2.49.0
 
