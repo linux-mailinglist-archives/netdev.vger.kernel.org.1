@@ -1,224 +1,248 @@
-Return-Path: <netdev+bounces-194341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8829AC8C30
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 12:35:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5B0AC8C8B
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 13:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75EEB7B003E
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 10:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9763E3ACE54
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 11:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8FF621D5B6;
-	Fri, 30 May 2025 10:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B220211A0E;
+	Fri, 30 May 2025 11:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MwARftDM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mR3zmx0I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A12221170D
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748601311; cv=none; b=mhxJ3tgyKWvhGISr4T2oJvydBIkqfggTHmb6Y/Lf5/chj1zqrQWnN06U25Fy0Gzp4zlkAd97nNoOMdbz2soGYKTkZmJELhjM2PaGwO4nAf3mBD7YRm/fEVvwP4yV84S0xfQTR5Kb9jQMwaJAekcTekdxOMigBdlFUiCzfPQzeqM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748601311; c=relaxed/simple;
-	bh=fxgj7OGryMUW5xse7UpmzjvRw2Pg2YEWJ2JQZko7Rlc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=Nj98c7Ge56Ld1bo/vLvUVu1CDwvN+sHOkUb3Yo/NZitGy/fkCzG/lnB0+CJANmDvp02L4VAqI6tYi9ClrXjE2mVLUYCGzvAaf3/aQQ+284vYbGgVvUzX7kOyl2pNA2UcRiYA1+yWAIM7sPKJrofAn3pYkuoTgkKRStaK2AKlWbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=MwARftDM; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250530103506euoutp01d03cdf0e0d19d28d05fbd18cd04c276e~ER5-BrFNH1455814558euoutp01X
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:35:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250530103506euoutp01d03cdf0e0d19d28d05fbd18cd04c276e~ER5-BrFNH1455814558euoutp01X
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1748601306;
-	bh=SbYTwkei89kqHUuH/tFo5n9/2NU8jJ/5PtLHFg7l9p8=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=MwARftDMQmUlKrAxg7Q1kGBybF3e/yAW9J6WFbIjYpbMWSFxY4oiNvvbG530u3V/4
-	 1iAAEWgCoox1MwTVzQE8KIDF+I7XUIV1SiatNAphPSnhAYw8YPs8SXf6UNW7TTnqkH
-	 ulxJIjAucrIjb4kawek3H9g/llCxPimJ5g1o/3aA=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009~ER5_rRF6f2628826288eucas1p1T;
-	Fri, 30 May 2025 10:35:06 +0000 (GMT)
-Received: from localhost.localdomain (unknown [106.210.135.126]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250530103506eusmtip168cfe8100186f39cdf3f515f4e3726b5~ER5_TD_o90378403784eusmtip1N;
-	Fri, 30 May 2025 10:35:05 +0000 (GMT)
-From: "e.kubanski" <e.kubanski@partner.samsung.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, "e.kubanski"
-	<e.kubanski@partner.samsung.com>
-Subject: [PATCH bpf v2] xsk: Fix out of order segment free in
- __xsk_generic_xmit()
-Date: Fri, 30 May 2025 12:34:56 +0200
-Message-Id: <20250530103456.53564-1-e.kubanski@partner.samsung.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF8A28FF;
+	Fri, 30 May 2025 11:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748602928; cv=fail; b=Ljp1qs0EefYhd7N6lo5HYDiC9HwVGTv7ZZ8Soa2Up08s8vGDqSoFwGBVNRRcXgdVK36zkpVNL2dOpnXrKSjwJaEKkKALY2HuYLViddUieCwrqhVYwSxVC46RRbpHVOu8vhv6j+xeHtIDULSuFaSdOkFjUBtP8mTRxIJlKQhggEc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748602928; c=relaxed/simple;
+	bh=04sa64FQ1lWGJE6OHDxWe1NbmzKvWTOXsMBYkmhWrog=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=fVo78v7MgTApn88GrWLG9lV/DNDG0NtCs5YNy1aAMtgOhsUmbKkb8BfpnWzh6kuKqNwl7HIm+toU5UIId2r7rtD0deaLXPU4nFU1bpU3D+qzvpvmppjdXaPMk42J3eEcDVuKm8PvGrl66g3QngZRFTdfjYXsVgXYry6tMgahwSc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mR3zmx0I; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748602926; x=1780138926;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=04sa64FQ1lWGJE6OHDxWe1NbmzKvWTOXsMBYkmhWrog=;
+  b=mR3zmx0I0cYlsf+BfKuY8UYq1Z01wfTD3gwZija2YwY7Khv1SzjIje1o
+   pGiJcUnA6Kp4n+Y7ChCL4EKXjYFiHSxIcwcqnWgR18pkxbDEGmoupuyAq
+   uluZrxTu7UMpmvMdsHBmxuir6yA6nONUm2JZgoaWMw3k7fOO0Mg/kARWV
+   ChlzZyiI4qPokYjPnhSwLg9gm/oM4+jsp1NvrULsUZSmBHRbBH4d6j/m9
+   M4wiBMxqlzsuUEDigF+W+Dy9ZmxmaFcq1VOOyk5IWFyLx9owam9rRmzGC
+   Li/nPiO9mEXXwSz2SGmsnlMgVLJEyXQ8ukJepkQKKfbRdptRRRJmNEcGd
+   g==;
+X-CSE-ConnectionGUID: 4vh97fAxS+yJE61HjdLINg==
+X-CSE-MsgGUID: 89gj0U4qTeK69c4YxYqz6A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11448"; a="68243668"
+X-IronPort-AV: E=Sophos;i="6.16,195,1744095600"; 
+   d="scan'208";a="68243668"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 04:02:05 -0700
+X-CSE-ConnectionGUID: qFnHCAp9Qi+7NV0dj2Ocng==
+X-CSE-MsgGUID: jwkbhRbYTq6dg4ClMMVuXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,195,1744095600"; 
+   d="scan'208";a="143761406"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 04:02:05 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 30 May 2025 04:02:03 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Fri, 30 May 2025 04:02:03 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (40.107.100.81)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Fri, 30 May 2025 04:02:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QxWSyE8Js4HFcbuFA4+U2LfAesYC/mhLQPU7oKXboRzknn12+Sbz4aHoXdqmynZVUnTxlJPUFCb+jHC1h67YMTTIhqbnBCE3sCjkQG1Fc+nVA3ZFFBMITruCwEsEp2AMmqhP5mbpanrCInUy97cR+ybyOfcvort+36RNyUzjfL9iiKp8t4gntaEZm64cOaMFq2B/TpD/xgG/WV0uEv2NCZs7hUIbbvYKr3lyid/1VRcyDGFktCFjTx2l8Yg06SDSqOYOc9JJ6r1gF8rrbmy1PRhQHB/fOJFn5+GU0e+dKcAPz6qtJJFI+JAdKAvjCWuWvtRH47dhsHHuA9a2S+12bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=90UUMpnIZBtjzBmOcFZi5z7OwEOOmkVhPXe1FQ3qbws=;
+ b=SdO2ElnUbTdPr+nt2ND268Aiu1dfH4UZGbqA/E/t823qQZExUamA5RkqjlVcIShoYnqSqgfxG8vDBPVPj2NyDJyd/i2+gYDtwGRraBmgfbGWbO1lzBKrTcnugBuQDSYc3jKJfqy4DetGseRFVk59F6HhKQM0FGQOz6uhzTuMool6FxgIlZe1YXFRrzVhLDlD4K6AS+amm5S+uDfePZYZGUQIoX7wGqr+hS0SreDA9eft2rwOTrQPFwslW5TDP7uVz4D4LGLPIoo4wUaGB6aLofBaI36Zz7LzQOKYyTBBMSVqXTIzwn7In7xGGL0Wd2JR8BU7BLReUOWI6j7QVEqrlg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com (2603:10b6:303:6c::15)
+ by IA1PR11MB6073.namprd11.prod.outlook.com (2603:10b6:208:3d7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.29; Fri, 30 May
+ 2025 11:01:31 +0000
+Received: from CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548]) by CO1PR11MB5057.namprd11.prod.outlook.com
+ ([fe80::4610:6d6c:9af6:2548%5]) with mapi id 15.20.8769.029; Fri, 30 May 2025
+ 11:01:31 +0000
+Date: Fri, 30 May 2025 11:01:18 +0000
+From: Krzysztof Karas <krzysztof.karas@intel.com>
+To: Jeff Layton <jlayton@kernel.org>
+CC: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, "Jani
+ Nikula" <jani.nikula@linux.intel.com>, Joonas Lahtinen
+	<joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<intel-gfx@lists.freedesktop.org>
+Subject: Re: [PATCH v12 01/10] i915: only initialize struct ref_tracker_dir
+ once
+Message-ID: <bcc3aaschdk64nieucfllygsqjvtvpffgxf7mjamabkeofangr@tmbkssauvg2d>
+"Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173,
+ 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316"
+References: <20250529-reftrack-dbgfs-v12-0-11b93c0c0b6e@kernel.org>
+ <20250529-reftrack-dbgfs-v12-1-11b93c0c0b6e@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20250529-reftrack-dbgfs-v12-1-11b93c0c0b6e@kernel.org>
+X-ClientProxiedBy: ZR2P278CA0041.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:47::10) To CO1PR11MB5057.namprd11.prod.outlook.com
+ (2603:10b6:303:6c::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-X-EPHeader: CA
-X-CMS-RootMailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-References: <CGME20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009@eucas1p1.samsung.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5057:EE_|IA1PR11MB6073:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c2803ae-411e-4571-0f36-08dd9f695541
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SmhmU2ZpRUVnV2pKOXRlcUJmNS9OVVZxVjg0SjcxeHZ1YnhhUGVIY1N2c0x5?=
+ =?utf-8?B?TElVSU5tR1p5ckVmMmtUMkpjdzBPR0twVjFHV3V6WjZvUk5ERjF6RkFiWk1G?=
+ =?utf-8?B?a2Z2dDVXWVhkZVE3SUdMT2VxR05tVUNPL3lGK29xTEhjSmhtbXc3eHVFcytn?=
+ =?utf-8?B?N2ppWFlZT0NnaUY2WFc2Qk85WVpjSGJOVnpPN2ZGTFdQdDNkenl0d2U0L1BM?=
+ =?utf-8?B?UFcvQXdudzZFd0w4MytSeEJzaTNRVnUrYjVjclUyV0hDakxma0ZlRktNN05M?=
+ =?utf-8?B?a3FTT1RjN0QyUVNJU3N2NWFueDBOYmZnV2ErYWY4dzlJcTNMNGpKeklSS1VC?=
+ =?utf-8?B?aHJoQVhQb09oaWhYeDd2d21Uc1BmaXZTZFNKVWpzMG5JV3BwcWJ6SnA3cGE1?=
+ =?utf-8?B?ZGZ6eTJRangyYnZmU0thMEVkU05qanEvbmlJMStGUlR3eVpjQTRBN2Nrbllr?=
+ =?utf-8?B?QUY4ZkJDQXoyTHVjN0NmSFkwVm1GakhsOFprWXRzbnRNNWJORzBaWnhzdEhV?=
+ =?utf-8?B?cUZUUmhOdUkrSnBRL0QxZHBxUVh6dXdab2VYSEg1MVFmSkdZR3VPbmF3U1FC?=
+ =?utf-8?B?eUQvRDFTQUhuOThIVE9yMDU0Y1ZKcEtoMkNpcVoweWd2ZktRaVhROVZBcnVW?=
+ =?utf-8?B?bUF5Ym0yT0NDK3N5ZTdYYXA0SWlEL1lPWVk2TDhUUFhUYnVMUG43dUVxZzZP?=
+ =?utf-8?B?eXVCZ290QktzUzc0bWxJaGVnNU9QcHJNaFAyNFM3QWk4RW55Qk9zZ05OQVkv?=
+ =?utf-8?B?RXkwclVnSkw0TnJSV3lhajFGMFNTMXlFTTk3bElkSmxUZCtKcXp6dGk0cHZQ?=
+ =?utf-8?B?ZnVBa056YVMrbGg3OXNQZzVWalp1M1BoNUJRRm8rcWk3SFEvQXAweU5MV1hK?=
+ =?utf-8?B?aFFINHMxbXBkVHNZcTV3YVU1TmhBeGdqcUh5WEx6M0xRMytZYVpjWkRtaTgz?=
+ =?utf-8?B?Q0p5UmFiQXU2UGlLdmNqU2NQZExCUncrZTREZ25lTEdwMTl3aXEyTXJXMkpH?=
+ =?utf-8?B?N1JwZWUwRnpNRDYxZ1ZoQ3hrQ20yUTloSE1iRGpYd2lUZXJoYjNBeGxiZWdj?=
+ =?utf-8?B?aDJtRWU3NXZQYXA3U1R6R1JyNk5LOW56aDJBWmwvM1YzOFVYSDJnV1dNUXN2?=
+ =?utf-8?B?QkRYMUlKcm5CMWZCd0w4eEpSWllwOVdYRnR1MVk1T1NXeUFEZVBOWGhaZVR0?=
+ =?utf-8?B?WmhIM2xjVTNyWnJVUzZLME5UR21oaitXZFdSV05RRVF3WjhpZ3JaVEorYUd4?=
+ =?utf-8?B?TVFyUGRsanZOMzdaVVVJbHBQN3ozdFlNRFh0czh5V3pHdGRyRXI4eWwvK0w2?=
+ =?utf-8?B?OC9ldzJmSkV4alROd2pFWDAxSEo0ZlBXM3dPOUw3U2hiZVpaVi9HOUZsbjRQ?=
+ =?utf-8?B?aDQ4bTFVQWN3aXNTK2NON1FQUUZLUmM0NmgxSGovM2RoSjJBMSs2RUkwbG9i?=
+ =?utf-8?B?ZGdxTXNxZDREQ0tiWnFyTHoxVlZvV3hkOW9ZR09UNnVna0pCMy9HUHdId2ZR?=
+ =?utf-8?B?Vkg4eUZwTktjMkVWUGVncUhZeUNQQWora294NDBhT0J3a3o5M2UvTWxlNWYv?=
+ =?utf-8?B?ZHJUWkVqTVFKc2N4TzVnNzdlYjNIR2ltSzZ1WlhOcEFzYmk2c1hiT2NZZ1ND?=
+ =?utf-8?B?V1UzNEU5ZGZmbm80dktYV3hyZ0xzd1dGVTJEelVucjd0UDBBdVJpNGZaNWRF?=
+ =?utf-8?B?dG9ZbEQ4WjdVZ0wrOHVQeDM0RmJPZHRacEtZSlMreGtXa1ZsaFVIM3QwRzRu?=
+ =?utf-8?B?R09iSXoyVW5QUzlVS1gra1lINW00MVFKRkVxTklaRWNUUmlJeXRtdDJ0Zjgr?=
+ =?utf-8?B?RVBUS2FYT0p0Y0pJMXBvNGExdVBUd2hCWjZvZ1BuMUxYa2hEcmdOMDh0QkNG?=
+ =?utf-8?B?WklkanFTZ3hXeEwxcWxYYm44YVBoZzdFSWdUR1BMTkdrVmNCdkpDYm9HajdJ?=
+ =?utf-8?Q?I61ctA/eD8Y=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5057.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TTZianNzOW9YeU5RVFNaWHRxcVlUYUFIOGw0QlNpR1dYQVB3ZXNIeGlGTk5S?=
+ =?utf-8?B?VGc0VUJ0N1ZETktnbFZSUWlmNWV2c09Sd3lhM2ZFWjJocVppNnZaOGs1U0hG?=
+ =?utf-8?B?M1pHRWdweVB0cGtPMndQeGs1bVMvOHRvUmVDZlRXZktCUmZtOThRQVRUTWVK?=
+ =?utf-8?B?cFN1ODFXN3MreEFDaEtZYis1dzRkRkgvWHUvdXJ3THlxckpONXVCV2N4aFpz?=
+ =?utf-8?B?NncraXNUUWtQQnV0WWtZUEJ2YjRBK1dXL3ZVTWhVTldkRGRPbTRZMGtsTmUz?=
+ =?utf-8?B?Sjg1cHhZR1BIYVRjWjNOWmhWWUNXblRUZmlheGxSaGN2dWFwczJtRFY3dlZx?=
+ =?utf-8?B?SktmOHBpc3V2WUkxek9ObGQyY2Jzcm1NdjFUcU55MWFKaDA2WW1HOHlZN2tW?=
+ =?utf-8?B?ZmNYVk0zTHcrNTB1WVRacmUrakJ5U1lUZkkwZVdUL0x4LzBUc1cwV3RTd0sy?=
+ =?utf-8?B?dmdKRjJBV0FMSjZtWHhOL0lyVFJzS1lDcTFrbzdYVTRnQmVTQWZnS21mQ0Vm?=
+ =?utf-8?B?UHlmNlBheEdENjJUL2JvZVQ3M1pzVDVVZ1JwRjRIODBGUXVaTU0wdVhWTjda?=
+ =?utf-8?B?Y0Yya09TZ3NQMDFCeXBoczhaZEs1SjJUTmEvUUIzTHFoVERBWUlWU0hlUzhN?=
+ =?utf-8?B?Wk9qWVBITnRWR25FSktLMUlzRE1ENm5BUTVBTnkzdmdaczZIckpkOGkzeFhz?=
+ =?utf-8?B?cjg3cFozempGQjZlcVd2SHZWRGlsZVF6MzRDK0VSMmN5VDUvNGVMSm5jR0tW?=
+ =?utf-8?B?YlMxbUtyU2FmTVkwbmRsZVRCOGxFSHNRNmNTYW9ZeC9IMStHVUFVdHNaSFYv?=
+ =?utf-8?B?Y01wYldBVkdmQUpueVBwTWp0L2NLWUxDRTFoZjVnNWJGZ2hLMXR0MFVSSVRm?=
+ =?utf-8?B?NE5wYWFPYWZaSkcyZjQ5UW4xNEI5TVZSaWJxa2FzYUN5N01paGxnK2FPSUVQ?=
+ =?utf-8?B?cTNkb3B5MkZZWGNtNzlGZTkza3A5VkxXeUhkeEhEZDR3dURWbjljcUl2ZjQ1?=
+ =?utf-8?B?cUhRUUhQbE56cVFQWWtPNGVvV3NaaUxXcnY4RHVGMzU5cVN1MEJ1aU5mNmpt?=
+ =?utf-8?B?LzZxbWdsOVZlWXR2OGFrWkVlTFIrenJhS1ZpZjZua1VDV045d3NnVjVYbEhl?=
+ =?utf-8?B?dmpQZUQxU3N4OXduWU5WeVZkWFZZZjMvUXVOd09NSjZuUUZIRGVUSVVsTnpH?=
+ =?utf-8?B?eXo0VzFlSkJZcktIdTVENk1oWm0rRWw1dGtyZXgyeG1jVE9jUTNIS2d2R2Vk?=
+ =?utf-8?B?ZmF3Ny80ZDEvYmJVY1dnWk1vYWw3MmYvYUFNSWdwekhaMWZtS3Z1ajRpMDc0?=
+ =?utf-8?B?MUZlb0lYZ1lyR25BSHNIVjM3K1hXenk5UnE5UlZrS3doZlVNS2gvZnZtQXVH?=
+ =?utf-8?B?YVM0Q0x1NHVkWFU5Z2h6dEkrVU15T3NjNkhjc0xSWGQzWnBhVmY5SXpIcUR0?=
+ =?utf-8?B?WnhtQllMK1h2TnI4SHgvQlE5amRWd1lnZzdheFg3MldleC9KcmhrWHNYVk9j?=
+ =?utf-8?B?VGgzYVpqSzE5VXZZbllVaHBST2tMckpOdW8rb1RBbUNOWVBCK3N0dHluQWRM?=
+ =?utf-8?B?YWpHcDB3MmZoOGJSRGkraUdWc3dnZ1A3RGxKSHU0V0tRU3VLNmtUQlU4dUVw?=
+ =?utf-8?B?SXh5MThEY1R2ZE9TNTZNL0dMUnM1THJ3cldxSVZ4MEphNmlXb20rK2d4WVVy?=
+ =?utf-8?B?TjBhdHVpN0NGUEdiYXNkZFkxYjU5UnFvWDBaWitzOWtoV3FWbC96bFcyUVZo?=
+ =?utf-8?B?VlVmTHRPeVM2aGs4dDdPR0tyUlQvV3lucGxYSW5kOUZjSlAweW1haUtxN1Bh?=
+ =?utf-8?B?bFdTblR3NldvQ0ZwOXJMQWtXcjg1cmtQWDBsUTl0bXVDTHVnYUsxV1UxUHU3?=
+ =?utf-8?B?eTlCWnBadmxIZTFhWUg0eUsrSUUvakM3UzNxQU5qN1R6d3RubHpmWGYyQ3d2?=
+ =?utf-8?B?WDVPUXhPbzhQSWJVK0ExNXN1S2Q4UGh6NVljVVU2ajlvUU5ISlF4dlJnSWla?=
+ =?utf-8?B?MzdhK1JQL1A5MHUyWXFPUW5YYXJwczlSS09lK2t1YitodGNnbnFqRC9GQmd4?=
+ =?utf-8?B?YTl0MUtzdHRJMDd3TVNVUHR5RWV0U1pnaGUxVlZRMWI0OUFLTWRqNjJUNlBM?=
+ =?utf-8?B?VXRDM25UbE4zSitoY0czUlBENFpPbjlNbkZwdXcxWUMwSy9jRHNPK014Vkdj?=
+ =?utf-8?B?aGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c2803ae-411e-4571-0f36-08dd9f695541
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5057.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2025 11:01:31.0482
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ULJ7J+zPQJqot0hOr1MlDtdjuNJh2MbE+MlF/F0zob+YN8lsbYNVzq4VisruvcKaK2q3X3Waf2+pz16i+WLieFBK1D6Zwck5PkxQU6gZTA8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6073
+X-OriginatorOrg: intel.com
 
-Move xsk completion queue descriptor write-back to destructor.
+Hi Jeff,
 
-Fix xsk descriptor management in completion queue. Descriptor
-management mechanism didn't take care of situations where
-completion queue submission can happen out-of-order to
-descriptor write-back.
+> I got some warnings from the i915 CI with the ref_tracker debugfs
+> patches applied, that indicated that these ref_tracker_dir_init() calls
+> were being called more than once. If references were held on these
+> objects between the initializations, then that could lead to leaked ref
+> tracking objects.
+> 
+> Since these objects are zalloc'ed, ensure that they are only initialized
+> once by testing whether the first byte of the name field is 0.
 
-__xsk_generic_xmit() was assigning descriptor to slot right
-after completion queue slot reservation. If multiple CPUs
-access the same completion queue after xmit, this can result
-in out-of-order submission of invalid descriptor batch.
-SKB destructor call can submit descriptor batch that is
-currently in use by other CPU, instead of correct transmitted
-ones. This could result in User-Space <-> Kernel-Space data race.
+Are you referring to these warnings?
+<3> [314.043410] debugfs: File 'intel_wakeref@ffff88815111a308' in directory 'ref_tracker' already present!
+<4> [314.043427] ref_tracker: ref_tracker: unable to create debugfs file for intel_wakeref@ffff88815111a308: -EEXIST
 
-Forbid possible out-of-order submissions:
-CPU A: Reservation + Descriptor Write
-CPU B: Reservation + Descriptor Write
-CPU B: Submit (submitted first batch reserved by CPU A)
-CPU A: Submit (submitted second batch reserved by CPU B)
+I think those might be caused by introduction of:
+"ref_tracker: automatically register a file in debugfs for a ref_tracker_dir".
 
-Move Descriptor Write to submission phase:
-CPU A: Reservation (only moves local writer)
-CPU B: Reservation (only moves local writer)
-CPU B: Descriptor Write + Submit
-CPU A: Descriptor Write + Submit
+Current version of "ref_tracker: add a static classname string
+to each ref_tracker_dir" further in this series should prevent
+multiple calls to "ref_tracker_dir_init()", so this patch could
+be dropped I think.
+If my reasoning is wrong however, then please add a note to the
+commit message which explains why this is needed in more detail
+or/and move this patch right before it is necessary. Otherwise
+it looks like a vague workaround.
 
-This solves potential out-of-order free of xsk buffers.
-
-Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
-Fixes: e6c4047f5122 ("xsk: Use xsk_buff_pool directly for cq functions")
----
- include/linux/skbuff.h |  2 ++
- net/xdp/xsk.c          | 17 +++++++++++------
- net/xdp/xsk_queue.h    | 11 +++++++++++
- 3 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 5520524c93bf..cc37b62638cd 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -624,6 +624,8 @@ struct skb_shared_info {
- 		void		*destructor_arg;
- 	};
- 
-+	u64 xsk_descs[MAX_SKB_FRAGS];
-+
- 	/* must be last field, see pskb_expand_head() */
- 	skb_frag_t	frags[MAX_SKB_FRAGS];
- };
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 72c000c0ae5f..2987e81482d7 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -528,24 +528,24 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
- 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
- }
- 
--static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 addr)
-+static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
- {
- 	unsigned long flags;
- 	int ret;
- 
- 	spin_lock_irqsave(&pool->cq_lock, flags);
--	ret = xskq_prod_reserve_addr(pool->cq, addr);
-+	ret = xskq_prod_reserve(pool->cq);
- 	spin_unlock_irqrestore(&pool->cq_lock, flags);
- 
- 	return ret;
- }
- 
--static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
-+static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u64 *descs, u32 n)
- {
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&pool->cq_lock, flags);
--	xskq_prod_submit_n(pool->cq, n);
-+	xskq_prod_write_submit_addr_n(pool->cq, descs, n);
- 	spin_unlock_irqrestore(&pool->cq_lock, flags);
- }
- 
-@@ -572,7 +572,9 @@ static void xsk_destruct_skb(struct sk_buff *skb)
- 		*compl->tx_timestamp = ktime_get_tai_fast_ns();
- 	}
- 
--	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(skb));
-+	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool,
-+			     skb_shinfo(skb)->xsk_descs,
-+			     xsk_get_num_desc(skb));
- 	sock_wfree(skb);
- }
- 
-@@ -754,7 +756,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 	skb->priority = READ_ONCE(xs->sk.sk_priority);
- 	skb->mark = READ_ONCE(xs->sk.sk_mark);
- 	skb->destructor = xsk_destruct_skb;
-+
- 	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
-+	skb_shinfo(skb)->xsk_descs[xsk_get_num_desc(skb)] = desc->addr;
- 	xsk_set_destructor_arg(skb);
- 
- 	return skb;
-@@ -765,6 +769,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 	if (err == -EOVERFLOW) {
- 		/* Drop the packet */
-+		skb_shinfo(xs->skb)->xsk_descs[xsk_get_num_desc(xs->skb)] = desc->addr;
- 		xsk_set_destructor_arg(xs->skb);
- 		xsk_drop_skb(xs->skb);
- 		xskq_cons_release(xs->tx);
-@@ -807,7 +812,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 		 * if there is space in it. This avoids having to implement
- 		 * any buffering in the Tx path.
- 		 */
--		err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
-+		err = xsk_cq_reserve_locked(xs->pool);
- 		if (err) {
- 			err = -EAGAIN;
- 			goto out;
-diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index 46d87e961ad6..06ce89aae217 100644
---- a/net/xdp/xsk_queue.h
-+++ b/net/xdp/xsk_queue.h
-@@ -436,6 +436,17 @@ static inline void xskq_prod_submit_n(struct xsk_queue *q, u32 nb_entries)
- 	__xskq_prod_submit(q, q->ring->producer + nb_entries);
- }
- 
-+static inline void xskq_prod_write_submit_addr_n(struct xsk_queue *q, u64 *addrs, u32 nb_entries)
-+{
-+	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
-+	u32 prod = q->ring->producer;
-+
-+	for (u32 i = 0; i < nb_entries; ++i)
-+		ring->desc[prod++ & q->ring_mask] = addrs[i];
-+
-+	__xskq_prod_submit(q, prod);
-+}
-+
- static inline bool xskq_prod_is_empty(struct xsk_queue *q)
- {
- 	/* No barriers needed since data is not accessed */
--- 
-2.34.1
-
+Best Regards,
+Krzysztof
 
