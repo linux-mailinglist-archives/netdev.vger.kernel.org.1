@@ -1,141 +1,130 @@
-Return-Path: <netdev+bounces-194405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD09AC9458
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:05:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B06AAC9475
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 364693BDFD5
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 17:03:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3295F1BC207A
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 17:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6921A2C11;
-	Fri, 30 May 2025 17:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03D71D89E3;
+	Fri, 30 May 2025 17:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HM9tOlRV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHU9WOTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780481494A8
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 17:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE812D600;
+	Fri, 30 May 2025 17:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748624652; cv=none; b=V/BDCEn+9D13PXzUYUFkwnQIMQTwTOuLOZbLtSQjwhjtdG9yeNvGHj1OzaK60rlvPKTNciY0JX6Nb6PF9OIeAC8qfj7+ACgsINPE903iVJ0GBItlPWM/VFNj56BLwjUty7kxp0jmkMhZESUApWiNa9heY3HgsZJDGF1ytVjZlB0=
+	t=1748625343; cv=none; b=qMpf3w3zEb7E35pR1j2Go1IZmIWt6i2gq1bTZhh8vJ0e1VBCZBKXI4fG1TYtgchaiZE79CyMJaeXYugyU6hd3tISgDGevjGoQNySvdmWwcPcq0t6sSbWiP+wBqU4yhVhEd81hZgti2qxnCOwXoT4GbD1n4b99L9dWv5JUGUuXSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748624652; c=relaxed/simple;
-	bh=rNCnAenY8Ad5bsIaOZF+Zf4Al/gRRnjtnKUNbK4d7OE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QUZVAL6Mp8RDDqAoNLojtbmJLhAa3wWwgnUOjWvgZN1yj0F6TqozK/iesHg/eO7kfpgfSFWjaSWOF+fSkL5Hug3CIjFUfuZfa10gcf7ZjKRT9yQ+oxQ5Bh7DF1jbwh/PUa73En52MstpWbeZzJB/g0/nCN1QceF8fWBhops1wJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HM9tOlRV; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a44b0ed780so4207631cf.3
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 10:04:10 -0700 (PDT)
+	s=arc-20240116; t=1748625343; c=relaxed/simple;
+	bh=aV56R5LwjSjBEB8PaKsoUC7GH8MBZvupl6e+frIn6ls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jXTHkbdTjf8fd03t9c4LXgYpdurnCe7V0WsHIXXdjsnFoB53YpT61T712uY7wbWxzsY7JLPZ68cmKglEfij1FFbEiSXxYnBrdjTRvWwHlKCrN95DRldMh6rdHY6kS1sfcjMvrMIjDI9pnoDdiGogdlUK8iWC7O0AqS16r3qUkxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHU9WOTk; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2301ac32320so23262005ad.1;
+        Fri, 30 May 2025 10:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1748624649; x=1749229449; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=24qe/xyB6X5FQMMCm8zjaCW0EV4mdf1CAxWLXZQVNAM=;
-        b=HM9tOlRVgadNMihsxrhjpr6IJcZBYlMBOo9LBf8JOSjNF6wnG7UfY9EaXCbSD7KUyE
-         eYVrmR9kgcJlO0G0Wc+Eg7o8L3j6iWawMVLkz5S34E/qNdJVLe6LlHYBksjptd6A1zWv
-         FCxTLHO4QsyOdrg8P7lgU1Nzgkz5qNsBBvOTM=
+        d=gmail.com; s=20230601; t=1748625341; x=1749230141; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QDA88krRjjfrMHi8XF/SJ2xvUb8o9K3lPrI4lhdku/U=;
+        b=IHU9WOTkvMV2/HQUfMUAJ9dULJpkSutkqzOB1Kw1A8znfAOFSn5GpVI+WJIyHkoxFH
+         MRy3fv4jm9lJxGnf8gw4VJ6Y0ChyBoIsV1YMSi1dv+8R59U5VnOpqCsO8cxAMfAyu0rO
+         Dwm9vM1CrniPREFjTTw0LDnkzW/r/KZYcnnD4lH6iy35b3Tl2Yo++PWUsS1nCmTzHYR4
+         Fwtlhuui4VtegCQVwUqrzDAYV8NtzejklfHP0V4fKyp57Cb3jShjEKfgDfBiFcImX/mB
+         PSptsdD61hudlBmSL3jymqjrOTQ4t9yUoKPXfLxXvZcrvJfFqbFqoBSzZY3BXhwhiq/2
+         xyKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748624649; x=1749229449;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=24qe/xyB6X5FQMMCm8zjaCW0EV4mdf1CAxWLXZQVNAM=;
-        b=Jh8ovo3ml4wxxe7tw1+nSf9VkZsnNiaQxi5iCqfp9MfqNu8JpKmLzLNwuOAPWOcImv
-         sihdTpZSryKRTqfnpX5XqDwXEY602cPbv4nNEPRTMN/H9Ggid6J92svRF+fV1/TWfit4
-         lt3L+2Y/I/UWTDgCKtel7w5ls5inbzFfx1DADmLp6ADvQqh+hDhi/W0iQzF1Xa4lln1I
-         Lu7+ARroUfTaAmyZLRC54VIj/kaRNBqyXYlFGZ6WpBkFyAhHcPNl/DbUY6joH0ok4i+0
-         dnMPjP2oAIGFf+x3mCLzWtdhogai0HlJamsVRaaMkg9K3Osxtk1IGoZVMa30K+8pzt/H
-         bFKg==
-X-Gm-Message-State: AOJu0YwanEHv51sSbq3W35Dl6mb0tJLQl9ihXcPQ5cvKR4gnugBGfhgX
-	F9qDSxqgBoYMQhQqUM0F7y2k4Be6Atel00JNmFCNrSAJ5K15IxOBxC3GbrHyiActCBtBe2treFW
-	Zx8t/
-X-Gm-Gg: ASbGncvfIlY5kn8BK9ArXszp6PlHlkI/ymjj6j/zhdbl+ZK48WLDIv6QYNxSSc+X8JJ
-	7/HYW4R+oLuiGRdz+zbFLdpcB+JB2iKdsRKK360Erx+hbFNcM/18K1/MWDzelCBpOwDFFZGvcum
-	si1bpt+MTHOwn4iCWogpSUHOQQzeAbchxmQyC6CJX7X1e35zW+QkMP7j8aV1VGfnGWS/renCsOA
-	6R6x7+ePWyLQXj02w15BZtSA+xDdo1HZw0sxMfb8BrDDRlzKFmXWUxPff09blxdo+jyHSTRTGSL
-	rJMxEfdEy5EP/yQEmiq0JAuv9z7+FdQwJLuF8NwvFz8YgFIutS8gjDtwf+lU+Q==
-X-Google-Smtp-Source: AGHT+IH8q+FpbqaoQpSMxQv90UHs12PrJul7zhJ4Jiejs0nou04xqJn9tgyjzjILKLWZMXwJWHkp7w==
-X-Received: by 2002:a05:6e02:2702:b0:3dc:90fc:282a with SMTP id e9e14a558f8ab-3dd9cbf8ce6mr33605055ab.21.1748624638251;
-        Fri, 30 May 2025 10:03:58 -0700 (PDT)
-Received: from [192.168.1.14] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7f00b7dsm530225173.130.2025.05.30.10.03.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 May 2025 10:03:57 -0700 (PDT)
-Message-ID: <46ba862e-b540-4037-a0ed-8bf5fa12b863@linuxfoundation.org>
-Date: Fri, 30 May 2025 11:03:56 -0600
+        d=1e100.net; s=20230601; t=1748625341; x=1749230141;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QDA88krRjjfrMHi8XF/SJ2xvUb8o9K3lPrI4lhdku/U=;
+        b=mEuT4ykDY5YUhLggLyQ70O4lvBCl1PTQyAu+RAjc2CMx1jtQ7cd7ydU7pM/zrp8fIj
+         cPK7TbtkU6XVXFT1QCcCAg6YEnW0TVB1VkqqJ/RXclKYNrNxiygZk0R0ZtTX8kOt7dna
+         GEgBtSAsnt8sXrN7a1VEdkMYCqVMOOhhjl0WfltTioiodRTy57gkdElWnDuPXznEwJoK
+         TcJ6K/Ec2XjoWTICrXsNxgpVKq5hJpRzk/BFIMjZD2GLWgWGA2emoxaNn743h5ZGoS81
+         ectJ1iZjEJbrtbDttIyEQ0X4N9qWgYl+pu1xOLH39NEiv9OcSvU0TBokGiSpG1/MmJeG
+         52ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVbD1uB+yvHEdY1ZdjZ+F5FU0/TksWczzyWTrPHSDZ4ce2pM7cbzBI1FP50BR+Hghr8vB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmX+S5Ou5U7BsKcH1bh3csLBtcybJ2AZgwjnMa3jg6MRMLikuE
+	ZfFGaCK342OOnc/TLplEDIFZhFXY4dRr3JQX/XE55qW1h2N1vT3IfVvF
+X-Gm-Gg: ASbGnctY/IJbjo2Mb/6UswvcdRu/V7DCzBsQGG+8Cnd7SKRInkHz0D3KUH8NBq/QXXP
+	YAB1cSt0D9B0y4vtVO+9sJv1oN3jQzmyrmhFWMiU7nJhTfzXRV+hbMpmPCzmvZX8d5TjDcIlnQ+
+	OWSiQf++fxsMvr8Ro4cqbONxBOtQaJXJxcKU6k/0Lb9dFlb3kVgT0YSYeq88XyhXUwsCTcuURzA
+	Msye3UAm5SlqoALc+Yip8KSUjZIMxPqdTeVFPhBygCtkq9EuePatCduqfl1LODZgl4gR0vhgzG2
+	+zEPwCr/vMcloYzIukpZNTyHP1nrpiS08OBlrlJUWCekbzqZ2Lvv
+X-Google-Smtp-Source: AGHT+IEZOOT4dL0X2Z0+F4OyrfSAYhBTvXNYp5t4nXsCToEPeTv6MlGSUWlLEh+HNbXi8qOSJSExew==
+X-Received: by 2002:a17:902:e888:b0:234:c8f6:1b10 with SMTP id d9443c01a7336-235291ef73bmr71615125ad.28.1748625341284;
+        Fri, 30 May 2025 10:15:41 -0700 (PDT)
+Received: from gmail.com ([98.97.39.137])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cf9380sm30815835ad.203.2025.05.30.10.15.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 May 2025 10:15:40 -0700 (PDT)
+Date: Fri, 30 May 2025 10:15:30 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, zhoufeng.zf@bytedance.com,
+	jakub@cloudflare.com, zijianzhang@bytedance.com,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next v3 3/4] skmsg: save some space in struct sk_psock
+Message-ID: <20250530171530.lqnim5gh3egiddkc@gmail.com>
+References: <20250519203628.203596-1-xiyou.wangcong@gmail.com>
+ <20250519203628.203596-4-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Revert "kunit: configs: Enable
- CONFIG_INIT_STACK_ALL_PATTERN in all_tests"
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, brendan.higgins@linux.dev, davidgow@google.com,
- rmoar@google.com, broonie@kernel.org, rf@opensource.cirrus.com,
- mic@digikod.net, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, Shuah Khan <skhan@linuxfoundation.org>
-References: <20250530135800.13437-1-kuba@kernel.org>
- <9628c61e-234f-45af-bc30-ab6db90f09c6@linuxfoundation.org>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <9628c61e-234f-45af-bc30-ab6db90f09c6@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250519203628.203596-4-xiyou.wangcong@gmail.com>
 
-On 5/30/25 10:59, Shuah Khan wrote:
-> On 5/30/25 07:58, Jakub Kicinski wrote:
->> This reverts commit a571a9a1b120264e24b41eddf1ac5140131bfa84.
->>
->> The commit in question breaks kunit for older compilers:
->> > $ gcc --version
->>   gcc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5)
->>
->> $ ./tools/testing/kunit/kunit.py run  --alltests --json --arch=x86_64
->>   Configuring KUnit Kernel ...
->>   Regenerating .config ...
->>   Populating config with:
->>   $ make ARCH=x86_64 O=.kunit olddefconfig
+On 2025-05-19 13:36:27, Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
+> This patch aims to save some space in struct sk_psock and prepares for
+> the next patch which will add more fields.
 > 
->>   ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
->>   This is probably due to unsatisfied dependencies.
->>   Missing: CONFIG_INIT_STACK_ALL_PATTERN=y
+> psock->eval can only have 4 possible values, make it 8-bit is
+> sufficient.
 > 
-> Does adding config option work for you?
-> ./tools/testing/kunit/kunit.py run --kconfig_add CONFIG_INIT_STACK_ALL_PATTERN
+> psock->redir_ingress is just a boolean, using 1 bit is enough.
 > 
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> ---
+>  include/linux/skmsg.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
->>
->> Link: https://lore.kernel.org/20250529083811.778bc31b@kernel.org
->> Fixes: a571a9a1b120 ("kunit: configs: Enable CONFIG_INIT_STACK_ALL_PATTERN in all_tests")
->> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->> ---
->> I'd like to take this in via netdev since it fixes our CI.
->> We'll send it to Linus next week.
->>
-> 
-> I am good with reverting it for now.
-Meant to add Ack.
-
-Acked-by: Shuah Khan <skhan@linuxfoundation.org>
-
-> 
-> David, Brendan,
-> We will have to enable this at a later time. Also we saw this problem
-> before with other configs. Anyway way to fix this for alltests case?
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index bf28ce9b5fdb..7620f170c4b1 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -85,8 +85,8 @@ struct sk_psock {
+>  	struct sock			*sk_redir;
+>  	u32				apply_bytes;
+>  	u32				cork_bytes;
+> -	u32				eval;
+> -	bool				redir_ingress; /* undefined if sk_redir is null */
+> +	u8				eval;
+> +	u8 				redir_ingress : 1; /* undefined if sk_redir is null */
+>  	struct sk_msg			*cork;
+>  	struct sk_psock_progs		progs;
+>  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+> -- 
+> 2.34.1
 > 
 
-thanks,
--- Shuah
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
