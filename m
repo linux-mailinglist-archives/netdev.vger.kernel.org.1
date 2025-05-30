@@ -1,128 +1,84 @@
-Return-Path: <netdev+bounces-194282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935BAAC8582
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:54:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A20CAC859B
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82FE11BC41B0
-	for <lists+netdev@lfdr.de>; Thu, 29 May 2025 23:54:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 834EB3A5BF4
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EC722D9EA;
-	Thu, 29 May 2025 23:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54259635;
+	Fri, 30 May 2025 00:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sTswQAmL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqyHFQYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60BF21B9FD
-	for <netdev@vger.kernel.org>; Thu, 29 May 2025 23:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295D5184;
+	Fri, 30 May 2025 00:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748562860; cv=none; b=MhfzDIia+BEpKIpdqBBGvilb3QSyYmsMpZk8iLj7sDLuzKlotl2JGN1fAQ1J0LLDMcAR3ZtL10zrMfd3Hg3zHAj3Lg8qha+7aZtPF79UpnxR+Mvn+TBDav7xDx9Xg1zrs5xkYYLvhN1fulq3bpuP52C3T4EaBjdRMYXJ8rkxeHI=
+	t=1748564203; cv=none; b=VAus7Y+X7MHqjN6hNJWShToGEUSZEe4l10jlzxLdw7ExHjcEQEy+fbOvHI80SdNqzXfd7siMK4UvldK9I3IBRvW7O01aQETyDYUcnr4N5WLttabJxfOZ6YhnAT1yGKOYl3gCC0RzxzN7sSBBnnA/r3IUpYPXHptDhNO7FRRjiBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748562860; c=relaxed/simple;
-	bh=fzBmoU/GBNrBZNry8iZF8TyWz5qhRHlF8PO8t/PwcGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u31ByNibO9Nrkh9gqrtSl3cN9S43dQn6vGpF+W9q721rR9riwPxD8JG+m9gkgNDKjBiLrj2iTiBxAka7x4boqmfQAQUvIc/RiIcuKObrtAms0Z4efoLYUEm+umOFuymlRrhUJqITWyhqTww3aweHpW2rHDru13Sl6jvasrf2/fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sTswQAmL; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-742c035f2afso930834b3a.2
-        for <netdev@vger.kernel.org>; Thu, 29 May 2025 16:54:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1748562856; x=1749167656; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XN6gTy630QM8CTJZaRMOSiOMF0uSjwbW1midZ/W3Pq8=;
-        b=sTswQAmLopSf6mslRPiyoxyWCsE8Qv7oU7wvQLo6EwSH2q/fUzw8hu9KAv1ePXPR5l
-         WhwsUz4k/LpxRhzJR7ATAsoc6uAQAcOcc7MDFOsBczd3c1ysoV3Y4w9+S7vAXL1e1jXG
-         AEe1emN/IZLAC4dfAF59QhdpKLvcQYKd5uX0E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748562856; x=1749167656;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XN6gTy630QM8CTJZaRMOSiOMF0uSjwbW1midZ/W3Pq8=;
-        b=B91y9Uuwxiqjmtr4B9N0g7AStfigRjVQUfdPIvxiNcSX1dNjnzl3E1Sbc9AgVq1Sgc
-         a3jpiONoLz9t78iEl/mveRULmuC6q/J7BP6ERVSn45gZFSW6y1gJ/0W/h+3q04Wkvva6
-         eVYc2U4Fch+931fH7vIpqge3BawPdC9CDvVMupmxqydQie543PGlshtlG+pgx/qmRkEw
-         lgfBH03Hh5AUdTyD2ualymnVOS5RuGSw1uUX6cVlGKvz60sDQU48NP9oi9iuXlYeSSKi
-         aUM4ajEeadSqvraSvfHPjcaBPGLhVlNg9IehdQ102HH4t8PGL0N+kHuEcKRZknoUp174
-         5ipw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxzkSwkiTPTBwYJjneNrUWfuzfsDou1NfRy1b2hs7mG/BGKGzFe+wufZ7XkrPJpPu6OSeiOBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZqcywJGvSSJf868+zicUqbd7hdnhqnKZQytN4P75IWovhzDky
-	TBuOrbkQG0tzUeZQp6od48KRHb5B1ESmhvdhvNh2pByuFtOU6Vo8efnMxjMagMYJzYKpXd5nvma
-	ZVhGp95E=
-X-Gm-Gg: ASbGncvU6oKJF8oDlN9Ss3tBzSYbi83faIsEmDXchVM2BdUbqkLPkjcS0pavWi4HWNM
-	2G56UBxkt3DFO3MeIGhkc6euXFw2oW8W+oUnmkgO2kEJlNbAcHob7ppfCYj0TWNDeHOKO1lEuZw
-	PLrLbEOMRTxu66btdMEbXtKAaEVJVfVU6M1o5RC9h6PG5ubihavebMvJ3g9K/kSCCAkYmFOhWxf
-	eRCqeZ1ngr8rzJc+EqqeN/Y13skV8e6a6uUKudAwHCq79lj45TEOOKGp89tmuHAySycIVFzRhyT
-	tiCpYSyRR7VyvOI/n+58ZAA/XRR3eck1VlS6OCbZ2hTzcRr4m/HxCCgw40aJs/ZWQT4wYO8Lile
-	2h1b3e0bIWUwPsmIOMZVHWTZOfabVdJox9g==
-X-Google-Smtp-Source: AGHT+IHRL6MZaRCV2qyHdIA1Ey0rZLl6zqYTvtI9TzqaPZDL2PqmYa7bTx0E2QQp2U5dgOaO4Eq8Hw==
-X-Received: by 2002:a05:6a21:6494:b0:1f5:5ca4:2744 with SMTP id adf61e73a8af0-21ad9572f95mr2027987637.17.1748562855934;
-        Thu, 29 May 2025 16:54:15 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747affadf5asm1874242b3a.115.2025.05.29.16.54.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 May 2025 16:54:15 -0700 (PDT)
-Date: Thu, 29 May 2025 16:54:12 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	syzbot <syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] possible deadlock in rtnl_newlink
-Message-ID: <aDjzpDHwcFuGhAqp@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot <syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-References: <683837bf.a00a0220.52848.0003.GAE@google.com>
- <aDiEby8WRjJ9Gyfx@mini-arch>
- <20250529091003.3423378b@kernel.org>
- <aDiPFiLrhUI0M2MI@mini-arch>
+	s=arc-20240116; t=1748564203; c=relaxed/simple;
+	bh=moLDOQjJyL3fO6Wf/7ZQqvgVhiJmnI73vJU9DS5AoYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sILEJIh4mXrvw0gnTaZmNB63oA/wNC+0+0Pp3HEG61F5uuVIKqPHkrr4hb1ZI+5vcdxbwRLVUI7nfWHvBnONBMOOvTsljL19UrAgxeB/kN/M1JfHuTZDEE8yuGo328oNt9dEgFYtfkx3c61gNhBL3s7+10FK6HNozcubUEAaFEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqyHFQYD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC94C4CEEB;
+	Fri, 30 May 2025 00:16:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748564201;
+	bh=moLDOQjJyL3fO6Wf/7ZQqvgVhiJmnI73vJU9DS5AoYc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lqyHFQYDTZ7+9f/9Qak7jwdvVIOTiQx52AYvic/dq3DiEK8ZvKaqWmDJa2Wd3qpM1
+	 SwI/mKZOYqgJb2Qx6mZhMKa0/3+VLmvvo3+9tZAGulX4OrN7fMgm91nlqPwlfG8EqN
+	 /LwwBFoAi93qp8OtEjwGzBvnVn26MBVooVyQ/8MG7b14GNSSLf9jYkuw/hoYDd4HKq
+	 A8k7yobtEII9etheV72fIPR86rwlQ35EkLnR7AqDyh7HxBBDjp8t2kwMvkZuxy/6nt
+	 bMc4nyUnV3lCRyL6XblIfNzIAtUIknnH1thJMeDV891N7JApiUwiUCDFn6I8s8h6cV
+	 zp6Mo4GI/rSQg==
+Date: Thu, 29 May 2025 17:16:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, John <john.cs.hey@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Bug] "possible deadlock in rtnl_newlink" in Linux kernel v6.13
+Message-ID: <20250529171640.54f1ecc6@kernel.org>
+In-Reply-To: <aDjyua1-GYt8mNa1@LQ3V64L9R2>
+References: <CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com>
+	<c9b62eaa-e05e-4958-bbf5-73b1e3c46b33@intel.com>
+	<aDjyua1-GYt8mNa1@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aDiPFiLrhUI0M2MI@mini-arch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 29, 2025 at 09:45:10AM -0700, Stanislav Fomichev wrote:
-> On 05/29, Jakub Kicinski wrote:
-> > On Thu, 29 May 2025 08:59:43 -0700 Stanislav Fomichev wrote:
-> > > So this is internal WQ entry lock that is being reordered with rtnl
-> > > lock. But looking at process_one_work, I don't see actual locks, mostly
-> > > lock_map_acquire/lock_map_release calls to enforce some internal WQ
-> > > invariants. Not sure what to do with it, will try to read more.
-> > 
-> > Basically a flush_work() happens while holding rtnl_lock,
-> > but the work itself takes that lock. It's a driver bug.
+On Thu, 29 May 2025 16:50:17 -0700 Joe Damato wrote:
+> @@ -1262,6 +1258,11 @@ static void e1000_remove(struct pci_dev *pdev)
+>         bool disable_dev;
 > 
-> e400c7444d84 ("e1000: Hold RTNL when e1000_down can be called") ?
-> I think similar things (but wrt netdev instance lock) are happening
-> with iavf: iavf_remove calls cancel_work_sync while holding the
-> instance lock and the work callbacks grab the instance lock as well :-/
+>         e1000_down_and_stop(adapter);
+> +
+> +       /* Only kill reset task if adapter is not resetting */
+> +       if (!test_bit(__E1000_RESETTING, &adapter->flags))
+> +               cancel_work_sync(&adapter->reset_task);
+> +
+>         e1000_release_manageability(adapter);
+> 
+>         unregister_netdev(netdev);
 
-I think this is probably the same thread as:
-
- https://lore.kernel.org/netdev/CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com/
-
-I posted a response there about how to possibly avoid the problem
-(based on my rough reading of the driver code), but am still
-thinking more on this.
+LGTM, FWIW.
+For extra points you can move it after the unregister_netdev(),
+the existing code cancels the work but netdev may still be up
+and kick it back in..
 
