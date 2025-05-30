@@ -1,184 +1,249 @@
-Return-Path: <netdev+bounces-194402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A0AAC93CC
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:43:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293BFAC9404
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 18:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87FE07B2516
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:41:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5F017405A
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 16:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440481DD525;
-	Fri, 30 May 2025 16:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FAD230997;
+	Fri, 30 May 2025 16:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="Pfd44QIN"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LkWegKQA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013039.outbound.protection.outlook.com [40.107.162.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03A11C8FBA
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 16:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748623388; cv=none; b=jDOEC7ydZwY8O9vKSQUTsJjhQLtIgDF3o8t5lh7ZRGQtW2f3CX8ExIvKZVxGKHlFO5d3aydszPJx67SFlIVSNcNAxp+ilv2tqo+e9s80OLRUgPtH5WGhI0J9I5PbjAbpbKdp6tWpgENw2yI48muRNkQo0UnipUy5/+1eW6mO0V8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748623388; c=relaxed/simple;
-	bh=6VnR19aWjvwXwg1SYHxcyQ9gqRgNVhxoENlPONOs/74=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=MQCItFADXG0z2oa4tUX+V2W5YEc4Ee8aONNrtXv594rHqBtgPSQlrb+Ve7eP3yKvj5jUC+eH05arQ2Ot7r/ic3Oqs9HkYp4mv0tTs48ncAkGEA/mqtH+WeSnUgDTL4KoPBbXq63fbsHqvF3b0UshLQW6d9k/VPubTLQAHo1Y3qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=Pfd44QIN; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 47C39240029
-	for <netdev@vger.kernel.org>; Fri, 30 May 2025 18:42:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1748623377; bh=6VnR19aWjvwXwg1SYHxcyQ9gqRgNVhxoENlPONOs/74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 From;
-	b=Pfd44QINrX4OSQycDrGrPtpg44V7MZ66nsSU4eHUCR2KjZHxjdpbSAN3+y+8xLEZJ
-	 PP747CfglyJ1hvIITWyzciXS6CNyYi/JprerpkFQLU5crnzH75OEYCLqiI6PaKtgvg
-	 BWcZ0NX18SPIbDcHnnYx+QExJkI/ac+0Wz75cg0zeGTvAXfDReKtQCKhuiiMf2He8Q
-	 WnCyagBI2zdbPTgaP3+RnD4bNYuyZ56xfA9AR+HrcJePOMGGAbE/6wgBkUqW2yPpHC
-	 4g/+C3gyUn/hRsIGZ6oOKtRCxVgq2xJq2BfqQWtOHmnVWmNOGPqdLDHUH2WAqLNvSQ
-	 kygU7zMkina0Q==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4b88DZ0h3Qz6v0W;
-	Fri, 30 May 2025 18:42:53 +0200 (CEST)
-References: <68138dfa.050a0220.14dd7d.0016.GAE@google.com>
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-To: syzbot <syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in nsim_fib_event_nb
-Date: Fri, 30 May 2025 16:41:34 +0000
-In-reply-to: <68138dfa.050a0220.14dd7d.0016.GAE@google.com>
-Message-ID: <87r006nj7e.fsf@posteo.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6BC22FDEC;
+	Fri, 30 May 2025 16:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748624085; cv=fail; b=CsV+hloTALytdHgdwokHG2ZlRXyw/lRdVgaXwoYeTcIqQMB+WrnISTHM2F1i1laqg/yzNqnPRFePuAQM5vraUhBFKdZh1SKfrDcuNmP3x9YAY7v9DB0Cho2BtK0v4EogJVVYaIiM7a0M0b9UvHHSnocE6MwH8rUK7WXANdQGTXU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748624085; c=relaxed/simple;
+	bh=S9UC/xmJCFbhWVc0L4rJTiowRZrTyx6I8O/8dG9YX4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LCtOdtVwPHPswS7AjyieTLosgs64fu8l5BNlH0RwfusvuI8pL492K8QUUKVzAlHLVq7YowfrBOGmZMbpxed+ZSBipTDBQbEjAoFcvACH9tBUNUs0UMASLIszhonn74bNngoghXrLleBnob+cxsXjl4xLhiCpFcpFi3mYOfzMZek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LkWegKQA; arc=fail smtp.client-ip=40.107.162.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WQrgbMNBLNXp/7QEc4R5edZROkQjDfJ9F7gJz6Hgq2DOI5cV5vcbR3+fEJ3xqBr2ka78ArRgez0I6cx/Rgypgk5wakQ8v2HZ+MaLs6fJozt1/O0eIPtETMICSTj42t/y2N5jeD/dzQMc4BINyrJ6BIIxNO1dWa06n56JAGuXYGFictc2T+GZ80D/JBvijgG9/ro8lWOY+UzeNT1OrjEHnokir/iCZWdWPVbPQmoxDDfla2Ulm0+6StBk/L5tTzy7E1u8Vji9Dq/VUpeHbjQsvqO5cF50veX4b9uyM1roK4GhfHIUn/J4N/1fyUXIsF4Kzw30LylP0wK4XMxm8yqkWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PuJoIA1Z4zBIxvvfaL8aailQlTQPBQSblEOpN9lsrKY=;
+ b=Ulun5vuZaISvkQXJVCYnWYzUxKroy2ikhl20/nXmRJH+wIWF2QtaU4eNCzcgvXarw+1RVcTNLe4VwFIzn7StqI6u3g7PE61PMqpCWAb/zV4lFVITs9EbBR/2hFqcCZHYFxtQlOvi31r+uciR/fJ7f7/OjzUJ+c/CAI35HJNr5zBzxpywP6zSX9ox/hwbX2IaCsMMpuJUBbEl791IWioRHnkQuLDlTGUhJClGOadnwELRySJJtofZDXvah3cgaiA0+p8kKHsyzagBDMqfvwpypRIKozpjjMGkiub/i4JST//pHUNBFPnyLDmHAVrO4MDqGfkULe71Y6ZcvKngiAgTJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PuJoIA1Z4zBIxvvfaL8aailQlTQPBQSblEOpN9lsrKY=;
+ b=LkWegKQAQcT5tu0VVpJJ3wId3sMH97bbt9mHpZqxRthMzYqXMK5T998PZr2NSfF6mSIhTLr8DVIv7RJtHDDEw2sdiOepELyV2YXhRQD8JUpfgY7O7MTJSS05v9G1Cs9SemjPng+LIgNmF/e0iZ9FS3SbPfDSv4c8InXva8q0mTpqZ2tNOR5WOOs6rah33CkTpB2F77XJb5WyZXCqUAf6pBHW1057zIazdsc0O2VryncNf2ImrOEBS2lddOU49oyVnOmW212uRMmHvoRGggkgafRYbapLCn3FppbPnsMkhX5VOqKf+rcrhcFTb4tfUOc8Zg5du/GT6oUSw4b1AYA8Tg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by VI1PR04MB10051.eurprd04.prod.outlook.com (2603:10a6:800:1db::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.27; Fri, 30 May
+ 2025 16:54:37 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.8769.031; Fri, 30 May 2025
+ 16:54:37 +0000
+Date: Fri, 30 May 2025 19:54:34 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH net] net: enetc: fix wrong TPID registers and remove dead
+ branch
+Message-ID: <20250530165434.xzdroce3i2mmwxcf@skbuf>
+References: <20250530090012.3989060-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250530090012.3989060-1-wei.fang@nxp.com>
+X-ClientProxiedBy: VE1PR03CA0036.eurprd03.prod.outlook.com
+ (2603:10a6:803:118::25) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|VI1PR04MB10051:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b727b25-b416-46aa-ba0c-08dd9f9aa965
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+Te2qOCGMi0u2SBoR91h8Sq2GDu24y6tp+qB5Q6FPQbc0vipVRnfagFVmiRp?=
+ =?us-ascii?Q?k6L/Ruu043rysnd9gks+kfIpQzc/XVnjzZ024lExjdzp+FvOaniGYMAdxxnB?=
+ =?us-ascii?Q?Gz4GkF5njZ5SMn31P1avBCXkLNO0xfczjrZ6myaTrZ5IaXPN59zNoSMFvFPM?=
+ =?us-ascii?Q?a9fU9uRWCX0SlJo0e5KiaihXWfcfRAYqxTst9J3ENwW5A5IuYVZtZVy4Bapg?=
+ =?us-ascii?Q?MA9OPqxXHUtMHIZDwBCGcbHGV+U2iJIn1UyuxHppQRAMD8E6F8qVldQY+3vr?=
+ =?us-ascii?Q?vJca4jRCi94xo6bG6xp+SCdmte624/4GVbcC0CfSaWY1NQv7nlcYaOpULx7W?=
+ =?us-ascii?Q?iUUciUoz311hTAg5z/VPSbBMBXqSx5hjIwfobaymhvU0WIWKa+ElBMcfa6FR?=
+ =?us-ascii?Q?/fpgntwCO/N7je2AgIUZKMEQCG69jQpemltjBRU7f5D3Dkn9HlvEohLmkSQK?=
+ =?us-ascii?Q?orryHeZTkFA58GtQXBkFrttWtSGe8+bmkj5H8bU82uabxWyoFMM5CUn6QfvP?=
+ =?us-ascii?Q?9kQnDhspBSuwhhzNvxa1/nAB1rdgS/a2Sw5DDTCZm9K1HJR6ObHCS8ENoJJs?=
+ =?us-ascii?Q?6g8u1xLM0uNS2/Eu1TscedGTcqvhsfbGRkYwnzTWVYMBy9FjR6UZoGwI9GAh?=
+ =?us-ascii?Q?bPZhIjLKVTwqDSwbBvONtTw8ZFwnojYVbxA33UvAwaVjZRYu3SuOFH7WqpDs?=
+ =?us-ascii?Q?KRPrkdvWHbL/okrkmkOiB2O+Iu0LwUXXdLqYr3YHQev9Apr7erUZzc+9Z4+G?=
+ =?us-ascii?Q?i54PjoMkZghbgAFGEc/eoY2fsph2uUvD9eCXEgBQ3/o/CL5s8q9ctWD+NMd9?=
+ =?us-ascii?Q?j3T37Xvc38yVJTUjdLcJnxDU2v8r3IJm/JcZyDT0sf1QVTB1RJ2nqNK2XdVs?=
+ =?us-ascii?Q?jggGQb1aD84HLxMplBUfDkKtzciDuWfgjzoumrV/imNb6/pY33oSuTzvlaRm?=
+ =?us-ascii?Q?QyHLxE9Vzk07BqCoc9BXgKqhfbPe06A5LD8sZiSQYutTL5wN3rEWzjR9vVEa?=
+ =?us-ascii?Q?YuWpK+21LXlZ/+AduHynS0hmZ+z9KTClzFS07DM0y4nmF+bC7GH50174FJBQ?=
+ =?us-ascii?Q?zB377367v4z7y9xvelzMUr1ID3YZ+/3aH3Ii9ySIHBVIGPWJrgj8MYcaE53u?=
+ =?us-ascii?Q?xtOyHNRYRlRrPm4+IkMeJwwLGAErlmRtmXCEXY0TQ+x1GJIeY+V0mUFeCtuU?=
+ =?us-ascii?Q?9CGPvTW0PWsEsqcrPaGvcck3KLmFQXxoWQbh+1VvRohHi1YydrXKb8fnG8rd?=
+ =?us-ascii?Q?eX2pMdAOos8XjbMbud6ExrzlOwaGjU4SL6ksUcbLDDwToiI60DE6pcYcfVdy?=
+ =?us-ascii?Q?BmWhjBlrOIkBZP6Wh8MwCd3EcXg+k439UQ6WVvx1yWXCIl2crlKwLKYA/xUv?=
+ =?us-ascii?Q?9yyunbAFBm7a+cF9NuTYRigzkcBBV5NRRvDfPHjkRVU/35L5q+XI9Q7DYVdm?=
+ =?us-ascii?Q?7MpsJYZ6E5Y=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LRsUX3yF6DfaLK1u+DdGgq4MfxlSragIgc6AGBm8qb22JCvv3rOmW5aLgAxb?=
+ =?us-ascii?Q?jAUuu3DN+BBoED7hXn125lfFrPoFi1wKQwkisD8ceFhIFJWrbKddtp7Xg+Lb?=
+ =?us-ascii?Q?EzK9Bb9C8Wy0wRTBXewDfuIJanMsJZvOHQRFeJfji8aqt6MK+16bBMz6G/xO?=
+ =?us-ascii?Q?JiVl2XpEZQb4NSBDzFe3RwRHSITRf/yvPWfIqOHELGxC/wfka3OPyJOlmYyX?=
+ =?us-ascii?Q?PDpeerM/jlCCe/bwkslVMAsV9l1gtzC2X3wGt627J+VzXKkwQvLSu5mo71LJ?=
+ =?us-ascii?Q?pbcQkBEnFKq/lzbKJIxUhFqPwX3DlFnmLFT6Ih45XEe1g+r3WUmFoFpPEZCU?=
+ =?us-ascii?Q?nbMh9Zn3EFJEpoAPQk4xq0gB5+eNOXZVICE6y/tfJzNs+HWlGtQ42SZKyuEq?=
+ =?us-ascii?Q?pG8ZAXxRrA6y86KtyRwiBB6FbItaPQXYc+1w5GV2aqKreVcXcBUBys5iMgyZ?=
+ =?us-ascii?Q?YYD7CKwdtYuhH7+TOyutHGY4uzMeFi9MNwD7SLu42XeFczt63w+uzqCcGPyE?=
+ =?us-ascii?Q?OtZDfx73F6Q/KoEDdvoHC6cTSkVVQC1KgRnquCZ1F7ChCwuTQUY2XQncG0z+?=
+ =?us-ascii?Q?rLbxoGe/nB2mE9QcyIcwM/f/wqO4c8FuxAOPdx4Z6zGiwynsZed9cCPu0ahC?=
+ =?us-ascii?Q?YGAVKND3tBTj+SBH7I8T3hOWGL73Ai86fyNDyJsd5abhcSy+a7N1RLIsDKLs?=
+ =?us-ascii?Q?j7oTBPc+VXaShNUFkkeibOjE0eySEfaa59QHfl5wkn8iMDNQV3DHM8HnIB/Y?=
+ =?us-ascii?Q?UYfU8Gl1yqkNMN2BWbKI9MHYt3Tyw2vEJ2Pv6fFQ6ZY09K6EIJeoYDOytjUt?=
+ =?us-ascii?Q?cTO3OKZzBsiukx3KGTtpF19J8AamoX7Yd/gGO2vJ2t2NvoaggxsLNUtfmWDX?=
+ =?us-ascii?Q?kUCQhvuIsZADaTFT+2dF+yl1+Q1TBs0tpePzk4gQ6l6q7L/lT6jmAWzJqV3x?=
+ =?us-ascii?Q?Li1JIadJG5/CHLw/4nrbWus9e/o8Cf66YmUVVTUUrJd9tv9E1a0ILxg7cueb?=
+ =?us-ascii?Q?wQdWQ6oMT6IyGUWjuWvKQRybFsqWvBt2tM4C3SHuMqWpImLNrheVsQ1Rp8Sp?=
+ =?us-ascii?Q?YITiYEj5dtoEkuqwWGCPEQu++6ECpC9Owi1RYUyWp+1FDsj0VO/2Dh/SEqyj?=
+ =?us-ascii?Q?PJ/izX6C9xBU2ox63W6T7nihYSegUvN5B9tQ4eWVUzYV+r0BF5sMINpLIc3T?=
+ =?us-ascii?Q?0jmtOpLPvu/Tv/hC3nhK8ELj8TODqVAq+pVSU7QoC4rI5s1UoWjI6PzG01Ng?=
+ =?us-ascii?Q?DcGFvVGrwTR3cmtjy7L/O0mdmN9k1vmCcK+XNwgc5kDIABIvxOCkA+EbVue3?=
+ =?us-ascii?Q?iQcFZtKUnFWEo/mg+WwcYRdaxd7/vjJ3TKyzU/VfxehMqFnxVkjpYm5gMWqd?=
+ =?us-ascii?Q?9mvttH3jYhol44KdmqB47tRHBU7KIHfkuobXMTU2fhjSXDMsdoka/dw3iuWg?=
+ =?us-ascii?Q?QuS3k24+2oIa5qWGRcf5CXI2CmTAU3w8uyzTOCwpnQnxVPysQxAJDf6rYoSu?=
+ =?us-ascii?Q?CT5Ibpl9KFpB89Gq3/+gMyYcfybxpadknG4dSs1LUor1oG8mN+S0Wz86wngN?=
+ =?us-ascii?Q?mySmNgV6Im8CLIIHwo/tbsCWF7qoTyTFmmzK3ZqESUIzGx6fF5/RWgp9HDAb?=
+ =?us-ascii?Q?wg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b727b25-b416-46aa-ba0c-08dd9f9aa965
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2025 16:54:37.6423
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hoJEgo5MaHMnR+WmCHXpUJvwvRppuFRH8lo2XwrZZzRTsbJLpMKTmWuoQxGV37w8hu+sEHDXd53BJwEOS66ELg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB10051
 
+Hi Wei,
 
-syzbot <syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com> writes:
+On Fri, May 30, 2025 at 05:00:12PM +0800, Wei Fang wrote:
+> Both PF and VF have rx-vlan-offload enabled, however, the PCVLANR1/2
+> registers are resources controlled by PF, so VF cannot access these
+> two registers. Fortunately, the hardware provides SICVLANR1/2 registers
+> for each SI to reflect the value of PCVLANR1/2 registers. Therefore,
+> use SICVLANR1/2 instead of PCVLANR1/2.
+> 
+> In addition, since ENETC_RXBD_FLAG_TPID is defined as GENMASK(1, 0),
+> the possible values are only 0, 1, 2, 3, so the default branch will
+> never be true, so remove the default branch.
+> 
+> Fixes: 827b6fd04651 ("net: enetc: fix incorrect TPID when receiving 802.1ad tagged packets")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    deeed351e982 Merge branch 'pds_core-cleanups'
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1125e39b980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=96ee122b7e5ad7d4
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a259a17220263c2d73fc
-> compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a46f74580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15e2d02f980000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f9cc381b3437/disk-deeed351.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/2df0da84738b/vmlinux-deeed351.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a1f015928ca2/bzImage-deeed351.xz
->
-> The issue was bisected to:
->
-> commit e6f497955fb6a072999db491a01dd3a203d5bcea
-> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date:   Fri Apr 18 00:03:45 2025 +0000
->
->     ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=153481cc580000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=173481cc580000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=133481cc580000
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+a259a17220263c2d73fc@syzkaller.appspotmail.com
-> Fixes: e6f497955fb6 ("ipv6: Check GATEWAY in rtm_to_fib6_multipath_config().")
->
-> IPv6: RTM_NEWROUTE with no NLM_F_CREATE or NLM_F_REPLACE
-> IPv6: NLM_F_CREATE should be set when creating new route
-> IPv6: NLM_F_CREATE should be set when creating new route
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 5822 at drivers/net/netdevsim/fib.c:831 nsim_fib6_event_init drivers/net/netdevsim/fib.c:831 [inline]
-> WARNING: CPU: 0 PID: 5822 at drivers/net/netdevsim/fib.c:831 nsim_fib6_prepare_event drivers/net/netdevsim/fib.c:947 [inline]
-> WARNING: CPU: 0 PID: 5822 at drivers/net/netdevsim/fib.c:831 nsim_fib_event_schedule_work drivers/net/netdevsim/fib.c:1003 [inline]
-> WARNING: CPU: 0 PID: 5822 at drivers/net/netdevsim/fib.c:831 nsim_fib_event_nb+0xed8/0x1080 drivers/net/netdevsim/fib.c:1043
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5822 Comm: syz-executor175 Not tainted 6.15.0-rc3-syzkaller-00644-gdeeed351e982 #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/19/2025
-> RIP: 0010:nsim_fib6_event_init drivers/net/netdevsim/fib.c:831 [inline]
-> RIP: 0010:nsim_fib6_prepare_event drivers/net/netdevsim/fib.c:947 [inline]
-> RIP: 0010:nsim_fib_event_schedule_work drivers/net/netdevsim/fib.c:1003 [inline]
-> RIP: 0010:nsim_fib_event_nb+0xed8/0x1080 drivers/net/netdevsim/fib.c:1043
-> Code: fa be 02 00 00 00 eb 0a e8 25 a2 bf fa be 01 00 00 00 4c 89 f7 e8 38 e6 b7 fd 4c 8b 64 24 08 e9 91 f4 ff ff e8 09 a2 bf fa 90 <0f> 0b 90 e9 70 fb ff ff 44 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c 35
-> RSP: 0018:ffffc90003fff028 EFLAGS: 00010293
-> RAX: ffffffff87001b77 RBX: 0000000000000002 RCX: ffff88802d180000
-> RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000001
-> RBP: dffffc0000000000 R08: ffff888078d6642f R09: 1ffff1100f1acc85
-> R10: dffffc0000000000 R11: ffffed100f1acc86 R12: ffff888072f34000
-> R13: ffffc90003fff1a0 R14: 0000000000000001 R15: ffffc90003fff1b8
-> FS:  00005555830fa380(0000) GS:ffff8881260c4000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 000000007d7da000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
->  atomic_notifier_call_chain+0xda/0x180 kernel/notifier.c:223
->  call_fib_notifiers+0x31/0x60 net/core/fib_notifier.c:35
->  call_fib6_multipath_entry_notifiers+0xe6/0x150 net/ipv6/ip6_fib.c:427
->  ip6_route_multipath_add net/ipv6/route.c:5593 [inline]
->  inet6_rtm_newroute+0x1a0c/0x1c70 net/ipv6/route.c:5717
->  rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
->  netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
->  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->  netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x219/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f6d91f8d999
-> Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fff05e7f5e8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 0000200000000300 RCX: 00007f6d91f8d999
-> RDX: 0000000000000000 RSI: 0000200000000100 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 0000555500000000 R09: 0000555500000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
->
->
+I see what the patch is trying to do, but how did you test/reproduce this?
+The CVLANR1/CVLANR2 registers are by default zero, and the driver
+doesn't write them, so I guess custom TPID values are never recognized
+in net-next. In such situations, I believe fixing a bug that has no
+consequences should also be considered net-next material (and net-next
+is currently closed until June 8th).
+
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
+>  drivers/net/ethernet/freescale/enetc/enetc.c    | 12 +++++-------
+>  drivers/net/ethernet/freescale/enetc/enetc_hw.h |  5 +++--
+>  2 files changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+> index dcc3fbac3481..e4287725832e 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -1375,6 +1375,7 @@ static void enetc_get_offloads(struct enetc_bdr *rx_ring,
+>  	}
+>  
+>  	if (le16_to_cpu(rxbd->r.flags) & ENETC_RXBD_FLAG_VLAN) {
+> +		struct enetc_hw *hw = &priv->si->hw;
+>  		__be16 tpid = 0;
+>  
+>  		switch (le16_to_cpu(rxbd->r.flags) & ENETC_RXBD_FLAG_TPID) {
+> @@ -1385,15 +1386,12 @@ static void enetc_get_offloads(struct enetc_bdr *rx_ring,
+>  			tpid = htons(ETH_P_8021AD);
+>  			break;
+>  		case 2:
+> -			tpid = htons(enetc_port_rd(&priv->si->hw,
+> -						   ENETC_PCVLANR1));
+> +			tpid = htons(enetc_rd_hot(hw, ENETC_SICVLANR1) &
+> +				     SICVLANR_ETYPE);
+>  			break;
+>  		case 3:
+> -			tpid = htons(enetc_port_rd(&priv->si->hw,
+> -						   ENETC_PCVLANR2));
+> -			break;
+> -		default:
+> -			break;
+> +			tpid = htons(enetc_rd_hot(hw, ENETC_SICVLANR2) &
+> +				     SICVLANR_ETYPE);
+>  		}
+>  
+>  		__vlan_hwaccel_put_tag(skb, tpid, le16_to_cpu(rxbd->r.vlan_opt));
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_hw.h b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> index 4098f01479bc..0385aa66a391 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc_hw.h
+> @@ -43,6 +43,9 @@
+>  
+>  #define ENETC_SIPMAR0	0x80
+>  #define ENETC_SIPMAR1	0x84
+> +#define ENETC_SICVLANR1	0x90
+> +#define ENETC_SICVLANR2	0x94
+> +#define  SICVLANR_ETYPE	GENMASK(15, 0)
+>  
+>  /* VF-PF Message passing */
+>  #define ENETC_DEFAULT_MSG_SIZE	1024	/* and max size */
+> @@ -178,8 +181,6 @@ enum enetc_bdr_type {TX, RX};
+>  #define ENETC_PSIPMAR0(n)	(0x0100 + (n) * 0x8) /* n = SI index */
+>  #define ENETC_PSIPMAR1(n)	(0x0104 + (n) * 0x8)
+>  #define ENETC_PVCLCTR		0x0208
+> -#define ENETC_PCVLANR1		0x0210
+> -#define ENETC_PCVLANR2		0x0214
 
-#syz test: https://github.com/charmitro/linux.git a5ecfdd98680b51a58a570660086f871873506f4
+I think you can leave these definitions in place. They will be useful if
+we ever add support for custom TPIDs. Having the definitions doesn't
+increase the compiled driver footprint in any way.
+
+>  #define ENETC_VLAN_TYPE_C	BIT(0)
+>  #define ENETC_VLAN_TYPE_S	BIT(1)
+>  #define ENETC_PVCLCTR_OVTPIDL(bmp)	((bmp) & 0xff) /* VLAN_TYPE */
+> -- 
+> 2.34.1
+>
 
