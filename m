@@ -1,72 +1,93 @@
-Return-Path: <netdev+bounces-194293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A217CAC85FC
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:23:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3297BAC8611
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE991BC141D
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C064A4959
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1F0148850;
-	Fri, 30 May 2025 01:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1DD155A4E;
+	Fri, 30 May 2025 01:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Uy9M2H8x"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ezXJMaqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFA69475;
-	Fri, 30 May 2025 01:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DE04C8E
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 01:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748568183; cv=none; b=R4Oudds5r1q2lH18Tgwn6twTQvWGUx5bc846BL+VG9cjcvZJ58NS8SkUKbc4eVAgTFcnCtrKQb0kEPnIl0InVt3ZSdwfKI2FoifyMGzLpKQt0zRQJQVq6zOmXeLbScgzhNZegi4F4gvdyPBkR17e+AcbWqRVNuzw8jF0oB3lVw0=
+	t=1748569802; cv=none; b=eW9WXv08SnBA4dehG5vi70MRt2lhIY8fmgmtWBOZRhcgbfbih+9q7SBKZDteQftrXZz0QJG+7nRbJM9jRiL2gE4D2xbF96RVuslYjU7HA4/o7q7Ux3bkuymK3CoJAt5Pz1LsnvBUiMDTTfIUHgHMGFEwUX2q4d9SaMQSizY0Sow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748568183; c=relaxed/simple;
-	bh=pfifIOZ6L41ab8gAlCxvqrKmjqTJMmJ7xVknGjPKv+o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J94EXCmSuKdNFkteV6PpjvqL4Gc411rgk9yq5KBCyJGV6+YLXTC2+SE/b8Mwur5gS+kNq2G3f2pzRLrPGWar0RUuERzUFYkgfnMnvPmVGWWPit9XvP+uEXlD60cUOO4xBqmWWTxX+HjHBypm9UKydexOrHr89BJpMgaS7DTOjhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Uy9M2H8x; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 9cf79b2a3cf411f0813e4fe1310efc19-20250530
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=FWvi6FV2yTRRNHn1Lyg8KOEvBAvCbi10ARhlbgXCrEo=;
-	b=Uy9M2H8xR5YbISt0/49cNMuDuvgOd5qn68yYXWXH2cRBMPyEYinI5MuVBG4/BFevoWW4APFY0M1C+bpkx7bbdscj+N1K4fjMbc0m/e8oMjAYSz6aqjwrBWGco1D6V3Bhlqi/0vcMeuW3nCqOccmaV3s+r7fZYamk48YEEJigthk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.2.1,REQID:da3d13a5-d6b0-44f8-8bb0-80ea183b5e5a,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:0ef645f,CLOUDID:e2734459-eac4-4b21-88a4-d582445d304a,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 9cf79b2a3cf411f0813e4fe1310efc19-20250530
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1993078269; Fri, 30 May 2025 09:22:55 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Fri, 30 May 2025 09:22:53 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Fri, 30 May 2025 09:22:52 +0800
-From: Shiming Cheng <shiming.cheng@mediatek.com>
-To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
-	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<shiming.cheng@mediatek.com>, <lena.wang@mediatek.com>
-Subject: [PATCH net v6] net: fix udp gso skb_segment after pull from frag_list
-Date: Fri, 30 May 2025 09:26:08 +0800
-Message-ID: <20250530012622.7888-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1748569802; c=relaxed/simple;
+	bh=CveUHtuP1DptHh8ecfltHD6hRz2GDjqnTk2DrPj0YRI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iwlfNjqTd+6ra/Ju4qU8S4dLDaLH+nLAi/iw5efg0AO2NNOEOpV81aXhSfUSpW8d8QE/B+acFLXV22pCc0wtu+FpeSIWcgFewuY1P5VNZhZ6l/0aYjIuYMAkFPbcxWva3YiqPsk/CuH7KUFscIz/DiQHSK3nOuXKQapaaIhamps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ezXJMaqs; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2353a2bc210so462915ad.2
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 18:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1748569800; x=1749174600; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=USkdCPHF2PH5TA65vT+omww+14Kmrvo8xr4kQydMtxQ=;
+        b=ezXJMaqslCLlNKM9i1+hOJzpaK/oN8rAv3zj43+6OkTaW3WUtBnHQIDndjbejVB+l+
+         aYrFR9mG0PhlrRM8QiZJxU77NEefx+Tx+I6L32AC+jZbpbn75hRsuE4/OWNbQElVC/LN
+         kowRAtStycOV8YEzN3ooyAkDhJtUK0T0hkHDg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748569800; x=1749174600;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=USkdCPHF2PH5TA65vT+omww+14Kmrvo8xr4kQydMtxQ=;
+        b=YPUZmhEZCvFU8SVInihry0MMAyvjnSPsR6BFuyuDDunKAWU4nU8vkLLBC85uKNK+Oj
+         wvRhJUeuu9aIb3wc+RNblYmZP+qFgVyb6nDFt8XyZDo/6gKZ5CAw34LN3i5DwAtc0QFn
+         fqjfkkjo0ENRHXzCZZuwvRjqIC08iPQv0iTuPEmOyLhJmrTPXZLEDnV+SI1tKQglU3uN
+         TQ7py7aLTFBoGCa9aFhaBpJFM+TCiUTCjkbLSGpXgLpF88/uDRWPzOuATAbjuK8cozGl
+         EEr7FJW9QdTwTBYJC/S1zt/+iPcl1AkC9DGD0tlkwvHnDWrfH14VGyOfMcJWJ7cFzz3z
+         X+qQ==
+X-Gm-Message-State: AOJu0YwM6lUd7VmSQJCs4P73ZHz8eEhBsiIBpzjl19v58owSQJ5/EdL8
+	tQWYpWQCdFy1WsaIY/7fY7rIqDdK83OGJ0UAb7cnv2Ge+dOphcjcXdf6g8FuaHpgmEfPlojYTvy
+	/Gnhf6EFnZMMkMWa0Ich8TJuJC8cXY4/iBjI4BfTXRKfTKw0j/NLNZmX8ZTSCFZ/qreeqWVoceO
+	H4OJ9VirXc33vytk+wB8s26mCSM0m7rsFOVOscl/4=
+X-Gm-Gg: ASbGncu8nJbdWwCbcSznclr/JiaoJ4gTuJeqwFNolGEhLKOJl4SSS1vEjrztlQyBvWO
+	Q3F28mtvJnJVrEUmZRAtVtfrgUvAinGUQtemCl3Lzo2i5TlVPRl2QZIDYWU6AOrUzpj1dzEC93a
+	xZL5xcUoimLkhDHR1ujjnlCVXII1D85zCbPOnQXYfIQc+uk/gDQTkP/GtqM2aCmo/NNMiXYjDMe
+	EL4M2hSWKUWIj/ptVMbtc9CEVDcghxrfVw+ZZ5/+DAwsECh5vAP+t1FyeNB3Sy5cMeHSa1ixQPe
+	Vu1Cw8Y3YGWjEqCUl4FuDximBAMosbaZ2gCP4MfCoHBpwjjDvDwT3E0QIfs=
+X-Google-Smtp-Source: AGHT+IF30dyRi/lEN79RRLEUtNpNXnDs814PCaa5b5ybHznKzvJuCfgL1TejPuzA/dDpqBg0EpC+zQ==
+X-Received: by 2002:a17:903:2f89:b0:234:eb6:a35b with SMTP id d9443c01a7336-235396e2b3amr5777265ad.44.1748569800003;
+        Thu, 29 May 2025 18:50:00 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cd8c35sm18316405ad.154.2025.05.29.18.49.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 18:49:59 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	stfomichev@gmail.com,
+	john.cs.hey@gmail.com,
+	jacob.e.keller@intel.com,
+	Joe Damato <jdamato@fastly.com>,
+	syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH iwl-net] e1000: Move cancel_work_sync to avoid deadlock
+Date: Fri, 30 May 2025 01:49:48 +0000
+Message-ID: <20250530014949.215112-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,102 +95,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
 
-Commit a1e40ac5b5e9 ("net: gso: fix udp gso fraglist segmentation after
-pull from frag_list") detected invalid geometry in frag_list skbs and
-redirects them from skb_segment_list to more robust skb_segment. But some
-packets with modified geometry can also hit bugs in that code. We don't
-know how many such cases exist. Addressing each one by one also requires
-touching the complex skb_segment code, which risks introducing bugs for
-other types of skbs. Instead, linearize all these packets that fail the
-basic invariants on gso fraglist skbs. That is more robust.
+Previously, e1000_down called cancel_work_sync for the e1000 reset task
+(via e1000_down_and_stop), which takes RTNL.
 
-If only part of the fraglist payload is pulled into head_skb, it will
-always cause exception when splitting skbs by skb_segment. For detailed
-call stack information, see below.
+As reported by users and syzbot, a deadlock is possible due to lock
+inversion in the following scenario:
 
-Valid SKB_GSO_FRAGLIST skbs
-- consist of two or more segments
-- the head_skb holds the protocol headers plus first gso_size
-- one or more frag_list skbs hold exactly one segment
-- all but the last must be gso_size
+CPU 0:
+  - RTNL is held
+  - e1000_close
+  - e1000_down
+  - cancel_work_sync (takes the work queue mutex)
+  - e1000_reset_task
 
-Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-modify fraglist skbs, breaking these invariants.
+CPU 1:
+  - process_one_work (takes the work queue mutex)
+  - e1000_reset_task (takes RTNL)
 
-In extreme cases they pull one part of data into skb linear. For UDP,
-this  causes three payloads with lengths of (11,11,10) bytes were
-pulled tail to become (12,10,10) bytes.
+To remedy this, avoid calling cancel_work_sync from e1000_down
+(e1000_reset_task does nothing if the device is down anyway). Instead,
+call cancel_work_sync for e1000_reset_task when the device is being
+removed.
 
-The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
-payload was pulled into head_skb, it needs to be linearized before pass
-to regular skb_segment.
-
-    skb_segment+0xcd0/0xd14
-    __udp_gso_segment+0x334/0x5f4
-    udp4_ufo_fragment+0x118/0x15c
-    inet_gso_segment+0x164/0x338
-    skb_mac_gso_segment+0xc4/0x13c
-    __skb_gso_segment+0xc4/0x124
-    validate_xmit_skb+0x9c/0x2c0
-    validate_xmit_skb_list+0x4c/0x80
-    sch_direct_xmit+0x70/0x404
-    __dev_queue_xmit+0x64c/0xe5c
-    neigh_resolve_output+0x178/0x1c4
-    ip_finish_output2+0x37c/0x47c
-    __ip_finish_output+0x194/0x240
-    ip_finish_output+0x20/0xf4
-    ip_output+0x100/0x1a0
-    NF_HOOK+0xc4/0x16c
-    ip_forward+0x314/0x32c
-    ip_rcv+0x90/0x118
-    __netif_receive_skb+0x74/0x124
-    process_backlog+0xe8/0x1a4
-    __napi_poll+0x5c/0x1f8
-    net_rx_action+0x154/0x314
-    handle_softirqs+0x154/0x4b8
-
-    [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
-    [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-    [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
-    [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
-    [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
-    [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
-    [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
-    [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
-
-Fixes: a1e40ac5b5e9 ("gso: fix udp gso fraglist segmentation after pull from frag_list")
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Fixes: e400c7444d84 ("e1000: Hold RTNL when e1000_down can be called")
+Reported-by: syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/683837bf.a00a0220.52848.0003.GAE@google.com/
+Reported-by: John <john.cs.hey@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com/
+Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
- net/ipv4/udp_offload.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index a5be6e4ed326..59ddb85c858c 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -273,6 +273,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 	bool copy_dtor;
- 	__sum16 check;
- 	__be16 newlen;
-+	int ret = 0;
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 3f089c3d47b2..d8595e84326d 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -477,10 +477,6 @@ static void e1000_down_and_stop(struct e1000_adapter *adapter)
  
- 	mss = skb_shinfo(gso_skb)->gso_size;
- 	if (gso_skb->len <= sizeof(*uh) + mss)
-@@ -301,6 +302,10 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
- 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+ 	cancel_delayed_work_sync(&adapter->phy_info_task);
+ 	cancel_delayed_work_sync(&adapter->fifo_stall_task);
+-
+-	/* Only kill reset task if adapter is not resetting */
+-	if (!test_bit(__E1000_RESETTING, &adapter->flags))
+-		cancel_work_sync(&adapter->reset_task);
+ }
  
-+		ret = __skb_linearize(gso_skb);
-+		if (ret)
-+			return ERR_PTR(ret);
+ void e1000_down(struct e1000_adapter *adapter)
+@@ -1266,6 +1262,10 @@ static void e1000_remove(struct pci_dev *pdev)
+ 
+ 	unregister_netdev(netdev);
+ 
++	/* Only kill reset task if adapter is not resetting */
++	if (!test_bit(__E1000_RESETTING, &adapter->flags))
++		cancel_work_sync(&adapter->reset_task);
 +
- 		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
- 		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
- 		gso_skb->csum_offset = offsetof(struct udphdr, check);
+ 	e1000_phy_hw_reset(hw);
+ 
+ 	kfree(adapter->tx_ring);
 -- 
-2.45.2
+2.43.0
 
 
