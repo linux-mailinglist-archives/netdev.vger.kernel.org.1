@@ -1,158 +1,242 @@
-Return-Path: <netdev+bounces-194288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5199DAC85D4
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:03:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DE4AC85E2
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3711E7B5235
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:02:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D663B5588
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2953405F7;
-	Fri, 30 May 2025 01:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GYwn9aM2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E40813B58A;
+	Fri, 30 May 2025 01:10:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E238749C;
-	Fri, 30 May 2025 01:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40F410E4;
+	Fri, 30 May 2025 01:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748567001; cv=none; b=c3glvR2Z/S8cpXCisHSgjtdUvLKjT9zdur0mdmebL6q3TRonIbH3vlHOpE4UscCwsSHquxhlJemg3N2MZjFUmTk/AHqL5c1dQQ2pvPoHYgjoJiW8OOOqOyPB2xhaH7wl2d23LhHWO+MtC2R8OQrDgkywb2ekd/H2ukp02rfU9fw=
+	t=1748567417; cv=none; b=FGadZmwXIcvMXtcCPn8dckPs5Q28H1GDAR+08J6PFgg/uASBIkiPKyKO2VJw6vJLX/FG2ptQEVzuBDwWfT0VKmLrhi0Fwns3R/Gxbmp1+o7DDQbrhL0ZH8bqItfvCCqewJ3Rkil73TdkDl8O2bwcpohgBCNa3jBXdP0RKGdFP2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748567001; c=relaxed/simple;
-	bh=8lg9tcjmyDPHmeMi3irqoS0NZTO/egGFWJG0MSTAeEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DJOZFdv/E8mDTCiqNcPUZ8/xGFtc/ta20rZTiiOJEhqB78bNLPgK7tAXAqFwOcQnWrGlVumrlAvuOGJkA8Nwl0ptNM+VNj5anavGKXHa5/fGb/sfus6KO38EzhSBrHRungilFlXmojZVWcTXxLjg07B4VJ/QoSEbmEcA9MntQDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GYwn9aM2; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1748566992;
-	bh=KFsDZftR4B6MnKOTyovSysgE8zvgQdPlPTpypjZ3vYs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GYwn9aM2pL8l5gIcaYkirTaiB8gbp0L78Zi217/yDsV9ZsH2YLy+rQBki8bSu5YOK
-	 ASsc7eIO1mVcouIje5YbVePzf8rzlGlt5CWAMwx+RsYF6m8icq1ryxvUBM0n+JU5gb
-	 AO3DjOH8HFkF7vX7PZuVNNEjeUyf+F0gchYRZrKJmUW5Uw5fgHZ9MczhMSFZsOXwM5
-	 ujngdo4GK0fNem0D8RzTtOdUvfjTmJn9xo00qL9qcBGNrKO6FNjIYVW2Cy6IXEwwg8
-	 h+e3a7398aolewWN8N52TFIpt1NdkZHeMrXMgslDRI8AE48d/dgJ8bBVnBxaTRz5RD
-	 exQQTqavG2z8A==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b7lNF0RNjz4x5Y;
-	Fri, 30 May 2025 11:03:08 +1000 (AEST)
-Date: Fri, 30 May 2025 11:03:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: linux-next: manual merge of the net-next tree with the reset
- tree
-Message-ID: <20250530110307.1eb48635@canb.auug.org.au>
-In-Reply-To: <20250506112554.3832cd40@canb.auug.org.au>
-References: <20250506112554.3832cd40@canb.auug.org.au>
+	s=arc-20240116; t=1748567417; c=relaxed/simple;
+	bh=JTWoZYMV/sBS4/+ns9GwXgeHnkr4jGPNv48ZkJkgXjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MxEMH1ii0S0Aj4ZatvZaenMD7HRa2ZM/HXeI64G02dC8yk/hVoOjul3qzO6yI0EvuqN696ESVNFAPGXdsVzXYNdt9UOflHTqs03kvOmdhFyhPiwoh1SwLXWEDhsdkSkRehox4c7HZpltyGNaGPbG3I/o/vAM6N7HHOGShLrO7nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-eb-6839056f5554
+Date: Fri, 30 May 2025 10:10:02 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com
+Subject: Re: [RFC v3 01/18] netmem: introduce struct netmem_desc mirroring
+ struct page
+Message-ID: <20250530011002.GA3093@system.software.com>
+References: <20250529031047.7587-1-byungchul@sk.com>
+ <20250529031047.7587-2-byungchul@sk.com>
+ <CAHS8izNBjkMLbQsP++0r+fbkW2q7gGOdrbmE7gH-=jQUMCgJ1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/dgk32W/+5/HDY1_RY9Za7rs";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izNBjkMLbQsP++0r+fbkW2q7gGOdrbmE7gH-=jQUMCgJ1g@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHefZe9jodva7bo5LRouxqGWJHCrUger5kdvkgCtVLvrTlnDEv
+	aRGstJs5u2iSc8Yq71mLZTqtpJaYYmooxeyislQIynCapXZziuS3H+f8z/mdD4ejFLcZX06t
+	TRZ1WkGjZGW07KvXrfWJTKhqY/3vUDBZqli4+zMNyvpsDJgqaxCMjr+XwkjjSxbu3BqjwNSR
+	ScN3ywQFA01OKfSWDtLw5HwtBc7LzSwYMicpOGMrl8DrmhwG8iZKKKjV90mhq97EQk/VXwYG
+	7QYaWowVNPTmRECTeRGMtX5B0GiplcBYdhELuZ1mFj5l9iLofOGkofB0DgJLg4OByZ8mNmIZ
+	qa7olpA640cpMVtTyMPyNSTL0UkRa+VFllhd16Tkw9snLGm+MUmTOtuIhBgyhlgyPPCOJt8a
+	3rDEUv2GJq/MjVIyYvWP4mNkW+NEjTpV1G0IOyRTvejQHrOtSmt53kbp0We/LOTBYT4YXyqw
+	U7Pc1vOUdjPNr8Alj/Klbmb5AOxwjE9nFvCrcXHDVcbNFN/L4HbTUTfP56Nx+b0miZvl/Gbs
+	KrRN5WWcgi9F2Pp5QjrT8MYtBf30zHAA/nWzcyrETbEfLvvDzZSX4oxHhdMuD34Ptrqyp10L
+	+eX4Wc1LiXsn5m0cLmqfRDNH++Dn5Q76CvI2zlEY5yiM/xXGOQozoiuRQq1NTRDUmuBAVbpW
+	nRZ4ODHBiqY+p/TUr1gbcr3eZ0c8h5Re8o1hoFIwQmpSeoIdYY5SLpCfCQ9RKeRxQvoJUZd4
+	UJeiEZPsyI+jlYvlm8aOxyn4I0KyGC+Kx0TdbFfCefjq0bb761KcOdcHi5/GdwVt8onJ3am3
+	eD+uDzKEh+tlkRmyisie5A5yLcu//lxzyKK84bVOWXdU06Et6q2Bu5O9YrdUMuNn8+t+1HSz
+	e1dFR/kSLni0df+urnzPofuaEGHljowHrnPD/T0+88RtIYFhQtHJt8uN1Z4HLhicPkdCfbcv
+	UdJJKiFoDaVLEv4BTbFk7DUDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX9P9+t0/FzJV9lsZ6SM0jx80Oif+M0wxjCz1eHHna7L7up2
+	sSwVpnVXyYxfl46USpydHq6WxpXUUFZK5SFKxmah0no4D13N9N9rn/f78/r882FJ+Vnal1Vr
+	YwWdVqlRMFJKumND8vIYep0q+J55CVhsJQzcHjHCrfcOGizF5QiGRl9LYLDuCQN514dJsDSn
+	UPDTNkZCX32PBLoLPlFQfb6ChJ70BgZMKeMkJDkKCajNaaThRbmZhktj+SRUJL6XQGuVhYF3
+	JX9o+OQ0UdAoFlHQbQ6DeqsPDD/9iqDOVkHAcFoOA1ktVgZ6U7oRtNT2UJB9xozAVtNBw/iI
+	hQlT8KVFnQRfKb6V8FZ7HH+/MJBP7WgheXvxBYa3D1yU8G/aqxm+4co4xVc6BgnelNzP8D/6
+	uij+W00bw+d9/k7wttI2in9mrZPsnHNAGnpE0KgNgi5oY6RUVdusPeFYamx89JxMRF/8UpEH
+	i7lV+Pm7B5SbKW4xzi+7LHEzw/njjo5R0s3eXAC+WZNJu5nkumncZDnuZi9uPy68U0+4Wcat
+	xQPZjom+lJVzBQjbv4xJpoI5uPHqR2pq2R+7rrVMlNgJ9sO3frNT44U4uSx78pYHtwvbB9Im
+	b83lFuGH5U+IDDRLnGYSp5nE/yZxmsmKqGLkrdYaopVqzeoV+ihVvFZtXHE4JtqOJp6jIMGV
+	6UBDrVuciGORwlMG4aCS00qDPj7aiTBLKrxlSZvWqOSyI8r4k4IuJkIXpxH0TuTHUop5sq37
+	hEg5d0wZK0QJwglB9y8lWA/fRBTR1Ls399eCsLejLmUT2fU4tdaQn5Lt5/XhXHq7cdjHvnQr
+	cWNPVnjn7uvHjVnr++9eFtWmbbnkK2f9o7iEgwtjc+dXJfzyDNpzNNi8rqgrLvNQqKs4ZM3m
+	GZtnhseHzY7WZVTKxaFFP1+K27FnW1p6yLaADZq1rlLDjGWnvKpMp6MUlF6lXBlI6vTKvx4l
+	hL8YAwAA
+X-CFilter-Loop: Reflected
 
---Sig_/dgk32W/+5/HDY1_RY9Za7rs
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 29, 2025 at 09:31:40AM -0700, Mina Almasry wrote:
+> On Wed, May 28, 2025 at 8:11 PM Byungchul Park <byungchul@sk.com> wrote:
+> >  struct net_iov {
+> > -       enum net_iov_type type;
+> > -       unsigned long pp_magic;
+> > -       struct page_pool *pp;
+> > -       struct net_iov_area *owner;
+> > -       unsigned long dma_addr;
+> > -       atomic_long_t pp_ref_count;
+> > +       union {
+> > +               struct netmem_desc desc;
+> > +
+> > +               /* XXX: The following part should be removed once all
+> > +                * the references to them are converted so as to be
+> > +                * accessed via netmem_desc e.g. niov->desc.pp instead
+> > +                * of niov->pp.
+> > +                *
+> > +                * Plus, once struct netmem_desc has it own instance
+> > +                * from slab, network's fields of the following can be
+> > +                * moved out of struct netmem_desc like:
+> > +                *
+> > +                *    struct net_iov {
+> > +                *       struct netmem_desc desc;
+> > +                *       struct net_iov_area *owner;
+> > +                *       ...
+> > +                *    };
+> > +                */
+> 
+> We do not need to wait until netmem_desc has its own instance from
+> slab to move the net_iov-specific fields out of netmem_desc. We can do
+> that now, because there are no size restrictions on net_iov.
 
-Hi all,
+Got it.  Thanks for explanation.
 
-On Tue, 6 May 2025 11:25:54 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> Today's linux-next merge of the net-next tree got a conflict in:
->=20
->   MAINTAINERS
->=20
-> between commit:
->=20
->   57dfdfbe1a03 ("MAINTAINERS: Add entry for Renesas RZ/V2H(P) USB2PHY Por=
-t Reset driver")
->=20
-> from the reset tree and commit:
->=20
->   326976b05543 ("MAINTAINERS: Add entry for Renesas RZ/V2H(P) DWMAC GBETH=
- glue layer driver")
->=20
-> from the net-next tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
->=20
-> diff --cc MAINTAINERS
-> index c056bd633983,5c31814c9687..000000000000
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@@ -20827,14 -20699,14 +20829,22 @@@ S:	Maintaine
->   F:	Documentation/devicetree/bindings/usb/renesas,rzn1-usbf.yaml
->   F:	drivers/usb/gadget/udc/renesas_usbf.c
->  =20
-> + RENESAS RZ/V2H(P) DWMAC GBETH GLUE LAYER DRIVER
-> + M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> + L:	netdev@vger.kernel.org
-> + L:	linux-renesas-soc@vger.kernel.org
-> + S:	Maintained
-> + F:	Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> + F:	drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> +=20
->  +RENESAS RZ/V2H(P) USB2PHY PORT RESET DRIVER
->  +M:	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
->  +M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->  +L:	linux-renesas-soc@vger.kernel.org
->  +S:	Supported
->  +F:	Documentation/devicetree/bindings/reset/renesas,rzv2h-usb2phy-reset.=
-yaml
->  +F:	drivers/reset/reset-rzv2h-usb2phy.c
->  +
->   RENESAS RZ/V2M I2C DRIVER
->   M:	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
->   L:	linux-i2c@vger.kernel.org
+> So, I recommend change this to:
+> 
+> struct net_iov {
+>   /* Union for anonymous aliasing: */
+>   union {
+>     struct netmem_desc desc;
+>     struct {
+>        unsigned long _flags;
+>        unsigned long pp_magic;
+>        struct page_pool *pp;
+>        unsigned long _pp_mapping_pad;
+>        unsigned long dma_addr;
+>        atomic_long_t pp_ref_count;
+>     };
+>     struct net_iov_area *owner;
+>     enum net_iov_type type;
+> };
 
-This is now a conflict between the arm-soc tree and Linus' tree.
+Do you mean?
 
---=20
-Cheers,
-Stephen Rothwell
+  struct net_iov {
+    /* Union for anonymous aliasing: */
+    union {
+      struct netmem_desc desc;
+      struct {
+         unsigned long _flags;
+         unsigned long pp_magic;
+         struct page_pool *pp;
+         unsigned long _pp_mapping_pad;
+         unsigned long dma_addr;
+         atomic_long_t pp_ref_count;
+      };
+    };
+    struct net_iov_area *owner;
+    enum net_iov_type type;
+  };
 
---Sig_/dgk32W/+5/HDY1_RY9Za7rs
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Right?  If so, I will.
 
------BEGIN PGP SIGNATURE-----
+> >  struct net_iov_area {
+> > @@ -48,27 +110,22 @@ struct net_iov_area {
+> >         unsigned long base_virtual;
+> >  };
+> >
+> > -/* These fields in struct page are used by the page_pool and net stack:
+> > +/* net_iov is union'ed with struct netmem_desc mirroring struct page, so
+> > + * the page_pool can access these fields without worrying whether the
+> > + * underlying fields are accessed via netmem_desc or directly via
+> > + * net_iov, until all the references to them are converted so as to be
+> > + * accessed via netmem_desc e.g. niov->desc.pp instead of niov->pp.
+> >   *
+> > - *        struct {
+> > - *                unsigned long pp_magic;
+> > - *                struct page_pool *pp;
+> > - *                unsigned long _pp_mapping_pad;
+> > - *                unsigned long dma_addr;
+> > - *                atomic_long_t pp_ref_count;
+> > - *        };
+> > - *
+> > - * We mirror the page_pool fields here so the page_pool can access these fields
+> > - * without worrying whether the underlying fields belong to a page or net_iov.
+> > - *
+> > - * The non-net stack fields of struct page are private to the mm stack and must
+> > - * never be mirrored to net_iov.
+> > + * The non-net stack fields of struct page are private to the mm stack
+> > + * and must never be mirrored to net_iov.
+> >   */
+> > -#define NET_IOV_ASSERT_OFFSET(pg, iov)             \
+> > -       static_assert(offsetof(struct page, pg) == \
+> > +#define NET_IOV_ASSERT_OFFSET(desc, iov)                    \
+> > +       static_assert(offsetof(struct netmem_desc, desc) == \
+> >                       offsetof(struct net_iov, iov))
+> > +NET_IOV_ASSERT_OFFSET(_flags, type);
+> 
+> Remove this assertion.
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg5A8sACgkQAVBC80lX
-0Gy5awf/TVPywlTaI7enDzkgErfmCiQkSYcadqY8FSfKDhsuQZK25S2o+9IWu1Wx
-rHxCcEYFFxrPSIPjXmurxEcq/C8qoODSB1YTn4VjoYU/nF2M5Ar5vOOH7vqrobUK
-VFjgNyyygGi7SvPV4PDF4vI3SYn2EaqQw/0av92AhC97gDOUPzOX+9cLW17peegG
-KAmwbchzGlspI3el238rhbg7IpuRycHVDzQ1UK59FGu19RhLUcuY3gP9fytw0eWE
-MMt3LGu/EbIQYxIaR04j38Yy1uGAGwDz7GFRv0SFb70R0gSAkWlxQ4Lvg0f4pvZn
-QGDg+Sw5VHcT84FE3kbKQ1qgrqOTHg==
-=D5jt
------END PGP SIGNATURE-----
+I will.
 
---Sig_/dgk32W/+5/HDY1_RY9Za7rs--
+> 
+> >  NET_IOV_ASSERT_OFFSET(pp_magic, pp_magic);
+> >  NET_IOV_ASSERT_OFFSET(pp, pp);
+> > +NET_IOV_ASSERT_OFFSET(_pp_mapping_pad, owner);
+> 
+> And this one.
+
+I will.
+
+> (_flags, type) and (_pp_mapping_pad, owner) have very different
+> semantics and usage, we should not assert they are not the same
+> offset. However (pp, pp) and (pp_magic,pp_magic) have the same
+> semantics and usage, so we do assert they are at the same offset.
+> 
+> Code is allowed to access __netmem_clear_lsb(netmem)->pp or
+> __netmem_clear_lsb(netmem)->pp_magic without caring what's the
+> underlying memory type because both fields have the same semantics and
+> usage.
+> 
+> Code should *not* assume it can access
+> __netmem_clear_lsb(netmem)->owner or __netmem_clear_lsb(netmem)->type
+> without doing a check whether the underlying memory is
+> page/netmem_desc or net_iov. These fields are only usable for net_iov,
+
+Sounds good.  Thanks.
+
+	Byungchul
+
+> so let's explicitly move them to a different place.
+> 
+> -- 
+> Thanks,
+> Mina
 
