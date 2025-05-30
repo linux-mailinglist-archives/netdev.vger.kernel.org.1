@@ -1,242 +1,131 @@
-Return-Path: <netdev+bounces-194290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DE4AC85E2
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:10:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A447AC85F0
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 03:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D663B5588
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:10:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34E0716467C
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 01:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E40813B58A;
-	Fri, 30 May 2025 01:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6597148850;
+	Fri, 30 May 2025 01:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jRqFkbqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40F410E4;
-	Fri, 30 May 2025 01:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DE3125D6
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 01:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748567417; cv=none; b=FGadZmwXIcvMXtcCPn8dckPs5Q28H1GDAR+08J6PFgg/uASBIkiPKyKO2VJw6vJLX/FG2ptQEVzuBDwWfT0VKmLrhi0Fwns3R/Gxbmp1+o7DDQbrhL0ZH8bqItfvCCqewJ3Rkil73TdkDl8O2bwcpohgBCNa3jBXdP0RKGdFP2o=
+	t=1748567551; cv=none; b=iIqMikOaaP0McF4c6bkMnzCGXZvb4dCxd6L2bHrSe8HDMEVuHSgyD5sNk+Zt7pM9GVNyMQWR+wwPMgKCmStbx2saNXDZk2/jWjdwcw+NbmmYZTcRihYsxPXWam/oOwjorJdGYcPTMB5gmFWBqkKieHr0cOs5A4yuyMvMvAs5KJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748567417; c=relaxed/simple;
-	bh=JTWoZYMV/sBS4/+ns9GwXgeHnkr4jGPNv48ZkJkgXjA=;
+	s=arc-20240116; t=1748567551; c=relaxed/simple;
+	bh=clOYv3dnJ+TShXUkp1L3GsXOXqSgKF+RNbjkUtidq8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MxEMH1ii0S0Aj4ZatvZaenMD7HRa2ZM/HXeI64G02dC8yk/hVoOjul3qzO6yI0EvuqN696ESVNFAPGXdsVzXYNdt9UOflHTqs03kvOmdhFyhPiwoh1SwLXWEDhsdkSkRehox4c7HZpltyGNaGPbG3I/o/vAM6N7HHOGShLrO7nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-eb-6839056f5554
-Date: Fri, 30 May 2025 10:10:02 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [RFC v3 01/18] netmem: introduce struct netmem_desc mirroring
- struct page
-Message-ID: <20250530011002.GA3093@system.software.com>
-References: <20250529031047.7587-1-byungchul@sk.com>
- <20250529031047.7587-2-byungchul@sk.com>
- <CAHS8izNBjkMLbQsP++0r+fbkW2q7gGOdrbmE7gH-=jQUMCgJ1g@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J9fdD//NKw5uHfv9J3dzmbHBG67ZhKsoAoOCp9fn49mmgXmG0Lzk3NueSS3mFvapk6DibgD0vBi3GCfOGosdVz36cAlyh905/8uTW9pMRvuv3Te+j0ZKXjoiLrDa8GKLzyOjT8MypzhxDEc6FwUEVatq2BGCXNWnSqgv3RB8PI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jRqFkbqu; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2301ac32320so15582035ad.1
+        for <netdev@vger.kernel.org>; Thu, 29 May 2025 18:12:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1748567548; x=1749172348; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A3JilLzV2DHootoqEMA3T8iks5XhI6tqHSdU2GxYNKU=;
+        b=jRqFkbquJ3SUsLiMG/rDjtFsTef8mz2stufBWJAJaOIYFKtOrjAq0QTK6nW7lRb21d
+         1WEzTmnFEOwaXHqPOGm58wFX58r0m3FZDCdPzoE3gWLmzS5NE8Iw71DlWaaSwq3Mncf3
+         l+MZclYZ6hLUPFbO94tadaNApnZUkDERstRJY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748567548; x=1749172348;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A3JilLzV2DHootoqEMA3T8iks5XhI6tqHSdU2GxYNKU=;
+        b=t3K/GuR9lbvMxKZbMqwUTYe8zWeLoNuroWCgN+mHT2vI29BMwQN6eCHg3Cg/t824xW
+         IfqftdYH6vMDGVSiQ2yOIsjqIrHN8AWrEN/yJxhQ3//OSfPPFIlI/apSZFkqszvX+fYg
+         lSlnB6ejuwaNz5y9nUY1xaOME4jcx+ZgkOnF7z6haCU/WNBSSw+73aBn9bxAHqJ0aDWw
+         3Cz1okMZ854cZgSZGqYqHBnLbA29Bclf5XDI8vTyHSuM2nfwuZcW9n9OvObWWp5ppl0O
+         0NuDhlrY+0r5AcxOD3L1Jn3IK1rmzi9pXNfvQZS8yO5RKRRR1gTQIgMvjOkJSqR7uOWd
+         GvFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7pXkGAtXMzgdRxPnPQ8D3PuXbDMuLTa7uCb5QnWtBB0rh0ggnu1xOnH4YMc9FFXg0QKgFCak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywcgF1EuIUrQlHKcGJvFa3/9Av86Yt3YYNE6m/5MSTILQQnx+X
+	cnQuN0+oC2zOsVQDT9uaCAwRj9S8hBUA/CX/tUdxFq6GT2FdZXglj/6SzbQnSvgdN+WQUugJKcs
+	xeTwYqd8=
+X-Gm-Gg: ASbGncuYGv6pUJOwK58skp1QTYmDftrOks4WNO511kcBdhnYc+V1e960RTOjuhv0VBo
+	ltiQtWI1mou2/e7CNaIqBKIsyaziYPgsKlryi4RDCBz1wxNOFIlhlMCay6derMpv62TdbIvStyw
+	8Khe1sI55eZBkr1SQjkZ+grZCyWTEMtnPeejkgJc0HHUbpoFWlX4gimE7mssm43oY4CUYZiHtMM
+	ivOfzTAgBOmRm0VZVoqHUDkwAx/AT/cy+/OfXieyWy4ZR7Znzq0oFPPigIT72ne4zP944YEWFSN
+	0H7ctRiq2squgx5Pprok0ELPPXbf2n6ngc376VK53MYcw2F6ONVQFc9c14qL8//sSQ4IwEmldhT
+	tCDbnr95RFgKhFnoMLA==
+X-Google-Smtp-Source: AGHT+IEfiZxx6lbiiXFwfi8oNgiGKbU3wyp4lqiu0NJfRIwH51vrgcK/4RpBMyMXJ6wF+G+lYudcaw==
+X-Received: by 2002:a17:902:f683:b0:234:ba37:87a5 with SMTP id d9443c01a7336-235290e65e2mr20475055ad.25.1748567548437;
+        Thu, 29 May 2025 18:12:28 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bca137sm18118685ad.10.2025.05.29.18.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 May 2025 18:12:28 -0700 (PDT)
+Date: Thu, 29 May 2025 18:12:25 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, John <john.cs.hey@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Bug] "possible deadlock in rtnl_newlink" in Linux kernel v6.13
+Message-ID: <aDkF-Q5K6RhIX5MD@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	John <john.cs.hey@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+References: <CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com>
+ <c9b62eaa-e05e-4958-bbf5-73b1e3c46b33@intel.com>
+ <aDjyua1-GYt8mNa1@LQ3V64L9R2>
+ <20250529171640.54f1ecc6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izNBjkMLbQsP++0r+fbkW2q7gGOdrbmE7gH-=jQUMCgJ1g@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHefZe9jodva7bo5LRouxqGWJHCrUger5kdvkgCtVLvrTlnDEv
-	aRGstJs5u2iSc8Yq71mLZTqtpJaYYmooxeyislQIynCapXZziuS3H+f8z/mdD4ejFLcZX06t
-	TRZ1WkGjZGW07KvXrfWJTKhqY/3vUDBZqli4+zMNyvpsDJgqaxCMjr+XwkjjSxbu3BqjwNSR
-	ScN3ywQFA01OKfSWDtLw5HwtBc7LzSwYMicpOGMrl8DrmhwG8iZKKKjV90mhq97EQk/VXwYG
-	7QYaWowVNPTmRECTeRGMtX5B0GiplcBYdhELuZ1mFj5l9iLofOGkofB0DgJLg4OByZ8mNmIZ
-	qa7olpA640cpMVtTyMPyNSTL0UkRa+VFllhd16Tkw9snLGm+MUmTOtuIhBgyhlgyPPCOJt8a
-	3rDEUv2GJq/MjVIyYvWP4mNkW+NEjTpV1G0IOyRTvejQHrOtSmt53kbp0We/LOTBYT4YXyqw
-	U7Pc1vOUdjPNr8Alj/Klbmb5AOxwjE9nFvCrcXHDVcbNFN/L4HbTUTfP56Nx+b0miZvl/Gbs
-	KrRN5WWcgi9F2Pp5QjrT8MYtBf30zHAA/nWzcyrETbEfLvvDzZSX4oxHhdMuD34Ptrqyp10L
-	+eX4Wc1LiXsn5m0cLmqfRDNH++Dn5Q76CvI2zlEY5yiM/xXGOQozoiuRQq1NTRDUmuBAVbpW
-	nRZ4ODHBiqY+p/TUr1gbcr3eZ0c8h5Re8o1hoFIwQmpSeoIdYY5SLpCfCQ9RKeRxQvoJUZd4
-	UJeiEZPsyI+jlYvlm8aOxyn4I0KyGC+Kx0TdbFfCefjq0bb761KcOdcHi5/GdwVt8onJ3am3
-	eD+uDzKEh+tlkRmyisie5A5yLcu//lxzyKK84bVOWXdU06Et6q2Bu5O9YrdUMuNn8+t+1HSz
-	e1dFR/kSLni0df+urnzPofuaEGHljowHrnPD/T0+88RtIYFhQtHJt8uN1Z4HLhicPkdCfbcv
-	UdJJKiFoDaVLEv4BTbFk7DUDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUzMcRzHfX9P9+t0/FzJV9lsZ6SM0jx80Oif+M0wxjCz1eHHna7L7up2
-	sSwVpnVXyYxfl46USpydHq6WxpXUUFZK5SFKxmah0no4D13N9N9rn/f78/r882FJ+Vnal1Vr
-	YwWdVqlRMFJKumND8vIYep0q+J55CVhsJQzcHjHCrfcOGizF5QiGRl9LYLDuCQN514dJsDSn
-	UPDTNkZCX32PBLoLPlFQfb6ChJ70BgZMKeMkJDkKCajNaaThRbmZhktj+SRUJL6XQGuVhYF3
-	JX9o+OQ0UdAoFlHQbQ6DeqsPDD/9iqDOVkHAcFoOA1ktVgZ6U7oRtNT2UJB9xozAVtNBw/iI
-	hQlT8KVFnQRfKb6V8FZ7HH+/MJBP7WgheXvxBYa3D1yU8G/aqxm+4co4xVc6BgnelNzP8D/6
-	uij+W00bw+d9/k7wttI2in9mrZPsnHNAGnpE0KgNgi5oY6RUVdusPeFYamx89JxMRF/8UpEH
-	i7lV+Pm7B5SbKW4xzi+7LHEzw/njjo5R0s3eXAC+WZNJu5nkumncZDnuZi9uPy68U0+4Wcat
-	xQPZjom+lJVzBQjbv4xJpoI5uPHqR2pq2R+7rrVMlNgJ9sO3frNT44U4uSx78pYHtwvbB9Im
-	b83lFuGH5U+IDDRLnGYSp5nE/yZxmsmKqGLkrdYaopVqzeoV+ihVvFZtXHE4JtqOJp6jIMGV
-	6UBDrVuciGORwlMG4aCS00qDPj7aiTBLKrxlSZvWqOSyI8r4k4IuJkIXpxH0TuTHUop5sq37
-	hEg5d0wZK0QJwglB9y8lWA/fRBTR1Ls399eCsLejLmUT2fU4tdaQn5Lt5/XhXHq7cdjHvnQr
-	cWNPVnjn7uvHjVnr++9eFtWmbbnkK2f9o7iEgwtjc+dXJfzyDNpzNNi8rqgrLvNQqKs4ZM3m
-	GZtnhseHzY7WZVTKxaFFP1+K27FnW1p6yLaADZq1rlLDjGWnvKpMp6MUlF6lXBlI6vTKvx4l
-	hL8YAwAA
-X-CFilter-Loop: Reflected
+In-Reply-To: <20250529171640.54f1ecc6@kernel.org>
 
-On Thu, May 29, 2025 at 09:31:40AM -0700, Mina Almasry wrote:
-> On Wed, May 28, 2025 at 8:11 PM Byungchul Park <byungchul@sk.com> wrote:
-> >  struct net_iov {
-> > -       enum net_iov_type type;
-> > -       unsigned long pp_magic;
-> > -       struct page_pool *pp;
-> > -       struct net_iov_area *owner;
-> > -       unsigned long dma_addr;
-> > -       atomic_long_t pp_ref_count;
-> > +       union {
-> > +               struct netmem_desc desc;
+On Thu, May 29, 2025 at 05:16:40PM -0700, Jakub Kicinski wrote:
+> On Thu, 29 May 2025 16:50:17 -0700 Joe Damato wrote:
+> > @@ -1262,6 +1258,11 @@ static void e1000_remove(struct pci_dev *pdev)
+> >         bool disable_dev;
+> > 
+> >         e1000_down_and_stop(adapter);
 > > +
-> > +               /* XXX: The following part should be removed once all
-> > +                * the references to them are converted so as to be
-> > +                * accessed via netmem_desc e.g. niov->desc.pp instead
-> > +                * of niov->pp.
-> > +                *
-> > +                * Plus, once struct netmem_desc has it own instance
-> > +                * from slab, network's fields of the following can be
-> > +                * moved out of struct netmem_desc like:
-> > +                *
-> > +                *    struct net_iov {
-> > +                *       struct netmem_desc desc;
-> > +                *       struct net_iov_area *owner;
-> > +                *       ...
-> > +                *    };
-> > +                */
+> > +       /* Only kill reset task if adapter is not resetting */
+> > +       if (!test_bit(__E1000_RESETTING, &adapter->flags))
+> > +               cancel_work_sync(&adapter->reset_task);
+> > +
+> >         e1000_release_manageability(adapter);
+> > 
+> >         unregister_netdev(netdev);
 > 
-> We do not need to wait until netmem_desc has its own instance from
-> slab to move the net_iov-specific fields out of netmem_desc. We can do
-> that now, because there are no size restrictions on net_iov.
+> LGTM, FWIW.
+> For extra points you can move it after the unregister_netdev(),
+> the existing code cancels the work but netdev may still be up
+> and kick it back in..
 
-Got it.  Thanks for explanation.
+Good idea, thanks.
 
-> So, I recommend change this to:
-> 
-> struct net_iov {
->   /* Union for anonymous aliasing: */
->   union {
->     struct netmem_desc desc;
->     struct {
->        unsigned long _flags;
->        unsigned long pp_magic;
->        struct page_pool *pp;
->        unsigned long _pp_mapping_pad;
->        unsigned long dma_addr;
->        atomic_long_t pp_ref_count;
->     };
->     struct net_iov_area *owner;
->     enum net_iov_type type;
-> };
-
-Do you mean?
-
-  struct net_iov {
-    /* Union for anonymous aliasing: */
-    union {
-      struct netmem_desc desc;
-      struct {
-         unsigned long _flags;
-         unsigned long pp_magic;
-         struct page_pool *pp;
-         unsigned long _pp_mapping_pad;
-         unsigned long dma_addr;
-         atomic_long_t pp_ref_count;
-      };
-    };
-    struct net_iov_area *owner;
-    enum net_iov_type type;
-  };
-
-Right?  If so, I will.
-
-> >  struct net_iov_area {
-> > @@ -48,27 +110,22 @@ struct net_iov_area {
-> >         unsigned long base_virtual;
-> >  };
-> >
-> > -/* These fields in struct page are used by the page_pool and net stack:
-> > +/* net_iov is union'ed with struct netmem_desc mirroring struct page, so
-> > + * the page_pool can access these fields without worrying whether the
-> > + * underlying fields are accessed via netmem_desc or directly via
-> > + * net_iov, until all the references to them are converted so as to be
-> > + * accessed via netmem_desc e.g. niov->desc.pp instead of niov->pp.
-> >   *
-> > - *        struct {
-> > - *                unsigned long pp_magic;
-> > - *                struct page_pool *pp;
-> > - *                unsigned long _pp_mapping_pad;
-> > - *                unsigned long dma_addr;
-> > - *                atomic_long_t pp_ref_count;
-> > - *        };
-> > - *
-> > - * We mirror the page_pool fields here so the page_pool can access these fields
-> > - * without worrying whether the underlying fields belong to a page or net_iov.
-> > - *
-> > - * The non-net stack fields of struct page are private to the mm stack and must
-> > - * never be mirrored to net_iov.
-> > + * The non-net stack fields of struct page are private to the mm stack
-> > + * and must never be mirrored to net_iov.
-> >   */
-> > -#define NET_IOV_ASSERT_OFFSET(pg, iov)             \
-> > -       static_assert(offsetof(struct page, pg) == \
-> > +#define NET_IOV_ASSERT_OFFSET(desc, iov)                    \
-> > +       static_assert(offsetof(struct netmem_desc, desc) == \
-> >                       offsetof(struct net_iov, iov))
-> > +NET_IOV_ASSERT_OFFSET(_flags, type);
-> 
-> Remove this assertion.
-
-I will.
-
-> 
-> >  NET_IOV_ASSERT_OFFSET(pp_magic, pp_magic);
-> >  NET_IOV_ASSERT_OFFSET(pp, pp);
-> > +NET_IOV_ASSERT_OFFSET(_pp_mapping_pad, owner);
-> 
-> And this one.
-
-I will.
-
-> (_flags, type) and (_pp_mapping_pad, owner) have very different
-> semantics and usage, we should not assert they are not the same
-> offset. However (pp, pp) and (pp_magic,pp_magic) have the same
-> semantics and usage, so we do assert they are at the same offset.
-> 
-> Code is allowed to access __netmem_clear_lsb(netmem)->pp or
-> __netmem_clear_lsb(netmem)->pp_magic without caring what's the
-> underlying memory type because both fields have the same semantics and
-> usage.
-> 
-> Code should *not* assume it can access
-> __netmem_clear_lsb(netmem)->owner or __netmem_clear_lsb(netmem)->type
-> without doing a check whether the underlying memory is
-> page/netmem_desc or net_iov. These fields are only usable for net_iov,
-
-Sounds good.  Thanks.
-
-	Byungchul
-
-> so let's explicitly move them to a different place.
-> 
-> -- 
-> Thanks,
-> Mina
+I'll post something to the list, but I don't have a reproducer to
+test. I'm a noob with syzbot, but maybe there's a way to trigger it
+to re-run with a posted patch?
 
