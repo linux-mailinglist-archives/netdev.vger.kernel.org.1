@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-194283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A20CAC859B
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:16:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B7CAC85B2
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 02:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 834EB3A5BF4
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:16:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EAD97B14FC
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 00:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54259635;
-	Fri, 30 May 2025 00:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41C7AD5E;
+	Fri, 30 May 2025 00:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqyHFQYD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+n7t5zf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295D5184;
-	Fri, 30 May 2025 00:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EC979D2;
+	Fri, 30 May 2025 00:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748564203; cv=none; b=VAus7Y+X7MHqjN6hNJWShToGEUSZEe4l10jlzxLdw7ExHjcEQEy+fbOvHI80SdNqzXfd7siMK4UvldK9I3IBRvW7O01aQETyDYUcnr4N5WLttabJxfOZ6YhnAT1yGKOYl3gCC0RzxzN7sSBBnnA/r3IUpYPXHptDhNO7FRRjiBs=
+	t=1748565195; cv=none; b=IK/QdTWvLtvaBpVaPEwgl3ePN0Wq3LSFZefGE5Y081+UeNusnh1oS3/BGlRhv9ETT1kAHUOXBWMw553OdafnhmPIfNaD4m1ChmxImVqRSvv3e2GuKMXDUSJAzzo/65R14JPjc3nKOTRpJbj1k7y6s3T7P0qvNey1bXZ3VtLBx/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748564203; c=relaxed/simple;
-	bh=moLDOQjJyL3fO6Wf/7ZQqvgVhiJmnI73vJU9DS5AoYc=;
+	s=arc-20240116; t=1748565195; c=relaxed/simple;
+	bh=NQvdTxmbBmPADvv5Bbcr1DYjCqG9xYmrWl2KDuQ7cd4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sILEJIh4mXrvw0gnTaZmNB63oA/wNC+0+0Pp3HEG61F5uuVIKqPHkrr4hb1ZI+5vcdxbwRLVUI7nfWHvBnONBMOOvTsljL19UrAgxeB/kN/M1JfHuTZDEE8yuGo328oNt9dEgFYtfkx3c61gNhBL3s7+10FK6HNozcubUEAaFEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqyHFQYD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC94C4CEEB;
-	Fri, 30 May 2025 00:16:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OpUqtY5ZZj5unTwLG0cavv383IsYldTxd8MZSYKLP6wG2Btc5Kv9CnHqenaka3cNfVgDzOED9jVxelv8oZL4EU7ec9ZoRjiZvsKdlXYdZrGM0llF9/bBE5TNWzgMngQ+eBa6rUxSKtgG+7Isy4bPDGFn/BJqQcE6/oGnJmHO2Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+n7t5zf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC2BC4CEE7;
+	Fri, 30 May 2025 00:33:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748564201;
-	bh=moLDOQjJyL3fO6Wf/7ZQqvgVhiJmnI73vJU9DS5AoYc=;
+	s=k20201202; t=1748565194;
+	bh=NQvdTxmbBmPADvv5Bbcr1DYjCqG9xYmrWl2KDuQ7cd4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lqyHFQYDTZ7+9f/9Qak7jwdvVIOTiQx52AYvic/dq3DiEK8ZvKaqWmDJa2Wd3qpM1
-	 SwI/mKZOYqgJb2Qx6mZhMKa0/3+VLmvvo3+9tZAGulX4OrN7fMgm91nlqPwlfG8EqN
-	 /LwwBFoAi93qp8OtEjwGzBvnVn26MBVooVyQ/8MG7b14GNSSLf9jYkuw/hoYDd4HKq
-	 A8k7yobtEII9etheV72fIPR86rwlQ35EkLnR7AqDyh7HxBBDjp8t2kwMvkZuxy/6nt
-	 bMc4nyUnV3lCRyL6XblIfNzIAtUIknnH1thJMeDV891N7JApiUwiUCDFn6I8s8h6cV
-	 zp6Mo4GI/rSQg==
-Date: Thu, 29 May 2025 17:16:40 -0700
+	b=E+n7t5zfIFrF1CjovLBdfycoxonkpvmWIN0L7aYqj25oaLSpUpaYTviCLiAh2pE/6
+	 S4h8xcxxOf95sbBmUGh5dJzDId6h3o4t9EalM9eCBCqV7q7nf/Jh+SqJNhUXHoleEc
+	 L6wmVYboycw+cVdrv94ihOoltdFrMRaMSoEiA7CXZ2Ydsnu2+ARz4eSIs7aRs1jvVP
+	 OD4ndEQ3ryL/7KldvqM3YFgyvFbZpmvEuRHRXDULSm8gdPI7igggoLKyCObYmylMaa
+	 CryyCHOL1DdOUdU0GZmWjkniRReeDHu3cMn7KszmDGwxF1JVZc6Cxtbb6NV9wbhy3d
+	 hzLAAfCVfMwbw==
+Date: Thu, 29 May 2025 17:33:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, John <john.cs.hey@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Bug] "possible deadlock in rtnl_newlink" in Linux kernel v6.13
-Message-ID: <20250529171640.54f1ecc6@kernel.org>
-In-Reply-To: <aDjyua1-GYt8mNa1@LQ3V64L9R2>
-References: <CAP=Rh=OEsn4y_2LvkO3UtDWurKcGPnZ_NPSXK=FbgygNXL37Sw@mail.gmail.com>
-	<c9b62eaa-e05e-4958-bbf5-73b1e3c46b33@intel.com>
-	<aDjyua1-GYt8mNa1@LQ3V64L9R2>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
+ jiri@resnulli.us, anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, aleksandr.loktionov@intel.com,
+ milena.olech@intel.com, corbet@lwn.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v4 1/3] dpll: add phase-offset-monitor feature
+ to netlink spec
+Message-ID: <20250529173311.15fcff9b@kernel.org>
+In-Reply-To: <20250523154224.1510987-2-arkadiusz.kubalewski@intel.com>
+References: <20250523154224.1510987-1-arkadiusz.kubalewski@intel.com>
+	<20250523154224.1510987-2-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,22 +66,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 29 May 2025 16:50:17 -0700 Joe Damato wrote:
-> @@ -1262,6 +1258,11 @@ static void e1000_remove(struct pci_dev *pdev)
->         bool disable_dev;
-> 
->         e1000_down_and_stop(adapter);
-> +
-> +       /* Only kill reset task if adapter is not resetting */
-> +       if (!test_bit(__E1000_RESETTING, &adapter->flags))
-> +               cancel_work_sync(&adapter->reset_task);
-> +
->         e1000_release_manageability(adapter);
-> 
->         unregister_netdev(netdev);
+On Fri, 23 May 2025 17:42:22 +0200 Arkadiusz Kubalewski wrote:
+> +Phase offset measurement is typically performed against the current active
+> +source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
+> +the capability to monitor phase offsets across all available inputs.
+> +The attribute and current feature state shall be included in the response
+> +message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL devices.
+> +In such cases, users can also control the feature using the
+> +``DPLL_CMD_DEVICE_SET`` command by setting the ``enum dpll_feature_state``
+> +values for the attribute.
 
-LGTM, FWIW.
-For extra points you can move it after the unregister_netdev(),
-the existing code cancels the work but netdev may still be up
-and kick it back in..
+Since we're waiting for the merge window to be over - could you mention
+the attribute the PHASE_OFFSET comes out as? DPLL_A_PIN_PHASE_OFFSET ?
+
+BTW I noticed that in the YAML spec, in a comment we say
+DPLL_A_PHASE_OFFSET a couple of times, missing the _PIN.
 
