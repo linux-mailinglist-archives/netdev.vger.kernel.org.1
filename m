@@ -1,162 +1,163 @@
-Return-Path: <netdev+bounces-194420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD8BAC95FB
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:14:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8BFAC9631
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 21:45:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B3CF504F6F
-	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E230AA22782
+	for <lists+netdev@lfdr.de>; Fri, 30 May 2025 19:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A354278768;
-	Fri, 30 May 2025 19:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB56281520;
+	Fri, 30 May 2025 19:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DIGW7bet"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="w9k/DXk8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD0C23E35B;
-	Fri, 30 May 2025 19:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A822820A3
+	for <netdev@vger.kernel.org>; Fri, 30 May 2025 19:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748632494; cv=none; b=TiwJPyQHFKJZTsKMA5b6ThE/1uUDZYUDVBdUslUPt0FNMBlV4SJ9mtrciabKoxtI+lZQuQkpEx2PYJqMJo32ixTCoNK2Pxj2pv4dbUx2Mo6T1RxO9yMhIlvdSZXfg7WcvjAUz8pTmiaZUUV9A7Vy7PKeYVtXkqrgq7eumrR4PN4=
+	t=1748634319; cv=none; b=Dj+fTpPsMxD2XHV7iwyPC9q+SSmJSldZ+AWJdpPH2Hnwj5Q53pDeERS498y892AtsOrN0prPJtvec0wt0RLOIk9lWfjCqtqsK8QYnh6opnx7JjQ/1VoursaI3Y0qPHDWi3SEHeRd+pkjScAMNDGAoYVI1Xeu+p46Kz5i0l99+VY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748632494; c=relaxed/simple;
-	bh=o94uNCWV71Npa/D7DFRsizf1ZwcH4B1mlc/EOztA0Kw=;
+	s=arc-20240116; t=1748634319; c=relaxed/simple;
+	bh=EeaHwLJP1b7aP+52eOMG2kzLLIkpJvV79sAdphPmorA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h6LpffOtx/qZ8FWjRQyY+b5trOY51FPuTf0eyDuuxGbyx+hu5vhFJxqNWHjuwh5aL/Pv4bUkmNDgjSUCP1dAiaplwklv/XTDdJUdoVfgOlPZ9iIJn6XmqNXYun0M/viUClDw9ApbaPCbPVfBaI0EYPZ76hIvekcTrReibH1Syd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DIGW7bet; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748632493; x=1780168493;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=o94uNCWV71Npa/D7DFRsizf1ZwcH4B1mlc/EOztA0Kw=;
-  b=DIGW7betdw4A7LfDhL/nZ09cFVNkcL3zzyxQv6c0eaho2zAMwdbjvV41
-   jpWx87BBaIXP4ON9hnj3FPhlNc3jxYDjXCWPLbQyDsrvxe9hL4Ia8eCVn
-   Ao8NKm8zC4ZIv4qwgVUe7f77kKO+VZ2CnUhV+73IrfROMM6o9mzcGutG/
-   nEHndllsdpCIscCl2duuPtU9EdQaEmkFnf7DQUDToYQlLdUsQBwGxq3RM
-   DeF6YI/94uWGLFKmjaIdiOpSjHKFo89H5TB6ZHnSjcU9lPckqWA6YYXIA
-   a7zOVOINoyBCd65xKAZHr52ke4McGizgkTZQaqJhWCbwFrpg+p3hzsVUZ
-   g==;
-X-CSE-ConnectionGUID: i/ug7soHTxmnwREaFCyxcA==
-X-CSE-MsgGUID: du7oQRH6RJym+M7YAgcjPg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11449"; a="60991991"
-X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
-   d="scan'208";a="60991991"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 12:14:53 -0700
-X-CSE-ConnectionGUID: eS2mBj5fQZS6qe3p2T0onQ==
-X-CSE-MsgGUID: y9qpQ4EUTiiGK7G8smW0bg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,196,1744095600"; 
-   d="scan'208";a="147843228"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 30 May 2025 12:14:50 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uL5Bm-000Xtw-2y;
-	Fri, 30 May 2025 19:14:46 +0000
-Date: Sat, 31 May 2025 03:14:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: =?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	jonas.gorski@gmail.com, florian.fainelli@broadcom.com,
-	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev,
-	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>
-Subject: Re: [PATCH] net: dsa: b53: support legacy FCS tags
-Message-ID: <202505310308.8veTfz2G-lkp@intel.com>
-References: <20250530155618.273567-4-noltari@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O3q1JIQl88K/pj3z00US+lo9YEnkmIO0GWKfZgPuKtZf0+joqa6mQ8Wnk0IturPvyjh3MUKKl3CO0BrN2IIL5EnEPG9jNWu2D9zTmNdqCC1gl7kw7MTFDSyER7nbVO7jdFbv7ybGrJRqa/yjh4e5BHSqGqqWgmu8LyDXzMx7wpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=w9k/DXk8; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22e09f57ed4so32163895ad.0
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 12:45:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1748634317; x=1749239117; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Lb9gK19lVJostbWgjUDtmKKqX07Lhy5W7Dpk4jXPzU=;
+        b=w9k/DXk8vhEH9jbsDTSchcwbOWLXEUOympSaBegMXXmm2u/pzD8CsXjnwLIKDmiVWH
+         aMXTv516zXtDK0mwxU7phZdzIuYJ6K99eTLAVy+xByKQfy/wcDoBnuMaD7Qt+k2WR0RE
+         7TkKT1JmiqDGKhIllzYw++xg5NIhjqjJ5zsck=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748634317; x=1749239117;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Lb9gK19lVJostbWgjUDtmKKqX07Lhy5W7Dpk4jXPzU=;
+        b=gKhVmBCicym9WqYfoNlVtdgCzt3b7fj9SUoEdCzSKep2JrDIn5hKcPgkF0/78Qdter
+         fgXl1Pb/NvkdPcGfIqr+OgX9eMg0l12AuSKEEl4cdn/J3zO225yYhlV4a1abxmrFKUlm
+         RGj0Sx6BEI03FRvV/BdFAXAvibu3zJefx7DDmeonGYp4nen08wGp2g7WUa1P8NjTOHtv
+         lMN3Dw9nDaDYl/TUiB7wUjKbcA4NnO0rZD8g0/dHzFu4wz2iKCh4Gb41a6LDIHIqCmyc
+         cwFCcHIUbjQtg4ThFCxGm5TJaLNS7XZrn1Lh6OvI/fMnsqtR7cK0HNkCzmGmLkao10P3
+         n6Xg==
+X-Gm-Message-State: AOJu0YwCEVVh7o0NWwPAc1dfqkwXIxJF1W1Jr3nDciX9LIClUOqxIVt0
+	67apwJOh6nAuE42u0wlf3o+SsbAkyPbMKlSod9bEtYExXdaD0QpoM5MMyBejOtA9AQg=
+X-Gm-Gg: ASbGnctQuvPTaJrGmeFSLE8Tvq/UCxMuTeUYYimHga7rDp7kYEd5cGPvsaVg1Ih/+0y
+	YkB86D/mAHu7AWyWSGYgplCsOC0aMrtHGJ94twnmENe5yeR1kS9OF2NiL3HsMZlQTMsj9LKKTpv
+	QbBMiQQ3qvw5u2/J3QojpNDGjtF4VbHk+gyet219W8aNfiqKpwlMqQqFnAsvLWcMvV5kZ8YD+sg
+	nUK0SEqYbmAuZupL+mztY8cfCCwi6h2klLvQkmzzV5mGHVPbim2f6Cjgq3BhN0WCVhcaIOKp196
+	JE0I3thHIUINLkn8/+ZTsljWUNQODWx1CtssUAtMhpAja+QrXs3tDN8E7WP+fpzyQuhGWHK2oJh
+	PW3QSXgr1mZheHp0rTBHUBFOYIv5Y
+X-Google-Smtp-Source: AGHT+IHYTayKgzes3pjEfxOEGOjuYQP5EzWW8jYaSd2BCsF4cWtCCGGULvjBHzBwuqDa1X7eSLYeOw==
+X-Received: by 2002:a17:903:1a68:b0:234:6b1f:6356 with SMTP id d9443c01a7336-234f6a1eab0mr135626485ad.22.1748634316752;
+        Fri, 30 May 2025 12:45:16 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cd7602sm32040845ad.109.2025.05.30.12.45.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 May 2025 12:45:16 -0700 (PDT)
+Date: Fri, 30 May 2025 12:45:13 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, john.cs.hey@gmail.com,
+	jacob.e.keller@intel.com,
+	syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH iwl-net] e1000: Move cancel_work_sync to avoid deadlock
+Message-ID: <aDoKyVE7_hVENi4O@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
+	kuba@kernel.org, john.cs.hey@gmail.com, jacob.e.keller@intel.com,
+	syzbot+846bb38dc67fe62cc733@syzkaller.appspotmail.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250530014949.215112-1-jdamato@fastly.com>
+ <aDnJsSb-DNBJPNUM@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250530155618.273567-4-noltari@gmail.com>
+In-Reply-To: <aDnJsSb-DNBJPNUM@mini-arch>
 
-Hi Álvaro,
+On Fri, May 30, 2025 at 08:07:29AM -0700, Stanislav Fomichev wrote:
+> On 05/30, Joe Damato wrote:
+> > Previously, e1000_down called cancel_work_sync for the e1000 reset task
+> > (via e1000_down_and_stop), which takes RTNL.
+> > 
+> > As reported by users and syzbot, a deadlock is possible due to lock
+> > inversion in the following scenario:
+> > 
+> > CPU 0:
+> >   - RTNL is held
+> >   - e1000_close
+> >   - e1000_down
+> >   - cancel_work_sync (takes the work queue mutex)
+> >   - e1000_reset_task
+> > 
+> > CPU 1:
+> >   - process_one_work (takes the work queue mutex)
+> >   - e1000_reset_task (takes RTNL)
+> 
+> nit: as Jakub mentioned in another thread, it seems more about the
+> flush_work waiting for the reset_task to complete rather than
+> wq mutexes (which are fake)?
 
-kernel test robot noticed the following build errors:
+Hm, I probably misunderstood something. Also, not sure what you
+meant by the wq mutexes being fake?
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.15 next-20250530]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+My understanding (which is prob wrong) from the syzbot and user
+report was that the order of wq mutex and rtnl are inverted in the
+two paths, which can cause a deadlock if both paths run.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/lvaro-Fern-ndez-Rojas/net-dsa-b53-support-legacy-FCS-tags/20250530-235844
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250530155618.273567-4-noltari%40gmail.com
-patch subject: [PATCH] net: dsa: b53: support legacy FCS tags
-config: sparc-randconfig-001-20250531 (https://download.01.org/0day-ci/archive/20250531/202505310308.8veTfz2G-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250531/202505310308.8veTfz2G-lkp@intel.com/reproduce)
+In the case you describe below, wouldn't cpu0's __flush_work
+eventually finish, releasing RTNL, and allowing CPU 1 to proceed? It
+seemed to me that the only way for deadlock to happen was with the
+inversion described above -- but I'm probably missing something.
+ 
+> CPU 0:
+>   - RTNL is held
+>   - e1000_close
+>   - e1000_down
+>   - cancel_work_sync
+>   - __flush_work
+>   - <wait here for the reset_task to finish>
+> 
+> CPU 1:
+>   - process_one_work
+>   - e1000_reset_task (takes RTNL)
+>   - <but cpu 0 already holds rtnl>
+> 
+> The fix looks good!
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505310308.8veTfz2G-lkp@intel.com/
+Thanks for taking a look.
 
-All errors (new ones prefixed by >>):
-
-   drivers/net/dsa/b53/b53_common.c: In function 'b53_get_tag_protocol':
->> drivers/net/dsa/b53/b53_common.c:2267:23: error: 'DSA_TAG_PROTO_BRCM_LEGACY_FCS' undeclared (first use in this function); did you mean 'DSA_TAG_PROTO_BRCM_LEGACY'?
-      dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
-                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                          DSA_TAG_PROTO_BRCM_LEGACY
-   drivers/net/dsa/b53/b53_common.c:2267:23: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +2267 drivers/net/dsa/b53/b53_common.c
-
-  2254	
-  2255	enum dsa_tag_protocol b53_get_tag_protocol(struct dsa_switch *ds, int port,
-  2256						   enum dsa_tag_protocol mprot)
-  2257	{
-  2258		struct b53_device *dev = ds->priv;
-  2259	
-  2260		if (!b53_can_enable_brcm_tags(ds, port, mprot)) {
-  2261			dev->tag_protocol = DSA_TAG_PROTO_NONE;
-  2262			goto out;
-  2263		}
-  2264	
-  2265		/* Older models require different 6 byte tags */
-  2266		if (is5325(dev) || is5365(dev)) {
-> 2267			dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
-  2268			goto out;
-  2269		} else if (is63xx(dev)) {
-  2270			dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY;
-  2271			goto out;
-  2272		}
-  2273	
-  2274		/* Broadcom BCM58xx chips have a flow accelerator on Port 8
-  2275		 * which requires us to use the prepended Broadcom tag type
-  2276		 */
-  2277		if (dev->chip_id == BCM58XX_DEVICE_ID && port == B53_CPU_PORT) {
-  2278			dev->tag_protocol = DSA_TAG_PROTO_BRCM_PREPEND;
-  2279			goto out;
-  2280		}
-  2281	
-  2282		dev->tag_protocol = DSA_TAG_PROTO_BRCM;
-  2283	out:
-  2284		return dev->tag_protocol;
-  2285	}
-  2286	EXPORT_SYMBOL(b53_get_tag_protocol);
-  2287	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
