@@ -1,138 +1,191 @@
-Return-Path: <netdev+bounces-194478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA06BAC9A23
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:52:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4224CAC9A34
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 11:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87EE1BA22B7
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B6644A5788
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 09:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8E0237162;
-	Sat, 31 May 2025 08:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AE9235BF3;
+	Sat, 31 May 2025 09:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfGgbmJX"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="BG2WZ1dD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B16F20F081;
-	Sat, 31 May 2025 08:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D581E519;
+	Sat, 31 May 2025 09:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748681528; cv=none; b=fB8NVB7wjKfDRAf7imm7S/RP+z/BOb4w7EScoe2v+4eBvVt5NIW1qDgvxF3B0Ke7lwcRhTIZTHszaa7SMznCEAnkr+WL0te99ZKaaaN0NP/uiB+xb6SDIsBPvEiB76j14baH/okzaT91yL7Galvc8tvAOX6k/WD2/DHQlum+8dU=
+	t=1748683009; cv=none; b=K5nff6htzvSl3H2PilN71OxsDyxIAuDo8GjGZOcu0gn23nnC+vIRfp0+gM82C7j04NeI42uLDZ5L+LQQWHzDV+s/Vwn49zOJvBtnYHKj3MP61341GD4s7du2jbL1arYdrevkUFJmNchkOapntzraY3kJDXKsAdslros7IZHCtRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748681528; c=relaxed/simple;
-	bh=REe60zlbqeu01BOJVePubuQZLx8kofDHdn8NxkEDkks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vblc3wbrUEjjHjqzV0r1WzwN+Y04r5kHgA7p1rpgEGfALyDD48/6jV5Myyh12mZ2vckt07UartyglysDrMVQ9vsSW/SIDfUHdTRTLkMvzULWzmcviqeaybNt3KzaEZ+JAhDBiMBENdYcXg7EORI2DSuOecixdJpJe8UnhPo9vwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfGgbmJX; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-747abb3cd0bso2271810b3a.1;
-        Sat, 31 May 2025 01:52:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748681526; x=1749286326; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=REe60zlbqeu01BOJVePubuQZLx8kofDHdn8NxkEDkks=;
-        b=OfGgbmJXuMm78Aj4iSx6+p9leW+M+/20Imo7fyu9h5grrRJQGMyvrSu27mzEPEeJvI
-         VaC1+o3Yxu8JAA3GK2DDXcAC7Yb6NsvikX+krkuFi1a/vmXs4U0YlOJhO2z2vjVbIOtk
-         DBTpCMqE+DzNIWOYC5/5whoK5SFkcFuYDZVqYCwbpw6Yce1WJpG6o+verNUaXTE9nz33
-         3ShA0cfM4XqNyKbAC7cJc9tFPA8O90kT0tXoclQkFSH9XTEFFpWnnwDYV0ag78gYQ5BS
-         EghIYqx7y+J8dNBj4bRTlH+PxXMlACtzn/KOXBOvBqsL37JmlvyGHTpyo7vhSlu1xyLw
-         gP1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748681526; x=1749286326;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=REe60zlbqeu01BOJVePubuQZLx8kofDHdn8NxkEDkks=;
-        b=iJvlp402iaAbL+80dN4DcdB+Zh3EA2A7KQP6lFqqkBClhqWG85/whBGgexqyrp4Br4
-         I5Ndy6EpkxAFI9IpQauggCUdoetyb6JTIMxVbJJDQhdbv1vu4/bbquDf04ST8pby2rXu
-         6fy8PrjyjD+qGDWc1jZ+Efr1ASkNiDa3FIWAsasj+fSyUSynePvKoHWDTEx5S4zt+jyF
-         VkqWoUp+WYC5zePNVQgedWVGroXUIL8c8anLEx/KjOWMH5XKoFG1RRwqEOjbH2/qbmkZ
-         Yv1MQzKNoUsjXwbtkcGD3WsDrQZSAoX3T3gZNcTcyJPnwcLk1Q9lAZ0usa89I+byuMQm
-         D0mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKpWehzOVBvFXctH/1P+wU/oTGWz52v2QNhdR7ecT3uwlmo4kEC1x4JLju7JilWP9yYY8=@vger.kernel.org, AJvYcCVsgL/LP2e6Cj3eaKEo8IEBOMirbOgg/hkkpLk3S8RoZqhYyLUpHJZ+2uMxao3ZkMrvQnn9Vbhe0/4MYoRJ@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywt73fvdcFU73J7YW2qQwRucRFBBSaDAyrFmcGdBj5jT/PHitHR
-	PWbnHGZzVBPu76pVrDOXVGQzalCrYk5LotzbgKQEb/cT6bIgTah96JYH
-X-Gm-Gg: ASbGnctsX+3POIXwDxLtWP552ax8BTj54CDhc7DvUVvLNCU8LLRxvZCu33WYUOptsq8
-	YOSXBx5Z6bc3nC5XmKM8HbEEmaLqUOtqZlJt+qUzXKDMbt+HWG3yX2IWGsj4Eu2UCNUr5VfKGmL
-	k3X7ekkl9D0J8ZLF1f2dlNi20f/gU4tPXE9YdYm0BJIp27FMM4P3J4ygpj5+f2mNe+0tVhDIHd2
-	tuWJWAHnBiHWf1MFJqLEtsviMkLwOwazJyaPL3x5Md9K75ZwGnEh/JSc9qPgq8EDL+zXOrHFXtV
-	SfNCqz09hDLr33FhP4b2841CeelhenzPYsc5g011PnbH7xMAv+RfR3KTtkS2tSMjrkvR3ObDbE4
-	t721rVXI9FZ4JmH8/+y03nqGG/AThdzbwYDcnZslb
-X-Google-Smtp-Source: AGHT+IFrK8g6/dGJ+qH8DK2puY7/mPl63dYSmPTZk3WE+0FNPHkZ94c11mvWpcO4rQ5k5aBxw+s1VQ==
-X-Received: by 2002:a17:903:1a0b:b0:234:71c1:d34f with SMTP id d9443c01a7336-234f67a7c06mr152428215ad.8.1748681525735;
-        Sat, 31 May 2025 01:52:05 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f0e:fb30:af83:9564:6a79:4f18? ([2001:ee0:4f0e:fb30:af83:9564:6a79:4f18])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cd362fsm39298485ad.116.2025.05.31.01.52.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 31 May 2025 01:52:05 -0700 (PDT)
-Message-ID: <ef4ac528-3f91-4004-b47b-e758a5712d28@gmail.com>
-Date: Sat, 31 May 2025 15:51:57 +0700
+	s=arc-20240116; t=1748683009; c=relaxed/simple;
+	bh=Nf9MPw+KHk4DbwHqcnlemdN1bMsyhVPmR+H46ueSbgk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T2BIKtXdv6Z+APXEsqR5jTcqrjDSCDUQzCL0FDCFyft9ZTKjlBoRuaoIqIJHpcexrzTo9EpErb9c45v7jMFF1Gwd50ebW7Hm7nOLASgTgFqAU+faPwWlFCLqTvrqm83geOD0KobB9QXdJMKiEkpGECG8XF0yaGEi6Iv6PqhXZC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=BG2WZ1dD; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1748683004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9e3ygM0jvmbE7HN2UFSQMTGTErfuZibV4CLp7vHuGEQ=;
+	b=BG2WZ1dD60ya0pAVPh+hdPXtTSW+DJ4yKrJtAXxJv5VB6kZTanThoKpm6xzDr05NLAd50i
+	3sEQhHzXjCdJf3EXt6eG7jggwjYcirULko5Bavrq5loJU0hN/bURHq3QqE2Xq2c25ZBD73
+	muErhrW/N+D390ue3h/ns6qNrrb33ac=
+From: Sven Eckelmann <sven@narfation.org>
+To: Marek Lindner <marek.lindner@mailbox.org>,
+ Simon Wunderlich <sw@simonwunderlich.de>,
+ Antonio Quartulli <antonio@mandelbit.com>,
+ Matthias Schiffer <mschiffer@universe-factory.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH batadv 2/5] batman-adv: only create hardif while a netdev is part
+ of a mesh
+Date: Sat, 31 May 2025 11:16:30 +0200
+Message-ID: <7760123.MhkbZ0Pkbq@sven-desktop>
+In-Reply-To:
+ <e311c7d643fa1a7d13f2b518f6ee525eb6711f6c.1747687504.git.mschiffer@universe-factory.net>
+References:
+ <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
+ <e311c7d643fa1a7d13f2b518f6ee525eb6711f6c.1747687504.git.mschiffer@universe-factory.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v2 2/2] selftests: net: add XDP socket tests
- for virtio-net
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250527161904.75259-1-minhquangbui99@gmail.com>
- <20250527161904.75259-3-minhquangbui99@gmail.com> <aDhCfxHo3M5dxlpH@boxer>
- <fe162eed-fd44-4c18-a541-8243ccfc4252@gmail.com> <aDmaT1cmoRa6PaqK@boxer>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <aDmaT1cmoRa6PaqK@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="nextPart3532761.VLH7GnMWUR";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On 5/30/25 18:45, Maciej Fijalkowski wrote:
-> On Thu, May 29, 2025 at 09:29:14PM +0700, Bui Quang Minh wrote:
->> On 5/29/25 18:18, Maciej Fijalkowski wrote:
->>> On Tue, May 27, 2025 at 11:19:04PM +0700, Bui Quang Minh wrote:
->>>> This adds a test to test the virtio-net rx when there is a XDP socket
->>>> bound to it. There are tests for both copy mode and zerocopy mode, both
->>>> cases when XDP program returns XDP_PASS and XDP_REDIRECT to a XDP socket.
->>>>
->>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->>> Hi Bui,
->>>
->>> have you considered adjusting xskxceiver for your needs? If yes and you
->>> decided to go with another test app then what were the issues around it?
->>>
->>> This is yet another approach for xsk testing where we already have a
->>> test framework.
->> Hi,
->>
->> I haven't tried much hard to adapt xskxceiver. I did have a look at
->> xskxceiver but I felt the supported topology is not suitable for my need. To
->> test the receiving side in virtio-net, I use Qemu to set up virtio-net in
->> the guest and vhost-net in the host side. The sending side is in the host
->> and the receiving is in the guest so I can't figure out how to do that with
->> xskxceiver.
-> I see - couldn't the python side be executing xdpsock then instead of your
-> own app?
+--nextPart3532761.VLH7GnMWUR
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Date: Sat, 31 May 2025 11:16:30 +0200
+Message-ID: <7760123.MhkbZ0Pkbq@sven-desktop>
+MIME-Version: 1.0
 
-I'm not aware of xdpsock. Could you give the path to that file?
+On Monday, 19 May 2025 22:46:29 CEST Matthias Schiffer wrote:
+> @@ -734,9 +768,6 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
+>         if (ret < 0)
+>                 goto err_upper;
+>  
+> -       hard_iface->if_status = BATADV_IF_INACTIVE;
+> -
+> -       kref_get(&hard_iface->refcount);
+>         hard_iface->batman_adv_ptype.type = ethertype;
+>         hard_iface->batman_adv_ptype.func = batadv_batman_skb_recv
 
-> I wouldn't like to end up with several xsk tools for testing data path on
-> different environments.
+This is confusing. You remove the reference for the batman_adv_ptype but kept 
+the `batadv_hardif_put(hard_iface);` after 
+`dev_remove_pack(&hard_iface->batman_adv_ptype);`.
+
+I think this should be added again and instead following code should receive a 
+`batadv_hardif_put(hard_iface);` after the `list_del_rcu(&hard_iface->list);`:
+
+
+> @@ -818,11 +849,16 @@ void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface)
+>         struct batadv_priv *bat_priv = netdev_priv(hard_iface->mesh_iface);
+>         struct batadv_hard_iface *primary_if = NULL;
+>  
+> +       ASSERT_RTNL();
+> +
+>         batadv_hardif_deactivate_interface(hard_iface);
+>  
+>         if (hard_iface->if_status != BATADV_IF_INACTIVE)
+>                 goto out;
+>  
+> +       list_del_rcu(&hard_iface->list);
+> +       batadv_hardif_generation++;
+> +
+>         batadv_info(hard_iface->mesh_iface, "Removing interface: %s\n",
+>                     hard_iface->net_dev->name);
+>         dev_remove_pack(&hard_iface->batman_adv_ptype);
+
+
+And yes, this means that this needs to be removed in PATCH 3 again - together 
+with the `kref_get` from this chunk (from PATCH 3):
+
+On Monday, 19 May 2025 22:46:31 CEST Matthias Schiffer wrote:
+> @@ -738,8 +735,6 @@ int batadv_hardif_enable_interface(struct net_device *net_dev,
+>         batadv_v_hardif_init(hard_iface);
+>  
+>         kref_get(&hard_iface->refcount);
+> -       list_add_tail_rcu(&hard_iface->list, &batadv_hardif_list);
+> -       batadv_hardif_generation++;
+>  
+>         hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
+>         required_mtu = READ_ONCE(mesh_iface->mtu) + max_header_len;
+
+
+
+Just a question about this part (you don't really need to change it - I am 
+just interested). Why did you move this MTU check to such a late position in 
+the code?
+
+> -       hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
+> -       required_mtu = READ_ONCE(mesh_iface->mtu) + max_header_len;
+> +       ASSERT_RTNL();
+>  
+> -       if (hardif_mtu < ETH_MIN_MTU + max_header_len)
+> +       if (!batadv_is_valid_iface(net_dev))
+>                 return -EINVAL;
+>  
+[...]
+> +       hard_iface = kzalloc(sizeof(*hard_iface), GFP_ATOMIC);
+> +       if (!hard_iface)
+> +               return -ENOMEM;
+> +
+> +       netdev_hold(net_dev, &hard_iface->dev_tracker, GFP_ATOMIC);
+> +       hard_iface->net_dev = net_dev;
+[...]
+> +       hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
+> +       required_mtu = READ_ONCE(mesh_iface->mtu) + max_header_len;
+> +
+> +       if (hardif_mtu < ETH_MIN_MTU + max_header_len) {
+> +               ret = -EINVAL;
+> +               goto err_put;
+> +       }
+
+It made the error handling more complicated. And at the moment, I don't see 
+the reason. For me, It would have been been more logical to just a a minimal 
+invasive change like:
+
+> -       hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
+> +       hardif_mtu = READ_ONCE(net_dev->mtu);
+
+
+
+Thanks,
+	Sven
+
+--nextPart3532761.VLH7GnMWUR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDrI7gAKCRBND3cr0xT1
+y07YAQDVyR/OScCqmjK6581lF8hCs9w6rB6o2vV6IV6R7NCsTQD9H6y3oePiuHOj
+BvPM8kV+xcZ3a+jPr3egHm+0AQ4K5wg=
+=9jGN
+-----END PGP SIGNATURE-----
+
+--nextPart3532761.VLH7GnMWUR--
+
+
+
 
