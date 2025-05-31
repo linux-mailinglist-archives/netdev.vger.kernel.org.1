@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-194467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A279AC996B
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 07:38:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6959EAC998C
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77888A233FF
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 05:37:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22EFE4A2CEF
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 06:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E861DDC07;
-	Sat, 31 May 2025 05:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE3513BAE3;
+	Sat, 31 May 2025 06:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="2XwaEGge"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="n5eV7MDo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018F02907
-	for <netdev@vger.kernel.org>; Sat, 31 May 2025 05:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2E7380
+	for <netdev@vger.kernel.org>; Sat, 31 May 2025 06:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748669882; cv=none; b=uca3o72phqutDm5MblcA9w91Bz2MHXE+tnuiy1iSXnm4R8Cb+CdB2wfp5Ze+/4ujC6ms8S3b5PiokQ4K0Vj35BOT4nJh4X25L0oi+PwXgCHQ+he8NrYd8k9pm8NTTLgj5kljw+9aPPAY3gm/BtPEKqvTd4budu3ECglAvcFxCzc=
+	t=1748672118; cv=none; b=AB7ZFGnfMAdYt88JXcn34IdIrrPri815QgV7eGVzsDJY6X2JdrnyqCX/KbLiHqK9BSgIQh+MkGvAlOXf8t3W3R9euYMD4vHAoRY8mVht2a4fHlZUiHp55FhuYALAlt3HuA3k/dafRKNc8KtxqJ6pKLOWzcQSlDhrHHUuVKZSyo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748669882; c=relaxed/simple;
-	bh=z2DL9paKpewL/tohFoGg4bsRZaQlsx9/i8iBASIiZtg=;
+	s=arc-20240116; t=1748672118; c=relaxed/simple;
+	bh=JAO+jntjKh3HLfLK6yVIbyUxXC8Og4r0vlAqlwAYOj8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TSVYb4IjNekoEkkLlgjbMWeLVEzLkiCHFkEtatfqf7Q58i/qm8xRJYlkHLZXl1Nmx2DgCrYIGEANWW17vHT2ySnMMG5amd0YHHxco6mcErWn9ua2n3D1Yi/ieLxX4qx8saDlb5Kbk0v9x7bB86phZ9YC7KF1AQmyLJyhB5TG0RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=2XwaEGge; arc=none smtp.client-ip=209.85.215.182
+	 In-Reply-To:Content-Type; b=bY6JiHJFXyh0IgUqTLObnK6qeeYM8yy2jnXjpQwc4yuKsRVL5jIrShSufNrbNa1BgB2QZj3hqKutGWHohqc9P+fjPpqSNZ20apkSEZTMB8zdKuuKEScBwld4aP9VLsnVvYEChIbloFrmpnjUm6ZBh6p6fCN+vkFWi3rht/khg8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=n5eV7MDo; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b1fd59851baso1655662a12.0
-        for <netdev@vger.kernel.org>; Fri, 30 May 2025 22:37:59 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2351ffb669cso20235675ad.2
+        for <netdev@vger.kernel.org>; Fri, 30 May 2025 23:15:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1748669879; x=1749274679; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1748672116; x=1749276916; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=i7pns3vNbL/afb0jgOCaVptWokAOC1F45T9AerlkrJM=;
-        b=2XwaEGgeS+0OdFgaWEQhhxfVvpccREZX8GLxekjYpvvfseUQm/XhWPEyOItWHMbvi6
-         fK1G3fARLfRCixPSiiM8h2ZgydWl1gOQPM9s+TkgZPa3FIwmKP8OOEnZAO4evnJKfmbF
-         7GKrBcayYeC6V9KunWuCYCCY6pwIisBWFVwMOdDTR7BAo2fs0+1iJ46aUZEasdE+tmj1
-         BdXgRzEJZi6u8s3ZyqgNsc7GXE65pKmyhn6JieZR97cWWetdyObWy3ipNOOjFm+S4BNh
-         yPo5UcY8DMbFUcNVGTgZ6kOmA57piBNUiCj1sZzWQ7pQgPkzK01OBGA81+qHbM3jhH9r
-         4ykg==
+        bh=Z4CEbBo9kOHxtt4F5lcELpR40xlCxau+7wiaQ+eXkuw=;
+        b=n5eV7MDo0to3wrG5rc/hpXUJVK4j5SGmDCJFi0DPeYTXak0wCJ3sTFDx32gGz8xofr
+         6gdcAJAM5mJWNcgLbcifEsY8w+RZrfBQdJFc9CN1YjpKJ5IAHs4ETE5Ntwo6SVjD7ufs
+         5NgHthKMSutqJpdiVC0c5vyGf5BMpDIqA1ZWspzI75RD7ddkmNxAWkS9kD9d+V2qaZdQ
+         9vDcuLfcq6d5f4YvOiMJNlsJVvJfu23XAcuAppi/HAFR6HmRjVqAck+VXZe6aNpW4uOx
+         /r9KWLoG/C0KKMlEti01P2AgZkyg6W5K5dac5Tgk2dfTBA6JCiH4IHHyhrJ+K5KCpgb0
+         MEpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748669879; x=1749274679;
+        d=1e100.net; s=20230601; t=1748672116; x=1749276916;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i7pns3vNbL/afb0jgOCaVptWokAOC1F45T9AerlkrJM=;
-        b=AyJE8q7zG4W/oqHKotLZBXyMxPjOL0W9ImAg0XniqwXvJzecVpNF7bYz25N0nwov4M
-         GSvuB8l9BnXYkVQhPC5O5hENDloT3UwvKVAIefio6m/mRnB6qetHxVpUP+o/ng8B4i+9
-         ZZKdjkZz8NvzgueNBiy11JkIiyn7FiU7SePbiZDgtylPDZl/cO1p7mrZST+mcwAgFMgU
-         W3N5/lTNEwyM/BSLEyCVW28PEmxAejIO1nVY0E9Hsa4McI9Pg9eR0GkIkjHvR7y0I0Mx
-         KHLwVDi7QMamrNPSnEvM3in9MMkJQFnpxnv4j1hXbYlLJzw9my9b1UCsMHhG9omaW1vt
-         4CyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTbS1leMY93o3JPspNW9bQnCK3LwWo5i6nwYXG21JTPPgEubI987HnGciphr6Hc9OSogW+pNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbNaQ+P3oj6Qqlr/EWYZg9Kdp8v0Tk8dG612t1NbUJdtOl0lDO
-	k7//UPH4Eo6UTxtO6hmM4atvOV9q3P5wSDxt4w7op46alT3+XmX1bVlV28k7HjDoouE=
-X-Gm-Gg: ASbGnct9GP4NLv2k4H/f7kFMxN8JsS3faOe741pp41cnXWxBJJ/G5Bf5zQS/dqA5F6c
-	C+kUYZd3ov4rktb30YcbdI0riK2sUH4YL+Bmwn60EF8TVKn8egQBim9yzFkni1aA2ppUm0wY4s1
-	DewHz8YTEFcuZg+vl3l8HhmHS6LXr98n8KewJqByYjizD3xX2OCEdy5QlR5QAUZ6Sb5Vlpal5oJ
-	FOYPvFVqkgKRr86BCxwhJvRmIVouZ+67hwkZhH/xSiK8t/LAMxgb+HDAhcA2/BtIlxUtF+jYASy
-	DUyt7KsqXWNfoznVLg16e7spNWG5zVa4T7EX0bV+IX0CgB/U8J7wvgCkTeU1Iw==
-X-Google-Smtp-Source: AGHT+IEBW2yN4mdkfyRqaqJYcOfq6U2ABG67WBxQnN4RV4Jfc1l3nJ8Ur00b/zAumm7VcY/wJ8zvaQ==
-X-Received: by 2002:a17:90b:2e45:b0:311:fde5:c4be with SMTP id 98e67ed59e1d1-31250476afcmr7148200a91.35.1748669879058;
-        Fri, 30 May 2025 22:37:59 -0700 (PDT)
+        bh=Z4CEbBo9kOHxtt4F5lcELpR40xlCxau+7wiaQ+eXkuw=;
+        b=LrYhh5Uguxj0CRDuzDneLX/tmzHRiX0cmo5WcI413XGsCV68eAcQoVDx7m8hS6As29
+         zBvH9Ago/+59JI/ivpMdg81uhL64gr+T58Iq8m/Mk3taSr4G5UlFJGqypaA2cJt0UeAd
+         NGBfw49pB9rlvox0MeyzYbdL8oOu2uR7unLnSrG+vd7JW8kHwggCjI35ucMXfAoKFbHR
+         2Ff+qPX9Ipcq2TzyIKSjlu5L6LIfqSc1EP34MG8ljS5GL8ZJFlK/Wn4YrC4x+YW8VMma
+         SLB8eGp394QqbinvsTPplx9amxk8NRrWiComIb1F40UXPD5PNJX6NQXem/5IiqSpZQon
+         oFKg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/ogvFlK0S9iaEecyCUB6eXGnJukLiGt23U6WkPmZQdZTXbFrmjU24vV+WHJDRWu5AL6No0rs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQz4gHL6CTOdbzERWOBVaQ0gVDg8QatFGQJHJuMVuSS2cZrhNo
+	fP/Ddz818VCCmnuBTPaENu7YT91QeFRlggE/tD9k9hW8bTigxf4tghzMJeWkOPRf29s=
+X-Gm-Gg: ASbGncsLJtSPE8a8xe8FFAnCQSaaJaHUt20k7nomnHYUSUyZj2IiNtSnyAWVmVCdKr/
+	MB6ZUNhRnSXvXIt+iPGVTLr0dRHAwiWKWaVbVAHn5YPIigi3wsM08EwYODlHgl3lq5G0TbCqK14
+	0eKSvtc/drHuZzzslCyZXcbthYjkZhXNL1EtI4zzxTb3aPztuW0myw4NdDs47irjGyXxyD/1xXf
+	S2Cmd8zUq+XNY2s0tBABzz7V/zFhpUcE7RNsbEBJVXmJ+zpc70iJ47MG+meTfTpROrnp+/3Gp7M
+	+IdLNajys0B+nDOJKkW3YVH8kTWhamlmrHmz9E+Nr76QHQp2NWP2G5pLv/8kkg==
+X-Google-Smtp-Source: AGHT+IHuiolWEMTQ9v6HviGgh78/cIDhfQ4a0S0ZzCjg4n8WUdDIXvlrmK+aXIYgcbkkclcxMEbaxA==
+X-Received: by 2002:a17:902:d4c1:b0:234:9cdd:ffd5 with SMTP id d9443c01a7336-2355f74fcd1mr12668865ad.25.1748672115621;
+        Fri, 30 May 2025 23:15:15 -0700 (PDT)
 Received: from [10.100.116.185] ([157.82.128.1])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3124e399c0esm2266095a91.26.2025.05.30.22.37.57
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506cf4730sm37240075ad.168.2025.05.30.23.15.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 May 2025 22:37:58 -0700 (PDT)
-Message-ID: <da18286e-c518-4f6b-99bb-13b52df3555f@daynix.com>
-Date: Sat, 31 May 2025 14:37:56 +0900
+        Fri, 30 May 2025 23:15:15 -0700 (PDT)
+Message-ID: <9eae960a-0226-46e2-a6f4-95c91800268c@daynix.com>
+Date: Sat, 31 May 2025 15:15:12 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,7 +81,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/8] virtio: introduce virtio_features_t
+Subject: Re: [RFC PATCH v2 3/8] vhost-net: allow configuring extended features
 To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -90,299 +90,199 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
  <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
 References: <cover.1748614223.git.pabeni@redhat.com>
- <5be304a8d0e2fffa6bd13cfa9ff848b2e5842171.1748614223.git.pabeni@redhat.com>
+ <b9b60ed5865958b9d169adc3b0196c21a50f6bca.1748614223.git.pabeni@redhat.com>
 Content-Language: en-US
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <5be304a8d0e2fffa6bd13cfa9ff848b2e5842171.1748614223.git.pabeni@redhat.com>
+In-Reply-To: <b9b60ed5865958b9d169adc3b0196c21a50f6bca.1748614223.git.pabeni@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2025/05/30 23:49, Paolo Abeni wrote:
-> The virtio specifications allows for up to 128 bits for the
-> device features. Soon we are going to use some of the 'extended'
-> bits features (above 64) for the virtio_net driver.
+> Use the extended feature type for 'acked_features' and implement
+> two new ioctls operation allowing the user-space to set/query an
+> unbounded amount of features.
 > 
-> Introduce an specific type to represent the virtio features bitmask.
+> The actual number of processed features is limited by virtio_features_t
+> size, and attempts to set features above such limit fail with
+> EOPNOTSUPP.
 > 
-> On platform where 128 bits integer are available use such wide int
-> for the features bitmask, otherwise maintain the current u64.
-> 
-> Introduce an extended get_features128() configuration callback that
-> devices supporting the extended features range must implement in
-> place of the traditional one.
-
-The callback is called get_extended_features() in the code, which makes 
-more sense as it is actually 64-bit if CONFIG_ARCH_SUPPORTS_INT128 is 
-not defined.
-
-That said, it doesn't seem that the code saved by the use of 128-bit 
-integer type is significant enough.
-
-I can think of three strategies to support more features:
-1) Converting bitmasks to 128-bit, which is this patch does
-2) Convert both "features" and "debugfs_filter_features" of the struct
-    into bitmaps provided by include/linux/bitmap.h
-
-2) requires more changes, but perhaps there may be a middle ground.
-
-Looking at details, there are two fields that contain feature bitmasks 
-in the common structure, struct virtio_device:
-- features
-- debugfs_filter_features
-
-Fortunately, "debugfs_filter_features" is only referred by
-drivers/virtio/virtio_debug.c. The problem is "features", which is 
-referred everywhere. Perhaps converting all of them into bitmaps may 
-make sense in a long term, but it may be something you want to avoid 
-with this patch series.
-
-So there is the following middle-ground option:
-
-3) Adding e.g., "features_hi" for the upper 64-bit of features
-    (which is similar to what I suggested for QEMU*),
-    and convert only "debugfs_filter_features" into a bitmap.
-
-This substantially reduces the code change required for "features" and 
-make them contained in the following three functions:
-- virtio_dev_probe() in drivers/virtio/virtio.c
-- features_show() in drivers/virtio/virtio.c
-- virtio_debug_device_filter_features() in drivers/virtio/virtio_debug.c
-
-These functions can use bitmaps internally, and convert them from/into 
-64-bit integers using bitmap_from_arr64() and bitmap_to_arr64().
-
-Since you are adding the support for extended features to 
-virtio_pci_modern and virtio_net, you'll later need to change their 
-implementations too, but that won't add complexity much; some complexity 
-is inevitable even when choosing 1) and "[RFC PATCH v2 2/8] 
-virtio_pci_modern: allow configuring extended features" already include it.
-
-And by choosing 3), you can remove the check of 
-CONFIG_ARCH_SUPPORTS_INT128 and avoid the need to test platforms without 
-the config. I suspect particularly eliminating the need of test 
-outweighs the cost of the additional change required for 3).
-
-Regards,
-Akihiko Odaki
-
-* 
-https://lore.kernel.org/qemu-devel/473516b5-d52b-4671-aeca-d02ad1940364@daynix.com/
-
-> 
-> Note that legacy and transport features don't need any change, as
-> they are always in the low 64 bit range.
+> Note that the legacy ioctls implicitly truncate the negotiated
+> features to the lower 64 bits range.
 > 
 > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
 > v1 -> v2:
->    - let u64 VIRTIO_BIT() cope with higher bit values
->    - add .get_extended_features instead of changing .get_features signature
+>    - change the ioctl to use an extensible API
 > ---
->   drivers/virtio/virtio.c         | 14 +++++++-------
->   drivers/virtio/virtio_debug.c   |  2 +-
->   include/linux/virtio.h          |  5 +++--
->   include/linux/virtio_config.h   | 32 ++++++++++++++++++++++----------
->   include/linux/virtio_features.h | 27 +++++++++++++++++++++++++++
->   5 files changed, 60 insertions(+), 20 deletions(-)
->   create mode 100644 include/linux/virtio_features.h
+>   drivers/vhost/net.c              | 61 ++++++++++++++++++++++++++++++--
+>   drivers/vhost/vhost.h            |  2 +-
+>   include/uapi/linux/vhost.h       |  7 ++++
+>   include/uapi/linux/vhost_types.h |  5 +++
+>   4 files changed, 71 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> index 95d5d7993e5b..206ae8fa0654 100644
-> --- a/drivers/virtio/virtio.c
-> +++ b/drivers/virtio/virtio.c
-> @@ -272,22 +272,22 @@ static int virtio_dev_probe(struct device *_d)
->   	int err, i;
->   	struct virtio_device *dev = dev_to_virtio(_d);
->   	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
-> -	u64 device_features;
-> -	u64 driver_features;
-> -	u64 driver_features_legacy;
-> +	virtio_features_t device_features;
-> +	virtio_features_t driver_features;
-> +	virtio_features_t driver_features_legacy;
->   
->   	/* We have a driver! */
->   	virtio_add_status(dev, VIRTIO_CONFIG_S_DRIVER);
->   
->   	/* Figure out what features the device supports. */
-> -	device_features = dev->config->get_features(dev);
-> +	device_features = virtio_get_features(dev);
->   
->   	/* Figure out what features the driver supports. */
->   	driver_features = 0;
->   	for (i = 0; i < drv->feature_table_size; i++) {
->   		unsigned int f = drv->feature_table[i];
-> -		BUG_ON(f >= 64);
-> -		driver_features |= (1ULL << f);
-> +		BUG_ON(f >= VIRTIO_FEATURES_MAX);
-> +		driver_features |= VIRTIO_BIT(f);
->   	}
->   
->   	/* Some drivers have a separate feature table for virtio v1.0 */
-> @@ -320,7 +320,7 @@ static int virtio_dev_probe(struct device *_d)
->   		goto err;
->   
->   	if (drv->validate) {
-> -		u64 features = dev->features;
-> +		virtio_features_t features = dev->features;
->   
->   		err = drv->validate(dev);
->   		if (err)
-> diff --git a/drivers/virtio/virtio_debug.c b/drivers/virtio/virtio_debug.c
-> index 95c8fc7705bb..5ca95422d3ca 100644
-> --- a/drivers/virtio/virtio_debug.c
-> +++ b/drivers/virtio/virtio_debug.c
-> @@ -12,7 +12,7 @@ static int virtio_debug_device_features_show(struct seq_file *s, void *data)
->   	u64 device_features;
->   	unsigned int i;
->   
-> -	device_features = dev->config->get_features(dev);
-> +	device_features = virtio_get_features(dev);
->   	for (i = 0; i < BITS_PER_LONG_LONG; i++) {
->   		if (device_features & (1ULL << i))
->   			seq_printf(s, "%u\n", i);
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index 64cb4b04be7a..6e51400d0463 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -11,6 +11,7 @@
->   #include <linux/gfp.h>
->   #include <linux/dma-mapping.h>
->   #include <linux/completion.h>
-> +#include <linux/virtio_features.h>
->   
->   /**
->    * struct virtqueue - a queue to register buffers for sending or receiving.
-> @@ -159,11 +160,11 @@ struct virtio_device {
->   	const struct virtio_config_ops *config;
->   	const struct vringh_config_ops *vringh_config;
->   	struct list_head vqs;
-> -	u64 features;
-> +	virtio_features_t features;
->   	void *priv;
->   #ifdef CONFIG_VIRTIO_DEBUG
->   	struct dentry *debugfs_dir;
-> -	u64 debugfs_filter_features;
-> +	virtio_features_t debugfs_filter_features;
->   #endif
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 7cbfc7d718b3..f53294440695 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -77,6 +77,8 @@ enum {
+>   			 (1ULL << VIRTIO_F_RING_RESET)
 >   };
 >   
-> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-> index 169c7d367fac..1cc43d9cf6e8 100644
-> --- a/include/linux/virtio_config.h
-> +++ b/include/linux/virtio_config.h
-> @@ -77,7 +77,10 @@ struct virtqueue_info {
->    *      vdev: the virtio_device
->    * @get_features: get the array of feature bits for this device.
->    *	vdev: the virtio_device
-> - *	Returns the first 64 feature bits (all we currently need).
-> + *	Returns the first 64 feature bits.
-> + * @get_extended_features:
-> + *      vdev: the virtio_device
-> + *      Returns the first VIRTIO_FEATURES_MAX feature bits (all we currently need).
->    * @finalize_features: confirm what device features we'll be using.
->    *	vdev: the virtio_device
->    *	This sends the driver feature bits to the device: it can change
-> @@ -121,6 +124,7 @@ struct virtio_config_ops {
->   	void (*del_vqs)(struct virtio_device *);
->   	void (*synchronize_cbs)(struct virtio_device *);
->   	u64 (*get_features)(struct virtio_device *vdev);
-> +	virtio_features_t (*get_extended_features)(struct virtio_device *vdev);
->   	int (*finalize_features)(struct virtio_device *vdev);
->   	const char *(*bus_name)(struct virtio_device *vdev);
->   	int (*set_vq_affinity)(struct virtqueue *vq,
-> @@ -149,11 +153,11 @@ static inline bool __virtio_test_bit(const struct virtio_device *vdev,
+> +#define VHOST_NET_ALL_FEATURES VHOST_NET_FEATURES
+> +
+>   enum {
+>   	VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
+>   };
+> @@ -1614,7 +1616,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
+>   	return err;
+>   }
+>   
+> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
+> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
 >   {
->   	/* Did you forget to fix assumptions on max features? */
->   	if (__builtin_constant_p(fbit))
-> -		BUILD_BUG_ON(fbit >= 64);
-> +		BUILD_BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
->   	else
-> -		BUG_ON(fbit >= 64);
-> +		BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
+>   	size_t vhost_hlen, sock_hlen, hdr_len;
+>   	int i;
+> @@ -1685,8 +1687,9 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>   	void __user *argp = (void __user *)arg;
+>   	u64 __user *featurep = argp;
+>   	struct vhost_vring_file backend;
+> -	u64 features;
+> -	int r;
+> +	virtio_features_t all_features;
+> +	u64 features, count;
+> +	int r, i;
 >   
-> -	return vdev->features & BIT_ULL(fbit);
-> +	return vdev->features & VIRTIO_BIT(fbit);
->   }
+>   	switch (ioctl) {
+>   	case VHOST_NET_SET_BACKEND:
+> @@ -1704,6 +1707,58 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>   		if (features & ~VHOST_NET_FEATURES)
+>   			return -EOPNOTSUPP;
+>   		return vhost_net_set_features(n, features);
+> +	case VHOST_GET_FEATURES_ARRAY:
+> +	{
+> +		if (copy_from_user(&count, argp, sizeof(u64)))
+> +			return -EFAULT;
+> +
+> +		/* Copy the net features, up to the user-provided buffer size */
+> +		all_features = VHOST_NET_ALL_FEATURES;
+> +		for (i = 0; i < min(VIRTIO_FEATURES_WORDS / 2, count); ++i) {
+
+I think you need to use: array_index_nospec()
+
+> +			argp += sizeof(u64);
+> +			features = all_features >> (64 * i);
+> +			if (copy_to_user(argp, &features, sizeof(u64)))
+> +				return -EFAULT;
+> +		}
+> +
+> +		/* Zero the trailing space provided by user-space, if any */
+> +		features = 0;
+> +		for (; i < count; ++i) {
+> +			argp += sizeof(u64);
+> +			if (copy_to_user(argp, &features, sizeof(u64)))
+> +				return -EFAULT;
+
+There is clear_user().
+
+> +		}
+> +		return 0;
+> +	}
+> +	case VHOST_SET_FEATURES_ARRAY:
+> +	{
+> +		if (copy_from_user(&count, argp, sizeof(u64)))
+> +			return -EFAULT;
+> +
+> +		all_features = 0;
+> +		for (i = 0; i < min(count, VIRTIO_FEATURES_WORDS / 2); ++i) {
+> +			argp += sizeof(u64);
+> +			if (copy_from_user(&features, argp, sizeof(u64)))
+> +				return -EFAULT;
+> +
+> +			all_features |= ((virtio_features_t)features) << (64 * i);
+> +		}
+> +
+> +		/* Any feature specified by user-space above VIRTIO_FEATURES_MAX is
+> +		 * not supported by definition.
+> +		 */
+> +		for (; i < count; ++i) {
+> +			if (copy_from_user(&features, argp, sizeof(u64)))
+> +				return -EFAULT;
+> +			if (features)
+> +				return -EOPNOTSUPP;
+> +		}
+> +
+> +		if (all_features & ~VHOST_NET_ALL_FEATURES)
+> +			return -EOPNOTSUPP;
+> +
+> +		return vhost_net_set_features(n, all_features);
+> +	}
+>   	case VHOST_GET_BACKEND_FEATURES:
+>   		features = VHOST_NET_BACKEND_FEATURES;
+>   		if (copy_to_user(featurep, &features, sizeof(features)))
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index bb75a292d50c..ef1c7fd6f4e1 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -133,7 +133,7 @@ struct vhost_virtqueue {
+>   	struct vhost_iotlb *umem;
+>   	struct vhost_iotlb *iotlb;
+>   	void *private_data;
+> -	u64 acked_features;
+> +	virtio_features_t acked_features;
+>   	u64 acked_backend_features;
+>   	/* Log write descriptors */
+>   	void __user *log_base;
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index d4b3e2ae1314..d6ad01fbb8d2 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -235,4 +235,11 @@
+>    */
+>   #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+>   					      struct vhost_vring_state)
+> +
+> +/* Extended features manipulation */
+> +#define VHOST_GET_FEATURES_ARRAY _IOR(VHOST_VIRTIO, 0x83, \
+> +				       struct vhost_features_array)
+> +#define VHOST_SET_FEATURES_ARRAY _IOW(VHOST_VIRTIO, 0x83, \
+> +				       struct vhost_features_array)
+> +
+>   #endif
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+> index d7656908f730..3f227114c557 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -110,6 +110,11 @@ struct vhost_msg_v2 {
+>   	};
+>   };
 >   
->   /**
-> @@ -166,11 +170,11 @@ static inline void __virtio_set_bit(struct virtio_device *vdev,
->   {
->   	/* Did you forget to fix assumptions on max features? */
->   	if (__builtin_constant_p(fbit))
-> -		BUILD_BUG_ON(fbit >= 64);
-> +		BUILD_BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
->   	else
-> -		BUG_ON(fbit >= 64);
-> +		BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
->   
-> -	vdev->features |= BIT_ULL(fbit);
-> +	vdev->features |= VIRTIO_BIT(fbit);
->   }
->   
->   /**
-> @@ -183,11 +187,11 @@ static inline void __virtio_clear_bit(struct virtio_device *vdev,
->   {
->   	/* Did you forget to fix assumptions on max features? */
->   	if (__builtin_constant_p(fbit))
-> -		BUILD_BUG_ON(fbit >= 64);
-> +		BUILD_BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
->   	else
-> -		BUG_ON(fbit >= 64);
-> +		BUG_ON(fbit >= VIRTIO_FEATURES_MAX);
->   
-> -	vdev->features &= ~BIT_ULL(fbit);
-> +	vdev->features &= ~VIRTIO_BIT(fbit);
->   }
->   
->   /**
-> @@ -204,6 +208,14 @@ static inline bool virtio_has_feature(const struct virtio_device *vdev,
->   	return __virtio_test_bit(vdev, fbit);
->   }
->   
-> +static inline virtio_features_t virtio_get_features(struct virtio_device *vdev)
-> +{
-> +	if (vdev->config->get_extended_features)
-> +		return vdev->config->get_extended_features(vdev);
+> +struct vhost_features_array {
+> +	__u64 count; /* number of entries present in features array */
+> +	__u64 features[];
+
+
+An alternative idea:
+
+#define VHOST_GET_FEATURES_ARRAY(len) _IOC(_IOC_READ, VHOST_VIRTIO,
+                                            0x00, (len))
+
+By doing so, the kernel can have share the code for 
+VHOST_GET_FEATURES_ARRAY() with VHOST_GET_FEATURES() since 
+VHOST_GET_FEATURES() will be just a specialized definition.
+
+It also makes the life of the userspace a bit easier by not making it 
+construct struct vhost_features_array.
+
+Looking at include/uapi, it seems there are examples of both your 
+pattern and my alternative, so please pick what you prefer.
+
+If you are going to keep struct vhost_features_array, you may want to 
+use __counted_by().
+
+> +};
 > +
-> +	return vdev->config->get_features(vdev);
-> +}
-> +
->   /**
->    * virtio_has_dma_quirk - determine whether this device has the DMA quirk
->    * @vdev: the device
-> diff --git a/include/linux/virtio_features.h b/include/linux/virtio_features.h
-> new file mode 100644
-> index 000000000000..0a7e2265f8b4
-> --- /dev/null
-> +++ b/include/linux/virtio_features.h
-> @@ -0,0 +1,27 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _LINUX_VIRTIO_FEATURES_H
-> +#define _LINUX_VIRTIO_FEATURES_H
-> +
-> +#include <linux/bits.h>
-> +
-> +#if IS_ENABLED(CONFIG_ARCH_SUPPORTS_INT128)
-> +#define VIRTIO_HAS_EXTENDED_FEATURES
-> +#define VIRTIO_FEATURES_MAX	128
-> +#define VIRTIO_FEATURES_WORDS	4
-> +#define VIRTIO_BIT(b)		_BIT128(b)
-> +
-> +typedef __uint128_t virtio_features_t;
-> +
-> +#else
-> +#define VIRTIO_FEATURES_MAX	64
-> +#define VIRTIO_FEATURES_WORDS	2
-> +
-> +static inline u64 VIRTIO_BIT(int bit)
-> +{
-> +	return bit >= 64 ? 0 : BIT_ULL(b);
-> +}
-> +
-> +typedef u64 virtio_features_t;
-> +#endif
-> +
-> +#endif
+>   struct vhost_memory_region {
+>   	__u64 guest_phys_addr;
+>   	__u64 memory_size; /* bytes */
 
 
