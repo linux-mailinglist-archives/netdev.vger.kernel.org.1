@@ -1,130 +1,152 @@
-Return-Path: <netdev+bounces-194503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D3CAC9A81
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 12:16:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9CE8AC9A8C
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 12:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D3921BA379A
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:16:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7426165733
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CC2242923;
-	Sat, 31 May 2025 10:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0339D22B8B8;
+	Sat, 31 May 2025 10:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xkp0Bo2y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="maKDgCvi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DBA241664;
-	Sat, 31 May 2025 10:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4664320F081;
+	Sat, 31 May 2025 10:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748686411; cv=none; b=Y6lUfuHelDD5P1qhSlhYf2V4vx7ao5mhetKp4wpsjEWIc2VssA5xpi7soDYo9J9pyUA8GR8xc1349+vObzn+mAB+iyw1RKEga20LAaAjHfOjPM/jPvIJrzOVlO1s672KlOmKCmofGQS1XdWx7NANzmJ1lcsLEWDNN1r8nHPBHnE=
+	t=1748687261; cv=none; b=DiAvzOr5FwnPXlevYzkXqikgrvEbYAm+4MPiQJ62qJzIzaR9z4oVO1BFkIjPRrZRFmA76X07vrAAVKl4HFmKvGS2kTWRpP7jk80cF/9dBv1VK5S2yw8A3kLVtSJ7Q7gFPyuPRBpt2rDpNOJ4KyliZXpZZR22G0sXy/PupX6JCIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748686411; c=relaxed/simple;
-	bh=LS49dlVCVfhP+stRhRD81356ZmEOJJqyVMdjDTH3+Bs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rRQeSnvYjK2fDlpZNi5j9mLmdDovs7JIfNBq6RusAdzngcAGh5sJh2SZbCAEd/8xcUwxqcL6NVf+/w38bE/MIR9I+j7bERXELWgDb0CAX/8LxgM9inObVtLLuaw4efqtMBKi9/bPxBGo4l3MHsfMQ2eYZyIRJKVzAb3eLoAx4O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xkp0Bo2y; arc=none smtp.client-ip=209.85.221.53
+	s=arc-20240116; t=1748687261; c=relaxed/simple;
+	bh=qLbEl+HELsNyJ3onNtP198Qwc3JGGySltJ1h9ocWi/Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N5BonyDZDyEdtdxHe+P1uWJIxHl7mylzY3eYtL3OD1oe6uQncTSHzjKwLIR8PemwQ3N3OVEvQQs2un7IFE9sd/xqH1y7CB/jDPc/w0cRTJ39CNh544cfyMEyqkEuEZP/0mIRmdVBKCeJNcep7Iq8pYuWtOHDrfYyhgKXCVwoGnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=maKDgCvi; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a36748920cso3102246f8f.2;
-        Sat, 31 May 2025 03:13:29 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6049431b0e9so4201598a12.0;
+        Sat, 31 May 2025 03:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748686408; x=1749291208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tq1QgWecPXKEOWBa1UyGhmKV+AVmn4AYKr6Ka0MIC54=;
-        b=Xkp0Bo2yNFf/3upmTCzF9bVz3/Vofy2VJokUf2xsrWUheOgwf/uixRKmfFhRyyMgLZ
-         uhSN2ijd7DMDyRkaorbTrux9QVFl4rx6xaG0HxDh9MgoKV5xTtexYRqr1gmx4kTGnA8J
-         ZQQKUZjaBWdOmxtGVkvdFwKZAt7zyoIWa1qzJpCD1gzs3jkPnCkX0HmOW4I1Mm5em5HJ
-         sNw8T1G8Ark4NPEmy8E/fILA5oyDrm0ULCoS+9ZUoHqu3YbTxuZXSmSWTnjBBmJiwLJg
-         znauhsu9X8BpaAaPcGhIGUKedJ9Sg8kQ4NKxVoJ4AuLPuLmZheUjaKQk/5z4uT5jXcuU
-         nl4w==
+        d=gmail.com; s=20230601; t=1748687258; x=1749292058; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VQ3poRpVAbqg8lKnPKyCxlIgIfKo7fljzJSrqrBhuj8=;
+        b=maKDgCvilsIaN5Q4PZLxED736iWKZWozaEaXnCWWNFKzmbhhZ63+aipAMbtJfTKpnO
+         X749Pl6xwm9NasBhJNd9HHe9djuzE4Izw0Kz4tX8uoJX2UTyQeM3s8ffxE8x/CKmHsuL
+         e1J2nq+5mGSzspj7PUfawBnzzmIdnxBXk6+mPb6B9zwFk5oaF3zCce6UZI5KSwZa1pk6
+         Qk2lIJsCtBkIot7Af3Mktm5VgUeYl/VD6dzR7xSuVZO9eh9Y/FkxPNIchQ3HvHJmxXv7
+         v2tU1TvK1lkswcG0ODULQtcoTDU/+gUaLJVDGBN1NJyRwa8fMGWyJUaFK64FSjSZJCsh
+         7lAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748686408; x=1749291208;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tq1QgWecPXKEOWBa1UyGhmKV+AVmn4AYKr6Ka0MIC54=;
-        b=QISP05l9e7jVCLXHDOYDTVeNtRXeMdCo9Vl+KvOm/1o+TFWurqjjSo5Lcyz/oje2Ap
-         l/hmKI1Jq5xdGKwKBcAocy4ajVf288Ml38YOtLA4n9SY/AFNtJpowkjIRBXK/2pxQNwN
-         A0kuKHw/ta1siNLE/H3n43jLc7xxHHgj2vqkQfiy15mArbRXxuDN2I3SgRz603YxoeWq
-         hMevm5oucyuCeKd8GnjkXmlVWRVL+LBO/pMH+6QoPiRhguPk02neN3UeyoNG6POaOq01
-         wlDBQBdONaZv5dOCg/9MQNdfisJK/avAhfW2h/XrJn4tM0aGtdKkEAW/FacreS19FXts
-         gabQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUk+wkJQB24VN41Mk7uQGWYmQLnXXlCs65OFZ3Y4dSWiZ2ISoTiURz8eYCx37/Mg2Kl49pnNSZ3NFZ0Ivo=@vger.kernel.org, AJvYcCVy1DPCW00tj5slDCactmm6h5u9TGwUCDWx9TikGni8WKhEzuN3fsSeseH65J+GYrIHFTX9ML9X@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFd4bJq742bGEe/MS8OE2A+QQzeU8Q85Tv9EpE29hUUeZtt9jV
-	Wc+Ohh4yvi3cEg6c8Vj4T3SkXJRYrYxu1amfHKOspmY9JllLmrt+lcgc
-X-Gm-Gg: ASbGncsMn80vWaMWCrN+a3q93TxkoFRdcnCXA+F+nRjYNI9fe4syL8RnPHt8yp6jRsX
-	hBmSPx3HK9wO7YVSC2qUEt5I1s/Esz30FnXfJibLjZTirXZ+nV9ubqI9ICueXXxDI+bNK5HYkq4
-	8lT8vuM5SdURkbYJZf166il2T7vwdpZ2jrn6BoweTDTaOCDJgE6Un0aS0kuOTtOe7Fc5TjoDxrV
-	SKhta/xuJDVXaz23PoofWQ92TpdkoMho8ElG7biMLSfmz2+QyMU/hIlycGfr6yiuyK5VbDwpjPY
-	j8T0AyaevmjaRf4mp05hIADx26z+xzt2YQCTtZ/n1j0OBxA+m7cA8TYyt9VjYmUW21wlWQtiiZ/
-	W0mtO5WWyRDV1yjyEKC2XA7Y4muP80tBe6torVZo3FmWsf2i5egxK
-X-Google-Smtp-Source: AGHT+IFq1s/33PU9NhVhaQIXLsSfqaM0L5mQsKy1IdijhQBIKAlU8lKlp8Te8KHbzSrKWn4AeqH/9A==
-X-Received: by 2002:a05:6000:2dc6:b0:3a4:dc32:6cbb with SMTP id ffacd0b85a97d-3a4f89cd26dmr4137946f8f.31.1748686407933;
-        Sat, 31 May 2025 03:13:27 -0700 (PDT)
-Received: from skynet.lan (2a02-9142-4580-1200-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1200::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8000d5dsm44500205e9.26.2025.05.31.03.13.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 May 2025 03:13:27 -0700 (PDT)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: jonas.gorski@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vivien.didelot@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dgcbueu@gmail.com
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [RFC PATCH 10/10] net: dsa: b53: ensure BCM5325 PHYs are enabled
-Date: Sat, 31 May 2025 12:13:08 +0200
-Message-Id: <20250531101308.155757-11-noltari@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250531101308.155757-1-noltari@gmail.com>
-References: <20250531101308.155757-1-noltari@gmail.com>
+        d=1e100.net; s=20230601; t=1748687258; x=1749292058;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VQ3poRpVAbqg8lKnPKyCxlIgIfKo7fljzJSrqrBhuj8=;
+        b=mSbtdjZceCQW4P8Ec0Cx01YymQea81LgFEDMvtiwwL0Dhs/0bD/fI12tG0bwhcG2+X
+         82JMChDuqfFpjIdVzaJkYeVgycm76BxWrlMdVbemPmgnBn5Ed7aTL3IO8+OZPD83ykV4
+         mXpzfrbZBsHpMarbBnZZBGElPOrXND0mGjvFwJFDZEXFZg255haeYljG4LFqqEdl3Dhk
+         twsdAmS1S6W9AtQLD+iWoea56DUdcKCSzg64q33J+OlmNghZLlxpERBURqxD2sDMeIpe
+         kWr7pE4m9Fu7dKUvGcsP6MuXhr6YHxdvZ6WOh/3HzfrkDtKHcVjaw4YfEAAudE6lvE5c
+         opNA==
+X-Gm-Message-State: AOJu0Yymb/uXwX8V152OHBUsnWXckmUHoC6bWKZpzxlJzhBG02mjEifn
+	tDVw0hEQO2ylDRUcawDHl1Eb42oeQY7OVummbpUYVWyX1b6u2DvwVJKVfL70Xg==
+X-Gm-Gg: ASbGncvAbNoyB3QiaV3hotjfPDL7H8bykYs+ss23UVjWlabFOX7B/cBsFr2R0uTZJpM
+	tTDXxrsjCqmlAFI+NUkvwC4ogO+HAvbjz5l36UNut6mDNlgCTCQTE810A0OZNMk9K1sL8uBUwS2
+	6k77I8syJ0NYnxY4JymCTZE+g/na4KDXvMqlrnM1Xld1p2zm8gYHpQoufVPn3irm3WORy7rhTKd
+	Pc7fUE2MfOe4NGiKlz/A+SBD09Hl6Ervn72Ni8n4Ub/6eSS60DD0Ie8x29+ATIl0zu9ZyA3ZEh0
+	LxB/YaUVx5ajZTP2Q/gLmW8NfiJtYQcCL0iZVYjFOufiW5CuVsocqYwQkmzjWTEvSHKlvRTu
+X-Google-Smtp-Source: AGHT+IFRhfClv4Mv2yEjBEk1lhmHGZ+8qm6WGwQJnNzHl20De/LDe4sgl8q9a+h3rUkW2bno9AzIsQ==
+X-Received: by 2002:a05:6402:35d5:b0:5f4:9017:c6a1 with SMTP id 4fb4d7f45d1cf-6057c62af81mr4896994a12.25.1748687257912;
+        Sat, 31 May 2025 03:27:37 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.133.152])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60567169cdfsm3021465a12.70.2025.05.31.03.27.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 31 May 2025 03:27:36 -0700 (PDT)
+Message-ID: <bf6aa4f9-7c6f-4e28-88c0-0e20c5e4a854@gmail.com>
+Date: Sat, 31 May 2025 11:28:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] io_uring/poll: introduce io_arm_apoll()
+To: io-uring@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+References: <cover.1748607147.git.asml.silence@gmail.com>
+ <8abeb8e2328e923515c63e43a1942802efabb3b1.1748607147.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <8abeb8e2328e923515c63e43a1942802efabb3b1.1748607147.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register to
-disable clocking to individual PHYs.
+On 5/30/25 13:18, Pavel Begunkov wrote:
+> In preparation to allowing commands to do file polling, add a helper
+> that takes the desired poll event mask and arms it for polling. We won't
+> be able to use io_arm_poll_handler() with IORING_OP_URING_CMD as it
+> tries to infer the mask from the opcode data, and we can't unify it
+> across all commands.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+... -		if (req->flags & REQ_F_CLEAR_POLLIN)
+> -			mask &= ~EPOLLIN;
+> -	} else {
+> -		mask |= EPOLLOUT | EPOLLWRNORM;
+> -	}
+> -	if (def->poll_exclusive)
+> -		mask |= EPOLLEXCLUSIVE;
+> -
+>   	apoll = io_req_alloc_apoll(req, issue_flags);
+>   	if (!apoll)
+>   		return IO_APOLL_ABORTED;
+> @@ -712,6 +696,31 @@ int io_arm_poll_handler(struct io_kiocb *req, unsigned issue_flags)
+>   	return IO_APOLL_OK;
+>   }
+>   
+> +int io_arm_poll_handler(struct io_kiocb *req, unsigned issue_flags)
+> +{
+> +	const struct io_issue_def *def = &io_issue_defs[req->opcode];
+> +	__poll_t mask = POLLPRI | POLLERR | EPOLLET;
+> +
+> +	if (!def->pollin && !def->pollout)
+> +		return IO_APOLL_ABORTED;
+> +	if (!io_file_can_poll(req))
+> +		return IO_APOLL_ABORTED;
+> +
+> +	if (def->pollin) {
+> +		mask |= EPOLLIN | EPOLLRDNORM;
+> +
+> +		/* If reading from MSG_ERRQUEUE using recvmsg, ignore POLLIN */
+> +		if (req->flags & REQ_F_CLEAR_POLLIN)
+> +		mask &= ~EPOLLIN;
 
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- drivers/net/dsa/b53/b53_common.c | 3 +++
- 1 file changed, 3 insertions(+)
+fwiw, I need to fix tabulation here
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 802020eaea44..7b786d0d14cd 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1299,6 +1299,9 @@ static int b53_setup(struct dsa_switch *ds)
- 
- 	b53_reset_mib(dev);
- 
-+	if (is5325(dev))
-+		b53_write8(dev, B53_CTRL_PAGE, B53_PD_MODE_CTRL_25, 0);
-+
- 	ret = b53_apply_config(dev);
- 	if (ret) {
- 		dev_err(ds->dev, "failed to apply configuration\n");
+> +	} else {
+> +		mask |= EPOLLOUT | EPOLLWRNORM;
+> +	}
+> +	if (def->poll_exclusive)
+> +		mask |= EPOLLEXCLUSIVE;
+> +
+> +	return io_arm_apoll(req, issue_flags, mask);
+> +}
 -- 
-2.39.5
+Pavel Begunkov
 
 
