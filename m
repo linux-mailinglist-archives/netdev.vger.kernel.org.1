@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-194486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D59AC9A53
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 11:53:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A207CAC9A58
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 11:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5199F9E323B
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 09:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5693418820D4
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 09:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E624239E76;
-	Sat, 31 May 2025 09:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32A62376F7;
+	Sat, 31 May 2025 09:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="nUO6SsTZ"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="yXIApW4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A932376EC;
-	Sat, 31 May 2025 09:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF30842AA6;
+	Sat, 31 May 2025 09:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748685143; cv=none; b=qf7hkVczKoVhrzEkhHyI6J2kPTZOgTErjBpd6A5dL2lKcg8yecvk9VdASXmOWmuuJfkcXd92DdGlE+WR0jKv7gyVuJMllO8eW6P8NkcQi95mDYWwZzMEomOsjH7zaZgL896e02JY/rSVfnzQnayBgEJ99pNuCW/QWV4OyxAW9/4=
+	t=1748685402; cv=none; b=ccVRqhjqZsD0mwGttcBJOuvv6Mt46TR/Dhc0wFj8qQ1YouJVmiZITx3KXDc/VBFH13ODgVmTIZjLvKL1TItWO+5pJbJAtbtpwh3idmftbVOHOL5ZEdTva9khC7fxLAjsZdacgTlRjwIZlSdAvVzVjoIkhU9Srswfh5UWW56XdDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748685143; c=relaxed/simple;
-	bh=mcLu69E22oPtyjeUulYDLFJPoP+jaJ+5GOPJWv+7XyQ=;
+	s=arc-20240116; t=1748685402; c=relaxed/simple;
+	bh=YH4FPc4zPeMtJdswC/DmhVLJXooDCtARO8fEo50NAeI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZpSvPG4yRulkBH8b2lthdRIZY8XiLYo5KIIIVSJZArDZ/ntrKaf5A0BVmvK5BFUnDY67GBAtOUcy+5qgzm8k2gure4iRrxo9vkcO+7EDcXzbrteGuO7b8tw0kVW8RXiQ2PiWpi/8dg/ujRx8gLirwYYoks3nN8D2yPIJAmtxKnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=nUO6SsTZ; arc=none smtp.client-ip=213.160.73.56
+	 MIME-Version:Content-Type; b=F88gSF1lCq24CVjM5mAAEqIqQZ27VwrZAoGzrQLD/tkjPJvqoBCLP4w7XYWZ07N3W/+vBVeyjk/a5WD5gMvBHhbj+fdph8DkW8+EkhuUgWZPwEB/y2hQGMg31FAcElIhStjKXvOhba4v6gRQ9AotrjhtsDQY2Z3MjdmyOAmmMkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=yXIApW4H; arc=none smtp.client-ip=213.160.73.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1748685138;
+	s=20121; t=1748685398;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yvo1gKEFvcCi1DSavYyf9wE/OfH4XiSCUbk32K7rcBQ=;
-	b=nUO6SsTZH54XbUvXnm3Ki3CChaZZZASBQx/bUv8hbtvqU5PiZUPFTbmxUu9k/yn5srJafl
-	k5CXPZdG/k8vTSCpGQa3b+CFO6elNPORIR2r0USjAJcoCUaMCLd6Xwwy3wbZ393/KKVX0N
-	ld/l6hZZXkLzBgccZIoVQ1O+Q9zUvsk=
+	bh=esolGE2tSmNnPRF4uWyr6841H7n9QIGFhdDzJ0qYsmo=;
+	b=yXIApW4HetJxcCx6PbYU2Q6MGzczG2zPhjkkhokn3Wrk5Q5F4MdxlWKesADIWWmNJOo548
+	VcTUqqQG9FvvAsjfF6eMVXMn93YX68dm4KK0EIhzX4oFIXTPlPCQpS6l35GJoMhqqPuOgJ
+	OUwp+cRrPEtZrF570WH7O4K/For/0DM=
 From: Sven Eckelmann <sven@narfation.org>
 To: Marek Lindner <marek.lindner@mailbox.org>,
  Simon Wunderlich <sw@simonwunderlich.de>,
@@ -51,42 +51,90 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org,
  Matthias Schiffer <mschiffer@universe-factory.net>
-Subject:
- Re: [PATCH batadv 2/5] batman-adv: only create hardif while a netdev is part
- of a mesh
-Date: Sat, 31 May 2025 11:52:12 +0200
-Message-ID: <6005840.1IzOArtZ34@sven-desktop>
+Subject: Re: [PATCH batadv 4/5] batman-adv: remove global hardif list
+Date: Sat, 31 May 2025 11:56:34 +0200
+Message-ID: <4860101.CbtlEUcBR6@sven-desktop>
 In-Reply-To:
- <e311c7d643fa1a7d13f2b518f6ee525eb6711f6c.1747687504.git.mschiffer@universe-factory.net>
+ <262d5c5a5afe3d478d2e65187c0913a3a8c4781f.1747687504.git.mschiffer@universe-factory.net>
 References:
  <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
- <e311c7d643fa1a7d13f2b518f6ee525eb6711f6c.1747687504.git.mschiffer@universe-factory.net>
+ <262d5c5a5afe3d478d2e65187c0913a3a8c4781f.1747687504.git.mschiffer@universe-factory.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4437374.BddDVKsqQX";
+Content-Type: multipart/signed; boundary="nextPart6384946.cEBGB3zze1";
  micalg="pgp-sha512"; protocol="application/pgp-signature"
 
---nextPart4437374.BddDVKsqQX
+--nextPart6384946.cEBGB3zze1
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
 From: Sven Eckelmann <sven@narfation.org>
-Date: Sat, 31 May 2025 11:52:12 +0200
-Message-ID: <6005840.1IzOArtZ34@sven-desktop>
+Subject: Re: [PATCH batadv 4/5] batman-adv: remove global hardif list
+Date: Sat, 31 May 2025 11:56:34 +0200
+Message-ID: <4860101.CbtlEUcBR6@sven-desktop>
 MIME-Version: 1.0
 
-On Monday, 19 May 2025 22:46:29 CEST Matthias Schiffer wrote:
-> -int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
-> +int batadv_hardif_enable_interface(struct net_device *net_dev,
->                                    struct net_device *mesh_iface)
+On Monday, 19 May 2025 22:46:31 CEST Matthias Schiffer wrote:
+>  struct batadv_hard_iface *
+> -batadv_hardif_get_by_netdev(const struct net_device *net_dev)
+> +batadv_hardif_get_by_netdev(struct net_device *net_dev)
 >  {
-[....]
-> +       hard_iface->wifi_flags =3D batadv_wifi_flags_evaluate(net_dev);
+>         struct batadv_hard_iface *hard_iface;
+> +       struct net_device *mesh_iface;
+> =20
+> -       rcu_read_lock();
+> -       list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
+> -               if (hard_iface->net_dev =3D=3D net_dev &&
+> -                   kref_get_unless_zero(&hard_iface->refcount))
+> -                       goto out;
+> -       }
+> +       mesh_iface =3D netdev_master_upper_dev_get(net_dev);
+> +       if (!mesh_iface || !batadv_meshif_is_valid(mesh_iface))
+> +               return NULL;
+> =20
+> -       hard_iface =3D NULL;
+> +       hard_iface =3D netdev_lower_dev_get_private(mesh_iface, net_dev);
+> +       if (!kref_get_unless_zero(&hard_iface->refcount))
+> +               return NULL;
+> =20
+> -out:
+> -       rcu_read_unlock();
+>         return hard_iface;
+>  }
 
-Moving this here should break the WIFI TT flag in scenarios like this:
+This code is now relying on rtnl_lock() (see `ASSERT_RTNL` in=20
+`netdev_master_upper_dev_get` and most likely some comments somwhere about =
+the=20
+lists used by `netdev_lower_dev_get_private`). But `batadv_tt_local_add` is=
+=20
+using this function without holding this lock all the time. For example dur=
+ing
+packet processing.
+
+See for example `batadv_tt_local_add` calls in `batadv_interface_tx`. This=
+=20
+will happen when `skb->skb_iif` is not 0 (so it was forwarded).
+
+
+Please double check this - I have not actually tested it but just went thro=
+ugh=20
+the code.
+
+
+And saying this, the `batadv_hardif_get_by_netdev` call was also used to=20
+retrieve additional information about alll kind of interfaces - even when t=
+hey=20
+are not used by batman-adv directly. For example for figuring out if it is =
+a=20
+wifi interface(for the TT wifi flag). With you change here, you are basical=
+ly=20
+breaking this functionality because you now require that the netdev is a lo=
+wer=20
+interface of batman-adv. Therefore, things like:
+
 
                    =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
 =E2=94=80=E2=94=90            =20
@@ -109,76 +157,29 @@ Moving this here should break the WIFI TT flag in scenarios like this:
                               =E2=94=82mesh0=E2=94=82  =20
                               =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
 =E2=94=80=E2=94=98  =20
-
-
-ap0 is not the lower interface of any batadv mesh interface but TT ap=20
-isolation is depending on the information stored for this hardif. See:
-
-
-
-/**
- * batadv_is_wifi_hardif() - check if the given hardif is a wifi interface
- * @hard_iface: the device to check
- *
- * Return: true if the net device is a 802.11 wireless device, false otherw=
-ise.
- */
-bool batadv_is_wifi_hardif(struct batadv_hard_iface *hard_iface)
-{
-	if (!hard_iface)
-		return false;
-
-	return hard_iface->wifi_flags !=3D 0;
-}
-
-bool batadv_tt_local_add(struct net_device *mesh_iface, const u8 *addr,
-			 unsigned short vid, int ifindex, u32 mark)
-{
-[...]
-	if (ifindex !=3D BATADV_NULL_IFINDEX)
-		in_dev =3D dev_get_by_index(net, ifindex);
-
-	if (in_dev)
-		in_hardif =3D batadv_hardif_get_by_netdev(in_dev);
-[...]
-	if (batadv_is_wifi_hardif(in_hardif))
-		tt_local->common.flags |=3D BATADV_TT_CLIENT_WIFI;
-[...]
-
-
-static bool
-_batadv_is_ap_isolated(struct batadv_tt_local_entry *tt_local_entry,
-		       struct batadv_tt_global_entry *tt_global_entry)
-{
-	if (tt_local_entry->common.flags & BATADV_TT_CLIENT_WIFI &&
-	    tt_global_entry->common.flags & BATADV_TT_CLIENT_WIFI)
-		return true;
-
-	/* check if the two clients are marked as isolated */
-	if (tt_local_entry->common.flags & BATADV_TT_CLIENT_ISOLA &&
-	    tt_global_entry->common.flags & BATADV_TT_CLIENT_ISOLA)
-		return true;
-
-	return false;
-}
-
+                                       =20
+                                       =20
+Is not handled anymore correctly in TT because ap0 is not a lower interface=
+ of=20
+any batadv mesh interface. And as result, the ap-isolation feature of TT
+will break.
 
 Kind regards,
 	Sven
---nextPart4437374.BddDVKsqQX
+--nextPart6384946.cEBGB3zze1
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part.
 Content-Transfer-Encoding: 7Bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDrRTAAKCRBND3cr0xT1
-yzUsAQCp/BGDaLgH0bq7xgYDPfCB+JWa1ATr3Z4n9blbzryMMgD/bOqU8Sjbwa9V
-21JVjVIElBn4VBShwmvDlt2H82tdMQg=
-=Ej70
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDrSUwAKCRBND3cr0xT1
+y1CLAP0XdjoI2bffn1RBFQJQ9/80BKTDk7uFDARhT1LU3ccLXgD/VigawRbVt5L8
+GQJphRNf9pct+c3yAGqgAEw2JOpY7wA=
+=BNYO
 -----END PGP SIGNATURE-----
 
---nextPart4437374.BddDVKsqQX--
+--nextPart6384946.cEBGB3zze1--
 
 
 
