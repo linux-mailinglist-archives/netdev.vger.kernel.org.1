@@ -1,110 +1,136 @@
-Return-Path: <netdev+bounces-194492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1256AC9A65
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 11:59:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856C4AC9A6D
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 12:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65F464A1820
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 09:59:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 899A41BA2B9B
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B4F238C3F;
-	Sat, 31 May 2025 09:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D08239096;
+	Sat, 31 May 2025 10:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="s4JsNElf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KI2i9ajm"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EEE238C39;
-	Sat, 31 May 2025 09:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FCFEAF9;
+	Sat, 31 May 2025 10:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748685561; cv=none; b=UtNfnA3gyLrmZal63m7s0B4Z7Md3AjiIPpimxBlRRolBVR7HwiDdgLMa33+LsuV4lBM4nQTfEfqaBQGofm2NwrkNVSh35aGqlJL/6nomYICRT6D+Sn7Gb+CbAN8bs9wO9xMO4webMWvnMvSQS3HgOAGs5GuSovSCvhZMJ08A8ms=
+	t=1748686395; cv=none; b=O3HUJDEhdK537li17zgtEP/2BPAQaUe8UluZj39Nz2VKI9RkkDVa2CZLJXhFLYJujxYh/Yr+9KmG9UWGPc2CyN4rKgkQxXEpu5Hf40UW7X4fV5DOX6JEyhkkwmww5EwRdeFi4P6jPlc/giEOQ1u/6L7o9JKZRwO2Ca5qd6hrAjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748685561; c=relaxed/simple;
-	bh=jHNdXiEkBPD/4hRFb5+gNLCWyeacWlbbq8GE5s0EJU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H8+YxsjEtu68uPHeQj/ZrOZZ2adoYj7By6NRTIqbv0Ncge0PcCkFlcpl+1JMWm+Q/xMy6b8NESLczH2qVQRkNub/tyfXtgI4c7UvzWdj4itRHDwvbR3TL39l3iISmqbluJZlQ1Dwe+JjR8oogdHNh+fu8ZvWguYcTeRlq7ZCIF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=s4JsNElf; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1748685555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F28uW/kKPBc+Y8EedF7wmeIStqF2kUtY2XQ+UTLAn34=;
-	b=s4JsNElftbgemCahvFHM5i7zibfPVAa5C95dnFlArOQD1Ow2PQokjqH5SBAe2F/rh5pjeT
-	9j9QS8md8jV5P3yncFR4uWkilj0xYGUNNEfnBhCVfHoZwdnjk/P0MnK0PhDMV63TYuAKgO
-	c72/3fSlpryMdWVFR03RgP4eMzXPEvk=
-From: Sven Eckelmann <sven@narfation.org>
-To: Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- Matthias Schiffer <mschiffer@universe-factory.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Matthias Schiffer <mschiffer@universe-factory.net>
-Subject:
- Re: [PATCH batadv 5/5] batman-adv: move hardif generation counter into
- batadv_priv
-Date: Sat, 31 May 2025 11:59:12 +0200
-Message-ID: <15478494.dW097sEU6C@sven-desktop>
-In-Reply-To:
- <fd475dcf9ceaa7d14e4f0b4dca668f93e704f370.1747687504.git.mschiffer@universe-factory.net>
-References:
- <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
- <fd475dcf9ceaa7d14e4f0b4dca668f93e704f370.1747687504.git.mschiffer@universe-factory.net>
+	s=arc-20240116; t=1748686395; c=relaxed/simple;
+	bh=fE9rjcOe73GczV4f3iFeM7TbM1yMFp+vz1ozRku4LIE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=HzrzQWHVXq5udoZAULST08WNHLT4MEEFhgzM65dJNTCgfWZReN48uwchakGLbKo+wwZ3O+k75d6bv4fP+5HRnKBgNtEKTD7V4uVg3rK+Qbd6VAWLdZmGfv/V6gMXPJQ48R4GJYvU0Beg05kseZ83Uhxpl3KH2Jxyf2egJtP79T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KI2i9ajm; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-450cfb79177so13474085e9.0;
+        Sat, 31 May 2025 03:13:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748686392; x=1749291192; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rQyDzOUbw+LDtAyftP1KtxZK0csZCuFuzRG5f8sdr2M=;
+        b=KI2i9ajm5fonXYMYcOdLHRK44umKBiKvpQOf23Dmv8jsqOJoz03XL8qGzlMEVc5zAJ
+         DF1KH5uXFcseLljjnNMqZnkw1fyPYaq3CYzu47Fp2A1WjChE+ib2uy3m2H+QTIVrKziB
+         ilF070weQEArj3g9E70sAd+zMjpvXJpCgD6hjOn03XvYqNkMel6G03YOSure6mTzPeq/
+         2t8G0QFAG6IOI1LqiF2UaqGVxJ5VlJASoqAenjk1bydQfpG+jz4htOl55aqOwVXe5qnc
+         r0uls/Sc9iw6kYDAX9FplX9jQz1KO7tDtx4Fqqf8UMfRNsRBpv8bZbzpxjm2lPiFnm8A
+         AClg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748686392; x=1749291192;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rQyDzOUbw+LDtAyftP1KtxZK0csZCuFuzRG5f8sdr2M=;
+        b=oP+VCzWNCLsW3msDUH2BUeZrlMnT7bWrc1fS/WtHjpEg0E9N8gohrNiur98ZaBRoyx
+         CnRdU7j16OGTBjksPtqm/GSYXnwg/Cam6XHIcGBC5VsWTWpcqGUunSWLqsJW0qA3HEX/
+         Lxu4t8c5X57j48oenPLCjl0EkCcyHs6F/bT7iNFcwTyPEqODW4RBXaCLv0jXY1IucMdW
+         Jxa+T4RGZGPmDb8hb1RcxnWOqGEOkUn9QfiScGFUPi+3J9SlpVQWgWSIY0/ahFPlKdQV
+         kmp5s17JLkyz++Hp7Ja9uKVYxxAvSdqwozSeJm/7IfJ+X+lnrc/uE+1sFw4hgFtGrjn2
+         fs+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUMVt3ks9ZWQz/pfqw99QaM5putf7pMa/T2AY8NJtfxqp1n+ZfA5hEJYykwh+4iswe6D0Hi7o+0@vger.kernel.org, AJvYcCWmU8xMsto1WLx7n8GHOHesFQUBim/65BHRSI+fCWvKvbq0l/vrWaiEKv3Vk8HuLatFqsc8v2j4E1iEG7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi8hem4d1QFNMatNPCT97BOWW+8eLwCi5NZsG/dzaUH4syc0rY
+	/qNe/uuO2/hdjauaeN6MoYta9T5GAGRWR1Mb7VSnj4yjHYjZO/Top9kH
+X-Gm-Gg: ASbGncvRKDdX3cwW6UsfGChtouEsLzzSAv8Lkx850LEB6SpCR4jYy5k408eZPVi7BIb
+	BelVRL7TxTkHxJP7qliNNctlV+juVk/C50FBTR6EytgkyKRm2kmy9IuPccBQB/9qmifpCW8gFT/
+	h2B2HuOfZ9zBJQOCePiAYjnYZM+Ns2nwekBUp/DA/C197C8DCisZoaSxGs9qaZZxlIpskKwdc+f
+	Lk2Vj3qWIT+HreA2VMFKpwp1OnX9F61CXuX3b6a2aGgWJL18YGw7dTuyOmI2S0pOTYSOIgvAeBC
+	0CUIFqjjrzRvoHmwcVayw075qMMPrzJJD2JI7sUvi/4+yF64iB83coSsHdx7QRwC8srUu9XkLER
+	l0hsNcKQOQIbVnPd7ex/vR96pRlyOZ1YKSIfXWblATJQyrh+aPM3TOVKWvVuoEY0=
+X-Google-Smtp-Source: AGHT+IH8gXomumzVn3X1fOVNK/UdIN3tXAOtzUrIbf95bqUOQc8bsc17bEKmD7i5aHj0OIc3P580Ag==
+X-Received: by 2002:a05:600c:46c7:b0:450:d019:263 with SMTP id 5b1f17b1804b1-450d886f76amr53507445e9.18.1748686391844;
+        Sat, 31 May 2025 03:13:11 -0700 (PDT)
+Received: from skynet.lan (2a02-9142-4580-1200-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1200::8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8000d5dsm44500205e9.26.2025.05.31.03.13.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 May 2025 03:13:11 -0700 (PDT)
+From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+To: jonas.gorski@gmail.com,
+	florian.fainelli@broadcom.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vivien.didelot@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dgcbueu@gmail.com
+Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
+Subject: [RFC PATCH 00/10] net: dsa: b53: fix BCM5325 support
+Date: Sat, 31 May 2025 12:12:58 +0200
+Message-Id: <20250531101308.155757-1-noltari@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart26338690.ouqheUzb2q";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---nextPart26338690.ouqheUzb2q
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Sat, 31 May 2025 11:59:12 +0200
-Message-ID: <15478494.dW097sEU6C@sven-desktop>
-MIME-Version: 1.0
+These patches get the BCM5325 switch working with b53.
 
-On Monday, 19 May 2025 22:46:32 CEST Matthias Schiffer wrote:
-> The counter doesn't need to be global.
+There are still some sporadic errors related to FDB, but at least the
+switch is working now:
+bcm53xx fffe4800.ethernet-mii:1e: port 0 failed to add d6:67:0c:XX:XX:XX vid 1 to fdb: -28
+bcm53xx fffe4800.ethernet-mii:1e: port 0 failed to add 5c:4c:a9:XX:XX:XX vid 0 to fdb: -28
+bcm53xx fffe4800.ethernet-mii:1e: port 0 failed to add 5c:4c:a9:XX:XX:XX vid 1 to fdb: -28
+bcm53xx fffe4800.ethernet-mii:1e: port 0 failed to delete d6:67:0c:XX:XX:XX vid 1 from fdb: -2
 
-Yes, with the changes from 
-[PATCH batadv 1/5] batman-adv: store hard_iface as iflink private data
+I'm not really sure that everything here is correct since I don't work for
+Broadcom and all this is based on the public datasheet available for the
+BCM5325 and my own experiments with a Huawei HG556a (BCM6358).
 
+Florian Fainelli (1):
+  net: dsa: b53: add support for FDB operations on 5325/5365
 
-Acked-by: Sven Eckelmann <sven@narfation.org>
+Álvaro Fernández Rojas (9):
+  net: dsa: b53: prevent FAST_AGE access on BCM5325
+  net: dsa: b53: prevent SWITCH_CTRL access on BCM5325
+  net: dsa: b53: fix IP_MULTICAST_CTRL on BCM5325
+  net: dsa: b53: prevent DIS_LEARNING access on BCM5325
+  net: dsa: b53: prevent BRCM_HDR access on BCM5325
+  net: dsa: b53: prevent GMII_PORT_OVERRIDE_CTRL access on BCM5325
+  net: dsa: b53: fix unicast/multicast flooding on BCM5325
+  net: dsa: b53: fix b53_imp_vlan_setup for BCM5325
+  net: dsa: b53: ensure BCM5325 PHYs are enabled
 
-Kind regards,
-	Sven
+ drivers/net/dsa/b53/b53_common.c | 213 +++++++++++++++++++++++--------
+ drivers/net/dsa/b53/b53_priv.h   |  57 ++++++---
+ drivers/net/dsa/b53/b53_regs.h   |  47 ++++++-
+ 3 files changed, 246 insertions(+), 71 deletions(-)
 
---nextPart26338690.ouqheUzb2q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDrS8AAKCRBND3cr0xT1
-y6P6AP9KRnJJUPOIrj7VPA28oI+6BCBzSpYDpPYREKPl1twT1gD/R6ggdPQFEeRJ
-rWPV5+4jwZmGS4UipJNC3BrNZrs8UA8=
-=f/dy
------END PGP SIGNATURE-----
-
---nextPart26338690.ouqheUzb2q--
-
-
+-- 
+2.39.5
 
 
