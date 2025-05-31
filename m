@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-194513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD73EAC9C58
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 20:40:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFEDCAC9C5C
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 20:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35ABD17A2F1
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 18:40:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38B5D9E110C
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 18:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525B71A3141;
-	Sat, 31 May 2025 18:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDDF1A8419;
+	Sat, 31 May 2025 18:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgQWXQob"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMYs4Rzt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08E52907;
-	Sat, 31 May 2025 18:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4D81A5BA2;
+	Sat, 31 May 2025 18:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748716795; cv=none; b=Qyu4cveu7ODc4ySmkJUav9xNX3ox+hYumGzMeFOXuZs+JnZAc3GWv3VDhFC9zOieO0CnEu/xlbvaVYO6jyzK5A/22dLAogkpPG3i69Hr23eUO5HU9FiOI1I68mUAj5WgFHC2wrfUO0QN4krRKQr1zS2VbECfZgvwKEFdNjVfhfs=
+	t=1748716798; cv=none; b=lcoFoD5+JfmsJgPAloJF14Zf5ciH8UdBRy2//c/e3srxsdLf0GW8WT71wM+keX2VrO0YtZHF/V2V3GjvHoI1lcg8bH7KvhlsciQ20aR44TKs8cRQYN3VmyR6Lj1iZdkfZKejjHyYkjJNvtOpqm5208OOGFTdEHn0qRNYuNEtkx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748716795; c=relaxed/simple;
-	bh=siLeM9++8r0ODoi+wjzDjRUa7L7fDm4F+gHfOU57OtY=;
+	s=arc-20240116; t=1748716798; c=relaxed/simple;
+	bh=jB+SAxV67/XkLO7Ja8VKYB3BnV/TpONenLjNMpQ2DpM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YueYJxCmrqg5PbRUWTi7iHuQhzhIwc2Gt+YJqUngOdEDzZ2D/hRcZOM3w7QxdTBVPiFKf5dD6+n3Jy2d7ZIVMIXYy+uY9vQzPc5wKvFALhxQ3zQw/4RCBl3BAuomsGl0VJffpvJuP+5ylxXAn4TpvTa8064MCIrh1x/Yr4BcZ24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgQWXQob; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version; b=CAlnmbLjwu9cy3ZA/AThoBmgOJZoVXEU9EHeXTBVaVsM8Ac0cOt3L+tGJDI5hMGg7AmQehg/hgLeG2hE9v1ScYQkoP1Mhn8QEAZPV1ReByRPRjTiZl5sH9Cau2FjDqvATv4tqB9lObmwt0Vjh4G3Xb5WXWJ7VBjRzn6zNETWxWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GMYs4Rzt; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-74019695377so1901072b3a.3;
-        Sat, 31 May 2025 11:39:53 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74267c68c11so2343847b3a.0;
+        Sat, 31 May 2025 11:39:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748716793; x=1749321593; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748716796; x=1749321596; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Pg0UJGmkB9eAqwQAGGERmKFyJgP97enh4p/9sTbGNAo=;
-        b=MgQWXQobMD/oGNnaGK3EoBi10A0ssnPtVpGc/SRl68PE0m13MPoA0iOXnD9DfCvAq0
-         36TO0XMcjrT6Md76Hb5dkoNfUlzC9pcc5zNQ2Fp2r1wSfvuRLO+/qQdyheje6QbINI3y
-         la256rTLjTaQcdZvRhnEXhdPNrBb5BEqEZpcjHAeOuhE0Wo/Us6q6SdFbdH8wIEsYxUT
-         nxPwIuxuIFQ6Fy7etoK9Qo3du1qBCjkzQwQ+LhEm0nJiuHdzsdkfeRAfNwr89kfSSVyc
-         NCYNg4s4HCMhaO3kdtWgsQnAgEi1332RWJwyb9eGNE23TkAqEZK3b49GT3cs8IMs77T/
-         TLjQ==
+        bh=LNmAyfWjthm2OoYu5rb89I5Fn5ozA8/1Vp5gyVNMnWg=;
+        b=GMYs4Rzto4OHd1K13J0oXDTlEmrT9QkL8halgQtcK5CO/r894EkV805JE5m6xbIVIi
+         Q9KnYJWVnLglVQVyPXrDcm9sRm0VujTYjvSbWVMBbDzi+n3djbAWjYEZFYm/Ms9bvh7M
+         IsMqN+BT9dpLRZUWwKnuFed0xEcIR1XDcF1c1/VVFWq8UCb7zIfng0XLLTabLWTzEZP7
+         4sBJtk1lGsRH5K+C6byNanpA31tWXFskiGz4LeXqm+TkRwCaBnrWV4Q7WU8hooui8fFg
+         o/2nFaW6MwDiq8IjUGOFa277au4e0dTUJW62EOsw9PLGD5wTewOkkLzU+3JHNd5V8AKe
+         9Vmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748716793; x=1749321593;
+        d=1e100.net; s=20230601; t=1748716796; x=1749321596;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Pg0UJGmkB9eAqwQAGGERmKFyJgP97enh4p/9sTbGNAo=;
-        b=F8qJrQ54nYNK9zltLAHs8Z1mxxNJBGCkrUJ1I4nXiX95Ztp5ZdM93jWoJsmudRTXcv
-         lfdprejscARR34aQewQhfgpFBqIbNM/Xnkxr/3wLqbllbv8P2l9fOTtDMEyiEHZPAocH
-         LVnIM6wvCRKfXC1bgDUcebgkBE7WPR0FjkYSxe9XlhtXL2i/wi9VUmXygG1qO2BCs9yS
-         F0DjCf4aSPfht8iTjpWRCElto9GwhdJ7fD5BftqoxUUmA8O5DVH8TbbCgf/c7xaQCCmk
-         ZRXUwtyA121zxQBFVprJ/6SadS6y08Dpw+p2mgIZeDSpAVZhXFSLBDiP4I9nWq27IlQs
-         16IA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6aEw6nf9FdTPnfazBLT/d9ht7cUbqC2ixQvmGPji0VbZmhIR2cczoqsvkhhAR65HSe2OECJYHzofC9dVo@vger.kernel.org, AJvYcCUVP5+SAumiAXp2Tfis2YGXnVn1oGxQBE0b1zbc6WN4orLyaNBNeyZKGKrj+R1xDINFXJFsaAMt@vger.kernel.org, AJvYcCVAv5jHxy00SoPNZnhpKD0Ya7+oARZMbDZTnJ47K98gtkn0l81b0e6c7qOrSCaMoDloKpSYmh4KqYv2@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgWD6+jOgkvFsruag1KGLqcoqDZhH8XMVw18NT/5Lwd+akYQLf
-	Ix/8X6W2l33jco+hYqOnO/AXX9yravQ5beWaFw16KwU3feEZnq7MvAK8
-X-Gm-Gg: ASbGnctIpxF1ZAtb6Ge3GIK2C1xkD7AlJimLz5VFy7VhdY/dZQVK9ueChFohG+CJXQo
-	hsvMoF3M19ruP4wbqXIQdAt0fG6XpP9yA2K/MsD22n4/UPHoGzPJbYNwuTNcjnJy4qxPO+/Ijh1
-	OlAqMlNK0lGFqIymLsDv/BZ9ol8t6KNSdzw1BLretr7tN84lOgMj5nDkzu+dAMXUITFmBw4xhKT
-	71eyuazfiX9CGhOof6xDqWqSpzj0HSbfGxvv4xbFhqsfgLhJKjcnBYa5rD8NaEHEeSpOT8wXxf9
-	bZLbAAUjaaUZr0ySa4XM2A8QzI/3hrzuuZ9Idnaz8CeVN7Rf1eG7RHnaOaKwcUMeqp34
-X-Google-Smtp-Source: AGHT+IGmHjrHz6p6eGio7dm2FVS4u6g10DOnqW8vHl3Zl8M3+vEeb5Gx21mjHTU52WNVTJGx1mlfIQ==
-X-Received: by 2002:a05:6a20:3949:b0:21a:d1fe:9e82 with SMTP id adf61e73a8af0-21bad0fb3bdmr4254938637.30.1748716792779;
-        Sat, 31 May 2025 11:39:52 -0700 (PDT)
+        bh=LNmAyfWjthm2OoYu5rb89I5Fn5ozA8/1Vp5gyVNMnWg=;
+        b=KxEgorm0lRgNFZHOev/xmNbvPOjiELKQkKnmBwrbnECvFCZygmOk+kB3S4f1nBJny/
+         yS12dQo2KND3bWcU8RkDQPQHPW9hHzi99c13/KS8Rs2dJTkPDAGLQ5/kBxmr9YrfTt6W
+         q4Z8FIwgoNnDJGvtXJOHH4slvT7NdJG4frR4pjjBqxGE3FBNeB2qvIcJ0aQR06dP/YO2
+         I97cwTZtG/vTGjmcfiTBzj+r6z5mDNNZRi1tpcoLNYlxG1yyOZIFSi9wdplhRqtjM4ca
+         ybY3eY3X12U61SnC2+OgcPl2MJg8GKPXxtqe82t5BlCtNrU2vVWNJXYseqARIuNboQ9l
+         NzNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrTBaBIe+i4HHZA4/dEmIOiGVx90q34QvYFet8j0lQCIB9RPfnvkLFdAW2l1mufAof2yJQn25l1TK9@vger.kernel.org, AJvYcCV2pu9g3YpnE/7kWtSmbWj2Sqhnu1ixh9jiSdJyLehkucAqdHVz3nsf8s5GEja/DtpMeOsXAGXh@vger.kernel.org, AJvYcCW7Xcb2/WcNIv+7F8XLBob6ipsniVPk4UxawGoIIU9vcQ9b5drJM7rAxQ0whElPo5Rep+gPNA7ITFQh6Fr/@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFb94yEnSgBbXFWgqm5fNhgXCxcyb8jrqoh8lxvcnSs2jeOgo7
+	Eu5Kda+PaTKhehFjj3QxAUrvSTKahdki4qf+V6K8CiH8fnJXno+dz5/K
+X-Gm-Gg: ASbGncu0VKsQ8XI2IN6DEq78HLhwglRYVq5X+/y6iuNhCVrUy2BqZF3gPYKbj1Ah5GY
+	ny6WsGTIYWPZhv9jN+40js2/tV2Dmpp/JDytgPYFYYzKTlFDRvWEfkmGjRb/rtfhgw9EiWrkg+R
+	1yGaBPaasgfOXF25S40lrxNc14oSQgRI9YtdK3Fz0heGD/AnP4pu9szI4af+nXy6UDbTrAmWD40
+	qIr1rV1W0vMl8ZVrch1MY7dVsCKDDRzB0o2Zz1WmmXYJmDpu/EcsVqw0ZsMmK4H4v0LYCdVfgE4
+	ld5zecyk3oDsNa62IRU4mKIYqS0ccuSre3fj3wLU87WYuzXh9b4i5qn3OAEg8PEVrlWH
+X-Google-Smtp-Source: AGHT+IGnokTqe2k6JjA0Dh07tmyGJBv4+/KSD4G2Vt+oE6wT2goM5tOBSfJWZO/rloJULn1dCj+Cjg==
+X-Received: by 2002:a05:6a00:14c8:b0:736:9f20:a175 with SMTP id d2e1a72fcca58-747c1a1f412mr9111124b3a.2.1748716796351;
+        Sat, 31 May 2025 11:39:56 -0700 (PDT)
 Received: from localhost.localdomain ([64.114.250.86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed34fdsm4888915b3a.75.2025.05.31.11.39.51
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afed34fdsm4888915b3a.75.2025.05.31.11.39.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 May 2025 11:39:52 -0700 (PDT)
+        Sat, 31 May 2025 11:39:55 -0700 (PDT)
 From: Kyle Hendry <kylehendrydev@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -92,9 +92,9 @@ Cc: noltari@gmail.com,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND net-next v4 1/3] net: phy: bcm63xx: add support for BCM63268 GPHY
-Date: Sat, 31 May 2025 11:39:12 -0700
-Message-ID: <20250531183919.561004-2-kylehendrydev@gmail.com>
+Subject: [PATCH RESEND net-next v4 2/3] net: phy: enable bcm63xx on bmips
+Date: Sat, 31 May 2025 11:39:13 -0700
+Message-ID: <20250531183919.561004-3-kylehendrydev@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250531183919.561004-1-kylehendrydev@gmail.com>
 References: <20250531183919.561004-1-kylehendrydev@gmail.com>
@@ -106,148 +106,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for the internal gigabit PHY on the BCM63268 SoC.
-Low power mode is set in the GPHY control register which is
-accessed through the GPIO controller syscon.
+Allow the bcm63xx PHY driver to be built on bmips machines
 
 Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- drivers/net/phy/bcm63xx.c | 88 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ drivers/net/phy/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/bcm63xx.c b/drivers/net/phy/bcm63xx.c
-index b46a736a3130..b45f2c9acc06 100644
---- a/drivers/net/phy/bcm63xx.c
-+++ b/drivers/net/phy/bcm63xx.c
-@@ -3,8 +3,11 @@
-  *	Driver for Broadcom 63xx SOCs integrated PHYs
-  */
- #include "bcm-phy-lib.h"
-+#include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/phy.h>
-+#include <linux/regmap.h>
-+#include <linux/reset.h>
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 41c15a2c2037..0f2956ba472d 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -156,10 +156,10 @@ config BCM54140_PHY
  
- #define MII_BCM63XX_IR		0x1a	/* interrupt register */
- #define MII_BCM63XX_IR_EN	0x4000	/* global interrupt enable */
-@@ -13,10 +16,20 @@
- #define MII_BCM63XX_IR_LINK	0x0200	/* link changed */
- #define MII_BCM63XX_IR_GMASK	0x0100	/* global interrupt mask */
+ config BCM63XX_PHY
+ 	tristate "Broadcom 63xx SOCs internal PHY"
+-	depends on BCM63XX || COMPILE_TEST
++	depends on BCM63XX || BMIPS_GENERIC || COMPILE_TEST
+ 	select BCM_NET_PHYLIB
+ 	help
+-	  Currently supports the 6348 and 6358 PHYs.
++	  Currently supports the 6348, 6358 and 63268 PHYs.
  
-+#define PHY_ID_BCM63268_GPHY	0x03625f50
-+
-+#define GPHY_CTRL_OFFSET	0x54
-+#define GPHY_CTRL_IDDQ_BIAS	BIT(0)
-+#define GPHY_CTRL_LOW_PWR	BIT(3)
-+
- MODULE_DESCRIPTION("Broadcom 63xx internal PHY driver");
- MODULE_AUTHOR("Maxime Bizon <mbizon@freebox.fr>");
- MODULE_LICENSE("GPL");
- 
-+struct bcm_gphy_priv {
-+	struct regmap *gpio_ctrl;
-+};
-+
- static int bcm63xx_config_intr(struct phy_device *phydev)
- {
- 	int reg, err;
-@@ -69,6 +82,71 @@ static int bcm63xx_config_init(struct phy_device *phydev)
- 	return phy_write(phydev, MII_BCM63XX_IR, reg);
- }
- 
-+static int bcm63268_gphy_set(struct phy_device *phydev, bool enable)
-+{
-+	struct bcm_gphy_priv *priv = phydev->priv;
-+	u32 pwr_bits;
-+	int ret;
-+
-+	pwr_bits = GPHY_CTRL_IDDQ_BIAS | GPHY_CTRL_LOW_PWR;
-+
-+	if (enable)
-+		ret = regmap_update_bits(priv->gpio_ctrl, GPHY_CTRL_OFFSET, pwr_bits, 0);
-+	else
-+		ret = regmap_update_bits(priv->gpio_ctrl, GPHY_CTRL_OFFSET, pwr_bits, pwr_bits);
-+
-+	return ret;
-+}
-+
-+static int bcm63268_gphy_resume(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = bcm63268_gphy_set(phydev, true);
-+	if (ret)
-+		return ret;
-+
-+	return genphy_resume(phydev);
-+}
-+
-+static int bcm63268_gphy_suspend(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = genphy_suspend(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return bcm63268_gphy_set(phydev, false);
-+}
-+
-+static int bcm63268_gphy_probe(struct phy_device *phydev)
-+{
-+	struct mdio_device *mdio = &phydev->mdio;
-+	struct device *dev = &mdio->dev;
-+	struct reset_control *reset;
-+	struct bcm_gphy_priv *priv;
-+	struct regmap *regmap;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
-+	regmap = syscon_regmap_lookup_by_phandle(dev->of_node, "brcm,gpio-ctrl");
-+	if (IS_ERR(regmap))
-+		return PTR_ERR(regmap);
-+
-+	priv->gpio_ctrl = regmap;
-+
-+	reset = devm_reset_control_get_optional_exclusive(dev, NULL);
-+	if (IS_ERR(reset))
-+		return PTR_ERR(reset);
-+
-+	return reset_control_reset(reset);
-+}
-+
- static struct phy_driver bcm63xx_driver[] = {
- {
- 	.phy_id		= 0x00406000,
-@@ -89,6 +167,15 @@ static struct phy_driver bcm63xx_driver[] = {
- 	.config_init	= bcm63xx_config_init,
- 	.config_intr	= bcm63xx_config_intr,
- 	.handle_interrupt = bcm_phy_handle_interrupt,
-+}, {
-+	.phy_id         = PHY_ID_BCM63268_GPHY,
-+	.phy_id_mask    = 0xfffffff0,
-+	.name           = "Broadcom BCM63268 GPHY",
-+	/* PHY_BASIC_FEATURES */
-+	.flags          = PHY_IS_INTERNAL,
-+	.probe          = bcm63268_gphy_probe,
-+	.resume			= bcm63268_gphy_resume,
-+	.suspend		= bcm63268_gphy_suspend,
- } };
- 
- module_phy_driver(bcm63xx_driver);
-@@ -96,6 +183,7 @@ module_phy_driver(bcm63xx_driver);
- static const struct mdio_device_id __maybe_unused bcm63xx_tbl[] = {
- 	{ 0x00406000, 0xfffffc00 },
- 	{ 0x002bdc00, 0xfffffc00 },
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_BCM63268_GPHY) },
- 	{ }
- };
- 
+ config BCM7XXX_PHY
+ 	tristate "Broadcom 7xxx SOCs internal PHYs"
 -- 
 2.43.0
 
