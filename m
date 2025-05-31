@@ -1,236 +1,229 @@
-Return-Path: <netdev+bounces-194475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEEA6AC9A0C
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:25:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCA8AC9A1D
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:41:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C8217E684
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B865B9E5B43
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43252367CD;
-	Sat, 31 May 2025 08:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2D72376F5;
+	Sat, 31 May 2025 08:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="O1YaF8uH"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="i3bZKa+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-68.smtpout.orange.fr [193.252.22.68])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EDB156F28;
-	Sat, 31 May 2025 08:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742AE22D4EB;
+	Sat, 31 May 2025 08:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748679914; cv=none; b=pgy78RSIwktjBGyeM9pnC746juHofKCVMtWlxwlSowZe1Wq9DmvnpdctvJ9vPH4iIoFWmt3C2JBA8kjWiGJeE91lkeI2oSJTxDKHEHCyahbIGx+SH5HsecM7CBJGwfeh12zzLbE4i6oCjD2iZcS/3BdRBxZZBD2V7TTVJXbv6kc=
+	t=1748680883; cv=none; b=LYcX+zbmTU/XI01QkuCk/mtMTQMd6SE02ZjMgM4l40KSpH6+tOgI0NlpZhSn+mMoy4FLKdQ59wbqhGOKJV2vlKzJWshBLYJF1j87OjAiXrdrjuGEPT1Pqz0aYjaKHmSDjwK0kzWRQrsic2Y3bhRZA9Yl+mxTNNKt2jjyKqA8meM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748679914; c=relaxed/simple;
-	bh=MjVWmkwHnmmJoIjCB1pi36wZ5EN1mRelCrY/of1Y8Zo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pF8071ebZNmVdNPDjbldiXALCiq1P7BzEycUCuw+Jj2PJZi0Q19Vai/GjXvqqTYwgu2XsBWrG21EUKYEait/DO2J1VIRJTuU6ngnu5xj42jEiMvlnlbF9vId6uZHB2fvmGY+I/L1rxLP5X+Qwvl0+zLU/4DOjdNBzLUeEx0hsx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=O1YaF8uH; arc=none smtp.client-ip=193.252.22.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id LHWVuydzdyzRELHWWuLXT6; Sat, 31 May 2025 10:25:02 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1748679902;
-	bh=2UxUsLSI9cJnAR9lAWYLYOx2TiTSnICm96fYVIit21k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=O1YaF8uH8KMmQL8HJjbQO/2aipJ//smiKL0+vM2wf3cW3QdSrisft6Oh7elCmy9Sd
-	 accSbF8BRyxbg32gAJAghDsmclcieke7o5kWWJAxp5Z6GHHhU4MJEd66Yl5YF1FjBZ
-	 NuKweDCtBAFn5bVoMR5LWJv/33Za/W5dpV6gN4lkhNcfyKh8PeMASLrudi1ENMUZPA
-	 vnoBR6RtXTybzsQlC4rhN+mlbpr+0Jxluo1vhi0d1LW/AH8sA6kFjFAXqTeOJYaQ1K
-	 hGab/SegtEMaRU9+lrTv9vp/oRSA92Ryi8M3hbMdIrZWhZ8aLVzK1N9ULcEll0Ik3+
-	 ceZFtSmOKCQ7w==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 31 May 2025 10:25:02 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <10ed3ec2-ac66-494a-9d3f-bf2df459ebc0@wanadoo.fr>
-Date: Sat, 31 May 2025 17:24:58 +0900
+	s=arc-20240116; t=1748680883; c=relaxed/simple;
+	bh=799jq6gFPy5XEnSwpA8+a+qrM154nWLIKmOn7fwmLLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vBHrfle7UTf4/JkvtUqgrc7tDTMJ6iTcunmLxGe473WcQm/rYTGYgxAvT3aVJ8vYtBW6GztZSZyJmxika86wHXVT5erekiYyfbLo/ehRPSqGgspf5GqNe1pSJnaMaJzdhwKohQjH/pp/3898xncUhSBzGa81ELV3+W/AhCjlR6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=i3bZKa+/; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1748680271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jll3XeKX99pWqsCTGFwx78r84HFnraGM4zNForfuar4=;
+	b=i3bZKa+/0lAKv8gR00vmayeK2aJiwvdrqTxJxAaXTEBLkXOwvbc+zORX/B0oIwems0YMAN
+	tu5Sv+Sn0Pl2VSVzj8GwBCls8lvt8IS8RO+QwBCo8vYYPt+Ib5EHQmEFIACe0fAeXvF+NY
+	oiW/bKeKsUqSJdNcoLoAa9ErZ/nl78A=
+From: Sven Eckelmann <sven@narfation.org>
+To: Marek Lindner <marek.lindner@mailbox.org>,
+ Simon Wunderlich <sw@simonwunderlich.de>,
+ Antonio Quartulli <antonio@mandelbit.com>,
+ Matthias Schiffer <mschiffer@universe-factory.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject:
+ Re: [PATCH batadv 1/5] batman-adv: store hard_iface as iflink private data
+Date: Sat, 31 May 2025 10:31:07 +0200
+Message-ID: <4075596.ElGaqSPkdT@sven-desktop>
+In-Reply-To:
+ <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
+References:
+ <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/6] can: netlink: add interface for CAN-FD Transmitter
- Delay Compensation (TDC)
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Stefan_M=C3=A4tje?= <Stefan.Maetje@esd.eu>
-References: <20210918095637.20108-1-mailhol.vincent@wanadoo.fr>
- <20210918095637.20108-5-mailhol.vincent@wanadoo.fr>
- <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="nextPart6691312.GXAFRqVoOG";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-Hi Geert,
+--nextPart6691312.GXAFRqVoOG
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Date: Sat, 31 May 2025 10:31:07 +0200
+Message-ID: <4075596.ElGaqSPkdT@sven-desktop>
+MIME-Version: 1.0
 
-On 30/05/2025 at 20:44, Geert Uytterhoeven wrote:
-> Hi Vincent,
+On Monday, 19 May 2025 22:46:28 CEST Matthias Schiffer wrote:
+> By passing the hard_iface to netdev_master_upper_dev_link() as private
+> data, we can iterate over hardifs of a mesh interface more efficiently
+> using netdev_for_each_lower_private*() (instead of iterating over the
+> global hardif list). In addition, this will enable resolving a hardif
+> from its netdev using netdev_lower_dev_get_private() and getting rid of
+> the global list altogether in the following patches.
 > 
-> Thanks for your patch, which is now commit d99755f71a80df33
-> ("can: netlink: add interface for CAN-FD Transmitter Delay
-> Compensation (TDC)") in v5.16.
+> A similar approach can be seen in the bonding driver.
 > 
-> On Sat, 18 Sept 2021 at 20:23, Vincent Mailhol
-> <mailhol.vincent@wanadoo.fr> wrote:
->> Add the netlink interface for TDC parameters of struct can_tdc_const
->> and can_tdc.
->>
->> Contrary to the can_bittiming(_const) structures for which there is
->> just a single IFLA_CAN(_DATA)_BITTMING(_CONST) entry per structure,
->> here, we create a nested entry IFLA_CAN_TDC. Within this nested entry,
->> additional IFLA_CAN_TDC_TDC* entries are added for each of the TDC
->> parameters of the newly introduced struct can_tdc_const and struct
->> can_tdc.
->>
->> For struct can_tdc_const, these are:
->>         IFLA_CAN_TDC_TDCV_MIN
->>         IFLA_CAN_TDC_TDCV_MAX
->>         IFLA_CAN_TDC_TDCO_MIN
->>         IFLA_CAN_TDC_TDCO_MAX
->>         IFLA_CAN_TDC_TDCF_MIN
->>         IFLA_CAN_TDC_TDCF_MAX
->>
->> For struct can_tdc, these are:
->>         IFLA_CAN_TDC_TDCV
->>         IFLA_CAN_TDC_TDCO
->>         IFLA_CAN_TDC_TDCF
->>
->> This is done so that changes can be applied in the future to the
->> structures without breaking the netlink interface.
->>
->> The TDC netlink logic works as follow:
->>
->>  * CAN_CTRLMODE_FD is not provided:
->>     - if any TDC parameters are provided: error.
->>
->>     - TDC parameters not provided: TDC parameters unchanged.
->>
->>  * CAN_CTRLMODE_FD is provided and is false:
->>      - TDC is deactivated: both the structure and the
->>        CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
->>
->>  * CAN_CTRLMODE_FD provided and is true:
->>     - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
->>       can_calc_tdco() to automatically decide whether TDC should be
->>       activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
->>       calculated tdco value.
-> 
-> This is not reflected in the code (see below).
+> Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
+> ---
+>  net/batman-adv/bat_algo.h       |  1 -
+>  net/batman-adv/bat_iv_ogm.c     | 25 +++++++--------------
+>  net/batman-adv/bat_v.c          |  6 ++---
+>  net/batman-adv/bat_v_elp.c      |  7 ++----
+>  net/batman-adv/bat_v_ogm.c      | 12 ++++------
+>  net/batman-adv/hard-interface.c | 39 ++++++++++++---------------------
+>  net/batman-adv/main.c           |  6 ++---
+>  net/batman-adv/mesh-interface.c |  6 ++---
+>  net/batman-adv/multicast.c      |  6 ++---
+>  net/batman-adv/netlink.c        |  6 ++---
+>  net/batman-adv/originator.c     |  6 ++---
+>  net/batman-adv/send.c           |  6 ++---
+>  12 files changed, 43 insertions(+), 83 deletions(-)
 
-Let me first repost what I wrote but this time using numerals and letters
-instead of the bullet points:
+Looks mostly good - I just want to modify the includes slightly (if it is ok for you):
 
-  The TDC netlink logic works as follow:
+index c165dede..ba5bea4c 100644
+--- a/net/batman-adv/bat_algo.c
++++ b/net/batman-adv/bat_algo.c
+@@ -14,6 +14,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/stddef.h>
+ #include <linux/string.h>
++#include <linux/types.h>
+ #include <net/genetlink.h>
+ #include <net/netlink.h>
+ #include <uapi/linux/batman_adv.h>
+diff --git a/net/batman-adv/bat_algo.h b/net/batman-adv/bat_algo.h
+index 898c71b5..cdd1ccfe 100644
+--- a/net/batman-adv/bat_algo.h
++++ b/net/batman-adv/bat_algo.h
+@@ -11,7 +11,6 @@
 
-   1. CAN_CTRLMODE_FD is not provided:
-      a) if any TDC parameters are provided: error.
+ #include <linux/netlink.h>
+ #include <linux/skbuff.h>
+-#include <linux/types.h>
 
-      b) TDC parameters not provided: TDC parameters unchanged.
+ extern char batadv_routing_algo[];
 
-   2. CAN_CTRLMODE_FD is provided and is false:
-      a) TDC is deactivated: both the structure and the
-         CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
+diff --git a/net/batman-adv/bat_v_elp.c b/net/batman-adv/bat_v_elp.c
+index 56b6216f..8df2dcc2 100644
+--- a/net/batman-adv/bat_v_elp.c
++++ b/net/batman-adv/bat_v_elp.c
+@@ -35,7 +35,6 @@
+ #include <net/cfg80211.h>
+ #include <uapi/linux/batadv_packet.h>
 
-   3. CAN_CTRLMODE_FD provided and is true:
-      a) CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
-         can_calc_tdco() to automatically decide whether TDC should be
-         activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
-         calculated tdco value.
+-#include "bat_algo.h"
+ #include "bat_v_ogm.h"
+ #include "hard-interface.h"
+ #include "log.h"
+diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
+index 5c955ac2..cab83d37 100644
+--- a/net/batman-adv/bat_v_ogm.c
++++ b/net/batman-adv/bat_v_ogm.c
+@@ -22,7 +22,6 @@
+ #include <linux/mutex.h>
+ #include <linux/netdevice.h>
+ #include <linux/random.h>
+-#include <linux/rculist.h>
+ #include <linux/rcupdate.h>
+ #include <linux/skbuff.h>
+ #include <linux/slab.h>
+@@ -33,7 +32,6 @@
+ #include <linux/workqueue.h>
+ #include <uapi/linux/batadv_packet.h>
 
-      b) CAN_CTRLMODE_TDC_AUTO and tdco provided: set
-         CAN_CTRLMODE_TDC_AUTO and use the provided tdco value. Here,
-         tdcv is illegal and tdcf is optional.
+-#include "bat_algo.h"
+ #include "hard-interface.h"
+ #include "hash.h"
+ #include "log.h"
+diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
+index af1e644b..d41ce799 100644
+--- a/net/batman-adv/main.c
++++ b/net/batman-adv/main.c
+@@ -27,7 +27,6 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/printk.h>
+-#include <linux/rculist.h>
+ #include <linux/rcupdate.h>
+ #include <linux/skbuff.h>
+ #include <linux/slab.h>
+diff --git a/net/batman-adv/netlink.c b/net/batman-adv/netlink.c
+index 35d7ecee..5afb1b70 100644
+--- a/net/batman-adv/netlink.c
++++ b/net/batman-adv/netlink.c
+@@ -20,7 +20,6 @@
+ #include <linux/if_vlan.h>
+ #include <linux/init.h>
+ #include <linux/limits.h>
+-#include <linux/list.h>
+ #include <linux/minmax.h>
+ #include <linux/netdevice.h>
+ #include <linux/netlink.h>
+diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
+index 5e4168f8..c13e05d3 100644
+--- a/net/batman-adv/originator.c
++++ b/net/batman-adv/originator.c
+@@ -29,7 +29,6 @@
+ #include <linux/workqueue.h>
+ #include <uapi/linux/batadv_packet.h>
 
-      c) CAN_CTRLMODE_TDC_MANUAL and both of tdcv and tdco provided: set
-         CAN_CTRLMODE_TDC_MANUAL and use the provided tdcv and tdco
-         value. Here, tdcf is optional.
+-#include "bat_algo.h"
+ #include "distributed-arp-table.h"
+ #include "fragmentation.h"
+ #include "gateway_client.h"
+diff --git a/net/batman-adv/send.c b/net/batman-adv/send.c
+index 788fcfd1..a9929948 100644
+--- a/net/batman-adv/send.c
++++ b/net/batman-adv/send.c
+@@ -21,7 +21,6 @@
+ #include <linux/list.h>
+ #include <linux/netdevice.h>
+ #include <linux/printk.h>
+-#include <linux/rculist.h>
+ #include <linux/rcupdate.h>
+ #include <linux/skbuff.h>
+ #include <linux/slab.h>
 
-      d) CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive. Whenever
-         one flag is turned on, the other will automatically be turned
-         off. Providing both returns an error.
+Thanks,
+	Sven
+--nextPart6691312.GXAFRqVoOG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-      e) Combination other than the one listed above are illegal and will
-         return an error.
+-----BEGIN PGP SIGNATURE-----
 
-You can double check that it is the exact same as before.
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDq+SwAKCRBND3cr0xT1
+y3drAQC++qUIxjP/5zx4qVUE0mPTESzY622rxoVLLdoMxpjWmwEAxQfC0Aj4rQZN
+/JLZqkC1kiWXGPIigQVmK6Q+O3cnYQw=
+=0ODT
+-----END PGP SIGNATURE-----
 
-> By default, a CAN-FD interface comes up in TDC-AUTO mode (if supported),
-> using a calculated tdco value.  However, enabling "tdc-mode auto"
-> explicitly from userland requires also specifying an explicit tdco
-> value.  I.e.
-> 
->     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
-                                                                ^^^^^
-Here:
-
-  - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
-
-  - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: so we *are* in
-    sub-clause a)
-
-3.a) tells that the framework will decide whether or not TDC should be
-activated, and if activated, will set the TDCO.
-
-> gives "can <FD,TDC-AUTO>" and "tdcv 0 tdco 3", while
-
-Looks perfectly coherent with 3.a)
-
-Note that with lower data bitrate, the framework might have decided to set TDC off.
-
->     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
-> tdc-mode auto
-
-This time:
-
-  - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
-
-  - CAN_CTRLMODE_TDC_AUTO is provided, we are *not* in sub-clause a)
-
-  - tdco is not provided.
-
-No explicit clauses matches this pattern so it defaults to the last
-sub-clause: e), which means an error.
-
-> gives:
-> 
->     tdc-mode auto: RTNETLINK answers: Operation not supported
-
-Looks perfectly coherent with 3.e)
-
-> unless I add an explicit "tdco 3".
-
-Yes, if you provide tcdo 3, then you are under 3.b).
-
-> According to your commit description, this is not the expected behavior?
-> Thanks!
-
-Looking back to my commit, I admit that the explanation is convoluted and could
-be hard to digest, but I do not see a mismatch between the description and the
-behaviour.
+--nextPart6691312.GXAFRqVoOG--
 
 
-Yours sincerely,
-Vincent Mailhol
 
 
