@@ -1,150 +1,236 @@
-Return-Path: <netdev+bounces-194474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF085AC99AC
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:47:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEEA6AC9A0C
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:25:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C33694A6C49
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 06:47:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C8217E684
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7392367D8;
-	Sat, 31 May 2025 06:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43252367CD;
+	Sat, 31 May 2025 08:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAU96o/c"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="O1YaF8uH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out.smtpout.orange.fr (out-68.smtpout.orange.fr [193.252.22.68])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E5A22F154;
-	Sat, 31 May 2025 06:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EDB156F28;
+	Sat, 31 May 2025 08:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748674007; cv=none; b=uEG7uoxHqSAkSlXgTUF+zHd9Y4ulGdgCbu0v860/58lWJisLVoaEJkKe8VAvvbo5DfIiwXkr2JDLiwuHBQKNZb5AJV7RSW4RcmatvfAqB4KzIHlqdwtccU1b6j5+JAxPcGaQZ5vvUCPnbsJ/no2TdTS0DTNjNrNaAW7fRolGsUY=
+	t=1748679914; cv=none; b=pgy78RSIwktjBGyeM9pnC746juHofKCVMtWlxwlSowZe1Wq9DmvnpdctvJ9vPH4iIoFWmt3C2JBA8kjWiGJeE91lkeI2oSJTxDKHEHCyahbIGx+SH5HsecM7CBJGwfeh12zzLbE4i6oCjD2iZcS/3BdRBxZZBD2V7TTVJXbv6kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748674007; c=relaxed/simple;
-	bh=kJHhCMPchGRegdd/rLWL991p93hqX6tlwuMJNQ8VRTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y3Lf7NGxAMrEd4MaAorvt3Bmnduge9JJAM8vIllAS7mKcUnNx0rlBdu6VwoyocmR/T+OEF0ZssxbFouvmppuES37J9TPlgEg3rt78EJWrpKUvGAINvz/R+3xc93FU0g1LRL8muVA/PTJpTdLTlaXyyakQUC/f5dAWqkRO9XQNV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cAU96o/c; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a4f379662cso1903316f8f.0;
-        Fri, 30 May 2025 23:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748674003; x=1749278803; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bEZTMJM9pvIuqA1503OtkplFn4omE0UxVG0G8NBdaq8=;
-        b=cAU96o/coM0mB4cqb1YQxH6Zrq/XSHEe58qZuiTKOBWM9e+fGEc0ZB0fkrsUNdinaP
-         v2QlAGpcgndcIvFyK6MNNOpEmrJA9568eu7r0SFSFdHjZhlownme8JHlFdIfcgHWvehf
-         gJ4T5alx19x/YwbaZwN6bTYfaOYTcQuai79i5IdBQ2e4F9nSxSS3Vfx78QVtYs3l80ad
-         5cA/q1c7fV5a9s2MiziBQhm41IdCQ1sBl9Ce3Z6mCuxxm1VHKmv9wWzt2jka1NHREhLj
-         sb93dZO3lsfg0yAuywHslX3jvvV/fARtmfNTZpoP2qKRejgPYGrY4StBoGYIoRoHfhX1
-         S3tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748674003; x=1749278803;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bEZTMJM9pvIuqA1503OtkplFn4omE0UxVG0G8NBdaq8=;
-        b=Lv2w/JVta+Y4XxNOM7zc6a+cj2/Nf2yw2A3gUyhO/9qOwfTTqwxhvZVz/wK74MJozF
-         W1y8XICaGLwRPrbk4ITNmT0oMvh5QBxCBKaR+6VU7sk71HTimyV1Z7MgVJad5yEe7p0u
-         KMOvye1yv9BdbJQbZy04H378WQgU+SEzOfjtxg5+8/iiSAjenzpu1sGoVuluupgcONd7
-         TK3Qb1/EEG0B/k/eteHWFSpWa7g+1EpIN1OpW1GMnmc56chSWqY4PEeocQHhNsDCNtOY
-         wASco+s8zgbVQQlGq3x+9NtOU6Z3mEhPKMKfyc0golSMPD2F3LZQ43JWxTIeQN9FobOo
-         id6A==
-X-Forwarded-Encrypted: i=1; AJvYcCW3WhzxmRW6g+0z++PlnVJf6ZQyokxA+GJqdgEmVxo9NjyfLDvlq6ebhJVQKdIUo+7sgHdZ2eFm@vger.kernel.org, AJvYcCXMJPr52ol3Q7lvqpWhXrb+boGagueG6EspAToruk1qzdXOww95+Qhf4LmYejaM0KxGK9pOLSKi/7Xm9Ak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBYcJrjKOhKaHOFp0KdJGbPB2KiwGZiakwfkXqi0aS2FsWZTvc
-	OTv0b/8Mxh5jSpJOBVMb/T+cFP0lWzE+D3aJdnuYklP7hGBqww6UFU0P
-X-Gm-Gg: ASbGncvcLVjSNaDTdDYcx8T6LyPXVPgF0A5BmcIqPYQWrJgNQDTVEAMGZ63Ql0IECq7
-	udNxjh9+dE5Vp/V7h7UYvH3n3TJGwwmQoAS26hMhXiurCAaXqHBeLyr4rFMdSYfkHaUuLzcP9Wq
-	uaDYV4Gz90bQjO7eWY4NsXhBKZYYR9f8i0AQPupxhCcSBFJsMlQhRCOEAsxIfm+K1ryMAsWx7U8
-	pG5nWSK946T9+8bM+uogR9rPEBzjQXVlSlO/uVJcSUcKEPXe+WP+HT7T6QAPj/Hy6n3QxuKifvy
-	mRB1Fyg60pKZ03cdFvzZecgtr+zCAZbFSucFVEcAH7JSIg6YlOBO1WjKIaPz9OIfpW1SFicVNVM
-	6Fn5FeWtzlQgAKGkbDtA2vpbg8nbhSZLVzJGrqAObwAbN/lzgJjqN64QjDn9dhSQ=
-X-Google-Smtp-Source: AGHT+IH9jceSJwyuAZ+BuVedMH5uEvP11Dv3f//jz5Beq0/qu3VpXRgQpNd82+MVe5SSOXX4og0Bjg==
-X-Received: by 2002:a5d:64e2:0:b0:3a4:f7d9:3f56 with SMTP id ffacd0b85a97d-3a4fe154c8bmr789019f8f.2.1748674003334;
-        Fri, 30 May 2025 23:46:43 -0700 (PDT)
-Received: from skynet.lan (2a02-9142-4580-1200-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1200::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8000e9asm38324765e9.21.2025.05.30.23.46.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 May 2025 23:46:42 -0700 (PDT)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: jonas.gorski@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dgcbueu@gmail.com
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [RFC PATCH 3/3] net: dsa: b53: support legacy FCS tags
-Date: Sat, 31 May 2025 08:46:35 +0200
-Message-Id: <20250531064635.119740-4-noltari@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250531064635.119740-1-noltari@gmail.com>
-References: <20250531064635.119740-1-noltari@gmail.com>
+	s=arc-20240116; t=1748679914; c=relaxed/simple;
+	bh=MjVWmkwHnmmJoIjCB1pi36wZ5EN1mRelCrY/of1Y8Zo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pF8071ebZNmVdNPDjbldiXALCiq1P7BzEycUCuw+Jj2PJZi0Q19Vai/GjXvqqTYwgu2XsBWrG21EUKYEait/DO2J1VIRJTuU6ngnu5xj42jEiMvlnlbF9vId6uZHB2fvmGY+I/L1rxLP5X+Qwvl0+zLU/4DOjdNBzLUeEx0hsx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=O1YaF8uH; arc=none smtp.client-ip=193.252.22.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id LHWVuydzdyzRELHWWuLXT6; Sat, 31 May 2025 10:25:02 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1748679902;
+	bh=2UxUsLSI9cJnAR9lAWYLYOx2TiTSnICm96fYVIit21k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=O1YaF8uH8KMmQL8HJjbQO/2aipJ//smiKL0+vM2wf3cW3QdSrisft6Oh7elCmy9Sd
+	 accSbF8BRyxbg32gAJAghDsmclcieke7o5kWWJAxp5Z6GHHhU4MJEd66Yl5YF1FjBZ
+	 NuKweDCtBAFn5bVoMR5LWJv/33Za/W5dpV6gN4lkhNcfyKh8PeMASLrudi1ENMUZPA
+	 vnoBR6RtXTybzsQlC4rhN+mlbpr+0Jxluo1vhi0d1LW/AH8sA6kFjFAXqTeOJYaQ1K
+	 hGab/SegtEMaRU9+lrTv9vp/oRSA92Ryi8M3hbMdIrZWhZ8aLVzK1N9ULcEll0Ik3+
+	 ceZFtSmOKCQ7w==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 31 May 2025 10:25:02 +0200
+X-ME-IP: 124.33.176.97
+Message-ID: <10ed3ec2-ac66-494a-9d3f-bf2df459ebc0@wanadoo.fr>
+Date: Sat, 31 May 2025 17:24:58 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/6] can: netlink: add interface for CAN-FD Transmitter
+ Delay Compensation (TDC)
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Stefan_M=C3=A4tje?= <Stefan.Maetje@esd.eu>
+References: <20210918095637.20108-1-mailhol.vincent@wanadoo.fr>
+ <20210918095637.20108-5-mailhol.vincent@wanadoo.fr>
+ <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Commit 46c5176c586c ("net: dsa: b53: support legacy tags") introduced
-support for legacy tags, but it turns out that BCM5325 and BCM5365
-switches require the original FCS value and length, so they have to be
-treated differently.
+Hi Geert,
 
-Fixes: 46c5176c586c ("net: dsa: b53: support legacy tags")
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- drivers/net/dsa/b53/Kconfig      | 1 +
- drivers/net/dsa/b53/b53_common.c | 7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+On 30/05/2025 at 20:44, Geert Uytterhoeven wrote:
+> Hi Vincent,
+> 
+> Thanks for your patch, which is now commit d99755f71a80df33
+> ("can: netlink: add interface for CAN-FD Transmitter Delay
+> Compensation (TDC)") in v5.16.
+> 
+> On Sat, 18 Sept 2021 at 20:23, Vincent Mailhol
+> <mailhol.vincent@wanadoo.fr> wrote:
+>> Add the netlink interface for TDC parameters of struct can_tdc_const
+>> and can_tdc.
+>>
+>> Contrary to the can_bittiming(_const) structures for which there is
+>> just a single IFLA_CAN(_DATA)_BITTMING(_CONST) entry per structure,
+>> here, we create a nested entry IFLA_CAN_TDC. Within this nested entry,
+>> additional IFLA_CAN_TDC_TDC* entries are added for each of the TDC
+>> parameters of the newly introduced struct can_tdc_const and struct
+>> can_tdc.
+>>
+>> For struct can_tdc_const, these are:
+>>         IFLA_CAN_TDC_TDCV_MIN
+>>         IFLA_CAN_TDC_TDCV_MAX
+>>         IFLA_CAN_TDC_TDCO_MIN
+>>         IFLA_CAN_TDC_TDCO_MAX
+>>         IFLA_CAN_TDC_TDCF_MIN
+>>         IFLA_CAN_TDC_TDCF_MAX
+>>
+>> For struct can_tdc, these are:
+>>         IFLA_CAN_TDC_TDCV
+>>         IFLA_CAN_TDC_TDCO
+>>         IFLA_CAN_TDC_TDCF
+>>
+>> This is done so that changes can be applied in the future to the
+>> structures without breaking the netlink interface.
+>>
+>> The TDC netlink logic works as follow:
+>>
+>>  * CAN_CTRLMODE_FD is not provided:
+>>     - if any TDC parameters are provided: error.
+>>
+>>     - TDC parameters not provided: TDC parameters unchanged.
+>>
+>>  * CAN_CTRLMODE_FD is provided and is false:
+>>      - TDC is deactivated: both the structure and the
+>>        CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
+>>
+>>  * CAN_CTRLMODE_FD provided and is true:
+>>     - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
+>>       can_calc_tdco() to automatically decide whether TDC should be
+>>       activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
+>>       calculated tdco value.
+> 
+> This is not reflected in the code (see below).
 
-diff --git a/drivers/net/dsa/b53/Kconfig b/drivers/net/dsa/b53/Kconfig
-index ebaa4a80d544..915008e8eff5 100644
---- a/drivers/net/dsa/b53/Kconfig
-+++ b/drivers/net/dsa/b53/Kconfig
-@@ -5,6 +5,7 @@ menuconfig B53
- 	select NET_DSA_TAG_NONE
- 	select NET_DSA_TAG_BRCM
- 	select NET_DSA_TAG_BRCM_LEGACY
-+	select NET_DSA_TAG_BRCM_LEGACY_FCS
- 	select NET_DSA_TAG_BRCM_PREPEND
- 	help
- 	  This driver adds support for Broadcom managed switch chips. It supports
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 132683ed3abe..28a20bf0c669 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -2262,8 +2262,11 @@ enum dsa_tag_protocol b53_get_tag_protocol(struct dsa_switch *ds, int port,
- 		goto out;
- 	}
- 
--	/* Older models require a different 6 byte tag */
--	if (is5325(dev) || is5365(dev) || is63xx(dev)) {
-+	/* Older models require different 6 byte tags */
-+	if (is5325(dev) || is5365(dev)) {
-+		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
-+		goto out;
-+	} else if (is63xx(dev)) {
- 		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY;
- 		goto out;
- 	}
--- 
-2.39.5
+Let me first repost what I wrote but this time using numerals and letters
+instead of the bullet points:
+
+  The TDC netlink logic works as follow:
+
+   1. CAN_CTRLMODE_FD is not provided:
+      a) if any TDC parameters are provided: error.
+
+      b) TDC parameters not provided: TDC parameters unchanged.
+
+   2. CAN_CTRLMODE_FD is provided and is false:
+      a) TDC is deactivated: both the structure and the
+         CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
+
+   3. CAN_CTRLMODE_FD provided and is true:
+      a) CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
+         can_calc_tdco() to automatically decide whether TDC should be
+         activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
+         calculated tdco value.
+
+      b) CAN_CTRLMODE_TDC_AUTO and tdco provided: set
+         CAN_CTRLMODE_TDC_AUTO and use the provided tdco value. Here,
+         tdcv is illegal and tdcf is optional.
+
+      c) CAN_CTRLMODE_TDC_MANUAL and both of tdcv and tdco provided: set
+         CAN_CTRLMODE_TDC_MANUAL and use the provided tdcv and tdco
+         value. Here, tdcf is optional.
+
+      d) CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive. Whenever
+         one flag is turned on, the other will automatically be turned
+         off. Providing both returns an error.
+
+      e) Combination other than the one listed above are illegal and will
+         return an error.
+
+You can double check that it is the exact same as before.
+
+> By default, a CAN-FD interface comes up in TDC-AUTO mode (if supported),
+> using a calculated tdco value.  However, enabling "tdc-mode auto"
+> explicitly from userland requires also specifying an explicit tdco
+> value.  I.e.
+> 
+>     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
+                                                                ^^^^^
+Here:
+
+  - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
+
+  - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: so we *are* in
+    sub-clause a)
+
+3.a) tells that the framework will decide whether or not TDC should be
+activated, and if activated, will set the TDCO.
+
+> gives "can <FD,TDC-AUTO>" and "tdcv 0 tdco 3", while
+
+Looks perfectly coherent with 3.a)
+
+Note that with lower data bitrate, the framework might have decided to set TDC off.
+
+>     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
+> tdc-mode auto
+
+This time:
+
+  - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
+
+  - CAN_CTRLMODE_TDC_AUTO is provided, we are *not* in sub-clause a)
+
+  - tdco is not provided.
+
+No explicit clauses matches this pattern so it defaults to the last
+sub-clause: e), which means an error.
+
+> gives:
+> 
+>     tdc-mode auto: RTNETLINK answers: Operation not supported
+
+Looks perfectly coherent with 3.e)
+
+> unless I add an explicit "tdco 3".
+
+Yes, if you provide tcdo 3, then you are under 3.b).
+
+> According to your commit description, this is not the expected behavior?
+> Thanks!
+
+Looking back to my commit, I admit that the explanation is convoluted and could
+be hard to digest, but I do not see a mismatch between the description and the
+behaviour.
+
+
+Yours sincerely,
+Vincent Mailhol
 
 
