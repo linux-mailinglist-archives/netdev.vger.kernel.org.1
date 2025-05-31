@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-194461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23865AC98EF
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 04:39:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D7BAC98FB
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 05:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44EF69E469F
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 02:39:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03C6616688B
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 03:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385D64EB38;
-	Sat, 31 May 2025 02:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6E113959D;
+	Sat, 31 May 2025 03:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrXFW70h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ljvns2tY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128EC1096F
-	for <netdev@vger.kernel.org>; Sat, 31 May 2025 02:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34FD1EB39;
+	Sat, 31 May 2025 03:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748659195; cv=none; b=A2hMR1h2NRvO3+4IOO1PjTz66iSrcKeAwu+Oa8Ql0jqadZZD3/O7uLbY5eONMn9uhQJpNg5T9szhxk6JCuypBZlSU3tzRnOsRc4lBFIAbLFlRFjUBWtA/tIzpfEFRCAh+0U4B0gVPXxixWcRVTQdJowF8fy/aaC9EplH/HrrAj8=
+	t=1748660997; cv=none; b=OAi17aS5QeBn7mLcJdGX7doR0mVOFx26qqLY87/QAaFAHuPN0kSZPfwUUSOq5sFkzuLFNdYgufmvbQKcz0MEt2OGDN2BD2e/ETFUYkg1y/A4LKbttmNrCgvhJ8hqGF/p47UB3DZg+HkwXp4ctKmu4cdPXX3ndfZ0+Fc5OHhFdzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748659195; c=relaxed/simple;
-	bh=8aEffykvU0v5dzPiCeUk5v35ZSw2IomsBpIPCpOjXA4=;
+	s=arc-20240116; t=1748660997; c=relaxed/simple;
+	bh=z8gZ+q37IvEpWDej+h76Rujah+rzvK1Yk/0ORMQ4eOI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bxg7+cynzvL3Wt+Ix0fkcgm2Wj6+jxtdgujzX4KgypaDMiaf8h4s7lW+0E2qn4DzuaIh1MhUTX3k2yemaPwolzhnscc6MjQ1WnxxEbp0kMPrdafUIjkORGO+v2SA3st3RfglBfOrZ4O932bk4E70OcHsGVaaeEgMcPM8MFWk0Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrXFW70h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06AEC4CEEB;
-	Sat, 31 May 2025 02:39:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=We+3c6sGCboTRz0dV8/d3jy4wWBlWnQ+iqq0vLqJN7qUtOyynU79WwYcadJMimyT616b7MXQHbrsbBP4Q8rZP+P7DboCyJRKJ2r6o2xb+lmkQzqWGw03o06Zsg3Ohh+sLu9Uuek2/MqHpRt00NeCquFco2Uiq5bnwUo3xjjAfj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ljvns2tY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AEB3C4CEEB;
+	Sat, 31 May 2025 03:09:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748659194;
-	bh=8aEffykvU0v5dzPiCeUk5v35ZSw2IomsBpIPCpOjXA4=;
+	s=k20201202; t=1748660996;
+	bh=z8gZ+q37IvEpWDej+h76Rujah+rzvK1Yk/0ORMQ4eOI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lrXFW70h10oabKQmfpbX8medJl1kCGaED4KDRWwTQJc+q6aivgmm3i28jFsvzKotK
-	 manvoFPLV7TQ2HQ7LE0Kh8eQSOMjc4DzU2IYW3XDjtqLT0Zkexdvutj+Ic0WTIC8XC
-	 azffFK4cS3Rw7yo+6JIMBa8Z8D54FdP5LNybBpnQQJHprwi2NwbxcK3AjLNuJhnzFL
-	 2tB5um4vERp4tyRUYe/YNpo7yKTud0lDgT5DXa0eJ/fLjdLsRU0P5NhqVNlBalu1aN
-	 Gqli1DOe2s4ZDueF3GjGl8SDqaMk83Kov/h+h5V2Ni4BabGB/8X7WkVouegdXpBbOl
-	 T8LXEE0LYuAEQ==
+	b=Ljvns2tYEp7FnoH02Ay/quaAkbUmtUORD8q6ntDbnCcVbxkuXij4gw9qL0zGbamsv
+	 QiWkhB6B4o6lgQZ3G/gfpDB93wU7Rtm9uGC2RZC+CPWUU3Dr+bhjL3kVirw1ZGnruI
+	 sa9vS29R97ogEWJfMtmbYExZx93Darp4ZA/M/UQIsbLiw35tq4j8PWMhfaIxtwEFDh
+	 b5mZ4yUX/aWzsJe1v8/13iXZFP4wFBnAcj1Pwz6dOlth5izzEgZ0EJV8EX3lbaDoqd
+	 ZiCznJW7AN+Oyry99ws/awerk1rTV9GSUACAAw4CxH2ryUS0hSWh1Yecahpmjtrp/A
+	 FXIlhzfH3zJ5Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7180939F1DF3;
-	Sat, 31 May 2025 02:40:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0A239F1DF3;
+	Sat, 31 May 2025 03:10:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: Fix net_devmem_bind_dmabuf for non-devmem
- configs
+Subject: Re: [PATCH net,v3] hv_netvsc: fix potential deadlock in
+ netvsc_vf_setxdp()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174865922825.10348.16576687297132828921.git-patchwork-notify@kernel.org>
-Date: Sat, 31 May 2025 02:40:28 +0000
-References: <20250528211058.1826608-1-praan@google.com>
-In-Reply-To: <20250528211058.1826608-1-praan@google.com>
-To: Pranjal Shrivastava <praan@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, willemb@google.com,
- almasrymina@google.com, kaiyuanz@google.com
+ <174866102976.15083.16967733452112171542.git-patchwork-notify@kernel.org>
+Date: Sat, 31 May 2025 03:10:29 +0000
+References: <1748513910-23963-1-git-send-email-ssengar@linux.microsoft.com>
+In-Reply-To: <1748513910-23963-1-git-send-email-ssengar@linux.microsoft.com>
+To: Saurabh Sengar <ssengar@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, kuniyu@amazon.com, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ ssengar@microsoft.com, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 28 May 2025 21:10:58 +0000 you wrote:
-> Fix the signature of the net_devmem_bind_dmabuf API for
-> CONFIG_NET_DEVMEM=n.
+On Thu, 29 May 2025 03:18:30 -0700 you wrote:
+> The MANA driver's probe registers netdevice via the following call chain:
 > 
-> Fixes: bd61848900bf ("net: devmem: Implement TX path")
-> Signed-off-by: Pranjal Shrivastava <praan@google.com>
-> ---
->  net/core/devmem.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> mana_probe()
+>   register_netdev()
+>     register_netdevice()
+> 
+> register_netdevice() calls notifier callback for netvsc driver,
+> holding the netdev mutex via netdev_lock_ops().
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: Fix net_devmem_bind_dmabuf for non-devmem configs
-    https://git.kernel.org/netdev/net/c/c1f4cb8a8d48
+  - [net,v3] hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
+    https://git.kernel.org/netdev/net/c/3ec523304976
 
 You are awesome, thank you!
 -- 
