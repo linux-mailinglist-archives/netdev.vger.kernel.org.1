@@ -1,61 +1,56 @@
-Return-Path: <netdev+bounces-194452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35461AC98C0
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 03:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64698AC98C3
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 03:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2ED24E1D13
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 01:18:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 298D04E1AFC
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 01:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6582117578;
-	Sat, 31 May 2025 01:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E089A14F70;
+	Sat, 31 May 2025 01:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ivCVrGK6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPD2T3W4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CE2F9CB;
-	Sat, 31 May 2025 01:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EB3BE46
+	for <netdev@vger.kernel.org>; Sat, 31 May 2025 01:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748654295; cv=none; b=kngYkQLKxzMbTlbyjlddL9qZv7e3lGdBgQhntHS+E3OMXvMo7OckPla7hfeUHIzdEqMO03xXD37Xg2P2D0nIVJEwykiy14p4kW5Wpv6dX6RMxa6DkEK6RWsaM9lyBcITxTald8XwrGu5ts8S+KRD2mejd/rRYaanybAMfP9azZE=
+	t=1748654403; cv=none; b=lHCobQHxvh3AeOXyUz/dx8npQLYuwoNNkJ8KC7W5Cl7eQNNF6HVP4n5F5ZzAADqFmcfmfslvs4iPh5D26S6PwyILM/goHigKS7v+slIp8sb3choiCKo+TW7nrJU6R8oh5f8RF4hElA49myZWj7u0805RlyEWGe5jXh1ngwU8sTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748654295; c=relaxed/simple;
-	bh=KCloIB4T1/EcOdaoUCdYvcDOeG6BrP9cZb98xI5Osr8=;
+	s=arc-20240116; t=1748654403; c=relaxed/simple;
+	bh=8Vg6zNuC6cihI+R/dlXZN+qfGJWTdP+8vgkZ2lQCCpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B+N+2WcnDb9Y/6u9Cy5iQ6L4SrD1SlC5bJdQ5LmjyvF/o7pWuH1oDknRjM9/L4MUh+E44Op+0nlgwRrcZ5Chw3OVbCNx3K3eX/JH1re94KPvIuh90VpMdHM0okg/PGeSu9dZ0wBRPgGdbZyu+SS4CYiHphw3xgctgobDTIalqAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ivCVrGK6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370D1C4CEEB;
-	Sat, 31 May 2025 01:18:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pkHRDsrfQj0BvSfaFKrWhsIMU5b/yAJ0CxGPpAT8NxzA3G4URHMb+5F6MIvu5Od2O49MhQCUQK80ZIhsp/fhnQDGbixglk0gUMOu7BSRLyea0GosO1qfC3OktOlkkP2XuGSFRKvty3jsXlbE2Swxm9/iPeoSeuIWwivHkqICNyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPD2T3W4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A93C4CEEB;
+	Sat, 31 May 2025 01:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748654294;
-	bh=KCloIB4T1/EcOdaoUCdYvcDOeG6BrP9cZb98xI5Osr8=;
+	s=k20201202; t=1748654403;
+	bh=8Vg6zNuC6cihI+R/dlXZN+qfGJWTdP+8vgkZ2lQCCpc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ivCVrGK6y3FxEiSPx2LR+tn+xwI7k8qQvJFmg0APzeLXFaeDQ7KvHLHKAj9ZxOCCq
-	 fYAAwkj9ySulYuGiM0ugEjacpu8TBD9K9MHqcjMDAVpK6woguex8ijRWE7aXDuCdog
-	 aF/+9734UvpR271lmGy8gYEZrzQRaC1IzvFncqy3LycmteBjJ8iEhClp9O20P9jiGY
-	 a97Ubx3eBRG/5VwckcaWjApi86LBSeqpXSllrYQp9JwKB738YQUETs0z3lUXK8NGqN
-	 Y8q4L2nmvU5Rju2D46fwJQtoY6gQqC/pQ+CFGOb/5liXEHCImvv+8nPOiBS6e5L3Fq
-	 ahSq9wndCMlcQ==
-Date: Fri, 30 May 2025 18:18:13 -0700
+	b=HPD2T3W48p7Xpy2iVDwE0/jix7q4bp3v++mnISF690uXIfnsNKd2NSUPSCo1ofqus
+	 wGZheeiMrs2OuzJNY3pNVvWWEUVeFKncqbtvd29ztWWav1jPfctv6rIPe6qArTiDPf
+	 8Nk7s23/KXAsOAF4NNTAMdvekbaSr3/0jPySjT/SsYjmDzP1hCAf4Dl2iGcfmsHVEn
+	 caBa0vvAMW+cKE6w8VO3Vli7DI8RFJInvg7zdOQr8Y1B713AGIaJ2UVydtl/xexoMc
+	 +B6PUoU/eg0adA5quBy3jbvgWNRVCLUJ/C5CjkuT+bM36fK/nhrRVW+JqqBx00YAg5
+	 UpInaaZQ4atgA==
+Date: Fri, 30 May 2025 18:20:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, LKML
- <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
- bpf@vger.kernel.org, Jonathan Lemon <jonathan.lemon@gmail.com>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, Masami Hiramatsu
- <mhiramat@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH] xdp: Remove unused mem_return_failed event
-Message-ID: <20250530181813.1024eec5@kernel.org>
-In-Reply-To: <20250530121638.35106c15@gandalf.local.home>
-References: <20250529160550.1f888b15@gandalf.local.home>
-	<696364e6-5eb1-4543-b9f4-60fba10623fc@kernel.org>
-	<20250530121638.35106c15@gandalf.local.home>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: danieller@nvidia.com, idosch@idosch.org, netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool 0/2] module_common: adjust the JSON output for
+ per-lane signals
+Message-ID: <20250530182002.557c8256@kernel.org>
+In-Reply-To: <tby3ld5penbfzrpvlbocwrmnyyahtjrocejelqfhfcrryz3uzq@24fixhzgipcl>
+References: <20250529142033.2308815-1-kuba@kernel.org>
+	<tby3ld5penbfzrpvlbocwrmnyyahtjrocejelqfhfcrryz3uzq@24fixhzgipcl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,17 +60,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 30 May 2025 12:16:38 -0400 Steven Rostedt wrote:
-> > Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>  
+On Fri, 30 May 2025 13:35:25 +0200 Michal Kubecek wrote:
+> On Thu, May 29, 2025 at 07:20:31AM GMT, Jakub Kicinski wrote:
+> > I got some feedback from users trying to integrate the SFP JSON
+> > output to Meta's monitoring systems. The loss / fault signals
+> > are currently a bit awkward to parse. This patch set changes
+> > the format, is it still okay to merge it (as a fix?)
+> > I think it's a worthwhile improvement, not sure how many people
+> > depend on the current JSON format after 1 release..  
 > 
-> Thanks. Will this go through the networking tree or should I just take it?
+> It's unfortunate that the format already got into 6.14 but thankfully
+> it's been only about six weeks since so hopefully there won't be many
+> (or perhaps none if we are lucky).
+> 
+> I wonder if it would make sense to also release 6.14.1 with the format
+> change to make it more apparent for those using 6.14 that the change
+> should be backported. SLE16 (and Leap 16.0) is going to be one of the
+> distributions with ethtool 6.14 but there I can add the patch myself.
 
-If you're planning to send it to Linus in this MW, still, go for it:
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-If you mean to keep it in your -next tree for next MW I think we should
-take it to avoid conflict noise. But our -next tree is closed during MW
-per linux-next preferences.
-
-IOW please take it if you wanna ship it now, otherwise please repost
-after MW?
+FWIW I'll try to get it backported to Fedora / CentOS too. 
+So cutting 6.14.1 may be preferable.
 
