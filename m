@@ -1,229 +1,176 @@
-Return-Path: <netdev+bounces-194477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCA8AC9A1D
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:41:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC43AC9A16
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 10:35:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B865B9E5B43
-	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:41:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26FCE189FEC7
+	for <lists+netdev@lfdr.de>; Sat, 31 May 2025 08:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2D72376F5;
-	Sat, 31 May 2025 08:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5B42376EF;
+	Sat, 31 May 2025 08:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="i3bZKa+/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D7GIhCt6"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742AE22D4EB;
-	Sat, 31 May 2025 08:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398E1235BF3;
+	Sat, 31 May 2025 08:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748680883; cv=none; b=LYcX+zbmTU/XI01QkuCk/mtMTQMd6SE02ZjMgM4l40KSpH6+tOgI0NlpZhSn+mMoy4FLKdQ59wbqhGOKJV2vlKzJWshBLYJF1j87OjAiXrdrjuGEPT1Pqz0aYjaKHmSDjwK0kzWRQrsic2Y3bhRZA9Yl+mxTNNKt2jjyKqA8meM=
+	t=1748680494; cv=none; b=h8zeArhcNiASGq5SlaqRRmG/gVVnGJ70ZpCobjwPANLDMjH4K4XxnIqeXVTZx6qWhO38iWN/KHE1nUu8tUgZx9YgLj5Qupc0fONEKRqFDKTbgwf5l/Z1l1ocWChj8dDwmG49h84yalgJuLRScWPirFc1uFBt46lnDjnGWwMQjy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748680883; c=relaxed/simple;
-	bh=799jq6gFPy5XEnSwpA8+a+qrM154nWLIKmOn7fwmLLM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBHrfle7UTf4/JkvtUqgrc7tDTMJ6iTcunmLxGe473WcQm/rYTGYgxAvT3aVJ8vYtBW6GztZSZyJmxika86wHXVT5erekiYyfbLo/ehRPSqGgspf5GqNe1pSJnaMaJzdhwKohQjH/pp/3898xncUhSBzGa81ELV3+W/AhCjlR6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=i3bZKa+/; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1748680271;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jll3XeKX99pWqsCTGFwx78r84HFnraGM4zNForfuar4=;
-	b=i3bZKa+/0lAKv8gR00vmayeK2aJiwvdrqTxJxAaXTEBLkXOwvbc+zORX/B0oIwems0YMAN
-	tu5Sv+Sn0Pl2VSVzj8GwBCls8lvt8IS8RO+QwBCo8vYYPt+Ib5EHQmEFIACe0fAeXvF+NY
-	oiW/bKeKsUqSJdNcoLoAa9ErZ/nl78A=
-From: Sven Eckelmann <sven@narfation.org>
-To: Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- Matthias Schiffer <mschiffer@universe-factory.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH batadv 1/5] batman-adv: store hard_iface as iflink private data
-Date: Sat, 31 May 2025 10:31:07 +0200
-Message-ID: <4075596.ElGaqSPkdT@sven-desktop>
-In-Reply-To:
- <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
-References:
- <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
+	s=arc-20240116; t=1748680494; c=relaxed/simple;
+	bh=HeN3k91sOApQ7ilb4MDhzjIZN7np++nNu/5P5o+DSy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tOnEFDoD7xfL3S1cY/C3P2/8TvGqky8QW7KyNGqFD3SCY8gjZ3Yyl/1BWgIyEAK770U1r8XHFcGPbXzD1jsxmbpQmYrRtR0bwgGK8z7yxdXtv/T5chcIxz2nXDVFn3k3Css+19Av/tqLx+636nJE6zZlu2VAuZ9smwqb+eAWmZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D7GIhCt6; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748680493; x=1780216493;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HeN3k91sOApQ7ilb4MDhzjIZN7np++nNu/5P5o+DSy0=;
+  b=D7GIhCt6tO2oZ67jQbTOpU8KE5Fzs66T+DOxKTKgnQ9uzUQz0pRHSOcb
+   S+RGBJEwHdSlCM54M1OGN7QzEKp6g5ME+xeYtjIecObx+HW6Y0r1/UdfC
+   ch03It5kdW1eTHyXcQfmTcLhDPaOpQ1tbqaZWgxVUATpB+v0Nsf0vpqR3
+   CBs4qpFW+AF9iOkX2b9LTBRhnCshoTWCvMnaGMdfwUYjBXyG56NdCINpK
+   vrHMeDV89PPckugzFKpmlNntHKo8oLLUCueKg+2M1u8k5iEc7UShI2xTG
+   KKOCXGFsiSP2OIwSFds6Chr57SGVNuIqaE4YWBfHg3hUccJTmokKRJGsC
+   Q==;
+X-CSE-ConnectionGUID: SxrCAs6oSOGuEyvbElS/fQ==
+X-CSE-MsgGUID: TZqikryIT+OwSyxiBcZ/Zw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11449"; a="62112332"
+X-IronPort-AV: E=Sophos;i="6.16,198,1744095600"; 
+   d="scan'208";a="62112332"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2025 01:34:52 -0700
+X-CSE-ConnectionGUID: pexTbHmsRlCFfRVy4HKntA==
+X-CSE-MsgGUID: hi6CG47NTjagHCLkylKQZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,198,1744095600"; 
+   d="scan'208";a="145057505"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 31 May 2025 01:34:49 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uLHfz-000YIO-1E;
+	Sat, 31 May 2025 08:34:47 +0000
+Date: Sat, 31 May 2025 16:34:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: oe-kbuild-all@lists.linux.dev, asml.silence@gmail.com,
+	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH 5/5] io_uring/netcmd: add tx timestamping cmd support
+Message-ID: <202505311513.4gHg718O-lkp@intel.com>
+References: <2308b0e2574858aeef6837f4f9897560a835e0f7.1748607147.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart6691312.GXAFRqVoOG";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2308b0e2574858aeef6837f4f9897560a835e0f7.1748607147.git.asml.silence@gmail.com>
 
---nextPart6691312.GXAFRqVoOG
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Sat, 31 May 2025 10:31:07 +0200
-Message-ID: <4075596.ElGaqSPkdT@sven-desktop>
-MIME-Version: 1.0
+Hi Pavel,
 
-On Monday, 19 May 2025 22:46:28 CEST Matthias Schiffer wrote:
-> By passing the hard_iface to netdev_master_upper_dev_link() as private
-> data, we can iterate over hardifs of a mesh interface more efficiently
-> using netdev_for_each_lower_private*() (instead of iterating over the
-> global hardif list). In addition, this will enable resolving a hardif
-> from its netdev using netdev_lower_dev_get_private() and getting rid of
-> the global list altogether in the following patches.
-> 
-> A similar approach can be seen in the bonding driver.
-> 
-> Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
-> ---
->  net/batman-adv/bat_algo.h       |  1 -
->  net/batman-adv/bat_iv_ogm.c     | 25 +++++++--------------
->  net/batman-adv/bat_v.c          |  6 ++---
->  net/batman-adv/bat_v_elp.c      |  7 ++----
->  net/batman-adv/bat_v_ogm.c      | 12 ++++------
->  net/batman-adv/hard-interface.c | 39 ++++++++++++---------------------
->  net/batman-adv/main.c           |  6 ++---
->  net/batman-adv/mesh-interface.c |  6 ++---
->  net/batman-adv/multicast.c      |  6 ++---
->  net/batman-adv/netlink.c        |  6 ++---
->  net/batman-adv/originator.c     |  6 ++---
->  net/batman-adv/send.c           |  6 ++---
->  12 files changed, 43 insertions(+), 83 deletions(-)
+kernel test robot noticed the following build warnings:
 
-Looks mostly good - I just want to modify the includes slightly (if it is ok for you):
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master next-20250530]
+[cannot apply to horms-ipvs/master v6.15]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-index c165dede..ba5bea4c 100644
---- a/net/batman-adv/bat_algo.c
-+++ b/net/batman-adv/bat_algo.c
-@@ -14,6 +14,7 @@
- #include <linux/skbuff.h>
- #include <linux/stddef.h>
- #include <linux/string.h>
-+#include <linux/types.h>
- #include <net/genetlink.h>
- #include <net/netlink.h>
- #include <uapi/linux/batman_adv.h>
-diff --git a/net/batman-adv/bat_algo.h b/net/batman-adv/bat_algo.h
-index 898c71b5..cdd1ccfe 100644
---- a/net/batman-adv/bat_algo.h
-+++ b/net/batman-adv/bat_algo.h
-@@ -11,7 +11,6 @@
+url:    https://github.com/intel-lab-lkp/linux/commits/Pavel-Begunkov/net-timestamp-add-helper-returning-skb-s-tx-tstamp/20250530-201922
+base:   net/main
+patch link:    https://lore.kernel.org/r/2308b0e2574858aeef6837f4f9897560a835e0f7.1748607147.git.asml.silence%40gmail.com
+patch subject: [PATCH 5/5] io_uring/netcmd: add tx timestamping cmd support
+config: riscv-randconfig-r121-20250531 (https://download.01.org/0day-ci/archive/20250531/202505311513.4gHg718O-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 10.5.0
+reproduce: (https://download.01.org/0day-ci/archive/20250531/202505311513.4gHg718O-lkp@intel.com/reproduce)
 
- #include <linux/netlink.h>
- #include <linux/skbuff.h>
--#include <linux/types.h>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505311513.4gHg718O-lkp@intel.com/
 
- extern char batadv_routing_algo[];
+sparse warnings: (new ones prefixed by >>)
+   io_uring/cmd_net.c:59:32: sparse: sparse: array of flexible structures
+   io_uring/cmd_net.c: note: in included file:
+   io_uring/uring_cmd.h:21:59: sparse: sparse: array of flexible structures
+>> io_uring/cmd_net.c:94:55: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected restricted __poll_t [usertype] mask @@     got int @@
+   io_uring/cmd_net.c:94:55: sparse:     expected restricted __poll_t [usertype] mask
+   io_uring/cmd_net.c:94:55: sparse:     got int
 
-diff --git a/net/batman-adv/bat_v_elp.c b/net/batman-adv/bat_v_elp.c
-index 56b6216f..8df2dcc2 100644
---- a/net/batman-adv/bat_v_elp.c
-+++ b/net/batman-adv/bat_v_elp.c
-@@ -35,7 +35,6 @@
- #include <net/cfg80211.h>
- #include <uapi/linux/batadv_packet.h>
+vim +94 io_uring/cmd_net.c
 
--#include "bat_algo.h"
- #include "bat_v_ogm.h"
- #include "hard-interface.h"
- #include "log.h"
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index 5c955ac2..cab83d37 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -22,7 +22,6 @@
- #include <linux/mutex.h>
- #include <linux/netdevice.h>
- #include <linux/random.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-@@ -33,7 +32,6 @@
- #include <linux/workqueue.h>
- #include <uapi/linux/batadv_packet.h>
+    81	
+    82	static int io_uring_cmd_timestamp(struct socket *sock,
+    83					  struct io_uring_cmd *cmd,
+    84					  unsigned int issue_flags)
+    85	{
+    86		struct sock *sk = sock->sk;
+    87		struct sk_buff_head *q = &sk->sk_error_queue;
+    88		struct sk_buff *skb, *tmp;
+    89		struct sk_buff_head list;
+    90		int ret;
+    91	
+    92		if (!(issue_flags & IO_URING_F_CQE32))
+    93			return -EINVAL;
+  > 94		ret = io_cmd_poll_multishot(cmd, issue_flags, POLLERR);
+    95		if (unlikely(ret))
+    96			return ret;
+    97	
+    98		if (skb_queue_empty_lockless(q))
+    99			return -EAGAIN;
+   100		__skb_queue_head_init(&list);
+   101	
+   102		scoped_guard(spinlock_irq, &q->lock) {
+   103			skb_queue_walk_safe(q, skb, tmp) {
+   104				/* don't support skbs with payload */
+   105				if (!skb_has_tx_timestamp(skb, sk) || skb->len)
+   106					continue;
+   107				__skb_unlink(skb, q);
+   108				__skb_queue_tail(&list, skb);
+   109			}
+   110		}
+   111	
+   112		while (1) {
+   113			skb = skb_peek(&list);
+   114			if (!skb)
+   115				break;
+   116			if (!io_process_timestamp_skb(cmd, sk, skb, issue_flags))
+   117				break;
+   118			__skb_dequeue(&list);
+   119			consume_skb(skb);
+   120		}
+   121	
+   122		if (!unlikely(skb_queue_empty(&list))) {
+   123			scoped_guard(spinlock_irqsave, &q->lock)
+   124				skb_queue_splice(q, &list);
+   125		}
+   126		return -EAGAIN;
+   127	}
+   128	
 
--#include "bat_algo.h"
- #include "hard-interface.h"
- #include "hash.h"
- #include "log.h"
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index af1e644b..d41ce799 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -27,7 +27,6 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/printk.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-diff --git a/net/batman-adv/netlink.c b/net/batman-adv/netlink.c
-index 35d7ecee..5afb1b70 100644
---- a/net/batman-adv/netlink.c
-+++ b/net/batman-adv/netlink.c
-@@ -20,7 +20,6 @@
- #include <linux/if_vlan.h>
- #include <linux/init.h>
- #include <linux/limits.h>
--#include <linux/list.h>
- #include <linux/minmax.h>
- #include <linux/netdevice.h>
- #include <linux/netlink.h>
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index 5e4168f8..c13e05d3 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -29,7 +29,6 @@
- #include <linux/workqueue.h>
- #include <uapi/linux/batadv_packet.h>
-
--#include "bat_algo.h"
- #include "distributed-arp-table.h"
- #include "fragmentation.h"
- #include "gateway_client.h"
-diff --git a/net/batman-adv/send.c b/net/batman-adv/send.c
-index 788fcfd1..a9929948 100644
---- a/net/batman-adv/send.c
-+++ b/net/batman-adv/send.c
-@@ -21,7 +21,6 @@
- #include <linux/list.h>
- #include <linux/netdevice.h>
- #include <linux/printk.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-
-Thanks,
-	Sven
---nextPart6691312.GXAFRqVoOG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDq+SwAKCRBND3cr0xT1
-y3drAQC++qUIxjP/5zx4qVUE0mPTESzY622rxoVLLdoMxpjWmwEAxQfC0Aj4rQZN
-/JLZqkC1kiWXGPIigQVmK6Q+O3cnYQw=
-=0ODT
------END PGP SIGNATURE-----
-
---nextPart6691312.GXAFRqVoOG--
-
-
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
