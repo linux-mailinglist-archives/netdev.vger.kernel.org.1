@@ -1,177 +1,100 @@
-Return-Path: <netdev+bounces-194529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401F4AC9EF1
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 16:54:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FA0AC9F57
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 18:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78E293B6985
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 14:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E7723B297D
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 16:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAE11EB18E;
-	Sun,  1 Jun 2025 14:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c5w1BAxt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BF981ACA;
+	Sun,  1 Jun 2025 16:21:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD341E260C;
-	Sun,  1 Jun 2025 14:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8532BD11
+	for <netdev@vger.kernel.org>; Sun,  1 Jun 2025 16:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748789669; cv=none; b=axi+ojZFbL1h4OHC8GBYR0+XkISmWlF3BlDUEUCQRV1mxhTIvvaQttpOVqFELGR/hoYsJfmvng6Meh2lT4lNmZM8TDHc/hnj9KT3Qah+zWpx5iPBjFnSU49F+8hYOue5Xi0M/GN65wL1DvQwdrKHat6g06HXTEe2Q5ddktswU88=
+	t=1748794864; cv=none; b=cRVa5gzjRXsNCLSMxQxeMdDQtSWoXulqx5ExqDd8NmuHXnwquIdSG0UsL/fddnuXBIADu4dmlAIZNUUHRI+/5QJelej7RjNc5EGjmHY38/ifrFne8ucMSJDIKFI9br6zbH0kDkXdO5k7jm1wkIo7gn42MzVN48aulpzjsAxFOF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748789669; c=relaxed/simple;
-	bh=pAsAKxToGmEVd3RIVnzdeeufEYuTCSyv5WEoqg6uhl8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SZtQm3IBNUGD+G5xJODGfID39haANHHt25n5Y4tHOBs33TGpS4gJBrqmvb06EZWOAEAiKV6rEPC+IyJDOQmDiQ4iZizVY53dONwizPzUcTsZA4nleyLBgyuDfYnXPcNum4eFLnmiqGHy1MZkQjODB4xzBrePGJjTUwmROzBZyNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c5w1BAxt; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <83244641-8fab-4f05-9d31-c5881fa1660c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748789653;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lOAhBl1Qhlq6wH2PH80gzRHGRgdy1O7aBgxLtbf1Yvc=;
-	b=c5w1BAxtYORCvEZoUtLIKVfUN0MKQgkVrFsOrwv0Zm73CWxGdO/mJV3n1432IKIxiIh2KN
-	yBIDnMbDLwSonNWt0ItBnisw9me9S+Oz0nYupaVp09WJN3kzH1k7nn0QDRrkWk3YpHnDBz
-	Si22yGpyvte1D9UyxJX3dg/Nux+Kq4M=
-Date: Sun, 1 Jun 2025 16:53:31 +0200
+	s=arc-20240116; t=1748794864; c=relaxed/simple;
+	bh=h6QoMpVGGZVy60Ef1tMLb7Ks9v3/ZkdGVQ1zpckE/E8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=EcVo7w+XgHuuVtapSu57UVy76HO6zsY0vnlnADyGMRAflA8Q5Xdppbm1E2gI1CwYuL2HgiS2FyN/8oWB55pbant7kAFrSP38QEAyhLw5X+d0M970h5rlLPPzXsg7WMuoBxmxVffvUUvmTtP0IvmOb4Ds8UWBYIDYfmyskZawx2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3dd76ca11easo77655305ab.3
+        for <netdev@vger.kernel.org>; Sun, 01 Jun 2025 09:21:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748794862; x=1749399662;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BxRCzM24gglLIr7E2yldOZZAcHs1wVBwC6JZOlmfhD8=;
+        b=l4GbKwbOAcFMO2E3xL7vu9N8RydYQhLowp6a88QKTRfrZACALJLziaD3ev2cdsdBvy
+         0qgeyp0ILTlWuaKwh0e+bANaSnjUMuUT8fHdAcJIT1ftrXrhN6MmvBEB30sOtDF4Z95W
+         0/lCe3ZslBckJLZ7BxGlkDMvwkfEo3X9MJZSbFaXv3qmBaVOgI7g5roXn5AGNG9nez8Q
+         qu8txInnu7YzO9bCYVA8HFejVlX8PzvTt3TGEar1qU2u7kWT5ByfLt7I9xzDfsyYOBs2
+         Cnz/xpVjjAhpoiU6t/AaKG2RgJFBu9urBR4Oahg38Xtg6NoEgPBdHY+AIzXAh1ND4JCo
+         eIhg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7aqrKKkAAtOkWHmtGh6ENYDwefxa/nlmT6vdpLOHY1nieQA1cF+TN8iQhyWlQqgOxkk7Rhtk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNHZSYmv5HPAS/mFAvbWC17KbK3DUWSUUZF9UW2GoBs6Vhd2OB
+	wTI0QRc2hujO2zj8WKLcvxyjRtnIzVuwyN+boCypLA1jaBTeqk8uvyWGbVP9Dp+jzsE2WwUDOhK
+	ELQsP2pgjx4S3DTae4U7wKqb2tfAejaURwIEDIAaHtxA2zWLN7nUXyyY4EqA=
+X-Google-Smtp-Source: AGHT+IE6dM+Sri1ig2zWdcwsj1cdNpnH6D5Ew7GCODMXRc5foiZExQDqXF9qiWibFIJGCE3VMwNQPSukaY5jbkheuww0vE49Df77
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 0/5] Allow dyn MSI-X vector allocation of MANA
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
- Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Cameron <Jonathan.Cameron@huwei.com>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
- Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas <bhelgaas@google.com>,
- Rob Herring <robh@kernel.org>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=EF=BF=BD=7EDski?= <kw@linux.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>, Dexuan Cui <decui@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Haiyang Zhang <haiyangz@microsoft.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Konstantin Taranov <kotaranov@microsoft.com>, Simon Horman
- <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
- Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
- Shradha Gupta <shradhagupta@microsoft.com>
-References: <1748361453-25096-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1748361453-25096-1-git-send-email-shradhagupta@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:1aa6:b0:3ce:8ed9:ca94 with SMTP id
+ e9e14a558f8ab-3dd99c2898cmr107808385ab.14.1748794862401; Sun, 01 Jun 2025
+ 09:21:02 -0700 (PDT)
+Date: Sun, 01 Jun 2025 09:21:02 -0700
+In-Reply-To: <6751e769.050a0220.b4160.01df.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <683c7dee.a00a0220.d8eae.0032.GAE@google.com>
+Subject: Re: [syzbot] [cgroups?] general protection fault in __cgroup_rstat_lock
+From: syzbot <syzbot+31eb4d4e7d9bc1fc1312@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org, 
+	axboe@kernel.dk, bpf@vger.kernel.org, cgroups@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, hannes@cmpxchg.org, 
+	haoluo@google.com, hawk@kernel.org, inwardvessel@gmail.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, josef@toxicpanda.com, 
+	kpsingh@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, martin.lau@linux.dev, 
+	mhocko@kernel.org, mkoutny@suse.com, muchun.song@linux.dev, mykolal@fb.com, 
+	netdev@vger.kernel.org, roman.gushchin@linux.dev, sdf@fomichev.me, 
+	shakeel.butt@linux.dev, shuah@kernel.org, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-在 2025/5/27 17:57, Shradha Gupta 写道:
-> In this patchset we want to enable the MANA driver to be able to
-> allocate MSI-X vectors in PCI dynamically.
-> 
-> The first patch exports pci_msix_prepare_desc() in PCI to be able to
-> correctly prepare descriptors for dynamically added MSI-X vectors.
-> 
-> The second patch adds the support of dynamic vector allocation in
-> pci-hyperv PCI controller by enabling the MSI_FLAG_PCI_MSIX_ALLOC_DYN
-> flag and using the pci_msix_prepare_desc() exported in first patch.
-> 
-> The third patch adds a detailed description of the irq_setup(), to
-> help understand the function design better.
-> 
-> The fourth patch is a preparation patch for mana changes to support
-> dynamic IRQ allocation. It contains changes in irq_setup() to allow
-> skipping first sibling CPU sets, in case certain IRQs are already
-> affinitized to them.
-> 
-> The fifth patch has the changes in MANA driver to be able to allocate
-> MSI-X vectors dynamically. If the support does not exist it defaults to
-> older behavior.
-> ---
->   Change in v4
->   * add a patch describing the functionality of irq_setup() through a
->     comment
->   * In irq_setup(), avoid using a label next_cpumask:
->   * modify the changes in MANA patch about restructuring the error
->     handling path in mana_gd_setup_dyn_irqs()
->   * modify the mana_gd_setup_irqs() to simplify handling around
->     start_irq_index
->   * add warning if an invalid gic is returned
->   * place the xa_destroy() cleanup in mana_gd_remove
-> ---
->   Changes in v3
->   * split the 3rd patch into preparation patch around irq_setup() and
->     changes in mana driver to allow dynamic IRQ allocation
->   * Add arm64 support for dynamic MSI-X allocation in pci_hyperv
->     controller
-> ---
->   Changes in v2
->   * split the first patch into two(exporting the preapre_desc
->     func and using the function and flag in pci-hyperv)
->   * replace 'pci vectors' by 'MSI-X vectors'
->   * Change the cover letter description to align with changes made
-> ---
-> 
-> Shradha Gupta (5):
->    PCI/MSI: Export pci_msix_prepare_desc() for dynamic MSI-X allocations
->    PCI: hv: Allow dynamic MSI-X vector allocation
->    net: mana: explain irq_setup() algorithm
->    net: mana: Allow irq_setup() to skip cpus for affinity
->    net: mana: Allocate MSI-X vectors dynamically
+syzbot suspects this issue was fixed by commit:
 
-In this patchset, base-commit seems missing.
+commit a97915559f5c5ff1972d678b94fd460c72a3b5f2
+Author: JP Kobryn <inwardvessel@gmail.com>
+Date:   Fri Apr 4 01:10:48 2025 +0000
 
-Please see this link:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.15#n868
+    cgroup: change rstat function signatures from cgroup-based to css-based
 
-"
-When you open ``outgoing/0000-cover-letter.patch`` for editing, you will
-notice that it will have the ``base-commit:`` trailer at the very
-bottom, which provides the reviewer and the CI tools enough information
-to properly perform ``git am`` without worrying about conflicts::
-"
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12ca4c82580000
+start commit:   932fc2f19b74 Merge branch 'irq-save-restore'
+git tree:       bpf-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=50c7a61469ce77e7
+dashboard link: https://syzkaller.appspot.com/bug?extid=31eb4d4e7d9bc1fc1312
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161cdfc0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12dfc8df980000
 
-When creating patches:
-"
-git format-patch --base=main origin/main
-"
+If the result looks correct, please mark the issue as fixed by replying with:
 
-This will include a base-commit: line in each patch file:
+#syz fix: cgroup: change rstat function signatures from cgroup-based to css-based
 
-"
-base-commit: abcdef1234567890...
-"
-
-This is useful when submitting patches to mailing lists or other tooling.
-
-Please follow the submitting-patches.rst to add base-commit.
-
-Best Regards,
-Zhu Yanjun
-
-> 
->   .../net/ethernet/microsoft/mana/gdma_main.c   | 356 ++++++++++++++----
->   drivers/pci/controller/pci-hyperv.c           |   5 +-
->   drivers/pci/msi/irqdomain.c                   |   5 +-
->   include/linux/msi.h                           |   2 +
->   include/net/mana/gdma.h                       |   8 +-
->   5 files changed, 293 insertions(+), 83 deletions(-)
-> 
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
