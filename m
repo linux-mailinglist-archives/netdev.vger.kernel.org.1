@@ -1,132 +1,123 @@
-Return-Path: <netdev+bounces-194533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE25ACA04E
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 21:43:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EC0ACA054
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 21:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEA643B40D9
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 19:42:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F3AA3B348E
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 19:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B780239562;
-	Sun,  1 Jun 2025 19:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B863515666D;
+	Sun,  1 Jun 2025 19:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ie0EZrth"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x877uQBK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5552238C3A;
-	Sun,  1 Jun 2025 19:43:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4560C383
+	for <netdev@vger.kernel.org>; Sun,  1 Jun 2025 19:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748806991; cv=none; b=QyBx692S1Up3QjBEJV8nfuUaDCNIs2QYLAhKzvNKYU5UMcpJUS51r/12f5lUy4r16p0kwyISXW/3cxtsA8X3YuXbGjLbjL3cI2IabL0oGBeATetxT5vhZFcv+cq+4z4xDHcrdvmq7rBwBf+y6+a7qF2684Mo2M31v4gi7GcofZM=
+	t=1748807371; cv=none; b=BlFQ+qRbzwo1VgoW1PsRgSwdTaWe1rJ6VFjasy8AvEayivYXOuX4fCvFRqGT+OcP1EtQzLXqJjQsv6bF5nAwoTadD6uCN8dBiOiUVI5Z9JmbaReLVkAOqCKYsXFMiyUsbJDOTLluEGg2w4cDR9uHMP+b/ANVJIfSoPOIiWeSIqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748806991; c=relaxed/simple;
-	bh=zlttJep6rq3I8+o8EQ7DmNCSKFq6mJq8IUZsLPjanpw=;
+	s=arc-20240116; t=1748807371; c=relaxed/simple;
+	bh=OA6gnjPmGrHTq6uMjAd4+9GuNtdx+SupMKZyX9oyrQU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B2PTK5G1eNNnh0FyOPGL5z5AsfEqH2BeehgVbEB2ICByL8THO4Psirm3c5xMG69WuystQAUN050HFl8dTb+eXeOQPhXtBIpdT+aFYmfDBY77sK1IcZPd60o99/Gps9jzn9DHx20RiXIi3Hd6wl9OFn0MY6LH7Xl/Cj5MfNjOdh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ie0EZrth; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54998f865b8so3542983e87.3;
-        Sun, 01 Jun 2025 12:43:09 -0700 (PDT)
+	 To:Cc:Content-Type; b=uiFv/0oc/x7R7lg5dZW8k8jQDMPDztvAMzHQuhWWopRgDPYAPmh91PFHUi3xhZM79Mq4Zp8D/MAN0ywkS+dSjUSkjBXbm0f84y1FB1V1WJZjQKZcL5KmKjrtT5vETtYG7EexlYIb3LAqU7I25mYNP4S8ln6Ywu4qIo+82bR2MB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x877uQBK; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2348a45fc73so215205ad.0
+        for <netdev@vger.kernel.org>; Sun, 01 Jun 2025 12:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748806988; x=1749411788; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748807369; x=1749412169; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zlttJep6rq3I8+o8EQ7DmNCSKFq6mJq8IUZsLPjanpw=;
-        b=ie0EZrth6Xrw3SRY3IovDnAxP5/8MKvP/wdwqtNhLD7rmDiMkiE52HyumbdFzKKCJP
-         uiUyUJMkpwyTeSsywi0gJZEc0Dx5Tu+JeSNiufvQO0Q82EeGQAfyM5gHU5swleGDyV6j
-         uMoPEenULYCL8SzmWizE+J0ysuqiOdF916vmmSP0RH9cC9DYLaye5SBnrQRQrV1ZmGyh
-         lkTWGcZ3i28fc09A7yIDXCrKVCRcFHIdRsvQnw+HAzdjnJjxQFh090NI1jJk1rnfRz72
-         tICek6z5ngtGQMmeZekfZCXzJUOcniZU83EKlcZxdRJMgMeRsjaiNwBlviP0aH5Zyimv
-         bSVQ==
+        bh=OA6gnjPmGrHTq6uMjAd4+9GuNtdx+SupMKZyX9oyrQU=;
+        b=x877uQBKt6Z89z/I7xaEt0rKdGbBrlP7i9Ge8lnBJpz/pmxxoSmKjMz0mOZOd77Tfu
+         dtg9McayivDTDhygj/57mB6WregKQsdTYPGTn0zlcuOuPMjwWqd6q8pSVsUq3mFcXEwo
+         7Pkw1M1ls2XK2OHAjoF0qp/IzCBOIraFjklF/azMmjy0GE7uVO84B3gvZPmGyKfnmlk5
+         KiGj7rC7jX76AZXg+8j7EIJg3RJjTYVIN9RBmjACJtJX0Y5TgskkfrjSHTDMkSqzKgPr
+         k3wN8xw7PKrjdq2vF0nh+IiiJWDtYMs9kvHkSydf+WXUDz6v2inpXXhir02SN88cn4of
+         yK0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748806988; x=1749411788;
+        d=1e100.net; s=20230601; t=1748807369; x=1749412169;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zlttJep6rq3I8+o8EQ7DmNCSKFq6mJq8IUZsLPjanpw=;
-        b=QzggFh93VWlxDjq0w/bxUAab4t8MRQOvQlJzA++4VOq1fbsEJTQSpa4QGkO75txepF
-         0gtWBU8d7ILJE6lX3lmVkD8QTXVzkW/23Uosp432S5pcm0Tm4d7ZVx6J8Wa4qHKM6d0Q
-         z5ZdKpNFsW9+muiGef3jkNYR0squ2PDsDphsIs9oHFA0/ylsavdze3rzixoBBB4btlKh
-         d3FNYO+bT4487NtrrpQ6nhvyHeVNqd7kJYwNGda/TMHsjvWbiju/r7Y8lS9Kzo+5pSW0
-         pR0Fdjm3I+FsOF+x7lB46TAODLxMqzVMoywcmm/ct5vk27iNJZfkm2EZt9JKZpZwoTTC
-         ls8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUFVscBmsfCU4TGjPmjlBcPpNj0F2suUpRqjVnxqTyBeMZ7Zj+VggBIbDKyzNndN/5WFl2G+EbX5f6/ID3HlwM=@vger.kernel.org, AJvYcCUI/MBiZhDSb/7R/b4n927i3DliqynnFjc1Y3HyWYPdTjQ9zm2tfLEJaNuZXtWUgcs2f6n77GZO/low@vger.kernel.org, AJvYcCUgcV9cURi0e2o/vJjlbtOBNxtNuGGEL1gsN3Gp7LSLDypbKIc+ZbuahKciukEuQ78Cqdudw5y8zKpE2WZCj3zf@vger.kernel.org, AJvYcCUzbFr25PyfIcDR+HfH1ZpJmNyZIIPkROycxeiKpFFtGP8ou/1LCiSeCi0jiMyjw41BxK44RphB@vger.kernel.org, AJvYcCVPp0Fk2zxjUsyHlXnWWersiPvpfzSAwlmbC/AEEausubQwTtAfNXRWkSNsNg1qF7KPSSbX2Qnz4pv5DT+m@vger.kernel.org, AJvYcCVxojdwRqCMVmuGvTDYlENB+vNiQj7rs9F/A9WGOMj09/Fwz/Iczm+lne4Tdkfnw2vmPi0SrvPjyO5jrnk=@vger.kernel.org, AJvYcCXFLVP20TJ2byEqjH5p1zl6sonEy4K3aGYMmtBA3VmeOWniWx49LxEXG4PsfMs5snHYVLKknTVkfvhR@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4KajWt0RL5va2yEg/rt7QWQqGxkubMeno7P8XVpUFXEnZ4lAK
-	JsrEUn7HbI285N0T7PWMFUS9SbeEO9VfY1/gwZOZOp9f7nTzEvAm10rNjv9Svqq9XWlKn4IUGnq
-	hMtCMD6qOoKA8uXPFwy5JfuhJm/BFHHE=
-X-Gm-Gg: ASbGncuMBIrsUMA6fMeqqDTSLBYGAxtJ7F73pHn/aDh/TedNlU6eMBnLm0vlMf0Dn2F
-	jm7b8RAhxIeJovalYZI6K+SIe6N295rlNygI+3DxGlk2ZzI3SbS+Ugj+0DTt6rZ+3Dnh72zDQA/
-	a5VPGd5JBL4xDx7IhK3Rh7+ehJXvKBBWTyhH7p5Gh8VLs+EOWgZ/spKjEzklw/QRdBVEY=
-X-Google-Smtp-Source: AGHT+IHtRgXkoammUnbUpN1dYXGck9bKGEUGn5GT5cV3fPbuB+pGOqAmc7vwPC05DiWkj0JlBHypesZfOXv6vLdnG6Q=
-X-Received: by 2002:a05:6512:3d28:b0:553:2c58:f967 with SMTP id
- 2adb3069b0e04-5533b93b8f9mr3282822e87.56.1748806987505; Sun, 01 Jun 2025
- 12:43:07 -0700 (PDT)
+        bh=OA6gnjPmGrHTq6uMjAd4+9GuNtdx+SupMKZyX9oyrQU=;
+        b=bTIUCZBjM9oEMKquf1hq8YP41UZTvDRMQ6pbnoJwO47KUWNShvdzsDEobKLVuW97/X
+         NavSqVJ4sWRjjVCmifF8i9kL2Blkw8aRlti/NQ+1CJum19iDKiHQ15ERKGujxMP1pu4J
+         RC39mrcy1Crc3KhbYb4oykzczyjZ4KldfjGbuFni4w71ztXeRHBa7ayQsKuPF7G6Fz7S
+         mRHC9+CUoiKW5E1beVerdCcWWc+vnN1htMeGfRxD+g9/o2/5hY2DoJFAQlCvMZeSeS/4
+         iFubnwZjQHMJ/2jTBE1qAlUSH9bFst1/3uHpMz5vaQZ8woSM5DIuZixna3m5lWrzl2WI
+         3vUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjWX5oUcbkZZd5zxdvFrc4NI4rAJs376o9Oj5+LZw2oB95UW+VefEls4pIJvReGvm/YVaEErI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKO8wpydHBegKV95fLQDlIDmcdk0BCU6hwEZCsGBM2C/YokLPN
+	mFQUfmJsdKD83j98u1RXbC2sKYjK9uIArzaLZq9/iHeE9e5aUxcx6fJAYs+IhtfGt6NqIMeR/q9
+	8Jrr0DkaDQG/Y5fUO463yAP743tI6RPNC/8RGphWC
+X-Gm-Gg: ASbGnctvpshJvZ5GEUcOLizkaLufL+A31CDWSBMo+zl9szY3+jBZ0ZtBBU1aTuNQxxX
+	aOFAwJ8IXCtUIGtLGlYKSEWvxSI/gqAbD/GZlbIyGyQGFOa3oGmfsOwQ9EIe3zVwNL/xo0ItZmk
+	ffCh4GeBOjLTpWdFcdG7A2LBiK2QxxgEgD33XpxFmeEzza
+X-Google-Smtp-Source: AGHT+IGuKYuACePHASwBc1caQn32lBjaqHshQBYH/h8PHU3WssUdv4MSjw2rLAjB+qZQfYRgGCCIAw3qrXEIS+kGKHg=
+X-Received: by 2002:a17:902:f651:b0:234:a734:4ab9 with SMTP id
+ d9443c01a7336-235568f2761mr2930795ad.20.1748807369084; Sun, 01 Jun 2025
+ 12:49:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com>
- <20250530-cstr-core-v11-1-cd9c0cbcb902@gmail.com> <DABC3ZAQ01GG.1VT5NL7PIMTEO@kernel.org>
-In-Reply-To: <DABC3ZAQ01GG.1VT5NL7PIMTEO@kernel.org>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Sun, 1 Jun 2025 15:42:30 -0400
-X-Gm-Features: AX0GCFsKjS9hgEwmEsRuHll_MOXzoBWv1p_-8FxpcxZc3tsgxztATvJimliHSmg
-Message-ID: <CAJ-ks9=awTggTjr-_dkaWLQRkQVwkBQKiJzdP9dA7_=zFKRY+g@mail.gmail.com>
-Subject: Re: [PATCH v11 1/5] rust: macros: reduce collections in `quote!` macro
-To: Benno Lossin <lossin@kernel.org>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
-	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+References: <20250601193428.3388418-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20250601193428.3388418-1-alok.a.tiwari@oracle.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Sun, 1 Jun 2025 12:49:15 -0700
+X-Gm-Features: AX0GCFsq2stzgpUbglrlQlKkYoMupX3j2X7PTQqh_PILem3fYMMDPTQUNWueH7k
+Message-ID: <CAHS8izOqWWdsEheAFSwOtzPM98ZudP7gKZMECWUhcU1NCLnwHA@mail.gmail.com>
+Subject: Re: [PATCH] gve: add missing NULL check for gve_alloc_pending_packet()
+ in TX DQO
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: bcf@google.com, joshwash@google.com, willemb@google.com, 
+	pkaligineedi@google.com, pabeni@redhat.com, kuba@kernel.org, 
+	jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, darren.kenny@oracle.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 1, 2025 at 12:24=E2=80=AFPM Benno Lossin <lossin@kernel.org> wr=
-ote:
+On Sun, Jun 1, 2025 at 12:34=E2=80=AFPM Alok Tiwari <alok.a.tiwari@oracle.c=
+om> wrote:
 >
-> On Fri May 30, 2025 at 2:27 PM CEST, Tamir Duberstein wrote:
-> > Remove a handful of unncessary intermediate vectors and token streams;
-> > mainly the top-level stream can be directly extended with the notable
-> > exception of groups.
+> gve_alloc_pending_packet() can return NULL, but gve_tx_add_skb_dqo()
+> did not check for this case before dereferencing the returned pointer.
 >
-> What's the motivation for this?
+> Add a missing NULL check to prevent a potential NULL pointer
+> dereference when allocation fails.
+>
+> This improves robustness in low-memory scenarios.
+>
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-I was squinting at the macro to understand how it worked and spotted
-these oddities.
+Patch itself looks good to me, but if you can, please designate it to
+the net tree by prefixing the patch with `[PATCH net v2]` as mentioned
+in our docs:
 
-> I wouldn't spend much effort on this file, as it'll go away when we add t=
-he `quote` crate.
+https://docs.kernel.org/process/maintainer-netdev.html
 
-Eh, this seems to be in the "I'll believe it when I see it" category.
+Also, if possible, add `Fixes: commit a57e5de476be ("gve: DQO: Add TX
+path")` to give it a chance to get picked up by stable trees.
+
+With that:
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+--=20
+Thanks,
+Mina
 
