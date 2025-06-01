@@ -1,176 +1,434 @@
-Return-Path: <netdev+bounces-194524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986C9AC9E66
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 12:51:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B91AC9E92
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 15:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCAD23AA828
-	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 10:51:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A933B4C15
+	for <lists+netdev@lfdr.de>; Sun,  1 Jun 2025 13:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527D31AF0BF;
-	Sun,  1 Jun 2025 10:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A47B1A5B8B;
+	Sun,  1 Jun 2025 13:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYQTEDiS"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="YAKbHLGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6814E19EEBD
-	for <netdev@vger.kernel.org>; Sun,  1 Jun 2025 10:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104092DCBFC;
+	Sun,  1 Jun 2025 13:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748775102; cv=none; b=bcDYLtEEvwym0pUiR6KJ/ZYxgiRgxag5VtzbM3pY7cdb/+52HZayMXQUDEgYpWkaRwYA5L0mK8yR3BnI/F6i9/ZKH8U9oq6PVrG2a9AiOhGFUmikIJQIbiCbTaOe+yynNU1dMJMZTER4e7pzQgY2tAw4njvfkRJ3IJpGvh05TQs=
+	t=1748783466; cv=none; b=Kz+nNwivhNzqFsax+WjFVh/MQVMu/w2qx8dWlgB36AYKOEQxj4Hed65XdARxA2/Iijp2+Dajqam22R4c3C8DlWCiX8vxwgri12DmZ0ITgXgCUya7mPyeGJiqeBXFDzvzQCUkoUZba0HRxa1qd7SbTjTyS22VcfzWW816C8KXSwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748775102; c=relaxed/simple;
-	bh=Kg3D1Hds9FAI9RcBxGC9kYXWJb0C19mfROuvp6I68T0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QWHDs7ientbg83OHOMDRnB/onmm3nvcLWwQ16+Ifr7Q34Mkuk+mjnROyMMICI1o8npXf3TuwhCR+akDjic4goRvQg6zQODRCR0CB6QgSYTmqQ0Ae+9IIw0ss1HB7LrFNaAWFac6l9kuxQ5ve0oeVQKyAl2nZbJyw2J7BCSD7N4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DYQTEDiS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748775098;
+	s=arc-20240116; t=1748783466; c=relaxed/simple;
+	bh=0gfsVUXR8Mg0vAlqqGSmzDfYzGuevOP+m14e9LsiocA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oT4WlXPLIKiPhYdV+ytTjGXoqg1EDY5Ph+OWQ/UbQxXdQme7uYpSqVtRix8LhuAPdMkx0USjayxVgzI6ySVJiut83CqSaA7nGrwnWAwIMS/XfAY/83EgsCRb2Q5Li7NCXobExHksictOf+Rml5QTWO8WX5pK7oBmyxYZ4LHynHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=YAKbHLGF; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1748783454;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=r+LDkkF3bl9XFii8SeXhYSZYWFK7xdUoFXE21Deot6Q=;
-	b=DYQTEDiSdyQbMJiPkdjD9rj8JmJt/YRpQJmcc1yatWWq/oh9omV/vKjfD+1ZPEPj1VtD0M
-	s2UcMULpqIUUAEmjbtUhvilfLGkQE8ysn9QHYx6ANFYa1z5NSFQx3k9Au8Ht9EwkWiGTVO
-	i+Fu57fjDppfyHwonXHoPNY4ZSMWwNM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-577-ygX12KLpOcicd_4_tYZyCw-1; Sun, 01 Jun 2025 06:51:37 -0400
-X-MC-Unique: ygX12KLpOcicd_4_tYZyCw-1
-X-Mimecast-MFC-AGG-ID: ygX12KLpOcicd_4_tYZyCw_1748775096
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so20658555e9.1
-        for <netdev@vger.kernel.org>; Sun, 01 Jun 2025 03:51:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748775096; x=1749379896;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r+LDkkF3bl9XFii8SeXhYSZYWFK7xdUoFXE21Deot6Q=;
-        b=k94oEKJW1OESE6gUx4wvAStu1LBqt4ff4ecG3B+ZkJjwmHwRRXAg1mirAH681Kq3QO
-         yxhqk9hitLgf6Vujp4sqLvSFnW+o2w9SGjpD7VR5fWrAjZrmi889RczizSlU0c5ENBdq
-         jMm03mJ2sTmoPui48XS3U52kWo4Y+ohdrJNQt4kNeE4zC3qHQfVSVzRShBF2lLGXRgkk
-         uecXsCCSj9RnPNXY+nTKO+vJgWe4lE1Q48Ze1fl8mxpXmNMs9sttOLqKdwS2D9STRnaC
-         q3DJJ15JBt0qds+hl+ZoZV9ZWKyIcYzvYdEnEQZf2Np02j0rs+cSOpxVQ3ERiDdffQKe
-         QqBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6aNGAvRPXD+Bi1g4l6/83fgy0PBw1Oe+6MiVwMXL/7AATu+9z0WHk0eWpFxL6dsdfXNfNPFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxJJ6fR0Gupxc//4PD074jVf6+tELsOLlPGvKwH9H1LY5P0QaM
-	XFirX9cefnoCfpxofPmKqYre8+2KpD7YwVdX4sEsIYznMJzgB9AspBOd8jTBz645DTE1yrVq6wP
-	KeuWJ89BcOZ2022x/7xi4+s2QHTeQhheCrenYtEmwv/3IqFC/gZMAs3ZnOA==
-X-Gm-Gg: ASbGncvchxeOT6UFzmJTEBS/vEjr+24CJ+1RFL5Q287oHqkfMiaApjtMrtsBJmNFB+P
-	DdusExQiWnTOsLjzlf76Cl8vVI0p3wZbMQXtyCjfqKWl6o/1g/BggfuNLLwcqEpmEAHjnMphu8g
-	+7byeRGQfPg2DXXjWxzNhzFTS3KdAOf26nXsuc6IZko+6aV3J7jkZaO2+yUHnBZxWmx5m0AZDuW
-	O9PquW6vuB8mHiSJhzvg9zqxITrFd43NSitBoi8iuYSIDGy2f1ZV/OJRjI7x3da+gf8vnQs7FgI
-	pmkTFg==
-X-Received: by 2002:a05:600c:6747:b0:450:cd50:3c66 with SMTP id 5b1f17b1804b1-450d8876bd5mr68720225e9.29.1748775095928;
-        Sun, 01 Jun 2025 03:51:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFyVvW8vOUJekNf9fJWEFV8OBsS9sxAfCFyfMFebeG/spr6/CyNivjswpG1bzmxkbm+qlN2ZA==
-X-Received: by 2002:a05:600c:6747:b0:450:cd50:3c66 with SMTP id 5b1f17b1804b1-450d8876bd5mr68720075e9.29.1748775095516;
-        Sun, 01 Jun 2025 03:51:35 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8012af3sm80427155e9.35.2025.06.01.03.51.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Jun 2025 03:51:34 -0700 (PDT)
-Date: Sun, 1 Jun 2025 06:51:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RESEND v10 1/3] vhost: Add a new modparam to allow
- userspace select kthread
-Message-ID: <20250601064917-mutt-send-email-mst@kernel.org>
-References: <20250531095800.160043-1-lulu@redhat.com>
- <20250531095800.160043-2-lulu@redhat.com>
+	bh=RqEhWe1zc+zD6NdVa3r6beSKjDCk/bjWY/syOEcqjOU=;
+	b=YAKbHLGFjlPdMKEswAJsu6KsfayUqF7eionq+6TK2Tjln+rAZmwpYnxslJVxLynQdBTG6W
+	OMeUp0FLl4nVDYx/sNjMRW53bsyzSuAGWMtru8JwIahCES0PXwQwrMFAzly2PomLQM+iTo
+	T7lnocJKmJo+k3Vk+KTOw/0r9wsoAoQ=
+From: Sven Eckelmann <sven@narfation.org>
+To: Marek Lindner <marek.lindner@mailbox.org>,
+ Simon Wunderlich <sw@simonwunderlich.de>,
+ Antonio Quartulli <antonio@mandelbit.com>,
+ Matthias Schiffer <mschiffer@universe-factory.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH batadv 4/5] batman-adv: remove global hardif list
+Date: Sun, 01 Jun 2025 15:10:50 +0200
+Message-ID: <3742218.iIbC2pHGDl@sven-l14>
+In-Reply-To: <bb85858d-b123-45ce-8fae-9658e13b822c@universe-factory.net>
+References:
+ <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
+ <4860101.CbtlEUcBR6@sven-desktop>
+ <bb85858d-b123-45ce-8fae-9658e13b822c@universe-factory.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250531095800.160043-2-lulu@redhat.com>
+Content-Type: multipart/signed; boundary="nextPart9566920.CDJkKcVGEf";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Sat, May 31, 2025 at 05:57:26PM +0800, Cindy Lu wrote:
-> The vhost now uses vhost_task and workers as a child of the owner thread.
-> While this aligns with containerization principles, it confuses some
-> legacy userspace applications, therefore, we are reintroducing kthread
-> API support.
-> 
-> Add a new module parameter to allow userspace to select behavior
-> between using kthread and task.
-> 
-> By default, this parameter is set to true (task mode). This means the
-> default behavior remains unchanged by this patch.
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+--nextPart9566920.CDJkKcVGEf
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Subject: Re: [PATCH batadv 4/5] batman-adv: remove global hardif list
+Date: Sun, 01 Jun 2025 15:10:50 +0200
+Message-ID: <3742218.iIbC2pHGDl@sven-l14>
+MIME-Version: 1.0
 
-So modparam is here but does nothing.
-This should be the last patch in the series, or squashed with 3/3.
+On Sunday, 1 June 2025 11:26:25 CEST Matthias Schiffer wrote:
+[...]
+> > And saying this, the `batadv_hardif_get_by_netdev` call was also used to
+> > retrieve additional information about alll kind of interfaces - even wh=
+en they
+> > are not used by batman-adv directly. For example for figuring out if it=
+ is a
+> > wifi interface(for the TT wifi flag). With you change here, you are bas=
+ically
+> > breaking this functionality because you now require that the netdev is =
+a lower
+> > interface of batman-adv. Therefore, things like:
+> >=20
+> >=20
+> >                     =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=90
+> >         =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=BCbr-lan=E2=94=9C=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+> >         =E2=94=82           =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=98      =E2=94=82
+> >         =E2=94=82                         =E2=94=82
+> >         =E2=94=82                         =E2=94=82
+> >       =E2=94=8C=E2=94=80=E2=96=BC=E2=94=80=E2=94=90                    =
+=E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=94=80=E2=94=90
+> >       =E2=94=82ap0=E2=94=82                    =E2=94=82bat0=E2=94=82
+> >       =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=98                    =
+=E2=94=94=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=98
+> >                                   =E2=94=82
+> >                                   =E2=94=82
+> >                                =E2=94=8C=E2=94=80=E2=94=80=E2=96=BC=E2=
+=94=80=E2=94=80=E2=94=90
+> >                                =E2=94=82mesh0=E2=94=82
+> >                                =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=98
+> >                                         =20
+> >                                         =20
+> > Is not handled anymore correctly in TT because ap0 is not a lower inter=
+face of
+> > any batadv mesh interface. And as result, the ap-isolation feature of TT
+> > will break.
+> >=20
+> > Kind regards,
+> > 	Sven
+>=20
+> Hmm, this is a tricky one. Only having the hardifs around while they're=20
+> used for meshing means we need some other way to determine the wifi flags=
+ -=20
+> but doing it on demand for every batadv_tt_local_add() seems like it coul=
+d=20
+> be used to facilitate a DoS on the RTNL by causing large numbers of TT=20
+> entries to be added, as the lock needs to be held for resolving the iflin=
+k.
 
-why is this inherit_owner but ioctl is fork_owner? is there
-a difference? If not
-can't the name be consistent with the ioctl?  vhost_fork_owner?
+Uhm, using a mutex in this place is a bad idea. If batadv_tt_local_add is=20
+called from the non-batadv_interface_tx context then rtnl_lock is already=20
+held - which is not the biggest problem because we can handle this with mor=
+e=20
+code. But when it is called from the batadv_interface_tx context then it is=
+=20
+usually in a context which doesn't allow sleeping. Here an example output w=
+hen=20
+adding an rtnl_lock/rtnl_unlock in this place:
+
+[    9.141427][   T43] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[    9.141835][   T43] WARNING: suspicious RCU usage
+[    9.142213][   T43] 6.15.0+ #1 Tainted: G           O      =20
+[    9.142630][   T43] -----------------------------
+[    9.142981][   T43] ./include/linux/rcupdate.h:409 Illegal context switc=
+h in RCU read-side critical section!
+[    9.143674][   T43]=20
+[    9.143674][   T43] other info that might help us debug this:
+[    9.143674][   T43]=20
+[    9.144334][   T43]=20
+[    9.144334][   T43] rcu_scheduler_active =3D 2, debug_locks =3D 1
+[    9.144904][   T43] 6 locks held by kworker/1:2/43:
+[    9.145255][   T43]  #0: ffff888007be2558 ((wq_completion)mld){+.+.}-{0:=
+0}, at: process_one_work+0xcee/0x1420
+[    9.145944][   T43]  #1: ffff88800792fd38 ((work_completion)(&(&idev->mc=
+_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work+0x798/0x1420
+[    9.146713][   T43]  #2: ffff88800a58e5a8 (&idev->mc_lock){+.+.}-{4:4}, =
+at: mld_ifc_work+0x2a/0x200
+[    9.147319][   T43]  #3: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: mld_sendpack+0x17f/0xc00
+[    9.147949][   T43]  #4: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: ip6_finish_output2+0x294/0x1650
+[    9.148621][   T43]  #5: ffffffff834050c0 (rcu_read_lock_bh){....}-{1:3}=
+, at: __dev_queue_xmit+0x18a/0xff0
+[    9.149286][   T43]=20
+[    9.149286][   T43] stack backtrace:
+[    9.149743][   T43] CPU: 1 UID: 0 PID: 43 Comm: kworker/1:2 Tainted: G  =
+         O        6.15.0+ #1 NONE=20
+[    9.149747][   T43] Tainted: [O]=3DOOT_MODULE
+[    9.149748][   T43] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
+BIOS 0.1 11/11/2019
+[    9.149751][   T43] Workqueue: mld mld_ifc_work
+[    9.149754][   T43] Call Trace:
+[    9.149756][   T43]  <TASK>
+[    9.149759][   T43]  dump_stack_lvl+0x6f/0xa0
+[    9.149764][   T43]  lockdep_rcu_suspicious.cold+0x4e/0x8b
+[    9.149768][   T43]  __might_resched+0x26a/0x380
+[    9.149771][   T43]  ? rcu_read_unlock+0x80/0x80
+[    9.149773][   T43]  ? batadv_primary_if_get_selected+0x320/0x320 [batma=
+n_adv]
+[    9.149786][   T43]  ? mark_held_locks+0x40/0x70
+[    9.149791][   T43]  __mutex_lock+0x113/0x1be0
+[    9.149795][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.149807][   T43]  ? batadv_bla_get_backbone_gw+0xad1/0xdf0 [batman_ad=
+v]
+[    9.149819][   T43]  ? mutex_lock_io_nested+0x18d0/0x18d0
+[    9.149824][   T43]  ? batadv_bla_claim_dump_entry.isra.0+0x6d0/0x6d0 [b=
+atman_adv]
+[    9.149835][   T43]  ? ret_from_fork_asm+0x11/0x20
+[    9.149841][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.149852][   T43]  ? batadv_bla_rx+0xe00/0xe00 [batman_adv]
+[    9.149862][   T43]  batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.149878][   T43]  ? batadv_tt_global_hash_count+0x110/0x110 [batman_a=
+dv]
+[    9.149892][   T43]  batadv_interface_tx+0x4b4/0x1820 [batman_adv]
+[    9.149905][   T43]  ? batadv_skb_head_push+0x220/0x220 [batman_adv]
+[    9.149917][   T43]  ? skb_csum_hwoffload_help+0x650/0x650
+[    9.149922][   T43]  dev_hard_start_xmit+0x15c/0x640
+[    9.149926][   T43]  ? validate_xmit_skb.isra.0+0x62/0x4a0
+[    9.149930][   T43]  __dev_queue_xmit+0x44d/0xff0
+[    9.149933][   T43]  ? netdev_core_pick_tx+0x230/0x230
+[    9.149938][   T43]  ip6_finish_output2+0x7f8/0x1650
+[    9.149942][   T43]  ? icmp6_dst_alloc+0x30a/0x480
+[    9.149946][   T43]  mld_sendpack+0x5de/0xc00
+[    9.149951][   T43]  ? mld_report_work+0x620/0x620
+[    9.149957][   T43]  ? mld_send_cr+0x4ff/0x7f0
+[    9.149961][   T43]  mld_ifc_work+0x32/0x200
+[    9.149965][   T43]  process_one_work+0x814/0x1420
+[    9.149971][   T43]  ? pwq_dec_nr_in_flight+0x540/0x540
+[    9.149977][   T43]  ? assign_work+0x168/0x240
+[    9.149980][   T43]  worker_thread+0x618/0x1010
+[    9.149985][   T43]  ? __kthread_parkme+0xf7/0x260
+[    9.149989][   T43]  ? process_one_work+0x1420/0x1420
+[    9.149991][   T43]  kthread+0x3bb/0x760
+[    9.149994][   T43]  ? kvm_sched_clock_read+0x11/0x20
+[    9.149997][   T43]  ? local_clock_noinstr+0x4e/0xe0
+[    9.150000][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.150002][   T43]  ? __lock_release+0x154/0x2a0
+[    9.150005][   T43]  ? ret_from_fork+0x1b/0x70
+[    9.150010][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.150012][   T43]  ret_from_fork+0x31/0x70
+[    9.150015][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.150018][   T43]  ret_from_fork_asm+0x11/0x20
+[    9.150025][   T43]  </TASK>
+[    9.150026][   T43]=20
+[    9.171355][   T43] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[    9.171360][   T43] WARNING: suspicious RCU usage
+[    9.171363][   T43] 6.15.0+ #1 Tainted: G           O      =20
+[    9.171366][   T43] -----------------------------
+[    9.171367][   T43] kernel/sched/core.c:8780 Illegal context switch in R=
+CU-bh read-side critical section!
+[    9.171371][   T43]=20
+[    9.171371][   T43] other info that might help us debug this:
+[    9.171371][   T43]=20
+[    9.171372][   T43]=20
+[    9.171372][   T43] rcu_scheduler_active =3D 2, debug_locks =3D 1
+[    9.171374][   T43] 6 locks held by kworker/1:2/43:
+[    9.171377][   T43]  #0: ffff888007be2558 ((wq_completion)mld){+.+.}-{0:=
+0}, at: process_one_work+0xcee/0x1420
+[    9.171392][   T43]  #1: ffff88800792fd38 ((work_completion)(&(&idev->mc=
+_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work+0x798/0x1420
+[    9.171402][   T43]  #2: ffff88800a58e5a8 (&idev->mc_lock){+.+.}-{4:4}, =
+at: mld_ifc_work+0x2a/0x200
+[    9.171413][   T43]  #3: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: mld_sendpack+0x17f/0xc00
+[    9.171423][   T43]  #4: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: ip6_finish_output2+0x294/0x1650
+[    9.171433][   T43]  #5: ffffffff834050c0 (rcu_read_lock_bh){....}-{1:3}=
+, at: __dev_queue_xmit+0x18a/0xff0
+[    9.171459][   T43]=20
+[    9.171459][   T43] stack backtrace:
+[    9.171462][   T43] CPU: 1 UID: 0 PID: 43 Comm: kworker/1:2 Tainted: G  =
+         O        6.15.0+ #1 NONE=20
+[    9.171467][   T43] Tainted: [O]=3DOOT_MODULE
+[    9.171468][   T43] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
+BIOS 0.1 11/11/2019
+[    9.171470][   T43] Workqueue: mld mld_ifc_work
+[    9.171474][   T43] Call Trace:
+[    9.171476][   T43]  <TASK>
+[    9.171479][   T43]  dump_stack_lvl+0x6f/0xa0
+[    9.171484][   T43]  lockdep_rcu_suspicious.cold+0x4e/0x8b
+[    9.171490][   T43]  __might_resched+0x336/0x380
+[    9.171493][   T43]  ? rcu_read_unlock+0x80/0x80
+[    9.171496][   T43]  ? batadv_primary_if_get_selected+0x320/0x320 [batma=
+n_adv]
+[    9.171508][   T43]  ? mark_held_locks+0x40/0x70
+[    9.171513][   T43]  __mutex_lock+0x113/0x1be0
+[    9.171517][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171529][   T43]  ? batadv_bla_get_backbone_gw+0xad1/0xdf0 [batman_ad=
+v]
+[    9.171541][   T43]  ? mutex_lock_io_nested+0x18d0/0x18d0
+[    9.171546][   T43]  ? batadv_bla_claim_dump_entry.isra.0+0x6d0/0x6d0 [b=
+atman_adv]
+[    9.171557][   T43]  ? ret_from_fork_asm+0x11/0x20
+[    9.171564][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171574][   T43]  ? batadv_bla_rx+0xe00/0xe00 [batman_adv]
+[    9.171585][   T43]  batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171601][   T43]  ? batadv_tt_global_hash_count+0x110/0x110 [batman_a=
+dv]
+[    9.171616][   T43]  batadv_interface_tx+0x4b4/0x1820 [batman_adv]
+[    9.171629][   T43]  ? batadv_skb_head_push+0x220/0x220 [batman_adv]
+[    9.171641][   T43]  ? skb_csum_hwoffload_help+0x650/0x650
+[    9.171647][   T43]  dev_hard_start_xmit+0x15c/0x640
+[    9.171650][   T43]  ? validate_xmit_skb.isra.0+0x62/0x4a0
+[    9.171654][   T43]  __dev_queue_xmit+0x44d/0xff0
+[    9.171657][   T43]  ? netdev_core_pick_tx+0x230/0x230
+[    9.171663][   T43]  ip6_finish_output2+0x7f8/0x1650
+[    9.171667][   T43]  ? icmp6_dst_alloc+0x30a/0x480
+[    9.171671][   T43]  mld_sendpack+0x5de/0xc00
+[    9.171676][   T43]  ? mld_report_work+0x620/0x620
+[    9.171682][   T43]  ? mld_send_cr+0x4ff/0x7f0
+[    9.171686][   T43]  mld_ifc_work+0x32/0x200
+[    9.171690][   T43]  process_one_work+0x814/0x1420
+[    9.171696][   T43]  ? pwq_dec_nr_in_flight+0x540/0x540
+[    9.171702][   T43]  ? assign_work+0x168/0x240
+[    9.171706][   T43]  worker_thread+0x618/0x1010
+[    9.171710][   T43]  ? __kthread_parkme+0xf7/0x260
+[    9.171715][   T43]  ? process_one_work+0x1420/0x1420
+[    9.171717][   T43]  kthread+0x3bb/0x760
+[    9.171720][   T43]  ? kvm_sched_clock_read+0x11/0x20
+[    9.171723][   T43]  ? local_clock_noinstr+0x4e/0xe0
+[    9.171727][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.171729][   T43]  ? __lock_release+0x154/0x2a0
+[    9.171732][   T43]  ? ret_from_fork+0x1b/0x70
+[    9.171736][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.171739][   T43]  ret_from_fork+0x31/0x70
+[    9.171742][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.171745][   T43]  ret_from_fork_asm+0x11/0x20
+[    9.171752][   T43]  </TASK>
+[    9.171754][   T43] BUG: sleeping function called from invalid context a=
+t kernel/locking/mutex.c:578
+[    9.171756][   T43] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pi=
+d: 43, name: kworker/1:2
+[    9.171759][   T43] preempt_count: 202, expected: 0
+[    9.171761][   T43] 6 locks held by kworker/1:2/43:
+[    9.171763][   T43]  #0: ffff888007be2558 ((wq_completion)mld){+.+.}-{0:=
+0}, at: process_one_work+0xcee/0x1420
+[    9.171774][   T43]  #1: ffff88800792fd38 ((work_completion)(&(&idev->mc=
+_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work+0x798/0x1420
+[    9.171784][   T43]  #2: ffff88800a58e5a8 (&idev->mc_lock){+.+.}-{4:4}, =
+at: mld_ifc_work+0x2a/0x200
+[    9.171794][   T43]  #3: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: mld_sendpack+0x17f/0xc00
+[    9.171804][   T43]  #4: ffffffff83405120 (rcu_read_lock){....}-{1:3}, a=
+t: ip6_finish_output2+0x294/0x1650
+[    9.171813][   T43]  #5: ffffffff834050c0 (rcu_read_lock_bh){....}-{1:3}=
+, at: __dev_queue_xmit+0x18a/0xff0
+[    9.171823][   T43] CPU: 1 UID: 0 PID: 43 Comm: kworker/1:2 Tainted: G  =
+         O        6.15.0+ #1 NONE=20
+[    9.171827][   T43] Tainted: [O]=3DOOT_MODULE
+[    9.171828][   T43] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), =
+BIOS 0.1 11/11/2019
+[    9.171829][   T43] Workqueue: mld mld_ifc_work
+[    9.171832][   T43] Call Trace:
+[    9.171833][   T43]  <TASK>
+[    9.171834][   T43]  dump_stack_lvl+0x6f/0xa0
+[    9.171838][   T43]  __might_resched.cold+0x160/0x1bc
+[    9.171842][   T43]  ? rcu_read_unlock+0x80/0x80
+[    9.171844][   T43]  ? batadv_primary_if_get_selected+0x320/0x320 [batma=
+n_adv]
+[    9.171855][   T43]  ? mark_held_locks+0x40/0x70
+[    9.171859][   T43]  __mutex_lock+0x113/0x1be0
+[    9.171863][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171874][   T43]  ? batadv_bla_get_backbone_gw+0xad1/0xdf0 [batman_ad=
+v]
+[    9.171886][   T43]  ? mutex_lock_io_nested+0x18d0/0x18d0
+[    9.171891][   T43]  ? batadv_bla_claim_dump_entry.isra.0+0x6d0/0x6d0 [b=
+atman_adv]
+[    9.171902][   T43]  ? ret_from_fork_asm+0x11/0x20
+[    9.171908][   T43]  ? batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171919][   T43]  ? batadv_bla_rx+0xe00/0xe00 [batman_adv]
+[    9.171929][   T43]  batadv_tt_local_add+0x3d4/0x1d20 [batman_adv]
+[    9.171945][   T43]  ? batadv_tt_global_hash_count+0x110/0x110 [batman_a=
+dv]
+[    9.171960][   T43]  batadv_interface_tx+0x4b4/0x1820 [batman_adv]
+[    9.171972][   T43]  ? batadv_skb_head_push+0x220/0x220 [batman_adv]
+[    9.171984][   T43]  ? skb_csum_hwoffload_help+0x650/0x650
+[    9.171990][   T43]  dev_hard_start_xmit+0x15c/0x640
+[    9.171993][   T43]  ? validate_xmit_skb.isra.0+0x62/0x4a0
+[    9.171997][   T43]  __dev_queue_xmit+0x44d/0xff0
+[    9.172000][   T43]  ? netdev_core_pick_tx+0x230/0x230
+[    9.172006][   T43]  ip6_finish_output2+0x7f8/0x1650
+[    9.172010][   T43]  ? icmp6_dst_alloc+0x30a/0x480
+[    9.172013][   T43]  mld_sendpack+0x5de/0xc00
+[    9.172018][   T43]  ? mld_report_work+0x620/0x620
+[    9.172024][   T43]  ? mld_send_cr+0x4ff/0x7f0
+[    9.172029][   T43]  mld_ifc_work+0x32/0x200
+[    9.172032][   T43]  process_one_work+0x814/0x1420
+[    9.172039][   T43]  ? pwq_dec_nr_in_flight+0x540/0x540
+[    9.172044][   T43]  ? assign_work+0x168/0x240
+[    9.172048][   T43]  worker_thread+0x618/0x1010
+[    9.172053][   T43]  ? __kthread_parkme+0xf7/0x260
+[    9.172056][   T43]  ? process_one_work+0x1420/0x1420
+[    9.172059][   T43]  kthread+0x3bb/0x760
+[    9.172061][   T43]  ? kvm_sched_clock_read+0x11/0x20
+[    9.172065][   T43]  ? local_clock_noinstr+0x4e/0xe0
+[    9.172069][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.172072][   T43]  ? __lock_release+0x154/0x2a0
+[    9.172076][   T43]  ? ret_from_fork+0x1b/0x70
+[    9.172080][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.172084][   T43]  ret_from_fork+0x31/0x70
+[    9.172089][   T43]  ? kthread_is_per_cpu+0xc0/0xc0
+[    9.172092][   T43]  ret_from_fork_asm+0x11/0x20
+[    9.172100][   T43]  </TASK>
+
+So, even getting the parent (see `ASSERT_RTNL` in=20
+`netdev_master_upper_dev_get`) of the lower interface is a no-go at that=20
+point.
 
 
-> ---
->  drivers/vhost/vhost.c |  5 +++++
->  drivers/vhost/vhost.h | 10 ++++++++++
->  2 files changed, 15 insertions(+)
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 3a5ebb973dba..240ba78b1e3f 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -41,6 +41,10 @@ static int max_iotlb_entries = 2048;
->  module_param(max_iotlb_entries, int, 0444);
->  MODULE_PARM_DESC(max_iotlb_entries,
->  	"Maximum number of iotlb entries. (default: 2048)");
-> +bool inherit_owner_default = true;
-> +module_param(inherit_owner_default, bool, 0444);
-> +MODULE_PARM_DESC(inherit_owner_default,
-> +		 "Set task mode as the default(default: Y)");
->  
->  enum {
->  	VHOST_MEMORY_F_LOG = 0x1,
-> @@ -552,6 +556,7 @@ void vhost_dev_init(struct vhost_dev *dev,
->  	dev->byte_weight = byte_weight;
->  	dev->use_worker = use_worker;
->  	dev->msg_handler = msg_handler;
-> +	dev->inherit_owner = inherit_owner_default;
->  	init_waitqueue_head(&dev->wait);
->  	INIT_LIST_HEAD(&dev->read_list);
->  	INIT_LIST_HEAD(&dev->pending_list);
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index bb75a292d50c..c1ff4a92b925 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -176,6 +176,16 @@ struct vhost_dev {
->  	int byte_weight;
->  	struct xarray worker_xa;
->  	bool use_worker;
-> +	/*
-> +	 * If inherit_owner is true we use vhost_tasks to create
-> +	 * the worker so all settings/limits like cgroups, NPROC,
-> +	 * scheduler, etc are inherited from the owner. If false,
-> +	 * we use kthreads and only attach to the same cgroups
-> +	 * as the owner for compat with older kernels.
-> +	 * here we use true as default value.
-> +	 * The default value is set by modparam inherit_owner_default
-> +	 */
-> +	bool inherit_owner;
->  	int (*msg_handler)(struct vhost_dev *dev, u32 asid,
->  			   struct vhost_iotlb_msg *msg);
->  };
-> -- 
-> 2.45.0
+> One option might be to add a cache for the wifi flag (and possible other=
+=20
+> information, I'll have to check if there is anything else), but store it =
+in=20
+> the mesh interface, only for interfaces that are bridged with the mesh.=20
+> Cache entries could be created on demand when a local TT entry is added f=
+or=20
+> an unknown IIF; when to remove cache entries is something I'll have to=20
+> figure out.
+>=20
+> Simpler ideas how to solve this are welcome :)
+
+Having something like a simple (rcu)hash(table) (yes, similar to the global=
+=20
+hardif list), which only stores entries for non-mesh netdev's when they are=
+=20
+(above) a wifi interface, might be enough. It is only for the =20
+"ap-isolation" feature but I guess that someone will not be happy if we=20
+break it.
+
+Kind regards,
+	Sven
+--nextPart9566920.CDJkKcVGEf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCaDxRWgAKCRBND3cr0xT1
+y7MUAP9jxtvDk3BJevLb+8D6M2OtLzL6sEnErbRg2SGjKKx55AD+OCjW6Ne+8dmS
+QvS0LWcbrPHkGeTbCAx2Nj+zB0cj5gA=
+=mhAw
+-----END PGP SIGNATURE-----
+
+--nextPart9566920.CDJkKcVGEf--
+
+
 
 
