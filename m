@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-194609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E494ACB016
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 16:00:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01375ACB81C
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 17:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8F5A7A21EC
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 13:58:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96E0B4C8384
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 15:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD851E1A3F;
-	Mon,  2 Jun 2025 13:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617DD231840;
+	Mon,  2 Jun 2025 15:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0DNiWPn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ILApTVGk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80001C5D72;
-	Mon,  2 Jun 2025 13:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB2D227BA4;
+	Mon,  2 Jun 2025 15:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748872789; cv=none; b=kFIEhZlPqkNGgyPcADuay7mZB4ZUNQxBHJQgvuoZ5Ny135gaFZPkNRLOiEX/za+izeAyaUF22QCU3OREck4wBt9XZQpsupMKhCOW5b3i+XHsmDyW2cPTo4AMHdTrNic3GQ1aXdfK6CAikbShXyQGipd4SIa4zBgLj5QyF8SpQvU=
+	t=1748877447; cv=none; b=D5wVfJa+6t0VTOngOHDC/FnKeeJI8IWF8rY6vT8UbFl+iwOkpiNqpcN9CnpY1uudJIG/XnNfqBfaSiS+BkDqbTLss9tHQQ/qizloWqn04LG7yLI5JTMhnewCta3AscswQ33LQRnvS2H6nUNvqAE/0btrhNRBhfF+HywsTgEVQwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748872789; c=relaxed/simple;
-	bh=510jMgMuVJgLONrJpYnhvGvMBIc9L3Cdb3rc79Pyu2Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aYHmbd/4lxPHjWLqYZuAow7FQiSVcDNmAsyywok4hzzLIzt1Kn0IHjNFZaWhtJEQNY9G2m8dxONsWgtKQdAxCe/swbLGYj4dGPe9UjhJ12WEyz/TlUzSUqINnN6K2q6UTtajUFa7qoSjaJptSLODqqcnVTdcodVGTRalyQtB83I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0DNiWPn; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234b9dfb842so40044595ad.1;
-        Mon, 02 Jun 2025 06:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748872787; x=1749477587; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2I9kHfTkQCdW1yuTkU7IIRkkfGeUty8kEfkKZcVJwRY=;
-        b=L0DNiWPnUolLMLTzty3nYrM9mJvowEsDoo/TAKcXCFRuLe+ch6fphTAECb1CnS+dnu
-         J2O/NIJcXiTLx1079YwrvisIc7/v/4697zG5DW8B9P2ByL+zskSpLqucHcCQnjkceaMv
-         XuLa3g/atp/KTZa0+/yyAp4/nfK6OglyZQbyLBYvLCbtPrbCTE+frm6E8IWDhqbqtiOa
-         WxR5aQVSD2+SKniioh8eel2Fs/GbsYtz1Q4GP0hMTYUd24Fi0ubi8yeSS9eCmzFbk909
-         PX8V8bhvWT3yvX4J43rBJ7HX0ZY2/bTI2Aomg5aU3sSbDOWFUef7aUEgx3cLfcYaeZBm
-         TZnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748872787; x=1749477587;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2I9kHfTkQCdW1yuTkU7IIRkkfGeUty8kEfkKZcVJwRY=;
-        b=tLZZefWuGulqVC98iE/n57P6aXVWmidKndV8PFCBfcLyW3OoeQT6FUAVCZSfznpA0o
-         XHKc2KBCA+duNbx4P0XOprd6TB2CQ7TlwPz78FuBidVoePMfJ4XW93/mXboYZHgRAxVz
-         USUWn6tTQrG9XJRFSueD+DxR/5AQ2psfmCnk0odV9bgrvDHDmacUNdgdmoRggu87+CU3
-         5Hy0mNrSFQ+joodiNsbH4/TSOWJ+aP+gBPVelXhMJXMAC+kVZzrGxyL9ellC5Nt9N8jT
-         iN+5MQHZjFn3hzQLleeNtzIB7OfNFiSkQ+GNLWosyJ4aQxix5Ti8QCeBi1EWVH4M5BIH
-         dlXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWm4a4CC/k+4LDy58XSS9sCBzldL+6ptZdORKwSYgHNYHmUeXvAukwWJYMW2+ftJVecpzKtgOZ12E1mo7U=@vger.kernel.org, AJvYcCX0H/iYuOmC6jxQJbzxe/ZrhTZgoJC387wtYI/l4sd1uROZWT0Xldv+Pt/WegWCeaNQraHwBrFU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqvn7OI2BD6D72Hhr0kohcVxKd7LTKU7Lsfm0qDBwFl9EEBnRd
-	IDTrEKg10cPaTmJnYpHmGwRbLdl/uDwjfH6l1/q7oIsOCLLSSOxPcAJM
-X-Gm-Gg: ASbGncvi38wPSjwa2GDMTPnUXr72J9/UNA/i+st69f2h2NgO/u+iJ7E1kyPZdBk9Rih
-	xYSePx3/jtUVD5Zd7/Faqpq0ZTAHMEjdd621F+zxO/i35ouzX2ELaWJE2JzJ+f62X8DTR9nOZck
-	jrEYT3da6xxuV1WrKIZhY5gpIybogYaI+tFgUZmkZMZSVg+NCymTPQvo6eJjt1ua0Hi76tEXiKE
-	1LASORXkhT2Fz4j++/2Heib+5FqRKAZRFbQt0/lHjejmOCPJ1M3ECXteuLKGEHW8vMddivO/sIl
-	7Opl8a3+Eh71hTAS+6N6T2u0qBrOb1CKROHokdZADSp3RyfSpgvZXLuAdgvcuxym8wv7T8w=
-X-Google-Smtp-Source: AGHT+IFY51lSdo7zfzC13+wWkvAWgQEqDkxEkSXJntWB0/HrzcJFz1Qu6WVZNLxHhgpfVvxEFhR9/w==
-X-Received: by 2002:a17:903:1c6:b0:234:ba37:879e with SMTP id d9443c01a7336-2355f781dadmr132895055ad.38.1748872786765;
-        Mon, 02 Jun 2025 06:59:46 -0700 (PDT)
-Received: from manjaro.domain.name ([2401:4900:1c66:a430:9007:9516:3e06:bd5d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506d14ddasm70988915ad.251.2025.06.02.06.59.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 06:59:46 -0700 (PDT)
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	keescook@chromium.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1748877447; c=relaxed/simple;
+	bh=FErq8caRDsGalfNF0DYdA9CIP38xryHF2uZADafN/2A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jPcrRtn/ElzNzEXVW+iWOnUAkp5b//kU5llkokAgv1cpILn4v6Ntxbr2E61//5qdSh0u6AT3sTYOwh8uHJ+xVt5P8VHNL6eejYptitvXtYYjx/IlUynMXKeAvtlhyGUS5Sg4vWaND5DYQfIUJi0kx0R0lKB59T8OlXKUabxgyZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ILApTVGk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79912C4CEEB;
+	Mon,  2 Jun 2025 15:17:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1748877447;
+	bh=FErq8caRDsGalfNF0DYdA9CIP38xryHF2uZADafN/2A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ILApTVGkAiZN6TM/wQcKBxT5abitoepqMTZmyrBRSRSX8zSbfOzPgIb+NXg0FmJwF
+	 MMtFGC+aUCh+ABg+8wlL+DOLshDggQtA06qvOtD9Q4EZiJrA+1IFz2X4QhX4N2tIGz
+	 ouTSREd71pJQ3M5g8cojt2TaKpS0VdH/c5yusCLQ=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Kees Cook <keescook@chromium.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Luca Boccassi <bluca@debian.org>,
 	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev
-Cc: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Subject: [PATCH] net: randomize layout of struct net_device
-Date: Mon,  2 Jun 2025 19:29:32 +0530
-Message-ID: <20250602135932.464194-1-pranav.tyagi03@gmail.com>
+	netdev@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Lee Jones <lee@kernel.org>
+Subject: [PATCH 6.1 281/325] af_unix: Kconfig: make CONFIG_UNIX bool
+Date: Mon,  2 Jun 2025 15:49:17 +0200
+Message-ID: <20250602134331.179674198@linuxfoundation.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250602134319.723650984@linuxfoundation.org>
+References: <20250602134319.723650984@linuxfoundation.org>
+User-Agent: quilt/0.68
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,34 +76,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add __randomize_layout to struct net_device to support structure layout
-randomization if CONFIG_RANDSTRUCT is enabled else the macro expands to
-do nothing. This enhances kernel protection by making it harder to
-predict the memory layout of this structure.
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-Link: https://github.com/KSPP/linux/issues/188
-Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+------------------
+
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+
+commit 97154bcf4d1b7cabefec8a72cff5fbb91d5afb7b upstream.
+
+Let's make CONFIG_UNIX a bool instead of a tristate.
+We've decided to do that during discussion about SCM_PIDFD patchset [1].
+
+[1] https://lore.kernel.org/lkml/20230524081933.44dc8bea@kernel.org/
+
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Lennart Poettering <mzxreary@0pointer.de>
+Cc: Luca Boccassi <bluca@debian.org>
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Acked-by: Christian Brauner <brauner@kernel.org>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Lee Jones <lee@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- include/linux/netdevice.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/unix/Kconfig |    6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 7ea022750e4e..0caff664ef3a 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2077,7 +2077,11 @@ enum netdev_reg_state {
-  *	moves out.
-  */
+--- a/net/unix/Kconfig
++++ b/net/unix/Kconfig
+@@ -4,7 +4,7 @@
+ #
  
-+#ifdef CONFIG_RANDSTRUCT
-+struct __randomize_layout net_device {
-+#else
- struct net_device {
-+#endif
- 	/* Cacheline organization can be found documented in
- 	 * Documentation/networking/net_cachelines/net_device.rst.
- 	 * Please update the document when adding new fields.
--- 
-2.49.0
+ config UNIX
+-	tristate "Unix domain sockets"
++	bool "Unix domain sockets"
+ 	help
+ 	  If you say Y here, you will include support for Unix domain sockets;
+ 	  sockets are the standard Unix mechanism for establishing and
+@@ -14,10 +14,6 @@ config UNIX
+ 	  an embedded system or something similar, you therefore definitely
+ 	  want to say Y here.
+ 
+-	  To compile this driver as a module, choose M here: the module will be
+-	  called unix.  Note that several important services won't work
+-	  correctly if you say M here and then neglect to load the module.
+-
+ 	  Say Y unless you know what you are doing.
+ 
+ config UNIX_SCM
+
 
 
