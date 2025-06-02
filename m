@@ -1,136 +1,130 @@
-Return-Path: <netdev+bounces-194584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E31EACAC40
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:09:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF6AACAC8F
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:35:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC7A176CFF
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:09:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECD3174006
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550EA1E5B6A;
-	Mon,  2 Jun 2025 10:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BE31A23B7;
+	Mon,  2 Jun 2025 10:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZ9AVCX8"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sFWT2U0t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CAE145A03;
-	Mon,  2 Jun 2025 10:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFFD1474DA;
+	Mon,  2 Jun 2025 10:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748858955; cv=none; b=doVceS0eDHiczHEJe2HPw92Q4sjC+W+hFpBEhymhTBzr3cpDqyd+FFBhqxnPTuaSFBHnYtKaUjII/RhTGN+HtYZb/AMoRnnM9pI7+9C+BFzEMBhbgrlWnTmquK5JHD6ry1r2QtY0tJqwusY2pu7LbOqjklKZ5USDghMJb63Vzo0=
+	t=1748860506; cv=none; b=BCvYh1DF2zvfK2x4JExDsCtaeTlHSEUIiYKXxhfFY84LZHwDTd430SA6f/RkrDwvOJ+CWNixIO4bwJK7180XpXHDBIbfiDvPxYVTD3uudHqBbfreVxMmie7AhkrFFhtPDCmSQwYmHgYcX5/M0js4HZCggzWRHctzlsPtVr0zJ0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748858955; c=relaxed/simple;
-	bh=cRXyGV9qMxw7Mqp385RRXEvnMD2ezN2tcInOJSKGL4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XiSU4v/8jmiDqV8kKWcoGcG4jhK7HP18D81KPC7LtSpVYLA8BoDwYWKDKT+zY2CRs3fxkqU2QHBSK/9Oo4IoqciFmP8wDwY46/32cIshTV2TCDULlRVEmlgVj7Sp+78sf1+8b7iiECNJX9CavthoNSgDFS4mkCIO4AXwU1++NYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZ9AVCX8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E2E2C4CEED;
-	Mon,  2 Jun 2025 10:09:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748858954;
-	bh=cRXyGV9qMxw7Mqp385RRXEvnMD2ezN2tcInOJSKGL4Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sZ9AVCX8QlaO1eU5+e/V4+wmAtmoR+O90JNKpPuqgjuBEtwz6ItI4NGxCl7FAw+Go
-	 O4yvCDH68ZzCToyax7IZRmSKl92rOP7f13CJ2S8XY+oWWwbRZVshmkyY8Rcy7Ch6Vs
-	 GJ8SgrAv/VynrWMd32K865XGk0QPAp3xJYxTcRunNhw5ZvmEQE06x9cMGKa7ySg68N
-	 BaAZdQzMHqxZaUj5PkibScRal3giqFsH5Dpl6lANCV+CLU6ECzC2OfD56/GUUQ03ep
-	 iJyUj1aD2LD1QxGWg/ZkqCBDqrJiMskSNsyEq2XNjFBC5+2FhV5CVuvignrQEzSczJ
-	 rj+i7Syk3tfLQ==
-Message-ID: <0459644e-cb62-441b-8fac-b7b50d484880@kernel.org>
-Date: Mon, 2 Jun 2025 12:09:09 +0200
+	s=arc-20240116; t=1748860506; c=relaxed/simple;
+	bh=8E0T9v34xRXXRTGYhDuC2chi+g4DNJyzdc253h68kVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IyWupGMdkO2Zykc6zuflKpK77ubGU7BqqE/EtBJR3yFjTNnrnkU/yDkU4K4UNVyl/9cF5hHiYnwrfBbtNQmKXpsLVRWlJ00bUaCnTtHq8VGAupjTbRrYU5PLgkPCj+IgbDi9cZpLG54E6IpPTMZpZ7kkoM8rEpyHOu23KMG5GFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sFWT2U0t; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5525tr8k004819;
+	Mon, 2 Jun 2025 10:34:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=d10F09HKcE9vaVzFWvr1qZcc2RWk1
+	4iuUKZIIZ0UNXs=; b=sFWT2U0tcUzcxbygvZqDNLRPuAru8T+DbpX887WYjeGte
+	Sia8d5diuf5bwXWgXQ3ND0gS4TdizmheDNCIkVNQi1gGF9o1utQ0fo8B9tBvx0AR
+	8RGHqeskI2wwKi598IJk8gpbczrx/hkz552huOpgzMopK8gFnEgr3oWuSJByRWZa
+	bPE+iu598DrtwY3u5UiTiNfID0XhOmC1JiOu0O3FsMgLvOG27FPDjlmIopk2a+X0
+	xzXkkupEtC1ZZxzL4eNnuEVsWuoGSzK+0LZuO78dcnHsKXEE4da9X+BjWAJveI2F
+	yuyZy5nzBVseblns4XankOdq2SLAjvUwNfdZ6g5UQ==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46ystetbbb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Jun 2025 10:34:54 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5529Iu6N016230;
+	Mon, 2 Jun 2025 10:34:54 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46yr77t4tt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Jun 2025 10:34:53 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 552AYrmZ019775;
+	Mon, 2 Jun 2025 10:34:53 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 46yr77t4t9-1;
+	Mon, 02 Jun 2025 10:34:53 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: almasrymina@google.com, bcf@google.com, joshwash@google.com,
+        willemb@google.com, pkaligineedi@google.com, pabeni@redhat.com,
+        kuba@kernel.org, jeroendb@google.com, hramamurthy@google.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
+        darren.kenny@oracle.com
+Subject: [PATCH net v2] gve: add missing NULL check for gve_alloc_pending_packet() in TX DQO
+Date: Mon,  2 Jun 2025 03:34:29 -0700
+Message-ID: <20250602103450.3472509-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH] mptcp: fix typos in comments
-Content-Language: en-GB, fr-BE
-To: moyuanhao3676@163.com
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-References: <20250530181004.261417-1-moyuanhao3676@163.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250530181004.261417-1-moyuanhao3676@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-02_04,2025-05-30_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
+ bulkscore=0 spamscore=0 suspectscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506020091
+X-Proofpoint-ORIG-GUID: 20Yu7RZYW7vRRmyRVOW4vrtwH_FHnZf1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAyMDA5MSBTYWx0ZWRfXyF47Lr94UO4d Hirr2bG1ZdyZbX24qpd2SRfUXzzT/NADrXx4VQ1tQDE4bK0uMfoy6A+4hmnlAPACblaHhQjEfaP CQtT/m6LPREY0rIbzT8Ffs8i+EH5Bl3LT3gqkblKRXZjie4WTTLleQxfuJG/ka/thh7G6TjsxSY
+ baP+pMXk0LiwPldbPPvvFXjBQzncIvbDXUBbc9XtQIe1h/xE+ZKFl2lvMtAmSx1Y9ruakcx0p0n OS8Vcqzp3PpU44KzQVIdbeaRKV+VQdwWmeu9B+g8WIPYU0M1rN/aUVY394Ar/JFSmWAggHQIymy RCIXzn0Z5s1jK2T6fVISti1oXhMPgsKurqHRpTi1tHU3eVolwMeXcQhic+U5w3qGbx/HLDXwBBp
+ b5izZuHtaekdJ2o6WDDd9NtTvlXMoYHQ+8ot5YvCsWvinDr9MogmUzuGgownGxSkqSnG+8BR
+X-Proofpoint-GUID: 20Yu7RZYW7vRRmyRVOW4vrtwH_FHnZf1
+X-Authority-Analysis: v=2.4 cv=XpX6OUF9 c=1 sm=1 tr=0 ts=683d7e4f cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=1XWaLZrsAAAA:8 a=YHu3FHGigSco7_P9gqwA:9
 
-Hi moyuanhao,
+gve_alloc_pending_packet() can return NULL, but gve_tx_add_skb_dqo()
+did not check for this case before dereferencing the returned pointer.
 
-On 30/05/2025 20:10, moyuanhao3676@163.com wrote:
-> From: moyuanhao <moyuanhao3676@163.com>
-> 
-> This patch fixes the spelling mistakes in comments.
-> greter -> greater
+Add a missing NULL check to prevent a potential NULL pointer
+dereference when allocation fails.
 
-Thank you for the patch. It looks good to me:
+This improves robustness in low-memory scenarios.
 
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Fixes: a57e5de476be ("gve: DQO: Add TX path")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+---
+v1->v2
+added Fixes tag and [PATCH net v2]
+---
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-But please note that net-next is closed, so this patch should not have
-been sent now:
-
-https://docs.kernel.org/process/maintainer-netdev.html#git-trees-and-patch-flow
-
-I will apply this patch in MPTCP tree, and send it later with others.
-
-pw-bot: deferred
-
-Cheers,
-Matt
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index a27f1574a733..9d705d94b065 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -764,6 +764,9 @@ static int gve_tx_add_skb_dqo(struct gve_tx_ring *tx,
+ 	s16 completion_tag;
+ 
+ 	pkt = gve_alloc_pending_packet(tx);
++	if (!pkt)
++		return -ENOMEM;
++
+ 	pkt->skb = skb;
+ 	completion_tag = pkt - tx->dqo.pending_packets;
+ 
 -- 
-Sponsored by the NGI0 Core fund.
+2.47.1
 
 
