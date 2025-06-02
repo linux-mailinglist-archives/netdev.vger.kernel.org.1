@@ -1,116 +1,107 @@
-Return-Path: <netdev+bounces-194600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50640ACAE44
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 14:47:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2A8ACAE2D
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 14:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C7A83B4710
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:47:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9066B7ACA5E
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B2B215F6B;
-	Mon,  2 Jun 2025 12:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD48121146A;
+	Mon,  2 Jun 2025 12:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="IdN/EfPC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fJ1oVQYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB8838DD1;
-	Mon,  2 Jun 2025 12:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFD6198845;
+	Mon,  2 Jun 2025 12:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748868466; cv=none; b=SIbV+O6pMdKQjmuWlll6rQx2LrWK3POYfFCzrZ+Y/NgCLu06+bbZcNxmW+SR7cRiq/5hrGxejKFcvwEx1ehaRpt7t1edz6ra6qPWD9QG8dyPCO00Rs1wXjfvyZLBV2kLu04M0cUpWVY71XMkiU8tEscz3j5/s30rFRcxy6HMnaM=
+	t=1748868129; cv=none; b=PmB0DV0zVMXE71eRyA7077RYKL2yaPB+APns5KgYZJ/2af1TeCH38ldHMl565s1XXVJdDhjNnZovcPQXH7JH0DXB38R+9+MNaJSgcEl7ieCEJxJ5LxeQvfPVLfxX8TT3+mq7hwTq/g72H2Wpdp4w1/xgdg21BkAI/1vdm9+ctTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748868466; c=relaxed/simple;
-	bh=FJkS0QakWU0n6b1qNi8YVrI4yg158AxwuU8g1LMNaos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hi16V2fhfKvPA1hvx3A01dGwrv5dY1y2KxKCqQM6zwmbIvJUppP27RAYxlrtgpCSGab3iWshuA6p5d/FGvnFaMj92MuJnA3g/sQcctEeT/sXijLCfoCtnA2jqATY47C8r62lrWE6GJPDh+rQCVf83xF49FS1aU0BGEMVoN1fwPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=IdN/EfPC; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1748867988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=G4+VCuBXlY5f39h1spysLYf7MRhFe7y4qDoXMnXq/a4=;
-	b=IdN/EfPCMarjWDnEMXf0bJPqxwCiB6yyV+w7CV6x7Rk5PaNMxdSbZaCCx9ShJgJaT+Oy9N
-	z6KYriMcnW2HBBEiUtA5B0O6kennx6gxzDYMgn1lJxjCBe38DlODCGDJRqcp4UTqlnavhz
-	bA6fG6jk3GTlrOrdaJ1dWZKeMM6pHSw=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
+	s=arc-20240116; t=1748868129; c=relaxed/simple;
+	bh=b4VrgvaUpGuhMsuGeP6n68tIjyYmDYkgwn8mjZPNNc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uwsu6O50dbCWvrwX87WoFT4Rd1TFZ5VNkSFSqyeD/gQz92O3H9qbS1AKjdNAi86ni2mfnXU6fxuSbXRo5tE1pGCMFbDiN+3wIW44LEI4hplRtkI56zuuaIaZnD9dYBS518XxtVBjXKMaT4/rxZaNNwvVW53+m8hlCMYk8MF4YVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fJ1oVQYD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HaTxOJSJ+INGXp69p1JUu+wzoMAuVQlQZ7IX9srKxLQ=; b=fJ1oVQYDwMZv3olSL5nJLM0oNC
+	X17T68yAaX0P9SG9niKk1JT8E8g3nwS76MGzHE0Gq1MMfoYnYDPu9MepwvU6NGkfoOQiEq5hSPHvI
+	lCS6hB8GOyv1g/RESmaw9JGAi1GEYd3oE+BKwhO145mp3WXFlebZjiB+4KiU1JxukbpI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uM4UG-00EVBX-Ko; Mon, 02 Jun 2025 14:41:56 +0200
+Date: Mon, 2 Jun 2025 14:41:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: george.moussalem@outlook.com
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Fernando Fernandez Mancera <ffmancera@riseup.net>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH 5.10] netfilter: nft_socket: fix sk refcount leaks
-Date: Mon,  2 Jun 2025 15:39:47 +0300
-Message-ID: <20250602123948.40610-1-arefev@swemel.ru>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v3 3/5] net: phy: qcom: at803x: Add Qualcomm IPQ5018
+ Internal PHY support
+Message-ID: <3704c056-91b9-464a-8bc8-7a98a9d9b7a7@lunn.ch>
+References: <20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com>
+ <20250602-ipq5018-ge-phy-v3-3-421337a031b2@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602-ipq5018-ge-phy-v3-3-421337a031b2@outlook.com>
 
-From: Florian Westphal <fw@strlen.de>             
+> +	/* PHY DAC values are optional and only set in a PHY to PHY link architecture */
+> +	if (priv->set_short_cable_dac) {
+> +		/* setting MDAC (Multi-level Digital-to-Analog Converter) in MMD1 */
+> +		phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, IPQ5018_PHY_MMD1_MDAC,
+> +			       IPQ5018_PHY_DAC_MASK, IPQ5018_PHY_MMD1_MDAC_VAL);
+> +
+> +		/* setting EDAC (Error-detection and Correction) in debug register */
+> +		at803x_debug_reg_mask(phydev, IPQ5018_PHY_DEBUG_EDAC,
+> +				      IPQ5018_PHY_DAC_MASK, IPQ5018_PHY_DEBUG_EDAC_VAL);
+> +	}
 
-commit 8b26ff7af8c32cb4148b3e147c52f9e4c695209c upstream.
+In the binding you say:
 
-We must put 'sk' reference before returning.
 
-Fixes: 039b1f4f24ec ("netfilter: nft_socket: fix erroneous socket assignment")
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-[Denis: minor fix to resolve merge conflict.]  
-Signed-off-by: Denis Arefev <arefev@swemel.ru> 
----
-Backport fix for CVE-2024-46855
-Link: https://nvd.nist.gov/vuln/detail/CVE-2024-46855
----
- net/netfilter/nft_socket.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
++            If not set, it is assumed the MDI output pins of this PHY are directly
++            connected to an RJ45 connector and default DAC values will be used.
 
-diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
-index 826e5f8c78f3..07e73e50b713 100644
---- a/net/netfilter/nft_socket.c
-+++ b/net/netfilter/nft_socket.c
-@@ -88,13 +88,13 @@ static void nft_socket_eval(const struct nft_expr *expr,
- 			*dest = sk->sk_mark;
- 		} else {
- 			regs->verdict.code = NFT_BREAK;
--			return;
-+			goto out_put_sk;
- 		}
- 		break;
- 	case NFT_SOCKET_WILDCARD:
- 		if (!sk_fullsock(sk)) {
- 			regs->verdict.code = NFT_BREAK;
--			return;
-+			goto out_put_sk;
- 		}
- 		nft_socket_wildcard(pkt, regs, sk, dest);
- 		break;
-@@ -103,6 +103,7 @@ static void nft_socket_eval(const struct nft_expr *expr,
- 		regs->verdict.code = NFT_BREAK;
- 	}
- 
-+out_put_sk:
- 	if (sk != skb->sk)
- 		sock_gen_put(sk);
- }
--- 
-2.43.0
+So shouldn't there be an else clause here setting these two values to
+their default, undoing what the bootloader might of done etc.
 
+Or you can change the binding, and say something like:
+
++            If not set, DAC values are not modified.
+
+We often need a tristate in DT, set something, unset something, leave
+it as it is. But that does not exist in DT in an easy form :-(
+
+	Andrew
 
