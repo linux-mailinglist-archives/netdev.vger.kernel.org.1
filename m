@@ -1,209 +1,240 @@
-Return-Path: <netdev+bounces-194605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C8EACAF0E
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 15:31:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC63DACAF1C
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 15:35:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 823A418968AB
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 13:32:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 707D27A8C56
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 13:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3C221C16D;
-	Mon,  2 Jun 2025 13:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D15221D3DB;
+	Mon,  2 Jun 2025 13:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KH6SQUud"
+	dkim=pass (2048-bit key) header.d=cirrus.com header.i=@cirrus.com header.b="el9Lyei+";
+	dkim=pass (1024-bit key) header.d=cirrus4.onmicrosoft.com header.i=@cirrus4.onmicrosoft.com header.b="WxDY6mZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001ae601.pphosted.com (mx0a-001ae601.pphosted.com [67.231.149.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4635B35968;
-	Mon,  2 Jun 2025 13:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748871108; cv=none; b=R5jSkYWDaAsTvlc08eWQgHworHCPkJa41IZvFyRTKpqw20/aDa+9YGf2Pn6hfbjJb0IzYXXMTz1ImJL4NinINbBsT1PY+1XEp3pHYZSj/s5Vsptm7y4Ae1KN+55dqOPfGkBWiNWfGvtVmIP7ghQwF059SzqSIV6RQvlLXKR4XfI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748871108; c=relaxed/simple;
-	bh=+DFimJ/qczZW7bRdNKT22gELISoWGzumRG2tc0dCMYE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DaenBGUr/3bFavRSaE2UjzXe3zOJ8hHBzMT3mTLCZGYTKyr4TdPcUlhUjJj4sSxa/Am7CvIpw6bC0nha5jvP06HXKazoauE9g0BmZNyubAcVtwUWv0iuOFMK9TdO+Gpce8IF5Dxc/z+xbf5fv+H1oPbygTDetODA16nxkkIOoM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KH6SQUud; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6face367320so32093246d6.3;
-        Mon, 02 Jun 2025 06:31:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53345221555;
+	Mon,  2 Jun 2025 13:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.149.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748871296; cv=fail; b=cXhh/IdYPeqtJqzlKR+QfXPq97qn6jeg9pO95nhpC8dFARj8LhD388efwUULMCQ7R91Pf0bnG3eK5Ve7Dvev7I3zaGwFOHOFjxQfIojmpr596GNRh1ROtteZCB/36Bq68fp4OVIO4dm13i0vLDN+xPtdtBLUENO+ZHAflX2KnnM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748871296; c=relaxed/simple;
+	bh=Lb3IN/6jXcoSKTuEPqixXW6ADvu+ajRSJXtM97/XuVE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=s09qSXegGP2rQrcGUcggJ2tX0YOBI/7rRFy3489tubB4QUr7nISrn4/gwAJJbrjcTkjD0LOg9Mby4zTudSEW46nXiuk0jlVfDvZSS/57JGVfEqjskMgP6o8DwXnwf29zb8TBvKa2SFUM7ZtfwZD7w6X4ZWSR/B5MWh+j5E+XFio=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensource.cirrus.com; spf=pass smtp.mailfrom=opensource.cirrus.com; dkim=pass (2048-bit key) header.d=cirrus.com header.i=@cirrus.com header.b=el9Lyei+; dkim=pass (1024-bit key) header.d=cirrus4.onmicrosoft.com header.i=@cirrus4.onmicrosoft.com header.b=WxDY6mZH; arc=fail smtp.client-ip=67.231.149.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensource.cirrus.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensource.cirrus.com
+Received: from pps.filterd (m0077473.ppops.net [127.0.0.1])
+	by mx0a-001ae601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 552BR1wh028253;
+	Mon, 2 Jun 2025 08:34:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirrus.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	PODMain02222019; bh=eqkp8cJswYuNo00IqOWPzyFvg92xaNUGrXfgycgck60=; b=
+	el9Lyei++qn2zAXGfpMxVTq8gExkxIt0mi0FGVTGoVyZ/L9Km8HXuxa39t4623X1
+	YqP5yjt730Q0ETSGvY8dgVtSBDb9fCuriC5pQZhY/sNZnbKr5BpRK+HpGBxJj11d
+	SvKnGwuUdc4EyIWHFSV2mTczVt2VRN/uIuhEKtgPkHgSfbGHYqKFhrbMSl0Rq3vc
+	5dEdSPym3JANnbWyzNvtJ3/iu/qn9vhw7GFmTVOBd5lh+/c7wsj8UdT3N9tErWx5
+	cvK3gkWPMdaTiBdReGo31rcLohJ1NCJW/byiJMCFcd1f05iUPa2Plkr6oLzl8Wzh
+	2WACppm6nmZ9eZ+Kest8Fg==
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11on2097.outbound.protection.outlook.com [40.107.220.97])
+	by mx0a-001ae601.pphosted.com (PPS) with ESMTPS id 471b3806x3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Jun 2025 08:34:24 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nWo0Yp5FzRpp0CpLimKZBCrzoAjMuuB3+QSbOJC+dQccXAHHX0zs6tzxIX64XnrtqXYJSgilEangW/SOJlsaFQakqnq5ymc2xCLZCf4li2ZSeQ3Do2sMaXDZBAmin3dqqo549WYCYZptaP9yff4W0QD98t718dcJ8Q4RBt3Ncgl/hq+/Ua/hu0V8A5sOz7YA+NfbQB8wfztoaIKz/GNEbhfau1IDxliSMqESEoIhKZmkJ20Z1IZWwLDsLVcCCfAgAHA0qYMjNRVvx5dz1Kmi5yx5ZP7dn+0iDHo3p3lLn/y2tVlCPgtl81bT6XRaKlY6m9IhKEJMvTPAlamN9jSZog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eqkp8cJswYuNo00IqOWPzyFvg92xaNUGrXfgycgck60=;
+ b=Xw1mJBE51SyNxUMYL2z8dy7y4EafoVJWe/+eJ63kyFVJZMltAEzfHQATZFVjcH1Uwe5RLrPMoEOA2gQ0Hlsb2kNOjbws+cXn/+K2maNt2jlEssz/VzC4YYH1muQRdpFwls16m8L/2R4lw7PCYJcqMtTGd0WSAIQ19LgBkV66dghY0gG3lp3V6dPGcSufcQTFDVA8RkMi9CFXPi3bgwlMIpxpyZtnFZ+anWq7ho9GgltvJDIgtAMcHQ/Fd8LdtlHSbDr55q6Q/NR3XgghpN2cxKOXoCN/L7sXDRThAeViISueMu8Ma81JWFcAdO1c+L6fszY3ZoJSAoDUOT6ooP8mbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 84.19.233.75) smtp.rcpttodomain=davemloft.net
+ smtp.mailfrom=opensource.cirrus.com; dmarc=fail (p=reject sp=reject pct=100)
+ action=oreject header.from=opensource.cirrus.com; dkim=none (message not
+ signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748871106; x=1749475906; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b7uDhYROBVHKQ3j2ronpzeARhgnkBg6U6c2yIwDBn50=;
-        b=KH6SQUudOI4OGTEfg3Gy7y0Z7ZYIymVPDb/he622cWQJ46mpcnyg+/D7E/oqaar+N3
-         EFiHsv0tVg9u/W2qvwhpYjLgyA7DWnprpAfP0y+wRp0dyTS9T+e61TJuLEA0TXnP5YmR
-         St2lAKngfd81SXg9pw8lzntuHInBfeVE7270MN9Y9pzbO/Amk6ZPBPRdOj0QqJkxKyxL
-         krJgWQxLeWRzajGBohZ9fc1BCDAYQmICOADOKDeHtO7mfkXX46CIUOVhbP+4iOqtNTkM
-         3UHSyWcUlvftS1IdQ3Ufi3YlYksIYueN0aG+pLfKgYJ4SGj1d0nsYuvuxvQAIxy6cqlp
-         rjHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748871106; x=1749475906;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=b7uDhYROBVHKQ3j2ronpzeARhgnkBg6U6c2yIwDBn50=;
-        b=iGP9Jc/yB+r7ZuaeP1mNWhofgg9E3PICx4dF9VwKLGk1gTn34pYoqIEsgIVuOqaDFt
-         se8R3a0IRkZyr6+AMoTQO9EFj+oyWVpaq9OP4I2UevmrBoOGNziXnsAu+OfQViGMdaVC
-         86jVO9E2Oet/pJopNx1NFO1yPVLEOXZJv62+KRHVj4psIsB8imWalo1zQfZVsPRBcuHS
-         64fMqJDXQUHWz2NxN/4OamTYYzZIbxueVgmp41kxL7BJrZq9BSZsNW+AVIiW9G4rTPCg
-         jMGZrDy4lgLkWVDWCf8yWf7smm4Ar2ESH6eE46ibWR2OStXPAnePKqjt/tIe7WHtwd7P
-         Mx1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUt8RfaC9hoVlAmzSRPhqIKv7J9QIFcIyfO85CcUXGsGNl5lZfcGsju8n2lKgarrMU6FZItOVIQ8Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCRBId/3sKMIdobc24TwjFhAshiLlBoG49nDGyXhr+GiJxtF3x
-	F9/QQB8lUvy9L7NTwStob0LO93cnrsHnaXcZF3DdHvnPNJ05uYIKEDwEQcOFsA==
-X-Gm-Gg: ASbGncvximo1gPnXM9agSza6WKZRrQwEFalgIDx8SPYa/pYimj5DNOV6lHh+SLeIXMR
-	V48f3sLXJk7uMzF/Y0ljm+F0+4C5EZoorhMoUp3T0o333jng9xXsQhWOEh+WUJCe8GlVcctjn63
-	m4sfX+U4Kc9CXz6lZLvBS4jUDdaOaOsbMFPEdJx+kCCNT36TubjVo2xwvkAOePP0uDyz7qiCjDB
-	A/MI06gkfYtPlTlYi5BGC9qfo86wk8A4bVj3LLPyP3OeROackVLfUJruMSSkkKJOzNUNmYWu0ZE
-	wXBXlbQg3tamH9J6pfev7bbGNbi+zIvQbzBHVju+oFm5W5BLPViQ6Fty4VdJJwnLMwKFJAZf5sQ
-	tRK4hUo8imQVVe4eYBkxBdhI=
-X-Google-Smtp-Source: AGHT+IFJEFSb0+Iffwq4ZPTwf6C3RZ8h04DQf58ILuOKZq0iFkFqY7Pc/pBZLRWhDYHLjjO3mccDrA==
-X-Received: by 2002:ad4:5de2:0:b0:6e4:4274:aaf8 with SMTP id 6a1803df08f44-6fad191c252mr186689666d6.17.1748871095063;
-        Mon, 02 Jun 2025 06:31:35 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6facab00339sm57167846d6.125.2025.06.02.06.31.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 06:31:34 -0700 (PDT)
-Date: Mon, 02 Jun 2025 09:31:34 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Pavel Begunkov <asml.silence@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- io-uring@vger.kernel.org, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>
-Message-ID: <683da7b621fc2_328fa4294e0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <07d408c8-c816-4997-ab87-1a6521d0bacd@gmail.com>
-References: <cover.1748607147.git.asml.silence@gmail.com>
- <6e83dc97b172c2adb2b167f2eda5c3ec2063abfe.1748607147.git.asml.silence@gmail.com>
- <683c5b38ed614_232d4429431@willemb.c.googlers.com.notmuch>
- <07d408c8-c816-4997-ab87-1a6521d0bacd@gmail.com>
-Subject: Re: [PATCH 1/5] net: timestamp: add helper returning skb's tx tstamp
+ d=cirrus4.onmicrosoft.com; s=selector2-cirrus4-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eqkp8cJswYuNo00IqOWPzyFvg92xaNUGrXfgycgck60=;
+ b=WxDY6mZHDIFnaGlTJqL9T+D9+CNHD+w4N5DalFgq7iB9HcdlLj15Mqc+4UbI5XBCDWi08h0WO8RBvL+jdyHcuU1ahcDFpSY0Rx7IAtsdhWyhB9tMo1ATSY+xwfInHa4IKBEE7JvHM5SIjiqP+r13Yp3jx1CZ1nziX9CITv2I0PU=
+Received: from DM6PR17CA0019.namprd17.prod.outlook.com (2603:10b6:5:1b3::32)
+ by PH3PPF8B4EB7E23.namprd19.prod.outlook.com (2603:10b6:518:1::c39) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.32; Mon, 2 Jun
+ 2025 13:34:20 +0000
+Received: from DS1PEPF00017091.namprd03.prod.outlook.com
+ (2603:10b6:5:1b3:cafe::b8) by DM6PR17CA0019.outlook.office365.com
+ (2603:10b6:5:1b3::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8746.32 via Frontend Transport; Mon,
+ 2 Jun 2025 13:34:19 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 84.19.233.75)
+ smtp.mailfrom=opensource.cirrus.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=oreject header.from=opensource.cirrus.com;
+Received-SPF: Fail (protection.outlook.com: domain of opensource.cirrus.com
+ does not designate 84.19.233.75 as permitted sender)
+ receiver=protection.outlook.com; client-ip=84.19.233.75;
+ helo=edirelay1.ad.cirrus.com;
+Received: from edirelay1.ad.cirrus.com (84.19.233.75) by
+ DS1PEPF00017091.mail.protection.outlook.com (10.167.17.133) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.29
+ via Frontend Transport; Mon, 2 Jun 2025 13:34:18 +0000
+Received: from ediswmail9.ad.cirrus.com (ediswmail9.ad.cirrus.com [198.61.86.93])
+	by edirelay1.ad.cirrus.com (Postfix) with ESMTPS id 2EC8940654F;
+	Mon,  2 Jun 2025 13:34:17 +0000 (UTC)
+Received: from [198.90.208.24] (ediswws06.ad.cirrus.com [198.90.208.24])
+	by ediswmail9.ad.cirrus.com (Postfix) with ESMTPSA id 31686820258;
+	Mon,  2 Jun 2025 13:34:17 +0000 (UTC)
+Message-ID: <74d3a550-a828-4666-8664-d08d06fc6f0f@opensource.cirrus.com>
+Date: Mon, 2 Jun 2025 14:34:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+Subject: Re: [PATCH net] Revert "kunit: configs: Enable
+ CONFIG_INIT_STACK_ALL_PATTERN in all_tests"
+To: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, brendan.higgins@linux.dev,
+        davidgow@google.com, rmoar@google.com, broonie@kernel.org,
+        mic@digikod.net, linux-kselftest@vger.kernel.org,
+        kunit-dev@googlegroups.com
+References: <20250530135800.13437-1-kuba@kernel.org>
+ <9628c61e-234f-45af-bc30-ab6db90f09c6@linuxfoundation.org>
+ <20250530180750.4c722f71@kernel.org>
+Content-Language: en-GB
+In-Reply-To: <20250530180750.4c722f71@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017091:EE_|PH3PPF8B4EB7E23:EE_
+X-MS-Office365-Filtering-Correlation-Id: e243792f-de39-425b-b4a3-08dda1da2d02
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|34070700014|7416014|82310400026|36860700013|376014|61400799027;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZFRSazBJTDFVaWlNUFJMZ05CVWFvdDBrY2w3cW1ZQ2dYV1V1YXRpMEt3eFli?=
+ =?utf-8?B?SGxJYXRYVGE2b3JYeStseDhiTllQRkdLRXQwODhIL3dIWGVYSkEzbUoxM3Y5?=
+ =?utf-8?B?NnNXd3c3NUdwbTFNdmw0M3BDamVhWVZ2OVlBZ3pjZGxKb1NWSzZwbmFjK0Va?=
+ =?utf-8?B?dTgwYmxhUGNYSDBRRHBoWlBpTjVHMDBkWS9NU2tWV2h0NmRiWlUyTnpkdWhE?=
+ =?utf-8?B?NytHTEpsS1ppMVFvendUcEtwRmZjbUM2RDEvQ1NZV0M1SFNXSXNoVElYVFhq?=
+ =?utf-8?B?cmVSY0VBTy9ZNVdhSHhjMlpLTkNqQ0ZoeGlmUk9OejZITGtBVDRYTTJDbnY5?=
+ =?utf-8?B?bDhRazQ1RnFrTGIyTEE1NlV5WVRxSjlCc1UzNTh0dzhBMzl6OUE1VTVlWUVp?=
+ =?utf-8?B?aGozdVlqbkcxeGJwVEx1Zy9jdU5yQm5BN2M1UGM5NnF3V01pMS8vUEc4dDBB?=
+ =?utf-8?B?S0dEbE5aWE54dWhKdXV5Wnl6NlhneTYwOEVXbkduMVpqM0pyaG81V0hBckFQ?=
+ =?utf-8?B?emtjWVRHVm95enNoRmtNd29wS0pJejBDZjV6OTR1Z05XUkVPQ290L21yV0Y5?=
+ =?utf-8?B?TmloMmUrMVNIaXhablhsTkJGd1hOYTlLK29xempld2pwdzVGT2NpVHV6V3U3?=
+ =?utf-8?B?TktLZzZPa1gvUGhhT2JRWXhaVUJCZXdXL3dweW1DeDVPQVoyRjdhSlhJSlho?=
+ =?utf-8?B?MExOVFdIRVRmdEVTdjgvVS9iWVIybFFIV0dFZlM5VWtCMXVYV29nc0VqSURr?=
+ =?utf-8?B?Rk9kaVNxQnVvZXFhQmdaVTFDaE9MYm0yY0RKWUIzNkJLeXQxekczcEI1TkpQ?=
+ =?utf-8?B?UVZZM2tsU1JCWnZYbkc4VysvQzZxaXFjZFlrZ3I0TWhyMTFuUmNTS3hHZG5S?=
+ =?utf-8?B?cmVsSmZ5SzN3Mll2L091Tmo2WGVhVytFV0VHVTBZSXgwVkpHYlQrelg3YjJE?=
+ =?utf-8?B?TFRmU1E3UnVoSzlpNnZzWGhMRG4zTnBNZmo1VG53WUM4U0pBWVlJU3RBVzZz?=
+ =?utf-8?B?UnVrb21mQlY2TjY5M1Zob3ZWQVBKdE4yWTAxdnJ2U00rYlQ4VVFtaEpQdmNx?=
+ =?utf-8?B?Ny9yVDNjbmFKc0FCNnZCR0phRURITFA4Zi92bFRYRUpCS0ZXUEVaSlhsRnZJ?=
+ =?utf-8?B?ZzBYSlA0SG5KZW5jWVQxUThkc0ZUNC8xcmlTM0dsSldkWEZlcDdvVjFnUUpR?=
+ =?utf-8?B?dXg1R0MxV21DNWc3R3d2MFl2NENiZ0IzZGV3T1M5UllPVlhZVU42eFFwZ2lG?=
+ =?utf-8?B?amQ1bTlrWFhtbjRINk9RdzY2N0c3Sk5ZdWtUZVIxK0JkSkJNZGljRzJLKysv?=
+ =?utf-8?B?emgvRm9lVE84M3B5R0M1VUdZWXhHSUtuODlPbmdzNEd2cXVKZlkxOG9oYVFB?=
+ =?utf-8?B?aVpHeTREQW9WcjlFM0NNeEJUeHFBV2cvMmlwaVBwemREeWVRM1BEblBncFRo?=
+ =?utf-8?B?UHA1R09wMmZPOU40WWhvMGJqZUg5QnYxd2FMaUFOSHd6RDFkL0xHQ252Z2M5?=
+ =?utf-8?B?WkxJRFhEbTdLK0c0dXBRb2REMklRODBxbGpwVjMxQ3dIYU9rRDc4SEkvYStk?=
+ =?utf-8?B?WnFoRWcxd09sMmJhVDllYVdLZnBrUy96YW14RjAwTTlFT21sN3FpWU8vLzVL?=
+ =?utf-8?B?RUVlWVJCbjZKdDFaT0s4L3BCR2gwTW9kbHgzTW1xd2NFUi9YWnl0K3lOZDM1?=
+ =?utf-8?B?RnRuWU5nYWpkMEtud2FLOXh5ZHdnWU1Nd2ZMYTdPWkZiL01zYy9kYTZ2SG4x?=
+ =?utf-8?B?SndkUk5BNkZzRVF6bU1hYy9oSFM0Zkp4WVBwRWc4bm5wRFhhcG9WV1phanUv?=
+ =?utf-8?B?MXdCZm52K1cwTVZ6azlmRTI3UnFwdmdoWTNwQkZucUxieENiMmZpNThzRDB4?=
+ =?utf-8?B?KzRpaCtWVHNrT3N4RXRqTy8welhtcS9NWnlUdVFMeWhUUFVRSm1vZ0pteCtn?=
+ =?utf-8?B?bWFSNnpJVkVtTHZyL2R3c0dJaUo5cUdOZzZyTzRmVHl2dzZQSlRScmFoc3Yz?=
+ =?utf-8?B?alU0WTJUQmJBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:84.19.233.75;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:edirelay1.ad.cirrus.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(34070700014)(7416014)(82310400026)(36860700013)(376014)(61400799027);DIR:OUT;SFP:1102;
+X-OriginatorOrg: opensource.cirrus.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2025 13:34:18.3800
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e243792f-de39-425b-b4a3-08dda1da2d02
+X-MS-Exchange-CrossTenant-Id: bec09025-e5bc-40d1-a355-8e955c307de8
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bec09025-e5bc-40d1-a355-8e955c307de8;Ip=[84.19.233.75];Helo=[edirelay1.ad.cirrus.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017091.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH3PPF8B4EB7E23
+X-Authority-Analysis: v=2.4 cv=Kf/SsRYD c=1 sm=1 tr=0 ts=683da860 cx=c_pps a=Ze6KCB9QP8ZtDdwQ7yE/RQ==:117 a=h1hSm8JtM9GN1ddwPAif2w==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=IkcTkHD0fZMA:10
+ a=6IFa9wvqVegA:10 a=RWc_ulEos4gA:10 a=VwQbUJbxAAAA:8 a=Dbesrkm3OhuCW59rINcA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: sq8J_i3bC0-jgnsUHMSYGOsNr_zocXmg
+X-Proofpoint-ORIG-GUID: sq8J_i3bC0-jgnsUHMSYGOsNr_zocXmg
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAyMDExMCBTYWx0ZWRfX0aqMOGWwNbet bsprOSzJlTOW7Ou3MYu+tBY3obbGRQ4ohHui3AMSeojKzinPPbjoSN/M550VTF/p75gvebTEJkA 7nMWlvuR6tmnI3qrecUW3wgUCWjCwWQdhMud6QeVLKpg7igT5sH+KKb6LyeCrWcF+cWOkkxbCI6
+ 0DWthK+joFTQuOMgVkDEaTVX5j/VHJyfJPlih8Y37FAxawWiapm7oW9Emxj23cGN54w3M8wBVwO hpZZXyl1YnMd4aTlbJNbxhPqEmKrZAitJk6phRRod+BqUSpn5hY9XAtkmq7TN53R8X73/3gWHZv ldnxkS/KwqSAn/Ew6J2eCPmbAeAa30IIQ+hXsr/Vg62j/t/PhQKBynBDZsrwLQsmXelfj04GASY
+ LccEGvDV6ZRjdGdmN5cKc5eyBcpjlOHXvMo7vpvBItjrd0cekkrLN37eYjh9zhCBHFfywg04
+X-Proofpoint-Spam-Reason: safe
 
-Pavel Begunkov wrote:
-> On 6/1/25 14:52, Willem de Bruijn wrote:
-> > Pavel Begunkov wrote:
-> >> Add a helper function skb_get_tx_timestamp() that returns a tx timestamp
-> >> associated with an skb from an queue queue.
-> > 
-> > Just curious: why a timestamp specific operation, rather than a
-> > general error queue report?
+On 31/05/2025 2:07 am, Jakub Kicinski wrote:
+> On Fri, 30 May 2025 10:59:54 -0600 Shuah Khan wrote:
+>> On 5/30/25 07:58, Jakub Kicinski wrote:
+>>> This reverts commit a571a9a1b120264e24b41eddf1ac5140131bfa84.
+>>>
+>>> The commit in question breaks kunit for older compilers:
+>>>> $ gcc --version
+>>>    gcc (GCC) 11.5.0 20240719 (Red Hat 11.5.0-5)
+>>>
+>>> $ ./tools/testing/kunit/kunit.py run  --alltests --json --arch=x86_64
+>>>    Configuring KUnit Kernel ...
+>>>    Regenerating .config ...
+>>>    Populating config with:
+>>>    $ make ARCH=x86_64 O=.kunit olddefconfig
+>>
+>>
+>>>    ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
+>>>    This is probably due to unsatisfied dependencies.
+>>>    Missing: CONFIG_INIT_STACK_ALL_PATTERN=y
+>>
+>> Does adding config option work for you?
+>> ./tools/testing/kunit/kunit.py run --kconfig_add CONFIG_INIT_STACK_ALL_PATTERN
 > 
-> Timestamps still need custom code, not like we can do a generic
-> implementation just by copying sock_extended_err to user. And then
-> it'll be a problem to fit it into completions, it's already tight
-> after placing the timeval directly into cqe, there are only
-> few bits left.
-
-Ok understood.
- 
-> Either way, I guess it can be extended if there are more use cases,
-> or might be better introducing and new command to cover that and
-> share some of the handling.
-
-Not a request from me, to be clear. Just wanted to understand the
-design choice.
-
-> ...>> diff --git a/net/socket.c b/net/socket.c
-> >> index 9a0e720f0859..d1dc8ab28e46 100644
-> >> --- a/net/socket.c
-> >> +++ b/net/socket.c
-> >> @@ -843,6 +843,55 @@ static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
-> >>   		 sizeof(ts_pktinfo), &ts_pktinfo);
-> >>   }
-> >>   
-> >> +bool skb_has_tx_timestamp(struct sk_buff *skb, struct sock *sk)
-> > 
-> > Here and elsewhere: consider const pointers where possible
+> Nope (with this patch applied):
 > 
-> will do
+> $ ./tools/testing/kunit/kunit.py run --kconfig_add CONFIG_INIT_STACK_ALL_PATTERN=y
+> [18:02:47] Configuring KUnit Kernel ...
+> Regenerating .config ...
+> Populating config with:
+> $ make ARCH=um O=.kunit olddefconfig
+> ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
+> This is probably due to unsatisfied dependencies.
+> Missing: CONFIG_INIT_STACK_ALL_PATTERN=y
+> Note: many Kconfig options aren't available on UML. You can try running on a different architecture with something like "--arch=x86_64".
 > 
-> > 
-> >> +{
-> >> +	u32 tsflags = READ_ONCE(sk->sk_tsflags);
-> >> +	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
-> >> +
-> >> +	if (serr->ee.ee_errno != ENOMSG ||
-> >> +	   serr->ee.ee_origin != SO_EE_ORIGIN_TIMESTAMPING)
-> >> +		return false;
-> >> +
-> >> +	/* software time stamp available and wanted */
-> >> +	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) && skb->tstamp)
-> >> +		return true;
-> >> +	/* hardware time stamps available and wanted */
-> >> +	return (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
-> >> +		skb_hwtstamps(skb)->hwtstamp;
-> >> +}
-> >> +
-> >> +bool skb_get_tx_timestamp(struct sk_buff *skb, struct sock *sk,
-> >> +			  struct timespec64 *ts)
-> >> +{
-> >> +	u32 tsflags = READ_ONCE(sk->sk_tsflags);
-> >> +	bool false_tstamp = false;
-> >> +	ktime_t hwtstamp;
-> >> +	int if_index = 0;
-> >> +
-> >> +	if (sock_flag(sk, SOCK_RCVTSTAMP) && skb->tstamp == 0) {
-> >> +		__net_timestamp(skb);
-> >> +		false_tstamp = true;
-> >> +	}
-> > 
-> > This is for SO_TIMESTAMP, not SO_TIMESTAMPING, and intended in the
-> > receive path only, where net_enable_timestamp may be too late for
-> > initial packets.
+>>> Link: https://lore.kernel.org/20250529083811.778bc31b@kernel.org
+>>> Fixes: a571a9a1b120 ("kunit: configs: Enable CONFIG_INIT_STACK_ALL_PATTERN in all_tests")
+>>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>>> ---
+>>> I'd like to take this in via netdev since it fixes our CI.
+>>> We'll send it to Linus next week.
+>>>    
+>>
+>> I am good with reverting it for now.
+>>
+>> David, Brendan,
+>> We will have to enable this at a later time. Also we saw this problem
+>> before with other configs. Anyway way to fix this for alltests case?
 > 
-> Got it, I'll drop that chunk if you think it's fine. Thanks
-> for review
-> 
-> >> +	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
-> >> +	    ktime_to_timespec64_cond(skb->tstamp, ts))
-> >> +		return true;
-> >> +
-> >> +	if (!(tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) ||
-> >> +	    skb_is_swtx_tstamp(skb, false_tstamp))
-> >> +		return false;
-> >> +
-> >> +	if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV)
-> >> +		hwtstamp = get_timestamp(sk, skb, &if_index);
-> >> +	else
-> >> +		hwtstamp = skb_hwtstamps(skb)->hwtstamp;
-> >> +
-> >> +	if (tsflags & SOF_TIMESTAMPING_BIND_PHC)
-> >> +		hwtstamp = ptp_convert_timestamp(&hwtstamp,
-> >> +						READ_ONCE(sk->sk_bind_phc));
-> >> +	return ktime_to_timespec64_cond(hwtstamp, ts);
-> > 
-> > This duplicates code in __sock_recv_timestamp. Perhaps worth a helper.
-> 
-> I couldn't find a good way for doing that. There are rx checks in
-> every if, there is also pkt info handling nested. And
-> scm_timestamping_internal has 3 timeouts , so
-> __sock_recv_timestamp() would need to duplicate some checks to
-> choose the right place for the timeout or so.
-
-Ack, then let's leave as is. Thanks for taking a stab.
+> FWIW Richard commented in the linked thread, IIUC this was just for
+> added coverage but not a hard requirement.
+Correct. It's not required (for me). It found a bug in my code, so it
+seemed useful to have enabled while testing. I thought this was safe to
+do, I didn't know that this only works with certain platforms and
+compilers.
 
