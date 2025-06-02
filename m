@@ -1,238 +1,164 @@
-Return-Path: <netdev+bounces-194590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C105ACACA0
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:38:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF7AACACBA
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABE11189E980
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:38:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4449416BAAA
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5598214225;
-	Mon,  2 Jun 2025 10:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC11202F9A;
+	Mon,  2 Jun 2025 10:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWC1Lb6F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDC420F063;
-	Mon,  2 Jun 2025 10:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDE119049A;
+	Mon,  2 Jun 2025 10:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748860618; cv=none; b=ldkdcwz0j/jECoxgKB1kHC2p0U/gbORDSlUvLX/7hLEztmfd/LyL6rc3kF+oRr/RzHj8PCXp0QsfHWJL34KskJ2BcWSqKVfPyGx95zcczwSd9yFY1AyUfQA4ToaLAMrwpunsw3o9KaTeZtUeJQs+6JWhGgf3FE2Vq0lzLohkx2w=
+	t=1748861397; cv=none; b=JGjPZW1nu3dULJc5HVPveCz6b7bMuP9vzLhJ8X85iADwjipphC4RzlIFOQ9eGgZHF0eQ4jhCMYMAOqlEXesMHkLZbaM0Uh5VZmC3GBTxf8JxdJhiHhmJlNgh6hU6vJ1fegA2Jhl2r+wAnRUc4SWtwK6Vzuj8/dkTtoIK9lFrgeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748860618; c=relaxed/simple;
-	bh=U1HRi5BPIfFqWuEI1MGDrOmrCChwD+M8uPEKP9QFZug=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qspQAFoXTYTXjn5VVUozxc9f3QgKn5uTtj16Yp0rS6eXPP2+v/7sWZCKw9HeX4eaZKeSexCA1DaNE9a3yN/xPcGkXezFWhKHijCYCn+KH9JWzj7ZzvYEDvDpk4i4lyuLITJEtTjqark9LJ57fLpNQXq85RPqS6bFoU4qlLZ4uAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1748861397; c=relaxed/simple;
+	bh=9WaAM0DFviW3Ug8kMcuL6hIx12rSZL33x0znJQdobt4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f4FAD7mFU7IEHQXQocwlhYBJe3vP0tPMF6tTuAZ+oLQuz8YKJwXAM5GWNbqL818UBvLkUg6tywQdmuSwh0eqSbxW9u07D678c29lBmzKToYTOW8vLAsyk3s+Va6XAZOfWqfQuALKN25l0cDTOEhjo1V5LUGLYesw7Y3j8xsRsJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWC1Lb6F; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ad89d8a270fso1101750866b.1;
-        Mon, 02 Jun 2025 03:36:56 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32a658c4cc4so40283391fa.2;
+        Mon, 02 Jun 2025 03:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748861393; x=1749466193; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AsxbXe8qRFrC4RTDRdhQf2KM3tIF4wckI+MuVJmqklg=;
+        b=HWC1Lb6FbVRo1lrUqjfo7D4NwWEnu7ph5Vpgx6vGUIpChXxTPfgSqu7aMX49SSi6ED
+         tQ+oAXJ1Qgsbopr4kVgFGfwO/98cXEqwp8gUbkfvFEYIHdVXUt2ErOgKcfG/VjfXIlLQ
+         cM2K6mGx8VdATihr9bjw4Ht7Z9vg/LyoQGhOAtK31KV+WDh0L2KwJHMTpGMgP6eOwtkZ
+         KzZ/OQrqJijzbPRXPscinzUR9ao9Sgi1Qp72fk2AZ6e2CDAUzSLSMcYwhzwcFM2K1C68
+         IDrZJKz3xyboHHerICpkb1VJNyrFtWCp/yyXlP9D1rSka1KL8pXMW8VpryqnW6IH7uzC
+         CE1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748860615; x=1749465415;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1748861393; x=1749466193;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pXeB4IhrYE0giS9euV0gxoGa7fI1ChwrCarbpGdkqKU=;
-        b=W2X2D6rzLiZRoHgJwfocMwwmfheTloiorS8VUTjWa2/+URCX5mvATbT+toEUTLdAxW
-         a/SR4VruU/Wa2g5x61zNfaqi1zH4m0HBMYYuj2i+lTVdRHQqLeBAo9jnnE33Kp9YACZu
-         QwJEAGWqeYD0SeApreWNRhdKp4SmRjpYoxHx1CIKwQY/kJdfI2/bjxAIeuQBH4NiK4YT
-         iiI9g1EIbVZVONdix1NwrU6zUI6I9qRqkLw6mr6oFe/c6GSvZrbtYHuR6v9fftiJ33al
-         oS2PwmCES4b7gXJmf+MZUKudKbn7xzFYNXuWE8FpFIoKx1O7omHlEZ8Yn/tfCJhP9QnP
-         MskQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVvrMkqqijH1tSQs9eem9juxL4zgJshAb8dHmR5pno4PtK2RCJWzGPq1VbZFD54FDtLp5jMqBIgnko7/micCtEL@vger.kernel.org, AJvYcCW9QfmqbY4csKjyUVRkjWBIuTruoGM5pvzHxSC/yFNOjXj1VvRLizebYRIwokwbqQ9zBLkhUGEEjn675jE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+tMxvgOb3cA5CDj+wsK6Y6CWYm33pzhh/zvO/MAtlCj+exJHE
-	VJqDynjscoixzLRkiuA4SoOwHqmCkAn3cdj5bC15K0AzW3xMftmBc8Np
-X-Gm-Gg: ASbGnctQq+leNlJJySR27f2jiCv+9gk1PA1WbyKtyjhEr4/uPbYZXTk5uuLjqyaiElY
-	hmnVIVipk5dkN78h/Zd6FjVbV37dFi4quW0EFQfRmKmSh7Op5V4j3ALvAbnqmyuIolflhQ+bjTp
-	x08cDFAcBRUidB9s2j1RgnCPcqAs0cGjIpC1zQyCtYLUiNJj8GOemTITIdURTQK9lYYEqt78Aki
-	UI4YPSYD59ntj+VPzzZxIX1TKcLQznSNvXjtelCkO5LSTHjzVXApEUeyZZuMGscOSrX5mEl87HS
-	p4hYf6/9QtDtspuAtPjVxGZcwlib+a0fP8p7p8YFY9E6Bl7d8dXh
-X-Google-Smtp-Source: AGHT+IHn7vU+rBvLSZJm7s0hF8MXiLY+JAT6UWKfMBWvYyDb9oZWYaTqMmosPAzqCMBa+OTNp6ZXiw==
-X-Received: by 2002:a17:907:da5:b0:ac7:81b0:62c9 with SMTP id a640c23a62f3a-adb32ca4d4fmr1263874766b.20.1748860614976;
-        Mon, 02 Jun 2025 03:36:54 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:6::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adb35af4456sm573655066b.182.2025.06.02.03.36.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 03:36:54 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 02 Jun 2025 03:34:44 -0700
-Subject: [PATCH net-next v2 4/4] selftests: netconsole: Add support for
- basic netconsole target format
+        bh=AsxbXe8qRFrC4RTDRdhQf2KM3tIF4wckI+MuVJmqklg=;
+        b=CYHcVb36eyE22otQr2hXZ+XFzbHFJCCMkwXhGn5CJOSSEWDz9IF05Y6Pkhx460wrC4
+         BLA5ObnfNTv5PGHfbn0anVFACY4Ruk1KeRjgLPPc1SghisKKFPdWqMFBfv7TF7DLmlXN
+         FAwsAHz2TBcAmuEOO3YSUlahDdwDtZu7tp5NvV444xqgF53AQH55s9YgdyLgNJvsK6mZ
+         kbYzVDg8QC8NXhAS8euu/C9s/t0IZTu8lK179CrPyAtmLzTkPKXA6AkLhYoDTvzIZjAP
+         2kp+dh5UF/eZGav5lKAWBAQgLlDCz0zcIvmHt/05jDaM2PlRE1t5EJq3VlP5RFdGvKZs
+         iEwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBp8G8WTG9do7Zb7Hs8HEwzz0vbBa9TZidOF8JTHV+wrFqU4JA2KtpUfaIt0TPnxEstirEhzf91Cmmqea5EZ0=@vger.kernel.org, AJvYcCVMBXj3dPxlPMlyg+1JWAO5MHM0hrCTABQ9T+kuUmuaW2nFPHbSg6cP/yGvNN1QxbaljVKSUjsrEyajF7WhB5ep@vger.kernel.org, AJvYcCVp88goaywfWZl39BRz+FNqnyNnPVx+H5rFBQYTb4bM1XeBXmjUFE/Wp8sOtspSf3cs5JdQ+mrRJ3RXP/5a@vger.kernel.org, AJvYcCWaC9eJ7bki2yxUI2EdFnCqZPkyyexmN2KDr2HWySkSLD6pp1i7KnHSmJVSbngLGeREYFSoX7pB@vger.kernel.org, AJvYcCWgtJnXWKXAw0d5ygE8cmQ9sJoHK1i5BHOnkzRK96Nc3NLJOCm3myiPENUYZshq/egGtgkuj5lUGE29@vger.kernel.org, AJvYcCXOIBj455Fa0O40s2pImyoEB0myrirCc6qHQUSwzC8ov44EQYvOTdiu9DDEISIozHoHoljIM/dsCYvyr9I=@vger.kernel.org, AJvYcCXwKgWSB1f/zq0HdZp9OI7NhZ6D6FgMzEbHhmvYUfdHBMWlWuOgpLyzJS4tsvJeCH2y3ESsXuGFJkBM@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZUQHtDEipPHRXSn5ljDxm4g3lADq3kAOCuEVqb6UCJWvXblon
+	r4cka8m2CSrFNU+0KzPHZBF/8CayQlBDJYxVMSX+fGk01QP3N9XXLgIoYglkmK8+4YfiGXZzkQb
+	oypzI7j8S3RDDlVw5hjp8ymAR+pEQjQs=
+X-Gm-Gg: ASbGncvs5BzYOsZwuLpICIHv1AqXa3eekxCxSqC5/lMCj9sQQSSjSm/qkwmLeosrvHH
+	o5UL7R9T6RxbUKvuFvJtGkRfx6gZH1Fm6xvZsNcJH0RFGCnHaR9+FacG3EYgukkSffKoU2DyELo
+	7GU84yieIL8yy/eJO0+QG4NMzU1VvuI9ndwWxKV8mizWxlgcQSeuhanPp9bxkkr21xXOg=
+X-Google-Smtp-Source: AGHT+IF5DWduxzl0/XGIjOoG2XZtzGtCfUO0aae++aWVjLV4gjiYEpeAaDYwqvBq64IuoR3CqF43l9YblyYjyY9SlHs=
+X-Received: by 2002:a2e:9a0d:0:b0:32a:6a85:f294 with SMTP id
+ 38308e7fff4ca-32a9ea8fcabmr18219761fa.35.1748861392393; Mon, 02 Jun 2025
+ 03:49:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250602-netcons_ext-v2-4-ef88d999326d@debian.org>
-References: <20250602-netcons_ext-v2-0-ef88d999326d@debian.org>
-In-Reply-To: <20250602-netcons_ext-v2-0-ef88d999326d@debian.org>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
- Shuah Khan <shuah@kernel.org>, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- gustavold@gmail.com, Usama Arif <usamaarif642@gmail.com>, 
- linux-kselftest@vger.kernel.org, kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4802; i=leitao@debian.org;
- h=from:subject:message-id; bh=U1HRi5BPIfFqWuEI1MGDrOmrCChwD+M8uPEKP9QFZug=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoPX6/0lNBDPzKUPIPKW+fhdJYu2fn3q4XyfN/P
- 6rgj/GrqOGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaD1+vwAKCRA1o5Of/Hh3
- bSZUEACuQNdin2wZExk20BPJGCtDxGDmtAuRzo0y/3B1t9xkNJMgHegTXA+/azHZ1Gf/4tZv68i
- r/m+bMJkJolGLB9jeZMwwJ2kZ5IdqXgmwRGySmsx80+uYVRJnkyrLbGoZ2o4bPKwJTa1Uf2aXGR
- IHZBsZ/2vNfiQo5LxojMBRur5GgveJ85NHj/hl+MBoaOQBpna7nLdYlUHmvS9ISe8bBB8NiOssE
- bGsQaEbAumFtK8utoa79js0qAWVwswCktUi7rRBVDUOtg/Huq+m5HxmjUhyXBUDwsIzITa/xWbk
- hrppjyvGMY6Zb/vCwfw9k+37ObWvtHo8xZ/uPeMLAt97hjgRCyMSQ2g0lTzeurpVX8izavHKVau
- FaS8FHROtKOHELyAbfP54G/cSyOICIl/VBuSH5fCILOKcpq5rY9DDgq61OZ0n0fUgVo5TfZuKI8
- QeyAHwM6NQcRsKTnsI3kxXE7e6dqfBu8ec9XZK0gaKJCvU/WxYRoFyK/MOB3vI7717z5QIqzNzX
- RPT8MTiUL2jUM1qjJDdjPvkQizX4GB5/z6dPkBNZo49bTICMlFSc+550maPxWbkiKE7D2UVh+5v
- vIQn332CwwjowQWGNznfpakZS/O65tZdlOb8DO26JVeehTs7L2SeAWmkr7pnR88v57sox5Fl2LT
- p6qlzl7i+6mthQA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com>
+ <20250530-cstr-core-v11-3-cd9c0cbcb902@gmail.com> <aD1k4rRK8Pt5Tkva@google.com>
+In-Reply-To: <aD1k4rRK8Pt5Tkva@google.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 2 Jun 2025 06:49:16 -0400
+X-Gm-Features: AX0GCFuWGPYle2xpajsjX9J5Dr7DqqKyrlmViDc69KiPl9rdFF48mQDz9UTJ46o
+Message-ID: <CAJ-ks9nx8fbm5J1yKfg4a1OOgBepu0LFFjdtomE=j4Gkszj=fA@mail.gmail.com>
+Subject: Re: [PATCH v11 3/5] rust: replace `CStr` with `core::ffi::CStr`
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Trevor Gross <tmgross@umich.edu>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Extend the netconsole selftest to validate both basic and extended
-target formats. The basic format is a simpler variant that doesn't
-support userdata or release functionality.
+On Mon, Jun 2, 2025 at 4:46=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> wr=
+ote:
+>
+> On Fri, May 30, 2025 at 08:27:44AM -0400, Tamir Duberstein wrote:
+> > `kernel::ffi::CStr` was introduced in commit d126d2380131 ("rust: str:
+> > add `CStr` type") in November 2022 as an upstreaming of earlier work
+> > that was done in May 2021[0]. That earlier work, having predated the
+> > inclusion of `CStr` in `core`, largely duplicated the implementation of
+> > `std::ffi::CStr`.
+> >
+> > `std::ffi::CStr` was moved to `core::ffi::CStr` in Rust 1.64 in
+> > September 2022. Hence replace `kernel::str::CStr` with `core::ffi::CStr=
+`
+> > to reduce our custom code footprint, and retain needed custom
+> > functionality through an extension trait.
+> >
+> > C-String literals were added in Rust 1.77, while our MSRV is 1.78. Thus
+> > opportunistically replace instances of `kernel::c_str!` with C-String
+> > literals where other code changes were already necessary or where
+> > existing code triggered clippy lints; the rest will be done in a later
+> > commit.
+> >
+> > Link: https://github.com/Rust-for-Linux/linux/commit/faa3cbcca03d0dec8f=
+8e43f1d8d5c0860d98a23f [0]
+> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>
+> > diff --git a/rust/kernel/firmware.rs b/rust/kernel/firmware.rs
+> > index 2494c96e105f..582ab648b14c 100644
+> > --- a/rust/kernel/firmware.rs
+> > +++ b/rust/kernel/firmware.rs
+> > @@ -4,7 +4,14 @@
+> >  //!
+> >  //! C header: [`include/linux/firmware.h`](srctree/include/linux/firmw=
+are.h)
+> >
+> > -use crate::{bindings, device::Device, error::Error, error::Result, ffi=
+, str::CStr};
+> > +use crate::{
+> > +    bindings,
+> > +    device::Device,
+> > +    error::Error,
+> > +    error::Result,
+> > +    ffi,
+> > +    str::{CStr, CStrExt as _},
+> > +};
+>
+> Did you not add CStrExt to the prelude?
 
-The test now validates that netconsole works correctly in both
-configurations, improving test coverage for different netconsole
-deployment scenarios.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 26 +++++++++--
- .../testing/selftests/drivers/net/netcons_basic.sh | 52 +++++++++++++---------
- 2 files changed, 54 insertions(+), 24 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 1b508131a6461..e0bc5927e83d5 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -96,6 +96,8 @@ function set_network() {
- }
- 
- function create_dynamic_target() {
-+	local FORMAT=${1:-"extended"}
-+
- 	DSTMAC=$(ip netns exec "${NAMESPACE}" \
- 		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
- 
-@@ -107,6 +109,16 @@ function create_dynamic_target() {
- 	echo "${DSTMAC}" > "${NETCONS_PATH}"/remote_mac
- 	echo "${SRCIF}" > "${NETCONS_PATH}"/dev_name
- 
-+	if [ "${FORMAT}" == "basic" ]
-+	then
-+		# Basic target does not support release
-+		echo 0 > "${NETCONS_PATH}"/release
-+		echo 0 > "${NETCONS_PATH}"/extended
-+	elif [ "${FORMAT}" == "extended" ]
-+	then
-+		echo 1 > "${NETCONS_PATH}"/extended
-+	fi
-+
- 	echo 1 > "${NETCONS_PATH}"/enabled
- }
- 
-@@ -160,6 +172,7 @@ function listen_port_and_save_to() {
- 
- function validate_result() {
- 	local TMPFILENAME="$1"
-+	local FORMAT=${2:-"extended"}
- 
- 	# TMPFILENAME will contain something like:
- 	# 6.11.1-0_fbk0_rc13_509_g30d75cea12f7,13,1822,115075213798,-;netconsole selftest: netcons_gtJHM
-@@ -177,10 +190,15 @@ function validate_result() {
- 		exit "${ksft_fail}"
- 	fi
- 
--	if ! grep -q "${USERDATA_KEY}=${USERDATA_VALUE}" "${TMPFILENAME}"; then
--		echo "FAIL: ${USERDATA_KEY}=${USERDATA_VALUE} not found in ${TMPFILENAME}" >&2
--		cat "${TMPFILENAME}" >&2
--		exit "${ksft_fail}"
-+	# userdata is not supported on basic format target,
-+	# thus, do not validate it.
-+	if [ "${FORMAT}" != "basic" ];
-+	then
-+		if ! grep -q "${USERDATA_KEY}=${USERDATA_VALUE}" "${TMPFILENAME}"; then
-+			echo "FAIL: ${USERDATA_KEY}=${USERDATA_VALUE} not found in ${TMPFILENAME}" >&2
-+			cat "${TMPFILENAME}" >&2
-+			exit "${ksft_fail}"
-+		fi
- 	fi
- 
- 	# Delete the file once it is validated, otherwise keep it
-diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
-index ada6b899c5282..40a6ac6191b8b 100755
---- a/tools/testing/selftests/drivers/net/netcons_basic.sh
-+++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
-@@ -32,23 +32,35 @@ check_for_dependencies
- echo "6 5" > /proc/sys/kernel/printk
- # Remove the namespace, interfaces and netconsole target on exit
- trap cleanup EXIT
--# Create one namespace and two interfaces
--set_network
--# Create a dynamic target for netconsole
--create_dynamic_target
--# Set userdata "key" with the "value" value
--set_user_data
--# Listed for netconsole port inside the namespace and destination interface
--listen_port_and_save_to "${OUTPUT_FILE}" &
--# Wait for socat to start and listen to the port.
--wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
--# Send the message
--echo "${MSG}: ${TARGET}" > /dev/kmsg
--# Wait until socat saves the file to disk
--busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
--
--# Make sure the message was received in the dst part
--# and exit
--validate_result "${OUTPUT_FILE}"
--
--exit "${ksft_pass}
-+
-+# Run the test twice, with different format modes
-+for FORMAT in "basic" "extended"
-+do
-+	echo "Running with target mode: ${FORMAT}"
-+	# Create one namespace and two interfaces
-+	set_network
-+	# Create a dynamic target for netconsole
-+	create_dynamic_target "${FORMAT}"
-+	# Only set userdata for extended format
-+	if [ "$FORMAT" == "extended" ]
-+	then
-+		# Set userdata "key" with the "value" value
-+		set_user_data
-+	fi
-+	# Listed for netconsole port inside the namespace and destination interface
-+	listen_port_and_save_to "${OUTPUT_FILE}" &
-+	# Wait for socat to start and listen to the port.
-+	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+	# Send the message
-+	echo "${MSG}: ${TARGET}" > /dev/kmsg
-+	# Wait until socat saves the file to disk
-+	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+
-+	# Make sure the message was received in the dst part
-+	# and exit
-+	validate_result "${OUTPUT_FILE}" "${FORMAT}"
-+	cleanup
-+done
-+
-+trap - EXIT
-+exit "${ksft_pass}"
-
--- 
-2.47.1
-
+I did, but I didn't add the prelude to all files I had to update. This
+one, like others, doesn't import the prelude.
 
