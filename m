@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-194564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0831ACAAC7
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:45:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27DCCACAAD2
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580793B5F69
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:45:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34B853A581D
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC941DBB2E;
-	Mon,  2 Jun 2025 08:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE191DC988;
+	Mon,  2 Jun 2025 08:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aIOjdn0/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zh5H11YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BAD2C3240
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 08:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B601C84B9
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 08:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748853923; cv=none; b=lbU2SEu6k7boAPtwgqU8KbHv1zIeTDtMJ8x09EIbt5uL6oV6Q8zma5G4oBANiMJtAi5sSun3xU7LEBnWK/Qb6EkkvRD81Ms/YKpyD8IirKhdTOfmJWwv5zRbLd0x/N/iDskenkU5ZB522TEm4bo2SXypkNPP8SffZiSkC4MibL0=
+	t=1748853993; cv=none; b=tfEkKFXdc5m0hG8xx1sRhnG2ahbW/sDNymEgYkM2sBW4PtT0MofS6mkhkQU73UeFVFAR7HYUj8xOKBYPdX04UunouoYyDZsvh0iZ1PXE57yltFeHUglAE1WUw0A6aBa43r+mGhlp2hLBeTtQLsBMTkQoLVcuR7fGDrFz1tX8B3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748853923; c=relaxed/simple;
-	bh=FnmJdnnfQEOeXtBs17TTqlpvE/Z6l2P4aZY4NkM4qxc=;
+	s=arc-20240116; t=1748853993; c=relaxed/simple;
+	bh=jMbUYSpsToA7O3te9eApd0pFDpdOD0eqFMFbPLpvW2I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FcYOYZ3FxXh4+8MbTOePKJAwLEHLgswErlWY2EreFZ33JRp6N5mSXc4HSkVQEURmeKLQ65xJYgxYLs4R28JNoMzPFPWuryGif8FWPgwgh0MdQ8F3FIg2DztOq+FEAQpZNwZrQbEh/wbm3WvpgTrvqloQoppxG7K5YRYvF3+Gi9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aIOjdn0/; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=FvtfHtFO8QSZ1c52dplrJNMxn4B21PaNvFa1UQ7hnDjl3dtp3s9qaEoDOqhRDy0y0Sr+05TdgFUVpLsL/xp0oZHfs2LlrZ6sc5A+0tegWxa3F/YEiHJyVlDwYrGiMKLawBUgzUiUl0doB/MgZpu2+DLW2ujSpE/YqCLrArONAp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zh5H11YE; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4fea70656so565406f8f.0
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 01:45:20 -0700 (PDT)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-440667e7f92so28239525e9.3
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 01:46:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748853919; x=1749458719; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748853989; x=1749458789; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6VThKlttpzakaK+gyheH3wNtNAtAxPTgkZTge5fKamo=;
-        b=aIOjdn0/uAGIvgue2rZNxXVyyYtn34qf2+wdYw83h/wiSyICBU6FpJAx7yeu2Otmy7
-         PDdjE99CIEyrE3tCK+4Tp9moDWlygpdD/3Y5HLkH3d4m+pbsy2I47tNLMwXethtqAqkD
-         wbLcujv5avzsXJLY8dE8DEmTwM5jHSsRDWdWBz68Bb0OMSd7DsyBfHGAq5sUoeibiva5
-         aZk+wrdp55qS5xqrAfnXJ9ayEHvfuSCpIWfxUZlmwN/loCWl8ZOQ86hz7QuXJEQ60Y60
-         xo7B1QqcLAL2gWI2dNl+Gj5F8SlZSMwVMy7yXqO7r4+9fnBXLVEM5mSPfTmxexxD1LVa
-         2Lew==
+        bh=ktsVoxepsNTrdCKxowANypGkEb6jHKbHJKn1XhGy1Uw=;
+        b=zh5H11YEjyHf/ZrGbGCtt0Ram36PTgfDVCpkP50fPzhGYifYz56NsRHr1SJDNOLkQ/
+         K0iIa1gQLeNm/fTQQs/czGTGqMofzLe2kIGZYtnEa+BEwPMN7UyWN1IEcthJNN3RVcUy
+         0Z7P2OkpuUPlOXy/X0P85wCgLYOEdFcCBqAJHOTcb4wGIUzFx63gWOmKA8CdR7tnTkj/
+         Zz70blfHTTQpuj78I9t7GOjB5Mf744L7BHpQJkQhGqV18HSQgzt5WvCsdmR4R1upBO/A
+         9MPR8B2tW4PgVrYLjVzx81Q6Bbx4p4HWo6rlttExAAA3/ib3ASiiG4OPZWaLzyvHrXdy
+         ebLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748853919; x=1749458719;
+        d=1e100.net; s=20230601; t=1748853989; x=1749458789;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6VThKlttpzakaK+gyheH3wNtNAtAxPTgkZTge5fKamo=;
-        b=nHjH69HBqZu7MwqhaqwnjHhUaZod1gssJV/cKtR140+squk7h/jR3Vg8XzQzCUjsiz
-         SZz5k5im3DAc5sS3oRUHAoF9dbr5fTiZLPTp5zf/z9+qzZ7frqxDNA30njG/OtXmfNNG
-         l8+GuhesjV9Uf9ILSTYs43qo3ukORERR5Em8kyi/UHjhtSNkSZ6LyX0ha0wi9rb2+SPr
-         gPddYKVJixb4PjTnHNPkNdCv38d9A8OZQaGFL7s2If8gBdEMlJzMks6kJC9hnHFy/7r7
-         /95PCv+8DC6tnNG+1WnrMYPkqeEu5QxM47ZyIwObatTNvjOLe3vuguPOK+lfEGmZs4SH
-         tpAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiTKIwJWi4Bed55AyLh0c2549mFTfAgf2OMBxOFWxdArCM6LDaZhc2hRoP21E4zsh3TONphdY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfNkJ6TzTnDvM3ReVrenkSC4L/lV1g1XfHa29Jn3yX5SvhNxL2
-	Hz4LazfN0JTeS8Qq1M+tbdKVHCsAcKazUGHeBRwo+hGisdjYeWoyqXUIQnxbPjXI1m0An/iEZ8W
-	xaFo3aDL7AvXPsg6vPA==
-X-Google-Smtp-Source: AGHT+IHMPBuyHnbsu1fzojxAvVWoB+t0RQajrCfQEAuCK7B7x+b6pusC9Fc1oNLvaFICxRkoCWW8Tzuvcbz6+Eo=
-X-Received: from wmbdo10.prod.google.com ([2002:a05:600c:680a:b0:450:dcf2:1c36])
+        bh=ktsVoxepsNTrdCKxowANypGkEb6jHKbHJKn1XhGy1Uw=;
+        b=KO1h8l/Jc2VtbslL4+tywb7SF8bfmu7cBvKMObZGW38VBGOqejcEJv1hC2fHwa5Haq
+         yVq80Fc7nvR9CbOqVhElF67AW8DmZzMUaFenNTakr1UdtYNV8Fo0HHpw2UbZXBxUN3Ty
+         Tdd4fzk0QAByUrIu7PaoX6kDmxKLt5NzE+XGCZCpOXowHU8en7moNF1MNdA9V0XerK1Q
+         iqmARifrFecPyGa/pUamtl6pNTt9D48yd0ZGpVhCpoZ4InbPVZ21o05Gv+saa2Zo/YRM
+         XTIe21dinz4XX2z/2HY3VjD2FOmxD2GasqfKgXhROo+N72JxnQd/2ry3Hfwh6E4FAtiG
+         A0Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPiuHjF2MjZBKgzv/s8lZ91GR78xmKMr/3eELkeabnlGifof4hT0JYNGH9z6q2MnmM14I5GAY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSLnsVw2drHcSxuyJ6uteMcdUml7RUdIAqCVIrzPQQLaBec2y9
+	fTEiVZ2C0IdDTw/xu4/aMImliyQeGEWQU4mDGtKnD/GfEQWrIi1bdcacEo7Cq1Vf1Mmvp2ZMHoX
+	3md20nUsqCZypRgHhyQ==
+X-Google-Smtp-Source: AGHT+IEN8wW1H0RTzFbTdIlqYAJYXEVRMaA4cvq7c8CG74BNxW0QzTAmaWpfyWc/gO5HljzZUpfF3+rdjR1DcgY=
+X-Received: from wmbhc27.prod.google.com ([2002:a05:600c:871b:b0:450:d422:69f9])
  (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:1a8a:b0:3a4:dfc2:b9e1 with SMTP id ffacd0b85a97d-3a4f89a7e71mr9312736f8f.2.1748853918569;
- Mon, 02 Jun 2025 01:45:18 -0700 (PDT)
-Date: Mon, 2 Jun 2025 08:45:16 +0000
-In-Reply-To: <20250530-cstr-core-v11-4-cd9c0cbcb902@gmail.com>
+ 2002:a05:600c:4ec9:b0:442:ccfa:fa with SMTP id 5b1f17b1804b1-45121fb9373mr61377385e9.27.1748853988668;
+ Mon, 02 Jun 2025 01:46:28 -0700 (PDT)
+Date: Mon, 2 Jun 2025 08:46:26 +0000
+In-Reply-To: <20250530-cstr-core-v11-3-cd9c0cbcb902@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com> <20250530-cstr-core-v11-4-cd9c0cbcb902@gmail.com>
-Message-ID: <aD1knOuEFxv6VQy1@google.com>
-Subject: Re: [PATCH v11 4/5] rust: replace `kernel::c_str!` with C-Strings
+References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com> <20250530-cstr-core-v11-3-cd9c0cbcb902@gmail.com>
+Message-ID: <aD1k4rRK8Pt5Tkva@google.com>
+Subject: Re: [PATCH v11 3/5] rust: replace `CStr` with `core::ffi::CStr`
 From: Alice Ryhl <aliceryhl@google.com>
 To: Tamir Duberstein <tamird@gmail.com>
 Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
@@ -105,47 +105,60 @@ Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>
 	linux-block@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, May 30, 2025 at 08:27:45AM -0400, Tamir Duberstein wrote:
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible and rename
-> `kernel::c_str!` to `str_to_cstr!` to clarify its intended use.
+On Fri, May 30, 2025 at 08:27:44AM -0400, Tamir Duberstein wrote:
+> `kernel::ffi::CStr` was introduced in commit d126d2380131 ("rust: str:
+> add `CStr` type") in November 2022 as an upstreaming of earlier work
+> that was done in May 2021[0]. That earlier work, having predated the
+> inclusion of `CStr` in `core`, largely duplicated the implementation of
+> `std::ffi::CStr`.
 > 
-> Closes: https://github.com/Rust-for-Linux/linux/issues/1075
+> `std::ffi::CStr` was moved to `core::ffi::CStr` in Rust 1.64 in
+> September 2022. Hence replace `kernel::str::CStr` with `core::ffi::CStr`
+> to reduce our custom code footprint, and retain needed custom
+> functionality through an extension trait.
+> 
+> C-String literals were added in Rust 1.77, while our MSRV is 1.78. Thus
+> opportunistically replace instances of `kernel::c_str!` with C-String
+> literals where other code changes were already necessary or where
+> existing code triggered clippy lints; the rest will be done in a later
+> commit.
+> 
+> Link: https://github.com/Rust-for-Linux/linux/commit/faa3cbcca03d0dec8f8e43f1d8d5c0860d98a23f [0]
 > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-> -/// Creates a new [`CStr`] from a string literal.
-> +/// Creates a static C string wrapper at compile time.
+> diff --git a/rust/kernel/firmware.rs b/rust/kernel/firmware.rs
+> index 2494c96e105f..582ab648b14c 100644
+> --- a/rust/kernel/firmware.rs
+> +++ b/rust/kernel/firmware.rs
+> @@ -4,7 +4,14 @@
+>  //!
+>  //! C header: [`include/linux/firmware.h`](srctree/include/linux/firmware.h)
+>  
+> -use crate::{bindings, device::Device, error::Error, error::Result, ffi, str::CStr};
+> +use crate::{
+> +    bindings,
+> +    device::Device,
+> +    error::Error,
+> +    error::Result,
+> +    ffi,
+> +    str::{CStr, CStrExt as _},
+> +};
 
-A C string *wrapper*? What do you mean? I would drop the word "wrapper"
-here.
+Did you not add CStrExt to the prelude?
 
-> -/// The string literal should not contain any `NUL` bytes.
-> +/// Rust supports C string literals since Rust 1.77, and they should be used instead of this macro
-> +/// where possible. This macro exists to allow static *non-literal* C strings to be created at
-> +/// compile time. This is most often used in other macros.
-> +///
-> +/// # Panics
-> +///
-> +/// This macro panics if the operand contains an interior `NUL` byte.
->  ///
->  /// # Examples
->  ///
->  /// ```
-> -/// # use kernel::c_str;
-> +/// # use kernel::str_to_cstr;
->  /// # use kernel::str::CStr;
-> -/// const MY_CSTR: &CStr = c_str!("My awesome CStr!");
-> +/// const MY_CSTR: &CStr = str_to_cstr!(concat!(file!(), ":", line!(), ": My CStr!"));
->  /// ```
->  #[macro_export]
-> -macro_rules! c_str {
-> +macro_rules! str_to_cstr {
-> +    // NB: we could write `($str:lit) => compile_error!("use a C string literal instead");` here but
-> +    // that would trigger when the literal is at the top of several macro expansions. That would be
-> +    // too limiting to macro authors, so we rely on the name as a hint instead.
->      ($str:expr) => {{
->          const S: &str = concat!($str, "\0");
->          const C: &$crate::str::CStr = match $crate::str::CStr::from_bytes_with_nul(S.as_bytes()) {
+> --- a/rust/kernel/error.rs
+> +++ b/rust/kernel/error.rs
+> @@ -164,6 +164,8 @@ pub fn name(&self) -> Option<&'static CStr> {
+>          if ptr.is_null() {
+>              None
+>          } else {
+> +            use crate::str::CStrExt as _;
+> +
+>              // SAFETY: The string returned by `errname` is static and `NUL`-terminated.
+>              Some(unsafe { CStr::from_char_ptr(ptr) })
+>          }
+
+Ditto here.
 
 Alice
 
