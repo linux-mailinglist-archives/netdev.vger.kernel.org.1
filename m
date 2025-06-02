@@ -1,140 +1,124 @@
-Return-Path: <netdev+bounces-194555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377B6ACA932
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:04:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1676BACA99C
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:58:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B6DB188BDEE
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 06:04:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F423BA8BD
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 06:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD93C18C002;
-	Mon,  2 Jun 2025 06:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3AC199FAF;
+	Mon,  2 Jun 2025 06:58:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pf+qgvAb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4Gjmizt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A2E2A8C1
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 06:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FD32C325A;
+	Mon,  2 Jun 2025 06:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748844219; cv=none; b=daWErb2IrGXFUViexlN804NPiih7DriVgk9VHfAy1WQ7E1GHB+Sg3C8hqkdsR+DKhFvn2tqh2bE2n/GxDU+7c5r5ZhJTOf9qwdlWKNwJPBqO8z0wKkQuMt412fNTejQ8ieHg6XduMLXKuDJFiUV5tGelq1SSRHwsGUDdtQsH6K8=
+	t=1748847514; cv=none; b=OFZKBocjyG1jO0hrfJAf1GaGOXCCdmB5fe6M8pR3OM1mTgKVzf2ukTEbPoXi4ZctgMs1q7UCf9jt3M6rno74NgxKUallD0IjpvAfoWy1odecGx1GbbW0cxuaw4mtkLekEKOeLfuhuswzGBHjnjZYn4fNY7ThkM/URMy5JrhQEgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748844219; c=relaxed/simple;
-	bh=eEW107ipIPy61Sk24Q1qrxcbmZLvd1y/kuKYBUoXKlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fWEqIF9a5/RR8FZBJ3z3K9RdVmvma45TnT30lfqZY8SCl9w3zqxMPlkzKOm+Gc9YyMhBXvT/GP9To4AZ2QG1l0UO/Zs/R4mqPebypAm3QtesduPEQqhjDU9zwBj/NdloCjW39Ju9cSl3drIXJqQnCDkmuCwN7la+ETQXkM6UpEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pf+qgvAb; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450cfb79177so19768215e9.0
-        for <netdev@vger.kernel.org>; Sun, 01 Jun 2025 23:03:36 -0700 (PDT)
+	s=arc-20240116; t=1748847514; c=relaxed/simple;
+	bh=36YoGRNVVTqpXdGCUTjghs0ma3vWVTdWGftyJMsNuiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EpdUvPL1vYdRaiswkBnF86GZJRG+U61PY+awXXB++nuTnl6f/LwHU6YK7uqtMAAFAIXDpZ5sP8wsJfQkERTg3GkcPvi1tcumeDcWiHdDvAQn5Mc+qJmjRodOumMx5mIM0OhXsEjF+moopEqy9Xiq6Qd2KIIiwA4qVrGt5Y6Qhlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4Gjmizt; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6049431b409so7257852a12.3;
+        Sun, 01 Jun 2025 23:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1748844215; x=1749449015; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VT+t88x6BILNu5xqyX1dO4pc6n5FbFQHrDThePEkea4=;
-        b=pf+qgvAb38MKBtH3sGtsAeClqJaum1sp9tzib8AS7ap08n2Y/h+fbuchIDOUr/kCFO
-         twqKlS2f3pj8my5bGAJmwky9Zow5DqHiGK5GT0svE2CS5wAC6RvdEkTA65/NxpXRveF+
-         oR+KJHbL1dZcKomfvXG8j+0NuWdPUGU7Gw+QyPaDkL0URl2CYYtUT3lDVTYwc19enALu
-         smwc4x2DA4vxbw7N01IIErGPJ++InkWrc8RqH/GSIY8ZybKYptHCYjjp1fq6uyk8CCcT
-         elYHskdyGkb5cf57wXfOZ7yciUUb5xZuPkwEDRE2p5Hdb4H8z9CA/clgdyQI+c07NHMy
-         C8XA==
+        d=gmail.com; s=20230601; t=1748847511; x=1749452311; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZDcrKrGhdz3qpwk0ZQcPaE8P0Ivco4wK8bocZrfj2PY=;
+        b=m4Gjmizt02MdzUVyRe1KDu+MZmxCKfe0W5mR6AejWlKG84fKk88Dbj3rXpiPGlhjOR
+         Za9Sm1cudx7D51yGwlUdiKfc9f4J7xHZLuT32S2ZOQL9VS0C8yo9kFpeOduNT5xOo7ED
+         JCxguzG8JQmUkk43A1K9rO2tVbfUCccgg7KDCeZ0PdwBUng9aRpl/G8tY0MrJ9rqX1Wc
+         HrFgicsq78BfDP+y6BpTLTBVtpiBqijO7LHXJpH0JmU16EHlZHdbP5vwdJh90gZmFICj
+         w2dKVhkYaJF+U5xYxGl/Y7jgaxLQ2nmJ7PlPL1YRy8OM4a1HfiHG6hDDeoPPE57fQOQr
+         foAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748844215; x=1749449015;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VT+t88x6BILNu5xqyX1dO4pc6n5FbFQHrDThePEkea4=;
-        b=rm4Q7nPE1k8Gi+LEmYQ2tgfejbddYgmKvilaaQxFWVR1Zm0Vv4pgKsugjU8a6Mukib
-         z6ix4Lt6R/nx/NNlvilRe7+Ua/59NWlIiBG7CxGxL+4lfb3u76NMpxHFdh0uJKUnTsGv
-         8kuDOOthhyqScZRDzBMfq4nCokmiFTQeq4EZXvH4rq277QQUU53/rIi3MpbLS7JmUm4m
-         iUDjBoXg8/9bZjzg71RYGp6kN313IWg61k15p/7pJEYm/fRPxTjQ40mJgWIuelskQ9w+
-         LLM9XiypYQKK3rutBnNlnMpsYx+vtKGBvycTCZUgwfTVa+ljhUAXJBo2qHPGIMJlNJYw
-         3F4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVAgURlXNEvqRsA4xOtp25gv1WgAWiGkekkJRPwA142MxcA/Bf1QWTP0pIr+l62FZDyDOAE+PI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzicDZSyL7sHAO/KZt9dBxRaOo/+6o3jCiYytV2HsCwG3H8oQJH
-	QORb1LZc5hxXTbqWRVjWYWMq5yyJVvNT+AZCJXAlVRcoxuZcyxvRjzomtE6XmlgpoHY=
-X-Gm-Gg: ASbGncvJvc8+Ki+3gTalS0IghVqrQjpAFm1/lTxTGAb2oaFlpxA7zLC7Zo5eP+J/Tii
-	R9lqjOX2CP98iSAeqy2ejBXbdmPG8g3yHTn7rRxJ1xQPo1BMQ8yyzbymMOLAM/uW5Klw+4gqw8C
-	iIwCBURnGKKbrX5HVIyZWdd3XaZjwzL38gdHD/PM18s9Y61nwjvtrDHcCo/j8Okoc051kDwyT8A
-	aGPrp8ilZvQe7f5lONA6BKoa8qE0SLPJ4t/pmgfbm0NWKjWZSmjFcR9fn+M4LpcixVVgWuMOW72
-	1ekgfNm7rOHdoYUqtApdtcbXRcZ5SCsFKtBKxYeakjFr100sq+b70Kf4Bsr2i6RoTA==
-X-Google-Smtp-Source: AGHT+IFiHvYxhztMfN11RapKmiEYv4gtaP/8gucGt4yDxjSNPii/2nMxpa6+aKJVEioWfWekhwNrGQ==
-X-Received: by 2002:a05:600c:3b8b:b0:43d:b3:fb1 with SMTP id 5b1f17b1804b1-450d8876dd6mr86632475e9.27.1748844215286;
-        Sun, 01 Jun 2025 23:03:35 -0700 (PDT)
-Received: from localhost ([41.210.143.146])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-450d8000f3esm109149925e9.23.2025.06.01.23.03.34
+        d=1e100.net; s=20230601; t=1748847511; x=1749452311;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZDcrKrGhdz3qpwk0ZQcPaE8P0Ivco4wK8bocZrfj2PY=;
+        b=B5RpfqfEoc3B5unKMCzCR/5kvu7vPd2eJNTpR2cnk2nMrDXK+6peKYOg4vbgImLDvR
+         ud/1qjwl8zJwlxvQlHQd5WHEH8GSyri1msi9sqGX+heVJUOsFxoUrxEq7R6taaQYU2lv
+         tNcQuAL9mbsDn972rVyv+8mzXmjWwkwN2iFc03FTaiT0I4qLdhXFN/dIkjx67vDoGl5d
+         2Zk3u5Itr9ABE+NnZRZREFXbvZ3ReUlq9r5l3ExdZXCc/ral9TUQSe++0x4OkAD9ixOl
+         MPekNop5RC/6v5Rg5vqiBGmXuOVBQI3/L8kLiBAK1LRF6+pjz6sm0ljwkLBug5ky+ngp
+         izxw==
+X-Gm-Message-State: AOJu0YxbIPFAiXkgtXDDkxS478uj6Vs1L0X023bHC5zAb+5tDsWO934/
+	PxwNVrr/XvTFD987yuWFy9ndHUGTmI3jK/pAiHnKPSbnlpC7/AMH75wbRzYXYMFK
+X-Gm-Gg: ASbGncv9CqWym9VyMeOlquqfhBl0yHm0QLB6UKLTyc3N5zv+4sD/imuilvBtrpFOTPP
+	DdVyY7+r0hl7EvRL/Jst15rbktu0iomYQzzhKUOolAq5aTcGIrIz5u0+SWqW+RgfSVT44jg3BII
+	0l9ETmociKKl3E2K9zq5IwAhj8dnDi7mqtLvUs/YC5fuae8vg3nOd9sQfT+C2VuDcPUoCIWcJIP
+	DBDqEq7Q9zVciQuu0YeOlEG+oA3k6nkRYezASIRBEvPDCnTr2GGI7OJNTEq4ULimsjnk8wnn08h
+	Xy4Cl817mluIJBXM8M+7P84AG8aO4jBcVR1tBDYyWQTnOol5r923lewfRvxesbCUZ9nIRCDn/Da
+	Nlb71JRLvehHzziT3EZJkOR0Q03OZF2tcq3i8hNY5tA==
+X-Google-Smtp-Source: AGHT+IGNoi54i4X/skqBuDa2DtRQofGmlFtwkcYu8Dg4w9xQajNkPpbKysRLfQjSv52hKlUH+6Gafg==
+X-Received: by 2002:a17:906:6a15:b0:ad5:6337:ba42 with SMTP id a640c23a62f3a-adb49513121mr564975766b.46.1748847510642;
+        Sun, 01 Jun 2025 23:58:30 -0700 (PDT)
+Received: from rafal-Predator-PHN16-71.NAT.wroclaw_krzyki_2.vectranet.pl ([89.151.25.111])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d82de8fsm760817866b.66.2025.06.01.23.58.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Jun 2025 23:03:34 -0700 (PDT)
-Date: Mon, 2 Jun 2025 09:03:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yevgeny Kliteynik <kliteyn@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mark Bloch <mbloch@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
-	Vlad Dogaru <vdogaru@nvidia.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] net/mlx5: HWS, Add an error check in
- hws_bwc_rule_complex_hash_node_get()
-Message-ID: <aD0-snUAsqT2_3NH@stanley.mountain>
-References: <aDbFcPR6U2mXYjhK@stanley.mountain>
- <782913be-5e22-4b4f-9867-26a6019271d9@nvidia.com>
+        Sun, 01 Jun 2025 23:58:30 -0700 (PDT)
+From: Rafal Bilkowski <rafalbilkowski@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	alex.aring@gmail.com,
+	rafalbilkowski@gmail.com
+Subject: [PATCH] ipv6: ndisc: fix potential out-of-bounds read in ndisc_router_discovery()
+Date: Mon,  2 Jun 2025 08:58:26 +0200
+Message-ID: <20250602065826.168402-1-rafalbilkowski@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <782913be-5e22-4b4f-9867-26a6019271d9@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 29, 2025 at 01:26:17AM +0300, Yevgeny Kliteynik wrote:
-> On 28-May-25 11:12, Dan Carpenter wrote:
-> > The rhashtable_lookup_get_insert_fast() function inserts an object into
-> > the hashtable.  If the object was already present in the table it
-> > returns a pointer to the original object.  If the object wasn't there
-> > it returns NULL.  If there was an allocation error or some other kind
-> > of failure, it returns an error pointer.
-> > 
-> > This caller needs to check for error pointers to avoid an error pointer
-> > dereference.  Add the check.
-> > 
-> > Fixes: 17e0accac577 ("net/mlx5: HWS, support complex matchers")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > ---
-> >   .../net/ethernet/mellanox/mlx5/core/steering/hws/bwc_complex.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc_complex.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc_complex.c
-> > index 5d30c5b094fc..6ae362fe2f36 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc_complex.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc_complex.c
-> > @@ -1094,6 +1094,9 @@ hws_bwc_rule_complex_hash_node_get(struct mlx5hws_bwc_rule *bwc_rule,
-> >   	old_node = rhashtable_lookup_get_insert_fast(refcount_hash,
-> >   						     &node->hash_node,
-> >   						     hws_refcount_hash);
-> > +	if (IS_ERR(old_node))
-> > +		return PTR_ERR(old_node);
-> > +
-> 
-> Agree with the need to check IS_ERR, but error flow is missing here.
-> Need to free the previously allocated IDA and node.
-> 
+This patch adds a length check at the start of ndisc_router_discovery()
+to prevent a potential out-of-bounds read if a short packet is received.
+Without this check, the function may dereference memory outside the
+buffer.
 
-:/  Yeah.  Sorry...  I'll resend.
+Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+Signed-off-by: Rafal Bilkowski <rafalbilkowski@gmail.com>
+---
+ net/ipv6/ndisc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-regards,
-dan carpenter
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index 8d853971f2f6..bdaac5a195d6 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -1235,6 +1235,10 @@ static void ndisc_ra_useropt(struct sk_buff *ra, struct nd_opt_hdr *opt)
+ 
+ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+ {
++	// Check if the buffer contains enough data for the struct ra_msg
++	if (!pskb_may_pull(skb, skb_transport_offset(skb) + sizeof(struct ra_msg)))
++		return SKB_DROP_REASON_PKT_TOO_SMALL;
++
+ 	struct ra_msg *ra_msg = (struct ra_msg *)skb_transport_header(skb);
+ 	bool send_ifinfo_notify = false;
+ 	struct neighbour *neigh = NULL;
+-- 
+2.43.0
 
 
