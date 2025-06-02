@@ -1,195 +1,135 @@
-Return-Path: <netdev+bounces-194568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9FFACAAF4
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:57:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA97ACAB38
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 11:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45251189BC9F
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:57:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B93D3BB60D
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 09:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97B21CAA7D;
-	Mon,  2 Jun 2025 08:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D431CEEB2;
+	Mon,  2 Jun 2025 09:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHEc3E1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1C12C3240
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 08:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E944D1A285;
+	Mon,  2 Jun 2025 09:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748854657; cv=none; b=SxSESLbZ4SINANG3/fEAopSUxf0Z2A/QqqoKcR88vqhKIbTdonII9wRDEu8c8oTaC8aGyCzkvEReOY2+KJwYOAQdX4Sj1bkt/bctT5+O2AYktmqEgJLyxDJ8hGjc6UYMsixabjqavExqL+FzX+oRwiTkK8S639u7DhiNl4gN5T8=
+	t=1748855786; cv=none; b=rhRdPyukstCdQsFoiGWEeCCNgnC4IKU9QFFaW4sY8nyQ6MFcakLsaaX70MVNRp+4oIuQG8tmCVmrhTOBgUBKIxH84U5CIF5WaZizpX15yOdgWil8qJ6tcOzcm4M5+zSgbuZ9xtHLbSyXB2UBxwhrF4a0KECeHxES5C3wJ6HMec8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748854657; c=relaxed/simple;
-	bh=WIyR3Re7+up+kS0orF/kj11dYKuFT2G96GA7uxPW2yg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FluUrB/+IE+ZTKGsUzOBcbQ731XYTBvwpGdQDBOkB3qENjsfnunRRHbVTXFOVQkG58hGavFArOCpueDW24z61sqkt7+UBsrLVaU9mTqEsT6L/+QRKyMzwYEYWo/hh++hf0G82O8nQoHSJIPjgbhE8qiHaLZu0BiAOzCRID/FK84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3dd74e0f5c7so28745625ab.0
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 01:57:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748854655; x=1749459455;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2+Brcn+wYWsVRkhj6nrhn1xtDtEP8u0MO8YrU6mHoho=;
-        b=YStPbmzIAVM/bEB6FpkSgIn1INVvqSl9wG/CuvAsZlwOA+ZFxSqaSFaU8OgR+L5tJB
-         mlPT7xPtoTGOn6hV23ebplHBP4UMb+WGVLrdP+JVg/OQRG02D0jtM8290upydEnZL45u
-         +MhvNQN8pkIrQyFbNa0VMnqJQkdXvaWt2aWgxxgPMWCaXSQdwPQQybvmodn/hH6adZPh
-         Sebr+0685O2fbScAjuiCNQ42gBuibXtR5F8bQYnw9pIPRDRwcDjQQFghdLkhnKHg21ud
-         XCCv9ijwcvm3a3fm17qbm07ubVBRPtIkuE4cHcdQH41usKRzrdOVM/d1OL6/shTT0s9A
-         SC2A==
-X-Forwarded-Encrypted: i=1; AJvYcCW40/OjVz3mikp6Zy3EtPsTrYLK7Grp6z/c08X6USBodOTQRw/weTC1NeZGFAOibgep8/9Hgfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8VH0W6gcPT3GXhY2HTYIyuBISiJe7rdgOaqgGwVDN5SpXRhEe
-	PQETi/njUP1R4nki6Hk09VswXZbA+fFvc1xuIvT0JiM8soAaBTKAd0RaUsrTttckRdYIRM9U3vT
-	fwhQARlIR3m44A4227akflORLAGaIQJi32xxmHpQTJlbM9Vlx8o3X8QMT3WE=
-X-Google-Smtp-Source: AGHT+IHK0k+47ZR/TMNO3T6BWt795DGnNcgyXBSxD6tIApSqlzaFasTtvBoNjyO2TaLiiD8DxZzJRSgsPdw2hoAQqoX5787xpZXt
+	s=arc-20240116; t=1748855786; c=relaxed/simple;
+	bh=C1De+IOxAcDQvZAsEVV4bkESfkA1sLY6u15THMKu99E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O4EJpRzSFrAd2zxF3+9M+v6+gffLf3Ps2gS0h3LXQT8v4jc1wWEaMUDdqQfTC7/rx+eVCaORQJxMDe6P6GLhp5pTw4qwlrMAiRLFfpUROhUiHmEOtRFfGBiAHOFSxQ29huh1DhqIVLSu5p0pVvXZIpiHI3y6JJXrYrSgpjUFzTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHEc3E1o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 248AFC4CEEB;
+	Mon,  2 Jun 2025 09:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748855785;
+	bh=C1De+IOxAcDQvZAsEVV4bkESfkA1sLY6u15THMKu99E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jHEc3E1oJ7/9XEzu+JsoTDOH5xVMcn/fP/A5jJUEuy+tl02dHstQU5qiCEQ7k22vH
+	 YPvW4Eo06B+L6lrc/gtocbzJs4F1h3i5cXOLwdDGPpPRbB2BUYzz2EGbLghrjiIEAN
+	 wDad7w8tSFobiy1axktSGLr/qTyQXjX1bPnovR63+I7395BS0vqR5te3jCArw1Gt8M
+	 bItsuS9D3+OTOc5rrvmmbSJ5u73eIUKiF33RYWcv4ZahYT70DHhTE8tNcqCOwaT1kf
+	 pVsWSSIsekxtiHhC9UxwFm0lA3Gw3+0mriORyHx5tCJpqamTXjpwD6TNNNtkcA6JRh
+	 /nKGXCwlDMPDA==
+Message-ID: <9b54c25e-27e9-4590-9ba4-030ba485abcc@kernel.org>
+Date: Mon, 2 Jun 2025 11:16:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:250c:b0:3dd:8724:aa93 with SMTP id
- e9e14a558f8ab-3dd9cc159bdmr125747955ab.22.1748854655016; Mon, 02 Jun 2025
- 01:57:35 -0700 (PDT)
-Date: Mon, 02 Jun 2025 01:57:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <683d677f.a00a0220.d8eae.004b.GAE@google.com>
-Subject: [syzbot] [net?] possible deadlock in __netdev_update_features
-From: syzbot <syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: clk: mt8189: Porting driver for clk
+To: "irving.ch.lin" <irving-ch.lin@mediatek.com>,
+ Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck
+ <linux@roeck-us.net>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>, Rob Herring <robh+dt@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, nfraprado@collabora.com
+Cc: angelogioacchino.delregno@collabora.com,
+ Project_Global_Chrome_Upstream_Group@mediatek.com,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-pm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mediatek@lists.infradead.org,
+ Irving lin <irving-ch.lin@mediatek.corp-partner.google.com>
+References: <20250602082610.1848291-1-irving-ch.lin@mediatek.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250602082610.1848291-1-irving-ch.lin@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 02/06/2025 10:25, irving.ch.lin wrote:
+> From: Irving lin <irving-ch.lin@mediatek.corp-partner.google.com>
+> 
+> 1. Add mt8189 clk driver
+> 2. Fix mux failed
+> 3. Add apll12_div_tdmout_b
+> 4. Add disable-unused configs
+> 
+> BUG=b:387252012
+> TEST=emerge-skywalker chromeos-kernel-6_6
 
-syzbot found the following issue on:
+6_6 feels like v6.6, so nope. You need to start working on mainline and
+TESTING on mainline.
 
-HEAD commit:    7d4e49a77d99 Merge tag 'mm-nonmm-stable-2025-05-31-15-28' ..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1298600c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2ea0d63949bc4278
-dashboard link: https://syzkaller.appspot.com/bug?extid=7e0f89fb6cae5d002de0
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+This also explains a bit all the issues which you copied from downstream
+drivers... although they were fixed in v6.6 as well, so maybe not. :/
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/eb4b617767b5/disk-7d4e49a7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d0be53c5da74/vmlinux-7d4e49a7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9a5769a0ff61/bzImage-7d4e49a7.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7e0f89fb6cae5d002de0@syzkaller.appspotmail.com
-
-netdevsim netdevsim1 netdevsim0: unset [0, 0] type 1 family 0 port 8472 - 0
-netdevsim netdevsim1 netdevsim0: unset [1, 0] type 2 family 0 port 6081 - 0
-============================================
-WARNING: possible recursive locking detected
-6.15.0-syzkaller-10769-g7d4e49a77d99 #0 Not tainted
---------------------------------------------
-syz.1.2750/15558 is trying to acquire lock:
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2756 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_sync_lower_features net/core/dev.c:10549 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __netdev_update_features+0xcb1/0x1a20 net/core/dev.c:10719
-
-but task is already holding lock:
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2756 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __dev_ethtool net/ethtool/ioctl.c:3227 [inline]
-ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_ethtool+0x716/0x1990 net/ethtool/ioctl.c:3490
-and the lock comparison function returns 0:
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&dev_instance_lock_key#20);
-  lock(&dev_instance_lock_key#20);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by syz.1.2750/15558:
- #0: ffffffff8f50b248 (rtnl_mutex){+.+.}-{4:4}, at: dev_ethtool+0x1d0/0x1990 net/ethtool/ioctl.c:3489
- #1: ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2756 [inline]
- #1: ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- #1: ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __dev_ethtool net/ethtool/ioctl.c:3227 [inline]
- #1: ffff88805a35cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_ethtool+0x716/0x1990 net/ethtool/ioctl.c:3490
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 15558 Comm: syz.1.2750 Not tainted 6.15.0-syzkaller-10769-g7d4e49a77d99 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3044
- check_deadlock kernel/locking/lockdep.c:3096 [inline]
- validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3898
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5240
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
- __mutex_lock_common kernel/locking/mutex.c:602 [inline]
- __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:747
- netdev_lock include/linux/netdevice.h:2756 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- netdev_sync_lower_features net/core/dev.c:10549 [inline]
- __netdev_update_features+0xcb1/0x1a20 net/core/dev.c:10719
- netdev_change_features+0x72/0xd0 net/core/dev.c:10791
- bond_compute_features+0x615/0x680 drivers/net/bonding/bond_main.c:1614
- bond_slave_netdev_event drivers/net/bonding/bond_main.c:4112 [inline]
- bond_netdev_event+0x72e/0xe80 drivers/net/bonding/bond_main.c:4157
- notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
- call_netdevice_notifiers net/core/dev.c:2282 [inline]
- netdev_features_change+0x85/0xc0 net/core/dev.c:1571
- __dev_ethtool net/ethtool/ioctl.c:3457 [inline]
- dev_ethtool+0x1520/0x1990 net/ethtool/ioctl.c:3490
- dev_ioctl+0x392/0x1150 net/core/dev_ioctl.c:758
- sock_do_ioctl+0x22c/0x300 net/socket.c:1204
- sock_ioctl+0x576/0x790 net/socket.c:1311
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa86e38e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa86b98f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fa86e5b6320 RCX: 00007fa86e38e969
-RDX: 0000200000000080 RSI: 0000000000008946 RDI: 0000000000000006
-RBP: 00007fa86e410ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fa86e5b6320 R15: 00007fa86e6dfa28
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Best regards,
+Krzysztof
 
