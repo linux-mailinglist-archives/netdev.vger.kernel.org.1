@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-194639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10E5ACBAC2
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 20:06:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF08ACBAC7
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 20:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AE511894B9F
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 18:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B75EF3BED28
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 18:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4795022A1C5;
-	Mon,  2 Jun 2025 18:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C89224B05;
+	Mon,  2 Jun 2025 18:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WuUAPqPT"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LtRnSrFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C228422839A
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 18:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136711925AB
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 18:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748887572; cv=none; b=LgaS3PPrX2KwpJNxFhjQR36ZyFXj1Fbuxtd6KCmjOfbCJvPzuE+i1xku0LRxI8AwuXZOpkQN1LrXwsrDJN2jZgXhBwMr9agZuCTHn3QAyqnCtVaQ+LL2OqlsGAL8b18rANYzvw5ow0lRtwSfgFNuqYM1/LgsTa9yZ1P2Bd/KdFc=
+	t=1748887645; cv=none; b=ePhEDKkgf8idhGGhEhAf98aZN/7QAQFu9c/YnYcOaNlu0j/kE27M9qOM2DGOxLPVSuL9sbMwNgV4Ll0c362OWifDZC7SfRxE+/RuLUVudQhJLZ9lgN+/K3RfJpotu6wZo5DbJ464CbPm3Cnd2pADLdImoKb/8z4HK8aYKEuq4yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748887572; c=relaxed/simple;
-	bh=XwmDGXznqEWTw2nfNirknvPgvCboCtPXEHBULgARSC8=;
+	s=arc-20240116; t=1748887645; c=relaxed/simple;
+	bh=B1IT92nzoDwlJgHyhF/M8EqdbkoWldClYQt+fdBC7O8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=m46Dgqrr6jZr7qxJMpiE3Jv7Z7nES/wqPAla5Dk7G5JT0KTPdU0AaeCT/2kRvQZ74uBI8xeVP7zm0iaJv6OPMMkpLm3/FzzFTaFRMVBVBS5SL+eVxcSMRD0LUS9ulE1ztdmBLjmJiQHQcsqDipNNLk7SROvK+/EOaYnYxVTj3AI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WuUAPqPT; arc=none smtp.client-ip=209.85.210.179
+	 In-Reply-To:Content-Type; b=SGQo2vx2XE2Kp/uY00Gl+Li4STOTQ9LIVGslf12QMYVJMX4d0Xk+ky9KPfWHg04ITJPDKprIBGSS7lQqFKMPWGy+Xw/LocFfuzx4NzDZjz6D4/2rXan/MBF0H2USimBMxlUI/knYP0ePfJLm7JTrpaVVyt+wByMwn7eZDE2yyKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LtRnSrFM; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso3311999b3a.2
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 11:06:10 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7406c6dd2b1so4627802b3a.0
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 11:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1748887570; x=1749492370; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1748887643; x=1749492443; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vWvKiH2Mm8EbNJ5RtFQE6GZhlIE3IosIvfbUm9RBQRk=;
-        b=WuUAPqPTfr/LgjUcYl/ZD51PpQuRIGYDMKvOrF88wJk6Cnz7G/WL/6VHLLid9Ck/Tw
-         e6NP8FoFKdjvtNmc1cmyaR4YN1qhjqJ9FuIjqcDPuQio/aMONP0nUjANaYyTswPdmqlo
-         RMA8LjalP/rdz7bokemTddrlLe8Bbrzw7rjwU=
+        bh=f75Fmd2HmTOxmb3ydCTXDBO0VW57Rha9LIEst3+i6PQ=;
+        b=LtRnSrFMIAfdFf8vnbe73IBT+DMTAY1UA5AxZ0JatLJGWRh4aKat8/gVYz8LFGRbM4
+         XA6caG9u4+BDYTItgDWd9lF24OVRaLksgvVUIxXhcbbthHMsL78VYF5x4YkOapbZIDHo
+         jAN0aEvWOdcybdUimk3SJ+MFDHpT57BP9m7sw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748887570; x=1749492370;
+        d=1e100.net; s=20230601; t=1748887643; x=1749492443;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vWvKiH2Mm8EbNJ5RtFQE6GZhlIE3IosIvfbUm9RBQRk=;
-        b=qGDEAGDWL7y4AHEjDTNebaDMSDbvwB3Vy8jd4UtSNcKQXJnrWnBpOM+TayR45JlSdI
-         CePFWj5E2483nBj73lQ1tDCRCpHYtiyXnV7Zf+XpKD0iiL+zgHDnuFn63yUFC5VixrvH
-         5Q9EOCAlF+TBWnwqhIDQyTzLmKVjHJHruilrH9ibizZlF2CCwrT/IeKt1nYeeOvfzrul
-         P+Qk89kXlrAiko3+JlSdWCzpw4GcNX99vxmR0ZfZKl75iTicaZUM8kDF8AYAt7fihE6s
-         BJb4a9Mw7eGpyEHs4eu7zNOTtSy7TWuF/kgNu3taTNgMqvr7Wn4lmRkd5a+Ten5v9lzk
-         xk6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUdR1mRuTixR++IqKchJ6xWgtgdnGZwdqhw8HwatHUCs5gdpfBFFR/MERUMhmwsRznMJQa5ajk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUjzOpCKBEu3WoFw2ynTupxYQdTedb85ft4MiFp3wqwirIIxK/
-	6VUEqtOfu2qCj3nKtvj7a/19BAIGq5j6otsMHp7DXrT3E1Zyjmf0WpVumnFZtshFEw==
-X-Gm-Gg: ASbGncvRkfXzMke3cOFfwW+aIxREUBQ+63tLrU/fsHeZuC0JD50yK7bstzhzvjdH1Sw
-	ZMlaDDyn97QirfuyzA6dBgKd+wWLFvA7CNI4IYABWaIr+Dhre21oD2M/lF6Q9b+Ff85JwkzmHZ9
-	T13/IJcP5gbxtEvo2ocXH1jcT1hET64WrK5QOuhOnMJ4Hb7qa++eTXKV7fKZ1nDqu10oqxLL5gY
-	lffFwhzJcgXpV5GcPflZ2OXzQxKOcMrvLz2DYmQ2cUMTSioK0KqxN2YwDHnSFA99cDabh9z08RG
-	GUJpU18so1yzxvW4v2rAyYgU1wxL1MAjgFh6J+QG5HqbZ0FpCPQHP3qL3a0HTJrhHoDM2Q98879
-	XPYV7N+Ju2IJAxOE=
-X-Google-Smtp-Source: AGHT+IF4+zdbKfHJ4X+31cSpPgVaRuv+nJ8qz+s+PnOZiduTX+UreaCQFduqwwpQTiszKthZ/dcIHw==
-X-Received: by 2002:a05:6a00:a13:b0:742:a23e:2a67 with SMTP id d2e1a72fcca58-747bd9e6da6mr18299998b3a.16.1748887569926;
-        Mon, 02 Jun 2025 11:06:09 -0700 (PDT)
+        bh=f75Fmd2HmTOxmb3ydCTXDBO0VW57Rha9LIEst3+i6PQ=;
+        b=ovxaUsbiVMVOdf3E7oxuF4Y9pXpu9aDyPmRZb3hfBzB8552KKCrpgM9rn+BacZJZ+B
+         fZkIES3sGK3hZLvDtEQboKvQg3UbhmKevzpCi7eGCrnQIqVkYU06mPSHxmp16/Y4VqbS
+         8PTsNzp1x+4QmNrvRRfh+TR8d1mni/p3JvKKii0YaNtvJQ8tjlZYWV7D4R3HAbwrsFby
+         mXZNDlO4WwoD46LtCXleoEMdTOcTRVuyAaT3WmvW89fAzbsQTQG7t0VLnyDMBf21tftJ
+         ANNxGG0t6aGad+UZ+8jVWQCopNdfvrgQfbkkvh3gnhu6AU07bMS2meetX2Fx34qPwZil
+         qvcw==
+X-Forwarded-Encrypted: i=1; AJvYcCXVi995z1oA6vGH2tKEWeDt0EazZCW6XQdg2IXbqDUoSawPMD8jpButL9jq7dfGjCCnWxapT+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAZPX2S8FDNdmYrren8mHyGp2Uw7VhHyvF7AgDk7hhz8ic5c8X
+	jfKXnSl0UYabin+LT/2U+w/uj4QN+gVlsoTtHmqKasOCf21mRESW+lV7HcrgujXhMA==
+X-Gm-Gg: ASbGncsgMsurLnXvyfLUoOi81M4/m646sldVApPVw5fi9Zr0tPdXLNyTJJGRaT94xzL
+	Ms8EAW+/BL4VlDL0d9H20s9o4euLl07LBHIXVLQY24I9Ija7KXinm0bTR5t6rusAMaQIl61ypLv
+	UTEWGrAjAp9F1dt/0+eQsbO0Fn0MMQbXlG7/nznKF4zueSGOIliLXbHl4Yj0E9g2F7cw4P9Nfr4
+	tkDqQ6m8qrq5bU5iiD/K55dVfD7lZWK4Ni3dSF+2/Yg+Cih2PhGiMxp8imKzgjmMfKVmWN2wM47
+	+NuJCpC2bpvhqlk3a39JA/tdtVKFgLJuyrs+eMWPnGMm/bDrmMGoDPLTTk5/72ggnLI+FtzP66f
+	Fv1i4SmPqZG8yHfA=
+X-Google-Smtp-Source: AGHT+IFW1A8jX6Iq5Uxnn5p/4m0wDsnzCLGnjep/xHiKvfLONgy5Zls2kW93VR4nae5axXvqgzGsiw==
+X-Received: by 2002:a05:6a20:748c:b0:218:d024:11f5 with SMTP id adf61e73a8af0-21d0a014e05mr656981637.3.1748887643322;
+        Mon, 02 Jun 2025 11:07:23 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afff7459sm7900776b3a.169.2025.06.02.11.06.08
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2eceb368d5sm5862201a12.39.2025.06.02.11.07.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Jun 2025 11:06:09 -0700 (PDT)
-Message-ID: <5d3d04c0-d9e4-4f80-8ab3-7bedb81505b3@broadcom.com>
-Date: Mon, 2 Jun 2025 11:06:07 -0700
+        Mon, 02 Jun 2025 11:07:22 -0700 (PDT)
+Message-ID: <0f26cda5-8269-484c-b5d0-2b627e92776c@broadcom.com>
+Date: Mon, 2 Jun 2025 11:07:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,14 +80,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 04/10] net: dsa: b53: fix IP_MULTICAST_CTRL on BCM5325
+Subject: Re: [RFC PATCH 06/10] net: dsa: b53: prevent BRCM_HDR access on
+ BCM5325
 To: =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
  jonas.gorski@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com, vivien.didelot@gmail.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, dgcbueu@gmail.com
 References: <20250531101308.155757-1-noltari@gmail.com>
- <20250531101308.155757-5-noltari@gmail.com>
+ <20250531101308.155757-7-noltari@gmail.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -122,47 +123,18 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250531101308.155757-5-noltari@gmail.com>
+In-Reply-To: <20250531101308.155757-7-noltari@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 5/31/25 03:13, Álvaro Fernández Rojas wrote:
-> BCM5325 doesn't implement B53_UC_FWD_EN, B53_MC_FWD_EN or B53_IPMC_FWD_EN.
+> BCM5325 doesn't implement BRCM_HDR register so we should avoid reading or
+> writing it.
 > 
-> Fixes: 53568438e381 ("net: dsa: b53: Add support for port_egress_floods callback")
+> Fixes: b409a9efa183 ("net: dsa: b53: Move Broadcom header setup to b53")
 > Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
-> ---
->   drivers/net/dsa/b53/b53_common.c | 13 +++++++++----
->   drivers/net/dsa/b53/b53_regs.h   |  1 +
->   2 files changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-> index f314aeb81643..6b2ad82aa95f 100644
-> --- a/drivers/net/dsa/b53/b53_common.c
-> +++ b/drivers/net/dsa/b53/b53_common.c
-> @@ -367,11 +367,16 @@ static void b53_set_forwarding(struct b53_device *dev, int enable)
->   		b53_write8(dev, B53_CTRL_PAGE, B53_SWITCH_CTRL, mgmt);
->   	}
->   
-> -	/* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide whether
-> -	 * frames should be flooded or not.
-> -	 */
->   	b53_read8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, &mgmt);
-> -	mgmt |= B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_EN;
-> +	if (is5325(dev)) {
-> +		/* Enable IP multicast address scheme. */
-> +		mgmt |= B53_IP_MCAST_25;
-> +	} else {
-> +		/* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide whether
-> +		 * frames should be flooded or not.
-> +		 */
-> +		mgmt |= B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_EN;
-> +	}
->   	b53_write8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, mgmt);
 
-I don't think B53_IPM_MULTICAST_CTRL is a valid register offset within 
-B53_CTRL_PAGE, or elsewhere for that matter, do you have a datasheet 
-that says this exists?
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
 Florian
 
