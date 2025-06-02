@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-194658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22652ACBBDD
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:41:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E122ACBBDC
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E341716EE9C
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:41:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 103607AB4D6
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F37222D9F3;
-	Mon,  2 Jun 2025 19:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5CF22D795;
+	Mon,  2 Jun 2025 19:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NdFOxf0K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pj0V2lnB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9964322D4F6;
-	Mon,  2 Jun 2025 19:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D5822B8D5;
+	Mon,  2 Jun 2025 19:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748893209; cv=none; b=X4y7lFgv59ISt8Nj/WFV9UW2FCT2fCMl1leIWVaKSWhLv++1D6zJR/KC6arQr9U4NZbZl4ogwt+2QBgRIZ5gZtLZTN/4dJedsnnU1zSZhdNlXFIc8uehEdthXCnqeKy1wSdPXX8RJQ86sMRhCIq3J0smvsVrhnkXcrZtg56D5bw=
+	t=1748893208; cv=none; b=ky/d9PChMVMYQGVS/Q6l7DLD3U7tJ66hdjEwhVIEIPpdOJVCSDLFIcEuk6d3zYAPRaO216Z37vh+ehmCtCY5JvzyKU7rIxRmjmmZonaGNy4mOPngA+woZ1jCoCJ9iw/Ap8lsBHZCcajwkDBNow2pMc9wsNBjp9mHLt2jm+WOtwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748893209; c=relaxed/simple;
-	bh=kaMgHoWYLYvGbfKuyz8FjfIvHL93d78mxqSd9irxe/Y=;
+	s=arc-20240116; t=1748893208; c=relaxed/simple;
+	bh=W5lvTQJx8Rg2GZ2MP+aKOXYOVUr4A7PTN2EZRYjapYo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jzaYJQYkaXtErYvGr1/gVAfxHsRDWrKJbSJtg49ItLgHM4Yg8wBQJKo/laaet6aGW3FcMj500TR4xJPqvyh6jr3AB+PxwDC7qjoLTgr0DUVbX/IlwXb/Mn/JADpVAg0+mRC79kbSO112WJmDvvm/hf8r2ZJZN3mR+DRmil3LSv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NdFOxf0K; arc=none smtp.client-ip=209.85.208.48
+	 MIME-Version; b=hRFvDTZHTT6f4Oo9R2wQISXCxNuXAXylcjJi7DWDY3eXYPQf3+MWaRKOf4O5FpwE08wYCM/Nga7nRjcdByZvXxbZmBf7h/Mxu+8ZdnqcHmkYLz/jYcsp3VuQM5HqtK+6k/mnSTWJu49y7TXhoMjSIhX6fQOa++4qWL99u8A/2j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pj0V2lnB; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6045e69c9a8so9228967a12.3;
-        Mon, 02 Jun 2025 12:40:05 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ad89ee255easo883048166b.3;
+        Mon, 02 Jun 2025 12:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748893204; x=1749498004; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748893205; x=1749498005; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QUzxaG7r98wSKohMlOOAAhXemIOrwTNYnmCUuKws3h4=;
-        b=NdFOxf0KjtRFLAA2Xhq38EoKda423tiQXWsYlmSK01M3nh4jRMXnoNdnyPlehgSErm
-         xDCP3XACm03SSKCL5VjMaCBIcWxsQ1QapHnuttJ0UerpZYAneTIG10loY5Ce/RWUdd2B
-         o1jSLNsmOrrFxFh+Rk2fmqDXU7+Z6ASeQ8QHgZYmvIMsKeCvbBDVLWJSm6B/9BYaaWEm
-         GqXlYlEVx7fCJbGhXBt6EhBk5biczv14eob0yG4q30RwHjRBsjQbOyNCn6dBI5ZmCsTS
-         /EwAvfvl/5fZxzjQW6v2grsS3nn4IBux0IjJPtv+rDaNXWo2SriajClAy2qv0A3+gaVc
-         GZ4w==
+        bh=+BTL5MAqEteMn2C6CJSs7Xxb84R1E6RDMzhMA/qaLVA=;
+        b=Pj0V2lnBYvoGTPyZEzwGz6BaInBDqGEgAWOmMUb4Ye9bSpM0lEmRobvrNWARwYWDqB
+         P/1gNjpxakg3U6WkUWBHp+cNQlNLzK2Loz/9ip9OoKaJ+8EamOf84UJEUdu/ss1YdCnK
+         BxaKsn4/Jm3VoGBQy8Zu8pNOH95ieutLe5hS4y5MIW9sbvCqWEZo0BXUVJVXsvvz5/kO
+         b8n4dCIcDptaPIZkQoY7YqjEWxqdDVzejhwLIFIygjQlm49ppQWW72Vga9UznUaZwHe/
+         8IgP8L9nNOloRB2t6XpkW4vX5pOGrwmOWVcRHG9+SblWVh+3AuzTEGiw7x/IkS2L64xD
+         arqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748893204; x=1749498004;
+        d=1e100.net; s=20230601; t=1748893205; x=1749498005;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QUzxaG7r98wSKohMlOOAAhXemIOrwTNYnmCUuKws3h4=;
-        b=Hrhf3wV78f95bqu/Zb+akGX9s0NTjHF+MRU7JXW4VD5FcYjmyZwlBEZg/9wYq3Mqcp
-         69cEq8vA5NCxvWojsJadiNZ8DDdEC6IFYL1FegPvzhVhaDNiOMIbmcixb+NYtaW2ZkYp
-         YkEWbgpphlBljh8uDf9phoqAr4Q/tpS7/7kcyjGpT4zMa83poorNT1HVdmPlcrs1RiJk
-         Ge7LAEdvl6F9Pvm23jPFAlO/x5jMb/G2z5SKHiJ0qutxb/WdZdYoK+iutp/zZ3QVEL+p
-         VWV+O/pKHn2Z9tfiVH9aE9cGhoNOO+xetHfWS+QVyur7mUORyA8pO5GOmP6ZbEotIhyd
-         JIkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOfEVcgsQToKxBIOt2T8+Gj0+x/AqXjQvBjYTIaPM294xk1agDLpi3XOHTBg+XGCa0aF2hZwvhwruvp1o=@vger.kernel.org, AJvYcCWvICTiKZXJzcBkuQp93TUuudq1CjSnyFENm2Gje3TfryWD6pJ5NXuyFNq1TnJCOjeQV1ZVDJkm@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMOvAFSSFkN1TWz57ES00HUCohmFxc/Sp9eed+LuS0Pn4U/lT8
-	LxfKm+pVC144iiwKjriGnfMbA3EuMPQ0jlXGpI9MFSFptAbhQd/6WgyU
-X-Gm-Gg: ASbGncv4Yc//NO4s05UQ2yexFYFRdS16fk3/OR3FOcQz4/YC0E3hnoEs9N5xLexABSm
-	XKd+MQv/ZmV5+VKRAkpdB+ziH58IkQb4OYWHdCqKn8RqWLiPqOoi9hwQJaPQTZnhLgwSmw3v0uh
-	wwRcpyJsxRmPmPpLFA402UwAuKAYFWPGx4bp9oW6XIOYi3bStwZNxse09kv/ZKPc8YgXlQLn2Vt
-	o/Py2WCX+OVoRaBDzzrj4v2zGnVoc+kuFjT9D4H93gNvLjMLJgmYeLMt1yfqAX0A9xtsLuxihgg
-	h7dkfSQ/B45fdwxf/BRUsuNnlL4GXko+4CDPADNKm9jDT8UmmAP8RbfgqS7mCZw9uNxWfCmRpGI
-	oxxg2wUGYqOmpApHhmSE5a7fiARSzZ9M=
-X-Google-Smtp-Source: AGHT+IHfZPl4EHqdvcHEsmAE+HPej3McuF8SlAf973Eld7dW+ssySVbsuESuRGVDGhGTauQmWW1q4w==
-X-Received: by 2002:a17:907:97c5:b0:adb:2bb2:ee3 with SMTP id a640c23a62f3a-adb4954948bmr908599566b.46.1748893203784;
-        Mon, 02 Jun 2025 12:40:03 -0700 (PDT)
+        bh=+BTL5MAqEteMn2C6CJSs7Xxb84R1E6RDMzhMA/qaLVA=;
+        b=pj3HyeGG1d7cxVG+zsWqFKWOmHrZzdPpURdZYSm3h74uFfH7j8R4KUca9H3vERzXFc
+         XN073N7fQihxOIM7PnHfhacGMxkSzlnGw6j/MPYufFte9vb4RhTCk5ZfI+AzcXWK3U0L
+         hteYqF5agjKqIN5fLuBQMhXhaJ+gjctjQNNG1RkZ2IVabhvKx3G/7AJJ5weO0Biv3zlA
+         ubOuMl0bpc75+uoLTcCb/Yf1PhIr9kBlNG1qaMeuOPIfXKIhzfMDdmD3tolZ9onN0Z41
+         g5nRfZkUfg/+N4sX0Wa6AdbxgSaoIANFlrtfeEr4YDw2EwG09Mot8yl2GRxJBj1GyDac
+         1hMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVchPVU8Elz2EAPFgKZ26FqOcRh5BkSCCgDIXlJB1htfWgDlag4LSTxcq/pIToLb4fg9DlIW+py@vger.kernel.org, AJvYcCX7Gd/RVrTxUthq3Zi1euAK6qJxOnGTEpuecQF5WnpkQUOu1zBNkaVyoHq84KocWHhJn3zUQLdhLOKunqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykeVwbaRrztmXXQd+nv3NMZYsifhnlvmRZoqdc87b/u19N25B4
+	nbTf0aYDspCHoDmuh2vdIwyMe92LrzF+NOeE/nLec8kdVOuWKwFqzDvJ
+X-Gm-Gg: ASbGncuSuuNqY+2pIqVgQpGtAc+rX387hsNQ1P4/w31v3Hzp96pNOeZCJKB5N3dNx83
+	KqgOD52q/JGZ10aZZO+yxs2Qdxam40wr4MxE5kFweRDrKHKE4h+L6z2aQ0wx62m+5E/0dNq+VpW
+	DLue0TBcl/RGrEBJbV5aMNQJ38K5grgeYG4Ps/BBLFOmlMwYYLxBLLGAhX9UYQ9HdArYCvD+YQh
+	DWoJv5QEMOyln/3TGB5Y57terRuVAuI+9JW/u02hHhtUL7CrCwHJGt7O6YmmUt+Yu3dlpqZcaNL
+	XLtSGb6YtiHyHD0mMeHL/fbiHxJH9B9evg4BtX6lCsVctFUsMsZj6u67Zp9via4hoOHRmdAzQxr
+	jlZ9qpA03bmUn1tG6eGMVFXBFgIbzaZg=
+X-Google-Smtp-Source: AGHT+IEqz3Qmt4vvH+dy3OjSllvjqINR9VvmuImfx9Uc2G1BzrLLX4CcXXU1AXe+rWU4Oad0XWPB7A==
+X-Received: by 2002:a17:906:c143:b0:ad8:9428:6a3b with SMTP id a640c23a62f3a-adb36b05316mr1286729866b.5.1748893204835;
+        Mon, 02 Jun 2025 12:40:04 -0700 (PDT)
 Received: from localhost (dslb-002-205-016-252.002.205.pools.vodafone-ip.de. [2.205.16.252])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d82eee2sm840999866b.73.2025.06.02.12.40.03
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada6ad6a76csm832322866b.165.2025.06.02.12.40.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 12:40:03 -0700 (PDT)
+        Mon, 02 Jun 2025 12:40:04 -0700 (PDT)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -86,9 +86,9 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 4/5] net: dsa: b53: allow RGMII for bcm63xx RGMII ports
-Date: Mon,  2 Jun 2025 21:39:52 +0200
-Message-ID: <20250602193953.1010487-5-jonas.gorski@gmail.com>
+Subject: [PATCH net v2 5/5] net: dsa: b53: do not touch DLL_IQQD on bcm53115
+Date: Mon,  2 Jun 2025 21:39:53 +0200
+Message-ID: <20250602193953.1010487-6-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250602193953.1010487-1-jonas.gorski@gmail.com>
 References: <20250602193953.1010487-1-jonas.gorski@gmail.com>
@@ -100,41 +100,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add RGMII to supported interfaces for BCM63xx RGMII ports so they can be
-actually used in RGMII mode.
+According to OpenMDK, bit 2 of the RGMII register has a different
+meaning for BCM53115 [1]:
 
-Without this, phylink will fail to configure them:
+"DLL_IQQD         1: In the IDDQ mode, power is down0: Normal function
+                  mode"
 
-[    3.580000] b53-switch 10700000.switch GbE3 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-[    3.600000] b53-switch 10700000.switch GbE3 (uninitialized): failed to connect to PHY: -EINVAL
-[    3.610000] b53-switch 10700000.switch GbE3 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 4
+Configuring RGMII delay works without setting this bit, so let's keep it
+at the default. For other chips, we always set it, so not clearing it
+is not an issue.
 
-Fixes: ce3bf94871f7 ("net: dsa: b53: add support for BCM63xx RGMIIs")
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+One would assume BCM53118 works the same, but OpenMDK is not quite sure
+what this bit actually means [2]:
+
+"BYPASS_IMP_2NS_DEL #1: In the IDDQ mode, power is down#0: Normal
+                    function mode1: Bypass dll65_2ns_del IP0: Use
+                    dll65_2ns_del IP"
+
+So lets keep setting it for now.
+
+[1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob/master/cdk/PKG/chip/bcm53115/bcm53115_a0_defs.h#L19871
+[2] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob/master/cdk/PKG/chip/bcm53118/bcm53118_a0_defs.h#L14392
+
+Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitch")
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
 v1 -> v2:
-* add reviewed-by
-* do not enable RGMII for CPU port (internal only, no rgmii)
+* new patch
 
- drivers/net/dsa/b53/b53_common.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/dsa/b53/b53_common.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 3f4934f974c8..be4493b769f4 100644
+index be4493b769f4..862bdccb7439 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1439,6 +1439,10 @@ static void b53_phylink_get_caps(struct dsa_switch *ds, int port,
- 	__set_bit(PHY_INTERFACE_MODE_MII, config->supported_interfaces);
- 	__set_bit(PHY_INTERFACE_MODE_REVMII, config->supported_interfaces);
+@@ -1354,8 +1354,7 @@ static void b53_adjust_531x5_rgmii(struct dsa_switch *ds, int port,
+ 	 * tx_clk aligned timing (restoring to reset defaults)
+ 	 */
+ 	b53_read8(dev, B53_CTRL_PAGE, off, &rgmii_ctrl);
+-	rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC |
+-			RGMII_CTRL_TIMING_SEL);
++	rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
  
-+	/* BCM63xx RGMII ports support RGMII */
-+	if (is63xx(dev) && in_range(port, B53_63XX_RGMII0, 4))
-+		phy_interface_set_rgmii(config->supported_interfaces);
+ 	/* PHY_INTERFACE_MODE_RGMII_TXID means TX internal delay, make
+ 	 * sure that we enable the port TX clock internal delay to
+@@ -1375,7 +1374,10 @@ static void b53_adjust_531x5_rgmii(struct dsa_switch *ds, int port,
+ 		rgmii_ctrl |= RGMII_CTRL_DLL_TXC;
+ 	if (interface == PHY_INTERFACE_MODE_RGMII)
+ 		rgmii_ctrl |= RGMII_CTRL_DLL_TXC | RGMII_CTRL_DLL_RXC;
+-	rgmii_ctrl |= RGMII_CTRL_TIMING_SEL;
 +
- 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
- 		MAC_10 | MAC_100;
++	if (dev->chip_id != BCM53115_DEVICE_ID)
++		rgmii_ctrl |= RGMII_CTRL_TIMING_SEL;
++
+ 	b53_write8(dev, B53_CTRL_PAGE, off, rgmii_ctrl);
  
+ 	dev_info(ds->dev, "Configured port %d for %s\n", port,
 -- 
 2.43.0
 
