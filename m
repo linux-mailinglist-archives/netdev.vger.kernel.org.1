@@ -1,99 +1,167 @@
-Return-Path: <netdev+bounces-194677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE94ACBDA7
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 01:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA991ACBDB0
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 01:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A93216962D
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 23:16:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D90A16DFB8
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 23:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736BA149C41;
-	Mon,  2 Jun 2025 23:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0F218C00B;
+	Mon,  2 Jun 2025 23:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6tmLEu9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nVCICnCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CD62C3251;
-	Mon,  2 Jun 2025 23:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6202A14F70
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 23:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748906202; cv=none; b=lHJmoOyNplS+uXqHgsdfU+hNmm6d61Sv2Atb7AWgws3rYMCaQyhpCRz8yjd6B0h88jN6y1DCH6aXOKI38x17q9q5HVTLhdZmmWeM8wwyX98iPBHx3zZ7khSt2B+mRaNV0WDEAqG50fJpqG/1QvurzqO9aQqyT82fTTOhFIWTwHs=
+	t=1748907016; cv=none; b=kHAFi/sJEuq9gnJSwasSF8kc03ejXuZK68so7nvCmmgM6+Ubezwr1Mb+T63yBcpL4qQfLJXzl6shJnQiEp0Tpn3vkBSCpX7qJNvga88k60/+28jmIAcbHllq3ldVLyqoZlsBrWQBZn21CNsYtAbZ5K6b1D2wbQ4la4YLNxWXBV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748906202; c=relaxed/simple;
-	bh=wuNpe20+onO7k+0xVYg9b6FKIsEIXOHA2lHpopy+8gk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AIloaZqODmT9iv1U67lsIw5ZbAvFYoa8SaM8dOyOlSnw/PoCpOcssv1EmXvRsjHv+9LCMLyzICeF0jjtVt6bpezawfL4BFGFLxbayolvmNPwuHdF/6f61bbnRyIPB7kB/wEzRKdu6BUK7vm3MWoDH6PUkarX1IuIzf+JmtrSrSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6tmLEu9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 570EAC4CEEB;
-	Mon,  2 Jun 2025 23:16:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748906201;
-	bh=wuNpe20+onO7k+0xVYg9b6FKIsEIXOHA2lHpopy+8gk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b6tmLEu9lSNC23UVrVXGvOanX/POFNM6+dxYqYsFCjlVEVzWZppSS4LXkG1l2EFPK
-	 RwrhD9BBZkst0jj/zQ78PP0FubBPiZeeQS2mtA/QBuLuCc2NDNNP/AH57Xlbp1/+cA
-	 YrRYDT1DepoWizF8N8EAT5aFoeuZeVpNhzPndR08obx/1aiJYGZuW5kdsXOA0HKVRe
-	 euhHNu9jPpevNk+FIZbSKfciJuFSWJ42KLVmBIPPE37h8CgSKvC9I5KBvjoEk+sqM0
-	 UHStajj7pGRTIvaVyTrUN25k5z6FjIApXWJ3cPBFqjXzQk2jMSF1VYZ5i2dvyVKt3g
-	 jZOYixB7ikPZg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: drv-net: add configs for the TSO test
-Date: Mon,  2 Jun 2025 16:16:40 -0700
-Message-ID: <20250602231640.314556-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1748907016; c=relaxed/simple;
+	bh=ERPVRkIbILIUcIjfV+EhBnHrMs9fZ3Q4qRlPwExSKOU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UwBSWFw9qaw0iuyd5e6Ck8/4sPQ9rZo7n5LA3W1x0naAy1HuMEukIzPOuXZTDiIywkm4Ga9PAjF+IZkFKRue/D6k0pKgUrMcHeTgKm4zG4hncN2foigBjmf14lxewOvtAImuu5qqj5Dj6KfMdOJSYHOuZ3D35WDdF66Fam7WTu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nVCICnCS; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-23581cf2f38so16699895ad.2
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 16:30:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748907014; x=1749511814; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yve1ZiL8T7g84JmBt/tikyI/6Bv4C2Bg0e+B1xxTdfo=;
+        b=nVCICnCSv8PFaqj6xzacChw/19sZEJ9ICfvHD/3vvqcx8uhcJXX1e5ZVebDJB+EiPn
+         LPJQmdVcpPklwAc8muYkO/XrGAMb+LlXlkeo+HzRGIl+MXi2azyCjA6RUecTv39xQOyi
+         1cL/JCbAZF7m12ei7fq2u+3CQFjZ33YveYTlHnrhvOJe1K+mNKuxWra0NiCnE74p1rI/
+         UIkO7nwGfKjYy3Fl9LTm8G0Z6oG2i+jryuGjW4yCNInKtddTnYxWKJCWvlYs8XA+0QnG
+         Y425XJ5/wl/mfyJoJjj+hvZANLCUV0FyJE5sx6lGCWSLtOhtXo5sdhTVotw0qt7Giat9
+         3qsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748907014; x=1749511814;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yve1ZiL8T7g84JmBt/tikyI/6Bv4C2Bg0e+B1xxTdfo=;
+        b=wtswbpEVPo82VvyJEMlev6DX/6mGVSM70X8KD+xqmj+iZhtTLlX13h+ofyOENncMkL
+         /tVuq92slIA4k5iQn6woZrXnxHTUE8LPq4x/kbDCpTOgA5N4RbycfPiEwDYtMU0ABPOO
+         TgJiVgC6PVTD8Jiaj0xNz6zED4+2VZlMLmiKDagihkIcbvqlkhqcPmeNHdaCrcbCqRQk
+         TNThVMm973VajL0mYjM/eGLgJ+Yw5JPxKZpGrDIRezGVQFqMejMtfE12qsDKGmy/KMDI
+         VEhzTsrVDYn9y6wH6DM7pOBiJCLfPlN4GrnZuyZ5gSKUWWaxkVWIS/vR+k8luV3+CPIN
+         2++A==
+X-Forwarded-Encrypted: i=1; AJvYcCXUuuxiMXAWFfss8d40f4MHxspVgvXiVGbnemjxj0k/6ln49L9Rs58t1n45cSgTyAuYf5OZdEk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFFrachRGGfZ3CJQV2w7BsKe8/ULjb7DSNkTOH7Vm/lrmIjF3e
+	9fMtHuR5n52G7JFgY1e1q5SrmIPFLmlfAUmlNfOZ00i3W8oynLBUtB+c1771B5o6NH29n8B8SRi
+	iTiaOqg==
+X-Google-Smtp-Source: AGHT+IE14BFeGM0J7uhuk33V5fPG5r1MtBBSniKvSePrbW7/nzVp1S6VXU7zoEWKiW8wpnHDPojK7VzfMl4=
+X-Received: from pjur7.prod.google.com ([2002:a17:90a:d407:b0:311:ea2a:3919])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4d:b0:312:1cd7:b337
+ with SMTP id 98e67ed59e1d1-3125034a47amr19482649a91.5.1748907013702; Mon, 02
+ Jun 2025 16:30:13 -0700 (PDT)
+Date: Mon, 2 Jun 2025 16:30:12 -0700
+In-Reply-To: <20250602125442.19d41098.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250516230734.2564775-1-seanjc@google.com> <20250602125442.19d41098.alex.williamson@redhat.com>
+Message-ID: <aD40BIYA1ecnbX73@google.com>
+Subject: Re: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
+From: Sean Christopherson <seanjc@google.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kevin Tian <kevin.tian@intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yong He <alexyonghe@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Add missing config options for the tso.py test, specifically
-to make sure the kernel is built with vxlan and gre tunnels.
+On Mon, Jun 02, 2025, Alex Williamson wrote:
+> On Fri, 16 May 2025 16:07:26 -0700
+> Sean Christopherson <seanjc@google.com> wrote:
+> 
+> > The two primary goals of this series are to make the irqbypass concept
+> > easier to understand, and to address the terrible performance that can
+> > result from using a list to track connections.
+> > 
+> > For the first goal, track the producer/consumer "tokens" as eventfd context
+> > pointers instead of opaque "void *".  Supporting arbitrary token types was
+> > dead infrastructure when it was added 10 years ago, and nothing has changed
+> > since.  Taking an opaque token makes a very simple concept (device signals
+> > eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
+> > 
+> > Burying that simple behind a layer of obfuscation also makes the overall
+> > code more brittle, as callers can pass in literally anything. I.e. passing
+> > in a token that will never be paired would go unnoticed.
+> > 
+> > For the performance issue, use an xarray.  I'm definitely not wedded to an
+> > xarray, but IMO it doesn't add meaningful complexity (even requires less
+> > code), and pretty much Just Works.  Like tried this a while back[1], but
+> > the implementation had undesirable behavior changes and stalled out.
+> > 
+> > Note, I want to do more aggressive cleanups of irqbypass at some point,
+> > e.g. not reporting an error to userspace if connect() fails is awful
+> > behavior for environments that want/need irqbypass to always work.  And
+> > KVM shold probably have a KVM_IRQFD_FLAG_NO_IRQBYPASS if a VM is never going
+> > to use device posted interrupts.  But those are future problems.
+> > 
+> > v2:
+> >  - Collect reviews. [Kevin, Michael]
+> >  - Track the pointer as "struct eventfd_ctx *eventfd" instead of "void *token".
+> >    [Alex]
+> >  - Fix typos and stale comments. [Kevin, Binbin]
+> >  - Use "trigger" instead of the null token/eventfd pointer on failure in
+> >    vfio_msi_set_vector_signal(). [Kevin]
+> >  - Drop a redundant "tmp == consumer" check from patch 3. [Kevin]
+> >  - Require producers to pass in the line IRQ number.
+> > 
+> > v1: https://lore.kernel.org/all/20250404211449.1443336-1-seanjc@google.com
+> > 
+> > [1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+> > [2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
+> > 
+> > Sean Christopherson (8):
+> >   irqbypass: Drop pointless and misleading THIS_MODULE get/put
+> >   irqbypass: Drop superfluous might_sleep() annotations
+> >   irqbypass: Take ownership of producer/consumer token tracking
+> >   irqbypass: Explicitly track producer and consumer bindings
+> >   irqbypass: Use paired consumer/producer to disconnect during
+> >     unregister
+> >   irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+> >   irqbypass: Use xarray to track producers and consumers
+> >   irqbypass: Require producers to pass in Linux IRQ number during
+> >     registration
+> > 
+> >  arch/x86/kvm/x86.c                |   4 +-
+> >  drivers/vfio/pci/vfio_pci_intrs.c |  10 +-
+> >  drivers/vhost/vdpa.c              |  10 +-
+> >  include/linux/irqbypass.h         |  46 ++++----
+> >  virt/kvm/eventfd.c                |   7 +-
+> >  virt/lib/irqbypass.c              | 190 +++++++++++-------------------
+> >  6 files changed, 107 insertions(+), 160 deletions(-)
+> > 
+> > 
+> > base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
+> 
+> Sorry for the delay.
 
-I noticed this while adding a TSO-capable device QEMU to the CI.
-Previously we only run virtio tests and it doesn't report LSO
-stats on the QEMU we have.
+Heh, no worries.  ~2 weeks is downright prompt by my standards ;-)
 
-Fixes: 0d0f4174f6c8 ("selftests: drv-net: add a simple TSO test")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/hw/config | 6 ++++++
- 1 file changed, 6 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/hw/config
+> Do you intend to take this through your trees?
 
-diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-new file mode 100644
-index 000000000000..ea4b70d71563
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/config
-@@ -0,0 +1,6 @@
-+CONFIG_IPV6=y
-+CONFIG_IPV6_GRE=y
-+CONFIG_NET_IP_TUNNEL=y
-+CONFIG_NET_IPGRE=y
-+CONFIG_NET_IPGRE_DEMUX=y
-+CONFIG_VXLAN=y
--- 
-2.49.0
-
+Yes, ideally, it would go into Paolo's kvm/next sooner than later (I'll start
+poking him if necessary).  The s/token/eventfd rename creates an annoying conflict
+in kvm/x86.c with an in-flight patch (significant code movement between files).
+It would be nice to be able to rebase the in-flight patch instead of having to
+resolve a merge confict (the conflict itself isn't difficult to resolve, I just
+find it hard to visually review/audit the resolution due to the code movement).
 
