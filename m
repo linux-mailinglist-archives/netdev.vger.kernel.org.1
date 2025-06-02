@@ -1,166 +1,150 @@
-Return-Path: <netdev+bounces-194649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC44ACBB4C
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:00:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AED22ACBB54
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D05483A6225
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:00:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E73A87A97FA
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3171CA81;
-	Mon,  2 Jun 2025 19:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDBB19DF66;
+	Mon,  2 Jun 2025 19:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GWFmNgou"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tvUiqwrA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE4933F7
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 19:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8120029B0;
+	Mon,  2 Jun 2025 19:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748890844; cv=none; b=RR4w4tYXFU5Cnmt64MtXy08o4VWOqxVbJUsmwRhn7u+liKhh++voJQ/BwDz54E0V5MQfp2Z7skTbKpNt5J152zG3yQyiH69ZyuCSe9ld9kqwW9slkTDc1/AV9vL1I1lnlhV+qjhZQnbTj8gw/oPQbyTFp0f61ay2uyceieAuaQA=
+	t=1748891222; cv=none; b=MyD58JEoM0+yYjnfOMBN+p6bGe3uqh3Co5vX8C7w23wgEMuBC7UFPmUN0tl7IBM/wy84ZJx/DqVWmoNJ8aXhepI2cL01a28/Ufu/lJ6dbjmMmGTJr2zWjk7jc1VKvQiUvquyR8jAbGdYA+vS2KDKh8ZVhDJT6tK+V/t4YAfNhY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748890844; c=relaxed/simple;
-	bh=WTzrwAL3v0QbUCxwUDRBQYjEh6Ha0q2pUIzeniOkvU0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cpA6UEIITnOBpoL9a9xD3AZhBTBLIzFf2JSPFr3n5J+lO3+xA0SMueiovTRANsmWQvVduFWF/0JG5X1/91/k7C+9lZaCHDafuQZQjTUg7zMhCCLB62Aka3MrQ47orqEsuDS/9hK08CfsorTYrmfjB0thjlsD2yXKNsbO/rKj+3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GWFmNgou; arc=none smtp.client-ip=209.85.215.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-b2c4331c50eso3443930a12.3
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 12:00:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1748890842; x=1749495642; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GcH20JTNBaY4y9WzIt8drFwfFqd3EprUGDsBzYEQ4V0=;
-        b=GWFmNgouELc3vo61GoOOb7aPfDIpnoUyL1bAyI5EL5GmPaAAUCFD7fzNzlo61o8PSG
-         CuoB9UPxxDE557XbNj5K45cf5UPzrVwIcz9sLOLZDHBAvyzC70fnfaObk26ipc6HNNmK
-         QNB1Qa/hjqx0JD1oz893vxym+pRGZFu2nKrk0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748890842; x=1749495642;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GcH20JTNBaY4y9WzIt8drFwfFqd3EprUGDsBzYEQ4V0=;
-        b=xC9WiyHcG3+l0pbjMWvINnbENZgtz4kANWul2/frwQ3Doa8qWyzIPx/SyX16DjkznB
-         YBNTQuoPJAT777oPQ/uj28cpQSYbuXJClz3U4EXOLc62R3vQsxuco4u92nsrp0zSXi/w
-         9hKHnNs8/1fHlZtOT4GkkuxPn3bg2pAIn83SY0BQfl6cvopG5xncxASyr6Kap/r27hGZ
-         XFsZh9BELDWML0Gc/GaAIR3eRLn4j9hJgm9nXqA4C4MDnGlVGzciXRfE/OXg1Q7WD8Pc
-         gU7hlmR+oxWhhVWyUzc5EK29ZYFSsRCwA1FZM7hG79qqDES36eM5sYHwoDLakr0Jqlrx
-         CV1A==
-X-Forwarded-Encrypted: i=1; AJvYcCXOnFGcNs/LJON5Jq7cDQ7dRbGysxVdlws/dYrc1Ee6k/zpfwiDt9x8iW1jIG0TkzcaPe9DAi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhOagCamkBp4RtAlpQdUfrYTGCw/2yJ3hynaId+AHHDcybVeYW
-	2oQfhRgO7c707ZXjbu5MfoTjcGZqMWiHa6XZZv9vm/Q465n71LAoG2YpmZ5nOn/xYA==
-X-Gm-Gg: ASbGncv2E8O/tgyf+tiXUxmbKpMXGxw1BbTnawCP3Y69URAiH+shjb1G3CEhz+8RywJ
-	D3x67aw4UuaX4fS/3G/WSiazRj8qmvOdX1OJvgInSBvi5wC9cwxBoLZ7/AVBSIqBFqOz1o7ZdCw
-	fnrFh31Dj4b9Z9wLRkt/5tuNhCcyirzHcj2zBkp7/W/7CkqCLCoUMDEHaCouVOxuAGWtexw3CH0
-	KePg+SbuLxy19SCGXe7W+MnzKDLbP2th8Y8G+1jI02cOAH/HjdZQrG1/l9jqCcNHzmbUFrxAFnX
-	LuDKgKJUmd7aIxSRuTFw7Z31HLkfqnYs5ypO6QUJanfwFeFOA9au9brOpCBGLm9y0v4BiS/0jGl
-	+Z85QohecbDZLQ/bDBSg03V+eUQ==
-X-Google-Smtp-Source: AGHT+IHIrpvkNgSlMz38q6LQHuGQWpTAX7KFlJgjFpEk9HBf0Ufg3NNhVVaSy4N30OgFCMqDHFsaDw==
-X-Received: by 2002:a17:90b:3b90:b0:311:eb85:96df with SMTP id 98e67ed59e1d1-31241531935mr25379469a91.17.1748890841545;
-        Mon, 02 Jun 2025 12:00:41 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3124e3221a4sm5923401a91.42.2025.06.02.12.00.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Jun 2025 12:00:40 -0700 (PDT)
-Message-ID: <53748db9-2efb-4e8b-9583-5fe21fc4b993@broadcom.com>
-Date: Mon, 2 Jun 2025 12:00:39 -0700
+	s=arc-20240116; t=1748891222; c=relaxed/simple;
+	bh=PN3fmGoLa5kt7rDvHpwnwpvdP3RQ8sd6Qaoj4VTuTUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rHlxt4Sjkqqog2bgukgKLInKVXQvW+0RJ8vqVV9L6PCCBdGROyZefmNW4xRNvohJFAT5d6mhUiqKrdLDPzH/DClWV3MGZ0YGJbJpCA7CiheVWGuIQUbUG3x4VlNdvNNMSJ/4KEd35xZAs2EruIK4Hv4AZ+UCStzJ9MMq0v/s4B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tvUiqwrA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nGyo5dQjAPB8J+L3QOcvLvGg54g5jhrVrYCFrnRzTxc=; b=tvUiqwrAM8R3OlXTjiYGxjZcnX
+	4lVFDulQ6QK+hABwtn5ut+laP+gBK7b/MMsz/yU7V3UW+WMghJX/x8tXviESdGy3EIXw2uEkqCUKB
+	BwluKkf30/URDN0iS5tJ1jHcRt5yezT49Dq2fpq+Fzxb7y1lxESCfmGv0gXW5aG/5SBo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uMAUj-00EWdV-3n; Mon, 02 Jun 2025 21:06:49 +0200
+Date: Mon, 2 Jun 2025 21:06:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kees Cook <kees@kernel.org>
+Cc: Pranav Tyagi <pranav.tyagi03@gmail.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: Re: [PATCH] net: randomize layout of struct net_device
+Message-ID: <25d96fc0-c54b-4f24-a62b-cf68bf6da1a9@lunn.ch>
+References: <20250602135932.464194-1-pranav.tyagi03@gmail.com>
+ <053507e4-14dc-48db-9464-f73f98c16b46@lunn.ch>
+ <202506021057.3AB03F705@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/2] net: bcmgenet: add support for GRO software
- interrupt coalescing
-To: Zak Kemble <zakkemble@gmail.com>, Doug Berger <opendmb@gmail.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250531224853.1339-1-zakkemble@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250531224853.1339-1-zakkemble@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202506021057.3AB03F705@keescook>
 
-Hi Zak,
+On Mon, Jun 02, 2025 at 11:03:18AM -0700, Kees Cook wrote:
+> On Mon, Jun 02, 2025 at 04:46:14PM +0200, Andrew Lunn wrote:
+> > On Mon, Jun 02, 2025 at 07:29:32PM +0530, Pranav Tyagi wrote:
+> > > Add __randomize_layout to struct net_device to support structure layout
+> > > randomization if CONFIG_RANDSTRUCT is enabled else the macro expands to
+> > > do nothing. This enhances kernel protection by making it harder to
+> > > predict the memory layout of this structure.
+> > > 
+> > > Link: https://github.com/KSPP/linux/issues/188
+> 
+> I would note that the TODO item in this Issue is "evaluate struct
+> net_device".
+> 
+> > A dumb question i hope.
+> > 
+> > As you can see from this comment, some time and effort has been put
+> > into the order of members in this structure so that those which are
+> > accessed on the TX fast path are in the same cache line, and those on
+> > the RX fast path are in the same cache line, and RX and TX fast paths
+> > are in different cache lines, etc.
+> 
+> This is pretty well exactly one of the right questions to ask, and
+> should be detailed in the commit message. Mainly: a) how do we know it
+> will not break anything? b) why is net_device a struct that is likely
+> to be targeted by an attacker?
 
-On 5/31/25 15:48, Zak Kemble wrote:
-> Hey, these patches enable support for software IRQ coalescing and GRO
-> aggregation and applies conservative defaults which can help improve
-> system and network performance by reducing the number of hardware
-> interrupts and improving GRO aggregation ratio.
+For a), i doubt anything will break. The fact the structure has been
+optimised for performance implies that members have been moved around,
+and there are no comments in the structure saying don't move this,
+otherwise bad things will happen.
 
-Without this patch, seeing the following with an iperf3 server running 
-at a gigabit link:
+There is a:
 
-00:18:19     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal 
-  %guest   %idle
-00:18:20     all    0.53    0.00    9.36    0.00    8.56   18.98    0.00 
-    0.00   62.57
+	u8			priv[] ____cacheline_aligned
+				       __counted_by(priv_len);
 
-and with your patches applied:
+at the end, but i assume RANDSTRUCT knows about them and won't move it.
 
-00:00:56     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal 
-  %guest   %idle
-00:00:57     all    0.00    0.00    3.29    0.00    1.01    7.34    0.00 
-    0.00   88.35
+As for b), i've no idea, not my area. There are a number of pointers
+to structures contains ops. Maybe if you can take over those pointers,
+point to something you can control, you can take control of the
+Program Counter?
 
-so definitively helping, thanks!
+> > Does CONFIG_RANDSTRUCT understand this? It is safe to move members
+> > around within a cache line. And it is safe to move whole cache lines
+> > around. But it would be bad if the randomisation moved members between
+> > cache lines, mixing up RX and TX fast path members, or spreading fast
+> > path members over more cache lines, etc.
+> 
+> No, it'll move stuff all around. It's very much a security vs
+> performance trade-off, but the systems being built with it are happy to
+> take the hit.
 
-Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+It would be interesting to look back at the work optimising this
+stricture to get a ball park figure how big a hit this is?
 
-You will have to repost once net-next opens though:
+I also think some benchmark numbers would be interesting. I would
+consider two different systems:
 
-https://patchwork.hopto.org/net-next.html
+1) A small ARM/MIPS/RISC-V with 1G interfaces. The low amount of L1
+cache on these systems mean that cache misses are important. So
+spreading out the fast path members will be bad.
 
-Thanks!
--- 
-Florian
+2) Desktop/Server class hardware, lots of cores, lots of cache, 10G,
+40G or 100G interfaces. For these systems, i expect cache line
+bouncing is more of an issue, so Rx and Tx fast path members want to
+be kept in separate cache lines.
+
+> The basic details are in security/Kconfig.hardening in the "choice" following
+> the CC_HAS_RANDSTRUCT entry.
+
+So i see two settings here. It looks like RANDSTRUCT_PERFORMANCE
+should have minimal performance impact, so maybe this should be
+mentioned in the commit message, and the benchmarks performed both on
+full randomisation and with the performance setting.
+
+I would also suggest a comment is added to the top of
+Documentation/networking/net_cachelines/net_device.rst pointing out
+this assumed RANDSTRUCT is disabled, and the existing comment in
+struct net_device is also updated.
+
+	Andrew
 
