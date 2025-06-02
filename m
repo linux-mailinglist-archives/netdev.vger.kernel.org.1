@@ -1,172 +1,120 @@
-Return-Path: <netdev+bounces-194581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 423F6ACAC1E
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 11:54:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A77ACAC23
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 11:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33CE917B195
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 09:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB41D17BBCC
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 09:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCF91FECBD;
-	Mon,  2 Jun 2025 09:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82421EB9FD;
+	Mon,  2 Jun 2025 09:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h7covpRT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tJS4Ixnh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A69E1EE02F;
-	Mon,  2 Jun 2025 09:53:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607321EB1BC
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 09:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748858006; cv=none; b=B5iL9RK0hni3flrRddkhcA08+DeRpNpUtmq2pF08Qxa2fzpO0NN+RTbW8bJd8RwKkpMKnrwMACAUv9F+Kf5KJYI7G7Awzzbycc+XwXKcvUJ7c1wIpANd/BYr5TNFbpdXGw9b0z9TeYvrUq9GcbZ8kKyVgK4c1kyYYUbwoWBfrQs=
+	t=1748858178; cv=none; b=DYOmneeLB+ntI9QGZR512QMZPOup3eKlXloiwuLbFiL/EcbL0FviWZrhGstx/f51xFBp12PbeGhr5p2EHYxSokjEzJLTDI7C55eMU6175ycWvbbQG5XLEMguTeG+1LDa7e9u6q1jxy88KjXg+3sRNGRfTdjtt1DGFWBTasTlYIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748858006; c=relaxed/simple;
-	bh=YW0aYGk44OBGXMXwnXBPhhKQgB+lh/nINEBWmVaTupA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nSvbY4074TBWqToP9tWk1y643SLKmmORv5hoY1r/Y0URR9CdWT3W8qy08WLmwXyL9nhzkqJvjq5wRdoCryccEitSrJrax5VqRUsUtADDawNXf1D+2jtXmMfj+dN9hjnro3alnyCeTYzmrUK6WQxZ2soZ6sojYPpC9jKeUU8bkPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h7covpRT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 871FCC4AF0B;
-	Mon,  2 Jun 2025 09:53:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748858005;
-	bh=YW0aYGk44OBGXMXwnXBPhhKQgB+lh/nINEBWmVaTupA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=h7covpRTh3TWctaSOHielhkRdC+O2qJwj1qh7JPnZTo7i1QKzENJBzN8rueMHgUJp
-	 6EZfL15aKWwLCEmDN2RsbsTgCHN3XJjKLl+l5QpzxooUpzIkV31Q5KBEhSob6HlJ9I
-	 D54LDGcf7vy/AoN9XnXzTahHDUxRE5tU8DXy82A44psLmwZtfM+7ve85lbMauo4WBY
-	 MEhf3FKqWn2t7dMeatvyVFtnRYq0RkITSXd1SJE/e0YBkAJaeCHbW61qAj7npGkGFS
-	 P2uryx7vqSf2oWgh+Afek/yj4pB+cIVYthJ66bMtkrx0V3Nh4SiPcS5vVQ3gk4nmZz
-	 0tOI0tGRhnrWg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D973C61CE5;
-	Mon,  2 Jun 2025 09:53:25 +0000 (UTC)
-From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
-Date: Mon, 02 Jun 2025 13:53:17 +0400
-Subject: [PATCH v3 5/5] arm64: dts: qcom: ipq5018: Add GE PHY to internal
- mdio bus
+	s=arc-20240116; t=1748858178; c=relaxed/simple;
+	bh=I5fhIcX9R5LzAmpupA2doeAUw0q6Egg1zDl0/wS0r10=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f0kNdHwIG9wcH3bRnOr9G9oc0DynqKnuGdMvntrbzGZgmlDWMt61b/rl+sJXQXOsAagr1zLOufQ55N6rcfeHdXrjyAF0cBySod17F6QHtvQE2lbbXqLBvP8Z8Hv73T8wbPpurv0qLqNdll+b5/Av7IrOazoeTEIUB8f+A6HjfFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tJS4Ixnh; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c922169051so208016785a.0
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 02:56:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748858176; x=1749462976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I5fhIcX9R5LzAmpupA2doeAUw0q6Egg1zDl0/wS0r10=;
+        b=tJS4IxnhZVLPuRCSlcvZ5MsISx3ym21vfQ2Z6wl9Etaxg5vBWnbEnXNt8fZndy74hn
+         6lNuvxmQHSvnXvjmiOHzdN4ibvrhpx2a3vleg447HY9vAy1xLEM2jTAofB7VIfOm604o
+         lq/s7cFhqnfIUaACw43RW4wWU3rohWnmC0ALFPwveCyAMEf01lopOqyepppxvvzmVkQn
+         7tY3LwUDfvowBisLLwEHsdcf+c9yb/fuVzYHnjhbyFN6aXK0VfKsE/DI1wO2dBOPQ4OK
+         8bPepC5IdQv5849Vj+8K4qRfyBfHjHW2fBlJdppNDXLzQQU7ArzIrG7cTIqRLV2NBc0g
+         MNYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748858176; x=1749462976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I5fhIcX9R5LzAmpupA2doeAUw0q6Egg1zDl0/wS0r10=;
+        b=mA7Pc6DSWlZgzFgAtOZVmFUaWnUPfp2BD764nk5jBXD+sh1KXzkI8qO1mKGe9oedsY
+         V0HGZVdS7bMCGSZKKVupcuzRvoGrttv24/IjOUVHE5ggnJh9y1m6fZy0NEPgEipPOK0a
+         7khmR238kCtwYJAk3myuDKDG6FWXwDqAuDdEXceyI7nePVfmyWpw7vqLmK5oBdx8Geog
+         gup8hdYzgTA3/PaHtsELvDl3tGb5ZbhFJL2uX02zCvrDCl71ukPwsxyqIS38OrV0s1If
+         wej2JLcqh5ppvyDLaPqygLJjGVTssGe8g4RznYRc5XWs6Ub+5KFuGISebT9ysHr4RgTX
+         BdPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWT5vwlSMxmEmh+ImO7ypaU2KRbZqp459CxWri9AB+VTyEI4rG+Or6a0oWhTvd6X6Q767W4KY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeWbWYvlkqh1KRfK5urMm1jqeWjushB7cOzlaJHKDKqsHXWMk+
+	zff/dEO/TLG7NoQEEq+kgVrtrJ1Z89/KeiWskYH5kDZFADEsnaV3eQrzsojJD7cpj05JHbovisl
+	20BAqkRHV5GXVnAOrMIHROvnXO/g0vOG5nj0wqR4W
+X-Gm-Gg: ASbGnctwMmXWP15TktWxzDq/RJPJxANTslJVoivupWD2t3rHCHagXmfes3BJlh/joqw
+	182LTyrjqGnZt/dnrGxp1XThTo4xNuQw9U4tgwdGy9Mqg5RIxquSVE1UEOxa9hqUe5CVuUUxtzq
+	yhAS2yV0pU2J3vz07NeEyxsO1+dvYXsmYn+7sb1PrpZhixAgciiglh
+X-Google-Smtp-Source: AGHT+IGmwhaOBW7VbwSOv1WMBKd6SlJI+wIxiB0zoKBYNRY6n8byD9lTOYsYwTbeAUBOkAF9KY/tvnaFVR/Hn7bYeIU=
+X-Received: by 2002:ac8:5391:0:b0:4a5:912a:7c64 with SMTP id
+ d75a77b69052e-4a5912a7c9dmr19160701cf.30.1748858175900; Mon, 02 Jun 2025
+ 02:56:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250602-ipq5018-ge-phy-v3-5-421337a031b2@outlook.com>
-References: <20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com>
-In-Reply-To: <20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Stephen Boyd <sboyd@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
- linux-clk@vger.kernel.org, George Moussalem <george.moussalem@outlook.com>, 
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1748858002; l=2285;
- i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
- bh=hFpy0osU/0n+A52muRC0D3Drst6JCZAX5hmtJZDrLks=;
- b=N49n6bXKezFjPN5GJPRT+nh05uSgQVNbY4Dz+Qo7xmhVhq7Ajjuu+u12p/VRDTiYU3yFSOF0D
- B9lgYJLAsIHDStM+rLG60GYWVlZU1VyEHjd0n5g4WNRwnLHpOP+cxJ+
-X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
- pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
-X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
- with auth_id=364
-X-Original-From: George Moussalem <george.moussalem@outlook.com>
-Reply-To: george.moussalem@outlook.com
+References: <20250601193428.3388418-1-alok.a.tiwari@oracle.com>
+ <CAHS8izOqWWdsEheAFSwOtzPM98ZudP7gKZMECWUhcU1NCLnwHA@mail.gmail.com>
+ <cc05cbf5-0b59-4442-9585-9658d67f9059@oracle.com> <bf4f1e06-f692-43bf-9261-30585a1427d7@oracle.com>
+In-Reply-To: <bf4f1e06-f692-43bf-9261-30585a1427d7@oracle.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Jun 2025 02:56:04 -0700
+X-Gm-Features: AX0GCFvShUBo8WbtS-wLZUcQnyH6CFG5ESUmItrjErL_sH8T6UjJdi1uunrIFUE
+Message-ID: <CANn89iJS9UNvotxXx7f920-OnxLnJ2CjWSUtvaioOMqGKNJdRg@mail.gmail.com>
+Subject: Re: [PATCH] gve: add missing NULL check for gve_alloc_pending_packet()
+ in TX DQO
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: Mina Almasry <almasrymina@google.com>, bcf@google.com, joshwash@google.com, 
+	willemb@google.com, pkaligineedi@google.com, pabeni@redhat.com, 
+	kuba@kernel.org, jeroendb@google.com, hramamurthy@google.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, darren.kenny@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: George Moussalem <george.moussalem@outlook.com>
+On Mon, Jun 2, 2025 at 1:50=E2=80=AFAM ALOK TIWARI <alok.a.tiwari@oracle.co=
+m> wrote:
+>
+> Hi Mina,
+>
+> On 02-06-2025 01:21, ALOK TIWARI wrote:
+> > Patch itself looks good to me, but if you can, please designate it to
+> > the net tree by prefixing the patch with `[PATCH net v2]` as mentioned
+> > in our docs:
+> >
+> > https://urldefense.com/v3/__https://docs.kernel.org/process/maintainer-
+> > netdev.html__;!!ACWV5N9M2RV99hQ!JPpnRT9itx84rhzAaeGelVD-
+> > bnJR8vFksx2OjGzAKZWf_A6o8hEY0CUMMUO_NuSStcCyBGnvhoJAJlADszR4D_aj$
+> >
+> > Also, if possible, add `Fixes: commit a57e5de476be ("gve: DQO: Add TX
+> > path")` to give it a chance to get picked up by stable trees.
+>
+> I believe commit a6fb8d5a8b69 is a more natural and appropriate
+> candidate for the Fixes tag compared to a57e5de476be
+> What=E2=80=99s your take on this, Mina?
 
-The IPQ5018 SoC contains an internal GE PHY, always at phy address 7.
-As such, let's add the GE PHY node to the SoC dtsi.
+Mina is right. Bug was added back in 2021.
 
-The LDO controller found in the SoC must be enabled to provide constant
-low voltages to the PHY. The mdio-ipq4019 driver already has support
-for this, so adding the appropriate TCSR register offset.
-
-In addition, the GE PHY outputs both the RX and TX clocks to the GCC
-which gate controls them and routes them back to the PHY itself.
-So let's create two DT fixed clocks and register them in the GCC node.
-
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Signed-off-by: George Moussalem <george.moussalem@outlook.com>
----
- arch/arm64/boot/dts/qcom/ipq5018.dtsi | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-index 03ebc3e305b267c98a034c41ce47a39269afce75..d47ad62b01991fafa51e7082bd1fcf6670d9b0bc 100644
---- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-+++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
-@@ -16,6 +16,18 @@ / {
- 	#size-cells = <2>;
- 
- 	clocks {
-+		gephy_rx_clk: gephy-rx-clk {
-+			compatible = "fixed-clock";
-+			clock-frequency = <125000000>;
-+			#clock-cells = <0>;
-+		};
-+
-+		gephy_tx_clk: gephy-tx-clk {
-+			compatible = "fixed-clock";
-+			clock-frequency = <125000000>;
-+			#clock-cells = <0>;
-+		};
-+
- 		sleep_clk: sleep-clk {
- 			compatible = "fixed-clock";
- 			#clock-cells = <0>;
-@@ -184,7 +196,8 @@ pcie0_phy: phy@86000 {
- 
- 		mdio0: mdio@88000 {
- 			compatible = "qcom,ipq5018-mdio";
--			reg = <0x00088000 0x64>;
-+			reg = <0x00088000 0x64>,
-+			      <0x019475c4 0x4>;
- 			#address-cells = <1>;
- 			#size-cells = <0>;
- 
-@@ -192,6 +205,13 @@ mdio0: mdio@88000 {
- 			clock-names = "gcc_mdio_ahb_clk";
- 
- 			status = "disabled";
-+
-+			ge_phy: ethernet-phy@7 {
-+				compatible = "ethernet-phy-id004d.d0c0";
-+				reg = <7>;
-+
-+				resets = <&gcc GCC_GEPHY_MISC_ARES>;
-+			};
- 		};
- 
- 		mdio1: mdio@90000 {
-@@ -232,8 +252,8 @@ gcc: clock-controller@1800000 {
- 				 <&pcie0_phy>,
- 				 <&pcie1_phy>,
- 				 <0>,
--				 <0>,
--				 <0>,
-+				 <&gephy_rx_clk>,
-+				 <&gephy_tx_clk>,
- 				 <0>,
- 				 <0>;
- 			#clock-cells = <1>;
-
--- 
-2.49.0
-
-
+Fixes: a57e5de476be ("gve: DQO: Add TX path")
 
