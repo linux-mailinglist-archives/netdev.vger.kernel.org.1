@@ -1,164 +1,118 @@
-Return-Path: <netdev+bounces-194565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27DCCACAAD2
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:46:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7B0ACAAD8
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34B853A581D
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:46:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B80F9175151
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 08:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE191DC988;
-	Mon,  2 Jun 2025 08:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10761D435F;
+	Mon,  2 Jun 2025 08:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zh5H11YE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="st4dgS23"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B601C84B9
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 08:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317227485;
+	Mon,  2 Jun 2025 08:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748853993; cv=none; b=tfEkKFXdc5m0hG8xx1sRhnG2ahbW/sDNymEgYkM2sBW4PtT0MofS6mkhkQU73UeFVFAR7HYUj8xOKBYPdX04UunouoYyDZsvh0iZ1PXE57yltFeHUglAE1WUw0A6aBa43r+mGhlp2hLBeTtQLsBMTkQoLVcuR7fGDrFz1tX8B3o=
+	t=1748854128; cv=none; b=Sim46KFSHXXK9a3uJjrVgK3Osj+Bs4F1z9DuUEYQUd6PW6uUDjCftnnteEUlSW775a4ArlSMT5mS3YmrJX9XBNHuPknMjv6oWeJyv5i35p6NFhLFONHZGXOZhBM17yvLmr5oY/GPHhFyVEQHUpO0JDMgVpfSPCLflFiiO5yaLew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748853993; c=relaxed/simple;
-	bh=jMbUYSpsToA7O3te9eApd0pFDpdOD0eqFMFbPLpvW2I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FvtfHtFO8QSZ1c52dplrJNMxn4B21PaNvFa1UQ7hnDjl3dtp3s9qaEoDOqhRDy0y0Sr+05TdgFUVpLsL/xp0oZHfs2LlrZ6sc5A+0tegWxa3F/YEiHJyVlDwYrGiMKLawBUgzUiUl0doB/MgZpu2+DLW2ujSpE/YqCLrArONAp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zh5H11YE; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-440667e7f92so28239525e9.3
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 01:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748853989; x=1749458789; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktsVoxepsNTrdCKxowANypGkEb6jHKbHJKn1XhGy1Uw=;
-        b=zh5H11YEjyHf/ZrGbGCtt0Ram36PTgfDVCpkP50fPzhGYifYz56NsRHr1SJDNOLkQ/
-         K0iIa1gQLeNm/fTQQs/czGTGqMofzLe2kIGZYtnEa+BEwPMN7UyWN1IEcthJNN3RVcUy
-         0Z7P2OkpuUPlOXy/X0P85wCgLYOEdFcCBqAJHOTcb4wGIUzFx63gWOmKA8CdR7tnTkj/
-         Zz70blfHTTQpuj78I9t7GOjB5Mf744L7BHpQJkQhGqV18HSQgzt5WvCsdmR4R1upBO/A
-         9MPR8B2tW4PgVrYLjVzx81Q6Bbx4p4HWo6rlttExAAA3/ib3ASiiG4OPZWaLzyvHrXdy
-         ebLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748853989; x=1749458789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktsVoxepsNTrdCKxowANypGkEb6jHKbHJKn1XhGy1Uw=;
-        b=KO1h8l/Jc2VtbslL4+tywb7SF8bfmu7cBvKMObZGW38VBGOqejcEJv1hC2fHwa5Haq
-         yVq80Fc7nvR9CbOqVhElF67AW8DmZzMUaFenNTakr1UdtYNV8Fo0HHpw2UbZXBxUN3Ty
-         Tdd4fzk0QAByUrIu7PaoX6kDmxKLt5NzE+XGCZCpOXowHU8en7moNF1MNdA9V0XerK1Q
-         iqmARifrFecPyGa/pUamtl6pNTt9D48yd0ZGpVhCpoZ4InbPVZ21o05Gv+saa2Zo/YRM
-         XTIe21dinz4XX2z/2HY3VjD2FOmxD2GasqfKgXhROo+N72JxnQd/2ry3Hfwh6E4FAtiG
-         A0Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCWPiuHjF2MjZBKgzv/s8lZ91GR78xmKMr/3eELkeabnlGifof4hT0JYNGH9z6q2MnmM14I5GAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSLnsVw2drHcSxuyJ6uteMcdUml7RUdIAqCVIrzPQQLaBec2y9
-	fTEiVZ2C0IdDTw/xu4/aMImliyQeGEWQU4mDGtKnD/GfEQWrIi1bdcacEo7Cq1Vf1Mmvp2ZMHoX
-	3md20nUsqCZypRgHhyQ==
-X-Google-Smtp-Source: AGHT+IEN8wW1H0RTzFbTdIlqYAJYXEVRMaA4cvq7c8CG74BNxW0QzTAmaWpfyWc/gO5HljzZUpfF3+rdjR1DcgY=
-X-Received: from wmbhc27.prod.google.com ([2002:a05:600c:871b:b0:450:d422:69f9])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4ec9:b0:442:ccfa:fa with SMTP id 5b1f17b1804b1-45121fb9373mr61377385e9.27.1748853988668;
- Mon, 02 Jun 2025 01:46:28 -0700 (PDT)
-Date: Mon, 2 Jun 2025 08:46:26 +0000
-In-Reply-To: <20250530-cstr-core-v11-3-cd9c0cbcb902@gmail.com>
+	s=arc-20240116; t=1748854128; c=relaxed/simple;
+	bh=5/sevNRgUt6k0r1juPz1NfFjuiEUMfrLGg3QCLM8iHg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s88dzHxWOXGeJq+qGcZXfTmv3kenXok6H4T7mwbGYnEX8PpshNQv1X9KQ4MAk1n1U946+vtSvaOq6eWMcDHlx475MZObB2szVicAQD0cwnb1v0naFxP6FK/yrm9WEAABGSjSCHPdKig5MFWlksEPhZ9A3mXIDbuj4WLOKuhzNPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=st4dgS23; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=X/XDYHOwQufeL3WOK7DdzyqsaQP2GwX+j+gHD2jSDoU=; b=st4dgS23gYo9uTJ4WSZyD5h1FZ
+	iX71+qBxv96XEy06iZm1hcqK8iPrrSPd+HMqpg7qgyuW8mO43CGLlfYGSj7VyKZn+icV81LD9qbMy
+	2Cw6EYaw/GB4tEFRF72g3r+29zEVus7wfsy1X9xB4TvzVN7WzhyjxfkW3yanNb4QyhhcYAyvlQkbu
+	VmJEM1B6SIuHRPcqIOlSrLH6Esk6FYQVDbSWKSyFisAp/nqYzE7zbXhwa/lwk26bflsbhqmQlSvyL
+	4MuOveqsNvgKgRsgggn5QWooR85qOmB/7J5uRoKkb0EW4ADBkKKOhSLN4OzhfWYr/XZe1hKSc4jBE
+	jU0/mrQw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35874)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uM0q6-0004hi-13;
+	Mon, 02 Jun 2025 09:48:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uM0py-0007Ug-1a;
+	Mon, 02 Jun 2025 09:48:06 +0100
+Date: Mon, 2 Jun 2025 09:48:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Ilya K <me@0upti.me>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+Message-ID: <aD1lRha-enQ9Pw0g@shell.armlinux.org.uk>
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+ <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+ <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+ <Z3-Tz5WdLCat91vm@shell.armlinux.org.uk>
+ <9cc913d7-7e5b-4b6c-886c-ca9778c3f970@0upti.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250530-cstr-core-v11-0-cd9c0cbcb902@gmail.com> <20250530-cstr-core-v11-3-cd9c0cbcb902@gmail.com>
-Message-ID: <aD1k4rRK8Pt5Tkva@google.com>
-Subject: Re: [PATCH v11 3/5] rust: replace `CStr` with `core::ffi::CStr`
-From: Alice Ryhl <aliceryhl@google.com>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, 
-	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
-	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
-	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cc913d7-7e5b-4b6c-886c-ca9778c3f970@0upti.me>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, May 30, 2025 at 08:27:44AM -0400, Tamir Duberstein wrote:
-> `kernel::ffi::CStr` was introduced in commit d126d2380131 ("rust: str:
-> add `CStr` type") in November 2022 as an upstreaming of earlier work
-> that was done in May 2021[0]. That earlier work, having predated the
-> inclusion of `CStr` in `core`, largely duplicated the implementation of
-> `std::ffi::CStr`.
-> 
-> `std::ffi::CStr` was moved to `core::ffi::CStr` in Rust 1.64 in
-> September 2022. Hence replace `kernel::str::CStr` with `core::ffi::CStr`
-> to reduce our custom code footprint, and retain needed custom
-> functionality through an extension trait.
-> 
-> C-String literals were added in Rust 1.77, while our MSRV is 1.78. Thus
-> opportunistically replace instances of `kernel::c_str!` with C-String
-> literals where other code changes were already necessary or where
-> existing code triggered clippy lints; the rest will be done in a later
-> commit.
-> 
-> Link: https://github.com/Rust-for-Linux/linux/commit/faa3cbcca03d0dec8f8e43f1d8d5c0860d98a23f [0]
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+On Mon, Jun 02, 2025 at 10:19:22AM +0300, Ilya K wrote:
+> On 2025-01-09 12:15, Russell King (Oracle) wrote:
+> > On Thu, Jan 09, 2025 at 09:56:17AM +0100, Eric Woudstra wrote:
+> > I'll look at what we can do for this today.
+> Hey folks, don't really want to necrobump this, but the original hack patch is the only way I can get my weirdo Realtek (noticing a pattern here) GPON modem-on-a-stick to probe at 2500base-x on a BPi-R4. I've actually tracked down the issue myself and wrote basically the same patch first :( Is there anything I can do (with my extremely limited phylink understanding) to help move this forward so other people don't have to suffer like I did?
 
-> diff --git a/rust/kernel/firmware.rs b/rust/kernel/firmware.rs
-> index 2494c96e105f..582ab648b14c 100644
-> --- a/rust/kernel/firmware.rs
-> +++ b/rust/kernel/firmware.rs
-> @@ -4,7 +4,14 @@
->  //!
->  //! C header: [`include/linux/firmware.h`](srctree/include/linux/firmware.h)
->  
-> -use crate::{bindings, device::Device, error::Error, error::Result, ffi, str::CStr};
-> +use crate::{
-> +    bindings,
-> +    device::Device,
-> +    error::Error,
-> +    error::Result,
-> +    ffi,
-> +    str::{CStr, CStrExt as _},
-> +};
+There were two issues that were identified. The first was that when in
+2500Base-X mode, the PCS wasn't reporting link-up. That was addressed
+by the patch series:
 
-Did you not add CStrExt to the prelude?
+Z4TbR93B-X8A8iHe@shell.armlinux.org.uk
 
-> --- a/rust/kernel/error.rs
-> +++ b/rust/kernel/error.rs
-> @@ -164,6 +164,8 @@ pub fn name(&self) -> Option<&'static CStr> {
->          if ptr.is_null() {
->              None
->          } else {
-> +            use crate::str::CStrExt as _;
-> +
->              // SAFETY: The string returned by `errname` is static and `NUL`-terminated.
->              Some(unsafe { CStr::from_char_ptr(ptr) })
->          }
+then, the replacement for Eric's patch was:
 
-Ditto here.
+E1tYhxp-001FHf-Ac@rmk-PC.armlinux.org.uk
 
-Alice
+So the problem should be solved with these applied, as when the PHY is
+attached, "changed" will always be true, which is in effect what Eric's
+patch was doing, but in a cleaner way.
+
+Please confirm that you have all six patches applied.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
