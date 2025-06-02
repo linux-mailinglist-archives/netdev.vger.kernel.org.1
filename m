@@ -1,197 +1,155 @@
-Return-Path: <netdev+bounces-194660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B63ACBBF5
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3719ACBC11
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 802D63A4531
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:53:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23873A4764
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C2919ADA4;
-	Mon,  2 Jun 2025 19:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F324E223DFC;
+	Mon,  2 Jun 2025 19:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCojKUWD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMi50EeR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726B813BC35;
-	Mon,  2 Jun 2025 19:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5872F801;
+	Mon,  2 Jun 2025 19:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748894003; cv=none; b=O+aZWopZtTJyzA2y7lRCeKjl5G/HBj8xSvyoi8T6hdadkXvsNIc8GuRUp89TcnKrDAn2CCGh33jMbtE1X+f6ewmyeW+80Q8zn47Pppl/4xNNJyoOR06TktlVn01C9WC/X29GYvpA52ZtvUhFzSDpJYKeNlIg9lcxnBV59BB4zU4=
+	t=1748894385; cv=none; b=TegxIGwpmZukbE7eHx8XqIM6zLomENJe9MArRjxUAMa9RSUCnJjtBLg9KmXN9hbhb6wPkp72dB5/yl4pRcfyHl6iHZ18W2NruvxPcCf2ncmqazlLsBCcJxCWq3i9VdqoUASkFQ3x7cVCaephvFGUVP/2BKZEAMRBVmdbKSDnoko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748894003; c=relaxed/simple;
-	bh=xxLHPiRenp4yZIphGmjEN+lPuM5g24FnW6uhTp0Vca0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z4IfcTIkev+NP5Uj1s579165/vpveJwX7X2tQwT+BiRZEN8HNO4/4zLBPgTSecCtT0klG1mYZuMDcJWG4+aSqvBWQRrd+6xuxaEXWkcOZHV0yv2amw3rI/KhLs4G0aWR7Ze9AplyEnviJVt0UkUQ2RxC2RdWcjVy2P1O8gcZVhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCojKUWD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A095C4CEEB;
-	Mon,  2 Jun 2025 19:53:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748894002;
-	bh=xxLHPiRenp4yZIphGmjEN+lPuM5g24FnW6uhTp0Vca0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QCojKUWDXjG/Sob0ga6Y/HDBW/ZeZ+5K0tXbOneqzTgPq4Nv6BmQRlaw9kwHqu1Kx
-	 FCTY1JUFGOhcW4mUcIwiRFfQtwpTU+YkLwH3EEdMxHB+GPQd7J8iZlHlM9QElfGldS
-	 q/VuC3Ijb7r28Yf4FwnBRvX/5ojes75ZSPLVlt6HIeiTDPhLMdMXzlnwyLhPV8wFEv
-	 r5cR+nRShgx9uzRT4EMasXilrfzAxAJFzbI7T8a2rc1Qo/5tZwrmzzakzjcv8On4Ps
-	 xFo/qwrQM2IF18hED6I0TvUDaBFPdq0MPvYtiJT23y4ZcqOJbuO4FRTak83wFNk748
-	 MfRDpjKpzqMnQ==
-Message-ID: <a5028d5a-cc93-4ece-bff5-16990a7de2e3@kernel.org>
-Date: Mon, 2 Jun 2025 21:53:17 +0200
+	s=arc-20240116; t=1748894385; c=relaxed/simple;
+	bh=RHvDS4cAJl+92SKascd6+GCLIsOdByGvIOkroYDtzFQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cvtN/a6IJVUXF7U/n3tXAvm5jilzn3scKkXoKN6X8OeuYRF26EJMg6A0SEKalfYJMV27V7keVuXb6tHR23VT4J3wvF/hLWciRgqyyLsUpH+3gUdVbskj6rev6QAMJ9aM4r7jb6VHj1Mx0VbPszbNwmWf00RIsYE1ojVjiIc1frc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMi50EeR; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-70e102eada9so43443007b3.2;
+        Mon, 02 Jun 2025 12:59:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748894383; x=1749499183; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xIhra9oieA5lipSepna6Y8iP2PylydCCjXn7hB/eBYU=;
+        b=YMi50EeRCPKXMllyPCADbX6O/wvnf81CWTeugrJenQUlOGFpbe3zJDnh/W1RMWOVVv
+         fpjAwTHab2cBie98+H4N26ho7tXoQH50z1D67tpjw3v7pDqn+0Uof9g0YewRqKRi9hNF
+         syjiUQKBikTwULBbsODF66e0xPZujLLtaQgstfIsnvkCDnIQL+c0jMY4z+Ks/VubTJ1u
+         GgYHkF1+oYf3+EPNjoNHBcx56nrtr/ch+7zI7iyfVX5zxwK7RO/+/8jsHPBSgu5bAeI8
+         bR3J7UbAwkuupmLELXUjq53nqZJgA//rTHt+JSijfA9somDh/Y/ZuywH3BEdRloXpe/v
+         fPcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748894383; x=1749499183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xIhra9oieA5lipSepna6Y8iP2PylydCCjXn7hB/eBYU=;
+        b=eyeqeEYSgXgRPBtkVPyGORgE8ZB9on/SYG6DlnOLGa3TY012Uy6UyC1kNNRPNe3MRu
+         XcIAQURz5t1SUB0yTTNW3mz+0s25dYDo1C8uiLn+kuKMkIgQXW4eYsAzxTyWJo9n4TI6
+         V38xhZogbOPWAuUeGhBsi39TM3oaB2LzGb/CGLqBPzmwI0J2tvWmpzqPAWUmNX15QVX7
+         wDxWV8NnD3C6E7BLNw13KlgOp7vXUjpp5SCfize8minaTGXndLjai+HJmRwQWHWTyV7+
+         wsyzT2Tto3bp3s6bp38hDGV3A2yVcNBfY5yfAVEAvnnIZNUSFZ6jTAN37kCPxBxweH6d
+         VJqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU59BOTXZAVY9DQFWdgdq4f+1j4ZvH0wsYMxuDLt0PuwaZZQ31yHREEoPrSVyIG0z+5Z2/DZD1Akt748gQ=@vger.kernel.org, AJvYcCUZAA3aQsyT2PYF6k28fZasOhKUm5+TZ0R+sTn1pnICOtZKI2QC9L4wJfAbR+PmgBUTxV7P2yf3@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPW5PolQOYoFM4r0yQ42NMfLH/zX6IMPxCK7YkIfsXLxgaj2Im
+	97xdC1v+ePAMA+yNLCCDjny52yQC3fhvKVPcRWcESLLfvZLmiQtPWtMt6e8xABAdvc4SNcSLz2W
+	14jzHtlAcOWbeN9rAwE7NePYuymXFi8k=
+X-Gm-Gg: ASbGncvb/AsDZPRR47ppsHVwg+JBAgt/cB4MhOFJMYYdi1O1d2ZV+XmO50M86qieczU
+	iHY7HydG4zNKZxS5s5FW/cFIcFMGNXsrAA9UyFva7E1jJ6J8h4CfDrUnN3+D2gNDb917aCNhYYI
+	1zkGA0ONhQ28A8CPnUOQAnMY89Zxcgiuk=
+X-Google-Smtp-Source: AGHT+IFaWA9t31/piCYFAJk6alZKu/kEChLNmdDEWgF6KlX3U4CkL8UaHAE4YZ2ByETQvmO7lewDlSOwJp08MPrWqqE=
+X-Received: by 2002:a05:690c:4485:b0:6fb:1c5a:80ea with SMTP id
+ 00721157ae682-70f97ff9266mr222966767b3.32.1748894382835; Mon, 02 Jun 2025
+ 12:59:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: net: dsa: microchip: add bit-banged SMI
- example
-To: Corentin Guillevic <corentin.guillevic@smile.fr>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250602170458.125549-1-corentin.guillevic@smile.fr>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250602170458.125549-1-corentin.guillevic@smile.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250531101308.155757-1-noltari@gmail.com> <20250531101308.155757-5-noltari@gmail.com>
+ <5d3d04c0-d9e4-4f80-8ab3-7bedb81505b3@broadcom.com>
+In-Reply-To: <5d3d04c0-d9e4-4f80-8ab3-7bedb81505b3@broadcom.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Mon, 2 Jun 2025 21:59:31 +0200
+X-Gm-Features: AX0GCFtdY2lyYs2N50Q99tWdxoPNyeqsskkVl8zfCyMTRNSNLhGpNsTfeSkElC0
+Message-ID: <CAOiHx=nQiYs43oHXJpOhUn1dJ-tzD-TPdB22zcHFxjUBKXeVng@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/10] net: dsa: b53: fix IP_MULTICAST_CTRL on BCM5325
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
+	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vivien.didelot@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 02/06/2025 19:04, Corentin Guillevic wrote:
-> KSZ8863 can be configured using I2C, SPI or Microchip SMI. The latter is
-> similar to MDIO, but uses a different protocol. If the hardware doesn't
-> support this, SMI bit banging can help. This commit adds an device tree
-> example that uses the CONFIG_MDIO_GPIO driver for SMI bit banging.
+On Mon, Jun 2, 2025 at 8:06=E2=80=AFPM Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+>
+> On 5/31/25 03:13, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
+> > BCM5325 doesn't implement B53_UC_FWD_EN, B53_MC_FWD_EN or B53_IPMC_FWD_=
+EN.
+> >
+> > Fixes: 53568438e381 ("net: dsa: b53: Add support for port_egress_floods=
+ callback")
+> > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > ---
+> >   drivers/net/dsa/b53/b53_common.c | 13 +++++++++----
+> >   drivers/net/dsa/b53/b53_regs.h   |  1 +
+> >   2 files changed, 10 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53=
+_common.c
+> > index f314aeb81643..6b2ad82aa95f 100644
+> > --- a/drivers/net/dsa/b53/b53_common.c
+> > +++ b/drivers/net/dsa/b53/b53_common.c
+> > @@ -367,11 +367,16 @@ static void b53_set_forwarding(struct b53_device =
+*dev, int enable)
+> >               b53_write8(dev, B53_CTRL_PAGE, B53_SWITCH_CTRL, mgmt);
+> >       }
+> >
+> > -     /* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide whether
+> > -      * frames should be flooded or not.
+> > -      */
+> >       b53_read8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, &mgmt);
+> > -     mgmt |=3D B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_EN;
+> > +     if (is5325(dev)) {
+> > +             /* Enable IP multicast address scheme. */
+> > +             mgmt |=3D B53_IP_MCAST_25;
+> > +     } else {
+> > +             /* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide whet=
+her
+> > +              * frames should be flooded or not.
+> > +              */
+> > +             mgmt |=3D B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_EN=
+;
+> > +     }
+> >       b53_write8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, mgmt);
 
-So the difference is in one property? Or no difference at all...
+Since the only common thing is the register name, maybe it would make
+more sense to have the flow here
 
-> 
-> Signed-off-by: Corentin Guillevic <corentin.guillevic@smile.fr>
-> ---
-> Changes in v2:
-> - Fix dt_binding_check errors
-> 
->  .../bindings/net/dsa/microchip,ksz.yaml       | 59 ++++++++++++++++++-
->  1 file changed, 58 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> index 62ca63e8a26f..33a067809ebe 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> @@ -241,4 +241,61 @@ examples:
->              };
->          };
->      };
-> -...
-> +
-> +  # KSZ8863 with bit-banged SMI
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    // Ethernet switch connected via SMI to the host, CPU port wired to eth0:
-> +    ethernet0 {
+if (is5325) {
+    enable IP_MULTICAST
+}  else {
+    enable DUMB_FWD_EN
+    enable {UC,MC,IPMC}_FWD_EN
+}
 
+>
+> I don't think B53_IPM_MULTICAST_CTRL is a valid register offset within
+> B53_CTRL_PAGE, or elsewhere for that matter, do you have a datasheet
+> that says this exists?
 
-Drop node, not really used.
+5325E-DS14-R, page 83 (or 105 in pdf paging) on the top.
 
-> +        phy-mode = "rmii";
-> +
-> +        fixed-link {
-> +            speed = <100>;
-> +            full-duplex;
-> +            pause;
-> +        };
-> +    };
-> +
-> +    mdio: mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-
-Order properties according to DTS coding style.
-
-> +        compatible = "microchip,mdio-smi0";
-
-Not relevant. This binding describes device, not bus.
-
-> +        gpios = <&gpioc 1 GPIO_ACTIVE_HIGH>,
-> +            <&gpioa 2 GPIO_ACTIVE_HIGH>;
-
-Messed indentation
-
-> +        status = "okay";
-
-Drop status
-
-but anyway all above is not really relevant, drop.
-
-> +
-> +        switch@0 {
-> +            compatible = "microchip,ksz8863";
-> +            reg = <0>;
-> +            reset-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
-> +            status = "okay";
-
-Drop.
-
-After cleanup from redundant pieces there is basically no difference.
-Don't add examples which differ by compatible (or even by one property).
-
-
-
-Best regards,
-Krzysztof
+Regards,
+Jonas
 
