@@ -1,134 +1,185 @@
-Return-Path: <netdev+bounces-194630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C379ACB966
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 18:19:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B51DACB9EF
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8714C3B2918
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 16:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 151574024D0
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 17:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FB72236F2;
-	Mon,  2 Jun 2025 16:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266E0155A4D;
+	Mon,  2 Jun 2025 17:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="UTsq0rdA"
+	dkim=pass (1024-bit key) header.d=smile.fr header.i=@smile.fr header.b="Q0pP/Un4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA854EAF9
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 16:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28222C3244
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 17:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748881142; cv=none; b=oJE4mGzotarlLRugxhcNa/4dubeqHEowo5n4L+L1DdLud9XQHU9azrzNOM1pgvkOPyoLJWi+JDNYH5MhUIpnKym0MBO34DTW2mht1N8RJnGVE2ZoQue9e6BM3nkEqUU9KBe1m9KFMO2BzrVocT/McTnTMpnEwcgQMqr1DE5xDUI=
+	t=1748883713; cv=none; b=fcyL+V490dA7LwYG4bH/IVkmbM4noCyupqF+3jdyvfnY15ODdoAA/eC+3gmHFy3Oc5J3vzTxtwTBndbr+vSNE7H+xiIJH15RJ8mrZVst/UJXQ4W2/kh8CTEC1EOherphyuHBpW5pH5uVvnwsKMGUwKODCuxQow+44/uikluuJoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748881142; c=relaxed/simple;
-	bh=FeHAqOZWp8WEa/07OySmkjrc1AGvp6/LlQs1Kynu+B8=;
-	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
-	 Content-Type:References; b=XTH+x9v/s0CoyJwBAFz5cn6F3sxOXibmSdorkfy+5WO1aRgSzZHxNV8efoY9Obu8x6eWyAnfkK1IlH4RrbxjDATD/KYNaPojRMfqb/OK8iGWu1mDAKJS2/TkDSvZpNAIur0SFPctlaSq4TqqFO2GIYHZg6+/pLdnxk7g94JzqKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=UTsq0rdA; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250602161858euoutp023939e63fc641661eccfbc8528729aa13~FRiELUwRq1205312053euoutp02X
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 16:18:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250602161858euoutp023939e63fc641661eccfbc8528729aa13~FRiELUwRq1205312053euoutp02X
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1748881138;
-	bh=FeHAqOZWp8WEa/07OySmkjrc1AGvp6/LlQs1Kynu+B8=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=UTsq0rdAjDyx88wAjUEZgSx/kLJsl0Z7g70So2OmYbNcGvFEXV6uMEDkEKNlA6d0O
-	 N0ri/Sxm0MgiIcjnbstwg9upbwZf9UUJLLSw2D0TOhnBZT0HzlyEDngymlZL6sJb2j
-	 +kISpyPlA7CBwT9/OoB9UGey+F52VVbus8/ii5eg=
+	s=arc-20240116; t=1748883713; c=relaxed/simple;
+	bh=HH4IZh2wZ91YFwtu/TN9O0Wjnf2tiVrksx+dUNEHZxc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mg52k1ojTMIUacW5PUodFLRSbdrXb2KJHPNmlpVhJdJsQCueMZhp09uyJyc01YRWwWgtdVCPvFu8+Znzmc5W01E8zVVPZZopmCGiis0M1AH57hewersqyg3NoRziv5FiP4a0M9Nmmou23EmAWSdoWePEnnq0anx3NGlJRlqWOP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smile.fr; spf=pass smtp.mailfrom=smile.fr; dkim=pass (1024-bit key) header.d=smile.fr header.i=@smile.fr header.b=Q0pP/Un4; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smile.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smile.fr
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6049431b0e9so7520895a12.0
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 10:01:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smile.fr; s=google; t=1748883708; x=1749488508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=abDph0Aj5XQN6In+Lzu8X3Vm8VPqLMwLrdQIcHgjTyU=;
+        b=Q0pP/Un4szZNC3IOfyP//MC8RoLsqa8BX7cQHeshkk0oVJI+cLH9PJdgpdO9ODD6HI
+         AAPjPQAyRm0xOR/G2x6bwQdD9PoG07dBQx2mgb06Wppq62s1k0nxpr/iBvzMchPvL9tU
+         yg0p7MIamF3ze7r7R6XGcEWGaSujGVikGwHJA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748883708; x=1749488508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=abDph0Aj5XQN6In+Lzu8X3Vm8VPqLMwLrdQIcHgjTyU=;
+        b=sVA68J4VBfhZ1BxAVowIp8ijE5cGMzY5YUTLDRCoGg1nvbOcHZZAjTQXeh5LxAfg6p
+         osu2gb8tziK47v0wMZDztp1LX3vHuOdg2n4aU8nYg6TjxkcFJ660jjm68TJq8Pvonnw1
+         8z/x5Zv0ADegRMIVBoSYxpDNb8AGCXtmhFVzZzGT72o//DcfkkXHk5DwgKxzqTgbyG8d
+         modTQZdOHEsLDRdKpk+BAU6rzVJkrj1wmKUIPLtn0/Be62rORP+SwPlec2x7bgUdJpTq
+         1rV30ScsjXHQ7VG1RjTfMm/LhM4k631zczw1jqJzd/nNQtmN1yFWQMMw0/jUB4n994Eg
+         asWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXnt+k9gFZ0YsHcYswm4gebdS7RGK1M4j6p/Uk5uEh07XYRo7HxyA996K5CykM7PGM5VMAvq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvPq0OR9VdMa7SF2gxtlaOUd31K14VgCONGH9Q8f13KOXNJWeh
+	2qvlb4lgXL+ey9SdcWEyzURQw9iLCqh5C39+k1J2xcQQSOnn4CwGtzX3mtl6C1ONi8RwLV2pFO0
+	Ro39qFdxEjq1Z+Fm+uwibUd4om2/jG+38/FwvcVTORg==
+X-Gm-Gg: ASbGncv5y2PkJ6toPmAyvfGcbv+xWdaskEyMHmPH0PAv7yA21ByxznWcsXjix8CcnJn
+	jSsTAthIHhb+HboLw8ZVXfYiwDEmN4rbu4jduviSIAAciMYdC8n181lly3QRXslIRLLaP//LEzV
+	Kvg1jrepclD/dezTcvm4fwzB/kcBW0uU1P7PgYDoPbM2Y=
+X-Google-Smtp-Source: AGHT+IG76GcE0CyIGvdYC6symGR++l6I7RyOq2ODj2VjqbpsYHvlsULDDGdmeG91WwsK5n6zSyCNIMvbwaUqpWiOWN8=
+X-Received: by 2002:a05:6402:280f:b0:602:3e6d:9334 with SMTP id
+ 4fb4d7f45d1cf-6057c628879mr10562013a12.24.1748883707841; Mon, 02 Jun 2025
+ 10:01:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE: Re: Re: [PATCH bpf v2] xsk: Fix out of order segment free in
- __xsk_generic_xmit()
-Reply-To: e.kubanski@partner.samsung.com
-Sender: Eryk Kubanski <e.kubanski@partner.samsung.com>
-From: Eryk Kubanski <e.kubanski@partner.samsung.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
-	<stfomichev@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com"
-	<magnus.karlsson@intel.com>, "jonathan.lemon@gmail.com"
-	<jonathan.lemon@gmail.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <aD3LNcG0qHHwPbiw@boxer>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20250602161857eucms1p2fb159a3058fd7bf2b668282529226830@eucms1p2>
-Date: Mon, 02 Jun 2025 18:18:57 +0200
-X-CMS-MailID: 20250602161857eucms1p2fb159a3058fd7bf2b668282529226830
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-X-EPHeader: Mail
-X-ConfirmMail: N,general
-X-CMS-RootMailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-References: <aD3LNcG0qHHwPbiw@boxer> <aDnX3FVPZ3AIZDGg@mini-arch>
-	<20250530103456.53564-1-e.kubanski@partner.samsung.com>
-	<20250602092754eucms1p1b99e467d1483531491c5b43b23495e14@eucms1p1>
-	<aD3DM4elo_Xt82LE@mini-arch>
-	<CGME20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009@eucms1p2>
+MIME-Version: 1.0
+References: <20250528203152.628818-1-corentin.guillevic@smile.fr> <174846881248.859527.7504198795486149705.robh@kernel.org>
+In-Reply-To: <174846881248.859527.7504198795486149705.robh@kernel.org>
+From: Corentin GUILLEVIC <corentin.guillevic@smile.fr>
+Date: Mon, 2 Jun 2025 19:01:37 +0200
+X-Gm-Features: AX0GCFuEbqSxAst_bXA7BoLSAfRzF9ne8TSDsrwoFAMFO0l0IJqCz-SKpTzZj5U
+Message-ID: <CAMFqQmoKEiakkXhhQf4E8fMYQSV76sKNdnKNEBoMh_+OL7riew@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: dsa: microchip: add bit-banged SMI example
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: devicetree@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Marek Vasut <marex@denx.de>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Vladimir Oltean <olteanv@gmail.com>, 
+	Woojung Huh <woojung.huh@microchip.com>, Conor Dooley <conor+dt@kernel.org>, 
+	UNGLinuxDriver@microchip.com, Paolo Abeni <pabeni@redhat.com>, 
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Eryk, can you tell us a bit more about HW you're using? The problem you
-> described simply can not happen for HW with in-order completions. You
-> can't complete descriptor from slot 5 without going through completion of
-> slot 3. So our assumption is you're using HW with out-of-order
-> completions, correct?
+Le mer. 28 mai 2025 =C3=A0 23:46, Rob Herring (Arm) <robh@kernel.org> a =C3=
+=A9crit :
+>
+>
+> On Wed, 28 May 2025 22:31:51 +0200, Corentin Guillevic wrote:
+> > KSZ8863 can be configured using I2C, SPI or Microchip SMI. The latter i=
+s
+> > similar to MDIO, but uses a different protocol. If the hardware doesn't
+> > support this, SMI bit banging can help. This commit adds an device tree
+> > example that uses the CONFIG_MDIO_GPIO driver for SMI bit banging.
+> >
+> > Signed-off-by: Corentin Guillevic <corentin.guillevic@smile.fr>
+> > ---
+> >  .../bindings/net/dsa/microchip,ksz.yaml       | 57 +++++++++++++++++++
+> >  1 file changed, 57 insertions(+)
+> >
+>
+> My bot found errors running 'make dt_binding_check' on your patch:
+>
+> yamllint warnings/errors:
+> ./Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:246:1: [er=
+ror] missing document start "---" (document-start)
+> ./Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:246:3: [er=
+ror] syntax error: expected '<document start>', but found '<block sequence =
+start>' (syntax)
+>
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/dsa/microchip,ksz.yaml: ignoring, error parsing file
+> Traceback (most recent call last):
+>   File "/usr/bin/yamllint", line 33, in <module>
+>     sys.exit(load_entry_point('yamllint=3D=3D1.29.0', 'console_scripts', =
+'yamllint')())
+>              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
+^^^^^^^^^
+>   File "/usr/lib/python3/dist-packages/yamllint/cli.py", line 228, in run
+>     prob_level =3D show_problems(problems, file, args_format=3Dargs.forma=
+t,
+>                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>   File "/usr/lib/python3/dist-packages/yamllint/cli.py", line 113, in sho=
+w_problems
+>     for problem in problems:
+>   File "/usr/lib/python3/dist-packages/yamllint/linter.py", line 200, in =
+_run
+>     for problem in get_cosmetic_problems(buffer, conf, filepath):
+>   File "/usr/lib/python3/dist-packages/yamllint/linter.py", line 137, in =
+get_cosmetic_problems
+>     for problem in rule.check(rule_conf,
+>   File "/usr/lib/python3/dist-packages/yamllint/rules/indentation.py", li=
+ne 583, in check
+>     yield from _check(conf, token, prev, next, nextnext, context)
+>   File "/usr/lib/python3/dist-packages/yamllint/rules/indentation.py", li=
+ne 344, in _check
+>     if expected < 0:
+>        ^^^^^^^^^^^^
+> TypeError: '<' not supported between instances of 'NoneType' and 'int'
+> ./Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:246:3: but=
+ found another document
+> make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/dsa/mic=
+rochip,ksz.example.dts'
+> Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:246:3: but f=
+ound another document
+> make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentatio=
+n/devicetree/bindings/net/dsa/microchip,ksz.example.dts] Error 1
+> make[2]: *** Waiting for unfinished jobs....
+> make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1524: dt_bin=
+ding_check] Error 2
+> make: *** [Makefile:248: __sub-make] Error 2
+>
+> doc reference errors (make refcheckdocs):
+>
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/202505=
+28203152.628818-1-corentin.guillevic@smile.fr
+>
+> The base for the series is generally the latest rc1. A different dependen=
+cy
+> should be noted in *this* patch.
+>
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+>
+> pip3 install dtschema --upgrade
+>
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your sch=
+ema.
+>
 
-Maciej this isn't reproduced on any hardware.
-I found this bug while working on generic AF_XDP.
+Sorry,.. I send a fixed one.
 
-We're using MACVLAN deployment where, two or more
-sockets share single MACVLAN device queue.
-It doesn't even need to go out of host...
-
-SKB doesn't even need to complete in this case
-to observe this bug. It's enough if earlier writer
-just fails after descriptor write. This case is
-writen in my diagram Notes 5).
-
-Are you sure that __dev_direct_xmit will keep
-the packets on the same thread? What's about
-NAPI, XPS, IRQs, etc?
-
-If sendmsg() is issued by two threads, you don't
-know which one will complete faster. You can still
-have out-of-order completion in relation to
-descrpitor CQ write.
-
-This isn't problem with out-of-order HW completion,
-but the problem with out-of-order completion in relation
-to sendmsg() call and descriptor write.
-
-But this doesn't even need to be sent, as I
-explained above, situation where one of threads
-fails is more than enough to catch that bug.
-
-> If that is the case then we have to think about possible solutions which
-> probably won't be straight-forward. As Stan said current fix is a no-go.
-
-Okay what is your idea? In my opinion the only
-thing I can do is to just push the descriptors
-before or after __dev_direct_xmit() and keep
-these descriptors in some stack array.
-However this won't be compatible with behaviour
-of DRV deployed AF_XDP. Descriptors will be returned
-right after copy to SKB instead of after SKB is sent.
-If this is fine for you, It's fine for me.
-
-Otherwise this need to be tied to SKB lifetime,
-but how?
+Regards,
+Corentin
 
