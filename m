@@ -1,130 +1,150 @@
-Return-Path: <netdev+bounces-194585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF6AACAC8F
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:35:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F700ACAC94
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECD3174006
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:35:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 156493A61DE
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 10:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22BE31A23B7;
-	Mon,  2 Jun 2025 10:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sFWT2U0t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410EF1F55F8;
+	Mon,  2 Jun 2025 10:36:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFFD1474DA;
-	Mon,  2 Jun 2025 10:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC221DED5C;
+	Mon,  2 Jun 2025 10:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748860506; cv=none; b=BCvYh1DF2zvfK2x4JExDsCtaeTlHSEUIiYKXxhfFY84LZHwDTd430SA6f/RkrDwvOJ+CWNixIO4bwJK7180XpXHDBIbfiDvPxYVTD3uudHqBbfreVxMmie7AhkrFFhtPDCmSQwYmHgYcX5/M0js4HZCggzWRHctzlsPtVr0zJ0k=
+	t=1748860613; cv=none; b=fC+vdL4Or4ZBOj9PQshvVWWE8cHFZkCUPwTPR2wdVYFji4gSKGYdG6BpKavaE80au6/r65bcgH9KAO9FgsAWXOdip7JeUoHgK1RWbE7Vo3ojSDvhY+cEYqra/UVW+gjYymIW6QRuE19ps8dHCWNT1W5GZ9cXBNXuCWys7DCwSzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748860506; c=relaxed/simple;
-	bh=8E0T9v34xRXXRTGYhDuC2chi+g4DNJyzdc253h68kVE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IyWupGMdkO2Zykc6zuflKpK77ubGU7BqqE/EtBJR3yFjTNnrnkU/yDkU4K4UNVyl/9cF5hHiYnwrfBbtNQmKXpsLVRWlJ00bUaCnTtHq8VGAupjTbRrYU5PLgkPCj+IgbDi9cZpLG54E6IpPTMZpZ7kkoM8rEpyHOu23KMG5GFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sFWT2U0t; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5525tr8k004819;
-	Mon, 2 Jun 2025 10:34:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=d10F09HKcE9vaVzFWvr1qZcc2RWk1
-	4iuUKZIIZ0UNXs=; b=sFWT2U0tcUzcxbygvZqDNLRPuAru8T+DbpX887WYjeGte
-	Sia8d5diuf5bwXWgXQ3ND0gS4TdizmheDNCIkVNQi1gGF9o1utQ0fo8B9tBvx0AR
-	8RGHqeskI2wwKi598IJk8gpbczrx/hkz552huOpgzMopK8gFnEgr3oWuSJByRWZa
-	bPE+iu598DrtwY3u5UiTiNfID0XhOmC1JiOu0O3FsMgLvOG27FPDjlmIopk2a+X0
-	xzXkkupEtC1ZZxzL4eNnuEVsWuoGSzK+0LZuO78dcnHsKXEE4da9X+BjWAJveI2F
-	yuyZy5nzBVseblns4XankOdq2SLAjvUwNfdZ6g5UQ==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46ystetbbb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 02 Jun 2025 10:34:54 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5529Iu6N016230;
-	Mon, 2 Jun 2025 10:34:54 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46yr77t4tt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 02 Jun 2025 10:34:53 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 552AYrmZ019775;
-	Mon, 2 Jun 2025 10:34:53 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 46yr77t4t9-1;
-	Mon, 02 Jun 2025 10:34:53 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: almasrymina@google.com, bcf@google.com, joshwash@google.com,
-        willemb@google.com, pkaligineedi@google.com, pabeni@redhat.com,
-        kuba@kernel.org, jeroendb@google.com, hramamurthy@google.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com, linux-kernel@vger.kernel.org,
-        darren.kenny@oracle.com
-Subject: [PATCH net v2] gve: add missing NULL check for gve_alloc_pending_packet() in TX DQO
-Date: Mon,  2 Jun 2025 03:34:29 -0700
-Message-ID: <20250602103450.3472509-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1748860613; c=relaxed/simple;
+	bh=Iii/Yj+1tStQr0+EYCTD9JhtDIsq64XtSnizfzrvUYY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=msXzwz7fyzkjZsLFYR95rPwWgX9S3Z5vPtQYETwEBb2fme2naNiprLmBkOjPP1xMqYrXnrkMtR5zj7NXXRddlfoPti9WhFzWltGV4t3RT1IuY6bM3/xihulbMg6irxsa3wKXD5RTcrStfGKD5cI1HZ7nkfolm5H4Z6CM48KikOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ad51ef2424bso814455366b.0;
+        Mon, 02 Jun 2025 03:36:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748860610; x=1749465410;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eOvWlqJyIdxb0F+c7ZReClfTkAnCyE8T1KtZuZ09rWA=;
+        b=SquxWGodXI0rQOxXAqJ2TipghcuDnKPnjRU8/F6s/hWIym99wyYFMvuSRqS23FcSh1
+         HGdRYTh46JuILqoSPpFdp8l5jHNrLwtqJbA2GgT8JFiuyEL3B2BLOUdaIG72I6vzBn9b
+         wOT1P/ZnvWBzRk2zgMZcSnJjRm3sh1FpxWcRODtDChsomOS3vjrxhDMh58gnO2fy60VQ
+         Y5Y0ul2WHv2HVSIUtI4BrlocQg5vNbqNFIw7+Z5TnTsPigTQt14m82m7E4XK5IBBQUnl
+         roddSDmRt6k2xZamZOKgcVro321kl0DsK9U+9oGNbRXY6WfKs66CvI1XlmMCYKkTqRTM
+         oU7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUTScFPDwu44cZUnVoxdz0r95JQhJ95bKdZKoSrr0KNwYpdMCDP65sTgXeOrwrMpvQ7GcKqH5kq0f2/8Tm0avRz@vger.kernel.org, AJvYcCUUSDEhUPjhOXQGFYlyM/9BJnnvzb2aIpQPBv1/pMMYWzcUG5Org9OGS0TnojF+0BNwUMDMOJW7Z+8NkfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIgL4qurHAdnmDJhae0irt5KSAkikFpMM1lgHn0E52J8KX8LtI
+	nfVuCIaTVGjmHA9cfXnyMCnHC4dMB5Jz6zts0q3hNpdblejyiy8qiYUpyYKwiQ==
+X-Gm-Gg: ASbGncudXjByOrYTjWVdz5SnTN+0b9vJ0ko+FrzKFHCPYGR9Afamy9vZa9v7P8uvval
+	MYyZKutDi1xX+14tu18yHjXmcsCJAwgbr1i7FeqbsN19spjlLbcAVT5wDVhYpBtGrIgJ+3u+5FP
+	AVQ1+okeBLsaABp//C5UXKG26pkcKbe7skTO3oGVKj6Jtv6mut7TCHG++YloZcT7rbaYEyzquGZ
+	3j/phZKTJ1p9HOtR/XrI4ocmGJnkHII32Z/94F+/Zr6d1mwb0BnbaD/1hmE8yL0ZpJg+isy58fg
+	vpB+3Pjo1VqqzoHCDcYc/n7xtPMER2YiFIENKo89X+I=
+X-Google-Smtp-Source: AGHT+IFqrSsK8DY8V7dpy2QWJnivCTTR1nffZQDrcCO1vwDrUr8YD0Tyd2L3H6BOPP2E8rlS+6MgwQ==
+X-Received: by 2002:a17:907:7f94:b0:ad5:557b:c369 with SMTP id a640c23a62f3a-adb494e5db8mr823445366b.33.1748860609305;
+        Mon, 02 Jun 2025 03:36:49 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:43::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d82ef07sm781166166b.69.2025.06.02.03.36.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 03:36:48 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/4] netconsole: Optimize console registration
+ and improve testing
+Date: Mon, 02 Jun 2025 03:34:40 -0700
+Message-Id: <20250602-netcons_ext-v2-0-ef88d999326d@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-02_04,2025-05-30_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
- bulkscore=0 spamscore=0 suspectscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506020091
-X-Proofpoint-ORIG-GUID: 20Yu7RZYW7vRRmyRVOW4vrtwH_FHnZf1
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAyMDA5MSBTYWx0ZWRfXyF47Lr94UO4d Hirr2bG1ZdyZbX24qpd2SRfUXzzT/NADrXx4VQ1tQDE4bK0uMfoy6A+4hmnlAPACblaHhQjEfaP CQtT/m6LPREY0rIbzT8Ffs8i+EH5Bl3LT3gqkblKRXZjie4WTTLleQxfuJG/ka/thh7G6TjsxSY
- baP+pMXk0LiwPldbPPvvFXjBQzncIvbDXUBbc9XtQIe1h/xE+ZKFl2lvMtAmSx1Y9ruakcx0p0n OS8Vcqzp3PpU44KzQVIdbeaRKV+VQdwWmeu9B+g8WIPYU0M1rN/aUVY394Ar/JFSmWAggHQIymy RCIXzn0Z5s1jK2T6fVISti1oXhMPgsKurqHRpTi1tHU3eVolwMeXcQhic+U5w3qGbx/HLDXwBBp
- b5izZuHtaekdJ2o6WDDd9NtTvlXMoYHQ+8ot5YvCsWvinDr9MogmUzuGgownGxSkqSnG+8BR
-X-Proofpoint-GUID: 20Yu7RZYW7vRRmyRVOW4vrtwH_FHnZf1
-X-Authority-Analysis: v=2.4 cv=XpX6OUF9 c=1 sm=1 tr=0 ts=683d7e4f cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=1XWaLZrsAAAA:8 a=YHu3FHGigSco7_P9gqwA:9
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEB+PWgC/23NSwqDMBRG4a2Ef2xKEnyPuo8iJepV7+SmJEEs4
+ t4Ljjs+8J0TiSJTQq9ORNo5cRD0yhUK0+ZlJc0zegVnXGUq12qhPAVJbzqyrhrXta623UgehcI
+ n0sLHrb0glLXQkTEUChunHOL33uz27n/F3Wqr625pLJWmJGOeM43s5RHiiuG6rh8g3lNgsQAAA
+ A==
+X-Change-ID: 20250528-netcons_ext-572982619bea
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Shuah Khan <shuah@kernel.org>, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ gustavold@gmail.com, Usama Arif <usamaarif642@gmail.com>, 
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2005; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Iii/Yj+1tStQr0+EYCTD9JhtDIsq64XtSnizfzrvUYY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoPX6/XCo3OGp0efr+CfY3n2LxrS9VH9qlf6pd6
+ vzJTtkLITaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaD1+vwAKCRA1o5Of/Hh3
+ bTRED/9FNDpQXJQZFpIM6d8twxfbI14m6eLbFhZcbuYmAY9jfqOVzEt9hR3yy3msK24qedtwrcE
+ MbL5oNbemOnQJ+L+TQ7dXi0Vv+vLuvQatDn3vMJu1jVlNzhVh27uICk8o4dRKScpFRcM0fiZlNE
+ zEHylAkhPiY0zF5kd5jqWAh6pPxfP49UEbscwRFT2d9FtqfDOROZBM/twJG7bOnuaHvsGt/v1Sg
+ 73jzVeoHsYHNbNpfGeCM4y5NhVgVPgfqJL9mS7ctKk1NK9N3BF2QcT0lOCUxQEIjCn4hpBC1+8s
+ zjDRzm/aAWPdYvipQhFPKIt1Gp6V9DYYACHB5p8qus6ePsq/SS5f40LqSnEw2e6Flv6cHoJPoJu
+ DC0JVs/yBo8nEAew06loItGrhP2JO371QtOniyGlYg0IpXgre3erm6D7TJt+9YgsHBX33DDJvX0
+ v+EJOCANYkK08zpVwff9HxojfEDUEW2VjZ7mRPtk17jujo2VHnV7gRayfEGOEIpsDIg0TPpXzd/
+ uEeOGMMwWN4xX6eUdSYALfNQxRTydVTRM7Czy+ER/yFa2lmumtdhlykQCQE+7ZOmEbA7E408lZ+
+ 5FgIndLqDVHVnI8uwRotrmvzQkzQKiiq8qREuxUFHMjcti37V8XOcSFFnT9YgFN8qh+9AYn7Q/l
+ VfN4KeLASj4NrYw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-gve_alloc_pending_packet() can return NULL, but gve_tx_add_skb_dqo()
-did not check for this case before dereferencing the returned pointer.
+During performance analysis of console subsystem latency, I discovered that
+netconsole registers console handlers even when no active targets exist.
+These orphaned console handlers are invoked on every printk() call, get
+the lock, iterate through empty target lists, and consume CPU cycles
+without performing any useful work.
 
-Add a missing NULL check to prevent a potential NULL pointer
-dereference when allocation fails.
+This patch series addresses the inefficiency by:
 
-This improves robustness in low-memory scenarios.
+1. Implementing dynamic console registration/unregistration based on target
+   availability, ensuring console handlers are only active when needed
+2. Adding automatic cleanup of unused console registrations when targets
+   are disabled or removed
+3. Extending the selftest suite to cover non-extended console format,
+   which was previously untested
 
-Fixes: a57e5de476be ("gve: DQO: Add TX path")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+The optimization reduces printk() overhead by eliminating unnecessary
+function calls and list traversals when netconsole targets are not
+configured, improving overall system performance during heavy logging
+scenarios.
+
 ---
-v1->v2
-added Fixes tag and [PATCH net v2]
----
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 3 +++
- 1 file changed, 3 insertions(+)
+Changes in v2:
+- Added selftests to test the new mechanism
+- Unregister the console if the last target got disabled
+- Sending to net-next instead of net (Jakub)
+- Link to v1: https://lore.kernel.org/r/20250528-netcons_ext-v1-1-69f71e404e00@debian.org
 
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index a27f1574a733..9d705d94b065 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -764,6 +764,9 @@ static int gve_tx_add_skb_dqo(struct gve_tx_ring *tx,
- 	s16 completion_tag;
- 
- 	pkt = gve_alloc_pending_packet(tx);
-+	if (!pkt)
-+		return -ENOMEM;
-+
- 	pkt->skb = skb;
- 	completion_tag = pkt - tx->dqo.pending_packets;
- 
+---
+Breno Leitao (4):
+      netconsole: Only register console drivers when targets are configured
+      netconsole: Add automatic console unregistration on target removal
+      selftests: netconsole: Do not exit from inside the validation function
+      selftests: netconsole: Add support for basic netconsole target format
+
+ drivers/net/netconsole.c                           | 61 +++++++++++++++++++---
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 27 ++++++++--
+ .../testing/selftests/drivers/net/netcons_basic.sh | 50 +++++++++++-------
+ 3 files changed, 107 insertions(+), 31 deletions(-)
+---
+base-commit: 914873bc7df913db988284876c16257e6ab772c6
+change-id: 20250528-netcons_ext-572982619bea
+
+Best regards,
 -- 
-2.47.1
+Breno Leitao <leitao@debian.org>
 
 
