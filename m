@@ -1,183 +1,115 @@
-Return-Path: <netdev+bounces-194632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D46AACB9F8
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3D3ACBA79
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAC3B4026AD
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 17:05:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2001C3A75A0
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 17:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE80421CA07;
-	Mon,  2 Jun 2025 17:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819D517B421;
+	Mon,  2 Jun 2025 17:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=smile.fr header.i=@smile.fr header.b="FJW8+aBS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Us3o10N3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECFA155A4D
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 17:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D676523A
+	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 17:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748883920; cv=none; b=jzp14/dn/y0rqYP89EXJEndiPbG8rSr6U1iCDSmLZ0Cikp+6E/wcIVz0IvCPndaUlWmlBCF7kLLY4tEP2d+KOI7Xhq9Z+q0opPmmnN3qtlPrB/Dfc71jWHoiuUZ7YrAZ46s/0nviVuchiVXhm1n1HuXN1H5yAuVkgLncotgB3Nk=
+	t=1748886695; cv=none; b=hNvYQ9aTuDjIybAg0HXpdUbhQRi2VTItB5aXNho+9rS4cXgn1xw2FjtZmr4o7x4bKnzVSJtwPaMVEnwTSqa8fWT+7EYKsZoGynX5+eWfO8r1uG05q5vRKHzRKCxjm00pLx5nHEQeCiFmcVGgiHowRKYzyXOdnyRsKWw6rcIoRSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748883920; c=relaxed/simple;
-	bh=EVmWrbes+DrEvV763dUtaIkINBe+NAnCg0Oomi3YIH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kiO/GxrliIxCNVKMnce48rSZh610OTaMdad+dkGUoGq4f1HjPRWR1ZSVZcG2KGCXKUeLGr7BwVkxJGmOExjEi0o7Rs7FONM8EVz8vaYii2GqdZjc7bdG7WioR764gu8cf8IIY9IKddL6KgTZEC1UJHZXCYTt+1HfTLUhB/MPM+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smile.fr; spf=pass smtp.mailfrom=smile.fr; dkim=pass (1024-bit key) header.d=smile.fr header.i=@smile.fr header.b=FJW8+aBS; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smile.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smile.fr
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-450d668c2a1so22758175e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 10:05:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smile.fr; s=google; t=1748883917; x=1749488717; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iSmzenDLo0lOAHDwohwCizehWGuiTqHtMMxqt2ZXZoU=;
-        b=FJW8+aBSU1ViX3aAlBdDU1g1V82oZVBStctV6LDBTzxorn7QZgtx67KzS3yE0WOvtN
-         tXTS03QaEFb4NOib5J/jFHtRnRYxo4kyzjFODH/S5V0JiUWcOH0eiggjLiuZ0G09ze3a
-         DMCTMz4EXRKqNVBYqkz8lswqLwum82x3P2zzQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748883917; x=1749488717;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iSmzenDLo0lOAHDwohwCizehWGuiTqHtMMxqt2ZXZoU=;
-        b=c6C9JtcyoWf7NOkabV5rF4LOv1y49JYfn1GCC198PBHKc9BRiUnOOZ9PwGNCU1vLyh
-         N7ovQ+0N4XKdRAOzCBM0txWJUBPg+1d+8lF2BkKRQCZw3h1kbj0yROomGB8wuUlo5Mow
-         4Bg9owmmnQFJOAvSXCsEHT6D3JdEoQFDLgv+spfe50ilH/s9oljIihN19I/jgsAXeHh3
-         m5w23Gc/ST9Jx2YwPUCWFF8SLDsMR5yVvOScbJDqDO8MaGzVHJv0lnCURo5PaOa5OKgT
-         yxgAWfWxLmkv665A6EL4SR0Kl8h4pb4KqdKXtJZQ+4vmWtc43dnFkFNAr3Bq8eeUP7YV
-         kgiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIfYZf4DjMY/LHpGXCXMPyzC8DU5cjiQ8HAe+Xm9behMBsai2PaWlkKpu6GpnY/10NytU0efE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyqx3OiljV2prKb68wHyyH9tFDFHNM1D/z8F8ed1rLumqZXNRQK
-	wEYL9X8oMAi8nI1mZYUiujqRSw8m4maUdx2+aFlnYcaH4OUZS2j2S+mPR1eB9Tp8wSY=
-X-Gm-Gg: ASbGncsdhWvcDwh0HQWOFVvTrzGmvPahH9x6l4z3d3TDiXGZKf6Si8cjQOaRm0SxztG
-	ReesYBBMKfHYwcvKV8ej0LUbF7SC8IqyeE5w6opGw8dkhFpXProuty53SVxJLRFEZRgeTPxytSX
-	zvYdxYIxZcXPUAk7kSQ4J5uEnunOFfLM90KhES7a/iwMvO9/RrphVWDhJw9XImzPliT39x7krxA
-	pwWvzwjCruDZe9maEYFYzU6cQynM9b+RmOyksnp2/VL7q0EsOv7gDafzs13xtEq+espsVc7JkPZ
-	6p4gL5rFgLYMLVPzIKyC+lzqKCaLVB3o3MYvHDFTgiOAYF4bI7sytxBnD3c9X8k4gBbrtQ==
-X-Google-Smtp-Source: AGHT+IEeIEyfIdg3dwyZenyn+vmwOhfjrZrRF2OqaliD83zxTjDsg4j4B6iszO5xYR2iPbGvRrtfkA==
-X-Received: by 2002:a05:600c:1906:b0:43b:c857:e9d7 with SMTP id 5b1f17b1804b1-451e39566cemr2068175e9.5.1748883917210;
-        Mon, 02 Jun 2025 10:05:17 -0700 (PDT)
-Received: from heaven.lanfs.local ([62.161.254.42])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7f8ed27sm135293415e9.2.2025.06.02.10.05.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 10:05:16 -0700 (PDT)
-From: Corentin Guillevic <corentin.guillevic@smile.fr>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1748886695; c=relaxed/simple;
+	bh=cmYfIkVp2GhB7UtadlrV/W7IP6KSNE8PR/uzTHE33Mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ioyz8tQm4F4otbbgXixnBQe6JzrSRIyhc6WzvnYzdO7tOTTSZTQfqMQACWdh73nO2ixD7E0r6k0mvTU4QzPnQUltu8m5EGQK3eSzXx7fQTLlqVA7d+hPPpRI0287u3xt32gcYzvvDdCdnUATyJER44sjf8xZJjtCZVoLzhXsapg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Us3o10N3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31608C4CEEB;
+	Mon,  2 Jun 2025 17:51:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748886694;
+	bh=cmYfIkVp2GhB7UtadlrV/W7IP6KSNE8PR/uzTHE33Mo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Us3o10N3mDoMbCSp28Uu6+R2M+PcFrjvpFLmU4V48QpzqZuYYFbajcrfvegmAm/6l
+	 wFcF9khuS5iPLPQr5JncapQyk1ckfiipwXgBdv4/X77HuXojKwNhmX3rlXRFzDA8SZ
+	 hMIMnQd2Op3SqW7p891CXODxkSaQTbzvmOaWlnR+3FZ7qhvitOYYFc6OoBvt2D9THu
+	 GrMkpSQw0lffYM7zOI8gzpPqoDQaRQ6E7iQQZx5N0DFIMXNBye7QhiqDuF7ts59Zu8
+	 1WS81x8mfihD9QGIQbWgX707kQ0fMHX0OFh4+EWsczyqt29nHmdBq3bysJp5QiCjTt
+	 14Ab+/JlhkLmQ==
+Date: Mon, 2 Jun 2025 19:51:31 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marek Vasut <marex@denx.de>
-Cc: Corentin Guillevic <corentin.guillevic@smile.fr>,
-	Woojung Huh <Woojung.Huh@microchip.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] dt-bindings: net: dsa: microchip: add bit-banged SMI example
-Date: Mon,  2 Jun 2025 19:04:57 +0200
-Message-ID: <20250602170458.125549-1-corentin.guillevic@smile.fr>
-X-Mailer: git-send-email 2.49.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: airoha: Initialize PPE UPDMEM source-mac
+ table
+Message-ID: <aD3kozxODijtDEZi@lore-desk>
+References: <20250529-airoha-flowtable-ipv6-fix-v1-0-7c7e53ae0854@kernel.org>
+ <20250529-airoha-flowtable-ipv6-fix-v1-1-7c7e53ae0854@kernel.org>
+ <20250530180501.GQ1484967@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+DvCR9HLpxO5M9dR"
+Content-Disposition: inline
+In-Reply-To: <20250530180501.GQ1484967@horms.kernel.org>
 
-KSZ8863 can be configured using I2C, SPI or Microchip SMI. The latter is
-similar to MDIO, but uses a different protocol. If the hardware doesn't
-support this, SMI bit banging can help. This commit adds an device tree
-example that uses the CONFIG_MDIO_GPIO driver for SMI bit banging.
 
-Signed-off-by: Corentin Guillevic <corentin.guillevic@smile.fr>
----
-Changes in v2:
-- Fix dt_binding_check errors
+--+DvCR9HLpxO5M9dR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- .../bindings/net/dsa/microchip,ksz.yaml       | 59 ++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
+> On Thu, May 29, 2025 at 05:52:37PM +0200, Lorenzo Bianconi wrote:
+> > UPDMEM source-mac table is a key-value map used to store devices mac
+> > addresses according to the port identifier. UPDMEM source mac table is
+> > used during IPv6 traffic hw acceleration since PPE entries, for space
+> > constraints, do not contain the full source mac address but just the
+> > identifier in the UPDMEM source-mac table.
+>=20
+> Hi Lorenzo,
+>=20
+> I think it would be nice to also mention a bit more clearly what (broken)
+> behaviour this fixes. Likewise for patch 2/2.
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-index 62ca63e8a26f..33a067809ebe 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-@@ -241,4 +241,61 @@ examples:
-             };
-         };
-     };
--...
-+
-+  # KSZ8863 with bit-banged SMI
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    // Ethernet switch connected via SMI to the host, CPU port wired to eth0:
-+    ethernet0 {
-+        phy-mode = "rmii";
-+
-+        fixed-link {
-+            speed = <100>;
-+            full-duplex;
-+            pause;
-+        };
-+    };
-+
-+    mdio: mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+        compatible = "microchip,mdio-smi0";
-+        gpios = <&gpioc 1 GPIO_ACTIVE_HIGH>,
-+            <&gpioa 2 GPIO_ACTIVE_HIGH>;
-+        status = "okay";
-+
-+        switch@0 {
-+            compatible = "microchip,ksz8863";
-+            reg = <0>;
-+            reset-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
-+            status = "okay";
-+
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+                lan1: port@0 {
-+                    reg = <0>;
-+                    label = "lan1";
-+                    phy-mode = "internal";
-+                };
-+                lan2: port@1 {
-+                    reg = <1>;
-+                    label = "lan2";
-+                    phy-mode = "internal";
-+                };
-+                port@2 {
-+                    reg = <2>;
-+                    label = "cpu";
-+                    ethernet = <&ethernet0>;
-+                    phy-mode = "rmii";
-+                    microchip,rmii-clk-internal;
-+
-+                    fixed-link {
-+                        speed = <100>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+        };
-+    };
--- 
-2.49.0
+Hi Simon,
 
+sure, I will do it in v2.
+
+Regards,
+Lorenzo
+
+>=20
+> >=20
+> > Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+> ...
+
+--+DvCR9HLpxO5M9dR
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaD3kowAKCRA6cBh0uS2t
+rFEgAQCvb6SYN8dv2ZvK999PTUzFx/PPLSgb3FFdFD8wcLjLDQD/YQkBTN9CF57q
+h2ebypsgUx5rdgJ07u1RTYhudd96rAI=
+=6fUW
+-----END PGP SIGNATURE-----
+
+--+DvCR9HLpxO5M9dR--
 
