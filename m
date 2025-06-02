@@ -1,55 +1,51 @@
-Return-Path: <netdev+bounces-194601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACAAACAE5B
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 14:57:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC371ACAEAC
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 15:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43D8317D9B1
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 12:57:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA0C74023FF
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 13:09:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460AF21B9C2;
-	Mon,  2 Jun 2025 12:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C2B221DB1;
+	Mon,  2 Jun 2025 13:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="hMTyHcPG"
+	dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b="EzcWINEr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-71.smtpout.orange.fr [193.252.22.71])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01EE1F461D;
-	Mon,  2 Jun 2025 12:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0611B221DA0;
+	Mon,  2 Jun 2025 13:08:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748869046; cv=none; b=UdqDGwqnFKRoATRXYT/6rLofbv1Zrj5gIPEGiokSZ92Py5BeCG0RkaPGFxP/vKKwz/mMp+p4Q7Ei53VWjdYyPMyVm9VeEmnqyXNlo+ueOQ+BzPERGY1iXD09pPvT/ez7x61umKzNNBj9Szay1+C2t/3KEqMEDEiQZDgz23o29iw=
+	t=1748869727; cv=none; b=ZD6cGKTjFrI6QeogsVoCiHkftC24lAnMYX0wlZJ5snmZIxCvMpHmIqsfOz2zGbD0tV6hZiKSExROIMXRURTV8EUYrqcYsYlS3d8nbHmojrocCk0BRuAKGSoAPMSawBBhj6p9jxm0Euhhs7Ii2PuVfcTXQB26Xrj1Qe7SEu0mPsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748869046; c=relaxed/simple;
-	bh=1T+4SjlPktQEfdR3wxZEdOF+qZdvMuowjfd72KE39/E=;
+	s=arc-20240116; t=1748869727; c=relaxed/simple;
+	bh=yTEXqsnUcW3cl5WcXbdMtFzmwUho1rDc7vZsuRYKyXU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gfj0osIgjZvQAPmyr44hMmUKyQYpJmflmQZIRtLCqUjw8h6+bQgnQjK/Kv3eIJ7f8cKC2Z1wNJ7XM9Ej/f2IX+TLx2mkdiVk5xJ1IkihFkkG0jHK/YqLeP+nDUBZ4OwJS9BIiWVUqVTCXORKMdJbCbRESaITrZN9pZhSasqbss0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=hMTyHcPG; arc=none smtp.client-ip=193.252.22.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id M4hyu0vvBVLIhM4hzubQOb; Mon, 02 Jun 2025 14:56:09 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1748868969;
-	bh=tJpgnt56+6gsOzEu20toZVeHIgDQ2dRsyJW0tnHgKwU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=hMTyHcPGlhHISDzQz5qTSzqnDykQUtWBMCIHzWUVj2pdesekSkWwhFfyMuuJwLfNa
-	 UQaDLpOwEnOra0eVwbcoeXPA2VD6Tuz/XFbegSLffE2EXvWufC6f3rCVTsvLpXCYyS
-	 gxWqq11aRkNodTBMMRdiqyTlCyVxfgql6CnE2lXt9rnxdAlQsqiuiKir8jHK4Cag7j
-	 +Kmp4DqQOaLPeY7C2WGEJ09sL/qGDYQP3XZXlK05E5drY/TD3mkSDfPnMZbcxdlPAQ
-	 wAyqk7Hn/XK70Fu8yuKqqL7uVT5cybD8bPOgcjnFVxRZscDpnZT+140aG2+BfCFrb+
-	 OX5CSooo41hsw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 02 Jun 2025 14:56:09 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <ad3dbd97-eb25-41bc-a105-1fd328b53899@wanadoo.fr>
-Date: Mon, 2 Jun 2025 21:56:05 +0900
+	 In-Reply-To:Content-Type; b=lTfWjxXNz6q98PXo1kFA9yDRzg5MMs0uH9UA7FECSCgeupQ8iu7SjxPeCqjzdYsrg30hfiXy82VGV0iG82mpU4Gj9TpvIgynItNEgM0qLiVqWs1DhXggNP5DT53unxNDhC1xCQ/BNpIztrNnx8NBqxUuLRJKEAbn76scvMgMzZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me; spf=pass smtp.mailfrom=0upti.me; dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b=EzcWINEr; arc=none smtp.client-ip=178.154.239.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0upti.me
+Received: from mail-nwsmtp-smtp-production-main-74.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-74.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:160e:0:640:a44a:0])
+	by forward501a.mail.yandex.net (Yandex) with ESMTPS id 89D6961677;
+	Mon,  2 Jun 2025 16:00:19 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-74.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id F0aS6QbLoa60-v1prNre5;
+	Mon, 02 Jun 2025 16:00:18 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=0upti.me; s=mail;
+	t=1748869218; bh=oZ32ri9UvCA0ZFnxXbOjw3nZYx8ajIN2VWmbh80DLjU=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=EzcWINEr1YcBsyckPUR3nlN3K+/LMzSaQKkMLqlbcJj6CrPBngXx/eDKc18C6WbJ+
+	 RJztATJ/WAvys8DZNnSxo0MbSn+9ezY18d5m9s1x9LMmcGUTwkR4lIQP67AAm6ZkCd
+	 Gv5gMnOxTZ5Oaa0NtUAkqX5gKrFUfqZi7JSa191U=
+Authentication-Results: mail-nwsmtp-smtp-production-main-74.iva.yp-c.yandex.net; dkim=pass header.i=@0upti.me
+Message-ID: <2894a781-4d4b-4e3c-9f4e-7c1f04122f8a@0upti.me>
+Date: Mon, 2 Jun 2025 16:00:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,176 +53,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/6] can: netlink: add interface for CAN-FD Transmitter
- Delay Compensation (TDC)
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Stefan_M=C3=A4tje?= <Stefan.Maetje@esd.eu>
-References: <20210918095637.20108-1-mailhol.vincent@wanadoo.fr>
- <20210918095637.20108-5-mailhol.vincent@wanadoo.fr>
- <CAMuHMdVEBLoG084rhBtELcFO+3cA9_UrZrUfspOeLNo80zyb9g@mail.gmail.com>
- <10ed3ec2-ac66-494a-9d3f-bf2df459ebc0@wanadoo.fr>
- <CAMuHMdWDUpkwPVCm2Dha04F59MES4QvKFUVfvg70x5GPZHsxDA@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+ <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+ <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+ <Z3-Tz5WdLCat91vm@shell.armlinux.org.uk>
+ <9cc913d7-7e5b-4b6c-886c-ca9778c3f970@0upti.me>
+ <aD1lRha-enQ9Pw0g@shell.armlinux.org.uk>
 Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CAMuHMdWDUpkwPVCm2Dha04F59MES4QvKFUVfvg70x5GPZHsxDA@mail.gmail.com>
+From: Ilya K <me@0upti.me>
+In-Reply-To: <aD1lRha-enQ9Pw0g@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 02/06/2025 at 16:23, Geert Uytterhoeven wrote:
-> Hi Vincent,
+On 2025-06-02 11:48, Russell King (Oracle) wrote:
+> On Mon, Jun 02, 2025 at 10:19:22AM +0300, Ilya K wrote:
+>> On 2025-01-09 12:15, Russell King (Oracle) wrote:
+>>> On Thu, Jan 09, 2025 at 09:56:17AM +0100, Eric Woudstra wrote:
+>>> I'll look at what we can do for this today.
+>> Hey folks, don't really want to necrobump this, but the original hack patch is the only way I can get my weirdo Realtek (noticing a pattern here) GPON modem-on-a-stick to probe at 2500base-x on a BPi-R4. I've actually tracked down the issue myself and wrote basically the same patch first :( Is there anything I can do (with my extremely limited phylink understanding) to help move this forward so other people don't have to suffer like I did?
 > 
-> On Sat, 31 May 2025 at 10:25, Vincent Mailhol
-> <mailhol.vincent@wanadoo.fr> wrote:
->> On 30/05/2025 at 20:44, Geert Uytterhoeven wrote:
-
-(...)
-
->> Let me first repost what I wrote but this time using numerals and letters
->> instead of the bullet points:
->>
->>   The TDC netlink logic works as follow:
->>
->>    1. CAN_CTRLMODE_FD is not provided:
->>       a) if any TDC parameters are provided: error.
->>
->>       b) TDC parameters not provided: TDC parameters unchanged.
->>
->>    2. CAN_CTRLMODE_FD is provided and is false:
->>       a) TDC is deactivated: both the structure and the
->>          CAN_CTRLMODE_TDC_{AUTO,MANUAL} flags are flushed.
->>
->>    3. CAN_CTRLMODE_FD provided and is true:
->>       a) CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: call
->>          can_calc_tdco() to automatically decide whether TDC should be
->>          activated and, if so, set CAN_CTRLMODE_TDC_AUTO and uses the
->>          calculated tdco value.
->>
->>       b) CAN_CTRLMODE_TDC_AUTO and tdco provided: set
->>          CAN_CTRLMODE_TDC_AUTO and use the provided tdco value. Here,
->>          tdcv is illegal and tdcf is optional.
->>
->>       c) CAN_CTRLMODE_TDC_MANUAL and both of tdcv and tdco provided: set
->>          CAN_CTRLMODE_TDC_MANUAL and use the provided tdcv and tdco
->>          value. Here, tdcf is optional.
->>
->>       d) CAN_CTRLMODE_TDC_{AUTO,MANUAL} are mutually exclusive. Whenever
->>          one flag is turned on, the other will automatically be turned
->>          off. Providing both returns an error.
->>
->>       e) Combination other than the one listed above are illegal and will
->>          return an error.
->>
->> You can double check that it is the exact same as before.
->>
->>> By default, a CAN-FD interface comes up in TDC-AUTO mode (if supported),
->>> using a calculated tdco value.  However, enabling "tdc-mode auto"
->>> explicitly from userland requires also specifying an explicit tdco
->>> value.  I.e.
->>>
->>>     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
->>                                                                 ^^^^^
->> Here:
->>
->>   - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
->>
->>   - CAN_CTRLMODE_TDC_{AUTO,MANUAL} and tdc{v,o,f} not provided: so we *are* in
->>     sub-clause a)
->>
->> 3.a) tells that the framework will decide whether or not TDC should be
->> activated, and if activated, will set the TDCO.
->>
->>> gives "can <FD,TDC-AUTO>" and "tdcv 0 tdco 3", while
->>
->> Looks perfectly coherent with 3.a)
->>
->> Note that with lower data bitrate, the framework might have decided to set TDC off.
+> There were two issues that were identified. The first was that when in
+> 2500Base-X mode, the PCS wasn't reporting link-up. That was addressed
+> by the patch series:
 > 
-> Yes, that case is fine for sure.
+> Z4TbR93B-X8A8iHe@shell.armlinux.org.uk
 > 
->>>     ip link set can0 type can bitrate 500000 dbitrate 8000000 fd on
->>> tdc-mode auto
->>
->> This time:
->>
->>   - CAN_CTRLMODE_FD provided and is true: so we are in close 3.
->>
->>   - CAN_CTRLMODE_TDC_AUTO is provided, we are *not* in sub-clause a)
->>
->>   - tdco is not provided.
->>
->> No explicit clauses matches this pattern so it defaults to the last
->> sub-clause: e), which means an error.
->>
->>> gives:
->>>
->>>     tdc-mode auto: RTNETLINK answers: Operation not supported
->>
->> Looks perfectly coherent with 3.e)
+> then, the replacement for Eric's patch was:
 > 
-> Thanks, I misread this as clause 3.a being applicable (hasn't NOT a
-> higher precedence than AND? ;-)
-
-Now I see where your confusion comes from.
-
-But if I read:
-
-  Paul and Mary not present
-
-I understand that both are absent. I do not see an ambiguity that Paul may be
-present and only Mary absent.
-
-Well, I guess this is what occurs when you write in English instead of C.
-
-And I just realize that there was an actual mistake in my description: I forgot
-to state the obvious and I omitted to mention that TDC_OFF means that TDC is
-forcefully deactivated.
-
->>> unless I add an explicit "tdco 3".
->>
->> Yes, if you provide tcdo 3, then you are under 3.b).
->>
->>> According to your commit description, this is not the expected behavior?
->>> Thanks!
->>
->> Looking back to my commit, I admit that the explanation is convoluted and could
->> be hard to digest, but I do not see a mismatch between the description and the
->> behaviour.
+> E1tYhxp-001FHf-Ac@rmk-PC.armlinux.org.uk
 > 
-> OK, so the description and the behaviour do match.
+> So the problem should be solved with these applied, as when the PHY is
+> attached, "changed" will always be true, which is in effect what Eric's
+> patch was doing, but in a cleaner way.
 > 
-> However, I still find it a bit counter-intuitive that
-> CAN_CTRLMODE_TDC_AUTO is not fully automatic, but automatic-with-one-
-> manual-knob.
+> Please confirm that you have all six patches applied.
+> 
 
-Fair enough. In truth, TDC_AUTO and TDC_MANUAL means respectively
-TDC_ON_WITH_TDCV_AUTO and TDC_ON_WITH_TDCV_MANUAL.
+That's weird, because I do have all the patches applied. I think this may have been broken by the pcs_inband_caps changes, because without the patch I'm just getting "autoneg setting not compatible with PCS", after which it bails, when it should really reconfigure the MAC instead.
 
-The problem is that it makes close to no sense to allow the user to ask to have
-TDC explicitly ON and TDCO automatically calculated. And if I recall, TDC_AUTO
-and TDC_MANUAL is also consistent with what I found in the datasheets.
-
-On a side note, I still have to update Documentation/networking/can.rst to add
-some TDC explanations. I will of course not change the naming (this is part of
-the UAPI, so now it is set in stone), but I will try to clarify the concerns you
-raised here so that the documentation is more clear than my patch comments.
-
-Also, I am not writing this documentation any soon. CAN-XL has a higher priority
-in my TODO list :)
-
-
-Yours sincerely,
-Vincent Mailhol
-
+(resending because I replied instead of reply-all by accident)
 
