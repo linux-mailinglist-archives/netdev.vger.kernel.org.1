@@ -1,197 +1,112 @@
-Return-Path: <netdev+bounces-194570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BC67ACAB59
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 11:28:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 220B6ACAB7C
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 11:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3903BC06B
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 09:27:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E2DF189BB6D
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 09:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B161DF75C;
-	Mon,  2 Jun 2025 09:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD8E1DF728;
+	Mon,  2 Jun 2025 09:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LPUN2xMY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hh11yP2J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00330BE6C
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 09:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F45A920;
+	Mon,  2 Jun 2025 09:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748856479; cv=none; b=nCSQn3a8FSXbePhC47XStSoWZow9EBM52NS8M/+9lq4xPIxCEyfgZf9I0lFxRY/MCJ0BnEzaTwZn0iMcP2qLcl6QxZobWJpsTMZVEfyxdTrFAW6pOqEEVjAi0rc805i2kVZ6+JVc+VLCkeinmaBjX/SR1sgrbjDIGPnmDe0DquQ=
+	t=1748857055; cv=none; b=LMJ1U0qpwkrGDFqwcuiJGXbCDUjPxwH1Se6kJt1t7UWDRrEJBEB4ip6DZdVyFtTvAEajrp6v2QJ3BgXd2Y6geg7glGwhpB2xIm2xcCwn3Mx804QT19Dtp5txMa6NJpcsMGEY0VIXVLsP0guogkayrq8t/L0M4aJ3IMpmi4O4uqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748856479; c=relaxed/simple;
-	bh=/uRonHDMgAb0wFA9zPFFRECao/tvSKnkaJBJMuh/T+0=;
-	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
-	 Content-Type:References; b=ULA1ZQN/N8ffkO54Rc11u8pM0bPZwJlexStwXmhDHBfTueFg+e/NZ/NWT6mxFKZtmY+9M0Fm+KTLrl68HcSdXzucEt4G2CTmCG8kYLt4MsftBo2YZc9QiVTzBVhRrjwrN51pxYxTidvdfsX1hg3XkErD9I9beQptCn9edpnSRDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LPUN2xMY; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250602092754euoutp01e64573957f793cb9eec37768a0b20e5f~FL7K6opVf0793807938euoutp01H
-	for <netdev@vger.kernel.org>; Mon,  2 Jun 2025 09:27:54 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250602092754euoutp01e64573957f793cb9eec37768a0b20e5f~FL7K6opVf0793807938euoutp01H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1748856475;
-	bh=ori1WjGvSN+iMz/nFdzMcGCHXG5z5JaYTLC/dZ9ojao=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=LPUN2xMYDz9QC76uehJ3cR4u7RMeRsByhJQbONHsKkF7mCeTnn32z57L7jbt/rTxU
-	 Entdr6W/XhhXPfv9PcnyHH34Jc3lFf8jhSDq56UB/FoLex73Tf89aMY40DOdHLDPy6
-	 irwyRVhJfUUppx7hCy5U9Nq1IlBIWTgGyYn54cLM=
+	s=arc-20240116; t=1748857055; c=relaxed/simple;
+	bh=gX6orxA/UV2aY4E8x3UQLkcLWz2Od09M6861ebakXig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewPiqHr4nuEW7KwU4GJEafyP+g7nk+Z2q+Ie9hsZ3Z+OcJg8sMkA0W7yJbhF0pC9c6rU+HngxC2HTyaI7Cx+XhdPLU1RMYUepQ6OZFo/4sWIFAQ6Rl9QpYRFnpnH0WzoWIHZovIc819037mOZ85sgwv3/vSD4UPKYGjiQuIAgtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hh11yP2J; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ad56886dd60so31415266b.2;
+        Mon, 02 Jun 2025 02:37:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748857052; x=1749461852; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WQxylw/p29sFR7A8ErN4cGXAefnIZYceNaxZSz3yM0U=;
+        b=hh11yP2JslFx8qWzKLcEztwVSz/jmMJrN3jJazDOeqk6ayGktFlHXWGJkz0P1upFBI
+         n0DjxVjkm2DJadxzVScTsRDZkp4a8eTiDj+I6QYtMgcFpJOjFhH7U0pzlhOlIbwOC9EA
+         amZX/etDe9c54JFin7UC4wXYR4ggeZyl1n7RTXRqL9En1Ofqmos+EkHRLixtYtrc1j0b
+         jtkpnaofca1PxIqqfW6/xiSES0bKFEkplGtjZOpWItrpOIR9Not2IbExbEwRPnMjD0ff
+         pyvMo6Anppopqhms3v6gJldmkHSHtV86m4RQ9ySuBXOrO3p2FOf55R4Dzwe6ylTWCghZ
+         Z4aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748857052; x=1749461852;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WQxylw/p29sFR7A8ErN4cGXAefnIZYceNaxZSz3yM0U=;
+        b=rjOaCaAmtYOR6WPrHYuw8XjN8RqFE+VWEtokUut3jQbK8DrVzKSLzvu/sNuJfkOS9Z
+         ybomjrd3TlM6YNBD0ATv1VQfd2VJ4AY7Uvnwf68gEbxzupPVxdvjtGY1LPCeLnccitWC
+         m3mXG27+CA8cxOqcciJqkGvxcpolz/TiP4LxQe5QeDlXyyr1L1NjcuH4anGI1NDU469i
+         H5F6d4aLvrttMdR4/G1dwNMuDPXqAnp8KE07X4UnUPE+wyYk0+ztkYfikmrK/ILVZikF
+         t8hjb7OwbLQ1M97F3mVZZP8cZQyVMCnRddCzU6VHcDZd5esuREu0C2VYJNanE713d5k7
+         SA8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXkJ3Mz1T3TIalNxjuEkFI9Rb56+yAD7c4byDtxIkkbQ6WC08TpilerEQb4LHkClumvHOizx+s5@vger.kernel.org, AJvYcCXxepXhHubPKYzQ35XI2NoLefkZzN56KoEv9GmDkd3o0lZwjIwDRXfzjfXEd3XjEHQNAmJnqlmJ4+I+prI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFwgOaqzr1+a6KvbKUe2EMV94JpJrJzKTUGqemy1PiOR4FfS3x
+	Y6Yg+piI7pxuTq4VhkaGTfRHKNt8+X3QENLSNWDnV+HkootUBzx5kGoEsSYQ5A==
+X-Gm-Gg: ASbGncs0ENUm7BBQXUmCyy8woGEmjE9YiM56xDsqh6QA6E4gUGUS9gGg9EWSG3VW78C
+	lJf1VNx24+6x0OlEshnvJ6DZga7DWTHmtYDRCtGAmy/iUWjOvJOhL3qpbwuFAYklgxyXNm/dweZ
+	lbId4v5uA1H3vWPzxF3m2lKxxm+J79N9z7FMfq3FILCI2ayjZ2tPdJPt+A0TuidVClDiPSPelEf
+	DY4bIYsbJNKeDXLjYHjaJOefvLrWn7b/BmOm6FaEXArwOyAJaa8m4yJQ13claq8iyY+na/qzALQ
+	GTj/eIXQzknEptKte9vm5YeHa6xlad/RVYd9GLI=
+X-Google-Smtp-Source: AGHT+IGG0NkXu0xcD5YRrx3VhPk05FgiykGfWfJ7sprXcYrUMKcrHTugQt+PqRMDOtNYTBVte+DR7w==
+X-Received: by 2002:a17:907:9810:b0:ad8:90db:8012 with SMTP id a640c23a62f3a-adb369989f2mr375721566b.0.1748857051933;
+        Mon, 02 Jun 2025 02:37:31 -0700 (PDT)
+Received: from skbuf ([86.127.125.65])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada6ad696d1sm765610166b.161.2025.06.02.02.37.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 02:37:30 -0700 (PDT)
+Date: Mon, 2 Jun 2025 12:37:28 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>
+Cc: jonas.gorski@gmail.com, florian.fainelli@broadcom.com, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vivien.didelot@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Subject: Re: [RFC PATCH 02/10] net: dsa: b53: prevent FAST_AGE access on
+ BCM5325
+Message-ID: <20250602093728.qp7gczoykrown34k@skbuf>
+References: <20250531101308.155757-1-noltari@gmail.com>
+ <20250531101308.155757-3-noltari@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE: Re: [PATCH bpf v2] xsk: Fix out of order segment free in
- __xsk_generic_xmit()
-Reply-To: e.kubanski@partner.samsung.com
-Sender: Eryk Kubanski <e.kubanski@partner.samsung.com>
-From: Eryk Kubanski <e.kubanski@partner.samsung.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com"
-	<magnus.karlsson@intel.com>, "maciej.fijalkowski@intel.com"
-	<maciej.fijalkowski@intel.com>, "jonathan.lemon@gmail.com"
-	<jonathan.lemon@gmail.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <aDnX3FVPZ3AIZDGg@mini-arch>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20250602092754eucms1p1b99e467d1483531491c5b43b23495e14@eucms1p1>
-Date: Mon, 02 Jun 2025 11:27:54 +0200
-X-CMS-MailID: 20250602092754eucms1p1b99e467d1483531491c5b43b23495e14
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-X-EPHeader: Mail
-X-ConfirmMail: N,general
-X-CMS-RootMailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
-References: <aDnX3FVPZ3AIZDGg@mini-arch>
-	<20250530103456.53564-1-e.kubanski@partner.samsung.com>
-	<CGME20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009@eucms1p1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250531101308.155757-3-noltari@gmail.com>
 
-> I'm not sure I understand what's the issue here. If you're using the
-> same XSK from different CPUs, you should take care of the ordering
-> yourself on the userspace side?
+Hello,
 
-It's not a problem with user-space Completion Queue READER side.
-Im talking exclusively about kernel-space Completion Queue WRITE side.
+On Sat, May 31, 2025 at 12:13:00PM +0200, Álvaro Fernández Rojas wrote:
+> BCM5325 doesn't implement FAST_AGE registers so we should avoid reading or
+> writing them.
+> 
+> Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitch")
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
+> ---
 
-This problem can occur when multiple sockets are bound to the same
-umem, device, queue id. In this situation Completion Queue is shared.
-This means it can be accessed by multiple threads on kernel-side.
-Any use is indeed protected by spinlock, however any write sequence
-(Acquire write slot as writer, write to slot, submit write slot to reader)
-isn't atomic in any way and it's possible to submit not-yet-sent packet
-descriptors back to user-space as TX completed.
+How about implementing a "slow age" procedure instead? Walk through the
+FDB, and delete the dynamically learned entries for the port?
 
-Up untill now, all write-back operations had two phases, each phase
-locks the spinlock and unlocks it:
-1) Acquire slot + Write descriptor (increase cached-writer by N + write values)
-2) Submit slot to the reader (increase writer by N)
-
-Slot submission was solely based on the timing. Let's consider situation,
-where two different threads issue a syscall for two different AF_XDP sockets
-that are bound to the same umem, dev, queue-id.
-
-AF_XDP setup:
-                                                            
-                             kernel-space                   
-                                                            
-           Write   Read                                     
-            +--+   +--+                                     
-            |  |   |  |                                     
-            |  |   |  |                                     
-            |  |   |  |                                     
- Completion |  |   |  | Fill                                
- Queue      |  |   |  | Queue                               
-            |  |   |  |                                     
-            |  |   |  |                                     
-            |  |   |  |                                     
-            |  |   |  |                                     
-            +--+   +--+                                     
-            Read   Write                                    
-                             user-space                     
-                                                            
-                                                            
-   +--------+         +--------+                            
-   | AF_XDP |         | AF_XDP |                            
-   +--------+         +--------+                            
-                                                            
-                                                            
-                                                            
-                                                            
-
-Possible out-of-order scenario:
-                                                                                                                                       
-                                                                                                                                       
-                              writer         cached_writer1                      cached_writer2                                        
-                                 |                 |                                   |                                               
-                                 |                 |                                   |                                               
-                                 |                 |                                   |                                               
-                                 |                 |                                   |                                               
-                  +--------------|--------|--------|--------|--------|--------|--------|----------------------------------------------+
-                  |              |        |        |        |        |        |        |                                              |
- Completion Queue |              |        |        |        |        |        |        |                                              |
-                  |              |        |        |        |        |        |        |                                              |
-                  +--------------|--------|--------|--------|--------|--------|--------|----------------------------------------------+
-                                 |                 |                                   |                                               
-                                 |                 |                                   |                                               
-                                 |-----------------|                                   |                                               
-                                  A) T1 syscall    |                                   |                                               
-                                  writes 2         |                                   |                                               
-                                  descriptors      |-----------------------------------|                                               
-                                                    B) T2 syscall writes 4 descriptors                                                 
-                                                                                                                                       
-                                                                                                                                       
-                                                                                                                                       
-                                                                                                                                       
-                 Notes:                                                                                                                
-                 1) T1 and T2 AF_XDP sockets are two different sockets,                                                                
-                    __xsk_generic_xmit will obtain two different mutexes.                                                              
-                 2) T1 and T2 can be executed simultaneously, there is no                                                              
-                    critical section whatsoever between them.                                                                          
-                 3) T1 and T2 will obtain Completion Queue Lock for acquire + write,                                                   
-                    only slot acquire + write are under lock.                                                                          
-                 4) T1 and T2 completion (skb destructor)                                                                              
-                    doesn't need to be the same order as A) and B).                                                                    
-                 5) What if T1 fails after T2 acquires slots?                                                                          
-                    cached_writer will be decreased by 2, T2 will                                                                      
-                    submit failed descriptors of T1 (they shall be
-                    retransmitted in next TX).                                                                                   
-                    Submission of writer will move writer by 4 slots                                                                   
-                    2 of these slots have failed T1 values. Last two
-                    slots of T2 will be missing, descriptor leak.                                                                            
-                 6) What if T2 completes before T1? writer will be                                                                     
-                    moved by 4 slots. 2 of them are slots filled by T1.                                                                
-                    T2 will complete 2 own slots and 2 slots of T1, It's bad.                                                          
-                    T1 will complete last 2 slots of T2, also bad.                                                                     
-
-This out-of-order completion can effectively cause User-space <-> Kernel-space
-data race. This patch solves that, by only acquiring cached_writer first and
-do the completion (sumission (write + increase writer)) after. This is the only
-way to make that bulletproof for multithreaded access, failures and
-out-of-order skb completions.
-
-> This is definitely a no-go (sk_buff and skb_shared_info space is
-> precious).
-
-Okay so where should I store It? Can you give me some advice?
-
-I left that there, because there is every information related to
-skb desctruction. Additionally this is the only place in skb related
-code that defines anything related to xsk: metadata, number of descriptors.
-SKBUFF doesn't. I need to hold this information somewhere, and skbuff or
-skb_shared_info are the only place I can store it. This need to be invariant
-across all skb fragments, and be released after skb completes.
+Address aging is important for STP state transitions.
 
