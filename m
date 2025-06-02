@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-194653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A28ACBBD4
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:40:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27C9AACBBD6
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 21:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8768E16E4B8
-	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77DAB1883284
+	for <lists+netdev@lfdr.de>; Mon,  2 Jun 2025 19:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE891A3150;
-	Mon,  2 Jun 2025 19:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2877227E8A;
+	Mon,  2 Jun 2025 19:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qj+VrtWh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ef+ggQyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF0E4A02;
-	Mon,  2 Jun 2025 19:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CA0221FD0;
+	Mon,  2 Jun 2025 19:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748893201; cv=none; b=Oxc+Ncw+JbhL/bRIQ+H3hbwPWHJzcut8byDKg68SLh5QSVrwwz5SqVjgx0e3JRAi35EBcmHmZoWO+LIDlV+wLQipL2RCQN1XG2u3yqZifuoif1/jBY+14PvHsENvcBdnLHPJG6xHDJL0bxnv/ygsPSgn+yMan1b3Wnp4qzdHWb4=
+	t=1748893203; cv=none; b=Ijke6AhjatVPwPdJgJPoMU9EkjPeUPggx0SlD/qm1mexiJyKeyaW+AYQBzyeGUAU8aQmb/lGxCHCxfwVyTZU0rssSTG13k6T2VKGSVV6lVv+KawOIuHZzEoCpUrhhqAYp6YelHlkcDG0zAtvvHE7uaCeKL9RnkoDGbaM+FRewoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748893201; c=relaxed/simple;
-	bh=GT1zv0fCygY9w6Z9DXyOtDB40JgDxHwzHtGfZNS2Ngs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nX6NNvS+UeftQPR+Cjgaa2E90sKSNBi2hn6adiHh89Y11+56tu12/NW/4hXRAxaba74Uvwl8hlhJh4HmCLAlrKZoga8mJaHYQHe1c/U66+BzxxfLoxP0Dn9j23enwdB44OezcmBlX5kHZOstqMWNTONNnlpe4W77HfFURwT6Fmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qj+VrtWh; arc=none smtp.client-ip=209.85.218.52
+	s=arc-20240116; t=1748893203; c=relaxed/simple;
+	bh=xGkaJcSVZIGZYDU20IlWkf8xu961WZ6N54Xce5GByBA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c3WlhFMe/nJGrEfY49KhPJAao74W9hwYJuwmz251H7+4uIO9fB6ymBUOOr8QgTvA73fNraKbrpmeEE/oAKpeSqpq0cfGo6MIcVDijCcoCZtYEuLYjBNFlngEaAy6q9Wn0w2Bbrvj5amXacQiniw0MHe6cRRtCh5JuP/QWhpoOh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ef+ggQyi; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ad89333d603so932349166b.2;
-        Mon, 02 Jun 2025 12:39:59 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-604f26055c6so11120694a12.1;
+        Mon, 02 Jun 2025 12:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748893198; x=1749497998; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oBRyf5h+e2S/sAJwDICV85vmseV9SuQfSptP7Gwtakk=;
-        b=Qj+VrtWh91z1M/qAm49PFP3VyCC6lHuRu+YqVu+F2hCeupIFDodfpCpmi3IIOrHK12
-         qRfET5RKic7w8pmzUATGqsEyCVbn8v+xrwOWilMCZa2lRVz0+cdLOQ7A1m5p+unyIUse
-         4omdXf9MiVrbQTqt+BHjKDM/bPmyjPoKvqWcm78ZuE+C0EH8Jt+yjOEu1V6n6WIayyIo
-         t+tL2WI238tSJWrLERqg7X3h9GOBlGwxTAPlcIiz696L2Dl45ar+O6k8CRudxfuvNtIi
-         gpTe9D6rtHh74Yei2RH8qHYnRO7X0E3mTDq5Mqm7idvv1VaoVI5T5m8Rph5v4ogT0Svu
-         Y7SQ==
+        d=gmail.com; s=20230601; t=1748893199; x=1749497999; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bchcVw16Rv9Ke6TBr+mieEKvbKHdwpSqUXH/kZd7AFk=;
+        b=ef+ggQyiChSsjb7Idy34WlBbmRuiCE+hN3DmmaUCxLH0uvS69dajEt57eny1XhiVZ2
+         pjrq342VBL/kFfkNEEnQLh4SoDsk2AseEwO3Ki8UELQWPeTzR8hBs7VbwoOw8YlzQQEF
+         b0S08d/m7P6zV/SrLIM3yuAAPS9lr7iG2SS2SJEEYDvm7actViS6w4N5+JN5kG9b8svR
+         Vr4qCGUimBmXmk8qCIEu0jQ7Cfe0ord00LgPlRveBM2eLXLuShmQGeSnKFOL6kv1Hg1O
+         ql17ICPh/jtK4wccoZDUmWVRRKOes4osdkcyYbKHaVL1beO5mmkgTFcwwuTE/CiWTlY4
+         337w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748893198; x=1749497998;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oBRyf5h+e2S/sAJwDICV85vmseV9SuQfSptP7Gwtakk=;
-        b=sKU32P8gkJEcrEz9L3uvExfzlDARp8P055hMxs6jGJheuRiS6fq54vyUmAwfup6jW4
-         Cvhpl0rNCxgIEMDwjonZLr+tdsHhHw2Rm2QfPbn1bXh0EUmRsoezug4Ty7jiZguuaI+F
-         7J/j+SI7gKUczsVzqU6yIUJMyrWJraJYS9XIn6e9br/dfbWfJS+Qlzh8xfPnomLpvKNu
-         qx35j9jUhqJq7WP2L1HEg128yHmkgcSmATY4lT+iK8CZ4zqCGlj1+2QQXNZrIEnD4CRr
-         NB2/d2bxmF2inZ81jJLOA3tiMfGUsizaphjJjJKihPCK8PtCpBz1XBkvt3o4R01I7Kv8
-         wW9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCURvVyjWmJn8GGldtwICwyHsFDVmirJMtTJ7uwtejkzYLgrYoMs6XiggUQ7vfzM1tQgUsI/Yqd2EXpXqoc=@vger.kernel.org, AJvYcCVcwxTeflHjVHPsEJAJ/6lxx+hiCVmaVMe+YAED6v+7xI0W466P/QTco00+h8CpyMsOtytbVJPi@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvT6hw82DO2agFgVl158fbuaxrZ4AjtssXu9CmgD6VFtqLIVml
-	D4K5IXCzk/zTVvemyAWRWHwSgXECA7IXKV+H7x/yAHUsXogwT/r4e8ER
-X-Gm-Gg: ASbGncvFCg5C9ZKIW+fs/gRgB36OXAz+KYovkEf0KqHHzxMGI2ZPqYwacacbulDnIZB
-	CxcWIh6ma0QmzgwNiBQTh23769V6VXQHafDq4+s/+B6o9Im1kIHsUpC+MHEf2yATBI5viFxP+jK
-	klKuaLYxC1FI6m0hA8M+VnyeF49guvEn9kMsXkiuAvFPd6oiRISkvu+Gv7jlfyBxZ3/AmqE7HsP
-	r6GJAXy/X9dpLnCnTf/lxWCVURpCcCW6fjKBj9EIxZstkXPq5Sk1aucCs7NFh7OQmOWXQtMCx9h
-	/hvT/xpZjE9i8+LqGjtWQESc5xDjPATRI+Fwaj19p1KQqJuPdeddKOg0ShQpRKlmJZEklP+neFj
-	CzSs3+3g/u/1H7Jn0kiDl9/6ykVH18QE=
-X-Google-Smtp-Source: AGHT+IGw8gDWod663cW7nH3VrVLoUwZOVOvyyd/bDS2oBb9Q2UptfpFUKwPecHLHFmh0lZQ8vfeFeg==
-X-Received: by 2002:a17:906:6a21:b0:ad8:a935:b8f7 with SMTP id a640c23a62f3a-adb32248c07mr1434448566b.12.1748893197560;
-        Mon, 02 Jun 2025 12:39:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748893199; x=1749497999;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bchcVw16Rv9Ke6TBr+mieEKvbKHdwpSqUXH/kZd7AFk=;
+        b=YTsFtVWsPVD652JIsd9wlycKx9o8WDG3UFcM6lbAih35J4ZTfIci1AGF7CwTQXbx/h
+         Y+J/0hpR0jU2Il/ibEw27qs4yF/KIrrKIWiyPM+KoF8RAcWlcgR2kKqWApFe+VavyiWi
+         En/wetJqyyeYtBSCFPdBpN8DS5RyAe/teG1JuugVDWVz1bxbIF7EnZeywbyKbg8oVYPc
+         W3AIp+r+abgmxIGdMoVUt6FmQ0P3cB2gBn8VviSneGyazDv/eTkmq4NSvvvsV0GIrm99
+         7o67oYDMg38+M60kOMIbKLE8XcxU8lDworyGKkzQg3SiQ0Yw3+PzSQMbW2SLrxmA+1Ih
+         nIqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEYsMCkm+nqnUKMfqPFS8lzi6uwSOR8d59nlxdAQdmb5s0zEqysDLd5qmsJyKWZqB/fNYZYXuFgDXzB4Y=@vger.kernel.org, AJvYcCXcHNZZwF6+iXLUAd6MPkmw044oDvapYl6GyVU02JhrLAytJ4c8Pn8OvtaYQs7zxBZLgLIkY2LT@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFFI3QLX0wJNPzlc9JPn7jc+QbZMkndq8ErGaJf1+t8JtmHsPo
+	LysmKaKg/+5HpuKCOVsazOEA97iwLNcmcpYDAz05QWpSZoazJBubdxqp
+X-Gm-Gg: ASbGncv6J/wfFF8mML9tqntmaFlbviTZB8VzfOTB8duzahERsbEzsyDMvVq/srW05KM
+	ScNsHyk4A997iI1cvCMtbbLTLGzJGgXrE99Jq0VqyWWnbq2PqNZ4+nesUMAeNIj+OHNGspZURlI
+	LWfKK8LQFl9vMwillwlC9uBOm1FzmcLVCOiJKmiqJalY9woOvz8l4PNRNz19e5cPwP0uqt+Vcrx
+	U4g/I1GmVxrXTgEj0mFhGZo1GJgS7RkrdQ5q2AcxQ4E6D28Z5wUe2ALAoIwdQ3Ae197L1VWQ406
+	Q64/UMwBch1xDWmqH1maZoxbDouYHA5rUbE4EuS3azIUCebVfeyk2DP25fjPaNQn15CfDlOScSl
+	HAalkx2DFsmf674xX5NSHSUsi/kZ1XfE=
+X-Google-Smtp-Source: AGHT+IHb/jsqEVAsc45ECKj+RtiMfmptnFT6BSiubYaBx6CB3I6qZSBCmHXuavZdxbsd0dNItTWoYQ==
+X-Received: by 2002:a17:907:868e:b0:ad8:93a3:29a0 with SMTP id a640c23a62f3a-adde0d54c7cmr69970766b.18.1748893198864;
+        Mon, 02 Jun 2025 12:39:58 -0700 (PDT)
 Received: from localhost (dslb-002-205-016-252.002.205.pools.vodafone-ip.de. [2.205.16.252])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5eb54d24sm833535166b.123.2025.06.02.12.39.56
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada5d82ccf8sm833259366b.44.2025.06.02.12.39.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 12:39:57 -0700 (PDT)
+        Mon, 02 Jun 2025 12:39:58 -0700 (PDT)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -84,10 +86,12 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 0/5] net: dsa: b53: fix RGMII ports
-Date: Mon,  2 Jun 2025 21:39:48 +0200
-Message-ID: <20250602193953.1010487-1-jonas.gorski@gmail.com>
+Subject: [PATCH net v2 1/5] net: dsa: b53: do not enable EEE on bcm63xx
+Date: Mon,  2 Jun 2025 21:39:49 +0200
+Message-ID: <20250602193953.1010487-2-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250602193953.1010487-1-jonas.gorski@gmail.com>
+References: <20250602193953.1010487-1-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,54 +101,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-RGMII ports on BCM63xx were not really working, especially with PHYs
-that support EEE and are capable of configuring their own RGMII delays.
+BCM63xx internal switches do not support EEE, but provide multiple RGMII
+ports where external PHYs may be connected. If one of these PHYs are EEE
+capable, we may try to enable EEE for the MACs, which then hangs the
+system on access of the (non-existent) EEE registers.
 
-So let's make them work, and fix additional minor rgmii related issues
-found while working on it.
+Fix this by checking if the switch actually supports EEE before
+attempting to configure it.
 
-With a BCM96328BU-P300:
+Fixes: 22256b0afb12 ("net: dsa: b53: Move EEE functions to b53")
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Tested-by: Álvaro Fernández Rojas <noltari@gmail.com>
+Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+---
+v1 -> v2:
+* add Reviewed-by, Tested-by
 
-Before:
+ drivers/net/dsa/b53/b53_common.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-[    3.580000] b53-switch 10700000.switch GbE3 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-[    3.600000] b53-switch 10700000.switch GbE3 (uninitialized): failed to connect to PHY: -EINVAL
-[    3.610000] b53-switch 10700000.switch GbE3 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 4
-[    3.620000] b53-switch 10700000.switch GbE1 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-[    3.640000] b53-switch 10700000.switch GbE1 (uninitialized): failed to connect to PHY: -EINVAL
-[    3.650000] b53-switch 10700000.switch GbE1 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 5
-[    3.660000] b53-switch 10700000.switch GbE4 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-[    3.680000] b53-switch 10700000.switch GbE4 (uninitialized): failed to connect to PHY: -EINVAL
-[    3.690000] b53-switch 10700000.switch GbE4 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 6
-[    3.700000] b53-switch 10700000.switch GbE5 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-[    3.720000] b53-switch 10700000.switch GbE5 (uninitialized): failed to connect to PHY: -EINVAL
-[    3.730000] b53-switch 10700000.switch GbE5 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 7
-
-After:
-
-[    3.700000] b53-switch 10700000.switch GbE3 (uninitialized): PHY [mdio_mux-0.1:00] driver [Broadcom BCM54612E] (irq=POLL)
-[    3.770000] b53-switch 10700000.switch GbE1 (uninitialized): PHY [mdio_mux-0.1:01] driver [Broadcom BCM54612E] (irq=POLL)
-[    3.850000] b53-switch 10700000.switch GbE4 (uninitialized): PHY [mdio_mux-0.1:18] driver [Broadcom BCM54612E] (irq=POLL)
-[    3.920000] b53-switch 10700000.switch GbE5 (uninitialized): PHY [mdio_mux-0.1:19] driver [Broadcom BCM54612E] (irq=POLL)
-
-Changes v1 -> v2:
-
-* add tested by, reviewed by
-* do not enable RGMII delays on bcm63xx at all
-* allow RGMII only on RGMII ports, not cpu ports
-* prevent bcm63xx's CPU port from being configured
-* prevent DLL_IQQD from being changed on BCM53115
-
-Jonas Gorski (5):
-  net: dsa: b53: do not enable EEE on bcm63xx
-  net: dsa: b53: do not enable RGMII delay on bcm63xx
-  net: dsa: b53: do not configure bcm63xx's IMP port interface
-  net: dsa: b53: allow RGMII for bcm63xx RGMII ports
-  net: dsa: b53: do not touch DLL_IQQD on bcm53115
-
- drivers/net/dsa/b53/b53_common.c | 58 ++++++++++++--------------------
- 1 file changed, 22 insertions(+), 36 deletions(-)
-
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 132683ed3abe..8a6a370c8580 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -2353,6 +2353,9 @@ int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
+ {
+ 	int ret;
+ 
++	if (!b53_support_eee(ds, port))
++		return 0;
++
+ 	ret = phy_init_eee(phy, false);
+ 	if (ret)
+ 		return 0;
+@@ -2367,7 +2370,7 @@ bool b53_support_eee(struct dsa_switch *ds, int port)
+ {
+ 	struct b53_device *dev = ds->priv;
+ 
+-	return !is5325(dev) && !is5365(dev);
++	return !is5325(dev) && !is5365(dev) && !is63xx(dev);
+ }
+ EXPORT_SYMBOL(b53_support_eee);
+ 
 -- 
 2.43.0
 
