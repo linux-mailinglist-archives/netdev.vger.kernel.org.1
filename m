@@ -1,446 +1,182 @@
-Return-Path: <netdev+bounces-194703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCD1ACBFFE
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:05:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A73ACC011
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E26B3A4C25
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:04:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C884188C57C
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED31202F65;
-	Tue,  3 Jun 2025 06:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QRqr5lHS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AD71F3BA4;
+	Tue,  3 Jun 2025 06:14:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8154E17A318
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 06:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CA7AD23;
+	Tue,  3 Jun 2025 06:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748930695; cv=none; b=YJ/kjJr+0HNqm+fTAvTlIgnh+lh+EKOWIRiTuu0Uswyc9Yk382JonT+DZlLURsScGkU2ELJ9BOWOBBTT2ND+kX9AgaEgpmbeMy2qChZ1zZj7a+a6nRQoQBSgDV/KiepvDc4FrSFjwANP7tkgJHDzUUUwkKZSfh6lHvDmmNAuDKo=
+	t=1748931298; cv=none; b=ZDWxrBehdU71LKMHaR9ItQXBPXWqqfNeVPGnw5CWp0ErRk5kI2IhfA900Klt9Fk+voZMRAFxQOY1e5Qz3v5kW3mWZ4vy5hriK8IXQ9IkdqBi/5/dXZUdfgBbl+Tojnt+qhsLcgn8prtNVYZAublZk6aaScZvBGr1hyPoCLwqoig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748930695; c=relaxed/simple;
-	bh=Qo4akI9pR3dvyqNI6pWSC4c7hDgCxvLhLMc26YWUNqI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FwadQmqoroD2yAsZh8J9nx48zGTf6mXZa2bvBzdTtCa+xeCVAfotlFOMGTjpS/fuzE8mvWFxZ5j71USgJHzS7Zqx3CK7LZFYodzKRXkhFMLPZ0aEUXi4fy1bpxFlIB2PhxpuWMfFmWCBj3+AZHZOtn8l2aebLAGj1WyYaog70WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QRqr5lHS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748930690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C4kk7REJPo5LVVCXYeE4H5PmhzE5bRIo4VhFMQx+60A=;
-	b=QRqr5lHSPXko/RHBHVfeJcDdkQRJTn0HFMyNjCzb6YRQrrXRP3YckxURvVCLBBW3GiGnCT
-	AjCQRlyh2l8ZkrI/P948Pi5itqyOLxV/WLyBUr43tI30IiiugWMXd8QAuaqqSr3TyzDm90
-	htOfTod3LUC8Ph+KhYUQgkVTiCzOWs0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-KtrNWCFRNRO36YKgbZ31IQ-1; Tue, 03 Jun 2025 02:04:48 -0400
-X-MC-Unique: KtrNWCFRNRO36YKgbZ31IQ-1
-X-Mimecast-MFC-AGG-ID: KtrNWCFRNRO36YKgbZ31IQ_1748930687
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ad88ac202c0so469370866b.1
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 23:04:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748930687; x=1749535487;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C4kk7REJPo5LVVCXYeE4H5PmhzE5bRIo4VhFMQx+60A=;
-        b=iWf/g6FRrPk6u/9Sm812/O3LzLc8VVmQQhmZz7FyYlKIa4YdxrzgppGMbBuWtGPytI
-         I/7MY69ygN1qPwLjtXADWeeyd1Iuohw03zoTIn9Cy3mFEZ2Mo37X0LFcV4MVUh7HYH8n
-         C/ivGLScB5UuLKaWtRtnVheLWhvVgKWz3HO110GpBc+UX5U8JcNJtbhYbLp74xgBiHq0
-         wg8vEIO7HewtsXne42YR2F6jFt6mqfCckV5A7IywGzGmdrwjcmi0hISwk8ALkgV+ACd+
-         8tpWfQGHC/kv3cm6dPwlARLv0hVHpN36O8oG1N2Bs8I7UhaGjoV13ICoINkF04Uaqy9Y
-         7jwg==
-X-Gm-Message-State: AOJu0YxIA/4QHY2OpUwx5Olrt1TIZ6l0VICJmLJfCoaWSD5eI6x2m1Pr
-	G2Ayy6vZY7L0CJp5cCuPGOHp/ppiyx4Eq6lCKEYkjQp+7/Ud7bfF3XZDY/kpJvMoPK7EXIzIKU1
-	wh9zfo9tqih3Esj9tCHKLOXuH8zIpSZ/Jks4FHWp6V1tBfRxCi/ruVOqNMVX927QMae7Zh6pBiV
-	5FUFYvPWGa6ojxOkB3rD9PrJXROW9XFYbq
-X-Gm-Gg: ASbGncs2Vu0EqVfEbppVgDPj+wQP6PKM2JRXYe0P9a+gyVUdNCReLNNsYglNVodK9hx
-	BSu6TpEK82iQ8RATh0nrwV+kuWktzMU57s7itU272tIjMs5iz4K/vL3bftn8PTTdh3jA8LQ==
-X-Received: by 2002:a17:907:5c1:b0:ad5:431d:fb32 with SMTP id a640c23a62f3a-adde5f1c71emr122578266b.14.1748930686642;
-        Mon, 02 Jun 2025 23:04:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEDqGWcsBEiyI8G77qxQfY9LRPjS9n1Y1MiStZVBpJF5sxgkeiT2avlQHgnMYEIngQ5ArsJOBo20scIAw00DaE=
-X-Received: by 2002:a17:907:5c1:b0:ad5:431d:fb32 with SMTP id
- a640c23a62f3a-adde5f1c71emr122573266b.14.1748930686102; Mon, 02 Jun 2025
- 23:04:46 -0700 (PDT)
+	s=arc-20240116; t=1748931298; c=relaxed/simple;
+	bh=H4ceec5yxnOChwxTFgmHVXVGW9miP1wPwGN9LC5kQjU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=LtcrCxp5dUp8aLukCPmsCuE5QJ44uwdCfaNXhHFV4FhQMz/GRH1V+qpbd8JTgMz1Vm7TbEcA3DYhlviChIUOUsgyNIBzqQ7GIH69zP2na2/8+3R9jQ8rYiBIC+nr/7c6aGnO49ys1WmWfxeRMkaj+g8ehuvmyfznrhP6OQyAkRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0e3e2006404211f0b29709d653e92f7d-20250603
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_TXT, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, UD_TRUSTED, CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS
+	GTI_C_CI, GTI_FG_IT, GTI_RG_INFO, GTI_C_BU, AMN_T1
+	AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:085eb006-b13b-4393-bf0d-8207b50233b3,IP:10,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACT
+	ION:release,TS:-20
+X-CID-INFO: VERSION:1.1.45,REQID:085eb006-b13b-4393-bf0d-8207b50233b3,IP:10,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-20
+X-CID-META: VersionHash:6493067,CLOUDID:a5139acd65cdecfd4de04f0d68efa02a,BulkI
+	D:250603141450DM8BP3ZN,BulkQuantity:0,Recheck:0,SF:19|24|38|44|66|72|78|10
+	2,TC:nil,Content:0|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:ni
+	l,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:
+	0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
+X-UUID: 0e3e2006404211f0b29709d653e92f7d-20250603
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1879150611; Tue, 03 Jun 2025 14:14:49 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Moshe Shemesh <moshe@nvidia.com>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH v3] net/mlx5: Flag state up only after cmdif is ready
+Date: Tue,  3 Jun 2025 14:14:33 +0800
+Message-Id: <20250603061433.82155-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527161904.75259-1-minhquangbui99@gmail.com>
- <20250527161904.75259-2-minhquangbui99@gmail.com> <CACGkMEvAJziO3KW3Nk9+appXmR92ixcTeWY_XEZz4Qz1MwrhYA@mail.gmail.com>
- <d572e8b6-e25c-480e-9d05-8c7eeb396b12@gmail.com> <CACGkMEvBPaqXxnmNqZAbAbYFh=9gONva+dpouAeW-sd1pzK58Q@mail.gmail.com>
-In-Reply-To: <CACGkMEvBPaqXxnmNqZAbAbYFh=9gONva+dpouAeW-sd1pzK58Q@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 3 Jun 2025 14:04:09 +0800
-X-Gm-Features: AX0GCFsfXLm2TC8NF-uKkDeAms9B2pKJaVSC9CISoMN6lat5FOQdoiwAow7ih7g
-Message-ID: <CAPpAL=yYweFPtA-E_vwPiHFjQpXXb2_v9yiPkfCP3WHnDZBqPQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v2 1/2] virtio-net: support zerocopy multi
- buffer XDP in mergeable
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Jason Wang <jasowang@redhat.com>, 
-	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Tested this patch with virtio-net regression tests, everything works fine.
+When driver is reloading during recovery flow, it can't get new commands
+till command interface is up again. Otherwise we may get to null pointer
+trying to access non initialized command structures.
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+The issue can be reproduced using the following script:
 
-On Tue, Jun 3, 2025 at 10:57=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, May 29, 2025 at 8:28=E2=80=AFPM Bui Quang Minh <minhquangbui99@gm=
-ail.com> wrote:
-> >
-> > On 5/29/25 12:59, Jason Wang wrote:
-> > > On Wed, May 28, 2025 at 12:19=E2=80=AFAM Bui Quang Minh
-> > > <minhquangbui99@gmail.com> wrote:
-> > >> Currently, in zerocopy mode with mergeable receive buffer, virtio-ne=
-t
-> > >> does not support multi buffer but a single buffer only. This commit =
-adds
-> > >> support for multi mergeable receive buffer in the zerocopy XDP path =
-by
-> > >> utilizing XDP buffer with frags.
-> > >>
-> > >> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> > >> ---
-> > >>   drivers/net/virtio_net.c | 123 +++++++++++++++++++++--------------=
-----
-> > >>   1 file changed, 66 insertions(+), 57 deletions(-)
-> > >>
-> > >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > >> index e53ba600605a..a9558650f205 100644
-> > >> --- a/drivers/net/virtio_net.c
-> > >> +++ b/drivers/net/virtio_net.c
-> > >> @@ -45,6 +45,8 @@ module_param(napi_tx, bool, 0644);
-> > >>   #define VIRTIO_XDP_TX          BIT(0)
-> > >>   #define VIRTIO_XDP_REDIR       BIT(1)
-> > >>
-> > >> +#define VIRTNET_MAX_ZC_SEGS    8
-> > >> +
-> > >>   /* RX packet size EWMA. The average packet size is used to determi=
-ne the packet
-> > >>    * buffer size when refilling RX rings. As the entire RX ring may =
-be refilled
-> > >>    * at once, the weight is chosen so that the EWMA will be insensit=
-ive to short-
-> > >> @@ -1232,65 +1234,53 @@ static void xsk_drop_follow_bufs(struct net_=
-device *dev,
-> > >>          }
-> > >>   }
-> > >>
-> > >> -static int xsk_append_merge_buffer(struct virtnet_info *vi,
-> > >> -                                  struct receive_queue *rq,
-> > >> -                                  struct sk_buff *head_skb,
-> > >> -                                  u32 num_buf,
-> > >> -                                  struct virtio_net_hdr_mrg_rxbuf *=
-hdr,
-> > >> -                                  struct virtnet_rq_stats *stats)
-> > >> +static int virtnet_build_xsk_buff_mrg(struct virtnet_info *vi,
-> > >> +                                     struct receive_queue *rq,
-> > >> +                                     u32 num_buf,
-> > >> +                                     struct xdp_buff *xdp,
-> > >> +                                     struct virtnet_rq_stats *stats=
-)
-> > >>   {
-> > >> -       struct sk_buff *curr_skb;
-> > >> -       struct xdp_buff *xdp;
-> > >> -       u32 len, truesize;
-> > >> -       struct page *page;
-> > >> +       unsigned int len;
-> > >>          void *buf;
-> > >>
-> > >> -       curr_skb =3D head_skb;
-> > >> +       if (num_buf < 2)
-> > >> +               return 0;
-> > >> +
-> > >> +       while (num_buf > 1) {
-> > >> +               struct xdp_buff *new_xdp;
-> > >>
-> > >> -       while (--num_buf) {
-> > >>                  buf =3D virtqueue_get_buf(rq->vq, &len);
-> > >> -               if (unlikely(!buf)) {
-> > >> -                       pr_debug("%s: rx error: %d buffers out of %d=
- missing\n",
-> > >> -                                vi->dev->name, num_buf,
-> > >> -                                virtio16_to_cpu(vi->vdev,
-> > >> -                                                hdr->num_buffers));
-> > >> +               if (!unlikely(buf)) {
-> > >> +                       pr_debug("%s: rx error: %d buffers missing\n=
-",
-> > >> +                                vi->dev->name, num_buf);
-> > >>                          DEV_STATS_INC(vi->dev, rx_length_errors);
-> > >> -                       return -EINVAL;
-> > >> -               }
-> > >> -
-> > >> -               u64_stats_add(&stats->bytes, len);
-> > >> -
-> > >> -               xdp =3D buf_to_xdp(vi, rq, buf, len);
-> > >> -               if (!xdp)
-> > >> -                       goto err;
-> > >> -
-> > >> -               buf =3D napi_alloc_frag(len);
-> > >> -               if (!buf) {
-> > >> -                       xsk_buff_free(xdp);
-> > >> -                       goto err;
-> > >> +                       return -1;
-> > >>                  }
-> > >>
-> > >> -               memcpy(buf, xdp->data - vi->hdr_len, len);
-> > >> -
-> > >> -               xsk_buff_free(xdp);
-> > >> +               new_xdp =3D buf_to_xdp(vi, rq, buf, len);
-> > >> +               if (!new_xdp)
-> > >> +                       goto drop_bufs;
-> > >>
-> > >> -               page =3D virt_to_page(buf);
-> > >> +               /* In virtnet_add_recvbuf_xsk(), we ask the host to =
-fill from
-> > >> +                * xdp->data - vi->hdr_len with both virtio_net_hdr =
-and data.
-> > >> +                * However, only the first packet has the virtio_net=
-_hdr, the
-> > >> +                * following ones do not. So we need to adjust the f=
-ollowing
-> > > Typo here.
-> >
-> > I'm sorry, could you clarify which word contains the typo?
-> >
-> > >
-> > >> +                * packets' data pointer to the correct place.
-> > >> +                */
-> > > I wonder what happens if we don't use this trick? I meant we don't
-> > > reuse the header room for the virtio-net header. This seems to be fin=
-e
-> > > for a mergeable buffer and can help to reduce the trick.
-> >
-> > I don't think using the header room for virtio-net header creates this
-> > case handling. In my opinion, it comes from the slightly difference in
-> > the recvbuf between single buffer and multi-buffer. When we have n
-> > single-buffer packets, each buffer will have its own virtio-net header.
-> > But when we have 1 multi-buffer packet (which spans across n buffers),
-> > only the first buffer has virtio-net header, the following buffers do n=
-ot.
-> >
-> > There 2 important pointers here. The pointer we announce to the vhost
-> > side to fill the data, let's call it announced_addr, and xdp_buff->data
-> > which is expected to point the the start of Ethernet frame. Currently,
-> >
-> >      announced_addr =3D xdp_buff->data - hdr_len
-> >
-> > The host side will write the virtio-net header to announced_addr then
-> > the Ethernet frame's data in the first buffer. In case of multi-buffer
-> > packet, in the following buffers, host side writes the Ethernet frame's
-> > data to the announced_addr no virtio-net header. So in the virtio-net,
-> > we need to subtract xdp_buff->data, otherwise, we lose some Ethernet
-> > frame's data.
-> >
-> > I think a slightly better solution is that we set announced_addr =3D
-> > xdp_buff->data then we only need to xdp_buff->data +=3D hdr_len for the
-> > first buffer and do need to adjust xdp_buff->data of the following buff=
-ers.
->
-> Exactly my point.
->
-> >
-> > >
-> > >> +               new_xdp->data -=3D vi->hdr_len;
-> > >> +               new_xdp->data_end =3D new_xdp->data + len;
-> > >>
-> > >> -               truesize =3D len;
-> > >> +               if (!xsk_buff_add_frag(xdp, new_xdp))
-> > >> +                       goto drop_bufs;
-> > >>
-> > >> -               curr_skb  =3D virtnet_skb_append_frag(head_skb, curr=
-_skb, page,
-> > >> -                                                   buf, len, truesi=
-ze);
-> > >> -               if (!curr_skb) {
-> > >> -                       put_page(page);
-> > >> -                       goto err;
-> > >> -               }
-> > >> +               num_buf--;
-> > >>          }
-> > >>
-> > >>          return 0;
-> > >>
-> > >> -err:
-> > >> +drop_bufs:
-> > >>          xsk_drop_follow_bufs(vi->dev, rq, num_buf, stats);
-> > >> -       return -EINVAL;
-> > >> +       return -1;
-> > >>   }
-> > >>
-> > >>   static struct sk_buff *virtnet_receive_xsk_merge(struct net_device=
- *dev, struct virtnet_info *vi,
-> > >> @@ -1307,23 +1297,42 @@ static struct sk_buff *virtnet_receive_xsk_m=
-erge(struct net_device *dev, struct
-> > >>          num_buf =3D virtio16_to_cpu(vi->vdev, hdr->num_buffers);
-> > >>
-> > >>          ret =3D XDP_PASS;
-> > >> +       if (virtnet_build_xsk_buff_mrg(vi, rq, num_buf, xdp, stats))
-> > >> +               goto drop;
-> > >> +
-> > >>          rcu_read_lock();
-> > >>          prog =3D rcu_dereference(rq->xdp_prog);
-> > >> -       /* TODO: support multi buffer. */
-> > >> -       if (prog && num_buf =3D=3D 1)
-> > >> -               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit=
-, stats);
-> > > Without this patch it looks like we had a bug:
-> > >
-> > >          ret =3D XDP_PASS;
-> > >          rcu_read_lock();
-> > >          prog =3D rcu_dereference(rq->xdp_prog);
-> > >          /* TODO: support multi buffer. */
-> > >          if (prog && num_buf =3D=3D 1)
-> > >                  ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit=
-, stats);
-> > >          rcu_read_unlock();
-> > >
-> > > This implies if num_buf is greater than 1, we will assume XDP_PASS?
-> >
-> > Yes, I think XDP_DROP should be returned in that case.
->
-> Care to post a patch and cc stable?
->
-> >
-> > >
-> > >> +       if (prog) {
-> > >> +               /* We are in zerocopy mode so we cannot copy the mul=
-ti-buffer
-> > >> +                * xdp buff to a single linear xdp buff. If we do so=
-, in case
-> > >> +                * the BPF program decides to redirect to a XDP sock=
-et (XSK),
-> > >> +                * it will trigger the zerocopy receive logic in XDP=
- socket.
-> > >> +                * The receive logic thinks it receives zerocopy buf=
-fer while
-> > >> +                * in fact, it is the copy one and everything is mes=
-sed up.
-> > >> +                * So just drop the packet here if we have a multi-b=
-uffer xdp
-> > >> +                * buff and the BPF program does not support it.
-> > >> +                */
-> > >> +               if (xdp_buff_has_frags(xdp) && !prog->aux->xdp_has_f=
-rags)
-> > >> +                       ret =3D XDP_DROP;
-> > > Could we move the check before trying to build a multi-buffer XDP buf=
-f?
-> >
-> > Yes, I'll fix this in next version.
-> >
-> > >
-> > >> +               else
-> > >> +                       ret =3D virtnet_xdp_handler(prog, xdp, dev, =
-xdp_xmit,
-> > >> +                                                 stats);
-> > >> +       }
-> > >>          rcu_read_unlock();
-> > >>
-> > >>          switch (ret) {
-> > >>          case XDP_PASS:
-> > >> -               skb =3D xsk_construct_skb(rq, xdp);
-> > >> +               skb =3D xdp_build_skb_from_zc(xdp);
-> > > Is this better to make this change a separate patch?
-> >
-> > Okay, I'll create a separate patch to convert the current XDP_PASS
-> > handler to use xdp_build_skb_from_zc helper.
->
-> That would be better.
->
-> >
-> > >
-> > >>                  if (!skb)
-> > >> -                       goto drop_bufs;
-> > >> +                       break;
-> > >>
-> > >> -               if (xsk_append_merge_buffer(vi, rq, skb, num_buf, hd=
-r, stats)) {
-> > >> -                       dev_kfree_skb(skb);
-> > >> -                       goto drop;
-> > >> -               }
-> > >> +               /* Later, in virtnet_receive_done(), eth_type_trans(=
-)
-> > >> +                * is called. However, in xdp_build_skb_from_zc(), i=
-t is called
-> > >> +                * already. As a result, we need to reset the data t=
-o before
-> > >> +                * the mac header so that the later call in
-> > >> +                * virtnet_receive_done() works correctly.
-> > >> +                */
-> > >> +               skb_push(skb, ETH_HLEN);
-> > >>
-> > >>                  return skb;
-> > >>
-> > >> @@ -1332,14 +1341,11 @@ static struct sk_buff *virtnet_receive_xsk_m=
-erge(struct net_device *dev, struct
-> > >>                  return NULL;
-> > >>
-> > >>          default:
-> > >> -               /* drop packet */
-> > >> -               xsk_buff_free(xdp);
-> > >> +               break;
-> > >>          }
-> > >>
-> > >> -drop_bufs:
-> > >> -       xsk_drop_follow_bufs(dev, rq, num_buf, stats);
-> > >> -
-> > >>   drop:
-> > >> +       xsk_buff_free(xdp);
-> > >>          u64_stats_inc(&stats->drops);
-> > >>          return NULL;
-> > >>   }
-> > >> @@ -1396,6 +1402,8 @@ static int virtnet_add_recvbuf_xsk(struct virt=
-net_info *vi, struct receive_queue
-> > >>                  return -ENOMEM;
-> > >>
-> > >>          len =3D xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
-> > >> +       /* Reserve some space for skb_shared_info */
-> > >> +       len -=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > >>
-> > >>          for (i =3D 0; i < num; ++i) {
-> > >>                  /* Use the part of XDP_PACKET_HEADROOM as the virtn=
-et hdr space.
-> > >> @@ -6734,6 +6742,7 @@ static int virtnet_probe(struct virtio_device =
-*vdev)
-> > >>          dev->netdev_ops =3D &virtnet_netdev;
-> > >>          dev->stat_ops =3D &virtnet_stat_ops;
-> > >>          dev->features =3D NETIF_F_HIGHDMA;
-> > >> +       dev->xdp_zc_max_segs =3D VIRTNET_MAX_ZC_SEGS;
-> > >>
-> > >>          dev->ethtool_ops =3D &virtnet_ethtool_ops;
-> > >>          SET_NETDEV_DEV(dev, &vdev->dev);
-> > >> --
-> > >> 2.43.0
-> > >>
-> > > Thanks
-> > >
-> >
->
-> Thanks
->
->
+1)Use following script to trigger PCI error.
+
+for((i=1;i<1000;i++));
+do
+echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+echo “pci reset test $i times”
+done
+
+2) Use following script to read speed.
+
+while true; do cat /sys/class/net/eth0/speed &> /dev/null; done
+
+task: ffff885f42820fd0 ti: ffff88603f758000 task.ti: ffff88603f758000
+RIP: 0010:[] [] dma_pool_alloc+0x1ab/0×290
+RSP: 0018:ffff88603f75baf0 EFLAGS: 00010046
+RAX: 0000000000000246 RBX: ffff882f77d90c80 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 00000000000080d0 RDI: ffff882f77d90d10
+RBP: ffff88603f75bb20 R08: 0000000000019ba0 R09: ffff88017fc07c00
+R10: ffffffffc0a9c384 R11: 0000000000000246 R12: ffff882f77d90d00
+R13: 00000000000080d0 R14: ffff882f77d90d10 R15: ffff88340b6c5ea8
+FS: 00007efce8330740(0000) GS:ffff885f4da00000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 0000003454fc6000 CR4: 00000000003407e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call trace:
+ mlx5_alloc_cmd_msg+0xb4/0×2a0 [mlx5_core]
+ mlx5_alloc_cmd_msg+0xd3/0×2a0 [mlx5_core]
+ cmd_exec+0xcf/0×8a0 [mlx5_core]
+ mlx5_cmd_exec+0x33/0×50 [mlx5_core]
+ mlx5_core_access_reg+0xf1/0×170 [mlx5_core]
+ mlx5_query_port_ptys+0x64/0×70 [mlx5_core]
+ mlx5e_get_link_ksettings+0x5c/0×360 [mlx5_core]
+ __ethtool_get_link_ksettings+0xa6/0×210
+ speed_show+0x78/0xb0
+ dev_attr_show+0x23/0×60
+ sysfs_read_file+0x99/0×190
+ vfs_read+0x9f/0×170
+ SyS_read+0x7f/0xe0
+ tracesys+0xe3/0xe8
+
+Fixes: a80d1b68c8b7a0 ("net/mlx5: Break load_one into three stages")
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+---
+v3:
+ - The recovery process of pci error is mlx5_load_one ->
+  mlx5_load_one_devl_locked -> mlx5_function_setup ->
+  mlx5_function_enable -> mlx5_cmd_enable. In the mlx5_cmd_enable
+  function, cmd->state will be set to MLX5_CMDIF_STATE_DOWN, and when the
+  pci error recovery fails, it is the recovery of the entire device, so I
+  prefer to use MLX5_DEVICE_STATE_UP.
+
+v2:
+ https://lore.kernel.org/all/b8c300f8-bb3b-421f-81c5-f493984f922d@nvidia.com/ 
+
+v1:
+ https://lore.kernel.org/all/20250527013723.242599-1-zhaochenguang@kylinos.cn/
+---
+ drivers/net/ethernet/mellanox/mlx5/core/main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index 41e8660c819c..713f1f4f2b42 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -1210,6 +1210,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
+ 	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
+ 	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
+ 
++	/* remove any previous indication of internal error */
++	dev->state = MLX5_DEVICE_STATE_UP;
++
+ 	err = mlx5_core_enable_hca(dev, 0);
+ 	if (err) {
+ 		mlx5_core_err(dev, "enable hca failed\n");
+@@ -1602,8 +1605,6 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
+ 		mlx5_core_warn(dev, "interface is up, NOP\n");
+ 		goto out;
+ 	}
+-	/* remove any previous indication of internal error */
+-	dev->state = MLX5_DEVICE_STATE_UP;
+ 
+ 	if (recovery)
+ 		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_ON_RECOVERY_TIMEOUT);
+-- 
+2.25.1
 
 
