@@ -1,430 +1,350 @@
-Return-Path: <netdev+bounces-194688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3770ACBEA2
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 04:57:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD54ACBEC8
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 05:19:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91B1C7A94EB
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 02:55:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24F423A2F57
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 03:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F52169397;
-	Tue,  3 Jun 2025 02:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925F217C224;
+	Tue,  3 Jun 2025 03:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbVuCKBo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9kmRvo/"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D245C3FE4
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 02:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED5E4C92
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748919423; cv=none; b=Ni0Bw6ZHAu1RzT85qhCQwdceCpAzIEOVULI3Jk6gTWdV7izTxuzZo2hli9tLHCENHDfG+K7Slfw96/KFNiYIZCceJd5oYMT+eut9a7F6wcdTIWXUarMUY92OxeACMY/U5lVIHFb+6ed89UBj2iiOdKcKC4YajMnB7D39n2qLlGg=
+	t=1748920760; cv=none; b=EiGnu1Oi7r49KVlzNWEiRD1AuqXhQM1uKFJi5lOhZNUHVTYEYL0oFJJYQfbKD0YKHZK2ZfI4B7+4++Zkr5nrT7pdCNT1Q/9xebaabywl0E2dmz4rePEQLlokjBKZ4j2zgnLM4LLDK2SELOTN/BGusiYME9o/B/LyJdLCPSMS84M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748919423; c=relaxed/simple;
-	bh=FyYvsDY9RRQ7Ye1uQhwbm4kH5XWJt7w+rEpIsRLZx/M=;
+	s=arc-20240116; t=1748920760; c=relaxed/simple;
+	bh=ulahXhuT8yDizo0bw9N/2oF8mAlXjmDARNszSAnWgEs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l39xcLLVB+TBYbRiX3Ce+QfKoEQfkBzCvpUbTFFX/BgCjQgoFeKLZ6BBInoJSEAXdlDa+foed1PqVKlEF6i2lOYx8Cwzztni1P+skASUrnz0dNm5T/21qQ4mOwEJnrRVBsydmeJdRLAw0dl/yyf6r9JRzK6JQ7NTKabfnQCl+Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SbVuCKBo; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=cj+4aI0MxTarepcJqlL8HdVn19eBaPS2zSsl9dGkMe4rHy8vM1+TXO1TZxW1hM3tkyGNt7IC6rDWsjDaq2x8JH10Q0IHG2O+mAy9N4E7Qs1boOtT58CYtC0GhQ1QuJCjwJm7hKzH1Cfo/VvE0RB6OLQ24rreWPhJY7UQ57vqiCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c9kmRvo/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748919419;
+	s=mimecast20190719; t=1748920757;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yQ+r5oBf4JFAgK9Q+tIlTdQ7PtffG9vedsHhS1feOvo=;
-	b=SbVuCKBoqW7dBjEQt+kc4/iWGUiji0+a3cJmJhUQEJpgXOLCbuBi7hcuHWnQx/vMSsKoB7
-	YOfiBO+NEBYQuXGn25uIAahZLc8K5NvC0SL3eftT9/NMSL+nS5NSzcO8MF5VSSHU7SzGIX
-	064nmadEnfx7BFPAVfEVtbdHWYwoTxM=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=aLUswlGrIATyOOlI6fhYu4jJYFEad2pBjyge/hX+nFY=;
+	b=c9kmRvo/bTbgE2fbYbh7Z4pyeARezSCdE3nHcglQD0Q7/eZtFtpFh1wDYY3718cgouArSd
+	pa6wuilqGcz93kvHgfDmo5S+eXIixRpNqFKVVx3fBMoYFFwJ4fAwjXme5/rN+2FVLe18IZ
+	arzkNu+P08srjPMg+BT1iDVrh5tjmsI=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124--RlbukEtOyuE5DFd4wNcdg-1; Mon, 02 Jun 2025 22:56:58 -0400
-X-MC-Unique: -RlbukEtOyuE5DFd4wNcdg-1
-X-Mimecast-MFC-AGG-ID: -RlbukEtOyuE5DFd4wNcdg_1748919418
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-312c33585c2so1512390a91.0
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 19:56:58 -0700 (PDT)
+ us-mta-364-OuMrhYW8Otuo-TtpuBioiA-1; Mon, 02 Jun 2025 23:19:16 -0400
+X-MC-Unique: OuMrhYW8Otuo-TtpuBioiA-1
+X-Mimecast-MFC-AGG-ID: OuMrhYW8Otuo-TtpuBioiA_1748920755
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-234a102faa3so35399285ad.0
+        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 20:19:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748919417; x=1749524217;
+        d=1e100.net; s=20230601; t=1748920755; x=1749525555;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yQ+r5oBf4JFAgK9Q+tIlTdQ7PtffG9vedsHhS1feOvo=;
-        b=SGP8dWQOTtprnTXZG/xAWwGSfHVF6Vj5BLzXXwIjeimecBJtGsV+BnKT4PrUbOOQ5p
-         o8iJzOK/U2Ez/j80ZZwq7l384+GgTaNFO9l/D8LTHQ/KEn3zcDjY4Rmqf6rvbHG2XtPq
-         sJUOvw7xTT8MG2lob6NmeN1hZ2o/MQ3vosCQiRoiXkf0XOM9TtozRmVMkAJ2hbAX7ruJ
-         9gA1tI4DmBqwAqbLE6rfNwKEuF+VraUPNZt5F6SvYpJXIq9QayYF8+oL7Pse/DVmHubA
-         QFPm/Q4U/eyvb8270MsBeTdMSMcJSgOQqxYuXQDIZSnSTN5PmdrjcuLt7pMXthLjIpv4
-         fBsQ==
-X-Gm-Message-State: AOJu0Yw8xved8Nw27pkfa/aqC2ALdzhKPByrwboWalVgDCKASJXN8/hl
-	2oHodkmoo4HHDgXWhN+F3URsFiJYS0ZCT5/Kmkb3BBnfhv4d8K0VgkAsIgqyVtdNtRVBxPgiFLD
-	lNMbVY4lcvKXDNuAJfLy2jGqnWuXqmedWeHjhuN/w86FKRjkbGnD5ldbXTDe3q61NlRZeCbfrWR
-	gzT4yEnsCXDpyxt1g6zuBhLMdFsPCTYObs
-X-Gm-Gg: ASbGncvo04h3mtv1CD5NsTw0/zfitt6+GvC1J7N/uf0gowVKLmUPy4Utkb3q94m0c1K
-	t1pq0g+o+KJFcGCGMNuE13jGO2tK5jmXY0zhGMYBHQu0cPNzdbUZy/sB3W9v7PNIUwlYhjA==
-X-Received: by 2002:a17:90b:2f8c:b0:2ee:d371:3227 with SMTP id 98e67ed59e1d1-31241735b7fmr26145332a91.17.1748919417512;
-        Mon, 02 Jun 2025 19:56:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHdHD3VSXY/qb/15d/+9RLJ+wolJ2Sye/tJcf7puOqTeU5auMV1IMlnvMY8bntNdJS3BXE9udtSG0+kr7BMVpE=
-X-Received: by 2002:a17:90b:2f8c:b0:2ee:d371:3227 with SMTP id
- 98e67ed59e1d1-31241735b7fmr26145293a91.17.1748919417021; Mon, 02 Jun 2025
- 19:56:57 -0700 (PDT)
+        bh=aLUswlGrIATyOOlI6fhYu4jJYFEad2pBjyge/hX+nFY=;
+        b=BtbH6urlzRacTDxeCH88M6PrM/7lfFhZkwzlkL55VrPNr6YjzFm9usg3OpMhOkLUm6
+         gzrlZBKQB2xqXU3opavpM1epxJBUadIctbBzLSVPDLppKMLHUVoBGm6I164P3qG0OI+o
+         HtW0psSGOT/bmnUpG7QjPh5KJCseMWEuQrFhY523TAJHMXukb42kVfqlx1WdOJwfYW9H
+         PQ8//pB34peAhp+6na8DTzPo5Q+Sxd8/NgD1DwvsJTUmwLe4XSvXmJHDovrvqb8RZTFs
+         bccy479NoK3pK8oPHla3YNzQCcHw/8+hPh9F2OLeWvXAR5PPUdgGKgoSo1aGuCSmVkLB
+         UEXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKSwNBZFoVMUIvPpxMrge7s4Gf5ctEcngL/eNDJyzgSEI3giG5QBhJedvbmr1ayNK5HQRCbOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHUZXc29QP1ZLVa42FPulqtDuTIBvMavVqqwXcx3H/D9dkUodk
+	6WM+qlk5gwREFSwXjXBXFc+XUsBQ4FAxm13zzcIAso+ZtStpuyPCzJfY2bSdtlbVDvDoq1/N+zK
+	Z2sn61IuXHJ86GCenuz2jT/mH50SCsoYacqxRcuvZEHXeNBysvKS57baEisRCvtYA4YHwPPBPV8
+	g9Vd5hhH1wlHU1hazohsIhDUMYJzpY3b9c
+X-Gm-Gg: ASbGncuhN2xmqPl5cRThCNW7f485DpEOFQKRF7UVPGweqvCrI3IUORLxCFbEm0svfQi
+	ZjE4fKkgR3s34R1PDxBtyMSAfaqdKuNPlXOuUNWZ2bzXGfdkUvdL+goJ7GSFXyvmFu2T06Q==
+X-Received: by 2002:a17:902:e849:b0:234:8a4a:ada5 with SMTP id d9443c01a7336-23529904f21mr247668385ad.37.1748920755087;
+        Mon, 02 Jun 2025 20:19:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHywPCLM/Qh3jSdbKsF9dOuO472rVd+vIBVeTePaa/6GUJRTTw4v5rkd8bePaost/OoMXAMwCrz5QAOrqb7r5E=
+X-Received: by 2002:a17:902:e849:b0:234:8a4a:ada5 with SMTP id
+ d9443c01a7336-23529904f21mr247667985ad.37.1748920754675; Mon, 02 Jun 2025
+ 20:19:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527161904.75259-1-minhquangbui99@gmail.com>
- <20250527161904.75259-2-minhquangbui99@gmail.com> <CACGkMEvAJziO3KW3Nk9+appXmR92ixcTeWY_XEZz4Qz1MwrhYA@mail.gmail.com>
- <d572e8b6-e25c-480e-9d05-8c7eeb396b12@gmail.com>
-In-Reply-To: <d572e8b6-e25c-480e-9d05-8c7eeb396b12@gmail.com>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
+In-Reply-To: <20250530-rss-v12-1-95d8b348de91@daynix.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 3 Jun 2025 10:56:45 +0800
-X-Gm-Features: AX0GCFvMg4Sj0bgAoq7y4zLkkqsNLbY_mZN0K8gVoKoJcPc_6sY9TVMS041R96c
-Message-ID: <CACGkMEvBPaqXxnmNqZAbAbYFh=9gONva+dpouAeW-sd1pzK58Q@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v2 1/2] virtio-net: support zerocopy multi
- buffer XDP in mergeable
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org
+Date: Tue, 3 Jun 2025 11:19:03 +0800
+X-Gm-Features: AX0GCFv2w2DYNXanInKBc5HQRF8lqBk-gAKp63FMQ8nnSSAfo4iUv1CXTbXlSAw
+Message-ID: <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 29, 2025 at 8:28=E2=80=AFPM Bui Quang Minh <minhquangbui99@gmai=
-l.com> wrote:
+On Fri, May 30, 2025 at 12:50=E2=80=AFPM Akihiko Odaki <akihiko.odaki@dayni=
+x.com> wrote:
 >
-> On 5/29/25 12:59, Jason Wang wrote:
-> > On Wed, May 28, 2025 at 12:19=E2=80=AFAM Bui Quang Minh
-> > <minhquangbui99@gmail.com> wrote:
-> >> Currently, in zerocopy mode with mergeable receive buffer, virtio-net
-> >> does not support multi buffer but a single buffer only. This commit ad=
-ds
-> >> support for multi mergeable receive buffer in the zerocopy XDP path by
-> >> utilizing XDP buffer with frags.
-> >>
-> >> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> >> ---
-> >>   drivers/net/virtio_net.c | 123 +++++++++++++++++++++----------------=
---
-> >>   1 file changed, 66 insertions(+), 57 deletions(-)
-> >>
-> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> >> index e53ba600605a..a9558650f205 100644
-> >> --- a/drivers/net/virtio_net.c
-> >> +++ b/drivers/net/virtio_net.c
-> >> @@ -45,6 +45,8 @@ module_param(napi_tx, bool, 0644);
-> >>   #define VIRTIO_XDP_TX          BIT(0)
-> >>   #define VIRTIO_XDP_REDIR       BIT(1)
-> >>
-> >> +#define VIRTNET_MAX_ZC_SEGS    8
-> >> +
-> >>   /* RX packet size EWMA. The average packet size is used to determine=
- the packet
-> >>    * buffer size when refilling RX rings. As the entire RX ring may be=
- refilled
-> >>    * at once, the weight is chosen so that the EWMA will be insensitiv=
-e to short-
-> >> @@ -1232,65 +1234,53 @@ static void xsk_drop_follow_bufs(struct net_de=
-vice *dev,
-> >>          }
-> >>   }
-> >>
-> >> -static int xsk_append_merge_buffer(struct virtnet_info *vi,
-> >> -                                  struct receive_queue *rq,
-> >> -                                  struct sk_buff *head_skb,
-> >> -                                  u32 num_buf,
-> >> -                                  struct virtio_net_hdr_mrg_rxbuf *hd=
-r,
-> >> -                                  struct virtnet_rq_stats *stats)
-> >> +static int virtnet_build_xsk_buff_mrg(struct virtnet_info *vi,
-> >> +                                     struct receive_queue *rq,
-> >> +                                     u32 num_buf,
-> >> +                                     struct xdp_buff *xdp,
-> >> +                                     struct virtnet_rq_stats *stats)
-> >>   {
-> >> -       struct sk_buff *curr_skb;
-> >> -       struct xdp_buff *xdp;
-> >> -       u32 len, truesize;
-> >> -       struct page *page;
-> >> +       unsigned int len;
-> >>          void *buf;
-> >>
-> >> -       curr_skb =3D head_skb;
-> >> +       if (num_buf < 2)
-> >> +               return 0;
-> >> +
-> >> +       while (num_buf > 1) {
-> >> +               struct xdp_buff *new_xdp;
-> >>
-> >> -       while (--num_buf) {
-> >>                  buf =3D virtqueue_get_buf(rq->vq, &len);
-> >> -               if (unlikely(!buf)) {
-> >> -                       pr_debug("%s: rx error: %d buffers out of %d m=
-issing\n",
-> >> -                                vi->dev->name, num_buf,
-> >> -                                virtio16_to_cpu(vi->vdev,
-> >> -                                                hdr->num_buffers));
-> >> +               if (!unlikely(buf)) {
-> >> +                       pr_debug("%s: rx error: %d buffers missing\n",
-> >> +                                vi->dev->name, num_buf);
-> >>                          DEV_STATS_INC(vi->dev, rx_length_errors);
-> >> -                       return -EINVAL;
-> >> -               }
-> >> -
-> >> -               u64_stats_add(&stats->bytes, len);
-> >> -
-> >> -               xdp =3D buf_to_xdp(vi, rq, buf, len);
-> >> -               if (!xdp)
-> >> -                       goto err;
-> >> -
-> >> -               buf =3D napi_alloc_frag(len);
-> >> -               if (!buf) {
-> >> -                       xsk_buff_free(xdp);
-> >> -                       goto err;
-> >> +                       return -1;
-> >>                  }
-> >>
-> >> -               memcpy(buf, xdp->data - vi->hdr_len, len);
-> >> -
-> >> -               xsk_buff_free(xdp);
-> >> +               new_xdp =3D buf_to_xdp(vi, rq, buf, len);
-> >> +               if (!new_xdp)
-> >> +                       goto drop_bufs;
-> >>
-> >> -               page =3D virt_to_page(buf);
-> >> +               /* In virtnet_add_recvbuf_xsk(), we ask the host to fi=
-ll from
-> >> +                * xdp->data - vi->hdr_len with both virtio_net_hdr an=
-d data.
-> >> +                * However, only the first packet has the virtio_net_h=
-dr, the
-> >> +                * following ones do not. So we need to adjust the fol=
-lowing
-> > Typo here.
+> They are useful to implement VIRTIO_NET_F_RSS and
+> VIRTIO_NET_F_HASH_REPORT.
 >
-> I'm sorry, could you clarify which word contains the typo?
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> ---
+>  include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 188 insertions(+)
 >
-> >
-> >> +                * packets' data pointer to the correct place.
-> >> +                */
-> > I wonder what happens if we don't use this trick? I meant we don't
-> > reuse the header room for the virtio-net header. This seems to be fine
-> > for a mergeable buffer and can help to reduce the trick.
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index 02a9f4dc594d..426f33b4b824 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -9,6 +9,194 @@
+>  #include <uapi/linux/tcp.h>
+>  #include <uapi/linux/virtio_net.h>
 >
-> I don't think using the header room for virtio-net header creates this
-> case handling. In my opinion, it comes from the slightly difference in
-> the recvbuf between single buffer and multi-buffer. When we have n
-> single-buffer packets, each buffer will have its own virtio-net header.
-> But when we have 1 multi-buffer packet (which spans across n buffers),
-> only the first buffer has virtio-net header, the following buffers do not=
-.
->
-> There 2 important pointers here. The pointer we announce to the vhost
-> side to fill the data, let's call it announced_addr, and xdp_buff->data
-> which is expected to point the the start of Ethernet frame. Currently,
->
->      announced_addr =3D xdp_buff->data - hdr_len
->
-> The host side will write the virtio-net header to announced_addr then
-> the Ethernet frame's data in the first buffer. In case of multi-buffer
-> packet, in the following buffers, host side writes the Ethernet frame's
-> data to the announced_addr no virtio-net header. So in the virtio-net,
-> we need to subtract xdp_buff->data, otherwise, we lose some Ethernet
-> frame's data.
->
-> I think a slightly better solution is that we set announced_addr =3D
-> xdp_buff->data then we only need to xdp_buff->data +=3D hdr_len for the
-> first buffer and do need to adjust xdp_buff->data of the following buffer=
-s.
+> +struct virtio_net_hash {
+> +       u32 value;
+> +       u16 report;
+> +};
+> +
+> +struct virtio_net_toeplitz_state {
+> +       u32 hash;
+> +       const u32 *key;
+> +};
+> +
+> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 |=
+ \
+> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv4 |=
+ \
+> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv4 |=
+ \
+> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6 | =
+\
+> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6 |=
+ \
+> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
+> +
+> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+> +
+> +static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t le=
+n)
+> +{
+> +       while (len >=3D sizeof(*input)) {
+> +               *input =3D be32_to_cpu((__force __be32)*input);
+> +               input++;
+> +               len -=3D sizeof(*input);
+> +       }
+> +}
+> +
+> +static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplitz_s=
+tate *state,
+> +                                           const __be32 *input, size_t l=
+en)
+> +{
+> +       while (len >=3D sizeof(*input)) {
+> +               for (u32 map =3D be32_to_cpu(*input); map; map &=3D (map =
+- 1)) {
+> +                       u32 i =3D ffs(map);
+> +
+> +                       state->hash ^=3D state->key[0] << (32 - i) |
+> +                                      (u32)((u64)state->key[1] >> i);
+> +               }
+> +
+> +               state->key++;
+> +               input++;
+> +               len -=3D sizeof(*input);
+> +       }
+> +}
+> +
+> +static inline u8 virtio_net_hash_key_length(u32 types)
+> +{
+> +       size_t len =3D 0;
+> +
+> +       if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+> +               len =3D max(len,
+> +                         sizeof(struct flow_dissector_key_ipv4_addrs));
+> +
+> +       if (types &
+> +           (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDPv4)=
+)
+> +               len =3D max(len,
+> +                         sizeof(struct flow_dissector_key_ipv4_addrs) +
+> +                         sizeof(struct flow_dissector_key_ports));
+> +
+> +       if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+> +               len =3D max(len,
+> +                         sizeof(struct flow_dissector_key_ipv6_addrs));
+> +
+> +       if (types &
+> +           (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDPv6)=
+)
+> +               len =3D max(len,
+> +                         sizeof(struct flow_dissector_key_ipv6_addrs) +
+> +                         sizeof(struct flow_dissector_key_ports));
+> +
+> +       return len + sizeof(u32);
+> +}
+> +
+> +static inline u32 virtio_net_hash_report(u32 types,
+> +                                        const struct flow_keys_basic *ke=
+ys)
+> +{
+> +       switch (keys->basic.n_proto) {
+> +       case cpu_to_be16(ETH_P_IP):
+> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_TCP &&
+> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
+> +                               return VIRTIO_NET_HASH_REPORT_TCPv4;
+> +
+> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_UDP &&
+> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
+> +                               return VIRTIO_NET_HASH_REPORT_UDPv4;
+> +               }
+> +
+> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+> +                       return VIRTIO_NET_HASH_REPORT_IPv4;
+> +
+> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> +
+> +       case cpu_to_be16(ETH_P_IPV6):
+> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_TCP &&
+> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
+> +                               return VIRTIO_NET_HASH_REPORT_TCPv6;
+> +
+> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_UDP &&
+> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
+> +                               return VIRTIO_NET_HASH_REPORT_UDPv6;
+> +               }
+> +
+> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
+> +                       return VIRTIO_NET_HASH_REPORT_IPv6;
+> +
+> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> +
+> +       default:
+> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> +       }
+> +}
+> +
+> +static inline void virtio_net_hash_rss(const struct sk_buff *skb,
+> +                                      u32 types, const u32 *key,
+> +                                      struct virtio_net_hash *hash)
+> +{
+> +       struct virtio_net_toeplitz_state toeplitz_state =3D { .key =3D ke=
+y };
+> +       struct flow_keys flow;
+> +       struct flow_keys_basic flow_basic;
+> +       u16 report;
+> +
+> +       if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
+> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> +               return;
+> +       }
+> +
+> +       flow_basic =3D (struct flow_keys_basic) {
+> +               .control =3D flow.control,
+> +               .basic =3D flow.basic
+> +       };
+> +
+> +       report =3D virtio_net_hash_report(types, &flow_basic);
+> +
+> +       switch (report) {
+> +       case VIRTIO_NET_HASH_REPORT_IPv4:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v4addrs,
+> +                                        sizeof(flow.addrs.v4addrs));
+> +               break;
+> +
+> +       case VIRTIO_NET_HASH_REPORT_TCPv4:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v4addrs,
+> +                                        sizeof(flow.addrs.v4addrs));
+> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.por=
+ts,
+> +                                        sizeof(flow.ports.ports));
+> +               break;
+> +
+> +       case VIRTIO_NET_HASH_REPORT_UDPv4:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v4addrs,
+> +                                        sizeof(flow.addrs.v4addrs));
+> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.por=
+ts,
+> +                                        sizeof(flow.ports.ports));
+> +               break;
+> +
+> +       case VIRTIO_NET_HASH_REPORT_IPv6:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v6addrs,
+> +                                        sizeof(flow.addrs.v6addrs));
+> +               break;
+> +
+> +       case VIRTIO_NET_HASH_REPORT_TCPv6:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v6addrs,
+> +                                        sizeof(flow.addrs.v6addrs));
+> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.por=
+ts,
+> +                                        sizeof(flow.ports.ports));
+> +               break;
+> +
+> +       case VIRTIO_NET_HASH_REPORT_UDPv6:
+> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> +                                        (__be32 *)&flow.addrs.v6addrs,
+> +                                        sizeof(flow.addrs.v6addrs));
+> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.por=
+ts,
+> +                                        sizeof(flow.ports.ports));
+> +               break;
+> +
+> +       default:
+> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> +               return;
 
-Exactly my point.
+So I still think we need a comment here to explain why this is not an
+issue if the device can report HASH_XXX_EX. Or we need to add the
+support, since this is the code from the driver side, I don't think we
+need to worry about the device implementation issues.
 
->
-> >
-> >> +               new_xdp->data -=3D vi->hdr_len;
-> >> +               new_xdp->data_end =3D new_xdp->data + len;
-> >>
-> >> -               truesize =3D len;
-> >> +               if (!xsk_buff_add_frag(xdp, new_xdp))
-> >> +                       goto drop_bufs;
-> >>
-> >> -               curr_skb  =3D virtnet_skb_append_frag(head_skb, curr_s=
-kb, page,
-> >> -                                                   buf, len, truesize=
-);
-> >> -               if (!curr_skb) {
-> >> -                       put_page(page);
-> >> -                       goto err;
-> >> -               }
-> >> +               num_buf--;
-> >>          }
-> >>
-> >>          return 0;
-> >>
-> >> -err:
-> >> +drop_bufs:
-> >>          xsk_drop_follow_bufs(vi->dev, rq, num_buf, stats);
-> >> -       return -EINVAL;
-> >> +       return -1;
-> >>   }
-> >>
-> >>   static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *=
-dev, struct virtnet_info *vi,
-> >> @@ -1307,23 +1297,42 @@ static struct sk_buff *virtnet_receive_xsk_mer=
-ge(struct net_device *dev, struct
-> >>          num_buf =3D virtio16_to_cpu(vi->vdev, hdr->num_buffers);
-> >>
-> >>          ret =3D XDP_PASS;
-> >> +       if (virtnet_build_xsk_buff_mrg(vi, rq, num_buf, xdp, stats))
-> >> +               goto drop;
-> >> +
-> >>          rcu_read_lock();
-> >>          prog =3D rcu_dereference(rq->xdp_prog);
-> >> -       /* TODO: support multi buffer. */
-> >> -       if (prog && num_buf =3D=3D 1)
-> >> -               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, =
-stats);
-> > Without this patch it looks like we had a bug:
-> >
-> >          ret =3D XDP_PASS;
-> >          rcu_read_lock();
-> >          prog =3D rcu_dereference(rq->xdp_prog);
-> >          /* TODO: support multi buffer. */
-> >          if (prog && num_buf =3D=3D 1)
-> >                  ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, =
-stats);
-> >          rcu_read_unlock();
-> >
-> > This implies if num_buf is greater than 1, we will assume XDP_PASS?
->
-> Yes, I think XDP_DROP should be returned in that case.
-
-Care to post a patch and cc stable?
-
->
-> >
-> >> +       if (prog) {
-> >> +               /* We are in zerocopy mode so we cannot copy the multi=
--buffer
-> >> +                * xdp buff to a single linear xdp buff. If we do so, =
-in case
-> >> +                * the BPF program decides to redirect to a XDP socket=
- (XSK),
-> >> +                * it will trigger the zerocopy receive logic in XDP s=
-ocket.
-> >> +                * The receive logic thinks it receives zerocopy buffe=
-r while
-> >> +                * in fact, it is the copy one and everything is messe=
-d up.
-> >> +                * So just drop the packet here if we have a multi-buf=
-fer xdp
-> >> +                * buff and the BPF program does not support it.
-> >> +                */
-> >> +               if (xdp_buff_has_frags(xdp) && !prog->aux->xdp_has_fra=
-gs)
-> >> +                       ret =3D XDP_DROP;
-> > Could we move the check before trying to build a multi-buffer XDP buff?
->
-> Yes, I'll fix this in next version.
->
-> >
-> >> +               else
-> >> +                       ret =3D virtnet_xdp_handler(prog, xdp, dev, xd=
-p_xmit,
-> >> +                                                 stats);
-> >> +       }
-> >>          rcu_read_unlock();
-> >>
-> >>          switch (ret) {
-> >>          case XDP_PASS:
-> >> -               skb =3D xsk_construct_skb(rq, xdp);
-> >> +               skb =3D xdp_build_skb_from_zc(xdp);
-> > Is this better to make this change a separate patch?
->
-> Okay, I'll create a separate patch to convert the current XDP_PASS
-> handler to use xdp_build_skb_from_zc helper.
-
-That would be better.
-
->
-> >
-> >>                  if (!skb)
-> >> -                       goto drop_bufs;
-> >> +                       break;
-> >>
-> >> -               if (xsk_append_merge_buffer(vi, rq, skb, num_buf, hdr,=
- stats)) {
-> >> -                       dev_kfree_skb(skb);
-> >> -                       goto drop;
-> >> -               }
-> >> +               /* Later, in virtnet_receive_done(), eth_type_trans()
-> >> +                * is called. However, in xdp_build_skb_from_zc(), it =
-is called
-> >> +                * already. As a result, we need to reset the data to =
-before
-> >> +                * the mac header so that the later call in
-> >> +                * virtnet_receive_done() works correctly.
-> >> +                */
-> >> +               skb_push(skb, ETH_HLEN);
-> >>
-> >>                  return skb;
-> >>
-> >> @@ -1332,14 +1341,11 @@ static struct sk_buff *virtnet_receive_xsk_mer=
-ge(struct net_device *dev, struct
-> >>                  return NULL;
-> >>
-> >>          default:
-> >> -               /* drop packet */
-> >> -               xsk_buff_free(xdp);
-> >> +               break;
-> >>          }
-> >>
-> >> -drop_bufs:
-> >> -       xsk_drop_follow_bufs(dev, rq, num_buf, stats);
-> >> -
-> >>   drop:
-> >> +       xsk_buff_free(xdp);
-> >>          u64_stats_inc(&stats->drops);
-> >>          return NULL;
-> >>   }
-> >> @@ -1396,6 +1402,8 @@ static int virtnet_add_recvbuf_xsk(struct virtne=
-t_info *vi, struct receive_queue
-> >>                  return -ENOMEM;
-> >>
-> >>          len =3D xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
-> >> +       /* Reserve some space for skb_shared_info */
-> >> +       len -=3D SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> >>
-> >>          for (i =3D 0; i < num; ++i) {
-> >>                  /* Use the part of XDP_PACKET_HEADROOM as the virtnet=
- hdr space.
-> >> @@ -6734,6 +6742,7 @@ static int virtnet_probe(struct virtio_device *v=
-dev)
-> >>          dev->netdev_ops =3D &virtnet_netdev;
-> >>          dev->stat_ops =3D &virtnet_stat_ops;
-> >>          dev->features =3D NETIF_F_HIGHDMA;
-> >> +       dev->xdp_zc_max_segs =3D VIRTNET_MAX_ZC_SEGS;
-> >>
-> >>          dev->ethtool_ops =3D &virtnet_ethtool_ops;
-> >>          SET_NETDEV_DEV(dev, &vdev->dev);
-> >> --
-> >> 2.43.0
-> >>
-> > Thanks
-> >
->
+For the issue of the number of options, does the spec forbid fallback
+to VIRTIO_NET_HASH_REPORT_NONE? If not, we can do that.
 
 Thanks
+
+> +       }
+> +
+> +       hash->value =3D toeplitz_state.hash;
+> +       hash->report =3D report;
+> +}
+> +
+>  static inline bool virtio_net_hdr_match_proto(__be16 protocol, __u8 gso_=
+type)
+>  {
+>         switch (gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+>
+> --
+> 2.49.0
+>
 
 
