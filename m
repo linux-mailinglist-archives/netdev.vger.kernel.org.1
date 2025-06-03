@@ -1,182 +1,160 @@
-Return-Path: <netdev+bounces-194704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53A73ACC011
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:15:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42789ACC015
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C884188C57C
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:15:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4682E7A4E2D
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AD71F3BA4;
-	Tue,  3 Jun 2025 06:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0AF1586C8;
+	Tue,  3 Jun 2025 06:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PA4KVyng"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CA7AD23;
-	Tue,  3 Jun 2025 06:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444B4182BC;
+	Tue,  3 Jun 2025 06:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748931298; cv=none; b=ZDWxrBehdU71LKMHaR9ItQXBPXWqqfNeVPGnw5CWp0ErRk5kI2IhfA900Klt9Fk+voZMRAFxQOY1e5Qz3v5kW3mWZ4vy5hriK8IXQ9IkdqBi/5/dXZUdfgBbl+Tojnt+qhsLcgn8prtNVYZAublZk6aaScZvBGr1hyPoCLwqoig=
+	t=1748931353; cv=none; b=TIMjp4AYHevUzRYeZiKSTZOso/V8F+x7bB9AduPeT7Tr5x7YDua6zBrJbNCjPlxb0pjSKIIEtjN4i5zbBkbf7nAjGvcCEeosanQ0Fg2un+G0BOu9CgAunSpisSyIvqOhAJSvEHKeBB6oeH9ZmAhxK1lz+/dY5fJzsKbkNBsZkDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748931298; c=relaxed/simple;
-	bh=H4ceec5yxnOChwxTFgmHVXVGW9miP1wPwGN9LC5kQjU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=LtcrCxp5dUp8aLukCPmsCuE5QJ44uwdCfaNXhHFV4FhQMz/GRH1V+qpbd8JTgMz1Vm7TbEcA3DYhlviChIUOUsgyNIBzqQ7GIH69zP2na2/8+3R9jQ8rYiBIC+nr/7c6aGnO49ys1WmWfxeRMkaj+g8ehuvmyfznrhP6OQyAkRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0e3e2006404211f0b29709d653e92f7d-20250603
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_TXT, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, UD_TRUSTED, CIE_BAD, CIE_GOOD_SPF, GTI_FG_BS
-	GTI_C_CI, GTI_FG_IT, GTI_RG_INFO, GTI_C_BU, AMN_T1
-	AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:085eb006-b13b-4393-bf0d-8207b50233b3,IP:10,
-	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-20
-X-CID-INFO: VERSION:1.1.45,REQID:085eb006-b13b-4393-bf0d-8207b50233b3,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-20
-X-CID-META: VersionHash:6493067,CLOUDID:a5139acd65cdecfd4de04f0d68efa02a,BulkI
-	D:250603141450DM8BP3ZN,BulkQuantity:0,Recheck:0,SF:19|24|38|44|66|72|78|10
-	2,TC:nil,Content:0|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:ni
-	l,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:
-	0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
-X-UUID: 0e3e2006404211f0b29709d653e92f7d-20250603
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1879150611; Tue, 03 Jun 2025 14:14:49 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH v3] net/mlx5: Flag state up only after cmdif is ready
-Date: Tue,  3 Jun 2025 14:14:33 +0800
-Message-Id: <20250603061433.82155-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1748931353; c=relaxed/simple;
+	bh=+TCfw6UJc0x8ReuGqpQSLdcc0Fq1J8YMPv6hWfnhg+g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ShgV8Txbpp9j9KE+aON5D7MP6q7m9xJcVN2iaGrA3L69MdUTWi5uHltDeytf/T4LHBg4DlYGCDmL/XoOc2ip1Bsjai60LpX77ndsNWYwZgfJ72zXEBW5idPUE1a9pQ8jJpG5cQhO3xadmfse0TQix6uAlt6KOdLHQ7NRxoLJveA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PA4KVyng; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-70e5599b795so50377787b3.3;
+        Mon, 02 Jun 2025 23:15:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748931351; x=1749536151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ExuFxCiiYbsiAIp1UmQZoEfKI6isD2hGXE7AN2ae6jI=;
+        b=PA4KVyngyCnC54XYY10ZAkm4BQzDhintsxY5nVYd/2lJLqzKLcKL6skET32PBDUQdJ
+         T0L+XeRIf0wqzoy77U45t42Y+VoKFMh+/dqJ01mB4FZ1c2qai1JB/ophwPjNNCQjD9YY
+         lGCXfDhdorRDIDXfr8QAk6XZX0/6U1T0dU3G+2T57Szwcv483qNwAUbwNHqLCog0ru3U
+         afXh4kteyWCxy1tWKCEaG23JnYiRRex8wRv+4KHdijOt0/64g5h782weS8zObK8IVeIL
+         84CDiT9+cPJnDna1tm4o9CCasSj0MXvOWWxykvtoiXF1EsoNoHzwET8UJ6Kek4FOR0cs
+         lU4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748931351; x=1749536151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ExuFxCiiYbsiAIp1UmQZoEfKI6isD2hGXE7AN2ae6jI=;
+        b=WQY1IeC2511DrTNxoEwQrB5uOvPgkuf2VAcskDgtzYjwS9ln1dsfAQuSEbaVQhhkUy
+         aBRV89tMO6YAZdv6EwfpnKVuvN549HngkNWLBMm5QLWPcCizXm6xR2Fu1i1YjdC843Zj
+         wY8H7pU6wuduEPL1JYXgi76Nwu0zNQ8V6ntWzihtEVqoKHZf6piOKI7tsq+IuC/jMb7+
+         P9Mt1E1hMqX6CtJDRQIQ0ZlAqyPHZbIhk+5pgidhldpq3rvSRoydvZEdx7ty+9XVIv76
+         xON9uFadGhldCeac5PTaWmgGibm7bacRIxUdYX5RsnZF1ghHhV4WHPlvJVJBE+HSAVQu
+         Mxiw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8KzCH4768BVPjFTuPzZHg57/o9y3VrTwXS65ayxw2pKpTQIhPIm2KNQ2EIRV4WtD14BB4pz88J2uMuJo=@vger.kernel.org, AJvYcCXfifob8ESkBCnSTMfHReLvE/VnPa2mlMM6PwBbVICVQnsF0WzPdWUV9pP6YFIUY5+xUYmXFMaI@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVY/+nmMLeL6TehepavrW3tmFugSJNNu+H5cSL/b9uKLYmahjR
+	QDn3qydkg36cLXHLi51oTHP8L06PZQpugtbmcvWPCjSkv9IG1t91UJkQ9YfqrOehuRBSbQgXhOq
+	XhoipaslJkvqYlBK5P14fo1Ip/zj7Nws=
+X-Gm-Gg: ASbGncvWMU6s2VH3EhdIkRMOrwQI8jmMXQjawUy1bhRx58D1k57IvCisTTR3qNXwkzy
+	K27wFaKtbI9erTFmxWIHpFqrP0qrLr6p2rgcDVftN750NP9sf/ssscHOweifgL3Q6LU6xIy5w3u
+	asSSxsCRjD4mQTkSRYNiqjmR/hWM1X5+q6Btwt2PQvOg==
+X-Google-Smtp-Source: AGHT+IGY6FBmZwmi0m/8ysBAH8/mLaagNSuxT/186P9VesCkOQnw6hhcDIYe/FLHli4CmyVMz+OZWeKmAV3QInXqeoQ=
+X-Received: by 2002:a05:690c:6382:b0:70e:7503:1181 with SMTP id
+ 00721157ae682-70f97eaa4femr240501707b3.18.1748931350921; Mon, 02 Jun 2025
+ 23:15:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250602193953.1010487-1-jonas.gorski@gmail.com>
+ <20250602193953.1010487-6-jonas.gorski@gmail.com> <c1c3b951-19b8-462a-9dee-a1b893251d6f@broadcom.com>
+In-Reply-To: <c1c3b951-19b8-462a-9dee-a1b893251d6f@broadcom.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Tue, 3 Jun 2025 08:15:38 +0200
+X-Gm-Features: AX0GCFu2kmJ_nnoOXZhbAertSNtMXnGhNEMlYn6h5PxdxbnewlMWrtzy2kbl8tE
+Message-ID: <CAOiHx=n6Mc+nM2QOa8okQbFcj9UHgfMbKKcNXG6D-VJjELHrsw@mail.gmail.com>
+Subject: Re: [PATCH net v2 5/5] net: dsa: b53: do not touch DLL_IQQD on bcm53115
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vivien Didelot <vivien.didelot@gmail.com>, =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When driver is reloading during recovery flow, it can't get new commands
-till command interface is up again. Otherwise we may get to null pointer
-trying to access non initialized command structures.
+On Mon, Jun 2, 2025 at 11:40=E2=80=AFPM Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+>
+> On 6/2/25 12:39, Jonas Gorski wrote:
+> > According to OpenMDK, bit 2 of the RGMII register has a different
+> > meaning for BCM53115 [1]:
+> >
+> > "DLL_IQQD         1: In the IDDQ mode, power is down0: Normal function
+> >                    mode"
+> >
+> > Configuring RGMII delay works without setting this bit, so let's keep i=
+t
+> > at the default. For other chips, we always set it, so not clearing it
+> > is not an issue.
+> >
+> > One would assume BCM53118 works the same, but OpenMDK is not quite sure
+> > what this bit actually means [2]:
+> >
+> > "BYPASS_IMP_2NS_DEL #1: In the IDDQ mode, power is down#0: Normal
+> >                      function mode1: Bypass dll65_2ns_del IP0: Use
+> >                      dll65_2ns_del IP"
+> >
+> > So lets keep setting it for now.
+> >
+> > [1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob=
+/master/cdk/PKG/chip/bcm53115/bcm53115_a0_defs.h#L19871
+> > [2] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob=
+/master/cdk/PKG/chip/bcm53118/bcm53118_a0_defs.h#L14392
+> >
+> > Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitc=
+h")
+> > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> > ---
+> > v1 -> v2:
+> > * new patch
+> >
+> >   drivers/net/dsa/b53/b53_common.c | 8 +++++---
+> >   1 file changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53=
+_common.c
+> > index be4493b769f4..862bdccb7439 100644
+> > --- a/drivers/net/dsa/b53/b53_common.c
+> > +++ b/drivers/net/dsa/b53/b53_common.c
+> > @@ -1354,8 +1354,7 @@ static void b53_adjust_531x5_rgmii(struct dsa_swi=
+tch *ds, int port,
+> >        * tx_clk aligned timing (restoring to reset defaults)
+> >        */
+> >       b53_read8(dev, B53_CTRL_PAGE, off, &rgmii_ctrl);
+> > -     rgmii_ctrl &=3D ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC |
+> > -                     RGMII_CTRL_TIMING_SEL);
+> > +     rgmii_ctrl &=3D ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
+>
+> Are not we missing a:
+>
+> if (dev->chip_id !=3D BCM53115_DEVICE_ID)
+>         rgmii_ctrl &=3D ~RGMII_CTRL_TIMING_SEL;
+>
+> here to be strictly identical before/after?
 
-The issue can be reproduced using the following script:
+We could add it for symmetry, but it would be purely decorational. We
+unconditionally set this bit again later, so clearing it before has no
+actual effect, which is why I didn't add it.
 
-1)Use following script to trigger PCI error.
-
-for((i=1;i<1000;i++));
-do
-echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
-echo “pci reset test $i times”
-done
-
-2) Use following script to read speed.
-
-while true; do cat /sys/class/net/eth0/speed &> /dev/null; done
-
-task: ffff885f42820fd0 ti: ffff88603f758000 task.ti: ffff88603f758000
-RIP: 0010:[] [] dma_pool_alloc+0x1ab/0×290
-RSP: 0018:ffff88603f75baf0 EFLAGS: 00010046
-RAX: 0000000000000246 RBX: ffff882f77d90c80 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 00000000000080d0 RDI: ffff882f77d90d10
-RBP: ffff88603f75bb20 R08: 0000000000019ba0 R09: ffff88017fc07c00
-R10: ffffffffc0a9c384 R11: 0000000000000246 R12: ffff882f77d90d00
-R13: 00000000000080d0 R14: ffff882f77d90d10 R15: ffff88340b6c5ea8
-FS: 00007efce8330740(0000) GS:ffff885f4da00000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000003454fc6000 CR4: 00000000003407e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call trace:
- mlx5_alloc_cmd_msg+0xb4/0×2a0 [mlx5_core]
- mlx5_alloc_cmd_msg+0xd3/0×2a0 [mlx5_core]
- cmd_exec+0xcf/0×8a0 [mlx5_core]
- mlx5_cmd_exec+0x33/0×50 [mlx5_core]
- mlx5_core_access_reg+0xf1/0×170 [mlx5_core]
- mlx5_query_port_ptys+0x64/0×70 [mlx5_core]
- mlx5e_get_link_ksettings+0x5c/0×360 [mlx5_core]
- __ethtool_get_link_ksettings+0xa6/0×210
- speed_show+0x78/0xb0
- dev_attr_show+0x23/0×60
- sysfs_read_file+0x99/0×190
- vfs_read+0x9f/0×170
- SyS_read+0x7f/0xe0
- tracesys+0xe3/0xe8
-
-Fixes: a80d1b68c8b7a0 ("net/mlx5: Break load_one into three stages")
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
-v3:
- - The recovery process of pci error is mlx5_load_one ->
-  mlx5_load_one_devl_locked -> mlx5_function_setup ->
-  mlx5_function_enable -> mlx5_cmd_enable. In the mlx5_cmd_enable
-  function, cmd->state will be set to MLX5_CMDIF_STATE_DOWN, and when the
-  pci error recovery fails, it is the recovery of the entire device, so I
-  prefer to use MLX5_DEVICE_STATE_UP.
-
-v2:
- https://lore.kernel.org/all/b8c300f8-bb3b-421f-81c5-f493984f922d@nvidia.com/ 
-
-v1:
- https://lore.kernel.org/all/20250527013723.242599-1-zhaochenguang@kylinos.cn/
----
- drivers/net/ethernet/mellanox/mlx5/core/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 41e8660c819c..713f1f4f2b42 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1210,6 +1210,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
- 	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
- 	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
- 
-+	/* remove any previous indication of internal error */
-+	dev->state = MLX5_DEVICE_STATE_UP;
-+
- 	err = mlx5_core_enable_hca(dev, 0);
- 	if (err) {
- 		mlx5_core_err(dev, "enable hca failed\n");
-@@ -1602,8 +1605,6 @@ int mlx5_load_one_devl_locked(struct mlx5_core_dev *dev, bool recovery)
- 		mlx5_core_warn(dev, "interface is up, NOP\n");
- 		goto out;
- 	}
--	/* remove any previous indication of internal error */
--	dev->state = MLX5_DEVICE_STATE_UP;
- 
- 	if (recovery)
- 		timeout = mlx5_tout_ms(dev, FW_PRE_INIT_ON_RECOVERY_TIMEOUT);
--- 
-2.25.1
-
+Regards,
+Jonas
 
