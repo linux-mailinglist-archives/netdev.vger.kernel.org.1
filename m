@@ -1,195 +1,197 @@
-Return-Path: <netdev+bounces-194763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFB5ACC50C
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:11:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C2DACC513
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0642918940C9
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:11:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6210417378D
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E9B22E3FC;
-	Tue,  3 Jun 2025 11:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541E922FAF4;
+	Tue,  3 Jun 2025 11:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="MrS446hd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAF722A804
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92F6149C41
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748949036; cv=none; b=d/64XRxMjjKndNW7kSlPZcnGQeAbaV4sA+CM2XjS6cUBJYA23eSYH/G7nNTPb4l8vwxWNLeeH4fZqtVzvXotr+4bi2YaAx5eMDoIqHHc4ba5gtChGwnIDCb96PbL8fq2DjD6CFcd/cEWoN6y+OFCrkDGvfrGq84dxPpFVYAuAQw=
+	t=1748949092; cv=none; b=DZWtpa+QlEXljkOdddPWTZ56y6+aMOSoSo21HVTmZf1FMmthK604YRucwDScdkX1n78CLbcfJOBQUV3WUq41cpo1iQH1Za9iVt5wPL+vmWc6I1UxQCYlH5/kaIWmFs8Wy+Q7Y5buiwIx19zzlGMsnyFCh7y5i0ctAC6BjvrVhhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748949036; c=relaxed/simple;
-	bh=BNCUlxhZ6MRKA6nV8I3BNSL71w9PIu3On7WkBXlGqmI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cMZJ3gvL8XhnCS+m9cPSBrXgF+WvbPLmwOLC/zfoqNjbh+tQjfbfZTBAXkSrv3n4aBofkJGsjgsJpXlmMWaM+U4/FOk99cgcT9f89MoP0zWL07agzMBZrVGSsd0TDyz4w0RKftWGJHGh5LZKAf8yfgJibc7pBGIu5UuHARjQ7+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddb8522720so12630135ab.2
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:10:34 -0700 (PDT)
+	s=arc-20240116; t=1748949092; c=relaxed/simple;
+	bh=ddSx87j2b/wethd973Bjs84NER0mKR9D5FDWt1Wtgb8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VQ79AqASMNsxs0hty9VhuZvIgJ26M4AyyAMf6Flowk4MLlFwoH8T8FBqWH5yCHvhUc+TtqL2wdMC0Jw2f8+zean8veF16wLNDoJKGKXd2LGlIsOmMDg9AqQKIjjQQreMzwHJTySj4R3rmNf0AmlK2XBRM+Ztv6/PoNcxX5KVPPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=MrS446hd; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-451d54214adso21172415e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:11:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1748949087; x=1749553887; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1O+G39zuQ0j4f3Im1BQ0ByTPG2i2UdQAzgJhKcuUgEo=;
+        b=MrS446hdVLvXhTegZG5KGjqo919K6/OVjEIH5EAOo91Rdjm2ZEHtqawXe92ktXDa/f
+         UT5qK+B7HQMn3CYqtX90q0G45Cc+BDhvrqZlu72hkrlme55B3lZ0LHFFdQe6x32AC+zn
+         sw9B6BDYThuYFT+M6zFa9BJO0GYJvFfA5zctJQRTmWJygLAPBEAYwT89VzMvrVta3q95
+         Gfpim7zLle2oJmjBdI+KLbPVXE1dak3lCGTdSc6Xhz4OpUzOQIeijmrx0nV09g5H97lw
+         Xjo5hSUpTkQYMuCYUlRZMxpDnXReaEFK09yKAvN95GfMgCeYmXWDUV1yVJe+6ciwXET6
+         +PKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748949034; x=1749553834;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sjqkPKKfGL6UKsOz6tntxTAr4cz7BoNXJ9xOc8bK7zE=;
-        b=OYiw5CJXwGuyQSDmdkNfSRdMzf3jK6useyVGXeuKnESYxSHI2VhUU6+77hq2LdmoqK
-         Oh/hXqyqAW4kRV9StmRMX1INyo2lg2nnKZ/pdFWWGKas20BZMnioEoAemr4g6ZZ0ul6r
-         PpCEZOiyJDjXu/FRkPsvKy9DDLzzVsjwKelTOrxynxS7W/H5iOJrbFjwJfZ/cMQjouvm
-         4iLEDLDC1UpZxi1co4s5Lo8vf+XcM2zj368UThRT47wjVqCwnI/6yjFFxD2FuKj+Qsf/
-         PSlDAGDZbe2O946AmT8CxFhae9GyZ4uxz+q/mKL7UlakKBoPc/WpdHyJeMNc+1H/WNI4
-         JMsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVI2vUA/qKrkgRlbBGsGvdbCqlSO1bUXvljb4YI6sM51ZmmflRKQ3qAtATKzCkkemh5lXfq2zE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV78+Aj8/cGx/0UsLrVMwuV4W7++e3TF7qfoL0HmsU9euCbA/u
-	GlAhSt0oiO6ArLp8WyZL3S8FYQ760oBlIMgYllPvDwjQLscuzd7c99N1XyiBDjSpDsGI18/GCFn
-	4aESp3hRtlxAnITi5pK+ddYgakvRT0p2vF8+PUAKyOj2Hhu4+F06dTSpw33U=
-X-Google-Smtp-Source: AGHT+IFOJwmyjFxjskp3g2tFSkQuJwlZqA7Cg9uOzjOV9WdxsZ9HH3JUzqmOqVCwd/tIakPEIcqnTkKGYBJD3XLsIE5lBANmjWzD
+        d=1e100.net; s=20230601; t=1748949087; x=1749553887;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1O+G39zuQ0j4f3Im1BQ0ByTPG2i2UdQAzgJhKcuUgEo=;
+        b=ofVwMzdb/eyi4WQOYcvykwiE+j9w+6Fq/ZI4Q3QsN+Rfzs+dAn2li/+EWTf/rfkqf3
+         ukAxFipVNqN/XLZhvee9lhV9e/AINysUB1O/ESJM9UbJzR5ZJMX2D1vvarbx98h/QFcS
+         kXopxz+q2fD17+EphlTo8Vv2MMsFWjmuPbBvObhUff2DpHeZoXoYDRRzpcLvVMZ0/l1s
+         ZkuypZ79LSdoZtbdoZeOiw1sGViAvmI+0T1kKMSS2ESZuNf0U3kGe/WMBgntfq6PZNXi
+         H7Td2JEzKAGbkwAlIEfgxbi3Q1ZfVUC47c29p1byVyGEfGYP059SW6kPraG2DZglVQrD
+         Rk3g==
+X-Gm-Message-State: AOJu0Yy1WaOmraWv4dulSrHs+j4b0gLVL1Oj0eHEyqCGSL6ebTSpFRvZ
+	of137VT9cGZ1eCbf4V2vczLLofTzXI3293Zg6IY5bNssz967CrUZjWw5p2fLpPPvmRP6ajdkdWb
+	w8F+5KJ2/SmgbIbPj2Hoy4Ds8Ik+bzB09VNvRyy+oUKUtnmivfW6ysfK55XfnFAsx
+X-Gm-Gg: ASbGncsT11KnH8TlWEbnvprH3wYvEpRlNMqFscBBUx7ut5R4nDt6WEC1YmwjFsxs0W6
+	gKOv7Bl8yFT/qFJYSMGiGAHlUq02P3kHEML8az3SbgkKGydBmVu6a7Grp6xd++bhkWVUf5LuAlV
+	ram6/5liyVCnoI2IItoi+Rzw4BNPvsFzkryu2XEvcxB56hf+ncbxfqeZTM94kxk5frpFX6Co96W
+	6U5orGcThUe21YF+3r3m2WQ4lKpuih8ECJIwAZSXug1kXAxyOc9dMi9+JKq3Jf8jBPRj2R5EqQp
+	1rnJOhtAn/eqQRFkKcilYdohX6Y1wS34v8O6mWH2qxCIJx9/Mlv+AJI30RiQIRP65I9BE4wzSmi
+	9m5JMip1AGQ==
+X-Google-Smtp-Source: AGHT+IFDKwI0xPJArN1iMwhcxgYZSAKN0i5t+bPVbf7n5ut9hEEZMbt56KnvjwnlXSX/nZvTC8jkdA==
+X-Received: by 2002:a05:600c:358c:b0:43d:172:50b1 with SMTP id 5b1f17b1804b1-450d655fa64mr138477725e9.29.1748949087558;
+        Tue, 03 Jun 2025 04:11:27 -0700 (PDT)
+Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:32cb:f052:3c80:d7a2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7fa249esm163244525e9.13.2025.06.03.04.11.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jun 2025 04:11:27 -0700 (PDT)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: netdev@vger.kernel.org
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Antonio Quartulli <antonio@openvpn.net>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net 0/5] pull request: fixes for ovpn 2025-06-03
+Date: Tue,  3 Jun 2025 13:11:05 +0200
+Message-ID: <20250603111110.4575-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:380d:b0:3dc:76c6:436f with SMTP id
- e9e14a558f8ab-3dda3394b74mr118384375ab.21.1748949033940; Tue, 03 Jun 2025
- 04:10:33 -0700 (PDT)
-Date: Tue, 03 Jun 2025 04:10:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <683ed829.a00a0220.d8eae.006c.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in __igmp_group_dropped
-From: syzbot <syzbot+b7da0e231ae4e5a9917f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Hi netdev-team,
+[2025-06-03: added WRITE_ONCE() to 1/5]
 
-syzbot found the following issue on:
+In this batch you can find the following bug fixes:
 
-HEAD commit:    d00a83477e7a Merge tag 'input-for-v6.16-rc0' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12f0dc82580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4df26174733e11f3
-dashboard link: https://syzkaller.appspot.com/bug?extid=b7da0e231ae4e5a9917f
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Patch 1: when releasing a UDP socket we were wrongly invoking
+setup_udp_tunnel_sock() with an empty config. This was not
+properly shutting down the UDP encap state.
+With this patch we simply undo what was done during setup.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Patch 2: ovpn was holding a reference to a 'struct socket'
+without increasing its reference counter. This was intended
+and worked as expected until we hit a race condition where
+user space tries to close the socket while kernel space is
+also releasing it. In this case the (struct socket *)->sk
+member would disappear under our feet leading to a null-ptr-deref.
+This patch fixes this issue by having struct ovpn_socket hold
+a reference directly to the sk member while also increasing
+its reference counter.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d00a8347.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9ac727dc51c3/vmlinux-d00a8347.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8981faa6f0a2/bzImage-d00a8347.xz
+Patch 3: in case of errors along the TCP RX path (softirq)
+we want to immediately delete the peer, but this operation may
+sleep. With this patch we move the peer deletion to a scheduled
+worker.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b7da0e231ae4e5a9917f@syzkaller.appspotmail.com
-
-bridge0: port 2(bridge_slave_1) entered disabled state
-bridge_slave_0: left allmulticast mode
-bridge_slave_0: left promiscuous mode
-bridge0: port 1(bridge_slave_0) entered disabled state
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000021: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000108-0x000000000000010f]
-CPU: 0 UID: 0 PID: 6857 Comm: kworker/u32:24 Not tainted 6.15.0-syzkaller-10954-gd00a83477e7a #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: netns cleanup_net
-RIP: 0010:read_pnet include/net/net_namespace.h:409 [inline]
-RIP: 0010:dev_net include/linux/netdevice.h:2713 [inline]
-RIP: 0010:__igmp_group_dropped+0xcd/0xe80 net/ipv4/igmp.c:1298
-Code: 3c 02 00 0f 85 10 0c 00 00 4d 8b 2c 24 e8 cb 5b 80 01 48 b8 00 00 00 00 00 fc ff df 49 8d bd 08 01 00 00 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 db 0b 00 00 48 8d bb db 00 00 00 4d 8b bd 08 01
-RSP: 0018:ffffc9000408f5d8 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: ffff888062ee0600 RCX: ffffffff89fda2e7
-RDX: 0000000000000021 RSI: ffffffff89fd05dc RDI: 0000000000000108
-RBP: 1ffff92000811ebe R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff888053fdf000
-R13: 0000000000000000 R14: 0000000000000001 R15: ffff88802bef0418
-FS:  0000000000000000(0000) GS:ffff8880d6765000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000000 CR3: 000000000e382000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- igmp_group_dropped net/ipv4/igmp.c:1335 [inline]
- ip_mc_down+0xc0/0x3c0 net/ipv4/igmp.c:1829
- inetdev_event+0x3b2/0x18a0 net/ipv4/devinet.c:1642
- notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
- call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
- call_netdevice_notifiers net/core/dev.c:2282 [inline]
- dev_close_many+0x319/0x630 net/core/dev.c:1785
- unregister_netdevice_many_notify+0x578/0x26f0 net/core/dev.c:12046
- ops_exit_rtnl_list net/core/net_namespace.c:188 [inline]
- ops_undo_list+0x8fc/0xab0 net/core/net_namespace.c:249
- cleanup_net+0x408/0x890 net/core/net_namespace.c:686
- process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3321 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x5d7/0x6f0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:read_pnet include/net/net_namespace.h:409 [inline]
-RIP: 0010:dev_net include/linux/netdevice.h:2713 [inline]
-RIP: 0010:__igmp_group_dropped+0xcd/0xe80 net/ipv4/igmp.c:1298
-Code: 3c 02 00 0f 85 10 0c 00 00 4d 8b 2c 24 e8 cb 5b 80 01 48 b8 00 00 00 00 00 fc ff df 49 8d bd 08 01 00 00 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 db 0b 00 00 48 8d bb db 00 00 00 4d 8b bd 08 01
-RSP: 0018:ffffc9000408f5d8 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: ffff888062ee0600 RCX: ffffffff89fda2e7
-RDX: 0000000000000021 RSI: ffffffff89fd05dc RDI: 0000000000000108
-RBP: 1ffff92000811ebe R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff888053fdf000
-R13: 0000000000000000 R14: 0000000000000001 R15: ffff88802bef0418
-FS:  0000000000000000(0000) GS:ffff8880d6965000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000003233b000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	3c 02                	cmp    $0x2,%al
-   2:	00 0f                	add    %cl,(%rdi)
-   4:	85 10                	test   %edx,(%rax)
-   6:	0c 00                	or     $0x0,%al
-   8:	00 4d 8b             	add    %cl,-0x75(%rbp)
-   b:	2c 24                	sub    $0x24,%al
-   d:	e8 cb 5b 80 01       	call   0x1805bdd
-  12:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  19:	fc ff df
-  1c:	49 8d bd 08 01 00 00 	lea    0x108(%r13),%rdi
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 db 0b 00 00    	jne    0xc0f
-  34:	48 8d bb db 00 00 00 	lea    0xdb(%rbx),%rdi
-  3b:	4d                   	rex.WRB
-  3c:	8b                   	.byte 0x8b
-  3d:	bd                   	.byte 0xbd
-  3e:	08 01                	or     %al,(%rcx)
+Patch 4 and 5 are instead fixing minor issues in the ovpn
+kselftests.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Please pull or let me know of any issue
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Thanks a lot,
+Antonio
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Antonio Quartulli (5):
+  ovpn: properly deconfigure UDP-tunnel
+  ovpn: ensure sk is still valid during cleanup
+  ovpn: avoid sleep in atomic context in TCP RX error path
+  selftest/net/ovpn: fix TCP socket creation
+  selftest/net/ovpn: fix missing file
 
-If you want to undo deduplication, reply with:
-#syz undup
+ drivers/net/ovpn/io.c                         |  8 +-
+ drivers/net/ovpn/netlink.c                    | 16 ++--
+ drivers/net/ovpn/peer.c                       |  4 +-
+ drivers/net/ovpn/socket.c                     | 68 +++++++++--------
+ drivers/net/ovpn/socket.h                     |  4 +-
+ drivers/net/ovpn/tcp.c                        | 73 ++++++++++---------
+ drivers/net/ovpn/tcp.h                        |  3 +-
+ drivers/net/ovpn/udp.c                        | 46 ++++++------
+ drivers/net/ovpn/udp.h                        |  4 +-
+ tools/testing/selftests/net/ovpn/ovpn-cli.c   |  1 +
+ .../selftests/net/ovpn/test-large-mtu.sh      |  9 +++
+ 11 files changed, 128 insertions(+), 108 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ovpn/test-large-mtu.sh
+
+-- 
+2.49.0
+
+The following changes since commit 408da3a0f89d581421ca9bd6ff39c7dd05bc4b2f:
+
+  Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2025-06-02 18:44:37 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/OpenVPN/ovpn-net-next tags/ovpn-net-20250603
+
+for you to fetch changes up to 9c7e8b31da035fe81399891b2630a8e0c4b09137:
+
+  selftest/net/ovpn: fix missing file (2025-06-03 13:08:15 +0200)
+
+----------------------------------------------------------------
+This bugfix batch includes the following changes:
+* dropped bogus call to setup_udp_tunnel_sock() during
+  cleanup, substituted by proper state unwind
+* fixed race condition between peer removal (by kernel
+  space) and socket closing (by user space)
+* fixed sleep in atomic context along TCP RX error path
+* fixes for ovpn kselftests
+
+----------------------------------------------------------------
+Antonio Quartulli (5):
+      ovpn: properly deconfigure UDP-tunnel
+      ovpn: ensure sk is still valid during cleanup
+      ovpn: avoid sleep in atomic context in TCP RX error path
+      selftest/net/ovpn: fix TCP socket creation
+      selftest/net/ovpn: fix missing file
+
+ drivers/net/ovpn/io.c                              |  8 +--
+ drivers/net/ovpn/netlink.c                         | 16 ++---
+ drivers/net/ovpn/peer.c                            |  4 +-
+ drivers/net/ovpn/socket.c                          | 68 +++++++++++---------
+ drivers/net/ovpn/socket.h                          |  4 +-
+ drivers/net/ovpn/tcp.c                             | 73 +++++++++++-----------
+ drivers/net/ovpn/tcp.h                             |  3 +-
+ drivers/net/ovpn/udp.c                             | 46 +++++++-------
+ drivers/net/ovpn/udp.h                             |  4 +-
+ tools/testing/selftests/net/ovpn/ovpn-cli.c        |  1 +
+ tools/testing/selftests/net/ovpn/test-large-mtu.sh |  9 +++
+ 11 files changed, 128 insertions(+), 108 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ovpn/test-large-mtu.sh
 
