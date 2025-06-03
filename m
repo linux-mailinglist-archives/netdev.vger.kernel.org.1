@@ -1,190 +1,237 @@
-Return-Path: <netdev+bounces-194798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D5A9ACCA20
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:27:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41289ACCA2B
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 423393A2787
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F40F1888EB4
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0038022FE17;
-	Tue,  3 Jun 2025 15:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jp+YEgEm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A51B1537DA;
+	Tue,  3 Jun 2025 15:30:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754C370838;
-	Tue,  3 Jun 2025 15:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748964454; cv=fail; b=c0266uu2phoAH/7H8A3zApwZ73S5JGF3dl/Ln2kEcz6t06naC1ZKKZfXn15mnwvL0+zGALbNJSYAOxN+VQOX5tQr2jk9MbXFW0ELIFeFpxRYkQiTCvX5SNRNOov1J8g4cKuANIRihVXXZeRr/ctpRELoj3j7XCcWN4vN8ObOXcU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748964454; c=relaxed/simple;
-	bh=DQsLwjhjyVnNcEhhIC9CZt8RhSPiqOqKivaLqLMh2KE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u28Ah+M4fwaeelDR3q/f0Cb1dEeqZKFIE7i0amzuU8IYFGnHvYsFu9j6KRJQurmpn9u9HkslS9WO+TylcO1DBIpR6aZ8des2/gCD0s8kpYiOVXv+gftSsS7rkrDwgvG8eL6HSgAqPxc2Kn40hsmznbZikjCsF1OdIXm1JMij2G8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jp+YEgEm; arc=fail smtp.client-ip=40.107.243.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i0BES23Ge40A6gdbBXxNQJuYolmANL+6DoIxlpxJjMgd3NIcIKfpb5AgJRmImUxbHQ5sdjLeCxB52zJJ7yD170OiO6/WSlZDwllAu481DqPGWTyDv2VoKzzxuIaGzstLVMi46WK9lt7D49PkJcbIwPwFEmcxIhGrT58yE0zuiqoStzdzQUVwuddhx8LCOCg8oKAbse60td1JfMgYWKgC5HSscdcwtxaIwzO/pm/en2ysfArGEiKn9xqEcNG7xXZmre2Z6eHtqu0hLNzznOfPTd5xXz4UB6lKid5aej7FuRjOF81ptqCamndW1Yma2FtYdC7jPd9+EnVDKPoBH1zWvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KgDGYzQtRO2ytvgfkrBGdqDnT1v6cE/YiTvVrlhuauk=;
- b=I0DTwNeCwOCTaUXR6+3iQ4DyYVu+7r8SrAyIdeaAxMRyHdanI+XxD7WlS6KGtVw9VEZyC4kLmTL4CKRkCtomjFk54Zl4xq380+ScY6jbAXqto/B+vefPo7E5q+Sn7w8EFa482Mh+Sn095tjlDCCIQ2ZY5QcGlNV2tNxfK3QTai0KBXJ3jDoGgF5nl37q5BBgV41Tmm3flcKYkMEJIJS1WDccuuRe15vn2MQljAUtPyFvJZ8mncHZXBDwhTe7mbVEOnno+83OY+BnOAJEWl7gkzwwG1AGNSiAc8KBKIJZSGh2CutSn0U7zWCzBn1mPSzI0JctJyeD1e7wJUD5E7zrwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KgDGYzQtRO2ytvgfkrBGdqDnT1v6cE/YiTvVrlhuauk=;
- b=jp+YEgEmV+ky6PVDiMjqzpy/4PWU08N3oXLv/8+8HGCr7Bmj7Xes0jmPlTNtd/tUvVPgze7nenNcDFyCjkColcD9s2peKST5rVCfS/pMf+vW1ZyZLLhMiSgL4t9wO4u6k/ViERzHNLK05x0EVp6lAh1zcrqlar/bRCdxPgHWrFk=
-Received: from CH3P220CA0029.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1e8::11)
- by DS0PR12MB8245.namprd12.prod.outlook.com (2603:10b6:8:f2::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Tue, 3 Jun
- 2025 15:27:29 +0000
-Received: from CH1PEPF0000A347.namprd04.prod.outlook.com
- (2603:10b6:610:1e8:cafe::57) by CH3P220CA0029.outlook.office365.com
- (2603:10b6:610:1e8::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.26 via Frontend Transport; Tue,
- 3 Jun 2025 15:27:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CH1PEPF0000A347.mail.protection.outlook.com (10.167.244.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8792.29 via Frontend Transport; Tue, 3 Jun 2025 15:27:29 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 3 Jun
- 2025 10:27:27 -0500
-Received: from xhdnrottela40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Tue, 3 Jun 2025 10:27:25 -0500
-From: Abin Joseph <abin.joseph@amd.com>
-To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] net: macb: Add shutdown operation support
-Date: Tue, 3 Jun 2025 20:57:24 +0530
-Message-ID: <20250603152724.3004759-1-abin.joseph@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA89A944
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 15:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748964640; cv=none; b=k6tXbj1Qc5D9aaGNLcqiKjYlTtIfW1vl8Btp3DrfTcITErt/YVtZ3xWRnY6RvWXN4FJ7z/RiBY5vkMc72Ohr8a9PAbGGOiBbRyr/8FUECyEVXegGOWI2eFTFWjNhnGzg5U4f49KBMk0ikrh7rDAH5kUsz7tDqaWO41iLIhihOco=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748964640; c=relaxed/simple;
+	bh=NgVzIKrV+vT373R7pPrBdnfQ+JbPy3LNrhvewfBlpoY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J7GaAnKEw2DjydDi7EZxjcbl6CzvNXT8wtEm+w/LLahHLetDCNn8Yv7lrlTqortgjiYA9yWv166MmdnMcHJjJxm6eDwwoMvxF/G+ciheWHTjaxCFXBWqxgQ5JhfQiS8cuY2ddMt0qd63a9e+95UbsC289sf0/f+UZKi/wW0u2jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddb62de753so17001085ab.1
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 08:30:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748964637; x=1749569437;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CdTk/4XrBAuy39KbJJeOpNDNYb42O4c1octVwjpyi+Q=;
+        b=plIlzb3hZc7+vGyIDVAQgezzzdjwtkB2zm2/U/1SPtO++8soTB+7rU4SID+HvLBv4r
+         iXCPe0QIssBUjnGBXgPF8nsEEN5+zS2dJwoKAwG9EukxTFFfZDSlVSaf0eIXtF9yZbuk
+         VgRHbHVHVcUXyltynS25Bl9QpIlc+ADh1h1DnXV8sRrx+Bxx0nW4C4cL5Zb/yr8MouO3
+         exHlpVA6AOs3HjN6RT2Ucu6ElMVrhJUanT/QPccNhQ8NRI0CuV3SvpFX2vIQvEFX6Yzl
+         TtnSo3lzgePIX204OxA0yrH4TLRNMvygUocxJ+eznLgoJbPBfb5oX12sjh3QfZ4Hr3Iy
+         sMWg==
+X-Forwarded-Encrypted: i=1; AJvYcCV78pX6qRLCNUkKtWnKXsB8HrMN+lxf6B985mYhQ/uKdgbbR0JsRPeofIcxoYP6M+aYCGHayq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1RvEPIzC8U2EG+23Nru7HAtIa+8TNRlG8Y5vXBnnMpjgXt5o6
+	9FY14R7j/pBXkInH5IMGg740lOZRhb88cFAbmycYxV0ZGRq9rPlMEUCWh11tjIMZ8NAJbB2lJRX
+	NXnOtjzczszT7PP9btDpeFNMwhcQb1bWdrUtt/GUWhnK/7xE4qbwAHcsUFe4=
+X-Google-Smtp-Source: AGHT+IESbnyBV6XlZCYt+k5zSHtdsO6KCiniIvtH0ta7Xbqbk/5TT2jaD91TWXYrgk1NsjL2k1R75FSVdCdjnt23EuWSv+mFTJwy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB03.amd.com: abin.joseph@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A347:EE_|DS0PR12MB8245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f59cd4a-20e5-46a5-f32a-08dda2b32731
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PMNCPnd+qM9/pnQUCL99SabFluUtKcOqmz+IBeAkcYfV7sjuY67DZKLIasK5?=
- =?us-ascii?Q?4eBTj+l5poyi8x+A8Tju3Z5FGzJ/qi5HOtWbN7urQ+O4/SkvYcxzg4SuFkbr?=
- =?us-ascii?Q?X8cTGv3qxI9g1JAPt14eRF1XDYSQ/eI+fZ2RW9nkqMrBl9BX4T06yRWhdYTS?=
- =?us-ascii?Q?vt55T7sf/VpuZZqtXqCDVpurZuBHPK9ZI6MWXpvH9/HJyRGTwld6J8l55Smc?=
- =?us-ascii?Q?Zy0423hYvx0si7HuMLwfqi9JDA/bSFzgodPC7h18ljB3ZPOugv+J+aeb+++2?=
- =?us-ascii?Q?XZAlyTiM9/K4+BkG91LIOqkVkk5tHSR5tjJH5ZAO5MxcMzTy849vu9p5v48Z?=
- =?us-ascii?Q?icIwoF4tkH57z7JE09IcmVFsumRwZUE/08jQ2xPTgMl9VP7EjlWj2fVAe/mY?=
- =?us-ascii?Q?ibSrrk8yriUaqu9NgbNDxLGds8HP8QemYDQQYwYFZ6G6w5UGa2v0uAyVeoqU?=
- =?us-ascii?Q?DDEhJFYwHM+vJgCtkE1XQMPgBphnLL0wer/auywOH/UyI8R5NgrbpW8mwKDW?=
- =?us-ascii?Q?1A+kU+dX10UGGxcMyTKSVPsmYBaWiVtBKZ3WY5KCQuGuZUodDs/9tL2GwJv4?=
- =?us-ascii?Q?1xbnc0ozNrbfmmPtZfB9Ndz5zv20MDDNr61eq5u2UY2fH+3LabKsxxFHsvcn?=
- =?us-ascii?Q?BvycgfqLHaj9/KHCszFcqU8t2ngIyR4JHm9cZs1SR3QL+F2NM3s5dV5fnFTo?=
- =?us-ascii?Q?6OJx7Q8lI2El9fesMwEG0E1akJl7ZVIoAf6+MAvBpl3gh7fl1ikyO4uhuhP4?=
- =?us-ascii?Q?fW88ADEukE3GgG8Bz/xG26Ham3lS7as3sn1dZMO7KYhJav4FxwwtDiXnv37m?=
- =?us-ascii?Q?78LVkZ7j/DuGZt4Epi/Vw12/skNFltiCegvB7WVNPCxzqg7AwKL+HAQcWB6o?=
- =?us-ascii?Q?y9sZQ8nzc1ifIVuVW6k532uZGvMCPj5LMiM/HpG+qNU0MYllcN6p+Zj04E2f?=
- =?us-ascii?Q?W8FmUqdYOfCgW0CM77U6Ri+vnkPaoB5KH0n0HSdpDKbav+r2FPP7X5bnTSiP?=
- =?us-ascii?Q?5ubh3mnYs0jzEteX9ge/4gtLEv/X5xf7Gi35CkmMYDGbMe1Skg5JyQJ3+Q0h?=
- =?us-ascii?Q?eKswCM4Z0vwBwvnbUC1783NXsFYa10aT6VJeMaV5b+/uv1ra1jnqP1P8IIx3?=
- =?us-ascii?Q?ZYY9PZR0idNL6d9zDWwVMnNt1ag1Iwl/mVt4HlRu0bsWicf2oObGI36whWvV?=
- =?us-ascii?Q?S3l/xu+PKibpQRzcWv+y6OqGU0Mk0VhZfOIYPClefyziBrOZ6ZdmihRG30KJ?=
- =?us-ascii?Q?XpFZky6LScXkcsfHXOq3SxsNWxBGjmuRNY3yrQhJLS1TlrDOnta1aVqNw0Iz?=
- =?us-ascii?Q?kEnP+BSRz774csjQa/NCVzZTAb8NDMrxzUXyv4J3tky8p4wLHvZRVCxGiw6w?=
- =?us-ascii?Q?gsQDVQQTjUl/m2Jv/L9BDzZNwc5g/v2BbU3SnMcW/fOjNV0uWN26RxFAeZcz?=
- =?us-ascii?Q?M8CR2ftkWAEQ6g/2ncPW3LHwJ43XYT/Qy2eIC7481LbR55k9rrawu6X7FEIh?=
- =?us-ascii?Q?yOpHXfIEbVqsucHKNrdPfwjRdxrV8fioSk51?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 15:27:29.6365
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f59cd4a-20e5-46a5-f32a-08dda2b32731
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A347.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8245
+X-Received: by 2002:a05:6e02:2287:b0:3dc:8a53:c9c4 with SMTP id
+ e9e14a558f8ab-3dda3342b6cmr117953985ab.6.1748964634098; Tue, 03 Jun 2025
+ 08:30:34 -0700 (PDT)
+Date: Tue, 03 Jun 2025 08:30:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <683f151a.050a0220.55ceb.0014.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in napi_disable
+From: syzbot <syzbot+406cbe754deca9aeaa82@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Implement the shutdown hook to ensure clean and complete deactivation of
-MACB controller. Kexec utility calls the shutdown hooks and facilitates
-loading and booting of new kernel directly from the currently running
-kernel, thereby ensuring a seamless and efficient transition.
+Hello,
 
-Signed-off-by: Abin Joseph <abin.joseph@amd.com>
+syzbot found the following issue on:
+
+HEAD commit:    d7fa1af5b33e Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=14c71170580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=89c13de706fbf07a
+dashboard link: https://syzkaller.appspot.com/bug?extid=406cbe754deca9aeaa82
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+userspace arch: arm64
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/da97ad659b2c/disk-d7fa1af5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/659e123552a8/vmlinux-d7fa1af5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6ec5dbf4643e/Image-d7fa1af5.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+406cbe754deca9aeaa82@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+WARNING: CPU: 0 PID: 6666 at kernel/locking/mutex.c:580 __mutex_lock_common+0x1650/0x2190 kernel/locking/mutex.c:580
+Modules linked in:
+CPU: 0 UID: 0 PID: 6666 Comm: kworker/u8:4 Not tainted 6.15.0-rc7-syzkaller-gd7fa1af5b33e #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Workqueue: netns cleanup_net
+pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : __mutex_lock_common+0x1650/0x2190 kernel/locking/mutex.c:580
+lr : __mutex_lock_common+0x1650/0x2190 kernel/locking/mutex.c:580
+sp : ffff80009bb27560
+x29: ffff80009bb27720 x28: dfff800000000000 x27: ffff80009bb27640
+x26: ffff700013764ec8 x25: 0000000000000000 x24: ffff80009bb27680
+x23: 0000000000000000 x22: 0000000000000000 x21: 0000000000000000
+x20: 0000000000000000 x19: ffff0000d446ccd2 x18: 1fffe0003386aa76
+x17: 0000000000000000 x16: ffff80008ad27e48 x15: ffff700011e740c0
+x14: 1ffff00011e740c0 x13: 0000000000000004 x12: ffffffffffffffff
+x11: ffff700011e740c0 x10: 0000000000ff0100 x9 : 120a1682c186fb00
+x8 : 120a1682c186fb00 x7 : 0000000000000001 x6 : 0000000000000001
+x5 : ffff80009bb26eb8 x4 : ffff80008f415ba0 x3 : ffff800080548ef0
+x2 : 0000000000000000 x1 : 0000000100000000 x0 : 0000000000000000
+Call trace:
+ __mutex_lock_common+0x1650/0x2190 kernel/locking/mutex.c:580 (P)
+ __mutex_lock kernel/locking/mutex.c:746 [inline]
+ mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:798
+ netdev_lock include/linux/netdevice.h:2751 [inline]
+ napi_disable+0x4c/0x84 net/core/dev.c:7238
+ gro_cells_destroy+0xf4/0x374 net/core/gro_cells.c:116
+ ip_tunnel_dev_free+0x20/0x38 net/ipv4/ip_tunnel.c:1102
+ netdev_run_todo+0xb44/0xd24 net/core/dev.c:11300
+ rtnl_unlock+0x14/0x20 net/core/rtnetlink.c:157
+ cleanup_net+0x574/0x9c0 net/core/net_namespace.c:650
+ process_one_work+0x7e8/0x156c kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x958/0xed8 kernel/workqueue.c:3400
+ kthread+0x5fc/0x75c kernel/kthread.c:464
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:847
+irq event stamp: 1642461
+hardirqs last  enabled at (1642461): [<ffff80008addfa48>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (1642461): [<ffff80008addfa48>] _raw_spin_unlock_irqrestore+0x38/0x98 kernel/locking/spinlock.c:194
+hardirqs last disabled at (1642460): [<ffff80008addf878>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
+hardirqs last disabled at (1642460): [<ffff80008addf878>] _raw_spin_lock_irqsave+0x2c/0x7c kernel/locking/spinlock.c:162
+softirqs last  enabled at (1641216): [<ffff800089102264>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
+softirqs last  enabled at (1641216): [<ffff800089102264>] netif_addr_unlock_bh include/linux/netdevice.h:4804 [inline]
+softirqs last  enabled at (1641216): [<ffff800089102264>] dev_mc_flush+0x1b0/0x1f4 net/core/dev_addr_lists.c:1037
+softirqs last disabled at (1641214): [<ffff800089102794>] local_bh_disable+0x10/0x34 include/linux/bottom_half.h:19
+---[ end trace 0000000000000000 ]---
+Unable to handle kernel paging request at virtual address ffff0000d446ccd2
+KASAN: maybe wild-memory-access in range [0xfffc0006a2366690-0xfffc0006a2366697]
+Mem abort info:
+  ESR = 0x0000000096000021
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x21: alignment fault
+Data abort info:
+  ISV = 0, ISS = 0x00000021, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+swapper pgtable: 4k pages, 48-bit VAs, pgdp=00000002079fa000
+[ffff0000d446ccd2] pgd=0000000000000000, p4d=180000023ffff403, pud=180000023f41b403, pmd=180000023f378403, pte=006800011446c707
+Internal error: Oops: 0000000096000021 [#1]  SMP
+Modules linked in:
+CPU: 1 UID: 0 PID: 6666 Comm: kworker/u8:4 Tainted: G        W           6.15.0-rc7-syzkaller-gd7fa1af5b33e #0 PREEMPT 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Workqueue: netns cleanup_net
+pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : __lse__cmpxchg_case_acq_64 arch/arm64/include/asm/atomic_lse.h:272 [inline]
+pc : __cmpxchg_case_acq_64 arch/arm64/include/asm/cmpxchg.h:121 [inline]
+pc : __cmpxchg_acq arch/arm64/include/asm/cmpxchg.h:169 [inline]
+pc : raw_atomic64_cmpxchg_acquire include/linux/atomic/atomic-arch-fallback.h:4181 [inline]
+pc : raw_atomic64_try_cmpxchg_acquire include/linux/atomic/atomic-arch-fallback.h:4299 [inline]
+pc : raw_atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-long.h:1482 [inline]
+pc : atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4458 [inline]
+pc : __mutex_trylock_common+0x178/0x258 kernel/locking/mutex.c:112
+lr : instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+lr : atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4457 [inline]
+lr : __mutex_trylock_common+0x16c/0x258 kernel/locking/mutex.c:112
+sp : ffff80009bb27480
+x29: ffff80009bb27500 x28: ffff0000d9f59e80 x27: ffff80009bb274a0
+x26: 1ffff00013764e94 x25: dfff800000000000 x24: ffff0000d9f59e80
+x23: 1ffff00012dee370 x22: ffff80008f32136c x21: ffff0000d9f59e80
+x20: ffff0000d446ccd2 x19: 0000000000000000 x18: 1fffe0003386aa76
+x17: 0000000000000000 x16: ffff800080514f0c x15: 0000000000000001
+x14: 1ffff00013764e98 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff700013764e99 x10: dfff800000000000 x9 : 0000000000000000
+x8 : 0000000000000000 x7 : 0000000000000001 x6 : ffff8000890d4c0c
+x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff800080515078
+x2 : 0000000000000001 x1 : 0000000000000008 x0 : 0000000000000001
+Call trace:
+ __lse__cmpxchg_case_acq_64 arch/arm64/include/asm/atomic_lse.h:272 [inline] (P)
+ __cmpxchg_case_acq_64 arch/arm64/include/asm/cmpxchg.h:121 [inline] (P)
+ __cmpxchg_acq arch/arm64/include/asm/cmpxchg.h:169 [inline] (P)
+ raw_atomic64_cmpxchg_acquire include/linux/atomic/atomic-arch-fallback.h:4181 [inline] (P)
+ raw_atomic64_try_cmpxchg_acquire include/linux/atomic/atomic-arch-fallback.h:4299 [inline] (P)
+ raw_atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-long.h:1482 [inline] (P)
+ atomic_long_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:4458 [inline] (P)
+ __mutex_trylock_common+0x178/0x258 kernel/locking/mutex.c:112 (P)
+ __mutex_trylock kernel/locking/mutex.c:135 [inline]
+ __mutex_lock_common+0x1e8/0x2190 kernel/locking/mutex.c:604
+ __mutex_lock kernel/locking/mutex.c:746 [inline]
+ mutex_lock_nested+0x2c/0x38 kernel/locking/mutex.c:798
+ netdev_lock include/linux/netdevice.h:2751 [inline]
+ napi_disable+0x4c/0x84 net/core/dev.c:7238
+ gro_cells_destroy+0xf4/0x374 net/core/gro_cells.c:116
+ ip_tunnel_dev_free+0x20/0x38 net/ipv4/ip_tunnel.c:1102
+ netdev_run_todo+0xb44/0xd24 net/core/dev.c:11300
+ rtnl_unlock+0x14/0x20 net/core/rtnetlink.c:157
+ cleanup_net+0x574/0x9c0 net/core/net_namespace.c:650
+ process_one_work+0x7e8/0x156c kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x958/0xed8 kernel/workqueue.c:3400
+ kthread+0x5fc/0x75c kernel/kthread.c:464
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:847
+Code: 941c570a f94023e9 d503201f aa0903e8 (c8e87e95) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	941c570a 	bl	0x715c28
+   4:	f94023e9 	ldr	x9, [sp, #64]
+   8:	d503201f 	nop
+   c:	aa0903e8 	mov	x8, x9
+* 10:	c8e87e95 	casa	x8, x21, [x20] <-- trapping instruction
+
+
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Reference:
-drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
----
- drivers/net/ethernet/cadence/macb_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index e1e8bd2ec155..7ccfdb1155f3 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5650,6 +5650,14 @@ static int __maybe_unused macb_runtime_resume(struct device *dev)
- 	return 0;
- }
- 
-+static void macb_shutdown(struct platform_device *pdev)
-+{
-+	struct net_device *netdev = dev_get_drvdata(&pdev->dev);
-+
-+	netif_device_detach(netdev);
-+	dev_close(netdev);
-+}
-+
- static const struct dev_pm_ops macb_pm_ops = {
- 	SET_SYSTEM_SLEEP_PM_OPS(macb_suspend, macb_resume)
- 	SET_RUNTIME_PM_OPS(macb_runtime_suspend, macb_runtime_resume, NULL)
-@@ -5663,6 +5671,7 @@ static struct platform_driver macb_driver = {
- 		.of_match_table	= of_match_ptr(macb_dt_ids),
- 		.pm	= &macb_pm_ops,
- 	},
-+	.shutdown	= macb_shutdown,
- };
- 
- module_platform_driver(macb_driver);
--- 
-2.34.1
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
