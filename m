@@ -1,138 +1,189 @@
-Return-Path: <netdev+bounces-194831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEC3ACCDD5
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 21:52:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF898ACCE51
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 22:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30F083A512F
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 19:52:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89F95163B3B
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 20:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAB221324E;
-	Tue,  3 Jun 2025 19:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3B21F30C3;
+	Tue,  3 Jun 2025 20:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w1Mk4zE0"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KFBk0X6X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F0B2F2D
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 19:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C7217C224;
+	Tue,  3 Jun 2025 20:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748980349; cv=none; b=tcltjQfye55uK7wUdG14k4RgDs4ox0hcUEFUtqbbA3CNzbtTqUuQ+ksRFwJOg/HdGf6cIGjXTZSK367vCycCERvskKLhEQT+gjDGeA2Nns3nG7Eyx89FMkP3ZxMvXm7V3f8WxL4lVLedJgMYjGi8mlR9cbIYIhadzm0L3zxDhfc=
+	t=1748983214; cv=none; b=F881g/0Kc2pWdRxs0OzSVpzRdOSk4icG06uyYDfXUU+8xVTrfjpLVClA2TKr7NlJmm+g5douPxEilQGAX/Z8RGzQSFpK2Sib9nKs+lqCoB9kZWwIiggiETNvYAgkYwT6G52DOKmy4Q42qotmPUdNoHUUmtUWUTPDserTc1JjXmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748980349; c=relaxed/simple;
-	bh=BBIQPN0gBmNraGTB7fxqolT00ky3D+w1y3Ip+IpcLVE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XHIBJEQf/Fd5xVSDtfm6Ygcz2issTSCz7Q33ke+o4uH4O+EvgYYC37ANtDCjDqiP0gIyH2HKxhpe14DJnPNJCsz1eLIz0UwRWpHO0f6RTr6ubAFpX33jdoZpSTO54fUWsi6m2pP/RkWGd/6K8V7Lwpnah14aIo4AuIkQX9JuHsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w1Mk4zE0; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2348a45fc73so50515ad.0
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 12:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748980347; x=1749585147; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2xu4Xvea4/RZ0hUeFzVrbFrDBrIPevWvQCTSFWqqcX0=;
-        b=w1Mk4zE0+uiffr/ER/0KCZNV2r7yjXI5xAjrFJR88xWmTpMhlxIhwqPBmtJ31/rgSK
-         3Yh/lHBy826lGq95fDioCDAxNY8F4zurykfbC3D8F4DYrcs8cZNs6mJg86qsm0m4+rv8
-         HWW6fQPE/vosNFEkuGWCehg0K6HxFtotzEHMYmOTQoUPYnejWmcXBoaD8qzf9kSPKD9M
-         JUx14AAPm4+mc1KROWN7mwgB98HlXcqOH6aObuHurV+5jDfNFaDQphf+mXJbAfnBMS9q
-         xDVNsTa2xzewiz0ek9TOW/l0HiybBXPtNJTovFBoWze5QJT1YlW6XkxeBjM0MkRiWPL3
-         JL3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748980347; x=1749585147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2xu4Xvea4/RZ0hUeFzVrbFrDBrIPevWvQCTSFWqqcX0=;
-        b=nLizGXVDe4Ql7SDu9YoFr4qMFDiTfOYE12H5lHdSa00V3iNT0YHL1K6kWefQbvRcLt
-         C/2FiQ2i2uiZZLpo+YwYdsWUKUZdtqAn/hHWUQOFt13p07+X0ib1ElepA4l/tSb9PrAo
-         wxqk6Hv8B8bGvWSag1Iw15urspItCu+SIe9EN0tjHF6AKZ3bpXI+PGp2ujPSbXTYyY7W
-         HvafINyoqbhcPN2glZu2FlFmbTiV/g0PIWaG1MFp/2I1zDsTOipKacnMGLNz4rRaWRB2
-         FhQZKhrWVtUn/Rm1H/I1Q+KaRoVlL8DG8gPGcZzPB7iJhVopytTwyF/KCYxurl5OTBg9
-         opAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOzh0sVOyRRwFrOQGr4rKsx/AsbQgSySENvCTTNR6BtnS3lVU8Rs8nFa8ywtLbcVZDbLTp9DU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVX/WqJZAVmzsu8MY8a9jc2B1Gd4mwFwpt5XfHEMxApFb7hgBv
-	Ln+xiJWDmLL3+zH6EdRV/iuOuRsI7MEfmEFDRZeT8JDBoQz794stBMrJOWzgmRHavBRHSJGFh1p
-	qL2n+Jzn01gK7BWTiBpeJSGm5DsuTlz+72V3Fuz4i
-X-Gm-Gg: ASbGnctZEL/FY4x6FlWHBt3KiQiU4/hyidkr24GLeicjW/FqU1pdjAlwBOKdYo/kHdE
-	+GYK2A59UCPCR9MtF/2qKQwktiKt8vB9gfq4Sl3v8j95dtoj9QG6dRL+Z6jWwbSlzqmBSU70kS4
-	IW4vUnAh3YAVZVKaBXo2E+POfwVKjtjA/oGrQw/XzRjUnTD1SIMoFw2fcDCu6gF3XjHt6TTEjkX
-	nY=
-X-Google-Smtp-Source: AGHT+IHFh1Py9kpL/kMi0IWMMD5q7rs8QpaLf+7z1cfp15D7ZXTSNiQeRzoMC9g90hdHog4pcjZsG9mf04UVCbESwLQ=
-X-Received: by 2002:a17:903:8c5:b0:234:b2bf:e67e with SMTP id
- d9443c01a7336-235dfca5073mr464645ad.13.1748980346684; Tue, 03 Jun 2025
- 12:52:26 -0700 (PDT)
+	s=arc-20240116; t=1748983214; c=relaxed/simple;
+	bh=59kjn+T/iQcq2WtpMy+enLaS4aE2tpQL8fp9wGq05To=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jCIkbAVGk5xRhQDlM5E2vX/yNH5I3dtxKBB1JkJahWSRgAQ0djcVqGHbHaY3q8mOkg1fB8yV5JhanahZpLy8zuQS1jlJgHdBxrUq2iLc7DTJ02FpSzNa+xnz9PsT8wQBObv/JE6P0aMY/fvOC1f85qWQ5sj5KzHTVIH93bwb5I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KFBk0X6X; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 553JkeUv032286;
+	Tue, 3 Jun 2025 20:39:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jpyoMrO4J6DQiZ/1xEwHZm7LlDQyjZc8GnXpDrN8mfc=; b=KFBk0X6Xm+my0T5P
+	+1Cbq8SbhTEOocgvDLxy7oyZtjTldN+EgRdpPCZmjHvebu778YbGs4YLHOSmOLMT
+	JH2/8vMz/1SpTeSL2VdoVfoZ9U+V3fW089wlXgmOYkPlm2HWt+7KyjTpiQuF5XBL
+	hRfsto1KaM9YoN8qe6fel9F6uHIFMwx7Cn0zifZnOaDzvMdzQ+zbZi3O1wUD3vJK
+	WJt8/eGt9Qgs8W0NSlcuKmcx2trDcvyysi6e9d7gfqlatMUG+Lgkv4X8oVXx9Fzp
+	dPa3aQ+HdYErrqKWw6DOT7CkrhlnMpAVpXD1Ad+t14OWuOkTghM5jSkxC1FbCNNY
+	g7Ds4w==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 471sfutmwv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Jun 2025 20:39:51 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 553Kdorb001777
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 3 Jun 2025 20:39:50 GMT
+Received: from [10.110.52.127] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 3 Jun 2025
+ 13:39:49 -0700
+Message-ID: <d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com>
+Date: Tue, 3 Jun 2025 13:39:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250601195223.3388860-1-alok.a.tiwari@oracle.com> <3fc6e01d-64d5-496d-8be6-d449b7e65182@redhat.com>
-In-Reply-To: <3fc6e01d-64d5-496d-8be6-d449b7e65182@redhat.com>
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-Date: Tue, 3 Jun 2025 12:52:15 -0700
-X-Gm-Features: AX0GCFuPVPl0aw_huyRHCSDstJeazFKT_oJd0NgBZXiZ9HxLKXDaOH0GPYOs8IY
-Message-ID: <CAEAWyHenoS_JBXPzX3cRCZMsT63CxTCn9NTQPD2SMM=TWFc3QA@mail.gmail.com>
-Subject: Re: [QUERY] gve: gve_tx_free_rings_dqo() uses num_xdp_queues instead
- of num_xdp_rings
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alok Tiwari <alok.a.tiwari@oracle.com>, almasrymina@google.com, bcf@google.com, 
-	joshwash@google.com, willemb@google.com, pkaligineedi@google.com, 
-	kuba@kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: phy: clear phydev->devlink when the link is
+ deleted
+To: Florian Fainelli <f.fainelli@gmail.com>, Wei Fang <wei.fang@nxp.com>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <xiaolei.wang@windriver.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <imx@lists.linux.dev>
+References: <20250523083759.3741168-1-wei.fang@nxp.com>
+ <8b947cec-f559-40b4-a0e0-7a506fd89341@gmail.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <8b947cec-f559-40b4-a0e0-7a506fd89341@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=CY8I5Krl c=1 sm=1 tr=0 ts=683f5d97 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=jZjJzmEmTJcjZ5Ws:21 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10
+ a=8AirrxEcAAAA:8 a=Q-fNiiVtAAAA:8 a=oBgyJLT1gLfHoXy3vE4A:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=ST-jHhOKWsTCqRlWije3:22
+X-Proofpoint-ORIG-GUID: u1YVSUlZlxDwz-UxLmuQY1GiUL2HMaad
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAzMDE4MCBTYWx0ZWRfX7YXCgV9ZhaXc
+ vJ4uWAx71rBDom39tS8Uog3jxfMVthIYaXu2ndn7GprjimU4/GLlEAnoC36F9QqUc3V87eyrCT1
+ xcdCGP+G0erJIvJekWFIOTCtfb5Fs13ZxARxmLPjYx5P+zXD5SwYvU9xuxU/D5k0IrT0i66yVb3
+ w96x4L0Xot5h7i83IHqjO4rk+MzJ7dO4qaVkI4XPDvmez2rltNUhE8pi77lhB3oQHknfSE+oBCY
+ q5wzUXJrU3zWgpQtCB2RKoDm7JFNG22E0MWURsKu6jL/mkpEvvKJFvy/Pwg27gvvYP4SvI8zqNs
+ kyeFHXQSHLtoR2MuIYfUq3aPTrEoczM6GVBFWFwKnF1q5D1H/Nm9NKg0bZP9bVY0xePQgQol28C
+ 4ZqWmo4OAqyFiZeF5GiqzSSYOAhAgUpYW3Jogq3kzGKfC5Lm0SKUbkIU7yhneBOF2uZRtQ5b
+X-Proofpoint-GUID: u1YVSUlZlxDwz-UxLmuQY1GiUL2HMaad
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-03_03,2025-06-02_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 clxscore=1011 lowpriorityscore=0 spamscore=0 impostorscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506030180
 
-On Tue, Jun 3, 2025 at 3:34=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 6/1/25 9:52 PM, Alok Tiwari wrote:
-> >  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net=
-/ethernet/google/gve/gve_tx_dqo.c
-> > index 9d705d94b065..e7ee4fa7089c 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> > @@ -424,7 +424,7 @@ void gve_tx_free_rings_dqo(struct gve_priv *priv,
-> >       if (!tx)
-> >               return;
-> >
-> > -     for (i =3D 0; i < cfg->qcfg->num_queues + cfg->qcfg->num_xdp_queu=
-es; i++)
-> > +     for (i =3D 0; i < cfg->qcfg->num_queues + cfg->qcfg->num_xdp_ring=
-s; i++)
->
-> Please note that num_xdp_rings has been moved elsewhere by commit
-> 346fb86ddd86 ("gve: update XDP allocation path support RX buffer posting"=
-)
->
-> /P
 
-Hi Alok,
 
-It's appropriate for the free methods to free based on cfg->qcfg
-parameters since struct gve_tx_queue_config is supposed to track
-'allowed and current' tx queue parameters as documented.
+On 5/23/2025 8:19 AM, Florian Fainelli wrote:
+> 
+> 
+> On 5/23/2025 1:37 AM, Wei Fang wrote:
+>> There is a potential crash issue when disabling and re-enabling the
+>> network port. When disabling the network port, phy_detach() calls
+>> device_link_del() to remove the device link, but it does not clear
+>> phydev->devlink, so phydev->devlink is not a NULL pointer. Then the
+>> network port is re-enabled, but if phy_attach_direct() fails before
+>> calling device_link_add(), the code jumps to the "error" label and
+>> calls phy_detach(). Since phydev->devlink retains the old value from
+>> the previous attach/detach cycle, device_link_del() uses the old value,
+>> which accesses a NULL pointer and causes a crash. The simplified crash
+>> log is as follows.
+>>
+>> [   24.702421] Call trace:
+>> [   24.704856]  device_link_put_kref+0x20/0x120
+>> [   24.709124]  device_link_del+0x30/0x48
+>> [   24.712864]  phy_detach+0x24/0x168
+>> [   24.716261]  phy_attach_direct+0x168/0x3a4
+>> [   24.720352]  phylink_fwnode_phy_connect+0xc8/0x14c
+>> [   24.725140]  phylink_of_phy_connect+0x1c/0x34
+>>
+>> Therefore, phydev->devlink needs to be cleared when the device link is
+>> deleted.
+>>
+>> Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
+>> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> 
+@Wei 
+What happens in case of shared mdio ? 
 
-Also, like Paolo has pointed out, cfg->qcfg->num_xdp_rings does not
-exist. 'cfg->num_xdp_rings' does exist but should not be used to free
-since during gve_adjust_config(), this field tracks what has to be
-allocated in the future, not what is current.
-cfg->qcfg->num_xdp_queues is the correct parameter that tracks what is
-currently in use and should be used in the free methods.
+1. Device 23040000 has the mdio node of both the ethernet phy and device 23000000 references the phy-handle present in the Device 23040000
+2. When rmmod of the driver happens 
+3. the parent devlink is already deleted. 
+4. This cause the child mdio to access an entry causing a corruption. 
+5. Thought this fix would help but i see that its not helping the case. 
 
-Thanks,
-Harshitha
+Wondering if this is a legacy issue with shared mdio framework. 
 
->
+
+ 43369.232799:   qcom-ethqos 23040000.ethernet eth1: stmmac_dvr_remove: removing driver
+ 43369.233782:   stmmac_pcs: Link Down
+ 43369.258337:   qcom-ethqos 23040000.ethernet eth1: FPE workqueue stop
+ 43369.258522:   br1: port 1(eth1) entered disabled state
+ 43369.758779:   qcom-ethqos 23040000.ethernet eth1: Timeout accessing MAC_VLAN_Tag_Filter
+ 43369.758789:   qcom-ethqos 23040000.ethernet eth1: failed to kill vid 0081/0
+ 43369.759270:   qcom-ethqos 23040000.ethernet eth1 (unregistering): left allmulticast mode
+ 43369.759275:   qcom-ethqos 23040000.ethernet eth1 (unregistering): left promiscuous mode
+ 43369.759301:   br1: port 1(eth1) entered disabled state
+ 43370.259618:   qcom-ethqos 23040000.ethernet eth1 (unregistering): Timeout accessing MAC_VLAN_Tag_Filter
+ 43370.309863:   qcom-ethqos 23000000.ethernet eth0: stmmac_dvr_remove: removing driver
+ 43370.310019:   list_del corruption, ffffff80c6ec9408->prev is LIST_POISON2 (dead000000000122)
+ 43370.310034:   ------------[ cut here ]------------
+ 43370.310035:   kernel BUG at lib/list_debug.c:59!
+ 43370.310119:   CPU: 4 PID: 3067767 Comm: rmmod Tainted: G        W  OE      6.6.65-rt47-debug #1
+ 43370.310122:   Hardware name: Qualcomm Technologies, Inc. SA8775P Ride (DT)
+ 43370.310165:   Call trace:
+ 43370.310166:    __list_del_entry_valid_or_report+0xa8/0xe0
+ 43370.310168:    __device_link_del+0x40/0xf0
+ 43370.310172:    device_link_put_kref+0xb4/0xc8
+ 43370.310174:    device_link_del+0x38/0x58
+ 43370.310176:    phy_detach+0x2c/0x170
+ 43370.310181:    phy_disconnect+0x4c/0x70
+ 43370.310184:    phylink_disconnect_phy+0x6c/0xc0 [phylink]
+ 43370.310194:    stmmac_release+0x60/0x358 [stmmac]
+ 43370.310210:    __dev_close_many+0xb4/0x160
+ 43370.310213:    dev_close_many+0xbc/0x1a0
+ 43370.310215:    unregister_netdevice_many_notify+0x178/0x870
+ 43370.310218:    unregister_netdevice_queue+0xf8/0x140
+ 43370.310221:    unregister_netdev+0x2c/0x48
+ 43370.310223:    stmmac_dvr_remove+0xd0/0x1b0 [stmmac]
+ 43370.310233:    devm_stmmac_pltfr_remove+0x2c/0x58 [stmmac_platform]
+
+
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
