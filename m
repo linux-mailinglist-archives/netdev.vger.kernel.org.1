@@ -1,94 +1,140 @@
-Return-Path: <netdev+bounces-194748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13D6ACC40B
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:10:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B10ACC40E
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74DD93A23A6
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:09:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 357C47A16B9
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18424226CF5;
-	Tue,  3 Jun 2025 10:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F8D1C3306;
+	Tue,  3 Jun 2025 10:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E7fq+/LR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ONSM1g9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B5D2AD02;
-	Tue,  3 Jun 2025 10:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4725826290;
+	Tue,  3 Jun 2025 10:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748945396; cv=none; b=jFUXGI02334n84PZhnOs1tgqPR+8SfZWihBHNXvWmkJ93wzuXep/gZYSyE8LsNwGrtNtmUQ979QIY0YV0i0BLkgLTSp6kz6ouD6EzabMGs/cKAjduARiX2tAVOZvfzfY6fqpYCd6jlwQXn/nkJoCNh/Q2ThEEo5l9sl+2aKzOUw=
+	t=1748945558; cv=none; b=oh1nmB0PbMATvS8Y833KK4s9MOF9jKqC177hhqeCOVevzxgnP635IKhtJKgDv8LzEWTqdl8yIrbZOA0rqblY0wJSVXlfL6iXO/8IqxxF466dmIneT/lamu+9Q5Fh5na1CjjnNz52JySqi9D9NE8Rdfv3Io2jP8ju8QtR7QET+LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748945396; c=relaxed/simple;
-	bh=oh0bRcCIykJVRc1cbwHbTCypspvbnK4XaoO2CqyBCaI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I8PmOYi+YZZ4sHIlDuTcHWb/us4nLXjVz0viV2SB+v0pxvTiw01fXMHhcXjq2PSR8xJp4hR22uVrv9cVI+1PjYdOHZCjtRvxsNnVohjA67/OSypQcKqTM/5sggEbkRs5u5jRNe3j1BD+8uRl+lpx73m2AP/oApv97yci2WulAIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E7fq+/LR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7A0C4CEED;
-	Tue,  3 Jun 2025 10:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748945395;
-	bh=oh0bRcCIykJVRc1cbwHbTCypspvbnK4XaoO2CqyBCaI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E7fq+/LRC1Trg3RPBUdKCLNUsEl0wnDkPUnI9dnGH9e4dj8+ch5E5G516D+d29Ehz
-	 7NAe4VpxHmGGDaQCxpuKn4qwV+346zM26f0y0s71aoQAzNbRBOYORJUJmjxQcawwie
-	 8wz87Ym0hwXtKvg/xh+n9xLxuLtdp74iii/DjFuoC9zTxKEnDIsmueSx9NhclqpfQq
-	 jpB5jnQki6IegNUuS53wn45MN7unqsV4QKYW7W/+j8/cnNtxCxPENRu0VFO/X91fud
-	 7bNJz32RJbFnw7rNyyKT6P03vW10SV9O+l4Y+Z6b571VRkcGPq05D0ahm/ChB/IQAZ
-	 9u3lKnputHqqw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CDE380DBEC;
-	Tue,  3 Jun 2025 10:10:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748945558; c=relaxed/simple;
+	bh=fb+1aoVEIY3lvgFvicVgPsuZu53K3kj2915ek084rRY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FeAhySFfdfrvxsXC1HEJTreYG9Y/n/T0kqNTe3suQcofousGH4f/fls2fUstDpVs94hEM5bu9dZFnGwQoZF+kxbK0RfiS4VktGqaTCRIoY7Be8ATvr3rW/qa+UQlyiwcq56sbNYnP32PlfcNLbepKRcMOXK+h6PjzPkkZrOFr7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ONSM1g9R; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b26f01c638fso4851208a12.1;
+        Tue, 03 Jun 2025 03:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748945556; x=1749550356; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5MxnhBc+O3vpHmBRAaLCl1aOvgfUSOP4JyB4k/c7duo=;
+        b=ONSM1g9Rn7kFaOQcfHk8KQIXoQwdpDOQvAszp3Yl8TsU2ESKUTquk5O3wEihRk0v7F
+         dlgr6dYMelz8Ld0r3SUWb0+676PBsVHmlLdLyaMwtsmbHavoy9sVKGcVmVRsxTdqOkvh
+         kFJ5T5WmxllyyKzxzEre2BcNBPy7MvzAuSJXBhiLgkPk2+wB29bDjXjZQetPkCAivlVA
+         YRf6YBYou4wVmJioZ2Jmh02cwN8GNmi7pl+tQNnq4sCXijKxj483aWeWriA2jFlMig2G
+         WIDeQf2ijxYTbqj5FHjQNstdIaRuz7Tt/rkbkLxDTUHPQyO2zXUeVxk2PpnbauWqZOe9
+         NAYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748945556; x=1749550356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5MxnhBc+O3vpHmBRAaLCl1aOvgfUSOP4JyB4k/c7duo=;
+        b=oqEmc1dum6xPVbbyFEcRY258Fq+cFs30NpvGppyL8kHDVWk4JA7t6QZ/fcy5rmpJFo
+         HXGXHjSAP0HncKJ6AVAjHXjupHrsjH49mNJRe9SnZ6sQDwPsmZepdx6R5Lpwh4tbLra7
+         ZKKV4L2ksXlp+8knonO4jI9emwUIyeFbBGd+9mOPW/vPpyOt/gTIjNlpwZeok5oWqbDZ
+         HxCgKMD1VKKEyAtR3aVuvMBKkt1mXFaYPIx5zotljDb3DwjIO1vfwxthGBKY54nH6Yay
+         YHH54igIBQBxkTkBMPJtrX5gFPDxNg8I0f0bOiAC5/+HXQkeDxIjd53fXUFpC9qf6Ue7
+         kp9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUt9nLLWVHok5/aIWDLTF74UvWnuhc8XsZ6ecLm2/NJv2lrxk2on+Y8tOL4YLGBJWKmDwO3gUrSxHqnVP4=@vger.kernel.org, AJvYcCVRNrGqqcXe80feIdJm3EPjlAQpCM0rkn8ah6tZ4zMYmu5AV4B4zRqD1stcAe3g6jn1Xwx9z5OA@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYHxbgISZi4hesxw18x/BjB+HMHn7M0bBEOlmLE90N+iuCJ2Tn
+	Ef6ENuotDUhYOyNMEF5F3CBPNeS2l/eX4vDv9ITdHNDseYvLg+GD199iFCxaSxWTM4kjR6CjQFv
+	FrNK4LT2u+x4JX2e9YjxA6hQnMzhZSh8=
+X-Gm-Gg: ASbGncs9m5SzWMsypr6oatxF10cf/HKWUIxrTX6lTf1IPTqiPGSW0cu8AmvlmBtSlqD
+	/nY7wYojWUJmPDP8+l1VScl9PdQhaQrsQSnj+V4pVeb4HU5Vk6TCKx1JBY/KHNDXV2Nm+n7ePB5
+	PVnGPet9u57CTnvhjPsPwtLcFyG4Ryd53+7Ve8P4Lht661fq8rYE7BxHTTvb6mKFx6ECw=
+X-Google-Smtp-Source: AGHT+IGdrSQjP4rJ8T/Sa2miwSpApd88R5Td7U6KQDGe3xw3mMPJJkK3NjL8KmDWn2w5uF+kr6yqXS0rcElvgAO2dgY=
+X-Received: by 2002:a17:90b:2dc7:b0:311:c939:c84a with SMTP id
+ 98e67ed59e1d1-3127c6ec095mr20445724a91.15.1748945556376; Tue, 03 Jun 2025
+ 03:12:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] vmxnet3: correctly report gso type for UDP tunnels
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174894542826.1452627.13316542259674401176.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Jun 2025 10:10:28 +0000
-References: <20250530152701.70354-1-ronak.doshi@broadcom.com>
-In-Reply-To: <20250530152701.70354-1-ronak.doshi@broadcom.com>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: netdev@vger.kernel.org, guolin.yang@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
+References: <20250531101308.155757-1-noltari@gmail.com> <20250531101308.155757-10-noltari@gmail.com>
+ <455d5122-7716-4323-b712-9a7d84063c0c@broadcom.com>
+In-Reply-To: <455d5122-7716-4323-b712-9a7d84063c0c@broadcom.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Tue, 3 Jun 2025 12:12:03 +0200
+X-Gm-Features: AX0GCFshSXcSsBhqGSUlWkOAp_xe8ImHNIAwihgvNfHTL013-EJ0y_m3uSttTJU
+Message-ID: <CAKR-sGcqVv8LO2sqE-wsh5As=9f+s1EcaVcMF264RafdWVVkdg@mail.gmail.com>
+Subject: Re: [RFC PATCH 09/10] net: dsa: b53: fix b53_imp_vlan_setup for BCM5325
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: jonas.gorski@gmail.com, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vivien.didelot@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Florian,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+El lun, 2 jun 2025 a las 20:11, Florian Fainelli
+(<florian.fainelli@broadcom.com>) escribi=C3=B3:
+>
+> On 5/31/25 03:13, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
+> > CPU port should be B53_CPU_PORT instead of B53_CPU_PORT_25 for
+> > B53_PVLAN_PORT_MASK register.
+> >
+> > Fixes: ff39c2d68679 ("net: dsa: b53: Add bridge support")
+> > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > ---
+> >   drivers/net/dsa/b53/b53_common.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> >
+> > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53=
+_common.c
+> > index d5216ea2c984..802020eaea44 100644
+> > --- a/drivers/net/dsa/b53/b53_common.c
+> > +++ b/drivers/net/dsa/b53/b53_common.c
+> > @@ -543,6 +543,10 @@ void b53_imp_vlan_setup(struct dsa_switch *ds, int=
+ cpu_port)
+> >       unsigned int i;
+> >       u16 pvlan;
+> >
+> > +     /* BCM5325 CPU port is at 8 */
+> > +     if ((is5325(dev) || is5365(dev)) && cpu_port =3D=3D B53_CPU_PORT_=
+25)
+> > +             cpu_port =3D B53_CPU_PORT;
+>
+> Don't we get to that point only if we have invalid Device Tree settings?
+> In which case wouldn't a WARN_ON() be more adequate?
 
-On Fri, 30 May 2025 15:27:00 +0000 you wrote:
-> Commit 3d010c8031e3 ("udp: do not accept non-tunnel GSO skbs landing
-> in a tunnel") added checks in linux stack to not accept non-tunnel
-> GRO packets landing in a tunnel. This exposed an issue in vmxnet3
-> which was not correctly reporting GRO packets for tunnel packets.
-> 
-> This patch fixes this issue by setting correct GSO type for the
-> tunnel packets.
-> 
-> [...]
+I just copied the same code that's already present on b53_enable_cpu_port:
+https://github.com/torvalds/linux/blob/master/drivers/net/dsa/b53/b53_commo=
+n.c#L753-L755
 
-Here is the summary with links:
-  - [net,v4] vmxnet3: correctly report gso type for UDP tunnels
-    https://git.kernel.org/netdev/net/c/982d30c30eaa
+I believe that the correct configuration should have the CPU port at
+#5, but certain registers expect it at #8:
+https://github.com/openwrt/openwrt/blob/cc5421128e44effd5df05227cec4d4c5d05=
+be8dc/target/linux/bmips/dts/bcm6358-huawei-hg556a-b.dts#L155-L204
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> --
+> Florian
 
-
+Best regards,
+=C3=81lvaro.
 
