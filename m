@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-194792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2AE9ACC884
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:54:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49648ACC885
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D24821890C6E
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:54:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1D93A6A8F
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430D5238C0B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D213D238C36;
 	Tue,  3 Jun 2025 13:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc01L22q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xk4JOYf/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC08132111
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 13:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE43B238C2D
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 13:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748958843; cv=none; b=jeujudzFxLarUNr1EYv010Lig+7oId+U3ay2pXd9PkeVWB6Rvp6m6hPtOsq7y/hURlMl8tVB5CvRdTqQrFTDQkfQEL+LPwmAjZYCZdMkQeyMBk6MY4cWqdX38vOQfl+YWCpF/ULvxAbr57DdQNIypOC4aCWxYJA3zlEHhWKLJXQ=
+	t=1748958843; cv=none; b=TbiikRYrQ5Z7Yr9tLZC175NdK6cwitLImO8LzOrWni9JOIXkBypIa/WVSq1DdmK+WdlVbu9IYCM69+3m44IF5Z1W9PVZoNm+BzzSiMm+3HjTErhuiqdABAp3hxVzMEJ+4JGCM7wrUqCBiIho74SaSjy3JPOncDtaNQ7OpHgBGII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1748958843; c=relaxed/simple;
-	bh=oGEjJrbt4wFhAeBb432vuTjndFwMq6uCxa5o+T4EMeY=;
+	bh=B5yfQ0VznwQpXE+djiH1tua0BNboI2YM5OujlOBiCos=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eqjPW34Cy9I4I+1MXRBq7ElchKhoVkydZNpmeapl+9M61q4g7xSkYlGuWTs+7IUhdagGc+cqLy6GrlJO9SeYhhrlbhKYozSkB3yZvKCFliShtQctGmVy3MOhepxWLkGFBUX5ejwnRNUa3sKJ/cBPYBuI1t+vQQ93LQIrwS7P1s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tc01L22q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BB02C4CEEF;
+	 MIME-Version; b=bgsNpDlfW2WFCd9wJxcIq3u3SFPDiIM9v5XqHomLo48UvufZ4VI5jZvBZNN1a9sooAdN0DtUvl6IKQWEoM/jbldvSGLAkgcmX93viLc0O99UdK2K+awfi9pTJO87YsGclrBHTrmus4zghNCPg9gKv81X8Nbv2WMZrePcmX5B24g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xk4JOYf/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA42AC4CEED;
 	Tue,  3 Jun 2025 13:54:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748958842;
-	bh=oGEjJrbt4wFhAeBb432vuTjndFwMq6uCxa5o+T4EMeY=;
+	s=k20201202; t=1748958843;
+	bh=B5yfQ0VznwQpXE+djiH1tua0BNboI2YM5OujlOBiCos=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Tc01L22qeDyw2M7mDkhySi6rpKJbCjdtl++VpDUgh8cko0KY8JdkcD7dsQtikrHzu
-	 mWz5MfqAAwo8wmtM5qcpgClvw8bIgGyesxSH1J3J4qg3MSpJgxfrAtHpwg2ymZTGR1
-	 8gZhzolZ81D084dOxA0jHE5nixPwWIHhkynjQ6KxafnGu6D9uN85V1g0X63LlGqpF0
-	 UfaCGyJ0iMjeQYYSFpLVnqjXswgWRVgdQto6bhZv7bk5/lFAB7Jd10OPCzXBx3CmNG
-	 3oOlqBtbrc2h+5dNpaE8+Tv949mpyritXIResCHizkfwDeLON2gTXbxOkxpDKMtiRf
-	 i/nF11XK1BC0A==
+	b=Xk4JOYf/yfvBcn5mqQM50dSpC9e+V82NuOM26wxDU8KXWXaR2/NL9+XM8D00i0CzA
+	 EAvn/Xo/+NAnkNJC9Cyw366jSjDT27PfAHmJKIqgBd9AyrBO1qRyO39vQ3fhvVTLbM
+	 Owx2a/VRf71CrtY+aX0pfF7/8pN8dpPQFqu0SsGWsjnBCEtZ02nC7n/x0xgx55CE43
+	 6PtqTwYnjiAFi8EEFWzvE8Edqcd9J+dhEaA9Ci+JbW+G41qz5PD35kNzEsoA0MhjD8
+	 04hzeMMKVO0nS2aZXo0PMbwHDmGDEQYixt2vlBBgXsNJUd909N6KRvm8K4C8vxawJe
+	 XTWGlSowPXO0g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	sdf@fomichev.me,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 1/2] netlink: specs: rt-link: add missing byte-order properties
-Date: Tue,  3 Jun 2025 06:53:56 -0700
-Message-ID: <20250603135357.502626-2-kuba@kernel.org>
+Subject: [PATCH net 2/2] netlink: specs: rt-link: decode ip6gre
+Date: Tue,  3 Jun 2025 06:53:57 -0700
+Message-ID: <20250603135357.502626-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250603135357.502626-1-kuba@kernel.org>
 References: <20250603135357.502626-1-kuba@kernel.org>
@@ -66,113 +66,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A number of fields in the ip tunnels are lacking the big-endian
-designation. I suspect this is not intentional, as decoding
-the ports with the right endian seems objectively beneficial.
+Driver tests now require GRE tunnels, while we don't configure
+them with YNL, YNL will complain when it sees link types it
+doesn't recognize. Teach it decoding ip6gre tunnels. The attrs
+are largely the same as IPv4 GRE.
 
-Fixes: 6ffdbb93a59c ("netlink: specs: rt_link: decode ip6tnl, vti and vti6 link attrs")
-Fixes: 077b6022d24b ("doc/netlink/specs: Add sub-message type to rt_link family")
+Correct the type of encap-limit, but note that this attr is
+only used in ip6gre, so the mistake didn't matter until now.
+
+Fixes: 0d0f4174f6c8 ("selftests: drv-net: add a simple TSO test")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/rt-link.yaml | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ Documentation/netlink/specs/rt-link.yaml | 53 +++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index 5ec3d35b7a38..6521125162e6 100644
+index 6521125162e6..b41b31eebcae 100644
 --- a/Documentation/netlink/specs/rt-link.yaml
 +++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -1685,15 +1685,19 @@ protonum: 0
+@@ -1717,7 +1717,7 @@ protonum: 0
+         type: u8
        -
-         name: iflags
-         type: u16
-+        byte-order: big-endian
-       -
-         name: oflags
-         type: u16
-+        byte-order: big-endian
-       -
-         name: ikey
-         type: u32
-+        byte-order: big-endian
-       -
-         name: okey
-         type: u32
-+        byte-order: big-endian
-       -
-         name: local
-         type: binary
-@@ -1717,6 +1721,7 @@ protonum: 0
+         name: encap-limit
+-        type: u32
++        type: u8
        -
          name: flowinfo
          type: u32
-+        byte-order: big-endian
+@@ -1760,6 +1760,54 @@ protonum: 0
        -
-         name: flags
-         type: u32
-@@ -1729,9 +1734,11 @@ protonum: 0
-       -
-         name: encap-sport
+         name: erspan-hwid
          type: u16
-+        byte-order: big-endian
++  -
++    name: linkinfo-gre6-attrs
++    subset-of: linkinfo-gre-attrs
++    attributes:
++      -
++        name: link
++      -
++        name: iflags
++      -
++        name: oflags
++      -
++        name: ikey
++      -
++        name: okey
++      -
++        name: local
++        display-hint: ipv6
++      -
++        name: remote
++        display-hint: ipv6
++      -
++        name: ttl
++      -
++        name: encap-limit
++      -
++        name: flowinfo
++      -
++        name: flags
++      -
++        name: encap-type
++      -
++        name: encap-flags
++      -
++        name: encap-sport
++      -
++        name: encap-dport
++      -
++        name: collect-metadata
++      -
++        name: fwmark
++      -
++        name: erspan-index
++      -
++        name: erspan-ver
++      -
++        name: erspan-dir
++      -
++        name: erspan-hwid
+   -
+     name: linkinfo-vti-attrs
+     name-prefix: ifla-vti-
+@@ -2239,6 +2287,9 @@ protonum: 0
        -
-         name: encap-dport
-         type: u16
-+        byte-order: big-endian
+         value: gretap
+         attribute-set: linkinfo-gre-attrs
++      -
++        value: ip6gre
++        attribute-set: linkinfo-gre6-attrs
        -
-         name: collect-metadata
-         type: flag
-@@ -1764,9 +1771,11 @@ protonum: 0
-       -
-         name: ikey
-         type: u32
-+        byte-order: big-endian
-       -
-         name: okey
-         type: u32
-+        byte-order: big-endian
-       -
-         name: local
-         type: binary
-@@ -1816,6 +1825,7 @@ protonum: 0
-       -
-         name: port
-         type: u16
-+        byte-order: big-endian
-       -
-         name: collect-metadata
-         type: flag
-@@ -1835,6 +1845,7 @@ protonum: 0
-       -
-         name: label
-         type: u32
-+        byte-order: big-endian
-       -
-         name: ttl-inherit
-         type: u8
-@@ -1875,9 +1886,11 @@ protonum: 0
-       -
-         name: flowinfo
-         type: u32
-+        byte-order: big-endian
-       -
-         name: flags
-         type: u16
-+        byte-order: big-endian
-       -
-         name: proto
-         type: u8
-@@ -1907,9 +1920,11 @@ protonum: 0
-       -
-         name: encap-sport
-         type: u16
-+        byte-order: big-endian
-       -
-         name: encap-dport
-         type: u16
-+        byte-order: big-endian
-       -
-         name: collect-metadata
-         type: flag
+         value: geneve
+         attribute-set: linkinfo-geneve-attrs
 -- 
 2.49.0
 
