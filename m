@@ -1,159 +1,216 @@
-Return-Path: <netdev+bounces-194773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E0B2ACC543
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:25:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0FDACC558
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDBDE1641EE
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:25:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A02A1893F9D
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529AB223DD1;
-	Tue,  3 Jun 2025 11:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E04722A808;
+	Tue,  3 Jun 2025 11:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDCElWwh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASunSOly"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D691F5E6
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1686322A7E8;
+	Tue,  3 Jun 2025 11:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748949926; cv=none; b=Pbi/fxCGt7JexNU+rwyBm4hi59DNzfF/Ya9etPcrgZKKAbhEYgPhCRClFfceDNJnWC2W/mU0g9H/Lcikqa7vDID/zeC9f26qrXBQOjU+lEqvOT99xq4mvUMehI2ZHO4Is7y9fHlXvCx5vOWAH84ySs/o0ylCOsPTI6JKaCQE+po=
+	t=1748950046; cv=none; b=R1blS70RKxPw+Ys+pV5LUBvGXYDBYL6X59j8c/OgTKqKVit/jD/vLkorRXl8FjMiDVX+dwG7j2TvhvJzE/ZL+CP3sy+rcW0GSnMVK5JEY3RJJkUGrAc++F2ZqFVtjU4n+bLyJ+I7ISMrKa8tshTuEpnPfw5yEUzrJTOAGDE+Bdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748949926; c=relaxed/simple;
-	bh=RtjqlcRotddY9cuLdBeFBTfBuuwQsJ56K3saJP1Rxbo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=A/NSHmDGSXB4T9Ept8it4TIwjbq+Nwa2nYvmFphsrBtN1bapkE4WYxXG85FhsawlbrD/SweiGJfAdTs7uw3GBmIdJ3vnlJ6RLEpvtL7srrPKHevfIhQwkha7qqN6eRoByu2TYPab1YtK/Nag96TPnNTFeuUzvL0IGkCnewlAEeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UDCElWwh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748949923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Kw5gWK7yNxNGpXr25Zj+mFBYI0NPKXqvVPIKPVgmyJs=;
-	b=UDCElWwht5qb96+pqzVSW9JRfVp9iCI3ZUN+AWbpNUSTMVURF3DXGWJZS0PorkTepf/94y
-	L2YRtgopZtX7ArkBuIobGsuLliNqybNf/ZWvpIGBvqcJl6jI5+ede3QeUrPKyz9alVA7yd
-	WJ3/IyYUDeuyKgOlxE3vLohVvw25tdA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-141-5AzxuRNnP_Kg4a3BclAxCQ-1; Tue, 03 Jun 2025 07:25:21 -0400
-X-MC-Unique: 5AzxuRNnP_Kg4a3BclAxCQ-1
-X-Mimecast-MFC-AGG-ID: 5AzxuRNnP_Kg4a3BclAxCQ_1748949921
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4f65a705dso3698386f8f.2
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:25:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748949920; x=1749554720;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kw5gWK7yNxNGpXr25Zj+mFBYI0NPKXqvVPIKPVgmyJs=;
-        b=O/mXeSROBnki0X+BruU0XABuvPwqlhfk8qzdDGGRMSk7guTYEiiYbG1lFlS+dkA/Of
-         IcJh6173oLzEf085zxa+HcAehe5OZXn//d15h2+c5AHyskIl0MGkK00hBnp+xkw31S4m
-         SNGx7BWEZTLMVe95U3H8l6Y09B/EEkEXiVu5ab9Oo+dKZzDhF4PjMBubCtQR4KCpFt+H
-         /D1Gm5KwqjIAYw/6FPIBaumgHf1tiYnLrqaLZ5k3RT8dshfYUZFNFvnKcgSMDEs4BG58
-         hKfJTYubiEEE0awtcfQ8LuUiig6H0Co5PHa6HXKNrRXm177s51ov6JJK3AML5Av4TqRo
-         ApPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJdxPdGskdnezNNRbo2GlLK/OGse0CBvecLNV9MShdCeuP9ETm9n388XjyT4QNOYqumIKUuYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUm94i0d6XsVUmanVN0zOZimlmdAN0+L7KwsPDLko1eHQql+mp
-	kGeAUQgUL/gus19l7IW9xwlg52K0leYcT9dfmmXAnE7DYrC7pe4keRJTzNuucnVsS61YozcjULF
-	ptv+dcFjRf4PSKAV3KrVtanfhI4XA0JeRwNFQix5U/ZrrD1WvPsvVAKhG0nvLNw20lQ==
-X-Gm-Gg: ASbGnctTYkm8nO5AbhU4DhCFg8E8JiN+qdyA4LScwHBbpKdDKy4e4la9bSm7pCK+4Ru
-	ATyEb26g9NVU0+Yv6Yo2RTXF5MOajwP+PUZiFIpF72wmhJl03gtFoCarm889cKIy5WPINyI3tb6
-	gfxd+kBz+FBPbhAo2ZZi/RHFFqKOqgbo0XZiuENK0zFDkHRgQdIpDTZVkwlllGtPDnqHLk9tJuC
-	axgtJyKmSbc71U2RYWNyc3o8rQFjoD4L0P+3qAYypbG6wEGXiFhlIRV1j4lhrSxKtfVGeJ8+aGC
-	a1yDWEi2poHhfSNRUIGBwjtwzHuIPDvx4khlMsuqXX7sD26piiGrfezH
-X-Received: by 2002:a5d:588a:0:b0:3a4:d79a:35a6 with SMTP id ffacd0b85a97d-3a4fe178e45mr8908615f8f.14.1748949920519;
-        Tue, 03 Jun 2025 04:25:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjh2WEW3uL+O2hoixHc8aiHYyOMA+1/XmATlP+pR0OSNsRTcMM/oh6ezbo9jKKqulG3FYX8w==
-X-Received: by 2002:a5d:588a:0:b0:3a4:d79a:35a6 with SMTP id ffacd0b85a97d-3a4fe178e45mr8908599f8f.14.1748949920135;
-        Tue, 03 Jun 2025 04:25:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7fb00ccsm158363775e9.17.2025.06.03.04.25.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 04:25:19 -0700 (PDT)
-Message-ID: <0f22133f-2eda-4cc9-9ac3-002a067c986e@redhat.com>
-Date: Tue, 3 Jun 2025 13:25:18 +0200
+	s=arc-20240116; t=1748950046; c=relaxed/simple;
+	bh=34TUZi3qOElaSed4nw9qb+k1ylFQGi/Eb0a+fyUwQac=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=O7P4O8sa75hORKxD4Pf2OjO4+gngfBRbqe5y2uoNsn/WCEBUG6T5kdGOlWrMAcBpmefMn86fi47gRGThnQPc5cT3o1DPN4oP3IgnPnsWivv/QosIS9pyElKhP3BV3kv0l9QGVbM6DbvWB6/xnzrTOP8nerj1RHE4MwA4ONQzf54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ASunSOly; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87EC5C4CEED;
+	Tue,  3 Jun 2025 11:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748950045;
+	bh=34TUZi3qOElaSed4nw9qb+k1ylFQGi/Eb0a+fyUwQac=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ASunSOly7J4Mqj/R4Dbic+5bLYBEEJoUROtJbK5x8jsVfW/Kd2EvuqyehnhimKKFw
+	 Icl6K13MUvU3Ghj7B/weDMkJRr3PihA63oo2ZUxJioFvs256ktZ5d14xeQU6XFEDpI
+	 2x9BEZrSXsV0kENwWAmROqnftlW2D3B/yuqfciBmjSgWTb32xVq1LwjwQOEPcuto4+
+	 rpOJR63jlW6pTKFu9eXJu2+Jep5pPloVr7/0zGzPK8qworjMXicRlgCoaVZ1leDqcD
+	 GpGlPtI3veJVcHDqw7T6Q1wXvD6MMv3qOU1xpUu0Dji3qGs/DpyMN2Ig0Jih4LJbat
+	 QGvHuBsWl2lGw==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v13 0/9] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Date: Tue, 03 Jun 2025 07:27:11 -0400
+Message-Id: <20250603-reftrack-dbgfs-v13-0-7b2a425019d8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/4] bonding: Extend arp_ip_target format to
- allow for a list of vlan tags.
-To: David J Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
-References: <20250603035243.402806-1-wilder@us.ibm.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250603035243.402806-1-wilder@us.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAA/cPmgC/23SS07DMBCA4atUWRPksT32mBX3QCz8bKOiFiVVB
+ Kp6dyaVEIZBWdnR98d2fB2WOk91GZ5212Gu67RM5xMPwDzshnyIp30dp8ITg1YalQUzzrVd5pi
+ PY0n7tozGO5+MMlW3ODB65/fTx7348srjw7RczvPn/QMrbLPfKfs3tcKoxqYMEpLRWpnnY51P9
+ e3xPO+HrbXq3qPwmn0CyjamAlo34U3vvfCGfTaAwWrK1JLwtvckvGWPOWL2FAJaKzx2XkuP7CG
+ nVBpvnlIR3nXeKOEde3I+6xAbn2MU3v94foT32/l7yliCTzlLT72X50fsnfIefDEpBRI+9D4IH
+ 7b1x0RE0aK2cv+guoCWCwDFhZIRm/cKXQBZgL4gfwFsdzDYWFUCh2T/Kei+IDcB2y0ESMFklVV
+ y9Vfhdrt9ARLnXiR0AwAA
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: Krzysztof Karas <krzysztof.karas@intel.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5469; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=34TUZi3qOElaSed4nw9qb+k1ylFQGi/Eb0a+fyUwQac=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoPtwUF2tKexk0NfHIfXSZPIZOlSmCxiQ5FejrQ
+ tjwBwHhzGSJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaD7cFAAKCRAADmhBGVaC
+ FegvD/46d+gMoksFRhuUk1ZZYj25LCaNXcygpg3KBTarN2QpiUyCaVrYEvBo/46Br+s0BXH4Dej
+ 3V7QT64jUWIyXkhrEgJCIPN6NGbkjyxTSFab3Ko5y8EHzrX4RutVUKZmE8s/E4DiCJil2oZBlBJ
+ UKex+Wk6shlzgq1VfyPLbMRWlvuq1Hj3vAfrDqzKC4X/EyHNSnr1H0ES+I7pUV/HmGWbFr4Ljk2
+ Cpy0XufVKLk5zg2B2I/4rJnQghG1EkGFdI5i1aVaqNo2XjGzfnN3Gu6tnQCwyGG+q1i6+lxElmx
+ nOHDTT6dJu1WEshqYVTMNPpaofWG6gzwC4HJbp6IUc0/Oeu8j3CS03FpLGaWAutj/oKfp9RVH7e
+ tBJM5bMVUrlOwjlcmXumuku8HD0rHZHtbUjXoiSNt4DRNHc2hJ4uwVyv8sU0Z+U+d2jmv3D2c7k
+ EXJ50EuWx6zz1TgDWmNC/GgQiTzfher4YqWUIgG2i87KrzIEiF3b9X3pywu6njL4r791DmXVTWV
+ IYWH3yDddd2FkRe9Yf622NLH6YDxM5GtFTJ6LVWldjkrrntfPh2yahNMM56GUNAqQ7PyzF3v6IB
+ 5XHdTu6H7Kn+HEdPqvUkV/y4e1j6fyZ4jo/3wXciWlGzStd4aP2eH+dkfxdsbmdNIbGK0Kf9um3
+ PWD64hGgdJcdsIg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On 6/3/25 5:51 AM, David J Wilder wrote:
-> The current implementation of the arp monitor builds a list of vlan-tags by
-> following the chain of net_devices above the bond. See: bond_verify_device_path().
-> Unfortunately with some configurations this is not possible. One example is
-> when an ovs switch is configured above the bond.
-> 
-> This change extends the "arp_ip_target" parameter format to allow for a list of
-> vlan tags to be included for each arp target. This new list of tags is optional
-> and may be omitted to preserve the current format and process of gathering tags.
-> When provided the list of tags circumvents the process of gathering tags by
-> using the supplied list. An empty list can be provided to simply skip the the
-> process of gathering tags.
-> 
-> The new optional format for arp_ip_target is:
-> arp_ip_target=ipv4-address[vlan-tag\...],...
-> 
-> Examples:
-> arp_ip_target=10.0.0.1,10.0.0.2 (Determine tags automatically for both targets)
-> arp_ip_target=10.0.0.1[]        (Don't add any tags, don't gather tags)
-> arp_ip_target=10.0.0.1[100/200] (Don't gather tags, use supplied list of tags)
-> arp_ip_target=10.0.0.1,10.0.0.2[100] (add vlan 100 tag for 10.0.0.2.
->                                       Gather tags for 10.0.0.1.)
-> 
-> This set of patches updates the arp_ip_target functionality.
-> 
-> This new functional is yet to be included to the ns_ip6_target feature.
-> 
-> The iprout2 package will also need to be updated with the following change:
-> 
-> 
-> diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-> index 19af67d0..b599cbae 100644
-> --- a/ip/iplink_bond.c
-> +++ b/ip/iplink_bond.c
-> @@ -242,9 +242,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
->                                 int i;
->  
->                                 for (i = 0; target && i < BOND_MAX_ARP_TARGETS; i++) {
-> -                                       __u32 addr = get_addr32(target);
-> -
-> -                                       addattr32(n, 1024, i, addr);
-> +                                       addattrstrz(n, 1024, i, target);
->                                         target = strtok(NULL, ",");
->                                 }
->                                 addattr_nest_end(n, nest);
-> 
-> Signed-off-by: David J Wilder <wilder@us.ibm.com>
+For those just joining in, this series adds a new top-level
+"ref_tracker" debugfs directory, and has each ref_tracker_dir register a
+file in there as part of its initialization. It also adds the ability to
+register a symlink with a more human-usable name that points to the
+file, and does some general cleanup of how the ref_tracker object names
+are handled.
 
-## Form letter - net-next-closed
+This reposting is mostly to address Krzysztof's comments. I've dropped
+the i915 patch, and rebased the rest of the series on top.
 
-The merge window for v6.16 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
+Note that I still see debugfs: warnings in the i915 driver even when we
+gate the registration of the debugfs file on the classname pointer being
+NULL. Here is a CI report from v12:
 
-Please repost when net-next reopens after June 8th.
+    https://intel-gfx-ci.01.org/tree/drm-tip/Patchwork_148490v8/bat-arls-6/igt@i915_selftest@live@workarounds.html
 
-RFC patches sent for review only are obviously welcome at any time.
+I think the i915 driver is doing something it shouldn't with these
+objects. They seem to be initialized more than once, which could lead
+to leaked ref_tracker objects. It would be good for one of the i915
+maintainers to comment on whether this is a real problem.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v13:
+- drop i915 patch
+- Link to v12: https://lore.kernel.org/r/20250529-reftrack-dbgfs-v12-0-11b93c0c0b6e@kernel.org
+
+Changes in v12:
+- drop redundant pr_warn() calls. Debugfs already warns when these ops fail
+- Link to v11: https://lore.kernel.org/r/20250528-reftrack-dbgfs-v11-0-94ae0b165841@kernel.org
+
+Changes in v11:
+- don't call ref_tracker_dir_init() more than once for same i915 objects
+- use %llx in format for net_cookie in symlink name
+- Link to v10: https://lore.kernel.org/r/20250527-reftrack-dbgfs-v10-0-dc55f7705691@kernel.org
+
+Changes in v10:
+- drop the i915 symlink patch
+- Link to v9: https://lore.kernel.org/r/20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org
+
+Changes in v9:
+- fix typo in ref_tracker_dir_init() kerneldoc header
+- Link to v8: https://lore.kernel.org/r/20250507-reftrack-dbgfs-v8-0-607717d3bb98@kernel.org
+
+Changes in v8:
+- fix up compiler warnings that the KTR warned about
+- ensure builds with CONFIG_DEBUG_FS=n and CONFIG_REF_TRACKER=y work
+- Link to v7: https://lore.kernel.org/r/20250505-reftrack-dbgfs-v7-0-f78c5d97bcca@kernel.org
+
+Changes in v7:
+- include net->net_cookie in netns symlink name
+- add __ostream_printf to ref_tracker_dir_symlink() stub function
+- remove unneeded #include of seq_file.h
+- Link to v6: https://lore.kernel.org/r/20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org
+
+Changes in v6:
+- clean up kerneldoc comment for ref_tracker_dir_debugfs()
+- add missing stub function for ref_tracker_dir_symlink()
+- temporary __maybe_unused on ref_tracker_dir_seq_print() to silence compiler warning
+- Link to v5: https://lore.kernel.org/r/20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org
+
+Changes in v5:
+- add class string to each ref_tracker_dir
+- auto-register debugfs file for every tracker in ref_tracker_dir_init
+- add function to allow adding a symlink for each tracker
+- add patches to create symlinks for netns's and i915 entries
+- change output format to print class@%p instead of name@%p
+- eliminate the name field in ref_tracker_dir
+- fix off-by-one bug when NULL terminating name string
+- Link to v4: https://lore.kernel.org/r/20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org
+
+Changes in v4:
+- Drop patch to widen ref_tracker_dir_.name, use NAME_MAX+1 (256) instead since this only affects dentry name
+- Link to v3: https://lore.kernel.org/r/20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org
+
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
+
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+
+---
+Jeff Layton (9):
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: add a static classname string to each ref_tracker_dir
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: automatically register a file in debugfs for a ref_tracker_dir
+      ref_tracker: add a way to create a symlink to the ref_tracker_dir debugfs file
+      net: add symlinks to ref_tracker_dir for netns
+      ref_tracker: eliminate the ref_tracker_dir name field
+
+ drivers/gpu/drm/display/drm_dp_tunnel.c |   2 +-
+ drivers/gpu/drm/i915/intel_runtime_pm.c |   4 +-
+ drivers/gpu/drm/i915/intel_wakeref.c    |   3 +-
+ include/linux/ref_tracker.h             |  58 ++++++++++-
+ lib/ref_tracker.c                       | 176 +++++++++++++++++++++++++++++---
+ net/core/dev.c                          |   2 +-
+ net/core/net_namespace.c                |  34 +++++-
+ 7 files changed, 253 insertions(+), 26 deletions(-)
+---
+base-commit: 90b83efa6701656e02c86e7df2cb1765ea602d07
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
 
