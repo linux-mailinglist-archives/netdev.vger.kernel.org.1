@@ -1,85 +1,86 @@
-Return-Path: <netdev+bounces-194771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4825DACC530
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:17:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF4FACC53F
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9623218942BB
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5A5164730
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C180C1A0BE0;
-	Tue,  3 Jun 2025 11:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF69221714;
+	Tue,  3 Jun 2025 11:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VeNsHPWZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvJzm9EO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A562C325E
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A5D149C41
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748949452; cv=none; b=t8t4AzcRXv4K4JGnJmdqYXwErn4VA+9veqHrxZs0MxIXzyKRBNntFeFQtc8j9tkOhdUyJaakbHsLxvEHSrDZJhiAZDBrLhNoChLE73oVmtuNufh7k7NJBSiYfxsAeXmQIrgR8ceCybPz5VWh5I4Bbf/Jyv32t7isEd74x1GohJc=
+	t=1748949809; cv=none; b=UmJ7RsCfxQqmGNkvLryB680xFOIc7OaQjCJq5TSmvrpyqliUyg26rjW8j6KZQ4u7+R3VPdqn7IsTkNL+dO1pUUatwBav42w0YAYCkauvLsMbxI7jmuCQCktxdjkLeJsMyFCA1h+9m+ALWHynFZOrejqtQuEURnogYuw/Em24oRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748949452; c=relaxed/simple;
-	bh=QFPlPzYOy9+vjKip3QUXt/X9+P7bR5yQLnucJxJ22N8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tlp1D5/9MYeWD83vmhfS2PVQNb2OijD0T1HcHhKghqcGY7LJMgidNdTAKHLoAiC4yk6Vcm10cXVJjencz5vY1dUJUzeL3kIuBEUwYCmsFzRslM3iVKr+isrk40zpM/lSys6I/VkluY/3rKaTPwp3WgqgKZOYOjJ064Qw4lT7ax0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VeNsHPWZ; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1748949809; c=relaxed/simple;
+	bh=EEfb1n0jSbcHtuK02QRnwKtnaxq+GHglK72eHN1XR+Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dv5+XispViHfRHj4jt/fFFPlXOUNhPLtXbz2K5wEkBV5T4kTHsO5eKXRFTqnnjyWlDBJs6DseoyKDcKTitQyG2yna6eALjFfuYkA3FbjfnQm81kGJBxUDAJTyOAsOXMvcpRiOP9/EcEDSiWtVbSij2MVuY+jcEVmw6n967nuRL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SvJzm9EO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748949449;
+	s=mimecast20190719; t=1748949806;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QFPlPzYOy9+vjKip3QUXt/X9+P7bR5yQLnucJxJ22N8=;
-	b=VeNsHPWZT1jqFRe3d33aFxGx329IY2aTjLS2V97MEs29wCgXDY1viDhakwwzxEi+fWTAT9
-	68jm0LrPDnp2cDBoiEdN3xa3wkRchsb18LoF+Lc6Sq3vy+C3e/neh/AW0fID/JnxcPjALl
-	20MN7GPniYlvqo6TSgBXQBX5ptfQ5bE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4bvlY+rIl2tF1486WY43gg3Xc4gehhSPHX/tzq5wgF8=;
+	b=SvJzm9EOIBJGv7SYnZaFWsbmRfKsVmJFSmcHTaFrRWpuHLfWcLpgXkce90VhWjK0eVs7pW
+	xU+A4ol1vRhhXjRKkbpeDfvzb4wf41qujkncx3KcSWKCmhG/tsUWYRWtH6AMdOgZf+U4je
+	yXSGeZcxZL4GKZVYUloUjVlU6YDlSnk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-EeLDhDPhPxuOaaC5QaNQqw-1; Tue, 03 Jun 2025 07:17:28 -0400
-X-MC-Unique: EeLDhDPhPxuOaaC5QaNQqw-1
-X-Mimecast-MFC-AGG-ID: EeLDhDPhPxuOaaC5QaNQqw_1748949447
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a37a0d1005so3446933f8f.3
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:17:28 -0700 (PDT)
+ us-mta-380-P0WdALEZM3CjQEQog88oYQ-1; Tue, 03 Jun 2025 07:23:25 -0400
+X-MC-Unique: P0WdALEZM3CjQEQog88oYQ-1
+X-Mimecast-MFC-AGG-ID: P0WdALEZM3CjQEQog88oYQ_1748949804
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-451d30992bcso21222265e9.2
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:23:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748949447; x=1749554247;
+        d=1e100.net; s=20230601; t=1748949803; x=1749554603;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QFPlPzYOy9+vjKip3QUXt/X9+P7bR5yQLnucJxJ22N8=;
-        b=EuVWBNu/5Ph3nD7BphXugzSBaZuxOgOe3cN1CUI/8AcHXtVk0HoV8BxtszN8kLPn7Z
-         0JjSbOBaG4XE1doCywPF1Z7mVOkJiHUl37nQkIi0CxTylbr7zJWW95ooWPiecd5CRL3r
-         e5uqrzAlApXxlinCmdBfcnD4tAQaql3I5IPbZKnc5oeBdPLgUjU3mmK+tiNwWzxz5wkb
-         /GjQA05zit16tnGMY8OgdsEvqHElUTqoJdZU7HXx8Fs4ZdwO1ckKyRDVUuQisaN6Rkfp
-         A+6Ow7sa5E/bHWDajGTG0XH/N6Ompk2REnLQaFdfmPYa22Cm0I2cPhd8Gm/9n0ir1uEF
-         qcuw==
-X-Gm-Message-State: AOJu0YznXLdmMJRCmiN+f0SUxbQFFeDzOsMwoYGUN/2hNVW0lbkAjsuB
-	vacQL4tZSlWC93Wf32UW3YrEJ/QZn3/h5y9zThqu2+bFjVaK933ISWT2ff7DbIgWELqm3pDktk8
-	0VgNMpMUkHF/kEyOVUcfB+4me2sCXvzOuoeGuq0Tc1S297GD6J8ETAldGOA==
-X-Gm-Gg: ASbGncsPnJQenbC0sr7A/Kt/vWxjskJ2skr+i1WmoqAr6U1QqyifWt56tK+V26mZeGy
-	8a6/W3jBWWH3AlqklSqTwxHBGTZSi0uuL1Cn904DeNw/WEX4VQNQpTD/2Ov89GZwmom+S+u7Cyp
-	ldWy6aSZwGGkwRcjAXuQY9Q9/bNhfKQN9o8Kirgqf5qJ0Y866i9ej+RjffX0PFpabWG4AJ4dwy3
-	FalfyAKnTWxYpUsDoC2Wn6aAYDWIe0X725oCJqb5nq3Mf/z1VMXmkZPvRMZ4qPQtfAiN+bQAKpd
-	VoCeeX3LKLxckSLtrcABA191Wkr4Q5rHcH7YCd0ou8qgBXcR49FffXKn
-X-Received: by 2002:a05:6000:2388:b0:3a4:d939:62f9 with SMTP id ffacd0b85a97d-3a4fe3936ddmr9924191f8f.31.1748949447428;
-        Tue, 03 Jun 2025 04:17:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFgHkfoSSvodaKiarQ8d4Om1K+dozYk7SljBPcJ37SJ+JrlXuJ7W8CXUiisgniU4ysWii3mJw==
-X-Received: by 2002:a05:6000:2388:b0:3a4:d939:62f9 with SMTP id ffacd0b85a97d-3a4fe3936ddmr9924156f8f.31.1748949446990;
-        Tue, 03 Jun 2025 04:17:26 -0700 (PDT)
+        bh=4bvlY+rIl2tF1486WY43gg3Xc4gehhSPHX/tzq5wgF8=;
+        b=eCQoqsvFoNtBsw2G6rbFE8nDLEfpjFnzzio3H5opPenAN12cKRFyEpaHiS4cUW1EOq
+         PXwIPSfOb+Hxei65aZClLfHXEN4gcR6XCnjXKp9+TycmIy4fAmoWoXzra9jrLhUlTRf4
+         XPTQgnFSAB5RXUd42Px7fg4fXKJLfklBA0bab6GYJVvLIAJnY8YwyHfxUbBsicR18wr3
+         YRDAbT7i8ffSMO4OGWbV2AAljcMsUZDtSlc/sejfU54+37Kan6GOgaD0PFCx02CEsVeL
+         QfU1Nq5hoi7SkJN9X7KQybTEmqrHmQ1HlWRumamJTAQVSMItDiWPsHnFOfmFAg2nCOgQ
+         fCUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUoeX/6YDalIZ3L62SAMBig30ZiOla/ZDi69MU2jb0PARDJF0R0AXzTHRHI2udAvEEIcw3659Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQOtyjbReB8m1ewZOzNuGY+2yqzW8FQ9v0xIUW1rp4nC4oxd6Z
+	7wyxsSPWnVm5+wca4lDfnWCRfLlY6h5HiHXyPmlNaWeTS7S0JY1aRaGO9uT+6s0M+t4gH6t/eMR
+	EYaDhp6nDEhTloxmPT9mEdsmk8Pym7OS88lslyoF5B+8hZ3Nakbo/5yi0KxoRwJDoJw==
+X-Gm-Gg: ASbGncve7ml2/3cB68j4Nft5LaeIXiT46I31AsC66ShP1BTYCBYqq7mUxXN+Nz9xR5s
+	FIikf3rYSMXV5gmItfiTFBgZ1J0+FdGzGnSyHzSh8IlZ3c80FDUr642KFhddlMMXQCcaUd3q8tl
+	hqgSA6N5VE4r5p0EIPi7Mv0kECxYhGMrLS0NTuBAOk+hfmHCDQpMPtm5Tyst+ac8C3eyxQVQGsv
+	UecMm7rUMk0saldjZ7UEQemmzCUdGAHBwtGxJ3G6/E9cXOE7USz3yFhOKt3uDHTWOm4BuYzY/f7
+	9rAZe3hjDwyymEg6APiEcDgPqgMwpSFpxf/6shsh9XmlYXmFmxet0uJv
+X-Received: by 2002:a05:600c:4f05:b0:43c:ea1a:720c with SMTP id 5b1f17b1804b1-4511ee13fb8mr120980055e9.18.1748949803620;
+        Tue, 03 Jun 2025 04:23:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpF1ExRPT+wYK497RpCeQmKjhfnc1tw+jN10WApgYc3qFpsAQTV+zDHBlWzVmpEF68D3RNBg==
+X-Received: by 2002:a05:600c:4f05:b0:43c:ea1a:720c with SMTP id 5b1f17b1804b1-4511ee13fb8mr120979875e9.18.1748949803200;
+        Tue, 03 Jun 2025 04:23:23 -0700 (PDT)
 Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8000d1fsm156897935e9.20.2025.06.03.04.17.25
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe7415asm18108840f8f.57.2025.06.03.04.23.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 04:17:26 -0700 (PDT)
-Message-ID: <bc91b431-9cb5-400a-afee-f5cbfda11788@redhat.com>
-Date: Tue, 3 Jun 2025 13:17:25 +0200
+        Tue, 03 Jun 2025 04:23:22 -0700 (PDT)
+Message-ID: <0f128f83-d4fa-462b-bcd0-2309e3c2c212@redhat.com>
+Date: Tue, 3 Jun 2025 13:23:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,33 +88,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests: drv-net: add configs for the TSO test
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, shuah@kernel.org, willemb@google.com,
- linux-kselftest@vger.kernel.org
-References: <20250602231640.314556-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 2/4] bonding: Extend arp_ip_target format to
+ allow for a list of vlan tags.
+To: David J Wilder <wilder@us.ibm.com>, netdev@vger.kernel.org
+References: <20250603035243.402806-1-wilder@us.ibm.com>
+ <20250603035243.402806-3-wilder@us.ibm.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250602231640.314556-1-kuba@kernel.org>
+In-Reply-To: <20250603035243.402806-3-wilder@us.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/3/25 1:16 AM, Jakub Kicinski wrote:
-> diff --git a/tools/testing/selftests/drivers/net/hw/config b/tools/testing/selftests/drivers/net/hw/config
-> new file mode 100644
-> index 000000000000..ea4b70d71563
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/config
-> @@ -0,0 +1,6 @@
-> +CONFIG_IPV6=y
-> +CONFIG_IPV6_GRE=y
-> +CONFIG_NET_IP_TUNNEL=y
+On 6/3/25 5:51 AM, David J Wilder wrote:
+> diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
+> index 1a3d17754c0a..78d41b7b28b5 100644
+> --- a/drivers/net/bonding/bond_netlink.c
+> +++ b/drivers/net/bonding/bond_netlink.c
+> @@ -288,13 +288,21 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
+>  		bond_option_arp_ip_targets_clear(bond);
+>  		nla_for_each_nested(attr, data[IFLA_BOND_ARP_IP_TARGET], rem) {
+>  			__be32 target;
+> +			char target_str[1024 + 1];
 
-I think the above it's not strictly needed, because it's selected by gre
-and vxlan (indirectly), but it should not hurt, nor I think we have
-minimal non redundant knobs list in other config files.
+This buffer is too big to be placed on the stack. Also please respect
+the reverse christmas tree order.
 
-/P
+/p
 
 
