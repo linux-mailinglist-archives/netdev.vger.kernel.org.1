@@ -1,124 +1,98 @@
-Return-Path: <netdev+bounces-194824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17D3ACCC9C
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 20:02:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B59EACCCDC
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 20:25:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3A41891370
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 18:02:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61DA31738A7
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 18:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E96C1C84CB;
-	Tue,  3 Jun 2025 18:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D79288C32;
+	Tue,  3 Jun 2025 18:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dHSs+hbs"
+	dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b="lfjC88AQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward502d.mail.yandex.net (forward502d.mail.yandex.net [178.154.239.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A143D3B8
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 18:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312D65FB95;
+	Tue,  3 Jun 2025 18:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748973752; cv=none; b=kOjh2dQu2g8YI9AKUB/as0e164BZZi62msncqIfApopl9fscB1tDKRZTZ0VCOJj6zmJKGr2EL8Z5bzaruLIhbF1kpk7SVpKc1wzfFY29L60SgDwQYfi81RENWatZsCKzl/HIv0dAnVIt38+4JNaH9fpBOWyi9i2gPivIyiydXDY=
+	t=1748975124; cv=none; b=mKB/BxUpa6iwco3WenfygI0JJHqMQ2upFfUJuuy3oHr09hCBVtat2VwLMvDvbYgu3e59iuAqLt0dHXJ3sVf50xa4fhH8EyJL9ZNcRxSKl6n9f4FEPBLv7gm3Ym7LYt5xFSJLdZbrKd0UKoZAIIaREJG67RYlAeDb0xtcSCz+RVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748973752; c=relaxed/simple;
-	bh=lxbHwT89FX0z6KinlP67fsFpath/+Mc4Kx0XnmT7D+o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q9z+XxhstWMU0dHFRZ82/Oez5XLmHKz8VoV5UBnrBv5seKusmYeUWji2MjARVvMRo1Qw1YW0Z3S0XA3EJAPJhAWjE2xAnsjBrA2sHkKrv0akpbNnlkA3iQ46+mZaqDvTOyOXUejOm2oVj0eFcZmqVJRCdejcnDpZbtrpenjPew8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dHSs+hbs; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4a433f52485so53991cf.0
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 11:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748973750; x=1749578550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lxbHwT89FX0z6KinlP67fsFpath/+Mc4Kx0XnmT7D+o=;
-        b=dHSs+hbsYzmGbAXtxaMGKVVggAooZEUuWawjbljTgc6g7XpyRttaRbG7dQVcQvM99N
-         pWTj07q/HesjpS6LuQPTVsUQiD6ZYtuZI7L2XsA1IRLBKdHTsUqTxSGp09zsIJYRmwYe
-         ZbgagaFQZD0Eqt1qnZswHzD5xbzQ+I2JV7bMr2HF266RzCh26aCJgERSMp4GZ5lVSEHV
-         uk2BrghLVhd68HNlx1BRES1589fPHH0uwRvVKHwE6TmEeqvPCl7obwYFg6efH5ZAzuQ/
-         4QjNl7ky++J7cg+1m4fa7vSLam1QJO8AlFD7fGSHJ5N7G9a1OzUfWgV1qEt4OcMzJnPf
-         bbqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748973750; x=1749578550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lxbHwT89FX0z6KinlP67fsFpath/+Mc4Kx0XnmT7D+o=;
-        b=aLcO8e7PKmWnkKwE0r+Rb3W9GI4a7aDJD1VhMVsfyb+ReDQ1u6K1ykdd76S6ubjPsU
-         USCIzE3zWVdFzK86GrAVlZG6XdpghCG32UdZoyR3U3jWkjC7yy31JuQMeQjpEXDq6GUE
-         i1AD5SCIaP7GsnrMUr0Sjke+Y16owBHAAzbsRvAma7IAyVX5PuSKH8J4qGFPLBA3tSY8
-         qsui828UzlZsBjsIncSKM/uATwH2sZIN3zz3n7OEuMzCk5QWvlzRTWm8MMO/lLCQTwjW
-         8O90mjFIegxLv2bNCynMlhGrArlqUdOJTiVAz4uuT/PQEQzuNk5pzQ94VmJ/I6WnnztQ
-         qKSg==
-X-Forwarded-Encrypted: i=1; AJvYcCX06pjABZmA8zQSqnvuSMeyPcMOzqoWfDE/Mb4LyRwDzCRXLYONVGSbrBUZxU/UGWDcwceEB1o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqWDIKuycnFEczvcHjCKz0cd+lJFZWZp5WnMbYtdqQsGCkesEZ
-	B+SF4czmDo5fvJ6tLRo1A+eQiGWjBkQE0ohMCI8sq14Hd9TVLzB+wiVpglgSHAyIyhrV60DvQVP
-	OV4AU6CUjSY3O2T9+2rs+oKR/Zy/6b/5Hd5OBI4gt
-X-Gm-Gg: ASbGncumy67epE6od+EFLNjPaFLZQuwQ5xCvNH8A2SBKIqN3A2G5gfnJDShDH2s5S5j
-	2zSBQ+67PepY72aoAAz4KLkLyEgosAqeVTl/rae99gaNXPSK07lIDaEW2pZp7Nu1quDTDB+fTve
-	2eCv6zElvI4WuBNUgDONRywR0Hc7JgNmCSWKPAvW/9XbYEXYhDKJfddzjM1pBV6urCSsSc28v9z
-	KjnMfEu+Hg=
-X-Google-Smtp-Source: AGHT+IFWo0uebQD7O3vcbTkA5s8t/G6RW4hquWATsZdfasRC+XMVOD0P/z1omQuoCPaDsmXd89sKt/OjC23eBGfsbrQ=
-X-Received: by 2002:a05:622a:488a:b0:49b:72e2:4058 with SMTP id
- d75a77b69052e-4a5a53ca761mr11511cf.11.1748973749501; Tue, 03 Jun 2025
- 11:02:29 -0700 (PDT)
+	s=arc-20240116; t=1748975124; c=relaxed/simple;
+	bh=tBzj3CA4+7TehMQW8dgTuM4sRw0JZHsMeayjCn7V8XI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RDXibchTcUWvkN0bvvGGis7yvu2kt1UeniZzkETqITdejQHoUmKFgrdb49UUkQ+IYFwAGILJKntdyah+VP9E0HXPtc8F2HqLoYKIYBoKkEO4h47rIxJCeqBprP503zl6gf+5iQAkvfQjYmoSXe5vD2YF3keVfLqw6Hus2+UNYX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me; spf=pass smtp.mailfrom=0upti.me; dkim=pass (1024-bit key) header.d=0upti.me header.i=@0upti.me header.b=lfjC88AQ; arc=none smtp.client-ip=178.154.239.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=0upti.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0upti.me
+Received: from mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:842f:0:640:b96f:0])
+	by forward502d.mail.yandex.net (Yandex) with ESMTPS id EBB8760C59;
+	Tue,  3 Jun 2025 21:17:25 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id LHgCkEULiKo0-pLzcZTYY;
+	Tue, 03 Jun 2025 21:17:24 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=0upti.me; s=mail;
+	t=1748974644; bh=pOpYljZuYO3T7PKQuPSq6hSLphxMmYBM9c7hIldkB8Q=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=lfjC88AQLYLUsUJy3b7nRVzevTZKollL8zItXcXC4rgjno4MWLGx6K+HDJLEJW5Rh
+	 YYsmCJsPg7cOuXLi+Dm6HNyLtLYQKa+LofdjRX7bQxnh6dlTW3AwOjaGjOb6PbLec6
+	 iyRtRNFb5eGkXo7L0wJ2J1pBv0BJdWAL954cjgbw=
+Authentication-Results: mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net; dkim=pass header.i=@0upti.me
+Message-ID: <40ac27ab-00f7-4fc4-97ca-f3b519167f5c@0upti.me>
+Date: Tue, 3 Jun 2025 21:17:21 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250601193428.3388418-1-alok.a.tiwari@oracle.com>
- <CAHS8izOqWWdsEheAFSwOtzPM98ZudP7gKZMECWUhcU1NCLnwHA@mail.gmail.com>
- <cc05cbf5-0b59-4442-9585-9658d67f9059@oracle.com> <bf4f1e06-f692-43bf-9261-30585a1427d7@oracle.com>
- <CANn89iJS9UNvotxXx7f920-OnxLnJ2CjWSUtvaioOMqGKNJdRg@mail.gmail.com>
- <CANH7hM5O7aq=bMybUqgMf5MxgAZm29RvCTO_oSOfAn1efZnKhg@mail.gmail.com>
- <abb065ab-1923-4154-8b79-f47a86a3d30e@oracle.com> <b8d181e9-d818-4cf4-b470-a54b6df763a4@redhat.com>
-In-Reply-To: <b8d181e9-d818-4cf4-b470-a54b6df763a4@redhat.com>
-From: Bailey Forrest <bcf@google.com>
-Date: Tue, 3 Jun 2025 11:02:18 -0700
-X-Gm-Features: AX0GCFvwHb5Lvh_26htHBAviwi6fz_uyPaSQ1gsaqfUjJJHI7tGGz3kpr2lLVIs
-Message-ID: <CANH7hM6qyU4+uEB06FSAiQyitQ8jyuBXzzTD0QkoH7vYca71mw@mail.gmail.com>
-Subject: Re: [PATCH] gve: add missing NULL check for gve_alloc_pending_packet()
- in TX DQO
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: ALOK TIWARI <alok.a.tiwari@oracle.com>, Eric Dumazet <edumazet@google.com>, 
-	Mina Almasry <almasrymina@google.com>, joshwash@google.com, willemb@google.com, 
-	pkaligineedi@google.com, kuba@kernel.org, jeroendb@google.com, 
-	hramamurthy@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, darren.kenny@oracle.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+ <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+ <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+ <Z3-Tz5WdLCat91vm@shell.armlinux.org.uk>
+ <9cc913d7-7e5b-4b6c-886c-ca9778c3f970@0upti.me>
+ <aD1lRha-enQ9Pw0g@shell.armlinux.org.uk>
+ <2894a781-4d4b-4e3c-9f4e-7c1f04122f8a@0upti.me>
+ <aD3Cc7gmB2Tev_ul@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Ilya K <me@0upti.me>
+In-Reply-To: <aD3Cc7gmB2Tev_ul@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 3, 2025 at 3:50=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
-> IMHO it's indeed confusing that the same condition is checked in
-> gve_alloc_pending_packet() and ignored by gve_tx_add_skb_dqo().
->
-> Even gve_alloc_pending_packet() is only called after the
-> gve_maybe_stop_tx_dqo().
->
-> Either always ignore the NULL condition it in both places (possibly with
-> a comment) or always check it.
+On 2025-06-02 18:25, Russell King (Oracle) wrote:
+> On Mon, Jun 02, 2025 at 04:00:14PM +0300, Ilya K wrote:
+>> That's weird, because I do have all the patches applied. I think this may have been broken by the pcs_inband_caps changes, because without the patch I'm just getting "autoneg setting not compatible with PCS", after which it bails, when it should really reconfigure the MAC instead.
+> 
+> Please enable phylink and sfp debug (adding #define DEBUG to the top of
+> phylink.c and sfp.c, and then send the kernel messages after reproducing
+> the issue.
+> 
+> Thanks.
+> 
 
-It's probably not harmful to go ahead with this patch, I agree this
-will make it easier for readers.
-
-My point was it's not technically a bug, so it doesn't need (Fixes ...)
-
-If we do make this change we can now remove the comment on gve_tx_add_skb_d=
-qo()
-
- * Before this function is called, the caller must ensure
- * gve_has_pending_packet(tx) returns true.
- */
-
-Reviewed-by: Bailey Forrest <bcf@google.com>
+OK, somehow it just works normally now, even with the patch reverted. I think I grew a few gray hairs over the last few days. Sorry for the trouble, everyone, I'm off to not touch this thing ever again.
 
