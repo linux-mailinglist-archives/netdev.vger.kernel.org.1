@@ -1,125 +1,166 @@
-Return-Path: <netdev+bounces-194755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C26ACC461
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:34:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 608CEACC4A7
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73B0E1651BE
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B75843A4E38
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B751DF75D;
-	Tue,  3 Jun 2025 10:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B36B22D4F6;
+	Tue,  3 Jun 2025 10:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMgSBBKk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itG7Po/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01151C7015
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 10:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9485322CBD8;
+	Tue,  3 Jun 2025 10:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748946847; cv=none; b=ach0+AtrmRhGFZXWi76kKb+XgHc0cYV8pCM2AiRf5NiUXWLIS1W7v72stioC4lxamXt18YcCWpgbFaiFg+Y+7LnQYqvC/Dfz78XmOKDF8vGJiFEQv2tDFn8RQQmCADIhLSqNy4UzP3qjtvGK1KAgtEXTsrtfKfEwnXZn4uj0d0M=
+	t=1748947853; cv=none; b=Al+R0rCXd3btih80qK2t5Poq/y82E4drzily5WksBgfNnZIK1VIUyLyU13zhsdvOCSWJnV2cIWo3ZoGNishiZv452OanWkZXf+2qhyzPiHzKlYkIl8G6s9WjoUN5my2zSGG1jf4pSxvWGVCP9iiLJ/2wRT4FbFj+9uRRU1XQsr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748946847; c=relaxed/simple;
-	bh=a70Bg4TxTGUH0mnu6b3PqDCP/iDyUy0+jkNeBE5HO3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=iEpEeTKq+pJ0gzbPzxLS3T4PtnduR11pZ99SGj27KCIQRoWX2bJA6fpifivlPMS2QyzQ1bseI2TFFzsrHzVQ+CBYMrqfbEGTJ+9wjQUN3X0LqrY7khlZI+AbRJc8SX8tKuEf6GNJ4WcVGBg3eebUxD9ePTUkWV5iM/NJ6060cuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fMgSBBKk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748946844;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5NlczaEApIN4sl+pxyBLL7DpTnisPbJmHNbDupcSccM=;
-	b=fMgSBBKk9kFEWKnRQ2sMgEQNrvS9V8bz3lJXuuW5SrvJk1W6rhlLJFpMuQOZBjflt4bBaI
-	FcmhHM8bmOCvMVy5lZp9PaqiWIcahPHDC+2hRfFQ2oz+rT9Dk2cXzEH0g4D0f2w6tYobfr
-	5CfDOcVBcamlTPBmo90VMw3eEKo4oJI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-440-7xv7cXRrNtGoozp3oGF1Sg-1; Tue, 03 Jun 2025 06:34:03 -0400
-X-MC-Unique: 7xv7cXRrNtGoozp3oGF1Sg-1
-X-Mimecast-MFC-AGG-ID: 7xv7cXRrNtGoozp3oGF1Sg_1748946842
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450cf229025so15246555e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:34:03 -0700 (PDT)
+	s=arc-20240116; t=1748947853; c=relaxed/simple;
+	bh=cDFJ50B5U5uPFJC9elUkw7oiF8dm2hb1XYKgiCw75mk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KCss9et7ZorC/shyNYtXnEhDL+uFCcZ38B3RnVhGPmRtX9HdfG7xla3KQy6eh4qcxVxEfvjvaRtEucoDwAHmdgkgXWv8swijB2DDIbZuF1QyD/c6DUj3HRo3JlVDuvAFAyEtwCoRgC3r24hryUfaovUEEOV8ANDW0a2RNRtD8HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=itG7Po/r; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-73c17c770a7so5961710b3a.2;
+        Tue, 03 Jun 2025 03:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748947851; x=1749552651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cc4NM6pw6KNZGmpFvBeiKc9tgGdf6YiQE3mYffB4/Vo=;
+        b=itG7Po/rOZqRn72oGVo0+yoyg9OqDAkTEIxxWwq/mFYOQnMN5REFc44L3+FxKTduIn
+         w9NtC3w2HpQkRxyroHSBYreuPSkvOLoYSJsXOiBqBOFGb4T6v9/omoV49ZV7klEPC8Is
+         0Ex7UA8iJzB8dcBLOhrrFjMnKp292KBRKQh3g2PxWHfXJn3JHa1QCk3qj/CwVC/M3R1i
+         qlepKiw+OvvpQJi+n5E1cuWNpAGwW1y2HiofT+NvxJfQPSJsJjHoH+6w1vp/qbcCcDvA
+         xTY/fE7Sb8Bbo8bbcCzCgs0Y95IzudcErMieowDMi1TSlIcOFp4jIvbf8sQe4VnRHWEt
+         N4YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748946842; x=1749551642;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5NlczaEApIN4sl+pxyBLL7DpTnisPbJmHNbDupcSccM=;
-        b=mcI8m1P1EDwcofwNeQjl2m0ImOGoASfnT2+x5Vy1bra9wGU6TkgByLtC2KTCWJ1/9U
-         4V22YXu3iQeqQ5vLE2Ud0KJwhQXe+BjHfM2irt3bFr/jpIx1UWjOaQA/1Z81qes8TbRO
-         46yA1VzvePBnqywNbyKT/nD3UV/aP0DnUdqzk4uHGVXDjos4Ev+u4qS/IWRyEHRlAycl
-         qxUgvsD5iIYzfrld61KpCFVYaHSrVdFOWXEeTWwlVCDyopqd4e3ZYZqzwHL3V5g1jZ88
-         q8HfLq6VAe+9+sR44hGvb3LhIrOb0zJ7QYaparDTbgmbyiTfkzYTTc2ei7d3D2F0PbMc
-         r2jw==
-X-Forwarded-Encrypted: i=1; AJvYcCWn93OISxiVteixRluxnQj5zuSsj+e8HGQqeHYKSkGHgPc/ez2/VGvRpH0nz3wYTzQLRt/JmXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1ovJ7vXm0bLStr4+3hml3GgtFCkKKDdvoDmJFKOpZ1UkFO6O+
-	0/VJ8lRw7LSbjeOtE+bYz5c3FnonCu0H0QQiLys4ZEh1P1MKsfRnE0BRybyJ/WPf3hVeIAlcE/l
-	CtF4I6L4CH7UpZR0A1MLdSFX4G8AuOoWZ/FAIFQhen+AWCEZvjFHiKI0KRg==
-X-Gm-Gg: ASbGncuZ/b3Y7MUPRe4R4mQDJPnDElrwAiB8PcGZrN2VTwTnj+i33jAlCUpp7ISkHy8
-	7FiMR3X4Tauny8LOOoEYHRqLfk2J1vrYbkGAMLcqtZv0y0cSyub16cCBEZlUqj3ekOs+9TovZVc
-	ca+frj4QfNJzcCFkjLOtQSBXNbolGJIe9yGBPOV5RIrerKBuPFofPJ782f6RUyL/PRSzrskdQOs
-	enG2WjO7AoXQCMebI/FZwxEK1jfaMfiBplpKeSYRawypF3Qnjh0vg6WhwxZ+kzazqR02JQ520Wt
-	U7p7gzHA1S7JGVhYSgJ2zK4a0yXaE/u1BtmlGd8mGqdx8HO1RD51Dm6C
-X-Received: by 2002:a05:600c:5007:b0:442:f4d4:522 with SMTP id 5b1f17b1804b1-4511ecbaa8dmr103276755e9.5.1748946842055;
-        Tue, 03 Jun 2025 03:34:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE8ofIGLRe7M56un1ufgHCQKkJAZ+SFQgu857TY9WXLx25C1tILiQOTGP2WUr7Xym7aj/6VEQ==
-X-Received: by 2002:a05:600c:5007:b0:442:f4d4:522 with SMTP id 5b1f17b1804b1-4511ecbaa8dmr103276505e9.5.1748946841719;
-        Tue, 03 Jun 2025 03:34:01 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450dcc18a80sm149463925e9.38.2025.06.03.03.34.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 03:34:01 -0700 (PDT)
-Message-ID: <3fc6e01d-64d5-496d-8be6-d449b7e65182@redhat.com>
-Date: Tue, 3 Jun 2025 12:33:59 +0200
+        d=1e100.net; s=20230601; t=1748947851; x=1749552651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cc4NM6pw6KNZGmpFvBeiKc9tgGdf6YiQE3mYffB4/Vo=;
+        b=ckgus4cIqBlKC2lGHywK/LOMlI9G+dxw5z/H9LYs7EA4HixnaGh/3ICatUFIPbqrda
+         j/00JJfY+BF5e0IL6RpF5Bhq25Tni9B27s6CfYFB5nwviBIQi+FArvEfrX6HVxPwxX6m
+         6US89P69+2avCliuK7XBUUf4OoevyEM+yaQu1VtEkoavAABi5hjGgeJcdQdtIz5jWsKX
+         vRhvZlnE/V1lgcbvuy6899t1zENrh3ofXywvh/EAlEgfE8AiYyPJlTYlNn/C2DDRarTB
+         PnKMAqDo1TpiLF3gmXekok+b4A9nMz3BotzwZXG5Qkej1RFjImgWNvIwn+6KiNBTQfq4
+         +niA==
+X-Forwarded-Encrypted: i=1; AJvYcCUC+XoVh7MNVWoiJ6reul1eAznE+jWcxVod0CoGWO95DbFSo0auO/rLETpiyAn5CppQYo+myxUT@vger.kernel.org, AJvYcCWidYWQsFUM1p16VJDVhA4lApwB7lLTaP/y2qZ0cF8y2aqjZJMbGsoTFifhgYTtQy6mdVWZRRjEmGFfCpE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfAl+rax0ye8SRXyp/pXhvFMyA/sf9uOGU66/oPkIzZpFxXeUs
+	Yw4rGNkbwRSarryc8aHAPriyP7YJnDJIt01JRCHLVcPmrEQ21BJdKlDebmyFKainjPp31r1dadP
+	HvI0YaKXyIB/Ezjb5/7D34CcvzdtaKlw=
+X-Gm-Gg: ASbGncuQfbR9F3BSFN10vtAYfRVqp9Tt6gtJUhxYkdBZH4aSX6oknWoBNv0gOzsrepO
+	ryCmvvimBOWop4XlrECnT4r+xZyKteDEOb9LFQm7NQDP6umTnWoeRVlj3zgQ0JZgNZixxi9D/KO
+	qkG640kZWGx3N8HhoScwodPjP7rHBKS2gpMfMVsL4V9WBt1T+jJTa3jgcYyjsowtR/bPA=
+X-Google-Smtp-Source: AGHT+IGTbWhP/8bCjLKFc+xQ5UOtSCO1oPELL/wgDD8ixi2TzBLinTpBoWavERvATIn8QDsvso1eJD1WxnXgyG+uqn4=
+X-Received: by 2002:a05:6a21:3996:b0:218:59b:b2f4 with SMTP id
+ adf61e73a8af0-21bad1ed9f9mr16343458637.42.1748947850766; Tue, 03 Jun 2025
+ 03:50:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [QUERY] gve: gve_tx_free_rings_dqo() uses num_xdp_queues instead
- of num_xdp_rings
-To: Alok Tiwari <alok.a.tiwari@oracle.com>, almasrymina@google.com,
- bcf@google.com, joshwash@google.com, willemb@google.com,
- pkaligineedi@google.com, kuba@kernel.org, jeroendb@google.com,
- hramamurthy@google.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, netdev@vger.kernel.org
-References: <20250601195223.3388860-1-alok.a.tiwari@oracle.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250601195223.3388860-1-alok.a.tiwari@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250531101308.155757-1-noltari@gmail.com> <20250531101308.155757-5-noltari@gmail.com>
+ <5d3d04c0-d9e4-4f80-8ab3-7bedb81505b3@broadcom.com> <CAOiHx=nQiYs43oHXJpOhUn1dJ-tzD-TPdB22zcHFxjUBKXeVng@mail.gmail.com>
+In-Reply-To: <CAOiHx=nQiYs43oHXJpOhUn1dJ-tzD-TPdB22zcHFxjUBKXeVng@mail.gmail.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Tue, 3 Jun 2025 12:50:14 +0200
+X-Gm-Features: AX0GCFuyiT_d8KNPW7k3g6jK43WaZrm7DEmW-LSpZjMyWBPw6tbzjqspbMpdzbU
+Message-ID: <CAKR-sGfepgD7fKpG4H2fN4B1e7eVpmdv4r3hBH-XHKprNigVtA@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/10] net: dsa: b53: fix IP_MULTICAST_CTRL on BCM5325
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vivien.didelot@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/1/25 9:52 PM, Alok Tiwari wrote:
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> index 9d705d94b065..e7ee4fa7089c 100644
-> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> @@ -424,7 +424,7 @@ void gve_tx_free_rings_dqo(struct gve_priv *priv,
->  	if (!tx)
->  		return;
->  
-> -	for (i = 0; i < cfg->qcfg->num_queues + cfg->qcfg->num_xdp_queues; i++)
-> +	for (i = 0; i < cfg->qcfg->num_queues + cfg->qcfg->num_xdp_rings; i++)
+Hi Jonas,
 
-Please note that num_xdp_rings has been moved elsewhere by commit
-346fb86ddd86 ("gve: update XDP allocation path support RX buffer posting")
+El lun, 2 jun 2025 a las 21:59, Jonas Gorski
+(<jonas.gorski@gmail.com>) escribi=C3=B3:
+>
+> On Mon, Jun 2, 2025 at 8:06=E2=80=AFPM Florian Fainelli
+> <florian.fainelli@broadcom.com> wrote:
+> >
+> > On 5/31/25 03:13, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
+> > > BCM5325 doesn't implement B53_UC_FWD_EN, B53_MC_FWD_EN or B53_IPMC_FW=
+D_EN.
+> > >
+> > > Fixes: 53568438e381 ("net: dsa: b53: Add support for port_egress_floo=
+ds callback")
+> > > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > > ---
+> > >   drivers/net/dsa/b53/b53_common.c | 13 +++++++++----
+> > >   drivers/net/dsa/b53/b53_regs.h   |  1 +
+> > >   2 files changed, 10 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b=
+53_common.c
+> > > index f314aeb81643..6b2ad82aa95f 100644
+> > > --- a/drivers/net/dsa/b53/b53_common.c
+> > > +++ b/drivers/net/dsa/b53/b53_common.c
+> > > @@ -367,11 +367,16 @@ static void b53_set_forwarding(struct b53_devic=
+e *dev, int enable)
+> > >               b53_write8(dev, B53_CTRL_PAGE, B53_SWITCH_CTRL, mgmt);
+> > >       }
+> > >
+> > > -     /* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide whether
+> > > -      * frames should be flooded or not.
+> > > -      */
+> > >       b53_read8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, &mgmt);
+> > > -     mgmt |=3D B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_EN;
+> > > +     if (is5325(dev)) {
+> > > +             /* Enable IP multicast address scheme. */
+> > > +             mgmt |=3D B53_IP_MCAST_25;
+> > > +     } else {
+> > > +             /* Look at B53_UC_FWD_EN and B53_MC_FWD_EN to decide wh=
+ether
+> > > +              * frames should be flooded or not.
+> > > +              */
+> > > +             mgmt |=3D B53_UC_FWD_EN | B53_MC_FWD_EN | B53_IPMC_FWD_=
+EN;
+> > > +     }
+> > >       b53_write8(dev, B53_CTRL_PAGE, B53_IP_MULTICAST_CTRL, mgmt);
+>
+> Since the only common thing is the register name, maybe it would make
+> more sense to have the flow here
+>
+> if (is5325) {
+>     enable IP_MULTICAST
+> }  else {
+>     enable DUMB_FWD_EN
+>     enable {UC,MC,IPMC}_FWD_EN
+> }
 
-/P
+OK, then I will do that by merging this patch with #3.
 
+>
+> >
+> > I don't think B53_IPM_MULTICAST_CTRL is a valid register offset within
+> > B53_CTRL_PAGE, or elsewhere for that matter, do you have a datasheet
+> > that says this exists?
+>
+> 5325E-DS14-R, page 83 (or 105 in pdf paging) on the top.
+>
+> Regards,
+> Jonas
+
+Best regards,
+=C3=81lvaro.
 
