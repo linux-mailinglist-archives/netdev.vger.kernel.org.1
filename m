@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-194715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42796ACC1AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35668ACC1D6
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677C1188FC27
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:06:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277271890569
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B153B280032;
-	Tue,  3 Jun 2025 08:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECCA280338;
+	Tue,  3 Jun 2025 08:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b="V/XGBVhI"
+	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="Pzvzk5+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2131.outbound.protection.outlook.com [40.107.20.131])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B27280026;
-	Tue,  3 Jun 2025 08:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94DE280A2F;
+	Tue,  3 Jun 2025 08:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748937985; cv=fail; b=MF/ogUCWs+GYNib1KpxXogYnlUlMTGgYbMZ2N1cymS2+j+GMi8Og+PaGEtA4d8tmA4xL+VptFZFRxTCUbpFgRcMKroLcxZD+3jAIW/tyZmG3OccWrb8dBhCXdBB5/Nqaz1PDS1lylR45W1oSIkDk801ggyPRLlv4NCtT3PtQuxI=
+	t=1748938201; cv=fail; b=iAjdbWdvNfi2p7Vye32WwneGucL7IZB7a7F6r2s8D4QEHeufwGf+QfXflSmq/IOYcXJBjC3/bWWntd0o+uUW+s+CtWXL3ivLv/p3gT0OOEZDCSCUagunjufxhodQTt8RJ/5dW7dhfZe2aj/fqBG5yl8S4kWFYpHBrAwYbUcKeEw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748937985; c=relaxed/simple;
-	bh=3GLSlHT3JIT0QedShjch37FFJYYfyBbRShRJecDl+hY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sKUOlk1tatPghHLyfjaM32AodhPHreIb+9iYAKOAIslYu5b+dkxfxYXEpw62btBmn9OVHfgeV6yR57et2DKg3AEb9nha/oLazt0fsWWRSTtAly605VxaHy2d0Zmlu8Hnuz1I9VzqTDJmRdnAFfcd/cvaYY/Hc7V0+hMRcGcvFiM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de; spf=pass smtp.mailfrom=technica-engineering.de; dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b=V/XGBVhI; arc=fail smtp.client-ip=40.107.20.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=technica-engineering.de
+	s=arc-20240116; t=1748938201; c=relaxed/simple;
+	bh=fk7LirMYmCoi10saU5u4gx32LIT9qzfafpOWdS0a/AU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e3jx0c9ZuxEwdMJJe3MugMIiDYf7PTElM34VA0E+7Q58h/7aYzFnV1TrIXFDiQv6fcKPXxP+U1kzthmKjj03HSJIBOarpKBiNhPbq2RMXlJBbnBJvkuynfLm5VtQ7+BaUBQF+n7pe4W6V7LHCpJRjlIEIeNaXSjnLtMh2LdVJcA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=Pzvzk5+V; arc=fail smtp.client-ip=40.107.93.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cnPm70GoOozlPqbiecYsX+CiWaMG10boUeL6p8sj322aqEoRv3BXhjtRtzX4a0y5dWILLkcRi3lKCYzVjQyENRnlv4SrDhrjPorsL7Ld7ziigjPxsKI9bitEF+1b8IowVCixunceZUjAnuh/igZ9OYEn9cg1wTNSqasB+r4g1DGOlv4qnx43nZ5a0jsr3yMiGSbCuQaFYJ6WD96LnScYm4apkJEO8FDY3vvy6m0Dfdkox3oLmDMrI3car7caQloeSSqIdJlZ+rfaF1OIZKjMTyrlsw12kndSDpmN14DHZ0+QIk5saWGN/WKXEzI1x4F7/2TDAkkMCtR5BPicBsLcmA==
+ b=jrOPDQr2cX8ZLxfsk655ysMQcDXb0r1LU4ewY+yYoyglBfRuHhytOZtk7vOXFsAVkkn9tE45AwVNM/BtFqlkQx471VIVwNjFAXHtbQOo3DERjJIMazcSBUOF1NE/F37wCCcGU6EMRKyEXjulVzrGLvE2GF3A4q0zhg8kvb5Xxw02fYeCwH1PPXNoS7kN5mj9KbJ/dhDtGBQ/rAwo3k6e+ZzbrL/1jIFhwsH2Wzp5sdrv8LxkqNq/6ruezaAUFHojE4YOyRHVDQNyf4EwWWDidI2hKhyEicn4IYToZkT+y2dsqtw9DOx7siiFZYXsNPde4hp7OtDLYggs1Hzzvj1QjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5LR48PESnHB9W9EkFIA2R5uuwgfcF0hQ8w+j+RrJ+Kk=;
- b=nNAVVwmUCNca+IGx5PISwQ+nYq3ZB4GLyiu71CeILvpBFFgC+Kduwv5kguOPQ6itnb2nFH1IiOkqWujElAaZQny8Ncxb4478RelZ0Kev5T6Pg6eh+eHKVF7nkawo+u6yK8slGK05xXhhpUmWtEqPmOEl+yhhkINd9VxQJFQQqlIAiWCFkFFR974p/laLlv/ptEVhkUWkildDo4Rw5ZzvbOWJ2BHt/aJj7Ggmn9CHNS2dPSbjPRNSzw59fZuRhkHwqx/7zHM4dO3HOc1Xvuf3V8UeQN6IBmFoyBljJpBj78yrMuiChqqudYMdVdbk44FAxPqRDeThxuJPWBqBp6Kg8g==
+ bh=p6QdSHRQibY5GhEPYBs11/eRb5U50DqEtSR6+Z646mc=;
+ b=NBEaNtPUu68BPO8y7TOolhZXzQD/lZiDOvuuyugN5WAj5OiLOdSv1GZ6AmFpLbiDgM6+2Pnhi3MJUG9TRC7gX9LRsEtFTTQxJtrXLLsUuRIEaGtikp3LDFldeOd+9BbmHqpLn0seWLJHVhfnCEDyuB/ZVhfwWlE6eWv8hTrEz8hmGGnA86iNRyrNXr4lLFa7uezPvkV/L5Ax3sVohWEjE7mTelodaERE9Ox1QVPFoW4DEQgb95J7lCa1ryw9gHhqweq6DVdDwESntGMn0lt61rfrIEdVQ1S4Q2pf5g22JiIzKr+OATtTCXxcV6oLDzkKSeS85IUsOSgK77HbqXn8Pg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 2.136.200.136) smtp.rcpttodomain=davemloft.net
- smtp.mailfrom=technica-engineering.de; dmarc=fail (p=reject sp=reject
- pct=100) action=oreject header.from=technica-engineering.de; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=technica-engineering.de; s=selector1;
+ 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
+ pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
+ not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5LR48PESnHB9W9EkFIA2R5uuwgfcF0hQ8w+j+RrJ+Kk=;
- b=V/XGBVhIF0Kx4hxkncO1dA4kjFruoDRvUt372PaCJ0mjTyy1jI0ALFaK0gBSQEJJtrPkjlsqUExnNy1bfJp3LIvSE1oCA1wdPe22sadE1rdx237gn2K0TgF+lj68/YQwjhjAB9PHeyVtb65jExLcynhYFKfAHjImnuRsi5tHrNE=
-Received: from DU2PR04CA0066.eurprd04.prod.outlook.com (2603:10a6:10:232::11)
- by DU0PR08MB7882.eurprd08.prod.outlook.com (2603:10a6:10:3b2::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.34; Tue, 3 Jun
- 2025 08:06:20 +0000
-Received: from DU6PEPF0000A7DD.eurprd02.prod.outlook.com
- (2603:10a6:10:232:cafe::70) by DU2PR04CA0066.outlook.office365.com
- (2603:10a6:10:232::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.26 via Frontend Transport; Tue,
- 3 Jun 2025 08:06:20 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 2.136.200.136)
- smtp.mailfrom=technica-engineering.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=oreject header.from=technica-engineering.de;
-Received-SPF: Fail (protection.outlook.com: domain of technica-engineering.de
- does not designate 2.136.200.136 as permitted sender)
- receiver=protection.outlook.com; client-ip=2.136.200.136;
- helo=jump.ad.technica-electronics.es;
-Received: from jump.ad.technica-electronics.es (2.136.200.136) by
- DU6PEPF0000A7DD.mail.protection.outlook.com (10.167.8.37) with Microsoft SMTP
- Server id 15.20.8792.29 via Frontend Transport; Tue, 3 Jun 2025 08:06:19
- +0000
-Received: from dalek.ad.technica-electronics.es (unknown [10.10.2.101])
-	by jump.ad.technica-electronics.es (Postfix) with ESMTP id 8DBB0400EB;
-	Tue,  3 Jun 2025 10:06:19 +0200 (CEST)
-From: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
-To:
-Cc: carlos.fernandez@technica-engineering.de,
-	Sabrina Dubroca <sd@queasysnail.net>,
+ bh=p6QdSHRQibY5GhEPYBs11/eRb5U50DqEtSR6+Z646mc=;
+ b=Pzvzk5+VckQ4c//1TpKbTW+HZR7uZnZ6oy8XGGJzcBZQD4FcNpbweS7Krzz9tFgnY+3+EoJI3suf6lfp/f1mKDXEqmXm7ZJhrkJAIzNtpSJpxEjbucBkShBKdkRH/ujnIZ/vGTBsYW3xYSy9ETBHo1RnoiSzDg+lcajFiSvKO54ojbPSkWoSbUmRkXnFMgp9Vv402yxQHzwIRupwyu3sl0CPpfKeQfiZPRmYeQwsfBS6o2oIp6REATdBwY8MrKUkqn/PnmLVYGwU8oInXSQM9U7N9JKT2bkZXucK3jb0ltQjfnlZvJdF/bN8G/N68fM2Gql755RKS/FLx1nQozyQMw==
+Received: from BYAPR01CA0038.prod.exchangelabs.com (2603:10b6:a03:94::15) by
+ CYYPR22MB4313.namprd22.prod.outlook.com (2603:10b6:930:c7::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8746.40; Tue, 3 Jun 2025 08:09:56 +0000
+Received: from SJ5PEPF00000203.namprd05.prod.outlook.com (2603:10b6:a03:94::4)
+ by BYAPR01CA0038.outlook.office365.com (2603:10b6:a03:94::15) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.24
+ via Frontend Transport; Tue, 3 Jun 2025 08:09:52 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
+ smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
+Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
+ not designate 165.85.157.49 as permitted sender)
+ receiver=protection.outlook.com; client-ip=165.85.157.49;
+ helo=mkerelay1.compute.ge-healthcare.net;
+Received: from mkerelay1.compute.ge-healthcare.net (165.85.157.49) by
+ SJ5PEPF00000203.mail.protection.outlook.com (10.167.244.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8792.29 via Frontend Transport; Tue, 3 Jun 2025 08:09:56 +0000
+Received: from 56525d0f2b9b.fihel.lab.ge-healthcare.net (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
+	by builder1.fihel.lab.ge-healthcare.net (Postfix) with ESMTP id 72556CFB7B;
+	Tue,  3 Jun 2025 11:09:53 +0300 (EEST)
+From: Ian Ray <ian.ray@gehealthcare.com>
+To: horms@kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: brian.ruley@gehealthcare.com,
+	Ian Ray <ian.ray@gehealthcare.com>,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] macsec: MACsec SCI assignment for ES = 0
-Date: Tue,  3 Jun 2025 10:06:13 +0200
-Message-ID: <20250603080618.1727268-1-carlos.fernandez@technica-engineering.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250529124455.2761783-1-carlos.fernandez@technica-engineering.de>
-References: <20250529124455.2761783-1-carlos.fernandez@technica-engineering.de>
+Subject: [PATCH v2] igb: Fix watchdog_task race with shutdown
+Date: Tue,  3 Jun 2025 11:09:49 +0300
+Message-ID: <20250603080949.1681-1-ian.ray@gehealthcare.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,59 +96,116 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF0000A7DD:EE_|DU0PR08MB7882:EE_
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000203:EE_|CYYPR22MB4313:EE_
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: dc3294fe-5ab7-47e3-0bd7-08dda275860f
-X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Office365-Filtering-Correlation-Id: 21e9bf95-3b70-4c08-bab9-08dda276074e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kflxdrGbpH3hMWpz82+yrs4tSRz2iNnG+MfXOFrIQKLjgQwY9B0loyH04j/9?=
- =?us-ascii?Q?b+bNGoSrd/+d5w6lTUGnLPLKmqMAlmoqPES86haEYek/beUz4nnqTnQMShZi?=
- =?us-ascii?Q?0e+TR3WX0ZYAPveaJ6ioRRyoqZjdbHDtRVbJt4YUMiTKrGGUlbmCWU+yEN22?=
- =?us-ascii?Q?q8hGGNdk8bWcit3psnMawqALmOQsA9IHsTn1rjXWTdL80IAeI24kGwSLxVpb?=
- =?us-ascii?Q?p8DZCWWgGlKYd7v2E3cwWSi9jz42xFtz5c7ZtGZvVDhyyKrsvcna1NkXj4Rv?=
- =?us-ascii?Q?2t1gG3A0GBFu8J727UWDpWku1YWrdgfrEBnMh6OWVk34wvhPb1Co+7AdAYj0?=
- =?us-ascii?Q?A0AkH/9xubBdcYWstz14IE5Kb/OYTtKAD+5OKtIxjcmYNa+4hWwfnCyXX6Kb?=
- =?us-ascii?Q?CAWt2NAMPtB/HEiTqZntsuRSHh0U9e85WmEEnzp7C9/uOAfIxKjeAe0TZU3/?=
- =?us-ascii?Q?vofYCXysXQx1c5Xs68VKnHx/0EzC0HaxxRuF752bZNn3+a39ev37NRc623S/?=
- =?us-ascii?Q?oVS6cfLOetSvaK+bizdDZLPsz8yHbH0hQA/bSsy8Nz1mGQscMFWu8J3urv6X?=
- =?us-ascii?Q?S0Qt/Tti3EhgXR9M2iiDoa4ob5Vis//vCZdvX0zl5uP57YLVXhveJCQ+RAJX?=
- =?us-ascii?Q?mKspaE3KLTQtQ9SMYh97mI9JHmg9CTBZb68SQOJwBU6cQ42qe4lNRBs5d1/M?=
- =?us-ascii?Q?jM/Nz8Y0UcwEY9eb0iCCUKghMhwt49g/Ec6A6VFY7HqHEE9SgbVATmbuHJos?=
- =?us-ascii?Q?r4hOzZRHuhAIGlPBC3nq9C7JTB4Isxp7CfMTJJa7c/RJ+mHXLzE6wNkmMSQW?=
- =?us-ascii?Q?OtZC9o42RHtA+L2gOMwIRvN2BNNHCN9WVwvHi95hDodPoVBUMCLpxlg7FZQJ?=
- =?us-ascii?Q?HTpWc0lwslW/fsdE3+AsphxF1EC6YB3d3ZGoRo2ocJRLX9ihapJ5aR0mUr3a?=
- =?us-ascii?Q?EjPPZQXC0g1V8zFf6aKk1hcU6i4KaW63PFw/KtDW6ndHKQIVx/xsn4WM6u/z?=
- =?us-ascii?Q?cuiVdcOfDT+s4aQH/Oh1qfdLd33QTC8IKESdKqgpYn5lU53D+YWsnUSmrKMZ?=
- =?us-ascii?Q?SAps4dMSJ3LSSIWhpfoszQ5rqlLGWtB0rBR7uf8RHLtp6V0yD+BD9Dc19ht4?=
- =?us-ascii?Q?M7ZAcThhPzy+rLUlrEO0/Gim/VKlB9DrdoWKGzvBOVOBxYezqlPWco/rL9cj?=
- =?us-ascii?Q?QXwPGEyrZ8PP/b5nVH62bV8Y1iFO0kIkxGfgL3uUpZ1W9nskn08WfUWWSkLf?=
- =?us-ascii?Q?VY15noUTC36t6JhFFq/tX3ARisbXVbZp8arODdp2HuyevL6ktvldik5PS42j?=
- =?us-ascii?Q?2L0HaJLF+vUaqlOuIw3A+D5fO80ZLkjAuIgszTe61XnU2ltIsLpfyyFb1FTP?=
- =?us-ascii?Q?x4rBuh+Uax7ruO7W/+RItTcCP1jhnnXpYWD394pU7d9c8VU3130xA6wL1vhd?=
- =?us-ascii?Q?C50034PWy3cpurZ2vsDiRTz9ovTfNxSiUnePPh7ljmEr7NHiBSRpqdteoYKL?=
- =?us-ascii?Q?NunlUM/pSksCxfxfmGGqghWvbwXSCS4Ca1h0?=
+	=?us-ascii?Q?UKQA0d+Ltk5DvIIrvCg79ltA8D9sUgZdyMfMRXs85stj301CVLGATyHDacB5?=
+ =?us-ascii?Q?fc/2mtMKUypvwZgbrVe7npI4Q1HTLJ6TrCOLVZOH9E8QIUebJbG4tg6gBr+u?=
+ =?us-ascii?Q?Zp47roHfxVPnPRmVqPRtsP8dLis/hoTV26mhhtlu9Ik7HI3i782fl+rOFj0j?=
+ =?us-ascii?Q?oXllMbU8/cT1QGqdlEM8UvUZy9+XfVC2rJI+TzBFvK1udN8TftW996os4/3F?=
+ =?us-ascii?Q?qSk+sNxEgCZcuz4XlRM+KjnnrVZyuTRoWzzVMGMOU61ZhI82Cpu6kmpJj7CS?=
+ =?us-ascii?Q?D7zs+nXU6MaREJABQg0NfBByMmdd6NXB/60ENVakiD2F9TEWqZ0/G6TxY1dY?=
+ =?us-ascii?Q?kE1mhbAqfa75HG0guBTdug3VXA2MqlhOJEZYSubl08AtazgM7PcsN9qarzw3?=
+ =?us-ascii?Q?sZEzd++iXdaJVZO4wBfdGuY8MInP/atkLHwaBB8Jfbjm3qSBHIRQ1Nq/YozS?=
+ =?us-ascii?Q?DtR8fKNWG0FdZ7g5VkOlKaLfq0wYJvvKR8IbGQWIQnrlh5TjbGQSItioY49Z?=
+ =?us-ascii?Q?zmYSTcb8FPIfWp2dCAtomk/jw3v8Hi2rcMtubIUK8XsAFJuUQfrQMM8iHVm6?=
+ =?us-ascii?Q?kc1/49YqT2csDbAI/Hu/X3wplJGOgjvOs9j+VEjHt0YUo+fAMVposyer+E42?=
+ =?us-ascii?Q?F+mnzqDo0RF/Nj0xCspZbZSVDNcjF1dFe5Y6qNOseCsY7ef43VUGTg/pbK7m?=
+ =?us-ascii?Q?cSXX5F2A8wMP60hWd3Tabm5l1HJyWo58lI+nSSX6lpN8N5jdoZvwhMRdRcg8?=
+ =?us-ascii?Q?Erwd8IoPW1KepB5icNC6JbIlsDMsRI7LJvFBUrliV3Hm9Gu5pZjz9N2eHhoz?=
+ =?us-ascii?Q?bx8S6brES0HZHP40RMOHS/EfFNoUQ8XC0a2ke0GcBWgu/rXMVK39yjJcG/1E?=
+ =?us-ascii?Q?xykdtTt0wPRHdKGwJqPjltHGqOrWYd7AFyYYQsK7++ozY4qYMVtxdtk5Q3yv?=
+ =?us-ascii?Q?S7+4wQM3IRhYhDF0qBmayQHPMWqwIs9uPTSPYTMVug1BI3B/WXMY676TnJ2k?=
+ =?us-ascii?Q?KGYDayOZ+XkihmIdHV0NL/TKkWuaLf/amtsUkEDjaFa+v7UsCYKvCVfY/laL?=
+ =?us-ascii?Q?wgjx5VkxS2QAYB+ryb1VW4MMLqujL0HwLEIEWL6swwRmgoX0kOvnKQlXSo6B?=
+ =?us-ascii?Q?7bKLrok2nSrHT7qK1TY9PLh9p9U9Tr7E0LeBXuwNhDhGIDTTKQB0+PVTiiXq?=
+ =?us-ascii?Q?RCv0KV7tBNxicB+smJjrbk5jwCZhZbyRz/l2SpsrZr18Ou8nkb3Q92hMUs/1?=
+ =?us-ascii?Q?4QOcZt5o0LUZDP1+A1tJ4fw3E//qqqCY8kZI72hklmsGiIFtxs8aO8yXdfSY?=
+ =?us-ascii?Q?ppv+qPhmfUTWMaRRv+Ge79uT+JYr5mteU5DmkFLVQLe96fNol+hFDTyODbQM?=
+ =?us-ascii?Q?xpTrXEDwjrS6z7RkzKwtiIu6oew0dogUolzXCvT5xlK8G1df9/hbTeRaRW63?=
+ =?us-ascii?Q?H9JEcXWKrpfU4KioRtWAgoBOHUZaXlJhlWIkPVPfPQCxMUy8kQjTAmUVo2v+?=
+ =?us-ascii?Q?yn/kYkTPTrmkVgPoipDPbFbTgtfZ5k4HCUVh?=
 X-Forefront-Antispam-Report:
-	CIP:2.136.200.136;CTRY:ES;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:jump.ad.technica-electronics.es;PTR:136.red-2-136-200.staticip.rima-tde.net;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1102;
-X-OriginatorOrg: technica-engineering.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 08:06:19.9213
+	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mkerelay1.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: gehealthcare.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 08:09:56.5597
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc3294fe-5ab7-47e3-0bd7-08dda275860f
-X-MS-Exchange-CrossTenant-Id: 1f04372a-6892-44e3-8f58-03845e1a70c1
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1f04372a-6892-44e3-8f58-03845e1a70c1;Ip=[2.136.200.136];Helo=[jump.ad.technica-electronics.es]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF0000A7DD.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21e9bf95-3b70-4c08-bab9-08dda276074e
+X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[mkerelay1.compute.ge-healthcare.net]
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-SJ5PEPF00000203.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB7882
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR22MB4313
 
-Hi, 
+A rare [1] race condition is observed between the igb_watchdog_task and
+shutdown on a dual-core i.MX6 based system with two I210 controllers.
 
-I'll ammend the patch and send it to net-next instead.
+Using printk, the igb_watchdog_task is hung in igb_read_phy_reg because
+__igb_shutdown has already called __igb_close.
 
-Thanks, 
-Carlos
+The fix is to delete timer and cancel the work after settting IGB_DOWN.
+This approach mirrors igb_up.
+
+reboot             kworker
+
+__igb_shutdown
+  rtnl_lock
+  __igb_close
+  :                igb_watchdog_task
+  :                :
+  :                igb_read_phy_reg (hung)
+  rtnl_unlock
+
+[1] Note that this is easier to reproduce with 'initcall_debug' logging
+and additional and printk logging in igb_main.
+
+Signed-off-by: Ian Ray <ian.ray@gehealthcare.com>
+---
+Changes in v2:
+- Change strategy to avoid taking RTNL.
+- Link to v1: https://lore.kernel.org/all/20250428115450.639-1-ian.ray@gehealthcare.com/
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 9e9a5900e6e5..a65ae7925ae8 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -2175,10 +2175,14 @@ void igb_down(struct igb_adapter *adapter)
+ 	u32 tctl, rctl;
+ 	int i;
+
+-	/* signal that we're down so the interrupt handler does not
+-	 * reschedule our watchdog timer
++	/* The watchdog timer may be rescheduled, so explicitly
++	 * disable watchdog from being rescheduled.
+ 	 */
+ 	set_bit(__IGB_DOWN, &adapter->state);
++	timer_delete_sync(&adapter->watchdog_timer);
++	timer_delete_sync(&adapter->phy_info_timer);
++
++	cancel_work_sync(&adapter->watchdog_task);
+
+ 	/* disable receives in the hardware */
+ 	rctl = rd32(E1000_RCTL);
+@@ -2210,9 +2214,6 @@ void igb_down(struct igb_adapter *adapter)
+ 		}
+ 	}
+
+-	timer_delete_sync(&adapter->watchdog_timer);
+-	timer_delete_sync(&adapter->phy_info_timer);
+-
+ 	/* record the stats before reset*/
+ 	spin_lock(&adapter->stats64_lock);
+ 	igb_update_stats(adapter);
+--
+2.49.0
+
 
