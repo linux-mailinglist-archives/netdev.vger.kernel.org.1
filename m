@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-194693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164ABACBEF3
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 05:53:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0194CACBEF4
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 05:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8DB37A24F6
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 03:51:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6738816FB5A
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 03:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197A418DB24;
-	Tue,  3 Jun 2025 03:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C3A198E9B;
+	Tue,  3 Jun 2025 03:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WZXC/ZY6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KBV4YCnX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C958C1798F
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E8218A93C
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748922775; cv=none; b=rPemn3E6+y0HNuYPvwtqPRljjfATRoqakWhAwt1ba8Fh25/X2x/eWHInJDEaq0EymFhXlTbWUgvEwfTkZ7CxVWrp+td4KR5FAH53Sun6GxkkoL19NF1npZadKB5DPeUs7uOBhS2p0aIFtFLfdu43IkZL4H0Q6C/yzWyqCnzH9o4=
+	t=1748922776; cv=none; b=ivNhNZeQ1MmAuRxd080LmA61I3QGmuS43w1BMO5hrCKzZ2On+SDfsDHm3WJw/469lzAEI9qTbUFrRSTbLnkHyImZdjoDkJFBejjqfaMpCIwdfzMFMnM8dVsohFAHFfZDiOHV/hk19PiCln84ZdWbFQMgmJZy8t5SLeGr5awPo3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748922775; c=relaxed/simple;
-	bh=cgL11n2DwqIZz8EoRLdZ3C1Y8Hj3OZi+fNuL+tWYLkc=;
+	s=arc-20240116; t=1748922776; c=relaxed/simple;
+	bh=N98nEHjZ0JtSgEEkUk6Ggeq9CDPnxb3e+zUAOGf0ncs=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nbRM6MoTAylG0mN1XUBOj7JER73kN5X5B4ct/EEIGhMvsqd5JZVEAjxGPB35M0EsZ0KWOd3VOKKImFSbTmXGcs00tofdv0V23i3xraQOLihdtPJXl4aN4rzyde50b5ocNWpOLQGtK2uEttGVqUZj6oaXQitQt7XLD09KCE6Co8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WZXC/ZY6; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=fxFKJFU9+CJhrL2ikuHjTv+NgrypeE89DcyeTzwaFwg2303qgkpHP3ui6XfrVNibsQqHyelIERaJK95zDcY1NHv9lWyycX/is8xiiI1piBEYy4HKR4vNDRdcNYvgcE96MZmmo41YY7CzcGj/ezFD5QcrsuAFi9jsTl4QZyqEXaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KBV4YCnX; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
 Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 552HX6jQ014535
-	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:51 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5533qmYC013765
+	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:53 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=O8Rr/EQMD5se+Zf0y
-	jRr3XJwrIHEPN4FkJCzqVwOYWE=; b=WZXC/ZY6JNHgNP0varn63vONJIWXJ5sPZ
-	oiR78N4v08xRbmqjSvjeQPHP76aB7jbym4xgSrwOM6GY1zYv/tMBmIV3SGeh77qJ
-	f0i3fX6pSe2hWH/oSOsjC8ksObTD3p9+jl9rn0GgapOqUG/fVXxuGIn8F+TBxYXS
-	TP9mscq4xKdsdP0AlDDDcbshm/SeHbnAeqJA/v2GuJLK/DMtUDvsdGGZXV7eNN1x
-	z9aePzjBXDA5oQikVpEUmbRsH4kpbcQrsYnyPwOc/pN2XZp6qyRHZinplI//LG5E
-	ibaZ+m62lfKJl5Dw3K89PMU5cVLr+iD5fZ/m6T0h6xqf9ezSVITBA==
+	:mime-version:references:subject:to; s=pp1; bh=WyBYvD1s3/GwycTnS
+	NIp7zfhKWkv6T+4Nqe3BhcU8uw=; b=KBV4YCnXlVVcdg2l7hNwqT5TEQvMP5EUS
+	PDlrbAZq35FPbH8OdbC07/13s+8xMv8aBsAPnI2ze7Z6o0BtZY4q01Sd7F88E0gd
+	fnuasQhgRFNNcF69BhtL+NpOr/Y/FEzvrHROwWsTf3n4v2g4tEXo1QU470l6vrP8
+	/1zBJO6OTLXuxDzKwi6zPJlcNjrn3MMlgeV5ohICW1epeVrpoFbhII/mp6+0RzSB
+	i8IyrI9oJtLAEamx7O159PioZU8zRxZE+APu6h/gLbKEBalVeqMHzq/yFXn2j3Hk
+	q7LE7pVuheDqvJgT1xIIMcCkXWS4Evy0OdR+Y1gNggd8sXXL+4Mwg==
 Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyj0mh-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyj0mn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:52:51 +0000 (GMT)
+	for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:52:53 +0000 (GMT)
 Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5530JqIU024944
-	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:50 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkm8ycr-1
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5530JqIX024944
+	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:52 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkm8ycu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:52:50 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5533qoEE2884244
+	for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:52:52 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5533qq1030016156
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:50 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 74E0D58050
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:50 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A7C258045
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:50 +0000 (GMT)
+	for <netdev@vger.kernel.org>; Tue, 3 Jun 2025 03:52:52 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3226758059
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:52 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8B7D58053
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:51 +0000 (GMT)
 Received: from localhost (unknown [9.61.177.224])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:50 +0000 (GMT)
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 03:52:51 +0000 (GMT)
 From: David J Wilder <wilder@us.ibm.com>
 To: netdev@vger.kernel.org
-Subject: [PATCH net-next v2 2/4] bonding: Extend arp_ip_target format to allow for a list of vlan tags.
-Date: Mon,  2 Jun 2025 20:51:48 -0700
-Message-ID: <20250603035243.402806-3-wilder@us.ibm.com>
+Subject: [PATCH net-next v2 3/4] bonding: Selftest for the arp_ip_target parameter.
+Date: Mon,  2 Jun 2025 20:51:49 -0700
+Message-ID: <20250603035243.402806-4-wilder@us.ibm.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250603035243.402806-1-wilder@us.ibm.com>
 References: <20250603035243.402806-1-wilder@us.ibm.com>
@@ -83,605 +83,246 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: On64zuvvBzDgARrSFGiUrt4vJg6q4GdJ
-X-Proofpoint-ORIG-GUID: On64zuvvBzDgARrSFGiUrt4vJg6q4GdJ
-X-Authority-Analysis: v=2.4 cv=X4dSKHTe c=1 sm=1 tr=0 ts=683e7193 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=_9dExB9TU08cRdUV:21 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=Ew-S_ov8G7oilRGAPbIA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAzMDAzMCBTYWx0ZWRfX6wBwywvmKbMk QkZMzy984mEerdz7dEItB8k3AYBgeFMW799Kml+NQLdO1dg4DdIqb1qh8QoKmtM/gOTVlRqrlR4 p80mx6FcsVaRnswGL+zMCBi0dtXNrZDntHo3NfuuLyeLYag/30KLezQ9GmEGC0U2IHY7hkuII0c
- nGm4LTAB6FvWz2V3o5b/njuL+3LBmYHQYuU7EnMo6ahJ3DcAmvdwQ4efdm2HzBoP+1Q3hrG+ZQg TeA1oh6ufq/PgO31XvaJtCv8mmbfH9BrJFMKNYGzJ7QUe8qiE76/mVV+yPPmdl3oO/ckZztWf6r iMg1D1yJJbjNo7DmzKJoT/MPQL2YQ3KsvuUk7gafqNJotLuZgv+4TLeSKs6HGsRNLSIw2RlkBtu
- knn1JdzDhWmH5vbJTl5ErOeQKoAZHiWH9X42tf7thuPnjwRVnsO+ofl+3qG+B1D9M4bTeHhC
+X-Proofpoint-GUID: D67qOdq6A4cS2ZasFJ3KGIn3GoEFKELi
+X-Proofpoint-ORIG-GUID: D67qOdq6A4cS2ZasFJ3KGIn3GoEFKELi
+X-Authority-Analysis: v=2.4 cv=X4dSKHTe c=1 sm=1 tr=0 ts=683e7195 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=yK2XMzAzKRrLdIfLQxMA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAzMDAzMCBTYWx0ZWRfX9/4Om83sQTC4 aR8hTxQaUMJOkcALqVXMXKTVg9WW/4mnRFARSMNcLwSWz2O3wwv3dV1Idsy92y/FhzQd3hKsW9Z II62Wul+oJQ0ew0QBGBROVWTgbYWajbHucNIlcRIwvSUFHb0UxDcaaccrmqR0lea31S4vRkm+dO
+ L2L/dfij7fKs46CFlj+ZMnA84O8vrwLPPZvdPcQyXhx6LUaPymhJU1J2OFLnKXm+AotViV9kn54 264zTLKWGmrnxVlhc0W1bYXUKB+SIv8B4gDjuCeoBFCHygCtWzrVZfX83+W+glNS7WQOGqc5mPo wlGRyL8w/zjm+Jiqq/uLGdK/N04di11xhPz5BaTlnsRnDMjzm15H48HkbV/kFMLm6ZwaWJ0N6fN
+ pVlVymxPv0Bsa0iFo4kMR2u95rw99a51/2eiogPDjI4shNUVNYIs4fls4rRWdm2fXGAmYaYm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-06-03_01,2025-06-02_01,2025-03-28_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
  priorityscore=1501 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 clxscore=1015 phishscore=0 bulkscore=0
+ mlxlogscore=999 adultscore=0 clxscore=1011 phishscore=0 bulkscore=0
  malwarescore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
  definitions=main-2506030030
 
-This change extends the "arp_ip_target" parameter format to allow for a
-list of vlan tags to be included for each arp target. This new list of
-tags is optional and may be omitted to preserve the current format and
-process of gathering tags.  When provided the list of tags circumvents
-the process of gathering tags by using the supplied list. An empty list
-can be provided to simply skip the process of gathering tags.
+This selftest provided a functional test for the arp_ip_target parameter
+both with and without user supplied vlan tags.
 
 Signed-off-by: David J Wilder <wilder@us.ibm.com>
 ---
- drivers/net/bonding/bond_main.c    |  47 +++++----
- drivers/net/bonding/bond_netlink.c |  12 ++-
- drivers/net/bonding/bond_options.c |  57 ++++++-----
- drivers/net/bonding/bond_procfs.c  |   5 +-
- drivers/net/bonding/bond_sysfs.c   |   9 +-
- include/net/bond_options.h         |  20 ++++
- include/net/bonding.h              | 156 +++++++++++++++++++++++++++--
- 7 files changed, 248 insertions(+), 58 deletions(-)
+ .../selftests/drivers/net/bonding/Makefile    |   3 +-
+ .../drivers/net/bonding/bond-arp-ip-target.sh | 194 ++++++++++++++++++
+ 2 files changed, 196 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index ac654b384ea1..a181879ab0c0 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -3029,8 +3029,6 @@ static bool bond_has_this_ip(struct bonding *bond, __be32 ip)
- 	return ret;
- }
+diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
+index 2b10854e4b1e..c59bb2912a38 100644
+--- a/tools/testing/selftests/drivers/net/bonding/Makefile
++++ b/tools/testing/selftests/drivers/net/bonding/Makefile
+@@ -10,7 +10,8 @@ TEST_PROGS := \
+ 	mode-2-recovery-updelay.sh \
+ 	bond_options.sh \
+ 	bond-eth-type-change.sh \
+-	bond_macvlan_ipvlan.sh
++	bond_macvlan_ipvlan.sh \
++	bond-arp-ip-target.sh
  
--#define BOND_VLAN_PROTO_NONE cpu_to_be16(0xffff)
--
- static bool bond_handle_vlan(struct slave *slave, struct bond_vlan_tag *tags,
- 			     struct sk_buff *skb)
- {
-@@ -3153,13 +3151,15 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
- 	for (i = 0; i < BOND_MAX_ARP_TARGETS && targets[i].target_ip; i++) {
- 		target_ip = targets[i].target_ip;
- 		tags = targets[i].tags;
-+		char pbuf[BOND_OPTION_STRING_MAX_SIZE];
- 
--		slave_dbg(bond->dev, slave->dev, "%s: target %pI4\n",
--			  __func__, &target_ip);
-+		bond_arp_target_to_string(&targets[i], pbuf, sizeof(pbuf));
-+		slave_dbg(bond->dev, slave->dev, "%s: target %s\n", __func__, pbuf);
- 
- 		/* Find out through which dev should the packet go */
- 		rt = ip_route_output(dev_net(bond->dev), target_ip, 0, 0, 0,
- 				     RT_SCOPE_LINK);
+ TEST_FILES := \
+ 	lag_lib.sh \
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh b/tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh
+new file mode 100755
+index 000000000000..7bd2f3beb1f0
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bonding/bond-arp-ip-target.sh
+@@ -0,0 +1,194 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Test bonding arp_ip_target.
++# Topology for Bond mode 1,5,6 testing
++#
++#  +-------------------------+
++#  |                         | Server
++#  |       bond.10.20.30     | 192.30.2.1/24
++#  |            |            |
++#  |        bond0.10.20      | 192.20.2.1/24
++#  |            |            |
++#  |         bond0.10        | 192.10.2.1/24
++#  |            |            |
++#  |          bond0          | 192.0.2.1/24
++#  |            |            |
++#  |            +            |
++#  |      eth0  |  eth1      |
++#  |        +---+---+        |
++#  |        |       |        |
++#  +-------------------------+
++#           |       |
++#  +-------------------------+
++#  |        |       |        |
++#  |    +---+-------+---+    |  Gateway
++#  |    |      br0      |    |
++#  |    +-------+-------+    |
++#  |            |            |
++#  +-------------------------+
++#               |
++#  +-------------------------+
++#  |            |            |  Client
++#  |          eth0           | 192.0.0.2/24
++#  |            |            |
++#  |         eth0.10         | 192.10.10.2/24
++#  |            |            |
++#  |        eth0.10.20       | 192.20.20.2/24
++#  |            |            |
++#  |      eth0.10.20.30      | 192.30.30.2/24
++#  +-------------------------+
 +
- 		if (IS_ERR(rt)) {
- 			/* there's no route to target_ip - try to send arp
- 			 * probe to generate any traffic (arp_validate=0)
-@@ -3177,9 +3177,13 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
- 		if (rt->dst.dev == bond->dev)
- 			goto found;
- 
--		rcu_read_lock();
--		tags = bond_verify_device_path(bond->dev, rt->dst.dev, 0);
--		rcu_read_unlock();
-+		if (!tags) {
-+			rcu_read_lock();
-+			tags = bond_verify_device_path(bond->dev, rt->dst.dev, 0);
-+			/* cache the tags */
-+			targets[i].tags = tags;
-+			rcu_read_unlock();
-+		}
- 
- 		if (!IS_ERR_OR_NULL(tags))
- 			goto found;
-@@ -3195,7 +3199,6 @@ static void bond_arp_send_all(struct bonding *bond, struct slave *slave)
- 		addr = bond_confirm_addr(rt->dst.dev, target_ip, 0);
- 		ip_rt_put(rt);
- 		bond_arp_send(slave, ARPOP_REQUEST, target_ip, addr, tags);
--		kfree(tags);
- 	}
- }
- 
-@@ -6077,6 +6080,7 @@ static void bond_uninit(struct net_device *bond_dev)
- 	bond_for_each_slave(bond, slave, iter)
- 		__bond_release_one(bond_dev, slave->dev, true, true);
- 	netdev_info(bond_dev, "Released all slaves\n");
-+	bond_free_vlan_tags(bond->params.arp_targets);
- 
- #ifdef CONFIG_XFRM_OFFLOAD
- 	mutex_destroy(&bond->ipsec_lock);
-@@ -6283,21 +6287,26 @@ static int __init bond_check_params(struct bond_params *params)
- 
- 	for (arp_ip_count = 0, i = 0;
- 	     (arp_ip_count < BOND_MAX_ARP_TARGETS) && arp_ip_target[i]; i++) {
--		__be32 ip;
-+		struct bond_arp_target tmp_arp_target;
- 
--		/* not a complete check, but good enough to catch mistakes */
--		if (!in4_pton(arp_ip_target[i], -1, (u8 *)&ip, -1, NULL) ||
--		    !bond_is_ip_target_ok(ip)) {
-+		if (bond_arp_ip_target_opt_parse(arp_ip_target[i], &tmp_arp_target)) {
- 			pr_warn("Warning: bad arp_ip_target module parameter (%s), ARP monitoring will not be performed\n",
- 				arp_ip_target[i]);
- 			arp_interval = 0;
--		} else {
--			if (bond_get_targets_ip(arp_target, ip) == -1)
--				arp_target[arp_ip_count++].target_ip = ip;
--			else
--				pr_warn("Warning: duplicate address %pI4 in arp_ip_target, skipping\n",
--					&ip);
-+			break;
- 		}
 +
-+		if (bond_get_targets_ip(arp_target, tmp_arp_target.target_ip) != -1) {
-+			pr_warn("Warning: duplicate address %pI4 in arp_ip_target, skipping\n",
-+				&tmp_arp_target.target_ip);
-+			kfree(tmp_arp_target.tags);
-+			continue;
-+		}
++lib_dir=$(dirname "$0")
++source ${lib_dir}/bond_topo_2d1c.sh
 +
-+		arp_target[i].target_ip = tmp_arp_target.target_ip;
-+		arp_target[i].tags = tmp_arp_target.tags;
-+		arp_target[i].flags |= BOND_TARGET_DONTFREE;
-+		++arp_ip_count;
- 	}
- 
- 	if (arp_interval && !arp_ip_count) {
-@@ -6663,7 +6672,7 @@ static void __exit bonding_exit(void)
- 
- 	bond_netlink_fini();
- 	unregister_pernet_subsys(&bond_net_ops);
--
-+	bond_free_vlan_tags_all(bonding_defaults.arp_targets);
- 	bond_destroy_debugfs();
- 
- #ifdef CONFIG_NET_POLL_CONTROLLER
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index 1a3d17754c0a..78d41b7b28b5 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -288,13 +288,21 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
- 		bond_option_arp_ip_targets_clear(bond);
- 		nla_for_each_nested(attr, data[IFLA_BOND_ARP_IP_TARGET], rem) {
- 			__be32 target;
-+			char target_str[1024 + 1];
- 
- 			if (nla_len(attr) < sizeof(target))
- 				return -EINVAL;
- 
--			target = nla_get_be32(attr);
-+			if (nla_len(attr) > sizeof(target)) {
-+				snprintf(target_str, sizeof(target_str),
-+					 "%s%s", "+", (__force char *)nla_data(attr));
++DEBUG=${DEBUG:-0}
++test ${DEBUG} -ne 0 && set -x
 +
-+				bond_opt_initstr(&newval, target_str);
-+			} else {
-+				target = nla_get_be32(attr);
-+				bond_opt_initval(&newval, (__force u64)target);
-+			}
- 
--			bond_opt_initval(&newval, (__force u64)target);
- 			err = __bond_opt_set(bond, BOND_OPT_ARP_TARGETS,
- 					     &newval,
- 					     data[IFLA_BOND_ARP_IP_TARGET],
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index e4b7eb376575..42a11483320c 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -31,8 +31,8 @@ static int bond_option_use_carrier_set(struct bonding *bond,
- 				       const struct bond_opt_value *newval);
- static int bond_option_arp_interval_set(struct bonding *bond,
- 					const struct bond_opt_value *newval);
--static int bond_option_arp_ip_target_add(struct bonding *bond, __be32 target);
--static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target);
-+static int bond_option_arp_ip_target_add(struct bonding *bond, struct bond_arp_target target);
-+static int bond_option_arp_ip_target_rem(struct bonding *bond, struct bond_arp_target target);
- static int bond_option_arp_ip_targets_set(struct bonding *bond,
- 					  const struct bond_opt_value *newval);
- static int bond_option_ns_ip6_targets_set(struct bonding *bond,
-@@ -1115,7 +1115,7 @@ static int bond_option_arp_interval_set(struct bonding *bond,
- }
- 
- static void _bond_options_arp_ip_target_set(struct bonding *bond, int slot,
--					    __be32 target,
-+					    struct bond_arp_target target,
- 					    unsigned long last_rx)
- {
- 	struct bond_arp_target *targets = bond->params.arp_targets;
-@@ -1125,24 +1125,24 @@ static void _bond_options_arp_ip_target_set(struct bonding *bond, int slot,
- 	if (slot >= 0 && slot < BOND_MAX_ARP_TARGETS) {
- 		bond_for_each_slave(bond, slave, iter)
- 			slave->target_last_arp_rx[slot] = last_rx;
--		targets[slot].target_ip = target;
-+		memcpy(&targets[slot], &target, sizeof(target));
- 	}
- }
- 
--static int _bond_option_arp_ip_target_add(struct bonding *bond, __be32 target)
-+static int _bond_option_arp_ip_target_add(struct bonding *bond, struct bond_arp_target target)
- {
- 	struct bond_arp_target *targets = bond->params.arp_targets;
- 	int ind;
- 
--	if (!bond_is_ip_target_ok(target)) {
-+	if (!bond_is_ip_target_ok(target.target_ip)) {
- 		netdev_err(bond->dev, "invalid ARP target %pI4 specified for addition\n",
--			   &target);
-+			   &target.target_ip);
- 		return -EINVAL;
- 	}
- 
--	if (bond_get_targets_ip(targets, target) != -1) { /* dup */
-+	if (bond_get_targets_ip(targets, target.target_ip) != -1) { /* dup */
- 		netdev_err(bond->dev, "ARP target %pI4 is already present\n",
--			   &target);
-+			   &target.target_ip);
- 		return -EINVAL;
- 	}
- 
-@@ -1152,19 +1152,19 @@ static int _bond_option_arp_ip_target_add(struct bonding *bond, __be32 target)
- 		return -EINVAL;
- 	}
- 
--	netdev_dbg(bond->dev, "Adding ARP target %pI4\n", &target);
-+	netdev_dbg(bond->dev, "Adding ARP target %pI4\n", &target.target_ip);
- 
- 	_bond_options_arp_ip_target_set(bond, ind, target, jiffies);
- 
- 	return 0;
- }
- 
--static int bond_option_arp_ip_target_add(struct bonding *bond, __be32 target)
-+static int bond_option_arp_ip_target_add(struct bonding *bond, struct bond_arp_target target)
- {
- 	return _bond_option_arp_ip_target_add(bond, target);
- }
- 
--static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target)
-+static int bond_option_arp_ip_target_rem(struct bonding *bond, struct bond_arp_target target)
- {
- 	struct bond_arp_target *targets = bond->params.arp_targets;
- 	struct list_head *iter;
-@@ -1172,23 +1172,23 @@ static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target)
- 	unsigned long *targets_rx;
- 	int ind, i;
- 
--	if (!bond_is_ip_target_ok(target)) {
-+	if (!bond_is_ip_target_ok(target.target_ip)) {
- 		netdev_err(bond->dev, "invalid ARP target %pI4 specified for removal\n",
--			   &target);
-+			   &target.target_ip);
- 		return -EINVAL;
- 	}
- 
--	ind = bond_get_targets_ip(targets, target);
-+	ind = bond_get_targets_ip(targets, target.target_ip);
- 	if (ind == -1) {
- 		netdev_err(bond->dev, "unable to remove nonexistent ARP target %pI4\n",
--			   &target);
-+			   &target.target_ip);
- 		return -EINVAL;
- 	}
- 
- 	if (ind == 0 && !targets[1].target_ip && bond->params.arp_interval)
- 		netdev_warn(bond->dev, "Removing last arp target with arp_interval on\n");
- 
--	netdev_dbg(bond->dev, "Removing ARP target %pI4\n", &target);
-+	netdev_dbg(bond->dev, "Removing ARP target %pI4\n", &target.target_ip);
- 
- 	bond_for_each_slave(bond, slave, iter) {
- 		targets_rx = slave->target_last_arp_rx;
-@@ -1196,9 +1196,16 @@ static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target)
- 			targets_rx[i] = targets_rx[i+1];
- 		targets_rx[i] = 0;
- 	}
--	for (i = ind; (i < BOND_MAX_ARP_TARGETS - 1) && targets[i + 1].target_ip; i++)
--		targets[i] = targets[i+1];
++# vlan subnets
++s_ip4v10="192.10.2.1"
++s_ip4v20="192.20.2.1"
++s_ip4v30="192.30.2.1"
++c_ip4v10="192.10.2.10"
++c_ip4v20="192.20.2.10"
++c_ip4v30="192.30.2.10"
 +
-+	bond_free_vlan_tag(&targets[ind]);
++ALL_TESTS="
++    no_vlan_hints
++    with_vlan_hints
++"
 +
-+	for (i = ind; (i < BOND_MAX_ARP_TARGETS - 1) && targets[i + 1].target_ip; i++) {
-+		targets[i].target_ip = targets[i + 1].target_ip;
-+		targets[i].tags = targets[i + 1].tags;
-+		targets[i].flags = targets[i + 1].flags;
-+	}
- 	targets[i].target_ip = 0;
-+	targets[i].tags = NULL;
- 
- 	return 0;
- }
-@@ -1206,20 +1213,24 @@ static int bond_option_arp_ip_target_rem(struct bonding *bond, __be32 target)
- void bond_option_arp_ip_targets_clear(struct bonding *bond)
- {
- 	int i;
-+	struct bond_arp_target empty_target;
++# load bonding modules and set options.
++load_bonding() {
++    local bond_options="$*"
 +
-+	empty_target.target_ip = 0;
-+	empty_target.tags = NULL;
- 
- 	for (i = 0; i < BOND_MAX_ARP_TARGETS; i++)
--		_bond_options_arp_ip_target_set(bond, i, 0, 0);
-+		_bond_options_arp_ip_target_set(bond, i, empty_target, 0);
- }
- 
- static int bond_option_arp_ip_targets_set(struct bonding *bond,
- 					  const struct bond_opt_value *newval)
- {
- 	int ret = -EPERM;
--	__be32 target;
-+	struct bond_arp_target target;
- 
- 	if (newval->string) {
- 		if (strlen(newval->string) < 1 ||
--		    !in4_pton(newval->string + 1, -1, (u8 *)&target, -1, NULL)) {
-+		    bond_arp_ip_target_opt_parse(newval->string + 1, &target)) {
- 			netdev_err(bond->dev, "invalid ARP target specified\n");
- 			return ret;
- 		}
-@@ -1230,7 +1241,7 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
- 		else
- 			netdev_err(bond->dev, "no command found in arp_ip_targets file - use +<addr> or -<addr>\n");
- 	} else {
--		target = newval->value;
-+		target.target_ip = newval->value;
- 		ret = bond_option_arp_ip_target_add(bond, target);
- 	}
- 
-diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
-index 94e6fd7041ee..b07944396912 100644
---- a/drivers/net/bonding/bond_procfs.c
-+++ b/drivers/net/bonding/bond_procfs.c
-@@ -111,6 +111,7 @@ static void bond_info_show_master(struct seq_file *seq)
- 
- 	/* ARP information */
- 	if (bond->params.arp_interval > 0) {
-+		char pbuf[BOND_OPTION_STRING_MAX_SIZE];
- 		int printed = 0;
- 
- 		seq_printf(seq, "ARP Polling Interval (ms): %d\n",
-@@ -125,7 +126,9 @@ static void bond_info_show_master(struct seq_file *seq)
- 				break;
- 			if (printed)
- 				seq_printf(seq, ",");
--			seq_printf(seq, " %pI4", &bond->params.arp_targets[i].target_ip);
-+			bond_arp_target_to_string(&bond->params.arp_targets[i],
-+						  pbuf, sizeof(pbuf));
-+			seq_printf(seq, " %s", pbuf);
- 			printed = 1;
- 		}
- 		seq_printf(seq, "\n");
-diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
-index d7c09e0a14dd..feff53e69bd3 100644
---- a/drivers/net/bonding/bond_sysfs.c
-+++ b/drivers/net/bonding/bond_sysfs.c
-@@ -288,11 +288,14 @@ static ssize_t bonding_show_arp_targets(struct device *d,
- {
- 	struct bonding *bond = to_bond(d);
- 	int i, res = 0;
-+	char pbuf[BOND_OPTION_STRING_MAX_SIZE];
- 
- 	for (i = 0; i < BOND_MAX_ARP_TARGETS; i++) {
--		if (bond->params.arp_targets[i].target_ip)
--			res += sysfs_emit_at(buf, res, "%pI4 ",
--					     &bond->params.arp_targets[i].target_ip);
-+		if (bond->params.arp_targets[i].target_ip) {
-+			bond_arp_target_to_string(&bond->params.arp_targets[i],
-+						  pbuf, sizeof(pbuf));
-+			res += sysfs_emit_at(buf, res, "%s ", pbuf);
-+		}
- 	}
- 	if (res)
- 		buf[res-1] = '\n'; /* eat the leftover space */
-diff --git a/include/net/bond_options.h b/include/net/bond_options.h
-index 18687ccf0638..0a7d690cb005 100644
---- a/include/net/bond_options.h
-+++ b/include/net/bond_options.h
-@@ -119,6 +119,26 @@ struct bond_option {
- 	int (*set)(struct bonding *bond, const struct bond_opt_value *val);
- };
- 
-+struct bond_vlan_tag {
-+	__be16		vlan_proto;
-+	unsigned short	vlan_id;
-+};
-+
-+/* Value type flags:
-+ *  BOND_TARGET_DONTFREE - never free the tags
-+ *  BOND_TARGET_USERTAGS - tags have been supplied by the user
-+ */
-+enum {
-+	BOND_TARGET_DONTFREE = BIT(0),
-+	BOND_TARGET_USERTAGS = BIT(1),
-+};
-+
-+struct bond_arp_target {
-+	__be32			target_ip;
-+	struct bond_vlan_tag	*tags;
-+	u32			flags;
-+};
-+
- int __bond_opt_set(struct bonding *bond, unsigned int option,
- 		   struct bond_opt_value *val,
- 		   struct nlattr *bad_attr, struct netlink_ext_ack *extack);
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index fc685779d27d..decb83930e86 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -23,6 +23,7 @@
- #include <linux/etherdevice.h>
- #include <linux/reciprocal_div.h>
- #include <linux/if_link.h>
-+#include <linux/inet.h>
- 
- #include <net/bond_3ad.h>
- #include <net/bond_alb.h>
-@@ -115,11 +116,6 @@ static inline int is_netpoll_tx_blocked(struct net_device *dev)
- #define is_netpoll_tx_blocked(dev) (0)
- #endif
- 
--struct bond_arp_target {
--	__be32 target_ip;
--	struct bond_vlan_tag *tags;
--};
--
- struct bond_params {
- 	int mode;
- 	int xmit_policy;
-@@ -279,11 +275,6 @@ struct bonding {
- void bond_queue_slave_event(struct slave *slave);
- void bond_lower_state_changed(struct slave *slave);
- 
--struct bond_vlan_tag {
--	__be16		vlan_proto;
--	unsigned short	vlan_id;
--};
--
- /*
-  * Returns NULL if the net_device does not belong to any of the bond's slaves
-  *
-@@ -797,6 +788,151 @@ static inline int bond_get_targets_ip6(struct in6_addr *targets, struct in6_addr
- }
- #endif
- 
-+#define BOND_VLAN_PROTO_NONE cpu_to_be16(0xffff)
-+#define BOND_OPTION_STRING_MAX_SIZE 512
-+
-+/* Convert vlan_list into struct bond_vlan_tag.
-+ * Inspired by bond_verify_device_path();
-+ */
-+static inline struct bond_vlan_tag *bond_vlan_tags_parse(char *vlan_list, int level)
-+{
-+	struct bond_vlan_tag *tags;
-+	char *vlan;
-+
-+	if (!vlan_list || strlen(vlan_list) == 0) {
-+		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
-+		if (!tags)
-+			return ERR_PTR(-ENOMEM);
-+		tags[level].vlan_proto = BOND_VLAN_PROTO_NONE;
-+		return tags;
-+	}
-+
-+	for (vlan = strsep(&vlan_list, "/"); (vlan != 0); level++) {
-+		tags = bond_vlan_tags_parse(vlan_list, level + 1);
-+		if (IS_ERR_OR_NULL(tags)) {
-+			if (IS_ERR(tags))
-+				return tags;
-+			continue;
-+		}
-+
-+		tags[level].vlan_proto = __cpu_to_be16(ETH_P_8021Q);
-+		if (kstrtou16(vlan, 0, &tags[level].vlan_id)) {
-+			kfree(tags);
-+			return ERR_PTR(-EINVAL);
-+		}
-+
-+		if (tags[level].vlan_id < 1 || tags[level].vlan_id > 4094) {
-+			kfree(tags);
-+			return ERR_PTR(-EINVAL);
-+		}
-+
-+		return tags;
-+	}
-+
-+	return NULL;
++    lsmod | grep bonding > /dev/null
++    if [ $? == 0 ]; then
++        rmmod bonding
++    fi
++    modprobe bonding ${bond_options}
 +}
 +
-+/**
-+ * bond_arp_ip_target_opt_parse - parse a single arp_ip_target option value string
-+ * @src: the option value to be parsed
-+ * @dest: struct bond_arp_target to place the results.
-+ *
-+ * This function parses a single arp_ip_target string in the form:
-+ * x.x.x.x[tag/....] into a struct bond_arp_target.
-+ * Returns 0 on success.
-+ */
-+static inline int bond_arp_ip_target_opt_parse(char *src, struct bond_arp_target *dest)
++# Build stacked vlans on top of an interface.
++stack_vlans()
 +{
-+	char *ipv4, *vlan_list;
-+	char target[BOND_OPTION_STRING_MAX_SIZE], *args;
-+	struct bond_vlan_tag *tags = NULL;
-+	__be32 ip;
++    RET=0
++    local interface=$1
++    local ns=$2
++    local last=$interface
++    local tags="10 20 30"
 +
-+	if (strlen(src) > BOND_OPTION_STRING_MAX_SIZE)
-+		return -E2BIG;
++    ip -n ${ns} link show ${interface} > /dev/null
++    if [[ $? -ne 0 ]] && RET=1; then
++        msg="Failed to create ${interface}"
++        return
++    fi
 +
-+	pr_debug("Parsing arp_ip_target (%s)\n", src);
++    if [ $ns == ${s_ns} ]; then host=1; else host=10;fi
 +
-+	/* copy arp_ip_target[i] to local array, strsep works
-+	 * destructively...
-+	 */
-+	args = target;
-+	strscpy(target, src);
-+	ipv4 = strsep(&args, "[");
-+
-+	/* not a complete check, but good enough to catch mistakes */
-+	if (!in4_pton(ipv4, -1, (u8 *)&ip, -1, NULL) ||
-+	    !bond_is_ip_target_ok(ip)) {
-+		return -EINVAL;
-+	}
-+
-+	/* extract vlan tags */
-+	vlan_list = strsep(&args, "]");
-+
-+	/* If a vlan list was not supplied skip the processing of the list.
-+	 * A value of "[]" is a valid list and should be handled a such.
-+	 */
-+	if (vlan_list) {
-+		tags = bond_vlan_tags_parse(vlan_list, 0);
-+		dest->flags |= BOND_TARGET_USERTAGS;
-+		if (IS_ERR(tags))
-+			return PTR_ERR(tags);
-+	}
-+
-+	dest->target_ip = ip;
-+	dest->tags = tags;
-+
-+	return 0;
++    for tag in $tags; do
++        ip -n ${ns} link add link $last name $last.$tag type vlan id $tag
++        ip -n ${ns} address add 192.$tag.2.$host/24 dev $last.$tag
++        ip -n ${ns} link set up dev $last.$tag
++        last=$last.$tag
++    done
 +}
 +
-+static inline int bond_arp_target_to_string(struct bond_arp_target *target,
-+					    char *buf, int size)
++# Check for link flapping
++check_failure_count()
 +{
-+	struct bond_vlan_tag *tags = target->tags;
-+	int i, num = 0;
++    RET=0
++    local ns=$1
++    local proc_file=/proc/net/bonding/$2
++    local  counts
 +
-+	if (!(target->flags & BOND_TARGET_USERTAGS)) {
-+		num = snprintf(&buf[0], size, "%pI4", &target->target_ip);
-+		return num;
-+	}
++    # Give the bond time to settle.
++    sleep 10
 +
-+	num = snprintf(&buf[0], size, "%pI4[", &target->target_ip);
-+	if (tags) {
-+		for (i = 0; (tags[i].vlan_proto != BOND_VLAN_PROTO_NONE); i++) {
-+			if (!tags[i].vlan_id)
-+				continue;
-+			if (i != 0)
-+				num = num + snprintf(&buf[num], size-num, "/");
-+			num = num + snprintf(&buf[num], size-num, "%u",
-+					     tags[i].vlan_id);
-+		}
-+	}
-+	snprintf(&buf[num], size-num, "]");
-+	return num;
++    counts=$(ip netns exec ${ns} grep -F "Link Failure Count" ${proc_file} | awk -F: '{print $2}')
++
++    local i
++    for i in $counts; do
++        [ $i != 0 ] && RET=1
++    done
 +}
 +
-+static inline void bond_free_vlan_tag(struct bond_arp_target *target)
++setup_bond_topo()
 +{
-+	if (!(target->flags & BOND_TARGET_DONTFREE))
-+		kfree(target->tags);
++    load_bonding $*
++    setup_prepare
++    setup_wait
++    stack_vlans bond0 ${s_ns}
++    stack_vlans eth0 ${c_ns}
 +}
 +
-+static inline void __bond_free_vlan_tags(struct bond_arp_target *targets, int all)
++skip_with_vlan_hints()
 +{
-+	int i;
++    local skip=1
 +
-+	for (i = 0; i < BOND_MAX_ARP_TARGETS && targets[i].tags; i++) {
-+		if (!all)
-+			bond_free_vlan_tag(&targets[i]);
-+		else
-+			kfree(targets[i].tags);
-+	}
++    # check if iproute support prio option
++    ip -n ${s_ns} link add bond2 type bond arp_ip_target 10.0.0.1[10]
++    [[ $? -ne 0 ]] && skip=0
++    ip -n ${s_ns} link del bond2 2> /dev/null
++
++    return $skip
 +}
 +
-+#define bond_free_vlan_tags(targets)  __bond_free_vlan_tags(targets, 0)
-+#define bond_free_vlan_tags_all(targets) __bond_free_vlan_tags(targets, 1)
++no_vlan_hints()
++{
++        RET=0
++        local targets="${c_ip4} ${c_ip4v10} ${c_ip4v20}"
++        local target
++        msg=""
++
++        for target in $targets; do
++                bond_reset "mode $mode arp_interval 100 arp_ip_target ${target}"
++
++                stack_vlans bond0 ${s_ns}
++                if [ $RET -ne 0 ]; then
++                    log_test "no_vlan_hints" "${msg}"
++                    return
++                fi
++
++                check_failure_count ${s_ns} bond0
++                log_test "arp_ip_target=${target} ${msg}"
++        done
++}
++
++with_vlan_hints()
++{
++        RET=0
++        local targets="${c_ip4}[] ${c_ip4v10}[10] ${c_ip4v20}[10/20]"
++        local target
++        msg=""
++
++        if skip_with_vlan_hints; then
++            log_test_skip "skip_with_vlan_hints" \
++	    "Current iproute doesn't support extended arp_ip_target options."
++            return 0
++        fi
++
++        for target in $targets; do
++                bond_reset "mode $mode arp_interval 100 arp_ip_target ${target}"
++
++                stack_vlans bond0 ${s_ns}
++                if [ $RET -ne 0 ]; then
++                    log_test "no_vlan_hints" "${msg}"
++                    return
++                fi
++
++                check_failure_count ${s_ns} bond0
++                log_test "arp_ip_target=${target} ${msg}"
++        done
++}
 +
 +
- /* exported from bond_main.c */
- extern unsigned int bond_net_id;
- 
++trap cleanup EXIT
++
++mode=active-backup
++
++setup_bond_topo # dyndbg=+p
++tests_run
++
++exit $EXIT_STATUS
 -- 
 2.43.5
 
