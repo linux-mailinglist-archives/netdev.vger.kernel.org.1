@@ -1,108 +1,134 @@
-Return-Path: <netdev+bounces-194706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC544ACC023
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:25:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB465ACC038
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63EA73A475D
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:25:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 826963A4FED
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 06:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA5D25D201;
-	Tue,  3 Jun 2025 06:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0D6267B89;
+	Tue,  3 Jun 2025 06:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cMPTIKKq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a+ZdawSf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F91F4A35
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 06:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F594267AFC
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 06:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748931925; cv=none; b=nT5Bc3dtzNHQnY+Ic1IDCD+4WPgb19U6qA2RtinK757v+Okuth0cWUzmS1fr51z6aSoYCHu5UxOWq5GiYCAbf8V+sCT/ewBS2EmyCho6N1X4Cp9F+rS6Eu9CAZJ/41BVvGh0L2bYIf6CM6o7ArwkIVIb8ebWnDk1lETBuRq2wgU=
+	t=1748932271; cv=none; b=pmj5z7z3uY0/uaDydDrO1F9/buXAckIsObM43WE8LS0oVjj/hxiga95aZSovq9EizlQx64O686/CuOzsiX7GkCCucTO2PXfhafCmRSIr139s2U/rWZezoa5PSQXul30rlYtB1ShB59dXK2CSesCrU0xIXrIcXN3IRpIZiU0BGUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748931925; c=relaxed/simple;
-	bh=fgvjIxoXjQOIyx+Lmwb3aWBAOOPAF1Ad2zK+juTXm20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ou3b/+g72cyTHnDb0P9emiz9pDQkSKEgBOFkbe/5fE44iCVKTYqfeW5XZMMd7GFDZuznWJ5NhPjC55MnWUNor8Oh8q9ylN1aggZRqNZQTJBOdkzFbfJnqgALPiaFZrEqsVr/wWldF3ARtQCKYp/v8qsLfhyAw4CGELD/Xsia3cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cMPTIKKq; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a442a3a2bfso69446421cf.1
-        for <netdev@vger.kernel.org>; Mon, 02 Jun 2025 23:25:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748931923; x=1749536723; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fgvjIxoXjQOIyx+Lmwb3aWBAOOPAF1Ad2zK+juTXm20=;
-        b=cMPTIKKqul93GHXljjVDndboOqMKMcvjI7LBZrZzUxn5TzNzUI/Ja5dirl7EVJYBtJ
-         9zRGG2NMEa3uDcdxNzXZyRnS/rELSN2IRl57YuamRfJV8WHD2UsTWl3nb34OEMCBofu6
-         /1VGovSvVXi9DbKPe1cv+Czcor6qurWUVKITocAztRBkQNim2Qaifcjuhcq8DohRsttB
-         FJg+xBIaBYrnOpuO6ngDCSKlE0fcA1eJfanXGlscf5iNhRwQN9qot+fn1kzRzbncKFwe
-         a6ocBH5Bz0mUN7oOOeNmRKLzpx6D6LVNMeugT0Yy/dKvTNOCNZKE5EG7QFF8gdaHa86J
-         eG8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748931923; x=1749536723;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fgvjIxoXjQOIyx+Lmwb3aWBAOOPAF1Ad2zK+juTXm20=;
-        b=DP0IDibQVHIIKU3tVnlGUh0fhnQTSu8+X1rBFD0KqmPtTOpk5Oj3fkS0P+wWAb906R
-         1jMFID0tswX3NaTLbSQZSfxoEpooAj7JiVRaauglFVaIBOxMYdO73dPWx2kTmSI6Dwno
-         8F/p6jJ2cBDUREnTdWh1xcxDctpKg4cwD/W3uiSMMILj3R6VEZzK2DovtxjNTq5VIyqC
-         NDQ3LGU50LHq5QgkFXChJPClRuyr1U5E/K6aafSuQM4q1cQGZOc+Agfg1nFT2UNmudtT
-         cTcguJmCbP+7n4R+QvZUuYFtuIeYwydWzbWWsl3E325upynvEXZ/CYQXlcbDtx4KYC5+
-         0a4g==
-X-Gm-Message-State: AOJu0Ywc8DUAxGa++b7ayxUTt6r747QH6lpfUVaI3EcSGXStCilmG3Tp
-	8eghSukq1OwfeKQdOtEACbsELEmMeE51bgX1WGSz1DQRCI/lHd5C2jHn54/5txVrjmGTEAAUrT2
-	AK8iGaP4a2vmb8XdJ2g/bVG4V0fFd72CSKE1iQdu0
-X-Gm-Gg: ASbGnctTt7rRcRNIs/DuXTo8dbdfWYqYYbB7lzQ8nF1WNBSucLPqlttrunHjx8fSltA
-	jGraIQ0aqZ953Ym465necbv1fFsj1wOhZ7vm5s91opABccqk003MjE2qZB7wwbLsKGxKIpWziVY
-	od+5fC3N2MeYdc8ci80ifOiYfBazu7Vf1DBtAX6Dtunx8=
-X-Google-Smtp-Source: AGHT+IHFfwRF3tYPXQ/VL91tBn9XCuarRKHuhLqW/yyoTW/vkmX0wo0HoX51ts8ezDr8dx/GzpSTz4C2u5gmsYYoG8U=
-X-Received: by 2002:a05:622a:544a:b0:472:1aed:c8b4 with SMTP id
- d75a77b69052e-4a443ef855fmr261872071cf.34.1748931922839; Mon, 02 Jun 2025
- 23:25:22 -0700 (PDT)
+	s=arc-20240116; t=1748932271; c=relaxed/simple;
+	bh=0V+XiGibVtBxthWGz0QKy0lpkFkufnlIgYI5Z12qcD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYjUxbElr64itKEG+zFlBwWfUjYm9suDB90YqLszsB/Fl15uTkv4BqYOrZDYvdYHIoGjcvSFT+JB33zexZiNV4+JQKF8S/G0rX+hHyrV6XZTUbraQQSnV3NqUJ6FdXqJdVHh04kiFulYZu524j2JOnKiw6Xb/t8lRQp1qqbn+Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a+ZdawSf; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748932269; x=1780468269;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0V+XiGibVtBxthWGz0QKy0lpkFkufnlIgYI5Z12qcD0=;
+  b=a+ZdawSf4miOehj3RF9gxY1kh1o/rxFG8ogJU/PjfXfUNIpBvGBCIHTw
+   p5P8yHPIRWSSyRXo4a4vI7WPC/DPYZGU+wC7ub4OCAKSANrf2degwnFxB
+   qg3M6ZnFWVj++nVmYVmWqx3AQ3rVJuLhsPr1gmNvUIf6ukm7SZVLhjoGM
+   wv07+v51RnHJdA/eEfhuU/Onu57k3yoa03bDb7zLg4Qt/pss06j94k7a9
+   XIcL1qkWi+tq/QhPIH3tNqagpUclGpvTUZgN4FeeF3eWw7vTyyyOzqLeZ
+   Oqf6eLQ/mwtyJTWXDRmHSRjAfaV6vW1s4s/o84sojqG3JGaXGDBo/Lryl
+   Q==;
+X-CSE-ConnectionGUID: APm9Lp5pSsaW6p8PQMjhDA==
+X-CSE-MsgGUID: ek2kmfQTQOOP9lG35IbxJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="68511443"
+X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
+   d="scan'208";a="68511443"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 23:31:09 -0700
+X-CSE-ConnectionGUID: MQgp7UU9RCS9+BiuUIpMcQ==
+X-CSE-MsgGUID: AeIj0zxHRwu+y5ep4GTzsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
+   d="scan'208";a="145092593"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 23:31:06 -0700
+Date: Tue, 3 Jun 2025 08:30:25 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Sabrina Dubroca <sd@queasysnail.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Oleksandr Natalenko <oleksandr@natalenko.name>
+Subject: Re: [PATCH net 1/5] ovpn: properly deconfigure UDP-tunnel
+Message-ID: <aD6WgTvaCU3w8zRr@mev-dev.igk.intel.com>
+References: <20250530101254.24044-1-antonio@openvpn.net>
+ <20250530101254.24044-2-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1748922042-32491-1-git-send-email-vmalla@linux.microsoft.com>
-In-Reply-To: <1748922042-32491-1-git-send-email-vmalla@linux.microsoft.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Jun 2025 23:25:11 -0700
-X-Gm-Features: AX0GCFsHCbKNO1rU3NqhVg3qbMccKW6KbAG1rzvbpGFa_zWl8K3FbdyKgHjeeaQ
-Message-ID: <CANn89iJW7oSi3NzAyJpTVD1==1Ms0OOerLtif75=jnYF1rcNXg@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next] Parse FQ band weights correctly
-To: vmalla@linux.microsoft.com
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org, 
-	vmalla@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250530101254.24044-2-antonio@openvpn.net>
 
-On Mon, Jun 2, 2025 at 8:41=E2=80=AFPM <vmalla@linux.microsoft.com> wrote:
->
-> From: Hemanth Malla <vmalla@microsoft.com>
->
-> Currently, NEXT_ARG() is called twice resulting in the first
-> weight being skipped. This results in the following errors:
->
-> $ sudo tc qdisc replace dev enP64183s1 root fq weights 589824 196608 6553=
-6
-> Not enough elements in weights
->
-> $ sudo tc qdisc replace dev enP64183s1 root fq weights 589824 196608 6553=
-6 nopacing
-> Illegal "weights" element, positive number expected
->
-> Fixes: 567eb4e41045 ("tc: fq: add TCA_FQ_WEIGHTS handling")
-> Signed-off-by: Hemanth Malla <vmalla@microsoft.com>
+On Fri, May 30, 2025 at 12:12:50PM +0200, Antonio Quartulli wrote:
+> When deconfiguring a UDP-tunnel from a socket, we cannot
+> call setup_udp_tunnel_sock() with an empty config, because
+> this helper is expected to be invoked only during setup.
+> 
+> Get rid of the call to setup_udp_tunnel_sock() and just
+> revert what it did during socket initialization..
+> 
+> Note that the global udp_encap_needed_key and the GRO state
+> are left untouched: udp_destroy_socket() will eventually
+> take care of them.
+> 
+> Cc: Sabrina Dubroca <sd@queasysnail.net>
+> Cc: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Fixes: ab66abbc769b ("ovpn: implement basic RX path (UDP)")
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Closes: https://lore.kernel.org/netdev/1a47ce02-fd42-4761-8697-f3f315011cc6@redhat.com
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  drivers/net/ovpn/udp.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+> index aef8c0406ec9..89bb50f94ddb 100644
+> --- a/drivers/net/ovpn/udp.c
+> +++ b/drivers/net/ovpn/udp.c
+> @@ -442,8 +442,16 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock,
+>   */
+>  void ovpn_udp_socket_detach(struct ovpn_socket *ovpn_sock)
+>  {
+> -	struct udp_tunnel_sock_cfg cfg = { };
+> +	struct sock *sk = ovpn_sock->sock->sk;
+>  
+> -	setup_udp_tunnel_sock(sock_net(ovpn_sock->sock->sk), ovpn_sock->sock,
+> -			      &cfg);
+> +	/* Re-enable multicast loopback */
+> +	inet_set_bit(MC_LOOP, sk);
+> +	/* Disable CHECKSUM_UNNECESSARY to CHECKSUM_COMPLETE conversion */
+> +	inet_dec_convert_csum(sk);
+> +
+> +	udp_sk(sk)->encap_type = 0;
+> +	udp_sk(sk)->encap_rcv = NULL;
+> +	udp_sk(sk)->encap_destroy = NULL;
+> +
+> +	rcu_assign_sk_user_data(sk, NULL);
+>  }
+> -- 
+> 2.49.0
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+LGTM, thanks
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
