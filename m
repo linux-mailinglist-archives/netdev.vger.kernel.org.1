@@ -1,100 +1,87 @@
-Return-Path: <netdev+bounces-194797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36412ACC9D5
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D5A9ACCA20
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:27:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ECC33A7FF7
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:07:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 423393A2787
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E9923C4E5;
-	Tue,  3 Jun 2025 15:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0038022FE17;
+	Tue,  3 Jun 2025 15:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YbTk7AFu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jp+YEgEm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D594123BCF7;
-	Tue,  3 Jun 2025 15:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748963233; cv=none; b=h7YloyBZJ99KDTdSMvVWHehCCQtkrsLXB2VQ1lwhbX8ETPcNO97keHfmEV9e4W4IPOxP2ry2tsuRk1F8O1mRnRTZBEIlvRGyJkOuyx9um0GRChTqKct5UGryMPmORF0hyKTSYJ3lO53EsyhCHirRb3JajETsDhB/DZ93g+89XgM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748963233; c=relaxed/simple;
-	bh=8V2kmbUZiu9hSlXFWJGJ4smleoQNWTcBNXYPPBlHjmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JNm1UerunCfxN/9Fe2PeRI2meKn1gikJzTZB/FmYgZZEV8/SNHZ5tPQP0omML/DFZR1qyHFDzEPVPDGZtyrMmoENFb8ip2Vq5ceHGq0GF5ms5iQ6XWmpFpEqlxWrQrIjGSvEBIEo1KBJKgzG1J/oQ7mGXhkxofvyjtY5HvXMmGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YbTk7AFu; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-747fba9f962so951584b3a.0;
-        Tue, 03 Jun 2025 08:07:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748963229; x=1749568029; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rHRcx0Q2kd7s5w9xmY/qLmUUkyxdFzsoRB5ggIvT+6M=;
-        b=YbTk7AFu9Ekm9Aod/0bD39/25yQrjNj68yTj5shjJBHZee2LDeefp53mdyKrc04DT1
-         LUwEhkS054F2vXJY0zPyyiPGvKoAc8PQ7ubhRcTdWHnyAEEnul/ouLt2/cOmtLB3oSZq
-         VI8tQZDoTUqlP0MBjhL4tQoZXIkEM2MQRATBX7wfs81UlMylf3PAs2wcRJeYX16qZIhV
-         DGpy+kBhcOJu06+mcveYTSS/k8W7pUtKrVVa3McyCo0v7jGsKrNhyN6dJZ9SicqrVf8H
-         6jvcvs7gmd4QKZpvptxsX5PjT2AB+zEHQMuxbVi5tBk8SDFy40Zosx8tx3URVy3uz0Ik
-         L81A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748963229; x=1749568029;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rHRcx0Q2kd7s5w9xmY/qLmUUkyxdFzsoRB5ggIvT+6M=;
-        b=isi4MSGk0JHX7M+Aslx3t2I4eBkP2Imv7SpG/V2Omwh5i6jNoAeAGKCZiROPLjgOZy
-         F1CvDKGiqjg/knc8RC5Naof4VdceaV7UnHXpDlq6yaAGSkQ9pW/oENr1Y5uXpnX/MUwt
-         eyfgv7iWSY3jt93hNp+kh+pO41HP7RpsMLlQWKhLTglqHdZbQOyPjR/jJYbbOoqPiYE9
-         /qBX0/59kEnv09rrQzN4yzMsB8zXGJiwy0ursl9xJrrA2Vlz6BsEQnT9oImnLIT2eWri
-         eQyBT26eZ6nI3wx71dgp/Fg9yvunDuU1lPc3oDLOa1B4ql1dzfsX7IplLWxa8dYR0R2j
-         rUxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+LIeY78Y/3ALe9UodHe0gy5AZiVW1sOB/XQd3q4Fz5Y1OnpmOgsxZbxn5dhUBGZHFsmGVmr0jaTNTcnbg@vger.kernel.org, AJvYcCUEl/SkggVTTSGFtlyyGnrgLiFdB6xIbGuZGr2YfRhqwuhBH8/W7b9i0DI8c07Xi189dyI=@vger.kernel.org, AJvYcCUVUnlgmdAJneRoUcTK314lgNe7RDxrEUg3PEkV4i7LqA5/HC7BfdWJjfBa9aG9QeD7aLoF+g32@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7XBTiXBv4zz5GyBVAa0b3QnMrTg/5LCp6H+jubgIhd64JUozK
-	tnuZhZGjy7k+wFXuOj0hL/C4HPqLKqtcYFpN9LJS94LSSwBZUpltTwMhaCLjSg==
-X-Gm-Gg: ASbGncvXo/7RXftK2Q+vNEPJrsZYfZkahLIZJ71bhSTkSQMBLR0Yps+kbGHQKQWC4On
-	Ry0PYyzxwcPgD1j6DL3E6kjddnfPgmoGM9gUCwY4RQvWsVI0baNmqzfDQL5PlyN60RsjRIObVlp
-	bPpM6czUE3jyxEyyAlxRwf1cRj+bvyHnn1EIqYJo+tTGc3UIkYb6qlt5hdhjvUqBkq4rmZMHWj0
-	Pf6bM/Z10uq1qh5AxxpISDOyGGlT4/F4rT4Vt7kFngAa2Y/t7gIq70TT2EnuDHGGFKWE78EShDD
-	qGA+cT+LGVIofN9naxjJB6w1NeXdQKAHAxzTuP5iF93zT5iG9htyHx1mjyE8imTa0anQeB41A1R
-	rTw==
-X-Google-Smtp-Source: AGHT+IF0pZpF9yVqhFdo6KrG71N2ZNsh9D4aeXFDJnmId/+aHoYpiDUuxam3stwW5F7pvrA6H0vAzA==
-X-Received: by 2002:a05:6a00:194a:b0:746:2ae9:fc49 with SMTP id d2e1a72fcca58-747fe29e165mr3581505b3a.9.1748963229373;
-        Tue, 03 Jun 2025 08:07:09 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:c672:ef11:a97b:5717])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-747afeab0d0sm9461782b3a.44.2025.06.03.08.07.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jun 2025 08:07:08 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] virtio-net: drop the multi-buffer XDP packet in zerocopy
-Date: Tue,  3 Jun 2025 22:06:13 +0700
-Message-ID: <20250603150613.83802-1-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754C370838;
+	Tue,  3 Jun 2025 15:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748964454; cv=fail; b=c0266uu2phoAH/7H8A3zApwZ73S5JGF3dl/Ln2kEcz6t06naC1ZKKZfXn15mnwvL0+zGALbNJSYAOxN+VQOX5tQr2jk9MbXFW0ELIFeFpxRYkQiTCvX5SNRNOov1J8g4cKuANIRihVXXZeRr/ctpRELoj3j7XCcWN4vN8ObOXcU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748964454; c=relaxed/simple;
+	bh=DQsLwjhjyVnNcEhhIC9CZt8RhSPiqOqKivaLqLMh2KE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u28Ah+M4fwaeelDR3q/f0Cb1dEeqZKFIE7i0amzuU8IYFGnHvYsFu9j6KRJQurmpn9u9HkslS9WO+TylcO1DBIpR6aZ8des2/gCD0s8kpYiOVXv+gftSsS7rkrDwgvG8eL6HSgAqPxc2Kn40hsmznbZikjCsF1OdIXm1JMij2G8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jp+YEgEm; arc=fail smtp.client-ip=40.107.243.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=i0BES23Ge40A6gdbBXxNQJuYolmANL+6DoIxlpxJjMgd3NIcIKfpb5AgJRmImUxbHQ5sdjLeCxB52zJJ7yD170OiO6/WSlZDwllAu481DqPGWTyDv2VoKzzxuIaGzstLVMi46WK9lt7D49PkJcbIwPwFEmcxIhGrT58yE0zuiqoStzdzQUVwuddhx8LCOCg8oKAbse60td1JfMgYWKgC5HSscdcwtxaIwzO/pm/en2ysfArGEiKn9xqEcNG7xXZmre2Z6eHtqu0hLNzznOfPTd5xXz4UB6lKid5aej7FuRjOF81ptqCamndW1Yma2FtYdC7jPd9+EnVDKPoBH1zWvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KgDGYzQtRO2ytvgfkrBGdqDnT1v6cE/YiTvVrlhuauk=;
+ b=I0DTwNeCwOCTaUXR6+3iQ4DyYVu+7r8SrAyIdeaAxMRyHdanI+XxD7WlS6KGtVw9VEZyC4kLmTL4CKRkCtomjFk54Zl4xq380+ScY6jbAXqto/B+vefPo7E5q+Sn7w8EFa482Mh+Sn095tjlDCCIQ2ZY5QcGlNV2tNxfK3QTai0KBXJ3jDoGgF5nl37q5BBgV41Tmm3flcKYkMEJIJS1WDccuuRe15vn2MQljAUtPyFvJZ8mncHZXBDwhTe7mbVEOnno+83OY+BnOAJEWl7gkzwwG1AGNSiAc8KBKIJZSGh2CutSn0U7zWCzBn1mPSzI0JctJyeD1e7wJUD5E7zrwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KgDGYzQtRO2ytvgfkrBGdqDnT1v6cE/YiTvVrlhuauk=;
+ b=jp+YEgEmV+ky6PVDiMjqzpy/4PWU08N3oXLv/8+8HGCr7Bmj7Xes0jmPlTNtd/tUvVPgze7nenNcDFyCjkColcD9s2peKST5rVCfS/pMf+vW1ZyZLLhMiSgL4t9wO4u6k/ViERzHNLK05x0EVp6lAh1zcrqlar/bRCdxPgHWrFk=
+Received: from CH3P220CA0029.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:1e8::11)
+ by DS0PR12MB8245.namprd12.prod.outlook.com (2603:10b6:8:f2::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Tue, 3 Jun
+ 2025 15:27:29 +0000
+Received: from CH1PEPF0000A347.namprd04.prod.outlook.com
+ (2603:10b6:610:1e8:cafe::57) by CH3P220CA0029.outlook.office365.com
+ (2603:10b6:610:1e8::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.26 via Frontend Transport; Tue,
+ 3 Jun 2025 15:27:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CH1PEPF0000A347.mail.protection.outlook.com (10.167.244.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8792.29 via Frontend Transport; Tue, 3 Jun 2025 15:27:29 +0000
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 3 Jun
+ 2025 10:27:27 -0500
+Received: from xhdnrottela40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Tue, 3 Jun 2025 10:27:25 -0500
+From: Abin Joseph <abin.joseph@amd.com>
+To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: macb: Add shutdown operation support
+Date: Tue, 3 Jun 2025 20:57:24 +0530
+Message-ID: <20250603152724.3004759-1-abin.joseph@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,44 +89,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Received-SPF: None (SATLEXMB03.amd.com: abin.joseph@amd.com does not designate
+ permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A347:EE_|DS0PR12MB8245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f59cd4a-20e5-46a5-f32a-08dda2b32731
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?PMNCPnd+qM9/pnQUCL99SabFluUtKcOqmz+IBeAkcYfV7sjuY67DZKLIasK5?=
+ =?us-ascii?Q?4eBTj+l5poyi8x+A8Tju3Z5FGzJ/qi5HOtWbN7urQ+O4/SkvYcxzg4SuFkbr?=
+ =?us-ascii?Q?X8cTGv3qxI9g1JAPt14eRF1XDYSQ/eI+fZ2RW9nkqMrBl9BX4T06yRWhdYTS?=
+ =?us-ascii?Q?vt55T7sf/VpuZZqtXqCDVpurZuBHPK9ZI6MWXpvH9/HJyRGTwld6J8l55Smc?=
+ =?us-ascii?Q?Zy0423hYvx0si7HuMLwfqi9JDA/bSFzgodPC7h18ljB3ZPOugv+J+aeb+++2?=
+ =?us-ascii?Q?XZAlyTiM9/K4+BkG91LIOqkVkk5tHSR5tjJH5ZAO5MxcMzTy849vu9p5v48Z?=
+ =?us-ascii?Q?icIwoF4tkH57z7JE09IcmVFsumRwZUE/08jQ2xPTgMl9VP7EjlWj2fVAe/mY?=
+ =?us-ascii?Q?ibSrrk8yriUaqu9NgbNDxLGds8HP8QemYDQQYwYFZ6G6w5UGa2v0uAyVeoqU?=
+ =?us-ascii?Q?DDEhJFYwHM+vJgCtkE1XQMPgBphnLL0wer/auywOH/UyI8R5NgrbpW8mwKDW?=
+ =?us-ascii?Q?1A+kU+dX10UGGxcMyTKSVPsmYBaWiVtBKZ3WY5KCQuGuZUodDs/9tL2GwJv4?=
+ =?us-ascii?Q?1xbnc0ozNrbfmmPtZfB9Ndz5zv20MDDNr61eq5u2UY2fH+3LabKsxxFHsvcn?=
+ =?us-ascii?Q?BvycgfqLHaj9/KHCszFcqU8t2ngIyR4JHm9cZs1SR3QL+F2NM3s5dV5fnFTo?=
+ =?us-ascii?Q?6OJx7Q8lI2El9fesMwEG0E1akJl7ZVIoAf6+MAvBpl3gh7fl1ikyO4uhuhP4?=
+ =?us-ascii?Q?fW88ADEukE3GgG8Bz/xG26Ham3lS7as3sn1dZMO7KYhJav4FxwwtDiXnv37m?=
+ =?us-ascii?Q?78LVkZ7j/DuGZt4Epi/Vw12/skNFltiCegvB7WVNPCxzqg7AwKL+HAQcWB6o?=
+ =?us-ascii?Q?y9sZQ8nzc1ifIVuVW6k532uZGvMCPj5LMiM/HpG+qNU0MYllcN6p+Zj04E2f?=
+ =?us-ascii?Q?W8FmUqdYOfCgW0CM77U6Ri+vnkPaoB5KH0n0HSdpDKbav+r2FPP7X5bnTSiP?=
+ =?us-ascii?Q?5ubh3mnYs0jzEteX9ge/4gtLEv/X5xf7Gi35CkmMYDGbMe1Skg5JyQJ3+Q0h?=
+ =?us-ascii?Q?eKswCM4Z0vwBwvnbUC1783NXsFYa10aT6VJeMaV5b+/uv1ra1jnqP1P8IIx3?=
+ =?us-ascii?Q?ZYY9PZR0idNL6d9zDWwVMnNt1ag1Iwl/mVt4HlRu0bsWicf2oObGI36whWvV?=
+ =?us-ascii?Q?S3l/xu+PKibpQRzcWv+y6OqGU0Mk0VhZfOIYPClefyziBrOZ6ZdmihRG30KJ?=
+ =?us-ascii?Q?XpFZky6LScXkcsfHXOq3SxsNWxBGjmuRNY3yrQhJLS1TlrDOnta1aVqNw0Iz?=
+ =?us-ascii?Q?kEnP+BSRz774csjQa/NCVzZTAb8NDMrxzUXyv4J3tky8p4wLHvZRVCxGiw6w?=
+ =?us-ascii?Q?gsQDVQQTjUl/m2Jv/L9BDzZNwc5g/v2BbU3SnMcW/fOjNV0uWN26RxFAeZcz?=
+ =?us-ascii?Q?M8CR2ftkWAEQ6g/2ncPW3LHwJ43XYT/Qy2eIC7481LbR55k9rrawu6X7FEIh?=
+ =?us-ascii?Q?yOpHXfIEbVqsucHKNrdPfwjRdxrV8fioSk51?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 15:27:29.6365
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f59cd4a-20e5-46a5-f32a-08dda2b32731
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A347.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8245
 
-In virtio-net, we have not yet supported multi-buffer XDP packet in
-zerocopy mode when there is a binding XDP program. However, in that
-case, when receiving multi-buffer XDP packet, we skip the XDP program
-and return XDP_PASS. As a result, the packet is passed to normal network
-stack which is an incorrect behavior. This commit instead returns
-XDP_DROP in that case.
+Implement the shutdown hook to ensure clean and complete deactivation of
+MACB controller. Kexec utility calls the shutdown hooks and facilitates
+loading and booting of new kernel directly from the currently running
+kernel, thereby ensuring a seamless and efficient transition.
 
-Fixes: 99c861b44eb1 ("virtio_net: xsk: rx: support recv merge mode")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+Signed-off-by: Abin Joseph <abin.joseph@amd.com>
 ---
- drivers/net/virtio_net.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index e53ba600605a..4c35324d6e5b 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -1309,9 +1309,14 @@ static struct sk_buff *virtnet_receive_xsk_merge(struct net_device *dev, struct
- 	ret = XDP_PASS;
- 	rcu_read_lock();
- 	prog = rcu_dereference(rq->xdp_prog);
--	/* TODO: support multi buffer. */
--	if (prog && num_buf == 1)
--		ret = virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, stats);
-+	if (prog) {
-+		/* TODO: support multi buffer. */
-+		if (num_buf == 1)
-+			ret = virtnet_xdp_handler(prog, xdp, dev, xdp_xmit,
-+						  stats);
-+		else
-+			ret = XDP_DROP;
-+	}
- 	rcu_read_unlock();
+Reference:
+drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+
+---
+ drivers/net/ethernet/cadence/macb_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index e1e8bd2ec155..7ccfdb1155f3 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5650,6 +5650,14 @@ static int __maybe_unused macb_runtime_resume(struct device *dev)
+ 	return 0;
+ }
  
- 	switch (ret) {
++static void macb_shutdown(struct platform_device *pdev)
++{
++	struct net_device *netdev = dev_get_drvdata(&pdev->dev);
++
++	netif_device_detach(netdev);
++	dev_close(netdev);
++}
++
+ static const struct dev_pm_ops macb_pm_ops = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(macb_suspend, macb_resume)
+ 	SET_RUNTIME_PM_OPS(macb_runtime_suspend, macb_runtime_resume, NULL)
+@@ -5663,6 +5671,7 @@ static struct platform_driver macb_driver = {
+ 		.of_match_table	= of_match_ptr(macb_dt_ids),
+ 		.pm	= &macb_pm_ops,
+ 	},
++	.shutdown	= macb_shutdown,
+ };
+ 
+ module_platform_driver(macb_driver);
 -- 
-2.43.0
+2.34.1
 
 
