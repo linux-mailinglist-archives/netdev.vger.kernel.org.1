@@ -1,125 +1,122 @@
-Return-Path: <netdev+bounces-194806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34765ACCBC3
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 19:11:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C582ACCBD8
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 19:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA1B316CFF2
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:11:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB7CD3A6E8B
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 17:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856E41DF27E;
-	Tue,  3 Jun 2025 17:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1562329D0D;
+	Tue,  3 Jun 2025 17:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y3D+vfsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658E31DE881;
-	Tue,  3 Jun 2025 17:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7475F1DFF8
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 17:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748970674; cv=none; b=D7FXaIb1/kXKvpNdKR2G8mlq1fhTXTd9RnY6uAKSSaMUWn/HQNFxC8A5pXEPa+J7PX6ggqB4KctoHGtVmch1RKBlZJdQYH5mc6HAW7459l9HaCYuDAlBqKL6ZNVjjfwU08yeyxad/zDVZ5ZzD/zw0S0HKqIFmUEvukRzmaSBI1M=
+	t=1748971039; cv=none; b=kXMAaZqIC37kRY4iEOkPGiw0XODzf9agEbDfb3b0G0TQyzKnmvphdumNglcwZSg5a2et+/mQhilrjPvWJDEEnHRI7xO4/UvJk3rUxLY9EG8nxf31O8NAF4YqS343p24FVoKsDbuc0BxWp33c3YlnYc2RB5gh3f1SIb3oC2xdgh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748970674; c=relaxed/simple;
-	bh=lqbYtMtbV3zVzsS0m8EoAwgPYRF7eEhKzLoHcu/5wbQ=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type; b=ldAuEzB+vKwm5y7MRxl3te1pnqp24CvsXXJsROyCASqTJwCRqC0xI/uCUl2by2LIG7eIlhcObCPkXuJIjL8HFAkwmpbtxcuVZh6rmXflc9u1L8/27DWSmN7p6y1EQlMi5ngj85Um48aWJAHBxS3+NpVebxVEfhGAam5HUOtoNTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA078C4CEF4;
-	Tue,  3 Jun 2025 17:11:13 +0000 (UTC)
-Received: from rostedt by gandalf with local (Exim 4.98.2)
-	(envelope-from <rostedt@goodmis.org>)
-	id 1uMVBc-0000000E40Y-3psS;
-	Tue, 03 Jun 2025 13:12:28 -0400
-Message-ID: <20250603171228.762591654@goodmis.org>
-User-Agent: quilt/0.68
-Date: Tue, 03 Jun 2025 13:11:52 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: linux-kernel@vger.kernel.org
-Cc: Masami Hiramatsu <mhiramat@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- netdev <netdev@vger.kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>
-Subject: [for-linus][PATCH 3/5] xdp: Remove unused mem_return_failed event
-References: <20250603171149.582996770@goodmis.org>
+	s=arc-20240116; t=1748971039; c=relaxed/simple;
+	bh=m0u6Aj5tYP2fToGPmsXT2Di1G2k2a7kSuIecM/VyJDU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XAC8i6HKhsb88B8fUaqEO0hEtVp2mNzhXkO3v5YO4k0n5fpq868HxE1D/DpEodfaMCa9YVbNjHjwIBl4X5mDrXVmCJK0HAJ2gkHLYfCxkZ72gUHYiv85TtFAtuZAKhK0MAzVfgsmHYHozdv4DaSuPo60rdUTMpDbf57YfLccf68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y3D+vfsF; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748971038; x=1780507038;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m0u6Aj5tYP2fToGPmsXT2Di1G2k2a7kSuIecM/VyJDU=;
+  b=Y3D+vfsFK06ExHAvRMHL1Jk2WJ7FRUAfn3V4UD1fI262MYoTsPxfwE8Q
+   /V3lGtXlrarC7srvvzXsToW7jchzASi6L0/VXeJIPFTizs3q7aO30TE4F
+   DkB80KH/r+52PHwZwgnVeV5nYXZ8nkULK45N/PWa0CnL36pUooCMzDQwm
+   /KnH3Y6MXEN++gxP0FTkP88dgrhAmlavXK1jbcTHjcnBmdB4wMqyZ31u/
+   G2DuVuSg6Y9oxH9mW684FRRnK9Tp3xyH6g3fNFFAuLLyK1qYJMfvYpopO
+   0CfDWJjiXWFhnewUGPlUDiyQgATCIUOefAx3LOA08sltMNxeDDu0Yp5NM
+   A==;
+X-CSE-ConnectionGUID: ly0lpJfqSOeBml0/FjeznA==
+X-CSE-MsgGUID: VhkUhVxpTzOKOOCtb2UC0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="73556755"
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="73556755"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 10:17:17 -0700
+X-CSE-ConnectionGUID: M227iS37TfOM1Hxr8pi86Q==
+X-CSE-MsgGUID: VmHxd3/ITHe9dy3GA19vbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="145546402"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa007.jf.intel.com with ESMTP; 03 Jun 2025 10:17:17 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	przemyslaw.kitszel@intel.com,
+	sdf@fomichev.me
+Subject: [PATCH net 0/6][pull request] iavf: get rid of the crit lock
+Date: Tue,  3 Jun 2025 10:17:01 -0700
+Message-ID: <20250603171710.2336151-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Steven Rostedt <rostedt@goodmis.org>
+Przemek Kitszel says:
 
-The change to allow page_pool to handle its own page destruction instead
-of relying on XDP removed the trace_mem_return_failed() tracepoint caller,
-but did not remove the mem_return_failed trace event. As trace events take
-up memory when they are created regardless of if they are used or not,
-having this unused event around wastes around 5K of memory.
+Fix some deadlocks in iavf, and make it less error prone for the future.
 
-Remove the unused event.
+Patch 1 is simple and independent from the rest.
+Patches 2, 3, 4 are strictly a refactor, but it enables the last patch
+	to be much smaller.
+	(Technically Jake given his RB tags not knowing I will send it to -net).
+Patch 5 just adds annotations, this also helps prove last patch to be correct.
+Patch 6 removes the crit lock, with its unusual try_lock()s.
 
-Link: https://lore.kernel.org/all/20250529130138.544ffec4@gandalf.local.home/
+I have more refactoring for scheduling done for -next, to be sent soon.
 
-Cc: netdev <netdev@vger.kernel.org>
-Cc: Jonathan Lemon <jonathan.lemon@gmail.com>
-Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Link: https://lore.kernel.org/20250529160550.1f888b15@gandalf.local.home
-Fixes: c3f812cea0d7 ("page_pool: do not release pool until inflight == 0.")
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+There is a simple test:
+ add VF; decrease number of queueus; remove VF
+that was way too hard to pass without this series :)
 ---
- include/trace/events/xdp.h | 26 --------------------------
- 1 file changed, 26 deletions(-)
+IWL: https://lore.kernel.org/intel-wired-lan/20250404102321.25846-1-przemyslaw.kitszel@intel.com/
 
-diff --git a/include/trace/events/xdp.h b/include/trace/events/xdp.h
-index a7e5452b5d21..d3ef86c97ae3 100644
---- a/include/trace/events/xdp.h
-+++ b/include/trace/events/xdp.h
-@@ -379,32 +379,6 @@ TRACE_EVENT(mem_connect,
- 	)
- );
- 
--TRACE_EVENT(mem_return_failed,
--
--	TP_PROTO(const struct xdp_mem_info *mem,
--		 const struct page *page),
--
--	TP_ARGS(mem, page),
--
--	TP_STRUCT__entry(
--		__field(const struct page *,	page)
--		__field(u32,		mem_id)
--		__field(u32,		mem_type)
--	),
--
--	TP_fast_assign(
--		__entry->page		= page;
--		__entry->mem_id		= mem->id;
--		__entry->mem_type	= mem->type;
--	),
--
--	TP_printk("mem_id=%d mem_type=%s page=%p",
--		  __entry->mem_id,
--		  __print_symbolic(__entry->mem_type, __MEM_TYPE_SYM_TAB),
--		  __entry->page
--	)
--);
--
- TRACE_EVENT(bpf_xdp_link_attach_failed,
- 
- 	TP_PROTO(const char *msg),
+The following are changes since commit b56bbaf8c9ffe02468f6ba8757668e95dda7e62c:
+  Merge branch 'net-airoha-fix-ipv6-hw-acceleration'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 40GbE
+
+Przemek Kitszel (6):
+  iavf: iavf_suspend(): take RTNL before netdev_lock()
+  iavf: centralize watchdog requeueing itself
+  iavf: simplify watchdog_task in terms of adminq task scheduling
+  iavf: extract iavf_watchdog_step() out of iavf_watchdog_task()
+  iavf: sprinkle netdev_assert_locked() annotations
+  iavf: get rid of the crit lock
+
+ drivers/net/ethernet/intel/iavf/iavf.h        |   1 -
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |  29 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 289 ++++++------------
+ 3 files changed, 96 insertions(+), 223 deletions(-)
+
 -- 
-2.47.2
-
+2.47.1
 
 
