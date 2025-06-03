@@ -1,124 +1,137 @@
-Return-Path: <netdev+bounces-194725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A793AACC22D
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:30:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F5AACC244
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1218A188652E
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:30:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC351664EF
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1957280338;
-	Tue,  3 Jun 2025 08:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50024268FDE;
+	Tue,  3 Jun 2025 08:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMtejok4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KSlLLa/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F27F2690EB
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 08:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E547918FC92;
+	Tue,  3 Jun 2025 08:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748939412; cv=none; b=mljr63glhctI+m4zFPU/9lvAIcpIgZO1bOxNXEpNGSvoAyuu1YNKs3amgx7u6CL22r7y9BCIVuWnBrhhtBbEdgXhWZnKEvvz6mB1Q/Kyd1X5uP1t+LFIylDIcDJReCnBDy62/x5ResNR99pZYIWd83NRZ/S9ylkaofoyOYvqjSs=
+	t=1748939751; cv=none; b=I+Nt1Mcx2DJXgiUUNlXZn+NpwvEMUiTofS6NoPJAhX8rcYlAP4t8XQUCQC7k3p9CLA5Nb7iJmSajRjjDdCF0ETDwLak5AqPdMezGnnfsuLX7fIRleKSqZz+qK8cJXC2nfSk2Kf+g4ISwkFqYu5mkW0eWFye/MXNKy0QdTCHZY7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748939412; c=relaxed/simple;
-	bh=NM5hKygr43dOmoJrxhszf653v1W3nDujh9/gFHnRQ+k=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=PQ4yOGqJR6HOAO8qhMNPJzSV6SDKWzn+rZEGnZ8jyZHU/nWDZaz6zzBHd429ZwVR+SvMMwcMI6ndbUXoVLBWAwQ07qGBx63nd1f80RDd8OKqpf3JPDsHWQiiUXcN/ixWBgn1PmGGMqNax0GL9dy8jLdZQgwGUffywOKV64Jvhss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UMtejok4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748939409;
+	s=arc-20240116; t=1748939751; c=relaxed/simple;
+	bh=iodA1TKQ/rp5dkp3P8YFyYWk1y8wZhPZffAodSc5e70=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PCy2UTUtSn533Us7E0ck3yDf65cRq/kbxfSY3/Z+AcjL3IuF5r/Z8FNaNKPAZ+nxjn6/xpz0ZZYY4P/bw9IWtySGA2FIfeiGf/mzeN7nSPgESeofROEpPsL2+/BPoOiPPOoMnkENGB5vDuN6+6GZjPeQH1t7SrmLJ2pSUJ9ouNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KSlLLa/z; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5F022431D5;
+	Tue,  3 Jun 2025 08:35:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1748939747;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KOjnN0Czy7oxBE7Ou95cHabmenVyP6K+fc9YtVb6CZI=;
-	b=UMtejok4wDllj+ZLPHdCuIqFqYzDODoP/iCGd1xpq++OjXSlQNs4TDEGCiPPr41GP2gWHi
-	ostkqhzW3G+oLN8ifTu9oUiFb/0VfqTR9/ERSdjdTi1YvtO6v7xVR0e6Df/06jHrsJRSo8
-	+fkw/c3jEQ6RgXp9GxRUd54+gxiKBgA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-p8fJY7Y_NgCiYe_Xu57rrg-1; Tue, 03 Jun 2025 04:30:08 -0400
-X-MC-Unique: p8fJY7Y_NgCiYe_Xu57rrg-1
-X-Mimecast-MFC-AGG-ID: p8fJY7Y_NgCiYe_Xu57rrg_1748939407
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-451ebd3cfa1so853065e9.0
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 01:30:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748939407; x=1749544207;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KOjnN0Czy7oxBE7Ou95cHabmenVyP6K+fc9YtVb6CZI=;
-        b=rdX/yLwLROa7QPYH/znDOFIhMsPIj8EJ/q9Q2JZZd4dFxI6tviHaGNQ6wsDLXWH+D8
-         VaUy9KffVafIyqP4WIUP17rgtVPRJCxlbeZHNXf87zqwmhctCqcuytdbnmjQMY7Htf5J
-         +Vprl8NDN0gUwby0fm+Y/6oFxnIHzyq26Nk6iQ7boLY1gD8w3gI4fRe/tTTOv7PImpc3
-         J3Q/EtwNSLfHxa2Nj775sqbWLoPd4iq6Tl5AfOnPXctoC2iDAmjLrgHQ0VB8l9/CBMqH
-         D7lh5cDHppf+RXr6Zf91I0UMHFCoUw14whjpn3UfrnG7bMLC+oQkvP1PRn9vdUdOT3M8
-         dSmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBVcWzzrAMbMsvx6XMTYjue/wtuMWGODKeoAjWD3L4ogw5sb3PMFe2LO12O7xEGTxZ8K1BcQQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqveGiovoEgpVSewojuuxkKz0resVzayrcXIk+LQJrDL/0WYxl
-	b//BLMyxI49D6PZI43KdBWDzmrfABFv8uYhFr1F0lWxMmrElvbmonv8g/3f46lmQ1lHsq9Iem0Q
-	erZjRiLNNghCYjHohgrhE29DbOy0fXTHED5qtIxFRMsmQ7nx1GiomEUTEJg==
-X-Gm-Gg: ASbGncvy1lnGbkVJUEfqDrtdg72/b4s8DkLFQnMK0UIYXcBY8oeGesqOEpZ+RGz7wr6
-	CSludAY+gN3QcwgS9nB7zVAVRPTTerHcydebi+MWll4GCM4//pDsi5paS9UZ217M6k5Ff0p6arX
-	zCH7MJawVfPDrIKDn7Tw3mZ+jeHrWri/EjlXsmkzP9O4br2pGDT/p6L/NklOyZdTGhd7yIhHxpS
-	o2CBCvzMx/054wUQlQCfWShWWpfg+8tt7GIftJO0Ld141tAlFiNCvxEKUqOwnLjoIdk0sWirY4E
-	2TCXQ1r8kQIpCab6fwADa1t5RFN/fBsbVFG96ul+sdRQ4htQzqDmadDx
-X-Received: by 2002:a05:6000:26d0:b0:3a4:e6c6:b8b1 with SMTP id ffacd0b85a97d-3a4f7a1bfa4mr12863007f8f.17.1748939406954;
-        Tue, 03 Jun 2025 01:30:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHqRrkNmOHAbZ39YcMMKj0jouOrajOti1ECJWOYzhZkJ3X24YCAG3yGNJkMcvDoId8mlKAeFw==
-X-Received: by 2002:a05:6000:26d0:b0:3a4:e6c6:b8b1 with SMTP id ffacd0b85a97d-3a4f7a1bfa4mr12862983f8f.17.1748939406555;
-        Tue, 03 Jun 2025 01:30:06 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7f1afebsm152655835e9.0.2025.06.03.01.30.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 01:30:06 -0700 (PDT)
-Message-ID: <1d85ad0b-8f3f-4ab1-810f-0b5357f561ab@redhat.com>
-Date: Tue, 3 Jun 2025 10:30:05 +0200
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1srqlJJ+HV0tLpY/tiu7cWFoNzbjcxmBJOZW2g3nTFE=;
+	b=KSlLLa/zTBpglEQ4+WRGl8m6hWvFQckutVPUKKherQtDW9EawdRjGZ4pGH+Im8l596QO5z
+	zijbQoXjO+NH90VDrtmzNx+N6k0jw5mjJDITnJ3TKhOIpP9Sz0d3g1Uk1JBhY1cYspE3Ar
+	fJYI4oywX9qyu+eqejFtmtpPXcPG1MsRVrTB9dg6M9mG7w9+GBXT+gUlyoCdO9IvSWlu/c
+	EWqhqKNFJZ7SFPUGoTNfXlwUsoW0kMdJc9u2pCh5/i+icwDKYsVLZNRsNbLahWufB04iZX
+	7UXcGLjJNCBjamL470mhrmQl6wEIrT89lTiL2G9LSfDCaWIO3F9p4+w1P+pOJw==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jijie Shao <shaojijie@huawei.com>
+Subject: [PATCH net] net: phy: phy_caps: Don't skip better duplex macth on non-exact match
+Date: Tue,  3 Jun 2025 10:35:40 +0200
+Message-ID: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/1] wireguard updates for 6.16, part 2, late
-From: Paolo Abeni <pabeni@redhat.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
- kuba@kernel.org
-References: <20250530030458.2460439-1-Jason@zx2c4.com>
- <c2025b81-7fbe-46bc-9a20-f9a61b3e22f7@redhat.com>
-Content-Language: en-US
-In-Reply-To: <c2025b81-7fbe-46bc-9a20-f9a61b3e22f7@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdegtddtjeculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfelieehgfffiefftdffiedvheefteehkedukefgteffteevffeuueejiedtveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvuddvrddutdehrdduhedtrddvhedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdduvddruddthedrudehtddrvdehvddphhgvlhhopehfvgguohhrrgdrrddpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepp
+ hgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 6/3/25 10:25 AM, Paolo Abeni wrote:
-> On 5/30/25 5:04 AM, Jason A. Donenfeld wrote:
->> This one patch missed the cut off of the series I sent last week for
->> net-next. It's a oneliner, almost trivial, and I suppose it could be a
->> "net" patch, but we're still in the merge window. I was hoping that if
->> you're planning on doing a net-next part 2 pull, you might include this.
->> If not, I'll send it later in 6.16 as a "net" patch.
-> 
-> We usually (always AFAIR) send a single PR for net-next, mostly because
-> there is no additional material due to net-next being closed in the
-> merge window.
-> 
-> Anyhow I can apply directly this patch to the net tree and it will be
-> included in this week net PR.
+When performing a non-exact phy_caps lookup, we are looking for a
+supported mode that matches as closely as possible the passed speed/duplex.
 
-I'm sorry, I rushed my reply a bit. Could you please provide a suitable
-Fixes: tag for this patch?
+Blamed patch broke that logic by returning a match too early in case
+the caller asks for half-duplex, as a full-duplex linkmode may match
+first, and returned as a non-exact match without even trying to mach on
+half-duplex modes.
 
-Thanks,
+Reported-by: Jijie Shao <shaojijie@huawei.com>
+Closes: https://lore.kernel.org/netdev/20250603102500.4ec743cf@fedora/T/#m22ed60ca635c67dc7d9cbb47e8995b2beb5c1576
+Fixes: fc81e257d19f ("net: phy: phy_caps: Allow looking-up link caps based on speed and duplex")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/phy/phy_caps.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-Paolo
+diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+index 703321689726..d80f6a37edf1 100644
+--- a/drivers/net/phy/phy_caps.c
++++ b/drivers/net/phy/phy_caps.c
+@@ -195,7 +195,7 @@ const struct link_capabilities *
+ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+ 		bool exact)
+ {
+-	const struct link_capabilities *lcap, *last = NULL;
++	const struct link_capabilities *lcap, *match = NULL, *last = NULL;
+ 
+ 	for_each_link_caps_desc_speed(lcap) {
+ 		if (linkmode_intersects(lcap->linkmodes, supported)) {
+@@ -204,16 +204,19 @@ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+ 			if (lcap->speed == speed && lcap->duplex == duplex) {
+ 				return lcap;
+ 			} else if (!exact) {
+-				if (lcap->speed <= speed)
+-					return lcap;
++				if (!match && lcap->speed <= speed)
++					match = lcap;
++
++				if (lcap->speed < speed)
++					break;
+ 			}
+ 		}
+ 	}
+ 
+-	if (!exact)
+-		return last;
++	if (!match && !exact)
++		match = last;
+ 
+-	return NULL;
++	return match;
+ }
+ EXPORT_SYMBOL_GPL(phy_caps_lookup);
+ 
+-- 
+2.49.0
 
 
