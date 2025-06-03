@@ -1,280 +1,234 @@
-Return-Path: <netdev+bounces-194783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E67ACC57B
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:30:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFA7ACC5B5
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7B01728D4
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7521F1891D69
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23113236A79;
-	Tue,  3 Jun 2025 11:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF20B229B12;
+	Tue,  3 Jun 2025 11:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eWGvXW7R"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="WMXUD97F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE7F23817A;
-	Tue,  3 Jun 2025 11:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA4018C91F
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 11:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748950066; cv=none; b=Dft/iKkiz2hYv6XaFra1620Ach2Ws3ZTiY95H2/OrX1/ZnjotJOOYLxVeWa6kbPsgo6syRYNhdXMnGGAF9ERrx/o0w3kyAZe/4Vg3KF2XCxHW3eVDlXuV/FTsAAFM1DEHHFV1kpXsK1nHrhTROg5Ory85GJz7xONfhe66upSBAI=
+	t=1748951171; cv=none; b=mEMOFmcfvxPAy1PCvBdagk61hJGoPqALb9hT6w5hiQnGpMhR/nvFryqw4F+IKHlkEg2HqtTvZS4pEoLbyatbyOYR1fy2ljpk8vO/Np7iSGUGJwpCX+pUf6/01GbmtGtVIrb0KChRw2WzYdUEbpCGTzpg9VCsg8/gmkZqP7t/vTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748950066; c=relaxed/simple;
-	bh=f5ciAUv1UREHj4iW3L7CjNpj/HfjYcnH7MCQgUPOcfs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KqtBvDOHd1XvMhatnOk7Tp4+iPwxm5Y8AsGq/eZE/lM1682jacNhzuy11dvKdshdWqUTZfj31qCmwajkgXDyiRTllRp6UUo1gCv/cZBnAGiFVz3iBfu5MmVQvvvSk7vz1RxQWoS6svfUXRjP+M6Y3qhT99C79RC6A4XdklNdFH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eWGvXW7R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F7F0C4CEF0;
-	Tue,  3 Jun 2025 11:27:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748950064;
-	bh=f5ciAUv1UREHj4iW3L7CjNpj/HfjYcnH7MCQgUPOcfs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eWGvXW7RDB9AuSwAcvUEdmAndtawToGO2+6jOb4wJeLRo6EuHUe65B5ZVkB+bpnq/
-	 2ZhYe8y1TmuJ8bAkhdJ1hxsNVyYRPA/SGz6DfqnfkXyG/Vnv3xSfDxwuWOsxX+sx42
-	 AX6woPT6UUa0TuZ5ytbpDUDgchEdtIuomLa4S5Kv/FGa7BeOAQrtlnRAGnXoMmHa9B
-	 wu+UPANIu2/bYeCSXqDc68A9gNodusX9Qg5E9C7yFRIKA6gz88icNs7nT4hQ1el0T9
-	 0AX8gBkbzLXSoTKrauGtslh+itfLPLNU/71oSkUFjNTBTYyj+JmZU5roTse4TIax4j
-	 jZdvTL3/uxdug==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Tue, 03 Jun 2025 07:27:20 -0400
-Subject: [PATCH v13 9/9] ref_tracker: eliminate the ref_tracker_dir name
- field
+	s=arc-20240116; t=1748951171; c=relaxed/simple;
+	bh=+ihgwVU+b9zMeEjPYVHveKrm9EftFoF33eyNXadvTxg=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=iCCjaVG+3nd/IAygooph3JrqCcnsO6nH4kjtlbOgnee88w0eqVmJUwuoOWiQsQNPA/drCWnE1GqtGDU6bbqfuwFJ7IoABtVuw/9xaFNT6Rz4xqG6u4WEOkL1Oq51ftAFXU/7IzkF9GDwD3J6ecuuMzLzYxuZLli3tkcuseW/HkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=WMXUD97F; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c597760323so531172685a.3
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 04:46:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1748951168; x=1749555968; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jng2POVZ39+DaVS2ZyIRj7+65RC9AU7gBQf6GvIlGHM=;
+        b=WMXUD97FxJTpnd8ZEmeKD9AXNFuzkO4QQFiv153+yqvyHNDKJU+ji+cLcg7ylsfQDd
+         9somrtdmWTMugViAbJkUZEUi+EcvOr2XpwYBaN59S1cbZxTfJnUucIyNmSEHjqyhgl2j
+         YXfuiD5kVlJKCucs4oBjnyfPXHKsJRhtA2OtUGT1f2acFl+05gd+D2D2HX5/E3skJ7ug
+         OiHUpsPqWcVfPcJadJkVK9cROxN2T88tOkILm0WPm3R9LEQZhR9APgXxhvdltsigVYeA
+         75GHILu8rXWnj8tvUawr51hg+Hy7yC0v11stDoj02TAucoyTQsTC4f5yebGS8vVZ+vVW
+         ukLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748951168; x=1749555968;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jng2POVZ39+DaVS2ZyIRj7+65RC9AU7gBQf6GvIlGHM=;
+        b=aUHpmiQbOWwgOF0mvS6+QKK0uA2/WO6IafHG0l8LnYmnlRzP5zDf30/y3WU5CvQ7IR
+         LBQWq1IfBVCTNmNEiWdWLfwGoXe4EvlRLAFmHSxBlel09txPOh9lzjaZxtv3r00uSpRK
+         fVCXe5XMiNG37sx8x6fjNQEXTTkUcdW8I6bwVoG8MIi9Bk/L/I45ULVynPtc09DKVYZ0
+         p3TydSx/urqJDszqvDJmd5yxjvtGd+A4f//n1cmqRUJmy0dM0vJ9G/Dx5RocdxqYjaqX
+         k5kbm+LMu1v6nFqhO0jWD25tTr36QrnF9So1B0YEpMxKmXd+wnJgvjzgAC8FDIfgx8mq
+         wV3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXuFhROYTHlBue7+cLqIAm5VlaeilRgTuWx0drpDwu+wJNpKaaD5B46YKASBXmzpSfOKmj4dEQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcfPTCegUkO6euKnKqaB7M70aIRbeu0t4drHDE9gPCGAISxMXO
+	LRFzLKDw0rxqEoPli47eMYY5fpkX1nW2ZjPUqW4qyWcYr6/a6mXREn+n1Qb+9QiJHw==
+X-Gm-Gg: ASbGncsjemzcEofv8TEq00R8kzQ72Xw51gE7xSE6gym4KcX5H2FUCtD6YHeTIa0GeaV
+	0VzTKwVUjYDi0BqNF0NzdGvvcgrfjo1nG2o1uzyPyASREVGE6G/So4c547nxyotUCi90QjWGxMx
+	biMXwopbs9/16SKqt6LVMr3sXTHs66+uuYIEr4jlDnCfdDXLFHa2+1liR6hms/RdlM0bYbfwDIf
+	kWl374wM6cEzrQiRg2i5El09WqQ9tLuKimJJGv1S8GJcYepp23pVMPrSPl5Dtq/5iD9Pbwa/yIp
+	Of07f47bpUajEHGtnxncnVB8jCAddOoQ2OjqBxuwmBOqv98uvlZnCJcr8wydYi+1m4UENBkY99E
+	2zUnW5BNeNqraHny42jRn2ldcrg==
+X-Google-Smtp-Source: AGHT+IHfT4l4UtcdZkWlD3Rmc5LKTQiF8iCdEHtEzyO8iotaUAm8tganF15gnja1setcHoPxtFaQFA==
+X-Received: by 2002:a05:620a:44d0:b0:7ce:d352:668f with SMTP id af79cd13be357-7d0a202c5cfmr2697790285a.47.1748951168314;
+        Tue, 03 Jun 2025 04:46:08 -0700 (PDT)
+Received: from [192.168.7.16] (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d09a0f8b61sm829024085a.26.2025.06.03.04.46.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jun 2025 04:46:07 -0700 (PDT)
+From: Paul Moore <paul@paul-moore.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Huw Davies <huw@codeweavers.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-security-module@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>, John Cheung <john.cs.hey@gmail.com>
+Date: Tue, 03 Jun 2025 07:46:04 -0400
+Message-ID: <197359ce460.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+In-Reply-To: <CANn89iJKc==e5pzCVFN2SBzrmb6=U_5nDEia2LMn8s7wdP9zJg@mail.gmail.com>
+References: <20250522221858.91240-1-kuniyu@amazon.com>
+ <CAHC9VhTM14E7Mz_ToVEqpW0CQr0KEfpwZOnSzTSYdMxX55k4yQ@mail.gmail.com>
+ <CANn89iJKc==e5pzCVFN2SBzrmb6=U_5nDEia2LMn8s7wdP9zJg@mail.gmail.com>
+User-Agent: AquaMail/1.55.1 (build: 105501552)
+Subject: Re: [PATCH v1 net] calipso: Don't call calipso functions for AF_INET sk.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250603-reftrack-dbgfs-v13-9-7b2a425019d8@kernel.org>
-References: <20250603-reftrack-dbgfs-v13-0-7b2a425019d8@kernel.org>
-In-Reply-To: <20250603-reftrack-dbgfs-v13-0-7b2a425019d8@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Jani Nikula <jani.nikula@linux.intel.com>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Krzysztof Karas <krzysztof.karas@intel.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7441; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=f5ciAUv1UREHj4iW3L7CjNpj/HfjYcnH7MCQgUPOcfs=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoPtwbreEeCTyxFX4pdMR+K22EBoSEdbGexdMTe
- mcveIlOY7WJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaD7cGwAKCRAADmhBGVaC
- FTy5EAC+23pjzEaPjiJP0FBheuZUcxBMJ7qv7i8l3onoEpeB3TPqBv8hvVPKwvU+W3yp3dp8GOI
- aitKcyn6jzLfrFR04LTfzJ3K3jJnoqXJpiyEKuusYPC+uqXPzwtrzs7GpXp6GkzEd778S1imp4j
- bxRN9LVwiIK7CoGt6iq7ZN/lLRRLWkZTKy9M4NGMdKzdqFD1f5NGpRIuwjh1Y/iwaFbYT+UGclT
- 39y1brYHqOQ44da87NbMxUWJCI4ojotHJ0YkwPTXHwEvSW2Zo3O3Fl31gic9GrkRliw/qCwZDGZ
- Y+EGnk1StLti8rdkdp4m93VDUjEswnFO9RFgCOJ2Tng9CtFXNlKHO2Eld/giVEQ7QAz1divpS5r
- /NESOVhluCJ1CjgqAEqYKbMkDcf75fs9qVHWpDa507PoDDVD+HEWyJ7aOtT/FJlhK/GlLy/Bfhw
- FeSBRfFTapQCW2ZzPrEQw0iZtYtQhyC/WmqCk4PWAFWmeTmW5HAqXfbYoxeGLm9wLq/P2vt52h9
- C/CO0n+lEGbX96S4dUVTM2QkKZhve4XTUVusDniQ6Rc9ZQViAkb+kLprCoLvRbsjRbm+v9vgdzg
- hAmoE+cJpeIeNVHjHItERxoLaz0uzHX2ggjHav8tnOHM+97ljqEzAx/Sgfvcv4hH2x3u/7f7C35
- bFYyQdM32Tk90Mw==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Now that we have dentries and the ability to create meaningful symlinks
-to them, don't keep a name string in each tracker. Switch the output
-format to print "class@address", and drop the name field.
+On June 3, 2025 6:01:06 AM Eric Dumazet <edumazet@google.com> wrote:
+> On Thu, May 22, 2025 at 3:31 PM Paul Moore <paul@paul-moore.com> wrote:
+>>
+>> On Thu, May 22, 2025 at 6:19 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+>>>
+>>> syzkaller reported a null-ptr-deref in txopt_get(). [0]
+>>>
+>>> The offset 0x70 was of struct ipv6_txoptions in struct ipv6_pinfo,
+>>> so struct ipv6_pinfo was NULL there.
+>>>
+>>> However, this never happens for IPv6 sockets as inet_sk(sk)->pinet6
+>>> is always set in inet6_create(), meaning the socket was not IPv6 one.
+>>>
+>>> The root cause is missing validation in netlbl_conn_setattr().
+>>>
+>>> netlbl_conn_setattr() switches branches based on struct
+>>> sockaddr.sa_family, which is passed from userspace.  However,
+>>> netlbl_conn_setattr() does not check if the address family matches
+>>> the socket.
+>>>
+>>> The syzkaller must have called connect() for an IPv6 address on
+>>> an IPv4 socket.
+>>>
+>>> We have a proper validation in tcp_v[46]_connect(), but
+>>> security_socket_connect() is called in the earlier stage.
+>>>
+>>> Let's copy the validation to netlbl_conn_setattr().
+>>>
+>>> [0]:
+>>> Oops: general protection fault, probably for non-canonical address 
+>>> 0xdffffc000000000e: 0000 [#1] PREEMPT SMP KASAN NOPTI
+>>> KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+>>> CPU: 2 UID: 0 PID: 12928 Comm: syz.9.1677 Not tainted 6.12.0 #1
+>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+>>> RIP: 0010:txopt_get include/net/ipv6.h:390 [inline]
+>>> RIP: 0010:
+>>> Code: 02 00 00 49 8b ac 24 f8 02 00 00 e8 84 69 2a fd e8 ff 00 16 fd 48 8d 
+>>> 7d 70 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 
+>>> 85 53 02 00 00 48 8b 6d 70 48 85 ed 0f 84 ab 01 00
+>>> RSP: 0018:ffff88811b8afc48 EFLAGS: 00010212
+>>> RAX: dffffc0000000000 RBX: 1ffff11023715f8a RCX: ffffffff841ab00c
+>>> RDX: 000000000000000e RSI: ffffc90007d9e000 RDI: 0000000000000070
+>>> RBP: 0000000000000000 R08: ffffed1023715f9d R09: ffffed1023715f9e
+>>> R10: ffffed1023715f9d R11: 0000000000000003 R12: ffff888123075f00
+>>> R13: ffff88810245bd80 R14: ffff888113646780 R15: ffff888100578a80
+>>> FS:  00007f9019bd7640(0000) GS:ffff8882d2d00000(0000) knlGS:0000000000000000
+>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> CR2: 00007f901b927bac CR3: 0000000104788003 CR4: 0000000000770ef0
+>>> PKRU: 80000000
+>>> Call Trace:
+>>> <TASK>
+>>> calipso_sock_setattr+0x56/0x80 net/netlabel/netlabel_calipso.c:557
+>>> netlbl_conn_setattr+0x10c/0x280 net/netlabel/netlabel_kapi.c:1177
+>>> selinux_netlbl_socket_connect_helper+0xd3/0x1b0 security/selinux/netlabel.c:569
+>>> selinux_netlbl_socket_connect_locked security/selinux/netlabel.c:597 [inline]
+>>> selinux_netlbl_socket_connect+0xb6/0x100 security/selinux/netlabel.c:615
+>>> selinux_socket_connect+0x5f/0x80 security/selinux/hooks.c:4931
+>>> security_socket_connect+0x50/0xa0 security/security.c:4598
+>>> __sys_connect_file+0xa4/0x190 net/socket.c:2067
+>>> __sys_connect+0x12c/0x170 net/socket.c:2088
+>>> __do_sys_connect net/socket.c:2098 [inline]
+>>> __se_sys_connect net/socket.c:2095 [inline]
+>>> __x64_sys_connect+0x73/0xb0 net/socket.c:2095
+>>> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>>> do_syscall_64+0xaa/0x1b0 arch/x86/entry/common.c:83
+>>> entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>> RIP: 0033:0x7f901b61a12d
+>>> Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 
+>>> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff 
+>>> ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+>>> RSP: 002b:00007f9019bd6fa8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+>>> RAX: ffffffffffffffda RBX: 00007f901b925fa0 RCX: 00007f901b61a12d
+>>> RDX: 000000000000001c RSI: 0000200000000140 RDI: 0000000000000003
+>>> RBP: 00007f901b701505 R08: 0000000000000000 R09: 0000000000000000
+>>> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+>>> R13: 0000000000000000 R14: 00007f901b5b62a0 R15: 00007f9019bb7000
+>>> </TASK>
+>>> Modules linked in:
+>>>
+>>> Fixes: ceba1832b1b2 ("calipso: Set the calipso socket label to match the 
+>>> secattr.")
+>>> Reported-by: syzkaller <syzkaller@googlegroups.com>
+>>> Reported-by: John Cheung <john.cs.hey@gmail.com>
+>>> Closes: 
+>>> https://lore.kernel.org/netdev/CAP=Rh=M1LzunrcQB1fSGauMrJrhL6GGps5cPAKzHJXj6GQV+-g@mail.gmail.com/
+>>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>>> ---
+>>> net/netlabel/netlabel_kapi.c | 3 +++
+>>> 1 file changed, 3 insertions(+)
+>>
+>> Looks good to me, thanks for tracking this down and fixing it :)
+>>
+>> Acked-by: Paul Moore <paul@paul-moore.com>
+>>
+>>> diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+>>> index cd9160bbc919..6ea16138582c 100644
+>>> --- a/net/netlabel/netlabel_kapi.c
+>>> +++ b/net/netlabel/netlabel_kapi.c
+>>> @@ -1165,6 +1165,9 @@ int netlbl_conn_setattr(struct sock *sk,
+>>>          break;
+>>> #if IS_ENABLED(CONFIG_IPV6)
+>>>  case AF_INET6:
+>>> +               if (sk->sk_family != AF_INET6)
+>>> +                       return -EAFNOSUPPORT;
+>
+> A more correct fix would be to not return with rcu_read_lock() held :/
+>
+> I will send this :
+>
+> diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+> index 
+> 6ea16138582c0b6ad39608f2c08bdfde7493a13e..33b77084a4e5f34770f960d7c82e481d9889753a
+> 100644
+> --- a/net/netlabel/netlabel_kapi.c
+> +++ b/net/netlabel/netlabel_kapi.c
+> @@ -1165,8 +1165,10 @@ int netlbl_conn_setattr(struct sock *sk,
+>                break;
+> #if IS_ENABLED(CONFIG_IPV6)
+>        case AF_INET6:
+> -               if (sk->sk_family != AF_INET6)
+> -                       return -EAFNOSUPPORT;
+> +               if (sk->sk_family != AF_INET6) {
+> +                       ret_val = -EAFNOSUPPORT;
+> +                       goto conn_setattr_return;
+> +               }
+>
+>                addr6 = (struct sockaddr_in6 *)addr;
+>                entry = netlbl_domhsh_getentry_af6(secattr->domain,
 
-Also, add a kerneldoc header for ref_tracker_dir_init().
+My apologies for not catching that, thanks Eric.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
- include/linux/ref_tracker.h             | 20 ++++++++++++++------
- lib/ref_tracker.c                       |  6 +++---
- lib/test_ref_tracker.c                  |  2 +-
- net/core/dev.c                          |  2 +-
- net/core/net_namespace.c                |  4 ++--
- 8 files changed, 24 insertions(+), 16 deletions(-)
+Acked-by: Paul Moore <paul@paul-moore.com>
 
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index b9c12b8bf2a3e400b6d8e9d184145834c603b9e1..1205a4432eb4142344fb6eed1cb5ba5b21ec6953 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
- 
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 90d90145a1890bf788e789858ddad3b3d8e3b978..7ce3e6de0c1970697e0e58198e1e3852975ee7bc 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -61,7 +61,7 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
- 	if (!rpm->debug.class)
- 		ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
--				     "intel_runtime_pm", dev_name(rpm->kdev));
-+				     "intel_runtime_pm");
- }
- 
- static intel_wakeref_t
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 21dcee7c9a659ac1fb0aa19f3018647be3bda754..080535fc71d8c25dcc848eefd063361bbe21b305 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -115,7 +115,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
- 	if (!wf->debug.class)
--		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-+		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref");
- #endif
- }
- 
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index ddc5a7b2bd84692bbc1e1ae67674ec2c6857e1ec..5878e7fce712930700054033ff5f21547e75224f 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -24,7 +24,6 @@ struct ref_tracker_dir {
- 	struct dentry		*dentry;
- 	struct dentry		*symlink;
- #endif
--	char			name[32];
- #endif
- };
- 
-@@ -48,10 +47,21 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
- 
- #endif /* CONFIG_DEBUG_FS */
- 
-+/**
-+ * ref_tracker_dir_init - initialize a ref_tracker dir
-+ * @dir: ref_tracker_dir to be initialized
-+ * @quarantine_count: max number of entries to be tracked
-+ * @class: pointer to static string that describes object type
-+ *
-+ * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-+ * will also be created for it under the top-level ref_tracker debugfs
-+ * directory.
-+ *
-+ * Note that @class must point to a static string.
-+ */
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- 	INIT_LIST_HEAD(&dir->list);
- 	INIT_LIST_HEAD(&dir->quarantine);
-@@ -65,7 +75,6 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dentry = NULL;
- 	dir->symlink = NULL;
- #endif
--	strscpy(dir->name, name, sizeof(dir->name));
- 	ref_tracker_dir_debugfs(dir);
- 	stack_depot_init();
- }
-@@ -90,8 +99,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- }
- 
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index 920538f1d3e9ee94acf141d1813badea59e3cfc6..d522aa151c016e94efffae5877aa800b9cf79510 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -124,7 +124,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 	stats = ref_tracker_get_stats(dir, display_limit);
- 	if (IS_ERR(stats)) {
- 		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
--			   s->prefix, dir->name, dir, stats);
-+			   s->prefix, dir->class, dir, stats);
- 		return;
- 	}
- 
-@@ -135,14 +135,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
- 			sbuf[0] = 0;
- 		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
--			   dir->name, dir, stats->stacks[i].count,
-+			   dir->class, dir, stats->stacks[i].count,
- 			   stats->total, sbuf);
- 		skipped -= stats->stacks[i].count;
- 	}
- 
- 	if (skipped)
- 		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
--			   s->prefix, dir->name, dir, skipped, stats->total);
-+			   s->prefix, dir->class, dir, skipped, stats->total);
- 
- 	kfree(sbuf);
- 
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e6fec0072e78ef79 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index eeb6aab16987dde277314d1a6b5bd32eaabab893..c7c25278267adb338f99407abe4a62d2a9cc3d33 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11714,7 +11714,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index b2fd9c5635ecf8fccd48f1d5b967a5c6c41cfec4..8d21c8f4eb83597ddee5fd345b5e38b308ce0335 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -403,8 +403,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
+--
+paul-moore.com
 
--- 
-2.49.0
+
 
 
