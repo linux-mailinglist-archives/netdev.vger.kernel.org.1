@@ -1,151 +1,368 @@
-Return-Path: <netdev+bounces-194751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84FD0ACC438
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:18:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51BB3ACC43A
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 496E73A34EB
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:18:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A1E316EF0C
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C24B1C3C1F;
-	Tue,  3 Jun 2025 10:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3C11531E3;
+	Tue,  3 Jun 2025 10:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9K8a4Ky"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jabPjZZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39B91531E3;
-	Tue,  3 Jun 2025 10:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526654A0C;
+	Tue,  3 Jun 2025 10:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748945931; cv=none; b=tRxlF4B29jOFze4406cG/S8c03SoZQWGIejF6jGq0nTdBOAY6zq45y8kwrM3TaoqMD0+xEYmv8LqkBTClajLGS20sE3lJxvTdrzMDNy/T75JA1kul2D+X17UiQr3OsLS+isxtV5aqneBY3dQ2VnqIJDHC+l0ccIfbID4q0qiHYU=
+	t=1748945979; cv=none; b=LwsulWR1QXn9L2+84HGPKWFIBFXEgDdWh+P6qaUhnsLHEe73hnYxTuZw4vwJ/mgdyVZ/v4y1SCIfDwPSd0ATvHIeTrFWNo3pqRa+eFb4ky124z9QUylSw1iqW/P7v0mQ7/bl23KNfX7XUnpPgPHMQqrPCRqY5YQJEJngQLtb/vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748945931; c=relaxed/simple;
-	bh=myd45d0i3xtNd60c7nVWYYckLHlit4IIiH9M202Dspk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GdqUFjcveLoNkUXnqjfPTabm55utniWi0d9AhRIjuh8apF0U00OyFOLCP9XS7lmS5Vmtr9SGU6acodZqr5hDifXq3MdsTvwa3W/D1baQr52C+RuydmL3dlbox3fuP+BlWouZckh/5rHH0yKHDATe4gIkGlilCcvzM0ivPb5krxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B9K8a4Ky; arc=none smtp.client-ip=209.85.216.48
+	s=arc-20240116; t=1748945979; c=relaxed/simple;
+	bh=PAhUoW4wFfW9zAsqJadOC30sXf3dehCXjxVbgX8JaMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AT40Yh1nPp12YCwRVjGLwn8B9lpcu7R9vH0MsRXOo8oDyQoq6G7Y//btWzAAQ1smcqHwQzr2ngM6M1hq2/koUr42Ukzhvr4hmoTO3LgcyXfm6mNyzz6mNdU+FG6jLDotOZJ3R4OzfX70ehHIJ34NohGhuVBWmkG09z8RUtybBn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jabPjZZg; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3109f106867so6830624a91.1;
-        Tue, 03 Jun 2025 03:18:49 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a4e575db1aso917764f8f.2;
+        Tue, 03 Jun 2025 03:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748945929; x=1749550729; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=70huqT6ptBSO340GgOIthwb677KQu/LcWxypJ+D6Bb4=;
-        b=B9K8a4KyWTVMTTHNv02YZVR6pRTOPQVde3rLGuzablf2Ax3DrXUc2SMm2TRxLFAElV
-         DMpzUZQOMWjCcHroN6UvQteuUiTMsKBS+IHtwxg4XwOiKRMGDf+tdwEDr1Snw4Ccbv3B
-         KMbt//s2KVl3cf/M1bPlRlxaVfP2QwYmhskXlUzbW66uXD/ohqxUOrvrVjCQ/gAGJ/5b
-         IBFZ57w2h7cKBi3AyJyEV8Llust5t3WGljDDMsRtZnNLKf98qjTp8oZFcrrrzbUKysP/
-         /Oisk0a2XPM11K2PMTl06KXRrjAtM/WXf/ZQQxIx3Gr+Y4kHqJVdUorqfKzplC2T15Z3
-         Kaew==
+        d=gmail.com; s=20230601; t=1748945975; x=1749550775; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FRyosMpxpGamF2C6lhKfiTpIH7op1n7yk0t4vAVTg5s=;
+        b=jabPjZZgxa8ZJtroKZIfeit5alGxtilyeaOiBIHn+OFIaKsWGaEjwlvXcQ3Sw+RLtr
+         PXf2IaClHT20UsFlDlk5f9QFmHHg91kX6jEvy0Agq9grTcU9D75qOyg02dbE5gmgLPBa
+         ZbAlbkXoxPjjK9Rb0rD06oVSJdbvDG+kbT6WROIpe0Z9jH7K0TbFUa9cNVXcJQtpHctM
+         fpf/Ti3AOFMWe/WRw1fnfrCjG5OSJBJlDhhMmEu6zmyOlbodYfxffCRu39mRWXZuG2YK
+         Iu8s3Rg5sV8ZYVMh//Q5YqR5KraB1DKUqMHN4mGwS/Yme3V9sthzo6fSXfNPQDbmvRJ4
+         TzjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748945929; x=1749550729;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=70huqT6ptBSO340GgOIthwb677KQu/LcWxypJ+D6Bb4=;
-        b=R4MnyZQLiRmKhIhuSpaLdMscxCJ1MtcPNjD6bh48AhGR1w6uPbFJURF6MkdyGywYiG
-         /htC8pbWnw6czGDA+8kLFj1ysCHhPI2DfDO16kq9rSrSC+lywOrT2dNpllzYrMXCZ7ha
-         NpOZGFCWTcmltVVcs4MjuT880Po0m8pdzzRz5p+pOw9BRxzznRqxIsQpxFEUkrssIJiH
-         XVhew/iUogg8DaQio3nNTb6ZyKYUZt/MqRBuupNm9QuoscZIXcys7a+qX7d/G9/Yz3/9
-         HQTyuVEIPuMybT/U66BBQ/yjLMC6I79ZEMm9DmLlpQTTfNfKvhT0HtGP9nGDnVYYy0iZ
-         648w==
-X-Forwarded-Encrypted: i=1; AJvYcCUCR/M34Ozjd/V+XbR/vHKxQ2FUv47FxqtbDxDplxXNTE4YxeUVOomLxm0/NMaYbFZl748wQ8peHea5PRE=@vger.kernel.org, AJvYcCV5RHJtxWhPn3p2cckMjOCUsWX8V1l4hpTIa4QuMUattj6K4R4VLKvD7QwGnvU/J9iOiUm1xS27@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4iANQyCEKOz4fHf6ZwML7EancQzX62jT3EKrvODDnlOixkfp9
-	GpO4N4BPZQTAbu5keeHfuIi72cdr3QGA7hrTlHdEkvoK0nYR04nqAoARYNi/JvMa4nhvk1FackB
-	su/B2hQ4vDnhtMAozwPyQWhaBo0Ya19c=
-X-Gm-Gg: ASbGncvm7USg8lJIh02cYrcDmriUbQoPZr5OEYyhH+ekmFIUEekW1u5KZzMjZw/qhDz
-	eNmQeHIoxl9usGUjdIqtxGcWgi+Ews4VvnWXSUWGmebkpENdW4ZKHlumzf++hmjQ6NMX9oY1edN
-	WhlgObAqMIhWpAmpGYQi5Gi2V/RvLviXGmSMm+Ug/XIjWLrO5I25jmf3YhZSiqp6dfSPQ=
-X-Google-Smtp-Source: AGHT+IFKdJlxQDPpwIlOWRylCF1tesMVeTdg7R2okl539fFA1Vg3wuEauXM5tgTgd+fNiRzwCx4qmhOuDVvam+0erWg=
-X-Received: by 2002:a17:90b:4c09:b0:312:1b53:5ead with SMTP id
- 98e67ed59e1d1-31240d1c0d7mr23255282a91.4.1748945928882; Tue, 03 Jun 2025
- 03:18:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748945975; x=1749550775;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRyosMpxpGamF2C6lhKfiTpIH7op1n7yk0t4vAVTg5s=;
+        b=EjeSJiMlv9tXfFzIMjzoOTf63c9Ieu6u3XE02F0RsvVlJnZ6pMxqZmEK0C9/pTF/27
+         VSyb7OqSMFJ1Tn1cJd9N7lRXmqbkKDCQMSfYQgKgLyyiqVPmmgElYHQbKS3og2UsH0mV
+         3t0F3H/s0tIRcd9KDUnnRd//3SMVzcIQVF3cC/Np3G9eKnsx3uFf1iZLCTf9eD5sqjfQ
+         ibao3lxISwgj4ih/LBa2gleAQgpx8ZucisF1EVaqc65vTITHuaXs7eLzT734agtiILb5
+         hfMlWwHtYNJp8wN4vwZGkuDAakiNjSJexQJr+TJ+mI+uvF1vXsxA7BkJEg1e8/QPvzsf
+         cqNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGOK8lgyPe2DfdSFLZfJpYrETIHZM7vHK/b27TOscoagww0HWCKnJq2LXi+noH3H51p3vu6utv@vger.kernel.org, AJvYcCWHpS4dq9kN1mRQP2pBb8mxylomUJ/8K220oc7eD3xm2UTqAtRBrpsqQ9DYHzOkdJS+4NMQ2IRqXaPGKOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7wg52oHfRbwqHeS11SuuuVj4vbHXdagJi4QfwbTT1KxtyjGeE
+	xiiVuyGJyGTOcq8dMcSwPLo2aXZ1ywwzptULkI5zbH6LDYXjJ7Qms6Yt
+X-Gm-Gg: ASbGnctsoB7/3EPNGg4bV2tHDs4bXPaI4GhIej1JN/3bppU015094fTP+4/ApuxPAw5
+	Rwz8aFOaah/Wpn0wbS6PbjNsHHTQYFe2+/2w0jZ7QY7oTrhj60M6Wq60dMhH7NFt9WkWzSGFKTW
+	hC07qZFh9VY+EdTJOxOdh6XwcSj+h/dTyIHLxpkOgNSJ5H9bo/UEEzFz5bbMruuL01Xk0Nm2agV
+	jRN/xjAGRE12BBjn/DV9NQEpvgOZ12Lxvc7K26FQHEXQEWmNRhGZ0OTCv/SFh/+kLP13twWBjmy
+	1ioBjfeiUD0Aw+z+ec+pvR9nMAmK/a1i0oJlykmTjKYyPGDwWw==
+X-Google-Smtp-Source: AGHT+IGeKbZmzZod6osApZaO46BOvVpdCEMFDwPFRZta3wOlLMFi4JOLZSIW2usprckf9A2HfTToGg==
+X-Received: by 2002:a05:6000:25c8:b0:3a4:eed9:755b with SMTP id ffacd0b85a97d-3a4f8966a5bmr5146077f8f.4.1748945975312;
+        Tue, 03 Jun 2025 03:19:35 -0700 (PDT)
+Received: from skbuf ([86.127.125.65])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe6d0dbsm17342901f8f.40.2025.06.03.03.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jun 2025 03:19:34 -0700 (PDT)
+Date: Tue, 3 Jun 2025 13:19:31 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: =?utf-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>,
+	jonas.gorski@gmail.com, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	vivien.didelot@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Subject: Re: [RFC PATCH 02/10] net: dsa: b53: prevent FAST_AGE access on
+ BCM5325
+Message-ID: <20250603101931.fgj3p46wkupjdrn4@skbuf>
+References: <20250531101308.155757-1-noltari@gmail.com>
+ <20250531101308.155757-3-noltari@gmail.com>
+ <20250602093728.qp7gczoykrown34k@skbuf>
+ <03565c9a-9345-4c1e-9c00-b16ed8acbcf5@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250531101308.155757-1-noltari@gmail.com> <20250531101308.155757-9-noltari@gmail.com>
- <a8332eba-70c3-482a-a644-c86c13792f8b@broadcom.com> <CAOiHx=nmuZe+aeZQrRSB6re1K0G9DzL-+w+dAs5Bkdze72Rf0w@mail.gmail.com>
-In-Reply-To: <CAOiHx=nmuZe+aeZQrRSB6re1K0G9DzL-+w+dAs5Bkdze72Rf0w@mail.gmail.com>
-From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
-Date: Tue, 3 Jun 2025 12:18:15 +0200
-X-Gm-Features: AX0GCFv4JEbh2JLg-oJFNxNP6YLTksnO0gB3S-DotEdw2V91RfbTd5BRS5LyFL8
-Message-ID: <CAKR-sGe7dB9kn28-3mcj41VXpVYGLvLQc85j=JcuJpsT4-6Nrg@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/10] net: dsa: b53: fix unicast/multicast flooding
- on BCM5325
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vivien.didelot@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="lwhczcmnpusi3ipa"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <03565c9a-9345-4c1e-9c00-b16ed8acbcf5@broadcom.com>
 
-Hi Jonas,
 
-El lun, 2 jun 2025 a las 22:08, Jonas Gorski
-(<jonas.gorski@gmail.com>) escribi=C3=B3:
->
-> On Mon, Jun 2, 2025 at 8:09=E2=80=AFPM Florian Fainelli
-> <florian.fainelli@broadcom.com> wrote:
-> >
-> > On 5/31/25 03:13, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
-> > > BCM5325 doesn't implement UC_FLOOD_MASK, MC_FLOOD_MASK and IPMC_FLOOD=
-_MASK
-> > > registers.
-> > > This has to be handled differently with other pages and registers.
-> > >
-> > > Fixes: a8b659e7ff75 ("net: dsa: act as passthrough for bridge port fl=
-ags")
-> > > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+--lwhczcmnpusi3ipa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+On Mon, Jun 02, 2025 at 11:01:40AM -0700, Florian Fainelli wrote:
+> On 6/2/25 02:37, Vladimir Oltean wrote:
+> > Hello,
+> > 
+> > On Sat, May 31, 2025 at 12:13:00PM +0200, Álvaro Fernández Rojas wrote:
+> > > BCM5325 doesn't implement FAST_AGE registers so we should avoid reading or
+> > > writing them.
+> > > 
+> > > Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitch")
+> > > Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 > > > ---
-> >
-> > [snip]
-> >
-> > > +/*******************************************************************=
-******
-> > > + * IEEE 802.1X Registers
-> > > + *******************************************************************=
-******/
-> > > +
-> > > +/* Multicast DLF Drop Control register (16 bit) */
-> > > +#define B53_IEEE_MCAST_DLF           0x94
-> > > +#define B53_IEEE_MCAST_DROP_EN               BIT(11)
-> > > +
-> > > +/* Unicast DLF Drop Control register (16 bit) */
-> > > +#define B53_IEEE_UCAST_DLF           0x96
-> > > +#define B53_IEEE_UCAST_DROP_EN               BIT(11)
-> >
-> > Are you positive the 5325 implements all of those registers? They are
-> > not documented in my databook.
->
-> They are in 5325E-DS14-R pages 112 - 112 (134/135)
->
-> That being said, I don't thing we need to touch the MC/BC/DLF rate
-> control registers when enabling/disabling flooding - these only limit
-> how much traffic may be UC / MC  on a port, but apart from that they
-> do not limit flooding. We don't limit this on other switch models
-> either.
+> > 
+> > How about implementing a "slow age" procedure instead? Walk through the
+> > FDB, and delete the dynamically learned entries for the port?
+> > 
+> > Address aging is important for STP state transitions.
+> 
+> That's a good suggestion, I suppose for now this can be b53 specific until
+> we encounter another 20 year old switch and then we move that logic within
+> the DSA framework?
+> -- 
+> Florian
 
-In that case there's nothing to enable/disable on the BCM5325 and we
-should do an early return on b53_port_set_ucast_flood and
-b53_port_set_mcast_flood since UC_FLOOD_MASK, MC_FLOOD_MASK and
-IPMC_FLOOD_MASK don't exist.
+Hmm, thank you for saying that, I didn't even consider consolidating the
+logic in the DSA framework, but it sure makes sense and we already have
+almost all API required to do that.
 
->
-> Regards,
-> Jonas
+So I now have a WIP patch attached, but the consolidation into the
+framework is definitely a net-next activity, since it will also affect
+mt7530, hellcreek and vsc73xx, and those need testing. Also, for b53 it
+further requires changing the port_fast_age() prototype.
 
-Best regards,
-=C3=81lvaro.
+The question further becomes whether for stable kernels we should
+implement a local slow age procedure in b53 like the one from sja1105,
+only to delete it in net-next, or to skip it altogether, go with
+Álvaro's patch as is and concentrate on the net-next implementation
+directly. I'm ok both ways.
+
+--lwhczcmnpusi3ipa
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-net-dsa-centralize-the-slow-aging-procedure-from-sja.patch"
+
+From ceb0f0b25ecd3bae6629bbb74fe30f030ddd3a0a Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Tue, 3 Jun 2025 12:40:30 +0300
+Subject: [PATCH] net: dsa: centralize the slow aging procedure from sja1105
+ (WIP)
+
+With more hardware drivers which are unable to perform a dynamic FDB
+flush on a port (see
+https://lore.kernel.org/netdev/20250531101308.155757-3-noltari@gmail.com/),
+it makes sense to move the sja1105 logic to the framework level, so that
+more drivers can flush out dynamically learned entries (relevant when
+transitioning to a bridge port STP state incompatible with learning).
+
+The drivers which have .port_fdb_dump() and .port_fdb_del() but not
+.port_fast_age() are mt7530, hellcreek, vsc73xx. These will go through
+dsa_port_slow_age() now.
+
+TODO: multi-generational drivers like b53 cannot signal that old
+hardware cannot do fast ageing and should fall back to
+dsa_port_slow_age(), because they offer a single ds->ops->port_fast_age()
+to the framework (which returns void), and the framework relies purely
+on the presence of the function pointer to determine that the function
+is implemented. We should change ds->ops->port_fast_age() to return int,
+and treat -EOPNOTSUPP, so as to fall back to slow aging even in that
+case.
+
+Also, this change also has squashed the conversion of some function
+prototypes from "struct dsa_port *" to "const struct dsa_port *", to be
+compatible with the dsa_port_fast_age() caller where dp is a const
+pointer. Eventualy, these changes should be split out into a preparatory
+change.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/dsa/sja1105/sja1105_main.c | 53 --------------------------
+ net/dsa/port.c                         | 50 +++++++++++++++++++++---
+ net/dsa/port.h                         |  5 ++-
+ 3 files changed, 48 insertions(+), 60 deletions(-)
+
+diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
+index f8454f3b6f9c..77faa43880ed 100644
+--- a/drivers/net/dsa/sja1105/sja1105_main.c
++++ b/drivers/net/dsa/sja1105/sja1105_main.c
+@@ -1910,58 +1910,6 @@ static int sja1105_fdb_dump(struct dsa_switch *ds, int port,
+ 	return 0;
+ }
+ 
+-static void sja1105_fast_age(struct dsa_switch *ds, int port)
+-{
+-	struct dsa_port *dp = dsa_to_port(ds, port);
+-	struct sja1105_private *priv = ds->priv;
+-	struct dsa_db db = {
+-		.type = DSA_DB_BRIDGE,
+-		.bridge = {
+-			.dev = dsa_port_bridge_dev_get(dp),
+-			.num = dsa_port_bridge_num_get(dp),
+-		},
+-	};
+-	int i;
+-
+-	mutex_lock(&priv->fdb_lock);
+-
+-	for (i = 0; i < SJA1105_MAX_L2_LOOKUP_COUNT; i++) {
+-		struct sja1105_l2_lookup_entry l2_lookup = {0};
+-		u8 macaddr[ETH_ALEN];
+-		int rc;
+-
+-		rc = sja1105_dynamic_config_read(priv, BLK_IDX_L2_LOOKUP,
+-						 i, &l2_lookup);
+-		/* No fdb entry at i, not an issue */
+-		if (rc == -ENOENT)
+-			continue;
+-		if (rc) {
+-			dev_err(ds->dev, "Failed to read FDB: %pe\n",
+-				ERR_PTR(rc));
+-			break;
+-		}
+-
+-		if (!(l2_lookup.destports & BIT(port)))
+-			continue;
+-
+-		/* Don't delete static FDB entries */
+-		if (l2_lookup.lockeds)
+-			continue;
+-
+-		u64_to_ether_addr(l2_lookup.macaddr, macaddr);
+-
+-		rc = __sja1105_fdb_del(ds, port, macaddr, l2_lookup.vlanid, db);
+-		if (rc) {
+-			dev_err(ds->dev,
+-				"Failed to delete FDB entry %pM vid %lld: %pe\n",
+-				macaddr, l2_lookup.vlanid, ERR_PTR(rc));
+-			break;
+-		}
+-	}
+-
+-	mutex_unlock(&priv->fdb_lock);
+-}
+-
+ static int sja1105_mdb_add(struct dsa_switch *ds, int port,
+ 			   const struct switchdev_obj_port_mdb *mdb,
+ 			   struct dsa_db db)
+@@ -3222,7 +3170,6 @@ static const struct dsa_switch_ops sja1105_switch_ops = {
+ 	.port_fdb_dump		= sja1105_fdb_dump,
+ 	.port_fdb_add		= sja1105_fdb_add,
+ 	.port_fdb_del		= sja1105_fdb_del,
+-	.port_fast_age		= sja1105_fast_age,
+ 	.port_bridge_join	= sja1105_bridge_join,
+ 	.port_bridge_leave	= sja1105_bridge_leave,
+ 	.port_pre_bridge_flags	= sja1105_port_pre_bridge_flags,
+diff --git a/net/dsa/port.c b/net/dsa/port.c
+index 082573ae6864..2875bda2603f 100644
+--- a/net/dsa/port.c
++++ b/net/dsa/port.c
+@@ -52,14 +52,53 @@ static void dsa_port_notify_bridge_fdb_flush(const struct dsa_port *dp, u16 vid)
+ 				 brport_dev, &info.info, NULL);
+ }
+ 
++struct dsa_port_slow_age_ctx {
++	const struct dsa_port *dp;
++};
++
++static int
++dsa_port_slow_age_entry(const unsigned char *addr, u16 vid,
++			bool is_static, void *data)
++{
++	struct dsa_port_slow_age_ctx *ctx = data;
++	const struct dsa_port *dp = ctx->dp;
++
++	if (is_static)
++		return 0;
++
++	dev_dbg(dp->ds->dev,
++		"Flushing dynamic FDB entry %pM vid %u on port %d\n",
++		addr, vid, dp->index);
++
++	return dsa_port_fdb_del(dp, addr, vid);
++}
++
++static int dsa_port_slow_age(const struct dsa_port *dp)
++{
++	struct dsa_port_slow_age_ctx ctx = {
++		.dp = dp,
++	};
++
++	return dsa_port_fdb_dump(dp, dsa_port_slow_age_entry, &ctx);
++}
++
+ static void dsa_port_fast_age(const struct dsa_port *dp)
+ {
+ 	struct dsa_switch *ds = dp->ds;
++	int err = 0;
+ 
+-	if (!ds->ops->port_fast_age)
+-		return;
++	if (ds->ops->port_fast_age)
++		ds->ops->port_fast_age(ds, dp->index);
++	else
++		err = dsa_port_slow_age(dp);
+ 
+-	ds->ops->port_fast_age(ds, dp->index);
++	if (err && err != -EOPNOTSUPP) {
++		dev_err(ds->dev,
++			"Port %d failed to age dynamic FDB entries: %pe\n",
++			dp->index, ERR_PTR(err));
++	}
++	if (err)
++		return;
+ 
+ 	/* flush all VLANs */
+ 	dsa_port_notify_bridge_fdb_flush(dp, 0);
+@@ -996,7 +1035,7 @@ int dsa_port_fdb_add(struct dsa_port *dp, const unsigned char *addr,
+ 	return dsa_port_notify(dp, DSA_NOTIFIER_FDB_ADD, &info);
+ }
+ 
+-int dsa_port_fdb_del(struct dsa_port *dp, const unsigned char *addr,
++int dsa_port_fdb_del(const struct dsa_port *dp, const unsigned char *addr,
+ 		     u16 vid)
+ {
+ 	struct dsa_notifier_fdb_info info = {
+@@ -1151,7 +1190,8 @@ int dsa_port_lag_fdb_del(struct dsa_port *dp, const unsigned char *addr,
+ 	return dsa_port_notify(dp, DSA_NOTIFIER_LAG_FDB_DEL, &info);
+ }
+ 
+-int dsa_port_fdb_dump(struct dsa_port *dp, dsa_fdb_dump_cb_t *cb, void *data)
++int dsa_port_fdb_dump(const struct dsa_port *dp, dsa_fdb_dump_cb_t *cb,
++		      void *data)
+ {
+ 	struct dsa_switch *ds = dp->ds;
+ 	int port = dp->index;
+diff --git a/net/dsa/port.h b/net/dsa/port.h
+index 6bc3291573c0..ea20ed6d706e 100644
+--- a/net/dsa/port.h
++++ b/net/dsa/port.h
+@@ -48,7 +48,7 @@ int dsa_port_vlan_msti(struct dsa_port *dp,
+ int dsa_port_mtu_change(struct dsa_port *dp, int new_mtu);
+ int dsa_port_fdb_add(struct dsa_port *dp, const unsigned char *addr,
+ 		     u16 vid);
+-int dsa_port_fdb_del(struct dsa_port *dp, const unsigned char *addr,
++int dsa_port_fdb_del(const struct dsa_port *dp, const unsigned char *addr,
+ 		     u16 vid);
+ int dsa_port_standalone_host_fdb_add(struct dsa_port *dp,
+ 				     const unsigned char *addr, u16 vid);
+@@ -62,7 +62,8 @@ int dsa_port_lag_fdb_add(struct dsa_port *dp, const unsigned char *addr,
+ 			 u16 vid);
+ int dsa_port_lag_fdb_del(struct dsa_port *dp, const unsigned char *addr,
+ 			 u16 vid);
+-int dsa_port_fdb_dump(struct dsa_port *dp, dsa_fdb_dump_cb_t *cb, void *data);
++int dsa_port_fdb_dump(const struct dsa_port *dp, dsa_fdb_dump_cb_t *cb,
++		      void *data);
+ int dsa_port_mdb_add(const struct dsa_port *dp,
+ 		     const struct switchdev_obj_port_mdb *mdb);
+ int dsa_port_mdb_del(const struct dsa_port *dp,
+-- 
+2.43.0
+
+
+--lwhczcmnpusi3ipa--
 
