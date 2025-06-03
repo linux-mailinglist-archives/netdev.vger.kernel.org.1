@@ -1,225 +1,190 @@
-Return-Path: <netdev+bounces-194789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D85ACC7DD
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:32:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226A2ACC81A
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 15:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83E1C3A5A58
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:32:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 351967A41B9
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB632040B6;
-	Tue,  3 Jun 2025 13:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B65235074;
+	Tue,  3 Jun 2025 13:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5Ga6MFe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n4t4mUV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F9122DFE8
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 13:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDC822FF22;
+	Tue,  3 Jun 2025 13:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748957541; cv=none; b=tQfCGjEdHh0Dg46uoY+yfefIaSyLmKzBbp0t63bs1fpWrHDkl8/SU5Zc0wl/1saozhSseBCU35gtNOH2q4gZOne6XajBH35MXYpTZgXQhEPZd2Z4HAeWBPnByqTk6aBGhxwbCEJOdM+ljp2lQkR1yGA4c9/n+s2D9paC19j7J3A=
+	t=1748958075; cv=none; b=gVvwhNOtflFbBmswkzetoUjt24ZTiE3JIIMtkJtW4TY3oHC3nfJ1tz10CHRkLoUsRwu5HSt7FXecQflqz+zchKbuWJ6tKRlXDAM6yECMKJFv4EHFIJa4BcbORFlfwB4227XNUxJfEZkdL7ccb4LJp+R/x7yzmMW6gDHBl0TBqXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748957541; c=relaxed/simple;
-	bh=hgrKRGr/bJsrA/KEB2BfjffXjMgdvvx1sCK5IHQ9hwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fiBxSroB9ls/QjUJhTyI4o0g36M57mGK3wHt6SuxsKwAkvuEYGdvwpcC8zjeyVTTwbDSwpaG8hCnhQFrHBfa5HmI+eQDaGh9NzeisCba8GIu97KxAAN0q7s8RhjLU5k2sYWeyc2r7uarLu9njhJE2G96ttBt7059q44GaA0iVIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A5Ga6MFe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748957538;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mzBXMB1UkdXo9l9ESHxPhGCM724oqaX2W4jhpDSOmTI=;
-	b=A5Ga6MFeTPt/VgSnsBvLULVmpaIeI9Vqhxo7jEKAFNmz5ilIk3I97t1TvTO2MVScr1Wj0A
-	W7v6w8p025E61BuO2ymtFlntgtO+iyodw+z3iWeYNgZkgGlbjZdGZxMf2pLwJ7CYLCNrI6
-	kurNg1d8ioaY56L1vBb0nyb305bKWxM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-rBbSeoKKMMiYzEMRj-Ypyw-1; Tue, 03 Jun 2025 09:32:17 -0400
-X-MC-Unique: rBbSeoKKMMiYzEMRj-Ypyw-1
-X-Mimecast-MFC-AGG-ID: rBbSeoKKMMiYzEMRj-Ypyw_1748957536
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-445135eb689so32301935e9.2
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 06:32:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748957536; x=1749562336;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mzBXMB1UkdXo9l9ESHxPhGCM724oqaX2W4jhpDSOmTI=;
-        b=bsiBcUAEnID1UjaxD6rzc+1GzGUCUG0SSMcWUIjd5efwXxYlrlLTqy2zJbIqTv/dAW
-         aud156UrSGhfK3Bih9w10ScnaxOP2ms3cZflQ0HE0JoBTn0WsZVbc7PHk7X3TcHUH30S
-         vIJo55kGVKDE4IOJ9yjbrk8xecKbhPjg2Y8gMGYqGizU/iyWxhSsM0+odxtAUJw+9noS
-         hchC1HSpSqBgioWBt5xES9ehIjrG/qwfqvtgqXr3HlptchEiKTgyXQUzMpEa4RwQoFsn
-         dizPBHoaiok+lURi+4rb+eATBE/Lki363ek8KrN0SkVwrsL2bNEAxEDpWi7Oz/Bt6Jm+
-         4tzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWV2HiBfAN4VpD5CjyhJ7h+cMq0J6PlGfByCWVvfTNmbi4K9RT7zvQlz2ita/gvbqmnFy7IRfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzqgWFEQYlUo2qwb+FL3ycNk0uSse86tDb82OKfZCtNzU+ERvt
-	npiFgAZS57lqpL4+qC5RG8/jCYTXx7IFFgFSlOiwD8myLOm1GIkh2l7KD+2NAG/ae3n1sG+taHD
-	61se+Wj8we2ILIoKiwYptjIk4wd4B9pbzwqu4RVOGzl0IYunZxHeU/Zuimg==
-X-Gm-Gg: ASbGncu5j5EI2EXeJQYiWWTS8pX3Y64SmDdqbAwVJOKWaOyBZySqkWniMFn2kGWIAoZ
-	9PQcWyL7F1VYAJHJXj3oFuT4l9sGiZDAuyCsjf2eJUGGQVKOo6mh5heYE0veF0SK0zN5j0Vn+97
-	b4LDEOYzQWreCsaTiooiCkXQlpZlg8wm2wYkoKBvcTzQTIi1ggOrj6qOidw3c5sYQl6V7Uz1SA4
-	KhdRvVxX3qQnUMAlAdK/mYGtmu/wkqKsrOxYjl0Hn2qOADyeQtBme6tn53tPzEzX3aRgTWhiFOK
-	W+oTyG0nktJvmPix+hg=
-X-Received: by 2002:a05:600c:1d98:b0:441:d43d:4f68 with SMTP id 5b1f17b1804b1-450d64e249fmr159455985e9.15.1748957536090;
-        Tue, 03 Jun 2025 06:32:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEATHdjgjlMSYDYv4JhpH58dcqODfa4naOytvhMKwxONc9OrXZOaV4Qobq6Kq0ftMq55sRIcA==
-X-Received: by 2002:a05:600c:1d98:b0:441:d43d:4f68 with SMTP id 5b1f17b1804b1-450d64e249fmr159455435e9.15.1748957535618;
-        Tue, 03 Jun 2025 06:32:15 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc2d:3210::f39? ([2a0d:3341:cc2d:3210::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-451e505c350sm24708085e9.0.2025.06.03.06.32.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 06:32:14 -0700 (PDT)
-Message-ID: <f0ee95b7-6830-4a53-8d6b-0edf1a7ab142@redhat.com>
-Date: Tue, 3 Jun 2025 15:32:13 +0200
+	s=arc-20240116; t=1748958075; c=relaxed/simple;
+	bh=Ld/DmiOsr/GIjO8Gve7Gwa5r9+0LnmJEzLNU8zeFIpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwwFrJbRu+zvCyS0e+DOGZlAh5X9IIw+eJfUBfK69XmTenu4TGmFwdC43siCacI1qsQJWBlmCv624r1AlJr4sk677qJ2rdHdZTxhlsNA/uHtwNXSeQkm9P7e9+qn0rn/OYPR3gycyYLEzelfftB/0e3OEP5shFGxOnlNTUEusvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n4t4mUV4; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748958074; x=1780494074;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ld/DmiOsr/GIjO8Gve7Gwa5r9+0LnmJEzLNU8zeFIpw=;
+  b=n4t4mUV4Egsa9n0z+ZRTTESCOnMD9YG83JaD6l/DRQ5V5amUaa7NEALD
+   6kxOEnLPxHlg4bwhny/x8N2/eOMoEX5EDeG8gW7QPbuaJKWiZYZuotzhD
+   B+gRrJyodcqCaDda21soXegjpF9Jgz2ud+GNRdr9ww91AXcpcRMcp66jn
+   ihqJ3N3zoDFcVmof0Q1faNadE0mx83/e79hvlLKfPARaHRExuxSuUClV3
+   PyaUISbhePp1RRDB5/+H2gnZyRWxeVF/uvJXgaoFV/9WNU4lJhdoB6rEi
+   th9W5vz9KkbUBa5DunFMr/A+j9k1zZxIkzki4jo3DVovcprhHlomLGVmI
+   A==;
+X-CSE-ConnectionGUID: jX+4bTatRoOH68ovH/7cKA==
+X-CSE-MsgGUID: RH2MfgJcRBqDKPEv309iMw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="50693253"
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="50693253"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 06:41:13 -0700
+X-CSE-ConnectionGUID: Ksv9muBGQaGp28i285/M4Q==
+X-CSE-MsgGUID: Xh9d85mtRBWw5r1/a3RPuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="145823921"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 03 Jun 2025 06:41:08 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uMRt4-0002Sv-1r;
+	Tue, 03 Jun 2025 13:41:06 +0000
+Date: Tue, 3 Jun 2025 21:40:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: "irving.ch.lin" <irving-ch.lin@mediatek.com>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>, nfraprado@collabora.com
+Cc: oe-kbuild-all@lists.linux.dev, angelogioacchino.delregno@collabora.com,
+	Project_Global_Chrome_Upstream_Group@mediatek.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-pm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Irving lin <irving-ch.lin@mediatek.corp-partner.google.com>
+Subject: Re: [1/5] clk: mt8189: Porting driver for clk
+Message-ID: <202506032107.zewlKCY5-lkp@intel.com>
+References: <20250602083624.1849719-1-irving-ch.lin@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 3/8] vhost-net: allow configuring extended features
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <cover.1748614223.git.pabeni@redhat.com>
- <b9b60ed5865958b9d169adc3b0196c21a50f6bca.1748614223.git.pabeni@redhat.com>
- <9eae960a-0226-46e2-a6f4-95c91800268c@daynix.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <9eae960a-0226-46e2-a6f4-95c91800268c@daynix.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602083624.1849719-1-irving-ch.lin@mediatek.com>
 
-On 5/31/25 8:15 AM, Akihiko Odaki wrote:
-> On 2025/05/30 23:49, Paolo Abeni wrote:
->> Use the extended feature type for 'acked_features' and implement
->> two new ioctls operation allowing the user-space to set/query an
->> unbounded amount of features.
->>
->> The actual number of processed features is limited by virtio_features_t
->> size, and attempts to set features above such limit fail with
->> EOPNOTSUPP.
->>
->> Note that the legacy ioctls implicitly truncate the negotiated
->> features to the lower 64 bits range.
->>
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->> ---
->> v1 -> v2:
->>    - change the ioctl to use an extensible API
->> ---
->>   drivers/vhost/net.c              | 61 ++++++++++++++++++++++++++++++--
->>   drivers/vhost/vhost.h            |  2 +-
->>   include/uapi/linux/vhost.h       |  7 ++++
->>   include/uapi/linux/vhost_types.h |  5 +++
->>   4 files changed, 71 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index 7cbfc7d718b3..f53294440695 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -77,6 +77,8 @@ enum {
->>   			 (1ULL << VIRTIO_F_RING_RESET)
->>   };
->>   
->> +#define VHOST_NET_ALL_FEATURES VHOST_NET_FEATURES
->> +
->>   enum {
->>   	VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
->>   };
->> @@ -1614,7 +1616,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
->>   	return err;
->>   }
->>   
->> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
->> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
->>   {
->>   	size_t vhost_hlen, sock_hlen, hdr_len;
->>   	int i;
->> @@ -1685,8 +1687,9 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>   	void __user *argp = (void __user *)arg;
->>   	u64 __user *featurep = argp;
->>   	struct vhost_vring_file backend;
->> -	u64 features;
->> -	int r;
->> +	virtio_features_t all_features;
->> +	u64 features, count;
->> +	int r, i;
->>   
->>   	switch (ioctl) {
->>   	case VHOST_NET_SET_BACKEND:
->> @@ -1704,6 +1707,58 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>   		if (features & ~VHOST_NET_FEATURES)
->>   			return -EOPNOTSUPP;
->>   		return vhost_net_set_features(n, features);
->> +	case VHOST_GET_FEATURES_ARRAY:
->> +	{
->> +		if (copy_from_user(&count, argp, sizeof(u64)))
->> +			return -EFAULT;
->> +
->> +		/* Copy the net features, up to the user-provided buffer size */
->> +		all_features = VHOST_NET_ALL_FEATURES;
->> +		for (i = 0; i < min(VIRTIO_FEATURES_WORDS / 2, count); ++i) {
-> 
-> I think you need to use: array_index_nospec()
+Hi irving.ch.lin,
 
-Do you mean like:
-			i = array_index_nospec(i, min(VIRTIO_FEATURES_WORDS / 2, count));
+kernel test robot noticed the following build warnings:
 
-?
+[auto build test WARNING on clk/clk-next]
+[also build test WARNING on linus/master v6.15 next-20250530]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Note that even if the cpu would speculative execute the loop for too
-high 'i' values, it will could only read `all_features`, which
-user-space can access freely.
+url:    https://github.com/intel-lab-lkp/linux/commits/irving-ch-lin/clk-mt8189-Porting-driver-for-clk/20250603-105623
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+patch link:    https://lore.kernel.org/r/20250602083624.1849719-1-irving-ch.lin%40mediatek.com
+patch subject: [1/5] clk: mt8189: Porting driver for clk
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20250603/202506032107.zewlKCY5-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250603/202506032107.zewlKCY5-lkp@intel.com/reproduce)
 
->> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
->> index d7656908f730..3f227114c557 100644
->> --- a/include/uapi/linux/vhost_types.h
->> +++ b/include/uapi/linux/vhost_types.h
->> @@ -110,6 +110,11 @@ struct vhost_msg_v2 {
->>   	};
->>   };
->>   
->> +struct vhost_features_array {
->> +	__u64 count; /* number of entries present in features array */
->> +	__u64 features[];
-> 
-> 
-> An alternative idea:
-> 
-> #define VHOST_GET_FEATURES_ARRAY(len) _IOC(_IOC_READ, VHOST_VIRTIO,
->                                             0x00, (len))
-> 
-> By doing so, the kernel can have share the code for 
-> VHOST_GET_FEATURES_ARRAY() with VHOST_GET_FEATURES() since 
-> VHOST_GET_FEATURES() will be just a specialized definition.
-> 
-> It also makes the life of the userspace a bit easier by not making it 
-> construct struct vhost_features_array.
-> 
-> Looking at include/uapi, it seems there are examples of both your 
-> pattern and my alternative, so please pick what you prefer.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506032107.zewlKCY5-lkp@intel.com/
 
-I'm ok either way, but I don't see big win code-wise. The user-space
-side saving will be literally a one liner. In the kernel the get/set
-sockopt could be consolidated, but there will be a slightly increase in
-complexity, to extract the ioctl len from the ioctl op value itself.
+All warnings (new ones prefixed by >>):
 
-/P
+   drivers/clk/mediatek/clk-bringup.c: In function '__bring_up_enable':
+   drivers/clk/mediatek/clk-bringup.c:18:50: error: invalid use of undefined type 'struct platform_device'
+      18 |         clk_con = of_count_phandle_with_args(pdev->dev.of_node, "clocks",
+         |                                                  ^~
+   drivers/clk/mediatek/clk-bringup.c:22:38: error: invalid use of undefined type 'struct platform_device'
+      22 |                 clk = of_clk_get(pdev->dev.of_node, i);
+         |                                      ^~
+   drivers/clk/mediatek/clk-bringup.c: In function 'clk_post_ao_probe':
+   drivers/clk/mediatek/clk-bringup.c:48:40: error: invalid use of undefined type 'struct platform_device'
+      48 |         struct device_node *node = pdev->dev.of_node;
+         |                                        ^~
+   drivers/clk/mediatek/clk-bringup.c: In function 'bring_up_probe':
+   drivers/clk/mediatek/clk-bringup.c:78:51: error: invalid use of undefined type 'struct platform_device'
+      78 |         clk_probe = of_device_get_match_data(&pdev->dev);
+         |                                                   ^~
+   drivers/clk/mediatek/clk-bringup.c:84:17: error: implicit declaration of function 'dev_err' [-Werror=implicit-function-declaration]
+      84 |                 dev_err(&pdev->dev,
+         |                 ^~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:84:30: error: invalid use of undefined type 'struct platform_device'
+      84 |                 dev_err(&pdev->dev,
+         |                              ^~
+   drivers/clk/mediatek/clk-bringup.c:86:29: error: invalid use of undefined type 'struct platform_device'
+      86 |                         pdev->name, r);
+         |                             ^~
+   drivers/clk/mediatek/clk-bringup.c: At top level:
+   drivers/clk/mediatek/clk-bringup.c:96:15: error: variable 'bring_up' has initializer but incomplete type
+      96 | static struct platform_driver bring_up = {
+         |               ^~~~~~~~~~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:97:10: error: 'struct platform_driver' has no member named 'probe'
+      97 |         .probe          = bring_up_probe,
+         |          ^~~~~
+   drivers/clk/mediatek/clk-bringup.c:97:27: warning: excess elements in struct initializer
+      97 |         .probe          = bring_up_probe,
+         |                           ^~~~~~~~~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:97:27: note: (near initialization for 'bring_up')
+   drivers/clk/mediatek/clk-bringup.c:98:10: error: 'struct platform_driver' has no member named 'remove'
+      98 |         .remove         = bring_up_remove,
+         |          ^~~~~~
+   drivers/clk/mediatek/clk-bringup.c:98:27: warning: excess elements in struct initializer
+      98 |         .remove         = bring_up_remove,
+         |                           ^~~~~~~~~~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:98:27: note: (near initialization for 'bring_up')
+   drivers/clk/mediatek/clk-bringup.c:99:10: error: 'struct platform_driver' has no member named 'driver'
+      99 |         .driver         = {
+         |          ^~~~~~
+   drivers/clk/mediatek/clk-bringup.c:99:27: error: extra brace group at end of initializer
+      99 |         .driver         = {
+         |                           ^
+   drivers/clk/mediatek/clk-bringup.c:99:27: note: (near initialization for 'bring_up')
+   drivers/clk/mediatek/clk-bringup.c:99:27: warning: excess elements in struct initializer
+   drivers/clk/mediatek/clk-bringup.c:99:27: note: (near initialization for 'bring_up')
+   drivers/clk/mediatek/clk-bringup.c:106:1: warning: data definition has no type or storage class
+     106 | module_platform_driver(bring_up);
+         | ^~~~~~~~~~~~~~~~~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:106:1: error: type defaults to 'int' in declaration of 'module_platform_driver' [-Werror=implicit-int]
+>> drivers/clk/mediatek/clk-bringup.c:106:1: warning: parameter names (without types) in function declaration
+   drivers/clk/mediatek/clk-bringup.c:96:31: error: storage size of 'bring_up' isn't known
+      96 | static struct platform_driver bring_up = {
+         |                               ^~~~~~~~
+   drivers/clk/mediatek/clk-bringup.c:96:31: warning: 'bring_up' defined but not used [-Wunused-variable]
+   cc1: some warnings being treated as errors
 
+
+vim +106 drivers/clk/mediatek/clk-bringup.c
+
+   105	
+ > 106	module_platform_driver(bring_up);
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
