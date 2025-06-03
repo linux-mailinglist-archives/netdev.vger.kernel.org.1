@@ -1,118 +1,134 @@
-Return-Path: <netdev+bounces-194728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB26BACC283
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:00:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051BEACC285
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E65057A3736
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 08:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B432C3A334D
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 09:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BF0271452;
-	Tue,  3 Jun 2025 08:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3562AEF1;
+	Tue,  3 Jun 2025 09:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5ewOc1I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4QUYpTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6024F5E0;
-	Tue,  3 Jun 2025 08:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870302C324C
+	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 09:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748941195; cv=none; b=G/vYZ6XH9Lp6PtLG7dJNTQM/y4ulLYS0gZJALFL+jDoTZsEUppqfzVXGPuS2yVzGp9ksI7jz0dh1GpvK8unyq49hKubi1A62xw4+39DlWf7rALWeahd3vFSBWBoNpsa9KstMq/Qb7n6NBDKzV9YmpwTyRaK3QgVDFogiTLCAxVc=
+	t=1748941341; cv=none; b=doiEX7j8MJYVwjfqQXm8o24BuqEewjCoxrhYwek8+aMOS8hTDz85q4YEtnyDJ1487nA40Y27i5GM0j42Em9fMOyg7wJo29aFZPbMkro4nKsxwytpHdnEhI3llgr/CSS4GJquwiMpYtdi2T/NSiIze80O02N8Rrj6zmHNGVJdjHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748941195; c=relaxed/simple;
-	bh=R50WQrCRCTILDFY9a5xYZZIKpDYGrHm9HaM9VrFd8qo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UmoGLTcRhxGwHn2HO9RLR9RwOmFIrdWTQUna0UvQppDZvIA35GgNf6tt84+Hit/be5D1mJ81WOxpaDc+tNeGn0BgZYlnqkc5CbokLdrM0qe2ZrYNo6uWh4VfJnIiISYgMRd5E9PXRKFwiFPbxKOPNgGmSRc6n/QImW+XDsFiKv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5ewOc1I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F96C4CEED;
-	Tue,  3 Jun 2025 08:59:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748941195;
-	bh=R50WQrCRCTILDFY9a5xYZZIKpDYGrHm9HaM9VrFd8qo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s5ewOc1IzJzHNkzRDAsQZ2xHPKpi2YS6kSkA/5HltTiaLiQYKfkEyIeNuN/jxhCsW
-	 s4B7+6SJeKjhbyKxZS5GYQuz62AkgQyCNTaU6bT8yUFr7Eci3zlYKpgUiUkqpmlqqK
-	 fh2u+coWSQxSjBhqF+dhVz6oYRfaF+KrxvCQCPcxL2phWj++C2qSMpAY/HYENGXQ1L
-	 9Vcgg7HDzZvCkwOi+/YrcJl5mfmS0JOi4jh4zN0ufHStOdEUZfcKDN6yBLPd7ZTsd0
-	 whGJBEPoXFGu/LvWJpVXuukKUKoiKXI3jO/HNH6ekNyxoxzJ9iSQ4jwwOreAinckRm
-	 cFzWJAyDlbW+w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BE8380DBEC;
-	Tue,  3 Jun 2025 09:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1748941341; c=relaxed/simple;
+	bh=YWIqRAreUQDNu/wiyAMfubB77Sef+k3duy8F2BANRcU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OAihbqjf0rz4tMleB4CGB9iKdiD3Xpiq0kdLkLU04GQVH4scN8gxvOs3/NekJkrTI54kXE68aHB5yac/UIYFczN7oxx+NCOxhTF4UsiblImCrJpSwv+A1B8rk6u0gE+RPdxfHvYlEHbO1wuy/lqyhl7QqeKolHBJQ7uAi8/kPiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y4QUYpTe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748941337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YCrNHikZEstW+IjZRA7mymdwsw0FDXEjx4HZaS53qis=;
+	b=Y4QUYpTes9FgfsiltFOI3LEpvyi77B2a+srk9u3faA0YYaQjfaDdq8gh4ZQ/7IsIn8HRyH
+	SGxbZyBYBNiiuOvH1Al86JANcuGNQ5U+QUvvVbjuUnbCh+yLBu1khSyQwCzXfRb+LPZa0P
+	AvsGscKDwVIsYMy00KVjqqOT+/H6i0c=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-573-A8iSWLzOONqxNiNuxEDDCg-1; Tue, 03 Jun 2025 05:02:15 -0400
+X-MC-Unique: A8iSWLzOONqxNiNuxEDDCg-1
+X-Mimecast-MFC-AGG-ID: A8iSWLzOONqxNiNuxEDDCg_1748941335
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450cb8f8b1bso13426785e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 02:02:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748941335; x=1749546135;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YCrNHikZEstW+IjZRA7mymdwsw0FDXEjx4HZaS53qis=;
+        b=QgF4oAWlWZKU3iFXNLo4kek46+fV9N0/HbsIhe6tWWQ34FJBTO9Mjwrk01g2XQu9kn
+         peBaeHWMICzQnsFzqVjZqsLc3JjIpsp2zd/oD6uCgYhsaEbbLwgiaED06YYDXeL8v9jD
+         yBFNc2nR3Yno/bTGqjoZ4U8BUYNZLvT37SOLxmk3DkPse2jigsKqEKvOEl9BaqDq+B39
+         Xgz/54nnFgxKwXJ5Q58nXmZHXzvOc+d8VI5p0K1nnm0AfI5yp34gRY9q293KbU5aUaEX
+         nqc8tW06fYBr0m3j+5twi/e2bMdcx6W25FhY4C5Xk0hRri1Xs9yEx6h+N02+HZKb4cDI
+         avCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVq79LM9NtNc1i5M6Qhp4za2BA3LEjEQWV3gulMEP0GZJsuu+TynpV8edpGOJ8JPDJMcbiGYPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwzOZkEOZqU6DERM7ojwOCdbvpwncAXX3xGrrNTfBBaJ8lSHEr
+	OHL96/ZbrtRZNje848CSEfK93B2ahd0lrw0nijdrarCv8foKqfB5TSPzdfgCsVVeSZLp+boQxHY
+	Eaz2obdiv60/pBuaeJqqmRAhiCENm0Vi6O4saMHuba7ZelfoMZ8jsOb3qpg==
+X-Gm-Gg: ASbGncvaUvegWEjTWqQ0xNmKYK9/b/n+fLX1UlUn6Fouo9P+Y0/hTXkeOAcuDvBjSuB
+	EmP1CLSmFdO0mk1P/PmBSVgTl09CSH15jwH/jP0gC0QcO19sHfejE2E/VhDGdNut9uNZSC8qPQs
+	ws44XMWjgtMQN3PrfhRbBAU24huaKzhZoPBcTxoFKbsHVcfmGbjR5hQ2XLeWQkrdz0yXj5eSjNy
+	Ekr8Sio1IfxgS0tc6jJlbWaXrNDwlzhCh/pUhi4x22qHAlGh6zBnph3SE/iwg+urP/aw8pZi1jP
+	i+t40Vy32SUciwwM50rx1HeLhtvPBjV9/axIewaeFjNZcuhYI0FN1Gmi
+X-Received: by 2002:a05:600c:348a:b0:450:d5bf:6720 with SMTP id 5b1f17b1804b1-451191fd609mr128599765e9.3.1748941334763;
+        Tue, 03 Jun 2025 02:02:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFNCbtyTornrYP1iF1VA/vpS2pvzrTYnsiNGZacCb0+vLOwqdlfI/tcA59g6/uATtZgYF7jTA==
+X-Received: by 2002:a05:600c:348a:b0:450:d5bf:6720 with SMTP id 5b1f17b1804b1-451191fd609mr128599315e9.3.1748941334385;
+        Tue, 03 Jun 2025 02:02:14 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4f009752esm17553616f8f.74.2025.06.03.02.02.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jun 2025 02:02:13 -0700 (PDT)
+Message-ID: <292bd402-f9de-45ac-829a-9cf04c4ce22d@redhat.com>
+Date: Tue, 3 Jun 2025 11:02:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net v3] net: wwan: t7xx: Fix napi rx poll issue
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174894122801.1429658.207799656496074697.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Jun 2025 09:00:28 +0000
-References: <20250530031648.5592-1-jinjian.song@fibocom.com>
-In-Reply-To: <20250530031648.5592-1-jinjian.song@fibocom.com>
-To: Jinjian Song <jinjian.song@fibocom.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
- ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com, corbet@lwn.net,
- linux-mediatek@lists.infradead.org, helgaas@kernel.org,
- danielwinkler@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
- sreehari.kancharla@linux.intel.com, ilpo.jarvinen@linux.intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/5] ovpn: properly deconfigure UDP-tunnel
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Oleksandr Natalenko <oleksandr@natalenko.name>
+References: <20250530101254.24044-1-antonio@openvpn.net>
+ <20250530101254.24044-2-antonio@openvpn.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250530101254.24044-2-antonio@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 5/30/25 12:12 PM, Antonio Quartulli wrote:
+> diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
+> index aef8c0406ec9..89bb50f94ddb 100644
+> --- a/drivers/net/ovpn/udp.c
+> +++ b/drivers/net/ovpn/udp.c
+> @@ -442,8 +442,16 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock,
+>   */
+>  void ovpn_udp_socket_detach(struct ovpn_socket *ovpn_sock)
+>  {
+> -	struct udp_tunnel_sock_cfg cfg = { };
+> +	struct sock *sk = ovpn_sock->sock->sk;
+>  
+> -	setup_udp_tunnel_sock(sock_net(ovpn_sock->sock->sk), ovpn_sock->sock,
+> -			      &cfg);
+> +	/* Re-enable multicast loopback */
+> +	inet_set_bit(MC_LOOP, sk);
+> +	/* Disable CHECKSUM_UNNECESSARY to CHECKSUM_COMPLETE conversion */
+> +	inet_dec_convert_csum(sk);
+> +
+> +	udp_sk(sk)->encap_type = 0;
+> +	udp_sk(sk)->encap_rcv = NULL;
+> +	udp_sk(sk)->encap_destroy = NULL;
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I'm sorry for not noticing this earlier, but you need to add
+WRITE_ONCE() annotation to the above statements, because readers access
+such fields lockless.
 
-On Fri, 30 May 2025 11:16:48 +0800 you wrote:
-> When driver handles the napi rx polling requests, the netdev might
-> have been released by the dellink logic triggered by the disconnect
-> operation on user plane. However, in the logic of processing skb in
-> polling, an invalid netdev is still being used, which causes a panic.
-> 
-> BUG: kernel NULL pointer dereference, address: 00000000000000f1
-> Oops: 0000 [#1] PREEMPT SMP NOPTI
-> RIP: 0010:dev_gro_receive+0x3a/0x620
-> [...]
-> Call Trace:
->  <IRQ>
->  ? __die_body+0x68/0xb0
->  ? page_fault_oops+0x379/0x3e0
->  ? exc_page_fault+0x4f/0xa0
->  ? asm_exc_page_fault+0x22/0x30
->  ? __pfx_t7xx_ccmni_recv_skb+0x10/0x10 [mtk_t7xx (HASH:1400 7)]
->  ? dev_gro_receive+0x3a/0x620
->  napi_gro_receive+0xad/0x170
->  t7xx_ccmni_recv_skb+0x48/0x70 [mtk_t7xx (HASH:1400 7)]
->  t7xx_dpmaif_napi_rx_poll+0x590/0x800 [mtk_t7xx (HASH:1400 7)]
->  net_rx_action+0x103/0x470
->  irq_exit_rcu+0x13a/0x310
->  sysvec_apic_timer_interrupt+0x56/0x90
->  </IRQ>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v3] net: wwan: t7xx: Fix napi rx poll issue
-    https://git.kernel.org/netdev/net/c/905fe0845bb2
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+/P
 
 
