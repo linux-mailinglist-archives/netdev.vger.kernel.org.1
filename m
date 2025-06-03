@@ -1,230 +1,135 @@
-Return-Path: <netdev+bounces-194846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B78BACCE91
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 23:01:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D70ACCEBA
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 23:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4773D17650F
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 21:01:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FBD3A5A42
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 21:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F5D22257E;
-	Tue,  3 Jun 2025 21:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1970225A3D;
+	Tue,  3 Jun 2025 21:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PTSxx49I"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="azw+oXlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2065.outbound.protection.outlook.com [40.107.220.65])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB58C221F09;
-	Tue,  3 Jun 2025 21:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748984476; cv=fail; b=GCJ5B/MZLasdWG7JeybAluLHr+Aimo/9/2YzPpLH8/WghlZqfbmfQ1FApphkwvAU3onX04iqUfa+yP8ux63HBYvBQiX6/dE3sVFw6XZ0RoWAXOGGA/ol9oj65xxGx/zmNFwXpiCI2zgUuUcWkeLZivxRpTfMAxfLGUS9D3Uizdk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748984476; c=relaxed/simple;
-	bh=tWp83JejVxBw/vMTNPWIcSe/lgtT/89yo5cyI/ctx+I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pHVGfiWxZT4wHobuveoqnC3LrK3F7SaZFspGj9+M44d2ktIKNeKDwOxtmKfRPQGh6W/951iaDIDLmAX+PxYZvM+lBBLIp/mOFasGq99dRR1TvzS3zTjZUIgJJTm/NphOm+g4S0W43zJAMew4D47aBwV4VA95fI+UDwRfpLf9iS4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PTSxx49I; arc=fail smtp.client-ip=40.107.220.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GkHcVHy1XxZEeM6oJKhcKMmt5ZYqAkkwj9Prgr+t6umwU9v4d8fio/2WToYI9SVRS4yJsN7cFqrpPKVYb8YCydKSHxXRGDRXlH4NzWfl+t05cRjLj93Um6qJN1B14NM0pshCGMuKNSj9W2zr3VyXTYKQuyT+Vdr1bI03wf+wKehDQMq+nJZK68VLxB1LN2m8iusRy++rxSuZICkvbQAktSuDCs4AzQPTBMv1+erLTyes2KUGtbeNtow8GP+MljjrdUWqCaw7WSv5hlP7VoTBQqQXJdf0InqIMpuclanuymvBxexCCfx7l6a33GYLzU5Ij1z66+WaQPUb9vb6NizZDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ue60DgP6iM59+zr+NpP4sT90hkUfRF092WT2pJ6fX6A=;
- b=b5VZytzGmrDluZ91ikr2BEmcWL9vbtwHPMvZCbzRMnnukMfABFS0c2UktnXoXTkkxQFp4JNd3QJp67ftn4ml4ZVSaIoU55oYYroUJHnXb5juOmVG1ISoqlUiWlLVXdNbuJaNVGIUsxZNef0DDDmXVhQ6vTvKexKge8p4JGtl0oyPVrF6UZPFC9lY3c/13bQbUq+GiD46xUwKycF9O+RsS+CcKOzSfUKxk4nRMaDSnHE4Xib2DhtbPeugi/hrkiFdEbJNXLQsViOnaypOIsl+qXF1tgQUJczENcoY4j/9elfIjlBg6RCEK3VFL6jCo0WHmx8xa5rvOnPn9hvoQcm9kg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ue60DgP6iM59+zr+NpP4sT90hkUfRF092WT2pJ6fX6A=;
- b=PTSxx49ILFa6uXFsEajtJPMQANRHstvoT8b09Is51i3WjxXtE5lxfPgaaQsqUMp5+UGr0ynNAfIkV5lVlesXt57emBdFnLSXCl+we+8oNDd6hbn5kZIKrCoTuSgSHhjiDh19y8CpwWd9LwpRZ+diDYY5hKAPiC1Rep6ZLRB3pKf5Tmhbf7RI+hjyaTWBALxS6rjOvc7J+KkfbTTKGuIHkjCLqrIOKzI0H+SSZcOXP3GYYsq+gcTMR7MVANIZvxnDZGcL2zjnVXgZ97qM6fg/VcE3ZW3xUGuxcNVqvTkdqK5f9Z6tb8q5jugSCrC0tXBQBEgQA+rFVQ7+HRdk6+wlbQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
- by SA3PR12MB8000.namprd12.prod.outlook.com (2603:10b6:806:31f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Tue, 3 Jun
- 2025 21:01:11 +0000
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b]) by SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b%2]) with mapi id 15.20.8769.019; Tue, 3 Jun 2025
- 21:01:11 +0000
-Message-ID: <2c0f4a69-dd90-4822-9981-faa90f7a58a6@nvidia.com>
-Date: Wed, 4 Jun 2025 00:01:05 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net/mlx5e: Log error messages when extack is
- not present
-To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>
-References: <1748173652-1377161-1-git-send-email-tariqt@nvidia.com>
- <1748173652-1377161-3-git-send-email-tariqt@nvidia.com>
- <20250527174955.594f3617@kernel.org>
-Content-Language: en-US
-From: Yael Chemla <ychemla@nvidia.com>
-In-Reply-To: <20250527174955.594f3617@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::19) To SN6PR12MB2847.namprd12.prod.outlook.com
- (2603:10b6:805:76::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AB7224B05;
+	Tue,  3 Jun 2025 21:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748985210; cv=none; b=tcGHAES+HTQePnOp0ahxqcBEYSDoISs0WI4R/wiXyuimUYJPjHt+b771v1kp4EgDXRk9PUczHFpo2DKQg+wT17+KB0kKL44P5hKGPLXmb33DtY3v3fSEgpsA8rJm6G5gVs9D7wOZ0eNKrJij44c3AFnLbRSCPmbOq44M/8iIfaw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748985210; c=relaxed/simple;
+	bh=1BcdnyMHgieTxm8ahEYkMYtEjs8zmaa3HiTW1iXKbeU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rgw/gbXtkf61pZK3dmIHSEhIgXIU6mykyYwi5+IzdFXqTaQulaAWQAIiTHoKC6wRAkJryKBQ/EZjSKv4vflDVYMgFvVbnlbYmjqpXdl5R54h6JaU6nHBNxezM2Fv6c+Ap9NgNqy676+PX0EsxBT150V95kfiuAhwL41RcbNzb6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=azw+oXlD; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bmhcf/j9uEBvFmWrno3AXxDLOTU31ZRPLYTptLNTT4I=; b=azw+oXlDU8KhpqtJ+QZTyDEzek
+	az9+bvyrejgDDwDnTYRrsNnwEs/tNrrUkkuW2q6FVstjBRCXHKJ1Rha0xADMT/ZaRsPfeXYTGioDW
+	JhA2xTwSl+wqPb6q+4y9wIrCuWJ3WVuT0C9jEYplZAxw5Qr0XmCD5li7WJfsRwvQllyqBmqsL8B9u
+	dGu/JNl4QIglQ4Qg++Vrr0UtAJDvnvBEWpXisPFirXaG0fki932y5iiP/TqxRAd46JQRK7X9ONHUO
+	rQ77av6uBKHAbqLIpPT7t4sLG58DhRvsc9R1OXyp4vFkr/B7V3a6LcCsBdptVtFcczQOMAhX5enZS
+	VxB5v87A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35734)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uMYwY-0006Qr-1W;
+	Tue, 03 Jun 2025 22:13:10 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uMYwP-0000Ug-2N;
+	Tue, 03 Jun 2025 22:13:01 +0100
+Date: Tue, 3 Jun 2025 22:13:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Wei Fang <wei.fang@nxp.com>,
+	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	xiaolei.wang@windriver.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v2 net] net: phy: clear phydev->devlink when the link is
+ deleted
+Message-ID: <aD9lXa1JVRyJKuP_@shell.armlinux.org.uk>
+References: <20250523083759.3741168-1-wei.fang@nxp.com>
+ <8b947cec-f559-40b4-a0e0-7a506fd89341@gmail.com>
+ <d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2847:EE_|SA3PR12MB8000:EE_
-X-MS-Office365-Filtering-Correlation-Id: d4322cd4-c247-4c62-cb6c-08dda2e1c4d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WHZNMTlFQU0zT2gyMm9ibGM5UkFkcGJ1VncybnJZUXMzOERMbkxaR1RhZFA5?=
- =?utf-8?B?N1lieWdXTXhNU3NQdXNPdWErS3pEdEFPbUw4eFZJZ1cvbEg4ZkNHOGJYd1JP?=
- =?utf-8?B?OEFHc1JwaDQ5TDRDYXpvUG5pSkVnbzltemZROC9iZTZXdktQVXd5VDgxMlY3?=
- =?utf-8?B?MnI4UE1KdlpmeTIxaHJXcjh6REcxVlVSZHpHOFFNRms4R24xd0ZUcUJuRnYx?=
- =?utf-8?B?T2tSSkxLaWRpYjlxR0ZuQk1yUzV1eW5LNmNkOUJudXd6elc2dUttdjFhc2dV?=
- =?utf-8?B?WS9PMWZNallPRjdDY2o2WENrSFpwMFcvZVpVc3MyR0o2cVAvc1c3VDZDSTZj?=
- =?utf-8?B?em16dDlOTUxzZitRV1ZJOUJKTEhrSTNDcXQ1dnp2MlNWOXVTd1IxRHZPUVJC?=
- =?utf-8?B?ZlVEd0Z1Y2RmeUhCeVdRZWJvV1F3SHF3MTZNdUxCZUZ2emYvUmE3aG1yblA4?=
- =?utf-8?B?dXFZKzBzUVQvdnM5b1ViNkNrdk8xSGMrcVMvUnlNS3F2OE9ISzh3ZThPR3FC?=
- =?utf-8?B?TW52ZUFialB4NmdITVVqTy9Gc1NtRzh4M2tqSzVEaW9kM1J3RGgvTWhySjFP?=
- =?utf-8?B?QjFHbStGNXhTSnB0dnpUZmZrdWloRjcwWmJhd1VIbjRzTzNlWTJOVFpKemIx?=
- =?utf-8?B?SFYzTlFvUEpRdXhrZFpyZXM3OUNBZEZ0VjE0MThWbUxTenU2TFI4Y1pFWFNB?=
- =?utf-8?B?ZjlXQ2VWMDYyVXFlRVgra010RThJTG1odCs1RWlhbzlDKzQrZ25RRFQ5a1c5?=
- =?utf-8?B?NVhaQThqUW5sUWFQS1loQzN4c1hJTFh5eU54ODk5QU5FMlh3ZnBqZ2JtNGxm?=
- =?utf-8?B?MVRLTVV6Zk9zYUZTak1EOFNkaFJhL2pTOTJwM1V0b1BCUS9zL29mT0RxeS9h?=
- =?utf-8?B?TWwvRjdjQkxKc1lIRSthVmlRZ3lBL2I4MVBybzFqSUVxTEttVmExZTFuaE5u?=
- =?utf-8?B?SnZCODBOMTVuekhYUFJlRkdIbmlrTnJXNkhJZzZxWXpxTFF3NEQrK0M5UFFW?=
- =?utf-8?B?clZrdlloMzR1dk1uSFE0MnJJdGlWU2QxWDhzcnNCNGN0dHdZZjd0UnVPYldw?=
- =?utf-8?B?bStmejQ3YnVVZVpQa291SUh1QjdUZkZHVVVocWNxY2ZNQ0xLM0RiSUpZRkhh?=
- =?utf-8?B?azJCV2ZKTGhqNXNtK3lwMndjbUJvWUtPYTBpdTRQOTZ4NTdiL3o5VFhzQWZl?=
- =?utf-8?B?OWFaUFBnY0FQNFJ0N2NKYklJMmxZMVBBM1IyUDNacm5ZNkhCd0haWEszNWJS?=
- =?utf-8?B?blNWNmRkYnhTM2xUbUU4WlFCRHE3aE9ZZ0ZaU2ZoRURLWCsvOWVrdkxyQklD?=
- =?utf-8?B?V1F2NDZRcEh4Zk9JeVhpRWlXeWh1Z1ZKTTEvUjUrd2ZMTitPQ2dyam96ZklD?=
- =?utf-8?B?bGxydW91c1VQdHlockFmTExRK0ZzcnFXVWE1VHNOaExVbytiL3BReThSS0N5?=
- =?utf-8?B?MTBKMm51TG5yN3NUYm5FZ1k4Z05KZWVEZStScmNQN001cWF1aUVERE9ZOFN5?=
- =?utf-8?B?dTU4YlQzWlFPRXZwbmtkeGtqcE1NREQrd09GUGJzZm04QVV4d0ladG1XWGhS?=
- =?utf-8?B?NkZvUFlOYlRsYk5KZ1QxUi9iQzBkampqWWtvS2k3V3phc05uK2hWU2VLdU5G?=
- =?utf-8?B?N1RZRWd5YitaLy9JMnMyTEJrZjBRNFI0VkxhbW5SUUhxTDlNM0VtWWZESzVj?=
- =?utf-8?B?bW9Uc2diY3VueGRvbUVRRHY3M1NmeDRrT1Y4ZkJnTTlYZ0daU25QTi9zeFRI?=
- =?utf-8?B?czdxVVQvRXBtci81TXdnUDFMMWN6OGV2L0wyUFM1aVhGNzRQaFU2L2QvclZk?=
- =?utf-8?B?RUJUQ3ZGYVhmK0RxYXRLaWNuTnYvVUswUldFRitGTlo2SGYrMTB2bGFxOWtV?=
- =?utf-8?B?N0kzeDByMFhWM3daYkt3WU16MW9rcDdHSXN2K1VKVGczVFhWdGVGWEFPMEhq?=
- =?utf-8?Q?jN93/7wUONQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2847.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MldSZ0s2bVJNZGJ3NTB1MGdvUm1SdGZDK3gzNUM4QjcxWWQ0UW13TVBGNUdL?=
- =?utf-8?B?UWVIVmE4YkhZbXIrSWRiY3pPSVh2M2hUR0prL3A4UmpUZE1sSGxpWVRrNFpG?=
- =?utf-8?B?NCtOZDFtaHFrUzJ5US9Mb3dEck1QV0c1WmNsYk53c3c0dis1SVpUYmtlTmtk?=
- =?utf-8?B?SDJ5Lzc1Vy9nTVI1UERaQVpadnp1aC9jQzdhNmw0OGlLc3Frc0dUVlhwclpa?=
- =?utf-8?B?aC9mSDEwS2R5RTFaSzZoM21ldlZhQ0VJMGQzRmVER00xRzF0dlJldGFtY21M?=
- =?utf-8?B?OWFEWEpKLzNvYU5vWW9DTW45M3JTazkweEtYbDE0cll3dW1VQk4zL3BKZ290?=
- =?utf-8?B?Z1hXUnFJcTVoRG1rcGE0LzlDa3doQWw3c1VrZ0RJTi9mY2dvWHRWSytNS2ZQ?=
- =?utf-8?B?dXdTZUFXSkdWZWIzVnAwVUsyQ29VZGpYWWxTUnRobkxpa3BPbm5YL1NsSjIv?=
- =?utf-8?B?WnB1OTJjTDJGWkF2alVNQmdxTnhUYjk1elJaSm1OR0E0aUxmVDNiN2tLeitM?=
- =?utf-8?B?UUk0Rk1NL09YUnpSSENyQU5LdGljR3NhSnBnYVp2RldrZWdBcjF1amRSOW0w?=
- =?utf-8?B?alpEVDVzVW8vZHhyRTJndzRoRGRQeXNycEI3cXdVbWt6clFta0J3MW9EWnpa?=
- =?utf-8?B?Zjh1WkdqNFcxK1ZaanhpVm5zNTNZUWVUUXdGVFlrTGF4WVVYVEhEWUVabE9m?=
- =?utf-8?B?cWl2ak9lZm91cFpOQ3FWSHVIcUd6ZkxmcWVEZmtUOVUzZC9LcnIyUG0zbmZr?=
- =?utf-8?B?MjFtdWhrY1ZGRGpxbk1ZVnVjNTNLYVlXcFVLQVVteG52VTFMY3p1Vm1rejZs?=
- =?utf-8?B?UXZmcHhJZ3JaN2VlUEhGTVhOVkxpVUw2ejZ3dHV4VmQ0MG9KUUNnRVhIbXA3?=
- =?utf-8?B?citnZXlNS1JrZTRxMXFkenV0V1ZhY0lyR3pYdC8vcFB2Ty85bGxSMm9PcHB4?=
- =?utf-8?B?ZlVRZ0x5dUNVWFl0TmlYSzFTQ3VvcVZOMDhZakRKTmsyOUlvZVZET2puNExW?=
- =?utf-8?B?a2NMdjhYTWdrVmg3RThmYitqcU1SL0JaMjc4cUlTK3J1K3JzR1RTcTJWMXQr?=
- =?utf-8?B?OU1zR0pVMjVQWTBOa3ZaeEJCRGRTREtxeFFnVXFYc2lQVG9HS2QvZFhCcHdj?=
- =?utf-8?B?TTdTaFJDVDJ0enp1VU9aM3hjeVNXa1RoMHZ5Vk4rblZjOFBaOTdRUjRWVCtM?=
- =?utf-8?B?VmZWdGRINW9sYjF4K0w1d1IraWt3bXJZYTZKb0poYTNFN2VySEpVbVNwSEsw?=
- =?utf-8?B?bWozQkRxajliZGtITzBnT1BKLzJiSWNmVTN0TVI3Vk9vV0docGdEa1J1QStv?=
- =?utf-8?B?SWlLWXlObGhrUy9VOE9IbXk0VjBjOG1ZNzRHNEJlZmlJSVJpVE1OOTdZRW96?=
- =?utf-8?B?a0xwd1N6Q1pSQ29wQWNGOEVvSC9vZzU3ekxIZWUxZHY5a2FFd2dub2hvNm4z?=
- =?utf-8?B?Qm8yZStleTFRWUl6L0dQbGR0OVBLZlR2TTlrMVhxTzA2K1hzZjhJNkh0Q3o1?=
- =?utf-8?B?SEVETzcwWVpaSWNRZUdwbW9WcCs0eTI3WnoyTWp0QVc3NVdyb2JkalYxek5R?=
- =?utf-8?B?aVdpYXJHL2RwQ1R6S3RSc3lzMzgvVXJ1TnZQMWh4UjJJYXlLbVYraVhTVjdk?=
- =?utf-8?B?bUgzcGxHWktoUXlQRmY3UzhGeHZYZG0rR2RBQ3gyZWxxeTYzc0tnMmpYa2tI?=
- =?utf-8?B?bW1JbGJIM21CNjc0WGxnc0xYb1Q2VDFqb1Qzd3NZMGg1NjVodHZmbmh3S0E3?=
- =?utf-8?B?cVQrU2lxMWxlWEppV2ZTR3VGVGxsc2NBa0xTZUZBOGRnZmVWVjZqYkZmcEFC?=
- =?utf-8?B?NFlxQUZHMGNDZ0s3ZktXZlFBUnNtVmQ2QVYxTzBTUmNaOUdlWjUxajZ1MTNM?=
- =?utf-8?B?MUJ6eW9WNnJsZnhJdzhYeUpDeHAyUEpLSkdJaGNEdm9rS1FTVEFjUWowMzl1?=
- =?utf-8?B?WXdWazB0L3ZjamdxcmE4c05XYlUrYzRQVm9oOTNMYVNKekJodUp3TGhiYlpv?=
- =?utf-8?B?d2xsOTBQWUl2U1FmU3RraVR4dnd5MjQ2aFNvNVNCUUFvY1Jpdk81WWZUOFo1?=
- =?utf-8?B?elBYSDFFUWlScmFOckhhdldBdzN2MDE5allwbkl5aUR0dXJLWnMweDBhNlVO?=
- =?utf-8?Q?TLrOBO9Ub3GbCj3vRKiaKVmkh?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4322cd4-c247-4c62-cb6c-08dda2e1c4d7
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2847.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 21:01:11.4432
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CdP10E1XoeZivnyxDBIgUJYX19cySU0uCnNbCLd0ifOnPtjMmBFT8eye51V9XRVmAl+fOqOtTu2ZC02AMMWlKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8000
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 28/05/2025 3:49, Jakub Kicinski wrote:
-> On Sun, 25 May 2025 14:47:32 +0300 Tariq Toukan wrote:
->> Encapsulate netlink error message macros to ensure error message remain
->> visible in dmesg when the userspace does not support netlink.
->>
->> This allows drivers to continue providing meaningful error messages even
->> when netlink is available in kernel but not in userspace.
->>
->> Replace direct extack macro calls with new wrapper macros to support
->> this fallback behavior.
+On Tue, Jun 03, 2025 at 01:39:47PM -0700, Abhishek Chauhan (ABC) wrote:
 > 
-> Please break this down API by API and explain for each why user space
-> can't use netlink. If we thought this was a good idea we would have
-> added the pr_err() to the NL_SET_ERR_MSG_MOD() from the start.
+> 
+> On 5/23/2025 8:19 AM, Florian Fainelli wrote:
+> > 
+> > 
+> > On 5/23/2025 1:37 AM, Wei Fang wrote:
+> >> There is a potential crash issue when disabling and re-enabling the
+> >> network port. When disabling the network port, phy_detach() calls
+> >> device_link_del() to remove the device link, but it does not clear
+> >> phydev->devlink, so phydev->devlink is not a NULL pointer. Then the
+> >> network port is re-enabled, but if phy_attach_direct() fails before
+> >> calling device_link_add(), the code jumps to the "error" label and
+> >> calls phy_detach(). Since phydev->devlink retains the old value from
+> >> the previous attach/detach cycle, device_link_del() uses the old value,
+> >> which accesses a NULL pointer and causes a crash. The simplified crash
+> >> log is as follows.
+> >>
+> >> [   24.702421] Call trace:
+> >> [   24.704856]  device_link_put_kref+0x20/0x120
+> >> [   24.709124]  device_link_del+0x30/0x48
+> >> [   24.712864]  phy_detach+0x24/0x168
+> >> [   24.716261]  phy_attach_direct+0x168/0x3a4
+> >> [   24.720352]  phylink_fwnode_phy_connect+0xc8/0x14c
+> >> [   24.725140]  phylink_of_phy_connect+0x1c/0x34
+> >>
+> >> Therefore, phydev->devlink needs to be cleared when the device link is
+> >> deleted.
+> >>
+> >> Fixes: bc66fa87d4fd ("net: phy: Add link between phy dev and mac dev")
+> >> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > 
+> @Wei 
+> What happens in case of shared mdio ? 
+> 
+> 1. Device 23040000 has the mdio node of both the ethernet phy and device 23000000 references the phy-handle present in the Device 23040000
+> 2. When rmmod of the driver happens 
+> 3. the parent devlink is already deleted. 
+> 4. This cause the child mdio to access an entry causing a corruption. 
+> 5. Thought this fix would help but i see that its not helping the case. 
+> 
+> Wondering if this is a legacy issue with shared mdio framework. 
 
+The device link does nothing for this as it has DL_FLAG_STATELESS set,
+which only affects suspend/resume/shutdown ordering, and with
+DL_FLAG_PM_RUNTIME also set, runtime PM.
 
-Hi Jakub,
+The device probe/removal ordering is unaffected. Maybe that's a
+problem, but it needs careful consideration to change.
 
-Thanks for the feedback.
-
-To clarify: extack can be NULL when userspace tools (like ethtool, tc,
-or devlink) send Netlink messages without the NLM_F_ACK flag. In such
-cases, the kernel usually wonâ€™t send an NLMSG_ERROR unless the failure
-is immediate. For more complex or asynchronous operations (like hardware
-offloads), NLM_F_ACK enables meaningful error reporting; otherwise,
-userspace might see only a generic errno or nothing at all.
-
-The NL_SET_ERR_MSG_MOD() and NL_SET_ERR_MSG_FMT_MOD() macros are safe in
-this contextâ€”they internally check for extack and no-op if itâ€™s NULL.
-
-Regarding the APIs modified in this patch:
-
-Ethtool APIs: While Netlink support was introduced around versions
-5.6â€“5.8, many LTS distributions (e.g., Ubuntu 20.04, CentOS 7) still
-ship with older userspace ethtool utilities that rely on ioctl for
-certain operations. In these ioctl-based paths, the extack pointer
-passed down to the driver may legitimately be NULL.
-
-TC APIs: Even though TC is predominantly Netlink-based, extack can still
-be NULL in certain internal driver code, legacy handling, or specific
-test/debug scenarios.
-
-If a narrower scope is preferred, I can revise the patch to include only
-the ethtool-related changes, which were the primary motivation behind
-this work.
-
-
-Thanks again,
-Yael Chemla
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
