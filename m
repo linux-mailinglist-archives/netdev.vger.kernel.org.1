@@ -1,139 +1,206 @@
-Return-Path: <netdev+bounces-194757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E09ACC4AE
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 12:51:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777F1ACC50F
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 13:12:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4699D1893BA1
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 10:51:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65DEC17369E
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 11:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB72322DFA8;
-	Tue,  3 Jun 2025 10:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7013B22ACEF;
+	Tue,  3 Jun 2025 11:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WfMDLrC9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Qc4+vsRP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010030.outbound.protection.outlook.com [52.101.84.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EAA22A7EF
-	for <netdev@vger.kernel.org>; Tue,  3 Jun 2025 10:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748947856; cv=none; b=jowv0ws7t/r0zies6xg2dL+FjL2DoH7vwmrx9o9uPVYvQSL6pOmKwAItrS3hkT2pNqVjeCPGuO1mWBGArA44l6U+PUBSqG0mopptQvDAuvEMr7Xgs2J9X3a3ioyiH9usch7avTRBtWuHcm5bC0s66vltGv5zPsnAJkVYyT/adkg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748947856; c=relaxed/simple;
-	bh=pP732qkBtLWc1YarRschcEvEOBGT5QCpzr6OZsyMpXU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rEgJDza1LiCi69zQD5gD6NGYBIUstqljideYHYYc8MPxzn0/dOSgKZ1piDqwth3SsUQw5PdqGAHV0Hxv3J1c5iFT48hk7+7WlbSOzKHZwwG98kNUh2zUvVe8/WZfKJQ6Y9Dvs6Cn2+yxljzm2voDmX8KCUktSn/HzmJ5hwhd8nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WfMDLrC9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748947852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n0+40Yg0Yos7RVqiMwJQqOocRWrul7ar29oZFeXB2SU=;
-	b=WfMDLrC9Qs6S04He4s/U50A7bOnHn75xMNjWAWOS0YJrpR8ENd8IlKGlUvJLCA93pYRD5F
-	sVLQnGA5gdm/YZOKfKAZjprvDJgv7BeIL+2mP8sLIBzEoeg5Tk6RC8tJvCNMdphKVhc17/
-	IubJ6atTGqUwQpwBoQfoaCl6FDs2imI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-oNIsuY9gOu69bdtdm8WiyQ-1; Tue, 03 Jun 2025 06:50:51 -0400
-X-MC-Unique: oNIsuY9gOu69bdtdm8WiyQ-1
-X-Mimecast-MFC-AGG-ID: oNIsuY9gOu69bdtdm8WiyQ_1748947850
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-451e24dfe1dso9089105e9.0
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 03:50:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748947850; x=1749552650;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n0+40Yg0Yos7RVqiMwJQqOocRWrul7ar29oZFeXB2SU=;
-        b=KijVdlpPQ2/usfcge/+dJWlE7gm7H6dv4x89GpHC6+GUaVB0DE77C4Z7XHiOwbSQ1i
-         Vfmfyp39lW1ClZjzg86z0J/9U+InS1d+aVoKPKQ3t6769/OszcbAVtLPcaKnabEDl5JU
-         hOJvVayZUtgj0mzQhvTTeAy7aPFRYprQhAldjol/XxIMULZXjYIZDB65oOe4NMvMuLyq
-         O22VS0N0pF6D6WXLhNS3AgKEc+G/h8Rl6QqoNxMU2i400Q10XV7MJwq1uHrZkYD98YcY
-         m9qAjgfF5JDc9hLe18e3pnzT1H7AbLSPvuEGayGTJ/FBojixGDx9NLx8lVYkDymfbF8/
-         CUUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVmIM3h489WbXsyuZY7If4zPLV3qX52YS6yqDHfnTImL9uzysSz/KqX24YfChivJpGZUdhk2Lg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOAQr+NarLMRBf1ZaNHcERbOlmgRU7aleBNCyer55HwchgrRmw
-	DqKz4/VdW1AonU4nHiX6NG1B9o3WvFZop3YixTMZlcdUhHIBezosTmj8QXJ5DwEOtVS6Gg26UXs
-	aCK8EeOJl8CMfA9lfYS5RVttie6mfwtepwb4aAfzl7qGv/OESdZeDfdkj+A==
-X-Gm-Gg: ASbGncsVZcI1h/rP+7HsK0qKEWzF4MtIuB01zdH6WLHskF6m4RD/w9AviTlhwu9e3Bo
-	EQgDzDKSnIm4qik4NsHm3r0abva6pqLGBlHz4kCj3ELiTxTNZabc7PwdkMYeab4w8eldRQx1Rvk
-	0/3B2MldRw4ca+hqqg8UM0bNAOxhyrKmcy2qxcfARYD9xQncJLfP7ya+sB6Duf86GSHLMq+5KLw
-	MNdSst4w1jwKm2j/9m3yAfW53WxaeppDtEIX0bhUVZ++u4Lwnrf2eUA2+UA0iCzuklJh9Nhguik
-	jv5LMo96HDKN1KxPnLkifytwl7+8XPOQsBmNeFhzg2UDDdI2QW9jRoWr
-X-Received: by 2002:a05:600c:3b10:b0:44a:b478:1387 with SMTP id 5b1f17b1804b1-450d885e485mr167351715e9.17.1748947850289;
-        Tue, 03 Jun 2025 03:50:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEtGECdKa1RWIrVSs41cY4rfCiCynHGO3J9EwYlEtBcnGInHb9ONotRvfoR7OrR5T/NIAl9cQ==
-X-Received: by 2002:a05:600c:3b10:b0:44a:b478:1387 with SMTP id 5b1f17b1804b1-450d885e485mr167351265e9.17.1748947849868;
-        Tue, 03 Jun 2025 03:50:49 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc2d:3210:4b21:7487:446:42ea? ([2a0d:3341:cc2d:3210:4b21:7487:446:42ea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d80065e0sm163577265e9.29.2025.06.03.03.50.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 03:50:49 -0700 (PDT)
-Message-ID: <b8d181e9-d818-4cf4-b470-a54b6df763a4@redhat.com>
-Date: Tue, 3 Jun 2025 12:50:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EDE149C41;
+	Tue,  3 Jun 2025 11:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748949082; cv=fail; b=iHgtKPw4wSymeYALKbkeJMXVDmWuNl1gAF8F45ScnmBbc54zpGrvfdsQZXrmDdsF4679nSOLfJolAg6bpiX58jQMCza2zZOTKV9b2W7naXZg2JeepAp4WdBZ0YD4ZE7MxhxsqiqHbRnrq3/lgHsMzOebSNhqt2CLpdS0Z5Ubh6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748949082; c=relaxed/simple;
+	bh=cmwqfcszbeT0XzRgVoenGFA8XvfEuHBtJDXq0zqnd0Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=U1fu1mwpiVSQnsPk05t0xHDJrRawYqyLRbvOSWys+JPaGOkqgjlhx1w2p1TAGJZhePBdNO0gs39OCvpLzwexbs/Qkenj7Rmy8c8x+LNCVkDNaTWXxFse7MhbNRrX8yIGO5o4woutOkbB1dYeb/+80QyxAqzyRlNWfKyejrH+OYQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Qc4+vsRP; arc=fail smtp.client-ip=52.101.84.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jj+FJpzO8pu1X4oVtJc23CSxfvljVmFLXD+o5aPEomLmgAnAUUGG7E9FKwDhi21WJPx2O1fbRyJ/NJQkvtLPOGIyOGmUGTeQYFYMgAPCi0BHMWrsZTf5nrSK7vidGaY/8KbPUXfm5IqF1CmtwzhCpHUonp48jCmSDDGoU0dAXUjWK3lVt3RsgEE+AjJMTWKkna8GRQP2TkqyQxPBc90U0Y0yrXt/F0vcyuVzG3+DiDmzKJAB2Fbg6tbH1Nnd1OnqgGdaH+IrlyVdHJqEqhT17Q/n5trGyolUeiLzI5YLqUrdaLyPevBs7X4uj2gtPkWqkMVpyBmjev9G6pW6FlkGMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qZqCrGQP2itdV/BrEbAxXIGWcKLKh3dB3khO48Z0JFM=;
+ b=F5zM0iyVImdXLV3kF7gU8HQeL8eyOD7z209qKiYU+M+wzs4lwTz1+XuJ9zcLSCDlY8hVUDHmaY22vf6WRVOuAf/SUaQPvJsolukjkSivU4VngRdLtx/rSDkdTyoHPq7vD22OkidvDQC6pX/xfgBTUeWEj2umdTHeC/Of+uESjRhpliQazr8iUn1qiqKlSQq7DBogdyN+Z3+QDTUth1jfj9VYYjEhFsJIJxnBhFMKZwcS7bm5PuRd7IupHgPUlI5l7NxPp4O7kjeRxGxnBmKptnGTk20Zz7QV0y+Jt/AveZien70CJKIKCxAgsKGNpWZjpSW/XMWKVNx/1MMwE1FWog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qZqCrGQP2itdV/BrEbAxXIGWcKLKh3dB3khO48Z0JFM=;
+ b=Qc4+vsRPxMIBpTvJayIkxW1WFoUfgmMKwfBA/dTzH+3Z/E8YCDT2xGxAr43l8YdOeniSGYTdYW+1AGcuC8RhvQMv09BtXJbCz1TUV2Ni8N4Pn7g1yCWEFAwoYOVQ2HQEJZwjKECyfJoop1X/OgYepmbzXQZ4LCqKdli96kOEKeV3AFdUzjmKiIucXZWOyNemqy2ASCUkhxzg9q1vQyNJe59WeZwFZ6G5Bm2pBPmCniEEAsTPz7DJWW5QFdewI31EgtHAMfF78arxPFgVWQvct4VRoy7fbR0hTOIGXAkZHMrcIRK5LQMHJii9H+JSXmFmSY6UBjVpNgZklaSmBNvuRg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VI1PR04MB7197.eurprd04.prod.outlook.com (2603:10a6:800:129::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.33; Tue, 3 Jun
+ 2025 11:11:14 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8769.035; Tue, 3 Jun 2025
+ 11:11:14 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	arnd@kernel.org
+Subject: [PATCH net] net: enetc: fix the netc-lib driver build dependency
+Date: Tue,  3 Jun 2025 18:50:56 +0800
+Message-Id: <20250603105056.4052084-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA1PR01CA0178.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:d::7) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] gve: add missing NULL check for
- gve_alloc_pending_packet() in TX DQO
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>, Bailey Forrest <bcf@google.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: Mina Almasry <almasrymina@google.com>, joshwash@google.com,
- willemb@google.com, pkaligineedi@google.com, kuba@kernel.org,
- jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- darren.kenny@oracle.com
-References: <20250601193428.3388418-1-alok.a.tiwari@oracle.com>
- <CAHS8izOqWWdsEheAFSwOtzPM98ZudP7gKZMECWUhcU1NCLnwHA@mail.gmail.com>
- <cc05cbf5-0b59-4442-9585-9658d67f9059@oracle.com>
- <bf4f1e06-f692-43bf-9261-30585a1427d7@oracle.com>
- <CANn89iJS9UNvotxXx7f920-OnxLnJ2CjWSUtvaioOMqGKNJdRg@mail.gmail.com>
- <CANH7hM5O7aq=bMybUqgMf5MxgAZm29RvCTO_oSOfAn1efZnKhg@mail.gmail.com>
- <abb065ab-1923-4154-8b79-f47a86a3d30e@oracle.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <abb065ab-1923-4154-8b79-f47a86a3d30e@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI1PR04MB7197:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22bdc941-e313-4e27-b8cf-08dda28f5a8e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|52116014|376014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?mtO3+bESIwQPNwK4N+83JrBR950oLD/hGG5PaPPdOFOlT0PlC+SxJGppZrLc?=
+ =?us-ascii?Q?2hzOIj72k3zNFI4GPvkpKlkpIdRdpkSjJLO8TMkW7IyrqksuDn5kIQ0Z/sQH?=
+ =?us-ascii?Q?kKrRRpllyvH3xXQyHzBOgZbVFIlJZa1AOxNtRADGiod9iuuqgbBph+D67vXM?=
+ =?us-ascii?Q?iUxkTaYU8JgkacEnP/R69plO0PC3K6f/BSkwul+SwWkgtn/3TsB2y3AZzdRY?=
+ =?us-ascii?Q?O4yHoVgmz55hLG1GdwwksdU3nDKABVnjzB5cysatK982ix640FFS217Ioq2U?=
+ =?us-ascii?Q?dEiNnoKDryN0FphjkKuzk/VJTL9QgB8yYXJGctFVmSwRrG3yQCW5vwh+lsFe?=
+ =?us-ascii?Q?ogVPLnbUvTBHY++Y2oEn7wVI3VMdtPA1BVyn5R6EE4jM54TAA2FjzmC5cjhh?=
+ =?us-ascii?Q?PhEA6/raK8cf18/2zWZWoC8kK4KMoTO6uzq+gKTGJv9phGHTjLubjdyqCFC7?=
+ =?us-ascii?Q?DaQNHUEfg7z9d9KAsCTnvxgDINNgeZuDB8p6t7t8nZCPb+p+skyynDyOQaqW?=
+ =?us-ascii?Q?GsYb27BqhBcNeD3ZVzp2yfmkJbgApdqlKUpJbSZk8b36rmuH0lZLpnzu/fKz?=
+ =?us-ascii?Q?R9tgKpqVI5sqj7yXK6gsbj8rKiQG5qdItBnvPLK3QcY9Vs0//T60w+JuWwk5?=
+ =?us-ascii?Q?DWjrRMFKuaEvkyGytDPrSzi5c0T+fj/+8nznVDb4COiqjYlno3n+BSYnHXoF?=
+ =?us-ascii?Q?5G51eKjnkHxgQo1+6btlDxUuughab0PmjdesmVJaYDC3m4NPdIKEb/fxquMj?=
+ =?us-ascii?Q?2mTPe1EH9jYCwfjvOUCk236Vn5vswDxSZ4QcD4UvzAnL1fc6R04nxOTl7tue?=
+ =?us-ascii?Q?spHiUhLtRojapNTpHEt/VtgjraXixxHOJiv5nQMq1uPMTzhMpWK9iKv5Z5S1?=
+ =?us-ascii?Q?0aGDN1RcWrRtO3OkgTW5OgIH0M8GnjWmXKMEIsCyyKXwPQ0E3Bdblpncl+n0?=
+ =?us-ascii?Q?JwNM+PrJAYKHKAJ3KR2syDIT0lzIoumJccZPbOKRh/EgjsOBMMJeP2IGGguw?=
+ =?us-ascii?Q?eFeoY/N3XO3njvR9Mh7e17bhpM/5swA//0hLgKrxW4b7XDD7ObXjCYsr92q2?=
+ =?us-ascii?Q?X9OkLCfSB+HpOP4059wrPwqLBvLhh7aXM4PdLYnX3gpjlslAD2XxHHPYPy5p?=
+ =?us-ascii?Q?pdXHKWVE2BF3L746hau/KksHc/YY++nON/uz5hRX6blirpqDiGzP8haxuqQO?=
+ =?us-ascii?Q?N7f/voy5UXpWVVDG4/aJaKaSNHW9jrXsypRFrFgHZ2uG8ORlRmkxMiVT/R0E?=
+ =?us-ascii?Q?SXmJBTfz6wt6KEMj8wA1ww4u3v21Yv0vCe0xg7xJ0KGqjPjD36EdqoKBQ8e6?=
+ =?us-ascii?Q?03xZZqvi+YUTWkY8BQXH+LapJafTa/+6H5PdlJTv+u2i/1tHfGMAbhLu6BW3?=
+ =?us-ascii?Q?bpu6GFhkyUaDX+EK5ee2CWFOxaAPFKIGqd+pWfRMpmEsu9ANiylQBHVZvtrt?=
+ =?us-ascii?Q?YAhRBvk1s2PZrkaEMwsDdb4PGwNhW1h4EhYdU1QQbCYp+QRj3LdlptvhTQZd?=
+ =?us-ascii?Q?jbvOj31Xs+0fn3I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rNnVhWlvwGww62BXVhiCN/tg3n4QNfrhhfEGqfrxe71+14TGa7ar6xT7XPlZ?=
+ =?us-ascii?Q?f6tJQ3kHpeP/XHIQYJaCMF4pM7n5wGs+FDgTq9HiW562SZZgD2lltR6vkTG2?=
+ =?us-ascii?Q?TqVU/b+lfGrdkXiq7xf8mWvx5SKqg4LIyasXiToB3oHGQ4/uQUE2p4PD+ygC?=
+ =?us-ascii?Q?li8eGY+OOHIS1T6XsInZ707pe5OfmMarx9hjjBy0ZQDn2wY+zL7mE/zc0Q4w?=
+ =?us-ascii?Q?KH3tA5G+Br4Sl7+PPTreTgT3r3li6XXXUhtFdzPxDb/EzBtMyEwAu906sq9Q?=
+ =?us-ascii?Q?flXhozodM6LZ757R9VFQRl4z9kR1D4tLUd3Gjx9b1L02L2JOg8f29FyGWa9H?=
+ =?us-ascii?Q?fFqNLgjuse9xFNIK44LmafcTo+BL1J2jOhA558MbHF03FR/hharCnglJesVA?=
+ =?us-ascii?Q?aT+YM5B9EJv1HAQhN/2X1ZiC0oQBJLjSrbY/0GWN3jt9VxVVphR7uT+9sfSb?=
+ =?us-ascii?Q?44FBciGjsgnLD6Y9GwIdbIK8zVMnRvHCpCqx9uM5Yq8YnRsT6rhIUcm84TjH?=
+ =?us-ascii?Q?4rRl6+q5w5S55DhGfZ/jML5denacnGBFESWABqxGRMm/w3PZr0bAxfHmV+f+?=
+ =?us-ascii?Q?oF4uoQhQV7TlmeEKMtTm8gX7pD047Itq8QomovBUcImkgUtCqulmmUEfh3lq?=
+ =?us-ascii?Q?sAGe4/FOEzVpFRJeyGV624jJdtx6xlqQU8E4jAzBGDXB6+7yfP+Qu1j5yA1H?=
+ =?us-ascii?Q?arXDsMbCDYUwapNnNwlviElWdNbPiSOrymux/kLloA9IQUZ9dA0xSrzq5lco?=
+ =?us-ascii?Q?cyxpQVI4TkD9ROSLpuUyo024syIkKzm0lbjbrwH0PJ/ID+HYsJZfb0YUrPlV?=
+ =?us-ascii?Q?JJDRXqvwWnAuCR66+QovYUFmKZlhEX1ew3GfO6HXjiYfQh7ebIZI0cuI6FFG?=
+ =?us-ascii?Q?f058J54orkVqIu/sJKW/6WCQkPhFho5RRit7SvnwDSLjrpLgbkNTXU93Celg?=
+ =?us-ascii?Q?kP7Ery/v8FgI+WQXdPTOXyDzfuUSMLUi1PmsAlpUzsDRKH4EspBHEuELzeCz?=
+ =?us-ascii?Q?ClrcGGMkzVKbhYMhIPJAfF8jI3bNpT5czco/aUYcccI4qr5u9jwjw9L/S+p5?=
+ =?us-ascii?Q?DTrUm/ZGL4b7CFDBhUOgvJ+NZBmAjAeCu6z+6iE822GHnJMKhw0XJPUj4lBP?=
+ =?us-ascii?Q?2LXYTA1/buFJ4QtPbetA9PYwLLx2aOdZ+aEFRG6Syi8KxFjb9udVEhxoHAw8?=
+ =?us-ascii?Q?7fH/G8iwMbRhLprgIRmmioIP2DqJI6z+cB63Zg73658uoTTJm+AOBeMnVzQO?=
+ =?us-ascii?Q?RPyho4SmzlQZDWoHzjYCVl9O/IZxdXT5Ba/3m5YxJEvDfkklHd/fJg2952HP?=
+ =?us-ascii?Q?Cchb9fGGXQzkpWeozhU1I0U15Q//4zOFVpZniajen838dol5ge+RFK3CZ8aD?=
+ =?us-ascii?Q?W0nUwKVhUKR9PgB1tpjNMtUzHsa1NSR3TF2YVOPbS297RaBO0OGd0vyREcD0?=
+ =?us-ascii?Q?j5xbrbJInQNRoCJiILdEQDVZkDzZ5jo2h50Ntt/dyucZOp4BhiqyrUjmMBt7?=
+ =?us-ascii?Q?GzgrAFxQxIl/L24iDO/NUb+KVSU035IclbyKIgo+zaYpIuCx0JOlJ5xu3AEp?=
+ =?us-ascii?Q?9QUqfo6+c1yZ1hINjYuXit3SEM+ocinHFnGz34Cn?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22bdc941-e313-4e27-b8cf-08dda28f5a8e
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 11:11:14.2997
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +BOODE8UREkCWfUKnnqzPnykMDe5KyEv8OrGhGEW+x2PVa8UNkPYMdI9orVHlLNrZrTmTXqotHegmcXKwdTpjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7197
 
-On 6/3/25 11:03 AM, ALOK TIWARI wrote:
-> On 03-06-2025 00:54, Bailey Forrest wrote:
->> I think this patch isn't needed. gve_tx_add_skb_dqo() is only called
->> after checking gve_maybe_stop_tx_dqo(), which checks that
->> gve_alloc_pending_packet() will not return NULL.
-> 
-> Thank you for the clarification,
-> 
-> Even so, I felt it could be a bit misleading for developers and tools. 
-> But if you believe the patch isn't required,I completely understand.
-> In that case, I kindly request you to provide your NACK on the [PATCH 
-> net v2] mail thread for formal tracking,
-> so that other developers can also be aware of the reasoning and 
-> understand the context.
+The kernel robot reported the following errors when the netc-lib driver
+was compiled as a loadable module and the enetc-core driver was built-in.
 
-IMHO it's indeed confusing that the same condition is checked in
-gve_alloc_pending_packet() and ignored by gve_tx_add_skb_dqo().
+ld.lld: error: undefined symbol: ntmp_init_cbdr
+referenced by enetc_cbdr.c:88 (drivers/net/ethernet/freescale/enetc/enetc_cbdr.c:88)
+ld.lld: error: undefined symbol: ntmp_free_cbdr
+referenced by enetc_cbdr.c:96 (drivers/net/ethernet/freescale/enetc/enetc_cbdr.c:96)
 
-Even gve_alloc_pending_packet() is only called after the
-gve_maybe_stop_tx_dqo().
+Simply changing "tristate" to "bool" can fix this issue, but take into
+account that the netc-lib driver needs to support being compiled as a
+loadable module. So we can solve this issue and support "tristate" by
+setting the default value.
 
-Either always ignore the NULL condition it in both places (possibly with
-a comment) or always check it.
+Reported-by: Arnd Bergmann <arnd@kernel.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202505220734.x6TF6oHR-lkp@intel.com/
+Fixes: 4701073c3deb ("net: enetc: add initial netc-lib driver to support NTMP")
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+---
+Arnd Bergmann has posted a similar patch [1], but it has not been updated
+since the first version, perhaps he is busy with more important things.
+In order to fix the issue ASAP, I made this patch. And I added the
+Reported-by tag to give credit to Arnd Bergmann.
+[1] https://lore.kernel.org/imx/20250520161218.3581272-1-arnd@kernel.org/
+---
+ drivers/net/ethernet/freescale/enetc/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-/P
+diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
+index e917132d3714..06759bedb193 100644
+--- a/drivers/net/ethernet/freescale/enetc/Kconfig
++++ b/drivers/net/ethernet/freescale/enetc/Kconfig
+@@ -17,6 +17,7 @@ config NXP_ENETC_PF_COMMON
+ 
+ config NXP_NETC_LIB
+ 	tristate
++	default y if FSL_ENETC_CORE=y && NXP_ENETC4=m
+ 	help
+ 	  This module provides common functionalities for both ENETC and NETC
+ 	  Switch, such as NETC Table Management Protocol (NTMP) 2.0, common tc
+-- 
+2.34.1
 
 
