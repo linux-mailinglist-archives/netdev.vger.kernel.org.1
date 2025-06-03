@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-194839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77058ACCE68
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 22:50:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B2CCACCE69
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 22:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC7353A5B51
-	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 20:49:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A26F91715A2
+	for <lists+netdev@lfdr.de>; Tue,  3 Jun 2025 20:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B14825332E;
-	Tue,  3 Jun 2025 20:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCF3253F07;
+	Tue,  3 Jun 2025 20:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJlkVr0h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jLpTYfJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B200022F766;
-	Tue,  3 Jun 2025 20:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB9B24DCF9;
+	Tue,  3 Jun 2025 20:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748983753; cv=none; b=WKU+zNFAHgic3b3g2VrnQNnFjztxbvzMuzQnCiIcLO8rBalV2lGvC6HVSAuqzeYRQkjW0j6R5kphR4ze4BHS7/YkqK7VUVQcHQpFBpxsrwCcywiGlUVowBRq9bq/7O2ByEWPpBj6QZTmreG5e3Z4/PxD4kJ2zWaPaO4tpNrXA+I=
+	t=1748983754; cv=none; b=kGPYOKrXSRoDUETRZJLzT+oCtOxo8INND3xq+8D8l1oqOYrVGMYxf1KjYU8x8t24dS+Q09Phl3QhB0fBj9BEPTaT47LIwtlrJOWXbqtOKEfaBqK2tOSHGNBgswR4iM3nL6nXoiQB+5k3HIJGWtGwkxEZsR09p8dmL1EnFy4VoG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748983753; c=relaxed/simple;
-	bh=n/bgIhFTed0kA+8ogu3e9r6YUkUg1esbTZK6SEVpDu0=;
+	s=arc-20240116; t=1748983754; c=relaxed/simple;
+	bh=xMsq1BEmjGy13ZIn7lFR/lNYbjg/uXqfolLFRsEXlwM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q0ELej3+PQDOcLWPxSjYUab65OI8tfLOPzVj+l4UB5U2zKK+sD3Qa9YphUz51FhHdo0xkj1rn+8ciurafBdEtfMCJc2rEgPA6pHAWc61Aua6ELoHdXaxlKZ/D6KkcP6Dyvw6waWZn2MuRO0epymMbFj1I3UuIHVx1RUyFGG/h8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FJlkVr0h; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version:Content-Type; b=hnGszARxPkHQnjccBkcMXzCwtJwqfvpPe1uRy2Tse8L09iQ7sBi7NOqPMBvC5LuARSADSXfpJyYGyQCKLCOxqy8WPi8BywCYPpwRC3GutQSfU/979iVXcWVk8SsPH3gMDD3PbWcm90LTlUG88oSzus9kIzR3UF/GDyzZoKexKzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jLpTYfJC; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-450dd065828so31487875e9.2;
-        Tue, 03 Jun 2025 13:49:11 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-451d3f72391so42877555e9.3;
+        Tue, 03 Jun 2025 13:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748983750; x=1749588550; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1748983751; x=1749588551; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dEargT3P78owSoRseiMu/y0IGCgyp/+OmHkvu02Af0Y=;
-        b=FJlkVr0hmwkA135JXuS2cqC16fM133poDYnZ2CkSjKn9d6cuexy8cdudP5W+4h7TBI
-         uuelRY2qkZDac6GvLuAR2JGh8EE8ximRrEbbDs33XzHZYjiu87PvJnPKKLs3/hZM0G7j
-         EQRoKOOHTPL8XzoSGo7SHtv4So3k0ahNVX0HBEGLA9EskGPf+2Vu5FlsA8OxLY2AWS3r
-         +H2lTamZbzRHs3JA7wp/JnDZgKboNqkyN9+iJvR4ZK7AhmaBM+i+5Q+KNtepHWR0Mjtr
-         +5Krf5+SfJ1HHr1BWYoVWXXKL29K/+0FEvRlwbMhYMwfTyPkZ/fEnv0zQoc/6r3CiE3U
-         x0EA==
+        bh=dRdbt6V9pkRCMzRa1/bwpnovvAg9OUnHvZR1pc6vjHE=;
+        b=jLpTYfJCXrnRWkjCCYW3FEZvfBuOfHrgc1yytIHnCNi/GBD6U+VX+XyfBpy4NKfRT9
+         8+1w7F+t3iXotNzeVRoPKvfDB/GkS6KmGcDwQLtQkZUIoMscDD13bosxIzZGxmg3XLrq
+         Tch0Sx3Ie0LF5WLUGt6px+VMJx+C3uIxWi7zsOXeZxZYCscsimkve2AnlZVhHl5KzjdT
+         MKSYXGDVXEQRRtfrFOYdJWmdHfrTP9ZS48yHnBYVvW9S+C062hdyNeYndpyAwfwKlq/j
+         c0M+El3Eu/NHSDN92BHWmbBoLVZJBzlxrh5n94PFVyTzENvMqBXvoqr8bOvmcZUDi8C+
+         VaaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748983750; x=1749588550;
+        d=1e100.net; s=20230601; t=1748983751; x=1749588551;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dEargT3P78owSoRseiMu/y0IGCgyp/+OmHkvu02Af0Y=;
-        b=WtxUdq+6WWHXF/xlYAlXRqxcLxBkvGvpJzySe3iuYsJuUVyspgRzUF5XftKDGKvaCF
-         5e3s9QE88u7QQ9poCoVlnhizmlctzNBpwPgmyh2vpnCbtfQgAGEbARuaMhAZ+5K02gEx
-         nvQn58yMMKIQG7tuGh/N9HdD1WKvtyk4FSNwoCXYm4BPp1HenrQTC4oY/+6IzYDsSFHn
-         OdDlgEGc86fyzUyKYHE1VUT2w1Y2xP39egPSKCNh18F3fWyAAQ9LWkcK7E2490hzgE9G
-         RAbnape1RxjTm9WWFdU//CRgQrcVbuy63s87xvljmYQUAK7l9yDvtAjnZ7xsOyDZdp+F
-         VIZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhx4nCpouK1ZleEfRtt479a1SvlWFpt477krU7XCqJ1j+zci0JdYbtkUU5Cg/Xak1qUDjbX61PTudMEYw=@vger.kernel.org, AJvYcCXspNeise+3aGIodo+MgsnJdZD1w10kbBe970oluMnZfyF4hs8mjnJvw19YW55QJXPSvvIElfZq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZx6gWgePpEJ4CIODCmOqCS6Ug9h8rTRYPr1gJfUdnWeSOL+fD
-	H6z/rmq/9X5FQDZdUPRsN7pVdYJx1dHO1l0FAvzslANLUyLztsQYZtwo
-X-Gm-Gg: ASbGnctnCfnYD/K3AsI43vZgElU/pB6RFGKNRBoVg9c5NQiSTQ4ebRlNgtPNaAuU8C6
-	8zU5/er2nHbS5XzzCRkRv0Ze3cq1jNxKtV6rIrso8YdLRd6EnWR2boKrqq+J7mQ3rLb8DESxaOl
-	tJcnekXB5ECLX0JM6KxdWvF7xODN82/zrmiBgP5ab6QPVm1L+MVkHJR4ZGtom6jez4yOpMPUTxT
-	WEzb/dHWQ1TPGTymiQJ0DCReaHUYfB2k/zkCeZPmAiC1iTmgR+AEoYwBX6K4dk7xXPsgtEtCtD4
-	R1oRSwardQ8h+67G2qUeU4bUEF7LUrGCkQkGTKZx08WTlVk9bxjs96OpBayLOh8MW8yOdKys/wr
-	IAQ0xq0JyVE2c9Pl7PASx1o0CBmRB656jUcoqVYPvDTnDZYjVGqu3
-X-Google-Smtp-Source: AGHT+IFlG1kg/mtA/8RQANgL4qp3Z9sOTadgypTRyTbHD2RGlEWfxQgcccB7HKYUvkFzf5NuOPSjJg==
-X-Received: by 2002:a05:600c:3e0a:b0:43d:fa5d:9314 with SMTP id 5b1f17b1804b1-451f0b3f30amr1082295e9.32.1748983749840;
-        Tue, 03 Jun 2025 13:49:09 -0700 (PDT)
+        bh=dRdbt6V9pkRCMzRa1/bwpnovvAg9OUnHvZR1pc6vjHE=;
+        b=hQUYxA3BVBaRzDWWL038bqG4xx+UYkunP9QKt3Ot/YPLdvNB9+ir33Tj7Cz+HaL3N/
+         u2/ovz7Wpq+eINpVRznaOcabCVU7HlHYz/SIbLeyrJ5lpcMR7DNmoITxAF/mFOzQanus
+         kJ7+HBiyyPN5o8qJeVbcFyvNw2YaKKMp39fjFU5KIH9T3F+TRKbKisZfbyXts12HZ1Oj
+         ZSxioD+J8oIh2iVABZo7fSZ4eIF5cxGC7z5LrvLaO2fWz0k0O3FiyMornSRFhlmGEtoQ
+         oWpf3/XeZ6VTkpsWwhEhlThtSQqxzZZtHD0CDmz+3B8CZ6/QdGxVz65u0rhcg+k3RYB2
+         OOpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUD8I6ulCqi+SY97SemI/ng7vq9rYStoTAiN8dTBiPdjzJRjwCSLLmPyudZzDJL/TXF1CU4AX+U@vger.kernel.org, AJvYcCXoI5el8QQSXZ6aB6M/YWK6fV0Uz82+nhzBxJn8dRGTmw8oYi4aLNw8dVPT9yepNBzmjXdCcRwJ2cIih7E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP53apeIU8InHUaueLZjF8BLofRGrg8ktfnyCuNPFZMhAYM1LG
+	OdXmOUUGmz2A1OT2HT7kRb6WICTnbf8onUDK0ALmScTp/8cJyHMPvAzi
+X-Gm-Gg: ASbGnctTRYnI1MsA+/+pcu7RmcusJmIi0a6no/UP71gmg45qgYB3HMejk9cboJFraRA
+	8IMztjV8rAkhpCcrMW1uvdiKsmdqkMLokQX2jFzXN14EfM3piShokFGn/EgdX7Cd6YottClhEv+
+	i/L9BGibPcW7MKtB+BCC1KV6XrTnTPhRDVeDRw/mjuo4DVbFpwwbSLJe+fxOST8mj73EtYK+7C+
+	unHhPg5K8HtRcBjZPn/pLKXT6RacjIvhX4aKGiQF+frlhUdBCkyz7tDx28ldIRtlvzSGRMiJy+E
+	IPf+Evp+PdsBxDT6PXuAc/NKPwijtoNtb0Dy19OdTRPVkHn/GtsRaT2Nq+4PoULascsNTmbvK54
+	aqs0YKyRJqMplqZReiB6soXcX8f1t4R2T3QxZxT6iPCVPa2a1s+80HMvUchqcoG4=
+X-Google-Smtp-Source: AGHT+IH1WEGuyW9XKmKz4BjVDXrWRz/lz6TUAN58rrx8wLwtxVwwJw+frJLuVX0Iu/6RQ2MIMA8A4w==
+X-Received: by 2002:a05:600c:1d24:b0:444:34c7:3ed9 with SMTP id 5b1f17b1804b1-451f0b256f3mr1050815e9.26.1748983750959;
+        Tue, 03 Jun 2025 13:49:10 -0700 (PDT)
 Received: from skynet.lan (2a02-9142-4580-1500-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1500::8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-451e58c348asm26258225e9.3.2025.06.03.13.49.08
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-451e58c348asm26258225e9.3.2025.06.03.13.49.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jun 2025 13:49:09 -0700 (PDT)
+        Tue, 03 Jun 2025 13:49:10 -0700 (PDT)
 From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
 To: jonas.gorski@gmail.com,
 	florian.fainelli@broadcom.com,
@@ -87,9 +87,9 @@ To: jonas.gorski@gmail.com,
 	linux-kernel@vger.kernel.org,
 	dgcbueu@gmail.com
 Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [RFC PATCH net-next v2 05/10] net: dsa: b53: prevent DIS_LEARNING access on BCM5325
-Date: Tue,  3 Jun 2025 22:48:53 +0200
-Message-Id: <20250603204858.72402-6-noltari@gmail.com>
+Subject: [RFC PATCH net-next v2 06/10] net: dsa: b53: prevent BRCM_HDR access on BCM5325
+Date: Tue,  3 Jun 2025 22:48:54 +0200
+Message-Id: <20250603204858.72402-7-noltari@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250603204858.72402-1-noltari@gmail.com>
 References: <20250603204858.72402-1-noltari@gmail.com>
@@ -102,47 +102,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-BCM5325 doesn't implement DIS_LEARNING register so we should avoid reading
-or writing it.
+BCM5325 doesn't implement BRCM_HDR register so we should avoid reading or
+writing it.
 
-Fixes: f9b3827ee66c ("net: dsa: b53: Support setting learning on port")
+Fixes: b409a9efa183 ("net: dsa: b53: Move Broadcom header setup to b53")
 Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- drivers/net/dsa/b53/b53_common.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ drivers/net/dsa/b53/b53_common.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- v2: add changes proposed by Vladimir:
-  - Disallow BR_LEARNING on b53_br_flags_pre() for BCM5325.
+ v2: no changes.
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index f1e82a0e84ea9..143c213a1992c 100644
+index 143c213a1992c..693a44150395e 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -592,6 +592,9 @@ static void b53_port_set_learning(struct b53_device *dev, int port,
- {
- 	u16 reg;
+@@ -729,6 +729,10 @@ void b53_brcm_hdr_setup(struct dsa_switch *ds, int port)
+ 		hdr_ctl |= GC_FRM_MGMT_PORT_M;
+ 	b53_write8(dev, B53_MGMT_PAGE, B53_GLOBAL_CONFIG, hdr_ctl);
  
++	/* B53_BRCM_HDR not present on BCM5325 */
 +	if (is5325(dev))
 +		return;
 +
- 	b53_read16(dev, B53_CTRL_PAGE, B53_DIS_LEARNING, &reg);
- 	if (learning)
- 		reg &= ~BIT(port);
-@@ -2264,7 +2267,13 @@ int b53_br_flags_pre(struct dsa_switch *ds, int port,
- 		     struct switchdev_brport_flags flags,
- 		     struct netlink_ext_ack *extack)
- {
--	if (flags.mask & ~(BR_FLOOD | BR_MCAST_FLOOD | BR_LEARNING))
-+	struct b53_device *dev = ds->priv;
-+	unsigned long mask = (BR_FLOOD | BR_MCAST_FLOOD);
-+
-+	if (!is5325(dev))
-+		mask |= BR_LEARNING;
-+
-+	if (flags.mask & ~mask)
- 		return -EINVAL;
- 
- 	return 0;
+ 	/* Enable Broadcom tags for IMP port */
+ 	b53_read8(dev, B53_MGMT_PAGE, B53_BRCM_HDR, &hdr_ctl);
+ 	if (tag_en)
 -- 
 2.39.5
 
