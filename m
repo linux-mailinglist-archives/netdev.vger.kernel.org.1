@@ -1,263 +1,123 @@
-Return-Path: <netdev+bounces-195087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDD10ACDE10
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:34:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36716ACDE24
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 619573A608D
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:34:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AC427A86FC
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750B428F52C;
-	Wed,  4 Jun 2025 12:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 951C528ECD0;
+	Wed,  4 Jun 2025 12:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b="Lwzy8AmT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBgnyp2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11023117.outbound.protection.outlook.com [40.107.162.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9594828ECF1;
-	Wed,  4 Jun 2025 12:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.117
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749040458; cv=fail; b=kq60PM/69cT+8wVP5/LMNT/LA+xXn9VJbOTmKB3w/4QfhWFBrP5HWj6ktaaNLSigoYn26ObFMSNovxfLjkD46PA1DqLdipb+cERiGZ/FRg8d0eeGGx1abSAMRaELuJ9jbkZcDdnlaI7WfaHeyfHIJznyM29FOtdyoqzk0yigVr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749040458; c=relaxed/simple;
-	bh=/zdeBRzQXESFvSukdpEyV6Inv8QSONsFOHxqns46bK4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PUjq89aHjO3+AMek0LRsTPi/3VeFZ324UE+TrKS8HSUts088Oz9Z35DPYT7wzOh8s+l/auKvHeeBzSuNuZx2xGeHmOK96gTeSgfpICzlGy1BER9pW1Gr+Qdp/pjPwsSFSEBWhDvF6eINf7FUhqqIIbZIQpyiUjWbkGl+PcJs/kc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de; spf=pass smtp.mailfrom=technica-engineering.de; dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b=Lwzy8AmT; arc=fail smtp.client-ip=40.107.162.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=technica-engineering.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gfaWMcEFjRBt2gy/Q8pKnjkEtpj/mepGWgeVKxA+IPc+t6GZhQzqkjhwGz/25pUiN/mYcCpRd3LCtEsew+Dw7R7T0iS+dV6DhPBz5YChS1ODyN41Ugn84T124n8GY8CYX4ptYsK1lxRsgd8KAMpFZ106i0oEK5D0MJw2um2nf8CRbOFmdfNwfAxorNze54Xj/IZZhCS+v+pabSkieFkGBJynuTgHqlaz/iKxO33k5wPajrfS7HzpeRNhjoZtDm0dq8ojEVpy/3MMnDgjyv8rgWK83iO9sB1uhq6udRxu5yC8ZgDkR/KXJMQAbVSErl2WqstlOaWMqZBLgbtumrD5Ng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V3zTbvcd0itzE+wrkAjTVxk03xkbgKE/Fqu0GZG43dk=;
- b=rkDAN1K741CwPuGC/bLmyhCkc6T9FAY2vcT+oMmQ2m0jl0qcJ/K233YnaJ1EZy5lnmJ7N+La5DbrkA1tDv3nPy21BxFyHzmUvZXlw3Of6WNqG6kc/rgYe6HFHnv54gA1K4Jx1a/e/FUP9ACcYxxgcxP5Qxuy8yIZ+4gNIv7nSTPjwWWOkElsJeso7fb6gZmApUjXrOAOjetQJ2PGhJBY84K+byD+tXhT7EytXEuHaPAos7dEluL1ZtioGYxuWNtEhAufcfKQC7zvByR3KcU0RpBQz4SMgzm+RASz2dGKRT66hRP1577pp2FM9xwJyqjmbFwzxg7P5NJL4ic7m6cqOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 2.136.200.136) smtp.rcpttodomain=davemloft.net
- smtp.mailfrom=technica-engineering.de; dmarc=fail (p=reject sp=reject
- pct=100) action=oreject header.from=technica-engineering.de; dkim=none
- (message not signed); arc=none (0)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2FF28EA41;
+	Wed,  4 Jun 2025 12:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749040603; cv=none; b=Rqx+L80S/o5SH1RCsUwMvR04eC1MQrFnO0emMpWLM+lazJRlSAIfFnM2RWzqfu+77xHTrWK53HNcFTDAYLukUrkNAgpoJCeT+tG/o5n3iEBmMzIp6ZuS4oh1NB4qeyqIm36qh5iV12QmtdjuVbERRaHp08Cuatk62Hcq5ORrF2E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749040603; c=relaxed/simple;
+	bh=tVbrkFg33kKCl6pz608RQ5AoDrhQHTPHfpoIjv/FzOo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u+kedBt0ua42jmajSv4YVZrbGLB0iKPPsx3qcUtcha8LbBsSWqbZmeRP6Qoxu6VcCbGTeCYuT1l06mf0dEPordQ4d+dQvjMD00xgKtfQCpu2HuVeQ/ivPozwDDjK7PK8ZEfodcPxQxlwi2GG30i8nQCSAsib0sBF6J8VdodFtqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GBgnyp2C; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ad883afdf0cso1285654666b.0;
+        Wed, 04 Jun 2025 05:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=technica-engineering.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V3zTbvcd0itzE+wrkAjTVxk03xkbgKE/Fqu0GZG43dk=;
- b=Lwzy8AmT9gjWR7vl5NaZ2jW0FU/n0pyK2T7Ik8TjvLv6wwj+bD4RPEXBSeWDwrwIHyeJ1e7vebCmx/NC4ipxzZ3v4xB/MxCo93OyE+sojPeVxFbh3inTM9RABQWtKN75d3mwHE4u0RCAejWPP6GB2YsWCS8gJIZGB6oi74o1CPI=
-Received: from DU2PR04CA0171.eurprd04.prod.outlook.com (2603:10a6:10:2b0::26)
- by VI0PR08MB10488.eurprd08.prod.outlook.com (2603:10a6:800:203::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Wed, 4 Jun
- 2025 12:34:11 +0000
-Received: from DU6PEPF00009526.eurprd02.prod.outlook.com
- (2603:10a6:10:2b0:cafe::b5) by DU2PR04CA0171.outlook.office365.com
- (2603:10a6:10:2b0::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.19 via Frontend Transport; Wed,
- 4 Jun 2025 12:34:11 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 2.136.200.136)
- smtp.mailfrom=technica-engineering.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=oreject header.from=technica-engineering.de;
-Received-SPF: Fail (protection.outlook.com: domain of technica-engineering.de
- does not designate 2.136.200.136 as permitted sender)
- receiver=protection.outlook.com; client-ip=2.136.200.136;
- helo=jump.ad.technica-electronics.es;
-Received: from jump.ad.technica-electronics.es (2.136.200.136) by
- DU6PEPF00009526.mail.protection.outlook.com (10.167.8.7) with Microsoft SMTP
- Server id 15.20.8792.29 via Frontend Transport; Wed, 4 Jun 2025 12:34:10
- +0000
-Received: from dalek.ad.technica-electronics.es (unknown [10.10.2.101])
-	by jump.ad.technica-electronics.es (Postfix) with ESMTP id 00F0440296;
-	Wed,  4 Jun 2025 14:34:09 +0200 (CEST)
-From: carlos.fernandez@technica-engineering.de
-To: andreu.montiel@technica-enginnering.de
-Cc: carlos.fernandez@technica-engineering.de,
-	Andreu Montiel <Andreu.Montiel@technica-engineering.de>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] macsec: MACsec SCI assignment for ES = 0
-Date: Wed,  4 Jun 2025 14:33:55 +0200
-Message-ID: <20250604123407.2795263-1-carlos.fernandez@technica-engineering.de>
-X-Mailer: git-send-email 2.43.0
+        d=gmail.com; s=20230601; t=1749040600; x=1749645400; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DwqYeSj50tPrfJo7B8aScun0SAt0rmNbA2C7B5WvB24=;
+        b=GBgnyp2C50i9T9ocFZuC2iZD4cLRiO/WFNmUZmYOKvDKQD8eMFcwUhskWNI4b45SFv
+         vuHP7t6mFFqx7A1H7/tPtu1gIw82Yk9Eqqd9b1SH7LRpebjmFD7r77NZrGl/gCbZKfi4
+         Tutc4t9Jy+D8woDvRGg6CsqPeJVa+1NnZOySA3mwYY9+jYwOHjZT2lkwPEQGa5d2hXW4
+         agPVafJ1+B0U4tMFBaI4aF46/rJFbOMrsB8Sie4yv6Dz9YQxnIjwRodkm42l19ohVtWG
+         uadqHjgfWZ0hTqlcfecZslN2qw1CpJo7Znu/DNXW4R6Wrtaad/DB8wcYvYIbFcpAATaJ
+         /3UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749040600; x=1749645400;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DwqYeSj50tPrfJo7B8aScun0SAt0rmNbA2C7B5WvB24=;
+        b=vQlCdXYjfrGaw64ZY8VBwWTJiDCrE8Y0St7X5vjVV1edZpzWfm+09OrJQZ6vFsTplJ
+         79o73C/XBOjmO51kP13CHQ4JX0u1qXXS091jSyNGg7aNp02CPqiyAAlLR6XxAyICTTWy
+         pzNOK0FtXwolFmbIidx4SWdpsF6DQdXYT5RA4lbnkC8/9e8Llwo9GpckGKPYdEqD4O74
+         rXBpBo8mC2jmirXU+WICN2ExDm0VJvQ3w2MWFt+9JvmUS1xp2r7vqse45gOIMW6DbZuZ
+         WcJf1ko4g1+UhjUwB+WAxrSKvf4/Npq1DO3Hde+Ny+2c7/YgrafexuvwUGvCCB72uzPP
+         AYGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/pF4tgKL3KioHJyIkePYQ1UtG/gCncw8t1ZmZFmyc3USnALLZ5tLQgt9+XPAbMGpCuFJHTxba9w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqiIQEt5tYncBHBuZa9P38HSoCfSDd+BoT5fWNwHVlAN+lX8n7
+	eLKw1yzVg5RiplNMG+P7ewjf/KV4JI57X/vouChDDB4rdzlApgqGBdi3BnY/kw==
+X-Gm-Gg: ASbGnct/SHm6IJH392s7x9tDuEN6khd7TmsEiilC1Go2GXjdptYqXFGkFP8hf4dgrkA
+	3SsoaIKJUeL+QYEqN14Ei9YEulZrPXbOIDGKZ8bX7YXHyBn8/T8DZzNlRd534J2ofEHjAazUdks
+	shFhaw3vYnAOOpFUmzuhdt59eakAcM9GFHWEP2ScBMLmLeW/24peSgTKxGcxhwgoNSG5OR5Y1b5
+	FYw6d8RutJTGMablOcIBDYpnzGaT6wObRlZCn2rW6xX5GidfcQ3SBppc7Oa6wwLI6Xmw1sNgOYM
+	VYW1cMVixSG3p0zT9hHygbbRzEmdfeN1smvL2Tn3/xFKfAlov9+jim0RUYG4rmqj
+X-Google-Smtp-Source: AGHT+IFd/CyVppJma2C+P75Q43NxxRfh7zM2X/byw+se/FmxoabmRdGrPSzYA6egeVh0yRQmYBEm3g==
+X-Received: by 2002:a17:907:6ea2:b0:ace:cc7f:8abe with SMTP id a640c23a62f3a-addf8f19124mr236411866b.31.1749040599865;
+        Wed, 04 Jun 2025 05:36:39 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::26f? ([2620:10d:c092:600::1:b3d1])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada6ad394f1sm1087613766b.135.2025.06.04.05.36.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Jun 2025 05:36:39 -0700 (PDT)
+Message-ID: <a3430f8f-8e38-445b-a3e8-f7c0d0bd1f00@gmail.com>
+Date: Wed, 4 Jun 2025 13:38:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU6PEPF00009526:EE_|VI0PR08MB10488:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 138a6405-bf99-4e21-b99d-08dda3641b42
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|1800799024|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ewvWkZC95af5RaTJCIF5TPu+rNvDYF9NG3jAjaNko3OPuOAcrNbEytRQy9cc?=
- =?us-ascii?Q?/3wezNVyhUJh1PJnhJyTR8Zz4O91btkjNUAY7spEWF0fFyYtCGEKp3SW68Vo?=
- =?us-ascii?Q?T5iX8sOUVgrgqTjxpi9cTddCXjHNbl7vveVZyIlGr6+1hTx/TzdGmkuAs2Nm?=
- =?us-ascii?Q?6CT83kj8XQY1/NbGBq6uL5MIKKgPwlvZbZJHGBsqoHnyBJ+MAUpWIYSL5uej?=
- =?us-ascii?Q?nSQB9V+dkJBMkctrPQ08e3PsxMtsC1tUEZmtE39t4cRDl2akNWN+OKw5KPSK?=
- =?us-ascii?Q?HSa7+cI37gdxtROe+sXw1CN7wechW923IBwCelUP2OkxFGOnpXy38Q0TRkT2?=
- =?us-ascii?Q?gKfGrG9ekv+ckkyD4dCrEMn04b0o4O4Q08mjEd2nlkeXcOJyFsra6yenGjyN?=
- =?us-ascii?Q?oyKqqwtxqauq+6kj5FzA/0a/1ZLDfCFUkDCm/Q2MIVKorbM7d1bLbOfx9Lhq?=
- =?us-ascii?Q?mgnDzvH16janjAFKqcb5OBd5EjL52Ze6Z9Uu27j85bnCUU5qsk92Oe4yAtas?=
- =?us-ascii?Q?1pYOcqFpBnJ2J0yKDKLCPP8gpljo/9XfLzTyTsBJWR2lLKuFHOIxhWE3g6aO?=
- =?us-ascii?Q?9D2AFQe0wP1DmgDEF9WKql7XNH8nTrU2OF6jtLyvoeI7XUsngs9hPmzqxBH/?=
- =?us-ascii?Q?ZWX6b8ptO+DxaNEeBJXdNoF/ZbC+DbuAXHBpMmgwI7CAnBCc1bTQXxf/H/LF?=
- =?us-ascii?Q?51ipgWLxOBFbI3826mnqe0gcuUbqYIr8si7eaalzok9DjNDO0FFolZJv2E+5?=
- =?us-ascii?Q?tLiafn0UgznRVYh2AGf1I3luhSQyGw22Niqdwbyy6P8hroSd5v6VrAoZIbCm?=
- =?us-ascii?Q?aOsIeJnsD3xC0KJ0XwiGHz54A3WRcPflrQh86m1IBX9zTV3kePQzROorfuax?=
- =?us-ascii?Q?xLjtNhvsxjD9pldAkuzgzwmNH/NsCE2JpsISKg9qsyzoC+R35fx1tz9hH4T9?=
- =?us-ascii?Q?w4wlt5ubzoMPB0tXuh+Ls1Y4MxBOpSs483yxYRog4XX/mMHXzZ+vJ/MkHlJf?=
- =?us-ascii?Q?jJKtKYmvMlh+cDTDYi+aTwKEfoRFSYoVoL5ryx+rxxsC/9J0iiMC/0kcQruQ?=
- =?us-ascii?Q?GHZ+xwk3BRIMEr20UcQ/FUlvSr8piy/7fpQrkMMwtSENIkXAXUipdXehB/r2?=
- =?us-ascii?Q?mc5Zn4QFXuzIw1lwaV5xBMfLPqv6zCoxvJZvWxguIP+/Fpa4Ip7HJgjE5foQ?=
- =?us-ascii?Q?ZPGpd4D8nNxMxJDu2Yccv+5TFlMrwK0eHxoZ1V/eS/Nb/mSteCKA2d/s0MeS?=
- =?us-ascii?Q?hN2fBxM56IYQYkj01ebC1lpXnKppDyDS6K1QAzAPur/VR8ZnLBxm1rgaDyU9?=
- =?us-ascii?Q?nvgCTN8EBD88rxp9Rpl9RAaNpxcZirXu+5lr48GHW5987cm7geJQ2UtHdp/C?=
- =?us-ascii?Q?aVd6jkhcb84ZEsOmd1TSC8TnRPvZq2q/XjrUNjo7IkTlcoyaPt1HLZBIT0JN?=
- =?us-ascii?Q?G6l7XkVlqPz0zuZY7iENXFqadE0MjhNHojNmlmxYA6by2HMn+hLnE8oXFngk?=
- =?us-ascii?Q?c0Bqc7M/KkNSnbY7j5VBYrIeavo+rUxfNnKd574NxHhDgguKSAAVPfMkoA?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:2.136.200.136;CTRY:ES;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:jump.ad.technica-electronics.es;PTR:136.red-2-136-200.staticip.rima-tde.net;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1102;
-X-OriginatorOrg: technica-engineering.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 12:34:10.4619
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 138a6405-bf99-4e21-b99d-08dda3641b42
-X-MS-Exchange-CrossTenant-Id: 1f04372a-6892-44e3-8f58-03845e1a70c1
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1f04372a-6892-44e3-8f58-03845e1a70c1;Ip=[2.136.200.136];Helo=[jump.ad.technica-electronics.es]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF00009526.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB10488
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/5] io_uring cmd for tx timestamps
+To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+References: <cover.1749026421.git.asml.silence@gmail.com>
+ <1cc7d36f-9bf7-4aa0-a974-35fea28a7f49@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <1cc7d36f-9bf7-4aa0-a974-35fea28a7f49@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+On 6/4/25 13:06, Jens Axboe wrote:
+> On 6/4/25 2:42 AM, Pavel Begunkov wrote:
+>> Vadim Fedorenko suggested to add an alternative API for receiving
+>> tx timestamps through io_uring. The series introduces io_uring socket
+>> cmd for fetching tx timestamps, which is a polled multishot request,
+>> i.e. internally polling the socket for POLLERR and posts timestamps
+>> when they're arrives. For the API description see Patch 5.
+>>
+>> It reuses existing timestamp infra and takes them from the socket's
+>> error queue. For networking people the important parts are Patch 1,
+>> and io_uring_cmd_timestamp() from Patch 5 walking the error queue.
+>>
+>> It should be reasonable to take it through the io_uring tree once
+>> we have consensus, but let me know if there are any concerns.
+> 
+> Still looks fine to me - is there a liburing test case as well?
 
-According to 802.1AE standard, when ES and SC flags in TCI are zero,
-used SCI should be the current active SC_RX. Current code uses the
-header MAC address. Without this patch, when ES flag is 0 (using a
-bridge or switch), header MAC will not fit the SCI and MACSec frames
-will be discarted.
+Just a hacky adaptation of a selftest for now and requires tc
+incantations either way.
 
-Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
-Co-developed-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
-Signed-off-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
-Signed-off-by: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
----
-v3:
-* Wrong drop frame afer macsec_frame_sci
-* Wrong Fixes tag in message 
-
-v2: https://patchwork.kernel.org/project/netdevbpf/patch/20250604113213.2595524-1-carlos.fernandez@technica-engineering.de/
-* Active sci lookup logic in a separate helper.
-* Unnecessary loops avoided. 
-* Check RXSC is exactly one for lower device.
-* Drops frame in case of error.
-
-
-v1: https://patchwork.kernel.org/project/netdevbpf/patch/20250529124455.2761783-1-carlos.fernandez@technica-engineering.de/
-
- drivers/net/macsec.c | 40 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index 3d315e30ee47..7edbe76b5455 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -247,15 +247,39 @@ static sci_t make_sci(const u8 *addr, __be16 port)
- 	return sci;
- }
- 
--static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present)
-+static sci_t macsec_active_sci(struct macsec_secy *secy)
- {
--	sci_t sci;
-+	struct macsec_rx_sc *rx_sc = rcu_dereference_bh(secy->rx_sc);
-+
-+	/* Case single RX SC */
-+	if (rx_sc && !rcu_dereference_bh(rx_sc->next))
-+		return (rx_sc->active) ? rx_sc->sci : 0;
-+	/* Case no RX SC or multiple */
-+	else
-+		return 0;
-+}
-+
-+static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present,
-+			      struct macsec_rxh_data *rxd)
-+{
-+	struct macsec_dev *macsec;
-+	sci_t sci = 0;
- 
--	if (sci_present)
-+	/* SC = 1 */
-+	if (sci_present) {
- 		memcpy(&sci, hdr->secure_channel_id,
- 		       sizeof(hdr->secure_channel_id));
--	else
-+	/* SC = 0; ES = 0 */
-+	} else if ((!(hdr->tci_an & (MACSEC_TCI_ES | MACSEC_TCI_SC))) &&
-+		   (list_is_singular(&rxd->secys))) {
-+		/* Only one SECY should exist on this scenario */
-+		macsec = list_first_or_null_rcu(&rxd->secys, struct macsec_dev,
-+						secys);
-+		if (macsec)
-+			return macsec_active_sci(&macsec->secy);
-+	} else {
- 		sci = make_sci(hdr->eth.h_source, MACSEC_PORT_ES);
-+	}
- 
- 	return sci;
- }
-@@ -1109,7 +1133,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
- 	struct macsec_rxh_data *rxd;
- 	struct macsec_dev *macsec;
- 	unsigned int len;
--	sci_t sci;
-+	sci_t sci = 0;
- 	u32 hdr_pn;
- 	bool cbit;
- 	struct pcpu_rx_sc_stats *rxsc_stats;
-@@ -1156,11 +1180,14 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
- 
- 	macsec_skb_cb(skb)->has_sci = !!(hdr->tci_an & MACSEC_TCI_SC);
- 	macsec_skb_cb(skb)->assoc_num = hdr->tci_an & MACSEC_AN_MASK;
--	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci);
- 
- 	rcu_read_lock();
- 	rxd = macsec_data_rcu(skb->dev);
- 
-+	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci, rxd);
-+	if (!sci)
-+		goto drop_nosc;
-+
- 	list_for_each_entry_rcu(macsec, &rxd->secys, secys) {
- 		struct macsec_rx_sc *sc = find_rx_sc(&macsec->secy, sci);
- 
-@@ -1283,6 +1310,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
- 	macsec_rxsa_put(rx_sa);
- drop_nosa:
- 	macsec_rxsc_put(rx_sc);
-+drop_nosc:
- 	rcu_read_unlock();
- drop_direct:
- 	kfree_skb(skb);
 -- 
-2.43.0
+Pavel Begunkov
 
 
