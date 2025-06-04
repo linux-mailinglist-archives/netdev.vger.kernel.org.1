@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-194948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB3C7ACD49E
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:31:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CE48ACD425
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AA85188FBCE
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:25:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2E72179AF5
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A22B22F75B;
-	Wed,  4 Jun 2025 01:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24008231850;
+	Wed,  4 Jun 2025 01:05:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+vw9Vkd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6SVtp7T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AB422D4C8;
-	Wed,  4 Jun 2025 01:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED78C19D08F;
+	Wed,  4 Jun 2025 01:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999123; cv=none; b=hpLJc11D+GiK4PKrZcOr47ku82fOGEgTVunQrSG0yRyhNEzf5ojWQftUssW6sy0I4NEpBOCrbg+p1YRpPQ358dF6k734kQKzevvcpHt+kQlPNebOFet4h0X61GEKP5gyXL4eAGmM8MoIv0isJmM9Fm5YZ30gis2chVer0bHhR18=
+	t=1748999128; cv=none; b=FQQCzT98kIg0oHMbObtrcJxFKPaUajKgj4qE4ahK+owFKa0suCnf7+/F/iK3WTZtF6aSJq2wDSMHZmYLSFiWQvfrhiubbuDWmbF7Qr1T8fFSf7Z8bcWAn2Qk5tZGmWSJPCTinUPc51Mg7uw6Omzr8jIbcVx8mkWXG4hTLWvxlUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999123; c=relaxed/simple;
-	bh=9v01QudIRakjiSUSsfrPjuLz9MyqZupvfq8bl4eSiks=;
+	s=arc-20240116; t=1748999128; c=relaxed/simple;
+	bh=7sPYSZ1OaFDu3HNANzwCOrbzVjcsp9WNbN6myF9HpxE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q8IUxudSCRrk3DOHi1lZmZPlY0GX7/kJXjzHwKsrQLaqvn/rXoxhQ2xXi4ny3bFzkiqIQTX2y0KmmmYNuEND9YDWoCAA1sZQ1dyM3z9erXNVM53QCfzaj//Z/YyWGKkdNWEpnTlWE4RslDLlf65qd+eOMarvOl/Y85PDocEO/OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+vw9Vkd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82AA2C4CEEF;
-	Wed,  4 Jun 2025 01:05:21 +0000 (UTC)
+	 MIME-Version; b=aYY6vtHacroalV8gW5zhn2yLhO84A4WXWFqlg+grSJ37aMoLOkEOZLZTR4S1Xlmo5qy0jmhgrqzsjHHy3IxYehmIDqU5bveW4Pmzq3Ct+Afcyqt/Kg5KM06EmznZvE7Wn7+59JJn8STSSglqL3IdB9ibMDWigHGvm7kVY6rlqiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6SVtp7T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0CCC4CEED;
+	Wed,  4 Jun 2025 01:05:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999122;
-	bh=9v01QudIRakjiSUSsfrPjuLz9MyqZupvfq8bl4eSiks=;
+	s=k20201202; t=1748999127;
+	bh=7sPYSZ1OaFDu3HNANzwCOrbzVjcsp9WNbN6myF9HpxE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o+vw9VkdbDbLbBfBDiT6xCGk/sQ2h+t7gF2gu17MKaqhEfg2bMbxSLLxe89E1i3RW
-	 OAYpBYA+LUkNiaZ0Nw20eT9bKgF+zigNPKxljWo0oYpLyEN8/4oKpQ01tF/PEAxYNy
-	 f8uhRbs/ewwchtv91aEbKrSFpqF9QjwJ0BqQ8cVVBMyUyv56HIdm1SEX24rB7sHh9b
-	 8Ab311zAO3n96brO7IQ1bjkt1MactsblBIqiGdGHpcP+bEae4K7LuqlobkGv2nSEMG
-	 IlC5bkkND3UA23LhKjrXFdDtNkuCFowRup0yL0fJDujr1JVShpksGwuXC/TKhrFKRA
-	 KpkfoBQWnVmNQ==
+	b=T6SVtp7TYJI+kmRZ7aBR7wwVvCOQ4c6xT2uEiqfY64XtCdao29kaxvZB743qW4BSz
+	 9OJjuW1GxLKWBWeVw9Dh+GaM4HwsLOaM/bsklluvjCzSa/44n4tuI8grNJBZ3YVeUp
+	 /Y2NBPbG7cfFNsN6m1bWCcVfdyCzaDKKAIUZzgXIQdoTILZ5V5l52ZKTQp5cknCwEL
+	 0YacOoJGU3CvwaD0O9zcMDOEKLF/YN44Rr3XzTMpcfV6UHgzu65VM+sCJ3PYKOBg4C
+	 GublHx6duRT6yleOXz+Ee6wP9LOlKMJZg6Y1dMpM3HEG5SkkfnQ/DnbgWkMUtAOSXT
+	 PtpIoAsioHl3Q==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Wentao Liang <vulab@iscas.ac.cn>,
-	Simon Horman <horms@kernel.org>,
+Cc: Zilin Guan <zilin@seu.edu.cn>,
+	Tung Nguyen <tung.quang.nguyen@est.tech>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	bbhushan2@marvell.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 46/46] octeontx2-pf: Add error log forcn10k_map_unmap_rq_policer()
-Date: Tue,  3 Jun 2025 21:04:04 -0400
-Message-Id: <20250604010404.5109-46-sashal@kernel.org>
+	jmaloy@redhat.com,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Subject: [PATCH AUTOSEL 5.15 02/33] tipc: use kfree_sensitive() for aead cleanup
+Date: Tue,  3 Jun 2025 21:04:53 -0400
+Message-Id: <20250604010524.6091-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250604010404.5109-1-sashal@kernel.org>
-References: <20250604010404.5109-1-sashal@kernel.org>
+In-Reply-To: <20250604010524.6091-1-sashal@kernel.org>
+References: <20250604010524.6091-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,93 +65,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.140
+X-stable-base: Linux 5.15.184
 Content-Transfer-Encoding: 8bit
 
-From: Wentao Liang <vulab@iscas.ac.cn>
+From: Zilin Guan <zilin@seu.edu.cn>
 
-[ Upstream commit 9c056ec6dd1654b1420dafbbe2a69718850e6ff2 ]
+[ Upstream commit c8ef20fe7274c5766a317f9193b70bed717b6b3d ]
 
-The cn10k_free_matchall_ipolicer() calls the cn10k_map_unmap_rq_policer()
-for each queue in a for loop without checking for any errors.
+The tipc_aead_free() function currently uses kfree() to release the aead
+structure. However, this structure contains sensitive information, such
+as key's SALT value, which should be securely erased from memory to
+prevent potential leakage.
 
-Check the return value of the cn10k_map_unmap_rq_policer() function during
-each loop, and report a warning if the function fails.
+To enhance security, replace kfree() with kfree_sensitive() when freeing
+the aead structure. This change ensures that sensitive data is explicitly
+cleared before memory deallocation, aligning with the approach used in
+tipc_aead_init() and adhering to best practices for handling confidential
+information.
 
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250408032602.2909-1-vulab@iscas.ac.cn
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
+Link: https://patch.msgid.link/20250523114717.4021518-1-zilin@seu.edu.cn
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** Based on my analysis of the commit and the surrounding codebase
-context, this commit should be backported to stable kernel trees. Here's
-my extensive analysis: ## Code Analysis ### The Specific Change The
-commit adds error checking to a loop in `cn10k_free_matchall_ipolicer()`
-that was previously ignoring return values from
-`cn10k_map_unmap_rq_policer()` calls: **Before:** ```c for (qidx = 0;
-qidx < hw->rx_queues; qidx++) cn10k_map_unmap_rq_policer(pfvf, qidx,
-hw->matchall_ipolicer, false); ``` **After:** ```c for (qidx = 0; qidx <
-hw->rx_queues; qidx++) { rc = cn10k_map_unmap_rq_policer(pfvf, qidx,
-hw->matchall_ipolicer, false); if (rc) dev_warn(pfvf->dev, "Failed to
-unmap RQ %d's policer (error %d).", qidx, rc); } ``` ### Why This Should
-Be Backported 1. **Fixes a Real Bug**: The function was silently
-ignoring failures from critical hardware unmapping operations. Based on
-my analysis of `otx2_tc.c`, this function can return various error codes
-including `-ENOMEM` and mailbox communication failures. 2. **Consistent
-Error Handling**: Every other usage of `cn10k_map_unmap_rq_policer()` in
-the codebase properly checks return values and logs errors. For example,
-in `otx2_tc.c:1216-1221`, the same operation uses: ```c err =
-cn10k_map_unmap_rq_policer(nic, flow_node->rq, flow_node->leaf_profile,
-false); if (err) netdev_err(nic->netdev, "Unmapping RQ %d & profile %d
-failed\n", flow_node->rq, flow_node->leaf_profile); ``` 3. **Meets
-Stable Criteria**: This commit: - Fixes a clear bug (missing error
-handling) - Is small and contained (only adds error checking) - Has
-minimal risk of regression (only adds logging) - Improves system
-robustness - Follows the driver's established error handling patterns 4.
-**Hardware Resource Management**: The `cn10k_map_unmap_rq_policer()`
-function deals with hardware policer resource management. Silent
-failures during cleanup could potentially: - Leave hardware in an
-inconsistent state - Cause resource leaks - Make debugging network QoS
-issues extremely difficult 5. **Alignment with Similar Commits**:
-Looking at the provided examples, this commit is very similar to
-"Similar Commit #1" and "Similar Commit #4" which both received
-"Backport Status: YES". Those commits also added error checking to
-`otx2_mbox_get_rsp()` calls that were previously unchecked. 6. **Low
-Risk**: The change only adds warning messages and doesn't change the
-control flow. Even if the warning message format had issues (which it
-doesn't), it wouldn't cause functional problems. 7. **Driver Quality**:
-This fix improves the overall quality and debuggability of the OcteonTX2
-network driver, which is important for enterprise and datacenter
-deployments where these cards are commonly used. The commit represents a
-straightforward bug fix that improves error visibility and follows
-established patterns in the driver, making it an excellent candidate for
-stable tree backporting.
+**YES** This commit should be backported to stable kernel trees. Here's
+my detailed analysis: ## Security Justification The commit addresses a
+clear security vulnerability by replacing `kfree()` with
+`kfree_sensitive()` for the `tipc_aead` structure in `tipc_aead_free()`.
+This is a critical security improvement because: 1. **Sensitive Data
+Content**: The `tipc_aead` structure contains highly sensitive
+cryptographic information: - `salt` field: Cryptographic salt used in
+key derivation - `key` pointer: References actual cryptographic key
+material - `hint` field: Contains key identification information 2.
+**Memory Security Risk**: Using regular `kfree()` leaves sensitive
+cryptographic data in freed memory, creating a potential information
+leakage vector where: - Attackers could potentially recover salt values
+and key hints from freed memory - Subsequent memory allocations might
+access residual cryptographic data - This violates cryptographic
+security best practices ## Code Change Analysis The specific change from
+`kfree(aead)` to `kfree_sensitive(aead)` on line 428 of
+`net/tipc/crypto.c` is: ```c - kfree(aead); + kfree_sensitive(aead); ```
+This change is: - **Minimal and contained**: Single line change with no
+functional impact - **Low risk**: `kfree_sensitive()` performs the same
+deallocation as `kfree()` but adds explicit memory zeroing -
+**Consistent**: The same file already uses `kfree_sensitive(aead->key)`
+on line 427, showing this practice is established ## Alignment with
+Similar Commits This commit closely parallels the "YES" backport
+examples: 1. **Similar Commit #1**: Used `aead_request_free()` instead
+of `kfree()` for proper crypto data handling 2. **Similar Commit #2**:
+Applied `kfree_sensitive()` to crypto buffers containing key material 3.
+**Similar Commit #5**: Fixed TIPC crypto security issue (preemption
+problem) The pattern of replacing standard memory deallocation with
+secure alternatives for cryptographic structures is well-established and
+consistently approved for backporting. ## Stable Tree Criteria
+Compliance This commit meets all stable tree requirements: - **Important
+bugfix**: Fixes potential cryptographic information leakage - **Minimal
+risk**: Single line change with no behavioral modifications - **No
+architectural changes**: Uses existing kernel API - **Contained scope**:
+Limited to TIPC crypto subsystem cleanup ## Security Impact Given TIPC's
+history of security vulnerabilities (including heap overflows and use-
+after-free issues), this defensive security measure is particularly
+valuable for preventing information disclosure attacks targeting
+cryptographic material. The commit represents a clear security hardening
+improvement with negligible risk, making it an excellent candidate for
+stable kernel backporting.
 
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ net/tipc/crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-index 8663bdf014d85..15fcb53cfb9a3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-@@ -350,9 +350,12 @@ int cn10k_free_matchall_ipolicer(struct otx2_nic *pfvf)
- 	mutex_lock(&pfvf->mbox.lock);
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index b09c4a17b283e..277fc5ee179e4 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -425,7 +425,7 @@ static void tipc_aead_free(struct rcu_head *rp)
+ 	}
+ 	free_percpu(aead->tfm_entry);
+ 	kfree_sensitive(aead->key);
+-	kfree(aead);
++	kfree_sensitive(aead);
+ }
  
- 	/* Remove RQ's policer mapping */
--	for (qidx = 0; qidx < hw->rx_queues; qidx++)
--		cn10k_map_unmap_rq_policer(pfvf, qidx,
--					   hw->matchall_ipolicer, false);
-+	for (qidx = 0; qidx < hw->rx_queues; qidx++) {
-+		rc = cn10k_map_unmap_rq_policer(pfvf, qidx, hw->matchall_ipolicer, false);
-+		if (rc)
-+			dev_warn(pfvf->dev, "Failed to unmap RQ %d's policer (error %d).",
-+				 qidx, rc);
-+	}
- 
- 	rc = cn10k_free_leaf_profile(pfvf, hw->matchall_ipolicer);
- 
+ static int tipc_aead_users(struct tipc_aead __rcu *aead)
 -- 
 2.39.5
 
