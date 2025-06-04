@@ -1,140 +1,160 @@
-Return-Path: <netdev+bounces-195137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC58BACE436
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 20:14:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 646C6ACE445
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 20:20:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810063A6A13
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 18:14:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3B0418912AC
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 18:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCCB31FE44C;
-	Wed,  4 Jun 2025 18:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1CF1F8690;
+	Wed,  4 Jun 2025 18:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7UbHZn+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gRKAEzAw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0782E1F9A89;
-	Wed,  4 Jun 2025 18:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC041A00F0
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 18:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749060879; cv=none; b=A4J1/GuXW9Yk71U/HLWtns7N+hlqNAyKMCpBgzhAMKxWBr6MEsEuseknfVqn91pR73Bos1VKq4JQ7HzMjazktWU2VeXu2nECA3hEFwdE0BDtDRZ8MSjViBRt6G2DLNH7FzeEaVjUEYUDMLy2/xujddMNiT+yOQqYpPGe7gk/qY0=
+	t=1749061215; cv=none; b=g/lCP8rp1goRFcg+uerrcpMmBqDnBmdwBEaJLHzW4DjYcQ9elmO26TGwUNUROIj9euL6WXv2GBforp58vIoXNzj+/bwF+jE9rigatSaqgD06dtb/0dQnmBsSSX+VNz82ZtjAEI86exXcXHAWDywJkMTNPStUCdmfD0ui/fSU5ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749060879; c=relaxed/simple;
-	bh=ehgtzLTDO+WEBHp3jiFE5+O21zqJvWbW0LGGhdbMTFQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rU2xDAI1QH/NOmCRcxyohFi7qIq6k+D1k+zn+r0kBXNu4ygj8LkNQmxYI1gfYzalZiTTQmaBOQjcPbVeR9X/f2NZ3dxRzoMDtSBrQy3rgbC6CcUUzfleibICqUYKFoBDkEh7U3+GoZgu+t+mc9SgZr0tmd2lRBmCqWiNJfa9OW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7UbHZn+; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a51d552de4so81748f8f.0;
-        Wed, 04 Jun 2025 11:14:37 -0700 (PDT)
+	s=arc-20240116; t=1749061215; c=relaxed/simple;
+	bh=CDVil5MS07Lcc+Sn1S+8nAcQJnHdbdTCvZQ0EqFJRqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PElEhtfLn2E0Dl4y7z65yr1/Q0ueyGU8rATnko2Lu7RxKUPz/A+gz7UtwonFTiEVLJtxbbWrnxY1jgbpLUZszOt+FrXEH02ZE1zufXDewZU14O2u8xlRazqRnID3QluAo/ZzJhYtLMFsx+bx5E6tTMNRk271hw/wfyiHuffAQY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gRKAEzAw; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-23539a1a421so1777755ad.0
+        for <netdev@vger.kernel.org>; Wed, 04 Jun 2025 11:20:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749060876; x=1749665676; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8aoZzBXtabDZ4ZNWdYqVpRgG+emFPNLC/glUQopk4ic=;
-        b=b7UbHZn+HVt3Q/F+rQT8i977QZzleto53Gpbmu0KHmEfCSxV3IVDFVb+KOO5uao138
-         G9Jmlm9C4umy5XNBQ12xA6TsbpQJwDwUlbkh1iHZa0NB7pP4KMpyubjliYSxoserSZRN
-         5iARlAv7gam03DTdDzbnATNMXk8nRqyTMp8yVfo2Ys8iJl+9EruYh7lv6nQ6G1tKLJz1
-         SzFWoiJn15TwxhXN5/cOXV+bMW9Yw0vCro6IAxPUmUo+qjR+EyMhlqCqHGOR8Bn+cqjZ
-         /JfgUx6V8tjHGGwj3OPWrZ1w4Lrsnp2wuKL0qrIYUTDkDTS20PubxvcefhFKh0oIJlpB
-         Twgg==
+        d=broadcom.com; s=google; t=1749061213; x=1749666013; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HrJOVyM/imOmIyNVSX1+3ly//LHI/VDAP8Q3M/dAr8A=;
+        b=gRKAEzAwdruGiQ+Kh+80Ftj8AcGz587Q7+dZdepIp/c3NPnEtX6IDFOOABrr6daHx/
+         V7gGi7ha1F7whpTj3KTWm0dWwuczNM83qoZkz9LQHxsdQrkyA5FvWrUx2WD9mT/10FTM
+         +fhXO32wKmH0Ksprlv+KnLYfu/wta6ad8Wre8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749060876; x=1749665676;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8aoZzBXtabDZ4ZNWdYqVpRgG+emFPNLC/glUQopk4ic=;
-        b=ebCZcotcFKVeeT8UY/NsuSM9oZMHs5cOgr2CzFGIz0v4HHPoi7JvdPG2eVpn5Yi/Kl
-         BbHcwdnvnnOsI5Or9N63f3upSq7nmma27NWPPNDThVkXs/0WsHaYKW9xyttLD+0HF7mH
-         U6Y4PNFz7iYpuow1MA8e0P1uHaVR59j5u7/wPsEUk+nDCqlNvJqwGePWgkTkupPrO+Qm
-         /rxh9T1Se6SHPQX92TMec+9/Pk5vIr0V+pasTXoRYEcyAgny6pzgjsH9+Q15ZMTLtsRT
-         zkcpz64EY4Pz1bafbZWzdWbPzNq2CwyLqnQKwknhejLbKnnP8Xf9knk50Cd+uc8RONB5
-         4qwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfJtVrw4jAgjUlKVW8dfvdpIT8WtTkEpYPcLvkENOoj79CXrBtsxl/abA0sWKlf53YKIxkcemE@vger.kernel.org, AJvYcCUuOCG6HrBvvnqS70q3dVIeAv6LI24wqltcnu+ows2kW9xDz4q6Ul0i4NeIT8VDH/A9lU8vduiQabM3mBvXAur1sXc=@vger.kernel.org, AJvYcCV+GrAvfSAU9YDFh+Eb9kSDx/I+PP1AuYQyZTs1dU/HSwNAGF/vvqNdQ6LNXqpxccxw0Gv8O7cH7o0W@vger.kernel.org, AJvYcCXTgPETgvVWXATC+NvjLfXdtVeBpeg8xhvV+rwXb8YqYba3Pel3jPjLJB5V2bT1laSUlwcXJ13k7Mz5LEGu@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWVOi51CTU819cybAgMw7ylqNiXuUqx3YjHw/8ER0sb7qQ1rDN
-	qnr6it0P1qe18M56eBwAu3UBMtTxX345BMXvI85mzPIHOj0OmbR1fQfqo9j92k5L/BB4rYkiGFU
-	YmswFmUX0Yj7Qkd+4pWCFmj2A8SFZ/ig=
-X-Gm-Gg: ASbGnctRKJ4oQnEW9bmSPcROu2YytqXFaKFm4ivNb94KiLoD6g+ikMumQYsfkLFrlw0
-	joVtedTuprMDcDUt0Aab1zeH7v7v6xFCa5E5hud37zWiLes9Ub81RwemRvPrnvNMMPXnekXgqnG
-	9vKWrdfLYAIHIOnsfbCt1sOWlC3+/p7WVSCzvLADhBEICE759pqmBHBPN2vEhimHoAzA==
-X-Google-Smtp-Source: AGHT+IEFXnFaqjhcI9IoEC+sWC51BhXcOMPTI9Db9Zy1IDnegd1BMkWud7zjIBCg2gUWrap+yi329OY3rsUQOVHAy4M=
-X-Received: by 2002:a05:6000:25ca:b0:3a4:d452:fff with SMTP id
- ffacd0b85a97d-3a51d91fad0mr3166598f8f.17.1749060875920; Wed, 04 Jun 2025
- 11:14:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749061213; x=1749666013;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HrJOVyM/imOmIyNVSX1+3ly//LHI/VDAP8Q3M/dAr8A=;
+        b=L4tZvRgAZMV1wnC9GxiFfbz/Pa6w99KOXDqGkywJrWlbdaD2a1nyfOwxYxUMZqpBmv
+         Xp1kuIBrsShQ9Ok5SpmY2ocyotlch28vnpjaJdVSSrUaHBRETdas5u+2IKeVSe6QTyt7
+         Mojcyaxk6lrB/idfBFbvAGZP4RPBFgZXCggSLn0CVOLmXR5aEMorSs8bnbx+0zIBQZqL
+         dr8j1K4qR1Mlq4HKCefAw7uNLglrSOvgR0W/0tXnSmA1YFdP3sjqD4SML0qxJegFB8ow
+         ty0bKuzWGL4qETA1uGQT4BrZlMehmtThUHkZybIAxuF9g57PogBtTbOkCm15eaWjHgUy
+         ut9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWMqL6fkdfYRZVYrvFKzqKICxMZaf9kcrteyrPKZhpCsX9+criN4oG/9ST1haqLJX+7LJWyv9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvT52lKVBZnos5XsRunhaaQh3RwJKstlyi1OKpHvytBY1APxjd
+	u+QXN6OtzOlWfKWW/uTN3rTJAYCbSC0MJEQl9FUvXelnCO/JPvkGuNo/FBr2ovCMqQ==
+X-Gm-Gg: ASbGncvKnfg5kHV6QQjCwtZLqJcWiHVK5qXHgZPrKBEEkahFa+rqKRFUFkYPH/dT5hk
+	BscTdc/NDUh8tYeSdqWTYLZeLkLTIsfZmkTJ5G7S/1GKQZsGiCXJNb0c1dehVtFRgaXdQ3TY7mg
+	D0w3m02mTxS4W27UeB6j1Ey8tOvwVPoNtyv0YdNNCaXjUl/EVvBt/mNzhi/MhnDF73ygfxclO8z
+	PTT8jKdg6jJc7YHTbtZUtKZlIK+r4GTvHspcbsbONhVdQr26z109aV6I7bm2FBxDcQkAJ1acVW2
+	/1U/xNV3Hro9M2/kEfLZU/KMdSl6cbdEdg6ClQ18/hNCbqTZ3HgYyhf+H6XvDkZ0DiRj448zR49
+	OmtxO7DmGwKESKIg=
+X-Google-Smtp-Source: AGHT+IGgzAgFSflk69D2KfxPzE1XCMxjKzx3LreR5/jjTXRTr6hTEPIg8jpaAiNhqWDFViQYC7xF3w==
+X-Received: by 2002:a17:902:e74c:b0:235:225d:3098 with SMTP id d9443c01a7336-235e11fef9amr54061395ad.46.1749061212874;
+        Wed, 04 Jun 2025 11:20:12 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23506bc8537sm106993965ad.26.2025.06.04.11.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Jun 2025 11:20:11 -0700 (PDT)
+Message-ID: <007c994f-8a3d-4563-8f88-0f34712f7fb3@broadcom.com>
+Date: Wed, 4 Jun 2025 11:20:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250604065200.163778-1-john.madieu.xa@bp.renesas.com> <20250604065200.163778-3-john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250604065200.163778-3-john.madieu.xa@bp.renesas.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 4 Jun 2025 19:14:10 +0100
-X-Gm-Features: AX0GCFt6k1sh_fjSNrp1SyZVuu5vH6txeiL7eVP9YJcg7aYzSzipt8rLlAjnyKI
-Message-ID: <CA+V-a8uaFOHd3Mp+fwH2i+0=7eUNNrkbpXHFduu9azHA7qS6sQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] dt-bindings: net: renesas-gbeth: Add support for
- RZ/G3E (R9A09G047) SoC
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: prabhakar.mahadev-lad.rj@bp.renesas.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	geert+renesas@glider.be, magnus.damm@gmail.com, biju.das.jz@bp.renesas.com, 
-	john.madieu@gmail.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v2 10/10] net: dsa: b53: ensure BCM5325 PHYs
+ are enabled
+To: =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
+ jonas.gorski@gmail.com, florian.fainelli@broadcom.com, andrew@lunn.ch,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, vivien.didelot@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+References: <20250603204858.72402-1-noltari@gmail.com>
+ <20250603204858.72402-11-noltari@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250603204858.72402-11-noltari@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 4, 2025 at 7:53=E2=80=AFAM John Madieu
-<john.madieu.xa@bp.renesas.com> wrote:
->
-> Document support for the GBETH IP found on the Renesas RZ/G3E (R9A09G047)=
- SoC.
-> The GBETH block on RZ/G3E is equivalent in functionality to the GBETH fou=
-nd on
-> RZ/V2H(P) (R9A09G057).
->
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+On 6/3/25 13:48, Álvaro Fernández Rojas wrote:
+> According to the datasheet, BCM5325 uses B53_PD_MODE_CTRL_25 register to
+> disable clocking to individual PHYs.
+> Only ports 1-4 can be enabled or disabled and the datasheet is explicit
+> about not toggling BIT(0) since it disables the PLL power and the switch.
+ > > Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 > ---
->  .../devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml        | 2 ++
->  1 file changed, 2 insertions(+)
->
-Reviwed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>   drivers/net/dsa/b53/b53_common.c | 13 +++++++++++++
+>   drivers/net/dsa/b53/b53_regs.h   |  2 ++
+>   2 files changed, 15 insertions(+)
+> 
+>   v2: add changes requested by Florian:
+>    - Move B53_PD_MODE_CTRL_25 to b53_setup_port().
+> 
+> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+> index a9b19451ffb30..38c08f6278d27 100644
+> --- a/drivers/net/dsa/b53/b53_common.c
+> +++ b/drivers/net/dsa/b53/b53_common.c
+> @@ -659,6 +659,19 @@ int b53_setup_port(struct dsa_switch *ds, int port)
+>   	if (dsa_is_user_port(ds, port))
+>   		b53_set_eap_mode(dev, port, EAP_MODE_SIMPLIFIED);
+>   
+> +	if (is5325(dev) &&
+> +	    (port >= B53_PD_MODE_PORT_MIN) &&
+> +	    (port <= B53_PD_MODE_PORT_MAX)) {
 
-Cheers,
-Prabhakar
+This would be a candidate for the in_range() helper?
+-- 
+Florian
 
-> diff --git a/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbet=
-h.yaml b/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> index c498a9999289..9961253d1d41 100644
-> --- a/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> +++ b/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> @@ -14,6 +14,7 @@ select:
->      compatible:
->        contains:
->          enum:
-> +          - renesas,r9a09g047-gbeth
->            - renesas,r9a09g056-gbeth
->            - renesas,r9a09g057-gbeth
->            - renesas,rzv2h-gbeth
-> @@ -24,6 +25,7 @@ properties:
->    compatible:
->      items:
->        - enum:
-> +          - renesas,r9a09g047-gbeth # RZ/G3E
->            - renesas,r9a09g056-gbeth # RZ/V2N
->            - renesas,r9a09g057-gbeth # RZ/V2H(P)
->        - const: renesas,rzv2h-gbeth
-> --
-> 2.25.1
->
->
 
