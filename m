@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-194967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D365ACD485
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBEB3ACD494
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4963A4D27
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:29:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4C43A3E83
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0452797BA;
-	Wed,  4 Jun 2025 01:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF4B25394C;
+	Wed,  4 Jun 2025 01:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lf3cfzUE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uu7FNiMw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D18C2522B4;
-	Wed,  4 Jun 2025 01:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7556812B73;
+	Wed,  4 Jun 2025 01:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999212; cv=none; b=lq6uZgzLlWWy6MzYr8ce2UhBnLeO2NoDgE2IpSS/xbFwkLJPqyippPGLKboS3dsMGb4AmPy8MsNOxtqHyanxGFxnNztOaVV22/KOQ+9Sam1/pwNJUFccmhCql2h1F9vjvzNT/JZ7H2ai0N8FCEX5VaW7i0Idln8kV0mJX+fLmdE=
+	t=1748999231; cv=none; b=YnE7/DJJDT3rdKoLZeyX0tY7RFVE8El0Pb8Bz4t7XBZOYT5M/POHfroHjToOIoN7m/CT73n8lNSLJnbdwu9icUIQaNhkIs0LMGZ5rNUnu8G0n0gOEqs+CmHuWpayIwJqf0r6agPcPvBkbNLOILTLbRI/v9RYKEbkOSBP2F0WCEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999212; c=relaxed/simple;
-	bh=nfDs3Wvcp54Yy0IsjgsKh6DUqSsMZoB3227CbOFozyc=;
+	s=arc-20240116; t=1748999231; c=relaxed/simple;
+	bh=uZiVtJtJElkZQ9XP1c8FaO68zfLJjauPxcW7nH4veqM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ILTicCVh7g3xPu+6dhRxXxWErWabB7qAaNVxHFGO3Opf3kckMhHo+x4eu+UKWfyTYxKHe+zMbDKNRXegON6+pupjWquOPLMldocexLMzci/rwk6OMz9kcESDDupKsIaO50XpItBWL8z+1HCFDB8xErOgPT3B4jEa+RnH+xkx+Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lf3cfzUE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF3BC4CEED;
-	Wed,  4 Jun 2025 01:06:51 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rdMk8WVWAsOcfsvcjTdAhhophqZJa+nTZIjYcopCHSvRz3li/Cm16KD2HD8Lx7vdWBs3PvtGhc3tV4RjjtcJvM3GotQhB9Q7v0sXwHkPqr2Lu0O4k4T77p78JqMPbxchWiBKYtkzzbSc9jOeD7wK4yhBTSin+iQRSZELh3+CYa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uu7FNiMw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 491C1C4CEEF;
+	Wed,  4 Jun 2025 01:07:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999212;
-	bh=nfDs3Wvcp54Yy0IsjgsKh6DUqSsMZoB3227CbOFozyc=;
+	s=k20201202; t=1748999231;
+	bh=uZiVtJtJElkZQ9XP1c8FaO68zfLJjauPxcW7nH4veqM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Lf3cfzUE4rk3bRc9qfBT/9Vqnk1XhzVHQ/L9rBA9xQIwhQ7FKwFFCMnHDu4hxc5n4
-	 F/eYiwDDx9/0tVGhNXkJ+FuTW8HUihEV918LCcbGuK4BKaWCmdujuR5GfQTFKZe4ww
-	 pdjCnA+QnMUQk5CbWmQ6XJaxzzw13jjcblnihkSU2SEYsD/D8Y5+k671ObZy7uK8RD
-	 kG4e0n+sz++2wtTRKEkmgE16+eIgFgpORxv35P1YVTnlfda7x+uOeox8BL8gBzKK0r
-	 lCEs82kn6brfzvktdolTSCGgetrZieMHwGxbcAmTb315L0sIMcfFkK4U/LiNzw6DZM
-	 GqzKGEuSPHtpw==
+	b=Uu7FNiMw85Q/dzfLFJK7ZkN8rKoy9ctzr23OaJHJAqmCrf9tjOJwndhhdzfPeocD7
+	 do46Or29ej19aV6CswKn4NCVaqj6NftElN/yGUup6S8Sc2hDjYdOtl+SHWGpyQq1mH
+	 3QgBE/u1Tyc8eqnBt8MPuMc5+BSaCwlSKW49ozDxkeKmp5ImaMB7kL8VktKX4smCYs
+	 8sAJZlBeOCWVad5AznqYYuQAqjdyW067yO+zFGULhe24P7jIxjTEpUhg26mYvS74Cn
+	 rtrTxprX+DXLqrD9SmxnJ1PwDUonQOnPrvWNiglWvjFCuxKRm5oiulnZN7Fli/jlA7
+	 N+Fw6sPQ9z8Eg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jason Xing <kernelxing@tencent.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
+Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 18/27] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
-Date: Tue,  3 Jun 2025 21:06:11 -0400
-Message-Id: <20250604010620.6819-18-sashal@kernel.org>
+	ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com,
+	somnath.kotur@broadcom.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 03/20] emulex/benet: correct command version selection in be_cmd_get_stats()
+Date: Tue,  3 Jun 2025 21:06:49 -0400
+Message-Id: <20250604010706.7395-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250604010620.6819-1-sashal@kernel.org>
-References: <20250604010620.6819-1-sashal@kernel.org>
+In-Reply-To: <20250604010706.7395-1-sashal@kernel.org>
+References: <20250604010706.7395-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,83 +65,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.237
+X-stable-base: Linux 5.4.293
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-[ Upstream commit b86bcfee30576b752302c55693fff97242b35dfd ]
+[ Upstream commit edb888d29748cee674006a52e544925dacc7728e ]
 
-As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
-SOFTWARE flag is surely needed when users are trying to get timestamp
-information.
+Logic here always sets hdr->version to 2 if it is not a BE3 or Lancer chip,
+even if it is BE2. Use 'else if' to prevent multiple assignments, setting
+version 0 for BE2, version 1 for BE3 and Lancer, and version 2 for others.
+Fixes potential incorrect version setting when BE2_chip and
+BE3_chip/lancer_chip checks could both be true.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/20250510093442.79711-1-kerneljasonxing@gmail.com
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Link: https://patch.msgid.link/20250519141731.691136-1-alok.a.tiwari@oracle.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-Perfect! Now I can see that `skb_tx_timestamp(skb)` is called in the
-`mlx4_en_xmit()` function, which is the main transmit function. This
-confirms that the mlx4 driver does implement software timestamping. Now
-let me compare this to the similar commits to see the pattern: **YES**
-This commit should be backported to stable kernel trees. **Extensive
-Explanation:** This commit addresses a clear inconsistency bug where the
-mlx4 driver implements software timestamping functionality but fails to
-advertise this capability to userspace through the ethtool timestamping
-info interface. **Analysis of the fix:** 1. **The Problem**: The mlx4
-driver calls `skb_tx_timestamp(skb)` in `mlx4_en_xmit()` at line 1091 of
-`/drivers/net/ethernet/mellanox/mlx4/en_tx.c`, which means it properly
-implements software TX timestamping. However, in
-`mlx4_en_get_ts_info()`, it only advertises hardware timestamping
-capabilities (`SOF_TIMESTAMPING_TX_HARDWARE`,
-`SOF_TIMESTAMPING_RX_HARDWARE`, `SOF_TIMESTAMPING_RAW_HARDWARE`) but
-omits the `SOF_TIMESTAMPING_TX_SOFTWARE` flag. 2. **The Fix**: The
-change adds a single line `SOF_TIMESTAMPING_TX_SOFTWARE |` to the
-`info->so_timestamping` field when hardware timestamping is supported,
-correctly advertising both hardware and software timestamping
-capabilities. 3. **Impact**: This is a user-facing API correctness
-issue. Applications checking timestamping capabilities via ethtool would
-incorrectly believe software timestamping is not supported, even though
-the driver implements it. **Comparison with similar commits:** -
-**Similar Commit #1 (YES)**: Also fixed a timestamping bug in mlx4,
-showing these are important fixes - **Similar Commit #3 (YES)**: Fixed
-incorrect timestamping capability reporting in mlx5 by removing false
-software timestamping indication - **Similar Commit #5 (YES)**: Fixed
-timestamping capabilities reporting using wrong BIT() macro in mlx5 The
-pattern shows that timestamping capability reporting bugs are
-consistently considered backport-worthy because they affect user-visible
-API behavior. **Backport Criteria Assessment:** ✅ **Fixes a user-
-affecting bug**: Applications cannot detect software timestamping
-support ✅ **Small, contained change**: Single line addition with no
-functional logic changes ✅ **No architectural changes**: Only fixes
-capability reporting ✅ **Low regression risk**: Only adds a missing
-flag, doesn't change driver behavior ✅ **Clear side effects**: None
-beyond correctly advertising existing functionality ✅ **Follows stable
-rules**: Important API correctness fix with minimal risk The fix is
-identical in nature to Similar Commit #3 (marked YES) but in reverse -
-where mlx5 removed false software timestamping advertisement, this adds
-the missing software timestamping advertisement for mlx4 where it's
-actually implemented.
+Based on my analysis, let me provide my determination: **YES** This
+commit should be backported to stable kernel trees. ## Detailed
+Analysis: ### 1. **Nature of the Bug:** The commit fixes a logical error
+in command version selection for the `be_cmd_get_stats()` function in
+the Emulex be2net driver. The original code had this problematic logic:
+```c if (BE2_chip(adapter)) hdr->version = 0; if (BE3_chip(adapter) ||
+lancer_chip(adapter)) // <- Missing "else" hdr->version = 1; else
+hdr->version = 2; ``` The bug is that the second `if` should be `else
+if`. Without the `else if`, if a chip satisfies both `BE2_chip(adapter)`
+AND `(BE3_chip(adapter) || lancer_chip(adapter))` conditions, the
+version would be incorrectly set multiple times, with the final value
+being either 1 or 2 depending on subsequent conditions. ### 2. **Impact
+Assessment:** - **User-facing impact:** This bug could cause incorrect
+command versions to be sent to the hardware, potentially leading to
+statistics retrieval failures or unexpected behavior - **Scope:**
+Affects all users of Emulex be2net network adapters where the chip
+detection logic could overlap - **Severity:** While not a critical
+security issue, it affects driver functionality and could lead to
+network statistics reporting failures ### 3. **Code Change Analysis:**
+The fix is minimal and surgical: - **Single line change:** Only changes
+`if` to `else if` on line 1612 - **No functional additions:** Does not
+introduce new features or change APIs - **Low regression risk:** The
+change makes the logic more explicit and prevents multiple assignments -
+**Clear intent:** The fix aligns with the comment stating "version 1 of
+the cmd is not supported only by BE2" ### 4. **Backport Suitability
+Criteria:** ✅ **Fixes important bug:** Corrects incorrect hardware
+command version selection ✅ **Small and contained:** Single line change
+with no side effects ✅ **Low regression risk:** Makes existing logic
+more explicit and correct ✅ **No architectural changes:** Pure bug fix
+without design modifications ✅ **Subsystem confined:** Only affects
+be2net driver statistics functionality ### 5. **Comparison with
+Historical Commits:** The provided historical commits were all marked
+"NO" for backporting because they were: - Version string updates
+(cosmetic changes) - Code simplifications (non-critical improvements) -
+Driver version removals (cleanup) In contrast, this commit fixes actual
+functional logic that could cause incorrect behavior. ### 6. **Stable
+Tree Compliance:** This commit perfectly fits the stable tree criteria:
+- Fixes a clear bug in existing code - Has minimal risk of introducing
+regressions - Affects a specific driver subsystem - Does not change
+user-visible APIs or behavior (except fixing incorrect behavior) The
+commit message clearly explains the problem and solution, and the change
+is straightforward to verify and test.
 
- drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-index 962851000ace4..7cb4dde12b926 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-@@ -1905,6 +1905,7 @@ static int mlx4_en_get_ts_info(struct net_device *dev,
- 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS) {
- 		info->so_timestamping |=
- 			SOF_TIMESTAMPING_TX_HARDWARE |
-+			SOF_TIMESTAMPING_TX_SOFTWARE |
- 			SOF_TIMESTAMPING_RX_HARDWARE |
- 			SOF_TIMESTAMPING_RAW_HARDWARE;
- 
+diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
+index 9812a9a5d033b..d9bceb26f4e5b 100644
+--- a/drivers/net/ethernet/emulex/benet/be_cmds.c
++++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
+@@ -1608,7 +1608,7 @@ int be_cmd_get_stats(struct be_adapter *adapter, struct be_dma_mem *nonemb_cmd)
+ 	/* version 1 of the cmd is not supported only by BE2 */
+ 	if (BE2_chip(adapter))
+ 		hdr->version = 0;
+-	if (BE3_chip(adapter) || lancer_chip(adapter))
++	else if (BE3_chip(adapter) || lancer_chip(adapter))
+ 		hdr->version = 1;
+ 	else
+ 		hdr->version = 2;
 -- 
 2.39.5
 
