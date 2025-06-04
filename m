@@ -1,185 +1,233 @@
-Return-Path: <netdev+bounces-195028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134A8ACD87E
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 09:24:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3AAACD882
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 09:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD7C7174C90
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 07:24:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82FF5174C32
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 07:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0131E7C11;
-	Wed,  4 Jun 2025 07:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3B623D282;
+	Wed,  4 Jun 2025 07:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HB/eFCnp"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ktpO+2cZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522002B9A9;
-	Wed,  4 Jun 2025 07:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF41238152
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 07:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749021886; cv=none; b=N8loxfyhUWHh4178RbjVMWMuodkDzrSAoGn07KkhduBEGCuLrMRDqrULvM+H0QmTfcDPKAZiCFwbz9wgTKj/FNZptwb1JaLL0LVsoAMSsxGds/8NctpCAj6jiLldydg1kB+V6vq6mpRbIqOn9ujyWAkpef9DvR460T4gXjXkQYQ=
+	t=1749021891; cv=none; b=sJ4aKtsWjpc6/kQJqDLW99jgCi397dDMX7o7/JveZW6UC+JaGKdK1M157dZrzlrkRbwaDVnqeEOJDijXLKmU1wC691zP33uEcHeoX49fUGg7GGClkrDfqPP/FqqXcSk4VJa0lzpquRns7ulsdR65ZAs/7LOOmQPdfqRoFzLnebE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749021886; c=relaxed/simple;
-	bh=5SyUvppNuSDFqKzdDCKf9UQfWjYA+/m0ZdXQA8ZCk04=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=UjEN+dQ5gCLFVOTzU7dWEhFIbhzzbHSXWoNgA9gjBtqW1WOsaatQBc8+k5l4iy1wPrceK3Mi3M/maqSRjRQCAs4V8OBKjBAMfzp+2vsqK5ZkNpR36HR/YC9d14m/5EP95foSB9jofTdDk1JzscqqXfBq4s8hZOlMp567Mj+epBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HB/eFCnp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7113BC4CEF3;
-	Wed,  4 Jun 2025 07:24:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749021884;
-	bh=5SyUvppNuSDFqKzdDCKf9UQfWjYA+/m0ZdXQA8ZCk04=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=HB/eFCnpX+ZayuBp8txIrg5VYlULfE/p9+roKKsskMKtDPDWg3iddFh9c0PKAwgHQ
-	 Tly9R/+1+C4r+KZn7sSpeEQYBunh1UkK8DGxqRQ0vrGw4RGfSsxB7YM/Sl4WPbQmys
-	 IufgNyTgI00B5gSiglvXfe+Hj3Ksf2yPPGz0V3zMm053tXbb5N5GUg3pgihCdWxBp8
-	 QHOnjbFKzNi19tm6jZVM5NE+CxtQ3bx1kVA6CaxC/PtPcGUqZJDc2N6/cTVmrrfi5v
-	 UiWUewSS13sxl21kkENnQQ7x2ytAbLUNOrGGU8tnls5pKMbPx5F1i2Ga/XEaHehFS7
-	 5auOw4CmWmj7g==
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 53D511200043;
-	Wed,  4 Jun 2025 03:24:43 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Wed, 04 Jun 2025 03:24:43 -0400
-X-ME-Sender: <xms:u_Q_aM0p66c7BTBlfuIYsSicCe_pViw9XN91-QilwIDc3PiTvTfObQ>
-    <xme:u_Q_aHEWoV0s6rTr_mdGh1Z8Zo48w71MXZNmxSxmsnyRP3r7ZMx5rNMRPQ01nrMTO
-    Fi-5oH7tiPLS8-pJT0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddujeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusehkvghrnhgvlh
-    drohhrgheqnecuggftrfgrthhtvghrnhepjeejffetteefteekieejudeguedvgfeffeei
-    tdduieekgeegfeekhfduhfelhfevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomheprghrnhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhi
-    thihqdduvdekhedujedtvdegqddvkeejtddtvdeigedqrghrnhgupeepkhgvrhhnvghlrd
-    horhhgsegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrges
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepihhmgieslhhishhtshdrlhhinhhugidrug
-    gvvhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghp
-    thhtoheptghlrghuughiuhdrmhgrnhhoihhlsehngihprdgtohhmpdhrtghpthhtohepvh
-    hlrgguihhmihhrrdholhhtvggrnhesnhigphdrtghomhdprhgtphhtthhopeifvghirdhf
-    rghnghesnhigphdrtghomhdprhgtphhtthhopeigihgrohhnihhnghdrfigrnhhgsehngi
-    hprdgtohhm
-X-ME-Proxy: <xmx:u_Q_aE5sTD0Kdfr_d2GhRgaixAi4cDUozX84ZsqAQekzD2Odxix8Zw>
-    <xmx:u_Q_aF2do4Prs4IglGpFHWYGkpGD4m9Y-ATuFOpdEw4urR-6I5qIXw>
-    <xmx:u_Q_aPFSCwDMnHJ9SKYi0HZA3GHdSOkGE76ZHFR45MARKZjOFyk2WQ>
-    <xmx:u_Q_aO9yaSbSBjSKAcVGz4qq4Lo_P0Ulge5Vjb0JlDXTyFCTkfh1lw>
-    <xmx:u_Q_aEk7GsFRp93W9iXWe4RGVXQK5UWMlfvk2tVEZ-jz5CImLKGqCYQE>
-Feedback-ID: i36794607:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 2BEE3700060; Wed,  4 Jun 2025 03:24:43 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1749021891; c=relaxed/simple;
+	bh=eJaM9PF91eHJBG8Hc+d7PGAX8a/KIWNyoS3YQxQ6GVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iLCH9huAO0V0wHLb5VfhyMuM5d2JN5GbCulLq8F1KbeHjUs52OVZ96yXFkJE/ZZMcye7Ie8dEqJ4rMZGOS6fc8CvuCsQXaioD1+cXivJ5QiKWfGRVSxIoXBI/4xenZQNJ9/caesD6xFMYI1Ds0cv6wjBu4MxO1Laqg1n9Nfsltw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ktpO+2cZ; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b2c49373c15so4109289a12.3
+        for <netdev@vger.kernel.org>; Wed, 04 Jun 2025 00:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1749021888; x=1749626688; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gtGbzLUDxU2IB9qPjKURq38VfX8ZCpDlPYi0PWx3MpY=;
+        b=ktpO+2cZ3s8p7tfhy9ELVkKdk/xSniXFRRelWOEdFg0wPZ4Kwb9xZXmIRUkubTIP7l
+         2TzQZk6SwGnnUesNwOPjxD5RFupY84UNFqHi+YSuHdYrbIQxDlKEMMFgiLoRCWP6wl2a
+         ImxS/klFMWYaRglpqEKcKOZQa1hS5bv1S9tfWPadOi9AkAkia8N6YCNN9hbaaHHcCcFE
+         rhp0OiyvloswvQXlUw4BW5MtZOFC4G1BDVLd7h32EP5YpaS7t/JGctxM7WJ+zSNF502S
+         5uHgvcOQShcsX8Merrk8GvbW+hQ8Nka1batBN2LUFCiDtD1D7tX2cwp1gZ0kl0pK9byD
+         YPMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749021888; x=1749626688;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gtGbzLUDxU2IB9qPjKURq38VfX8ZCpDlPYi0PWx3MpY=;
+        b=u9jXiGsNzqOXaCa5a24kIYIfcMh/pYLlOUyBDnKUp0gZTcB+l1CUQ3rucVvEGw1jFs
+         y3mEfZiPjcNjfaVVm5x5qkf9wR4ZK/O0pp5EvNnbgeO+bydSYCT2vTZ5ukUprKB0w5AG
+         m6K1f9DlXyf2E9jjSl9Vj+aE9ezCEBuY1XQquaF8d8zvChzqloYeHdbgGqiV/TfUJtAl
+         4OZizyCCGqA+ggzLcl8UwUsFIACIiiAOmDsfOZWqfNw9iyx3mxO/pAHr3h0v63+kZaDr
+         7x47OQM5O2INwJz8iu4LguQIuiz2VMeoUKyusWUgH2MboQWI4AwdUZVmPac+gW743jjU
+         8klw==
+X-Forwarded-Encrypted: i=1; AJvYcCVY0ocScXQ/ujnS58A4i+FLWmHR3at/DqkAaCRJw299D8UZh8Ms/KSo4rEOYVB5Z7tZi/2+Dpw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzoa2xeYiZ30O3rr5pqwNh9jVdJCsqFmrvIdCY3N/l9G/RALEo
+	x59RkinjvsDkmbGz/vReT+1bS8SSvM8lLHdaMV2N5WAfA7+xze5Z9cRkjhIH9Dpeluk=
+X-Gm-Gg: ASbGncu2VnoSNq/cs03zhwM3H4o1FVaTqY1HQEc8qEF1Q8PJQh2HQWYTfNtcZjSJnsF
+	Zd0GaeoIefcA+EAPuD5Iz9VW34NIp0LmqozTM9orCQiEkTGkYUiuyWPPA2//89Bos+J8+sFuHjL
+	b7PATLLBn5UnVCiLEKDxDw5VDtSM1EWUBvuD1GzI0nJnoQRWHvzZZrtM34ysWSQJfh0DNm8+udW
+	NrnYGbJFkXZrtrTppDvuq60o+/rS2UeVbqimB309VsBYms0Oi4iiDtLTYFrIlUfuHGAd++vrtYV
+	8VgMlKOfwLc6qLbEbWTlvQB6O0mSOC4OpriWQJpGnrB4yZV87al/cX9H78/4Ti92
+X-Google-Smtp-Source: AGHT+IHXDTL1GYPRjqoXaAf0lXb/mQXNX5irqPQDyrCtJl+J8aEBhNquD8+cbiWqUJBWAylgDPuoqQ==
+X-Received: by 2002:a05:6a20:6a03:b0:216:1c88:df46 with SMTP id adf61e73a8af0-21d22909953mr3036667637.0.1749021887895;
+        Wed, 04 Jun 2025 00:24:47 -0700 (PDT)
+Received: from [157.82.203.223] ([157.82.203.223])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747affd478bsm10590024b3a.155.2025.06.04.00.24.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Jun 2025 00:24:47 -0700 (PDT)
+Message-ID: <517d5838-3313-4b31-b96d-d471b062cd1a@daynix.com>
+Date: Wed, 4 Jun 2025 16:24:42 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Tcd26d72acdec76a4
-Date: Wed, 04 Jun 2025 09:24:22 +0200
-From: "Arnd Bergmann" <arnd@kernel.org>
-To: "Wei Fang" <wei.fang@nxp.com>, "Vladimir Oltean" <vladimir.oltean@nxp.com>
-Cc: "Claudiu Manoil" <claudiu.manoil@nxp.com>,
- "Clark Wang" <xiaoning.wang@nxp.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>
-Message-Id: <b2068b86-dcbb-4fee-b091-4910e975a9b9@app.fastmail.com>
-In-Reply-To: 
- <PAXPR04MB85104C607BF23FFFD6663ABB886CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250603105056.4052084-1-wei.fang@nxp.com>
- <20250603204501.2lcszfoiy5svbw6s@skbuf>
- <PAXPR04MB85104C607BF23FFFD6663ABB886CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Subject: Re: [PATCH net] net: enetc: fix the netc-lib driver build dependency
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 03/10] tun: Allow steering eBPF program to
+ fall back
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com>
+ <20250530-rss-v12-3-95d8b348de91@daynix.com>
+ <CACGkMEvVf0LrquZcWSv3vp-r44sTj0ZDnjwbwB20N0aU35+vxw@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEvVf0LrquZcWSv3vp-r44sTj0ZDnjwbwB20N0aU35+vxw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 4, 2025, at 04:44, Wei Fang wrote:
->> Ok, so to summarize, you want nxp-netc-lib.ko to be separate from
->> fsl-enetc-core.ko, because when you upstream the switch driver (also a
->> consumer of ntmp.o), you want it to depend just on nxp-netc-lib.ko but
->> not on the full fsl-enetc-core.ko.
->> If the only reverse dependency of NXP_NETC_LIB, NXP_ENETC4, becomes m,
->> then NXP_NETC_LIB also becomes m, but in reality, FSL_ENETC_CORE, via
->> cbdr.o, still depends on symbols from NXP_NETC_LIB.
->> 
->> So you influence NXP_NETC_LIB to not become m when its only selecter is m,
->> instead stay y.
->> 
->> Won't this need to change, and become even more complicated when
->> NXP_NETC_LIB gains another selecter, the switch driver?
->
-> The dependency needs to be updated as follows when switch driver is
-> added, to avoid the compilation errors.
->
-> default y if FSL_ENETC_CORE=y && (NXP_ENETC4=m || NET_DSA_NETC_SWITCH=m)
->
->> 
->> >  	help
->> >  	  This module provides common functionalities for both ENETC and NETC
->> >  	  Switch, such as NETC Table Management Protocol (NTMP) 2.0, common tc
->> > --
->> > 2.34.1
->> >
->> 
->> What about this interpretation? cbdr.o uses symbols from NXP_NETC_LIB,
->> so the Kconfig option controlling cbdr.o, aka FSL_ENETC_CORE, should
->> select NXP_NETC_LIB. This solves the problem in a way which is more
->> logical to me, and doesn't need to change when the switch is later added.
->> 
->
-> Yes, this is also a solution. I thought that LS1028A does not need the netc-lib
-> driver at all. Doing so will result in netc-lib being compiled on the LS1028A
-> platform, which may be unacceptable, so I did not do this. Since you think
-> this is better, I will apply this solution next. Thanks.
+On 2025/06/04 10:27, Jason Wang wrote:
+> On Fri, May 30, 2025 at 12:50 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> This clarifies a steering eBPF program takes precedence over the other
+>> steering algorithms.
+> 
+> Let's give an example on the use case for this.
+> 
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> ---
+>>   Documentation/networking/tuntap.rst |  7 +++++++
+>>   drivers/net/tun.c                   | 28 +++++++++++++++++-----------
+>>   include/uapi/linux/if_tun.h         |  9 +++++++++
+>>   3 files changed, 33 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/Documentation/networking/tuntap.rst b/Documentation/networking/tuntap.rst
+>> index 4d7087f727be..86b4ae8caa8a 100644
+>> --- a/Documentation/networking/tuntap.rst
+>> +++ b/Documentation/networking/tuntap.rst
+>> @@ -206,6 +206,13 @@ enable is true we enable it, otherwise we disable it::
+>>         return ioctl(fd, TUNSETQUEUE, (void *)&ifr);
+>>     }
+>>
+>> +3.4 Reference
+>> +-------------
+>> +
+>> +``linux/if_tun.h`` defines the interface described below:
+>> +
+>> +.. kernel-doc:: include/uapi/linux/if_tun.h
+>> +
+>>   Universal TUN/TAP device driver Frequently Asked Question
+>>   =========================================================
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index d8f4d3e996a7..9133ab9ed3f5 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -476,21 +476,29 @@ static u16 tun_automq_select_queue(struct tun_struct *tun, struct sk_buff *skb)
+>>          return txq;
+>>   }
+>>
+>> -static u16 tun_ebpf_select_queue(struct tun_struct *tun, struct sk_buff *skb)
+>> +static bool tun_ebpf_select_queue(struct tun_struct *tun, struct sk_buff *skb,
+>> +                                 u16 *ret)
+>>   {
+>>          struct tun_prog *prog;
+>>          u32 numqueues;
+>> -       u16 ret = 0;
+>> +       u32 prog_ret;
+>> +
+>> +       prog = rcu_dereference(tun->steering_prog);
+>> +       if (!prog)
+>> +               return false;
+>>
+>>          numqueues = READ_ONCE(tun->numqueues);
+>> -       if (!numqueues)
+>> -               return 0;
+>> +       if (!numqueues) {
+>> +               *ret = 0;
+>> +               return true;
+>> +       }
+>>
+>> -       prog = rcu_dereference(tun->steering_prog);
+>> -       if (prog)
+>> -               ret = bpf_prog_run_clear_cb(prog->prog, skb);
+>> +       prog_ret = bpf_prog_run_clear_cb(prog->prog, skb);
+>> +       if (prog_ret == TUN_STEERINGEBPF_FALLBACK)
+>> +               return false;
+> 
+> This seems to break the uAPI. So I think we need a new ioctl to enable
+> the behaviour
 
-I think this version should work, and make logical sense:
+I assumed it is fine to repurpose one of the 32-bit integer values since 
+32-bit integer is too big to specify the queue number, but it may not be 
+fine. I don't have a concrete use case either.
 
---- a/drivers/net/ethernet/freescale/enetc/Kconfig
-+++ b/drivers/net/ethernet/freescale/enetc/Kconfig
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- config FSL_ENETC_CORE
-        tristate
-+       select NXP_NETC_LIB if NXP_ENETC_NTMP
-        help
-          This module supports common functionality between the PF and VF
-          drivers for the NXP ENETC controller.
-@@ -22,6 +23,9 @@ config NXP_NETC_LIB
-          Switch, such as NETC Table Management Protocol (NTMP) 2.0, common tc
-          flower and debugfs interfaces and so on.
- 
-+config NXP_ENETC_NTMP
-+       bool
-+
- config FSL_ENETC
-        tristate "ENETC PF driver"
-        depends on PCI_MSI
-@@ -45,7 +49,7 @@ config NXP_ENETC4
-        select FSL_ENETC_CORE
-        select FSL_ENETC_MDIO
-        select NXP_ENETC_PF_COMMON
--       select NXP_NETC_LIB
-+       select NXP_ENETC_NTMP
-        select PHYLINK
-        select DIMLIB
-        help
+Perhaps it is safer to note that TUNSETSTEERINGEBPF takes precedence 
+over TUNSETVNETRSS to allow such an extension in the future (but without 
+implementing one now).
 
-FSL_ENETC selects the feature it actually wants, and FSL_ENETC_CORE
-enables the module based on the set of features that are enabled.
-The switch module can then equally enable bool symbol. Not sure
-what the best name would be for that symbol, that depends on what
-you expect to get added to NXP_NETC_LIB.
+> 
+>>
+>> -       return ret % numqueues;
+>> +       *ret = (u16)prog_ret % numqueues;
+>> +       return true;
+>>   }
+>>
+>>   static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
+>> @@ -500,9 +508,7 @@ static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
+>>          u16 ret;
+>>
+>>          rcu_read_lock();
+>> -       if (rcu_dereference(tun->steering_prog))
+>> -               ret = tun_ebpf_select_queue(tun, skb);
+>> -       else
+>> +       if (!tun_ebpf_select_queue(tun, skb, &ret))
+>>                  ret = tun_automq_select_queue(tun, skb);
+>>          rcu_read_unlock();
+>>
+>> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+>> index 287cdc81c939..980de74724fc 100644
+>> --- a/include/uapi/linux/if_tun.h
+>> +++ b/include/uapi/linux/if_tun.h
+>> @@ -115,4 +115,13 @@ struct tun_filter {
+>>          __u8   addr[][ETH_ALEN];
+>>   };
+>>
+>> +/**
+>> + * define TUN_STEERINGEBPF_FALLBACK - A steering eBPF return value to fall back
+>> + *
+>> + * A steering eBPF program may return this value to fall back to the steering
+>> + * algorithm that should have been used if the program was not set. This allows
+>> + * selectively overriding the steering decision.
+>> + */
+>> +#define TUN_STEERINGEBPF_FALLBACK -1
+> 
+> Not a native speaker, consider it works more like XDP_PASS, would it
+> be better to use "TUN_STERRING_PASS"?
 
-     Arnd
+That sounds indeed better to me.
+
+Regards,
+Akihiko Odaki
 
