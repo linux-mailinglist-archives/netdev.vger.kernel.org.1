@@ -1,245 +1,198 @@
-Return-Path: <netdev+bounces-195019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485FCACD7FB
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:43:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E972BACD80A
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D750D3A565D
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:43:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C22877A7C98
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8E81EEA5F;
-	Wed,  4 Jun 2025 06:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POdXv3Aa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8461F4CB3;
+	Wed,  4 Jun 2025 06:52:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A6646447;
-	Wed,  4 Jun 2025 06:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B682B9A9;
+	Wed,  4 Jun 2025 06:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749019408; cv=none; b=Le96+36qNEDBEErUOFxc2J0uuLwPNyqQ4644TVaqFNdb9yza16OYxBKxLZX+hTxszj8ec2FtCmKqxz90QqzrvUIXN3XM0T2Oej4B8pcBtFnQsat/n7R7LW0TjIfds2FXiLHx+KJnCdPGe3jypjS2MuoxhazXoEG4mP8Pqav6wFw=
+	t=1749019953; cv=none; b=O2qLVl7JppewgTupMuGaCDtAUSkZ2dISUeb5zwg70uTSFiCornaoQ46HKlEhqwrqXjOcpsdcfzzZb3fBR4gqMJGnK/IXSur3sWNJTSOkqnj1yoM4F/0jKzVPC+9D7GH9N2Nx6+Y/MCNs8aPmFnyo35zZ+UQa5giXFU86Ir31NqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749019408; c=relaxed/simple;
-	bh=FNpeV30QqdCaEMh4xg3sPuA/kgFP1i6pImcSeIWxbIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K4HcQ6GzJ2qLrdaF/8erSuFBT7V8eP4yBmM3su5UY1MmlyvD4IreJkX+pOxnK951IudCs4t+1H2v1sDBFWCKXgkch8haziBblTm0rhRy5meI7WsGRv9Cn+z7OGrjVYFKcZbzKK9Qr8+szqcNRy8S2zRYmwQTKhyAmjX4NZqpDLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POdXv3Aa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 668F2C4CEE7;
-	Wed,  4 Jun 2025 06:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749019408;
-	bh=FNpeV30QqdCaEMh4xg3sPuA/kgFP1i6pImcSeIWxbIY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=POdXv3AaTkvdfCAWcLJC3VmbhE1vhabB4Ibpamnn1iA6tY56SRQL7v+gFU+SaAkF6
-	 /7d/QydXvigoxApnKYdEoDW87nENtVlIlSp9NOCTSxnIfvqYQH+ObqRey3STGfxKac
-	 LkNS2f7oZEHUTAoO9MF1aYbF7QL0m8oP6XFmzL6L5cEzbhA+Hqi1MfxWLKkJnI1Pie
-	 J5opVMj1W5mvMIr+sXQcM3qQVYA9PQWw1Q9d0yX28QjYsIsrLFRpVzzmDbh/fSr25V
-	 n7do0GUGv8uUo/+5oeRYZfwuEOskybppBVyBBdb/tMd1RMqcEvPM3qeaUQNLjzKsLw
-	 AHe2ypgzG7sOw==
-Message-ID: <c4316518-01d2-45f2-94d8-40ed2028689b@kernel.org>
-Date: Wed, 4 Jun 2025 08:43:22 +0200
+	s=arc-20240116; t=1749019953; c=relaxed/simple;
+	bh=G5m/DmmWuNvT20bPcL1Uarq9Pf4dQmINhuu8phslNrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KpvH8kWgyedBPtL6qxIAHOlP0aAUI/hYV6EKMzqpbIyqLL2dznBsTh0YjoQ5B+eavh3QeK4D+MZ041RDuZrDFULyzTTSrkEPFpZnuQ9W/C9EN7FL0V7UYilB0QnEnsbslJF2PXDr96GVgIQAf4z5z1Y6BqQa/k9LzK3RqjFJ/tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-CSE-ConnectionGUID: EXyizG4rTayaEo+Z3yN2oQ==
+X-CSE-MsgGUID: Get4dq+gQSqZI32LIDBxJQ==
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie5.idc.renesas.com with ESMTP; 04 Jun 2025 15:52:22 +0900
+Received: from ubuntu.adwin.renesas.com (unknown [10.226.93.1])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 098F8417CA9D;
+	Wed,  4 Jun 2025 15:52:16 +0900 (JST)
+From: John Madieu <john.madieu.xa@bp.renesas.com>
+To: prabhakar.mahadev-lad.rj@bp.renesas.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	geert+renesas@glider.be,
+	magnus.damm@gmail.com
+Cc: biju.das.jz@bp.renesas.com,
+	john.madieu@gmail.com,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	John Madieu <john.madieu.xa@bp.renesas.com>
+Subject: [PATCH 0/4] Add support for GBETH IPs found on RZ/G3E SoCs
+Date: Wed,  4 Jun 2025 08:51:56 +0200
+Message-ID: <20250604065200.163778-1-john.madieu.xa@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 1/2] dt-bindings: net: pse-pd: Describe the
- LTC4266 PSE chipset
-To: Kyle Swenson <kyle.swenson@est.tech>,
- "o.rempel@pengutronix.de" <o.rempel@pengutronix.de>,
- "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-References: <20250603230422.2553046-1-kyle.swenson@est.tech>
- <20250603230422.2553046-2-kyle.swenson@est.tech>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250603230422.2553046-2-kyle.swenson@est.tech>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 04/06/2025 01:04, Kyle Swenson wrote:
-> +allOf:
-> +  - $ref: pse-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - lltc,ltc4266
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  '#pse-cells':
-> +    const: 1
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +
-> +  channels:
-> +
+Hi all,
 
-Drop blank line
+This series adds support for the two Gigabit Ethernet (GBETH) interfaces on the
+Renesas RZ/G3E (R9A09G047) SoCs and their enablement on the SMARC-II EVK. This
+is achieved by integrating the necessary clock/reset signals prior to defining
+common DTS nodes, and enabling both GBETH ports at the board level.
 
-> +    description: This parameter describes the mapping between the logical ports
-> +      on the PSE controller and the physical ports.
+Here are pach dependencies:
 
-Move description after additionalProperties, so entire block is together.
+ - Patch 1/4 is based on renesas-drivers tree, on top of renesas-clk-for-v6.17
+ branch
+ - Patches [2,3,4]/4 are based on renesas-devel tree, on top of
+ renesas-dts-for-v6.17 branch
 
-> +
+Below are some test logs, involving pings, then unbind/bind, then pings again:
 
-> +    type: object
-> +
-Drop blank line
+```
+root@smarc-rzg3e:~# ping -I eth0 google.com
+PING google.com (172.217.20.174) from 192.168.1.245 eth0: 56(84) bytes of data.
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=1 ttl=117 time=4.42 ms
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=2 ttl=117 time=3.87 ms
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=3 ttl=117 time=3.68 ms
+64 bytes from waw02s07-in-f14.1e100.net (172.217.20.174): icmp_seq=4 ttl=117 time=3.83 ms
+^C
+--- google.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 3.680/3.949/4.415/0.278 ms
+root@smarc-rzg3e:~# 
 
+root@smarc-rzg3e:~# ping -I eth1 google.com
+PING google.com (142.250.75.238) from 192.168.1.242 eth1: 56(84) bytes of data.
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.72 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.34 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=5.66 ms
+^C
+--- google.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 4.338/4.904/5.659/0.555 ms
+root@smarc-rzg3e:~# 
+root@smarc-rzg3e:~# 
+root@smarc-rzg3e:~# 
+root@smarc-rzg3e:~# echo "15c40000.ethernet" > /sys/bus/platform/drivers/renesas-gbeth/bind
+[  413.422009] renesas-gbeth 15c40000.ethernet: IRQ sfty not found
+[  413.429570] renesas-gbeth 15c40000.ethernet: User ID: 0x0, Synopsys ID: 0x52
+[  413.436749] renesas-gbeth 15c40000.ethernet:         DWMAC4/5
+[  413.441974] renesas-gbeth 15c40000.ethernet: DMA HW capability register supported
+[  413.449536] renesas-gbeth 15c40000.ethernet: RX Checksum Offload Engine supported
+[  413.457098] renesas-gbeth 15c40000.ethernet: Wake-Up On Lan supported
+[  413.463617] renesas-gbeth 15c40000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+[  413.471807] renesas-gbeth 15c40000.ethernet: Enabled L3L4 Flow TC (entries=8)
+[  413.478982] renesas-gbeth 15c40000.ethernet: Enabled RFS Flow TC (entries=10)
+[  413.486148] renesas-gbeth 15c40000.ethernet: Using 32/32 bits DMA host/device width
+[  413.523040] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+[  413.534875] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-1
+[  413.546218] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-2
+[  413.556666] renesas-gbeth 15c40000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-3
+[  413.633799] renesas-gbeth 15c40000.ethernet eth0: PHY [stmmac-1:07] driver [Microchip KSZ9131 Gigabit PHY] (irq=27)
+[  413.659645] dwmac4: Master AXI performs fixed burst length
+[  413.666549] renesas-gbeth 15c40000.ethernet eth0: No Safety Features support found
+[  413.674263] renesas-gbeth 15c40000.ethernet eth0: IEEE 1588-2008 Advanced Timestamp supported
+[  413.683733] renesas-gbeth 15c40000.ethernet eth0: registered PTP clock
+[  413.695546] renesas-gbeth 15c40000.ethernet eth0: configuring for phy/rgmii-id link mode
+[  416.576645] renesas-gbeth 15c40000.ethernet eth0: Link is Up - 1Gbps/Full - flow control off
+root@smarc-rzg3e:~#
+root@smarc-rzg3e:~# echo "15c30000.ethernet" > /sys/bus/platform/drivers/renesas-gbeth/bind
+[  430.269771] renesas-gbeth 15c30000.ethernet: IRQ sfty not found
+[  430.277347] renesas-gbeth 15c30000.ethernet: User ID: 0x1, Synopsys ID: 0x52
+[  430.284525] renesas-gbeth 15c30000.ethernet:         DWMAC4/5
+[  430.289753] renesas-gbeth 15c30000.ethernet: DMA HW capability register supported
+[  430.297317] renesas-gbeth 15c30000.ethernet: RX Checksum Offload Engine supported
+[  430.304880] renesas-gbeth 15c30000.ethernet: Wake-Up On Lan supported
+[  430.311400] renesas-gbeth 15c30000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+[  430.319598] renesas-gbeth 15c30000.ethernet: Enabled L3L4 Flow TC (entries=8)
+[  430.326774] renesas-gbeth 15c30000.ethernet: Enabled RFS Flow TC (entries=10)
+[  430.333942] renesas-gbeth 15c30000.ethernet: Using 32/32 bits DMA host/device width
+[  430.360549] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-0
+[  432.366627] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-1
+[  432.377218] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-2
+[  432.386450] renesas-gbeth 15c30000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-3
+[  432.461470] renesas-gbeth 15c30000.ethernet eth1: PHY [stmmac-0:07] driver [Microchip KSZ9131 Gigabit PHY] (irq=23)
+[  432.487523] dwmac4: Master AXI performs fixed burst length
+[  432.494429] renesas-gbeth 15c30000.ethernet eth1: No Safety Features support found
+[  432.502149] renesas-gbeth 15c30000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
+[  432.511638] renesas-gbeth 15c30000.ethernet eth1: registered PTP clock
+[  432.523033] renesas-gbeth 15c30000.ethernet eth1: configuring for phy/rgmii-id link mode
+[  435.489601] renesas-gbeth 15c30000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
+root@smarc-rzg3e:~# 
+root@smarc-rzg3e:~# 
+root@smarc-rzg3e:~# ping -I eth0 google.com
+PING google.com (142.250.75.238) from 192.168.1.242 eth0: 56(84) bytes of data.
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.62 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.19 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=4.49 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=4 ttl=251 time=4.76 ms
+^C
+--- google.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 4.189/4.514/4.758/0.210 ms
+root@smarc-rzg3e:~# ping -I eth1 google.com
+PING google.com (142.250.75.238) from 192.168.1.245 eth1: 56(84) bytes of data.
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=1 ttl=251 time=4.45 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=2 ttl=251 time=4.79 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=3 ttl=251 time=4.42 ms
+64 bytes from par10s41-in-f14.1e100.net (142.250.75.238): icmp_seq=4 ttl=251 time=4.47 ms
+^C
+--- google.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 4.417/4.530/4.787/0.149 ms
+root@smarc-rzg3e:~# 
+```
 
-> +    additionalProperties: false
-> +
-> +    properties:
-> +      "#address-cells":
-> +        const: 1
-> +
-> +      "#size-cells":
-> +        const: 0
-> +
-> +
+Regards,
+John Madieu
 
-Only one blank line
+John Madieu (4):
+  clk: renesas: r9a09g047: Add clock and reset signals for the GBETH IPs
+  dt-bindings: net: renesas-gbeth: Add support for RZ/G3E (R9A09G047)
+    SoC
+  arm64: dts: renesas: r9a09g047: Add GBETH nodes
+  arm64: dts: renesas: rzg3e-smarc-som: Enable eth{0-1} (GBETH)
+    interfaces
 
-> +    patternProperties:
-> +      '^channel@[0-3]$':
-> +        type: object
-> +        additionalProperties: false
-> +
-> +        properties:
-> +          reg:
-> +            maxItems: 1
-> +
-> +          sense-resistor-micro-ohms:
-> +            description: Sense resistor connected to the channel's MOSFET, used
-> +              for current measurement for overcurrent detection.
-> +            enum: [250000, 500000]
-> +
-> +        required:
-> +          - reg
-> +
-> +    required:
-> +      - "#address-cells"
+ .../bindings/net/renesas,r9a09g057-gbeth.yaml |   2 +
+ arch/arm64/boot/dts/renesas/r9a09g047.dtsi    | 207 ++++++++++++++++++
+ .../boot/dts/renesas/rzg3e-smarc-som.dtsi     | 106 +++++++++
+ drivers/clk/renesas/r9a09g047-cpg.c           |  64 ++++++
+ 4 files changed, 379 insertions(+)
 
-Keep consistent quotes, either ' or "
+-- 
+2.25.1
 
-> +      - "#size-cells"
-> +
-> +unevaluatedProperties: false
-
-This goes after required block
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +examples:
-> +  - |
-> +    i2c {
-> +      #address-cells = <1>;
-> +      #size-cells = <0>;
-> +
-> +      ethernet-pse@2f {
-> +        compatible = "lltc,ltc4266";
-> +        status = "okay";
-
-Drop
-
-> +
-
-Drop blank line
-
-
-> +        reg = <0x2f>;
-> +
-> +        channels {
-> +          #address-cells = <1>;
-> +          #size-cells = <0>;
-> +
-> +          phys0: channel@0 {
-> +            reg = <0>;
-> +          };
-> +
-> +          phys1: channel@1 {
-> +            reg = <1>;
-> +          };
-> +
-> +          phys2: channel@2 {
-> +            reg = <2>;
-> +          };
-> +
-> +          phys3: channel@3 {
-> +            reg = <3>;
-> +          };
-> +        };
-
-Blank line... you really folllow entirely different style :/
-
-
-
-Best regards,
-Krzysztof
 
