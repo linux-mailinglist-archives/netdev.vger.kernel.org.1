@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-194957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E91BACD44D
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:27:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58BFACD475
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9247917A1D7
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:27:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 067967A431F
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935B02741B1;
-	Wed,  4 Jun 2025 01:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFB31E04BD;
+	Wed,  4 Jun 2025 01:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KSb79OgN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ojo1x7hC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E7E2741AD;
-	Wed,  4 Jun 2025 01:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDEF1922FD;
+	Wed,  4 Jun 2025 01:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999166; cv=none; b=ZEd4RGgkkT8+4vheHNk0L9GLLygl3HOoNUjditccAKJjFR+FcdW7znQ1nn+P7xpaiV3IazIqxTzFp78LqeV+ojZTb74DlypyB8wttqVbdeEaK/Z0OOgC0BOj7dRXniYyWRLWJcs3VMbUxvADkceSpSw8/LXnUny7LFkUtQEc5Jc=
+	t=1748999177; cv=none; b=ZHoPmqf0/m23BaZVevCos+BnfCDc8A7CIX2GBnHDt7UPMXFWVLW4SfCVFA9YQWtjlRbecHl3YDCuopy4WQg14GdirOp8ZPsvx76TMXUfhwBEnRPOYSzj/fd48ipwy0tQq9g5VLIz2KU03h6yCFOu7SlmL/nw0rp353x1KvSckbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999166; c=relaxed/simple;
-	bh=+ufvZDeQZqG9z/x1UYxI3XtzZkUgcESqcL8LIDE+3IU=;
+	s=arc-20240116; t=1748999177; c=relaxed/simple;
+	bh=6PpL0gCbXfBRyt7NE6srUXN+h5ji8hiZ69L/Eo6UrBg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RXHstyGZBpZg6X7EryKWoYQVH6jm6EYs/CjE5B/AzVKfoTGOA6uhl3Hx//ZSTpUJplERcXt3wN20maVxbsu5YxPBmMRSPBmSot5IfuaE2x4txEpRw2N4jEFDi5aa3jqw26jKGWsIuQBE7TutgtuKLbN5ZkB79Bh0fe+TDCzukfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KSb79OgN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A558C4CEED;
-	Wed,  4 Jun 2025 01:06:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jhqQAcQ5dLS00KPdyqfot/O1MuYC4abdFdzXC7sxHU+sDXTLCO6G/IZDX4FmzZMiO6CivQlS3tQ4YCnT7/ALqy1uN1uR2JbKUzJ8hLsHDssZuFzaat9F8kuorjU8kwbw3lkD6Z+pbTZ0jRwevAFNzFsLUwBa92kGpwA7AFQadjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ojo1x7hC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25089C4CEED;
+	Wed,  4 Jun 2025 01:06:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999166;
-	bh=+ufvZDeQZqG9z/x1UYxI3XtzZkUgcESqcL8LIDE+3IU=;
+	s=k20201202; t=1748999177;
+	bh=6PpL0gCbXfBRyt7NE6srUXN+h5ji8hiZ69L/Eo6UrBg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KSb79OgNurUKuBTO3K97KNlo1BAdfqfLia7c17G33zYzukQeOqni3gOHvgGK3+P0m
-	 xHQejSU3UwVeHoyh7/jlV0Gbfe8ZxqrJVokA4sxi68/l8dtNsFvmI332Or4BTPqXVH
-	 eRqZF1ScLyw7Zbr3tmAXbsNuAkaAg0m7RVeIwJlkVGg9/o7KgU5/vU+wt0ZxSzqS4E
-	 WVFhDIdoUGqYRDn9jZpIviNdFsjD6JF9c3aWXHsPjs6KLxUJTXMtdUNWuAvTjKHQZD
-	 1UWtxVJ8bXk9jSqyaoedxQ0uaVaLqLfxreztNeei0+OelIasZfnvq1eemN1JnFU9VG
-	 JyLEUwY9X6IWQ==
+	b=Ojo1x7hCoWGNW5Arp4D8puaMp4sbWeQ23srJA9c9v1+O+y+rfgp+XHbbhqz1NNqCp
+	 r5x7ibO+iY04Ii1XEGkjK7TYdRrlxHIub0fqPpFPm6lKLf/rGT38wmGub2F+DW//u2
+	 fUlDDzxCG3UwFY+mPI3NTHC4CssiwrXKdl9VO8nNnWvqXpCJxs57iH53HwAGhwlZWd
+	 XZg/OMC1iNhCUhjXmmfS2YR9FN8Hg1WVG+HkQEx+WdU5JHfULn5qXSO/ZDpqnHNSZw
+	 gL7fkJ4u19kwgIBNv8e6d/eMU58ng9X3vHj+6xK/B7FHqcZJ/wzDz2C4TfZ3Vp+gv/
+	 YwvuPSmg9rBSA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Yong Wang <yongwang@nvidia.com>,
-	Andy Roulin <aroulin@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 25/33] net: bridge: mcast: re-implement br_multicast_{enable, disable}_port functions
-Date: Tue,  3 Jun 2025 21:05:16 -0400
-Message-Id: <20250604010524.6091-25-sashal@kernel.org>
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 32/33] bpf, sockmap: Fix data lost during EAGAIN retries
+Date: Tue,  3 Jun 2025 21:05:23 -0400
+Message-Id: <20250604010524.6091-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604010524.6091-1-sashal@kernel.org>
 References: <20250604010524.6091-1-sashal@kernel.org>
@@ -71,211 +69,115 @@ X-stable-base: Linux 5.15.184
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Yong Wang <yongwang@nvidia.com>
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-[ Upstream commit 4b30ae9adb047dd0a7982975ec3933c529537026 ]
+[ Upstream commit 7683167196bd727ad5f3c3fc6a9ca70f54520a81 ]
 
-When a bridge port STP state is changed from BLOCKING/DISABLED to
-FORWARDING, the port's igmp query timer will NOT re-arm itself if the
-bridge has been configured as per-VLAN multicast snooping.
+We call skb_bpf_redirect_clear() to clean _sk_redir before handling skb in
+backlog, but when sk_psock_handle_skb() return EAGAIN due to sk_rcvbuf
+limit, the redirect info in _sk_redir is not recovered.
 
-Solve this by choosing the correct multicast context(s) to enable/disable
-port multicast based on whether per-VLAN multicast snooping is enabled or
-not, i.e. using per-{port, VLAN} context in case of per-VLAN multicast
-snooping by re-implementing br_multicast_enable_port() and
-br_multicast_disable_port() functions.
+Fix skb redir loss during EAGAIN retries by restoring _sk_redir
+information using skb_bpf_set_redir().
 
-Before the patch, the IGMP query does not happen in the last step of the
-following test sequence, i.e. no growth for tx counter:
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
- # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
- # ip link add name swp1 up master br1 type dummy
- # bridge link set dev swp1 state 0
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # sleep 1
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # bridge link set dev swp1 state 3
- # sleep 2
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
+Before this patch:
+'''
+./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress
+Setting up benchmark 'sockmap'...
+create socket fd c1:13 p1:14 c2:15 p2:16
+Benchmark 'sockmap' started.
+Send Speed 1343.172 MB/s, BPF Speed 1343.238 MB/s, Rcv Speed   65.271 MB/s
+Send Speed 1352.022 MB/s, BPF Speed 1352.088 MB/s, Rcv Speed   0 MB/s
+Send Speed 1354.105 MB/s, BPF Speed 1354.105 MB/s, Rcv Speed   0 MB/s
+Send Speed 1355.018 MB/s, BPF Speed 1354.887 MB/s, Rcv Speed   0 MB/s
+'''
+Due to the high send rate, the RX processing path may frequently hit the
+sk_rcvbuf limit. Once triggered, incorrect _sk_redir will cause the flow
+to mistakenly enter the "!ingress" path, leading to send failures.
+(The Rcv speed depends on tcp_rmem).
 
-After the patch, the IGMP query happens in the last step of the test:
- # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
- # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
- # ip link add name swp1 up master br1 type dummy
- # bridge link set dev swp1 state 0
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # sleep 1
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-1
- # bridge link set dev swp1 state 3
- # sleep 2
- # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
-3
+After this patch:
+'''
+./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress
+Setting up benchmark 'sockmap'...
+create socket fd c1:13 p1:14 c2:15 p2:16
+Benchmark 'sockmap' started.
+Send Speed 1347.236 MB/s, BPF Speed 1347.367 MB/s, Rcv Speed   65.402 MB/s
+Send Speed 1353.320 MB/s, BPF Speed 1353.320 MB/s, Rcv Speed   65.536 MB/s
+Send Speed 1353.186 MB/s, BPF Speed 1353.121 MB/s, Rcv Speed   65.536 MB/s
+'''
 
-Signed-off-by: Yong Wang <yongwang@nvidia.com>
-Reviewed-by: Andy Roulin <aroulin@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Link: https://lore.kernel.org/r/20250407142234.47591-2-jiayuan.chen@linux.dev
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-Based on my comprehensive analysis, here's my assessment: **YES** ##
-Analysis Summary This commit should be backported to stable kernel
-trees. Here's my detailed reasoning: ### **What the Bug Fixes** The
-commit fixes a critical bug where **IGMP query timers fail to re-arm**
-when a bridge port transitions from BLOCKING/DISABLED to FORWARDING
-state in **per-VLAN multicast snooping** configurations. ### **Technical
-Problem** 1. **Context**: When `BROPT_MCAST_VLAN_SNOOPING_ENABLED` is
-active, each VLAN has its own multicast context (`port_mcast_ctx`) with
-separate query timers 2. **Bug**: The old implementation in
-`br_multicast_enable_port()` and `br_multicast_disable_port()` only
-operated on the port's main multicast context (`port->multicast_ctx`) 3.
-**Impact**: Per-VLAN multicast contexts were never properly
-enabled/disabled during STP state transitions 4. **Result**: IGMP/MLD
-query timers for VLANs remain permanently disabled, causing multicast
-flooding instead of proper snooping ### **Evidence from Commit** The
-commit message provides clear **before/after test results**: -
-**Before**: IGMP query count stays at 1 (timer not re-arming) -
-**After**: IGMP query count increases to 3 (timer properly re-arming)
-This demonstrates the fix works and solves a real, testable problem. ###
-**Code Analysis** The fix **re-implements** `br_multicast_enable_port()`
-and `br_multicast_disable_port()` to: 1. **Check VLAN snooping status**:
-If `BROPT_MCAST_VLAN_SNOOPING_ENABLED` is set 2. **Iterate through
-VLANs**: Process each VLAN's multicast context individually 3. **Proper
-state handling**: Only enable contexts for VLANs in LEARNING/FORWARDING
-states 4. **Fallback behavior**: Use old behavior when VLAN snooping is
-disabled ### **Backporting Criteria Met** ✅ **Bug Fix**: Fixes
-functional regression in multicast snooping ✅ **Self-contained**:
-Changes isolated to bridge multicast code ✅ **No API changes**: Pure
-internal refactoring with same public interface ✅ **Production Impact**:
-Affects real-world VLAN multicast deployments ✅ **Well-tested**:
-Includes specific test case demonstrating the fix ✅ **Minimal Risk**:
-Well-reviewed code from experienced maintainers (Nvidia networking team)
-### **Stability Impact** - **Risk Level**: Low - internal refactoring
-with clear improvement - **Regression Potential**: Very low - maintains
-backward compatibility - **User Impact**: High - fixes broken multicast
-functionality in VLAN scenarios This is exactly the type of targeted bug
-fix that stable trees are designed to include: it fixes a clear
-functional regression affecting production deployments while carrying
-minimal risk of introducing new issues.
+**YES** This commit should be backported to stable kernel trees. ##
+Extensive Analysis ### **Critical Bug Fix Nature** This is a **data loss
+bug** in the BPF sockmap subsystem that causes silent packet drops under
+load conditions. The commit adds a single line that restores essential
+redirect information during EAGAIN retry scenarios. ### **Code Change
+Analysis** The fix adds exactly one line at `net/core/skmsg.c:694`: ```c
+skb_bpf_set_redir(skb, psock->sk, ingress); ``` This line restores
+redirect information that was previously cleared by
+`skb_bpf_redirect_clear(skb)` at line 684. When `sk_psock_handle_skb()`
+returns `-EAGAIN` due to memory pressure or socket buffer limits, the
+work is rescheduled, but without this fix, the redirect information
+(`skb->_sk_redir`) would be lost. ### **Impact Without the Fix** 1.
+**Silent Data Loss**: When EAGAIN occurs, subsequent retry attempts find
+no redirect target (`skb_bpf_redirect_fetch()` returns NULL), causing
+packets to be dropped in `sk_psock_skb_redirect()` at lines 935-938. 2.
+**BPF Policy Bypass**: Packets that should be redirected according to
+BPF program logic get dropped instead, effectively bypassing network
+policies. 3. **Production Impact**: The commit message shows concrete
+performance degradation - receive speeds dropping from 65+ MB/s to 0
+MB/s under high load conditions. ### **Backport Suitability Factors**
+**✅ Minimal and Surgical:** - Single line addition - No API changes or
+structural modifications - Uses existing stable function
+`skb_bpf_set_redir()` **✅ Self-Contained:** - Fix only affects the
+specific error path (`ret == -EAGAIN`) - No dependencies on other
+concurrent changes - Uses well-established APIs present across kernel
+versions **✅ Clear Bug Fix Semantics:** - Restores state that was
+previously cleared - Follows the established pattern: clear → try →
+restore on failure - The comment explicitly states "Restore redir info
+we cleared before" **✅ Critical Subsystem:** - Affects BPF sockmap, a
+core networking infrastructure component - Used by service meshes,
+container networking, and load balancers - Failure causes silent data
+loss that's difficult to debug ### **Comparison with Similar Commits**
+Looking at the provided historical examples: - Similar to commit #2 and
+#4 (both marked YES) which also fix sockmap data handling issues -
+Unlike commit #1, #3, and #5 (marked NO) which involved more complex
+architectural changes - This fix addresses a fundamental correctness
+issue rather than optimizations ### **Risk Assessment** **Low Risk:** -
+The fix is in an error recovery path, so it only executes when problems
+already exist - Restoring redirect information cannot make the situation
+worse - The function `skb_bpf_set_redir()` is a simple state restoration
+operation ### **Stable Tree Criteria Compliance** 1. **Important
+bugfix**: ✅ Fixes silent data loss 2. **Minimal risk**: ✅ Single line,
+error path only 3. **No new features**: ✅ Pure bug fix 4. **Confined
+scope**: ✅ Limited to sockmap redirect handling 5. **User-visible
+impact**: ✅ Prevents packet loss under load This commit perfectly fits
+the stable tree criteria for important, low-risk bug fixes that address
+user-visible problems in critical subsystems.
 
- net/bridge/br_multicast.c | 77 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 69 insertions(+), 8 deletions(-)
+ net/core/skmsg.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 3cd2b648408d6..085c9e706bc47 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -1931,12 +1931,17 @@ static void __br_multicast_enable_port_ctx(struct net_bridge_mcast_port *pmctx)
- 	}
- }
- 
--void br_multicast_enable_port(struct net_bridge_port *port)
-+static void br_multicast_enable_port_ctx(struct net_bridge_mcast_port *pmctx)
- {
--	struct net_bridge *br = port->br;
-+	struct net_bridge *br = pmctx->port->br;
- 
- 	spin_lock_bh(&br->multicast_lock);
--	__br_multicast_enable_port_ctx(&port->multicast_ctx);
-+	if (br_multicast_port_ctx_is_vlan(pmctx) &&
-+	    !(pmctx->vlan->priv_flags & BR_VLFLAG_MCAST_ENABLED)) {
-+		spin_unlock_bh(&br->multicast_lock);
-+		return;
-+	}
-+	__br_multicast_enable_port_ctx(pmctx);
- 	spin_unlock_bh(&br->multicast_lock);
- }
- 
-@@ -1963,11 +1968,67 @@ static void __br_multicast_disable_port_ctx(struct net_bridge_mcast_port *pmctx)
- 	br_multicast_rport_del_notify(pmctx, del);
- }
- 
-+static void br_multicast_disable_port_ctx(struct net_bridge_mcast_port *pmctx)
-+{
-+	struct net_bridge *br = pmctx->port->br;
-+
-+	spin_lock_bh(&br->multicast_lock);
-+	if (br_multicast_port_ctx_is_vlan(pmctx) &&
-+	    !(pmctx->vlan->priv_flags & BR_VLFLAG_MCAST_ENABLED)) {
-+		spin_unlock_bh(&br->multicast_lock);
-+		return;
-+	}
-+
-+	__br_multicast_disable_port_ctx(pmctx);
-+	spin_unlock_bh(&br->multicast_lock);
-+}
-+
-+static void br_multicast_toggle_port(struct net_bridge_port *port, bool on)
-+{
-+#if IS_ENABLED(CONFIG_BRIDGE_VLAN_FILTERING)
-+	if (br_opt_get(port->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED)) {
-+		struct net_bridge_vlan_group *vg;
-+		struct net_bridge_vlan *vlan;
-+
-+		rcu_read_lock();
-+		vg = nbp_vlan_group_rcu(port);
-+		if (!vg) {
-+			rcu_read_unlock();
-+			return;
-+		}
-+
-+		/* iterate each vlan, toggle vlan multicast context */
-+		list_for_each_entry_rcu(vlan, &vg->vlan_list, vlist) {
-+			struct net_bridge_mcast_port *pmctx =
-+						&vlan->port_mcast_ctx;
-+			u8 state = br_vlan_get_state(vlan);
-+			/* enable vlan multicast context when state is
-+			 * LEARNING or FORWARDING
-+			 */
-+			if (on && br_vlan_state_allowed(state, true))
-+				br_multicast_enable_port_ctx(pmctx);
-+			else
-+				br_multicast_disable_port_ctx(pmctx);
-+		}
-+		rcu_read_unlock();
-+		return;
-+	}
-+#endif
-+	/* toggle port multicast context when vlan snooping is disabled */
-+	if (on)
-+		br_multicast_enable_port_ctx(&port->multicast_ctx);
-+	else
-+		br_multicast_disable_port_ctx(&port->multicast_ctx);
-+}
-+
-+void br_multicast_enable_port(struct net_bridge_port *port)
-+{
-+	br_multicast_toggle_port(port, true);
-+}
-+
- void br_multicast_disable_port(struct net_bridge_port *port)
- {
--	spin_lock_bh(&port->br->multicast_lock);
--	__br_multicast_disable_port_ctx(&port->multicast_ctx);
--	spin_unlock_bh(&port->br->multicast_lock);
-+	br_multicast_toggle_port(port, false);
- }
- 
- static int __grp_src_delete_marked(struct net_bridge_port_group *pg)
-@@ -4130,9 +4191,9 @@ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
- 		__br_multicast_open(&br->multicast_ctx);
- 	list_for_each_entry(p, &br->port_list, list) {
- 		if (on)
--			br_multicast_disable_port(p);
-+			br_multicast_disable_port_ctx(&p->multicast_ctx);
- 		else
--			br_multicast_enable_port(p);
-+			br_multicast_enable_port_ctx(&p->multicast_ctx);
- 	}
- 
- 	list_for_each_entry(vlan, &vg->vlan_list, vlist)
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index a5947aa559837..3ae1704a8a7c1 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -663,7 +663,8 @@ static void sk_psock_backlog(struct work_struct *work)
+ 			if (ret <= 0) {
+ 				if (ret == -EAGAIN) {
+ 					sk_psock_skb_state(psock, state, len, off);
+-
++					/* Restore redir info we cleared before */
++					skb_bpf_set_redir(skb, psock->sk, ingress);
+ 					/* Delay slightly to prioritize any
+ 					 * other work that might be here.
+ 					 */
 -- 
 2.39.5
 
