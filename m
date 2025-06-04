@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-194918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D6BACD39B
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:20:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5CAFACD356
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0016F1889BFE
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EEE617A1B3
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB61B261588;
-	Wed,  4 Jun 2025 01:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD2617AE11;
+	Wed,  4 Jun 2025 01:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GLU/a5ml"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmzWxTbJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF78433D9;
-	Wed,  4 Jun 2025 01:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74A327726;
+	Wed,  4 Jun 2025 01:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748998890; cv=none; b=ccLHKZHzOBh6rknLifmoGODaAbJubSnaLqVbNTXMIu+MxNPPXdRTcxnxTMYrec+4wUBxbiHvD0EIu9eeCVEkRJspMX6nP9rfZ81y+Xh0ylWu2fSqVW27r0ShaYWfucBnukk9GK1qD/erXWPlqKoUoAs//S/x8NtEybalJCCRYbU=
+	t=1748998914; cv=none; b=TXK0MIjgWwvXmuc6fK7opnBDEo8egoWv4t5ZZ7qYUAUyQdGVqotNQ33H0WURgg54n26QpnRJKBihbx1UsW+DdZhLQF+bNwekLy3QxfDboVwmJxHvW1JdCL0/lkG7AScVzRwBMj9I3d3lzhD3TyjitR8J4fOmaeQoaRHrpKd/Ao0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748998890; c=relaxed/simple;
-	bh=UTGodAg1s9ok1dCkRdB3ZF5myQ6C3T5C46rwnQRvuls=;
+	s=arc-20240116; t=1748998914; c=relaxed/simple;
+	bh=KVolGAcX7oueIE0Sbb+ta5lMCGBforILEJpbrcfIY7c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pgAib59EPUc/oLKOY38oSX8klfNSd5KAPLckm0WA486OftgLKHnd/PGaiVOXrzuINpl++aSUUIfPXFtHMTWsZ1LPvM/LYyLzkXH6PeP+OVz5Y3m65oP6O49rWCaiZ0Ib8W5QbpgG1jHikPgTFBmii77l43QprLvloaMiK6T7bHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GLU/a5ml; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2AA5C4CEED;
-	Wed,  4 Jun 2025 01:01:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=HxyN4kX6u5FKoUuOPMaEJkXHm9LS9trhQ6xxh2IvwDb9oNjdeCDkdtOOQ8x9BwUcFWwUQ8k/h4CKgtz+Pb3S4qiMY8n4bRDaTq40kVoW5+CQz9fmJF2ZE00Zl2ryK2oyQWDUalbokqVVF8fq0K8H5DY3g4gTJzowyxtZ2xCqAXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmzWxTbJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9947EC4CEED;
+	Wed,  4 Jun 2025 01:01:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748998890;
-	bh=UTGodAg1s9ok1dCkRdB3ZF5myQ6C3T5C46rwnQRvuls=;
+	s=k20201202; t=1748998913;
+	bh=KVolGAcX7oueIE0Sbb+ta5lMCGBforILEJpbrcfIY7c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GLU/a5ml9ZJhixKa/hDJtCUk/8076U2Ty+5TTn7oGYCECVjKGQaDMXRGAJvyZBZgQ
-	 UMK/8LA9MzMIjuoDra7gDGrecFaxhVisp2OTuLvIZ34lG16TUJ0TXpJPU7LuJrUfSN
-	 9wvwwiCu7GKXC8mRNZwyAGDytAkYfw6Nnyiyk8TP1lsvdPvdV3tMMGf/HGFeOla/EV
-	 8EfeLWsCslmu/4kfIpYCkJSBtpY+MHrljRtOqcn7wgxh5ypScLRCUKYyHMxjCCMLHn
-	 ntDruyEd/tHek4UKEUH8Zdr0XjXK3pQ6GCwr9U2c7rV31eS0SyEDRcuEI3hxtpf0lU
-	 1u3ff59hIprgw==
+	b=NmzWxTbJRZAyjByuygPzZrwiBcIbc+JbLrYbKYTEK8z/SjduKPpkCBW8LnegUhEWA
+	 mPKuli+wIxv8xesbJr38F70RFjaM0s/K3FasvW+8H6jfu0JwzgPVtp23f+NV4XrSWW
+	 y/smCdW7ETMTlRXIwyx1XVlP3cTlCpn20MWABUnNSJWzCpKzo0Pm0YU7BPDlNJoUDo
+	 PGJL49k0mQNNrHAl49Q2iBPrGzg3E2uvhiE3ZHkraPEyVk9VI3LPyMJJbQdEy8XYMG
+	 nU/ICxko6h27FoKpUWiE6TnOO9MVUUuSIchqgNyrCp+C7yF9H6lRzdNxQ/w6dJAS6X
+	 pK1w/KuOm5EMw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Michael Chan <michael.chan@broadcom.com>,
+Cc: =?UTF-8?q?Krzysztof=20Ha=C5=82asa?= <khalasa@piap.pl>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
+	linux@armlinux.org.uk,
+	max.schulze@online.de,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 71/93] bnxt_en: Remove unused field "ref_count" in struct bnxt_ulp
-Date: Tue,  3 Jun 2025 20:58:57 -0400
-Message-Id: <20250604005919.4191884-71-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 84/93] usbnet: asix AX88772: leave the carrier control to phylink
+Date: Tue,  3 Jun 2025 20:59:10 -0400
+Message-Id: <20250604005919.4191884-84-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604005919.4191884-1-sashal@kernel.org>
 References: <20250604005919.4191884-1-sashal@kernel.org>
@@ -63,96 +64,200 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.31
 Content-Transfer-Encoding: 8bit
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+From: Krzysztof Hałasa <khalasa@piap.pl>
 
-[ Upstream commit 5bccacb4cc32cb835fe2fe100a210332c494e81d ]
+[ Upstream commit 4145f00227ee80f21ab274e9cd9c09758e9bcf3d ]
 
-The "ref_count" field in struct bnxt_ulp is unused after
-commit a43c26fa2e6c ("RDMA/bnxt_re: Remove the sriov config callback").
-So we can just remove it now.
+ASIX AX88772B based USB 10/100 Ethernet adapter doesn't come
+up ("carrier off"), despite the built-in 100BASE-FX PHY positive link
+indication. The internal PHY is configured (using EEPROM) in fixed
+100 Mbps full duplex mode.
 
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://patch.msgid.link/20250417172448.1206107-4-michael.chan@broadcom.com
+The primary problem appears to be using carrier_netif_{on,off}() while,
+at the same time, delegating carrier management to phylink. Use only the
+latter and remove "manual control" in the asix driver.
+
+I don't have any other AX88772 board here, but the problem doesn't seem
+specific to a particular board or settings - it's probably
+timing-dependent.
+
+Remove unused asix_adjust_link() as well.
+
+Signed-off-by: Krzysztof Hałasa <khalasa@piap.pl>
+Tested-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Link: https://patch.msgid.link/m3plhmdfte.fsf_-_@t19.piap.pl
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** This commit should be backported to stable kernel trees.
-**Analysis:** This commit removes an unused field `ref_count` from
-`struct bnxt_ulp` and the associated code that was waiting for the
-reference count to reach zero during unregistration. Looking at the code
-changes: 1. **Removes unused field from struct definition**
-(bnxt_ulp.h:49): The `atomic_t ref_count;` field is completely removed
-from `struct bnxt_ulp`. 2. **Removes dead code** (bnxt_ulp.c:151-162):
-The commit removes a loop that was waiting for
-`atomic_read(&ulp->ref_count) != 0` with sleeps, which is now
-unnecessary since the field and its usage were removed in a previous
-commit (a43c26fa2e6c). **Why this should be backported:** 1. **Code
-cleanup with no functional impact**: This is a pure cleanup commit that
-removes truly unused code. The `ref_count` field was made unused by a
-previous commit that removed the sriov config callback. 2. **Follows
-stable backport patterns**: Looking at the similar commits, particularly
-Similar Commit #1 which was marked "YES" for backport, this commit has
-the exact same characteristics: - Removes unused functions/fields -
-Small, contained change - No risk of regression - Code cleanup that
-improves maintainability 3. **No architectural changes**: The commit
-only removes code that was already dead/unused, with no changes to
-active code paths. 4. **Minimal risk**: Since the code being removed was
-already unused (as confirmed by the commit message referencing the
-previous commit that made it unused), there's zero risk of regression.
-5. **Clear precedent**: Similar Commit #1 showed that removal of unused
-code (`bnxt_subtract_ulp_resources()` function and making
-`bnxt_get_max_func_irqs()` static) was considered appropriate for
-backporting. This commit fits the stable tree criteria perfectly: it's a
-low-risk cleanup that removes dead code without affecting functionality,
-similar to other cleanup commits that have been successfully backported.
+**YES** This commit should be backported to stable kernel trees. Here's
+my detailed analysis: ## Why This Should Be Backported ### 1. **Clear
+Bug Fix Nature** This commit fixes a functional bug where ASIX AX88772B
+USB Ethernet adapters fail to establish carrier state ("carrier off")
+despite the PHY indicating a positive link. This is a real-world
+connectivity issue that affects users' ability to use their network
+hardware. ### 2. **Code Analysis - Specific Changes** Looking at the
+diff, the changes are: - **Removed `asix_adjust_link()` function** from
+`asix_common.c` - This function was manually calling
+`usbnet_link_change()` which conflicts with phylink - **Removed
+`usbnet_link_change()` calls** from `ax88772_mac_link_up()` and
+`ax88772_mac_link_down()` in `asix_devices.c` - **Removed `.status =
+asix_status`** from driver info structures for AX88772 devices -
+**Removed `FLAG_LINK_INTR`** from AX88772 device driver flags These
+changes eliminate the dual carrier control conflict by removing manual
+carrier management and letting phylink handle it exclusively. ### 3.
+**Low Risk Profile** - **Removes conflicting code** rather than adding
+new functionality - **Small, focused changes** that address a specific
+technical conflict - **Phylink is well-established** and already
+properly handles carrier management for these devices - **Changes are
+targeted** to specific hardware (AX88772) rather than broad
+architectural changes ### 4. **Comparison to Similar "NO" Commits** The
+provided similar commits were marked "NO" because they were: - **Feature
+additions** (phylink migration, selftest support) - **Architectural
+changes** (migrating from MII to phylink) - **Enhancements** rather than
+bug fixes This commit is fundamentally different - it's a **bug fix**
+that resolves a conflict introduced by previous phylink migration work.
+### 5. **User Impact** This affects users who have ASIX AX88772B
+adapters that don't work properly due to carrier detection issues. This
+is likely a regression from earlier phylink migration commits, making it
+a critical fix for hardware compatibility. ### 6. **Stable Tree Criteria
+Compliance** - ✅ **Important bug fix** - Fixes network connectivity
+issues - ✅ **Minimal risk** - Removes conflicting code, doesn't
+introduce new features - ✅ **Small and contained** - Changes are focused
+on carrier control conflict - ✅ **No architectural changes** -
+Simplifies by removing duplicate functionality - ✅ **Clear side
+effects** - Only affects AX88772 devices, improves their functionality
+The commit message explicitly states this fixes a timing-dependent issue
+where devices "don't come up" despite proper PHY indication, which is
+exactly the type of hardware compatibility bug that stable trees aim to
+address.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 5 -----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h | 1 -
- 2 files changed, 6 deletions(-)
+ drivers/net/usb/asix.h         |  1 -
+ drivers/net/usb/asix_common.c  | 22 ----------------------
+ drivers/net/usb/asix_devices.c | 17 ++++-------------
+ 3 files changed, 4 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index 546d9a3d7efea..b33c29fdf8fd3 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -148,7 +148,6 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 	struct net_device *dev = edev->net;
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct bnxt_ulp *ulp;
--	int i = 0;
+diff --git a/drivers/net/usb/asix.h b/drivers/net/usb/asix.h
+index 74162190bccc1..8531b804021aa 100644
+--- a/drivers/net/usb/asix.h
++++ b/drivers/net/usb/asix.h
+@@ -224,7 +224,6 @@ int asix_write_rx_ctl(struct usbnet *dev, u16 mode, int in_pm);
  
- 	ulp = edev->ulp_tbl;
- 	rtnl_lock();
-@@ -164,10 +163,6 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 	synchronize_rcu();
- 	ulp->max_async_event_id = 0;
- 	ulp->async_events_bmap = NULL;
--	while (atomic_read(&ulp->ref_count) != 0 && i < 10) {
--		msleep(100);
--		i++;
+ u16 asix_read_medium_status(struct usbnet *dev, int in_pm);
+ int asix_write_medium_mode(struct usbnet *dev, u16 mode, int in_pm);
+-void asix_adjust_link(struct net_device *netdev);
+ 
+ int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm);
+ 
+diff --git a/drivers/net/usb/asix_common.c b/drivers/net/usb/asix_common.c
+index 72ffc89b477ad..7fd763917ae2c 100644
+--- a/drivers/net/usb/asix_common.c
++++ b/drivers/net/usb/asix_common.c
+@@ -414,28 +414,6 @@ int asix_write_medium_mode(struct usbnet *dev, u16 mode, int in_pm)
+ 	return ret;
+ }
+ 
+-/* set MAC link settings according to information from phylib */
+-void asix_adjust_link(struct net_device *netdev)
+-{
+-	struct phy_device *phydev = netdev->phydev;
+-	struct usbnet *dev = netdev_priv(netdev);
+-	u16 mode = 0;
+-
+-	if (phydev->link) {
+-		mode = AX88772_MEDIUM_DEFAULT;
+-
+-		if (phydev->duplex == DUPLEX_HALF)
+-			mode &= ~AX_MEDIUM_FD;
+-
+-		if (phydev->speed != SPEED_100)
+-			mode &= ~AX_MEDIUM_PS;
 -	}
- 	mutex_unlock(&edev->en_dev_lock);
- 	rtnl_unlock();
- 	return;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-index 4f4914f5c84c9..b76a231ca7dac 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-@@ -48,7 +48,6 @@ struct bnxt_ulp {
- 	unsigned long	*async_events_bmap;
- 	u16		max_async_event_id;
- 	u16		msix_requested;
--	atomic_t	ref_count;
- };
+-
+-	asix_write_medium_mode(dev, mode, 0);
+-	phy_print_status(phydev);
+-	usbnet_link_change(dev, phydev->link, 0);
+-}
+-
+ int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm)
+ {
+ 	int ret;
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index da24941a6e444..9b0318fb50b55 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -752,7 +752,6 @@ static void ax88772_mac_link_down(struct phylink_config *config,
+ 	struct usbnet *dev = netdev_priv(to_net_dev(config->dev));
  
- struct bnxt_en_dev {
+ 	asix_write_medium_mode(dev, 0, 0);
+-	usbnet_link_change(dev, false, false);
+ }
+ 
+ static void ax88772_mac_link_up(struct phylink_config *config,
+@@ -783,7 +782,6 @@ static void ax88772_mac_link_up(struct phylink_config *config,
+ 		m |= AX_MEDIUM_RFC;
+ 
+ 	asix_write_medium_mode(dev, m, 0);
+-	usbnet_link_change(dev, true, false);
+ }
+ 
+ static const struct phylink_mac_ops ax88772_phylink_mac_ops = {
+@@ -1350,10 +1348,9 @@ static const struct driver_info ax88772_info = {
+ 	.description = "ASIX AX88772 USB 2.0 Ethernet",
+ 	.bind = ax88772_bind,
+ 	.unbind = ax88772_unbind,
+-	.status = asix_status,
+ 	.reset = ax88772_reset,
+ 	.stop = ax88772_stop,
+-	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR | FLAG_MULTI_PACKET,
++	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup = asix_rx_fixup_common,
+ 	.tx_fixup = asix_tx_fixup,
+ };
+@@ -1362,11 +1359,9 @@ static const struct driver_info ax88772b_info = {
+ 	.description = "ASIX AX88772B USB 2.0 Ethernet",
+ 	.bind = ax88772_bind,
+ 	.unbind = ax88772_unbind,
+-	.status = asix_status,
+ 	.reset = ax88772_reset,
+ 	.stop = ax88772_stop,
+-	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-	         FLAG_MULTI_PACKET,
++	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup = asix_rx_fixup_common,
+ 	.tx_fixup = asix_tx_fixup,
+ 	.data = FLAG_EEPROM_MAC,
+@@ -1376,11 +1371,9 @@ static const struct driver_info lxausb_t1l_info = {
+ 	.description = "Linux Automation GmbH USB 10Base-T1L",
+ 	.bind = ax88772_bind,
+ 	.unbind = ax88772_unbind,
+-	.status = asix_status,
+ 	.reset = ax88772_reset,
+ 	.stop = ax88772_stop,
+-	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-		 FLAG_MULTI_PACKET,
++	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup = asix_rx_fixup_common,
+ 	.tx_fixup = asix_tx_fixup,
+ 	.data = FLAG_EEPROM_MAC,
+@@ -1412,10 +1405,8 @@ static const struct driver_info hg20f9_info = {
+ 	.description = "HG20F9 USB 2.0 Ethernet",
+ 	.bind = ax88772_bind,
+ 	.unbind = ax88772_unbind,
+-	.status = asix_status,
+ 	.reset = ax88772_reset,
+-	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-	         FLAG_MULTI_PACKET,
++	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup = asix_rx_fixup_common,
+ 	.tx_fixup = asix_tx_fixup,
+ 	.data = FLAG_EEPROM_MAC,
 -- 
 2.39.5
 
