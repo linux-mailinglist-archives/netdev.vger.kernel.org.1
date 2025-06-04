@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-194937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A736ACD3D1
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:23:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E06ACD3CC
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:22:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D4C33A6DDE
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:22:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17A5116A2F7
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED5426A095;
-	Wed,  4 Jun 2025 01:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC762116F6;
+	Wed,  4 Jun 2025 01:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvh9FxOy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jLCSKwv1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E5126A086;
-	Wed,  4 Jun 2025 01:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2204A2101A0;
+	Wed,  4 Jun 2025 01:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999050; cv=none; b=FSAKHhRrx8XFtMf5CmT4/9MdBqYgtrhnd8QH1WoEv4I6L56yNEo0WJ0uwNdV9o2aLwrBQ9umwcHIfsengp5psGm2lCNjuPDln82BriA6Z8pCwE9+VHNbyZ0pTwMCezUU9tjqcqCNNfy7pEN1nA98nJmhPqlNQIRxdcVfBnBU6Ng=
+	t=1748999054; cv=none; b=MlsnMLq01UaVhCLu7fQGGTXYv98boISo5xVPNhbza0fkOzNz/5vdy2JcQB9aaiPJX92pofUE//uht0VORGqbyFsQwi0ldGrkt/ZlVIISwVDgTAYrV5PvngJOhg308VH8iV9RycuIvF9MElcOmLFpC2fumS2kxhM3z9cKBTy+uIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999050; c=relaxed/simple;
-	bh=UdIiGjQZLoUzomSFRVOQaD1AgstX0wBpsBNRWycu3iQ=;
+	s=arc-20240116; t=1748999054; c=relaxed/simple;
+	bh=wCgbi/FTa2Unwe8WYB6oOuLnnI416gMwv7nyWedfbg4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iRjxEdbDOzf/1HPhFfQWJQ+X4JoC+aq8AR/45UCnnCx44npv0PNKGDV1qN4rQAJLwm5CmOhKW8y+RfcpHDRDbIOAipixxDgaPF31Jn1j69Cu/SvjgTfcUCHOHkZjzewJbcFFmyZPcYqIJV8E4RiHCgsu2h3GxGEI5+FE9+aKMe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvh9FxOy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDE4EC4CEF1;
-	Wed,  4 Jun 2025 01:04:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=q//3JJ3RjOBrpth0vw9ZyfrIx3qnxrua1jMkK7pbwV6OCqztvvIZNPqUO5/3yIip7JKdvTsWtSOUMz0S1xs8Nz+gVuwHHGQhv49SbW7R1eRq6RIPSp71TCGaRry08h94iRcA38aOE04htMIul15Boi0lp8EnKckI5IBLe/Fvrzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jLCSKwv1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3F6C4CEF1;
+	Wed,  4 Jun 2025 01:04:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999049;
-	bh=UdIiGjQZLoUzomSFRVOQaD1AgstX0wBpsBNRWycu3iQ=;
+	s=k20201202; t=1748999054;
+	bh=wCgbi/FTa2Unwe8WYB6oOuLnnI416gMwv7nyWedfbg4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rvh9FxOyRB7nh/JUJYt3t0GgnvTC01kUIiHlQqY583L24ASNbQGBi5l3kn866eVnT
-	 gV9Uoe+CIkas9ijLCMIHQwUDZyZvK0DqR8TzOu6dR7p6YC8YvIvOcCRwXXQ+KPVNgP
-	 bjXsmrhNGmPUKiYo4HeNVORO7UsggYSqfxgxrAjWudflJ6l+9I0Pk2TjXb/cntyKz2
-	 YX9k/tXdJkj8e1t71Y9qE3AvjE8aeJomEuuP34JFt190L5QIo0nkSiDSkDC4QSiyqk
-	 lQosRIFk3kKoCJlelT3LmnBP1KsfUtJ1QSK/TSY1boWaW1f38xheK4Wh4YdzZb1T3o
-	 Xifm8HiLQp6Gg==
+	b=jLCSKwv1jweQMZGL/9QbEaft2f7xZ7lVPy0f57319zv4f8b18++pN3Ah7ljkiBY+U
+	 RJClD4R1RiQoVAoNKsrisIHk8pYBcuGknxySL9P/QANE098ehWErHES+ibv+Z3HJVT
+	 I2LRsyxoWE4YLSQi7GqV2585lGm2VrQaGl2dMOlqQo3ncsQnWOGFkRm1mXpy4sl0vA
+	 X9XBrL0bN9gHjlWGZqT94SmFviDdlDJkrbCHmmIvf8StfJLcaNSLSm0gVTFoUoDL4l
+	 8tL3TILWuyggxlMHfx208oQvWtfxMlMcY9tipIU7L0jQ7WxQfYSCB854z9axGaGG9x
+	 X/ec6IZM8OJSQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Zilin Guan <zilin@seu.edu.cn>,
-	Tung Nguyen <tung.quang.nguyen@est.tech>,
+Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jmaloy@redhat.com,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: [PATCH AUTOSEL 6.1 03/46] tipc: use kfree_sensitive() for aead cleanup
-Date: Tue,  3 Jun 2025 21:03:21 -0400
-Message-Id: <20250604010404.5109-3-sashal@kernel.org>
+	ajit.khaparde@broadcom.com,
+	sriharsha.basavapatna@broadcom.com,
+	somnath.kotur@broadcom.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 06/46] emulex/benet: correct command version selection in be_cmd_get_stats()
+Date: Tue,  3 Jun 2025 21:03:24 -0400
+Message-Id: <20250604010404.5109-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604010404.5109-1-sashal@kernel.org>
 References: <20250604010404.5109-1-sashal@kernel.org>
@@ -66,88 +66,84 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.140
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Zilin Guan <zilin@seu.edu.cn>
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
 
-[ Upstream commit c8ef20fe7274c5766a317f9193b70bed717b6b3d ]
+[ Upstream commit edb888d29748cee674006a52e544925dacc7728e ]
 
-The tipc_aead_free() function currently uses kfree() to release the aead
-structure. However, this structure contains sensitive information, such
-as key's SALT value, which should be securely erased from memory to
-prevent potential leakage.
+Logic here always sets hdr->version to 2 if it is not a BE3 or Lancer chip,
+even if it is BE2. Use 'else if' to prevent multiple assignments, setting
+version 0 for BE2, version 1 for BE3 and Lancer, and version 2 for others.
+Fixes potential incorrect version setting when BE2_chip and
+BE3_chip/lancer_chip checks could both be true.
 
-To enhance security, replace kfree() with kfree_sensitive() when freeing
-the aead structure. This change ensures that sensitive data is explicitly
-cleared before memory deallocation, aligning with the approach used in
-tipc_aead_init() and adhering to best practices for handling confidential
-information.
-
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-Reviewed-by: Tung Nguyen <tung.quang.nguyen@est.tech>
-Link: https://patch.msgid.link/20250523114717.4021518-1-zilin@seu.edu.cn
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Link: https://patch.msgid.link/20250519141731.691136-1-alok.a.tiwari@oracle.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** This commit should be backported to stable kernel trees. Here's
-my detailed analysis: ## Security Justification The commit addresses a
-clear security vulnerability by replacing `kfree()` with
-`kfree_sensitive()` for the `tipc_aead` structure in `tipc_aead_free()`.
-This is a critical security improvement because: 1. **Sensitive Data
-Content**: The `tipc_aead` structure contains highly sensitive
-cryptographic information: - `salt` field: Cryptographic salt used in
-key derivation - `key` pointer: References actual cryptographic key
-material - `hint` field: Contains key identification information 2.
-**Memory Security Risk**: Using regular `kfree()` leaves sensitive
-cryptographic data in freed memory, creating a potential information
-leakage vector where: - Attackers could potentially recover salt values
-and key hints from freed memory - Subsequent memory allocations might
-access residual cryptographic data - This violates cryptographic
-security best practices ## Code Change Analysis The specific change from
-`kfree(aead)` to `kfree_sensitive(aead)` on line 428 of
-`net/tipc/crypto.c` is: ```c - kfree(aead); + kfree_sensitive(aead); ```
-This change is: - **Minimal and contained**: Single line change with no
-functional impact - **Low risk**: `kfree_sensitive()` performs the same
-deallocation as `kfree()` but adds explicit memory zeroing -
-**Consistent**: The same file already uses `kfree_sensitive(aead->key)`
-on line 427, showing this practice is established ## Alignment with
-Similar Commits This commit closely parallels the "YES" backport
-examples: 1. **Similar Commit #1**: Used `aead_request_free()` instead
-of `kfree()` for proper crypto data handling 2. **Similar Commit #2**:
-Applied `kfree_sensitive()` to crypto buffers containing key material 3.
-**Similar Commit #5**: Fixed TIPC crypto security issue (preemption
-problem) The pattern of replacing standard memory deallocation with
-secure alternatives for cryptographic structures is well-established and
-consistently approved for backporting. ## Stable Tree Criteria
-Compliance This commit meets all stable tree requirements: - **Important
-bugfix**: Fixes potential cryptographic information leakage - **Minimal
-risk**: Single line change with no behavioral modifications - **No
-architectural changes**: Uses existing kernel API - **Contained scope**:
-Limited to TIPC crypto subsystem cleanup ## Security Impact Given TIPC's
-history of security vulnerabilities (including heap overflows and use-
-after-free issues), this defensive security measure is particularly
-valuable for preventing information disclosure attacks targeting
-cryptographic material. The commit represents a clear security hardening
-improvement with negligible risk, making it an excellent candidate for
-stable kernel backporting.
+Based on my analysis, let me provide my determination: **YES** This
+commit should be backported to stable kernel trees. ## Detailed
+Analysis: ### 1. **Nature of the Bug:** The commit fixes a logical error
+in command version selection for the `be_cmd_get_stats()` function in
+the Emulex be2net driver. The original code had this problematic logic:
+```c if (BE2_chip(adapter)) hdr->version = 0; if (BE3_chip(adapter) ||
+lancer_chip(adapter)) // <- Missing "else" hdr->version = 1; else
+hdr->version = 2; ``` The bug is that the second `if` should be `else
+if`. Without the `else if`, if a chip satisfies both `BE2_chip(adapter)`
+AND `(BE3_chip(adapter) || lancer_chip(adapter))` conditions, the
+version would be incorrectly set multiple times, with the final value
+being either 1 or 2 depending on subsequent conditions. ### 2. **Impact
+Assessment:** - **User-facing impact:** This bug could cause incorrect
+command versions to be sent to the hardware, potentially leading to
+statistics retrieval failures or unexpected behavior - **Scope:**
+Affects all users of Emulex be2net network adapters where the chip
+detection logic could overlap - **Severity:** While not a critical
+security issue, it affects driver functionality and could lead to
+network statistics reporting failures ### 3. **Code Change Analysis:**
+The fix is minimal and surgical: - **Single line change:** Only changes
+`if` to `else if` on line 1612 - **No functional additions:** Does not
+introduce new features or change APIs - **Low regression risk:** The
+change makes the logic more explicit and prevents multiple assignments -
+**Clear intent:** The fix aligns with the comment stating "version 1 of
+the cmd is not supported only by BE2" ### 4. **Backport Suitability
+Criteria:** ✅ **Fixes important bug:** Corrects incorrect hardware
+command version selection ✅ **Small and contained:** Single line change
+with no side effects ✅ **Low regression risk:** Makes existing logic
+more explicit and correct ✅ **No architectural changes:** Pure bug fix
+without design modifications ✅ **Subsystem confined:** Only affects
+be2net driver statistics functionality ### 5. **Comparison with
+Historical Commits:** The provided historical commits were all marked
+"NO" for backporting because they were: - Version string updates
+(cosmetic changes) - Code simplifications (non-critical improvements) -
+Driver version removals (cleanup) In contrast, this commit fixes actual
+functional logic that could cause incorrect behavior. ### 6. **Stable
+Tree Compliance:** This commit perfectly fits the stable tree criteria:
+- Fixes a clear bug in existing code - Has minimal risk of introducing
+regressions - Affects a specific driver subsystem - Does not change
+user-visible APIs or behavior (except fixing incorrect behavior) The
+commit message clearly explains the problem and solution, and the change
+is straightforward to verify and test.
 
- net/tipc/crypto.c | 2 +-
+ drivers/net/ethernet/emulex/benet/be_cmds.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index 25c18f8783ce9..5d2914beaab89 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -425,7 +425,7 @@ static void tipc_aead_free(struct rcu_head *rp)
- 	}
- 	free_percpu(aead->tfm_entry);
- 	kfree_sensitive(aead->key);
--	kfree(aead);
-+	kfree_sensitive(aead);
- }
- 
- static int tipc_aead_users(struct tipc_aead __rcu *aead)
+diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.c b/drivers/net/ethernet/emulex/benet/be_cmds.c
+index d00f4e29c9d88..17098cd89dfff 100644
+--- a/drivers/net/ethernet/emulex/benet/be_cmds.c
++++ b/drivers/net/ethernet/emulex/benet/be_cmds.c
+@@ -1608,7 +1608,7 @@ int be_cmd_get_stats(struct be_adapter *adapter, struct be_dma_mem *nonemb_cmd)
+ 	/* version 1 of the cmd is not supported only by BE2 */
+ 	if (BE2_chip(adapter))
+ 		hdr->version = 0;
+-	if (BE3_chip(adapter) || lancer_chip(adapter))
++	else if (BE3_chip(adapter) || lancer_chip(adapter))
+ 		hdr->version = 1;
+ 	else
+ 		hdr->version = 2;
 -- 
 2.39.5
 
