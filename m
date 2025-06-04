@@ -1,133 +1,123 @@
-Return-Path: <netdev+bounces-195060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F4EACDB28
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 11:40:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CC3ACDB64
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 11:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523FF1881CB9
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 09:39:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062603A36D4
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 09:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A2C1E5B65;
-	Wed,  4 Jun 2025 09:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC6C28D83D;
+	Wed,  4 Jun 2025 09:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bQMdVrEl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JCI0RtYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C884628C849
-	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 09:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCA528CF5E
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 09:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749029972; cv=none; b=RiCkTAfxh8vVblurv+vionp/ojB7WNNw6Zh6r58hXpvS3vS3j8nH0uEAOpewHH1N17h6an+QO2/C+jVjwNEuRZFJpju4sAPKrHB1wEDJoXgOTUgJfx78CC0ngEbr8yL2oRPK8wf8t7YIiE8ATeCdWCFuXI3z20I982dKYfvauM8=
+	t=1749030555; cv=none; b=qnWoFRYRyBSkgM1131gP1cbgx1D9xuPdppS3/GXfz/jJsX6UFL2pajT/beAe00RwTiuiJkWkEBQDp1HAnjRK05OCw/eUiECFIk9yqdQ60mw9732vneFu5uDdEE1rxtRT5GES6nXwbM1p2kiTPrK3ba4IQ4Oljg6ajpf3mDiaboY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749029972; c=relaxed/simple;
-	bh=S/nU51ezINmKqUymi1Yi9xBxJD4pe4GuUB97QEpwcgk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JzkaT1iYa9xOnlTO4BZGH5bnpPuxsJwhZcCXxLXAvzupnI3jBws9vNYx7uUUNuX3s/QhRWfeLXdk+5cg754ndBTzgEP78OnynH9EjSWV69t2rCBSI7k2XYnKZAW/bCwaYxZMBlWLGzFlfV5nVYoMXpMdPcfdnO4IvoZLCpuqi1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bQMdVrEl; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7d21fc72219so931185a.1
-        for <netdev@vger.kernel.org>; Wed, 04 Jun 2025 02:39:30 -0700 (PDT)
+	s=arc-20240116; t=1749030555; c=relaxed/simple;
+	bh=0oYWr2w1sH3GTmD1mBRVA3ufMqKu8oKUJzomrcdrnhQ=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=Up4f9mUrOEtyAAlu6tqnTS1AbIre1t4wiuJV+0RMdQoMrRd2h5KV+8LZvqG0pGhyMRiE9MYyi3Lnvb68ld+ldjc3th4/gWVNQ6Z82qoWI/iXGa6xhVUOtsuvMYqxl9aWM/wyZw8b9Y5sDzGZ6JvA81q9rn1JM/z+rfQaO95qFlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JCI0RtYI; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-450ccda1a6eso60187485e9.2
+        for <netdev@vger.kernel.org>; Wed, 04 Jun 2025 02:49:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749029969; x=1749634769; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cU6MEzVc6Kwm7vKkLxi7hg8K/p9attCEoppYME40tQI=;
-        b=bQMdVrEl0vTzE6rIpu/GjPxXkhIOBeyPF97qO67KbY76IKho0Kcr4N76YAsyY2IMIq
-         vsSY8LHw7mWuTH58sZhjMYnp44gpEMV4TYKhIz5x6NfFk3pScnu1KKDfcpua9qoTj0xY
-         eYXrqC9s7d4BV1TZvmFKNxNbnNGn0LfpC0cyEiE51OAtDm4EuJ9PfiqhAwGyCucb3Q76
-         gq76IxXPb+DG1TxoWBR16VJOv6NCPJIrPf8R0K1dteiQ9tk0z5z52wRi1ozRQ8hd7Mel
-         5jFdctkEGq4vuw7NtK/GTR7UQ5zzVCdm7+X3EYV1MLb9x9+zFleUz+vNQGuoRyO1gq57
-         A6LQ==
+        d=gmail.com; s=20230601; t=1749030552; x=1749635352; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pYEcamhMFwsgWMoLazQ4SImjKGUGp73/lvYYgzNA9G8=;
+        b=JCI0RtYIBpxRq+OpaedxpjUY+mFyWJ/jVidjh2LeBe5z0/z+bd8kMEG1YaQoQTKVAb
+         ec7/H76meR0VmYvcLBI1BgOsT9o8nGH9ankhdSYiBcUI3UbNBryCea4uNwvMVHAM827L
+         ScwOckPSX6avxZ2V5GVt3FK87ClWDPCXzCgy4ROLC59zoob5dwVvi22unbZlsxwE/wlu
+         EOZHFP8yKPDHzrdDjdb6TnlLyOO5vmg3+9OwnkGUN+LYT6WEud32eyRK9ERZ8TdlwuLB
+         5kzbpqy4u4B84fzpKQVwoRbiCOy8arQ8VUC5I7/0M7yQTLdcUlY1bG9rHmlutWDjAF8D
+         w8yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749029969; x=1749634769;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cU6MEzVc6Kwm7vKkLxi7hg8K/p9attCEoppYME40tQI=;
-        b=WBgW+NnLWmtNZ3sxIDZutsgvrlJa9VFRZ92L0I9keQcCAjmt+DT4m+V86XukLv2an3
-         jiRfDLyDByCZAv+rXOLDOaXDK7bs6vF09lNJ6igaNpTeBpSjKnG0I2kJ0lJOe19srA66
-         /rC+iBKD6FzZ2dUaWXwBfjRn/S0s68mdZ+EuDUhKpq0VJVylGRLK99gSm7L0lrZ0Mf9g
-         HauDKvcVgcJTvBZRrYDhJMOxbVlM+o/iw/2Kuuh/BNNBt5QckunImSBgBwSHeht5DNMc
-         nEzfOYypCBxHvI1mAR/W14e/Gri9HKaPgsdLYoWUsp+VeQNeCOucEDkihOrjEfgBtnQH
-         ekww==
-X-Forwarded-Encrypted: i=1; AJvYcCUCL2h2lTWip6nutCh8aMAVy2wdFrr2vZwsXgWLEp2pCEA3qY2RLtUOQoK0jhDEQe17G92bjFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw119fHS0e1NH5f8cM8KAJ1+diVPKAhuWr5NJA6FzGTyiFdJ384
-	PViSzi2KQjDLeoRTx/28oYs/bQfZkhZkL69xlP9B9Wqoy6Cq1AVZ+kNN/pvs8EIMppVyuy7eMMw
-	yftssscWTYlXrzQ==
-X-Google-Smtp-Source: AGHT+IHfGBZI/hFZOH3mo6BUOtKM1/AYAsDk6SO8NHCv9v1bx+72C8jpRRxmUO/EI3a9jshIo0wRmTOL6GFRFQ==
-X-Received: from qkcc9.prod.google.com ([2002:ae9:e209:0:b0:7d0:9bd4:d3b0])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:40cc:b0:7ca:df2c:e112 with SMTP id af79cd13be357-7d2198cc90bmr369472385a.45.1749029969617;
- Wed, 04 Jun 2025 02:39:29 -0700 (PDT)
-Date: Wed,  4 Jun 2025 09:39:28 +0000
+        d=1e100.net; s=20230601; t=1749030552; x=1749635352;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pYEcamhMFwsgWMoLazQ4SImjKGUGp73/lvYYgzNA9G8=;
+        b=YUc3jcI7QGKj39kn1azkoncYsT0sNtdEkbJpezea9PpwKwtDgDyZ9Bb+nNScXIYThO
+         o7Bi3XTTrhiwpYqAhFDKiv1pxYF69a7mBT7yidyNKgFVmasco/p1yuKQlpGmyR09Tl6Y
+         aCCdMWAiMkZbbFeOgbNerAOBP0REWmGNqhzpsyF7LSAzcORByZog8VSNFPImD5PkqrbW
+         2jhRg1qivNZu8FzPGrHmFXUDE9wWARZ5ODOrWM29pS+hHNjpgSLkoqZv/v+R6GLwcQOH
+         0dG0RR0u0+iYZn7dTd61/IizukpuGPiG7DWdtWeiPWw6u3Zttdk3XXeVIjrvJhSEG4at
+         WAVQ==
+X-Gm-Message-State: AOJu0YxA6eQbyARVWc0WztUWzrrJEPcMMAEQ0MXDSn7fYO/eGwTGLdUD
+	ykEeHIMGq4PRv+HRooot+i1jV+v04tuaWUCh3jlMReqCnOg6pt/I6XYe4C+GrA==
+X-Gm-Gg: ASbGncsCODlZx2ruxmvWJ2lFvGAgMMzxI6fcMdJi6rH+MVdJ8kC3jR9VOmXLBMwTgjE
+	H0a/XbEOcgF3kKVzFqfbUDWych/T4gYLaaN/u6PgXvAd2wLzM562DOKjScnyMBK7WZuadInXYg2
+	eScsbSbvZg5fvi62bryv1jSeXxdUiI4diUvPVOT9zFXJSb1uL7jUNdzUi+7M0H7ts+XujklQ/b7
+	pKKFA1r5doWSIkigcHCKlRNbP2OYWOjKwAdbWowBtIv2d9I0jz6xGn+h0I4HtKZsyzE6vqEAx6l
+	E8PqYTMa2FsDgOw7yjIS8OPW8v3SjT01ZAMABxcG+J1Zadi1fEk6Ps56T0R67qHTKoPuua+h7EE
+	=
+X-Google-Smtp-Source: AGHT+IG7soY52mh+fNcB5EAfiFFOvOmK0++I5ME5+aW4xEqstILthgrRtZf3bWvQZxMzJOMQxHE5Yg==
+X-Received: by 2002:a05:600c:19c6:b0:43c:f87c:24ce with SMTP id 5b1f17b1804b1-451f0b0d5cdmr13445515e9.21.1749030551504;
+        Wed, 04 Jun 2025 02:49:11 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:3176:4b1c:8227:69ea])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d7f1b0a4sm193810785e9.0.2025.06.04.02.49.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jun 2025 02:49:11 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [ANN] pylint and shellcheck
+In-Reply-To: <20250603120639.3587f469@kernel.org>
+Date: Wed, 04 Jun 2025 10:41:14 +0100
+Message-ID: <m2ldq7vo79.fsf@gmail.com>
+References: <20250603120639.3587f469@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
-Message-ID: <20250604093928.1323333-1-edumazet@google.com>
-Subject: [PATCH net] net: annotate data-races around cleanup_net_task
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-from_cleanup_net() reads cleanup_net_task locklessly.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Add READ_ONCE()/WRITE_ONCE() annotations to avoid
-a potential KCSAN warning, even if the race is harmless.
+> Hi!
+>
+> It's merge window time so I have a bit of time to catch up on random
+> things. I added shellcheck, yamllint and pylint:
+> https://github.com/linux-netdev/nipa/commit/c0fe53ae533d19c19d2e00955403fb57c3679084
+> https://github.com/linux-netdev/nipa/commit/255ee0295a096ee7096bebd9d640388acc590da0
+> https://github.com/linux-netdev/nipa/commit/54e060c9094e33bffe356b5d3e25853e22235d49
+> to the netdev patchwork checks.
+>
+> They will likely be pretty noisy so please take them with a grain of
+> salt (pretty much like checkpatch). Using the NIPA scripts from the
+> commits above could be useful to find the delta of new warnings, since
+> there will be quite a few existing ones.
+>
+> I suspect as we get more experience we will find the warning types to
+> disable, and we will drive the number of existing errors down to make
+> checking for new ones less of a pain. As I said, for now please don't
+> take these checks failing at face value.
 
-Fixes: 0734d7c3d93c ("net: expedite synchronize_net() for cleanup_net()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/dev.c           | 2 +-
- net/core/net_namespace.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+This is a possible config for yamllint:
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index a388f459a3666e3d186fb38d1eebd7cd33eb6979..be97c440ecd5f993344ae08d76c0b5216c4d296a 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10499,7 +10499,7 @@ static void dev_index_release(struct net *net, int ifindex)
- static bool from_cleanup_net(void)
- {
- #ifdef CONFIG_NET_NS
--	return current == cleanup_net_task;
-+	return current == READ_ONCE(cleanup_net_task);
- #else
- 	return false;
- #endif
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 42ee7fce3d95b5a2756d6a3780edba070f01ddb6..ae54f26709ca242567e5d62d7b5dcc7f6303da57 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -654,7 +654,7 @@ static void cleanup_net(struct work_struct *work)
- 	struct net *net, *tmp, *last;
- 	LIST_HEAD(net_exit_list);
- 
--	cleanup_net_task = current;
-+	WRITE_ONCE(cleanup_net_task, current);
- 
- 	/* Atomically snapshot the list of namespaces to cleanup */
- 	net_kill_list = llist_del_all(&cleanup_list);
-@@ -704,7 +704,7 @@ static void cleanup_net(struct work_struct *work)
- 		put_user_ns(net->user_ns);
- 		net_passive_dec(net);
- 	}
--	cleanup_net_task = NULL;
-+	WRITE_ONCE(cleanup_net_task, NULL);
- }
- 
- /**
--- 
-2.50.0.rc0.604.gd4ff7b7c86-goog
-
+extends: default
+rules:
+  document-start: disable
+  brackets:
+    max-spaces-inside: 1
+  comments:
+    min-spaces-from-content: 1
+  line-length:
+    max: 96
 
