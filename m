@@ -1,380 +1,214 @@
-Return-Path: <netdev+bounces-195069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A9D8ACDC2C
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:53:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68CCACDC2A
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C84177D65
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F83C3A5554
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D293928E5E6;
-	Wed,  4 Jun 2025 10:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AC428CF58;
+	Wed,  4 Jun 2025 10:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b="q6ZoxAlo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4ly+D30T"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2073.outbound.protection.outlook.com [40.107.93.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A7428DB55;
-	Wed,  4 Jun 2025 10:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCB81B0F17;
+	Wed,  4 Jun 2025 10:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749034376; cv=pass; b=jjZq/cjerStY6zPuhWrs0VkEAiwJGPEQ21DieEQF0MxUC7S7K8fn4Pkjb3CjhR6esJpnHUw43sdrYs6r/tjp9i1PRuuxs6K9NjMGC7YBjpcbQAa8xhbbf2iCyimwB+ryZhwrw4cJnppXmRuNcTBWH7dAeWi1RhaBlP2O9ouSs1k=
+	t=1749034374; cv=fail; b=O1/AYwlvtzlhZvHZ3Qp4GQXOxquTuSvxA4IKyfncLZF9yUsGt6414u9xq1Ehj2U6rx3IgqRATIe44aaprO1sndQQFOGocVDWdyLDN9sI35zdcj17sLYvjKiBA+6f4HrJyHF8hkaKfgaOeBE/meKFBml0reHddbHqgjc5J4zqEmY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749034376; c=relaxed/simple;
-	bh=nR/LHrJoVGLjUqxTxpxdGWVYuwJ60L9TMZkpjlQV3HU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Mh2reNUvupCg5AkxeWOhFV/1R+YW26jfDEwVdZnErCAiPOOJLWnOIbhMYY72M4NYOhgbA/YXIr0sbL2bOSMkp43oPZPhdI7jRugzzdFvxqkAPzvrpcUi7dh/pvCoi0eBwNF6V45KzzW+r/oZT9/gOCDz1iVU1QmaeUgeMmsMLY4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me; spf=pass smtp.mailfrom=icenowy.me; dkim=pass (2048-bit key) header.d=icenowy.me header.i=uwu@icenowy.me header.b=q6ZoxAlo; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=icenowy.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icenowy.me
-ARC-Seal: i=1; a=rsa-sha256; t=1749034338; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=R9riRJJ/sv0Li6EH/rmyeFTBjxmehFkTOcdm/E4NPApNXOdsYR7YpxJTG0PGcoIvpI81suJ/DDlgY8V/LbwEq2n4Sxq7xjLMeCcAd1jS6UafGGlDgjTDBRQsMXESuz/fgZgYhXVFc9BZ0kkb+lxDDOOazoW7HCWHyiUkr1LsmQI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1749034338; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=nR/LHrJoVGLjUqxTxpxdGWVYuwJ60L9TMZkpjlQV3HU=; 
-	b=VdugbJyo72ec55W7FAszckRO4ct43KCenjwfrqSIsXYuQZeNq9dziF3kLwIicqrLWHEDHug3lkiHAxWrFlB1uC3XJB/V9mdz4D1P2yvqSWJE3kNcrkyPmZF6009kYcvsp14/XjjxpDsgQ77wf/r2frv6NsZ/Gg7G161l9ffj1iI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=icenowy.me;
-	spf=pass  smtp.mailfrom=uwu@icenowy.me;
-	dmarc=pass header.from=<uwu@icenowy.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1749034338;
-	s=zmail2; d=icenowy.me; i=uwu@icenowy.me;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=nR/LHrJoVGLjUqxTxpxdGWVYuwJ60L9TMZkpjlQV3HU=;
-	b=q6ZoxAlo0pMnzbwoQgrVifuA8LaCYqMPMU37ajb8OV4pViUxjKqzlsNOrnnZORpH
-	3DCGJavzD22yErAxviuOOIq6yHS23jVyPoZtnYT9nytiERNlbiHSj6/AuBvPa3h5SMt
-	qogWNA/MkHTz0uK4F0tZeq4dkBVOgPX6BnjXvRFzGp/HyUPvV1G9Z3TjsAhhUWa/Eb6
-	QE0NqDPGaJvhhlZ82O3NNSM67QN5MMtJtWiD91m2ilaYlwsBw9LNJL2qj1F56CMxArI
-	x/18oDNlreHUcxfhk9FRV9ktxg+33ZNVe1n4tTTS4rdfGi6Drch7rSChpj/FuVQd6So
-	03N4qU1Aig==
-Received: by mx.zohomail.com with SMTPS id 1749034336346498.96758739824725;
-	Wed, 4 Jun 2025 03:52:16 -0700 (PDT)
-Message-ID: <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-From: Icenowy Zheng <uwu@icenowy.me>
-To: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chaoyi Chen
- <chaoyi.chen@rock-chips.com>, Matthias Schiffer
- <matthias.schiffer@ew.tq-group.com>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Wed, 04 Jun 2025 18:52:06 +0800
-In-Reply-To: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
-Organization: Anthon Open-Source Community
-Content-Type: text/plain; charset="UTF-8"
+	s=arc-20240116; t=1749034374; c=relaxed/simple;
+	bh=wcIsxtEeHE9NUPZAvzluYWu4OzNIThL1mdevFRSrVcY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GkN0i9fi1xcyesvWjvZ7RG+slJGL/VsdfhH5iM5wUoOcuZwvHJRDehaBhCXChxCMvAPbZ06qpRIkMoHdl68SS+VxYKTjK8fnwWVyKb9A0ZfdD1Vj4AD4RIrQvEl4+LGVWgp6HgorWpylIQ38DDegtM92oCq7omZlgbz/ROrzFCk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4ly+D30T; arc=fail smtp.client-ip=40.107.93.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eoS1JvS0P8jH6wExeHJHLVdq7cCA4yQsOKbNgPnQ+7zeYBFxI61yHX6SjISBYauUIRZ9wXo/0oDdiqoxd19HQBXCQlEqH6Ex7JBBQs82UeDb+v71h6Tzy+3G9Jfdwrit74b1JYpw2uCzCaYjpk3yEVUUhecFu11S9AeRQeQcpNH5G/760kXt51bvgSbluRlCtm59EzS5bKAZD4uH1Dc9/0S4agYQGIDA4y0daYROVWc6hw4Dh6Wh0rBJCwDosWwWGea8/FKjEyQl+jRuEMenR9WR1lLdf5qZ+oJkD9itBuLAvNKMhfyK33Hosxr6ObW0+IqhP1kmdg8hNi9K5vbbGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AKZSWj69udCLp9IP2Mr4xKsivl0TM7HGBZGc7SfgpV8=;
+ b=aQb5JizY3dNoOZr/1ArjnDuBwqTLUWVuqYoiKHPSxe/Ww0u5gXuiXgacZFuid+LmNWDkye6ZA2BjHLq2zJCShkhut/CrlMHZfJaY613JdGXniA36NwraITnxMw3FPMRub20RcrlieWEFCladfYTwZXCyGDtM5IGQ85+yAVwP8UWKQcyrKfo2X/iS78B2tQt9azujU+koSyN/DHKssMlSnO6K9cUumwl3ta0RHI2DFh5Oo6ZFLQ5v90P+yGsHzGZ72RhfrEsvMzf+U7Dz5+dz0tJeeb3WT33ktP79cxaJOJWWrWWf5OL2vraFsC/8vypFR54aBu96GcEfHLsfMW4dWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AKZSWj69udCLp9IP2Mr4xKsivl0TM7HGBZGc7SfgpV8=;
+ b=4ly+D30Tl7AyuZ+fxnS/s/ubsdU4o00zDHn5KJUFRaTb969dnj8hbJJZynJl9Uv16ZnmZ8IPiUTY6VMI/8jRZ57iQKARu8NbYSZt6iBdW72RrWG8W0ZcE1EYkXAUnIsF86dmVy9JZg2bNmvx6s5C0oUQsnDWxHZTaeTusj9Geb0=
+Received: from CH3PR12MB9171.namprd12.prod.outlook.com (2603:10b6:610:1a2::5)
+ by PH7PR12MB9073.namprd12.prod.outlook.com (2603:10b6:510:2eb::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Wed, 4 Jun
+ 2025 10:52:48 +0000
+Received: from CH3PR12MB9171.namprd12.prod.outlook.com
+ ([fe80::4c1:7aaa:e0b2:ebd0]) by CH3PR12MB9171.namprd12.prod.outlook.com
+ ([fe80::4c1:7aaa:e0b2:ebd0%4]) with mapi id 15.20.8792.034; Wed, 4 Jun 2025
+ 10:52:47 +0000
+From: "Joseph, Abin" <Abin.Joseph@amd.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "nicolas.ferre@microchip.com" <nicolas.ferre@microchip.com>,
+	"claudiu.beznea@tuxon.dev" <claudiu.beznea@tuxon.dev>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"git (AMD-Xilinx)" <git@amd.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next] net: macb: Add shutdown operation support
+Thread-Topic: [PATCH net-next] net: macb: Add shutdown operation support
+Thread-Index: AQHb1JwRPoJ9JHDVV0yZ8utTANT4R7PxlxIAgAE7qaA=
+Date: Wed, 4 Jun 2025 10:52:47 +0000
+Message-ID:
+ <CH3PR12MB9171B307A46A01455DBBA241FC6CA@CH3PR12MB9171.namprd12.prod.outlook.com>
+References: <20250603152724.3004759-1-abin.joseph@amd.com>
+ <3f3a9687-1dea-41fb-8567-1186d4fa2df2@lunn.ch>
+In-Reply-To: <3f3a9687-1dea-41fb-8567-1186d4fa2df2@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ActionId=18e6ddb4-1fe7-4b3d-97b4-4e863d4ea4b0;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=0;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=true;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
+ Internal Distribution
+ Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-06-04T10:46:49Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR12MB9171:EE_|PH7PR12MB9073:EE_
+x-ms-office365-filtering-correlation-id: bdf238bd-aee8-4794-03eb-08dda355f1a9
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?JakUonl5DGYB0/TzUkvdspNMIzWkVcPjSPVAx1zkvW3FfqC4ljmep6iC/YUw?=
+ =?us-ascii?Q?pLUD2ChoVSNKCXKIrqfnnVehW2GNBnq+uxZFCBcCa5wZdcwT2OsPCbUkEKGe?=
+ =?us-ascii?Q?ss3bcc9+zUbaCCfDHaF3ehI+8FNo7LsSeHNx95ZuqAXxPsmbzeBBGniRsZgV?=
+ =?us-ascii?Q?WjpPX5J88LPkJt8CAQsFvSNk2oL5c6czgJ3Zby1J6iPyaFxct3NgkwZDImMP?=
+ =?us-ascii?Q?VkzgK/Ipu6QOthhzhp3tBs39lzXVnnZipaudXH3aFFBS4I9GuffRIowuEHhR?=
+ =?us-ascii?Q?3+5yzapvKCPqNA+h47SqqVqYVi1iKjtfoA+/kwKtTGdX64IWjsVg5d1SenY0?=
+ =?us-ascii?Q?LWEhIvXayka1/Fvi1MUmF5EpxVBEa9FxG/aGagQ/gSMVzFc0OtBjJLm0kzdx?=
+ =?us-ascii?Q?leJnFy+UbG/QHI5VonYDAimDHJ43DDY+qkpXmIEaRSvBGNLzoYqtmFbSGEWY?=
+ =?us-ascii?Q?Js0tq/71AhYR8vDM1/iHUhz7Wu7+3II+WUkvLQ0XWdt8ZEjWwmomk9asYHpS?=
+ =?us-ascii?Q?bHON2hzWYTFfrIskibfNTUCA6gjJQMlOoi3sfyWf2Bl9ThvUe2O6PWafRAi4?=
+ =?us-ascii?Q?+i7ihyDbUSdBhcTQOWw3LFp3KLTYRjsrfHOtmViQgptIVfWHeSC/27KVcTs1?=
+ =?us-ascii?Q?FNmcHPUvn56vI1mh+TEvtqAyPAHG1fwAg55KZRLUnw42kg0cCOFQo3He9nyr?=
+ =?us-ascii?Q?XnU9XBAOtNx4ejtwV35zvwZg3UH/I5sqiGVT9e1hAD/PK2XDCN9XVl71YyN+?=
+ =?us-ascii?Q?4CWYPnpR31dTqPllEnHKX6T/SxmKxpUHqOg51LSWKvnOJYJYY/ZW0kU5M64t?=
+ =?us-ascii?Q?mh45t4Fgp9mQzB2a15u8p6RXSke+ab4n5rEK0mI7kKxAEn9lrlX8a6OmaXgH?=
+ =?us-ascii?Q?NGbC6KiGsU6bRK9i6lpJJpWSoAgaqDYrzSUw+ZVP2UcqOFvM4J6MNklbtLwj?=
+ =?us-ascii?Q?V5kwF9O3KzSLux9xYJel3LQNKBzJtkcOFYbxyqVcFqsCApFqJWgh3C6fxGdB?=
+ =?us-ascii?Q?MrParFaTJj9KfZDOlyEIIeLgQ/lgDo35ZNwVvo4rKZoauB9y15l/D4hCgF3r?=
+ =?us-ascii?Q?4pVCZuOc9NV6kq1iXvI4hNCIPlvLzt5+rkQQGqJx17DzK4R0s2obZVbVBhwT?=
+ =?us-ascii?Q?HYIxTCrzaT+wv9DOQtFEnEg1w/caBwYngOPKgP19z6rFiIhT0QblZx+PrRj6?=
+ =?us-ascii?Q?V1PaKL4SamzZHRd+0gWJ8NZgYATD8QOO/4n2gxpchmlwvUzsDdDyHlViFnZX?=
+ =?us-ascii?Q?+/9qMTl7CBQtyNRHSceuZvntnuJAm4ayyMf3cExaP/RA/4BEoRAQ2lMZjEOn?=
+ =?us-ascii?Q?uBte38mfWZjw9x2XxkN+PhNp3D4dIvxhXETf/Q9kELPCEKGB3g5B0yECqkim?=
+ =?us-ascii?Q?3lVujAhThWeZ3kv771LvJTf0ozhvo7kx8EOEDYSOMKDpdKLPnuZK7l6p8NrG?=
+ =?us-ascii?Q?LgfyjRoTq1BZwZm10VRX9OLjEOfXFf2XkCFyf8VusWkvKDaOptWlM4ysANFc?=
+ =?us-ascii?Q?IpLMa9rA858o7Dg=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9171.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Rt4Ix0SkBmPiXuxWXeoWglAPKaaZnkk1bbGW9alp8aVDuPV46I8TXarpVD2o?=
+ =?us-ascii?Q?sfwcNQM6e7+iN6BUmhY0HlJZh42UrQ+AlyOP9mCrS8L6trA7Bijk+WFTVVtA?=
+ =?us-ascii?Q?MKpr4WJQmXzq2//0+AezSWVw98sS/R9zb4DAX71x8YP9dVa8gphtrCM6TmLL?=
+ =?us-ascii?Q?G6bkHBkQnbnEshH3UH/Ast6wDRWhh/WmRt0FcaiB8zLJ8/2NPSLtlMqsW/1w?=
+ =?us-ascii?Q?KlHy7Y5qP9ZhgsMU1nrtZv4EVKkHD9Ig1elTqXq5yqL3EXGm/1io0qvTnYRv?=
+ =?us-ascii?Q?GCD5GZKwKMqASWQn/gpcmicd/MRY/N+yr3ZBVUm7MBLfXWRbyjtQrWBKgkoe?=
+ =?us-ascii?Q?0ErX6TZoJqO3ZzRTJSn5ucocd6V5yKiITzZn4j5wo85ecVTNK4f/QUDBwX0N?=
+ =?us-ascii?Q?OD1DCMQiKOXkTM1b1uKdBpGVHBVsxR7LXsZ/l78Z4WA1Otg6dkY2jpAtHmr8?=
+ =?us-ascii?Q?dWKrfvJ8o93dFZTXDmue8htCo6x+JiqM9kfpCltKtne3ELMV3pTyLm1eRIvs?=
+ =?us-ascii?Q?KwqG7lLgQLw3dyZOYz+KtWeja+5zYEx6DAZccdpUCBMy/xbT12/QkHdiGfQ4?=
+ =?us-ascii?Q?iq5TBG0R+dJRiXB0GB6W31ajtzcilE5QOC9yJxz5yWMuSwrm41TjUUMtaZlx?=
+ =?us-ascii?Q?HjFfSFPmkXtZWXNYwdj8OSijN5z/Suwi609/vaeWZ6MyRRBXvrjTK4UIQAtk?=
+ =?us-ascii?Q?yVebe1/fYxkQihK9IqGbvN3ieJt92loIE5cDFEoAK4R9P229/Zl7FTn035vv?=
+ =?us-ascii?Q?vSeX1/NFl9wCgpTqA9BtRqRlwd+EtumutUNGlKLoLKGe3cVuYy3grEaD6zQZ?=
+ =?us-ascii?Q?PtMfYI4i+1Xi+5PIgdswPKzkVu2A6yaws8QirqvYW4YI1fa6lTcKuDUc9gRj?=
+ =?us-ascii?Q?BxLDl01CT1sH4RZisJs9bYI9l/6FP4ZqlIa2gOd1TdO/uHxUJ/lAUeA6dxQV?=
+ =?us-ascii?Q?Oeq8RVy0xRyqVe0vWrpZu6+488x4aLfzblLlS8xR8VZe2wCW31SUeSra8oSt?=
+ =?us-ascii?Q?hTtJbmQ1p1wnO/96nQJADIEeCB43U9XROY0x5Xnf4BcARgy0M1xbbwu7pPkX?=
+ =?us-ascii?Q?KYniQBEnv0CzwcTLbsuKvKVfCk8pw5XeY0HpxbVRn/t6yHmCz2ap511rff1H?=
+ =?us-ascii?Q?sDlZtSAvbE5w1aJd+fzh8NupR8lr2Y1pE9rKrySLwUh7SvcRWsmnYtYt191j?=
+ =?us-ascii?Q?pC1KnDSIn8NiHmINb9wDYjzhBOHWg5BafZ/zlWeqaMHGmfUK0ylvdepnwxbA?=
+ =?us-ascii?Q?FiCWSVGbqhBXXvpeY6EJgEJJEriz+a0D6rMClA0BBoKRfewhXKWPNu/psM39?=
+ =?us-ascii?Q?RIwnAdKKryObFk+eLdWi/HcqRsSTGYrKWAXdOPV6v0gQ+pm1Zo9ICgUh0UKH?=
+ =?us-ascii?Q?Hb2MZKBiFJnHxKzlPv/JR2JaeOxwTVegCj2n4T0Tm0SKDlIieS/I3gaDxR72?=
+ =?us-ascii?Q?b6QXt5BtJhb66IwpEuW4JLG2mOR6XgtQdIT55M8tdp65qTpLK0sfFuL27ls2?=
+ =?us-ascii?Q?UaU4S4ZppIT5gqtCJ4KXi/PxTU1Qqx8tkFFS/DlUJjrJTgYrtzxdvWjKSCsg?=
+ =?us-ascii?Q?zfNVgl+gU9YPJglq2mw=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9171.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdf238bd-aee8-4794-03eb-08dda355f1a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2025 10:52:47.8249
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aZidJSJG0tXO4tMNGBvO/BFPAGDtLZqNuHf0zQFc31SsX9aQ7SlzR6fX57IKEXZX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9073
 
-=E5=9C=A8 2025-04-30=E6=98=9F=E6=9C=9F=E4=B8=89=E7=9A=84 11:21 -0500=EF=BC=
-=8CAndrew Lunn=E5=86=99=E9=81=93=EF=BC=9A
-> Device Tree and Ethernet MAC driver writers often misunderstand RGMII
-> delays. Rewrite the Normative section in terms of the PCB, is the PCB
-> adding the 2ns delay. This meaning was previous implied by the
-> definition, but often wrongly interpreted due to the ambiguous
-> wording
-> and looking at the definition from the wrong perspective. The new
-> definition concentrates clearly on the hardware, and should be less
-> ambiguous.
->=20
-> Add an Informative section to the end of the binding describing in
-> detail what the four RGMII delays mean. This expands on just the PCB
-> meaning, adding in the implications for the MAC and PHY.
->=20
-> Additionally, when the MAC or PHY needs to add a delay, which is
-> software configuration, describe how Linux does this, in the hope of
-> reducing errors. Make it clear other users of device tree binding may
-> implement the software configuration in other ways while still
-> conforming to the binding.
+[AMD Official Use Only - AMD Internal Distribution Only]
 
-Sorry for my late disturbance (so late that this patch is already
-included in released version), but I have some questions about this...
+Hi Andrew,
 
->=20
-> Fixes: 9d3de3c58347 ("dt-bindings: net: Add YAML schemas for the
-> generic Ethernet options")
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
-> Changes in v2:
-> Reword Normative section
-> manor->manner
-> add when using phylib/phylink
-> request details in the commit message and .dts comments
-> clarify PHY -internal-delay-ps values being depending on rgmii-X
-> mode.
-> Link to v1:
-> https://lore.kernel.org/r/20250429-v6-15-rc3-net-rgmii-delays-v1-1-f52664=
-945741@lunn.ch
-> ---
-> =C2=A0.../bindings/net/ethernet-controller.yaml=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 97
-> ++++++++++++++++++++--
-> =C2=A01 file changed, 90 insertions(+), 7 deletions(-)
->=20
->=20
-> ---
-> base-commit: d4cb1ecc22908ef46f2885ee2978a4f22e90f365
-> change-id: 20250429-v6-15-rc3-net-rgmii-delays-8a00c4788fa7
->=20
-> Best regards,
->=20
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-
-> controller.yaml b/Documentation/devicetree/bindings/net/ethernet-
-> controller.yaml
-> index
-> 45819b2358002bc75e876eddb4b2ca18017c04bd..a2d4c626f659a57fc7dcd39301f
-> 322c28afed69d 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -74,19 +74,17 @@ properties:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rev-rmii
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - moca
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RX and TX delays are added by the MAC w=
-hen required
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RX and TX delays are provided by the PC=
-B. See below
+>-----Original Message-----
+>From: Andrew Lunn <andrew@lunn.ch>
+>Sent: Tuesday, June 3, 2025 9:27 PM
+>To: Joseph, Abin <Abin.Joseph@amd.com>
+>Cc: nicolas.ferre@microchip.com; claudiu.beznea@tuxon.dev;
+>andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+>kuba@kernel.org; pabeni@redhat.com; git (AMD-Xilinx) <git@amd.com>;
+>netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+>Subject: Re: [PATCH net-next] net: macb: Add shutdown operation support
+>
+>Caution: This message originated from an External Source. Use proper cauti=
+on when
+>opening attachments, clicking links, or responding.
+>
+>
+>> +static void macb_shutdown(struct platform_device *pdev) {
+>> +     struct net_device *netdev =3D dev_get_drvdata(&pdev->dev);
+>> +
+>> +     netif_device_detach(netdev);
+>> +     dev_close(netdev);
+>> +}
+>
+>Have you tried this on a device which was admin down? It seems like you ge=
+t
+>unbalanced open()/close() calls.
+>
 
-This really sounds like a breaking change that changes the meaning of
-the definition of this item instead of simply rewording.
+Yes, I tested this on a device which was admin down using "ifconfig eth0 do=
+wn". I observed that macb_close() is invoked only once,
+specifically when the interface is bought down. During the kexec call the s=
+hutdown hook is triggered, but the close() won't be called
+In this scenario.
 
-Everything written according to the original description is broken by
-this change.
+Regards,
+Abin Joseph
 
-In addition, considering this is set as a property of the MAC device
-tree node, it's more natural to represents the perspective of MAC,
-instead of only describing what's on the PCB.
-
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rgmii
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RGMII with internal RX and TX delays pr=
-ovided by the PHY,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # the MAC should not add the RX or TX del=
-ays in this case
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RX and TX delays are not provided by th=
-e PCB. This is the
-> most
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # frequent case. See below
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rgmii-id
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RGMII with internal RX delay provided b=
-y the PHY, the MAC
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # should not add an RX delay in this case
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # TX delay is provided by the PCB. See be=
-low
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rgmii-rxid
-> =C2=A0
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RGMII with internal TX delay provided b=
-y the PHY, the MAC
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # should not add an TX delay in this case
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # RX delay is provided by the PCB. See be=
-low
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rgmii-txid
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - rtbi
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - smii
-> @@ -286,4 +284,89 @@ allOf:
-> =C2=A0
-> =C2=A0additionalProperties: true
-> =C2=A0
-> +# Informative
-> +# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +#
-> +# 'phy-modes' & 'phy-connection-type' properties 'rgmii', 'rgmii-
-> id',
-> +# 'rgmii-rxid', and 'rgmii-txid' are frequently used wrongly by
-> +# developers. This informative section clarifies their usage.
-> +#
-> +# The RGMII specification requires a 2ns delay between the data and
-> +# clock signals on the RGMII bus. How this delay is implemented is
-> not
-> +# specified.
-> +#
-> +# One option is to make the clock traces on the PCB longer than the
-> +# data traces. A sufficiently difference in length can provide the
-> 2ns
-> +# delay. If both the RX and TX delays are implemented in this
-> manner,
-> +# 'rgmii' should be used, so indicating the PCB adds the delays.
-> +#
-> +# If the PCB does not add these delays via extra long traces,
-> +# 'rgmii-id' should be used. Here, 'id' refers to 'internal delay',
-> +# where either the MAC or PHY adds the delay.
-> +#
-> +# If only one of the two delays are implemented via extra long clock
-> +# lines, either 'rgmii-rxid' or 'rgmii-txid' should be used,
-> +# indicating the MAC or PHY should implement one of the delays
-> +# internally, while the PCB implements the other delay.
-> +#
-> +# Device Tree describes hardware, and in this case, it describes the
-> +# PCB between the MAC and the PHY, if the PCB implements delays or
-> +# not.
-> +#
-> +# In practice, very few PCBs make use of extra long clock lines.
-> Hence
-> +# any RGMII phy mode other than 'rgmii-id' is probably wrong, and is
-> +# unlikely to be accepted during review without details provided in
-> +# the commit description and comments in the .dts file.
-> +#
-> +# When the PCB does not implement the delays, the MAC or PHY must.=C2=A0
-> As
-> +# such, this is software configuration, and so not described in
-> Device
-> +# Tree.
-
-Usually, in this case, this isn't pure software configuration but
-already described as '?x-internal-delay-ps' (or in some legacy cases,
-'vendor,?x-delay-ps') property in the MAC.
-
-> +#
-> +# The following describes how Linux implements the configuration of
-> +# the MAC and PHY to add these delays when the PCB does not. As
-> stated
-> +# above, developers often get this wrong, and the aim of this
-> section
-> +# is reduce the frequency of these errors by Linux developers. Other
-> +# users of the Device Tree may implement it differently, and still
-> be
-> +# consistent with both the normative and informative description
-> +# above.
-> +#
-> +# By default in Linux, when using phylib/phylink, the MAC is
-> expected
-> +# to read the 'phy-mode' from Device Tree, not implement any delays,
-> +# and pass the value to the PHY. The PHY will then implement delays
-> as
-> +# specified by the 'phy-mode'. The PHY should always be reconfigured
-> +# to implement the needed delays, replacing any setting performed by
-> +# strapping or the bootloader, etc.
-> +#
-> +# Experience to date is that all PHYs which implement RGMII also
-> +# implement the ability to add or not add the needed delays. Hence
-> +# this default is expected to work in all cases. Ignoring this
-> default
-> +# is likely to be questioned by Reviews, and require a strong
-> argument
-> +# to be accepted.
-
-Although these PHYs are able to implement (or not to implement) the
-delay, it's not promised that this could be overriden by the kernel
-instead of being set up as strap pins.
-
-Take Realtek GbE PHYs, which I am most familiar with, as examples. The
-Linux realtek netphy driver supports overriding delay configuration
-only for RTL8211E/F. From Internet, RTL8211B/C/E/F datasheets could be
-found. All of them contain RXDLY/TXDLY strap pins, but neither of them
-mention any register to config the delays, which means that on
-RTL8211B/C there's no known way to override them (the only known , and
-on RTL8211E/F the way to override them are undocumented registers from
-unknown origin (which means no support from Realtek themselves are
-available). I do partly participate a dramatic case about RTL8211E:
-there were some Pine A64+ boards with broken RTL8211E that have some
-delay-chain related issues, and Pine64 only got magic numbers from
-Realtek to fix them (the magic numbers happen to match current RTL8211E
-delay configuration code in realtek driver and show that RXDLY is
-overriden to disabled).
-
-In addition, the Linux kernel contains a "Generic PHY" driver for any
-802.1 c22 PHYs to work, without setting any delays. With this driver
-it's impossible to let the PHY "always be reconfigured", and
-enabling/disabling the PHY-specific driver may lead to behavior change
-(when enabling the specific driver, the configuration is overriden;
-when disabling it, the strap pin configuration is used). Well
-personally I think the driver should give out a warning when it can
-read out strip pin status and it does not match the DT configuration).
-
-The DT binding (and phylib) currently also lacks any way to describe
-"respect the hardware strapping delay configuration of PHY".
-
-> +#
-> +# There are a small number of cases where the MAC has hard coded
-> +# delays which cannot be disabled. The 'phy-mode' only describes the
-> +# PCB.=C2=A0 The inability to disable the delays in the MAC does not
-> change
-> +# the meaning of 'phy-mode'. It does however mean that a 'phy-mode'
-> of
-> +# 'rgmii' is now invalid, it cannot be supported, since both the PCB
-> +# and the MAC and PHY adding delays cannot result in a functional
-> +# link. Thus the MAC should report a fatal error for any modes which
-
-Considering compatibilty, should this be just a warning (which usually
-means a wrong phy-mode setup) instead of a fatal error?
-
-> +# cannot be supported. When the MAC implements the delay, it must
-> +# ensure that the PHY does not also implement the same delay. So it
-> +# must modify the phy-mode it passes to the PHY, removing the delay
-> it
-> +# has added. Failure to remove the delay will result in a
-> +# non-functioning link.
-
-In case of the MAC implementing a '?x-internal-delay-ps' property, when
-should the MAC stripping delays from phy-mode? Should the phy-mode be
-changed when MAC delaying 100ps? Should it be changed when MAC delaying
-1000ps? And if the PHY could be reprogrammed to do the delay and the
-property contains a big value that is higher than 2000ps, should the
-software switch to do the delay in PHY and decrease the MAC side delay
-by 2000ps?
-
-Besides this, do we have any existing MAC driver that implements
-stripping the delay from passing to PHY? How should we maintain
-compatibilty between a DT that does not consider MAC driver delay
-stripping and a driver that considers this? DTs are expected to be
-backward compatible, and if this problem could not be solved, we can
-never implement this intended MAC delay stripping.
-
-My personal idea here, which reflects the current practice of most
-drivers/DTs I read and leads to no known breaking change, is to make
-the "phy-mode" property of the MAC node represents how the MAC expects
-external components (PCB+PHY), and, assuming no significant PCB delay,
-just pass this value to PHY instead. The MAC side delay shouldn't be
-considered and represented in this property, but extra properties, like
-'?x-internal-delay-ps' should be used instead.
-
-> +#
-> +# Sometimes there is a need to fine tune the delays. Often the MAC
-> or
-> +# PHY can perform this fine tuning. In the MAC node, the Device Tree
-> +# properties 'rx-internal-delay-ps' and 'tx-internal-delay-ps'
-> should
-> +# be used to indicate fine tuning performed by the MAC. The values
-> +# expected here are small. A value of 2000ps, i.e 2ns, and a phy-
-> mode
-> +# of 'rgmii' will not be accepted by Reviewers.
-
-BTW the MAC might be very powerful on introducing delays, e.g. it can
-have delay lines on data pins in addition to clock pins (in case of
-data pins are delayed, this could be considered as a "negative clock
-delay"), or some hardware might be able to do per-data-pin data delay
-(to compensate HW trace length inconsistency). Should these be
-considered by the standard binding, or should these be left to vendored
-properties?
-
-> +#
-> +# If the PHY is to perform fine tuning, the properties
-> +# 'rx-internal-delay-ps' and 'tx-internal-delay-ps' in the PHY node
-> +# should be used. When the PHY is implementing delays, e.g. 'rgmii-
-> id'
-> +# these properties should have a value near to 2000ps. If the PCB is
-> +# implementing delays, e.g. 'rgmii', a small value can be used to
-> fine
-> +# tune the delay added by the PCB.
-> =C2=A0...
-
+>    Andrew
 
