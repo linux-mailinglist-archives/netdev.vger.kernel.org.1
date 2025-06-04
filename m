@@ -1,58 +1,61 @@
-Return-Path: <netdev+bounces-194930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C672ACD3A2
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB58ACD3B8
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA46B3A691D
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D5E33A56DA
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C591DF742;
-	Wed,  4 Jun 2025 01:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746A881E;
+	Wed,  4 Jun 2025 01:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlXgDxDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T0i8uIS3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E4920B804;
-	Wed,  4 Jun 2025 01:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4726054739;
+	Wed,  4 Jun 2025 01:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748998987; cv=none; b=H9n1zFjTWi5q9ZQKgRKGYNDq2YnQq5Y8Er8lDrnxJE23zm7VrKZZva604pUWRSwK+oiDjDo1z5UKTG+iDFzjWwPsBOthACIgcAMaF3EWXThH61kVYUb2RnpHekaYB40ewbVJymcUiKbfs0n0oVsyyamH5CyaCb/J4SMr0gxi7ac=
+	t=1748999009; cv=none; b=XuMK4qzyDfgauTJ3EQmdGHnzkSEHXh+c4/zvRHAu0Aqdwz0xLdRHFW04WXbvmpJDt65JUk7fi+z/zmY/IvsxmANolljjBMYk+2YBbQMluAaJPgUoj8akgH4y8kGmeTDAbmv3NJ/LfAOkMJSQpdfKrkggDOtADKmigT8dJkLjnPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748998987; c=relaxed/simple;
-	bh=08BxaT9ZGJXp3r0UYYVj8yIm9CHhMt71rgBI9Nq5iyM=;
+	s=arc-20240116; t=1748999009; c=relaxed/simple;
+	bh=/1WO6XteEw0GYgw9a4bIM6p49n5XGG17KcxIx9C36Wc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g9m4pLrVB0whQW6Twq4Y07X+nShteICYyJYnzXGMV0SbIQLqJzd45aAwfnofbqdYMChr5Mpk+18drDA5J/ns0eIitBMWXHNR2MhcwT0IoMQg0Ka2y4PMPgGG7fOuo3ijXV4SfoO/KUZZgaO9RuewF8z/nsgVmPMlobQ6dKVvO6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jlXgDxDT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB197C4CEF2;
-	Wed,  4 Jun 2025 01:03:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tEV8vRJWBR35cBgem2AH0D5fFnEto0zi4Fyx/W6X/9mdYdkZeWLr4RBJDdwV7fM3NNSqa8Q5uhq0wtit6jjtxhk762j6jB4IOu+el2ZHR5PMJbzEVpcNUY/mZrE/7eYxj2qyrqi+UAzHls7La9N4m145L28dFPKRGjQgayT3nos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T0i8uIS3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4383C4CEEF;
+	Wed,  4 Jun 2025 01:03:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748998987;
-	bh=08BxaT9ZGJXp3r0UYYVj8yIm9CHhMt71rgBI9Nq5iyM=;
+	s=k20201202; t=1748999009;
+	bh=/1WO6XteEw0GYgw9a4bIM6p49n5XGG17KcxIx9C36Wc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jlXgDxDTI7TkHxWsQvEz/h4zVS27eFRMzMR5bXHrym6VADfeRkoBA+sK2WR607kIP
-	 VP7qYPIIoQ2du8JkCGQBIX3GlI5Dxkr1ahJKW3wOjvtn7pZEvxwaIvTbjkNoboxbqh
-	 XdZo7GnH0zMMSSPdC40EppZ2W1CM+bldNLOB+e5cqQ+6UrKx57heQS/9evPiUKRLPQ
-	 98sokrVfZxzPTzuIWT/CBFLOFeNJgfZwwm/xToWQUO5SiVVvuu/TphG2iLi3ZttIRd
-	 vJq4qODb6QTn4mU2PB3WzIQJLFFj2jFhaJ4U/tlNK5BZ6eXAA0+TROrJgbPpqaFJG3
-	 cEI6swyFamKCQ==
+	b=T0i8uIS3nAf+y54rERbOvygAD4Cr5UENx5/Y4SkFpo6pUeOr1ZbwMC6D7xjSWKAJq
+	 bQibF22u4d5JYD7tYdjWEe6Fo0CdLT3GsHDjBoFNrY3zMo0c4jrfAd1d160GC9+g4o
+	 wxXabLvH1jgKuMswU3/fwMJuJwH5JpJ1+P2r3Z67xYDaHuhVdFrGOoEXb40YJPCrbC
+	 MDzkq+gSWZTZ8gNMS0m8Ibe7ktChUtm6UDK1+QSpsuyZZQTvxsUDKtqBwXO2Ya1tAe
+	 lFNq8Tfq6yoUwyidxWSkrb8B+IEcJz01YSLNFWzbv9aVk+XJUDYXJNz6923CZLhupM
+	 nR2MKklts+Dxw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Jason Xing <kernelxing@tencent.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Yong Wang <yongwang@nvidia.com>,
+	Andy Roulin <aroulin@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 30/62] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
-Date: Tue,  3 Jun 2025 21:01:41 -0400
-Message-Id: <20250604010213.3462-30-sashal@kernel.org>
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 43/62] net: bridge: mcast: update multicast contex when vlan state is changed
+Date: Tue,  3 Jun 2025 21:01:54 -0400
+Message-Id: <20250604010213.3462-43-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604010213.3462-1-sashal@kernel.org>
 References: <20250604010213.3462-1-sashal@kernel.org>
@@ -68,79 +71,215 @@ X-stable-base: Linux 6.6.92
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
+From: Yong Wang <yongwang@nvidia.com>
 
-[ Upstream commit b86bcfee30576b752302c55693fff97242b35dfd ]
+[ Upstream commit 6c131043eaf1be2a6cc2d228f92ceb626fbcc0f3 ]
 
-As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
-SOFTWARE flag is surely needed when users are trying to get timestamp
-information.
+When the vlan STP state is changed, which could be manipulated by
+"bridge vlan" commands, similar to port STP state, this also impacts
+multicast behaviors such as igmp query. In the scenario of per-VLAN
+snooping, there's a need to update the corresponding multicast context
+to re-arm the port query timer when vlan state becomes "forwarding" etc.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/20250510093442.79711-1-kerneljasonxing@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Update br_vlan_set_state() function to enable vlan multicast context
+in such scenario.
+
+Before the patch, the IGMP query does not happen in the last step of the
+following test sequence, i.e. no growth for tx counter:
+ # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
+ # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
+ # ip link add name swp1 up master br1 type dummy
+ # sleep 1
+ # bridge vlan set vid 1 dev swp1 state 4
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+1
+ # sleep 1
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+1
+ # bridge vlan set vid 1 dev swp1 state 3
+ # sleep 2
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+1
+
+After the patch, the IGMP query happens in the last step of the test:
+ # ip link add name br1 up type bridge vlan_filtering 1 mcast_snooping 1 mcast_vlan_snooping 1 mcast_querier 1 mcast_stats_enabled 1
+ # bridge vlan global set vid 1 dev br1 mcast_snooping 1 mcast_querier 1 mcast_query_interval 100 mcast_startup_query_count 0
+ # ip link add name swp1 up master br1 type dummy
+ # sleep 1
+ # bridge vlan set vid 1 dev swp1 state 4
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+1
+ # sleep 1
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+1
+ # bridge vlan set vid 1 dev swp1 state 3
+ # sleep 2
+ # ip -j -p stats show dev swp1 group xstats_slave subgroup bridge suite mcast | jq '.[]["multicast"]["igmp_queries"]["tx_v2"]'
+3
+
+Signed-off-by: Yong Wang <yongwang@nvidia.com>
+Reviewed-by: Andy Roulin <aroulin@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-Perfect! Now I can see that `skb_tx_timestamp(skb)` is called in the
-`mlx4_en_xmit()` function, which is the main transmit function. This
-confirms that the mlx4 driver does implement software timestamping. Now
-let me compare this to the similar commits to see the pattern: **YES**
-This commit should be backported to stable kernel trees. **Extensive
-Explanation:** This commit addresses a clear inconsistency bug where the
-mlx4 driver implements software timestamping functionality but fails to
-advertise this capability to userspace through the ethtool timestamping
-info interface. **Analysis of the fix:** 1. **The Problem**: The mlx4
-driver calls `skb_tx_timestamp(skb)` in `mlx4_en_xmit()` at line 1091 of
-`/drivers/net/ethernet/mellanox/mlx4/en_tx.c`, which means it properly
-implements software TX timestamping. However, in
-`mlx4_en_get_ts_info()`, it only advertises hardware timestamping
-capabilities (`SOF_TIMESTAMPING_TX_HARDWARE`,
-`SOF_TIMESTAMPING_RX_HARDWARE`, `SOF_TIMESTAMPING_RAW_HARDWARE`) but
-omits the `SOF_TIMESTAMPING_TX_SOFTWARE` flag. 2. **The Fix**: The
-change adds a single line `SOF_TIMESTAMPING_TX_SOFTWARE |` to the
-`info->so_timestamping` field when hardware timestamping is supported,
-correctly advertising both hardware and software timestamping
-capabilities. 3. **Impact**: This is a user-facing API correctness
-issue. Applications checking timestamping capabilities via ethtool would
-incorrectly believe software timestamping is not supported, even though
-the driver implements it. **Comparison with similar commits:** -
-**Similar Commit #1 (YES)**: Also fixed a timestamping bug in mlx4,
-showing these are important fixes - **Similar Commit #3 (YES)**: Fixed
-incorrect timestamping capability reporting in mlx5 by removing false
-software timestamping indication - **Similar Commit #5 (YES)**: Fixed
-timestamping capabilities reporting using wrong BIT() macro in mlx5 The
-pattern shows that timestamping capability reporting bugs are
-consistently considered backport-worthy because they affect user-visible
-API behavior. **Backport Criteria Assessment:** ✅ **Fixes a user-
-affecting bug**: Applications cannot detect software timestamping
-support ✅ **Small, contained change**: Single line addition with no
-functional logic changes ✅ **No architectural changes**: Only fixes
-capability reporting ✅ **Low regression risk**: Only adds a missing
-flag, doesn't change driver behavior ✅ **Clear side effects**: None
-beyond correctly advertising existing functionality ✅ **Follows stable
-rules**: Important API correctness fix with minimal risk The fix is
-identical in nature to Similar Commit #3 (marked YES) but in reverse -
-where mlx5 removed false software timestamping advertisement, this adds
-the missing software timestamping advertisement for mlx4 where it's
-actually implemented.
+**YES** This commit should be backported to stable kernel trees. Here's
+my extensive analysis: ## Bug Fix Classification This is clearly a **bug
+fix** that resolves broken IGMP query functionality when VLAN states
+change. The commit message and test output demonstrate a clear
+before/after scenario where IGMP queries fail to increment after VLAN
+state transitions to forwarding, then work correctly after the patch. ##
+Code Analysis ### 1. Core Issue and Fix The bug occurs because VLAN
+state changes weren't properly synchronizing with multicast contexts.
+The fix adds a call to `br_multicast_update_vlan_mcast_ctx(v, state)` in
+the `br_vlan_set_state()` function: ```c static inline void
+br_vlan_set_state(struct net_bridge_vlan *v, u8 state) {
+WRITE_ONCE(v->state, state); + br_multicast_update_vlan_mcast_ctx(v,
+state); // NEW LINE } ``` ### 2. Low Risk Assessment The changes are
+**low risk** because: - **Conservative approach**: The fix reuses
+existing, well-tested multicast context update logic - **Targeted
+scope**: Only affects VLAN state → multicast context synchronization -
+**Built-in safeguards**: The `br_multicast_update_vlan_mcast_ctx()`
+function includes multiple safety checks: ```c if
+(!br_vlan_should_use(v)) return; if (br_vlan_is_master(v)) return; if
+(!br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED)) return; ``` ### 3.
+Production Impact This bug affects **critical networking
+functionality**: - **Broken multicast in VLAN environments**: IGMP
+queries fail when VLANs transition to forwarding state - **Real-world
+scenarios**: Common in enterprise networks using VLAN filtering with
+multicast applications (video conferencing, IPTV, gaming) - **STP
+convergence issues**: After network topology changes, multicast
+functionality remains broken until manual intervention ### 4. Minimal
+Code Footprint The changes are **minimal and contained**: - **3 files
+changed**: All within bridge multicast/VLAN subsystem - **Small
+additions**: New function + one-line addition to existing inline
+function - **No API changes**: Internal synchronization fix only - **No
+architectural changes**: Uses existing code paths and patterns ### 5.
+Comparison with Historical Examples Looking at the similar commits
+provided: - **Similar to Commit #4 (YES)**: Also fixes a helper function
+in bridge multicast VLAN logic with minimal risk - **Unlike Commits
+#1-3, #5 (NO)**: Those add new features or make architectural changes,
+while this purely fixes broken existing functionality ### 6. Critical
+Networking Subsystem Bridge multicast snooping is a **core networking
+feature** that: - Prevents multicast flooding in switched networks -
+Essential for network performance in multicast-heavy environments -
+Widely deployed in production networks ### 7. Test Evidence The commit
+message provides concrete test evidence showing: - **Before**: IGMP
+query counter remains at 1 (broken) - **After**: IGMP query counter
+increases to 3 (working) This demonstrates the fix resolves a
+measurable, reproducible issue. ## Conclusion This commit meets all the
+criteria for stable backporting: it's a low-risk fix for broken
+functionality in a critical networking subsystem, with minimal code
+changes and clear test evidence of the problem and solution. The
+synchronization issue between VLAN state management and multicast
+contexts represents exactly the type of bug that stable trees are
+designed to address.
 
- drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bridge/br_mst.c       |  4 ++--
+ net/bridge/br_multicast.c | 26 ++++++++++++++++++++++++++
+ net/bridge/br_private.h   | 11 ++++++++++-
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-index 164a13272faa2..07dced3c2b1c0 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
-@@ -1916,6 +1916,7 @@ static int mlx4_en_get_ts_info(struct net_device *dev,
- 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS) {
- 		info->so_timestamping |=
- 			SOF_TIMESTAMPING_TX_HARDWARE |
-+			SOF_TIMESTAMPING_TX_SOFTWARE |
- 			SOF_TIMESTAMPING_RX_HARDWARE |
- 			SOF_TIMESTAMPING_RAW_HARDWARE;
+diff --git a/net/bridge/br_mst.c b/net/bridge/br_mst.c
+index 1820f09ff59ce..3f24b4ee49c27 100644
+--- a/net/bridge/br_mst.c
++++ b/net/bridge/br_mst.c
+@@ -80,10 +80,10 @@ static void br_mst_vlan_set_state(struct net_bridge_vlan_group *vg,
+ 	if (br_vlan_get_state(v) == state)
+ 		return;
  
+-	br_vlan_set_state(v, state);
+-
+ 	if (v->vid == vg->pvid)
+ 		br_vlan_set_pvid_state(vg, state);
++
++	br_vlan_set_state(v, state);
+ }
+ 
+ int br_mst_set_state(struct net_bridge_port *p, u16 msti, u8 state,
+diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
+index c38244d60ff86..ea71a64f915f9 100644
+--- a/net/bridge/br_multicast.c
++++ b/net/bridge/br_multicast.c
+@@ -4210,6 +4210,32 @@ static void __br_multicast_stop(struct net_bridge_mcast *brmctx)
+ #endif
+ }
+ 
++void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
++{
++#if IS_ENABLED(CONFIG_BRIDGE_VLAN_FILTERING)
++	struct net_bridge *br;
++
++	if (!br_vlan_should_use(v))
++		return;
++
++	if (br_vlan_is_master(v))
++		return;
++
++	br = v->port->br;
++
++	if (!br_opt_get(br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
++		return;
++
++	if (br_vlan_state_allowed(state, true))
++		br_multicast_enable_port_ctx(&v->port_mcast_ctx);
++
++	/* Multicast is not disabled for the vlan when it goes in
++	 * blocking state because the timers will expire and stop by
++	 * themselves without sending more queries.
++	 */
++#endif
++}
++
+ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
+ {
+ 	struct net_bridge *br;
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 72d80fd943a8a..77cdc93a50a34 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -1042,6 +1042,7 @@ void br_multicast_port_ctx_init(struct net_bridge_port *port,
+ 				struct net_bridge_vlan *vlan,
+ 				struct net_bridge_mcast_port *pmctx);
+ void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pmctx);
++void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state);
+ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on);
+ int br_multicast_toggle_vlan_snooping(struct net_bridge *br, bool on,
+ 				      struct netlink_ext_ack *extack);
+@@ -1478,6 +1479,11 @@ static inline void br_multicast_port_ctx_deinit(struct net_bridge_mcast_port *pm
+ {
+ }
+ 
++static inline void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v,
++						      u8 state)
++{
++}
++
+ static inline void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan,
+ 						bool on)
+ {
+@@ -1829,7 +1835,9 @@ bool br_vlan_global_opts_can_enter_range(const struct net_bridge_vlan *v_curr,
+ bool br_vlan_global_opts_fill(struct sk_buff *skb, u16 vid, u16 vid_range,
+ 			      const struct net_bridge_vlan *v_opts);
+ 
+-/* vlan state manipulation helpers using *_ONCE to annotate lock-free access */
++/* vlan state manipulation helpers using *_ONCE to annotate lock-free access,
++ * while br_vlan_set_state() may access data protected by multicast_lock.
++ */
+ static inline u8 br_vlan_get_state(const struct net_bridge_vlan *v)
+ {
+ 	return READ_ONCE(v->state);
+@@ -1838,6 +1846,7 @@ static inline u8 br_vlan_get_state(const struct net_bridge_vlan *v)
+ static inline void br_vlan_set_state(struct net_bridge_vlan *v, u8 state)
+ {
+ 	WRITE_ONCE(v->state, state);
++	br_multicast_update_vlan_mcast_ctx(v, state);
+ }
+ 
+ static inline u8 br_vlan_get_pvid_state(const struct net_bridge_vlan_group *vg)
 -- 
 2.39.5
 
