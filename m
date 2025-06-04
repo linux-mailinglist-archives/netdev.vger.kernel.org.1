@@ -1,197 +1,397 @@
-Return-Path: <netdev+bounces-194974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A40ACD4FA
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:37:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C511FACD509
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:38:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBC6D1893898
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:31:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47E061BA1105
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54FC1E3775;
-	Wed,  4 Jun 2025 01:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34F127713;
+	Wed,  4 Jun 2025 01:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QY+fPzdn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UinGPSTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C01E17F7;
-	Wed,  4 Jun 2025 01:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5C71E52D
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 01:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999254; cv=none; b=GhZOoplJcwBAnxmEvyp5Xp3+m0zbtMl0Y9zbbSTUPjPJTOxbrE1LsKk6ECR99hkxL7XhUDiUwJSpn61JOTLqQddCUd+JjWem1FdYXCBgLWJgEh7mE4nxgwfnoRy6ij8dxiCYvq1SmU7BCk6udUnE429o/nvJjYuXrmRJY/8tWsg=
+	t=1748999927; cv=none; b=GHm9pwClYO1g5QMeePB5eo1CjtBFYAow5PuXJTcAwK4kd1aKNyqNS1AgxwbyquykXRybKPCw/skbr0YPCYjMeifs9iEVm5FqS2CXidEikocR2A4cQV69k8BqzgYwrCQldEqDWGEmDv9FyQmpr8zbeSUnDRo3lPPq5EG8J/p7Sj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999254; c=relaxed/simple;
-	bh=X61MbhuEx57n4K/LBwsNObI2FMbS69p+d73z3erGKrE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CuSIjx6qh78DbJP6wkcax2N8kkZE62rjH0aDKlvDbZkE326Ux1K3cPpcJ8uNx5s0CeUvQWt+FZMBl/Iuw4q9HzsjpSJl3EzCsFoRA4Sg7bj7yyTQBHu5U9cnYOGOr9yCJg0bgQuZo1Yf6tbAP/WmEr+q1NrOjl1QrtyImbG7xJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QY+fPzdn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D4F3C4CEED;
-	Wed,  4 Jun 2025 01:07:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999254;
-	bh=X61MbhuEx57n4K/LBwsNObI2FMbS69p+d73z3erGKrE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QY+fPzdn377BOwkT6N+mUVQjnF+z1doFYNmr6xouFVQTaEHioEt7hOc+wfFkrvajP
-	 FlFhmWwtM8fYcLlqMn4gt2Pzd9P0sGPZMtVNG4Pdi++4QB0KlrqimJTDs89cwi03Ul
-	 hXVCEPydEwS89+gS2am5mQwV9y9oGS279d8iOJLAh6j+aDL4DwHKvOVmH/XBGjiIDw
-	 OnOcDqF6/EJo/+0dCA/PeHngeK0vXN9GwcrBmT26wS9OtVOSoGJYsZv5wJFaKKdWjA
-	 tvjXJbTf/xUsM/5/d1Rj/neeX/9jFaiEoCKo9jBp5LeUQLKDmN3mt+4+k3cop+zipw
-	 +G1yiDe4PG72A==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 17/20] vxlan: Do not treat dst cache initialization errors as fatal
-Date: Tue,  3 Jun 2025 21:07:03 -0400
-Message-Id: <20250604010706.7395-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250604010706.7395-1-sashal@kernel.org>
-References: <20250604010706.7395-1-sashal@kernel.org>
+	s=arc-20240116; t=1748999927; c=relaxed/simple;
+	bh=TU5raU8CLI5e3LMHuVmzVjSuFh7aCubUMZ1v6HP3ni4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VOhJC6C0PT0zFUL72HyBeeMcMQAL5bXVCOJFV3uvq5UiIkYbBkJ6C1kafFdxXw2pN7vlrbOkbT0yMYeM2QZ0Q7l8TV0cdksFjq4fAjkVy7R7gh/uhdo0rvxOe0+A557aakvB8knH6s0YK4c8X4wLK2p8Gw7VVQiYfckD/SbI8XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UinGPSTj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748999923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FGSicdZ/oCg5lp+er2IEvl27RXvIulGaT4Ab9/IfYPs=;
+	b=UinGPSTjeYwTNToKFpXOba9gtkV/Af3cAJ2Xc4fmR1zEJxkkk0wrlUNwQ9fjaqcjHmDZiy
+	4HD/vBgPYku4OjR0hZ+Mi+GOzlgQaej2eruCI1SJBx0TzGZL6XeH3RWkwh8rEWOxZ1xcfd
+	moWNf4Y1JWLIcQFSmGTcD9JYe1tIYMk=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-79-zYlAVf6JMdeNC7TUN2xuuQ-1; Tue, 03 Jun 2025 21:18:42 -0400
+X-MC-Unique: zYlAVf6JMdeNC7TUN2xuuQ-1
+X-Mimecast-MFC-AGG-ID: zYlAVf6JMdeNC7TUN2xuuQ_1748999921
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b115383fcecso3794022a12.1
+        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 18:18:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748999921; x=1749604721;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FGSicdZ/oCg5lp+er2IEvl27RXvIulGaT4Ab9/IfYPs=;
+        b=rb0ucI2YfIIKmeSqqrw9jXJf7rCVbYm78PG1tOpn9dCHC0R+f/S+rDhqX05NhjdkSo
+         lN+ZC+DhgLJqxHvig17PToZRxBX40GP8s+sq+JQmaXaZxOKEimKxJhUyRujpeB+1jhld
+         rbbKaN72f2sPMl1pdEXQ9OdAoOcRozHGU/c0YEJB8K2XMjSI9rZ6nSfDb9+EWA01Lxm6
+         hychVM2HVawMBAxN2RaG57HOIvmIaPJmbaIA5yz631i0iA3Rh3sFJaB3A7IuSq4E8DYz
+         jqM3DvRlGdfwt+6wyJ45C25OmE3UK4qVEEu+bzlvsdK6RKmS7QOmxEcULLIPrptkb4Yi
+         4TTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXerevlMFE7R6vMomqT7JoGEB2x6WXb3qSftgZbQjU3W3Yf1KPJmu67nC84hwdX+FfVsn22KmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5wIYpUJkpvs4/hWXd+f5P3CnVg6DHzjQys6u+7dyJS5IL7M3x
+	5t+mluhoDln/zMrlQlgtb2/BNVkNwrjhkO14VYr101Pso7P0+N0DnA2vwKQspJOjG/LaIL/j6Qw
+	pPbqKPITISR23oSGxTLUXQ8heHf2Es71F72fMzOHKVD3qbOo/xCaWXlpwGuzSzQmSgwor6KUeth
+	6TRPBBPm3CTUrVDJ1gCR+dKqE2O2R5qo3O
+X-Gm-Gg: ASbGncst9kQBSDQt0la4urwmwxgSolnEv9yBjoXi3Ri74qBWxYLgn5npFwhIjF2vIRZ
+	PML7X9i13emen7FnBLHBTEhIAV470v6AZ1hwTuXZhKoU4kMXCiO0RdokSG2T3Kjs0W1G4SQ==
+X-Received: by 2002:a05:6a21:15c9:b0:203:addb:5a29 with SMTP id adf61e73a8af0-21d2478a934mr804207637.40.1748999921378;
+        Tue, 03 Jun 2025 18:18:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9x2Jsz+oEkjdyApeUA+CuoK8myNpbDW4bJgTDO/ZV8ngn2BsxLUd0KXN3ouD9XKiPa4r78geNfVRdh7nw+0I=
+X-Received: by 2002:a05:6a21:15c9:b0:203:addb:5a29 with SMTP id
+ adf61e73a8af0-21d2478a934mr804171637.40.1748999920971; Tue, 03 Jun 2025
+ 18:18:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.293
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-1-95d8b348de91@daynix.com>
+ <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com> <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com>
+In-Reply-To: <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 4 Jun 2025 09:18:29 +0800
+X-Gm-Features: AX0GCFuo2dPa7ucM1Nh8rfxdTLetjqqveALggfJbyBjhCoXiIN_FHhv1NK0hF9M
+Message-ID: <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ido Schimmel <idosch@nvidia.com>
+On Tue, Jun 3, 2025 at 1:31=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> On 2025/06/03 12:19, Jason Wang wrote:
+> > On Fri, May 30, 2025 at 12:50=E2=80=AFPM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> >>
+> >> They are useful to implement VIRTIO_NET_F_RSS and
+> >> VIRTIO_NET_F_HASH_REPORT.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> Tested-by: Lei Yang <leiyang@redhat.com>
+> >> ---
+> >>   include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++=
+++++++++++
+> >>   1 file changed, 188 insertions(+)
+> >>
+> >> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> >> index 02a9f4dc594d..426f33b4b824 100644
+> >> --- a/include/linux/virtio_net.h
+> >> +++ b/include/linux/virtio_net.h
+> >> @@ -9,6 +9,194 @@
+> >>   #include <uapi/linux/tcp.h>
+> >>   #include <uapi/linux/virtio_net.h>
+> >>
+> >> +struct virtio_net_hash {
+> >> +       u32 value;
+> >> +       u16 report;
+> >> +};
+> >> +
+> >> +struct virtio_net_toeplitz_state {
+> >> +       u32 hash;
+> >> +       const u32 *key;
+> >> +};
+> >> +
+> >> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv=
+4 | \
+> >> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv=
+4 | \
+> >> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv=
+4 | \
+> >> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6=
+ | \
+> >> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv=
+6 | \
+> >> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv=
+6)
+> >> +
+> >> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+> >> +
+> >> +static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t=
+ len)
+> >> +{
+> >> +       while (len >=3D sizeof(*input)) {
+> >> +               *input =3D be32_to_cpu((__force __be32)*input);
+> >> +               input++;
+> >> +               len -=3D sizeof(*input);
+> >> +       }
+> >> +}
+> >> +
+> >> +static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplit=
+z_state *state,
+> >> +                                           const __be32 *input, size_=
+t len)
+> >> +{
+> >> +       while (len >=3D sizeof(*input)) {
+> >> +               for (u32 map =3D be32_to_cpu(*input); map; map &=3D (m=
+ap - 1)) {
+> >> +                       u32 i =3D ffs(map);
+> >> +
+> >> +                       state->hash ^=3D state->key[0] << (32 - i) |
+> >> +                                      (u32)((u64)state->key[1] >> i);
+> >> +               }
+> >> +
+> >> +               state->key++;
+> >> +               input++;
+> >> +               len -=3D sizeof(*input);
+> >> +       }
+> >> +}
+> >> +
+> >> +static inline u8 virtio_net_hash_key_length(u32 types)
+> >> +{
+> >> +       size_t len =3D 0;
+> >> +
+> >> +       if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+> >> +               len =3D max(len,
+> >> +                         sizeof(struct flow_dissector_key_ipv4_addrs)=
+);
+> >> +
+> >> +       if (types &
+> >> +           (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDP=
+v4))
+> >> +               len =3D max(len,
+> >> +                         sizeof(struct flow_dissector_key_ipv4_addrs)=
+ +
+> >> +                         sizeof(struct flow_dissector_key_ports));
+> >> +
+> >> +       if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+> >> +               len =3D max(len,
+> >> +                         sizeof(struct flow_dissector_key_ipv6_addrs)=
+);
+> >> +
+> >> +       if (types &
+> >> +           (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDP=
+v6))
+> >> +               len =3D max(len,
+> >> +                         sizeof(struct flow_dissector_key_ipv6_addrs)=
+ +
+> >> +                         sizeof(struct flow_dissector_key_ports));
+> >> +
+> >> +       return len + sizeof(u32);
+> >> +}
+> >> +
+> >> +static inline u32 virtio_net_hash_report(u32 types,
+> >> +                                        const struct flow_keys_basic =
+*keys)
+> >> +{
+> >> +       switch (keys->basic.n_proto) {
+> >> +       case cpu_to_be16(ETH_P_IP):
+> >> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+> >> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_TCP &&
+> >> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
+> >> +                               return VIRTIO_NET_HASH_REPORT_TCPv4;
+> >> +
+> >> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_UDP &&
+> >> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
+> >> +                               return VIRTIO_NET_HASH_REPORT_UDPv4;
+> >> +               }
+> >> +
+> >> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+> >> +                       return VIRTIO_NET_HASH_REPORT_IPv4;
+> >> +
+> >> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >> +
+> >> +       case cpu_to_be16(ETH_P_IPV6):
+> >> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+> >> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_TCP &&
+> >> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
+> >> +                               return VIRTIO_NET_HASH_REPORT_TCPv6;
+> >> +
+> >> +                       if (keys->basic.ip_proto =3D=3D IPPROTO_UDP &&
+> >> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
+> >> +                               return VIRTIO_NET_HASH_REPORT_UDPv6;
+> >> +               }
+> >> +
+> >> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
+> >> +                       return VIRTIO_NET_HASH_REPORT_IPv6;
+> >> +
+> >> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >> +
+> >> +       default:
+> >> +               return VIRTIO_NET_HASH_REPORT_NONE;
+> >> +       }
+> >> +}
+> >> +
+> >> +static inline void virtio_net_hash_rss(const struct sk_buff *skb,
+> >> +                                      u32 types, const u32 *key,
+> >> +                                      struct virtio_net_hash *hash)
+> >> +{
+> >> +       struct virtio_net_toeplitz_state toeplitz_state =3D { .key =3D=
+ key };
+> >> +       struct flow_keys flow;
+> >> +       struct flow_keys_basic flow_basic;
+> >> +       u16 report;
+> >> +
+> >> +       if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
+> >> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> >> +               return;
+> >> +       }
+> >> +
+> >> +       flow_basic =3D (struct flow_keys_basic) {
+> >> +               .control =3D flow.control,
+> >> +               .basic =3D flow.basic
+> >> +       };
+> >> +
+> >> +       report =3D virtio_net_hash_report(types, &flow_basic);
+> >> +
+> >> +       switch (report) {
+> >> +       case VIRTIO_NET_HASH_REPORT_IPv4:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v4addrs=
+,
+> >> +                                        sizeof(flow.addrs.v4addrs));
+> >> +               break;
+> >> +
+> >> +       case VIRTIO_NET_HASH_REPORT_TCPv4:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v4addrs=
+,
+> >> +                                        sizeof(flow.addrs.v4addrs));
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.=
+ports,
+> >> +                                        sizeof(flow.ports.ports));
+> >> +               break;
+> >> +
+> >> +       case VIRTIO_NET_HASH_REPORT_UDPv4:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v4addrs=
+,
+> >> +                                        sizeof(flow.addrs.v4addrs));
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.=
+ports,
+> >> +                                        sizeof(flow.ports.ports));
+> >> +               break;
+> >> +
+> >> +       case VIRTIO_NET_HASH_REPORT_IPv6:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v6addrs=
+,
+> >> +                                        sizeof(flow.addrs.v6addrs));
+> >> +               break;
+> >> +
+> >> +       case VIRTIO_NET_HASH_REPORT_TCPv6:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v6addrs=
+,
+> >> +                                        sizeof(flow.addrs.v6addrs));
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.=
+ports,
+> >> +                                        sizeof(flow.ports.ports));
+> >> +               break;
+> >> +
+> >> +       case VIRTIO_NET_HASH_REPORT_UDPv6:
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state,
+> >> +                                        (__be32 *)&flow.addrs.v6addrs=
+,
+> >> +                                        sizeof(flow.addrs.v6addrs));
+> >> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.=
+ports,
+> >> +                                        sizeof(flow.ports.ports));
+> >> +               break;
+> >> +
+> >> +       default:
+> >> +               hash->report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> >> +               return;
+> >
+> > So I still think we need a comment here to explain why this is not an
+> > issue if the device can report HASH_XXX_EX. Or we need to add the
+> > support, since this is the code from the driver side, I don't think we
+> > need to worry about the device implementation issues.
+>
+> This is on the device side, and don't report HASH_TYPE_XXX_EX.
+>
+> >
+> > For the issue of the number of options, does the spec forbid fallback
+> > to VIRTIO_NET_HASH_REPORT_NONE? If not, we can do that.
+>
+> 5.1.6.4.3.4 "IPv6 packets with extension header" says:
+>  > If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a TCPv6
+>  > header, the hash is calculated over the following fields:
+>  > - Home address from the home address option in the IPv6 destination
+>  >   options header. If the extension header is not present, use the
+>  >   Source IPv6 address.
+>  > - IPv6 address that is contained in the Routing-Header-Type-2 from the
+>  >   associated extension header. If the extension header is not present,
+>  >   use the Destination IPv6 address.
+>  > - Source TCP port
+>  > - Destination TCP port
+>
+> Therefore, if VIRTIO_NET_HASH_TYPE_TCP_EX is set, the packet has a TCPv6
+> and an home address option in the IPv6 destination options header is
+> present, the hash is calculated over the home address. If the hash is
+> not calculated over the home address in such a case, the device is
+> contradicting with this section and violating the spec. The same goes
+> for the other HASH_TYPE_XXX_EX types and Routing-Header-Type-2.
 
-[ Upstream commit 20c76dadc783759fd3819d289c72be590660cc8b ]
+Just to make sure we are one the same page. I meant:
 
-FDB entries are allocated in an atomic context as they can be added from
-the data path when learning is enabled.
+1) If the hash is not calculated over the home address (in the case of
+IPv6 destination destination), it can still report
+VIRTIO_NET_RSS_HASH_TYPE_IPv6. This is what you implemented in your
+series. So the device can simply fallback to e.g TCPv6 if it can't
+understand all or part of the IPv6 options.
+2) the VIRTIO_NET_SUPPORTED_HASH_TYPES is not checked against the
+tun_vnet_ioctl_sethash(), so userspace may set
+VIRTIO_NET_HASH_TYPE_TCP_EX regardless of what has been returned by
+tun_vnet_ioctl_gethashtypes(). In this case they won't get
+VIRTIO_NET_HASH_TYPE_TCP_EX.
+3) implementing part of the hash types might complicate the migration
+or at least we need to describe the expectations of libvirt or other
+management in this case. For example, do we plan to have a dedicated
+Qemu command line like:
 
-After converting the FDB hash table to rhashtable, the insertion rate
-will be much higher (*) which will entail a much higher rate of per-CPU
-allocations via dst_cache_init().
+-device virtio-net-pci,hash_report=3Don,supported_hash_types=3DX,Y,Z?
 
-When adding a large number of entries (e.g., 256k) in a batch, a small
-percentage (< 0.02%) of these per-CPU allocations will fail [1]. This
-does not happen with the current code since the insertion rate is low
-enough to give the per-CPU allocator a chance to asynchronously create
-new chunks of per-CPU memory.
+Thanks
 
-Given that:
-
-a. Only a small percentage of these per-CPU allocations fail.
-
-b. The scenario where this happens might not be the most realistic one.
-
-c. The driver can work correctly without dst caches. The dst_cache_*()
-APIs first check that the dst cache was properly initialized.
-
-d. The dst caches are not always used (e.g., 'tos inherit').
-
-It seems reasonable to not treat these allocation failures as fatal.
-
-Therefore, do not bail when dst_cache_init() fails and suppress warnings
-by specifying '__GFP_NOWARN'.
-
-[1] percpu: allocation failed, size=40 align=8 atomic=1, atomic alloc failed, no space left
-
-(*) 97% reduction in average latency of vxlan_fdb_update() when adding
-256k entries in a batch.
-
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Link: https://patch.msgid.link/20250415121143.345227-14-idosch@nvidia.com
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-Perfect! Now I have all the information needed to analyze this commit.
-**Answer: YES** **Extensive Analysis:** This commit should be backported
-to stable kernel trees for several important reasons: ## Bug Fix
-Analysis **1. Problem Being Fixed:** The commit addresses a real
-production issue where `dst_cache_init()` failures in atomic context
-cause legitimate vxlan FDB entries to be rejected. The specific problem
-occurs when: - Adding large numbers of FDB entries (e.g., 256k entries)
-- In atomic context (GFP_ATOMIC allocations) - A small percentage (<
-0.02%) of per-CPU allocations fail - This causes the entire FDB entry
-creation to fail unnecessarily **2. Code Change Analysis:** ```c //
-Before: Fatal error handling if (dst_cache_init(&rd->dst_cache,
-GFP_ATOMIC)) { kfree(rd); return -ENOMEM; } // After: Non-fatal error
-handling dst_cache_init(&rd->dst_cache, GFP_ATOMIC | __GFP_NOWARN); ```
-**3. Safety and Correctness:** The fix is extremely safe because: -
-**Safe graceful degradation**: All dst_cache functions check `if
-(!dst_cache->cache)` and gracefully handle uninitialized caches by
-returning NULL or doing nothing - **No functionality loss**: The vxlan
-driver works correctly without dst caches - they are performance
-optimizations, not functional requirements - **Atomic context
-appropriate**: Uses `__GFP_NOWARN` to prevent log spam under memory
-pressure - **Consistent with existing patterns**: Similar to commit
-examples 1 & 3 that handled resource initialization failures gracefully
-## Backport Suitability Criteria **1. Important Bug Fix**: ✅ - Fixes
-production failure scenario where legitimate network operations fail -
-Addresses memory allocation failures in high-throughput scenarios -
-Prevents spurious FDB entry creation failures **2. Small and
-Contained**: ✅ - Only 4 lines changed in a single function - No
-architectural changes - No new features introduced - Clear, targeted fix
-**3. Low Risk of Regression**: ✅ - The dst_cache API is designed to
-handle uninitialized caches safely - Removes failure path rather than
-adding complexity - Well-tested pattern (dst_cache functions all check
-cache initialization) - No changes to critical control flow **4. No Side
-Effects**: ✅ - Only changes error handling behavior - Maintains all
-functional capabilities - No API changes - No dependencies on other
-changes **5. Matches Stable Tree Rules**: ✅ - Important bugfix for
-production systems - Minimal risk - Self-contained change - Addresses
-real user-visible issue ## Comparison to Historical Examples This commit
-aligns perfectly with the "YES" examples: - **Similar to Example #1**:
-Fixes resource leak/failure issues in network driver - **Similar to
-Example #3**: Handles initialization failures gracefully rather than
-fatally - **Unlike "NO" examples**: No performance optimizations,
-architectural changes, or new features ## Network Subsystem Context
-VXLAN is a critical networking technology used in: - Container
-networking (Docker, Kubernetes) - Cloud networking overlays - Data
-center virtualization - SDN implementations FDB entry creation failures
-can cause significant networking disruption in production environments,
-making this fix important for stability. The commit correctly recognizes
-that dst_cache is a performance optimization, not a functional
-requirement, and handles allocation failures appropriately without
-compromising the core networking functionality.
-
- drivers/net/vxlan.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
-index ce11fb2b05561..c7dfd8ab2486c 100644
---- a/drivers/net/vxlan.c
-+++ b/drivers/net/vxlan.c
-@@ -681,10 +681,10 @@ static int vxlan_fdb_append(struct vxlan_fdb *f,
- 	if (rd == NULL)
- 		return -ENOMEM;
- 
--	if (dst_cache_init(&rd->dst_cache, GFP_ATOMIC)) {
--		kfree(rd);
--		return -ENOMEM;
--	}
-+	/* The driver can work correctly without a dst cache, so do not treat
-+	 * dst cache initialization errors as fatal.
-+	 */
-+	dst_cache_init(&rd->dst_cache, GFP_ATOMIC | __GFP_NOWARN);
- 
- 	rd->remote_ip = *ip;
- 	rd->remote_port = port;
--- 
-2.39.5
+>
+> Regards,
+> Akihiko Odaki
+>
 
 
