@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-194940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933CEACD45F
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:28:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB39ACD3FE
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADA4B1885472
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:24:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C9CE3A436D
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D642F26B2A9;
-	Wed,  4 Jun 2025 01:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B6026B960;
+	Wed,  4 Jun 2025 01:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dnat4AMk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EeQjMlHz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFBD78F5E;
-	Wed,  4 Jun 2025 01:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C97E78F5E;
+	Wed,  4 Jun 2025 01:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999075; cv=none; b=Av1+McqdeBkRBA9AXFXr7kRagLRh1MXril+77+rmGm9Iu3Dde8MeeKUl7BqgqO7fPNI1iC7FnBhMialfl9kfE8jrZJYd3371MRMuKwrJij1dbbj8o446x9fE7PsjQ/uQHha+qNDldSQpo9uYO1KcVOFr5FBTbaTLNp7Zf8bZrg0=
+	t=1748999079; cv=none; b=vAQYtB96/MtWUAEMjf6+vKe1EUrZ4MQDOPglAVKVhThqujye4UbUD3aucx6uMv8lvHHeJvb14Zlz0kmHpsW/LOF8Cs1XiC48HuIyzP+7i6J4ugMqxgZ1+W3QHBcBFrdKSzXA1CCohFv3IZztkOCLoNv2vUtEzNAADZmN4Oz789o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999075; c=relaxed/simple;
-	bh=4XRD+Opj+tUl51aybXo6mYo6EJ7vLmIwTCRkF0j4bFQ=;
+	s=arc-20240116; t=1748999079; c=relaxed/simple;
+	bh=8/oeYAg5iJhzdeDooHApMEPgP64/nvnW+56QP4na5aU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FbuBV3LMXCBeZ82dBMxw1Vo8o+OsS6dUFdP9hCMGHgtrGIm68LthngZeB/9xCMiUqO3jSYtnFUL1CtDoda7RzFGpfEgpt4SiQuxjuPvyxLiLI4DCXOqaFW8JlXlj5YyRtXcNyZjAIa0e0GPG16H4IAl3LaviRL3bu+cFYWovcwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dnat4AMk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AB6FC4CEEF;
-	Wed,  4 Jun 2025 01:04:34 +0000 (UTC)
+	 MIME-Version; b=gTYZLuYtt8F1fgnNiuZdOWr7JSSD/+5YR7NaLjNWOkukB6WbhrkwVX/7rjdg6l4QFPgK87oriHPnkJkaXQJNKLDV7EC/9awwe4AN39mTKRpd5/fQgF/FIGuMTmPYAPOmA9YlqKqd2GQOGKLzUIX+6J53gaDykiMS6b15TyGKcVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EeQjMlHz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B81ACC4CEED;
+	Wed,  4 Jun 2025 01:04:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999075;
-	bh=4XRD+Opj+tUl51aybXo6mYo6EJ7vLmIwTCRkF0j4bFQ=;
+	s=k20201202; t=1748999079;
+	bh=8/oeYAg5iJhzdeDooHApMEPgP64/nvnW+56QP4na5aU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dnat4AMkqKrThYlgaJzn3SKJubMeQAHtP1/WEcO1YQ1k4ydKUvpQp4Ztb+MQS+znP
-	 sb9QePKsLZxPTn0BHuoDJgPmbptBh9vjPwxJiq+wWDgaQ29wZECz2bqsE0H9UXiGlo
-	 4HQ91prqnur+k+9lQOo5ke9jEz0oF1KeR1JEBuhnNqxYjBYiotNg9CAsztRIL2b/MC
-	 2Q0YqzjK9xZoMHmMZczzTU1CISNIw/D/YOHWLlU2h7Yn2C3jW3m9DSL7rUHz8AVA6J
-	 7ZRvpq9QMaXWr4BCGNdXQ1VJjL7o7tNIcbU1vsNxk4NrBnonHqrv1uvbeu8kxqUEtT
-	 OXbjrof/9X6KA==
+	b=EeQjMlHzjRwNvVeaLz4Ap9zZs2XA0GSzbQNmYqJOarwuJJjZDtpZVPOPAXXC51sWR
+	 ILfEPj27XadIWOMrCxofx7t7Bd6kqn2dhaMOQoOn8GdxzQiEA3tfZVlUWYc0lDt0gk
+	 RHKbwk7UXHh8YLs0zurty3q4+JDND0AJRiWFb4qGGB3guINssWNakE3OOxI1yNHCLN
+	 9pgr19Ece3MkuLNdC1Zr4FeUCbCUVNovJhES+3V1bJCePrL6BSsdaccD8Hv/UNpYXM
+	 8v5BZOESUzzc1387B3Henl/RC6iQSdzs/cvyJ2GAschNp9m310zJMkCAsP47mSZy17
+	 2PzZVElbeiUBg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Wei Wang <weiwan@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	David Ahern <dsahern@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	ncardwell@google.com,
 	davem@davemloft.net,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 16/46] tcp: fix initial tp->rcvq_space.space value for passive TS enabled flows
-Date: Tue,  3 Jun 2025 21:03:34 -0400
-Message-Id: <20250604010404.5109-16-sashal@kernel.org>
+	clrkwllms@kernel.org,
+	rostedt@goodmis.org,
+	netdev@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.1 18/46] ipv4/route: Use this_cpu_inc() for stats on PREEMPT_RT
+Date: Tue,  3 Jun 2025 21:03:36 -0400
+Message-Id: <20250604010404.5109-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604010404.5109-1-sashal@kernel.org>
 References: <20250604010404.5109-1-sashal@kernel.org>
@@ -67,101 +68,84 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.140
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-[ Upstream commit cd171461b90a2d2cf230943df60d580174633718 ]
+[ Upstream commit 1c0829788a6e6e165846b9bedd0b908ef16260b6 ]
 
-tcp_rcv_state_process() must tweak tp->advmss for TS enabled flows
-before the call to tcp_init_transfer() / tcp_init_buffer_space().
+The statistics are incremented with raw_cpu_inc() assuming it always
+happens with bottom half disabled. Without per-CPU locking in
+local_bh_disable() on PREEMPT_RT this is no longer true.
 
-Otherwise tp->rcvq_space.space is off by 120 bytes
-(TCP_INIT_CWND * TCPOLEN_TSTAMP_ALIGNED).
+Use this_cpu_inc() on PREEMPT_RT for the increment to not worry about
+preemption.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Wei Wang <weiwan@google.com>
-Link: https://patch.msgid.link/20250513193919.1089692-7-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Link: https://patch.msgid.link/20250512092736.229935-4-bigeasy@linutronix.de
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** This commit should be backported to stable kernel trees. ##
-Detailed Analysis ### Nature of the Fix This commit addresses a **subtle
-but significant bug** in the TCP receive buffer space initialization for
-passive (server-side) connections when TCP timestamps are enabled. The
-fix is a simple 2-line reordering that moves the `advmss` adjustment for
-timestamp options **before** the call to `tcp_init_transfer()`. ### The
-Problem 1. **Root Cause**: In `tcp_rcv_state_process()` for
-`TCP_SYN_RECV` state, the `tp->advmss` reduction for timestamp options
-(`TCPOLEN_TSTAMP_ALIGNED = 12 bytes`) was happening **after**
-`tcp_init_transfer()` was called. 2. **Impact**: Since
-`tcp_init_transfer()` calls `tcp_init_buffer_space()`, which initializes
-`tp->rcvq_space.space` using the formula: ```c tp->rcvq_space.space =
-min3(tp->rcv_ssthresh, tp->rcv_wnd, (u32)TCP_INIT_CWND linux
-tp->advmss); ``` The calculation was using an **unadjusted `advmss`
-value**, leading to a 120-byte overestimate: - `TCP_INIT_CWND (10) ×
-TCPOLEN_TSTAMP_ALIGNED (12) = 120 bytes` 3. **Consequence**: The
-`rcvq_space.space` field is critical for TCP receive buffer auto-tuning
-in `tcp_rcv_space_adjust()`, and this miscalculation could lead to
-suboptimal buffer management and performance issues. ### Why This Should
-Be Backported #### ✅ **Bug Fix Criteria Met**: 1. **Clear Bug**: This
-fixes a real initialization ordering bug that affects TCP performance 2.
-**User Impact**: Affects all passive TCP connections with timestamp
-options enabled (very common) 3. **Minimal Risk**: The fix is a simple
-2-line reordering with no functional changes 4. **Contained Scope**:
-Only affects the initialization path in `tcp_rcv_state_process()` #### ✅
-**Follows Stable Tree Rules**: 1. **Important**: TCP receive buffer
-tuning affects network performance for most connections 2. **Small &
-Contained**: The change moves just 2 lines of existing code 3. **No
-Regression Risk**: The fix corrects an obvious ordering error without
-introducing new logic 4. **No Architectural Changes**: No new features
-or major changes to TCP stack #### ✅ **Comparison with Similar
-Backported Commits**: The provided reference commits show a pattern of
-TCP receive buffer and `rcvq_space` related fixes being consistently
-backported: - Integer overflow fixes in `tcp_rcv_space_adjust()` ✅
-**Backported** - Data race fixes for `sysctl_tcp_moderate_rcvbuf` ✅
-**Backported** - MPTCP `rcv_space_init` fixes ✅ **Backported** -
-Timestamp handling in `tcp_rcv_space_adjust()` ✅ **Backported** This fix
-follows the exact same pattern: a small, surgical fix to TCP receive
-buffer initialization logic. ### Technical Verification Looking at the
-code change in `/home/sasha/linux/net/ipv4/tcp_input.c:6872-6873`, the
-fix simply moves: ```c if (tp->rx_opt.tstamp_ok) tp->advmss -=
-TCPOLEN_TSTAMP_ALIGNED; ``` from **after** `tcp_init_transfer()` to
-**before** it. This ensures that when `tcp_init_buffer_space()` is
-called within `tcp_init_transfer()`, it uses the correct timestamp-
-adjusted `advmss` value. The change is **safe, targeted, and addresses a
-clear functional bug** that affects TCP performance for a large class of
-connections. It meets all criteria for stable tree backporting.
+**Answer: YES** This commit should be backported to stable kernel trees
+based on the following analysis: ## Technical Analysis **The Issue:**
+The commit fixes a correctness bug in IPv4 routing statistics collection
+on PREEMPT_RT kernels. The `RT_CACHE_STAT_INC` macro uses
+`raw_cpu_inc()` which assumes preemption is disabled, but this
+assumption is violated on PREEMPT_RT systems where many previously non-
+preemptible contexts become preemptible. **Code Changes:** The fix is
+minimal and surgical: ```c #ifndef CONFIG_PREEMPT_RT #define
+RT_CACHE_STAT_INC(field) raw_cpu_inc(rt_cache_stat.field) #else #define
+RT_CACHE_STAT_INC(field) this_cpu_inc(rt_cache_stat.field) #endif ```
+This conditional compilation ensures that: - Non-PREEMPT_RT systems
+maintain existing performance with `raw_cpu_inc()` - PREEMPT_RT systems
+get correctness with `this_cpu_inc()` which includes implicit preemption
+protection ## Backport Justification **1. Follows Stable Tree
+Criteria:** - **Bug Fix:** Corrects statistics corruption on PREEMPT_RT
+systems - **Small and Contained:** Only 4 lines changed in a single
+macro definition - **Low Risk:** No behavioral change for non-PREEMPT_RT
+systems - **No Architectural Changes:** Simple conditional compilation
+approach **2. Consistent with Similar Commits:** The change follows the
+exact same pattern as Similar Commit #1 and #3 (both marked "Backport
+Status: YES"), which fix preemption-related issues in per-CPU
+statistics. Like those commits, this addresses scenarios where
+`__this_cpu_*` or `raw_cpu_*` operations are called from preemptible
+context on PREEMPT_RT. **3. Real User Impact:** - **Affected Systems:**
+PREEMPT_RT kernels with IPv4 routing (real-time systems, industrial
+applications) - **Symptoms:** Inaccurate routing statistics due to race
+conditions during CPU migration - **Debugging Impact:** Could mislead
+network troubleshooting efforts **4. Technical Correctness:** Race
+conditions can occur when a process is preempted and migrated to another
+CPU between reading the per-CPU pointer and incrementing the counter,
+leading to lost statistics updates. The `this_cpu_inc()` variant
+prevents this by ensuring atomic access to per-CPU data. **5. Minimal
+Risk Profile:** - No functional changes to packet forwarding - Zero
+impact on non-PREEMPT_RT systems - Follows established kernel patterns
+for PREEMPT_RT safety - No performance regression expected This is
+exactly the type of targeted correctness fix that stable trees are
+designed to include - it addresses a real bug affecting a specific
+subset of users with minimal risk to the broader user base.
 
- net/ipv4/tcp_input.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/ipv4/route.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 410a5b4189ea7..3757d35040a25 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6625,6 +6625,9 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 		if (!tp->srtt_us)
- 			tcp_synack_rtt_meas(sk, req);
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 4574dcba9f193..8701081010173 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -192,7 +192,11 @@ const __u8 ip_tos2prio[16] = {
+ EXPORT_SYMBOL(ip_tos2prio);
  
-+		if (tp->rx_opt.tstamp_ok)
-+			tp->advmss -= TCPOLEN_TSTAMP_ALIGNED;
-+
- 		if (req) {
- 			tcp_rcv_synrecv_state_fastopen(sk);
- 		} else {
-@@ -6649,9 +6652,6 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 		tp->snd_wnd = ntohs(th->window) << tp->rx_opt.snd_wscale;
- 		tcp_init_wl(tp, TCP_SKB_CB(skb)->seq);
+ static DEFINE_PER_CPU(struct rt_cache_stat, rt_cache_stat);
++#ifndef CONFIG_PREEMPT_RT
+ #define RT_CACHE_STAT_INC(field) raw_cpu_inc(rt_cache_stat.field)
++#else
++#define RT_CACHE_STAT_INC(field) this_cpu_inc(rt_cache_stat.field)
++#endif
  
--		if (tp->rx_opt.tstamp_ok)
--			tp->advmss -= TCPOLEN_TSTAMP_ALIGNED;
--
- 		if (!inet_csk(sk)->icsk_ca_ops->cong_control)
- 			tcp_update_pacing_rate(sk);
- 
+ #ifdef CONFIG_PROC_FS
+ static void *rt_cache_seq_start(struct seq_file *seq, loff_t *pos)
 -- 
 2.39.5
 
