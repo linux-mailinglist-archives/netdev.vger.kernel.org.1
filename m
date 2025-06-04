@@ -1,66 +1,58 @@
-Return-Path: <netdev+bounces-194872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F64ACD170
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 02:56:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE7EACD3A0
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1BC11788EA
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 00:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBC03188D1D1
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56D215689A;
-	Wed,  4 Jun 2025 00:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3AB1862A;
+	Wed,  4 Jun 2025 00:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rZd69Eq0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8TJvwNv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5CB1553AA;
-	Wed,  4 Jun 2025 00:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40C4111BF;
+	Wed,  4 Jun 2025 00:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748998348; cv=none; b=KROYNMSZtGE3DaJ80dNo5AxepnzhjiQgPhijn6B2SS/QxZwJdJCrcycETp5t5V9Ht2W0FAZil9Pm7ZZY9TtPGEc1zNzVl8IKp0XDCw2dv3e8m0ULlrrCEP85QMSvRHa2fGo4v0C9K1zdma125bWkyQSWZysvFib8qztHDB4dHLQ=
+	t=1748998369; cv=none; b=YbloY+r1Qc7MwErWdG1YtAN1N/sIYnv8vJBfnHbzDR41rp41JlmlozQZuVpjFe+VK2s4YWIXYQjis1wEMNx0Srdx3kwf0syYAabzrhtuWqvp4mXfDdTXI/0hfoYglbiMdiXFnDILv3ikU51qKRjE7/wFf+0tFdpX4MpN2GjWsac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748998348; c=relaxed/simple;
-	bh=pI5EtjIR+Gd1ZUGKs+hQPSxBJfgW9d78S5kjWynaYTw=;
+	s=arc-20240116; t=1748998369; c=relaxed/simple;
+	bh=WqTxG+GTFwkX5t72aDNMBFs7Y7N43jDTPU21dIgUKMg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KmYmG3rO0MPpk14N5UNKwY+e+UZEM2lH2Iudfqkdo99VucPSrDPbJfD/lAtVdevTovroNSF8qv36b77L0rX6upTtJcun6i9KLwyOhO71Z3GuzedeBRy5ar3TwxE42eA98WX23UbRYqrg8Pt89Czw7u5ORt01ohPsf60UliCUsWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rZd69Eq0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD6B9C4CEED;
-	Wed,  4 Jun 2025 00:52:26 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Rux/omU1r/RStwpSqi23InhM2mkHOgn7G9DzotSWbsh1jmuyl5xvjkz2HlIPRGQ0OGtvYxLNXgbzycc2YJEmNlQK5AOtpM1LsG3qmtOPeemtTnewuqULGMgs1JEnqd4hVAGEuWC+0AJQhiiHCCrYb0M9uVuh5f0Y1GWeV7grqnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8TJvwNv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8933C4CEED;
+	Wed,  4 Jun 2025 00:52:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748998348;
-	bh=pI5EtjIR+Gd1ZUGKs+hQPSxBJfgW9d78S5kjWynaYTw=;
+	s=k20201202; t=1748998368;
+	bh=WqTxG+GTFwkX5t72aDNMBFs7Y7N43jDTPU21dIgUKMg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rZd69Eq0HIUAcamFW9nOFHGQ4SW7mY54ZW1kFKtNR6/hNGCsz4ARbTCIGeUrCkGci
-	 kxe+TaT87yKP5B+40iJGefsBElvuU4jLxfAk97WxJM4CPsjanvmXnLOS1wRml37bgc
-	 VodOSRtf3EBC9JDfhllOEsZLYnvRUdN8g+XJMU+MRbeuyXPYLVFpQFYG4d3vEYyizB
-	 S/QW6e6vxnOFbgLKSblbbqrlyygss/1+uwvk1bOiA7XzKQzb7+djK9Daap7FbGF+4U
-	 K8V9L1YZel0np7SzIg3wqlVxqApIQ+l+0DiqF5Cl0vfVafc7/SlcGbblGyMIzrOv+o
-	 T8WUWlECg6UDg==
+	b=J8TJvwNvqN27N9FqUeC/eFXZ27xmPQsypx1toBLhrKZvxnGd7IhDpGBATq6Ba8bAw
+	 eIfIzjN4ViVuD5RoivoR0kn/QPb1DOQhFIDpvy139PMXDIeohefoBzyHTO+NHHB7BX
+	 Tbpz1jTVZdv015ZldmxZOQJKK2vUJc223x+X5fUGGaaXXm1CjpeSHCBEThGcgieVvw
+	 cd02e8ZTVo8hLSXNfKOfdFLvuU4y822XcaJbt5mlo3E2dWb4XjqJhXuIaGYBs2YLMP
+	 HyrQAOJ1/mas25EujRJgdgW+2PKmwb30C3i0VitZ8WNHirmxXs3igi8BnqFAWElX6q
+	 HzTS9GVMbVozw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Jason Xing <kernelxing@tencent.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	0x1207@gmail.com,
-	andrew@lunn.ch,
-	pabeni@redhat.com,
-	hayashi.kunihiko@socionext.com,
-	vladimir.oltean@nxp.com,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.15 049/118] net: stmmac: generate software timestamp just before the doorbell
-Date: Tue,  3 Jun 2025 20:49:40 -0400
-Message-Id: <20250604005049.4147522-49-sashal@kernel.org>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 054/118] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
+Date: Tue,  3 Jun 2025 20:49:45 -0400
+Message-Id: <20250604005049.4147522-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604005049.4147522-1-sashal@kernel.org>
 References: <20250604005049.4147522-1-sashal@kernel.org>
@@ -73,108 +65,81 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.15
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-[ Upstream commit 33d4cc81fcd930fdbcca7ac9e8959225cbec0a5e ]
+[ Upstream commit b86bcfee30576b752302c55693fff97242b35dfd ]
 
-Make sure the call of skb_tx_timestamp is as close as possbile to the
-doorbell.
-
-The patch also adjusts the order of setting SKBTX_IN_PROGRESS and
-generate software timestamp so that without SOF_TIMESTAMPING_OPT_TX_SWHW
-being set the software and hardware timestamps will not appear in the
-error queue of socket nearly at the same time (Please see __skb_tstamp_tx()).
+As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
+SOFTWARE flag is surely needed when users are trying to get timestamp
+information.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Link: https://patch.msgid.link/20250510134812.48199-4-kerneljasonxing@gmail.com
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250510093442.79711-1-kerneljasonxing@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-Based on my comprehensive analysis, here is my assessment: **YES** This
-commit should be backported to stable kernel trees. Here's my detailed
-analysis: ## Code Analysis The commit moves `skb_tx_timestamp(skb)`
-calls to execute immediately before the hardware "doorbell" operations:
-1. **In `stmmac_tso_xmit()`**: Moves `skb_tx_timestamp(skb)` from line
-4483 to line 4532, placing it right before
-`stmmac_flush_tx_descriptors()` 2. **In `stmmac_xmit()`**: Moves
-`skb_tx_timestamp(skb)` from line 4759 to line 4823, placing it between
-`stmmac_enable_dma_transmission()` and `stmmac_flush_tx_descriptors()`
-## Why This Should Be Backported ### 1. **Follows Established Kernel
-Patterns** This change aligns with the kernel documentation requirement
-that drivers "call skb_tx_timestamp() as close to passing sk_buff to
-hardware as possible." It matches the exact pattern used in the NFP
-driver fix (Similar Commit #5) that was marked "Backport Status: YES" -
-both move `skb_tx_timestamp()` immediately before the hardware doorbell
-operation. ### 2. **Addresses Real Timing Accuracy Issues** The original
-code creates a problematic gap between when the software timestamp is
-recorded and when the packet is actually handed to hardware. This
-affects: - PTP (Precision Time Protocol) synchronization accuracy -
-Network performance debugging tools that rely on precise timestamps -
-Applications using SOF_TIMESTAMPING_OPT_TX_SWHW that need correlated
-SW/HW timestamps ### 3. **Fixes Race Condition** The commit message
-specifically mentions reordering to prevent software and hardware
-timestamps from appearing in the socket error queue "nearly at the same
-time" without SOF_TIMESTAMPING_OPT_TX_SWHW. This indicates it addresses
-a race condition in the timestamp handling logic in `__skb_tstamp_tx()`.
-### 4. **Minimal Risk of Regression** This is a simple reordering of
-existing function calls with no new functionality or complex logic
-changes. The transformation is identical to multiple other network
-drivers that have been successfully backported. ### 5. **Important for
-Embedded Systems** The STMMAC driver is widely used in embedded systems
-and SoCs where precise timing is often critical for industrial
-applications, making accurate timestamping particularly important. ###
-6. **Matches Reference Patterns** The Similar Commit #5 (NFP driver)
-with "Backport Status: YES" shows this exact same type of fix - moving
-`skb_tx_timestamp()` to just before the hardware doorbell - was deemed
-appropriate for backporting. The STMMAC commit follows this same proven
-pattern. This commit fixes a legitimate timing/correctness issue with
-minimal risk and follows established patterns that have been approved
-for stable backporting in other drivers.
+Perfect! Now I can see that `skb_tx_timestamp(skb)` is called in the
+`mlx4_en_xmit()` function, which is the main transmit function. This
+confirms that the mlx4 driver does implement software timestamping. Now
+let me compare this to the similar commits to see the pattern: **YES**
+This commit should be backported to stable kernel trees. **Extensive
+Explanation:** This commit addresses a clear inconsistency bug where the
+mlx4 driver implements software timestamping functionality but fails to
+advertise this capability to userspace through the ethtool timestamping
+info interface. **Analysis of the fix:** 1. **The Problem**: The mlx4
+driver calls `skb_tx_timestamp(skb)` in `mlx4_en_xmit()` at line 1091 of
+`/drivers/net/ethernet/mellanox/mlx4/en_tx.c`, which means it properly
+implements software TX timestamping. However, in
+`mlx4_en_get_ts_info()`, it only advertises hardware timestamping
+capabilities (`SOF_TIMESTAMPING_TX_HARDWARE`,
+`SOF_TIMESTAMPING_RX_HARDWARE`, `SOF_TIMESTAMPING_RAW_HARDWARE`) but
+omits the `SOF_TIMESTAMPING_TX_SOFTWARE` flag. 2. **The Fix**: The
+change adds a single line `SOF_TIMESTAMPING_TX_SOFTWARE |` to the
+`info->so_timestamping` field when hardware timestamping is supported,
+correctly advertising both hardware and software timestamping
+capabilities. 3. **Impact**: This is a user-facing API correctness
+issue. Applications checking timestamping capabilities via ethtool would
+incorrectly believe software timestamping is not supported, even though
+the driver implements it. **Comparison with similar commits:** -
+**Similar Commit #1 (YES)**: Also fixed a timestamping bug in mlx4,
+showing these are important fixes - **Similar Commit #3 (YES)**: Fixed
+incorrect timestamping capability reporting in mlx5 by removing false
+software timestamping indication - **Similar Commit #5 (YES)**: Fixed
+timestamping capabilities reporting using wrong BIT() macro in mlx5 The
+pattern shows that timestamping capability reporting bugs are
+consistently considered backport-worthy because they affect user-visible
+API behavior. **Backport Criteria Assessment:** ✅ **Fixes a user-
+affecting bug**: Applications cannot detect software timestamping
+support ✅ **Small, contained change**: Single line addition with no
+functional logic changes ✅ **No architectural changes**: Only fixes
+capability reporting ✅ **Low regression risk**: Only adds a missing
+flag, doesn't change driver behavior ✅ **Clear side effects**: None
+beyond correctly advertising existing functionality ✅ **Follows stable
+rules**: Important API correctness fix with minimal risk The fix is
+identical in nature to Similar Commit #3 (marked YES) but in reverse -
+where mlx5 removed false software timestamping advertisement, this adds
+the missing software timestamping advertisement for mlx4 where it's
+actually implemented.
 
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 59d07d0d3369d..6c90a88f7b0ea 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4488,8 +4488,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (priv->sarc_type)
- 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
- 
--	skb_tx_timestamp(skb);
--
- 	if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
- 		     priv->hwts_tx_en)) {
- 		/* declare that device is doing timestamping */
-@@ -4522,6 +4520,7 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	}
- 
- 	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
-+	skb_tx_timestamp(skb);
- 
- 	stmmac_flush_tx_descriptors(priv, queue);
- 	stmmac_tx_timer_arm(priv, queue);
-@@ -4765,8 +4764,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (priv->sarc_type)
- 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
- 
--	skb_tx_timestamp(skb);
--
- 	/* Ready to fill the first descriptor and set the OWN bit w/o any
- 	 * problems because all the descriptors are actually ready to be
- 	 * passed to the DMA engine.
-@@ -4813,7 +4810,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
- 
- 	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
--
-+	skb_tx_timestamp(skb);
- 	stmmac_flush_tx_descriptors(priv, queue);
- 	stmmac_tx_timer_arm(priv, queue);
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+index cd17a3f4faf83..a68cd3f0304c6 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+@@ -1897,6 +1897,7 @@ static int mlx4_en_get_ts_info(struct net_device *dev,
+ 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS) {
+ 		info->so_timestamping |=
+ 			SOF_TIMESTAMPING_TX_HARDWARE |
++			SOF_TIMESTAMPING_TX_SOFTWARE |
+ 			SOF_TIMESTAMPING_RX_HARDWARE |
+ 			SOF_TIMESTAMPING_RAW_HARDWARE;
  
 -- 
 2.39.5
