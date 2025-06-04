@@ -1,146 +1,245 @@
-Return-Path: <netdev+bounces-195018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2DF7ACD7DA
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:32:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485FCACD7FB
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FE643A48FC
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:32:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D750D3A565D
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3F62AF0A;
-	Wed,  4 Jun 2025 06:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8E81EEA5F;
+	Wed,  4 Jun 2025 06:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLnpojqS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="POdXv3Aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0781C14286;
-	Wed,  4 Jun 2025 06:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A6646447;
+	Wed,  4 Jun 2025 06:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749018743; cv=none; b=tZl39blWYqks1r2m/5P+c1T2bCYax9GHzDEYtzsIm5mPYtAZjiA1QmlzKB4NRMaPqvrj+k46JNb/5jLHoDGTRoo5qLbhGUqw77tmItYTxAdy4NE9QuUtcOioAxNZ6NcLQp9J2g/b3yM5Vs0IdyDzCw9yppjMexKm4jROV72TZbY=
+	t=1749019408; cv=none; b=Le96+36qNEDBEErUOFxc2J0uuLwPNyqQ4644TVaqFNdb9yza16OYxBKxLZX+hTxszj8ec2FtCmKqxz90QqzrvUIXN3XM0T2Oej4B8pcBtFnQsat/n7R7LW0TjIfds2FXiLHx+KJnCdPGe3jypjS2MuoxhazXoEG4mP8Pqav6wFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749018743; c=relaxed/simple;
-	bh=HrUA/493NEN9uE8zA3xiNFXWRTC6qwWQJcNULV0EPUM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GIhMiJkvnCka6sxGrY/BDtTjDfE2FueiLvb0urTIGhiHZflob5tNRs8tUJvlGpV64w+53ZyOkFhGqsc7/Ft2gaVTzbGtuvAb8+Mp0tFRLQRDkn8uEGBFkagdomTOBHvXjtGia81qpfdTKqDrChJFXd+qUGWbS8mbm2POmEbJ4Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLnpojqS; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-70e3ac940ecso47977597b3.2;
-        Tue, 03 Jun 2025 23:32:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749018741; x=1749623541; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ms+LCbsutb8KW48WzOhQS6Y9P4iFjvEFRghkClssGZo=;
-        b=nLnpojqSkZHIg8ePZE0xrGh+cQtSWlW/nqmL5rU+83FPxMGyHQqUK6GtpQrruVeV/u
-         EttHbACSdlyqYgK7kKMxMTqTdM5yqhKUiiULlbMbQlzNrMApnVwu2MbvQYY9cBgaRqZV
-         LGCrR+qYtaErIBkAWY7+5F+kcxgI6NX6OTvfBZ/84dbzFUpL3K0Ho3a4YIqVB8F1QreW
-         6HN3EiFXdc2hpLrQY9V6coGva4ltD26fF4FSy9fIglyHP4rZDd733+Sj6ryLYHGdBBI5
-         /lpk2Gs7IVVvRzqzIvAdjaX5is+Y3F6HylxGAIMsLv1mm8ERfVZ/rNfE2gIgFfbW/TQg
-         xSGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749018741; x=1749623541;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ms+LCbsutb8KW48WzOhQS6Y9P4iFjvEFRghkClssGZo=;
-        b=jhthNHC3IX6sIHmd7TESnU2abrmARdDfKZdJ3wKQZ5ChRbXulNT8+WzNIRoPOT1W6J
-         95Yj1bmT+6WOGLRrjCMZsw7E/8Z0VF2TLHzKJW2fWUBw6kwAuB8fuoi512ArxCSPQ0O+
-         kZb1Hd5Fx/Ollui8bNGR6NlQdaUt3q9T/ReItfiyoDrmIPKgL5K8V0dW0Jn/eH0EKAbV
-         plujcSutqEhqkh15OtZWfTXURcm62jCHEMGFymUX5qMZy2lIet41lKlmht/eIoasPW/l
-         /+WNsxowZRwUxJjb9zGnOUeyceN3wCf7RfKZoe5rx1KlzjAWz5ZpuVduyxG5fJjETE2q
-         F2Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqNpjBRXWyhC7u1IO5v4gHu5+/YEJ6sn2/PuZs+TvyNdB0aDG9rJpp/Gk3gAI/EO3920hw1jEZ@vger.kernel.org, AJvYcCVLfqpnTznX1W9FFVt3kSGH0RjHhZgE4Tu3QXNpYaWHVuugjwB+u4W7UVor5y6HMxzAhP2xi0FTCUw9tAc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7CEjlxmp1uh+0MxfxzevqI6gQ64c9GaxFeHDIMmqWdvEhyX6e
-	oGuR3aRcDkRxaQNORfqkXgV7c51fJmb3EhlB6v1maTIb4BgoGJY/OG26m81QBGwhnvTMm82chWc
-	JXXei7nnDh6dadoJ3hCxbETkYDUbXWkFHXg==
-X-Gm-Gg: ASbGncsfUyQLNxNgcjzUtTrgwpEQkGe+RErEzzJL8V0kzj6DpJ1zVorx086x3c3IybY
-	SroSORO9Ofi8YpR98R0xxnfmuIpP16myy1Rl7kIcX2RfqxVTqdqA2YbJiZHr3HQBY0NoZP+Jc+A
-	IYGtuSDpwzHjJ+cG8q4xmvIJS3uHsk7wI=
-X-Google-Smtp-Source: AGHT+IFS2DmutEXJW+Z0K5aNrE2XFe43CoGAyxSeKa7W9mRcsqTTn2m/46GhQsIhF2o8C0f08KVkuY4Pmfa5btILNwI=
-X-Received: by 2002:a05:690c:46c3:b0:70d:ed5d:b4b2 with SMTP id
- 00721157ae682-710d9a70674mr21676607b3.13.1749018740846; Tue, 03 Jun 2025
- 23:32:20 -0700 (PDT)
+	s=arc-20240116; t=1749019408; c=relaxed/simple;
+	bh=FNpeV30QqdCaEMh4xg3sPuA/kgFP1i6pImcSeIWxbIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K4HcQ6GzJ2qLrdaF/8erSuFBT7V8eP4yBmM3su5UY1MmlyvD4IreJkX+pOxnK951IudCs4t+1H2v1sDBFWCKXgkch8haziBblTm0rhRy5meI7WsGRv9Cn+z7OGrjVYFKcZbzKK9Qr8+szqcNRy8S2zRYmwQTKhyAmjX4NZqpDLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=POdXv3Aa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 668F2C4CEE7;
+	Wed,  4 Jun 2025 06:43:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749019408;
+	bh=FNpeV30QqdCaEMh4xg3sPuA/kgFP1i6pImcSeIWxbIY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=POdXv3AaTkvdfCAWcLJC3VmbhE1vhabB4Ibpamnn1iA6tY56SRQL7v+gFU+SaAkF6
+	 /7d/QydXvigoxApnKYdEoDW87nENtVlIlSp9NOCTSxnIfvqYQH+ObqRey3STGfxKac
+	 LkNS2f7oZEHUTAoO9MF1aYbF7QL0m8oP6XFmzL6L5cEzbhA+Hqi1MfxWLKkJnI1Pie
+	 J5opVMj1W5mvMIr+sXQcM3qQVYA9PQWw1Q9d0yX28QjYsIsrLFRpVzzmDbh/fSr25V
+	 n7do0GUGv8uUo/+5oeRYZfwuEOskybppBVyBBdb/tMd1RMqcEvPM3qeaUQNLjzKsLw
+	 AHe2ypgzG7sOw==
+Message-ID: <c4316518-01d2-45f2-94d8-40ed2028689b@kernel.org>
+Date: Wed, 4 Jun 2025 08:43:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603204858.72402-1-noltari@gmail.com> <20250603204858.72402-2-noltari@gmail.com>
- <507a09f6-8b6e-4800-8c90-f2b1662cafa2@broadcom.com>
-In-Reply-To: <507a09f6-8b6e-4800-8c90-f2b1662cafa2@broadcom.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Wed, 4 Jun 2025 08:32:09 +0200
-X-Gm-Features: AX0GCFsyMq2aZf5NHYqZfwT6MTm2ZeUU_GTj_9sxXkTzEzNrK3kVErt9rYfPTA0
-Message-ID: <CAOiHx==HkOqi4TY6v7bdzWoHEQxO4Q4=HH8kWe7hJiEdLTy3-g@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v2 01/10] net: dsa: b53: add support for FDB
- operations on 5325/5365
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
-	andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vivien.didelot@gmail.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 1/2] dt-bindings: net: pse-pd: Describe the
+ LTC4266 PSE chipset
+To: Kyle Swenson <kyle.swenson@est.tech>,
+ "o.rempel@pengutronix.de" <o.rempel@pengutronix.de>,
+ "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+ "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+References: <20250603230422.2553046-1-kyle.swenson@est.tech>
+ <20250603230422.2553046-2-kyle.swenson@est.tech>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250603230422.2553046-2-kyle.swenson@est.tech>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 4, 2025 at 12:10=E2=80=AFAM Florian Fainelli
-<florian.fainelli@broadcom.com> wrote:
->
-> On 6/3/25 13:48, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
-> > From: Florian Fainelli <f.fainelli@gmail.com>
-> >
-> > BCM5325 and BCM5365 are part of a much older generation of switches whi=
-ch,
-> > due to their limited number of ports and VLAN entries (up to 256) allow=
-ed
-> > a single 64-bit register to hold a full ARL entry.
-> > This requires a little bit of massaging when reading, writing and
-> > converting ARL entries in both directions.
-> >
-> > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
-> > ---
->
-> [snip]
->
-> >   static int b53_arl_op(struct b53_device *dev, int op, int port,
-> >                     const unsigned char *addr, u16 vid, bool is_valid)
-> >   {
-> > @@ -1795,14 +1834,18 @@ static int b53_arl_op(struct b53_device *dev, i=
-nt op, int port,
-> >
-> >       /* Perform a read for the given MAC and VID */
-> >       b53_write48(dev, B53_ARLIO_PAGE, B53_MAC_ADDR_IDX, mac);
-> > -     b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
-> > +     if (!is5325(dev))
-> > +             b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
->
-> I used the 5325M-DS113-RDS datasheet for this code initially but the
-> 5325E-DS14-R datasheet shows that this register is defined. It's not
-> clear to me how to differentiate the two kinds of switches. The 5325M
-> would report itself as:
->
-> 0x00406330
->
-> in the integrated PHY PHYSID1/2 registers, whereas a 5325E would report
-> itself as 0x0143bc30. Maybe we can use that to key off the very first
-> generation 5325 switches?
+On 04/06/2025 01:04, Kyle Swenson wrote:
+> +allOf:
+> +  - $ref: pse-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - lltc,ltc4266
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  '#pse-cells':
+> +    const: 1
+> +
+> +  reset-gpios:
+> +    maxItems: 1
+> +
+> +  channels:
+> +
 
-According to the product brief and other documents BCM5325M does not
-support 802.1Q VLANs, which would explain the missing register
-descriptions. It does have 2k ARL entries compared to 1k for the 5325E
-though, so I now see where that value comes from.
+Drop blank line
 
-If it really doesn't support 802.1Q, then checking if related
-registers are writable might also work.
+> +    description: This parameter describes the mapping between the logical ports
+> +      on the PSE controller and the physical ports.
 
-Jonas
+Move description after additionalProperties, so entire block is together.
+
+> +
+
+> +    type: object
+> +
+Drop blank line
+
+
+> +    additionalProperties: false
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +
+> +      "#size-cells":
+> +        const: 0
+> +
+> +
+
+Only one blank line
+
+> +    patternProperties:
+> +      '^channel@[0-3]$':
+> +        type: object
+> +        additionalProperties: false
+> +
+> +        properties:
+> +          reg:
+> +            maxItems: 1
+> +
+> +          sense-resistor-micro-ohms:
+> +            description: Sense resistor connected to the channel's MOSFET, used
+> +              for current measurement for overcurrent detection.
+> +            enum: [250000, 500000]
+> +
+> +        required:
+> +          - reg
+> +
+> +    required:
+> +      - "#address-cells"
+
+Keep consistent quotes, either ' or "
+
+> +      - "#size-cells"
+> +
+> +unevaluatedProperties: false
+
+This goes after required block
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +examples:
+> +  - |
+> +    i2c {
+> +      #address-cells = <1>;
+> +      #size-cells = <0>;
+> +
+> +      ethernet-pse@2f {
+> +        compatible = "lltc,ltc4266";
+> +        status = "okay";
+
+Drop
+
+> +
+
+Drop blank line
+
+
+> +        reg = <0x2f>;
+> +
+> +        channels {
+> +          #address-cells = <1>;
+> +          #size-cells = <0>;
+> +
+> +          phys0: channel@0 {
+> +            reg = <0>;
+> +          };
+> +
+> +          phys1: channel@1 {
+> +            reg = <1>;
+> +          };
+> +
+> +          phys2: channel@2 {
+> +            reg = <2>;
+> +          };
+> +
+> +          phys3: channel@3 {
+> +            reg = <3>;
+> +          };
+> +        };
+
+Blank line... you really folllow entirely different style :/
+
+
+
+Best regards,
+Krzysztof
 
