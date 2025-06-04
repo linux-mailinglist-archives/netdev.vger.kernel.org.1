@@ -1,116 +1,150 @@
-Return-Path: <netdev+bounces-195033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F510ACD95A
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:11:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28E0EACD950
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:09:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB331885CE7
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:08:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1C0D7A33FE
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 08:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAB3288522;
-	Wed,  4 Jun 2025 08:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IGlr3/M+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F8F28B418;
+	Wed,  4 Jun 2025 08:09:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAB028137A;
-	Wed,  4 Jun 2025 08:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEEB1B4240;
+	Wed,  4 Jun 2025 08:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749024480; cv=none; b=Yj3k1uA9TnYvRp23DZ0zVl5RZLpNbnEPvS/zl2wq0gJnM+pDaQMYPNcffFNWQEoS3zOKj2RcXuRelVCZ5SMDfqej/pmOjXDabFqRrx8qYRz1bLTFxGq8ZB8BAbphPw8Yce5YfcqH3FhwOxzJpNEbxnmmotahgPYGPS0Pf2uy0Gw=
+	t=1749024550; cv=none; b=alMASCalChIlwogrqqDDZt6Vl01AH0wZeBd5szFCTSKNYmPH512rNS/13H0hSNVj6U06NVMGTIbD35dTF/440ooB6lzJuCJA2ib76E/0yClAVZNqUdg473fEeSRk/Q4jtAOxkrEO3MVaLtGtTgjUmZrgeoQfnv4BOLrevNHglYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749024480; c=relaxed/simple;
-	bh=/7JQPneGSdMcZBQxQyUWbhwLUGRX3LY+MRtNfc1CRS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AgOE+8UVR9UVmUDychEwsHtV8KPem23o2N6Fz/UB6/s1qOM9Y3TXgjLu/Gwit0Db6CU1DiD8mAH+zRT7ZuUENLbDII7Ok8cdZ7YXRxMWrwJq+sMgBsbT3oemdB4lcVzfUbm5WNS3k4N1nlp00EesM2fx968IDzb3F5vGDnzpCFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IGlr3/M+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+Bpzrm16WN6oSaQuwLtYmFyc8WV8CsH8T7lwcJTKxAw=; b=IGlr3/M+u/1r5P2aqJThWvquCu
-	OsYWJPLLVhBzFkejTLaGHl9pQ1vnUJdE1iFdHuXwSrfbOYpRboncUFhLXX8GBAeA+S9RvLwS0G/TI
-	0A/UTF0d70Wz1+73Y2wmlgfdGo3xjl0/CcDpNl8G6OlH3mbelHmy0Pw9Bg4XC6PqQBZHy4g7dyOnJ
-	HHc+wck/2Jrvohq4949FEKby8MA4dcuJNoWdZdEmm0vSgpJ0Shl2NotOp0OcdzSZfjmj6qTsBqOvp
-	J0bnLbe8glPR+f7Woe9wfHLBIPIqOnCfjgG0GJAwCo3kuNMnZ698xO2CHQ3oTtzUFSe93/mlAl635
-	7VRjuxWg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46960)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uMj9v-0006xS-2n;
-	Wed, 04 Jun 2025 09:07:39 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uMj9o-00010z-2v;
-	Wed, 04 Jun 2025 09:07:32 +0100
-Date: Wed, 4 Jun 2025 09:07:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"xiaolei.wang@windriver.com" <xiaolei.wang@windriver.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: Re: [PATCH v2 net] net: phy: clear phydev->devlink when the link is
- deleted
-Message-ID: <aD_-xLBCswtemwee@shell.armlinux.org.uk>
-References: <20250523083759.3741168-1-wei.fang@nxp.com>
- <8b947cec-f559-40b4-a0e0-7a506fd89341@gmail.com>
- <d696a426-40bb-4c1a-b42d-990fb690de5e@quicinc.com>
- <PAXPR04MB85107D8AB628CC9814C9B230886CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1749024550; c=relaxed/simple;
+	bh=13cATS1c3OEXoHR24+vaOerFjz8R/1zsN0Fw1cBeNAA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IAR0jr3WW4+nQZ7EPw72wy9e2Tm6A121mWuHRmoJgzU4d/RPnSCfCs1cuFnLfiRNPbjemn7sqMCM3hR9/iN1YlSdrqFqiBbjgRXfRXj8t/Os7F09QOq63nKGpeYZ1hnWtMYeC/RxR5Q5Xn7rYyOoRKBDMcb+uiuthYVM/n0phJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bC0Vs16bsz6DKsL;
+	Wed,  4 Jun 2025 16:05:09 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1910A1400D9;
+	Wed,  4 Jun 2025 16:09:04 +0800 (CST)
+Received: from localhost (10.202.227.76) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 4 Jun
+ 2025 10:09:03 +0200
+Date: Wed, 4 Jun 2025 09:09:06 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Dan Williams <dan.j.williams@intel.com>
+CC: Alejandro Lucero Palau <alucerop@amd.com>,
+	<alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Edward Cree <ecree.xilinx@gmail.com>
+Subject: Re: [PATCH v16 02/22] sfc: add cxl support
+Message-ID: <20250604090906.000071ad@huawei.com>
+In-Reply-To: <682f7ddf1f0b9_3e70100fb@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250514132743.523469-1-alejandro.lucero-palau@amd.com>
+	<20250514132743.523469-3-alejandro.lucero-palau@amd.com>
+	<682c3129d6a47_2b1610070@dwillia2-mobl4.notmuch>
+	<172834c6-0cc7-479b-be04-5ccd5cf8aae0@amd.com>
+	<682e09813a374_1626e100e@dwillia2-xfh.jf.intel.com.notmuch>
+	<8a993411-26db-44c6-954c-e58eb12f9d82@amd.com>
+	<682f7ddf1f0b9_3e70100fb@dwillia2-xfh.jf.intel.com.notmuch>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB85107D8AB628CC9814C9B230886CA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, Jun 04, 2025 at 06:00:54AM +0000, Wei Fang wrote:
-> I think this issue is also introduced by the commit bc66fa87d4fd
-> ("net: phy: Add link between phy dev and mac dev"). I suggested
-> to change the DL_FLAG_STATELESS flag to
-> DL_FLAG_AUTOREMOVE_SUPPLIER to solve this issue, so that
-> the consumer (MAC controller) driver will be automatically removed
-> when the link is removed. The changes are as follows.
+On Thu, 22 May 2025 12:41:19 -0700
+Dan Williams <dan.j.williams@intel.com> wrote:
 
-I suspect this still has problems. This is fine if the PHY device is
-going away and as you say device_del() is called.
+> Alejandro Lucero Palau wrote:
+> >=20
+> > On 5/21/25 18:12, Dan Williams wrote: =20
+> > > Alejandro Lucero Palau wrote:
+> > > [..] =20
+> > >>>> +void efx_cxl_exit(struct efx_probe_data *probe_data)
+> > >>>> +{ =20
+> > >>> So this is empty which means it leaks the cxl_dev_state_create()
+> > >>> allocation, right? =20
+> > >>
+> > >> Yes, because I was wrongly relying on devres ...
+> > >>
+> > >>
+> > >> Previous patchsets were doing the explicit release here.
+> > >>
+> > >>
+> > >> Your suggestion below relies on adding more awareness of cxl into
+> > >> generic efx code, what we want to avoid using the specific efx_cxl.*=
+ files.
+> > >>
+> > >> As I mentioned in patch 1, I think the right thing to do is to add
+> > >> devres for cxl_dev_state_create. =20
+> > > ...but I thought netdev is anti-devres? I am ok having a
+> > > devm_cxl_dev_state_create() alongside a "manual" cxl_dev_state_create=
+()
+> > > if that is the case. =20
+> >=20
+> >=20
+> > But a netdev is using the CXL API where devres is being used already.=20
+> > AFAIK, netdev maintainers prefer to not use devres by netdev drivers,=20
+> > but I do not think they can impose their view to external API, mainly=20
+> > when other driver types could likely also make use of it in the future.=
+ =20
+>=20
+> From the CXL perspective I am neutral. As long as the parallel manual
+> interfaces arrange to undo everything it "should just work (TM)". You
+> would need to create the manual version of devm_cxl_add_memdev(), and
+> audit that the paired cxl_del_memdev() does not result in any cxl_core
+> internal devres events to leak past the ->remove() event for the
+> accelerator driver.
 
-However, you need to consider the case where a MAC driver attaches the
-PHY during .ndo_open and releases it during .ndo_release. These will
-happen multiple times.
+Maybe look at wrapping the CXL calls up in a devres group.  Those
+are sometimes useful for cases where we need to wind all devm stuff
+down at a particular point in a remove flow. Might allow us to
+have devm_cxl_add_memdev() wrapped up by cxl_add_memdev() and
+cxl_del_memdev() or versions of those in the the net driver.
+Whether that group management sits in the network driver or is in
+CXL helpers is an open question and might be refined over time.
 
-Each time the MAC driver attaches to the PHY via .ndo_open, we will
-call device_link_add(), but the device link will not be removed when
-.ndo_release is called.
+Jonathan
 
-Either device_link_add() will fail, or we will eat memory each time
-the device is closed and re-opened.
+>=20
+> > >> Before sending v17 with this change, are you ok with the rest of the
+> > >> patches or you want to go through them as well? =20
+> > > So I did start taking a look and then turned away upon finding a
+> > > memory-leak on the first 2 patches in the series. I will continue goi=
+ng
+> > > through it, but in general the lifetime and locking rules of the CXL
+> > > subsystem continue to be a source of trouble in new enabling. At a
+> > > minimum that indicates a need/opportunity to review the rules at a
+> > > future CXL collab meeting. =20
+> >=20
+> > Great. And I agree about potential improvements mostly required after=20
+> > all this new code (hopefully) ends up being merged, which I'll be happy=
+=20
+> > to contribute. Also, note this patchset original RFC and=A0 cover lette=
+rs=20
+> > since then states "basic Type2 support". =20
+>=20
+> It would help to define "basic" in terms of impact. How much end-user
+> benefit arrives at this stage, and what is driving motivation to go
+> beyond basic. E.g. "PIO buffer in CXL =3D=3D X amount of goodness, and Y
+> amount of goodness comes with additional changes".
+>=20
 
-If that is correct, then we're trading one problem for another.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
