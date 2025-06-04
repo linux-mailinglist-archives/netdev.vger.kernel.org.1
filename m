@@ -1,114 +1,149 @@
-Return-Path: <netdev+bounces-195066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83786ACDBD3
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:20:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D383ACDBE8
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 853827A9924
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:19:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A90A7A1B9A
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 10:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B680225A20;
-	Wed,  4 Jun 2025 10:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DEC24EF7F;
+	Wed,  4 Jun 2025 10:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="NIYrsHCd"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="O0na44ib"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-70.smtpout.orange.fr [193.252.22.70])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55EE28DB4F;
-	Wed,  4 Jun 2025 10:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0615227574;
+	Wed,  4 Jun 2025 10:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749032424; cv=none; b=XeQnQG5yhM5zrt03VXmplnUK1x48oWl3i7yIOzgC4lyToCxT/gnZ3kt/FKdi+U5+Til9KfK+pbdct87v+HDvpW6KNI0RlsrR2DShBnn1C0884baUlmr4cVJVXKt5HvzCHZoPrCMvRsvZB8lB64hX6abzk93LLnLMXAvDbJrVn2E=
+	t=1749032629; cv=none; b=uJHY/dxI/Y5+MqRk77eoljuk5o4bGj458kPz9xeDb3EN88l9ZlLzoZHhf5Ozv4su/q/fK63W7WATekz2F220blDu9WltgDX8ej2TuC/28HJfY6hXofKa4DQ+JTds6SruvQ+7Dx8UoUT30qmV/BhRakKo9Q1iZduzlhmWgSa2a8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749032424; c=relaxed/simple;
-	bh=SI8hKINZA8ZOjnngj3VI4gk5fVqroFWExXzS49Plxbg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kU1qh2tiBhfSqR3PDYriOBDbvDMkPGV83nl09vqXaFgtD/i6R/O29Cr9UuX8E/Q1pp70YsTmRhyoyZek7KuY7nte57Qe8gFx4tQvnXRe+S1u3AUpUQkFQ4ySBpBx5DfnWwl93kq+rYZuk1U7RhmqU9DSWX9hBklHpNta+8h4aRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=NIYrsHCd; arc=none smtp.client-ip=193.252.22.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id MlDzuEUloXQs6MlE1uxdmP; Wed, 04 Jun 2025 12:20:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1749032412;
-	bh=f3saFh4IWjuvEXxBtC57if+A82mqTstaTkfFE0fvKtg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=NIYrsHCdw63o6pQVgtEauY0CxUs3bQOHE+QFt5XnMaFYdI1PC9wWt7jC+7IufUft/
-	 93HtXBP7z/ZNIXkbUU4urmoxoQO2V9Z5UR/T9GD38IyOwVUmyiXs5Pj91L7w/X91ep
-	 S+MvilUt7wZR6JSuEmZ/YoxHg43mxroFJUyQ79F1yqJSjRKeRa2+xR//ESBMX1SSS+
-	 jJrExTzsNfpXIktW+OjrrFGv6Hnvskd5G43guF1ui29xr94gc97cv3/9REgxDjDbfZ
-	 752n6Ekgb+sdoDkhW10A0eFzxJ8nxsaQ8P1dAYlRpPgwiNjSOSTwIG6XAuJ1wYcCID
-	 VFxECmNYqPH8w==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 04 Jun 2025 12:20:12 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <460dee11-4cb2-4ec3-80c4-feca344e0ea0@wanadoo.fr>
-Date: Wed, 4 Jun 2025 19:19:58 +0900
+	s=arc-20240116; t=1749032629; c=relaxed/simple;
+	bh=QxNSTDXCGJOmWNBGEOkx78UPdyo2nZYaQ3Fb7w+/lws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rergP1k9pjbquP9MYUxsReO7Ei8p3vxfVkh18k3XKrbngwfMIfHBdLTCqoDWUp0y9iVOH53EVAEUW8Nr2abukrWxvkwAhRcgCdlqxSJlz9p9RZl0x10zbn4ezlILxsPJ5agbHw4V1Wt1gse/hW45EIN1yk4ru46fEl5i18s8mNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=O0na44ib; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 63D0B1140142;
+	Wed,  4 Jun 2025 06:23:45 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 04 Jun 2025 06:23:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1749032625; x=
+	1749119025; bh=HjeA796RFt94HBnou7FcFNxCyD0fs7Jyu9j4FkElU7c=; b=O
+	0na44ibaSzxf1NrXoE2V5ZGwpoAM7NQVFLd/s/7v32+tw0yKDB2gDPLHUP+4lphu
+	cMt8WX9k1AZLKcqM/R00DW9zB2KCvA4w6R1IRHDFhXX2/vwoatl+QF89vhbBtLF/
+	VTYbt5EtNhssgJE/1O2RSySzeZnnfP7f6K/m617vGbgWE8tSnT5omQsWykUIUe1/
+	Qqw0x39uRTB13imdwOtJfaHgUATAnOJ8nIuWSdxO5eeMv67sPK0nvTr5dDInNze7
+	a5TAc9w/WDx4cKgoZ7INAl5tqbIozQm8C0UkmQYOXCgU9R43oocnDPlpb8cnejg8
+	Duh1qmERoqUB+2v0hPvvg==
+X-ME-Sender: <xms:sB5AaMpPOmEDLgVz71jxwql8VU--mtfOyHp7m6lb7vdSvP0FyCJcKQ>
+    <xme:sB5AaCqRscuHMXPJKbYyA33ZUtoXbBI0YoZO5YRUfd2lNA0bCHFlqT4Vnsvnq3eBj
+    HCzRSSfHOLllLw>
+X-ME-Received: <xmr:sB5AaBPjHnkZ0PwzYvhE1mr8YMdHRF3SELzYVdOWERwibwJShz1o3Sk_8QiD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdduleeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpeekgefggefhuedvgeettdegvdeuvdfhudejvddv
+    jeetledvuedtheehleelhffhudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohephigthhgvmhhlrgesnh
+    hvihguihgrrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehtrghrihhqthesnhhvihguihgrrdgtohhmpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehprggsvghnihesrhgvughhrght
+    rdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepshgr
+    vggvughmsehnvhhiughirgdrtghomhdprhgtphhtthhopehlvghonheskhgvrhhnvghlrd
+    horhhg
+X-ME-Proxy: <xmx:sB5AaD4tkWY5BOzrYbi1ML5dWNcPznC6zqdJDm3zn5mn7SkTiR465g>
+    <xmx:sB5AaL674c-b4D_wCz4iFJqcQ_Tepap7vKdelTs7RmRWLsO0pmibug>
+    <xmx:sB5AaDhA2KkOjJQ09X8BqyPk6jTNQ1Lf2EIvcUw8Om4XnaqwUbsVEA>
+    <xmx:sB5AaF45A9G_7DoLTpVr1Yzeefc-tAO4GqfsfDwL3wuBkd5ViBSZ2g>
+    <xmx:sR5AaOc4iUAA06aGfHmDHjUf64jxLYEBlVGp5yQh150WFicpvMZ9Z1-i>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 4 Jun 2025 06:23:43 -0400 (EDT)
+Date: Wed, 4 Jun 2025 13:23:41 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Yael Chemla <ychemla@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next 2/2] net/mlx5e: Log error messages when extack
+ is not present
+Message-ID: <aEAerYw-5p8S4bHq@shredder>
+References: <1748173652-1377161-1-git-send-email-tariqt@nvidia.com>
+ <1748173652-1377161-3-git-send-email-tariqt@nvidia.com>
+ <20250527174955.594f3617@kernel.org>
+ <2c0f4a69-dd90-4822-9981-faa90f7a58a6@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 4/7] can: Add Nuvoton NCT6694 CANFD support
-To: a0282524688@gmail.com
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-usb@vger.kernel.org, Ming Yu <tmyu0@nuvoton.com>, lee@kernel.org,
- linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
- mkl@pengutronix.de, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com,
- alexandre.belloni@bootlin.com
-References: <20250604041418.1188792-1-tmyu0@nuvoton.com>
- <20250604041418.1188792-5-tmyu0@nuvoton.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20250604041418.1188792-5-tmyu0@nuvoton.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2c0f4a69-dd90-4822-9981-faa90f7a58a6@nvidia.com>
 
-On 04/06/2025 at 13:14, a0282524688@gmail.com wrote:
-> From: Ming Yu <tmyu0@nuvoton.com>
-> 
-> This driver supports Socket CANFD functionality for NCT6694 MFD
-> device based on USB interface.
-> 
-> Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+On Wed, Jun 04, 2025 at 12:01:05AM +0300, Yael Chemla wrote:
+> Ethtool APIs: While Netlink support was introduced around versions
+> 5.6–5.8, many LTS distributions (e.g., Ubuntu 20.04, CentOS 7) still
+> ship with older userspace ethtool utilities that rely on ioctl for
+> certain operations. In these ioctl-based paths, the extack pointer
+> passed down to the driver may legitimately be NULL.
 
-You are sending this from a0282524688@gmail.com, but your signature says
-tmyu0@nuvoton.com.
+[...]
 
-Can you use your actual email address in the signature?
+> If a narrower scope is preferred, I can revise the patch to include only
+> the ethtool-related changes, which were the primary motivation behind
+> this work.
 
-Aside from that:
+FWIW, there is a netlink extack tracepoint that is always triggered from
+NL_SET_ERR_MSG(). Example:
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+ethtool$ ./configure --disable-netlink &> /dev/null
+ethtool$ make -j14 &> /dev/null
+# echo "10 1" > /sys/bus/netdevsim/new_device
+# echo 1 > /sys/kernel/tracing/events/netlink/netlink_extack/enable
+# cat /sys/kernel/tracing/trace_pipe &
+[1] 390
+# ./ethtool --set-ring eni10np1 rx 1
+         ethtool-413     [008] .....    80.588053: netlink_extack: msg=netdevsim: testing123
 
-Thank you!
+Used this dummy patch:
 
-
-Yours sincerely,
-Vincent Mailhol
-
+diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+index 4d191a3293c7..38022e8e1f37 100644
+--- a/drivers/net/netdevsim/ethtool.c
++++ b/drivers/net/netdevsim/ethtool.c
+@@ -85,6 +85,7 @@ static int nsim_set_ringparam(struct net_device *dev,
+ {
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 
++	NL_SET_ERR_MSG_MOD(extack, "testing123");
+ 	ns->ethtool.ring.rx_pending = ring->rx_pending;
+ 	ns->ethtool.ring.rx_jumbo_pending = ring->rx_jumbo_pending;
+ 	ns->ethtool.ring.rx_mini_pending = ring->rx_mini_pending;
 
