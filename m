@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-195013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4B6FACD722
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:19:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C5CACD733
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 06:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0025717A176
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 04:19:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2FC18938EE
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 04:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865782236FB;
-	Wed,  4 Jun 2025 04:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D8622F770;
+	Wed,  4 Jun 2025 04:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNn720XV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JaKBp9xK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A017D22A813;
-	Wed,  4 Jun 2025 04:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B044517AE11;
+	Wed,  4 Jun 2025 04:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749010750; cv=none; b=Nc6ozbDwI9161UoloxwusIlEn4X7sKy1jQduVaNe9Z0JQ30ORlFfTM8A9rMQJ8Q+SqNykKMm6RHL1s3OLYr6YCEz+JzbLetr4RSFJCLyCxvipGcz6cXbCLE8kBKOLkLVh1SqX6G6b2PU4D0w3NMGYVUdkw4uZwAKE2OQsjH7QkI=
+	t=1749011234; cv=none; b=tgP0Hn4HbQKdIqq6X5/fTgQjR9VWZ1eUGApoJaSuHlVtTf0P9yLCWtz4sQoUfGLuxn81MZk80LTdKKKGY+rR5PidxuTSzAPLxormLkaPMn0hEBQCMfllYf+F6Ifiqvh6cnws6J27tZSViWrkhFwDrGjBATDD3cCZ7bgF6phzdL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749010750; c=relaxed/simple;
-	bh=U5jP+lXXoeXfOXG4BEs/tLNfMJ3AevB5d9zyUYUMwdc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Q3LVmr6L2KuC9HzJeN3Lfnq4WI0uNVq0iwYrUkOJ//OxQ4XO/4Z4aXcLWp5Z3FJwcHyV1GotvaxOBPgjlS0xvJ5DaXv204CactSqfwbSGSqx82E7fVgeOd64Rlx1oKWqo2JrOo3wSwo3iEQpwqnERM0kZ3SUzvGg8X6oQ4JKlGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MNn720XV; arc=none smtp.client-ip=209.85.167.52
+	s=arc-20240116; t=1749011234; c=relaxed/simple;
+	bh=1evMnnmMSYJSXg2IXlGewHSViRm7MB6nkSC7LHyLqrc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qz9m5QNRmoSv74DH1pw4re8I+0riTT4V3sv1Nz1xKcfGv/yEWR39yQQGLwFFIuXaJ14F7O/lxRr3tuetf/9+8X+MwQ4W5jAjPepYArvz0gVQk8VN/3bGYP/jdeixpWzfHRzIps0M1wwWjcMKDgvm+0A6kfuJ+fHM8zOZYAcV7zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JaKBp9xK; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-54acc0cd458so7826320e87.0;
-        Tue, 03 Jun 2025 21:19:08 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32aa864e0e9so33210991fa.2;
+        Tue, 03 Jun 2025 21:27:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749010746; x=1749615546; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749011230; x=1749616030; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=vwSmbFm9BQLJoSJOmaEVrFb2/yxxwEJVld2ae/xv9LY=;
-        b=MNn720XVRMl3BfOp7aGgyoxoF3n1mMzCPQfJMgvN3xSL72d2h1rN0oh4aftSua6UKl
-         XeBIe6i3sm531Ks/eAOy8UIU2LWujft8lrmO614CVYjsU8fkfE9O5v0YDjbrr4k8smCd
-         mC/a6SnVG7yYUdCZaYfKb8VXDFHzz5c+BCcM6wucVOeBiDPrFrVzJVmuRDAdEabSze0D
-         DLTjjIAILAbAPBya+xCCC/jTHEEXu4LlXmC8P3eFUuZxboht0fe41tH+lMWVvtxS+PoS
-         MG+/8s72/lxhYito93cZXachO0TYA8OmLuheFlLPZ/dj1UhwsoASoqdVgeD83JyawT5x
-         yMew==
+        bh=tJuhntjfcXBPQ/m5wkBZugOryuT0atdnE1px3Wo8XlE=;
+        b=JaKBp9xKF1mC4Y4UAgtTdQWu7SaGmepYDc7m0yXfhoieB8hfy8WFrnVonyv5EDA3Fo
+         PXFbH/Q0YWMAA5DKPBUCguYmIVOx+EHToQBO4Iv4hukDuVWQAdOJ9HaaInnEtotzH5KF
+         KtVM3xvLC5rdC9fEpXg06860LuzTz1NK+qJFnA8OfEe7hOlHxSXw2q7jyK+8Bgty0fEn
+         s3uSLM1WVb6VIvU8V0KBrA+hezo4soM5h8o5WQIbqicP7AIXixm/NdhA/UQVtvYQA5Zl
+         T40PUGyxxpC5Uj3OyeCcgZ0NlPdmNKzUaGaMbkx7sjYggre2zEXoI4QF0S6/g92SGp3W
+         F15g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749010746; x=1749615546;
+        d=1e100.net; s=20230601; t=1749011230; x=1749616030;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vwSmbFm9BQLJoSJOmaEVrFb2/yxxwEJVld2ae/xv9LY=;
-        b=OR9D0ca9nEvnLWN2YftKc4jBXQRh1XPlmOaiEbbLU2vRXryPUDlfO+UieLl2RToEyn
-         Lm/KRwNnzqkxyUzCMnsvcWhGoJ6PQfkOdgINP8Wo48CoFVwTkLSDQ0x2GMRkfA+7B/Zq
-         tTeP7/0djCGEqHH05iIpbY5PK+tF0blGZj00LsH8/iEsxIW0WoXiqrn6wPkxRBiAdXIO
-         nSWGpnz/EVoPoqaIXoelbqKsSxFZW/iH/jGDeO6UXCYWDGNSnFc9yLZXER4WyPAY1U3t
-         WehfkHScZDFuudblqACNs7F7FdgJwyzAUrEsFsdvv8b+DJeDRU+U+3wpjIhpQ/JNOU1s
-         861A==
-X-Forwarded-Encrypted: i=1; AJvYcCWe0sjBuEb2PttsxDPqm8G/JwYZRin5F9rGDpRcqRGXREzkrPf8QZ1Z0fwP+MoFqzqpILBma6Ts@vger.kernel.org, AJvYcCXyt5HDQ9UwjmPIqQRmDPbuh6qr6RYq37sFieP+G1KS9h42YXkbLfxMgnh2rlt4S7vsgul4uJVjOKsaTG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO07eqz3cG3Z7C2k66XTRt06BU0e622tnDoqo8cvzCd0akVbGD
-	hvkmkvG6apDYkRSrNQAeJ76y8LXAEA7+i8Iz7zPXSuPA9f5ZnqKcDEu4/JXgqGblprABeewipH6
-	caP6LXfaKfrJpgefKDUFpawpi0OTfW+XUwZu7
-X-Gm-Gg: ASbGncvX+UHoqq8rdwCt67+cFLtizHbR9mEFRdxVwRlinik7uAliA0a3BUapOVISq26
-	qxkQnlB+7nTVZKwKUc8MVWUkOzV1MnEg+UPKbsJdv/8+6imThmMGxBD3H6N5VBaSjyRcvqpMdGL
-	NO0SqxgQRCdEjbEbawlZ3IMvoUlflNxErcAno=
-X-Google-Smtp-Source: AGHT+IEW8wj69/CJqKq7zWiNi1G1ylZSFxN4OeC7JGtrvBnHGNCTYka6lyBv1oGIAYFpr1QpyK+vReP+fnvUdDk6fpM=
-X-Received: by 2002:a05:6512:3d22:b0:54f:c074:f91b with SMTP id
- 2adb3069b0e04-55356aea9a9mr400195e87.24.1749010746464; Tue, 03 Jun 2025
- 21:19:06 -0700 (PDT)
+        bh=tJuhntjfcXBPQ/m5wkBZugOryuT0atdnE1px3Wo8XlE=;
+        b=Zq2WiF0y5qRnNNGyHBdrkHZaDVlpUnOAF2eKxw4mwjc4RtOPulVLFcATO9bxd8AG0i
+         w43ZVJlHd+Wy13vL+i8O3B0L/OVeGVAPaPnUuJ/nlk18utkXCsI4g2RRuT0BhptCBn58
+         rNHgooTNz6ZKbx+MMPDDld43m42H9N6bNsMfh+sgj6T1FmYr+Q/IVN6doTZ06c07dgRo
+         wYFEQWONjhnO53AtQM63mh6VeVcT8Z5X5MbgZhBd9HorQ8uFbvzp/7vcd+hpso3JYcFE
+         oEuhSO+n1XaYoF4jNTYWWq6KIO1BfiYvr8UhpcyhEiMQNMYHwbyxC8gwvx3GRs5iU0nx
+         m+rw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXnUHZ/hzB9dQ1c9fvV9Jm7vQvnWQKKnOAYVFG/Sb/xsNLkr0EF9cmdFf7rWLPSDY9zfEoSTcy@vger.kernel.org, AJvYcCVgqH/5FTb2j6dTBdiy1HbqQLtQ6nKuRHCNWx3AxBCl7JfX6N0XSjPkNXPQ2MB0AQd35vWDkDLXpEwNb+s8fJJs@vger.kernel.org, AJvYcCXISU/WZrqpiu2VYH9v1e521+5xsPhPTA9z92CNmZ86yujL/NiGugqslAXQxoXa7mc4ujVUzyyebPLe7VY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNuXJcnSkc99pU1EwkpoqzuAqNtYebIIMX4BIxEcmAAiTPOI+H
+	ELbgyOFTu66itRnoFZ2LKkuHzEcIYfPUsK5vc4D6cYehnp3sZdis+SWO3eKwrpK6/Cyf9ks5pT5
+	2B4RswhCqGFuGNkXcOxVrqeqQHLUqGd3JVHrj
+X-Gm-Gg: ASbGncs1J0v/tTEEKtuKhXz1fqnYKsbY5UbdRHyBNK+8kshySCQKuxO6px8d04sYLFG
+	t7l1mW+MiyZsoxoqmg+UlqJlwKuFstOcdfnoyY3h4oP7K/qZMsWdmUj6+CHoMLSuP7Foi4WMqpK
+	gDslNY5q8wyOkntWsNwyLN/AHexZzOeCCpaGg=
+X-Google-Smtp-Source: AGHT+IFX5jO3COLUJRnQhQyuxD770TZX6dYTmz+LGSVP2ythi3VgcFI6e2i33CEPsfvT9BRa5aEQJyadsG/zb1GL6Jo=
+X-Received: by 2002:a2e:b8ce:0:b0:32a:8101:bc06 with SMTP id
+ 38308e7fff4ca-32ac71d5b06mr3561681fa.9.1749011229566; Tue, 03 Jun 2025
+ 21:27:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,13 +72,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Luka <luka.2016.cs@gmail.com>
-Date: Wed, 4 Jun 2025 12:18:55 +0800
-X-Gm-Features: AX0GCFtdOftKsu9kho5lrbGXwbclP_bIOHXNUOSPcUC05XiyVFuZViyCXsylFCQ
-Message-ID: <CALm_T+0emUog-74YTfGnpY4AAgh=jFsYBmttc-uesXFRoyofhw@mail.gmail.com>
-Subject: [Bug] task hung in rtnl_newlink in Linux kernel v6.12
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 4 Jun 2025 12:26:57 +0800
+X-Gm-Features: AX0GCFtc7TndShEm9CaEvmnN1dDhjQyV6OO5S6NpHrqWWW48tDVqbd_Eigo7-ZY
+Message-ID: <CALm_T+1uP=2cXh3D8eCu8A6URcKLwpy+4wMDaErg_RMNswyCSA@mail.gmail.com>
+Subject: [Bug] kernel panic: Hard LOCKUP at 'net/netfilter/nf_conntrack_core.c'
+ in Linux kernel v6.12
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	"David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 Dear Kernel Maintainers,
@@ -104,11 +107,11 @@ platform and identified that the root cause lies in the upstream
 codebase.
 
 
-Bug Location: rtnl_newlink+0x64c/0x12f4 net/core/rtnetlink.c:3772
+Bug Location: gc_worker+0x2a0/0x1024 net/netfilter/nf_conntrack_core.c:1534
 
-Bug Report: https://hastebin.com/share/omisagagir.bash
+Bug Report: https://hastebin.com/share/bupiconuya.bash
 
-Entire Log: https://hastebin.com/share/cetuxoduko.perl
+Entire Log: https://hastebin.com/share/inunasepaj.less
 
 
 Thank you very much for your time and attention. I sincerely apologize
