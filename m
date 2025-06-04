@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-194972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84BE0ACD4F6
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:37:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F585ACD4FC
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 03:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE7861BA0D93
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:31:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70EC71898CE9
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 01:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A7819F40F;
-	Wed,  4 Jun 2025 01:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9513C27CCC7;
+	Wed,  4 Jun 2025 01:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exZ9JZCT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQLQwk8A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41E813C3F2;
-	Wed,  4 Jun 2025 01:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8A919E971;
+	Wed,  4 Jun 2025 01:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748999242; cv=none; b=lqFip+XzPdXu1jUxNZOgVBs/G7IvltFIH9iUx0DRbJo4AsCUzHQCXZU6Nio5MxL8wwU63fj9aArDcegmzoT++l5ulNUbtcFcYWhgV6dRXrIH4jw6FL/Bm97U20CRYU2W3o8/3CJfyJcalzULp7Ahaqeqc+4ZoRd8JihD+g4/sts=
+	t=1748999250; cv=none; b=BANzXqiIimLGUtpHhWFKfN+UvKEHd21HfOqH4ffRL1aOh52OnFf0a+24zXnBloUxhdFFfm2IpnhwP2x7vOwf75nKMdSyFHMRgcpfp0QZsUc/PLmoJ6I5wgKY1q9zLJxkfS37FJNwdBajxpJmYvUn45xltJblMs2eR3tNS1Ife1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748999242; c=relaxed/simple;
-	bh=/jsKi9CSTHx+CeAbjK67+mABdsFxLzAAzg44Qy9Ksyw=;
+	s=arc-20240116; t=1748999250; c=relaxed/simple;
+	bh=P+A5NfgO9BFaz1yef9hYcl6zxLNgtEW8OmZXQzCd8OA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o+SvS66YzMRboJPmvkGTyDXrn7LsW/hIUEhxJJBpmDxdpIC/u2IaSRdu+0bA8Fqyc/GMbdb8s2ZbTb46zSfB+vCQ1ldmRQfdLR6JNbMAB6PQxWgQKVbr5gz9J+XGkonRQ6xIdTs8jomp7M6AzOsGMK+eMS7FV126pkRRQ8XW5To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exZ9JZCT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEFD4C4CEEF;
-	Wed,  4 Jun 2025 01:07:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BA+OBVHK83Sy11gotulhrn/lcCqNkPO/VY1FitetQTA4hOrYGCmixU0okrZ8d3/lg+/c/hUSPN4wMptWGoc3PI0R84XXH++/ZAhm7o8Xca4SxO2YHeVHyZqT3dtNySB+n27EKUqtYrhLalEmefxrJME2G3jdEZWIsNq8PY+5a7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQLQwk8A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AA7C4CEF1;
+	Wed,  4 Jun 2025 01:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748999242;
-	bh=/jsKi9CSTHx+CeAbjK67+mABdsFxLzAAzg44Qy9Ksyw=;
+	s=k20201202; t=1748999250;
+	bh=P+A5NfgO9BFaz1yef9hYcl6zxLNgtEW8OmZXQzCd8OA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=exZ9JZCTX5HRuoxjxWI8Xh/nKrny4XlOcXQ3cXQ+qeCsgwyseqXsn62dsovj69qn5
-	 /EMAQCx18cl58Q2ex/MjJ6YIKdiNQI9hjTKRTSD/eCibzoS4VxiD6+dqyjGDZjMuZs
-	 e5gciPbRKuXeb0LNxLIUBO6+4hIk+wKyV3e6TleeuafNtGHq/3wWQhQ2s5mFTr5mLw
-	 31jcV2Dwzcm3iaJ/no6Ym+sHzm5/4eDsaXVWiV8yYhVQaHWm7D3sySTkYyGOLWU8Lp
-	 4tjczqg0HtT/sx36TFifq9P+zM0PIwfP5pAgvpxrtPBz3k+t2hLc+SVhMMvuDRXxNo
-	 z5rYuXuxk8uzw==
+	b=HQLQwk8AWz48TBxyswRwv9nsjRDG+MeKhAatsKn27LTl08EOT9K/5unDuW4LBzbGQ
+	 qM+BvDFaRjKH72LfWR7/X1a/00aKuMCnj91gn+SdIM/c3UZQICrR+vrKaIQe5Ydxvd
+	 0HlSqYYSJec4BjPT9m8K79R6GWuCshTPWh589ibyjpvLhy0IlPKmROn06o+Sk93H0c
+	 JH18z6buQDg4/wFVFM1mqyAoqunAT/QR8jUzDb3PFKXd8ocmmfOLDu6OmjisvFHYu6
+	 49rWJKCuEZWYFbgBOfTC8utm+Ovt6yixICOtlcLRqo/14UV4RH17eorWMrRpCTme08
+	 JjlEJ1YutzrJQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Eelco Chaudron <echaudro@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ilya Maximets <i.maximets@ovn.org>,
+Cc: Jason Xing <kernelxing@tencent.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	aconole@redhat.com,
 	netdev@vger.kernel.org,
-	dev@openvswitch.org
-Subject: [PATCH AUTOSEL 5.4 09/20] openvswitch: Stricter validation for the userspace action
-Date: Tue,  3 Jun 2025 21:06:55 -0400
-Message-Id: <20250604010706.7395-9-sashal@kernel.org>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 14/20] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
+Date: Tue,  3 Jun 2025 21:07:00 -0400
+Message-Id: <20250604010706.7395-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250604010706.7395-1-sashal@kernel.org>
 References: <20250604010706.7395-1-sashal@kernel.org>
@@ -67,89 +65,82 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Eelco Chaudron <echaudro@redhat.com>
+From: Jason Xing <kernelxing@tencent.com>
 
-[ Upstream commit 88906f55954131ed2d3974e044b7fb48129b86ae ]
+[ Upstream commit b86bcfee30576b752302c55693fff97242b35dfd ]
 
-This change enhances the robustness of validate_userspace() by ensuring
-that all Netlink attributes are fully contained within the parent
-attribute. The previous use of nla_parse_nested_deprecated() could
-silently skip trailing or malformed attributes, as it stops parsing at
-the first invalid entry.
+As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
+SOFTWARE flag is surely needed when users are trying to get timestamp
+information.
 
-By switching to nla_parse_deprecated_strict(), we make sure only fully
-validated attributes are copied for later use.
-
-Signed-off-by: Eelco Chaudron <echaudro@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Ilya Maximets <i.maximets@ovn.org>
-Link: https://patch.msgid.link/67eb414e2d250e8408bb8afeb982deca2ff2b10b.1747037304.git.echaudro@redhat.com
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250510093442.79711-1-kerneljasonxing@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
-**YES** This commit should be backported to stable kernel trees. ##
-Analysis **Commit Overview:** The commit changes `validate_userspace()`
-function in `net/openvswitch/flow_netlink.c` by replacing
-`nla_parse_nested_deprecated()` with `nla_parse_deprecated_strict()` to
-ensure stricter validation of Netlink attributes for the userspace
-action. **Specific Code Changes:** The key change is on lines 3052-3054:
-```c // Before: error = nla_parse_nested_deprecated(a,
-OVS_USERSPACE_ATTR_MAX, attr, userspace_policy, NULL); // After: error =
-nla_parse_deprecated_strict(a, OVS_USERSPACE_ATTR_MAX, nla_data(attr),
-nla_len(attr), userspace_policy, NULL); ``` **Why This Should Be
-Backported:** 1. **Security Enhancement:** This commit addresses a
-parsing vulnerability where malformed attributes could be silently
-ignored. The original `nla_parse_nested_deprecated()` stops parsing at
-the first invalid entry, potentially allowing trailing malformed data to
-bypass validation. 2. **Robustness Fix:** The change ensures all netlink
-attributes are fully contained within the parent attribute bounds,
-preventing potential buffer over-reads or under-reads that could lead to
-security issues. 3. **Pattern Consistency:** Looking at the git blame
-output (lines 3085-3087), we can see that
-`nla_parse_deprecated_strict()` was already introduced in 2019 by commit
-8cb081746c031 and is used elsewhere in the same file for similar
-validation (e.g., `validate_and_copy_check_pkt_len()` function). 4.
-**Low Risk:** This is a small, contained change that only affects input
-validation - it doesn't change functionality or introduce new features.
-The change is defensive and follows existing patterns in the codebase.
-5. **Similar Precedent:** This commit is very similar to the validated
-"Similar Commit #2" which was marked for backporting (status: YES). That
-commit also dealt with netlink attribute validation safety in
-openvswitch (`validate_set()` function) and was considered suitable for
-stable trees. 6. **Critical Subsystem:** Open vSwitch is a critical
-networking component used in virtualization and container environments.
-Input validation issues in this subsystem could potentially be exploited
-for privilege escalation or denial of service. 7. **Clear Intent:** The
-commit message explicitly states this "enhances robustness" and ensures
-"only fully validated attributes are copied for later use," indicating
-this is a defensive security improvement. **Risk Assessment:** - Very
-low regression risk - No API changes - Only affects error handling paths
-- Follows established validation patterns in the same codebase This
-commit fits perfectly into the stable tree criteria: it's an important
-security/robustness fix, has minimal risk of regression, is well-
-contained, and addresses a clear validation vulnerability in a critical
-kernel subsystem.
+Perfect! Now I can see that `skb_tx_timestamp(skb)` is called in the
+`mlx4_en_xmit()` function, which is the main transmit function. This
+confirms that the mlx4 driver does implement software timestamping. Now
+let me compare this to the similar commits to see the pattern: **YES**
+This commit should be backported to stable kernel trees. **Extensive
+Explanation:** This commit addresses a clear inconsistency bug where the
+mlx4 driver implements software timestamping functionality but fails to
+advertise this capability to userspace through the ethtool timestamping
+info interface. **Analysis of the fix:** 1. **The Problem**: The mlx4
+driver calls `skb_tx_timestamp(skb)` in `mlx4_en_xmit()` at line 1091 of
+`/drivers/net/ethernet/mellanox/mlx4/en_tx.c`, which means it properly
+implements software TX timestamping. However, in
+`mlx4_en_get_ts_info()`, it only advertises hardware timestamping
+capabilities (`SOF_TIMESTAMPING_TX_HARDWARE`,
+`SOF_TIMESTAMPING_RX_HARDWARE`, `SOF_TIMESTAMPING_RAW_HARDWARE`) but
+omits the `SOF_TIMESTAMPING_TX_SOFTWARE` flag. 2. **The Fix**: The
+change adds a single line `SOF_TIMESTAMPING_TX_SOFTWARE |` to the
+`info->so_timestamping` field when hardware timestamping is supported,
+correctly advertising both hardware and software timestamping
+capabilities. 3. **Impact**: This is a user-facing API correctness
+issue. Applications checking timestamping capabilities via ethtool would
+incorrectly believe software timestamping is not supported, even though
+the driver implements it. **Comparison with similar commits:** -
+**Similar Commit #1 (YES)**: Also fixed a timestamping bug in mlx4,
+showing these are important fixes - **Similar Commit #3 (YES)**: Fixed
+incorrect timestamping capability reporting in mlx5 by removing false
+software timestamping indication - **Similar Commit #5 (YES)**: Fixed
+timestamping capabilities reporting using wrong BIT() macro in mlx5 The
+pattern shows that timestamping capability reporting bugs are
+consistently considered backport-worthy because they affect user-visible
+API behavior. **Backport Criteria Assessment:** ✅ **Fixes a user-
+affecting bug**: Applications cannot detect software timestamping
+support ✅ **Small, contained change**: Single line addition with no
+functional logic changes ✅ **No architectural changes**: Only fixes
+capability reporting ✅ **Low regression risk**: Only adds a missing
+flag, doesn't change driver behavior ✅ **Clear side effects**: None
+beyond correctly advertising existing functionality ✅ **Follows stable
+rules**: Important API correctness fix with minimal risk The fix is
+identical in nature to Similar Commit #3 (marked YES) but in reverse -
+where mlx5 removed false software timestamping advertisement, this adds
+the missing software timestamping advertisement for mlx4 where it's
+actually implemented.
 
- net/openvswitch/flow_netlink.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index 4ad4c89886ee3..f1f7a0e34c7a9 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -2912,7 +2912,8 @@ static int validate_userspace(const struct nlattr *attr)
- 	struct nlattr *a[OVS_USERSPACE_ATTR_MAX + 1];
- 	int error;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+index b711148a9d503..9dbdd6266f731 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+@@ -1889,6 +1889,7 @@ static int mlx4_en_get_ts_info(struct net_device *dev,
+ 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS) {
+ 		info->so_timestamping |=
+ 			SOF_TIMESTAMPING_TX_HARDWARE |
++			SOF_TIMESTAMPING_TX_SOFTWARE |
+ 			SOF_TIMESTAMPING_RX_HARDWARE |
+ 			SOF_TIMESTAMPING_RAW_HARDWARE;
  
--	error = nla_parse_nested_deprecated(a, OVS_USERSPACE_ATTR_MAX, attr,
-+	error = nla_parse_deprecated_strict(a, OVS_USERSPACE_ATTR_MAX,
-+					    nla_data(attr), nla_len(attr),
- 					    userspace_policy, NULL);
- 	if (error)
- 		return error;
 -- 
 2.39.5
 
