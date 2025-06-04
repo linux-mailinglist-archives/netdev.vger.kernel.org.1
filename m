@@ -1,131 +1,113 @@
-Return-Path: <netdev+bounces-195105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E302ACDFEC
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 16:11:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27607ACE001
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 16:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090C1171739
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:11:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 355EF7A0434
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE984290BA5;
-	Wed,  4 Jun 2025 14:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB8770810;
+	Wed,  4 Jun 2025 14:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIj7V4Ul"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NCG+qbWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391852900B7;
-	Wed,  4 Jun 2025 14:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417544207F
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 14:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749046258; cv=none; b=ohsEZu9JkreNeQnRm+ocTKeowX+q6zUYbNqc5JsHQtT8n0Iy5mc1YU8L1/gJ2wPKxzFIG+NE5pwFJQ1LaoQwD+KZvb0Gd9E+xIbEZGsWdzaQz3S7JGFY3sDl+1y3CpBb6Hifo8Fo2cIaQdWSNPtuF3tm3PE3+SNjC6OvH66+His=
+	t=1749046527; cv=none; b=qjlYQe/945TovsqaFM9a1J56MRJ3oKkBT1V3V0JOY7Tmmd2DwYMaELCWrC0O0MaLXiRnu0ofExr0iM9ctLFagW0MUKCGmtlNhm0t8jWviNfnzn0bR1AcOTfBuohePwreJlaulZP91ycKo/YNbyZl2O3V4ThpEymODEzlYsSbUyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749046258; c=relaxed/simple;
-	bh=gb6i8ixhdEJTCsrYUor/DxYu+KnWObvlCHIlRhFnFY8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TOkHLa5YSyEcxI9KRmAqsJVA6FdtFx3QsiwsBFQ2E/hg0G2ryaVZddEPVBt0Pb9YtVXjd40C5q5XlsowqmkkUO7RqwKTsqydEt1vILqig4nhn/Ykec8jfAJ6NPEE/grhDUKQ7paASY6ex7BaSV9pQB644ZCMPFEMS3njGVixrtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MIj7V4Ul; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-309fac646adso975937a91.1;
-        Wed, 04 Jun 2025 07:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749046256; x=1749651056; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gb6i8ixhdEJTCsrYUor/DxYu+KnWObvlCHIlRhFnFY8=;
-        b=MIj7V4UlvgzIklIYTK7TvnQ5OkhxBjzOMoVmZDGHboTlqLlhXVnwsW+sYRs98yX07D
-         1sceRB5S9FAMLj7KigRfc4Z8nfsAWJKFEKD8a8QOg54LUpspahRhj6BXS/iJW8+C6Ju+
-         4m6lWw1Af0bsgGrGkDkWeMRW4ik/pJz9PU4eIPqVaOTJ9rMwdzFkcS1pf2MqVWVnaCn8
-         hmCzOi6E4znpxV0dsfGh7yVzjQG39kgYbhx1icjOWD3fwsMcyDJKY6ixM9En3cTZZWZE
-         A5T8YBJQ/+6+98tPWDfjoxGLuLDfekjL0nYzg0OnsnOIBb++C7lxSj2l6PPITAgL+rvA
-         aOtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749046256; x=1749651056;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gb6i8ixhdEJTCsrYUor/DxYu+KnWObvlCHIlRhFnFY8=;
-        b=cW2AOry4ywiPfkdnHEt18VGQQLAMM7vFh3pQQGEJwLhwKi0O5D2EgROqjkNt846+pz
-         F2LHH01B8ZpVZsFXryQXUWzkjx9hTTVIcedGWnF+F6F8BHsC3vYmGAFhjZ3BHSdE0RhC
-         9p3DG27+5e0N/LOiIkXeph1yrD9onNcZtQzsesPXLDUjqeFey4WhIYJKEzZz2J5S9A2F
-         PhJVsttbFgp7Z6OSNlsSM9AF6jAI5VFGzYs0K31IXCJ/wxR+HqH+9s99R3TDq0EPEfEp
-         9s9hT0wkSbq5fC392yRXryZLPeT5eJgaCe3G5j9otI9KaD3RFV6hNK082CjOvwtZ0ZLV
-         X6ug==
-X-Forwarded-Encrypted: i=1; AJvYcCV+fvq7BBoBVXNwEP6qtS8GwMirpd4IXu4eWKF+MPstK1TAXuYlB7qbU1qSe1MRMVqWAAr/OLch@vger.kernel.org, AJvYcCXnrP27Uvx5e8qblMcHVBbC5GvAY9cUIXF+LOeJpHK6O3IUMbsuL/IEWl7pqpG93waBI7sNJ6rCdz4YPtU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy45yDVS1G5nSVgyucVgzdbubGr10D+QY7MhwGXyfALFJtlk8ac
-	46f0kvdxMSLHUyPKwN8MPm8YdK3c/+3+SHDsCAYiAWzbNB5vWBpvYEVqEnu2kmc0W06nRh72z99
-	wjuIOQ4NPUnHHhkoGtZFW57Y2QQ594Zs=
-X-Gm-Gg: ASbGncupw03WzI7CdpENmpvmk1IHkRvAk1RuoZ48YmxCoq7NpFKpxyRq7XMdwMBXsLd
-	05vfVPLKvEmMaqzBYnfWKra7hSL+UF7/AnzVJ0I7luyWPkrJ8sWnKVuTxH/8VbkWEZYNt3eb1tE
-	YfNLUp9jmHP1ny0GFfMhKgscVLRMwvisXXlio=
-X-Google-Smtp-Source: AGHT+IEGbimpeZ4Qs+yGgWh6cNi2oO72hjcngLwtcweFhvIvhJH7pUzxZ0sWe052vRx5DrKFRVhqTJGUJMiwZNAU7KE=
-X-Received: by 2002:a17:90b:51c3:b0:2ff:556f:bf9 with SMTP id
- 98e67ed59e1d1-3130da33e3bmr4158050a91.4.1749046256255; Wed, 04 Jun 2025
- 07:10:56 -0700 (PDT)
+	s=arc-20240116; t=1749046527; c=relaxed/simple;
+	bh=aq9zI0qJSBFJwGii0gj0hrTLS1pDyymUIUuvv+Bpi3o=;
+	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
+	 Content-Type:References; b=JqbXIh9KDZ5bDEPMk1Z37WW5907KJT14Gn+Dpf3Nlj7/ycJVvHDF8wcAQeiMypLkh9M3Xw6IG6oPJ53BwkDMSEvxJq0pk4t3up1Hq/T7ese4Xf5VDM5FsrZMcYLYVnuQmJxzX6MVvzjGDBdOIS3Aq+db5es9UOweZ9s3a7oyDOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NCG+qbWG; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250604141522euoutp021150b2dbd3406a42c782031f5a8e8855~F3IuN4FCv0166901669euoutp02K
+	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 14:15:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250604141522euoutp021150b2dbd3406a42c782031f5a8e8855~F3IuN4FCv0166901669euoutp02K
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1749046522;
+	bh=aq9zI0qJSBFJwGii0gj0hrTLS1pDyymUIUuvv+Bpi3o=;
+	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+	b=NCG+qbWGKcv1JlZxQTrrwDS0yn0GgDxt+hWOoRX2Z4Pktw6TgNZBJ3audyaJNnDGI
+	 ZIaYUDxdTj/wZdcAYSqo5Rv8ahql6hyMnSziwTloh49iG9V84eoGgCfMfYadGZEXf3
+	 NfemDcl6ZN3Lce7UdYC8HH2xmIn4CjpkZW3KmPyc=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250520160717.7350-1-aha310510@gmail.com> <20250522145037.4715a643@kernel.org>
- <CAO9qdTHuDb9Uqu3zqjnV6PdX9ExWv24Q9_JfQ8FbKigipDrN+Q@mail.gmail.com> <20250527104202.7fbb916c@kernel.org>
-In-Reply-To: <20250527104202.7fbb916c@kernel.org>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Wed, 4 Jun 2025 23:10:59 +0900
-X-Gm-Features: AX0GCFuxsnioAEkavhQj-4D8j5tuc9AFppLgy6Him-R1TfbjP66-gtiNDfEjve4
-Message-ID: <CAO9qdTEjQ5414un7Yw604paECF=6etVKSDSnYmZzZ6Pg3LurXw@mail.gmail.com>
-Subject: Re: [PATCH v2] ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, yangbo.lu@nxp.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Subject: RE: Re: Re: Re: [PATCH bpf v2] xsk: Fix out of order segment free
+ in __xsk_generic_xmit()
+Reply-To: e.kubanski@partner.samsung.com
+Sender: Eryk Kubanski <e.kubanski@partner.samsung.com>
+From: Eryk Kubanski <e.kubanski@partner.samsung.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+CC: Stanislav Fomichev <stfomichev@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "bjorn@kernel.org" <bjorn@kernel.org>,
+	"magnus.karlsson@intel.com" <magnus.karlsson@intel.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <aEBPF5wkOqYIUhOl@boxer>
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20250604141521eucms1p26b794744fb73f84f223927c36ade7239@eucms1p2>
+Date: Wed, 04 Jun 2025 16:15:21 +0200
+X-CMS-MailID: 20250604141521eucms1p26b794744fb73f84f223927c36ade7239
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
+X-EPHeader: Mail
+X-ConfirmMail: N,general
+X-CMS-RootMailID: 20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009
+References: <aEBPF5wkOqYIUhOl@boxer> <aD3LNcG0qHHwPbiw@boxer>
+	<aDnX3FVPZ3AIZDGg@mini-arch>
+	<20250530103456.53564-1-e.kubanski@partner.samsung.com>
+	<20250602092754eucms1p1b99e467d1483531491c5b43b23495e14@eucms1p1>
+	<aD3DM4elo_Xt82LE@mini-arch>
+	<20250602161857eucms1p2fb159a3058fd7bf2b668282529226830@eucms1p2>
+	<CGME20250530103506eucas1p1e4091678f4157b928ddfa6f6534a0009@eucms1p2>
 
-Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Mon, 26 May 2025 20:00:53 +0900 Jeongjun Park wrote:
-> > If you need to check n_vclocks when checking
-> > whether ptp virtual clock is in use, it means that caller function has
-> > already performed work related to n_vclocks, and in this case, it is
-> > appropriate to perform n_vclocks check and n_vclocks_mux lock in caller
-> > function.
->
-> Can you be a little less abstract in this explanation, given that
-> ptp_vclock_in_use() only has a handful of callers?
-> For ptp_clock_freerun() do you mean the ->has_cycles check?
-
-There are two main cases where we need to check if ptp vclock is in use:
-
-1. Check if ptp clock shall be free running (ptp_clock_freerun)
-2. Check if ptp clock can be unregistered (ptp_clock_unregister)
-
-In the first case, If I'm not misreading the code, ptp_clock_freerun()
-determines whether it can run based on the result of ptp_vclock_in_use()
-if ptp->has_cycles is false.
-
-However, ptp_clock_{set,adj}time() , which calls ptp_clock_freerun(),
-does not use n_vclocks . Therefore, it would be more appropriate to
-remove unnecessary lock and n_vclocks checks when calling these
-functions, both to prevent false positives in lockdep and to reduce
-performance overhead.
-
-And in the second case as well, there is no need to check n_vclocks in
-every caller function. Because n_vclocks itself is a concept added for
-physical/virtual clocks conversion in ptp physical clock sysfs, functions
-other than sysfs actually do not need to check n_vclocks. Moreover,
-since ptp_clock_unregister() is called by many functions, locking
-n_vclocks_mux and checking n_vclocks when called by a function that
-does not use n_vclocks causes performance overhead.
-
-Therefore, after reviewing from various aspects, I think that the
-unnecessary n_vclocks check and n_vclocks_mux lock in ptp_vclock_in_use()
-should be removed to prevent false lockdep detection and performance
-overhead, and it is more appropriate to change the n_vclocks check to be
-performed first in the function that actually uses n_vclocks.
+>=C2=A0Thanks=20for=20shedding=20a=20bit=20more=20light=20on=20it.=20In=20t=
+he=20future=20it=20would=20be=20nice=0D=0A>=20if=20you=20would=20be=20able=
+=20to=20come=20up=20with=20a=20reproducer=20of=20a=20bug=20that=20others=0D=
+=0A>=20could=20use=20on=20their=20side.=20Plus=20the=20overview=20of=20your=
+=20deployment=20from=20the=0D=0A>=20beginning=20would=20also=20help=20with=
+=20people=20understanding=20the=20issue=20:)=0D=0A=0D=0ASure,=20sorry=20for=
+=20not=20giving=20that=20in=20advance,=20I=20found=20this=20issue=0D=0Aduri=
+ng=20code=20analysis,=20not=20during=20deployment.=0D=0AIt's=20not=20that=
+=20simple=20to=20catch.=0D=0AI=20thought=20that=20in=20finite=20time=20we=
+=20will=20agree=20:D.=0D=0ANext=20patchsets=20from=20me=20will=20have=20mor=
+e=20information=20up-front.=0D=0A=0D=0A>=20I'm=20looking=20into=20it,=20bot=
+tom=20line=20is=20that=20we=20discussed=20it=20with=20Magnus=20and=0D=0A>=
+=20agree=20that=20issue=20you're=20reporting=20needs=20to=20be=20addressed.=
+=0D=0A>=20I'll=20get=20back=20to=20you=20to=20discuss=20potential=20way=20o=
+f=20attacking=20it.=0D=0A>=20Thanks=21=0D=0A=0D=0AThank=20you.=0D=0AWill=20=
+this=20be=20discussed=20in=20the=20same=20mailing=20chain?=0D=0A=0D=0ATechn=
+ically=20we=20need=20to=20tie=20descriptor=20write-back=0D=0Awith=20skb=20l=
+ifetime.=0D=0Axsk_build_skb()=20function=20builds=20skb=20for=20TX,=0D=0Aif=
+=20i=20understand=20correctly=20this=20can=20work=20both=20ways=0D=0Aeither=
+=20we=20perform=20zero-copy,=20so=20specific=20buffer=0D=0Apage=20is=20atta=
+ched=20to=20skb=20with=20given=20offset=20and=20size.=0D=0AOR=20perform=20t=
+he=20copy.=0D=0A=0D=0AIf=20there=20was=20no=20zerocopy=20case,=20we=20could=
+=20store=20it=0D=0Aon=20stack=20array=20and=20simply=20recycle=20descriptor=
+=20back=0D=0Aright=20away=20without=20waiting=20for=20SKB=20completion.=0D=
+=0A=0D=0AThis=20zero-copy=20case=20makes=20it=20impossible=20right?=0D=0AWe=
+=20need=20to=20store=20these=20descriptors=20somewhere=20else=0D=0Aand=20ti=
+e=20it=20to=20SKB=20destruction=20:(.
 
