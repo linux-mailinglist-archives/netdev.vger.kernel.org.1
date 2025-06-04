@@ -1,135 +1,91 @@
-Return-Path: <netdev+bounces-195082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF680ACDDD1
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:23:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30B89ACDDF1
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 14:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 283351892F59
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:23:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91DE01890327
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 12:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5DB928DB78;
-	Wed,  4 Jun 2025 12:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D72A23BCE2;
+	Wed,  4 Jun 2025 12:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Db0ompKE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DvliSg9D"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C432C327E;
-	Wed,  4 Jun 2025 12:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB718494;
+	Wed,  4 Jun 2025 12:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749039809; cv=none; b=PjcxCTBMMGhUyY27h4tbyUh+gelkEVZcM+0CvNkUir7qnF9KZ4+2ZpYGrA+XKnykjElKYhRIZAOBwcCxraWM5NDLrCfh+7EI109AT1y0IaVtUAvYq97yVU7BFllBFKZDgSQ0+n5tatj0huNbhPB+0m0q7zNH4Qt//s3NGXhJqiY=
+	t=1749040276; cv=none; b=WbaHVi728mGQyTYeeKMr3tEXeTdjgfySca2tF2pVrvtHGKufUngtwV5fooHNIMVO010LjkBZbAAwO5TWdbp4GggvvwuqtFGOPIW57eTEoKgC71+Ai/QuAaF4GJa+Jy6dmlvDMtlzNW4/q0nNxBtH3yAVaIIOCXRYooZkf80epio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749039809; c=relaxed/simple;
-	bh=QaTyjEznJ1R5sNay9RQIac7K2Sj38RK5k3TLtoVPbzM=;
+	s=arc-20240116; t=1749040276; c=relaxed/simple;
+	bh=3a8a3VNtDPC5P7znjUS9D0EHfuwYumd32SWxjdL1tZk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ki2ruQ0jessNEVNfN95IiCJ8ra7iB2rgMFUAs5PAYUcPG6ABJQYFrrmkqUozhM8YzU8M4bCLHAL30X+TjVAHgiW0zLBCnh/0TSfoY9NdiV/qXXENiA8r65UWo2KX2wU2BkX3yrRM35eZUSKbLGywDqNWrwVG5RcFkW4SxceVd/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Db0ompKE; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bW9SbtdWQtKGFUKI60H1khOX7fDCbN+SinSHi2ypqHbikLLSOIF4/Hcl/RLZ1ytxedYtds91ygjFlF4N0a8AvpTsHjvNUKPiohO1M0cxu/YXTfJRNvAwMLVGdYwuewaK9pFkVLoAfBAXgGKvPkAFb2XRGXSv4veIAs8gPScwloU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DvliSg9D; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=7XWieguazqtxUMRi6G7yUlfR8Tu1/VnAzgOfOXGtr7c=; b=Db
-	0ompKEjd/bvN9l1Nb/8IXd21AkXSBrYqRkJVu6UzHiWEXh3fFqWo8NlaMkhFdMbtgZ4Vol0lgGMEi
-	7VIeePYWVWilUfF6UoVrFgd1U1/rTaJQTWvnfTyzCwZIl+Ak2hxdbiFxk140Lpb7MgTZVVQCTS3hX
-	iFgyrNvRoMtfgnM=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=826RNNo4pLf5DowBri4/2RCK+Kg2Gne6GYyzYhuVGIU=; b=DvliSg9DsB0+0yzG6i6MTfbD9F
+	qLnL4Z+3badsfgFU8A9QOfj1hK4a1swl277066wiJAm/v2DxDgPJ5wW5oznCwVWizGWaL6tE++JLL
+	DUDlTGHrqpPWw5Qjn8H0ytmSwsfCc1nB1qgdK/ZFnvS1SdCnw0xVtz+3soskS/24ICLY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uMn9A-00EgC3-M8; Wed, 04 Jun 2025 14:23:08 +0200
-Date: Wed, 4 Jun 2025 14:23:08 +0200
+	id 1uMnGp-00EgEC-KG; Wed, 04 Jun 2025 14:31:03 +0200
+Date: Wed, 4 Jun 2025 14:31:03 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Icenowy Zheng <uwu@icenowy.me>
-Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-Message-ID: <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
- <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
+To: "Joseph, Abin" <Abin.Joseph@amd.com>
+Cc: "nicolas.ferre@microchip.com" <nicolas.ferre@microchip.com>,
+	"claudiu.beznea@tuxon.dev" <claudiu.beznea@tuxon.dev>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"git (AMD-Xilinx)" <git@amd.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: macb: Add shutdown operation support
+Message-ID: <7a8bf428-1332-44f9-bb59-321989ec2578@lunn.ch>
+References: <20250603152724.3004759-1-abin.joseph@amd.com>
+ <3f3a9687-1dea-41fb-8567-1186d4fa2df2@lunn.ch>
+ <CH3PR12MB9171B307A46A01455DBBA241FC6CA@CH3PR12MB9171.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
+In-Reply-To: <CH3PR12MB9171B307A46A01455DBBA241FC6CA@CH3PR12MB9171.namprd12.prod.outlook.com>
 
-> > -      # RX and TX delays are added by the MAC when required
-> > +      # RX and TX delays are provided by the PCB. See below
-> 
-> This really sounds like a breaking change that changes the meaning of
-> the definition of this item instead of simply rewording.
-> 
-> Everything written according to the original description is broken by
-> this change.
+> Yes, I tested this on a device which was admin down using "ifconfig eth0 down".
 
-Please give some examples. What has broken, which was not already
-broken. There has been a lot of discussion about this over the last
-year, so please do some careful research about what has been said, and
-try not to repeat past discussion.
+ifconfig has been deprecated for over a decade. I suggest you stop
+using it.
 
-The whole point of this change is this is often wrongly interpreted,
-and there are a lot of broken .dts files. By including a lot of text,
-explaining both the pure OS agnostic DT meaning, and how Linux systems
-should implement it, i hope i have made it less ambiguous.
+> I observed that macb_close() is invoked only once, specifically when
+> the interface is bought down. During the kexec call the shutdown
+> hook is triggered, but the close() won't be called In this scenario.
 
-> Although these PHYs are able to implement (or not to implement) the
-> delay, it's not promised that this could be overriden by the kernel
-> instead of being set up as strap pins.
+Implementations vary quite a bit, so i have no idea what is actually
+correct. But my aesthetic sense is calling dev_close() without a
+matching dev_open() up is wrong. Please could you expand the commit
+message, because i had a look at some other .shutdown functions and
+they are careful to not call dev_close() unless the interface is admin
+up.  Some take, RTNL, some don't. So a good commit message which
+explaining why you change is correct would be good.
 
-If you want the kernel to not touch the PHY, use
-
-phy-mode = 'internal'
-
-> In addition, the Linux kernel contains a "Generic PHY" driver for any
-> 802.1 c22 PHYs to work, without setting any delays.
-
-genphy is best effort, cross your fingers, it might work if you are
-luckily. Given the increasing complexity of PHYs, it is becoming less
-and less likely to work. From a Maintainers perspective, i only care
-if the system works with the proper PHY driver for the
-hardware. Anything else is unmaintainable.
-
-> > +#
-> > +# There are a small number of cases where the MAC has hard coded
-> > +# delays which cannot be disabled. The 'phy-mode' only describes the
-> > +# PCB.  The inability to disable the delays in the MAC does not
-> > change
-> > +# the meaning of 'phy-mode'. It does however mean that a 'phy-mode'
-> > of
-> > +# 'rgmii' is now invalid, it cannot be supported, since both the PCB
-> > +# and the MAC and PHY adding delays cannot result in a functional
-> > +# link. Thus the MAC should report a fatal error for any modes which
-> 
-> Considering compatibilty, should this be just a warning (which usually
-> means a wrong phy-mode setup) instead of a fatal error?
-
-As i said, there are a large number of broken DT blobs. In order to
-fix them, but not break backwards compatibility, some MAC and PHY
-drivers are going to have to check the strapping/bootloader
-configuration and issue a warning if phy-mode seems wrong, telling the
-user to update there DT blob. So, yes it is just a warning for systems
-that are currently broken, but i would consider it an error for
-correctly implemented systems.
-
-	Andrew
+	   Andrew
 
