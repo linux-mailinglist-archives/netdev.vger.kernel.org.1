@@ -1,154 +1,202 @@
-Return-Path: <netdev+bounces-194856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-194857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EB1ACD0B5
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 02:37:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79276ACD10C
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 02:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7897160CF7
-	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 00:37:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 150563A11B7
+	for <lists+netdev@lfdr.de>; Wed,  4 Jun 2025 00:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735D614286;
-	Wed,  4 Jun 2025 00:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61947BA2D;
+	Wed,  4 Jun 2025 00:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IeyVi1Bx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0jJG8Xx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C328C79F5
-	for <netdev@vger.kernel.org>; Wed,  4 Jun 2025 00:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D07D8F6C;
+	Wed,  4 Jun 2025 00:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748997455; cv=none; b=CxMgHIZA66ews4yFXw4MErW3MW6Fx39YkIPXUwXin1JwT0GzktxK1QboJzODPJ/GsUhXik95WzfM37Wf52tz6H+uFZzPGV5l4+dQTZrHPxg2/Xnu/TzkXNF/cVWpoB9O75MQ1dvm6csI6HoEH1v8AH0yVnzGHzasevDWREZFz0Q=
+	t=1748998253; cv=none; b=X+FuqnvKkQ3+8t6n1mbcLljHHfsSWb6gSF4lTLvEPuTbtMu/UOGK500k993eE3zb9EyTnY4HrmfE7C5R8alf4rteRnCzGfDvLS8wGczk+xnQEfCXp2Un6NJ6GSncdaLMZechT60Vtlt86m9ghs3EO8R8IzZXXjtIzt6Grleneb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748997455; c=relaxed/simple;
-	bh=FIhhwRMnEvPjuGUpf9qf+tqZDLEP9lZKLjQ3YYZd4as=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=edhciX6Umtlko9iq8CnWGR9HZ1WbCkB9ue51aSqP71f2alke5qJiL3agwBNeAdTRmaoMisRzbFfc9g/AYjEOqDUdawFzKmV8yGA3g41H6kuGmqvxdJfpm+6uHdsRO92gPHYmdTHYcjVaNUGrottWU2UzJyC0WUaizwQxD/ARHBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IeyVi1Bx; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748997452;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TCJQT/kav5ff3pRxvzcaTAEwPIznqrXjhdq5yD+vQEE=;
-	b=IeyVi1BxRcWuhlZAvHSmxFJmdP5hBXqbCxwsPS8J0plqYgBA+U7TgZcdGD+Yd+vWoWudlP
-	Ha1TejpBZ8g1yBzqaku97nhAzVHc4LesjiZ8bxSKx31UrgukMPrkIxpKs9AyFROtcaZgER
-	HZkzUR99jlSltGRmTPxIpJWFdzj2NzA=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-Tvg01p9QOAeRpuhC5zmxcQ-1; Tue, 03 Jun 2025 20:37:30 -0400
-X-MC-Unique: Tvg01p9QOAeRpuhC5zmxcQ-1
-X-Mimecast-MFC-AGG-ID: Tvg01p9QOAeRpuhC5zmxcQ_1748997450
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-311b6d25163so5661836a91.0
-        for <netdev@vger.kernel.org>; Tue, 03 Jun 2025 17:37:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748997449; x=1749602249;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TCJQT/kav5ff3pRxvzcaTAEwPIznqrXjhdq5yD+vQEE=;
-        b=EJ3KxP3gu3nrK5rPraNBwIuBN6LntGfL5/pfvSHEH21CP29T72c0JaHPE39108B0p2
-         FfhOgmZt2ciQOeyZQbfsgQbRDrvtYaIFS72V5r2MiINEzNI9lpNOaZWdmRsIMj9vG7MD
-         F9gguUGRtIBbwHjRgbGTFr4nrZf6BxuCURo0CZOCCJShv8/kr0r39vic0VIOKr+IKki/
-         cOtjoFHmJs5gPRjowD6IKVaQDfaBqJyDPsP7mGnB6cV1QUQ7HOidfh6ONiE6y48u0Mua
-         dkQEbkWsfh1ARza6l0kJthPoCmH0vR60pnYDecnV/QpGcrwYiFtwM8eVer6FWhAdzzU2
-         Yggw==
-X-Gm-Message-State: AOJu0YzALZEtsiRdk2Rt9b2DAagv1WsgJ3OFl+1JeBauRqV8g3oWrsZ8
-	4DwmJNVO2CgR6hpTK5K9qmxCIpjtuLjHphR6k6XVEFml3V7sG+kDlNCrkt4xdW6cawuff7+O/9w
-	rcAEZ1dpwLMSe7l+tBboVenZhk06JOdqutQxZOLWXpcF0tOlLF7WQ829tHIHgE0Uh0IAo0iIUxf
-	P39pOsEwlzKWA6MNlYcByzUs7fA/CSusvDAh/jmbY2MpU=
-X-Gm-Gg: ASbGncuXsKVAg8tikFmrxT5O1UbgvcL2UQ0hgU9L/KJY5wNfKsvTXqM0OtgzBYSs/qG
-	sXs1KLa1D+/jhjws7jmhcGMkHV5SAj4vmm0PfGomfQ9KeGvXbnCPzdntv0I46ui38xRbTmw==
-X-Received: by 2002:a17:90b:51c4:b0:311:c1ec:7d0c with SMTP id 98e67ed59e1d1-3130cd65aaemr1426536a91.27.1748997449158;
-        Tue, 03 Jun 2025 17:37:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQeODWbQfUbRlPw0j1gKXQJysD64GEXXnB2RuYnjq0y+PzQoFeIG5PN3PQdqbkgUndiDNUyG9oiwKSrJbbewE=
-X-Received: by 2002:a17:90b:51c4:b0:311:c1ec:7d0c with SMTP id
- 98e67ed59e1d1-3130cd65aaemr1426509a91.27.1748997448759; Tue, 03 Jun 2025
- 17:37:28 -0700 (PDT)
+	s=arc-20240116; t=1748998253; c=relaxed/simple;
+	bh=V7AHzSWDZ7vd1Pk+34QudtNHwQbitjFR57EKODmkOvY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kLYm3YZdNT9ef/4vq5wUTT0eixbq+NCJNvWVOAIS7rNRNv8O7MUbwjmTB3rMj6IBrv5K9cFZGy3KE+MDDDshlomXfx1/GLfiMTaKQAqFNfjXm50c8M3HcpUz+zw+fTWCM6qWvPnLcrmd1PfKDOwgCxewRSZIL4mjFEwAYdwrR0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0jJG8Xx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA29C4CEED;
+	Wed,  4 Jun 2025 00:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748998253;
+	bh=V7AHzSWDZ7vd1Pk+34QudtNHwQbitjFR57EKODmkOvY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=W0jJG8XxJFT/sLVcrLHAZddpKKD+wcHS7SzRFh6ApHaPDFAcf7QEBWE4FYLwRnt2Y
+	 MPxJaS9A8kRkogqiH9kYUOGg3us1UPeS35pR0ap0qT9l8jjnmV0moW4sItA8/lWleM
+	 laBDTGkR+vM72OpSGVeUgnAJBLrdHrGAHiqBe/TacfnEmUbAXoxd03AGEBpn5R1awg
+	 Th2H826TowywTibX0Vho56kaS7/ICfkdNgxUPK64vUCMxM/axHJOzjV8yfSma5Xktt
+	 uxZSLUGkpGbrmPQInZL23h3SNICPx+SNH9ebvgkQ6SYr0UkE9W1hFYljuZ31M1/5IS
+	 s9Pel5RghQrQg==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Rengarajan S <rengarajan.s@microchip.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 002/118] net: lan743x: Modify the EEPROM and OTP size for PCI1xxxx devices
+Date: Tue,  3 Jun 2025 20:48:53 -0400
+Message-Id: <20250604005049.4147522-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250604005049.4147522-1-sashal@kernel.org>
+References: <20250604005049.4147522-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603150613.83802-1-minhquangbui99@gmail.com>
-In-Reply-To: <20250603150613.83802-1-minhquangbui99@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 4 Jun 2025 08:37:16 +0800
-X-Gm-Features: AX0GCFt_tMiNdtyDIBlXvuQJILPten36fjn0u2OKQnhU-6uwjA7mU6t1xM2SrDY
-Message-ID: <CACGkMEuHDLJiw=VdX38xqkaS-FJPTAU6+XUNwfGkNZGfp+6tKg@mail.gmail.com>
-Subject: Re: [PATCH net] virtio-net: drop the multi-buffer XDP packet in zerocopy
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 3, 2025 at 11:07=E2=80=AFPM Bui Quang Minh <minhquangbui99@gmai=
-l.com> wrote:
->
-> In virtio-net, we have not yet supported multi-buffer XDP packet in
-> zerocopy mode when there is a binding XDP program. However, in that
-> case, when receiving multi-buffer XDP packet, we skip the XDP program
-> and return XDP_PASS. As a result, the packet is passed to normal network
-> stack which is an incorrect behavior. This commit instead returns
-> XDP_DROP in that case.
->
-> Fixes: 99c861b44eb1 ("virtio_net: xsk: rx: support recv merge mode")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
->  drivers/net/virtio_net.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index e53ba600605a..4c35324d6e5b 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1309,9 +1309,14 @@ static struct sk_buff *virtnet_receive_xsk_merge(s=
-truct net_device *dev, struct
->         ret =3D XDP_PASS;
+From: Rengarajan S <rengarajan.s@microchip.com>
 
-It would be simpler to just assign XDP_DROP here?
+[ Upstream commit 3b9935586a9b54d2da27901b830d3cf46ad66a1e ]
 
-Or if you wish to stick to the way, we can simply remove this assignment.
+Maximum OTP and EEPROM size for hearthstone PCI1xxxx devices are 8 Kb
+and 64 Kb respectively. Adjust max size definitions and return correct
+EEPROM length based on device. Also prevent out-of-bound read/write.
 
->         rcu_read_lock();
->         prog =3D rcu_dereference(rq->xdp_prog);
-> -       /* TODO: support multi buffer. */
-> -       if (prog && num_buf =3D=3D 1)
-> -               ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_xmit, sta=
-ts);
-> +       if (prog) {
-> +               /* TODO: support multi buffer. */
-> +               if (num_buf =3D=3D 1)
-> +                       ret =3D virtnet_xdp_handler(prog, xdp, dev, xdp_x=
-mit,
-> +                                                 stats);
-> +               else
-> +                       ret =3D XDP_DROP;
-> +       }
->         rcu_read_unlock();
->
->         switch (ret) {
-> --
-> 2.43.0
->
+Signed-off-by: Rengarajan S <rengarajan.s@microchip.com>
+Link: https://patch.msgid.link/20250523173326.18509-1-rengarajan.s@microchip.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-Thanks
+**YES** This commit should be backported to stable kernel trees. Here's
+my detailed analysis: ## Security Fix Classification This commit
+addresses a **security vulnerability** by adding bounds checking to
+prevent out-of-bounds reads and writes in EEPROM/OTP operations for
+PCI1xxxx devices. The commit explicitly states "Also prevent out-of-
+bound read/write" in the commit message, making this a clear security
+fix. ## Code Analysis Details The commit adds critical bounds checking
+in four functions: 1. **`lan743x_hs_otp_read()`** - Adds `if (offset +
+length > MAX_HS_OTP_SIZE) return -EINVAL;` 2.
+**`lan743x_hs_otp_write()`** - Adds `if (offset + length >
+MAX_HS_OTP_SIZE) return -EINVAL;` 3. **`lan743x_hs_eeprom_read()`** -
+Adds `if (offset + length > MAX_HS_EEPROM_SIZE) return -EINVAL;` 4.
+**`lan743x_hs_eeprom_write()`** - Adds `if (offset + length >
+MAX_HS_EEPROM_SIZE) return -EINVAL;` The new size limits are: -
+`MAX_HS_OTP_SIZE = 8 linux 1024` (8KB) - `MAX_HS_EEPROM_SIZE = 64 linux
+1024` (64KB) ## Vulnerability Impact Without these bounds checks, the
+functions could perform out-of-bounds memory operations when: - User-
+space provides large `offset` or `length` values via ethtool EEPROM/OTP
+access - The hardware access operations could read/write beyond the
+intended EEPROM/OTP memory regions - This could potentially lead to
+memory corruption or information disclosure ## Context from Kernel Tree
+Analysis The kernel tree analysis confirms that: - The original LAN743x
+functions already had proper bounds checking - The newer Hearthstone
+PCI1xxxx variants lacked these critical safety checks - This creates an
+inconsistency where newer hardware had weaker security protections - The
+commit message explicitly mentions preventing "out-of-bound read/write"
+## Backport Suitability Criteria ✅ **Fixes important security
+vulnerability**: Prevents out-of-bounds memory access ✅ **Small and
+contained change**: Only adds 4 simple bounds checks, minimal code
+change ✅ **Low regression risk**: Simple validation logic that only
+rejects invalid inputs ✅ **Clear side effects**: Only affects invalid
+operations that should fail anyway ✅ **No architectural changes**:
+Maintains existing function interfaces and behavior ✅ **Affects critical
+subsystem**: Network driver EEPROM/OTP access with potential security
+implications ## Comparison with Similar Commits The similar commits
+shown all have "Backport Status: NO" but they are primarily feature
+additions (new EEPROM support, SGMII support, performance improvements).
+This commit is fundamentally different as it's a **security fix**
+addressing missing bounds validation, not a new feature. ## Conclusion
+This commit represents a textbook example of a stable tree backport
+candidate: it's a small, targeted security fix that prevents out-of-
+bounds memory access with minimal code changes and negligible regression
+risk. The absence of bounds checking in the Hearthstone variants while
+present in the original LAN743x functions suggests this was an oversight
+that needs correction across all supported kernel versions.
+
+ .../net/ethernet/microchip/lan743x_ethtool.c   | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 1459acfb1e618..64a3b953cc175 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -18,6 +18,8 @@
+ #define EEPROM_MAC_OFFSET		    (0x01)
+ #define MAX_EEPROM_SIZE			    (512)
+ #define MAX_OTP_SIZE			    (1024)
++#define MAX_HS_OTP_SIZE			    (8 * 1024)
++#define MAX_HS_EEPROM_SIZE		    (64 * 1024)
+ #define OTP_INDICATOR_1			    (0xF3)
+ #define OTP_INDICATOR_2			    (0xF7)
+ 
+@@ -272,6 +274,9 @@ static int lan743x_hs_otp_read(struct lan743x_adapter *adapter, u32 offset,
+ 	int ret;
+ 	int i;
+ 
++	if (offset + length > MAX_HS_OTP_SIZE)
++		return -EINVAL;
++
+ 	ret = lan743x_hs_syslock_acquire(adapter, LOCK_TIMEOUT_MAX_CNT);
+ 	if (ret < 0)
+ 		return ret;
+@@ -320,6 +325,9 @@ static int lan743x_hs_otp_write(struct lan743x_adapter *adapter, u32 offset,
+ 	int ret;
+ 	int i;
+ 
++	if (offset + length > MAX_HS_OTP_SIZE)
++		return -EINVAL;
++
+ 	ret = lan743x_hs_syslock_acquire(adapter, LOCK_TIMEOUT_MAX_CNT);
+ 	if (ret < 0)
+ 		return ret;
+@@ -497,6 +505,9 @@ static int lan743x_hs_eeprom_read(struct lan743x_adapter *adapter,
+ 	u32 val;
+ 	int i;
+ 
++	if (offset + length > MAX_HS_EEPROM_SIZE)
++		return -EINVAL;
++
+ 	retval = lan743x_hs_syslock_acquire(adapter, LOCK_TIMEOUT_MAX_CNT);
+ 	if (retval < 0)
+ 		return retval;
+@@ -539,6 +550,9 @@ static int lan743x_hs_eeprom_write(struct lan743x_adapter *adapter,
+ 	u32 val;
+ 	int i;
+ 
++	if (offset + length > MAX_HS_EEPROM_SIZE)
++		return -EINVAL;
++
+ 	retval = lan743x_hs_syslock_acquire(adapter, LOCK_TIMEOUT_MAX_CNT);
+ 	if (retval < 0)
+ 		return retval;
+@@ -604,9 +618,9 @@ static int lan743x_ethtool_get_eeprom_len(struct net_device *netdev)
+ 	struct lan743x_adapter *adapter = netdev_priv(netdev);
+ 
+ 	if (adapter->flags & LAN743X_ADAPTER_FLAG_OTP)
+-		return MAX_OTP_SIZE;
++		return adapter->is_pci11x1x ? MAX_HS_OTP_SIZE : MAX_OTP_SIZE;
+ 
+-	return MAX_EEPROM_SIZE;
++	return adapter->is_pci11x1x ? MAX_HS_EEPROM_SIZE : MAX_EEPROM_SIZE;
+ }
+ 
+ static int lan743x_ethtool_get_eeprom(struct net_device *netdev,
+-- 
+2.39.5
 
 
