@@ -1,169 +1,240 @@
-Return-Path: <netdev+bounces-195205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BFEACED7E
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:25:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 051E6ACED89
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D55170866
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3E27178653
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFF520B7FC;
-	Thu,  5 Jun 2025 10:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4D32147E5;
+	Thu,  5 Jun 2025 10:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bvg+6+IB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iAZCZFkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532781A2C25
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 10:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDBB20B7FC
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 10:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749119103; cv=none; b=KtZTkJ83TCOwRC0wqIo4ZXLeWqKPOsRu2ky5vMymUfpLC85dR/MFr/e7hGd5wnW0AN2JpT4ZJB/omwa4p7myOAoodM0YslqP2CECmjslE0gZMzsGwO1fpGBh7bY/ATNIVnbUF8tnhUGn4yxHZKeuXf0jIOQlCMBlV+eMXdFhyiw=
+	t=1749119156; cv=none; b=fVSQBaAneyT8qV5fnrQoH0GXmxwzTTkKtiaGrRWg9CfuKIYU4v76jx4hTPfVeM3x1n3j3W8E//jBFe1zDeJ379hslAR6BpeZY1NTrFKgC8X+fkDtESwJSTHxrCtukHWp2ovHPr7Lh5v3IzKqxamWB68xGcDctD8xrBaCuX8sVCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749119103; c=relaxed/simple;
-	bh=015oBGMB3YXrG897FkQBa+RLeqYZAPDXjdd6A32n7dk=;
+	s=arc-20240116; t=1749119156; c=relaxed/simple;
+	bh=8FxoLj6LiBlq6MIoflJO6Wt9XFMOGnA1Ab7cJH+/6HY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jJsaHGEZzomAJ6TmuK9blk/Puw+8XigiYTpTsaqHwXzFiClVXiQQcHm3fnmbYoOm9B0CtiYSlKwEf0YJRJEm70ahhPtLOsB/WNMGalVJNOpv+8ryROCzII5Xx3erwC7iEUgkhVFbzCkMBjvb97Nv+0q0rh9NNneg0qsqTUX4Cqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bvg+6+IB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749119100;
+	 In-Reply-To:Content-Type; b=CPT2TTtji5hdVQ8FPfPDcaPmTgF77CTFR8FdpYx/OY2mTsGRM6qB1ubwTXWOn/54DNn0YAojzBPl43DwtxP9CoT0ju4A3d7uZCB1iJ1ANQi39U938E8nqpE78xdaDFEZ2NKNNGcttAGz72DG4/Frmu3lReH21WJL/th3xOgew/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iAZCZFkT; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749119151;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+/I6BadOUjI/02G0YPnq9xgrPHjXcmZakozl0E4TDSo=;
-	b=Bvg+6+IB77bbCXKQ9QKMIe09Cxj2onu9iZOFiZZZ7ob5FmB8kBxSE0QiPwpxQ+dGyw92wR
-	J3YHX8gqvOOsE3mINVAzPONp0vMp/J7v+bppMi/r++QLDeZSvjNEY4mes2p74bdBa5i54+
-	V77VBvQoWuz1X07F9thNzDaxz1CXlu4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-sZa07UzOMum0iz-0gAbwtA-1; Thu, 05 Jun 2025 06:24:58 -0400
-X-MC-Unique: sZa07UzOMum0iz-0gAbwtA-1
-X-Mimecast-MFC-AGG-ID: sZa07UzOMum0iz-0gAbwtA_1749119097
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f8fd1856so384338f8f.2
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 03:24:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749119097; x=1749723897;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+/I6BadOUjI/02G0YPnq9xgrPHjXcmZakozl0E4TDSo=;
-        b=S4LuQRTjgmfin+xV9DGaZGswTceM18QGpjSn96/86bNNruFMmprYOBeDi1lUNt24eb
-         hW/rkOVP/uQsOUBVomacOWNBvIGMQlhPme+PqtzlyG/19Gi61jP36k2bQlzCYE6iLWtz
-         3pSTsibYU0RySOB1+JDlYeXxJ7hFkblo1rdDDA0+bQx/iBTPH1TI7+wa32rFkGDwWYol
-         g8f9JHR+NRl1PaDnqPo4Scch4Yj3JHbwJrrOOlE97TGAskTLpuCQ1lTBzGNCBWVTRPjp
-         fpdSZLcgl6Pp0/6vGFo4QfTylChb/62PBHxtMAUNp58CRLpnBpuUCEL4KmPIU3pPg6uo
-         EsiQ==
-X-Gm-Message-State: AOJu0YwgyLkYdH1fA8kFNtgn68CfhSHkuKwuhZ87ste3KpcEfSPQ1Gzv
-	N+WTRJfu29BELXmHZ9yvV5Rwh3u67UO6+eLuwhyYMisbBxcUTSQ9FJ+kuLyAQaUp+BPR/vHXsTx
-	mVub9xgPILGv0VWexOguObxUaYVM6I54ZYmkD1Id6Om2tLYHPRdmWAfQv1A==
-X-Gm-Gg: ASbGnctg/rrJ+HwTJT2girqktJUKl9u935DmTp/G/IWB/fwukAMk9CyqigfvFQAXAp9
-	BWB19Dgra8PVeSU2I1UlOp7K7ZOZb+33c0lhgA3WnBtaZEY8Oh4bnN1nKU79f05gPRDnlxNVy4Y
-	rorzccFdiHWlQNOXuiLUWYer2XNkUK4cYPrQZZmVhXcdx0KXk5ea+zBH+8tm63crO2ko+gkqtvA
-	erC4xR+7D/LDhOcFbUexW/kSE3wp2KULk2qIZWSEpIJgQwGz8MYp22dTkuNHhGjN3iWoFmPJ9V9
-	w4c+rTwthdvqSORe7mE=
-X-Received: by 2002:a05:6000:1a85:b0:3a4:d0ed:257b with SMTP id ffacd0b85a97d-3a51d923b56mr5438394f8f.22.1749119097320;
-        Thu, 05 Jun 2025 03:24:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9rhdrXoBB2l0aQ9oW8se1WPPDQ7OCJdLmo7Mz8TqllVZz9mFe8kK46lg4hrRM9Z/HNjs9tg==
-X-Received: by 2002:a05:6000:1a85:b0:3a4:d0ed:257b with SMTP id ffacd0b85a97d-3a51d923b56mr5438361f8f.22.1749119096926;
-        Thu, 05 Jun 2025 03:24:56 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cced:ed10::f39? ([2a0d:3341:cced:ed10::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a5253a7aeesm2687387f8f.1.2025.06.05.03.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 03:24:56 -0700 (PDT)
-Message-ID: <ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
-Date: Thu, 5 Jun 2025 12:24:54 +0200
+	bh=KGvfcQK4SqoxUSANLaanDU9SMPl09zRLKA5RRmHvlfk=;
+	b=iAZCZFkTGX1328h7yh0mXXRrEM7+l/JrWmWr0P2HFBSVvGm9KFw86TJbjQTXtwcw0dzKZM
+	HuXOSaXQJB+T+x0mmpOxRMQLQynczV1Ps2tPjQ0/0UApzl9eVMwXuM1JxrGd1Ob44xA4cw
+	axG/XgzE73XTNHt/cmNPCRx3lPU7mc4=
+Date: Thu, 5 Jun 2025 11:25:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: phy_caps: Don't skip better duplex macth on
- non-exact match
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Simon Horman <horms@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Jijie Shao <shaojijie@huawei.com>
-References: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+References: <cover.1749026421.git.asml.silence@gmail.com>
+ <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
+ <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 6/3/25 10:35 AM, Maxime Chevallier wrote:
-> When performing a non-exact phy_caps lookup, we are looking for a
-> supported mode that matches as closely as possible the passed speed/duplex.
+On 05/06/2025 01:59, Willem de Bruijn wrote:
+> Pavel Begunkov wrote:
+>> Add a new socket command which returns tx time stamps to the user. It
+>> provide an alternative to the existing error queue recvmsg interface.
+>> The command works in a polled multishot mode, which means io_uring will
+>> poll the socket and keep posting timestamps until the request is
+>> cancelled or fails in any other way (e.g. with no space in the CQ). It
+>> reuses the net infra and grabs timestamps from the socket's error queue.
+>>
+>> The command requires IORING_SETUP_CQE32. All non-final CQEs (marked with
+>> IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 bits
+>> of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). The
+>> timevalue is store in the upper part of the extended CQE. The final
+>> completion won't have IORING_CQR_F_MORE and will have cqe->res storing
+>> 0/error.
+>>
+>> Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>   include/uapi/linux/io_uring.h |  6 +++
+>>   io_uring/cmd_net.c            | 77 +++++++++++++++++++++++++++++++++++
+>>   2 files changed, 83 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+>> index cfd17e382082..0bc156eb96d4 100644
+>> --- a/include/uapi/linux/io_uring.h
+>> +++ b/include/uapi/linux/io_uring.h
+>> @@ -960,6 +960,11 @@ struct io_uring_recvmsg_out {
+>>   	__u32 flags;
+>>   };
+>>   
+>> +struct io_timespec {
+>> +	__u64		tv_sec;
+>> +	__u64		tv_nsec;
+>> +};
+>> +
+>>   /*
+>>    * Argument for IORING_OP_URING_CMD when file is a socket
+>>    */
+>> @@ -968,6 +973,7 @@ enum io_uring_socket_op {
+>>   	SOCKET_URING_OP_SIOCOUTQ,
+>>   	SOCKET_URING_OP_GETSOCKOPT,
+>>   	SOCKET_URING_OP_SETSOCKOPT,
+>> +	SOCKET_URING_OP_TX_TIMESTAMP,
+>>   };
+>>   
+>>   /* Zero copy receive refill queue entry */
+>> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
+>> index e99170c7d41a..dae59aea5847 100644
+>> --- a/io_uring/cmd_net.c
+>> +++ b/io_uring/cmd_net.c
+>> @@ -1,5 +1,6 @@
+>>   #include <asm/ioctls.h>
+>>   #include <linux/io_uring/net.h>
+>> +#include <linux/errqueue.h>
+>>   #include <net/sock.h>
+>>   
+>>   #include "uring_cmd.h"
+>> @@ -51,6 +52,80 @@ static inline int io_uring_cmd_setsockopt(struct socket *sock,
+>>   				  optlen);
+>>   }
+>>   
+>> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
+>> +				     struct sk_buff *skb, unsigned issue_flags)
+>> +{
+>> +	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
+>> +	struct io_uring_cqe cqe[2];
+>> +	struct io_timespec *iots;
+>> +	struct timespec64 ts;
+>> +	u32 tskey;
+>> +
+>> +	BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
+>> +
+>> +	if (!skb_get_tx_timestamp(skb, sk, &ts))
+>> +		return false;
+>> +
+>> +	tskey = serr->ee.ee_data;
+>> +
+>> +	cqe->user_data = 0;
+>> +	cqe->res = tskey;
+>> +	cqe->flags = IORING_CQE_F_MORE;
+>> +	cqe->flags |= (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIFT;
+>> +
+>> +	iots = (struct io_timespec *)&cqe[1];
+>> +	iots->tv_sec = ts.tv_sec;
+>> +	iots->tv_nsec = ts.tv_nsec;
 > 
-> Blamed patch broke that logic by returning a match too early in case
-> the caller asks for half-duplex, as a full-duplex linkmode may match
-> first, and returned as a non-exact match without even trying to mach on
-> half-duplex modes.
+> skb_get_tx_timestamp loses the information whether this is a
+> software or a hardware timestamp. Is that loss problematic?
 > 
-> Reported-by: Jijie Shao <shaojijie@huawei.com>
-> Closes: https://lore.kernel.org/netdev/20250603102500.4ec743cf@fedora/T/#m22ed60ca635c67dc7d9cbb47e8995b2beb5c1576
-> Fixes: fc81e257d19f ("net: phy: phy_caps: Allow looking-up link caps based on speed and duplex")
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->  drivers/net/phy/phy_caps.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
+> If a process only requests one type of timestamp, it will not be.
 > 
-> diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-> index 703321689726..d80f6a37edf1 100644
-> --- a/drivers/net/phy/phy_caps.c
-> +++ b/drivers/net/phy/phy_caps.c
-> @@ -195,7 +195,7 @@ const struct link_capabilities *
->  phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
->  		bool exact)
->  {
-	> -	const struct link_capabilities *lcap, *last = NULL;
-> +	const struct link_capabilities *lcap, *match = NULL, *last = NULL;
->  
->  	for_each_link_caps_desc_speed(lcap) {
->  		if (linkmode_intersects(lcap->linkmodes, supported)) {
-> @@ -204,16 +204,19 @@ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
->  			if (lcap->speed == speed && lcap->duplex == duplex) {
->  				return lcap;
->  			} else if (!exact) {
-> -				if (lcap->speed <= speed)
-> -					return lcap;
-> +				if (!match && lcap->speed <= speed)
-> +					match = lcap;
-> +
-> +				if (lcap->speed < speed)
-> +					break;
->  			}
->  		}
->  	}
->  
-> -	if (!exact)
-> -		return last;
-> +	if (!match && !exact)
-> +		match = last;
+> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
+> annotation may be necessary.
 
-If I read correctly, when user asks for half-duplex, this can still
-return a non exact matching full duplex cap, even when there is non
-exact matching half-duplex cap available.
+skb_has_tx_timestamp() helper has clear priority of software timestamp,
+if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW case
+won't produce both timestamps with the current implementation. Am I
+missing something?
 
-I'm wondering if the latter would be preferable, or at least if the
-current behaviour should be explicitly called out in the function
-documentation.
-
-/P
+> 
+>> +	return io_uring_cmd_post_mshot_cqe32(cmd, issue_flags, cqe);
+>> +}
+>> +
+>> +static int io_uring_cmd_timestamp(struct socket *sock,
+>> +				  struct io_uring_cmd *cmd,
+>> +				  unsigned int issue_flags)
+>> +{
+>> +	struct sock *sk = sock->sk;
+>> +	struct sk_buff_head *q = &sk->sk_error_queue;
+>> +	struct sk_buff *skb, *tmp;
+>> +	struct sk_buff_head list;
+>> +	int ret;
+>> +
+>> +	if (!(issue_flags & IO_URING_F_CQE32))
+>> +		return -EINVAL;
+>> +	ret = io_cmd_poll_multishot(cmd, issue_flags, EPOLLERR);
+>> +	if (unlikely(ret))
+>> +		return ret;
+>> +
+>> +	if (skb_queue_empty_lockless(q))
+>> +		return -EAGAIN;
+>> +	__skb_queue_head_init(&list);
+>> +
+>> +	scoped_guard(spinlock_irq, &q->lock) {
+>> +		skb_queue_walk_safe(q, skb, tmp) {
+>> +			/* don't support skbs with payload */
+>> +			if (!skb_has_tx_timestamp(skb, sk) || skb->len)
+>> +				continue;
+>> +			__skb_unlink(skb, q);
+>> +			__skb_queue_tail(&list, skb);
+>> +		}
+>> +	}
+>> +
+>> +	while (1) {
+>> +		skb = skb_peek(&list);
+>> +		if (!skb)
+>> +			break;
+>> +		if (!io_process_timestamp_skb(cmd, sk, skb, issue_flags))
+>> +			break;
+>> +		__skb_dequeue(&list);
+>> +		consume_skb(skb);
+>> +	}
+>> +
+>> +	if (!unlikely(skb_queue_empty(&list))) {
+>> +		scoped_guard(spinlock_irqsave, &q->lock)
+>> +			skb_queue_splice(q, &list);
+>> +	}
+>> +	return -EAGAIN;
+>> +}
+>> +
+>>   int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>>   {
+>>   	struct socket *sock = cmd->file->private_data;
+>> @@ -76,6 +151,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>>   		return io_uring_cmd_getsockopt(sock, cmd, issue_flags);
+>>   	case SOCKET_URING_OP_SETSOCKOPT:
+>>   		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
+>> +	case SOCKET_URING_OP_TX_TIMESTAMP:
+>> +		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
+>>   	default:
+>>   		return -EOPNOTSUPP;
+>>   	}
+>> -- 
+>> 2.49.0
+>>
+> 
+> 
 
 
