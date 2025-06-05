@@ -1,114 +1,211 @@
-Return-Path: <netdev+bounces-195325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B739FACF8D4
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:33:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD0DACF8D6
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 921EA17A993
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:33:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69C3E178152
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034FF27C875;
-	Thu,  5 Jun 2025 20:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965FD27E1AB;
+	Thu,  5 Jun 2025 20:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jAXTuLFa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fA3EasR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327CD27A127;
-	Thu,  5 Jun 2025 20:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D3227C854
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 20:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749155617; cv=none; b=K8/NiDOdhSSb+wkYsLVO9vI5YTSgo9QWy4fvqN26UGvDbRrMsy4B5at9jmnyWkN8uVdEokzssy1nZtkr78OGYVIphrdpwb+9n/YTILHIorAVnhBaBjj/2QaZsJYpwIjAv7R+Fv7fjtQNl+hR692hSpKw4t0pcpcE2C3VSYT1DCM=
+	t=1749155682; cv=none; b=UxfIjL5rnlUsCZR0YOuMChnpqdURIT+7foOw+feZ7m2B4ssPsOVxb12ryPXBrFgbIhrw5hH0KI17YIKttagEhkp8wHAX6SPAiG2czfSeGWdVFeQJWSdmGwScuURzXFvEWETlkXMz38XydSwcb4Q2qIupAwMHWW/RcP228boNI/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749155617; c=relaxed/simple;
-	bh=C13lyaepQeg+W9FybN+9Webo8rqXcAFoCH0QZGDKxcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGUY+0qz2d1xXj+Y8xhBUakemN7Q4+VPIwOqI4MVxQ/gAuTODtAwDGNFMtRbn69FvUyhryBHOVB3RhbZUrBN5e98dPI/ffDQoTJ3LjaZOP1JUTz/dkpNRGsRj6GU4k9bG1tKaACA3SMN5F+bwHTFEjnNonLHK44/AkZ/w+A897g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jAXTuLFa; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a528e301b0so108912f8f.1;
-        Thu, 05 Jun 2025 13:33:35 -0700 (PDT)
+	s=arc-20240116; t=1749155682; c=relaxed/simple;
+	bh=0QII3GWTrtGjkUbjZoP+Vf2mHDWYUvjDCDt2cueIiOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VCE7tWpouLkAhU9qAhK+PfyUmGyoSjFjiQjG8v22KOAzBNN93GI+7okPUzHdBd1wtgUTdMY8/lr1qPJkrToLg7UCsZI2Lh02WhZ3U6maJ2NlO5rEU3LlkU5FWkZ8WS1ufi6/UKhbjoRtepgMQza/ZQanSUlIcefhMiquUQVrNaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fA3EasR9; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2348ac8e0b4so19435ad.1
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 13:34:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749155614; x=1749760414; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C13lyaepQeg+W9FybN+9Webo8rqXcAFoCH0QZGDKxcI=;
-        b=jAXTuLFatQnKS1TMyPSf3lx6BYGlsaFMkqKoFBrzRtflQvzj1ryn9AYKC04HJUKUJy
-         M75P4XDi2y/KOomUVdndtM3f1CzoOzFh7vLiSAs87oCw/iOWfW4J6ZKtS2d86BNZlGsO
-         VXUf3q00s1xxsLCKhPEBX7vs/1h4FPTAFn5adVMGOUW6G3m0gpzMINdPCINBPGcRkmiQ
-         XMJThm4+nqAW38Bb0hF6kkriHsmqaGag632ZeBXyn8ufL7W4VqlS8EGCafF+/bClmci/
-         0iawWKTf+XU+I5S50ibZz9AK9DbFEVSkbqK2qXR9aSRT4ES8JDjftPdPiQbqS5m+9MAn
-         YqYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749155614; x=1749760414;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1749155680; x=1749760480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C13lyaepQeg+W9FybN+9Webo8rqXcAFoCH0QZGDKxcI=;
-        b=DGQXKhaQOxMqGkRFyUWTSqMxj3Y9bX26oZMAbhMOBdGFsD+s0CBRHXyQZqyhbyDkD+
-         E/Lo7+wD8W0rYd4zAbYUws8SLSTeoUH83rDXazi830MLKUiBYT1vMnfcbAtsPMRctDRw
-         7uZeOqjNivC/tZAh7bhnGHqwKl2uNX18dRJXeEsSKMkDBBCZSUn2S9gyUvulKclU6bIM
-         nfqydrBmPsMEkpIJ6ppAlPHeP2t3xn4AgWmaZk7Epw6qdQhhqdZN/t8jliTJGFnHqOPt
-         8Glvi+GkW6su5kcNDX3XSFUMBuhNMBLThbxiIWUkozJcsva55jmFYhwjwnfW1derAjvm
-         tajQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNnjBogH5xy0eTdVEsWkmRPJoDo0V9E9aF0QGONPnw+5BDL+EmyrOgVygg0C1d3UpCq1Ehu3lMdzkquS8=@vger.kernel.org, AJvYcCXtek22UXX1qvknhYDdcGcvb04Ia2lWgJpEzsEPML7E62KG6CynrCQnlTG9o+wPojly5Mz2Iszr@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtjP5y27dAvU1Lvpxd0grRpzW9F436TpEnkoaqEPImG4Fh2/XF
-	0VG4cg+HW7lpVyET8XRWzxO37B8H73AdX2m3HWyQesd84tqlQIB9HpEd
-X-Gm-Gg: ASbGncui/jrB3zqZfA1EJgdL1Op4nBb3uGYXyN7yDSjyr4t5Z2SAw73G01NZ0fthhMm
-	uC47ghSfqNpQh8nAtLkj17P5XLLQPe2jhwJtPP6rvMUiO86XIo5lI22LvONw0Fkzf7g3pZoVcyb
-	aCGICs69JzNMIa8i2WKrlexwo8B18ekJs/zYEvdOfk5cDE99bTT0p9tTBuwxQOvx8qtCO3Iac7G
-	8/vv9IS5ay/JdijDibICSdxxFlI5NVbV4VXmPX+rYlYFP8fCXIqvEnP4eBnkdVTkhNOkWJEVrXB
-	/E1BKrDM+aXQIkfFW7SS1XhPnqCKai8bqfDJhgSgwRHc57oAIA==
-X-Google-Smtp-Source: AGHT+IGXEKJnubZ7beEaQJblRyNzWfu8E4pvqMGMNr0AwK4lFXVVSq9+04lNS3pnIjDVm8/5AwunAQ==
-X-Received: by 2002:a05:6000:2dc9:b0:3a4:eeeb:7e79 with SMTP id ffacd0b85a97d-3a5319a96admr170386f8f.12.1749155614180;
-        Thu, 05 Jun 2025 13:33:34 -0700 (PDT)
-Received: from skbuf ([86.127.125.65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209cf9715sm3554475e9.18.2025.06.05.13.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 13:33:33 -0700 (PDT)
-Date: Thu, 5 Jun 2025 23:33:31 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: b53: fix untagged traffic sent via cpu
- tagged with VID 0
-Message-ID: <20250605203331.twof2p2orvuxwuzt@skbuf>
-References: <20250602194914.1011890-1-jonas.gorski@gmail.com>
- <20250605202043.ivkjlwtvzi6jqhqx@skbuf>
+        bh=4ZoLre5WJXzZI3tRwkyLjsbHGJ2C1Pcu+Ob2SlEJwY0=;
+        b=fA3EasR9DfNX2l8GwvcaT0MvZ7Aq938G5NX2vSzkm9JV0bUQL0daiUSzQFdmjjYXrc
+         KpH3ZVGuZoyFQ9dfZ8nHCf8UplLDYvkDfM8+6cMFPoXL+/Am9RgiKUfceEwmpnT9XVbF
+         lLc8/7mOUzCJv0zrO0uvzSNgpul5XRrZxFbUotDU+3qD/jZs/1QjZrJwTOl6VinxpHRC
+         kYyDpKqwBbuLfVWv4YureLecupPHUK9QLpthWcNBqLQ0PEM3X6SgKZ2AiQshJD6j/59O
+         KRB5oP+owa7iHToZIippsRv442PPbF6z3n0GPUpHELvthLJ6QL1vqeQuteCCh1Iq93Ud
+         KwpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749155680; x=1749760480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4ZoLre5WJXzZI3tRwkyLjsbHGJ2C1Pcu+Ob2SlEJwY0=;
+        b=ZsrAG8m+ZAN2B9diG8PLSHUTlsiolsrd1xtIxov6j5OAurUPeBoE0SDlkZjQqwMmB1
+         jmD7eyE1Ilf5gcwsHRBWbSRMjXdkOVoi0bJgGBKLM0E00BSFmVxXH5SOj+cD1HgMlhpI
+         orWEuVVfKX0oNfitAFOA3hy/Xc+DVSgKSIduUAGsyacaML9qMQyhw59HTUnFsRrQpZKF
+         bMkQyBHvn9VTDlJFvvMavh8i9pf28LjiGY06rXaGanAMt6n9MPQmCHTC1PFMbVr8I0b+
+         AVuSaiZfZEGlMPSxSAuLKI0boEjPhOW5B/PhTTEzkUAbOsB50lvXnq7zLC5fv/Dj43Uf
+         Pbmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdZAcsZW/xCmnB/I381F3DIhqDNW5QwaIzpF4nObbxJwR3e1FRsbEXxs4wI+RFtPout4WDkqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf6Ee9bGicJ/iyA9yzhj3ZGPT5TRz8tnNkfbOoq36ZJ6BUFHOX
+	KdnvKAknsLtNVTLvy+UHu6MNLTHiACwgv57sKYhNFQEArdy8tZKoI/VtOfL5j6KOMLRhKI5LU1M
+	QKvYjbJk45LX7FYsHDbuF9Rgvz4AeeCU5ssjL2BAd
+X-Gm-Gg: ASbGncsLYKwFevyTrFTi+LUMdUZp7KldGzeWNyWEpGHBgJ0N8P7A7NK1pcPfWFsGRKw
+	pHMhF2W9uG5LGxnnSlRM/JjSMIhvj9DBBS/v0SFmU12t4/vmcgtjU7UBUF0fZXiDzAHyp2rI1+5
+	8yg6I6v9UoA1os3rTAKTgLn2MnlYaNsgxgy3jVtC4ffEuv
+X-Google-Smtp-Source: AGHT+IEz65fw6eX6HnqKD1lGuCRGB/lwbhJS2C0P8T2RK/ATRMV91beDaRjDj92IaN4e2RiyHUifHQ+O8l0xyf76AkM=
+X-Received: by 2002:a17:902:f60b:b0:234:8eeb:d81a with SMTP id
+ d9443c01a7336-236021e505cmr754845ad.16.1749155679795; Thu, 05 Jun 2025
+ 13:34:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250605202043.ivkjlwtvzi6jqhqx@skbuf>
+References: <20250604025246.61616-1-byungchul@sk.com> <20250604025246.61616-4-byungchul@sk.com>
+ <29f2c375-65e3-4d22-8274-552653222f8d@gmail.com> <CAHS8izMb23eaav-Fz50sefuS8BhF7as7=BX+Sv1wj01+0n6tMg@mail.gmail.com>
+ <ec924af7-1330-4220-97be-1171ef6ffc75@gmail.com>
+In-Reply-To: <ec924af7-1330-4220-97be-1171ef6ffc75@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 5 Jun 2025 13:34:25 -0700
+X-Gm-Features: AX0GCFsZcj1hI7C7EPh1g4w7_P54Ew1pJG_c13sE__2Bloq-K4EM8uiIisV8cik
+Message-ID: <CAHS8izND_JonvNqJm4XpXm-sk9+v6KCGqeKb7ZUSAWoyckUY6A@mail.gmail.com>
+Subject: Re: [RFC v4 03/18] page_pool: use netmem alloc/put APIs in __page_pool_alloc_page_order()
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com, 
+	kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com, 
+	hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com, 
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 05, 2025 at 11:20:43PM +0300, Vladimir Oltean wrote:
-> Testing both on sja1105, as well as on veth using software bridging, the
-> answer should be "tagged with VID 2". However, you make it sounds like
-> the answer on b53 is "untagged".
+On Thu, Jun 5, 2025 at 1:26=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 6/5/25 20:39, Mina Almasry wrote:
+> > On Thu, Jun 5, 2025 at 3:25=E2=80=AFAM Pavel Begunkov <asml.silence@gma=
+il.com> wrote:
+> >>
+> >> On 6/4/25 03:52, Byungchul Park wrote:
+> >>> Use netmem alloc/put APIs instead of page alloc/put APIs and make it
+> >>> return netmem_ref instead of struct page * in
+> >>> __page_pool_alloc_page_order().
+> >>>
+> >>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> >>> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> >>> ---
+> >>>    net/core/page_pool.c | 26 +++++++++++++-------------
+> >>>    1 file changed, 13 insertions(+), 13 deletions(-)
+> >>>
+> >>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> >>> index 4011eb305cee..523354f2db1c 100644
+> >>> --- a/net/core/page_pool.c
+> >>> +++ b/net/core/page_pool.c
+> >>> @@ -518,29 +518,29 @@ static bool page_pool_dma_map(struct page_pool =
+*pool, netmem_ref netmem, gfp_t g
+> >>>        return false;
+> >>>    }
+> >>>
+> >>> -static struct page *__page_pool_alloc_page_order(struct page_pool *p=
+ool,
+> >>> -                                              gfp_t gfp)
+> >>> +static netmem_ref __page_pool_alloc_page_order(struct page_pool *poo=
+l,
+> >>> +                                            gfp_t gfp)
+> >>>    {
+> >>> -     struct page *page;
+> >>> +     netmem_ref netmem;
+> >>>
+> >>>        gfp |=3D __GFP_COMP;
+> >>> -     page =3D alloc_pages_node(pool->p.nid, gfp, pool->p.order);
+> >>> -     if (unlikely(!page))
+> >>> -             return NULL;
+> >>> +     netmem =3D alloc_netmems_node(pool->p.nid, gfp, pool->p.order);
+> >>> +     if (unlikely(!netmem))
+> >>> +             return 0;
+> >>>
+> >>> -     if (pool->dma_map && unlikely(!page_pool_dma_map(pool, page_to_=
+netmem(page), gfp))) {
+> >>> -             put_page(page);
+> >>> -             return NULL;
+> >>> +     if (pool->dma_map && unlikely(!page_pool_dma_map(pool, netmem, =
+gfp))) {
+> >>> +             put_netmem(netmem);
+> >>
+> >> It's a bad idea to have {put,get}_netmem in page pool's code, it has a
+> >> different semantics from what page pool expects for net_iov. I.e.
+> >> instead of releasing the netmem and allowing it to be reallocated by
+> >> page pool, put_netmem(niov) will drop a memory provider reference and
+> >> leak the net_iov. Depending on implementation it might even underflow
+> >> mp refs if a net_iov is ever passed here.
+> >>
+> >
+> > Hmm, put_netmem (I hope) is designed and implemented to do the right
+> > thing no matter what netmem you pass it (and it needs to, because we
+> > can't predict what netmem will be passed to it):
+> >
+> > - For non-pp pages, it drops a page ref.
+> > - For pp pages, it drops a pp ref.
+> > - For non-pp net_iovs (devmem TX), it drops a net_iov ref (which for
+> > devmem net_iovs is a binding ref)
+> > - For pp net_iovs, it drops a niov->pp ref (the same for both iouring
+> > and devmem).
+>
+> void put_netmem(netmem_ref netmem)
+> {
+>         struct net_iov *niov;
+>
+>         if (netmem_is_net_iov(netmem)) {
+>                 niov =3D netmem_to_net_iov(netmem);
+>                 if (net_is_devmem_iov(niov))
+>                         net_devmem_put_net_iov(netmem_to_net_iov(netmem))=
+;
+>                 return;
+>         }
+>
+>         put_page(netmem_to_page(netmem));
+> }
+> EXPORT_SYMBOL(put_netmem);
+>
+> void net_devmem_put_net_iov(struct net_iov *niov)
+> {
+>         net_devmem_dmabuf_binding_put(net_devmem_iov_binding(niov));
+> }
+>
+> Am I looking at an outdated version? for devmem net_iov it always puts
+> the binding and not niov refs, and it's always does put_page for pages.
+> And it'd also silently ignore io_uring. And we're also patching early
+> alloc/init failures in this series, so gauging if it's pp or non-pp
+> originated struct page might be dangerous and depend on init order. We
+> don't even need to think about all that if we continue to use put_page,
+> which is why I think it's a much better option.
+>
 
-Sorry, some neurons misfired. I don't expect the b53 answer to be
-anything other than "tagged with VID 2". The bridge passes the skb as
-tagged with VID 2 already.
+Oh, my bad. I was thinking of skb_page_unref, which actually handles
+all net_iov/page types correctly. You're right, put_netmem doesn't
+actually do that.
 
-Only if the bridge port VLAN 2 were egress-untagged, would the skb be
-coming to ndo_start_xmit() as VLAN-untagged. Then it would be processed
-in VID 2 in software, and in VID 0 in hardware. But the fact that VID 2
-is egress-untagged in software just like VID 0 is egress-untagged in
-hardware will mask that. That would only potentially matter for source
-address learning, which I'm not sure whether it exists on CPU-injected
-packets on b53.
+In that case reverting to put_page would be better here indeed.
+
+--=20
+Thanks,
+Mina
 
