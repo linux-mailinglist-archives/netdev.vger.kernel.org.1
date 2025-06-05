@@ -1,81 +1,108 @@
-Return-Path: <netdev+bounces-195239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E4CACEF6D
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 14:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D82ACF001
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E243F3ACE90
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B89871713CE
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9226202F83;
-	Thu,  5 Jun 2025 12:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92815221FC9;
+	Thu,  5 Jun 2025 13:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kxBehvSj"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="HsR4v8p8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="I60eOZwF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3DD1D8A0A;
-	Thu,  5 Jun 2025 12:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E2A20ADE6
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 13:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749127521; cv=none; b=TDqcVtNQ0+E5WJv+utUBKThzV2L3+XNHlBRWpGt8qHjf9pWPdLg0FYo4YZC7PmZL9HA+5voxqh6AuCY+xHSxXgt4pQHkcmdm4/6dIp9dzz8HRbNMdBwBIdlgfrcdEmXDwiujXZ8W/L+tSZkMwu4iuGAlLmVDxS7PQnAAbmrVuMI=
+	t=1749128968; cv=none; b=mZmeCTW/5TLp+EvfKU3nXX2Yd6ytHkqklSJ/fmyr6iXJQ8L2MsQVy9O49GKGtvWamxG5Y1h46cTSxnjVBSUja7uzBDFG5wflVU4UdICPnOfQ4qmthKsgxtYSFZw8qIfemHS9RjtpdeHwwvfBjhCDRZDCD+qjesCdMD7VYvhr7JQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749127521; c=relaxed/simple;
-	bh=876duFcUVR7+0KAQ6ukxzRWHIerSAdLfmfGb8IxF5Dk=;
+	s=arc-20240116; t=1749128968; c=relaxed/simple;
+	bh=oc012CRErAlX/R19OO6y0h92lUfW7KVDwu5kvl8aVfM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ugPYVQBUwnZxWpbw9Eiy/LVtTLdymFBhNCBIJKkEcU1qKhlR0iLRpzGTXvk0dTmr4zR/YOH/VLx+C5oXEWoOY9WgSoq4dbsbvWDRnAW57bNg/UsSOUAjyHdi6KsQBCSVlWFrdf1AzNqEdIi4i69EOYWnLSdDPWNq0P5yW+J/LJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kxBehvSj; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=mSyAMRzlzNI8j10B10P5gib/izeLj7pMpMECYWU5pTk=; b=kxBehvSjqnApdD5W5sVeB0kXZ4
-	Wkj0eg+BgY3CNtLtU7Nn+5shIDEFcXsPD/d2cik5Hu/SlMQxUFWabXTR5ZVeiYhW/oR74g3rSzcCG
-	koT17IPfI5v9/eQSOvQilBBJmQgtB5rV9MISu2pLKfnqlKN5wcwSK46tdfGlTWOPBMgQdjrw29VTD
-	uBNHUN8AE1qIu2v9VaiuHnQYLrCm7rpTJ4XULVP8X+fpJRWTurjWt1ilBlA2vrq+ZKnexPogtFwsy
-	Z6ceNGB44xN2aUQdTq3ji7ysaNXZJuSZ2pEE/KhIYjDPyD94+58ww99zHpOD2XVyDvuo1lFhDgFYJ
-	Fl9fDt3w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37046)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uN9xv-0008Ap-2B;
-	Thu, 05 Jun 2025 13:45:03 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uN9xo-0002C0-0G;
-	Thu, 05 Jun 2025 13:44:56 +0100
-Date: Thu, 5 Jun 2025 13:44:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Icenowy Zheng <uwu@icenowy.me>
-Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=t/oexEnsFBV4K2I7JTjC6qeQR845Lfp4OW4Ev+RtsnNZdihZxU/YLHt2/vo11/SKx/xhSoErOQxJcAY2C5L8FG6z1HmDoLaTvjqwX232QTlVlbmn2twc2Xm80KRPxSRk+NGJk0ipJ6urNFiWu/VIfrq6CbbEw/pQjzRzidVIqTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=HsR4v8p8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=I60eOZwF; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 70A151380319;
+	Thu,  5 Jun 2025 09:09:24 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Thu, 05 Jun 2025 09:09:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1749128964; x=
+	1749215364; bh=rjq4DK1a9DCfmLlsa+T2JLVJDj403rswC3XC69HTW1U=; b=H
+	sR4v8p8wajV+waW5NL7XewOo+Bb80BUbD5YHUm+w/zmwZdkc3DFgXlSCZDpBef2r
+	LNvND+hQ9XdEGdnYfPLlg0jrnPR49Y0hRM9p9zWrYXAOFxWE/HI/G1LmeolD0Vvo
+	yos7zlW8N6oPo2H0ombkMeTM+WEUBrWbBqeumUUKudzDHEAo+xcdoVxf2sDAYV8e
+	DfCkAuSlErwnKJpgVH4bSMrE38jShcuhodZkiLrMOsQQljzJI1XpXMEkmHTfKpCP
+	sFqBbjdygId71CzUSaTdrj1lXYNNlbe0PTcficbAW1ywDfPMpB9FJrzlK2L+s26l
+	3lHUygs1VyI52GagkxagA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1749128964; x=1749215364; bh=rjq4DK1a9DCfmLlsa+T2JLVJDj403rswC3X
+	C69HTW1U=; b=I60eOZwF1aMgHRUybLowpWhhCPwpECfiKKXhFdvShAA1zuQMT/a
+	/0fE3jI/Pc5P8CrmGvMORJmqfZ/dMFVBBfYYqLTYLv8s07Eqg6FCWbpsEr7TcoCh
+	u/ukONpgSV0lunV9PxRpdWzDgzlL3oK9F5gzJ7fx4yLJt9PYgFdSZNXkc2agD9x1
+	CYvXf8qq8MzFDfg7YEYlWlXo8w/Gn/r+kWN6fACO+PUZroR3D5T2JfS+oZlX0pA1
+	rIH7tlPFtDH3vjLGYODfR72uifP+k2XM2kCCd0te+uHUjlBxElMSE3/19qgZlpRu
+	uf9TR6QrwDMLfinO+qmMgD/3XLeaF8KaSqg==
+X-ME-Sender: <xms:ApdBaJ9LOpGSm5fp6WUjnEc4kTEtN3J9urZOIcN7aTDCzNwci0bFfQ>
+    <xme:ApdBaNsoTRYFMbCdhBp8mG8A_-PufbsrMgE5hpd2PjObxpqA_bNKkEcrAQYDWFxPI
+    KqQ6hQ-diKhsDx-XYA>
+X-ME-Received: <xmr:ApdBaHB_01z58kOo-jkhTjSUlVjyfy3yVdHlSapi50HjijbUA6fjpwVERTLj>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdefieejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehsthgvfhhfvg
+    hnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehlvghonhes
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvohhnrhhosehnvhhiughirgdrtghomh
+    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
+    vgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhvghrsggvrhhtse
+    hgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepkhhusggrsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:ApdBaNdOr2qg5qj0eQ7L1O_TFAW9e4n7EXq94YF8BrSmWgc3SRi4Kw>
+    <xmx:ApdBaON_8UnjlbHgXKR5L6ive-WyhPFb6azL-_49XFN0yMw5yHzLKA>
+    <xmx:ApdBaPkB5LSchPyy-rhQvCP5_OSQPIdNfUkJyqLqGvNAXBBs9WUBZQ>
+    <xmx:ApdBaIseBBE8cjuXXHnwulfOnNXX2k7wDF0MOJR3sIeorglG7vyULw>
+    <xmx:BJdBaFcAAgHOJCXxzNuM3Nyt_56hwPp4bkcvOClFNy324sYiVRC8Obd_>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 5 Jun 2025 09:09:22 -0400 (EDT)
+Date: Thu, 5 Jun 2025 15:09:19 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-Message-ID: <aEGRR6kTZT_B5oYt@shell.armlinux.org.uk>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
- <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
- <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
- <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
- <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
- <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH ipsec-next v1 1/5] xfrm: delay initialization of offload
+ path till its actually requested
+Message-ID: <aEGW_5HfPqU1rFjl@krikkit>
+References: <cover.1739972570.git.leon@kernel.org>
+ <3a5407283334ffad47a7079f86efdf9f08a0cda7.1739972570.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,99 +111,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <3a5407283334ffad47a7079f86efdf9f08a0cda7.1739972570.git.leon@kernel.org>
 
-On Thu, Jun 05, 2025 at 06:51:43PM +0800, Icenowy Zheng wrote:
-> 在 2025-06-05星期四的 10:41 +0100，Russell King (Oracle)写道：
-> > On Thu, Jun 05, 2025 at 05:06:43PM +0800, Icenowy Zheng wrote:
-> > > In addition, analyzing existing Ethernet drivers, I found two
-> > > drivers
-> > > with contradition: stmicro/stmmac/dwmac-qcom-ethqos.c and
-> > > ti/icssg/icssg_prueth.c .
-> > > 
-> > > The QCOM ETHQOS driver enables the MAC's TX delay if the phy_mode
-> > > is
-> > > rgmii or rgmii-rxid, and the PRU ETH driver, which works on some
-> > > MAC
-> > > with hardcoded TX delay, rejects rgmii and rgmii-rxid, and patches
-> > > rgmii-id or rgmii-txid to remove the txid part.
-> > 
-> > No, this is wrong.
-> > 
-> > First, it does not reject any RGMII mode. See qcom_ethqos_probe() and
-> > the switch() in there. All four RGMII modes are accepted.
+Hello,
+
+I think we need to revert this patch. It causes a severe performance
+regression for SW IPsec (around 40-50%).
+
+2025-02-19, 15:50:57 +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Well my sentence have its subject switched here. I mean the TI PRU ETH
-> driver is rejecting modes.
-> 
-> > 
-> > The code in ethqos_rgmii_macro_init() is the questionable bit, but
-> > again, does _not_ do any rejection of any RGMII mode. It simply sets
-> > the transmit clock phase shift according to the mode, and the only
-> > way this can work is if the board does not provide the required
-> > delay.
-> > 
-> > This code was not reviewed by phylib maintainers, so has slipped
-> > through the review process. It ought to be using the delay properties
-> > to configure the MAC.
-> > 
-> > > The logic of QCOM ETHQOS clearly follows the original DT binding,
-> > > which
-> > 
-> > Let's make this clear. "original DT binding" - no, nothing has
-> > *actually* changed with the DT binding - the meaning of the RGMII
-> > modes have not changed. The problem is one of interpretation, and
-> > I can tell you from personal experience that getting stuff documented
-> > so that everyone gets the same understanding is nigh on impossible.
-> > People will pick holes, and deliberately interpret whatever is
-> > written
-> > in ways that it isn't meant to - and the more words that are used the
-> > more this happens.
-> 
-> Well I am not sure, considering two examples I raised here (please note
-> I am comparing QCOM ETHQOS and TI PRUETH two drivers, they have
-> contrary handling of RGMII modes, and one matches the old binding
-> document, one matches the new one).
+> XFRM offload path is probed even if offload isn't needed at all. Let's
+> make sure that x->type_offload pointer stays NULL for such path to
+> reduce ambiguity.
 
-Code sometimes sneaks in that hasn't been reviewed by the phylib
-maintainers. That seems to be the case with the qcom ethqos driver.
-Note the lack of tags from a phylib maintainer. However, I haven't
-checked the mailing list history, maybe they put forward a good
-reason for the code being as it is.
-
-However, the fundamental fact is that the PHY interface mode is
-passed into phylink and phylib unchanged, which instructs the PHY
-driver to set the delays at the PHY as per that mode - as per the
-phylib documentation.
-
-One reason the code in qcom ethqos may exist is that all boards do
-not insert the transmit delay, so the MAC needs to if the PHY
-isn't. That may have been covered on the mailing list. I don't
-know without checking, and I'm not able to check at the moment.
-
-> > The RGMII modes have been documented in
-> > Documentation/networking/phy.rst
-> > (Documentation/networking/phy.txt predating) since:
-> 
-> I checked the document here, and it seems that it's against the changed
-> binding document (it matches the original one):
-
-I repeatedly raised the issue that the phylib documentation is the
-definitive documentation, and we shouldn't be duplicating it. If you
-think that the binding document is contrary to what the phylib doc
-says, then the binding document is wrong.
-
-I stand by my comment in the review. We should *not* be documenting
-the same thing in two different places. You've proven my point.
-
-I suggest we get rid of the "clarification" in the binding document
-because it's just adding to the confusion. Document stuff in one
-place, and one place only. Anything else is madness and leads to
-exactly this problem.
+x->type_offload is used for GRO with SW IPsec, not just for HW offload.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
