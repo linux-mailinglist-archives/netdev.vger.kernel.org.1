@@ -1,399 +1,182 @@
-Return-Path: <netdev+bounces-195292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE15DACF3DC
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:13:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B17ACF3E6
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:15:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49CD4189C8F8
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 16:13:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09DC13A6BA7
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 16:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EA81F91D6;
-	Thu,  5 Jun 2025 16:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099DD1EFFB8;
+	Thu,  5 Jun 2025 16:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6BlH1fX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxO+7HHD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA3533062;
-	Thu,  5 Jun 2025 16:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F751C4A13
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 16:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749139933; cv=none; b=oVVC/ptMCjObgT1S4JJX5LNtKg556kJxnM7uKwJ43H2W9m76vuyXg4neSmJBZAHpyrNq4tnoBF9EJwQ01UJ2iXugu0AA9RuhKual+VqDeYMIsvA1y0R0IFXwHPQNkeGvFsytaHSutYZNQfcBvittuAWyfOJRSzZKTM2Jt4Xk+Kk=
+	t=1749140128; cv=none; b=IBhVY+oyt5czlzgSx1I0gA9ALf0pTKel3obJO/IZfPHQ3SsG1Ezq7tPsaXm3G1ZgCp6la+a/5wjibmLPeTuYVyyWPONRvxRn+kZX0b44UId5xEwj2ZBFuuHRxnOHOL4c/FI+Ky02XCBOzXTIEdJ+rc9BEn42Nw3JuCOs3pM+73Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749139933; c=relaxed/simple;
-	bh=c7jgBo/AzI0O1+jT39VW9dZxBQdtvZE7DTKrrDXU5h8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=odPuweKBkH8ZJUhvtuaLYixbHFehl9PAs2RRaZYF7Cl5QHt3mke7kYcCfuPRXmCxA3KhbQe0QhOmMlGpTuAzpZktv8IP/0HEHhr/wJL0paqiXYxbpjjVNv9nshMppdjE9Nt6EokHJCylhIm3noXj20L/0MkbWnFqpZOYX8oeBaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6BlH1fX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 038B8C4CEE7;
-	Thu,  5 Jun 2025 16:12:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749139933;
-	bh=c7jgBo/AzI0O1+jT39VW9dZxBQdtvZE7DTKrrDXU5h8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=l6BlH1fX3l+BValQrzqY1TnsKBZgV4k8+UdcXnRuvCJA3BJ1S+iV/Uap6sC3WHKZc
-	 hYKbXuGBlXTIkEd4GIbcHfKm/V+1TQeK37iTA3YJ5q2LgYQ+/leICcPzWrVg1kLonc
-	 9HAQlKNJo/clem5t+GS23unDuzRVRyc7AvH8vFyi6DvlNOmH527428gHhQjzZZKd83
-	 v1b0HkdtlJwnJ3MZfhMtCGtPBIJShXxdmR4HkInb/ClWrHTh0G5Kuij6C4Sqd8l79/
-	 sCEeso3gy+g835BJJOaHvU7m6VRjlcoSlhphd2gUGNppHA+YuAAq81VHDmWLMrx4In
-	 JfzgUXpi15qvw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking for v6.16-rc1
-Date: Thu,  5 Jun 2025 09:12:12 -0700
-Message-ID: <20250605161212.145569-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749140128; c=relaxed/simple;
+	bh=5YRfXPx9urXs5R9JeRsxMZW2JAsNkY5U5iQs48ngJ1w=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HjGXjYRJzb+rIdJwkqrMS7Q9I07krcy4z01hO7gBbSAcGiYuPlzI2AzUaldChOPLk3rlE1IfBEsxoULSZoKflhY8HlkF5Pg5VO9+jesJsTuJV8fjOGfmHIU9UGNAHSVPhwrHxOKymHve7og8Nrb0mdPpE1P81sNtx1BGTulCswo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WxO+7HHD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749140126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8oBJwL5i85fvyuh1/EIGr7LIagSUnBICErVA++ejqYk=;
+	b=WxO+7HHDX9kEVOh4CX6W9zOhLs3ZxmNqDETB3qs2D7nsWCmsSUJ7ccyRE1xWoZxkTqVFXB
+	yGhp3Z6CXQrczKwR2EL/FEm3gxN867TOAh9xS4cA3D33zz38xK90CCjYb6KWkjsgW7kNB4
+	EveuE9u9r8O2L26x6fDp/8A3pJPM2nw=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-7Nat_UrVOSS6M8SMwlHXLQ-1; Thu, 05 Jun 2025 12:15:23 -0400
+X-MC-Unique: 7Nat_UrVOSS6M8SMwlHXLQ-1
+X-Mimecast-MFC-AGG-ID: 7Nat_UrVOSS6M8SMwlHXLQ_1749140122
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-32a6ecca4ddso7185191fa.0
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 09:15:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749140122; x=1749744922;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8oBJwL5i85fvyuh1/EIGr7LIagSUnBICErVA++ejqYk=;
+        b=NrQndBdds4g/Jpn7cm0O1wDMmLsP+xQPCoHPMXIeWSM4fFmwuHWW5Hm10nzQCIiZjA
+         QcEYTc94cN0e8UUIZFupltbKJ8aRzwaNEBZo/7tl17qXJGGz44I9slWpIQQZ/vIMOzQC
+         XBsZftf69JdJaeQak9wWySYs1jR+peGZwMF/Da6RWoXC4fK4e4D09i3ZcxSfpKouu7E9
+         Jnzf1oen6nwwp1IaLIGYDjfIyHXQqt0RVj29rWZGvyOP+bhnwt1YyTVf+EKPyCm3mnqr
+         YIFEnWjtTvMfzwIKqbb+jsdbnR06kVyNR7jE0CLuZa1QVluYBUtg0deNLHpm9cYhyxzj
+         Jkyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJW/Bvl0dNDB2fxTr/8LREoglsZLdqRTwAEXI9uz4wO6QaTdonhDEW0CHWOXCZmJyB0H+hxwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQyug/37/ilo2ZcRCkE+k2KoWf450+ahwyigDUhkVll+Brcrko
+	teFVnH3EgD4KTYE0J/IYah3gbqQ8J67un+J9QmICGJB8dYgGNFjPWUexuj+bU1mzu/z8YlHWk6V
+	TNQ1l3YLu2oegWpW72Fw1t/R4PZuYNJHjR3KvNTBTdOn/EuNuW8ixN/C/Ng==
+X-Gm-Gg: ASbGncukx5RwUQvcO9L5d64Y87owk96WNX2vdrmdSazw/wGRLQtxeVUVkb2tnLLSCVp
+	uDwpZRp4/gtgKazQuHZvts2NAFqkdIa2fi10pOOtmnZ/NOa2aTSkgpu7SeNfndWMd/UCCi/SSXm
+	NmQxq5/0Hrq9bAPigl+KEF3Rbd6GlRFDdmZ2rLeBau6BOM2Bv5fMUcl3folaE73l7orYbThYPLJ
+	kUjNK5f/yTrfb7MqRMCnmtCSjVmtpgJoTXakJxcczU2hEqiPzdRi4MKfcEPPuoIZDeE4aWeXQmb
+	W4IJ5wuk1yQUYKXwlgE=
+X-Received: by 2002:a05:6512:1195:b0:553:2633:8a63 with SMTP id 2adb3069b0e04-55356bf0810mr2550087e87.17.1749140121788;
+        Thu, 05 Jun 2025 09:15:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyEGbTPkSKROw9FM9QAr8F2/I2JIMKK1z9Bn5SHjSwSvXY3jUXjSWANlqa0vsJXPbGPEkgrA==
+X-Received: by 2002:a05:6512:1195:b0:553:2633:8a63 with SMTP id 2adb3069b0e04-55356bf0810mr2550079e87.17.1749140121308;
+        Thu, 05 Jun 2025 09:15:21 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553378a13d2sm2650604e87.74.2025.06.05.09.15.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 09:15:20 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 60FF81AA92F7; Thu, 05 Jun 2025 18:15:18 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong
+ Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [BUG] veth: TX drops with NAPI enabled and crash in combination
+ with qdisc
+In-Reply-To: <9da42688-bfaa-4364-8797-e9271f3bdaef@hetzner-cloud.de>
+References: <9da42688-bfaa-4364-8797-e9271f3bdaef@hetzner-cloud.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 05 Jun 2025 18:15:18 +0200
+Message-ID: <87zfemtbah.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+
+Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de> writes:
+
+> Hi,
+>
+> while experimenting with XDP_REDIRECT from a veth-pair to another interface, I
+> noticed that the veth-pair looses lots of packets when multiple TCP streams go
+> through it, resulting in stalling TCP connections and noticeable instabilities.
+>
+> This doesn't seem to be an issue with just XDP but rather occurs whenever the
+> NAPI mode of the veth driver is active.
+> I managed to reproduce the same behavior just by bringing the veth-pair into
+> NAPI mode (see commit d3256efd8e8b ("veth: allow enabling NAPI even without
+> XDP")) and running multiple TCP streams through it using a network namespace.
+>
+> Here is how I reproduced it:
+>
+>   ip netns add lb
+>   ip link add dev to-lb type veth peer name in-lb netns lb
+>
+>   # Enable NAPI
+>   ethtool -K to-lb gro on
+>   ethtool -K to-lb tso off
+>   ip netns exec lb ethtool -K in-lb gro on
+>   ip netns exec lb ethtool -K in-lb tso off
+>
+>   ip link set dev to-lb up
+>   ip -netns lb link set dev in-lb up
+>
+> Then run a HTTP server inside the "lb" namespace that serves a large file:
+>
+>   fallocate -l 10G testfiles/10GB.bin
+>   caddy file-server --root testfiles/
+>
+> Download this file from within the root namespace multiple times in parallel:
+>
+>   curl http://[fe80::...%to-lb]/10GB.bin -o /dev/null
+>
+> In my tests, I ran four parallel curls at the same time and after just a few
+> seconds, three of them stalled while the other one "won" over the full bandwidth
+> and completed the download.
+>
+> This is probably a result of the veth's ptr_ring running full, causing many
+> packet drops on TX, and the TCP congestion control reacting to that.
+>
+> In this context, I also took notice of Jesper's patch which describes a very
+> similar issue and should help to resolve this:
+>   commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
+>   reduce TX drops")
+>
+> But when repeating the above test with latest mainline, which includes this
+> patch, and enabling qdisc via
+>   tc qdisc add dev in-lb root sfq perturb 10
+> the Kernel crashed just after starting the second TCP stream (see output below).
+>
+> So I have two questions:
+> - Is my understanding of the described issue correct and is Jesper's patch
+>   sufficient to solve this?
+
+Hmm, yeah, this does sound likely.
+
+> - Is my qdisc configuration to make use of this patch correct and the kernel
+>   crash is likely a bug?
+>
+> ------------[ cut here ]------------
+> UBSAN: array-index-out-of-bounds in net/sched/sch_sfq.c:203:12
+> index 65535 is out of range for type 'sfq_head [128]'
+
+This (the 'index 65535') kinda screams "integer underflow". So certainly
+looks like a kernel bug, yeah. Don't see any obvious reason why Jesper's
+patch would trigger this; maybe Eric has an idea?
+
+Does this happen with other qdiscs as well, or is it specific to sfq?
+
+-Toke
 
-Hi Linus!
-
-The following changes since commit 90b83efa6701656e02c86e7df2cb1765ea602d07:
-
-  Merge tag 'bpf-next-6.16' of git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2025-05-28 15:52:42 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.16-rc1
-
-for you to fetch changes up to 3cae906e1a6184cdc9e4d260e4dbdf9a118d94ad:
-
-  calipso: unlock rcu before returning -EAFNOSUPPORT (2025-06-05 08:03:38 -0700)
-
-----------------------------------------------------------------
-Including fixes from CAN, wireless, Bluetooth, and Netfilter.
-
-Current release - regressions:
-
- - Revert "kunit: configs: Enable CONFIG_INIT_STACK_ALL_PATTERN
-   in all_tests", makes kunit error out if compiler is old
-
- - wifi: iwlwifi: mvm: fix assert on suspend
-
- - rxrpc: fix return from none_validate_challenge()
-
-Current release - new code bugs:
-
- - ovpn: couple of fixes for socket cleanup and UDP-tunnel teardown
-
- - can: kvaser_pciefd: refine error prone echo_skb_max handling logic
-
- - fix net_devmem_bind_dmabuf() stub when DEVMEM not compiled
-
- - eth: airoha: fixes for config / accel in bridge mode
-
-Previous releases - regressions:
-
- - Bluetooth: hci_qca: move the SoC type check to the right place,
-   fix GPIO integration
-
- - prevent a NULL deref in rtnl_create_link() after locking changes
-
- - fix udp gso skb_segment after pull from frag_list
-
- - hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
-
-Previous releases - always broken:
-
- - netfilter:
-   - nf_nat: also check reverse tuple to obtain clashing entry
-   - nf_set_pipapo_avx2: fix initial map fill (zeroing)
-
- - fix the helper for incremental update of packet checksums after
-   modifying the IP address, used by ILA and BPF
-
- - eth: stmmac: prevent div by 0 when clock rate is misconfigured
-
- - eth: ice: fix Tx scheduler handling of XDP and changing queue count
-
- - eth: b53: fix support for the RGMII interface when delays configured
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Alexis Lothoré (2):
-      net: stmmac: make sure that ptp_rate is not 0 before configuring timestamping
-      net: stmmac: make sure that ptp_rate is not 0 before configuring EST
-
-Alok Tiwari (2):
-      gve: Fix RX_BUFFERS_POSTED stat to report per-queue fill_cnt
-      gve: add missing NULL check for gve_alloc_pending_packet() in TX DQO
-
-Antonio Quartulli (5):
-      ovpn: properly deconfigure UDP-tunnel
-      ovpn: ensure sk is still valid during cleanup
-      ovpn: avoid sleep in atomic context in TCP RX error path
-      selftest/net/ovpn: fix TCP socket creation
-      selftest/net/ovpn: fix missing file
-
-Bartosz Golaszewski (1):
-      Bluetooth: hci_qca: move the SoC type check to the right place
-
-Brian Vazquez (1):
-      idpf: fix a race in txq wakeup
-
-Bui Quang Minh (1):
-      selftests: net: build net/lib dependency in all target
-
-Charalampos Mitrodimas (1):
-      net: tipc: fix refcount warning in tipc_aead_encrypt
-
-Dan Carpenter (1):
-      net/mlx4_en: Prevent potential integer overflow calculating Hz
-
-Daniele Palmas (1):
-      net: wwan: mhi_wwan_mbim: use correct mux_id for multiplexing
-
-David Howells (1):
-      rxrpc: Fix return from none_validate_challenge()
-
-Dmitry Antipov (1):
-      Bluetooth: MGMT: reject malformed HCI_CMD_SYNC commands
-
-Dong Chenchen (1):
-      page_pool: Fix use-after-free in page_pool_recycle_in_ring
-
-Emil Tantilov (1):
-      idpf: avoid mailbox timeout delays during reset
-
-Eric Dumazet (3):
-      net: annotate data-races around cleanup_net_task
-      net: prevent a NULL deref in rtnl_create_link()
-      calipso: unlock rcu before returning -EAFNOSUPPORT
-
-Fedor Pchelkin (1):
-      can: kvaser_pciefd: refine error prone echo_skb_max handling logic
-
-Florian Westphal (5):
-      netfilter: nf_set_pipapo_avx2: fix initial map fill
-      selftests: netfilter: nft_concat_range.sh: prefer per element counters for testing
-      selftests: netfilter: nft_concat_range.sh: add datapath check for map fill bug
-      netfilter: nf_nat: also check reverse tuple to obtain clashing entry
-      selftests: netfilter: nft_nat.sh: add test for reverse clash with nat
-
-Geert Uytterhoeven (1):
-      hinic3: Remove printed message during module init
-
-Horatiu Vultur (1):
-      net: lan966x: Make sure to insert the vlan tags also in host mode
-
-Ido Schimmel (1):
-      seg6: Fix validation of nexthop addresses
-
-Ilan Peer (1):
-      wifi: iwlwifi: mld: Move regulatory domain initialization
-
-Jakub Kicinski (11):
-      Merge tag 'for-net-2025-05-30' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge branch 'net-stmmac-prevent-div-by-0'
-      Merge branch 'net-fix-inet_proto_csum_replace_by_diff-for-ipv6'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Revert "kunit: configs: Enable CONFIG_INIT_STACK_ALL_PATTERN in all_tests"
-      netlink: specs: rt-link: add missing byte-order properties
-      netlink: specs: rt-link: decode ip6gre
-      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      selftests: drv-net: add configs for the TSO test
-      selftests: drv-net: tso: fix the GRE device name
-      selftests: drv-net: tso: make bkg() wait for socat to quit
-
-Jinjian Song (1):
-      net: wwan: t7xx: Fix napi rx poll issue
-
-Johannes Berg (2):
-      wifi: iwlwifi: pcie: fix non-MSIX handshake register
-      Merge tag 'iwlwifi-fixes-2025-06-04' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-
-Jonas Gorski (5):
-      net: dsa: b53: do not enable EEE on bcm63xx
-      net: dsa: b53: do not enable RGMII delay on bcm63xx
-      net: dsa: b53: do not configure bcm63xx's IMP port interface
-      net: dsa: b53: allow RGMII for bcm63xx RGMII ports
-      net: dsa: b53: do not touch DLL_IQQD on bcm53115
-
-Krzysztof Kozlowski (1):
-      Bluetooth: btnxpuart: Fix missing devm_request_irq() return value check
-
-Lachlan Hodges (1):
-      wifi: cfg80211/mac80211: correctly parse S1G beacon optional elements
-
-Lorenzo Bianconi (3):
-      net: airoha: Initialize PPE UPDMEM source-mac table
-      net: airoha: Fix IPv6 hw acceleration in bridge mode
-      net: airoha: Fix smac_id configuration in bridge mode
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: L2CAP: Fix not responding with L2CAP_CR_LE_ENCRYPTION
-
-Meghana Malladi (1):
-      net: ti: icssg-prueth: Fix swapped TX stats for MII interfaces.
-
-Michal Kubiak (3):
-      ice: fix Tx scheduler error handling in XDP callback
-      ice: create new Tx scheduler nodes for new queues only
-      ice: fix rebuilding the Tx scheduler tree for large queue counts
-
-Mirco Barone (1):
-      wireguard: device: enable threaded NAPI
-
-Miri Korenblit (2):
-      wifi: iwlwifi: mvm: fix assert on suspend
-      wifi: iwlwifi: mld: avoid panic on init failure
-
-Oliver Neukum (1):
-      net: usb: aqc111: debug info before sanitation
-
-Paolo Abeni (7):
-      Merge tag 'linux-can-fixes-for-6.16-20250529' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
-      Merge branch 'net-airoha-fix-ipv6-hw-acceleration'
-      Merge branch 'net-dsa-b53-fix-rgmii-ports'
-      Merge tag 'ovpn-net-20250603' of https://github.com/OpenVPN/ovpn-net-next
-      Merge branch 'netlink-specs-rt-link-decode-ip6gre'
-      Merge tag 'nf-25-06-05' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge tag 'wireless-2025-06-05' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-
-Paul Chaignon (2):
-      net: Fix checksum update for ILA adj-transport
-      bpf: Fix L4 csum update on IPv6 in CHECKSUM_COMPLETE
-
-Pranjal Shrivastava (1):
-      net: Fix net_devmem_bind_dmabuf for non-devmem configs
-
-Przemek Kitszel (6):
-      iavf: iavf_suspend(): take RTNL before netdev_lock()
-      iavf: centralize watchdog requeueing itself
-      iavf: simplify watchdog_task in terms of adminq task scheduling
-      iavf: extract iavf_watchdog_step() out of iavf_watchdog_task()
-      iavf: sprinkle netdev_assert_locked() annotations
-      iavf: get rid of the crit lock
-
-Qasim Ijaz (1):
-      net: ch9200: fix uninitialised access during mii_nway_restart
-
-Quentin Schulz (1):
-      net: stmmac: platform: guarantee uniqueness of bus_id
-
-Ronak Doshi (1):
-      vmxnet3: correctly report gso type for UDP tunnels
-
-Saurabh Sengar (1):
-      hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
-
-Shiming Cheng (1):
-      net: fix udp gso skb_segment after pull from frag_list
-
-Tengteng Yang (1):
-      Fix sock_exceed_buf_limit not being triggered in __sk_mem_raise_allocated
-
-Yanqing Wang (1):
-      driver: net: ethernet: mtk_star_emac: fix suspend/resume issue
-
-Álvaro Fernández Rojas (1):
-      net: dsa: tag_brcm: legacy: fix pskb_may_pull length
-
- Documentation/netlink/specs/rt-link.yaml           |  68 ++++-
- drivers/bluetooth/btnxpuart.c                      |   2 +
- drivers/bluetooth/hci_qca.c                        |  14 +-
- drivers/net/can/kvaser_pciefd.c                    |   3 +-
- drivers/net/dsa/b53/b53_common.c                   |  58 ++--
- drivers/net/ethernet/airoha/airoha_eth.c           |   2 +
- drivers/net/ethernet/airoha/airoha_eth.h           |   1 +
- drivers/net/ethernet/airoha/airoha_ppe.c           |  52 +++-
- drivers/net/ethernet/airoha/airoha_regs.h          |  10 +
- drivers/net/ethernet/google/gve/gve_main.c         |   2 +-
- drivers/net/ethernet/google/gve/gve_tx_dqo.c       |   3 +
- drivers/net/ethernet/huawei/hinic3/hinic3_main.c   |   2 -
- drivers/net/ethernet/intel/iavf/iavf.h             |   1 -
- drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |  29 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c        | 291 +++++++--------------
- drivers/net/ethernet/intel/ice/ice_main.c          |  47 +++-
- drivers/net/ethernet/intel/ice/ice_sched.c         | 181 ++++++++++---
- drivers/net/ethernet/intel/idpf/idpf_lib.c         |  18 +-
- .../net/ethernet/intel/idpf/idpf_singleq_txrx.c    |   9 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c        |  45 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.h        |   8 -
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c    |   2 +-
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.h    |   1 +
- drivers/net/ethernet/mediatek/mtk_star_emac.c      |   4 +
- drivers/net/ethernet/mellanox/mlx4/en_clock.c      |   2 +-
- .../net/ethernet/microchip/lan966x/lan966x_main.c  |   1 +
- .../net/ethernet/microchip/lan966x/lan966x_main.h  |   1 +
- .../ethernet/microchip/lan966x/lan966x_switchdev.c |   1 +
- .../net/ethernet/microchip/lan966x/lan966x_vlan.c  |  21 ++
- drivers/net/ethernet/stmicro/stmmac/stmmac_est.c   |   5 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   5 +
- .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |  11 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c   |   2 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.c        |   8 +
- drivers/net/hyperv/netvsc_bpf.c                    |   2 +-
- drivers/net/hyperv/netvsc_drv.c                    |   4 +-
- drivers/net/ovpn/io.c                              |   8 +-
- drivers/net/ovpn/netlink.c                         |  16 +-
- drivers/net/ovpn/peer.c                            |   4 +-
- drivers/net/ovpn/socket.c                          |  68 ++---
- drivers/net/ovpn/socket.h                          |   4 +-
- drivers/net/ovpn/tcp.c                             |  73 +++---
- drivers/net/ovpn/tcp.h                             |   3 +-
- drivers/net/ovpn/udp.c                             |  46 ++--
- drivers/net/ovpn/udp.h                             |   4 +-
- drivers/net/usb/aqc111.c                           |   8 +-
- drivers/net/usb/ch9200.c                           |   7 +-
- drivers/net/vmxnet3/vmxnet3_drv.c                  |  26 ++
- drivers/net/wireguard/device.c                     |   1 +
- drivers/net/wireless/intel/iwlwifi/mld/fw.c        |   8 +-
- drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   3 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |   4 +-
- .../net/wireless/intel/iwlwifi/pcie/trans-gen2.c   |   2 +-
- drivers/net/wwan/mhi_wwan_mbim.c                   |   9 +-
- drivers/net/wwan/t7xx/t7xx_netdev.c                |  11 +-
- include/linux/ieee80211.h                          |  79 +++++-
- include/net/checksum.h                             |   2 +-
- include/uapi/linux/bpf.h                           |   2 +
- net/bluetooth/l2cap_core.c                         |   3 +-
- net/bluetooth/mgmt.c                               |   3 +-
- net/core/dev.c                                     |   3 +-
- net/core/devmem.h                                  |   3 +-
- net/core/filter.c                                  |   5 +-
- net/core/net_namespace.c                           |   4 +-
- net/core/page_pool.c                               |  27 +-
- net/core/rtnetlink.c                               |   2 +-
- net/core/sock.c                                    |   8 +-
- net/core/utils.c                                   |   4 +-
- net/dsa/tag_brcm.c                                 |   2 +-
- net/ipv4/udp_offload.c                             |   5 +
- net/ipv6/ila/ila_common.c                          |   6 +-
- net/ipv6/seg6_local.c                              |   6 +-
- net/mac80211/mlme.c                                |   7 +-
- net/mac80211/scan.c                                |  11 +-
- net/netfilter/nf_nat_core.c                        |  12 +-
- net/netfilter/nft_set_pipapo_avx2.c                |  21 +-
- net/netlabel/netlabel_kapi.c                       |   6 +-
- net/rxrpc/insecure.c                               |   5 +-
- net/tipc/crypto.c                                  |   6 +-
- net/wireless/scan.c                                |  18 +-
- tools/include/uapi/linux/bpf.h                     |   2 +
- tools/testing/kunit/configs/all_tests.config       |   1 -
- tools/testing/selftests/Makefile                   |   2 +-
- tools/testing/selftests/drivers/net/hw/config      |   5 +
- tools/testing/selftests/drivers/net/hw/tso.py      |   4 +-
- .../selftests/net/netfilter/nft_concat_range.sh    | 102 +++++++-
- tools/testing/selftests/net/netfilter/nft_nat.sh   |  81 +++++-
- tools/testing/selftests/net/ovpn/ovpn-cli.c        |   1 +
- tools/testing/selftests/net/ovpn/test-large-mtu.sh |   9 +
- 89 files changed, 1060 insertions(+), 618 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/hw/config
- create mode 100755 tools/testing/selftests/net/ovpn/test-large-mtu.sh
 
