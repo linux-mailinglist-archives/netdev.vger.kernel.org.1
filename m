@@ -1,148 +1,146 @@
-Return-Path: <netdev+bounces-195322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9BFACF8A1
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:15:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA3B0ACF8B5
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C293AFD8E
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:14:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C6D1795AC
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6D127A927;
-	Thu,  5 Jun 2025 20:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE0B27C179;
+	Thu,  5 Jun 2025 20:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brPlE76X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JDa11dC5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FC417548;
-	Thu,  5 Jun 2025 20:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8006C27C150;
+	Thu,  5 Jun 2025 20:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749154495; cv=none; b=IBk4K7A0iJT5m9I2cTN7cfRzaY2E01mHwXmN7yfBv5HFghN/S9gplR6OCRl6poDsIj1+BWkjUDb4OLEMN+3GJ8bzNYjSbue+oPUC72nonAwlJCBwOI9YJcgHqnSArzT4zCxlonPz9+jLzrFZrSPjrPct+y1LfM/FlUjADxUzYGs=
+	t=1749154850; cv=none; b=YkNfeRa5s3TYUCzDfraL0Wug+AKWJ1MMPnmVIOlHFLaTOhlpmw2WSI+9rIEHm1AmdGD9wJYWn/4tR+zNS9ENG/ws33ZEIJU2GXFtiJojtX11StckLXgqwJ9M71oz/SqdJVMHFqA55qUqZWVA8/gnAO6H+h9XA2bLDp8/KzBpLrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749154495; c=relaxed/simple;
-	bh=k2Q0O9UQ45RQ36LfMj7Bdv+5YX5+XlaWPgX7rs7Tix0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rSxUZrWpi5avJIJSwfyRbVexmm3pO/6CdMyRXxxYH/MTsWtm3FC3YxT6Y0YArqqP7d0MRVMv9UqKepPQg7gHGBwKvABpm4dgDqV6JXGc6daXz0XEHMXPhGm/zsT6GzrK1E4iCz0RyZNthR8D4ytJKhpzj1zYCUENCSbU1skx08g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brPlE76X; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1749154850; c=relaxed/simple;
+	bh=r1utos8IHVUWPpcTEYj5oGYSf7pgmh3WfT8WkMKuzO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E83ISm4h/NCrWn3xZh4AYW43YXxn+QxQyS3KoJCZmcJF/BnnLlUm3PNCiFy82VRJbrn2F+kL8BWMSUm4pNPaGsbtTcrBRKTU7AR+4o8AOpRBDHtHDL6OdMsxnILzeOtA9YQ6Fe9oQ/1EOWEPjvaXWLUVhMkBtBXeUQvPkT5mbms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JDa11dC5; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-451e2f0d9c2so11888895e9.1;
-        Thu, 05 Jun 2025 13:14:52 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ad87fec4400so21627066b.1;
+        Thu, 05 Jun 2025 13:20:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749154491; x=1749759291; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f+cjUMM/AEqKNUgpKT4nzaOOhbvSaoi3UBoC5zwm/Gw=;
-        b=brPlE76X144Jhoaarg43T2KSiFFR/rNZAoERd7cldT6gPzXtcBGJ8s0Xom2t3rkTkb
-         wnZhYSjlH940uVXofIWbdD+qHnl8nl3DeN4Ppu3G3xoyaBVcCpIPBUzLw5rgsKoXMAlI
-         gDDI+7iQcMJ2C//5NPwWN8Jl/N+OuXIK9sQd0CDG9siM5V8WUc15dHAILBiGfxAMFS20
-         zmYUwOtxrQ0XwiESmA31mh4jXAR+qgX0sYhAL1fyxTTxBMcS8XyT5cbrM86rp7qxqUe9
-         I/hcCoxQE5jIdrZJl1q7Rg/oR4uUx2NI+yfaquJrdrd3lSTRkqmmm7UliJPjAvEubqwW
-         Bftw==
+        d=gmail.com; s=20230601; t=1749154847; x=1749759647; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pOf6kMkJBMv/kxUwMYAvC6No+wYBD2t+/55N4SZuCQA=;
+        b=JDa11dC5kjCHUZSikzG31PL1YRcZ5PgPfcB8rcSMu8+Vg0P57Wj60RuFkNZ0yXS09w
+         JVYyH5bjZlD93vSfc4HjEVOTqXVQIHFFbUlEHf2TrgL3TPCwS0AaXGFwt4iOHDkFTCPr
+         /SZ29ugZUOfW+d2Ns895sQCw/JihUbQzgm5ZVQ1ak7eKU0Flo5UJHe7WJ1jClJf3ez2i
+         qKIoPhMWcvPkvUnZ3Ry320llSpmx92C76cPuBEjiANh8yQD8hmiTodL7ukRaE6uCxPS4
+         7RLx4PAeqWrxDQYt0N/tYziHL4xByK1OyzCHuys4GigIu8iMlGmlbeMsKh0JzZzE8Q1T
+         0bQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749154491; x=1749759291;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f+cjUMM/AEqKNUgpKT4nzaOOhbvSaoi3UBoC5zwm/Gw=;
-        b=Qbz1iYX4D33ez58u9mbzytcQL5d/6eDKr03t8Ra2FOspT7JmdBF10Ke2E6L3yGWcJv
-         sCQ7RqHyWhm7/qEwCqdCNzaiI/fVejr9y8lLvtO+xVcfj040caSntCerkLjF2PkWU6g3
-         wV9Cz0PxL59jAS3p7/ajQDxs9LA1Q0JgzQEBHjKpHfdR+y1yEm8+wsEi7MwBVmYtF5XT
-         ugYDXTUun12Mx+uYivmjNU1XAIPVUIzWdW70SLGVJVgnhu20xIrWV1D463vvNYERIYQg
-         Rb4oUjzFp1PSor4hWy2mmESb4l9s3fiJulrN7uP7FFPQr9sCvIT7e5PR8fPvzZKMSPCt
-         qMkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUB02rJu44s9l/fQhCPq4VvaEjS9vsYfbQOQeN7to4tiUTOMh9AbRImFEIzpy3V3Gqt4iv6wsru@vger.kernel.org, AJvYcCV4v0hX7alnDSWj20L9NG/CYmZJmRnwXEpHhe/ygZHNLw0tbU/gS4578Zy+mrCHHIlFqbFDCx8xmx/pSpyh@vger.kernel.org, AJvYcCVoNIGqLRG4e+5fOnfmYyror9qvJd7NghOdKdl7rpYc0264NB9p/Nnpt2G413OaNroMVXsz7LLYGoRjuA==@vger.kernel.org, AJvYcCVyddUP/vTXVjqym4CBePUs4lQi/5bm8OwgmyY4iLpp5je2RL5CoMAZNKmLZ/kuHYnbgR0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3gOu1PIpYEnf7X0MC0DYp8C6XJ57txTf4sZ2HUTYRyzpjMhDz
-	ojzZuiCWM5Co5A2l1V57TVGB+mEYxnrqTAcpzG6baQpJ0BwqTLNstF65
-X-Gm-Gg: ASbGncsERJNBn9jFbSvMhdhjjbTKwXmhWC/RIL2Aq471uD7eCkcS7RH2aIEmAR2aOkk
-	7yqGvrfHsxcOnHcnhn4qITdO5mnzbKpCprvfTqPHwnsrkxMEpAWYNqk+U01mWxbpdh+5Vh67qGY
-	CP2PNDfgvkrl52HFGrLVuH0wzVuLNqYhKUI8dY6Im4Js0S9ECxCFEY+mnci2DQj1sznsaTi9Xvi
-	+WXSXicpfROkmm8st9dYX2t/LBtUmHj7t9sdvVs48WhbrrRQyOTXNAKgF0zsg0a2wVHBiuGvEg1
-	wPHSutujFZF7Me8RYc7bNLa61H9iTXr8XA7PXcgZmxrj/HbrGwc+jD2/WejBZZsdaEf5yEn7mfI
-	ikOOXFW4=
-X-Google-Smtp-Source: AGHT+IFYycvJM2i/VSYKq/XS+8nRykdaQFdAMb7xHQBYhmMNIZdyie6Xtr4zGV+6D8zpAAR7QV4waw==
-X-Received: by 2002:a05:600c:1d05:b0:43b:c592:7e16 with SMTP id 5b1f17b1804b1-451f844f896mr52572425e9.3.1749154490953;
-        Thu, 05 Jun 2025 13:14:50 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.145.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-452730b92d4sm109565e9.19.2025.06.05.13.14.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 13:14:50 -0700 (PDT)
-Message-ID: <9138df77-fe7d-430b-a369-05453a76bdb4@gmail.com>
-Date: Thu, 5 Jun 2025 21:16:12 +0100
+        d=1e100.net; s=20230601; t=1749154847; x=1749759647;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pOf6kMkJBMv/kxUwMYAvC6No+wYBD2t+/55N4SZuCQA=;
+        b=SyNl1DxE+WmCHBvCzm/Hn4zoM6mhfjFfnkCTnupr81TroqTSAWBv/v97ceixKKbmjp
+         iDuspn0MYiFWvvfCrlx+wAJnh18358Q8ZpGgudJjT4AYsPGdkHqO6Z8jimjMOnKZ/Ngv
+         KLMAdbZ3+gAdQ6UFtTPAOfIUVmy9jCo2BHcshkfv4w/u2zGDNqXcobcn+NLio7afCzHI
+         qbVw3cMiscRVOphQjPdWBNuPuXD6w/eNE1EVk6rO8aQ9sMT7nxWIen3P6cklBgPOcBD3
+         sFasdmz9loQIcEyNy2J090nPYjHdY07k77kOm3Xsm6gJefHBqXPexaXiQSdcdO10DSun
+         uNWg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3cHpg/vhYLSBw2Fxc8S49b4QOBIOSc8wyD7WfDjrGjy0UJWCnDhrpZYfjZQCMvSMQiG/RygUohU85P/0=@vger.kernel.org, AJvYcCWd5UDnj3kOa2OF6M0c/TTfCNO1sLWtrQ8OpKehrzY9RIyQeMeyVYPP0G1hfgS6NHr50JUl94LW@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAOWtI2/dvhNETthN5ZkDO4s/NJ41aEGfg2EZmFrajYVEe1DmH
+	NDfQzIODw36WnWbE3ywCu+pryEc+Qmu46wr1KEPS6zc8DiGGUH0JC+Gw
+X-Gm-Gg: ASbGnctqU3odNXAemdZMRmzady6XHWO6QmAesIByh8GN9qG659j4b/8b+qudm08Of9n
+	4TIgHrYEQzhEUPuoOWRy+ZP/gbaJweCkm4xpy75UvIE5tXthsyOEfR3DSa45MBdaZfJyZ7T835m
+	dODND3o2ijgomGjRsPp9bOZa7qdr7a/bNz/edlGu3K+c2asKYncMC6H18jmmuOlL4W9ebwE+K/E
+	cImcO3M2e8C84zAujyHS3U4+/GBtiQYsQfSORNXoYgFK5WZKUzbno1M7cAdgyt0vfshrOubyY25
+	SGsHYUPdCXvI3LoGKGcIDscUqsaQfXdxX3WlExr/qWAGE8RDlQ==
+X-Google-Smtp-Source: AGHT+IG1rF0vK+81PB6gHlhmZyzr6XShnt5ZbsRu+W2TX9OAKnZ16UeydPdB8eGaw5MVCH1Bd7hU6A==
+X-Received: by 2002:a17:906:590b:b0:add:fa4e:8a57 with SMTP id a640c23a62f3a-ade1a9abadbmr14972566b.9.1749154846506;
+        Thu, 05 Jun 2025 13:20:46 -0700 (PDT)
+Received: from skbuf ([86.127.125.65])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc1c7a0sm5095566b.82.2025.06.05.13.20.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 13:20:45 -0700 (PDT)
+Date: Thu, 5 Jun 2025 23:20:43 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: b53: fix untagged traffic sent via cpu
+ tagged with VID 0
+Message-ID: <20250605202043.ivkjlwtvzi6jqhqx@skbuf>
+References: <20250602194914.1011890-1-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v4 18/18] page_pool: access ->pp_magic through struct
- netmem_desc in page_pool_page_is_pp()
-To: Mina Almasry <almasrymina@google.com>, Harry Yoo <harry.yoo@oracle.com>
-Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, ilias.apalodimas@linaro.org,
- hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net,
- john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
- tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- vishal.moola@gmail.com
-References: <20250604025246.61616-1-byungchul@sk.com>
- <20250604025246.61616-19-byungchul@sk.com>
- <390073b2-cc7f-4d31-a1c8-4149e884ce95@gmail.com> <aEGEM3Snkl8z8v4N@hyeyoo>
- <CAHS8izPvdKZncxARWUqUqjXgoMb2MmMy+PaYa8XCcWHCQT-CSg@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izPvdKZncxARWUqUqjXgoMb2MmMy+PaYa8XCcWHCQT-CSg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602194914.1011890-1-jonas.gorski@gmail.com>
 
-On 6/5/25 20:47, Mina Almasry wrote:
-> On Thu, Jun 5, 2025 at 4:49 AM Harry Yoo <harry.yoo@oracle.com> wrote:
->>
->> On Thu, Jun 05, 2025 at 11:56:14AM +0100, Pavel Begunkov wrote:
->>> On 6/4/25 03:52, Byungchul Park wrote:
->>>> To simplify struct page, the effort to separate its own descriptor from
->>>> struct page is required and the work for page pool is on going.
->>>>
->>>> To achieve that, all the code should avoid directly accessing page pool
->>>> members of struct page.
->>>
->>> Just to clarify, are we leaving the corresponding struct page fields
->>> for now until the final memdesc conversion is done?
->>
->> Yes, that's correct.
->>
->>> If so, it might be better to leave the access in page_pool_page_is_pp()
->>> to be "page->pp_magic", so that once removed the build fails until
->>> the helper is fixed up to use the page->type or so.
->>
->> When we truly separate netmem from struct page, we won't have 'lru' field
->> in memdesc (because not all types of memory are on LRU list),
->> so NETMEM_DESC_ASSERT_OFFSET(lru, pp_magic) should fail.
->>
->> And then page_pool_page_is_pp() should be changed to check lower bits
->> of memdesc pointer to identify its type.
->>
+Hi Jonas,
+
+On Mon, Jun 02, 2025 at 09:49:14PM +0200, Jonas Gorski wrote:
+> When Linux sends out untagged traffic from a port, it will enter the CPU
+> port without any VLAN tag, even if the port is a member of a vlan
+> filtering bridge with a PVID egress untagged VLAN.
 > 
-> Oh boy, I'm not sure that works. We already do LSB tricks with
-> netmem_ref to tell what kind of ref it is. I think the LSB pointer
-> tricks with netmem_ref and netmem_desc may trample each other's toes.
-> I guess we'll cross that bridge when we get to it...
+> This makes the CPU port's PVID take effect, and the PVID's VLAN
+> table entry controls if the packet will be tagged on egress.
+> 
+> Since commit 45e9d59d3950 ("net: dsa: b53: do not allow to configure
+> VLAN 0") we remove bridged ports from VLAN 0 when joining or leaving a
+> VLAN aware bridge. But we also clear the untagged bit, causing untagged
+> traffic from the controller to become tagged with VID 0 (and priority
+> 0).
+> 
+> Fix this by not touching the untagged map of VLAN 0. Additionally,
+> always keep the CPU port as a member, as the untag map is only effective
+> as long as there is at least one member, and we would remove it when
+> bridging all ports and leaving no standalone ports.
+> 
+> Since Linux (and the switch) treats VLAN 0 tagged traffic like untagged,
+> the actual impact of this is rather low, but this also prevented earlier
+> detection of the issue.
+> 
+> Fixes: 45e9d59d3950 ("net: dsa: b53: do not allow to configure VLAN 0")
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
 
-I believe Harry wants to tag struct page::memdesc, while
-netmem is tagging the struct page pointer / net_iov.
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
--- 
-Pavel Begunkov
+However, this situation triggered a bell in my mind. But it looks like
+I am about to open a can of worms, so I don't expect that to gate this
+patch.
 
+In the configuration below, what will the packet look like on the wire?
+
+$ ip link add br0 type bridge vlan_filtering 1 && ip link set br0 up
+$ ip link set lan1 master br0 && ip link set lan1 up
+$ bridge vlan add dev br0 vid 2 pvid untagged self
+$ bridge vlan add dev lan1 vid 2
+$ mausezahn br0 -t ip -b 00:01:02:03:04:05 -c 1 -p 1480
+
+Testing both on sja1105, as well as on veth using software bridging, the
+answer should be "tagged with VID 2". However, you make it sounds like
+the answer on b53 is "untagged".
+
+Depending on the answer, I can try to make some suggestions what to do
+about this.
 
