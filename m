@@ -1,124 +1,120 @@
-Return-Path: <netdev+bounces-195201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB0D5ACED26
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 11:54:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E47FACED3C
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE8518927C1
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 09:55:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27293AC03A
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C969C209F45;
-	Thu,  5 Jun 2025 09:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30C41F8733;
+	Thu,  5 Jun 2025 10:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="cOKR5TZh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ioZaRDJf"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B242C3242;
-	Thu,  5 Jun 2025 09:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070273C17;
+	Thu,  5 Jun 2025 10:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749117292; cv=none; b=WmNPLX/O7Y7PFnSo+zFmo9fiH5215GfEmbhB0nywBpQWeINcEi4FmPGP9PIz28L75K0r476UNbBRRTtQAJIoQPzBgPndThGkYbIZ+WAtUelzMjp01WRnHD79oBtizQBDDoJSn9Fce0EXsCS/Bdgbqo8L3LHxWgqErqUVk+ref0A=
+	t=1749117735; cv=none; b=ENaM1OFrINsLbhJHpRCp/mBPIZ65rcUM/k2Db4hmxy4COgjNyKRU507Fzl08+ppZVZamgsCIzVyty005Prk8k1gwvQKUCKXdUBGxuhBhY1+qm6qVp3J/Xr42eXsH88KCZBsu2nsNvH4c7ZjZBD03EZMCU1VPkefM+p/ujRW2wOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749117292; c=relaxed/simple;
-	bh=DmjHcnxxXghLWewLB4CIo5GegDNFRkuT/KyPu4lRXBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fu40M7Fgwu3H0XtTkzttmhxD4brWUcqABOm7Pnh5feYYoIH6HdPSqhfKJ1iy+u4Bjhj41n+8FKP714Ii7XF+xUP4HM4HPtKmHqAnNSTj1NznlQAktmHbXbkThEP02IeXe6wn369o5Uy3xHr22o6s7mA1rpwt2BgOCL3zMYDCI0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=cOKR5TZh; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=iMlViXmimPkwbyhs6IdSuw5ZMK0qViLQ2UlSFgI+Uks=; t=1749117291; x=1750326891; 
-	b=cOKR5TZhpzKc9WbzxjTCH9o6GJEhRJ2aUECxYXuHFhSTOKIZOzRhGYtbPP3hKO0sL4TzmO3J4Pm
-	zzxfTJaG0RSkLl2hnExQuX/WN4Yht0ESWOnixgPdH2E6DzSUYnvoZXSZRunqWCkedSBjvvoYq6MvD
-	AQG0wVRyTNHwF/aUjc99Tx7fRDh7ycd/z2bfsvF5QLHF3l/oPKsYuLm4l/UQ007R5ZNHRNzj8tQmN
-	bavn1uwr3Q51DY/9BA4cD6xpZVgTbI6h/tVDuKsYeqGI2T2tpPtO7XtxEAXl/VDpxPN6R6TKqHL90
-	vn/CkAhJMPYwJUA6kU4R+XoeG6CRt3cbiX2A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uN7J8-00000001x4c-02uq;
-	Thu, 05 Jun 2025 11:54:46 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-06-05
-Date: Thu,  5 Jun 2025 11:53:56 +0200
-Message-ID: <20250605095443.17874-6-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749117735; c=relaxed/simple;
+	bh=3wIA8FzM28jTAmLDNYzym8PGR5wMdvCsj7ojq/EphCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LtBQ+wbHKow4GUl6DrK+gUCa0zQIk7DZug9KTDNsFiPLHJZVeSnvvKjVtwTdn9DCUZU4cWq/rwoFYbdEeTmx7mfWFAmSu3zI1M0utB0dVo4+wWdoUnBuNM9r2yJSttapj/mkGxbzdw4y6Bcitelsi+kFzDTqnFwgokUr5iEqgos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ioZaRDJf; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-605b9488c28so1292820a12.2;
+        Thu, 05 Jun 2025 03:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749117732; x=1749722532; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=up4swdLNOvslRPxbCj7NvUPbNSrEcnEpawU2SYYjeSs=;
+        b=ioZaRDJfpMfd3CkvenTHALAy6pCLzPvtGJCydBNObncWa9p2S6LR9woZlYHoh6HqIy
+         I2NVwJN2WJhtVjw2dHsmK6lkl8JNW8jv+OywhIsiDH2H/4X0UgUj+UibZwMkvyODXTs4
+         M372Lvz5mvNwO9xh/U5zOl0udkWSN2FHF3Mc71u/shcI7yocGYDmdgzi1UPoyUZJQqha
+         Ykd26/AjtgMPiN/n+dxSzEUtXk2oKrpcGUcQnpbfRogme8sbiLF+e/QYMSvLKM2aiORs
+         T6NmsU0GCLVyGVU59hSbVzjw96PxZeMzLfLNKlxAuuAdrBi8THw/NJBa6Y5ySLBKJVvh
+         ct9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749117732; x=1749722532;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=up4swdLNOvslRPxbCj7NvUPbNSrEcnEpawU2SYYjeSs=;
+        b=gm+DpfZ0kde1DoxPbDGlte7K7edLBUrHRehnqssTdmKep2q+eF+LTf8bj2xU4iFQVd
+         0joNiH89xhBJQgVOxNtpDAcplpSaaDId24IuHFhEMo7ghytq4TCOF7AR0KHdusF6YuPp
+         QyJN2WLYaN/JYBu0DrnAiBfvEu3PWCwYGZo+hctgd692xDaKkzl8WKfti/3pXwB9T5L1
+         Aq5iZqRHHtjumCKCBKNP+SD+rNrYuFJHCTa6cSm1zorqikDhOcxvbcb2RWE6MMGLyvlW
+         DrIQNkltm0dG1qLz6aC+mT1oF6j350uG8D2ihDCgkyI6e9p0YVs4XulUy/cbXRBPhL63
+         CSZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUDaxCLV7JG5SyhoNc2Yn4u+Se9x7hEW2Pgp44GwfqxKqOmX5SoxvMQTdcqQgeTPoqLkvMbvNf5m5p8g==@vger.kernel.org, AJvYcCVyoLwctxUlVxw7nYlUsygPJvNuJGRtO8Mu+Dj8lTrOfCQ4LmKC/3Wn3Abvqk+Csn6EUILjI2+P@vger.kernel.org, AJvYcCX5I3kQp6XLBGv8WRhKJOnri+6iGFXQBPyuNA/jgtHWA1gsubFsKjaC7SsrTPGbl75vLs4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCxwY5OoMmmGpf4TQ3H5I4AYtqCJjXMr2ZvO2HfjtMh+RWZx2r
+	8WWSpg4+Nnrc1a87jL7jYQRniuX54WtTxKcLMAMpM2rc5lrDyDiGpVdKrSFcwZVw
+X-Gm-Gg: ASbGncvQ6fHM+0bD1wlO7Cv6cfMYYJoG5p/SaBrTi4E9tyDmAke4vnxOgjUhb1RLs9M
+	YoBfYOB/ASCn13FWAiWLc7E95VAAauDwLyF1ywPfYCpO5oqEChZda2z2pnqAun8zNqDaRBJRvoD
+	Fyt/8nP6W+o+GT4C0dcqfV5eZ5feGMUKzw2m0C8KhCtaz40oY4ZcJz8I4i5VTittiL6ofiktK+H
+	9d1mK0CTmdpZUi9pctQFfhMJwQKu11sCPP0GmVq5O5TqNaAMtj+5HJq4grd4hzLigj4pGD8H8ZB
+	gkD9q3E2wqJQO16L3aIbHPEapeXUkEr27iT5itZUKNu10tgIhc1dE7ZRGTXz6rX529g4gbfG9Vg
+	=
+X-Google-Smtp-Source: AGHT+IEerswt3uaI6aJfTNE+H3AMj09WEw62WDqPCqgipaohetyKETPKo7eDe1WxPbiiU7kRJiNKeA==
+X-Received: by 2002:a05:6402:270e:b0:602:2d06:6b21 with SMTP id 4fb4d7f45d1cf-606e9415e96mr5459962a12.5.1749117731874;
+        Thu, 05 Jun 2025 03:02:11 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::22f? ([2620:10d:c092:600::1:d66f])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-606fe850afasm1809494a12.78.2025.06.05.03.02.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Jun 2025 03:02:11 -0700 (PDT)
+Message-ID: <37376916-6fd0-4a29-ba40-dec512f9796a@gmail.com>
+Date: Thu, 5 Jun 2025 11:03:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v4 01/18] netmem: introduce struct netmem_desc mirroring
+ struct page
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+ akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
+ andrew+netdev@lunn.ch, toke@redhat.com, tariqt@nvidia.com,
+ edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+References: <20250604025246.61616-1-byungchul@sk.com>
+ <20250604025246.61616-2-byungchul@sk.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250604025246.61616-2-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 6/4/25 03:52, Byungchul Park wrote:
+> To simplify struct page, the page pool members of struct page should be
+> moved to other, allowing these members to be removed from struct page.
+> 
+> Introduce a network memory descriptor to store the members, struct
+> netmem_desc, and make it union'ed with the existing fields in struct
+> net_iov, allowing to organize the fields of struct net_iov.
 
-So normally I wouldn't send fixes right now, but there
-have already been reports about those iwlwifi issues,
-so here we are.
+Pavel Begunkov <asml.silence@gmail.com>
 
-If this somehow doesn't work out I can defer to after
--rc1 too though.
+-- 
+Pavel Begunkov
 
-Please pull and let us know if there's any problem.
-
-Thanks,
-johannes
-
-
-
-The following changes since commit 1b98f357dadd6ea613a435fbaef1a5dd7b35fd21:
-
-  Merge tag 'net-next-6.16' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2025-05-28 15:24:36 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-06-05
-
-for you to fetch changes up to 787fe16b435668205fba19aaa7387972b7575991:
-
-  Merge tag 'iwlwifi-fixes-2025-06-04' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-06-05 11:52:39 +0200)
-
-----------------------------------------------------------------
-Couple of quick fixes:
- - iwlwifi/iwlmld crash on certain error paths
- - iwlwifi/iwlmld regulatory data mixup
- - iwlwifi/iwlmld suspend/resume fix
- - iwlwifi MSI (without -X) fix
- - cfg80211/mac80211 S1G parsing fixes
-
-----------------------------------------------------------------
-Ilan Peer (1):
-      wifi: iwlwifi: mld: Move regulatory domain initialization
-
-Johannes Berg (2):
-      wifi: iwlwifi: pcie: fix non-MSIX handshake register
-      Merge tag 'iwlwifi-fixes-2025-06-04' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-
-Lachlan Hodges (1):
-      wifi: cfg80211/mac80211: correctly parse S1G beacon optional elements
-
-Miri Korenblit (2):
-      wifi: iwlwifi: mvm: fix assert on suspend
-      wifi: iwlwifi: mld: avoid panic on init failure
-
- drivers/net/wireless/intel/iwlwifi/mld/fw.c        |  8 +--
- drivers/net/wireless/intel/iwlwifi/mld/mld.c       |  3 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  4 +-
- .../net/wireless/intel/iwlwifi/pcie/trans-gen2.c   |  2 +-
- include/linux/ieee80211.h                          | 79 +++++++++++++++++++---
- net/mac80211/mlme.c                                |  7 +-
- net/mac80211/scan.c                                | 11 ++-
- net/wireless/scan.c                                | 18 ++---
- 8 files changed, 92 insertions(+), 40 deletions(-)
 
