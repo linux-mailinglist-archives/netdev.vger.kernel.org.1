@@ -1,117 +1,97 @@
-Return-Path: <netdev+bounces-195209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA8CACED9C
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:29:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D4F9ACEDA4
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE9901896CD9
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8553D3ABEBE
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51128214818;
-	Thu,  5 Jun 2025 10:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386612147F9;
+	Thu,  5 Jun 2025 10:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atoVG6KX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvigbRTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18F61F3BAC;
-	Thu,  5 Jun 2025 10:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143B81A2C25
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 10:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749119353; cv=none; b=NYVl36XGD55xxea695+pI7XCp2qH8nsh8dCwoNnRHfEZieJkwl14e6EVDpeMPfNeE0R5/mkbBf+KnmWSQO5z8Qst+1/itKLc746xX0QqEBa7urQwEScXzkPkRSf156veCgPe9COjdc0TCe67/8JBDGgI0qzhbdjGwLllWffrufk=
+	t=1749119397; cv=none; b=iEfLeR+FsVC1VGkEMVK4WACT4jJ+ELz2RQL1YQI7ypcKuUnZGnJsT9QRFDdNSK0DTaUL2wqNTYBm5zk58jz/6Y1eNy7xGJTpnjFLpz9JuyGm6xfo2K1Z/jCn2Hc+BpT2Cd+vKan2mFKNLKkn/n7A/cMEc8iLkutioYaGMuafiR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749119353; c=relaxed/simple;
-	bh=9EVBFQQcN5lDcIVjfp+dbF4/DeU+U2HrBX+t02xZwGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BG/3Ox02Fk9a1ySzOqXf/9Jva2thJec/X0IMNfx/jdt/A5LMD5wa+XndqIg/CPg/WprsoaDLHfLfmribqUTsfAcQXgMwDy/RGdfbF+eDKNN4ZfyUt2UneG954bg2vSpy4964Hun2Og97LbVPcF9JDZKrmTLMLsfM0XNxKpB/tIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atoVG6KX; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ad89f9bb725so154450866b.2;
-        Thu, 05 Jun 2025 03:29:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749119350; x=1749724150; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=okGpE+wWkCZMA6eCmE9lZtKgPGws8qXKt8I6SS2wxOw=;
-        b=atoVG6KXQkuktgzJmEFZ9pClsctQnOzHTCd24vkxn9suFgVqJGOrlc5j/OhAVEOjZv
-         NYJQH5+KIimY+i/4Ak1rh6tMUUQ+4cg67WPTHmshYSojPpkNorw6vQFn2HPhwI565RKk
-         uNIirNneJOdZyEKRKIvrwyH0i4X4LrYj8QUryyjfC1+YVECR9/ZeBKjLlB1jxJz5wuzV
-         Tig5zGdW20DJWpS/affy6d0hDReTq4WzJKN3ZaBZuLipNYEEq2xRPvnEMtnC24HCt5HN
-         FULnB4xtBfZpC8jD/NG9P44AgZPOkMZGZ1Sjh1R4XFHtBxV/R/b7PM1irVDrySM3XoVg
-         12iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749119350; x=1749724150;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=okGpE+wWkCZMA6eCmE9lZtKgPGws8qXKt8I6SS2wxOw=;
-        b=D0lwlIacA2oesuqzuDNdC0aY0giqqiqJzvr0UwqIy8MO4saTjjSOBhJsGP1q3MyXA6
-         qlsg5gmUxHq+6M6trLbLVTNDEqYDuyNm8OyS+/mYeQ8eut38vvaHxUWVTp39CmGaDRJ0
-         EY0hlpBZ6dkE2Iew6OS/ZUWDFsuaZG6ETYqCj8KWBRlDmrYuoEKcRwJ8/OQmSbU4g0Rf
-         AnZtIXAeZ0nWoyUI25vInuPTeAJov4J8nrnJ+pNUEzZhFawdj6IWAr8f8tNY3VuzyI3D
-         2puYZbhEH2mfCG+GZMAmpqfFgkmm0ftyKREZOmsS4EeJWe6teqhvejE3Iabk/Q4Alu0M
-         ILzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnSrencZMUJZfU+B32Bb36TPU89nh8Zaii2NHMKCq3WnFhLhnUejvU3kFzWuNYichGZD1DPDk+@vger.kernel.org, AJvYcCWPYf2zc0OyzZ8laHWCSAjHPantSWQRLa6lIJ6dLnIs+4sQcXCb757FrhZ0oU/OfnkiMUWycp6yNwkJxA==@vger.kernel.org, AJvYcCXVnJgCDy+tPD0vsd1Is01beyEHAhTmjUmqfR2U19Ug0L+iQZL3AALycE6jg0+01WIagqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMPK5tTXmhIyljlFDXbUf79EFRORUPiXI13Dwt6ctXSKzyQ7GX
-	5IOREnPNL7NufZKnVdFt0PhMnkAQivcKtARFjeEP0SymvZqJTLe0lbmV
-X-Gm-Gg: ASbGncum3pzyQdkA4IRg0CPBcrt1lFo5OfOHq43m0MYbcFJ0xiYkUDgxzZGhxSs+43r
-	ZBEMGmO3MXYYgHdW7WEEfV0zLu+IFAmoWhTQJTCtobEFEpdMSsGkSj4gOeUl4dE1aIB7MFNcFmT
-	O7hEHdUY0cywvM6se18WbYg12C2XMA4+t7ZNMBwjbrbiUKSK+XUhtFfiZlJYtA3HBlfZLnrs1Y7
-	S2IJCC676WVFYi9BUvtV4DF+ItGDsK6/1zTTuNd6zJDKrgoz3rrweARlOyGL8VxNP4Ljd/MOJYk
-	F3mBv9hQ9Lbn11NJePAyI0xZ4EgTfu8Jdj1u5ScrYrBbbn658afuOe/Pyj0EW2Vj
-X-Google-Smtp-Source: AGHT+IHT6brV05Y5OAGOmfdZtAJIVb6v85wA5aFgZLaNV6j8ac2I58mUZB4g0aXUHIK5FvEkU6cAfw==
-X-Received: by 2002:a17:907:3d8d:b0:adb:300a:bcc0 with SMTP id a640c23a62f3a-addf8f9973dmr552533566b.46.1749119349745;
-        Thu, 05 Jun 2025 03:29:09 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::22f? ([2620:10d:c092:600::1:d66f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-addfc8034ddsm211348866b.112.2025.06.05.03.29.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 03:29:09 -0700 (PDT)
-Message-ID: <eb53ac69-b6a3-4167-8d92-0638ed1d28c8@gmail.com>
-Date: Thu, 5 Jun 2025 11:30:23 +0100
+	s=arc-20240116; t=1749119397; c=relaxed/simple;
+	bh=aM5w2z1CF6VYnIEaLCslGsr8eyisI4KSVMnTHLtYsBs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=A/rBBN4bPNoeza2fRV6r73uLlkwY+k5S5gwCws28mCU9dCNMTuA625ZZqXdTCpVuovYorpH9+Atej7LniPh2OLC2ctEWt+9cApyAoZ66aRu/18VQtLRVprTuK8nmnhyqD7Ah1PyOBS9i63x7jSS6LaDuGQAea2W/Y4FRNMDr8mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvigbRTG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E9E5C4CEE7;
+	Thu,  5 Jun 2025 10:29:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749119396;
+	bh=aM5w2z1CF6VYnIEaLCslGsr8eyisI4KSVMnTHLtYsBs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YvigbRTG6MMw6k+3S+15QbWEy6KwEEd7UBA/msSndbbsjlslt7P/6nmJ2AVQFjlR3
+	 oHTBAvB/SqhQhjJRgIYoQpaNVZQ3UjreCf7WfZ27WvtqZYqTaYIqxmE9dsCuMhIqPN
+	 oxC4TjTJwCI+QcEe2mmLNVpU8RHGHlJrIBmp3aTEG3pP/tB7sNLtsOHT9x5Zjh4ZLA
+	 tRdC4isseuhHXAxR/cQ5pYtX9vUKHo51QeXE3lYT9V4zdCdBsRbbVX8jv846atYeRM
+	 QBnQsU2sNzbPgKypsBUZPovlzTSnTHb2ZNIxvLKi5SYy9XGDfdf6cLkeYtDx/idoXt
+	 4JyE7exWxGLWw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF0C38111D8;
+	Thu,  5 Jun 2025 10:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v4 05/18] page_pool: use netmem alloc/put APIs in
- __page_pool_alloc_pages_slow()
-To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/1] net: wwan: mhi_wwan_mbim: use correct mux_id
+ for
+ multiplexing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174911942850.3016846.13970926519962437747.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Jun 2025 10:30:28 +0000
+References: <20250603091204.2802840-1-dnlplm@gmail.com>
+In-Reply-To: <20250603091204.2802840-1-dnlplm@gmail.com>
+To: Daniele Palmas <dnlplm@gmail.com>
+Cc: loic.poulain@oss.qualcomm.com, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, slark_xiao@163.com,
+ manivannan.sadhasivam@linaro.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
  netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
- ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
- akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
- andrew+netdev@lunn.ch, toke@redhat.com, tariqt@nvidia.com,
- edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
- ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-References: <20250604025246.61616-1-byungchul@sk.com>
- <20250604025246.61616-6-byungchul@sk.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250604025246.61616-6-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 6/4/25 03:52, Byungchul Park wrote:
-> Use netmem alloc/put APIs instead of page alloc/put APIs in
-> __page_pool_alloc_pages_slow().
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue,  3 Jun 2025 11:12:04 +0200 you wrote:
+> Recent Qualcomm chipsets like SDX72/75 require MBIM sessionId mapping
+> to muxId in the range (0x70-0x8F) for the PCIe tethered use.
 > 
-> While at it, improved some comments.
+> This has been partially addressed by the referenced commit, mapping
+> the default data call to muxId = 112, but the multiplexed data calls
+> scenario was not properly considered, mapping sessionId = 1 to muxId
+> 1, while it should have been 113.
+> 
+> [...]
 
-Same comment as with Patch 3
+Here is the summary with links:
+  - [net,v2,1/1] net: wwan: mhi_wwan_mbim: use correct mux_id for multiplexing
+    https://git.kernel.org/netdev/net/c/501fe52aa908
 
+You are awesome, thank you!
 -- 
-Pavel Begunkov
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
