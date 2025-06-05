@@ -1,206 +1,132 @@
-Return-Path: <netdev+bounces-195240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A754ACEFCB
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:00:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63240ACEF68
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 14:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F3816980C
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:00:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2723017191F
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22E222A4E2;
-	Thu,  5 Jun 2025 13:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FFB218821;
+	Thu,  5 Jun 2025 12:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EC0aaG6z"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4293214818
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 13:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7197A1D8A0A
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 12:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749128411; cv=none; b=lwwl+jBCUBjUghJkIeohQsoYGrXC3s1xjjGKnzAhjR5wmdx3BP3AKUuHCBg7CrSMuRgj3i3hwls7fj2iYKdVVRBN9ouOWJIl/Vx/IPR9Pvdu/X6H1ncwL66ek4fvxgLq8wIxkp6YMgrssL9ji81EMvAMxMdJXPLar1uYQmrPAFA=
+	t=1749127494; cv=none; b=salJbChbGv78cdkvZolSlwxrRVXzP2YOVx1ZcW9dI9am0IUEPSKzx3rgpVmckpM/+rB+gWaHSEmjTUbh+qo8Ac4aDH/I+ltNavfiRI3bx65eI+Wafz7/1k/0KcGe23pfWPjtmxtXZjAuQ6G1w4RJo7rq9YmABnPYGIr72Ol3DnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749128411; c=relaxed/simple;
-	bh=Xq995ikjF+1zz/NSQcD4fsZBu1374h/DjVC6M83e9qY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=fOB0iW/nGIphcQKDxsDxDmaXGAxOrCZg1FT17I6KgkD1lPYEdfA/Sey8H9RinZeQOTobdma8J1kqIxTcGVJ2TQbCJcI3C8HUdvdcj1QxxP5iBW58wuVR5SZNd4OQDjKk8RKTPNUZZcdwC4KjLFdBhYBTYaPbBrBgWRX1fwGsVXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-Received: from [122.175.9.182] (port=50237 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1uN9wZ-00000005CZU-3S77;
-	Thu, 05 Jun 2025 08:43:40 -0400
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id C35401781AB2;
-	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id AF85F178207F;
-	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id MwA0TtYZoI_J; Thu,  5 Jun 2025 18:13:36 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 918AB1781AB2;
-	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
-Date: Thu, 5 Jun 2025 18:13:36 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: pabeni <pabeni@redhat.com>
-Cc: netdev <netdev@vger.kernel.org>, krishna <krishna@couthit.com>, 
-	mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>, 
-	basharath <basharath@couthit.com>
-Message-ID: <242129523.1435061.1749127416328.JavaMail.zimbra@couthit.local>
-In-Reply-To: <337432675.1282729.1747229070648.JavaMail.zimbra@couthit.local>
-References: <20250503121107.1973888-1-parvathi@couthit.com> <20250503131139.1975016-5-parvathi@couthit.com> <ce36ce0e-ad16-4950-b601-ae1a555f2cfb@redhat.com> <1918420534.1246603.1746786066099.JavaMail.zimbra@couthit.local> <1183e3e4-fa93-4fe6-bfe5-e58b7852d294@redhat.com> <876351908.1270745.1747138715014.JavaMail.zimbra@couthit.local> <cbba5990-959b-476f-a3fd-6b346a7d58ee@redhat.com> <337432675.1282729.1747229070648.JavaMail.zimbra@couthit.local>
-Subject: Re: [PATCH net-next v7 04/11] net: ti: prueth: Adds link detection,
- RX and TX support.
+	s=arc-20240116; t=1749127494; c=relaxed/simple;
+	bh=1M6Ahw064n/3Pm/ml44MdAZPyTS+I3rtCo7RuL6Pkcs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HS0sfWj2c5epQPEanmyqUQ2Pmj6z6EIoBhHis6AW20drKs351AD9KZUaCavlzZsniPHD8fTRtZazVAV2dGzajCkn6K1tp49qGpiAjpCDDuRPf7CnNBLlYmo26Lhu0+cXTBKHGZ8q3MB6oWkhe612LcawqQ5Vu61jYs5va7Xf9pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EC0aaG6z; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4a43e277198so6317261cf.1
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 05:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749127491; x=1749732291; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v+ja4+M2xOWPi6Bygoxn28Zjqtj43MyDHO0fI4xSLYw=;
+        b=EC0aaG6zkPKeKpYdPc1IhYcCFR55wssbG0Bq+Okoo0U7gpLGmQBPII47JJNI3Z4kzf
+         mRRMBPp4SxK7fwKKa77kYDdjm+ASk4PWFTQXRBONmCA3p9HIpeFsKowQlb5jwJBlC5UH
+         mF4ByMVw0eumJRAPnZ5zSHSzlzZXbgQStKH5w6+L0IynVKJjAwepPTBtc1t7wN6k2B8+
+         3CDssqzOulTlgbMpGWFGY33lxx6gh+o82EwzvnuSIPeE1jXwCCTQIfAOrTeM8n8mcypY
+         8DNwbpc2bhKK0kLiGDdVU+jJLAU01cLTAGT6t/DmWQiUTnrTTyLn+oubzbB1rZ/jqAPh
+         aO6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749127491; x=1749732291;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v+ja4+M2xOWPi6Bygoxn28Zjqtj43MyDHO0fI4xSLYw=;
+        b=sC6/NNazaklrab1xZKAaz0y8kPXVdLYsFbmcpfpHg5WoBhXEMf0eCHVT1TgcL641nS
+         7Qx97dm7pBaNXJ3YhDwoW9D2pVHVBIY4jwV+AyxfLuMnX2l0CceZAMXNNN9Jr9UvvgD5
+         8cqPthzATyIbQvIrF5FJ5f4s84PfnfA0VZM8XkIeTndzBuZg0pjoZGtDmPgIdL4ZxmkU
+         /aUH/YU6cyA27+cClEKabG7oCcKbpgMfxvZGpScadO1/1GDvUJRMfBDQ4FFw0HoWGMCk
+         l47w6xU7JFYKipZGQITdSR26EOexi6QJyJ+P0vFLFMHb2pUkjwjXf79dpbPjV0+hB5W/
+         trVg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxyXkEN2s7hwxA+j9BeDBt1jiu9PRvmJIHQGhv86+myFnxlnZVAepDBazwerh3QH7CUbr8POk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymlcEnIe16xD7AgifflVSth4t0vpRPtGVW+uyfhMkX5lEVXWak
+	Sso9r+50KEY+rDM7BtLHjhcT06dIdbu+z5MUhmeHe//5mJu6pXzsS5YUORiRSXROyXK6D2VyUU4
+	s274/FqUCKsEd6/1gSV2e4XfaQOyXSsq0PXIzWEuc
+X-Gm-Gg: ASbGncsY53PJHRWbXixmyXOPExjXb10ZQPy6TZdkgvGLVnx68RjxybcHnUXlj+/e0oT
+	SkrhP8CDd9J3zUQrR46qzd+1sJWolSAcfCk4D2hXJDCJjiTNJfOe+DnPhAtT9rmdCXVUMOGDEgv
+	K1IvYba6FHkZl1IXOSa19wi1nmnqft54WJ9nWnvFm0+8o=
+X-Google-Smtp-Source: AGHT+IHqFrG2DFMtuDJWcNH3yBa3lwc6UQVRUn1VXB36hEb5kwOFTUcIAYFHWNVi3s25DT33VFaHpvlR/7SkQZ+Uh4s=
+X-Received: by 2002:a05:622a:4d48:b0:49d:89bf:298f with SMTP id
+ d75a77b69052e-4a5a5768e7fmr95088851cf.22.1749127490981; Thu, 05 Jun 2025
+ 05:44:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds link detection, RX and TX support.
-Thread-Index: l9+gi0FaKZMBzCWiVYrODcBt7ep9wsFagViR
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+References: <20250430085741.5108-1-aaptel@nvidia.com> <20250430085741.5108-2-aaptel@nvidia.com>
+ <CANn89iLW86_BsB97jZw0joPwne_K79iiqwogCYFA7U9dZa3jhQ@mail.gmail.com>
+ <2537c2gzk6x.fsf@nvidia.com> <CANn89iJa+fWdR4jUqeJyhgwHMa5ujZ96WR6jv6iVFUhOXC+jhA@mail.gmail.com>
+ <2531psgzo2n.fsf@nvidia.com> <253y0u7y9cj.fsf@nvidia.com> <CANn89iJ6HROtg3m3z8Ac61e0Ex5HvgOTNavfG_W0j97B0XMZkw@mail.gmail.com>
+ <253v7paxv1t.fsf@nvidia.com>
+In-Reply-To: <253v7paxv1t.fsf@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 5 Jun 2025 05:44:40 -0700
+X-Gm-Features: AX0GCFuwcu_gh1VljBmLTBOpOh6i_LMFTvbsRpVwTihlPW3hlvD6yXK1BWR9a3E
+Message-ID: <CANn89i+y4cKYezwQ6Zr0fr=d6ky8K20E9zYOz=EUiRi_vY8e_g@mail.gmail.com>
+Subject: Re: [PATCH v28 01/20] net: Introduce direct data placement tcp offload
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me, 
+	hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com, 
+	davem@davemloft.net, kuba@kernel.org, Boris Pismenny <borisp@nvidia.com>, 
+	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com, 
+	ogerlitz@nvidia.com, yorayz@nvidia.com, galshalom@nvidia.com, 
+	mgurtovoy@nvidia.com, tariqt@nvidia.com, gus@collabora.com, pabeni@redhat.com, 
+	dsahern@kernel.org, ast@kernel.org, jacob.e.keller@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Thu, Jun 5, 2025 at 4:55=E2=80=AFAM Aurelien Aptel <aaptel@nvidia.com> w=
+rote:
+>
+> Eric Dumazet <edumazet@google.com> writes:
+> > Adding one bit in all skbs for such a narrow case is not very convincin=
+g to me.
+> >
+> > I would prefer a disable/enable bit in the receiving socket, or a
+> > global static key.
+>
+> We can move the bit to the socket, within the sock_read_rx cacheline grou=
+p:
+>
+>
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -420,7 +420,7 @@ struct sock {
+>  #endif
+>         u8                      sk_userlocks;
+>         int                     sk_rcvbuf;
+> -
+> +       bool                    sk_no_condense;
+>         struct sk_filter __rcu  *sk_filter;
+>         union {
+>                 struct socket_wq __rcu  *sk_wq;
+>
+>
+> And then check for it in skb_condense().
+> We are still evaluating it but it looks fine for us.
+> Would that work for you?
 
-> 
->> Apparently you unintentionally stripped the recipients list. Let me
->> re-add the ML.
->> 
->> On 5/13/25 2:18 PM, Parvathi Pudi wrote:
->>>> On 5/9/25 12:21 PM, Parvathi Pudi wrote:
->>>>>> On 5/3/25 3:11 PM, Parvathi Pudi wrote:
->>>>>>> +/**
->>>>>>> + * icssm_emac_rx_thread - EMAC Rx interrupt thread handler
->>>>>>> + * @irq: interrupt number
->>>>>>> + * @dev_id: pointer to net_device
->>>>>>> + *
->>>>>>> + * EMAC Rx Interrupt thread handler - function to process the rx frames in a
->>>>>>> + * irq thread function. There is only limited buffer at the ingress to
->>>>>>> + * queue the frames. As the frames are to be emptied as quickly as
->>>>>>> + * possible to avoid overflow, irq thread is necessary. Current implementation
->>>>>>> + * based on NAPI poll results in packet loss due to overflow at
->>>>>>> + * the ingress queues. Industrial use case requires loss free packet
->>>>>>> + * processing. Tests shows that with threaded irq based processing,
->>>>>>> + * no overflow happens when receiving at ~92Mbps for MTU sized frames and thus
->>>>>>> + * meet the requirement for industrial use case.
->>>>>>
->>>>>> The above statement is highly suspicious. On an non idle system the
->>>>>> threaded irq can be delayed for an unbound amount of time. On an idle
->>>>>> system napi_poll should be invoked with a latency comparable - if not
->>>>>> less - to the threaded irq. Possibly you tripped on some H/W induced
->>>>>> latency to re-program the ISR?
->>>>>>
->>>>>> In any case I think we need a better argumented statement to
->>>>>> intentionally avoid NAPI.
->>>>>>
->>>>>> Cheers,
->>>>>>
->>>>>> Paolo
->>>>>
->>>>> The above comment was from the developer to highlight that there is an
->>>>> improvement in
->>>>> performance with IRQ compared to NAPI. The improvement in performance was
->>>>> observed due to
->>>>> the limited PRU buffer pool (holds only 3 MTU packets). We need to service the
->>>>> queue as
->>>>> soon as a packet is written to prevent overflow. To achieve this, IRQs with
->>>>> highest
->>>>> priority is used. We will clean up the comments in the next version.
->>>>
->>>> Do you mean 'IRQ _thread_ with the highest priority'? I'm possibly
->>>> missing something, but I don't see the driver setting the irq thread
->>>> priority.
->>>>
->>>> Still it's not clear to me why/how scheduling a thread should guarantee
->>>> lower latency than serving the irq is softirq context, where no
->>>> reschedule is needed.
->>>>
->>>> I think you should justify this statement which sounds counter-intuitive
->>>> to me.
->>>>
->>>> Thanks,
->>>>
->>>> Paolo
->>> 
->>> I might not have been clear in my earlier communication. The driver does not
->>> configure the IRQ thread to run at the highest priority. Instead, the highest
->>> real-time priority is assigned to the user applications using "chrt" to ensure
->>> timely processing of network traffic.
->> 
->> I don't follow. Setting real-time priority for the user-space
->> application thread will possibly increase the latency for the irq thread.
->> 
->>> This commit in the TI Linux kernel can be used as a reference for the transition
->>> from NAPI-based polling to IRQ-driven packet processing:
->>> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?id=7db2c2eb0e33821c2f1abea14f079bc23b7bde56
->>> 
->>> This change is based on performance limitations observed with NAPI polling under
->>> high UDP traffic. Specifically, during iperf tests with UDP traffic at 92 Mbps
->>> and MTU-sized frames, ingress queue overflows were observed. This occurs because
->>> the hardware ingress queues have limited buffering capacity, resulting in
->>> dropped
->>> frames.
->>> 
->>> Based on the stated limitations with NAPI polling, we believe that switching to
->>> a
->>> threaded IRQ handler is a reasonable solution. I'll follow up with the
->>> developers
->>> in the background to gather additional context on this implementation and will
->>> try
->>> to collect relevant bench-marking data to help justify the approach further. In
->>> the meantime, do you see any concern moving forward with the use of threaded
->>> IRQs
->>> for now?
->> 
->> The IRQ thread is completely under the scheduler control. It can
->> experience unbound latency (i.e. if there are many other running thread
->> in the same CPU). You need to tune the scheduling priority for the
->> specific setup/host, and likely will not work well (or at all) in other
->> scenarios.
->> 
->> See commit 4cd13c21b207 and all it's follow-ups to get an idea of the
->> things that could go wrong. Note that such commit moved the network
->> processing into thread scope only on quite restrictive conditions.
->> Having the packet processing unconditionally threaded could be much worse.
->> 
->> /P
-> 
-> Thank you for clarifying where you are coming from and sharing the references
-> to the discussions. We will review thoroughly and revert back with more
-> details soon.
-> 
-
-We did bench-marked both IRQ and NAPI schemes using RT kernel 6.15.y-rt
-(main use case for ICSS applications). Based on the results, we did not observe
-any significant performance differences between the two schemes.
-
-The results are shared in the link below for reference.
-https://gist.github.com/ParvathiPudi/e2982872bce92d932c0fb377777fc57d
-
-We have decided to proceed with the NAPI based implementation. We will
-post the updated patches in the next version.
-
-
-Thanks and Regards,
-Parvathi.
+This is a slow path check, you can use one bit after sk_no_check_rx,
+because we have a hole there.
 
