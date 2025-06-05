@@ -1,149 +1,136 @@
-Return-Path: <netdev+bounces-195311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5B7ACF78E
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:59:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D900ACF7A8
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 21:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90A84188FACD
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:59:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A776D189AAE4
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 19:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0AC27AC36;
-	Thu,  5 Jun 2025 18:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C594276045;
+	Thu,  5 Jun 2025 19:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JQMs6X12"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fT+lzUrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDC820012C
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 18:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE00C27603F;
+	Thu,  5 Jun 2025 19:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749149979; cv=none; b=IQ8+vk9zt3AYqnn77raJCLcgzdLA/dK2orhe/bYVa/e7eAUfz63tUQA5HcnDYTEc2zxooA/Iwv/CE4BVwrdW/8hKiQH50SvT48QWYdr8z8wqSm0K5JUar78sZUCSRWADlIY3ceLe1xkmicft+sC8iOqtJ4rOcUZgfvzz2bLRd3c=
+	t=1749150702; cv=none; b=BDCxpqG0rxqvHUeA0m61VTJAajWg7RnLBP45a6XaGCq1/GeQVaZYBWdG4HOr3gtk3MuW+15VW7tvUkOhzHuqyW/JzO1pez8Wb6V71C9YlcsvLnO46jucxVCu48chQK6v8k9dJsDeA8GkK6phraesp8MOVyH302OvnZ+5tCizL8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749149979; c=relaxed/simple;
-	bh=uMI+9/1wKveAhyojQMkdj/cma+OSgU0Tqvt6R/U9zEE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ElEBNCVJTKOwg7t5j2ihrhwhq3x2Q/tlqbgNRgqY13qIFY4XmE1wtqoTrzI6y12+gGadW2sSE97htbpYnOoGuXfwKVYrkFlNDQlQUv3sKSFXM5mbp9Yp4etF4TeNnBNY4upDGsqEmxfMOlN4On0/toCun5RoK/gpQQzC3eZfuIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JQMs6X12; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2348ac8e0b4so35965ad.1
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 11:59:38 -0700 (PDT)
+	s=arc-20240116; t=1749150702; c=relaxed/simple;
+	bh=UavmorA6Z6h1ZV2xxYK0m615TzGH16lJNOj5fX6rsmQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ot8yVOkMq29vGr1T9pp1qxiRZJX3Bqu+4QYVLcmTvZELsvAbSWYwjGtdLduw2cs3fs+Bq/kCg5zNNmFFxnDTEz6qONCNAzQDjOJK5urpSNoSl6rzq2mtVYZlaVxTumoV8m4yQVWTBgPQN6+7QWWh4iLp/4dtqBK6fn8a8UjUkHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fT+lzUrS; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7d2107eb668so201227785a.1;
+        Thu, 05 Jun 2025 12:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749149977; x=1749754777; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H05/LnQbfBjMagEcyvCs4/p13Cyqf8KAitB4wn3TCi8=;
-        b=JQMs6X12Ie7b5Kuvjp+Wtfhqw8qebDsxmrY3zlMuqBkzqFujlbIZGRQAe9OL4tx8Cu
-         y1h+1//ZhnrPgaf4pZUgQbhazAHGwXdllposp3EKgnq3R4gO1frlMh70I2aspDdiWZ5Q
-         l12siuH1FbsP8ICWPJchfTeyFOJwUy3Mxw2/w+b9V8gGD9gk7Qa2QSjlQ1ChkbGMviWA
-         p0CmGmVbJs3i9MyO6m58Pg/cRZ1/6cRw5lYf4ZX+Ra4yCT6maPXCPk4nNr0YLyLYPZJw
-         RpzNhzciAyH7NXwuI5nba8lwiA76sBOVFFEJDJop6vzLwMFGRUa4a7wR5lM4AHGvdrcP
-         3PeA==
+        d=gmail.com; s=20230601; t=1749150700; x=1749755500; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vSBM/UN0tA4NOLAaOMClRv/8/Dln46G8mMRcSeY86XY=;
+        b=fT+lzUrSveo2YTc+EiqhJf7K3kbSRspjGXOqDM2JrniwdPOCgEu7zMlzPsbYJfw7Dx
+         HUCu4Gthm07BunEyoXjV0piBtLqsDYw84dp6Zyh+n59inIv9kE658Khe9yvIidFJ+5a5
+         v2dB3gt7pShKyq3Fp39ozZqE07ofKN3P3+cKc2sgbimEWkvAHjZPfs1ZSS0SZPEEuRXl
+         svpP7e0UPY5m7ASsm1NfjZqWmWbKLzWUSV+CXrNxTriTLQRJez8cYNQg2VS5xpnmki0E
+         BWp98aZCW3kBQ62/lHnsbRyzYMkR1YcOCnJYPMhz5QB89rPzCHzQGFRZNrV/Sl8DkTOb
+         LhPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749149977; x=1749754777;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H05/LnQbfBjMagEcyvCs4/p13Cyqf8KAitB4wn3TCi8=;
-        b=iBqzni1X6VIv3wRsJ1eksyHW+0JXdP4GItJDVS1FN4mpLS/L9Ob02EqWQJOQB/GhHM
-         Hy49/BC91/aILrg2qGaFa1Il4cg2f642xlrrBdzZpezmSWw/6SI5lMd8a2WCBwCoxXcD
-         EOaBz2dMQjN2n9bC1ocATXsClt3vpKKx1NQj4lGChRhPuBBeUlyX3ebnkLVAZibCcWYA
-         9S19XBC7UY47mETJNAGu6k7IgltToUFCfYwxf07uCocq1CHDLBZssVa66tfwjIZOlMj4
-         Zx8t2RqfxWkb07YmxCKfwBJXnR/EIrdpsu0wwwWQRkysM26y5WKzQ926vt70ntpTvW4t
-         Wlfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUxNQ/DI7wqNxq1xxcBH2SbJMHRmQSPcw7uq6HRt7Y/q5IxRmehy0iUXSMK3tDTOu2SIc5QGiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3JnDdPQGd08mnrCwLlYdjMdooZB1YrJl6oTcWVU9Rn1gjH7m4
-	HsWqDHoutmRtC+ojcMFW0M9Q1NXmhQMKIAdJ7tSgVX6LzeaXVgiP/eQ33JAFZdFwxVWKmEL7wOD
-	0/Szo+gbpPuPtpiXfygQLSYNjFx5ekD0hMeEyCE4q
-X-Gm-Gg: ASbGnct4xcrpgL4AcAyd5tOm3zL0pAdYJIiFjJzoaNCu11s/9KsF4S+w7DlWBfbDw4F
-	6YhPtVA9wQxXaNHiRZtZjKDuqH8ylPy19IAgs/oENM7raudLAQ8DAPqMi1GSSySNPci2elV6sLB
-	MgWsWGiELxk3k7F1OyhfRoXEhOMWSI8TVKd4cze/XpAjf+
-X-Google-Smtp-Source: AGHT+IH0Z19F+C9739ZW11S4OWSArlhc70SyePq2+bEvFgwOuWKH5ok0NpwbUSbVk9PZRJ/HXQ1ZP8O7qcCObcGc9VM=
-X-Received: by 2002:a17:902:cec2:b0:235:e1fa:1fbc with SMTP id
- d9443c01a7336-23602119b58mr512155ad.0.1749149976908; Thu, 05 Jun 2025
- 11:59:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749150700; x=1749755500;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vSBM/UN0tA4NOLAaOMClRv/8/Dln46G8mMRcSeY86XY=;
+        b=NlwiY22vghZcPWkHeOAsnqFGXlVsOgV2U7yVytQVwWWkIon83vpnQuBFbcbRN2R77u
+         /1kJsm1ytiG8w1UpaELSEh0R1+wx9Fznp74Sp5aaFltUZOc+/3ebktH89TN35vLZ2xUd
+         1g8HViCnKhiBY5faUucpOHc7TnWrykq+IaHHONTaeQ5Xjjp4DRegytFw0KmYoQuOC6TW
+         94Bf4vS+bwZRWCD6qNnTEAe6gdXO/5veW2RpwVfDg6Go/KEteKPOADcqhg84pnMR71g9
+         Pm1Ig1ntcwSGZLjriYgPO6V0MiSgtJIDWfE0FuJZfn265YNS2xGHVtSMtpBgFuL7JEuZ
+         SZuA==
+X-Forwarded-Encrypted: i=1; AJvYcCXF8/kbXFdqX3x1okrZ4jatRFQaU9i39wuFKg7fhynkhBWRt4vSOG931yNYQ/qpoeLcf22k8C0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWfJkg/FVI/iPI5n8EsGu6xFRoRtuFadOx6gbATvnGZwsG13aj
+	7dCu/JK6heuKbetCnT9QAGWS/UYcMb84AmKCNaMc38DT9YdLpUV2TdgV
+X-Gm-Gg: ASbGnct0K9yGrncp8JIxWt5zBTG/Bic6ZytYR1PcL6D43czNIXZC6l/2MzWQA1kle/S
+	S6/SQxS1nh400u/Oma0KL3W5VkioGnfq8C7dGQPjRdrF/ynavgxjp7M4iaKzs5nIMJeC8InnHrV
+	KWpOf4BanlZW5VbHWdVaQ0J57HY52nBPXxFI4tKJseALGBbRS5HfK4/w41QSuyUSJdbgq5OMtq+
+	FUOjeYVjxohr2bm/JvmUdtPJ3Bv6I0TBpQRJs8PoKxeOa8N+jUzOKL7dIjF4guQ6pS4UZOsd1Kf
+	cQJ73zHn2FVeczYqWfo5Xw3iHpBke0gDO69WkQcTUDzOZvB0ekmItRaEJ+/T7TT6Uq10d4P1etV
+	bsYLFf0JjA+91XPa0VENu
+X-Google-Smtp-Source: AGHT+IGFFfHdYjDRHOeZqZdWVvh7xeNgRly0IyvyUhrahs3yKPSfmk6KxvIrLsDS5EkUxNXShl9ZvA==
+X-Received: by 2002:a05:620a:270a:b0:7d0:9ee6:e7ac with SMTP id af79cd13be357-7d22987fbd0mr125579785a.21.1749150699678;
+        Thu, 05 Jun 2025 12:11:39 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ebd231270sm67117241.32.2025.06.05.12.11.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 12:11:38 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-06-05
+Date: Thu,  5 Jun 2025 15:11:36 -0400
+Message-ID: <20250605191136.904411-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <770012.1748618092@warthog.procyon.org.uk> <aDnTsvbyKCTkZbOR@mini-arch>
- <1097885.1749048961@warthog.procyon.org.uk>
-In-Reply-To: <1097885.1749048961@warthog.procyon.org.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 5 Jun 2025 11:59:24 -0700
-X-Gm-Features: AX0GCFvXkMQX3ul5swdW02rs4DNQ2tHgyFN68VxdxFtirNcZNnjY_XTNytYjMiA
-Message-ID: <CAHS8izP-6mKM1vEELjRXRj09qwSh_tCDdwA3TWxVuSOYNBGYeA@mail.gmail.com>
-Subject: Re: Device mem changes vs pinning/zerocopy changes
-To: David Howells <dhowells@redhat.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, willy@infradead.org, hch@infradead.org, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 4, 2025 at 7:56=E2=80=AFAM David Howells <dhowells@redhat.com> =
-wrote:
->
-> Stanislav Fomichev <stfomichev@gmail.com> wrote:
->
-> > >  (1) Separate fragment lifetime management from sk_buff.  No more wan=
-gling
-> > >      of refcounts in the skbuff code.  If you clone an skb, you stick=
- an
-> > >      extra ref on the lifetime management struct, not the page.
-> >
-> > For device memory TCP we already have this: net_devmem_dmabuf_binding
-> > is the owner of the frags. And when we reference skb frag we reference
-> > only this owner, not individual chunks: __skb_frag_ref -> get_netmem ->
-> > net_devmem_get_net_iov (ref on the binding).
-> >
-> > Will it be possible to generalize this to cover MSG_ZEROCOPY and splice
-> > cases? From what I can tell, this is somewhat equivalent of your net_tx=
-buf.
->
-> Yes and no.  The net_devmem stuff that's now upstream still manages refs =
-on a
-> per-skb-frag basis.
+The following changes since commit 3cae906e1a6184cdc9e4d260e4dbdf9a118d94ad:
 
-Actually Stan may be right here, something similar to the net_devmem
-model may be what you want here.
+  calipso: unlock rcu before returning -EAFNOSUPPORT (2025-06-05 08:03:38 -0700)
 
-The net_devmem stuff actually never grabs references on the frags
-themselves, as Stan explained (which is what you want). We have an
-object 'net_devmem_dmabuf_binding', which represents a chunk of pinned
-devmem passed from userspace. When the net stack asks for a ref on a
-frag, we grab a ref on the binding the frag belongs too in this call
-path that Stan pointed to:
+are available in the Git repository at:
 
-__skb_frag_ref -> get_netmem -> net_devmem_get_net_iov (ref on the binding)=
-.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-05
 
-This sounds earingly similar to what you want to do. You could have a
-new struct (net_zcopy_mem) which represents a chunk of zerocopy memory
-that you've pinned using GUP or whatever is the correct api is. Then
-when the net stack wants a ref on a frag, you (somehow) figure out
-which net_zcopy_mem it belongs to, and you grab a ref on the struct
-rather than the frag.
+for you to fetch changes up to 6fe26f694c824b8a4dbf50c635bee1302e3f099c:
 
-Then when the refcount of net_zcopy_mem hits 0, you know you can
-un-GUP the zcopy memory. I think that model in general may work. But
-also it may be a case of everything looking like a nail to someone
-with a hammer.
+  Bluetooth: MGMT: Protect mgmt_pending list with its own lock (2025-06-05 14:54:57 -0400)
 
-Better yet, we already have in the code a struct that represent
-zerocopy memory, struct ubuf_info_msgzc. Instead of inventing a new
-struct, you can reuse this one to do the memory pinning and
-refcounting on behalf of the memory underneath?
+----------------------------------------------------------------
+bluetooth pull request for net:
 
---=20
-Thanks,
-Mina
+ - MGMT: Fix UAF on mgmt_remove_adv_monitor_complete
+ - MGMT: Protect mgmt_pending list with its own lock
+ - hci_core: fix list_for_each_entry_rcu usage
+ - btintel_pcie: Increase the tx and rx descriptor count
+ - btintel_pcie: Reduce driver buffer posting to prevent race condition
+ - btintel_pcie: Fix driver not posting maximum rx buffers
+
+----------------------------------------------------------------
+Chandrashekar Devegowda (2):
+      Bluetooth: btintel_pcie: Increase the tx and rx descriptor count
+      Bluetooth: btintel_pcie: Reduce driver buffer posting to prevent race condition
+
+Kiran K (1):
+      Bluetooth: btintel_pcie: Fix driver not posting maximum rx buffers
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_complete
+      Bluetooth: MGMT: Protect mgmt_pending list with its own lock
+
+Pauli Virtanen (1):
+      Bluetooth: hci_core: fix list_for_each_entry_rcu usage
+
+ drivers/bluetooth/btintel_pcie.c |  31 +++++----
+ drivers/bluetooth/btintel_pcie.h |  10 +--
+ include/net/bluetooth/hci_core.h |   2 +-
+ net/bluetooth/hci_core.c         |  16 ++---
+ net/bluetooth/mgmt.c             | 138 +++++++++++++++++----------------------
+ net/bluetooth/mgmt_util.c        |  32 +++++++--
+ net/bluetooth/mgmt_util.h        |   4 +-
+ 7 files changed, 118 insertions(+), 115 deletions(-)
 
