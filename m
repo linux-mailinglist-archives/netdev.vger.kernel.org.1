@@ -1,92 +1,84 @@
-Return-Path: <netdev+bounces-195282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E17DCACF2D2
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 17:17:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5909ACF2EA
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 17:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 512467AAA47
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:11:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51CC97AD9FB
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E991DDC1A;
-	Thu,  5 Jun 2025 15:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F7F1C4A13;
+	Thu,  5 Jun 2025 15:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgA6t6sH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bR70Wmli"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C7A1DDA32
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 15:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA891AC44D;
+	Thu,  5 Jun 2025 15:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749136217; cv=none; b=jBVUlztH9FOv44rS754Biwb+PYqiTUU8M3TFRu4sFXFJJUl2IpOEajHL43TREMrEZeUf0/I5EgXi8AvtWHaFEVvJsMF0oqAQPpfJ6nHT2Niez9MjSdhRzz1yTUTNXgeCk0sNDW55gKduvCeYezZKECjT8mcAxqbbpEkkACVof1M=
+	t=1749136383; cv=none; b=NRCO6QN0F+G8TdPq1Dyw/uegvrX8q/zjBiaf2XpRpcZw6F5qxVQHRDOIgj2b78fgN0KcQE9MCu2aybvzMvMOE7jyRr4w3Ih/aTtUZUP+b3WQ3y/sIlOIQ1ZFxOmMnEZzmhpgSfQwDDAgR8+9uDCIuHSdjXMFaUs5BdZma8i49Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749136217; c=relaxed/simple;
-	bh=j2da+68dr9luj6Bpkt6gO6xZi05z3aPGyFUj9tK4kgk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qaDaq9f9fGephnpQAuC91rm/ROfLShLw5Kh6PgIy0bAckDCtjOn7YLG3/GCMN/pZY13RXJ2kH2TEg1mPRZX5E7m0Veyb+z/JUpI+xkqv/4qyCpoow4sJW3L/N/12iRBFJSKbwetko2ldfHGU7fdDDvh1icAp7coOETw95w8mbi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgA6t6sH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53086C4CEE7;
-	Thu,  5 Jun 2025 15:10:15 +0000 (UTC)
+	s=arc-20240116; t=1749136383; c=relaxed/simple;
+	bh=JdVHcHsY08lcMK6ICKfUDHxE6j64CtG+laE7A0bEhlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S5Fb5GhqaowKD2y8/UDE92gexcRkbEXXYng/GzRBWf9ztcRLoszXw+R4EncHrw/7s4AEbj3eHy5FHHc0YUtNT1EzzMYmPAIVxpAy4EwYaQqICF93OpUaiDV+FINxVCJ+Dq12W+5XhdFnTnpM6l0IkyeRyS3sWxUqCAx35W45/Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bR70Wmli; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF91C4CEEB;
+	Thu,  5 Jun 2025 15:13:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749136215;
-	bh=j2da+68dr9luj6Bpkt6gO6xZi05z3aPGyFUj9tK4kgk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JgA6t6sHTL3U+9r2qaCjyxwhYfjHw89bpelcSgUa2TCPY/YR9I5wi891c4qnYQA8q
-	 rZv5MJ04EfKRnm6hAloNxA55HJGTeERhDBGpBOFMSs3AOcA4WotRizT5oxFamZSE/f
-	 Ev68tlzNMf1rGMYXpRFPFJGohg4/utK3r6TaArsWINbP76r/VptCObNa5Ay4YI84sw
-	 jbk58jJ2NW/NqnyL0BZh3Pfm7yRerfLKKa5DMAN4QO5LxB08XAtu3/Fu8hHm3XqR8d
-	 ++5khPBYwEPFctqLVGkc4HDSyxKX3LdVC1WBxONHwVODBcYUh3+BOrQDcIXWiWPWD/
-	 pRqJCZJq8Dsyw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70ADE38111D8;
-	Thu,  5 Jun 2025 15:10:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749136383;
+	bh=JdVHcHsY08lcMK6ICKfUDHxE6j64CtG+laE7A0bEhlw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bR70Wmlia/Sth/9zcx6hEj1Y+RJ/ElDQtpRyxK6wTumhgqMGYH9YlfinW6zP7kZ+2
+	 dC29ZVQzapJlnSQ8dm74QeL1y9efmLsaIfLq6vUt7TBykNMZp+aT5ACTKURRdIDolg
+	 TJAsQF+rXDCz4TLUMe9cdnjuRr8E8FFzRbHZotXksTNnWwXxXssf+tTcu2Ov1hlcm5
+	 cmu0OgREhuDPQcaXN0Op+dfZ9YLTr6wFXSLsbs/Zya75H5qxYBZADE2l/o62ZhpAmp
+	 +pIHNQtzztj9tGhCaz5HHBPmTNJ/bzQWeO4m8697pcAabK2dQKTV6bk/eJ4dyECvlw
+	 z8R4iJVVsyWdg==
+Date: Thu, 5 Jun 2025 08:13:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, jeroendb@google.com, andrew+netdev@lunn.ch,
+ willemb@google.com, pkaligineedi@google.com, joshwash@google.com,
+ thostet@google.com, jfraker@google.com, awogbemila@google.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] gve: Fix stuck TX queue for DQ queue format
+Message-ID: <20250605081301.2659870c@kernel.org>
+In-Reply-To: <20250604201938.1409219-1-hramamurthy@google.com>
+References: <20250604201938.1409219-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 1/1] wireguard: device: enable threaded NAPI
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174913624724.3108661.5339353104000181534.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Jun 2025 15:10:47 +0000
-References: <20250605120616.2808744-1-Jason@zx2c4.com>
-In-Reply-To: <20250605120616.2808744-1-Jason@zx2c4.com>
-To: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: pabeni@redhat.com, netdev@vger.kernel.org, mirco.barone@polito.it
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  4 Jun 2025 20:19:38 +0000 Harshitha Ramamurthy wrote:
+> +	netdev_info(dev, "Kicking queue %d", txqueue);
+> +	napi_schedule(&block->napi);
+> +	tx->last_kick_msec = current_time;
+> +	goto out;
+>  
+>  reset:
+>  	gve_schedule_reset(priv);
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+gotos at the base level of the function are too ugly to exit.
 
-On Thu,  5 Jun 2025 14:06:16 +0200 you wrote:
-> From: Mirco Barone <mirco.barone@polito.it>
-> 
-> Enable threaded NAPI by default for WireGuard devices in response to low
-> performance behavior that we observed when multiple tunnels (and thus
-> multiple wg devices) are deployed on a single host.  This affects any
-> kind of multi-tunnel deployment, regardless of whether the tunnels share
-> the same endpoints or not (i.e., a VPN concentrator type of gateway
-> would also be affected).
-> 
-> [...]
+Please refactor this first to move the logic that decides whether
+reset should happen to a separate helper, then you can avoid both
+gotos/labels.
 
-Here is the summary with links:
-  - [net-next,v2,1/1] wireguard: device: enable threaded NAPI
-    https://git.kernel.org/netdev/net/c/db9ae3b6b43c
-
-You are awesome, thank you!
+goto reset should turn into return true
+goto out should turn into return false
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
