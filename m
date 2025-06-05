@@ -1,211 +1,206 @@
-Return-Path: <netdev+bounces-195326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD0DACF8D6
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:34:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D396DACF8FF
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69C3E178152
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:34:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6A257A4BFC
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965FD27E1AB;
-	Thu,  5 Jun 2025 20:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079EC27F198;
+	Thu,  5 Jun 2025 20:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fA3EasR9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Q+HrzrIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010010.outbound.protection.outlook.com [52.101.84.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D3227C854
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 20:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749155682; cv=none; b=UxfIjL5rnlUsCZR0YOuMChnpqdURIT+7foOw+feZ7m2B4ssPsOVxb12ryPXBrFgbIhrw5hH0KI17YIKttagEhkp8wHAX6SPAiG2czfSeGWdVFeQJWSdmGwScuURzXFvEWETlkXMz38XydSwcb4Q2qIupAwMHWW/RcP228boNI/0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749155682; c=relaxed/simple;
-	bh=0QII3GWTrtGjkUbjZoP+Vf2mHDWYUvjDCDt2cueIiOA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VCE7tWpouLkAhU9qAhK+PfyUmGyoSjFjiQjG8v22KOAzBNN93GI+7okPUzHdBd1wtgUTdMY8/lr1qPJkrToLg7UCsZI2Lh02WhZ3U6maJ2NlO5rEU3LlkU5FWkZ8WS1ufi6/UKhbjoRtepgMQza/ZQanSUlIcefhMiquUQVrNaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fA3EasR9; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2348ac8e0b4so19435ad.1
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 13:34:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749155680; x=1749760480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ZoLre5WJXzZI3tRwkyLjsbHGJ2C1Pcu+Ob2SlEJwY0=;
-        b=fA3EasR9DfNX2l8GwvcaT0MvZ7Aq938G5NX2vSzkm9JV0bUQL0daiUSzQFdmjjYXrc
-         KpH3ZVGuZoyFQ9dfZ8nHCf8UplLDYvkDfM8+6cMFPoXL+/Am9RgiKUfceEwmpnT9XVbF
-         lLc8/7mOUzCJv0zrO0uvzSNgpul5XRrZxFbUotDU+3qD/jZs/1QjZrJwTOl6VinxpHRC
-         kYyDpKqwBbuLfVWv4YureLecupPHUK9QLpthWcNBqLQ0PEM3X6SgKZ2AiQshJD6j/59O
-         KRB5oP+owa7iHToZIippsRv442PPbF6z3n0GPUpHELvthLJ6QL1vqeQuteCCh1Iq93Ud
-         KwpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749155680; x=1749760480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4ZoLre5WJXzZI3tRwkyLjsbHGJ2C1Pcu+Ob2SlEJwY0=;
-        b=ZsrAG8m+ZAN2B9diG8PLSHUTlsiolsrd1xtIxov6j5OAurUPeBoE0SDlkZjQqwMmB1
-         jmD7eyE1Ilf5gcwsHRBWbSRMjXdkOVoi0bJgGBKLM0E00BSFmVxXH5SOj+cD1HgMlhpI
-         orWEuVVfKX0oNfitAFOA3hy/Xc+DVSgKSIduUAGsyacaML9qMQyhw59HTUnFsRrQpZKF
-         bMkQyBHvn9VTDlJFvvMavh8i9pf28LjiGY06rXaGanAMt6n9MPQmCHTC1PFMbVr8I0b+
-         AVuSaiZfZEGlMPSxSAuLKI0boEjPhOW5B/PhTTEzkUAbOsB50lvXnq7zLC5fv/Dj43Uf
-         Pbmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdZAcsZW/xCmnB/I381F3DIhqDNW5QwaIzpF4nObbxJwR3e1FRsbEXxs4wI+RFtPout4WDkqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf6Ee9bGicJ/iyA9yzhj3ZGPT5TRz8tnNkfbOoq36ZJ6BUFHOX
-	KdnvKAknsLtNVTLvy+UHu6MNLTHiACwgv57sKYhNFQEArdy8tZKoI/VtOfL5j6KOMLRhKI5LU1M
-	QKvYjbJk45LX7FYsHDbuF9Rgvz4AeeCU5ssjL2BAd
-X-Gm-Gg: ASbGncsLYKwFevyTrFTi+LUMdUZp7KldGzeWNyWEpGHBgJ0N8P7A7NK1pcPfWFsGRKw
-	pHMhF2W9uG5LGxnnSlRM/JjSMIhvj9DBBS/v0SFmU12t4/vmcgtjU7UBUF0fZXiDzAHyp2rI1+5
-	8yg6I6v9UoA1os3rTAKTgLn2MnlYaNsgxgy3jVtC4ffEuv
-X-Google-Smtp-Source: AGHT+IEz65fw6eX6HnqKD1lGuCRGB/lwbhJS2C0P8T2RK/ATRMV91beDaRjDj92IaN4e2RiyHUifHQ+O8l0xyf76AkM=
-X-Received: by 2002:a17:902:f60b:b0:234:8eeb:d81a with SMTP id
- d9443c01a7336-236021e505cmr754845ad.16.1749155679795; Thu, 05 Jun 2025
- 13:34:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168A827CCF3;
+	Thu,  5 Jun 2025 20:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749157152; cv=fail; b=rgMZ7bJC9dtI4g4JK9CEovdOD+G/+C5La64HAxvi8V94G8qUxm+tY9saw3zAy/hxrdVAw9vskpyaSpv6dgI8zOKOrIWyb6Kgc4tcoOlfc6X8hl//vvWEowKgdhPsDJz+ETedanuJtlPngxfK4yJ1r7EjuhhZ/8mzgBf7GJy9VWI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749157152; c=relaxed/simple;
+	bh=7f5rYS/G5Co5ezbQ0qXbvFtJlrX8bqNiyLDDZP7R5V4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GhCv6e10muLoMsp6VQEAt0OPss5tA952dqECRMwfeZne+8RzodyKmludQ0jjGUwKzsgytRii91PAqPHppMJIRy5UXarK/jOJnbYC0jkRgnekPl4VxWBCiJiMkN7GDwPvLBq8o50sKt+yIJyo4y/QBwmVo+aKAlj0O7iQrmZ0+34=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Q+HrzrIV; arc=fail smtp.client-ip=52.101.84.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X6BAXqRA1i+rXZrCW4qGF3V+1AbwZYl9HgqiNGYjUPCxdR23SpCpzL50cfYC1Lc28qXJ716Cassy6m5SynxvJjmz0kBUq/sEle7rekPtWqyJmNYvGpapfsYW18tv+TRwvikiiUhSXx+4TtTlejy8xLFsUsRymJby7Lm9oV/7RTLbz/VcY3V6i3QLkvQMyUMNhtL5GVrmy+4zOvs6+mnvCgky9PcFDm5hmkzAXCqUyRblFcO/UwER0EJSLXILP0fg1FtUqbLfRYHG/OK9csFmTClnoUMzDEuCLQmE3S8gzX/X7IGuj8XrljDfzydWAqFGoprY1G3InujDuWChHTyiPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gJHORHEwOzhyfbFUF4R5IGYc98WpcYh99P2tAVRCOCg=;
+ b=L6Rqb46KcA2Mq4MOmUlWbsMttuOrCQTphCiL1qEDqG91AoDDhIuC6pH/X+ZkxLt8Hj6UFVypRKFv1+JnYD09XOlI9ig5V9caKYLhOQo5zcbfOf+87pVhgbvPND8OLxbSZ78oQno1ian3QBlVwnKYl2F0N0BjIAt5dyDFhf+V/MgLDbEoiZHsSpHs86xqVkzGjVL6vxIm8oA4gYuUR6g4Rx6v7LW+TPQIwziIdQNhss/EmldU6d5q90QQE7KAS00p37ta2dOdeUVs6z2XUEAtR//MLMFbT2RRthlGOlKBje+UwwMeXHpjK2qfQBZwS5LKXBM6TFW1RqX6IANBMTtYsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gJHORHEwOzhyfbFUF4R5IGYc98WpcYh99P2tAVRCOCg=;
+ b=Q+HrzrIVN5h+pXH9lWPFI00lS8bpNxGIXqGnzi2brtH7j7xOcS/kfvGQsWgsqWepzRVjFjVXv2mwGlJe9jYP6DFBJaqcUKnwwBaH5Cd1gDFCygBQb7FZCYarZdleev7pfh09qhRya6S49hUxemtlo4A7XdOAk7T9bOmC6/RjZ2uvgVYUF89UzLW8TSw6OcTt6B3g1z8qod41apQkNgQ2151mmT+igZUnlCAZmjkBWWLnR2PXCQhNCTwd2PlzIVDq1/ZFaTmUYU4V99UPJrc1ncPNa5cGQwLBO4TFIbiVvUFznKSSN/VwrNWg0iv/HdWsRaHYGQHXtpm7Z59mDe7d5w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by AS1PR04MB9697.eurprd04.prod.outlook.com (2603:10a6:20b:480::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Thu, 5 Jun
+ 2025 20:59:09 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%6]) with mapi id 15.20.8769.025; Thu, 5 Jun 2025
+ 20:59:09 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	imx@lists.linux.dev (open list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-kernel@vger.kernel.org (open list),
+	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
+Cc: imx@lists.linux.dev
+Subject: [PATCH 2/6] arm64: dts: imx93: remove eee-broken-1000t for eqos node
+Date: Thu,  5 Jun 2025 16:58:49 -0400
+Message-Id: <20250605205853.1334131-2-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250605205853.1334131-1-Frank.Li@nxp.com>
+References: <20250605205853.1334131-1-Frank.Li@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH3PEPF000040A3.namprd05.prod.outlook.com
+ (2603:10b6:518:1::57) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250604025246.61616-1-byungchul@sk.com> <20250604025246.61616-4-byungchul@sk.com>
- <29f2c375-65e3-4d22-8274-552653222f8d@gmail.com> <CAHS8izMb23eaav-Fz50sefuS8BhF7as7=BX+Sv1wj01+0n6tMg@mail.gmail.com>
- <ec924af7-1330-4220-97be-1171ef6ffc75@gmail.com>
-In-Reply-To: <ec924af7-1330-4220-97be-1171ef6ffc75@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 5 Jun 2025 13:34:25 -0700
-X-Gm-Features: AX0GCFsZcj1hI7C7EPh1g4w7_P54Ew1pJG_c13sE__2Bloq-K4EM8uiIisV8cik
-Message-ID: <CAHS8izND_JonvNqJm4XpXm-sk9+v6KCGqeKb7ZUSAWoyckUY6A@mail.gmail.com>
-Subject: Re: [RFC v4 03/18] page_pool: use netmem alloc/put APIs in __page_pool_alloc_page_order()
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com, 
-	kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com, 
-	hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AS1PR04MB9697:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a44e5d7-5504-4b1e-43fc-08dda473d117
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|7416014|376014|366016|1800799024|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kQzu5Uuq3vOEqYX/u4WjRiguRbwtdbAryrIsQx03KZ/EtAdbMC+ee5+/XXxb?=
+ =?us-ascii?Q?9HI56a8gQHfGkFB0kjSWpQ5q+fLmhjqmDJ+7BMSy5Frm1/K63sBsP2KHbusV?=
+ =?us-ascii?Q?I41J1PH+mWpSUeDZiFGoFSbo51wNkNS01UHwFWKQuzEKKMnTxkZ+/6Q/TTTC?=
+ =?us-ascii?Q?fKE5VDG4E/MrA8oh/vVbLs2ub/JKdgSGtw68ADJKKf7mtkgKpXPzYDfHu24Y?=
+ =?us-ascii?Q?Ck+sGasnRExpV8Np9eOeWZXS5ExCXLa2teKfXyqLLSeVWrlfOvr9lbU9YUhc?=
+ =?us-ascii?Q?pQbQnopBlCoHxex27LzmnFaQ14MCSC48mU5UniIrmdC76hJbSxmKFMKJ+hDY?=
+ =?us-ascii?Q?XWyng7X9hVyUvDGT2tJK1MaonvdoJ2MQzGuyq60/kfAnWhJYhZAfFDqCUiSJ?=
+ =?us-ascii?Q?JiBKbcK5/M3iqnSZjbIMRSMvTWUFNe/3OGSlr8gDN3AmljnFDLRqpALbLFCX?=
+ =?us-ascii?Q?kaG9FLs2WaxWB3BkgSaQawmswH2n5Q3EwE0oxH3sYSUCI4PJKRw0b3klHSJ9?=
+ =?us-ascii?Q?mJFibRR3OFEWKTwf/k7UhbvoCLYnuLZM5eyXF0sGZBDJFHKDBK+y8ol7ZTxb?=
+ =?us-ascii?Q?k1r/XRmhrwzsHps5G0YO/WAApi01d9r/imMafIm4x1iCtqTrv9wC3l3YrS1c?=
+ =?us-ascii?Q?+AqLjV9DxU7wiWtkKHychgHawFLREpmhUIoXZWVXJygAdTh3YwpBVgG4gODV?=
+ =?us-ascii?Q?yDyCWWmQX2Hh3vtSJsIf6N2dkc62LmMpGAnuYgPFitiJNW/ifo11ISFH21wX?=
+ =?us-ascii?Q?bDf7bHYOFApf72z8keYyTD8OLJW7tz9AqO2JdRfkKU3uQFTXjbl1EsULgBMS?=
+ =?us-ascii?Q?mxx2USqRHIO9DotlqhEWYUmmdRoTWqRkaIAc7HnSG8SZYw1Fc4+Hc0UkaH1o?=
+ =?us-ascii?Q?pKR2osMWpQbcf1K2OQ7c2JTw1pgp32b6hYWrE2VihPz69eZZvcg+TVxsVESH?=
+ =?us-ascii?Q?l7+6oDai1WYSmuhSnHfZFPSXYj59DZ9bEYbE2FmMG6Ax3+BJ7UWrUs84gvA2?=
+ =?us-ascii?Q?lrWUo36RqcxJ/8Tb2q2AUIfwURonKpvPCTFtfvlcX7KP3fNZ4MBA2jBT/YUz?=
+ =?us-ascii?Q?wCR1OeySyzw9bCYGm17VhbVmKwP4CCWGq37MuHUQQrCwZrZ65vIV1if7BnOE?=
+ =?us-ascii?Q?b2ZNPoWMSv5zyzrtP/bXpRMArpHHcFGoO2AVByF5/CSPIYaWKiX84klulYUL?=
+ =?us-ascii?Q?nC/Q30YB0fcR/8PzN/CTtoM+lDJcTaJDUzyXvkP39u7TzbM1FhUqVYqfK2i/?=
+ =?us-ascii?Q?NEX8XF+iwBWKyb+szy1LZvryJWmnwHu9a1sE5BqAn63O+VuYnXfV+77DtMEx?=
+ =?us-ascii?Q?cz99EFw/gkA545BxPeNHY7LuLw3PnRGWxhbVHJY2zaK2GsGzU8VTlpN4orKd?=
+ =?us-ascii?Q?KDhm5RvwLt1QtKmClwJl/Ysw2Wv40ML053BhuNY1tFSnex7leVRZv37T9teM?=
+ =?us-ascii?Q?S6+hheqv/lS1sF8zvDmnelnro7nyvnQ/Cm/YGBGER2pWag4gTsXqgiu55/6K?=
+ =?us-ascii?Q?nvQhqsRYXbz+LrI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(366016)(1800799024)(38350700014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rYZRZ8naq1rxoB+pdAJBwr7r0yhwN7F3NDxbDc6EeJQV9JuhD9nGuGcyx+c+?=
+ =?us-ascii?Q?WY0l6mXbWbAxrkhaOZr6VlpxqG7YqK1tlI3e+WVN3l8HEbfkjdrUih7IRjvx?=
+ =?us-ascii?Q?m2TFLGlfju3GEdT9t/ltxclQIg9WTYLEt1G5BUoELasn8U+IYIMLLfR60K8N?=
+ =?us-ascii?Q?xJQ1NRSGqao34ltZ73X5kv0wxN+LMq3SkUTulVXjUugpfoiDtl+EpJee2+HC?=
+ =?us-ascii?Q?oubYT6OyEGOYtJDmSupGeVnoHayIBMk0eJNDjoZWMhJfmNjXuLO/wDdkY/R4?=
+ =?us-ascii?Q?sgvM7iV3yhp/jxrJMNJR0SbqGq+MXoqVL0c8Zr9hZoggFuad+L42BUd+AChC?=
+ =?us-ascii?Q?/5qiVSmvgYScBgSxNGw66BIGgnSrwclDCn+XDuWpjsPhRxUSpwL6N91Gp26i?=
+ =?us-ascii?Q?wPJ+DDX8s79eQAz2S+Gwt5Os30+5L03llLumaeDJ204tdryJ3Zu9RTWr08ek?=
+ =?us-ascii?Q?JK3f79QTXNOMJGNjVKLhK5e9+BX4G5KvnHWHosBKsVrneA2hp9+1DW0smTYm?=
+ =?us-ascii?Q?J6NZaKK7zfLSkRY3Yuix0XqzA4ZT3C4PiphQgpJPUwHxLlcFBcqHvk7g5x5+?=
+ =?us-ascii?Q?OtoorGei/ArxBhIJiVjBOCDoJg8ehlxnM/wSpfM08byupiYjBuX+8y8lsouk?=
+ =?us-ascii?Q?oW4H4/tCM9hMCi8oN2dS+QJ55xXn9wb3HfDgwEqK6bUhLeEU/UYjDVRZZzG9?=
+ =?us-ascii?Q?EZgtTnwEKD/iCFqKRwog9+7QtBZxXL10ebPwJXLgahJEFdQbXX4raIxq7mvJ?=
+ =?us-ascii?Q?p8CBt3aGFYHLoFPSZOFluIyfrY7WAvKt10jIhako0oJk/92vtJHvauq1yM7F?=
+ =?us-ascii?Q?++INywW5GB9qK9CjvTj3u5QprMn4ttSMLxeibYmDuSSEc5L1oIjT+ASxEASF?=
+ =?us-ascii?Q?1XjoXBGaSgtGHd6OiKh93CAQsXckj6yviQWvKkQO9K4ivdojTX3P9GP8UlTW?=
+ =?us-ascii?Q?xoRu8FN4F+RMPK7hv8z696nbILnk9rAFfwGLY96eqg3oaOfGP5g1SaOALLtJ?=
+ =?us-ascii?Q?5LU8MgdDIg9r5gNcLm0noBzPhEpjclM5CEDjxPomDbXpZ+b5lESOW1bjYM+J?=
+ =?us-ascii?Q?nQHYkpuUhjEjlpvYoEoLacIKfDXsOaeNKVWDPtrTJLkH+bOURsX48gNd5u0B?=
+ =?us-ascii?Q?DZkd37JeyIYEAi2mU1Zoc1MXjP4rd19GpkmVSV7rPVGmJzrciifb4furCAI6?=
+ =?us-ascii?Q?0nhgFXjQAEhEOBaOMDW7gdePwCs8OAOuDl4U7DpOQBxMO7Fli7eg/GKvQESV?=
+ =?us-ascii?Q?U6uxTcHfdtHXiIQs8Aad37FqHD4huxipZNdirf1lQJYkB5pWMCYxlvHWhoJz?=
+ =?us-ascii?Q?TLkuEiJCVzzHgRt4mk9lL0A82baIwdEY1HadXqqy4frQ37a4OBIEhTcjlQRd?=
+ =?us-ascii?Q?dNK/NjGkk7IUkyVx5GNSxng09YB0MJIqE+Z6mDzHwskpSXpEci5J3NRN6Hsn?=
+ =?us-ascii?Q?647zxDISrr62Evqq8EZB45rHTKQ5SlxhwAVUThbYbNXF86/P6dImophjlDOF?=
+ =?us-ascii?Q?7Yg9b32eNmPnLdDiaYkYVwiz4uJn0vVAz03vqz8x7uHhCOgtVvL9yXp+K843?=
+ =?us-ascii?Q?ydf0MPyuyg8Zfd8E9+NLO2fIGhToACiB2jNHM9P8?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a44e5d7-5504-4b1e-43fc-08dda473d117
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2025 20:59:09.4581
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: A+MZk1Ee/yF1rXrsgc/yU33Njn91WFpll7Mk4UwYmoDyhDN4T7GxlVTTG6i5OzUAHnTdlxgLXKzk/foSJzBUgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9697
 
-On Thu, Jun 5, 2025 at 1:26=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 6/5/25 20:39, Mina Almasry wrote:
-> > On Thu, Jun 5, 2025 at 3:25=E2=80=AFAM Pavel Begunkov <asml.silence@gma=
-il.com> wrote:
-> >>
-> >> On 6/4/25 03:52, Byungchul Park wrote:
-> >>> Use netmem alloc/put APIs instead of page alloc/put APIs and make it
-> >>> return netmem_ref instead of struct page * in
-> >>> __page_pool_alloc_page_order().
-> >>>
-> >>> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> >>> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> >>> ---
-> >>>    net/core/page_pool.c | 26 +++++++++++++-------------
-> >>>    1 file changed, 13 insertions(+), 13 deletions(-)
-> >>>
-> >>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> >>> index 4011eb305cee..523354f2db1c 100644
-> >>> --- a/net/core/page_pool.c
-> >>> +++ b/net/core/page_pool.c
-> >>> @@ -518,29 +518,29 @@ static bool page_pool_dma_map(struct page_pool =
-*pool, netmem_ref netmem, gfp_t g
-> >>>        return false;
-> >>>    }
-> >>>
-> >>> -static struct page *__page_pool_alloc_page_order(struct page_pool *p=
-ool,
-> >>> -                                              gfp_t gfp)
-> >>> +static netmem_ref __page_pool_alloc_page_order(struct page_pool *poo=
-l,
-> >>> +                                            gfp_t gfp)
-> >>>    {
-> >>> -     struct page *page;
-> >>> +     netmem_ref netmem;
-> >>>
-> >>>        gfp |=3D __GFP_COMP;
-> >>> -     page =3D alloc_pages_node(pool->p.nid, gfp, pool->p.order);
-> >>> -     if (unlikely(!page))
-> >>> -             return NULL;
-> >>> +     netmem =3D alloc_netmems_node(pool->p.nid, gfp, pool->p.order);
-> >>> +     if (unlikely(!netmem))
-> >>> +             return 0;
-> >>>
-> >>> -     if (pool->dma_map && unlikely(!page_pool_dma_map(pool, page_to_=
-netmem(page), gfp))) {
-> >>> -             put_page(page);
-> >>> -             return NULL;
-> >>> +     if (pool->dma_map && unlikely(!page_pool_dma_map(pool, netmem, =
-gfp))) {
-> >>> +             put_netmem(netmem);
-> >>
-> >> It's a bad idea to have {put,get}_netmem in page pool's code, it has a
-> >> different semantics from what page pool expects for net_iov. I.e.
-> >> instead of releasing the netmem and allowing it to be reallocated by
-> >> page pool, put_netmem(niov) will drop a memory provider reference and
-> >> leak the net_iov. Depending on implementation it might even underflow
-> >> mp refs if a net_iov is ever passed here.
-> >>
-> >
-> > Hmm, put_netmem (I hope) is designed and implemented to do the right
-> > thing no matter what netmem you pass it (and it needs to, because we
-> > can't predict what netmem will be passed to it):
-> >
-> > - For non-pp pages, it drops a page ref.
-> > - For pp pages, it drops a pp ref.
-> > - For non-pp net_iovs (devmem TX), it drops a net_iov ref (which for
-> > devmem net_iovs is a binding ref)
-> > - For pp net_iovs, it drops a niov->pp ref (the same for both iouring
-> > and devmem).
->
-> void put_netmem(netmem_ref netmem)
-> {
->         struct net_iov *niov;
->
->         if (netmem_is_net_iov(netmem)) {
->                 niov =3D netmem_to_net_iov(netmem);
->                 if (net_is_devmem_iov(niov))
->                         net_devmem_put_net_iov(netmem_to_net_iov(netmem))=
-;
->                 return;
->         }
->
->         put_page(netmem_to_page(netmem));
-> }
-> EXPORT_SYMBOL(put_netmem);
->
-> void net_devmem_put_net_iov(struct net_iov *niov)
-> {
->         net_devmem_dmabuf_binding_put(net_devmem_iov_binding(niov));
-> }
->
-> Am I looking at an outdated version? for devmem net_iov it always puts
-> the binding and not niov refs, and it's always does put_page for pages.
-> And it'd also silently ignore io_uring. And we're also patching early
-> alloc/init failures in this series, so gauging if it's pp or non-pp
-> originated struct page might be dangerous and depend on init order. We
-> don't even need to think about all that if we continue to use put_page,
-> which is why I think it's a much better option.
->
+From: Clark Wang <xiaoning.wang@nxp.com>
 
-Oh, my bad. I was thinking of skb_page_unref, which actually handles
-all net_iov/page types correctly. You're right, put_netmem doesn't
-actually do that.
+The "eee-broken-1000t" was added on 8mm for FEC to avoid issue of ptp sync.
+EQoS haven't such issue. So, remove this for EQoS phys.
 
-In that case reverting to put_page would be better here indeed.
+Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts | 1 -
+ arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts   | 1 -
+ 2 files changed, 2 deletions(-)
 
---=20
-Thanks,
-Mina
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+index 8491eb53120e6..a6ebeb642eb65 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+@@ -217,7 +217,6 @@ mdio {
+ 
+ 		ethphy1: ethernet-phy@1 {
+ 			reg = <1>;
+-			eee-broken-1000t;
+ 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+ 			reset-deassert-us = <80000>;
+diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+index acbd981ba548a..cceca130c5b4e 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+@@ -184,7 +184,6 @@ mdio {
+ 		ethphy1: ethernet-phy@1 {
+ 			compatible = "ethernet-phy-ieee802.3-c22";
+ 			reg = <1>;
+-			eee-broken-1000t;
+ 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+ 			reset-deassert-us = <80000>;
+-- 
+2.34.1
+
 
