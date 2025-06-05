@@ -1,141 +1,176 @@
-Return-Path: <netdev+bounces-195306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEE5ACF633
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:09:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40051ACF655
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C8F3A7431
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:09:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C60A189D382
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A0027603A;
-	Thu,  5 Jun 2025 18:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B66527A102;
+	Thu,  5 Jun 2025 18:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtsPRP/G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="irglAXUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6588B4400;
-	Thu,  5 Jun 2025 18:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE7D275869;
+	Thu,  5 Jun 2025 18:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749146973; cv=none; b=EL07srfrUb3xpiTgRviwT1d66VoRauf3Thjwha0TqgOGwjcjrWoPeLzRbH9wFhSD+Ko46Hzz2ZmsMCjDWkL+Ms2iJHyPeHeV+f3piSl7XGzfuPBPJvfv7i4hsTGrKXsWPUt36kuohMsP4ehoeus4ryQS9uiM2pmSumNaUPg5q2U=
+	t=1749147296; cv=none; b=ulBQQ14iFdrhXbO00MA3Upol6evW7bEN0B0HtbNn7C2B2BlJvA1tL1qwsi5+aYMgj5A4cX52RxO0a9R7gk0P2PN+Nj/OIsRm7QwMDhdlTtY5+2PaUhE24Cm2Aowp9zQ5z5oOb+R3QVlfI2P3hFL5NlpHBUYOsdutg1DUZ/iVrhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749146973; c=relaxed/simple;
-	bh=hCpEyHqiBnpT85ZnAEXBHJnsThLhlMdygvzgkhGSFk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aeMh+0gGSFUF/MbqyFxhA+zE4LY5yUhdVZG6NpW/vhHC34e0d4dfZb/bfP9ObavvPK4+FwI9jV3gKMHiNBpw2gIt0DCtIN65Mn/wkvEaEFt/wlK3aLQgOIGdbuSEkEHjapqG97NGWEccqF4/aB0iDq/N+eCj0xwML7yL9XJxTNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WtsPRP/G; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-311ef4fb43dso1105688a91.3;
-        Thu, 05 Jun 2025 11:09:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749146969; x=1749751769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8luWUuoNqYwTjrcszSVsilqxBIhH6lfcQzMovWFpql4=;
-        b=WtsPRP/GRKTTOUzfitkWz4r/zGvTK5a7mR1rBQFamekzeErRYpJGWepLDCkm7SgKDl
-         ETCS5EoSZkdvQYDzRhPexFEQn7KLNeMhV/gHCZPc5F7hUkM8kIS6JrBRppuFJUa8F7e7
-         9cTkjrW1Vxpb0Bj2WnVhiw6xSDOIPlhvEyujDk1dlQvLF61hLGCWl0iHr74/xFVPS0iK
-         ZKLv/n9O6X1kLNAR339eiicHq9qWvW+4sQck3qdGrrctIKqVi8GNxOlJOPcMz5GAYG19
-         lHE0Yk61GtUU7S/IRlxYfWf92Tkl5AKNL0Lg41SraiL1FJt6t40sD8HaYbhIBMiLlFkz
-         CB2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749146969; x=1749751769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8luWUuoNqYwTjrcszSVsilqxBIhH6lfcQzMovWFpql4=;
-        b=ULsrSkWWAHITxsj9GMbS6dZPvyegiKLcx9elOEvXWDYxr7FUP/9qYuZP8g/tKxUWhD
-         8IMCOCFCnsiuU4jn2pPyZH04+dx7wGvyqKnB7mATfZJUl/iFlOq23v2Nl3HsP1JllPqQ
-         VcumTM/klDXEI5PxrjsEA40a6Zk2hjkZZ6BkUykx0kExE6R+MCL8aifV7Q1lc8FXhuFU
-         dr1hUZ7MWUtjeRgO95PoTxbMHsNVrDv3ixOxMd4YBGmz4VCzK8cYm7SwJnXTWhI/TOqA
-         ZGh5JUVCpVTWOZaWif5oRa3NmhvmwnhwN202Y/Olzq250kL73P8ITxA9yL/SCTjJOdsd
-         Yxrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDBkUv90W1901JtUbbTam+IiAsfq2F+qJoFVRckGA/V9CW9+56BLondgx/V1E8RfeKrh70n+182YLZ744NqyjfbUgjJqRR@vger.kernel.org, AJvYcCUTidintgYT2RSZ9xfrjcfLWYP7/Zokl981bcZLI5RgiZNdprWbw7lZe7a1qpkaIgn4FXNyztzm@vger.kernel.org, AJvYcCVCUuXHIQDloGo9T8sYQdLvKcSoT2kjNpWpVMwfvpLguvtb4P4EPZ5kA5OX2FgKWom+k7n8VOhCOFYu@vger.kernel.org, AJvYcCWSlOtFXKmnhI3XN6AG+OkbK+MioG3OVOViTWdAQRA2KGXfVCnX9c20KKIhp8iwZsqOuUDXYNCUm19Qo1IQ@vger.kernel.org, AJvYcCWikBPWjVI4ySsDV+wqdW2petOYuF5fMocmGl54WcGWD0kulX0FPzVxXSTEDJgsaEZCzNUQQmg4p/OcVbo0@vger.kernel.org, AJvYcCX0wOQcC3rMLgMZL4Z0746woHJf930s6StAbOrYsO9ATi+eFM8zlbPf/zXoHXU/tJaxc6uZ+deuHA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJhjyV52lblP9kpK9TrTQOvC8gnIqv4zIIn8XONDpC8vaoDB/H
-	gWgn/wtQ5jeeSktcp01lQxKdDK7BxmjjRPFYnMwZltK8kYfIQWblXOVZO+/pz++WKDvBOMc3bTR
-	r21l8uLpd3e2F24L73/Ex2HcRi2Ke5u4=
-X-Gm-Gg: ASbGncuWBm/+335WMR9/vk8ke1FsjJNzza4uwfopS7+Wry7TT40+1MkImyQb2CXgkGo
-	gYzT9EQmdssh6tXW8EMuVd+UheUnZj7/FkIdvou8u3CEhR8n7FBKI8qcEsON8hX4AtXusnCaH/y
-	Ej/8CraJcUtiXyRNi3Vlx2itVCK73Gf+cX
-X-Google-Smtp-Source: AGHT+IFip/lShvRWllilwhcL8Ol8PacwWwmFAaam0lqLm+JyQwZMflMxpqN8f8m/6W1ii3AUdmKnFhSBfa79vqtPCVA=
-X-Received: by 2002:a17:90b:2fc4:b0:311:ae39:3dad with SMTP id
- 98e67ed59e1d1-31347696706mr809115a91.30.1749146969467; Thu, 05 Jun 2025
- 11:09:29 -0700 (PDT)
+	s=arc-20240116; t=1749147296; c=relaxed/simple;
+	bh=kM+tZQLZzYNHuIw8DxjQDCB49bssz5ArH/w0ixdklPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bYUZ2tvzNbunXXwMPDGqw3yrO+brcobqYiryd4PYpgTsGLJ0pINHr8HEdzfyDDBvBIpz9HX6QT49HN0pnMjvnv1K7kIyeAIMa5Df7wTkIOErRNagBbVEwBwUzhlxNp2oNVJ+SfMzGcNjflQr7pwEjvz39EEBcMVqG4N/gsn4K0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=irglAXUu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 949B2C4CEE7;
+	Thu,  5 Jun 2025 18:14:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749147295;
+	bh=kM+tZQLZzYNHuIw8DxjQDCB49bssz5ArH/w0ixdklPE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=irglAXUu2OpsKW9nnQWyxV8tVob52YV/dgR9F0uBahjTSfnZlgO5EVlJhjYbltYXu
+	 9lTnWSlOsDUgBwDvE9NnQENGN4k8AxmNWWB21jbtpF/pFzg60sSqmyI9dd3g5UaIz5
+	 F/yka1xtCh7bwVqLQQeTpiQPGJ1kwkYVV0zSpPRYNwVdUkDHn8GPH0MElwJ/1I8bIT
+	 Xd8kh5eKQp/yUzk+TnmPYge/1i12/RZSZK/yV4iJ1ZCrUSYecHTTRFAczRReeZXc0/
+	 MNpV1jjiF6eTu/jqu6EA4GcnV0PXjdq2agD/BztXZ55wQNNMXKc8epepoAHiLxuDss
+	 FLRKwbWv7PVFg==
+Date: Thu, 5 Jun 2025 13:14:53 -0500
+From: Rob Herring <robh@kernel.org>
+To: George Moussalem <george.moussalem@outlook.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v3 2/5] dt-bindings: net: qca,ar803x: Add IPQ5018
+ Internal GE PHY support
+Message-ID: <20250605181453.GA2946252-robh@kernel.org>
+References: <20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com>
+ <20250602-ipq5018-ge-phy-v3-2-421337a031b2@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250428195022.24587-2-stephen.smalley.work@gmail.com> <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
-In-Reply-To: <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Thu, 5 Jun 2025 14:09:17 -0400
-X-Gm-Features: AX0GCFvSHOanjqux2hTZnx--qeaWrQ1aQE-CbC_PtPMv61y7GT38kV1BQ65yzOA
-Message-ID: <CAEjxPJ5CSUEsXGT5e9KKXvdWpetm=v8iWc9jKvUMFub30w9KqA@mail.gmail.com>
-Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
- interface
-To: Paul Moore <paul@paul-moore.com>
-Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler <casey@schaufler-ca.com>, linux-nfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602-ipq5018-ge-phy-v3-2-421337a031b2@outlook.com>
 
-On Tue, Apr 29, 2025 at 7:35=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
->
-> On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
-> <stephen.smalley.work@gmail.com> wrote:
-> >
-> > Update the security_inode_listsecurity() interface to allow
-> > use of the xattr_list_one() helper and update the hook
-> > implementations.
-> >
-> > Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.sma=
-lley.work@gmail.com/
-> >
-> > Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
-> > ---
-> > This patch is relative to the one linked above, which in theory is on
-> > vfs.fixes but doesn't appear to have been pushed when I looked.
-> >
-> >  fs/nfs/nfs4proc.c             | 10 ++++++----
-> >  fs/xattr.c                    | 19 +++++++------------
-> >  include/linux/lsm_hook_defs.h |  4 ++--
-> >  include/linux/security.h      |  5 +++--
-> >  net/socket.c                  | 17 +++++++----------
-> >  security/security.c           | 16 ++++++++--------
-> >  security/selinux/hooks.c      | 10 +++-------
-> >  security/smack/smack_lsm.c    | 13 ++++---------
-> >  8 files changed, 40 insertions(+), 54 deletions(-)
->
-> Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Smack
-> folks I can pull this into the LSM tree.
+On Mon, Jun 02, 2025 at 01:53:14PM +0400, George Moussalem wrote:
+> Document the IPQ5018 Internal Gigabit Ethernet PHY found in the IPQ5018
+> SoC. Its output pins provide an MDI interface to either an external
+> switch in a PHY to PHY link scenario or is directly attached to an RJ45
+> connector.
+> 
+> The PHY supports 10/100/1000 mbps link modes, CDT, auto-negotiation and
+> 802.3az EEE.
+> 
+> For operation, the LDO controller found in the IPQ5018 SoC for which
+> there is provision in the mdio-4019 driver.
+> 
+> Two common archictures across IPQ5018 boards are:
+> 1. IPQ5018 PHY --> MDI --> RJ45 connector
+> 2. IPQ5018 PHY --> MDI --> External PHY
+> In a phy to phy architecture, the DAC needs to be configured to
+> accommodate for the short cable length. As such, add an optional boolean
+> property so the driver sets preset DAC register values accordingly.
+> 
+> Signed-off-by: George Moussalem <george.moussalem@outlook.com>
+> ---
+>  .../devicetree/bindings/net/qca,ar803x.yaml        | 39 ++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qca,ar803x.yaml b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> index 3acd09f0da863137f8a05e435a1fd28a536c2acd..fce167412896edbf49371129e3e7e87312eee051 100644
+> --- a/Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> +++ b/Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> @@ -16,8 +16,32 @@ description: |
+>  
+>  allOf:
+>    - $ref: ethernet-phy.yaml#
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - ethernet-phy-id004d.d0c0
+> +
+> +    then:
+> +      properties:
+> +        reg:
+> +          const: 7  # This PHY is always at MDIO address 7 in the IPQ5018 SoC
 
-Note that this will need to have a conflict resolved with:
-https://lore.kernel.org/selinux/20250605164852.2016-1-stephen.smalley.work@=
-gmail.com/
+blank line
 
-Fortunately it should be straightforward - just delete the line added
-by that patch since this patch fixes the security_inode_listsecurity()
-hook interface to return 0 or -errno itself.
+> +        resets:
+> +          items:
+> +            - description:
+> +                GE PHY MISC reset which triggers a reset across MDC, DSP, RX, and TX lines.
 
->
-> --
-> paul-moore.com
+blank line
+
+> +        qcom,dac-preset-short-cable:
+> +          description:
+> +            Set if this phy is connected to another phy to adjust the values for
+> +            MDAC and EDAC to adjust amplitude, bias current settings, and error
+> +            detection and correction algorithm to accommodate for short cable length.
+> +            If not set, it is assumed the MDI output pins of this PHY are directly
+> +            connected to an RJ45 connector and default DAC values will be used.
+> +          type: boolean
+>  
+>  properties:
+> +
+
+Drop
+
+But this schema is broken. There's no way for it to be applied to a node 
+because there is no compatible defined in this schema nor a 'select'. 
+You can introduce an error and see (e.g. 'qcom,dac-preset-short-cable = 
+"foo";'). Really, any phy using these properties should have a specific 
+compatible defined here.
+
+>    qca,clk-out-frequency:
+>      description: Clock output frequency in Hertz.
+>      $ref: /schemas/types.yaml#/definitions/uint32
+> @@ -132,3 +156,18 @@ examples:
+>              };
+>          };
+>      };
+> +  - |
+> +    #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
+> +
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        /* add alias to set qcom,dac-preset-short-cable on boards that need it */
+> +        ge_phy: ethernet-phy@7 {
+> +            compatible = "ethernet-phy-id004d.d0c0";
+> +            reg = <7>;
+> +
+> +            resets = <&gcc GCC_GEPHY_MISC_ARES>;
+> +        };
+> +    };
+> 
+> -- 
+> 2.49.0
+> 
 
