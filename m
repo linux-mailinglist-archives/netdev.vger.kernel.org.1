@@ -1,206 +1,225 @@
-Return-Path: <netdev+bounces-195327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D396DACF8FF
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:59:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E28D0ACF98A
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 00:12:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6A257A4BFC
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:58:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D86216ED2B
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 22:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079EC27F198;
-	Thu,  5 Jun 2025 20:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922DA220685;
+	Thu,  5 Jun 2025 22:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Q+HrzrIV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="12dqb9m+"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010010.outbound.protection.outlook.com [52.101.84.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168A827CCF3;
-	Thu,  5 Jun 2025 20:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749157152; cv=fail; b=rgMZ7bJC9dtI4g4JK9CEovdOD+G/+C5La64HAxvi8V94G8qUxm+tY9saw3zAy/hxrdVAw9vskpyaSpv6dgI8zOKOrIWyb6Kgc4tcoOlfc6X8hl//vvWEowKgdhPsDJz+ETedanuJtlPngxfK4yJ1r7EjuhhZ/8mzgBf7GJy9VWI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749157152; c=relaxed/simple;
-	bh=7f5rYS/G5Co5ezbQ0qXbvFtJlrX8bqNiyLDDZP7R5V4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GhCv6e10muLoMsp6VQEAt0OPss5tA952dqECRMwfeZne+8RzodyKmludQ0jjGUwKzsgytRii91PAqPHppMJIRy5UXarK/jOJnbYC0jkRgnekPl4VxWBCiJiMkN7GDwPvLBq8o50sKt+yIJyo4y/QBwmVo+aKAlj0O7iQrmZ0+34=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Q+HrzrIV; arc=fail smtp.client-ip=52.101.84.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X6BAXqRA1i+rXZrCW4qGF3V+1AbwZYl9HgqiNGYjUPCxdR23SpCpzL50cfYC1Lc28qXJ716Cassy6m5SynxvJjmz0kBUq/sEle7rekPtWqyJmNYvGpapfsYW18tv+TRwvikiiUhSXx+4TtTlejy8xLFsUsRymJby7Lm9oV/7RTLbz/VcY3V6i3QLkvQMyUMNhtL5GVrmy+4zOvs6+mnvCgky9PcFDm5hmkzAXCqUyRblFcO/UwER0EJSLXILP0fg1FtUqbLfRYHG/OK9csFmTClnoUMzDEuCLQmE3S8gzX/X7IGuj8XrljDfzydWAqFGoprY1G3InujDuWChHTyiPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gJHORHEwOzhyfbFUF4R5IGYc98WpcYh99P2tAVRCOCg=;
- b=L6Rqb46KcA2Mq4MOmUlWbsMttuOrCQTphCiL1qEDqG91AoDDhIuC6pH/X+ZkxLt8Hj6UFVypRKFv1+JnYD09XOlI9ig5V9caKYLhOQo5zcbfOf+87pVhgbvPND8OLxbSZ78oQno1ian3QBlVwnKYl2F0N0BjIAt5dyDFhf+V/MgLDbEoiZHsSpHs86xqVkzGjVL6vxIm8oA4gYuUR6g4Rx6v7LW+TPQIwziIdQNhss/EmldU6d5q90QQE7KAS00p37ta2dOdeUVs6z2XUEAtR//MLMFbT2RRthlGOlKBje+UwwMeXHpjK2qfQBZwS5LKXBM6TFW1RqX6IANBMTtYsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gJHORHEwOzhyfbFUF4R5IGYc98WpcYh99P2tAVRCOCg=;
- b=Q+HrzrIVN5h+pXH9lWPFI00lS8bpNxGIXqGnzi2brtH7j7xOcS/kfvGQsWgsqWepzRVjFjVXv2mwGlJe9jYP6DFBJaqcUKnwwBaH5Cd1gDFCygBQb7FZCYarZdleev7pfh09qhRya6S49hUxemtlo4A7XdOAk7T9bOmC6/RjZ2uvgVYUF89UzLW8TSw6OcTt6B3g1z8qod41apQkNgQ2151mmT+igZUnlCAZmjkBWWLnR2PXCQhNCTwd2PlzIVDq1/ZFaTmUYU4V99UPJrc1ncPNa5cGQwLBO4TFIbiVvUFznKSSN/VwrNWg0iv/HdWsRaHYGQHXtpm7Z59mDe7d5w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by AS1PR04MB9697.eurprd04.prod.outlook.com (2603:10a6:20b:480::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Thu, 5 Jun
- 2025 20:59:09 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%6]) with mapi id 15.20.8769.025; Thu, 5 Jun 2025
- 20:59:09 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	imx@lists.linux.dev (open list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
-Cc: imx@lists.linux.dev
-Subject: [PATCH 2/6] arm64: dts: imx93: remove eee-broken-1000t for eqos node
-Date: Thu,  5 Jun 2025 16:58:49 -0400
-Message-Id: <20250605205853.1334131-2-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250605205853.1334131-1-Frank.Li@nxp.com>
-References: <20250605205853.1334131-1-Frank.Li@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: PH3PEPF000040A3.namprd05.prod.outlook.com
- (2603:10b6:518:1::57) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEDF27F74E
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 22:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749161528; cv=none; b=n95uFwepcC2R7BKJBE/T7BhIS6/gySkJvN2a5MajyaBcZe383XGqC6/JtQ0mO+2Dx3sYSTxhfekXLJMuYqokiLcRh+VVw6Cnjf6MeItJV+qTNC2CwUjNDli2CRyFuwhX99c72I2za8VWMc5m6zSnpPFb1vxHPdwUtKFrGwpKocA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749161528; c=relaxed/simple;
+	bh=U0acoCeoCvc+YWm82btY91MES9glhx6EOzF1AQamPn4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bqKvtbUI3EuKI77w90F8OGNCm2i5MeCY7wUz6F9XJQIuoLgMeah2rqoH1qYGg3FtQ2bdTxgTfp9MQhRYWDpD6qxI6+Nd5l4qvsPde29Z2w4we+hUYDUqSgJHz1WS0Aml2cN3buOPsIsofISqlAAS8FfOfqT0fbBgb49mnWcXydg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=12dqb9m+; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a58ebece05so15675121cf.1
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 15:11:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749161515; x=1749766315; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7ihE80hjZVxwRnd93NuMTMpDkR9tucUu7qLlu8sWM04=;
+        b=12dqb9m+bO20ahd7wQ32KjwkW8ss3FWDkLmpC/2gcCDSnV0eRYPB5Zq1iaFtnTT5jh
+         rvUuLnkb/xxsqfaZl0kB/kIfOyHIz56nuN02gpxjPQGso0IN3038bUn8Nsu2UEVE5UcK
+         UWPGPsQBzgaMxGYFGwjuSI/4iKniADC+8Fu74H5QKcs4oOGFnHbRTuz9HxsFQe8xoh8o
+         ANRP4yzSxBFRdR5yYriQzi4NLe3Umiw7GNa5nkkF6TbsvkfvFJ0bWOtIOWKoqLNPsb05
+         ad3baJ2kEZ6Vzh0UakdvzD1b+gMfDneuuwVB+i6U2F66igCSWNpe3h5R5lAiy4/rZX25
+         orZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749161515; x=1749766315;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7ihE80hjZVxwRnd93NuMTMpDkR9tucUu7qLlu8sWM04=;
+        b=GCC3CLO70lCPLX18Zim7k/zu68JYE2h24GXpYSl0myImegQVzO+mB2jtZxkGCEXmcw
+         ewf5SHJ/v4cYjvrz0gIOH4SNbmik0hs1yClPd4PascRCErQ+DO3jtsYb3SOgJkTz4lnX
+         PaS8Hvdigu/4QBVBu1dVQFI5tBtPOd/FdIxu/tRKQR09H6wEBtWW8xSi233mYrLf1ZHC
+         d3tXJkuyzi+yvvRko6MdY3T5QO5Docr3wbdHbAZEex+hE0BhwzgplOzF05ydWj4bQh8+
+         PxUtpNYZRUdff3MR4kc14nlW1oqtCk1zIdyxJQcXw6Vk47/a/U7VFb3f1JDd+uEO7Fe6
+         LHyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWdWbD/1ziqD8n9Kwcj9zKnmKrLn95EEHyFG3Nf0QbkBtmcqOGJA1tO9eqKxh/FIaMsLavOSpE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEvkJMZHKPJJVOPIFLILbjmuqVdv1gq+c3HoqVgAZV3EubTrB0
+	RoHlUDD4j6Mqra+b5fijj3297//nCG6bDv6iPAEmpR+10+QrL7S03+JgPEX5ZKkVVX7NeETxodC
+	g4qEBz8P9MVDzU+neGIlDr8rOqB/loukPfXo8FVHu
+X-Gm-Gg: ASbGncu9gthGSnQ4DlA71R+4z7iY5bN11R90EXBhRevC59IkWeYwn08FdUEiiZQCgWM
+	vJOSoLM2cnpUvOcznpBoJVdptA8YixlUnSNysYyWUtQcXWRQLUdunE/t3y0MGqjWIV26vgSV5U7
+	bETFWZYWVDSarQzz2Pub2VTHC2DKOkW7UqtzY234b4Gg==
+X-Google-Smtp-Source: AGHT+IHlJzvolYW98aXTfeyuv2pATqwuYW7vhIFciqojIZ4XHbgLhP4rJTpwPHOpJ2GA+8qoZDKdNQurut8TCSpSZg0=
+X-Received: by 2002:a05:622a:4d85:b0:4a3:1b23:2862 with SMTP id
+ d75a77b69052e-4a5b9dd6e44mr23952781cf.50.1749161515059; Thu, 05 Jun 2025
+ 15:11:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AS1PR04MB9697:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a44e5d7-5504-4b1e-43fc-08dda473d117
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|376014|366016|1800799024|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kQzu5Uuq3vOEqYX/u4WjRiguRbwtdbAryrIsQx03KZ/EtAdbMC+ee5+/XXxb?=
- =?us-ascii?Q?9HI56a8gQHfGkFB0kjSWpQ5q+fLmhjqmDJ+7BMSy5Frm1/K63sBsP2KHbusV?=
- =?us-ascii?Q?I41J1PH+mWpSUeDZiFGoFSbo51wNkNS01UHwFWKQuzEKKMnTxkZ+/6Q/TTTC?=
- =?us-ascii?Q?fKE5VDG4E/MrA8oh/vVbLs2ub/JKdgSGtw68ADJKKf7mtkgKpXPzYDfHu24Y?=
- =?us-ascii?Q?Ck+sGasnRExpV8Np9eOeWZXS5ExCXLa2teKfXyqLLSeVWrlfOvr9lbU9YUhc?=
- =?us-ascii?Q?pQbQnopBlCoHxex27LzmnFaQ14MCSC48mU5UniIrmdC76hJbSxmKFMKJ+hDY?=
- =?us-ascii?Q?XWyng7X9hVyUvDGT2tJK1MaonvdoJ2MQzGuyq60/kfAnWhJYhZAfFDqCUiSJ?=
- =?us-ascii?Q?JiBKbcK5/M3iqnSZjbIMRSMvTWUFNe/3OGSlr8gDN3AmljnFDLRqpALbLFCX?=
- =?us-ascii?Q?kaG9FLs2WaxWB3BkgSaQawmswH2n5Q3EwE0oxH3sYSUCI4PJKRw0b3klHSJ9?=
- =?us-ascii?Q?mJFibRR3OFEWKTwf/k7UhbvoCLYnuLZM5eyXF0sGZBDJFHKDBK+y8ol7ZTxb?=
- =?us-ascii?Q?k1r/XRmhrwzsHps5G0YO/WAApi01d9r/imMafIm4x1iCtqTrv9wC3l3YrS1c?=
- =?us-ascii?Q?+AqLjV9DxU7wiWtkKHychgHawFLREpmhUIoXZWVXJygAdTh3YwpBVgG4gODV?=
- =?us-ascii?Q?yDyCWWmQX2Hh3vtSJsIf6N2dkc62LmMpGAnuYgPFitiJNW/ifo11ISFH21wX?=
- =?us-ascii?Q?bDf7bHYOFApf72z8keYyTD8OLJW7tz9AqO2JdRfkKU3uQFTXjbl1EsULgBMS?=
- =?us-ascii?Q?mxx2USqRHIO9DotlqhEWYUmmdRoTWqRkaIAc7HnSG8SZYw1Fc4+Hc0UkaH1o?=
- =?us-ascii?Q?pKR2osMWpQbcf1K2OQ7c2JTw1pgp32b6hYWrE2VihPz69eZZvcg+TVxsVESH?=
- =?us-ascii?Q?l7+6oDai1WYSmuhSnHfZFPSXYj59DZ9bEYbE2FmMG6Ax3+BJ7UWrUs84gvA2?=
- =?us-ascii?Q?lrWUo36RqcxJ/8Tb2q2AUIfwURonKpvPCTFtfvlcX7KP3fNZ4MBA2jBT/YUz?=
- =?us-ascii?Q?wCR1OeySyzw9bCYGm17VhbVmKwP4CCWGq37MuHUQQrCwZrZ65vIV1if7BnOE?=
- =?us-ascii?Q?b2ZNPoWMSv5zyzrtP/bXpRMArpHHcFGoO2AVByF5/CSPIYaWKiX84klulYUL?=
- =?us-ascii?Q?nC/Q30YB0fcR/8PzN/CTtoM+lDJcTaJDUzyXvkP39u7TzbM1FhUqVYqfK2i/?=
- =?us-ascii?Q?NEX8XF+iwBWKyb+szy1LZvryJWmnwHu9a1sE5BqAn63O+VuYnXfV+77DtMEx?=
- =?us-ascii?Q?cz99EFw/gkA545BxPeNHY7LuLw3PnRGWxhbVHJY2zaK2GsGzU8VTlpN4orKd?=
- =?us-ascii?Q?KDhm5RvwLt1QtKmClwJl/Ysw2Wv40ML053BhuNY1tFSnex7leVRZv37T9teM?=
- =?us-ascii?Q?S6+hheqv/lS1sF8zvDmnelnro7nyvnQ/Cm/YGBGER2pWag4gTsXqgiu55/6K?=
- =?us-ascii?Q?nvQhqsRYXbz+LrI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(366016)(1800799024)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rYZRZ8naq1rxoB+pdAJBwr7r0yhwN7F3NDxbDc6EeJQV9JuhD9nGuGcyx+c+?=
- =?us-ascii?Q?WY0l6mXbWbAxrkhaOZr6VlpxqG7YqK1tlI3e+WVN3l8HEbfkjdrUih7IRjvx?=
- =?us-ascii?Q?m2TFLGlfju3GEdT9t/ltxclQIg9WTYLEt1G5BUoELasn8U+IYIMLLfR60K8N?=
- =?us-ascii?Q?xJQ1NRSGqao34ltZ73X5kv0wxN+LMq3SkUTulVXjUugpfoiDtl+EpJee2+HC?=
- =?us-ascii?Q?oubYT6OyEGOYtJDmSupGeVnoHayIBMk0eJNDjoZWMhJfmNjXuLO/wDdkY/R4?=
- =?us-ascii?Q?sgvM7iV3yhp/jxrJMNJR0SbqGq+MXoqVL0c8Zr9hZoggFuad+L42BUd+AChC?=
- =?us-ascii?Q?/5qiVSmvgYScBgSxNGw66BIGgnSrwclDCn+XDuWpjsPhRxUSpwL6N91Gp26i?=
- =?us-ascii?Q?wPJ+DDX8s79eQAz2S+Gwt5Os30+5L03llLumaeDJ204tdryJ3Zu9RTWr08ek?=
- =?us-ascii?Q?JK3f79QTXNOMJGNjVKLhK5e9+BX4G5KvnHWHosBKsVrneA2hp9+1DW0smTYm?=
- =?us-ascii?Q?J6NZaKK7zfLSkRY3Yuix0XqzA4ZT3C4PiphQgpJPUwHxLlcFBcqHvk7g5x5+?=
- =?us-ascii?Q?OtoorGei/ArxBhIJiVjBOCDoJg8ehlxnM/wSpfM08byupiYjBuX+8y8lsouk?=
- =?us-ascii?Q?oW4H4/tCM9hMCi8oN2dS+QJ55xXn9wb3HfDgwEqK6bUhLeEU/UYjDVRZZzG9?=
- =?us-ascii?Q?EZgtTnwEKD/iCFqKRwog9+7QtBZxXL10ebPwJXLgahJEFdQbXX4raIxq7mvJ?=
- =?us-ascii?Q?p8CBt3aGFYHLoFPSZOFluIyfrY7WAvKt10jIhako0oJk/92vtJHvauq1yM7F?=
- =?us-ascii?Q?++INywW5GB9qK9CjvTj3u5QprMn4ttSMLxeibYmDuSSEc5L1oIjT+ASxEASF?=
- =?us-ascii?Q?1XjoXBGaSgtGHd6OiKh93CAQsXckj6yviQWvKkQO9K4ivdojTX3P9GP8UlTW?=
- =?us-ascii?Q?xoRu8FN4F+RMPK7hv8z696nbILnk9rAFfwGLY96eqg3oaOfGP5g1SaOALLtJ?=
- =?us-ascii?Q?5LU8MgdDIg9r5gNcLm0noBzPhEpjclM5CEDjxPomDbXpZ+b5lESOW1bjYM+J?=
- =?us-ascii?Q?nQHYkpuUhjEjlpvYoEoLacIKfDXsOaeNKVWDPtrTJLkH+bOURsX48gNd5u0B?=
- =?us-ascii?Q?DZkd37JeyIYEAi2mU1Zoc1MXjP4rd19GpkmVSV7rPVGmJzrciifb4furCAI6?=
- =?us-ascii?Q?0nhgFXjQAEhEOBaOMDW7gdePwCs8OAOuDl4U7DpOQBxMO7Fli7eg/GKvQESV?=
- =?us-ascii?Q?U6uxTcHfdtHXiIQs8Aad37FqHD4huxipZNdirf1lQJYkB5pWMCYxlvHWhoJz?=
- =?us-ascii?Q?TLkuEiJCVzzHgRt4mk9lL0A82baIwdEY1HadXqqy4frQ37a4OBIEhTcjlQRd?=
- =?us-ascii?Q?dNK/NjGkk7IUkyVx5GNSxng09YB0MJIqE+Z6mDzHwskpSXpEci5J3NRN6Hsn?=
- =?us-ascii?Q?647zxDISrr62Evqq8EZB45rHTKQ5SlxhwAVUThbYbNXF86/P6dImophjlDOF?=
- =?us-ascii?Q?7Yg9b32eNmPnLdDiaYkYVwiz4uJn0vVAz03vqz8x7uHhCOgtVvL9yXp+K843?=
- =?us-ascii?Q?ydf0MPyuyg8Zfd8E9+NLO2fIGhToACiB2jNHM9P8?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a44e5d7-5504-4b1e-43fc-08dda473d117
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2025 20:59:09.4581
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A+MZk1Ee/yF1rXrsgc/yU33Njn91WFpll7Mk4UwYmoDyhDN4T7GxlVTTG6i5OzUAHnTdlxgLXKzk/foSJzBUgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9697
+References: <9da42688-bfaa-4364-8797-e9271f3bdaef@hetzner-cloud.de>
+ <87zfemtbah.fsf@toke.dk> <CANn89i+7crgdpf-UXDpTNdWfei95+JHyMD_dBD8efTbLBnvZUQ@mail.gmail.com>
+In-Reply-To: <CANn89i+7crgdpf-UXDpTNdWfei95+JHyMD_dBD8efTbLBnvZUQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 5 Jun 2025 15:11:43 -0700
+X-Gm-Features: AX0GCFu7qvbmaAXvQ_Cf4hUkvMm5HQpqCLgrLfmyA2lfuALjsLDUhKGTPKh5Uy4
+Message-ID: <CANn89iKpZ5aLNpv66B9M4R1d_Pn5ZX=8-XaiyCLgKRy3marUtQ@mail.gmail.com>
+Subject: Re: [BUG] veth: TX drops with NAPI enabled and crash in combination
+ with qdisc
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Clark Wang <xiaoning.wang@nxp.com>
+On Thu, Jun 5, 2025 at 9:46=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Thu, Jun 5, 2025 at 9:15=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <=
+toke@redhat.com> wrote:
+> >
+> > Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de> writes:
+> >
+> > > Hi,
+> > >
+> > > while experimenting with XDP_REDIRECT from a veth-pair to another int=
+erface, I
+> > > noticed that the veth-pair looses lots of packets when multiple TCP s=
+treams go
+> > > through it, resulting in stalling TCP connections and noticeable inst=
+abilities.
+> > >
+> > > This doesn't seem to be an issue with just XDP but rather occurs when=
+ever the
+> > > NAPI mode of the veth driver is active.
+> > > I managed to reproduce the same behavior just by bringing the veth-pa=
+ir into
+> > > NAPI mode (see commit d3256efd8e8b ("veth: allow enabling NAPI even w=
+ithout
+> > > XDP")) and running multiple TCP streams through it using a network na=
+mespace.
+> > >
+> > > Here is how I reproduced it:
+> > >
+> > >   ip netns add lb
+> > >   ip link add dev to-lb type veth peer name in-lb netns lb
+> > >
+> > >   # Enable NAPI
+> > >   ethtool -K to-lb gro on
+> > >   ethtool -K to-lb tso off
+> > >   ip netns exec lb ethtool -K in-lb gro on
+> > >   ip netns exec lb ethtool -K in-lb tso off
+> > >
+> > >   ip link set dev to-lb up
+> > >   ip -netns lb link set dev in-lb up
+> > >
+> > > Then run a HTTP server inside the "lb" namespace that serves a large =
+file:
+> > >
+> > >   fallocate -l 10G testfiles/10GB.bin
+> > >   caddy file-server --root testfiles/
+> > >
+> > > Download this file from within the root namespace multiple times in p=
+arallel:
+> > >
+> > >   curl http://[fe80::...%to-lb]/10GB.bin -o /dev/null
+> > >
+> > > In my tests, I ran four parallel curls at the same time and after jus=
+t a few
+> > > seconds, three of them stalled while the other one "won" over the ful=
+l bandwidth
+> > > and completed the download.
+> > >
+> > > This is probably a result of the veth's ptr_ring running full, causin=
+g many
+> > > packet drops on TX, and the TCP congestion control reacting to that.
+> > >
+> > > In this context, I also took notice of Jesper's patch which describes=
+ a very
+> > > similar issue and should help to resolve this:
+> > >   commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ri=
+ng to
+> > >   reduce TX drops")
+> > >
+> > > But when repeating the above test with latest mainline, which include=
+s this
+> > > patch, and enabling qdisc via
+> > >   tc qdisc add dev in-lb root sfq perturb 10
+> > > the Kernel crashed just after starting the second TCP stream (see out=
+put below).
+> > >
+> > > So I have two questions:
+> > > - Is my understanding of the described issue correct and is Jesper's =
+patch
+> > >   sufficient to solve this?
+> >
+> > Hmm, yeah, this does sound likely.
+> >
+> > > - Is my qdisc configuration to make use of this patch correct and the=
+ kernel
+> > >   crash is likely a bug?
+> > >
+> > > ------------[ cut here ]------------
+> > > UBSAN: array-index-out-of-bounds in net/sched/sch_sfq.c:203:12
+> > > index 65535 is out of range for type 'sfq_head [128]'
+> >
+> > This (the 'index 65535') kinda screams "integer underflow". So certainl=
+y
+> > looks like a kernel bug, yeah. Don't see any obvious reason why Jesper'=
+s
+> > patch would trigger this; maybe Eric has an idea?
+> >
+> > Does this happen with other qdiscs as well, or is it specific to sfq?
+>
+> This seems like a bug in sfq, we already had recent fixes in it, and
+> other fixes in net/sched vs qdisc_tree_reduce_backlog()
+>
+> It is possible qdisc_pkt_len() could be wrong in this use case (TSO off ?=
+)
 
-The "eee-broken-1000t" was added on 8mm for FEC to avoid issue of ptp sync.
-EQoS haven't such issue. So, remove this for EQoS phys.
+This seems to be a very old bug, indeed caused by sch->gso_skb
+contribution to sch->q.qlen
 
-Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
----
- arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts | 1 -
- arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts   | 1 -
- 2 files changed, 2 deletions(-)
-
-diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-index 8491eb53120e6..a6ebeb642eb65 100644
---- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-+++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-@@ -217,7 +217,6 @@ mdio {
- 
- 		ethphy1: ethernet-phy@1 {
- 			reg = <1>;
--			eee-broken-1000t;
- 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
- 			reset-assert-us = <10000>;
- 			reset-deassert-us = <80000>;
-diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-index acbd981ba548a..cceca130c5b4e 100644
---- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-+++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-@@ -184,7 +184,6 @@ mdio {
- 		ethphy1: ethernet-phy@1 {
- 			compatible = "ethernet-phy-ieee802.3-c22";
- 			reg = <1>;
--			eee-broken-1000t;
- 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
- 			reset-assert-us = <10000>;
- 			reset-deassert-us = <80000>;
--- 
-2.34.1
-
+diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+index b912ad99aa15d95b297fb28d0fd0baa9c21ab5cd..77fa02f2bfcd56a36815199aa2e=
+7987943ea226f
+100644
+--- a/net/sched/sch_sfq.c
++++ b/net/sched/sch_sfq.c
+@@ -310,7 +310,10 @@ static unsigned int sfq_drop(struct Qdisc *sch,
+struct sk_buff **to_free)
+                /* It is difficult to believe, but ALL THE SLOTS HAVE
+LENGTH 1. */
+                x =3D q->tail->next;
+                slot =3D &q->slots[x];
+-               q->tail->next =3D slot->next;
++               if (slot->next =3D=3D x)
++                       q->tail =3D NULL; /* no more active slots */
++               else
++                       q->tail->next =3D slot->next;
+                q->ht[slot->hash] =3D SFQ_EMPTY_SLOT;
+                goto drop;
+        }
 
