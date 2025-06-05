@@ -1,122 +1,115 @@
-Return-Path: <netdev+bounces-195250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7320CACF0EE
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D796ACF0EF
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2F06188C941
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED6DC3A24F4
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D41825D525;
-	Thu,  5 Jun 2025 13:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1C725C813;
+	Thu,  5 Jun 2025 13:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=konsulko.com header.i=@konsulko.com header.b="DttgFVns"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C9A25C813
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 13:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0402494F8
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 13:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749130822; cv=none; b=Jlx1kg2JPXcFp4zLzRvVjzz1hh46HqVlc+yWaq1i70xgDmu10R4fBTbZ9x/uHyfQSbSahGuUPr6AyDkpNMCn4LI4PmAteQCU0mLFv/0uBXIvxMgom2Bj8OBfZH2FLVtjpBjgwmN0nOhFXWTwX/5lJdCrwVZqGEZtSUbo0lpAoQg=
+	t=1749130839; cv=none; b=leEsfNatN4fJpl41JbR6JOJSia24C8YWZ4XkKiNXd9wKygNSdSoY0QPnk+2NYD4qAIR4L9nGlE+CiRhvr8bU+byok6RvWSuJ2X2cBCZy1pC8CTl2uIiZVhwH+QzKajPf19abmh6SIST3IbuKVtkY9k/V2OUHmLuZZWV6Fu8r/No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749130822; c=relaxed/simple;
-	bh=eHfQrTC0YqcsfNHP+pfBrnfS8oHwL+W9menMSWW99rQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Co4hMQFRQDJSASdz2j14UoPeWUxwibIWvuWiacgrs/tBU0DFLsApk7awH/H6MQCpJd/71Nh3BjHFdzbolIhKg0XuKv8EiJaC/Z25UkbRslObvlx2GOdNOOemrTt1kFIo3DEbdoGkVgbkybskDFUPIYyW9G1zcp0fS5uEZNsAIpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-72c09f8369cso268964a34.3
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 06:40:18 -0700 (PDT)
+	s=arc-20240116; t=1749130839; c=relaxed/simple;
+	bh=iHIzoVdsgUinoZ8BmsUrRbKp3He5F7VRvpO1K9lEvKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uiFxbiRV+4vA77C0fuYJXccL1bBqSLhcHDHkoCAJ7RUt8F5dpMHGhZABNrYUoJVVqTJJxdHcfqRziDsbKoRWcV8dbwA+Iq4Xzer9gMluU3uLLt+TkQey7/bL6YdyYglXY9TF0WYcjDyJNupvxsI0Wbzn64X/HrzoD/Csz3I9pzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konsulko.com; spf=pass smtp.mailfrom=konsulko.com; dkim=pass (1024-bit key) header.d=konsulko.com header.i=@konsulko.com header.b=DttgFVns; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konsulko.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=konsulko.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-adb5cb6d8f1so160573566b.3
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 06:40:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=konsulko.com; s=google; t=1749130836; x=1749735636; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dquXSD3f+mF944uxid9rtpogR5b2YO3NRGhOoE+P3gs=;
+        b=DttgFVnsp+vpbC7D9o1vmmyOIJjriQGT8XL4KFj7OKjhV6RplonnJk3mfPbUBAU3wJ
+         Qv/tLc4VXSBuBNT2tmVsFZmPwHM7RKHjJWWhJ2M4DvCLhHb/SIutok7NGWBIYMFh3N/6
+         S68+JyP2eyvkteUMSsyWCnSbM9xx7T4+b3Ssc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749130817; x=1749735617;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TeCZVZW7lnBPQQGcRFRIqFvWhqdxCwtGKMH0CVJpWqs=;
-        b=u7LE02GzWS4pGTnWc+ShWQOOfFdF2iQ1hwRJ1cbUgvlKxFmVgBuk1vKg9189NHngg2
-         /XC4O/sbIVPU6DSh/gVo5EbTpCRwmlmGZLPoQYaUpTeHJR5DJwL6ugmqOzzR3adrK81k
-         3gw0aGMNyo6QgPC67GMSGfsa8oTUnJfR+9srLdCsq/60jpES/AqVsU834lP20XgCANtZ
-         RxkJ0iutIIeDaCbTScRBxwmUasTVaD7vyvmqwNMCvM9yVdjbaAtYmp04tEbaSmwKKcmJ
-         ZzDraQ4OSv24fUvC/ualsZJjoRfJNS492XFw3sQQF/725L/hYZVq8uTTw7vURy5DlvVH
-         J7CA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2W/Z4sNHZb94y+GHlf0hfJf4yPQQHeeAZmJ/6F6wM3kAe4zurZJ7L0RpMBD1RiSdEIAskjCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcRuHMYN6dU6Jolv4fBUNTe/IfVrvHkp5QUk8o88CHR/cn+nKn
-	AGV4fDDPdSJzofwUiI7XmZ077ltu9g0vBoLtBSYtzDN0O0B/zQ1xBswhPRRrEELyRig=
-X-Gm-Gg: ASbGncsuwFaG+O94LMEI0x4S5WjUnKTS08Nd35QxKz+gDj5EinYgf0P7/v+Qh510DOq
-	XBm07d9CCW54ZT1aWgKSfGvubQXwmnt6Pv6Jgwz7XSuoV96RQnmjn/YFmOySeumvsMWH3/Rn/yn
-	mINfPlq2ZK2DzVM++4UCWxgpd/Nkw9AMyv8aoEPAMrJHlyqfd5I1o5bt529+Z5mQgVWkFyJHqQe
-	G35jD0ut9JKNPDT6TNkZwidO6wVGVgKXP+OLLDFN5s/FMfTaGPra4z0DC/oLkfixkRUgUbYY+eb
-	fASH+VJXJEqP6YsPc6WJKu/Yeu60zaLIuy9B55aSFxkcV+1ojXUdstyEsHKZ88m92VU342CRpFq
-	o3y1XvATIISMHJy1Pkw==
-X-Google-Smtp-Source: AGHT+IHVqhyK1dRrdLTRKyiwBS+ngJEL6T5pi9Zkm69jadiJfNnUnjAf/FsK6iQWjJqkBX6gKkq8hA==
-X-Received: by 2002:a05:6830:6488:b0:735:51b9:4688 with SMTP id 46e09a7af769-73869de72f6mr5073576a34.19.1749130816857;
-        Thu, 05 Jun 2025 06:40:16 -0700 (PDT)
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com. [209.85.167.170])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-735af9bc883sm2632632a34.54.2025.06.05.06.40.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 06:40:16 -0700 (PDT)
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-4080548891fso375803b6e.3
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 06:40:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU+TDGBQ/gDNzq61A3vVp2RVyFyfdXtENGZnmU0ruNPmffov4kdyLI+DPo1v3k/JX/tu5R5vY4=@vger.kernel.org
-X-Received: by 2002:a05:6102:5494:b0:4dd:b192:960f with SMTP id
- ada2fe7eead31-4e746e18d59mr5244968137.13.1749130806053; Thu, 05 Jun 2025
- 06:40:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749130836; x=1749735636;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dquXSD3f+mF944uxid9rtpogR5b2YO3NRGhOoE+P3gs=;
+        b=JTkLOZHJF4wXcT/XxJY9JbMH4HMaKBuev0c03WX5Iq07BasuR41TtQygcTydRFzWKi
+         P098Siolt7rekvb3a9wlsWOk+VZViwP8Rs41888W5kkg1jWs5PXM3YqvNaK7lVIBur08
+         iEqbcgbbTbP2n11IKTtKd0HWuVZV9GS3p/3f/sDLZSGczgiMQ221oduKspT/pyygM/rw
+         Us/fPDx3YxWoxIuiYAFPZ13jOCl0dq6fg+vN8lsfqdVjwMC84oZmkUBl2pSdqJm4SCfc
+         yJcRucMMzvKIOP9/iPLra4+CgvV5B4ruECv+DM/eyp4FkWn7Kjt6eAYXMJnDxlCVY09+
+         8bMw==
+X-Gm-Message-State: AOJu0Yx8e8OdMwU1ljsiBjpLOt6VKgcgoEHYRaIg06JW1MI2lqstTMei
+	KJ/FVvnRxePisCRK3U0RF44g/zxj1NYfkukGgztnr7FHI6h/4tSCwj4SXa64ZlSDBbNRA47Z296
+	OoosaSHI=
+X-Gm-Gg: ASbGncuCEnhhtmhNp0f47tmU3QQwBZ3HomNEU+QH7nakjFkOfADIV9Oj/3KJJdwZqA7
+	T9hMCzY2P07K0bccAwl8scW6BsG8hZiOdQvzLuuYVM8W9WvyH42WP0TIm26X8DaDuy6ITmX6psx
+	/KxYBzmLClH9qMd9r/U2ZNVGnye0UBi/LcGqr62gKwJiUNCVb5Xs28Jcn7SMoGKK1VoSSTTurGS
+	Nv6Aj6XG4tfdQP8/G2GMeJOozUOcgpLrS+BkBQ5t7b+Qel+K8ySOdggzouofOULF3VeLcuU/ECC
+	OV1MVS3DcLB+lirLCN4iM5vxH1pVPbePPb6zVkqXQ2NacFg5aPM2xOTafhrLQNHtuNEERcqo
+X-Google-Smtp-Source: AGHT+IEREIje3v2Hq1PcwMkHBac9ZyQHKMo+XtGQ+4HAwjNL/dcCiapUwoLffvMHf6Mabx1QiIU6VQ==
+X-Received: by 2002:a17:906:dc8d:b0:adb:229f:6b71 with SMTP id a640c23a62f3a-addf8caa363mr658709066b.5.1749130835587;
+        Thu, 05 Jun 2025 06:40:35 -0700 (PDT)
+Received: from bender.k.g (lan.nucleusys.com. [92.247.61.126])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ada6ad39420sm1265773266b.136.2025.06.05.06.40.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 06:40:35 -0700 (PDT)
+Date: Thu, 5 Jun 2025 16:40:34 +0300
+From: Petko Manolov <petko.manolov@konsulko.com>
+To: netdev@vger.kernel.org
+Cc: Jerome.Pouiller@silabs.com, David.Legoff@silabs.com
+Subject: wfx200 weird out-of-range power supply issue
+Message-ID: <20250605134034.GD1779@bender.k.g>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423103923.2513425-1-tianx@yunsilicon.com>
- <20250423104000.2513425-15-tianx@yunsilicon.com> <20250424184840.064657da@kernel.org>
- <3fd3b7fc-b698-4cf3-9d43-4751bfb40646@yunsilicon.com> <20250605062855.019d4d2d@kernel.org>
-In-Reply-To: <20250605062855.019d4d2d@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 5 Jun 2025 15:39:54 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVMrFzeFUu+H0MvMmf82TDc=4qfM2kjcoUCXiOFLmutDA@mail.gmail.com>
-X-Gm-Features: AX0GCFuR08tAnWqKWeAah0zNgGtTLBVIaYN9uACTHjmSu7IPJg6CjzystwAQEIU
-Message-ID: <CAMuHMdVMrFzeFUu+H0MvMmf82TDc=4qfM2kjcoUCXiOFLmutDA@mail.gmail.com>
-Subject: Re: [PATCH net-next v11 14/14] xsc: add ndo_get_stats64
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Xin Tian <tianx@yunsilicon.com>, netdev@vger.kernel.org, leon@kernel.org, 
-	andrew+netdev@lunn.ch, pabeni@redhat.com, edumazet@google.com, 
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com, 
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com, wanry@yunsilicon.com, 
-	jacky@yunsilicon.com, horms@kernel.org, parthiban.veerasooran@microchip.com, 
-	masahiroy@kernel.org, kalesh-anakkur.purayil@broadcom.com, 
-	geert+renesas@glider.be
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Thu, 5 Jun 2025 at 15:29, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Thu, 5 Jun 2025 15:25:21 +0800 Xin Tian wrote:
-> > Regarding u64_stats_sync.h helpers:
-> > Since our driver exclusively runs on 64-bit platforms (ARM64 or x86_64)
-> > where u64 accesses are atomic, is it still necessary to use these helpers?
->
-> alright.
+	Hey guys,
 
-[PATCH 1/14] indeed has:
+Apologies if this has been asked before, but i've searched and didn't find
+anything related to this problem.  So here it goes: i'm upgrading the kernel of
+a custom stm32mp15 board (from v5.4 to v6.6) and i've stumbled upon this when
+wfx driver module get loaded:
 
-    depends on PCI
-    depends on ARM64 || X86_64 || COMPILE_TEST
+wfx-spi spi0.0: sending configuration file wfx/wf200.pds      
+wfx-spi spi0.0: asynchronous error: out-of-range power supply voltage: -20
+... a bunch of "hif: 00000000: bc 04 e4 15 04 00 00 00 ec 00 74 76 f7 b7 cd 09" like messages ...
+wfx-spi spi0.0: time out while polling control register       
+wfx-spi spi0.0: chip is abnormally long to answer                                                       
+wfx-spi spi0.0: chip did not answer                                                                     
+wfx-spi spi0.0: hardware request CONFIGURATION (0x09) on vif 2 returned error -110                      
+wfx-spi spi0.0: PDS:4: chip didn't reply (corrupted file?)                                              
+wfx-spi: probe of spi0.0 failed with error -110       
 
-However, if this device is available on a PCIe expansion card, it
-could be plugged into any system with a PCIe expansion slot?
+Needless to say that v5.4 kernel setup works fine.  The only difference with
+v6.6 is the wfx driver and kernel's DTB.  Now, i've verified that wf200 is
+powered with 3.3V, in both cases, so that's not it.  I've also lowered the SPI
+clock from 40000000 to 20000000 but it didn't make a difference.
 
-Gr{oetje,eeting}s,
-
-                        Geert
+By looking at the driver i'm fairly certain the above error is actually coming
+from the wf200 firmware and the driver is just printing an error message so i
+don't see reasonable ways of debugging this thing.  In short, any suggestion
+would be greatly appreciated.
 
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+thanks guys,
+Petko
 
