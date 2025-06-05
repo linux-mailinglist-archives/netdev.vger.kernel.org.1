@@ -1,240 +1,177 @@
-Return-Path: <netdev+bounces-195207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051E6ACED89
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:26:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EDB3ACED85
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3E27178653
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7EFB7A89CF
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 10:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4D32147E5;
-	Thu,  5 Jun 2025 10:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9562147E5;
+	Thu,  5 Jun 2025 10:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iAZCZFkT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ieu1dsbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDBB20B7FC
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 10:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EAC1A2C25;
+	Thu,  5 Jun 2025 10:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749119156; cv=none; b=fVSQBaAneyT8qV5fnrQoH0GXmxwzTTkKtiaGrRWg9CfuKIYU4v76jx4hTPfVeM3x1n3j3W8E//jBFe1zDeJ379hslAR6BpeZY1NTrFKgC8X+fkDtESwJSTHxrCtukHWp2ovHPr7Lh5v3IzKqxamWB68xGcDctD8xrBaCuX8sVCs=
+	t=1749119145; cv=none; b=AAKknLPTe2DunE9vwTeigrxssffsLkqiK/FRWZtMVxWMjvyCDLUHEoN6keb+DORyTe6r/NtqdOvr32tfh9SnADpkF2Zhkpo2U7mobLJ6TV7lH595Fv26EszY5gsh8/lUnI9FAaay19BD3MR+/2IalRvZFZyVrWE+/nyzj2vkX6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749119156; c=relaxed/simple;
-	bh=8FxoLj6LiBlq6MIoflJO6Wt9XFMOGnA1Ab7cJH+/6HY=;
+	s=arc-20240116; t=1749119145; c=relaxed/simple;
+	bh=Y6odTPkaS4fOfYNHRYgsmVh7nl91jNEtq7WCKbmDCAs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CPT2TTtji5hdVQ8FPfPDcaPmTgF77CTFR8FdpYx/OY2mTsGRM6qB1ubwTXWOn/54DNn0YAojzBPl43DwtxP9CoT0ju4A3d7uZCB1iJ1ANQi39U938E8nqpE78xdaDFEZ2NKNNGcttAGz72DG4/Frmu3lReH21WJL/th3xOgew/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iAZCZFkT; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749119151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KGvfcQK4SqoxUSANLaanDU9SMPl09zRLKA5RRmHvlfk=;
-	b=iAZCZFkTGX1328h7yh0mXXRrEM7+l/JrWmWr0P2HFBSVvGm9KFw86TJbjQTXtwcw0dzKZM
-	HuXOSaXQJB+T+x0mmpOxRMQLQynczV1Ps2tPjQ0/0UApzl9eVMwXuM1JxrGd1Ob44xA4cw
-	axG/XgzE73XTNHt/cmNPCRx3lPU7mc4=
-Date: Thu, 5 Jun 2025 11:25:48 +0100
+	 In-Reply-To:Content-Type; b=MXarD/ypyDiV0rB/Sca4vaQEO6a7P6ViZhyyJh+m9Awh2KHdx1Ca3UeiAbEuLeiAoCiVHQQ5fH7kzT9g1GmZ8YVdmvEaYYQh8bVR65d+6Kbz55xeKENeVlXFoaWHjNd1YppmkZDtNSL3xJOHP/sN203/64VwkX2u378Kujfnkkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ieu1dsbO; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-adb2bd27c7bso134255066b.2;
+        Thu, 05 Jun 2025 03:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749119141; x=1749723941; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=itRQPWabF7d6IdaAkp4MBncmkvXPAe8HLLkNyEpU2ug=;
+        b=Ieu1dsbO4YNZ0Sij4j9owQnq0t605ibIwCLymHlB2UCaxSQs+HAF2s5OSUmvAESZxx
+         yuxm0t3u5g0RbboZq/Xoj61dvDhoCSCQ9qoqoDt/YXQguu0y+d71WhqUUElr8l45XD98
+         Pd70PiNiPCxIv7B/4oOMgD5DB3dbu+f5dQVLS5b/PCmXKkQMQP8E7b/HpbWZGXadEvyH
+         50FTS4xCsMYIgXIvnwBDDfGyzoeyah0fzdxWqA60xF0+b+Ny5SkFqPybJ7XuzwQkyKZz
+         FrVHHiZt2oWGPzNNE4ExqWddIhIWv4UV3NE6/N/Ve2Xnd3q6eTNZhyKZCDBe3lb+eAiK
+         tQEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749119141; x=1749723941;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=itRQPWabF7d6IdaAkp4MBncmkvXPAe8HLLkNyEpU2ug=;
+        b=Ilaflht0no8Cnq0g8KhwNPykndNE2acpXUPkGAkv/FpU9zsleBrpdeGM88ih0/zn6o
+         W9skaNzrMXyBxQolk/i6GAEZ4LNgVaYMEA3taeq4Ri6bkEQIg7TKdl3Z7bDlsTKmePZt
+         K8qwdVGeYVGKfCMV0SFIpSnPmc3Hd1V6WHEAl5fccMwIRaqFzbDLcEpN9nIAc2+TyG+p
+         mEd4cfk+xvBxBpy/5c35p+L+Ljkc8X4FdNybJ4hh2GnUBhZNvux78an8t100wvRswR9s
+         wflXnPG4qHYZ3B1g9UBdWCTlxA84F71YOwC5Sq45Y6r3VCJCQyFZke8m9x0pM5n62LvI
+         w09g==
+X-Forwarded-Encrypted: i=1; AJvYcCUOLG67atCA5QHhNxMrHSco/C8WrZuVKlx0t/8kJHQMKIW5QlUPHnBNZqBqZdA5OpqLtfo=@vger.kernel.org, AJvYcCWaJyU4dHYo+/U8zahCK9eIZq6EATpXtPTwlGDtvQ1T4UzKjFB6JV64+ubbd7VptCKcrVvSdWFZ@vger.kernel.org, AJvYcCWo65KWJ7E4bJajFJsPF5N2mPk8TtlZTHFRVQzP9nZDNLE8erS5F2+P0LiVF6pXrjrgw+pMJwwo0gIhQg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywp5ZGTm6vxhPrZSs375QzTLK+kHWt0lOyDPQdgyQ4JHHC1+7Cc
+	1e6VvMkARAAFKXKqouWMJFO1cjY6EpyMAnfMRXj2d4+es5hPmrO5rcuD
+X-Gm-Gg: ASbGncsr1bm2FTlSCPkTLriULdGgiOUbFNMw0Ez8u7+DRVKSwoL3lN7uaSLvWWzARX+
+	TYM1v0SrDL7ZdJCcNL4n7WAY1V0gDRYy+he22f9/TJbgz9WKG9CuXcr12PYTtAXEQKFUD0C+R5E
+	Xp9fovXiME7KVRCG6o9oMbotm1Cn/7ZNeOIZGfVzEbAA3yvs8LQoLZ9/QU+5UQN9c03kRIcp7ho
+	BCPb3oIKpznVCvDGhhomgMSA9CxdckiCnj2S+ZMbGUdncsjMLIbcOBQI9x1XiwQr/KRyzLiV7fz
+	EMZBSeeIcAmy5wVRibTJ4ZQ67wR5adf8ODTT0zFJ0WJ8gydDolPtB/amTSpKM68IGJxaB8k0KHE
+	=
+X-Google-Smtp-Source: AGHT+IEJVIeyPovY+XNoaWDAFKnxn+Gk0ei3Mrur69LBv34N0LN+wxmIwZL7D5wIY9s978A9r9fmyA==
+X-Received: by 2002:a17:906:f58c:b0:ad8:93a3:299c with SMTP id a640c23a62f3a-addf8c96579mr614742266b.10.1749119140426;
+        Thu, 05 Jun 2025 03:25:40 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::22f? ([2620:10d:c092:600::1:d66f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-adb31ea3504sm1104621366b.172.2025.06.05.03.25.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Jun 2025 03:25:39 -0700 (PDT)
+Message-ID: <29f2c375-65e3-4d22-8274-552653222f8d@gmail.com>
+Date: Thu, 5 Jun 2025 11:26:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>
-References: <cover.1749026421.git.asml.silence@gmail.com>
- <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
- <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v4 03/18] page_pool: use netmem alloc/put APIs in
+ __page_pool_alloc_page_order()
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+ akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
+ andrew+netdev@lunn.ch, toke@redhat.com, tariqt@nvidia.com,
+ edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+References: <20250604025246.61616-1-byungchul@sk.com>
+ <20250604025246.61616-4-byungchul@sk.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250604025246.61616-4-byungchul@sk.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 05/06/2025 01:59, Willem de Bruijn wrote:
-> Pavel Begunkov wrote:
->> Add a new socket command which returns tx time stamps to the user. It
->> provide an alternative to the existing error queue recvmsg interface.
->> The command works in a polled multishot mode, which means io_uring will
->> poll the socket and keep posting timestamps until the request is
->> cancelled or fails in any other way (e.g. with no space in the CQ). It
->> reuses the net infra and grabs timestamps from the socket's error queue.
->>
->> The command requires IORING_SETUP_CQE32. All non-final CQEs (marked with
->> IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 bits
->> of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). The
->> timevalue is store in the upper part of the extended CQE. The final
->> completion won't have IORING_CQR_F_MORE and will have cqe->res storing
->> 0/error.
->>
->> Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> ---
->>   include/uapi/linux/io_uring.h |  6 +++
->>   io_uring/cmd_net.c            | 77 +++++++++++++++++++++++++++++++++++
->>   2 files changed, 83 insertions(+)
->>
->> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->> index cfd17e382082..0bc156eb96d4 100644
->> --- a/include/uapi/linux/io_uring.h
->> +++ b/include/uapi/linux/io_uring.h
->> @@ -960,6 +960,11 @@ struct io_uring_recvmsg_out {
->>   	__u32 flags;
->>   };
->>   
->> +struct io_timespec {
->> +	__u64		tv_sec;
->> +	__u64		tv_nsec;
->> +};
->> +
->>   /*
->>    * Argument for IORING_OP_URING_CMD when file is a socket
->>    */
->> @@ -968,6 +973,7 @@ enum io_uring_socket_op {
->>   	SOCKET_URING_OP_SIOCOUTQ,
->>   	SOCKET_URING_OP_GETSOCKOPT,
->>   	SOCKET_URING_OP_SETSOCKOPT,
->> +	SOCKET_URING_OP_TX_TIMESTAMP,
->>   };
->>   
->>   /* Zero copy receive refill queue entry */
->> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
->> index e99170c7d41a..dae59aea5847 100644
->> --- a/io_uring/cmd_net.c
->> +++ b/io_uring/cmd_net.c
->> @@ -1,5 +1,6 @@
->>   #include <asm/ioctls.h>
->>   #include <linux/io_uring/net.h>
->> +#include <linux/errqueue.h>
->>   #include <net/sock.h>
->>   
->>   #include "uring_cmd.h"
->> @@ -51,6 +52,80 @@ static inline int io_uring_cmd_setsockopt(struct socket *sock,
->>   				  optlen);
->>   }
->>   
->> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
->> +				     struct sk_buff *skb, unsigned issue_flags)
->> +{
->> +	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
->> +	struct io_uring_cqe cqe[2];
->> +	struct io_timespec *iots;
->> +	struct timespec64 ts;
->> +	u32 tskey;
->> +
->> +	BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
->> +
->> +	if (!skb_get_tx_timestamp(skb, sk, &ts))
->> +		return false;
->> +
->> +	tskey = serr->ee.ee_data;
->> +
->> +	cqe->user_data = 0;
->> +	cqe->res = tskey;
->> +	cqe->flags = IORING_CQE_F_MORE;
->> +	cqe->flags |= (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIFT;
->> +
->> +	iots = (struct io_timespec *)&cqe[1];
->> +	iots->tv_sec = ts.tv_sec;
->> +	iots->tv_nsec = ts.tv_nsec;
+On 6/4/25 03:52, Byungchul Park wrote:
+> Use netmem alloc/put APIs instead of page alloc/put APIs and make it
+> return netmem_ref instead of struct page * in
+> __page_pool_alloc_page_order().
 > 
-> skb_get_tx_timestamp loses the information whether this is a
-> software or a hardware timestamp. Is that loss problematic?
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> ---
+>   net/core/page_pool.c | 26 +++++++++++++-------------
+>   1 file changed, 13 insertions(+), 13 deletions(-)
 > 
-> If a process only requests one type of timestamp, it will not be.
-> 
-> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
-> annotation may be necessary.
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 4011eb305cee..523354f2db1c 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -518,29 +518,29 @@ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem, gfp_t g
+>   	return false;
+>   }
+>   
+> -static struct page *__page_pool_alloc_page_order(struct page_pool *pool,
+> -						 gfp_t gfp)
+> +static netmem_ref __page_pool_alloc_page_order(struct page_pool *pool,
+> +					       gfp_t gfp)
+>   {
+> -	struct page *page;
+> +	netmem_ref netmem;
+>   
+>   	gfp |= __GFP_COMP;
+> -	page = alloc_pages_node(pool->p.nid, gfp, pool->p.order);
+> -	if (unlikely(!page))
+> -		return NULL;
+> +	netmem = alloc_netmems_node(pool->p.nid, gfp, pool->p.order);
+> +	if (unlikely(!netmem))
+> +		return 0;
+>   
+> -	if (pool->dma_map && unlikely(!page_pool_dma_map(pool, page_to_netmem(page), gfp))) {
+> -		put_page(page);
+> -		return NULL;
+> +	if (pool->dma_map && unlikely(!page_pool_dma_map(pool, netmem, gfp))) {
+> +		put_netmem(netmem);
 
-skb_has_tx_timestamp() helper has clear priority of software timestamp,
-if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW case
-won't produce both timestamps with the current implementation. Am I
-missing something?
+It's a bad idea to have {put,get}_netmem in page pool's code, it has a
+different semantics from what page pool expects for net_iov. I.e.
+instead of releasing the netmem and allowing it to be reallocated by
+page pool, put_netmem(niov) will drop a memory provider reference and
+leak the net_iov. Depending on implementation it might even underflow
+mp refs if a net_iov is ever passed here.
 
-> 
->> +	return io_uring_cmd_post_mshot_cqe32(cmd, issue_flags, cqe);
->> +}
->> +
->> +static int io_uring_cmd_timestamp(struct socket *sock,
->> +				  struct io_uring_cmd *cmd,
->> +				  unsigned int issue_flags)
->> +{
->> +	struct sock *sk = sock->sk;
->> +	struct sk_buff_head *q = &sk->sk_error_queue;
->> +	struct sk_buff *skb, *tmp;
->> +	struct sk_buff_head list;
->> +	int ret;
->> +
->> +	if (!(issue_flags & IO_URING_F_CQE32))
->> +		return -EINVAL;
->> +	ret = io_cmd_poll_multishot(cmd, issue_flags, EPOLLERR);
->> +	if (unlikely(ret))
->> +		return ret;
->> +
->> +	if (skb_queue_empty_lockless(q))
->> +		return -EAGAIN;
->> +	__skb_queue_head_init(&list);
->> +
->> +	scoped_guard(spinlock_irq, &q->lock) {
->> +		skb_queue_walk_safe(q, skb, tmp) {
->> +			/* don't support skbs with payload */
->> +			if (!skb_has_tx_timestamp(skb, sk) || skb->len)
->> +				continue;
->> +			__skb_unlink(skb, q);
->> +			__skb_queue_tail(&list, skb);
->> +		}
->> +	}
->> +
->> +	while (1) {
->> +		skb = skb_peek(&list);
->> +		if (!skb)
->> +			break;
->> +		if (!io_process_timestamp_skb(cmd, sk, skb, issue_flags))
->> +			break;
->> +		__skb_dequeue(&list);
->> +		consume_skb(skb);
->> +	}
->> +
->> +	if (!unlikely(skb_queue_empty(&list))) {
->> +		scoped_guard(spinlock_irqsave, &q->lock)
->> +			skb_queue_splice(q, &list);
->> +	}
->> +	return -EAGAIN;
->> +}
->> +
->>   int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
->>   {
->>   	struct socket *sock = cmd->file->private_data;
->> @@ -76,6 +151,8 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
->>   		return io_uring_cmd_getsockopt(sock, cmd, issue_flags);
->>   	case SOCKET_URING_OP_SETSOCKOPT:
->>   		return io_uring_cmd_setsockopt(sock, cmd, issue_flags);
->> +	case SOCKET_URING_OP_TX_TIMESTAMP:
->> +		return io_uring_cmd_timestamp(sock, cmd, issue_flags);
->>   	default:
->>   		return -EOPNOTSUPP;
->>   	}
->> -- 
->> 2.49.0
->>
-> 
-> 
+The second problem is that you pass it page_pool_dma_map(), which
+works only with struct page and not net_iov, and so it just
+unconditionally casts it back to struct page. Which, to be fair,
+a pre-existent issue.
+
+This function deals with pages, can we just use pages instead and
+cast to netmem when needed? Sth like in this pseudo code:
+
+netmem_ref __page_pool_alloc_page_order() {
+	struct page *p = alloc_pages_order();
+
+	netmem = page_to_netmem(p);
+	if (!page_pool_dma_map(netmem)) {
+		put_page(p);
+		return 0;
+	}
+	return netmem;
+}
+
+-- 
+Pavel Begunkov
 
 
