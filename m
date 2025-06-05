@@ -1,149 +1,116 @@
-Return-Path: <netdev+bounces-195298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A22CACF517
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 19:15:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B92ACF530
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 19:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83AA63AD9D9
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 17:14:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8104F3A3C71
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 17:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39F127780C;
-	Thu,  5 Jun 2025 17:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892A827C15C;
+	Thu,  5 Jun 2025 17:16:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IrhEqj3z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MwAyXaEw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A355A277013;
-	Thu,  5 Jun 2025 17:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990B227BF83
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 17:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749143704; cv=none; b=sDF2r6aYKwbIDKKc7O6Oqk8yTeCDyyZC83eRHfj2uFWND7oA6CmZqnmF1QARlnHFpU4gGllN5ORVYPO+Hu0io9TvTnP8W/nWSMDeN2n9f/2QFeoJK6mKOfe+Ws8TAih8GvzT7zxEKB226H1kUxtWEykCTkug8SPujUm/7Q5i5Us=
+	t=1749143766; cv=none; b=eLeO33q+7UqDN46D3faXN3izkAvr+AuGTm0F8N8yQdlg6JDSJW9ucExatTIt+Zux3VsGrF8hoOyHchjsBGhpnYPxKsgQNAq8Ovkk/yzo/Cza8kDhG+ukr9qaSS3p5+cDMhPxDVr2D9eKacJ6enSAsIwoIVliadNMu/zohq5QTOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749143704; c=relaxed/simple;
-	bh=E0LLnEBBXupp6wiEw+vUdkJo0HIl9ljS9wURxTt0PII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GUKFANYDc2VOqDasfsPhKJEDgzz2F+Y0jbCOA2inbEHA1kgtLgsyg1E3vdckc4rWH+52S62IViSe/DfNAsOtnbH0lZSZbatebC4ISyxkRdvkVSbgukRJnyfI/QGwA6uBWK3rPwJL4gaP7+aP4njU4HP631zU1rN4Mq7Ts1uviHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IrhEqj3z; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749143703; x=1780679703;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=E0LLnEBBXupp6wiEw+vUdkJo0HIl9ljS9wURxTt0PII=;
-  b=IrhEqj3zW9ByB5nhWaGKJEDtRncmlRMs8DCXozie8GvJ/bG/+DbLN6Pm
-   9PlXVDHxT3PQI03ISssE387MdzmSMfIUGvw3wodqPqk5zUxsSv3opfLJx
-   jVp2ZSLXvTFwzEU8UhfW+gxSStomTfN8KjRAAKHw6yHG9wYz9MQqsaA/H
-   bZqIxJDnu7/vBb+942+/3BpDrcQDo9MtXYjb/hQgMH/bayOyMCdDgo568
-   4ngPs0pdSkMVH8Wu9af3lYTW+zTheK0y+o3m7j9/bs1bjulzjMrC9OFn0
-   E3QZ2WohqTa8JgOCf7MRw0o+zCvUqf6xBpOSl45xEfrpBlHpJZem7Ex9z
-   g==;
-X-CSE-ConnectionGUID: pH3saeqbQZaPqwOR4ZAkEw==
-X-CSE-MsgGUID: bJpqMW43SJ64r+TNkgM/bg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11455"; a="51372390"
-X-IronPort-AV: E=Sophos;i="6.16,212,1744095600"; 
-   d="scan'208";a="51372390"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2025 10:15:02 -0700
-X-CSE-ConnectionGUID: 1ozayxrpRb+wnJxdc0ERMg==
-X-CSE-MsgGUID: yJehJmXMRUScxGzuQA50Sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,212,1744095600"; 
-   d="scan'208";a="145611704"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.111.0]) ([10.125.111.0])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2025 10:15:01 -0700
-Message-ID: <b27d96fc-b234-4406-8d6e-885cd97a87f3@intel.com>
-Date: Thu, 5 Jun 2025 10:15:00 -0700
+	s=arc-20240116; t=1749143766; c=relaxed/simple;
+	bh=BsygIKSp4Y3uOUd9YvjvTHCT2OkAn7HB5ddVxCuXJEk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GD/6+svThKXu63IKLIudi5ubjYjcyyeJARsS4AkRNbRziEx9cZvxvOYDpwTOIYwWj6no9bZh6v8wnC5C5movnS7qa2/GPKuFbs6Qi+k9XNtBnyJOIaW0ncpIriaqsy4B5RcLVXnIBFHvHsiHt5JC8ODs6E2IeTx9BsLrr/JWAD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MwAyXaEw; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5f438523d6fso634a12.1
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 10:16:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749143763; x=1749748563; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yPVE+qJAV6lF2hHXHMzzV+2De3yTj5blSt0gISYXzwA=;
+        b=MwAyXaEwlZ7Nxrxm/X6cB0znXJd7O7WKJzf2NblihAy3Ww9LpVGuJtoIsh4BW8CRAX
+         1Epaq2CeQzEsTahYiq0LArwfoMvR3WlIuTUvc3dBJYzVdWkaeOc5HP9h4yiDgMkHTphT
+         cdz/srYV1XFjAFAcHK0iC79USIKJTN/kyKgrV/koT3pUbLuIXO6E4nuWycE7JLE/G/QP
+         3w6oXGuOH4dRw5cvDXnru7LfvM2Z+1yyZI8bSt5CEtBuIVY3Ad1GG8TdEoiiyjPGvN5R
+         mL0Z6rShShxT7tIr3JnrIdQP8FGHF2KOAHbU0PNG2i95oblAB5Dajimsf6tin2zbkZ9V
+         qYrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749143763; x=1749748563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yPVE+qJAV6lF2hHXHMzzV+2De3yTj5blSt0gISYXzwA=;
+        b=sDibk8TmktMTCPKDmkH8kNCJt6X2Qc4118TGrnxwwYDq34CNFgEy/5MJbpkd5YY243
+         OjqvsiNna6WPOnw2q66bHyMcXkRgv24zf2BbBXE7dVBQiZ46yxezbPy5A7VViDbcTZRO
+         iI614iFJ2zvCCtl3gwS7EGXmcH8zkC8MHJ4+yBGXQwjHtR4v2a3X/p+BUG5LfFjsEXYl
+         Qi2Gu1FKNgWhQnjZKLsiN0zN/deT3vFgZYjtVoC7mIHpJjjLAYrSozSCXiDSnmEJ3lc1
+         rza4qoiqssTRBKKD6YEGYkK3vFXLyto/6LN7yZ2Yo4gSpsnyxBR4EPq2KNLWjwkP0FK8
+         fyuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2zdDzYKUhfzPcb+YtQvHf1WUPU8Oz9wG5ZXlwlmHKNy8Byobv7hgLpbqZgHDRQzrMkznlpg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKhpszXccDHnJH1yw7YISeuGxK5e6DAOphHGguRx8QxGj0/Hl/
+	0fyrMLvRaaTi9GSNg6Wreczp4D4n/2Ch+UZzI16MS1LgGygGlhrddni7+CSy+XW8fDWG8sdfK2P
+	dPjIRi6i1k+cpizA5Cr7Q1fD7BUg4KoEI3nPI/of1w2P4UDvJ+agpAhXz
+X-Gm-Gg: ASbGncu4XH5C+am44V2yRmmA6xyWN86DlCLvdVzKc6VU4Hl70AmaSdJtqBKgYm7ZAd5
+	vNem7wsk0cStksrflaKGw2LwgxviDUtYlfoQ9g24GdEr32P7YW15vG/8sT2YjNEbcq79k91c0cn
+	5Uooxz5cBYpLn5wuVCa5JpEbOYv9rxEfZ07lsuKsuz2oXCOlDaGwmLdo4DP8HLBLh559nV08j6E
+	Q==
+X-Google-Smtp-Source: AGHT+IEsgNzktdJh8pc4Dp3J6fwwrOaLSQOcszvs7/V6sLuXQttJOIsOGPFSPRrS9VKP14E+I/IdyLbh1uIoYp0lGsg=
+X-Received: by 2002:aa7:d9d3:0:b0:604:58e9:516c with SMTP id
+ 4fb4d7f45d1cf-60728a7df98mr100839a12.5.1749143762656; Thu, 05 Jun 2025
+ 10:16:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Large modules with 6.15 [was: [PATCH v4 6/6] percpu/x86: Enable
- strict percpu checks via named AS qualifiers]
-To: Jiri Slaby <jirislaby@kernel.org>, Uros Bizjak <ubizjak@gmail.com>,
- x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Nadav Amit <nadav.amit@gmail.com>, Dennis Zhou <dennis@kernel.org>,
- Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Andy Lutomirski <luto@kernel.org>, Brian Gerst <brgerst@gmail.com>,
- Peter Zijlstra <peterz@infradead.org>, Shung-Hsi Yu <shung-hsi.yu@suse.com>
-References: <20250127160709.80604-1-ubizjak@gmail.com>
- <20250127160709.80604-7-ubizjak@gmail.com>
- <02c00acd-9518-4371-be2c-eb63e5d11d9c@kernel.org>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <02c00acd-9518-4371-be2c-eb63e5d11d9c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250604201938.1409219-1-hramamurthy@google.com> <20250605081301.2659870c@kernel.org>
+In-Reply-To: <20250605081301.2659870c@kernel.org>
+From: Tim Hostetler <thostet@google.com>
+Date: Thu, 5 Jun 2025 10:15:51 -0700
+X-Gm-Features: AX0GCFvU2CbYecoDIb-s7wGpB4WkLnNVAMUQD6Cou3zqyUzrgIjk7T8up8uY8kk
+Message-ID: <CAByH8UvMV94aVmmwb37f-wT8HpPKB3Nf8AF+67FM87XBz7+pww@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Fix stuck TX queue for DQ queue format
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, jeroendb@google.com, 
+	andrew+netdev@lunn.ch, willemb@google.com, pkaligineedi@google.com, 
+	joshwash@google.com, jfraker@google.com, awogbemila@google.com, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/5/25 07:27, Jiri Slaby wrote:
-> Reverting this gives me back to normal sizes.
-> 
-> Any ideas?
+On Thu, Jun 5, 2025 at 8:13=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Wed,  4 Jun 2025 20:19:38 +0000 Harshitha Ramamurthy wrote:
+> > +     netdev_info(dev, "Kicking queue %d", txqueue);
+> > +     napi_schedule(&block->napi);
+> > +     tx->last_kick_msec =3D current_time;
+> > +     goto out;
+> >
+> >  reset:
+> >       gve_schedule_reset(priv);
+>
+> gotos at the base level of the function are too ugly to exit.
+>
+> Please refactor this first to move the logic that decides whether
+> reset should happen to a separate helper, then you can avoid both
+> gotos/labels.
+>
+> goto reset should turn into return true
+> goto out should turn into return false
 
-I don't see any reason not to revert it. The benefits weren't exactly
-clear from the changelogs or cover letter. Enabling "various compiler
-checks" doesn't exactly scream that this is critical to end users in
-some way.
-
-The only question is if we revert just this last patch or the whole series.
-
-Uros, is there an alternative to reverting?
+That makes sense to me, I'll refactor this in v2.
 
