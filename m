@@ -1,102 +1,113 @@
-Return-Path: <netdev+bounces-195243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53A99ACF03A
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:20:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 222DDACF041
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E3C017A4D7
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:20:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F4A6188351E
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB66C226CFC;
-	Thu,  5 Jun 2025 13:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F28922D9F7;
+	Thu,  5 Jun 2025 13:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="thiiz6VL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DWO8+mjR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F74238FB9;
-	Thu,  5 Jun 2025 13:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80231E5B95;
+	Thu,  5 Jun 2025 13:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749129602; cv=none; b=al1JGIOibN1KuuOzdkC4GR97gkT9OYaH30H1trL7sL7di9pNtX0qnqklA1UGmEotfk8VRKC34atH0aCw3KQENvEXKXDWZ8zEXYSolrNruJhtcTBtt4mPN7wdO7+4UlxYTZXJcs+5DTCN0z69mTGSsQ2TrRH/WD25dFLGsyHyXdQ=
+	t=1749129661; cv=none; b=lsFTcGBbeXZcfF8tcyQZp3qS2f1H2nFY0GTBc7qkjCZxI7CEmHNYmy62VesA46WPtKorGTD6YOhMcki3AIjQmR0mFdCl90Jv4pSa97mIafmBsvBNlOtuaQZTHwHq3VPdejjc3xe4nNbyVmifQMj8MYgjeZCoZvVoMscV4oA2/aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749129602; c=relaxed/simple;
-	bh=E7/He3B0xCBq7u7uBhSii0J5lGaeIzae3IWWW9vbH4A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fD9iQ6ec9ixtuRISL+aa/TFu7I5QkVA6pvfLl9FLGHrtLcszQadFQgdRbECCCA5egQ1XFdBT5gdk45NZCToSi1Kfmr046qR3nuHtmEZc1ojBp6HqifeAtixnm4p/IyxzrD4kQZbPi4ZTi3t0WkvQBnCD6tY+e+fxcC97eJabhY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=thiiz6VL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1209EC4CEE7;
-	Thu,  5 Jun 2025 13:20:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749129602;
-	bh=E7/He3B0xCBq7u7uBhSii0J5lGaeIzae3IWWW9vbH4A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=thiiz6VLQXUAUUEsvo1iW8lQigPltvkQwF/NMOP884IZjr67xHl/mWx8FDS85Mqo4
-	 /drmnPgUs94mBAEjMFQuuDm2icSrQnwGEYlJ9A1hKdR+DbU7EArwmnQjK1a/2cUjtb
-	 HIeGASLs1Mb0xMZpRuSus4yshlSBb6vR/oniUrmesL5+b2cjs5Rz+29N5kuT1IIsPe
-	 +ZoVEZGUPRCRWCgi2LuP6d7fFuc/1bHZv3D1ibfrd/40dwMZs353H0Om+RewhmZBdi
-	 9jcNWmFZBY2NpJPp73ukxrJVlofCmhLHC0oKafJsHTLlvd4senUrN9ArWx5opYL2EN
-	 c85/ToT+Cn31w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EB238111D8;
-	Thu,  5 Jun 2025 13:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1749129661; c=relaxed/simple;
+	bh=IbVjDlJ1LhjKgB3WqYIBNmH2O1Kjjxb8PtBFxfYMhYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mRizQXJhh9+luT5fsiOxSpGNZIoJP9iBDPByn8iKqhfGXw1wPBSmcxGXanoIa5IuU/XmD33ZVg/ly+HVp64WHbep6kGC+RXZVe8xCQq8PVFlsGAZx3TsJ7AGtTX1PBlCoC0Qgzwar7EfSa2bEmkqFcUlCVZqDENrYBhN0POE1xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DWO8+mjR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4Gx+44VNAwh2nJ7uA+08Jgl1iBxYZsQ6aOzwSW1WEA0=; b=DWO8+mjRZ/4bKNTzzBrVD7UrHe
+	xCFH6vd6BJF/G33XVCTybt05IuKx97iMEzGm1kZ14NLJJ22ap9H8IIzdC+QqblOp1AntUpFarqMii
+	cDtE78R1CeYPneuS3hRjSaUXMcOd3C5qtvM8quWAfO/1j5QvzX5tPG34djXX9aKMF+hE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uNAWN-00ElxD-7O; Thu, 05 Jun 2025 15:20:39 +0200
+Date: Thu, 5 Jun 2025 15:20:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Icenowy Zheng <uwu@icenowy.me>, Rob Herring <robh@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
+ informative text about RGMII delays
+Message-ID: <e0e468af-dc5d-4a27-b0b4-dddfef1e7405@lunn.ch>
+References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
+ <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
+ <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
+ <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
+ <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/5] netfilter: nf_set_pipapo_avx2: fix initial map
- fill
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174912963400.3069926.17729445468849750891.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Jun 2025 13:20:34 +0000
-References: <20250605085735.52205-2-pablo@netfilter.org>
-In-Reply-To: <20250605085735.52205-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Thu,  5 Jun 2025 10:57:31 +0200 you wrote:
-> From: Florian Westphal <fw@strlen.de>
+> > > If you want the kernel to not touch the PHY, use
+> > > 
+> > > phy-mode = 'internal'
+> > 
+> > This sounds weird, and may introduce side effect on the MAC side.
+> > 
+> > Well we might need to allow PHY to have phy-mode property in addition
+> > to MAC, in this case MAC phy-mode='rgmii*' and PHY phy-mode='internal'
+> > might work?
 > 
-> If the first field doesn't cover the entire start map, then we must zero
-> out the remainder, else we leak those bits into the next match round map.
+> I'm not convinced that adding more possibilities to the problem (i.o.w.
+> the idea that phy=mode = "internal" can be used to avoid the delays
+> being messed with) is a good idea - not at this point, because as you
+> point out MACs (and PHYs) won't know that they need to be configured
+> for RGMII mode. "internal" doesn't state this, and if we do start doing
+> this, we'll end up with "internal" selecting RGMII mode which may work
+> for some platforms but not all.
 > 
-> The early fix was incomplete and did only fix up the generic C
-> implementation.
-> 
-> [...]
+> So, IMHO this is a bad idea.
 
-Here is the summary with links:
-  - [net,1/5] netfilter: nf_set_pipapo_avx2: fix initial map fill
-    https://git.kernel.org/netdev/net/c/ea77c397bff8
-  - [net,2/5] selftests: netfilter: nft_concat_range.sh: prefer per element counters for testing
-    https://git.kernel.org/netdev/net/c/febe7eda74d1
-  - [net,3/5] selftests: netfilter: nft_concat_range.sh: add datapath check for map fill bug
-    https://git.kernel.org/netdev/net/c/38399f2b0fe4
-  - [net,4/5] netfilter: nf_nat: also check reverse tuple to obtain clashing entry
-    https://git.kernel.org/netdev/net/c/50d9ce9679dd
-  - [net,5/5] selftests: netfilter: nft_nat.sh: add test for reverse clash with nat
-    https://git.kernel.org/netdev/net/c/3c3c3248496a
+I agree, and if actually see a MAC/PHY pair doing this, i will ask
+why. Using "internal" like is currently mostly hypothetical, i don't
+actually know of any real users. Those DT blobs which do use
+"internal" actually are internal interfaces within a SoC and it is
+some vendor proprietary interface which does not need any
+configuration. That is the original meaning for "internal", but it has
+been noticed it can be used to side step RGMII delay configuration.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It _might_ play a role when developers decide to clean up a mess with
+RGMII delays, and decide to just go with the strapping resistors
+rather than try to figure out what is actually happening vs what DT
+says should be happening, and issue warning the DT blob is out of
+date. But still, i would consider "internal" a lazy hack, not a proper
+fix.
 
-
+	Andrew
 
