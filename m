@@ -1,264 +1,206 @@
-Return-Path: <netdev+bounces-195237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8728ACEF5B
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 14:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A754ACEFCB
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 15:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87E74176AF7
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 12:38:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F3816980C
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 13:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4843E1F5823;
-	Thu,  5 Jun 2025 12:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="e+R7foQQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22E222A4E2;
+	Thu,  5 Jun 2025 13:00:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE721B4242
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 12:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4293214818
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 13:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749127098; cv=none; b=hRKfe6BBdfqhfSFNB5oDs8WMdMDZV8GC1f6CZ0kLCrtrOeaNZXL33EG9gNkTDU0YogAfxxfoAO68CZctaXj6yZCMTuzGlM4kAO1cimPBhlEE6F+AMh3/mlZNe+9QnQKWmeYKE0vIpAm4IvN5NNasD6o/iQD/3A7ruN8o6JvuHBg=
+	t=1749128411; cv=none; b=lwwl+jBCUBjUghJkIeohQsoYGrXC3s1xjjGKnzAhjR5wmdx3BP3AKUuHCBg7CrSMuRgj3i3hwls7fj2iYKdVVRBN9ouOWJIl/Vx/IPR9Pvdu/X6H1ncwL66ek4fvxgLq8wIxkp6YMgrssL9ji81EMvAMxMdJXPLar1uYQmrPAFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749127098; c=relaxed/simple;
-	bh=u7j7vRddluRP/v3J30p50ftJorJERwh1tmE6aHtMetU=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=XETEURanZP46+cbjhpKofq6dqUIa+zGFKuQTkaJjpkZyaQu2uQz8q7fZ9t5/mP3YeN58HknE5usuNso2fAv3XhtEJsRmx1amdnm2nFrjIMjxGSr1zrfOQ1uMb1y3Qtoer7PzfUnnkcnpX5teIEjokSy5RzedGJ6QesI7jEfYTCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=e+R7foQQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QVZFqA7SHOoJDTQIfXIFEnPJfjciVTcfnFXWznWa0fw=; b=e+R7foQQt9rqd87hnkF+cx+j7n
-	bt3ITUdZ8xWz2wLcYs2TZAt7uSRAU4r26tOqi61Jw9RPt053M1h0XBDSJxf7TixfFPDI3ZQ2My6/2
-	2nE+SJlgx6SLV4oC28tT04+15DF5l1mwpUjDSupUdDBfQHkswcxCCLgbQC65blc+KWEraWXGD4j8k
-	qlXCGZQhEy+UazB48+JH2zk/pui9h+iJFNQhaYqBHKz8OdpMROMjcdIDFNQ2tSoeVgFZ90lGG2upP
-	s35zFvz6W7u1VQvhDIFvei2NXajCmhfPkDk85+tjDlSA/1qbM819YhjAj+s2wU+NTNwuHDz9g9Ghg
-	Tw6lK8Lw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55184 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uN9rE-0008AA-19;
-	Thu, 05 Jun 2025 13:38:08 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uN9qa-003NsX-JS; Thu, 05 Jun 2025 13:37:28 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next] net: phy: simplify phy_get_internal_delay()
+	s=arc-20240116; t=1749128411; c=relaxed/simple;
+	bh=Xq995ikjF+1zz/NSQcD4fsZBu1374h/DjVC6M83e9qY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=fOB0iW/nGIphcQKDxsDxDmaXGAxOrCZg1FT17I6KgkD1lPYEdfA/Sey8H9RinZeQOTobdma8J1kqIxTcGVJ2TQbCJcI3C8HUdvdcj1QxxP5iBW58wuVR5SZNd4OQDjKk8RKTPNUZZcdwC4KjLFdBhYBTYaPbBrBgWRX1fwGsVXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+Received: from [122.175.9.182] (port=50237 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1uN9wZ-00000005CZU-3S77;
+	Thu, 05 Jun 2025 08:43:40 -0400
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id C35401781AB2;
+	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id AF85F178207F;
+	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id MwA0TtYZoI_J; Thu,  5 Jun 2025 18:13:36 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 918AB1781AB2;
+	Thu,  5 Jun 2025 18:13:36 +0530 (IST)
+Date: Thu, 5 Jun 2025 18:13:36 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: pabeni <pabeni@redhat.com>
+Cc: netdev <netdev@vger.kernel.org>, krishna <krishna@couthit.com>, 
+	mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>, 
+	basharath <basharath@couthit.com>
+Message-ID: <242129523.1435061.1749127416328.JavaMail.zimbra@couthit.local>
+In-Reply-To: <337432675.1282729.1747229070648.JavaMail.zimbra@couthit.local>
+References: <20250503121107.1973888-1-parvathi@couthit.com> <20250503131139.1975016-5-parvathi@couthit.com> <ce36ce0e-ad16-4950-b601-ae1a555f2cfb@redhat.com> <1918420534.1246603.1746786066099.JavaMail.zimbra@couthit.local> <1183e3e4-fa93-4fe6-bfe5-e58b7852d294@redhat.com> <876351908.1270745.1747138715014.JavaMail.zimbra@couthit.local> <cbba5990-959b-476f-a3fd-6b346a7d58ee@redhat.com> <337432675.1282729.1747229070648.JavaMail.zimbra@couthit.local>
+Subject: Re: [PATCH net-next v7 04/11] net: ti: prueth: Adds link detection,
+ RX and TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uN9qa-003NsX-JS@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 05 Jun 2025 13:37:28 +0100
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: l9+gi0FaKZMBzCWiVYrODcBt7ep9wsFagViR
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Simplify the arguments passed to phy_get_internal_delay() - the "dev"
-argument is always &phydev->mdio.dev, and as the phydev is passed in,
-there's no need to also pass in the struct device, especially when this
-function is the only reason for the caller to have a local "dev"
-variable.
+Hi,
 
-Remove the redundant "dev" argument, and update the callers.
+> 
+>> Apparently you unintentionally stripped the recipients list. Let me
+>> re-add the ML.
+>> 
+>> On 5/13/25 2:18 PM, Parvathi Pudi wrote:
+>>>> On 5/9/25 12:21 PM, Parvathi Pudi wrote:
+>>>>>> On 5/3/25 3:11 PM, Parvathi Pudi wrote:
+>>>>>>> +/**
+>>>>>>> + * icssm_emac_rx_thread - EMAC Rx interrupt thread handler
+>>>>>>> + * @irq: interrupt number
+>>>>>>> + * @dev_id: pointer to net_device
+>>>>>>> + *
+>>>>>>> + * EMAC Rx Interrupt thread handler - function to process the rx frames in a
+>>>>>>> + * irq thread function. There is only limited buffer at the ingress to
+>>>>>>> + * queue the frames. As the frames are to be emptied as quickly as
+>>>>>>> + * possible to avoid overflow, irq thread is necessary. Current implementation
+>>>>>>> + * based on NAPI poll results in packet loss due to overflow at
+>>>>>>> + * the ingress queues. Industrial use case requires loss free packet
+>>>>>>> + * processing. Tests shows that with threaded irq based processing,
+>>>>>>> + * no overflow happens when receiving at ~92Mbps for MTU sized frames and thus
+>>>>>>> + * meet the requirement for industrial use case.
+>>>>>>
+>>>>>> The above statement is highly suspicious. On an non idle system the
+>>>>>> threaded irq can be delayed for an unbound amount of time. On an idle
+>>>>>> system napi_poll should be invoked with a latency comparable - if not
+>>>>>> less - to the threaded irq. Possibly you tripped on some H/W induced
+>>>>>> latency to re-program the ISR?
+>>>>>>
+>>>>>> In any case I think we need a better argumented statement to
+>>>>>> intentionally avoid NAPI.
+>>>>>>
+>>>>>> Cheers,
+>>>>>>
+>>>>>> Paolo
+>>>>>
+>>>>> The above comment was from the developer to highlight that there is an
+>>>>> improvement in
+>>>>> performance with IRQ compared to NAPI. The improvement in performance was
+>>>>> observed due to
+>>>>> the limited PRU buffer pool (holds only 3 MTU packets). We need to service the
+>>>>> queue as
+>>>>> soon as a packet is written to prevent overflow. To achieve this, IRQs with
+>>>>> highest
+>>>>> priority is used. We will clean up the comments in the next version.
+>>>>
+>>>> Do you mean 'IRQ _thread_ with the highest priority'? I'm possibly
+>>>> missing something, but I don't see the driver setting the irq thread
+>>>> priority.
+>>>>
+>>>> Still it's not clear to me why/how scheduling a thread should guarantee
+>>>> lower latency than serving the irq is softirq context, where no
+>>>> reschedule is needed.
+>>>>
+>>>> I think you should justify this statement which sounds counter-intuitive
+>>>> to me.
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Paolo
+>>> 
+>>> I might not have been clear in my earlier communication. The driver does not
+>>> configure the IRQ thread to run at the highest priority. Instead, the highest
+>>> real-time priority is assigned to the user applications using "chrt" to ensure
+>>> timely processing of network traffic.
+>> 
+>> I don't follow. Setting real-time priority for the user-space
+>> application thread will possibly increase the latency for the irq thread.
+>> 
+>>> This commit in the TI Linux kernel can be used as a reference for the transition
+>>> from NAPI-based polling to IRQ-driven packet processing:
+>>> https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/commit/?id=7db2c2eb0e33821c2f1abea14f079bc23b7bde56
+>>> 
+>>> This change is based on performance limitations observed with NAPI polling under
+>>> high UDP traffic. Specifically, during iperf tests with UDP traffic at 92 Mbps
+>>> and MTU-sized frames, ingress queue overflows were observed. This occurs because
+>>> the hardware ingress queues have limited buffering capacity, resulting in
+>>> dropped
+>>> frames.
+>>> 
+>>> Based on the stated limitations with NAPI polling, we believe that switching to
+>>> a
+>>> threaded IRQ handler is a reasonable solution. I'll follow up with the
+>>> developers
+>>> in the background to gather additional context on this implementation and will
+>>> try
+>>> to collect relevant bench-marking data to help justify the approach further. In
+>>> the meantime, do you see any concern moving forward with the use of threaded
+>>> IRQs
+>>> for now?
+>> 
+>> The IRQ thread is completely under the scheduler control. It can
+>> experience unbound latency (i.e. if there are many other running thread
+>> in the same CPU). You need to tune the scheduling priority for the
+>> specific setup/host, and likely will not work well (or at all) in other
+>> scenarios.
+>> 
+>> See commit 4cd13c21b207 and all it's follow-ups to get an idea of the
+>> things that could go wrong. Note that such commit moved the network
+>> processing into thread scope only on quite restrictive conditions.
+>> Having the packet processing unconditionally threaded could be much worse.
+>> 
+>> /P
+> 
+> Thank you for clarifying where you are coming from and sharing the references
+> to the discussions. We will review thoroughly and revert back with more
+> details soon.
+> 
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-Is there any reason to pass a different "dev" into this function other
-than phydev->mdio.dev ?
+We did bench-marked both IRQ and NAPI schemes using RT kernel 6.15.y-rt
+(main use case for ICSS applications). Based on the results, we did not observe
+any significant performance differences between the two schemes.
 
- drivers/net/phy/dp83822.c        | 7 ++-----
- drivers/net/phy/dp83869.c        | 7 +++----
- drivers/net/phy/intel-xway.c     | 7 ++-----
- drivers/net/phy/mscc/mscc_main.c | 5 ++---
- drivers/net/phy/phy_device.c     | 6 +++---
- include/linux/phy.h              | 4 ++--
- 6 files changed, 14 insertions(+), 22 deletions(-)
+The results are shared in the link below for reference.
+https://gist.github.com/ParvathiPudi/e2982872bce92d932c0fb377777fc57d
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 01255dada600..33db21251f2e 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -516,7 +516,6 @@ static int dp83822_config_init_leds(struct phy_device *phydev)
- static int dp83822_config_init(struct phy_device *phydev)
- {
- 	struct dp83822_private *dp83822 = phydev->priv;
--	struct device *dev = &phydev->mdio.dev;
- 	int rgmii_delay = 0;
- 	s32 rx_int_delay;
- 	s32 tx_int_delay;
-@@ -549,15 +548,13 @@ static int dp83822_config_init(struct phy_device *phydev)
- 		return err;
- 
- 	if (phy_interface_is_rgmii(phydev)) {
--		rx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
--						      true);
-+		rx_int_delay = phy_get_internal_delay(phydev, NULL, 0, true);
- 
- 		/* Set DP83822_RX_CLK_SHIFT to enable rx clk internal delay */
- 		if (rx_int_delay > 0)
- 			rgmii_delay |= DP83822_RX_CLK_SHIFT;
- 
--		tx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
--						      false);
-+		tx_int_delay = phy_get_internal_delay(phydev, NULL, 0, false);
- 
- 		/* Set DP83822_TX_CLK_SHIFT to disable tx clk internal delay */
- 		if (tx_int_delay <= 0)
-diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-index a62cd838a9ea..a2cd1cc35cde 100644
---- a/drivers/net/phy/dp83869.c
-+++ b/drivers/net/phy/dp83869.c
-@@ -540,9 +540,8 @@ static const int dp83869_internal_delay[] = {250, 500, 750, 1000, 1250, 1500,
- 
- static int dp83869_of_init(struct phy_device *phydev)
- {
-+	struct device_node *of_node = phydev->mdio.dev.of_node;
- 	struct dp83869_private *dp83869 = phydev->priv;
--	struct device *dev = &phydev->mdio.dev;
--	struct device_node *of_node = dev->of_node;
- 	int delay_size = ARRAY_SIZE(dp83869_internal_delay);
- 	int ret;
- 
-@@ -597,13 +596,13 @@ static int dp83869_of_init(struct phy_device *phydev)
- 				 &dp83869->tx_fifo_depth))
- 		dp83869->tx_fifo_depth = DP83869_PHYCR_FIFO_DEPTH_4_B_NIB;
- 
--	dp83869->rx_int_delay = phy_get_internal_delay(phydev, dev,
-+	dp83869->rx_int_delay = phy_get_internal_delay(phydev,
- 						       &dp83869_internal_delay[0],
- 						       delay_size, true);
- 	if (dp83869->rx_int_delay < 0)
- 		dp83869->rx_int_delay = DP83869_CLK_DELAY_DEF;
- 
--	dp83869->tx_int_delay = phy_get_internal_delay(phydev, dev,
-+	dp83869->tx_int_delay = phy_get_internal_delay(phydev,
- 						       &dp83869_internal_delay[0],
- 						       delay_size, false);
- 	if (dp83869->tx_int_delay < 0)
-diff --git a/drivers/net/phy/intel-xway.c b/drivers/net/phy/intel-xway.c
-index a44771e8acdc..9766dd99afaa 100644
---- a/drivers/net/phy/intel-xway.c
-+++ b/drivers/net/phy/intel-xway.c
-@@ -174,7 +174,6 @@ static const int xway_internal_delay[] = {0, 500, 1000, 1500, 2000, 2500,
- 
- static int xway_gphy_rgmii_init(struct phy_device *phydev)
- {
--	struct device *dev = &phydev->mdio.dev;
- 	unsigned int delay_size = ARRAY_SIZE(xway_internal_delay);
- 	s32 int_delay;
- 	int val = 0;
-@@ -207,8 +206,7 @@ static int xway_gphy_rgmii_init(struct phy_device *phydev)
- 
- 	if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
- 	    phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID) {
--		int_delay = phy_get_internal_delay(phydev, dev,
--						   xway_internal_delay,
-+		int_delay = phy_get_internal_delay(phydev, xway_internal_delay,
- 						   delay_size, true);
- 
- 		/* if rx-internal-delay-ps is missing, use default of 2.0 ns */
-@@ -220,8 +218,7 @@ static int xway_gphy_rgmii_init(struct phy_device *phydev)
- 
- 	if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
- 	    phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID) {
--		int_delay = phy_get_internal_delay(phydev, dev,
--						   xway_internal_delay,
-+		int_delay = phy_get_internal_delay(phydev, xway_internal_delay,
- 						   delay_size, false);
- 
- 		/* if tx-internal-delay-ps is missing, use default of 2.0 ns */
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 7ff975efd8e7..7ed6522fb0ef 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -530,7 +530,6 @@ static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
- 	u16 rgmii_rx_delay_pos = ffs(rgmii_rx_delay_mask) - 1;
- 	u16 rgmii_tx_delay_pos = ffs(rgmii_tx_delay_mask) - 1;
- 	int delay_size = ARRAY_SIZE(vsc85xx_internal_delay);
--	struct device *dev = &phydev->mdio.dev;
- 	u16 reg_val = 0;
- 	u16 mask = 0;
- 	s32 rx_delay;
-@@ -549,7 +548,7 @@ static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
- 	if (phy_interface_is_rgmii(phydev))
- 		mask |= rgmii_rx_delay_mask | rgmii_tx_delay_mask;
- 
--	rx_delay = phy_get_internal_delay(phydev, dev, vsc85xx_internal_delay,
-+	rx_delay = phy_get_internal_delay(phydev, vsc85xx_internal_delay,
- 					  delay_size, true);
- 	if (rx_delay < 0) {
- 		if (phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID ||
-@@ -559,7 +558,7 @@ static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
- 			rx_delay = RGMII_CLK_DELAY_0_2_NS;
- 	}
- 
--	tx_delay = phy_get_internal_delay(phydev, dev, vsc85xx_internal_delay,
-+	tx_delay = phy_get_internal_delay(phydev, vsc85xx_internal_delay,
- 					  delay_size, false);
- 	if (tx_delay < 0) {
- 		if (phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID ||
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 73f9cb2e2844..ebcfd80032fa 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2899,7 +2899,6 @@ static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
- /**
-  * phy_get_internal_delay - returns the index of the internal delay
-  * @phydev: phy_device struct
-- * @dev: pointer to the devices device struct
-  * @delay_values: array of delays the PHY supports
-  * @size: the size of the delay array
-  * @is_rx: boolean to indicate to get the rx internal delay
-@@ -2912,9 +2911,10 @@ static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
-  * array then size = 0 and the value of the delay property is returned.
-  * Return -EINVAL if the delay is invalid or cannot be found.
-  */
--s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
--			   const int *delay_values, int size, bool is_rx)
-+s32 phy_get_internal_delay(struct phy_device *phydev, const int *delay_values,
-+			   int size, bool is_rx)
- {
-+	struct device *dev = &phydev->mdio.dev;
- 	int i, ret;
- 	u32 delay;
- 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index e194dad1623d..b95e3b8eba26 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1997,8 +1997,8 @@ bool phy_validate_pause(struct phy_device *phydev,
- 			struct ethtool_pauseparam *pp);
- void phy_get_pause(struct phy_device *phydev, bool *tx_pause, bool *rx_pause);
- 
--s32 phy_get_internal_delay(struct phy_device *phydev, struct device *dev,
--			   const int *delay_values, int size, bool is_rx);
-+s32 phy_get_internal_delay(struct phy_device *phydev, const int *delay_values,
-+			   int size, bool is_rx);
- 
- int phy_get_tx_amplitude_gain(struct phy_device *phydev, struct device *dev,
- 			      enum ethtool_link_mode_bit_indices linkmode,
--- 
-2.30.2
+We have decided to proceed with the NAPI based implementation. We will
+post the updated patches in the next version.
 
+
+Thanks and Regards,
+Parvathi.
 
