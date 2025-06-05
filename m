@@ -1,157 +1,141 @@
-Return-Path: <netdev+bounces-195305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B46ACF626
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:02:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCEE5ACF633
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 20:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350DC1676B3
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:02:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C8F3A7431
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 18:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81DF01C84D2;
-	Thu,  5 Jun 2025 18:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A0027603A;
+	Thu,  5 Jun 2025 18:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EGXkBsiL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtsPRP/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201ED4400
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 18:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6588B4400;
+	Thu,  5 Jun 2025 18:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749146554; cv=none; b=S+p9acvCIPt89I4fSLuem7XAq7U1YO2lQ+DlO5zCIZteYYgFxK+y2IT31kp3ZFlHP7tCHFB75O6W0MPo/CG6MunheDibfe1wGWxJ1Dr1yWvGvVFDkf4KM1e6jv0q7yZQhK8scoCiIgLv1Hb7B1wsYF87jPdd4NQwVRcAQbad5YI=
+	t=1749146973; cv=none; b=EL07srfrUb3xpiTgRviwT1d66VoRauf3Thjwha0TqgOGwjcjrWoPeLzRbH9wFhSD+Ko46Hzz2ZmsMCjDWkL+Ms2iJHyPeHeV+f3piSl7XGzfuPBPJvfv7i4hsTGrKXsWPUt36kuohMsP4ehoeus4ryQS9uiM2pmSumNaUPg5q2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749146554; c=relaxed/simple;
-	bh=Qixvd4OhypbD8d/UbtBEp9h3rsuuLj4KcvcrC0o/m/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KJKb9icY0ettfSW4aA5hCVYo9fL7JRaY7dYN3PRv9HykCp2VGmJAGrHUdqqrK9a9ozji/Ewjpu3gMzXVYqftU55K2isf+2NvjCrWdX8oK88U+b01mxd4OWmoZOv006rZNe0IQrZWPaPncqlZR8Oaq7wAroL0J2ImolK4+guWL3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EGXkBsiL; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-73972a54919so1306757b3a.3
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 11:02:32 -0700 (PDT)
+	s=arc-20240116; t=1749146973; c=relaxed/simple;
+	bh=hCpEyHqiBnpT85ZnAEXBHJnsThLhlMdygvzgkhGSFk8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aeMh+0gGSFUF/MbqyFxhA+zE4LY5yUhdVZG6NpW/vhHC34e0d4dfZb/bfP9ObavvPK4+FwI9jV3gKMHiNBpw2gIt0DCtIN65Mn/wkvEaEFt/wlK3aLQgOIGdbuSEkEHjapqG97NGWEccqF4/aB0iDq/N+eCj0xwML7yL9XJxTNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WtsPRP/G; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-311ef4fb43dso1105688a91.3;
+        Thu, 05 Jun 2025 11:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1749146552; x=1749751352; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BwlFuB/WA8JgwT54XR12ivvxbEoyZqbT8RK1LGV138g=;
-        b=EGXkBsiL42X3wbnYJLn/KntMJ9sWLH9AOkbhtw/W2PnyTw9vbRt8FQAqbN3TfQFrIx
-         kSri/r80tn4/mH/sZoZzE3/OsgUdXpoa7X8aaF/8FEWVFqPjTMVjJAPIbuZERADsz0tS
-         vGEZxk9rr/97aNyKsbwgs0V+Ez3vv44ZZyASI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749146552; x=1749751352;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1749146969; x=1749751769; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BwlFuB/WA8JgwT54XR12ivvxbEoyZqbT8RK1LGV138g=;
-        b=d0o5m6bUOFLmD7YPiLSxGtRFejK4mPddgFGpcuwZQ/dc/bKiXV/JrOQwUspEuzulf7
-         0k/+RIbpmF1UELA/FSzwLKNkNdf4dm5GRL2nlglTNJXq9+wHkRU860XNuv1s8Haei+RW
-         ccifQddA1zBhZ5gp0FuOOjtNCbJGhrzcVqgUotPSKyu2BpfhqqkAkZwdVf2oVZ9aN+2Z
-         QN9wVj0CC39gIy5v0jyQHo0cuNNHLmLQJOCm52exVvjGEwwHH7urmktR0k7RnfCd973C
-         cc+bnA14bU8QWq1wvuVZml3DI0s1eEZ2QZfB5jlT9oH9X811Y0zy/6kL4Mon/r8c9Uov
-         soAw==
-X-Gm-Message-State: AOJu0YwXBebyAbB5E9joNSfeq0hPXZBzNLl8xUYIzb1LG1QcGoMz5fKb
-	2793RGxVNDRQ2KCaWVzkJvelF/3YgNaVJD4NL4AV6ZZiEiqrRjt/VJ1ywUhj7bQK/g==
-X-Gm-Gg: ASbGncsXWCmEUocdv9uF3ax1u7dNRv3XgTVJYC1NGgJCuk9FpeEBCag5tq4dYJ0s/uk
-	WohQ9tVMFMHiLTA3dO65Z+GQRm61YtAhHb62US62giLmmpYXA9KwJOsFTo7DuArtL88RrU/IVsz
-	F4aEdD24p8mBnxsdcyiVOr+9YEJCKTVBD4z002npng36tnA6zPxIFEcAj7PtEfoU2woQGkQYXtp
-	NuzhEFsB2lSq8dfSrUaqBtobirEo6UrnfQi3MwTuFy46Qcpmtxt+OYQP6AmresOI99F9raS2FBE
-	HPIfEkcIH5+jLgudS0xTrwVZEWmmvKZZy8rjNflsV9U17fUdb4wvUSF4RIwnZbMTum7adV9iq4o
-	aFLsZDR2TsT3EP+3QepRCyHNWUg==
-X-Google-Smtp-Source: AGHT+IEIUa9PX/FUvJMVxiR3QvCiRLgr7dERa3ZumCVq2A2BQoxv4jgjwbyszorMPUkMHGKjETHTvA==
-X-Received: by 2002:a05:6a21:6b16:b0:1f5:51d5:9ef3 with SMTP id adf61e73a8af0-21ee253296emr216532637.20.1749146552073;
-        Thu, 05 Jun 2025 11:02:32 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747afff7407sm13462933b3a.178.2025.06.05.11.02.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 11:02:31 -0700 (PDT)
-Message-ID: <9092793c-cb9c-4440-b2b6-3e80216a737c@broadcom.com>
-Date: Thu, 5 Jun 2025 11:02:29 -0700
+        bh=8luWUuoNqYwTjrcszSVsilqxBIhH6lfcQzMovWFpql4=;
+        b=WtsPRP/GRKTTOUzfitkWz4r/zGvTK5a7mR1rBQFamekzeErRYpJGWepLDCkm7SgKDl
+         ETCS5EoSZkdvQYDzRhPexFEQn7KLNeMhV/gHCZPc5F7hUkM8kIS6JrBRppuFJUa8F7e7
+         9cTkjrW1Vxpb0Bj2WnVhiw6xSDOIPlhvEyujDk1dlQvLF61hLGCWl0iHr74/xFVPS0iK
+         ZKLv/n9O6X1kLNAR339eiicHq9qWvW+4sQck3qdGrrctIKqVi8GNxOlJOPcMz5GAYG19
+         lHE0Yk61GtUU7S/IRlxYfWf92Tkl5AKNL0Lg41SraiL1FJt6t40sD8HaYbhIBMiLlFkz
+         CB2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749146969; x=1749751769;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8luWUuoNqYwTjrcszSVsilqxBIhH6lfcQzMovWFpql4=;
+        b=ULsrSkWWAHITxsj9GMbS6dZPvyegiKLcx9elOEvXWDYxr7FUP/9qYuZP8g/tKxUWhD
+         8IMCOCFCnsiuU4jn2pPyZH04+dx7wGvyqKnB7mATfZJUl/iFlOq23v2Nl3HsP1JllPqQ
+         VcumTM/klDXEI5PxrjsEA40a6Zk2hjkZZ6BkUykx0kExE6R+MCL8aifV7Q1lc8FXhuFU
+         dr1hUZ7MWUtjeRgO95PoTxbMHsNVrDv3ixOxMd4YBGmz4VCzK8cYm7SwJnXTWhI/TOqA
+         ZGh5JUVCpVTWOZaWif5oRa3NmhvmwnhwN202Y/Olzq250kL73P8ITxA9yL/SCTjJOdsd
+         Yxrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDBkUv90W1901JtUbbTam+IiAsfq2F+qJoFVRckGA/V9CW9+56BLondgx/V1E8RfeKrh70n+182YLZ744NqyjfbUgjJqRR@vger.kernel.org, AJvYcCUTidintgYT2RSZ9xfrjcfLWYP7/Zokl981bcZLI5RgiZNdprWbw7lZe7a1qpkaIgn4FXNyztzm@vger.kernel.org, AJvYcCVCUuXHIQDloGo9T8sYQdLvKcSoT2kjNpWpVMwfvpLguvtb4P4EPZ5kA5OX2FgKWom+k7n8VOhCOFYu@vger.kernel.org, AJvYcCWSlOtFXKmnhI3XN6AG+OkbK+MioG3OVOViTWdAQRA2KGXfVCnX9c20KKIhp8iwZsqOuUDXYNCUm19Qo1IQ@vger.kernel.org, AJvYcCWikBPWjVI4ySsDV+wqdW2petOYuF5fMocmGl54WcGWD0kulX0FPzVxXSTEDJgsaEZCzNUQQmg4p/OcVbo0@vger.kernel.org, AJvYcCX0wOQcC3rMLgMZL4Z0746woHJf930s6StAbOrYsO9ATi+eFM8zlbPf/zXoHXU/tJaxc6uZ+deuHA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJhjyV52lblP9kpK9TrTQOvC8gnIqv4zIIn8XONDpC8vaoDB/H
+	gWgn/wtQ5jeeSktcp01lQxKdDK7BxmjjRPFYnMwZltK8kYfIQWblXOVZO+/pz++WKDvBOMc3bTR
+	r21l8uLpd3e2F24L73/Ex2HcRi2Ke5u4=
+X-Gm-Gg: ASbGncuWBm/+335WMR9/vk8ke1FsjJNzza4uwfopS7+Wry7TT40+1MkImyQb2CXgkGo
+	gYzT9EQmdssh6tXW8EMuVd+UheUnZj7/FkIdvou8u3CEhR8n7FBKI8qcEsON8hX4AtXusnCaH/y
+	Ej/8CraJcUtiXyRNi3Vlx2itVCK73Gf+cX
+X-Google-Smtp-Source: AGHT+IFip/lShvRWllilwhcL8Ol8PacwWwmFAaam0lqLm+JyQwZMflMxpqN8f8m/6W1ii3AUdmKnFhSBfa79vqtPCVA=
+X-Received: by 2002:a17:90b:2fc4:b0:311:ae39:3dad with SMTP id
+ 98e67ed59e1d1-31347696706mr809115a91.30.1749146969467; Thu, 05 Jun 2025
+ 11:09:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: b53: fix untagged traffic sent via cpu
- tagged with VID 0
-To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250602194914.1011890-1-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250602194914.1011890-1-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250428195022.24587-2-stephen.smalley.work@gmail.com> <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
+In-Reply-To: <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Thu, 5 Jun 2025 14:09:17 -0400
+X-Gm-Features: AX0GCFvSHOanjqux2hTZnx--qeaWrQ1aQE-CbC_PtPMv61y7GT38kV1BQ65yzOA
+Message-ID: <CAEjxPJ5CSUEsXGT5e9KKXvdWpetm=v8iWc9jKvUMFub30w9KqA@mail.gmail.com>
+Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
+ interface
+To: Paul Moore <paul@paul-moore.com>
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Casey Schaufler <casey@schaufler-ca.com>, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	selinux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/2/25 12:49, Jonas Gorski wrote:
-> When Linux sends out untagged traffic from a port, it will enter the CPU
-> port without any VLAN tag, even if the port is a member of a vlan
-> filtering bridge with a PVID egress untagged VLAN.
-> 
-> This makes the CPU port's PVID take effect, and the PVID's VLAN
-> table entry controls if the packet will be tagged on egress.
-> 
-> Since commit 45e9d59d3950 ("net: dsa: b53: do not allow to configure
-> VLAN 0") we remove bridged ports from VLAN 0 when joining or leaving a
-> VLAN aware bridge. But we also clear the untagged bit, causing untagged
-> traffic from the controller to become tagged with VID 0 (and priority
-> 0).
-> 
-> Fix this by not touching the untagged map of VLAN 0. Additionally,
-> always keep the CPU port as a member, as the untag map is only effective
-> as long as there is at least one member, and we would remove it when
-> bridging all ports and leaving no standalone ports.
-> 
-> Since Linux (and the switch) treats VLAN 0 tagged traffic like untagged,
-> the actual impact of this is rather low, but this also prevented earlier
-> detection of the issue.
-> 
-> Fixes: 45e9d59d3950 ("net: dsa: b53: do not allow to configure VLAN 0")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+On Tue, Apr 29, 2025 at 7:35=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
+ote:
+>
+> On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
+> <stephen.smalley.work@gmail.com> wrote:
+> >
+> > Update the security_inode_listsecurity() interface to allow
+> > use of the xattr_list_one() helper and update the hook
+> > implementations.
+> >
+> > Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.sma=
+lley.work@gmail.com/
+> >
+> > Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+> > ---
+> > This patch is relative to the one linked above, which in theory is on
+> > vfs.fixes but doesn't appear to have been pushed when I looked.
+> >
+> >  fs/nfs/nfs4proc.c             | 10 ++++++----
+> >  fs/xattr.c                    | 19 +++++++------------
+> >  include/linux/lsm_hook_defs.h |  4 ++--
+> >  include/linux/security.h      |  5 +++--
+> >  net/socket.c                  | 17 +++++++----------
+> >  security/security.c           | 16 ++++++++--------
+> >  security/selinux/hooks.c      | 10 +++-------
+> >  security/smack/smack_lsm.c    | 13 ++++---------
+> >  8 files changed, 40 insertions(+), 54 deletions(-)
+>
+> Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Smack
+> folks I can pull this into the LSM tree.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Note that this will need to have a conflict resolved with:
+https://lore.kernel.org/selinux/20250605164852.2016-1-stephen.smalley.work@=
+gmail.com/
+
+Fortunately it should be straightforward - just delete the line added
+by that patch since this patch fixes the security_inode_listsecurity()
+hook interface to return 0 or -errno itself.
+
+>
+> --
+> paul-moore.com
 
