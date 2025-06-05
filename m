@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-195258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D894ACF171
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 16:01:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED079ACF183
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 16:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF0DC1893925
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 14:01:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A0816658F
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 14:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D62226541;
-	Thu,  5 Jun 2025 14:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2AA2749ED;
+	Thu,  5 Jun 2025 14:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgCfynbo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4CQZnVPR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2774E1DD9AD;
-	Thu,  5 Jun 2025 14:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F6B1E500C
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 14:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749132094; cv=none; b=twqPFNi1VzeSQ/1cYIkhHPvmEkMROhg8S4U/FpOLlSwCQ71TGGac5Fa2keRHtY3Q2zNJoyKb/c5RCQ9dL1t7RSU3RL1oDXvi3imILefjSQeX75C24mv7+Ka4POSya1tPvRYEJ3ug2/DhOTvWvMU2ccxCHxgLzbvoAnwJNx4HYCE=
+	t=1749132303; cv=none; b=Q8ZApEgGZUFDRZf7H9Z/wqijZLpbI/N2Kf4m8wAJ33+CNkA4ZkHmEJBDnJMR3MvhlX7AhMuDwQ/ADk/N/A5qEcxPFHqn6H+FzFZIoEjlDELbiOAtfyMlq8sL5q5vOACTOIMTsAqXMtdW5UppfViZshYfUVrfh+ztvyMlCXcfRd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749132094; c=relaxed/simple;
-	bh=1ed5iLGRXVaQHfOf0Zj7ng95yJ0hlYFMtMNrRHDgmIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uxiwu+4D+UQ0YQ9/sy5LGg8t8ZcvYGMGJZdLN9C8GVbJoPVXlq4jM31L05g+vbvr+e64W4hWTJE1j9UKqNvtU5r6VRv+ivNcH1TfEvKu14mEfun1Vdqyn73KD3cy6CfYp02g61wtuNqT4+A0Fi7XuZ7Fh2qjf03nn0QpxX3MVhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hgCfynbo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC8E3C4CEE7;
-	Thu,  5 Jun 2025 14:01:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749132093;
-	bh=1ed5iLGRXVaQHfOf0Zj7ng95yJ0hlYFMtMNrRHDgmIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hgCfynborg8AMQONHWEyRuSiwZ8I0303C21MbVqqZpd2NPMpcTD4t5NZu3PWQ4zlv
-	 NWL2taKpGX+cD1b5UkNtlt5TzQ3Y/itq77XBJFJ7QOIbW9U3HhkDhBpkWAax4DeFh4
-	 uvgqUeRbWgTePwBd26oP4YuW69Xdcl5IBszjDMeGHltova7N7wl24dIuaY3MXpLFO/
-	 uDim7gLg8U+8pngU3HVYzH88kv3FlfU0hBOj52j5T86yNQxHthWw4PDi6GOIP1Z6GK
-	 d4rrWLWbrv58y8+cK8Jq4AF14lUCRAyN0j+6/F2nqKUwPJfwSfKc0iKICOZfJ8UpAZ
-	 WOMMUfbfhJ6wQ==
-Date: Thu, 5 Jun 2025 07:01:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- martin.lau@linux.dev, daniel@iogearbox.net, john.fastabend@gmail.com,
- eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com,
- william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org
-Subject: Re: [PATCH net] net: clear the dst when changing skb protocol
-Message-ID: <20250605070131.53d870f6@kernel.org>
-In-Reply-To: <CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
-References: <20250604210604.257036-1-kuba@kernel.org>
-	<CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com>
-	<20250605062234.1df7e74a@kernel.org>
-	<CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
+	s=arc-20240116; t=1749132303; c=relaxed/simple;
+	bh=gAvR+Cs9ZGmXIj5nDVjNtPfHB2KTpHDycvMz98WLB+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZoKSL0a+1knE0/Y69M8nPt7ljX6mR2BM/2pEIZgoscbHBnM6s9StgLqsrQmluWFTqDYnPladO8s3Wu5Afb48NDcSWirPsQY89PZb7ena89DGS1U5RvsPv6AWMbM8bEP8KilH73qF+2/0YIBBxN1bAPknipfnk+UVXgbafzkIHFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4CQZnVPR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uCeznskelHqtDK2qSw5TV5JZc+mTpp4OO2+yvV0NTKo=; b=4CQZnVPR2QqlZyHWvG2F4bchGU
+	DsW7Ar8tpfhHrSFDark15seR03YiUgjE1MU5+BdZX+czUScfT2Px9pLmnQ/AfeE/w9jwhizkmICPG
+	WndFSE2VuFzAMseUVfn/D0ooO/GS5GRi3oTq7Xfb1emf6LfptjpgBQystLWfWye4jcvA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uNBDB-00EmHg-Av; Thu, 05 Jun 2025 16:04:53 +0200
+Date: Thu, 5 Jun 2025 16:04:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Xin Tian <tianx@yunsilicon.com>, netdev@vger.kernel.org,
+	leon@kernel.org, andrew+netdev@lunn.ch, pabeni@redhat.com,
+	edumazet@google.com, davem@davemloft.net,
+	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
+	weihg@yunsilicon.com, wanry@yunsilicon.com, jacky@yunsilicon.com,
+	horms@kernel.org, parthiban.veerasooran@microchip.com,
+	masahiroy@kernel.org, kalesh-anakkur.purayil@broadcom.com,
+	geert+renesas@glider.be
+Subject: Re: [PATCH net-next v11 14/14] xsc: add ndo_get_stats64
+Message-ID: <96f53bdd-13e4-4e4b-ab8e-3470782df3b2@lunn.ch>
+References: <20250423103923.2513425-1-tianx@yunsilicon.com>
+ <20250423104000.2513425-15-tianx@yunsilicon.com>
+ <20250424184840.064657da@kernel.org>
+ <3fd3b7fc-b698-4cf3-9d43-4751bfb40646@yunsilicon.com>
+ <20250605062855.019d4d2d@kernel.org>
+ <CAMuHMdVMrFzeFUu+H0MvMmf82TDc=4qfM2kjcoUCXiOFLmutDA@mail.gmail.com>
+ <20250605065615.46e015eb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250605065615.46e015eb@kernel.org>
 
-On Thu, 5 Jun 2025 15:50:31 +0200 Maciej =C5=BBenczykowski wrote:
-> On Thu, Jun 5, 2025 at 3:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> > > I wonder if this shouldn't drop dst even when doing ipv4->ipv4 or
-> > > ipv6->ipv6 -- it's encapping, presumably old dst is irrelevant... =20
-> >
-> > I keep going back and forth on this. You definitely have a point,
-> > but I feel like there are levels to how BPF prog can make the dst
-> > irrelevant:
-> >  - change proto
-> >  - encap
-> >  - adjust room but not set any encap flag
-> >  - overwrite the addrs without calling any helpers
-> > First case we have to cover for safety, last we can't possibly cover.
-> > So the question is whether we should draw the line somewhere in
-> > the middle, or leave this patch as is and if the actual use case arrives
-> > - let BPF call skb_dst_drop() as a kfunc. Right now I'm leaning towards
-> > the latter.
-> >
-> > Does that make sense? Does anyone else have an opinion? =20
->=20
-> It does make a fair bit of sense.
-> Question: does calling it as a kfunc require kernel BTF?
-> Specifically some ram limited devices want to disable CONFIG_DEBUG_INFO_B=
-TF...
-> I know normal bpf helpers don't need that...
-> I guess you could always convert ipv4 -> ipv6 -> ipv4 ;-)
+On Thu, Jun 05, 2025 at 06:56:15AM -0700, Jakub Kicinski wrote:
+> On Thu, 5 Jun 2025 15:39:54 +0200 Geert Uytterhoeven wrote:
+> > On Thu, 5 Jun 2025 at 15:29, Jakub Kicinski <kuba@kernel.org> wrote:
+> > > On Thu, 5 Jun 2025 15:25:21 +0800 Xin Tian wrote:  
+> > > > Regarding u64_stats_sync.h helpers:
+> > > > Since our driver exclusively runs on 64-bit platforms (ARM64 or x86_64)
+> > > > where u64 accesses are atomic, is it still necessary to use these helpers?  
+> > >
+> > > alright.  
+> > 
+> > [PATCH 1/14] indeed has:
+> > 
+> >     depends on PCI
+> >     depends on ARM64 || X86_64 || COMPILE_TEST
+> > 
+> > However, if this device is available on a PCIe expansion card, it
+> > could be plugged into any system with a PCIe expansion slot?
+> 
+> I've been trying to fight this fight but people keep pushing back :(
+> Barely any new PCIe driver comes up without depending on X86_64 and/or
+> ARM64. Maybe we should write down in the docs that it's okay to depend
+> on 64b but not okay to depend on specific arches?
 
-Not sure how BPF folks feel about that, but technically we could
-also add a flag to bpf_skb_adjust_room() or bpf_skb_change_proto().
+I agree. I expect in a few years time we will start seeing patches to
+drivers like this adding RISCV, because RISCV has made it into data
+center CPUs, where this sort of card makes sense. Its the fact it is
+64bit which counts here, not ARM or X86_64.
+
+	Andrew
 
