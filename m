@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-195195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89550ACEC93
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 11:07:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F162ACECB6
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 11:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27B3D7A5FEB
-	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 09:05:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A70C1746BF
+	for <lists+netdev@lfdr.de>; Thu,  5 Jun 2025 09:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682C21F4C90;
-	Thu,  5 Jun 2025 09:07:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A9440855;
+	Thu,  5 Jun 2025 09:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SgIuyM5/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bsJLVCHG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72167566A
-	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 09:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC3320C005
+	for <netdev@vger.kernel.org>; Thu,  5 Jun 2025 09:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749114423; cv=none; b=bC3G1ptWGP3FOEw2FEnvrT/1imWLxRpmpMosVtNIxDPHfPVKHWYUmYJz8WMBmo/hqjb7jy7V2VFUr/JA6eL5J15e5QqUvcjadAgtw+99Rad27iGBWjLHFxx0ygNyMpuwsvjBYYiLvONo+2MBnC20h5c+oIY4gQCdupohQLJpX8g=
+	t=1749115185; cv=none; b=swPydiIrfMHE717VGpKpnKd9aAB/2toYHsAScB3IIfAmaSt0oYzsMuGe/Ye1U7r7Ot9Iovt62aGaR7OO+GGWlTqgrms+aVRfCozKUsFgYpdzOFydTGTs8uI6TVuXkGb9q0h642ITOPImIIUMHPr61dBtWiUTrbQzDnT212CIlJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749114423; c=relaxed/simple;
-	bh=gTftk7/nkdK9vp6F7FHEsBQZkeiPm4Dw7fvnIHl0Tno=;
+	s=arc-20240116; t=1749115185; c=relaxed/simple;
+	bh=Jna34DJuIz4lYrqaZp7xKG5CCFB0I/HmBOSFfw1c+x4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eH6NTpMLOM7IfqJiQpNXHohXJB/dlxcgyt9t7NBVYwQlGRyce1P207tXbscmfvT2rbp3FnLdod551XvDDPMdFQ6XKeEkr30ttCc/1IZcjq8YNqAUCpuok/h75N4uGnqbphwNAeVK7xy0gWov8s7ElKKhZfUlNHCPLaY3+sPKHNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SgIuyM5/; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=ERrgNpk1Fo7Anz9NgWCpod0HvsZkK0jFMnhwPGXTknEBLD1VUIWaXfmiMp0/9mcJuY1hedtyr4ozt7v2yzHQMihAuQV61pJAOOLdWpvJc7fq4Ngf+ou/Az3Rnhq+1wgnunvwh0PCAOxjmJJmG8n2+OpIqfd6xzxx/4aJ/F1V+vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bsJLVCHG; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749114420;
+	s=mimecast20190719; t=1749115182;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LZzG29XfVtAPAG3t2hijtGsa7i91luWBgzXZdJoVOTU=;
-	b=SgIuyM5/U65IswB1PI1RZ1Aex3E7jLCmQx6ez7MA+i6tK04oqP/hsZg01fVY/xyNf2XRxS
-	hBo0OQ7jcud8Sh0O9/D8MpjrPTti+Jj8g3VCMYnIjDYZGVleIWlJ5l3HntMQnHrEfzFn0N
-	h9lgFkwlO38bllVbidcTolWoMlsKT1o=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QbvOWE1CNUocL1BEc3ljc1g1zxTrUZmYCXxonJr+pKM=;
+	b=bsJLVCHGpBkXZzEwJKf50nuTmbDluKAfBvfnvcfpA5DImRDYoT3sF5QU5dbx14Fbo4t5O9
+	nYQooevfsQT/yBJZnRc8GyNSj/Xfvw5//sopBcCkHqk8GabBkU3oiqj5VIp/Lid1usgCfd
+	h3qMjo+/gByqn6aDucssNbqJ+4CbjW4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-416-iR2hAF0CMtW6gf4BXRjhcA-1; Thu, 05 Jun 2025 05:06:59 -0400
-X-MC-Unique: iR2hAF0CMtW6gf4BXRjhcA-1
-X-Mimecast-MFC-AGG-ID: iR2hAF0CMtW6gf4BXRjhcA_1749114418
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450d886b9d5so2462785e9.3
-        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 02:06:58 -0700 (PDT)
+ us-mta-493-cOaG-EtVM7aB1JqQL8-ZFQ-1; Thu, 05 Jun 2025 05:19:39 -0400
+X-MC-Unique: cOaG-EtVM7aB1JqQL8-ZFQ-1
+X-Mimecast-MFC-AGG-ID: cOaG-EtVM7aB1JqQL8-ZFQ_1749115178
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4eb9c80deso324575f8f.0
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 02:19:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749114418; x=1749719218;
+        d=1e100.net; s=20230601; t=1749115178; x=1749719978;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LZzG29XfVtAPAG3t2hijtGsa7i91luWBgzXZdJoVOTU=;
-        b=ExN+HR6+LMVFenA/enXsQlDPeLnmy6guJAl1KLuHH+e5/S8Xc/auzLFXtX2vw+EfIE
-         bxCYeJFZX98rwAzT7DzirSgqpfFs7tZ4ZeryTxkHlNzGqrmu0tWF6it8xN8KlEsHg7a1
-         wB7aBxAflJcaGSOLoP8uWlPD6MKnoD75Jqd3n8XDGMKx3C5G5qQSo2LRCnvcep42MbL5
-         XvNnXOUwjDNZEbWSiigxzq+qDjVPhJDRNkXBDmrTWFWod5tpH4/vE6sIe+QolFl7oUj9
-         xCDCWyoZWDe6u9Ac8CW6x7OQ8AKuezXNle16zRTp7H08S+fgW+gsOFabbw12v4RkglZf
-         EEUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxyxQaICrRzsMQheHkULxHalQXf1HMma8HO3WP61Ycsp06CZrwJ3pk+uf6FOn1azeWWnHkOLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr8d2n7yyj5MxnBFr/OOQ8p2v08yCn2n1rCNx/6oMt87hop7OP
-	taKbKBLRkvI5uBWBHYUOO5rzT6TTtXInQDhUYD6bffIo+2kxQjAK+6//G5914cO6rcuaau8litY
-	Ijc2sc+9uJki0G34vg3LG1e1q4S9Xwx7QF+DEr3ymcISqSC2ttNxvYBQw8w==
-X-Gm-Gg: ASbGncscNIOOlJBWrdVpTw6TK6x1A4PNIzJ5i5OXSjcwE0EPZRxZXaOmyblbKGYssuE
-	5QHkYlQJwbL1YWLeHPuJ2Di1jI8D+nj5fFsqbWvW5wjvlYjLz7BrZyBnNSIX+xCQPsvqZHpZN2O
-	vuw4BFqYqK6A5TX4nXUAGw78ECcK7LwOsg5X+E/B+1YHhyiGH9iJj9frDsc7wkJWhBk2Dau14Me
-	cZTgrwkbIJNwe6LkDsyV+0U1XyC6oV0pUnuY1yePo2FSqzSRoP3HYYBeghzH9e406MUfcTKc18r
-	mgHJWLpuibVR1YeS/UM=
-X-Received: by 2002:a05:600c:8b5c:b0:450:cc80:e594 with SMTP id 5b1f17b1804b1-451f0f9ec8cmr47390975e9.26.1749114417779;
-        Thu, 05 Jun 2025 02:06:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlrfN/L0KGA9nkVyJ1PtjS5kYtl/CnjHZ8ZUdlVpdeHiEfUCdFyXT/5Q9D9x2ORf/SUTY2kg==
-X-Received: by 2002:a05:600c:8b5c:b0:450:cc80:e594 with SMTP id 5b1f17b1804b1-451f0f9ec8cmr47390645e9.26.1749114417350;
-        Thu, 05 Jun 2025 02:06:57 -0700 (PDT)
+        bh=QbvOWE1CNUocL1BEc3ljc1g1zxTrUZmYCXxonJr+pKM=;
+        b=Cy52fYFFx87mzR27JKY2PMr4VMg3HqDNictJMw3yHMWLIERKMCHwjb82bsajJvwO9s
+         9pHrhLwEmhwJyIy1o+2sI1ihWdBDK246C76fqJORtY5+a5eoMQeQ0OkF+4+xz59nvuhm
+         xr+Ngyl4trlx3JvzatSzd/VcEpaRp++2/4hILqPmAzLkvLqGDoyLYzPHdmU0DzQFU2dE
+         O8s/7PZ+gEDEyApOtEg/QnsYg+ysvr7x2FQb9FBcE+fe57yc0i8oak4ofO+PUP/S1QU5
+         O5eh/pmoqwuRpoA3leDWmjWidmE1mob1/oWDLAuFNrYhKaLqeUbytkae3vbK5+VA73RR
+         2sEQ==
+X-Gm-Message-State: AOJu0YwdJVtXHbXt/GXqjD0ahS154rcDkNftlnh81Hn0PschERTmppdg
+	aiVM8AkkOAw9sXNj1fgV6jxSAYE/JePB5GpZHT3A2HSkOcw+L2tyPXaGb5e/VrgwdGh9r7F1UtJ
+	aR0K8Xtx7p5YmJzfHPA4MMFL3X1KaOTiWWVdqS0W1Qjs2mkGUbhROREid1Q==
+X-Gm-Gg: ASbGncuHgD543tT4zeTzUehk7A8d5LiPo5UYXJzIQHfCWSpwN6YGF0rVkZTq5ik/PJH
+	6cGLH3yMVGBQgeYeXcSHmYJdpVQPDFZCIvCaEaoQojJkYr1VSi0XcNplHHZxolnokA5/TAKib19
+	ZzAdbarDNG8vT9hWEE0gbfLagb0I5ItsvLUxmGN2QLQ1Re636etr04cb8B+Zv4CNAyJSUdm/IH0
+	lwKUHmYyFx1nYkcFK/GtY7iUIhaudXwmrt1DBS4LEI0yRNKafO6StcYQlSScDUbGM3R0r5kF2iS
+	qnxjzp5MIoMjA60/NkI=
+X-Received: by 2002:a05:6000:2901:b0:3a4:d6aa:1277 with SMTP id ffacd0b85a97d-3a51d96cfdcmr4632404f8f.37.1749115178512;
+        Thu, 05 Jun 2025 02:19:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEiVIWKhvMhdKbM6hBmvDr6wXdqFF9eZ53YO8jtw/IL68kmldCR4ynqhTKRPPASOlhqnJbzTw==
+X-Received: by 2002:a05:6000:2901:b0:3a4:d6aa:1277 with SMTP id ffacd0b85a97d-3a51d96cfdcmr4632374f8f.37.1749115178007;
+        Thu, 05 Jun 2025 02:19:38 -0700 (PDT)
 Received: from ?IPV6:2a0d:3341:cced:ed10::f39? ([2a0d:3341:cced:ed10::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-451fb208240sm11589085e9.26.2025.06.05.02.06.56
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4f0097210sm23909436f8f.73.2025.06.05.02.19.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Jun 2025 02:06:56 -0700 (PDT)
-Message-ID: <ead87a84-5a44-4c21-91bb-9086ba1fbcc3@redhat.com>
-Date: Thu, 5 Jun 2025 11:06:55 +0200
+        Thu, 05 Jun 2025 02:19:37 -0700 (PDT)
+Message-ID: <0d96b03a-e0a6-4277-b8e7-a6d9373539f6@redhat.com>
+Date: Thu, 5 Jun 2025 11:19:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,85 +87,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 5/5] net: dsa: b53: do not touch DLL_IQQD on
- bcm53115
-To: Jonas Gorski <jonas.gorski@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+Subject: Re: [PATCH v3] net/mlx5: Flag state up only after cmdif is ready
+To: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Vivien Didelot <vivien.didelot@gmail.com>,
- =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250602193953.1010487-1-jonas.gorski@gmail.com>
- <20250602193953.1010487-6-jonas.gorski@gmail.com>
- <c1c3b951-19b8-462a-9dee-a1b893251d6f@broadcom.com>
- <CAOiHx=n6Mc+nM2QOa8okQbFcj9UHgfMbKKcNXG6D-VJjELHrsw@mail.gmail.com>
+ Jakub Kicinski <kuba@kernel.org>, Moshe Shemesh <moshe@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20250603061433.82155-1-zhaochenguang@kylinos.cn>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAOiHx=n6Mc+nM2QOa8okQbFcj9UHgfMbKKcNXG6D-VJjELHrsw@mail.gmail.com>
+In-Reply-To: <20250603061433.82155-1-zhaochenguang@kylinos.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 6/3/25 8:15 AM, Jonas Gorski wrote:
-> On Mon, Jun 2, 2025 at 11:40 PM Florian Fainelli
-> <florian.fainelli@broadcom.com> wrote:
->> On 6/2/25 12:39, Jonas Gorski wrote:
->>> According to OpenMDK, bit 2 of the RGMII register has a different
->>> meaning for BCM53115 [1]:
->>>
->>> "DLL_IQQD         1: In the IDDQ mode, power is down0: Normal function
->>>                    mode"
->>>
->>> Configuring RGMII delay works without setting this bit, so let's keep it
->>> at the default. For other chips, we always set it, so not clearing it
->>> is not an issue.
->>>
->>> One would assume BCM53118 works the same, but OpenMDK is not quite sure
->>> what this bit actually means [2]:
->>>
->>> "BYPASS_IMP_2NS_DEL #1: In the IDDQ mode, power is down#0: Normal
->>>                      function mode1: Bypass dll65_2ns_del IP0: Use
->>>                      dll65_2ns_del IP"
->>>
->>> So lets keep setting it for now.
->>>
->>> [1] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob/master/cdk/PKG/chip/bcm53115/bcm53115_a0_defs.h#L19871
->>> [2] https://github.com/Broadcom-Network-Switching-Software/OpenMDK/blob/master/cdk/PKG/chip/bcm53118/bcm53118_a0_defs.h#L14392
->>>
->>> Fixes: 967dd82ffc52 ("net: dsa: b53: Add support for Broadcom RoboSwitch")
->>> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
->>> ---
->>> v1 -> v2:
->>> * new patch
->>>
->>>   drivers/net/dsa/b53/b53_common.c | 8 +++++---
->>>   1 file changed, 5 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
->>> index be4493b769f4..862bdccb7439 100644
->>> --- a/drivers/net/dsa/b53/b53_common.c
->>> +++ b/drivers/net/dsa/b53/b53_common.c
->>> @@ -1354,8 +1354,7 @@ static void b53_adjust_531x5_rgmii(struct dsa_switch *ds, int port,
->>>        * tx_clk aligned timing (restoring to reset defaults)
->>>        */
->>>       b53_read8(dev, B53_CTRL_PAGE, off, &rgmii_ctrl);
->>> -     rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC |
->>> -                     RGMII_CTRL_TIMING_SEL);
->>> +     rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
->>
->> Are not we missing a:
->>
->> if (dev->chip_id != BCM53115_DEVICE_ID)
->>         rgmii_ctrl &= ~RGMII_CTRL_TIMING_SEL;
->>
->> here to be strictly identical before/after?
+On 6/3/25 8:14 AM, Chenguang Zhao wrote:
+> When driver is reloading during recovery flow, it can't get new commands
+> till command interface is up again. Otherwise we may get to null pointer
+> trying to access non initialized command structures.
 > 
-> We could add it for symmetry, but it would be purely decorational. We
-> unconditionally set this bit again later, so clearing it before has no
-> actual effect, which is why I didn't add it.
+> The issue can be reproduced using the following script:
+> 
+> 1)Use following script to trigger PCI error.
+> 
+> for((i=1;i<1000;i++));
+> do
+> echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+> echo “pci reset test $i times”
+> done
+> 
+> 2) Use following script to read speed.
+> 
+> while true; do cat /sys/class/net/eth0/speed &> /dev/null; done
+> 
+> task: ffff885f42820fd0 ti: ffff88603f758000 task.ti: ffff88603f758000
+> RIP: 0010:[] [] dma_pool_alloc+0x1ab/0×290
+> RSP: 0018:ffff88603f75baf0 EFLAGS: 00010046
+> RAX: 0000000000000246 RBX: ffff882f77d90c80 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: 00000000000080d0 RDI: ffff882f77d90d10
+> RBP: ffff88603f75bb20 R08: 0000000000019ba0 R09: ffff88017fc07c00
+> R10: ffffffffc0a9c384 R11: 0000000000000246 R12: ffff882f77d90d00
+> R13: 00000000000080d0 R14: ffff882f77d90d10 R15: ffff88340b6c5ea8
+> FS: 00007efce8330740(0000) GS:ffff885f4da00000(0000) knlGS:0000000000000000
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 0000003454fc6000 CR4: 00000000003407e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call trace:
+>  mlx5_alloc_cmd_msg+0xb4/0×2a0 [mlx5_core]
+>  mlx5_alloc_cmd_msg+0xd3/0×2a0 [mlx5_core]
+>  cmd_exec+0xcf/0×8a0 [mlx5_core]
+>  mlx5_cmd_exec+0x33/0×50 [mlx5_core]
+>  mlx5_core_access_reg+0xf1/0×170 [mlx5_core]
+>  mlx5_query_port_ptys+0x64/0×70 [mlx5_core]
+>  mlx5e_get_link_ksettings+0x5c/0×360 [mlx5_core]
+>  __ethtool_get_link_ksettings+0xa6/0×210
+>  speed_show+0x78/0xb0
+>  dev_attr_show+0x23/0×60
+>  sysfs_read_file+0x99/0×190
+>  vfs_read+0x9f/0×170
+>  SyS_read+0x7f/0xe0
+>  tracesys+0xe3/0xe8
+> 
+> Fixes: a80d1b68c8b7a0 ("net/mlx5: Break load_one into three stages")
+> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
 
-Makes sense, and the code in this patch is IMHO more readable.
+Minor nit: the 'net' tag should be in the subj prefix, alike:
 
-/P
+[PATCH net v<n>] mlx5: #...
+
+More importantly, please deal with Moshe feedback.
+
+Thanks,
+
+Paolo
 
 
