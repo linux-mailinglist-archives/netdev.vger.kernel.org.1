@@ -1,150 +1,134 @@
-Return-Path: <netdev+bounces-195467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E65CFAD04F0
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:13:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47FE6AD0518
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41AB5188A00E
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:13:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C29BA172799
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BDC1B0F1E;
-	Fri,  6 Jun 2025 15:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA39F2857D2;
+	Fri,  6 Jun 2025 15:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="DQTw9nl7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QrfroUUQ"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="K2tCnOwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781D545009
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 15:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B3913D52F;
+	Fri,  6 Jun 2025 15:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749222780; cv=none; b=tKHBan+e1d/SyL8YRDsC8m1wf1OXoAnaG9v5c1y2BH2/0Egi0iamY3CAWGVUXXb9GKTJkE3YAA2EqAOzf5B94Fd5uJac0nbxxvjwVHMWEkP4avYfsH4q4FWA4+vHv4yfRXJZ44M65B0Did9asCYbzC3opstCwHf+kHVBTn335jQ=
+	t=1749223403; cv=none; b=Gi5s3haulA7o89LOrutaPLwppFfAiReh1OTWWSlwRL+9VkvkXKSKddYHE4mjhmbxnM8LVFdEMY7Cq7rtPm1tmMmLNSHejnUT1GgqizVadWyWBoURRqVaPTh65askGv5PsHkhdwBB936QFKqpcRgtdIgd2o++Qocxlws9d4KNQ0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749222780; c=relaxed/simple;
-	bh=CfPrUY0ccFHhO4stV5xK7skzk+/2TSQVvIvZkILRryM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=en4pwijcwfI+AYKSW1cq7WLejtJn7eFH1PTMWCSCF6+ALxbMbBEIbIOR/qSEkut8hJEY7bUKQBHwWCX4Xea66dV4jA/ENezlrIuRE2Z1POK6NRInLv/LULY/p26EmGi5yqcPk5tIrfkVRf0AH3/UnqDWp+tgYpktFYPwkhLWPQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=DQTw9nl7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QrfroUUQ; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5D45D1140149;
-	Fri,  6 Jun 2025 11:12:56 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Fri, 06 Jun 2025 11:12:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1749222776; x=
-	1749309176; bh=OycdHmucKqZhzX8K5Ys7TJE3ZfkGve5bJ6DPydvETzE=; b=D
-	QTw9nl7urceXPCRyKXIwC6fOJb7QrL2ZUKLEnRwAqSzXKNEUgXBEZbtc0tqjSFS0
-	rT5/q4VauFc9ZBLSiAPbiBm6RXl0H0Hf7u7zb/hMsTXVBYxcwpCygWjxdBnjpxCO
-	OsGoX5e7Egi8P1CpSi7ivUNsPHHE9GzTb/dBHLgDTh+C9XYSBPCPTbhq1MhTRRfS
-	s+Rwk4TSB4cVmT4NFFzswf+WBjI3Msl0F8vfLLu+nkwKCZJTmxd8zh0dhFrYB++V
-	8IVj+jWyk2VbM5iUkLfWh6VGHeFY+K9K5UfG+KLb5i2hEthWLz9CTuH81Pw3738j
-	YC0VTSmWM6uqXo4IF0ZvA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1749222776; x=1749309176; bh=OycdHmucKqZhzX8K5Ys7TJE3ZfkGve5bJ6D
-	PydvETzE=; b=QrfroUUQxccZZ9fnhBWoU0juZ/q3qa0n6ewFXLKwZl2KxTKGJnm
-	MUvaiye04OBBPWT2+8cchIvNxN2S/zbC7QkSSRAd7qaUsf83moRhpE1YoXNgilaY
-	LMrjsy9OX8RC2WsAxPVJqVyEoexOEilCmiD9hIrSRDQkkJ4sDA6AYL/81lqjsyDC
-	TWelgSl7ha3IbOVUJevwJUbrOSpsO62/eBgFF0zKcbxedF2dk5SqLpe6BAuIAbyP
-	mR245oUF2D0y2K5eZvyRiEowV3zNIKuAJr0t/lmlq3mMw840qCH/zk1SwtL7R/6L
-	N1Lze+7h3P3uhH1ybDd5v0J+fMZwzUzS+cQ==
-X-ME-Sender: <xms:dgVDaIsFN4ISLeDtl6iES21y1nOvIFfd3AMvWxPKL7ygcwM7aEuwQA>
-    <xme:dgVDaFdags5vReeMDYokvxlGplH4mRktqmNDolt3dUklYhVt1b2z9g-Wwc1gzS5Ru
-    vGyIx3X82iIpS1MVfw>
-X-ME-Received: <xmr:dgVDaDz5PrxtL2pf81T6ToMe5MfllFR1Hf_U0IrFNIAjmcsuSr3dV07Rtk1a>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdehvdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
-    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlvghonheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtsehs
-    vggtuhhnvghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
-    gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthht
-    ohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtth
-    hopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
-    homh
-X-ME-Proxy: <xmx:dgVDaLNy78pOAMNtQZl9oY-klRCQVgCdsbicvAd5NbHQLBuynG7QTw>
-    <xmx:dgVDaI9sSLx-_knn-4yNurLyHHh4Hyr8rydpVC1P27hH6dZ1djeeVw>
-    <xmx:dgVDaDVPGdOnPpFuQdIrDeSypvxxLIp0pCh7O0F0njVWSTFQBzRyHw>
-    <xmx:dgVDaBfpaQwWf-w0e122sh5tfVHoBGuQFR_biER0-erurlPpxr9xvw>
-    <xmx:eAVDaGJUwFq5ODV0Y8BBc5p4paMwgAZBhy1GlM_5n4NlPV9GXKlhzIqq>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 6 Jun 2025 11:12:54 -0400 (EDT)
-Date: Fri, 6 Jun 2025 17:12:52 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH ipsec-next v1 1/5] xfrm: delay initialization of offload
- path till its actually requested
-Message-ID: <aEMFdAPopn9Td-Dn@krikkit>
-References: <cover.1739972570.git.leon@kernel.org>
- <3a5407283334ffad47a7079f86efdf9f08a0cda7.1739972570.git.leon@kernel.org>
- <aEGW_5HfPqU1rFjl@krikkit>
- <20250605141624.GG7435@unreal>
+	s=arc-20240116; t=1749223403; c=relaxed/simple;
+	bh=YPQHOA5kSqFGUsoQ+jIhAIS36Z4dE20BlDV3jKC+PYI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l/ViD0qPFS6J9B2wlLLoZb4RQ1c07LOiXmu0CHmXXbXkAMzNDMAOfEMed9ToWzLcpAgKTGJyqPOaq98ZjHify4imTfLUt/hjUihF6t3mKcNueLdn7jyEET/VcheiRVreHTolb67jsib8dcAFZc7zq+yWCCjMVsG8OeDZLiBURts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=K2tCnOwG; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+Message-ID: <3b461ee7-c3ee-484b-b945-ec6070355bfe@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1749223398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EC5WXwIyePFbi5jc4rzYZSJpl/hestrYvtJLaOCfr/c=;
+	b=K2tCnOwGIIkIFg0EJpp+pfHV2hk6mQ1J5urKlln67Jp5fOG7BkINyAZLmeBP2rChxlDZei
+	7s3I6VKB79cpZhyt1jcb+fqAQ8v7Ctxk08/ZFVXH6AGy+EJZ6hOr4nFbz4eR9VxMNfp5Yn
+	IlUrn/sE5ZbRKNd7wiB96flFIQnU1lE=
+Date: Fri, 6 Jun 2025 18:24:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250605141624.GG7435@unreal>
+Subject: Re: [PATCH v2] security,fs,nfs,net: update
+ security_inode_listsecurity() interface
+Content-Language: en-US
+To: Stephen Smalley <stephen.smalley.work@gmail.com>
+Cc: linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, selinux@vger.kernel.org,
+ Christian Brauner <brauner@kernel.org>,
+ Casey Schaufler <casey@schaufler-ca.com>, Paul Moore <paul@paul-moore.com>
+References: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
+ <49730b18-605f-4194-8f93-86f832f4b8f8@swemel.ru>
+ <CAEjxPJ5KoTBB18_7+fWL+GWY4N5Vp2=Kn=9FJR2GewFRcMgzPQ@mail.gmail.com>
+From: Konstantin Andreev <andreev@swemel.ru>
+Disposition-Notification-To: Konstantin Andreev <andreev@swemel.ru>
+In-Reply-To: <CAEjxPJ5KoTBB18_7+fWL+GWY4N5Vp2=Kn=9FJR2GewFRcMgzPQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-OriginalArrivalTime: 06 Jun 2025 15:23:17.0475 (UTC) FILETIME=[EDA31B30:01DBD6F6]
 
-2025-06-05, 17:16:24 +0300, Leon Romanovsky wrote:
-> On Thu, Jun 05, 2025 at 03:09:19PM +0200, Sabrina Dubroca wrote:
-> > Hello,
-> > 
-> > I think we need to revert this patch. It causes a severe performance
-> > regression for SW IPsec (around 40-50%).
-> > 
-> > 2025-02-19, 15:50:57 +0200, Leon Romanovsky wrote:
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > XFRM offload path is probed even if offload isn't needed at all. Let's
-> > > make sure that x->type_offload pointer stays NULL for such path to
-> > > reduce ambiguity.
-> > 
-> > x->type_offload is used for GRO with SW IPsec, not just for HW offload.
+Stephen Smalley, 06/06/2025 10:28 -0400:
+> On Fri, Jun 6, 2025 at 9:38 AM Konstantin Andreev <andreev@swemel.ru> wrote:
+>> Stephen Smalley, 28/04/2025:
+>>> Update the security_inode_listsecurity() interface to allow
+>>> use of the xattr_list_one() helper and update the hook
+>>> implementations.
+>>>
+>>> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.smalley.work@gmail.com/
+>>
+>> Sorry for being late to the party.
+>>
+>> Your approach assumes that every fs-specific xattr lister
+>> called like
+>>
+>> | vfs_listxattr() {
+>> |    if (inode->i_op->listxattr)
+>> |        error = inode->i_op->listxattr(dentry, list, size)
+>> |   ...
+>>
+>> must call LSM to integrate LSM's xattr(s) into fs-specific list.
+>> You did this for tmpfs:
+>>
+>> | simple_xattr_list() {
+>> |   security_inode_listsecurity()
+>> |   // iterate real xatts list
+>>
+>>
+>> Well, but what about other filesystems in the linux kernel?
+>> Should all of them also modify their xattr listers?
+>>
+>> To me, taking care of security xattrs is improper responsibility
+>> for filesystem code.
+>>
+>> May it be better to merge LSM xattrs
+>> and fs-backed xattrs at the vfs level (vfs_listxattr)?
 > 
-> Thanks for the report, can you please try the following fix?
+> This patch and the preceding one on which it depends were specifically
+> to address a regression in the handling of listxattr() for tmpfs/shmem
+> and similar filesystems.
+> Originally they had no xattr handler at the filesystem level and
+> vfs_listxattr() already has a fallback to ensure inclusion of the
+> security.* xattr for that case.
 
-Seems to work in my setup. That's basically a revert of every
-functional change in 585b64f5a620 ("xfrm: delay initialization of
-offload path till its actually requested"), except that now we set
-->type_offload during xfrm_state_construct instead of
-__xfrm_init_state, so other callers of __xfrm_init_state
-(xfrm_state_migrate and pfkey - we can ignore ipcomp since it doesn't
-have ->type_offload) won't get ->type_offload set correctly. I'm not
-sure we want that.
+Understood
 
-Do you need to also revert 49431af6c4ef ("xfrm: rely on XFRM offload")
-from this series? The assumption that x->type_offload is set only for
-HW offload isn't correct.
+> For filesystems like ext4 that have always (relative to first
+> introduction of security.* xattrs) provided handlers, they already
+> return the fs-backed xattr value and we don't need to ask the LSM for
+> it.
 
--- 
-Sabrina
+They only return those security.* xattrs that were physically stored
+in the fs permanent storage.
+
+If LSM's xattrs are not stored they are not listed :(
+
+> That said, you may be correct that it would be better to introduce
+> some additional handling in vfs_listxattr() but I would recommend
+> doing that as a follow-up.
+
+Understood
+
+--
+Konstantin Andreev
 
