@@ -1,66 +1,80 @@
-Return-Path: <netdev+bounces-195472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF35AD05F6
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:48:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2179AD062D
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37A011893383
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:47:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F25C03B43EF
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF1828C5CD;
-	Fri,  6 Jun 2025 15:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BE0289E3D;
+	Fri,  6 Jun 2025 15:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dMGAp+k5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NW9nvpxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FF428C2D8;
-	Fri,  6 Jun 2025 15:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51865289801;
+	Fri,  6 Jun 2025 15:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749224642; cv=none; b=lGq9+UCEpGYHCS32qScp8wsTQ/h7kYkmIr4LHcgozPWWOCRCfiSg887ci+JfhFPnmTAWLtsP6fWXRFCqKpcjbJzaKFjoSJTSJhf/AanQ2KM88S7aXQh5KHrORb6XOMb15q58oxdHJ/KNswLAbKNZMJu5ZCNpsjo0Z38VyuutHT4=
+	t=1749224943; cv=none; b=SlwTT0kdBa83VR/RJjThsoyOIzXuJNe5L6VGpZoZKIj2r9FLsZPxoDmp+EPCXBOGZX30xdoFV5PKneGkrd/VyCiYfBkQFqJQsTMDGSVKgvlp47otz3lbFC2xwZ+P7Hyo0gr8BkIXDr1g/TpOxTjHWm1AVy4bLzYh75htl1nNZss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749224642; c=relaxed/simple;
-	bh=lB7lYnSbEiy3QlbxWlsGm9NoOotpmKsaXkCsatuLtCU=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=j5MS2ph4PlloO8GF4KZCjOUw9DIiyI9H7am2oY/efr229Pa6+zTSE5gMlC8VvVylX7H0tkDDfmEYKtZmPqqeZmOev7/e71QWsmPOoSRxrrY/ZmnDITNHjRYPTKi4D9FLNVZeEDBabIO2Gn3BAhqlft8XDaY4DwBRVwIc/UROVBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dMGAp+k5; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749224641; x=1780760641;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to;
-  bh=lB7lYnSbEiy3QlbxWlsGm9NoOotpmKsaXkCsatuLtCU=;
-  b=dMGAp+k5q9eIA56QE3vf+mjdl1tNwg8QY8i7qtE8Xf4XpxIShrerWI6f
-   l+BbffjZvLhPPvwVfIJP++M8m/qsqjMoqHYwsLDImZiiSvUBqmrzkoKoE
-   rq52BzQEyQRdc4lm/XR7yR9BgyNy/QSVp/khR04BvG/nEURVWfG+3WDyx
-   S1ppBAbDoH4tV4e9zRVOMCXvjou+7KQAU7JDEEFIXlrSQv6/TLybKdEy2
-   cnHJbsXB5nqTthGy5GWsCPi+4HohwdL8xHw1fZ1J7B2UU5A9dOzBStqWw
-   5R+zOxJZPD1wa+/0KlkbMG/1B20JDHVHdpthXD/c5WmQ/OLLDevjvJOne
-   g==;
-X-CSE-ConnectionGUID: Hx6NfXDoQV2rFOW5onEi2g==
-X-CSE-MsgGUID: KOLghiviTI6+vjqhqKbxPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11456"; a="51456348"
-X-IronPort-AV: E=Sophos;i="6.16,215,1744095600"; 
-   d="scan'208,223";a="51456348"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2025 08:44:00 -0700
-X-CSE-ConnectionGUID: ENqPB+5XQGiQY/yi1cX9fQ==
-X-CSE-MsgGUID: AsKefRFdRIGewsNhJnZ6bg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,215,1744095600"; 
-   d="scan'208,223";a="149693365"
-Received: from iherna2-mobl4.amr.corp.intel.com (HELO [10.125.111.31]) ([10.125.111.31])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2025 08:43:58 -0700
-Content-Type: multipart/mixed; boundary="------------N9L4FQ8octb0E0gpQ8FX8oQZ"
-Message-ID: <6412d84a-edc3-4723-89f1-b2017fb0d1ea@intel.com>
-Date: Fri, 6 Jun 2025 08:43:57 -0700
+	s=arc-20240116; t=1749224943; c=relaxed/simple;
+	bh=qteTWSdXmGXbvSh/VWtVvDyFhQzDEAd2cyVRYJIO0yg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Su3JyLeECc9POlaqsV9NX0mmffc6oUpvIirGytxKxBJdXwaDIi95Q0A2Hs79ilI6ebuxGfUXr1n1Xwe3wbtxYTucZHwzZYjE5eDMO2934KS23fp+hzgtKA597hKMjHNEllwl0P6hlKZO1kgBVQ/sjd8Do/0gQ403xKfGfMRXBI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NW9nvpxe; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3122368d7cfso1909446a91.1;
+        Fri, 06 Jun 2025 08:49:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749224941; x=1749829741; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SFAXCqQFrPjFZs7s5flyQDRDOg704B5o+gINoyafWfw=;
+        b=NW9nvpxeAQP5ozos0dNMFjHsOTDiHhdYnfFRH5y1LXmTH6P+GQBmavLMlYGU+UunS1
+         dx/9ZTX9qlvIen5rJDoEr2CXjZ4KGcZB/OJJL+XaTEf6PLxFZREjbCyi91q3CafQeXse
+         SLELgwWo9HWSH7hqRcNH11fuMGOUiRldPyHpgqHybibseAqzqk4e+VPLipDl/SbxVnyN
+         GQffJNiJnGmOgMGg1FYlWYN9auyOkf1V4wDZeNVTl2OvexSZxRuNv7OtrdcfPIqY0dPA
+         6AXACvLe5NZbMGw/d/CAWPQRRtHcoSuanMQmHpAFxULAFAIpOM+Cj2HedtotFwExwKse
+         KQbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749224941; x=1749829741;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SFAXCqQFrPjFZs7s5flyQDRDOg704B5o+gINoyafWfw=;
+        b=IK1f7+fkfSZf8+x0Od3jjyQhV2w/xAAUtfTZQu7NKxdRpT50iA+Wh5cgypyZV4oeiU
+         3HdZaT2Fj7infffm+6EOeuFaWmFJazcCKnjF/nra0M8NnIwMD1r/tjQPa+3xZyh4Bsrn
+         m/h3dv1bhN8RxLehpjiiL3NtdSGzwW6KqKd5NRryJ0cs3Q0Au9taYvyv0/zclHkUZx60
+         E/aqqSaifp8D87U2ltyFQRN5vgNik2cusRACSDKuRUEtlGOKIziQYF2na5gO29HtlJbq
+         FpLIC1s6axLnFWJEXwXq+krUncbfFRguF0/NppxmDUvtcQhrpval14725zVqzP0cGEKE
+         kR+w==
+X-Forwarded-Encrypted: i=1; AJvYcCV8inONVebNTMWFS1+jxo9bIYBi4c4AcKuCFhreyDSg2mWspDzJtI4U2YqwOsI7dTxTOoM=@vger.kernel.org, AJvYcCW/LL05J10mLnP/BYgqStfgz/INlTnZdDd53W8ShtzcbskgsLHbATBVYrcqSuhoMbYM9JF3NBxRgt+OqJnc@vger.kernel.org, AJvYcCWjCAG8g4RmS/wzUdPNQmpLTpS1wB3pCbLt5GibjD0wBroDlEJLHMSCFvxTAFs51Hz2NaLt0hRB@vger.kernel.org, AJvYcCWrdoseY7tsDAWVhKDXYAFMV7X6VffmJoufiusExI3nfMdqAorpfehwBX84aGTdYOVNV+nTrtYa@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ5jYDd+1BxHKRc3i5P1n1FMRbPKlLP4wF2vpw9ot5CAfIZXkc
+	2Ug/lJx9jMeWVxAzs2NOpnxt+eYk63VNg1QlLxWeZBzfcCczySLhWLA+
+X-Gm-Gg: ASbGncsU4LcebNuK3HsVUbOkQePPdccZiN4wjr0V7A/XEEJ5We9eOvckS9ip91mnZKl
+	AG2JAJb28czfo4d9Z7/4PtmaLarvZs03KgKcXoTdE9X/B7rd09j+JneAJatIvB4vrPHW4YH3Nbq
+	wmZFjIow6iBMxBqDtfqj1W+U+pjW8J5wZAm0nq6otio7I2bT+EOJCdY7GcCMtUEUyYk/Uvnq/0R
+	hwHegOb8DhgfZ+pAsAhCO5yrOQOjNw+G3MtZ3GpCA6kNGJeIUrYyfOmyuN/KOdsmbb2c6WmOmmf
+	kzx0KUUJaaEde+AN3qhFfmm2JkkFHLuNyxD7cslC0xrg23i0MGLOF/bE29NkGObfP232M0dNd7X
+	Wita23ATLZrhE3lFkRr7X33s7pqpndPFlEPcbDH8y
+X-Google-Smtp-Source: AGHT+IHG/4StZ2v8LodTRZ+tFEEY1GEgtwGds0NXN4+D7wj3obn0sPwJ9Edgk7OM0j71WGZIu3Rb6w==
+X-Received: by 2002:a17:90b:4b09:b0:313:2adc:b4c4 with SMTP id 98e67ed59e1d1-31347678bbcmr5917844a91.24.1749224941467;
+        Fri, 06 Jun 2025 08:49:01 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:e7b6:944a:261d:ef5a? ([2001:ee0:4f0e:fb30:e7b6:944a:261d:ef5a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236032fcf53sm13827705ad.129.2025.06.06.08.48.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jun 2025 08:49:00 -0700 (PDT)
+Message-ID: <f073b150-b2e9-43db-aa61-87eee4755a2f@gmail.com>
+Date: Fri, 6 Jun 2025 22:48:53 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,132 +82,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Large modules with 6.15 [was: [PATCH v4 6/6] percpu/x86: Enable
- strict percpu checks via named AS qualifiers]
-To: Jiri Slaby <jirislaby@kernel.org>, Uros Bizjak <ubizjak@gmail.com>
-Cc: x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-arch@vger.kernel.org,
- netdev@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
- Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
- Christoph Lameter <cl@linux.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Andy Lutomirski <luto@kernel.org>, Brian Gerst <brgerst@gmail.com>,
- Peter Zijlstra <peterz@infradead.org>, Shung-Hsi Yu <shung-hsi.yu@suse.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-References: <20250127160709.80604-1-ubizjak@gmail.com>
- <20250127160709.80604-7-ubizjak@gmail.com>
- <02c00acd-9518-4371-be2c-eb63e5d11d9c@kernel.org>
- <b27d96fc-b234-4406-8d6e-885cd97a87f3@intel.com>
- <CAFULd4Ygz8p8rD1=c-S2MjJniP6vjVNMsWG_B=OjCVpthk0fBg@mail.gmail.com>
- <9767d411-81dc-491b-b6da-419240065ffe@kernel.org>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH net] virtio-net: drop the multi-buffer XDP packet in
+ zerocopy
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+References: <20250603150613.83802-1-minhquangbui99@gmail.com>
+ <dd087fdf-5d6c-4015-bed3-29760002f859@redhat.com>
+ <f6d7610b-abfe-415d-adf8-08ce791e4e72@gmail.com>
+ <20250605074810.2b3b2637@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <9767d411-81dc-491b-b6da-419240065ffe@kernel.org>
-
-This is a multi-part message in MIME format.
---------------N9L4FQ8octb0E0gpQ8FX8oQZ
-Content-Type: text/plain; charset=UTF-8
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20250605074810.2b3b2637@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/6/25 02:17, Jiri Slaby wrote:
-> Given this is the second time I hit a bug with this, perhaps introduce
-> an EXPERIMENTAL CONFIG option, so that random users can simply disable
-> it if an issue occurs? Without the need of patching random userspace and
-> changing random kernel headers?
+On 6/5/25 21:48, Jakub Kicinski wrote:
+> On Thu, 5 Jun 2025 21:33:26 +0700 Bui Quang Minh wrote:
+>> On 6/5/25 18:03, Paolo Abeni wrote:
+>>> On 6/3/25 5:06 PM, Bui Quang Minh wrote:
+>>>> In virtio-net, we have not yet supported multi-buffer XDP packet in
+>>>> zerocopy mode when there is a binding XDP program. However, in that
+>>>> case, when receiving multi-buffer XDP packet, we skip the XDP program
+>>>> and return XDP_PASS. As a result, the packet is passed to normal network
+>>>> stack which is an incorrect behavior.
+>>> Why? AFAICS the multi-buffer mode depends on features negotiation, which
+>>> is not controlled by the VM user.
+>>>
+>>> Let's suppose the user wants to attach an XDP program to do some per
+>>> packet stats accounting. That suddenly would cause drop packets
+>>> depending on conditions not controlled by the (guest) user. It looks
+>>> wrong to me.
+>> But currently, if a multi-buffer packet arrives, it will not go through
+>> XDP program so it doesn't increase the stats but still goes to network
+>> stack. So I think it's not a correct behavior.
+> Sounds fair, but at a glance the normal XDP path seems to be trying to
+> linearize the frame. Can we not try to flatten the frame here?
+> If it's simply to long for the chunk size that's a frame length error,
+> right?
 
-What about something like the attached (untested) patch? That should at
-least get folks back to the old, universal working behavior even when
-using new compilers.
---------------N9L4FQ8octb0E0gpQ8FX8oQZ
-Content-Type: text/x-patch; charset=UTF-8; name="CC_USE_TYPEOF_UNQUAL1.patch"
-Content-Disposition: attachment; filename="CC_USE_TYPEOF_UNQUAL1.patch"
-Content-Transfer-Encoding: base64
+Here we are in the zerocopy path, so the buffers for the frame to fill 
+in are allocated from XDP socket's umem. And if the frame spans across 
+multiple buffers then the total frame size is larger than the chunk 
+size. Furthermore, we are in the zerocopy so we cannot linearize by 
+allocating a large enough buffer to cover the whole frame then copy the 
+frame data to it. That's not zerocopy anymore. Also, XDP socket zerocopy 
+receive has assumption that the packet it receives must from the umem 
+pool. AFAIK, the generic XDP path is for copy mode only.
 
-RnJvbSAwOGQ5OGI0ZmEwOGJhNzZiZTk2ZTQwNmI1M2FlNjk5NDY4NDJmNmE5IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZlIEhhbnNlbiA8ZGF2ZS5oYW5zZW5AbGludXgu
-aW50ZWwuY29tPgpEYXRlOiBGcmksIDYgSnVuIDIwMjUgMDg6MzM6MjkgLTA3MDAKU3ViamVj
-dDogW1BBVENIXSBjb21waWxlci5oOiBFbmFibGUgY29uZmlnIGNob2ljZSBmb3IgdXNpbmcg
-dW5xdWFsaWZpZWQgY2FzdHMKClRZUEVPRl9VTlFVQUwoKSBoYXMgYSBub2JsZSBnb2FsIG9m
-IGxldHRpbmcgbm9ybWFsIGNvbXBpbGVycyBkbyBtb3JlCm9mIHRoZSBqb2Igbm9ybWFsbHkg
-cmVzZXJ2ZWQgZm9yIHNwYXJzZS4gQnV0IGl0IGhhcyBjYXVzZWQgKG9yCmV4cG9zZWQpIGEg
-bnVtYmVyIG9mIG5hc3R5IGJ1Z3MgYW5kIGlzIG5vdCBxdWl0ZSByZWFkeSBmb3IgcHJpbWUg
-dGltZS4KRXZlbiBuYXN0aWVyLCBzb21lIG9mIHRoZXNlIGlzc3VlcyBuZWVkIHNlcGFyYXRl
-IHVzZXJzcGFjZSBmaXhlcy4KClJpZ2h0IG5vdywgX190eXBlb2ZfdW5xdWFsX18gd2lsbCBi
-ZSB3aGVuZXZlciB0aGUgY29tcGlsZXIgc3VwcG9ydHMKaXQuIFJlc3RyaWN0IGl0IHRvIGNh
-c2VzIHdoZXJlIHVzZXJzIGhhdmUgb3B0ZWQgaW4gd2l0aCBhIG5ldyBLY29uZmlnCm9wdGlv
-bi4gVGhpcyBvcHRpb24gY2FuIGVpdGhlciBiZSByZW1vdmVkIG9yIGhhdmUgaXRzIGRlZmF1
-bHQgcG9sYXJpdHkKZmxpcHBlZCB3aGVuIHVzZXJzcGFjZSBpcyB3aWRlbHkgZml4ZWQgdXAu
-CgpTaWduZWQtb2ZmLWJ5OiBEYXZlIEhhbnNlbiA8ZGF2ZS5oYW5zZW5AbGludXguaW50ZWwu
-Y29tPgotLS0KIGluY2x1ZGUvbGludXgvY29tcGlsZXIuaCB8ICAyICstCiBpbml0L0tjb25m
-aWcgICAgICAgICAgICAgfCAxMSArKysrKysrKysrKwogMiBmaWxlcyBjaGFuZ2VkLCAxMiBp
-bnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51
-eC9jb21waWxlci5oIGIvaW5jbHVkZS9saW51eC9jb21waWxlci5oCmluZGV4IDI3NzI1ZjFh
-YjVhYmMuLjNlZmE5M2Y4ZWNhNjYgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvY29tcGls
-ZXIuaAorKysgYi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyLmgKQEAgLTIzMiw3ICsyMzIsNyBA
-QCB2b2lkIGZ0cmFjZV9saWtlbHlfdXBkYXRlKHN0cnVjdCBmdHJhY2VfbGlrZWx5X2RhdGEg
-KmYsIGludCB2YWwsCiAgKiBYWFg6IFJlbW92ZSB0ZXN0IGZvciBfX0NIRUNLRVJfXyBvbmNl
-CiAgKiBzcGFyc2UgbGVhcm5zIGFib3V0IF9fdHlwZW9mX3VucXVhbF9fKCkuCiAgKi8KLSNp
-ZiBDQ19IQVNfVFlQRU9GX1VOUVVBTCAmJiAhZGVmaW5lZChfX0NIRUNLRVJfXykKKyNpZiBk
-ZWZpbmVkKENPTkZJR19DQ19VU0VfVFlQRU9GX1VOUVVBTCkgJiYgQ0NfSEFTX1RZUEVPRl9V
-TlFVQUwgJiYgIWRlZmluZWQoX19DSEVDS0VSX18pCiAjIGRlZmluZSBVU0VfVFlQRU9GX1VO
-UVVBTCAxCiAjZW5kaWYKIApkaWZmIC0tZ2l0IGEvaW5pdC9LY29uZmlnIGIvaW5pdC9LY29u
-ZmlnCmluZGV4IDYzZjU5NzRiOWZhNmUuLjc0ZTVlOGQ2NDA3NTAgMTAwNjQ0Ci0tLSBhL2lu
-aXQvS2NvbmZpZworKysgYi9pbml0L0tjb25maWcKQEAgLTE0ODksNiArMTQ4OSwxNyBAQCBj
-b25maWcgQ0NfT1BUSU1JWkVfRk9SX1NJWkUKIAogZW5kY2hvaWNlCiAKK2NvbmZpZyBDQ19V
-U0VfVFlQRU9GX1VOUVVBTAorCWJvb2wgIlVzZSBjb21waWxlci1wcm92aWRlZCB1bnF1YWxp
-ZmllZCBjYXN0cyAoRVhQRVJJTUVOVEFMKSIKKwlkZXBlbmRzIG9uIEVYUEVSVAorCWhlbHAK
-KwkgIE5ld2VyIGNvbXBpbGVycyBoYXZlIHRoZSBhYmlsaXR5IHRvIGRvICJ1bnF1YWxpZmll
-ZCIgY2FzdHMgd2hpY2gKKwkgIHN0cmlwIG91dCB0eXBlIHF1YWxpZmllcnMgbGlrZSAnY29u
-c3QnLiBLZXJuZWwgYnVpbGRzIGNhbgorCSAgbGV2ZXJhZ2UgdGhlc2UgdG8gZG8gbW9yZSBz
-dHJpY3QgdHlwZSBjaGVja2luZyB3aXRoIG5vcm1hbAorCSAgY29tcGlsZXJzIGluc3RlYWQg
-b2YgcmVzb3J0aW5nIHRvIHVzaW5nIHNwYXJzZS4KKworCSAgSWYgdW5zdXJlLCBzYXkgTiBo
-ZXJlLgorCiBjb25maWcgSEFWRV9MRF9ERUFEX0NPREVfREFUQV9FTElNSU5BVElPTgogCWJv
-b2wKIAloZWxwCi0tIAoyLjM0LjEKCg==
+Thanks,
+Quang Minh.
 
---------------N9L4FQ8octb0E0gpQ8FX8oQZ--
 
