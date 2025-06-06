@@ -1,237 +1,140 @@
-Return-Path: <netdev+bounces-195353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F174CACFD4B
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:16:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54105ACFD66
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DDC43A82AE
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 07:16:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFC36189606A
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 07:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72075149C7B;
-	Fri,  6 Jun 2025 07:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E0D2040B6;
+	Fri,  6 Jun 2025 07:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="UXBatLuy"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PRp10qEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC5D3596A
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 07:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DF91EF0B9;
+	Fri,  6 Jun 2025 07:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749194207; cv=none; b=r7i3vEMYjWbBp0KQdwKHYPQ8XVm8askyvH+dfGt5+PrMxLpjPkharnKJa0ak+00gbTwMtUwAU5J4fLyuE/cNwnpQ6EaMh/mR96EHzOyOqB95yobCokPhYxTWPXgtHlS+AQO8TTMv1DfF4CLn94DZM3ajiphqyG7J5Y2M/X/kuBo=
+	t=1749194487; cv=none; b=jgwK7na+hGLurq/VCFJq96P85xHYVhSjyBuewQL9Ix8zL6gBW5rttjvC2PvrKqbJAdF5xbAX6vPjWfcxLj9+k03cxaRmcLJGZBLojTyaPVmZj0lbbOsmw7G8ONLoftFsT+NX/soWtiW122WJo+K+PdXBXmKHia56i1bpI7U/2Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749194207; c=relaxed/simple;
-	bh=cAJrkKXG09xOhd2Hzr+C5E4wIGGeJl26deIYWukEoLc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JQ2/iYoWVwTC/PFEmI1Nlpf36R+fDbNxFF0fB07aNP7C/+D+ZsrUs9lFyylcmeyh/YkKRnrm+FGcLXLkuDlQWbL1W282UTr1xQJam7ptb3vx8dXqzK2THKdUyeByxqDS7aOM7kzYw2hwj+O6VNQhWV6rsiZe9kJU2VSAI6Z5+lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=UXBatLuy; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-451e2f0d9c2so14415855e9.1
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 00:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmo-cybersecurity.com; s=google; t=1749194203; x=1749799003; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/XMi5+8eZH1IMFT7aIIxuzqoktYcarPLjPOsXqsdoW0=;
-        b=UXBatLuy9FR+dbtuBtJlT2cpTWlw9nh0lfnPueOdY586OZlNETOlN3JLHU/qXWm9ub
-         BVXcS0MC4rfWfWcn1TwcCmRjg7s/kKeuveT2vtTmkSI/cF/Wl7coxXv8yWHCzfz38sgm
-         MI+h+qU9XsktNbRu+iehVVvoy9/zk/ZclP2fweNa1GLVw9Do+vcwMJjj1vP+2MTrBgE5
-         SyXnwS/aiwOowu6zoxwzyFOYnNqjc9168UYW6l4pudCTZHEtq2bDgPWaYSoEPhb4jAvd
-         npNyQQEUw6JWfVIHijWVpldBwT47I/bghBMY++9WnJvCbNwfDhexzTEkvqhk3arOCbeE
-         EJfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749194203; x=1749799003;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/XMi5+8eZH1IMFT7aIIxuzqoktYcarPLjPOsXqsdoW0=;
-        b=CiGKfUp49vGZU/kHhxEVEwWxAVGhpi5LwYBF6dU593NB1NLFWZWF22iC+T1duweE8s
-         NXczXwMZzRNvP2YN5CKtVZhPqCFEeevOBb8iZCplibZRID0TfUjE2NtHW98fQFICF+D9
-         1PA7TPphYykR3gpH0wNFKwBF1+RRYlWexZlFVBSUDrPw9z3ppCbL0dN6C9n4O4u8asT6
-         mrXx82UfEAbnBbLspaVrsCokRyH4CqdSmzpujHBWTZ7NhJOf5/cJklKhg4VPJoluWj1b
-         u5NtzQzk8r5shrKVS2hDoiUgvqJkcvPrXPF/pIWKkPAIc0CGdL6hGAgtapAvjhzlXxtH
-         vXKg==
-X-Gm-Message-State: AOJu0Yxzy2fbBIatFBr5ieJZpXTp3cRSGTUB7QNk3cuikk4UsXli/KYF
-	O1vHHE01gX6Ys6BjXqoMk4wwnmnnVBPfWx6m+sl91i0a/RCk2YB8W4tOL9bZ7AQrTbNdgpk3B5J
-	WBVsFIEsCb1O63L3YOzY6GN1w4ZmP7pr8L/mURKszZg==
-X-Gm-Gg: ASbGncvIuFB1nJOjiNnsTb//EXS6y0t4ozzI+zuh1LAabVs1OHDA5m5nrEg6gwAMEAE
-	h354z3Na/P+K959St7IfNy8s7AxNvBrcYZRsp0vqoeliAaEZ6KFHT1i940njYNEYGKQcEIr7bk0
-	hAwXz8VWJ+H91yr2FDhPKBfG7jEYN4jKM/Nm0=
-X-Google-Smtp-Source: AGHT+IFbp+79x8nHQ+OULHJyBDfxZG/qTcxnaYx6r++2repCfOCP6My7PuJtJ4f7O4onCD/EyLM6Nt3of8iU/1n4iUE=
-X-Received: by 2002:a05:600c:8b8b:b0:451:df07:d8e0 with SMTP id
- 5b1f17b1804b1-452015832f0mr22700445e9.11.1749194202956; Fri, 06 Jun 2025
- 00:16:42 -0700 (PDT)
+	s=arc-20240116; t=1749194487; c=relaxed/simple;
+	bh=ChjZONmvwHIQgHEoxS2hbayUZ7YTKLK86GqYEJ9vb8w=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CdTWpvqTdfKXZ8OuUXuJuVSKFa6r0d5huON0HPTubrqhnOnli9kKS+PpCq6h9to2Ntsp66gqum+f8JnC1QValjKwclkaJAGVCGpiQ/bzgF9aC5G8ZJw70gzN25amj5aYyIawtqDh9m/kpcBJTjBUBsKbrMzKXFoHnVRX0QLbKvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PRp10qEB; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 555H0UpP024603;
+	Fri, 6 Jun 2025 00:20:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=78vuFN+FTuBzAdllm1AMLckzj
+	iwjwEP6iKxOkB7ETO8=; b=PRp10qEBEI9/KmMIIszcRTvtEgWZDg11o43L9G5Vs
+	3RK8/YkI7bwMDFjWy7w/IMjeaW9QIGGgeOZyOsdpPksvkq0hTRYzmzkeKwOkwhsk
+	4dBGQyf73+k1zamqCP5CaUMbW4YRuWiod+DVgvawFp3NCLeGEHdDPnVdFgp1eQh9
+	f5B9671WGYd2+8hs9DV2fAwMinyjJos5PmugXUHZsMznjpvdi+F3F0qUEwKMuxnI
+	5fCrQ0vCg8K+51Kp9t5ksfvI2iG1D3g3JbdoLknEp1FC+lhlWVkY5hIkPepq/0j7
+	nXkAd6svC3l0sBO16u30zhUBFz4LwNzhdMacWw+J0BUdA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 473f8s9fn4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Jun 2025 00:20:56 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 6 Jun 2025 00:20:55 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 6 Jun 2025 00:20:55 -0700
+Received: from 7f70c4b51185 (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 1DE233F7085;
+	Fri,  6 Jun 2025 00:20:51 -0700 (PDT)
+Date: Fri, 6 Jun 2025 07:20:50 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hannes
+ Frederic Sowa <hannes@stressinduktion.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3] macsec: MACsec SCI assignment for ES = 0
+Message-ID: <aEKW0nDwvkfMy-_c@7f70c4b51185>
+References: <20250604123407.2795263-1-carlos.fernandez@technica-engineering.de>
+ <20250605132110.3922404-1-carlos.fernandez@technica-engineering.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
- <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
- <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com> <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
-In-Reply-To: <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
-From: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>
-Date: Fri, 6 Jun 2025 16:16:31 +0900
-X-Gm-Features: AX0GCFt4wB4HZLPyKUDTkRdMREAP3Zt6ZcM3tUJZen_xiATXlJ5q5OVPx5uS9_Y
-Message-ID: <CAA3_GnqOnsOXHk-x4gKKe7MFmS0WQsXmMp6XoQc+fR3gmZVQEQ@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, 
-	=?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250605132110.3922404-1-carlos.fernandez@technica-engineering.de>
+X-Proofpoint-ORIG-GUID: lY8RMgbu4n9SVZRdOylOt15s4GEHAAwl
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA2MDA2NyBTYWx0ZWRfX4NVX3mV6ewBh jz3dzTPIN2pXMVgt/dQ13c2eSqvIc4lwfg7dmiZgcYdgivNzGZM3M7+nOGpL/ykCMSjS1ripwNR vbvWXRG7K+CIifNIu591iBSrY3gZFj+2PPHyL/9v7J881/Z0bj8j27iQvK9fuUrlWgn6aEryZaM
+ NPsdGD1YWamDFDG2+FGHNZx/3qSnrUB3uY9GWIgZIgO18cZp9MkdzNi0/AYgc9YdC4XmTZRygsZ KbRPSeAQPVlPWlKsoWD2B2UI9/C8wDYC4Rssi50r9DJK/u3g37nBslSMWpy2MF/9SB5I5ckPNjq krQQDoZq16FlK4Hu7ZE6sTQcybAcrzk501qPjY7wtWTlqJPG3oAM36Zk6k25hCBOSYAAH58yJPF
+ RnXIbUat5Ui3HfU2THnrRcKyewYKWjjDemfHTieeqgitkhy86Yauc035NGFO8iWFLLoAZR9w
+X-Authority-Analysis: v=2.4 cv=RKizH5i+ c=1 sm=1 tr=0 ts=684296d8 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=yWhXGdImo7ep3bz_Ny0A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: lY8RMgbu4n9SVZRdOylOt15s4GEHAAwl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-06_02,2025-06-05_01,2025-03-28_01
 
-2025=E5=B9=B45=E6=9C=8829=E6=97=A5(=E6=9C=A8) 0:10 Eric Dumazet <edumazet@g=
-oogle.com>:
+On 2025-06-05 at 13:21:04, Carlos Fernandez (carlos.fernandez@technica-engineering.de) wrote:
+> Hi Sundeep, 
+> 
+> In order to test this scenario, ES and SC flags must be 0 and 
+> port identifier should be different than 1.
+> 
+> In order to test it, I runned the following commands that configure
+> two network interfaces on qemu over different namespaces.
+> 
+> After applying this configuration, MACsec ping works in the patched version 
+> but fails with the original code.
+> 
+> I'll paste the script commands here. Hope it helps your testing.
+> 
+> PORT=11
+> SEND_SCI="off"
+> ETH1_MAC="52:54:00:12:34:57"
+> ETH0_MAC="52:54:00:12:34:56"
+> ENCRYPT="on"
+> 
+> ip netns add macsec1
+> ip netns add macsec0
+> ip link set eth0 netns macsec0
+> ip link set eth1 netns macsec1
+>   
+> ip netns exec macsec0 ip link add link eth0 macsec0 type macsec port $PORT send_sci $SEND_SCI end_station off encrypt $ENCRYPT
+> ip netns exec macsec0 ip macsec add macsec0 tx sa 0 pn 2 on key 01 12345678901234567890123456789012
+> ip netns exec macsec0 ip macsec add macsec0 rx port $PORT address $ETH1_MAC 
+> ip netns exec macsec0 ip macsec add macsec0 rx port $PORT address $ETH1_MAC sa 0 pn 2 on key 02 09876543210987654321098765432109
+> ip netns exec macsec0 ip link set dev macsec0 up
+> ip netns exec macsec0 ip addr add 10.10.12.1/24 dev macsec0
+> 
+> ip netns exec macsec1 ip link add link eth1 macsec1 type macsec port $PORT send_sci $SEND_SCI end_station off encrypt $ENCRYPT
+> ip netns exec macsec1 ip macsec add macsec1 tx sa 0 pn 2 on key 02 09876543210987654321098765432109
+> ip netns exec macsec1 ip macsec add macsec1 rx port $PORT address $ETH0_MAC 
+> ip netns exec macsec1 ip macsec add macsec1 rx port $PORT address $ETH0_MAC sa 0 pn 2 on key 01 12345678901234567890123456789012
+> ip netns exec macsec1 ip link set dev macsec1 up
+> ip netns exec macsec1 ip addr add 10.10.12.2/24 dev macsec1
+> 
+> ip netns exec macsec1 ping 10.10.12.1 #Ping works on patched version.
+> 
+> Thanks, 
+> Carlos
 
->
-> On Wed, May 28, 2025 at 7:36=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=A4=
-=AA <kota.toda@gmo-cybersecurity.com> wrote:
-> >
-> > Thank you for your review.
-> >
-> > 2025=E5=B9=B45=E6=9C=8826=E6=97=A5(=E6=9C=88) 17:23 Eric Dumazet <eduma=
-zet@google.com>:
-> > >
-> > > On Sun, May 25, 2025 at 10:08=E2=80=AFPM =E6=88=B8=E7=94=B0=E6=99=83=
-=E5=A4=AA <kota.toda@gmo-cybersecurity.com> wrote:
-> > > >
-> > > > In bond_setup_by_slave(), the slave=E2=80=99s header_ops are uncond=
-itionally
-> > > > copied into the bonding device. As a result, the bonding device may=
- invoke
-> > > > the slave-specific header operations on itself, causing
-> > > > netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpre=
-ted
-> > > > as the slave's private-data type.
-> > > >
-> > > > This type-confusion bug can lead to out-of-bounds writes into the s=
-kb,
-> > > > resulting in memory corruption.
-> > > >
-> > > > This patch adds two members to struct bonding, bond_header_ops and
-> > > > header_slave_dev, to avoid type-confusion while keeping track of th=
-e
-> > > > slave's header_ops.
-> > > >
-> > > > Fixes: 1284cd3a2b740 (bonding: two small fixes for IPoIB support)
-> > > > Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
-> > > > Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> > > > Co-Developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> > > > Reviewed-by: Paolo Abeni <pabeni@redhat.com>
-> > > > Reported-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
-> > > > ---
-> > > >  drivers/net/bonding/bond_main.c | 61
-> > > > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> > > >  include/net/bonding.h           |  5 +++++
-> > > >  2 files changed, 65 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/=
-bond_main.c
-> > > > index 8ea183da8d53..690f3e0971d0 100644
-> > > > --- a/drivers/net/bonding/bond_main.c
-> > > > +++ b/drivers/net/bonding/bond_main.c
-> > > > @@ -1619,14 +1619,65 @@ static void bond_compute_features(struct bo=
-nding *bond)
-> > > >      netdev_change_features(bond_dev);
-> > > >  }
-> > > >
-> > > > +static int bond_hard_header(struct sk_buff *skb, struct net_device=
- *dev,
-> > > > +        unsigned short type, const void *daddr,
-> > > > +        const void *saddr, unsigned int len)
-> > > > +{
-> > > > +    struct bonding *bond =3D netdev_priv(dev);
-> > > > +    struct net_device *slave_dev;
-> > > > +
-> > > > +    slave_dev =3D bond->header_slave_dev;
-> > > > +
-> > > > +    return dev_hard_header(skb, slave_dev, type, daddr, saddr, len=
-);
-> > > > +}
-> > > > +
-> > > > +static void bond_header_cache_update(struct hh_cache *hh, const
-> > > > struct net_device *dev,
-> > > > +        const unsigned char *haddr)
-> > > > +{
-> > > > +    const struct bonding *bond =3D netdev_priv(dev);
-> > > > +    struct net_device *slave_dev;
-> > > > +
-> > > > +    slave_dev =3D bond->header_slave_dev;
-> > >
-> > > I do not see any barrier ?
-> > >
-> > > > +
-> > > > +    if (!slave_dev->header_ops || !slave_dev->header_ops->cache_up=
-date)
-> > > > +        return;
-> > > > +
-> > > > +    slave_dev->header_ops->cache_update(hh, slave_dev, haddr);
-> > > > +}
-> > > > +
-> > > >  static void bond_setup_by_slave(struct net_device *bond_dev,
-> > > >                  struct net_device *slave_dev)
-> > > >  {
-> > > > +    struct bonding *bond =3D netdev_priv(bond_dev);
-> > > >      bool was_up =3D !!(bond_dev->flags & IFF_UP);
-> > > >
-> > > >      dev_close(bond_dev);
-> > > >
-> > > > -    bond_dev->header_ops        =3D slave_dev->header_ops;
-> > > > +    /* Some functions are given dev as an argument
-> > > > +     * while others not. When dev is not given, we cannot
-> > > > +     * find out what is the slave device through struct bonding
-> > > > +     * (the private data of bond_dev). Therefore, we need a raw
-> > > > +     * header_ops variable instead of its pointer to const header_=
-ops
-> > > > +     * and assign slave's functions directly.
-> > > > +     * For the other case, we set the wrapper functions that pass
-> > > > +     * slave_dev to the wrapped functions.
-> > > > +     */
-> > > > +    bond->bond_header_ops.create =3D bond_hard_header;
-> > > > +    bond->bond_header_ops.cache_update =3D bond_header_cache_updat=
-e;
-> > > > +    if (slave_dev->header_ops) {
-> > > > +        bond->bond_header_ops.parse =3D slave_dev->header_ops->par=
-se;
-> > > > +        bond->bond_header_ops.cache =3D slave_dev->header_ops->cac=
-he;
-> > > > +        bond->bond_header_ops.validate =3D slave_dev->header_ops->=
-validate;
-> > > > +        bond->bond_header_ops.parse_protocol =3D
-> > > > slave_dev->header_ops->parse_protocol;
-> > >
-> > > All these updates probably need WRITE_ONCE(), and corresponding
-> > > READ_ONCE() on reader sides, at a very minimum ...
-> > >
-> > > RCU would even be better later.
-> > >
-> > I believe that locking is not necessary in this patch. The update of
-> > `header_ops` only happens when a slave is newly enslaved to a bond.
-> > Under such circumstances, members of `header_ops` are not called in
-> > parallel with updating. Therefore, there is no possibility of race
-> > conditions occurring.
->
-> bond_dev can certainly be live, and packets can flow.
->
-> I have seen enough syzbot reports hinting at this precise issue.
+Clear for me now. Thanks for the steps.
 
-Hi Eric, Thank you for reviewing the patch.
-
-At the beginning of `bond_setup_by_slave`, `dev_close(bond_dev)` is called,
-meaning bond_dev is down and no packets can flow during the update of
-`bond_header_ops`.
-
-The syzbot report (you mentioned in the conversation in security@) indicati=
-ng
-`dev->header_ops` becoming NULL should be resolved by this patch.
-I couldn't find any other related syzbot reports.
+Sundeep
 
