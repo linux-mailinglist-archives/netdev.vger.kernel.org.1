@@ -1,228 +1,160 @@
-Return-Path: <netdev+bounces-195457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5D2AD044A
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 16:55:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C30EEAD044C
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 16:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB1D17AB379
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 14:54:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1233C3AFD2C
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 14:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A241A76BC;
-	Fri,  6 Jun 2025 14:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S0y/zdVS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6525D1A76BC;
+	Fri,  6 Jun 2025 14:56:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2980F17B50A;
-	Fri,  6 Jun 2025 14:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CBD14AD2B
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 14:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749221745; cv=none; b=k4JrfnuDkrIu0WbKVJKUB9LlW8FVvbR5+rhboc1jRtQ0mLCbDqhazomgodoyBREzvK7/VB5mz/rMzMSXd0qf5/wzkseLWtFBimjGZHDgxDuyOzpfqzPDWMnV3lrjyAHGX4/lomJVNTjnzcxSaaj6ibiIvhSJyN7YKI0tQgvX1ps=
+	t=1749221794; cv=none; b=u83fdTSdRkzmQpeA8McZre8i9ptc0wJUmcj3c5zhOB4ENV9Yi7pqlHnaiQIkDfhFyLZeNsivCiyy00zj9kCRnd1QHJzayS522Ni3i0zmWv4Iq4L2dVz8eUWpV69zdI4CVrLDyxT0MEHBtzzJEaAv8/jDzkSZlUXj0Xbh1IqlYhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749221745; c=relaxed/simple;
-	bh=L9/yg7FYVpcvI0YfTkdkZgBobhQMILGK8egVK8yFG2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SDlYwq+KtvPYjv64x5T8cK2uiV0FPZUoCwhdc5WlSrVwtX9uW5aYEYARIka6BNeQJZDtl4dV5vq2Bk7FKhh7MnSGu+mDZ0u6QlKS0+tyEgbRGw9kau7ww5ja6amdzzwqb5MVLTxOzEp3H+Y2oM479RiiIwqqdvJ2w6HNrE3Sid4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S0y/zdVS; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-551efd86048so2345950e87.3;
-        Fri, 06 Jun 2025 07:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749221740; x=1749826540; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9vEqxDPn0ZUq7X1FTJtTDzBWFl7WShO2WerhdN2+vTs=;
-        b=S0y/zdVSsX+BIuiw04KolyZlTKAsgnxYFkl35jzQ5QrVOO3bfTWvGyeIR0MVmQZylK
-         oFnWx+fNUVZEhk+O7PKWE7cGxqR0HgHXVvBM/dnBIyltDQg/WVJLc/JCxkHwH2iRgpCs
-         kP0V4oxn+xZvzPK2rixvgctkF4n4HHONK3e/r3JYo4a7KV4u4f7ADT2tkhDtbuWxLbTE
-         /HNqZ7eJ8vVXaD+1h+5ftCbOe0dt4TQme14TyXOEiQQHYV9gXpOroMvQs68G3zYLQy23
-         +e8NQylRgQm9AwUMaYKLQcpENx7QQ0506Qts2SX3iWeV+MGdfDZJKbaU8vIh+VqYR75U
-         aNHQ==
+	s=arc-20240116; t=1749221794; c=relaxed/simple;
+	bh=Un6/u1lqCJMKeoiAiYXzAp6NLdokv78xP3NcfhlOiFM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tfjEegry8jZX25c+gYGK1QwT8AbK0LksDTO16jg4BEVMD52wYclXm28AZjrFFbmZqs8ZZ3pNQSJtdV24r4FFqJfI4UftQO65GVu8AJ6eGifLOrIX3Su+KTOpRMD3LMLz2S2AuhkglUMQObDjLbLHlflftwUYL0eEVUqb8kKHBCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddc147611fso44508555ab.3
+        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 07:56:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749221740; x=1749826540;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9vEqxDPn0ZUq7X1FTJtTDzBWFl7WShO2WerhdN2+vTs=;
-        b=kkn1ZeYNjuTplWzEiUvXaUbNYkRyX3/hI1RVVITprm78nh50QA2mjzX/SiNpBbahqQ
-         okCpM51ZOnOJkoIYhJcp/v7nXM4yLlxg+ciTIxqfHOMKSGldLQBsJtGbYV/MuO4XzaL7
-         mNYF/GurFXf5C/puIKDZPESuaobYAX+Pn+rwfKZPxwKsOZp9HZvaBICI/g6lcpfMh7xE
-         dFzF95gUHxjFXeJrPsdz1Hcv+CAMLUhQrC2r5nu0zStSn6/6HNVHsJgAOq+6Nfc60l9K
-         zfDe+segjFVcjxghfKkNUiMZGfTyycbJZ+6luifeLqF+6eQPJjT+xPGwrN67xgsD2YFx
-         Qq/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVtMviv861IjmvtbkcOXZNtt6n/W8keTs27BrSPIQEunoYnUYAvrGkXwdvTWgVCQIG8WBRytPOOI6YotJU=@vger.kernel.org, AJvYcCXd5LBw0kQ4u2hmhaqKFClJ2mBe7vMTMj/XsFk7b0jHbxRdO5H3hNizVlcUnDECg2G+fpcnfMK5@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/CdToSSWgL1iHoTe43zDYoGL+a0yoIVmy3INaeVHmPumLrHec
-	/xiSxV86RGJWyWd+hFIGDHimtvtUD3RgNXnTw/RR3ctD+hXxRufIHbpuy8XDxyNlsZfaxWtBBMp
-	QcHVmpUzq489zpoo3RXOKedy5nizebRQ=
-X-Gm-Gg: ASbGncseSBvfc8cDDy52AqcjTP7fwdhr8wCjour/qtI//8yLeBi1R0AVG2bQT0EVx3w
-	XKDFfqm47RaSp1DP6Rnfpo+QMoyA88voT9lAHV2imfZCzXEMtNJlU/xHHRmjagtbCpa0VJu5lr5
-	N7SaNzh+RRTFDq0U7t+ue5C6cfR37iuFt4Nstems0iGmDviWwmuKzXcWyM3bS3B+Ehko7S4WiiA
-	dPvNA==
-X-Google-Smtp-Source: AGHT+IFZWOEBNtk6rAy+hlSFXTHbia35W3Eb5q7wIpwrt+5TKHTVOh1XTS2ghbuZ6plcpgQrnD1VoNRTQQ+B8Al5/mQ=
-X-Received: by 2002:a05:651c:1545:b0:32a:6c39:8938 with SMTP id
- 38308e7fff4ca-32adfc821acmr9118621fa.13.1749221740202; Fri, 06 Jun 2025
- 07:55:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749221792; x=1749826592;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YF+eXovpI+BPFHViBf5OAfiZKlMj7V/t4795WnL00rU=;
+        b=U4kBI6PCNs94JKfyk4HjNBQoiHWY14XVJYauS5wGgjygwWM6keQUWshpsD40ucEiUQ
+         JvDVTVJ60Y+MDY1MUc9HBzazZLZnU3f/nEA8WC8gmP9pVJUVZWEXZFZ+0eWmhNg4OvfV
+         1EZfH3sGfYJq1q8lKTBYGziGmnCNivD6ZQvYZwmBL/B67QiYHRXoee1xrm2IJ+BDSc9D
+         /G+akuvkvuVr8Y7C5JkePQRdWVha95n3i3dpCC0mUDWCQnJB5S84eHWBym6x3Mz9NLNC
+         4ruRpsgJE+UBptnKyyghl2mEXUa7J2g3l7Fi9MUIGawe3ZWnR9gojG9JQlzTFcmhG62a
+         HrdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXS4sATYfwNrSSCRbWHdb9FkeVrn4qgyG/Y7yXuzxQs7xFsM/lmlyT1CSdiIIqJRmfjO1o+b5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb5tS3vICcC/yD34iKVNtI6ZZad2G12dNZSo0Ufz7Punsf0+Pb
+	2ASDg62PITlmpHmkGZpagAr2iFmNXXj2OqOT3yTRI52lLqZ20nQlhNfEBy83q+uM/GGgWQVH7az
+	MmCvimqo2sXTHB09ekw8aLepdtIahd0dU6iaF2njYjlcEUhF8kPuINlUPFgQ=
+X-Google-Smtp-Source: AGHT+IFoFrrAmYlUpTD7FdSKQo72bN7Yrvawlqt2K4lsdzd6TpbdcCvkEx3s0/p4fEZWZ1kM1Nfeko7FkjTGgW4lQtakoFYCEXF7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250602135932.464194-1-pranav.tyagi03@gmail.com>
- <053507e4-14dc-48db-9464-f73f98c16b46@lunn.ch> <202506021057.3AB03F705@keescook>
- <25d96fc0-c54b-4f24-a62b-cf68bf6da1a9@lunn.ch>
-In-Reply-To: <25d96fc0-c54b-4f24-a62b-cf68bf6da1a9@lunn.ch>
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Date: Fri, 6 Jun 2025 20:25:27 +0530
-X-Gm-Features: AX0GCFvWsxNzpeHQ-45krsT9OQBs0Twpqds55CAANGDSlgC7gQxq8HsNVzgkPKQ
-Message-ID: <CAH4c4jJRkeiCaRji9s1dXxWL538X=vXRyKgwcuAOLPNd-jv4VQ@mail.gmail.com>
-Subject: Re: [PATCH] net: randomize layout of struct net_device
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kees Cook <kees@kernel.org>, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev
+X-Received: by 2002:a05:6e02:4416:10b0:3dd:d348:715a with SMTP id
+ e9e14a558f8ab-3ddd3487186mr12124125ab.8.1749221791701; Fri, 06 Jun 2025
+ 07:56:31 -0700 (PDT)
+Date: Fri, 06 Jun 2025 07:56:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6843019f.a00a0220.29ac89.0044.GAE@google.com>
+Subject: [syzbot] [net?] WARNING: refcount bug in gro_cleanup
+From: syzbot <syzbot+9de2587cce48f5642f16@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 3, 2025 at 12:36=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Mon, Jun 02, 2025 at 11:03:18AM -0700, Kees Cook wrote:
-> > On Mon, Jun 02, 2025 at 04:46:14PM +0200, Andrew Lunn wrote:
-> > > On Mon, Jun 02, 2025 at 07:29:32PM +0530, Pranav Tyagi wrote:
-> > > > Add __randomize_layout to struct net_device to support structure la=
-yout
-> > > > randomization if CONFIG_RANDSTRUCT is enabled else the macro expand=
-s to
-> > > > do nothing. This enhances kernel protection by making it harder to
-> > > > predict the memory layout of this structure.
-> > > >
-> > > > Link: https://github.com/KSPP/linux/issues/188
-> >
-> > I would note that the TODO item in this Issue is "evaluate struct
-> > net_device".
-> >
-> > > A dumb question i hope.
-> > >
-> > > As you can see from this comment, some time and effort has been put
-> > > into the order of members in this structure so that those which are
-> > > accessed on the TX fast path are in the same cache line, and those on
-> > > the RX fast path are in the same cache line, and RX and TX fast paths
-> > > are in different cache lines, etc.
-> >
-> > This is pretty well exactly one of the right questions to ask, and
-> > should be detailed in the commit message. Mainly: a) how do we know it
-> > will not break anything? b) why is net_device a struct that is likely
-> > to be targeted by an attacker?
->
-> For a), i doubt anything will break. The fact the structure has been
-> optimised for performance implies that members have been moved around,
-> and there are no comments in the structure saying don't move this,
-> otherwise bad things will happen.
->
-> There is a:
->
->         u8                      priv[] ____cacheline_aligned
->                                        __counted_by(priv_len);
->
-> at the end, but i assume RANDSTRUCT knows about them and won't move it.
->
-> As for b), i've no idea, not my area. There are a number of pointers
-> to structures contains ops. Maybe if you can take over those pointers,
-> point to something you can control, you can take control of the
-> Program Counter?
->
-> > > Does CONFIG_RANDSTRUCT understand this? It is safe to move members
-> > > around within a cache line. And it is safe to move whole cache lines
-> > > around. But it would be bad if the randomisation moved members betwee=
-n
-> > > cache lines, mixing up RX and TX fast path members, or spreading fast
-> > > path members over more cache lines, etc.
-> >
-> > No, it'll move stuff all around. It's very much a security vs
-> > performance trade-off, but the systems being built with it are happy to
-> > take the hit.
->
-> It would be interesting to look back at the work optimising this
-> stricture to get a ball park figure how big a hit this is?
->
-> I also think some benchmark numbers would be interesting. I would
-> consider two different systems:
->
-> 1) A small ARM/MIPS/RISC-V with 1G interfaces. The low amount of L1
-> cache on these systems mean that cache misses are important. So
-> spreading out the fast path members will be bad.
->
-> 2) Desktop/Server class hardware, lots of cores, lots of cache, 10G,
-> 40G or 100G interfaces. For these systems, i expect cache line
-> bouncing is more of an issue, so Rx and Tx fast path members want to
-> be kept in separate cache lines.
->
-> > The basic details are in security/Kconfig.hardening in the "choice" fol=
-lowing
-> > the CC_HAS_RANDSTRUCT entry.
->
-> So i see two settings here. It looks like RANDSTRUCT_PERFORMANCE
-> should have minimal performance impact, so maybe this should be
-> mentioned in the commit message, and the benchmarks performed both on
-> full randomisation and with the performance setting.
->
-> I would also suggest a comment is added to the top of
-> Documentation/networking/net_cachelines/net_device.rst pointing out
-> this assumed RANDSTRUCT is disabled, and the existing comment in
-> struct net_device is also updated.
->
->         Andrew
+Hello,
 
-Resending to the list=E2=80=94my previous reply was accidentally sent off-l=
-ist.
+syzbot found the following issue on:
 
-Apologies for the delayed response, and thank you
-all for the detailed feedback.
+HEAD commit:    d0c22de9995b Merge tag 'input-for-v6.15-rc7' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1745b5f4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9fd1c9848687d742
+dashboard link: https://syzkaller.appspot.com/bug?extid=9de2587cce48f5642f16
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
 
-Regarding the concern about breaking functionality,
-I did compile and boot the kernel successfully with
-this change, and everything appeared to work as
-expected during basic testing. However, I agree
-that this is not a substitute for thorough
-benchmarking.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-You're absolutely right that applying
-__randomize_layout to net_device will shuffle
-structure fields and likely incur a performance
-penalty. As mentioned, this is a trade-off that
-targets hardening over performance. It's worth
-noting that CONFIG_RANDSTRUCT has two options:
-RANDSTRUCT_FULL and RANDSTRUCT_PERFORMANCE, with
-the latter aiming to minimize the impact by only
-shuffling less performance-critical members.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b862906e9f4b/disk-d0c22de9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c0d716f15db2/vmlinux-d0c22de9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7ffe8e4af4ec/bzImage-d0c22de9.xz
 
-I=E2=80=99d appreciate guidance on which specific
-benchmarking tests would be most appropriate to
-quantify the performance impact. Based on your
-suggestions, I plan to run benchmarks on a small
-SoC (ARM/MIPS/RISC-V) with 1G NICs. However, I
-currently don=E2=80=99t have access to high-end server
-hardware with 10G/40G+ NICs, so I=E2=80=99ll start with the
-systems I have and clearly note the limitations in
-the revised commit message.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9de2587cce48f5642f16@syzkaller.appspotmail.com
 
-I=E2=80=99ll also update the commit message to reflect the
-security vs performance trade-offs, mention
-RANDSTRUCT_PERFORMANCE, and add a reference to
-net_cachelines/net_device.rst to document the
-assumption of structure layout.
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 1 PID: 8170 at lib/refcount.c:28 refcount_warn_saturate+0x11a/0x1d0 lib/refcount.c:28
+Modules linked in:
+CPU: 1 UID: 0 PID: 8170 Comm: syz.4.605 Not tainted 6.15.0-rc7-syzkaller-00152-gd0c22de9995b #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:refcount_warn_saturate+0x11a/0x1d0 lib/refcount.c:28
+Code: 80 aa c1 8b e8 e7 52 cb fc 90 0f 0b 90 90 eb d7 e8 4b f6 06 fd c6 05 67 3c b0 0a 01 90 48 c7 c7 e0 aa c1 8b e8 c7 52 cb fc 90 <0f> 0b 90 90 eb b7 e8 2b f6 06 fd c6 05 44 3c b0 0a 01 90 48 c7 c7
+RSP: 0018:ffffc9000419f628 EFLAGS: 00010246
+RAX: b3f3c577eef85a00 RBX: 0000000000000003 RCX: 0000000000080000
+RDX: ffffc9001071e000 RSI: 000000000007ffff RDI: 0000000000080000
+RBP: 0000000000000000 R08: ffffffff8f7f3577 R09: 1ffffffff1efe6ae
+R10: dffffc0000000000 R11: fffffbfff1efe6af R12: dffffc0000000000
+R13: 4888ffffe8ffffc8 R14: ffffe8ffffc8496e R15: ffffe8ffffc8488a
+FS:  00007f92701cb6c0(0000) GS:ffff8881261c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0f5af71440 CR3: 00000000262e0000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ kfree_skb_reason include/linux/skbuff.h:1279 [inline]
+ kfree_skb include/linux/skbuff.h:1288 [inline]
+ gro_cleanup+0x300/0x640 net/core/gro.c:815
+ __netif_napi_del_locked+0x2e0/0x3c0 net/core/dev.c:7301
+ __netif_napi_del include/linux/netdevice.h:2876 [inline]
+ gro_cells_destroy+0x16a/0x430 net/core/gro_cells.c:117
+ ip_tunnel_dev_free+0x19/0x30 net/ipv4/ip_tunnel.c:1102
+ netdev_run_todo+0xcd7/0xea0 net/core/dev.c:11300
+ setup_net+0x5db/0x830 net/core/net_namespace.c:392
+ copy_net_ns+0x32e/0x590 net/core/net_namespace.c:518
+ create_new_namespaces+0x3d3/0x700 kernel/nsproxy.c:110
+ copy_namespaces+0x438/0x4b0 kernel/nsproxy.c:179
+ copy_process+0x1700/0x3b80 kernel/fork.c:2433
+ kernel_clone+0x21e/0x870 kernel/fork.c:2845
+ __do_sys_clone kernel/fork.c:2988 [inline]
+ __se_sys_clone kernel/fork.c:2972 [inline]
+ __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2972
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f926f38e969
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f92701cafe8 EFLAGS: 00000206 ORIG_RAX: 0000000000000038
+RAX: ffffffffffffffda RBX: 00007f926f5b6160 RCX: 00007f926f38e969
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000042000000
+RBP: 00007f926f410ab1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
+R13: 0000000000000001 R14: 00007f926f5b6160 R15: 00007fff8df30f78
+ </TASK>
 
-Thanks again for the thoughtful review=E2=80=94I=E2=80=99ll revise
-the patch accordingly.
 
-Regards
-Pranav Tyagi
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
