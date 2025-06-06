@@ -1,103 +1,125 @@
-Return-Path: <netdev+bounces-195355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434F6ACFD6F
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D597CACFDB3
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6457188A526
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 07:24:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 650F2189A5D5
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 07:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDB82040B6;
-	Fri,  6 Jun 2025 07:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE6428466C;
+	Fri,  6 Jun 2025 07:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="FPhu2FQk"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Wx8myK16"
 X-Original-To: netdev@vger.kernel.org
-Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward206b.mail.yandex.net (forward206b.mail.yandex.net [178.154.239.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E1D149C7B
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 07:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC8324EABC
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 07:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749194671; cv=none; b=eghlghkXxugUsostHVKDW7eQ4OBLRG/vs82nWIU6N01/JWNKFqtzUH+zL5cwhCj8a3xzbMUnSdWdDNXR2G84WJESr8ljF4f8uVl8/T0j0O52cjwWyobyUo5woaieTnA7Bzv+xDFE+cZ79dX38o535R7tRg21e39e0RdlgXlE7kE=
+	t=1749196068; cv=none; b=tANAwpc7CyH7YA0s52uV1nDOcNTAMU5YVcBcfSaM1rPe0sW/Uyp4BJw41NQy2M+CXr2sR+9Hm8PUfGmLwfFI42JTnnD7sh7euyPZ2BOm6MB/9uqfoy0kZ66oosU8iAemafyrAVpquf3deUIDTJ6zvSJ8mlKIIdkz/z+kGXt0CpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749194671; c=relaxed/simple;
-	bh=ccafHMnygaW6vo5XsqPyrNWgWL3f0MGNQum3uzNrE5g=;
-	h=In-Reply-To:References:To:Cc:Mime-Version:From:Subject:Date:
-	 Message-Id:Content-Type; b=e+5buqppCjDkgi2hYxxy7ionwZ5eFN2J++4cRFz9IkGiXd26rksS202xKXXhxzHi/J8pk2jl2zliS6rrUwcJY5PfEYOUYxc37lKtHgzsETyPO3d4Rp+cXMBbY1OdYS2OzB3ETaBs6rVRIj1zql1mmjwdM0YREasJ/+kUnZraIZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=FPhu2FQk; arc=none smtp.client-ip=118.26.132.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1749194661; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=G7QbOBFbxh5v/2LEN4d4Q6UgVXO16QJCvW2JiPdhBwI=;
- b=FPhu2FQkpQNZDrv7kbdW6TRGHmOt3RLPZxN+234wP6kFoNwoEAY8PCsq4paYl0Syk8GAet
- 7ViwiKuFHXCwB2vBDmhy7qpOkeVbF5Ys7OLPs86O5VXmwg5LTFIllgiLQBuIpv2P3cYeQJ
- ypBZwfqC/iDFUugO4V8rc+0Oy41eElxLTpWg13rpKSJoOvupu+lXT5DJhxyx/6d1V4oIiM
- ED6ojxxnyoCNByCYIXH9WlWmsJ8hDvY2VbePWCKhKoCe9VLhMCmZQEpcF7N6koiS7eI8Dj
- gXHddjw2oJshiw8AhbJNB5gkOlrV1t3H5mZklLSxGjwfihnEYYPdcot357bi4Q==
-In-Reply-To: <20250605065615.46e015eb@kernel.org>
-References: <20250423103923.2513425-1-tianx@yunsilicon.com> <20250423104000.2513425-15-tianx@yunsilicon.com> <20250424184840.064657da@kernel.org> <3fd3b7fc-b698-4cf3-9d43-4751bfb40646@yunsilicon.com> <20250605062855.019d4d2d@kernel.org> <CAMuHMdVMrFzeFUu+H0MvMmf82TDc=4qfM2kjcoUCXiOFLmutDA@mail.gmail.com> <20250605065615.46e015eb@kernel.org>
-To: "Jakub Kicinski" <kuba@kernel.org>, 
-	"Geert Uytterhoeven" <geert@linux-m68k.org>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
-	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
-	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
-	<geert+renesas@glider.be>
+	s=arc-20240116; t=1749196068; c=relaxed/simple;
+	bh=OvapX4HQacQWD92oMRx3oG8iPYYITLHqOc2Uea8osUA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AAFxDi/n+MziwJhduFo/dXlfC6/oyn2TO3XNOpPP0GZxHedHt5OIG13Rlx67mB6BEA9i0N0cAa912fOsjXbOaOV2YtvLZOSbnMxJX2q4hju+hT5ut4mzv1McM+1tYOWTpIqTWA6171xa+3kORz809n/fVE0EdafMxKx/UtAWD/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Wx8myK16; arc=none smtp.client-ip=178.154.239.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d100])
+	by forward206b.mail.yandex.net (Yandex) with ESMTPS id 8C4CE6449C
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 10:41:16 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:c122:0:640:3648:0])
+	by forward100b.mail.yandex.net (Yandex) with ESMTPS id 8669560AE7;
+	Fri,  6 Jun 2025 10:41:08 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 7fYNPgtLhiE0-ersqVpof;
+	Fri, 06 Jun 2025 10:41:07 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1749195668; bh=0wEmroOvWMBIWLDeBD0L00+hat/6YvzauWs7GjtLPnQ=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=Wx8myK16xE2Nb/W62Gwp5RQv2Ja33SbxH4+oqkskHezO24lv4Woph5Xc1XTijP3Sq
+	 5wg0XAYRuKtQxvFRTBhu23ttr55yF2//dmd3zYZx6+NJ0F0ygCJwIxcS39F4u+XB6/
+	 dI9Y3UNP7tD+2GniW7woa22Ns2w9gHZYB6PIH2r0=
+Authentication-Results: mail-nwsmtp-smtp-production-main-76.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] net: core: avoid extra pskb_expand_head() when adjusting headroom
+Date: Fri,  6 Jun 2025 10:41:04 +0300
+Message-ID: <20250606074105.1382899-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-X-Lms-Return-Path: <lba+2684297a3+965e35+vger.kernel.org+tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Fri, 06 Jun 2025 15:24:17 +0800
-From: "Xin Tian" <tianx@yunsilicon.com>
-Subject: Re: [PATCH net-next v11 14/14] xsc: add ndo_get_stats64
-Date: Fri, 6 Jun 2025 15:24:17 +0800
-Message-Id: <abe7daba-e636-4ab1-a79e-f451db5d56c4@yunsilicon.com>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset=UTF-8
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On 2025/6/5 21:56, Jakub Kicinski wrote:
-> On Thu, 5 Jun 2025 15:39:54 +0200 Geert Uytterhoeven wrote:
->> On Thu, 5 Jun 2025 at 15:29, Jakub Kicinski <kuba@kernel.org> wrote:
->>> On Thu, 5 Jun 2025 15:25:21 +0800 Xin Tian wrote:
->>>> Regarding u64_stats_sync.h helpers:
->>>> Since our driver exclusively runs on 64-bit platforms (ARM64 or x86_64)
->>>> where u64 accesses are atomic, is it still necessary to use these helpers?
->>> alright.
->> [PATCH 1/14] indeed has:
->>
->>      depends on PCI
->>      depends on ARM64 || X86_64 || COMPILE_TEST
->>
->> However, if this device is available on a PCIe expansion card, it
->> could be plugged into any system with a PCIe expansion slot?
-> I've been trying to fight this fight but people keep pushing back :(
-> Barely any new PCIe driver comes up without depending on X86_64 and/or
-> ARM64. Maybe we should write down in the docs that it's okay to depend
-> on 64b but not okay to depend on specific arches?
->
-> Requiring 32b arch support for >= 100Gbps NICs feels a bit hard to
-> justify to me at this stage, but I'm happy to oblige if there are
-> reasons.
+In 'skb_realloc_headroom()' and 'skb_expand_head()', using 'skb_clone()'
+with following 'pskb_expand_head()' looks suboptimal, and it's expected to
+be a bit faster to do 'skb_copy_expand()' with desired headroom instead.
 
-All right, I'll moidfy the depend to:
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ net/core/skbuff.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-     depends on PCI
-     depends on 64BIT || COMPILE_TEST
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 85fc82f72d26..3ed540cba5a3 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -2316,14 +2316,10 @@ struct sk_buff *skb_realloc_headroom(struct sk_buff *skb, unsigned int headroom)
+ 
+ 	if (delta <= 0)
+ 		skb2 = pskb_copy(skb, GFP_ATOMIC);
+-	else {
+-		skb2 = skb_clone(skb, GFP_ATOMIC);
+-		if (skb2 && pskb_expand_head(skb2, SKB_DATA_ALIGN(delta), 0,
+-					     GFP_ATOMIC)) {
+-			kfree_skb(skb2);
+-			skb2 = NULL;
+-		}
+-	}
++	else
++		skb2 = skb_copy_expand(skb, (skb_headroom(skb) +
++					     SKB_DATA_ALIGN(delta)),
++				       0, GFP_ATOMIC);
+ 	return skb2;
+ }
+ EXPORT_SYMBOL(skb_realloc_headroom);
+@@ -2400,8 +2396,10 @@ struct sk_buff *skb_expand_head(struct sk_buff *skb, unsigned int headroom)
+ 	delta = SKB_DATA_ALIGN(delta);
+ 	/* pskb_expand_head() might crash, if skb is shared. */
+ 	if (skb_shared(skb) || !is_skb_wmem(skb)) {
+-		struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
++		struct sk_buff *nskb;
+ 
++		nskb = skb_copy_expand(skb, skb_headroom(skb) + delta,
++				       skb_tailroom(skb), GFP_ATOMIC);
+ 		if (unlikely(!nskb))
+ 			goto fail;
+ 
+@@ -2409,8 +2407,7 @@ struct sk_buff *skb_expand_head(struct sk_buff *skb, unsigned int headroom)
+ 			skb_set_owner_w(nskb, sk);
+ 		consume_skb(skb);
+ 		skb = nskb;
+-	}
+-	if (pskb_expand_head(skb, delta, 0, GFP_ATOMIC))
++	} else if (pskb_expand_head(skb, delta, 0, GFP_ATOMIC))
+ 		goto fail;
+ 
+ 	if (sk && is_skb_wmem(skb)) {
+-- 
+2.49.0
 
-Thanks,
-Xin
 
