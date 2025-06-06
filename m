@@ -1,128 +1,164 @@
-Return-Path: <netdev+bounces-195359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ABCACFDE2
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:02:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E415ACFE00
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:11:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ADE81891D16
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:02:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCEF17A33F9
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABFB201013;
-	Fri,  6 Jun 2025 08:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6393C283FE0;
+	Fri,  6 Jun 2025 08:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="gXkqoXsS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwSX3p5g"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward202d.mail.yandex.net (forward202d.mail.yandex.net [178.154.239.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9171E13B2A4
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 08:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972AD24EF6B;
+	Fri,  6 Jun 2025 08:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749196954; cv=none; b=JpFgN94H3/Uw0YJEPohG5gXsi6/aHRdy1F+6vi48gLxbXPJAsOnVpCQREZWEI0MpSIw56K4V5nBR0rXYKTnRlkuK8ue8Vla79OsKb17C80i9E4oyZcW8H/9WIKz8NE1vv/7ZSB7KIKpXfIun5e4sajPOPjpb3endINBJSCe62Ao=
+	t=1749197486; cv=none; b=eH7KScQaGFeDKFvgmKBxH5PddO3zWXv9NtgOo1wziamq5k3qvnNPLvNYLJElVFl3j97WD8SO+HSFFFrRzD91b4a08PEcLd9eHjISoPL8KLFZT33GAWkPAk2b0MuUTS6Nk/esyK4Ytu/odDSkDngAcKxJLNBa7ReFwIznhdLsF6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749196954; c=relaxed/simple;
-	bh=1gX2KIgXByEMwfkvgREMkqeEVeGpFpVraXwpk5/BFHo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VtHXfm4pOLrLCIXlZSWh1cIqD2ydTZ7aPgpuT47gOEBn7cv5drT+sUf2uHIsj+AL7dXevG5qT9jeKr1zOSyX8srxlQbcZBpMP4cJjuW18gPuy7Olb3uWXoGjl43tzwh9QJAqf+mT+v8iNmcvzPJA6qLeG/fyhwRp66cc/oWBbwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=gXkqoXsS; arc=none smtp.client-ip=178.154.239.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward103d.mail.yandex.net (forward103d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d103])
-	by forward202d.mail.yandex.net (Yandex) with ESMTPS id 0C22B64244
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 10:55:51 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-57.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-57.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:73a9:0:640:b740:0])
-	by forward103d.mail.yandex.net (Yandex) with ESMTPS id BA2CE60B8E;
-	Fri,  6 Jun 2025 10:55:42 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-57.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ftY6Ws0LkSw0-MQk9tEXk;
-	Fri, 06 Jun 2025 10:55:42 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1749196542; bh=6fbJmaNapAHHCEMmmtla5RZHUnzHwpkWoAyGJLFjBDE=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=gXkqoXsS7QIOvK3cz3v7YULFWUkuiy1U49FupRe8wpDVHJKhjpGv4CCR6Woi5dx0k
-	 N/AgYWhopg57e3sbmPE2cWculCiFfBS8xJsuy1Q3s0zdjFZ1Gs16SuCgVIk2KgSFM3
-	 kr0YuvS0rbHADZ4sskzXsFRPyS/GC+BeR4a/cPYM=
-Authentication-Results: mail-nwsmtp-smtp-production-main-57.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH v2] net: core: avoid extra pskb_expand_head() when adjusting headroom
-Date: Fri,  6 Jun 2025 10:55:17 +0300
-Message-ID: <20250606075517.1383732-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749197486; c=relaxed/simple;
+	bh=pwZOfGiJt/s7Oge9X/SgMEhL5+DQd75nbQ6SFA1txnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hQM77DuLyNwiqZlyc3FhOUjcwKpM2DmhueZ6/j44mL9uBTW1LoqyvXEhH8ABmdnuMZCEh+NvRUPmXTD4Lf/9LI41cMBOg/1rwjJnO5Wc+KMdeYKePQ9eSIyyOcjDVewObnG/R0ymMSI2jOw0xM1/4EOjiZx7x/8oNnT3KFWRNb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwSX3p5g; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-452f9735424so688705e9.3;
+        Fri, 06 Jun 2025 01:11:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749197483; x=1749802283; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UzBVGZZU0P4i5ZwPSQTCBiEjH3K0NW/99S1seOitdw0=;
+        b=fwSX3p5gj2Nx6J4/F5QAe3t6+p0u5cBf6AOZjn1yuO/U9acc8RNiZqFailAZvl5neE
+         tlQEFl5mEZzr6UJtzi7BjysOwymMuqORl3lLfoS0snNWzkiGerlgzE9UTUZ2x2Az8EOi
+         paYvpJ7JgEkwfPTw7XJREOlwup8dy0vYTjE2pQ1th93K38E3AtlkcOgzCajuybYR702A
+         juhezyVP1v/lMJ7ypHaXpr2zxnqI87+z9p/rOXTt62UYOM/gV2JN4CJ27O16DNvebVNQ
+         dtLP276X0b1GUoUyxtEfqx3XBNWnXZBsPaww2Wj83ulBrk+y6sunLN9wTYBnDNDEWKbt
+         /R8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749197483; x=1749802283;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UzBVGZZU0P4i5ZwPSQTCBiEjH3K0NW/99S1seOitdw0=;
+        b=gCXXq8Lu+Jb1fsZcab9MXjSEzIDt4mzC+Rahh34fOF9kvX9mbf6x/iLDTHGYlDBflb
+         UPEYODdR8mIYxTBf9fF9d9QwoY1U7VgRKii8f+0pLl82zF0n8ELwFUJ7ysMVViYdg9sl
+         HMs+dUBU2kwBL/5x5toEWAxGPWldeC6QGOu3e3IO65rVlb7qQNMmnR4WKEOR9gSRC9FU
+         thiZKx0/aBP+FE3EriQbW+h+ggFFN9FYL2wfbRZy9yY+lrXyCaQLdj4nPz79vwLdVbYO
+         cYXQlI6hKrTzDBctPtE2Yp2Gci8+VBUqCEu9L1nf0UHpeJAEbovg6hA2fMsli8neOSJO
+         JjCg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3nES2DAfzFor27v0Wq5k7cWVIhVADSqCOu79/OkLsqlhw1b2cANDja0yRI4nuzr2IKhv8ZlwO@vger.kernel.org, AJvYcCXCcnB6UA+xlPYY51hMtRVyyNbcAvqG4gi/+PXh7kw4SlCIc9dikYRi8EnaCuA8L5xzae7N0rzr3w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAOB+7lq66AXPDNms56mQOGI7IvY5TFumaIl8+gIt4jt/mMPY/
+	9A6B1Fh4ms4Enpbj82snjUE5BKd6irlyNyomicl0H9Eex50oAhXeFjYf
+X-Gm-Gg: ASbGncv6RS4o0ZMMRFijxUMGy+DmKt7o5PNiPiPrXrFI00DYlF83RTFmK5AbN82PJJz
+	+71ubZNBqSFD+Vfv+QyP3NXfmY8kP3dtuxmrL+oFahTl1wW/xSdhnfc6tpCcQbhDV9NBBaio1vu
+	nmn0+sz2xnXxTfJ6PyLHvYj75TXi3rYB/b6oBB6Ile02OtEJwzpGpDWdGVKsZaFjsp95ZurdUUj
+	MCLYIGcIwPyNLrNlzcwAUXXn2+B3K/KZItyThZt1YaC/TikBUhjfDxbRgwNKHtEeqNzfmqDnZ+r
+	/EI/xC8Ns6vhCZ6gng1pjNZorFcrOgj9x0wLP62dOoUBoxegw7HRJwAta5wGPAKrkPDp8bOI
+X-Google-Smtp-Source: AGHT+IGf2jh/0R53RduPJ/tEH+Vx7xIZ9YJ9JXIiNdXSgon6H4ecW4DYZegQ3GxVXUfR2VuT5QJyxg==
+X-Received: by 2002:a05:600c:8b72:b0:441:d43d:4f68 with SMTP id 5b1f17b1804b1-45201450b88mr26891065e9.15.1749197482402;
+        Fri, 06 Jun 2025 01:11:22 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.145.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209bc6905sm16074265e9.8.2025.06.06.01.11.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jun 2025 01:11:21 -0700 (PDT)
+Message-ID: <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
+Date: Fri, 6 Jun 2025 09:12:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
+To: Jason Xing <kerneljasonxing@gmail.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+References: <cover.1749026421.git.asml.silence@gmail.com>
+ <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
+ <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
+ <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
+ <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In 'skb_realloc_headroom()' and 'skb_expand_head()', using 'skb_clone()'
-with following 'pskb_expand_head()' looks suboptimal, and it's expected to
-be a bit faster to do 'skb_copy_expand()' with desired headroom instead.
+On 6/6/25 01:02, Jason Xing wrote:
+...>>>>                                 optlen);
+>>>>    }
+>>>>
+>>>> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
+>>>> +                                 struct sk_buff *skb, unsigned issue_flags)
+>>>> +{
+>>>> +    struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
+>>>> +    struct io_uring_cqe cqe[2];
+>>>> +    struct io_timespec *iots;
+>>>> +    struct timespec64 ts;
+>>>> +    u32 tskey;
+>>>> +
+>>>> +    BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
+>>>> +
+>>>> +    if (!skb_get_tx_timestamp(skb, sk, &ts))
+>>>> +            return false;
+>>>> +
+>>>> +    tskey = serr->ee.ee_data;
+>>>> +
+>>>> +    cqe->user_data = 0;
+>>>> +    cqe->res = tskey;
+>>>> +    cqe->flags = IORING_CQE_F_MORE;
+>>>> +    cqe->flags |= (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIFT;
+>>>> +
+>>>> +    iots = (struct io_timespec *)&cqe[1];
+>>>> +    iots->tv_sec = ts.tv_sec;
+>>>> +    iots->tv_nsec = ts.tv_nsec;
+>>>
+>>> skb_get_tx_timestamp loses the information whether this is a
+>>> software or a hardware timestamp. Is that loss problematic?
+>>>
+>>> If a process only requests one type of timestamp, it will not be.
+>>>
+>>> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
+>>> annotation may be necessary.
+>>
+>> skb_has_tx_timestamp() helper has clear priority of software timestamp,
+>> if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW case
+>> won't produce both timestamps with the current implementation. Am I
+>> missing something?
+> 
+> Sorry that I don't know how iouring works at a high level, so my
+> question could be naive and unrelated to what Willem said.
+> 
+> Is it possible that applications set various tx sw timestamp flags
+> (like SOF_TIMESTAMPING_TX_SCHED, SOF_TIMESTAMPING_TX_SOFTWARE)? If it
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
-v2: pass 'skb_tailroom(...)' to 'skb_copy_expand(...)' since
-the latter expects the final size rather than an increment
----
- net/core/skbuff.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+io_uring takes timestamps from the error queue, just like the socket
+api does it. There should be different skbs in the queue for different
+SCM_TSTAMP_{SND,SCHED,ACK,*} timestamps, io_uring only passes the
+type it got in an skb's serr->ee.ee_info to user without changes.
+Hope it answers it
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 85fc82f72d26..afd346c842e4 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -2316,14 +2316,10 @@ struct sk_buff *skb_realloc_headroom(struct sk_buff *skb, unsigned int headroom)
- 
- 	if (delta <= 0)
- 		skb2 = pskb_copy(skb, GFP_ATOMIC);
--	else {
--		skb2 = skb_clone(skb, GFP_ATOMIC);
--		if (skb2 && pskb_expand_head(skb2, SKB_DATA_ALIGN(delta), 0,
--					     GFP_ATOMIC)) {
--			kfree_skb(skb2);
--			skb2 = NULL;
--		}
--	}
-+	else
-+		skb2 = skb_copy_expand(skb, (skb_headroom(skb) +
-+					     SKB_DATA_ALIGN(delta)),
-+				       skb_tailroom(skb), GFP_ATOMIC);
- 	return skb2;
- }
- EXPORT_SYMBOL(skb_realloc_headroom);
-@@ -2400,8 +2396,10 @@ struct sk_buff *skb_expand_head(struct sk_buff *skb, unsigned int headroom)
- 	delta = SKB_DATA_ALIGN(delta);
- 	/* pskb_expand_head() might crash, if skb is shared. */
- 	if (skb_shared(skb) || !is_skb_wmem(skb)) {
--		struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
-+		struct sk_buff *nskb;
- 
-+		nskb = skb_copy_expand(skb, skb_headroom(skb) + delta,
-+				       skb_tailroom(skb), GFP_ATOMIC);
- 		if (unlikely(!nskb))
- 			goto fail;
- 
-@@ -2409,8 +2407,7 @@ struct sk_buff *skb_expand_head(struct sk_buff *skb, unsigned int headroom)
- 			skb_set_owner_w(nskb, sk);
- 		consume_skb(skb);
- 		skb = nskb;
--	}
--	if (pskb_expand_head(skb, delta, 0, GFP_ATOMIC))
-+	} else if (pskb_expand_head(skb, delta, 0, GFP_ATOMIC))
- 		goto fail;
- 
- 	if (sk && is_skb_wmem(skb)) {
+> might happen, then applications can get lost on which type of tx
+> timestamp it acquires without explicitly specifying in cqe.
+
 -- 
-2.49.0
+Pavel Begunkov
 
 
