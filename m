@@ -1,164 +1,190 @@
-Return-Path: <netdev+bounces-195360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E415ACFE00
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:11:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD09ACFE1E
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:19:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCEF17A33F9
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C196A172A6E
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6393C283FE0;
-	Fri,  6 Jun 2025 08:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40261C861D;
+	Fri,  6 Jun 2025 08:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fwSX3p5g"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="B5Ey5XQo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972AD24EF6B;
-	Fri,  6 Jun 2025 08:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9378A1FECDD;
+	Fri,  6 Jun 2025 08:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749197486; cv=none; b=eH7KScQaGFeDKFvgmKBxH5PddO3zWXv9NtgOo1wziamq5k3qvnNPLvNYLJElVFl3j97WD8SO+HSFFFrRzD91b4a08PEcLd9eHjISoPL8KLFZT33GAWkPAk2b0MuUTS6Nk/esyK4Ytu/odDSkDngAcKxJLNBa7ReFwIznhdLsF6w=
+	t=1749197979; cv=none; b=EwgyhqVCYruFcPRcK7GRIXZuv5frNYnuy1R1Y2YCq4B4GHtJUdo4StqegQMDyZlcQMuI8+9D+8LHFeDy34bPNQiEXqryfNwFEmVe4GpBwi4NS5iiQNSXs2kj6UzOIlYm2TwBcd+GMeTUybLLMZERVw84ANPWqIgWfrDEk7UwoSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749197486; c=relaxed/simple;
-	bh=pwZOfGiJt/s7Oge9X/SgMEhL5+DQd75nbQ6SFA1txnY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQM77DuLyNwiqZlyc3FhOUjcwKpM2DmhueZ6/j44mL9uBTW1LoqyvXEhH8ABmdnuMZCEh+NvRUPmXTD4Lf/9LI41cMBOg/1rwjJnO5Wc+KMdeYKePQ9eSIyyOcjDVewObnG/R0ymMSI2jOw0xM1/4EOjiZx7x/8oNnT3KFWRNb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fwSX3p5g; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-452f9735424so688705e9.3;
-        Fri, 06 Jun 2025 01:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749197483; x=1749802283; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UzBVGZZU0P4i5ZwPSQTCBiEjH3K0NW/99S1seOitdw0=;
-        b=fwSX3p5gj2Nx6J4/F5QAe3t6+p0u5cBf6AOZjn1yuO/U9acc8RNiZqFailAZvl5neE
-         tlQEFl5mEZzr6UJtzi7BjysOwymMuqORl3lLfoS0snNWzkiGerlgzE9UTUZ2x2Az8EOi
-         paYvpJ7JgEkwfPTw7XJREOlwup8dy0vYTjE2pQ1th93K38E3AtlkcOgzCajuybYR702A
-         juhezyVP1v/lMJ7ypHaXpr2zxnqI87+z9p/rOXTt62UYOM/gV2JN4CJ27O16DNvebVNQ
-         dtLP276X0b1GUoUyxtEfqx3XBNWnXZBsPaww2Wj83ulBrk+y6sunLN9wTYBnDNDEWKbt
-         /R8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749197483; x=1749802283;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzBVGZZU0P4i5ZwPSQTCBiEjH3K0NW/99S1seOitdw0=;
-        b=gCXXq8Lu+Jb1fsZcab9MXjSEzIDt4mzC+Rahh34fOF9kvX9mbf6x/iLDTHGYlDBflb
-         UPEYODdR8mIYxTBf9fF9d9QwoY1U7VgRKii8f+0pLl82zF0n8ELwFUJ7ysMVViYdg9sl
-         HMs+dUBU2kwBL/5x5toEWAxGPWldeC6QGOu3e3IO65rVlb7qQNMmnR4WKEOR9gSRC9FU
-         thiZKx0/aBP+FE3EriQbW+h+ggFFN9FYL2wfbRZy9yY+lrXyCaQLdj4nPz79vwLdVbYO
-         cYXQlI6hKrTzDBctPtE2Yp2Gci8+VBUqCEu9L1nf0UHpeJAEbovg6hA2fMsli8neOSJO
-         JjCg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3nES2DAfzFor27v0Wq5k7cWVIhVADSqCOu79/OkLsqlhw1b2cANDja0yRI4nuzr2IKhv8ZlwO@vger.kernel.org, AJvYcCXCcnB6UA+xlPYY51hMtRVyyNbcAvqG4gi/+PXh7kw4SlCIc9dikYRi8EnaCuA8L5xzae7N0rzr3w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAOB+7lq66AXPDNms56mQOGI7IvY5TFumaIl8+gIt4jt/mMPY/
-	9A6B1Fh4ms4Enpbj82snjUE5BKd6irlyNyomicl0H9Eex50oAhXeFjYf
-X-Gm-Gg: ASbGncv6RS4o0ZMMRFijxUMGy+DmKt7o5PNiPiPrXrFI00DYlF83RTFmK5AbN82PJJz
-	+71ubZNBqSFD+Vfv+QyP3NXfmY8kP3dtuxmrL+oFahTl1wW/xSdhnfc6tpCcQbhDV9NBBaio1vu
-	nmn0+sz2xnXxTfJ6PyLHvYj75TXi3rYB/b6oBB6Ile02OtEJwzpGpDWdGVKsZaFjsp95ZurdUUj
-	MCLYIGcIwPyNLrNlzcwAUXXn2+B3K/KZItyThZt1YaC/TikBUhjfDxbRgwNKHtEeqNzfmqDnZ+r
-	/EI/xC8Ns6vhCZ6gng1pjNZorFcrOgj9x0wLP62dOoUBoxegw7HRJwAta5wGPAKrkPDp8bOI
-X-Google-Smtp-Source: AGHT+IGf2jh/0R53RduPJ/tEH+Vx7xIZ9YJ9JXIiNdXSgon6H4ecW4DYZegQ3GxVXUfR2VuT5QJyxg==
-X-Received: by 2002:a05:600c:8b72:b0:441:d43d:4f68 with SMTP id 5b1f17b1804b1-45201450b88mr26891065e9.15.1749197482402;
-        Fri, 06 Jun 2025 01:11:22 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.145.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209bc6905sm16074265e9.8.2025.06.06.01.11.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Jun 2025 01:11:21 -0700 (PDT)
-Message-ID: <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
-Date: Fri, 6 Jun 2025 09:12:47 +0100
+	s=arc-20240116; t=1749197979; c=relaxed/simple;
+	bh=xZlhkRAkf9NtLVuWaJZVBEvuhnY31s4L7SnFMDiGwoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b1IvGZZBI5q3ImX7YZeDFi108xhI4+CEnqeJlgIKLeWt2MyOri/xzqEodap8u/Ix57s2BpDkEyHBbN7mpQDtPrG092C3m88alVmw4faXxnWqxS6kyujvTGnlhHgVVRebWPJ05Z+yl9i4dozcO7h4fQSyKZxD96bw2Rzr7ozErgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=B5Ey5XQo; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AC86241D02;
+	Fri,  6 Jun 2025 08:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749197969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L9OL/AoGykLh8iv60m7BkynFYdgLzm2qSbm2BGgS4HQ=;
+	b=B5Ey5XQoeq+ZDoSg7Va76oi/nJ1WxdKyLsALXCcWuruWFaEr67IuHf2UXOO1OjnxCYe4qZ
+	d6M+EyQFkLbu6svj00TePXK+ejdXSwQhZtfc3ftuv2K0zbBIi5krTPh9W/jIBto10YVpjr
+	faJlFIUwuQSRnce4pgMuwLl19MANeKyuGRmTW9ELDbxC6Ydut0rkssSHOPAnABdrWO76JF
+	MhSE7R1o9LgLTBrHj17K5jmpoSnZdjMAUZ8KIeoUsYiU/RruDafw+6z9TjLSurAaYh7oLB
+	AN3s/sNoIsv/ZJtXnzGNP6B4hv/mGbTXm/5OODafrxi9irPbxRf9imyt2Sovjw==
+Date: Fri, 6 Jun 2025 10:19:23 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Simon Horman <horms@kernel.org>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Romain Gantois <romain.gantois@bootlin.com>,
+ Jijie Shao <shaojijie@huawei.com>
+Subject: Re: [PATCH net] net: phy: phy_caps: Don't skip better duplex macth
+ on non-exact match
+Message-ID: <20250606101923.04393789@fedora>
+In-Reply-To: <ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
+References: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
+	<ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Jason Xing <kerneljasonxing@gmail.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>
-References: <cover.1749026421.git.asml.silence@gmail.com>
- <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
- <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch>
- <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
- <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdegkeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeeftdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepleehgeevfeejgfduledtlefhlefgveelkeefffeuiedtteejheduueegiedvveehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdduvddruddthedrudehtddrvdehvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvuddvrddutdehrdduhedtrddvhedvpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhgl
+ hgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 6/6/25 01:02, Jason Xing wrote:
-...>>>>                                 optlen);
->>>>    }
->>>>
->>>> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, struct sock *sk,
->>>> +                                 struct sk_buff *skb, unsigned issue_flags)
->>>> +{
->>>> +    struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
->>>> +    struct io_uring_cqe cqe[2];
->>>> +    struct io_timespec *iots;
->>>> +    struct timespec64 ts;
->>>> +    u32 tskey;
->>>> +
->>>> +    BUILD_BUG_ON(sizeof(struct io_uring_cqe) != sizeof(struct io_timespec));
->>>> +
->>>> +    if (!skb_get_tx_timestamp(skb, sk, &ts))
->>>> +            return false;
->>>> +
->>>> +    tskey = serr->ee.ee_data;
->>>> +
->>>> +    cqe->user_data = 0;
->>>> +    cqe->res = tskey;
->>>> +    cqe->flags = IORING_CQE_F_MORE;
->>>> +    cqe->flags |= (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIFT;
->>>> +
->>>> +    iots = (struct io_timespec *)&cqe[1];
->>>> +    iots->tv_sec = ts.tv_sec;
->>>> +    iots->tv_nsec = ts.tv_nsec;
->>>
->>> skb_get_tx_timestamp loses the information whether this is a
->>> software or a hardware timestamp. Is that loss problematic?
->>>
->>> If a process only requests one type of timestamp, it will not be.
->>>
->>> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
->>> annotation may be necessary.
->>
->> skb_has_tx_timestamp() helper has clear priority of software timestamp,
->> if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW case
->> won't produce both timestamps with the current implementation. Am I
->> missing something?
+On Thu, 5 Jun 2025 12:24:54 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
+
+> On 6/3/25 10:35 AM, Maxime Chevallier wrote:
+> > When performing a non-exact phy_caps lookup, we are looking for a
+> > supported mode that matches as closely as possible the passed speed/duplex.
+> > 
+> > Blamed patch broke that logic by returning a match too early in case
+> > the caller asks for half-duplex, as a full-duplex linkmode may match
+> > first, and returned as a non-exact match without even trying to mach on
+> > half-duplex modes.
+> > 
+> > Reported-by: Jijie Shao <shaojijie@huawei.com>
+> > Closes: https://lore.kernel.org/netdev/20250603102500.4ec743cf@fedora/T/#m22ed60ca635c67dc7d9cbb47e8995b2beb5c1576
+> > Fixes: fc81e257d19f ("net: phy: phy_caps: Allow looking-up link caps based on speed and duplex")
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+> >  drivers/net/phy/phy_caps.c | 15 +++++++++------
+> >  1 file changed, 9 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+> > index 703321689726..d80f6a37edf1 100644
+> > --- a/drivers/net/phy/phy_caps.c
+> > +++ b/drivers/net/phy/phy_caps.c
+> > @@ -195,7 +195,7 @@ const struct link_capabilities *
+> >  phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+> >  		bool exact)
+> >  {
+> 	> -	const struct link_capabilities *lcap, *last = NULL;
+> > +	const struct link_capabilities *lcap, *match = NULL, *last = NULL;
+> >  
+> >  	for_each_link_caps_desc_speed(lcap) {
+> >  		if (linkmode_intersects(lcap->linkmodes, supported)) {
+> > @@ -204,16 +204,19 @@ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+> >  			if (lcap->speed == speed && lcap->duplex == duplex) {
+> >  				return lcap;
+> >  			} else if (!exact) {
+> > -				if (lcap->speed <= speed)
+> > -					return lcap;
+> > +				if (!match && lcap->speed <= speed)
+> > +					match = lcap;
+> > +
+> > +				if (lcap->speed < speed)
+> > +					break;
+> >  			}
+> >  		}
+> >  	}
+> >  
+> > -	if (!exact)
+> > -		return last;
+> > +	if (!match && !exact)
+> > +		match = last;  
 > 
-> Sorry that I don't know how iouring works at a high level, so my
-> question could be naive and unrelated to what Willem said.
+> If I read correctly, when user asks for half-duplex, this can still
+> return a non exact matching full duplex cap, even when there is non
+> exact matching half-duplex cap available.
+
+That would be only if there's no half-duplex match at the requested
+speed, but yes indeed.
+
 > 
-> Is it possible that applications set various tx sw timestamp flags
-> (like SOF_TIMESTAMPING_TX_SCHED, SOF_TIMESTAMPING_TX_SOFTWARE)? If it
+> I'm wondering if the latter would be preferable, or at least if the
+> current behaviour should be explicitly called out in the function
+> documentation.
 
-io_uring takes timestamps from the error queue, just like the socket
-api does it. There should be different skbs in the queue for different
-SCM_TSTAMP_{SND,SCHED,ACK,*} timestamps, io_uring only passes the
-type it got in an skb's serr->ee.ee_info to user without changes.
-Hope it answers it
+Looking at the previous way of doing this, we looked at the following
+array in descending order : 
 
-> might happen, then applications can get lost on which type of tx
-> timestamp it acquires without explicitly specifying in cqe.
+[...]
+	/* 1G */
+	PHY_SETTING(   1000, FULL,   1000baseT_Full		),
+	PHY_SETTING(   1000, HALF,   1000baseT_Half		),
+	PHY_SETTING(   1000, FULL,   1000baseT1_Full		),
+	PHY_SETTING(   1000, FULL,   1000baseX_Full		),
+	PHY_SETTING(   1000, FULL,   1000baseKX_Full		),
+	/* 100M */
+	PHY_SETTING(    100, FULL,    100baseT_Full		),
+	PHY_SETTING(    100, FULL,    100baseT1_Full		),
+	PHY_SETTING(    100, HALF,    100baseT_Half		),
+	PHY_SETTING(    100, HALF,    100baseFX_Half		),
+	PHY_SETTING(    100, FULL,    100baseFX_Full		),
+[...]
 
--- 
-Pavel Begunkov
+The matching logic was pretty much the same, walk that (and and'ing
+with the passed supported modes), note the partial matches, return
+either an exact or non-exact match.
+
+None of the logic actually cared about the duplex for non-exact
+matches, only the speed. I think we would have faced the same behaviour.
+
+In reality, the case you're mentioning would be a device that supports
+1000/Full, 100/Full and 100/Half, user asks for 1000/Half, and 100/Full
+would be reported.
+
+That's unlikely to exist, but I'll document it as I've been surprised
+in the past with setups that shouldn't exist that actually do :)
+
+All of this really makes me want to add some test scripts to cover all
+these corner-case behaviours and test for future regressions.
+Hopefully when I get a bit more bandwidth I'll be finally able to
+finish the netdevsim PHY support...
+
+Thanks,
+
+Maxime
+
+> /P
+> 
 
 
