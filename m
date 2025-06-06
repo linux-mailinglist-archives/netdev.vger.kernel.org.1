@@ -1,230 +1,204 @@
-Return-Path: <netdev+bounces-195392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0FDACFFDD
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 11:57:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACF7ACFFEF
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 12:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 206743A8F49
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529F63AA554
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D66F286881;
-	Fri,  6 Jun 2025 09:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CC52857E2;
+	Fri,  6 Jun 2025 10:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="DnvPduGO"
+	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="Xe4WDA/N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022081.outbound.protection.outlook.com [52.101.126.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433EE286880
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 09:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749203842; cv=none; b=PC+Rssk9MC3ZH8kxs+PVJU2r1FzSBQnE673AC70FOZ+nax6eMCJohQntIm5Tpr/xa4JIsvdcptQWXtkWS40zKbaal4BMn7BgiBeB+oX/RKlN4mtTmmEydtIGXY5OAXaJQzsPGxaooJRsSGY5UqQIlwzhazKuyaYI4haaIGAD7xA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749203842; c=relaxed/simple;
-	bh=sOirZ7eYb7y1UO9MMdszGYY3cPSpGPLQ3FL9sduITUQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BYN4UPwimJhBZinBWRKI11h+2pMteFgTROzvHnjefGiFfLXV2n7FKAyliIcSSXnTK1jJ5nrC2X9of+zC45rRFpDA+iTqX8mVTxvEhtw3rfP891Sw/Z0EgzboNWHKPB7IAXBsMlPdBz9hh/AxPNmjH0iqM6HAdZCm1rq374RcnnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=DnvPduGO; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-747e41d5469so2240305b3a.3
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 02:57:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BC01E47AD;
+	Fri,  6 Jun 2025 10:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749204077; cv=fail; b=XM5OqRASJ0gDmXhOxcYlHJlWD9tRbxnMGlM7Txri43QpS4uReaotojsjiKx69rJo/iaGwIhUKU50VG/Ko7Ugu1DtBV8L9/8fizFP0go9O0zuc//p4P2oTrOZkp/MBB29VRX7hg2eok3g+7AgoovSkgG9wIMvk0bTBCwLyrrieQg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749204077; c=relaxed/simple;
+	bh=lJhdvA2wGEZBekHI5Abk6bnseD6lkzX1ynCr+A66mQg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=To8ZNydqZug5KyfLk8z88SjNfhOHIfU8NyN/L6AH0xfBcNc6IlfssKfJw+jmtxelGHm3fUnspSKkcP/a45xVkgy6byRiO8c+fZVTSdsfChw+MMogDAZ7Nnnj22rgfOIyoS+7/j6A33xLH7gsgBsSKjZEaSw3fdv5jw70QEMgr7A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=Xe4WDA/N; arc=fail smtp.client-ip=52.101.126.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=H0sFuv36HdPZ3dkM6dALJon1j6OPcpzOES/3iWV3i7P35FGMeW2ypD4S7A8RCFqBIfbWdTGQdPI8WpFRUPULMQQ51g6093K6JKDm80jV9BJMTKKc7KR2gAVn91HafOZmqDX7oMYoZyBxodXga7tddny3HYpq8+Gcb6F/mEXx29M6H0VcYemPHcJoGPMOO4sgA4IBLr9RS+WxB8ilo3U5Aob3/mWtL/sUmSnrvOrhwXCNvEIiAm7ub1iud8ttMbeHH1TJpL8cE0VQpcqPno9AaQlfHJf/618BVJI79aaMu/Ou4dVVGQZ2G9UJWVsjLqEcVR3uBSkBnnxIpZd6HKpbCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w5VkthyIBrvsULez1SzppZ3IHx9AbISlhDI5aoLPBs4=;
+ b=WDAoBqEOE6bWFXF/gNJjJ419e9O6TYe9318dLHdVSAeSmXpNHassZKI3s5COAizlEWAz89Zx7A3fTuHLFNEOpC3QWc9C1mINsUIZ13vmaj3ltVmGv2teSPFMsHyH4RBzqYHVEqXQG7oNwVUh8e0tnbW6VX1ElXCqhYVSlXEBy5K1u1YIT7O0smgWQktvoARGRU4moy/Xm/q14tODne11C4XfAlXLvF1tEMILYKRrJob1zBkBOOjPyzXsqBZNhncBwn5zxpVtYG0nJFeZdd0aJns5NdDGY0LLQx6ok6+O9RbM7vypb0mj3Gh/gs1221C6bVoDnivBS5bPSSI9iI8eHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
+ dkim=pass header.d=fibocom.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1749203838; x=1749808638; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ek+hT4560E7PcChw1SCdDE2YGHVY0ATIzA/WxFP43NM=;
-        b=DnvPduGOIF8+2jSdVEHpqbzAmE6x5af886WtiiVsL0Yt8ITr4IqsQW5pUf9QtYvZCX
-         DVmGvMkG0GGmPSr5NDK55KBJ5LhhtmJd+HjIuqqmAcjEdmjM4SFHSVQNseiWrJzeOmON
-         6c1TtM1rsGvxgWlA2gFWZt1qA2O3Sw/TToNzgy85dgvtmTkW+5CSBkHWzly96F8s1pFw
-         eD4Jt58b3Iffw2OS2rqD8qS5Cl9nUL8uylKFxk2BRYkiltctFIeWF6DGBV2zVtm0v88h
-         zaY52+kEnuPgJsUL5fd7/wmvDXbgVRciSXKMXTAkTAEuuR3k7LodlBn6b9IzaEZFqRrz
-         P7dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749203838; x=1749808638;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ek+hT4560E7PcChw1SCdDE2YGHVY0ATIzA/WxFP43NM=;
-        b=jIy96CVlWpKr7JIeyeYxLPsNV/J1QupiQMEEzfQ/jrAXjG6fgUkLsVBiKL4euvqccf
-         S0/b41vkUrweUev1/C5AIJpBBiJCY6n7pibU3pWDWQji7glsADqLiNR+zFSTdKyPrj5S
-         GYt1sigt0K6bBMROziMAhCYDXrFNrlxayDnHyYYVh0QPLMpVgzFSANPSkQ0KDhGSCP9j
-         uVi9x9Xl+mK23EB292E5N9ZtSO2chFP18Qj5gjd10CwN1NXXFyYrkvCCWU55OYRR5zgn
-         IrvVJWQY+rjPrQdeH4gvYewKbUvKFfa2ntKUuwwUmrprtGfAB6uXU3UstXty+xaZ2Wxt
-         VeCw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0Iy23rERW/ZT/gcsCiSjVw9AjGdxKk+0Sv3xWsceNhN4eMLi+d0aUVk6ZE9vL0ePkaHCkU1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7tbd+VEspHfgO0tilG4oBkyYk/2kKSEhAtg4daPUoPGknx2jW
-	iz9dx5cyrLHfz4EmTTDQ6G+RmgtCo3mw5LoxYqXafgV5XlG/LrzORqQj7gDgcKAnIpA=
-X-Gm-Gg: ASbGncsEJYqBVBC+mCkAeNLhef+mdQkBzz9N5f3OEFVkvJRRVU2dOLZroaHukKlA+Ka
-	XwPYVjnZp8fyW1UN8l+1DMj7u4UVZ8/2XDuPQ0faAqEq/4drjHgab+uze8zXk0ZN74ryPk6Rbt/
-	GE0PkKFzu1R46ngSmG0sV33f0iDN/QCHsdnJPuTlwxcENMW8mL1ZYBPuI4YBZeNrrDKk/J6otXi
-	mRYf5+6Xu2Nlmv8Gov/Nxfihlo9kbqxxRiJoMtrfRMBN+9kmAVSBryIyTXpH3oWLX21FIgaEs8a
-	1bvFE/dfMM8m9N5twfsrwcdRDhJGsziEjploSND3uwt9o5/RCZNsJeg3+AgDLGD4l5pmwKSl59s
-	=
-X-Google-Smtp-Source: AGHT+IFMWrbaAriqzlw98FQShXPzRTZew1R66AEp3JLaUcbgoytS6fZHgKdSxG380PejwUYGS7f5rw==
-X-Received: by 2002:a05:6a00:21d3:b0:746:3200:5f8 with SMTP id d2e1a72fcca58-74827f304f8mr3677897b3a.22.1749203838464;
-        Fri, 06 Jun 2025 02:57:18 -0700 (PDT)
-Received: from [157.82.203.223] ([157.82.203.223])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482af7b29esm945812b3a.70.2025.06.06.02.57.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Jun 2025 02:57:18 -0700 (PDT)
-Message-ID: <fc27ca0b-c00e-4461-9890-746a237e48bc@daynix.com>
-Date: Fri, 6 Jun 2025 18:57:14 +0900
+ d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w5VkthyIBrvsULez1SzppZ3IHx9AbISlhDI5aoLPBs4=;
+ b=Xe4WDA/NSe9NuWJnPn2U8Qvk0vUyruwboVlHWyktNphP3vSjHfbWKszv7Bvq7eqqcJuL7D2ZyvWZRoSm+XFmUYzZtKHzBOAkhXzkqA3xlxxwdR4mHPVxjPfym3HIbT6gr3YIxoRYnQHIoR2t3QGrmhYm2l8qP7ixMDuKJ8hSRes=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fibocom.com;
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
+ by TYSPR02MB7321.apcprd02.prod.outlook.com (2603:1096:400:46a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Fri, 6 Jun
+ 2025 10:01:08 +0000
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b%4]) with mapi id 15.20.8769.037; Fri, 6 Jun 2025
+ 10:01:07 +0000
+From: Jinjian Song <jinjian.song@fibocom.com>
+To: kuba@kernel.org,
+	Jinjian Song <jinjian.song@fibocom.com>
+Cc: andrew+netdev@lunn.ch,
+	angelogioacchino.delregno@collabora.com,
+	chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	corbet@lwn.net,
+	danielwinkler@google.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	haijun.liu@mediatek.com,
+	helgaas@kernel.org,
+	horms@kernel.org,
+	johannes@sipsolutions.net,
+	korneld@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	loic.poulain@linaro.org,
+	m.chetan.kumar@linux.intel.com,
+	matthias.bgg@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	rafael.wang@fibocom.com,
+	ricardo.martinez@linux.intel.com,
+	ryazanov.s.a@gmail.com
+Subject: Re: [net-next v1] net: wwan: t7xx: Parameterize data plane RX BAT and FAG count
+Date: Fri,  6 Jun 2025 18:00:50 +0800
+Message-Id: <20250605071240.7133d1a5@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250605071240.7133d1a5@kernel.org>
+References: <20250514104728.10869-1-jinjian.song@fibocom.com> <20250515180858.2568d930@kernel.org> <20250516084320.66998caf@kernel.org> <20250520122141.025616c9@kernel.org>
+Precedence: bulk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI1PR02CA0007.apcprd02.prod.outlook.com
+ (2603:1096:4:1f7::6) To TY0PR02MB5766.apcprd02.prod.outlook.com
+ (2603:1096:400:1b5::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 3/8] vhost-net: allow configuring extended features
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <cover.1748614223.git.pabeni@redhat.com>
- <b9b60ed5865958b9d169adc3b0196c21a50f6bca.1748614223.git.pabeni@redhat.com>
- <9eae960a-0226-46e2-a6f4-95c91800268c@daynix.com>
- <f0ee95b7-6830-4a53-8d6b-0edf1a7ab142@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <f0ee95b7-6830-4a53-8d6b-0edf1a7ab142@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|TYSPR02MB7321:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48427f90-6ee8-4e4a-da48-08dda4e10e53
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|4022899009|7416014|376014|52116014|38350700014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?DdzY82Qv0DOH8x1TQefXIHGuEjGoabnP4OaZmjZZn6KjT6j4HDnNLnb/MuHj?=
+ =?us-ascii?Q?y6gRdhzsYUQd1tFvafc2DabT0cLX12e0TSuRf8TQszINDY6c5zh6FvxE/FwQ?=
+ =?us-ascii?Q?mB8s+xAHGGiqsXlvfDrK92TbDk23r39ESVWfYBzswHc4o3frZpXxr/rbB9oX?=
+ =?us-ascii?Q?7FkVlwnTwezO16n6pHJUA7/kZIxZ0oGQCruJcryLmvg+qMB3Lhg70pFZczcv?=
+ =?us-ascii?Q?0lhbO3oph8XFdZI58j8DtItGbTRTT61hKrp1xClwiDUFY0g537zE05cX8wSz?=
+ =?us-ascii?Q?1QlUTtKflfsibW7ofYiijkwmr81y1CNr5wG3KfI1/WbD2BHg+BWayR5WB3AQ?=
+ =?us-ascii?Q?ixEo56JvaloMI+OM9NbutAQHUDgkVtltsO3/CDc1mdp7Y1xAGAOUBqT703VU?=
+ =?us-ascii?Q?m5bi47Z7NhPKuUvVMsbG+6rJ3L2/RzuHWsN/b9VtYYCB49mHvVUEeDEs9EsM?=
+ =?us-ascii?Q?ku5BXjxNm5fS/o0XQ/ZZZ8dOdYDZJYnNUYNCR5XNudnjKXF3HAMkCSZJV6Jq?=
+ =?us-ascii?Q?1utTu+5qEuf9DibUOMHB3cxvC5ej6CT6XuPANptchYzNue22YeB640DT53CK?=
+ =?us-ascii?Q?7+OEka+qNJbOp8FJQvvvmsZglhRYJoiCCigK8ReIsybUNemL2PJp5y8ZtV1n?=
+ =?us-ascii?Q?6AAUbUXorug/OKfjAtXQrBUES7inJ4Uxb81FBiJnioK7acGSESIgVmsIzsTn?=
+ =?us-ascii?Q?gVuZJSSueC81ryE+CHB6FxeEmqGDI0Y2HYaimwwMDDsoLAQX7uvCj7bTHapf?=
+ =?us-ascii?Q?9MEdzxknE7nQ6I+i3895f0nKkm8lXTOEoO4bT8setR4WDNxsiMTXz90OMWcF?=
+ =?us-ascii?Q?m10vgF/o5+Jhi18tVRqXrr9sV2wV7Fv24sMs+M45kEPP6bUKUSQcWbWo31nC?=
+ =?us-ascii?Q?hUSaOM2Xy71jma10ojP7OP+oLQbOQnUi4lFtwI3DC8X+q+NAwFidh/H+M1nd?=
+ =?us-ascii?Q?/hIPEJacoR3+xXEHKy3/Th7yZCa/5FExz6+YQKAvdOscfVovSultXZmdi0eL?=
+ =?us-ascii?Q?3ZRCNSVIbG/Wp0PqES7nsEgaJHV9TNdo25juJWH2Kuukwr2U7VjiWFxDLT5o?=
+ =?us-ascii?Q?oq0JjsBjS/TRGXYQlUzvxj8qxVsq6KvepcVJ0nyHBVo+d65yAOrWTRtaRXs+?=
+ =?us-ascii?Q?LKNCKe3vUmpMk/G5pW99GqeGmIEwuU47WCLEsNxV8UyfVNWadBdpBa2R6k/g?=
+ =?us-ascii?Q?l05ywbm4uZH5eV4/ZyZx248n1K/wyTzb/7PXFdoYydjmRG7JRjqqMbn3DjJ/?=
+ =?us-ascii?Q?DMCARbIUoOQ7SLEeIwodkZisgxcKDgIjzmmwKw1Tf+nNIMN81SjRDnXw9AMf?=
+ =?us-ascii?Q?5+pOOKBWdMIrSF/YFe8nZfDV+raH59ZNqAYbvMBqZky/r9kWr01h7f6yk+7a?=
+ =?us-ascii?Q?BO86OCgrjAfsHUmgTAdJIrktPmzGMb3dFI0gaS0kgA8ceFPdceLy0Bot72Xb?=
+ =?us-ascii?Q?2bN0UN2O9i7uGuNDT0T7NGzYhCY36xzENS2gwfM907LI59oWA5WQug=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(4022899009)(7416014)(376014)(52116014)(38350700014)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PGXmFVjQB6JpiPLQXgARI36F8ivVaFwYVOZRPKBJSBxN3WbMS3R4h8l/USQF?=
+ =?us-ascii?Q?mkW+DMsQ42BawgBowHA6SlUevs138XbDRkGFdvUmimMVH1TIQ5Si04C110pB?=
+ =?us-ascii?Q?vmMPnKjXpcvG2eFAoQwoYngmZOS+dZYaeFf2hX4rkgF2VQkkghONHOaIRIM2?=
+ =?us-ascii?Q?jbNOSYh0y06DfL8l/dRhaq13/DBVftKCGZqoq0pexbeO6DKe+FMo8lBFgE6e?=
+ =?us-ascii?Q?zIR3XY6rM5CpQWCq/QZR57HypeR4k/2aB5BqeQnLhlnQTBc4ha8yLcH5ZRPI?=
+ =?us-ascii?Q?YOxj4soG91Vurg3HO/Td58UISpH35wN5BlAUFATSo5IJYHpf+r0Di5eBKx7R?=
+ =?us-ascii?Q?YlggG2gECgc8IOHL6GV3O5IQWFjfd0/38QhhtWsa37VNgYsULL3dqP7zAgO7?=
+ =?us-ascii?Q?a7tijrZgztGhHq+veCIZUoeSuYuw8s7O9/f1e7Q/BhRDM2uPeaFzHl5tA9WU?=
+ =?us-ascii?Q?So1d9/HJES+rB4j/023vUnhJe4AWs3viXBH8lfAn0DjFQn8cJODs/Ddmc2aR?=
+ =?us-ascii?Q?GZSuPRNWoCjJcKr7W7pdZEbBuAN76vjH31Di/f4ciCqMT3edM9sZom1dOM/I?=
+ =?us-ascii?Q?KMfw5IoLoYnFs9eiwdJNddv37KRZ2TEVxqIcfz86275bgkvxSRQx7SNsQnED?=
+ =?us-ascii?Q?DDmHeIgLkWPLuJB4qX7Rh8e9iN8c/wjgXRqI+9xGw+S2PfXiw6O2+66K7eia?=
+ =?us-ascii?Q?CBgpS5rMH0ICANKKXBPqKMdM1iyKRwIpVrElk/cNbG5QOvC9oRdkFCIaofvd?=
+ =?us-ascii?Q?XVgIs9B3msPMNbhGqV1MtObBLm68RAEXYk3pYSldzzV4sTl1kwqjxpFhqPMt?=
+ =?us-ascii?Q?FpfoWA2pmqy3DH8798IZ17C/u+J2rogYmDObBHDayyobvRLsNDzMMs+/LLGS?=
+ =?us-ascii?Q?HcIEhj3F9Zf9LdKrH64r3NucM2kaXOanddi8Jwrw9EV25ldOwGHgdoe4TxYj?=
+ =?us-ascii?Q?JuQYxAspsk3EoHkcSvfiAdWvKtjq/bbx7sbDHAvEqrsliEiae+c5Owe50Ojb?=
+ =?us-ascii?Q?fYtm8CyGuytVPh1RddkJM6k20vh6ejx1/EVv5TCc8HnpYmG24fIRhbM076TS?=
+ =?us-ascii?Q?H9ADe3Ooope4TgDxxhtuy0lQAvm91WoFpiP1YJFqlzgD5DmeE8k/y+CXc9D3?=
+ =?us-ascii?Q?+qR63tjYl9A3aLHSYpn/xKtQlFxcZhT8rkBVbcr5jzR0Dm7R9CC0VYAF/y3w?=
+ =?us-ascii?Q?6ZoSj+t3uRVZeKpbw5HMH2yT7HFSlx1JabUU/n5t90MnNzhmlZTKXxMz6mmZ?=
+ =?us-ascii?Q?StjdpDsrfpfFlkXLiTG1FcoxppD9v5sxTq/gL/3kNWXOoiY6moYedn0hAxtu?=
+ =?us-ascii?Q?y0MStqek3AJtNFMDhY+RQNN2mMbw1W0qoOrXY/xkrVBh7psBe2hqrR/6pQG/?=
+ =?us-ascii?Q?W+xFpC0wMJeL67EU1yaYsztdYL7uxNvFSL2Pxnp8yteb0bw2JG1J1vsmw0BO?=
+ =?us-ascii?Q?BQH0bmJr0Sc05BB3iNRNjbUXPg8CL6F+QJPqMyqPSL0ln45Gq+81XmQstTKJ?=
+ =?us-ascii?Q?IcFdivMxCnKJbvPD3vkFNMuC31m4LnXNOw0ElIX1BNSP1KvH6wzvS8FLtgFO?=
+ =?us-ascii?Q?yVzPb0CAimEapzp10gYOgj+PEnH/pz49FE5trc48dABw6BsgwfRN9McilhrJ?=
+ =?us-ascii?Q?0w=3D=3D?=
+X-OriginatorOrg: fibocom.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48427f90-6ee8-4e4a-da48-08dda4e10e53
+X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2025 10:01:07.7221
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Dfl5Rtpq1KKiZxCWbz0E/oDuOPHyQcOJabcue24b1Pg3M8+rdKxGVxa4cbBMlznaqbQf3tNLoT3GNFq+c2gwEwaKpZqMduCx5mNoljTiFmQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR02MB7321
 
-On 2025/06/03 22:32, Paolo Abeni wrote:
-> On 5/31/25 8:15 AM, Akihiko Odaki wrote:
->> On 2025/05/30 23:49, Paolo Abeni wrote:
->>> Use the extended feature type for 'acked_features' and implement
->>> two new ioctls operation allowing the user-space to set/query an
->>> unbounded amount of features.
->>>
->>> The actual number of processed features is limited by virtio_features_t
->>> size, and attempts to set features above such limit fail with
->>> EOPNOTSUPP.
->>>
->>> Note that the legacy ioctls implicitly truncate the negotiated
->>> features to the lower 64 bits range.
->>>
->>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->>> ---
->>> v1 -> v2:
->>>     - change the ioctl to use an extensible API
->>> ---
->>>    drivers/vhost/net.c              | 61 ++++++++++++++++++++++++++++++--
->>>    drivers/vhost/vhost.h            |  2 +-
->>>    include/uapi/linux/vhost.h       |  7 ++++
->>>    include/uapi/linux/vhost_types.h |  5 +++
->>>    4 files changed, 71 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>> index 7cbfc7d718b3..f53294440695 100644
->>> --- a/drivers/vhost/net.c
->>> +++ b/drivers/vhost/net.c
->>> @@ -77,6 +77,8 @@ enum {
->>>    			 (1ULL << VIRTIO_F_RING_RESET)
->>>    };
->>>    
->>> +#define VHOST_NET_ALL_FEATURES VHOST_NET_FEATURES
->>> +
->>>    enum {
->>>    	VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
->>>    };
->>> @@ -1614,7 +1616,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
->>>    	return err;
->>>    }
->>>    
->>> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
->>> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
->>>    {
->>>    	size_t vhost_hlen, sock_hlen, hdr_len;
->>>    	int i;
->>> @@ -1685,8 +1687,9 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>>    	void __user *argp = (void __user *)arg;
->>>    	u64 __user *featurep = argp;
->>>    	struct vhost_vring_file backend;
->>> -	u64 features;
->>> -	int r;
->>> +	virtio_features_t all_features;
->>> +	u64 features, count;
->>> +	int r, i;
->>>    
->>>    	switch (ioctl) {
->>>    	case VHOST_NET_SET_BACKEND:
->>> @@ -1704,6 +1707,58 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->>>    		if (features & ~VHOST_NET_FEATURES)
->>>    			return -EOPNOTSUPP;
->>>    		return vhost_net_set_features(n, features);
->>> +	case VHOST_GET_FEATURES_ARRAY:
->>> +	{
->>> +		if (copy_from_user(&count, argp, sizeof(u64)))
->>> +			return -EFAULT;
->>> +
->>> +		/* Copy the net features, up to the user-provided buffer size */
->>> +		all_features = VHOST_NET_ALL_FEATURES;
->>> +		for (i = 0; i < min(VIRTIO_FEATURES_WORDS / 2, count); ++i) {
->>
->> I think you need to use: array_index_nospec()
-> 
-> Do you mean like:
-> 			i = array_index_nospec(i, min(VIRTIO_FEATURES_WORDS / 2, count));
-> 
-> ?
-> 
-> Note that even if the cpu would speculative execute the loop for too
-> high 'i' values, it will could only read `all_features`, which
-> user-space can access freely.
+From: Jakub Kicinski <kuba@kernel.org>
 
-I was wrong; I forgot you used a 128-bit integer instead of an array.
+>On Wed,  4 Jun 2025 17:17:22 +0800 Jinjian Song wrote:
+>> The parameters are used by data plane to request RX DMA buffers for the entrire lifetime of
+>> the driver, so it's best to determine them at the driver load time. Adjusting them after the
+>> driver has been probed could introduce complex issues (e.g., the DMA buffers may already be
+>> in use for communication when the parameters are changed. While devlink appears to support
+>> parameter configuration via driver reload and runtime adjustment, both of these occur after
+>> the driver has been probed, which doesn't seem very friendly to the overall logic.
+>
+>no.
+>
 
-> 
->>> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
->>> index d7656908f730..3f227114c557 100644
->>> --- a/include/uapi/linux/vhost_types.h
->>> +++ b/include/uapi/linux/vhost_types.h
->>> @@ -110,6 +110,11 @@ struct vhost_msg_v2 {
->>>    	};
->>>    };
->>>    
->>> +struct vhost_features_array {
->>> +	__u64 count; /* number of entries present in features array */
->>> +	__u64 features[];
->>
->>
->> An alternative idea:
->>
->> #define VHOST_GET_FEATURES_ARRAY(len) _IOC(_IOC_READ, VHOST_VIRTIO,
->>                                              0x00, (len))
->>
->> By doing so, the kernel can have share the code for
->> VHOST_GET_FEATURES_ARRAY() with VHOST_GET_FEATURES() since
->> VHOST_GET_FEATURES() will be just a specialized definition.
->>
->> It also makes the life of the userspace a bit easier by not making it
->> construct struct vhost_features_array.
->>
->> Looking at include/uapi, it seems there are examples of both your
->> pattern and my alternative, so please pick what you prefer.
-> 
-> I'm ok either way, but I don't see big win code-wise. The user-space
-> side saving will be literally a one liner. In the kernel the get/set
-> sockopt could be consolidated, but there will be a slightly increase in
-> complexity, to extract the ioctl len from the ioctl op value itself.
+Hi Jakub,
 
-The current patch also requires copy_from_user() to get the count, so I 
-don't think they are different in that sense.
+Could we configue this parameter of mtk_t7xx through Kconfig?
 
-The difference will be marginal anyway, and it may turn out encoding the 
-length in the ioctl number requires a bit more code.
+Thanks.
 
-Regards,
-Akihiko Odaki
+Jinjian,
+Best Regards.
 
