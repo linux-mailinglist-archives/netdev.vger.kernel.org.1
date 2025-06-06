@@ -1,190 +1,168 @@
-Return-Path: <netdev+bounces-195488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CA8AD073C
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 19:11:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD95AD0748
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 19:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A1ED1893A17
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61E4C1891495
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0D528A1D1;
-	Fri,  6 Jun 2025 17:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD719148838;
+	Fri,  6 Jun 2025 17:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9RVO82n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WMHniWf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFA4289356;
-	Fri,  6 Jun 2025 17:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B1912CDBE
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 17:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749229868; cv=none; b=kD8Ebfy1lrjxIHpkzkZ+0r6F8w+QW0sDXyOi1LCPx0Maaf+R0i+DcQDXNYpPo41ELmU7TEiqOXDl1z/ApBGDUKfHYrjZp1W2arnbU8857JiHLt4ysVx+hgU+Rg9bVwkcihfV22AUJCbYF9gq7ZauHMM9YOi+5SLDPw9jzKWvYbE=
+	t=1749230229; cv=none; b=oGbI/ueLI5RI9AIj/IdoBiAqzWXXd4bfrqaA1OIe4iqKvu4zw+EBQYwOz8JMtBvKtJunhUW1AGzv4QSFnS0WH0G5N9dXEL5FtoZpII4dBrbIZLzfhOpRYk4btOsWmtgyUbTMiwYTIOP0ZbWK1o9Tz9RIWFt7jxDmSnTZz8GrNMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749229868; c=relaxed/simple;
-	bh=6+GobG0hQYhzxyYNBAoxR/PdlVWqMkVm5lRIM1SNtE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Muwbhr1BrfJ79gA4jkf7ovCnrHdjCIYXuJkUiutqoXzdcUP6u7472DNni9ingm4sv5aJAlOHsLNUCSFl6Tav7l2nxZ648rEVNxRbuvUsZsGxf5hOpt2TZiuTx84OxNUQazUn3JkjHsn77BUauvxdnTwqagcLZFZsV3Q7d3+5l8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h9RVO82n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63312C4CEEB;
-	Fri,  6 Jun 2025 17:11:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749229868;
-	bh=6+GobG0hQYhzxyYNBAoxR/PdlVWqMkVm5lRIM1SNtE4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h9RVO82nyI3agMJUPn6vDJDr81E+3Ey6abjj2n6XE3ZDc0klBz9HOkFr2GSuqzkKR
-	 Pint7OrBeCoezn3EN7ib8q3liAKA2jFQ2Pk/tZ/XZwJbTOYPBuTIgjmHs/ffE1MHzw
-	 rbkxM5UKjZxczTauit6GT+zUkXcy4jBOtfPNZTRXYHShMZiAS28lDK3hTZTjXhIrDK
-	 0NJmHr7SId2Cz3J/JZmnCi6DRSmoUnD6UCh+zxIoY3uOjmy51SRBtyx8+UI4BdKUUl
-	 +1VPBrUlAuKiRjFFZrt3PVXCI4dF0UPQvZC97B9Y1YOozTZBJFhjOcbHO4a43v5h3z
-	 8bZzGp7DB6M2A==
-Date: Fri, 6 Jun 2025 10:11:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, martin.lau@linux.dev,
- daniel@iogearbox.net, john.fastabend@gmail.com, eddyz87@gmail.com,
- sdf@fomichev.me, haoluo@google.com, willemb@google.com,
- william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org
-Subject: Re: [PATCH net] net: clear the dst when changing skb protocol
-Message-ID: <20250606101106.133cb314@kernel.org>
-In-Reply-To: <CANP3RGfXNrL7b+BPUCPc_=iiExtxZVxLhpQR=vyzgksuuLYkeA@mail.gmail.com>
-References: <20250604210604.257036-1-kuba@kernel.org>
-	<CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com>
-	<20250605062234.1df7e74a@kernel.org>
-	<CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
-	<20250605070131.53d870f6@kernel.org>
-	<684231d3bb907_208a5f2945f@willemb.c.googlers.com.notmuch>
-	<20250605173142.1c370506@kernel.org>
-	<CANP3RGfXNrL7b+BPUCPc_=iiExtxZVxLhpQR=vyzgksuuLYkeA@mail.gmail.com>
+	s=arc-20240116; t=1749230229; c=relaxed/simple;
+	bh=SfR0cOaGofkev22hPCQ3XghIJYkqaoiwMH2ugkUSszc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GLcjbsXw+V+omH07PcjEjO1ZXqmCZWACnm3mwHdF/4bHFdCd9D3DF6/m1gMNhl1VD0M9+i+ZLqUHreb+Vfzte05H46HWIeWXZdzOOSm8rBkFsoyrLRWjgYsxqMhMX+r9FXnBPfMNNGAAPrpsydk5vCJ8H/g/zr3zdK/Ia43yeuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WMHniWf3; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47e9fea29easo13701cf.1
+        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 10:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749230227; x=1749835027; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mLeUStVGbo2/FnVij1rEUX9XeKz+QSY9QYDjoAQvIIw=;
+        b=WMHniWf3xIzr/Gl3VKK2CkrRHcLzLubFByxd3PWtBI71HOc31KvV9XndpwS7T5aIVK
+         UWAANJC4mtnyDlTdw/9Jae7+SEI6VsCnyE9qwIbt0hRDzvSXazrEqD0cgo8aLH/qR2lP
+         yX8fgg5XlXAVyAJOJSxIsrGrOuH3JhIqqB/3N3x7lZubBoLldZSJ6i51uTBoPA5a/+p8
+         gA9nh3JgBQpQshCi55tWRJI/hvGW4ktXP+EbNHbDES2ynE6iTK2ImqwnKbnTyruIO5Nz
+         CDQn2QMn2p1JBGSj/1E6yg5RWgla5o2Gs1qNT88yfybIif26e+tnTiif4jTVmSf5Ex85
+         A8+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749230227; x=1749835027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mLeUStVGbo2/FnVij1rEUX9XeKz+QSY9QYDjoAQvIIw=;
+        b=qZthBTqw9pM6jAoE7TiUVmBPncT3jSHCRDxCQLIBJ0MKJbvqCboq4p2VXSRe2MA6bc
+         UJzMhW52uxU7qfqyRbemZ8Iz0+Wp3fId8Lli27m/QVOvFv+SMAdMcqOOuoFhCDmYYAPa
+         1AQcw8o/mY9D1XuPttxp3xztPgbJBiK9GviFaWn25AV2O8ucJClwP/LO2qVB7Iy2HlFR
+         NOyWWPRqSmnij8zUsBegaUDaqNuBMC1hbTxbHEhqPcYGwFugh+x5kE4fkoy5441O55XF
+         DrS4KG1Sgw6AWx18PQ7+qsyodAMbGyAXzic7aaHULDUNVyW6tSTeoszRuHv6Rjntz3MN
+         cvvw==
+X-Gm-Message-State: AOJu0YyOmIpj74LmaUF+1wfBAM4K40yDuVT1R912ga4mqE8B0cG1Kjh2
+	kEeRa/+khjPvO417lJMqs57geQpUULwoqITH/fUDC5zjnJPQHoTCjNOK0uYnBX8t3JMRxnopS4A
+	XRZz6ceNvia/rDS6sfdawna25+6sjvHVm0J5thkPw
+X-Gm-Gg: ASbGnctWFtH1UZ/jyl1+przIajYkwuEZkSrO/AzSYLSMB29UuH3PJ30kj2I5LSQgjEW
+	KLNzA0EjS84GSNClC4syDKg2Jsqgbq08NOAYrpgSFCWC9qe8+xI+2GVDRtX/bKToM5PCgnIjH2D
+	vWPEHWKD9RsjCZvUWqaFk+wxvAYGG7VbHi0eCqiKqVpxUDmGeZt7znL/zwCbTURrUTKvMMEQ96A
+	w==
+X-Google-Smtp-Source: AGHT+IGXJYAGeILggRWXBoiM6XzanudwWwNBXwZfCBAe9BF4hZR56OJrq5T9F7Ugx77AYe3EfP69zThT+BATQRNI7i0=
+X-Received: by 2002:a05:622a:59c6:b0:486:b41d:b0ed with SMTP id
+ d75a77b69052e-4a5baa662femr4943861cf.12.1749230226666; Fri, 06 Jun 2025
+ 10:17:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net>
+In-Reply-To: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 6 Jun 2025 13:16:49 -0400
+X-Gm-Features: AX0GCFvbh4Jitx6HDUJyevwVpd9tUOP0li0ve8Oz80_3QPb9S1ZF2uEf_hxPWzc
+Message-ID: <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com>
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+To: Eric Wheeler <netdev@lists.ewheeler.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, stable@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 6 Jun 2025 11:40:31 +0200 Maciej =C5=BBenczykowski wrote:
-> Hopefully this is helpful?
+On Thu, Jun 5, 2025 at 9:33=E2=80=AFPM Eric Wheeler <netdev@lists.ewheeler.=
+net> wrote:
+>
+> Hello Neal,
+>
+> After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> across the switch on 10Gbit ports runs at full 10GbE.
+>
+> Interestingly, the problem only presents itself when transmitting
+> from Linux; receive traffic (to Linux) performs just fine:
+>         ~60Mbit: Linux v6.6.85 =3DTX=3D> 10GbE -> switch -> 1GbE  -> devi=
+ce
+>          ~1Gbit: device        =3DTX=3D>  1GbE -> switch -> 10GbE -> Linu=
+x v6.6.85
+>
+> Through bisection, we found this first-bad commit:
+>
+>         tcp: fix to allow timestamp undo if no retransmits were sent
+>                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+>                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+>
+> To validate the regression, we performed the procedures below using the
+> latest versions of Linux. As you can see by comparing the performance
+> measurements, it is 10-16x faster after reverting. This appears to affect
+> everything after ~6.6.12-rc1 when the patch was introduced, as well as an=
+y
+> stable releases that cherry-picked it. I have pasted the small commit tha=
+t
+> was reverted below for your reference.
+>
+> Do you understand why it would behave this way, and what the correct fix
+> (or possible workaround) would be?
+>
+> Currently we are able to reproduce this reliably, please let me know if
+> you would like us to gather any additional information.
 
-So IIUC this is what we should do?
-Cover the cases where we are 99% sure dropping dst is right without
-being overeager ?
+Hi Eric,
 
----->8-----
+Thank you for your detailed report and your offer to run some more tests!
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 327ca73f9cd7..d5917d6446f2 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3401,18 +3401,24 @@ BPF_CALL_3(bpf_skb_change_proto, struct sk_buff *, =
-skb, __be16, proto,
- 	 * care of stores.
- 	 *
- 	 * Currently, additional options and extension header space are
- 	 * not supported, but flags register is reserved so we can adapt
- 	 * that. For offloads, we mark packet as dodgy, so that headers
- 	 * need to be verified first.
- 	 */
- 	ret =3D bpf_skb_proto_xlat(skb, proto);
-+	if (ret)
-+		return ret;
-+
- 	bpf_compute_data_pointers(skb);
--	return ret;
-+	if (skb_valid_dst(skb))
-+		skb_dst_drop(skb);
-+
-+	return 0;
- }
-=20
- static const struct bpf_func_proto bpf_skb_change_proto_proto =3D {
- 	.func		=3D bpf_skb_change_proto,
- 	.gpl_only	=3D false,
- 	.ret_type	=3D RET_INTEGER,
- 	.arg1_type	=3D ARG_PTR_TO_CTX,
- 	.arg2_type	=3D ARG_ANYTHING,
-@@ -3549,16 +3555,19 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
-2 off, u32 len_diff,
-=20
- 		/* Match skb->protocol to new outer l3 protocol */
- 		if (skb->protocol =3D=3D htons(ETH_P_IP) &&
- 		    flags & BPF_F_ADJ_ROOM_ENCAP_L3_IPV6)
- 			skb->protocol =3D htons(ETH_P_IPV6);
- 		else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
- 			 flags & BPF_F_ADJ_ROOM_ENCAP_L3_IPV4)
- 			skb->protocol =3D htons(ETH_P_IP);
-+
-+		if (skb_valid_dst(skb))
-+			skb_dst_drop(skb);
- 	}
-=20
- 	if (skb_is_gso(skb)) {
- 		struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-=20
- 		/* Header must be checked, and gso_segs recomputed. */
- 		shinfo->gso_type |=3D gso_type;
- 		shinfo->gso_segs =3D 0;
-@@ -3576,16 +3585,17 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
-2 off, u32 len_diff,
- 	}
-=20
- 	return 0;
- }
-=20
- static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
- 			      u64 flags)
- {
-+	bool decap =3D flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK;
- 	int ret;
-=20
- 	if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
- 			       BPF_F_ADJ_ROOM_DECAP_L3_MASK |
- 			       BPF_F_ADJ_ROOM_NO_CSUM_RESET)))
- 		return -EINVAL;
-=20
- 	if (skb_is_gso(skb) && !skb_is_gso_tcp(skb)) {
-@@ -3598,23 +3608,28 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, =
-u32 off, u32 len_diff,
- 	ret =3D skb_unclone(skb, GFP_ATOMIC);
- 	if (unlikely(ret < 0))
- 		return ret;
-=20
- 	ret =3D bpf_skb_net_hdr_pop(skb, off, len_diff);
- 	if (unlikely(ret < 0))
- 		return ret;
-=20
--	/* Match skb->protocol to new outer l3 protocol */
--	if (skb->protocol =3D=3D htons(ETH_P_IP) &&
--	    flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
--		skb->protocol =3D htons(ETH_P_IPV6);
--	else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
--		 flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
--		skb->protocol =3D htons(ETH_P_IP);
-+	if (decap) {
-+		/* Match skb->protocol to new outer l3 protocol */
-+		if (skb->protocol =3D=3D htons(ETH_P_IP) &&
-+		    flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
-+			skb->protocol =3D htons(ETH_P_IPV6);
-+		else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
-+			 flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
-+			skb->protocol =3D htons(ETH_P_IP);
-+
-+		if (skb_valid_dst(skb))
-+			skb_dst_drop(skb);
-+	}
-=20
- 	if (skb_is_gso(skb)) {
- 		struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-=20
- 		/* Due to header shrink, MSS can be upgraded. */
- 		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
- 			skb_increase_gso_size(shinfo, len_diff);
-=20
+I don't have any good theories yet. It is striking that the apparent
+retransmit rate is more than 100x higher in your "Before Revert" case
+than in your "After Revert" case. It seems like something very odd is
+going on. :-)
+
+If you could re-run tests while gathering more information, and share
+that information, that would be very useful.
+
+What would be very useful would be the following information, for both
+(a) Before Revert, and (b) After Revert kernels:
+
+# as root, before the test starts, start instrumentation
+# and leave it running in the background; something like:
+(while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/ss.txt &
+nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  >
+/tmp/nstat.txt &
+tcpdump -w /tmp/tcpdump.${eth}.pcap -n -s 116 -c 1000000  &
+
+# then run the test
+
+# then kill the instrumentation loops running in the background:
+kill %1 %2 %3
+
+Then if you could copy the iperf output and these output files to a
+web server, or Dropbox, or Google Drive, etc, and share the URL, I
+would be very grateful.
+
+For this next phase, there's no need to test both 6.6 and 6.15.
+Testing either one is fine. We just need, say, 6.15 before the revert,
+and 6.15 after the revert.
+
+Thanks!
+neal
 
