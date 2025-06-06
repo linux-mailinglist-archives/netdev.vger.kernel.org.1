@@ -1,295 +1,176 @@
-Return-Path: <netdev+bounces-195476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C44AD0643
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:57:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEF7AD066A
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 18:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AC6F18813D8
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:57:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEC1A188DCF3
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 16:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C204288C1B;
-	Fri,  6 Jun 2025 15:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBCC28540B;
+	Fri,  6 Jun 2025 16:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jJdQIME9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NmV6czw6"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013056.outbound.protection.outlook.com [40.107.159.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A201B040D;
-	Fri,  6 Jun 2025 15:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749225418; cv=fail; b=HXaCO1NnG0hkahCRf9xgpNDInKnmSvKezhTx0AcxRSVmCYBAPY2jKyKn/39V/WDi6S2d9BcUW6vOzfqyP5lckIymYyfQWPiI1E4V0sHbLowms6cjU+bWfPAtKT62BG9pWm/PeHgEkefaY7r8agmGGDvn9PfKI1SFQo9loVTNwiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749225418; c=relaxed/simple;
-	bh=DjWqW1kdl7gJc5laNidO5V0DJUqKyAu+sQ+WhKYK3Dw=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=L1b2hZwIPtsMwIFaErUBJzl9o65fxguxXP0RuLrpYLNMY5fjTnxF5NgT8lVKftOuOxHZko++fAWSsh7PAXSXVYG5RIKlbv5NFBsBfSxs0ngjka5pmxYV2SiST6GpbN2HIg830dSBn7aBAsnzPBivzfBqPtlucfyqDWpAWQXwWtk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jJdQIME9; arc=fail smtp.client-ip=40.107.159.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JAgqgOhHaCswN4uSRfzjqb5Q53t0n7JvAqmazHb2/Qn9Q5sva15pJvAXzNwbEhfzjZtzXGj7cy7IJnmCZyi/EIIt6Q9zaOwcOo4NzxcA8PEzHnFCiPwc+LSyk6IEzX1T13JOLYfrwgOlRGQTjlfdLJZkaWl7uus/eBEiho/b4K9PNQyxj3kCPKc1AWCg89+PQ/vPRGr/UwnaYU8D1/uZAA87VxQz72u3giRAfrT/T1AXAiuoktmJLZesUW/nfA9SY5gwGUK5q4ph6deva+8dvDM0WimhSMb6dDMCyUpsJ1JcdZAT0IZw4EckAXcWUkPhHstXpTT2N0gaz6iPOYff9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fKKpqt7bYD8BpfCD9Jy07xmrYOoRXiaa/RTP9F++AfA=;
- b=w0kv1SeXQWUlHXgVel1egmW6NUYTEk2/A0YGLxLHoOGOSocO+icQjvoxscITg4+vw7n4DiojMQAdwihV223aOd4scH780Bm8b7YJKxV2CLisc0Q57QlYoVO1SO5kL5Vul5fYWar0sDML6F0WAPbFo8xA9NBYwUCTI8j9a3gj5wbY+zRlEulF8rjkoI8t/0eja5e/ae8HgnoSUyRpWogH8ReB6st8S4Uh3gvZcX8sIE8gif1DofGgmtDpKChMj+rth3FAcNkVDX0JIbDM6o3Fx/ITdD8v8GcWKN0m4Sc2RZydDqOdVAHO4w+yFiBSht4O7iosLWespqp6WLSjKl9TxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fKKpqt7bYD8BpfCD9Jy07xmrYOoRXiaa/RTP9F++AfA=;
- b=jJdQIME91m0kd17GrCT8bpp/DFVOF3dk+J5fge7IT9IBWpg+/oe51XZKbVYRcFFeGCv6OrY7czxET+ropaEdJ//4qxiHgav7Cr4pwQK+iy6fL7FdjdXpzju/CjPQ0EgZIHC4Rh5p6tvel0UfiEDSaNb8RnmPa+4ra3UJ/XeXpB8WiN58f7wcEc3MZid+IBXjaOW6CpOS7YqPmBXE8Ze/aWDPBqLF7aw/Pkqbf8D12c4cQuio+oXGu7OlUqQRxJ31CcqFIZJPA7488QNHJJHPh6AzPLU6f7AHMEVwUtwaEN0ZwmLw+cP6LMFyEJjciPzPEAhMneEE5j8o8h47qeGYwQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by AM0PR04MB7187.eurprd04.prod.outlook.com (2603:10a6:208:196::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.20; Fri, 6 Jun
- 2025 15:56:52 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%6]) with mapi id 15.20.8769.025; Fri, 6 Jun 2025
- 15:56:52 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Microchip (AT91) SoC support)
-Cc: imx@lists.linux.dev
-Subject: [PATCH v3 1/1] dt-bindings: ieee802154: Convert at86rf230.txt yaml format
-Date: Fri,  6 Jun 2025 11:56:33 -0400
-Message-Id: <20250606155638.1355908-1-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR07CA0017.namprd07.prod.outlook.com
- (2603:10b6:a02:bc::30) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A5314AD2B;
+	Fri,  6 Jun 2025 16:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749226059; cv=none; b=rTFIzEzBYYHMPAJ/Y4VPWEDVUpO/E8TKzU7wfZ23Klwfwoh/+muaVftgUrzdp2eE37ZgwvvVlGxvt8awRBs6s58G74+tc1Ff8T0uK3EcnhPTEWFuTm6GHFxvRH2b21Oq3OkR53RScQIwooxEwaBJVEielpdi+w0ABJPp2/QjqB0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749226059; c=relaxed/simple;
+	bh=aCBYs3HYbqHCtSKb89ZiDyardqdxI2f1i3HiuFqwWtE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TqvAHktPJv8ke2iqPbNuNMbblq0nS5RJ3dr/ZHJNKnal+4B1AoF1SRdbu2H44b9Zmwn4B9qN5pHi+AUQi/9IpN/P1/rtENpYX3DCyRxsBeKsku8+OkFXvP+RluTSEHcSZnQLlDHLF8JuxIsajwgH6MzyWCbBXEgTAkEBgMF46Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NmV6czw6; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-450cfb6a794so15901545e9.1;
+        Fri, 06 Jun 2025 09:07:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749226056; x=1749830856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GmxqTl8zXhUJWzbEhSbM4iH/Woj92FmKhTvp/ZOVPhY=;
+        b=NmV6czw6ejLXnlWyTEEJFLctsgsE/QRFzEzZJ8WwO984vySQX34oUffkyLsc6t6Efq
+         73Muksj0CijOTRtE+qZAATBcYWeE3jxF2nY7wgyHsu++ZeYUukVZ5RlEn6fyTMiLaPRI
+         yYRsOqUtOKlGj0kRkN9pi84gx1+FOIe7NhiIi5Gdd7YirbAqY5VqDyc3l3Z3bl4+cIQy
+         vbYF5iDIBfNlD8ZD8h9F4N1KDI4VKarkkc8+yHaoNG5Jg+WHy3w5no8xJ+XDF9kKDkPa
+         RsD+2cwfzflvUgrbOXqIUfw/I93pQwKCKZ+5aKutRcfGH/+L1lcoTeUo2L5JHNk1LUiB
+         Lo/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749226056; x=1749830856;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GmxqTl8zXhUJWzbEhSbM4iH/Woj92FmKhTvp/ZOVPhY=;
+        b=KyEaaHXnIe3aawiPOyFxLS3tuVMXUDr5hfS4gzKKJSJEpaxfZH6Af/suu5Y2ZyFI5G
+         x9o4m9otwMGwWbjvdUjUbnt5UsLkvl7Vx2PtAT9I0ZFK25TP+xzSPtIQY8II9kDoY8BJ
+         8ksWa49eHYgQjILcwvHvEoO7bpBLk5gj6lrmYJvqHOD+h1i3J9C59joIpIQ3TDZ5KAsz
+         1/GIrvMaHnxPQjR5x6IiBZFXE+iXO63wXUJbYFDUQSgTQTEkqsY+Ko4FfIvPYP6i0UZt
+         ttQiN6OsAv4hdLnUejfhFH2sOUlemy2Z3IvByYHe2GtxQzqhwjRF4Ed688yrewRegLXE
+         Wcsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWNtX43m4eFTlwqHzxI+FbBbZPAyFJQUOBVGf1akfG+PvIRajN09nnN+Uce5QHXgLmP5iKy/aj3IH6n6Ac=@vger.kernel.org, AJvYcCWyDxNGmDWQoQaGBKLDgUof0MfeTeXQ4Y78u3Po+srRClJqvTmlHUbyX1AqOgR1Apb1JQ/6VXkf@vger.kernel.org
+X-Gm-Message-State: AOJu0YwByEYvl8iUMquLOS1EcEZZHNCe9fXAy8nNiY3W+3g6tGb0Yz1L
+	NdKMi7r6BGfLaa2zFq3CJP/t+C/VMux9QTQsK/I1pY8jr2MupcBLweiYIcpx9g==
+X-Gm-Gg: ASbGncsAzQx1T7aOgNxM3PEsbZ5T98tVGCtLdsaxyWnmi2CPTDbUbtwUmWwZ0960mSQ
+	/JtKC4ZtT+G7vABrRNqQRPH4jUA9+VR6+yoCH1D6VSG1qxbr5a5idX18Fy2k1fA9LtfIX/K9yK5
+	P0uu8Ihn+upWWZw7hsuM0u12ZDjUtoiXd03k+zvLQgC/q2f+tq2aGDGbcI54r65R/qs0s0oLRjx
+	SsrrFOfWuTvLkZft8QRsLKyhQ94L6RR7ah/O8vdsrc/u9a2Hym5WIRM+jrylSNwQ9JIJJ/a4Mmn
+	cMoAB/CFwBiHZwCuM0PrJxsigMg6gZSC17cqy5uSEIikUzKnuxurI3KYtxxdnLw=
+X-Google-Smtp-Source: AGHT+IHSPmMAHUVKafg9JMqrfsTW9IVMgChgGgQ5N7vYRn20mw+68UMyYTnoSjJ3+qTqY0HgNX2N0A==
+X-Received: by 2002:a05:600c:a49:b0:43c:fceb:91a with SMTP id 5b1f17b1804b1-452013512a3mr41720205e9.11.1749226055624;
+        Fri, 06 Jun 2025 09:07:35 -0700 (PDT)
+Received: from qasdev.Home ([2a02:c7c:6696:8300:44e7:a1ae:b1f1:d5a4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45209ce458bsm28732025e9.15.2025.06.06.09.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Jun 2025 09:07:35 -0700 (PDT)
+From: Qasim Ijaz <qasdev00@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: ch9200: use BIT macro for bitmask constants
+Date: Fri,  6 Jun 2025 17:07:23 +0100
+Message-Id: <20250606160723.12679-1-qasdev00@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|AM0PR04MB7187:EE_
-X-MS-Office365-Filtering-Correlation-Id: d79e7142-1794-4c2a-4e29-08dda512c0d3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|7416014|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5kD/Rnr8GNDaR+rp7xCaHXeTXIX36D4e0ldasvewbBBgqba2xGF9uPVHJ/i2?=
- =?us-ascii?Q?UpbUrkV75W1F2FagyIlX6rB272lTJCZ9vngL//K4rB0qOz8RFbfxgBfj4WF/?=
- =?us-ascii?Q?rSMc9UJ51beCAG4HrSWL3l0epq/ygg6TLf1wBUMEIpB+zziSwNFaUlNfp1VD?=
- =?us-ascii?Q?aVjjJe5ul+lIEvuBgFE1k4WsIyCJ2joBEcRJq2BFNQulTv5yIbnN9HVPs2Sr?=
- =?us-ascii?Q?p4ix6+YpEOoTwAbnEgUsm3yS9grkEY4uPmVYHVhGY8TZct/P/cComXy/Ij8l?=
- =?us-ascii?Q?dieYqrbFmbj02a7yjufkp5gO2at1hmhir86GOYVryKiOY0wNGRk/0WSrbJp4?=
- =?us-ascii?Q?BtmCj+QTEk3eH5CpGZqGPPYi0yhxDCO3CLHdR/gnby2QC0oJSkI1YXpEz6J6?=
- =?us-ascii?Q?dJZg0sYZCaR6OiBVs9Q/NGWdvOguy2+glz6TbXxpfWaY1FFfOeZzQm2gphMP?=
- =?us-ascii?Q?0j5baGAI1U2EKndkDY+dhFRBNjXN7/+rijLVM8JYEA169HuuJQmB3K1syRPt?=
- =?us-ascii?Q?pRz2oH2x0jeF1dxtVlU8odL9FQjHAWKXitE+c/h3DHg7f3li91L76gITbkTV?=
- =?us-ascii?Q?6ONTr6hxy24mqkaPAnjXnVxRJlNHk5DW0923n2P56qL64CF0u+0Jf2MFzGMx?=
- =?us-ascii?Q?qSDo+dG5Iv/HqwxrTBL/bbdwnJW1OF+6BPPpwcuW5bAOLTVoVPag+4D3i5Lo?=
- =?us-ascii?Q?7fnSIOSxnP7jLo/qM+UROHqjYO2/O5fyEWyn/M24615M5LpUydIHVTbTQuCG?=
- =?us-ascii?Q?ZtitOIgr+2X99X4zSMEyHYf6fG/rBBfR8gbjEukPyijwC9E5qKSL3hgCY1gS?=
- =?us-ascii?Q?6KojWeJ4wCMIPdU7ufsNyeSkiNL/plqD8rqC2yE3AFWpymyD/w70Oiv/apJZ?=
- =?us-ascii?Q?qD52aOiRHff25I9Q8U4uR0HPmhMWeOiIBVlEt64F6tcm7D/QO0vKYpxmHEOX?=
- =?us-ascii?Q?fQBHb4qZr3CDaMDE8H14uVqlROkA2QwbhAz+SVhCophB1OcHwvF9zVk2uZ8i?=
- =?us-ascii?Q?wGWtXcifq7K+3ebpE3edMTO8B9CBGB6Y+cT3Eb/xXExqyky/zXT1bVKtuuK3?=
- =?us-ascii?Q?SDwKspeOXTx7EbG0znaV5QRZVkT0oJbuVdN1R+oUmdN94W3Cmu6d+GiKzbuN?=
- =?us-ascii?Q?P2YZT1/c+Fhd6YLk1CT/6SVfkcx6QpA3Rm8TwcGQULhEAEZf7nEhu6aYB/Yn?=
- =?us-ascii?Q?rkONsiI4IAyj1Ow6wvrsQT1o4f4QjJOE+K9BJjKOTvDw18hOgrzGKGUU5EQO?=
- =?us-ascii?Q?L0Z1SoLKWTx088EmT3NvSjSqKeTBVFvXyXtvY+B95mo0UxPqU54GWwBYhTXu?=
- =?us-ascii?Q?8UamXsx6RbpzIOwyuMZLj0xRU6X3K3+NYp3iEvhyaNviNh586iA9wPNtzzsZ?=
- =?us-ascii?Q?Rsv+zfu6ok5i0gWYR0w7UNYGuU7Mo95I7W88iWTVi5VsBDINeG4Auz4Rc10O?=
- =?us-ascii?Q?JybUVYLJUJji/OccVvEkCHqHfLnlUYDd?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(7416014)(921020)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sZ5h64Je3wuHLu6sVthYs8Hp3d1/J10DJtjWe/mVGfwU54ws112n3AKa9GfR?=
- =?us-ascii?Q?o9dXC7NTWYS6FQ/KqLLD5gbTCAlYXCXKzKK8qDssiJm/qyhA+9zRGPY3pkBZ?=
- =?us-ascii?Q?loQsMyIgTGZDqt/wZcJ4CTerY+XSq8a72N9Iv2uNQu9w3DkmDahGUMZEyvPe?=
- =?us-ascii?Q?KNZlKUhNtsTci2zIo0PEvZeZu+iQi9546diPwb+rZS5QhKzIRtU+3kRHtEz6?=
- =?us-ascii?Q?1f4qGLlm2u6Fx1C1ZQMxkTYqnf8Iom3KXYwg2aKzS/Dq6h/W1XWF2vTmUadR?=
- =?us-ascii?Q?DHSQCn/AF3hIAfoKGo6QdHxB6CgsLeQ7kwuMfj9rB4deNeo9PF9ovGWkbRtD?=
- =?us-ascii?Q?ycJ+Hd0cLG1ffHYWX5keyFyeRgJup8IZCOC04OGprvUscerSVi8J+Z2QanuP?=
- =?us-ascii?Q?7pjT/kC0md8Mqt0/2UP0n0Z1L/rBlk9aJw+4ZOItdhnouEkcc10ExjsgSWOy?=
- =?us-ascii?Q?vPyBayr5YMhzyA8GhtdqJySanBBey4H8WBOuwZTS/66fi/36T6ROy+XDzaKq?=
- =?us-ascii?Q?GUZWPx7BDHfisbplsdD5+jpzPrFyieB5w1IAfMXRDnH/T2K/T/pAFzky8VWk?=
- =?us-ascii?Q?EAwGJG9X4ep+OTXf65KVvRTta0EwVbcqe97s4j7rlKZra540G+HPYcFtQ7IO?=
- =?us-ascii?Q?apgTmI/GV1pOHeVIKVSEYCeoh05o+d/j82v0YkGD4Ns2fjBx++EFk0WAjP5q?=
- =?us-ascii?Q?vjbaPjrixXFwF3XWYaVVANAvyS3RTFLAV1baCOhw8GQRdEESIOHG0N5FVqUd?=
- =?us-ascii?Q?aUtSKlml6TkTMGidqyW3sv7Mn/qyU0zRSRZFn288wIwZ71Km5P6YMjohjryJ?=
- =?us-ascii?Q?K1IEw7+BkEyiLRpbSD5SEqsToobaPbeS/FMbZ5uP9xGnEdrfK5g9W4kSQ/8o?=
- =?us-ascii?Q?/Rj7fhaicVCcEn+s47FktQZkXHZb/ubZjQseOtC2UVMi2mcHhv0YYwJBxqMJ?=
- =?us-ascii?Q?t9fD3wAE8jyfqWZgkW3aopVmmYspTsIQWSWRjTUAvqF9dXVyynvyIMOWcv4b?=
- =?us-ascii?Q?/W3vNOOak0unEP8tblrBeXiniAl0qtxuPGL8vJ171Mv1sILzixKvl+XjfsDD?=
- =?us-ascii?Q?2mrVqhikRDM6YQrgfZxJoK3XHDzx1UP8tNQTfuNuaxhTm6I21wS7TqF5/MYf?=
- =?us-ascii?Q?DXS0Tb8AY5NuqbVNKUjMF2RhKXvQXiC53dJ5WdGi01BOzHOfL9KOaZdXVw2J?=
- =?us-ascii?Q?wcQFOqLfv+wSia0fLu1WFpfndIT4LT8+sXf+pRf2B4I3U2DijJW0GcpSDu7Y?=
- =?us-ascii?Q?h4lA1TezpJEfb/GVuptvnrBaOX+G4q9nvnsEkgQkejlMI2Xcd0ojBLy+DzyD?=
- =?us-ascii?Q?5nqQaoy78+mLslV7EWfjqqAIK45Q4X0+ze16nFbbUr13lkcBQCwbxoNdC03y?=
- =?us-ascii?Q?J70TYX8vskyumABw+TzF32cjF4pU1aNfniPfaoTSICH62xK40K6dV7s14Biz?=
- =?us-ascii?Q?OFcHKHsUCLal+Ldr9A2fLjFpH0Wrh6BbLcPgalLnEw0dYOXXjKmNof4kEfMT?=
- =?us-ascii?Q?et9IOVvg9pc6A5u4WalkKy7IYuOYAlZe15Ljzdm0MbkqEIn/2i80Lp1fvJmP?=
- =?us-ascii?Q?3fO4/esQeTop/G0o1R0Hx72ErobFlTDu0aX2CP5y?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d79e7142-1794-4c2a-4e29-08dda512c0d3
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2025 15:56:52.1904
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +NKeSpYSG41nOjC5jr8Ya3B78+3ypnTQrnpLIEXDWgFP1026YIMoq3i1qaKle2Aqx2LTjt1aP08tdEx8Y+Jk9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7187
+Content-Transfer-Encoding: 8bit
 
-Convert at86rf230.txt yaml format.
+Use the BIT() macro for bitmask constants.
 
-Additional changes:
-- Add ref to spi-peripheral-props.yaml.
-- Add parent spi node in examples.
-
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
 ---
-change in v3
-- add maximum: 0xf for xtal-trim
-- drop 'u8 value ...' for xtal-trim's description
+ drivers/net/usb/ch9200.c | 50 ++++++++++++++++++++--------------------
+ 1 file changed, 25 insertions(+), 25 deletions(-)
 
-change in v2
-- xtal-trim to uint8
----
- .../bindings/net/ieee802154/at86rf230.txt     | 27 --------
- .../net/ieee802154/atmel,at86rf233.yaml       | 66 +++++++++++++++++++
- 2 files changed, 66 insertions(+), 27 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
- create mode 100644 Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-deleted file mode 100644
-index 168f1be509126..0000000000000
---- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-+++ /dev/null
-@@ -1,27 +0,0 @@
--* AT86RF230 IEEE 802.15.4 *
--
--Required properties:
--  - compatible:		should be "atmel,at86rf230", "atmel,at86rf231",
--			"atmel,at86rf233" or "atmel,at86rf212"
--  - spi-max-frequency:	maximal bus speed, should be set to 7500000 depends
--			sync or async operation mode
--  - reg:		the chipselect index
--  - interrupts:		the interrupt generated by the device. Non high-level
--			can occur deadlocks while handling isr.
--
--Optional properties:
--  - reset-gpio:		GPIO spec for the rstn pin
--  - sleep-gpio:		GPIO spec for the slp_tr pin
--  - xtal-trim:		u8 value for fine tuning the internal capacitance
--			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
--
--Example:
--
--	at86rf231@0 {
--		compatible = "atmel,at86rf231";
--		spi-max-frequency = <7500000>;
--		reg = <0>;
--		interrupts = <19 4>;
--		interrupt-parent = <&gpio3>;
--		xtal-trim = /bits/ 8 <0x06>;
--	};
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-new file mode 100644
-index 0000000000000..32cdc30009cc0
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-@@ -0,0 +1,66 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/ieee802154/atmel,at86rf233.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: AT86RF230 IEEE 802.15.4
-+
-+maintainers:
-+  - Frank Li <Frank.Li@nxp.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - atmel,at86rf212
-+      - atmel,at86rf230
-+      - atmel,at86rf231
-+      - atmel,at86rf233
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  reset-gpio:
-+    maxItems: 1
-+
-+  sleep-gpio:
-+    maxItems: 1
-+
-+  spi-max-frequency:
-+    maximum: 7500000
-+
-+  xtal-trim:
-+    $ref: /schemas/types.yaml#/definitions/uint8
-+    maximum: 0xf
-+    description: |
-+      Fine tuning the internal capacitance arrays of xtal pins:
-+        0 = +0 pF, 0xf = +4.5 pF
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+
-+allOf:
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        zigbee@0 {
-+            compatible = "atmel,at86rf231";
-+            reg = <0>;
-+            spi-max-frequency = <7500000>;
-+            interrupts = <19 4>;
-+            interrupt-parent = <&gpio3>;
-+            xtal-trim = /bits/ 8 <0x06>;
-+        };
-+    };
+diff --git a/drivers/net/usb/ch9200.c b/drivers/net/usb/ch9200.c
+index a206ffa76f1b..bfe27a7dcbb4 100644
+--- a/drivers/net/usb/ch9200.c
++++ b/drivers/net/usb/ch9200.c
+@@ -59,42 +59,42 @@
+  *
+  * Note: bits 13 and 15 are reserved
+  */
+-#define LOOPBACK		(0x01 << 14)
+-#define BASE100X		(0x01 << 12)
+-#define MBPS_10			(0x01 << 11)
+-#define DUPLEX_MODE		(0x01 << 10)
+-#define PAUSE_FRAME		(0x01 << 9)
+-#define PROMISCUOUS		(0x01 << 8)
+-#define MULTICAST		(0x01 << 7)
+-#define BROADCAST		(0x01 << 6)
+-#define HASH			(0x01 << 5)
+-#define APPEND_PAD		(0x01 << 4)
+-#define APPEND_CRC		(0x01 << 3)
+-#define TRANSMITTER_ACTION	(0x01 << 2)
+-#define RECEIVER_ACTION		(0x01 << 1)
+-#define DMA_ACTION		(0x01 << 0)
++#define LOOPBACK		BIT(14)
++#define BASE100X		BIT(12)
++#define MBPS_10			BIT(11)
++#define DUPLEX_MODE		BIT(10)
++#define PAUSE_FRAME		BIT(9)
++#define PROMISCUOUS		BIT(8)
++#define MULTICAST		BIT(7)
++#define BROADCAST		BIT(6)
++#define HASH			BIT(5)
++#define APPEND_PAD		BIT(4)
++#define APPEND_CRC		BIT(3)
++#define TRANSMITTER_ACTION	BIT(2)
++#define RECEIVER_ACTION		BIT(1)
++#define DMA_ACTION		BIT(0)
+ 
+ /* Status register bits
+  *
+  * Note: bits 7-15 are reserved
+  */
+-#define ALIGNMENT		(0x01 << 6)
+-#define FIFO_OVER_RUN		(0x01 << 5)
+-#define FIFO_UNDER_RUN		(0x01 << 4)
+-#define RX_ERROR		(0x01 << 3)
+-#define RX_COMPLETE		(0x01 << 2)
+-#define TX_ERROR		(0x01 << 1)
+-#define TX_COMPLETE		(0x01 << 0)
++#define ALIGNMENT		BIT(6)
++#define FIFO_OVER_RUN		BIT(5)
++#define FIFO_UNDER_RUN		BIT(4)
++#define RX_ERROR		BIT(3)
++#define RX_COMPLETE		BIT(2)
++#define TX_ERROR		BIT(1)
++#define TX_COMPLETE		BIT(0)
+ 
+ /* FIFO depth register bits
+  *
+  * Note: bits 6 and 14 are reserved
+  */
+ 
+-#define ETH_TXBD		(0x01 << 15)
+-#define ETN_TX_FIFO_DEPTH	(0x01 << 8)
+-#define ETH_RXBD		(0x01 << 7)
+-#define ETH_RX_FIFO_DEPTH	(0x01 << 0)
++#define ETH_TXBD		BIT(15)
++#define ETN_TX_FIFO_DEPTH	BIT(8)
++#define ETH_RXBD		BIT(7)
++#define ETH_RX_FIFO_DEPTH	BIT(0)
+ 
+ static int control_read(struct usbnet *dev,
+ 			unsigned char request, unsigned short value,
 -- 
-2.34.1
+2.39.5
 
 
