@@ -1,167 +1,218 @@
-Return-Path: <netdev+bounces-195363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04C0DACFE64
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:34:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0699ACFEA1
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 11:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF8E8189A520
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:34:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDE373B11D6
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31881283FF6;
-	Fri,  6 Jun 2025 08:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F15F28642D;
+	Fri,  6 Jun 2025 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQGa+fE2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eDXc9HHY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2050.outbound.protection.outlook.com [40.107.93.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926F41DF739;
-	Fri,  6 Jun 2025 08:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749198846; cv=none; b=I7f2shniXxMvbG+dmLIeO9wkb6u0DBZhbN7xH2wpwLVgLqsBcswk767QOzSxAaMsElsZRcPDNi4xJCNI+8HORM4rs/2eOcb+9W6J6wUbY6UFYcQ9G7X78QLJSmSHLGqlZVh+q8uMtK2kM4ubw/pRW6+qxyDcUgTN+hEq0oaaaWA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749198846; c=relaxed/simple;
-	bh=MlWjKv6N8n786ldv+fOBqFDX6cRovDX3bUWZpnnE31s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=prZPZWbGh5A1ZwgqZck600LZRz2PqA9LNddU5IkWutct9HTtbTr13aJ7TMG1yWqhO4s/EXN6CFGeAtNGu9n8ZErWTcLuBVf+8cEV0BeH+yLlFMKPrGR9zgoy09MkcN6sR4MOh06dXbu0HvvhMjP+kphUYfIWT2ys1DkZxfUjntM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQGa+fE2; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dc7294716cso15118835ab.2;
-        Fri, 06 Jun 2025 01:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749198843; x=1749803643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gEV0yP7e+tTurJnFgSwDfnrgYjosGeo8ZE0291CoQy0=;
-        b=iQGa+fE24dMKW6CWAg1AJz9Jy5EvlihR9LAYCEHD2WhfkJUSfwERVkWibWykWULNpV
-         jWuqJR8nktCo3wPvVeXIrrYavui73npgS4Pg7A8w0P4mrVhem6iFZQ68bTcktW+5PRIe
-         FdIlnUj0UyI91LEYfSq1R4BpT5Vm9/fwB4L7s6vrkWJlgEQCxnjxeyg/KjoCjEyZm5Ge
-         gpzLeCSr2LJqPGXGqljElsufbWPVkbWatMwfQGpjLxf274RgzpuRT/MBX0GWRx3z+xrL
-         UJYXqhJVgghLWnMAiQsqqjUirsSHnuTKTa+fP3JLf0P5zPowneHa7hE7j5k0v/Z09UuP
-         WDkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749198843; x=1749803643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gEV0yP7e+tTurJnFgSwDfnrgYjosGeo8ZE0291CoQy0=;
-        b=nnfRZJjFGw3+dtkNhQabnrktFHocmU5xvz160sD2/DkW532aekd3pJww4qlASBk6M+
-         HenOi+vk9QMFFQxbdUnKXw6ZrpG1wNvmwDbjx62O945k64WAlNcwrpVHM+pt12oAEy8v
-         UXq5kXN4tkk2DY+daop4u/dZLbc8c3gfZZbfJFjfz5XzPsqb/yHp3UPJmqQRp7IZ8VL+
-         8RdEwm2reYCQjGMU4+VhsWX5E+z5k1Gy/pD229aUvlpWcBL/Bxo9CAieE+0lLK3pGm47
-         r/5YK/TlQJtl0NrbEIzIo8EGDM5rpBHcXPM4kyrWmKriGkL/C4ZnrqpF9gp3HFIuBPQd
-         +3xA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNmhQVpPAjEBhynuCHMJAi7e9KKGeCDOGK8LJXMLUxdiwB0m3KdwAamrha03i+zor53LAWGJa4@vger.kernel.org, AJvYcCXR0g2IuUGZbh4Ihc9qj29upGcSF3e4vdtw5Oc+2eAK8FTu/vsXmaedhO9AhlN6/QGapoarw0rQqQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoufUOKp74ByMJEUomiEoQ3cF+W4E5+a1IcHwbuunGA1xxXp1+
-	6iJJDToWujNffRGmf6sduFcmGzIMT7OgsP7ufrub3jyj8T6bjxEkxuqS6+Z9MwvoTQSMzSg+EHG
-	LGvcHkOsO/6cmPUx5EPAzN/g7n2NURss=
-X-Gm-Gg: ASbGncvDCG9MyKyZlDUIZN1oysWYxv7Kj4G9X0Udf4mED1DRNj9sbl7MbAs14C9Wcm1
-	Y2b7naaJ41Sh3+wTOcdw/cHH5w1aZ+eE3jSc2pA3if+jPsqZI1PJwuf1LizY7rNLuwLGf8jUjEA
-	q6/B4QMyt9soM53EXLC0+iIugPX1qzKipWPZJ9L19fFu0=
-X-Google-Smtp-Source: AGHT+IHAgZYASrsHIPplviCv7Kp5d6BKggJOd+4qBlUUUxN/muYGA+0S/uDR7cuuebsle4hZYPd02SUtsGFLrtfpPfs=
-X-Received: by 2002:a05:6e02:1aac:b0:3dd:c40d:787e with SMTP id
- e9e14a558f8ab-3ddce4136damr29394415ab.2.1749198843531; Fri, 06 Jun 2025
- 01:34:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF532853F8;
+	Fri,  6 Jun 2025 09:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749200429; cv=fail; b=lZxlc4ZNq50hI3AiGoE64sxwBPrryydEEk0NxFgRGOXmHSD6N3is2gacyitvGBrx1VEpEIhLP7r5sFKnLRjBj5d6a0gJT78z2nLo+8KiLlm2Tc2HBmqyubloBsjm7+JF5X9h83onBt5JC+0UApaTEvqngNMknORQTpZIZSh6lbc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749200429; c=relaxed/simple;
+	bh=V+K/b2IrXDmFlcbL+ja7aFrZUUtQcX5tmthaHEqGdpI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=S3aBNyj/MdwtsSA0us+Jpm1cLvAai89hFbFvqjM0r55zmPAaGatJxbcYYmSyOJydqr9PXezlmZgQDFylPJgd3BAVJre8ovH+YiYBIge1nNwEn2b0IV6l2/kFFJNXdtmLSG65nAG8BQW9OYxRBZvUJ8qMR5MiLdExNFJmjNxgw24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eDXc9HHY; arc=fail smtp.client-ip=40.107.93.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RgvzHyNMVUbs3TEQ4BtuouNQJAZENPV8mzWbGSYK00wTREsTP/QUEutnojkA+SmTxCGJtiHmpGwn1k8U1hLtx7Zmru1KlSV2CLvQLxJQmgZQtYmQfRJ3qO5VNmyZu2ogejFImPb/kVDHeWqZhZYuzgQ/rZOdMLQVQGMD9hhGd6fBZSu0PgLvLdhWuVRGhFXviXhXwKWvWgLWTI0B422xOAXZ/37IBXBa4sjX4RhbRLYcJCvj3BqqLvmoPxyu7YsAlZNVhVZjZTZ6aj7rctopRc+iPfS8WOtx77/dU9ywjDb8KzGb5DE+yHdGRlBK+e0szfuQJknSerXpbOuN4ygJVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V+K/b2IrXDmFlcbL+ja7aFrZUUtQcX5tmthaHEqGdpI=;
+ b=C3sFsriMD5wdMmDIVown0Ywb04qvNM61rG5KhzUSrCNBnYQw+Q3ITV3B70XviLNWSw9KwKZImnldWeR1ODVk5RbVc7NSqLyJw0JYqGckd+uLt/0aAGHQten0F2FRO7i93mu8WP20tCzxtRuyUuqdf7x+IAk6y6zZvSH9GaAOvnn2XbkG92AK30rfStnLD1lKodBFXdvUhdhuBUoWNYIqhSw50/6EUzVqqiHb1VPqnrpsZU1ygldF4Nu5YG1u5r8r58OVyujg0iw5JrUyY1QH+gyoG2xvfC39weboDONdmq71XD9y7rk1NSJ0+5ChjcgpLpMYd3iu7kaEleaubtP2YA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V+K/b2IrXDmFlcbL+ja7aFrZUUtQcX5tmthaHEqGdpI=;
+ b=eDXc9HHYD/s6QaPCBxWOJHY6BWCBnYIp0zfdwZQTioCBKBrU6MJ8zB924dWrKZEREyG2qVa9BwAvYIHWz/4JsoaQWS3LrlE6U/XZWJg2w28xC8EC5+S1VTMPiKCSARNRfw69iYNZgMF4R+nWtLI/weS4A0BoaNwjGIKjwFl1SV2HYlC4b81tAeDqV0e74uEIo7p67yH+6UTdt/byZ/EwovSnIV8ShywKoziU47vSYHwNgd1oVEfmO4G6iHSyBpyW4oCNA0o9ouOTTPMg87ULxxUwnH6598U9A33+G0BYGyei8n1vw0itgx2VWU3OsNC9qkWZod/2+cuVlg3xzUUYAQ==
+Received: from DS5PPF266051432.namprd12.prod.outlook.com
+ (2603:10b6:f:fc00::648) by DS7PR12MB6357.namprd12.prod.outlook.com
+ (2603:10b6:8:96::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.33; Fri, 6 Jun
+ 2025 09:00:24 +0000
+Received: from DS5PPF266051432.namprd12.prod.outlook.com
+ ([fe80::a991:20ac:3e28:4b08]) by DS5PPF266051432.namprd12.prod.outlook.com
+ ([fe80::a991:20ac:3e28:4b08%6]) with mapi id 15.20.8655.033; Fri, 6 Jun 2025
+ 09:00:23 +0000
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: Dragos Tatulea <dtatulea@nvidia.com>, "stfomichev@gmail.com"
+	<stfomichev@gmail.com>, "almasrymina@google.com" <almasrymina@google.com>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "hawk@kernel.org"
+	<hawk@kernel.org>, "leon@kernel.org" <leon@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"ast@kernel.org" <ast@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, Tariq Toukan
+	<tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Mark Bloch
+	<mbloch@nvidia.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, Moshe
+ Shemesh <moshe@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next V2 00/11] net/mlx5e: Add support for devmem and
+ io_uring TCP zero-copy
+Thread-Topic: [PATCH net-next V2 00/11] net/mlx5e: Add support for devmem and
+ io_uring TCP zero-copy
+Thread-Index:
+ AQHby2JnWbRK2QGPS0ishQmLipVYlrPmq6eAgAEgIwCAAGxkAIAAeYGAgAABOQCAAMs/AIAMbfOA
+Date: Fri, 6 Jun 2025 09:00:23 +0000
+Message-ID: <b51a92bb8f4b46e9370b93d68a0a994e9c7289d1.camel@nvidia.com>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+	 <aDXi3VpAOPHQ576e@mini-arch>
+	 <izjshibliwhxfqiidy24xmxsq6q6te4ydmcffucwrhikaokqgg@l5tn6arxiwgo>
+	 <aDcvfvLMN2y5xkbo@mini-arch>
+	 <CAHS8izMhCm1+UzmWK2Ju+hbA5U-7OYUcHpdd8yEuQEux3QZ74A@mail.gmail.com>
+	 <aDeWcntZgm7Je8TZ@mini-arch>
+	 <phuigc2himixvyaxydukgupqy2oxpobj6qo4m4hb6vsr5qenfd@7q4ct2c5gjdq>
+In-Reply-To: <phuigc2himixvyaxydukgupqy2oxpobj6qo4m4hb6vsr5qenfd@7q4ct2c5gjdq>
+Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS5PPF266051432:EE_|DS7PR12MB6357:EE_
+x-ms-office365-filtering-correlation-id: 94cab8b6-a694-4485-2d6e-08dda4d892c3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?c0tzQ255Y1V6YVppeno2QW1wVnpvWllwVHRMbTVCRWU3cmdBUnRIejZGM0dM?=
+ =?utf-8?B?c2xoTktHSjNtUm1iRUZxWDlkTkpuYTMvZytDbncwTXdlRUphU3gxYU1ERFFF?=
+ =?utf-8?B?M29ybUJsSkFPVTh4bG9XbjZaWCtxMFU3akl2WGZTUzh6Y1luQXhhVDlNWllk?=
+ =?utf-8?B?UHpZUUF6M2QyajUzZTEzbU9NN0xMT2p0UWFvS1N3cW5qcVBRSmFxL2ZUSFpQ?=
+ =?utf-8?B?djVCaXJFeU50SDFKbXh4WVRCRER2dy9zNUxHZVdVTWJseVpJcmhsSS9jOXJQ?=
+ =?utf-8?B?MnNmZDdQTGFyOG5YR3d1cWxqNTJhdlFkVjljOFgxTUNiU0oxMEpDeHQxd3A0?=
+ =?utf-8?B?RURLUitFc0xJT2RKQmdkaTVhdEdZVnRVeFFZdjdQc0g1UmV0Vkd5NmVSdGdH?=
+ =?utf-8?B?NzU3SENtNEtlOTZQaTVNSmhYVnAvSFdRTHdIRHZtQXJpbUUxaDBYcjJxQkQx?=
+ =?utf-8?B?MGt3OEVKczlBcVBXcXhzOUlQRmsyOHJ5SlE4UEpYa1k4Mnk1SzNLRy82NnND?=
+ =?utf-8?B?cGRsQTRkd1RxcXVVWUljM0ZOempPa2dScjhTbXArSkdLa1Ruck1zMDIxRDll?=
+ =?utf-8?B?Y1ROeXlYRk1YYkZ0NStDOUw2SS95czJTbDlHVm5ldFNDdXo0VmxReFU5OGFK?=
+ =?utf-8?B?ay9qZllUL3ZXbFJwbnZqbWppTDZMS2R5TjZJaG1ERHQrTlBDNFREYWRsWWxO?=
+ =?utf-8?B?M1YxTzVyS0NuQndReVpDWEFyNDd2QXBueElxdUJHc3BjT0dHOXZacktDbTZR?=
+ =?utf-8?B?SjZTSlY5T09hbVJPZVZSTURpVFNhOURESURCM3g1VUcrTVpWWE1GRm9McWJY?=
+ =?utf-8?B?NzFmQitYN2hjZVFIazQ3L1VRcWxUa0VSQnRTSVJ4QnZxczVsR3c4dlpKdERX?=
+ =?utf-8?B?ZmpRekQ2bFFVTHprS0psUmtBRDIrcytNV0Q4WDUyNS8wajlUN0lMZkFNc2lx?=
+ =?utf-8?B?eHRRQmNYQjY3eGR0VWJDd3ZaTE9aZVcrc3FKNWEyaU9zMkY3K0dvUmNWUjIw?=
+ =?utf-8?B?RzA1UlVzWnZoRGsxRXNxdU5LOGloV3dTbDA4UXBMeFZ6TnFjSWg0WGRFa083?=
+ =?utf-8?B?NHlka2Vzb24rYjBROG4rK1c5UlFmM0RuVkk0dkR3b28zcUtDMFB0M21JWnNU?=
+ =?utf-8?B?ODNJMHdyK2JVUVM1dlAwdys3OFB1MURWeCt4TUFMOS8xOGdqeXQ5WWZCK3lZ?=
+ =?utf-8?B?T084VVVoWm5td01jZUQxZHpFN2xvS1RVckIwaTZjS3l5bjVMbDVMMzNLeHFC?=
+ =?utf-8?B?ZDVUeE1lUjlxRWlnamorOE9PVlpaOEFjcERNaWNMT0JBSWZqL1Y4Wmc0cFJD?=
+ =?utf-8?B?TlA5M3NZbEtxOEUyOVBheWsxOGMyTndJb3JibVJQb1ZEcW55WWJwMlFDdDVi?=
+ =?utf-8?B?dlNITDYra1lPejBWb0x0Qm1PVWxTWmhSa3hyMGp1Q3ViSTJMVUw1c3p5U0dm?=
+ =?utf-8?B?akFrcWp5Z2RnTXJJSWZlSDFWTmxZVU1pSFRNYlZHNmh3TFJRZHlCNXBIRktL?=
+ =?utf-8?B?VnNIaE5palpKRjBUMy9JaFovK1k1aExWK1dHTitiVlFlUDRINTJNMEFRcHRF?=
+ =?utf-8?B?T3BpeDZaOHhWV05EVTFmZmYva3YzbU9xMmlzcnRqNmZHWi9DTUpQeHlCNlcw?=
+ =?utf-8?B?OXZqZjVzbm9Xb09LWEYydUJ3eE1OTmlVV0E5VldEOXpDVytFUjNoY0pNMnVR?=
+ =?utf-8?B?TVMyRUlEcTNYeU9sTXNZYmphVFl6aU9mNUZic2oxRU1JTm9saGY0UmJjK0RZ?=
+ =?utf-8?B?cDBEQ0FsbmwyeGdTSTgxYUZXckJkdUdISjdjZlRvdHIxMXdwTCt2NjdQckpa?=
+ =?utf-8?B?YzIxZ0RKN3lBUy9tcXhIUFI5SGRQTHNDMkdiK1VPbnFxeCtGQityR2c1bndv?=
+ =?utf-8?B?RjUvTTQrSzU3dWV5SmpKS09FMHJmRlFDcXNCQ2FLbmVMUUI4c3d5aXdpd1dt?=
+ =?utf-8?B?Z3hxU0R1bDJSK0I0Qm5OcTBsa1FacnVDZjQxeHB1ekY3S0dScGNsTmpCZmJ2?=
+ =?utf-8?B?cllZbFMxYXpBPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS5PPF266051432.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?V3FzN0dMNlZ6U0NmMmhzcG5iMklBRHRsQ1k2OHZwcDgxU0xGUFJzRUxlTHN2?=
+ =?utf-8?B?cFhmZ2xsM29YR05pNmdqL2M4TTdVZ1ZOUDF0T0haekpLcFZaUmJGQUUwN0lX?=
+ =?utf-8?B?VnBjVGZmOTZvOVJOa0o2N1RjbytFVVdYN3NmOW9mbU1Oc0pwaDRFMlB1eVVy?=
+ =?utf-8?B?d1lydE54RFFteW85UllmQXBFNjFFTXZRZXdJMkNCcVh6dS9JNVYzb1oyY3RH?=
+ =?utf-8?B?a0l3K3F2WTdWWVNGZXpSWDl5ZHIrMTVXNmN2a1BKcklrMTFjU2JRSU03amNo?=
+ =?utf-8?B?U1lZUHRUMEt4NG1MSDZ3dWVDSzZCUXV3V2g4dWNvcnlFd05KaUNPMVpSaFhM?=
+ =?utf-8?B?cXlMelU4Z1dQeEtvMm1KeTBTRHVIVUpyV3paVXRFREFyNWJ0dlpLcUR5VFN1?=
+ =?utf-8?B?QkM1V09sakxTTnZseHozYmJaNThHd2dWRU9kTndXcHNvWnROY3FNVEoyODUy?=
+ =?utf-8?B?akcxTnlETDRwRGhQTjlvMDVOYmtpY0c5NTdZM0VGVk10ZC9mT1VtMzcwaGZL?=
+ =?utf-8?B?QnJPYitWN2NGTmlNb2I1N0xNc0d0clYvMEc0aUtTMGFxdHRRSmNodGlETUhm?=
+ =?utf-8?B?Mmx2TTJ3WTM5VlF3QnQ3dllsNFMwWUIyRU5CSmRoMERldEJDbkl0cm9RekZC?=
+ =?utf-8?B?NDlkTGNkZ3V4ZG5EOHZMalpHTGFzWHQ4Ty8weUgyK2FlZ2p4WWVlZW4ybWpQ?=
+ =?utf-8?B?Wmo0SlVRclViUjdMZUsrSnNwUVdOQW0xb3ZBVEROMGhyNEp6eTl6dTJubVRD?=
+ =?utf-8?B?UE9yRHpFcmNzS25ycHlJOWFvZmVyKzYxbG9wa2p1S2Y1RWRSbE5GZXUyelAx?=
+ =?utf-8?B?K2EyWEhwTkovbGJZYU1WYVMyMkJncnBCZlJpbkkzRnV1aWxXeWc2RWRBWWN1?=
+ =?utf-8?B?YkZXSnhUMEhXUUc3NVNuL2JTLzU5VDU1SEFRRVEzWlRKRGMrdzNBUnlZbExS?=
+ =?utf-8?B?bjBmSmpiQjUzdEpuWmhiRUt1YnhzY1E2Sk9lMzkzMUJGc0JxZ2M3cVRHeEJ6?=
+ =?utf-8?B?VXVxS0FyREI2WE5RV3BNdnJ2Q2VaenMyb2h2UFVlMHR5NEIrbSs0ZlhrTnFY?=
+ =?utf-8?B?Z3NDdTVVSkcrS1RQQStWN0Npc0lLT2dKYi9KVTNNeEsySGpkekQrSXVldity?=
+ =?utf-8?B?MkU3VUNicWJWbDBQbEc1TjFXUm5FcEd5Y3UxZTlKSXV3cVJJWjBDM2FSYTRW?=
+ =?utf-8?B?ZGJsSHQ0T1NYT3NZbkhYUEV5RjJhKzVHdkZHdStIQUIwN3lzK1FqcVhxS21q?=
+ =?utf-8?B?aWdtbFlmZnR0TnNxQ1llQXVMZ1l6SkMzallOYWxWL3AzK0l4RCtEejFjYjFS?=
+ =?utf-8?B?SktyamZVaG12dFlmVFY2TitpaUdHdlRoWTRCVGYweFFGdVR1RkIwU1lLRHlW?=
+ =?utf-8?B?bW9kTE9tSHVpc3NITHdwVzA5ZXRYdjZyelZQcGRXN2JmNW05dGc2ejNZSFEx?=
+ =?utf-8?B?SzdTVDRMek1Yckw2SVpqaFkvdXVySG55Z2M2c2duNXhndjc3UnNDRU94QmlV?=
+ =?utf-8?B?R29HbTRBMDh3dnRkdm9lTHUxa0haM3poOWZZT2RJNU8yL29OeFoydjd2QUVn?=
+ =?utf-8?B?aEsvdE5KQ0lEV3JKamZiMzl1OUcyMHVmS1ptYTQzUHNCcXcxVnE3TXRpcStS?=
+ =?utf-8?B?OWF4NWx4ZHNaUzlpcm13SFgyUnhWOFBwS2ZhdHB5VEFwU1kvaS90NlVaekF1?=
+ =?utf-8?B?Y1E0OElmdU96NjBoSDJPd2NZaWpRNkU4MlErV2xwK09mTzBDRFprU1Mzemcr?=
+ =?utf-8?B?MFVHWVVxQ2tDTU0vdGM0SnpnTjMydkRaR1RWemVBbjBRV3hKK3ZCMWpXMVFp?=
+ =?utf-8?B?ZENCdm8xWUNxZ0VwVnJVSnBadVhNYXArdjVGNzlQdlBGUHRlNzVrWGFwenlH?=
+ =?utf-8?B?Zm00b2J1ZFRpc2orNUxDWE14bmpBL1lYVzMxd3VkSUhDSkVPcTF5UFFJWkRo?=
+ =?utf-8?B?SHFUSU5TZ1phbnpHRUVCVzArODE0UFphNVpxci9pMVdnaHpOTWkwNFhaOXFv?=
+ =?utf-8?B?TWxjemJCZTJsMWtGclljVGczZ2lXakRMU2J3L1ZEaEgvVVMrS2RNNDFkTHIv?=
+ =?utf-8?B?dEtSaXZMaWdNVEpvNnlRS29weUg1YnphZzR5Y0NKMWRjRXJUOVZjTE44Uzl0?=
+ =?utf-8?Q?7+hUVYtok/pBeSkXOKB8R4Xle?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7057BC76BD5F4043AB30A529DE45AAD3@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749026421.git.asml.silence@gmail.com> <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
- <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch> <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
- <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com> <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
-In-Reply-To: <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 6 Jun 2025 16:33:25 +0800
-X-Gm-Features: AX0GCFt8Lln1mFEw0D1s0DEDHPnsYV1ib0zPKGoBdwXWUHV_nP_V2Sa2OCKBCeE
-Message-ID: <CAL+tcoCTpFm+-CVZb-6=70ZCh3ERHrJ19MmL+u56SNFrkd2QCw@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, io-uring@vger.kernel.org, 
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS5PPF266051432.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94cab8b6-a694-4485-2d6e-08dda4d892c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2025 09:00:23.8197
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QGPSaqCtC6MAD24aduopsxAw40sZN2Ni+KdH0X/GPuT7eRlGWESTE7wRV3Fb5cZNlCioSYS7+edInQyNr4VkhA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6357
 
-On Fri, Jun 6, 2025 at 4:11=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 6/6/25 01:02, Jason Xing wrote:
-> ...>>>>                                 optlen);
-> >>>>    }
-> >>>>
-> >>>> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, stru=
-ct sock *sk,
-> >>>> +                                 struct sk_buff *skb, unsigned issu=
-e_flags)
-> >>>> +{
-> >>>> +    struct sock_exterr_skb *serr =3D SKB_EXT_ERR(skb);
-> >>>> +    struct io_uring_cqe cqe[2];
-> >>>> +    struct io_timespec *iots;
-> >>>> +    struct timespec64 ts;
-> >>>> +    u32 tskey;
-> >>>> +
-> >>>> +    BUILD_BUG_ON(sizeof(struct io_uring_cqe) !=3D sizeof(struct io_=
-timespec));
-> >>>> +
-> >>>> +    if (!skb_get_tx_timestamp(skb, sk, &ts))
-> >>>> +            return false;
-> >>>> +
-> >>>> +    tskey =3D serr->ee.ee_data;
-> >>>> +
-> >>>> +    cqe->user_data =3D 0;
-> >>>> +    cqe->res =3D tskey;
-> >>>> +    cqe->flags =3D IORING_CQE_F_MORE;
-> >>>> +    cqe->flags |=3D (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIF=
-T;
-> >>>> +
-> >>>> +    iots =3D (struct io_timespec *)&cqe[1];
-> >>>> +    iots->tv_sec =3D ts.tv_sec;
-> >>>> +    iots->tv_nsec =3D ts.tv_nsec;
-> >>>
-> >>> skb_get_tx_timestamp loses the information whether this is a
-> >>> software or a hardware timestamp. Is that loss problematic?
-> >>>
-> >>> If a process only requests one type of timestamp, it will not be.
-> >>>
-> >>> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
-> >>> annotation may be necessary.
-> >>
-> >> skb_has_tx_timestamp() helper has clear priority of software timestamp=
-,
-> >> if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW cas=
-e
-> >> won't produce both timestamps with the current implementation. Am I
-> >> missing something?
-> >
-> > Sorry that I don't know how iouring works at a high level, so my
-> > question could be naive and unrelated to what Willem said.
-> >
-> > Is it possible that applications set various tx sw timestamp flags
-> > (like SOF_TIMESTAMPING_TX_SCHED, SOF_TIMESTAMPING_TX_SOFTWARE)? If it
->
-> io_uring takes timestamps from the error queue, just like the socket
-> api does it. There should be different skbs in the queue for different
-> SCM_TSTAMP_{SND,SCHED,ACK,*} timestamps, io_uring only passes the
-> type it got in an skb's serr->ee.ee_info to user without changes.
-> Hope it answers it
-
-Sure, thanks, io_uring has no difference from other regular
-applications in this case. Then the question that Willem proposed
-remains because in other applications struct scm_timestamping_internal
-can be used to distinguish sw and hw timestamps (please see
-__sock_recv_timestamp() as an example).
-
-Thanks,
-Jason
+T24gVGh1LCAyMDI1LTA1LTI5IGF0IDExOjExICswMDAwLCBEcmFnb3MgVGF0dWxlYSB3cm90ZToN
+Cj4gDQo+IEFGQUlVIGZyb20gQ29zbWluIHRoZSBjb25kaXRpb24gaGFwcGVuZWQgb24gaW5pdGlh
+bCBxdWV1ZSBmaWxsIHdoZW4NCj4gdGhlcmUgYXJlIG5vIGJ1ZmZlcnMgdG8gYmUgcmVsZWFzZWQg
+Zm9yIHRoZSBjdXJyZW50IFdRRS4NCg0KVGhlIGlzc3VlIGhhcHBlbnMgd2hlbiB0aGVyZSBpc24n
+dCBlbm91Z2ggbWVtb3J5IGluIHRoZSBwb29sIHRvDQpjb21wbGV0ZWx5IGZpbGwgdGhlIHJ4IHJp
+bmcgd2l0aCBkZXNjcmlwdG9ycywgYW5kIHRoZW4gcnggZXZlbnR1YWxseQ0KZnVsbHkgc3RvcHMg
+b25jZSB0aGUgcG9zdGVkIGRlc2NyaXB0b3JzIGdldCBleGhhdXN0ZWQsIGJlY2F1c2UgdGhlIHJp
+bmcNCnJlZmlsbCBsb2dpYyB3aWxsIGFjdHVhbGx5IG9ubHkgcmVsZWFzZSByaW5nIG1lbW9yeSBi
+YWNrIHRvIHRoZSBwb29sDQpmcm9tIHJpbmdfdGFpbCwgd2hlbiByaW5nX2hlYWQgPT0gcmluZ190
+YWlsIChmb3IgY2FjaGUgZWZmaWNpZW5jeSkuDQpUaGlzIG1lYW5zIGlmIHRoZSByaW5nIGNhbm5v
+dCBiZSBjb21wbGV0ZWx5IGZpbGxlZCwgbWVtb3J5IG5ldmVyIGdldHMNCnJlbGVhc2VkIGJlY2F1
+c2UgcmluZ19oZWFkICE9IHJpbmdfdGFpbC4NCg0KVGhlIGVhc3kgd29ya2Fyb3VuZCBpcyB0byBo
+YXZlIGEgcG9vbCB3aXRoIGVub3VnaCBtZW1vcnkgdG8gbGV0IHRoZSByeA0KcmluZyBjb21wbGV0
+ZWx5IGZpbGwgdXAuIEkgc3VzcGVjdCBpbiByZWFsIGxpZmUgdGhpcyBpcyBlYXNpbHkgdGhlDQpj
+YXNlLCBidXQgaW4gdGhlIGNvbnRyaXZlZCBuY2Rldm1lbSB0ZXN0IHdpdGggdWRtYWJ1ZiBtZW1v
+cnkgb2YgMTI4IE1CDQphbmQgYXJ0aWZpY2lhbGx5IGhpZ2ggcmluZyBzaXplICYgTVRVIHRoaXMg
+Y29ybmVyIGNhc2Ugd2FzIGhpdC4NCg0KQXMgRHJhZ29zIHNhaWQsIHdlIHdpbGwgbG9vayBpbnRv
+IHRoaXMgYWZ0ZXIgdGhlIGNvZGUgaGFzIGJlZW4gcG9zdGVkLg0KDQpDb3NtaW4uDQo=
 
