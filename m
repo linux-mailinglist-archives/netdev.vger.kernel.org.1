@@ -1,147 +1,167 @@
-Return-Path: <netdev+bounces-195362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18435ACFE54
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:31:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C0DACFE64
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B12B18959BB
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:31:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF8E8189A520
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143382857DE;
-	Fri,  6 Jun 2025 08:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31881283FF6;
+	Fri,  6 Jun 2025 08:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="r7EdqUQS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQGa+fE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47205F9EC;
-	Fri,  6 Jun 2025 08:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926F41DF739;
+	Fri,  6 Jun 2025 08:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749198677; cv=none; b=kCR6Plth6BPUnRNYiJ7RxAFM6VRlRUnyp+47Ps8l2H5vTRozAdfled1WITk2IXAtFFuvdV9ZKuuLXqVyLBb7dW32Pc/lGALOA3a8OXcUGZgHC/JIaFtYJCZzbx/jdhCuOjyfUAqrrOn3CDW68236J8AEDYw6gvxJsyThlE7Ehd0=
+	t=1749198846; cv=none; b=I7f2shniXxMvbG+dmLIeO9wkb6u0DBZhbN7xH2wpwLVgLqsBcswk767QOzSxAaMsElsZRcPDNi4xJCNI+8HORM4rs/2eOcb+9W6J6wUbY6UFYcQ9G7X78QLJSmSHLGqlZVh+q8uMtK2kM4ubw/pRW6+qxyDcUgTN+hEq0oaaaWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749198677; c=relaxed/simple;
-	bh=GOaecTwnFqUtKaM46dtg8BN9hvAYfBIit3afUD3tV4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FNRXsD0TuRiYoTXr+PbP42Kj6MJ86AGt24YqIMp3/yz6mtAqb6mM9TqosctsRkH46Xb7L4ucLZH0EUYixTlXhS9DubqVUrTqrxRqZ0BEySekVbHH7cmkwmAKEyfYNlFJfIYJ8L7bylDMmo1XrtpAXSmkY10uNBqUuYfPFf8gKro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=r7EdqUQS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UiP4Miv2fJBDHLcvZPsk9HjMhtpzsvxsINCe1ehfFjc=; b=r7EdqUQSJRqm9CeA+rK2wsC/Xm
-	s2szXU0GVh++A4mDTsHpuq3LGkszUuEdzlaAculq6QhLktb52PTg4VCssV8DMF3ktMRbeYlgjo3md
-	wHvN5GQma3fHpkPAE0Qu+kA52r6/uwh8L/gvtSF7z8Rb3XxxtUYZtPtQUd26DBhFpVLQ8WEDR+GOw
-	FEXwoJw+SnfMc+WG13rWZzdRa8u/+8Y1zMm+VNbreqiKZQ28jqpPQBbS1a5k+0uxw5C/ILmaUdxgN
-	XUuQQUiKriG38tnn9HGEq0RJIUYAXTGLR4a6fd3xNwRFHJ4MUjux+hOJ8dreS7Rz0z83KsC4vi3aD
-	MtTXOAmQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33176)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uNSTg-0000Zv-22;
-	Fri, 06 Jun 2025 09:31:04 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uNSTb-00034M-2K;
-	Fri, 06 Jun 2025 09:30:59 +0100
-Date: Fri, 6 Jun 2025 09:30:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Jijie Shao <shaojijie@huawei.com>
-Subject: Re: [PATCH net] net: phy: phy_caps: Don't skip better duplex macth
- on non-exact match
-Message-ID: <aEKnQ4haQtcJWzXX@shell.armlinux.org.uk>
-References: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
- <ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
- <20250606101923.04393789@fedora>
+	s=arc-20240116; t=1749198846; c=relaxed/simple;
+	bh=MlWjKv6N8n786ldv+fOBqFDX6cRovDX3bUWZpnnE31s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=prZPZWbGh5A1ZwgqZck600LZRz2PqA9LNddU5IkWutct9HTtbTr13aJ7TMG1yWqhO4s/EXN6CFGeAtNGu9n8ZErWTcLuBVf+8cEV0BeH+yLlFMKPrGR9zgoy09MkcN6sR4MOh06dXbu0HvvhMjP+kphUYfIWT2ys1DkZxfUjntM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQGa+fE2; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dc7294716cso15118835ab.2;
+        Fri, 06 Jun 2025 01:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749198843; x=1749803643; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gEV0yP7e+tTurJnFgSwDfnrgYjosGeo8ZE0291CoQy0=;
+        b=iQGa+fE24dMKW6CWAg1AJz9Jy5EvlihR9LAYCEHD2WhfkJUSfwERVkWibWykWULNpV
+         jWuqJR8nktCo3wPvVeXIrrYavui73npgS4Pg7A8w0P4mrVhem6iFZQ68bTcktW+5PRIe
+         FdIlnUj0UyI91LEYfSq1R4BpT5Vm9/fwB4L7s6vrkWJlgEQCxnjxeyg/KjoCjEyZm5Ge
+         gpzLeCSr2LJqPGXGqljElsufbWPVkbWatMwfQGpjLxf274RgzpuRT/MBX0GWRx3z+xrL
+         UJYXqhJVgghLWnMAiQsqqjUirsSHnuTKTa+fP3JLf0P5zPowneHa7hE7j5k0v/Z09UuP
+         WDkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749198843; x=1749803643;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gEV0yP7e+tTurJnFgSwDfnrgYjosGeo8ZE0291CoQy0=;
+        b=nnfRZJjFGw3+dtkNhQabnrktFHocmU5xvz160sD2/DkW532aekd3pJww4qlASBk6M+
+         HenOi+vk9QMFFQxbdUnKXw6ZrpG1wNvmwDbjx62O945k64WAlNcwrpVHM+pt12oAEy8v
+         UXq5kXN4tkk2DY+daop4u/dZLbc8c3gfZZbfJFjfz5XzPsqb/yHp3UPJmqQRp7IZ8VL+
+         8RdEwm2reYCQjGMU4+VhsWX5E+z5k1Gy/pD229aUvlpWcBL/Bxo9CAieE+0lLK3pGm47
+         r/5YK/TlQJtl0NrbEIzIo8EGDM5rpBHcXPM4kyrWmKriGkL/C4ZnrqpF9gp3HFIuBPQd
+         +3xA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNmhQVpPAjEBhynuCHMJAi7e9KKGeCDOGK8LJXMLUxdiwB0m3KdwAamrha03i+zor53LAWGJa4@vger.kernel.org, AJvYcCXR0g2IuUGZbh4Ihc9qj29upGcSF3e4vdtw5Oc+2eAK8FTu/vsXmaedhO9AhlN6/QGapoarw0rQqQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoufUOKp74ByMJEUomiEoQ3cF+W4E5+a1IcHwbuunGA1xxXp1+
+	6iJJDToWujNffRGmf6sduFcmGzIMT7OgsP7ufrub3jyj8T6bjxEkxuqS6+Z9MwvoTQSMzSg+EHG
+	LGvcHkOsO/6cmPUx5EPAzN/g7n2NURss=
+X-Gm-Gg: ASbGncvDCG9MyKyZlDUIZN1oysWYxv7Kj4G9X0Udf4mED1DRNj9sbl7MbAs14C9Wcm1
+	Y2b7naaJ41Sh3+wTOcdw/cHH5w1aZ+eE3jSc2pA3if+jPsqZI1PJwuf1LizY7rNLuwLGf8jUjEA
+	q6/B4QMyt9soM53EXLC0+iIugPX1qzKipWPZJ9L19fFu0=
+X-Google-Smtp-Source: AGHT+IHAgZYASrsHIPplviCv7Kp5d6BKggJOd+4qBlUUUxN/muYGA+0S/uDR7cuuebsle4hZYPd02SUtsGFLrtfpPfs=
+X-Received: by 2002:a05:6e02:1aac:b0:3dd:c40d:787e with SMTP id
+ e9e14a558f8ab-3ddce4136damr29394415ab.2.1749198843531; Fri, 06 Jun 2025
+ 01:34:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250606101923.04393789@fedora>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <cover.1749026421.git.asml.silence@gmail.com> <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
+ <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch> <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
+ <CAL+tcoAPV03jr6p2=XyRhdC1KiZBojtqn-frBdKjh+0=f=G2Qw@mail.gmail.com> <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
+In-Reply-To: <449d5c82-7af5-42ce-bd69-00c2bb135a21@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 6 Jun 2025 16:33:25 +0800
+X-Gm-Features: AX0GCFt8Lln1mFEw0D1s0DEDHPnsYV1ib0zPKGoBdwXWUHV_nP_V2Sa2OCKBCeE
+Message-ID: <CAL+tcoCTpFm+-CVZb-6=70ZCh3ERHrJ19MmL+u56SNFrkd2QCw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, io-uring@vger.kernel.org, 
+	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 06, 2025 at 10:19:23AM +0200, Maxime Chevallier wrote:
-> In reality, the case you're mentioning would be a device that supports
-> 1000/Full, 100/Full and 100/Half, user asks for 1000/Half, and 100/Full
-> would be reported.
-> 
-> That's unlikely to exist, but I'll document it as I've been surprised
-> in the past with setups that shouldn't exist that actually do :)
+On Fri, Jun 6, 2025 at 4:11=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 6/6/25 01:02, Jason Xing wrote:
+> ...>>>>                                 optlen);
+> >>>>    }
+> >>>>
+> >>>> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, stru=
+ct sock *sk,
+> >>>> +                                 struct sk_buff *skb, unsigned issu=
+e_flags)
+> >>>> +{
+> >>>> +    struct sock_exterr_skb *serr =3D SKB_EXT_ERR(skb);
+> >>>> +    struct io_uring_cqe cqe[2];
+> >>>> +    struct io_timespec *iots;
+> >>>> +    struct timespec64 ts;
+> >>>> +    u32 tskey;
+> >>>> +
+> >>>> +    BUILD_BUG_ON(sizeof(struct io_uring_cqe) !=3D sizeof(struct io_=
+timespec));
+> >>>> +
+> >>>> +    if (!skb_get_tx_timestamp(skb, sk, &ts))
+> >>>> +            return false;
+> >>>> +
+> >>>> +    tskey =3D serr->ee.ee_data;
+> >>>> +
+> >>>> +    cqe->user_data =3D 0;
+> >>>> +    cqe->res =3D tskey;
+> >>>> +    cqe->flags =3D IORING_CQE_F_MORE;
+> >>>> +    cqe->flags |=3D (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIF=
+T;
+> >>>> +
+> >>>> +    iots =3D (struct io_timespec *)&cqe[1];
+> >>>> +    iots->tv_sec =3D ts.tv_sec;
+> >>>> +    iots->tv_nsec =3D ts.tv_nsec;
+> >>>
+> >>> skb_get_tx_timestamp loses the information whether this is a
+> >>> software or a hardware timestamp. Is that loss problematic?
+> >>>
+> >>> If a process only requests one type of timestamp, it will not be.
+> >>>
+> >>> But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
+> >>> annotation may be necessary.
+> >>
+> >> skb_has_tx_timestamp() helper has clear priority of software timestamp=
+,
+> >> if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW cas=
+e
+> >> won't produce both timestamps with the current implementation. Am I
+> >> missing something?
+> >
+> > Sorry that I don't know how iouring works at a high level, so my
+> > question could be naive and unrelated to what Willem said.
+> >
+> > Is it possible that applications set various tx sw timestamp flags
+> > (like SOF_TIMESTAMPING_TX_SCHED, SOF_TIMESTAMPING_TX_SOFTWARE)? If it
+>
+> io_uring takes timestamps from the error queue, just like the socket
+> api does it. There should be different skbs in the queue for different
+> SCM_TSTAMP_{SND,SCHED,ACK,*} timestamps, io_uring only passes the
+> type it got in an skb's serr->ee.ee_info to user without changes.
+> Hope it answers it
 
-That's not unlikely. Many MACs do not support 1000/Half but do support
-100/Half and 10/Half.
+Sure, thanks, io_uring has no difference from other regular
+applications in this case. Then the question that Willem proposed
+remains because in other applications struct scm_timestamping_internal
+can be used to distinguish sw and hw timestamps (please see
+__sock_recv_timestamp() as an example).
 
-Also... you're wrong about the result.
-
-If phy_lookup_setting() is called with speed = 1000, duplex = half,
-and we have a MAC that supports 1000/Full, 100/Half, 100/Full, then:
-
-- We iterate down through the phy_settings[] to:
-	PHY_SETTING(   1000, FULL,   1000baseT_Full             ),
-
-	if (p->speed == speed && p->duplex == duplex) {
-  the first condition is true, the second is false.
-	} else if (!exact) {
-  this is true.
-		if (!match && p->speed <= speed)
-  match is NULL, and p->speed == speed, so this is a candidate:
-			match = p;
-  We continue.
-- The next entry that will be tested is:
-	PHY_SETTING(    100, FULL,    100baseT_Full             ),
-
-	if (p->speed == speed && p->duplex == duplex) {
-  the first condition is false.
-	} else if (!exact) {
-  this is true.
-		if (!match && p->speed <= speed)
-  this is now false because match is set.
-  We continue.
-- The next entry that will be tested is:
-	PHY_SETTING(    100, HALF,    100baseT_Half             ),
-
-	if (p->speed == speed && p->duplex == duplex) {
-  the first condition is false.
-	} else if (!exact) {
-  this is true.
-		if (!match && p->speed <= speed)
-  this is now false because match is set.
-  We continue.
-
-- We eventually get to the end of the list.
-	if (!match && !exact)
-  this is false.
-
-- We return the entry for 1000/Full, which is exactly the behaviour I
-  was after when I wrote this matching.
-
-If you're version doesn't come out with a matching speed, then I'm
-afraid it's still broken.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Jason
 
