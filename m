@@ -1,232 +1,105 @@
-Return-Path: <netdev+bounces-195337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3055DACFA64
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:18:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA5D4ACFA6C
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7E587A1914
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 00:17:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DD97189BAAD
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 00:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5498733DF;
-	Fri,  6 Jun 2025 00:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097B74C9F;
+	Fri,  6 Jun 2025 00:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kR5Gwz1v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfQlCg4n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926AB257D;
-	Fri,  6 Jun 2025 00:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D510F136A;
+	Fri,  6 Jun 2025 00:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749169103; cv=none; b=f3jDX1WOiXRYWjdvdRQNkuehvegu+XOtes0dQGgqZBTOJ1MOevR9cRSrsscsaZm8Czd4Q9ygc23ctrHuPzbaLlHFJRjsmj2HQO8dFcf0RX0psMq7xuDyffpDWvZ/B2lMoipeBZ41fmqiDxHW/e9BQ3lcwrkVuNw9uZuVEWBLqC0=
+	t=1749169906; cv=none; b=NA3tVJnrQBp+tpMcuuw4RCMtzS5vkzPcz7DvjiVkALf9axq0ci/HPYeMOGM5sUlnlNQNl2vFtZNyREkbTTqYGar5oBcLShcCNsvZ3d8t5TkfeN4IUIdZThQFxkI9OejkvSeCkuM0m/ieLG0NOjeL9DQwH9ael1VM+T7mZAKMl2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749169103; c=relaxed/simple;
-	bh=afPGX4x4+KsmVCitk1TAmuyskJRq6RcU+QkJK+0JFjk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ap5yg122j3zNfcNEfXB6eDD0r5x4QAPgVYxs5McSCvcodQICgeVgDNmb/5p8nb8DkS+8wc79WQs3gAbcMlYtd4NrnobHvnQM1/kHp7GgVqU6vG5q4waX1N3Ut+sIKXYso7ktcKklrbQ5B8Uj7s/3NJHfAjTbGUnOIwzZBZM0B20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kR5Gwz1v; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3dc75fe4e9bso8580825ab.0;
-        Thu, 05 Jun 2025 17:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749169100; x=1749773900; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sgwbHvBoczoJieXBooLMQ38TI5ZL4QgmCGl0bb41wGE=;
-        b=kR5Gwz1vHpHqHc9IboGyYtNRAEYS5ZnjWk9fR6lCZswOFzB/afqDj+zxBdRPvbOfKh
-         tzWVdqNJK7c+K5W9U4t8lqyPVd/se8ZBqGKy//ATz3RX0SOWx9AD5TRHQFaTYpH1noCx
-         p3VQ/2HI7Ja+O43IM3xq8mWZFwkE8mH2f6I+CCPvu0u4oGGmvfSD2luqnbLxrrgGSZg5
-         rJBa2dWlTwMQeH+w4r/Csqf3f3jibGUkR+0p0P6mjfH7HIq+rH7ktiTKzJCWUXIhekaR
-         9Jl3ZlEMgcbRSmBhGfYSKyEuJiVruwGrMebJPXsyhi/Og6upHd5Va9LqttNT3WlLFuSG
-         2CoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749169100; x=1749773900;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sgwbHvBoczoJieXBooLMQ38TI5ZL4QgmCGl0bb41wGE=;
-        b=XiLCDHeAL/fWp1zvAnQxOSDwxnNBS7/8XSYVy/kK07/Bov9PHgeeBAc8FLTa7TqudS
-         3OuqyDqcZahg3jLgYlArWkwM66nBuO719C3ri0Cpp7ee1D6TzHpmmjbglDumGIx3ndzi
-         L4/EPw07KK/mc2npiJxxsLCoEBUHH6q6gOSK5gbT/wZFDLNUp6PX3Udvs3qX6G22NzaM
-         mY0+VdFa7IGCgu5jqm/hz3YS2FAuN4FGb8czaQmvYsl6eIl/CBEXt/cLueEij6KeMMYi
-         iT22JP1ncTpM5W50VUEz5OKZ0riOEzGeNNPGO52CKSQ5xZj6c+ZnIJBUjOmIey900XXZ
-         TUMA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2wfrgQ8UNyzgLKyz1AJg3eZu3MwcDwFxsfopIKGwRP9tYSs2cDgmTohn8FpwnLzhw8k2s1ggi@vger.kernel.org, AJvYcCXdFbISVBi6zoeOALPLCNcSwEJ26lVrw1DS6UI/SdsE/OYGGHrhh37DswdCZOrYtZKFg7w7Ex5z7w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFJjb31cgLoaSPIW5yRv1gaZ7sCqUR99Ft8lIMUWRDvczLQEdP
-	N3NIyLmO7Zet2Gn47+ZTis607+uNRUl8J2Qxb4emL/vFzpaqaFlRmebGIG6vAOSscufCNDKy98x
-	H1I1k6i9hN/RJKnRH+FYVftwPBG4YIec=
-X-Gm-Gg: ASbGncu0RbSJMpzxyd3P0qBIf5hFigFkhaIkGjEqFL85NUM/OD3JxhIWB78TnRUh3lp
-	+0j70T02kJaSpDpWQ9WGKpAp4fgiIZ9q8aQ/x8bZIIEZvuyN3/JkME3/WTxOEyCn73bZy6jehVg
-	MN33apPMzDo2tSHsX9GN8j6SsTKZ8jVOO6Rdzxq4TtNFNkkWAQX1oqsg==
-X-Google-Smtp-Source: AGHT+IHejsjfafuT+fPslTjI1f4V6IshJEMqFJGslKboGl6wEpseQL93xEqnxajbwweubU3/xpS4P02ua54VYP4+AUE=
-X-Received: by 2002:a05:6e02:3e05:b0:3dc:875e:ed8d with SMTP id
- e9e14a558f8ab-3ddce5d8c17mr14437545ab.4.1749169100527; Thu, 05 Jun 2025
- 17:18:20 -0700 (PDT)
+	s=arc-20240116; t=1749169906; c=relaxed/simple;
+	bh=z9+pJwlg7l/xWx9Us3YaK6Toh3Aj6JbFhW2MZ3BKAe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kROriOHyG0ZMkDn7e4wQpZxYvbBLw+XLQDhGekQMAQS8oP76i65eY8edZeMG0HFTxYKe9lGR826KrC3fDzLGyIY7MBx4unOzj7fAsA50zRPurGttL6wzWBNCiqM/OdwwhNqnX3cYDq5tL1olYy+s86lR2jCeGS22h30lFg4mMoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfQlCg4n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B568C4CEE7;
+	Fri,  6 Jun 2025 00:31:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749169904;
+	bh=z9+pJwlg7l/xWx9Us3YaK6Toh3Aj6JbFhW2MZ3BKAe4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MfQlCg4nOE/TLj16dV15ObSSInuNP2HeePwbL9QovH4D0ExQuBlqtVlt3txNxB6km
+	 /T9picVSfR45kHKUD4Em+uuhVWzWtS7c5QXCP2gdNYEpopVBmDOMuczDbnZb4eaPqE
+	 iJO0rDqdUFX4ZEzybkLGy1zmkqM1Jzp/OyVJzpNSHSOuUzi04SdDZw/rdhig3ExnS+
+	 Ia2/Co2S3n7gXcgh5e3aHMxVxW0f/qbrlmPPsQpNb8mEsgyfenRVqdjAgTRinA0qmk
+	 GOSnvti3qUfyEGdSOkbaOv3aMokP505vu1B/04izwx19draY1akaUbkQLeqUHedHj/
+	 gcwFthgsUZq7Q==
+Date: Thu, 5 Jun 2025 17:31:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>,
+ davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ martin.lau@linux.dev, daniel@iogearbox.net, john.fastabend@gmail.com,
+ eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com,
+ william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org
+Subject: Re: [PATCH net] net: clear the dst when changing skb protocol
+Message-ID: <20250605173142.1c370506@kernel.org>
+In-Reply-To: <684231d3bb907_208a5f2945f@willemb.c.googlers.com.notmuch>
+References: <20250604210604.257036-1-kuba@kernel.org>
+	<CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com>
+	<20250605062234.1df7e74a@kernel.org>
+	<CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
+	<20250605070131.53d870f6@kernel.org>
+	<684231d3bb907_208a5f2945f@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1749026421.git.asml.silence@gmail.com> <7b81bb73e639ecfadc1300264eb75e12c925ad76.1749026421.git.asml.silence@gmail.com>
- <6840ec0b351ee_1af4929492@willemb.c.googlers.com.notmuch> <584526c3-79f3-42f2-9c6e-4e55ad81b90c@linux.dev>
- <68422e4d1b8ef_208a5f2949@willemb.c.googlers.com.notmuch>
-In-Reply-To: <68422e4d1b8ef_208a5f2949@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 6 Jun 2025 08:17:44 +0800
-X-Gm-Features: AX0GCFtKpA2rl6ZhwKKot9X8brZZsv3b9wBx9ab88eM5X_9x7h4XJlHAlfcLWcE
-Message-ID: <CAL+tcoDVZUPrGTKwbd-4vSp4uy_6oV6oJgk0ek8nVzO5TkjmdA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] io_uring/netcmd: add tx timestamping cmd support
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Pavel Begunkov <asml.silence@gmail.com>, 
-	io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 6, 2025 at 7:55=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Vadim Fedorenko wrote:
-> > On 05/06/2025 01:59, Willem de Bruijn wrote:
-> > > Pavel Begunkov wrote:
-> > >> Add a new socket command which returns tx time stamps to the user. I=
-t
-> > >> provide an alternative to the existing error queue recvmsg interface=
-.
-> > >> The command works in a polled multishot mode, which means io_uring w=
-ill
-> > >> poll the socket and keep posting timestamps until the request is
-> > >> cancelled or fails in any other way (e.g. with no space in the CQ). =
-It
-> > >> reuses the net infra and grabs timestamps from the socket's error qu=
-eue.
-> > >>
-> > >> The command requires IORING_SETUP_CQE32. All non-final CQEs (marked =
-with
-> > >> IORING_CQE_F_MORE) have cqe->res set to the tskey, and the upper 16 =
-bits
-> > >> of cqe->flags keep tstype (i.e. offset by IORING_CQE_BUFFER_SHIFT). =
-The
-> > >> timevalue is store in the upper part of the extended CQE. The final
-> > >> completion won't have IORING_CQR_F_MORE and will have cqe->res stori=
-ng
-> > >> 0/error.
-> > >>
-> > >> Suggested-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> > >> ---
-> > >>   include/uapi/linux/io_uring.h |  6 +++
-> > >>   io_uring/cmd_net.c            | 77 +++++++++++++++++++++++++++++++=
-++++
-> > >>   2 files changed, 83 insertions(+)
-> > >>
-> > >> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_u=
-ring.h
-> > >> index cfd17e382082..0bc156eb96d4 100644
-> > >> --- a/include/uapi/linux/io_uring.h
-> > >> +++ b/include/uapi/linux/io_uring.h
-> > >> @@ -960,6 +960,11 @@ struct io_uring_recvmsg_out {
-> > >>    __u32 flags;
-> > >>   };
-> > >>
-> > >> +struct io_timespec {
-> > >> +  __u64           tv_sec;
-> > >> +  __u64           tv_nsec;
-> > >> +};
-> > >> +
-> > >>   /*
-> > >>    * Argument for IORING_OP_URING_CMD when file is a socket
-> > >>    */
-> > >> @@ -968,6 +973,7 @@ enum io_uring_socket_op {
-> > >>    SOCKET_URING_OP_SIOCOUTQ,
-> > >>    SOCKET_URING_OP_GETSOCKOPT,
-> > >>    SOCKET_URING_OP_SETSOCKOPT,
-> > >> +  SOCKET_URING_OP_TX_TIMESTAMP,
-> > >>   };
-> > >>
-> > >>   /* Zero copy receive refill queue entry */
-> > >> diff --git a/io_uring/cmd_net.c b/io_uring/cmd_net.c
-> > >> index e99170c7d41a..dae59aea5847 100644
-> > >> --- a/io_uring/cmd_net.c
-> > >> +++ b/io_uring/cmd_net.c
-> > >> @@ -1,5 +1,6 @@
-> > >>   #include <asm/ioctls.h>
-> > >>   #include <linux/io_uring/net.h>
-> > >> +#include <linux/errqueue.h>
-> > >>   #include <net/sock.h>
-> > >>
-> > >>   #include "uring_cmd.h"
-> > >> @@ -51,6 +52,80 @@ static inline int io_uring_cmd_setsockopt(struct =
-socket *sock,
-> > >>                              optlen);
-> > >>   }
-> > >>
-> > >> +static bool io_process_timestamp_skb(struct io_uring_cmd *cmd, stru=
-ct sock *sk,
-> > >> +                               struct sk_buff *skb, unsigned issue_=
-flags)
-> > >> +{
-> > >> +  struct sock_exterr_skb *serr =3D SKB_EXT_ERR(skb);
-> > >> +  struct io_uring_cqe cqe[2];
-> > >> +  struct io_timespec *iots;
-> > >> +  struct timespec64 ts;
-> > >> +  u32 tskey;
-> > >> +
-> > >> +  BUILD_BUG_ON(sizeof(struct io_uring_cqe) !=3D sizeof(struct io_ti=
-mespec));
-> > >> +
-> > >> +  if (!skb_get_tx_timestamp(skb, sk, &ts))
-> > >> +          return false;
-> > >> +
-> > >> +  tskey =3D serr->ee.ee_data;
-> > >> +
-> > >> +  cqe->user_data =3D 0;
-> > >> +  cqe->res =3D tskey;
-> > >> +  cqe->flags =3D IORING_CQE_F_MORE;
-> > >> +  cqe->flags |=3D (u32)serr->ee.ee_info << IORING_CQE_BUFFER_SHIFT;
-> > >> +
-> > >> +  iots =3D (struct io_timespec *)&cqe[1];
-> > >> +  iots->tv_sec =3D ts.tv_sec;
-> > >> +  iots->tv_nsec =3D ts.tv_nsec;
-> > >
-> > > skb_get_tx_timestamp loses the information whether this is a
-> > > software or a hardware timestamp. Is that loss problematic?
-> > >
-> > > If a process only requests one type of timestamp, it will not be.
-> > >
-> > > But when requesting both (SOF_TIMESTAMPING_OPT_TX_SWHW) this per cqe
-> > > annotation may be necessary.
-> >
-> > skb_has_tx_timestamp() helper has clear priority of software timestamp,
-> > if enabled for the socket. Looks like SOF_TIMESTAMPING_OPT_TX_SWHW case
-> > won't produce both timestamps with the current implementation. Am I
-> > missing something?
->
-> The point of that option is to request both SW and HW tx
-> timestamps. Before that option, the SW timestamp was suppressed if a
-> HW timestamp was pending.
+On Thu, 05 Jun 2025 20:09:55 -0400 Willem de Bruijn wrote:
+> > > It does make a fair bit of sense.
+> > > Question: does calling it as a kfunc require kernel BTF?
+> > > Specifically some ram limited devices want to disable CONFIG_DEBUG_INFO_BTF...
+> > > I know normal bpf helpers don't need that...
+> > > I guess you could always convert ipv4 -> ipv6 -> ipv4 ;-)  
+> > 
+> > Not sure how BPF folks feel about that, but technically we could
+> > also add a flag to bpf_skb_adjust_room() or bpf_skb_change_proto().  
+> 
+> To invert the question: what is the value in keeping the dst?
 
-Agree, the regular driver does such an implementation in such an order:
-XXX_xmit()
-{
-    if (unlikely((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)...
-        skb_shinfo(skb)->tx_flags |=3D SKBTX_IN_PROGRESS;
+I guess simplicity defined as "how many English words are needed to
+explain the semantics".
 
-    skb_tx_timestamp(skb); // here, it would not generate timestamp
-with SKBTX_IN_PROGRESS being set in advance
-}
+The semantics I have in mind would be - dst is dropped if (1) proto 
+is changed (this patch), or (2) "CLEAR_DST" flag is explicitly set
+(future extension).
 
-If both sw and hw flags are set, the software one will not take any effect.
+If we drop on encap (which I supposed is the counter proposal)
+we may end up with: dst is dropped if (1) proto is changed, 
+(2) encap flags are set (1+2 = alternative patch), or (3) "CLEAR_DST"
+flag is explicitly set (future extension). 
 
-Thanks,
-Jason
+Don't think we can rule out the need for a CLEAR_DST flag as not all
+re-routings are encaps.
+
+But both you and Maciej consider dropping for all encaps more
+intuitive, so I'll do that in v2 unless someone objects.
+
+> The test refers to a nat6to4.bpf.o, but this is not included.
+
+I reused an existing BPF prog, it does what we need -
+it turns a v4 packet into a v6 one :)
 
