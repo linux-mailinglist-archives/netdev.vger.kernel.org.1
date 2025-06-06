@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-195342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F44ACFAB7
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 03:30:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935B0ACFAB9
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 03:30:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29A317A350A
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 01:28:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6FD23AFFC2
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 01:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A87A288D2;
-	Fri,  6 Jun 2025 01:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55602487BF;
+	Fri,  6 Jun 2025 01:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQdCkqb2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhRGZS6l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EBE17BCE;
-	Fri,  6 Jun 2025 01:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270643D561;
+	Fri,  6 Jun 2025 01:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749173398; cv=none; b=KC4m4IRMgmCBvYJ0bxgjg7rhomFw4WFI5oIi70044s/fWqSZbImENmIXEHd+CJ3fPobWrdAYuFU7QimlRhvjf/dlw+YJAL/+3Vo6JElYN2qJhhdQvsSWuC2sebVk47GRlAIQHpUmqvbyADQCU4kSwXxgyOzogYcVKSyKrjwDsVI=
+	t=1749173399; cv=none; b=Fe2u9Q/cKF1X8AlTO075WfD4rjysZxjKGlvvSbCewsJEkZcTqA09549EGXnpkguEzpRcgxCrht3Zp0pdHrL7R7Mty7T6dm9yuKojIKJT/KtjYv8/kqH1zI3AkFTX58PYaR2hJdtEkxY8fHVbZKXM2oho+/nQiQlinr/7BG+8iXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749173398; c=relaxed/simple;
-	bh=iwf5a5FP/+wveBfvG/f8Kj+2lB82zStdmDbWQfjenHA=;
+	s=arc-20240116; t=1749173399; c=relaxed/simple;
+	bh=POIw/L4oIu6+bMliJb1g4x2nEniJ2yDHQiFLfUQXVZY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qqRWsyQpO4eUSgfOHCMVg6FS14gFsoDmxPa9WR47aU2AuCwmZQdhkQ//TWkBx+e95AvhdWc0sIQhg8ngLqsg2ipELW/GfZicsP3RKdpSfEpfclnQOUgScegrZXDdRTTbuuQz2ZoTVEtOqIPK5ncLFNmkFetBo6G0YaWDfbnqwAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQdCkqb2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EDC3C4CEE7;
-	Fri,  6 Jun 2025 01:29:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=UmEEXmmilCQBMr3ApSRqcoSvrgtEzDDNcdZuLsPloRO9rOsdSjdJZmzAlPdtlhiYrPmVbmQwpJ+ngK/LiYUaIaz8CKUSM2FeXJl8Hp39Lp/iOBHuuE8SSyOBbRbHntV5g8zQD3kGrLhFAfRV7hQG2Vz125v9ieOLktFh72glzUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhRGZS6l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99C6C4CEEE;
+	Fri,  6 Jun 2025 01:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749173397;
-	bh=iwf5a5FP/+wveBfvG/f8Kj+2lB82zStdmDbWQfjenHA=;
+	s=k20201202; t=1749173399;
+	bh=POIw/L4oIu6+bMliJb1g4x2nEniJ2yDHQiFLfUQXVZY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jQdCkqb2i6KhzcFjuBGS/gKWflsJRJ+tXmzeFKyGsagLRrsDhyAMa7IyGlhiqkQXD
-	 fUmHCNX/tuiUG/31ktDtIsRr/fpgqSoeVFre/qavXUnnyS26FeNdsB1P+Es3YLrx/2
-	 xT1kGo1umdW8ljJDZjEVo5cKspLm1z2OXQiKui6NoaH0HBBDhC+RUMYckcG40qRgU7
-	 ldEQq3iBNQ0vSDQANSoqyxVF3ZMPNa2Yq5pOP+owtiLmJ5t7xPIVtZxO2rj0qFzUpY
-	 gR8use6wDUtEKIpJUcIWZXgiXQQSp/HXY7n6forrCH5+mgVC9M1FrDsRCy6VkJPrPI
-	 fky4td/JJl9GA==
+	b=YhRGZS6lAcaVbi1eheAGZ1f/yceMsRtOvtyJ9FTSciYW6uMlp/aLkNeqHzDz2K3oR
+	 QOIIt49Qw14RWeGbOCIJSDAyLFAsTZ/d7fgPiOO1duFF6R8mGIgP4qLEfbB8moZbK9
+	 p+TSOHFIw7cri5r8VNpeXEu0SyWmeS9vqjSUlhShgqpRnomxvVHND46xpLa3O63Dlr
+	 XLR9ALop/kHOsAHtMsd37+ZjxYjisk8ffKbFJ93izQdiNmdUJ/pYGN/i6PW0VtliHs
+	 EU6QDPcMmhx7YOuTd/7S1jTi9nmkrSTJmnayielI58AU19cMuz1nkkfvynDB4fP++0
+	 AqyEuQTiqnAxQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BD439D60B4;
-	Fri,  6 Jun 2025 01:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE639D60B4;
+	Fri,  6 Jun 2025 01:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,17 +52,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] ptp: remove ptp->n_vclocks check logic in
- ptp_vclock_in_use()
+Subject: Re: [PATCH net] net: dsa: b53: fix untagged traffic sent via cpu
+ tagged
+ with VID 0
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174917342925.3314262.10526916646495537846.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Jun 2025 01:30:29 +0000
-References: <20250520160717.7350-1-aha310510@gmail.com>
-In-Reply-To: <20250520160717.7350-1-aha310510@gmail.com>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, yangbo.lu@nxp.com,
+ <174917343049.3314262.7602954077671451203.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Jun 2025 01:30:30 +0000
+References: <20250602194914.1011890-1-jonas.gorski@gmail.com>
+In-Reply-To: <20250602194914.1011890-1-jonas.gorski@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
@@ -70,19 +71,19 @@ Hello:
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 21 May 2025 01:07:17 +0900 you wrote:
-> There is no disagreement that we should check both ptp->is_virtual_clock
-> and ptp->n_vclocks to check if the ptp virtual clock is in use.
+On Mon,  2 Jun 2025 21:49:14 +0200 you wrote:
+> When Linux sends out untagged traffic from a port, it will enter the CPU
+> port without any VLAN tag, even if the port is a member of a vlan
+> filtering bridge with a PVID egress untagged VLAN.
 > 
-> However, when we acquire ptp->n_vclocks_mux to read ptp->n_vclocks in
-> ptp_vclock_in_use(), we observe a recursive lock in the call trace
-> starting from n_vclocks_store().
+> This makes the CPU port's PVID take effect, and the PVID's VLAN
+> table entry controls if the packet will be tagged on egress.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()
-    https://git.kernel.org/netdev/net/c/87f7ce260a3c
+  - [net] net: dsa: b53: fix untagged traffic sent via cpu tagged with VID 0
+    https://git.kernel.org/netdev/net/c/692eb9f8a5b7
 
 You are awesome, thank you!
 -- 
