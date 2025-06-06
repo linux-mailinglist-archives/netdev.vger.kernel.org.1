@@ -1,130 +1,222 @@
-Return-Path: <netdev+bounces-195491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4B8AD0770
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 19:24:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EA8AD0772
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 19:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91312165BAA
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3697E188C293
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 17:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FA428A1F3;
-	Fri,  6 Jun 2025 17:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Av4sINpB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B048F28A3F3;
+	Fri,  6 Jun 2025 17:24:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E0B28A1CB
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 17:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C462628A1F3
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 17:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749230665; cv=none; b=HoZW7L/S0jeaxs7aJ2AeFqFNdqNXemJbuQC/628WCgMCEHfNqcbn8RXbNUqIhGzP7BKkPhEgRbuIqUUZqARJY1IUr3aXzrnClP2flasLh7Aa9rfWELp6dJzNnerEYxfmFd6/lhiVbttTAiO+GG28bk2+SuUQNjAyt8SYCGrNJQA=
+	t=1749230676; cv=none; b=pl47M2OePNIs4Um/IaKv9Au8mghV5bWlEq2dlgNZy14SBYxKduHdJOipAgEYEbW/ozNBcm6tph5QajmuYVc9VQjX0moMM64tk/t7FDNnoNuEQI2lxtRfjETJ5vuch6dm06ifEfOFv3ZlocDoSe1SJx+UUt16a/mL66I7+Hxdm1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749230665; c=relaxed/simple;
-	bh=bQ38KmJJGmrTHb+zulrc8zCiYNFdsJC1EbUj/im5B5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dxhnj1nx/KuEcoA0LuU+M3xN9Ka5utd6jS8wqz+INU2iD+0i6bfyhCTF8NF2HzUf/UENlbxlPZmRQndH0KFTuClIYaVL9T9e6CpsJzTGhAPVSWtnXaCLnLIf+r7ydVMnaSu1zT5falFtaGoGtOR5NxlWVtEIqcQUC072sathHYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Av4sINpB; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a44b3526e6so28540411cf.0
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 10:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749230663; x=1749835463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ffCo5dXVRroZvzAAAAZg8qxWZENQN0EkOAHPkbaNFvQ=;
-        b=Av4sINpBVqXQisVFvHxtHHqmyEnAz41xocVe4df71I8GPd2jENOouVZ3SgZNdDvMls
-         0XvsuMj7D160h7Vj8XQGzn4Bgy3XyQBC7Fm1Hw/uTtUrAg0OqaWi9v/o3amPn0oouXoI
-         6L1CpYN/dCd0jAeY3zG6dYu1Slszb0BaGUchD4s3G1luhvZYE5dUogYC7ovhfpaZMBsR
-         sfEpJAgCWb41bfuXQ+PW5oWJ7JivIZIZiqKf+TcxpvyqvBAuAFurREnZQzuIaMahLEqG
-         31FP+ZoGxx6exroJcR/Wv0U9oqv2p96KBJIM3Q8reVWK7ln+wO6WnbCW80jenLY5kRok
-         8NSQ==
+	s=arc-20240116; t=1749230676; c=relaxed/simple;
+	bh=OfmI4hYuk7S0k7xDrzF8qpyHJ4ezPJC4LnnM2RV3zJg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JutDasS4vGJhFv8d+Ydj2kaR4cubJnrmGM61Csw4BK7wezDk5+skIrnq6awoVawi82VN5LpuhhUd/Ozcu+do2EwFN6RRkpA5ZHF50sVMpgXKLT83mH55kRO7aS7eV4tOK7RryI7qPG7KQY8Z2RZgFFBvC36KEesZJHqo9Z98l/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-86cfccca327so380944739f.2
+        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 10:24:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749230663; x=1749835463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ffCo5dXVRroZvzAAAAZg8qxWZENQN0EkOAHPkbaNFvQ=;
-        b=wXtxkT2+NLcDxZ3VyOgXQkwNF/T/QRCewEPs6ZATMwD/0XL99zPF9wb+TeF49orQs/
-         YPGXQ5+rxeqykv8wCTGOnNbFGXRgPgt+/UYQg8CLQJPk37tNtAgiT2i+z3ogKN4IrAw3
-         OST1dbYGatLCyKprTjBjqolXjy3sqOIMi2LglI0DNfWaGja0n8qoS0Kg1BkuwJfmOqPH
-         m6yxlE7JLrpajIFX6XSByBrNxQbXXDdyWtu5H4dMP9kNFatnweLhHJwsgssragH7uKik
-         xbYKPd9RPgw5ZI500DQEW/ddg0v/FW7rDt+k/CdeuybBQi7k5ALsEq6uSkLuPPuQQjb3
-         CBtw==
-X-Forwarded-Encrypted: i=1; AJvYcCXc4x74GbrLk1BUxr2uB0apSHZ1d+krrurV8vnMVgrviW+76t5fYDqiTu44ZzhNwclPvHtCYYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXJ6xJc8lkuBXxaqK/eFTQ2UQdNCIeSC2Qew4/bPdWxyvpNgem
-	mvotson+/xkvAXRk4bGecEcQmH+VCCS2jXBNXX2LVCFbjSNVFML9SHOozr1ksuuvM+Vp4fz+Dg2
-	UR0cLFJtPUexQ2EQVjvWdtZPlReeChfVPqZVC3oac
-X-Gm-Gg: ASbGnctrVKpTv118ixac2xYOXZBWuvH0tI5WiuEQ7mM8gCvGnH1A94UIlGFhBWyFOSm
-	OBzPz5AWVwowVU75m4izI1KFfm1/kbnFeY/ucHQAlmCYmo/igGqqgGOVNebpHxCbddxwSMtK/1G
-	G66XeS10M5JSbl4b6H8FRFDxbdB6ZpqDwx3Xnn0lnshm4=
-X-Google-Smtp-Source: AGHT+IF0Nd7Gtw8FrLO2kv+YjD8srzAHi/Fp1In3ZGRb8OMlcA2h06J9rnpLtTHA8mC0F7fRGMYcXVXRQ5uFtMybiDg=
-X-Received: by 2002:a05:622a:428c:b0:48e:1f6c:227b with SMTP id
- d75a77b69052e-4a5b9a47e1amr68167491cf.26.1749230662900; Fri, 06 Jun 2025
- 10:24:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749230674; x=1749835474;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NAVXPMJdCcVOsE8gmQnKvDRTVEWIXrEwrI1rszWDhOs=;
+        b=YbJtl0gYAilwJZ+qcbAbtqWQUq1nUoEJb/zM3nKoJBfeqNE+Bjkhn5Yb1+am2gmG5h
+         v7v0p0Hih1fASsDa8X7Xec9WbZjWnXNlnsKzSgfjKjmQdFOgrF+IZF8pSGn5B8d4y79h
+         LRJQLoABQicFWmwOLYdAlUur/ZB+/tdD+7YUn3bgiZwaIg1IYvQhsFGq2Tin3O/sg2Ki
+         Cfni2LotJCL4A5pU6pRl72VVgeBqLU2gOGt1/NYf58N00qGnWvFquiG6EgbS7kTGEvVx
+         tunYtOAIgQZCmKv3aRWjeIXFgNh41BTfSSKu0QZnOgGC6Cw6uSa+G564jVPZGOY5ipa/
+         NK9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUH+hMYwmvUzRRlwf/A1YugDEvYEbY+QYOeJRaK2bJwgvYaa4cvgh6FQYEYNORK7JbNkUjYKr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2sH/FGHbQf198VYxoCxOsD9KTeRXp5mgBTP70xA9oVlS2NGLs
+	kfIaFskeNpRH48EF/CtMyIsiE85APq1GdE2nVNmiUaEHqlpFdTBawX3MOrnobbYVESfGgfy6VOl
+	r57LVNErnA811Mh+1ac9EI5trL1EjgOIKRU6iBGSpBjgApuwdD1oJqx9PzRA=
+X-Google-Smtp-Source: AGHT+IEzZYA8JWRsTTDM8ueo2eOwGEnueuWH/zYo7Cnlm+sskH68rYp7JXKFweqIhiROqV2jx3fypQGQof10pSlhgpQtqBb0vAvD
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250606162650.2063172-1-peteryin.openbmc@gmail.com>
-In-Reply-To: <20250606162650.2063172-1-peteryin.openbmc@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 6 Jun 2025 10:24:11 -0700
-X-Gm-Features: AX0GCFtdzy0SFiQsGmt7R159fBYswVNv7hbUBGBEp-VWTo7DjSeHnc3f_lZkY7c
-Message-ID: <CANn89iLD8woPzgBcjetiUvFNp6DZQZRK9WTjr-Quz3BctyeKiw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] mctp: fix mctp_dump_addrinfo due to unincremented ifindex
-To: Peter Yin <peteryin.openbmc@gmail.com>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6e02:250d:b0:3dc:7a9a:44d5 with SMTP id
+ e9e14a558f8ab-3ddce530818mr58573735ab.22.1749230673994; Fri, 06 Jun 2025
+ 10:24:33 -0700 (PDT)
+Date: Fri, 06 Jun 2025 10:24:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68432451.a00a0220.29ac89.0047.GAE@google.com>
+Subject: [syzbot] [wireless?] general protection fault in carl9170_usb_rx_complete
+From: syzbot <syzbot+0d8afba53e8fb2633217@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 6, 2025 at 9:28=E2=80=AFAM Peter Yin <peteryin.openbmc@gmail.co=
-m> wrote:
->
-> From: Peter Yin <peter.yin@quantatw.com>
->
-> The mctp_dump_addrinfo() function uses mcb->ifindex to track resume
-> progress when dumping MCTP device address information via netlink.
-> However, if mcb->ifindex is not updated after each iteration,
-> the dump restarts from the same net_device repeatedly, resulting
-> in an infinite loop.
->
-> This patch updates mcb->ifindex to dev->ifindex + 1 after
-> a successful call to mctp_dump_dev_addrinfo(), ensuring that
-> subsequent dump callbacks resume from the correct device.
->
-> This fixes the netlink dump hang observed during sequential
-> `ip mctp addr show` or similar operations.
->
-> Fixes: 2d20773 ("mctp: no longer rely on net->dev_index_head[]")
-> Signed-off-by: Peter Yin <peteryin.openbmc@gmail.com>
-> ---
->  net/mctp/device.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/mctp/device.c b/net/mctp/device.c
-> index 4d404edd7446..ddde938c7123 100644
-> --- a/net/mctp/device.c
-> +++ b/net/mctp/device.c
-> @@ -142,9 +142,9 @@ static int mctp_dump_addrinfo(struct sk_buff *skb, st=
-ruct netlink_callback *cb)
->                 if (rc < 0)
->                         break;
->                 mcb->a_idx =3D 0;
-> +               mcb->ifindex =3D dev->ifindex+1;
+Hello,
 
-I do not understand this patch.
+syzbot found the following issue on:
 
-for_each_netdev_dump() already has such an operation.
+HEAD commit:    882826f58b2c ALSA: usb-audio: qcom: fix USB_XHCI dependency
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=113fc1d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cc73a376913a3005
+dashboard link: https://syzkaller.appspot.com/bug?extid=0d8afba53e8fb2633217
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16ba180c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a9d80c580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/211f4b32c93c/disk-882826f5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8b1eeb82b8a1/vmlinux-882826f5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c4696fbe4f76/bzImage-882826f5.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0d8afba53e8fb2633217@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000038: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x00000000000001c0-0x00000000000001c7]
+CPU: 1 UID: 0 PID: 38 Comm: kworker/1:1 Not tainted 6.15.0-rc6-syzkaller-00177-g882826f58b2c #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:__queue_work+0x9d/0x10f0 kernel/workqueue.c:2256
+Code: 85 db 0f 84 ae 04 00 00 e8 b0 da 33 00 49 8d 86 c0 01 00 00 48 89 c2 48 89 44 24 10 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e e8 0c 00 00 41 8b 9e c0 01 00
+RSP: 0018:ffffc900001a8a48 EFLAGS: 00010002
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff8148954e
+RDX: 0000000000000038 RSI: ffffffff81489090 RDI: 0000000000000005
+RBP: ffff88810ff73bd0 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000008
+R13: 0000000000000000 R14: 0000000000000000 R15: 0100000000000004
+FS:  0000000000000000(0000) GS:ffff8882692c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd9d9eca0c8 CR3: 0000000124b4e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ queue_work_on+0x15f/0x1f0 kernel/workqueue.c:2392
+ queue_work include/linux/workqueue.h:662 [inline]
+ ieee80211_queue_work net/mac80211/util.c:906 [inline]
+ ieee80211_queue_work+0x113/0x180 net/mac80211/util.c:899
+ carl9170_usb_rx_complete+0x275/0x2b0 drivers/net/wireless/ath/carl9170/usb.c:448
+ __usb_hcd_giveback_urb+0x38a/0x6e0 drivers/usb/core/hcd.c:1650
+ usb_hcd_giveback_urb+0x39b/0x450 drivers/usb/core/hcd.c:1734
+ dummy_timer+0x180e/0x3a20 drivers/usb/gadget/udc/dummy_hcd.c:1994
+ __run_hrtimer kernel/time/hrtimer.c:1761 [inline]
+ __hrtimer_run_queues+0x1ff/0xad0 kernel/time/hrtimer.c:1825
+ hrtimer_run_softirq+0x17d/0x350 kernel/time/hrtimer.c:1842
+ handle_softirqs+0x205/0x8d0 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
+ __irq_exit_rcu+0xfa/0x160 kernel/softirq.c:680
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:console_flush_all+0x9a2/0xc60 kernel/printk/printk.c:3227
+Code: 00 e8 72 c5 27 00 9c 5b 81 e3 00 02 00 00 31 ff 48 89 de e8 e0 08 20 00 48 85 db 0f 85 55 01 00 00 e8 62 0d 20 00 fb 4c 89 e0 <48> c1 e8 03 42 80 3c 38 00 0f 84 11 ff ff ff 4c 89 e7 e8 17 d3 7b
+RSP: 0018:ffffc90000287438 EFLAGS: 00000293
+RAX: ffffffff895ba678 RBX: 0000000000000000 RCX: ffffffff815c5dd0
+RDX: ffff8881062b0000 RSI: ffffffff815c5dde RDI: 0000000000000007
+RBP: 0000000000000000 R08: 0000000000000007 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff895ba678
+R13: ffffffff895ba620 R14: ffffc900002874c8 R15: dffffc0000000000
+ __console_flush_and_unlock kernel/printk/printk.c:3285 [inline]
+ console_unlock+0xd8/0x210 kernel/printk/printk.c:3325
+ vprintk_emit+0x418/0x6d0 kernel/printk/printk.c:2450
+ dev_vprintk_emit drivers/base/core.c:4917 [inline]
+ dev_printk_emit+0xfa/0x140 drivers/base/core.c:4928
+ __dev_printk+0xf5/0x270 drivers/base/core.c:4940
+ _dev_info+0xe4/0x120 drivers/base/core.c:4986
+ show_string drivers/usb/core/hub.c:2369 [inline]
+ show_string drivers/usb/core/hub.c:2365 [inline]
+ announce_device drivers/usb/core/hub.c:2388 [inline]
+ usb_new_device+0x94c/0x1a20 drivers/usb/core/hub.c:2644
+ hub_port_connect drivers/usb/core/hub.c:5535 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5675 [inline]
+ port_event drivers/usb/core/hub.c:5835 [inline]
+ hub_event+0x2f85/0x5030 drivers/usb/core/hub.c:5917
+ process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c2/0x780 kernel/kthread.c:464
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__queue_work+0x9d/0x10f0 kernel/workqueue.c:2256
+Code: 85 db 0f 84 ae 04 00 00 e8 b0 da 33 00 49 8d 86 c0 01 00 00 48 89 c2 48 89 44 24 10 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84 c0 74 08 3c 03 0f 8e e8 0c 00 00 41 8b 9e c0 01 00
+RSP: 0018:ffffc900001a8a48 EFLAGS: 00010002
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff8148954e
+RDX: 0000000000000038 RSI: ffffffff81489090 RDI: 0000000000000005
+RBP: ffff88810ff73bd0 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000008
+R13: 0000000000000000 R14: 0000000000000000 R15: 0100000000000004
+FS:  0000000000000000(0000) GS:ffff8882692c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd9d9eca0c8 CR3: 0000000124b4e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	85 db                	test   %ebx,%ebx
+   2:	0f 84 ae 04 00 00    	je     0x4b6
+   8:	e8 b0 da 33 00       	call   0x33dabd
+   d:	49 8d 86 c0 01 00 00 	lea    0x1c0(%r14),%rax
+  14:	48 89 c2             	mov    %rax,%rdx
+  17:	48 89 44 24 10       	mov    %rax,0x10(%rsp)
+  1c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  23:	fc ff df
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	74 08                	je     0x3a
+  32:	3c 03                	cmp    $0x3,%al
+  34:	0f 8e e8 0c 00 00    	jle    0xd22
+  3a:	41                   	rex.B
+  3b:	8b                   	.byte 0x8b
+  3c:	9e                   	sahf
+  3d:	c0 01 00             	rolb   $0x0,(%rcx)
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
