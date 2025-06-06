@@ -1,210 +1,148 @@
-Return-Path: <netdev+bounces-195494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C0EAD07E0
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 20:07:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DABAD0826
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 20:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B25353B2062
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 18:07:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 183B57A3F6D
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 18:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A35128BA85;
-	Fri,  6 Jun 2025 18:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129C01DF755;
+	Fri,  6 Jun 2025 18:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LlnB/C8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF10189906
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 18:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5FC323D
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 18:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749233251; cv=none; b=oqrlqfMKGQF1CWz58Sirm2niLp2zdxKSIORlcdAB+D49mvTfY2idfJIC2GBBk1Yc2rlneYN51XTVMoSwCU8uzax9P1bXc+1FnhX7brMvyWoMrphaFYJ7DFApLSjNAIKPe1bUoKmDVXRmb8jBJRQMtUNjSH4P7cVpcDD1SuiVo/A=
+	t=1749235083; cv=none; b=FMTw0ujL347DMLQzHIkhprfJ22bmpZRlJwCR7J1DlhyJDNGEw6sNxYcCJ4vC96sZH5VWBNXOIdu38LS0pXU6mzxFmftx2ANjZbnTsIUa/zD0hCp1O2J4zm1el4/Vun4ha2foW4ZVuq834WNx7MwBMoQ9/1qLZWpr08nFTQ3vD38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749233251; c=relaxed/simple;
-	bh=aTkzrlBF+7fHXVGsOtOrnRnAXid0DyRz+kGS/+Jn0JY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ja/cHBI3tBdKytFmYA2ErSWmk8oUrKOliwIaOjSqtUDkots92Xe4MCEi8mDaBkcwn+YNyeHUyElIIk67A+W/4NjZgoua/9UbDzmNyh0kdyPM2ZOhs7dVRsMdSy7lfjzO5LXTqTLBVMxjIUKB/UEv76qwOhxuY7dRGkOhsuORLUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddcc14b794so9661525ab.2
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 11:07:29 -0700 (PDT)
+	s=arc-20240116; t=1749235083; c=relaxed/simple;
+	bh=imD6ZSayNfSVwZx/blZuazEzy1ybdpsgUf98M0iHw7s=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=AnpOR8O0cpAqd3N2e4gyiem0FgxgMaUjFVjMmuaKg+Ez0ZU6ILbiDteCq1zcIsg8MWHyuSqZif3K0qwLBwU9yXC/fjZ/joLH9RzW3DCvrkpKPQVRh1Fl1mBVfMPd+yeX7a+huQMIFp4qI8kvGqkbXXphr56/aWMhe9OhA3C3msg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LlnB/C8W; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749235080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QYk2NEAtOlpT7LhP5jummxbLR5KyLp36GZzjyWqqbPQ=;
+	b=LlnB/C8WC5cjUutTUZkvxXGc3Jui5gvZoTEwHhWRBcrBvgm3P2px8GUNkhHehcumoZVmDJ
+	17cKk9560OMZ8HuB0sbA5e/ZhVAZlpIYkwd5dn2Vqw7sB2g6kbqjKyCmYEssps/RfhVQi5
+	O5uHz9L5CWdAUxOZ0tqLoBCu8FoLhDY=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-u61ZBuz7Onmny-S62fG7QQ-1; Fri, 06 Jun 2025 14:37:59 -0400
+X-MC-Unique: u61ZBuz7Onmny-S62fG7QQ-1
+X-Mimecast-MFC-AGG-ID: u61ZBuz7Onmny-S62fG7QQ_1749235078
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ade0abc1ce0so173281766b.3
+        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 11:37:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749233249; x=1749838049;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NdN2i83y3apiJCE5pOS2UVD4tc2Dg376Kdyc8YW5OBA=;
-        b=bwu/IWgzsIi6zhO03wfqQd1IweLyvN1pDulNKaLqYAr996nMHBw2eLIftoyX3T93ul
-         LF4mx0Yo5RlnB8lpBRFB1txER0jKa979dVEB5HkaqXiZ9w2kyEQHvX/UOVaUO9Zww1CJ
-         IR/r9+ESYnaZfUPqvsj2xkW5vD+mV7daEUZLC4eUbPzCz16vt/tbctnnPxWeu4YnB35A
-         lckl+PpnRsH9rltPOmFFYTILL45Xlaw5O9BmcINb7f8ZBOc1inHmv+yOMoYDc1cOBOd6
-         fFcV2YERRV15MtE8nhCXCPCoXqcKRpqXUVBWYIyH7FvCg9uzqRz0o/jxcQhP2ZU4CjxG
-         UTvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKi3NVm1gIt8j+W7/j9usNgXaJX1/7Psf149wKTDlutJzQNdAMlH15X0BYrEoG13v42GRARrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx+lVV7Ccr6Wy6VNPd7DoNH6nqKZ18eoRIIQGJ/F1B1/ZvFES5
-	wWYq3WMRDVJVBU7JKlpBvlKgKXmc1Nzzu+vk2m1Szy++zoZl81qrjhjHnyIW7y5idcc0nsu/esB
-	5HrWyz6gGzqweMFjPhhhZzovHgt7t0F6jEYVr5v9OnXZG/DFGhh2moD0Artc=
-X-Google-Smtp-Source: AGHT+IHE6Eg/MG61GMFO7qXshttr1gq+JGkOyRcFUhFZ5p7W+5XTc748uMIeUret2q5Th53ZZv4OKfwQUR7oyOvBEYL7AriCxxt3
+        d=1e100.net; s=20230601; t=1749235078; x=1749839878;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QYk2NEAtOlpT7LhP5jummxbLR5KyLp36GZzjyWqqbPQ=;
+        b=INFZJAydPIBJXM3eXssmCI07hpzNAIsRrPpf67oLcUKjGE+9M2FNngvd6Khtr2l47L
+         48CGEv4gpPgkc6jNEijbCzoUZOgK65YnJOZg8Vkubxq37D8dRk8GTicRDg8ScTk65QEu
+         ecCquk6lRNVXm1WgaLrjKS8j4hjDUth+0MLPXo4Cj8JlRDJ579cafXQVwBTRNPhk6sFw
+         1U7DnG8/t2MSFsDdHiMh3NSA+mk0Bz0eMEpcstv2CT6l29Gmi9u4NZ/CLjZURSCaj58Z
+         9rXpJxQHuyBS/fsLDNyr1MOlJAJI+UACIxJsISiASXciMqBUz4Wv5CyVxdJY+0UwLL7c
+         Aiyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhiySGXf6SLj9SKk2vjhSwdhyjMwQXK2A201BU3lxXt/gOSQTK3wKN15bWg5sxPmcInIBxBZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymiV8s1ANDzqkWmlXzPiP+fIyDgdCQoBAhVGjOgA0PF/JpRXSC
+	WvqVPqDR95KS6FmPGD/jNNwWg9sUnjmP0ULqmTSCKkkGfvTXIU8vhbthYJIFixOdf4zRGtO44dm
+	uQWJ9VbQHl77iRZva/+jAtqyIiqsbuDK8gFDcvKF9dp7kQTHFAuV1bsW3dQ==
+X-Gm-Gg: ASbGncslDEvIaOBOb1XlUX0KLQko7FvQjnbcreCkWNc/oEl+d0SyKUHdH/wgwz3Gv0W
+	QZZXN6OTtWUbAGoH0X/jchCIxyXJvIzRCpUwFKc1yFFtIaMyNX2hjFjBq0o32HfxIQmZdnSymKk
+	Tro0jCeGm3S3XO5pIQw4AKtdX5wDk80FWMdb1WKCIIe+HCiWzsv3dIMMezelI/3tCiZEfOy4N6t
+	3t80EXwmK/keV98eI71AWlCuu2NKqrgkANBWDyg7xP4HtuVifZoLjWgjBsiESwLhEzYa6JG68OU
+	hO5TfVc2b3TrrJteG5QJJ49asTO3wamUOepk
+X-Received: by 2002:a17:907:7ea4:b0:adb:300a:bcc0 with SMTP id a640c23a62f3a-ade1a9c8279mr401296766b.46.1749235077751;
+        Fri, 06 Jun 2025 11:37:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFKB8cMvREIGn4LQz6CGGdktnmGeAkGQxxQfYplyC7dXFAz8mlvZwIq16WDNlbTccxvvDVZ2A==
+X-Received: by 2002:a17:907:7ea4:b0:adb:300a:bcc0 with SMTP id a640c23a62f3a-ade1a9c8279mr401295066b.46.1749235077295;
+        Fri, 06 Jun 2025 11:37:57 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc7d635sm157251666b.177.2025.06.06.11.37.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Jun 2025 11:37:56 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0B9FD1AA94E7; Fri, 06 Jun 2025 20:37:55 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric Dumazet
+ <edumazet@google.com>, Marcus Wichelmann
+ <marcus.wichelmann@hetzner-cloud.de>
+Subject: Re: [PATCH net] net_sched: sch_sfq: fix a potential crash on
+ gso_skb handling
+In-Reply-To: <20250606165127.3629486-1-edumazet@google.com>
+References: <20250606165127.3629486-1-edumazet@google.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 06 Jun 2025 20:37:54 +0200
+Message-ID: <87jz5ou35p.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:4518:20b0:3dd:d189:8a6c with SMTP id
- e9e14a558f8ab-3ddd1898dd9mr22748965ab.4.1749233248886; Fri, 06 Jun 2025
- 11:07:28 -0700 (PDT)
-Date: Fri, 06 Jun 2025 11:07:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68432e60.a00a0220.29ac89.0048.GAE@google.com>
-Subject: [syzbot] [net?] divide error in taprio_update_queue_max_sdu (2)
-From: syzbot <syzbot+3957824f1e313a2bd6d6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, vinicius.gomes@intel.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Eric Dumazet <edumazet@google.com> writes:
 
-syzbot found the following issue on:
+> SFQ has an assumption of always being able to queue at least one packet.
+>
+> However, after the blamed commit, sch->q.len can be inflated by packets
+> in sch->gso_skb, and an enqueue() on an empty SFQ qdisc can be followed
+> by an immediate drop.
+>
+> Fix sfq_drop() to properly clear q->tail in this situation.
+>
+> Tested:
+>
+> ip netns add lb
+> ip link add dev to-lb type veth peer name in-lb netns lb
+> ethtool -K to-lb tso off                 # force qdisc to requeue gso_skb
+> ip netns exec lb ethtool -K in-lb gro on # enable NAPI
+> ip link set dev to-lb up
+> ip -netns lb link set dev in-lb up
+> ip addr add dev to-lb 192.168.20.1/24
+> ip -netns lb addr add dev in-lb 192.168.20.2/24
+> tc qdisc replace dev to-lb root sfq limit 100
+>
+> ip netns exec lb netserver
+>
+> netperf -H 192.168.20.2 -l 100 &
+> netperf -H 192.168.20.2 -l 100 &
+> netperf -H 192.168.20.2 -l 100 &
+> netperf -H 192.168.20.2 -l 100 &
+>
+> Fixes: a53851e2c321 ("net: sched: explicit locking in gso_cpu fallback")
+> Reported-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+> Closes: https://lore.kernel.org/netdev/9da42688-bfaa-4364-8797-e9271f3bda=
+ef@hetzner-cloud.de/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-HEAD commit:    2c7e4a2663a1 Merge tag 'net-6.16-rc1' of git://git.kernel...
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=120a9570580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=73696606574e3967
-dashboard link: https://syzkaller.appspot.com/bug?extid=3957824f1e313a2bd6d6
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+Thanks for the quick fix!
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f7bcf4a3e380/disk-2c7e4a26.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3145a82e112f/vmlinux-2c7e4a26.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b770afd502e3/bzImage-2c7e4a26.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3957824f1e313a2bd6d6@syzkaller.appspotmail.com
-
-Oops: divide error: 0000 [#1] SMP KASAN PTI
-CPU: 0 UID: 0 PID: 12175 Comm: syz.3.1468 Not tainted 6.15.0-syzkaller-12422-g2c7e4a2663a1 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
-RIP: 0010:taprio_update_queue_max_sdu+0x2b9/0x890 net/sched/sch_taprio.c:288
-Code: 74 08 48 89 df e8 37 36 9e f8 48 8b 03 89 c1 4c 89 e8 48 c1 e8 20 74 0d 4c 89 e8 31 d2 48 f7 f1 48 89 c5 eb 09 44 89 e8 31 d2 <f7> f1 89 c5 48 83 7c 24 50 00 49 bd 00 00 00 00 00 fc ff df 74 48
-RSP: 0018:ffffc90003486978 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff8880292be2e0 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff8880292be2e0
-RBP: 0000000000000000 R08: ffff8880292be2e7 R09: 1ffff11005257c5c
-R10: dffffc0000000000 R11: ffffed1005257c5d R12: 00000000ffffffff
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff888057048c00
-FS:  00007fc8a83a76c0(0000) GS:ffff888125c55000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000029c28000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- taprio_dev_notifier+0x2a4/0x3b0 net/sched/sch_taprio.c:1333
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- netif_state_change+0x284/0x3a0 net/core/dev.c:1584
- netif_set_operstate net/core/rtnetlink.c:1055 [inline]
- set_operstate+0x2cc/0x3a0 net/core/rtnetlink.c:1083
- do_setlink+0x12bc/0x41c0 net/core/rtnetlink.c:3216
- rtnl_group_changelink net/core/rtnetlink.c:3773 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3927 [inline]
- rtnl_newlink+0x149f/0x1c70 net/core/rtnetlink.c:4055
- rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6944
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc8a758e929
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc8a83a7038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fc8a77b5fa0 RCX: 00007fc8a758e929
-RDX: 0000000000000000 RSI: 0000200000000140 RDI: 0000000000000004
-RBP: 00007fc8a7610b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fc8a77b5fa0 R15: 00007ffe00d939a8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
-RIP: 0010:taprio_update_queue_max_sdu+0x2b9/0x890 net/sched/sch_taprio.c:288
-Code: 74 08 48 89 df e8 37 36 9e f8 48 8b 03 89 c1 4c 89 e8 48 c1 e8 20 74 0d 4c 89 e8 31 d2 48 f7 f1 48 89 c5 eb 09 44 89 e8 31 d2 <f7> f1 89 c5 48 83 7c 24 50 00 49 bd 00 00 00 00 00 fc ff df 74 48
-RSP: 0018:ffffc90003486978 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffff8880292be2e0 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff8880292be2e0
-RBP: 0000000000000000 R08: ffff8880292be2e7 R09: 1ffff11005257c5c
-R10: dffffc0000000000 R11: ffffed1005257c5d R12: 00000000ffffffff
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff888057048c00
-FS:  00007fc8a83a76c0(0000) GS:ffff888125d55000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000008000 CR3: 0000000029c28000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	74 08                	je     0xa
-   2:	48 89 df             	mov    %rbx,%rdi
-   5:	e8 37 36 9e f8       	call   0xf89e3641
-   a:	48 8b 03             	mov    (%rbx),%rax
-   d:	89 c1                	mov    %eax,%ecx
-   f:	4c 89 e8             	mov    %r13,%rax
-  12:	48 c1 e8 20          	shr    $0x20,%rax
-  16:	74 0d                	je     0x25
-  18:	4c 89 e8             	mov    %r13,%rax
-  1b:	31 d2                	xor    %edx,%edx
-  1d:	48 f7 f1             	div    %rcx
-  20:	48 89 c5             	mov    %rax,%rbp
-  23:	eb 09                	jmp    0x2e
-  25:	44 89 e8             	mov    %r13d,%eax
-  28:	31 d2                	xor    %edx,%edx
-* 2a:	f7 f1                	div    %ecx <-- trapping instruction
-  2c:	89 c5                	mov    %eax,%ebp
-  2e:	48 83 7c 24 50 00    	cmpq   $0x0,0x50(%rsp)
-  34:	49 bd 00 00 00 00 00 	movabs $0xdffffc0000000000,%r13
-  3b:	fc ff df
-  3e:	74 48                	je     0x88
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
