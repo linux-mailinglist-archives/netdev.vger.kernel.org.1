@@ -1,91 +1,158 @@
-Return-Path: <netdev+bounces-195335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22231ACFA49
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:07:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5191AACFA52
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC803AA4AE
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 00:06:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D4C3AA631
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 00:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07F0A41;
-	Fri,  6 Jun 2025 00:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943D7322A;
+	Fri,  6 Jun 2025 00:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLO4lH2S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVyNlIok"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90969257D;
-	Fri,  6 Jun 2025 00:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4392F2E;
+	Fri,  6 Jun 2025 00:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749168431; cv=none; b=F22sYePfyj8OZn06bOkpluhOunV4z9jVn7VsElEtLl9bFK7Wwvz3SgamikflagZu1PuLLW6eOEqloe1NS/0INUiGQ93ztlRQe3JyATyyp8bZX1ZAXAuk8N0XxTsrDGIYSNV2WE7DYWa+Wn86c4wB8gSi+t7z9oHiUwuDAwKPeGA=
+	t=1749168599; cv=none; b=kRfpxk0CSDKaMbq7nwELRLfnns0TVNrwK0+HERkAbNA2Ur+zghZj8hW7k575tZgmhpIoji84ZKzF7rfcn9pjWLyv84ydQWZNekVVvx1j8yL+nHCWoL4T1fDNEwn+GulMRvS1W87INJTWJbGn90bVOlVIwHyq5KDcJS0DZAUy6Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749168431; c=relaxed/simple;
-	bh=WCAnL1RuMU0W+2QGcVKKuVXGaRhQpR/IhkCMFv/QF7g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M46Ot4Ui5KsWRTuBzovoB3YKrvlGHRiFzvXjO3IW+CQAGaclAL23qc+Im/Ugr/qZw9GYDk3JVclx1DiK1JABopDwT6MKyVCsnco7DQSTTh7CitgFmQAt0xnaB6L7g+z6nujd/sXFUrwZ1olQmUP0M0btyhaNwBPH9oPhxOM7FxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLO4lH2S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9E45C4CEE7;
-	Fri,  6 Jun 2025 00:07:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749168431;
-	bh=WCAnL1RuMU0W+2QGcVKKuVXGaRhQpR/IhkCMFv/QF7g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nLO4lH2SoVVbUbKRIreNMqW0at1MlwNLNSZPPRiPGgGlDSSwFcDZVO9GiK7fjvvLQ
-	 txSCX1W7R7wa/vUTA6BQFYmpYlbdLHPtVrXs9KQpz8rs7V5xbhd04lOC7iJpz+TK1D
-	 MEtD4mU+MHZPpgXizLtifZ8eLbEu3JRn8gVw4FZF3RdYTH8vr40EKTDq2157vTFe/O
-	 GQJlyx2z4dIDg+uB7N049bsA6LTMlcv2SbCcW71XtymH80Up+ka2B/SryhyKIrQBMr
-	 KTOPsw8TlY+mAMelna1rVRUYH1U00zh8UWUBOp26t8OhiQWA2yozWzwMWawo2jXSJJ
-	 s3vZ7hT872iQw==
-Date: Thu, 5 Jun 2025 19:07:08 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, imx@lists.linux.dev,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH 1/1] dt-bindings: net: convert nxp,lpc1850-dwmac.txt to
- yaml format
-Message-ID: <174916842673.3519885.13165846799874556339.robh@kernel.org>
-References: <20250602141638.941747-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1749168599; c=relaxed/simple;
+	bh=tGZsc8JM2HeXq59M5OEcIQjzggS9Wyn85So9Jv+3x4g=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JMfwCQQ//dugUJGoiM2ak70KAbyq1yBd2QSjaskReSRSFHxE81rev1dWsCBTr6Gjuw/m9EYSYQdlzBXuxCXEJe6IbjpjrtKdYtRN4tHCGUSPjjE+No55MgENKLzJL+y6ZKHq0/5KryeEhkZs1wuwuTSdckEITZu8aXIYcnjWYws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVyNlIok; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-70f147b5a52so10482487b3.3;
+        Thu, 05 Jun 2025 17:09:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749168597; x=1749773397; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Wm0b4kamn+LbKyyV0kC1vXdI1Ng2SfV4wmd4NVLl40=;
+        b=OVyNlIoktB3mtfgOBVPwYKMPkb4LSe5X40kOqOtd80vU0aA3xYnAj9AUOwhN68kjR/
+         Z90ypbER5msA1q0TsvsMJwyTx7tfk7nqWtlQvayvbXQO/z474sO0uen32lORDba6Fmkd
+         CE850dymK5bXTonvWlEWB7wPFeYEUXNvP6I0l0L9e0wQItPg3xZx2NDMFBRKkRoId3e2
+         T2nq3pVtw8wxrh7Z/uH5m/6D0AGKbsXNxHhJpSizmOaxgKodhLoBHw+1itcSqMYa+RtB
+         P01p0IxQlwfOPd5w3Q9hDguWOu2INGZFUhVKCI59GBnZVFqUcV6h3Cto0EVPyzX1jTI1
+         dyRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749168597; x=1749773397;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2Wm0b4kamn+LbKyyV0kC1vXdI1Ng2SfV4wmd4NVLl40=;
+        b=J3/PNTI3MZbs8YNDPcaO0Vi0dhMV5VR5w5etMtzoNDYHuPFpY9MTCOY/EdMfCsaSJ2
+         Qgjq70ebhR1FRo50iYfiPrXyDZ3IAU3eGk3xBFeHiK5L0xhiam2r4xap4s4ZIEBSGQy2
+         b0cesSsBZaGTjhkrEoPAPAAJ7Qtek0K9euxIf71HD7Ek/ud2utAj6ogdyougBPjd81a6
+         94t8aaX2afjI4Kal9Vv+j43Vo1gMkoqOQ9drMt88VNqZO4/Z8QGENxhMjmfUFbvEcfJc
+         fsVEnBonnVfV7U4Cv289lmjxCEFxuKEov5Yr9ygoN+suR38Fxz2tM8YYOP5QhwT+NW6d
+         Lhtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcnQO1hGfJ/UQlohKhFCN7kzUB4z8u7b3IM3rHBkWhzzd8JzFLjKxBrueRaTDz7B/XfPNpYfnW@vger.kernel.org, AJvYcCXFvin1djjkCXETSRdvfg+vqjVhoKr5vFN19ZF7EpvRIFGew+H67iwGg4A0UgN3WOR0alY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6ipaZyJRi3pB4FVnVvVHv62LXGI7Z9FSXYp56aWvYt6IVdvnY
+	+2bdWGdGG0Kj5rtRg8N7f9nvUuQHGhKkUo6k9GBraF/IWnHVvucCG9lt
+X-Gm-Gg: ASbGnct2CMzbY/pzi9gloNIGvFlUp60vaXJHum+GNFbN594Woo51G6y4CDnwvSvYjPp
+	O0wOgCNhc+je0404iR6i4exGoupfd02V7WiUpPntQ1sQvCpwSyB9te2rnuCfjWSRBopZ7cWntm0
+	vDcd4sAb35N16wm4SYQcGO06AteRsPt7/o249ieXLeIDArzrYdp3zDH4w4KE/uMN+tFl9RP1cDi
+	onMjAMU+8QNwCrFZI6y1sdCj35beZQq5CcO85YVKJPJ9HKpz/1CT3VKa5NxrY2X8YSFuf5CL+6G
+	WDmGyN6PVbsmHcc7fw/VNJlPO8Xkb0NrejL/GrvlDOfMfDt3MN9wGYFICA/7EXbwyk7A6qRXov9
+	jprIx4ABqWB67IpOGeyWdqad9poTGjuLXjtGW97+dlg==
+X-Google-Smtp-Source: AGHT+IHall2B+2ArctoBHAaDzZNU6U3mi4WC9aoh/CjGVtf8Z0f8NOOsOi16hmN8CsCtdVhHct2S2A==
+X-Received: by 2002:a05:690c:f0f:b0:6f7:ae31:fdf with SMTP id 00721157ae682-710f765d3e8mr22176777b3.12.1749168596815;
+        Thu, 05 Jun 2025 17:09:56 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-710f99e8f15sm693187b3.71.2025.06.05.17.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 17:09:56 -0700 (PDT)
+Date: Thu, 05 Jun 2025 20:09:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>
+Cc: davem@davemloft.net, 
+ netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ martin.lau@linux.dev, 
+ daniel@iogearbox.net, 
+ john.fastabend@gmail.com, 
+ eddyz87@gmail.com, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ willemb@google.com, 
+ william.xuanziyang@huawei.com, 
+ alan.maguire@oracle.com, 
+ bpf@vger.kernel.org
+Message-ID: <684231d3bb907_208a5f2945f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250605070131.53d870f6@kernel.org>
+References: <20250604210604.257036-1-kuba@kernel.org>
+ <CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com>
+ <20250605062234.1df7e74a@kernel.org>
+ <CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
+ <20250605070131.53d870f6@kernel.org>
+Subject: Re: [PATCH net] net: clear the dst when changing skb protocol
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250602141638.941747-1-Frank.Li@nxp.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Jakub Kicinski wrote:
+> On Thu, 5 Jun 2025 15:50:31 +0200 Maciej =C5=BBenczykowski wrote:
+> > On Thu, Jun 5, 2025 at 3:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+> > > > I wonder if this shouldn't drop dst even when doing ipv4->ipv4 or=
 
-On Mon, 02 Jun 2025 10:16:36 -0400, Frank Li wrote:
-> Convert nxp,lpc1850-dwmac.txt to yaml format.
-> 
-> Additional changes:
-> - compatible string add fallback as "nxp,lpc1850-dwmac", "snps,dwmac-3.611"
-> "snps,dwmac".
-> - add common interrupts, interrupt-names, clocks, clock-names, resets and
->   reset-names properties.
-> - add ref snps,dwmac.yaml.
-> - add phy-mode in example to avoid dt_binding_check warning.
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  .../bindings/net/nxp,lpc1850-dwmac.txt        | 20 -----
->  .../bindings/net/nxp,lpc1850-dwmac.yaml       | 81 +++++++++++++++++++
->  2 files changed, 81 insertions(+), 20 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.txt
->  create mode 100644 Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.yaml
-> 
+> > > > ipv6->ipv6 -- it's encapping, presumably old dst is irrelevant...=
+  =
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> > >
+> > > I keep going back and forth on this. You definitely have a point,
+> > > but I feel like there are levels to how BPF prog can make the dst
+> > > irrelevant:
+> > >  - change proto
+> > >  - encap
+> > >  - adjust room but not set any encap flag
+> > >  - overwrite the addrs without calling any helpers
+> > > First case we have to cover for safety, last we can't possibly cove=
+r.
+> > > So the question is whether we should draw the line somewhere in
+> > > the middle, or leave this patch as is and if the actual use case ar=
+rives
+> > > - let BPF call skb_dst_drop() as a kfunc. Right now I'm leaning tow=
+ards
+> > > the latter.
+> > >
+> > > Does that make sense? Does anyone else have an opinion?  =
 
+> > =
+
+> > It does make a fair bit of sense.
+> > Question: does calling it as a kfunc require kernel BTF?
+> > Specifically some ram limited devices want to disable CONFIG_DEBUG_IN=
+FO_BTF...
+> > I know normal bpf helpers don't need that...
+> > I guess you could always convert ipv4 -> ipv6 -> ipv4 ;-)
+> =
+
+> Not sure how BPF folks feel about that, but technically we could
+> also add a flag to bpf_skb_adjust_room() or bpf_skb_change_proto().
+
+To invert the question: what is the value in keeping the dst?
+
+The test refers to a nat6to4.bpf.o, but this is not included.
 
