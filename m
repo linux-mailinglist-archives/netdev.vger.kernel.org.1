@@ -1,190 +1,147 @@
-Return-Path: <netdev+bounces-195361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD09ACFE1E
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:19:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18435ACFE54
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 10:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C196A172A6E
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:19:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B12B18959BB
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 08:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40261C861D;
-	Fri,  6 Jun 2025 08:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143382857DE;
+	Fri,  6 Jun 2025 08:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="B5Ey5XQo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="r7EdqUQS"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9378A1FECDD;
-	Fri,  6 Jun 2025 08:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47205F9EC;
+	Fri,  6 Jun 2025 08:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749197979; cv=none; b=EwgyhqVCYruFcPRcK7GRIXZuv5frNYnuy1R1Y2YCq4B4GHtJUdo4StqegQMDyZlcQMuI8+9D+8LHFeDy34bPNQiEXqryfNwFEmVe4GpBwi4NS5iiQNSXs2kj6UzOIlYm2TwBcd+GMeTUybLLMZERVw84ANPWqIgWfrDEk7UwoSE=
+	t=1749198677; cv=none; b=kCR6Plth6BPUnRNYiJ7RxAFM6VRlRUnyp+47Ps8l2H5vTRozAdfled1WITk2IXAtFFuvdV9ZKuuLXqVyLBb7dW32Pc/lGALOA3a8OXcUGZgHC/JIaFtYJCZzbx/jdhCuOjyfUAqrrOn3CDW68236J8AEDYw6gvxJsyThlE7Ehd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749197979; c=relaxed/simple;
-	bh=xZlhkRAkf9NtLVuWaJZVBEvuhnY31s4L7SnFMDiGwoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b1IvGZZBI5q3ImX7YZeDFi108xhI4+CEnqeJlgIKLeWt2MyOri/xzqEodap8u/Ix57s2BpDkEyHBbN7mpQDtPrG092C3m88alVmw4faXxnWqxS6kyujvTGnlhHgVVRebWPJ05Z+yl9i4dozcO7h4fQSyKZxD96bw2Rzr7ozErgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=B5Ey5XQo; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AC86241D02;
-	Fri,  6 Jun 2025 08:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1749197969;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L9OL/AoGykLh8iv60m7BkynFYdgLzm2qSbm2BGgS4HQ=;
-	b=B5Ey5XQoeq+ZDoSg7Va76oi/nJ1WxdKyLsALXCcWuruWFaEr67IuHf2UXOO1OjnxCYe4qZ
-	d6M+EyQFkLbu6svj00TePXK+ejdXSwQhZtfc3ftuv2K0zbBIi5krTPh9W/jIBto10YVpjr
-	faJlFIUwuQSRnce4pgMuwLl19MANeKyuGRmTW9ELDbxC6Ydut0rkssSHOPAnABdrWO76JF
-	MhSE7R1o9LgLTBrHj17K5jmpoSnZdjMAUZ8KIeoUsYiU/RruDafw+6z9TjLSurAaYh7oLB
-	AN3s/sNoIsv/ZJtXnzGNP6B4hv/mGbTXm/5OODafrxi9irPbxRf9imyt2Sovjw==
-Date: Fri, 6 Jun 2025 10:19:23 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Simon Horman <horms@kernel.org>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Romain Gantois <romain.gantois@bootlin.com>,
- Jijie Shao <shaojijie@huawei.com>
+	s=arc-20240116; t=1749198677; c=relaxed/simple;
+	bh=GOaecTwnFqUtKaM46dtg8BN9hvAYfBIit3afUD3tV4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNRXsD0TuRiYoTXr+PbP42Kj6MJ86AGt24YqIMp3/yz6mtAqb6mM9TqosctsRkH46Xb7L4ucLZH0EUYixTlXhS9DubqVUrTqrxRqZ0BEySekVbHH7cmkwmAKEyfYNlFJfIYJ8L7bylDMmo1XrtpAXSmkY10uNBqUuYfPFf8gKro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=r7EdqUQS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UiP4Miv2fJBDHLcvZPsk9HjMhtpzsvxsINCe1ehfFjc=; b=r7EdqUQSJRqm9CeA+rK2wsC/Xm
+	s2szXU0GVh++A4mDTsHpuq3LGkszUuEdzlaAculq6QhLktb52PTg4VCssV8DMF3ktMRbeYlgjo3md
+	wHvN5GQma3fHpkPAE0Qu+kA52r6/uwh8L/gvtSF7z8Rb3XxxtUYZtPtQUd26DBhFpVLQ8WEDR+GOw
+	FEXwoJw+SnfMc+WG13rWZzdRa8u/+8Y1zMm+VNbreqiKZQ28jqpPQBbS1a5k+0uxw5C/ILmaUdxgN
+	XUuQQUiKriG38tnn9HGEq0RJIUYAXTGLR4a6fd3xNwRFHJ4MUjux+hOJ8dreS7Rz0z83KsC4vi3aD
+	MtTXOAmQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33176)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uNSTg-0000Zv-22;
+	Fri, 06 Jun 2025 09:31:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uNSTb-00034M-2K;
+	Fri, 06 Jun 2025 09:30:59 +0100
+Date: Fri, 6 Jun 2025 09:30:59 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jijie Shao <shaojijie@huawei.com>
 Subject: Re: [PATCH net] net: phy: phy_caps: Don't skip better duplex macth
  on non-exact match
-Message-ID: <20250606101923.04393789@fedora>
-In-Reply-To: <ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
+Message-ID: <aEKnQ4haQtcJWzXX@shell.armlinux.org.uk>
 References: <20250603083541.248315-1-maxime.chevallier@bootlin.com>
-	<ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+ <ef3efb3c-3b5a-4176-a512-011e80c52a06@redhat.com>
+ <20250606101923.04393789@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdegkeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeeftdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepleehgeevfeejgfduledtlefhlefgveelkeefffeuiedtteejheduueegiedvveehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdduvddruddthedrudehtddrvdehvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvuddvrddutdehrdduhedtrddvhedvpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhgl
- hgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250606101923.04393789@fedora>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 5 Jun 2025 12:24:54 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
-
-> On 6/3/25 10:35 AM, Maxime Chevallier wrote:
-> > When performing a non-exact phy_caps lookup, we are looking for a
-> > supported mode that matches as closely as possible the passed speed/duplex.
-> > 
-> > Blamed patch broke that logic by returning a match too early in case
-> > the caller asks for half-duplex, as a full-duplex linkmode may match
-> > first, and returned as a non-exact match without even trying to mach on
-> > half-duplex modes.
-> > 
-> > Reported-by: Jijie Shao <shaojijie@huawei.com>
-> > Closes: https://lore.kernel.org/netdev/20250603102500.4ec743cf@fedora/T/#m22ed60ca635c67dc7d9cbb47e8995b2beb5c1576
-> > Fixes: fc81e257d19f ("net: phy: phy_caps: Allow looking-up link caps based on speed and duplex")
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---
-> >  drivers/net/phy/phy_caps.c | 15 +++++++++------
-> >  1 file changed, 9 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-> > index 703321689726..d80f6a37edf1 100644
-> > --- a/drivers/net/phy/phy_caps.c
-> > +++ b/drivers/net/phy/phy_caps.c
-> > @@ -195,7 +195,7 @@ const struct link_capabilities *
-> >  phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
-> >  		bool exact)
-> >  {
-> 	> -	const struct link_capabilities *lcap, *last = NULL;
-> > +	const struct link_capabilities *lcap, *match = NULL, *last = NULL;
-> >  
-> >  	for_each_link_caps_desc_speed(lcap) {
-> >  		if (linkmode_intersects(lcap->linkmodes, supported)) {
-> > @@ -204,16 +204,19 @@ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
-> >  			if (lcap->speed == speed && lcap->duplex == duplex) {
-> >  				return lcap;
-> >  			} else if (!exact) {
-> > -				if (lcap->speed <= speed)
-> > -					return lcap;
-> > +				if (!match && lcap->speed <= speed)
-> > +					match = lcap;
-> > +
-> > +				if (lcap->speed < speed)
-> > +					break;
-> >  			}
-> >  		}
-> >  	}
-> >  
-> > -	if (!exact)
-> > -		return last;
-> > +	if (!match && !exact)
-> > +		match = last;  
+On Fri, Jun 06, 2025 at 10:19:23AM +0200, Maxime Chevallier wrote:
+> In reality, the case you're mentioning would be a device that supports
+> 1000/Full, 100/Full and 100/Half, user asks for 1000/Half, and 100/Full
+> would be reported.
 > 
-> If I read correctly, when user asks for half-duplex, this can still
-> return a non exact matching full duplex cap, even when there is non
-> exact matching half-duplex cap available.
+> That's unlikely to exist, but I'll document it as I've been surprised
+> in the past with setups that shouldn't exist that actually do :)
 
-That would be only if there's no half-duplex match at the requested
-speed, but yes indeed.
+That's not unlikely. Many MACs do not support 1000/Half but do support
+100/Half and 10/Half.
 
-> 
-> I'm wondering if the latter would be preferable, or at least if the
-> current behaviour should be explicitly called out in the function
-> documentation.
+Also... you're wrong about the result.
 
-Looking at the previous way of doing this, we looked at the following
-array in descending order : 
+If phy_lookup_setting() is called with speed = 1000, duplex = half,
+and we have a MAC that supports 1000/Full, 100/Half, 100/Full, then:
 
-[...]
-	/* 1G */
-	PHY_SETTING(   1000, FULL,   1000baseT_Full		),
-	PHY_SETTING(   1000, HALF,   1000baseT_Half		),
-	PHY_SETTING(   1000, FULL,   1000baseT1_Full		),
-	PHY_SETTING(   1000, FULL,   1000baseX_Full		),
-	PHY_SETTING(   1000, FULL,   1000baseKX_Full		),
-	/* 100M */
-	PHY_SETTING(    100, FULL,    100baseT_Full		),
-	PHY_SETTING(    100, FULL,    100baseT1_Full		),
-	PHY_SETTING(    100, HALF,    100baseT_Half		),
-	PHY_SETTING(    100, HALF,    100baseFX_Half		),
-	PHY_SETTING(    100, FULL,    100baseFX_Full		),
-[...]
+- We iterate down through the phy_settings[] to:
+	PHY_SETTING(   1000, FULL,   1000baseT_Full             ),
 
-The matching logic was pretty much the same, walk that (and and'ing
-with the passed supported modes), note the partial matches, return
-either an exact or non-exact match.
+	if (p->speed == speed && p->duplex == duplex) {
+  the first condition is true, the second is false.
+	} else if (!exact) {
+  this is true.
+		if (!match && p->speed <= speed)
+  match is NULL, and p->speed == speed, so this is a candidate:
+			match = p;
+  We continue.
+- The next entry that will be tested is:
+	PHY_SETTING(    100, FULL,    100baseT_Full             ),
 
-None of the logic actually cared about the duplex for non-exact
-matches, only the speed. I think we would have faced the same behaviour.
+	if (p->speed == speed && p->duplex == duplex) {
+  the first condition is false.
+	} else if (!exact) {
+  this is true.
+		if (!match && p->speed <= speed)
+  this is now false because match is set.
+  We continue.
+- The next entry that will be tested is:
+	PHY_SETTING(    100, HALF,    100baseT_Half             ),
 
-In reality, the case you're mentioning would be a device that supports
-1000/Full, 100/Full and 100/Half, user asks for 1000/Half, and 100/Full
-would be reported.
+	if (p->speed == speed && p->duplex == duplex) {
+  the first condition is false.
+	} else if (!exact) {
+  this is true.
+		if (!match && p->speed <= speed)
+  this is now false because match is set.
+  We continue.
 
-That's unlikely to exist, but I'll document it as I've been surprised
-in the past with setups that shouldn't exist that actually do :)
+- We eventually get to the end of the list.
+	if (!match && !exact)
+  this is false.
 
-All of this really makes me want to add some test scripts to cover all
-these corner-case behaviours and test for future regressions.
-Hopefully when I get a bit more bandwidth I'll be finally able to
-finish the netdevsim PHY support...
+- We return the entry for 1000/Full, which is exactly the behaviour I
+  was after when I wrote this matching.
 
-Thanks,
+If you're version doesn't come out with a matching speed, then I'm
+afraid it's still broken.
 
-Maxime
-
-> /P
-> 
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
