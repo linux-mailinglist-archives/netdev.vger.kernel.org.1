@@ -1,84 +1,132 @@
-Return-Path: <netdev+bounces-195499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71351AD08CF
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 21:46:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9639CAD0966
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 23:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF8D9189AFCF
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 19:46:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAF933AE6C1
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 21:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B781A262D;
-	Fri,  6 Jun 2025 19:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB1F230BF1;
+	Fri,  6 Jun 2025 21:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1kh6CKn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BtXSTc54"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694EC36D;
-	Fri,  6 Jun 2025 19:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646E384039
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 21:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749239181; cv=none; b=aMCK+i7wukPEiA5U1c3DjvRfnjdRzRRZt0TG87tbXetWwYun6hqoSjKJa3jwvspoVADEFbUu3N+h9lfEW38gYLkGVDNvpyTShizJwZaind33J2GM+6iXg3NC0s4FM8zcbuSzEsv/DplnJhVuvyRwSSfsMavWSN9WyObNbImbWFw=
+	t=1749244908; cv=none; b=cwGbVuCuDRQ+asSx68iKoioAI/RUWpRtVVHhFDnXRi/dowwQ1gXzOImoN4KfUUV2WjTUbRUA696kcgNxz5DgoM/oqcvfUPbvVRLMY2CXXxx33pQLakc0utoHfZSwIxCiGNygivozHKU+y3uJ7gPhrk6L55V1TJotJ9cMlEzz1AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749239181; c=relaxed/simple;
-	bh=01zrtN3LHWp3T9SlDc6J4OdMI4FP63NecS3WUI0ue1w=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=fknN+YwrXPrelds+TMRtFmCCrqZRGB4Mcnn3a8X6xplRM+RwxSBHTYWFyZhs+GubDUlYujdb3wa2FUxe3pUjTLVtEOIs+cDqnxTibJUA1wyXeTYhMrmkPW5fwmQtKYN3v11YTCpheLZJwwaF8OwU9WR5R32GTb3uTk8pKk5WaFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1kh6CKn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 668B1C4CEEB;
-	Fri,  6 Jun 2025 19:46:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749239180;
-	bh=01zrtN3LHWp3T9SlDc6J4OdMI4FP63NecS3WUI0ue1w=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=S1kh6CKnovjc32GVIf+1sxu269Qc4igI05LZNceRGVi7fI7Rii96g51x7D1iy3StZ
-	 /FbmDP9LAdRBUEbmuUxFPibEpJBF4F/SeWfBIvWMavG8UNU5u7qWi235r7THakknNv
-	 aYu5lZQdXwe5UfSnG0cUHyCVvrvDB9Ea6KOdtZlaW3ezdXF/i/HilWxp55k8CDR7Jc
-	 9e2l0XzmfdhP+EERWfjSGLdLFYEPLx+GIcBVCXGeDHGFc0sY3Ad7vNSoDHbn6d13KM
-	 B3AnAo14177XSxbPVXqH0vcfqSeqDb4JMg+RR79aa8dqs1dfhLdGSaCmAFbi5hrICb
-	 AodQPi+RO59jQ==
-Date: Fri, 06 Jun 2025 12:46:10 -0700
-From: Kees Cook <kees@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, Pranav Tyagi <pranav.tyagi03@gmail.com>
-CC: Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
- linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] net: randomize layout of struct net_device
-User-Agent: K-9 Mail for Android
-In-Reply-To: <CANn89iJR1i3hhXrkDNtXyPCNUj1KmrTAff2=pcuYNsXBxogNpw@mail.gmail.com>
-References: <20250602135932.464194-1-pranav.tyagi03@gmail.com> <053507e4-14dc-48db-9464-f73f98c16b46@lunn.ch> <202506021057.3AB03F705@keescook> <25d96fc0-c54b-4f24-a62b-cf68bf6da1a9@lunn.ch> <CAH4c4jJRkeiCaRji9s1dXxWL538X=vXRyKgwcuAOLPNd-jv4VQ@mail.gmail.com> <CANn89iJR1i3hhXrkDNtXyPCNUj1KmrTAff2=pcuYNsXBxogNpw@mail.gmail.com>
-Message-ID: <123565BC-9619-40F1-9F38-0F2BAAE09716@kernel.org>
+	s=arc-20240116; t=1749244908; c=relaxed/simple;
+	bh=N0FDbV/IqGRqdLY6zSdIrMUln/GD3327Fchr4xJWw8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LnA9mJWaQ/5NOpvz9BNvDSZUHoD0IWOQZilaMP5Sdvtj1wToB5RIYFH4cIQZKWdZ/ZZI2cAHNPoZj5h1hSdS/K7a9ziZ2f12Zny9O3/ofiJO6JJc5TurULaKkZiUI7jsr3QlMNtnWzQtOlCtsnIA9JwrlCH/oUim3hbLe9zJVc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BtXSTc54; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+8i0qq5I394n5FTg/ubH+sy9iFc+cmepNaqLACN6CVE=; b=BtXSTc54QMV6d1f1FWxu9nUIqi
+	xQNV5iWUismWQ4Fx0K+QEnNT3QngaM1/eS/Lntbj7C9w5on/z+4yLxYwNC47ZrTfJN0XAKzr2uCDt
+	/zBJLavTjXnIEfjbbEQzslmagdBOjEOXhxaKBzEZ2H79E2ih+2c9TcxdWybqwULgqnrLJ6JNay2Ao
+	wAkg7zEg1iX9DbmVgCas5bEL/A+IpFlFRWsUJDlxC3TBwEDdIQ65L9kJ66QleR3ai9edyqZU+DYqw
+	O+hbQRCZC4btoaCoFBPSJZRBWxaTWE04koXjNhCgIsSwTJOrkOAXHOIyAmplA7UwYaGdD2lJJvNaY
+	ILY3K3Og==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34438)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uNeVQ-0001Cl-2U;
+	Fri, 06 Jun 2025 22:21:40 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uNeVO-0003Yk-0J;
+	Fri, 06 Jun 2025 22:21:38 +0100
+Date: Fri, 6 Jun 2025 22:21:37 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Chris Morgan <macromorgan@hotmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Chris Morgan <macroalpha82@gmail.com>,
+	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH V2] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
+Message-ID: <aENb4YX4mkAUgfi2@shell.armlinux.org.uk>
+References: <20250606022203.479864-1-macroalpha82@gmail.com>
+ <ab987609-0cc7-4051-bc51-234e254cbec0@lunn.ch>
+ <SN6PR1901MB46541BA6488F73EB49EBCDDFA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
+ <eb99e702-5766-4af6-b527-660988ad9b54@lunn.ch>
+ <SN6PR1901MB465464D2B7D905F6CD076F3FA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR1901MB465464D2B7D905F6CD076F3FA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Fri, Jun 06, 2025 at 01:54:27PM -0500, Chris Morgan wrote:
+> 	Option values					: 0x00 0x00
 
+This suggests that LOS is not supported, nor any of the other hardware
+signals. However, because early revisions of the SFP MSA didn't have
+an option byte, and thus was zero, but did have the hardware signals,
+we can't simply take this to mean the signals aren't implemented,
+except for RX_LOS.
 
-On June 6, 2025 8:42:45 AM PDT, Eric Dumazet <edumazet@google=2Ecom> wrote=
-:
->Most distros use CONFIG_RANDSTRUCT_NONE=3Dy
+> I'll send the bin dump in another message (privately). Since the OUI
+> is 00:00:00 and the serial number appears to be a datestamp, I'm not
+> seeing anything on here that's sensitive.
 
-That is true=2E But distros don't strictly define our code base=2E :)
+I have augmented tools which can parse the binary dump, so I get a
+bit more decode:
 
-> I do not think __randomize_layout has a future=2E
+        Enhanced Options                          : soft TX_DISABLE
+        Enhanced Options                          : soft TX_FAULT
+        Enhanced Options                          : soft RX_LOS
 
-It will remain an actively supported feature -- many high security systems=
- (that build their own kernels) use it, along with other features where the=
-y have no problem trading performance for security=2E
+So, this tells sfp.c that the status bits in the diagnostics address
+offset 110 (SFP_STATUS) are supported.
 
--Kees
+Digging into your binary dump, SFP_STATUS has the value 0x02, which
+indicates RX_LOS is set (signal lost), but TX_FAULT is clear (no
+transmit fault.)
 
---=20
-Kees Cook
+I'm guessing the SFP didn't have link at the time you took this
+dump given that SFP_STATUS indicates RX_LOS was set?
+
+Now, the problem with clearing bits in ->state_hw_mask is that
+leads the SFP code to think "this hardware signal isn't implemented,
+so I'll use the software specified signal instead where the module
+indicates support via the enhanced options."
+
+Setting bits in ->state_ignore_mask means that *both* the hardware
+and software signals will be ignored, and if RX_LOS is ignored,
+then the "Options" word needs to be updated to ensure that neither
+inverted or normal LOS is reported there to avoid the state machines
+waiting indefinitely for LOS to change. That is handled by
+sfp_fixup_ignore_los().
+
+If the soft bits in SFP_STATUS is reliable, then clearing the
+appropriate flags in ->state_hw_mask for the hardware signals is
+fine.
+
+However, we have seen modules where this is not the case, and the
+software bits seem to follow the wiggling of the hardware lines.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
