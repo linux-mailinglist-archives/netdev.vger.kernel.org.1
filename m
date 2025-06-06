@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-195441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209D0AD02E4
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:14:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 035ABAD02F0
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 15:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E27C5175A9D
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 13:14:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558973B1500
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 13:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC2C288C3D;
-	Fri,  6 Jun 2025 13:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8822289350;
+	Fri,  6 Jun 2025 13:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3cq+q9T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQe3K4zj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBB4288C21
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 13:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2A0288CBC;
+	Fri,  6 Jun 2025 13:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749215628; cv=none; b=M9btNPRF7geFO6oNGicHqmyTWGbpaEFkXxg0blq8UJG9PsU35U9o4QDrWPwZicbWyDQz7qt+oRKnC+/gytO4uhZnWwg6ksmIvd2C2LGxiAbOkdOwvN7IIBL3aLAEB/DPS/KG2Ce5guU+9mEEYHws05JdlREyoNZ1129vhR5zEVE=
+	t=1749215682; cv=none; b=S6IVlC87pA6cOGuHmAP5Djx0gI0v/h0Sq+N6yRRJJ9pxbrycNlz7MC2tni88yMGPmUbJXp8XqhZ5iD5c4xJtIUUjV+MufGPgkIBw8EyNcjI0V+qqlhtdqb/UYo3/5/n94Hh5bOkJQ6m9UU+TlL0XuXjL2cecASCQDnlpFaZjNfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749215628; c=relaxed/simple;
-	bh=7BK4cAFFZwhiO806eROooZ9YTqB5zUfT9rGu7osftt4=;
+	s=arc-20240116; t=1749215682; c=relaxed/simple;
+	bh=7pw97sieU7T1F+62xaELTwjjTTSUaRf6+M7upMa96BU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXpuZ/4zpgtcbXJqh5ICl8/amo1aDd0umOde0Vj8OVFhXfepCMfK0YFxYCj8HeHdKjddFlS/Gfm/N/VmuqWoHwNUjbcQ4IMb94JyWDHxw9Q3KdEZj1YwxJ0TrbVDK7U/S8HQeHOasFCtURN5GBBmmTOrQbPs5MmNz+PmN1KnYqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3cq+q9T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0E18C4CEEB;
-	Fri,  6 Jun 2025 13:13:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FVWIsguDN8wfMbwGf0+UnGyOVfDsl38zibydsiWDVcGAQgl8swNw0Wcel1PBB0V1f2AwxumyTAmP88EVhOo0iaZ2ykpk/YEwAxpagzgrqFA2jz7j7uEY8Dg6jUqGf1ZGB3qnVBdaHNpxkzwUNNMwbBKR0qm3CXKH+YRhb9ircOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQe3K4zj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DC6BC4CEF0;
+	Fri,  6 Jun 2025 13:14:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749215628;
-	bh=7BK4cAFFZwhiO806eROooZ9YTqB5zUfT9rGu7osftt4=;
+	s=k20201202; t=1749215681;
+	bh=7pw97sieU7T1F+62xaELTwjjTTSUaRf6+M7upMa96BU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S3cq+q9THjl29nfM/uFJwRTwAPwwffIHJW1xUR8aTD4dNdQDYV1MoCZzW8HF6kekz
-	 n/K4lQhjjg01fKhSbnOtwx8Ybh0O00Tn76mLPF1ayA93F8R0rgcC57U6AYYBu3XAqq
-	 ay3DgWAcMKm0LYa/OuMbZCG0RO5m36dXHcpAlBU1ljYOuYwrd6ORFyWcGvp/KnwxVK
-	 yu8dTrMsBI5wmdI+YGGCyzS8tyLaLDv5pCoPRZupn/OgM09y5G/4FG7lYWA7GI0pU8
-	 R/5PC8umPQiYDEVSboXNhAW2/mcNvF1MnNsqahsltskyiInGmMI1N5yTw/Pa3t8if3
-	 va4ZOHw12GjNw==
-Date: Fri, 6 Jun 2025 14:13:42 +0100
+	b=NQe3K4zj6LZA7NsgmitBbENfWid4o30TZbo8pGZZhp25y5aySPEXWZ1srOQJxeg21
+	 kqS40kYX/drmI6hxHfj+fPzPX9Iyl6X+ESHpOn/PDHVY+0C/ubY6uBPK/SjHA27gna
+	 pRsnehK7XueAZ60OhEIdO0HbNb+RsTYY4WxSRh2IvOtnYb7XRLGGRX+KvYhTlfYZj0
+	 tLbz+iSPciAN6cumlXrlhSVXD0fWAEYsXk+qb2eGQ8BFGVdUEcvgMDvUIYMCR1OXbd
+	 VbJcvCkzyyU0xdRiERPn8dRYkH1Oy7GzGul8rp7YUblr1F7PtdK+Ml0xvrhbzXuZjS
+	 IGUn/W1Ksz0GQ==
+Date: Fri, 6 Jun 2025 14:14:37 +0100
 From: Simon Horman <horms@kernel.org>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
-	wanry@yunsilicon.com, jacky@yunsilicon.com,
-	parthiban.veerasooran@microchip.com, masahiroy@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com, geert+renesas@glider.be,
-	geert@linux-m68k.org
-Subject: Re: [PATCH net-next v12 00/14] xsc: ADD Yunsilicon XSC Ethernet
- Driver
-Message-ID: <20250606131342.GG120308@horms.kernel.org>
-References: <20250606100132.3272115-1-tianx@yunsilicon.com>
+To: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+Cc: sbhatta@marvell.com, Sabrina Dubroca <sd@queasysnail.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] macsec: MACsec SCI assignment for ES = 0
+Message-ID: <20250606131437.GH120308@horms.kernel.org>
+References: <20250604123407.2795263-1-carlos.fernandez@technica-engineering.de>
+ <20250605132110.3922404-1-carlos.fernandez@technica-engineering.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,50 +63,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250606100132.3272115-1-tianx@yunsilicon.com>
+In-Reply-To: <20250605132110.3922404-1-carlos.fernandez@technica-engineering.de>
 
-On Fri, Jun 06, 2025 at 06:02:15PM +0800, Xin Tian wrote:
-> The patch series adds the xsc driver, which will support the YunSilicon
-> MS/MC/MV series of network cards. These network cards offer support for
-> high-speed Ethernet and RDMA networking, with speeds of up to 200Gbps.
+On Thu, Jun 05, 2025 at 03:21:04PM +0200, Carlos Fernandez wrote:
+> Hi Sundeep, 
 > 
-> The Ethernet functionality is implemented by two modules. One is a
-> PCI driver(xsc_pci), which provides PCIe configuration,
-> CMDQ service (communication with firmware), interrupt handling,
-> hardware resource management, and other services, while offering
-> common interfaces for Ethernet and future InfiniBand drivers to
-> utilize hardware resources. The other is an Ethernet driver(xsc_eth),
-> which handles Ethernet interface configuration and data
-> transmission/reception.
+> In order to test this scenario, ES and SC flags must be 0 and 
+> port identifier should be different than 1.
 > 
-> - Patches 1-7 implement the PCI driver
-> - Patches 8-14 implement the Ethernet driver
+> In order to test it, I runned the following commands that configure
+> two network interfaces on qemu over different namespaces.
 > 
-> This submission is the first phase, which includes the PF-based Ethernet
-> transmit and receive functionality. Once this is merged, we will submit
-> additional patches to implement support for other features, such as SR-IOV,
-> ethtool support, and a new RDMA driver.
+> After applying this configuration, MACsec ping works in the patched version 
+> but fails with the original code.
 > 
-> Changes v11->v12
-> Link to v11: https://lore.kernel.org/netdev/20250423103923.2513425-1-tianx@yunsilicon.com/
-> - patch01: modify NET_VENDOR_YUNSILICON depends on: "ARM64 || X86_64" -> "64BIT" (Jakub)
-> - patch12: TSO byte stats include headers added after hardware segmentation (Jakub)
+> I'll paste the script commands here. Hope it helps your testing.
+> 
+> PORT=11
+> SEND_SCI="off"
+> ETH1_MAC="52:54:00:12:34:57"
+> ETH0_MAC="52:54:00:12:34:56"
+> ENCRYPT="on"
+> 
+> ip netns add macsec1
+> ip netns add macsec0
+> ip link set eth0 netns macsec0
+> ip link set eth1 netns macsec1
+>   
+> ip netns exec macsec0 ip link add link eth0 macsec0 type macsec port $PORT send_sci $SEND_SCI end_station off encrypt $ENCRYPT
+> ip netns exec macsec0 ip macsec add macsec0 tx sa 0 pn 2 on key 01 12345678901234567890123456789012
+> ip netns exec macsec0 ip macsec add macsec0 rx port $PORT address $ETH1_MAC 
+> ip netns exec macsec0 ip macsec add macsec0 rx port $PORT address $ETH1_MAC sa 0 pn 2 on key 02 09876543210987654321098765432109
+> ip netns exec macsec0 ip link set dev macsec0 up
+> ip netns exec macsec0 ip addr add 10.10.12.1/24 dev macsec0
+> 
+> ip netns exec macsec1 ip link add link eth1 macsec1 type macsec port $PORT send_sci $SEND_SCI end_station off encrypt $ENCRYPT
+> ip netns exec macsec1 ip macsec add macsec1 tx sa 0 pn 2 on key 02 09876543210987654321098765432109
+> ip netns exec macsec1 ip macsec add macsec1 rx port $PORT address $ETH0_MAC 
+> ip netns exec macsec1 ip macsec add macsec1 rx port $PORT address $ETH0_MAC sa 0 pn 2 on key 01 12345678901234567890123456789012
+> ip netns exec macsec1 ip link set dev macsec1 up
+> ip netns exec macsec1 ip addr add 10.10.12.2/24 dev macsec1
+> 
+> ip netns exec macsec1 ping 10.10.12.1 #Ping works on patched version.
 
-Hi Xin Tian,
-
-Thanks for the updates. Unfortunately the timing of this submission is
-not ideal.
-
-## Form letter - net-next-closed
-
-The merge window for v6.16 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
-
-Please repost when net-next reopens after June 8th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
--- 
-pw-bot: defer
+It seems to me that it would be useful to include these instructions in
+the commit message. Or better still, add a selftests.
 
