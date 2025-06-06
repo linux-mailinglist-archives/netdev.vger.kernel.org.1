@@ -1,202 +1,150 @@
-Return-Path: <netdev+bounces-195372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E556DACFF82
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 11:41:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD47ACFF87
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 11:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C7A4189BAF9
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E034189147E
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 09:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABBB286D48;
-	Fri,  6 Jun 2025 09:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3525286424;
+	Fri,  6 Jun 2025 09:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DsbKINYz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sl5v8Ary"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED24286D42
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 09:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381D0207A3A;
+	Fri,  6 Jun 2025 09:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749202847; cv=none; b=UWpRKcGePq3oA05ZOYuUYOFAPje1ZO0h24cCpBAqFV3Sgifk8tpJwYTL6+yyYaF8gc50KaAWB7ipiPzZf9T4QucmeHdnfg6ijPWJk9h2IvT0brEGsi/fwBTm2neAl5na33Tu/KgCiY73ijnzMYm8TkHnQMlH/6YlaeWcoEW82V8=
+	t=1749203085; cv=none; b=OPUbe08bDn9evVN/dmeKFmBwK+WjrPSpca0zVzW1lKtbhe2BCQ1ze6MxaYQ7GuDTS5v7m4MtKjxw+N15oULFRfhcCbpwbHeGtM4WVewopODN+gw9xKf/Tuufm8XHK47dfUmVNmR9YkODQPTClqrYrfRMEpDr0EYUGnFZoaD6vFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749202847; c=relaxed/simple;
-	bh=PnuyZEF43PAaG6ER7b1YMQ31IpCLXqhEAlrLZbQXrG0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LwmiHl7+2063papboIbdfDlbup8rrfXpWE9xzLzHuNpPQLHmezMZqqKFyZ/XjMhmdsL9axCBLSf2xxMBIU+bvTbDkguRArbZtYMAeaveyz7ADlAdFmZvfkCwJJMZzT28R9zcJmCO+yKUPJcfrklGqIS9yOzavY8nzEiRfzJ28B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DsbKINYz; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-601a67c6e61so8968a12.0
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 02:40:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749202844; x=1749807644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zAfTd10Yw9K2pZvfr2dRb9UAhgYnCFwO4TyYe6PRuSc=;
-        b=DsbKINYzOMHiBlWUKnsmgf8+axxYICImRNi2MXXt0Y0MgwSzHxPwz76C6BqhnHeGyv
-         3KMohnEVC6iAyxsL2MgOcjjgu8jcsdsHEEkcLjK66nonGXBErAu7K8TnDGdem6EUlEhu
-         NxOtLGA2Oad1/7T+CYG9Spny9o7Jg/j4BUj5GFn9Z36XjJGJntKolP76aGJaDI1QoVwh
-         70ezE8uXmQwYV9s/DVOeEiWEzY8LFSEYWPOnraE/jFJZcFwbD2l6qyaJ0Lh2suguxOil
-         Wulhjict75GlVRLpxTmJWGnSF8x1/yaFpsgoCIT3/Jqvr5g9Uwzehh+9XciCgOBQVtuo
-         hJdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749202844; x=1749807644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zAfTd10Yw9K2pZvfr2dRb9UAhgYnCFwO4TyYe6PRuSc=;
-        b=mhlRgEu408mqqiDjKGdvMhkmOGSksoMZqM6p3EreOlt0qhizEaOrIYo+h8wZGzE8ab
-         A0By7pfSjKqIYbSbb0wtyltaD4av3jI7tnE112KA0TnBrZuRu0TPx5vGCqt47XXpLRMV
-         1tuVHfWeRecbFG0pugYeuw/jyqiReJC9uXuonxt9aixuholo+4UX+dTxZbiryldbZ8eY
-         MifqFoyklzT/NPELml1C1Pvv9QggZ8PQ3XmLL5YbkwujMKHHCuQAGsZHYvHUmfWwpkRJ
-         y3+vnYWeRAL1xPVUIoTj0F8ev1I1NhKFq008JR8EiR5RuaFBPx9M6Dh1izxTwarmooEd
-         kBdw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1F4AqoAjvARe/WaZovMHYr4tTz5jCKKW3lv87IpbDbtQcmGB3YZA6nuAP2Idr6wBBrbHCR38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySyu+Ajwd2DhHUcdJyLEEOU8KspwsMWGMwfIM4Ia4yyvHnbCOo
-	pt1pr4/QKNjqizZbnDKxQ0x6I4uLkgdvwwDrvJ1FBGrRhtTdgi12ilSeBN196TPY+xRpGps7I0P
-	kt/KOE9gEit6qc/YI5IYl3kHGzL9OlLJaX5TeAtpgnNpK3p7NNspVrgXgnSM=
-X-Gm-Gg: ASbGnctCeWtPbbo3vsePcSybpeCQvJBsgzgGBUg484BmSh0aYo+P++oxQ0D+IYP3Nn/
-	55kvE9WVjDv9v6RdxURcYRA9rGHmaL+Ap1yI6fhDoZVXTqddKcewHF6bZ5jimScST6iXNsgXDSU
-	eRmZTMBqJIeu+ruX1rRSeWt4wnU6KJJmnqyAAb/2lU43uibgPXt7/c9f5n37triPyiJnbUVlU4s
-	jY9
-X-Google-Smtp-Source: AGHT+IGKKbLOyqwWS4IZGmwjDIgoabOvBLdPv+RQWjr5FaPAucKt8M0vS/txudh3ymwJQKw69mVr2CPYgfW54HNZ9Po=
-X-Received: by 2002:a05:6402:3125:b0:606:b6da:5028 with SMTP id
- 4fb4d7f45d1cf-6077295a9c2mr81449a12.0.1749202843719; Fri, 06 Jun 2025
- 02:40:43 -0700 (PDT)
+	s=arc-20240116; t=1749203085; c=relaxed/simple;
+	bh=9qfH4e4DKeBNWo1tN5k/hRYd/YM+kbmrEZZ6Hb/KOZs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V1/qU3PHGEYXGSxASr7gWjET1ewqMCuq1SXaeV3acI6B5bOKKbazv3WnGB32AvU4Rk73SKsCcObM3uytNXcRttYkxsFvnnmP0kkjrZ4Llc5MD1+EfwXAlqLzaheMJgJDp2XbIujRKkt2Jv0cVWaLEpICzSrOvtPO2+9FjkdPf1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sl5v8Ary; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 03E9542E77;
+	Fri,  6 Jun 2025 09:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749203081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eTDZAF5gNbxnNxj+lsJqqE9vfgSs2erOnFdEb7FBGt0=;
+	b=Sl5v8AryVjAS3ndFPZhBmcx9hFXUMFuUCZ34zswapUR19vQWw3kr8zlh28JFfquff+41aw
+	OqYBYRq7X+WjlTW/mT8YlsWcrPDu96IEpKTBfef0F+3XJMLpqiOdDjTkWRFKtOpr+MCZaT
+	qPamB/Oik2zueznSG0VIz9HIfJr16PuUDvoY/dBY6bAXfn1GGTASm2+73unuCYAqEqNveb
+	nUjHbCy3+bla4Dm9H0cdBYCPC37gB6WvwFEBUJ63FBdMdjQ7ntAdqfTQH47gG1ixy2uSu0
+	2nK3Klxd9rMka1CHvRJf5SyrC7AXENylNnsiqB+EeaHWM24GhLOesCU+cFZq0A==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: [PATCH net v2] net: phy: phy_caps: Don't skip better duplex macth on non-exact match
+Date: Fri,  6 Jun 2025 11:43:20 +0200
+Message-ID: <20250606094321.483602-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250604210604.257036-1-kuba@kernel.org> <CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com>
- <20250605062234.1df7e74a@kernel.org> <CANP3RGc=U4g7aGfX9Hmi24FGQ0daBXLVv_S=Srk288x57amVDg@mail.gmail.com>
- <20250605070131.53d870f6@kernel.org> <684231d3bb907_208a5f2945f@willemb.c.googlers.com.notmuch>
- <20250605173142.1c370506@kernel.org>
-In-Reply-To: <20250605173142.1c370506@kernel.org>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Fri, 6 Jun 2025 11:40:31 +0200
-X-Gm-Features: AX0GCFvkymAy0ucuJORzcFDXtLnLbeZp-CZZfSawlnJHrrBGX7mUqZoSXJ1VWkQ
-Message-ID: <CANP3RGfXNrL7b+BPUCPc_=iiExtxZVxLhpQR=vyzgksuuLYkeA@mail.gmail.com>
-Subject: Re: [PATCH net] net: clear the dst when changing skb protocol
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, martin.lau@linux.dev, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, eddyz87@gmail.com, 
-	sdf@fomichev.me, haoluo@google.com, willemb@google.com, 
-	william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdegleduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepjefhleeihefgffeiffdtffeivdehfeetheekudekgfetffetveffueeujeeitdevnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdduvddruddthedrudehtddrvdehvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvuddvrddutdehrdduhedtrddvhedvpdhhvghlohepfhgvughorhgrrddrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtr
+ dgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, Jun 6, 2025 at 2:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu, 05 Jun 2025 20:09:55 -0400 Willem de Bruijn wrote:
-> > > > It does make a fair bit of sense.
-> > > > Question: does calling it as a kfunc require kernel BTF?
-> > > > Specifically some ram limited devices want to disable CONFIG_DEBUG_=
-INFO_BTF...
-> > > > I know normal bpf helpers don't need that...
-> > > > I guess you could always convert ipv4 -> ipv6 -> ipv4 ;-)
-> > >
-> > > Not sure how BPF folks feel about that, but technically we could
-> > > also add a flag to bpf_skb_adjust_room() or bpf_skb_change_proto().
-> >
-> > To invert the question: what is the value in keeping the dst?
->
-> I guess simplicity defined as "how many English words are needed to
-> explain the semantics".
->
-> The semantics I have in mind would be - dst is dropped if (1) proto
-> is changed (this patch), or (2) "CLEAR_DST" flag is explicitly set
-> (future extension).
->
-> If we drop on encap (which I supposed is the counter proposal)
-> we may end up with: dst is dropped if (1) proto is changed,
-> (2) encap flags are set (1+2 =3D alternative patch), or (3) "CLEAR_DST"
-> flag is explicitly set (future extension).
->
-> Don't think we can rule out the need for a CLEAR_DST flag as not all
-> re-routings are encaps.
->
-> But both you and Maciej consider dropping for all encaps more
-> intuitive, so I'll do that in v2 unless someone objects.
->
-> > The test refers to a nat6to4.bpf.o, but this is not included.
->
-> I reused an existing BPF prog, it does what we need -
-> it turns a v4 packet into a v6 one :)
+When performing a non-exact phy_caps lookup, we are looking for a
+supported mode that matches as closely as possible the passed speed/duplex.
 
-I haven't yet written code like this, so I'm not sure which specific
-helpers would be used, but here's what I'm aware of:
+Blamed patch broke that logic by returning a match too early in case
+the caller asks for half-duplex, as a full-duplex linkmode may match
+first, and returned as a non-exact match without even trying to mach on
+half-duplex modes.
 
-nat46/nat64 translation - obviously the dst should be dropped, as it
-cannot be correct
-- note that the bpf skb change proto helper is not always enough,
-as it always adjusts by 20, but for fragments you need to adjust by 8
-more (ipv4 had frag info straight in the core ipv4 header, ipv6
-requires an extra 8 byte extension header),
-thus our latest Android clat/nat64/nat46 code sometimes calls:
-  bpf_skb_adjust_room(skb, -(__s32)sizeof(struct frag_hdr),
-BPF_ADJ_ROOM_NET, /*flags*/0))
+Reported-by: Jijie Shao <shaojijie@huawei.com>
+Closes: https://lore.kernel.org/netdev/20250603102500.4ec743cf@fedora/T/#m22ed60ca635c67dc7d9cbb47e8995b2beb5c1576
+Tested-by: Jijie Shao <shaojijie@huawei.com>
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Fixes: fc81e257d19f ("net: phy: phy_caps: Allow looking-up link caps based on speed and duplex")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/phy/phy_caps.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-(and should also do the reverse +8 in the other direction, but that's
-not yet implemented)
-Anyway in theory this bpf_skb_adjust_room(BPF_ADJ_ROOM_NET) likely
-shouldn't clear dst.
+diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+index 703321689726..38417e288611 100644
+--- a/drivers/net/phy/phy_caps.c
++++ b/drivers/net/phy/phy_caps.c
+@@ -188,6 +188,9 @@ phy_caps_lookup_by_linkmode_rev(const unsigned long *linkmodes, bool fdx_only)
+  * When @exact is not set, we return either an exact match, or matching capabilities
+  * at lower speed, or the lowest matching speed, or NULL.
+  *
++ * Non-exact matches will try to return an exact speed and duplex match, but may
++ * return matching capabilities with same speed but a different duplex.
++ *
+  * Returns: a matched link_capabilities according to the above process, NULL
+  *	    otherwise.
+  */
+@@ -195,7 +198,7 @@ const struct link_capabilities *
+ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+ 		bool exact)
+ {
+-	const struct link_capabilities *lcap, *last = NULL;
++	const struct link_capabilities *lcap, *match = NULL, *last = NULL;
+ 
+ 	for_each_link_caps_desc_speed(lcap) {
+ 		if (linkmode_intersects(lcap->linkmodes, supported)) {
+@@ -204,16 +207,19 @@ phy_caps_lookup(int speed, unsigned int duplex, const unsigned long *supported,
+ 			if (lcap->speed == speed && lcap->duplex == duplex) {
+ 				return lcap;
+ 			} else if (!exact) {
+-				if (lcap->speed <= speed)
+-					return lcap;
++				if (!match && lcap->speed <= speed)
++					match = lcap;
++
++				if (lcap->speed < speed)
++					break;
+ 			}
+ 		}
+ 	}
+ 
+-	if (!exact)
+-		return last;
++	if (!match && !exact)
++		match = last;
+ 
+-	return NULL;
++	return match;
+ }
+ EXPORT_SYMBOL_GPL(phy_caps_lookup);
+ 
+-- 
+2.49.0
 
-ipv4-in-ipv6/ipv6-in-ipv4 decap/encap - drop, cannot be correct
-
-ipv4-in-ipv4/ipv6-in-ipv6 decap/encap - the dst ip is almost always
-different in inner vs outer packet, so again drop seems correct,
-though yeah I guess it could be conditional
-
-now, what other cases do we have where we need to insert stuff at the
-beginning of the packet (I assume we're not talking about cases where
-we change something at the end)
-
-I can think of 2 more:
-
-(a) forwarding to an interface with a different L2 header size
-
-specifically I think in Android when we forward (tethering offload)
-from rawip to ether we have to adjust the front of the packet to add
-an ethernet header: bpf_skb_change_head(skb, sizeof(struct ethhdr),
-/*flags*/ 0))
-- in practice, for v4, we just did manual nat44 so the dst is garbage,
-while for v6 we didn't so the dst would in theory still be valid (but
-we immediately bpf_redirect(EGRESS) so dst is also likely useless)
-
-I think we might unconditionally add the ethernet header when
-forwarding from rawip to rawip as well, because I think the kernel
-then just drops / ignores it when egressing (via bpf_redirect) through
-a rawip interface.
-
-Honestly this stuff is annoying as hell to deal with (unfortunately
-true of bpf in general).
-
-(b) adding/removing some sort of vlan tag / mpls tag / ipv4
-options/ipv6 extension headers / tcp options or something - most of
-these likely should keep the dst
-
-I think this wouldn't use BPF_F_ADJ_ROOM_ENCAP_L3_IPV4 & friends but
-something else, and at least some of these should likely not
-invalidate the dst.
-
-I'm not clear on what all the 'proper' apis are for all these different cas=
-es.
-
-(I thought I had a 3rd case, but I can't remember it any more...)
-
-Hopefully this is helpful?
-
---
-Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
