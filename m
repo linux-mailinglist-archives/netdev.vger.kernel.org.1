@@ -1,136 +1,145 @@
-Return-Path: <netdev+bounces-195454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD16BAD03C9
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 16:14:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF71AD0401
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 16:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 213DE17454B
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 14:14:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF339189CE63
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 14:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7035B288C3A;
-	Fri,  6 Jun 2025 14:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E82813D891;
+	Fri,  6 Jun 2025 14:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XtfkfdBX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkTDT8Zz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D66171C9
-	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 14:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EC11805E;
+	Fri,  6 Jun 2025 14:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749219266; cv=none; b=dQjow2+DxWaIG+/bSlWv6w5Z4BjG3R31+Q48e8329kQR7e5cVzB2MDHGvhfIieR/EnYfQ219eg+l9EPQ5c05VEROTbbSaRn/3w9OCbP6keP45in/RzbEsNbp0T6ojuK/k68AtsmkvbacZ2PAKE6A2gGzyUCi3MHtop9qRoj499w=
+	t=1749220096; cv=none; b=Pbi9DIfzCPmumo/DKwMupBSFT6tfCoVpf1O8vQfoTLNa5ZKbRWUKqZxXvOTuaNJUbqIxrQWq7kGoJJSF4WHBG8jrKCuCkVI5fZpwzr2zkIymytLcPSlpdtQ5gKPkTacx8VAr07kCNkJyHTVXx4XlYZaOwX2yUYzp0asno9FlrRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749219266; c=relaxed/simple;
-	bh=cJR4xtjiaA4wm7E8Tru4XigM5sB8FdydifKhmuSt/kw=;
+	s=arc-20240116; t=1749220096; c=relaxed/simple;
+	bh=08Vq20uOgofu8CZCdNlOobGZcEnOMNCeL/M4vYUrAnE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HksJ0dfrNw0rKeobmk4qy04HlBkdlK8YKTKh8XV/s6b4jYJLd4RZPvnAP/hXFHEXPlBtPdAugeXiX9d8Q1LuCn2vl9pEfetkT7jX8dKgKY98zSfAG5LMZP5Zu57WsUmz55y3wQZVyQqdGq+1WqpPaj//cxm/x9282Jb58309Rs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XtfkfdBX; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a56cc0def0so34981401cf.3
-        for <netdev@vger.kernel.org>; Fri, 06 Jun 2025 07:14:24 -0700 (PDT)
+	 To:Cc:Content-Type; b=uL0vrAtZ1wLF2gxv4f4t8QipxmJ+v4O0tlkEC8m6/Ur3+0RrRGlZOJpY6YWtK8bQGH9Luvs9t1qUqvpS+S5GXiGcAh6v618MOhTc81lvCZlqxaa31OiNjBptBYjYZg/9UlGZgWyAyf14maxBSTbhYhR3zaNhqA4ZaZcFMr7uHPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MkTDT8Zz; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22e09f57ed4so30261815ad.0;
+        Fri, 06 Jun 2025 07:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749219264; x=1749824064; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749220094; x=1749824894; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bbr5FD/qyZU5d3nuLflIQu/SrgJWifjJFAM1Ft2QlK4=;
-        b=XtfkfdBX6n4FwtEwopTn6vyYJ44ktqQMoOoMwT4B1kWvXbwBSyWr2wYMyMcm9eatHd
-         5fWswjdrPDoIYRav+sEwo5r0TMAWre+Ts3xyGO2NddOXxRG/79wJB1b2k7p2/sSTNN+O
-         SkOoAM8H6osQjDguO/FycPHOU+Z3loSpLZNaBr6/kk02N+ltyHcRIR4UF0kXyj/sRbTM
-         ERCNxs2elFTgaAirlg6Y/I7rtAFakHULu08YXUO1+ge2kbxHE1wRyBrvXddIRmQwnpIm
-         7wcChGTL0X6aRA+QQuGnfcFZkjx5NI7CkRApZYHhqhG7L8KinOHY52uwz3rgI9P/8vmo
-         R5zg==
+        bh=ralCqpmIy+3EJB5V6PR2/HbS8cHhfOSaQOQqHRr2GTw=;
+        b=MkTDT8Zz4ShzijTklDSj55uYiwgKoF8vuzNAH0YKxRyYA48/nNxmRXLYfMbmCCG2ko
+         wR+sdt4lpFjQv0TuLrJHKyIFoVvu0R1P6/cGlq3/frpGg8gAxqB6Vb1Uohz+YwirpC6v
+         5gRPd8s0rD0A0db/KRvYo4yRf57C8ja4w6OpmyEHzqsZ6dC3JHzHEEQeekKg+X7cQhOw
+         xXyUrYtgbPjMyeUQXDLebmV6DPIWiY7zNZYif/JX78Q1JS4cZTgzhZHwgSAuEsTfMg8r
+         gq7SLNnzCOTqTQLi3DgqFh+e7J7B2ClcWfJ6IrUz2Y0+8aQTADCafnY+LnP65/0Fqham
+         DaMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749219264; x=1749824064;
+        d=1e100.net; s=20230601; t=1749220094; x=1749824894;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bbr5FD/qyZU5d3nuLflIQu/SrgJWifjJFAM1Ft2QlK4=;
-        b=KuPxjv2xMjyQraVtF3H95cd6xwIHlkYg+HidwSmGUsaoMDgkC6Pqy3zKUcMIKl6hJT
-         SpG2beyjx0ft9/stlhtD5neX54c19MR42+UJ1omMyMK9aNubPs38gPiXOQL/AKhIk9yN
-         eshfPqs3GjeaEjUlr7VvK4kw5BXk9rj9IZ7j5StfBO23dqeQ2fxTm17x8xe5bqyAbdsM
-         a9iTBnXHeg8jLaEs8eGrlh1rLdNOXVLmpPtGNPJNqZiOmzXyLw7yVqaTEQOFZbcickt7
-         OwRQLWV6BDKoEx/RHrsPL3PCYfrRYJOlc/ASjfR4qL3Tuew1SDO5waPo+6vvlK0QOVLP
-         pM7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVDSlwgb+Pu1EbIBVGndEGr5VAlLC0dYrNyvj439N1hev1irZYK9TWsFrU4CIBPbUVHzZa5l/I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8yunEO7aUtXJkUysx8uarsyH/Q3QdrYfH5exvgDCwNBoIQDhf
-	cjEffOcbUVDyTmAoTctoXpZLPPteyg9E8HezAqWKYl+A+HW2kkSHKTSXMiFSHetkQF4Xcoe1PRV
-	HGKSbBS5wldfgqcitE6lWCwSyJVXJeSfugqYf+7cb
-X-Gm-Gg: ASbGncsdEscP02PP1X7DmkKcjAzIssngA0a4Gkm6uKR0IJzwKi5rsYZI9CDmuf9afrf
-	dlYrEH7gNSINndw+rZGg2k58VeAIv5tv2Xng+ziNTumwdH3pDPXo9KgsmuScx5GBSdTARPwLeyV
-	2RReYTdfZDLzOSe73cl2lflO+87PraEXqKSgmTzceb5kg=
-X-Google-Smtp-Source: AGHT+IEfpGAipVMOvER7WEo8x0oAHPJxVuaqd/ptFxJpu5UTCgHSUl8JJC+yQxORAkTuYHG25+LW2GGpF/6Uw+QnK8o=
-X-Received: by 2002:a05:622a:5509:b0:47a:e13f:2569 with SMTP id
- d75a77b69052e-4a5b9eac7a4mr61005331cf.35.1749219263436; Fri, 06 Jun 2025
- 07:14:23 -0700 (PDT)
+        bh=ralCqpmIy+3EJB5V6PR2/HbS8cHhfOSaQOQqHRr2GTw=;
+        b=PtJUT8tq6DdgQpQNEJJJ02nUuRg7grxfNdmx44w/jiL5ERcwwW5cV/PGS2J+/daeN1
+         Lk4NeqmpKp9uLeUGbQx2MGyuu3iz8V26PsLDb9CaRCBx1HAiOqtffK7i+UYqE7M87Ao6
+         wVZg9KcjyxMOwERUCalvkpn0McVYuIhh7g8zxEZAIJHI3WnPJuPNT1k1Jd1FUFBkAoQo
+         HtkuzaLjpKybYDf7VaSLQ95GqX4kJP4qLE1tBPZX8jlgWj7s29mcKebHiYGfFHMzrkbR
+         CBOlUHKBfa97NswnEvk0bU8deIFG/UhFW/HoH5rLjhhHjXgahlIrTXJcQSaiWw8I7QW8
+         pgnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUN9xzj+FH2e8zaUjpNHxBneHuM1vFrH+Cp+I56ql3SkvtWAw/iJdzGV9n3Pwr9PY3Id7VOnupC@vger.kernel.org, AJvYcCUUEfB3ygTJgVghtlnAj4X/gsvd/C0OExK3sjUBv8ZmEi3q51eOb1QWsR0ti7PlZYE38RXq6buleQ==@vger.kernel.org, AJvYcCW/mXwgQ6LuKo/vSHmqL9spSGgmpZaMfRtdPB6xf2prAQCo4ep1rwIyNkVCQ5mKQzQFzgyeZOwy35IoyzT9@vger.kernel.org, AJvYcCWsv/wv0FrrkAb8nxsSVsnhG2Nda81lmrLm87i/fcoYVIjDrPbpVEaaIrhGmoCuUUymMlqZd03aU+BrokJb@vger.kernel.org, AJvYcCXv+yrv1OIxAPS1QR9VE9MTYS+66R6BWCFJ2s5VCPvEPU+TE4UWssi6C55yQmCEzM1klqAMWwnvrdMN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6ZQOtTUPCJb0eluKM2KkF2Xsfy26Z3n4zDPVMEFTmZRKnM/tj
+	oUgfKxMpUmtJaBo8/hrvoFGyNbeB4s0jtxUOoNrp4E0slkft2TmzXdzN0+9nUkChvv9ZgVwR64o
+	oiDj4/ywRcqzqTkx8CQj/aMvVoGO6R3g=
+X-Gm-Gg: ASbGncvdRig4xkAKwFrqVa3KIcK/UqRMUQsm/mH3tm3i2JRHe/yGL/AKV63Lb1OkvQ0
+	apsIfOuqbDG6p+9e9E23cK7rpwmTRBdWOoXslvctKAqAmPZsUjVI4rofQHnR/E1gnlnBfXm37RX
+	+6HwO92GeruTBr1JMHq3nw2gDKGFhfsZVG98IIeHiPVLg=
+X-Google-Smtp-Source: AGHT+IGHvaPfG0+HpV+ht/ZksV0or0KV3mn59t6Z00XO5UHbDk9SfQ3Vtr3w5WebYdPMjG8RFTO1SGBROVNg+vl67bY=
+X-Received: by 2002:a17:902:da48:b0:233:d3e7:6fd6 with SMTP id
+ d9443c01a7336-23603a467eamr42749185ad.19.1749220094008; Fri, 06 Jun 2025
+ 07:28:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250606075517.1383732-1-dmantipov@yandex.ru>
-In-Reply-To: <20250606075517.1383732-1-dmantipov@yandex.ru>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 6 Jun 2025 07:14:11 -0700
-X-Gm-Features: AX0GCFvqvHm9nG2-ssHb3mv2LJ6iZDD-C5Nx8RdcOHvSh8vphJQ3K8g0ziboODc
-Message-ID: <CANn89iLFO8W6zDEBfoPzUMsAK4Pvei_gcUYufu+s8EYcit=MFg@mail.gmail.com>
-Subject: Re: [PATCH v2] net: core: avoid extra pskb_expand_head() when
- adjusting headroom
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org
+References: <20250428195022.24587-2-stephen.smalley.work@gmail.com> <49730b18-605f-4194-8f93-86f832f4b8f8@swemel.ru>
+In-Reply-To: <49730b18-605f-4194-8f93-86f832f4b8f8@swemel.ru>
+From: Stephen Smalley <stephen.smalley.work@gmail.com>
+Date: Fri, 6 Jun 2025 10:28:02 -0400
+X-Gm-Features: AX0GCFt8v2wBKzn1NQGbVueq_d16kQDnTqZtsxchgiVnzbBvdY-HnKnaHyqWKgg
+Message-ID: <CAEjxPJ5KoTBB18_7+fWL+GWY4N5Vp2=Kn=9FJR2GewFRcMgzPQ@mail.gmail.com>
+Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
+ interface
+To: Konstantin Andreev <andreev@swemel.ru>
+Cc: linux-security-module@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, selinux@vger.kernel.org, 
+	Christian Brauner <brauner@kernel.org>, Casey Schaufler <casey@schaufler-ca.com>, 
+	Paul Moore <paul@paul-moore.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 6, 2025 at 12:55=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru=
-> wrote:
+On Fri, Jun 6, 2025 at 9:38=E2=80=AFAM Konstantin Andreev <andreev@swemel.r=
+u> wrote:
 >
-> In 'skb_realloc_headroom()' and 'skb_expand_head()', using 'skb_clone()'
-> with following 'pskb_expand_head()' looks suboptimal, and it's expected t=
-o
-> be a bit faster to do 'skb_copy_expand()' with desired headroom instead.
+> Stephen Smalley, 28/04/2025:
+> > Update the security_inode_listsecurity() interface to allow
+> > use of the xattr_list_one() helper and update the hook
+> > implementations.
+> >
+> > Link: https://lore.kernel.org/selinux/20250424152822.2719-1-stephen.sma=
+lley.work@gmail.com/
 >
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
-> v2: pass 'skb_tailroom(...)' to 'skb_copy_expand(...)' since
-> the latter expects the final size rather than an increment
-> ---
->  net/core/skbuff.c | 19 ++++++++-----------
->  1 file changed, 8 insertions(+), 11 deletions(-)
+> Sorry for being late to the party.
 >
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 85fc82f72d26..afd346c842e4 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -2316,14 +2316,10 @@ struct sk_buff *skb_realloc_headroom(struct sk_bu=
-ff *skb, unsigned int headroom)
+> Your approach assumes that every fs-specific xattr lister
+> called like
 >
->         if (delta <=3D 0)
->                 skb2 =3D pskb_copy(skb, GFP_ATOMIC);
-> -       else {
-> -               skb2 =3D skb_clone(skb, GFP_ATOMIC);
-> -               if (skb2 && pskb_expand_head(skb2, SKB_DATA_ALIGN(delta),=
- 0,
-> -                                            GFP_ATOMIC)) {
-> -                       kfree_skb(skb2);
-> -                       skb2 =3D NULL;
-> -               }
-> -       }
-> +       else
-> +               skb2 =3D skb_copy_expand(skb, (skb_headroom(skb) +
-> +                                            SKB_DATA_ALIGN(delta)),
-> +                                      skb_tailroom(skb), GFP_ATOMIC);
->         return skb2;
+> | vfs_listxattr() {
+> |    if (inode->i_op->listxattr)
+> |        error =3D inode->i_op->listxattr(dentry, list, size)
+> |   ...
+>
+> must call LSM to integrate LSM's xattr(s) into fs-specific list.
+> You did this for tmpfs:
+>
+> | simple_xattr_list() {
+> |   security_inode_listsecurity()
+> |   // iterate real xatts list
+>
+>
+> Well, but what about other filesystems in the linux kernel?
+> Should all of them also modify their xattr listers?
+>
+> To me, taking care of security xattrs is improper responsibility
+> for filesystem code.
+>
+> May it be better to merge LSM xattrs
+> and fs-backed xattrs at the vfs level (vfs_listxattr)?
 
-Please read the comment about this function :
-
-/* Make private copy of skb with writable head and some headroom */
-
-So the skb_clone() is needed.
+This patch and the preceding one on which it depends were specifically
+to address a regression in the handling of listxattr() for tmpfs/shmem
+and similar filesystems.
+Originally they had no xattr handler at the filesystem level and
+vfs_listxattr() already has a fallback to ensure inclusion of the
+security.* xattr for that case.
+For filesystems like ext4 that have always (relative to first
+introduction of security.* xattrs) provided handlers, they already
+return the fs-backed xattr value and we don't need to ask the LSM for
+it.
+That said, you may be correct that it would be better to introduce
+some additional handling in vfs_listxattr() but I would recommend
+doing that as a follow-up.
 
