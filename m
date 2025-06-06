@@ -1,205 +1,154 @@
-Return-Path: <netdev+bounces-195349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77033ACFB25
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 04:12:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E755ACFB3F
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 04:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311C217132F
-	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA2A18975A9
+	for <lists+netdev@lfdr.de>; Fri,  6 Jun 2025 02:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971BF1D7E35;
-	Fri,  6 Jun 2025 02:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B971D5AC6;
+	Fri,  6 Jun 2025 02:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKZuavQn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbaRxCqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D7929A2;
-	Fri,  6 Jun 2025 02:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0802A17548
+	for <netdev@vger.kernel.org>; Fri,  6 Jun 2025 02:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749175919; cv=none; b=dh5fsAKLmDjvWOnEbcwbri7MJzv9yWT/eYubdrBqLSW16ndDg/Ocy+E6Yedwic9YT1YlkrG7UdKh3BHrEgZ1XHnNm8E8RElCRcoC6NN0Hk+qtQv/s0tIDjsmniuLPBeEMiyHNesUIvOZ1DH4aphBHO6MTZHpmveLto4iYcZE+6s=
+	t=1749176668; cv=none; b=lRZAS8njYIuGU+g8UhQ0gh7unShbmemgzNXyJFxNlKO/8aXZWoQkeEfYvctWFdtbZAFXtd/LeiYX/gK51qZmf7GhYXyRJIPNS4xXR2uZA2k4JCbqZb22gmD2J/cEYUfApliQKgw9Ziu1zIZNwltQAK3AcSmUedcFCyfuMyFQP9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749175919; c=relaxed/simple;
-	bh=G0NA9QukdyKS4fk2n1Yl/YyeZJx+qnKUTJAd9JdBjK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWyOCCGs1dQUPOX/KAFIHZb3jKP+6pZPWVBJVc73H31Z9ckaBiWzh4PNf5mEYoXtG+2P4ygAs7nbfMZ+TM8mpuIrRLYUJanE/LkN9okkt/hcpfdbYkOV3oeJwRBaULiuCiEkgxmBmSWpTsKX3k4kAPPeZhcwUD0Uhhags9BPVYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKZuavQn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A98B8C4CEE7;
-	Fri,  6 Jun 2025 02:11:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749175918;
-	bh=G0NA9QukdyKS4fk2n1Yl/YyeZJx+qnKUTJAd9JdBjK4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TKZuavQnWCXtl7BTKihWvG8j/Lfe6N4iWrK7+Jze+SRinKdAv/HpDxvMLrsxz8GX5
-	 YdA1sYlRtP0txd1nX5Gobn7XM9xlMxMkSNGSFebRm6oQxeVpj4emNA1dfZRDtPrnCa
-	 mfoEUxeBoiMKd0p4W8BKWf9RmZxZEXhFXVRvBpwaN7wUM/7myPvTa9wAQK3n5I/P6g
-	 fSY7NCGOfJNaur8NcvS4RL6J8x2Bm6s8Vd30o6CmEzNGgrfJ8rM1VBRqjz/FCJWf4a
-	 8OAbRoa01AwKrwAK4rT2CNh6LJxRV44azNZ0Bps/uFlqf8Cqqk1+7EhXN9nOgkBVbI
-	 nBcI1+HX66UCQ==
-Date: Thu, 5 Jun 2025 21:11:56 -0500
-From: Rob Herring <robh@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"moderated list:ARM/Microchip (AT91) SoC support" <linux-arm-kernel@lists.infradead.org>,
-	imx@lists.linux.dev, wahrenst@gmx.net
-Subject: Re: [PATCH v2 1/1] dt-bindings: ieee802154: Convert at86rf230.txt
- yaml format
-Message-ID: <20250606021156.GA3780713-robh@kernel.org>
-References: <20250602151601.948874-1-Frank.Li@nxp.com>
+	s=arc-20240116; t=1749176668; c=relaxed/simple;
+	bh=3osgMJ75cTjUs9AXJIyhi7j0c7lWSEZ2U2fFD7KbH9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYZnk42+zcx6EVbVdYt9lvm7q4XffA8iHcFUGbiW+2fxfyOAFzNj3f5/RIpRVmaWOouhiatgdy08PwdHBPN5ALvdRaKVsrM+wx2kJTf0mClSjRePgGpkI6g0NGe8pAQCsCt4ATF8ssk3fIXzcbpMznk1eXp8yH6fAJItPHxRAss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbaRxCqo; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-407a3913049so981953b6e.2
+        for <netdev@vger.kernel.org>; Thu, 05 Jun 2025 19:24:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749176666; x=1749781466; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LlGXWEUQVIDy1ejGC7NLM0C8ptRsfsrNUJ/C3SvYAZ0=;
+        b=FbaRxCqoPxFccmB/RLhbAgZ81TKhqd3lDyPDb6BRCS60+5p8nna0Moquty9zZP3WOd
+         lEkZgaJSZ3hqoM91kSgtefXJrC3vpzQ83imKhp037DsyWDHfInHDp4L18UnOS0xF03ba
+         +oYFYUSweU2Nv0e3MHuQyIb6owxOixki+QTIZA3RnivnzGUfKHLSQspMZsdugkCMzmQl
+         yKbITLvV3kUk3GnpxPlXR2Ha4Cd1h+MQXRU29a/QHXhHrDh/c5/5m66/RfMCi+N2LU2P
+         p7EkF9r8GIGsPo28IRHlzlOhYxMk7iNcJx7gRSEbxTSStTtHeBRxUFLZAfV4fSQ1dCF5
+         Xwcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749176666; x=1749781466;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LlGXWEUQVIDy1ejGC7NLM0C8ptRsfsrNUJ/C3SvYAZ0=;
+        b=QrOrUWFm4NBVv5UEaHZcp4M0sKzOVb0tXig7tg6E9YwZWNFqSkt/o6sOTzS41/cFMk
+         WatodZwiRX8gc45am4QR8kVG/nQ+WpCUczjNf/2CDHBgOUO6a4OiIAyH1g4GT6dCl2cQ
+         h7UJeI4hGIRG6CX40jN+DFInbCdCjTlKDfyRmTlKoCVgulNzOfREtUq9Gr92JD4lFEtS
+         zE6wC/gHLYIH0QgPQG++i2MqCW1TLlU869l5R3UPgZ6W++nkkCQR/yUQzZOQ7+LXVUkQ
+         W5LP7fHH3jqwHK/EdcZthjhS/VzPH35qqFibLMovwCdxx6TXn3bzsncJ+Ki0pEJPQXFn
+         ADBQ==
+X-Gm-Message-State: AOJu0YxhaL0m88HL87Gk8cS+22uaey6CuL8q52BOVUtYqokZmf3DeMLM
+	V2eHPyzobwwYBnKHxSp2KEZ+GPHV9q5Dzy9M/jgZCwtgjfPSy3ZeDQ+tFcqcNQ==
+X-Gm-Gg: ASbGncuj2z9765a7dgO+r2Dxrh+qDyHjnoQnysYvgIzbCpr44TP0cutwnnFjIpTORk8
+	YbYOxwy2BXPcqWFqhDM3JsM2mfTaUtpmjm4QTJkXdgtce3Mc3/PVH5k6EQCH0msMTe7bdzSM5Xd
+	poMhyYF6QmK51QkVXUGyst0HZHA3CMcYc07s7Qak913Hr5LTWlJNT1k0zIRXUX5BwoEQOKUKpQe
+	jDeCroCB8ZOqhlnQeTvHtD0F0Z+ywFBecNLvA7GpNySaeXGLfNgivcn/3TsGV4MyoFIgO96UA61
+	usuBoqB+kFBO8VRH196PP/lxLuhqwQVuf95y0YQM8dwUka/JacP8u8mEjfdZgKAhx1aNogQvKZ9
+	R6DqxwQ==
+X-Google-Smtp-Source: AGHT+IG2aoAd3w8qWDrJoBhEayfj9TIj6kjKlsLBNVTaQZIRW0kTYpBM+MamELnGczqDDSQEIP53JA==
+X-Received: by 2002:a05:6808:3192:b0:403:3502:80f0 with SMTP id 5614622812f47-40905245469mr1496360b6e.24.1749176665851;
+        Thu, 05 Jun 2025 19:24:25 -0700 (PDT)
+Received: from localhost.localdomain ([2600:1700:fb0:1bcf:c121:baa8:78d3:f2cf])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73889f2d20bsm137391a34.4.2025.06.05.19.24.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jun 2025 19:24:25 -0700 (PDT)
+From: Chris Morgan <macroalpha82@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Chris Morgan <macromorgan@hotmail.com>
+Subject: [PATCH V2] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
+Date: Thu,  5 Jun 2025 21:22:03 -0500
+Message-ID: <20250606022203.479864-1-macroalpha82@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250602151601.948874-1-Frank.Li@nxp.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 02, 2025 at 11:15:58AM -0400, Frank Li wrote:
-> Convert at86rf230.txt yaml format.
-> 
-> Additional changes:
-> - Add ref to spi-peripheral-props.yaml.
-> - Add parent spi node in examples.
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
-> change in v2
-> - xtal-trim to uint8
-> ---
->  .../bindings/net/ieee802154/at86rf230.txt     | 27 --------
->  .../net/ieee802154/atmel,at86rf233.yaml       | 65 +++++++++++++++++++
->  2 files changed, 65 insertions(+), 27 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
->  create mode 100644 Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-> deleted file mode 100644
-> index 168f1be509126..0000000000000
-> --- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-> +++ /dev/null
-> @@ -1,27 +0,0 @@
-> -* AT86RF230 IEEE 802.15.4 *
-> -
-> -Required properties:
-> -  - compatible:		should be "atmel,at86rf230", "atmel,at86rf231",
-> -			"atmel,at86rf233" or "atmel,at86rf212"
-> -  - spi-max-frequency:	maximal bus speed, should be set to 7500000 depends
-> -			sync or async operation mode
-> -  - reg:		the chipselect index
-> -  - interrupts:		the interrupt generated by the device. Non high-level
-> -			can occur deadlocks while handling isr.
-> -
-> -Optional properties:
-> -  - reset-gpio:		GPIO spec for the rstn pin
-> -  - sleep-gpio:		GPIO spec for the slp_tr pin
-> -  - xtal-trim:		u8 value for fine tuning the internal capacitance
-> -			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
-> -
-> -Example:
-> -
-> -	at86rf231@0 {
-> -		compatible = "atmel,at86rf231";
-> -		spi-max-frequency = <7500000>;
-> -		reg = <0>;
-> -		interrupts = <19 4>;
-> -		interrupt-parent = <&gpio3>;
-> -		xtal-trim = /bits/ 8 <0x06>;
-> -	};
-> diff --git a/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-> new file mode 100644
-> index 0000000000000..d84e05c133710
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/ieee802154/atmel,at86rf233.yaml
-> @@ -0,0 +1,65 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/ieee802154/atmel,at86rf233.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: AT86RF230 IEEE 802.15.4
-> +
-> +maintainers:
-> +  - Frank Li <Frank.Li@nxp.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - atmel,at86rf212
-> +      - atmel,at86rf230
-> +      - atmel,at86rf231
-> +      - atmel,at86rf233
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  reset-gpio:
-> +    maxItems: 1
-> +
-> +  sleep-gpio:
-> +    maxItems: 1
-> +
-> +  spi-max-frequency:
-> +    maximum: 7500000
-> +
-> +  xtal-trim:
-> +    $ref: /schemas/types.yaml#/definitions/uint8
-> +    description: |
-> +      u8 value for fine tuning the internal capacitance
-> +      arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
+From: Chris Morgan <macromorgan@hotmail.com>
 
-Drop 'u8 value for '
+Add quirk for Potron SFP+ XGSPON ONU Stick (YV SFP+ONT-XGSPON).
 
-maximum: 0xf
+This device uses pins 2 and 7 for UART communication, so disable
+TX_FAULT and LOS. Additionally as it is an embedded system in an
+SFP+ form factor provide it enough time to fully boot before we
+attempt to use it.
 
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +
-> +allOf:
-> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    spi {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        zigbee@0 {
-> +            compatible = "atmel,at86rf231";
-> +            reg = <0>;
-> +            spi-max-frequency = <7500000>;
-> +            interrupts = <19 4>;
-> +            interrupt-parent = <&gpio3>;
-> +            xtal-trim = /bits/ 8 <0x06>;
-> +        };
-> +    };
-> -- 
-> 2.34.1
-> 
+https://www.potrontec.com/index/index/list/cat_id/2.html#11-83
+https://pon.wiki/xgs-pon/ont/potron-technology/x-onu-sfpp/
+
+Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+---
+
+Changes since V1:
+ - Call sfp_fixup_ignore_tx_fault() and sfp_fixup_ignore_los() instead
+   of setting the state_hw_mask.
+
+---
+ drivers/net/phy/sfp.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 347c1e0e94d9..a7fee449fa92 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -412,6 +412,19 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+ 	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
+ }
+ 
++static void sfp_fixup_potron(struct sfp *sfp)
++{
++	/*
++	 * The TX_FAULT and LOS pins on this device are used for serial
++	 * communication, so ignore them. Additionally, provide extra
++	 * time for this device to fully start up.
++	 */
++
++	sfp_fixup_long_startup(sfp);
++	sfp_fixup_ignore_tx_fault(sfp);
++	sfp_fixup_ignore_los(sfp);
++}
++
+ static void sfp_fixup_rollball_cc(struct sfp *sfp)
+ {
+ 	sfp_fixup_rollball(sfp);
+@@ -512,6 +525,8 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK_F("Walsun", "HXSX-ATRC-1", sfp_fixup_fs_10gt),
+ 	SFP_QUIRK_F("Walsun", "HXSX-ATRI-1", sfp_fixup_fs_10gt),
+ 
++	SFP_QUIRK_F("YV", "SFP+ONU-XGSPON", sfp_fixup_potron),
++
+ 	// OEM SFP-GE-T is a 1000Base-T module with broken TX_FAULT indicator
+ 	SFP_QUIRK_F("OEM", "SFP-GE-T", sfp_fixup_ignore_tx_fault),
+ 
+-- 
+2.43.0
+
 
