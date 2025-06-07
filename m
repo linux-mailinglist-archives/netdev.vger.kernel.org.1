@@ -1,123 +1,95 @@
-Return-Path: <netdev+bounces-195515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC52AD0E19
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 17:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E52BAD0E80
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 18:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6D716D67B
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 15:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 357E016BAD4
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 16:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1251C84C6;
-	Sat,  7 Jun 2025 15:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3381D86C6;
+	Sat,  7 Jun 2025 16:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+DZPIv5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZBiEfQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2978136D;
-	Sat,  7 Jun 2025 15:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD1E2F3E;
+	Sat,  7 Jun 2025 16:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749310125; cv=none; b=bVquXRCIIaHjfzeK4nNxDtOUbZMRaGLWzvhMaPFR5/tuYQSs/c/hsuBCcvZrrdO/JDxK917R98UKjsoBs94N5mPeyQhOUcutm5e5t/kjizBUMcoH36C3j1XP5G5tqF5WjF+oMe9sReyALdDnTlg15ionQn+uG7x0rfEYy9sbI9U=
+	t=1749313276; cv=none; b=I9fHi9nC2ys7A+6jtopEJziLRWuEoKxuLYBf/08ddL6QNnkM+ESR4UA0mWn5bCgIhCN3kbrDciVeHOgXdDwqikAyWi/yqbOyEYapQp3PFhrvkUITti5SNm2b3Jd0iu3sdkoTQ5YThcHqsPRiSmUKxJ3NKwCY4SOfYJR3qCbXlX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749310125; c=relaxed/simple;
-	bh=z+jyBC0rDsvIMFnB2CX5hTuZkM0uQU8PSDEQ97J9Fms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=msxe/qAPqpK74NiI4tmYekdVwTZfzV+dhCbGlABqBtZ8KehCQo7ZS+yPKtP97a3KFTnkiNOpg4UV2qR94gKXpWKzOUz288L9eLgacT0S2osMMZ9q3n3kMCbMwpIk37AYxQPYir1h65XoTO6C0eS/WUWhaN1zjGUbMNuVNRFZiT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+DZPIv5; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-742c27df0daso2757933b3a.1;
-        Sat, 07 Jun 2025 08:28:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749310123; x=1749914923; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+c2fxGTrOu+gHD3RHbFZi/o0nuFFUaAiSBwnrt9ygdg=;
-        b=W+DZPIv5k3zkxUrraIUqUJnWBKbw91RGvfgeDFjbPLSRpzgdY24O1EOIMYrEjC3lba
-         wavtlk+gqVxFoLLa+ixWSxT9RgBJ0jzXiNZqBPEwAcTxymbWTZYJtXogXowoElgRgxgo
-         eANYLY+q6vPV2ztOZpfQOiONQp6rksg35sqMyu5ILOPvqmedsvyikR+AgjCcZwz7j93j
-         KAHbaSGMh6IymiJswoBxrlc/9ANFUpmFU3ZYGN2nfXn9kNzmZt+pj/WtaX/61sjd1/aR
-         XxkR3H/Btu0qbMD2WxmE5ztRrwx97qYu40yQybY/BfMOjr9ce7fp7ZRjWezBYFRup5Bp
-         r52g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749310123; x=1749914923;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+c2fxGTrOu+gHD3RHbFZi/o0nuFFUaAiSBwnrt9ygdg=;
-        b=nuJvpCTlCicvfef4+s0G/B7b4vf6ZCRYImITm2OqMc9A3hmlOi/u5iQZsfEVJEh43q
-         nmywkzhKnGU3VAn9DLcahqipbT6UjwtMWwFUl192pb2Q1s1BBeCzm4MjSZFrv6Y6AsHu
-         LO3pq6uCcvD/ON46v6Q2cjfuzO+b8slhrf+7a/xEj0AYE6KAno6DJazhU6Wdgc9D1Dok
-         1/Kjw7OcZVIBUhbObnmLfboedtZE/ZJdBmsgurNTpL1trIihsV0VBfoi7Jl4PrpsFtGk
-         SBDlXnatrG0u3PZndJUYxn1zuOleiFAwy+QabRyL5A23Cm7k1kZJ3/O8gg/69xSFZQU9
-         S/4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVGj2pNIa+D27LyAxI/4tohYbrrQJkEpqNJA61QALldk356YxxGc0PZUJrqMoYo5S0wpY0n0GgtC0bao3I=@vger.kernel.org, AJvYcCXA0YRFw4ugy6kIJWBdnvQ5Hx2HJO4ufiC3LJ4UiZk5r69KnpxKGMq5I8U2e5fM6YErNm9QUj05@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSftKquSbUDi21ZOtSDZb/8OnFeDdg9aL4dNLQCA1pZcvVFmC6
-	M/VjMv9Sv5blCJB8VV4lVmqyck6KBNfRpLEEA3sKQr0CZtZN1nr/MeV4
-X-Gm-Gg: ASbGnct7Q35DP7hmfNSS4KJbtjkJQjpQyZ/YwniJGg+EXWsfbJf7zCZOWN9EPbXTBsw
-	opTTo6LNfh/O1wXQsJNJDzGmnLeVgRJLkujPmijB7Z5OEmlIyHDBK5Ai6u6+fR6YSrVzLlzC2Ie
-	00P5PYs+DezPrnZM1ZT/3yrAfhkEbJwasy4x0hzElqYxd/t/Dnq9b3z4ICSG6wmiNXCgHYX1ist
-	MP2p10c4ICizpipFgg/zk2dvo/LuJzypWCWrd1CoTx5ar7MM4k79h1wXJCLpH0HMZWtkcHVVK6W
-	69+jpsYBTp8QeYieAu7RaFRukayAV3bc3kukQc3fUxiZtxsO2T+WgkWDVbG8B4hSyMhQMBs=
-X-Google-Smtp-Source: AGHT+IGe5PvLLkyfOcvRfGoQZO2yM5rs9oLpWj19Gd+8+aRM/ZSBmC4cTKl3EgRRwqh8R4Ru25G9lw==
-X-Received: by 2002:a05:6a00:4612:b0:736:a8db:93bb with SMTP id d2e1a72fcca58-74827fa2840mr8940461b3a.5.1749310123426;
-        Sat, 07 Jun 2025 08:28:43 -0700 (PDT)
-Received: from manjaro.domain.name ([2401:4900:1c66:bf5b:2e56:6e66:c9ef:ed1b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482af3831esm2965754b3a.13.2025.06.07.08.28.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Jun 2025 08:28:42 -0700 (PDT)
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: skhan@linuxfoundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	Pranav Tyagi <pranav.tyagi03@gmail.com>
-Subject: [PATCH] net: ipconfig: replace strncpy with strscpy
-Date: Sat,  7 Jun 2025 20:58:30 +0530
-Message-ID: <20250607152830.26597-1-pranav.tyagi03@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749313276; c=relaxed/simple;
+	bh=oiI/UBIp22xDHCckuTpupPI1ZnNEyqHPaX1KMdJp0rE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1apQ/scL4ADvViLxFyjoQYFv/Xno3PSeyoBMbdcMfjhvwDyzF23C4s4/TYo561gywMIYOeTGHU+WUv+9pSm2c/T55pVFHw5WEshQoIMdmhYhj/MKzwurGXqodLFCVBqeEq6JztQu4n+38qR0CyimZgO1jlvkZ6p3f0xYDvuYoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZBiEfQq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD844C4CEE4;
+	Sat,  7 Jun 2025 16:21:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749313275;
+	bh=oiI/UBIp22xDHCckuTpupPI1ZnNEyqHPaX1KMdJp0rE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PZBiEfQqujGjVpyqz8adTEM705B7KVMUfSgJlzeViiwwh4N+aqa5a/Z44MmIE5W/c
+	 wu1MduHg0/1b7KSea1myrHVzzyPHQ5ZSySxT0Qf7fDH8lfLwlKEpXpPrGtHEud1EPO
+	 guAcoYvH5Fa/yuDMFv9ek+dAsNZdp/xrS6YSf2cdWM64frwnZ6DBmIINsbfaCLKVKt
+	 qO33LH1aLdDgTMg/RzSXy+nOWBfZidZqCmunLrDXxD2Q5ldmLYD7Py7kpBWjRJ1ggg
+	 2KXkk44C1BfY2FX0FFQRfUiDcpdyI9wL3kt7G7wiAGoRKnS+0wr+dI0SqwWpLHlp3e
+	 6clzCiH8rFyug==
+Date: Sat, 7 Jun 2025 17:21:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Bartlomiej Dziag <bartlomiejdziag@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: Change the busy-wait loops timing
+Message-ID: <20250607162110.GB197663@horms.kernel.org>
+References: <20250606102100.12576-1-bartlomiejdziag@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250606102100.12576-1-bartlomiejdziag@gmail.com>
 
-Replace the deprecated strncpy() with strscpy() as the destination
-buffer is NUL-terminated and does not require any
-trailing NUL-padding. Also increase the length to 252
-as NUL-termination is guaranteed.
+On Fri, Jun 06, 2025 at 12:19:49PM +0200, Bartlomiej Dziag wrote:
+> After writing a new value to the PTP_TAR or PTP_STSUR registers,
+> the driver waits for the addend/adjust operations to complete.
+> Sometimes, the first check operation fails, resulting in
+> a 10 milliseconds busy-loop before performing the next check.
+> Since updating the registers takes much less than 10 milliseconds,
+> the kernel gets stuck unnecessarily. This may increase the CPU usage.
+> Fix that with changing the busy-loop interval to 5 microseconds.
+> The registers will be checked more often.
 
-Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
----
- net/ipv4/ipconfig.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Bartlomiej,
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index c56b6fe6f0d7..eb9b32214e60 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
- 			*v = 0;
- 			if (kstrtou8(client_id, 0, dhcp_client_identifier))
- 				pr_debug("DHCP: Invalid client identifier type\n");
--			strncpy(dhcp_client_identifier + 1, v + 1, 251);
-+			strscpy(dhcp_client_identifier + 1, v + 1, 252);
- 			*v = ',';
- 		}
- 		return 1;
--- 
-2.49.0
+I am curious.
 
+Does it always take much less than 10ms, or is that usually so.
+If it is the former, then do we need to wait for in the order of
+10000 x 5us = 50ms before giving up?
+
+> 
+> Signed-off-by: Bartlomiej Dziag <bartlomiejdziag@gmail.com>
+
+...
 
