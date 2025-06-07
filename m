@@ -1,201 +1,179 @@
-Return-Path: <netdev+bounces-195510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2079AD0BCE
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 09:57:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2BEAD0C07
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 10:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9A216FF71
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 07:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10D7A1890877
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 08:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCF31F8691;
-	Sat,  7 Jun 2025 07:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DC81F8744;
+	Sat,  7 Jun 2025 08:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ew7e9ye6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EgcbhFwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84B819539F;
-	Sat,  7 Jun 2025 07:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749283047; cv=fail; b=dzbUTqj9d6qZZYGou0PkA59Rlq6n9k0UdSvYilVr4TRko3/iOQMqErASK4PpWUg0lWbSXyVN59r+mretIAS7Oi1wuwF8+co1uwInEhmKr+C5Am9dSuwhPlRgPpBjvBuqssrcP/MjRSw71JnmrHWRQh5eUY3k4ACS7IpZZsjv5dE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749283047; c=relaxed/simple;
-	bh=01eyO/i9fpFsbN7YdILIPwGAOVMdL1adSR20PWt5JJ8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VK87jBDr4dbUrzEf0+blng6EnlBkYDg5SPNBN6tnbJECgKTnfGfMfwAvxWUxnXBcJblyFUnp/IGOm5PMoPzm7Ta/cymzwgrLPV0IhqqfkHQql5g4Oko/Vcbbp4mbzjZXocuuMIzOoVa+MIQvv1jkt/s0ljBliQQ3Wkv0ucdi/e4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ew7e9ye6; arc=fail smtp.client-ip=40.107.223.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w5AQ8kH1PgpeftiVGrKkWj5WsdtW29TFQ9qsUD9WmNIxteHULN3ysxCuN8C5kCfYNs/XlnliHNzbHOvMqxKM9iarwgkFrQjm7Gh2MyBX/ILDmcZepD68fDBlFml0xrYzB+yiJY0z9zoGkJIUCaC2/uW8bVR5v3PXV+zH1WZvXi76Un3REyWLrbJUTZksylDRVpLgsfATuj0952rfTp4KqC7DHzoqoFHSi7NK6qnzKxanndJC+kDlwT8NGE6FVxPPKFwrodOpIfRLMN4SehJAfw8MFern6tytoHSO5gTrGjnFnKTm2xCCf7wyNOPZ/tyQfUl6qxlsYQB8sFSyBZAwyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AKIZ/in0KztmfZJa5AfN47jTpSfVUAkxU5kMp8AI0+M=;
- b=UmYaRBQBZGusTpeZ2XPYhMf7kPQCpufVfY0N54X9Udm0m4Bbx+e4tnn/bqZy/s0zjZJfFWdmsMC0Qe8M18h2cUTZvyXdQ3DJH+XjviT10+aa0Iyia3CdOasEFlco3/BjVxHrQqO/s5sH2SxQg27cLjcjBS6TvUu/0W1KLX1JHNNO01bwKPfFPy0r/MaIu2XGGZVy3z6dHK3u0BVyGlvzjrI68ORMPfFPdQSjYCO0pYa+2QuAe774XnQhBJIGu14uhmDBv2gTRPiI4KReqVHUiDp3Ch3jKGFkYYIHsQftKKxY9ZWx5MyE7gpfjlOKFV88DZjRtPq8WSzYLJ61FGe/9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AKIZ/in0KztmfZJa5AfN47jTpSfVUAkxU5kMp8AI0+M=;
- b=ew7e9ye67iv8+R2DsLBu6njb4RT2kAErkN5Cy8PuUvaBPVrUUfML8MBpqq3yGrSATSEfp19gEwyObszcR2lx76o60D766wUAYd5dqrxln+6qpt8ra3MmmDXHKM8Y2WGd57OycXvKhpdYtg3hQiAOabLxRm/ARmZuiSCNT9R4VgU=
-Received: from DM6PR11CA0059.namprd11.prod.outlook.com (2603:10b6:5:14c::36)
- by CYXPR12MB9426.namprd12.prod.outlook.com (2603:10b6:930:e3::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Sat, 7 Jun
- 2025 07:57:22 +0000
-Received: from DS1PEPF0001708F.namprd03.prod.outlook.com
- (2603:10b6:5:14c:cafe::6b) by DM6PR11CA0059.outlook.office365.com
- (2603:10b6:5:14c::36) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Sat,
- 7 Jun 2025 07:57:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0001708F.mail.protection.outlook.com (10.167.17.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8792.29 via Frontend Transport; Sat, 7 Jun 2025 07:57:21 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 7 Jun
- 2025 02:57:19 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 7 Jun
- 2025 02:57:17 -0500
-Received: from xhdsneeli40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Sat, 7 Jun 2025 02:57:14 -0500
-From: Abin Joseph <abin.joseph@amd.com>
-To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v2] net: macb: Add shutdown operation support
-Date: Sat, 7 Jun 2025 13:27:13 +0530
-Message-ID: <20250607075713.1829282-1-abin.joseph@amd.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A612284039;
+	Sat,  7 Jun 2025 08:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749286378; cv=none; b=mY8oHPdcmp8azKvqu4xxTAKX7/2diQbCh+6MiTjhfl42kNvfL70dBBlsQ18YfYod3mIf/xfXKRxO/XsDLt9VBxrIguhjI/LZtQsOG6k2BJt7BuQM4Bdlml7037yUjVGA/MoPV3Q0MhZ+ZUunmkFzosXlussnkZfsBNHXFC96ZJg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749286378; c=relaxed/simple;
+	bh=vyutQaTYXrN4bm09V9PWZFQHSh8YZLIkVVALBR7R7AQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NPjt3CF4UTejV6J416skxB6Gd4wL73niYYTd+JH8jN8eVcbwr257GXjfuK7FfRUXPTqsJhJanaxQah5EPmvM/fB+Rf2ofL8PabhCcyBk4WnbyxB1RsMiTtH3JtrfAeEbfl+ecTWufP1YK4oJbWRRBcaLjB/J1A9+KGfYg1u/alk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EgcbhFwG; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3105ef2a06cso23333501fa.2;
+        Sat, 07 Jun 2025 01:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749286375; x=1749891175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KFyeqit6vTlbw/r6iPxMrJhoHvnvByEOju0HOOfl2RQ=;
+        b=EgcbhFwG/Ev5vVX8ivr1hzdlo/7aJjpd3c/3JwqrptFbkXBoJQNy3PW/KUfL7fo72v
+         0PnghCzCGuWitC3teMgimhvRWYW+BK1aqoE1Qc+CUVoQ03+urOBPNRKaTFtCDG9+tJS9
+         ItYVQGO0ymULQ6ch/Ui2hlwkazplVB8+s5Pcivz/+vJuYfha7zsiNbZaiOnanPaEg7l+
+         z6Y+Ewkel/e5qHrelmgWRDISd2lEy2Z/ADBUDXTTsEDEXCfPGWD9JxnTeoLA0zCenq0P
+         1xyMFQHnpLTta/pafLXcTAyZAPNr4YilMnuMqGBvXz5c+M/MmHX+Vb/4XKcug2ofhL1r
+         WOxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749286375; x=1749891175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KFyeqit6vTlbw/r6iPxMrJhoHvnvByEOju0HOOfl2RQ=;
+        b=jHPIN2wrIHlfJWYWQ/87n8YuEPhAsHLYzV5sodePoemwGY8ng+fQrmEZ6dcBROv0D6
+         kwPxjzQsU9LTR4zcP76Z9aHpfksOMlVgTPgTBXXRREWwQHow2BWdJXbRkmn0rAIkhBHo
+         TSkSTuoA8VJKcKJwfk3gAjqsEsZkZSTLPtBZfYhJ+bDfTn4UwQ72lhdAtjVJMuF+ePal
+         9tB8RFFDJVX7ai5j0wcfKqT8JXTvRSqzYSu1r4PSUOtZlb0EMzFrRMRtmVE6ZPSN42tN
+         OJ1Q979hTXWKuk3uuh1gZ+IvY9ILNab/jUvDtJLJ7JfVSaQoIbBBxdQh14E7+KYj9Jqy
+         3OvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3mTTT8vQceBFIhqm9GzSWzOw+KWNbm6b9cxeDZXnxVTJ/Fambfg4y9/deaPXW3j+iUD8FylUS@vger.kernel.org, AJvYcCV5RuNMsRPbjz56nPWAdOpzsrZ1MPbRsaHJA3SnLPQ8ZTi/3376qa2+LpHlhHamlgtxjtZ/7HZOgH1g@vger.kernel.org, AJvYcCW0xFUhTy2wXWBb0V0Strfrs3+HDNAQyAOcfMP3qwRW+zMulqoA13NqroN6aYvM1M1y9iYonZN66IjLPRZj+T0=@vger.kernel.org, AJvYcCWbJcdOn7HvA4ktNGmhw5rPA0d/6LBblgqkZeMkYIwM1PR6DZZrzchFaRrxKq6mk+xfEuJCiDoHOND8LF1l@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDApWV1FRoSMcGNHN1j30h8YKbkOdPazdFEaSTvEFWE8SeOJOo
+	Pp3PpkpvG8mx1t/qX3V6uAO+nfib+hvNcoPTZ9ES50KgVBNj6ADHWupSWAeUQMPDSNLs3pEjhvZ
+	gHklUJluDHUnLqkuT3BO3NrxpQVr19LM=
+X-Gm-Gg: ASbGncuEKYXNBbzWst5l76qI5/rwUghPBpGCi5BGSCvPnAc2vyO8N3Ym99MvmBAr6au
+	EmdjrRJedidbvJwYu8YSu6UfmvQHh4qV1Hvl1JByQqDvRDff/kSbsN6LPx7CH8jxuI00kdfiDGI
+	JpVrGybFCNfIhSmyfiwB8Gl396ui7d2wvj
+X-Google-Smtp-Source: AGHT+IEv37WjEi+vaAOMeA5SgqO5lvoauaHOHnb329J/YwAGAVcoSaaoQm5IHeU+YLfaL/u+ZCEwVl2jWuJ6emEkASk=
+X-Received: by 2002:a05:651c:2125:b0:32a:613b:270e with SMTP id
+ 38308e7fff4ca-32adfbd6680mr15634651fa.31.1749286374353; Sat, 07 Jun 2025
+ 01:52:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: abin.joseph@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001708F:EE_|CYXPR12MB9426:EE_
-X-MS-Office365-Filtering-Correlation-Id: e606e40d-124f-4ba4-408f-08dda598eed6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UceTL5e1hu/mzL8l1ef1sItKMluul5HCv6wPRzDFdg7SD217Kqx/6bQ4YA+m?=
- =?us-ascii?Q?1MqsvbCh+Y0IAcuUvgykkPXMqyswbnQ1jSXlSbemzWOkCQIvu72/3ejalwcX?=
- =?us-ascii?Q?uRTzDirHbJFqL4VsWWCoKF3SRRCvBiK1g/pjHtRKZ61YtCJssRGXlS5uNYZc?=
- =?us-ascii?Q?9NOGZCui0ZfmX9L6Y4kdW3rk/Gp0VzQ/TjlaxzWoWNnYEkKbB5VYmaocfx0+?=
- =?us-ascii?Q?OtarIWzF1C4X5IMS0MttXAiqc9Rsl04Nu3zqV68xMr/Oy8GERqkH+3dJLPzr?=
- =?us-ascii?Q?EDKWHMim+vwNKXaorKwuKsciBOTLp9/aqkEDZJBfvIqoiXGFBtN7cpPqxGcg?=
- =?us-ascii?Q?ORhyaJYECX8p40yhfY57EC+u5i9mBuqLNd3AtX2O4qhSNrlOBHK6e0HCrFb+?=
- =?us-ascii?Q?H7BxQCbNGwwr9x2Sfr2tiwmxUT13b6s12jT8XX42sT17ljstrdSKWr9sRZr0?=
- =?us-ascii?Q?qInGMAp081ChOHc62WGaL+56qEfSUKWbHOzexJAXD3l4mve6VqPJgrBPHB++?=
- =?us-ascii?Q?23tOu+krVOPemYROyjmwCJZ3NrZDv6Rw8spzDReZMp3Oh1yat8XHFVUd9iVa?=
- =?us-ascii?Q?4uTrcCRSnCGA9Qw8zSTsEWhJ1Kg3HFfkSQWz9LQvXI3znlurNOXszf4OsQ7o?=
- =?us-ascii?Q?9jkexSEW95S+zQLVj+lLmfhMaVk4nVQVROh3nfYc14sf6/hPhv6fuCoSgL+w?=
- =?us-ascii?Q?/AthOc7Amch02vWyuduUt5t7psWLX7K3GVjcFFd1Nk+MlCcSX+IdRq5WlBvH?=
- =?us-ascii?Q?UEMntoQOLX//XOoiykATqgPn1YSvwLwjNV0JDuvJFTWR2zx9se9u8UYNOcrq?=
- =?us-ascii?Q?NYLrth6MfMyzhKNKvL3jDBCKwiA2NusD1lqAITxqPAMPccnNev1K8IJHYIO2?=
- =?us-ascii?Q?uyqY1X58yNJfxou7+amvbukDX+J6X8sx090u51WF7B0nuaOpOGuGvUm/n4ls?=
- =?us-ascii?Q?B3szVqIkfD2xat7L3mcVty5HEcroxRlvwMKLjWe9Izhnw6zJEPBqWMkODN4Y?=
- =?us-ascii?Q?eQZFeN7uV5J0mhTrVvLVYOrMt8He5+BdCjkzL7zabT+6oBLcLayk5zPlGxDw?=
- =?us-ascii?Q?olCUnfoRreE2Dmqhss4gW43pmiCDRv6UQ24pplgOWCWUbyAfAvYNs2wyiLP7?=
- =?us-ascii?Q?kn112ImEA3grW5VcyMTPMmDoq5EmruxgrrsFpAognxc70KiA6v/mIp5SvzbV?=
- =?us-ascii?Q?0wTwIUw2LuD92FgEDr1I1e+s5QUza30amztbl+icXtsuyfPVm3pejI+Eq1UV?=
- =?us-ascii?Q?SUGZnHQ08jEDbs09/2kFT4l9bcnszvYMHU/TkguGNmsK/OPtTNv8ELKn/6WA?=
- =?us-ascii?Q?d7eFpkR5A3y1rsvUwyGfKFTBR+XI4iQ5h9g3KBe0R1iOdDhZpxxAm8+c1G5F?=
- =?us-ascii?Q?Nq5Be1Co+VQak2RhB2MRBowPkmvSmSH95S6eFWppUivL2qd3jN/2VOC6I4rp?=
- =?us-ascii?Q?n0AwG3egcMbOpbObR4LfoS/1qzA0nuLzpvqXR8lfK5R8hsa0lAf80zEBPSSo?=
- =?us-ascii?Q?cePJZweffrA4QoVBnHQdFoefZNxKbIWBtkDo?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2025 07:57:21.6289
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e606e40d-124f-4ba4-408f-08dda598eed6
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001708F.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9426
+References: <20250127160709.80604-1-ubizjak@gmail.com> <20250127160709.80604-7-ubizjak@gmail.com>
+ <02c00acd-9518-4371-be2c-eb63e5d11d9c@kernel.org> <b27d96fc-b234-4406-8d6e-885cd97a87f3@intel.com>
+ <CAFULd4Ygz8p8rD1=c-S2MjJniP6vjVNMsWG_B=OjCVpthk0fBg@mail.gmail.com>
+ <9767d411-81dc-491b-b6da-419240065ffe@kernel.org> <6412d84a-edc3-4723-89f1-b2017fb0d1ea@intel.com>
+In-Reply-To: <6412d84a-edc3-4723-89f1-b2017fb0d1ea@intel.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Sat, 7 Jun 2025 10:52:51 +0200
+X-Gm-Features: AX0GCFvfdq2FOXmAZPfE7zBP4TMsOLROw_40PNuCe1ZfMVOzlSJ4vDSOaP8ertQ
+Message-ID: <CAFULd4asiDaj1OTrqWNMr5coyPeqM1NT6v2uEqKvJicRUhekSQ@mail.gmail.com>
+Subject: Re: Large modules with 6.15 [was: [PATCH v4 6/6] percpu/x86: Enable
+ strict percpu checks via named AS qualifiers]
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Jiri Slaby <jirislaby@kernel.org>, x86@kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-bcachefs@vger.kernel.org, 
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org, 
+	Nadav Amit <nadav.amit@gmail.com>, Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Christoph Lameter <cl@linux.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Andy Lutomirski <luto@kernel.org>, Brian Gerst <brgerst@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Shung-Hsi Yu <shung-hsi.yu@suse.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Implement the shutdown hook to ensure clean and complete deactivation of
-MACB controller. The shutdown sequence is protected with 'rtnl_lock()'
-to serialize access and prevent race conditions while detaching and
-closing the network device. This ensure a safe transition when the Kexec
-utility calls the shutdown hook, facilitating seamless loading and
-booting of a new kernel from the currently running one.
+On Fri, Jun 6, 2025 at 5:44=E2=80=AFPM Dave Hansen <dave.hansen@intel.com> =
+wrote:
+>
+> On 6/6/25 02:17, Jiri Slaby wrote:
+> > Given this is the second time I hit a bug with this, perhaps introduce
+> > an EXPERIMENTAL CONFIG option, so that random users can simply disable
+> > it if an issue occurs? Without the need of patching random userspace an=
+d
+> > changing random kernel headers?
+>
+> What about something like the attached (untested) patch? That should at
+> least get folks back to the old, universal working behavior even when
+> using new compilers.
 
-Signed-off-by: Abin Joseph <abin.joseph@amd.com>
----
+IMO the commit message is unnecessarily overly dramatic. The "nasty
+bugs" were in fact:
 
-Changes in v2:
-Update the commit description
-Update the code to call the close only when admin is up
+- unfortunate mix of clang < 19 and new gcc-14 [1], fixed by
+robustifying the  detection of typeof_unqual
 
----
- drivers/net/ethernet/cadence/macb_main.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+[1] https://lore.kernel.org/lkml/CA+G9fYuP2bHnDvJwfMm6+8Y8UYk74qCw-2HsFyRzJ=
+DFiQ5dbpQ@mail.gmail.com/
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index e1e8bd2ec155..5bb08f518d54 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5650,6 +5650,19 @@ static int __maybe_unused macb_runtime_resume(struct device *dev)
- 	return 0;
- }
- 
-+static void macb_shutdown(struct platform_device *pdev)
-+{
-+	struct net_device *netdev = platform_get_drvdata(pdev);
-+
-+	rtnl_lock();
-+	netif_device_detach(netdev);
-+
-+	if (netif_running(netdev))
-+		dev_close(netdev);
-+
-+	rtnl_unlock();
-+}
-+
- static const struct dev_pm_ops macb_pm_ops = {
- 	SET_SYSTEM_SLEEP_PM_OPS(macb_suspend, macb_resume)
- 	SET_RUNTIME_PM_OPS(macb_runtime_suspend, macb_runtime_resume, NULL)
-@@ -5663,6 +5676,7 @@ static struct platform_driver macb_driver = {
- 		.of_match_table	= of_match_ptr(macb_dt_ids),
- 		.pm	= &macb_pm_ops,
- 	},
-+	.shutdown	= macb_shutdown,
- };
- 
- module_platform_driver(macb_driver);
--- 
-2.34.1
+- sparse doesn't understand new keyword, patch at [2], but sparse is
+effectively unmaintained so a workaround is in place
 
+[2] https://lore.kernel.org/linux-sparse/5b8d0dee-8fb6-45af-ba6c-7f74aff9a4=
+b8@stanley.mountain/
+
+- genksyms didn't understand the new keyword, fixed by [3].
+
+[3] https://lore.kernel.org/lkml/174461594538.31282.5752735096854392083.tip=
+-bot2@tip-bot2/
+
+- a performance regression, again due to the unfortunate usage of old
+gcc-13 [4]. The new gcc-14 would break compilation due to the missing
+__percpu qualifier. This is one of the examples, where new checks
+would prevent the issue during the development. Fixed with the help of
+gcc-14.
+
+[4] https://lore.kernel.org/all/CAADnVQ+iFBxauKq99=3D-Xk+BdG+Lv=3DXgvwi1dC4=
+fpG0utmXJiiA@mail.gmail.com/
+
+- the issue in this thread, already fixed/worked around. Looking at
+the fix, I don't think gcc is at fault, but I speculate that there
+could be some invalid assumption about dwarf representation of
+variables in non-default address space at play. I'll look at this one
+in some more detail.
+
+Please also note that besides the above issues, the GCC type system
+and related checks around named address spaces was rock solid; there
+were *zero* bugs regarding __percpu variables, and the referred patch
+moves *all of them* to __seg_gs named address space. The patch builds
+off an equally stable and now well proven GCC named address space
+support, so in my opinion, it *is* ready for prime time. As
+demonstrated in the above list of issues, it was *never* the compiler
+at fault.
+
+Let me reiterate what the patch brings to the table. It prevents
+invalid references of per cpu variables to non-percpu locations. One
+missing percpu dereference can have disastrous consequences (all CPUs
+will access data in the shared space). Currently, the safety builds on
+checking sparse logs, but sparse errors don't break the build. With
+new checks in place, *every* invalid access is detected and breaks the
+build with some 50 lines of errors.
+
+Hiding these checks behind the CONFIG_EXPERT option breaks the
+intention of the patch. IMO, it should be always enabled to avoid
+errors, mentioned in the previous paragraph, already during the
+development time.
+
+I'm much more inclined to James' proposal. Maybe we can disable these
+checks in v6.15 stable series, but leave them in v6.16? This would
+leave a couple of months for distributions to update libbpf.
+
+Thanks,
+Uros.
 
