@@ -1,79 +1,65 @@
-Return-Path: <netdev+bounces-195512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CF88AD0D69
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 14:29:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 517EFAD0DD0
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 16:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84331188E275
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 12:29:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9E4F1893066
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 14:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC657221DB2;
-	Sat,  7 Jun 2025 12:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D471A841A;
+	Sat,  7 Jun 2025 14:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="qRNwsGkA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KpeVND0H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F35218AC3
-	for <netdev@vger.kernel.org>; Sat,  7 Jun 2025 12:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974FD288DB;
+	Sat,  7 Jun 2025 14:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749299341; cv=none; b=a5JAakZAwKxHt//yFdFUOPM7lBpbs1PCWeabAeC9HYuPeKYVY6Oh0qdLSL+dIPO23fJ6pI/piYOrzt6xfDEESJ9pATiWmbxx7gXEprsHdQsgXdPiYoCyG69pS1/Ihs2gjqGvpdBAdoCCWJHgtu5NvuNEI9oFqpiTdc4dQPoKYeo=
+	t=1749305527; cv=none; b=ZhK7LiRoT+BM6bdvwxRkAz/1Q2yJg86bTzoJO5VF5On60IKcu2mt/7ncAaTU0JEeahkL+krb4Uk+0oROmRQczYAIi0WChuWaWMXwVGg/UR4RLwLllhfNoO6ypX2nzN3w/S8Txrpkfhxw5RhVdBWqbTdbmfEswEANYqg0AiGIpVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749299341; c=relaxed/simple;
-	bh=mOYIXQSgfPhZh9fXOpojbPonzPyR2relJWId2pZWqTI=;
+	s=arc-20240116; t=1749305527; c=relaxed/simple;
+	bh=tOsURfwpu5JIYYGzjKsueBWYxy8LFs6ja4Urw/zMLwY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CLezveyrIMiAjmsjolpWmRwfnxwjCovun3l5vyWPrkgwcd29OBoELqiyMWX0hDGvikJ1dukvq3jnas3drURCZlAlWfQQVHjfn9SwKnGkA9w+I7sDs1nYqEW1DKJs8xIo1jGotG1mh/cqXYqlA3dFbeIbCqe4Cb+2HFWAged1fSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=qRNwsGkA; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5fff52493e0so3636405a12.3
-        for <netdev@vger.kernel.org>; Sat, 07 Jun 2025 05:28:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1749299338; x=1749904138; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pFcvezHtTKFU/yLY9c/XHMI/P40/ElaQdRi+0Qte8ys=;
-        b=qRNwsGkAAOjiLWji54gDHgxDd1zPZBy78zuuxdZ1lkGq7H0oRYkClGY8HPJjIwicl7
-         EbhKuG2dZ++gUw6xP4n3B/nenvbFG+70UrNmJ+fsgN1i27ID21w3wEORwjl1T5pchhOm
-         9scpiBRrUCGVGJpTrI4qFnhlCYxSHdWxDVUyyeMaXyRQO6Sz85gVIgAAoMRzt0QShIO/
-         +uMmHhSxDEP4ngNQHH1tjL5tGq9Ma8YK1Vxh57GO+0DghrEharWtI7QSIikXMuiMR6qe
-         50FiC4X13DS5l00V/SkGbCt829Bux15sF35WPkzCrPXb2gxVKLPa7rFkvZjWgQTsh2Ua
-         5FGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749299338; x=1749904138;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFcvezHtTKFU/yLY9c/XHMI/P40/ElaQdRi+0Qte8ys=;
-        b=V1+1cvBTLMD8MBgqZndFN3e7MiUS240KcMlogjB7nMrzGtndehgzB8KvXsZVDx+pmn
-         i++XD/tEA2PuhzRs30l+7B94rXTph/4ozj3aCIsz9wAVlkok5H9iDovcsVybIrqLYMQN
-         6JSY8Z0aZNM27dUIYmSjFwRLAiLAQG6SV2lGaOPn14ySuuwwXJJlb3hAgkkhwYjXYH9X
-         iqc4tXSzkvLy1Yab5OiZv3VCfvSH0smelked6Rwmh4dHTQYWzGtoa7VHVgYc2id6x2Nl
-         E8u5V6NxEcfQay+VMua4GcmDoUW8ubIdpJ2oWTKKxArKJ3L49Oky8iGL2JS8tUxzaIIQ
-         GoGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUXj0OqCzsUlfJbdR+HZU4a9ASgldYvc8DWNa80qq8mio+Zyzk4LNSeTTBvUNaiV201aO1H1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziWdUsAYM2UHX3DXoK0vcdKYJN4LSk3QcY6M+Q0zUZthzRv5iy
-	hkBlrovLdLPGvyBhTsBszYNLPA/7AJvQ1n0JGEiMBsdJmGKzogkiQlb7M+pUQT+t2UY=
-X-Gm-Gg: ASbGncsw0EIZRCBNE88mkmDEoIKkLLh3EV6GCzFAaNfykMXRf947s5uhBX9kT5tuA21
-	FR+PSQMlRdK3olHMprPrZLtMTt76pgXMnUdpM0bsy54LF1hovIZ+K/WRgym65gkADOSm9q8e4vh
-	fFM0BCoj39t+MAr82jUftKFZnNutX2k/0oFhwLLJ4QLYokZ/OeQPg/L//sXu7GKjrh1t6Ih4Qb7
-	R/kfgPpfqRLKj9KhNEoaQSa//UDrFxN2tXiK2LJ5TupmPQeJ5BzKwFgZ3OCkzQrovzFNvdircsz
-	Urrh6g2+5d/9S+GuoKViLmjHD/IeUyHLY02HHJNq7qsQMh7ptlkV99odDPf/
-X-Google-Smtp-Source: AGHT+IFDAnUmiVsyjfygehYUr8ASHgYoLs98lcg7K2XPROZpb83wxSo3Nj+DR+TRSNXc7a0sWKTb0g==
-X-Received: by 2002:a17:907:1c8e:b0:ad5:27b6:7fd1 with SMTP id a640c23a62f3a-ade1a9ed9a1mr624659966b.17.1749299337801;
-        Sat, 07 Jun 2025 05:28:57 -0700 (PDT)
-Received: from [192.168.50.4] ([82.78.167.126])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc38a06sm267601466b.119.2025.06.07.05.28.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Jun 2025 05:28:57 -0700 (PDT)
-Message-ID: <07d527e5-32d9-4e8c-ad19-92f5a722bfd5@tuxon.dev>
-Date: Sat, 7 Jun 2025 15:28:56 +0300
+	 In-Reply-To:Content-Type; b=N6/VT96qd4sDPvdVJk/kgDHYUM23yI2iyTR7esEJLmaSINR1g9JGoqFVh5P8nCqpQMgh2zyt+7XSmKS2a1zCCceNEXfiy3boO8rczwKimvr/EoW2pSdWb3ZM6a5M2Bri3ULp78+jR9lyL42OHitvYVElUp9MjxpTJsJwVmKZOV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KpeVND0H; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749305526; x=1780841526;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tOsURfwpu5JIYYGzjKsueBWYxy8LFs6ja4Urw/zMLwY=;
+  b=KpeVND0HpNdRdUWOOYhGagscfYV6c8q4anW6d0ispW3IIV7fRWKSszZ+
+   DD+5hNl/0L0xnplEKRQ/M407Ax9I6Ljawvc943FCziMJSV6tMzRLCBWTK
+   bPxIHT3RENY0wntHeNgWLYJvW3o//m6Egewr/rCU0BBtB5ajCt7GvpXVp
+   BRG9dzElXeuEToftc3s8UmGFsta38fjRFJwz9hOEU/pCo/BqVassX3tMt
+   +l+GPkndw415gLG2O/ai+pl2371B92beWyy2hLMDI0e/oM1sPWvGIVsD0
+   a0ASzR4w+GiaDsdt8m/7HEWWB4Qkmu5Rn1YAb7yCSn0SVy84QTwHOhYq6
+   w==;
+X-CSE-ConnectionGUID: J46COigUTqKLvFlqxTQSAA==
+X-CSE-MsgGUID: rO7rDcMkSHiJA61/bGG2Tg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11457"; a="55231460"
+X-IronPort-AV: E=Sophos;i="6.16,218,1744095600"; 
+   d="scan'208";a="55231460"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2025 07:12:05 -0700
+X-CSE-ConnectionGUID: tBMhaICIR3CN1VGkDijZZw==
+X-CSE-MsgGUID: QIrKOpfMQBC9VEoVh73s9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,218,1744095600"; 
+   d="scan'208";a="169264059"
+Received: from msatwood-mobl.amr.corp.intel.com (HELO [10.125.111.75]) ([10.125.111.75])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2025 07:12:03 -0700
+Message-ID: <34a2bfa5-30e1-4ba0-ac36-bf07a0d60d97@intel.com>
+Date: Sat, 7 Jun 2025 07:12:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,88 +67,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: macb: Add shutdown operation support
-To: Abin Joseph <abin.joseph@amd.com>, nicolas.ferre@microchip.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: git@amd.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250607075713.1829282-1-abin.joseph@amd.com>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Subject: Re: Large modules with 6.15 [was: [PATCH v4 6/6] percpu/x86: Enable
+ strict percpu checks via named AS qualifiers]
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: Jiri Slaby <jirislaby@kernel.org>, x86@kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+ linux-arch@vger.kernel.org, netdev@vger.kernel.org,
+ Nadav Amit <nadav.amit@gmail.com>, Dennis Zhou <dennis@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Andy Lutomirski <luto@kernel.org>, Brian Gerst <brgerst@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, Shung-Hsi Yu <shung-hsi.yu@suse.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+References: <20250127160709.80604-1-ubizjak@gmail.com>
+ <20250127160709.80604-7-ubizjak@gmail.com>
+ <02c00acd-9518-4371-be2c-eb63e5d11d9c@kernel.org>
+ <b27d96fc-b234-4406-8d6e-885cd97a87f3@intel.com>
+ <CAFULd4Ygz8p8rD1=c-S2MjJniP6vjVNMsWG_B=OjCVpthk0fBg@mail.gmail.com>
+ <9767d411-81dc-491b-b6da-419240065ffe@kernel.org>
+ <6412d84a-edc3-4723-89f1-b2017fb0d1ea@intel.com>
+ <CAFULd4asiDaj1OTrqWNMr5coyPeqM1NT6v2uEqKvJicRUhekSQ@mail.gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
-In-Reply-To: <20250607075713.1829282-1-abin.joseph@amd.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <CAFULd4asiDaj1OTrqWNMr5coyPeqM1NT6v2uEqKvJicRUhekSQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi, Abin,
+On 6/7/25 01:52, Uros Bizjak wrote:
+> Let me reiterate what the patch brings to the table. It prevents
+> invalid references of per cpu variables to non-percpu locations.
 
-On 07.06.2025 10:57, Abin Joseph wrote:
-> Implement the shutdown hook to ensure clean and complete deactivation of
-> MACB controller. The shutdown sequence is protected with 'rtnl_lock()'
-> to serialize access and prevent race conditions while detaching and
-> closing the network device. This ensure a safe transition when the Kexec
-> utility calls the shutdown hook, facilitating seamless loading and
-> booting of a new kernel from the currently running one.
-> 
-> Signed-off-by: Abin Joseph <abin.joseph@amd.com>
-> ---
-> 
-> Changes in v2:
-> Update the commit description
-> Update the code to call the close only when admin is up
-> 
-> ---
->  drivers/net/ethernet/cadence/macb_main.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index e1e8bd2ec155..5bb08f518d54 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -5650,6 +5650,19 @@ static int __maybe_unused macb_runtime_resume(struct device *dev)
->  	return 0;
->  }
->  
-> +static void macb_shutdown(struct platform_device *pdev)
-> +{
-> +	struct net_device *netdev = platform_get_drvdata(pdev);
-> +
-> +	rtnl_lock();
-> +	netif_device_detach(netdev);
-> +
-> +	if (netif_running(netdev))
-> +		dev_close(netdev);
+Yes, it's a very useful mechanism. That's exactly why I want to preserve
+it for developers or things like 0day that do build tests and don't care
+about modules quadrupling in size.
 
-Apart from closing the interface should we also invoke the remove?
+> Hiding these checks behind the CONFIG_EXPERT option breaks the
+> intention of the patch. IMO, it should be always enabled to avoid
+> errors, mentioned in the previous paragraph, already during the
+> development time.
 
-Consider the new loaded kernel will not use this interface and some
-hardware resources may remain on while not used by the newly loaded kernel.
+I agree, it should always be enabled ... eventually. But now now. That's
+why we're having this conversation: it's breaking too many things and
+needs to be disabled.
 
-E.g., there is this code in macb_remove():
+> I'm much more inclined to James' proposal. Maybe we can disable these
+> checks in v6.15 stable series, but leave them in v6.16? This would
+> leave a couple of months for distributions to update libbpf.
 
-		if (!pm_runtime_suspended(&pdev->dev)) {
-			macb_clks_disable(bp->pclk, bp->hclk, bp->tx_clk,
-					  bp->rx_clk, bp->tsu_clk);
-			pm_runtime_set_suspended(&pdev->dev);
-		}
+I'd be worried that it will hit a whole bunch of folks doing 6.16 work.
+I was expecting to revert it _everywhere_ for now, if we go the revert
+route.
 
-
-Thank you,
-Claudiu
-
-> +
-> +	rtnl_unlock();
-> +}
-> +
->  static const struct dev_pm_ops macb_pm_ops = {
->  	SET_SYSTEM_SLEEP_PM_OPS(macb_suspend, macb_resume)
->  	SET_RUNTIME_PM_OPS(macb_runtime_suspend, macb_runtime_resume, NULL)
-> @@ -5663,6 +5676,7 @@ static struct platform_driver macb_driver = {
->  		.of_match_table	= of_match_ptr(macb_dt_ids),
->  		.pm	= &macb_pm_ops,
->  	},
-> +	.shutdown	= macb_shutdown,
->  };
->  
->  module_platform_driver(macb_driver);
-
+James, by partial revert, did you mean to revert in stable but not
+mainline? I assumed you meant to just revert patch 6/6 of the series
+(stable and mainline) but leave 1-5 in place so turning it back on later
+was easier.
 
