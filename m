@@ -1,293 +1,123 @@
-Return-Path: <netdev+bounces-195529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B48AD1021
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 23:34:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99293AD1024
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 23:42:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B34527A23F2
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 21:32:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 317AB188ECE1
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 21:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A46E2163BB;
-	Sat,  7 Jun 2025 21:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5174A1FE44D;
+	Sat,  7 Jun 2025 21:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pWkfsfnI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyRxrc5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474E1EA7F4
-	for <netdev@vger.kernel.org>; Sat,  7 Jun 2025 21:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34531AC88B;
+	Sat,  7 Jun 2025 21:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749332034; cv=none; b=g9zMlPd6wDaljGanVADR8SNm3eg9tha5Pw713WEk3thhnQCyyb9nA6l7RytX/J1GtKsyXH/2CA/RQaFB+6akQq95ltYrnJytTewpLDTfhecj6U1hjLi981zreXhgrResS9uTDT6XEoMUeYoP36mAxpfbz62ivPv6s06Ywo2kvr8=
+	t=1749332543; cv=none; b=Qig7cpMZ45KH3+fM+EFuatuwT21WQbgXBQQnzgXl3RT9C4XGjF7fkMQZzfwLN/r2iwceZPQJccCsBGegI9CYM5LgkUMiDPkOnuiQKgebsiRAZkhlfhBhxUC3tZav8cJZAthb1Z9wsbf8mOELURMXDwRwRJ+x0eo0ZG3OS/70orw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749332034; c=relaxed/simple;
-	bh=3/M3ccrWZp5u2VNOBbvcJoc7wo14vpHAa7KQVn3+GrM=;
+	s=arc-20240116; t=1749332543; c=relaxed/simple;
+	bh=pauCeS0EJZD/FTktO7RvGI9OVXfyv3h41pyC2H2w2cI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DFTGpny+LSf6elgGmsgm9iQWAS1MP+6TVApuzDTo1zdME1omlIJwUn9iy/8kM4eLF9Sca4vDKjDL1xFIZ/tIKBlNdD+HQc49l0b9QDL5rqtx9U9pQwrh7GLones0WMAiR8kUSyeKCp9d4py7MROCigQ47G/W+9Fn4SyWIKpYCO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pWkfsfnI; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6000791e832so4422a12.1
-        for <netdev@vger.kernel.org>; Sat, 07 Jun 2025 14:33:52 -0700 (PDT)
+	 To:Cc:Content-Type; b=UiVcemBAO7aGCWZn1J4YljjX+pbOfrt63J5O6FKQX+wM936lpM/fPWBPgwc32KCz1BiQVxM/z6boOX2xm06D3Enbyy50Z62Jn2yPdQ5m4S/6nSpiyoM4wTujCPFLD1paNdcHbY2Rdo7Lf6zlf2y6hG6ZGD7VBvY6N8iHSaKBLps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyRxrc5r; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4e592443229so1017459137.1;
+        Sat, 07 Jun 2025 14:42:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749332031; x=1749936831; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749332540; x=1749937340; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ULC9uw+RVtU2OdxAfjiUwybXCKSG72R6i3xFRi9IKKQ=;
-        b=pWkfsfnIfhO28gOAH8COjiOt7oLoGYKxC0LF8CIuJ9XpVxu3wX8aRkuniq4vZCga1B
-         6zW4efU1SvvYZJuapmYHVixWqgY0MYwUuJWvmoh4RvFEN4R4fWhfWBInB6sk2yaBQU5d
-         D/myTecazpXNRc3KIrP6jATmBaqT0c7i8RrmFOPo9+MN13mceJNmcq7V3G/PNvkt82/T
-         zB0ifG8Xe9zg8ORnIri9fyvJS+eXaXTJ8gWxA2m5hI9MATXwx48GjJXhCv/BHVQAbsSz
-         rBeHiB/iRVgTbqOdi6geWsoqpsGSF3RN8BzfB7Cgqrk4oehlW+NGhQEF3lpgoev/2hhQ
-         omqg==
+        bh=eUEFTcUbSkQLJ43hZPLV+2GZum/ztVJHLmBcrHIjKsc=;
+        b=kyRxrc5rXJcG9CXbxSEEBA2RW5td+IApQKNdus0hXtKUV/pPrlwjyxGz/QXIhU/kuC
+         hDJGw5QRkDrrPOUtjt2Ia2rLM1YLrQHN3jP/LkplfphtUTrYD3zYvetpL2dhZwYX6GdN
+         WPb7yr7cJ2spXgZfS5NnY/8wxD3sYwwSqgf86ua4mopDkt/5CwlrXuvZ1vBePDf2c0C+
+         vn03hePQeHK8U3srgcnq4AwGJkxCAnaKL1YovHIOWtKrFANVkkqGYQeOXjI8y8m1Rnug
+         RXO+qGWk9hal67HxDmfbGLkQZEmKERdgKW7w+Lg5Pjnhe7cjuzhPmAYzUpyBXO7E3xIY
+         WWFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749332031; x=1749936831;
+        d=1e100.net; s=20230601; t=1749332540; x=1749937340;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ULC9uw+RVtU2OdxAfjiUwybXCKSG72R6i3xFRi9IKKQ=;
-        b=bEvLbwG5RW5uXh+qqpCQW45NGAaLy7jtFW9gGmH9kJZiJYgLmrGHX864jIdaTOAIRe
-         0u27VkD/urgq8PkVd8feBBsMttG152GEXm99FsI/J5AQ00yFp7ikizKqIJJ0MpRIgnvE
-         NkorYwfL04lt19Tr6lVrI+clkddUmG/ZHt+CihNuMrbyLLmNfWjrnOl6qW5HyJJ0paTN
-         ysBi6lShpysyH6UBD2w3mtiaOeQ/7AXwALxnhJFjMZgqs37IkWNUQLr/KYoM0wQ6/JgD
-         j9QavRNTcb1EQek0CmcW2RACOWz4RG4rOoATgqNexIomjo+grXgRB0xXMW3HV3Xdc5WS
-         f4Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqpfu9DRhp3F5wEoVL8XCZsWxNZq6HMr/XcIIet9XLyjtztSqgctIY+xKUvkRR3NPdvTO2q84=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydzehE2BhSK3wUOGx7A7LlErCO9GMcS6rXx+T+kQejIE5GdwWT
-	NG42l16hix2X+1httVDzDA6nCG4GwFQMFO7y+Hf0kBj4gi+tTE5BjdSC0dhiU+PbkrqL/E6woJw
-	mffAizvgcMHTZN8MKHDmaUWydf2ZrG1+w4YUO56Rf
-X-Gm-Gg: ASbGncue5eFpNLKqwi/ij4UgbXqSwWsgHc++p4JTr/AEIwpMGKQyeWbEDa6fbj/qet8
-	BVGNkx+q/2nA9moTqf+C3ThnqS2j/pih36UrByCtoVSJvUwJMaE69ssMDKcFuXg0SE5JW8/3Mbo
-	j0WVNos6UgmnO8fSt2zqcUoloo6270iXqz9uS9gh4SP0Lo3AhJDCJt8z+/furtUwslCN8ZPK//o
-	ViQ
-X-Google-Smtp-Source: AGHT+IHZRw75GHcfGKidr88HD4akXh5GHOYLSnXUBzwNvKK0NFSaNvii2au/1wkAxzA5bTDf1WVuilINzQxwF0wUBpA=
-X-Received: by 2002:a05:6402:78a:b0:5e6:15d3:ffe7 with SMTP id
- 4fb4d7f45d1cf-607bc5b1adfmr37729a12.7.1749332030475; Sat, 07 Jun 2025
- 14:33:50 -0700 (PDT)
+        bh=eUEFTcUbSkQLJ43hZPLV+2GZum/ztVJHLmBcrHIjKsc=;
+        b=Aj+dsITrPRdFv5oE0jAXaOTx5E6rPAdannimgb+3ymwJAfVvAVfQT81xiRspbo7GNK
+         zAdezwvK38K6yhvxg/EfbNBFrjVKnsf53roUKnqTws9CI0AHy+5dZAgQP584H47a2ZKg
+         01OKb/4FKQMUtKhTGGrCvOTEIrxYUQer6Tphk/bHPooHthlsQ8Hc9dSSa/LyC4/e0fGz
+         I0FFZLfq+Hsm+4Uq1D4tAgC2hbIf2CLev1WxqYb+mc/M0XE4nWBsURt2zzK7flIV+Lfn
+         OoFJr1cZbnjgEAWHvQ0/honm4CIQw1XIIfCVul15Gddw9yCAizr01IIorhBn98JdT0x2
+         evYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV81n15bmi7qx6uowgkJRHkcFrq5m5Y2u91E4dUbLRp/Yc3pkdP6loyBiU7sHZ7CJ2x4miiTEja0LTA@vger.kernel.org, AJvYcCX+zZGK4RUl2fq4PS+BMukLsXnGtcsaIDooqqshu2zZ2eD2es1cKwU3k3XoTNTMgnfnq8czGA6h@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/eZ7lnzJVIcfxMuMmZYTJmieddlv9+ukgiUVNa31ptPR3AeZi
+	tztM/DKahk2zvzbsiSwbZPBKieLqC9eOCaU4Bu/kAcQznSBQ2kvmTkx79yCnT5zwcg3XPo4SkbU
+	IS5yp8sh9xXGvE4qcInVrcAUs90RCgik=
+X-Gm-Gg: ASbGncvhZRJGrxYZFxDm81fUa6uphriJLHZGZfrMDt+GvA9GI5N2pkv21A4i53AtUrz
+	/Nna9RAS7RV/i0lBMGLVbDKMKr8tQCPx+/7LsqbsVYdwn++GZqSGDKq91r0rzYTf58a/fqJW/6F
+	bt0U0T5IYS1llw0se7cVoeqHxbfU4ttg9vUlgRjcxwwpk=
+X-Google-Smtp-Source: AGHT+IGyP2aHnlSuagxZ5yttUXL8obOQtZvYrGkFDANjroqpvNljK8OXHZR7vtLSVLO5eAKOCUojDwR4d2nFrx3UTAg=
+X-Received: by 2002:a05:6102:c12:b0:4b1:1eb5:8ee3 with SMTP id
+ ada2fe7eead31-4e772ac55fbmr6961789137.22.1749332540514; Sat, 07 Jun 2025
+ 14:42:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250607204734.1588964-1-kuba@kernel.org>
-In-Reply-To: <20250607204734.1588964-1-kuba@kernel.org>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Sat, 7 Jun 2025 23:33:39 +0200
-X-Gm-Features: AX0GCFveamE-E1Ol5AvUbHWowgW6jiuE_W-0_tRJ-bcHM84FhrgZa_Krv70YkoU
-Message-ID: <CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: clear the dst when changing skb protocol
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev, john.fastabend@gmail.com, 
-	eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com, 
-	william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, yonghong.song@linux.dev
+References: <20250603183321.18151-1-ramonreisfontes@gmail.com>
+ <CAK-6q+i1BAtsYbMHMBfYK89HfiyQbXONjivt51GDA_ihhe4-oA@mail.gmail.com>
+ <CAK8U23YF53F0-zMbq5mk2kY4nkS1L0NH9j-UJrdaS5VUZ5JZdA@mail.gmail.com> <54980160-6e46-4ac4-b87f-41b7dccba1d3@lunn.ch>
+In-Reply-To: <54980160-6e46-4ac4-b87f-41b7dccba1d3@lunn.ch>
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+Date: Sat, 7 Jun 2025 18:42:09 -0300
+X-Gm-Features: AX0GCFvsXSWU3mlKCe2to0Ib9H8Tz-A6j5lcYINHQaAgHERqjFxX3aSXi2LiS6A
+Message-ID: <CAK8U23aRrvC4wC6WvcBRPA4YuyC1MPvOj8FO=cWfi43_Fdh4Zw@mail.gmail.com>
+Subject: Re: [PATCH] mac802154_hwsim: allow users to specify the number of
+ simulated radios dinamically instead of the previously hardcoded value of 2
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexander Aring <aahringo@redhat.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, linux-wpan@vger.kernel.org, alex.aring@gmail.com, 
+	miquel.raynal@bootlin.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 7, 2025 at 10:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> A not-so-careful NAT46 BPF program can crash the kernel
-> if it indiscriminately flips ingress packets from v4 to v6:
->
->   BUG: kernel NULL pointer dereference, address: 0000000000000000
->     ip6_rcv_core (net/ipv6/ip6_input.c:190:20)
->     ipv6_rcv (net/ipv6/ip6_input.c:306:8)
->     process_backlog (net/core/dev.c:6186:4)
->     napi_poll (net/core/dev.c:6906:9)
->     net_rx_action (net/core/dev.c:7028:13)
->     do_softirq (kernel/softirq.c:462:3)
->     netif_rx (net/core/dev.c:5326:3)
->     dev_loopback_xmit (net/core/dev.c:4015:2)
->     ip_mc_finish_output (net/ipv4/ip_output.c:363:8)
->     NF_HOOK (./include/linux/netfilter.h:314:9)
->     ip_mc_output (net/ipv4/ip_output.c:400:5)
->     dst_output (./include/net/dst.h:459:9)
->     ip_local_out (net/ipv4/ip_output.c:130:9)
->     ip_send_skb (net/ipv4/ip_output.c:1496:8)
->     udp_send_skb (net/ipv4/udp.c:1040:8)
->     udp_sendmsg (net/ipv4/udp.c:1328:10)
->
-> The output interface has a 4->6 program attached at ingress.
-> We try to loop the multicast skb back to the sending socket.
-> Ingress BPF runs as part of netif_rx(), pushes a valid v6 hdr
-> and changes skb->protocol to v6. We enter ip6_rcv_core which
-> tries to use skb_dst(). But the dst is still an IPv4 one left
-> after IPv4 mcast output.
->
-> Clear the dst in all BPF helpers which change the protocol.
-> Also clear the dst if we did an encap or decap as those
-> will most likely make the dst stale.
-> Try to preserve metadata dsts, those may carry non-routing
-> metadata.
->
-> Reviewed-by: Maciej =C5=BBenczykowski <maze@google.com>
-> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
-> Fixes: d219df60a70e ("bpf: Add ipip6 and ip6ip decap support for bpf_skb_=
-adjust_room()")
-> Fixes: 1b00e0dfe7d0 ("bpf: update skb->protocol in bpf_skb_net_grow")
-> Fixes: 6578171a7ff0 ("bpf: add bpf_skb_change_proto helper")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - drop on encap/decap
->  - fix typo (protcol)
->  - add the test to the Makefile
-> v1: https://lore.kernel.org/20250604210604.257036-1-kuba@kernel.org
->
-> I wonder if we should not skip ingress (tc_skip_classify?)
-> for looped back packets in the first place. But that doesn't
-> seem robust enough vs multiple redirections to solve the crash.
->
-> Ignoring LOOPBACK packets (like the NAT46 prog should) doesn't
-> work either, since BPF can change pkt_type arbitrarily.
->
-> CC: martin.lau@linux.dev
-> CC: daniel@iogearbox.net
-> CC: john.fastabend@gmail.com
-> CC: eddyz87@gmail.com
-> CC: sdf@fomichev.me
-> CC: haoluo@google.com
-> CC: willemb@google.com
-> CC: william.xuanziyang@huawei.com
-> CC: alan.maguire@oracle.com
-> CC: bpf@vger.kernel.org
-> CC: edumazet@google.com
-> CC: maze@google.com
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> CC: yonghong.song@linux.dev
-> ---
->  tools/testing/selftests/net/Makefile   |  1 +
->  net/core/filter.c                      | 31 +++++++++++++++++++-------
->  tools/testing/selftests/net/nat6to4.sh | 15 +++++++++++++
->  3 files changed, 39 insertions(+), 8 deletions(-)
->  create mode 100755 tools/testing/selftests/net/nat6to4.sh
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index ea84b88bcb30..ab996bd22a5f 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -27,6 +27,7 @@ TEST_PROGS +=3D amt.sh
->  TEST_PROGS +=3D unicast_extensions.sh
->  TEST_PROGS +=3D udpgro_fwd.sh
->  TEST_PROGS +=3D udpgro_frglist.sh
-> +TEST_PROGS +=3D nat6to4.sh
->  TEST_PROGS +=3D veth.sh
->  TEST_PROGS +=3D ioam6.sh
->  TEST_PROGS +=3D gro.sh
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 327ca73f9cd7..d5917d6446f2 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -3406,8 +3406,14 @@ BPF_CALL_3(bpf_skb_change_proto, struct sk_buff *,=
- skb, __be16, proto,
->          * need to be verified first.
->          */
->         ret =3D bpf_skb_proto_xlat(skb, proto);
-> +       if (ret)
-> +               return ret;
-> +
->         bpf_compute_data_pointers(skb);
-> -       return ret;
-> +       if (skb_valid_dst(skb))
-> +               skb_dst_drop(skb);
-> +
-> +       return 0;
->  }
->
->  static const struct bpf_func_proto bpf_skb_change_proto_proto =3D {
-> @@ -3554,6 +3560,9 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
-2 off, u32 len_diff,
->                 else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
->                          flags & BPF_F_ADJ_ROOM_ENCAP_L3_IPV4)
->                         skb->protocol =3D htons(ETH_P_IP);
-> +
-> +               if (skb_valid_dst(skb))
-> +                       skb_dst_drop(skb);
->         }
->
->         if (skb_is_gso(skb)) {
-> @@ -3581,6 +3590,7 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
-2 off, u32 len_diff,
->  static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff=
-,
->                               u64 flags)
->  {
-> +       bool decap =3D flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK;
->         int ret;
->
->         if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
-> @@ -3603,13 +3613,18 @@ static int bpf_skb_net_shrink(struct sk_buff *skb=
-, u32 off, u32 len_diff,
->         if (unlikely(ret < 0))
->                 return ret;
->
-> -       /* Match skb->protocol to new outer l3 protocol */
-> -       if (skb->protocol =3D=3D htons(ETH_P_IP) &&
-> -           flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
-> -               skb->protocol =3D htons(ETH_P_IPV6);
-> -       else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
-> -                flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
-> -               skb->protocol =3D htons(ETH_P_IP);
-> +       if (decap) {
-> +               /* Match skb->protocol to new outer l3 protocol */
-> +               if (skb->protocol =3D=3D htons(ETH_P_IP) &&
-> +                   flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
-> +                       skb->protocol =3D htons(ETH_P_IPV6);
-> +               else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
-> +                        flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
-> +                       skb->protocol =3D htons(ETH_P_IP);
-> +
-> +               if (skb_valid_dst(skb))
-> +                       skb_dst_drop(skb);
-> +       }
->
->         if (skb_is_gso(skb)) {
->                 struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> diff --git a/tools/testing/selftests/net/nat6to4.sh b/tools/testing/selft=
-ests/net/nat6to4.sh
-> new file mode 100755
-> index 000000000000..0ee859b622a4
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/nat6to4.sh
-> @@ -0,0 +1,15 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +NS=3D"ns-peer-$(mktemp -u XXXXXX)"
-> +
-> +ip netns add "${NS}"
-> +ip -netns "${NS}" link set lo up
-> +ip -netns "${NS}" route add default via 127.0.0.2 dev lo
-> +
-> +tc -n "${NS}" qdisc add dev lo ingress
-> +tc -n "${NS}" filter add dev lo ingress prio 4 protocol ip \
-> +   bpf object-file nat6to4.bpf.o section schedcls/egress4/snat4 direct-a=
-ction
-> +
-> +ip netns exec "${NS}" \
-> +   bash -c 'echo 0123456789012345678901234567890123456789012345678901234=
-56789012345678901234567890123456789012345678901234567890123456789abc | soca=
-t - UDP4-DATAGRAM:224.1.0.1:6666,ip-multicast-loop=3D1'
-> --
-> 2.49.0
+Ok! Just a last question:
 
-Submit away.
+Shouldn't we define a maximum number of supported radios when using
+unsigned? A value like -1 would wrap around and result in thousands of
+radios, right?
+That said, wouldn't it be simpler and safer to just use int instead?
 
-1 meta question: as this is a fix and will thus be backported into
-5.4+ LTS, should this be split into two patches? Either making the
-test a follow up, or even going with only the crash fix in patch 1 and
-putting the 4-in-4 and 6-in-6 behavioural change in patch 2?  We'd end
-up in the same state at tip of tree... but it would affect the LTS
-backports.  Honestly I'm not even sure what's best.
+
+Em s=C3=A1b., 7 de jun. de 2025 =C3=A0s 16:22, Andrew Lunn <andrew@lunn.ch>=
+ escreveu:
+>
+> On Sat, Jun 07, 2025 at 02:54:57PM -0300, Ramon Fontes wrote:
+> > > handle as unsigned then this check would not be necessary?
+> >
+> > Yeah, it does make sense. However, I have a bit of an embarrassing
+> > question. How do I submit an updated patch in this same thread?
+>
+> You don't. You should submit a new patchset, as a new thread.
+>
+> The CI tooling works on one patchset per thread, and if you deviate
+> from that, the CI won't test it. And if it is not tested, it is pretty
+> much an automatic reject.
+>
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+>
+> It is also the merge windows right now, so anything you post will get
+> rejected anyway, so please post as RFC.
+>
+>         Andrew
 
