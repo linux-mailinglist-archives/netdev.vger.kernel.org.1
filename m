@@ -1,224 +1,293 @@
-Return-Path: <netdev+bounces-195528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C818AAD0FD3
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 23:00:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B48AD1021
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 23:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3390E188DD5D
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 21:00:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B34527A23F2
+	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 21:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF731FAC4E;
-	Sat,  7 Jun 2025 21:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A46E2163BB;
+	Sat,  7 Jun 2025 21:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBAfxO1t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pWkfsfnI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70B91EFFB7;
-	Sat,  7 Jun 2025 21:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474E1EA7F4
+	for <netdev@vger.kernel.org>; Sat,  7 Jun 2025 21:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749330026; cv=none; b=JxR7XIl8Hj8Fje0qteHlOmCuyhCplgk/D9J5+yvAT7ZU0ydJcF5ZKHwA453J9yU6wVaD526aXDBum8O2fB6PAUPA6M8uezGUMX0wn/wIrf0nHeyyqdRX6cEmzyP8Xg32P67MPXvCT1nC8iAzLHLTXYSr/+uvwnNRzVqREpbZu+g=
+	t=1749332034; cv=none; b=g9zMlPd6wDaljGanVADR8SNm3eg9tha5Pw713WEk3thhnQCyyb9nA6l7RytX/J1GtKsyXH/2CA/RQaFB+6akQq95ltYrnJytTewpLDTfhecj6U1hjLi981zreXhgrResS9uTDT6XEoMUeYoP36mAxpfbz62ivPv6s06Ywo2kvr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749330026; c=relaxed/simple;
-	bh=4dqDAAVvsuOWGlyn+0xiU62bAwgcv4wXpaHtFvItnZE=;
+	s=arc-20240116; t=1749332034; c=relaxed/simple;
+	bh=3/M3ccrWZp5u2VNOBbvcJoc7wo14vpHAa7KQVn3+GrM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ug/9bAHfZUdUAYkLY9PnAiOCci08/NsIxWiGJM/H9p87x+HFff30CLiV4N23C+hvX4CQTxSOJ0utWHYVJvpVrOMP4WI5ltmU1IRuUETE1O8NpaVo09R/lut9ulBvIe9xpr0Johk/XLPWz0UINSE+2TAr+d001o7oM8+71+Qixm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBAfxO1t; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-4e5962a0f20so930467137.1;
-        Sat, 07 Jun 2025 14:00:24 -0700 (PDT)
+	 To:Cc:Content-Type; b=DFTGpny+LSf6elgGmsgm9iQWAS1MP+6TVApuzDTo1zdME1omlIJwUn9iy/8kM4eLF9Sca4vDKjDL1xFIZ/tIKBlNdD+HQc49l0b9QDL5rqtx9U9pQwrh7GLones0WMAiR8kUSyeKCp9d4py7MROCigQ47G/W+9Fn4SyWIKpYCO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pWkfsfnI; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6000791e832so4422a12.1
+        for <netdev@vger.kernel.org>; Sat, 07 Jun 2025 14:33:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749330023; x=1749934823; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749332031; x=1749936831; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4dqDAAVvsuOWGlyn+0xiU62bAwgcv4wXpaHtFvItnZE=;
-        b=eBAfxO1tJl46SqJvdINUi+EnByMr9bDQ5KNdAELn42TQnWQFdv+p11AMqEi0vq9K88
-         jtp+dTildXjRSkTT1yksor80ln6thGqBvaCoQt3ylkxjzuvAEAJfD5fuwO2Jnxaajiai
-         D5bIQEdJS2WXtWVBEpW1Z5rl3WL/CFDk0n7o0GeBld+yeSriF8IuoNJ05hLEyZJwwkbB
-         7nImkN3EgdvcYXoEtcnJa5cid7wAAPVt1fld9HjzgAYzfCHq3hqyFSzEswnLRve3ysNV
-         USs+4yvifBfNEc/1HY+Q3AOxKBHzI6Md9CoVjyfIPFz7X0HBkxYtA0WJC/e2JIl3QB3b
-         +PFg==
+        bh=ULC9uw+RVtU2OdxAfjiUwybXCKSG72R6i3xFRi9IKKQ=;
+        b=pWkfsfnIfhO28gOAH8COjiOt7oLoGYKxC0LF8CIuJ9XpVxu3wX8aRkuniq4vZCga1B
+         6zW4efU1SvvYZJuapmYHVixWqgY0MYwUuJWvmoh4RvFEN4R4fWhfWBInB6sk2yaBQU5d
+         D/myTecazpXNRc3KIrP6jATmBaqT0c7i8RrmFOPo9+MN13mceJNmcq7V3G/PNvkt82/T
+         zB0ifG8Xe9zg8ORnIri9fyvJS+eXaXTJ8gWxA2m5hI9MATXwx48GjJXhCv/BHVQAbsSz
+         rBeHiB/iRVgTbqOdi6geWsoqpsGSF3RN8BzfB7Cgqrk4oehlW+NGhQEF3lpgoev/2hhQ
+         omqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749330023; x=1749934823;
+        d=1e100.net; s=20230601; t=1749332031; x=1749936831;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4dqDAAVvsuOWGlyn+0xiU62bAwgcv4wXpaHtFvItnZE=;
-        b=Q40ZWkcARXG1g9zTNSA+3oIlnHmuW20k2jcLaIIA8o0RCsUYLWi9JHfC7TchIAg1bw
-         zFJDmuiVAhUhn3ed1DK+LMvSI6JLNsmnbfXF5UEVI7UCItKK8tgwJjgGGLAYSSvHs0xh
-         dLmx88NdBVHGTeifAthvK+5nTu6CstIkCUKnkLTc1qg5c8gJyzYKVqeQwkLf7ou5tudp
-         8Dsub+DkKudiUkl0Qo58ilf4gASQwFAmNsmE46Vs4ix3qN/4KYO8F2YJrDgyXFc3/suI
-         iDaZSyJXYn0sbxqBLPWYq4bMmDtzUQD+SXcgjXnge6SzN0aeNpEKUJMi4iyH6fS/gusq
-         c7jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDKms7dRvfXzxemY71CPNLrElEStfgAjZfYSThqY4rlQFhXpfHqGs92XtkKLu+W5RuszlxLt7x@vger.kernel.org, AJvYcCWgfIfL+GjByNyJd7/9C68qWZqg9+emspRdG7um7YwklgKRDOpfWuLuElVdN49sPSQoMOhHbpfiBqU9@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsquzdWsHtOsjajT2LM9KSKF7kJIPNVqnMFF9SLZ7CLKISFVfY
-	47D7Ln3DpFii4SSYDhAnW2w5S7fI2ya1xwJXX6289cGcmgKR6pF+/CUJNAPBc+c/CxE43PDOZmY
-	XhymyipjMPCsdHOcaiJYInii6zoKJsRo=
-X-Gm-Gg: ASbGncvyP5KhsZqGGetJo9XhSWOaXT6opwPISuZfp2yb9H6ncB7VD8ImqnF/+lb5meQ
-	myuXO5S1g7wh7Md/6yUIXRL6v3RaylPfom6wRSY35o6T4c1TNyFyPKvHVfamUJDuJv7SPImqpLO
-	P1vLNTNAKLrbYrh8DBVz1VRheK9e+1A+whKMUNHEYKtlM=
-X-Google-Smtp-Source: AGHT+IFdToe+TpajY/CBdhu5gy5SigYztQhVYCj1QUb14v9HZuCsJG2F6Ly8dA3IIJo+GI7HCi2Z7U3gCm1mMpo7rCs=
-X-Received: by 2002:a05:6102:2c19:b0:4da:e6e1:c33c with SMTP id
- ada2fe7eead31-4e7728863e5mr8002473137.3.1749330023116; Sat, 07 Jun 2025
- 14:00:23 -0700 (PDT)
+        bh=ULC9uw+RVtU2OdxAfjiUwybXCKSG72R6i3xFRi9IKKQ=;
+        b=bEvLbwG5RW5uXh+qqpCQW45NGAaLy7jtFW9gGmH9kJZiJYgLmrGHX864jIdaTOAIRe
+         0u27VkD/urgq8PkVd8feBBsMttG152GEXm99FsI/J5AQ00yFp7ikizKqIJJ0MpRIgnvE
+         NkorYwfL04lt19Tr6lVrI+clkddUmG/ZHt+CihNuMrbyLLmNfWjrnOl6qW5HyJJ0paTN
+         ysBi6lShpysyH6UBD2w3mtiaOeQ/7AXwALxnhJFjMZgqs37IkWNUQLr/KYoM0wQ6/JgD
+         j9QavRNTcb1EQek0CmcW2RACOWz4RG4rOoATgqNexIomjo+grXgRB0xXMW3HV3Xdc5WS
+         f4Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqpfu9DRhp3F5wEoVL8XCZsWxNZq6HMr/XcIIet9XLyjtztSqgctIY+xKUvkRR3NPdvTO2q84=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydzehE2BhSK3wUOGx7A7LlErCO9GMcS6rXx+T+kQejIE5GdwWT
+	NG42l16hix2X+1httVDzDA6nCG4GwFQMFO7y+Hf0kBj4gi+tTE5BjdSC0dhiU+PbkrqL/E6woJw
+	mffAizvgcMHTZN8MKHDmaUWydf2ZrG1+w4YUO56Rf
+X-Gm-Gg: ASbGncue5eFpNLKqwi/ij4UgbXqSwWsgHc++p4JTr/AEIwpMGKQyeWbEDa6fbj/qet8
+	BVGNkx+q/2nA9moTqf+C3ThnqS2j/pih36UrByCtoVSJvUwJMaE69ssMDKcFuXg0SE5JW8/3Mbo
+	j0WVNos6UgmnO8fSt2zqcUoloo6270iXqz9uS9gh4SP0Lo3AhJDCJt8z+/furtUwslCN8ZPK//o
+	ViQ
+X-Google-Smtp-Source: AGHT+IHZRw75GHcfGKidr88HD4akXh5GHOYLSnXUBzwNvKK0NFSaNvii2au/1wkAxzA5bTDf1WVuilINzQxwF0wUBpA=
+X-Received: by 2002:a05:6402:78a:b0:5e6:15d3:ffe7 with SMTP id
+ 4fb4d7f45d1cf-607bc5b1adfmr37729a12.7.1749332030475; Sat, 07 Jun 2025
+ 14:33:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603190506.6382-1-ramonreisfontes@gmail.com>
- <CAK-6q+hLqQcVSqW7NOxS8hQbM1Az-De11-vGvxXT1+RNcUZx0g@mail.gmail.com>
- <CAK8U23a2mF5Q5vW8waB3bRyWjLp9wSAOXFZA1YpC+oSeycTBRA@mail.gmail.com> <CAK-6q+iY02szz_EdxESDZDEaCfSjF0e3BTskZr1YWhXpei+qHg@mail.gmail.com>
-In-Reply-To: <CAK-6q+iY02szz_EdxESDZDEaCfSjF0e3BTskZr1YWhXpei+qHg@mail.gmail.com>
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-Date: Sat, 7 Jun 2025 18:00:12 -0300
-X-Gm-Features: AX0GCFv7od7ZH20T1Xou3Gna-DdmRMeAlqWhMslWK0Cqm6esLHgCUfeVJdp-jq8
-Message-ID: <CAK8U23brCSGZSVKZC=DcHMGKYPyG3SHOd9AoX0MdhbyfroTkWQ@mail.gmail.com>
-Subject: Re: [PATCH] Integration with the user space
-To: Alexander Aring <aahringo@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
-	netdev@vger.kernel.org
+References: <20250607204734.1588964-1-kuba@kernel.org>
+In-Reply-To: <20250607204734.1588964-1-kuba@kernel.org>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Sat, 7 Jun 2025 23:33:39 +0200
+X-Gm-Features: AX0GCFveamE-E1Ol5AvUbHWowgW6jiuE_W-0_tRJ-bcHM84FhrgZa_Krv70YkoU
+Message-ID: <CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: clear the dst when changing skb protocol
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev, john.fastabend@gmail.com, 
+	eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com, 
+	william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> There is a generic way by using netem qdisc and using AF_PACKET
-without PACKET_QDISC_BYPASS, should do something like that.
-If you really want to do something else there or only act on 802.15.4
-fields and you hit the limitations of netem then this is something
-netem needs to be extended.
+On Sat, Jun 7, 2025 at 10:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> A not-so-careful NAT46 BPF program can crash the kernel
+> if it indiscriminately flips ingress packets from v4 to v6:
+>
+>   BUG: kernel NULL pointer dereference, address: 0000000000000000
+>     ip6_rcv_core (net/ipv6/ip6_input.c:190:20)
+>     ipv6_rcv (net/ipv6/ip6_input.c:306:8)
+>     process_backlog (net/core/dev.c:6186:4)
+>     napi_poll (net/core/dev.c:6906:9)
+>     net_rx_action (net/core/dev.c:7028:13)
+>     do_softirq (kernel/softirq.c:462:3)
+>     netif_rx (net/core/dev.c:5326:3)
+>     dev_loopback_xmit (net/core/dev.c:4015:2)
+>     ip_mc_finish_output (net/ipv4/ip_output.c:363:8)
+>     NF_HOOK (./include/linux/netfilter.h:314:9)
+>     ip_mc_output (net/ipv4/ip_output.c:400:5)
+>     dst_output (./include/net/dst.h:459:9)
+>     ip_local_out (net/ipv4/ip_output.c:130:9)
+>     ip_send_skb (net/ipv4/ip_output.c:1496:8)
+>     udp_send_skb (net/ipv4/udp.c:1040:8)
+>     udp_sendmsg (net/ipv4/udp.c:1328:10)
+>
+> The output interface has a 4->6 program attached at ingress.
+> We try to loop the multicast skb back to the sending socket.
+> Ingress BPF runs as part of netif_rx(), pushes a valid v6 hdr
+> and changes skb->protocol to v6. We enter ip6_rcv_core which
+> tries to use skb_dst(). But the dst is still an IPv4 one left
+> after IPv4 mcast output.
+>
+> Clear the dst in all BPF helpers which change the protocol.
+> Also clear the dst if we did an encap or decap as those
+> will most likely make the dst stale.
+> Try to preserve metadata dsts, those may carry non-routing
+> metadata.
+>
+> Reviewed-by: Maciej =C5=BBenczykowski <maze@google.com>
+> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+> Fixes: d219df60a70e ("bpf: Add ipip6 and ip6ip decap support for bpf_skb_=
+adjust_room()")
+> Fixes: 1b00e0dfe7d0 ("bpf: update skb->protocol in bpf_skb_net_grow")
+> Fixes: 6578171a7ff0 ("bpf: add bpf_skb_change_proto helper")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - drop on encap/decap
+>  - fix typo (protcol)
+>  - add the test to the Makefile
+> v1: https://lore.kernel.org/20250604210604.257036-1-kuba@kernel.org
+>
+> I wonder if we should not skip ingress (tc_skip_classify?)
+> for looped back packets in the first place. But that doesn't
+> seem robust enough vs multiple redirections to solve the crash.
+>
+> Ignoring LOOPBACK packets (like the NAT46 prog should) doesn't
+> work either, since BPF can change pkt_type arbitrarily.
+>
+> CC: martin.lau@linux.dev
+> CC: daniel@iogearbox.net
+> CC: john.fastabend@gmail.com
+> CC: eddyz87@gmail.com
+> CC: sdf@fomichev.me
+> CC: haoluo@google.com
+> CC: willemb@google.com
+> CC: william.xuanziyang@huawei.com
+> CC: alan.maguire@oracle.com
+> CC: bpf@vger.kernel.org
+> CC: edumazet@google.com
+> CC: maze@google.com
+> CC: shuah@kernel.org
+> CC: linux-kselftest@vger.kernel.org
+> CC: yonghong.song@linux.dev
+> ---
+>  tools/testing/selftests/net/Makefile   |  1 +
+>  net/core/filter.c                      | 31 +++++++++++++++++++-------
+>  tools/testing/selftests/net/nat6to4.sh | 15 +++++++++++++
+>  3 files changed, 39 insertions(+), 8 deletions(-)
+>  create mode 100755 tools/testing/selftests/net/nat6to4.sh
+>
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
+ts/net/Makefile
+> index ea84b88bcb30..ab996bd22a5f 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -27,6 +27,7 @@ TEST_PROGS +=3D amt.sh
+>  TEST_PROGS +=3D unicast_extensions.sh
+>  TEST_PROGS +=3D udpgro_fwd.sh
+>  TEST_PROGS +=3D udpgro_frglist.sh
+> +TEST_PROGS +=3D nat6to4.sh
+>  TEST_PROGS +=3D veth.sh
+>  TEST_PROGS +=3D ioam6.sh
+>  TEST_PROGS +=3D gro.sh
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 327ca73f9cd7..d5917d6446f2 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3406,8 +3406,14 @@ BPF_CALL_3(bpf_skb_change_proto, struct sk_buff *,=
+ skb, __be16, proto,
+>          * need to be verified first.
+>          */
+>         ret =3D bpf_skb_proto_xlat(skb, proto);
+> +       if (ret)
+> +               return ret;
+> +
+>         bpf_compute_data_pointers(skb);
+> -       return ret;
+> +       if (skb_valid_dst(skb))
+> +               skb_dst_drop(skb);
+> +
+> +       return 0;
+>  }
+>
+>  static const struct bpf_func_proto bpf_skb_change_proto_proto =3D {
+> @@ -3554,6 +3560,9 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
+2 off, u32 len_diff,
+>                 else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
+>                          flags & BPF_F_ADJ_ROOM_ENCAP_L3_IPV4)
+>                         skb->protocol =3D htons(ETH_P_IP);
+> +
+> +               if (skb_valid_dst(skb))
+> +                       skb_dst_drop(skb);
+>         }
+>
+>         if (skb_is_gso(skb)) {
+> @@ -3581,6 +3590,7 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u3=
+2 off, u32 len_diff,
+>  static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff=
+,
+>                               u64 flags)
+>  {
+> +       bool decap =3D flags & BPF_F_ADJ_ROOM_DECAP_L3_MASK;
+>         int ret;
+>
+>         if (unlikely(flags & ~(BPF_F_ADJ_ROOM_FIXED_GSO |
+> @@ -3603,13 +3613,18 @@ static int bpf_skb_net_shrink(struct sk_buff *skb=
+, u32 off, u32 len_diff,
+>         if (unlikely(ret < 0))
+>                 return ret;
+>
+> -       /* Match skb->protocol to new outer l3 protocol */
+> -       if (skb->protocol =3D=3D htons(ETH_P_IP) &&
+> -           flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
+> -               skb->protocol =3D htons(ETH_P_IPV6);
+> -       else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
+> -                flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
+> -               skb->protocol =3D htons(ETH_P_IP);
+> +       if (decap) {
+> +               /* Match skb->protocol to new outer l3 protocol */
+> +               if (skb->protocol =3D=3D htons(ETH_P_IP) &&
+> +                   flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV6)
+> +                       skb->protocol =3D htons(ETH_P_IPV6);
+> +               else if (skb->protocol =3D=3D htons(ETH_P_IPV6) &&
+> +                        flags & BPF_F_ADJ_ROOM_DECAP_L3_IPV4)
+> +                       skb->protocol =3D htons(ETH_P_IP);
+> +
+> +               if (skb_valid_dst(skb))
+> +                       skb_dst_drop(skb);
+> +       }
+>
+>         if (skb_is_gso(skb)) {
+>                 struct skb_shared_info *shinfo =3D skb_shinfo(skb);
+> diff --git a/tools/testing/selftests/net/nat6to4.sh b/tools/testing/selft=
+ests/net/nat6to4.sh
+> new file mode 100755
+> index 000000000000..0ee859b622a4
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/nat6to4.sh
+> @@ -0,0 +1,15 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +NS=3D"ns-peer-$(mktemp -u XXXXXX)"
+> +
+> +ip netns add "${NS}"
+> +ip -netns "${NS}" link set lo up
+> +ip -netns "${NS}" route add default via 127.0.0.2 dev lo
+> +
+> +tc -n "${NS}" qdisc add dev lo ingress
+> +tc -n "${NS}" filter add dev lo ingress prio 4 protocol ip \
+> +   bpf object-file nat6to4.bpf.o section schedcls/egress4/snat4 direct-a=
+ction
+> +
+> +ip netns exec "${NS}" \
+> +   bash -c 'echo 0123456789012345678901234567890123456789012345678901234=
+56789012345678901234567890123456789012345678901234567890123456789abc | soca=
+t - UDP4-DATAGRAM:224.1.0.1:6666,ip-multicast-loop=3D1'
+> --
+> 2.49.0
 
-Let=E2=80=99s say I=E2=80=99m quite familiar with netem - netem is indeed w=
-ell-known
-and has been used extensively with tc/ifb. However, it is primarily
-suited for 1-to-1 communication scenarios.
-In 1-to-n topologies, such as when node 0 communicates with both node
-1 and node 2, it becomes unclear which peer should serve as the
-reference for applying delay, loss, or latency.
-This limitation makes netem unsuitable for scenarios where
-link-specific behavior is required, such as in ad hoc networks.
-In such cases, a more precise per-link control - as provided by
-wmediumd - becomes necessary.
+Submit away.
 
-> With that being said, however there are so few users of 802.15.4 in
-Linux and adding your specific stuff, I might add it if this helps you
-currently... but I think there are better ways to accomplish your use
-cases by using existing generic infrastructure and don't add handling
-for that into hwsim.
-
-Back in 2016, mac80211_hwsim had relatively few users. Today, I
-maintain a community of approximately 1,000 users worldwide who rely
-on mac80211_hwsim for their research - industry and academy.
-The need for a realistic experimental platform is not a personal
-requirement, but rather a broader gap in the ecosystem. Addressing
-this gap has the potential to significantly advance research on IEEE
-802.15.4.
-
-> but I think there are better ways to accomplish your use
-cases by using existing generic infrastructure and don't add handling
-for that into hwsim.
-
-Honestly, based on my experience so far, there=E2=80=99s no better approach
-available. Well - there is one: integrating all the wmediumd
-functionality directly into the kernel module itself. But I fully
-agree - that would be both unrealistic and impractical.
-
---
-Ramon
-
-Em s=C3=A1b., 7 de jun. de 2025 =C3=A0s 16:51, Alexander Aring
-<aahringo@redhat.com> escreveu:
->
-> Hi,
->
-> On Sat, Jun 7, 2025 at 1:47=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmai=
-l.com> wrote:
-> >
-> > Hi Alex, thanks for the feedback!
-> >
-> > You're right, using AF_PACKET raw sockets on a monitor-mode wpan_dev
-> > is indeed sufficient for user-space access to the raw PHY, and we=E2=80=
-=99ve
-> > also tested that setup successfully for basic communication.
-> >
-> > However, if the use case focuses on evaluating realistic wireless
-> > scenarios, where connectivity and interference vary across links. For
-> > that, we rely on wmediumd, which integrates at the PHY level
-> > (mac802154_hwsim) and controls per-link delivery based on configurable
-> > SNR values and propagation models (e.g., log-distance, shadowing).
-> > This allows us to emulate asymmetric topologies and partial
-> > connectivity, something raw sockets alone cannot provide (or can?),
-> > since all virtual radios are fully connected by default.
-> >
->
-> It sounds to me like you want to do some specific 802.15.4 things and
-> the raw socket interface is too generic to do your tests.
->
-> > In this context, wmediumd becomes essential for simulating:
-> >
-> > - Packet loss due to weak signal or distance;
->
-> There is a generic way by using netem qdisc and using AF_PACKET
-> without PACKET_QDISC_BYPASS, should do something like that.
-> If you really want to do something else there or only act on 802.15.4
-> fields and you hit the limitations of netem then this is something
-> netem needs to be extended.
->
-> > - Asymmetric links (e.g., node A hears B, but not vice versa);
->
-> You can do that already with mac802154_hwsim, it is a directed network
-> graph. A->B and B<-A need to be there so that A<->B can talk to each
-> other, you can drop one of the edges and it is asymmetric.
->
-> > - Controlled interference between nodes;
->
-> netem again? Or any kind of tc egress action with a ebpf script.
->
-> > - Link-specific behaviors needed for higher-layer protocol evaluation.
-> >
->
-> That can mean anything. I need more information.
->
-> > Additionally, by inducing realistic transmission failures, wmediumd
-> > allows us to test MAC-layer features like retransmission (ARET) and
-> > ACK handling (AACK) in a meaningful way, which would not be triggered
-> > in a fully-connected environment.
-> >
->
-> There is no ACK handling in mac802154 as it needs to be handled by the
-> hardware, but I agree that there can be something similar like netem
-> in 802.15.4 that only fake reports about missing acks, or failed
-> retransmission to the upper layer. (whoever the user currently is and
-> there is only one I know that is MLME association).
->
-> > Let me know if you'd like me to elaborate further or clarify anything
-> > about this.
-> >
->
-> I am not sure about this as there exists generic network hooks which I
-> believe can be used to reach your use cases in e.g. tc. In combination
-> with a ebpf program you can do a lot of specific 802.15.4 frame
-> handling and do whatever you want. If you hit some limitations in
-> those generic hooks then the right way is to extend those areas.
->
-> Maybe the "fake" ack reporting is something that hwsim needs to
-> support as this is usually implemented by the driver to ask the
-> hardware for.
->
-> With that being said, however there are so few users of 802.15.4 in
-> Linux and adding your specific stuff, I might add it if this helps you
-> currently... but I think there are better ways to accomplish your use
-> cases by using existing generic infrastructure and don't add handling
-> for that into hwsim.
->
-> - Alex
->
+1 meta question: as this is a fix and will thus be backported into
+5.4+ LTS, should this be split into two patches? Either making the
+test a follow up, or even going with only the crash fix in patch 1 and
+putting the 4-in-4 and 6-in-6 behavioural change in patch 2?  We'd end
+up in the same state at tip of tree... but it would affect the LTS
+backports.  Honestly I'm not even sure what's best.
 
