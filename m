@@ -1,140 +1,122 @@
-Return-Path: <netdev+bounces-195579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B5C9AD148B
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 23:17:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46EC3AD14A6
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 23:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EBA1188B929
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 21:17:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C06D3A9325
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 21:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CACE255E27;
-	Sun,  8 Jun 2025 21:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C80925A33D;
+	Sun,  8 Jun 2025 21:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F42ytKTF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AE0wCESV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2920254852;
-	Sun,  8 Jun 2025 21:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156151DED52;
+	Sun,  8 Jun 2025 21:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749417375; cv=none; b=ET1YQpfB47zBr7K3KAjkSOtZhdPSFizmrxeK64n1CGcYhucZaEPngbACQU9ngjh4sKGL2OjkXv2kBvYSTvmmoWMB2DSeSWszAvYAxTitxGhLOCk3zrrp+zuHWNofEc/0wx1nRc3/jC+O4djrnN59Ey24rvgDsSgJNJI9vRScBJM=
+	t=1749417828; cv=none; b=GhvHF04KAwWSwRtqcPLZW3/FhonhG/60AfTDC4U35Xrfe0FTmXhFQgGyQHF8TSyQvIoII3kiCWc9kZ86i/irrSIfgzDibY/pWvqfNGCkaznRWQJFB8a7eu7MrupTPzG1K1tbPw41roShtPbs7s2ezIbUVyg3UVlQ+qkhWCMsaQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749417375; c=relaxed/simple;
-	bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nloNUrstlEjnS0q642pixFXWajeoKVkBT0ETi/97hFCe1pmt96cZAp/ibxjKSS5g7kOT4yvc2IYuekqs4uakv1v/wNYOiMILspHlk8doEdtyE2Q8LL2etqQNwXI8XOJr5GOE7lvHEIPrM82hMVBO2niiErEDgavr4uQfo6z2MeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F42ytKTF; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-31306794b30so699029a91.2;
-        Sun, 08 Jun 2025 14:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749417373; x=1750022173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-        b=F42ytKTF/oQgtoz8Bpapn6xX3Cy0wFjRg4Qc2WoCuhhrJnUq3ayfepn9KQ1u3bpQy3
-         J75UgHNPSv3HYDIMt4U9RJqvGcrsVLiK8oJSrFAEL8UvbwN21pS25hMFHZsKAVg8PA4F
-         P+kNyLye1CVl0fRJn3sQxIGY8U53ZkrnMaZ5IYvbqtWgt4WyqdhkKLIHEmYVEH7e8/Mj
-         R6KFp//sctTh4v3tfzVnddCtfXwwfXWGmYnNsMNIRqOP0VO0szy2hPW4P/n7GkcrOaqE
-         q8pAjaR9+8XMtVX9YSBdLdV9UGPijpDsiBCym/6LeseoWlvmgGAWb35uzolw7c1mZeZI
-         rvFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749417373; x=1750022173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ROMnbxB2A/F6Fvu/BM6R9kuzlo9+xJJX8W2nDVs24Gc=;
-        b=aFdKTwFsdAmPAIQx5mW+hud9i7C3QiWtCmt9WYkCbU+StXDRSsCzwK0awZt+CMwZDI
-         yzJDVjfl1m/vcqrsgeMOBeAeKWYwnGYAWcrTMbcp8d7ZiR2f5ot5ELPabgeLqWp0LK3j
-         IdS3wEefuoWjASg7SGelIXv7XWJUWs8zZT0ofjm4BQKv71TFwD/PuOlyjfUd6ABXr6Uo
-         gzt26+VIYjuvHEvs/oLXrz8Oe5o3pErybJ6J6LeV995MAFrFMEhB8oZIT3Do31X9J1UK
-         ziyhg3ibj5ch8Vk6wPLdbw12TCnV+7eNFU2TRUZr23C0JU/kj9j1LpnOXgODjg1jIY6E
-         pYIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyB8mJrCIUdTF34dWWVEziewMdPqGedKlZLUPkwbB0pEV3XAgTTyzXnyfwQqtUbSGhaVY5vg5ojRTe@vger.kernel.org, AJvYcCVB92/2m//n9o7JpnH2T4Rbd8f0xDgOxESjzLh8bZXguaEFKfz7DJynKTc4pA1tEh/bBiJLTQlvEUecy4AK0Xr1@vger.kernel.org, AJvYcCVgsiBaaPhPC5UtQTXsBtKNf0tuDacxXe2jnv+D1VbUPd7yCapp6ZMiCGIHA0lpVv874qIku+ro1xf936Jr@vger.kernel.org, AJvYcCW4Bz++acQJtaCql2FLXnwKG95pTC8P7GAEws1TzAK4xBWJS/p2cM2aCQbC7xpOqig1ul6csdCwneMpEaIuFgs=@vger.kernel.org, AJvYcCWXczlquP3wUag/KtdImK+qZUmqpfXe0Ah2DxDhIqV3ljLvqmajqrPOiVPJGqJRQXnIv1Ka5tRIKx2D@vger.kernel.org, AJvYcCXLzw8KPCzrnFR26+Z7PF4uVsBMEpWirJDsBcEy9hfOZKDfUgHZgs/1stlBSuRrZzcqJr7tOyRxDY8PS3wV@vger.kernel.org, AJvYcCXPjT5Nb6XPyGiBRff7jiDF8e+BojPAmiQS+S5zGzq9PZ5MxBpYxe8Cn22GVzqAZOKYHQT5esuh8gFYgLY=@vger.kernel.org, AJvYcCXn+ETdiWYuEqc5OlFNyGTJDhqlfn45EE2qpX4h3bGmrYKHgRpaiOTCdCuslwQgkqu3KnRsxFnp@vger.kernel.org
-X-Gm-Message-State: AOJu0YysjLWQvvuSfKMbPC2xy/Cez+k1BULMLGdOANqzrp3fCT9tyM1n
-	WwIJ0HEAuOylNX9/KTe1v/WHQR999beiVlfz8WSpwy/2OyoR/ucyswjlSATWJc8Buf+yLgnO94C
-	IM0TdxsBZvDQ6HLBH5nhGAheq6BUS+sc=
-X-Gm-Gg: ASbGncs41ZQYYEEp68K/V5FVheZMxnBjMIHD9S3LDE95SxwOcrO+xRAb0bgbvYeGgyP
-	AmPtS9cMV9BV/qi57ObZMJHlA0brxiCqvaQXLOOSV5aOzaQtv2MfmuFlMBdRmvfg6bA1xNXnFDa
-	5QUntoX9GGZusiy1fU+SH/iq2+brH5d8QoHDEnHzct5ac=
-X-Google-Smtp-Source: AGHT+IHcnKxE4P/cFhuEWZW0D4lMoOaOrfEZtsoCHwxA4JPSsZt+wbEk5r3gKugcA90wbKi32QwaTUF3LYa15AmI+uM=
-X-Received: by 2002:a17:90b:3c89:b0:310:cf92:7899 with SMTP id
- 98e67ed59e1d1-31347506b75mr5866067a91.3.1749417372649; Sun, 08 Jun 2025
- 14:16:12 -0700 (PDT)
+	s=arc-20240116; t=1749417828; c=relaxed/simple;
+	bh=WJEH2etwcynU+UPKgXiBrqtDc3afsRIYVIBs2k0FJhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eg3hpcDWsyaDLHJh3VFG7A+E+F0nPogprDSqlGbm1EZnCKA+keChYwFHkjDf/EZcRDveZV3kNHC8i58DuvqBiiRvflWMLceOFUglf1v/ksTqHDoimZCvMFkG0ogX9FnDk1LaYWydetC/QEElAb2G25fIL3ytQtHRSHoteTVekt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AE0wCESV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=t6K1DK8TwWXVFwtnP7hylwxjWAnaQ8nQe4sIAcH0KiI=; b=AE0wCESVzCTtp0M8ElqNVDGXRM
+	oGFM+uCGOfAOyb9B0QkwBlohtYwCV54AeYrviLNRh09FEZZ1gi+HBm2qSYdOXZkp2gl1Os+5gOl2n
+	JGHmqqGaG2RRZpE83eoNbG+VjkxTaZ/EzB1CHOFam8alz/6jwvvpf+eXZzU2QF1nwqtY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uONU2-00F6eS-Px; Sun, 08 Jun 2025 23:23:14 +0200
+Date: Sun, 8 Jun 2025 23:23:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Jia-Wei Chang <jia-wei.chang@mediatek.com>,
+	Johnson Wang <johnson.wang@mediatek.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic
+ ethernet-nodes
+Message-ID: <cc73b532-f31b-443e-8127-0e5667c3f9c3@lunn.ch>
+References: <20250608211452.72920-1-linux@fw-web.de>
+ <20250608211452.72920-7-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
-In-Reply-To: <20250418-ptr-as-ptr-v10-0-3d63d27907aa@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sun, 8 Jun 2025 23:15:58 +0200
-X-Gm-Features: AX0GCFu7kEGuuhs8xaCtkzWNC6Znk5oSHyCpfKw_qD8poEL7ZBxhU_Wo9Kw_iYo
-Message-ID: <CANiq72km=RmQcVAkTcs3UoZzSUXKthW0ru8UH4r0KFFmUSjwgQ@mail.gmail.com>
-Subject: Re: [PATCH v10 0/6] rust: reduce `as` casts, enable related lints
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, 
-	linux-block@vger.kernel.org, devicetree@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250608211452.72920-7-linux@fw-web.de>
 
-On Fri, Apr 18, 2025 at 5:37=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
- wrote:
->
-> This started with a patch that enabled `clippy::ptr_as_ptr`. Benno
-> Lossin suggested I also look into `clippy::ptr_cast_constness` and I
-> discovered `clippy::as_ptr_cast_mut`. This series now enables all 3
-> lints. It also enables `clippy::as_underscore` which ensures other
-> pointer casts weren't missed.
->
-> As a later addition, `clippy::cast_lossless` and `clippy::ref_as_ptr`
-> are also enabled.
->
-> This series depends on "rust: retain pointer mut-ness in
-> `container_of!`"[1].
->
-> Link: https://lore.kernel.org/all/20250409-container-of-mutness-v1-1-64f4=
-72b94534@gmail.com/ [1]
->
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> +			gmac0: mac@0 {
+> +				compatible = "mediatek,eth-mac";
+> +				reg = <0>;
+> +				phy-mode = "internal";
+> +
+> +				fixed-link {
+> +					speed = <10000>;
+> +					full-duplex;
+> +					pause;
+> +				};
 
-Now that -rc1 is out, could you please spin a v11? There are some new
-ones in configfs, drm/device, cpufreq, nova-core and mm/virt.
+Maybe i've asked this before? What is on the other end of this link?
+phy-mode internal and fixed link seems an odd combination. It might
+just need some comments, if this is internally connected to a switch.
 
-(Please also see my comments in the underscore one).
+> +			mdio_bus: mdio-bus {
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +
+> +				/* internal 2.5G PHY */
+> +				int_2p5g_phy: ethernet-phy@f {
+> +					reg = <15>;
 
-Thanks!
+It is a bit odd mixing hex and decimal.
 
-Cheers,
-Miguel
+> +					compatible = "ethernet-phy-ieee802.3-c45";
+
+I _think_ the coding standard say the compatible should be first.
+
+> +					phy-mode = "internal";
+
+A phy should not have a phy-mode.
+
+	Andrew
 
