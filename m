@@ -1,141 +1,99 @@
-Return-Path: <netdev+bounces-195566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA84BAD1362
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 18:47:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6913AD138E
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 19:33:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C429169C6C
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 16:47:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABA4F169393
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 17:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE8543ABC;
-	Sun,  8 Jun 2025 16:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsVwCIYw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E405E19F464;
+	Sun,  8 Jun 2025 17:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D292629C;
-	Sun,  8 Jun 2025 16:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6839015DBB3
+	for <netdev@vger.kernel.org>; Sun,  8 Jun 2025 17:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749401256; cv=none; b=PLeougpeq4NEkU/QU0sudxAIElGmJdPg6xKdYPJ/wwTVVDlI8nxJ6NZp1keg7qFsa1Yoz2G4yrb7Cplp30/wapFD38Qo7vkVlCEOIkRyVEaE6cG3TGL1QCDNpGdMntjjwSi6t4x2lxYxRJF4KbFNoU9J3M8/W/9N7cPZtsYL+5U=
+	t=1749404006; cv=none; b=JAG6cqe3Njl8oqx9uaF/IWR0XeGAvpDl4U2cDxuh0BfABbFRv9MfevaJqDUAfVuuLsgsIYKP/C8+RHzI1XZQD9EsBssO5TS2YPg7C1P74hp/ekAcAvFi5LMetFXmDZhqpaAZPUaffvTv0dPhveJvACOAvttsG9EtVQ4V/sGNaKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749401256; c=relaxed/simple;
-	bh=pznfatdaTME2rTmyt/8vtUl1sZZ4dvZcbWqjCTMljJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F2a1KyUDH0t3LgGIAu4fX5AbSoA8xHo59I0K6cJTfiMcCBDY+fNoWUfQIjDr3dNHkKJKcyhrZL/sXidN4YqWX95JczAgBFzizVJSUn+yEDkqm5rM8XtGwak8w4wdDqfZWyplLbCYHDDAXztfRgwPh+GY1BtJDzbbX9IWmjexmP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LsVwCIYw; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4e771347693so1833553137.1;
-        Sun, 08 Jun 2025 09:47:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749401254; x=1750006054; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KS9CP9/A/h3iEtm7CMIEpKMQqYwspFw8uVeTqe2WDug=;
-        b=LsVwCIYw7jMcLg+uy7mFk+fO18uageWo/L+TGzL+EbB9nOQSu5uI35a9etQUehN1dw
-         NQ9U0550SD26IcfNoALZFiw1qkv1ySHybkycd0HcAUMgNMKYeLjhe8hv8isMNaAr+QOk
-         GlCMqJItyV2huJ2PniVS63h0gNZdN/JUxIXzwzulZOWl1zr0d2KQN/2BVwfeuIYiFY2l
-         gLgKuoUO6eAiPKPYg3mXHUxLm1C7qsE434jGNgj54mCEKuYmVCTYrfmCjOVack++PFHT
-         mmiysKv367QQoyRjoIZxKsAgqeGe1Zbn4adWAwtEfG1b9ovlb8OgqDO5EF1AZeDQoAg1
-         gNyw==
+	s=arc-20240116; t=1749404006; c=relaxed/simple;
+	bh=5bAIMo5449Y2Zsk7C/nk7K3d2lZ2pHmlhbszdjHS2Fk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=k+btcOKzWJjXdqiDIsHuRl2tJPIAh3vohpFXx6RvHhZMYffkBonWsIFi1rxjdsmwBtPk7HLqkg15acYIep43qQ2XzJssUmCpy68OC7HXTZe1ausLE1zBYKQmp7KTyXn9NOFAOD9Y7LZBPZgZ3wQOAjHteQBKWWRRUaO3V1LwOgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3da6fe2a552so77685925ab.1
+        for <netdev@vger.kernel.org>; Sun, 08 Jun 2025 10:33:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749401254; x=1750006054;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KS9CP9/A/h3iEtm7CMIEpKMQqYwspFw8uVeTqe2WDug=;
-        b=a2L+/kP6GNolqO3B2MYDmczG2A4H2VsY7dhJReVX/AxPC/UYhLCpqcNWFmLvMXnnxk
-         6tKpBpo8TGsgCA0Y+oF593vKFb0fwhgn3GDe/IgsbV5Y4HmVc6ks7JNLFtf6KlOWr6mx
-         SHqU6o9xzFufkOVHbgwjSCJqI7Sicd7xMO/SYawLWHvybloxbb3r80L74Dh+Z/SNIkqN
-         4dP72WAIJErMlh4AOFyUbtYLoJniI16OLFz2TdUp59DGbaS2+kE0psSxCv+hRr+XUdCu
-         /K4FbJ6Od8/8nSE9XPYtishoC1Q5/k2vrgYAfrxoHcJ8rNpDswAk2NwhjnvQ6FMcsOWy
-         bj8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUlLi+NtgpYQFXaVaW6PLDYIXdgGwT0YzaSo+KWOu+PYBgsI2DyEu6lU1baj94i3Ao3jw/Pqn0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqtFk4aIZs5aQNUeZBP6Kg4TW3tAMilv40G2b8xDBHlEM3gPIQ
-	Bx4VrVnf25S6IPYAcjMKqJM0wtKTNXfeGB3oeDN2J0ILh7/1J93QiNY6
-X-Gm-Gg: ASbGncuxxsptoNCtYIZ/DKI+7sxcmElqL5z5LZuOI53mDYT2CFTQxuqEyGFdEa43Wsz
-	dt9l1YHpx1LkEm9hdsnLwWcPvyx0F6RliILL3jsDCf1jtpy9k+zT/QiHjLm/7g+aKibgOKbXPZZ
-	AYl+UENIbmBed7xIN+Odzcn6xrVmWYJovfuI0NwnIU2IMNfr6yRyZld8pdQuQesk+DOI8ufnB7a
-	ArvqHa64tUAJm8AwtF4EA2j4rnvffMAbR29J8wA2V0uKmLSdPthPzCCAkY7gWRghgt/0j0+v0BV
-	snRTBNQJ5xhoi99gJagrrWHkg9CTmNSx5j0TdtC5XY+NnA1ekwU4AOHfRjFdQ3Hwtk5ke2Y=
-X-Google-Smtp-Source: AGHT+IHwEXbK7g307mf4AZt9BTqviVR2/Z9Oe2q7nsEnoGO5dQ8yPBphNtJtl8gS9zj7PoryG0DNIQ==
-X-Received: by 2002:a05:6102:2912:b0:4e5:9138:29ab with SMTP id ada2fe7eead31-4e7729c4bc1mr8624088137.15.1749401253616;
-        Sun, 08 Jun 2025 09:47:33 -0700 (PDT)
-Received: from localhost.localdomain ([187.61.150.61])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ecda08c3asm1565215241.29.2025.06.08.09.47.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jun 2025 09:47:33 -0700 (PDT)
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wpan@vger.kernel.org,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org,
-	Ramon Fontes <ramonreisfontes@gmail.com>
-Subject: [PATCH] mac802154_hwsim: allow users to specify the number of simulated radios dynamically instead of the previously hardcoded value of 2
-Date: Sun,  8 Jun 2025 13:47:24 -0300
-Message-ID: <20250608164724.6710-1-ramonreisfontes@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1749404004; x=1750008804;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+jIBUgKfo1s7YvNdeDIUYV5LKf2tqtfkNThcYR4lhL4=;
+        b=r9funtv5xEDrO5E9DW1wnldeahqbmJLBQFZ8qSWOJZLhzWCCa6vdExXO6BuyrNxO2+
+         ePUFvthfTRJX0FImHTXR9rUrFvJaSJ8rLFHajZbuP51L+RGrKSzYwoLqxohr1hNViDv5
+         RM2sNnGjApwRdObnrFnidtXXGhRIGZhIDT/IDVgw/afBRJKF0Ad47QCWElvQX1PoDzts
+         ygsMYciZY3RciepV1kpyyuius82XAXiQ9rB62l3Mb4TbkejRN+ViLalQAzUc5czpkDRB
+         60BDOHoA7CpGl9WyVgO+HlXgs+2pTnEZeW5B60APg2l7DqA5mdCIb0DPCrvdCnx72fIu
+         cIJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXi9+WsX/bj8khclJdkntR0LyP1tLcMff1g18P/9HzizyKrWk0daQXhvhO8YG2U3WSOFGaK8K8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxATYI93jXrZWtgU7J0sbFV/AMAlrSbeWtKpGHBHK0mRCazY8oE
+	ffpSdESMih3gRVMg9UtiZetPpcwV05rKZ2cETBdrEiJZmfhGoHiSZCOBDGEooA4av/MsMxx4M7O
+	D1V/hmhXLU9PZnYr9FVYjHsIUpOFiahMQ4cK/zIvQqF04VuNYHLHXZIxHVIE=
+X-Google-Smtp-Source: AGHT+IFoy4TaPwn8E6wr/Kz7niH6YlVpH16ANSJ65jY+XgtoMNn2+9E+sZaiizIt9EUQD0OYvF9pEU7imDP+5bSfO1TCja2+GWz7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2701:b0:3dc:87c7:a5b9 with SMTP id
+ e9e14a558f8ab-3ddce426531mr109203445ab.10.1749404004600; Sun, 08 Jun 2025
+ 10:33:24 -0700 (PDT)
+Date: Sun, 08 Jun 2025 10:33:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6845c964.050a0220.daf97.0af3.GAE@google.com>
+Subject: [syzbot] Monthly nfc report (Jun 2025)
+From: syzbot <syzbot+listac4fa3bbb63e8b6699d9@syzkaller.appspotmail.com>
+To: krzk@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add a module parameter `radios` to allow users to configure the number
-of virtual radios created by mac802154_hwsim at module load time.
-This replaces the previously hardcoded value of 2.
+Hello nfc maintainers/developers,
 
-* Added a new module parameter `radios`
-* Modified the loop in hwsim_probe()
-* Updated log message in hwsim_probe()
+This is a 31-day syzbot report for the nfc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nfc
 
-Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 27 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 430     Yes   INFO: task hung in nfc_rfkill_set_block
+                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
+<2> 308     Yes   INFO: task hung in rfkill_unregister (3)
+                  https://syzkaller.appspot.com/bug?extid=bb540a4bbfb4ae3b425d
+<3> 50      Yes   KMSAN: uninit-value in nci_ntf_packet (3)
+                  https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
+
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 1cab20b5a..8fcf8a549 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -27,6 +27,10 @@
- MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac802154");
- MODULE_LICENSE("GPL");
- 
-+static unsigned int radios = 2;
-+module_param(radios, uint, 0444);
-+MODULE_PARM_DESC(radios, "Number of simulated radios");
-+
- static LIST_HEAD(hwsim_phys);
- static DEFINE_MUTEX(hwsim_phys_lock);
- 
-@@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pdev)
- 	struct hwsim_phy *phy, *tmp;
- 	int err, i;
- 
--	for (i = 0; i < 2; i++) {
-+	for (i = 0; i < radios; i++) {
- 		err = hwsim_add_one(NULL, &pdev->dev, true);
- 		if (err < 0)
- 			goto err_slave;
- 	}
- 
--	dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n");
-+	dev_info(&pdev->dev, "Added %d mac802154 hwsim hardware radios\n", radios);
- 	return 0;
- 
- err_slave:
--- 
-2.43.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
