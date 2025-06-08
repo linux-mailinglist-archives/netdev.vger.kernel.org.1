@@ -1,272 +1,251 @@
-Return-Path: <netdev+bounces-195532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A27AD1070
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 01:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58E36AD1109
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 07:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2CE9188ECF6
-	for <lists+netdev@lfdr.de>; Sat,  7 Jun 2025 23:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CECD3AA467
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 05:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3CC2192FA;
-	Sat,  7 Jun 2025 23:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70892191499;
+	Sun,  8 Jun 2025 05:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uk4r28pQ"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="Sxwj6HFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3CE21ABBD
-	for <netdev@vger.kernel.org>; Sat,  7 Jun 2025 23:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46EAE573
+	for <netdev@vger.kernel.org>; Sun,  8 Jun 2025 05:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749338805; cv=none; b=VA2BHUJVfBDUS+IB29Fl8MTbuT7tzR0a09KD/+tRTOOcEWdb7zjBX4v72XJqjLPwUyJ188sq2bT/Z7lf8guJjJkWW2K41N6qn17YMNA3hdWEsY4aDIqff3GVwQRxclTZPYC5ihIG9xaP1VVrulK30+m1FZCEebLbVTpf9yclso0=
+	t=1749360512; cv=none; b=HfGypp+Otr9K5jSrR/wucpH9tgreYltccFJwKqEvv3pYZazp631CV60PHOohiKPdB0eydrkoCfVlMKsmAmkLScIpLWm8Fw0Sau0+L6PFg/qztlegl8CUypP1bt5RcsqIQ1ZlM5aS0v+v4NjmltBzY7mS0WiphtabO/akD6VRC4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749338805; c=relaxed/simple;
-	bh=TWwBFTC8u4yTjNRC4+6jc++9DASoCCEgz8Ctn2z2dbU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RDOuz3wokJyl6XGKq/4CKq8XDaeWq6a2UFqOAQFiqvf5MhwRekcDso3gpDJrfukIiSqDhouW1q5CgKTU36ML4pItWM2a67JeND8cJTdSSu6ydL79YWi3bVc999tS9MW0PfGGrVshKImDZy7deprUHtbzx4qw7dfMEfD1sqQvPRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uk4r28pQ; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5ac8fae12so332711cf.0
-        for <netdev@vger.kernel.org>; Sat, 07 Jun 2025 16:26:43 -0700 (PDT)
+	s=arc-20240116; t=1749360512; c=relaxed/simple;
+	bh=IINu2gAbLpFxYv4xnlnDp6lZR9HUu7c5unpKANkeHXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jHBpUzSc+/OFOze/i9h6KrEPgLZXKiDWZjl9lNr2VNVARUGuoyK1fVbYZKfdGgBQUmt+k75tabzyIyriUjfdWl22EcxQr6Cz/eHGmWgvY/f7wDo0jX1fCiYuzWjfVvYL7FEqWvnkB+wPiUg1nGLxFuM6RYA2UMiceQhMv+EQAgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=Sxwj6HFA; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-312a62055d0so3363907a91.3
+        for <netdev@vger.kernel.org>; Sat, 07 Jun 2025 22:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749338803; x=1749943603; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=u7tbyib6CZQtOoG5oWNgudUl2/i8n48ZFHnOyVgbmA8=;
-        b=uk4r28pQBjeeN/uiS7FpOK1LKfunHaw5RIxostBmP2PklXWXyZ51qgkTJFR8Ztfoxt
-         TereWdmaAfysjhkcfXjXx1sPb0OzfZ55tywfJ6qKC+h7O2CSrU9V+KDge3r8cXnBo+SO
-         N20Z+AottyAJEAQlkFoVRZH7ME5TDHSyCng9yJr5bduf9ZjaGhnyo/eDh1x7XhDXAeP0
-         1YuCR9lco9fdKBTPelJzQb7Z6aBJChrqvMdAy4uowT1HBmhkTNxTHaGROuRYeHH1yCTX
-         MdNfBKRUIvQQsNRwjw9INHttO0SFwoal+ZaeoK31qS+0IdYfKYU0HC+3Lh24YrmDsn2b
-         i0ew==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1749360510; x=1749965310; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GTIrSIuhxPxy2+kWPEOiaK5ZIVwsN/kS2fj/ol82KfA=;
+        b=Sxwj6HFAUuUZLzP7RnqFkKKcM4zr7N826XsKUygGAM+3GosFdT2/Fi6/DJduhm8gAC
+         UUvPMUXB7jJF/hKBpPvyq2fhV7h2eTi6ruvBf2wWtDca6KbsZ9zdzy7csvp6IWUXjKmD
+         Rv1XUqoLe2PbsZ1G2g7V8T8aBxMwd2eIHcr9J2xA3KT8xj/+c1HMA/YW5OtTQImZpXq1
+         1s08IYsFddqv1Bh8BjqS2EzUvTwKAWGqq8aTtht15ra3zFxDNDhjzdT2HYmck+7Py3l8
+         C7DNO3mKe4feSAChrxTRbw10844q/Lx3mCvwz0E601jpKhSFW0tOJjLDVIsHYEg/1vFN
+         6nHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749338803; x=1749943603;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u7tbyib6CZQtOoG5oWNgudUl2/i8n48ZFHnOyVgbmA8=;
-        b=m/N1LLmZ7XNDV2feYtKUoY32lr1xikjA8F09avkyEqApAmlr6xCK1b50uaRQ+nujHu
-         KnrPubl2zBsJNgcwdSYNE+5xwVtlvs48VrBC/gYbe+sPrb18pN6RDjHXaAV19PbL0Cct
-         dIFRSIvbYFF3Dwhof0D5Rj40CaPcJZtgez5thOsXRwB5qA4K3cK/JwWRKNCiTTe+1VQt
-         ivdVmnKfWRWZ0yxS5o+hDeHLZFRGAMRHkWG2+DqUZYzZ212+modgx8d3raHAIZeOTmNk
-         FqxXs2hzm2zGrsQRfo+SHAPd//sSdSXanJ4g73Opy+UJRAtml4t4XMTaVb75bTMYrm/g
-         VcPg==
-X-Gm-Message-State: AOJu0YyFFm6eZXW4OXzdLHCfPX/biXzg1dr9fkMqIdTzs3o1Zp6P8Kpw
-	f9nEI0VSGgQcCU2VyFLzJINZHAjz2XW/ZA4hlEre3C7kmj4qXOsc9jTNGMLiGOmjLMFSLtdezHc
-	PQNrgi9pAKdIttkjRNXjd/MsR8IF0vdXnbr3Tam83
-X-Gm-Gg: ASbGncvz4wrfAUm9DXPJh7cHCdFLm27j049uyn3GUdPK/AEUEigO7e8ZYdzs5VBD9To
-	imA+8eZ9dmNIhyyMXfe5rxy8nctocKvcxZaRc2m2396fTzMjLgMS9rVS0eVYnfK4GlI+34xRugu
-	Pg7retEyOfvfDmC0yKQFNvmbZ8m/IuuoPOoc2V9yLwnqy45TYEqdF3vWw7cdjM1ElBd7SKUKtBA
-	eTd
-X-Google-Smtp-Source: AGHT+IFic17hA6ooelgZOTWeixWOevdVa9gbqk11H5lAG5HRNNGSzW8eHZDFGcLqRKyaGceCEKRC2tYmAoHF0TTLklY=
-X-Received: by 2002:a05:622a:348:b0:498:e884:7ca9 with SMTP id
- d75a77b69052e-4a6f0717bcdmr2499771cf.13.1749338802726; Sat, 07 Jun 2025
- 16:26:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749360510; x=1749965310;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GTIrSIuhxPxy2+kWPEOiaK5ZIVwsN/kS2fj/ol82KfA=;
+        b=thWiT0C2yeb5HVvKzjtgejy6Rw4sG/mIVyQdhp5gPulPn9muwpsbmOKDln92Eans8F
+         PcIxv6pe3iivOh5GhMOOhkhQO1yJHBzhwi+cZfiz+l6xGeEFGhIc22DehsuU2V+vmRMY
+         92lmlWKRg0qddY4efZ5+VfTkeNM5T0a7xWXsK22gdHsQ+HGCiTKm1lcd/qFUXuKcoGO5
+         DNp9/9237soV0TpFxvcBcxaHNpyN+pTr0L6S1uelGwpNcGfkgRNnIAOxjImewJW58JX4
+         8ZgogVYclcQKAoWc86qFUl/7Hmev5eUe+SK+QUalWaBFyVNqdrbkdtANdu+67B+kAcKl
+         lIPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVIP+tTXsvxPfPpfd3LjPwrL6TY4UV4FxumMvq4zY1WJcVchDIWVRQSA5VJeJ/xG7QQwKMrbKQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Yip+DvNyJl+kpNYJbzeQS0t9GJicOHkCqI2trecsrM5l+sNc
+	ylDOfgNKuxlJduZDtM8Xcge+m3naoU/5jd3Nh4PV/7FWLI/KFKOiM2A3dlL35gawGGE=
+X-Gm-Gg: ASbGncuyFuJyW9V0M7WIU8eqhKVCPQ+JlCC9Ol3M5gVr65JKXNvi7rT8Pt25TZwCrP1
+	gQ7Guket8n+VNxb/4DnZL2sEjOK3mwE1rRI59bAMhI102ss3Q9/tJGW3Oo7r/cmt1++JlFZw3of
+	THQZAvRRbSa8G7utc3hQhqtv5PLpKIUIX+0ZdSXSbasv1Xe4RsYxgbF9tSpELSehPgt+J2p11GW
+	0bribot2mcXUDI1Kk8tlRo+IFsUXuN5yOqEukhCk+80NgxOlQ0TL5Dlige9SDnp+gUr6ZkOV91r
+	obCKxvCy3J2I88M1IQstFjytxQkF/KWlDhbJpfAR+VLl51blHGlBLxQMsi5N8kCpVHQ3UVbsqaU
+	=
+X-Google-Smtp-Source: AGHT+IEE8tI2u8ucfQU7WyYCTdrk+OAbUP4wpQT9Z0fDhYvJfRms1v711D1BM8a7JuW+VzQt1/Dl9w==
+X-Received: by 2002:a17:90a:e7d2:b0:311:c1ec:7d05 with SMTP id 98e67ed59e1d1-31347077473mr12786035a91.35.1749360509797;
+        Sat, 07 Jun 2025 22:28:29 -0700 (PDT)
+Received: from [157.82.203.223] ([157.82.203.223])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3134b044e2bsm3571939a91.5.2025.06.07.22.28.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 07 Jun 2025 22:28:29 -0700 (PDT)
+Message-ID: <ece8f139-fcd4-4b55-b4bb-3a62da66ad01@daynix.com>
+Date: Sun, 8 Jun 2025 14:28:25 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net>
- <CADVnQykCiDvzqgGU5NO9744V2P+umCdDQjduDWV0-xeLE0ey0Q@mail.gmail.com>
- <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com>
- <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com>
-In-Reply-To: <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Sat, 7 Jun 2025 19:26:26 -0400
-X-Gm-Features: AX0GCFtz0gqq7D2jXs_5MolnWFbwdVVv7F-Zsn7GuT8mx0vBV1aJ2u98Jng368s
-Message-ID: <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com>
-Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
- retransmits were sent
-To: Eric Wheeler <netdev@lists.ewheeler.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, stable@kernel.org
-Content-Type: multipart/mixed; boundary="000000000000ee6ed6063703ad85"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/8] vhost-net: allow configuring extended features
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <cover.1748614223.git.pabeni@redhat.com>
+ <b9b60ed5865958b9d169adc3b0196c21a50f6bca.1748614223.git.pabeni@redhat.com>
+ <9eae960a-0226-46e2-a6f4-95c91800268c@daynix.com>
+ <f0ee95b7-6830-4a53-8d6b-0edf1a7ab142@redhat.com>
+ <fc27ca0b-c00e-4461-9890-746a237e48bc@daynix.com>
+ <936eaedc-d4e0-446c-9667-82ee4d0e1ab2@redhat.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <936eaedc-d4e0-446c-9667-82ee4d0e1ab2@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---000000000000ee6ed6063703ad85
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2025/06/06 20:52, Paolo Abeni wrote:
+> On 6/6/25 11:57 AM, Akihiko Odaki wrote:
+>> On 2025/06/03 22:32, Paolo Abeni wrote:
+>>> On 5/31/25 8:15 AM, Akihiko Odaki wrote:
+>>>> On 2025/05/30 23:49, Paolo Abeni wrote:
+>>>>> Use the extended feature type for 'acked_features' and implement
+>>>>> two new ioctls operation allowing the user-space to set/query an
+>>>>> unbounded amount of features.
+>>>>>
+>>>>> The actual number of processed features is limited by virtio_features_t
+>>>>> size, and attempts to set features above such limit fail with
+>>>>> EOPNOTSUPP.
+>>>>>
+>>>>> Note that the legacy ioctls implicitly truncate the negotiated
+>>>>> features to the lower 64 bits range.
+>>>>>
+>>>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>>>>> ---
+>>>>> v1 -> v2:
+>>>>>      - change the ioctl to use an extensible API
+>>>>> ---
+>>>>>     drivers/vhost/net.c              | 61 ++++++++++++++++++++++++++++++--
+>>>>>     drivers/vhost/vhost.h            |  2 +-
+>>>>>     include/uapi/linux/vhost.h       |  7 ++++
+>>>>>     include/uapi/linux/vhost_types.h |  5 +++
+>>>>>     4 files changed, 71 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>>>>> index 7cbfc7d718b3..f53294440695 100644
+>>>>> --- a/drivers/vhost/net.c
+>>>>> +++ b/drivers/vhost/net.c
+>>>>> @@ -77,6 +77,8 @@ enum {
+>>>>>     			 (1ULL << VIRTIO_F_RING_RESET)
+>>>>>     };
+>>>>>     
+>>>>> +#define VHOST_NET_ALL_FEATURES VHOST_NET_FEATURES
+>>>>> +
+>>>>>     enum {
+>>>>>     	VHOST_NET_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
+>>>>>     };
+>>>>> @@ -1614,7 +1616,7 @@ static long vhost_net_reset_owner(struct vhost_net *n)
+>>>>>     	return err;
+>>>>>     }
+>>>>>     
+>>>>> -static int vhost_net_set_features(struct vhost_net *n, u64 features)
+>>>>> +static int vhost_net_set_features(struct vhost_net *n, virtio_features_t features)
+>>>>>     {
+>>>>>     	size_t vhost_hlen, sock_hlen, hdr_len;
+>>>>>     	int i;
+>>>>> @@ -1685,8 +1687,9 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>>>>>     	void __user *argp = (void __user *)arg;
+>>>>>     	u64 __user *featurep = argp;
+>>>>>     	struct vhost_vring_file backend;
+>>>>> -	u64 features;
+>>>>> -	int r;
+>>>>> +	virtio_features_t all_features;
+>>>>> +	u64 features, count;
+>>>>> +	int r, i;
+>>>>>     
+>>>>>     	switch (ioctl) {
+>>>>>     	case VHOST_NET_SET_BACKEND:
+>>>>> @@ -1704,6 +1707,58 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+>>>>>     		if (features & ~VHOST_NET_FEATURES)
+>>>>>     			return -EOPNOTSUPP;
+>>>>>     		return vhost_net_set_features(n, features);
+>>>>> +	case VHOST_GET_FEATURES_ARRAY:
+>>>>> +	{
+>>>>> +		if (copy_from_user(&count, argp, sizeof(u64)))
+>>>>> +			return -EFAULT;
+>>>>> +
+>>>>> +		/* Copy the net features, up to the user-provided buffer size */
+>>>>> +		all_features = VHOST_NET_ALL_FEATURES;
+>>>>> +		for (i = 0; i < min(VIRTIO_FEATURES_WORDS / 2, count); ++i) {
+>>>>
+>>>> I think you need to use: array_index_nospec()
+>>>
+>>> Do you mean like:
+>>> 			i = array_index_nospec(i, min(VIRTIO_FEATURES_WORDS / 2, count));
+>>>
+>>> ?
+>>>
+>>> Note that even if the cpu would speculative execute the loop for too
+>>> high 'i' values, it will could only read `all_features`, which
+>>> user-space can access freely.
+>>
+>> I was wrong; I forgot you used a 128-bit integer instead of an array.
+>>
+>>>
+>>>>> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+>>>>> index d7656908f730..3f227114c557 100644
+>>>>> --- a/include/uapi/linux/vhost_types.h
+>>>>> +++ b/include/uapi/linux/vhost_types.h
+>>>>> @@ -110,6 +110,11 @@ struct vhost_msg_v2 {
+>>>>>     	};
+>>>>>     };
+>>>>>     
+>>>>> +struct vhost_features_array {
+>>>>> +	__u64 count; /* number of entries present in features array */
+>>>>> +	__u64 features[];
+>>>>
+>>>>
+>>>> An alternative idea:
+>>>>
+>>>> #define VHOST_GET_FEATURES_ARRAY(len) _IOC(_IOC_READ, VHOST_VIRTIO,
+>>>>                                               0x00, (len))
+>>>>
+>>>> By doing so, the kernel can have share the code for
+>>>> VHOST_GET_FEATURES_ARRAY() with VHOST_GET_FEATURES() since
+>>>> VHOST_GET_FEATURES() will be just a specialized definition.
+>>>>
+>>>> It also makes the life of the userspace a bit easier by not making it
+>>>> construct struct vhost_features_array.
+>>>>
+>>>> Looking at include/uapi, it seems there are examples of both your
+>>>> pattern and my alternative, so please pick what you prefer.
+>>>
+>>> I'm ok either way, but I don't see big win code-wise. The user-space
+>>> side saving will be literally a one liner. In the kernel the get/set
+>>> sockopt could be consolidated, but there will be a slightly increase in
+>>> complexity, to extract the ioctl len from the ioctl op value itself.
+>>
+>> The current patch also requires copy_from_user() to get the count, so I
+>> don't think they are different in that sense.
+>>
+>> The difference will be marginal anyway, and it may turn out encoding the
+>> length in the ioctl number requires a bit more code.
+> 
+> I'm sorry, almost mid-air collision. I just send out the rfc v3, and I
+> read your reply here only afterwards.
+> 
+> I stuck to separate ioctls operations; as an additional reason for that,
+> I understand there is interest in extending the features space even
+> more, and let user-space/kernel with different features space limits
+> easily interact.
+> 
+> I think that with a single ioctl either the kernel or the user-space
+> should be update to handle explicitly every additional features space
+> expansion, while the API proposed here no additional changes should be
+> required.
 
-On Sat, Jun 7, 2025 at 6:54=E2=80=AFPM Neal Cardwell <ncardwell@google.com>=
- wrote:
->
-> On Sat, Jun 7, 2025 at 3:13=E2=80=AFPM Neal Cardwell <ncardwell@google.co=
-m> wrote:
-> >
-> > On Fri, Jun 6, 2025 at 6:34=E2=80=AFPM Eric Wheeler <netdev@lists.ewhee=
-ler.net> wrote:
-> > >
-> > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
-> > > > On Thu, Jun 5, 2025 at 9:33=E2=80=AFPM Eric Wheeler <netdev@lists.e=
-wheeler.net> wrote:
-> > > > >
-> > > > > Hello Neal,
-> > > > >
-> > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T=
--6RFT+
-> > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728=
-TXS at
-> > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance wit=
-h
-> > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with de=
-vices
-> > > > > across the switch on 10Gbit ports runs at full 10GbE.
-> > > > >
-> > > > > Interestingly, the problem only presents itself when transmitting
-> > > > > from Linux; receive traffic (to Linux) performs just fine:
-> > > > >         ~60Mbit: Linux v6.6.85 =3DTX=3D> 10GbE -> switch -> 1GbE =
- -> device
-> > > > >          ~1Gbit: device        =3DTX=3D>  1GbE -> switch -> 10GbE=
- -> Linux v6.6.85
-> > > > >
-> > > > > Through bisection, we found this first-bad commit:
-> > > > >
-> > > > >         tcp: fix to allow timestamp undo if no retransmits were s=
-ent
-> > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aada=
-d69bb9e
-> > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1=
-591d45f
-> > > > >
-> > > >
-> > > > Thank you for your detailed report and your offer to run some more =
-tests!
-> > > >
-> > > > I don't have any good theories yet. It is striking that the apparen=
-t
-> > > > retransmit rate is more than 100x higher in your "Before Revert" ca=
-se
-> > > > than in your "After Revert" case. It seems like something very odd =
-is
-> > > > going on. :-)
-> > >
-> > > good point, I wonder what that might imply...
-> > >
-> > > > If you could re-run tests while gathering more information, and sha=
-re
-> > > > that information, that would be very useful.
-> > > >
-> > > > What would be very useful would be the following information, for b=
-oth
-> > > > (a) Before Revert, and (b) After Revert kernels:
-> > > >
-> > > > # as root, before the test starts, start instrumentation
-> > > > # and leave it running in the background; something like:
-> > > > (while true; do date +%s.%N; ss -tenmoi; sleep 0.050; done) > /tmp/=
-ss.txt &
-> > > > nstat -n; (while true; do date +%s.%N; nstat; sleep 0.050; done)  >
-> > > > /tmp/nstat.txt &
-> > > > tcpdump -w /tmp/tcpdump.${eth}.pcap -n -s 116 -c 1000000  &
-> > > >
-> > > > # then run the test
-> > > >
-> > > > # then kill the instrumentation loops running in the background:
-> > > > kill %1 %2 %3
-> > >
-> > > Sure, here they are:
-> > >
-> > >         https://www.linuxglobal.com/out/for-neal/
-> >
-> > Hi Eric,
-> >
-> > Many thanks for the traces! These traces clearly show the buggy
-> > behavior. The problem is an interaction between the non-SACK behavior
-> > on these connections (due to the non-Linux "device" not supporting
-> > SACK) and the undo logic. The problem is that, for non-SACK
-> > connections, tcp_is_non_sack_preventing_reopen() holds steady in
-> > CA_Recovery or CA_Loss at the end of a loss recovery episode but
-> > clears tp->retrans_stamp to 0. So that upon the next ACK the "tcp: fix
-> > to allow timestamp undo if no retransmits were sent" sees the
-> > tp->retrans_stamp at 0 and erroneously concludes that no data was
-> > retransmitted, and erroneously performs an undo of the cwnd reduction,
-> > restoring cwnd immediately to the value it had before loss recovery.
-> > This causes an immediate build-up of queues and another immediate loss
-> > recovery episode. Thus the higher retransmit rate in the buggy
-> > scenario.
-> >
-> > I will work on a packetdrill reproducer, test a fix, and post a patch
-> > for testing. I think the simplest fix would be to have
-> > tcp_packet_delayed(), when tp->retrans_stamp is zero, check for the
-> > (tp->snd_una =3D=3D tp->high_seq && tcp_is_reno(tp)) condition and not
-> > allow tcp_packet_delayed() to return true in that case. That should be
-> > a precise fix for this scenario and does not risk changing behavior
-> > for the much more common case of loss recovery with SACK support.
->
-> Indeed, I'm able to reproduce this issue with erroneous undo events on
-> non-SACK connections at the end of loss recovery with the attached
-> packetdrill script.
->
-> When you run that script on a kernel with the "tcp: fix to allow
-> timestamp undo if no retransmits were sent" patch, we see:
->
-> + nstat shows an erroneous TcpExtTCPFullUndo event
->
-> + the loss recovery reduces cwnd from the initial 10 to the correct 7
-> (from CUBIC) but then the erroneous undo event restores the pre-loss
-> cwnd of 10 and leads to a final cwnd value of 11
->
-> I will test a patch with the proposed fix and report back.
+It is not a problem with the VHOST_GET_FEATURES_ARRAY() macro I 
+suggested. It takes the size of array as a parameter, enabling it to 
+grow without updating the ioctl definition.
 
-Oops, forgot to attach the packetdrill script! Let's try again...
-
-neal
-
---000000000000ee6ed6063703ad85
-Content-Type: application/octet-stream; 
-	name="fr-non-sack-hold-at-high-seq.pkt"
-Content-Disposition: attachment; filename="fr-non-sack-hold-at-high-seq.pkt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mbmv4qkx0>
-X-Attachment-Id: f_mbmv4qkx0
-
-Ly8gVGVzdCB0aGF0IGluIG5vbi1TQUNLIGZhc3QgcmVjb3ZlcnksIHdlIHN0YXkgaW4gQ0FfUmVj
-b3Zlcnkgd2hlbgovLyBzbmRfdW5hID09IGhpZ2hfc2VxLCBhbmQgY29ycmVjdGx5IGxlYXZlIHdo
-ZW4gc25kX3VuYSA+IGhpZ2hfc2VxLgovLyBBbmQgdGhhdCB0aGlzIGRvZXMgbm90IGNhdXNlIGEg
-c3B1cmlvdXMgdW5kby4KCi8vIFNldCB1cCBjb25maWcuCmAuLi9jb21tb24vZGVmYXVsdHMuc2hg
-CgovLyBFc3RhYmxpc2ggYSBjb25uZWN0aW9uLgogICAgMCBzb2NrZXQoLi4uLCBTT0NLX1NUUkVB
-TSwgSVBQUk9UT19UQ1ApID0gMwogICArMCBzZXRzb2Nrb3B0KDMsIFNPTF9TT0NLRVQsIFNPX1JF
-VVNFQUREUiwgWzFdLCA0KSA9IDAKICAgKzAgYmluZCgzLCAuLi4sIC4uLikgPSAwCiAgICswIGxp
-c3RlbigzLCAxKSA9IDAKCiAgKzAgYG5zdGF0IC1uYAoKICAgKzAgPCBTIDA6MCgwKSB3aW4gMzI3
-OTIgPG1zcyAxMDAwLG5vcCx3c2NhbGUgNz4KICAgKzAgPiBTLiAwOjAoMCkgYWNrIDEgPG1zcyAx
-NDYwLG5vcCx3c2NhbGUgOD4KKy4wMjAgPCAuIDE6MSgwKSBhY2sgMSB3aW4gMzIwCiAgICswIGFj
-Y2VwdCgzLCAuLi4sIC4uLikgPSA0CgovLyBXcml0ZSBzb21lIGRhdGEsIGFuZCBzZW5kIHRoZSBp
-bml0aWFsIGNvbmdlc3Rpb24gd2luZG93LgogICArMCB3cml0ZSg0LCAuLi4sIDE1MDAwKSA9IDE1
-MDAwCiAgICswID4gUC4gMToxMDAwMSgxMDAwMCkgYWNrIDEKCi8vIExpbWl0ZWQgdHJhbnNtaXQ6
-IG9uIGZpcnN0IGR1cGFjayAoZm9yIHBrdCAyKSwgc2VuZCBhIG5ldyBkYXRhIHNlZ21lbnQuCisu
-MDIwIDwgLiAxOjEoMCkgYWNrIDEgd2luIDMyMAogICArMCA+IC4gMTAwMDE6MTEwMDEoMTAwMCkg
-YWNrIDEKICArMCAleyBwcmludCh0Y3BpX3NuZF9jd25kKSB9JQogICswICV7IHByaW50KHRjcGlf
-c2Fja2VkKSB9JQoKLy8gTGltaXRlZCB0cmFuc21pdDogb24gc2Vjb25kIGR1cGFjayAoZm9yIHBr
-dCAzKSwgc2VuZCBhIG5ldyBkYXRhIHNlZ21lbnQuCisuMDAyIDwgLiAxOjEoMCkgYWNrIDEgd2lu
-IDMyMAogICArMCA+IC4gMTEwMDE6MTIwMDEoMTAwMCkgYWNrIDEKICArMCAleyBhc3NlcnQgdGNw
-aV9zbmRfY3duZCA9PSAxMCwgIHRjcGlfc25kX2N3bmQgfSUKICArMCAleyBwcmludCh0Y3BpX3Nh
-Y2tlZCkgfSUKCgovLyBPbiB0aGlyZCBkdXBhY2sgKGZvciBwa3QgNCksIGVudGVyIGZhc3QgcmVj
-b3ZlcnkuCiAgICswIDwgLiAxOjEoMCkgYWNrIDEgd2luIDMyMAogICArMCA+IC4gMToxMDAxKDEw
-MDApIGFjayAxCiAgICswICV7IGFzc2VydCB0Y3BpX2NhX3N0YXRlID09IFRDUF9DQV9SZWNvdmVy
-eSwgdGNwaV9jYV9zdGF0ZSB9JQoKLy8gUmVjZWl2ZSBkdXBhY2sgZm9yIHBrdCA1OgorLjAwMiA8
-IC4gMToxKDApIGFjayAxIHdpbiAzMjAKCi8vIFJlY2VpdmUgZHVwYWNrIGZvciBwa3QgNjoKKy4w
-MDIgPCAuIDE6MSgwKSBhY2sgMSB3aW4gMzIwCgovLyBSZWNlaXZlIGR1cGFjayBmb3IgcGt0IDc6
-CisuMDAyIDwgLiAxOjEoMCkgYWNrIDEgd2luIDMyMAoKLy8gUmVjZWl2ZSBkdXBhY2sgZm9yIHBr
-dCA4OgorLjAwMiA8IC4gMToxKDApIGFjayAxIHdpbiAzMjAKCi8vIFJlY2VpdmUgZHVwYWNrIGZv
-ciBwa3QgOToKKy4wMDIgPCAuIDE6MSgwKSBhY2sgMSB3aW4gMzIwCgovLyBSZWNlaXZlIGR1cGFj
-ayBmb3IgcGt0IDEwOgorLjAwMiA8IC4gMToxKDApIGFjayAxIHdpbiAzMjAKCi8vIFJlY2VpdmUg
-ZHVwYWNrIGZvciBsaW1pdGVkIHRyYW5zbWl0IG9mIHBrdCAxMToKKy4wMDIgPCAuIDE6MSgwKSBh
-Y2sgMSB3aW4gMzIwCgovLyBSZWNlaXZlIGR1cGFjayBmb3IgbGltaXRlZCB0cmFuc21pdCBvZiBw
-a3QgMTI6CisuMDAyIDwgLiAxOjEoMCkgYWNrIDEgd2luIDMyMAoKLy8gUmVjZWl2ZSBjdW11bGF0
-aXZlIEFDSyBmb3IgZmFzdCByZXRyYW5zbWl0IHRoYXQgcGx1Z2dlZCB0aGUgc2VxdWVuY2UgaG9s
-ZS4KLy8gQmVjYXVzZSB0aGlzIGlzIGEgbm9uLVNBQ0sgY29ubmVjdGlvbiBhbmQgc25kX3VuYSA9
-PSBoaWdoX3NlcSwKLy8gd2Ugc3RheSBpbiBDQV9SZWNvdmVyeS4KKy4wMjAgPCAuIDE6MSgwKSBh
-Y2sgMTIwMDEgd2luIDMyMAogICArMCAleyBhc3NlcnQgdGNwaV9jYV9zdGF0ZSA9PSBUQ1BfQ0Ff
-UmVjb3ZlcnksIHRjcGlfY2Ffc3RhdGUgfSUKICAgKzAgJXsgcHJpbnQodGNwaV9zbmRfY3duZCkg
-fSUKCi8vIFJlY2VpdmUgQUNLIGFkdmFuY2luZyBzbmRfdW5hIHBhc3QgaGlnaF9zZXEKKy4wMDIg
-PCAuIDE6MSgwKSBhY2sgMTMwMDEgd2luIDMyMAogICArMCAleyBhc3NlcnQgdGNwaV9jYV9zdGF0
-ZSA9PSBUQ1BfQ0FfT3BlbiwgdGNwaV9jYV9zdGF0ZSB9JQogICArMCAleyBwcmludCh0Y3BpX3Nu
-ZF9jd25kKSB9JQogICArMCBgbnN0YXRgCg==
---000000000000ee6ed6063703ad85--
+Regards,
+Akihiko Odaki
 
