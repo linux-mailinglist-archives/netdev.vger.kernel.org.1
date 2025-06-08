@@ -1,139 +1,217 @@
-Return-Path: <netdev+bounces-195563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2FD5AD1307
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 17:35:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61EDDAD1315
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 17:49:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E80873A9D47
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 15:35:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1558816896C
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 15:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCC4186284;
-	Sun,  8 Jun 2025 15:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E033516DEB3;
+	Sun,  8 Jun 2025 15:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="LkOSeTj/"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qFBaxcwr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44731185E7F
-	for <netdev@vger.kernel.org>; Sun,  8 Jun 2025 15:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38F417A586
+	for <netdev@vger.kernel.org>; Sun,  8 Jun 2025 15:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749396926; cv=none; b=n+cLCLnYNyNyeiWaEYzVNZOf6vQmOyZ3MPnik73T8/gg0eyocf8LArfBlfY4p2lNo63jcsxuDKf2XsDjA8s6d5rVqQUpuf7ePo5+yX1/mLhvDWRttHNYIQTJxcIlU2DlZnQHN/vQSZSbg8G+pY9VsVA1bL3CdZN1RRGQCoM7wWI=
+	t=1749397791; cv=none; b=HY6a/JrR3lllcQAWE8apkp+OzTGJDH3GbVjBjDCqjaYsFMzWLyJCCZd+HPN0BdO3wYU+2Dw1ruaSbg33vVK6QbU+v9M4asA1mkALBP3TZgInKejWMsqCLWmp+QlGi/1K9Q3xwufIHxbgjHPSGqFPwKCUY+FcwrkWhM1U8FCSq2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749396926; c=relaxed/simple;
-	bh=+7FrqGD94iVWcdbGz2+uCljqiSBoVQtmboCi9o5L1VE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hpyWD9+0KhdNyJdwt2Ew40FJgPPRDu9ss+7LYZ9wftUrnxWT8UnIZBFsSfhpxfIvhAlQlHPpnnQIA1jZ3Fyk3Dd87EFK0+bv2qWAzz6LDC+y6serdt9y9dWP5pFozZ9hjeDuH17SRHDmBqehI/0YKq/ktICONT2dQfF6s7zVd5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=LkOSeTj/; arc=none smtp.client-ip=185.67.36.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id 746B1240104
-	for <netdev@vger.kernel.org>; Sun,  8 Jun 2025 17:35:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
-	s=1984.ea087b; t=1749396917;
-	bh=+7FrqGD94iVWcdbGz2+uCljqiSBoVQtmboCi9o5L1VE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
-	b=LkOSeTj/YHKtLcJ/mB8whXDh7KtNkhjkCAzn9WTjlG7gvMEsLWqiJA+opAt++/fI5
-	 YXKcTfP0QBufkq826TnL9qHarKSp9acOTKh7wjBMTfqI3TC3pEJZbqV168sAB/xjzq
-	 01bz2j13nxIqMdKH/nn8tj2IVrvmJaM8lrKb9ZLCRBet9cs9cQh/pYwSOct29t5VeK
-	 v+1T6AgY8Rm5MU57aHOSYNihJKgt49FmXQBKQ2iCNrOcyEU3c3e+i+pfNdcfgcPb0K
-	 mtWat8/c6Fg99C9XXN4IreikGmzcZk0/hGVGI5j8GhkpArLEvqi5UyH8RGK4n+nK/P
-	 nHHJOd0a+bRX+7JwF0nx03OPpMl8fFDFNIbBc4lG3uzKCVHZ23CPukwmmJMQwtGkKz
-	 mU4u0BJn/aBVPtulV0dW2REvUpxln3KGidTT+Qg3TsyJ97Iv5ZKMWxdiUeQvM/C4qt
-	 fRzMDeWIPUH3tEjOg47ZKEaIZCR+8RyP7kx8hBJrlJgx2/h21DD
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bFfJK1d0pz6tvc;
-	Sun,  8 Jun 2025 17:35:13 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-Date: Sun, 08 Jun 2025 15:34:55 +0000
-Subject: [PATCH bpf-next] bpf: Fix RCU usage in bpf_get_cgroup_classid_curr
- helper
+	s=arc-20240116; t=1749397791; c=relaxed/simple;
+	bh=MKsTM1+C9QeCGD0Pjs9eZErUYlC1Pyuc2805DCEa5Ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P3woXKY4Ymxrhq2C/s1PcC2RRjm9DteaSeoCvXiBDc0Dz1A51bifBLXadcuYBjRkhcGumG5cDW7u0XlGoIqX79ihvqSZa0Ok/zmbi3LJKZ6d5vFe8xWEiT2x6pKCdbjZ3Fyg2+W0sWW0w530p0qUNxV4woHdG6HZYlVpkFmeLIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qFBaxcwr; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7d20451c016so195534685a.1
+        for <netdev@vger.kernel.org>; Sun, 08 Jun 2025 08:49:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1749397789; x=1750002589; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=15SfyzB2KZkvwixg00o+49m0a1+RaFWhfwNSGqXDKgg=;
+        b=qFBaxcwrGwx3aC4keLcL1yxTx9LInLVOMMYK5CmMizK9qjXY9C3o221FK2DC9cBFJa
+         i0FJjBgYkCxNKBw4qQbWmAchJ61jl1pcxmPUUsX8+OTonLcqH7Ks1JbO1WhqS+rMjngn
+         1Qhk0GRZP7Q6iIuPhV5yJjrDsGr4YqymemcP3H4k29FfwbPeOBXb3yt/TODOB3AOg8yN
+         I8SROv+PIBKd1ereY3L7onL+lQTPsdITHJO1U83Xh03NzOm60f4o0wzJB48vj8QjCQee
+         9gUeBu3fZTO9qNY7T0nZVgpdu6LlRskPWtMDKEfRk4YhzG3rSgakJSMbRDf6BlG+UJlk
+         0S0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749397789; x=1750002589;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=15SfyzB2KZkvwixg00o+49m0a1+RaFWhfwNSGqXDKgg=;
+        b=QE1aW4GYbO56fI/OkUMY16/VbbpnY5r7PLFrcDla9me8WUitPrZO5YBo3q82sAShwA
+         Zp/gUIMud7fYspCVIcGfYoO6y0IeDm+E5xmTEVqtESAvBgt4YVicHX4s4/BxEXHo0E9+
+         6dl6XisGMM3g2JADkCjoCbWtNGghAtO0EQRDNLkdR7A8bBRrmIuNzcxQfsL1Jpg0VTiM
+         750zxfsb8H/EmIgnoNDXZ63s7N0JMrJ3CaBJ0AW2H6b4Eyg1Nh92wAQVK5SlbKmoIsW7
+         EfVYs6/d+uzDj/AiUjQB9T1H5oaLqLrfoElKbwY/Q8uTHsD4p4fyJVk2cNwEjLXlxpPw
+         nP0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWxsV8o3HvyYWIAdJ/MMj/8VLDBzSyMkw4o4A6wA0YG6Bdikwq04ZYeVjlfqJSntmlfSq8IyVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxuega+xz52DlqUEO62zBbtmMQNIImCXNgEf9eyvT1iqumOnqW
+	UKaBmCL9A9oMR4ynzwTgPoS5RmBbhAGh8SIUIFJECx2DdwGhZ+zzfLptNvELe+mAAko=
+X-Gm-Gg: ASbGncszz4wRVKPSg4FNVE8GFxrUOQ62tdLzi+J/+t0N03Ac/FmeLUDB9M8lyD5Vbgl
+	w0XEkxkkZCY1UcBBT93zEuVRWVRv9C8STLuDvjUuZngChkEs7xoSuTMcR7aHGQTza4tVeC20y61
+	EwwZ4JYBOyJUqmfQqSK9Z4sorWXN1o9JWYxmW0B8+97TF3tzpURA8EztaMDDGr/sr1wD9uD/+R7
+	Xils+eBkBEnGM2u+h1UDLcdFOCTn4y4DGKXQHIgxPNToU+2CpTSg0mDjfBI9atbRGb/0aVAKjK2
+	VFShgNR6r84fumGrWOMh7YJ5NZbFC2c1GscOa6x+Bh7ZFBN6DGleFh3QN5OwsIUx5K205lUuOBn
+	lXhgRs0kkrE0RekmOmgxD4PdgQVdmSiQ1XMzi+Bg=
+X-Google-Smtp-Source: AGHT+IFMItTRkpFBvAJi4PVEEUt3/gJfRAjUZYN3c1UYEfhEKFgqVle4xRdj02wbVxFz+gkYB1ZUlw==
+X-Received: by 2002:a05:620a:9163:b0:7d3:8df7:af6e with SMTP id af79cd13be357-7d38df7ba37mr494433985a.32.1749397788793;
+        Sun, 08 Jun 2025 08:49:48 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a61b5fesm425460185a.93.2025.06.08.08.49.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Jun 2025 08:49:48 -0700 (PDT)
+Date: Sun, 8 Jun 2025 08:49:45 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: moyuanhao3676@163.com
+Cc: edumazet@google.com, kuniyu@amazon.com, pabeni@redhat.com,
+ willemb@google.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] net: core: fix UNIX-STREAM alignment in
+ /proc/net/protocols
+Message-ID: <20250608084945.0342a4f1@hermes.local>
+In-Reply-To: <20250608144652.27079-1-moyuanhao3676@163.com>
+References: <20250608144652.27079-1-moyuanhao3676@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net>
-X-B4-Tracking: v=1; b=H4sIAJ6tRWgC/x2M7QpAQBAAX0X729ZxvvIqkq67xUbo9kjJu7v8n
- JqZB4Q8k0CbPODpYuF9i5ClCdjZbBMhu8iQq7xUlWrQ2xNHvjEYWQa7yiDBBEJFrtZjoWuXEcT
- 48BStf9z17/sBBQ7m8GgAAAA=
-X-Change-ID: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
- Tejun Heo <tj@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com, 
- Charalampos Mitrodimas <charmitro@posteo.net>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1749396896; l=1811;
- i=charmitro@posteo.net; s=20250526; h=from:subject:message-id;
- bh=+7FrqGD94iVWcdbGz2+uCljqiSBoVQtmboCi9o5L1VE=;
- b=YnnNXup1gwqyVg+Q760GVOdLmszHN8jeFOIQHKavcH7xBLebR+ekaAPuUS7md/qk9y1was3qj
- QLScmUeznjwCQec6DbpYC67nuAyHEyCP5kpLdrgSBwV/9ZPGoq2Zxve
-X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
- pk=PNHEh5o1dcr5kfKoZhfwdsfm3CxVfRje7vFYKIW0Mp4=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
-types") made bpf_get_cgroup_classid_curr helper available to all BPF
-program types.  This helper used __task_get_classid() which calls
-task_cls_state() that requires rcu_read_lock_bh_held().
+On Sun,  8 Jun 2025 22:46:52 +0800
+moyuanhao3676@163.com wrote:
 
-This triggers an RCU warning when called from BPF syscall programs
-which run under rcu_read_lock_trace():
+> From: MoYuanhao <moyuanhao3676@163.com>
+>=20
+> Widen protocol name column from %-9s to %-11s to properly display
+> UNIX-STREAM and keep table alignment.
+>=20
+> before modification=EF=BC=9A
+> console:/ # cat /proc/net/protocols
+> protocol  size sockets  memory press maxhdr  slab module     cl co di ac =
+io in de sh ss gs se re sp bi br ha uh gp em
+> PPPOL2TP   920      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> HIDP       808      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> BNEP       808      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> RFCOMM     840      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> KEY        864      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PACKET    1536      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PINGv6    1184      0      -1   NI       0   yes  kernel      y  y  y  n =
+ n  y  n  n  y  y  y  y  n  y  y  y  y  y  n
+> RAWv6     1184      0      -1   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  n  y  y  y  y  n  n
+> UDPLITEv6 1344      0       0   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  n  n  n  y  y  y  n
+> UDPv6     1344      0       0   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  n  n  n  y  y  y  n
+> TCPv6     2352      0       0   no     320   yes  kernel      y  y  y  y =
+ y  y  y  y  y  y  y  y  y  n  y  y  y  y  y
+> PPTP       920      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PPPOE      920      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> UNIX-STREAM 1024     29      -1   NI       0   yes  kernel      y  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  y  n  n
+> UNIX      1024    193      -1   NI       0   yes  kernel      y  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> UDP-Lite  1152      0       0   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  y  n  n  y  y  y  n
+> PING       976      0      -1   NI       0   yes  kernel      y  y  y  n =
+ n  y  n  n  y  y  y  y  n  y  y  y  y  y  n
+> RAW        984      0      -1   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  n  y  y  y  y  n  n
+> UDP       1152      0       0   NI       0   yes  kernel      y  y  y  n =
+ y  y  y  n  y  y  y  y  y  n  n  y  y  y  n
+> TCP       2192      0       0   no     320   yes  kernel      y  y  y  y =
+ y  y  y  y  y  y  y  y  y  n  y  y  y  y  y
+> SCO        848      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> L2CAP      824      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> HCI        888      0      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> NETLINK   1104     18      -1   NI       0   no   kernel      n  n  n  n =
+ n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+>=20
+> after modification:
+> console:/ # cat /proc/net/protocols
+> protocol    size sockets  memory press maxhdr  slab module     cl co di a=
+c io in de sh ss gs se re sp bi br ha uh gp em
+> PPPOL2TP     920      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> HIDP         808      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> BNEP         808      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> RFCOMM       840      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> KEY          864      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PACKET      1536      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PINGv6      1184      0      -1   NI       0   yes  kernel      y  y  y  =
+n  n  y  n  n  y  y  y  y  n  y  y  y  y  y  n
+> RAWv6       1184      0      -1   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  n  y  y  y  y  n  n
+> UDPLITEv6   1344      0       0   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  n  n  n  y  y  y  n
+> UDPv6       1344      0       0   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  n  n  n  y  y  y  n
+> TCPv6       2352      0       0   no     320   yes  kernel      y  y  y  =
+y  y  y  y  y  y  y  y  y  y  n  y  y  y  y  y
+> PPTP         920      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> PPPOE        920      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> UNIX-STREAM 1024     29      -1   NI       0   yes  kernel      y  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  y  n  n
+> UNIX        1024    193      -1   NI       0   yes  kernel      y  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> UDP-Lite    1152      0       0   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  y  n  n  y  y  y  n
+> PING         976      0      -1   NI       0   yes  kernel      y  y  y  =
+n  n  y  n  n  y  y  y  y  n  y  y  y  y  y  n
+> RAW          984      0      -1   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  n  y  y  y  y  n  n
+> UDP         1152      0       0   NI       0   yes  kernel      y  y  y  =
+n  y  y  y  n  y  y  y  y  y  n  n  y  y  y  n
+> TCP         2192      0       0   no     320   yes  kernel      y  y  y  =
+y  y  y  y  y  y  y  y  y  y  n  y  y  y  y  y
+> SCO          848      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> L2CAP        824      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> HCI          888      0      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+> NETLINK     1104     18      -1   NI       0   no   kernel      n  n  n  =
+n  n  n  n  n  n  n  n  n  n  n  n  n  n  n  n
+>=20
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: MoYuanhao <moyuanhao3676@163.com>
+> ---
 
-  WARNING: suspicious RCU usage
-  6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
-  -----------------------------
-  net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usage!
-
-Fix this by replacing __task_get_classid() with task_cls_classid()
-which handles RCU locking internally using regular rcu_read_lock() and
-is safe to call from any context.
-
-Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b4169a1cfb945d2ed0ec
-Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
-Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 30e7d36790883b29174654315738e93237e21dd0..3b3f81cf674dde7d2bd83488450edad4e129bdac 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -3083,7 +3083,7 @@ static const struct bpf_func_proto bpf_msg_pop_data_proto = {
- #ifdef CONFIG_CGROUP_NET_CLASSID
- BPF_CALL_0(bpf_get_cgroup_classid_curr)
- {
--	return __task_get_classid(current);
-+	return task_cls_classid(current);
- }
- 
- const struct bpf_func_proto bpf_get_cgroup_classid_curr_proto = {
-
----
-base-commit: 079e5c56a5c41d285068939ff7b0041ab10386fa
-change-id: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
-
-Best regards,
--- 
-Charalampos Mitrodimas <charmitro@posteo.net>
-
+This could break existing applications. Changing the format of /proc output
+is an ABI change.
 
