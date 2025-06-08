@@ -1,139 +1,129 @@
-Return-Path: <netdev+bounces-195590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD393AD14B8
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 23:32:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77767AD15B7
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 01:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C6C3A7FA9
-	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 21:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3814F168C02
+	for <lists+netdev@lfdr.de>; Sun,  8 Jun 2025 23:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919E3255E26;
-	Sun,  8 Jun 2025 21:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3F5266EFA;
+	Sun,  8 Jun 2025 23:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w9VG/uwr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lkSbGoEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB3026AEC;
-	Sun,  8 Jun 2025 21:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9922E288DB;
+	Sun,  8 Jun 2025 23:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749418321; cv=none; b=CpVptAhiB0EHL7fUbUNcBBMQil3R2mWBtegvRmpLuYZ37NBLndDr5qOA5OVWcSZRyxCcAjLvaq5vXKfXjlInE0svYAejJlAahiARt85rF/jWtKaiq25a4gb+I6A12weCJS054hU6j4ZynUtDWxtiopJw7AOGXhnj9vvxMQj4J9w=
+	t=1749425385; cv=none; b=Pqx8nO5/t7Asa0MclylIifIFQhTNHvEPsTLrBLKB36/3QHaYz2PJgAbO3bG8V3qahDjPc4WtbDqsADDxyAKLDk4To6JRERCWMLbTY28kFYeclyMV2mb2G+qc88y3xBM2ji53cKYDAAftF7/cmdnODdWBkcHzjjzFmkVOOxK2YU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749418321; c=relaxed/simple;
-	bh=ulUePR5jT4qAREe0JlQxVCloNhSU+AG4wpLgSicpXVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ap7n79IiT76/tx5ab+wcmkvfny4n+yfCyrMl6PbADAhTep9FuyrbTdfUUJ0X10/wrNilfH7qgMyGz7WRp1qm/OjxgVX3b2Ycgn6qFHaQqat7gojSjKUneicONGpC8KvrZKJrXCZW4y98NQ4w7tCmGSViwMIW2jGUS32EKiFCoWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w9VG/uwr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cNR/B7AqzdKfH857DzdE8tOVpJSvBSdIIAm71LoG8+Q=; b=w9VG/uwrH6ldVIbDNCSzexwlcA
-	0IkhUzqmyvjr8S5smyyX/m9une4wVH4uaSieDcpqc0vdEgdI/OJckwaOmoF0++WOuysWVwbdKKNOO
-	DZiNCTs/0sijtcNrgbwvQmednFxrbPPUH+WXRH8ZYxfB17hNyUJj3xP7iMFp8IU13dFI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uONcB-00F6it-L9; Sun, 08 Jun 2025 23:31:39 +0200
-Date: Sun, 8 Jun 2025 23:31:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
+	s=arc-20240116; t=1749425385; c=relaxed/simple;
+	bh=afKw2RLAsHkx4z7Ink9JdbmTDsPPLL5SsmxRARZhi4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SM0dTulxK/YCogDtbpgwKea23/DahWD+wubIOt3WQgE96OEj2ykdByWdlJOoAY/CuyynUJL5Hrs0ZEB//bIUUDRrjLdSm+4UULFntGIgjTbaHaLrbuQCWbGL1vTZNgbsv6FTA/XEEgXcaa3oR+rixNCIDwgHkgOAnnfkp1nvaUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lkSbGoEN; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6facba680a1so42493886d6.3;
+        Sun, 08 Jun 2025 16:29:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749425382; x=1750030182; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SU8RawjSZdNZIx5mCZErc6Hx9E5djpvdZZjZt5itdtY=;
+        b=lkSbGoENEnE8LutZLSmIB6Q037ZzzwuUaQpA06WQPVnJv78fIgrlXa13+xHllXDdwk
+         lgGBP5R4vcdWcl3rEnnNB1ESQKVWaDPNZvBjwIaOh1zYaAb1I4ILnLx/JwGn6SOim1KK
+         zBkwAsDfp1Y7cNVE/Vx68k2tzrz5LAuo/qQaeoTzmn+PEtzbYP45F548zQGGLg+Fw43c
+         BM7MX08FgQ6Tdl1CsRyyhuDQYkLgPs9BRWXj6Dg+ddpd89iHBkPHY/vu0HTQbfQQiQPO
+         qbr+lqN7VZGdMuhJwbTlp3fpjSjllm5LW4/Afa/IVKie0xAxfliEh8zvvzhGbXMQev/3
+         JN8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749425382; x=1750030182;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SU8RawjSZdNZIx5mCZErc6Hx9E5djpvdZZjZt5itdtY=;
+        b=u5J3GvEuG0O3p9kQBeti69cERKWHV1JT9WWjetz9uXAxnEC/hqrAVIrxD3Jb6N6qG6
+         Q0l+9p+lsJwXKtcNxycLtNHOnGVtble/h2D9J/G4LqxWTJZlFbs/MY4nbgu93wJNI2pE
+         3wTNkIXTTnwSKiHZ52s4VocMtH4QRzmufz7FRw3rWZd29KdoUA7KSC8VaWunlmzmBCeB
+         NP+2P6stLGw00+bAzmhTWOm0iOIHrgQN66qZ4pTOba0IQlL3pWr6+lBNTXQeleyC72OF
+         BsmIq+bumId+wfNpV64tv7/nIChiLf5hVyDVPKlhLv9RgEKTmxNzfMvnoxgDMXaGFjNp
+         ExrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAePaSPd96Ig+PW6iqhPHs1AvqZmSNrOZ7KbIZ6SqeI+lCtIynoQWNX5sSpAgO1SwObdZJpQ7uUR1b@vger.kernel.org, AJvYcCWVRwnQZtTvi/iVQvYnnNOSfl3zwqYNuZmEOsyQPe/FAPex9rKSfG0mDymc0/3E5qf52k4j+1fp@vger.kernel.org, AJvYcCXsWzWP3vYu5thkoaFz8qvlyojpeRDBfYqbO2rAws4RYRE04GpPxi01b4IYqw7D4pgBuCfFrm5Et4ZiyFze@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT4459CYh80HwvH/kB5zHvvpv6z3EnFrQImnT/mQ46d3nOoRlK
+	33EYmunwvsBJ2hfynny2u9JQI5b/WBJw0iVWFhtRGw22OT7Iwiczawrg
+X-Gm-Gg: ASbGnctVipoTvYsnA6ItZIGADUidFP6tHlB2zT2XR5Vi09xb/GcR0b88+O3CohTDID0
+	VI/2cfl6ipewagAnz+Xg+lHBFMnm/jaZqYPxRC6+2NlR7TEIiPqRP+h3oA66vOx4Z0rOTv7vnqK
+	BipcVi0MmG2j7J4Guf8KNt1JXaZ4jJLanvDEWHFtovfYpeIvnIoku0Z1P2h31XvPmhyeSBszF2q
+	B4Fmpuua2B9XdlxkhIE15a2ONv4720opZUPSIiKp0/woBZymkfE3WqkMAVAhaIXhlqqPtKEn0F9
+	pXT14PUcYpYBlZ++KF2Uv8h0dBtJ5IDLkC2JFw==
+X-Google-Smtp-Source: AGHT+IGptkGsilp0rjRsjr4k4/JNTYB2bLGg6xQxJeSBP2iNfrPSLopfC8ZXQso4Bk3xGJqa+Kzo+A==
+X-Received: by 2002:ad4:5ded:0:b0:6fa:fc96:d10a with SMTP id 6a1803df08f44-6fb08ff86f4mr198607016d6.27.1749425382538;
+        Sun, 08 Jun 2025 16:29:42 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6fb09ac85a8sm43748866d6.35.2025.06.08.16.29.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Jun 2025 16:29:42 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Jia-Wei Chang <jia-wei.chang@mediatek.com>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v3 12/13] arm64: dts: mediatek: mt7988a-bpi-r4: add sfp
- cages and link to gmac
-Message-ID: <934b1515-2da1-4479-848e-cd2475ebe98d@lunn.ch>
-References: <20250608211452.72920-1-linux@fw-web.de>
- <20250608211452.72920-13-linux@fw-web.de>
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Longbin Li <looong.bin@gmail.com>
+Cc: Han Gao <rabenda.cn@gmail.com>,
+	devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	sophgo@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Yixun Lan <dlan@gentoo.org>
+Subject: [PATCH 00/11] riscv: sophgo: sg2044: add DTS support for all available devices
+Date: Mon,  9 Jun 2025 07:28:24 +0800
+Message-ID: <20250608232836.784737-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250608211452.72920-13-linux@fw-web.de>
+Content-Transfer-Encoding: 8bit
 
-> +&gmac1 {
-> +	phy-mode = "internal";
-> +	phy-connection-type = "internal";
+As the clock driver for SG2044 got merged, it is possible to add
+dts node for all support devices of SG2044.
 
-ethernet-controller.yaml says:
+Inochi Amaoto (9):
+  riscv: dts: sophgo: sg2044: Add system controller device
+  riscv: dts: sophgo: sg2044: Add clock controller device
+  riscv: dts: sophgo: sg2044: Add GPIO device
+  riscv: dts: sophgo: sg2044: Add I2C device
+  riscv: dts: sophgo: sg2044: add DMA controller device
+  riscv: dts: sophgo: sg2044: Add MMC controller device
+  riscv: dts: sophgo: sophgo-srd3-10: add HWMON MCU device
+  riscv: dts: sophgo: sg2044: Add ethernet control device
+  riscv: dts: sophgo: sg2044: Add pinctrl device
 
-  phy-connection-type:
-    description:
-      Specifies interface type between the Ethernet device and a physical
-      layer (PHY) device.
-    enum:
-      # There is not a standard bus between the MAC and the PHY,
-      # something proprietary is being used to embed the PHY in the
-      # MAC.
-      - internal
-      - mii
-      - gmii
-  ...
+Longbin Li (2):
+  riscv: dts: sophgo: add SG2044 SPI NOR controller driver
+  riscv: dts: sophgo: add pwm controller for SG2044
 
-  phy-mode:
-    $ref: "#/properties/phy-connection-type"
+ .../boot/dts/sophgo/sg2044-sophgo-srd3-10.dts |  48 +++
+ arch/riscv/boot/dts/sophgo/sg2044.dtsi        | 313 ++++++++++++++++++
+ 2 files changed, 361 insertions(+)
 
-
-so phy-mode and phy-connection-type are the same thing.
-
-> +	/* SFP2 cage (LAN) */
-> +	sfp2: sfp2 {
-> +		compatible = "sff,sfp";
-> +		i2c-bus = <&i2c_sfp2>;
-> +		los-gpios = <&pio 2 GPIO_ACTIVE_HIGH>;
-> +		mod-def0-gpios = <&pio 83 GPIO_ACTIVE_LOW>;
-> +		tx-disable-gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
-> +		tx-fault-gpios = <&pio 1 GPIO_ACTIVE_HIGH>;
-> +		rate-select0-gpios = <&pio 3 GPIO_ACTIVE_LOW>;
-> +		maximum-power-milliwatt = <3000>;
-
-sff,sfp.yaml says:
-
-  maximum-power-milliwatt:
-    minimum: 1000
-    default: 1000
-    description:
-      Maximum module power consumption Specifies the maximum power consumption
-      allowable by a module in the slot, in milli-Watts. Presently, modules can
-      be up to 1W, 1.5W or 2W.
-
-I've no idea what will happen when the SFP core sees 3000. Is the
-comment out of date?
-
-	Andrew
+--
+2.49.0
 
 
