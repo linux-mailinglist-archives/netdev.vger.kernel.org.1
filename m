@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-195699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39358AD1FC2
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:49:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5712AD1FE3
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C503A7DC1
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:46:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 984C03B0CFD
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16ACB25A2CD;
-	Mon,  9 Jun 2025 13:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5954325B1EA;
+	Mon,  9 Jun 2025 13:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8eqc+36"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UIhbs9Bo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0038258CF5;
-	Mon,  9 Jun 2025 13:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9AE25B1DA;
+	Mon,  9 Jun 2025 13:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749476796; cv=none; b=g5PmQYPJHCKceVqrx3DPAhcMDRTCKL1AjrWPRs+YE/pxoQokQIdER1+AYI2kwo8VbOSUlcd8CIH3oK6cKhiceDyFFtB4s9xAxIFU23t6EaeHxMsay4n2M4f0cTedoRMKvNWf4ptgzPaus11qiak1oKnO6ZGlICoJJloXMKlw9Sk=
+	t=1749476832; cv=none; b=fi2U1FuoP9pRfjeThwqTAk3ec8qZGZVEaWr2tpWhvUclf7oZIqTFsC+2rqqvrPUDStdjmPothMm3mNBGDCXoYHwo1oDxcOM9z3OBWKAoPBBzvsFIzkUj7Y+WPmZiIPESm3iQM+ZL+d9aJFfIT7pntKGdWwztnHJBAEPFuqWoBuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749476796; c=relaxed/simple;
-	bh=3q8kh2RBJvFjh9VlHrBhc7cN7tnCeOi4qlcDWeWEBQ0=;
+	s=arc-20240116; t=1749476832; c=relaxed/simple;
+	bh=Z5NuxohrQLznppg9+0VUmhyKgfQrAojDypzx2UmnJqw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aqkhK0MUwljD1pjblrVF/xJFSULFYOWA29/0NhttTEKZPfpraUjzV0iD0F5QSQ/dDtAw+iF/uRgWgZ3U2qcbfQ5Yy2Qleo5veW6/3Y03LduSRQaAkCpqLTfwJhDPvpRteKGfVDFbbAHhgxalU23HJ4QYM4YAup0kT4BP7qLP158=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8eqc+36; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E87EBC4CEEB;
-	Mon,  9 Jun 2025 13:46:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VYfZPI8P4K1sAjwE5tD/gXqlsG3th/etcKDwLt9WSDq/YUWpzHB7hDCj2SYdZzlKUsYmcCVJke0XehynBXIkAjIbroDWq5kuusiG9aPDF8Jx1hWOjNj+hSwuRvcjgeWISlrzAJiCrpJmUKF9tjB2cxz8NshYtrHXJiroaoDMkNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UIhbs9Bo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF92AC4CEF5;
+	Mon,  9 Jun 2025 13:47:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749476795;
-	bh=3q8kh2RBJvFjh9VlHrBhc7cN7tnCeOi4qlcDWeWEBQ0=;
+	s=k20201202; t=1749476831;
+	bh=Z5NuxohrQLznppg9+0VUmhyKgfQrAojDypzx2UmnJqw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p8eqc+36O4OdKz8ZoHrfcNa97OIC/0UPlvSRhxK9Uokpq+NreDRM4SJB+4UVKQgNx
-	 dAshGE8C7AhCM2r7mmT77jhT9k9t/r/l/wtAZWuGMHZ9kPJKZKN4YTZm8ffAzb8/VY
-	 LZ2+zPJ6lTUE3fK+xJqR3mOKIsZQnu13gKCKepaCMYiVZALU/XKtwtA5KKzP/Wzq07
-	 6bUIeJeDIEhqusPFwi+wEQmsg7siqvYLMs+Ww+ki5dUG5fB4z8IOaiBdVyrSNDgAK8
-	 Mmhr+w3FWXBGkolDTqFzYQR7tgrhu6acQ7BItwWL4uFi1Dqj+kPCoWxUlMxaDfHC8F
-	 ubyfOfHzSujxQ==
+	b=UIhbs9BoaOaSQqvEeMPxCX6D3wPvQeDPHX4y9e5sWATNDcQb16FWJ04HQhBm1dilV
+	 Xr1R4JsDRcFpjcQAb1yTy+fxVTDC90aLqJUv4U11IEI7qMDtIQiPpEwAwstSTQCu3Z
+	 +KP8NLAQf3Hyn9b07ROaeWTeaQj7gqRBENqKissqhT6OzuMZbByPQn3hWZsYsIi64B
+	 DAWFvqrQILGkqe0D3KEJU/waPsp6BItIjr1CCwDA/befLaeBh4vrHKuvUSLoa4qE+i
+	 OatLvVaZypczDqd/m2dl19aB0CFIq9ueyzc48wN7jpN1mD6S4YodNdsrUl8KjAYMvZ
+	 Ch1Gjv3HRHNuw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -49,12 +49,12 @@ Cc: Chenyuan Yang <chenyuan0y@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
 	richardcochran@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 15/23] misc: tps6594-pfsm: Add NULL pointer check in tps6594_pfsm_probe()
-Date: Mon,  9 Jun 2025 09:46:02 -0400
-Message-Id: <20250609134610.1343777-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 11/18] misc: tps6594-pfsm: Add NULL pointer check in tps6594_pfsm_probe()
+Date: Mon,  9 Jun 2025 09:46:45 -0400
+Message-Id: <20250609134652.1344323-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250609134610.1343777-1-sashal@kernel.org>
-References: <20250609134610.1343777-1-sashal@kernel.org>
+In-Reply-To: <20250609134652.1344323-1-sashal@kernel.org>
+References: <20250609134652.1344323-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.32
+X-stable-base: Linux 6.6.93
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
@@ -170,10 +170,10 @@ minimal risk of regression.
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/misc/tps6594-pfsm.c b/drivers/misc/tps6594-pfsm.c
-index 9bcca1856bfee..db3d6a21a2122 100644
+index 88dcac8148922..71fbe31542e56 100644
 --- a/drivers/misc/tps6594-pfsm.c
 +++ b/drivers/misc/tps6594-pfsm.c
-@@ -281,6 +281,9 @@ static int tps6594_pfsm_probe(struct platform_device *pdev)
+@@ -260,6 +260,9 @@ static int tps6594_pfsm_probe(struct platform_device *pdev)
  	pfsm->miscdev.minor = MISC_DYNAMIC_MINOR;
  	pfsm->miscdev.name = devm_kasprintf(dev, GFP_KERNEL, "pfsm-%ld-0x%02x",
  					    tps->chip_id, tps->reg);
@@ -182,7 +182,7 @@ index 9bcca1856bfee..db3d6a21a2122 100644
 +
  	pfsm->miscdev.fops = &tps6594_pfsm_fops;
  	pfsm->miscdev.parent = dev->parent;
- 	pfsm->chip_id = tps->chip_id;
+ 
 -- 
 2.39.5
 
