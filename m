@@ -1,96 +1,81 @@
-Return-Path: <netdev+bounces-195907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45FB7AD2A84
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:28:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51F9DAD2A8C
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279043A40E0
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:27:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3797D7A1EB5
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7DB22B8A6;
-	Mon,  9 Jun 2025 23:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snNA452v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27C622D4D8;
+	Mon,  9 Jun 2025 23:31:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FFB22A4CC;
-	Mon,  9 Jun 2025 23:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from trinity3.trinnet.net (trinity.trinnet.net [96.78.144.185])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E5C148857;
+	Mon,  9 Jun 2025 23:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.78.144.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749511693; cv=none; b=HxfN2XUi38tjH4uoSmPu8Pde+JUpfYXxcN0BTy0dNwFZ0at59i+7uaexjcJTR+mNsevegjleWZQryDckuzcqZxoRxN9QRJNyO4omCCGjGC//0eDO7Sc3+HYmDszJb8mDyj3t2CebEIIR0n/w2HimDw0Lb0MgGqAEFxHuomZ4jVU=
+	t=1749511881; cv=none; b=jKusLQomTLgEdxuzda+furkBgbX1sQsGUSvDtGPeeDSzSVqGaC2wi+jExms7bPZSwzAs2+tpFan0JJjpatPK8ZjfV97+WWP/KEoe8qZ+mVAeaOm7d8SXiAMTPEYmBS5jRDiE+EfghUMoCDJ4WVtY9sFfh6K6BCLtrOrwwJSZXac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749511693; c=relaxed/simple;
-	bh=s81oEcid/OEGvazYHy8C4bU29ApBKyS/u//Zxdr+YSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bSfMTAvaQO2e8HlLvSIh30HuhR6PLmwwPAYWDdWk6AeKMDNNZBLhFyitvrQ+muGsIO39zaUZLJi99ZJysrsraI/CK95fcBEx6HIdm/vPNG7gLwmNosgmjJlI2teIlJ8mX1XwYuVpg4Bu6F06V2DWRY/Y1JiyA6R3yg87jdXSgBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=snNA452v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93BB6C4CEEB;
-	Mon,  9 Jun 2025 23:28:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749511693;
-	bh=s81oEcid/OEGvazYHy8C4bU29ApBKyS/u//Zxdr+YSI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=snNA452vJDcTsUcu6tEaoLgPVCt5nY/vTJEtQEddO3eHDykMbeJw2wQvLi84lceNF
-	 LeyMPxzhW8qOwCBhYaKI9qdpZswIS0yTdwPro/JldTQV/cif9J7s7jqmfnNo5oYXAW
-	 GyH36l/5SQl28xlVrVUQXuLfNldnP2JZb5hwMckmHSqC/p9IYgRc7b1qFReOrOs+/8
-	 4EP2xZu0gtto4+wRinGw+mgt+c4CzX6XvjmMCsVuKIN9aXrlpc+tB0OM3tmtsqA0Z6
-	 8Imiiv4wJ7xsMvgh1bfErer6kopdZAv29VUuiowYmio8vdGm8AfbOSxYLzYhCdQ2YX
-	 rhqAXX1auWhFw==
-Date: Mon, 9 Jun 2025 16:28:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, skalluru@marvell.com, manishc@marvell.com,
- andrew+netdev@lunn.ch, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, ajit.khaparde@broadcom.com,
- sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- tariqt@nvidia.com, saeedm@nvidia.com, louis.peens@corigine.com,
- shshaikh@marvell.com, GR-Linux-NIC-Dev@marvell.com, ecree.xilinx@gmail.com,
- horms@kernel.org, dsahern@kernel.org, shuah@kernel.org, mheib@redhat.com,
- ruanjinjie@huawei.com, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
- oss-drivers@corigine.com, linux-net-drivers@amd.com,
- linux-kselftest@vger.kernel.org, leon@kernel.org
-Subject: Re: [PATCH net-next v2 0/4] udp_tunnel: remove rtnl_lock dependency
-Message-ID: <20250609162811.020322be@kernel.org>
-In-Reply-To: <aEdsBhZ4C--0ohYj@mini-arch>
-References: <20250609162541.1230022-1-stfomichev@gmail.com>
-	<20250609153817.14d7e762@kernel.org>
-	<aEdsBhZ4C--0ohYj@mini-arch>
+	s=arc-20240116; t=1749511881; c=relaxed/simple;
+	bh=e4cngVeTJ3eRhYpYUjJHLm0cfk8IWeU6ftfJPlRuRXA=;
+	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BL5BeXG5ZkvlR1RVfs6Ty5fs0ypcykbssGMAtzjQumvLoKqoHgxdglc6GY6CWMEw14nxBjL1en0XgoiIu3QfQNwSmgL820bpFqH1zS81mQRvxfh55On6VKzbGzKlFaTszcHS9cLd2RKsCa5NvHmjHHltvhXdUUt1WkjaQoZjDPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net; spf=pass smtp.mailfrom=trinnet.net; arc=none smtp.client-ip=96.78.144.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trinnet.net
+Received: from trinity4.trinnet.net (trinity4.trinnet.net [192.168.0.11])
+	by trinity3.trinnet.net (TrinityOS hardened/TrinityOS Hardened) with ESMTP id 559NUq2A013070;
+	Mon, 9 Jun 2025 16:30:52 -0700
+Subject: Re: [PATCH net] netrom: fix possible deadlock in nr_rt_device_down
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20250605105449.12803-1-arefev@swemel.ru>
+ <20250609155729.7922836d@kernel.org>
+ <5f821879-6774-3dc2-e97d-e33b76513088@trinnet.net>
+ <20250609162642.7cb49915@kernel.org>
+Cc: Denis Arefev <arefev@swemel.ru>, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>, Nikita Marushkin <hfggklm@gmail.com>,
+        Ilya Shchipletsov <rabbelkin@mail.ru>,
+        Hongbo Li <lihongbo22@huawei.com>, linux-hams@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lvc-project@linuxtesting.org, stable@vger.kernel.org,
+        syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
+From: David Ranch <linux-hams@trinnet.net>
+Message-ID: <4cfc85af-c13a-aa9c-a57c-bf4b6e0f2186@trinnet.net>
+Date: Mon, 9 Jun 2025 16:30:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20250609162642.7cb49915@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-3.0 (trinity3.trinnet.net [192.168.0.1]); Mon, 09 Jun 2025 16:30:52 -0700 (PDT)
 
-On Mon, 9 Jun 2025 16:19:34 -0700 Stanislav Fomichev wrote:
-> On 06/09, Jakub Kicinski wrote:
-> > On Mon,  9 Jun 2025 09:25:37 -0700 Stanislav Fomichev wrote:  
-> > > Recently bnxt had to grow back a bunch of rtnl dependencies because
-> > > of udp_tunnel's infra. Add separate (global) mutext to protect
-> > > udp_tunnel state.  
-> > 
-> > Appears to break the selftest, unfortunately:
-> > https://netdev.bots.linux.dev/contest.html?test=udp-tunnel-nic-sh&branch=net-next-2025-06-09--21-00  
-> 
-> Argh, should have run it locally first :-(
-> Looks like there is a test that sets up pretty high sleep time (1 sec)
-> and expects entry to not appear during next 'ethtool --show-tunnels' run.
-> 
-> Gonna double check and remove the case if my understanding is correct.
-> Don't think there is much value in keeping the debugfs knob just for the
-> sake of this test? LMK if you disagree; otherwise gonna repost tomorrow.
 
-Hm, I see you partially deleted the sleep support in patch 3.
-Maybe it's easier to keep it since we now always sleep?
-No strong preference, tho.
+That's unclear to me but maybe someone else knowing the code better than 
+myself can chime in.  I have to assume having these locks present
+are for a reason.
+
+--David
+KI6ZHD
+
+
+On 06/09/2025 04:26 PM, Jakub Kicinski wrote:
+> On Mon, 9 Jun 2025 16:16:32 -0700 David Ranch wrote:
+>> I'm not sure what you mean by "the only user of this code".  There are
+>> many people using the Linux AX.25 + NETROM stack but we unfortunately
+>> don't have a active kernel maintainer for this code today.
+>
+> Alright, sorry. Either way - these locks are not performance critical
+> for you, right?
+>
 
