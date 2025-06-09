@@ -1,156 +1,158 @@
-Return-Path: <netdev+bounces-195643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F253AAD18FF
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:32:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3197AD1905
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED17E7A3FA3
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 07:31:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BF451668C8
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 07:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDE61DE2D7;
-	Mon,  9 Jun 2025 07:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385D827F160;
+	Mon,  9 Jun 2025 07:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b="rwMwEt/B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTEZM4/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11020113.outbound.protection.outlook.com [52.101.84.113])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF924C9D;
-	Mon,  9 Jun 2025 07:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.113
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749454348; cv=fail; b=VqhYqZHdySYQVR6UoslEfZWPumXu70DK6SxrpnTtKGJNtGSWPLhx0iUgYnt/nFk7nVQVngb7r6RuMU+1YXk0ZNmUn20COEXMWbEOr2niJfHEHOUqJ+adHOLQAkMUIy7BFifxWjTQLnB7yXZfc4ihau7FjU6lW88XYhd3Wd9X+CE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749454348; c=relaxed/simple;
-	bh=98ubVO00buLighJLOL7yalJzxZrAirS5G8b5YtPop7s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cke39Vs5tDEkU1xgesB6Q4uLLtUzoBbaoWqLtlNLnNVxUqH0/RCWScUeAHuZz90/qXso8NJVc9qr5FukIEGFZTBrWzlyak6YN/TVJDzWFEaW9ayJVBLuG6kkP3yHnPyrPa2EoNzjtMQxx+cNDiglHq7ly+3tDsIBDx6ZysaLx2M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de; spf=pass smtp.mailfrom=technica-engineering.de; dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b=rwMwEt/B; arc=fail smtp.client-ip=52.101.84.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=technica-engineering.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Iqhm1NemNAv1IT4FkfnO7kH1+8Pm9qCM8gH+qAugG06duoiwDxFm6rgtSuQoBkCfNipbUogcaFyoZg245Eq37ryYhPtOr0R9DTOH+SoplErcleCWhZR0Fmzwx1cuiJJJnPEOO5TNb19tCQ93a1kNh+4H3E3wgeK4khK42O/YaA82YSykELCrOyvjkwRacTetXkJcjIIFkfwdXDPZgHFWFHx8J9vp5/lpZrsPVrsciPlwSX/Nildo5y9rQt58Wpg0+WJ1Pq7EYtBXzlZM/ocONoUj/jV46oGCKM5Qpv1eEkVrfdOKl7UO39woaQn4XwrVbewvZ9WRUwjcX2PhDQ9wiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dL0s6kQI03T3/CroPCSn4LQzoZbWYB3xWFVH/PgHuT4=;
- b=i8NyJVZxLyJCV5q0+K61tjdkNSAnn1fXlZ7kGf7TseA121w3dm8ejhLp6+QGGlFNU/bxNLSfbua0VJXzMM7pavoP32RCA1/YaNutRcbbHc3sL5ZfGqxf3JcdcWmoDJllEaRL2xM/3KJO94ProYBeumYOTTopU1XmENDDeiT8fDmX+MApENrPVhPHfHJCcPBOGQKXEaiRC625DStlZd5BQVo2waW1ZUbDiFKjmmBxsl+j4Cqc0R6sn9TCFYdw5aVnm10y0Eqyn4BR2A3XXgqqXlk5SmtopKs6hKblI52/NGVC6BNx8/e8dS69imKg51xMtzsL26MOUfmddNR1OhNwtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 2.136.200.136) smtp.rcpttodomain=davemloft.net
- smtp.mailfrom=technica-engineering.de; dmarc=fail (p=reject sp=reject
- pct=100) action=oreject header.from=technica-engineering.de; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=technica-engineering.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dL0s6kQI03T3/CroPCSn4LQzoZbWYB3xWFVH/PgHuT4=;
- b=rwMwEt/Bd8wRYs6ukyyJ+a6mZnQck3A32zO/0fHFwCbA7tsBlS/UfobsF61/lprwyredr0xXiCfh0/b961RuyVQbLsZC0dDRI8KfUJ0meI2MaH7+FmUBo6+KDrH2NjD9YIovwoVQBq0Uog3HUclBE8wytdlM6gmM1TKLfz/ZbkM=
-Received: from AM9P250CA0016.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:21c::21)
- by DBBPR08MB10506.eurprd08.prod.outlook.com (2603:10a6:10:532::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.29; Mon, 9 Jun
- 2025 07:32:22 +0000
-Received: from AM4PEPF00027A61.eurprd04.prod.outlook.com
- (2603:10a6:20b:21c:cafe::b0) by AM9P250CA0016.outlook.office365.com
- (2603:10a6:20b:21c::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Mon,
- 9 Jun 2025 07:32:22 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 2.136.200.136)
- smtp.mailfrom=technica-engineering.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=oreject header.from=technica-engineering.de;
-Received-SPF: Fail (protection.outlook.com: domain of technica-engineering.de
- does not designate 2.136.200.136 as permitted sender)
- receiver=protection.outlook.com; client-ip=2.136.200.136;
- helo=jump.ad.technica-electronics.es;
-Received: from jump.ad.technica-electronics.es (2.136.200.136) by
- AM4PEPF00027A61.mail.protection.outlook.com (10.167.16.70) with Microsoft
- SMTP Server id 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 07:32:21
- +0000
-Received: from dalek.ad.technica-electronics.es (unknown [10.10.2.101])
-	by jump.ad.technica-electronics.es (Postfix) with ESMTP id 2895E401BF;
-	Mon,  9 Jun 2025 09:32:21 +0200 (CEST)
-From: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
-To:
-Cc: carlos.fernandez@technica-engineering.de,
-	sbhatta@marvell.com,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4] macsec: MACsec SCI assignment for ES = 0
-Date: Mon,  9 Jun 2025 09:31:53 +0200
-Message-ID: <20250609073219.939903-1-carlos.fernandez@technica-engineering.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
-References: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E7D25C813
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 07:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749454483; cv=none; b=sowSRUTA19JmtFHHes05LrQfULEgMkp3ifU+pw3AFF4KQv55MDsJfVFNbKKe5fWAFlI41gXf5CbIWD2wGn8ZqjzMuDmt1hfXrlwcg9uoCBI0ZdP5+0EOkso7K9IPb3ZR9Tj7eP6sJla970BxcwXgDDykk6zyudH+TZ0YMswglaU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749454483; c=relaxed/simple;
+	bh=Pk2IKlN944aLWRdOUSAy2DXbgVTz9MMRw1o6JvUdAXE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ToOgElFhLWxPAsgH0s+uqmrEBB+dTLXNyC1JzzNqdpvwDABBVukDwtIzrZwhDPzAS/+p9z8miCHzrwBA2d8sz4OCbZMXnU8x4oX5HM99hNMIfczMd0hVwfJhRSQT7uUQPYHQMkZQUXeSvwDQ5uLa24HREOS/4qSSlsFpZpmnCtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JTEZM4/v; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749454480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lgIvOtbbVoeCdziN1/6LEAtUpp454oRAjXMdabFdZhE=;
+	b=JTEZM4/vvnsSchyTysDJEC+hWkpzGZAsaXnHy1gFfb93MxaDEYbIdtHw6R29AWzMWWGzXd
+	Z7fg99yDXQ9JWveEf4CZuUeQOop3uM+fXpEfwoxfu5cRvk/6biG6qZEHCb1Mic4Lnn3u9Q
+	INtm0le5c7y8GAfqdCIvNBAPyn/+d2s=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-XO18P4WAPvuO8ZGsJPSbuQ-1; Mon,
+ 09 Jun 2025 03:34:38 -0400
+X-MC-Unique: XO18P4WAPvuO8ZGsJPSbuQ-1
+X-Mimecast-MFC-AGG-ID: XO18P4WAPvuO8ZGsJPSbuQ_1749454477
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 34B7B1800343;
+	Mon,  9 Jun 2025 07:34:37 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.22])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 449DA19560AB;
+	Mon,  9 Jun 2025 07:34:32 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	jasowang@redhat.com,
+	mst@redhat.com,
+	michael.christie@oracle.com,
+	sgarzare@redhat.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v11 0/3] vhost: Add support of kthread API
+Date: Mon,  9 Jun 2025 15:33:06 +0800
+Message-ID: <20250609073430.442159-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00027A61:EE_|DBBPR08MB10506:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 367cbc03-1d53-4478-58f4-08dda727c582
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bOqBwwT7RP5PKf7X+VaLxEw+2VBlJ8vYtOGf6ECGJ2Y78ayRMJFE13EgUrOI?=
- =?us-ascii?Q?SQ4X2r9MhAuZRfbBceDV9jF9/GV8EI0EYdZVJYdss7v98/sou6XPX+bLbTHs?=
- =?us-ascii?Q?/BgEVXoLSRIF5JrGXCG1hyt4CXneagizdaZ3IDaGgpeJvOsVxzaBKn9KyRtW?=
- =?us-ascii?Q?o7m+0FZ0dc29LN6+gevxcVvSk/v241TYW3NFcmOhNGBrzYwz/eUNRnqBgTci?=
- =?us-ascii?Q?Dwu15e73ltqmJOHFPUq5a5GUihPOU2hIWS35seBYGxHonsqBlN/HAyntCBBH?=
- =?us-ascii?Q?H6WhbunXiDoJSnPLMPH3Im5WQ+kWmKcFksZ4nlgHpypWewGuNb2HMtBN0BDM?=
- =?us-ascii?Q?wp2vVhdFGX1TmXd88Rn9eoE6qHrwk93IjPKQyQUc7/9dLC8IUHEHm2/HoBwl?=
- =?us-ascii?Q?Q3ZXun7cxuCL0AKXisBiaWZJtQx5s7pPVcMSBx0jRNwQWmmNMtNxhUBfTB15?=
- =?us-ascii?Q?ZpW3a0UUqe8ilXuVxv81Jv/Pb8VtgCCyJutVNKN45qXrT6mc1XblLsaLQMeW?=
- =?us-ascii?Q?/XqTZX9gk+favBDsO4TEeOkYnGy9162xsmwY9G9xVFSg30aOKW+0+SHEHPoL?=
- =?us-ascii?Q?rPMLNHMaTSgTddXyFb530Mv+YvnUrZX/06T5nCc5Ehh1SbgBm/9Q9yMKXaHN?=
- =?us-ascii?Q?pOIYFL485ZjuXy1Pn/fp/9FK8/T4HbU1RUFMIqlIzoF3F2NkPkLvihQUkIsI?=
- =?us-ascii?Q?bl9DGSGPSKMbGtVWD/ZZi/O+J3VdZj19XC7qQ6RuDrTPMfys8QZsqHYZ8Uma?=
- =?us-ascii?Q?G9c/3wx8EDIziDdm1ZQRTvPo3gMVvi2FtXRNcri6xpjgQ+IC1ni5gKbovYaf?=
- =?us-ascii?Q?DSiE/J2jQQcuswoIxOk+b6z53HLdRsh3EcorVNlNK30NjygrBUwHYP0YD2a5?=
- =?us-ascii?Q?0KvK/yiLuZHG3dO6ru/cHnlOcjbfp5aM2J0+MSTJw0jwKb1trk6HczkKX9SR?=
- =?us-ascii?Q?pgac7LIEDcxgMJvTh7ax2fcVzItH/i3+G69mXUUtXrlhXXGFOWxOB5ZspRmr?=
- =?us-ascii?Q?2P5AeDYgFEogKpQcdi6qfAw9SHOOirh7tbl6qA9ANGkZB7eMP1bfEcW4wEO6?=
- =?us-ascii?Q?vKxUoe6KgIoyYEpcf3CMiKxOhq38Ge7bzXAXk6R7MoJcgpa971cZNzqzGfRn?=
- =?us-ascii?Q?H3I2KLYChBMi06wjK6YntbOvSwQzMp7PxnYI5273uw/ps1TxAXfhrguTAx2V?=
- =?us-ascii?Q?HUi4mBsRqwTCIneBSh0jJL9P4Di1495A2Y3PA8Dn1+Dzh5QeESnrmuH8fJVn?=
- =?us-ascii?Q?GIsnEIuutVAttcwvLt1fL49bJgVhLTbu4+LQZDYcz7AzpcnpSp0RSXnVeZbi?=
- =?us-ascii?Q?lhckEYpK9Yb52An++1iQkVadlvGbDKvaVScnLV6g4Dk7OXHYgJH2BBg4uCEA?=
- =?us-ascii?Q?VUD466PcC1CUh1SbxrK5U6ZWO1WpINJrWgM4l5XADyAK9W4goJf4rR9TwyVn?=
- =?us-ascii?Q?ef/oxmvesVANGsqOO6TxOLyDfThBEKjpB6pqzY3BefEDFjgyfYenQqITgQT5?=
- =?us-ascii?Q?NDO+i91ZZdpvW1OblUhdX0pecj0YNSAenJYL?=
-X-Forefront-Antispam-Report:
-	CIP:2.136.200.136;CTRY:ES;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:jump.ad.technica-electronics.es;PTR:136.red-2-136-200.staticip.rima-tde.net;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1102;
-X-OriginatorOrg: technica-engineering.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 07:32:21.4558
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 367cbc03-1d53-4478-58f4-08dda727c582
-X-MS-Exchange-CrossTenant-Id: 1f04372a-6892-44e3-8f58-03845e1a70c1
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1f04372a-6892-44e3-8f58-03845e1a70c1;Ip=[2.136.200.136];Helo=[jump.ad.technica-electronics.es]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A61.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB10506
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Hi Sundeep, 
+In this series, a new UAPI is implemented to allow   
+userspace applications to configure their thread mode.
 
-Thanks for catching the typo. I've corrected it and added your review tag in v5
-https://patchwork.kernel.org/project/netdevbpf/patch/20250609072630.913017-1-carlos.fernandez@technica-engineering.de/
+Changelog v2:
+ 1. Change the module_param's name to enforce_inherit_owner, and the default value is true.
+ 2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
+
+Changelog v3:
+ 1. Change the module_param's name to inherit_owner_default, and the default value is true.
+ 2. Add a structure for task function; the worker will select a different mode based on the value inherit_owner.
+ 3. device will have their own inherit_owner in struct vhost_dev
+ 4. Address other comments
+
+Changelog v4:
+ 1. remove the module_param, only keep the UAPI
+ 2. remove the structure for task function; change to use the function pointer in vhost_worker
+ 3. fix the issue in vhost_worker_create and vhost_dev_ioctl
+ 4. Address other comments
+
+Changelog v5:
+ 1. Change wakeup and stop function pointers in struct vhost_worker to void.
+ 2. merging patches 4, 5, 6 in a single patch
+ 3. Fix spelling issues and address other comments.
+
+Changelog v6:
+ 1. move the check of VHOST_NEW_WORKER from vhost_scsi to vhost
+ 2. Change the ioctl name VHOST_SET_INHERIT_FROM_OWNER to VHOST_FORK_FROM_OWNER
+ 3. reuse the function __vhost_worker_flush
+ 4. use a ops sturct to support worker relates function
+ 5. reset the value of inherit_owner in vhost_dev_reset_owner.
+ 
+Changelog v7: 
+ 1. add a KConfig knob to disable legacy app support
+ 2. Split the changes into two patches to separately introduce the ops and add kthread support.
+ 3. Utilized INX_MAX to avoid modifications in __vhost_worker_flush
+ 4. Rebased on the latest kernel
+ 5. Address other comments
+ 
+Changelog v8: 
+ 1. Rebased on the latest kernel
+ 2. Address some other comments 
+ 
+Changelog v9:
+ 1. Rebased on the latest kernel. 
+ 2. Squashed patches 6‑7. 
+ 3. Squashed patches 2‑4. 
+ 4. Minor fixes in commit log
+ 
+Changelog v10:
+ 1.Add support for the module_param.
+ 2.Squash patches 3 and 4.
+ 3.Make minor fixes in the commit log.
+ 4.Fix the mismatched tabs in Kconfig.
+ 5.Rebase on the latest kernel.
+
+Changelog v11:
+ 1.make the module_param under Kconfig
+ 2.Make minor fixes in the commit log.
+ 3.change the name inherit_owner to fork_owner
+ 4.add NEW ioctl VHOST_GET_FORK_FROM_OWNER
+ 5.Rebase on the latest kernel
+     
+Tested with QEMU with kthread mode/task mode/kthread+task mode
+
+Cindy Lu (3):
+  vhost: Add a new parameter in vhost_dev to allow user select kthread
+  vhost: Reintroduce kthread mode support in vhost
+  vhost: Add configuration controls for vhost worker's mode
+
+ drivers/vhost/Kconfig      |  17 +++
+ drivers/vhost/vhost.c      | 234 ++++++++++++++++++++++++++++++++++---
+ drivers/vhost/vhost.h      |  22 ++++
+ include/uapi/linux/vhost.h |  25 ++++
+ 4 files changed, 280 insertions(+), 18 deletions(-)
+
+-- 
+2.45.0
+
 
