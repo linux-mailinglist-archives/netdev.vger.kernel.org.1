@@ -1,235 +1,185 @@
-Return-Path: <netdev+bounces-195687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D96AD1E23
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:53:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AF7AD1E2F
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DB4D16B094
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:53:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88FE316B7CD
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60962571BF;
-	Mon,  9 Jun 2025 12:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADCB2571BF;
+	Mon,  9 Jun 2025 12:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="u/pn3P2W"
+	dkim=pass (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="DPpGuOqM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JtfotKuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2050.outbound.protection.outlook.com [40.92.40.50])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E1C13635C;
-	Mon,  9 Jun 2025 12:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.40.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749473610; cv=fail; b=HaFR73cLRzf/jglhIVfOC1KKsDweFmd3Qgd4HYhw4y/XcuQYr6QPipUjNAE/7qMaUDr0V2zl8UWCqQsL6VRJ+T8misDX/zRTwLxxz62+xpmrZ46uQuo9wELVXP/LBbh+HzGzp93Nqcm0xUkLDyjZf+3HrlElgvqEO+qr6bHxXTg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749473610; c=relaxed/simple;
-	bh=9bn6VP+K2HAmRjIqMEjjKIZ44V1Ym8rGLRtvi7dwETg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=aK8sV3acs/LMfGM5tMytc+307jsOp+yO8lXNr/u4aM0eaPPWxaF3ZYX0trskeTjAPe6DuXB44oUGxkJdPLE00Us6mQXNHWWeuOwnt3VljQ5zzIlLZbFBwaQHIfjCPcrJ/qQHz3JngjFLFP9Z/SCk1fwlCaXrNwO95Kv4cCaHPYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=u/pn3P2W; arc=fail smtp.client-ip=40.92.40.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iFPW7p28dOI/MZCWyYIY9z2Imqd0dpK3p2fQp4XjJctOX1nT4Aphbg1JDnN3/hc5iyGHm6PzKTJ4yXpbjTSnZy894RZ+k6v976Zo3eZAmCUOdAQctHO2yHBim7Hd9iPlyx5PFLWxr20w7rWuvsfPkfeRJdPu3s10HzC83ztgd2+RNctK1mxM/Cb9ARBXN+YDA2paJQPyMBd755K543dkkEAxVWPVCHFFhg7QdzCp9HZetDcd0izdeedODcHeaRgvoCHQLQiI9/5XbCv4cKtb/9l8rtl2kbMX18UfN6Gn9EY/NfOF0SnhovRzhNQpmG03YdyDcv8eneqVhkJt6TAtxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/MFSQlFDsY3qQpcAbAlJvrZiUGOX1eSwxOkZX4+Y3gs=;
- b=jOTcSYPJ4xBxn6Q9WVLHZ8FpVChBNmPKd9mxSIxDT/dfs4ny4EGxFarxpcVRbB5JL8ykS97R4JfPdyDi77cNxdKQbqw6HR9wylDA1Nc28XkZtt/Iz20YnC7i6ve3Wh+T0WyA/tpcyTFdqYY4Mk+3cR+vfiIi2pxCNMYAd8nn3xszFZRQztcuAg4RX8ki1v7DjvIuHBPXo74mpDMQasoA4WsuPVJRGUnmcqq8T3W67O7oB3lXS/K3j02DvJoQekAQLQu+MsoZ2j2qWA4LioibizqD0SsyLFlaK+xddiyF9AdwbEhNJSMH48zM//F0spILULHiDdJb9i9yKCi94xjqcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/MFSQlFDsY3qQpcAbAlJvrZiUGOX1eSwxOkZX4+Y3gs=;
- b=u/pn3P2WwKhBPAd2HPpN00xlDnWK5pBm6aB7nzTn9ub8nW9RY5imoL42imkThjMSfxX4OtxfcjYNVgiMDDtB/MlPugWqcpRHii+/Gn0OqQ8KQJPuSwuG2wD0xIRUxCqYe0nr98LURJOTXnPFp/23imj8+OOt0QoqTknZn6n4duoX+27MOCed7hK3ab8h5jyJa7C17qyW2suD24GjihSKCCQmoWgm1f0EQ3HklHRC9swMGrheK7t4qlhSmcE61wqSWIErQpb9U2xWEv67/vOOIz19smTn3rBwycAisqA/qwr9Dt8+BZ1kMia0fC7MAN78lAi3ev8YmvY2ToQUQSVTVw==
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com (2603:10b6:8:253::16)
- by MW4PR19MB6981.namprd19.prod.outlook.com (2603:10b6:303:21b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.13; Mon, 9 Jun
- 2025 12:53:25 +0000
-Received: from DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305]) by DS7PR19MB8883.namprd19.prod.outlook.com
- ([fe80::e0c2:5b31:534:4305%5]) with mapi id 15.20.8769.037; Mon, 9 Jun 2025
- 12:53:24 +0000
-Message-ID:
- <DS7PR19MB888335F938BA5A8F19FAC8F49D6BA@DS7PR19MB8883.namprd19.prod.outlook.com>
-Date: Mon, 9 Jun 2025 16:53:12 +0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/5] net: phy: qcom: at803x: Add Qualcomm IPQ5018
- Internal PHY support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-clk@vger.kernel.org
-References: <20250609-ipq5018-ge-phy-v4-0-1d3a125282c3@outlook.com>
- <20250609-ipq5018-ge-phy-v4-3-1d3a125282c3@outlook.com>
- <a46bf855-e9fc-44c4-9219-7d91651b30d3@lunn.ch>
-Content-Language: en-US
-From: George Moussalem <george.moussalem@outlook.com>
-In-Reply-To: <a46bf855-e9fc-44c4-9219-7d91651b30d3@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DX0P273CA0012.AREP273.PROD.OUTLOOK.COM
- (2603:1086:300:26::11) To DS7PR19MB8883.namprd19.prod.outlook.com
- (2603:10b6:8:253::16)
-X-Microsoft-Original-Message-ID:
- <391b9e0d-8bf7-44c6-8b85-6367a5e610df@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D5960DCF;
+	Mon,  9 Jun 2025 12:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749473705; cv=none; b=oAdHQvfQryjYzhiyPrpjMBLrjmYab07X9YJI9iW7PX12JB5z2iN7b/o3gdY7zbcE8qJVw3deoqxoZC7mH/b3NoXsvxS2PB3zOFN0ynFSm+DIRxPaHY8tWW1Ar4eQoX8PpR9fkICWZjvtaEqzGnwJ/pm++Vh5xqWAGosFu2BXf1s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749473705; c=relaxed/simple;
+	bh=bPYp6XMwLg16+zGYigllyk/wrSQ6mKM5RJaOYTMv97o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lWqeAC66Scmn2lJBPPGM5xV26FN+tZA3aSAlVTijSu91GLEhMu0JO2K1iOCES1GY5LKVzrtuoQgF48WHisUXCBAV6bEDxTQVySFhsMPKSIw/GnShhbEpO68V6QGErAdjf6qgMDBRHWyj9NLnowXMYiH22hl4NDlVqxFrdbVjstM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stwcx.xyz; spf=pass smtp.mailfrom=stwcx.xyz; dkim=pass (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b=DPpGuOqM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JtfotKuq; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stwcx.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stwcx.xyz
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id DE29E13804E7;
+	Mon,  9 Jun 2025 08:55:01 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Mon, 09 Jun 2025 08:55:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1749473701; x=1749560101; bh=S729HnA4jb
+	8m0hmjvYJPSqMiZdCif/ewwBRO+2NkvbY=; b=DPpGuOqMlauZQBLd+MjT/JPZ/B
+	Yr3eDoGN8XbBIuaz2SHdvFtx9gLpKcVXMx8o9QlbE/wdoGYzQ61lDlypChtjquuc
+	+k+LV9z/XFZ7sW72H3ZGG9BtyKVoeGeXZVfdycr5EIWdliPqX8gTvybtJnB9A3Za
+	lu3otp8RlA6bgcPntieOjBEe+InAIbhFkkMcCsqOpYZzLdH3iILeVVTMIJgBXRF3
+	+u9owm12AMEi7Pli6NYv8Tg0YDvXpoxxWqbCSXvCJaCVyAhJr+sc0yAKV1oHka4A
+	I5b8Mnkt7dwk0jxa06+GOVRZCQ9DAfQJoCn2rljNq3qf2RQnR5ICgTWWLOxQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1749473701; x=1749560101; bh=S729HnA4jb8m0hmjvYJPSqMiZdCif/ewwBR
+	O+2NkvbY=; b=JtfotKuqk99TQrFRR2ysmZRs70V2RYgzRvfPFYWPYffuN9zfiqj
+	XXsRvuokpFRIyLiqv/L19551Y15bvgNWDX1eA82BDvvG99T+g8FBFZWcVzlXmt3O
+	g4i9zvT9U+08x+TSVgKAume61u9stIjAU4UgK2+yX6e89Hd7KHLrCnwCiB0kNwCt
+	32IxnvO8ARe4JfiB1SMZYO0uSFOm5BynyBIQdHdv2PyK4VWQFDX84+x6FfuqqNmu
+	MTFT3GV+3reKgxkcau8l0Dhbqb0+1xZ4WAv2IA8v5cfeA7z5b0gFqDWZiE5nOGFo
+	2F6fyDIodpnPB/nbYwYpb18eRM8IeRuMm9g==
+X-ME-Sender: <xms:pNlGaGn1e142nL6resnxnUPHgykxj9UgbItyTljzDlQjarP3MZbGrw>
+    <xme:pNlGaN3vBSxrnNkfyAYXwk_w0b-HyxwKSJMPeavaLIn3MW4ezZvAWddPjMC16OLC-
+    tyGRBluK8Kg5d1fMq0>
+X-ME-Received: <xmr:pNlGaEoHJNECDj5khn57rk2VcDhikVcF8bVzmtiDSrS25F5Ld_n-G93pf1g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdelfedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnegfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvvefukfhf
+    gggtuggjsehgtderredttddvnecuhfhrohhmpefrrghtrhhitghkucghihhllhhirghmsh
+    cuoehprghtrhhitghksehsthiftgigrdighiiiqeenucggtffrrghtthgvrhhnpeehfeej
+    heeftdejiedvfeekffehledukeduleelffekgfdtleduledvtdegtdehkeenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehprghtrhhitghksehs
+    thiftgigrdighiiipdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpd
+    hrtghpthhtohepjhhksegtohguvggtohhnshhtrhhutghtrdgtohhmrdgruhdprhgtphht
+    thhopehmrghtthestghouggvtghonhhsthhruhgtthdrtghomhdrrghupdhrtghpthhtoh
+    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigv
+    thesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhho
+    rhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhunhhihihusegrmhgriihonh
+    drtghomhdprhgtphhtthhopehpvghtvghrhihinhdrohhpvghnsghmtgesghhmrghilhdr
+    tghomh
+X-ME-Proxy: <xmx:pNlGaKkC_5O5FGh9HhDqi7d-5JqQtnSxp0m9tglXPz7whDEsJyUnlA>
+    <xmx:pNlGaE28B17l_1VAJVePMJyrg3yTM2GilmPv9IVBcy7gUgv3gdP31w>
+    <xmx:pNlGaBv3WtowVLYuyq3NRRvTJ1F2-MQXUWyTavAX7-uzh13WgrvoSg>
+    <xmx:pNlGaAUKP1xjLqEl0sPcE7Ma7ChyZeR7jd2NpXLWmBdARshcXDUM_w>
+    <xmx:pdlGaE-SZbrM-oeNAhjaaywkPSoJy0bUWZGegLqGuef-SU3NA5pK5yv_>
+Feedback-ID: i68a1478a:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 9 Jun 2025 08:55:00 -0400 (EDT)
+Date: Mon, 9 Jun 2025 08:54:59 -0400
+From: Patrick Williams <patrick@stwcx.xyz>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Peter Yin <peteryin.openbmc@gmail.com>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: mctp: fix infinite data from mctp_dump_addrinfo
+Message-ID: <aEbZoxqFBnd0Pr32@heinlein>
+References: <20250606111117.3892625-1-patrick@stwcx.xyz>
+ <0ee86d6d80c08f6dce6422503b247a253fa75874.camel@codeconstruct.com.au>
+ <575fa12e699f6f65b47f5b776ec91ef9c350644a.camel@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR19MB8883:EE_|MW4PR19MB6981:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9a2096e-3179-4fbf-1b55-08dda7549e6d
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|15080799009|19110799006|5072599009|8060799009|7092599006|6090799003|461199028|4302099013|3412199025|440099028|10035399007|1602099012;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S2ZLSEpZZzQzWjE4bm9RQ2RuYTNWdHplYVZkZkVlakUydVFoK3VnenR6NHhn?=
- =?utf-8?B?a0ViYWc1SW92czVSVGhvN01RVHQxOWlqcGpqdjd4Z0pUZmdBOUJGMWl0cFBW?=
- =?utf-8?B?bGtWZWNsYjI5V1g2eU8wY1FZYUVCTFRmS0VRc3Q4OExyWVU5T3lpQ2RMZXdz?=
- =?utf-8?B?RnNlaUdaRWtNR1FscmR6aHcyM0RaWll3WWkwYkd4Nk9QaENvbzhzYVpYaWVS?=
- =?utf-8?B?bWpnbE9ka2hGcm5zTUlmeDVnNzlJV0lrTC9HQ0JUWU93eHRvcG1ENDhyN1ky?=
- =?utf-8?B?dDhXaUdYZTBHZURuTFNHNmVqaEVXWExMY3BNUDBnUUFzVWlSeEpFdlhGaExO?=
- =?utf-8?B?UjgvR3lqV09rblIxeDVFZ1lDVDdVTGZ3aDZ1QmZQdW8vNVNjam56L0dPd0du?=
- =?utf-8?B?MG1HNHRaTTVhSlNhUzVrWkE2alZoOFNtbEJBUnU4MThBeldlOEF2RG5LaUhm?=
- =?utf-8?B?NG5KeDdtdU9mVDBLNHdLWmx2NktuQ3gyRHNLTHpxSm1BTWRtOHhwRldRWENM?=
- =?utf-8?B?NGhueTdCT1Y3Y2E3ZFczbEpWS05PbjZ3cFB1V25vcnJQbmNRQk12VlVLU0o5?=
- =?utf-8?B?YmRUSFI2QW5PQTNuTHp0YVhYWkppVCtZQWpaZU01cVN0VWlSc2puTSs5Uzhk?=
- =?utf-8?B?Wlk1WUpTbTdNcThRRzdObEtTbER3eThnb3J0RmdnTEtCcWhJem9nV0Y1Vi94?=
- =?utf-8?B?cEJWUU05SThzVVBhU2x2OHlaU3BJWDBpRko2U1MrVGdjbnRySE1vR0xGTFZp?=
- =?utf-8?B?T1ZqUS9YNFl4MzhNaDZzWDRvM0wreXFpSExiU0QzMmhzYTJ0QzNmUDNhYmd0?=
- =?utf-8?B?dXYxZVAwMmExbHpnSmcyOERHVVBVMVNqZ0x2ZFhSeEU2ZmFlL1ZEYjl3cTl0?=
- =?utf-8?B?YUtRM2RCTlN0VU04WDZweXh1d2xJeXhMdzRUY0s5K05CVEZTZHJaS0pSblVP?=
- =?utf-8?B?RE9scFpaRHQycjEvYTRiYU9keVRQZFg0OXpLZ0s0MW9KWDBkN2p2eHVZRGFs?=
- =?utf-8?B?R0ZwWHBTRi96bUFnMjJiTzYrSDZjR2FFamdPelBWT2Uxbkttd1AvdUozdkdu?=
- =?utf-8?B?VlBtc1Z0Z0wwN2Y1cDgrKzNTY2ViKzNmWkxNUTVsOXpIeWRSVjRNeDNXRlVX?=
- =?utf-8?B?SUcxSktoRkVBMENMRlVUNGgvdEt4aGFCeTE1TnUwYTY0bDFoTFFkY05iYTJu?=
- =?utf-8?B?ckt1a1luVk1Kenh0WHJjRWJkWTVNbGp1SXBIRnBOOVh6UkpSMmFQcmZWWXJz?=
- =?utf-8?B?UE5MMEJxdWlxc283Tzl2OHdBYTRxZm82Vzh2TmVDVEs2ZEw5NDZhdHFyRENE?=
- =?utf-8?B?S3FselVWUTJqV24rWXF3ZGs5OENBVWUvR2syYUhrSzRYbmg1MEUrMjZZSmtO?=
- =?utf-8?B?N25wc0ZWNzYzREdPdktqYjRZWFc4RUF5cHRrT21FM0lJaUltU3ZjZGhUVjdp?=
- =?utf-8?B?NkpQeVZlWHR2cG1ZbUoyMFNPUmlIeDBsOEdOSW9OQmpqakRpVHRXR044TlRz?=
- =?utf-8?B?QnR2aC9OQlE5SlZUcVN5ZWllcXFBUS82TXN4TWNUSXNlZE56cDBHR1NWR2xr?=
- =?utf-8?B?dmdVenNmOHZCL3ExOGgvWWdXRlI0YUs2WDB0K2pxcWp6OGRXdW5HbWoxcUtB?=
- =?utf-8?B?S2VuWDZRbHhBMnZ0akhIcFVHSnM5N1NDNDh1YkwzYmkydW11RERpaEdLb2l2?=
- =?utf-8?Q?l9YLmEm5WlJtepmPCt5O?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TEUvUW5YQzNycjl1R3VqamZhdkxNL3Q2Qy9wQkVVR0VqQ1A2RDdoOHZGcVFO?=
- =?utf-8?B?bm9aZ3dMZENHM0hxYUVEU1l0bzR2a3UyL2FNZ0g5aFhBTmxWT0NkYmZIbys4?=
- =?utf-8?B?bzA5VDZ2d2xWdG1VT29pNEtaWEprSjRuQitWWjFqcEdZY1FrQUkwY1J0OVpQ?=
- =?utf-8?B?N0oyQWxLOUxUaXZxcmFvUkRXOVhNdUFhNHhVVERXQW1PUXlLWUdsMTd2UTZC?=
- =?utf-8?B?KzF4S0tWdTZYdkNoN3J1cnR6YXhUWkM0N0VGeVlXUWpNbWw4Y2VNN1BqWXIy?=
- =?utf-8?B?VnptOTdKQmVCNXRtTVJsbEdWR3VTeU1rNUIwTzVvU1E1dTFzTnVuY254c0FI?=
- =?utf-8?B?T2ZhUzlUdmluQjZkZzkxb2huWXRtZkZ1NnVHM0pZL0xXVVJ5RGVwWHZvZ2s3?=
- =?utf-8?B?SE90THJNdXpTS0U1b0RLU2krVzh1QlhIQVlydlRaNk9WRlVZSWxtVUNkVWFi?=
- =?utf-8?B?dCtONG5OaDFER3dTNnhMWVp5VzNHQVplZFB2dHQ5Y2p6c2dWc0loTzdsUFRw?=
- =?utf-8?B?Q0hxWGN6Q2Vjai9kQ1lOeDJBU0paN0VYS1JVaXB5dEU1c2IzdzdyNVdtUXkz?=
- =?utf-8?B?UDRqNi9PRUxpenltSE43cEllVzZ6RS9xNENldzJmVGhmNitLQUJkcko2TkxZ?=
- =?utf-8?B?RVZhNExFNzc5K1hSS3R1WkdwK0JZdk5hT0luazI3OEVDNkMrSFNuRVVWeGp1?=
- =?utf-8?B?dWN3ZEdGTXNxbE84amdzNkZhT0FpRFhWMCs0M1NXWUlkc21uNXlMdk5EN0Fn?=
- =?utf-8?B?MkJQRkUvR25MNktxVzVvN2tNdVBwQXpwV2ZTZVY2aWltYmFmcnVOYlkrR1Rz?=
- =?utf-8?B?M1NBdldaVGVJSHVyZCtxeGNoL1J1ODRMYzVXSzhPeVR3bHJBYUFLRTZVR3VU?=
- =?utf-8?B?OWVxOHB2OUV5UUZZWUFLcittRDhFdS9neC82UDM3c3ErSGRNUmZxaEtlOGR2?=
- =?utf-8?B?TFdWTnRzanBLeWE5V1dXQWNEbkRrZ3A1bDB6MkI3dUY0TVJsUXFxVEtWTWxQ?=
- =?utf-8?B?dGZlWmtuRFZzVzFLbmFGaTNDNW5TbDdWRmxKeVpxRDN3UkpZVEVVZVNERFdh?=
- =?utf-8?B?VU1XSlJXeVFDU0dRc2NZaVJ0OXZGTHdyOE1Ec2c0YTFwUUJsOWZJNVdUT3ND?=
- =?utf-8?B?eEd5S3VPbk9KVVkzVDR6OU5aVVNNMVpya0QrdFNiZW54aVpiczhGUDJWS1hH?=
- =?utf-8?B?K1c5bTlqREhtSjc2d0IzOVpkb2xGSU85OWVUV29kQkQ2WTFoQ2lPbitDSVlM?=
- =?utf-8?B?SERQcnQwVkJ1UWo1L001eTEyakluYVVUK2tIQ1orSzVxb3VYSE1DSCt5WEFY?=
- =?utf-8?B?azBYR2dsejFxbXY3M1lqQXYzUWNjMUhRd05kLzJyM1cvNDRoOG1sb0VGd0pq?=
- =?utf-8?B?TEFVSEtUMU9YTjdsaFpjS1FDTTI5LzRpcFRoeE9uK2Vtelg0eER6NEZMNEZs?=
- =?utf-8?B?MnVySUQyZE9vam1LVmZNcFVFbHRQSjVlN0pSUHp2a2twbnRiOU4xWTlxalF2?=
- =?utf-8?B?YjZwTUhHdFdsUDVHMXI1ZjdzTU5yWDBxLzhpY0FNMmFMYVB1TjIrSG85MGdk?=
- =?utf-8?B?aC95NzlzVTR3MDErTGk1aTNrbHFzc0laLy93cVFwUHBlRXl6TkZ1WmRtQTFS?=
- =?utf-8?B?WVdrSEFVUlA2MGwvQ1ZnMVdKZmVlaHkyWTJZVzZSQ1ExaWhULy9xd2lCYzJK?=
- =?utf-8?Q?++Rq1HYD2g1Hz8JZrrUd?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9a2096e-3179-4fbf-1b55-08dda7549e6d
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR19MB8883.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 12:53:24.0141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR19MB6981
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="5DQEcKQFOqy03Isn"
+Content-Disposition: inline
+In-Reply-To: <575fa12e699f6f65b47f5b776ec91ef9c350644a.camel@codeconstruct.com.au>
 
 
+--5DQEcKQFOqy03Isn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 6/9/25 16:24, Andrew Lunn wrote:
->> -#include <linux/phy.h>
->> -#include <linux/module.h>
->> -#include <linux/string.h>
->> -#include <linux/netdevice.h>
->> +#include <linux/bitfield.h>
->> +#include <linux/clk.h>
->> +#include <linux/clk-provider.h>
->>   #include <linux/etherdevice.h>
->>   #include <linux/ethtool_netlink.h>
->> -#include <linux/bitfield.h>
->> -#include <linux/regulator/of_regulator.h>
->> -#include <linux/regulator/driver.h>
->> -#include <linux/regulator/consumer.h>
->> +#include <linux/mfd/syscon.h>
->> +#include <linux/module.h>
->> +#include <linux/netdevice.h>
->>   #include <linux/of.h>
->> +#include <linux/phy.h>
->>   #include <linux/phylink.h>
->> +#include <linux/regmap.h>
->> +#include <linux/regulator/consumer.h>
->> +#include <linux/regulator/driver.h>
->> +#include <linux/regulator/of_regulator.h>
->> +#include <linux/reset.h>
->>   #include <linux/sfp.h>
->> +#include <linux/string.h>
->>   #include <dt-bindings/net/qca-ar803x.h>
-> 
-> Please sort the headers in a separate patch. Cleanup and new features
-> are logically different things, so should not be mixed.
+On Sat, Jun 07, 2025 at 03:47:09PM +0800, Jeremy Kerr wrote:
+> Hi Patrick,
+>=20
+> [+CC Andrew, for openbmc kernel reasons]
+>=20
+> > So, it seems like there's something more subtle happening here - or I
+> > have misunderstood something about the fix (I'm unsure of the
+> > reference to xa_for_each_start; for_each_netdev_dump only calls xa_star=
+t?).
+>=20
+> Ah! Are you on the openbmc 6.6 backport perhaps?
+>=20
+> It look the xa_for_each_start()-implementation of netdev_for_each_dump()
+> would not be compatible with a direct backport of 2d20773aec14 ("mctp: no
+> longer rely on net->dev_index_head[]").
+>=20
+> This was the update for the for_each_netdev_dump() macro:
+>=20
+> commit f22b4b55edb507a2b30981e133b66b642be4d13f
+> Author: Jakub Kicinski <kuba@kernel.org>
+> Date:   Thu Jun 13 14:33:16 2024 -0700
+>=20
+>     net: make for_each_netdev_dump() a little more bug-proof
+>    =20
+>     I find the behavior of xa_for_each_start() slightly counter-intuitive.
+>     It doesn't end the iteration by making the index point after the last
+>     element. IOW calling xa_for_each_start() again after it "finished"
+>     will run the body of the loop for the last valid element, instead
+>     of doing nothing.
+>=20
+> ... which sounds like what's happening here.
 
-Will do in v5, thanks.
+Ah, yep.  That's exactly what is going on here.  I guess this change
+isn't needed for master and it looks like you've already requested a
+revert for 6.6?
 
-> 
->> +static void ipq5018_link_change_notify(struct phy_device *phydev)
->> +{
->> +	mdiobus_modify_changed(phydev->mdio.bus, phydev->mdio.addr,
->> +			       IPQ5018_PHY_FIFO_CONTROL, IPQ5018_PHY_FIFO_RESET,
->> +			       phydev->link ? IPQ5018_PHY_FIFO_RESET : 0);
->> +}
-> 
-> 
-> link_change_notify is pretty much only used when the PHY is broken. So
-> it would be good to add a comment what is happening here. Why does the
-> FIFO need to be reset?
+--=20
+Patrick Williams
 
-in the downstream QCA-SSDK, the phy is reset when the link state changes 
-to 'up'. And as part of that sequence, the FIFO buffer is cleared. I 
-don't have access to the documentation, unfortunately.
+--5DQEcKQFOqy03Isn
+Content-Type: application/pgp-signature; name=signature.asc
 
-Link: 
-https://git.codelinaro.org/clo/qsdk/oss/lklm/qca-ssdk/-/blob/NHSS.QSDK.12.5/src/adpt/mp/adpt_mp_portctrl.c#L1150
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> 	Andrew
+iQIzBAABCAAdFiEEBGD9ii4LE9cNbqJBqwNHzC0AwRkFAmhG2aIACgkQqwNHzC0A
+wRmUTA/9FdHgKfnG+gFQo6DCG9mHLf0yPDJrTBdo/7jBgeLqBgGieTVqP9XW77Gm
+tZJqLaj14dZgQoGIXpVgcNp/0vb5V+WxwM1iKoguhr1IgJRgBnGUh84sB3g4y058
+3NjAUF1mUt54nMnqS7dcy3bV9fb/Jz3d8oouOx50jSNynj79ufykNbB3RTinScTU
+BuFtsD1W9S1OOEJ6VvuO5NgUee83m2zpx13qHiou+JBkn8VStXbRPDs5gWVXKXbL
+QVzjOM0TTJ3WayWxPeS/G6bvV+3aDwBgllHOP0BY8v7D6YY6g2di/kyH4mknv4WR
+tScONFlI/PbViokMq0uriVPl28aQcA3dUEuXke9SPeNEcaTn9CWHs0LKMiN/VbFV
+rl2cWfUdND+PO8oe8nFat6+RfNTwHuJK9QIEY8gRtfK6A/38XimbfIuaYJwXaJBS
+ytw89/ojbQsK9xklkxIBeIBpI/uQ/fSfZwNomNCoDxGqcc8LpU/fN+c9CLAP6ZBC
+Qs52Cd4Q2yXObbvSb5JrtWZ+kdCyQ0Ancw/rKYYIsWMd8iP013TCrLs0gT3ANIc/
+Vq0SclVZ66iBOL9cCswVBNgOpTo+TbbPUIuPE7Z3FPy3kqXIhVnMz0JjGREuglo+
+KNNIBwXA4wuO5Kzy2i3XP5FxsaZh+eyRsuE270td1RjFjjrRI4o=
+=Qp9/
+-----END PGP SIGNATURE-----
 
-George
+--5DQEcKQFOqy03Isn--
 
