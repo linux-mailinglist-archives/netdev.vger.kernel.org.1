@@ -1,86 +1,134 @@
-Return-Path: <netdev+bounces-195886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91828AD291E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:00:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B30AD2921
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 559E316D5F2
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CD9E18921BB
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7029221263;
-	Mon,  9 Jun 2025 22:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215FA223330;
+	Mon,  9 Jun 2025 22:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRxdBwXm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cfMfkQG8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A714F881E;
-	Mon,  9 Jun 2025 22:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538EF221263
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 22:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749506439; cv=none; b=tiIvuXwRmihktM5+7YlWX+/7Zda6A3QL11ewnKMPO3oW4x48hqvBq8yyg23JgzaQL5OqPM5ZTNP9IOb8aJzhPTcRoY+juYCNDPxRoI3DP6DBafWAzGKCFmYcedGLuYFL3kzA0GHORsGPv5LdS25Uxhx31PSwomJ/S8wtf7Fje+M=
+	t=1749506545; cv=none; b=OEMWiAcf7beU7A4mQRhgbbk5kZZ6X0S9gSOdAUMvMU92CgR4MtPZ0nGjXDYx/s2PTeSzOHgb5J/4yN0NkLJZi0Y0CsGuP4qFp+JLaNI/ThcbjKdentT0av7r93CoHuC52FOxhVKrHCtD0gkI7x7MH/ztBygGwq9jULSrtzHbz6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749506439; c=relaxed/simple;
-	bh=CCQ6UXOHB+c5ctwB/EL8rAqFO9dWevbk6fecl/G/TU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NjnRaWnsxCeK0U/XipXgd2Infz21ztXaNDclIvab2QrwMiD1e57iueQpD5XKUbPvU5wuAS50Im4FeFuYtTQQ37MCvfCcZDZMe5jYL4pz9AgZkvfJYZlF9FQ8bNcnEAw8dA2/QqWC2hgfu+M6kSxRkrcrJlA7/xsq2sno44TZc/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRxdBwXm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721DEC4CEED;
-	Mon,  9 Jun 2025 22:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749506439;
-	bh=CCQ6UXOHB+c5ctwB/EL8rAqFO9dWevbk6fecl/G/TU0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KRxdBwXmgkJHIjzWGouOsiCArYVNMnZ9UxHLldGOTOd9qTDBrq3TZyInh/BUs8E+G
-	 3q17tDoLng4+0JeOVEjmhQw/OZu91G7crTiXSY+EgxAMmgGq2LFtFT7oAqF4qnHO9p
-	 l+REv/sthDjGTuu9KHdZo9SXat1I4QN/f4vw7je/BwYiII9o4A5bni2mmITS86TYlz
-	 VJk47urtR2hS0IJkK1bIYXcpwzm90nTylbox2CiCAHClliabgIOC0qYNYqQ84Oqbdv
-	 Y6crZzG/L9gHz41qp87IppkfAfIfO+6OILQi44Wi2+9A5YfYE13LbYiz6uBqCvj2Pv
-	 P2Px+hsYGyW2Q==
-Date: Mon, 9 Jun 2025 15:00:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?= <maze@google.com>,
- davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, Daniel Borkmann
- <daniel@iogearbox.net>, martin.lau@linux.dev, john.fastabend@gmail.com,
- eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com,
- william.xuanziyang@huawei.com, alan.maguire@oracle.com,
- bpf@vger.kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- yonghong.song@linux.dev
-Subject: Re: [PATCH net v2] net: clear the dst when changing skb protocol
-Message-ID: <20250609150037.1cc762e0@kernel.org>
-In-Reply-To: <6846e6a6342c7_34e997294f9@willemb.c.googlers.com.notmuch>
-References: <20250607204734.1588964-1-kuba@kernel.org>
-	<CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
-	<6846e6a6342c7_34e997294f9@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1749506545; c=relaxed/simple;
+	bh=vJ7vwoEH/pDxChm0RuJpIo6mifBRQChAuirwu8RlfXA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eDT569OvMU3zYatZBx5iSOutaxBAO8dWPDTa7w0DoLJ7rxEcEHrjzylQqwXGDFkvpvLhl/sn6hTIeEfAkw+MwCuK4kiz3prNaUEvnjtQtoG9ensSxQZVpzIoCDQfQKewgK3x75eckPEApMtQisf109Em3g4TVyb/OvPyg8al7kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cfMfkQG8; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5f438523d6fso1107a12.1
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 15:02:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749506542; x=1750111342; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bCk3OwXgakmShms97NNqM6EdI2vclTH5gJUQ/SWU7Oc=;
+        b=cfMfkQG8HeMltrwp5Dq1g/jQ3b+OImUltKeL0d4+xknG0uSItjut7kt6Z+/2ZQHFHR
+         lSF3T91QFR5YKStebpHrOlMYNY0tUf0yc1hsBFvrwZlMZlj2CPSl3ZaBmSFZYqGBZz3K
+         SqBiaSsSdefOX6j004fUS6ghZQKVB4D7J+FPrasMO/Owlug1ZvTA0EKDcqrCu+P4Vu1L
+         yDqQphykAdhF6sUUUbELo1o3yUrkiKbNHFeOrJN8/IFAb/dN9Azvt5QMKdqNcItKoyVW
+         6XXPGfo1spbvd8gHLBTax8+2VBbioUO3NQiNoX+xpKxBerlV47a/cP8BP8+2eSFuHnR3
+         EQ8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749506542; x=1750111342;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bCk3OwXgakmShms97NNqM6EdI2vclTH5gJUQ/SWU7Oc=;
+        b=TsWy2zElgAMEwN/8sXpykND8S0AulBnZUoOJdUVc4vWA2NWmr2OG3xENmrHNnmtIOe
+         WGnUTRINszHbvZlFn8wi+rx0Yim36y0ZHfdZNy6aXdodxbzP4wR3SawBavr+ORlRe08h
+         qzd0yz3LFQZGRiozGLA/xmiJIyG9LPfBkTnUV9m/SJTKZyJ2b9u/KHTDnzki0T73lv+R
+         VUGHcrNy7e069Rj5smM1Zw/3BWOIgxhVOhuIw6yLMopZBgkqshsUt8ESFCIepgZ9xWFG
+         PCuhRwYre0pEy25ohR0ADuuxDeRWRKzASejOEBTljZ/xlk0ugGiooz6wNt0VIdHzED+E
+         YKMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJGFSQX4kxouUz7ZxL8pvF4kAVsyoIY2/DGFSEJmPpSPuZ0TGinqXlIIObCSxxvzc5UhDzwgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJz8mV54PXQL4cOu/g42GmcHiUA6WbeJJDR7oMNCRGOQ39DWqN
+	dXbFarEIPWYsBtL8NoOT9WRhHR/uqC785anp3nEUCB0unkiwx+PebuPoYU2jYUNSZeA0dHgrTQn
+	MfG59vTv1p5RwvoZcHLAyLsJus6FpoVYvAVnxBlin
+X-Gm-Gg: ASbGnctQL17D9GtVNkA6Jv5qhf2OWnkW7vI6+ZwMb5YgDIzVtQ1gJEYpYDwYSpxLkkR
+	6H5o/Pg8Vr19bsAIJi7xwiVnXyCT2yiEBaB6zf9N7/pOTmf/YXiVVUl+Cc0C3RDj3B569Ueh4XH
+	ZjEv5yJqOMGYsD8zpFkEGsTHpatlkMLiw9gFkqniQ8XtKT4IR2miolDdM6/aLEHT8wkWXPMteH5
+	OOAQ3Dd6Ad1cA==
+X-Google-Smtp-Source: AGHT+IEbyIF7CSd+WRJZbLDF/+Itzq7vC/RRb8uqa3+Uo1W4YpTLoFUlg6mNBUmA1xLYGDFVl3NHkQUFqIXtjt2kWeU=
+X-Received: by 2002:a05:6402:da:b0:607:e1f1:ecf0 with SMTP id
+ 4fb4d7f45d1cf-607e1f1ed58mr132174a12.3.1749506541446; Mon, 09 Jun 2025
+ 15:02:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250607204734.1588964-1-kuba@kernel.org> <CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
+ <20250609145928.014a72c6@kernel.org>
+In-Reply-To: <20250609145928.014a72c6@kernel.org>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Tue, 10 Jun 2025 00:02:09 +0200
+X-Gm-Features: AX0GCFutj74rlH_Ud09IHNAnLPpkxULmxSrij6mqjJUQJhxSAN9xsb13A9CPzro
+Message-ID: <CANP3RGc+BjY-7LRFZmeXLqXVAbf3aYce=_H-Ru7B2sw8O+mbGQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: clear the dst when changing skb protocol
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, martin.lau@linux.dev, john.fastabend@gmail.com, 
+	eddyz87@gmail.com, sdf@fomichev.me, haoluo@google.com, willemb@google.com, 
+	william.xuanziyang@huawei.com, alan.maguire@oracle.com, bpf@vger.kernel.org, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 09 Jun 2025 09:50:30 -0400 Willem de Bruijn wrote:
-> > > +       if (ret)
-> > > +               return ret;
-> > > +
-> > >         bpf_compute_data_pointers(skb);
-> > > -       return ret;  
-> 
-> I wonder whether that unconditional call to bpf_compute_data_pointers
-> even if ret was there for a reason.
-> 
-> From reviewing the bpf_skb_proto_xlat error paths, it does seem safe
-> to remove it. The cases where an error may be returned after the skb
-> is modified only modify the skb in terms of headroom, not headlen.
+On Mon, Jun 9, 2025 at 11:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 7 Jun 2025 23:33:39 +0200 Maciej =C5=BBenczykowski wrote:
+> > 1 meta question: as this is a fix and will thus be backported into
+> > 5.4+ LTS, should this be split into two patches? Either making the
+> > test a follow up, or even going with only the crash fix in patch 1 and
+> > putting the 4-in-4 and 6-in-6 behavioural change in patch 2?  We'd end
+> > up in the same state at tip of tree... but it would affect the LTS
+> > backports.  Honestly I'm not even sure what's best.
+>
+> :) Did we go from wondering if we can strip dst unconditionally to
+> wondering if stripping it on encap/decap may introduce regressions?
 
-I should have mentioned, I looked around and also concluded this
-unconditional recompute was purely aesthetic.
+Yeah, well I have utterly enough regression chasing in my day job.
+
+Just spent two days chasing this fun one.
+
+enum bpf_cmd {
+        BPF_MAP_CREATE,
+...
+        BPF_PROG_DETACH,
+        BPF_GET_COMM_HASH,    <--- added
+        BPF_PROG_TEST_RUN,
+...
+        BPF_OBJ_GET_INFO_BY_FD,
+};
+
+> I suppose it may be useful to split, just to make it clear which
+> portion of the change is the crash fix and which one is just because
+> we think it's more consistent.
+
+Your call.
+> --
+> pw-bot: cr
+
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
