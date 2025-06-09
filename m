@@ -1,192 +1,142 @@
-Return-Path: <netdev+bounces-195659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3812CAD1AEB
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 11:47:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39311AD1AE8
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 11:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB50A16B6DD
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:47:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34D34188D484
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B69E252292;
-	Mon,  9 Jun 2025 09:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AE824E00F;
+	Mon,  9 Jun 2025 09:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi+9m5/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5CB1A238C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20AE1519BA;
 	Mon,  9 Jun 2025 09:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749462401; cv=none; b=aD5t2gQLxmxsZWdZn8lPnjeRJvWnnTGBxxU+Fk+yskPdepXHCh7G3Ct7fHocU+iRTScCl5HYx0GxiYS+d+BpxiIeiQE/eoIR7HE3bx1eDL1hxXXIWlY7S0TuZnk2OD7CF7ZFVmyYsoAOeFtpgi6h6MdskXBr9Ll1E32xUP6PC+c=
+	t=1749462401; cv=none; b=sr7wA2b6Argwc6U5Nd9rqaHbYnzWZa6+2522uWRXO0BbZpMsw82YAcLt9IPN8ArZqfB51Xa/no5YNybdkGaeB+yugB7sClJwMkg0BQhEFdwHgVHlL2gZ4k/CGRXpiLvTx9nu7z9/Vp74+KJx2rWtUHqEI3ku34cpDjb4Wa5c6yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749462401; c=relaxed/simple;
-	bh=PcMgP/Xx+i1wlGQQTmnJJGspz6T6srm8czqC/8uKNrg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=unkOetBz+vRIDK6/mMZL+8StXGYLFX9dSpwH0GDoOC4fhu3ioHlGK9OviPUtirDr10HFRs2CZU5VrNaG8axKPpU9+NvPtd1uSkmoS29bh7serPDwNmZVxUk6DVZ21moaxkPqdgxZO9oRfBZPguv7eN2/iq9S6by/UhLxMMf6arc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	bh=T5+i/IXY5HMlgi5Xmm4N9FOVecSlPeCMn41asEZv3qQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pc8EEzQ7dTU7PIhNJf5iOBBnB9LTP8aJma9ljFAM9ARSkPZHBPWemzpZ3TkU6Nz2rzMoncF1NTtdPGTWOblElTznRELiEpUAW9vcpmmfWDex/gaZNADE9ajnqzXnL6hhSuOgz+Vr2KVoZtlr19npn5Q+Ez+UkXh4qwuUb8pKEZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi+9m5/Z; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-605b9488c28so6607056a12.2;
-        Mon, 09 Jun 2025 02:46:38 -0700 (PDT)
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4e75abe99b7so1352258137.3;
+        Mon, 09 Jun 2025 02:46:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749462398; x=1750067198; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ovdMc1FQ82CEzYnflp6frUiKJPTgmoVtQzARQA5rIDA=;
+        b=Qi+9m5/ZZw9giEoy95IIBQd1jzMjBBmvgrpZojmJ/vKe5cUhkBh9BS+QrRkCZWH8fJ
+         BQnNaN8bRZUSsUuMM8lHE9/Yrpnw0+NEJt8iUV9nBlUmgZoRBSv5KIAqNxe+7Ksnyun4
+         NyEc9gWsNo2oKbTaBCSVYDpy+RNgdRA6R9AeYZ3GbOagBCvOwdrPhGt4a1Y0//TglTm8
+         /vO/HQMel4+wDACt8+yvGr3kpzBAwswyumcZaU6IwjiyBqPLp48mVmtMlhlexHlyPTL6
+         4J6A+P2bwexSQgEaJublTseOS1T7207YARu1n8vy5tXChmfOpfEIoyIaFtsj2ieZZLYb
+         kPag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749462397; x=1750067197;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9srcSMol0c+UDsrqSjvhXDEchnbl8eBTxxIuTk0MKl4=;
-        b=t/nYqclP+oqmP0wPFrj0J3mPyBP31jtJDDhky2xttFkrZC1/Hh66wMxN/v/dnElwY4
-         TKL0bGOXH+YuPOBErWd2+kGlisDKxPbDncvXslqZNF6CZPT6TCzkhqo2MX00F6gHQTz5
-         lxAe15uHhKcGY5f71q/cuwF/Qiw7R6Lldg4per1v5rE66Yy+wJnoE7k5IgIRMeFg/qhC
-         KZSqH0D6h+TPGrPYMVK6yn7YiUrEwh38ATx+jU/RIpmAWkSwuD6lm3eyN6tvrkrisKH8
-         StPMW22fijq2pfJYBd3j45WBPg9oEH2PTAUbiMAfSjtSzq7Pn+Kjdx5jHXZnUnA1HeeX
-         nY+w==
-X-Forwarded-Encrypted: i=1; AJvYcCU+SGPX5wxB8uWTgOxgjsL8gEILr6t624xxx7lFk+6ax9i0yRXJHbyfcgK+187h8mhaJuX7LyBeqnZKfbm1i0Rl@vger.kernel.org, AJvYcCXaN4Hs22b1jcWNS5CT/eB5QY1RyA8TDdT7r9pevVdHjQJ2BmayyiVo/BoV2palPHu+EIz4lNPTohWlKpk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXC+TW/phRnchcUdX8cIFUaHaNpv1p8eUTBxhEUx3xd/WdtPXh
-	iVPOaowFHr5FvmHZWbmBGmPzvYGs1VAMUKpothO6Qc9Q1usjkAF7S9UUNpjRiw==
-X-Gm-Gg: ASbGncsoun/wz+hq0pKGmDZH15bbGRsQOZrjdENooUyith9V1cb/kJf73O39b2tAoEy
-	dW57ysBBH2tPYKk0GZ7uWZw8sLovJ4cWcZelL8HXQZ+LZLDrl15L/9eIz5ZnFyh7gMdLtphLzyS
-	ZTsMTAYoMsVhMwF9XoFm8XJZ8waIGQ6NN35S+RgyKbfEccwvcwYcEkKaL71jDzyZ0jyuSVC9Yr/
-	jISAEf5Xe0TrWCwtbGyFX9abUoeqBE/h2DI4TpZQsIM7Oc07CSi+2Fdknm9TZG0EGIrnZa8jiRS
-	l3KTijIrlPRO1s1noggLNWpjkafEC7yrd3VjnTD2mdX+hFNPDeArNg==
-X-Google-Smtp-Source: AGHT+IExjHyiPhte1wwY1E+snj45M23nryaOO7uTbbMCxtigSnjey2IkVn1y4SiCS8mVaf9DAC0EDw==
-X-Received: by 2002:a17:906:dc8b:b0:ad2:28be:9a16 with SMTP id a640c23a62f3a-ade1abc4055mr1125553066b.51.1749462397154;
-        Mon, 09 Jun 2025 02:46:37 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1db575f9sm523118766b.48.2025.06.09.02.46.36
+        d=1e100.net; s=20230601; t=1749462398; x=1750067198;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ovdMc1FQ82CEzYnflp6frUiKJPTgmoVtQzARQA5rIDA=;
+        b=bubwer+4mjZOH0kIsoregwNz1IclfPmoy/PW1I6hjZdIrDFy05SASrG7CndPPVLI4M
+         8s3U32uh7GwQtFEmNiTHAwYw4Z2hUMCVSsjthhPFbcoyyupADJ44+YtuHt2/G29VRHvd
+         BxP1cQr7qgCNBjpQeRnjKhsmKtlzilXoPMGF56J70hNP0dSgdPhEYZ9C+J6LN0F5CzvG
+         DfAk/t2Qtjxk9B8kSGUdXLD/WxAA816ASQ4wClf7N+425AFj90cP+0ZhUrtkYxKsN+Fp
+         YxYyss1Tv/TNG7kvGCfgCtxnryW7i1h5CR78SXvNRU9tHvfiDwqbgW+9R+PVNuR8Bt/7
+         qjXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlnLrl9PtBKJm5HgUX8lSgxAuUevismiCTCTT9bszhl1O03j9CoBIkY2xQlXSGIBXiAZSOuqc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2UrtdepDXj1Z7xDX/LdRDRBFwaqbBGzsLV9Sz/k6J785QacB9
+	EtK7ibnfscffYg/VH/+2TEB1WdLEBZO86WlvrVLRSsCwDX0fx5f1v6ew
+X-Gm-Gg: ASbGncsLNVRE0KRRKi8yrlWIrxN4t4ZR9wMjCJdLAe22TFdvDCsGS5cyvojYScfa8V5
+	6sSTD6EpRKeJcC2Zk8AYH+ejU7CFVAc35TuvxGcKYjid2Ra/W84XjO32a4YF00ssWvX+FZdzriE
+	PwX/ug+AkrdMfVl4Xz1pep4dT/Tueo4aS5xHZWsYZ8IhA9exAYa8KM/eLDaZ3YSqG7LprYKM+2V
+	wtjOEkgHozytYdY6ker97UYVjZ3ohKQHaz1q8J7rwxpLnu3I61naG2tuhXeh/UcyUxvzvPgER8v
+	UlhT6h35Uz1m8+Vf+aJP7F4AD5xKcMg0foIn+BbQ+EEe+QiHF9+wzTDfwPBbyBjyGFq2E3qeNBc
+	R4rd+rg==
+X-Google-Smtp-Source: AGHT+IHhBQtxj0UI8XNLr0PrzKwYEnZsOFMk+fBH0dYUOlF7WlJj1nnDuG+YS4QLGaBftztpRKN4aw==
+X-Received: by 2002:a05:6102:c0c:b0:4e5:a9b7:df with SMTP id ada2fe7eead31-4e7728f71c8mr9600540137.13.1749462398515;
+        Mon, 09 Jun 2025 02:46:38 -0700 (PDT)
+Received: from localhost.localdomain ([187.61.150.61])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ed07c0abasm1964643241.20.2025.06.09.02.46.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 02:46:36 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 09 Jun 2025 02:46:27 -0700
-Subject: [PATCH net-next v3 2/4] netconsole: Add automatic console
- unregistration on target removal
+        Mon, 09 Jun 2025 02:46:38 -0700 (PDT)
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	Ramon Fontes <ramonreisfontes@gmail.com>
+Subject: [PATCH] mac802154_hwsim: allow users to specify the number of  simulated radios dynamically instead of the previously hardcoded value of 2
+Date: Mon,  9 Jun 2025 06:46:28 -0300
+Message-ID: <20250609094628.6929-1-ramonreisfontes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250609-netcons_ext-v3-2-5336fa670326@debian.org>
-References: <20250609-netcons_ext-v3-0-5336fa670326@debian.org>
-In-Reply-To: <20250609-netcons_ext-v3-0-5336fa670326@debian.org>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
- Shuah Khan <shuah@kernel.org>, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- gustavold@gmail.com, Usama Arif <usamaarif642@gmail.com>, 
- linux-kselftest@vger.kernel.org, kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3187; i=leitao@debian.org;
- h=from:subject:message-id; bh=PcMgP/Xx+i1wlGQQTmnJJGspz6T6srm8czqC/8uKNrg=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoRq14syo3K59GlRRtZ/UTJ18TAka+WDv7liY1z
- Ie8t+/sMs6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEateAAKCRA1o5Of/Hh3
- bfmrEACC6/RhIchyphNzgUoDnwYukGg0+m1yS0ka+SpqBs/N2ddHwFjNVNHKoiKLt8Quha0EF/Y
- oDAklIbHOP8eR4ZFBHK6D5AhGw3M5xeAzZpNMmI5KRs0+4UUqUIhXa78tftmEpK/ZxhxTdnfm07
- kOHZSYM9iJud7vQMe3ABkrbVVKzWqfmLZAwZhyQJTJr1HL5PuFHXYNokJKOJEEFRy3PDir9aYKx
- +o6UHkXx0aHXhar4wJXqya1N6EUSQh8EVsfvFpkvk/oBYMgc5WAfDb6bAcTPDJ5N472VBpOF3S+
- IT/lUvDpOf6uWtTGgngw3Cqx3yfSOPH5sy/FsK/ndjLMDKezfpdUAeVD4hRERuCI1OAVZXkm53j
- et54Gea4bNTatQDGdsGUJpKB7Mk9Ej7fb+dFrNRg5m21e1eKV+czFr/e+bLol6VckULXctpVP0i
- yr3MmoH/jqnSqYPpkWo4aFe4beZSkifRnfUiu85xe4/qfQKhRsVBsIRDUiR1Qack+2ytzhz3RHN
- kk2OI9uVsjRemCllal35e9Mk+6x6yAtBkpnUEQ93RN37AeEiKqr9B5AcOijKHFA2lZ9GhZVZztN
- HI1ZgqkiWNAF3rxuHvMk/9Hj1tvH+Xj0typTIMy1JcEOXIXHC0Ze3YF9oVgWELKPn1wPLtuyaSg
- XeTerqsc4OR1znA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Transfer-Encoding: 8bit
 
-Add unregister_netcons_consoles() function to automatically unregister
-console handlers when no targets of the corresponding type remain active.
+Add a module parameter radios to allow users to configure the number
+of virtual radios created by mac802154_hwsim at module load time.
+This replaces the previously hardcoded value of 2.
 
-The function iterates through the target list to determine which console
-types (basic vs extended) are still needed, and unregisters any console
-handlers that are no longer required. This prevents having registered
-console handlers without corresponding active targets.
+* Added a new module parameter radios
+* Modified the loop in hwsim_probe()
+* Updated log message in hwsim_probe()
 
-The function is called when a target is disabled and moved to the cleanup
-list, ensuring proper cleanup of unused console registrations.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
 ---
- drivers/net/netconsole.c | 39 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+ drivers/net/ieee802154/mac802154_hwsim.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 01baa45221b4b..21077aff061c5 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -460,6 +460,33 @@ static ssize_t sysdata_release_enabled_show(struct config_item *item,
- 	return sysfs_emit(buf, "%d\n", release_enabled);
- }
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 1cab20b5a..1740abe1a 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -27,6 +27,10 @@
+ MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac802154");
+ MODULE_LICENSE("GPL");
  
-+/* Iterate in the list of target, and make sure we don't have any console
-+ * register without targets of the same type
-+ */
-+static void unregister_netcons_consoles(void)
-+{
-+	struct netconsole_target *nt;
-+	u32 console_type_needed = 0;
-+	unsigned long flags;
++static unsigned int radios = 2;
++module_param(radios, int, 0444);
++MODULE_PARM_DESC(radios, "Number of simulated radios");
 +
-+	spin_lock_irqsave(&target_list_lock, flags);
-+	list_for_each_entry(nt, &target_list, list) {
-+		if (nt->extended)
-+			console_type_needed |= CONS_EXTENDED;
-+		else
-+			console_type_needed |= CONS_BASIC;
-+	}
-+	spin_unlock_irqrestore(&target_list_lock, flags);
-+
-+	if (!(console_type_needed & CONS_EXTENDED) &&
-+	    console_is_registered(&netconsole_ext))
-+		unregister_console(&netconsole_ext);
-+
-+	if (!(console_type_needed & CONS_BASIC) &&
-+	    console_is_registered(&netconsole))
-+		unregister_console(&netconsole);
-+}
-+
- /*
-  * This one is special -- targets created through the configfs interface
-  * are not enabled (and the corresponding netpoll activated) by default.
-@@ -493,14 +520,18 @@ static ssize_t enabled_store(struct config_item *item,
- 			goto out_unlock;
- 		}
+ static LIST_HEAD(hwsim_phys);
+ static DEFINE_MUTEX(hwsim_phys_lock);
  
--		if (nt->extended && !console_is_registered(&netconsole_ext))
-+		if (nt->extended && !console_is_registered(&netconsole_ext)) {
-+			netconsole_ext.flags |= CON_ENABLED;
- 			register_console(&netconsole_ext);
-+		}
+@@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pdev)
+ 	struct hwsim_phy *phy, *tmp;
+ 	int err, i;
  
- 		/* User might be enabling the basic format target for the very
- 		 * first time, make sure the console is registered.
- 		 */
--		if (!nt->extended && !console_is_registered(&netconsole))
-+		if (!nt->extended && !console_is_registered(&netconsole)) {
-+			netconsole.flags |= CON_ENABLED;
- 			register_console(&netconsole);
-+		}
- 
- 		/*
- 		 * Skip netpoll_parse_options() -- all the attributes are
-@@ -528,6 +559,10 @@ static ssize_t enabled_store(struct config_item *item,
- 		list_move(&nt->list, &target_cleanup_list);
- 		spin_unlock_irqrestore(&target_list_lock, flags);
- 		mutex_unlock(&target_cleanup_list_lock);
-+		/* Unregister consoles, whose the last target of that type got
-+		 * disabled.
-+		 */
-+		unregister_netcons_consoles();
+-	for (i = 0; i < 2; i++) {
++	for (i = 0; i < radios; i++) {
+ 		err = hwsim_add_one(NULL, &pdev->dev, true);
+ 		if (err < 0)
+ 			goto err_slave;
  	}
  
- 	ret = strnlen(buf, count);
-
+-	dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n");
++	dev_info(&pdev->dev, "Added %u mac802154 hwsim hardware radios\n", radios);
+ 	return 0;
+ 
+ err_slave:
 -- 
-2.47.1
+2.43.0
 
 
