@@ -1,73 +1,95 @@
-Return-Path: <netdev+bounces-195892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DF7AD298E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:46:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF23AD29A7
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14243A97B5
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:46:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9EB1882C57
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C5225A32;
-	Mon,  9 Jun 2025 22:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA6B1D89E3;
+	Mon,  9 Jun 2025 22:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmE3Q8Oo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oHjSux5H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C04225788;
-	Mon,  9 Jun 2025 22:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568551519BA
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 22:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749509198; cv=none; b=j9HASQnamQmXUT04inFu4OyKA3IgYJorgkl/y4AHzz9WbJP0J7v/0cB0D6r7/voYT46NkqoZ89dT+K+xlV7eWnnUL5s6YuSOr04aifO6e2fyhQmisd2+vC3WlCHxcjel76pniiz+EqGwPkvlvnT6bWEplm0kBbffvjddS4KtOmU=
+	t=1749509403; cv=none; b=UDaVBQltMpbqgnLQ4lDGm/gFTEtpFy/spDH6kH6NJcOy7gpsWD7f3PYX/tsARESyzUoYU7fqBxCy7Hy835jRfR5B583LqN6hjwYit1yOipAmzX0DU6aqdvRxWPMifN+78RrWCpgrMYbiMhZ4vZlq+vZAJLCvuBZKGqSmVyzy2vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749509198; c=relaxed/simple;
-	bh=nJj12iQ8vhZRCjp76lVlJ10BcU6g8lFx42piFMF5C7U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z6C3i3Zk5SfCZacybBp7Cv3DzuKB/NA+DUhDHluYydMJfHL0yf4xroe9Pp7oDTU52iu+O1WPA60chAxtrHaW17pUjC1/4WUc/dc2/qHx6XDcelZ0TSRbjJuIrTIt1byYAt9iz47aMrzz//G9LoXPJ/4GgIkqbZGzx4YAPOxT/uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmE3Q8Oo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC0ADC4CEEB;
-	Mon,  9 Jun 2025 22:46:37 +0000 (UTC)
+	s=arc-20240116; t=1749509403; c=relaxed/simple;
+	bh=lmgZt7awv6ki0+3MJB+gj+R8pdTSGkFvFwudFg96/04=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ynp6ajLJqMqXT63ZUqkwYQYeyk0XKGSWRMQBXNNGpGTIadLJQiWVG4dPBBf6PQm6Levteniq+0MMPFxGVCxQ0RFwSev8xzXm4TcQ5nvKRru8pzjQvI4GlY548RYEHdUNRznz/R9chKcqM4ihYAPZhnsh8nw96wWbp+3x6mrVtkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oHjSux5H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBA6BC4CEEB;
+	Mon,  9 Jun 2025 22:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749509198;
-	bh=nJj12iQ8vhZRCjp76lVlJ10BcU6g8lFx42piFMF5C7U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NmE3Q8Oo30TpdYeAMa7SpaIKWQTOtsnMDk054gK/fIuyHOZV2Q6u79WnxwFuPgFor
-	 nR8ILY2F/TAyvVXGaMhuPQ2+n9/8AxWYApXmeZgC0x/5cKKWEhMGBjF6461Dz+Q+H8
-	 Zxcm4dwJwFI11BXo1ENe+ImELyFsSbKTP9oXLXLTYEIrYHws0LEWFI/xxdSmRODuBj
-	 gkajEQJlYimIaEJ31S/L26WA0/b/NswApRiBjKvOwtHJX6R3yez3XyqJODXRV/nESj
-	 Sikasz1BavVo3vv3g4GZmzZZX91gZlAXLNoaez/osDkL7GgiNbyjcVEPbly8K3Y/g2
-	 uC9KGCGx5Ho0w==
-Date: Mon, 9 Jun 2025 15:46:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH 2/3] netns: use stable inode number for initial mount ns
-Message-ID: <20250609154637.06f27fde@kernel.org>
-In-Reply-To: <20250606-work-nsfs-v1-2-b8749c9a8844@kernel.org>
-References: <20250606-work-nsfs-v1-0-b8749c9a8844@kernel.org>
-	<20250606-work-nsfs-v1-2-b8749c9a8844@kernel.org>
+	s=k20201202; t=1749509402;
+	bh=lmgZt7awv6ki0+3MJB+gj+R8pdTSGkFvFwudFg96/04=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oHjSux5HVgjAwVO3LqHt1thnCLa7VqX5cflST0t8TYVjraN2O9uX4kriQkEIc8iMY
+	 /u12vW8A1Pxk2P5DWJXFPFrXVr3w6JDyeKFJm2P1L9sDl22V79cZzGZT+NTVASvyNb
+	 tAMHrsz3KgElhuCNHWlboBsKIxjj/Xu4ab8FuXOH4MksbPhry/d4rlN4HT9nNa7yrb
+	 3ke8K7LbrGqB+/u7JfyqtfYXj9CxTW3xVmeHJ4Q3sSqLLoltA0kMgjp/mr8lxQorwG
+	 lLfnMJ3ufKoKmkjUAqmtg7e1JzPSmJtLxM4Vch2aoQ1vF84gbjqFUTTEdrfOO26xYI
+	 EXXZnrISbcXPA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDCA3822D49;
+	Mon,  9 Jun 2025 22:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net_sched: sch_sfq: fix a potential crash on gso_skb
+ handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174950943350.1577535.9819128012531579233.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Jun 2025 22:50:33 +0000
+References: <20250606165127.3629486-1-edumazet@google.com>
+In-Reply-To: <20250606165127.3629486-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ toke@redhat.com, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ marcus.wichelmann@hetzner-cloud.de
 
-On Fri, 06 Jun 2025 11:45:08 +0200 Christian Brauner wrote:
-> Apart from the network and mount namespace all other namespaces expose a
-> stable inode number and userspace has been relying on that for a very
-> long time now. It's very much heavily used API. Align the network
-> namespace and use a stable inode number from the reserved procfs inode
-> number space so this is consistent across all namespaces.
+Hello:
 
-Nice!
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+On Fri,  6 Jun 2025 16:51:27 +0000 you wrote:
+> SFQ has an assumption of always being able to queue at least one packet.
+> 
+> However, after the blamed commit, sch->q.len can be inflated by packets
+> in sch->gso_skb, and an enqueue() on an empty SFQ qdisc can be followed
+> by an immediate drop.
+> 
+> Fix sfq_drop() to properly clear q->tail in this situation.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net_sched: sch_sfq: fix a potential crash on gso_skb handling
+    https://git.kernel.org/netdev/net/c/82ffbe7776d0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
