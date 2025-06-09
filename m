@@ -1,241 +1,140 @@
-Return-Path: <netdev+bounces-195709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0CA4AD2040
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:56:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED39AD2087
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F22B216C7EE
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:54:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A71F3A5CEA
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503FE25D527;
-	Mon,  9 Jun 2025 13:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A589B25A2B4;
+	Mon,  9 Jun 2025 14:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nz3Di2xi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dHb7UP9Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783A62571D8;
-	Mon,  9 Jun 2025 13:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFBF25B1FC;
+	Mon,  9 Jun 2025 14:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749477034; cv=none; b=Vg/y/mC2jufBp4wzudHcAjgKy6vrjZh+6gfOrHvB4GJKP998SIApcl3/bV2u8oB95subAxedhzbpgwPf73DSw4JxRk7JR6gdZxbq9377K3irr1UJipnpPQ/oG3luYYdixo2k4kIhVtFjWx/ODjQy676wm265zgIgHrpSWHrzT2w=
+	t=1749477839; cv=none; b=mVd3H0uht1kxHuz7uTBPWcvkdGE4AfSQDTIOgYP047pAxdalhMKoOSlm406eMk8aJQlelk6GKDmO4CzrzVs0BCnqg1BE9VGy6DpcZv5cCSTyHqOPRw1R3sSIAlt5jSLulclbg5/GdNIjn+MapdkEZBco1m25T10tjtreyedlW5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749477034; c=relaxed/simple;
-	bh=TfJRv3Jq8V/kbJ9EAFnJDVvFjSVflQQqAcFlIwK70d4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ePSqode9XyufJ4eK79zgALDw3XPgg8kSD8ikxMPKa5mogPBFTCZduW48OUAH7hiChQGeetT6ZrikuyiaU6/wuhByp1NndrW3CUAbJcj8Ii6FuPvc0DxvivXtkuJluwM+K+c1eDtLJdMR4dr8+fti13SDxRH4b1i/NlIXn1aGRWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nz3Di2xi; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-710f39f5cb9so30749737b3.3;
-        Mon, 09 Jun 2025 06:50:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749477031; x=1750081831; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UCFKHnn9XDXTSH/ces8W9yv4oDl2tYdrN0/ngfBqiGg=;
-        b=Nz3Di2xiHeOWgHzQeuoFddY5EoqXPAP8aTOAFkVKp1e9HoiebY+uJy5TJ4RQtStLWX
-         bt//s7veI9hlMO3q18I+41fdn2bu64I3C2APyXfvQrsjmSvbOL8JmbGXRlgYL3nQZwFI
-         /nsiFNxwTiG4m4PFRBT1WVxjMgdpt95259JY3c9iCrhXUun/SNkru0H2GFyS7nA2MpAL
-         COPDpKmPVq6X4+H4Xc7WU59GPN9QBfxaUFQCbR95OlUGhSP7P9H5nsCAJvNQwTmsuJ3S
-         +xIZsc0z+CiR5d+syzZiGhwMEhTk41N2WY/9hi1W4wWKiyHfPx1ovjDbU+TbJ4sj+rpt
-         SqpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749477031; x=1750081831;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UCFKHnn9XDXTSH/ces8W9yv4oDl2tYdrN0/ngfBqiGg=;
-        b=WlpwTEPYihRb7Q4CArsWAKfmQN1/nr7iTr1BW+2aMdmn7fpu0DHOVWEvOHQIn8h1qI
-         rAtQdd+QJzYRjeimdC6wks9q2zkrJV3rTc1Goi913pXyAJVD1g7YCYt0g1YKyKVMbB22
-         32sqFJobTxCwBKT7NuLES8M+1EdmAcznj8JViBTc+J9lyiTYC/81zg+31NxvKZ19GSQm
-         KEQMf+4YVTNrPwjfi8H4aMuRkm9zs+OP609QLNLG4NX46cTmLI7Gkj8pGrSAZu3htX9q
-         6hv9EBKtz2jHvJqrIKamr1E/ylAf/QC/+2sJnmKnozgyz7tIPutjtcSW88t4B5BwC/eS
-         esGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIEMRnxUUEogtSORRCXSUnJkeERp/gRMcFlGz3Rv3CMjdz3FiARSeQV3er57k/zpzCY0o=@vger.kernel.org, AJvYcCWXoPRsRcZhRA4W4LKJZwc9/h2SRhblez+dpx0crBRhO06BvuK94A/orQRYI/a4JjrG8QWJa3vn@vger.kernel.org, AJvYcCXgSMraFUNowKQoPkC9AfgCb8H62ESbX2F+cZZvLgnlGQNmN9V91DLE8tJNmfg49v7kAz5yn0brqH0qJTHUAZy5@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0cEwUpqFUJ+4PxJPOXRiFkhY+VlLR224oFoPIHzk4F2mRL9K6
-	z6YGywY1l0XZ2TaI22+VwH4YA6gXCHN8EJbhBmS0HvHaj/DmdA30JBtM
-X-Gm-Gg: ASbGncuVkFIUsh7boniQalh3CtcB6RLyc31PYk8o2cCn+j1rdTOtVgcbepad2VkkiN7
-	eHvuBybtb1YWlXjPL9f8EfxXFMcclgB8eGg/yZbn7wx6zfucRBv8dd9yKE5jVSeicRIdXYe+Yyo
-	uB1odTmK6CxiSViiCdow2nJCAtiD97QSABdIVLcSTo4scjpfrSlmwiwpssA+kXNLipXeN9kCvdw
-	7aX5x0qmiKgrgxKYUxcAcKARxkMTQtYdrhpyXIGmavNCMnt4t1VszzE5/uaocu+2qiI/uI9J7i4
-	KOz7Lq2HXd5AquQv5Mf6GCVBZb/A+5i4pHNy2BzFQImHpVwmW6rx9E8ITi1cREdQUBGZxNge0v6
-	tNSuOGEteRBFdWsIIVSupFmO3l//jVk8m2NaRh00Etg==
-X-Google-Smtp-Source: AGHT+IE9BX0iSiWC9oKQMJC2n+ps6EL2p2MU+EEs0w2d3NOwBfHjr3+wwU8sQL4sDbXG/qwafEx5UQ==
-X-Received: by 2002:a05:690c:389:b0:70d:ed5d:b4bd with SMTP id 00721157ae682-710f76ff597mr174049457b3.21.1749477031438;
-        Mon, 09 Jun 2025 06:50:31 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-710f98af944sm12555627b3.13.2025.06.09.06.50.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 06:50:30 -0700 (PDT)
-Date: Mon, 09 Jun 2025 09:50:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>, 
- Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- martin.lau@linux.dev, 
- john.fastabend@gmail.com, 
- eddyz87@gmail.com, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- willemb@google.com, 
- william.xuanziyang@huawei.com, 
- alan.maguire@oracle.com, 
- bpf@vger.kernel.org, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- yonghong.song@linux.dev
-Message-ID: <6846e6a6342c7_34e997294f9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
-References: <20250607204734.1588964-1-kuba@kernel.org>
- <CANP3RGcUbSG3dQQbDrsYq9YSMStXbmEsq6U34jcieA_45H4_JQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: clear the dst when changing skb protocol
+	s=arc-20240116; t=1749477839; c=relaxed/simple;
+	bh=G45qDbAehHP+NM/bfLTf8rrcj6I8n8nlynfPDbDRo3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qdTWd1VEHKWbn+w2L+z+QkMXZ4wkBr0c8Vsn/bhFGGASHKLlIW29uTLT7myGdQVomjNFqvlbnlmw36PeCCq18hNgY7QirOUygcCdFMj34zsOKjOd/AZTlTcgdKIDmGF8AnHgDeCH5blfJe4XXSLCV9es+jnk+v4S8IiWUXZ7dbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dHb7UP9Q; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4124243EB4;
+	Mon,  9 Jun 2025 14:03:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749477829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OqMBpg9+vjtHlgxrQiNduRjtVddZANrog7hUYnBT5YU=;
+	b=dHb7UP9Qm8R2b2sYhW4xHcgsGQGVkTY5pv94V/mgXxenhroYTbQr0jbuTLbIKYVTve/L/h
+	YBd6keuLT7NYBJo5fOX9RD0fAqjjmCGq5h5BCoFU/trCVwbqG+nx0vv24mCUaA8fKmWE1y
+	TrHh4BoFWSCS0Hx7GTU6xfNiEbd4c0HpDIiea7SNSSGvTKlqGSmec0jeiDTaFWu+FdinnG
+	q4j6FB6STjwvPfEb/hHVWhWRGQ4bdB5eUOYsO3zuyQw/0t6Oa66uHgAfydzBi4kmLyxorW
+	0R7UyUw4LU4cBdDSLNxnWT2eZB0EnUuqMs07cuowxpalKm6O0k/L9L8hiHStGg==
+Date: Mon, 9 Jun 2025 16:03:46 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Oleksij
+ Rempel <o.rempel@pengutronix.de>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
+ Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
+ King <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget
+ evaluation strategy
+Message-ID: <20250609160346.39776688@kmaincent-XPS-13-7390>
+In-Reply-To: <f5fb49b6-1007-4879-956d-cead2b0f1c86@nvidia.com>
+References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
+	<8b3cdc35-8bcc-41f6-84ec-aee50638b929@redhat.com>
+	<71dc12de-410d-4c69-84c5-26c1a5b3fa6e@nvidia.com>
+	<20250609103622.7e7e471d@kmaincent-XPS-13-7390>
+	<f5fb49b6-1007-4879-956d-cead2b0f1c86@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdelfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqheftdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfejveefgeeggefhgfduhfehvdevvdeukeelveejuddvudethfdvudegtdefledunecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdelpdhrtghpthhtohepghgrlhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepuggrvhgvmhesuggrvhgvm
+ hhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvth
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Maciej =C5=BBenczykowski wrote:
-> On Sat, Jun 7, 2025 at 10:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> >
-> > A not-so-careful NAT46 BPF program can crash the kernel
-> > if it indiscriminately flips ingress packets from v4 to v6:
-> >
-> >   BUG: kernel NULL pointer dereference, address: 0000000000000000
-> >     ip6_rcv_core (net/ipv6/ip6_input.c:190:20)
-> >     ipv6_rcv (net/ipv6/ip6_input.c:306:8)
-> >     process_backlog (net/core/dev.c:6186:4)
-> >     napi_poll (net/core/dev.c:6906:9)
-> >     net_rx_action (net/core/dev.c:7028:13)
-> >     do_softirq (kernel/softirq.c:462:3)
-> >     netif_rx (net/core/dev.c:5326:3)
-> >     dev_loopback_xmit (net/core/dev.c:4015:2)
-> >     ip_mc_finish_output (net/ipv4/ip_output.c:363:8)
-> >     NF_HOOK (./include/linux/netfilter.h:314:9)
-> >     ip_mc_output (net/ipv4/ip_output.c:400:5)
-> >     dst_output (./include/net/dst.h:459:9)
-> >     ip_local_out (net/ipv4/ip_output.c:130:9)
-> >     ip_send_skb (net/ipv4/ip_output.c:1496:8)
-> >     udp_send_skb (net/ipv4/udp.c:1040:8)
-> >     udp_sendmsg (net/ipv4/udp.c:1328:10)
-> >
-> > The output interface has a 4->6 program attached at ingress.
-> > We try to loop the multicast skb back to the sending socket.
-> > Ingress BPF runs as part of netif_rx(), pushes a valid v6 hdr
-> > and changes skb->protocol to v6. We enter ip6_rcv_core which
-> > tries to use skb_dst(). But the dst is still an IPv4 one left
-> > after IPv4 mcast output.
-> >
-> > Clear the dst in all BPF helpers which change the protocol.
-> > Also clear the dst if we did an encap or decap as those
-> > will most likely make the dst stale.
-> > Try to preserve metadata dsts, those may carry non-routing
-> > metadata.
-> >
-> > Reviewed-by: Maciej =C5=BBenczykowski <maze@google.com>
-> > Acked-by: Daniel Borkmann <daniel@iogearbox.net>
-> > Fixes: d219df60a70e ("bpf: Add ipip6 and ip6ip decap support for bpf_=
-skb_adjust_room()")
-> > Fixes: 1b00e0dfe7d0 ("bpf: update skb->protocol in bpf_skb_net_grow")=
+Le Mon, 9 Jun 2025 14:03:46 +0300,
+Gal Pressman <gal@nvidia.com> a =C3=A9crit :
 
-> > Fixes: 6578171a7ff0 ("bpf: add bpf_skb_change_proto helper")
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> On 09/06/2025 11:36, Kory Maincent wrote:
+> > Le Sun, 8 Jun 2025 09:17:59 +0300,
+> > Gal Pressman <gal@nvidia.com> a =C3=A9crit :
+> >  =20
+> >> On 28/05/2025 10:31, Paolo Abeni wrote: =20
+>  [...] =20
+> >>
+> >> Are all new uapi changes expected to come with a test that exercises t=
+he
+> >> functionality? =20
+> >=20
+> > I don't think so and I don't think it is doable for now on PSE. There is
+> > nothing that could get the PSE control of a dummy PSE controller driver=
+. We
+> > need either the support for a dummy PHY driver similarly to netdevsim or
+> > the support for the MDI ports.
+> > By luck Maxime Chevallier is currently working on both of these tasks a=
+nd
+> > had already sent several times the patch series for the MDI port suppor=
+t.
+> >  =20
+>=20
+> We shouldn't rule it out so quickly, testing is important, let's try to
+> accommodate to our rules.
+>=20
+> Why can't this be tested on real hardware using a drivers/net/hw
+> selftest? The test can skip if it lacks the needed hardware.
+> Or rebase this over Maxime's work?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+How should I do it if I need to use ethtool to test it? It is a vicious cir=
+cle
+as ethtool need this to be merge before supporting it.
+Would it be ok to accept it like that and wait for ethtool support to add t=
+he
+selftest?
+Otherwise I could test it through ynl python command but there is no similar
+cases in the selftest.
 
-> > ---
-> > v2:
-> >  - drop on encap/decap
-> >  - fix typo (protcol)
-> >  - add the test to the Makefile
-> > v1: https://lore.kernel.org/20250604210604.257036-1-kuba@kernel.org
-> >
-> > I wonder if we should not skip ingress (tc_skip_classify?)
-> > for looped back packets in the first place. But that doesn't
-> > seem robust enough vs multiple redirections to solve the crash.
-> >
-> > Ignoring LOOPBACK packets (like the NAT46 prog should) doesn't
-> > work either, since BPF can change pkt_type arbitrarily.
-> >
-> > CC: martin.lau@linux.dev
-> > CC: daniel@iogearbox.net
-> > CC: john.fastabend@gmail.com
-> > CC: eddyz87@gmail.com
-> > CC: sdf@fomichev.me
-> > CC: haoluo@google.com
-> > CC: willemb@google.com
-> > CC: william.xuanziyang@huawei.com
-> > CC: alan.maguire@oracle.com
-> > CC: bpf@vger.kernel.org
-> > CC: edumazet@google.com
-> > CC: maze@google.com
-> > CC: shuah@kernel.org
-> > CC: linux-kselftest@vger.kernel.org
-> > CC: yonghong.song@linux.dev
-> > ---
-> >  tools/testing/selftests/net/Makefile   |  1 +
-> >  net/core/filter.c                      | 31 +++++++++++++++++++-----=
---
-> >  tools/testing/selftests/net/nat6to4.sh | 15 +++++++++++++
-> >  3 files changed, 39 insertions(+), 8 deletions(-)
-> >  create mode 100755 tools/testing/selftests/net/nat6to4.sh
-> >
-> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/sel=
-ftests/net/Makefile
-> > index ea84b88bcb30..ab996bd22a5f 100644
-> > --- a/tools/testing/selftests/net/Makefile
-> > +++ b/tools/testing/selftests/net/Makefile
-> > @@ -27,6 +27,7 @@ TEST_PROGS +=3D amt.sh
-> >  TEST_PROGS +=3D unicast_extensions.sh
-> >  TEST_PROGS +=3D udpgro_fwd.sh
-> >  TEST_PROGS +=3D udpgro_frglist.sh
-> > +TEST_PROGS +=3D nat6to4.sh
-> >  TEST_PROGS +=3D veth.sh
-> >  TEST_PROGS +=3D ioam6.sh
-> >  TEST_PROGS +=3D gro.sh
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 327ca73f9cd7..d5917d6446f2 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -3406,8 +3406,14 @@ BPF_CALL_3(bpf_skb_change_proto, struct sk_buf=
-f *, skb, __be16, proto,
-> >          * need to be verified first.
-> >          */
-> >         ret =3D bpf_skb_proto_xlat(skb, proto);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> >         bpf_compute_data_pointers(skb);
-> > -       return ret;
+Nevertheless, it would have been nicer to point this out earlier in the ser=
+ies.
 
-I wonder whether that unconditional call to bpf_compute_data_pointers
-even if ret was there for a reason.
-
-From reviewing the bpf_skb_proto_xlat error paths, it does seem safe
-to remove it. The cases where an error may be returned after the skb
-is modified only modify the skb in terms of headroom, not headlen.
-
-> > +       if (skb_valid_dst(skb))
-> > +               skb_dst_drop(skb);
-> > +
-> > +       return 0;
-> >  }
-> >=
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
