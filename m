@@ -1,160 +1,122 @@
-Return-Path: <netdev+bounces-195629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D00AD1801
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:36:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17763AD1829
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4330216ADE6
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D090016665C
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40AD27FD4F;
-	Mon,  9 Jun 2025 04:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4CC27FB1C;
+	Mon,  9 Jun 2025 04:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="NI1fzrF7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="KOe51b9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EBD19309E;
-	Mon,  9 Jun 2025 04:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E24326E17A
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 04:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749443595; cv=none; b=fKwHljEa/gZPcuK5/XP8jI5gyhwsJx/ymuqRMwCNJeARVbh1cpb6JJZg8aJ4EX7SpxlLFamWUO/Pv2C1vGNSch17FdQAOPdlXvpWRqC1YtXj9KIOu+9tboODKM2viT3gjyer568/xs0Ou0vG9sUPCeM6mfrSRTx7TRgT7saents=
+	t=1749444880; cv=none; b=ANhVSsbnjqu9iimtqk4F94w9zKzXciQkap+XTbMbcPgtPpIDrsIBmS86RFRfXACuoyFW/W2b84GrGKXN475mndCSQqmU5UBqOBveZjWDd2Mn00s4nbc71/miS4JnJapi7AnZH7YFTk7kyWFvdWQHlcCHB//2Yr3CTk7q4ohqWT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749443595; c=relaxed/simple;
-	bh=7+bSEDdkuLIICSf100hVTfZ2IMYgPaUemWV4CuSRMwY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I2j6r1+SUqdEIcwcAgHKQXMSBoqeGt1plpwgeSHBJwnaJQsf+fmGTp/GyRlGkUwq0MxGtMyJL0+wFySkLS3i9AjAIS8bTvoNVyIFW8q+CJtFxWIQQiCpVF5MA6qRM3fQOp7vjklI1j46H3uYLbA64z3FbDgpGz9et8MTPk0vGaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=NI1fzrF7; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749443595; x=1780979595;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=K1IXsGeOjEMrDiz6/avTqx4a+iEDZuQrzJNH3kyvoUo=;
-  b=NI1fzrF753ZGmjB8gZiWxdHuXcuaonGlved08f0dvwD8n+tAEXKAJgAY
-   eeCwFL+har4LxLOPCifFcaAxL6hUPf2GfNKC9KxToiI9RrgIVm3dP9rnq
-   k0fHDhZuYsS9Am4TiWm/NC1TgytGt3pHsesAp6RdUyNox+Oc8GnCfpDaC
-   jE0Dr/7qyTrfjAPpKPtHLUFa43tU5/7ZtGRsYX411oDVwZ6bXTjk3o3AQ
-   yun51rAnZNUKqrmkc84B+rDPZmdptnbOWCxC3OdXmtNlFushI/MOwFoPZ
-   q/3U+K+dDaInbfLo9WeU7h3P5oi7HWClKA6MeYxITa2g9FZ7/QJ9TOUUh
-   A==;
-X-IronPort-AV: E=Sophos;i="6.16,221,1744070400"; 
-   d="scan'208";a="306689927"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 04:33:14 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:63521]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.98:2525] with esmtp (Farcaster)
- id 267c9614-9b46-44a6-817f-8e49af2d718e; Mon, 9 Jun 2025 04:33:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 267c9614-9b46-44a6-817f-8e49af2d718e
-Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 9 Jun 2025 04:33:12 +0000
-Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
- (172.19.116.181) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 9 Jun 2025
- 04:33:09 +0000
-From: Eliav Farber <farbere@amazon.com>
-To: <davem@davemloft.net>, <kuznet@ms2.inr.ac.ru>, <yoshfuji@linux-ipv6.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <sashal@kernel.org>,
-	<edumazet@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <stable@vger.kernel.org>, <farbere@amazon.com>
-Subject: [PATCH v2 5.10.y] net/ipv4: fix type mismatch in inet_ehash_locks_alloc() causing build failure
-Date: Mon, 9 Jun 2025 04:32:59 +0000
-Message-ID: <20250609043259.10772-1-farbere@amazon.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1749444880; c=relaxed/simple;
+	bh=zP9HTYEemg/dzfNxqTavUrDW7l86s3FaPSQDl88Dwyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4qz36LRAyF2EmGXiy1a9KdLpWgVND6IPztZPa0kXCCZRHBZkGNziHudmOfBmxorzY/DrVZWBOnprWEvzoB1PPkf/o/Ud0LVGT7IXCEY0daqEHzDu9toTr3g3IK6OPJJCogOW8cRabkDOVX0rZqW7GiPC1wLQHeSve4rLsUI5BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=KOe51b9e; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Qu5rb/plJ5VBp/ia/CyKVGQI0qCsjZybcVr/HB5dRjw=; b=KOe51b9e/Z3jTXWTzuBi0xknrT
+	/MuxR820Jfuv7LA6ljymEjLxqqoWCs2K4+UiidHXdJtGpbrVxZvEo1LPWgRAYthNoKCcPDgdP8Q2e
+	I53cDT33DRO3pS9YP1ghW3V3A3DZ4gStUnhBn8XE67sFp+b3iTzKf/DuBiBdHJMH6RHhfaWyEhryg
+	zWJcsQemEJTTWLC3qcabygWaNePGnzFHwZ+LxMk7SWPkDp841T+aezzGVDGpY2SfPDV6H2lCDEqHl
+	MrWA4e/7+nvNCqcObu5kT6ifSBvmIpLKzQ1ID2BFnAKp24vQazvm0ByQtKonhDmjhwb4twBsPKmoZ
+	ctVluiYw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1uOUWk-00Bikv-0H;
+	Mon, 09 Jun 2025 12:54:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 09 Jun 2025 12:54:30 +0800
+Date: Mon, 9 Jun 2025 12:54:30 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Aakash Kumar S <saakashkumar@marvell.com>
+Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, akamaluddin@marvell.com
+Subject: Re: [PATCH] xfrm: Duplicate =?utf-8?Q?SPI_?=
+ =?utf-8?B?SGFuZGxpbmcg4oCT?= IPsec-v3 Compliance Concern
+Message-ID: <aEZpBsgcdTTKr98q@gondor.apana.org.au>
+References: <20250602181948.129956-1-saakashkumar@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
- EX19D018EUA004.ant.amazon.com (10.252.50.85)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250602181948.129956-1-saakashkumar@marvell.com>
 
-Fix compilation warning:
+On Mon, Jun 02, 2025 at 11:49:48PM +0530, Aakash Kumar S wrote:
+>
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 341d79ecb5c2..d0b221a4a625 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -2550,7 +2550,6 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+>  	__be32 minspi = htonl(low);
+>  	__be32 maxspi = htonl(high);
+>  	__be32 newspi = 0;
+> -	u32 mark = x->mark.v & x->mark.m;
+>  
+>  	spin_lock_bh(&x->lock);
+>  	if (x->km.state == XFRM_STATE_DEAD) {
+> @@ -2565,7 +2564,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+>  	err = -ENOENT;
+>  
+>  	if (minspi == maxspi) {
+> -		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
+> +		x0 = xfrm_state_lookup_byspi(net, minspi, x->props.family);
+>  		if (x0) {
+>  			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
+>  			xfrm_state_put(x0);
+> @@ -2576,7 +2575,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+>  		u32 spi = 0;
+>  		for (h = 0; h < high-low+1; h++) {
+>  			spi = get_random_u32_inclusive(low, high);
+> -			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
+> +			x0 = xfrm_state_lookup_byspi(net, htonl(spi), x->props.family);
+>  			if (x0 == NULL) {
+>  				newspi = htonl(spi);
+>  				break;
 
-In file included from ./include/linux/kernel.h:15,
-                 from ./include/linux/list.h:9,
-                 from ./include/linux/module.h:12,
-                 from net/ipv4/inet_hashtables.c:12:
-net/ipv4/inet_hashtables.c: In function ‘inet_ehash_locks_alloc’:
-./include/linux/minmax.h:20:35: warning: comparison of distinct pointer types lacks a cast
-   20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
-      |                                   ^~
-./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck’
-   26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
-      |                  ^~~~~~~~~~~
-./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp’
-   36 |         __builtin_choose_expr(__safe_cmp(x, y), \
-      |                               ^~~~~~~~~~
-./include/linux/minmax.h:52:25: note: in expansion of macro ‘__careful_cmp’
-   52 | #define max(x, y)       __careful_cmp(x, y, >)
-      |                         ^~~~~~~~~~~~~
-net/ipv4/inet_hashtables.c:946:19: note: in expansion of macro ‘max’
-  946 |         nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
-      |                   ^~~
-  CC      block/badblocks.o
+The patch looks OK to me.
 
-When warnings are treated as errors, this causes the build to fail.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-The issue is a type mismatch between the operands passed to the max()
-macro. Here, nblocks is an unsigned int, while the expression
-num_online_nodes() * PAGE_SIZE / locksz is promoted to unsigned long.
+That function in general has some issues though.  First of all
+the SPI search is racy.  We only take the lock and update the
+state database after the search.  That means the supposedly unique
+SPI may no longer be unique.
 
-This happens because:
- - num_online_nodes() returns int
- - PAGE_SIZE is typically defined as an unsigned long (depending on the
-   architecture)
- - locksz is unsigned int
+The search for an SPI in the range is also prone to DoS attacks
+if the SPI range is large and dense at the same time.  That depends
+on how user-space constructs the range of course.
 
-The resulting arithmetic expression is promoted to unsigned long.
-
-Thus, the max() macro compares values of different types: unsigned int
-vs unsigned long.
-
-This issue was introduced in commit f8ece40786c9 ("tcp: bring back NUMA
-dispersion in inet_ehash_locks_alloc()") during the update from kernel
-v5.10.237 to v5.10.238.
-
-It does not exist in newer kernel branches (e.g., v5.15.185 and all 6.x
-branches), because they include commit d03eba99f5bf ("minmax: allow
-min()/max()/clamp() if the arguments have the same signedness.")
-
-Fix the issue by using max_t(unsigned int, ...) to explicitly cast both
-operands to the same type, avoiding the type mismatch and ensuring
-correctness.
-
-Fixes: f8ece40786c9 ("tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()")
-Signed-off-by: Eliav Farber <farbere@amazon.com>
----
-V1 -> V2: Use upstream commit SHA1 in reference
- net/ipv4/inet_hashtables.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index fea74ab2a4be..ac2d185c04ef 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -943,7 +943,7 @@ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
- 	nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U) * num_possible_cpus();
- 
- 	/* At least one page per NUMA node. */
--	nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
-+	nblocks = max_t(unsigned int, nblocks, num_online_nodes() * PAGE_SIZE / locksz);
- 
- 	nblocks = roundup_pow_of_two(nblocks);
- 
+Cheers,
 -- 
-2.47.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
