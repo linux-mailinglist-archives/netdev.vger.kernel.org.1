@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-195881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FC79AD28EB
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:47:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990BFAD28EF
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9A1318919C3
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:47:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195A116F9DC
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BE11F0E29;
-	Mon,  9 Jun 2025 21:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CF5224B1C;
+	Mon,  9 Jun 2025 21:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Wkc6+Nic"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Kdm8HkPf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2047.outbound.protection.outlook.com [40.107.236.47])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0AD18024;
-	Mon,  9 Jun 2025 21:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA60224257;
+	Mon,  9 Jun 2025 21:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749505636; cv=fail; b=aV14hjwiv5xfvc59UB7b3oQM6R1g0akMpQhrNA90ExJWYd73ojNHiX/uhlBEsZhAc65aeCTfWvef+hhckT4nTrjrL4qM2/yaqFfPVNpZvHD0EUwFrpW5aFLYXznyouz101JnwWaa/DXA+Czmfyvz0xnxB7DJp7psHXDgCISLEjI=
+	t=1749505639; cv=fail; b=eQF3+cJuK6JrM7ajlzPp7dFwJCam3E4qHlatn6E98AINtZwpFQ10/+5z2vlTcwZFNMIjBFyvh7KMEVf5TkBUprja703uUJfm2guFxNTvf4KpUU2AK556Z7kinsj6YwRjMfEnkNn01V8kFWAB1oQyJwk2OMAcEiEce/YsrNT5n1Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749505636; c=relaxed/simple;
-	bh=d6krwjLJJZ6ZprRGiWfg2W4HwTyZG6qcoqp1qUx61ng=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cwkja3MlyeAGbUt0K1NwL6p5/kV+YWiOXg4bphoCWmTK0yo9Gb62ismXKt8uXowOFRxXy4opHX7GIk1EyO4QtGvE/Lk7xqJH3a9wrKZfYDU+NMzLvvvo2AUE3+cwWiogGw6yOB2DDpcd+gbjHoniFE03uJB6WSrNMgj4yVZFWEQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Wkc6+Nic; arc=fail smtp.client-ip=40.107.236.47
+	s=arc-20240116; t=1749505639; c=relaxed/simple;
+	bh=7GQ4++gIjAlts9XNKEci5H7kTYza53A2tC3Q1F32bfs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mzWcFKEpJlLeNPi6hDSCC5JjnL5p6gO67mJFHjhbLEsWak88ot1Mymrtwc3pe7CobDSKAfArh2tjbDpdCJwZseThGRLFwnGavAMYFuvC5Jl6noSZZLzSUI2qzxa0ur1mfELMpC8umCAQndcFSPI6Z70zRgDNWXwZmKboHmOi1VQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Kdm8HkPf; arc=fail smtp.client-ip=40.107.94.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sHvJi1pfjcNA7Uv+p7k3YBEpzstlRBpgZlQOx28d0jW6cj0MD8QOl9zfrgQrBQgIHZB3lD/zkyjD/ytBzuBlexyF0tvOxzne/3FlmkN+k3k1CWaULkm2qjnC4mSDjI0tiLrSlc8dGTjstNWhFvtPvJ5nuJiUcLPiIvWdAjnVd18Ty8HF5ndMp8Sv30aUGtHq9TQ1o+twxbhrHQkhELtTSEagC0Hyj69DO6lTH+8jGC5TCOdrAsyfrpsB2jEP5ZT6Wm47bTrOpGuj7PZodgqwwu+Od7qvD0Ji+A3LyGjPBnWn5LlkNNlYgTyFZzc0ZTFyCom7TwvrOEciG+lODE7mKw==
+ b=tNf0I+s6uNPLnghjm01IYgIlLZ+Txiay3XFpkKCwxFSMQ+Y3FcimaTk9662BmSMQX+QGH0tUk6P/hRvflyEduLACuFWHjPuuCvzq/K7NsSzYhwXA1Mu1azwzmHn+YfzYQK2+U0/xH/MVk8Pn35WybQ4qV3aGcEcwgewl/5lxV/jj29mNI3tSbMHiAqJ/XyCwoJ7HgSop/YUsLr4U9cTIjBY5uPV3rUmr3lFmpQzdcWZM7605JbHKbrpeOg4IVW13w7D/arNUnGT3PkTLsVkYJElQpu7povVIptIQduyALowy/Z95vKBk3sRoTM5n2A6i9fQ6LZFrpiJN9p3u//3oRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7FZtWlvnB3XDqA4knyUGFaeT349p7uDQuHk0m37k55o=;
- b=v1RcYvl6x1pVwQm5xLiOYwxV9sRSGeNT+rhRY5RgXCniOH63sSgW/Q/GcByJ/vCuB3IADRdSjw8Jhve8RB21zjGRLB0XJ1E85RG9MnRhxqDd9X3Xvria1OMNXj5mWPrPNZY5Kh8ZDhWWrlye51mgICkSITa1JPVGwQjrHm3JfmBbRCFsz5bldwhTkwa7IFKibQ+GRW4dUdv0rhxr7DoSUxaaVAXOVEsGVpmtJ+FoAAT+0YUClfKfV1kQbhZTyAHtwViSXyJcQQsZplJY41VdbEMLU92hSGFMLSbShLXZ1xcOC+UHU5WIjVFqjzxJay9XW7Pe9u5JfZL6RHmw+/tDTw==
+ bh=Ya3kgvaF0yZcn0rBjQ1YxZBNLo4wTXOq2g3jRd9Mt3M=;
+ b=WQDn5WYgUBwFqkqmt4mGaXiZm+hg0blbGoH0SWaZhZYtRveyiRYb3S7EDK0cAwm34Ou3vfXGyZBG0hI+PVUKyAkNCN86ICTCwlzqp5jZrbfdYm3AujkmjZfdTZHd4TGpJMJDHSMi9kKvuYnIGH7Iv5VXEVkpVZIVIEFCuefg9p3HX57ZEVbu/bLdTOcrcV/mJZcyLRabcgGFPqaqAbKWQmIJiWw2e4vtw742uHBo60jMgskqTAPPAxiOmfsxYKN6wQS294qsTr8C4oKLSR1QPR3DqT4WL8F5ENg9ZCQLmkufKtjTRQCZxRbIrdrMu2QzRc8PEWl/JUwH5ovfjGab4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7FZtWlvnB3XDqA4knyUGFaeT349p7uDQuHk0m37k55o=;
- b=Wkc6+NicJvKg9ojg1mgtFh4+CW+LbqnvxglTtaaCV3XlVIey8DWHe7TnNCXocvPW+cc0U6fVUCeWgxmPGM66x+833H1DKXEVfpgd02SIwvY4Uf1wVfWU/EarpFEeax+af/gv5ooTj+If9biwCbZf2GJCg8oREQtpDcmDPXl8CLM=
-Received: from BL0PR02CA0112.namprd02.prod.outlook.com (2603:10b6:208:35::17)
- by DS0PR12MB7677.namprd12.prod.outlook.com (2603:10b6:8:136::13) with
+ bh=Ya3kgvaF0yZcn0rBjQ1YxZBNLo4wTXOq2g3jRd9Mt3M=;
+ b=Kdm8HkPfJVPbh5PPthzU4XaQD2dMg/Ymt4FYVRmPEWgsLPoid5Q4YUirEbgyeXi1qp5II2keVk3Ojjs/AgwBsFDGS9ITI8KY4EyTn+MVRHYnlvN8Yg/UmYWFZNCqqlG/WFTOkaqQWmTFxT7IijvojsmkRB7tdsvZOww4aPG10hk=
+Received: from BL0PR02CA0133.namprd02.prod.outlook.com (2603:10b6:208:35::38)
+ by SJ2PR12MB7798.namprd12.prod.outlook.com (2603:10b6:a03:4c0::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Mon, 9 Jun
- 2025 21:47:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.35; Mon, 9 Jun
+ 2025 21:47:12 +0000
 Received: from BN3PEPF0000B36F.namprd21.prod.outlook.com
- (2603:10b6:208:35:cafe::94) by BL0PR02CA0112.outlook.office365.com
- (2603:10b6:208:35::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.18 via Frontend Transport; Mon,
- 9 Jun 2025 21:47:10 +0000
+ (2603:10b6:208:35:cafe::d8) by BL0PR02CA0133.outlook.office365.com
+ (2603:10b6:208:35::38) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.24 via Frontend Transport; Mon,
+ 9 Jun 2025 21:47:11 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -64,20 +65,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BN3PEPF0000B36F.mail.protection.outlook.com (10.167.243.166) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8835.2 via Frontend Transport; Mon, 9 Jun 2025 21:47:10 +0000
+ 15.20.8835.2 via Frontend Transport; Mon, 9 Jun 2025 21:47:11 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Jun
- 2025 16:47:09 -0500
+ 2025 16:47:10 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
 CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net-next 0/3] ionic: three little changes
-Date: Mon, 9 Jun 2025 14:46:41 -0700
-Message-ID: <20250609214644.64851-1-shannon.nelson@amd.com>
+Subject: [PATCH net-next 1/3] ionic: print firmware heartbeat as unsigned
+Date: Mon, 9 Jun 2025 14:46:42 -0700
+Message-ID: <20250609214644.64851-2-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20250609214644.64851-1-shannon.nelson@amd.com>
+References: <20250609214644.64851-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,66 +92,81 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36F:EE_|DS0PR12MB7677:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9deb5625-ebe2-4fac-79d7-08dda79f3016
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36F:EE_|SJ2PR12MB7798:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c7293de-d2b8-4efb-8e55-08dda79f309e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?qTpZTa8cPl9N4w+CdfbdsGHqe7K53M8vl2bHLHoKbpLeYV1D4vv9Q55iHY5n?=
- =?us-ascii?Q?GJuIJp3qJ3QV3jdTcWcWWXFVBCqJ/MQVAiZzN1lS2ajCar6V+5YWw7X+CK7l?=
- =?us-ascii?Q?KAdVcWTRj+SvzN3XxDkcX8L/HKz7RXpPLolJLxFW+MPQNkb9M2LAtr5nG8lO?=
- =?us-ascii?Q?cY0uWcpxJvYL2ynxlTfFxbKbC2zKri/yJ+dZqUdwAXLmty6oyV7Qt45EdQDT?=
- =?us-ascii?Q?LEPP4R8TqmYW9tCJ6ud0DAxu/Ry1FaENTh/Pbq4fLQKMZbhPIFi3tYpikZht?=
- =?us-ascii?Q?hGJ3Kbx0b2wyM/3vNtFhUHiIGrKdKjPpLCAvSv7A/HOf/EZ5PuGGn7Lqrl6J?=
- =?us-ascii?Q?ISfCGCy0hanLij2NHEhOArliYhVizXduk0V0AJMMuHJJrq58VLCktD3jOSF9?=
- =?us-ascii?Q?vE5hz+eM1kkNRI2pW5QXgvoYyfxJ5m20/i4fFRZCSdUqpfs2+OasgE8QIVvQ?=
- =?us-ascii?Q?v4oJ47S1rqK+HsUW1E25FSQf8KHS1oigEcse7lRF56hlwaeXEZWGnPpuIu69?=
- =?us-ascii?Q?tDzoyiIO4LDNyi3o+nK88SV9vXxAAvr8ypeeMMKAybZKDPgpdo4jv6aDMHIA?=
- =?us-ascii?Q?k/OHbb2nR4npU29i6qTviQHJJAbkiKEBh+rCJuoTQl2HRMUQFI4VJ+SJ09/p?=
- =?us-ascii?Q?TSDu9cnrID/Qz1uDG481ro2gLv29H0murTrIDQF305kuBZDYrC2WrFcc75fI?=
- =?us-ascii?Q?y94X1O8d73mJP7hoSocnfw88VwLF1vNxCTA1Jjo8LjHGNlZ4N1ZBpBUwmtdR?=
- =?us-ascii?Q?XQM2T8LmWp2tXDarJRPAb8jAfGaNJ7EhCnjbS0YdZUYJqw4WWKxutOx5m7ci?=
- =?us-ascii?Q?LBIiSRrJHLzATpOdAHomUMDOkR7A4e3rJRSoXTN26HKEmeAevei6UfHgYXeh?=
- =?us-ascii?Q?PjKIvOdUuabEx8xHnZW0xwRczqTi5/pVKf/OXHlNXoci4/x2bpN2hshD6iS4?=
- =?us-ascii?Q?RlTddLqMkygw6rXxX4SbuXLUpztZdbTZWUpdt6cz424yZaFU0GKFTYQE3iTt?=
- =?us-ascii?Q?kamSX8CTWzkbvTs7xwIYo72EFdE++346Lkydr9W6+hCX5lwOaPmm8lpy+X44?=
- =?us-ascii?Q?NmYw9inALesLY1yj7+oRosonWqoasrKxet+Afvot5jOfdl1XrCdk7ORo5SoV?=
- =?us-ascii?Q?81bfaTE8XjYD09OLhjgaZjwiM2ZHsBX+s0XEYAzWlpxpWL6JonvP+qLeAUsh?=
- =?us-ascii?Q?omM+xzRCub/8PGy1SHulNpiidJCO79sHIz1qFO7JhQX/tGbiSHbqWAMu5TxE?=
- =?us-ascii?Q?+pJvkukvOB/RwDPR5bm30P8xWidTwqKawKjj+BTtauCxY6gN7lH6Gtl9Q9RV?=
- =?us-ascii?Q?rPcU7X86TWUWPcWP6Ez0+6/XqBimMMNiNZiTC5kEE+vuM1s9txqTEdrUoNA0?=
- =?us-ascii?Q?ccT4IfE337ybCo2Gqy7i6FlebW/BKT1L0LuXiryzezZVUn8oRuXYro1aXvVO?=
- =?us-ascii?Q?PQSt9Fzr1RXEvMMH7ctzKMasUv0DDlaa4G83mKPEv6qX6+Kw58TY/BGskQDg?=
- =?us-ascii?Q?ZS3KtTpuTtpHE+6lZTEvO9lh8wjlzNcoe6+e?=
+	=?us-ascii?Q?OjW0AeyHJ4t5D/VFVSHho8bsNf33mGOF8jE6qV87TyDvNwNLSpGGVdfs5Vtc?=
+ =?us-ascii?Q?fc6ZvcQ0WVfFRuzw/s+H6lCDhs/Jfvi/cuJ3GOBeP1LTTMYLPKCENXSIcQ30?=
+ =?us-ascii?Q?zAWMzLe8d/2S9GgARPK1FNC0akDjsqT+T2zcEp/nemzSiUer2q+a/opN2RGL?=
+ =?us-ascii?Q?ip1V1yi6wV3bZlCzltdcDWKl0TxQHkMOpvxnjjyCtNXoyAiOXcLqLctftDiA?=
+ =?us-ascii?Q?YxqgEnAelS6h//xq6EkU6Js0MuH4P1plMa/hXx9eNYHX6rM8Xkx3lfLm58Y/?=
+ =?us-ascii?Q?PTEq3dg7Sw8zG0/GLuzDNITkj7hcMGPUIaFGhCvMi5GFneRkKIulk5ya7Flk?=
+ =?us-ascii?Q?qIq4vVcVetWqzqETwUerd2i14UGUiyEuNy9nrF0xkLfWP1OL7JKF6Q2IWJ/O?=
+ =?us-ascii?Q?W1hQ4hVD8PgG4Xm0iffli1eYmqNsWuOmdWBpQPMdf4dDiYWqbtTiSKOvWPlO?=
+ =?us-ascii?Q?s6ale/nlQJHWEffyDUsG6EkUw/XmK/lQNnUu9IOjcJSpsq0QItdsqC8/KVUB?=
+ =?us-ascii?Q?+vbTUM6pnJh5ZuFmKge+9SxqtTVcOpIJK2jXxBp9Y6q21RIVOZpQFh5p6s61?=
+ =?us-ascii?Q?G1C7qAhEpOHVGwNt11FXvrtd3a6lg55abSl8mRV9xF/MLYwucwyL2ORYgJvG?=
+ =?us-ascii?Q?65gbRzyl2WLX3susldlRXItk9OnoLsmtJVedj6bDWfcL5LIVFYhsqt7mcENo?=
+ =?us-ascii?Q?f5o1YieIo0En4XsJs46Wc8GLIRnTwsEceEN3O82MhIZIfVAIr6HN5HXEmtRv?=
+ =?us-ascii?Q?+XHUa9l9XmQvJJ2sZ4NNJ/4D7MFx3li+lYdFoCEXjaAAmsTKkh1nc8YRzZ1R?=
+ =?us-ascii?Q?vO0S+U8vENKi0r0GlLZv5hmNgcTfViI+AmcVnx64nqaqtkPCs0kGhttWUfwd?=
+ =?us-ascii?Q?WeiWTuHFx++S0dMt7dKRDrglEdazKyCW77OJgEekeOx34iTVb+AdZiIYjzbd?=
+ =?us-ascii?Q?WKj0F/2L7jByfMmidMXxgNRnx22PSgkPni4QwMI76p+V/AnE3KPywcDs2yUh?=
+ =?us-ascii?Q?BZiXoJ7fX5GD8hg5SrWh7lvoVsHAq/JxeVZ72DfCeESp6FFBMBRNPoGW2zJj?=
+ =?us-ascii?Q?aGOxfS9Ad/oe/1tLkRpQdWc5HvMdQu8hToVUoxhiME9loSqAmhs3LYxtHRa0?=
+ =?us-ascii?Q?VnuRx6Tq3cuhG8GwLBuUvaudI8G6f1Ax3STAktpQk0YUoEeL7pu4sWGYK2B8?=
+ =?us-ascii?Q?QzQe5+C36RCsh1CrtXErTkMMTLBJS9P86FEseXEqM7Z6y1fycLURgbawoftw?=
+ =?us-ascii?Q?ifFDryu8HM7iIBaLW5HCHA+3XJK9BV2VkOtuWyZJoA+stV9sslOJde3CVYrf?=
+ =?us-ascii?Q?AlY1JAoqFQ55D6zKboDeRQ7Cm/jSz/+GLkoZN/I2hU9wb9LukZMgDks4QKwT?=
+ =?us-ascii?Q?mA8+XQhxocamGLuoX7fIREVj5gtYIeO6zJbhvl+dFkKXHsQpLoenMblS5fo9?=
+ =?us-ascii?Q?HiWgwgDDvhApSTwL8pKJxQtzADNdKSGfOT4FkzZ8xICXWbdJ4Trbjki+xPJy?=
+ =?us-ascii?Q?Jr8+37MVHjEcbys7XAejDJDQaCsRVFKlpyNm?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 21:47:10.4433
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 21:47:11.3223
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9deb5625-ebe2-4fac-79d7-08dda79f3016
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c7293de-d2b8-4efb-8e55-08dda79f309e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BN3PEPF0000B36F.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7677
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7798
 
-These are three little changes for the code from inspection
-and testing.
+The firmware heartbeat value is an unsigned number, and seeing
+a negative number when it gets big is a little disconcerting.
+Example:
+    ionic 0000:24:00.0: FW heartbeat stalled at -1342169688
 
-Shannon Nelson (3):
-  ionic: print firmware heartbeat as unsigned
-  ionic: clean dbpage in de-init
-  ionic: cancel delayed work earlier in remove
+Print using the unsigned flag.
 
- drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 1 +
- drivers/net/ethernet/pensando/ionic/ionic_dev.c     | 4 ++--
- drivers/net/ethernet/pensando/ionic/ionic_lif.c     | 7 +++----
- 3 files changed, 6 insertions(+), 6 deletions(-)
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+---
+ drivers/net/ethernet/pensando/ionic/ionic_dev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
+index 57edcde9e6f8..532faf6d15ee 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
+@@ -424,9 +424,9 @@ int ionic_heartbeat_check(struct ionic *ionic)
+ 	if (fw_hb_ready != idev->fw_hb_ready) {
+ 		idev->fw_hb_ready = fw_hb_ready;
+ 		if (!fw_hb_ready)
+-			dev_info(ionic->dev, "FW heartbeat stalled at %d\n", fw_hb);
++			dev_info(ionic->dev, "FW heartbeat stalled at %u\n", fw_hb);
+ 		else
+-			dev_info(ionic->dev, "FW heartbeat restored at %d\n", fw_hb);
++			dev_info(ionic->dev, "FW heartbeat restored at %u\n", fw_hb);
+ 	}
+ 
+ 	if (!fw_hb_ready)
 -- 
 2.17.1
 
