@@ -1,86 +1,62 @@
-Return-Path: <netdev+bounces-195611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF88AD16C4
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:14:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C99AD1736
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F8BC1880762
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 02:14:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AF0A188ACC7
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 02:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74CE19E83C;
-	Mon,  9 Jun 2025 02:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADF72459FD;
+	Mon,  9 Jun 2025 02:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWx7O1rV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tWyQrXWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24DA19ABD8;
-	Mon,  9 Jun 2025 02:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA8319F464
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 02:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749435233; cv=none; b=oydbNf7s80irWzh9qRL4wXHN3U97GpwUoR0ijBch2dduKt8MhQ/l5DCg4QZgWc5AqJtPpIG31O61aqFYKuUNtV9A3Jzkz43PTdM3lX8j7gY5/GByYwlA0AXko7sl4zRYbPaaC6nYkOa6iKogezduuHFG79EX2m9mErS29dR0kuA=
+	t=1749437974; cv=none; b=SmEyDGRqXRx/l1+JSHutKpgZyyz3RwKL2rG0/Z6xriKdMt6BbiYH2p0LLKHjsHEUTRIdBHGiFH+X29dmXRX5yzfMbgP2OT4Zf/JbOp8rrKJEKLigVXi4v7FKBOxEOouCBrptqRNZl3HBe2kuRbanJAoIqPWI098evpHcR6E67n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749435233; c=relaxed/simple;
-	bh=pKI7PDJDDIBqjgERXsXsauxic7BaA/Too5aSv2HsggU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V5hnLUhiC3WDVcCFL2GeRWfJ/j0c37RJ6L3GN2n4AoBftsuJ7YihrL2An08evLacsgsKq5/A98pqbSz/3mB6hOaEzYZOTCHkydMHEacn90LCx8q+IkQY/53Lh/N4dk0PcvwUSLk38786exyPSC9ML2enznlSqDqWnCR++94cFq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWx7O1rV; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-742c2ed0fe1so3994843b3a.1;
-        Sun, 08 Jun 2025 19:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749435231; x=1750040031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6z8EhSmpBxYVZeDxPrGmj000mL8LzmqeVT/fjQjyJgw=;
-        b=LWx7O1rVrgAh4IwW5NOMn2wKsVDgQ896YZRorl9NRNR/9gNT3iyMTozXjJmGLBtpX2
-         yoWjNaOYnKDOBfPqpO/23aHktwIBBteIH2kKhBhgn8/068S4rowNPLEiLZQAHd5B9Wpt
-         WMjpFhiyAI9uuPbJXvGo7R1TAQ8hefIQsNx3tC+9j3/FTjQ40hxALvC7I3mwwbdGL8QU
-         /DiacyR/hJ5aWXpzEqAY9n4VZ+7buCCthpha96CzRrsK8wupANDudwgnS/SAuKdXRp25
-         ezklqNex4h1r0fVJ9/pq6eg8IpGmqRVTKUkQiI//gakiJ+L7OhfQZvi4Vj+oeQP2Om9r
-         r/AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749435231; x=1750040031;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6z8EhSmpBxYVZeDxPrGmj000mL8LzmqeVT/fjQjyJgw=;
-        b=biuHFpvXwALKjVOWPoV+y4kM2PE6x4RYTitBCeGxf3cSY+CVsEmVIyfgNhu2YlZQlk
-         DgoJZuxm4sz4BdLuUyNUEqfe7x+JLGpXd3RyXML4qbk3GNGPhPgQ5hcAsemLqfbrbW1a
-         M5Dw3bXDLYw/CK5xPsc6QQw6Hf8MFFFHKXu+XJor7hE0u47F3PD47IkLRk2oFsT0UR0p
-         v7cxtzBe+3g3pBe/GzKDA2fJd4jCh7RDfGtKOgt/53qRGWUvstCPup1MS68Lp/PncGtB
-         pZGWo5S7M0yrbPFIy9l5kZDampt/9xPONu86HOV1fgRVCMfnz3PdG24gjxalYzRTyif5
-         F6fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVC+3DKXATpRymTYSYy1HpnrJCuNDXPcBI9eBKcJNVRoLNCbEDKbndEENmjcL/ezEySdRThfumLG+c=@vger.kernel.org, AJvYcCXm/t6tOpblUdisxaPmkSffJ2kYJxDY1sxZoyyFqnG7p2S890VTVrvZa48nf14mos+Mo1FsJBnng2C9t5aG@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWVpeZ3UwVSCxofDdeMrx6zhFFh43TEQfDrLUxhJ9yXrC3sYFK
-	yznEzvulaNdPJ3W55iNhTkexnNH1AebOpShC95ISZXi+3g6KmZTL5/ts8bZw5Q==
-X-Gm-Gg: ASbGnct/Nj9ds06meSB4q15P9QZcavlR9qLxhCXoUQEhvA7emePSRFVdAzSAdKYWMJ/
-	mrnzohW94SLGMmDgoD3FwUtU6QQ9KIdo3UfvN1VSWwEWRj4pa4Q+iUwioppI7JbHhZ3oCRjbMTQ
-	CdNwoHMMZPPpMOdVqErqQuabcGuVk8+bQe4rgrs+AbGOryjPN18kAmFEnOIN+Z1cHA8AkhdOLDv
-	tHVskLsxFa2LNno4CDStnaPPXWXF8g263VfRFh749R0L5xRX2gDT1FBWWTg+L8HABpswTfDBS+A
-	ILyqjKo04PEbGXjalm0Dhv2pdhzUiIMf3J1fcCfTZYIU
-X-Google-Smtp-Source: AGHT+IGvA/02yp0vD1aNE7i4OxB7xo4YBi2vBKNkuRZdXgojOa+m7Bh5C8nm1uDK7BXrPsafSk+eMA==
-X-Received: by 2002:a05:6a20:1584:b0:21f:5674:3dda with SMTP id adf61e73a8af0-21f56744088mr6492468637.34.1749435231088;
-        Sun, 08 Jun 2025 19:13:51 -0700 (PDT)
-Received: from fedora.. ([2601:646:8081:3770::889])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2f5f899b35sm3687406a12.71.2025.06.08.19.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jun 2025 19:13:50 -0700 (PDT)
-From: Collin Funk <collin.funk1@gmail.com>
-To: olteanv@gmail.com,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Collin Funk <collin.funk1@gmail.com>
-Subject: [PATCH] docs: packing: Fix a typo in example code.
-Date: Sun,  8 Jun 2025 19:13:30 -0700
-Message-ID: <e532b992a79999d3405a363db4b2bd4504fed592.1749434907.git.collin.funk1@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1749437974; c=relaxed/simple;
+	bh=UQElxAqGxBmUymstBZ/Dk/1nzyfCRHDk4FZj9475Mnk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uu5mOxIC3PEp7zKUUJhnOOhYtAASorV95TzslQLTl5/Tsth/JV4J0gYXh+hAfrocaeCE7FkR5y6p5UhSSrBvCbyOmdmjriNSFAJVlvXwtRQTt4o4M/hZkt18k7Ii/ysbKGFTJopYSG9MjHA9OWxslqrEE1jZNYuSkP0a6EiuMM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tWyQrXWg; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749437960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=K0E0j2BlPBhEZVL7ok/0anTaOlpOqXA2NyI5PTiVfMY=;
+	b=tWyQrXWguA+ancsJD83ufgUvjOSaZJM8GQUgWmiCpxfkAPoFtrldct233g2dm09zrZEWqr
+	dTNiLK6Hqupx/HlzQhgZvBbgoe2MQE3DSHV0Jf4aGbJ13/0POOQD7Rn/4GT76imbEQWGvr
+	IC6o3BtFXr5ZDS6pz2xprufyGVjLKvo=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v2] bpf, sockmap: Fix psock incorrectly pointing to sk
+Date: Mon,  9 Jun 2025 10:59:08 +0800
+Message-ID: <20250609025908.79331-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,28 +64,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Fix misspelling of "typedef".
+We observed an issue from the latest selftest: sockmap_redir where
+sk_psock(psock->sk) != psock in the backlog. The root cause is the special
+behavior in sockmap_redir - it frequently performs map_update() and
+map_delete() on the same socket. During map_update(), we create a new
+psock and during map_delete(), we eventually free the psock via rcu_work
+in sk_psock_drop(). However, pending workqueues might still exist and not
+be processed yet. If users immediately perform another map_update(), a new
+psock will be allocated for the same sk, resulting in two psocks pointing
+to the same sk.
 
-Signed-off-by: Collin Funk <collin.funk1@gmail.com>
+When the pending workqueue is later triggered, it uses the old psock to
+access sk for I/O operations, which is incorrect.
+
+Timing Diagram:
+
+cpu0                        cpu1
+
+map_update(sk):
+    sk->psock = psock1
+    psock1->sk = sk
+map_delete(sk):
+   rcu_work_free(psock1)
+
+map_update(sk):
+    sk->psock = psock2
+    psock2->sk = sk
+                            workqueue:
+                                wakeup with psock1, but the sk of psock1
+                                doesn't belong to psock1
+rcu_handler:
+    clean psock1
+    free(psock1)
+
+Previously, we used reference counting to address the concurrency issue
+between backlog and sock_map_close(). This logic remains necessary as it
+prevents the sk from being freed while processing the backlog. But this
+patch prevents pending backlogs from using a psock after it has been
+stopped.
+
+Note: We cannot call cancel_delayed_work_sync() in map_delete() since this
+might be invoked in BPF context by BPF helper, and the function may sleep.
+
+Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
 ---
- Documentation/core-api/packing.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+V1->V2: Use existing flag instead of adding new one.
+https://lore.kernel.org/bpf/20250605142448.3llri3w7wbclfxwc@gmail.com/
 
-diff --git a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
-index 0ce2078c8e13..f68f1e08fef9 100644
---- a/Documentation/core-api/packing.rst
-+++ b/Documentation/core-api/packing.rst
-@@ -319,7 +319,7 @@ Here is an example of how to use the fields APIs:
+Thanks to Michal Luczaj for providing the sockmap_redir test case, which
+indeed covers almost all sockmap forwarding paths.
+---
+ net/core/skmsg.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index 34c51eb1a14f..83c78379932e 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -656,6 +656,13 @@ static void sk_psock_backlog(struct work_struct *work)
+ 	bool ingress;
+ 	int ret;
  
-    #define SIZE 13
- 
--   typdef struct __packed { u8 buf[SIZE]; } packed_buf_t;
-+   typedef struct __packed { u8 buf[SIZE]; } packed_buf_t;
- 
-    static const struct packed_field_u8 fields[] = {
-            PACKED_FIELD(100, 90, struct data, field1),
++	/* If sk is quickly removed from the map and then added back, the old
++	 * psock should not be scheduled, because there are now two psocks
++	 * pointing to the same sk.
++	 */
++	if (!sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
++		return;
++
+ 	/* Increment the psock refcnt to synchronize with close(fd) path in
+ 	 * sock_map_close(), ensuring we wait for backlog thread completion
+ 	 * before sk_socket freed. If refcnt increment fails, it indicates
 -- 
-2.49.0
+2.47.1
 
 
