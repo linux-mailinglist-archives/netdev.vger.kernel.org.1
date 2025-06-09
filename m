@@ -1,66 +1,99 @@
-Return-Path: <netdev+bounces-195810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20ECEAD250C
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:35:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05CB7AD251D
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:39:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 194CE3AE65C
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:35:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9BAF3B0A4E
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391E521D3D9;
-	Mon,  9 Jun 2025 17:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A4321C189;
+	Mon,  9 Jun 2025 17:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fj5eqiuN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dy59W2SO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8E321D3CA;
-	Mon,  9 Jun 2025 17:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF8E215766;
+	Mon,  9 Jun 2025 17:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749490498; cv=none; b=fGyI9UeN/zn4blvChqW4nOsnwodEDQzovioJMZtzJWJjkmRj1o8nwVE2hkHGP5vE13EHhyRYfrn7NhT78fwONMuihiVp9bDGgUNJflUxz0zpcvOLw5KSoMB+z2H+me3WeUYhifJaYFha9ATA8IuD352y8MwGAYHlBkM5i/GfIA8=
+	t=1749490775; cv=none; b=plTu0aNjdchS0adbc8wVh8LvOmZ6iqdoayrZMV+DH+m+tCWjYtuKajJCrY77Gc7ZxeTrx+cJCJuX/gNe08uv0YyuTVeRIcA4mVJU5J55hg6IjP9lJ3sumtFqIMdHkJFw3Ha4+XMAkq3KhNMssUBdX/+sk90cw0MpDwDvkbs1iDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749490498; c=relaxed/simple;
-	bh=P0uyLXZUJ1b2YGY6ixM1C+JXdrEdr9j6L4IfO3sQ7R8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SGuAWQ8WrQlFZxEVksJ837B2LB6vGaeuRq+G85CpdtVWVVUbImDzkXS7xVSQImW8i7nF5GpVAAVmOqz7waRCaQVs7bZ8T4qbkgm7IzayG37mLMh4OuoOrAr6Zp0FI5R1rYU0lzIA7vf98ajZrorTQJGqeP1OYT10kPvu3eHiuJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fj5eqiuN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54773C4CEF6;
-	Mon,  9 Jun 2025 17:34:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749490497;
-	bh=P0uyLXZUJ1b2YGY6ixM1C+JXdrEdr9j6L4IfO3sQ7R8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fj5eqiuNf2Y5tsv10HOnXxTcxQ0stff3Bg9U1nxzTFCaZfHbIKAER+EzqER8IrGaS
-	 BAWX99AYfG94OFUhTWgzD1mQJiuT7nlpSYnTrMDRut6CMCCGT+LGK7WmAApaoZkaNH
-	 tAildvKjNA0oBTRBcJqpoFN618Gz8narWR7fVWtlyk6pde2BIMx5n/0ERkDNhees5H
-	 jfxz79MaNf5xDQL5tm1bMBwgQU5RufVOMz8EewbR0sGcFxxW4f32M80bCyb1MnnmZ2
-	 wldmYLcYdbC56AiTWMGrRojn8PWWUxW0Qz9LYkNbMDA6vjEK/9Il39h752aNQFCOBf
-	 cTerovs+zp2zw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com
-Cc: willemdebruijn.kernel@gmail.com,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1749490775; c=relaxed/simple;
+	bh=o3PREeO4DOrU7ekFiopqC8hOe4/3H9IhP7e2Wtv14rU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sF9Tazj+qj3rdV8Sh/Ag7Za0hJbIJjvKBzJuATdYomMT4RLGRJKv082Vf3Zf1jkYslRkRWQgEfM27jPQoGSRsC7AkqUUh181016exRrr+p9nPZTB80aKoz2VuDPm9JHX+9ILnsW3Y35tONVqk2JODENWEoGbXvLtfoJYSWDa9nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dy59W2SO; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af6a315b491so3823621a12.1;
+        Mon, 09 Jun 2025 10:39:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749490774; x=1750095574; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mIBPFAGPp8hXcKc/4wwQc/egzYY6bQX2XSKLxjUmpLY=;
+        b=dy59W2SOtAoihFrxYMkHPqTudxgPI0YZ5ToYCUvHlzm4JE5mbuEHFnxyKgrnguGxh8
+         mhkvwIxTpLTAjT3AHlVfCq7n2s29VM2C0WkSe/Lxigb15e3VBjcSDuHwHHEgioi7YIe8
+         OUM9FUFveb32hSxrgBhHCQwGX7x5Xwc3y5MBukctKoRmtVuaPVNs6jAsT7FGUGKCYkJB
+         wbpTzB4ykGHRGjiMk44hlMbZsfmMb8TO1Xsw6Gk0yi0TBrHHICY0sglYu7RH1L/I4ddQ
+         osYeWAh+99N5NNqVS2DS47ZxNmlcFuPEiVYxaDM3m5DEpVWjw+V+9A6yQ+KL8Q8KhTEx
+         rq+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749490774; x=1750095574;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mIBPFAGPp8hXcKc/4wwQc/egzYY6bQX2XSKLxjUmpLY=;
+        b=XgMClZGbmVuabbM+1YxQIKbPT2RXYa/+jPKI4YAWDQZVUqcIpHzsrjeW6X6gy8Due3
+         ELrCemVxZELsGydFGdZLz9Ws3OQF3lmFRw+WYiU4pb8zrS9jhtf9u+F5GzVsTlkYjMgI
+         lFE5URYYXZ8zwwZr3+GxBGeiFa9YrSwjoEUMAyvbvocwALtSvX7hd2GySle+sGbq85UU
+         WKFoFsadEQxKiCc3cyidmWu3jY0o0WYMLmyqHAv7RQTHxrbS8G8IzzDf4d9Z4HkaXXtm
+         mVZccHxWE8d1OGwLAS7zpNnPoPz9E6XjdYt/0iBglD1zVelw6P1icmmv2l0DQYpnft3f
+         teqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXTsGRkONW2Jd+zyIJb9nxwDUCH29MJdJAUETO0AcAqshW/f8+JYRiEdhGxp5G4Bsn2ldYqAAEYAUFu5CB@vger.kernel.org, AJvYcCWy3+YqebpI3kRA/Oxi70hGk4fgjlMQqMnbGtnCSMo7GRHOZNahR1GgoUBW4mmRsOiI67I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHLWjh0rMtPSuF+kv5PnXILbmY6RawD/FaaRaqNnckhSW450fA
+	+cW95V3xAu0Xtt7punVgjpLgdbTG/bT7lXGANcQm58tU4pQPR0UU5Yo=
+X-Gm-Gg: ASbGnctmkBNjc8qhGl4Tn7WFx0izkPDUWGHxlsXqTlXl++PfAdqfbEl05RMGgLjNzOI
+	9wXtrpi13x12SZeKsUg6ghyIPc7tRf9MMng7dr5E3TcaliY0B2LK0EOKIgDh8ez0xgOjRfiLZpF
+	cG1kywlbGatH5cAZHIpwb31+7cO018M8c3mkmfW+Gye4jT9fJ7HFli6tDXzY6RUSGtGlneGavDr
+	RqUrRNbv+78wdNtH9dx7YuYzVy8auLvoxtt1K4vol+5iS6lIAKTNnK2oqCImtctay1P//iKgRBM
+	qxdZguvOFsm0Ex7oJ7LZsqpzIsz8B7gJZQKEirX48U1z4tPdBTr4r/j84uT/wtCT85sTq2s=
+X-Google-Smtp-Source: AGHT+IE9KMa9l69eTnubbzgLEvHrPpwQoVF8z70wRp8ljIOdlocN91B1ZfBA3RHHH+CFtn5cN1pZAw==
+X-Received: by 2002:a05:6a20:160e:b0:20b:9774:ac6c with SMTP id adf61e73a8af0-21ee6853262mr16219357637.5.1749490773373;
+        Mon, 09 Jun 2025 10:39:33 -0700 (PDT)
+Received: from debian.ujwal.com ([223.185.129.95])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482b0c212fsm6180691b3a.135.2025.06.09.10.39.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jun 2025 10:39:33 -0700 (PDT)
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
 	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
+	kuba@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
 	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org
-Subject: [RFC net-next 6/6] selftests: drv-net: add test for RSS on flow label
-Date: Mon,  9 Jun 2025 10:34:42 -0700
-Message-ID: <20250609173442.1745856-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250609173442.1745856-1-kuba@kernel.org>
-References: <20250609173442.1745856-1-kuba@kernel.org>
+	aoluo@google.com,
+	jolsa@kernel.org
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ujwal Kundur <ujwal.kundur@gmail.com>
+Subject: [PATCH] bpf: cpumap: report Rx queue index to xdp_rxq_info
+Date: Mon,  9 Jun 2025 23:08:52 +0530
+Message-Id: <20250609173851.778-1-ujwal.kundur@gmail.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,197 +102,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a simple test for checking that RSS on flow label works,
-and that its rejected for IPv4 flows.
+Refer to the Rx queue using a XDP frame's attached netdev and ascertain
+the queue index from it.
 
- # ./tools/testing/selftests/drivers/net/hw/rss_flow_label.py
- TAP version 13
- 1..2
- ok 1 rss_flow_label.test_rss_flow_label
- ok 2 rss_flow_label.test_rss_flow_label_6only
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
 ---
-CC: shuah@kernel.org
-CC: sdf@fomichev.me
-CC: linux-kselftest@vger.kernel.org
----
- .../testing/selftests/drivers/net/hw/Makefile |   1 +
- .../drivers/net/hw/rss_flow_label.py          | 151 ++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/rss_flow_label.py
+ kernel/bpf/cpumap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index df2c047ffa90..56bf1f1b8377 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -17,6 +17,7 @@ TEST_PROGS = \
- 	loopback.sh \
- 	pp_alloc_fail.py \
- 	rss_ctx.py \
-+	rss_flow_label.py \
- 	rss_input_xfrm.py \
- 	tso.py \
- 	xsk_reconfig.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_flow_label.py b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-new file mode 100755
-index 000000000000..e471e13160ae
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/rss_flow_label.py
-@@ -0,0 +1,151 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Tests for RSS hashing on IPv6 Flow Label.
-+"""
-+
-+import glob
-+import socket
-+from lib.py import CmdExitFailure
-+from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_in, \
-+    ksft_not_in, ksft_raises, KsftSkipEx
-+from lib.py import bkg, cmd, defer, fd_read_timeout, rand_port
-+from lib.py import NetDrvEpEnv
-+
-+
-+def _ethtool_get_cfg(cfg, fl_type):
-+    descr = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+
-+    converter = {
-+        "IP SA": "s",
-+        "IP DA": "d",
-+        "L3 proto": "t",
-+        "L4 bytes 0 & 1 [TCP/UDP src port]": "f",
-+        "L4 bytes 2 & 3 [TCP/UDP dst port]": "n",
-+        "IPv6 Flow Label": "l",
-+    }
-+
-+    ret = ""
-+    for line in descr.split("\n")[1:-2]:
-+        # if this raises we probably need to add more keys to converter above
-+        ret += converter[line]
-+    return ret
-+
-+
-+def _traffic(cfg, one_sock, one_cpu):
-+    local_port  = rand_port(socket.SOCK_DGRAM)
-+    remote_port = rand_port(socket.SOCK_DGRAM)
-+
-+    sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+    sock.bind(("", local_port))
-+    sock.connect((cfg.remote_addr_v["6"], 0))
-+    if one_sock:
-+        send = f"exec 5<>/dev/udp/{cfg.addr_v['6']}/{local_port}; " \
-+                "for i in `seq 20`; do echo a >&5; sleep 0.02; done; exec 5>&-"
-+    else:
-+        send = "for i in `seq 20`; do echo a | socat -t0.02 - UDP6:" \
-+              f"[{cfg.addr_v['6']}]:{local_port},sourceport={remote_port}; done"
-+
-+    cpus = set()
-+    with bkg(send, shell=True, host=cfg.remote, exit_wait=True):
-+        for _ in range(20):
-+            fd_read_timeout(sock.fileno(), 1)
-+            cpu = sock.getsockopt(socket.SOL_SOCKET, socket.SO_INCOMING_CPU)
-+            cpus.add(cpu)
-+
-+    if one_cpu:
-+        ksft_eq(len(cpus), 1,
-+                f"{one_sock=} - expected one CPU, got traffic on: {cpus=}")
-+    else:
-+        ksft_ge(len(cpus), 2,
-+                f"{one_sock=} - expected many CPUs, got traffic on: {cpus=}")
-+
-+
-+def test_rss_flow_label(cfg):
-+    """
-+    Test hashing on IPv6 flow label. Send traffic over a single socket
-+    and over multiple sockets. Depend on the remote having auto-label
-+    enabled so that it randomizes the label per socket.
-+    """
-+
-+    cfg.require_ipver("6")
-+    cfg.require_cmd("socat", remote=True)
-+    if not hasattr(socket, "SO_INCOMING_CPU"):
-+        raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
-+
-+    # 1 is the default, if someone changed it we probably shouldn"t mess with it
-+    af = cmd("cat /proc/sys/net/ipv6/auto_flowlabels", host=cfg.remote).stdout
-+    if af.strip() != "1":
-+        raise KsftSkipEx("Remote does not have auto_flowlabels enabled")
-+
-+    qcnt = len(glob.glob(f"/sys/class/net/{cfg.ifname}/queues/rx-*"))
-+    if qcnt < 2:
-+        raise KsftSkipEx(f"Local has only {qcnt} queues")
-+
-+    # Enable flow label hashing for UDP6
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    no_lbl = initial.replace("l", "")
-+    if "l" not in initial:
-+        try:
-+            cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 l{no_lbl}")
-+        except CmdExitFailure as exc:
-+            raise KsftSkipEx("Device doesn't support Flow Label for UDP6") from exc
-+
-+        defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _traffic(cfg, one_sock=True, one_cpu=True)
-+    _traffic(cfg, one_sock=False, one_cpu=False)
-+
-+    # Disable it, we should see no hashing (reset was already defer()ed)
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {no_lbl}")
-+
-+    _traffic(cfg, one_sock=False, one_cpu=True)
-+
-+
-+def _check_v4_flow_types(cfg):
-+    for fl_type in ["tcp4", "udp4", "ah4", "esp4", "sctp4"]:
-+        try:
-+            cur = cmd(f"ethtool -n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+            ksft_not_in("Flow Label", cur,
-+                        comment=f"{fl_type=} has Flow Label:" + cur)
-+        except CmdExitFailure:
-+            # Probably does not support this flow type
-+            pass
-+
-+
-+def test_rss_flow_label_6only(cfg):
-+    """
-+    Test interactions with IPv4 flow types. It should not be possible to set
-+    IPv6 Flow Label hashing for an IPv4 flow type. The Flow Label should also
-+    not appear in the IPv4 "current config".
-+    """
-+
-+    with ksft_raises(CmdExitFailure) as cm:
-+        cmd(f"ethtool -N {cfg.ifname} rx-flow-hash tcp4 sdfnl")
-+    ksft_in("Invalid argument", cm.exception.cmd.stderr)
-+
-+    _check_v4_flow_types(cfg)
-+
-+    # Try to enable Flow Labels and check again, in case it leaks thru
-+    initial = _ethtool_get_cfg(cfg, "udp6")
-+    changed = initial.replace("l", "") if "l" in initial else initial + "l"
-+
-+    cmd(f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {changed}")
-+    restore = defer(cmd, f"ethtool -N {cfg.ifname} rx-flow-hash udp6 {initial}")
-+
-+    _check_v4_flow_types(cfg)
-+    restore.exec()
-+    _check_v4_flow_types(cfg)
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
-+        ksft_run([test_rss_flow_label,
-+                  test_rss_flow_label_6only],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 67e8a2fc1a99..8230292deac1 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -34,6 +34,7 @@
+ #include <linux/btf_ids.h>
+ 
+ #include <linux/netdevice.h>
++#include <net/netdev_rx_queue.h>
+ #include <net/gro.h>
+ 
+ /* General idea: XDP packets getting XDP redirected to another CPU,
+@@ -196,7 +197,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
+ 
+ 		rxq.dev = xdpf->dev_rx;
+ 		rxq.mem.type = xdpf->mem_type;
+-		/* TODO: report queue_index to xdp_rxq_info */
++		rxq.queue_index = get_netdev_rx_queue_index(xdpf->dev_rx->_rx);
+ 
+ 		xdp_convert_frame_to_buff(xdpf, &xdp);
+ 
 -- 
-2.49.0
+2.20.1
 
 
