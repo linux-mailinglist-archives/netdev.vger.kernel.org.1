@@ -1,664 +1,216 @@
-Return-Path: <netdev+bounces-195841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B05AD270E
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:56:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25C6AD2786
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:27:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9812316F34D
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:56:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 945DA3B44F5
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 20:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865FC21CFEF;
-	Mon,  9 Jun 2025 19:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3913A21FF24;
+	Mon,  9 Jun 2025 20:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="y0H9oSCr"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="gECh56s6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11023072.outbound.protection.outlook.com [40.93.201.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1ED421D3DF
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 19:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749498965; cv=none; b=i40OfIdnLDycEQbpIpTGDEW+uWQ0vFAIXNyES8GJgT0LUG1uR1V3O/u16nD3LuC8ml4fEQh3Jpgn9lISic5blBZRk1q+jUeFC9WADedOSSCLXkmbgT0OWPpVga5djk2IQ+pba3ronYMfYL05Do3TBCTWauB9SckNCB+cw3Tn+LU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749498965; c=relaxed/simple;
-	bh=8MvQhCtyQUftmroV3OH0KT+bTE8cHFpM8MhHDg75R9k=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LjwCw3PvYQQ6LKzgQ1/PrNNRiETx69qMeF4Brnm//NdwwEn1kyW7j4LMNRqHF6jIKAHH0AGGKj9RUw3kngrMZoPJTiSslN6/iffr+3e1qrrP5/pfKgOCozoJzM0smtc92HPHvdbXQmrCStKwqQt7DsJAVc2S0YG3kCkbbyWMTJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=y0H9oSCr; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1749498952; x=1749758152;
-	bh=rKvc6W73JHxvYSoajeybf+9gF8vUb98/ivMhYmzyIxo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=y0H9oSCr6P7YuwNvc0r5bcVFMeQzQ8W0mZarImttMnvm978mSVoKYx8KCEI8fKNbI
-	 H25cADj3+iBbSc/W8DlJpTw6/QP8oWtrbfjBX5BXVZQ3dk08S2d5rKZ2D0sPyk94VQ
-	 bxbyb7uKohPZ4bad0wAGyXpgvy0tj2ZSlNlWazpYPW7q4rMsaSjWwC1O2fJTOodBDA
-	 pI0ZsQchHT9jhlNPTobq2R0sOaML1lQZ9JblR0gEr8cNrX5BRZCuK4oiSWH9aQf6EZ
-	 2EkLOfI+HRj3ntFJ+yYS5FeNXKNydO+pWfZl/U63BhNIq1MSZ/sDGSK/etmOQxP0lV
-	 tmXsUNexLhlYw==
-Date: Mon, 09 Jun 2025 19:55:49 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: William Liu <will@willsroot.io>
-Cc: Savy <savy@syst3mfailure.io>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <xHNRt9BXhR1vk5BYygHc0KpzK2os-725E9Jgq4ycBo0hIcAknk2ewG_bidnYKmiIbfzaPcIjWPv6-5FQB_LWIhCmoZ7uz3y52pfrvV9MklI=@willsroot.io>
-In-Reply-To: <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io> <99X_9_r0DXyyKP-0xVz3Bg2FFXhmpCsIdTix8J-a52alNswEyVRbhMFnzyT35EOUP-8TVPL-UDvBbOd8u5_jRE10A98e_ULf5x6GTv03tbg=@syst3mfailure.io> <CAM0EoMnCHu5HrNjE-mf8_OFanrptcTFgaEPJbkWXJybhm8f8tw@mail.gmail.com> <CAM0EoMk--+xXTf9ZG9M=r+gkRn2hczjqSTJRMV0dcgouJ4zw6g@mail.gmail.com> <CAM0EoMk4dxOFoN_=3yOy+XrtU=yvjJXAw3fVTmN9=M=R=vtbxA@mail.gmail.com> <lVH_UKrQzWPCHJS7_1Cj0gmEV0x4KI3VB_4auivP0fDokTBbmWuDV455wXrf6eQzakVFoK6wUxlDuMw_Lo0p4P9ByPLSjklsIkQiNcd_hvQ=@willsroot.io> <CAM0EoMkoFJJQD_ZVSMb7DUo1mafevgujx+WA=1ecTeYBcpB1Lw@mail.gmail.com> <A2nutOWbLBIdLRrnsUdavOagBEebp4YBFx0DdL23njEFVAySZul2pDRK1xf76_g6dLb82YXCRb1Ry9btDkZqeY9Btib0KgViSIIfsi4BDfU=@willsroot.io> <CAM0EoMmhP_9UsF18M=6B6AbY_am8cEnaqggpnVb9fkmBB4vjtA@mail.gmail.com> <dF67hR5ZcMlQZMtkrUEol_zkunpoJipfdVXveT5z-3_g57e5T6TQZRYlluKWzRoNiW4dCl603wlnnYR8eE-alv6UwTf-F8o5GzHWuDsypj0=@willsroot.io>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 473b78b39aa7a372219521083176f3de21fe6dc3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC73E20EB;
+	Mon,  9 Jun 2025 20:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749500853; cv=fail; b=jGYSL5hD8NhtAANwKidGVX9iObzlbYVdLCUAMfxb9DWD84Xk/YxGHSJcDOV77XM7C2LH7KUZxgvs2tKnx330iQd1ywb1B5ayQ7UKCAMqlRbiJFzjj7fjYROMYeEXJYRjUPVcgSn4hMFwFmlzCMLx0VFlLOdMZatlUlinfHpyEg8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749500853; c=relaxed/simple;
+	bh=v7zbMYBIekAQO9fR3nUNecuM6EB+S0vE20wMmpw1VNA=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BuWLBO+BkN3C10OZne/lrBObADrTSm93MVfc+rZ4PiH9RgCJNdOsTOYmaCUpQ9BnjN8AfOET3Wp+baAH2c1z99uRUswWtb7Enoyn9071gC8AVmEPIxvjnRqShoPTnw3Qvoc9OqkLW/RTd2dLgNkQXc8Lm4VqRoUkGH4xb8RU4Ks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=gECh56s6; arc=fail smtp.client-ip=40.93.201.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EXsFk/OEtIHghwldl7tOflCmCVgWXVuvUuV4IsaPgkwtNWRsdP97rADkAIXTyyZcmQW3ngOXEYWCQcLJrgqVtB3W+m1Zlb/51hPkmWj3SKnXvDPHU6dGblXKFtYoNyRqHIdW4NhCPr+RkQgVAeTixaYx2xcSGntlz0N9TBlsherNsALcNSQ0aNIkYmem31XXvvjSngfozWvfyAxlE1qCNNFIWsmykDOjukzM15zNiXiRWXFHwlGhFkjlmSvOauXmTbEsqTLy9lf3mbfyhVwHzmdyzJWcQq2EUBQJiEEsnlZy8mi5/NfxjP1lKHtsO6CDUAP/HOz0mn1HT1TjZTjAnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v7zbMYBIekAQO9fR3nUNecuM6EB+S0vE20wMmpw1VNA=;
+ b=TbotS7LPKP8PMgMdO8HF+vyKFTs87ev2ixYa2tpcg/zcdrvl/ryT5JHeO3z2wGCmZELGw0J5a1Wi6nColM3+smtJqPIPwIpTOGl5e7K/IsizViA82BiZv+53QCtkdlydEX5DmjzwPtKCVFjqhhxFGst1lBH+CemZ/PD5lvaL5AvTi8pQF8WnLLsrWUoZVyZ1JKmSzQ2N7ES4DQqptBsWoQ1rpP5Hyc7uCa0CkV7z6GcoDc6E20OUHPn+dwlmRfDhdsOdlzVXDaqXlvh7ywOMOhJjj4azlZjhzPRQfy0yKoYXSF2/GuQNFFWtThhK3d1l43QXDmn7iEqPyyJFmgsD7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v7zbMYBIekAQO9fR3nUNecuM6EB+S0vE20wMmpw1VNA=;
+ b=gECh56s6WYdnwg/w6tjCqUCNVdHWjoGD/KCPvEUkwh27Kg42xYVBC7tj+O7o6//+cIwaiJR1UNWEzJsTzfgjCWmdM/oU/CNrrnm9Qk6e1i+4cnDsoKaebK96AaPgaYGgcWSQBGLO4XxXkjVLz4hmISLkTyHHWprfT2Dfs8Ky+bo=
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com (2603:10b6:805:f::12)
+ by DS4PR21MB5128.namprd21.prod.outlook.com (2603:10b6:8:29a::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.16; Mon, 9 Jun
+ 2025 20:27:29 +0000
+Received: from SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf]) by SN6PR2101MB0943.namprd21.prod.outlook.com
+ ([fe80::c112:335:8240:6ecf%6]) with mapi id 15.20.8835.015; Mon, 9 Jun 2025
+ 20:27:29 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, "andrew+net@lunn.ch"
+	<andrew+net@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, Long Li <longli@microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, "horms@kernel.org" <horms@kernel.org>,
+	"mhklinux@outlook.com" <mhklinux@outlook.com>, "ernis@linux.microsoft.com"
+	<ernis@linux.microsoft.com>, Dipayaan Roy <dipayanroy@microsoft.com>,
+	"schakrabarti@linux.microsoft.com" <schakrabarti@linux.microsoft.com>,
+	"rosenp@gmail.com" <rosenp@gmail.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>
+Subject: RE: [PATCH] net: mana: Expose additional hardware counters for drop
+ and TC via ethtool.
+Thread-Topic: [PATCH] net: mana: Expose additional hardware counters for drop
+ and TC via ethtool.
+Thread-Index: AQHb2SVt94JsebuHT0O1cu1SJfWCrLP7RwNQ
+Date: Mon, 9 Jun 2025 20:27:29 +0000
+Message-ID:
+ <SN6PR2101MB094371F71B98FE8E3D0652D4CA6BA@SN6PR2101MB0943.namprd21.prod.outlook.com>
+References:
+ <20250609100103.GA7102@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To:
+ <20250609100103.GA7102@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=49a82560-6bc0-4fdf-8efa-7098101083f5;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-06-09T20:25:34Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR2101MB0943:EE_|DS4PR21MB5128:EE_
+x-ms-office365-filtering-correlation-id: 3ea8851b-86e2-4444-3bee-08dda7940e31
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700018|7053199007|921020;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?sjAsTqbyC9g/OQLcUF4DryEjhs6Nw0vXtkhk6b7mxHDQnDwnmb2kQqDuaALh?=
+ =?us-ascii?Q?9WLcPwRqwUTfgdcSSMn6rpqDm/I3uAip5/hXKE7Mo4PzhaehxTmve+AAwL0w?=
+ =?us-ascii?Q?0SpaLQIj+c/DxPqYT4FMarGI2A6ZQMXY93Eav6vO9jTuvdnslHIz6MeNJJzx?=
+ =?us-ascii?Q?Tc2XoftQcuAoNJTfpLKhoVf0xUkbDzyClhlxGTetFj3a8T1/DuImtAhr3M0E?=
+ =?us-ascii?Q?CLRiu+xrjesqnMoSbuDFM9kzI2++4hYdlql8QukBeLeE33c8u+/ynlcApHNn?=
+ =?us-ascii?Q?Rk41gDip3wny4BRFZ//rHMxHlCXoEdqDW+fLIyXA6J8ggiGLp9EdP6JQOPoX?=
+ =?us-ascii?Q?5Rwln0ILGOFnRZzJuaVU4kyC6GQvTMQehSFOBPz1elAo+PUD1s2CljWlM0g8?=
+ =?us-ascii?Q?Gtb9JylhiYlY7Ta36q36mQTZLsPzXVyBRZSBeuVJccGxi6MyBNhF65jgAxfD?=
+ =?us-ascii?Q?6XkbXmRCjjzn6PSH35dHyVb0m6ILZIcBTLtUHPdmGOm0ODDjrOTgvEt7BcCe?=
+ =?us-ascii?Q?xrB07fPjgOSvHyPeNkK1r+XBdqbGv+9V10YWn47HJas21HDSYENhn2K/s8Fw?=
+ =?us-ascii?Q?KtdGwI+38P+4VstO5OhIcl7YqF0GJWAJgH+bWXZMLL2IIoKPHnEwKe5qxaXr?=
+ =?us-ascii?Q?eKAHuLGoxeqSGhYGbT3hwednbTwgAL0LvUyIlTO1d/ySf1BJvXdfRQsuf1pE?=
+ =?us-ascii?Q?2n2LgLMrh3tOkNjOU/gSxZnvMImG3uH0IpiHgwyiC2FWDBjcMngVhVIlH3cq?=
+ =?us-ascii?Q?QjI2Ox1yuRp9uOpmOFfQkwCsdZyJFGpzukweCNel8MKsdOKFPfDTKf1ENOuC?=
+ =?us-ascii?Q?dgTN0X+znrys12WtHdqYx/9HA5CeBmMV6dZT/ifga9UVmnC0hLsIAqOlfwVy?=
+ =?us-ascii?Q?4PiD5Od7RSWW5MWTAiyeW0Qw3wQHSWjbe8N2PWKtwr/PVgoHTtD1AyZ6nJIp?=
+ =?us-ascii?Q?iRbMIhsfcRflpbgzVmvzvLYAmdNiwg49m07QDeVzt8iOjdfDodTu9+vZHBOq?=
+ =?us-ascii?Q?Pqs7IgzFYYb8ir3vl6R8kcEDcW2/iPhqvZRymmfxf88A2F4AEGke5OsBQeGj?=
+ =?us-ascii?Q?lrvrUs1Jkl3YLAN/FDSBGjc6mtVKuY4O3feVjS4TwLEUOGzfpLlNqqAjNv4e?=
+ =?us-ascii?Q?lC6hfzEC6n4tfuPwZyQLJFplRVUIOD4mjT7vEyFe53hzyXBqWmea/DVylJbh?=
+ =?us-ascii?Q?0Qg/EjcTmi1GEIxQiz2hfIWjrWSd0kNdpjaB0R+kvv90ZM+WwDPzWZYHvGW+?=
+ =?us-ascii?Q?yFpEVUTo67Uh7n/7BpIrCQ+o9qCKpCBeSaB2YnDx6ooLarUdh5nb7D26t0Yr?=
+ =?us-ascii?Q?ZvYoBQS0PCQ5nD+Z7tNAMOYxnv34z/fbGbcAAcbwAEgWu2FL0bYZl3yb+H+1?=
+ =?us-ascii?Q?Ttbosn3r3IfAMMOINfY9BmhRWGo7BLyFzykon2IK/4fEGlCEwojaOvE63GYp?=
+ =?us-ascii?Q?tbOIE3Mbq9w+6cSE+zlZ07JzM56YUmgTKfdZpJzDKqype1TmreHXrGMWu1lG?=
+ =?us-ascii?Q?KzCofTnr4UbzQlk=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB0943.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700018)(7053199007)(921020);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?FsTAurv2PIkiQeFFnL1Ec5pSnbbLgClpiTJrSKFLY6PhoWF9YGtD7YIKNLDt?=
+ =?us-ascii?Q?3ERTOYQyWHaUEdjiw5g0aNtsgS4R00GDYqtBU3fYwPBMwYoBjFW4vEveEQoW?=
+ =?us-ascii?Q?gKa1GDR3B9Vuvb8+xdeHup0jW5p8BovlWY6qQAhRNq74fTfXC9v3GFm4vhtD?=
+ =?us-ascii?Q?e3XbLjbRRYMgZz9e00H08YaJ44UdzfvPQnGClj4lFI0EUf37EYO4zWBrOOEZ?=
+ =?us-ascii?Q?QgznxF1b8IsKU1C5W4yc1bQoBs0tJdsP3qmIbFilDqpL8z2gX5IMRbKz7pmb?=
+ =?us-ascii?Q?7dlTmqEZCF9KAorF9DVxTfpZmk/uw3z/0q0qgH/+xgS1pSkpa3UovTetLyCc?=
+ =?us-ascii?Q?SM0ItcNWqZUiIVNxxnzGlor1C9QYwQcbL2lB7z1g6YUMlB9xqNambSsPG8cY?=
+ =?us-ascii?Q?sS56tHJ1MR3OVlpEIvH9VBE6LWkvr59qf/EHTRQXXi2rjGe0QekYbslM7lDZ?=
+ =?us-ascii?Q?vipGn7/URMkhlipM6Sz9soKckeTDXC5S4hNabY7W1atZpimcI3sLxBV1fM3c?=
+ =?us-ascii?Q?T9K3IDIY+PcL9EAne+P1Egyvqz5XwQGAib/Z+2DDljg8nR2SSYB6f2v1laSR?=
+ =?us-ascii?Q?QfaymRuI2n3kn24ACFo79gm49KEfHxk1hxxUMBOAR1m2nw5nTpEQh/Yr3iwZ?=
+ =?us-ascii?Q?NI+wPnZYE7d9pvIAHZpr2zQfqKkz4fsDmskHvR2zqWI6vgj97xtBMJpK4Q0x?=
+ =?us-ascii?Q?W2eUQBGQKysnCs0tRz4zpfdrjBJKUri8/fomENHJ9vNBIzY4WvcLdY6+lLAB?=
+ =?us-ascii?Q?oZhED+TuqoXwIiGndouE2bRbD6OyKpxLH+M0NeU/Qz5tRFQwDaVUCSDILx+b?=
+ =?us-ascii?Q?Ho23ups3PwKL6TaWsEBtr7HxP24hWTNZGjfgM+RZc/l1+CP8SoqvSwMdPGp5?=
+ =?us-ascii?Q?q+VWI7Cxxz9HBAu5b/AF4e4vEqmVVMKnogYI6J5l6YwbiH5siX1xOwQKXFBj?=
+ =?us-ascii?Q?YbrN2nikcnE7sFxKRPxJqVuXU9IHiopes45cWjKKUtsrPPkxdDREYkq2okBg?=
+ =?us-ascii?Q?qKK2kuAq6NiIlwtqGzXUjj133Rca6vvmJe2TO4hsLCx91YNzzdnzwvF94wwj?=
+ =?us-ascii?Q?1ioY0iuJjDgdUHtug7Wy+GLpb6+K5C+UeQ9xujYF03gF4DIkrLiCCyS/dygE?=
+ =?us-ascii?Q?jd20r0omh38ze2kgY9sQc+d1YTQ+a44uzWQJxTKO3CqueY23/3+V0pVHTlP1?=
+ =?us-ascii?Q?qyuSvDNT+W5t2L/boE+eslvK4EftgYpyy4oBclk8yVA3p6m2wyPoWdjcTuPg?=
+ =?us-ascii?Q?vcAEnt7on0Qy+vfDMKxzstXtPtmUf3514OaQJWxIMusBu7GQPnp/Xg0A4/ld?=
+ =?us-ascii?Q?S1IXxFHvuXyHJnbq3cTsQaTqhzrXKi9+K44+oknLOkPdRXd5KH3ifg7p9snu?=
+ =?us-ascii?Q?g2xo0v5DqRF6pZ/noEzxR2VnG9Aj6sXk8jP5NmLS5VfunrX+DRmu01fcrbQH?=
+ =?us-ascii?Q?pYQd0AYyMSlZsEaU4BpCKiblHW9F0YHYCIkXcd+whgNu90UM9mYycRi1rp3T?=
+ =?us-ascii?Q?doGkvu4uXPGHScsspGKXOnYYdQY693ToFVAOlIPKXjuYwbDwDhp5jrsKZ0qw?=
+ =?us-ascii?Q?0D1CQEvAjqHux3v6ECd5RWFA7FJmHNotIn/hibEf?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB0943.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ea8851b-86e2-4444-3bee-08dda7940e31
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2025 20:27:29.1013
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g+KLpwy1Q/7rKEL8RVIfMuBsvImj1nslljCP7qW1znPP6/m8mcj6EuOsUz2Grc5fUQi8O51cB0p8u904FuP6Nw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR21MB5128
 
 
 
+> -----Original Message-----
+> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> Sent: Monday, June 9, 2025 6:01 AM
+> To: andrew+net@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; KY Srinivasan <kys@microsoft.com>;
+> Haiyang Zhang <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <decui@microsoft.com>; Long Li <longli@microsoft.com>; Konstantin Taranov
+> <kotaranov@microsoft.com>; horms@kernel.org; mhklinux@outlook.com;
+> ernis@linux.microsoft.com; Dipayaan Roy <dipayanroy@microsoft.com>;
+> schakrabarti@linux.microsoft.com; rosenp@gmail.com; linux-
+> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-rdma@vger.kernel.org
+> Subject: [PATCH] net: mana: Expose additional hardware counters for drop
+> and TC via ethtool.
+>=20
+> Add support for reporting additional hardware counters for drop and
+> TC using the ethtool -S interface.
+>=20
+> These counters include:
+>=20
+> - Aggregate Rx/Tx drop counters
+> - Per-TC Rx/Tx packet counters
+> - Per-TC Rx/Tx byte counters
+> - Per-TC Rx/Tx pause frame counters
+>=20
+> The counters are exposed using ethtool_ops->get_ethtool_stats and
+> ethtool_ops->get_strings. This feature/counters are not available
+> to all versions of hardware.
+>=20
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-
-On Monday, June 9th, 2025 at 3:31 PM, William Liu <will@willsroot.io> wrote=
-:
-
->=20
->=20
-> On Monday, June 9th, 2025 at 12:27 PM, Jamal Hadi Salim jhs@mojatatu.com =
-wrote:
->=20
-> > On Sun, Jun 8, 2025 at 4:04=E2=80=AFPM William Liu will@willsroot.io wr=
-ote:
-> >=20
-> > > On Sunday, June 8th, 2025 at 12:39 PM, Jamal Hadi Salim jhs@mojatatu.=
-com wrote:
-> > >=20
-> > > > On Thu, Jun 5, 2025 at 11:20=E2=80=AFAM William Liu will@willsroot.=
-io wrote:
-> > > >=20
-> > > > > On Monday, June 2nd, 2025 at 9:39 PM, Jamal Hadi Salim jhs@mojata=
-tu.com wrote:
-> > > > >=20
-> > > > > > On Sat, May 31, 2025 at 11:38=E2=80=AFAM Jamal Hadi Salim jhs@m=
-ojatatu.com wrote:
-> > > > > >=20
-> > > > > > > On Sat, May 31, 2025 at 11:23=E2=80=AFAM Jamal Hadi Salim jhs=
-@mojatatu.com wrote:
-> > > > > > >=20
-> > > > > > > > On Sat, May 31, 2025 at 9:20=E2=80=AFAM Savy savy@syst3mfai=
-lure.io wrote:
-> > > > > > > >=20
-> > > > > > > > > On Friday, May 30th, 2025 at 9:41 PM, Jamal Hadi Salim jh=
-s@mojatatu.com wrote:
-> > > > > > > > >=20
-> > > > > > > > > > Hi Will,
-> > > > > > > > > >=20
-> > > > > > > > > > On Fri, May 30, 2025 at 10:49=E2=80=AFAM William Liu wi=
-ll@willsroot.io wrote:
-> > > > > > > > > >=20
-> > > > > > > > > > > On Friday, May 30th, 2025 at 2:14 PM, Jamal Hadi Sali=
-m jhs@mojatatu.com wrote:
-> > > > > > > > > > >=20
-> > > > > > > > > > > > On Thu, May 29, 2025 at 11:23=E2=80=AFAM William Li=
-u will@willsroot.io wrote:
-> > > > > > > > > > > >=20
-> > > > > > > > > > > > > On Wednesday, May 28th, 2025 at 10:00 PM, Jamal H=
-adi Salim jhs@mojatatu.com wrote:
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > Hi,
-> > > > > > > > > > > > > > Sorry for the latency..
-> > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > On Sun, May 25, 2025 at 4:43=E2=80=AFPM William=
- Liu will@willsroot.io wrote:
-> > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > > I did some more testing with the percpu appro=
-ach, and we realized the following problem caused now by netem_dequeue.
-> > > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > > Recall that we increment the percpu variable =
-on netem_enqueue entry and decrement it on exit. netem_dequeue calls enqueu=
-e on the child qdisc - if this child qdisc is a netem qdisc with duplicatio=
-n enabled, it could duplicate a previously duplicated packet from the paren=
-t back to the parent, causing the issue again. The percpu variable cannot p=
-rotect against this case.
-> > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > I didnt follow why "percpu variable cannot prot=
-ect against this case"
-> > > > > > > > > > > > > > - the enqueue and dequeue would be running on t=
-he same cpu, no?
-> > > > > > > > > > > > > > Also under what circumstances is the enqueue ba=
-ck to the root going to
-> > > > > > > > > > > > > > end up in calling dequeue? Did you test and hit=
- this issue or its just
-> > > > > > > > > > > > > > theory? Note: It doesnt matter what the source =
-of the skb is as long
-> > > > > > > > > > > > > > as it hits the netem enqueue.
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Yes, I meant that just using the percpu variable =
-in enqueue will not protect against the case for when dequeue calls enqueue=
- on the child. Because of the child netem with duplication enabled, packets=
- already involved in duplication will get sent back to the parent's tfifo q=
-ueue, and then the current dequeue will remain stuck in the loop before hit=
-ting an OOM - refer to the paragraph starting with "In netem_dequeue, the p=
-arent netem qdisc's t_len" in the first email for additional clarification.=
- We need to know whether a packet we dequeue has been involved in duplicati=
-on - if it has, we increment the percpu variable to inform the children net=
-em qdiscs.
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Hopefully the following diagram can help elucidat=
-e the problem:
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Step 1: Initial enqueue of Packet A:
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > +----------------------+
-> > > > > > > > > > > > > | Packet A |
-> > > > > > > > > > > > > +----------------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > +-------------------------+
-> > > > > > > > > > > > > | netem_enqueue |
-> > > > > > > > > > > > > +-------------------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > +-----------------------------------+
-> > > > > > > > > > > > > | Duplication Logic (percpu OK): |
-> > > > > > > > > > > > > | =3D> Packet A, Packet B (dup) |
-> > > > > > > > > > > > > +-----------------------------------+
-> > > > > > > > > > > > > | <- percpu variable for netem_enqueue
-> > > > > > > > > > > > > v prevents duplication of B
-> > > > > > > > > > > > > +-------------+
-> > > > > > > > > > > > > | tfifo queue |
-> > > > > > > > > > > > > | [A, B] |
-> > > > > > > > > > > > > +-------------+
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Step 2: netem_dequeue processes Packet B (or A)
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > +-------------+
-> > > > > > > > > > > > > | tfifo queue |
-> > > > > > > > > > > > > | [A] |
-> > > > > > > > > > > > > +-------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > +----------------------------------------+
-> > > > > > > > > > > > > | netem_dequeue pops B in tfifo_dequeue |
-> > > > > > > > > > > > > +----------------------------------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > +--------------------------------------------+
-> > > > > > > > > > > > > | netem_enqueue to child qdisc (netem w/ dup)|
-> > > > > > > > > > > > > +--------------------------------------------+
-> > > > > > > > > > > > > | <- percpu variable in netem_enqueue prologue
-> > > > > > > > > > > > > | and epilogue does not stop this dup,
-> > > > > > > > > > > > > v does not know about previous dup involvement
-> > > > > > > > > > > > > +------------------------------------------------=
---------+
-> > > > > > > > > > > > > | Child qdisc duplicates B to root (original nete=
-m) as C |
-> > > > > > > > > > > > > +------------------------------------------------=
---------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Step 3: Packet C enters original root netem again
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > +-------------------------+
-> > > > > > > > > > > > > | netem_enqueue (again) |
-> > > > > > > > > > > > > +-------------------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > +-------------------------------------+
-> > > > > > > > > > > > > | Duplication Logic (percpu OK again) |
-> > > > > > > > > > > > > | =3D> Packet C, Packet D |
-> > > > > > > > > > > > > +-------------------------------------+
-> > > > > > > > > > > > > |
-> > > > > > > > > > > > > v
-> > > > > > > > > > > > > .....
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > If you increment a percpu variable in enqueue pro=
-logue and decrement in enqueue epilogue, you will notice that our original =
-repro will still trigger a loop because of the scenario I pointed out above=
- - this has been tested.
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > From a current view of the codebase, netem is the=
- only qdisc that calls enqueue on its child from its dequeue. The check we =
-propose will only work if this invariant remains.
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > > However, there is a hack to address this. We =
-can add a field in netem_skb_cb called duplicated to track if a packet is i=
-nvolved in duplicated (both the original and duplicated packet should have =
-it marked). Right before we call the child enqueue in netem_dequeue, we che=
-ck for the duplicated value. If it is true, we increment the percpu variabl=
-e before and decrement it after the child enqueue call.
-> > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > is netem_skb_cb safe really for hierarchies? gr=
-ep for qdisc_skb_cb
-> > > > > > > > > > > > > > net/sched/ to see what i mean
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > We are not using it for cross qdisc hierarchy che=
-cking. We are only using it to inform a netem dequeue whether the packet ha=
-s partaken in duplication from its corresponding netem enqueue. That part s=
-eems to be private data for the sk_buff residing in the current qdisc, so m=
-y understanding is that it's ok.
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > > This only works under the assumption that the=
-re aren't other qdiscs that call enqueue on their child during dequeue, whi=
-ch seems to be the case for now. And honestly, this is quite a fragile fix =
-- there might be other edge cases that will cause problems later down the l=
-ine.
-> > > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > > Are you aware of other more elegant approache=
-s we can try for us to track this required cross-qdisc state? We suggested =
-adding a single bit to the skb, but we also see the problem with adding a f=
-ield for a one-off use case to such a vital structure (but this would also =
-completely stomp out this bug).
-> > > > > > > > > > > > > >=20
-> > > > > > > > > > > > > > It sounds like quite a complicated approach - i=
- dont know what the
-> > > > > > > > > > > > > > dequeue thing brings to the table; and if we re=
-ally have to dequeue to
-> > > > > > > > > > > > >=20
-> > > > > > > > > > > > > Did what I say above help clarify what the proble=
-m is? Feel free to let me know if you have more questions, this bug is quit=
-e a nasty one.
-> > > > > > > > > > > >=20
-> > > > > > > > > > > > The text helped a bit, but send a tc reproducer of =
-the issue you
-> > > > > > > > > > > > described to help me understand better how you end =
-up in the tfifo
-> > > > > > > > > > > > which then calls the enqueu, etc, etc.
-> > > > > > > > > > >=20
-> > > > > > > > > > > The reproducer is the same as the original reproducer=
- we reported:
-> > > > > > > > > > > tc qdisc add dev lo root handle 1: netem limit 1 dupl=
-icate 100%
-> > > > > > > > > > > tc qdisc add dev lo parent 1: handle 2: netem gap 1 l=
-imit 1 duplicate 100% delay 1us reorder 100%
-> > > > > > > > > > > ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
-> > > > > > > > > > >=20
-> > > > > > > > > > > We walked through the issue in the codepath in the fi=
-rst email of this thread at the paragraph starting with "The root cause for=
- this is complex. Because of the way we setup the parent qdisc" - please le=
-t me know if any additional clarification is needed for any part of it.
-> > > > > > > > > >=20
-> > > > > > > > > > Ok, so I tested both your approach and a slight modific=
-ation of the
-> > > > > > > > > > variant I sent you. They both fix the issue. TBH, I sti=
-ll find your
-> > > > > > > > > > approach complex. While i hate to do this to you, my pr=
-eference is
-> > > > > > > > > > that you use the attached version - i dont need the cre=
-dit, so just
-> > > > > > > > > > send it formally after testing.
-> > > > > > > > > >=20
-> > > > > > > > > > cheers,
-> > > > > > > > > > jamal
-> > > > > > > > >=20
-> > > > > > > > > Hi Jamal,
-> > > > > > > > >=20
-> > > > > > > > > Thank you for your patch. Unfortunately, there is an issu=
-e that Will and I
-> > > > > > > > > also encountered when we submitted the first version of o=
-ur patch.
-> > > > > > > > >=20
-> > > > > > > > > With this check:
-> > > > > > > > >=20
-> > > > > > > > > if (unlikely(nest_level > 1)) {
-> > > > > > > > > net_warn_ratelimited("Exceeded netem recursion %d > 1 on =
-dev %s\n",
-> > > > > > > > > nest_level, netdev_name(skb->dev));
-> > > > > > > > > // ...
-> > > > > > > > > }
-> > > > > > > > >=20
-> > > > > > > > > when netem_enqueue is called, we have:
-> > > > > > > > >=20
-> > > > > > > > > netem_enqueue()
-> > > > > > > > > // nest_level is incremented to 1
-> > > > > > > > > // q->duplicate is 100% (0xFFFFFFFF)
-> > > > > > > > > // skb2 =3D skb_clone()
-> > > > > > > > > // rootq->enqueue(skb2, ...)
-> > > > > > > > > netem_enqueue()
-> > > > > > > > > // nest_level is incremented to 2
-> > > > > > > > > // nest_level now is > 1
-> > > > > > > > > // The duplicate is dropped
-> > > > > > > > >=20
-> > > > > > > > > Basically, with this approach, all duplicates are automat=
-ically dropped.
-> > > > > > > > >=20
-> > > > > > > > > If we modify the check by replacing 1 with 2:
-> > > > > > > > >=20
-> > > > > > > > > if (unlikely(nest_level > 2)) {
-> > > > > > > > > net_warn_ratelimited("Exceeded netem recursion %d > 1 on =
-dev %s\n",
-> > > > > > > > > nest_level, netdev_name(skb->dev));
-> > > > > > > > > // ...
-> > > > > > > > > }
-> > > > > > > > >=20
-> > > > > > > > > the infinite loop is triggered again (this has been teste=
-d and also verified in GDB).
-> > > > > > > > >=20
-> > > > > > > > > This is why we proposed an alternative approach, but I un=
-derstand it is more complex.
-> > > > > > > > > Maybe we can try to work on that and make it more elegant=
-.
-> > > > > > > >=20
-> > > > > > > > I am not sure.
-> > > > > > > > It is a choice between complexity to "fix" something that i=
-s a bad
-> > > > > > > > configuration, i.e one that should not be allowed to begin =
-with, vs
-> > > > > > > > not burdening the rest.
-> > > > > > > > IOW, if you created a single loop(like the original report)=
- the
-> > > > > > > > duplicate packet will go through but subsequent ones will n=
-ot). If you
-> > > > > > > > created a loop inside a loop(as you did here), does anyone =
-really care
-> > > > > > > > about the duplicate in each loop not making it through? It =
-would be
-> > > > > > > > fine to "fix it" so you get duplicates in each loop if ther=
-e was
-> > > > > > > > actually a legitimate use case. Remember one of the origina=
-l choices
-> > > > > > > > was to disallow the config ...
-> > > > > > >=20
-> > > > > > > Actually I think i misunderstood you. You are saying it break=
-s even
-> > > > > > > the working case for duplication.
-> > > > > > > Let me think about it..
-> > > > > >=20
-> > > > > > After some thought and experimentation - I believe the only way=
- to fix
-> > > > > > this so nobody comes back in the future with loops is to disall=
-ow the
-> > > > > > netem on top of netem setup. The cb approach can be circumvente=
-d by
-> > > > > > zeroing the cb at the root.
-> > > > > >=20
-> > > > > > cheers,
-> > > > > > jamal
-> > > > >=20
-> > > > > Doesn't the cb zeroing only happen upon reset, which should be fi=
-ne?
-> > > >=20
-> > > > The root qdisc can be coerced to set values that could be zero. IMO=
-,
-> > > > it is not fine for folks to come back in a few months and claim som=
-e
-> > > > prize because they managed to create the loop after this goes in. I=
- am
-> > > > certainly not interested in dealing with that...
-> > > > I wish we still had the 2 bit TTL in the skb, this would have been =
-an
-> > > > easy fix[1].
-> > >=20
-> > > The loopy fun problem combined with this duplication issue maybe show=
-s the need for us to get some bits in the sk_buff reserved for this case - =
-this is a security issue, as container/unprivileged users can trigger DOS.
-> > >=20
-> > > Regarding the size of sk_buff, at least when I tried this approach, t=
-here was no increase in struct size. The slab allocator architecture wouldn=
-'t cause increased memory consumption even if an extra byte were to be used=
-. A robust fix here can future proof this subsystem against packet looping =
-bugs, so maybe this can be a consideration for later.
-> >=20
-> > There are approaches which alleviate these issues but i would argue
-> > the return on investment to remove those two bits has been extremely
-> > poor return on investment in terms of human hours invested for working
-> > around and fixing bugs. The "penny wise pound foolish" adage is a very
-> > apropos. Decisions like that work if you assume free labor.
-> > I dont think you will get far trying to restore those bits, so no
-> > point in trying.
-> >=20
-> > > > > I agree that the strategy you propose would be more durable. We w=
-ould have to prevent setups of the form:
-> > > > >=20
-> > > > > qdisc 0 ... qdisc i, netem, qdisc i + 1, ... qdisc j, netem, ...
-> > > > >=20
-> > > > > Netem qdiscs can be identified through the netem_qdisc_ops pointe=
-r.
-> > > > >=20
-> > > > > We would also have to check this property on qdisc insertion and =
-replacement. I'm assuming the traversal can be done with the walk/leaf hand=
-lers.
-> > > > >=20
-> > > > > Are there other things we are missing?
-> > > >=20
-> > > > Make it simple: Try to prevent the config of a new netem being adde=
-d
-> > > > when one already exists at any hierarchy i.e dont bother checking i=
-f
-> > > > Can I assume you will work on this? Otherwise I or someone else can=
-.
-> > >=20
-> > > Yep, I will give this a try in the coming days and will let you know =
-if I encounter any difficulties.
-> >=20
-> > I didnt finish my thought on that: I meant just dont allow a second
-> > netem to be added to a specific tree if one already exists. Dont
-> > bother checking for duplication.
-> >=20
-> > cheers,
-> > jamal
-> >=20
-> > > > [1] see "loopy fun" in https://lwn.net/Articles/719297/
->=20
-> Hi Jamal,
->=20
-> I came up with the following fix last night to disallow adding a netem qd=
-isc if one of its ancestral qdiscs is a netem. It's just a draft -I will cl=
-ean it up, move qdisc_match_from_root to sch_generic, add test cases, and s=
-ubmit a formal patchset for review if it looks good to you. Please let us k=
-now if you catch any edge cases or correctness issues we might be missing.
->=20
-> Also, please let us know if you would us to bring in fixes for the 2 othe=
-r small issues we discussed previously - moving the duplication after the i=
-nitial enqueue to more accurately respect the limit check, and having loss =
-take priority over duplication.
->=20
-> We tested with the following configurations, all of which are illegal now=
- when we add the second netem (tc prints out RTNETLINK answers: Invalid arg=
-ument).
->=20
-> Netem parent is netem:
-> tc qdisc add dev lo root handle 1: netem limit 1 duplicate 100%
-> tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100=
-% delay 1us reorder 100%
->=20
-> Qdisc tree root is netem:
-> tc qdisc add dev lo root handle 1:0 netem limit 1 duplicate 100%
-> tc qdisc add dev lo parent 1:0 handle 2:0 hfsc
-> tc class add dev lo parent 2:0 classid 2:1 hfsc rt m2 10Mbit
-> tc qdisc add dev lo parent 2:1 handle 3:0 netem duplicate 100%
-> tc class add dev lo parent 2:0 classid 2:2 hfsc rt m2 10Mbit
-> tc qdisc add dev lo parent 2:2 handle 4:0 netem duplicate 100%
->=20
-> netem grandparent is netem:
-> tc qdisc add dev lo root handle 1:0 tbf rate 8bit burst 100b latency 1s
-> tc qdisc add dev lo parent 1:0 handle 2:0 netem gap 1 limit 1 duplicate 1=
-00% delay 1us reorder 100%
-> tc qdisc add dev lo parent 2:0 handle 3:0 hfsc
-> tc class add dev lo parent 3:0 classid 3:1 hfsc rt m2 10Mbit
-> tc qdisc add dev lo parent 3:1 handle 4:0 netem duplicate 100%
->=20
-> netem great-grandparent is netem:
-> tc qdisc add dev lo root handle 1:0 netem limit 1 duplicate 100%
-> tc qdisc add dev lo parent 1:0 handle 2:0 hfsc
-> tc class add dev lo parent 2:0 classid 2:1 hfsc rt m2 10Mbit
-> tc qdisc add dev lo parent 2:1 handle 3:0 tbf rate 8bit burst 100b latenc=
-y 1s
-> tc qdisc add dev lo parent 3:0 handle 4:0 netem duplicate 100%
->=20
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..6178cd1453c5 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -1085,6 +1085,52 @@ static int netem_change(struct Qdisc *sch, struct =
-nlattr *opt,
-> return ret;
-> }
->=20
-> +static const struct Qdisc_class_ops netem_class_ops;
-> +
-> +static struct Qdisc *qdisc_match_from_root(struct Qdisc *root, u32 handl=
-e)
-> +{
-> + struct Qdisc *q;
-> +
-> + if (!qdisc_dev(root))
-> + return (root->handle =3D=3D handle ? root : NULL);
->=20
-> +
-> + if (!(root->flags & TCQ_F_BUILTIN) &&
->=20
-> + root->handle =3D=3D handle)
->=20
-> + return root;
-> +
-> + hash_for_each_possible_rcu(qdisc_dev(root)->qdisc_hash, q, hash, handle=
-,
->=20
-> + lockdep_rtnl_is_held()) {
-> + if (q->handle =3D=3D handle)
->=20
-> + return q;
-> + }
-> + return NULL;
-> +}
-> +
-> +static bool has_netem_ancestor(struct Qdisc *sch) {
-> + struct Qdisc *root, *parent, *curr;
-> + bool ret =3D false;
-> +
-> + sch_tree_lock(sch);
-> + curr =3D sch;
-> + root =3D qdisc_root_sleeping(sch);
-> + parent =3D qdisc_match_from_root(root, TC_H_MAJ(curr->parent));
->=20
-> +
-> + while (parent !=3D NULL) {
-> + if (parent->ops->cl_ops =3D=3D &netem_class_ops) {
->=20
-> + ret =3D true;
-> + pr_warn("Ancestral netem already exists, cannot nest netem");
-> + goto unlock;
-> + }
-> +
-> + curr =3D parent;
-> + parent =3D qdisc_match_from_root(root, TC_H_MAJ(curr->parent));
->=20
-> + }
-> +
-> +unlock:
-> + sch_tree_unlock(sch);
-> + return ret;
-> +}
-> +
-> static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-> struct netlink_ext_ack *extack)
-> {
-> @@ -1093,6 +1139,9 @@ static int netem_init(struct Qdisc *sch, struct nla=
-ttr *opt,
->=20
-> qdisc_watchdog_init(&q->watchdog, sch);
->=20
->=20
-> + if (has_netem_ancestor(sch))
-> + return -EINVAL;
-> +
-> if (!opt)
-> return -EINVAL;
->=20
-> @@ -1330,3 +1379,4 @@ module_init(netem_module_init)
-> module_exit(netem_module_exit)
-> MODULE_LICENSE("GPL");
-> MODULE_DESCRIPTION("Network characteristics emulator qdisc");
-
-Just realized an edge case in regards to the parent being TC_H_ROOT and fac=
-tored it in to the patch (as 0xffff can be a valid major handle).
-
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fdd79d3ccd8c..3e28367ef081 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -1085,6 +1085,58 @@ static int netem_change(struct Qdisc *sch, struct nl=
-attr *opt,
-        return ret;
- }
-=20
-+static const struct Qdisc_class_ops netem_class_ops;
-+
-+static struct Qdisc *qdisc_match_from_root(struct Qdisc *root, u32 handle)
-+{
-+       struct Qdisc *q;
-+
-+       if (!qdisc_dev(root))
-+               return (root->handle =3D=3D handle ? root : NULL);
-+
-+       if (!(root->flags & TCQ_F_BUILTIN) &&
-+           root->handle =3D=3D handle)
-+               return root;
-+
-+       hash_for_each_possible_rcu(qdisc_dev(root)->qdisc_hash, q, hash, ha=
-ndle,
-+                                  lockdep_rtnl_is_held()) {
-+               if (q->handle =3D=3D handle)
-+                       return q;
-+       }
-+       return NULL;
-+}
-+
-+static bool has_netem_ancestor(struct Qdisc *sch) {
-+       struct Qdisc *root, *parent, *curr;
-+       bool ret =3D false;
-+
-+       if (sch->parent =3D=3D TC_H_ROOT)
-+               return false;
-+
-+       sch_tree_lock(sch);
-+       curr =3D sch;
-+       root =3D qdisc_root_sleeping(sch);
-+       parent =3D qdisc_match_from_root(root, TC_H_MAJ(curr->parent));
-+
-+       while (parent !=3D NULL) {
-+               if (parent->ops->cl_ops =3D=3D &netem_class_ops) {
-+                       ret =3D true;
-+                       pr_warn("Ancestral netem already exists, cannot nes=
-t netem");
-+                       goto unlock;
-+               }
-+
-+               curr =3D parent;
-+               if (curr->parent =3D=3D TC_H_ROOT)
-+                       break;
-+
-+               parent =3D qdisc_match_from_root(root, TC_H_MAJ(curr->paren=
-t));
-+       }
-+
-+unlock:
-+       sch_tree_unlock(sch);
-+       return ret;
-+}
-+
- static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-                      struct netlink_ext_ack *extack)
- {
-@@ -1093,6 +1145,9 @@ static int netem_init(struct Qdisc *sch, struct nlatt=
-r *opt,
-=20
-        qdisc_watchdog_init(&q->watchdog, sch);
-=20
-+       if (has_netem_ancestor(sch))
-+               return -EINVAL;
-+
-        if (!opt)
-                return -EINVAL;
 
 
