@@ -1,158 +1,241 @@
-Return-Path: <netdev+bounces-195637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC4BAD18B9
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 08:54:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF44AD18DA
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:08:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F36F07A4F08
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:52:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C19716A3C5
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 07:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38ABC28030C;
-	Mon,  9 Jun 2025 06:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC93280A52;
+	Mon,  9 Jun 2025 07:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b="i4aUDZeQ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="F5Uc8Jf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11021142.outbound.protection.outlook.com [52.101.70.142])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5ED12CDAE;
-	Mon,  9 Jun 2025 06:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.142
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749452049; cv=fail; b=fK7pDkfw3m3hjqtBU3j3agdQEVMtjBrHsmiYRhbT18+qs9GnvdrNvch78lhsCpWI7wj/7f0vJNcqWxDIGOsRbw8axzWJ+1kBDjcMhS7DbPHETBcYfZvTw1FwmzviDK34+9Di4RSkpsQritTqm5tKiiVlirBxwvnPaSkBmNoRFRU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749452049; c=relaxed/simple;
-	bh=tOaCHDCy1vu4xA8i0q3iFGhCb+1KhT/9GyA88zNnhqs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iey+dejOF44Q+0yHlbH2v5uwmlXMgdVhy3f5CWV/J6v3uWBgttKqkkadqSczSYGqCQJ98xeO2c96dAZOroPXBVoFv0BC8vOIB8qKmBKKk07XzSUtioJORJlg8oX/CE9X2ScomZ6c4+03XPE6ERKAJrxNT+fZVigr0h7Ml2JW15Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de; spf=pass smtp.mailfrom=technica-engineering.de; dkim=pass (1024-bit key) header.d=technica-engineering.de header.i=@technica-engineering.de header.b=i4aUDZeQ; arc=fail smtp.client-ip=52.101.70.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=technica-engineering.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=technica-engineering.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vOtoPR2EX0/ufbhti5sMMIrLRCyJzeICJCuWtqESH6zm4G6syahnA7i4WwWo4IFXmgLLCzhSoNzoDgLpfW2Ga/M7wMqGYsFt+aFW0FmTrpSSz0cY7Ed0QiuVu/OLNqRMnxTE/0VUIPU6gQ1N6Vmr2/nwXIQ30fxsE/6g08FwQpHEP06OMoOnIcmnCWu+PkgwfvduMfTZJZh/L9zgYQ420tJPKaLuPmuJDEqGgaltSXAY0thCvZX+BqJUH6sv2HR9jMfUqxZNb8FXmL3UW2FSg0mGzzTxmQAs2CMEUsB0lpfVPVttABdl4wbUlMN7i3Ui8ysL8FU9Z10g3GmU03vyYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wESoGR7BnMdcxxaqeIs6T6NKZZ9DCT2YK2CrU/6uRfc=;
- b=sVbawAM5R+HbFIm+lcq+pxueP6TD3e94lEQ+oCs2Bbr6j6Qo94K4FkbagRz9tgZzh3uGkIMu8go84WhkC357WQ73hnNLUS78FB4ZfKTEl5jAYL68zfvDDiTTQJdgH8diizv8xwuh9xZFvdkJyU3x+DxWitRWe1qn3TRHYoA3qA13fRnk3K1J7k+BBEJLlBcnGQh/DdLzqzzOaV1IsJbM0k/yT4xhFkLtwzksWNb+O5GLheCjjGGsWUuNvrLUYjXuT8SAu7A5ZtPRMXGtwA91aTDvXvC+ElwJW/KNO/ZhDR4dGgYwZLnzf7ZHfk1c3pmM3ZEMjYJC1UH1xUhBgeuPrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 2.136.200.136) smtp.rcpttodomain=davemloft.net
- smtp.mailfrom=technica-engineering.de; dmarc=fail (p=reject sp=reject
- pct=100) action=oreject header.from=technica-engineering.de; dkim=none
- (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=technica-engineering.de; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wESoGR7BnMdcxxaqeIs6T6NKZZ9DCT2YK2CrU/6uRfc=;
- b=i4aUDZeQParjfX75b4rESnG/U4uly8EoxQfQOk1x1FrpAqUpoBGO4gOh7vRQcy/X1jnI/rUUKa62qOCzgbwpaNiisIKYN+cRsd9Un91fWmgcUOcJfs6XLnialuVZPQTJ2WSiDZ7Qm9bRjByBdmVP6yGBHJEdK6gDQ16eUVfR3iI=
-Received: from AM0PR02CA0007.eurprd02.prod.outlook.com (2603:10a6:208:3e::20)
- by AS8PR08MB9220.eurprd08.prod.outlook.com (2603:10a6:20b:5a3::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.34; Mon, 9 Jun
- 2025 06:54:04 +0000
-Received: from AM4PEPF00027A61.eurprd04.prod.outlook.com
- (2603:10a6:208:3e:cafe::75) by AM0PR02CA0007.outlook.office365.com
- (2603:10a6:208:3e::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.29 via Frontend Transport; Mon,
- 9 Jun 2025 06:54:04 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 2.136.200.136)
- smtp.mailfrom=technica-engineering.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=oreject header.from=technica-engineering.de;
-Received-SPF: Fail (protection.outlook.com: domain of technica-engineering.de
- does not designate 2.136.200.136 as permitted sender)
- receiver=protection.outlook.com; client-ip=2.136.200.136;
- helo=jump.ad.technica-electronics.es;
-Received: from jump.ad.technica-electronics.es (2.136.200.136) by
- AM4PEPF00027A61.mail.protection.outlook.com (10.167.16.70) with Microsoft
- SMTP Server id 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 06:54:03
- +0000
-Received: from dalek.ad.technica-electronics.es (unknown [10.10.2.101])
-	by jump.ad.technica-electronics.es (Postfix) with ESMTP id C1F6040220;
-	Mon,  9 Jun 2025 08:54:02 +0200 (CEST)
-From: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
-To:
-Cc: carlos.fernandez@technica-engineering.de,
-	horms@kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] macsec: MACsec SCI assignment for ES = 0
-Date: Mon,  9 Jun 2025 08:53:54 +0200
-Message-ID: <20250609065401.795982-1-carlos.fernandez@technica-engineering.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250604123407.2795263-1-carlos.fernandez@technica-engineering.de>
-References: <20250604123407.2795263-1-carlos.fernandez@technica-engineering.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF18C2F3E;
+	Mon,  9 Jun 2025 07:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749452929; cv=none; b=Wwrk/0S7s0zhuompnYBP3pSRq7FI0Fv6Q6DnVU5ghKJoc28xzxw9O0Ra1V1afw20mAZobSuOK2Fa1t97gryPBs818fFCITiWsTLOEyl+sydasml3u9W+iFLS3+ZXFqx0iE0u1ZbVkyLH6IX4+R0MGgkv8cSvkbAV4o5sMpT+fus=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749452929; c=relaxed/simple;
+	bh=JZtxyo1n3N1KrOrn3X14M5FVlS2HxZZ2L3LzJ09g1XM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZCN/0irOP68H1CmpjDDwwasFvrJBWZRqfmQqcUg9kuVpisJtdi41RnZpYE6MpvZ4N2KZObhnwno5vbioqba6WsTdEvmLks7YBStAvUgAfK+UypxRrJEerPVnqsVIA/sWK4EI76aC3X9G1tdmM/kBDbRtspF+D8OtBzfGQVKa6Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=F5Uc8Jf3; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55941ADf006625;
+	Mon, 9 Jun 2025 00:08:32 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=Bwy5AqT1Riai8H1MnSUj+tFx6
+	ayyWFItxbVX7bAn5Xg=; b=F5Uc8Jf3xflyNis8REGeGVtq1vzxxrqTuSEXEqOa/
+	LJjX4XTeT27HBeV2BytNFcFCNYjf3AN+lYweIFnO9eWlslhNpsoSixg3D8Yfnkqw
+	gfkliWdjK734WqZbopmojMJtLQ8raW0wPe+JnpUcOf+sN97V4GvjvO8Wa+FNhSOM
+	NTI/IPNltUoneC7ELy4NROdOtA9p9/o1Sw2W0AMoXk2Of/5JAKKNOuIW7Vas0WAc
+	4FTeqtehnrrJgwUNl7vTJ5xWxsGMWoZkpiaQbN2IPyMd/8fWi21sLipsxv7PTLL6
+	3eHUpDRLIGJClj7gTSR2Mc3+QpC5bnDKBZtetyQmcNgLg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4759pbh77q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Jun 2025 00:08:32 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 9 Jun 2025 00:08:30 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 9 Jun 2025 00:08:30 -0700
+Received: from 82bae11342dd (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 8F8313F707C;
+	Mon,  9 Jun 2025 00:08:26 -0700 (PDT)
+Date: Mon, 9 Jun 2025 07:08:24 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+CC: <horms@kernel.org>,
+        Andreu Montiel
+	<Andreu.Montiel@technica-engineering.de>,
+        Sabrina Dubroca
+	<sd@queasysnail.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hannes Frederic Sowa
+	<hannes@stressinduktion.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v4] macsec: MACsec SCI assignment for ES = 0
+Message-ID: <aEaIaB1zLEQlc77s@82bae11342dd>
+References: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00027A61:EE_|AS8PR08MB9220:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 90944177-5f34-4072-5b12-08dda7226b9a
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?k9BTIRH6XakuD2SFAuitw6b36UyLe7q7HVg9ufsO/dMqX8UmboZDSHHoAh66?=
- =?us-ascii?Q?zHfujt5pnEmpBMUpDN0yokiqL693UFgc4afiPXd0ZCULTXTG5fn9BvogEKQ+?=
- =?us-ascii?Q?2sZY4jDOQh1zd3e1Xlec0/g22YKsSLS0qf/EXkskb1apifppzUnz+2MVeCkw?=
- =?us-ascii?Q?MUtPRTkGJeNtILZJLPKxkOLwqqJ/7Czjuu0p4gVjtCwji1+mwZDqt5Z59yBU?=
- =?us-ascii?Q?lsQ/g4RpxmRExVvXNccYw7cQhD05ABdx82p8IBdP9OCLmeELxsKw9i5deGEG?=
- =?us-ascii?Q?iOv6Pl6UE9hYJU7rss5dpcOIgrpts3dUP5CkY+Q+G2W9eyp2RDsWBfYsf/h6?=
- =?us-ascii?Q?Xu55sO3W7uZ5HnB/pOqgBR3+fL4HuEIxt1s4+LQVzVadWDESodzIvMkTU/e1?=
- =?us-ascii?Q?y1sgrL9sqezYFsIsovx+iYxBQM6C9G5ZrUpS9HGoiiF17sgVqerb8adI4TZR?=
- =?us-ascii?Q?Arewnzkw20Q+smGQbqVjqFFf/XDFFQmQVWrXpf9RyP0DCdtgiK9wU4mFymk8?=
- =?us-ascii?Q?jzJYLaRagn6aUY740xWaUXVklYZEV99GyCcx2i6udTrMwAWBbDTSVSG8fCpq?=
- =?us-ascii?Q?/3Q9/51fSsR5zuqlC4WuAIvzcyeGi0Dc7yxRcxNPjZNrnxrMGdEiZSOAv3tx?=
- =?us-ascii?Q?Gt0SZve2WxxZurThikHAexuZzGhoUImZaVpPjmzzqmzuniZh0ppRVvz6AgAP?=
- =?us-ascii?Q?j4Gnt9HJtO4dBTFHLn8yN/XAqrQDd/UGhvH8CP9ElE/3Yfe7M8sslam9v2om?=
- =?us-ascii?Q?wA/BgGuJm9HY2XwRooGyFM5RawJ6u4fF1wBSIL3E2nuH6ZtczGXM8/WEek6X?=
- =?us-ascii?Q?HH0RX7hkXv3lIDJIxQPfyF+wrXxPvQMGdvvaA+iUU/sgDEKtOYjkD1lBXXPj?=
- =?us-ascii?Q?c8UO0NpYDOlUDFwdKE8MzuXjUUbSBtp7z1ab5LLHpMJr1evSSE965vyTgNMq?=
- =?us-ascii?Q?+RRjQJmZz+SzTlW2PSL7M1wN+fI49bgzwThMHM8dyZRZrPRrI1rJKlooLZlA?=
- =?us-ascii?Q?Q1hasKAlxmXYMTpa06k0E6+rEdfN21ReZAOWWM3lwsrYsQndmUFyPnCsgWX/?=
- =?us-ascii?Q?93WKX2y+TyTw6piEWJlFlqogu/IZ2VaRRNtpWYzPBawR1dtLz4xqlk0BfKxy?=
- =?us-ascii?Q?AfmSlBSdQUMfRCiZA5+T5LNUlNtjA+goLeQ1jo+UDLer8+KynUz0fHxmd+UM?=
- =?us-ascii?Q?ijwBiXMAhyIj3Sm1GrC47HqOYXuCvMhEjUl2MZ86ZPeJDneIkRIKonKwYW2M?=
- =?us-ascii?Q?cBu/09byDP6ze2mn07IRLgIsa6ZHmroEeJfB7Z2fQFJT19GQgv+URPinafKx?=
- =?us-ascii?Q?QR2c0J6QsQgbd3XE5xnlSzxDP7eHCpTR26Rp2UVyNDIzunQfuoyYkMVWtnhK?=
- =?us-ascii?Q?UcNo84Njj4uPwP5En4qyo8D4r7d8cxoZmil6102jDfmkLBvkaSrjnBn4gxUY?=
- =?us-ascii?Q?twVmE2o+M1+aSJtaAoBO1Trrw/9VVcNta8UQQy+qtAZdRiQQS2domktJ3Mlz?=
- =?us-ascii?Q?ZKSvTK6MeEKJeIh00w+pXvccLS0O/OT+TbO3?=
-X-Forefront-Antispam-Report:
-	CIP:2.136.200.136;CTRY:ES;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:jump.ad.technica-electronics.es;PTR:136.red-2-136-200.staticip.rima-tde.net;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(7416014)(376014);DIR:OUT;SFP:1102;
-X-OriginatorOrg: technica-engineering.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 06:54:03.1256
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90944177-5f34-4072-5b12-08dda7226b9a
-X-MS-Exchange-CrossTenant-Id: 1f04372a-6892-44e3-8f58-03845e1a70c1
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1f04372a-6892-44e3-8f58-03845e1a70c1;Ip=[2.136.200.136];Helo=[jump.ad.technica-electronics.es]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A61.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9220
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
+X-Authority-Analysis: v=2.4 cv=f+pIBPyM c=1 sm=1 tr=0 ts=68468870 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=dtjKx1S9dE8yFvv4bDgA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 5HHtWuTEDVUEMRGXdeeI85R5VZcLb026
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDA1NCBTYWx0ZWRfXw4/vNziNRcqq S1UV+huwZ9vhl3uEqUT9huJjKur/LP1cgMQXnX5vNL+z9wQmeNBTaOZ4QGsuEejPIzu+cjZCo5S +I4cgfSOd22fmjyRt8Qn+G7vUWraSFoMDmqkYQfdO497i8xinhwBREC6b9CRrVvvpPcIm9ugLAz
+ G9InqPvwnvGH49WHWqkdecNKcecTu+9aNwLQamuzY0a/3QXWX4CSsRtbhvak4np4DG4lE2NM1YA MfOTseuqY4T6HObXGwAasJ79Dm7JuYjjwW9cs9dqY52UJxxjbUXhPCHtu40VVMoJh1RiIslfU12 P2cM0nXUUeAgtIwtDBgmkA/Oi6uZfBZSi7Jl5dcmB3mKunsBuzWKi9QvfzXzsLK2O3x1vveCIBm
+ AKoQ6lb0m9y1RxTQr+NrQsru2dUG8GBiHEkRhzCAsUUVB7hY2HTnWdEutmxVufHG98Cr47gN
+X-Proofpoint-GUID: 5HHtWuTEDVUEMRGXdeeI85R5VZcLb026
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_02,2025-06-05_01,2025-03-28_01
 
-Hi Simon, 
+On 2025-06-09 at 06:47:02, Carlos Fernandez (carlos.fernandez@technica-engineering.de) wrote:
+> According to 802.1AE standard, when ES and SC flags in TCI are zero,
+> used SCI should be the current active SC_RX. Current code uses the
+> header MAC address. Without this patch, when ES flag is 0 (using a
+> bridge or switch), header MAC will not fit the SCI and MACSec frames
+> will be discarted.
+> 
+> In order to test this issue, MACsec link should be stablished between
+> two interfaces, setting SC and ES flags to zero and a port identifier
+> different than one. For example, using ip macsec tools:
+> 
+> ip link add link $ETH0 macsec0 type macsec port 11 send_sci off I
+Looks like 'I' above is typo.
+> end_station off
+> ip macsec add macsec0 tx sa 0 pn 2 on key 01 $ETH1_KEY
+> ip macsec add macsec0 rx port 11 address $ETH1_MAC
+> ip macsec add macsec0 rx port 11 address $ETH1_MAC sa 0 pn 2 on key 02
+> ip link set dev macsec0 up
+> 
+> ip link add link $ETH1 macsec1 type macsec port 11 send_sci off I
+Ditto. Please fix these and resubmit.
+With that you can add Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
 
-I've added the test explanation in a new v4 of the patch.
-https://patchwork.kernel.org/project/netdevbpf/patch/20250609064707.773982-1-carlos.fernandez@technica-engineering.de/
-
-Thanks, 
+Thanks,
+Sundeep
+> end_station off
+> ip macsec add macsec1 tx sa 0 pn 2 on key 01 $ETH0_KEY
+> ip macsec add macsec1 rx port 11 address $ETH0_MAC
+> ip macsec add macsec1 rx port 11 address $ETH0_MAC sa 0 pn 2 on key 02
+> ip link set dev macsec1 up
+> 
+> 
+> Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
+> Co-developed-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
+> Signed-off-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
+> Signed-off-by: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+> ---
+> v4: 
+> * Added testing info in commit as suggested. 
+> 
+> v3: https://patchwork.kernel.org/project/netdevbpf/patch/20250604123407.2795263-1-carlos.fernandez@technica-engineering.de/
+> * Wrong drop frame afer macsec_frame_sci
+> * Wrong Fixes tag in message 
+> 
+> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20250604113213.2595524-1-carlos.fernandez@technica-engineering.de/
+> * Active sci lookup logic in a separate helper.
+> * Unnecessary loops avoided. 
+> * Check RXSC is exactly one for lower device.
+> * Drops frame in case of error.
+> 
+> 
+> v1: https://patchwork.kernel.org/project/netdevbpf/patch/20250529124455.2761783-1-carlos.fernandez@technica-engineering.de/
+> 
+> 
+>  drivers/net/macsec.c | 40 ++++++++++++++++++++++++++++++++++------
+>  1 file changed, 34 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+> index 3d315e30ee47..7edbe76b5455 100644
+> --- a/drivers/net/macsec.c
+> +++ b/drivers/net/macsec.c
+> @@ -247,15 +247,39 @@ static sci_t make_sci(const u8 *addr, __be16 port)
+>  	return sci;
+>  }
+>  
+> -static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present)
+> +static sci_t macsec_active_sci(struct macsec_secy *secy)
+>  {
+> -	sci_t sci;
+> +	struct macsec_rx_sc *rx_sc = rcu_dereference_bh(secy->rx_sc);
+> +
+> +	/* Case single RX SC */
+> +	if (rx_sc && !rcu_dereference_bh(rx_sc->next))
+> +		return (rx_sc->active) ? rx_sc->sci : 0;
+> +	/* Case no RX SC or multiple */
+> +	else
+> +		return 0;
+> +}
+> +
+> +static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present,
+> +			      struct macsec_rxh_data *rxd)
+> +{
+> +	struct macsec_dev *macsec;
+> +	sci_t sci = 0;
+>  
+> -	if (sci_present)
+> +	/* SC = 1 */
+> +	if (sci_present) {
+>  		memcpy(&sci, hdr->secure_channel_id,
+>  		       sizeof(hdr->secure_channel_id));
+> -	else
+> +	/* SC = 0; ES = 0 */
+> +	} else if ((!(hdr->tci_an & (MACSEC_TCI_ES | MACSEC_TCI_SC))) &&
+> +		   (list_is_singular(&rxd->secys))) {
+> +		/* Only one SECY should exist on this scenario */
+> +		macsec = list_first_or_null_rcu(&rxd->secys, struct macsec_dev,
+> +						secys);
+> +		if (macsec)
+> +			return macsec_active_sci(&macsec->secy);
+> +	} else {
+>  		sci = make_sci(hdr->eth.h_source, MACSEC_PORT_ES);
+> +	}
+>  
+>  	return sci;
+>  }
+> @@ -1109,7 +1133,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+>  	struct macsec_rxh_data *rxd;
+>  	struct macsec_dev *macsec;
+>  	unsigned int len;
+> -	sci_t sci;
+> +	sci_t sci = 0;
+>  	u32 hdr_pn;
+>  	bool cbit;
+>  	struct pcpu_rx_sc_stats *rxsc_stats;
+> @@ -1156,11 +1180,14 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+>  
+>  	macsec_skb_cb(skb)->has_sci = !!(hdr->tci_an & MACSEC_TCI_SC);
+>  	macsec_skb_cb(skb)->assoc_num = hdr->tci_an & MACSEC_AN_MASK;
+> -	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci);
+>  
+>  	rcu_read_lock();
+>  	rxd = macsec_data_rcu(skb->dev);
+>  
+> +	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci, rxd);
+> +	if (!sci)
+> +		goto drop_nosc;
+> +
+>  	list_for_each_entry_rcu(macsec, &rxd->secys, secys) {
+>  		struct macsec_rx_sc *sc = find_rx_sc(&macsec->secy, sci);
+>  
+> @@ -1283,6 +1310,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+>  	macsec_rxsa_put(rx_sa);
+>  drop_nosa:
+>  	macsec_rxsc_put(rx_sc);
+> +drop_nosc:
+>  	rcu_read_unlock();
+>  drop_direct:
+>  	kfree_skb(skb);
+> -- 
+> 2.43.0
+> 
 
