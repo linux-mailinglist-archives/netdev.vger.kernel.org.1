@@ -1,167 +1,127 @@
-Return-Path: <netdev+bounces-195632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56BE9AD1897
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 08:33:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FBCAD18A5
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 08:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D3467A2DD3
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:31:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C4E21693E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF6521639B;
-	Mon,  9 Jun 2025 06:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1202459F9;
+	Mon,  9 Jun 2025 06:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="gosGOGoX"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="emmX+3yQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2078.outbound.protection.outlook.com [40.107.223.78])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A831C36D;
-	Mon,  9 Jun 2025 06:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749450787; cv=fail; b=OuvOeYhYYV5uyvp1rr1WquDHJoG+QaE3eEadKiHVj6/mrdkMvXfOdCPWQLgnOcblj4DLPCby9v1XTfv5QQf5525BgyU+ea0z1bKrS6eDc8V1tKrwnDVzUxtaL5iUrjcd9eRztuo+57lhWlLrj6niI7jOdlTRzOhrhJ5sxrV8ZoM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749450787; c=relaxed/simple;
-	bh=oN26JRD8/7RilE9b9TpKmV8PxolVGqqJCwg0ONz8aK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XDJeNAU7n/NjGYmqf+FinadJh6qX6rbIdthTlYnC8HrTmL1D71edRw+EPxLCUB3SUnUEweRARbOlxe2WN+Ze3w7XwHMJqdIJjlljpRpMkcQZqVNRjb886TlicmOZWKsJm9JtTblUaQwGw3qNWguaxpUfB/dQpuWyDY7v3LPl0hQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=gosGOGoX; arc=fail smtp.client-ip=40.107.223.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kuz7zrOGJh84hyDz6/gcWV/93Oapw8hvi2Y1pbgH3EuoPnmatA8H0BT8NRJ8gN6wG14rP4W9m7DYZsFYty6rO7pewPDIazUhaEvspUTxxOTK1FJ6GAFm65Lj/vsy0YGjdUIdKsf0WX3g2BDYbStXKf4MMLxsstHDUfrMgvTq6iZljFRXrn+d75qkr6eNjK+jAPQ5UNC5/XnOFOzyxogYS2uHcMT6Ub0lieGlL9xOi1ycPSEBam9jrRAlKU6xquLKKVHS0VG2sP0CoWZo6nassS6D7VCB+Bv/V1L7v/3/tGkR9T6dDSBCIzd8nJIvf41UFW0tmVKKDL9HuMjy78TiXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MmAYUg7O6dkTdkIiBtg/5kdLBbcYIVSTeEcnUEGi/DI=;
- b=QGJ6uddIn9eihynipaVxlsuQ9lC/Xdf+DcuQywY+VmxxM2Ft70UKtnwLyhCubgFvea7NdciQQoW/y4Ur+XxuiO3Esbej5i653/VtUTP5VE1aNjT6VISf9GGWO+L3pJGmVPUOcPWHcnYokT1V0tToFFO6W3vgfocAEPHbtcm+375mdv0NsAD+j6B8Z7v6s7HKvM+m6dk/ahPPGNwdp+VQSPQmUSs9D6Vv8eCwWsAC3u5UU1ZOV3yh1NbmcX/ZxGo098tYHeKw3FaELOQo2CWgRlQjwvPfQLCYfFGVFyNPkoWASBMCyLWqkJghq3C9MrT1s8GbbIcisoTWgh31djS/Cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
- pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MmAYUg7O6dkTdkIiBtg/5kdLBbcYIVSTeEcnUEGi/DI=;
- b=gosGOGoXoBO6EFKSYJ7BLzdxI/HVgSxGIoekTpHZVDjT7XYqX5FhEiNcxi/kRSkMki5i2CmOIGi0cZTTtoWlaczV9vfq77CCxj72YuPScUdfdyDbVvszTuFQPeuuwhcokYmXac8EeXkie4PalmhFJYScIEgrGA+IjM0vaKwgugA6wjjEH8hPIvIjEOCQehW3PsHocbEnKBcVIxAmJms/29AQmZc+D+foXSn0C5tPEskCX9EFjCU4QSh2NNj1S2IKA7W3+6GwxctMT5hCu49PIWJXwvKzaEsd6BIvPK6BZa0k39DxV/8xkCxhsw3JCVlia8HA8E0Gw5NKuZLcrrartQ==
-Received: from BL1PR13CA0334.namprd13.prod.outlook.com (2603:10b6:208:2c6::9)
- by LV8PR22MB5098.namprd22.prod.outlook.com (2603:10b6:408:1c5::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.30; Mon, 9 Jun
- 2025 06:33:02 +0000
-Received: from MN1PEPF0000F0DF.namprd04.prod.outlook.com
- (2603:10b6:208:2c6:cafe::af) by BL1PR13CA0334.outlook.office365.com
- (2603:10b6:208:2c6::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.12 via Frontend Transport; Mon,
- 9 Jun 2025 06:33:02 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
- smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
-Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
- not designate 165.85.157.49 as permitted sender)
- receiver=protection.outlook.com; client-ip=165.85.157.49;
- helo=mkerelay2.compute.ge-healthcare.net;
-Received: from mkerelay2.compute.ge-healthcare.net (165.85.157.49) by
- MN1PEPF0000F0DF.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 06:33:02 +0000
-Received: from 50995b80b0f4 (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
-	by builder1.fihel.lab.ge-healthcare.net (Postfix) with SMTP id 61CCDCFB78;
-	Mon,  9 Jun 2025 09:32:59 +0300 (EEST)
-Date: Mon, 9 Jun 2025 09:32:58 +0300
-From: Ian Ray <ian.ray@gehealthcare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: horms@kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	brian.ruley@gehealthcare.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] igb: Fix watchdog_task race with shutdown
-Message-ID: <aEaAGqP-KtcYCMs-@50995b80b0f4>
-References: <20250603080949.1681-1-ian.ray@gehealthcare.com>
- <20250605184339.7a4e0f96@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25424610D
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 06:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749451134; cv=none; b=IdpCLwlDDli4IFLgwNAfL8QI2VVeg0b5sO+ieh1bXmpdItPcHEK7pmFfJcgtI7HTHRPUnVht24Jk0rLmK0zS0W8VWnx8+MYJ0t5IqEGvAGfgsobDblrz5+0+h14l0zedRrbEmuAf+VCFl8gr0SRFHcEMGVvnfrDNThGckO5wIjM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749451134; c=relaxed/simple;
+	bh=cAb2IEGtUUtGGHDIj2yjd6O7vwK9cSmyXW3SsJpOSiw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVNBe9OTQNNMDRFiWl/sxw8kaY00hs27m+9I31FWS+2Hxd+1sqPmvbmc+/tD7DigE3Spbi/nXcBGae14Zxnx9+w9qW3aCxKAyUgxvkGcHAsRaKCeMYzw0i7Zu64w67otidtCGkwrqWE7li5CV4M4yraFlK5QXNCpXJTV3DWXxE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=emmX+3yQ; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55940qkO009739;
+	Sun, 8 Jun 2025 23:38:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=oATtCwnFCB/2aKY/BP7CiP3AQ
+	7LXI1oOBW68AWYVq1E=; b=emmX+3yQ5UXCkz9er+z0XemakxpGH13Sp4JhtmFPA
+	53I3S5kZenqLbPQkz8g4PC8OPO5XyULdqXtOq6ictbDdj7qFLUKJSGBbty49qllE
+	4j36EPSv0N9gyOk+Cl20FeI3xx25KC6sPdClM/1eIhBBCVnMFn4E/vuht0xoQvMx
+	MVgF/hH++Ws3fuCEfqYQQH8myMDwK1jjZtJt6wCObPANvXy/VY4dYcNsyUWnj2fo
+	CT+5NYfhW4c78jnvrVDTeiSPh8R+ZCEamUmv3wouvMd5p3VAy97xCNT/suqo7KmG
+	n2+VmGvU1t9qb/kPylfE92N0xOESxbnWqG3g6R54F942A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 474mxkad3k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 08 Jun 2025 23:38:36 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 8 Jun 2025 23:38:35 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 8 Jun 2025 23:38:35 -0700
+Received: from 82bae11342dd (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 393793F707D;
+	Sun,  8 Jun 2025 23:38:32 -0700 (PDT)
+Date: Mon, 9 Jun 2025 06:38:31 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Li Jun <lijun01@kylinos.cn>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+        <michal.swiatkowski@linux.intel.com>, <horms@kernel.org>
+Subject: Re: [PATCH net-next] net: ppp: remove error variable
+Message-ID: <aEaBZ2jK1DjxaEAr@82bae11342dd>
+References: <20250609005143.23946-1-lijun01@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250605184339.7a4e0f96@kernel.org>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0DF:EE_|LV8PR22MB5098:EE_
-X-MS-Office365-Filtering-Correlation-Id: be6ed8f8-ab88-4b1b-10d1-08dda71f7c1b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?B0pY2SqHHhH7HwKh9QXuGolM+IJmMuxaruupTLMUXVOkQXkkyyVUS4v40+xf?=
- =?us-ascii?Q?l8XcCwO5JPxVr4/6giovfGywVRPbH+1cE8s6EC4gYVK5VM3sOaQS+ChNji4F?=
- =?us-ascii?Q?Yx+FVlALSeRVFy//XVBh18I1iOcdwF0YweF+YnJ/5GXcgUu+MBp+ztRoN96B?=
- =?us-ascii?Q?Pb863SOWn+HWpJ7s9MNwe0tYut8vKwJ/6AKxqCvhBZ+rrKCTdDQuxKc/MBQV?=
- =?us-ascii?Q?E+w056Z9x9AoE5tk4B6s2SCj820N8S2Ln0gOa7xmAcCapF7u5304IzoT8Hzt?=
- =?us-ascii?Q?8956RKBapH2wGx3UOD4lZYM1FROsbAHTP8RHFufanWoh7paUp8mR2pVfSes7?=
- =?us-ascii?Q?yvD4lJ0CZOnaUfkV7u0V7kkg2rEk9MHV34qUFB1ig6BTgR9Ex42bnW/kgiLx?=
- =?us-ascii?Q?ImHmnBi16rXDmPPjotxhnXLFMNcsUrgzl9uliYd7aZxdtrCalz6LIFkmG6Ql?=
- =?us-ascii?Q?982BRtrDHHkCQtiJwraAFpUpjrVJK9x1C3M+z/Ig7SUK5RKjiHxb6W6fFt8f?=
- =?us-ascii?Q?9DCcvQtmDz8rhFMul1XDwKXVBzb6mZ9q7jonKhabPZUCrHyHdsT6IKaoUgDs?=
- =?us-ascii?Q?Ua3wQoct2vtwjJYtCL7gyX0ao8Mbpf6AzbHGqna1udRpwwqRvS8s4jIPD1mS?=
- =?us-ascii?Q?su3BLLCK/pWu/uh/TNu4c3MiQFp2FtdaCReBJjRzqcqT/qToPdMWe1TMk2xC?=
- =?us-ascii?Q?U+AwQa/4+Kr0ALVRZjPqvgTEu1Yh2HFCy7zU6G8EYwwl+/Bi/Pnqdbz1agPN?=
- =?us-ascii?Q?7aKOD4YIFezCsCxCRKzml6x0ljimco1yxkxV8AUkQs65M5pT/sgv8BKtlygt?=
- =?us-ascii?Q?/E/ZOENy9BLO5dPfx4shDAsnmlFhHjD/DmNrv564g8aZgHjVxSJUVUi7JmfT?=
- =?us-ascii?Q?lKSbp2/4Cf81ymlYYM1h0flhTntjfk8Yhf+ra/v8/4tTcMiqL9jvSDEyfueU?=
- =?us-ascii?Q?Wxu/sAxB3nPNguZnKAbSuC/29ESawYVrm6SmClmcyWuPk/Mwr/rtTgyy2Itt?=
- =?us-ascii?Q?OzDkJnccqHhDdlzDxjpzjOW9JatTukyw4d5pUV4Jjw0sdmdogl3Z5daa7xWl?=
- =?us-ascii?Q?BylO6JGsX8dDMSORLaOldEe41xDwWUC+RhTIMUHVxivlZ8d2eEZxuBlFHYmT?=
- =?us-ascii?Q?Cj66EbM3YIf6vhNiaiUaMpV5BqeGVDiHHTG7kgd33Vf+kGh07WgAuPNQSKu+?=
- =?us-ascii?Q?w8OCyIzPdt/dSiUjOAYsSVz5DjRrJ3sSwgVjTHqIF2K3Znor6Ycq5bFizyOW?=
- =?us-ascii?Q?F1+QapysmIzfrJbE8LML/WKiQh8IiUZC+GeDchgvocwYBRYRRkRAWTBXvZc3?=
- =?us-ascii?Q?/dLD70K6Tc8CFLNyCxz3fSdwjqYOpPdD3UBZadiU7vO1mqyY+g7C8PP1X8bZ?=
- =?us-ascii?Q?YcUM/0dpYFvx6GyNqQZXwfWihoYs8O/O0gRVWVjMatZPCrMcKMM5+QVn+m2I?=
- =?us-ascii?Q?kKk+/KoYUQT9w20fPTkXBYKAOFb8rajgwnDwgXEs3+DH1wpKR2ovlOtVEx7S?=
- =?us-ascii?Q?vDjWJsUymtP/1cPrZStQGETlIFakpG7NogCo?=
-X-Forefront-Antispam-Report:
-	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mkerelay2.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: gehealthcare.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 06:33:02.2108
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: be6ed8f8-ab88-4b1b-10d1-08dda71f7c1b
-X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[mkerelay2.compute.ge-healthcare.net]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-MN1PEPF0000F0DF.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR22MB5098
+In-Reply-To: <20250609005143.23946-1-lijun01@kylinos.cn>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDA1MSBTYWx0ZWRfX1YngPCwkbLc3 aKlqjxZ/XZDchxaSFHrp9WpdeXA3zj4jWxrL3cNKjpBOjEXOIzgSNJ4q2QR47XBkNcfY2gkPG9M 80thmh8RwDlb5/wPPx3PnO/07EKYI07ApOWd8Rztyp3lwhlpq90wKacKYLkrxtj293fBWidN8+n
+ 1Wn5mCOsED77ER4X2X5jAU5cusvlg7i4RUKYGA0l4dnFg4B/TmY7JIOtyqYeh1uLnnT1f1W8zJw U5SNiW5hzOusdK5xrJaELDZai0puqGWa8RPNjtngz4qPjz/agmbDohdtxVKTB5Fjs17fRo6Hcmh LAryYB48ejtRBegsfCfTW4bKOmuHTTxAvEty3rMXOkqVk5nEHbRRHqVH32CliH/CutquZMLTogx
+ pdodPUD3WLsX9Lo57q+9H5oU9ZTipv1nwpvcRRsYch/UHPPg1CM6nODEXhdNR+T8GeT8/Ueu
+X-Proofpoint-GUID: k6AgCrvYIkpVAJ36VmYxmXwL8fxmOBiV
+X-Authority-Analysis: v=2.4 cv=Lq6Symdc c=1 sm=1 tr=0 ts=6846816c cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=tvudAbC32e9tQbKPJnUA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=45YzpkTmBZ4hW-29o7YJ:22
+X-Proofpoint-ORIG-GUID: k6AgCrvYIkpVAJ36VmYxmXwL8fxmOBiV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_02,2025-06-05_01,2025-03-28_01
 
-On Thu, Jun 05, 2025 at 06:43:39PM -0700, Jakub Kicinski wrote:
-> On Tue,  3 Jun 2025 11:09:49 +0300 Ian Ray wrote:
-> >       set_bit(__IGB_DOWN, &adapter->state);
-> > +     timer_delete_sync(&adapter->watchdog_timer);
-> > +     timer_delete_sync(&adapter->phy_info_timer);
-> > +
-> > +     cancel_work_sync(&adapter->watchdog_task);
+On 2025-06-09 at 00:51:43, Li Jun (lijun01@kylinos.cn) wrote:
+> the error variable did not function as a variable.
+> so remove it.
 > 
-> This doesn't look very race-proof as watchdog_task
-> can schedule the timer as its last operation?
+> Signed-off-by: Li Jun <lijun01@kylinos.cn>
 
-Thanks for the reply.  __IGB_DOWN is the key to this design.
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
 
-If watchdog_task runs *before* __IGB_DOWN is set, then the
-timer is stopped (by this patch) as required.
+Thanks,
+Sundeep
 
-However, if watchdog_task runs *after* __IGB_DOWN is set,
-then the timer will not even be started (by watchdog_task).
-
-Regards,
-Ian
+> ---
+>  drivers/net/ppp/pptp.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
+> index 5feaa70b5f47..67239476781e 100644
+> --- a/drivers/net/ppp/pptp.c
+> +++ b/drivers/net/ppp/pptp.c
+> @@ -501,7 +501,6 @@ static int pptp_release(struct socket *sock)
+>  {
+>  	struct sock *sk = sock->sk;
+>  	struct pppox_sock *po;
+> -	int error = 0;
+>  
+>  	if (!sk)
+>  		return 0;
+> @@ -526,7 +525,7 @@ static int pptp_release(struct socket *sock)
+>  	release_sock(sk);
+>  	sock_put(sk);
+>  
+> -	return error;
+> +	return 0;
+>  }
+>  
+>  static void pptp_sock_destruct(struct sock *sk)
+> -- 
+> 2.25.1
+> 
 
