@@ -1,87 +1,81 @@
-Return-Path: <netdev+bounces-195799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C23BAD246A
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:53:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1C4AD2475
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F17816AFAC
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3E95189174A
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AE321B9F0;
-	Mon,  9 Jun 2025 16:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81ACA21D3CC;
+	Mon,  9 Jun 2025 16:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="U4dY0vs0"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="Wk2lKHAk"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013025.outbound.protection.outlook.com [40.107.159.25])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2075.outbound.protection.outlook.com [40.107.95.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B007821A443;
-	Mon,  9 Jun 2025 16:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1089921C161;
+	Mon,  9 Jun 2025 16:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749487981; cv=fail; b=AFNoEMnua+ambAY4PqVkIeaZ7LcIelhJE5acCKSLNwXuOaZ5nHU88sBq3xHbbiKn2G1wMIkTFMTLR4L8eOs17HQGuUyhEXOeov8Wx6/mDOz36+0+aCYMTR7vseheLWhcosApdnmRuH6w3qsguXKghBgnj/XLE0aKjyECofLVUTw=
+	t=1749488000; cv=fail; b=PRR6eSdjt9RnWnm99AOB0q7F1AZB3FQ2qa7SeNkFN1j6tWbhqkwjNSC/tk5lKgc9jMvdXrRv0yAcArzGLa4lu4puFL89G6W/UcDghbUnazprv9Kerz1EQ5Zmm4iuwghyNVQt/5XwmlRHSBnKqo59qD41cu5S1qtWvUbqFYa38+c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749487981; c=relaxed/simple;
-	bh=vbv0cAfB6kMVRjNmTPPWQKaJRdEhzVtwW1ae4qh2v7Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Bf02Bjjts/tl0LvoYz8hYR+rJBKcMYbdkSwsF4/gD5/+LmQ8wXVJxcyqYcNMKLa0QbTIaRiG/PR3+9WZOM7SiEQlwTi9pkZAznS1o6ynj8/+btnLlRBMaJLkP3VRcbTgE6FhcEgmhWSX0wu5Mx922A7MZl1C0O6NHYAL2LoX9SY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=U4dY0vs0; arc=fail smtp.client-ip=40.107.159.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1749488000; c=relaxed/simple;
+	bh=BPQu47ge2jZW9CkX97AuLAi+sQYUK2hZuPZVsJ37CUc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ueVUqAbKP27by+/r3oRFvvfL0ieAonW4XJhkGIxdCfFS/0ScU1MbJLIvmMco+P8mXuVOIoMHF9LtTE3Iqso6OeYMQwp61o/2vxadoRTO2dPWtlZa7QRJDucRHbMWLPwOmCTbtQsN4l1WTerWItyRbZw1bcubO8tGInGcDZsX7F0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=Wk2lKHAk; arc=fail smtp.client-ip=40.107.95.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X4f0NpWWYXogPsWmDUHmTgg4wZt2j5MMDUQ4RtlywMkYMi9gLlJUdhS/iUUEnMhWxxGEbntDYhwL6caYihno7ggVh1qfV4SsVeg8J7+HZfVYSYTbinAAnAPMmMOhtBT9vi0QpA93GJ09Mz0EfXFPITIMktZ3BEqgISEmV5vGaeVG/2wPcvrifsGdsZti7rul+xi7xmVphBgn/FtB6uVah2RMiuXFfGdv/UgO6SQ2sDDuch5E+aRRZwa99jUycHcfPu2Zyfbyp2RBTVSk/+5E55lonFTehbSMM3njz4A+WtqqC+U/0vtkgO9uDdyg1QaTr6RujslcucIv3jTE12dDNg==
+ b=auuRtDXugFj0x7Ob3gyL7l+vi0mn1vjCorVCaIf7A2P1NgT7S7eVfDl7ehrnGNGtlJwnHBsT7Sx73uRXgNF96xPoD1eQIorgpGXeKOQcTorBff/1i1epPvKtHEocCo44FEQc6qs2jTQ/kQuqEbQsFSVvqH8IQi6Tepwl1i8/f5Qiur3Esn+1lkEr6dxD4PdONz8VVCXUya//pUsL9Tb5kOH8Z5lDgqlkiMa/27x2pDzGncZBo10SNkDTIuMBurhaJTG0uMXHYBunu6LYD+hMQA0JQT3tgmlYipWvN7CTGft3RmHcRATTABEX4vdKVOWaQbMSrgYSHcWzBs0w63IK7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KtxdfybRC+z4q6j32t25S1HAhXaSsDWINMjc2wuj3is=;
- b=GcecjgaXtnyAk3aM5eSuQzpFqgozMJ3/NgexFvh51ZicSenuEwYVutgvlQxhxYZ476+QkXUo9UIZhwTht7LAdbXDDDKWk5kngv8eBesSX3uO505VaMd6xTe9dY6iEmzPdEjNw0bB5H+ih8FC4mqR4HOdwiVGA1yAimrMoh4JCAMZ51phCPFPwizkO4GgS0+lYGAksmycx2GL0J21aKWLzMrDBcfMr1SNw03vT4muVK6qI5ue11c/Az21N0sKPw2b4kXHR8+brwDy0g0SYmkYpkkuewhKPvkSpskvr8xnGqPFrpH4baQwojkmy7Yf9scgpxxDNmoz0/x+plLaLTeiRg==
+ bh=DwGlQqbWfDW0Ooaa804R0BiYkAZOhpGCf7azpYDKN3A=;
+ b=lAfaTRq0xqVKqBoOIs/MNrBpNJCBjYWiIaeDlW65YQGUzU6ST+QK5/bSIVmcCxLbbqQrgzBc6pXWncaCBnE2nggEjwt1Gh8h9YzzL9JtLJ9Ez2A658b2FRdEdGEx/S8Q7+ki/ZBkALTMpOFwP1F5DHptg7PJOoiKfK1EDc9c1/+8xhcpbRVzQpXFTCWKlBLCq13TCt5EbaknVgqWTfYE2hxh9YHPQq0cFNUmf0q3TGegF4p6iL8apR4O3kWPaiUfdHRacwZcUdDtEGr8NGuzI+mChSJzloDvxmtXMsUav0Ytc/1W+T4PPuahFDwJJmpuiOBSylQhb3XBJLig+b7qWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KtxdfybRC+z4q6j32t25S1HAhXaSsDWINMjc2wuj3is=;
- b=U4dY0vs0Nxd4NN8CHAafBVxevCSg4XNSvsCg2jQ3gGXNXHLLduqBzAc5OTg4iW0cSJfg54/+uJSN9UJmQHbBMHpOGhsYo2CXNJO3HxHD3g+uUXVWkFjnOjUPZLRcJ1ts2EmJivTEBpS4rSrhxgp6ingn4VdZnFETQYePPIVYEcfWHIpP1sz5J5gat5tsqKMoOMCvBVeKXz+fyA6VUQK8p9biN+YdUph4giNYZ4LVjl+Mfr1IgRbnHCQkbzw+C1c4PkxLQRBpoQ4oENY3lriiEyWFDWys7hgl+ukEWV34ONw4z8iTO0HYzB/UdAzAtZpDSiuOExobpcLBylcT7lmi6A==
+ bh=DwGlQqbWfDW0Ooaa804R0BiYkAZOhpGCf7azpYDKN3A=;
+ b=Wk2lKHAkp5TnKy5xugSS++cHIB2IDu8LRskhdOIZKO8lusF2ETE7e38YDgDbbUTF7ygPMv/3UTwbi4JIX9V2Q8yzs1ihUgIkqGGlvDbEzfIOlcThf4tiZpQRuLkNSrHECMkHHYjK9FH2vYO9K5qmnZXatKU22mNa9ujJ4Jve5AW1rCR+IbM7vzYueOpAPSQFBxvOL6qeVgA96S1eNTRXfFO7HBFHIsNhGpCqvKy8qUAER1xWs8AXZb6y7D5XSs7z9+DQc0l5cU2477P7q/d6yV2j8PwtIs6/WQ78IjAliLLbc1UVfFEq9INtsSLGeXmhHAqlBfNIwjnpoFp/Ia57rw==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by VI0PR04MB10230.eurprd04.prod.outlook.com (2603:10a6:800:240::12) with
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com (2603:10b6:a02:b4::23)
+ by CH2PR03MB5270.namprd03.prod.outlook.com (2603:10b6:610:94::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.26; Mon, 9 Jun
- 2025 16:52:58 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%7]) with mapi id 15.20.8813.024; Mon, 9 Jun 2025
- 16:52:58 +0000
-From: Frank Li <Frank.Li@nxp.com>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	imx@lists.linux.dev (open list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
-Cc: imx@lists.linux.dev
-Subject: [PATCH v2 2/6] arm64: dts: imx93: remove eee-broken-1000t for eqos node
-Date: Mon,  9 Jun 2025 12:52:33 -0400
-Message-Id: <20250609165237.1617560-2-Frank.Li@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250609165237.1617560-1-Frank.Li@nxp.com>
-References: <20250609165237.1617560-1-Frank.Li@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR05CA0193.namprd05.prod.outlook.com
- (2603:10b6:a03:330::18) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.39; Mon, 9 Jun
+ 2025 16:53:15 +0000
+Received: from BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c]) by BYAPR03MB3461.namprd03.prod.outlook.com
+ ([fe80::706b:dd15:bc81:313c%5]) with mapi id 15.20.8792.040; Mon, 9 Jun 2025
+ 16:53:15 +0000
+Message-ID: <21b13081-b54b-4499-bf39-99ee0546369a@altera.com>
+Date: Mon, 9 Jun 2025 09:53:12 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] clk: socfpga: agilex: add support for the Intel
+ Agilex5
+To: dinguyen@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+ richardcochran@gmail.com, linux-clk@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>,
+ Teh Wen Ping <wen.ping.teh@intel.com>
+References: <20250513234837.2859-1-matthew.gerlach@altera.com>
+Content-Language: en-US
+From: Matthew Gerlach <matthew.gerlach@altera.com>
+In-Reply-To: <20250513234837.2859-1-matthew.gerlach@altera.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR05CA0038.namprd05.prod.outlook.com
+ (2603:10b6:a03:39b::13) To BYAPR03MB3461.namprd03.prod.outlook.com
+ (2603:10b6:a02:b4::23)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,124 +83,599 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI0PR04MB10230:EE_
-X-MS-Office365-Filtering-Correlation-Id: 930f0406-06af-48bb-3e50-08dda776165e
+X-MS-TrafficTypeDiagnostic: BYAPR03MB3461:EE_|CH2PR03MB5270:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a521edf-8ede-420b-2b79-08dda7761fd0
+X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|1800799024|366016|52116014|376014|921020|38350700014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8LYRJp7gQpLYZyFyLtC72GBuKwr6DKMfEcXU710oD4Xo8Lzyt6lSDVVtEiLL?=
- =?us-ascii?Q?xdH7oewL1AFpkgH400XbiJHl11VsCMLsjnQyd0gv/pQgHJE/N1JSptj3ml4Q?=
- =?us-ascii?Q?Uk4lDYPwDkYRbbgqrhrKsLS0mbUKk/1TmPoTnkhlV+8anlaP5/VOIXXHqgwq?=
- =?us-ascii?Q?aSsoZr9Fx68adTTwbXe5xRuBDe7ug+ZL6lFA7Z3N1L9awQFegtE2OIYHjsQT?=
- =?us-ascii?Q?BUbWN9z06YNh8R/LL09QrhT3rGXUMRW9IlVCQ583L9UJSVfIMws+9qu56xxR?=
- =?us-ascii?Q?Sy0atZ6Hl6nZsJSi62AWsn5coIjhbYrSMsaiMsosx/gdKg91WUVRibgYc0wX?=
- =?us-ascii?Q?bRpYtdVjrL+l7XeG7aayf6Tz5C71PZJWmWhGXxn9qriw2ubC5DaBJud72WyY?=
- =?us-ascii?Q?5OQxMC67hG0pjungvJ3VypSWAmaCmL5QZEGuAP2bvhMq8ot7JmY5UT6GKpAr?=
- =?us-ascii?Q?fqTJPn7MWyHzEabI02ncOMUQTbb9fxn18ICjxwg27BdcmYpPauyO5kM9aMyB?=
- =?us-ascii?Q?iOy2tMdV0jhv6SkNQbu9VT0uI13HSu0Zs5Mna55BLb4JCtkbZxSAQn2s0kRe?=
- =?us-ascii?Q?l9042xra4hLzVryngsYMBLLDn8NjLts32ryqXmsWlHolE78S1SkmY/gzx+8E?=
- =?us-ascii?Q?StKg1dsprN9vZBd2vOzqJQUnftjQQNQ3MoZoV3SkUO4PQEEbmiKCBe1gJyb1?=
- =?us-ascii?Q?RHt4fSMwxjoulcxZPCID14VNohdyBiDWxEAFJH8rDarhzQ+/MZfBq6deDDyG?=
- =?us-ascii?Q?A2t3y68eR1PoGt+tLyiTCNqnNutNLHeGnGo4tgcqdw3NjEztUKiENe05+7bk?=
- =?us-ascii?Q?DKufSaO4YB0zlz4LI+8IBhnyBkPovCtOjtYLxN3KmhzcNqL+FA//3SEIYaSI?=
- =?us-ascii?Q?/oTgtmJl+pcD10n7RlfpPOcwmmFc/f9mqPakWrrO49LYolL7+5SRshQSQ2aq?=
- =?us-ascii?Q?G7JYggcGKopMJJFX2a338q1DmiGzzC0iiRfESuK0ekf0/spN6vWtoKY1VZR7?=
- =?us-ascii?Q?Nd8l5rHw9gMqD7Gdyos19xhlANfG9uUZHNWPCOZbxZVh10mThkYR7I29eDIy?=
- =?us-ascii?Q?p5D9xPUCL4K0aYIJ5Be7Lol0ZhclZxvrhVDqVjzazqT00wYDiH25U2K6rtvP?=
- =?us-ascii?Q?owMlAeRPYfXMltPixEX/F/3x4JRG8/8UX3Ut2kk2PLkBiF+hrDIRtPfwpb+8?=
- =?us-ascii?Q?tHnChI3q1QMhHv/yAdYQlNkF35ajTGGgpk5uCOcKuovDGxtR94fMq/ZiQlhf?=
- =?us-ascii?Q?gSgbIElgngOn3vXNXjfB02KCu3eX9xFgrCHfyhInz3Pf4I44zoeJidOlIqwB?=
- =?us-ascii?Q?bii5YwnByjk0Os7zWNIURfIO4JHLmCPE3otidIYH8F1ZpIi0J9YexIDwq/Lr?=
- =?us-ascii?Q?Zq4rnAdaC+7wrDPnbMfkdS0Xb8NAdvZwqJC59kudf7EdXfIGga/OxFsYCxDa?=
- =?us-ascii?Q?CjaHfhTIGbpUmlFivPh0u4dqzhY5uoGme7gGSoxcR9AWSHE5RsVZazP7/Awi?=
- =?us-ascii?Q?dFV7uvnxKy9TCXs=3D?=
+	=?utf-8?B?NGdLMDFLUVJ0WkxqSjdSaFErWWo2UVJsWkFNTGFCdlhUSk1QSUQzZzl1S2tz?=
+ =?utf-8?B?QkxxbHhTNGhDRGhCVGNMRG54MTY2czdzWThIeVIwWDJ2VXAzaUs4R094dXI3?=
+ =?utf-8?B?WWMyRlFnNnZVODlhMGtlTy9weEQ2cTVzYTJGOUc4R01rSXMvTWovVXBmL1V3?=
+ =?utf-8?B?V3hraXh0QytteTd3dld3NENBeFllcjNvRmpPUVVpdlZzVVdVRnN0ZHZQeTBY?=
+ =?utf-8?B?cU1KZjlTZS9QbDBxMlJoN3VWWHZPSzBhbzZ0bWNFWmxQMnlxa2xRNCttS0xD?=
+ =?utf-8?B?UlpIVlY0T1FXSms2eGpPL1hCS29TQ05na0JmRUNYZ1pVbWZJeXZxUlZERlhJ?=
+ =?utf-8?B?Rk0xaGRpTFR6bzBDeGFhbkt0NmJPYllsUnlZT01VSXhNL1A1bS8rMlVaUFdo?=
+ =?utf-8?B?RWNvQ25LTDBUUzJMRTJieWxTZHhpR2pIQ0VHaWhnaXpRa3ZtTExWdU9QeEhr?=
+ =?utf-8?B?TjdtSEpCQnpRNFU0ODQ4QWFRckVTdHNoMmZJUE1SemtWQW91Y2ZrOFlwaitE?=
+ =?utf-8?B?ODFHVGIrTzIxN0luUDBVOTA4MWs3a0VjYXZrNklGekU1NkZvOGF0UDUxK1g2?=
+ =?utf-8?B?cnB2bHJ6Nm1CSUd6QTFBalRwcVFWSDJ2R2xvWTFWR0RHcDJNQUNQRERWSkNW?=
+ =?utf-8?B?enZrUHE2T3ZXK0cvU2pabEZVZDBSaDdiTzN5RGpoRkZOUXpZUVNhNnNNT3Nz?=
+ =?utf-8?B?M1V2a0VSQmRCc0gwOUdBamxhQS9wTUk4UlRkN3pWUXlSWWpoQVFac01GUTdX?=
+ =?utf-8?B?T1diNG1mc3JBWlFXT0hhVWV6OWI0Y0dTRmJGcjFjZHJsYXNYS0lNWE1EdzZ6?=
+ =?utf-8?B?aXNzNHJ1a2tJcElxTnp3Z2JnbnRRWHlybk9keEk1dEhsc2pveHV3UlBOT00y?=
+ =?utf-8?B?RXduU3R5SWVsM29oYlF0aWJGUWZGT0FYSUNhMFBpNlYyRkp5RjhCQnYvaldU?=
+ =?utf-8?B?TlFDRUtUOFVNWG9Qa1l3NUl3cnpVVFVUUEMzVFpaeHdndytJamNIV3hLbUJv?=
+ =?utf-8?B?NGJ5V2NUMktCaTdoeCtRaTJ4ZnZwTVhJb3pwM1NzUnJQejNuRXpHcjVyVkhP?=
+ =?utf-8?B?c1V4MGJORFF1Z1FkMkZjR1NTMlFRME5GWEZnaHJlVDRFQ2R6c0VZUjRZa296?=
+ =?utf-8?B?VXFiWUZTcEkyN0oyckJhbHdWcEVwWnowNTJuamsvSkN3eU5keVlzeTJSaXBa?=
+ =?utf-8?B?bURoclFmQ3pSSEtHU0pZYnZkbVhlTXZDcjlTZ3QvQmxTN0xJUlZ4QmlHZFFa?=
+ =?utf-8?B?aHNuUnZKZEVFK2drTE5jbHdwSEplamFaMmF4aHE2MkVEOFRlTmdYRkxKWUlm?=
+ =?utf-8?B?TUY3THZkTXU3SjZ3Sk5zUjAvbXRpUmNHc3cvMitPSE56clBuQnBSYjBwbjE5?=
+ =?utf-8?B?UEdCSmxDTXdrTU9iQWx5amkyaGhzdDhPTDhJQ1pna205M2J2ckh2NjE2VFF3?=
+ =?utf-8?B?ajBVOWsraXpjZFBlM25RVzdkUE1DZGhYMEdGcVlmVFVLVnpmUm5pMktxUHlw?=
+ =?utf-8?B?R3VrWGtjbjM3cjdWNmFKeVdrOCtJQlNsYXhJR3hOMmg0TzNjcGZ0d0loTFN5?=
+ =?utf-8?B?QTNNYXc0L1NyQzRCSk9jd1NiSHBWOW04cFdPOW1kOUhrNWJZRm16eUd4ejdz?=
+ =?utf-8?B?dmhGbFEvTW93aFRKQlQzdEFXZnRpdm9JOWptNklSdk0wUDlPN0lEcUltSEdD?=
+ =?utf-8?B?NEJKYnlua3FLRHNNWUovNjlZQjdVcGJhaThIcC9xUDJQMVZ0MGo2K0VMV290?=
+ =?utf-8?B?MlVucWd4aEZBMXEvZFB4UmpGVGtIWW1lNEU1S3VTRWIzZ2lNU3V3R09SZkxL?=
+ =?utf-8?Q?i17/ouIB/lmsd2LWZOSPB9DAF/xxqs3MFBj5M=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(52116014)(376014)(921020)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR03MB3461.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?IDVrI8lARjxi4mmmuYNX0zOgCJzOwKaorKichGaBcxTzIzbHZEU9j1qfp6Pq?=
- =?us-ascii?Q?+Czj1APs5lUPdIcOADKoIDkOZ6V+78Nla4P6Jcu/sYNtl5p3fZ8GQMM6s/VQ?=
- =?us-ascii?Q?TfxphC2pEQehCXNIJ8eX8PSHVhEHIwQljYayTquhIvANLtQW3Y08M9Jcm7R8?=
- =?us-ascii?Q?sIWzi7rZsquOeG5tKJyG4YrYWajM8TrzH8WcpBjRKUKk3O2enhfnV8Ndzxzb?=
- =?us-ascii?Q?g652R0JoLDuLeNY+lkCciJhl11tvUOK2c+J5t0D9si818OdtV3SOPQC04xb8?=
- =?us-ascii?Q?hpqmqetdn1HZ79+PqM8opeh7u/cgRX96ATfFn9JLzWixLtCiXu/0AERDif9k?=
- =?us-ascii?Q?0GtcTmWdgiAbX0NsK+vBlaQUge31EiTWH4N0i9uRpqCuLYe8+YTN2CraADbL?=
- =?us-ascii?Q?HpGiaYpYT1hOlSLXNyqIzA9yep1CtHo47lbTJ8UDoanTkneH58TeM3zUoLkT?=
- =?us-ascii?Q?dhyZsT5Yu0gC3QJOHqjcIWg2ecPlRqHCb9jtxbEGqBHaLOA8UL9VaMCUxD+H?=
- =?us-ascii?Q?hUor3WsbN4X0wlkzM5/xtAPj3nmHmA0vEi0eQM4ScuzdgCqORIAhtWvtFwqp?=
- =?us-ascii?Q?ps9TeAgzQOccyGQborVga5V40h8fBQDCmTbeOab1/3WVOmMepXaFONZ8fo0O?=
- =?us-ascii?Q?YSTmCHnLeXsnxpclTqnuoHANIoS2JuuJRQ1M9BXfbTdSvzPgaDKZMr0Emp1h?=
- =?us-ascii?Q?VytU8D6jbM7BqT0XUL2DeB2AttwBIXmX7pbuZDl2xHN/zpuwNM85H5XyQmsy?=
- =?us-ascii?Q?9zmaG1S3MgCD5CUOyO2WBEGtl/zrmdaDNs93rljJDgM0doywS4tt4RjT24QK?=
- =?us-ascii?Q?GX/6TGMSJH+n+PVv8SmM3WURRAvN84tTIHUoRvsclx1Egqi5enpiQsUDBDwp?=
- =?us-ascii?Q?6/FJTyxOhjceqeU9QxKXBavRo0TAqsQnDVD7o0cjGbwqY848Fqiii3t1926K?=
- =?us-ascii?Q?L9gxyC/T2nVedTB3igbC1cEKsG5nTZCBnPxFPVROw7u2j03pgTRMmnEb6Ess?=
- =?us-ascii?Q?qyr2MjhY1JQVy7flWNxjTqjlmzu5GVD/LCX2n7IKefVPX2x1phGSfhYxXjA1?=
- =?us-ascii?Q?ku54IQ6vC+QQbql3IwluKIw7BTQ4k3CMC5YYC3822dBGw+wKVYtkDrhYxfS8?=
- =?us-ascii?Q?871b9YFJY3X/MEuA/t/mI8feHw9EJMHZV2BDd2fbzv2CsWChrZT+EZUmVmln?=
- =?us-ascii?Q?xsWbekWKnB3u7XH267ne+5LzZjEy1OTYwm9KrNh8AIVBDuKuOBR0C+qbaAJj?=
- =?us-ascii?Q?Hl/c1ng2sZhrw//0nJ+0YtCxIq6BuaQV5CMjqWF7XQGe2IUsO33p00QIYF4b?=
- =?us-ascii?Q?MPwnNsbcN34VCiMeISRE8y96E0p64CEIgTebbQHTTJyeNl85e+5reDd4XzXn?=
- =?us-ascii?Q?OOaIdTu8HT+Zqszf9CHAmAC4p9a0eCiwPpCdzAmdcnL1HYb6MfqXC5jDQfdA?=
- =?us-ascii?Q?fMDnrX+Z+ZHsl+5pHUwOCTIsiXRVe0zoAi6JZmv1kQRqGQiOxqSrz6K2n2bk?=
- =?us-ascii?Q?XVLyae+nElD0peGZN/lEIwPgntQUvm5dMbjozJelY5xlOqrEO7HP8MVGwROP?=
- =?us-ascii?Q?7N6bTrdk0Kfb3ZiU6cIhLENXnOgtWG+WctAWogm/?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 930f0406-06af-48bb-3e50-08dda776165e
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+	=?utf-8?B?MzNSUEpydURMaml1eWZOQTMyL2VxWmdjWEV5T1Q5ZWVOcmVSTm9VOTVzUDhi?=
+ =?utf-8?B?djBJMHE2V1B2YnZJZERYRUNxelptT3U0SmM1M2p3UTlpZzBmRGZRcXlPQVIz?=
+ =?utf-8?B?WWZKbmlFbExiSHVmSlVySE1IVTllaDNJV2l0TlpkckxMeDkyMXRKT3BDbWoz?=
+ =?utf-8?B?dFZyTk1YY2NDMS9seUNSeHMvemxqYXIvT25jVGdFNkVZRzFNS1diTWxhZmhs?=
+ =?utf-8?B?NlY0RkRxWWIwNmNKRGxhamM3QzlpbU53TmV3SXV2QUpJRnM4dFZJY2lRSjF4?=
+ =?utf-8?B?SDBaM2h5YUt2RXVyMFFDZDd4Zzh5am9CQjlBNzVsZWYxdG5ITzBKcU45N2R0?=
+ =?utf-8?B?U25DV1ljdGRXblVoak1pNVNkUGlZWllicnkzaEdWaklwa0o3QzY0L0YxQnZT?=
+ =?utf-8?B?MVpqWGZEQmFpT0NGcmJMWWJudjRSNGNxNURPTWQ2VndsNXJCMHovbzZWc05p?=
+ =?utf-8?B?aUtvSjJIRStXdDFheTgzQjVEOStlMmd1MkZpVEZKOHYzWUVEL0NubFZ1ZlFq?=
+ =?utf-8?B?MDRydzdwZkRxaHhmRzlpTSsxSmpZK0E1QzBIV3RvREw3bmp3T3kyRXVaeVZ0?=
+ =?utf-8?B?WUd6WkpaNUZFTzdDM2RZdTk3bTYzMjlLb2dQMUhUalFjZUN5bHJPQnVuU3RT?=
+ =?utf-8?B?QW9MVGhtdGJKdXZFcnRYMGQrTjJtTnorWHJhVERheFJ4WVdGL3Q4V2JGTEVl?=
+ =?utf-8?B?TmRDWGFhR0JFaTdzbllES1hidFVibnVGNk5DUDVCeU5TeFRWK0Nrc2NTZUNI?=
+ =?utf-8?B?Z3hDSTZCVWF1QXNTZlJYbGIvSWFWZDRXRVVHbWIwYzRRSXM5OThuS1g0NTUr?=
+ =?utf-8?B?dWY1RmhmRVhSSWdLV2FiV2l1WnlvY1A4UHZzOTRmeCtvdHFzVGM0TG9vVFVG?=
+ =?utf-8?B?c095Qk05V3FFUzkxbTBIbnlhU0dQTjVJMklZblJEZmZVc3QxTGFzVHlDUTVR?=
+ =?utf-8?B?QS9sZGRKRXB1ZnNsVm9WMk02WVF1SFl6YmY4VkVjRDNXKzY1T3YzNGsxMTJr?=
+ =?utf-8?B?aWtrdms1RU10WnRtVzdXZHNUTWpOckp6Y1dJTFZaZkUrdXByd20zbSttRzZ3?=
+ =?utf-8?B?b2FRZnhBeEl2Sno3SW1mcnRVMVF3elViZldrNkRrdk9sRnFBYzVqWm5WMkl0?=
+ =?utf-8?B?b1hkWlY5NUw3ZkI5MG5oTkdGNXlnVmxNdVo2RDhlYUN4bDRmWklYaS96NWgv?=
+ =?utf-8?B?RmQzS2E3cmlYaHBTbTEyb0RENVFrUHgvVzRJS1JKTG84bEtkMjBERW5UYkpk?=
+ =?utf-8?B?N0wreWN0dGx1SnJZa1pLMS96QlgyNVRsWG1qTVJRQWo5ZkhBNTh3Rjl6aTJW?=
+ =?utf-8?B?Y21obGpYNEpzdjBvbTZHK0oreUdkb3M5Y2VQNUI5TzBTTCtpclFBWWx2OVk5?=
+ =?utf-8?B?cUJJTHd2dGwwODQvbEpwL0Z6N1dHV01razdRNGswbGdOQkZTa2k0MXFNekc3?=
+ =?utf-8?B?QXRiYkJlM3RWTVczZndwMjIyYmhFRkFOc0JoSWxwNVk2ZVZNMDZQUUdsOTdO?=
+ =?utf-8?B?RTJmVXI4M2ZodnNzRkJHK2kxcCsybm5CbG1Ga1BKK3BVM056MW0zTkNhek0w?=
+ =?utf-8?B?QVMrN1dtMmdkUTZ1MW4xQkZBWm1QTGdETDlrSTlNZDVNY2pNL05lMFRSZGFV?=
+ =?utf-8?B?T2l6YjlLS055NktqVVU1bjEvWHZlbUlGRUt5eGFqS0JvWFY1ZGV0MjVYdGN3?=
+ =?utf-8?B?Qm80dm9sLzNHNWxaMUxkRmhTQ3V4NUpUQ0l6RldvTy9JY2xVdHJwalpWbnBt?=
+ =?utf-8?B?SmtTSlRtQ0d1OWdaNTNUWE5PTFZpdlQ1blhPREhseEZCNFdrSHJwUjBqcm5B?=
+ =?utf-8?B?YUFETzRxR083MU1oUWNyZzV5dm9mWGx2VnpVOUdkZGEwTCtlR0FGaXh4MDli?=
+ =?utf-8?B?R0d5OFVkMVZJS1VxWnYvMmR6SWpTZHJDS0Nxa0ovU0xja2NMdGF2ZHFjWDhi?=
+ =?utf-8?B?WFhDUkJ5c29CRnVHVlVEY0hHYzk0blNSQWVnSU1JRFNJZ3VWRlg4OGVTd2cv?=
+ =?utf-8?B?bzFycWtQRXozM0xmYnh0Qk9IQnpsalhDdUpJaWMrbmdWb05GNHhRbCtSOGV1?=
+ =?utf-8?B?YmZzMDlnalp3RWlDVU1tcld6U0NjMGFpQmxkQ0JUeVBpOExLSnVydXBpdk9v?=
+ =?utf-8?B?RStlUTZEWjhZMmN2ZjkwSldPNkp2QUZtR3QzWEhIanRwL0UxVGltMjdGTW9a?=
+ =?utf-8?B?TFE9PQ==?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a521edf-8ede-420b-2b79-08dda7761fd0
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB3461.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 16:52:58.2382
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 16:53:15.1388
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y+2sKfG3Dx23SWUtcVe1l+/y8NSZG4YuaSrS6YkrOChkBDpm4AwsROCvnCc+oApkbzhcRiu//7iLT41qeJS99A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10230
+X-MS-Exchange-CrossTenant-UserPrincipalName: vrBIvz2No8ejFX2qRtTpQqQG9eetxKfjjaEoMmbwgYi9/YZN2pC20+uZOOcXnFNtDuoXtouEuM4Hob2gOx/csZosp4wX9Wz39qRuyDFzy88=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR03MB5270
 
-From: Clark Wang <xiaoning.wang@nxp.com>
 
-The "eee-broken-1000t" was added on 8mm for FEC to avoid issue of ptp sync.
-EQoS haven't such issue. So, remove this for EQoS phys.
+On 5/13/25 4:48 PM, Matthew Gerlach wrote:
+> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+>
+> Add support for Intel's SoCFPGA Agilex5 platform. The clock manager
+> driver for the Agilex5 is very similar to the Agilex platform, so
+> it is reusing most of the Agilex clock driver code.
 
-Reviewed-by: Peng Fan <peng.fan@nxp.com>
-Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
-change in v2
-- add peng fan review tag
-- add missed s-o-b
----
- arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts | 1 -
- arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts   | 1 -
- 2 files changed, 2 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-index 8491eb53120e6..a6ebeb642eb65 100644
---- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-+++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
-@@ -217,7 +217,6 @@ mdio {
- 
- 		ethphy1: ethernet-phy@1 {
- 			reg = <1>;
--			eee-broken-1000t;
- 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
- 			reset-assert-us = <10000>;
- 			reset-deassert-us = <80000>;
-diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-index acbd981ba548a..cceca130c5b4e 100644
---- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-+++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
-@@ -184,7 +184,6 @@ mdio {
- 		ethphy1: ethernet-phy@1 {
- 			compatible = "ethernet-phy-ieee802.3-c22";
- 			reg = <1>;
--			eee-broken-1000t;
- 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
- 			reset-assert-us = <10000>;
- 			reset-deassert-us = <80000>;
--- 
-2.34.1
+Any feedback on this revision?
 
+Thanks,
+
+Matthew Gerlach
+
+>
+> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
+> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> ---
+> Changes in v5:
+> - Remove incorrect usage of .index and continue with the old way
+>    of using string names.
+> - Add lore links to revision history.
+> - Link to v4: https://lore.kernel.org/lkml/20250417145238.31657-1-matthew.gerlach@altera.com/T/#u
+>
+> Changes in v4:
+> - Add .index to clk_parent_data.
+> - Link to v3: https://lore.kernel.org/linux-clk/20231003120402.4186270-1-niravkumar.l.rabara@intel.com/
+>
+> Changes in v3:
+> - Used different name for stratix10_clock_data pointer.
+> - Used a single function call, devm_platform_ioremap_resource().
+> - Used only .name in clk_parent_data.
+> - Link to v2: https://lore.kernel.org/linux-clk/20230801010234.792557-1-niravkumar.l.rabara@intel.com/
+>
+> Stephen suggested to use .fw_name or .index, But since the changes are on top
+> of existing driver and current driver code is not using clk_hw and removing
+> .name and using .fw_name and/or .index resulting in parent clock_rate &
+> recalc_rate to 0.
+>
+> In order to use .index, I would need to refactor the common code that is shared
+> by a few Intel SoCFPGA platforms (S10, Agilex and N5x). So, if using .name for
+> this patch is acceptable then I will upgrade clk-agilex.c in future submission.
+>
+> Changes in v2:
+> - Instead of creating separate clock manager driver, re-use agilex clock
+>    manager driver and modified it for agilex5 changes to avoid code
+>    duplicate.
+> - Link to v1: https://lore.kernel.org/linux-clk/20230618132235.728641-4-niravkumar.l.rabara@intel.com/
+> ---
+>   drivers/clk/socfpga/clk-agilex.c | 413 ++++++++++++++++++++++++++++++-
+>   1 file changed, 412 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/clk/socfpga/clk-agilex.c b/drivers/clk/socfpga/clk-agilex.c
+> index 8dd94f64756b..43c1e4e26cf0 100644
+> --- a/drivers/clk/socfpga/clk-agilex.c
+> +++ b/drivers/clk/socfpga/clk-agilex.c
+> @@ -1,6 +1,7 @@
+>   // SPDX-License-Identifier: GPL-2.0
+>   /*
+> - * Copyright (C) 2019, Intel Corporation
+> + * Copyright (C) 2019-2024, Intel Corporation
+> + * Copyright (C) 2025, Altera Corporation
+>    */
+>   #include <linux/slab.h>
+>   #include <linux/clk-provider.h>
+> @@ -8,6 +9,7 @@
+>   #include <linux/platform_device.h>
+>   
+>   #include <dt-bindings/clock/agilex-clock.h>
+> +#include <dt-bindings/clock/intel,agilex5-clkmgr.h>
+>   
+>   #include "stratix10-clk.h"
+>   
+> @@ -334,6 +336,375 @@ static const struct stratix10_gate_clock agilex_gate_clks[] = {
+>   	  10, 0, 0, 0, 0, 0, 4},
+>   };
+>   
+> +static const struct clk_parent_data agilex5_pll_mux[] = {
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_boot_mux[] = {
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core0_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c0", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core1_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c0", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core2_free_mux[] = {
+> +	{ .name = "main_pll_c0", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core3_free_mux[] = {
+> +	{ .name = "main_pll_c0", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_dsu_free_mux[] = {
+> +	{ .name = "main_pll_c2", },
+> +	{ .name = "peri_pll_c0", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_noc_free_mux[] = {
+> +	{ .name = "main_pll_c3", },
+> +	{ .name = "peri_pll_c1", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_emaca_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_emacb_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_emac_ptp_free_mux[] = {
+> +	{ .name = "main_pll_c3", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_gpio_db_free_mux[] = {
+> +	{ .name = "main_pll_c3", },
+> +	{ .name = "peri_pll_c1", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_psi_ref_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_usb31_free_mux[] = {
+> +	{ .name = "main_pll_c3", },
+> +	{ .name = "peri_pll_c2", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_s2f_usr0_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_s2f_usr1_free_mux[] = {
+> +	{ .name = "main_pll_c1", },
+> +	{ .name = "peri_pll_c3", },
+> +	{ .name = "osc1", },
+> +	{ .name = "cb-intosc-hs-div2-clk", },
+> +	{ .name = "f2s-free-clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core0_mux[] = {
+> +	{ .name = "core0_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core1_mux[] = {
+> +	{ .name = "core1_free_clk", .index = AGILEX5_CORE1_FREE_CLK },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core2_mux[] = {
+> +	{ .name = "core2_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_core3_mux[] = {
+> +	{ .name = "core3_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_dsu_mux[] = {
+> +	{ .name = "dsu_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_emac_mux[] = {
+> +	{ .name = "emaca_free_clk", },
+> +	{ .name = "emacb_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_noc_mux[] = {
+> +	{ .name = "noc_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_s2f_user0_mux[] = {
+> +	{ .name = "s2f_user0_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_s2f_user1_mux[] = {
+> +	{ .name = "s2f_user1_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_psi_mux[] = {
+> +	{ .name = "psi_ref_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_gpio_db_mux[] = {
+> +	{ .name = "gpio_db_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_emac_ptp_mux[] = {
+> +	{ .name = "emac_ptp_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +static const struct clk_parent_data agilex5_usb31_mux[] = {
+> +	{ .name = "usb31_free_clk", },
+> +	{ .name = "boot_clk", },
+> +};
+> +
+> +/*
+> + * clocks in AO (always on) controller
+> + */
+> +static const struct stratix10_pll_clock agilex5_pll_clks[] = {
+> +	{ AGILEX5_BOOT_CLK, "boot_clk", agilex5_boot_mux, ARRAY_SIZE(agilex5_boot_mux), 0,
+> +	  0x0 },
+> +	{ AGILEX5_MAIN_PLL_CLK, "main_pll", agilex5_pll_mux, ARRAY_SIZE(agilex5_pll_mux), 0,
+> +	  0x48 },
+> +	{ AGILEX5_PERIPH_PLL_CLK, "periph_pll", agilex5_pll_mux, ARRAY_SIZE(agilex5_pll_mux), 0,
+> +	  0x9C },
+> +};
+> +
+> +static const struct stratix10_perip_c_clock agilex5_main_perip_c_clks[] = {
+> +	{ AGILEX5_MAIN_PLL_C0_CLK, "main_pll_c0", "main_pll", NULL, 1, 0,
+> +	  0x5C },
+> +	{ AGILEX5_MAIN_PLL_C1_CLK, "main_pll_c1", "main_pll", NULL, 1, 0,
+> +	  0x60 },
+> +	{ AGILEX5_MAIN_PLL_C2_CLK, "main_pll_c2", "main_pll", NULL, 1, 0,
+> +	  0x64 },
+> +	{ AGILEX5_MAIN_PLL_C3_CLK, "main_pll_c3", "main_pll", NULL, 1, 0,
+> +	  0x68 },
+> +	{ AGILEX5_PERIPH_PLL_C0_CLK, "peri_pll_c0", "periph_pll", NULL, 1, 0,
+> +	  0xB0 },
+> +	{ AGILEX5_PERIPH_PLL_C1_CLK, "peri_pll_c1", "periph_pll", NULL, 1, 0,
+> +	  0xB4 },
+> +	{ AGILEX5_PERIPH_PLL_C2_CLK, "peri_pll_c2", "periph_pll", NULL, 1, 0,
+> +	  0xB8 },
+> +	{ AGILEX5_PERIPH_PLL_C3_CLK, "peri_pll_c3", "periph_pll", NULL, 1, 0,
+> +	  0xBC },
+> +};
+> +
+> +/* Non-SW clock-gated enabled clocks */
+> +static const struct stratix10_perip_cnt_clock agilex5_main_perip_cnt_clks[] = {
+> +	{ AGILEX5_CORE0_FREE_CLK, "core0_free_clk", NULL, agilex5_core0_free_mux,
+> +	ARRAY_SIZE(agilex5_core0_free_mux), 0, 0x0104, 0, 0, 0},
+> +	{ AGILEX5_CORE1_FREE_CLK, "core1_free_clk", NULL, agilex5_core1_free_mux,
+> +	ARRAY_SIZE(agilex5_core1_free_mux), 0, 0x0104, 0, 0, 0},
+> +	{ AGILEX5_CORE2_FREE_CLK, "core2_free_clk", NULL, agilex5_core2_free_mux,
+> +	ARRAY_SIZE(agilex5_core2_free_mux), 0, 0x010C, 0, 0, 0},
+> +	{ AGILEX5_CORE3_FREE_CLK, "core3_free_clk", NULL, agilex5_core3_free_mux,
+> +	ARRAY_SIZE(agilex5_core3_free_mux), 0, 0x0110, 0, 0, 0},
+> +	{ AGILEX5_DSU_FREE_CLK, "dsu_free_clk", NULL, agilex5_dsu_free_mux,
+> +	ARRAY_SIZE(agilex5_dsu_free_mux), 0, 0x0100, 0, 0, 0},
+> +	{ AGILEX5_NOC_FREE_CLK, "noc_free_clk", NULL, agilex5_noc_free_mux,
+> +	  ARRAY_SIZE(agilex5_noc_free_mux), 0, 0x40, 0, 0, 0 },
+> +	{ AGILEX5_EMAC_A_FREE_CLK, "emaca_free_clk", NULL, agilex5_emaca_free_mux,
+> +	  ARRAY_SIZE(agilex5_emaca_free_mux), 0, 0xD4, 0, 0x88, 0 },
+> +	{ AGILEX5_EMAC_B_FREE_CLK, "emacb_free_clk", NULL, agilex5_emacb_free_mux,
+> +	  ARRAY_SIZE(agilex5_emacb_free_mux), 0, 0xD8, 0, 0x88, 1 },
+> +	{ AGILEX5_EMAC_PTP_FREE_CLK, "emac_ptp_free_clk", NULL,
+> +	  agilex5_emac_ptp_free_mux, ARRAY_SIZE(agilex5_emac_ptp_free_mux), 0, 0xDC, 0, 0x88,
+> +	  2 },
+> +	{ AGILEX5_GPIO_DB_FREE_CLK, "gpio_db_free_clk", NULL, agilex5_gpio_db_free_mux,
+> +	  ARRAY_SIZE(agilex5_gpio_db_free_mux), 0, 0xE0, 0, 0x88, 3 },
+> +	{ AGILEX5_S2F_USER0_FREE_CLK, "s2f_user0_free_clk", NULL,
+> +	  agilex5_s2f_usr0_free_mux, ARRAY_SIZE(agilex5_s2f_usr0_free_mux), 0, 0xE8, 0, 0x30,
+> +	  2 },
+> +	{ AGILEX5_S2F_USER1_FREE_CLK, "s2f_user1_free_clk", NULL,
+> +	  agilex5_s2f_usr1_free_mux, ARRAY_SIZE(agilex5_s2f_usr1_free_mux), 0, 0xEC, 0, 0x88,
+> +	  5 },
+> +	{ AGILEX5_PSI_REF_FREE_CLK, "psi_ref_free_clk", NULL, agilex5_psi_ref_free_mux,
+> +	  ARRAY_SIZE(agilex5_psi_ref_free_mux), 0, 0xF0, 0, 0x88, 6 },
+> +	{ AGILEX5_USB31_FREE_CLK, "usb31_free_clk", NULL, agilex5_usb31_free_mux,
+> +	  ARRAY_SIZE(agilex5_usb31_free_mux), 0, 0xF8, 0, 0x88, 7},
+> +};
+> +
+> +/* SW Clock gate enabled clocks */
+> +static const struct stratix10_gate_clock agilex5_gate_clks[] = {
+> +	/* Main PLL0 Begin */
+> +	/* MPU clocks */
+> +	{ AGILEX5_CORE0_CLK, "core0_clk", NULL, agilex5_core0_mux,
+> +	  ARRAY_SIZE(agilex5_core0_mux), 0, 0x24, 8, 0, 0, 0, 0x30, 5, 0 },
+> +	{ AGILEX5_CORE1_CLK, "core1_clk", NULL, agilex5_core1_mux,
+> +	  ARRAY_SIZE(agilex5_core1_mux), 0, 0x24, 9, 0, 0, 0, 0x30, 5, 0 },
+> +	{ AGILEX5_CORE2_CLK, "core2_clk", NULL, agilex5_core2_mux,
+> +	  ARRAY_SIZE(agilex5_core2_mux), 0, 0x24, 10, 0, 0, 0, 0x30, 6, 0 },
+> +	{ AGILEX5_CORE3_CLK, "core3_clk", NULL, agilex5_core3_mux,
+> +	  ARRAY_SIZE(agilex5_core3_mux), 0, 0x24, 11, 0, 0, 0, 0x30, 7, 0 },
+> +	{ AGILEX5_MPU_CLK, "dsu_clk", NULL, agilex5_dsu_mux, ARRAY_SIZE(agilex5_dsu_mux), 0, 0,
+> +	  0, 0, 0, 0, 0x34, 4, 0 },
+> +	{ AGILEX5_MPU_PERIPH_CLK, "mpu_periph_clk", NULL, agilex5_dsu_mux,
+> +	  ARRAY_SIZE(agilex5_dsu_mux), 0, 0, 0, 0x44, 20, 2, 0x34, 4, 0 },
+> +	{ AGILEX5_MPU_CCU_CLK, "mpu_ccu_clk", NULL, agilex5_dsu_mux,
+> +	  ARRAY_SIZE(agilex5_dsu_mux), 0, 0, 0, 0x44, 18, 2, 0x34, 4, 0 },
+> +	{ AGILEX5_L4_MAIN_CLK, "l4_main_clk", NULL, agilex5_noc_mux,
+> +	  ARRAY_SIZE(agilex5_noc_mux), 0, 0x24, 1, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_L4_MP_CLK, "l4_mp_clk", NULL, agilex5_noc_mux, ARRAY_SIZE(agilex5_noc_mux), 0,
+> +	  0x24, 2, 0x44, 4, 2, 0x30, 1, 0 },
+> +	{ AGILEX5_L4_SYS_FREE_CLK, "l4_sys_free_clk", NULL, agilex5_noc_mux,
+> +	  ARRAY_SIZE(agilex5_noc_mux), 0, 0, 0, 0x44, 2, 2, 0x30, 1, 0 },
+> +	{ AGILEX5_L4_SP_CLK, "l4_sp_clk", NULL, agilex5_noc_mux, ARRAY_SIZE(agilex5_noc_mux),
+> +	  CLK_IS_CRITICAL, 0x24, 3, 0x44, 6, 2, 0x30, 1, 0 },
+> +
+> +	/* Core sight clocks*/
+> +	{ AGILEX5_CS_AT_CLK, "cs_at_clk", NULL, agilex5_noc_mux, ARRAY_SIZE(agilex5_noc_mux), 0,
+> +	  0x24, 4, 0x44, 24, 2, 0x30, 1, 0 },
+> +	{ AGILEX5_CS_TRACE_CLK, "cs_trace_clk", NULL, agilex5_noc_mux,
+> +	  ARRAY_SIZE(agilex5_noc_mux), 0, 0x24, 4, 0x44, 26, 2, 0x30, 1, 0 },
+> +	{ AGILEX5_CS_PDBG_CLK, "cs_pdbg_clk", "cs_at_clk", NULL, 1, 0, 0x24, 4,
+> +	  0x44, 28, 1, 0, 0, 0 },
+> +	/* Main PLL0 End */
+> +
+> +	/* Main Peripheral PLL1 Begin */
+> +	{ AGILEX5_EMAC0_CLK, "emac0_clk", NULL, agilex5_emac_mux, ARRAY_SIZE(agilex5_emac_mux),
+> +	  0, 0x7C, 0, 0, 0, 0, 0x94, 26, 0 },
+> +	{ AGILEX5_EMAC1_CLK, "emac1_clk", NULL, agilex5_emac_mux, ARRAY_SIZE(agilex5_emac_mux),
+> +	  0, 0x7C, 1, 0, 0, 0, 0x94, 27, 0 },
+> +	{ AGILEX5_EMAC2_CLK, "emac2_clk", NULL, agilex5_emac_mux, ARRAY_SIZE(agilex5_emac_mux),
+> +	  0, 0x7C, 2, 0, 0, 0, 0x94, 28, 0 },
+> +	{ AGILEX5_EMAC_PTP_CLK, "emac_ptp_clk", NULL, agilex5_emac_ptp_mux,
+> +	  ARRAY_SIZE(agilex5_emac_ptp_mux), 0, 0x7C, 3, 0, 0, 0, 0x88, 2, 0 },
+> +	{ AGILEX5_GPIO_DB_CLK, "gpio_db_clk", NULL, agilex5_gpio_db_mux,
+> +	  ARRAY_SIZE(agilex5_gpio_db_mux), 0, 0x7C, 4, 0x98, 0, 16, 0x88, 3, 1 },
+> +	  /* Main Peripheral PLL1 End */
+> +
+> +	  /* Peripheral clocks  */
+> +	{ AGILEX5_S2F_USER0_CLK, "s2f_user0_clk", NULL, agilex5_s2f_user0_mux,
+> +	  ARRAY_SIZE(agilex5_s2f_user0_mux), 0, 0x24, 6, 0, 0, 0, 0x30, 2, 0 },
+> +	{ AGILEX5_S2F_USER1_CLK, "s2f_user1_clk", NULL, agilex5_s2f_user1_mux,
+> +	  ARRAY_SIZE(agilex5_s2f_user1_mux), 0, 0x7C, 6, 0, 0, 0, 0x88, 5, 0 },
+> +	{ AGILEX5_PSI_REF_CLK, "psi_ref_clk", NULL, agilex5_psi_mux,
+> +	  ARRAY_SIZE(agilex5_psi_mux), 0, 0x7C, 7, 0, 0, 0, 0x88, 6, 0 },
+> +	{ AGILEX5_USB31_SUSPEND_CLK, "usb31_suspend_clk", NULL, agilex5_usb31_mux,
+> +	  ARRAY_SIZE(agilex5_usb31_mux), 0, 0x7C, 25, 0, 0, 0, 0x88, 7, 0 },
+> +	{ AGILEX5_USB31_BUS_CLK_EARLY, "usb31_bus_clk_early", "l4_main_clk",
+> +	  NULL, 1, 0, 0x7C, 25, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_USB2OTG_HCLK, "usb2otg_hclk", "l4_mp_clk", NULL, 1, 0, 0x7C,
+> +	  8, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPIM_0_CLK, "spim_0_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 9,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPIM_1_CLK, "spim_1_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 11,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPIS_0_CLK, "spis_0_clk", "l4_sp_clk", NULL, 1, 0, 0x7C, 12,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPIS_1_CLK, "spis_1_clk", "l4_sp_clk", NULL, 1, 0, 0x7C, 13,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_DMA_CORE_CLK, "dma_core_clk", "l4_mp_clk", NULL, 1, 0, 0x7C,
+> +	  14, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_DMA_HS_CLK, "dma_hs_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 14,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I3C_0_CORE_CLK, "i3c_0_core_clk", "l4_mp_clk", NULL, 1, 0,
+> +	  0x7C, 18, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I3C_1_CORE_CLK, "i3c_1_core_clk", "l4_mp_clk", NULL, 1, 0,
+> +	  0x7C, 19, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I2C_0_PCLK, "i2c_0_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 15,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I2C_1_PCLK, "i2c_1_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 16,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I2C_EMAC0_PCLK, "i2c_emac0_pclk", "l4_sp_clk", NULL, 1, 0,
+> +	  0x7C, 17, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I2C_EMAC1_PCLK, "i2c_emac1_pclk", "l4_sp_clk", NULL, 1, 0,
+> +	  0x7C, 22, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_I2C_EMAC2_PCLK, "i2c_emac2_pclk", "l4_sp_clk", NULL, 1, 0,
+> +	  0x7C, 27, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_UART_0_PCLK, "uart_0_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 20,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_UART_1_PCLK, "uart_1_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 21,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPTIMER_0_PCLK, "sptimer_0_pclk", "l4_sp_clk", NULL, 1, 0,
+> +	  0x7C, 23, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SPTIMER_1_PCLK, "sptimer_1_pclk", "l4_sp_clk", NULL, 1, 0,
+> +	  0x7C, 24, 0, 0, 0, 0, 0, 0 },
+> +
+> +	/*NAND, SD/MMC and SoftPHY overall clocking*/
+> +	{ AGILEX5_DFI_CLK, "dfi_clk", "l4_mp_clk", NULL, 1, 0, 0, 0, 0x44, 16,
+> +	  2, 0, 0, 0 },
+> +	{ AGILEX5_NAND_NF_CLK, "nand_nf_clk", "dfi_clk", NULL, 1, 0, 0x7C, 10,
+> +	  0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_NAND_BCH_CLK, "nand_bch_clk", "l4_mp_clk", NULL, 1, 0, 0x7C,
+> +	  10, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SDMMC_SDPHY_REG_CLK, "sdmmc_sdphy_reg_clk", "l4_mp_clk", NULL,
+> +	  1, 0, 0x7C, 5, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SDMCLK, "sdmclk", "dfi_clk", NULL, 1, 0, 0x7C, 5, 0, 0, 0, 0,
+> +	  0, 0 },
+> +	{ AGILEX5_SOFTPHY_REG_PCLK, "softphy_reg_pclk", "l4_mp_clk", NULL, 1, 0,
+> +	  0x7C, 26, 0, 0, 0, 0, 0, 0 },
+> +	{ AGILEX5_SOFTPHY_PHY_CLK, "softphy_phy_clk", "l4_mp_clk", NULL, 1, 0,
+> +	  0x7C, 26, 0x44, 16, 2, 0, 0, 0 },
+> +	{ AGILEX5_SOFTPHY_CTRL_CLK, "softphy_ctrl_clk", "dfi_clk", NULL, 1, 0,
+> +	  0x7C, 26, 0, 0, 0, 0, 0, 0 },
+> +};
+> +
+>   static int n5x_clk_register_c_perip(const struct n5x_perip_c_clock *clks,
+>   				       int nums, struct stratix10_clock_data *data)
+>   {
+> @@ -542,11 +913,51 @@ static int agilex_clkmgr_probe(struct platform_device *pdev)
+>   	return	probe_func(pdev);
+>   }
+>   
+> +static int agilex5_clkmgr_init(struct platform_device *pdev)
+> +{
+> +	struct stratix10_clock_data *stratix_data;
+> +	struct device *dev = &pdev->dev;
+> +	void __iomem *base;
+> +	int i, num_clks;
+> +
+> +	base = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(base))
+> +		return PTR_ERR(base);
+> +
+> +	num_clks = AGILEX5_NUM_CLKS;
+> +
+> +	stratix_data = devm_kzalloc(dev,
+> +				    struct_size(stratix_data, clk_data.hws, num_clks), GFP_KERNEL);
+> +	if (!stratix_data)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < num_clks; i++)
+> +		stratix_data->clk_data.hws[i] = ERR_PTR(-ENOENT);
+> +
+> +	stratix_data->base = base;
+> +	stratix_data->clk_data.num = num_clks;
+> +
+> +	agilex_clk_register_pll(agilex5_pll_clks, ARRAY_SIZE(agilex5_pll_clks),
+> +				stratix_data);
+> +
+> +	agilex_clk_register_c_perip(agilex5_main_perip_c_clks,
+> +				    ARRAY_SIZE(agilex5_main_perip_c_clks), stratix_data);
+> +
+> +	agilex_clk_register_cnt_perip(agilex5_main_perip_cnt_clks,
+> +				      ARRAY_SIZE(agilex5_main_perip_cnt_clks), stratix_data);
+> +
+> +	agilex_clk_register_gate(agilex5_gate_clks,
+> +				 ARRAY_SIZE(agilex5_gate_clks), stratix_data);
+> +	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get, &stratix_data->clk_data);
+> +}
+> +
+>   static const struct of_device_id agilex_clkmgr_match_table[] = {
+>   	{ .compatible = "intel,agilex-clkmgr",
+>   	  .data = agilex_clkmgr_init },
+>   	{ .compatible = "intel,easic-n5x-clkmgr",
+>   	  .data = n5x_clkmgr_init },
+> +	{ .compatible = "intel,agilex5-clkmgr",
+> +	  .data = agilex5_clkmgr_init },
+>   	{ }
+>   };
+>   
 
