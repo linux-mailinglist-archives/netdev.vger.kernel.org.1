@@ -1,141 +1,134 @@
-Return-Path: <netdev+bounces-195616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2A2AD17B6
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:22:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E319DAD17B1
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C9577A43F0
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:21:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5D247A43FC
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E083078F4B;
-	Mon,  9 Jun 2025 04:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28351FC0EA;
+	Mon,  9 Jun 2025 04:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="pkipP3zS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlOonVhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CE4B67F
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 04:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749442956; cv=fail; b=QJYC7d0dEPAA241xgvgMaM/fVArja6CCUny6zypzVmalHTUp7yeNJjbNoCDoDJeolgiL4GlNCtHmBMDeahMQ4SCB40JhmVnpNSEDr0zqIjZWWVguYF2Q6lI8H9pL+8HddNanLZ7TJjf0R4cZZ6SmGWFYOcPZpTyV5kNzV15Xp48=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749442956; c=relaxed/simple;
-	bh=7RZknZMr0d1qQJGYoqfi9hGHu17+eYRhoBHvmE8WpiI=;
-	h=From:Date:Subject:Message-Id:To:Cc:MIME-Version:Content-Type; b=pRD3J1Uh5TjTE7x7kG1fE7AGqdjtddMOKV7n2L2eFhPZvDQI7pDIIufCzov4pLu0KqG9uckFhq0EB5BxLh8xgIhmQIkknZhgc2m7BgDM3gBiz72WGKs/e2FCmMuKKZgeupztDvvVtNipHWsHUXOfsBPRAqFiPbvZbATT/ts8AiQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=pkipP3zS; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55940fiP027550;
-	Sun, 8 Jun 2025 21:13:48 -0700
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12on2132.outbound.protection.outlook.com [40.107.243.132])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 475m9d8bqq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 08 Jun 2025 21:13:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=njDraMNt+uxx8stl6GW5+AMNI8wzxi2i86PQJRoN2g2RH6FQXhSyVuEwbdqZh72bRtjnOVO/SddZoxbfdXJdG/6hn5xstQdkVPkeLfD2WvZfB8g1VcD5+NBaoKU96r9g40dxFknAYwBZ/CpbhI8SIN0+acBaE5Us6Y6sT78+H3rZ6NFaxjpzjrC9/sUd72pip1Tzr+84fglCOEnHQspPRBzNz9heoQPQBUpVOvnc2zqstjetLYQJmM1B3uZcYutTjntwjWGlyUydR066vXSUF18LVN5E6UAU3ivAT8Tlm6nOEMtgA47+Ue570QzJcbT/rL0p+jxUNdExTajGojE+Vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7RZknZMr0d1qQJGYoqfi9hGHu17+eYRhoBHvmE8WpiI=;
- b=ePl4mf7SGUKeyH03fILu3PoV0UPbXfFxfZwhIHxoKQAyb4xsgT/B71a2uDlHOGEhseYKpF/w0hb7+IdMNaRtFMc3XmIwZgbx2rscJs8GoIST+4gu8AWDYwBGhWCVFqzYgSf8CwMToSxypc43Pl42r9r9cbJk4Nqz/fch3Q7CSzTiAEDAslaqj939hL11Kb8OIxB043Klv0CHPKduv5Yv5lx0MhA3zETBmpL78kAcRqr1V322daE176w779qUDiygsSnBSmYHcA/NRTIJCXKGIIbDOLQefrp0cLRppNGgLcVJYYu2vREZvBByQFZz2lZM+C4iJ1xh7ptkPq8PJFFydw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7RZknZMr0d1qQJGYoqfi9hGHu17+eYRhoBHvmE8WpiI=;
- b=pkipP3zS0zk7IpV6HSo9NbwPxc+ZlrM+jRam5zmUBt+Lee8omF0KIJkadNzS6ZPdK3NQ8i9FPpp7uINREnn/O7bap9dVktI9nrzfEN3xXKkb92eHayxseVO5P/tbGs80EyQ82no6KsQqVid7BIoyrLx+FRhiGf9SkjjcZJA3uw4=
-Received: from substrate-int.office.com (2603:10b6:f:fc00::aa9) by
- DS4PPF7EE294EC5.namprd18.prod.outlook.com with HTTP via
- DS7PR05CA0058.NAMPRD05.PROD.OUTLOOK.COM; Mon, 9 Jun 2025 04:13:45 +0000
-From: Aakash Kumar Shankarappa <saakashkumar@marvell.com>
-Date: Mon, 09 Jun 2025 04:13:45 +0000
-Subject: Recall: Re: [PATCH] xfrm: Duplicate SPI Handling =?utf-8?b?4oCT?=
- IPsec-v3 Compliance Concern
-Message-Id: <Q3AX2MAKDQU4.SX8SFRJIZ1CP2@bl1ppf25ef7e22a>
-To: netdev@vger.kernel.org
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, akamaluddin@marvell.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746293A1DB;
+	Mon,  9 Jun 2025 04:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749442844; cv=none; b=eVy14TFPvbtj6w6vzm8kaZOcMHdn6WEpse/9YUpakWWusLZkNV61jcZDuDEIbhNziBrvbE4WtBVXJ16wFTpRxT7w+BPrCdzw+fB//JbdLc9tEes0rULbeNwQFsy4FYtOp68N4EyC5po+9JgLWMoQkyarzZluB55HljTIipjJLPM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749442844; c=relaxed/simple;
+	bh=U0lQ7XugEXKGGzfczw8VnB1sNM8SX9qezu7R5K9s8Y0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LfWRLI+W5owohihQT1Q2i8YHJAEn8iC/e+GaVu8FZl7feSuSq56qB9Wb1zOUhOB7UNVwAM0ZgQX56NWGQGB0HJ/Y5/ovxXjqUm0UX64bpGvMHcjOHH0HdxKg9cFRGSSC0F2FVgRRWksni6bDD6dNqKg3OBvPlk88n7kym29w7cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FlOonVhV; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-747e41d5469so4319474b3a.3;
+        Sun, 08 Jun 2025 21:20:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749442843; x=1750047643; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V4URcKEOTtG7gkDcQ+As7WhEjMnb7PTh9qAPDmOqKGs=;
+        b=FlOonVhVY/u8D2jrD1jAnzagfVynPBkBTyfLuMlCqiFnXK43goaLqIG8tjq7LYf86f
+         pxNyeKpnszOdYlUuuWWfVNcLlhsVGj2jAUDAlT6AB8tlISnBXPldbJLMZHO5LUArxH8u
+         lHhWaQmJ775CSqgcHqc0TT8EB1SVA5/xa6h4ZOpsmP9jCaFjkahS8e3bo0amphMKjPyV
+         Cgzu2oCpSgZP4d8QuttRz/WZ/TLyifxn6JSLwZ9GgE0xii1H2MnDqmdLQJQYefwtmNn/
+         Ur2dIE6Qs2ppq3xPK5BcJjQHHWPkfxhuJh/9B6TRZbQSq0koSy8A7G2aWDLKsLDNW10u
+         vn3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749442843; x=1750047643;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V4URcKEOTtG7gkDcQ+As7WhEjMnb7PTh9qAPDmOqKGs=;
+        b=aEvJi5c8FOyBumf7nH2syoa+onYZZ7IF+nEejR9q/jRr52S/oNP2ME0g5U0WoPAmFm
+         cX423xw9G+m0rJYy67McBWp7DRR3pirUFVplQ3L1m159ZulRdLhidOEqAVcWVam3bd3M
+         cPUUqoSEmmFtmC/x9OjdpWH4QHhkECwIGB9+ndaR25CQmNsfWMK9nSUTZJibKVeAQgWT
+         4MMMlUy88dxN2LlqmrIQyY9WYbVaeOlhuZGB744YQ3iOrJmUnbumYLWfgSmVgVdgd40f
+         M9/EaNseeoKIoUbpYyJ+JRYa6bshplhxGzyAew/UXH6glknD/nuAYZQJIYj/Zw37LZ/D
+         zd6A==
+X-Forwarded-Encrypted: i=1; AJvYcCU/vIIVTAjnYtd6f6xAPZ6xtaNAqtmdLMn2/NUBaczcNtIcDr3PsA5LpjAuACSOhu8cj7D4T6VP@vger.kernel.org, AJvYcCXtLXO9X0SiCNBsAmUTJwI7QTEBSThxkhGQconjvrePYGiNkpaJQDboy4aqA94pO8Ge7kw3+e8JTKeCF1I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJtbXpcMIF9mMTTNg4vIMXJ7DBBD2BHad4C9J2Z+qcMDF6Xinz
+	fdyeS38WSG6+REyQm0IRJZqTho5ZnZC5tSDnthPe0czkG0JGY3964cjwCy9z3w==
+X-Gm-Gg: ASbGncuCesICUCz7eLIgS3X5+y+cm3iFgy/Tlj4fA2vCVkdjI+ijhu/K6xHzkN2DpGo
+	kA9/0t61bxbzhpYxYC9crww/4WV/9GQXWhMlREbWGIF1rUCoK0BqadEyEKLMm6xTUCfJaVnWB64
+	Dws1XhkOS7xZX80bzwyE/cwvOkGkUB4++G+k0BTwDZhwjwfOwU/En47KZd7KE3WF9oQ/AR2zkSB
+	kfFGgYJZgx8MpAvCDQ0yK72Wvum3poh46eFHMvnuPyWicKJcp61IxD6o5fVt6C+olwmh80bHk0G
+	MLED2YOHdMtpMNOxcllpj/iwPTQDwaYZe6jCNVjvX1JhQS20NlvK
+X-Google-Smtp-Source: AGHT+IGPvy4kykj0lhb+spVXVfcSeM4rDVBSnkPv1sXyzGwUgPowc1odOEOQkiDn15B6rBudrNukHQ==
+X-Received: by 2002:a05:6a00:1d89:b0:748:2d1d:f7b7 with SMTP id d2e1a72fcca58-7482d1df920mr14224065b3a.21.1749442842714;
+        Sun, 08 Jun 2025 21:20:42 -0700 (PDT)
+Received: from gmail.com ([98.97.41.254])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7483318cc55sm3942180b3a.88.2025.06.08.21.20.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Jun 2025 21:20:42 -0700 (PDT)
+Date: Sun, 8 Jun 2025 21:20:24 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] bpf, sockmap: Fix psock incorrectly pointing
+ to sk
+Message-ID: <20250609042024.ta4fuiogxxklolst@gmail.com>
+References: <20250609025908.79331-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-X-MS-PublicTrafficType: Email
-client-request-id: 19867a7e-8937-81b2-a5ff-d593ae425681
-request-id: 19867a7e-8937-81b2-a5ff-d593ae425681
-X-MS-TrafficTypeDiagnostic: DS4PPF7EE294EC5:EE_MessageRecallEmail
-X-MS-Exchange-RecallReportGenerated: true
-X-MS-Exchange-RecallReportCfmGenerated: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TnNiNGQ5eWEwdkZEdTRZam42NkQvWlZ2YzV3R0Y4ZHdOQm9kZnM3ZjlZb0VG?=
- =?utf-8?B?TG9YNWtTTC96QUhYRE9mMmpaV1ZXb2J3NGwzNHNEcmh3ZDZnTFBPWUo5bjhz?=
- =?utf-8?B?ZU1ZZWNZWFNvWFplcHo1ck9Cd1FiMVVmLzluZk5PaTlGMURlVDlxdElKM2tE?=
- =?utf-8?B?QkRJaVRjcnlIVXZyb0hYeDdYQVhjRDRSd1Ixc21LNWlnZ2w3L1dZZ1NDU0Ix?=
- =?utf-8?B?bUh5YjJWMmZKU0NyQUY1REZrZitETVNvNEVEZVlyTDNjNGp5ak1hMzk5RzJS?=
- =?utf-8?B?VzJFNVlGUzBhYk1iYzFGSmVlOEFjSVZZczlTY0p2RHdOc0trbU1SZXR4c1Az?=
- =?utf-8?B?RzZ4WnIwaG8rTVpnTlBFM1U5Qkw4UEJxMy9CVExCejNvUEk5T1JJelplQXFv?=
- =?utf-8?B?b0lwR05ZQ2ZyeUR3eTBnTDlsc0JQM1VSdVdnS2hKWEpWMHlCeDlsb3BaZzNk?=
- =?utf-8?B?Ym9nUUp2YUJXZGN1dGhtbXRyWHVSNkxhcjBweEhhWXArNnVISW9laWhqYi9P?=
- =?utf-8?B?Nld5dHd2OWZDNXhiemw1M1pkWGRaSHRWUm4wamhsaXVNUDlaUE4rOVZMSWlv?=
- =?utf-8?B?SFVkOHo5M1RRNHNYQUlVN21LQkJ2Si96QjVjTmt0ZEhmUXRQK0JPNmJEa3py?=
- =?utf-8?B?aEFrOXN5dGtvRWppdW03NkdwbzVxZi9Kck1YV29Na2NiOHphVHpSSldkUVF5?=
- =?utf-8?B?aGVsczQ1cGg2Z3pvNldBNDY1MThyMUdzME41dnAwU0hNR1hpdVp0czN5VTBN?=
- =?utf-8?B?WEt3SzJETERITFRCaUtNenRqRVRGM1o1RzZ6L1gyQzRpVi9MdlgzMXdmV3dM?=
- =?utf-8?B?RCtkSDEraEZvMmNPYXF5SUxXMTBKZ0phRVlLTVNDdUJ2RUVZM3U2QXd3ZERK?=
- =?utf-8?B?Z3YvNko5cDBWZDlKMElOc2RFRGJ5SFRmeW5INUtTQ2kwZ1BNc2k2TFE2Tksy?=
- =?utf-8?B?cjhoVjRNSzJYeTNRVW9FZUoxV0x4dUQyalYrQWRDUVJrdXg3R05vU0RTelVo?=
- =?utf-8?B?TitDRkRHUGJRK05sUHhEVi9GMlE2ekhqQURyamJtUEgzV1FmVmV0azREYkhs?=
- =?utf-8?B?bnBBWE45aXU5K0VuYUdjZ1dzL1ppK2R3R2lCRGxDTyttczZucVpHL1VTS0dU?=
- =?utf-8?B?WnNnNVNVa2ZrUngvWDExTmszZ0lZK0tQanllT0JpZ3hOOXo5QWlPWDE0SStO?=
- =?utf-8?B?aTBsWXlCMDVISzN0YWE0Wlc0eWZhVEh3Q2cvRWlHRjMzRUUzYXJrWXc1VWdi?=
- =?utf-8?B?empUM05KK0laa2NIQlMrK3FDd2tXMmQ4eVo0Nk1Dc2gzUGloS0dFaEhaTE13?=
- =?utf-8?B?Y09XK05sVUQxa21ZeXh1U1VrakNGam1Qc2JKUmZaQXRnS21SSWxFL0xDY1Zk?=
- =?utf-8?B?Y2pLQ2E4RkpkMEtadU1menAwZmM4dE5RQk9OWXdTbnhTWEdBQ3NmTSt3VENR?=
- =?utf-8?B?K1NHSXNEdzZINE12b0FMMGFNOVNwTUhYWDl3d3V0MlhTUTBVVjdOMm52ZFdH?=
- =?utf-8?B?bUc2WlluVWRLQ2FQcy8zYUQ4dnBSVTJ2VmZiTG1RcjhuSU1MRVkrSVR6a3pW?=
- =?utf-8?B?cTVHdTVyS1pCZERkcXBUS3dGVkIzdVhOZW9hMkJQNnQzazBmZFJmdDV2T0t2?=
- =?utf-8?B?Q0ZobXluN1lMVkJUdmNhdTJ6MnptL1B1bE50VU1CaTRuRWF2UXl3UTZhZDZl?=
- =?utf-8?B?L20rRytaRXE3Z2FaeVdRZHpncFQ2WEQyUmpseWlNT0JZclQxOW8yMTM4bkhv?=
- =?utf-8?B?NGxXM20rOS9IWEZNWE9aRFZXVXNxRC9pWWw3UHpRUTgzdHpaeVJ3ZUZPa2R2?=
- =?utf-8?B?MC96cy96bEcrcy8rK0pTK3laZFVGSTZpNytYZmFzQXFZekhWWDFWQ3o4TXBB?=
- =?utf-8?B?MUdYOEhmcHBwREE1YWhidG5BSUdMckhxR1NwY3VEQ0dnLzFXUEdvUEhRUU9X?=
- =?utf-8?Q?cgzmOSc4RoE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	EClb306iCOSkPUCVG9uF6R/fm4ZNum9wT2U/2ILpco8JXw+WxhE9boMMq2FsISvTfhDN948CnqfIgjhIW8t/zjgcfQh4xeZ7uncCxLZSZdxDszccCtuYTBo0lIwllPjPAA4bm3zaFbeuAtqf29WeGOajUZjTXY9Ob92g1Ix0sdAkEmxwMvUqrZ8TzCXaqEMUUydD9qYcaOCbwY4G9iSVb2ZQpxr8TEXlQ3ivIZPNdjIYTbUzya3LHEUIA9aZRzxLYRbY+8ptPPKuU8NwyWuFWJNNxyc5RKN9I2cfyyMwzrjB7LijQJeFSFStHk04ik/JoNxUhpxwtZ4nwcjF+U7JNEJXpGy41K5QhEW5r7xmFQa7YZkDfo9zPeoJIfV8mpizQohcWzr4zqtHn84Xcf1Fw7lyW1aDdjZ5YZLIrhoGZe0=
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: HttpSubmission-DS4PPF7EE294EC5
-X-MS-Exchange-CrossTenant-Id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 04:13:45.9417 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id:
-	eb7ec2ef-83e3-412b-f3ed-08dda70c0747
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF7EE294EC5
-X-Authority-Analysis: v=2.4 cv=LI5mQIW9 c=1 sm=1 tr=0 ts=68465f7c cx=c_pps a=CixL6RxEtn7Qem6gLs8pAQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=5KLPUuaC_9wA:10 a=-AAbraWEqlQA:10 a=M5GUcnROAAAA:8 a=WvMNB7J51JmsecufNMgA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=Dah5q-dcpJ0A:10 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: otliwEuRIv0-649lcp69rqnjusVUBsfw
-X-Proofpoint-ORIG-GUID: otliwEuRIv0-649lcp69rqnjusVUBsfw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDAzMSBTYWx0ZWRfX6Lv1pTVfmiHt Rpo62BXI+wnUISvNgDnvf/pKOkZ6Ng7Y/H2M/ZmOrNgu8vQhtQIzU2ATySqVWbTUkgq9mR3pKog yU+/pzx1zyGAJY8i55LQ2spFIaVYcHFFxCl9gumwOdItj/xhWdujcC+EPUKBnQuhT8O9eqzv1Yg
- fym9Q5Y+pTpE0ztriPhLxXFvjdKvil66DQxH7YLEKMUnzl+Nl2ufY3bVe3vnpPugyB0sTDkKB0W qkgwkbSU6t5RAQ7km/4q7JyUBd9TSaL6ubYu/YqEz37dmPQ6as2ZOWVe1fbu5ZArJ4C8pZsRooG WrNpyKLoC3PnFVUu7k6youkpPrmy7xG8wjsX7VJ+Aq33i35JHXIgWZTbNeZjzf5jiZl4QgrMabq
- qH772QUFn+SNSTr1pDumGiBKgsW2hEuqAvfBwYZtG4S46RnfLx5aM6ix33sV74yOrzEW/LkJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-09_01,2025-06-05_01,2025-03-28_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250609025908.79331-1-jiayuan.chen@linux.dev>
 
-saakashkumar@marvell.com would like to recall the message, "Re: [PATCH] xfrm: Duplicate SPI Handling – IPsec-v3 Compliance Concern".
+On 2025-06-09 10:59:08, Jiayuan Chen wrote:
+> We observed an issue from the latest selftest: sockmap_redir where
+> sk_psock(psock->sk) != psock in the backlog. The root cause is the special
+> behavior in sockmap_redir - it frequently performs map_update() and
+> map_delete() on the same socket. During map_update(), we create a new
+> psock and during map_delete(), we eventually free the psock via rcu_work
+> in sk_psock_drop(). However, pending workqueues might still exist and not
+> be processed yet. If users immediately perform another map_update(), a new
+> psock will be allocated for the same sk, resulting in two psocks pointing
+> to the same sk.
+> 
+> When the pending workqueue is later triggered, it uses the old psock to
+> access sk for I/O operations, which is incorrect.
+
+[...]
+
+> 
+> Note: We cannot call cancel_delayed_work_sync() in map_delete() since this
+> might be invoked in BPF context by BPF helper, and the function may sleep.
+> 
+> Fixes: 604326b41a6f ("bpf, sockmap: convert to generic sk_msg interface")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> 
+> ---
+> V1->V2: Use existing flag instead of adding new one.
+> https://lore.kernel.org/bpf/20250605142448.3llri3w7wbclfxwc@gmail.com/
+> 
+> Thanks to Michal Luczaj for providing the sockmap_redir test case, which
+> indeed covers almost all sockmap forwarding paths.
+> ---
+>  net/core/skmsg.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
