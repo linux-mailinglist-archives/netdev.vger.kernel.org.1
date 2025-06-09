@@ -1,115 +1,102 @@
-Return-Path: <netdev+bounces-195742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12DADAD2216
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:15:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38365AD2241
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E0E3A1AB5
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:13:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DE5A3A7629
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF861A2C0B;
-	Mon,  9 Jun 2025 15:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A874620E33F;
+	Mon,  9 Jun 2025 15:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MtYyNbCc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7nVh0kV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1BD55E69;
-	Mon,  9 Jun 2025 15:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756921FF5F9;
+	Mon,  9 Jun 2025 15:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749482000; cv=none; b=JQa5siEZlxVNpVbG85tY/5RssB5Agux43/8pY95KgzcMZHMBiZyGNq82WLqDJmP9HCK5Whh7lXXT3bsJX3LujQhXH32xGkGLPkJatqeumSd9VeYXlzQugYqio2utL8nxr03XHpvioDD67ta1OOuCuE6CneVCdb6V4n6vrhLVJKk=
+	t=1749482424; cv=none; b=ANKSRhay2Z8egt6nmZIRT6lmJ5hXfPblGYf0c2NjXZswMtmx1zGQoJGY8+UjGwYRS3zdu+VW1YJTK3gUNQqRmvs0TQpYPapqbUtvlgNcBy2fK/7rmHVc3h/kCJdITveBhr7gW3nJhFSPhrWtr7Jariy5ya7bdiCbbOrVY4iZ31E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749482000; c=relaxed/simple;
-	bh=KuL9QXFnbjP/6dnmbITZhX26APLbHlD5cgbjI49fUGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NaNZPGwqWPiwuj5Aal9V27C1CsGxQbPfuL+of40lqRKyHSUTTlJDe62w2fD0SQNKSFpP+Gnp7EwMNWG0/Q6GEhosnXvxyRB/egDI55E+0RB2JEeIhDK1NRjf9Ai36jEP3XRN+7kQbAhkKhVeBtaxFr6z8pC+caXZpj2BaGFojrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MtYyNbCc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gqSBvYEPHPitebv2P1vYqvusEdj1tCP+6lQ1cirEEtc=; b=MtYyNbCc0fiTVgvVYWBKHGqS+i
-	8JxYiM6H+jVbkkHdygJCAruCGLEUS12pUfUNI4sBp0U1tG4yB6sZ+IUm3DSdE35d8gbJutci6jTxj
-	EFtec3cdQ5z5CZGDgKcouSAZmkr7KF47BcvSZuTeARGZvl/7UJ8WFt3+TDvVonkwOx4s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uOeBG-00F9zg-2A; Mon, 09 Jun 2025 17:12:58 +0200
-Date: Mon, 9 Jun 2025 17:12:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gal Pressman <gal@nvidia.com>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget evaluation
- strategy
-Message-ID: <cfb35f07-7f35-4c1f-9239-5c35cc301fce@lunn.ch>
-References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
- <8b3cdc35-8bcc-41f6-84ec-aee50638b929@redhat.com>
- <71dc12de-410d-4c69-84c5-26c1a5b3fa6e@nvidia.com>
- <20250609103622.7e7e471d@kmaincent-XPS-13-7390>
- <f5fb49b6-1007-4879-956d-cead2b0f1c86@nvidia.com>
- <20250609160346.39776688@kmaincent-XPS-13-7390>
- <0ba3c459-f95f-483e-923d-78bf406554ea@nvidia.com>
+	s=arc-20240116; t=1749482424; c=relaxed/simple;
+	bh=sUaUR4iSXz3vBAGFwkg3IlGWXLi6RP/yU+4D3g+9NZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GTy4DTQ9r3nJMtkNqLDtV8vhmvcHBDjoGZyYGWa4xGTixvfbSNJTKH4UP9uLdpLoqkuYDpBz9ohIlAUTUd+X8IhicGroYupZ1M7v25h4GS6farzX2b0wnyBUepzFGqoc+mZKfatxyAcgIc2OB2/pN0elpNxGpXjP4itzpcgW9kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7nVh0kV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 657C9C4CEF0;
+	Mon,  9 Jun 2025 15:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749482424;
+	bh=sUaUR4iSXz3vBAGFwkg3IlGWXLi6RP/yU+4D3g+9NZk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W7nVh0kVizSkOEZ3nC7Hqdj053DIZFgYMyFad7S6tGsZrRXqitqx2lUUbvzorqaU3
+	 +Kq4gyqsqsarbYPzB8DUktJmAFZOA2B9EfVbk6Id2tH2Ndj9UkC8haUxkl2fM0VeZl
+	 PSjHpa6y/Y30m4xlFD6fnM0bTWaU+JeXUsjoGvbwAeT9Hl2wyBrSxGrdGyVozkaG0n
+	 y4cEUGs69A8hUc/eOv4QpQlcILkA8EO3VUaILaTIKyP5PA2Gj+7+at5iTno7fdTOTB
+	 4pXAIiPa14/mvlJI3XAtHilSHX4EGIEQ4TOpBGpq/BkpMSzNSV5wK7YAkmRTV+SVPq
+	 EPYBpFQed9POg==
+Date: Mon, 9 Jun 2025 08:20:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Cosmin Ratiu <cratiu@nvidia.com>, "saeed@kernel.org" <saeed@kernel.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "hawk@kernel.org"
+ <hawk@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>, "leon@kernel.org"
+ <leon@kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "edumazet@google.com"
+ <edumazet@google.com>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>, Mark
+ Bloch <mbloch@nvidia.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Gal Pressman
+ <gal@nvidia.com>, "daniel@iogearbox.net" <daniel@iogearbox.net>, Moshe
+ Shemesh <moshe@nvidia.com>
+Subject: Re: [PATCH net-next V2 07/11] net/mlx5e: SHAMPO: Headers page pool
+ stats
+Message-ID: <20250609082022.5ef0c44a@kernel.org>
+In-Reply-To: <c8196bc9-ea3d-4171-b99b-b38898081681@gmail.com>
+References: <1747950086-1246773-1-git-send-email-tariqt@nvidia.com>
+	<1747950086-1246773-8-git-send-email-tariqt@nvidia.com>
+	<20250522153142.11f329d3@kernel.org>
+	<aC-sIWriYzWbQSxc@x130>
+	<2c0dbde8d0e65678eeb0847db1710aaef3a8ce91.camel@nvidia.com>
+	<c8196bc9-ea3d-4171-b99b-b38898081681@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0ba3c459-f95f-483e-923d-78bf406554ea@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> I think that in theory the userspace patches need to be posted together
-> with the kernel, from maintainer-netdev.rst:
-> 
-> 	User space code exercising kernel features should be posted
-> 	alongside kernel patches. This gives reviewers a chance to see
-> 	how any new interface is used and how well it works.
-> 
-> I am not sure if that's really the case though.
+On Sun, 8 Jun 2025 13:09:16 +0300 Tariq Toukan wrote:
+> >> We already expose the stats of the main pool in ethtool.
+> >> So it will be an inconvenience to keep exposing half of the stats.
+> >> So either we delete both or keep both. Some of us rely on this for
+> >> debug
+> >>  
+> > 
+> > What is the conclusion here?
+> > Do we keep this patch, to have all the stats in the same place?
+> > Or do we remove it, and then half of the stats will be accessible
+> > through both ethtool and netlink, and the other half only via netlink?
 
-The ethtool Maintainer tends to wait to the end of the cycle to pick
-up all patches and then applies and releases a new ethtool binary. The
-same applies for iproute2. That means the CI tests are not capable of
-testing new features using ethtool. I'm also not sure if it needs a
-human to update the ethtool binary on the CI systems, and how active
-that human is. Could this be changed, sure, if somebody has the needed
-bandwidth.
+Unfortunately by that logic we would never be able to move away from
+deprecated APIs.
 
-Using the APIs directly via ynl python is possible in CI, since that
-is all in tree, as far as i know. However, ethtool is the primary user
-tool, so i do see having tests for it as useful. But they might need
-to wait for a cycle, or at least fail gracefully until the ethtool
-binary is updated.
+> IIRC, the netlink API shows only the overall/sum, right?
 
-	Andrew
+Wrong.
+
+> ethtool stats show you per-ring numbers, this is very helpful for system 
+> monitoring and perf debug.
 
