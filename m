@@ -1,191 +1,160 @@
-Return-Path: <netdev+bounces-195627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07882AD17F7
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:35:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49D00AD1801
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D52516AC05
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:34:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4330216ADE6
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 04:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6EB283C94;
-	Mon,  9 Jun 2025 04:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40AD27FD4F;
+	Mon,  9 Jun 2025 04:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="NI1fzrF7"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218AF280334;
-	Mon,  9 Jun 2025 04:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EBD19309E;
+	Mon,  9 Jun 2025 04:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749443565; cv=none; b=RyaN+Z1ZmmpOysE4noM77YKG/JS4LZa5hMe6U1eGwHJnrbqJXh9WDA8WXCPe2SAPJOqPeMwFFW8L1dxbHgQJB/fyAJOUl4NBhbLuuuZYq62rBjom7PpkjpEfnGvmxC/SJ+0pGHWz+5l5Z5RwYtR1AHK/3NkgJwTwxEZzpq0WOuI=
+	t=1749443595; cv=none; b=fKwHljEa/gZPcuK5/XP8jI5gyhwsJx/ymuqRMwCNJeARVbh1cpb6JJZg8aJ4EX7SpxlLFamWUO/Pv2C1vGNSch17FdQAOPdlXvpWRqC1YtXj9KIOu+9tboODKM2viT3gjyer568/xs0Ou0vG9sUPCeM6mfrSRTx7TRgT7saents=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749443565; c=relaxed/simple;
-	bh=Lmy+RFwqYXPu6N1bxf4/Xzdmx3q5DYPNxpm9jG4/57A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z9wm0zTthy+Jj9AlVa8gldBINJv95FTeaLEhwgMdgu2rm+F5iBk5l2eDzZXWJdYNF+w7Hxw+U1X2Vfg6Qb/cAOfsnTVwouLaalf6KlE51eer4yHbxvjn+DNp2amOV/VvJUCPG2D4Is9IPoVDQ4Qt+l0X36lP4s2S0/C//EqJP5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-a3-684663e4a09b
-From: Byungchul Park <byungchul@sk.com>
-To: willy@infradead.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	kernel_team@skhynix.com,
-	kuba@kernel.org,
-	almasrymina@google.com,
-	ilias.apalodimas@linaro.org,
-	harry.yoo@oracle.com,
-	hawk@kernel.org,
-	akpm@linux-foundation.org,
-	davem@davemloft.net,
-	john.fastabend@gmail.com,
-	andrew+netdev@lunn.ch,
-	asml.silence@gmail.com,
-	toke@redhat.com,
-	tariqt@nvidia.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	david@redhat.com,
-	lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com,
-	vbabka@suse.cz,
-	rppt@kernel.org,
-	surenb@google.com,
-	mhocko@suse.com,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: [PATCH net-next 9/9] page_pool: access ->pp_magic through struct netmem_desc in page_pool_page_is_pp()
-Date: Mon,  9 Jun 2025 13:32:25 +0900
-Message-Id: <20250609043225.77229-10-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20250609043225.77229-1-byungchul@sk.com>
-References: <20250609043225.77229-1-byungchul@sk.com>
+	s=arc-20240116; t=1749443595; c=relaxed/simple;
+	bh=7+bSEDdkuLIICSf100hVTfZ2IMYgPaUemWV4CuSRMwY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I2j6r1+SUqdEIcwcAgHKQXMSBoqeGt1plpwgeSHBJwnaJQsf+fmGTp/GyRlGkUwq0MxGtMyJL0+wFySkLS3i9AjAIS8bTvoNVyIFW8q+CJtFxWIQQiCpVF5MA6qRM3fQOp7vjklI1j46H3uYLbA64z3FbDgpGz9et8MTPk0vGaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=NI1fzrF7; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1749443595; x=1780979595;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=K1IXsGeOjEMrDiz6/avTqx4a+iEDZuQrzJNH3kyvoUo=;
+  b=NI1fzrF753ZGmjB8gZiWxdHuXcuaonGlved08f0dvwD8n+tAEXKAJgAY
+   eeCwFL+har4LxLOPCifFcaAxL6hUPf2GfNKC9KxToiI9RrgIVm3dP9rnq
+   k0fHDhZuYsS9Am4TiWm/NC1TgytGt3pHsesAp6RdUyNox+Oc8GnCfpDaC
+   jE0Dr/7qyTrfjAPpKPtHLUFa43tU5/7ZtGRsYX411oDVwZ6bXTjk3o3AQ
+   yun51rAnZNUKqrmkc84B+rDPZmdptnbOWCxC3OdXmtNlFushI/MOwFoPZ
+   q/3U+K+dDaInbfLo9WeU7h3P5oi7HWClKA6MeYxITa2g9FZ7/QJ9TOUUh
+   A==;
+X-IronPort-AV: E=Sophos;i="6.16,221,1744070400"; 
+   d="scan'208";a="306689927"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 04:33:14 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:63521]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.98:2525] with esmtp (Farcaster)
+ id 267c9614-9b46-44a6-817f-8e49af2d718e; Mon, 9 Jun 2025 04:33:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 267c9614-9b46-44a6-817f-8e49af2d718e
+Received: from EX19D018EUA004.ant.amazon.com (10.252.50.85) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 9 Jun 2025 04:33:12 +0000
+Received: from dev-dsk-farbere-1a-46ecabed.eu-west-1.amazon.com
+ (172.19.116.181) by EX19D018EUA004.ant.amazon.com (10.252.50.85) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14; Mon, 9 Jun 2025
+ 04:33:09 +0000
+From: Eliav Farber <farbere@amazon.com>
+To: <davem@davemloft.net>, <kuznet@ms2.inr.ac.ru>, <yoshfuji@linux-ipv6.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <sashal@kernel.org>,
+	<edumazet@google.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <stable@vger.kernel.org>, <farbere@amazon.com>
+Subject: [PATCH v2 5.10.y] net/ipv4: fix type mismatch in inet_ehash_locks_alloc() causing build failure
+Date: Mon, 9 Jun 2025 04:32:59 +0000
+Message-ID: <20250609043259.10772-1-farbere@amazon.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUhTYRjHefe+5+y4XJ1m1MmyaBTVUMuweC5KhDDerpLsoi/IMQ9tNT+Y
-	H2mUaC6qpRalqHPaxLKpxWLlXCFRU3KipGnF+tQ0vSojV2NqUZ4k6u7H//l/3DwcVl1gIjlD
-	Ro5oytAa1ayCKD6HN8R81O3Sbw7cjgSb8xYLraF8uDniYcDW4kbwbfqNHAJd3Sw0NgQx2PrN
-	BL47ZzCMPxmVw3DTBIGOc+0YRi/5WCgzz2I443HIYMBdzkDFzA0M7UUjchh6YGPh/a1fDEx4
-	ywj0WJsJDJcnwhP7Ugj2fkLQ5WyXQbC0joWrg3YWxszDCAY7RwnUFpcjcD70MzAbsrGJa+i9
-	5lcyet/6Tk7trlx616GhFv8gpq6WCyx1TV2R07cvO1jqq54l9L4nIKNlJZMs/Tr+mtAvD1+w
-	1HnvBaF99i45DbhWJfMHFdvTRKMhTzRtSkhV6Mdaf8qzyiLyK3zl8iJ0mbegME7g44XQ+Q5k
-	Qdwfnr64UJJZfr3g909jiZfwcUJgtJtYkILD/CQjjNtmZdIhgs8UJp5V/GHCrxMaq32MxEp+
-	m9BWOYnm+1cLrXceYak/bE4f8edIsorfKnifO/C8fbHQU/ORSBY8t+usV0kynkuWtNViaVbg
-	mznBe+0pma9cLjx2+MllxFv/i1v/xa3/xe0ItyCVISMvXWswxsfqCzIM+bG6zHQXmnuQptM/
-	DnnQ1ECKF/EcUocrU6uS9CpGm5ddkO5FAofVS5T88E69SpmmLTgpmjKPmHKNYrYXreCIeply
-	S/BEmoo/qs0Rj4tilmj6e5VxYZFF6Fibp7/CJla+2xh8rNvXtHL3RJU5qy96ES7cMBT5cqiR
-	FkcpNHFRnWtjDpRsSFiZYExJrA3jY2Xvx0KdDaVLDx/ScSl1bG54YZJhf4zPvMOgi6mewXtZ
-	Nxa6a5M1jhBx2w52LqhxX7fsMd+erDGm1g98iH6jOdXeezY1V8OoSbZeG6fBpmztb/NMs34c
-	AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHefeenR1Xi+O0PNSHYlCBpSmkPFCUdH0TunyIAgly2KkNr2w6
-	NJGsSZG6lWlYa9rSNG+0mDO1MmKazgpWmrGu2qbrgpe8ZM0ltRVR3378/7/neb48DJaOUksZ
-	ZVomr0qTp8hoMSXes0EbMZy0QxF1s1cMRnMTDY3fs+HGUJsQjA23Ecx4X4tguquHhuprsxiM
-	jgIKvprnMIx0u0QwWOuh4N6ZVgyuc3YadAU+DKfa6gTQWdErhKe39UIom6vB0Jo/JIL+O0Ya
-	3jX9FILHpqOg11BPwaA+DrpNS2D28SiCLnOrAGaLK2go7TPR4C4YRNDX6aLgykk9AvN9pxB8
-	3410nIxY618KSLvhrYiYLFmkuS6cFDr7MLE0nKWJZeqCiLx5cY8m9ks+irS3TQuITjtOk8mR
-	VxSZuD9Ak+qPXwTEbB2gyBNTl2hfcIJ44xE+RanhVes2JYoV7sZ5UYYuJLvMrhflo/NsIWIY
-	jl3PeYsWFaIghmZXc06nFwc4lI3mpl09VCESM5gdF3IjRp8gUISw6ZznWdlvptiVXPUluzDA
-	EjaWa7k4jgLMscu5xlsPcGB/kD8fcmYGYikbw9me1+E/ejDXe3mYCijYf9dcKQ3E2D+pbbmC
-	zyOJ4T/L8M8y/GeZEG5Aoco0TapcmRITqU5W5KQpsyOT0lMtyP8DtXk/StrQTP9OG2IZJFso
-	SSzfrpAK5Rp1TqoNcQyWhUrYwa0KqeSIPOc4r0o/rMpK4dU2tIyhZGGS+IN8opQ9Js/kk3k+
-	g1f9bQVM0NJ8VJqbm7BmNq7809ptSf1lVbn1u+5q5n/OPD26IiJ8xUzF1eLTGZ74kqH18Q7b
-	xIGQbwtqwuaryFRJkSc42xS1/3py8+6zxoef3avmqysjHMWTH/IiMmtyo7Zv3rJ3rMOreueY
-	cy8+4bt+yKrhvR3WIqPuUWls3cgGV8f7sWXFl7Vz5TJKrZBHh2OVWv4LhMCT+P8CAAA=
-X-CFilter-Loop: Reflected
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+ EX19D018EUA004.ant.amazon.com (10.252.50.85)
 
-To simplify struct page, the effort to separate its own descriptor from
-struct page is required and the work for page pool is on going.
+Fix compilation warning:
 
-To achieve that, all the code should avoid directly accessing page pool
-members of struct page.
+In file included from ./include/linux/kernel.h:15,
+                 from ./include/linux/list.h:9,
+                 from ./include/linux/module.h:12,
+                 from net/ipv4/inet_hashtables.c:12:
+net/ipv4/inet_hashtables.c: In function ‘inet_ehash_locks_alloc’:
+./include/linux/minmax.h:20:35: warning: comparison of distinct pointer types lacks a cast
+   20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+      |                                   ^~
+./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck’
+   26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
+      |                  ^~~~~~~~~~~
+./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp’
+   36 |         __builtin_choose_expr(__safe_cmp(x, y), \
+      |                               ^~~~~~~~~~
+./include/linux/minmax.h:52:25: note: in expansion of macro ‘__careful_cmp’
+   52 | #define max(x, y)       __careful_cmp(x, y, >)
+      |                         ^~~~~~~~~~~~~
+net/ipv4/inet_hashtables.c:946:19: note: in expansion of macro ‘max’
+  946 |         nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
+      |                   ^~~
+  CC      block/badblocks.o
 
-Access ->pp_magic through struct netmem_desc instead of directly
-accessing it through struct page in page_pool_page_is_pp().  Plus, move
-page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
-without header dependency issue.
+When warnings are treated as errors, this causes the build to fail.
 
-Signed-off-by: Byungchul Park <byungchul@sk.com>
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+The issue is a type mismatch between the operands passed to the max()
+macro. Here, nblocks is an unsigned int, while the expression
+num_online_nodes() * PAGE_SIZE / locksz is promoted to unsigned long.
+
+This happens because:
+ - num_online_nodes() returns int
+ - PAGE_SIZE is typically defined as an unsigned long (depending on the
+   architecture)
+ - locksz is unsigned int
+
+The resulting arithmetic expression is promoted to unsigned long.
+
+Thus, the max() macro compares values of different types: unsigned int
+vs unsigned long.
+
+This issue was introduced in commit f8ece40786c9 ("tcp: bring back NUMA
+dispersion in inet_ehash_locks_alloc()") during the update from kernel
+v5.10.237 to v5.10.238.
+
+It does not exist in newer kernel branches (e.g., v5.15.185 and all 6.x
+branches), because they include commit d03eba99f5bf ("minmax: allow
+min()/max()/clamp() if the arguments have the same signedness.")
+
+Fix the issue by using max_t(unsigned int, ...) to explicitly cast both
+operands to the same type, avoiding the type mismatch and ensuring
+correctness.
+
+Fixes: f8ece40786c9 ("tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()")
+Signed-off-by: Eliav Farber <farbere@amazon.com>
 ---
- include/linux/mm.h   | 12 ------------
- include/net/netmem.h | 14 ++++++++++++++
- mm/page_alloc.c      |  1 +
- 3 files changed, 15 insertions(+), 12 deletions(-)
+V1 -> V2: Use upstream commit SHA1 in reference
+ net/ipv4/inet_hashtables.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index e51dba8398f7..f23560853447 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -4311,16 +4311,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-  */
- #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index fea74ab2a4be..ac2d185c04ef 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -943,7 +943,7 @@ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
+ 	nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U) * num_possible_cpus();
  
--#ifdef CONFIG_PAGE_POOL
--static inline bool page_pool_page_is_pp(struct page *page)
--{
--	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
--}
--#else
--static inline bool page_pool_page_is_pp(struct page *page)
--{
--	return false;
--}
--#endif
--
- #endif /* _LINUX_MM_H */
-diff --git a/include/net/netmem.h b/include/net/netmem.h
-index d84ab624b489..8f354ae7d5c3 100644
---- a/include/net/netmem.h
-+++ b/include/net/netmem.h
-@@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-  */
- static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
+ 	/* At least one page per NUMA node. */
+-	nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
++	nblocks = max_t(unsigned int, nblocks, num_online_nodes() * PAGE_SIZE / locksz);
  
-+#ifdef CONFIG_PAGE_POOL
-+static inline bool page_pool_page_is_pp(struct page *page)
-+{
-+	struct netmem_desc *desc = (struct netmem_desc *)page;
-+
-+	return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-+}
-+#else
-+static inline bool page_pool_page_is_pp(struct page *page)
-+{
-+	return false;
-+}
-+#endif
-+
- /* net_iov */
+ 	nblocks = roundup_pow_of_two(nblocks);
  
- DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 4f29e393f6af..be0752c0ac92 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -55,6 +55,7 @@
- #include <linux/delayacct.h>
- #include <linux/cacheinfo.h>
- #include <linux/pgalloc_tag.h>
-+#include <net/netmem.h>
- #include <asm/div64.h>
- #include "internal.h"
- #include "shuffle.h"
 -- 
-2.17.1
+2.47.1
 
 
