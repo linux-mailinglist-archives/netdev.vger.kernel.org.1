@@ -1,78 +1,91 @@
-Return-Path: <netdev+bounces-195819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8730EAD2595
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 20:26:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C857AD259B
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 20:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AFAA7A31DC
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:25:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E753B15D9
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A031321C9F7;
-	Mon,  9 Jun 2025 18:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD0B1B425C;
+	Mon,  9 Jun 2025 18:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LHltyaz7"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="Y9CMZLa2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE34118DB34
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 18:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE311FAA;
+	Mon,  9 Jun 2025 18:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749493583; cv=none; b=SneQbdz3USrEwZk6iik3kR/lR31x0BgDwCvSSlpCIuC9wHwyiQOcZk4rkQA0IrUBFBGqOvJeWRYDZqGjlKxGPadNQHqV+RpVaQzukDCu/cEMm6vDh3GH8K3xkwxaG2+a1wkyfrt2iGabgbb2mcGDqKqI95U6idFR5bHUEfEPyeg=
+	t=1749493813; cv=none; b=fQpqx4gvKdJ9MevLjNt/jui4z8C/lqoS/lhT4qC9T/SDoHnwAogDF4CdUaZuqXhZGq0KsOpSMlA+vEyBfeK3ww/T6n0kk7V+h1vuHeI+erMwpGZuhxeac3mFT+X5gmA6lup7o8nyds0KA/WClssOiiVfxwn6+jcF++EZ+WjpB3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749493583; c=relaxed/simple;
-	bh=L9N3DQyyI8A1MFQof1iKEcUHnCvvPgVn+6xNQ2FM6qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AJ3otWGp9LhCm2BmYLqGR57mtUpQf8ROD7CYdZtmmmKTFncKN9FG/xCmLsSQMAIZotQkKaMlu5PNqQjBIwD/5c0iRkxJbJdvPgK6YW4WEp/C9GX2bXJ45B3IGPHsVl98d6ST0qi+vTiZzEvyBmpV1XJztcqTaFqvWnKhRLnOSsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LHltyaz7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aOISAKpS6ZsSusxHd5GpfiZkoZ76HFNYlOgrmoSxyc8=; b=LHltyaz7vUmitIuButQy2BY7dX
-	Qznxz6vZBkdbNIICyMZu4bASa0SoZWUT+omCnP5RbBXLJLQpOxHsdkVZoY4kvsgRQ/UUJkxP2yp08
-	P+0rVESctbCEdkuq/rl6jhCnMKeT7GRTY5vf/yhVktQ6wXpM1NMT9yGUMs/TnVQ2VeWE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uOhCI-00FBIY-FP; Mon, 09 Jun 2025 20:26:14 +0200
-Date: Mon, 9 Jun 2025 20:26:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [RFC net-next 0/6] net: ethtool: support including Flow Label in
- the flow hash for RSS
-Message-ID: <1eca3a2d-aad2-4aac-854e-1370aba5b225@lunn.ch>
-References: <20250609173442.1745856-1-kuba@kernel.org>
+	s=arc-20240116; t=1749493813; c=relaxed/simple;
+	bh=kjW3bXWtT9KddxypLMRSdi906UpsccRqwwYpDQtcvUo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=T/9dHvXNZk08Bt4GmKNLI7S6BKloY38j/A4277f4KbQ65pSvAYdGZ3KPYnAiVr17h3cEu87+s7rtBZK3dTUACyzguNDEXetrctALAAvXlcOYtB1V0esvlXNHEUIqJOwYJHcyNHbN8ng6wb3JQh0q6fnCiD06QtCOg5Y2Bcj96k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=Y9CMZLa2; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8A51F41AA1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1749493808; bh=XYGYRkyG9IlI4ZNS524wiPaT2tN2DQXtYfqupXo9Sms=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Y9CMZLa294WgXKldnbrEh35bU4APnaG7nk+M8zmqx425Okivh2L2eg/21Yb85JUOs
+	 fLbXebU2jcIhWoZNGYXoIAGCJyiRrZXr7ysc5nyYV9EbfBWEzU44NniApGEYi0G1vm
+	 C3xYeE1f8lRiNgS/SsghKA2EycbugpwFPj7eYsPnZiX/YkCID4YO2sQohuVk86H9bY
+	 zERaN2ovvWVCpN1vfTr859JZgVDAJV+El7rghnoo1EuUZBbsMU1vRAw/HNGuP4QyDY
+	 SY8LSDGvmBamXubCVvYbDqS3z0McmJeWzVKji5xGp7ai47MJGWLOo5nX3CJofxUZoz
+	 gV3U0iRK+63JQ==
+Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 8A51F41AA1;
+	Mon,  9 Jun 2025 18:30:08 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Collin Funk <collin.funk1@gmail.com>, olteanv@gmail.com
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Collin Funk <collin.funk1@gmail.com>
+Subject: Re: [PATCH] docs: packing: Fix a typo in example code.
+In-Reply-To: <e532b992a79999d3405a363db4b2bd4504fed592.1749434907.git.collin.funk1@gmail.com>
+References: <e532b992a79999d3405a363db4b2bd4504fed592.1749434907.git.collin.funk1@gmail.com>
+Date: Mon, 09 Jun 2025 12:30:07 -0600
+Message-ID: <87jz5kbweo.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250609173442.1745856-1-kuba@kernel.org>
+Content-Type: text/plain
 
-On Mon, Jun 09, 2025 at 10:34:36AM -0700, Jakub Kicinski wrote:
-> Add support for using IPv6 Flow Label in Rx hash computation
-> and therefore RSS queue selection.
+Collin Funk <collin.funk1@gmail.com> writes:
 
-It took me a while to get there, i wondered why you are extending the
-IOCTL code, rather than netlink. But netlink ethtool does not appear
-to support ops->set_rxnfc() calls.
+> Fix misspelling of "typedef".
+>
+> Signed-off-by: Collin Funk <collin.funk1@gmail.com>
+> ---
+>  Documentation/core-api/packing.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Documentation/core-api/packing.rst b/Documentation/core-api/packing.rst
+> index 0ce2078c8e13..f68f1e08fef9 100644
+> --- a/Documentation/core-api/packing.rst
+> +++ b/Documentation/core-api/packing.rst
+> @@ -319,7 +319,7 @@ Here is an example of how to use the fields APIs:
+>  
+>     #define SIZE 13
+>  
+> -   typdef struct __packed { u8 buf[SIZE]; } packed_buf_t;
+> +   typedef struct __packed { u8 buf[SIZE]; } packed_buf_t;
+>  
 
-Rather than extend the deprecated ioctl i think the first patch in the
-series should add set_rxnfc() to netlink ethtool.
+Applied, thanks.
 
-	Andrew
+jon
 
