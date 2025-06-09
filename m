@@ -1,133 +1,189 @@
-Return-Path: <netdev+bounces-195696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBB8AD1F08
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:40:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAB3AD1F47
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E013AD5D5
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:40:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00A5816BDB1
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B2E25A2CC;
-	Mon,  9 Jun 2025 13:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4C925A33D;
+	Mon,  9 Jun 2025 13:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Laf5E0Vx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTCSGJld"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243DB25A2A2;
-	Mon,  9 Jun 2025 13:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3878259C93;
+	Mon,  9 Jun 2025 13:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749476413; cv=none; b=HLhIB88l1CTSts9MPrPTceYfh32DPh+qRnkCq02nNsj+oHjd9eunw4pRaJIG4qw5ncw+9h7UYSA8OHDM0DMUnp0Az3mPVZAGxB2WPOERXiXHskzHsuC47LVKTMNEn0Q7HdqQioIRwYDFtkASgnC+p1YEXJ2ZzyxBiB57LbiC49U=
+	t=1749476688; cv=none; b=LfFg43+KyxmtI8swgytFUzCOy8p/GdggRzmQ5pBQEmAuBZzMevN3A2RUjFNvdZ0xOSTiIQMKrYZ4MGNt/ZRg6BPHbjUMNoIrlK7CDfOslv7dEIV+nGnTy/bpXl17been8kYp9qBAwesGtqOsWXLrY0xf208mye5JlKpzz6dscas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749476413; c=relaxed/simple;
-	bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ETEeHsEtTbojDUKF3GifyKc9TgilQ+mps8SF8ZlgWKhe7092tqIpKyuSZA//WTaHk8cKicY+2KKWVPoV/CXkF6kAG/sd+P5YhWzCSFOdKCeFqbCtR2xVDtPz3vnPpHhxm1LBFlogsnXJItCY9fTLx9L9S7fajnCdykmDybYo1ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Laf5E0Vx; arc=none smtp.client-ip=209.85.221.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-53090b347dfso1410532e0c.0;
-        Mon, 09 Jun 2025 06:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749476411; x=1750081211; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
-        b=Laf5E0VxclgjwUI34BI36dDqNDdq7UQOm+xEhbO2mgRNf/JH8biWWxMbti5TOulf8Q
-         GKJ+ewYIW41AAuBo4QkEY6076zTLryGTrt2wEYJ50FwP9UYsDyVcvG+uQXDKNgpkztve
-         7UNc1Omj/1oKSPNU8O3c614TJrMV6mv6F1+l/e7IXXUYcjNGaZdEMFmSfFwXZNf41lJZ
-         MRjMM0ZOcxpElPop3jW+TSwHYBmHg2SRAOZ1TdmTWVjw8UHgF0YtT4BcunLKGvFULkh7
-         FDCCa6a01iQLzBZILcdUbWVYqOu1gutBz4bWpo7g8nAZs5Nd/K0wMXFWrauk4RA9cMDx
-         yYLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749476411; x=1750081211;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
-        b=CqGvGPrSyUY/wieA2qU+G0By/3zdAjUxmUWdmOvUq9Ec520Q8Awcs1eO8scgvL4z1W
-         bu8e1Au5jbzUqCynE6Fp5p14EzjYBQ7mqWR+tUJRuO4GhX+RB7Qb5KuOuuHw49Al1Bnh
-         rq2yft5q+W2bLv0084lPo9ATPskI4RlV6pSp7IX9HNZfUrsBg19FUj9glhVI0c2HGowE
-         n4ZrQSciqcgRlaSHTFW12XdaaYf/Yazod8WjGdUHZ59h7jmaZMYDw/wRFRk7OiFHL7Dk
-         jMPwkqfhcJ7LfLClOJWdZ8I1/yPa2+zBMglN4sdvyZGZpiGRwj1QVxKlwZd+PtT4kMO8
-         RvUw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0yLMDS+u6lBIYA34WFqYX/k/L0ru0/Byk9iUv4zlt3xjD9IneVN9Hxkzn/U4OMlELtIKWs+Cy@vger.kernel.org, AJvYcCXvfeLdxBDag2EwGb+p8xLH8XXJ/b4fmadNTAx5yvH2fshX/61cndgBAJxLFKpcplq5KDJZP+697N74Aqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb2RVm36PS1YrIlWqQNPLaZ8nR1EGHZFJbWqZLv0nfagyhMRnJ
-	VKUZtVKjpnb7Wm9fDP59sM0gRmcQXIigGSjccxkKc2xZdRg+8BfK45OZu8x4gL/3qKzVJw3fivU
-	4fGoGUlvl1vLOKT2c1PHMKFV9RhPso/E=
-X-Gm-Gg: ASbGnctiI8dw1sYED5gzduQydLcmdrzcsBe4SbacFQHr9TfJZ9kA8KUzN2jehNMBIsS
-	7DlLFe7OIjYUNqsCJSDgOQod44/TW01/N1fOhLQGOerpW99DuXR4Gh9ADntVq58wkhG/OSnTpqF
-	1GJeaUk9y3hpjlX6E+AxqKfdFKXt1/3pV2cP0kO/pXoKeL
-X-Google-Smtp-Source: AGHT+IGY6fU6lJ8V5VjYmrvOBlPolfPyq3XHCfqRqIx9PvrE87W7ON5Flq55XC+vB3tO7sziS7pDRkGERLXIw/X3o/Y=
-X-Received: by 2002:a05:6122:201f:b0:526:2210:5b64 with SMTP id
- 71dfb90a1353d-530e48b54efmr10496314e0c.9.1749476410937; Mon, 09 Jun 2025
- 06:40:10 -0700 (PDT)
+	s=arc-20240116; t=1749476688; c=relaxed/simple;
+	bh=tFUG8HzIW//IN/0rdoNVAb1477sL9Oo8/9Wu4zkkaoQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bg0Xv6uuoX3ZN9zzRMiKUZVOG5z0vbQpjclAlKg+NayAfH2+elitWmgxyOZ/1Zr/p7hNGJ0Qc0ElieP7F35S3S/P4vZi4wD1xbI2GUV2LuKK95x0Z6vTjNBdOFhpcPOEwe7lsz9TiBMIkwMhNtVCVNJ3ejJOzsdtEp++4MGObAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTCSGJld; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACC43C4CEF0;
+	Mon,  9 Jun 2025 13:44:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749476688;
+	bh=tFUG8HzIW//IN/0rdoNVAb1477sL9Oo8/9Wu4zkkaoQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DTCSGJldput2Fbz9jvs1YFia3CgR8Lco5/ow8vmEqWU5yKJjCQmQXYM/QWODIB0qq
+	 ++wRV/FmO0CXQD1Do8WNfQAxbB3SCkQPiQo6yDSOlVcTI+h96cOKm+OCB+9aSSN4N6
+	 xdNIeDTqshzNsw5NPlNKm1fblZznAY379UpAIYnZ0toJIVod5/nZXYRFHseErT+Dly
+	 31KG7b61mc+Y0RmeSA7bkArSP4/+aXOkJekD1rizjzPFmBC4jUTXOLHCe7kSK2kBiw
+	 70D+eq54NBTwPOap3GMumprcWMu8/a7eBhH4Wjpsc+fh23toDUcodbuRAdV2P25Pzs
+	 W+YdfGpSPQZcQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Chenyuan Yang <chenyuan0y@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	richardcochran@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 25/35] misc: tps6594-pfsm: Add NULL pointer check in tps6594_pfsm_probe()
+Date: Mon,  9 Jun 2025 09:43:41 -0400
+Message-Id: <20250609134355.1341953-25-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250609134355.1341953-1-sashal@kernel.org>
+References: <20250609134355.1341953-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Xianying Wang <wangxianying546@gmail.com>
-Date: Mon, 9 Jun 2025 21:39:59 +0800
-X-Gm-Features: AX0GCFvxspkhrn78Sa-QcFbj3ft8P-CqaA5D2axID067xmJTtU7TPXtPy7th6SA
-Message-ID: <CAOU40uC6U3PS3cu7RmK71DPA_jbW_ZY0FBkBjCdjVArCiZO-fA@mail.gmail.com>
-Subject: [BUG] WARNING in sendmsg
-To: davem@davemloft.net
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.15.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Chenyuan Yang <chenyuan0y@gmail.com>
 
-I discovered a kernel WARNING described as "WARNING in sendmsg"when
-fuzzing the Linux 6.8 kernel using Syzkaller. This issue occurs in the
-memory allocation path within the sendmsg system call, specifically in
-the __alloc_pages function at mm/page_alloc.c:4545. The warning is
-triggered by a WARN_ON_ONCE assertion in the page allocator during an
-attempt to allocate memory via kmalloc from the socket layer.
+[ Upstream commit a99b598d836c9c6411110c70a2da134c78d96e67 ]
 
-This occurs when invoking sendmsg, which internally attempts to
-allocate memory for socket buffers via sock_kmalloc(net/core/sock.c).
-The allocation triggers a warning due to either an invalid allocation
-context (e.g., atomic context with GFP_KERNEL) or memory pressure
-conditions that violate allocation constraints.
+The returned value, pfsm->miscdev.name, from devm_kasprintf()
+could be NULL.
+A pointer check is added to prevent potential NULL pointer dereference.
+This is similar to the fix in commit 3027e7b15b02
+("ice: Fix some null pointer dereference issues in ice_ptp.c").
 
-This may be triggered by an unusual runtime state induced by the
-fuzzing program =E2=80=94 such as mounting a compressed ext4 filesystem via
-loop device, performing ptrace and socket operations, and using
-certain sysctl interfaces. This combination may have placed the system
-in a constrained memory context, causing __alloc_pages to emit a
-warning.
+This issue is found by our static analysis tool.
 
-I recommend reviewing the use of kmalloc in sock_kmalloc, particularly
-the GFP flags used under socket send operations, and whether the call
-can occur in atomic or memory-constrained contexts. It may be
-necessary to guard such allocations or use GFP_ATOMIC where
-appropriate.
+Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+Link: https://lore.kernel.org/r/20250311010511.1028269-1-chenyuan0y@gmail.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-This can be reproduced on:
+**YES**
 
-HEAD commit:
+This commit should be backported to stable kernel trees. Here's my
+detailed analysis:
 
-e8f897f4afef0031fe618a8e94127a0934896aba
+## Analysis
 
-report: https://pastebin.com/raw/DJLgSX8N
+### 1. Bug Fix Nature
+This commit fixes a clear NULL pointer dereference vulnerability. The
+`devm_kasprintf()` function can return NULL on memory allocation
+failure, and the code was not checking this return value before using
+`pfsm->miscdev.name`. This would lead to a NULL pointer dereference when
+`misc_register(&pfsm->miscdev)` is called at line 302.
 
-console output : https://pastebin.com/raw/DLirgK1i
+### 2. Code Analysis
+Looking at the specific changes in `drivers/misc/tps6594-pfsm.c`:
 
-kernel config : https://pastebin.com/raw/aJ9rUnhG
+**Before the fix (lines 282-283):**
+```c
+pfsm->miscdev.name = devm_kasprintf(dev, GFP_KERNEL, "pfsm-%ld-0x%02x",
+                                    tps->chip_id, tps->reg);
+```
 
-C reproducer : https://pastebin.com/raw/EXf8Gc4A
+**After the fix (lines 282-286):**
+```c
+pfsm->miscdev.name = devm_kasprintf(dev, GFP_KERNEL, "pfsm-%ld-0x%02x",
+                                    tps->chip_id, tps->reg);
++if (!pfsm->miscdev.name)
++    return -ENOMEM;
+```
 
-Let me know if you need more details or testing.
+The fix adds essential NULL pointer checking that prevents potential
+kernel crashes.
 
-Best regards,
+### 3. Comparison with Similar Commits
+This fix follows the exact same pattern as the reference commits marked
+as "Backport Status: YES":
 
-Xianying
+- **Similar Commit #1 (ipmi)**: Same issue with `devm_kasprintf()` not
+  being checked
+- **Similar Commit #2 (mfd: tps6594)**: Same issue, even in the same
+  TPS6594 subsystem
+- **Similar Commit #4 (ice)**: Same issue, explicitly referenced in the
+  commit message
+
+All these similar commits were deemed suitable for backporting because
+they fix the same fundamental issue.
+
+### 4. Risk Assessment
+- **Minimal risk**: The fix is a simple 2-line addition that only adds
+  error checking
+- **No side effects**: The change doesn't alter functionality, only
+  prevents crashes
+- **Contained scope**: Only affects the TPS6594 PFSM driver
+  initialization path
+- **No architectural changes**: Doesn't modify any interfaces or major
+  logic
+
+### 5. Stability Criteria Met
+- ✅ **Important bug fix**: Prevents kernel NULL pointer dereference
+  crashes
+- ✅ **Minimal and contained**: Only 2 lines added for error checking
+- ✅ **Low regression risk**: Cannot introduce new issues, only prevents
+  crashes
+- ✅ **Clear fix**: Addresses a well-defined problem with obvious
+  solution
+
+### 6. Driver Context
+The TPS6594 PFSM driver was introduced in kernel v6.10, making it a
+relatively recent addition. The driver handles power management for TI
+PMIC devices, making reliability crucial for system stability.
+
+### 7. Static Analysis Tool Finding
+The commit message mentions this was found by static analysis, which
+indicates it's a real potential issue that could manifest under memory
+pressure conditions.
+
+This commit clearly meets all the criteria for stable tree backporting:
+it's a small, contained fix for an important potential crash bug with
+minimal risk of regression.
+
+ drivers/misc/tps6594-pfsm.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/misc/tps6594-pfsm.c b/drivers/misc/tps6594-pfsm.c
+index 0a24ce44cc37c..6db1c9d48f8fc 100644
+--- a/drivers/misc/tps6594-pfsm.c
++++ b/drivers/misc/tps6594-pfsm.c
+@@ -281,6 +281,9 @@ static int tps6594_pfsm_probe(struct platform_device *pdev)
+ 	pfsm->miscdev.minor = MISC_DYNAMIC_MINOR;
+ 	pfsm->miscdev.name = devm_kasprintf(dev, GFP_KERNEL, "pfsm-%ld-0x%02x",
+ 					    tps->chip_id, tps->reg);
++	if (!pfsm->miscdev.name)
++		return -ENOMEM;
++
+ 	pfsm->miscdev.fops = &tps6594_pfsm_fops;
+ 	pfsm->miscdev.parent = dev->parent;
+ 	pfsm->chip_id = tps->chip_id;
+-- 
+2.39.5
+
 
