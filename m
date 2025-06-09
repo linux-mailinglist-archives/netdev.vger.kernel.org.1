@@ -1,80 +1,145 @@
-Return-Path: <netdev+bounces-195744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E095AD2248
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:22:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66649AD2251
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C70673A2239
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:21:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C37D164E27
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84091A23A2;
-	Mon,  9 Jun 2025 15:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AF61A2C0B;
+	Mon,  9 Jun 2025 15:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPnLMRsZ"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Z4VW/vvC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A95619992D;
-	Mon,  9 Jun 2025 15:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA401DA5F;
+	Mon,  9 Jun 2025 15:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749482514; cv=none; b=XqXAsoSlNr08X+pULI8Fb5J1+mPPCCkHnxrWWRnDl+/c/N8Fs8pOncwyZQALdQ8RwKBNJhx+9oCD0gwLLy5yJVdBSKe/iWErWzLiR/0t/UAnZ6k0S5AWE3YERUbK2aoj4PKlunQjofEJTRxQHQMZ/VJNwt/mlrfKmnzxsGNCEZE=
+	t=1749482630; cv=none; b=FgMI42nNoKJzUWRfuhwCauisHWErLfRLETaYyLSqq/7DlGwY3Z9OSbSqvWjSFA9bLj8JV+ske4h4cVmr1HIyFpUVrzrP3gCv6bXjZ+ZH0keFoxc8oUTxHPf3HZaVHeJgYjTANKbqgrq7L9SpmHaQ34G5TTszL2gp3FK2WHXGaHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749482514; c=relaxed/simple;
-	bh=RAIZr91P52A43t1NLsPlreqriBfynim6B6+rykmjSu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lDqtxhsWZSQSfUrcmfZzIuFmopZIS7pvChquHdhwZ4T6IDsiwJqIn9MXbV1n0woLHBnjcb7ga/eykAIWYVd2BaU2ETbrx7TMMd1jhIkCjzF/yXFPKqpvgTcm/oCRBLrHvI2QZtfxQZaOCYbH3i6I70eppbCbbHflVthfyCQnRt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPnLMRsZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D931C4CEEB;
-	Mon,  9 Jun 2025 15:21:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749482514;
-	bh=RAIZr91P52A43t1NLsPlreqriBfynim6B6+rykmjSu8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QPnLMRsZVXoD9cUFtGg3aWli2wJ0wmm2pflTfFNeWsVVVs4OGLd+wK2wE0K4y27CD
-	 jzROgPEOCf7Hn5zEg+KX25MgN8wfi8RxktENKFJiArT3aRv4m2N/203ZIIpaXUsJOn
-	 IIln02tuIC5/0MkJXoUUL8vhl4HNTR2yhzEZkeSHmMmZxngL5OlkdhqX+T5gZRyONm
-	 VlQ73VKgKQiyBJ9ydOvweJYSuREDNy408GbccYzyXE0lWrIFb2cSUG11Zb6Q+sb+4n
-	 TgAKe4U749EnqQZblQcUm4ipDOZHqI2OHrlbmxEovoSCFP2LkCuTV4220nnOLn/fHs
-	 416eyT7/qJ3dA==
-Date: Mon, 9 Jun 2025 08:21:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, <saeedm@nvidia.com>, <gal@nvidia.com>,
- <leonro@nvidia.com>, <tariqt@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Simon Horman <horms@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, "Alexei Starovoitov" <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, "Jesper Dangaard Brouer"
- <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>, Dragos Tatulea
- <dtatulea@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next v3 07/12] net/mlx5e: SHAMPO: Headers page pool
- stats
-Message-ID: <20250609082152.29244fca@kernel.org>
-In-Reply-To: <20250609145833.990793-8-mbloch@nvidia.com>
-References: <20250609145833.990793-1-mbloch@nvidia.com>
-	<20250609145833.990793-8-mbloch@nvidia.com>
+	s=arc-20240116; t=1749482630; c=relaxed/simple;
+	bh=BdUcjRRvSLLWka5U57jJO0G2e7/tVuCHFhZgA60z8WQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kU1+vo9mlIhQjnSrNxKKyyfVe7q4XW3Sypf5rI3h7jEGhPybTBa0FZ8qwdvS0f62VR8MZfaMEBg3z6BddoSNkGcfOpWP59plCEuDLAbPKG5fk031MqCByubgAgWCSqjTEZ+JXPN4RAWwO5IObDeQuhBPvK32WlQQFqVcqZor1tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Z4VW/vvC; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=+I81mYkss4iXVd4qqii/+SHPD2opsMDFxEhS0MTaCiU=; b=Z4VW/vvC7ZkXwX5g
+	ZtTn5VRZoVgaTjx/22DfXa1xQKyC6oFuilWqYVFgubtXN+cRloARdhpibFD4ptewCF/P0aVTnQVMb
+	iGugiQmA8lzVL/onD14CiPqwLFkSPWKbUo2DBMDwIv04xNUcPeoFmFbpLpFSvKGw/y6bsFafhEl9+
+	muzYccoDuWLX6kXRJkGO62Aot2N6lAJ5mR4FX1Lq4UaWVfK6EtDmgBm5Z1Jtpk5rBNAv/pYiT1NGw
+	jg0fF4WE9bPWutuIXQVAC65cTKfUSSoG2FUeYpKXNNHzXs3qisR2ldNElv0Qlj/EmccM46SPaK2Bb
+	0paOPIHA+FYVM6NM9g==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1uOeLT-008QN5-0J;
+	Mon, 09 Jun 2025 15:23:31 +0000
+From: linux@treblig.org
+To: bharat@chelsio.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] cxgb3/l2t: Remove unused t3_l2t_send_event
+Date: Mon,  9 Jun 2025 16:23:30 +0100
+Message-ID: <20250609152330.24027-1-linux@treblig.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 9 Jun 2025 17:58:28 +0300 Mark Bloch wrote:
-> Expose the stats of the new headers page pool.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Y'all asked for clarifications on this patch 2 weeks after v2 was
-posted and then reposted v3 before I could answer. This patch must go.
+The last use of t3_l2t_send_event() was removed in 2019 by
+commit 30e0f6cf5acb ("RDMA/iw_cxgb3: Remove the iw_cxgb3 module from
+kernel")
+
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/net/ethernet/chelsio/cxgb3/l2t.c | 37 ------------------------
+ drivers/net/ethernet/chelsio/cxgb3/l2t.h |  1 -
+ 2 files changed, 38 deletions(-)
+
+diff --git a/drivers/net/ethernet/chelsio/cxgb3/l2t.c b/drivers/net/ethernet/chelsio/cxgb3/l2t.c
+index 9749d1239f58..5d5f3380ecca 100644
+--- a/drivers/net/ethernet/chelsio/cxgb3/l2t.c
++++ b/drivers/net/ethernet/chelsio/cxgb3/l2t.c
+@@ -176,43 +176,6 @@ int t3_l2t_send_slow(struct t3cdev *dev, struct sk_buff *skb,
+ 
+ EXPORT_SYMBOL(t3_l2t_send_slow);
+ 
+-void t3_l2t_send_event(struct t3cdev *dev, struct l2t_entry *e)
+-{
+-again:
+-	switch (e->state) {
+-	case L2T_STATE_STALE:	/* entry is stale, kick off revalidation */
+-		neigh_event_send(e->neigh, NULL);
+-		spin_lock_bh(&e->lock);
+-		if (e->state == L2T_STATE_STALE) {
+-			e->state = L2T_STATE_VALID;
+-		}
+-		spin_unlock_bh(&e->lock);
+-		return;
+-	case L2T_STATE_VALID:	/* fast-path, send the packet on */
+-		return;
+-	case L2T_STATE_RESOLVING:
+-		spin_lock_bh(&e->lock);
+-		if (e->state != L2T_STATE_RESOLVING) {
+-			/* ARP already completed */
+-			spin_unlock_bh(&e->lock);
+-			goto again;
+-		}
+-		spin_unlock_bh(&e->lock);
+-
+-		/*
+-		 * Only the first packet added to the arpq should kick off
+-		 * resolution.  However, because the alloc_skb below can fail,
+-		 * we allow each packet added to the arpq to retry resolution
+-		 * as a way of recovering from transient memory exhaustion.
+-		 * A better way would be to use a work request to retry L2T
+-		 * entries when there's no memory.
+-		 */
+-		neigh_event_send(e->neigh, NULL);
+-	}
+-}
+-
+-EXPORT_SYMBOL(t3_l2t_send_event);
+-
+ /*
+  * Allocate a free L2T entry.  Must be called with l2t_data.lock held.
+  */
+diff --git a/drivers/net/ethernet/chelsio/cxgb3/l2t.h b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
+index 646ca0bc25bd..33558f177497 100644
+--- a/drivers/net/ethernet/chelsio/cxgb3/l2t.h
++++ b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
+@@ -113,7 +113,6 @@ struct l2t_entry *t3_l2t_get(struct t3cdev *cdev, struct dst_entry *dst,
+ 			     struct net_device *dev, const void *daddr);
+ int t3_l2t_send_slow(struct t3cdev *dev, struct sk_buff *skb,
+ 		     struct l2t_entry *e);
+-void t3_l2t_send_event(struct t3cdev *dev, struct l2t_entry *e);
+ struct l2t_data *t3_init_l2t(unsigned int l2t_capacity);
+ 
+ int cxgb3_ofld_send(struct t3cdev *dev, struct sk_buff *skb);
 -- 
-pw-bot: cr
+2.49.0
+
 
