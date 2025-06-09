@@ -1,137 +1,196 @@
-Return-Path: <netdev+bounces-195812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CB7AD251D
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:39:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C716CAD251C
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9BAF3B0A4E
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:39:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 507F11891214
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A4321C189;
-	Mon,  9 Jun 2025 17:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A894021CA14;
+	Mon,  9 Jun 2025 17:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dy59W2SO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UxFchhEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF8E215766;
-	Mon,  9 Jun 2025 17:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2571621B8E0
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 17:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749490775; cv=none; b=plTu0aNjdchS0adbc8wVh8LvOmZ6iqdoayrZMV+DH+m+tCWjYtuKajJCrY77Gc7ZxeTrx+cJCJuX/gNe08uv0YyuTVeRIcA4mVJU5J55hg6IjP9lJ3sumtFqIMdHkJFw3Ha4+XMAkq3KhNMssUBdX/+sk90cw0MpDwDvkbs1iDE=
+	t=1749490762; cv=none; b=l8Ac4p79o2Z4ElY/zvzpxVLLoxzxeyzYXX4h05F2IpgJ9t9UC9UsHkygOoRCyC8IOxEJx8TtVeJzsoidUD0CwbOYzczVa9XPiiz59FfDtM/zplxRQdDIfQAcFB38vSiMXcMxDKu6yVgoR101z8IXH2uFLo7ZypF+PRnYHWFP0MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749490775; c=relaxed/simple;
-	bh=o3PREeO4DOrU7ekFiopqC8hOe4/3H9IhP7e2Wtv14rU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sF9Tazj+qj3rdV8Sh/Ag7Za0hJbIJjvKBzJuATdYomMT4RLGRJKv082Vf3Zf1jkYslRkRWQgEfM27jPQoGSRsC7AkqUUh181016exRrr+p9nPZTB80aKoz2VuDPm9JHX+9ILnsW3Y35tONVqk2JODENWEoGbXvLtfoJYSWDa9nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dy59W2SO; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af6a315b491so3823621a12.1;
-        Mon, 09 Jun 2025 10:39:34 -0700 (PDT)
+	s=arc-20240116; t=1749490762; c=relaxed/simple;
+	bh=vDEZLmFiWUgAEhhMnpPxC2x5ptegpxqcBtIXF4EgUvw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YsXgY305aCei+tgclDhHkiU5JquwRqeRxVYT+zXyqngronI/YKVP8F0VXqz34ps2xuE2nkVb5eN4LQdL2OQib8Eem/uM1W/XLP3FP9EDiHll035KsaD3W9kAB76WluBS4EisQx5euoqX60Ey+Hc6iM6UC+iv5r0bPuFyLwYmbxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UxFchhEB; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2357c61cda7so13255ad.1
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 10:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749490774; x=1750095574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mIBPFAGPp8hXcKc/4wwQc/egzYY6bQX2XSKLxjUmpLY=;
-        b=dy59W2SOtAoihFrxYMkHPqTudxgPI0YZ5ToYCUvHlzm4JE5mbuEHFnxyKgrnguGxh8
-         mhkvwIxTpLTAjT3AHlVfCq7n2s29VM2C0WkSe/Lxigb15e3VBjcSDuHwHHEgioi7YIe8
-         OUM9FUFveb32hSxrgBhHCQwGX7x5Xwc3y5MBukctKoRmtVuaPVNs6jAsT7FGUGKCYkJB
-         wbpTzB4ykGHRGjiMk44hlMbZsfmMb8TO1Xsw6Gk0yi0TBrHHICY0sglYu7RH1L/I4ddQ
-         osYeWAh+99N5NNqVS2DS47ZxNmlcFuPEiVYxaDM3m5DEpVWjw+V+9A6yQ+KL8Q8KhTEx
-         rq+w==
+        d=google.com; s=20230601; t=1749490759; x=1750095559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9RRpRkvuNJy3cXkOhH8biChoDOFuxh8lZ/u2fpQqLzg=;
+        b=UxFchhEB/EOTc0w70KhZaY15W09uYu6jXZOdr2ase+hIfTCPnYc/ZCm8tpKuJPWiOY
+         xZJfxn+61Ida+6G3EvB/BAOPBOyt9hI4GgbeyzuBG9TCxdpv0yWiNx+10mK38OG8e0YT
+         njTgmMc4zguYLqaxNenGblIq6z0Z8wqh9hm59Kfbjy+dkQUMe6KED7usY9RvlBxgF+3i
+         pCE1id1SQeHxgEQygp3chDNtfyiTg+MIK2RFk9nxvVh6TbdJiCQv8iz16M15ZPipF32q
+         Gs6Q9ysEJjPpaVmI39FOiyCGGRz2hKEMgb7wWg+9x67ahJ6X0DcMqFebPc/FxvZhcJM1
+         zfTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749490774; x=1750095574;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mIBPFAGPp8hXcKc/4wwQc/egzYY6bQX2XSKLxjUmpLY=;
-        b=XgMClZGbmVuabbM+1YxQIKbPT2RXYa/+jPKI4YAWDQZVUqcIpHzsrjeW6X6gy8Due3
-         ELrCemVxZELsGydFGdZLz9Ws3OQF3lmFRw+WYiU4pb8zrS9jhtf9u+F5GzVsTlkYjMgI
-         lFE5URYYXZ8zwwZr3+GxBGeiFa9YrSwjoEUMAyvbvocwALtSvX7hd2GySle+sGbq85UU
-         WKFoFsadEQxKiCc3cyidmWu3jY0o0WYMLmyqHAv7RQTHxrbS8G8IzzDf4d9Z4HkaXXtm
-         mVZccHxWE8d1OGwLAS7zpNnPoPz9E6XjdYt/0iBglD1zVelw6P1icmmv2l0DQYpnft3f
-         teqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXTsGRkONW2Jd+zyIJb9nxwDUCH29MJdJAUETO0AcAqshW/f8+JYRiEdhGxp5G4Bsn2ldYqAAEYAUFu5CB@vger.kernel.org, AJvYcCWy3+YqebpI3kRA/Oxi70hGk4fgjlMQqMnbGtnCSMo7GRHOZNahR1GgoUBW4mmRsOiI67I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHLWjh0rMtPSuF+kv5PnXILbmY6RawD/FaaRaqNnckhSW450fA
-	+cW95V3xAu0Xtt7punVgjpLgdbTG/bT7lXGANcQm58tU4pQPR0UU5Yo=
-X-Gm-Gg: ASbGnctmkBNjc8qhGl4Tn7WFx0izkPDUWGHxlsXqTlXl++PfAdqfbEl05RMGgLjNzOI
-	9wXtrpi13x12SZeKsUg6ghyIPc7tRf9MMng7dr5E3TcaliY0B2LK0EOKIgDh8ez0xgOjRfiLZpF
-	cG1kywlbGatH5cAZHIpwb31+7cO018M8c3mkmfW+Gye4jT9fJ7HFli6tDXzY6RUSGtGlneGavDr
-	RqUrRNbv+78wdNtH9dx7YuYzVy8auLvoxtt1K4vol+5iS6lIAKTNnK2oqCImtctay1P//iKgRBM
-	qxdZguvOFsm0Ex7oJ7LZsqpzIsz8B7gJZQKEirX48U1z4tPdBTr4r/j84uT/wtCT85sTq2s=
-X-Google-Smtp-Source: AGHT+IE9KMa9l69eTnubbzgLEvHrPpwQoVF8z70wRp8ljIOdlocN91B1ZfBA3RHHH+CFtn5cN1pZAw==
-X-Received: by 2002:a05:6a20:160e:b0:20b:9774:ac6c with SMTP id adf61e73a8af0-21ee6853262mr16219357637.5.1749490773373;
-        Mon, 09 Jun 2025 10:39:33 -0700 (PDT)
-Received: from debian.ujwal.com ([223.185.129.95])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482b0c212fsm6180691b3a.135.2025.06.09.10.39.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 10:39:33 -0700 (PDT)
-From: Ujwal Kundur <ujwal.kundur@gmail.com>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	aoluo@google.com,
-	jolsa@kernel.org
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ujwal Kundur <ujwal.kundur@gmail.com>
-Subject: [PATCH] bpf: cpumap: report Rx queue index to xdp_rxq_info
-Date: Mon,  9 Jun 2025 23:08:52 +0530
-Message-Id: <20250609173851.778-1-ujwal.kundur@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        d=1e100.net; s=20230601; t=1749490759; x=1750095559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9RRpRkvuNJy3cXkOhH8biChoDOFuxh8lZ/u2fpQqLzg=;
+        b=azVJuHzlwT7kdWdbc9TKXZmcLTwZ5MrMwG1HrweyuBkhI2LxnaFVbuncf/iucRkZcu
+         pwi3dVw5o9MfQBCSQBy+Juhj1h2z7JW4PUizWZvGemIlDaeNs5S0Z30czuzlaMCV5p/E
+         kRj1dKrrsnT1vbPoMth7AsxN4jc0dJVmdl1z/1ZW1FvXfp+Wcccv27QPJj7laxPKAm9r
+         Bz+MOitp66PTkiJqjZUOFbjr0b9aCDaeyOkCPbeDuPWWEUJvXUsTnL0NkdZekk8/GgiP
+         AGRY0JBlhC8cLViWxPA6yavqV0jqfe6u0hHeM4zf5MlHGSBkN2PcZJCX7CgblmhF8thw
+         gfRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWh1duPFyb3CyjLicuPetbO6Tq10f+f8w42fY+rV32t3I7veLDzDe4gJ19mmb+gKBB//kO44v0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRHzxdxiJjKkVAMoWvWurjWwIhAiTesBaBtRSgTUWtYnxnsCSb
+	/ta9ss1bDJ72BileYSNsMNNWQxU2CVY/X1oqI/fI368B7nd6ZjT4OrniP6rr0B81NwE/nOD/KoI
+	8IJMtz63rKvHrpdDYkutugPyLEXJ3+dcIgxAiWS6z
+X-Gm-Gg: ASbGncstIyRRNz+Wg2OGgfafwW0VjcOQLgPy+DTLIR0zhiAlQpMoAQpbXR5LLUiRVMl
+	ts8l2YV13FPiLaobRljUeDVlg51bk9JkXe6PcHKmAN1ZbRm7JtLO+2lJBpL5CvkQrERjLgRyKeu
+	vB3mBvMkpEbxJmKFPEO+quwPVOJ747+NNoepEw4FuP3PPbG/x269YtI3hXSUI5yPKWz2NkJiK6/
+	w==
+X-Google-Smtp-Source: AGHT+IEvrq24XpltBFWvdSIlKpCIc8JCZdMNJ6F/M800m9IOuRhKavTYagOECC3DsNK5G3lKUSM8nYe/B6o3T3jdn9Q=
+X-Received: by 2002:a17:902:e745:b0:231:ed22:e230 with SMTP id
+ d9443c01a7336-23613de3742mr5147245ad.15.1749490759104; Mon, 09 Jun 2025
+ 10:39:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250609043225.77229-1-byungchul@sk.com> <20250609043225.77229-10-byungchul@sk.com>
+In-Reply-To: <20250609043225.77229-10-byungchul@sk.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 9 Jun 2025 10:39:06 -0700
+X-Gm-Features: AX0GCFuAdxMyfuOpDJOl1NBEK5X2zXvXF5ManUgjd3SO6IAFQ752DFSmiJ8__HE
+Message-ID: <CAHS8izMLnyJNnK-K-kR1cSt0LOaZ5iGSYsM2R=QhTQDSjCm8pg@mail.gmail.com>
+Subject: Re: [PATCH net-next 9/9] page_pool: access ->pp_magic through struct
+ netmem_desc in page_pool_page_is_pp()
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
+	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
+	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Refer to the Rx queue using a XDP frame's attached netdev and ascertain
-the queue index from it.
+On Sun, Jun 8, 2025 at 9:32=E2=80=AFPM Byungchul Park <byungchul@sk.com> wr=
+ote:
+>
+> To simplify struct page, the effort to separate its own descriptor from
+> struct page is required and the work for page pool is on going.
+>
+> To achieve that, all the code should avoid directly accessing page pool
+> members of struct page.
+>
+> Access ->pp_magic through struct netmem_desc instead of directly
+> accessing it through struct page in page_pool_page_is_pp().  Plus, move
+> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
+> without header dependency issue.
+>
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  include/linux/mm.h   | 12 ------------
+>  include/net/netmem.h | 14 ++++++++++++++
+>  mm/page_alloc.c      |  1 +
+>  3 files changed, 15 insertions(+), 12 deletions(-)
+>
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index e51dba8398f7..f23560853447 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -4311,16 +4311,4 @@ int arch_lock_shadow_stack_status(struct task_stru=
+ct *t, unsigned long status);
+>   */
+>  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+>
+> -#ifdef CONFIG_PAGE_POOL
+> -static inline bool page_pool_page_is_pp(struct page *page)
+> -{
+> -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> -}
+> -#else
+> -static inline bool page_pool_page_is_pp(struct page *page)
+> -{
+> -       return false;
+> -}
+> -#endif
+> -
+>  #endif /* _LINUX_MM_H */
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index d84ab624b489..8f354ae7d5c3 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+>   */
+>  static_assert(sizeof(struct netmem_desc) <=3D offsetof(struct page, _ref=
+count));
+>
+> +#ifdef CONFIG_PAGE_POOL
+> +static inline bool page_pool_page_is_pp(struct page *page)
+> +{
+> +       struct netmem_desc *desc =3D (struct netmem_desc *)page;
+> +
+> +       return (desc->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
+> +}
+> +#else
+> +static inline bool page_pool_page_is_pp(struct page *page)
+> +{
+> +       return false;
+> +}
+> +#endif
+> +
+>  /* net_iov */
+>
+>  DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index 4f29e393f6af..be0752c0ac92 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -55,6 +55,7 @@
+>  #include <linux/delayacct.h>
+>  #include <linux/cacheinfo.h>
+>  #include <linux/pgalloc_tag.h>
+> +#include <net/netmem.h>
 
-Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
----
- kernel/bpf/cpumap.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+mm files starting to include netmem.h is a bit interesting. I did not
+expect/want dependencies outside of net. If anything the netmem stuff
+include linux/mm.h
 
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index 67e8a2fc1a99..8230292deac1 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -34,6 +34,7 @@
- #include <linux/btf_ids.h>
- 
- #include <linux/netdevice.h>
-+#include <net/netdev_rx_queue.h>
- #include <net/gro.h>
- 
- /* General idea: XDP packets getting XDP redirected to another CPU,
-@@ -196,7 +197,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
- 
- 		rxq.dev = xdpf->dev_rx;
- 		rxq.mem.type = xdpf->mem_type;
--		/* TODO: report queue_index to xdp_rxq_info */
-+		rxq.queue_index = get_netdev_rx_queue_index(xdpf->dev_rx->_rx);
- 
- 		xdp_convert_frame_to_buff(xdpf, &xdp);
- 
--- 
-2.20.1
+But I don't have a butter suggestion here and I don't see any huge
+problems with this off the top of my head, so
 
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+Lets see if Jakub objects though. To be fair, we did put the netmem
+private stuff in net/core/netmem_priv.h, so technically
+include/net/netmem.h should be exportable indeed.
+
+--=20
+Thanks,
+Mina
 
