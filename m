@@ -1,105 +1,125 @@
-Return-Path: <netdev+bounces-195801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2B8AD2486
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:58:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07E7AD24BF
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 19:09:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B763AA038
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:58:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07F0E7A2811
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE7F21C19F;
-	Mon,  9 Jun 2025 16:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B418F21B9DB;
+	Mon,  9 Jun 2025 17:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olFgYI+X"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ZjPwz9lx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279D921ABD5;
-	Mon,  9 Jun 2025 16:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B5B21B8EC
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 17:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749488306; cv=none; b=VV3y7rXEKccpqLMJJyoukmghXpvY/1qI+GxfA/GcgyWxad7MMxxPYmHujSXV4LgFu2h2UxlOZrPtRgsgWNdKWQOy201Jo4256nS2pW803bMcPtjMf0lk5fsR2YErUqEnyFDvVAiTBm6JH5B/YDWuUUhvYL35bMyrSgC5CP98u+4=
+	t=1749488978; cv=none; b=J3NlA3CNgnqLuoaHa2eCoprgf4MoVsa/mT37es/eDJEen8+XvPex0Cqo7sfvf9iDIGLoDrP2ql3hTAcs781MqFxA8pfL4QV94FQzjzfkyNOtPhkM1TGwJqMudxklRaxxt0GqlFvgRikS5Ra8X/+J6L0XtEssipqCJzMgVXrb4lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749488306; c=relaxed/simple;
-	bh=7/+fV92PI7N/anDBZpoLsl+SgkUsOs/cO+aD/zBKOxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JlqrH/xdrK8hrG9AJKrrl3smKXr52TNYnPIMquQQi8SORKXl7CmLgZXUvfKRGuG+/3x6CmiBTuJpfD1Rbz1Gzg8NpwfvIVoUbRF1+Adujad65w4RmRNwXgUnYflLy6no29J53xIxxc+80K/jGCiHzsLRtCTFroTuv/wVlp/+gZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olFgYI+X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34523C4CEEF;
-	Mon,  9 Jun 2025 16:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749488305;
-	bh=7/+fV92PI7N/anDBZpoLsl+SgkUsOs/cO+aD/zBKOxo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=olFgYI+Xa7Iccb/yQOL5irrKAL5EBQwtXKpB0/zVT+oIWHVwVTJFP1ZzS3p/xuWgc
-	 fMn/NEPGDYyrPLKJwj8kM/JZiJuo6o54VGkkytyvsMYzPSnTG7mE26GwHPRJYmHnuf
-	 H3llsd5tecQJUoLJNwnS1vzPJCO1pxZmlrV2RRlmD7tDzpXW7vlAxN0TGigQKemRWt
-	 izEsmZ4ZRc2DjafRVcO8s7zcEpf9w1XofUU5g2yXZQngsOYu/j+UHhfPHzQqEd9fra
-	 CkalzekrVkDXZx4bRy7QNymi14ZnJ2DgnjOSUxiYqfn64VdEpT2wyIpUNAbDE454fs
-	 oWLCCnKo33bVQ==
-Date: Mon, 9 Jun 2025 09:58:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] virtio-net: drop the multi-buffer XDP packet in
- zerocopy
-Message-ID: <20250609095824.414cffa1@kernel.org>
-In-Reply-To: <f073b150-b2e9-43db-aa61-87eee4755a2f@gmail.com>
-References: <20250603150613.83802-1-minhquangbui99@gmail.com>
-	<dd087fdf-5d6c-4015-bed3-29760002f859@redhat.com>
-	<f6d7610b-abfe-415d-adf8-08ce791e4e72@gmail.com>
-	<20250605074810.2b3b2637@kernel.org>
-	<f073b150-b2e9-43db-aa61-87eee4755a2f@gmail.com>
+	s=arc-20240116; t=1749488978; c=relaxed/simple;
+	bh=ejShZg3nrpO6t61lC7z8J0natiNtxxqmp/l4Uo1BTzM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gVsZkOx9UOec0kVHwBfy7w7+68U7W5fSKLy7EVwq5m2SiAfO6IhvQaX2i2qRwmloaQsmPuBxR2O1fhUYv4cRigdifZv/xDWuQ/y7/luH//HVsZfHb7eF6iGpO7pckxHYgmEqeIYDT2jHCsqgFf6YrGC6o57EysinbMP+gsaOVOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ZjPwz9lx; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uOfzs-005947-Nq; Mon, 09 Jun 2025 19:09:20 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From;
+	bh=K62tSSJO9AzfPfkS5uR12qqvaFjnl+xhv7L+AEP9hsc=; b=ZjPwz9lxlTYO4dOlYrCPRqpn1B
+	imk7KtYIP2RXb+Q4dpsNfZg6dVH2AnBxm7Lix1b7/UC1bQW+BMJTZF4HKm7MJ7srTw6xBIsV1U6G4
+	L2CVrmXdSVJVLXj+wn9//MqfQC+66oPHH75Glxhm0L4T0uK75zJOHiI2RxzvztYQPphMgAgGeKTL1
+	B6Xp1KP2Hqq7OCf4ym9qdcCCbVqBC8go9wvoERj4Otvxaken0gy0r1RXR/ICvQKvh+uB09RvdIvTT
+	JivTL7om6nYXC4EneRxYIyhbRIEg3qKRSQVP0RFR+8mdU1MlIqJH/9xfmPvvgURkPacWMPqv35XPq
+	Tayg6U7g==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uOfzr-0005ZP-E2; Mon, 09 Jun 2025 19:09:19 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uOfzi-00EhDz-Qx; Mon, 09 Jun 2025 19:09:10 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Date: Mon, 09 Jun 2025 19:08:03 +0200
+Subject: [PATCH net] net: Fix TOCTOU issue in sk_is_readable()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250609-skisreadable-toctou-v1-1-d0dfb2d62c37@rbox.co>
+X-B4-Tracking: v=1; b=H4sIAPIUR2gC/x3M3QoCIRBA4VeRuU6waQ3pVaILf8ZtKDQci0D23
+ Vf28rs4Z4BQYxK4qQGNfixcy8T5pCA+fVlJc5oGNGiNRavlxdLIJx/epHuNvX71xWFcMOdwdRZ
+ m+WmU+X9c71Cow2Pbdg3pfnRqAAAA
+X-Change-ID: 20250525-skisreadable-toctou-382c42ffb685
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Jakub Sitnicki <jakub@cloudflare.com>, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On Fri, 6 Jun 2025 22:48:53 +0700 Bui Quang Minh wrote:
-> >> But currently, if a multi-buffer packet arrives, it will not go through
-> >> XDP program so it doesn't increase the stats but still goes to network
-> >> stack. So I think it's not a correct behavior.  
-> > Sounds fair, but at a glance the normal XDP path seems to be trying to
-> > linearize the frame. Can we not try to flatten the frame here?
-> > If it's simply to long for the chunk size that's a frame length error,
-> > right?  
-> 
-> Here we are in the zerocopy path, so the buffers for the frame to fill 
-> in are allocated from XDP socket's umem. And if the frame spans across 
-> multiple buffers then the total frame size is larger than the chunk 
-> size.
+sk->sk_prot->sock_is_readable is a valid function pointer when sk resides
+in a sockmap. After the last sk_psock_put() (which usually happens when
+socket is removed from sockmap), sk->sk_prot gets restored and
+sk->sk_prot->sock_is_readable becomes NULL.
 
-Is that always the case? Can the multi-buf not be due to header-data
-split of the incoming frame? (I'm not familiar with the virtio spec)
+This makes sk_is_readable() racy, if the value of sk->sk_prot is reloaded
+after the initial check. Which in turn may lead to a null pointer
+dereference.
 
-> Furthermore, we are in the zerocopy so we cannot linearize by 
-> allocating a large enough buffer to cover the whole frame then copy the 
-> frame data to it. That's not zerocopy anymore. Also, XDP socket zerocopy 
-> receive has assumption that the packet it receives must from the umem 
-> pool. AFAIK, the generic XDP path is for copy mode only.
+Ensure the function pointer does not turn NULL after the check.
 
-Generic XDP == do_xdp_generic(), here I think you mean the normal XDP
-patch in the virtio driver? If so then no, XDP is very much not
-expected to copy each frame before processing.
+Fixes: 8934ce2fd081 ("bpf: sockmap redirect ingress support")
+Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ include/net/sock.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-This is only slightly related to you patch but while we talk about
-multi-buf - in the netdev CI the test which sends ping while XDP
-multi-buf program is attached is really flaky :(
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-drv-hw&test=ping-py.ping-test-xdp-native-mb&ld-cases=1
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 92e7c1aae3ccafe3a806dcee07ec77a469c0f43d..4c37015b7cf71e4902bdf411cfa57528a5d16ab3 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -3010,8 +3010,11 @@ int sock_ioctl_inout(struct sock *sk, unsigned int cmd,
+ int sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
+ static inline bool sk_is_readable(struct sock *sk)
+ {
+-	if (sk->sk_prot->sock_is_readable)
+-		return sk->sk_prot->sock_is_readable(sk);
++	const struct proto *prot = READ_ONCE(sk->sk_prot);
++
++	if (prot->sock_is_readable)
++		return prot->sock_is_readable(sk);
++
+ 	return false;
+ }
+ #endif	/* _SOCK_H */
+
+---
+base-commit: 82cbd06f327f3c2ccdee990bd356c9303ae168f9
+change-id: 20250525-skisreadable-toctou-382c42ffb685
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
