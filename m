@@ -1,137 +1,123 @@
-Return-Path: <netdev+bounces-195711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2EDAD2085
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:06:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33CAEAD2091
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:08:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D916D7A3EB8
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 302453A0F55
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E8325A625;
-	Mon,  9 Jun 2025 14:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D8C25CC56;
+	Mon,  9 Jun 2025 14:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="q1n9aZFJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GclB97S4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5276513C918;
-	Mon,  9 Jun 2025 14:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B534A25C834;
+	Mon,  9 Jun 2025 14:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749477978; cv=none; b=rmiL75+pBOMdj27MS6hqYdatqQOyojnhA+aFo+i+nZGyZ9Kzzi8GOpG1ggcGN3Ks9JiJlAca7r+JhpKfyAxfdfFWY2Y0iO+7rVQYrucT+PEsVSJrrQ3nJ0ynHidEWKHabMl8SMDlnjtKU+EpRXRCg5CHwwu6EXcTJS7IaR1OpdA=
+	t=1749477983; cv=none; b=ZmS+IeV1y6MMTIC32PhAE9MqqcLk1uPrX/JAqXZinH7N2EQqGu7QcDYuZpuN/7q59vWjsNIPOh+1uAbcPXGF7c3MIItt7chktsuS9oqZyVJ59FO6neIh4Dl5/wdH46VU3xf/LbNqaA29gBkYnoiyKugDIvNhpmWWwb+B5By6jaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749477978; c=relaxed/simple;
-	bh=Lqz2IXP0f71+stZWZq3nQhJN56DepDBP0MfIkkLnz0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a1kjUrqxLHctnrGxN6WMzn9X8NUaVigHqt73AhQUpXiJX9+qEG4tKghrymhEiyNfgPL1bdZtpZWO9s8nBl0MQzB8DYoRDz58CW31nFq6NI6DpwyE3X/nKFek4eLJF7UR6nXUvaY0IJRWCdp/bzGcMdKb2Ipkrprd23L2pYO8RpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=q1n9aZFJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PIMYK36uvIqcecnw+wsNtJNA1jDZ1QoKID40Lzud8WI=; b=q1n9aZFJiH/t5KyVNuHn1TrEwy
-	oCdSvsEB67ZQ+fBQYTl7YItoe4V1LjF2GFhMIcpHV1Gr9pqNaQpxbeej2rDqF3+aqf34zBDgbJ1j2
-	xb6ZkIKNsbW5RWoQA9rZCvLvK6n4Z3emYvGqDFCvPgCc+DhE3KeHLDshhRE8nmpKmtJPbu8HH/J+j
-	RcaCU63UOyGiPTqCqPkftCEO+/IQNqFhlJGOhMUFqjG2fMB+u0cfXkdO/W41ak2IaANdaLhODp4gZ
-	A6QaH3W885a42EplVCctRTJsxWHX2JKjq1MwBPI3najMRLQ/iXZ2p5Cnj1tghQmCs1d7gZPhF8CEM
-	J46tkLtw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49642)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uOd8P-0003M3-14;
-	Mon, 09 Jun 2025 15:05:57 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uOd8M-0006HU-09;
-	Mon, 09 Jun 2025 15:05:54 +0100
-Date: Mon, 9 Jun 2025 15:05:53 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: george.moussalem@outlook.com
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v4 3/5] net: phy: qcom: at803x: Add Qualcomm IPQ5018
- Internal PHY support
-Message-ID: <aEbqQYDi8_LN7lDj@shell.armlinux.org.uk>
-References: <20250609-ipq5018-ge-phy-v4-0-1d3a125282c3@outlook.com>
- <20250609-ipq5018-ge-phy-v4-3-1d3a125282c3@outlook.com>
+	s=arc-20240116; t=1749477983; c=relaxed/simple;
+	bh=3lOJgnhrpQkPu25jDi+5V6s0BfBYYwj8jM4H4EhVCZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fm4+6j/Q2nvdUsKnxRDJEy6+PNSu+CXfdsf/vOsic/yHf3zrAMcD3n7HIahsvBDb0FwqnWeiS/dPDJEcPD0UVrBx9zVHK84PMlZzCPUOGqdvPbQHLFIenxzlILZ2mAd2g9LtLTpKOD1y9LkT7Qfs4S4w9QkoenWXUwhWWhaWyTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GclB97S4; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3DCF143B16;
+	Mon,  9 Jun 2025 14:06:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749477979;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zn7wuquz4DmlIJeSlveu8NxjTLD/+5rvhB4h/bX2BVM=;
+	b=GclB97S4y4Jr4l7SuD1EVFc6EXjzEUhlJx7X6R+GF/Gf9CePGKDtGcO4p5rVnhoB8Nh9i0
+	p87KVyZv63vJmN8GERsQm9Y90cdXF3dtmMICIUvLnkVOs0Bu2wDVbi4AAQw21gbOrRDwwh
+	rr2m64lN9SWQED3zlmDlqO40A+mDLou43L9vLgTEOq0Mh+90GSupKJJaZn2XriJyghVAUo
+	YQeogCebledYjtdxstqiaKDetfc64B8kJhC6jntslj7p84JQg6rEHioDPR2mpUifT0vUhz
+	OvJoBSO3v2cho5lcVdgOPmmM33JT4rdh8xOZXfO0Q3rtVJ20Ja3JPLMxS6CClg==
+Date: Mon, 9 Jun 2025 16:06:16 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, andrew@lunn.ch, kuba@kernel.org,
+ donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, willemdebruijn.kernel@gmail.com,
+ kernelxing@tencent.com, richardcochran@gmail.com,
+ thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com,
+ linux@armlinux.org.uk
+Subject: Re: [PATCH net-next v4] net: Add support for providing the PTP
+ hardware source in tsinfo
+Message-ID: <20250609160616.3afc8acd@kmaincent-XPS-13-7390>
+In-Reply-To: <fd48f64f-dec2-489b-a9b9-dc1aa38ca61d@nvidia.com>
+References: <20250519-feature_ptp_source-v4-1-5d10e19a0265@bootlin.com>
+	<174792123749.2878676.12488958833707087703.git-patchwork-notify@kernel.org>
+	<fd48f64f-dec2-489b-a9b9-dc1aa38ca61d@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250609-ipq5018-ge-phy-v4-3-1d3a125282c3@outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdelfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhudevkeeutddvieffudeltedvgeetteevtedvleethefhuefhgedvueeutdelgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtohepghgrlhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepphgrthgthhifohhrkhdqsghothdonhgvthguvghvsghpfheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhun
+ hhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Jun 09, 2025 at 03:44:36PM +0400, George Moussalem via B4 Relay wrote:
-> +static int ipq5018_config_init(struct phy_device *phydev)
-> +{
-> +	struct ipq5018_priv *priv = phydev->priv;
-> +	u16 val = 0;
+Le Mon, 9 Jun 2025 15:18:49 +0300,
+Gal Pressman <gal@nvidia.com> a =C3=A9crit :
 
-Useless initialisation. See the first statement below which immediately
-assigns a value to val. I've no idea why people think local variables
-need initialising in cases like this, but it seems to have become a
-common pattern. I can only guess that someone is teaching this IMHO bad
-practice.
+> On 22/05/2025 16:40, patchwork-bot+netdevbpf@kernel.org wrote:
+> > Hello:
+> >=20
+> > This patch was applied to netdev/net-next.git (main)
+> > by Paolo Abeni <pabeni@redhat.com>:
+> >=20
+> > On Mon, 19 May 2025 10:45:05 +0200 you wrote: =20
+> >> Multi-PTP source support within a network topology has been merged,
+> >> but the hardware timestamp source is not yet exposed to users.
+> >> Currently, users only see the PTP index, which does not indicate
+> >> whether the timestamp comes from a PHY or a MAC.
+> >>
+> >> Add support for reporting the hwtstamp source using a
+> >> hwtstamp-source field, alongside hwtstamp-phyindex, to describe
+> >> the origin of the hardware timestamp.
+> >>
+> >> [...] =20
+> >=20
+> > Here is the summary with links:
+> >   - [net-next,v4] net: Add support for providing the PTP hardware sourc=
+e in
+> > tsinfo https://git.kernel.org/netdev/net-next/c/4ff4d86f6cce
+> >=20
+> > You are awesome, thank you! =20
+>=20
+> Netdev maintainers,
+>=20
+> Was there a discussion about merging this without a selftest that covers
+> this uapi extension? Is this considered an exception?
 
-> +
-> +	/*
-> +	 * set LDO efuse: first temporarily store ANA_DAC_FILTER value from
-> +	 * debug register as it will be reset once the ANA_LDO_EFUSE register
-> +	 * is written to
-> +	 */
-> +	val = at803x_debug_reg_read(phydev, IPQ5018_PHY_DEBUG_ANA_DAC_FILTER);
-> +	at803x_debug_reg_mask(phydev, IPQ5018_PHY_DEBUG_ANA_LDO_EFUSE,
-> +			      IPQ5018_PHY_DEBUG_ANA_LDO_EFUSE_MASK,
-> +			      IPQ5018_PHY_DEBUG_ANA_LDO_EFUSE_DEFAULT);
-> +	at803x_debug_reg_write(phydev, IPQ5018_PHY_DEBUG_ANA_DAC_FILTER, val);
-> +
-> +	/* set 8023AZ CTRL values */
-> +	phy_write_mmd(phydev, MDIO_MMD_PCS, IPQ5018_PHY_PCS_AZ_CTRL1,
-> +		      IPQ5018_PHY_PCS_AZ_CTRL1_VAL);
-> +	phy_write_mmd(phydev, MDIO_MMD_PCS, IPQ5018_PHY_PCS_AZ_CTRL2,
-> +		      IPQ5018_PHY_PCS_AZ_CTRL2_VAL);
+Not that I know of.
+Indeed I will update tools/testing/selftests/net/hwtstamp_config.c following
+the new uAPI using netlink instead of ioctl.
 
-The comment doesn't help understand what's going on here, neither do the
-register definition names.
-
-Also, what interface modes on the host side does this PHY actually
-support?
-
-> +	priv->rst = devm_reset_control_array_get_exclusive(dev);
-> +	if (IS_ERR_OR_NULL(priv->rst))
-> +		return dev_err_probe(dev, PTR_ERR(priv->rst),
-> +				     "failed to acquire reset\n");
-
-Why IS_ERR_OR_NULL() ? What error do you think will be returned by this
-if priv->rst is NULL? (Hint: PTR_ERR(NULL) is 0.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
