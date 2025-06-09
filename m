@@ -1,556 +1,249 @@
-Return-Path: <netdev+bounces-195783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AABDAD2364
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:09:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7551AD23C2
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:25:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0A0188E388
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:08:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B35EA7A17F4
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5C5217733;
-	Mon,  9 Jun 2025 16:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879E4211A2A;
+	Mon,  9 Jun 2025 16:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FIflxrVI"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="ZFVjFFww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E523182BD;
-	Mon,  9 Jun 2025 16:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA53199939
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 16:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749485283; cv=none; b=P2rXDfqEBmy3wHUMfV7S9AtkBTzFJmP6r9LKBQMyP8E9ZNwGL+mmQfwqsjrm0LSvxefrchj8AH+dJns5TUs3/+FzxGEfprOF2TvZQiCD9pwGI6JPiDQE0EdEhufnlOpak05kJBJBqacm3boQxl/SaxPvXtfHWkP9zDbmhqM1aSw=
+	t=1749486302; cv=none; b=mhNNahjUF3/0nORcgFA4O+FUfxQNm+FqSRCjoIZa2H04eHqNe1eeBFMxMtEpXFIjSNn89GGGW2Z+QFJCbSI2N6JLKw49V9Fa/CLKZdNnbOWb3LFjwcB8d8ShyeiIRwHks47ve+BRnB31k/VcxB26xsmbarJhELFLgJAMKPw1wSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749485283; c=relaxed/simple;
-	bh=bHGO7vOz2RwAtGEmIC8y9DzhoZqgiMmowHh6ZZnvP8o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pWrm+sRCC6ZzTRyRG3gD7GIRBLp6phUxdeOuFNbfIK472LcDVWotNy53QfCaMfhZJYKnJmvJEHBa79TzOEeNSmrZteUFnurPmI6B0HwhfOiv/jo1mdpusKOLtM/OWb8wYTxaLKg+QUTw8IOOrsrRIhw4f2xWAn/zKpuCpAs9z/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=FIflxrVI; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 559DtXGO022481;
-	Mon, 9 Jun 2025 09:07:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=TzxfKiytMsOsQRAyd/OKddXk/
-	Xu5Sq6F3ojipSUtVXY=; b=FIflxrVIXEDjTyR7ma6jqwYvm7D93aME6dUFC7kLj
-	mLn3wV+kS7x3z/nmfxfHAqWXW81lNqSDHfVA/0K/5sMqw6mSXrh5gww5LKrT7MZo
-	yYo4d3HxByVeV+RP27dHtJo8yV+U0XQZ+GvGf4WT0+wfbrxiFNwnC5kB5erYU3uH
-	AtxziTiDyrFmoEF4w88fH4a4uCHRFfnHrnia7VZ9UL13Ni9Qy82Ffh0WrshG606M
-	3YTa1aWDUDVDYAc9RVM1bIeyASldcSSzalnCD4TXz+LCDEygQWH1RKqAHdN4fPU9
-	qeQhO/OF41uh/yAjTZl4loBfqve7db5ubcB97WTdfAhbQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4760x2g9u0-1
+	s=arc-20240116; t=1749486302; c=relaxed/simple;
+	bh=BCts238fw86cRl/doLIV7qPA4CGyAdFhQhzYizTmO0g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f7gpFq034JUIVWM8qyewdLKqmQxl5KGWHhm/T+NB2F4fBZ+llemnZLV5b7nNfSK0rpzfxGGFART+CM8fjbb4HWtcwg33b548PDLLl+7XJ2mOG6wecF9GvBnV4JxJKOgnkKHodPALzDsx2T7SVqvqYdNLKdWH9b5A5aIle551gos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=ZFVjFFww; arc=none smtp.client-ip=67.231.157.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0050102.ppops.net [127.0.0.1])
+	by m0050102.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 559ETcKq008929;
+	Mon, 9 Jun 2025 17:13:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=jan2016.eng; bh=GZV5WabxiyC56sOeBumt4vSyXxKvdvH+X
+	3wP8+I+ZYw=; b=ZFVjFFwwTXViiRV58TPnXf3z1JQddyYEk0Y5p3G54DjTHBMIa
+	e2R+P71j6ofUODUNNHTuzc5bWNZfA5Q8p6Wjm2r7uAAD5BUCJjy3VrKOq7IWygfj
+	H7G3GUgqVJvRCuRk1xSHl5jcgqmbhVvT8ucBcuhSLOzGnprtdln1Ok0MtOq2DSTA
+	LhmRrcGl9hpfBkt5uCeoWg8+A+36FRJkoEghTlHbB0Z8T0e7T/tlm/SpX0+XGZoc
+	Apz8WHh/dl2DDPigbEVZvnoZua9z9vaVoRuCd2JdmE+YFtFpwsr29CoCvjBt3/t2
+	Vf+wY6ml1ct/LVcGGvCGfm5EmliYXhpAFlmNQ==
+Received: from prod-mail-ppoint5 (prod-mail-ppoint5.akamai.com [184.51.33.60] (may be forged))
+	by m0050102.ppops.net-00190b01. (PPS) with ESMTPS id 474agn5qk6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Jun 2025 09:07:47 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 9 Jun 2025 09:07:46 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 9 Jun 2025 09:07:45 -0700
-Received: from 64799e4f873a (unknown [10.28.168.138])
-	by maili.marvell.com (Postfix) with SMTP id 92D663F704D;
-	Mon,  9 Jun 2025 09:07:38 -0700 (PDT)
-Date: Mon, 9 Jun 2025 16:07:37 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-CC: <andrew+net@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <kys@microsoft.com>,
-        <haiyangz@microsoft.com>, <wei.liu@kernel.org>, <decui@microsoft.com>,
-        <longli@microsoft.com>, <kotaranov@microsoft.com>, <horms@kernel.org>,
-        <mhklinux@outlook.com>, <ernis@linux.microsoft.com>,
-        <dipayanroy@microsoft.com>, <schakrabarti@linux.microsoft.com>,
-        <rosenp@gmail.com>, <linux-hyperv@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: Expose additional hardware counters for drop
- and TC via ethtool.
-Message-ID: <aEcGyUepZMLydsux@64799e4f873a>
-References: <20250609100103.GA7102@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	Mon, 09 Jun 2025 17:13:02 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint5.akamai.com [127.0.0.1])
+	by prod-mail-ppoint5.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 559ESiQN009211;
+	Mon, 9 Jun 2025 09:13:01 -0700
+Received: from prod-mail-relay11.akamai.com ([172.27.118.250])
+	by prod-mail-ppoint5.akamai.com (PPS) with ESMTP id 474kdb01qk-1;
+	Mon, 09 Jun 2025 09:13:01 -0700
+Received: from bos-lhv9ol.bos01.corp.akamai.com (bos-lhv9ol.bos01.corp.akamai.com [172.28.41.79])
+	by prod-mail-relay11.akamai.com (Postfix) with ESMTP id 4581B33970;
+	Mon,  9 Jun 2025 16:13:01 +0000 (GMT)
+From: Jason Baron <jbaron@akamai.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com
+Subject: [PATCH net-next] netlink: Fix wraparounds of sk->sk_rmem_alloc
+Date: Mon,  9 Jun 2025 12:12:44 -0400
+Message-Id: <20250609161244.3591029-1-jbaron@akamai.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250609100103.GA7102@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-X-Proofpoint-GUID: q3ukxHEhbYP12uG64zKQ8xxIbRTo3ZmG
-X-Authority-Analysis: v=2.4 cv=dd2A3WXe c=1 sm=1 tr=0 ts=684706d3 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=yMhMjlubAAAA:8 a=M5GUcnROAAAA:8 a=kj1g1qYaxY35xbrHA0gA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: q3ukxHEhbYP12uG64zKQ8xxIbRTo3ZmG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDEyMCBTYWx0ZWRfX/veOys0qsqBA iAj1eg9SNExSHCFrB6Fo3Er4Pb/V83T31UNe30Lx9e6cuiXQlY47NWBc0GMrzt1IbonmMvEoUSy 0Zy1/jPoRtkfukHWw7iuLK/kOwmKWhbODQ/4TEA04VDGklIu2SJhg9cFv1+QhcS2NMTXxeHilRX
- u7Be9kVJEV8JbrGXMgIu2s3lT8EcyeOrW1z3j6YwcR3EUbSEHb6cE5mtAqNQEbl4fzC2OogC9h4 AJY9bDUA4u0C3D53uh3W/Nn+u4eyIiUzDSsCWuCdZsJVfSMZ4cbuJn4Uk22aoeOEJOxg35n5Cyc CA2narPXu/sdjq229S75UBYdfJCe6lUfpFpNwEuq9eSammJMX3KlnbZQQjkatOc+eo+7tn6enyU
- +qc178wEtQJL/C48OSnreT1YHq20vSuV9MayGvaflVsxpVvtmNuEfG0CblcCUi90Hb6cloHl
+Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-06-09_06,2025-06-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 spamscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506090119
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDEyMSBTYWx0ZWRfX97VvPFq5xovD
+ Vum24GG19wbQj+wSVAmlshUJiYHos1plw08IABOz+Iv7ki9qNRE1kViynLN2GpR+NTSqr9bp9aQ
+ SpCxd8nfBFfVpehqJcd/3WyKkQpNKL9ohUfbj5QY5cK/gpeLJYQU8eFUNtfNJ4hlRd5mM/AmlS2
+ bdT/CuorB1pLBS2JAS+mgzke5JpbDylmHedaqT0wq6sXFfDqbltzR6NPwi3YQ7qEsPtiG5pp9AF
+ u96i4YOgFhcyALoOXqIT93gycoQeHDkBCMrgL96V1fhei/7JYZ7OqI5x336m8NxrO5Uq3QIY1WK
+ xBANUsi44uGgsSQuM1bHRD+OHdV0jhlhT+E5KzFsphNntRoCqQYTLHOCHHLbR7pwR/UmKjB7o/C
+ VScck8rbVYm01Vj4KFs3uG7bAoNk1TSycNhQIKykkACtKQZZySNmaqmUvU05qHRYFDKECOfY
+X-Authority-Analysis: v=2.4 cv=LI5mQIW9 c=1 sm=1 tr=0 ts=6847080e cx=c_pps
+ a=NpDlK6FjLPvvy7XAFEyJFw==:117 a=NpDlK6FjLPvvy7XAFEyJFw==:17
+ a=6IFa9wvqVegA:10 a=X7Ea-ya5AAAA:8 a=2p7L7b79wo0mKIl_s0IA:9
+X-Proofpoint-ORIG-GUID: J1RcJ5Ih8vgSB1IdebK0NPAP5DiNiNc8
+X-Proofpoint-GUID: J1RcJ5Ih8vgSB1IdebK0NPAP5DiNiNc8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_06,2025-06-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0 phishscore=0 mlxscore=0 lowpriorityscore=0
+ spamscore=0 mlxlogscore=759 adultscore=0 bulkscore=0 suspectscore=0
+ clxscore=1011 impostorscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506090121
 
-On 2025-06-09 at 10:01:03, Dipayaan Roy (dipayanroy@linux.microsoft.com) wrote:
-> Add support for reporting additional hardware counters for drop and
-> TC using the ethtool -S interface.
-> 
-> These counters include:
-> 
-> - Aggregate Rx/Tx drop counters
-> - Per-TC Rx/Tx packet counters
-> - Per-TC Rx/Tx byte counters
-> - Per-TC Rx/Tx pause frame counters
-> 
-> The counters are exposed using ethtool_ops->get_ethtool_stats and
-> ethtool_ops->get_strings. This feature/counters are not available
-> to all versions of hardware.
-> 
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+For netlink sockets, when comparing allocated rmem memory with the
+rcvbuf limit, the comparison is done using signed values. This means
+that if rcvbuf is near INT_MAX, then sk->sk_rmem_alloc may become
+negative in the comparison with rcvbuf which will yield incorrect
+results.
 
-LGTM.
+This can be reproduced by using the program from SOCK_DIAG(7) with
+some slight modifications. First, setting sk->sk_rcvbuf to INT_MAX
+using SO_RCVBUFFORCE and then secondly running the "send_query()"
+in a loop while not calling "receive_responses()". In this case,
+the value of sk->sk_rmem_alloc will continuously wrap around
+and thus more memory is allocated than the sk->sk_rcvbuf limit.
+This will eventually fill all of memory leading to an out of memory
+condition with skbs filling up the slab.
 
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Let's fix this in a similar manner to:
+5a465a0da13e ("udp: Fix multiple wraparounds of sk->sk_rmem_alloc.")
 
-Thanks,
-Sundeep
+As noted in that fix, if there are multiple threads writing to a
+netlink socket it's possible to slightly exceed rcvbuf value. But as
+noted this avoids an expensive 'atomic_add_return()' for the common
+case. I've confirmed that with the fix the modified program from
+SOCK_DIAG(7) can no longer fill memory and the sk->sk_rcvbuf limit
+is enforced.
 
-> ---
->  .../net/ethernet/microsoft/mana/hw_channel.c  |   6 +-
->  drivers/net/ethernet/microsoft/mana/mana_en.c |  87 +++++++++++-
->  .../ethernet/microsoft/mana/mana_ethtool.c    |  76 +++++++++-
->  include/net/mana/mana.h                       | 131 ++++++++++++++++++
->  4 files changed, 292 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> index 1ba49602089b..feb3b74700ed 100644
-> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> @@ -2,6 +2,7 @@
->  /* Copyright (c) 2021, Microsoft Corporation. */
->  
->  #include <net/mana/gdma.h>
-> +#include <net/mana/mana.h>
->  #include <net/mana/hw_channel.h>
->  #include <linux/vmalloc.h>
->  
-> @@ -871,8 +872,9 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  	}
->  
->  	if (ctx->status_code && ctx->status_code != GDMA_STATUS_MORE_ENTRIES) {
-> -		dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
-> -			ctx->status_code);
-> +		if (req_msg->req.msg_type != MANA_QUERY_PHY_STAT)
-> +			dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
-> +				ctx->status_code);
->  		err = -EPROTO;
->  		goto out;
->  	}
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 9c58d9e0bbb5..d2b6e3f09ec2 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -774,8 +774,9 @@ static int mana_send_request(struct mana_context *ac, void *in_buf,
->  	err = mana_gd_send_request(gc, in_len, in_buf, out_len,
->  				   out_buf);
->  	if (err || resp->status) {
-> -		dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
-> -			err, resp->status);
-> +		if (req->req.msg_type != MANA_QUERY_PHY_STAT)
-> +			dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
-> +				err, resp->status);
->  		return err ? err : -EPROTO;
->  	}
->  
-> @@ -2611,6 +2612,88 @@ void mana_query_gf_stats(struct mana_port_context *apc)
->  	apc->eth_stats.hc_tx_err_gdma = resp.tx_err_gdma;
->  }
->  
-> +void mana_query_phy_stats(struct mana_port_context *apc)
-> +{
-> +	struct mana_query_phy_stat_resp resp = {};
-> +	struct mana_query_phy_stat_req req = {};
-> +	struct net_device *ndev = apc->ndev;
-> +	int err;
-> +
-> +	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_PHY_STAT,
-> +			     sizeof(req), sizeof(resp));
-> +	err = mana_send_request(apc->ac, &req, sizeof(req), &resp,
-> +				sizeof(resp));
-> +	if (err)
-> +		return;
-> +
-> +	err = mana_verify_resp_hdr(&resp.hdr, MANA_QUERY_PHY_STAT,
-> +				   sizeof(resp));
-> +	if (err || resp.hdr.status) {
-> +		netdev_err(ndev,
-> +			   "Failed to query PHY stats: %d, resp:0x%x\n",
-> +				err, resp.hdr.status);
-> +		return;
-> +	}
-> +
-> +	/* Aggregate drop counters */
-> +	apc->phy_stats.rx_pkt_drop_phy = resp.rx_pkt_drop_phy;
-> +	apc->phy_stats.tx_pkt_drop_phy = resp.tx_pkt_drop_phy;
-> +
-> +	/* Per TC traffic Counters */
-> +	apc->phy_stats.rx_pkt_tc0_phy = resp.rx_pkt_tc0_phy;
-> +	apc->phy_stats.tx_pkt_tc0_phy = resp.tx_pkt_tc0_phy;
-> +	apc->phy_stats.rx_pkt_tc1_phy = resp.rx_pkt_tc1_phy;
-> +	apc->phy_stats.tx_pkt_tc1_phy = resp.tx_pkt_tc1_phy;
-> +	apc->phy_stats.rx_pkt_tc2_phy = resp.rx_pkt_tc2_phy;
-> +	apc->phy_stats.tx_pkt_tc2_phy = resp.tx_pkt_tc2_phy;
-> +	apc->phy_stats.rx_pkt_tc3_phy = resp.rx_pkt_tc3_phy;
-> +	apc->phy_stats.tx_pkt_tc3_phy = resp.tx_pkt_tc3_phy;
-> +	apc->phy_stats.rx_pkt_tc4_phy = resp.rx_pkt_tc4_phy;
-> +	apc->phy_stats.tx_pkt_tc4_phy = resp.tx_pkt_tc4_phy;
-> +	apc->phy_stats.rx_pkt_tc5_phy = resp.rx_pkt_tc5_phy;
-> +	apc->phy_stats.tx_pkt_tc5_phy = resp.tx_pkt_tc5_phy;
-> +	apc->phy_stats.rx_pkt_tc6_phy = resp.rx_pkt_tc6_phy;
-> +	apc->phy_stats.tx_pkt_tc6_phy = resp.tx_pkt_tc6_phy;
-> +	apc->phy_stats.rx_pkt_tc7_phy = resp.rx_pkt_tc7_phy;
-> +	apc->phy_stats.tx_pkt_tc7_phy = resp.tx_pkt_tc7_phy;
-> +
-> +	/* Per TC byte Counters */
-> +	apc->phy_stats.rx_byte_tc0_phy = resp.rx_byte_tc0_phy;
-> +	apc->phy_stats.tx_byte_tc0_phy = resp.tx_byte_tc0_phy;
-> +	apc->phy_stats.rx_byte_tc1_phy = resp.rx_byte_tc1_phy;
-> +	apc->phy_stats.tx_byte_tc1_phy = resp.tx_byte_tc1_phy;
-> +	apc->phy_stats.rx_byte_tc2_phy = resp.rx_byte_tc2_phy;
-> +	apc->phy_stats.tx_byte_tc2_phy = resp.tx_byte_tc2_phy;
-> +	apc->phy_stats.rx_byte_tc3_phy = resp.rx_byte_tc3_phy;
-> +	apc->phy_stats.tx_byte_tc3_phy = resp.tx_byte_tc3_phy;
-> +	apc->phy_stats.rx_byte_tc4_phy = resp.rx_byte_tc4_phy;
-> +	apc->phy_stats.tx_byte_tc4_phy = resp.tx_byte_tc4_phy;
-> +	apc->phy_stats.rx_byte_tc5_phy = resp.rx_byte_tc5_phy;
-> +	apc->phy_stats.tx_byte_tc5_phy = resp.tx_byte_tc5_phy;
-> +	apc->phy_stats.rx_byte_tc6_phy = resp.rx_byte_tc6_phy;
-> +	apc->phy_stats.tx_byte_tc6_phy = resp.tx_byte_tc6_phy;
-> +	apc->phy_stats.rx_byte_tc7_phy = resp.rx_byte_tc7_phy;
-> +	apc->phy_stats.tx_byte_tc7_phy = resp.tx_byte_tc7_phy;
-> +
-> +	/* Per TC pause Counters */
-> +	apc->phy_stats.rx_pause_tc0_phy = resp.rx_pause_tc0_phy;
-> +	apc->phy_stats.tx_pause_tc0_phy = resp.tx_pause_tc0_phy;
-> +	apc->phy_stats.rx_pause_tc1_phy = resp.rx_pause_tc1_phy;
-> +	apc->phy_stats.tx_pause_tc1_phy = resp.tx_pause_tc1_phy;
-> +	apc->phy_stats.rx_pause_tc2_phy = resp.rx_pause_tc2_phy;
-> +	apc->phy_stats.tx_pause_tc2_phy = resp.tx_pause_tc2_phy;
-> +	apc->phy_stats.rx_pause_tc3_phy = resp.rx_pause_tc3_phy;
-> +	apc->phy_stats.tx_pause_tc3_phy = resp.tx_pause_tc3_phy;
-> +	apc->phy_stats.rx_pause_tc4_phy = resp.rx_pause_tc4_phy;
-> +	apc->phy_stats.tx_pause_tc4_phy = resp.tx_pause_tc4_phy;
-> +	apc->phy_stats.rx_pause_tc5_phy = resp.rx_pause_tc5_phy;
-> +	apc->phy_stats.tx_pause_tc5_phy = resp.tx_pause_tc5_phy;
-> +	apc->phy_stats.rx_pause_tc6_phy = resp.rx_pause_tc6_phy;
-> +	apc->phy_stats.tx_pause_tc6_phy = resp.tx_pause_tc6_phy;
-> +	apc->phy_stats.rx_pause_tc7_phy = resp.rx_pause_tc7_phy;
-> +	apc->phy_stats.tx_pause_tc7_phy = resp.tx_pause_tc7_phy;
-> +}
-> +
->  static int mana_init_port(struct net_device *ndev)
->  {
->  	struct mana_port_context *apc = netdev_priv(ndev);
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index c419626073f5..4fb3a04994a2 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -7,10 +7,12 @@
->  
->  #include <net/mana/mana.h>
->  
-> -static const struct {
-> +struct mana_stats_desc {
->  	char name[ETH_GSTRING_LEN];
->  	u16 offset;
-> -} mana_eth_stats[] = {
-> +};
-> +
-> +static const struct mana_stats_desc mana_eth_stats[] = {
->  	{"stop_queue", offsetof(struct mana_ethtool_stats, stop_queue)},
->  	{"wake_queue", offsetof(struct mana_ethtool_stats, wake_queue)},
->  	{"hc_rx_discards_no_wqe", offsetof(struct mana_ethtool_stats,
-> @@ -75,6 +77,59 @@ static const struct {
->  					rx_cqe_unknown_type)},
->  };
->  
-> +static const struct mana_stats_desc mana_phy_stats[] = {
-> +	{ "hc_rx_pkt_drop_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_drop_phy) },
-> +	{ "hc_tx_pkt_drop_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_drop_phy) },
-> +	{ "hc_tc0_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc0_phy) },
-> +	{ "hc_tc0_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc0_phy) },
-> +	{ "hc_tc0_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc0_phy) },
-> +	{ "hc_tc0_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc0_phy) },
-> +	{ "hc_tc1_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc1_phy) },
-> +	{ "hc_tc1_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc1_phy) },
-> +	{ "hc_tc1_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc1_phy) },
-> +	{ "hc_tc1_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc1_phy) },
-> +	{ "hc_tc2_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc2_phy) },
-> +	{ "hc_tc2_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc2_phy) },
-> +	{ "hc_tc2_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc2_phy) },
-> +	{ "hc_tc2_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc2_phy) },
-> +	{ "hc_tc3_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc3_phy) },
-> +	{ "hc_tc3_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc3_phy) },
-> +	{ "hc_tc3_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc3_phy) },
-> +	{ "hc_tc3_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc3_phy) },
-> +	{ "hc_tc4_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc4_phy) },
-> +	{ "hc_tc4_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc4_phy) },
-> +	{ "hc_tc4_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc4_phy) },
-> +	{ "hc_tc4_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc4_phy) },
-> +	{ "hc_tc5_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc5_phy) },
-> +	{ "hc_tc5_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc5_phy) },
-> +	{ "hc_tc5_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc5_phy) },
-> +	{ "hc_tc5_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc5_phy) },
-> +	{ "hc_tc6_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc6_phy) },
-> +	{ "hc_tc6_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc6_phy) },
-> +	{ "hc_tc6_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc6_phy) },
-> +	{ "hc_tc6_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc6_phy) },
-> +	{ "hc_tc7_rx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, rx_pkt_tc7_phy) },
-> +	{ "hc_tc7_rx_byte_phy", offsetof(struct mana_ethtool_phy_stats, rx_byte_tc7_phy) },
-> +	{ "hc_tc7_tx_pkt_phy", offsetof(struct mana_ethtool_phy_stats, tx_pkt_tc7_phy) },
-> +	{ "hc_tc7_tx_byte_phy", offsetof(struct mana_ethtool_phy_stats, tx_byte_tc7_phy) },
-> +	{ "hc_tc0_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc0_phy) },
-> +	{ "hc_tc0_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc0_phy) },
-> +	{ "hc_tc1_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc1_phy) },
-> +	{ "hc_tc1_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc1_phy) },
-> +	{ "hc_tc2_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc2_phy) },
-> +	{ "hc_tc2_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc2_phy) },
-> +	{ "hc_tc3_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc3_phy) },
-> +	{ "hc_tc3_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc3_phy) },
-> +	{ "hc_tc4_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc4_phy) },
-> +	{ "hc_tc4_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc4_phy) },
-> +	{ "hc_tc5_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc5_phy) },
-> +	{ "hc_tc5_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc5_phy) },
-> +	{ "hc_tc6_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc6_phy) },
-> +	{ "hc_tc6_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc6_phy) },
-> +	{ "hc_tc7_rx_pause_phy", offsetof(struct mana_ethtool_phy_stats, rx_pause_tc7_phy) },
-> +	{ "hc_tc7_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc7_phy) },
-> +};
-> +
->  static int mana_get_sset_count(struct net_device *ndev, int stringset)
->  {
->  	struct mana_port_context *apc = netdev_priv(ndev);
-> @@ -83,8 +138,8 @@ static int mana_get_sset_count(struct net_device *ndev, int stringset)
->  	if (stringset != ETH_SS_STATS)
->  		return -EINVAL;
->  
-> -	return ARRAY_SIZE(mana_eth_stats) + num_queues *
-> -				(MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT);
-> +	return ARRAY_SIZE(mana_eth_stats) + ARRAY_SIZE(mana_phy_stats) +
-> +			num_queues * (MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT);
->  }
->  
->  static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
-> @@ -99,6 +154,9 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
->  	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++)
->  		ethtool_puts(&data, mana_eth_stats[i].name);
->  
-> +	for (i = 0; i < ARRAY_SIZE(mana_phy_stats); i++)
-> +		ethtool_puts(&data, mana_phy_stats[i].name);
-> +
->  	for (i = 0; i < num_queues; i++) {
->  		ethtool_sprintf(&data, "rx_%d_packets", i);
->  		ethtool_sprintf(&data, "rx_%d_bytes", i);
-> @@ -128,6 +186,7 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
->  	struct mana_port_context *apc = netdev_priv(ndev);
->  	unsigned int num_queues = apc->num_queues;
->  	void *eth_stats = &apc->eth_stats;
-> +	void *phy_stats = &apc->phy_stats;
->  	struct mana_stats_rx *rx_stats;
->  	struct mana_stats_tx *tx_stats;
->  	unsigned int start;
-> @@ -151,9 +210,18 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
->  	/* we call mana function to update stats from GDMA */
->  	mana_query_gf_stats(apc);
->  
-> +	/* We call this mana function to get the phy stats from GDMA and includes
-> +	 * aggregate tx/rx drop counters, Per-TC(Traffic Channel) tx/rx and pause
-> +	 * counters.
-> +	 */
-> +	mana_query_phy_stats(apc);
-> +
->  	for (q = 0; q < ARRAY_SIZE(mana_eth_stats); q++)
->  		data[i++] = *(u64 *)(eth_stats + mana_eth_stats[q].offset);
->  
-> +	for (q = 0; q < ARRAY_SIZE(mana_phy_stats); q++)
-> +		data[i++] = *(u64 *)(phy_stats + mana_phy_stats[q].offset);
-> +
->  	for (q = 0; q < num_queues; q++) {
->  		rx_stats = &apc->rxqs[q]->stats;
->  
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 38238c1d00bf..be6d5e878321 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -404,6 +404,65 @@ struct mana_ethtool_stats {
->  	u64 rx_cqe_unknown_type;
->  };
->  
-> +struct mana_ethtool_phy_stats {
-> +	/* Drop Counters */
-> +	u64 rx_pkt_drop_phy;
-> +	u64 tx_pkt_drop_phy;
-> +
-> +	/* Per TC traffic Counters */
-> +	u64 rx_pkt_tc0_phy;
-> +	u64 tx_pkt_tc0_phy;
-> +	u64 rx_pkt_tc1_phy;
-> +	u64 tx_pkt_tc1_phy;
-> +	u64 rx_pkt_tc2_phy;
-> +	u64 tx_pkt_tc2_phy;
-> +	u64 rx_pkt_tc3_phy;
-> +	u64 tx_pkt_tc3_phy;
-> +	u64 rx_pkt_tc4_phy;
-> +	u64 tx_pkt_tc4_phy;
-> +	u64 rx_pkt_tc5_phy;
-> +	u64 tx_pkt_tc5_phy;
-> +	u64 rx_pkt_tc6_phy;
-> +	u64 tx_pkt_tc6_phy;
-> +	u64 rx_pkt_tc7_phy;
-> +	u64 tx_pkt_tc7_phy;
-> +
-> +	u64 rx_byte_tc0_phy;
-> +	u64 tx_byte_tc0_phy;
-> +	u64 rx_byte_tc1_phy;
-> +	u64 tx_byte_tc1_phy;
-> +	u64 rx_byte_tc2_phy;
-> +	u64 tx_byte_tc2_phy;
-> +	u64 rx_byte_tc3_phy;
-> +	u64 tx_byte_tc3_phy;
-> +	u64 rx_byte_tc4_phy;
-> +	u64 tx_byte_tc4_phy;
-> +	u64 rx_byte_tc5_phy;
-> +	u64 tx_byte_tc5_phy;
-> +	u64 rx_byte_tc6_phy;
-> +	u64 tx_byte_tc6_phy;
-> +	u64 rx_byte_tc7_phy;
-> +	u64 tx_byte_tc7_phy;
-> +
-> +	/* Per TC pause Counters */
-> +	u64 rx_pause_tc0_phy;
-> +	u64 tx_pause_tc0_phy;
-> +	u64 rx_pause_tc1_phy;
-> +	u64 tx_pause_tc1_phy;
-> +	u64 rx_pause_tc2_phy;
-> +	u64 tx_pause_tc2_phy;
-> +	u64 rx_pause_tc3_phy;
-> +	u64 tx_pause_tc3_phy;
-> +	u64 rx_pause_tc4_phy;
-> +	u64 tx_pause_tc4_phy;
-> +	u64 rx_pause_tc5_phy;
-> +	u64 tx_pause_tc5_phy;
-> +	u64 rx_pause_tc6_phy;
-> +	u64 tx_pause_tc6_phy;
-> +	u64 rx_pause_tc7_phy;
-> +	u64 tx_pause_tc7_phy;
-> +};
-> +
->  struct mana_context {
->  	struct gdma_dev *gdma_dev;
->  
-> @@ -474,6 +533,8 @@ struct mana_port_context {
->  
->  	struct mana_ethtool_stats eth_stats;
->  
-> +	struct mana_ethtool_phy_stats phy_stats;
-> +
->  	/* Debugfs */
->  	struct dentry *mana_port_debugfs;
->  };
-> @@ -498,6 +559,7 @@ struct bpf_prog *mana_xdp_get(struct mana_port_context *apc);
->  void mana_chn_setxdp(struct mana_port_context *apc, struct bpf_prog *prog);
->  int mana_bpf(struct net_device *ndev, struct netdev_bpf *bpf);
->  void mana_query_gf_stats(struct mana_port_context *apc);
-> +void mana_query_phy_stats(struct mana_port_context *apc);
->  int mana_pre_alloc_rxbufs(struct mana_port_context *apc, int mtu, int num_queues);
->  void mana_pre_dealloc_rxbufs(struct mana_port_context *apc);
->  
-> @@ -524,6 +586,7 @@ enum mana_command_code {
->  	MANA_FENCE_RQ		= 0x20006,
->  	MANA_CONFIG_VPORT_RX	= 0x20007,
->  	MANA_QUERY_VPORT_CONFIG	= 0x20008,
-> +	MANA_QUERY_PHY_STAT     = 0x2000c,
->  
->  	/* Privileged commands for the PF mode */
->  	MANA_REGISTER_FILTER	= 0x28000,
-> @@ -686,6 +749,74 @@ struct mana_query_gf_stat_resp {
->  	u64 tx_err_gdma;
->  }; /* HW DATA */
->  
-> +/* Query phy stats */
-> +struct mana_query_phy_stat_req {
-> +	struct gdma_req_hdr hdr;
-> +	u64 req_stats;
-> +}; /* HW DATA */
-> +
-> +struct mana_query_phy_stat_resp {
-> +	struct gdma_resp_hdr hdr;
-> +	u64 reported_stats;
-> +
-> +	/* Aggregate Drop Counters */
-> +	u64 rx_pkt_drop_phy;
-> +	u64 tx_pkt_drop_phy;
-> +
-> +	/* Per TC(Traffic class) traffic Counters */
-> +	u64 rx_pkt_tc0_phy;
-> +	u64 tx_pkt_tc0_phy;
-> +	u64 rx_pkt_tc1_phy;
-> +	u64 tx_pkt_tc1_phy;
-> +	u64 rx_pkt_tc2_phy;
-> +	u64 tx_pkt_tc2_phy;
-> +	u64 rx_pkt_tc3_phy;
-> +	u64 tx_pkt_tc3_phy;
-> +	u64 rx_pkt_tc4_phy;
-> +	u64 tx_pkt_tc4_phy;
-> +	u64 rx_pkt_tc5_phy;
-> +	u64 tx_pkt_tc5_phy;
-> +	u64 rx_pkt_tc6_phy;
-> +	u64 tx_pkt_tc6_phy;
-> +	u64 rx_pkt_tc7_phy;
-> +	u64 tx_pkt_tc7_phy;
-> +
-> +	u64 rx_byte_tc0_phy;
-> +	u64 tx_byte_tc0_phy;
-> +	u64 rx_byte_tc1_phy;
-> +	u64 tx_byte_tc1_phy;
-> +	u64 rx_byte_tc2_phy;
-> +	u64 tx_byte_tc2_phy;
-> +	u64 rx_byte_tc3_phy;
-> +	u64 tx_byte_tc3_phy;
-> +	u64 rx_byte_tc4_phy;
-> +	u64 tx_byte_tc4_phy;
-> +	u64 rx_byte_tc5_phy;
-> +	u64 tx_byte_tc5_phy;
-> +	u64 rx_byte_tc6_phy;
-> +	u64 tx_byte_tc6_phy;
-> +	u64 rx_byte_tc7_phy;
-> +	u64 tx_byte_tc7_phy;
-> +
-> +	/* Per TC(Traffic Class) pause Counters */
-> +	u64 rx_pause_tc0_phy;
-> +	u64 tx_pause_tc0_phy;
-> +	u64 rx_pause_tc1_phy;
-> +	u64 tx_pause_tc1_phy;
-> +	u64 rx_pause_tc2_phy;
-> +	u64 tx_pause_tc2_phy;
-> +	u64 rx_pause_tc3_phy;
-> +	u64 tx_pause_tc3_phy;
-> +	u64 rx_pause_tc4_phy;
-> +	u64 tx_pause_tc4_phy;
-> +	u64 rx_pause_tc5_phy;
-> +	u64 tx_pause_tc5_phy;
-> +	u64 rx_pause_tc6_phy;
-> +	u64 tx_pause_tc6_phy;
-> +	u64 rx_pause_tc7_phy;
-> +	u64 tx_pause_tc7_phy;
-> +}; /* HW DATA */
-> +
->  /* Configure vPort Rx Steering */
->  struct mana_cfg_rx_steer_req_v2 {
->  	struct gdma_req_hdr hdr;
-> -- 
-> 2.43.0
-> 
+Signed-off-by: Jason Baron <jbaron@akamai.com>
+---
+ net/netlink/af_netlink.c | 47 ++++++++++++++++++++++++++++------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index e8972a857e51..607e5d72de39 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -1213,11 +1213,15 @@ int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
+ 		      long *timeo, struct sock *ssk)
+ {
+ 	struct netlink_sock *nlk;
++	unsigned int rmem, rcvbuf, size;
+ 
+ 	nlk = nlk_sk(sk);
++	rmem = atomic_read(&sk->sk_rmem_alloc);
++	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++	size = skb->truesize;
+ 
+-	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
+-	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
++	if (((rmem + size) > rcvbuf) ||
++	     test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
+ 		DECLARE_WAITQUEUE(wait, current);
+ 		if (!*timeo) {
+ 			if (!ssk || netlink_is_kernel(ssk))
+@@ -1230,7 +1234,9 @@ int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
+ 		__set_current_state(TASK_INTERRUPTIBLE);
+ 		add_wait_queue(&nlk->wait, &wait);
+ 
+-		if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
++		rmem = atomic_read(&sk->sk_rmem_alloc);
++		rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++		if ((((rmem + size) > rcvbuf) ||
+ 		     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
+ 		    !sock_flag(sk, SOCK_DEAD))
+ 			*timeo = schedule_timeout(*timeo);
+@@ -1383,12 +1389,18 @@ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
+ static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct netlink_sock *nlk = nlk_sk(sk);
++	unsigned int rmem, rcvbuf;
+ 
+-	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf &&
++	rmem = atomic_read(&sk->sk_rmem_alloc);
++	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++
++	if (((rmem + skb->truesize) <= rcvbuf) &&
+ 	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
+ 		netlink_skb_set_owner_r(skb, sk);
+ 		__netlink_sendskb(sk, skb);
+-		return atomic_read(&sk->sk_rmem_alloc) > (sk->sk_rcvbuf >> 1);
++		rmem = atomic_read(&sk->sk_rmem_alloc);
++		rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++		return rmem > (rcvbuf >> 1);
+ 	}
+ 	return -1;
+ }
+@@ -1896,6 +1908,7 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 	size_t copied, max_recvmsg_len;
+ 	struct sk_buff *skb, *data_skb;
+ 	int err, ret;
++	unsigned int rmem, rcvbuf;
+ 
+ 	if (flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+@@ -1960,12 +1973,15 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 
+ 	skb_free_datagram(sk, skb);
+ 
+-	if (READ_ONCE(nlk->cb_running) &&
+-	    atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf / 2) {
+-		ret = netlink_dump(sk, false);
+-		if (ret) {
+-			WRITE_ONCE(sk->sk_err, -ret);
+-			sk_error_report(sk);
++	if (READ_ONCE(nlk->cb_running)) {
++		rmem = atomic_read(&sk->sk_rmem_alloc);
++		rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++		if (rmem <= (rcvbuf >> 1)) {
++			ret = netlink_dump(sk, false);
++			if (ret) {
++				WRITE_ONCE(sk->sk_err, -ret);
++				sk_error_report(sk);
++			}
+ 		}
+ 	}
+ 
+@@ -2250,6 +2266,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	int err = -ENOBUFS;
+ 	int alloc_min_size;
+ 	int alloc_size;
++	unsigned int rmem, rcvbuf;
+ 
+ 	if (!lock_taken)
+ 		mutex_lock(&nlk->nl_cb_mutex);
+@@ -2258,9 +2275,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 		goto errout_skb;
+ 	}
+ 
+-	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf)
+-		goto errout_skb;
+-
+ 	/* NLMSG_GOODSIZE is small to avoid high order allocations being
+ 	 * required, but it makes sense to _attempt_ a 32KiB allocation
+ 	 * to reduce number of system calls on dump operations, if user
+@@ -2283,6 +2297,11 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	if (!skb)
+ 		goto errout_skb;
+ 
++	rmem = atomic_read(&sk->sk_rmem_alloc);
++	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++	if ((rmem + skb->truesize) > rcvbuf)
++		goto errout_skb;
++
+ 	/* Trim skb to allocated size. User is expected to provide buffer as
+ 	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
+ 	 * netlink_recvmsg())). dump will pack as many smaller messages as
+-- 
+2.25.1
+
 
