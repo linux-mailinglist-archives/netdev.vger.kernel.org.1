@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-195863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB219AD286C
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:08:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE8BAD286E
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A11616D703
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:08:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AAD3188D9C7
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C7D193062;
-	Mon,  9 Jun 2025 21:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CEE222597;
+	Mon,  9 Jun 2025 21:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWLCtCgo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0B/N0Lp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8F27FD;
-	Mon,  9 Jun 2025 21:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A49321D5A2;
+	Mon,  9 Jun 2025 21:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749503305; cv=none; b=Utkr/iAfHhic/h1162aD91VBWOaZ+kRbNTwJ1gX8Er8N5LF5jjJSWP2Wc1ukrJj1dnMgqxO84THs68UNivu67wri370guzsw4PutpQmLq+A4JQL8rtKx1YNXNFMbRbsvaxuLsgaSr/hg5I5BdEp2ah5GLdVYOzGJ9mh+4CVKroc=
+	t=1749503307; cv=none; b=sssXj8EqwJH6DYiowZNiI/7Zn1IGGqxcOmEojcr1K95sPoNktfRZZ/zo9PFXFXtajZEmT2GAIb9+Vnaa+0VTfgLWrN7f8hEhtPH1IGcoaK+4+v5NqdbJ4IXUTiPA/op0VtPMm27LZ23bbsaxXL2V6JbkIgi67AzdGQoIwSklT+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749503305; c=relaxed/simple;
-	bh=zuDTL7cB69EL+PgchjhF1SUAyQ94xhf+ydp3hPzb0kE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rNDG1tu6W1wSVJ9ZFjnDvVx61P7mB02Ig6gJ+xcVAOmnq9BFRAHRv6o0LkgyE10NQ0ugNoap723YkHX0u3AViU/AeQzygmES7uQI+kfdgRVO7QVdl9XM7MkgvONZb2N00W5SMjEsn9LULijztOrFOw5+UQcp2q9H4TPNR1zGAeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWLCtCgo; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1749503307; c=relaxed/simple;
+	bh=zJTjdCr8yR6jka+8Fl6/XXKV/YPVY/4YWXAs4bcR55U=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=sS8bFibjM5F5CsBqezPQHoiillKB+KT+hdOnCGwbOuUDxj0HDibZijNJMwZ9EGbfE4Pg8uritpIzos5gozdOuho7CpJxWCcb7OaxLhiM0ktfNdpAS8PWbGfnuQ+3nJjLcb6DwbkekZVgnD271wDWUxH6ePvsgB3/057RBR+qgFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0B/N0Lp; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ade30256175so602144066b.1;
-        Mon, 09 Jun 2025 14:08:23 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ad883afdf0cso867213366b.0;
+        Mon, 09 Jun 2025 14:08:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749503302; x=1750108102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K/+E654N6VLDLEVmc+jj3F2mGdbgofFxddmyLbhAauw=;
-        b=YWLCtCgozOEGwd2SO5xUw6jlJIdYncbd/ThwylTe7xEcpDeS4JUXJIemNHZw32cjFB
-         WYIPHeWGRukAieewujubFql/DzwMTKK834bniJij2Vksq22KB3Z8PF4F8gz18DXsMfNS
-         qjwolZFTagEFmfdP4ZVHcB3rfIMCvapS0+aRzYp76ohqdvhSAKZZY5UDMVLao/crzP+N
-         +eopL8a7oVAilP3G+mB0fK0yEYENMKESLDaPPstzG1OyDYjZGyeqDZHXH2+30rsxKf3I
-         T9qXn8EjBhqtwz/IANhPJN+sutZm0x4nOGQgWACbR7fR/PcovQMmeAEgy/EAu/rhn+IL
-         DgDg==
+        d=gmail.com; s=20230601; t=1749503304; x=1750108104; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aaer8KAt7DHXZvrLCnz/sCu0lhGcXvLJk84mttxt34U=;
+        b=E0B/N0LpVCF0rcat7KgPdyKFCLMBVdc7Z97xWV7Q/nTv6kKFazzAeiPsRsTHT8OUpL
+         rOhPkYYci1rzUg4fCs6IDmiSzBnVeq9fBMX3QxByilTOXzhwTlKJy/gGMQpQRH6XMAUU
+         SHtQjW+SjqUVxbkYlISQjptGr1uhzk4i+I59ra7yW5BXppoz0iY7dKFh70gidqZb/ndx
+         m3UJvAJjdQr/hrneRBtZtUmv6r0zXVPlZmz5nTUVAfud4EkiVqaVDRK9pQ8QYKNkmFN4
+         PKSzkMSvWjhvK8TlDMQ5MVis222sJn9YmocHt/TXaEhF8B2DBIngyhQpl8ZRbB5bBM1S
+         HhAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749503302; x=1750108102;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K/+E654N6VLDLEVmc+jj3F2mGdbgofFxddmyLbhAauw=;
-        b=ssOM1M/gZEWjCV2Exhabi9tps0IjsPnjBEEggng71ga+huTg3EMsyXq4KMtml0uZDY
-         t+VI+gCH4n77HyotIAAi/GQ6seeqBBdiaZSsfxe/To0gMccjqtWZy6ErHlPZsWVQsuGG
-         jns81ypMivsc36ArNUnEO2XAdO9fhPR3KhkjHcvsjLP5IWUHWNPpaGqmC0qGHMdSExMZ
-         /D18P8r/gM8TGN8tybjeUd0viKiE0dBNAOK8DpWOVjm4UaRQNfrQRbHsioJESWYfJEr8
-         PtIN5YmjAjB+hxNC5MiO9b1YgkRtjSa+wv3xeU99h8dbpDlSDrtrKLpN837ZRtPeyeIe
-         CzWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVsdRT8Jjkx47mDjZV7Xf1it/MaRt6z06vrNivc7q0456VjcU00hdrPkJX2BpUg7sQHVGeFC5/@vger.kernel.org, AJvYcCXxmi4wYcC/MQexaBS+rCQoIOZtny/uWDZspL4OjHRJxDVeTAnT+oVscBS/o8rW1JtP57NvgF5Htd5dUoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ9CeDZ51BOw/+5AK3DHMZuqhklrxvxVR/cXsw2mYycyEIol7K
-	41Vtrw8lbvNXERfWsFKLVzJ4ZK5SwXyPgVcIokavnwspuLhEsHQHO5qnNSNci2pJ
-X-Gm-Gg: ASbGncstcF8bn2Tv6eyBVo32o99OeGNFg74bNgwUY74UVnsx83w1o5AkL/3e70z8v1C
-	vXyXwFLZ+Cd4pmG/glsGhqjEzfMtRFhLUx96LABSr/v6th7oCvbNTZ4+WZNZUUclCjcZpompeLi
-	pjanx0jvLTS2IKiWqwaHAXWE5UaCuOX0HD3GPyrHNl2ba5vj91df8sbEPUXm0V46QNE2lSkn50i
-	TIIuJsNk/1xBah1J9481Vd+GEfkgJAmvkkcrrf0JwOi+F8kz3eGKO3w/zQ57XYaua1LwhnFqrUm
-	XH9G7YkAnLmoTuhbBqHBLWyLZXt8MW7t9BSuerZ0UeMnsD+jnXCNoQNs3m5ZkRwLFIZHAp57
-X-Google-Smtp-Source: AGHT+IHww2Hb3N2NjaqINV7+U/1Ul6vltTjx2k8COiF/gro5XFioDzd+0yMzKwRSito0syJsOt/tOQ==
-X-Received: by 2002:a17:906:ee8e:b0:ad5:7732:6759 with SMTP id a640c23a62f3a-ade1aa471bcmr1379707466b.53.1749503301975;
-        Mon, 09 Jun 2025 14:08:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749503304; x=1750108104;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aaer8KAt7DHXZvrLCnz/sCu0lhGcXvLJk84mttxt34U=;
+        b=fU8KWbZaF5jzqZyjSezjt+xvZE6pd/9JJBYBVlRJar0SaSW7/ekrO2MKD6V2gpqArG
+         oFbsfNyo+eczdpFl5/7cWHDQSBiWRf0aXET/teAoBWId5Ly52/cOglj3LX3Ij6g9HBsR
+         XsW9DbUXzw1q5uJ6uNgaouXOGxvsjRkaQaPgl90nOzmJUZs7mqCTVwejKBqiKQ4GOGgl
+         SAcXcjP+4uZ/4kCzTu+FxeI0L8pgW2gw22DcSDO/qViq4SHK76F3bAqiA073uqKnHGEF
+         syl4Y8nc+IsOB2c1cm04o8FBUSdKE8SMagQ6U+MtEpvp682GwrBveUpxpYJzJaS4gkal
+         410A==
+X-Forwarded-Encrypted: i=1; AJvYcCULSHr6+WZfIfTytes29I4jO1w1Gcyvv/U7OxRN4A5YHfk/ss6Fx0pnCVucqaF5rPAhm8U6h32d@vger.kernel.org, AJvYcCXaOVxS5DMvHZpT+/fo3AspQWfxTkZx8xjEqw8rc+sQfb6YD9lgAzQN4vY0hJraZJtww+WcQ8hcFvDZQdE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRLE6E8WAPGViV/52dMkCq6PRYQhJ7ApqrP7zLn+4BCkXQLt4w
+	Dk4tvUiqgu7+v2D4DZ5EDEgw7CVWnIAxPiYbAPdKPei2A9fu/I78UsLZ
+X-Gm-Gg: ASbGncuipEGlaIiYgb/zjNGagEjIIZNcZts3TjF40bsgckqMhWs0GqpikjIVyfNwjh0
+	nFWwzOSRNmCSJOD0FUQHQTLW+J5wq3kZk8A6Tus+aN+Wa2kT/q+xyqokeQqNEm7TT+b+S6UIWv2
+	8nN+GYl6VseArTaS12E/UHpb0VIwpi6192eDEe/5wDb32GeleULVAxWm0bnfa9UUsMGDMHnBllY
+	CTjqbMiRzx/lJyRoi2xs4pT+XQmq5/hGyBB3KMDdoNdt3FXOfcw/7Kp8AUkBBN8ce/Tl77H1nDm
+	OihzHuvjiIJEIqIp6kF1BKLsdfv0jo1Qw6o+eIcn0bUiD8fo3SJ+qB9/x946o0O9NVYIT9Cm
+X-Google-Smtp-Source: AGHT+IEF3fQvwd1EIVSbTlo6LUuUxv3OibA7tXvxVkt4PpEP2e2lZf2MmCaWCy6qIv21CKgts09mig==
+X-Received: by 2002:a17:907:7216:b0:ad4:f517:ca3 with SMTP id a640c23a62f3a-ade1aa0702cmr1303826466b.20.1749503304229;
+        Mon, 09 Jun 2025 14:08:24 -0700 (PDT)
 Received: from debian-vm.localnet ([2a01:4b00:d20c:cddd:20c:29ff:fe56:c86])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc1c57fsm609733366b.100.2025.06.09.14.08.21
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc1c57fsm609733366b.100.2025.06.09.14.08.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 14:08:21 -0700 (PDT)
+        Mon, 09 Jun 2025 14:08:24 -0700 (PDT)
 From: Zak Kemble <zakkemble@gmail.com>
 To: Doug Berger <opendmb@gmail.com>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -82,10 +84,12 @@ To: Doug Berger <opendmb@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Zak Kemble <zakkemble@gmail.com>
-Subject: [PATCH v1 0/2] net: bcmgenet: add support for GRO software interrupt coalescing
-Date: Mon,  9 Jun 2025 22:08:07 +0100
-Message-Id: <20250609210809.1006-1-zakkemble@gmail.com>
+Subject: [PATCH v1 1/2] net: bcmgenet: use napi_complete_done return value
+Date: Mon,  9 Jun 2025 22:08:08 +0100
+Message-Id: <20250609210809.1006-2-zakkemble@gmail.com>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250609210809.1006-1-zakkemble@gmail.com>
+References: <20250609210809.1006-1-zakkemble@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,20 +98,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Reposting as requested here https://lore.kernel.org/all/20250531224853.1339-1-zakkemble@gmail.com
+Make use of the return value from napi_complete_done(). This allows users to
+use the gro_flush_timeout and napi_defer_hard_irqs sysfs attributes for
+configuring software interrupt coalescing.
 
-Hey, these patches enable support for software IRQ coalescing and GRO
-aggregation and applies conservative defaults which can help improve
-system and network performance by reducing the number of hardware
-interrupts and improving GRO aggregation ratio.
+Signed-off-by: Zak Kemble <zakkemble@gmail.com>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Zak Kemble (2):
-  net: bcmgenet: use napi_complete_done return value
-  net: bcmgenet: enable GRO software interrupt coalescing by default
-
- drivers/net/ethernet/broadcom/genet/bcmgenet.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index fa0077bc6..cc9bdd244 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -2472,10 +2472,8 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
+ 
+ 	work_done = bcmgenet_desc_rx(ring, budget);
+ 
+-	if (work_done < budget) {
+-		napi_complete_done(napi, work_done);
++	if (work_done < budget && napi_complete_done(napi, work_done))
+ 		bcmgenet_rx_ring_int_enable(ring);
+-	}
+ 
+ 	if (ring->dim.use_dim) {
+ 		dim_update_sample(ring->dim.event_ctr, ring->dim.packets,
 -- 
 2.39.5
 
