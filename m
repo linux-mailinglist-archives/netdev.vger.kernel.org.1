@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-195679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A52C0AD1CEE
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:13:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A51AD1CFA
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 14:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DF0016AE62
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:13:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4032D188C9AC
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139C62571AC;
-	Mon,  9 Jun 2025 12:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27337256C60;
+	Mon,  9 Jun 2025 12:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GELQe7zl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O8DCTvUA"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AB4256C9B;
-	Mon,  9 Jun 2025 12:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8ED253F1E;
+	Mon,  9 Jun 2025 12:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749471204; cv=none; b=nLGD8XeGwDo6F8sa7V/YBCarmGhvhxQAJeqr0vLscJOCAeJq/XscTeyd5UP6VBx7QlXXUvJOsXKaf8jdCWZTgRofZIbdH1ZO5Eui4PjbroVjbJQsS/Zowp5wi1Je5nOJcgYQH06cMN8xGymFjPd/444BbpeUpv01agpGJ4Um5mw=
+	t=1749471388; cv=none; b=I4zDgBQ3Io4EEv2zVuPmh3QzKaOmU//vuOmRs+PViEfDCMfy9edaSYoqdLAui5Fh11Aq7bN99da0nbk1k2vfnjLbV0j+DG1bl0wz2eOIqPik36XUDrf/qD7uJGaVP+kA2djB5tczOQhcqns7VoNMuscX4xwv9ok0c7n/PC3yF7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749471204; c=relaxed/simple;
-	bh=PjWv2JVHoaGy0VTS2P6IlLGrSZt154xP1RtHIPoptTs=;
+	s=arc-20240116; t=1749471388; c=relaxed/simple;
+	bh=zlhMzS1dNDm4+twZV8FdiFuIsRgvrGoLgdUTyedqKYo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kvv+ko017wQbNuw37KAUBVKkGJNFFzzyFyAScw2AdV/1rMMVyiwfXkjxts6sLbSgYWlnrvYo9wTx31NqfNpNC7NSW0WbSZLrb9n4VQ4jAE9ef9/y848KSKlPT2YjmUyQ8P5yWcYCLydz0WJh3BQlIpOo1nxHbifcaV7c+j2YrVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GELQe7zl; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DXE8YVj8l+xpMFYl+91eQsdAxzcbLLiDHFN9wdqhYWyLHocXy2rdnZVRSx6dwk6BAYK+5RIW8jBmepOWwNoaJA84dKyMiR8hbVgC0WikiBKMLlAETj0zhseNGJzzb/M94Asn+kQsE1Ey1HSL+O2PD7Cg/iz6v0PMreGjpndhDFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O8DCTvUA; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,36 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NueSzK31DadYmmhRVawstIJJP48eqaOR7oYF5vEnWFE=; b=GELQe7zlFulZ3w8scQGOg8Bdph
-	qmSuWlEQovDrrtDkxsJHB8b7o9FWIvW5gzD/DF+r0DMgiYc5LOhBBw+OhvM2B1pPGkUzM7riKoSc7
-	xsFzUDNgO29L1XHNB9QZWzUSYJBTUV4grY00EkB+ig27NwqE82kIMJl39FuFa8HLAvVQ=;
+	bh=xZ8VkTY6ypJSXCk+Hz7uCo3eSGgDAR8exyMJTsBLtnU=; b=O8DCTvUApTGLf07xMb/apcXz+a
+	aAVMaJDmyTfy7vxzmsf5d5O9R1gfDj4FeOQica38teS7riBpoSlZSvmAZgAzosAFSozB0JW1nlfEE
+	tgsa9saywwKybrYFyIXIB0FQTg40KFJ96rIl9plZw+u4PGmJ00Y43uLJJDeBJ6Abk/bM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uObMx-00F9CK-5J; Mon, 09 Jun 2025 14:12:51 +0200
-Date: Mon, 9 Jun 2025 14:12:51 +0200
+	id 1uObQF-00F9EB-Hy; Mon, 09 Jun 2025 14:16:15 +0200
+Date: Mon, 9 Jun 2025 14:16:15 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Frank Wunderlich <frank-w@public-files.de>
-Cc: linux@fw-web.de, daniel@makrotopia.org, myungjoo.ham@samsung.com,
-	kyungmin.park@samsung.com, cw00.choi@samsung.com, djakov@kernel.org,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com, jia-wei.chang@mediatek.com,
-	johnson.wang@mediatek.com, arinc.unal@arinc9.com,
-	Landen.Chao@mediatek.com, dqfext@gmail.com, sean.wang@mediatek.com,
-	lorenzo@kernel.org, nbd@nbd.name, linux-pm@vger.kernel.org,
+To: george.moussalem@outlook.com
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic
- ethernet-nodes
-Message-ID: <9d27e0d3-5ecb-4dcd-b8aa-d4e0affbb915@lunn.ch>
-References: <20250608211452.72920-1-linux@fw-web.de>
- <20250608211452.72920-7-linux@fw-web.de>
- <cc73b532-f31b-443e-8127-0e5667c3f9c3@lunn.ch>
- <trinity-87fadcdb-eee3-4e66-b62d-5cef65f1462d-1749464918307@trinity-msg-rest-gmx-gmx-live-5d9b465786-mldbm>
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] dt-bindings: net: qca,ar803x: Add IPQ5018
+ Internal GE PHY support
+Message-ID: <6bf839e4-e208-458c-a3d1-f03b47597347@lunn.ch>
+References: <20250609-ipq5018-ge-phy-v4-0-1d3a125282c3@outlook.com>
+ <20250609-ipq5018-ge-phy-v4-2-1d3a125282c3@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,71 +74,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <trinity-87fadcdb-eee3-4e66-b62d-5cef65f1462d-1749464918307@trinity-msg-rest-gmx-gmx-live-5d9b465786-mldbm>
+In-Reply-To: <20250609-ipq5018-ge-phy-v4-2-1d3a125282c3@outlook.com>
 
-> > > +			gmac0: mac@0 {
-> > > +				compatible = "mediatek,eth-mac";
-> > > +				reg = <0>;
-> > > +				phy-mode = "internal";
-> > > +
-> > > +				fixed-link {
-> > > +					speed = <10000>;
-> > > +					full-duplex;
-> > > +					pause;
-> > > +				};
-> > 
-> > Maybe i've asked this before? What is on the other end of this link?
-> > phy-mode internal and fixed link seems an odd combination. It might
-> > just need some comments, if this is internally connected to a switch.
-> 
-> yes you've asked in v1 and i responded :)
-> 
-> https://patchwork.kernel.org/project/linux-mediatek/patch/20250511141942.10284-9-linux@fw-web.de/
-> 
-> connected to internal (mt7530) switch. Which kind of comment do you want here? Only "connected to internal switch"
-> or some more details?
+> +  - |
+> +    #include <dt-bindings/reset/qcom,gcc-ipq5018.h>
+> +
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        /* add alias to set qcom,dac-preset-short-cable on boards that need it */
+> +        ge_phy: ethernet-phy@7 {
+> +            compatible = "ethernet-phy-id004d.d0c0";
+> +            reg = <7>;
+> +
+> +            resets = <&gcc GCC_GEPHY_MISC_ARES>;
 
-"Connected to internal switch" will do. The word switch explains the
-fixed-link, and internal the phy-mode.
-
-It is not the case here, but i've seen DT misused like this because
-the MAC is connected to a PHY and there is no PHY driver yet, so a
-fixed link is used instead.
-
-> > > +			mdio_bus: mdio-bus {
-> > > +				#address-cells = <1>;
-> > > +				#size-cells = <0>;
-> > > +
-> > > +				/* internal 2.5G PHY */
-> > > +				int_2p5g_phy: ethernet-phy@f {
-> > > +					reg = <15>;
-> > 
-> > It is a bit odd mixing hex and decimal.
-> 
-> do you prefer hex or decimal for both? for r3mini i used decimal for both, so i would change unit-address
-> to 15.
-
-I suspect decimal is more common, but i don't care.
-
-> 
-> > > +					compatible = "ethernet-phy-ieee802.3-c45";
-> > 
-> > I _think_ the coding standard say the compatible should be first.
-> 
-> i can move this up of course
-> 
-> > > +					phy-mode = "internal";
-> > 
-> > A phy should not have a phy-mode.
-> 
-> not sure if this is needed for mt7988 internal 2.5g phy driver, but seems not when i look at the driver
-> (drivers/net/phy/mediatek/mtk-2p5ge.c). The switch phys also use this and also here i do not see any
-> access in the driver (drivers/net/dsa/mt7530-mmio.c + mt7530.c) on a quick look.
-> Afaik binding required the property and should be read by phylink (to be not unknown, but looks like
-> handled the same way).
-
-Which binding requires this? This is a PHY node, but i don't see
-anything about it in ethernet-phy.yaml.
+What do you mean by 'alias' here?
 
 	Andrew
 
