@@ -1,944 +1,212 @@
-Return-Path: <netdev+bounces-195798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3562AD2442
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:40:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C23BAD246A
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 18:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FEB3A62AE
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F17816AFAC
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 16:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2E521ABBB;
-	Mon,  9 Jun 2025 16:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AE321B9F0;
+	Mon,  9 Jun 2025 16:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dbSUN5AS"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="U4dY0vs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013025.outbound.protection.outlook.com [40.107.159.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFAB19F41C;
-	Mon,  9 Jun 2025 16:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749487179; cv=none; b=N5uIPNWuJP+i+rQiIYtmjaW0w6y9CB1UoDtH6tDgPxydoClI5qKxbfgVw2PJAoajIKijgiMu+yMciIMVQ0sEwdxgQhWM5Annq1GR4lyUqgZ+C4UaijUdUNH1i6GD9ElxH/4zQVTbTV9te26gWKyy1QsAyti/rrlPy2y6VkMB6nM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749487179; c=relaxed/simple;
-	bh=3BwNw0P+elmkm3VtxvGkC3epemFWEgWICDuzUQ7jTXk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hRkS0qu7akNZdzaNCN4cemrs5+j9V/EmbTL0n7/pk+KM3mtAd63tmMpXrm0UHGPoDYJDaKpMt/tlk19PD0bY3IdGYfm5PqS6oa5+d0vUyb1+AJLLO6+HkGewFwYePZBTKH6SEXXPZEuM/BTtiIhZZp8F9+cZ5HqxedggEOMhkjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dbSUN5AS; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so3073419a12.3;
-        Mon, 09 Jun 2025 09:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749487176; x=1750091976; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQ/2tFs2HYRlYSNhbd2W/zhps6+ZumXbGDoAgG+yTHo=;
-        b=dbSUN5ASKIMsd+vX7RPwxsOYjk67e3DehDJCL7CokghTzS1iVwaa0zY5IE+D/fj1RT
-         5YEdRrfRY8Y4W6WxDuzhywjlU8zE+LYcB8Ce4cQ7GkHujPoq7NTSjiUgz/+RbEMgAmxl
-         JMggid8rLsJIec40+dIKfRcITqeVyPBEnVKVrdS16CMY9y5kxl5Io6ybqho1GtqeFvSn
-         UIldb8K+rKJMsEbfYOL9jlyVILTm4KCpZnrpj1Ltu+D9RP6ozLC6B2mjQcHo1zbxAJgy
-         ICLE3t3LpKFvTUb+X14RpNPljTG1ilNLdFlEdjN2KDy3SGpGDLkseXSyOf6AU1EW7WAR
-         1Dyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749487176; x=1750091976;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qQ/2tFs2HYRlYSNhbd2W/zhps6+ZumXbGDoAgG+yTHo=;
-        b=QRDhyk8/NYH/ldkpuxqLdUokNXUwFb85e3cCOSVOspEw5KiyXPxSYcE2ULXGjzI3WV
-         9/jSqBwK/GXQ53qA6VkUFawMi1wSd5Pxkq2u6aAFy77rFhQbRm7YETH3fJbgTDFHKYq8
-         bMWoDqi0LuHN5kdQ7nw52mA56smJx9ctnYCdkg6r4zaTv5UEl2o29ykMx1Cg+4Tmotnq
-         9LiPnWOGWtqKWkPLhWD/Q6zu/X3OQwCJgeLH+00njVCunNJnSaTErvRGC8DYNW1JDTi3
-         rALVKUB8K0C1XUXWvA2Pqozj+V7+G9Git3FKH5yj9tZ9HDWBldxCH/1HlkV/YpBIsdjA
-         RONA==
-X-Forwarded-Encrypted: i=1; AJvYcCWPXnfzfpGUnuf1YWPnLnZla2FYtZF1tPpnFZEryGatUo7cb+Gua26aW09NpNFZPMgvb2kZxk+2@vger.kernel.org, AJvYcCX9luIbALUgXl86sESl/ZSmq3GGI0rZvERWt/GqsFCVUUuVvT9b4dbHyW56TFAA9n4kt6cHpCDLw70eUto=@vger.kernel.org, AJvYcCXlQsAsoK2SvMcstrJJuSroUlXJyW5VB9iB25APrkEArvi0/RD1TbqfS/b0ek4vpT+Z+arzYsVTIn89P2Pw42nY@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvILCMGBdux02sVoqZiRDwsh+qRfyXFcffQPuHrr9vTJ/ChKu1
-	bqOzQbFEttegXW2fRi9hkUv8pVQPeRrY4P2MjBH3ckWJATTCeyEznErdDGjn1mm4
-X-Gm-Gg: ASbGncvhUfpk1NCd8WJ1pI9HUf3AK6p2KzvFASTi5d3lRd56BrruDzWpk+wVVXA/VC3
-	HA45tTsw4O/WYZ8PVD0SIdGK5Cp7sloMzq1jk28HNhonfxwt/8UNDywTR98m7knOn+XDhjM7Oad
-	Aja985tw+Pawv/hM9yK8pVG5CND/nrePsDYg390o19U4oUejWv3ZpdZk2ertRipwUga7Ce2eDss
-	7pyyWcQ8oKBL+NKpjzdosc4aMBXG5L1y3VwJQAsvt59T/M5ca9CvtIG8mEzG20WUjyc26h9oXsG
-	n2jp7Pz3Lr1x4hXsOp4+X2ROVJho6cTtbLVToAmGF9D8s6JqEMibsmSlGA==
-X-Google-Smtp-Source: AGHT+IEj3ZebVwM69SayOlQr/LPuRrtixckY6FzQzvRXrTD17EqcN2jAQr3VB6rDttHKV+VZ8u8pBw==
-X-Received: by 2002:a17:90b:350d:b0:311:ea13:2e61 with SMTP id 98e67ed59e1d1-31347697347mr16401681a91.34.1749487176062;
-        Mon, 09 Jun 2025 09:39:36 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:c::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3134b09067dsm5786083a91.22.2025.06.09.09.39.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jun 2025 09:39:35 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Mon, 09 Jun 2025 09:39:24 -0700
-Subject: [PATCH net-next v10] selftests/vsock: add initial vmtest.sh for
- vsock
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B007821A443;
+	Mon,  9 Jun 2025 16:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749487981; cv=fail; b=AFNoEMnua+ambAY4PqVkIeaZ7LcIelhJE5acCKSLNwXuOaZ5nHU88sBq3xHbbiKn2G1wMIkTFMTLR4L8eOs17HQGuUyhEXOeov8Wx6/mDOz36+0+aCYMTR7vseheLWhcosApdnmRuH6w3qsguXKghBgnj/XLE0aKjyECofLVUTw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749487981; c=relaxed/simple;
+	bh=vbv0cAfB6kMVRjNmTPPWQKaJRdEhzVtwW1ae4qh2v7Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Bf02Bjjts/tl0LvoYz8hYR+rJBKcMYbdkSwsF4/gD5/+LmQ8wXVJxcyqYcNMKLa0QbTIaRiG/PR3+9WZOM7SiEQlwTi9pkZAznS1o6ynj8/+btnLlRBMaJLkP3VRcbTgE6FhcEgmhWSX0wu5Mx922A7MZl1C0O6NHYAL2LoX9SY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=U4dY0vs0; arc=fail smtp.client-ip=40.107.159.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X4f0NpWWYXogPsWmDUHmTgg4wZt2j5MMDUQ4RtlywMkYMi9gLlJUdhS/iUUEnMhWxxGEbntDYhwL6caYihno7ggVh1qfV4SsVeg8J7+HZfVYSYTbinAAnAPMmMOhtBT9vi0QpA93GJ09Mz0EfXFPITIMktZ3BEqgISEmV5vGaeVG/2wPcvrifsGdsZti7rul+xi7xmVphBgn/FtB6uVah2RMiuXFfGdv/UgO6SQ2sDDuch5E+aRRZwa99jUycHcfPu2Zyfbyp2RBTVSk/+5E55lonFTehbSMM3njz4A+WtqqC+U/0vtkgO9uDdyg1QaTr6RujslcucIv3jTE12dDNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KtxdfybRC+z4q6j32t25S1HAhXaSsDWINMjc2wuj3is=;
+ b=GcecjgaXtnyAk3aM5eSuQzpFqgozMJ3/NgexFvh51ZicSenuEwYVutgvlQxhxYZ476+QkXUo9UIZhwTht7LAdbXDDDKWk5kngv8eBesSX3uO505VaMd6xTe9dY6iEmzPdEjNw0bB5H+ih8FC4mqR4HOdwiVGA1yAimrMoh4JCAMZ51phCPFPwizkO4GgS0+lYGAksmycx2GL0J21aKWLzMrDBcfMr1SNw03vT4muVK6qI5ue11c/Az21N0sKPw2b4kXHR8+brwDy0g0SYmkYpkkuewhKPvkSpskvr8xnGqPFrpH4baQwojkmy7Yf9scgpxxDNmoz0/x+plLaLTeiRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KtxdfybRC+z4q6j32t25S1HAhXaSsDWINMjc2wuj3is=;
+ b=U4dY0vs0Nxd4NN8CHAafBVxevCSg4XNSvsCg2jQ3gGXNXHLLduqBzAc5OTg4iW0cSJfg54/+uJSN9UJmQHbBMHpOGhsYo2CXNJO3HxHD3g+uUXVWkFjnOjUPZLRcJ1ts2EmJivTEBpS4rSrhxgp6ingn4VdZnFETQYePPIVYEcfWHIpP1sz5J5gat5tsqKMoOMCvBVeKXz+fyA6VUQK8p9biN+YdUph4giNYZ4LVjl+Mfr1IgRbnHCQkbzw+C1c4PkxLQRBpoQ4oENY3lriiEyWFDWys7hgl+ukEWV34ONw4z8iTO0HYzB/UdAzAtZpDSiuOExobpcLBylcT7lmi6A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by VI0PR04MB10230.eurprd04.prod.outlook.com (2603:10a6:800:240::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.26; Mon, 9 Jun
+ 2025 16:52:58 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%7]) with mapi id 15.20.8813.024; Mon, 9 Jun 2025
+ 16:52:58 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	imx@lists.linux.dev (open list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-kernel@vger.kernel.org (open list),
+	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
+Cc: imx@lists.linux.dev
+Subject: [PATCH v2 2/6] arm64: dts: imx93: remove eee-broken-1000t for eqos node
+Date: Mon,  9 Jun 2025 12:52:33 -0400
+Message-Id: <20250609165237.1617560-2-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250609165237.1617560-1-Frank.Li@nxp.com>
+References: <20250609165237.1617560-1-Frank.Li@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR05CA0193.namprd05.prod.outlook.com
+ (2603:10b6:a03:330::18) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250609-vsock-vmtest-v10-1-7f37198e1cd4@gmail.com>
-X-B4-Tracking: v=1; b=H4sIADsOR2gC/33RTWrDMBAF4KsYrTNFM/r3qvcoXcjyKDFt7GIbk
- RJy91JvqqrQ9fC9B2/uYuN14k303V2sXKZtWmbRdyhPnUiXOJ8ZplH0nSBJRioyULYlvUG57rz
- tMKhIOBJKSiROnfhYOU+3I+9FzLzDzLddvJ46cZm2fVk/j6KCx/2I1Ch/RxYEhKxM9DjGIfj0f
- L7G6f0pLdcjqFCNXYMJEFSQGMkphexbrCpMvsEKENBjzBatyopbrH+wkW2zBgTLFIMjS2m0LTY
- VRtVgAwianUk6apN4aLGtcfODYgEhxIwpSVJByha7/7ADhCHaHL0dbaI/a/sKEzXYf69tncUwc
- EalWxxq3A4WAIE0R+ZkczSmxo/H4wvRL/NDmwIAAA==
-X-Change-ID: 20250325-vsock-vmtest-b3a21d2102c2
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VI0PR04MB10230:EE_
+X-MS-Office365-Filtering-Correlation-Id: 930f0406-06af-48bb-3e50-08dda776165e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|366016|52116014|376014|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?8LYRJp7gQpLYZyFyLtC72GBuKwr6DKMfEcXU710oD4Xo8Lzyt6lSDVVtEiLL?=
+ =?us-ascii?Q?xdH7oewL1AFpkgH400XbiJHl11VsCMLsjnQyd0gv/pQgHJE/N1JSptj3ml4Q?=
+ =?us-ascii?Q?Uk4lDYPwDkYRbbgqrhrKsLS0mbUKk/1TmPoTnkhlV+8anlaP5/VOIXXHqgwq?=
+ =?us-ascii?Q?aSsoZr9Fx68adTTwbXe5xRuBDe7ug+ZL6lFA7Z3N1L9awQFegtE2OIYHjsQT?=
+ =?us-ascii?Q?BUbWN9z06YNh8R/LL09QrhT3rGXUMRW9IlVCQ583L9UJSVfIMws+9qu56xxR?=
+ =?us-ascii?Q?Sy0atZ6Hl6nZsJSi62AWsn5coIjhbYrSMsaiMsosx/gdKg91WUVRibgYc0wX?=
+ =?us-ascii?Q?bRpYtdVjrL+l7XeG7aayf6Tz5C71PZJWmWhGXxn9qriw2ubC5DaBJud72WyY?=
+ =?us-ascii?Q?5OQxMC67hG0pjungvJ3VypSWAmaCmL5QZEGuAP2bvhMq8ot7JmY5UT6GKpAr?=
+ =?us-ascii?Q?fqTJPn7MWyHzEabI02ncOMUQTbb9fxn18ICjxwg27BdcmYpPauyO5kM9aMyB?=
+ =?us-ascii?Q?iOy2tMdV0jhv6SkNQbu9VT0uI13HSu0Zs5Mna55BLb4JCtkbZxSAQn2s0kRe?=
+ =?us-ascii?Q?l9042xra4hLzVryngsYMBLLDn8NjLts32ryqXmsWlHolE78S1SkmY/gzx+8E?=
+ =?us-ascii?Q?StKg1dsprN9vZBd2vOzqJQUnftjQQNQ3MoZoV3SkUO4PQEEbmiKCBe1gJyb1?=
+ =?us-ascii?Q?RHt4fSMwxjoulcxZPCID14VNohdyBiDWxEAFJH8rDarhzQ+/MZfBq6deDDyG?=
+ =?us-ascii?Q?A2t3y68eR1PoGt+tLyiTCNqnNutNLHeGnGo4tgcqdw3NjEztUKiENe05+7bk?=
+ =?us-ascii?Q?DKufSaO4YB0zlz4LI+8IBhnyBkPovCtOjtYLxN3KmhzcNqL+FA//3SEIYaSI?=
+ =?us-ascii?Q?/oTgtmJl+pcD10n7RlfpPOcwmmFc/f9mqPakWrrO49LYolL7+5SRshQSQ2aq?=
+ =?us-ascii?Q?G7JYggcGKopMJJFX2a338q1DmiGzzC0iiRfESuK0ekf0/spN6vWtoKY1VZR7?=
+ =?us-ascii?Q?Nd8l5rHw9gMqD7Gdyos19xhlANfG9uUZHNWPCOZbxZVh10mThkYR7I29eDIy?=
+ =?us-ascii?Q?p5D9xPUCL4K0aYIJ5Be7Lol0ZhclZxvrhVDqVjzazqT00wYDiH25U2K6rtvP?=
+ =?us-ascii?Q?owMlAeRPYfXMltPixEX/F/3x4JRG8/8UX3Ut2kk2PLkBiF+hrDIRtPfwpb+8?=
+ =?us-ascii?Q?tHnChI3q1QMhHv/yAdYQlNkF35ajTGGgpk5uCOcKuovDGxtR94fMq/ZiQlhf?=
+ =?us-ascii?Q?gSgbIElgngOn3vXNXjfB02KCu3eX9xFgrCHfyhInz3Pf4I44zoeJidOlIqwB?=
+ =?us-ascii?Q?bii5YwnByjk0Os7zWNIURfIO4JHLmCPE3otidIYH8F1ZpIi0J9YexIDwq/Lr?=
+ =?us-ascii?Q?Zq4rnAdaC+7wrDPnbMfkdS0Xb8NAdvZwqJC59kudf7EdXfIGga/OxFsYCxDa?=
+ =?us-ascii?Q?CjaHfhTIGbpUmlFivPh0u4dqzhY5uoGme7gGSoxcR9AWSHE5RsVZazP7/Awi?=
+ =?us-ascii?Q?dFV7uvnxKy9TCXs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(52116014)(376014)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?IDVrI8lARjxi4mmmuYNX0zOgCJzOwKaorKichGaBcxTzIzbHZEU9j1qfp6Pq?=
+ =?us-ascii?Q?+Czj1APs5lUPdIcOADKoIDkOZ6V+78Nla4P6Jcu/sYNtl5p3fZ8GQMM6s/VQ?=
+ =?us-ascii?Q?TfxphC2pEQehCXNIJ8eX8PSHVhEHIwQljYayTquhIvANLtQW3Y08M9Jcm7R8?=
+ =?us-ascii?Q?sIWzi7rZsquOeG5tKJyG4YrYWajM8TrzH8WcpBjRKUKk3O2enhfnV8Ndzxzb?=
+ =?us-ascii?Q?g652R0JoLDuLeNY+lkCciJhl11tvUOK2c+J5t0D9si818OdtV3SOPQC04xb8?=
+ =?us-ascii?Q?hpqmqetdn1HZ79+PqM8opeh7u/cgRX96ATfFn9JLzWixLtCiXu/0AERDif9k?=
+ =?us-ascii?Q?0GtcTmWdgiAbX0NsK+vBlaQUge31EiTWH4N0i9uRpqCuLYe8+YTN2CraADbL?=
+ =?us-ascii?Q?HpGiaYpYT1hOlSLXNyqIzA9yep1CtHo47lbTJ8UDoanTkneH58TeM3zUoLkT?=
+ =?us-ascii?Q?dhyZsT5Yu0gC3QJOHqjcIWg2ecPlRqHCb9jtxbEGqBHaLOA8UL9VaMCUxD+H?=
+ =?us-ascii?Q?hUor3WsbN4X0wlkzM5/xtAPj3nmHmA0vEi0eQM4ScuzdgCqORIAhtWvtFwqp?=
+ =?us-ascii?Q?ps9TeAgzQOccyGQborVga5V40h8fBQDCmTbeOab1/3WVOmMepXaFONZ8fo0O?=
+ =?us-ascii?Q?YSTmCHnLeXsnxpclTqnuoHANIoS2JuuJRQ1M9BXfbTdSvzPgaDKZMr0Emp1h?=
+ =?us-ascii?Q?VytU8D6jbM7BqT0XUL2DeB2AttwBIXmX7pbuZDl2xHN/zpuwNM85H5XyQmsy?=
+ =?us-ascii?Q?9zmaG1S3MgCD5CUOyO2WBEGtl/zrmdaDNs93rljJDgM0doywS4tt4RjT24QK?=
+ =?us-ascii?Q?GX/6TGMSJH+n+PVv8SmM3WURRAvN84tTIHUoRvsclx1Egqi5enpiQsUDBDwp?=
+ =?us-ascii?Q?6/FJTyxOhjceqeU9QxKXBavRo0TAqsQnDVD7o0cjGbwqY848Fqiii3t1926K?=
+ =?us-ascii?Q?L9gxyC/T2nVedTB3igbC1cEKsG5nTZCBnPxFPVROw7u2j03pgTRMmnEb6Ess?=
+ =?us-ascii?Q?qyr2MjhY1JQVy7flWNxjTqjlmzu5GVD/LCX2n7IKefVPX2x1phGSfhYxXjA1?=
+ =?us-ascii?Q?ku54IQ6vC+QQbql3IwluKIw7BTQ4k3CMC5YYC3822dBGw+wKVYtkDrhYxfS8?=
+ =?us-ascii?Q?871b9YFJY3X/MEuA/t/mI8feHw9EJMHZV2BDd2fbzv2CsWChrZT+EZUmVmln?=
+ =?us-ascii?Q?xsWbekWKnB3u7XH267ne+5LzZjEy1OTYwm9KrNh8AIVBDuKuOBR0C+qbaAJj?=
+ =?us-ascii?Q?Hl/c1ng2sZhrw//0nJ+0YtCxIq6BuaQV5CMjqWF7XQGe2IUsO33p00QIYF4b?=
+ =?us-ascii?Q?MPwnNsbcN34VCiMeISRE8y96E0p64CEIgTebbQHTTJyeNl85e+5reDd4XzXn?=
+ =?us-ascii?Q?OOaIdTu8HT+Zqszf9CHAmAC4p9a0eCiwPpCdzAmdcnL1HYb6MfqXC5jDQfdA?=
+ =?us-ascii?Q?fMDnrX+Z+ZHsl+5pHUwOCTIsiXRVe0zoAi6JZmv1kQRqGQiOxqSrz6K2n2bk?=
+ =?us-ascii?Q?XVLyae+nElD0peGZN/lEIwPgntQUvm5dMbjozJelY5xlOqrEO7HP8MVGwROP?=
+ =?us-ascii?Q?7N6bTrdk0Kfb3ZiU6cIhLENXnOgtWG+WctAWogm/?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 930f0406-06af-48bb-3e50-08dda776165e
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 16:52:58.2382
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y+2sKfG3Dx23SWUtcVe1l+/y8NSZG4YuaSrS6YkrOChkBDpm4AwsROCvnCc+oApkbzhcRiu//7iLT41qeJS99A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR04MB10230
 
-This commit introduces a new vmtest.sh runner for vsock.
+From: Clark Wang <xiaoning.wang@nxp.com>
 
-It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
-H2G, and loopback. The testing tools from tools/testing/vsock/ are
-reused. Currently, only vsock_test is used.
+The "eee-broken-1000t" was added on 8mm for FEC to avoid issue of ptp sync.
+EQoS haven't such issue. So, remove this for EQoS phys.
 
-VMCI and hyperv support is included in the config file to be built with
-the -b option, though not used in the tests.
-
-Only tested on x86.
-
-To run:
-
-  $ make -C tools/testing/selftests TARGETS=vsock
-  $ tools/testing/selftests/vsock/vmtest.sh
-
-or
-
-  $ make -C tools/testing/selftests TARGETS=vsock run_tests
-
-Example runs (after make -C tools/testing/selftests TARGETS=vsock):
-
-$ ./tools/testing/selftests/vsock/vmtest.sh
-1..3
-ok 0 vm_server_host_client
-ok 1 vm_client_host_server
-ok 2 vm_loopback
-SUMMARY: PASS=3 SKIP=0 FAIL=0
-Log: /tmp/vsock_vmtest_m7DI.log
-
-$ ./tools/testing/selftests/vsock/vmtest.sh vm_loopback
-1..1
-ok 0 vm_loopback
-SUMMARY: PASS=1 SKIP=0 FAIL=0
-Log: /tmp/vsock_vmtest_a1IO.log
-
-$ mkdir -p ~/scratch
-$ make -C tools/testing/selftests install TARGETS=vsock INSTALL_PATH=~/scratch
- [... omitted ...]
-$ cd ~/scratch
-$ ./run_kselftest.sh
- TAP version 13
- 1..1
- # timeout set to 300
- # selftests: vsock: vmtest.sh
- # 1..3
- # ok 0 vm_server_host_client
- # ok 1 vm_client_host_server
- # ok 2 vm_loopback
- # SUMMARY: PASS=3 SKIP=0 FAIL=0
- # Log: /tmp/vsock_vmtest_svEl.log
- ok 1 selftests: vsock: vmtest.sh
-
-Future work can include vsock_diag_test.
-
-Because vsock requires a VM to test anything other than loopback, this
-patch adds vmtest.sh as a kselftest itself. This is different than other
-systems that have a "vmtest.sh", where it is used as a utility script to
-spin up a VM to run the selftests as a guest (but isn't hooked into
-kselftest).
-
-Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
 ---
-Changes in v10:
-- remove dupes in tools/testing/selftests/vsock/config
-- Link to v9: https://lore.kernel.org/r/20250527-vsock-vmtest-v9-1-24eaeec6fa55@gmail.com
-
-Changes in v9:
-- make kselftest build target depend on tools/testing/vsock sources (Stefano)
-- add check_vng() for vng version checking (Stefano)
-- add virtme_ssh_channel=tcp to kernel cmdline (Stefano)
-- Link to v8: https://lore.kernel.org/r/20250522-vsock-vmtest-v8-1-367619bef134@gmail.com
-
-Changes in v8:
-- remove NIPA comment from commit msg
-- remove tap_* functions and TAP_PREFIX
-- add -b for building kernel
-- Link to v7: https://lore.kernel.org/r/20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com
-
-Changes in v7:
-- fix exit code bug when ran is kselftest: use cnt_total instead of KSFT_NUM_TESTS
-- updated commit message with updated output
-- updated commit message with commands for installing/running as
-  kselftest
-- Link to v6: https://lore.kernel.org/r/20250515-vsock-vmtest-v6-1-9af1cc023900@gmail.com
-
-Changes in v6:
-- add make cmd in commit message in vmtest.sh example (Stefano)
-- check nonzero size of QEMU_PIDFILE using -s conditional (Stefano)
-- display log file path after tests so it is easier to find amongst other random names
-- cleanup qemu pidfile if qemu is unable to remove it
-- make oops/warning failures more obvious with 'FAIL' prefix in log
-  (simply saying 'detected' wasn't clear enough to identify failing
-  condition)
-- Link to v5: https://lore.kernel.org/r/20250513-vsock-vmtest-v5-1-4e75c4a45ceb@gmail.com
-
-Changes in v5:
-- make log file a tmpfile (Paolo)
-- make sure both default and user defined QEMU gets handled by the dependency check (Paolo)
-- increased VM boot up timeout from 1m to 3m for slow hosts (Paolo)
-- rename vm_setup -> vm_start (Paolo)
-- derive wait_for_listener from selftests/net/net_helper.sh to removes ss usage 
-- Remove unused 'unset IFS' line (Paolo)
-- leave space after variable declarations (Paolo)
-- make QEMU_PIDFILE a tmp file (Paolo)
-- make everything readonly that is only read (Paolo)
-- source ktap_helpers.sh for KSFT_PASS and friends (Paolo)
-- don't check for timeout util (Paolo)
-- add missing usage string for -q qemu arg
-- add tap prefix to SUMMARY line since it isn't part of TAP protocol
-- exit with the correct status code based on failure/pass counts
-- Link to v4: https://lore.kernel.org/r/20250507-vsock-vmtest-v4-1-6e2a97262cd6@gmail.com
-
-Changes in v4:
-- do not use special tab delimiter for help string parsing (Stefano + Paolo)
-- fix paths for when installing kselftest and running out-of-tree (Paolo)
-- change vng to using running kernel instead of compiled kernel (Paolo)
-- use multi-line string for QEMU_OPTS (Stefano)
-- change timeout to 300s (Paolo)
-- skip if tools are not found and use kselftests status codes (Paolo)
-- remove build from vmtest.sh (Paolo)
-- change 2222 -> SSH_HOST_PORT (Stefano)
-- add tap-format output
-- add vmtest.log to gitignore
-- check for vsock_test binary and remind user to build it if missing
-- create a proper build in makefile
-- style fixes
-- add ssh, timeout, and pkill to dependency check, just in case
-- fix numerical comparison in conditionals
-- check qemu pidfile exists before proceeding (avoid wasting time waiting for ssh)
-- fix tracking of pass/fail bug
-- fix stderr redirection bug
-- Link to v3: https://lore.kernel.org/r/20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com
-
-Changes in v3:
-- use common conditional syntax for checking variables
-- use return value instead of global rc
-- fix typo TEST_HOST_LISTENER_PORT -> TEST_HOST_PORT_LISTENER
-- use SIGTERM instead of SIGKILL on cleanup
-- use peer-cid=1 for loopback
-- change sleep delay times into globals
-- fix test_vm_loopback logging
-- add test selection in arguments
-- make QEMU an argument
-- check that vng binary is on path
-- use QEMU variable
-- change <tab><backslash> to <space><backslash>
-- fix hardcoded file paths
-- add comment in commit msg about script that vmtest.sh was based off of
-- Add tools/testing/selftest/vsock/Makefile for kselftest
-- Link to v2: https://lore.kernel.org/r/20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com
-
-Changes in v2:
-- add kernel oops and warnings checker
-- change testname variable to use FUNCNAME
-- fix spacing in test_vm_server_host_client
-- add -s skip build option to vmtest.sh
-- add test_vm_loopback
-- pass port to vm_wait_for_listener
-- fix indentation in vmtest.sh
-- add vmci and hyperv to config
-- changed whitespace from tabs to spaces in help string
-- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
+change in v2
+- add peng fan review tag
+- add missed s-o-b
 ---
- MAINTAINERS                              |   1 +
- tools/testing/selftests/vsock/.gitignore |   2 +
- tools/testing/selftests/vsock/Makefile   |  17 ++
- tools/testing/selftests/vsock/config     | 111 +++++++
- tools/testing/selftests/vsock/settings   |   1 +
- tools/testing/selftests/vsock/vmtest.sh  | 487 +++++++++++++++++++++++++++++++
- 6 files changed, 619 insertions(+)
+ arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts | 1 -
+ arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts   | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 657a67f9031ef7798c19ac63e6383d4cb18a9e1f..3fbdd7bbfce7196a3cc7db70203317c6bd0e51fd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25751,6 +25751,7 @@ F:	include/uapi/linux/vm_sockets.h
- F:	include/uapi/linux/vm_sockets_diag.h
- F:	include/uapi/linux/vsockmon.h
- F:	net/vmw_vsock/
-+F:	tools/testing/selftests/vsock/
- F:	tools/testing/vsock/
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+index 8491eb53120e6..a6ebeb642eb65 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-evk.dts
+@@ -217,7 +217,6 @@ mdio {
  
- VMALLOC
-diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
-new file mode 100644
-index 0000000000000000000000000000000000000000..9c5bf379480f829a14713d5f5dc7d525bc272e84
---- /dev/null
-+++ b/tools/testing/selftests/vsock/.gitignore
-@@ -0,0 +1,2 @@
-+vmtest.log
-+vsock_test
-diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/selftests/vsock/Makefile
-new file mode 100644
-index 0000000000000000000000000000000000000000..c407c0afd9388ee692d59a95f304182f067596e9
---- /dev/null
-+++ b/tools/testing/selftests/vsock/Makefile
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+CURDIR := $(abspath .)
-+TOOLSDIR := $(abspath ../../..)
-+VSOCK_TEST_DIR := $(TOOLSDIR)/testing/vsock
-+VSOCK_TEST_SRCS := $(wildcard $(VSOCK_TEST_DIR)/*.c $(VSOCK_TEST_DIR)/*.h)
-+
-+$(OUTPUT)/vsock_test: $(VSOCK_TEST_DIR)/vsock_test
-+	install -m 755 $< $@
-+
-+$(VSOCK_TEST_DIR)/vsock_test: $(VSOCK_TEST_SRCS)
-+	$(MAKE) -C $(VSOCK_TEST_DIR) vsock_test
-+TEST_PROGS += vmtest.sh
-+TEST_GEN_FILES := vsock_test
-+
-+include ../lib.mk
-+
-diff --git a/tools/testing/selftests/vsock/config b/tools/testing/selftests/vsock/config
-new file mode 100644
-index 0000000000000000000000000000000000000000..5f0a4f17dfc96c0f4b8decafb01724648495191a
---- /dev/null
-+++ b/tools/testing/selftests/vsock/config
-@@ -0,0 +1,111 @@
-+CONFIG_BLK_DEV_INITRD=y
-+CONFIG_BPF=y
-+CONFIG_BPF_SYSCALL=y
-+CONFIG_BPF_JIT=y
-+CONFIG_HAVE_EBPF_JIT=y
-+CONFIG_BPF_EVENTS=y
-+CONFIG_FTRACE_SYSCALLS=y
-+CONFIG_FUNCTION_TRACER=y
-+CONFIG_HAVE_DYNAMIC_FTRACE=y
-+CONFIG_DYNAMIC_FTRACE=y
-+CONFIG_HAVE_KPROBES=y
-+CONFIG_KPROBES=y
-+CONFIG_KPROBE_EVENTS=y
-+CONFIG_ARCH_SUPPORTS_UPROBES=y
-+CONFIG_UPROBES=y
-+CONFIG_UPROBE_EVENTS=y
-+CONFIG_DEBUG_FS=y
-+CONFIG_FW_CFG_SYSFS=y
-+CONFIG_FW_CFG_SYSFS_CMDLINE=y
-+CONFIG_DRM=y
-+CONFIG_DRM_VIRTIO_GPU=y
-+CONFIG_DRM_VIRTIO_GPU_KMS=y
-+CONFIG_DRM_BOCHS=y
-+CONFIG_VIRTIO_IOMMU=y
-+CONFIG_SOUND=y
-+CONFIG_SND=y
-+CONFIG_SND_SEQUENCER=y
-+CONFIG_SND_PCI=y
-+CONFIG_SND_INTEL8X0=y
-+CONFIG_SND_HDA_CODEC_REALTEK=y
-+CONFIG_SECURITYFS=y
-+CONFIG_CGROUP_BPF=y
-+CONFIG_SQUASHFS=y
-+CONFIG_SQUASHFS_XZ=y
-+CONFIG_SQUASHFS_ZSTD=y
-+CONFIG_FUSE_FS=y
-+CONFIG_VIRTIO_FS=y
-+CONFIG_SERIO=y
-+CONFIG_PCI=y
-+CONFIG_INPUT=y
-+CONFIG_INPUT_KEYBOARD=y
-+CONFIG_KEYBOARD_ATKBD=y
-+CONFIG_SERIAL_8250=y
-+CONFIG_SERIAL_8250_CONSOLE=y
-+CONFIG_X86_VERBOSE_BOOTUP=y
-+CONFIG_VGA_CONSOLE=y
-+CONFIG_FB=y
-+CONFIG_FB_VESA=y
-+CONFIG_FRAMEBUFFER_CONSOLE=y
-+CONFIG_RTC_CLASS=y
-+CONFIG_RTC_HCTOSYS=y
-+CONFIG_RTC_DRV_CMOS=y
-+CONFIG_HYPERVISOR_GUEST=y
-+CONFIG_PARAVIRT=y
-+CONFIG_KVM_GUEST=y
-+CONFIG_KVM=y
-+CONFIG_KVM_INTEL=y
-+CONFIG_KVM_AMD=y
-+CONFIG_VSOCKETS=y
-+CONFIG_VSOCKETS_DIAG=y
-+CONFIG_VSOCKETS_LOOPBACK=y
-+CONFIG_VMWARE_VMCI_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS_COMMON=y
-+CONFIG_HYPERV_VSOCKETS=y
-+CONFIG_VMWARE_VMCI=y
-+CONFIG_VHOST_VSOCK=y
-+CONFIG_HYPERV=y
-+CONFIG_UEVENT_HELPER=n
-+CONFIG_VIRTIO=y
-+CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_MMIO=y
-+CONFIG_VIRTIO_BALLOON=y
-+CONFIG_NET=y
-+CONFIG_NET_CORE=y
-+CONFIG_NETDEVICES=y
-+CONFIG_NETWORK_FILESYSTEMS=y
-+CONFIG_INET=y
-+CONFIG_NET_9P=y
-+CONFIG_NET_9P_VIRTIO=y
-+CONFIG_9P_FS=y
-+CONFIG_VIRTIO_NET=y
-+CONFIG_CMDLINE_OVERRIDE=n
-+CONFIG_BINFMT_SCRIPT=y
-+CONFIG_SHMEM=y
-+CONFIG_TMPFS=y
-+CONFIG_UNIX=y
-+CONFIG_MODULE_SIG_FORCE=n
-+CONFIG_DEVTMPFS=y
-+CONFIG_TTY=y
-+CONFIG_VT=y
-+CONFIG_UNIX98_PTYS=y
-+CONFIG_EARLY_PRINTK=y
-+CONFIG_INOTIFY_USER=y
-+CONFIG_BLOCK=y
-+CONFIG_SCSI_LOWLEVEL=y
-+CONFIG_SCSI=y
-+CONFIG_SCSI_VIRTIO=y
-+CONFIG_BLK_DEV_SD=y
-+CONFIG_VIRTIO_CONSOLE=y
-+CONFIG_WATCHDOG=y
-+CONFIG_WATCHDOG_CORE=y
-+CONFIG_I6300ESB_WDT=y
-+CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
-+CONFIG_OVERLAY_FS=y
-+CONFIG_DAX=y
-+CONFIG_DAX_DRIVER=y
-+CONFIG_FS_DAX=y
-+CONFIG_MEMORY_HOTPLUG=y
-+CONFIG_MEMORY_HOTREMOVE=y
-+CONFIG_ZONE_DEVICE=y
-diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/selftests/vsock/settings
-new file mode 100644
-index 0000000000000000000000000000000000000000..694d70710ff08ac9fc91e9ecb5dbdadcf051f019
---- /dev/null
-+++ b/tools/testing/selftests/vsock/settings
-@@ -0,0 +1 @@
-+timeout=300
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..edacebfc163251eee9cd495eb5e704dc7adc958e
---- /dev/null
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -0,0 +1,487 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
-+#
-+# Dependencies:
-+#		* virtme-ng
-+#		* busybox-static (used by virtme-ng)
-+#		* qemu	(used by virtme-ng)
-+
-+readonly SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-+readonly KERNEL_CHECKOUT=$(realpath "${SCRIPT_DIR}"/../../../../)
-+
-+source "${SCRIPT_DIR}"/../kselftest/ktap_helpers.sh
-+
-+readonly VSOCK_TEST="${SCRIPT_DIR}"/vsock_test
-+readonly TEST_GUEST_PORT=51000
-+readonly TEST_HOST_PORT=50000
-+readonly TEST_HOST_PORT_LISTENER=50001
-+readonly SSH_GUEST_PORT=22
-+readonly SSH_HOST_PORT=2222
-+readonly VSOCK_CID=1234
-+readonly WAIT_PERIOD=3
-+readonly WAIT_PERIOD_MAX=60
-+readonly WAIT_TOTAL=$(( WAIT_PERIOD * WAIT_PERIOD_MAX ))
-+readonly QEMU_PIDFILE=$(mktemp /tmp/qemu_vsock_vmtest_XXXX.pid)
-+
-+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
-+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
-+# adding an additional port to forward to the device created from "--ssh" and
-+# virtme-init mistakenly sets identical IPs to the ssh device and additional
-+# devices, we instead opt out of using --ssh, add the device manually, and also
-+# add the kernel cmdline options that virtme-init uses to setup the interface.
-+readonly QEMU_TEST_PORT_FWD="hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
-+readonly QEMU_SSH_PORT_FWD="hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
-+readonly QEMU_OPTS="\
-+	 -netdev user,id=n0,${QEMU_TEST_PORT_FWD},${QEMU_SSH_PORT_FWD} \
-+	 -device virtio-net-pci,netdev=n0 \
-+	 -device vhost-vsock-pci,guest-cid=${VSOCK_CID} \
-+	 --pidfile ${QEMU_PIDFILE} \
-+"
-+readonly KERNEL_CMDLINE="\
-+	virtme.dhcp net.ifnames=0 biosdevname=0 \
-+	virtme.ssh virtme_ssh_channel=tcp virtme_ssh_user=$USER \
-+"
-+readonly LOG=$(mktemp /tmp/vsock_vmtest_XXXX.log)
-+readonly TEST_NAMES=(vm_server_host_client vm_client_host_server vm_loopback)
-+readonly TEST_DESCS=(
-+	"Run vsock_test in server mode on the VM and in client mode on the host."
-+	"Run vsock_test in client mode on the VM and in server mode on the host."
-+	"Run vsock_test using the loopback transport in the VM."
-+)
-+
-+VERBOSE=0
-+
-+usage() {
-+	local name
-+	local desc
-+	local i
-+
-+	echo
-+	echo "$0 [OPTIONS] [TEST]..."
-+	echo "If no TEST argument is given, all tests will be run."
-+	echo
-+	echo "Options"
-+	echo "  -b: build the kernel from the current source tree and use it for guest VMs"
-+	echo "  -q: set the path to or name of qemu binary"
-+	echo "  -v: verbose output"
-+	echo
-+	echo "Available tests"
-+
-+	for ((i = 0; i < ${#TEST_NAMES[@]}; i++)); do
-+		name=${TEST_NAMES[${i}]}
-+		desc=${TEST_DESCS[${i}]}
-+		printf "\t%-35s%-35s\n" "${name}" "${desc}"
-+	done
-+	echo
-+
-+	exit 1
-+}
-+
-+die() {
-+	echo "$*" >&2
-+	exit "${KSFT_FAIL}"
-+}
-+
-+vm_ssh() {
-+	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost "$@"
-+	return $?
-+}
-+
-+cleanup() {
-+	if [[ -s "${QEMU_PIDFILE}" ]]; then
-+		pkill -SIGTERM -F "${QEMU_PIDFILE}" > /dev/null 2>&1
-+	fi
-+
-+	# If failure occurred during or before qemu start up, then we need
-+	# to clean this up ourselves.
-+	if [[ -e "${QEMU_PIDFILE}" ]]; then
-+		rm "${QEMU_PIDFILE}"
-+	fi
-+}
-+
-+check_args() {
-+	local found
-+
-+	for arg in "$@"; do
-+		found=0
-+		for name in "${TEST_NAMES[@]}"; do
-+			if [[ "${name}" = "${arg}" ]]; then
-+				found=1
-+				break
-+			fi
-+		done
-+
-+		if [[ "${found}" -eq 0 ]]; then
-+			echo "${arg} is not an available test" >&2
-+			usage
-+		fi
-+	done
-+
-+	for arg in "$@"; do
-+		if ! command -v > /dev/null "test_${arg}"; then
-+			echo "Test ${arg} not found" >&2
-+			usage
-+		fi
-+	done
-+}
-+
-+check_deps() {
-+	for dep in vng ${QEMU} busybox pkill ssh; do
-+		if [[ ! -x $(command -v "${dep}") ]]; then
-+			echo -e "skip:    dependency ${dep} not found!\n"
-+			exit "${KSFT_SKIP}"
-+		fi
-+	done
-+
-+	if [[ ! -x $(command -v "${VSOCK_TEST}") ]]; then
-+		printf "skip:    %s not found!" "${VSOCK_TEST}"
-+		printf " Please build the kselftest vsock target.\n"
-+		exit "${KSFT_SKIP}"
-+	fi
-+}
-+
-+check_vng() {
-+	local tested_versions
-+	local version
-+	local ok
-+
-+	tested_versions=("1.33" "1.36")
-+	version="$(vng --version)"
-+
-+	ok=0
-+	for tv in "${tested_versions[@]}"; do
-+		if [[ "${version}" == *"${tv}"* ]]; then
-+			ok=1
-+			break
-+		fi
-+	done
-+
-+	if [[ ! "${ok}" -eq 1 ]]; then
-+		printf "warning: vng version '%s' has not been tested and may " "${version}" >&2
-+		printf "not function properly.\n\tThe following versions have been tested: " >&2
-+		echo "${tested_versions[@]}" >&2
-+	fi
-+}
-+
-+handle_build() {
-+	if [[ ! "${BUILD}" -eq 1 ]]; then
-+		return
-+	fi
-+
-+	if [[ ! -d "${KERNEL_CHECKOUT}" ]]; then
-+		echo "-b requires vmtest.sh called from the kernel source tree" >&2
-+		exit 1
-+	fi
-+
-+	pushd "${KERNEL_CHECKOUT}" &>/dev/null
-+
-+	if ! vng --kconfig --config "${SCRIPT_DIR}"/config; then
-+		die "failed to generate .config for kernel source tree (${KERNEL_CHECKOUT})"
-+	fi
-+
-+	if ! make -j$(nproc); then
-+		die "failed to build kernel from source tree (${KERNEL_CHECKOUT})"
-+	fi
-+
-+	popd &>/dev/null
-+}
-+
-+vm_start() {
-+	local logfile=/dev/null
-+	local verbose_opt=""
-+	local kernel_opt=""
-+	local qemu
-+
-+	qemu=$(command -v "${QEMU}")
-+
-+	if [[ "${VERBOSE}" -eq 1 ]]; then
-+		verbose_opt="--verbose"
-+		logfile=/dev/stdout
-+	fi
-+
-+	if [[ "${BUILD}" -eq 1 ]]; then
-+		kernel_opt="${KERNEL_CHECKOUT}"
-+	fi
-+
-+	vng \
-+		--run \
-+		${kernel_opt} \
-+		${verbose_opt} \
-+		--qemu-opts="${QEMU_OPTS}" \
-+		--qemu="${qemu}" \
-+		--user root \
-+		--append "${KERNEL_CMDLINE}" \
-+		--rw  &> ${logfile} &
-+
-+	if ! timeout ${WAIT_TOTAL} \
-+		bash -c 'while [[ ! -s '"${QEMU_PIDFILE}"' ]]; do sleep 1; done; exit 0'; then
-+		die "failed to boot VM"
-+	fi
-+}
-+
-+vm_wait_for_ssh() {
-+	local i
-+
-+	i=0
-+	while true; do
-+		if [[ ${i} -gt ${WAIT_PERIOD_MAX} ]]; then
-+			die "Timed out waiting for guest ssh"
-+		fi
-+		if vm_ssh -- true; then
-+			break
-+		fi
-+		i=$(( i + 1 ))
-+		sleep ${WAIT_PERIOD}
-+	done
-+}
-+
-+# derived from selftests/net/net_helper.sh
-+wait_for_listener()
-+{
-+	local port=$1
-+	local interval=$2
-+	local max_intervals=$3
-+	local protocol=tcp
-+	local pattern
-+	local i
-+
-+	pattern=":$(printf "%04X" "${port}") "
-+
-+	# for tcp protocol additionally check the socket state
-+	[ "${protocol}" = "tcp" ] && pattern="${pattern}0A"
-+	for i in $(seq "${max_intervals}"); do
-+		if awk '{print $2" "$4}' /proc/net/"${protocol}"* | \
-+		   grep -q "${pattern}"; then
-+			break
-+		fi
-+		sleep "${interval}"
-+	done
-+}
-+
-+vm_wait_for_listener() {
-+	local port=$1
-+
-+	vm_ssh <<EOF
-+$(declare -f wait_for_listener)
-+wait_for_listener ${port} ${WAIT_PERIOD} ${WAIT_PERIOD_MAX}
-+EOF
-+}
-+
-+host_wait_for_listener() {
-+	wait_for_listener "${TEST_HOST_PORT_LISTENER}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
-+}
-+
-+__log_stdin() {
-+	cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
-+}
-+
-+__log_args() {
-+	echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
-+}
-+
-+log() {
-+	local prefix="$1"
-+
-+	shift
-+	local redirect=
-+	if [[ ${VERBOSE} -eq 0 ]]; then
-+		redirect=/dev/null
-+	else
-+		redirect=/dev/stdout
-+	fi
-+
-+	if [[ "$#" -eq 0 ]]; then
-+		__log_stdin | tee -a "${LOG}" > ${redirect}
-+	else
-+		__log_args "$@" | tee -a "${LOG}" > ${redirect}
-+	fi
-+}
-+
-+log_setup() {
-+	log "setup" "$@"
-+}
-+
-+log_host() {
-+	local testname=$1
-+
-+	shift
-+	log "test:${testname}:host" "$@"
-+}
-+
-+log_guest() {
-+	local testname=$1
-+
-+	shift
-+	log "test:${testname}:guest" "$@"
-+}
-+
-+test_vm_server_host_client() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=server \
-+		--control-port="${TEST_GUEST_PORT}" \
-+		--peer-cid=2 \
-+		2>&1 | log_guest "${testname}" &
-+
-+	vm_wait_for_listener "${TEST_GUEST_PORT}"
-+
-+	${VSOCK_TEST} \
-+		--mode=client \
-+		--control-host=127.0.0.1 \
-+		--peer-cid="${VSOCK_CID}" \
-+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
-+
-+	return $?
-+}
-+
-+test_vm_client_host_server() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	${VSOCK_TEST} \
-+		--mode "server" \
-+		--control-port "${TEST_HOST_PORT_LISTENER}" \
-+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
-+
-+	host_wait_for_listener
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=client \
-+		--control-host=10.0.2.2 \
-+		--peer-cid=2 \
-+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
-+
-+	return $?
-+}
-+
-+test_vm_loopback() {
-+	local testname="${FUNCNAME[0]#test_}"
-+	local port=60000 # non-forwarded local port
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=server \
-+		--control-port="${port}" \
-+		--peer-cid=1 2>&1 | log_guest "${testname}" &
-+
-+	vm_wait_for_listener "${port}"
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=client \
-+		--control-host="127.0.0.1" \
-+		--control-port="${port}" \
-+		--peer-cid=1 2>&1 | log_guest "${testname}"
-+
-+	return $?
-+}
-+
-+run_test() {
-+	local host_oops_cnt_before
-+	local host_warn_cnt_before
-+	local vm_oops_cnt_before
-+	local vm_warn_cnt_before
-+	local host_oops_cnt_after
-+	local host_warn_cnt_after
-+	local vm_oops_cnt_after
-+	local vm_warn_cnt_after
-+	local name
-+	local rc
-+
-+	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
-+	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
-+	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
-+	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
-+
-+	name=$(echo "${1}" | awk '{ print $1 }')
-+	eval test_"${name}"
-+	rc=$?
-+
-+	host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${host_oops_cnt_after} -gt ${host_oops_cnt_before} ]]; then
-+		echo "FAIL: kernel oops detected on host" | log_host "${name}"
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	host_warn_cnt_after=$(dmesg --level=warn | wc -l)
-+	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
-+		echo "FAIL: kernel warning detected on host" | log_host "${name}"
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
-+		echo "FAIL: kernel oops detected on vm" | log_host "${name}"
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
-+	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
-+		echo "FAIL: kernel warning detected on vm" | log_host "${name}"
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	return "${rc}"
-+}
-+
-+QEMU="qemu-system-$(uname -m)"
-+
-+while getopts :hvsq:b o
-+do
-+	case $o in
-+	v) VERBOSE=1;;
-+	b) BUILD=1;;
-+	q) QEMU=$OPTARG;;
-+	h|*) usage;;
-+	esac
-+done
-+shift $((OPTIND-1))
-+
-+trap cleanup EXIT
-+
-+if [[ ${#} -eq 0 ]]; then
-+	ARGS=("${TEST_NAMES[@]}")
-+else
-+	ARGS=("$@")
-+fi
-+
-+check_args "${ARGS[@]}"
-+check_deps
-+check_vng
-+handle_build
-+
-+echo "1..${#ARGS[@]}"
-+
-+log_setup "Booting up VM"
-+vm_start
-+vm_wait_for_ssh
-+log_setup "VM booted up"
-+
-+cnt_pass=0
-+cnt_fail=0
-+cnt_skip=0
-+cnt_total=0
-+for arg in "${ARGS[@]}"; do
-+	run_test "${arg}"
-+	rc=$?
-+	if [[ ${rc} -eq $KSFT_PASS ]]; then
-+		cnt_pass=$(( cnt_pass + 1 ))
-+		echo "ok ${cnt_total} ${arg}"
-+	elif [[ ${rc} -eq $KSFT_SKIP ]]; then
-+		cnt_skip=$(( cnt_skip + 1 ))
-+		echo "ok ${cnt_total} ${arg} # SKIP"
-+	elif [[ ${rc} -eq $KSFT_FAIL ]]; then
-+		cnt_fail=$(( cnt_fail + 1 ))
-+		echo "not ok ${cnt_total} ${arg} # exit=$rc"
-+	fi
-+	cnt_total=$(( cnt_total + 1 ))
-+done
-+
-+echo "SUMMARY: PASS=${cnt_pass} SKIP=${cnt_skip} FAIL=${cnt_fail}"
-+echo "Log: ${LOG}"
-+
-+if [ $((cnt_pass + cnt_skip)) -eq ${cnt_total} ]; then
-+	exit "$KSFT_PASS"
-+else
-+	exit "$KSFT_FAIL"
-+fi
-
----
-base-commit: 8066e388be48f1ad62b0449dc1d31a25489fa12a
-change-id: 20250325-vsock-vmtest-b3a21d2102c2
-
-Best regards,
+ 		ethphy1: ethernet-phy@1 {
+ 			reg = <1>;
+-			eee-broken-1000t;
+ 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+ 			reset-deassert-us = <80000>;
+diff --git a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+index acbd981ba548a..cceca130c5b4e 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-9x9-qsb.dts
+@@ -184,7 +184,6 @@ mdio {
+ 		ethphy1: ethernet-phy@1 {
+ 			compatible = "ethernet-phy-ieee802.3-c22";
+ 			reg = <1>;
+-			eee-broken-1000t;
+ 			reset-gpios = <&pcal6524 15 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+ 			reset-deassert-us = <80000>;
 -- 
-Bobby Eshleman <bobbyeshleman@gmail.com>
+2.34.1
 
 
