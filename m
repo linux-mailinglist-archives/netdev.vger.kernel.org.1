@@ -1,243 +1,181 @@
-Return-Path: <netdev+bounces-195878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64573AD28C1
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:28:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04CD2AD28C7
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C92F3B3055
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AECA4163FE6
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F341822578E;
-	Mon,  9 Jun 2025 21:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BC4221FD3;
+	Mon,  9 Jun 2025 21:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="np3MAqtQ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QfWK1q4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EE32253A8
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 21:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749504430; cv=none; b=lC5CsKDQAE3lfYLzFmQpzGBUgYeWIZRqmG7eS7f9YDrwvIwmUDoD3IXAr4Ym2N4cfw6o1LAkBjHV5YWPKx36Eqcfd0A8w+B1r1K+a5IvRqFOuCc9Zv/Tq9NBgyl0TmfRSjXm3DAW6QerSqA6ILQfbwvTeznMN+GNDd6Uw87Y7uY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749504430; c=relaxed/simple;
-	bh=Y9u/sJcyUV4KAT9pMqfiNUMEYY1syoz/3I4d+ZdaPtg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r6d+wysQ0svstzpH+N8iFGDYVnwOmwkGfW5+Ozv7lHq6HWTxB+lEPVsqLWBAcQdmbHga1vNwws5ua4tDVnR0jrSytEi6l2h6U30P6qmY6ohIh/pzYfu2VOlTUmKbSdy0yQrMhpCgP+qD0WQo10be8Yr7hHvkuW1uPZSrn/CyR10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=np3MAqtQ; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749504429; x=1781040429;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y9u/sJcyUV4KAT9pMqfiNUMEYY1syoz/3I4d+ZdaPtg=;
-  b=np3MAqtQC05407e2eyejC0zcETWaw+kVwTqnNbmuw3puoqITvvneso6E
-   gjVP3pamIknT+E6W4PHsbjJeSBoIha+ORYF5qoawfQYWi7rfHVpyIqFvS
-   PgBkgn1JMXDUm2dwfB6nTPL54m+yO1zLyeRALSuZEhCskmBxJC7kl9gbQ
-   Feq9kp6BOrjVRk7uL41ySzdNT1dQPkHGfbFCWgg1hJ2i/uuOQtyaE+FBY
-   rJ+nEaqFJw0dPPhKm8sfL9HdW5WWP2PVZldE0HEPy7XMsqAem0qsoBBdM
-   354LNmD/efIzXvNZsyBn8OzOwoSg9/6KCKq7Osv4U4oFDt5P5BvZXbEZL
-   w==;
-X-CSE-ConnectionGUID: h/Gq+9NGR7aPKiTBL/xhhw==
-X-CSE-MsgGUID: h9WVZGdoRGabT1z/2Ge7Ow==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="61864247"
-X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="61864247"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 14:27:08 -0700
-X-CSE-ConnectionGUID: ro3WNvHjR3ych4sG5zStzw==
-X-CSE-MsgGUID: 5hYJdmbtSFO+klyWejDb6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="150469066"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 09 Jun 2025 14:27:06 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 11/11] ixgbe: Fix typos and clarify comments in X550 driver code
-Date: Mon,  9 Jun 2025 14:26:50 -0700
-Message-ID: <20250609212652.1138933-12-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250609212652.1138933-1-anthony.l.nguyen@intel.com>
-References: <20250609212652.1138933-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB341E3DF2;
+	Mon,  9 Jun 2025 21:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749504533; cv=fail; b=pwK32uxXGcoJlodY7nZhmpZhyfaJaMXu/9h/N38HVLz1rcgVKRHyLbVwQhh5m1je3TZUgzcsc9TTBUtXUactJRoxua/CwhyhtMkFwH71u+XMtm+vIlzEoU/R0KfIg/ggZBrx3KPVrRL/mtrGcizQtwUqRV8UuX2LUdJQjXYXfv0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749504533; c=relaxed/simple;
+	bh=XZk0JlOXuB0/FsG43yne3rxfyitLItDULdl6NcL1T6w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TaFNgDSgpgoZIN2bBrU7Cgtt5qOq+rxNd2VhZs/Q0l8y6rrzA6l24gG0t7wmQG62MoQA3tqemVh0ddUVsXnpxy5erlqquS18CsFYvHcHG9corJuZK519jo8jJZ5WuII/7zDps75UoLewcswgUCSmPLlUiEuWA/iHq1urkkWn47w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QfWK1q4f; arc=fail smtp.client-ip=40.107.237.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dfX9+uigH2nTJeer3ECr8BvHYZxzP16k0maxBNbmsZf4KGm4kaSqnUx7vLVSuK9NEAOZu0pU8anrzThd4+60b7LGQ2j/Q+eqvRY3zH5+Ip/RAcyaayJ5idsDgPp6+5koWjg4Gd+zbQ/P8tAFFZZ8cH51spnx7hpeENQ11K4xEYZcZQsmcDm3WjcutF3fEq/cnRa6kd/bEvGllgJOMnq3H/+tHO8D81aUTXzkN5qYeYP8K+zDRvC1TWPbo3U7UBkBqnkkAugVdZDmQRJmwFIHgkdSDMvdUTQyu3gCBi4/iJZfn1d8zvyyKJkWtEJ+s+/JBWZ7MHxcfG0fxkFdcO60Ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wBAed7ELX5u+XLarNRxS3nkIAC63RbuBic0mXTxVjw8=;
+ b=QSwuBO8DU+CcoRfbtX9MaUeaa09ZHvK/twEJURCeiXtGChSVeGTrIQhl5uS0/9BH24/KTF13ylMaQtHKqkh0auTQmr760h90AXlCMLWEEqkNAitZ8BibZwQdg8CzpfLZw7q2v2wgIvClpRYmuWgVO2YrIcM31ICq4YssqQ/vqgaADf/jvoGpQUW+huYhQMJl27G+3RcRAGh/J+sLmtKE9EIovQXVOC1I/RJTVbEbn5Q5aRjyXd42a+5EZ9GBgS6FZ8Mt3oLrFEVB/Jaz9MHkCXwQTPh3HbM5+oSGpp36kW+7Va4K7PY2e+fjN6mPvLtLGKOUVdLsiSK7TQtGUjuHVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wBAed7ELX5u+XLarNRxS3nkIAC63RbuBic0mXTxVjw8=;
+ b=QfWK1q4fTus4xqXYSdOj4XX8cgmWOqfSIzJ7+fzZhl5DtNcz5DwL+rKDEwaYyRSgZBAiyCoQTv1MweTMPWwUN0P1eUIEs9KY8x4wu2m6dLR5S5NNlRXaKGJFkjqjFf88+XsfU3Vfin444sUOzTxiewuJwuZ/H5wefcXetPvTMP8=
+Received: from CY5PR19CA0044.namprd19.prod.outlook.com (2603:10b6:930:1a::24)
+ by LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Mon, 9 Jun
+ 2025 21:28:48 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:930:1a:cafe::a) by CY5PR19CA0044.outlook.office365.com
+ (2603:10b6:930:1a::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.24 via Frontend Transport; Mon,
+ 9 Jun 2025 21:28:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8835.15 via Frontend Transport; Mon, 9 Jun 2025 21:28:47 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Jun
+ 2025 16:28:46 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
+Subject: [PATCH net] ionic: Prevent driver/fw getting out of sync on devcmd(s)
+Date: Mon, 9 Jun 2025 14:28:27 -0700
+Message-ID: <20250609212827.53842-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|LV2PR12MB5869:EE_
+X-MS-Office365-Filtering-Correlation-Id: 782b0082-6f81-47cb-1baa-08dda79c9ef5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?6ss7FkqNNE9/QFzP8MEua5guDAJ+MYHSGPeVOK9nOiOPtc6SKAUdzoBlrLg/?=
+ =?us-ascii?Q?YOZf+41OTQzCIf9TxiuWJUl9/LsgDGuJJj59By/VFc5hCKDusIaXEh4nKuvD?=
+ =?us-ascii?Q?38NJxCFvzXAMUF5cZC9eqbHzPc1AKHVvC6G1zszHjpeRzFnNWkz0BHiq1N3X?=
+ =?us-ascii?Q?GYpUVnLSOLLf/m3Iz78iW8y00Tf0psKDIGDxRGC4brAhVenkUK7FL1ky4O1X?=
+ =?us-ascii?Q?eAxpfiMG66188X/rNbj3MGZWwDy34TlXSL7BhUdgwGqJshG8TSkBOkbpm04j?=
+ =?us-ascii?Q?tWyq1uxHUtIzUQp8c8c9JhJJNIAi0342h+mGzb5eqjAajgtVYG58mwFdbAeb?=
+ =?us-ascii?Q?KL4T14FqxtT++iMDxv+ovWK9wr+TMGjSU8aTQ5me6YTruKyem/jjMMSf1QUg?=
+ =?us-ascii?Q?c5IsH2FC2TgRzzz4Ny8iPA3D9kICbcwZ85qH+eOmNePzjJTr1wzohPAg9r7o?=
+ =?us-ascii?Q?TLuL2neA3jPxVuRy6CwoGSZ7snDGlLaNsd/nIY/i7bVmajSR9D5eFfeGWgIO?=
+ =?us-ascii?Q?yRVf5P0tSqPGJ7air7ysVCljmDL+VU6Ud9lPPAR0FCzo0NW6HjbG7U/tf0S1?=
+ =?us-ascii?Q?MSQer2H0OH5zHYhy43pKjAiwn62pIhejrvoiFJjDBcx1cDgI9Ga9iTIc14JJ?=
+ =?us-ascii?Q?PxxjMT8oJjqEGz3zYgNXkkG3ZpmTiUsK183FKAZPC40f7erOU2vxpOoxsUaf?=
+ =?us-ascii?Q?7gF2x4nCW/XY5vBlid6e4JLo/sSm5XuOIGESiSRhKixI8ptfLkTxBKqTnbZJ?=
+ =?us-ascii?Q?YeaUwkjDctlYw1J74NL/WHgHF3bTSzzHwtq+mWvpys/Qh5esglEt39F+3ckO?=
+ =?us-ascii?Q?FdIkAXZLjMa7rr9f+jXUI+cSde4L+73ysGYFY7sQ0uXqvOfwGuBrHjLgs4H+?=
+ =?us-ascii?Q?hxNAaKvvqRMl4Yuq8J3JBLb0FDtf1d2Nr8/yWNa19xr3DnT/o1PHMqPITzWn?=
+ =?us-ascii?Q?4FegwhcXp5hFvcznNkbFYCo+lwWEYXL5z/eGUu4LxJCan1dWg7xAMteD0I2e?=
+ =?us-ascii?Q?YGuUEjRGH9UynLVLEFNAVuse5mCyOGB60srdKJyhPgqVoytnBDW+dV4yN/V1?=
+ =?us-ascii?Q?zDDqE1RRWmyh6TrRQqL8kMIvEZlAkcGlVx7SIdsuN2JigvqdDkaEvmAsQhjF?=
+ =?us-ascii?Q?fbETOeaheEhgYTPNyL38wcgm5LxJxxHeHpAnX7LSFwZ6z7wTI2bGDZ7mQXo2?=
+ =?us-ascii?Q?5xDPCkXAe78uJVtxsTW3hfYBAqXyfNlhiVAnHH2csZMFH3qmif4qIchJYDbU?=
+ =?us-ascii?Q?tLHbsOtSWWwFo74XhHUC1KVRzolsJmq75iIYjeHDspg6Eh8N/FTytdkmiW6g?=
+ =?us-ascii?Q?gdXWHf/JsF6QdVDereUorqzWmalcTUVHVLSHp9pwcDVHI8EFrjHVgo9AADNv?=
+ =?us-ascii?Q?7UuXspp7Y+IqM+siDihyhq5Bl/94AHutHsXlf0tmWfO8JSd9XjcR6ezlDU2S?=
+ =?us-ascii?Q?HjGYlS408cKmgAjQB8fZ/HMFYmeKPipNmArwGU/XnE+XvFoSEiYmZkXfMQJe?=
+ =?us-ascii?Q?hboCS9HyBaQ3Cw1mC3wLl/ALDirA1Hi0jYog?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 21:28:47.9045
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 782b0082-6f81-47cb-1baa-08dda79c9ef5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5869
 
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
+From: Brett Creeley <brett.creeley@amd.com>
 
-Corrected spelling errors such as "simular" -> "similar",
-"excepted" -> "accepted", and "Determime" -> "Determine".
-Fixed including incorrect word usage ("to MAC" -> "two MAC")
-and improved awkward phrasing.
+Some stress/negative firmware testing around devcmd(s) returning
+EAGAIN found that the done bit could get out of sync in the
+firmware when it wasn't cleared in a retry case.
 
-Aligned function header descriptions with their actual functionality
-(e.g., "Writes a value" -> "Reads a value").
-Corrected typo in error code from -ENIVAL to -EINVAL.
-Improved overall clarity and consistency in comment across various
-functions.
+While here, change the type of the local done variable to a bool
+to match the return type from ionic_dev_cmd_done().
 
-These changes improve maintainability and readability of the code
-without affecting functionality.
-
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Fixes: ec8ee714736e ("ionic: stretch heartbeat detection")
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 28 +++++++++----------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 1d2acdb64f45..7461367a1868 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -20,7 +20,7 @@ static int ixgbe_get_invariants_X550_x(struct ixgbe_hw *hw)
- 	struct ixgbe_phy_info *phy = &hw->phy;
- 	struct ixgbe_link_info *link = &hw->link;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+index daf1e82cb76b..0e60a6bef99a 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+@@ -516,9 +516,9 @@ static int __ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_seconds,
+ 	unsigned long start_time;
+ 	unsigned long max_wait;
+ 	unsigned long duration;
+-	int done = 0;
+ 	bool fw_up;
+ 	int opcode;
++	bool done;
+ 	int err;
  
--	/* Start with X540 invariants, since so simular */
-+	/* Start with X540 invariants, since so similar */
- 	ixgbe_get_invariants_X540(hw);
- 
- 	if (mac->ops.get_media_type(hw) != ixgbe_media_type_copper)
-@@ -48,7 +48,7 @@ static int ixgbe_get_invariants_X550_a(struct ixgbe_hw *hw)
- 	struct ixgbe_mac_info *mac = &hw->mac;
- 	struct ixgbe_phy_info *phy = &hw->phy;
- 
--	/* Start with X540 invariants, since so simular */
-+	/* Start with X540 invariants, since so similar */
- 	ixgbe_get_invariants_X540(hw);
- 
- 	if (mac->ops.get_media_type(hw) != ixgbe_media_type_copper)
-@@ -685,7 +685,7 @@ static int ixgbe_iosf_wait(struct ixgbe_hw *hw, u32 *ctrl)
- 	return 0;
- }
- 
--/** ixgbe_read_iosf_sb_reg_x550 - Writes a value to specified register of the
-+/** ixgbe_read_iosf_sb_reg_x550 - Reads a value to specified register of the
-  *  IOSF device
-  *  @hw: pointer to hardware structure
-  *  @reg_addr: 32 bit PHY register to write
-@@ -847,7 +847,7 @@ static int ixgbe_read_iosf_sb_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
- 
- /** ixgbe_read_ee_hostif_buffer_X550- Read EEPROM word(s) using hostif
-  *  @hw: pointer to hardware structure
-- *  @offset: offset of  word in the EEPROM to read
-+ *  @offset: offset of word in the EEPROM to read
-  *  @words: number of words
-  *  @data: word(s) read from the EEPROM
-  *
-@@ -1253,7 +1253,7 @@ static int ixgbe_get_bus_info_X550em(struct ixgbe_hw *hw)
- 
- /**
-  * ixgbe_fw_recovery_mode_X550 - Check FW NVM recovery mode
-- * @hw: pointer t hardware structure
-+ * @hw: pointer to hardware structure
-  *
-  * Returns true if in FW NVM recovery mode.
-  */
-@@ -1267,7 +1267,7 @@ static bool ixgbe_fw_recovery_mode_X550(struct ixgbe_hw *hw)
- 
- /** ixgbe_disable_rx_x550 - Disable RX unit
-  *
-- *  Enables the Rx DMA unit for x550
-+ *  Disables the Rx DMA unit for x550
-  **/
- static void ixgbe_disable_rx_x550(struct ixgbe_hw *hw)
- {
-@@ -1754,7 +1754,7 @@ ixgbe_setup_mac_link_sfp_n(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
- 
- 	/* If no SFP module present, then return success. Return success since
--	 * SFP not present error is not excepted in the setup MAC link flow.
-+	 * SFP not present error is not accepted in the setup MAC link flow.
+ 	/* Wait for dev cmd to complete, retrying if we get EAGAIN,
+@@ -526,6 +526,7 @@ static int __ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_seconds,
  	 */
- 	if (ret_val == -ENOENT)
- 		return 0;
-@@ -1804,7 +1804,7 @@ ixgbe_setup_mac_link_sfp_x550a(struct ixgbe_hw *hw, ixgbe_link_speed speed,
- 	ret_val = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
- 
- 	/* If no SFP module present, then return success. Return success since
--	 * SFP not present error is not excepted in the setup MAC link flow.
-+	 * SFP not present error is not accepted in the setup MAC link flow.
- 	 */
- 	if (ret_val == -ENOENT)
- 		return 0;
-@@ -2324,7 +2324,7 @@ static int ixgbe_get_link_capabilities_X550em(struct ixgbe_hw *hw,
-  *	 PHY interrupt is lsc
-  * @is_overtemp: indicate whether an overtemp event encountered
-  *
-- * Determime if external Base T PHY interrupt cause is high temperature
-+ * Determine if external Base T PHY interrupt cause is high temperature
-  * failure alarm or link status change.
-  **/
- static int ixgbe_get_lasi_ext_t_x550em(struct ixgbe_hw *hw, bool *lsc,
-@@ -2669,7 +2669,7 @@ static int ixgbe_setup_internal_phy_t_x550em(struct ixgbe_hw *hw)
- 	if (status)
- 		return status;
- 
--	/* If link is not still up, then no setup is necessary so return */
-+	/* If the link is still not up, no setup is necessary */
- 	status = ixgbe_ext_phy_t_x550em_get_link(hw, &link_up);
- 	if (status)
- 		return status;
-@@ -2768,7 +2768,7 @@ static int ixgbe_led_off_t_x550em(struct ixgbe_hw *hw, u32 led_idx)
-  *  Sends driver version number to firmware through the manageability
-  *  block.  On success return 0
-  *  else returns -EBUSY when encountering an error acquiring
-- *  semaphore, -EIO when command fails or -ENIVAL when incorrect
-+ *  semaphore, -EIO when command fails or -EINVAL when incorrect
-  *  params passed.
-  **/
- int ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
-@@ -3175,7 +3175,7 @@ static void ixgbe_read_mng_if_sel_x550em(struct ixgbe_hw *hw)
- 	hw->phy.nw_mng_if_sel = IXGBE_READ_REG(hw, IXGBE_NW_MNG_IF_SEL);
- 
- 	/* If X552 (X550EM_a) and MDIO is connected to external PHY, then set
--	 * PHY address. This register field was has only been used for X552.
-+	 * PHY address. This register field has only been used for X552.
- 	 */
- 	if (hw->mac.type == ixgbe_mac_x550em_a &&
- 	    hw->phy.nw_mng_if_sel & IXGBE_NW_MNG_IF_SEL_MDIO_ACT) {
-@@ -3735,7 +3735,7 @@ static int ixgbe_acquire_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
-  * @hw: pointer to hardware structure
-  * @mask: Mask to specify which semaphore to release
-  *
-- * Release the SWFW semaphore and puts the shared PHY token as needed
-+ * Release the SWFW semaphore and puts back the shared PHY token as needed
-  */
- static void ixgbe_release_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
- {
-@@ -3756,7 +3756,7 @@ static void ixgbe_release_swfw_sync_x550em_a(struct ixgbe_hw *hw, u32 mask)
-  * @phy_data: Pointer to read data from PHY register
-  *
-  * Reads a value from a specified PHY register using the SWFW lock and PHY
-- * Token. The PHY Token is needed since the MDIO is shared between to MAC
-+ * Token. The PHY Token is needed since the MDIO is shared between two MAC
-  * instances.
-  */
- static int ixgbe_read_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
+ 	max_wait = jiffies + (max_seconds * HZ);
+ try_again:
++	done = false;
+ 	opcode = idev->opcode;
+ 	start_time = jiffies;
+ 	for (fw_up = ionic_is_fw_running(idev);
 -- 
-2.47.1
+2.17.1
 
 
