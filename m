@@ -1,149 +1,98 @@
-Return-Path: <netdev+bounces-195900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31933AD2A41
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:05:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06C7EAD2A4C
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:10:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E927A18925C3
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:05:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0251890C70
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B1D226CF9;
-	Mon,  9 Jun 2025 23:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA924227BAD;
+	Mon,  9 Jun 2025 23:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3kdc0vK"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="ZH1AqCgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5966C226CEF
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 23:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2AD226D09;
+	Mon,  9 Jun 2025 23:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749510266; cv=none; b=kUyXpVzkIpqODtEHl5cHXkiqGkiCLrOaZAIX47aclf4LM3l1Wda2SwfL7elD+ln8D8MspfItLley5gp8dJsgNeY1tHpUNPaShEvPwx+MHbo6du6o7XqaNniSjCl++lbcZmpwC/gopUZa1sJQMxEt+qharRHzlqNAiytUKvqY/iY=
+	t=1749510597; cv=none; b=AizPRPhifN2kJ+ptVjR9j8HhHUdiiCqKJBw/9+3Fiao4AaAhGHSrcu2M4atB2BE20jvkcdtyJvIu0O6r6WULxkUJ7JAto/H7xHG6OF/131lQv9kOLetfwKLSyRBOBqDvYRxKO7eNwseVyOGUbFIhPP9PWIWOuG29xDpdJ7nWt1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749510266; c=relaxed/simple;
-	bh=PcBDmqXyBhXKkjWPy1J7wSgj1WZqkZ+VKxDTSGH0MJ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iZ+kTM8t/Zc/L1G5Q4OcxznAvPIBX750cLKQ7hkwMrlopV1MYSgqWoHK5RlY4qGQEi367QAOqfpZE7cs6raiZOU13USF0qDSjtIaTOMf05ODZDIKumCwvp7yKyWp594RkcpWA2v8qdH3jUcGZxTgZ7qIWMigSDZkWbhr4xrtRLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y3kdc0vK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749510263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eMqPz5T5ms2+Vuv/P7AkLmCC+Jeyi+hIZycmP47qQCI=;
-	b=Y3kdc0vKbLlcIDNvrZwgZfZh460vdMWmkbZKlNJ5VQE8nzGdywraDaCYoOq7nAQOC0Xr6C
-	s/+MbQxGIUcYfLVxWjlUXxpgC0CBZc68rcOgipwdHfGAyPNzNY76KXydzLp3Ei5BQHOeom
-	kLXFHx/+7SC6HzstOwVvoPWfhNbPTWY=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-_LbqyJTuOTOUGamIwakelg-1; Mon, 09 Jun 2025 19:04:22 -0400
-X-MC-Unique: _LbqyJTuOTOUGamIwakelg-1
-X-Mimecast-MFC-AGG-ID: _LbqyJTuOTOUGamIwakelg_1749510261
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-32a6c3d3a75so14908121fa.3
-        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 16:04:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749510260; x=1750115060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eMqPz5T5ms2+Vuv/P7AkLmCC+Jeyi+hIZycmP47qQCI=;
-        b=iG4/A6BWvhABY0LIOQE4QvpTJbjD5DLY4h+ODwx1Nf/VXJptm1XXA1qdfRvPPwY9VU
-         BeHdi/W7/QarSIgvGokT+iJpYKuUYUC0RhcwgU81GMvYm5NMehDwThm0TQNT93ki12rM
-         FzMS+diI77v5WTjxVoNbgqPiLUYMDVmxnC1PIOOan2EwnkmI5ieGHmsdPTIe6bUT2uzP
-         /hjvgAhOeDp6jmSwe/1fgO5Lmlhjr4d6icGoBoxJWJQRXOLSDR2ZxueKLDKKt7WyEkcN
-         vz02yTpVMIuTXLJCMLmJp+4QHEKpeMknLRw39QGbG2IWzFbXFx6Xcy2sP16uGbDbpt90
-         e7Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCULHN49oKt/3VkDWFkrCW2bVCmUZpb56R7RI8g1muOyWY5zGeB4F586i8NFTyEB+lcWN2vMPww=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxs6YMN+cQk7sbCjC9ihg5Iu77mp93DL96dM1QAmPIaKl8r0gpi
-	iMi/bMZRhS2CzQfluiClruOaiRvqisjtGDcZHmNefmaRJT+Lv4xPjX5WxflbB08D+Vw4XirAdYP
-	XUJ1FkMhbSRscDI6yYZN0IPXUR8VTvhwHIGZxEoKuxGY/N0FEb6T8He/O8bAuHnDgQ4sneOyC8T
-	TCS9dXOJZDl1EpYWHoLBSYgM19+CJgoiTau0QnnX08kUU=
-X-Gm-Gg: ASbGncunJaH26/a8qpcH2MBeaQhwtgoqJGBBZ3bWEoiAwCVRgtkCb/YHuEyvFViHlbC
-	1aAbmMkOWajRXF/S7j4dCelTjq7bE9Duxd5UmZxZ1cs6UJK6ncbhOcss13T0opV0y2aMGiP5Z0k
-	w3HEU+XXGL5ArN4wNkgiMNUnM2tL1n40ClqyXX6A==
-X-Received: by 2002:a2e:b892:0:b0:32a:778d:be86 with SMTP id 38308e7fff4ca-32adfe270f1mr37092641fa.31.1749510260231;
-        Mon, 09 Jun 2025 16:04:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEMfqTSlst8c6suWs1k0ndLs7U+aVZ5OFmK6rcE8gYx6tuiEl6hKJ7ceS8cdacI2w9LKaXptFQyHzlKjkLaOZE=
-X-Received: by 2002:a2e:b892:0:b0:32a:778d:be86 with SMTP id
- 38308e7fff4ca-32adfe270f1mr37092581fa.31.1749510259818; Mon, 09 Jun 2025
- 16:04:19 -0700 (PDT)
+	s=arc-20240116; t=1749510597; c=relaxed/simple;
+	bh=TJHn+xrGIoG5X5uuAIOvVOsYlBHH6Fh+hKmZRMoOHF4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=r8BXqIXPKCKmJXS4r0lDtgT7sQLgnlITPK7o4uGJKkqdeDnvsp+GUagx8ggD/rcmdcZswO5AGrz/+dZZ+1gdQv8mdYa6lC//rAJb7VQ1bHnhCG9/kYeW5eQ2Z9wlRXjgacLDinMkIl91LHb9kZg7PH1VmWzG35bGsa+8Ji8Q8aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=ZH1AqCgd; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id BF4582117585; Mon,  9 Jun 2025 16:09:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BF4582117585
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1749510595;
+	bh=o4TJdFyGSavIpC6NVIXpJYvJt9fYZsYcucpFDPtb1k0=;
+	h=From:To:Cc:Subject:Date:Reply-To:From;
+	b=ZH1AqCgdgKQQpNUXcLrN9QnH6K6JjugB2TUsOFvP53brqkxVV1jcxJbadsbAxvbfW
+	 l/zGRCD+hts4sDWr+hs/WbdqpHSIpT4kJ9HrSaSzrXyo0pmL7fw9pJJfoLspD6LhRd
+	 UPDogOP8n1N4ao8PhmyaZtpmrWt2gn0ZD1NPtomc=
+From: longli@linuxonhyperv.com
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Long Li <longli@microsoft.com>
+Subject: [PATCH net-next] net: mana: Record doorbell physical address in PF mode
+Date: Mon,  9 Jun 2025 16:09:40 -0700
+Message-Id: <1749510580-21011-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+Reply-To: longli@microsoft.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250609094628.6929-1-ramonreisfontes@gmail.com>
-In-Reply-To: <20250609094628.6929-1-ramonreisfontes@gmail.com>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Mon, 9 Jun 2025 19:04:08 -0400
-X-Gm-Features: AX0GCFu1jQFWpnoMMyFRZstITGxwEgNzEuhvf1aY2fE4abY6GozoHKv5DIDedbE
-Message-ID: <CAK-6q+g3ns4BvZhgtzH6a6gDrEGpPmpugQki86fmbKxgHi51Aw@mail.gmail.com>
-Subject: Re: [PATCH] mac802154_hwsim: allow users to specify the number of
- simulated radios dynamically instead of the previously hardcoded value of 2
-To: Ramon Fontes <ramonreisfontes@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
+From: Long Li <longli@microsoft.com>
 
-On Mon, Jun 9, 2025 at 5:47=E2=80=AFAM Ramon Fontes <ramonreisfontes@gmail.=
-com> wrote:
->
-> Add a module parameter radios to allow users to configure the number
-> of virtual radios created by mac802154_hwsim at module load time.
-> This replaces the previously hardcoded value of 2.
->
-> * Added a new module parameter radios
-> * Modified the loop in hwsim_probe()
-> * Updated log message in hwsim_probe()
->
-> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
-> ---
->  drivers/net/ieee802154/mac802154_hwsim.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee8=
-02154/mac802154_hwsim.c
-> index 1cab20b5a..1740abe1a 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> @@ -27,6 +27,10 @@
->  MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac=
-802154");
->  MODULE_LICENSE("GPL");
->
-> +static unsigned int radios =3D 2;
-> +module_param(radios, int, 0444);
+MANA supports RDMA in PF mode. The driver should record the doorbell
+physical address when in PF mode.
 
-uint? I can swear I saw that in an earlier patch.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> +MODULE_PARM_DESC(radios, "Number of simulated radios");
-> +
->  static LIST_HEAD(hwsim_phys);
->  static DEFINE_MUTEX(hwsim_phys_lock);
->
-> @@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pd=
-ev)
->         struct hwsim_phy *phy, *tmp;
->         int err, i;
->
-> -       for (i =3D 0; i < 2; i++) {
-> +       for (i =3D 0; i < radios; i++) {
-
-The iterator needs to be unsigned now?
-
-- Alex
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 3504507477c6..52cf7112762c 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -31,6 +31,9 @@ static void mana_gd_init_pf_regs(struct pci_dev *pdev)
+ 	gc->db_page_base = gc->bar0_va +
+ 				mana_gd_r64(gc, GDMA_PF_REG_DB_PAGE_OFF);
+ 
++	gc->phys_db_page_base = gc->bar0_pa +
++				mana_gd_r64(gc, GDMA_PF_REG_DB_PAGE_OFF);
++
+ 	sriov_base_off = mana_gd_r64(gc, GDMA_SRIOV_REG_CFG_BASE_OFF);
+ 
+ 	sriov_base_va = gc->bar0_va + sriov_base_off;
+-- 
+2.25.1
 
 
