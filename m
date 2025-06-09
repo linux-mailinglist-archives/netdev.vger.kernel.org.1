@@ -1,65 +1,88 @@
-Return-Path: <netdev+bounces-195750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD9FAD227A
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:32:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E58FAD227F
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC77F3A85FA
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:31:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0985D1888701
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389B51F3FED;
-	Mon,  9 Jun 2025 15:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A6B42AA6;
+	Mon,  9 Jun 2025 15:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RdJfvjGU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brm+jFUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222181FBE80
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 15:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5581619992D
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 15:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749483120; cv=none; b=TXzZh2EhxwAyGjK9KReqEd23iWHw2P8Arby4EeevtJQAQMvtH5Vr1SMt+pYAM4fU5kuBlbf94ypz95KSscJbizpin7ksseObN/gmyhNp4Dki+lmj8+HQhO+gBLQUJD7EUja4nQoM4ptvSqFNd65467IXePYZOnCzD7jHFJVsW2w=
+	t=1749483182; cv=none; b=uJUhPycCP6T8cXbgVuzSpUcHhSh0kgYaX1IbwxcRRu71qpgCkaRkFC+C3P4044A+N8WgmvRXycPWxhCOexJEPy4cnNOBoPH0Z/fa1/noM7u2jGLFJ9K4IJwra3d/TD58cHhk+gIxA5NnZUMULpocw/E/6u8fg6/xxSEu8CAa+z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749483120; c=relaxed/simple;
-	bh=dV9ocoa0PcpeTm/G8g/EfUy7y6M/jyd61EQotUF2MOg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=UZGrtWlPkzryFB/Qza/4Hq+YdSAZEywcfyBhrwKQ6UXzx5CHy9JPPpwf8aHrAW+8pqumqiI8wj2VEYFtLyAZOu+ONLvhkR1jR8o4NxZpc3lj4yevVLAR6Dmwd/cH/r8JTxjYU/Fyee925eOr1y7Ys2390rYqS0ErCSJwbuTyoVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=RdJfvjGU; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250609153156euoutp016cc7114117d55f31634b64ccf9b58ba0~HaaASYWJL2305223052euoutp01k
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 15:31:56 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250609153156euoutp016cc7114117d55f31634b64ccf9b58ba0~HaaASYWJL2305223052euoutp01k
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1749483116;
-	bh=ffW9nNUAtcbBjg01JUeoB8jBeRlx3RPs8ZTJ8M6WXgs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RdJfvjGUtvEbjC3/ik52dUxf4yoyDgG1jMs7r1y/VnwQiDeY22QelcUay+fqSWiBZ
-	 /G6OyieuJKgK4nATBTbNjiAWLwoXSi/Uz23kMPkB5+xxSqLOtmphQRwWMugXcHgGLx
-	 +VOpT0KLV5AcUvLOqWGEMkbjB+zih4lK/bJxMxsU=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250609153156eucas1p2cf6399b609395de4d4a33b0cf6b4c15d~HaZ-4BTic0658406584eucas1p2P;
-	Mon,  9 Jun 2025 15:31:56 +0000 (GMT)
-Received: from AMDC4622.eu.corp.samsungelectronics.net (unknown
-	[106.120.77.34]) by eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250609153155eusmtip2ec90ce94e7020726023fcb3f8bbf992d~HaZ-kkFr40427204272eusmtip2-;
-	Mon,  9 Jun 2025 15:31:55 +0000 (GMT)
-From: Jakub Raczynski <j.raczynski@samsung.com>
-To: linux@armlinux.org.uk
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org, Jakub
-	Raczynski <j.raczynski@samsung.com>, Wenjing Shan <wenjing.shan@samsung.com>
-Subject: [PATCH 2/2] net/mdiobus: Fix potential out-of-bounds clause 45
- read/write access
-Date: Mon,  9 Jun 2025 17:31:47 +0200
-Message-Id: <20250609153147.1435432-2-j.raczynski@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250609153147.1435432-1-j.raczynski@samsung.com>
+	s=arc-20240116; t=1749483182; c=relaxed/simple;
+	bh=IvCYo4WUfTdCGvrzzlTNx3vtDnL0R8hCugQXRRv3law=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LZEEOK+nOCMfW+yxQcf2zJrXNTjyRLHIhdH9Epr+4qmR7GjZA4jhxqpvcSdFvHq1AJDn3PuL2rJTa7Sx749v4l6uSdYliatfNAoWPLuCQA/lniI+poKZT+XhhpCvEKulmqy4G0pBDMzchh1XP/pd36v7zCG3c9i9735AQkosKBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brm+jFUh; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-70a57a8ffc3so42858137b3.0
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 08:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749483180; x=1750087980; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IuKQJgNWs9iKMlDLAROBf01xXyNk3WkCc0S9K3f1IGA=;
+        b=brm+jFUhgnns2Dc5TTOk+9Ts57Ta8+ci0WLlkub9sfSxACeyOXBJTXiXEr//5fYAv2
+         7RTitZ8p9pVNMnhsFut0yeil0rG1a69rIwxh+oNk+kCAC1B1rLBsMj2RkJTRWa9WbrSL
+         +A9spjac1uRBGM39ZQ9lWB7mXd3kly+abu84rLUlIZDtKNGckGmNfNxF0QQweWj+vNDg
+         dq8ru3mEmhA/46YBd/Bw4RT6mcAqWdToplyK4vjKgeRN4o7Wrvkt2RJyMFDbUn4pBmtl
+         tF67QGRzonAlZhc8skCt61Cmr/0Ofu6JUx4fySrpzxi0WH8/doopWWcpSPGj8NDK5kGW
+         gKbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749483180; x=1750087980;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IuKQJgNWs9iKMlDLAROBf01xXyNk3WkCc0S9K3f1IGA=;
+        b=Wqf/vDClTeUt2hFxsMua7VzWFh4BHXBr24Hqx7VAhHsZPgWpMR5sWq50v24eOgfoKk
+         AlubmDwPP8gPRJF4eyRllRxSNZeW85Fy73TzVt8Z9wuL+WJIuzD1WrxsxZ2v4o3drUOQ
+         0KenM3n/ApysCcyZ7qLG7Knf/t0wwwwxFB4FFnj7/jfue2m7213ebHLj6ebJ/gm86pI7
+         WV0drkVVb8pkU23w+GUJCcwEv8FF6OSkVM5oAKrJhyqO3fZeeyZ46LJEVxeod8uCg76w
+         RwBU5v7Qcq46CjcFfwc1o45MUDh6do5EXJVu/4aqfZBVm2BnM7qZJA7O4BaTQ9wo5nDR
+         Zh2w==
+X-Gm-Message-State: AOJu0Ywq+yPDLymUK49HOvF65YP0+IRi08/nAr6iE0au87sFDzTHVREv
+	9SFi3/5tYB/3qWcPfnePD/t5gt3SE923w5IRKMTFpYUXqZ8rJTvUdRtNA8BY6w==
+X-Gm-Gg: ASbGncvQ5OkQTOdLcgC7rBPcLvrc2nJTz0bza11BvSmdROVSbGDp9K6TJleG1J+2Asj
+	YiS2BogpWn0mN27mR6fT3he43xqHqjZNZURKnEz685CQgPPyH6a2V6g8vg6oSNryGGx3nb3B8U/
+	GC+ahO9AYfNzElOxKb8pNcyc/QmEvC8grOQQgVCAuHMrfHPdE/ugCAt1crCpwjHEVJHup3t6iUl
+	IgzgHXM5mRhO58kqNvP2uvCVLgI9lknDIqK7D1zPQO15Ol8wRiVnvA+sFOJnU87O5mBOmOTa9Ie
+	/hMP0ONZhU5duxhg7sJg9Z3r3nDs1pM5mP4kqjZBxyweUiNT3+8qgRYR+PoI77XHXKAxZ+m9rFq
+	XXMedvkZPgCVlljpF/MavG2TErTb2KhR4kF/56PloWCo+Vw2W7koYqQ==
+X-Google-Smtp-Source: AGHT+IGnd0F8hka5gDDiA2ACB6VqOKctuknp7pCoNyds3Y72kCpK/fEr6zbP/NctKBKH9Hy5Q9cbMg==
+X-Received: by 2002:a05:690c:4902:b0:70f:6ebb:b29a with SMTP id 00721157ae682-710f771066cmr182077987b3.29.1749483180184;
+        Mon, 09 Jun 2025 08:33:00 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e81a40217a2sm2345216276.13.2025.06.09.08.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jun 2025 08:32:59 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kernelxing@tencent.com,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] net: remove unused sock_enable_timestamps
+Date: Mon,  9 Jun 2025 11:32:35 -0400
+Message-ID: <20250609153254.3504909-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,62 +90,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250609153156eucas1p2cf6399b609395de4d4a33b0cf6b4c15d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250609153156eucas1p2cf6399b609395de4d4a33b0cf6b4c15d
-X-EPHeader: CA
-X-CMS-RootMailID: 20250609153156eucas1p2cf6399b609395de4d4a33b0cf6b4c15d
-References: <aEb2WfLHcGBdI3_G@shell.armlinux.org.uk>
-	<20250609153147.1435432-1-j.raczynski@samsung.com>
-	<CGME20250609153156eucas1p2cf6399b609395de4d4a33b0cf6b4c15d@eucas1p2.samsung.com>
 
-When using publicly available tools like 'mdio-tools' to read/write data
-from/to network interface and its PHY via C45 (clause 45) mdiobus,
-there is no verification of parameters passed to the ioctl and
-it accepts any mdio address.
-Currently there is support for 32 addresses in kernel via PHY_MAX_ADDR define,
-but it is possible to pass higher value than that via ioctl.
-While read/write operation should generally fail in this case,
-mdiobus provides stats array, where wrong address may allow out-of-bounds
-read/write.
+From: Willem de Bruijn <willemb@google.com>
 
-Fix that by adding address verification before C45 read/write operation.
-While this excludes this access from any statistics, it improves security of
-read/write operation.
+This function was introduced in commit 783da70e8396 ("net: add
+sock_enable_timestamps"), with one caller in rxrpc.
 
-Fixes: 4e4aafcddbbf ("net: mdio: Add dedicated C45 API to MDIO bus drivers")
-Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
-Reported-by: Wenjing Shan <wenjing.shan@samsung.com>
+That only caller was removed in commit 7903d4438b3f ("rxrpc: Don't use
+received skbuff timestamps").
+
+Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- drivers/net/phy/mdio_bus.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/net/sock.h | 1 -
+ net/core/sock.c    | 8 --------
+ 2 files changed, 9 deletions(-)
 
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index 60fd0cd7cb9c..fda2e27c1810 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -541,6 +541,9 @@ int __mdiobus_c45_read(struct mii_bus *bus, int addr, int devad, u32 regnum)
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 92e7c1aae3cc..85e17da5c9db 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2982,7 +2982,6 @@ void sock_set_timestamp(struct sock *sk, int optname, bool valbool);
+ int sock_set_timestamping(struct sock *sk, int optname,
+ 			  struct so_timestamping timestamping);
  
- 	lockdep_assert_held_once(&bus->mdio_lock);
+-void sock_enable_timestamps(struct sock *sk);
+ #if defined(CONFIG_CGROUP_BPF)
+ void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int op);
+ #else
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 3b409bc8ef6d..502042a0d3b5 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -837,14 +837,6 @@ static void __sock_set_timestamps(struct sock *sk, bool val, bool new, bool ns)
+ 	}
+ }
  
-+	if (addr >= PHY_MAX_ADDR)
-+		return -ENXIO;
-+
- 	if (bus->read_c45)
- 		retval = bus->read_c45(bus, addr, devad, regnum);
- 	else
-@@ -572,6 +575,9 @@ int __mdiobus_c45_write(struct mii_bus *bus, int addr, int devad, u32 regnum,
- 
- 	lockdep_assert_held_once(&bus->mdio_lock);
- 
-+	if (addr >= PHY_MAX_ADDR)
-+		return -ENXIO;
-+
- 	if (bus->write_c45)
- 		err = bus->write_c45(bus, addr, devad, regnum, val);
- 	else
+-void sock_enable_timestamps(struct sock *sk)
+-{
+-	lock_sock(sk);
+-	__sock_set_timestamps(sk, true, false, true);
+-	release_sock(sk);
+-}
+-EXPORT_SYMBOL(sock_enable_timestamps);
+-
+ void sock_set_timestamp(struct sock *sk, int optname, bool valbool)
+ {
+ 	switch (optname) {
 -- 
-2.34.1
+2.50.0.rc0.604.gd4ff7b7c86-goog
 
 
