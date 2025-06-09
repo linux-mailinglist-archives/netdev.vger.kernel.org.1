@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-195869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6246BAD28B6
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4A3AD28B8
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1858017049C
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:27:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9DF13AC91E
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 21:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7156C22259C;
-	Mon,  9 Jun 2025 21:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A04223DF8;
+	Mon,  9 Jun 2025 21:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lEjDDeAI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VueENzGT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F55B1E9B31
-	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 21:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF18221732
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 21:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749504425; cv=none; b=sJWFMEvIPlKcZ5NAlb1boDJAhg7FAhcePeApH2N4yInxmYrsJQ6zp3fcVpvsYk5IoeEX0ed0N1QCeGheaxE8Asm9O3NmspgJWmhs/qvWV7Sc3m2q9XNjm+lqM/DAyGYnlA6ZO6L4dkOn5VdNQTPBzHqh2MVYmOcEEsy0iZ+9VSY=
+	t=1749504426; cv=none; b=t5dQx8+vnCJsYBw+5imbdbCCQq6EZnGtVrJ91sqBy1770VL4hSI9lwlvlYTyZ1VtvikGyVebU8i/77gjcB2KVBWT0zvJlDxLFk9/C1twgnjjdL5OIXz0vhhloz8bw0xBwNHWbXpYFE0BuRAdxpHiADYykemzGFJ5pcRAY8Ol8Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749504425; c=relaxed/simple;
-	bh=zZw47mVO7QXpXUM32Rf/qG21oFoKnIXVn5EJhJF0t1g=;
+	s=arc-20240116; t=1749504426; c=relaxed/simple;
+	bh=nO8bbvwUHNnotSjbgfiMAwgOD/6JqcqfPJYbD6Ce/lE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q7unra7Zmx7RcQf8S9o6T8UdlaiLruWLrfzZZuVVL+gx+q+dEnZ5F1STg1x5RXDMCEoRVQLsR31czX8CJHOF8fdPMQJTmKnNWf/jgNv4UrqXA0BIPE9m0ugrVA9WViGdKeY4GfhOJKMLB2QNenq/GPurdHsAHr/0vyb6jnxW5HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lEjDDeAI; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=Qm+3zHCOG0woA8Gin4xZcAzJJ80y34EIMGJZbs256LEUWo7y/KSGPEY8yOH/nJ/Md2bN6I6llLN8FQPYbbW/Q4k1D7PY+T3q7hQhg98xu9aDXMtFu9OhAdURzTXPebF/xT2ip4untOiqEr1zo0lRF7gyNf04/IJXYyBg6vhhgrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VueENzGT; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749504423; x=1781040423;
+  t=1749504424; x=1781040424;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zZw47mVO7QXpXUM32Rf/qG21oFoKnIXVn5EJhJF0t1g=;
-  b=lEjDDeAIOYB+k7k4P3Svx9nZYSiyazhth5M6s8vpxwrqkkF4/mj/tlYQ
-   mngRDYXbPJA340QsypC9tQW+EF1imgdxEvohxaRaq1dqSomr1GDYLHnbC
-   wACiC8rgsNTJZmS5a+JaxaGhLnyogJON1w3rZbZT2MJ07JhMbgk5xMTvb
-   PB7DE+bLbJgHPOoIGcVeST8I27OxEggGwEOu82xQW99GYZZc8q7Gztdmz
-   AFGabyNoogfIbrRWmWMNYLAlD7c6xuefZIGR9s4TjyIqD4Sho2Iy4z1OY
-   DGBZQK422xHwqEG/SB01EoXt+5h3WBj+UOEM7XYtsaTNDkB6xsMf/MRJE
-   g==;
-X-CSE-ConnectionGUID: BEw70D4wR8WdSZbI8sX4dw==
-X-CSE-MsgGUID: bFf0fDFxSICy8k7AGcWVKw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="61864167"
+  bh=nO8bbvwUHNnotSjbgfiMAwgOD/6JqcqfPJYbD6Ce/lE=;
+  b=VueENzGTUq4JgO3X5CdF99sacUXYfGBK5bzLlxddy8fsD0ZQ8LrjLrIu
+   0ViQRfOYjsH6fMy2X/tlkgjBTeQICYNMjt7LPtIj94EnHbXRBy1roIN2i
+   Y81lbqXFmlGjWbbK3ni4HFLms7ZQ+6bWx/uKVNnA2hIfUCwulKyIvnAq/
+   QSJ3iLbhFnwI7UVKipd+2NGfWvtIUj+W/b4VcB5/oLAq6qgO357GV9ZlT
+   rfRomA0IWk8I789NVhUB0mQrfas5cZ5IDC5muKyCGxB+TQkhsz0Vare5f
+   p8o1NzFrv4V49l4Vg4URZserCyZfUisi6ZpRaZOhuChJMJ/rW1uKPU+Tt
+   w==;
+X-CSE-ConnectionGUID: 4Im3ZK/uSZup7ZOqb3Q7gQ==
+X-CSE-MsgGUID: LSZamsrqTyC6SjBc78kEGw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="61864176"
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="61864167"
+   d="scan'208";a="61864176"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 14:27:01 -0700
-X-CSE-ConnectionGUID: Px+jl6CES26x8NCClrOheg==
-X-CSE-MsgGUID: BzEU3+DfTxC6VFxVRDVJKg==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 14:27:02 -0700
+X-CSE-ConnectionGUID: 9seQUpUsRqCZzr8Pxp15/w==
+X-CSE-MsgGUID: O0QHdWLmTUa5ZuEdtalYgA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="150469006"
+   d="scan'208";a="150469015"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa003.fm.intel.com with ESMTP; 09 Jun 2025 14:27:02 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -67,14 +67,15 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
+	aleksander.lobakin@intel.com,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Simon Horman <horms@kernel.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 01/11] net: intel: rename 'hena' to 'hashcfg' for clarity
-Date: Mon,  9 Jun 2025 14:26:40 -0700
-Message-ID: <20250609212652.1138933-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 02/11] net: intel: move RSS packet classifier types to libie
+Date: Mon,  9 Jun 2025 14:26:41 -0700
+Message-ID: <20250609212652.1138933-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250609212652.1138933-1-anthony.l.nguyen@intel.com>
 References: <20250609212652.1138933-1-anthony.l.nguyen@intel.com>
@@ -88,627 +89,868 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-i40e, ice, and iAVF all use 'hena' as a shorthand for the "hash enable"
-configuration. This comes originally from the X710 datasheet 'xxQF_HENA'
-registers. In the context of the registers the meaning is fairly clear.
+The Intel i40e, iavf, and ice drivers all include a definition of the
+packet classifier filter types used to program RSS hash enable bits. For
+i40e, these bits are used for both the PF and VF to configure the PFQF_HENA
+and VFQF_HENA registers.
 
-However, on its own, hena is a weird name that can be more difficult to
-understand. This is especially true in ice. The E810 hardware doesn't even
-have registers with HENA in the name.
+For ice and iAVF, these bits are used to communicate the desired hash
+enable filter over virtchnl via its struct virtchnl_rss_hashena. The
+virtchnl.h header makes no mention of where the bit definitions reside.
 
-Replace the shorthand 'hena' with 'hashcfg'. This makes it clear the
-variables deal with the Hash configuration, not just a single boolean
-on/off for all hashing.
+Maintaining a separate copy of these bits across three drivers is
+cumbersome. Move the definition to libie as a new pctype.h header file.
+Each driver can include this, and drop its own definition.
 
-Do not update the register names. These come directly from the datasheet
-for X710 and X722, and it is more important that the names can be searched.
+The ice implementation also defined a ICE_AVF_FLOW_FIELD_INVALID, intending
+to use this to indicate when there were no hash enable bits set. This is
+confusing, since the enumeration is using bit positions. A value of 0
+*should* indicate the first bit. Instead, rewrite the code that uses
+ICE_AVF_FLOW_FIELD_INVALID to just check if the avf_hash is zero. From
+context this should be clear that we're checking if none of the bits are
+set.
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+The values are kept as bit positions instead of encoding the BIT_ULL
+directly into their value. While most users will simply use BIT_ULL
+immediately, i40e uses the macros both with BIT_ULL and test_bit/set_bit
+calls.
+
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c   |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  8 ++--
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 46 ++++++++++---------
- drivers/net/ethernet/intel/iavf/iavf.h        | 10 ++--
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 17 +++----
- drivers/net/ethernet/intel/iavf/iavf_txrx.h   |  4 +-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 33 ++++++-------
- drivers/net/ethernet/intel/ice/ice_flow.h     |  4 +-
- drivers/net/ethernet/intel/ice/ice_lib.c      |  2 +-
- drivers/net/ethernet/intel/ice/ice_virtchnl.c | 44 +++++++++---------
- drivers/net/ethernet/intel/ice/ice_virtchnl.h |  4 +-
- .../intel/ice/ice_virtchnl_allowlist.c        |  2 +-
- include/linux/avf/virtchnl.h                  | 22 ++++-----
- 13 files changed, 101 insertions(+), 97 deletions(-)
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    | 81 ++++++++++---------
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 23 +++---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 25 +++---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   | 35 ++++----
+ drivers/net/ethernet/intel/i40e/i40e_type.h   | 32 --------
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   | 36 +++++----
+ drivers/net/ethernet/intel/iavf/iavf_type.h   | 32 --------
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 45 +++++------
+ drivers/net/ethernet/intel/ice/ice_flow.h     | 64 +++++----------
+ include/linux/avf/virtchnl.h                  |  1 +
+ include/linux/net/intel/libie/pctype.h        | 41 ++++++++++
+ 11 files changed, 185 insertions(+), 230 deletions(-)
+ create mode 100644 include/linux/net/intel/libie/pctype.h
 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+index 8a7a83f83ee5..814e20325feb 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+@@ -3,6 +3,7 @@
+ 
+ /* ethtool support for i40e */
+ 
++#include <linux/net/intel/libie/pctype.h>
+ #include "i40e_devids.h"
+ #include "i40e_diag.h"
+ #include "i40e_txrx_common.h"
+@@ -3146,16 +3147,16 @@ static int i40e_get_rss_hash_opts(struct i40e_pf *pf, struct ethtool_rxnfc *cmd)
+ 
+ 	switch (cmd->flow_type) {
+ 	case TCP_V4_FLOW:
+-		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
++		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
+ 		break;
+ 	case UDP_V4_FLOW:
+-		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
++		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
+ 		break;
+ 	case TCP_V6_FLOW:
+-		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
++		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
+ 		break;
+ 	case UDP_V6_FLOW:
+-		flow_pctype = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
++		flow_pctype = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
+ 		break;
+ 	case SCTP_V4_FLOW:
+ 	case AH_ESP_V4_FLOW:
+@@ -3412,28 +3413,28 @@ static int i40e_get_ethtool_fdir_entry(struct i40e_pf *pf,
+ 
+ 	switch (rule->flow_type) {
+ 	case SCTP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_SCTP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP;
+ 		break;
+ 	case TCP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
+ 		break;
+ 	case UDP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
+ 		break;
+ 	case SCTP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_SCTP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP;
+ 		break;
+ 	case TCP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
+ 		break;
+ 	case UDP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
+ 		break;
+ 	case IP_USER_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
+ 		break;
+ 	case IPV6_USER_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
+ 		break;
+ 	default:
+ 		/* If we have stored a filter with a flow type not listed here
+@@ -3643,40 +3644,40 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
+ 
+ 	switch (nfc->flow_type) {
+ 	case TCP_V4_FLOW:
+-		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP, flow_pctypes);
++		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP, flow_pctypes);
+ 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
+ 			     pf->hw.caps))
+-			set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK,
+ 				flow_pctypes);
+ 		break;
+ 	case TCP_V6_FLOW:
+-		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP, flow_pctypes);
++		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP, flow_pctypes);
+ 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
+ 			     pf->hw.caps))
+-			set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK,
+ 				flow_pctypes);
+ 		break;
+ 	case UDP_V4_FLOW:
+-		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_UDP, flow_pctypes);
++		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP, flow_pctypes);
+ 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
+ 			     pf->hw.caps)) {
+-			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP,
+ 				flow_pctypes);
+-			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP,
+ 				flow_pctypes);
+ 		}
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4);
+ 		break;
+ 	case UDP_V6_FLOW:
+-		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_UDP, flow_pctypes);
++		set_bit(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP, flow_pctypes);
+ 		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
+ 			     pf->hw.caps)) {
+-			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP,
+ 				flow_pctypes);
+-			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP,
++			set_bit(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP,
+ 				flow_pctypes);
+ 		}
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6);
+ 		break;
+ 	case AH_ESP_V4_FLOW:
+ 	case AH_V4_FLOW:
+@@ -3685,7 +3686,7 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
+ 		if ((nfc->data & RXH_L4_B_0_1) ||
+ 		    (nfc->data & RXH_L4_B_2_3))
+ 			return -EINVAL;
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER);
+ 		break;
+ 	case AH_ESP_V6_FLOW:
+ 	case AH_V6_FLOW:
+@@ -3694,15 +3695,15 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
+ 		if ((nfc->data & RXH_L4_B_0_1) ||
+ 		    (nfc->data & RXH_L4_B_2_3))
+ 			return -EINVAL;
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER);
+ 		break;
+ 	case IPV4_FLOW:
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER) |
+-			BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) |
++			BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4);
+ 		break;
+ 	case IPV6_FLOW:
+-		hena |= BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER) |
+-			BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6);
++		hena |= BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) |
++			BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6);
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -4312,36 +4313,36 @@ static int i40e_check_fdir_input_set(struct i40e_vsi *vsi,
+ 
+ 	switch (fsp->flow_type & ~FLOW_EXT) {
+ 	case SCTP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_SCTP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP;
+ 		fdir_filter_count = &pf->fd_sctp4_filter_cnt;
+ 		break;
+ 	case TCP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_TCP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP;
+ 		fdir_filter_count = &pf->fd_tcp4_filter_cnt;
+ 		break;
+ 	case UDP_V4_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_UDP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP;
+ 		fdir_filter_count = &pf->fd_udp4_filter_cnt;
+ 		break;
+ 	case SCTP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_SCTP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP;
+ 		fdir_filter_count = &pf->fd_sctp6_filter_cnt;
+ 		break;
+ 	case TCP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_TCP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP;
+ 		fdir_filter_count = &pf->fd_tcp6_filter_cnt;
+ 		break;
+ 	case UDP_V6_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_UDP;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP;
+ 		fdir_filter_count = &pf->fd_udp6_filter_cnt;
+ 		break;
+ 	case IP_USER_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
+ 		fdir_filter_count = &pf->fd_ip4_filter_cnt;
+ 		flex_l3 = true;
+ 		break;
+ 	case IPV6_USER_FLOW:
+-		index = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
++		index = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
+ 		fdir_filter_count = &pf->fd_ip6_filter_cnt;
+ 		flex_l3 = true;
+ 		break;
+@@ -4677,8 +4678,8 @@ static int i40e_check_fdir_input_set(struct i40e_vsi *vsi,
+ 	 * separate support, we'll always assume and enforce that the two flow
+ 	 * types must have matching input sets.
+ 	 */
+-	if (index == I40E_FILTER_PCTYPE_NONF_IPV4_OTHER)
+-		i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV4,
++	if (index == LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER)
++		i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV4,
+ 					new_mask);
+ 
+ 	/* Add the new offset and update table, if necessary */
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 120d68654e3f..516e07b58161 100644
+index 516e07b58161..67faf5a8dcbf 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -12507,7 +12507,7 @@ static int i40e_pf_config_rss(struct i40e_pf *pf)
- 	/* By default we enable TCP/UDP with IPv4/IPv6 ptypes */
- 	hena = (u64)i40e_read_rx_ctl(hw, I40E_PFQF_HENA(0)) |
- 		((u64)i40e_read_rx_ctl(hw, I40E_PFQF_HENA(1)) << 32);
--	hena |= i40e_pf_get_default_rss_hena(pf);
-+	hena |= i40e_pf_get_default_rss_hashcfg(pf);
+@@ -3,6 +3,7 @@
  
- 	i40e_write_rx_ctl(hw, I40E_PFQF_HENA(0), (u32)hena);
- 	i40e_write_rx_ctl(hw, I40E_PFQF_HENA(1), (u32)(hena >> 32));
+ #include <generated/utsrelease.h>
+ #include <linux/crash_dump.h>
++#include <linux/net/intel/libie/pctype.h>
+ #include <linux/if_bridge.h>
+ #include <linux/if_macvlan.h>
+ #include <linux/module.h>
+@@ -9188,47 +9189,47 @@ static void i40e_fdir_filter_exit(struct i40e_pf *pf)
+ 	i40e_reset_fdir_filter_cnt(pf);
+ 
+ 	/* Reprogram the default input set for TCP/IPv4 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_TCP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for TCP/IPv6 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_TCP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP,
+ 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for UDP/IPv4 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_UDP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for UDP/IPv6 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_UDP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP,
+ 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for SCTP/IPv4 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_SCTP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for SCTP/IPv6 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_SCTP,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP,
+ 				I40E_L3_V6_SRC_MASK | I40E_L3_V6_DST_MASK |
+ 				I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+ 	/* Reprogram the default input set for Other/IPv4 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_OTHER,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
+ 
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV4,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV4,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
+ 
+ 	/* Reprogram the default input set for Other/IPv6 */
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV6_OTHER,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
+ 
+-	i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_FRAG_IPV6,
++	i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_FRAG_IPV6,
+ 				I40E_L3_SRC_MASK | I40E_L3_DST_MASK);
+ }
+ 
+@@ -9656,7 +9657,7 @@ static void i40e_reenable_fdir_atr(struct i40e_pf *pf)
+ 		 * settings. It is safe to restore the default input set
+ 		 * because there are no active TCPv4 filter rules.
+ 		 */
+-		i40e_write_fd_input_set(pf, I40E_FILTER_PCTYPE_NONF_IPV4_TCP,
++		i40e_write_fd_input_set(pf, LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP,
+ 					I40E_L3_SRC_MASK | I40E_L3_DST_MASK |
+ 					I40E_L4_SRC_MASK | I40E_L4_DST_MASK);
+ 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index c006f716a3bd..048c33039130 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -2,6 +2,7 @@
+ /* Copyright(c) 2013 - 2018 Intel Corporation. */
+ 
+ #include <linux/bpf_trace.h>
++#include <linux/net/intel/libie/pctype.h>
+ #include <linux/net/intel/libie/rx.h>
+ #include <linux/prefetch.h>
+ #include <linux/sctp.h>
+@@ -397,12 +398,12 @@ static int i40e_add_del_fdir_udp(struct i40e_vsi *vsi,
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_UDPIP_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV4_UDP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP);
+ 	else
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_UDPIP6_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV6_UDP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP);
+ 
+ 	if (ret) {
+ 		kfree(raw_packet);
+@@ -444,12 +445,12 @@ static int i40e_add_del_fdir_tcp(struct i40e_vsi *vsi,
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_TCPIP_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV4_TCP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP);
+ 	else
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_TCPIP6_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV6_TCP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP);
+ 
+ 	if (ret) {
+ 		kfree(raw_packet);
+@@ -499,12 +500,12 @@ static int i40e_add_del_fdir_sctp(struct i40e_vsi *vsi,
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_SCTPIP_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV4_SCTP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP);
+ 	else
+ 		ret = i40e_prepare_fdir_filter
+ 			(pf, fd_data, add, raw_packet,
+ 			 I40E_SCTPIP6_DUMMY_PACKET_LEN,
+-			 I40E_FILTER_PCTYPE_NONF_IPV6_SCTP);
++			 LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP);
+ 
+ 	if (ret) {
+ 		kfree(raw_packet);
+@@ -543,11 +544,11 @@ static int i40e_add_del_fdir_ip(struct i40e_vsi *vsi,
+ 	int i;
+ 
+ 	if (ipv4) {
+-		iter_start = I40E_FILTER_PCTYPE_NONF_IPV4_OTHER;
+-		iter_end = I40E_FILTER_PCTYPE_FRAG_IPV4;
++		iter_start = LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER;
++		iter_end = LIBIE_FILTER_PCTYPE_FRAG_IPV4;
+ 	} else {
+-		iter_start = I40E_FILTER_PCTYPE_NONF_IPV6_OTHER;
+-		iter_end = I40E_FILTER_PCTYPE_FRAG_IPV6;
++		iter_start = LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER;
++		iter_end = LIBIE_FILTER_PCTYPE_FRAG_IPV6;
+ 	}
+ 
+ 	for (i = iter_start; i <= iter_end; i++) {
+@@ -2948,9 +2949,9 @@ static void i40e_atr(struct i40e_ring *tx_ring, struct sk_buff *skb,
+ 	flex_ptype = FIELD_PREP(I40E_TXD_FLTR_QW0_QINDEX_MASK,
+ 				tx_ring->queue_index);
+ 	flex_ptype |= (tx_flags & I40E_TX_FLAGS_IPV4) ?
+-		      (I40E_FILTER_PCTYPE_NONF_IPV4_TCP <<
++		      (LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP <<
+ 		       I40E_TXD_FLTR_QW0_PCTYPE_SHIFT) :
+-		      (I40E_FILTER_PCTYPE_NONF_IPV6_TCP <<
++		      (LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP <<
+ 		       I40E_TXD_FLTR_QW0_PCTYPE_SHIFT);
+ 
+ 	flex_ptype |= tx_ring->vsi->id << I40E_TXD_FLTR_QW0_DEST_VSI_SHIFT;
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-index 7c26c9a2bf65..b007a84268a7 100644
+index b007a84268a7..1e5fd63d47f4 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-@@ -71,7 +71,7 @@ enum i40e_dyn_idx {
- #define I40E_SW_ITR    I40E_IDX_ITR2
+@@ -4,6 +4,7 @@
+ #ifndef _I40E_TXRX_H_
+ #define _I40E_TXRX_H_
+ 
++#include <linux/net/intel/libie/pctype.h>
+ #include <net/xdp.h>
+ #include "i40e_type.h"
+ 
+@@ -72,25 +73,25 @@ enum i40e_dyn_idx {
  
  /* Supported RSS offloads */
--#define I40E_DEFAULT_RSS_HENA ( \
-+#define I40E_DEFAULT_RSS_HASHCFG ( \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_UDP) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP) | \
-@@ -84,7 +84,7 @@ enum i40e_dyn_idx {
- 	BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_L2_PAYLOAD))
+ #define I40E_DEFAULT_RSS_HASHCFG ( \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_UDP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV4) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_UDP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_TCP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_FRAG_IPV6) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_L2_PAYLOAD))
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_L2_PAYLOAD))
  
--#define I40E_DEFAULT_RSS_HENA_EXPANDED (I40E_DEFAULT_RSS_HENA | \
-+#define I40E_DEFAULT_RSS_HASHCFG_EXPANDED (I40E_DEFAULT_RSS_HASHCFG | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-@@ -92,9 +92,9 @@ enum i40e_dyn_idx {
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
+ #define I40E_DEFAULT_RSS_HASHCFG_EXPANDED (I40E_DEFAULT_RSS_HASHCFG | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
+-	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
  
--#define i40e_pf_get_default_rss_hena(pf) \
-+#define i40e_pf_get_default_rss_hashcfg(pf) \
+ #define i40e_pf_get_default_rss_hashcfg(pf) \
  	(test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, (pf)->hw.caps) ? \
--	 I40E_DEFAULT_RSS_HENA_EXPANDED : I40E_DEFAULT_RSS_HENA)
-+	 I40E_DEFAULT_RSS_HASHCFG_EXPANDED : I40E_DEFAULT_RSS_HASHCFG)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
+index 28568e126850..a09ed83835ff 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_type.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
+@@ -929,38 +929,6 @@ struct i40e_filter_program_desc {
+ #define I40E_TXD_FLTR_QW0_PCTYPE_MASK	(0x3FUL << \
+ 					 I40E_TXD_FLTR_QW0_PCTYPE_SHIFT)
  
- /* Supported Rx Buffer Sizes (a multiple of 128) */
- #define I40E_RXBUFFER_256   256
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 1120f8e4bb67..2d9b7e51bbe1 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -812,7 +812,7 @@ static int i40e_alloc_vsi_res(struct i40e_vf *vf, u8 idx)
- 	}
- 
- 	if (!idx) {
--		u64 hena = i40e_pf_get_default_rss_hena(pf);
-+		u64 hashcfg = i40e_pf_get_default_rss_hashcfg(pf);
- 		u8 broadcast[ETH_ALEN];
- 
- 		vf->lan_vsi_idx = vsi->idx;
-@@ -841,8 +841,9 @@ static int i40e_alloc_vsi_res(struct i40e_vf *vf, u8 idx)
- 			dev_info(&pf->pdev->dev,
- 				 "Could not allocate VF broadcast filter\n");
- 		spin_unlock_bh(&vsi->mac_filter_hash_lock);
--		wr32(&pf->hw, I40E_VFQF_HENA1(0, vf->vf_id), (u32)hena);
--		wr32(&pf->hw, I40E_VFQF_HENA1(1, vf->vf_id), (u32)(hena >> 32));
-+		wr32(&pf->hw, I40E_VFQF_HENA1(0, vf->vf_id), (u32)hashcfg);
-+		wr32(&pf->hw, I40E_VFQF_HENA1(1, vf->vf_id),
-+		     (u32)(hashcfg >> 32));
- 		/* program mac filter only for VF VSI */
- 		ret = i40e_sync_vsi_filters(vsi);
- 		if (ret)
-@@ -3447,15 +3448,15 @@ static int i40e_vc_config_rss_lut(struct i40e_vf *vf, u8 *msg)
- }
- 
- /**
-- * i40e_vc_get_rss_hena
-+ * i40e_vc_get_rss_hashcfg
-  * @vf: pointer to the VF info
-  * @msg: pointer to the msg buffer
-  *
-- * Return the RSS HENA bits allowed by the hardware
-+ * Return the RSS Hash configuration bits allowed by the hardware
-  **/
--static int i40e_vc_get_rss_hena(struct i40e_vf *vf, u8 *msg)
-+static int i40e_vc_get_rss_hashcfg(struct i40e_vf *vf, u8 *msg)
- {
--	struct virtchnl_rss_hena *vrh = NULL;
-+	struct virtchnl_rss_hashcfg *vrh = NULL;
- 	struct i40e_pf *pf = vf->pf;
- 	int aq_ret = 0;
- 	int len = 0;
-@@ -3464,7 +3465,7 @@ static int i40e_vc_get_rss_hena(struct i40e_vf *vf, u8 *msg)
- 		aq_ret = -EINVAL;
- 		goto err;
- 	}
--	len = sizeof(struct virtchnl_rss_hena);
-+	len = sizeof(struct virtchnl_rss_hashcfg);
- 
- 	vrh = kzalloc(len, GFP_KERNEL);
- 	if (!vrh) {
-@@ -3472,26 +3473,26 @@ static int i40e_vc_get_rss_hena(struct i40e_vf *vf, u8 *msg)
- 		len = 0;
- 		goto err;
- 	}
--	vrh->hena = i40e_pf_get_default_rss_hena(pf);
-+	vrh->hashcfg = i40e_pf_get_default_rss_hashcfg(pf);
- err:
- 	/* send the response back to the VF */
--	aq_ret = i40e_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_RSS_HENA_CAPS,
-+	aq_ret = i40e_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS,
- 					aq_ret, (u8 *)vrh, len);
- 	kfree(vrh);
- 	return aq_ret;
- }
- 
- /**
-- * i40e_vc_set_rss_hena
-+ * i40e_vc_set_rss_hashcfg
-  * @vf: pointer to the VF info
-  * @msg: pointer to the msg buffer
-  *
-- * Set the RSS HENA bits for the VF
-+ * Set the RSS Hash configuration bits for the VF
-  **/
--static int i40e_vc_set_rss_hena(struct i40e_vf *vf, u8 *msg)
-+static int i40e_vc_set_rss_hashcfg(struct i40e_vf *vf, u8 *msg)
- {
--	struct virtchnl_rss_hena *vrh =
--		(struct virtchnl_rss_hena *)msg;
-+	struct virtchnl_rss_hashcfg *vrh =
-+		(struct virtchnl_rss_hashcfg *)msg;
- 	struct i40e_pf *pf = vf->pf;
- 	struct i40e_hw *hw = &pf->hw;
- 	int aq_ret = 0;
-@@ -3500,13 +3501,14 @@ static int i40e_vc_set_rss_hena(struct i40e_vf *vf, u8 *msg)
- 		aq_ret = -EINVAL;
- 		goto err;
- 	}
--	i40e_write_rx_ctl(hw, I40E_VFQF_HENA1(0, vf->vf_id), (u32)vrh->hena);
-+	i40e_write_rx_ctl(hw, I40E_VFQF_HENA1(0, vf->vf_id),
-+			  (u32)vrh->hashcfg);
- 	i40e_write_rx_ctl(hw, I40E_VFQF_HENA1(1, vf->vf_id),
--			  (u32)(vrh->hena >> 32));
-+			  (u32)(vrh->hashcfg >> 32));
- 
- 	/* send the response to the VF */
- err:
--	return i40e_vc_send_resp_to_vf(vf, VIRTCHNL_OP_SET_RSS_HENA, aq_ret);
-+	return i40e_vc_send_resp_to_vf(vf, VIRTCHNL_OP_SET_RSS_HASHCFG, aq_ret);
- }
- 
- /**
-@@ -4253,11 +4255,11 @@ int i40e_vc_process_vf_msg(struct i40e_pf *pf, s16 vf_id, u32 v_opcode,
- 	case VIRTCHNL_OP_CONFIG_RSS_LUT:
- 		ret = i40e_vc_config_rss_lut(vf, msg);
- 		break;
--	case VIRTCHNL_OP_GET_RSS_HENA_CAPS:
--		ret = i40e_vc_get_rss_hena(vf, msg);
-+	case VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS:
-+		ret = i40e_vc_get_rss_hashcfg(vf, msg);
- 		break;
--	case VIRTCHNL_OP_SET_RSS_HENA:
--		ret = i40e_vc_set_rss_hena(vf, msg);
-+	case VIRTCHNL_OP_SET_RSS_HASHCFG:
-+		ret = i40e_vc_set_rss_hashcfg(vf, msg);
- 		break;
- 	case VIRTCHNL_OP_ENABLE_VLAN_STRIPPING:
- 		ret = i40e_vc_enable_vlan_stripping(vf, msg);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index f7a98ff43a57..eb86cca38be2 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -315,8 +315,8 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_CONFIGURE_RSS		BIT_ULL(9) /* direct AQ config */
- #define IAVF_FLAG_AQ_GET_CONFIG			BIT_ULL(10)
- /* Newer style, RSS done by the PF so we can ignore hardware vagaries. */
--#define IAVF_FLAG_AQ_GET_HENA			BIT_ULL(11)
--#define IAVF_FLAG_AQ_SET_HENA			BIT_ULL(12)
-+#define IAVF_FLAG_AQ_GET_RSS_HASHCFG		BIT_ULL(11)
-+#define IAVF_FLAG_AQ_SET_RSS_HASHCFG		BIT_ULL(12)
- #define IAVF_FLAG_AQ_SET_RSS_KEY		BIT_ULL(13)
- #define IAVF_FLAG_AQ_SET_RSS_LUT		BIT_ULL(14)
- #define IAVF_FLAG_AQ_SET_RSS_HFUNC		BIT_ULL(15)
-@@ -456,7 +456,7 @@ struct iavf_adapter {
- 	u32 aq_wait_count;
- 	/* RSS stuff */
- 	enum virtchnl_rss_algorithm hfunc;
--	u64 hena;
-+	u64 rss_hashcfg;
- 	u16 rss_key_size;
- 	u16 rss_lut_size;
- 	u8 *rss_key;
-@@ -600,8 +600,8 @@ void iavf_set_promiscuous(struct iavf_adapter *adapter);
- bool iavf_promiscuous_mode_changed(struct iavf_adapter *adapter);
- void iavf_request_stats(struct iavf_adapter *adapter);
- int iavf_request_reset(struct iavf_adapter *adapter);
--void iavf_get_hena(struct iavf_adapter *adapter);
--void iavf_set_hena(struct iavf_adapter *adapter);
-+void iavf_get_rss_hashcfg(struct iavf_adapter *adapter);
-+void iavf_set_rss_hashcfg(struct iavf_adapter *adapter);
- void iavf_set_rss_key(struct iavf_adapter *adapter);
- void iavf_set_rss_lut(struct iavf_adapter *adapter);
- void iavf_set_rss_hfunc(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 2c0bb41809a4..01e11ac5055b 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1823,12 +1823,13 @@ static int iavf_init_rss(struct iavf_adapter *adapter)
- 		/* Enable PCTYPES for RSS, TCP/UDP with IPv4/IPv6 */
- 		if (adapter->vf_res->vf_cap_flags &
- 		    VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2)
--			adapter->hena = IAVF_DEFAULT_RSS_HENA_EXPANDED;
-+			adapter->rss_hashcfg =
-+				IAVF_DEFAULT_RSS_HASHCFG_EXPANDED;
- 		else
--			adapter->hena = IAVF_DEFAULT_RSS_HENA;
-+			adapter->rss_hashcfg = IAVF_DEFAULT_RSS_HASHCFG;
- 
--		wr32(hw, IAVF_VFQF_HENA(0), (u32)adapter->hena);
--		wr32(hw, IAVF_VFQF_HENA(1), (u32)(adapter->hena >> 32));
-+		wr32(hw, IAVF_VFQF_HENA(0), (u32)adapter->rss_hashcfg);
-+		wr32(hw, IAVF_VFQF_HENA(1), (u32)(adapter->rss_hashcfg >> 32));
- 	}
- 
- 	iavf_fill_rss_lut(adapter);
-@@ -2195,12 +2196,12 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		adapter->aq_required &= ~IAVF_FLAG_AQ_CONFIGURE_RSS;
- 		return 0;
- 	}
--	if (adapter->aq_required & IAVF_FLAG_AQ_GET_HENA) {
--		iavf_get_hena(adapter);
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_RSS_HASHCFG) {
-+		iavf_get_rss_hashcfg(adapter);
- 		return 0;
- 	}
--	if (adapter->aq_required & IAVF_FLAG_AQ_SET_HENA) {
--		iavf_set_hena(adapter);
-+	if (adapter->aq_required & IAVF_FLAG_AQ_SET_RSS_HASHCFG) {
-+		iavf_set_rss_hashcfg(adapter);
- 		return 0;
- 	}
- 	if (adapter->aq_required & IAVF_FLAG_AQ_SET_RSS_KEY) {
+-/* Packet Classifier Types for filters */
+-enum i40e_filter_pctype {
+-	/* Note: Values 0-28 are reserved for future use.
+-	 * Value 29, 30, 32 are not supported on XL710 and X710.
+-	 */
+-	I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
+-	I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
+-	I40E_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
+-	I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
+-	I40E_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
+-	I40E_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
+-	I40E_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
+-	I40E_FILTER_PCTYPE_FRAG_IPV4			= 36,
+-	/* Note: Values 37-38 are reserved for future use.
+-	 * Value 39, 40, 42 are not supported on XL710 and X710.
+-	 */
+-	I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
+-	I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
+-	I40E_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
+-	I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
+-	I40E_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
+-	I40E_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
+-	I40E_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
+-	I40E_FILTER_PCTYPE_FRAG_IPV6			= 46,
+-	/* Note: Value 47 is reserved for future use */
+-	I40E_FILTER_PCTYPE_FCOE_OX			= 48,
+-	I40E_FILTER_PCTYPE_FCOE_RX			= 49,
+-	I40E_FILTER_PCTYPE_FCOE_OTHER			= 50,
+-	/* Note: Values 51-62 are reserved for future use */
+-	I40E_FILTER_PCTYPE_L2_PAYLOAD			= 63,
+-};
+-
+ enum i40e_filter_program_desc_dest {
+ 	I40E_FILTER_PROGRAM_DESC_DEST_DROP_PACKET		= 0x0,
+ 	I40E_FILTER_PROGRAM_DESC_DEST_DIRECT_PACKET_QINDEX	= 0x1,
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index 79ad554f2d53..94b324f212bd 100644
+index 94b324f212bd..df49b0b1d54a 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
 +++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -59,7 +59,7 @@ enum iavf_dyn_idx_t {
- #define IAVF_PE_ITR    IAVF_IDX_ITR2
+@@ -4,6 +4,8 @@
+ #ifndef _IAVF_TXRX_H_
+ #define _IAVF_TXRX_H_
+ 
++#include <linux/net/intel/libie/pctype.h>
++
+ /* Interrupt Throttling and Rate Limiting Goodies */
+ #define IAVF_DEFAULT_IRQ_WORK      256
+ 
+@@ -60,25 +62,25 @@ enum iavf_dyn_idx_t {
  
  /* Supported RSS offloads */
--#define IAVF_DEFAULT_RSS_HENA ( \
-+#define IAVF_DEFAULT_RSS_HASHCFG ( \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_UDP) | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP) | \
-@@ -72,7 +72,7 @@ enum iavf_dyn_idx_t {
- 	BIT_ULL(IAVF_FILTER_PCTYPE_FRAG_IPV6) | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_L2_PAYLOAD))
+ #define IAVF_DEFAULT_RSS_HASHCFG ( \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_UDP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_FRAG_IPV4) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_UDP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_TCP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_FRAG_IPV6) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_L2_PAYLOAD))
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_L2_PAYLOAD))
  
--#define IAVF_DEFAULT_RSS_HENA_EXPANDED (IAVF_DEFAULT_RSS_HENA | \
-+#define IAVF_DEFAULT_RSS_HASHCFG_EXPANDED (IAVF_DEFAULT_RSS_HASHCFG | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
- 	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index a6f0e5990be2..1815cf3e28f4 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -1128,12 +1128,12 @@ void iavf_request_stats(struct iavf_adapter *adapter)
- }
+ #define IAVF_DEFAULT_RSS_HASHCFG_EXPANDED (IAVF_DEFAULT_RSS_HASHCFG | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
+-	BIT_ULL(IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
+ 
+ /* How many Rx Buffers do we bundle into one write to the hardware ? */
+ #define IAVF_RX_INCREMENT(r, i) \
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h b/drivers/net/ethernet/intel/iavf/iavf_type.h
+index f9e1319620f4..cb12e86ba4a6 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_type.h
++++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
+@@ -463,38 +463,6 @@ enum iavf_tx_ctx_desc_cmd_bits {
+ 	IAVF_TX_CTX_DESC_SWPE		= 0x40
+ };
+ 
+-/* Packet Classifier Types for filters */
+-enum iavf_filter_pctype {
+-	/* Note: Values 0-28 are reserved for future use.
+-	 * Value 29, 30, 32 are not supported on XL710 and X710.
+-	 */
+-	IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
+-	IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
+-	IAVF_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
+-	IAVF_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
+-	IAVF_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
+-	IAVF_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
+-	IAVF_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
+-	IAVF_FILTER_PCTYPE_FRAG_IPV4			= 36,
+-	/* Note: Values 37-38 are reserved for future use.
+-	 * Value 39, 40, 42 are not supported on XL710 and X710.
+-	 */
+-	IAVF_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
+-	IAVF_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
+-	IAVF_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
+-	IAVF_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
+-	IAVF_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
+-	IAVF_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
+-	IAVF_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
+-	IAVF_FILTER_PCTYPE_FRAG_IPV6			= 46,
+-	/* Note: Value 47 is reserved for future use */
+-	IAVF_FILTER_PCTYPE_FCOE_OX			= 48,
+-	IAVF_FILTER_PCTYPE_FCOE_RX			= 49,
+-	IAVF_FILTER_PCTYPE_FCOE_OTHER			= 50,
+-	/* Note: Values 51-62 are reserved for future use */
+-	IAVF_FILTER_PCTYPE_L2_PAYLOAD			= 63,
+-};
+-
+ #define IAVF_TXD_CTX_QW1_TSO_LEN_SHIFT	30
+ #define IAVF_TXD_CTX_QW1_TSO_LEN_MASK	(0x3FFFFULL << \
+ 					 IAVF_TXD_CTX_QW1_TSO_LEN_SHIFT)
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+index d97b751052f2..278e57686274 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.c
++++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+@@ -2573,38 +2573,38 @@ ice_rem_rss_cfg(struct ice_hw *hw, u16 vsi_handle,
+  * convert its values to their appropriate flow L3, L4 values.
+  */
+ #define ICE_FLOW_AVF_RSS_IPV4_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_OTHER) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV4))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4))
+ #define ICE_FLOW_AVF_RSS_TCP_IPV4_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP))
+ #define ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_UDP))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP))
+ #define ICE_FLOW_AVF_RSS_ALL_IPV4_MASKS \
+ 	(ICE_FLOW_AVF_RSS_TCP_IPV4_MASKS | ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS | \
+-	 ICE_FLOW_AVF_RSS_IPV4_MASKS | BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP))
++	 ICE_FLOW_AVF_RSS_IPV4_MASKS | BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP))
+ 
+ #define ICE_FLOW_AVF_RSS_IPV6_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_OTHER) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV6))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6))
+ #define ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_UDP))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP))
+ #define ICE_FLOW_AVF_RSS_TCP_IPV6_MASKS \
+-	(BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK) | \
+-	 BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP))
++	(BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
++	 BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP))
+ #define ICE_FLOW_AVF_RSS_ALL_IPV6_MASKS \
+ 	(ICE_FLOW_AVF_RSS_TCP_IPV6_MASKS | ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS | \
+-	 ICE_FLOW_AVF_RSS_IPV6_MASKS | BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP))
++	 ICE_FLOW_AVF_RSS_IPV6_MASKS | BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP))
  
  /**
-- * iavf_get_hena
-+ * iavf_get_rss_hashcfg
-  * @adapter: adapter structure
+  * ice_add_avf_rss_cfg - add an RSS configuration for AVF driver
+  * @hw: pointer to the hardware structure
+  * @vsi: VF's VSI
+- * @avf_hash: hash bit fields (ICE_AVF_FLOW_FIELD_*) to configure
++ * @avf_hash: hash bit fields (LIBIE_FILTER_PCTYPE_*) to configure
   *
-- * Request hash enable capabilities from PF
-+ * Request RSS Hash enable bits from PF
-  **/
--void iavf_get_hena(struct iavf_adapter *adapter)
-+void iavf_get_rss_hashcfg(struct iavf_adapter *adapter)
- {
- 	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
- 		/* bail because we already have a command pending */
-@@ -1141,20 +1141,20 @@ void iavf_get_hena(struct iavf_adapter *adapter)
- 			adapter->current_op);
- 		return;
- 	}
--	adapter->current_op = VIRTCHNL_OP_GET_RSS_HENA_CAPS;
--	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_HENA;
--	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_RSS_HENA_CAPS, NULL, 0);
-+	adapter->current_op = VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_RSS_HASHCFG;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS, NULL, 0);
- }
+  * This function will take the hash bitmap provided by the AVF driver via a
+  * message, convert it to ICE-compatible values, and configure RSS flow
+@@ -2621,8 +2621,7 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
+ 		return -EINVAL;
  
- /**
-- * iavf_set_hena
-+ * iavf_set_rss_hashcfg
-  * @adapter: adapter structure
-  *
-  * Request the PF to set our RSS hash capabilities
-  **/
--void iavf_set_hena(struct iavf_adapter *adapter)
-+void iavf_set_rss_hashcfg(struct iavf_adapter *adapter)
- {
--	struct virtchnl_rss_hena vrh;
-+	struct virtchnl_rss_hashcfg vrh;
+ 	vsi_handle = vsi->idx;
+-	if (avf_hash == ICE_AVF_FLOW_FIELD_INVALID ||
+-	    !ice_is_vsi_valid(hw, vsi_handle))
++	if (!avf_hash || !ice_is_vsi_valid(hw, vsi_handle))
+ 		return -EINVAL;
  
- 	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
- 		/* bail because we already have a command pending */
-@@ -1162,10 +1162,10 @@ void iavf_set_hena(struct iavf_adapter *adapter)
- 			adapter->current_op);
- 		return;
- 	}
--	vrh.hena = adapter->hena;
--	adapter->current_op = VIRTCHNL_OP_SET_RSS_HENA;
--	adapter->aq_required &= ~IAVF_FLAG_AQ_SET_HENA;
--	iavf_send_pf_msg(adapter, VIRTCHNL_OP_SET_RSS_HENA, (u8 *)&vrh,
-+	vrh.hashcfg = adapter->rss_hashcfg;
-+	adapter->current_op = VIRTCHNL_OP_SET_RSS_HASHCFG;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_SET_RSS_HASHCFG;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_SET_RSS_HASHCFG, (u8 *)&vrh,
- 			 sizeof(vrh));
- }
+ 	/* Make sure no unsupported bits are specified */
+@@ -2658,11 +2657,11 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
+ 					ICE_FLOW_HASH_UDP_PORT;
+ 				hash_flds &= ~ICE_FLOW_AVF_RSS_UDP_IPV4_MASKS;
+ 			} else if (hash_flds &
+-				   BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP)) {
++				   BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP)) {
+ 				rss_hash = ICE_FLOW_HASH_IPV4 |
+ 					ICE_FLOW_HASH_SCTP_PORT;
+ 				hash_flds &=
+-					~BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP);
++					~BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP);
+ 			}
+ 		} else if (hash_flds & ICE_FLOW_AVF_RSS_ALL_IPV6_MASKS) {
+ 			if (hash_flds & ICE_FLOW_AVF_RSS_IPV6_MASKS) {
+@@ -2679,11 +2678,11 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
+ 					ICE_FLOW_HASH_UDP_PORT;
+ 				hash_flds &= ~ICE_FLOW_AVF_RSS_UDP_IPV6_MASKS;
+ 			} else if (hash_flds &
+-				   BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP)) {
++				   BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP)) {
+ 				rss_hash = ICE_FLOW_HASH_IPV6 |
+ 					ICE_FLOW_HASH_SCTP_PORT;
+ 				hash_flds &=
+-					~BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP);
++					~BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP);
+ 			}
+ 		}
  
-@@ -2735,11 +2735,12 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (v_opcode != adapter->current_op)
- 			return;
- 		break;
--	case VIRTCHNL_OP_GET_RSS_HENA_CAPS: {
--		struct virtchnl_rss_hena *vrh = (struct virtchnl_rss_hena *)msg;
-+	case VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS: {
-+		struct virtchnl_rss_hashcfg *vrh =
-+			(struct virtchnl_rss_hashcfg *)msg;
- 
- 		if (msglen == sizeof(*vrh))
--			adapter->hena = vrh->hena;
-+			adapter->rss_hashcfg = vrh->hashcfg;
- 		else
- 			dev_warn(&adapter->pdev->dev,
- 				 "Invalid message %d from PF\n", v_opcode);
 diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
-index 6cb7bb879c98..b1313fb61677 100644
+index b1313fb61677..52f906d89eca 100644
 --- a/drivers/net/ethernet/intel/ice/ice_flow.h
 +++ b/drivers/net/ethernet/intel/ice/ice_flow.h
-@@ -295,10 +295,10 @@ enum ice_flow_avf_hdr_field {
- };
+@@ -4,6 +4,8 @@
+ #ifndef _ICE_FLOW_H_
+ #define _ICE_FLOW_H_
  
++#include <linux/net/intel/libie/pctype.h>
++
+ #include "ice_flex_type.h"
+ #include "ice_parser.h"
+ 
+@@ -264,57 +266,27 @@ enum ice_flow_field {
+ #define ICE_FLOW_HASH_FLD_GTPU_DWN_TEID \
+ 	BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID)
+ 
+-/* Flow headers and fields for AVF support */
+-enum ice_flow_avf_hdr_field {
+-	/* Values 0 - 28 are reserved for future use */
+-	ICE_AVF_FLOW_FIELD_INVALID		= 0,
+-	ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP	= 29,
+-	ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP,
+-	ICE_AVF_FLOW_FIELD_IPV4_UDP,
+-	ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK,
+-	ICE_AVF_FLOW_FIELD_IPV4_TCP,
+-	ICE_AVF_FLOW_FIELD_IPV4_SCTP,
+-	ICE_AVF_FLOW_FIELD_IPV4_OTHER,
+-	ICE_AVF_FLOW_FIELD_FRAG_IPV4,
+-	/* Values 37-38 are reserved */
+-	ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP	= 39,
+-	ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP,
+-	ICE_AVF_FLOW_FIELD_IPV6_UDP,
+-	ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK,
+-	ICE_AVF_FLOW_FIELD_IPV6_TCP,
+-	ICE_AVF_FLOW_FIELD_IPV6_SCTP,
+-	ICE_AVF_FLOW_FIELD_IPV6_OTHER,
+-	ICE_AVF_FLOW_FIELD_FRAG_IPV6,
+-	ICE_AVF_FLOW_FIELD_RSVD47,
+-	ICE_AVF_FLOW_FIELD_FCOE_OX,
+-	ICE_AVF_FLOW_FIELD_FCOE_RX,
+-	ICE_AVF_FLOW_FIELD_FCOE_OTHER,
+-	/* Values 51-62 are reserved */
+-	ICE_AVF_FLOW_FIELD_L2_PAYLOAD		= 63,
+-	ICE_AVF_FLOW_FIELD_MAX
+-};
+-
  /* Supported RSS offloads  This macro is defined to support
-- * VIRTCHNL_OP_GET_RSS_HENA_CAPS ops. PF driver sends the RSS hardware
-+ * VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS ops. PF driver sends the RSS hardware
+  * VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS ops. PF driver sends the RSS hardware
   * capabilities to the caller of this ops.
   */
--#define ICE_DEFAULT_RSS_HENA ( \
-+#define ICE_DEFAULT_RSS_HASHCFG ( \
- 	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_UDP) | \
- 	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP) | \
- 	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP) | \
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 03bb16191237..2cc050db509f 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1579,7 +1579,7 @@ static void ice_vsi_set_vf_rss_flow_fld(struct ice_vsi *vsi)
- 		return;
- 	}
+ #define ICE_DEFAULT_RSS_HASHCFG ( \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_UDP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_SCTP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_OTHER) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV4) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_UDP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_SCTP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_OTHER) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_FRAG_IPV6) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV4_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV4_UDP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV4_UDP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_IPV6_TCP_SYN_NO_ACK) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_UNICAST_IPV6_UDP) | \
+-	BIT_ULL(ICE_AVF_FLOW_FIELD_MULTICAST_IPV6_UDP))
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV4) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_FRAG_IPV6) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP) | \
++	BIT_ULL(LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
  
--	status = ice_add_avf_rss_cfg(&pf->hw, vsi, ICE_DEFAULT_RSS_HENA);
-+	status = ice_add_avf_rss_cfg(&pf->hw, vsi, ICE_DEFAULT_RSS_HASHCFG);
- 	if (status)
- 		dev_dbg(dev, "ice_add_avf_rss_cfg failed for vsi = %d, error = %d\n",
- 			vsi->vsi_num, status);
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index eeeb9968e477..24426dcd8aa2 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -2999,13 +2999,13 @@ static int ice_vc_dis_vlan_stripping(struct ice_vf *vf)
- }
- 
- /**
-- * ice_vc_get_rss_hena - return the RSS HENA bits allowed by the hardware
-+ * ice_vc_get_rss_hashcfg - return the RSS Hash configuration
-  * @vf: pointer to the VF info
-  */
--static int ice_vc_get_rss_hena(struct ice_vf *vf)
-+static int ice_vc_get_rss_hashcfg(struct ice_vf *vf)
- {
- 	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
--	struct virtchnl_rss_hena *vrh = NULL;
-+	struct virtchnl_rss_hashcfg *vrh = NULL;
- 	int len = 0, ret;
- 
- 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
-@@ -3019,7 +3019,7 @@ static int ice_vc_get_rss_hena(struct ice_vf *vf)
- 		goto err;
- 	}
- 
--	len = sizeof(struct virtchnl_rss_hena);
-+	len = sizeof(struct virtchnl_rss_hashcfg);
- 	vrh = kzalloc(len, GFP_KERNEL);
- 	if (!vrh) {
- 		v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
-@@ -3027,23 +3027,23 @@ static int ice_vc_get_rss_hena(struct ice_vf *vf)
- 		goto err;
- 	}
- 
--	vrh->hena = ICE_DEFAULT_RSS_HENA;
-+	vrh->hashcfg = ICE_DEFAULT_RSS_HASHCFG;
- err:
- 	/* send the response back to the VF */
--	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_RSS_HENA_CAPS, v_ret,
-+	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS, v_ret,
- 				    (u8 *)vrh, len);
- 	kfree(vrh);
- 	return ret;
- }
- 
- /**
-- * ice_vc_set_rss_hena - set RSS HENA bits for the VF
-+ * ice_vc_set_rss_hashcfg - set RSS Hash configuration bits for the VF
-  * @vf: pointer to the VF info
-  * @msg: pointer to the msg buffer
-  */
--static int ice_vc_set_rss_hena(struct ice_vf *vf, u8 *msg)
-+static int ice_vc_set_rss_hashcfg(struct ice_vf *vf, u8 *msg)
- {
--	struct virtchnl_rss_hena *vrh = (struct virtchnl_rss_hena *)msg;
-+	struct virtchnl_rss_hashcfg *vrh = (struct virtchnl_rss_hashcfg *)msg;
- 	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
- 	struct ice_pf *pf = vf->pf;
- 	struct ice_vsi *vsi;
-@@ -3074,9 +3074,9 @@ static int ice_vc_set_rss_hena(struct ice_vf *vf, u8 *msg)
- 	 * disable RSS
- 	 */
- 	status = ice_rem_vsi_rss_cfg(&pf->hw, vsi->idx);
--	if (status && !vrh->hena) {
-+	if (status && !vrh->hashcfg) {
- 		/* only report failure to clear the current RSS configuration if
--		 * that was clearly the VF's intention (i.e. vrh->hena = 0)
-+		 * that was clearly the VF's intention (i.e. vrh->hashcfg = 0)
- 		 */
- 		v_ret = ice_err_to_virt_err(status);
- 		goto err;
-@@ -3089,14 +3089,14 @@ static int ice_vc_set_rss_hena(struct ice_vf *vf, u8 *msg)
- 			 vf->vf_id);
- 	}
- 
--	if (vrh->hena) {
--		status = ice_add_avf_rss_cfg(&pf->hw, vsi, vrh->hena);
-+	if (vrh->hashcfg) {
-+		status = ice_add_avf_rss_cfg(&pf->hw, vsi, vrh->hashcfg);
- 		v_ret = ice_err_to_virt_err(status);
- 	}
- 
- 	/* send the response to the VF */
- err:
--	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_SET_RSS_HENA, v_ret,
-+	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_SET_RSS_HASHCFG, v_ret,
- 				     NULL, 0);
- }
- 
-@@ -4243,8 +4243,8 @@ static const struct ice_virtchnl_ops ice_virtchnl_dflt_ops = {
- 	.add_vlan_msg = ice_vc_add_vlan_msg,
- 	.remove_vlan_msg = ice_vc_remove_vlan_msg,
- 	.query_rxdid = ice_vc_query_rxdid,
--	.get_rss_hena = ice_vc_get_rss_hena,
--	.set_rss_hena_msg = ice_vc_set_rss_hena,
-+	.get_rss_hashcfg = ice_vc_get_rss_hashcfg,
-+	.set_rss_hashcfg = ice_vc_set_rss_hashcfg,
- 	.ena_vlan_stripping = ice_vc_ena_vlan_stripping,
- 	.dis_vlan_stripping = ice_vc_dis_vlan_stripping,
- 	.handle_rss_cfg_msg = ice_vc_handle_rss_cfg,
-@@ -4380,8 +4380,8 @@ static const struct ice_virtchnl_ops ice_virtchnl_repr_ops = {
- 	.add_vlan_msg = ice_vc_add_vlan_msg,
- 	.remove_vlan_msg = ice_vc_remove_vlan_msg,
- 	.query_rxdid = ice_vc_query_rxdid,
--	.get_rss_hena = ice_vc_get_rss_hena,
--	.set_rss_hena_msg = ice_vc_set_rss_hena,
-+	.get_rss_hashcfg = ice_vc_get_rss_hashcfg,
-+	.set_rss_hashcfg = ice_vc_set_rss_hashcfg,
- 	.ena_vlan_stripping = ice_vc_ena_vlan_stripping,
- 	.dis_vlan_stripping = ice_vc_dis_vlan_stripping,
- 	.handle_rss_cfg_msg = ice_vc_handle_rss_cfg,
-@@ -4582,11 +4582,11 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event,
- 	case VIRTCHNL_OP_GET_SUPPORTED_RXDIDS:
- 		err = ops->query_rxdid(vf);
- 		break;
--	case VIRTCHNL_OP_GET_RSS_HENA_CAPS:
--		err = ops->get_rss_hena(vf);
-+	case VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS:
-+		err = ops->get_rss_hashcfg(vf);
- 		break;
--	case VIRTCHNL_OP_SET_RSS_HENA:
--		err = ops->set_rss_hena_msg(vf, msg);
-+	case VIRTCHNL_OP_SET_RSS_HASHCFG:
-+		err = ops->set_rss_hashcfg(vf, msg);
- 		break;
- 	case VIRTCHNL_OP_ENABLE_VLAN_STRIPPING:
- 		err = ops->ena_vlan_stripping(vf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
-index 222990f229d5..b3eece8c6780 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
-@@ -57,8 +57,8 @@ struct ice_virtchnl_ops {
- 	int (*add_vlan_msg)(struct ice_vf *vf, u8 *msg);
- 	int (*remove_vlan_msg)(struct ice_vf *vf, u8 *msg);
- 	int (*query_rxdid)(struct ice_vf *vf);
--	int (*get_rss_hena)(struct ice_vf *vf);
--	int (*set_rss_hena_msg)(struct ice_vf *vf, u8 *msg);
-+	int (*get_rss_hashcfg)(struct ice_vf *vf);
-+	int (*set_rss_hashcfg)(struct ice_vf *vf, u8 *msg);
- 	int (*ena_vlan_stripping)(struct ice_vf *vf);
- 	int (*dis_vlan_stripping)(struct ice_vf *vf);
- 	int (*handle_rss_cfg_msg)(struct ice_vf *vf, u8 *msg, bool add);
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
-index a3d1579a619a..4c2ec2337b38 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
-@@ -65,7 +65,7 @@ static const u32 vlan_v2_allowlist_opcodes[] = {
- /* VIRTCHNL_VF_OFFLOAD_RSS_PF */
- static const u32 rss_pf_allowlist_opcodes[] = {
- 	VIRTCHNL_OP_CONFIG_RSS_KEY, VIRTCHNL_OP_CONFIG_RSS_LUT,
--	VIRTCHNL_OP_GET_RSS_HENA_CAPS, VIRTCHNL_OP_SET_RSS_HENA,
-+	VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS, VIRTCHNL_OP_SET_RSS_HASHCFG,
- 	VIRTCHNL_OP_CONFIG_RSS_HFUNC,
- };
- 
+ enum ice_rss_cfg_hdr_type {
+ 	ICE_RSS_OUTER_HEADERS, /* take outer headers as inputset. */
 diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
-index cf0afa60e4a7..362d1cdc8cd8 100644
+index 362d1cdc8cd8..5be1881abbb6 100644
 --- a/include/linux/avf/virtchnl.h
 +++ b/include/linux/avf/virtchnl.h
-@@ -132,8 +132,8 @@ enum virtchnl_ops {
- 	VIRTCHNL_OP_RELEASE_RDMA_IRQ_MAP = VIRTCHNL_OP_RELEASE_IWARP_IRQ_MAP,
- 	VIRTCHNL_OP_CONFIG_RSS_KEY = 23,
- 	VIRTCHNL_OP_CONFIG_RSS_LUT = 24,
--	VIRTCHNL_OP_GET_RSS_HENA_CAPS = 25,
--	VIRTCHNL_OP_SET_RSS_HENA = 26,
-+	VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS = 25,
-+	VIRTCHNL_OP_SET_RSS_HASHCFG = 26,
- 	VIRTCHNL_OP_ENABLE_VLAN_STRIPPING = 27,
- 	VIRTCHNL_OP_DISABLE_VLAN_STRIPPING = 28,
- 	VIRTCHNL_OP_REQUEST_QUEUES = 29,
-@@ -974,18 +974,18 @@ struct virtchnl_rss_lut {
- VIRTCHNL_CHECK_STRUCT_LEN(4, virtchnl_rss_lut);
- #define virtchnl_rss_lut_LEGACY_SIZEOF	6
- 
--/* VIRTCHNL_OP_GET_RSS_HENA_CAPS
-- * VIRTCHNL_OP_SET_RSS_HENA
-- * VF sends these messages to get and set the hash filter enable bits for RSS.
-+/* VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS
-+ * VIRTCHNL_OP_SET_RSS_HASHCFG
-+ * VF sends these messages to get and set the hash filter configuration for RSS.
-  * By default, the PF sets these to all possible traffic types that the
-  * hardware supports. The VF can query this value if it wants to change the
+@@ -982,6 +982,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(4, virtchnl_rss_lut);
   * traffic types that are hashed by the hardware.
   */
--struct virtchnl_rss_hena {
--	u64 hena;
-+struct virtchnl_rss_hashcfg {
-+	u64 hashcfg;
+ struct virtchnl_rss_hashcfg {
++	/* Bits defined by enum libie_filter_pctype */
+ 	u64 hashcfg;
  };
  
--VIRTCHNL_CHECK_STRUCT_LEN(8, virtchnl_rss_hena);
-+VIRTCHNL_CHECK_STRUCT_LEN(8, virtchnl_rss_hashcfg);
- 
- /* Type of RSS algorithm */
- enum virtchnl_rss_algorithm {
-@@ -1779,10 +1779,10 @@ virtchnl_vc_validate_vf_msg(struct virtchnl_version_info *ver, u32 v_opcode,
- 	case VIRTCHNL_OP_CONFIG_RSS_HFUNC:
- 		valid_len = sizeof(struct virtchnl_rss_hfunc);
- 		break;
--	case VIRTCHNL_OP_GET_RSS_HENA_CAPS:
-+	case VIRTCHNL_OP_GET_RSS_HASHCFG_CAPS:
- 		break;
--	case VIRTCHNL_OP_SET_RSS_HENA:
--		valid_len = sizeof(struct virtchnl_rss_hena);
-+	case VIRTCHNL_OP_SET_RSS_HASHCFG:
-+		valid_len = sizeof(struct virtchnl_rss_hashcfg);
- 		break;
- 	case VIRTCHNL_OP_ENABLE_VLAN_STRIPPING:
- 	case VIRTCHNL_OP_DISABLE_VLAN_STRIPPING:
+diff --git a/include/linux/net/intel/libie/pctype.h b/include/linux/net/intel/libie/pctype.h
+new file mode 100644
+index 000000000000..d783417fbf36
+--- /dev/null
++++ b/include/linux/net/intel/libie/pctype.h
+@@ -0,0 +1,41 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright (C) 2025 Intel Corporation */
++
++#ifndef __LIBIE_PCTYPE_H
++#define __LIBIE_PCTYPE_H
++
++/* Packet Classifier Type indexes, used to set the xxQF_HENA registers. Also
++ * communicated over the virtchnl API as part of struct virtchnl_rss_hashena.
++ */
++enum libie_filter_pctype {
++	/* Note: Values 0-28 are reserved for future use.
++	 * Value 29, 30, 32 are not supported on XL710 and X710.
++	 */
++	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
++	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
++	LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
++	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
++	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
++	LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
++	LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
++	LIBIE_FILTER_PCTYPE_FRAG_IPV4			= 36,
++	/* Note: Values 37-38 are reserved for future use.
++	 * Value 39, 40, 42 are not supported on XL710 and X710.
++	 */
++	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
++	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
++	LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
++	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
++	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
++	LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
++	LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
++	LIBIE_FILTER_PCTYPE_FRAG_IPV6			= 46,
++	/* Note: Value 47 is reserved for future use */
++	LIBIE_FILTER_PCTYPE_FCOE_OX			= 48,
++	LIBIE_FILTER_PCTYPE_FCOE_RX			= 49,
++	LIBIE_FILTER_PCTYPE_FCOE_OTHER			= 50,
++	/* Note: Values 51-62 are reserved for future use */
++	LIBIE_FILTER_PCTYPE_L2_PAYLOAD			= 63
++};
++
++#endif /* __LIBIE_PCTYPE_H */
 -- 
 2.47.1
 
