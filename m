@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-195896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0D9AD2A28
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:59:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5964AD2A31
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 407C73B1B53
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 22:58:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6FEE3A2FB1
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A0222576D;
-	Mon,  9 Jun 2025 22:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046A41FC11F;
+	Mon,  9 Jun 2025 23:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrTWFZRG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXpkkqeo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F713221FB5;
-	Mon,  9 Jun 2025 22:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE531A5BA2;
+	Mon,  9 Jun 2025 23:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749509851; cv=none; b=I9NDKRjb4pKbRLvDMyuVJDk0sTAuqd8ePvAFrj71S3+D46WAzTUyixhngT7KbSJFbGWyBdGkFeemJOEwAl1FHJ4ZsOmuXponWdbgjj5EexoOXaw+lRdmaUgRVLvlodGlpMPA0N5E1TqHsBj03S18pMHd+LOOfSdgR8QafFxzXuM=
+	t=1749510044; cv=none; b=fF69RNg2GyEUgE75ysjcsy9zdWB3Ae67TYPqn5gNE9KvtN/pvCcE2kc6yA9RBeIyHD2ektOHZBBU+wOL9cYR5xPQpRCuhGCqiX0Wz9vyDVMe/ZmQOeoPdHq2B856I6BsYfaLKQ9sffEZwT+i9bsbdSsr7viFYelXQ665gL6QXCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749509851; c=relaxed/simple;
-	bh=O3RIkh8fIuDuUU8AHiU0ARvWF+AEnkDibFM2u4pe1EE=;
+	s=arc-20240116; t=1749510044; c=relaxed/simple;
+	bh=0vE193A/wHZyTzDn9gzuWnoyy3hViOW8q63CEtcRwBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VQLJ5NsBBYQXoGhWr//mZxsJY5UGSXvShH1BxNOLnd8FvI0GdLeByE3yK45bfaSdrUU2Y09jVMdKACuw1y04axl5/URCWg/nc+kshucNM9ybcBcJhjLDSuUREXY8CCPN/tTHPyeePRcbc9V/l1VxVSVNKETgrfmhqQ2wUiE6oBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrTWFZRG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1893AC4CEED;
-	Mon,  9 Jun 2025 22:57:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=t85rfFl/u9wBPPj9SjLnPUXTnSskiuRpq7xN52BU5kGWnXCi7dyk2fpYIdaK3VRmBQQchUyv1umBhapHYoBfj72hi94aB0ppO/YHUCAnJeyuhSfTSNPAuIAlA4Ja3XYaUxUR6Mo8PodgzcLSi99eih6nteE6D86bAdgHCXEoOhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXpkkqeo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD92C4CEEB;
+	Mon,  9 Jun 2025 23:00:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749509850;
-	bh=O3RIkh8fIuDuUU8AHiU0ARvWF+AEnkDibFM2u4pe1EE=;
+	s=k20201202; t=1749510043;
+	bh=0vE193A/wHZyTzDn9gzuWnoyy3hViOW8q63CEtcRwBM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OrTWFZRGCSKXvFXerjpJ0TQtjDnZg5rvcHLQVLrgweDOnqPI+J/BqgKPYK4V/Cwt2
-	 05YqbHrzTFyiecdNQYV0dod66aVSUMQ87ITkRO7zMHg/HxTmJULuQ7z+UV91hAjh5e
-	 BYkIzAAPuJtyX5ZHhxIAm6+g4a2A4mUQE/3fIjfuTgEyPtpx2wriroLxKIm75fJqhe
-	 wwtNUxuGOYcWWUFFUdk5PW9ig8SnqcW9lZx2U80o0vIpkANoGORpR1fyvjzBmX6g+i
-	 aXSsZq7hCoKMJCDUnZkG/Y94aVhFatNgkXkGjta7rSvr+8EQpp+y5EclA1x4yf2JdA
-	 SogPKYhMZcDfQ==
-Date: Mon, 9 Jun 2025 15:57:29 -0700
+	b=dXpkkqeo+wLGWozw/r4gfKyLADKqlpdNLBdiLWHn4g4UHBBKeBh95I7AVEGYE+Vyh
+	 DHEY98V9BFx99/pcwOjWnYsgxgilzyLu/2hklEwxuGPCzprwb7uNniZebez5KBwdkG
+	 BwD96ujmMkgqxmtYw0CAomJ1h+LI2tqz2pvS/0SzfPMhRzCJ6F626uxhuE4nUb4ZMf
+	 r2dCBhm5PeqPtqnXlBmEBhtNjj0CF7x2japlk+kFXwbGqTdlLPZOCF/abdzmYzctRk
+	 5gN+qpBSYFvtQSshYenfdzzB38ZUC9qRKSMXzVoOPj//2TxCc0d4CBrBXpJbMePlCd
+	 jF1eFKT5MPlKw==
+Date: Mon, 9 Jun 2025 16:00:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Denis Arefev <arefev@swemel.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Nikita Marushkin <hfggklm@gmail.com>, Ilya Shchipletsov
- <rabbelkin@mail.ru>, Hongbo Li <lihongbo22@huawei.com>,
- linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- stable@vger.kernel.org,
- syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] netrom: fix possible deadlock in nr_rt_device_down
-Message-ID: <20250609155729.7922836d@kernel.org>
-In-Reply-To: <20250605105449.12803-1-arefev@swemel.ru>
-References: <20250605105449.12803-1-arefev@swemel.ru>
+To: Chris Lew <chris.lew@oss.qualcomm.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Hemant Kumar
+ <quic_hemantk@quicinc.com>, Maxim Kochetkov <fido_max@inbox.ru>, Loic
+ Poulain <loic.poulain@oss.qualcomm.com>, Manivannan Sadhasivam
+ <mani@kernel.org>, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>
+Subject: Re: [PATCH v2] net: qrtr: mhi: synchronize qrtr and mhi preparation
+Message-ID: <20250609160042.7a8940d7@kernel.org>
+In-Reply-To: <20250604-qrtr_mhi_auto-v2-1-a143433ddaad@oss.qualcomm.com>
+References: <20250604-qrtr_mhi_auto-v2-1-a143433ddaad@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,12 +64,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  5 Jun 2025 13:54:48 +0300 Denis Arefev wrote:
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+On Wed, 04 Jun 2025 14:05:42 -0700 Chris Lew wrote:
+> +	rc = qrtr_mhi_queue_rx(qdev);
+> +	if (rc) {
+> +		qrtr_endpoint_unregister(&qdev->ep);
+> +		mhi_unprepare_from_transfer(mhi_dev);
 
-I suspect syzbot is the only user of this code.
-Can you delete one of the locks to make the maintenance simpler?
-At a glance - I don't think your fix covers all the ABBA cases.
+is ignoring the rc here intentional? may be worth a comment
+
+> +	}
+> +
+>  	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+>  
+>  	return 0;
+
+Note that we return 0 here, not rc
 -- 
 pw-bot: cr
 
