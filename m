@@ -1,203 +1,258 @@
-Return-Path: <netdev+bounces-195664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0FFAD1B95
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:29:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20AA1AD1BA6
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 12:36:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9BF3AE23F
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 10:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE48616B996
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 10:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C4D253F2C;
-	Mon,  9 Jun 2025 10:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E071255F24;
+	Mon,  9 Jun 2025 10:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="MS/0fkoK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iz4qchAz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7DE253949;
-	Mon,  9 Jun 2025 10:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115DC255E27;
+	Mon,  9 Jun 2025 10:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749464964; cv=none; b=LV7/l7jLeVpJ9APGystqXRQRVXY1Lo0Vy/W77/CV/p+yqNV/EyvpakWmyntED1BhNY6Wgs/kv+CeDY7XGlGcQbZs6L/gDGuYbVoGS3RqpWYqyZ3mA0ZwsoORJqm3J+POHVhHEXZ2zhvoPJl3+X5b2REuS0oizjoj2IGXjItvIUw=
+	t=1749465374; cv=none; b=B2C42Sqb39IpERNV/DBKeVhWu2KgEnvFjEs+f7egQVcxc5oXcU2xg53936dce2NjYZyJgcqE0cok1Nwj46vcBByAe8huva7vykY8KZ0OyJYcbiMnakbDzL35kf1RAtYf0Bd+hJx+Ycc2RGqtYz4KfEyRGAqlDCuovXltWbPAAc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749464964; c=relaxed/simple;
-	bh=kLeynbC7Nsabe/zZnAE4wIR/2+EJVZRySOC+x218YFQ=;
-	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
-	 In-Reply-To:References; b=DAiIUDuONzxJglc6/2kjp79DzX5hYJRjJTtp+I9lhk2LWaQS/HlVlhIrEcrzyH240KuLCFoKbCz9quF9T94HhW3jHsmjivQDQ+CLu+7xKXHKEu2EDhrP6T2P4Heph0JHg+1jGiutT2vdNzVwGQpaQ4DD7iK2YQff2Mir6oR+LA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=MS/0fkoK; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1749464918; x=1750069718; i=frank-w@public-files.de;
-	bh=UjVgFSIpV2X04ea9AxQMDu3aUAqHlJDuyDyhBp2KhX4=;
-	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Date:In-Reply-To:References:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=MS/0fkoKpCyad+CC+J4GnkAyF87kEu/JFzIgg5K4U+jerrW54U+QOyOsaXPpvRKr
-	 LyCb8s0xH6ff+z6Nv3DomqSz0T0hAC7TjTfw5CUUiFu67M3Hso8pxSIW4hYIXPu8y
-	 T2T4AC2rsVc6vVEfmGHJqTKelmohQ0y+JHAcphkSJO4Y1lAUu8jB0rSAxkbHhLP2v
-	 w2RgfeS+BdRzDattHZZf2Q/p9ef6LzvK05Xw37ITnzQzcUja9Q7ZCuKBc9f7XWt2A
-	 SpOVrpq3MKhRx884LzjMZRtAXRVs+WdzYVtwSBmZKPc0EwT5OszD77DHgelzJ8m2n
-	 RY7cEaodwo7EOS+9Rg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [100.71.3.129] ([100.71.3.129]) by
- trinity-msg-rest-gmx-gmx-live-5d9b465786-mldbm (via HTTP); Mon, 9 Jun 2025
- 10:28:38 +0000
+	s=arc-20240116; t=1749465374; c=relaxed/simple;
+	bh=npMVXxHMPKw0K4pl8YSzdq62rI6pAxWfW19zNP8+gnQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=my2poZ43elplU1ByvgG+ggFY6PkyMxR9PziuZpBlONsaWTazHsaOej2+SKHXZHwRawg83ONOCsXwSja7R2LH019J6Fh6GweaCxIPKJDajoBv1kcgespcep2a71QWgbgbJF/2oI3E1YhGxFR2JkTN8rJxQMcYmp9pgCegBAPHe2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iz4qchAz; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-530807a856fso3709827e0c.0;
+        Mon, 09 Jun 2025 03:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749465371; x=1750070171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=npMVXxHMPKw0K4pl8YSzdq62rI6pAxWfW19zNP8+gnQ=;
+        b=Iz4qchAzejx4cQI0QcR/RWEHKOH132LygOrJkXaRvDQgVmIOnBu+5n1pImTQ/Meqaj
+         HClDML4ZxqN5Zn+PWchg1y2bIAUpOaScXUWAiikYSLmsIj5GbN6QjN/+8rNQC5rtCi+p
+         NVx5k5ym8CqP49Rpe/ntDy5JZ6Yi3c7n5pzZ/nmjqdDXmnO29VaXPKuDkw8Dn9dXaAr3
+         +hk8sTAiR9cQLRHpWCA9AroPQGknavAw/GmFrT+SzCchyOdcGLB8qrknKnEF+9chlACe
+         EMcba5iETPqpe91J4ig/FvXhg5xJGbZySuR90VcZx/HKFnZGq+3w/NN4m9Ee+ROxStet
+         BFew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749465371; x=1750070171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=npMVXxHMPKw0K4pl8YSzdq62rI6pAxWfW19zNP8+gnQ=;
+        b=UdMVH6tFDnpWlZW301mn7vp8ev32xUtJ9EP73xKTuFr1Dq89VZHO1MMqCx8iFCyjTn
+         jspG1KPPblnXV5+fjjXTy5rYK2fpgb1ljOBd1ZqoHznMFtOq8qaM8od4lUKRCO0TN9yr
+         DIMimRoHC3ceZfQUCpJF91LgczzvKFuo4EzyFs2apQMO92ytT1rgnsrr26ni7zGXqbPK
+         LJWmgFHUykv46B9UGM2d+xQ5+nA4wW4zpMkVsRyVpzqztCjKY/csTNRl0MQBUa3nTcUd
+         YcaB6TDllnuEjJmq6oBfvqdU9ekFVVfVmZbkcLVYafJIe18i4shPGPdDfFm4Xdhl4PUG
+         E8Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWPIE64bj9ocggdKEiajD+S9tkwzQb+T5bHcDZDZE2OcefsllQjxyBFGfLWC0yrjFjzaGfu+tPA@vger.kernel.org, AJvYcCXAQtxsJ3/D8QoCosL6pYMyPYy0iSCPAnyg0HimlVW7udwJQWkpd/DmGZAhqPMN+h2V49nliju47bS1@vger.kernel.org
+X-Gm-Message-State: AOJu0YygOdMJn3A4e686pW4b7To1Z13hb+rPthShevl3F9LF3fjK6udp
+	0mjd+IYLpIhhdNx1KfFrLlN0xiGN7sG8MVXC7DHNDaTKkVabPlyZ/QMEmMlImv7nuRX0ChyZSTu
+	/z1fBfhonkiijAynympJIlhahTvPvfa8=
+X-Gm-Gg: ASbGncvrhcbOq6CmiT1bKRtlFYCsrhXA7DUiImKfOBBcRbzy2tWwg6bWGU9czAr92g2
+	aNllMN1wqf6NDu+f1NjRQtDlCH4YopdePjzEHLf/kg6AW775yWzUwJtP1kfpD0HTvzp+lku9VyT
+	Tndf2T7MnoBDwL+GKpkESt6HTs9FmrZO8p
+X-Google-Smtp-Source: AGHT+IFvWqrPkS0nRrxPnH7t0NlKShekyJjkvIDMBJ/RVTKzyp5c/8F+x/2gQyMeh6bu3EXJdwLYJXA7uZ80qmFfiY0=
+X-Received: by 2002:a05:6122:35ca:b0:530:56e2:1e00 with SMTP id
+ 71dfb90a1353d-530f34a12c3mr4322269e0c.3.1749465370674; Mon, 09 Jun 2025
+ 03:36:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <trinity-87fadcdb-eee3-4e66-b62d-5cef65f1462d-1749464918307@trinity-msg-rest-gmx-gmx-live-5d9b465786-mldbm>
-From: Frank Wunderlich <frank-w@public-files.de>
-To: andrew@lunn.ch, linux@fw-web.de, daniel@makrotopia.org
-Cc: myungjoo.ham@samsung.com, kyungmin.park@samsung.com,
- cw00.choi@samsung.com, djakov@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, jia-wei.chang@mediatek.com,
- johnson.wang@mediatek.com, arinc.unal@arinc9.com, Landen.Chao@mediatek.com,
- dqfext@gmail.com, sean.wang@mediatek.com, lorenzo@kernel.org, nbd@nbd.name,
- linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Aw: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic
- ethernet-nodes
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 9 Jun 2025 10:28:38 +0000
-In-Reply-To: <cc73b532-f31b-443e-8127-0e5667c3f9c3@lunn.ch>
-References: <20250608211452.72920-1-linux@fw-web.de>
- <20250608211452.72920-7-linux@fw-web.de>
- <cc73b532-f31b-443e-8127-0e5667c3f9c3@lunn.ch>
-X-UI-CLIENT-META-MAIL-DROP: W10=
-X-Provags-ID: V03:K1:5JwfFEh+N+ttjTh5vxuvvC5upKEDjso7yy21yl5pV/dtZv3anNKBvjY4rDfI6hKaUSOph
- u8cGAWJUMqq9DWNm8iKkqwO2Z5WJeQqxTWvWCSuzL4Xre7oAMDiEITW76an37MgkjRiA/VVTVBAn
- TCuY1ELiDsMHuFNrDzszDGVRqLzacVimbed2YZnRdNlsBYJjaqCXQLWiZPBfQq3r7GObmVg0ocIP
- A5WoGgxfMhiqvOzBnRLK+WX0OfUnkAXTuI00V5820/3i5E3zK5rBte6ZVcFLl2V5lBRpaDq949jq
- 3zwHlZajQ3Yg+5V0ACqAG+LGF7OsDOtplghm9747djY/y9p/OJ653mxK7VE6jqn6OU=
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:nc+zqxOfX0U=;I8/8WjzQbL4heqzXq4h8MsUMufe
- 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
+References: <20250603190506.6382-1-ramonreisfontes@gmail.com>
+ <CAK-6q+hLqQcVSqW7NOxS8hQbM1Az-De11-vGvxXT1+RNcUZx0g@mail.gmail.com>
+ <CAK8U23a2mF5Q5vW8waB3bRyWjLp9wSAOXFZA1YpC+oSeycTBRA@mail.gmail.com>
+ <CAK-6q+iY02szz_EdxESDZDEaCfSjF0e3BTskZr1YWhXpei+qHg@mail.gmail.com>
+ <CAK8U23brCSGZSVKZC=DcHMGKYPyG3SHOd9AoX0MdhbyfroTkWQ@mail.gmail.com> <CAK-6q+g-A4T4RBg_BiRxR+G2k0_=Ma9nPZ1y=H=-F2FYDCUTMw@mail.gmail.com>
+In-Reply-To: <CAK-6q+g-A4T4RBg_BiRxR+G2k0_=Ma9nPZ1y=H=-F2FYDCUTMw@mail.gmail.com>
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+Date: Mon, 9 Jun 2025 07:35:59 -0300
+X-Gm-Features: AX0GCFtfkMaj7VE505KSzOnsCEQ66HiElw_iTSiO2MdlMqWU8Gl7SbnDGu6jmOg
+Message-ID: <CAK8U23bj0jqA5KNPN8oZxxf5gN7M2Acp3_qpeDz+uxk6kbmRUA@mail.gmail.com>
+Subject: Re: [PATCH] Integration with the user space
+To: Alexander Aring <aahringo@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew
+> That's why there exist addresses.
 
-> Gesendet: Sonntag, 8. Juni 2025 um 23:23
-> Von: "Andrew Lunn" <andrew@lunn.ch>
-> An: "Frank Wunderlich" <linux@fw-web.de>
-> Betreff: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic et=
-hernet-nodes
+The addresses are really important here. However, that still requires
+the entire emulation logic, including per-link delay, loss, and
+interference modeling to be implemented and managed manually in user
+space. The approach proposed here aims to offload this complexity by
+providing an integrated solution at the PHY level, before packets
+reach the MAC, where interference and delivery decisions can be made
+consistently and transparently, without requiring user space to
+replicate the entire logic. In that sense, while addresses do help
+identify the destination, they are not sufficient alone to handle the
+broader scope of realistic wireless emulation, especially when
+topology-aware behavior and MAC feedback are needed.
+
+> Teach netem to deal with addresses on a generic filter hook.
+> Maybe you can ask at batman project how they test things because they
+> use 80211 mesh functionality?
+
+I'm familiar with the BATMAN project, as well as IEEE 802.11s, OLSR,
+Babel, and other mesh routing protocols. In fact, I authored a book
+chapter in 2022 specifically on these protocols, focusing on their use
+in wireless networking. That work was centered on wireless network
+emulation, where I provided practical examples of how to deploy and
+test these protocols in Linux-based environments.
+
+That said, all the netem-based approaches, while useful, are not
+sufficient on their own to address the broader requirements of
+realistic wireless emulation. They lack integration with physical
+layer behavior, cannot model per-link dynamics based on distance or
+interference, and offer limited support for topological asymmetry and
+MAC-level feedback, which are essential for accurate and reproducible
+wireless testing.
+
+Book chapter ref: https://digital-library.theiet.org/doi/10.1049/pbte101e_c=
+h1
+
+> I looked more closely at the patches and there are a lot of question
+> marks coming up, for example why there is virtio handling, when this
+> patch should not do anything with virtio?
+
+I agree with you. That's actually something I had been thinking about
+as well. I believe we can remove the virtio-related handling for now,
+as it doesn=E2=80=99t belong in the scope of this patch. If needed, we can
+revisit it separately in a follow-up patch that properly addresses its
+purpose.
+
+> Why do we introduce a second data structure to keep registered hwsim phys=
+?
+
+The second data structure, in this case, (the rhashtable?), was
+introduced to allow efficient lookup and management of registered
+hwsim PHYs based on attributes such as the portid or virtual address.
+
+The existing hwsim_phys list is sufficient for basic iteration over
+all PHYs, but it becomes inefficient and cumbersome when we need:
+
+- Fast lookup by a unique identifier (e.g., portid, ieee_addr);
+- To support operations like remove_user_radios() efficiently;
+- To associate radios with specific users or namespaces (net),
+particularly when cleaning up after NETLINK_URELEASE or network
+namespace shutdown.
+
+Additionally, this follows the same architectural pattern used in
+mac80211_hwsim, where similar per-radio or per-user management is
+needed.
+
+So the rhashtable is not a replacement but a complementary structure
+optimized for use cases that require fast indexed access or
+conditional cleanup, while the existing list remains useful for
+ordered traversal and general-purpose iteration.
+
+Honestly, I chose to keep the existing structure to ensure I wasn=E2=80=99t
+changing the current behavior of mac802154_hwsim. The intention was to
+maintain compatibility and avoid introducing any regressions, while
+extending the functionality in a non-intrusive way.
+
+> Why do we have a lot of wording of "wmediumd" when this is the
+> project/process part in user space?
+
+I should probably reconsider the title of the PR, especially since
+mac802154_hwsim already supports user-space interaction independently.
+
+As for the use of the term "wmediumd", I chose to reuse it because the
+new functionality aligns closely with the goals and structure of the
+original wmediumd project for mac80211_hwsim. Since both
+mac80211_hwsim and mac802154_hwsim serve a similar purpose, enabling
+kernel-level virtual radios for wireless experimentation, it felt
+natural to extend the naming convention to indicate compatibility and
+continuity. I didn=E2=80=99t see the need to reinvent something new when th=
+e
+existing model worked well and was familiar to the community.
+
+--
+Ramon
+Em dom., 8 de jun. de 2025 =C3=A0s 22:49, Alexander Aring
+<aahringo@redhat.com> escreveu:
 >
-> > +			gmac0: mac@0 {
-> > +				compatible =3D "mediatek,eth-mac";
-> > +				reg =3D <0>;
-> > +				phy-mode =3D "internal";
-> > +
-> > +				fixed-link {
-> > +					speed =3D <10000>;
-> > +					full-duplex;
-> > +					pause;
-> > +				};
->=20
-> Maybe i've asked this before? What is on the other end of this link?
-> phy-mode internal and fixed link seems an odd combination. It might
-> just need some comments, if this is internally connected to a switch.
-
-yes you've asked in v1 and i responded :)
-
-https://patchwork.kernel.org/project/linux-mediatek/patch/20250511141942.1=
-0284-9-linux@fw-web.de/
-
-connected to internal (mt7530) switch. Which kind of comment do you want h=
-ere? Only "connected to internal switch"
-or some more details?
-
-> > +			mdio_bus: mdio-bus {
-> > +				#address-cells =3D <1>;
-> > +				#size-cells =3D <0>;
-> > +
-> > +				/* internal 2.5G PHY */
-> > +				int_2p5g_phy: ethernet-phy@f {
-> > +					reg =3D <15>;
->=20
-> It is a bit odd mixing hex and decimal.
-
-do you prefer hex or decimal for both? for r3mini i used decimal for both,=
- so i would change unit-address
-to 15.
-
-> > +					compatible =3D "ethernet-phy-ieee802.3-c45";
->=20
-> I _think_ the coding standard say the compatible should be first.
-
-i can move this up of course
-
-> > +					phy-mode =3D "internal";
->=20
-> A phy should not have a phy-mode.
-
-not sure if this is needed for mt7988 internal 2.5g phy driver, but seems =
-not when i look at the driver
-(drivers/net/phy/mediatek/mtk-2p5ge.c). The switch phys also use this and =
-also here i do not see any
-access in the driver (drivers/net/dsa/mt7530-mmio.c + mt7530.c) on a quick=
- look.
-Afaik binding required the property and should be read by phylink (to be n=
-ot unknown, but looks like
-handled the same way).
-
-Maybe daniel can describe a bit deeper.
-
-> 	Andrew
-
-regards Frank
-
+> Hi,
+>
+> On Sat, Jun 7, 2025 at 5:00=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmai=
+l.com> wrote:
+> >
+> > > There is a generic way by using netem qdisc and using AF_PACKET
+> > without PACKET_QDISC_BYPASS, should do something like that.
+> > If you really want to do something else there or only act on 802.15.4
+> > fields and you hit the limitations of netem then this is something
+> > netem needs to be extended.
+> >
+> > Let=E2=80=99s say I=E2=80=99m quite familiar with netem - netem is inde=
+ed well-known
+> > and has been used extensively with tc/ifb. However, it is primarily
+> > suited for 1-to-1 communication scenarios.
+> > In 1-to-n topologies, such as when node 0 communicates with both node
+> > 1 and node 2, it becomes unclear which peer should serve as the
+> > reference for applying delay, loss, or latency.
+>
+> That's why there exist addresses.
+>
+> > This limitation makes netem unsuitable for scenarios where
+> > link-specific behavior is required, such as in ad hoc networks.
+> > In such cases, a more precise per-link control - as provided by
+> > wmediumd - becomes necessary.
+> >
+>
+> Teach netem to deal with addresses on a generic filter hook.
+> Maybe you can ask at batman project how they test things because they
+> use 80211 mesh functionality?
+>
+> > > With that being said, however there are so few users of 802.15.4 in
+> > Linux and adding your specific stuff, I might add it if this helps you
+> > currently... but I think there are better ways to accomplish your use
+> > cases by using existing generic infrastructure and don't add handling
+> > for that into hwsim.
+> >
+> > Back in 2016, mac80211_hwsim had relatively few users. Today, I
+> > maintain a community of approximately 1,000 users worldwide who rely
+> > on mac80211_hwsim for their research - industry and academy.
+> > The need for a realistic experimental platform is not a personal
+> > requirement, but rather a broader gap in the ecosystem. Addressing
+> > this gap has the potential to significantly advance research on IEEE
+> > 802.15.4.
+> >
+> > > but I think there are better ways to accomplish your use
+> > cases by using existing generic infrastructure and don't add handling
+> > for that into hwsim.
+> >
+> > Honestly, based on my experience so far, there=E2=80=99s no better appr=
+oach
+> > available. Well - there is one: integrating all the wmediumd
+> > functionality directly into the kernel module itself. But I fully
+> > agree - that would be both unrealistic and impractical.
+> >
+>
+> I looked more closely at the patches and there are a lot of question
+> marks coming up, for example why there is virtio handling, when this
+> patch should not do anything with virtio?
+> Why do we introduce a second data structure to keep registered hwsim phys=
+?
+> Why do we have a lot of wording of "wmediumd" when this is the
+> project/process part in user space?
+>
+> - Alex
+>
 
