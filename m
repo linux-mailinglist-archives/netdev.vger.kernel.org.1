@@ -1,241 +1,249 @@
-Return-Path: <netdev+bounces-195638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF44AD18DA
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:08:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5ECFAD18E0
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C19716A3C5
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 07:08:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BA8918884A4
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 07:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC93280A52;
-	Mon,  9 Jun 2025 07:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4A425487D;
+	Mon,  9 Jun 2025 07:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="F5Uc8Jf3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="enSTQhmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF18C2F3E;
-	Mon,  9 Jun 2025 07:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749452929; cv=none; b=Wwrk/0S7s0zhuompnYBP3pSRq7FI0Fv6Q6DnVU5ghKJoc28xzxw9O0Ra1V1afw20mAZobSuOK2Fa1t97gryPBs818fFCITiWsTLOEyl+sydasml3u9W+iFLS3+ZXFqx0iE0u1ZbVkyLH6IX4+R0MGgkv8cSvkbAV4o5sMpT+fus=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749452929; c=relaxed/simple;
-	bh=JZtxyo1n3N1KrOrn3X14M5FVlS2HxZZ2L3LzJ09g1XM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZCN/0irOP68H1CmpjDDwwasFvrJBWZRqfmQqcUg9kuVpisJtdi41RnZpYE6MpvZ4N2KZObhnwno5vbioqba6WsTdEvmLks7YBStAvUgAfK+UypxRrJEerPVnqsVIA/sWK4EI76aC3X9G1tdmM/kBDbRtspF+D8OtBzfGQVKa6Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=F5Uc8Jf3; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55941ADf006625;
-	Mon, 9 Jun 2025 00:08:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=Bwy5AqT1Riai8H1MnSUj+tFx6
-	ayyWFItxbVX7bAn5Xg=; b=F5Uc8Jf3xflyNis8REGeGVtq1vzxxrqTuSEXEqOa/
-	LJjX4XTeT27HBeV2BytNFcFCNYjf3AN+lYweIFnO9eWlslhNpsoSixg3D8Yfnkqw
-	gfkliWdjK734WqZbopmojMJtLQ8raW0wPe+JnpUcOf+sN97V4GvjvO8Wa+FNhSOM
-	NTI/IPNltUoneC7ELy4NROdOtA9p9/o1Sw2W0AMoXk2Of/5JAKKNOuIW7Vas0WAc
-	4FTeqtehnrrJgwUNl7vTJ5xWxsGMWoZkpiaQbN2IPyMd/8fWi21sLipsxv7PTLL6
-	3eHUpDRLIGJClj7gTSR2Mc3+QpC5bnDKBZtetyQmcNgLg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4759pbh77q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Jun 2025 00:08:32 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0C6EEBB
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 07:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749453126; cv=fail; b=Df/IzVjD5I50lCzNAPRTM8WUOLKZ6VCOmYMnVbPgAW6rBwAml4263cfwa26WV3LbuWsE1SoKwtAfLkkYo4cR9Sf3l388hD5MyVCAikVGTbfbT9drWn4oy1U3Ytqczi4Z+S0Xm8vV9sTZ+g+e+Pkn/FYSGMC9OWd313Il/Z8fG0w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749453126; c=relaxed/simple;
+	bh=lA2zdhuxnsQ52sjKDwP2G/NKE5flUiQT4JTQhjU2Osg=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mhiXGr/zUdCLy6lLDJCkR3lWZ0Cta/bRhQGebJVD0ZPCroBitFhJp/GE/ZVEf+An16inkpdxfUifNNHh/erzIsgh8ui3jKWLDZFSXLOhEQwxBY9fY1+rsXONdquJgG81MqSXLDXHZV+jSYsKtQcHeSzVvMfmaU6eMJ6Q5xBlSkQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=enSTQhmr; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749453124; x=1780989124;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=lA2zdhuxnsQ52sjKDwP2G/NKE5flUiQT4JTQhjU2Osg=;
+  b=enSTQhmr8AMOJgZnhk5mXDTRF+SxWhm3wxl5+zqs0C6zv+EG5qUQ/vTU
+   x4/FdXrHhTCmGZZQDmTfLbJb1VSD+1ijDpNlhYUObcQf5XBL2hLdoWam4
+   xhomnTVx3SfyR0OVwQw10UTOOhovNGRgl+/YOhfIvmZql24kO3cf9095p
+   CHbPc2ONNCmQycIW8HRkfdBZP0ZFYdRmS3A6PNRuCLs6YraXc/wM0y/09
+   6PF/fuffBc5P1nsqIjlFXipsGky8eWy5XFABwO10R4hRyPVyJW70HtHpi
+   fbnNv5sxjp29vDpLfea/byQf1z6Sy8AZQW3JonC2RfR5khP+bIuyykF3n
+   g==;
+X-CSE-ConnectionGUID: JAKGeI00SC+8aq4pOOf8eA==
+X-CSE-MsgGUID: T09w/DEmT7eDkuC2Zln62A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11458"; a="62136913"
+X-IronPort-AV: E=Sophos;i="6.16,221,1744095600"; 
+   d="scan'208";a="62136913"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 00:12:04 -0700
+X-CSE-ConnectionGUID: Dan1x+f+R4GHvYoA9Q//OA==
+X-CSE-MsgGUID: 4sY6FHyPRDS39ggP9BqQkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,221,1744095600"; 
+   d="scan'208";a="151583648"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 00:12:03 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 9 Jun 2025 00:08:30 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 9 Jun 2025 00:08:30 -0700
-Received: from 82bae11342dd (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id 8F8313F707C;
-	Mon,  9 Jun 2025 00:08:26 -0700 (PDT)
-Date: Mon, 9 Jun 2025 07:08:24 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
-CC: <horms@kernel.org>,
-        Andreu Montiel
-	<Andreu.Montiel@technica-engineering.de>,
-        Sabrina Dubroca
-	<sd@queasysnail.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hannes Frederic Sowa
-	<hannes@stressinduktion.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v4] macsec: MACsec SCI assignment for ES = 0
-Message-ID: <aEaIaB1zLEQlc77s@82bae11342dd>
-References: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
+ 15.2.1544.25; Mon, 9 Jun 2025 00:12:02 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 9 Jun 2025 00:12:02 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.74)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Mon, 9 Jun 2025 00:12:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MPGbooNrR+Yxh9vBJh256vIFKlsiwAHVeHjKWhQOHnpUlnF2+WZ/6BNM1Sq8c8i1sp/jDC2kQlaQsxYKQSUAL5IPT2R6naXKbvyHSmY4fS8THk1RSIUgQqR6Bo/85R0Kk7L4Np3U0KWSYaAId9KhEfE+3y/JCF94DLMjfZOqXbVS7EXIfYozyVcFINCWwbQufUQBUhfoaWU0xcFWk6DauKr+pA8IJQw/U7dpO5oVLQynbYo/Ben/Te8fkJQ3R9QxQXOSCpsZxwc4RAtvJxJ1sqCIDn0UetfZSLGx5aY6t+VDH7GOc7ecDHDkHw29k0NHYGSol75k7TGXgvNSjsVupg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VZPppG3PqE+XFpA02SkSUdC5/CDC9HpOKj2hhc+dYyM=;
+ b=JmD29e9Z16SOHPbxUR8mVbj3R4E4DYen8fB0HfJbm8v5b4KJKTWw/BpW8s1CyHRySVg40KGM37rfKN6a6Rivoi1hk+2V0f8PlgmSvquVUYHimTBxDFEO1X0BLnmTtq8LOeN/XtZ3BTSW+1KKvhe1sh115N2gtjWEEBEmFfF27FvuMeDaPoKfX5X/mlvKzHoyRbCWQRFuPGPuZfAzo/IMBaXg7PrVldt7UDbb7sxYc9qD/UEJGZWVVSGA8fywR+XEPx3dxGJAxyWGl+mndPJNcWtzhNNSYcdwxXuL73MNkjM29Z+kf15KEKXSQNBnNVmGcE+eQmrQBtah5VizSLs+cg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8985.namprd11.prod.outlook.com (2603:10b6:208:575::17)
+ by PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.32; Mon, 9 Jun
+ 2025 07:11:59 +0000
+Received: from IA3PR11MB8985.namprd11.prod.outlook.com
+ ([fe80::4955:174:d3ce:10e6]) by IA3PR11MB8985.namprd11.prod.outlook.com
+ ([fe80::4955:174:d3ce:10e6%6]) with mapi id 15.20.8769.022; Mon, 9 Jun 2025
+ 07:11:59 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: Robert Malz <robert.malz@canonical.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"sylwesterx.dziedziuch@intel.com" <sylwesterx.dziedziuch@intel.com>,
+	"mateusz.palczewski@intel.com" <mateusz.palczewski@intel.com>, "Keller, Jacob
+ E" <jacob.e.keller@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v3 1/2] i40e: return false from
+ i40e_reset_vf if reset is in progress
+Thread-Topic: [Intel-wired-lan] [PATCH v3 1/2] i40e: return false from
+ i40e_reset_vf if reset is in progress
+Thread-Index: AQHbyWG2oGJSIj3PLEGIy5NVhSVzA7P6iL8Q
+Date: Mon, 9 Jun 2025 07:11:59 +0000
+Message-ID: <IA3PR11MB8985FDFAD4E99DB7E554EF5F8F6BA@IA3PR11MB8985.namprd11.prod.outlook.com>
+References: <20250520083152.278979-1-robert.malz@canonical.com>
+ <20250520083152.278979-2-robert.malz@canonical.com>
+In-Reply-To: <20250520083152.278979-2-robert.malz@canonical.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8985:EE_|PH0PR11MB4855:EE_
+x-ms-office365-filtering-correlation-id: 0b3ce531-12c6-4954-6672-08dda724ed4d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018|921020;
+x-microsoft-antispam-message-info: =?us-ascii?Q?fOxKkgE7prcFpkNfAFUJr65n7h65LXEFgMGelEwu6fs/Gcnr7q6/FQTChd6/?=
+ =?us-ascii?Q?H3VGYy7Zi6kVEK/jOeoaSjelkjC7AvjWr12zE4R8WfZcZo11rhn2l2j4Miuu?=
+ =?us-ascii?Q?I/gEP2DBQgSo5GzZ2Qhh+2/vQ8ovOIPPPbWkREnHynaqvK74uAAE7ShJjuNl?=
+ =?us-ascii?Q?9n+dvuKy79qCDeTxBqz1N0LxZO8HmknLK8crH8ZvHssCndPP0bwcKxBogWpJ?=
+ =?us-ascii?Q?lirLLuDtathjccuTf2uUnyt95JZj10xw8sZo0BxDX94AkmH1Iew19tV0a0Bg?=
+ =?us-ascii?Q?qzcCST/WioNSxtwSnO+NKjC3GQQEL48xZCOKN7VmB2smSNenVnex91ZgwxM0?=
+ =?us-ascii?Q?vYPL0E1J5V7vrNvXtE+6eWcp6E7Mr/uP4Msa5nDAp1hAgvms7bDL3jTzbYM1?=
+ =?us-ascii?Q?b2wCBeTCkhUGAeHd/hEQhWgWdhnyO9PEYnzmz869JLa6b2sVES2GnVn4lPpm?=
+ =?us-ascii?Q?d8Z7gc5AqTd9qWa1UFefq+kWFXMPRRVlJ9UoxT3xHqDV5jGeGnw+U7sMl13Q?=
+ =?us-ascii?Q?5gJR4kBF3egJ+GfOzxZf0Dv2zszcC+E3NWMP1dnxGiXrmzbDGZvT6a+59CUN?=
+ =?us-ascii?Q?CM9KGIlUSNmCmmVx6BEvKj09aE4kQreS2zMKJmyMA7L2MdHbF4tBjvMGsRlI?=
+ =?us-ascii?Q?/emWgn+GVNRLdfxDtKYVDpYRdk0mw9zKe0+Zk1L3dLOzxmflw49NdpO91Jf2?=
+ =?us-ascii?Q?0ZxJ7W6sZHxmFX/lFPacVM3IqrbFGnkVUkbEk+7NVYSzwQOQj5N4x+2OO8Bm?=
+ =?us-ascii?Q?CguFD7qFaJm4/YUhHt7wowDEyQFwGTIBoZZS8EVfpfmOUX5wfjek9crHvT1e?=
+ =?us-ascii?Q?5KvfUeZNj9tyI/6k0nL8rZ6USTximas4+YqvNBujxFfDwLGJTfuqThWOjTU2?=
+ =?us-ascii?Q?KLwYTVFKL0fNqlUIBAZY8RY/OZXgHA2L3Dc6tfhsJqlYirFl36arD0J/c/MY?=
+ =?us-ascii?Q?ojzvJv60vlZv5X+XyRvxzsJi+EIb+p3mOBPTT7SXJHRFJRlTe8yA9w5kXzLA?=
+ =?us-ascii?Q?TgyPP/pJrLjxg2ddyEQw62inM5NTSP+2tk3obLRTBKKQ9S8/7WH7OfZUIQCl?=
+ =?us-ascii?Q?tsvOzz8684gb969KEJoS+HdQWxNTKjhTazR12wJ6HTBv9e1utouSNtpRSqpU?=
+ =?us-ascii?Q?S5eECwzSIG/dRkpUdQzfL0agFDctLKmZa7BRi4Mu0dC5bXR2Blo62se9efXv?=
+ =?us-ascii?Q?o0YJLGu2I9zPK1igjZW9MJVKy0x43CvDehGpG84dlrIH+yaOIPXtOwnA4GUw?=
+ =?us-ascii?Q?2JrF3jig1s5Pj/QyJbYbQN5isoRpi0p9pLmVzD+99rgP4tODDEX/D/z+P8y4?=
+ =?us-ascii?Q?ynWU5K7hdAGTIdDpMCxNR8gWNuSZOI1qUoSmfJw2m5Nz4OPG4PzW2xDjcfxM?=
+ =?us-ascii?Q?/1ppdyAkqSHzGzHYnmqPOPwWs0QzUJa01TTHSbVxrjZkVp6b/ghf/3/xGV8a?=
+ =?us-ascii?Q?3/yPodgMz7Gj/R19wOtnGVG+fJnVNamFQIxj/3TKoDSnJD2kAfGaIUPuk80P?=
+ =?us-ascii?Q?E1+zdhwNLVTx7bc=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8985.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7YAt4a+TugsEi7oL7PUk6HckUX4Q55UkO/A1Et+/IUgsS4JD6hh7OfXtKqiH?=
+ =?us-ascii?Q?gK7xztu6XhioLacaty0dSVg0E97yyvgAkc0iJniCCnNOc2Jy3h0VKjJwr5Zp?=
+ =?us-ascii?Q?rk1J7r7OynZV0koedTb7049GuSKtIcl5Sa3cehpzQDAwBJUwqD3TuCVpn4+6?=
+ =?us-ascii?Q?gTyYd0182dqrz5qqUAF4ADOpcrIXsz2Kai84/Ae0bwngCfNTDfPYRE1jLzKp?=
+ =?us-ascii?Q?hQoc+jmj7SEe+6saw4Pk/e1FUXpt+1i+TfLV3wjuSMCSivgZXgeB59soa8+K?=
+ =?us-ascii?Q?1zU5G/Obq1qeSMH/iDUgaocJeqi8tynLBkHakyT8FR3DLvp5+j6qBlQwplCT?=
+ =?us-ascii?Q?VEJBrSLlM6rZiCrgew/HcJYV9ECg19s06LYMb+sSrhovIX28J1ClBOlioqJ4?=
+ =?us-ascii?Q?3mIJrC31GLk6317EiHy3IuIm7nRj/XHZpDIYLZ8vi7G9fmhP/CcXm1lkJGWf?=
+ =?us-ascii?Q?/+Z5yDMTmpd8EdwuphxjYss2FVA7dzXlofL1xGjzR5ELJHP0lQ+7Jw1bSeCg?=
+ =?us-ascii?Q?jCZZgHMXCJRf2PXYbQHVtEUzWxKFkR1kT52HcMUCh4OcqvU6N+tp2z0TOnsM?=
+ =?us-ascii?Q?oaN1TGHXMScRiFCTBtGmwWDi+vsi3W7ZLMcS5Ca+lDm3p3XoEvGOWoMBXgUT?=
+ =?us-ascii?Q?S9SblDL4XKbuyeO6jfPNDQgW4UOUmW3nIOLTcdrkegMB0P8htqHPHOBgfOOj?=
+ =?us-ascii?Q?18CSC8Us9ZLZtwvNbWGrQV+PhCrD6UjExIeMn31yZgdNFPcRarsO54E88iNv?=
+ =?us-ascii?Q?WgQ9XzSZT9ylBygdtgL0RGm0cK7XOCY3aw8nOd6CAUwNwtzf5YqNMHHDggDw?=
+ =?us-ascii?Q?sj/t7FH/y0fpYojdQuQDyOMk1H6uwG5HrFDwsApIPJ5x0BA04TvY3+7IFAL3?=
+ =?us-ascii?Q?pHeBKqtNcy1M57+5z5ooPGjLBUsfRt0yehTa8aXs+bOuBafnZHCq7CeuGp7i?=
+ =?us-ascii?Q?/ghLnsnzXYpAkzV/C/bj5NNAt8HEYGZscT0yfXTXUENlSK3qJZfPN1cLYKXX?=
+ =?us-ascii?Q?Vvg7Zd7VurB25c6wDretNwCJ9MJ2a4JJu+K5VYf5oiJOSnARUnmIeZRS6dH2?=
+ =?us-ascii?Q?UHFgzCSYfLrGzd1hvm7054j0Fbt5lpPr2NP0msN7YzC33oqt/wWNzdtF0kUl?=
+ =?us-ascii?Q?Ak+OntnpzFlTCdhiDsC9+hre8wPsXZNo2xFAYQxvbPaPoHRdZXZUvt9vNjuT?=
+ =?us-ascii?Q?EjarKBuwky1vGGN2PIkwMqpeJIBe32crthZQCeNTq3e6GAygoODlil71HxWa?=
+ =?us-ascii?Q?J00gdnha+bBUk55ol5/x0zc2G1q7E0rq6ZfTm34Tfs3onl0I5rBx4+JSg/js?=
+ =?us-ascii?Q?8DSrThpW2zx5L6VAlpy8f4QmL7HRN5/TzchdFWM1JL9ME7SixqQPYJbIKkuM?=
+ =?us-ascii?Q?sRIj/t715IqotlgnBycSTGaGhRX/1GxWAHENob2w5cqxtx4eBTvyrj4pS8TC?=
+ =?us-ascii?Q?G624Gvn1GFm5BUObxxex+3pPPcG6RS4gJBj0JCKAsA9BuQlVA7vaxbiDsxdN?=
+ =?us-ascii?Q?y5kp0FU/DCSzx2ePuCRd2Ebggw/maFoGjg3F8i6iA9xt3i7SXZJQvFz231Gx?=
+ =?us-ascii?Q?ek43P0WAbI9c/cIcAnuBKCkTsCdO+FboNdjtmLE2hYtOMNQm2Yh8o3X8iVR5?=
+ =?us-ascii?Q?gQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250609064707.773982-1-carlos.fernandez@technica-engineering.de>
-X-Authority-Analysis: v=2.4 cv=f+pIBPyM c=1 sm=1 tr=0 ts=68468870 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=dtjKx1S9dE8yFvv4bDgA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: 5HHtWuTEDVUEMRGXdeeI85R5VZcLb026
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDA1NCBTYWx0ZWRfXw4/vNziNRcqq S1UV+huwZ9vhl3uEqUT9huJjKur/LP1cgMQXnX5vNL+z9wQmeNBTaOZ4QGsuEejPIzu+cjZCo5S +I4cgfSOd22fmjyRt8Qn+G7vUWraSFoMDmqkYQfdO497i8xinhwBREC6b9CRrVvvpPcIm9ugLAz
- G9InqPvwnvGH49WHWqkdecNKcecTu+9aNwLQamuzY0a/3QXWX4CSsRtbhvak4np4DG4lE2NM1YA MfOTseuqY4T6HObXGwAasJ79Dm7JuYjjwW9cs9dqY52UJxxjbUXhPCHtu40VVMoJh1RiIslfU12 P2cM0nXUUeAgtIwtDBgmkA/Oi6uZfBZSi7Jl5dcmB3mKunsBuzWKi9QvfzXzsLK2O3x1vveCIBm
- AKoQ6lb0m9y1RxTQr+NrQsru2dUG8GBiHEkRhzCAsUUVB7hY2HTnWdEutmxVufHG98Cr47gN
-X-Proofpoint-GUID: 5HHtWuTEDVUEMRGXdeeI85R5VZcLb026
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-09_02,2025-06-05_01,2025-03-28_01
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8985.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b3ce531-12c6-4954-6672-08dda724ed4d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2025 07:11:59.8254
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qhuzq0B29f1QK6yvPioWfEmHDPj5WMGx6tFPngIk8CY63Gx7nU6cvtXqOSTsPs2wST+3LhMxwLNbATyfLI7umGgaHGYqJHiwUTLAAGVLp94=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4855
+X-OriginatorOrg: intel.com
 
-On 2025-06-09 at 06:47:02, Carlos Fernandez (carlos.fernandez@technica-engineering.de) wrote:
-> According to 802.1AE standard, when ES and SC flags in TCI are zero,
-> used SCI should be the current active SC_RX. Current code uses the
-> header MAC address. Without this patch, when ES flag is 0 (using a
-> bridge or switch), header MAC will not fit the SCI and MACSec frames
-> will be discarted.
-> 
-> In order to test this issue, MACsec link should be stablished between
-> two interfaces, setting SC and ES flags to zero and a port identifier
-> different than one. For example, using ip macsec tools:
-> 
-> ip link add link $ETH0 macsec0 type macsec port 11 send_sci off I
-Looks like 'I' above is typo.
-> end_station off
-> ip macsec add macsec0 tx sa 0 pn 2 on key 01 $ETH1_KEY
-> ip macsec add macsec0 rx port 11 address $ETH1_MAC
-> ip macsec add macsec0 rx port 11 address $ETH1_MAC sa 0 pn 2 on key 02
-> ip link set dev macsec0 up
-> 
-> ip link add link $ETH1 macsec1 type macsec port 11 send_sci off I
-Ditto. Please fix these and resubmit.
-With that you can add Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-
-Thanks,
-Sundeep
-> end_station off
-> ip macsec add macsec1 tx sa 0 pn 2 on key 01 $ETH0_KEY
-> ip macsec add macsec1 rx port 11 address $ETH0_MAC
-> ip macsec add macsec1 rx port 11 address $ETH0_MAC sa 0 pn 2 on key 02
-> ip link set dev macsec1 up
-> 
-> 
-> Fixes: c09440f7dcb3 ("macsec: introduce IEEE 802.1AE driver")
-> Co-developed-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
-> Signed-off-by: Andreu Montiel <Andreu.Montiel@technica-engineering.de>
-> Signed-off-by: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of R=
+obert
+> Malz
+> Sent: Tuesday, May 20, 2025 10:32 AM
+> To: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Nguyen, Ant=
+hony L
+> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; sylwesterx.dziedziuch@intel.com;
+> mateusz.palczewski@intel.com; Keller, Jacob E <jacob.e.keller@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v3 1/2] i40e: return false from i40e_re=
+set_vf if
+> reset is in progress
+>=20
+> The function i40e_vc_reset_vf attempts, up to 20 times, to handle a VF re=
+set
+> request, using the return value of i40e_reset_vf as an indicator of wheth=
+er the
+> reset was successfully triggered. Currently, i40e_reset_vf always returns=
+ true,
+> which causes new reset requests to be ignored if a different VF reset is =
+already in
+> progress.
+>=20
+> This patch updates the return value of i40e_reset_vf to reflect when anot=
+her VF
+> reset is in progress, allowing the caller to properly use the retry mecha=
+nism.
+>=20
+> Fixes: 52424f974bc5 ("i40e: Fix VF hang when reset is triggered on anothe=
+r VF")
+> Signed-off-by: Robert Malz <robert.malz@canonical.com>
 > ---
-> v4: 
-> * Added testing info in commit as suggested. 
-> 
-> v3: https://patchwork.kernel.org/project/netdevbpf/patch/20250604123407.2795263-1-carlos.fernandez@technica-engineering.de/
-> * Wrong drop frame afer macsec_frame_sci
-> * Wrong Fixes tag in message 
-> 
-> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20250604113213.2595524-1-carlos.fernandez@technica-engineering.de/
-> * Active sci lookup logic in a separate helper.
-> * Unnecessary loops avoided. 
-> * Check RXSC is exactly one for lower device.
-> * Drops frame in case of error.
-> 
-> 
-> v1: https://patchwork.kernel.org/project/netdevbpf/patch/20250529124455.2761783-1-carlos.fernandez@technica-engineering.de/
-> 
-> 
->  drivers/net/macsec.c | 40 ++++++++++++++++++++++++++++++++++------
->  1 file changed, 34 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-> index 3d315e30ee47..7edbe76b5455 100644
-> --- a/drivers/net/macsec.c
-> +++ b/drivers/net/macsec.c
-> @@ -247,15 +247,39 @@ static sci_t make_sci(const u8 *addr, __be16 port)
->  	return sci;
->  }
->  
-> -static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present)
-> +static sci_t macsec_active_sci(struct macsec_secy *secy)
->  {
-> -	sci_t sci;
-> +	struct macsec_rx_sc *rx_sc = rcu_dereference_bh(secy->rx_sc);
-> +
-> +	/* Case single RX SC */
-> +	if (rx_sc && !rcu_dereference_bh(rx_sc->next))
-> +		return (rx_sc->active) ? rx_sc->sci : 0;
-> +	/* Case no RX SC or multiple */
-> +	else
-> +		return 0;
-> +}
-> +
-> +static sci_t macsec_frame_sci(struct macsec_eth_header *hdr, bool sci_present,
-> +			      struct macsec_rxh_data *rxd)
-> +{
-> +	struct macsec_dev *macsec;
-> +	sci_t sci = 0;
->  
-> -	if (sci_present)
-> +	/* SC = 1 */
-> +	if (sci_present) {
->  		memcpy(&sci, hdr->secure_channel_id,
->  		       sizeof(hdr->secure_channel_id));
-> -	else
-> +	/* SC = 0; ES = 0 */
-> +	} else if ((!(hdr->tci_an & (MACSEC_TCI_ES | MACSEC_TCI_SC))) &&
-> +		   (list_is_singular(&rxd->secys))) {
-> +		/* Only one SECY should exist on this scenario */
-> +		macsec = list_first_or_null_rcu(&rxd->secys, struct macsec_dev,
-> +						secys);
-> +		if (macsec)
-> +			return macsec_active_sci(&macsec->secy);
-> +	} else {
->  		sci = make_sci(hdr->eth.h_source, MACSEC_PORT_ES);
-> +	}
->  
->  	return sci;
->  }
-> @@ -1109,7 +1133,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
->  	struct macsec_rxh_data *rxd;
->  	struct macsec_dev *macsec;
->  	unsigned int len;
-> -	sci_t sci;
-> +	sci_t sci = 0;
->  	u32 hdr_pn;
->  	bool cbit;
->  	struct pcpu_rx_sc_stats *rxsc_stats;
-> @@ -1156,11 +1180,14 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
->  
->  	macsec_skb_cb(skb)->has_sci = !!(hdr->tci_an & MACSEC_TCI_SC);
->  	macsec_skb_cb(skb)->assoc_num = hdr->tci_an & MACSEC_AN_MASK;
-> -	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci);
->  
->  	rcu_read_lock();
->  	rxd = macsec_data_rcu(skb->dev);
->  
-> +	sci = macsec_frame_sci(hdr, macsec_skb_cb(skb)->has_sci, rxd);
-> +	if (!sci)
-> +		goto drop_nosc;
-> +
->  	list_for_each_entry_rcu(macsec, &rxd->secys, secys) {
->  		struct macsec_rx_sc *sc = find_rx_sc(&macsec->secy, sci);
->  
-> @@ -1283,6 +1310,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
->  	macsec_rxsa_put(rx_sa);
->  drop_nosa:
->  	macsec_rxsc_put(rx_sc);
-> +drop_nosc:
->  	rcu_read_unlock();
->  drop_direct:
->  	kfree_skb(skb);
-> -- 
-> 2.43.0
-> 
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index 1120f8e4bb67..22d5b1ec2289 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+
+
 
