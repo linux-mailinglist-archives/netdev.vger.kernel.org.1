@@ -1,142 +1,145 @@
-Return-Path: <netdev+bounces-195658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39311AD1AE8
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 11:46:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1639BAD1AEE
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 11:47:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34D34188D484
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:47:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D08A2188D6A4
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 09:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AE824E00F;
-	Mon,  9 Jun 2025 09:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi+9m5/Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F86253924;
+	Mon,  9 Jun 2025 09:46:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20AE1519BA;
-	Mon,  9 Jun 2025 09:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96AF1B78F3;
+	Mon,  9 Jun 2025 09:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749462401; cv=none; b=sr7wA2b6Argwc6U5Nd9rqaHbYnzWZa6+2522uWRXO0BbZpMsw82YAcLt9IPN8ArZqfB51Xa/no5YNybdkGaeB+yugB7sClJwMkg0BQhEFdwHgVHlL2gZ4k/CGRXpiLvTx9nu7z9/Vp74+KJx2rWtUHqEI3ku34cpDjb4Wa5c6yo=
+	t=1749462402; cv=none; b=M+CGgbDCfZWdg3YemOyVevzPpLk4NYFAXvwN6KXhhTkMsMK0o5m6MxbTXA/QF3x4pTRGiyX8xDD0Ic9uL7hF/mkZpU8Q7zpl6KVdi3DXzIyXA8N9mNzLaXDvyOYyEStwdHzAmWVZGdr85E6CJhhYTulr+CHlg4FWerAFrUsJo6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749462401; c=relaxed/simple;
-	bh=T5+i/IXY5HMlgi5Xmm4N9FOVecSlPeCMn41asEZv3qQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pc8EEzQ7dTU7PIhNJf5iOBBnB9LTP8aJma9ljFAM9ARSkPZHBPWemzpZ3TkU6Nz2rzMoncF1NTtdPGTWOblElTznRELiEpUAW9vcpmmfWDex/gaZNADE9ajnqzXnL6hhSuOgz+Vr2KVoZtlr19npn5Q+Ez+UkXh4qwuUb8pKEZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi+9m5/Z; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1749462402; c=relaxed/simple;
+	bh=M77Dohdcks7F+pmdLkwjKzh3y7A/CL8UcrnCn8JYYjY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=b3KntWxCeCd57fVF0sXQ/MW0HoMMEOfR5PWomVec3Zkr49Usjx1OYgS3i5EA1AgYIkmiVJZuIAGj4TPSHKE/J14rej9+FQaHLqP0mbgRmRS9T42sfJfwMNJpcSfiL2vJCemQkOgvP+2NK/BlR+uIyqnAy0H2FssklGmb6u3FPC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4e75abe99b7so1352258137.3;
-        Mon, 09 Jun 2025 02:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749462398; x=1750067198; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ovdMc1FQ82CEzYnflp6frUiKJPTgmoVtQzARQA5rIDA=;
-        b=Qi+9m5/ZZw9giEoy95IIBQd1jzMjBBmvgrpZojmJ/vKe5cUhkBh9BS+QrRkCZWH8fJ
-         BQnNaN8bRZUSsUuMM8lHE9/Yrpnw0+NEJt8iUV9nBlUmgZoRBSv5KIAqNxe+7Ksnyun4
-         NyEc9gWsNo2oKbTaBCSVYDpy+RNgdRA6R9AeYZ3GbOagBCvOwdrPhGt4a1Y0//TglTm8
-         /vO/HQMel4+wDACt8+yvGr3kpzBAwswyumcZaU6IwjiyBqPLp48mVmtMlhlexHlyPTL6
-         4J6A+P2bwexSQgEaJublTseOS1T7207YARu1n8vy5tXChmfOpfEIoyIaFtsj2ieZZLYb
-         kPag==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ade33027bcfso303041466b.1;
+        Mon, 09 Jun 2025 02:46:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749462398; x=1750067198;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ovdMc1FQ82CEzYnflp6frUiKJPTgmoVtQzARQA5rIDA=;
-        b=bubwer+4mjZOH0kIsoregwNz1IclfPmoy/PW1I6hjZdIrDFy05SASrG7CndPPVLI4M
-         8s3U32uh7GwQtFEmNiTHAwYw4Z2hUMCVSsjthhPFbcoyyupADJ44+YtuHt2/G29VRHvd
-         BxP1cQr7qgCNBjpQeRnjKhsmKtlzilXoPMGF56J70hNP0dSgdPhEYZ9C+J6LN0F5CzvG
-         DfAk/t2Qtjxk9B8kSGUdXLD/WxAA816ASQ4wClf7N+425AFj90cP+0ZhUrtkYxKsN+Fp
-         YxYyss1Tv/TNG7kvGCfgCtxnryW7i1h5CR78SXvNRU9tHvfiDwqbgW+9R+PVNuR8Bt/7
-         qjXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlnLrl9PtBKJm5HgUX8lSgxAuUevismiCTCTT9bszhl1O03j9CoBIkY2xQlXSGIBXiAZSOuqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2UrtdepDXj1Z7xDX/LdRDRBFwaqbBGzsLV9Sz/k6J785QacB9
-	EtK7ibnfscffYg/VH/+2TEB1WdLEBZO86WlvrVLRSsCwDX0fx5f1v6ew
-X-Gm-Gg: ASbGncsLNVRE0KRRKi8yrlWIrxN4t4ZR9wMjCJdLAe22TFdvDCsGS5cyvojYScfa8V5
-	6sSTD6EpRKeJcC2Zk8AYH+ejU7CFVAc35TuvxGcKYjid2Ra/W84XjO32a4YF00ssWvX+FZdzriE
-	PwX/ug+AkrdMfVl4Xz1pep4dT/Tueo4aS5xHZWsYZ8IhA9exAYa8KM/eLDaZ3YSqG7LprYKM+2V
-	wtjOEkgHozytYdY6ker97UYVjZ3ohKQHaz1q8J7rwxpLnu3I61naG2tuhXeh/UcyUxvzvPgER8v
-	UlhT6h35Uz1m8+Vf+aJP7F4AD5xKcMg0foIn+BbQ+EEe+QiHF9+wzTDfwPBbyBjyGFq2E3qeNBc
-	R4rd+rg==
-X-Google-Smtp-Source: AGHT+IHhBQtxj0UI8XNLr0PrzKwYEnZsOFMk+fBH0dYUOlF7WlJj1nnDuG+YS4QLGaBftztpRKN4aw==
-X-Received: by 2002:a05:6102:c0c:b0:4e5:a9b7:df with SMTP id ada2fe7eead31-4e7728f71c8mr9600540137.13.1749462398515;
+        d=1e100.net; s=20230601; t=1749462399; x=1750067199;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8m3a7UChjUd7XKPt0ibqoeBEr419vnR0BHhyGlJO5vk=;
+        b=Kb2ye8AkJNFI1Q23sJL84kcPhgX7RSJMsYENEUwrtQxgmU9Sbp8fqJ5NGvHBxMYwht
+         +/ZB2HAjGGwya2Uvrpo2RFLNiYCyywCxCyKpVc9WY/k5JqomKn6JX64i5NmiGK3/WdrL
+         ledhP/CBCRpnmYvEpZaBmYu3JXwXZ4cnSE2qpjU8p44qPgIlOotEzFFNT8uSgMvF3cQP
+         +e8ed6WfGvno/0zlaTP3MvDTMP+3js943uoE5zDvFE4HwQxWVm8+CZteYVqDXRxOgLl/
+         VUB63u5XKLaYhrZBBjx3qx00CmeUnks1egZjyAwxaZfC9wMdrKGDVqaeYKuMtpikUD8f
+         qRdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKWBnDsRqEa9E2LCkxusSLnics8VzIcVatpTg/+9KnvKGl0yBWX94tvW6yW+NMh2Y/o4l8DtaIzkae9m0=@vger.kernel.org, AJvYcCXD+hTt0LirUxBQAHbpGBhQ2sKbCESQ3jZySZmI9Yk5YKTlSIrhV8Tp0G+Pd4pfnq5oeRZYH3B5tPXBWLOVIZdY@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEcvACNxzObmsdfhtx2Rd4hHy7NUk+ccN53dIpHp9GBJ2QdUjW
+	I0B1FcO3VvAMT4rAtUYxJ5wt1Sdzse+ZSgXfcsttKGwUlwiDdzw/ZOQkc/pkLg==
+X-Gm-Gg: ASbGnctjytImdRnBvz5f+jiedUTQ5XSYUBSNAmCVsU+z4qMtszP7DQm+jct15qI13e8
+	bF3F/YWdIMKVfTR2o/lcFqSbCjy93C4H+1b3DiZxfwfahfWPhkQ4FRvY0l7QqUaBZCZLLxOL2gn
+	Pq8xfwyl0ZYJOAk6md7Gx6+Mfs6KKinefYH5p8eRw5xL/PhoIsXwX4Qw5TZsqxQYUu7/oypcb7O
+	2kg3cHkuDOsX8jzyswJE2E5O6PZ6OW7w6dzJ4GEfVFJn24FVptUst6v/YbUMbgc+q5zsgwd83ik
+	i6VoGTpkQNewJdryQ5HDHKOzKC2V7bcflrcjqrtbNQ==
+X-Google-Smtp-Source: AGHT+IFf2A541fHEB70IxIl9r/qHLkmoAHSrk1DX6IYAvQjouUtGTRuKB/Oul1WEFv80beUotf6usQ==
+X-Received: by 2002:a17:907:94c4:b0:acb:5c83:25b with SMTP id a640c23a62f3a-ade1a9c818amr1211994966b.7.1749462398564;
         Mon, 09 Jun 2025 02:46:38 -0700 (PDT)
-Received: from localhost.localdomain ([187.61.150.61])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87ed07c0abasm1964643241.20.2025.06.09.02.46.35
+Received: from localhost ([2a03:2880:30ff:1::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc3a4absm532197866b.143.2025.06.09.02.46.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 09 Jun 2025 02:46:38 -0700 (PDT)
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wpan@vger.kernel.org,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org,
-	Ramon Fontes <ramonreisfontes@gmail.com>
-Subject: [PATCH] mac802154_hwsim: allow users to specify the number of  simulated radios dynamically instead of the previously hardcoded value of 2
-Date: Mon,  9 Jun 2025 06:46:28 -0300
-Message-ID: <20250609094628.6929-1-ramonreisfontes@gmail.com>
-X-Mailer: git-send-email 2.43.0
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 09 Jun 2025 02:46:28 -0700
+Subject: [PATCH net-next v3 3/4] selftests: netconsole: Do not exit from
+ inside the validation function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250609-netcons_ext-v3-3-5336fa670326@debian.org>
+References: <20250609-netcons_ext-v3-0-5336fa670326@debian.org>
+In-Reply-To: <20250609-netcons_ext-v3-0-5336fa670326@debian.org>
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Tejun Heo <tj@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Shuah Khan <shuah@kernel.org>, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ gustavold@gmail.com, Usama Arif <usamaarif642@gmail.com>, 
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1842; i=leitao@debian.org;
+ h=from:subject:message-id; bh=M77Dohdcks7F+pmdLkwjKzh3y7A/CL8UcrnCn8JYYjY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoRq14sjI2ZotnHIOJAiEOYzYnNNjI2XncK4uBZ
+ Or/9NSFQcmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEateAAKCRA1o5Of/Hh3
+ bVWZD/9zW8W8nXlsc0Vqd34Qd121sHapyvL0JszEa9ylMDHeG+VB9Z1XZRicAxqYGDP3IGIBKrk
+ SayaKm1d3jaJygPa+16n3hVFNFgy7VScczfo3Ik8J9aJ+NAJ54uYIteDVj2+iyqrvzA5Shuj1XN
+ RobXC3IdvDc3bq8bAVy4lzgbekzP3z9Sh0vju4ujRink3r5KGr4LW4bfAheTnXz6mHq+PWcmhTe
+ VgponPTliOF00VBrqLlFpBDkYzVOijrPAPgN6Y2mdJuf07+/w5fdgc/xZk/crQkYxfPO+9KVqMR
+ J8Ox2n5rxDQ26DcPt1iHV74QJvk2vhWdwOj68H5n56jzWB++f8/6so+mMdtLctHVtIH2d5eQaEw
+ GrjuFBVmm3Q2M3uWn6R2IsRgYYGxhpdHnSOSRkE2oIql353zblPBbzwxwVENlrMv/rz605Lb2N5
+ CJABvtRibO28ZerXQ7y/VoQorX7FI4p9LQyCDtv95GGgv98Ab5T1Q6HyHG81Ytgui0TQFaUsHz2
+ hB2DS2yxmuyjImn7q4bb7UQ+tAQ2XI3CGPB3JRfN5ioWZf/ocNNhQaFiwXHjfZ4SGE+2P+bGsWL
+ S5M5RXgb9SvzB94Hw0DTDjxiZwP2A5bdTz1YzuT2ib4S7gO1BTFZ9LcKof++d5rR51G9FQkKd8S
+ X9H9/qxHXFJU63w==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Add a module parameter radios to allow users to configure the number
-of virtual radios created by mac802154_hwsim at module load time.
-This replaces the previously hardcoded value of 2.
+Remove the exit call from validate_result() function and move the
+test exit logic to the main script. This allows the function to
+be reused in scenarios where the test needs to continue execution
+after validation, rather than terminating immediately.
 
-* Added a new module parameter radios
-* Modified the loop in hwsim_probe()
-* Updated log message in hwsim_probe()
+The validate_result() function should focus on validation logic
+only, while the calling script maintains control over program
+flow and exit conditions. This change improves code modularity
+and prepares for potential future enhancements where multiple
+validations might be needed in a single test run.
 
-Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh | 1 -
+ tools/testing/selftests/drivers/net/netcons_basic.sh      | 2 ++
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 1cab20b5a..1740abe1a 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -27,6 +27,10 @@
- MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac802154");
- MODULE_LICENSE("GPL");
+diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+index 29b01b8e2215c..2d5dd3297693c 100644
+--- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
++++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
+@@ -185,7 +185,6 @@ function validate_result() {
+ 	# Delete the file once it is validated, otherwise keep it
+ 	# for debugging purposes
+ 	rm "${TMPFILENAME}"
+-	exit "${ksft_pass}"
+ }
  
-+static unsigned int radios = 2;
-+module_param(radios, int, 0444);
-+MODULE_PARM_DESC(radios, "Number of simulated radios");
+ function check_for_dependencies() {
+diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
+index fe765da498e84..d2f0685d24ba3 100755
+--- a/tools/testing/selftests/drivers/net/netcons_basic.sh
++++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
+@@ -50,3 +50,5 @@ busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
+ # Make sure the message was received in the dst part
+ # and exit
+ validate_result "${OUTPUT_FILE}"
 +
- static LIST_HEAD(hwsim_phys);
- static DEFINE_MUTEX(hwsim_phys_lock);
- 
-@@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pdev)
- 	struct hwsim_phy *phy, *tmp;
- 	int err, i;
- 
--	for (i = 0; i < 2; i++) {
-+	for (i = 0; i < radios; i++) {
- 		err = hwsim_add_one(NULL, &pdev->dev, true);
- 		if (err < 0)
- 			goto err_slave;
- 	}
- 
--	dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n");
-+	dev_info(&pdev->dev, "Added %u mac802154 hwsim hardware radios\n", radios);
- 	return 0;
- 
- err_slave:
++exit "${ksft_pass}"
+
 -- 
-2.43.0
+2.47.1
 
 
