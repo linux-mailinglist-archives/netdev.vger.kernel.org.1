@@ -1,219 +1,133 @@
-Return-Path: <netdev+bounces-195694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1528AD1ECC
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:27:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBB8AD1F08
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1BDF16A9A9
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E013AD5D5
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 13:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ED7259CBC;
-	Mon,  9 Jun 2025 13:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B2E25A2CC;
+	Mon,  9 Jun 2025 13:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YQhfZ2gY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Laf5E0Vx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E332A259C83;
-	Mon,  9 Jun 2025 13:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243DB25A2A2;
+	Mon,  9 Jun 2025 13:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749475634; cv=none; b=Z2PH479KP/sAxEiJpLe/jiREKDCRhduTZ7Hw+MABGp+J5P+gTFmnhHkgRbc7Q4FyW0S7IGGCohi4NLgPP7SYvKeGd/QTwjRrCPYvqZt/yvNElO+2Au1Fo1j9NgBZ3hsD/pFc2dvKhMZmA5H0F0+/IH1o9RGxwDRijG272tJP6Ew=
+	t=1749476413; cv=none; b=HLhIB88l1CTSts9MPrPTceYfh32DPh+qRnkCq02nNsj+oHjd9eunw4pRaJIG4qw5ncw+9h7UYSA8OHDM0DMUnp0Az3mPVZAGxB2WPOERXiXHskzHsuC47LVKTMNEn0Q7HdqQioIRwYDFtkASgnC+p1YEXJ2ZzyxBiB57LbiC49U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749475634; c=relaxed/simple;
-	bh=xZml02WCQ994/V4RlPqFg4+yIuwCYDka9Oaz38kEodM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XT1cl/B0g4WWinuMK4GrlQs9Qkpvo/I351SvMQ0+VodteKpDM71GURgtRbuVRwMR/p72tPDhANEgAMxDbos6uxr2bh9uT3Amcy0Utgpsr/RNFaUZUqZTqbRmim1xDLH2oLXRJVw9Ay7CgEIZ4uVPXIUwce4aQe0iSBfb8uF0fG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YQhfZ2gY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B0503C4CEF8;
-	Mon,  9 Jun 2025 13:27:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749475633;
-	bh=xZml02WCQ994/V4RlPqFg4+yIuwCYDka9Oaz38kEodM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=YQhfZ2gYtAWzxK4b56JNo6WQJYEUNphOCsw5UW6p4jiMJeZ+HLNqmrKFYEufCUy+e
-	 PJJtqz8FR1GUAbqeAl/ta7Vma/BuLuzvrd0UD2KXg+d4BpDQxLMSxmb0jtWlen5khh
-	 uSTMBEHqhahuhEbEpZeTaggMyc+a1QA1aa/GTgM6hhDnqVXdgtYWV5TvSqOtiFFbwX
-	 0Eyz0PcyI1oAHataRVttc+Yk7WQZb+QC3nZYQA0zqkERXUMTwUKitjJikMA2zyXSva
-	 Ke6vM2DvHRNZcerT6jzMwfvaKcTXn2vObqZBPHSKBPpaC2IG0v5ixCRgMoHXImof4a
-	 KSmoLjU4Yk2Wg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4169C5B552;
-	Mon,  9 Jun 2025 13:27:13 +0000 (UTC)
-From: Vincent Whitchurch via B4 Relay <devnull+vincent.whitchurch.datadoghq.com@kernel.org>
-Date: Mon, 09 Jun 2025 15:27:02 +0200
-Subject: [PATCH bpf-next v2 5/5] selftests/bpf: sockmap: Add splice +
- SK_PASS regression test
+	s=arc-20240116; t=1749476413; c=relaxed/simple;
+	bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ETEeHsEtTbojDUKF3GifyKc9TgilQ+mps8SF8ZlgWKhe7092tqIpKyuSZA//WTaHk8cKicY+2KKWVPoV/CXkF6kAG/sd+P5YhWzCSFOdKCeFqbCtR2xVDtPz3vnPpHhxm1LBFlogsnXJItCY9fTLx9L9S7fajnCdykmDybYo1ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Laf5E0Vx; arc=none smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-53090b347dfso1410532e0c.0;
+        Mon, 09 Jun 2025 06:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749476411; x=1750081211; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
+        b=Laf5E0VxclgjwUI34BI36dDqNDdq7UQOm+xEhbO2mgRNf/JH8biWWxMbti5TOulf8Q
+         GKJ+ewYIW41AAuBo4QkEY6076zTLryGTrt2wEYJ50FwP9UYsDyVcvG+uQXDKNgpkztve
+         7UNc1Omj/1oKSPNU8O3c614TJrMV6mv6F1+l/e7IXXUYcjNGaZdEMFmSfFwXZNf41lJZ
+         MRjMM0ZOcxpElPop3jW+TSwHYBmHg2SRAOZ1TdmTWVjw8UHgF0YtT4BcunLKGvFULkh7
+         FDCCa6a01iQLzBZILcdUbWVYqOu1gutBz4bWpo7g8nAZs5Nd/K0wMXFWrauk4RA9cMDx
+         yYLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749476411; x=1750081211;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cY4xKlehVdvlZ3NiQzDRzQlO9jXyfXVG9+zrEpxgDxs=;
+        b=CqGvGPrSyUY/wieA2qU+G0By/3zdAjUxmUWdmOvUq9Ec520Q8Awcs1eO8scgvL4z1W
+         bu8e1Au5jbzUqCynE6Fp5p14EzjYBQ7mqWR+tUJRuO4GhX+RB7Qb5KuOuuHw49Al1Bnh
+         rq2yft5q+W2bLv0084lPo9ATPskI4RlV6pSp7IX9HNZfUrsBg19FUj9glhVI0c2HGowE
+         n4ZrQSciqcgRlaSHTFW12XdaaYf/Yazod8WjGdUHZ59h7jmaZMYDw/wRFRk7OiFHL7Dk
+         jMPwkqfhcJ7LfLClOJWdZ8I1/yPa2+zBMglN4sdvyZGZpiGRwj1QVxKlwZd+PtT4kMO8
+         RvUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0yLMDS+u6lBIYA34WFqYX/k/L0ru0/Byk9iUv4zlt3xjD9IneVN9Hxkzn/U4OMlELtIKWs+Cy@vger.kernel.org, AJvYcCXvfeLdxBDag2EwGb+p8xLH8XXJ/b4fmadNTAx5yvH2fshX/61cndgBAJxLFKpcplq5KDJZP+697N74Aqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb2RVm36PS1YrIlWqQNPLaZ8nR1EGHZFJbWqZLv0nfagyhMRnJ
+	VKUZtVKjpnb7Wm9fDP59sM0gRmcQXIigGSjccxkKc2xZdRg+8BfK45OZu8x4gL/3qKzVJw3fivU
+	4fGoGUlvl1vLOKT2c1PHMKFV9RhPso/E=
+X-Gm-Gg: ASbGnctiI8dw1sYED5gzduQydLcmdrzcsBe4SbacFQHr9TfJZ9kA8KUzN2jehNMBIsS
+	7DlLFe7OIjYUNqsCJSDgOQod44/TW01/N1fOhLQGOerpW99DuXR4Gh9ADntVq58wkhG/OSnTpqF
+	1GJeaUk9y3hpjlX6E+AxqKfdFKXt1/3pV2cP0kO/pXoKeL
+X-Google-Smtp-Source: AGHT+IGY6fU6lJ8V5VjYmrvOBlPolfPyq3XHCfqRqIx9PvrE87W7ON5Flq55XC+vB3tO7sziS7pDRkGERLXIw/X3o/Y=
+X-Received: by 2002:a05:6122:201f:b0:526:2210:5b64 with SMTP id
+ 71dfb90a1353d-530e48b54efmr10496314e0c.9.1749476410937; Mon, 09 Jun 2025
+ 06:40:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250609-sockmap-splice-v2-5-9c50645cfa32@datadoghq.com>
-References: <20250609-sockmap-splice-v2-0-9c50645cfa32@datadoghq.com>
-In-Reply-To: <20250609-sockmap-splice-v2-0-9c50645cfa32@datadoghq.com>
-To: John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1749475632; l=3614;
- i=vincent.whitchurch@datadoghq.com; s=20240606; h=from:subject:message-id;
- bh=2akB6neBnN7soD9RxBYPWNSQma3x6Mu7ppi7sqIUp90=;
- b=qe0AI+VKgweti4Dya20MEVWQ+GSspGh4qO+E1PVz1e9jjczLEZE7pwbXheBaqDMmTt0u7k9I3
- MzWE4i7etzXCJASEpOc88fK95qvlQRlm1cJMrmG0twtf+cl6hDAEBu1
-X-Developer-Key: i=vincent.whitchurch@datadoghq.com; a=ed25519;
- pk=GwUiPK96WuxbUAD4UjapyK7TOt+aX0EqABOZ/BOj+/M=
-X-Endpoint-Received: by B4 Relay for
- vincent.whitchurch@datadoghq.com/20240606 with auth_id=170
-X-Original-From: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
-Reply-To: vincent.whitchurch@datadoghq.com
+From: Xianying Wang <wangxianying546@gmail.com>
+Date: Mon, 9 Jun 2025 21:39:59 +0800
+X-Gm-Features: AX0GCFvxspkhrn78Sa-QcFbj3ft8P-CqaA5D2axID067xmJTtU7TPXtPy7th6SA
+Message-ID: <CAOU40uC6U3PS3cu7RmK71DPA_jbW_ZY0FBkBjCdjVArCiZO-fA@mail.gmail.com>
+Subject: [BUG] WARNING in sendmsg
+To: davem@davemloft.net
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
+Hi,
 
-Add a test which checks that splice(2) is still able to read data from
-the socket if it is added to a verdict program which returns SK_PASS.
+I discovered a kernel WARNING described as "WARNING in sendmsg"when
+fuzzing the Linux 6.8 kernel using Syzkaller. This issue occurs in the
+memory allocation path within the sendmsg system call, specifically in
+the __alloc_pages function at mm/page_alloc.c:4545. The warning is
+triggered by a WARN_ON_ONCE assertion in the page allocator during an
+attempt to allocate memory via kmalloc from the socket layer.
 
-Signed-off-by: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
----
- tools/testing/selftests/bpf/test_sockmap.c | 73 ++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+This occurs when invoking sendmsg, which internally attempts to
+allocate memory for socket buffers via sock_kmalloc(net/core/sock.c).
+The allocation triggers a warning due to either an invalid allocation
+context (e.g., atomic context with GFP_KERNEL) or memory pressure
+conditions that violate allocation constraints.
 
-diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
-index 8be2714dd573..b4102161db62 100644
---- a/tools/testing/selftests/bpf/test_sockmap.c
-+++ b/tools/testing/selftests/bpf/test_sockmap.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- // Copyright (c) 2017-2018 Covalent IO, Inc. http://covalent.io
-+#define _GNU_SOURCE
- #include <stdio.h>
- #include <stdlib.h>
- #include <sys/socket.h>
-@@ -965,6 +966,61 @@ static int sendmsg_test(struct sockmap_options *opt)
- 	return err;
- }
- 
-+static int splice_test(struct sockmap_options *opt)
-+{
-+	int pipefds[2];
-+	char buf[1024] = {0};
-+	ssize_t bytes;
-+	int ret;
-+
-+	ret = pipe(pipefds);
-+	if (ret < 0) {
-+		perror("pipe");
-+		return ret;
-+	}
-+
-+	bytes = send(c1, buf, sizeof(buf), 0);
-+	if (bytes < 0) {
-+		perror("send failed");
-+		return bytes;
-+	}
-+	if (bytes == 0) {
-+		fprintf(stderr, "send wrote zero bytes\n");
-+		return -1;
-+	}
-+
-+	bytes = write(pipefds[1], buf, sizeof(buf));
-+	if (bytes < 0) {
-+		perror("pipe write failed");
-+		return bytes;
-+	}
-+
-+	bytes = splice(p1, NULL, pipefds[1], NULL, sizeof(buf), 0);
-+	if (bytes < 0) {
-+		perror("splice failed");
-+		return bytes;
-+	}
-+	if (bytes == 0) {
-+		fprintf(stderr, "spliced zero bytes\n");
-+		return -1;
-+	}
-+
-+	bytes = read(pipefds[0], buf, sizeof(buf));
-+	if (bytes < 0) {
-+		perror("pipe read failed");
-+		return bytes;
-+	}
-+	if (bytes == 0) {
-+		fprintf(stderr, "EOF from pipe\n");
-+		return -1;
-+	}
-+
-+	close(pipefds[1]);
-+	close(pipefds[0]);
-+
-+	return 0;
-+}
-+
- static int forever_ping_pong(int rate, struct sockmap_options *opt)
- {
- 	struct timeval timeout;
-@@ -1047,6 +1103,7 @@ enum {
- 	BASE,
- 	BASE_SENDPAGE,
- 	SENDPAGE,
-+	SPLICE,
- };
- 
- static int run_options(struct sockmap_options *options, int cg_fd,  int test)
-@@ -1378,6 +1435,8 @@ static int run_options(struct sockmap_options *options, int cg_fd,  int test)
- 		options->base = true;
- 		options->sendpage = true;
- 		err = sendmsg_test(options);
-+	} else if (test == SPLICE) {
-+		err = splice_test(options);
- 	} else
- 		fprintf(stderr, "unknown test\n");
- out:
-@@ -1993,6 +2052,17 @@ static int populate_progs(char *bpf_file)
- 	return 0;
- }
- 
-+static void test_txmsg_splice_pass(int cgrp, struct sockmap_options *opt)
-+{
-+	txmsg_omit_skb_parser = 1;
-+	txmsg_pass_skb = 1;
-+
-+	__test_exec(cgrp, SPLICE, opt);
-+
-+	txmsg_omit_skb_parser = 0;
-+	txmsg_pass_skb = 0;
-+}
-+
- struct _test test[] = {
- 	{"txmsg test passthrough", test_txmsg_pass},
- 	{"txmsg test redirect", test_txmsg_redir},
-@@ -2009,6 +2079,7 @@ struct _test test[] = {
- 	{"txmsg test push/pop data", test_txmsg_push_pop},
- 	{"txmsg test ingress parser", test_txmsg_ingress_parser},
- 	{"txmsg test ingress parser2", test_txmsg_ingress_parser2},
-+	{"txmsg test splice pass", test_txmsg_splice_pass},
- };
- 
- static int check_whitelist(struct _test *t, struct sockmap_options *opt)
-@@ -2187,6 +2258,8 @@ int main(int argc, char **argv)
- 				test = BASE_SENDPAGE;
- 			} else if (strcmp(optarg, "sendpage") == 0) {
- 				test = SENDPAGE;
-+			} else if (strcmp(optarg, "splice") == 0) {
-+				test = SPLICE;
- 			} else {
- 				usage(argv);
- 				return -1;
+This may be triggered by an unusual runtime state induced by the
+fuzzing program =E2=80=94 such as mounting a compressed ext4 filesystem via
+loop device, performing ptrace and socket operations, and using
+certain sysctl interfaces. This combination may have placed the system
+in a constrained memory context, causing __alloc_pages to emit a
+warning.
 
--- 
-2.34.1
+I recommend reviewing the use of kmalloc in sock_kmalloc, particularly
+the GFP flags used under socket send operations, and whether the call
+can occur in atomic or memory-constrained contexts. It may be
+necessary to guard such allocations or use GFP_ATOMIC where
+appropriate.
 
+This can be reproduced on:
 
+HEAD commit:
+
+e8f897f4afef0031fe618a8e94127a0934896aba
+
+report: https://pastebin.com/raw/DJLgSX8N
+
+console output : https://pastebin.com/raw/DLirgK1i
+
+kernel config : https://pastebin.com/raw/aJ9rUnhG
+
+C reproducer : https://pastebin.com/raw/EXf8Gc4A
+
+Let me know if you need more details or testing.
+
+Best regards,
+
+Xianying
 
