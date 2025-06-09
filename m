@@ -1,155 +1,175 @@
-Return-Path: <netdev+bounces-195770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FEFAD22FA
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:52:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1A1AD22FD
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 17:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750DF16AC42
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:52:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13FC41886FAF
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 15:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7E120CCCA;
-	Mon,  9 Jun 2025 15:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B863520CCCA;
+	Mon,  9 Jun 2025 15:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VymgnPd1"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VIa4WrcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF843D544;
-	Mon,  9 Jun 2025 15:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26163398B
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 15:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749484318; cv=none; b=HNAs0Hq8elU5nOEC9OS3FWjmXCScM5t3RtFdGkVPgbOWwXiyvmm2Ops6CfdjEkMSW6ZsJZHrCdEW0gNbooRJSgwOTvhhFEgQD1mobhzjLBy8Qy5yySsPeGIGe6fmbqaCfwjymQ5fe4myGTTO+rhSW0G7Gc7iORuf2oJMEaR70f0=
+	t=1749484342; cv=none; b=HTRGoXl4/XNUR9iSv9U4yDstCkYUghXYnzK7HeKCqchGvE1oEo254ENr4+2aAoJS2ukICqTVTss4ydZDrQvDj/x/rDCG3W+GCU+a0mGJK+0WSJ1rjCsgOHNnUTu7SrZ2G3tGsjpkO1z2HDJdlezy7Xf6MEz2KUNIVEUyJQL2yDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749484318; c=relaxed/simple;
-	bh=s64BLmWnfaM1vIhzNh+zo4arXIAPHhvLNQvOr3AmvR4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TPWrqjR+zNgCREvmmHBclmEJuYnD5r5Gr0DsYtJ7mf+gcTC+8oBwNr4m+Hpiz+afq47WFoXCwjYe2qtS+JfyuA0jOJ5D0Ew2ntGZzoFIbdgxE+MtJ0E/ZooHJadQoDXIKDD0SccG2cOBEIyddfakn+uVg0jKMtWXbzoX7ywYmyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VymgnPd1; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a54690d369so1154144f8f.3;
-        Mon, 09 Jun 2025 08:51:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749484315; x=1750089115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=clLX/uroe3gYLiyc0WLjLQGuYII2RVMuYJR/xVsDYms=;
-        b=VymgnPd1hrTWPWk6XMjidMbbTOr0cPXyG73wc32uPCef1TWrqQeJ4LekgyEm1v6Per
-         9nlxhbU6vnsjSiyLBx7Ao4v63SORcPnAvYDfkAcFyIUugtjds2YF+6ISyPYhsPFrNEBI
-         0fINMkrNWQ8UB4d3/Tsg6YD9Wbt1qEwTPBJtA9byDsRyeVcRJ7PAK1mIwqvQGXIGLZ8a
-         T9jULR+d5/Mx/q8eF38hWtT/lKna5C/UwO0Xb6+N8mzmjWYQbM0ZMHynu6zBS0ELFwhQ
-         Hw7tVQZglipjkV4QISaPxs7MJG3pEo1EgpkQs3K/Fqqguz78FWQ+9IgDyvYUoVrcKIUA
-         l8ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749484315; x=1750089115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=clLX/uroe3gYLiyc0WLjLQGuYII2RVMuYJR/xVsDYms=;
-        b=FXx+cvPcE4jlgcaVb7rCFIhpWyuoqhOntkRIqeGTBzqxKlC0WYcZ83zn9gxWKGociz
-         RP57fGpnwGcsyUitpspJnOHrq0ZrsQTr9tsX0fGV6nIDz5B8Q7AXz7tckB6UF3zJE1si
-         ufvUNVk0FtKEnkw4K3Ugna4d5gUijNnLTg4g1NhUvjvu+1UTbAWhgtir6rOuSab4Q1DE
-         cF6fHlnCgU3+loPl6vbQXw9mJqnpO5PmDxZeZs5iBpSwVC/r11bVKDwf/azuPuCdbYr6
-         YdoNWgQEFXQLoLLISC9beHavIEBkQe9meCo9jAHlm61HflLhvVOD0jJd71UcITnXCYWR
-         ACew==
-X-Forwarded-Encrypted: i=1; AJvYcCV7ukApb3P8J1c7tQ+ClRvmcQfOPyTfSnHPUcMhpjwkAgbC9Sdyr/dbEPCircXMxWSvxms=@vger.kernel.org, AJvYcCVM9KLYnv2UrOBITJe1ewWckMsyLoWy4qRXKNtW9vU1KkWZpg+ZmJ3AfPbxLGKIMFX2Ez14dNNu@vger.kernel.org, AJvYcCXXbh87K+4GrbJXIYruwfTEDX2as1dZ3H5Kcgos6zeLt/Qe44ek4QPnpCWfzL2inQ55hHsXu+azGsDssF/x@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiNC3N6auAC4ACuank9W58yi6pEHRj7m6ilz6E0zV9F5ZH5yLF
-	9Ch2E1Np0khf8Y8DDoBV+8XD8uVYizhgHvrl9Cz0B+aBetf92c+T633qWaaRTkipLJt5Qo5WuQ1
-	lso9hfQ38Yp2wZItpdH2AIAKzzUbcpys=
-X-Gm-Gg: ASbGnctypgm2pt7fTBVcQjnBJTuZOyl4oDr6ZtbYa3zrAnhCDFCZaPVZlXLpzCv/eaA
-	pfyFRtwng2Zp0tR46Ks4qlWbIJEgb9QQOpq1SinGNAqs/jpwINpUkh+GYb4JFr4rebgfRH4V3B5
-	lPEkKcPAYunZN8620kmiwvV84IvBO/C15Es2mnUnGqT9UG3m5a1hBPetWK3l375g==
-X-Google-Smtp-Source: AGHT+IGd/auF1dsHAeUUw3cW1bqncv0x0TPUZfk6gX2HXWg3VCovHGbOFafUUgThYO8/qWtAKPskOQF/zRIGnx35G/E=
-X-Received: by 2002:a05:6000:1acb:b0:3a4:ebc4:45a9 with SMTP id
- ffacd0b85a97d-3a531ca80ecmr10296668f8f.19.1749484314421; Mon, 09 Jun 2025
- 08:51:54 -0700 (PDT)
+	s=arc-20240116; t=1749484342; c=relaxed/simple;
+	bh=BSLdyxIsQ0xPel/VCm+GYlhzhJxRNONqXsYLib2yb8A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q9+wW/4iTTjeX7grdt1xA/GGuvbKGFozYL6oi+fQ1lL1ntLJT0npPiMAn9k3HScDX1Fln/Ql+t+V4WF864U1zIKDeQ7MX30Fs/bexOCrpuvIvIRkINbDjqLujRLuyzUP6qNtf4tA0EvovLL20uzZbSpojoupzx1f982u8L7sEeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VIa4WrcS; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 559DtYnr022492;
+	Mon, 9 Jun 2025 08:52:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=8efMkTBIH8E6HBAki7mCyf7SfYu9z++iJiYfZmHbr/U=; b=VIa
+	4WrcSU+Clgvo0Fx67YhJ/eAZV0uM4TvgmU2MSp3GkpmccagiVMtVU1ykTU2DQ9cT
+	kxD87v7krldop5JHfk62tVzcLqW/JZQcS1ZAp53q4tAPWp3wBlqbFua9HIl35woe
+	xRCBkZG/S+5Z55iHH9SW5IB0BxKp7CNlCgA/QuIq2uyhABzh7nLXvl9hZc96ZKGU
+	g2qO78uqc90foj1uvuyNDMcPBlevC9Dn+TA5VAKnpe1/0m7Tfj8RZr79HIglnNrP
+	5UE4AeFy/CsIhYxeVvGCzl2H63k8DFJM9lhiuphfdHzZ9nsAlzC/3TpfazQUQSpo
+	OCkBkxbsvJ+sP2hKBSA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4760x2g8ab-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Jun 2025 08:52:11 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 9 Jun 2025 08:52:11 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 9 Jun 2025 08:52:11 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id DAA623F7075;
+	Mon,  9 Jun 2025 08:52:06 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <bbhushan2@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [net-next PATCH] octeontx2: Annotate mmio regions as __iomem
+Date: Mon, 9 Jun 2025 21:21:49 +0530
+Message-ID: <1749484309-3434-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net>
-In-Reply-To: <20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 9 Jun 2025 08:51:42 -0700
-X-Gm-Features: AX0GCFvpkGJzjbMKyAFdZWIDTS0SQLwEme5a3oVOV4gg4DU8ivK2rKsAOzMMG_4
-Message-ID: <CAADnVQLxaxVpCaK90FfePOKMLpH=axaK3gDwVZLp0L1+fNxgtA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] bpf: Fix RCU usage in bpf_get_cgroup_classid_curr
- helper
-To: Charalampos Mitrodimas <charmitro@posteo.net>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Feng Yang <yangfeng@kylinos.cn>, Tejun Heo <tj@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-GUID: ztxZrNKGgovLyylFd451RUsd5JbDhLIo
+X-Authority-Analysis: v=2.4 cv=dd2A3WXe c=1 sm=1 tr=0 ts=6847032c cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=pCkVVIg8AwnW8QNEWxUA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: ztxZrNKGgovLyylFd451RUsd5JbDhLIo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDExNyBTYWx0ZWRfX9RO97/kdLERP XRv+xUButnkFJZCIim8VKRiLULJcyZ6doeIkQ5nZkCmVXytWhjPGh8VSKCW4gq776bVwdmmPlgT XkbUDuFvG4XxA93pMZpGHOqqiDW1IHhdBPZIarcGRQlCGkUbKnCKOdZGaHaYyItfi36gLvaMSUI
+ F4lgMxaH3KTTvIdivHYyyurw7lZKL9Knhkxx0sbnwAZiwSbLbjyMwBCYAKEUkgvSz6A7BRQOPcy t77hvkb8a8COWkPUmh/L2Bc8302HwhaZ39MI9+n3r/oge4o8idTcGd47qQlmzhl8rzqI074v4Vh 4CM38iSxHidG9xODTux3Yozl1JbEOtVkb6n9fAAMXqVDWhjngoid6m7r/RYXDAZz/Ibv9YklAZl
+ WLE4atSPzYnfSILhBAlyuz7OV4zRAo7smwGOB5alUvXCVc23GBZR8YDjW3DhTCfb2Y9YmnTY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_06,2025-06-09_01,2025-03-28_01
 
-On Sun, Jun 8, 2025 at 8:35=E2=80=AFAM Charalampos Mitrodimas
-<charmitro@posteo.net> wrote:
->
-> The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
-> types") made bpf_get_cgroup_classid_curr helper available to all BPF
-> program types.  This helper used __task_get_classid() which calls
-> task_cls_state() that requires rcu_read_lock_bh_held().
->
-> This triggers an RCU warning when called from BPF syscall programs
-> which run under rcu_read_lock_trace():
->
->   WARNING: suspicious RCU usage
->   6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
->   -----------------------------
->   net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usag=
-e!
->
-> Fix this by replacing __task_get_classid() with task_cls_classid()
-> which handles RCU locking internally using regular rcu_read_lock() and
-> is safe to call from any context.
->
-> Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Db4169a1cfb945d2ed0ec
-> Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
-> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
-> ---
->  net/core/filter.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 30e7d36790883b29174654315738e93237e21dd0..3b3f81cf674dde7d2bd834884=
-50edad4e129bdac 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -3083,7 +3083,7 @@ static const struct bpf_func_proto bpf_msg_pop_data=
-_proto =3D {
->  #ifdef CONFIG_CGROUP_NET_CLASSID
->  BPF_CALL_0(bpf_get_cgroup_classid_curr)
->  {
-> -       return __task_get_classid(current);
-> +       return task_cls_classid(current);
->  }
+This patch removes unnecessary typecasts by marking the
+mbox_regions array as __iomem since it is used to store
+pointers to memory-mapped I/O (MMIO) regions. Also simplified
+the call to readq() in PF driver by removing redundant type casts.
 
-Daniel added this helper in
-commit 5a52ae4e32a6 ("bpf: Allow to retrieve cgroup v1 classid from v2 hook=
-s")
-with intention to use it from networking hooks.
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c      | 12 ++++++------
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c |  3 +--
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-But task_cls_classid() has
-        if (in_interrupt())
-                return 0;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index a8025f0..43eea74 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -2364,7 +2364,7 @@ static inline void rvu_afvf_mbox_up_handler(struct work_struct *work)
+ 	__rvu_mbox_up_handler(mwork, TYPE_AFVF);
+ }
+ 
+-static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
++static int rvu_get_mbox_regions(struct rvu *rvu, void __iomem **mbox_addr,
+ 				int num, int type, unsigned long *pf_bmap)
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+@@ -2389,7 +2389,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 				bar4 = rvupf_read64(rvu, RVU_PF_VF_BAR4_ADDR);
+ 				bar4 += region * MBOX_SIZE;
+ 			}
+-			mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++			mbox_addr[region] = ioremap_wc(bar4, MBOX_SIZE);
+ 			if (!mbox_addr[region])
+ 				goto error;
+ 		}
+@@ -2412,7 +2412,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 					  RVU_AF_PF_BAR4_ADDR);
+ 			bar4 += region * MBOX_SIZE;
+ 		}
+-		mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++		mbox_addr[region] = ioremap_wc(bar4, MBOX_SIZE);
+ 		if (!mbox_addr[region])
+ 			goto error;
+ 	}
+@@ -2420,7 +2420,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 
+ error:
+ 	while (region--)
+-		iounmap((void __iomem *)mbox_addr[region]);
++		iounmap(mbox_addr[region]);
+ 	return -ENOMEM;
+ }
+ 
+@@ -2430,10 +2430,10 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
+ 			 void (mbox_up_handler)(struct work_struct *))
+ {
+ 	int err = -EINVAL, i, dir, dir_up;
++	void __iomem **mbox_regions;
+ 	void __iomem *reg_base;
+ 	struct rvu_work *mwork;
+ 	unsigned long *pf_bmap;
+-	void **mbox_regions;
+ 	const char *name;
+ 	u64 cfg;
+ 
+@@ -2456,7 +2456,7 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
+ 
+ 	mutex_init(&rvu->mbox_lock);
+ 
+-	mbox_regions = kcalloc(num, sizeof(void *), GFP_KERNEL);
++	mbox_regions = kcalloc(num, sizeof(void __iomem *), GFP_KERNEL);
+ 	if (!mbox_regions) {
+ 		err = -ENOMEM;
+ 		goto free_bitmap;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 2c2a4af..07da4d6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -602,8 +602,7 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
+ 		base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
+ 		       MBOX_SIZE;
+ 	else
+-		base = readq((void __iomem *)((u64)pf->reg_base +
+-					      RVU_PF_VF_BAR4_ADDR));
++		base = readq(pf->reg_base + RVU_PF_VF_BAR4_ADDR);
+ 
+ 	hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
+ 	if (!hwbase) {
+-- 
+2.7.4
 
-which will trigger in softirq and tc hooks.
-So this might break Daniel's use case.
-
-Daniel,
-ptal.
 
