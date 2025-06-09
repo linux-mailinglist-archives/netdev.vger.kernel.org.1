@@ -1,269 +1,173 @@
-Return-Path: <netdev+bounces-195635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E95DBAD18B4
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 08:50:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1564AAD18B8
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 08:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97C6A16998D
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:50:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1897169804
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 06:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2D8280305;
-	Mon,  9 Jun 2025 06:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB4728030B;
+	Mon,  9 Jun 2025 06:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="UemKjj6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9596578F4B;
-	Mon,  9 Jun 2025 06:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1652459CF
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 06:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749451806; cv=none; b=W5PW1w3o0400sEVDnW4L8M/RicOfe9UrqI2zEf4OhDZvxg88xQIjr+HSFrM870vjMpVdh6zLCqVHTxDQsleR6iDvfXC4wQTw7ngvJWd87g74XC5GclQC4lGR83NrpPkDkmBG6OgrRN6S31jHZJ6t1hrOZtPOR7El0QLIJKUeKH8=
+	t=1749451834; cv=none; b=FKTynI+kUXoCqNjEiIp8WSf+UIjZ5XGgdKNKI2qsnBmU6/y37G2r9qPUOxqA6Xp2Gu1Y0glfGFEh5mY3rgNrcdgwW7hEeh2fO1HMjOOkRodMRLvtAKSRovxv86EARqPeRpScTEQdIQ5BDqQjFZRDbenptsm9AAkJ9JxXzYGwj3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749451806; c=relaxed/simple;
-	bh=6yy7uWYBmrpwoqPT7FTXXF937NeAXtOiGTHzyLC+6Wk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8ALlDrUCkdwhxD1PLGmPflev4TjGBElMOlekfPiHweZieRYbGnCl8ffua7dW8hGYewMRc/hgXde+uSCKsYSuqrAEyUH39xRUZZCYd/QrNyuIMTd06F2I0mRcg/Jcb3ssCjfXT7H+hm54pAda/TxmM5YCrtudljNjINYnX+XHNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-5c-6846841883c9
-Date: Mon, 9 Jun 2025 15:49:55 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: willy@infradead.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH net-next 0/9] Split netmem from struct page
-Message-ID: <20250609064955.GA57249@system.software.com>
-References: <20250609043225.77229-1-byungchul@sk.com>
+	s=arc-20240116; t=1749451834; c=relaxed/simple;
+	bh=EsmXMKt64tYiu+smKrC2ARAI+5VLlmhr2veqlA2P9vc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A4kc4N1p4UHxjHwYCTqKiOkL/fWuk1FeNNLBJwvcPfTpGzoO+sVAPh70Vhn4HSEuT5Qk0U9yZPEhpF5epur0PC02I0J6qppoYEQf4ktXqh14MQ6+KquK8d5+3RLtiIf7OlIjfsH2YozfDmIvDSTKVUyniFe66Zx1CEiNfZ819BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=UemKjj6L; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55940tPI005580;
+	Sun, 8 Jun 2025 23:50:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=SRxlXKxDhlkVwaERbD8tMYA
+	vBa7GfiaYewMd6PgC2Qs=; b=UemKjj6LiLh8UwYuA617DFrr2hgijBG0zb3NpE5
+	uu32EnHcYuyUIHwPco5DRG/qqVQR6J8rnQr3gFxK94bQdq0n1j+QiAUrescHGG40
+	SzCJcRpm0KcHhRET/h4zW3cg3zTU1xhJ0rUGQ6P1X0+rXv3cZquL04LXvGREKBvX
+	x6N+WI7vLXkADg+8SideblYUnVmnT8RhSoMxBnzwMHMvK6q32B4L+3ncZaQYPyoS
+	a8G+XN+WMI94vCCSl7md2r+osUde899UMU0ECRkBbjh2lylTONt8kXMBcQzXIpdm
+	fFAdH3Nzq3ogbI8OQn59wenEMmQr5x66MOgWaJFzZtXwXBw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4759pbh65x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 08 Jun 2025 23:50:21 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sun, 8 Jun 2025 23:50:21 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sun, 8 Jun 2025 23:50:21 -0700
+Received: from cavium-System-i9-11 (unknown [10.28.38.183])
+	by maili.marvell.com (Postfix) with ESMTP id E53233F708C;
+	Sun,  8 Jun 2025 23:50:17 -0700 (PDT)
+From: Aakash Kumar S <saakashkumar@marvell.com>
+To: <netdev@vger.kernel.org>
+CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
+        <akamaluddin@marvell.com>
+Subject: [PATCH] =?UTF-8?q?=20=20=20xfrm:=20Duplicate=20SPI=20Handling=20?= =?UTF-8?q?=E2=80=93=20IPsec-v3=20Compliance=20Concern?=
+Date: Mon, 9 Jun 2025 12:20:14 +0530
+Message-ID: <20250609065014.381215-1-saakashkumar@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250609043225.77229-1-byungchul@sk.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHe/Ze9joaPK2sJ5XKaVSWmmF1PkgJWb5BRiAU1Qdd+dJGOmPe
-	g0Jz3cxLmVHOSRNR5wUWS+fsIjbFaQWJZcxqTbQrmF00M9f1VSK//fifP79zPhyOUpxl/DiN
-	Nl3QaVXJSlZGyz7Mrwol+h3q9QMjwWC0NLHQOJUNdUN2BowNNgQT359LYbzLyUJ11SQFxkd6
-	Gr5apil43T0sBU/tGxrunG2lYLikh4UivZeCU3azBPpsxQyUTddQ0Jo7JIXHt4wsvGz6zcAb
-	RxENvYZ6GjzF0dBtWgyTD0YRdFlaJTBZWMnC5X4TCyN6D4L+zmEaKvKKEVjaXQx4p4xsdCDf
-	XD8o4dsMbilvsmbwN80hfIGrn+KtDedZ3vqlVMq/eHqH5XuueWm+zT4u4Yvyx1j+8+tnNP+x
-	fYDlLc0DNP/Q1CXlx63L9uADsqgkIVmTKejCtyTK1IXvs465IftTnwvlItu6AuTDERxJ8r7Z
-	6QLEzfCYOVGMaRxMci/opSKzeBVxub5TYmURDidPS/cXIBlH4R6GeK+/Y8TOQryVfHsxwoos
-	x0Cmhs/N5Aq8kTiemKnZfAHpLX9Fi0zhEOL69V4iOinsT+p+cSL64E1kyJUuNnxxEOmwOSXi
-	KoJrONJY3SKdvXgpuWd20RcRNsyxGuZYDf+tJkQ1IIVGm5mi0iRHhqlztJrssMOpKVb09z1q
-	T/w4aEdf+uIdCHNIOV+eeHW7WsGoMtNyUhyIcJRykRx7tqkV8iRVznFBl5qgy0gW0hzIn6OV
-	S+QbJrOSFPiIKl04KgjHBN2/qYTz8ctF6QGlg7dj78e9jVCXBI5ORDy37Yw57RfUUtHvDZ+4
-	cslfNc/XufddXKpzpU+o32lNfka3M253QLawb2ns9q4blp8ng5/EX86PzHM3Ra6+uX9VeVne
-	3tKY1KrprOUr1nzV6HZpy4OjDhV3dB5KoKrjK6vbzO6GXQMta71h6tuNdzefCVHSaWpVRAil
-	S1P9AUtQ+nQaAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+e+cnZ2NVsdpeVCUmIUhpUkqLxUmWfbvghR9EPuiwx3bUKds
-	aloUcw4sL8tLUK1ZC8lMhYXKNBGLJakZaZo17zIvVMTMvGTOrFZEfvvxvL/n+fTShOQT6UMr
-	VZmcWiVLlVIiUhR7IH8Pq49R7H3j3AomSz0FdSs58HCyhQ+mWiuCxe8jAljo6KSg6v4yAaZe
-	PQlLllUCZl44BDBRPUtCW0EzAY7rXRSU6F0E6FpqePC8spsPfVYDH26sPiCgWTspgIFWEwXj
-	9T/5MGsrIaHb+IiECUMUvDBvg+Wezwg6LM08WC6upKCi30zBlH4CQf9zBwl38gwILO12PrhW
-	TFSUFDc9GuLhJ8YxATY3ZOHGmiBcaO8ncEPtNQo3fC0X4NF3bRTuuuUi8ZOWBR4uyXdSeH5m
-	mMRz7YMUrvrwhYctTYMkfmXuEJz2OCc6KOdSldmcOiQyUaQo/nghYwxyvvTZkRZZdxcimmaZ
-	MNZZk1iIhDTJ7GC1RXqBmykmkLXbvxNuxYsJYd+VxxciEU0wXXzWde8D3+14MofYb6NTlJvF
-	DLArjqt/cgkTztre1hB/cw+2+/Y06WaCCWLt6x957k2C8WUfrtNuFDIR7KQ9021sZQLYZ9ZO
-	XikSGzeUjRvKxv9lMyJqkZdSlZ0mU6aGB2tSFLkqZU5wUnpaA/r9AdWX18pa0OLAMRtiaCTd
-	JE68eVQh4cuyNblpNsTShNRLzExEKyRiuSz3IqdOT1BnpXIaG/KlSam3+EQclyhhzssyuRSO
-	y+DU/648WuijRa9HRure9yaMr0syjogbQ3WXsuYqJKLeIkMrlyc8c9buRCfvls31aK78CJ8O
-	wIFRxqTY42ve8dEHns5fEE0l7wzzK981eco2NLw/ZrB9+0t/v8g1w3CIv+vwvuqheXnBZt0W
-	7cLSY12Sp6M1IPmeMq7pk0VdSmXvr4rwkMpVjZelpEYhCw0i1BrZL1SNyB39AgAA
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authority-Analysis: v=2.4 cv=f+pIBPyM c=1 sm=1 tr=0 ts=6846842d cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=5KLPUuaC_9wA:10 a=M5GUcnROAAAA:8 a=zGm2w0v4Y8SJgk1fLE4A:9 a=QEXdDO2ut3YA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: yssy3skGLSBR2NAHbne30mFFCmxM5ahE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA5MDA1MyBTYWx0ZWRfX/W/1ot4BCzus cUQxYcoilNt34WynvvJAZ2o7btBvhVYj0J8zjX8a5V/yWdYec0DRItn8U04Rv/zrsd4z9L1afbz FsxVBSw19mgc90q0J8B+9czxR3nbApkyIqtQkFRP9Ck6P0CtbZv2XFP+V9Ura7iPuXAbjG/x9qm
+ c1jg2kdHBJUTKXmayF8H2Azh9Wy0aD3RUFtiYttae7Lx9bsExQQeQ8u9CX+Nqrd5v7gpTRWV6gL 0HGozbOMJ5IweyN7j+JVBrCYct/QF6Jp4vKRxjlZfkwd6myoXjfJ0u3ok3kABtq9kueNMN3eV8P WNnwuJcTbc8yZtFM/AH9j1q2BULdZhK1ficUD9prXQ14zNpcBavFXV4zUI+tZqULlBcELp53lVm
+ nlkVei3pdpRV/bUag50t9h8AETTyw+kDv+2yktzAagHYsg3sIA3OFA2PLNVZYwqiLpz4pJcB
+X-Proofpoint-GUID: yssy3skGLSBR2NAHbne30mFFCmxM5ahE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-09_02,2025-06-05_01,2025-03-28_01
 
-On Mon, Jun 09, 2025 at 01:32:16PM +0900, Byungchul Park wrote:
-> Hi all,
+        The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
+        Netlink message, which triggers the kernel function xfrm_alloc_spi().
+        This function is expected to ensure uniqueness of the Security Parameter
+        Index (SPI) for inbound Security Associations (SAs). However, it can
+        return success even when the requested SPI is already in use, leading
+        to duplicate SPIs assigned to multiple inbound SAs, differentiated
+        only by their destination addresses.
 
-I'm so sorry.. I missed to add v5 into the prefix..
+        This behavior causes inconsistencies during SPI lookups for inbound packets.
+        Since the lookup may return an arbitrary SA among those with the same SPI,
+        packet processing can fail, resulting in packet drops.
 
-	Byungchul
+        According to RFC 6071, in IPsec-v3, a unicast SA is uniquely identified
+        by the SPI alone. Therefore, relying on additional fields
+        (such as destination addresses, proto) to disambiguate SPIs contradicts
+        the RFC and undermines protocol correctness.
 
-> In this version, I'm posting non-controversial patches first.  I will
-> post the rest more carefully later.  In this version, no update has been
-> applied except excluding some patches from the previous version.  See
-> the changes below.
-> 
-> --8<---
-> The MM subsystem is trying to reduce struct page to a single pointer.
-> The first step towards that is splitting struct page by its individual
-> users, as has already been done with folio and slab.  This patchset does
-> that for netmem which is used for page pools.
-> 
-> Matthew Wilcox tried and stopped the same work, you can see in:
-> 
->    https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infradead.org/
-> 
-> Mina Almasry already has done a lot fo prerequisite works by luck.  I
-> stacked my patches on the top of his work e.i. netmem.
-> 
-> I focused on removing the page pool members in struct page this time,
-> not moving the allocation code of page pool from net to mm.  It can be
-> done later if needed.
-> 
-> The final patch removing the page pool fields will be submitted once
-> all the converting work of page to netmem are done:
-> 
->    1. converting of libeth_fqe by Tony Nguyen.
->    2. converting of mlx5 by Tariq Toukan.
->    3. converting of prueth_swdata (on me).
->    4. converting of freescale driver (on me).
-> 
-> For our discussion, I'm sharing what the final patch looks like the
-> following.
-> 
-> 	Byungchul
-> --8<--
-> commit 1847d9890f798456b21ccb27aac7545303048492
-> Author: Byungchul Park <byungchul@sk.com>
-> Date:   Wed May 28 20:44:55 2025 +0900
-> 
->     mm, netmem: remove the page pool members in struct page
->     
->     Now that all the users of the page pool members in struct page have been
->     gone, the members can be removed from struct page.
->     
->     However, since struct netmem_desc still uses the space in struct page,
->     the important offsets should be checked properly, until struct
->     netmem_desc has its own instance from slab.
->     
->     Remove the page pool members in struct page and modify static checkers
->     for the offsets.
->     
->     Signed-off-by: Byungchul Park <byungchul@sk.com>
-> 
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 32ba5126e221..db2fe0d0ebbf 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -120,17 +120,6 @@ struct page {
->  			 */
->  			unsigned long private;
->  		};
-> -		struct {	/* page_pool used by netstack */
-> -			/**
-> -			 * @pp_magic: magic value to avoid recycling non
-> -			 * page_pool allocated pages.
-> -			 */
-> -			unsigned long pp_magic;
-> -			struct page_pool *pp;
-> -			unsigned long _pp_mapping_pad;
-> -			unsigned long dma_addr;
-> -			atomic_long_t pp_ref_count;
-> -		};
->  		struct {	/* Tail pages of compound page */
->  			unsigned long compound_head;	/* Bit zero is set */
->  		};
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> index 8f354ae7d5c3..3414f184d018 100644
-> --- a/include/net/netmem.h
-> +++ b/include/net/netmem.h
-> @@ -42,11 +42,8 @@ struct netmem_desc {
->  	static_assert(offsetof(struct page, pg) == \
->  		      offsetof(struct netmem_desc, desc))
->  NETMEM_DESC_ASSERT_OFFSET(flags, _flags);
-> -NETMEM_DESC_ASSERT_OFFSET(pp_magic, pp_magic);
-> -NETMEM_DESC_ASSERT_OFFSET(pp, pp);
-> -NETMEM_DESC_ASSERT_OFFSET(_pp_mapping_pad, _pp_mapping_pad);
-> -NETMEM_DESC_ASSERT_OFFSET(dma_addr, dma_addr);
-> -NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-> +NETMEM_DESC_ASSERT_OFFSET(lru, pp_magic);
-> +NETMEM_DESC_ASSERT_OFFSET(mapping, _pp_mapping_pad);
->  #undef NETMEM_DESC_ASSERT_OFFSET
->  
->  /*
-> ---
-> Changes from v4:
-> 	1. Add given 'Reviewed-by's, thanks to all.
-> 	2. Exclude potentially controversial patches.
-> 
-> Changes from v3:
-> 	1. Relocates ->owner and ->type of net_iov out of netmem_desc
-> 	   and make them be net_iov specific.
-> 	2. Remove __force when casting struct page to struct netmem_desc.
-> 
-> Changes from v2:
-> 	1. Introduce a netmem API, virt_to_head_netmem(), and use it
-> 	   when it's needed.
-> 	2. Introduce struct netmem_desc as a new struct and union'ed
-> 	   with the existing fields in struct net_iov.
-> 	3. Make page_pool_page_is_pp() access ->pp_magic through struct
-> 	   netmem_desc instead of struct page.
-> 	4. Move netmem alloc APIs from include/net/netmem.h to
-> 	   net/core/netmem_priv.h.
-> 	5. Apply trivial feedbacks, thanks to Mina, Pavel, and Toke.
-> 	6. Add given 'Reviewed-by's, thanks to Mina.
-> 
-> Changes from v1:
-> 	1. Rebase on net-next's main as of May 26.
-> 	2. Check checkpatch.pl, feedbacked by SJ Park.
-> 	3. Add converting of page to netmem in mt76.
-> 	4. Revert 'mlx5: use netmem descriptor and APIs for page pool'
-> 	   since it's on-going by Tariq Toukan.  I will wait for his
-> 	   work to be done.
-> 	5. Revert 'page_pool: use netmem APIs to access page->pp_magic
-> 	   in page_pool_page_is_pp()' since we need more discussion.
-> 	6. Revert 'mm, netmem: remove the page pool members in struct
-> 	   page' since there are some prerequisite works to remove the
-> 	   page pool fields from struct page.  I can submit this patch
-> 	   separatedly later.
-> 	7. Cancel relocating a page pool member in struct page.
-> 	8. Modify static assert for offests and size of struct
-> 	   netmem_desc.
-> 
-> Changes from rfc:
-> 	1. Rebase on net-next's main branch.
-> 	   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
-> 	2. Fix a build error reported by kernel test robot.
-> 	   https://lore.kernel.org/all/202505100932.uzAMBW1y-lkp@intel.com/
-> 	3. Add given 'Reviewed-by's, thanks to Mina and Ilias.
-> 	4. Do static_assert() on the size of struct netmem_desc instead
-> 	   of placing place-holder in struct page, feedbacked by
-> 	   Matthew.
-> 	5. Do struct_group_tagged(netmem_desc) on struct net_iov instead
-> 	   of wholly renaming it to strcut netmem_desc, feedbacked by
-> 	   Mina and Pavel.
-> 
-> Byungchul Park (9):
->   netmem: introduce struct netmem_desc mirroring struct page
->   page_pool: rename page_pool_return_page() to page_pool_return_netmem()
->   page_pool: rename __page_pool_release_page_dma() to
->     __page_pool_release_netmem_dma()
->   page_pool: rename __page_pool_alloc_pages_slow() to
->     __page_pool_alloc_netmems_slow()
->   netmem: use _Generic to cover const casting for page_to_netmem()
->   netmem: remove __netmem_get_pp()
->   page_pool: make page_pool_get_dma_addr() just wrap
->     page_pool_get_dma_addr_netmem()
->   netmem: introduce a netmem API, virt_to_head_netmem()
->   page_pool: access ->pp_magic through struct netmem_desc in
->     page_pool_page_is_pp()
-> 
->  include/linux/mm.h              |  12 ---
->  include/net/netmem.h            | 138 ++++++++++++++++++++++----------
->  include/net/page_pool/helpers.h |   7 +-
->  mm/page_alloc.c                 |   1 +
->  net/core/page_pool.c            |  36 ++++-----
->  5 files changed, 117 insertions(+), 77 deletions(-)
-> 
-> 
-> base-commit: 90b83efa6701656e02c86e7df2cb1765ea602d07
-> -- 
-> 2.17.1
+        Current implementation:
+        xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
+        So if two SAs have the same SPI but different destination addresses or protocols,
+        they will:
+           a. Hash into different buckets
+           b. Be stored in different linked lists (byspi + h)
+           c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
+        As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
+
+        Proposed Change:
+        xfrm_state_lookup_byspi() does a truly global search - across all states,
+        regardless of hash bucket and matches SPI for a specified family
+
+        Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
+---
+ net/xfrm/xfrm_state.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 341d79ecb5c2..4a3d6fbb3fba 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -2550,7 +2550,6 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	__be32 minspi = htonl(low);
+ 	__be32 maxspi = htonl(high);
+ 	__be32 newspi = 0;
+-	u32 mark = x->mark.v & x->mark.m;
+ 
+ 	spin_lock_bh(&x->lock);
+ 	if (x->km.state == XFRM_STATE_DEAD) {
+@@ -2565,18 +2564,12 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	err = -ENOENT;
+ 
+ 	if (minspi == maxspi) {
+-		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
+-		if (x0) {
+-			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
+-			xfrm_state_put(x0);
+-			goto unlock;
+-		}
+ 		newspi = minspi;
+ 	} else {
+ 		u32 spi = 0;
+ 		for (h = 0; h < high-low+1; h++) {
+ 			spi = get_random_u32_inclusive(low, high);
+-			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
++			x0 = xfrm_state_lookup_byspi(net, htonl(spi), x->props.family);
+ 			if (x0 == NULL) {
+ 				newspi = htonl(spi);
+ 				break;
+@@ -2587,6 +2580,14 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
+ 	if (newspi) {
+ 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
+ 		x->id.spi = newspi;
++
++		x0 = xfrm_state_lookup_byspi(net, newspi, x->props.family);
++		if (x0) {
++			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
++			xfrm_state_put(x0);
++			goto unlock;
++		}
++
+ 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
+ 		XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h,
+ 				  x->xso.type);
+-- 
+2.43.0
+
 
