@@ -1,469 +1,215 @@
-Return-Path: <netdev+bounces-195898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098DFAD2A35
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E199AD2A37
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B303516551F
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:02:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD3C41633FF
+	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7601622541D;
-	Mon,  9 Jun 2025 23:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E6C225A4F;
+	Mon,  9 Jun 2025 23:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="VsQoXdVM"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ADCMFzqU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAEA1D89E3;
-	Mon,  9 Jun 2025 23:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EC821E0AA
+	for <netdev@vger.kernel.org>; Mon,  9 Jun 2025 23:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749510154; cv=none; b=c81BYkJ88HaiDh0pjuEcup6Ef9dlAba/F4bcHhSE+sE8xObs0hsiuUmfYKT0TYBNT/WqLUzdrAgwLD3LuMo5iFS7TfxP+m1vQUl0Pb6f/y4Ooodjj2u/MevhutCPo1ggxSpBuEDSH+z7LKd+YKm+xZqEJt5c4rBjuuEsZmkauKU=
+	t=1749510243; cv=none; b=NFT4K2QrwTcMhiNM7+ieK0KIkuqtImGJ3U1AZKbwhXYcD+aUSGdJtPMVyBjbHol5NN1m97WqMUaZZ6l/jP8tEZrM5Klhs3fuESHFZMLDJ6nqSMnXJr+hzCI4UdahyH6ADX/v2fjJz8fUpRpt2AjrKdppuQVjqwAzDFJGH9hCZvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749510154; c=relaxed/simple;
-	bh=3jQ2/BwlzDQVu+hIFV83ttrxI9vBK/ZalDlfs2CF0kg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eBiheqBSIEuLByVF2DG2WkCIyFDJXYYlWYb7ge31kt8mTf9d6rzDMTlvMyZ6phUUZTnbzhfrlZXrKBOIVCvUreY8B0l2yYtyTMBEYiPhtJpChCGRi8ucNYoYOZpgJjPQVXQoCbROx3fcF/WYVInsOuFBpcPcrqgggxiAnK1OLJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=VsQoXdVM; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9774810397298;
-	Tue, 10 Jun 2025 01:02:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1749510142; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=M1pM0ueTeYF/X9+4fPTVBqoLksdbZ+Cyw0VfJldze0Q=;
-	b=VsQoXdVMiWDNJ9TDQVksppIyT+as0Yv8kWI56ovGxk0wzhwz2mRrO1wXyNJgbURMy+9XLA
-	rthdr+ydytgMKODaaqewotKNqi9OGAHLDGND7m5q6XbRZVdPsSbBGtRV7keLxuwHfPnCVx
-	AarmxHJz+2HfaGPM3tixhVj8/ejakCDSHtx0hg66/viTP0F+hu4YEhlEtcUzYJLZNyHdI2
-	WJK8/YMqScXIC++tGBuh4XXi7G8XqOOoSmq0pPuD4fs0qjAqnXlv9Qnpl/m7N2wSvKOwoY
-	yGac2wLyWvb/ZUaWlrKZZLWZSyqZa/bB6fAFcNm/9lxhoqC+mJkXUTszDrZZxg==
-Date: Tue, 10 Jun 2025 01:02:16 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v12 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250610010216.7331ebb5@wsk>
-In-Reply-To: <0df20c3e-bd51-415f-bfdf-f88bbd39f260@redhat.com>
-References: <20250522075455.1723560-1-lukma@denx.de>
-	<20250522075455.1723560-5-lukma@denx.de>
-	<f738d1ed-7ade-4a37-b8fd-25178f7c1dee@redhat.com>
-	<20250528125329.084ab649@wsk>
-	<0df20c3e-bd51-415f-bfdf-f88bbd39f260@redhat.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1749510243; c=relaxed/simple;
+	bh=tkkIZNr65LWsxwdURqmTje7EhYRpALq/aQlIKmUidJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TzrGp3iUbGSN2ZU5vpTWfKu6MKScFWdJmzyNbZnmR48TnRcFus80VEpCQSkKFZfmXOFuy6qZX0ywBX+e32ZGP3srM0xe2T/w5Xpa9ognv7K454Gq5jaw/IHHJkd1XfNeJNLry+h4XkXh962jM2iq8NFHF30l9U/a8H4U0gnlCE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ADCMFzqU; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60179d8e65fso4011100a12.0
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 16:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1749510240; x=1750115040; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IwfHQri8pp29e7WFlO9ldRHFDXlcbjRxh+UPJ7dEfDs=;
+        b=ADCMFzqU4BZ4QmZFQf26m+WNJeCyUCOPevNFocFfVeGoHCvveWNrcwvdIZmlaWdoKS
+         5gTadvMjNMxZhAW56JLDK5S5dcLmaPgueOOhbmtuUIyw1zF1umhW2a6g5oh0SuBWRJNI
+         +u0E3HK2Er1ZhKc6+OAolkMYXxG4y8rlBHaNM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749510240; x=1750115040;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IwfHQri8pp29e7WFlO9ldRHFDXlcbjRxh+UPJ7dEfDs=;
+        b=Y+RKQWq0p+jKfPXz4Phi+pKLTsgY5ZD9Rm3hvqrgzcVBqEKnsOVbVHyiRxErIeSnoo
+         MLRLZWKFRoOZTaudz2kWJRFS/tJ4R81/579A1w4rWcZ0jwCIcfOTmHjpu7YFmQFfKwE/
+         UZh90KPp3cMal6fAib+yCx/FoSkuOq2xHP0U8uditexmefOBC/TUhJgpkq6BrT1BmYzj
+         Z1UWFVyIve9VrSR6aNxDE4cX7uUxj43puUPOg3Odxs9DdJJZJTVRIbrU8DM5bFBTzc0x
+         M2qx8B06D9YubjJYlN7Rn4H45y/JiPi+j4NZ0/SA6Nu3m7B6mYTFVJCrEGOXYK5M2Jo1
+         jO1w==
+X-Forwarded-Encrypted: i=1; AJvYcCXRaXF7rMXJr8dkRWAT+2R9T58X3jOivyJtUB9wHAyFkkGVXgksA3LWb6ptYoaAfh22HrjMrCc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9rgMEdFL3tgUiDEBtmCyuAJybIrRuNuSrp6aO+f1mSGEfe7HS
+	sLVVZAkcs6Dwitve+AaGxepQww1zahFwv6ZJULR4utf5S/mUUIbO974/yxRxAN+APNsQNN1ZkxM
+	M3yTO5cCZiKr/5cgXUQQNdlGM6YEYiJCfNbwvud4x
+X-Gm-Gg: ASbGnctIqEvKR11lXqnJh38WG1ZTJCD//O8m4cj8gksmZoPQImknjkRZFGHPpRUwWVA
+	nQ6syoaMwfohwYNQjezsMN/1plJtu16mbFfmyziTEki/8cNWXU/XWdFFgGeXmV78UBdX5M27/7+
+	6uvMb/3Q9ZGj/SR7OUn5y4unWs8xxcW5U/L+J8XSRIYJpJ
+X-Google-Smtp-Source: AGHT+IG8ZIEq+oYHfO4jfUeUw1YirBadtHVF9dVKc90niDaz3HPHGf+5gKFouB2iRhqgS16hfuSkNoEJlA+WzpnrBbQ=
+X-Received: by 2002:a17:907:7206:b0:ad5:d597:561e with SMTP id
+ a640c23a62f3a-ade7ad5b37cmr32768666b.56.1749510239968; Mon, 09 Jun 2025
+ 16:03:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/sgnmYD9Yr/9ZQSdJ73NdC6_";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20250609173442.1745856-1-kuba@kernel.org> <20250609173442.1745856-5-kuba@kernel.org>
+ <CACKFLik-ri1gkE4T8UWEwCPZMtPE6PPZXYVbnYJSM26LwQqtnw@mail.gmail.com> <20250609114424.6e57da26@kernel.org>
+In-Reply-To: <20250609114424.6e57da26@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Mon, 9 Jun 2025 16:03:48 -0700
+X-Gm-Features: AX0GCFuliz7HrMG-dBz3ab1wWpRWxakryKK508FdTf6FcCNpgVtIEFB_UQnYez0
+Message-ID: <CACKFLimwEPmYSf5ZAKxTPuhKmO_Dd9PwO2+01M8Gp-LkEWcS4Q@mail.gmail.com>
+Subject: Re: [RFC net-next 4/6] eth: bnxt: support RSS on IPv6 Flow Label
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: pavan.chebbi@broadcom.com, willemdebruijn.kernel@gmail.com, 
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000067384c06372b98fc"
 
---Sig_/sgnmYD9Yr/9ZQSdJ73NdC6_
-Content-Type: text/plain; charset=UTF-8
+--00000000000067384c06372b98fc
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+On Mon, Jun 9, 2025 at 11:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Ah, sorry, something like this?
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/=
+net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> index fd9405cadad1..4385a94d4d1e 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> @@ -1582,9 +1582,14 @@ static u64 get_ethtool_ipv4_rss(struct bnxt *bp)
+>
+>  static u64 get_ethtool_ipv6_rss(struct bnxt *bp)
+>  {
+> +       u64 rss =3D 0;
+> +
+>         if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6)
+> -               return RXH_IP_SRC | RXH_IP_DST;
+> -       return 0;
+> +               rss |=3D RXH_IP_SRC | RXH_IP_DST;
+> +       if (bp->rss_hash_cfg & VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6_FLOW_LABEL=
+)
+> +               rss |=3D RXH_IP6_FL;
+> +
+> +       return rss;
+>  }
 
-> On 5/28/25 12:53 PM, Lukasz Majewski wrote:
-> >> On 5/22/25 9:54 AM, Lukasz Majewski wrote: =20
-> >>> +/* dynamicms MAC address table learn and migration */
-> >>> +static void mtip_aging_timer(struct timer_list *t)
-> >>> +{
-> >>> +	struct switch_enet_private *fep =3D from_timer(fep, t,
-> >>> timer_aging); +
-> >>> +	fep->curr_time =3D mtip_timeincrement(fep->curr_time);
-> >>> +
-> >>> +	mod_timer(&fep->timer_aging,
-> >>> +		  jiffies +
-> >>> msecs_to_jiffies(LEARNING_AGING_INTERVAL)); +}   =20
-> >>
-> >> It's unclear to me why you need to maintain a timer just to update
-> >> a timestamp?!?
-> >> =20
-> >=20
-> > This timestamp is afterwards used in:
-> > mtip_atable_dynamicms_learn_migration(), which in turn manages the
-> > entries in switch "dynamic" table (it is one of the fields in the
-> > record.
-> >  =20
-> >> (jiffies >> msecs_to_jiffies(LEARNING_AGING_INTERVAL)) & ((1 <<
-> >> AT_DENTRY_TIMESTAMP_WIDTH) - 1)
-> >> =20
-> >=20
-> > If I understood you correctly - I shall remove the timer and then
-> > just use the above line (based on jiffies) when
-> > mtip_atable_dynamicms_learn_migration() is called (and it requires
-> > the timestamp)?
-> >=20
-> > Otherwise the mtip_timeincrement() seems like a nice wrapper on
-> > incrementing the timestamp. =20
->=20
-> Scheduling a timer to obtain a value you can have for free is not a
-> good resource usage strategy. Note that is a pending question/check
-> above: verify that the suggested expression yield the expected value
-> in all the possible use-case.
+Yes, I think this should work.
 
-This is a bit more tricky than just getting value from jiffies.
+>
+>  static int bnxt_grxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+>
+> Would someone at Broadcom be able to test (per cover letter)?
+> I'd love to have the test validated on bnxt if possible :(
 
-The current code provides a monotonic, starting from 0 time "base" for
-learning and managing entries in internal routing tables for MTIP.
+Yes, we'll get this tested in our lab.
 
-To be more specific - the fep->curr_time is a value incremented after
-each ~10ms.
+> I can post a v2 with the snippet merged in if that helps.
 
-Simple masking of jiffies would not provide such features.
+You don't need to post v2 just for this, unless you have some other
+changes you want to make.
 
-However, I've rewritten relevant portions where GENMASK() could be used
-to simplify and make the code more readable.
+--00000000000067384c06372b98fc
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
->=20
-> >>> +	if (!fep->link[0] && !fep->link[1]) {
-> >>> +		/* Link is down or autonegotiation is in
-> >>> progress. */
-> >>> +		netif_stop_queue(dev);
-> >>> +		spin_unlock_irqrestore(&fep->hw_lock, flags);
-> >>> +		return NETDEV_TX_BUSY;   =20
-> >>
-> >> Intead you should probably stop the queue when such events happen =20
-> >=20
-> > Please correct me if I'm wrong - the netif_stop_queue(dev); is
-> > called before return. Shall something different be also done? =20
->=20
-> The xmit routine should assume the link is up and the tx ring has
-> enough free slot to enqueue a packet.
-
-In the case of MTIP driver, there is a circular buffer of 16 "sets" of
-descriptors (allocated as coherent) and corresponding buffer
-(dma_map_single at start).
-
-The size of each "buffer" is set to 2048B to accommodate at least single
-packet.
-
-> After enqueueing it should
-> check for enough space availble for the next xmit and stop the queue,
-> likely using the netif_txq_maybe_stop() helper.
-
-The problem with not using the netif_txq_maybe_stop() is that I'm not
-using the "txq" (netdev_queue).
-
-With the current code it looks like netif_stop_queue() is the most
-suitable one from the network API.
-
->=20
-> Documentation/networking/driver.rst
->=20
-> >>> +	}
-> >>> +
-> >>> +	/* Clear all of the status flags */
-> >>> +	status &=3D ~BD_ENET_TX_STATS;
-> >>> +
-> >>> +	/* Set buffer length and buffer pointer */
-> >>> +	bufaddr =3D skb->data;
-> >>> +	bdp->cbd_datlen =3D skb->len;
-> >>> +
-> >>> +	/* On some FEC implementations data must be aligned on
-> >>> +	 * 4-byte boundaries. Use bounce buffers to copy data
-> >>> +	 * and get it aligned.
-> >>> +	 */
-> >>> +	if ((unsigned long)bufaddr & MTIP_ALIGNMENT) {
-> >>> +		unsigned int index;
-> >>> +
-> >>> +		index =3D bdp - fep->tx_bd_base;
-> >>> +		memcpy(fep->tx_bounce[index],
-> >>> +		       (void *)skb->data, skb->len);
-> >>> +		bufaddr =3D fep->tx_bounce[index];
-> >>> +	}
-> >>> +
-> >>> +	if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
-> >>> +		swap_buffer(bufaddr, skb->len);   =20
-> >>
-> >> Ouch, the above will kill performances. =20
-> >=20
-> > This unfortunately must be done in such a way (the same approach is
-> > present on fec_main.c) as the IP block is implemented in such a way
-> > (explicit conversion from big endian to little endian).
-> >  =20
-> >> Also it looks like it will
-> >> access uninitialized memory if skb->len is not 4 bytes aligned.
-> >> =20
-> >=20
-> > There is a few lines above a special code to prevent from such a
-> > situation ((unsigned long)bufaddr & MTIP_ALIGNMENT). =20
->=20
-> The problem here is not with memory buffer alignment, but with the
-> packet length, that can be not a multiple of 4. In such a case the
-> last swap will do an out-of-bound read touching uninitialized data.
-
-On the init function the size of allocation for each buffer is set to
-be 2048 bytes, so there is no such a thread.
-
->=20
-> >>> +	bdp->cbd_sc =3D status;
-> >>> +
-> >>> +	netif_trans_update(dev);
-> >>> +	skb_tx_timestamp(skb);
-> >>> +
-> >>> +	/* For port separation - force sending via specified port
-> >>> */
-> >>> +	if (!fep->br_offload && port !=3D 0)
-> >>> +		mtip_forced_forward(fep, port, 1);
-> >>> +
-> >>> +	/* Trigger transmission start */
-> >>> +	writel(MCF_ESW_TDAR_X_DES_ACTIVE, fep->hwp + ESW_TDAR);
-> >>>  =20
-> >>
-> >> Possibly you should check skb->xmit_more to avoid ringing the
-> >> doorbell when not needed. =20
-> >=20
-> > I couldn't find skb->xmit_more in the current sources. Instead,
-> > there is netdev_xmit_more(). =20
->=20
-> Yeah, I referred to the old code, sorry.
->=20
-> > However, the TX code just is supposed to setup one frame
-> > transmission and hence there is no risk that we trigger "empty"
-> > transmission. =20
->=20
-> The point is that doorbell ringing is usually very expensive (slow)
-> for the H/W. And is not needed when netdev_xmit_more() is true,
-> because the another xmit operation will follow. If you care about
-> performances you should leverage such info.
-
-I do have an impression, that this is very important for network
-devices having many queues with separate priorities.
-
-In my case - I do have a single uDMA0 port with a single RX and TX
-circular buffer (16 packets can be "queued").
-
->=20
-> >  =20
-> >>> +	/* First, grab all of the stats for the incoming packet.
-> >>> +	 * These get messed up if we get called due to a busy
-> >>> condition.
-> >>> +	 */
-> >>> +	bdp =3D fep->cur_rx;
-> >>> +
-> >>> +	while (!((status =3D bdp->cbd_sc) & BD_ENET_RX_EMPTY)) {
-> >>> +		if (pkt_received >=3D budget)
-> >>> +			break;
-> >>> +
-> >>> +		pkt_received++;
-> >>> +		/* Since we have allocated space to hold a
-> >>> complete frame,
-> >>> +		 * the last indicator should be set.
-> >>> +		 */
-> >>> +		if ((status & BD_ENET_RX_LAST) =3D=3D 0)
-> >>> +			dev_warn_ratelimited(&dev->dev,
-> >>> +					     "SWITCH ENET: rcv is
-> >>> not +last\n"); +
-> >>> +		if (!fep->usage_count)
-> >>> +			goto rx_processing_done;
-> >>> +
-> >>> +		/* Check for errors. */
-> >>> +		if (status & (BD_ENET_RX_LG | BD_ENET_RX_SH |
-> >>> BD_ENET_RX_NO |
-> >>> +			      BD_ENET_RX_CR | BD_ENET_RX_OV)) {
-> >>> +			dev->stats.rx_errors++;
-> >>> +			if (status & (BD_ENET_RX_LG |
-> >>> BD_ENET_RX_SH)) {
-> >>> +				/* Frame too long or too short.
-> >>> */
-> >>> +				dev->stats.rx_length_errors++;
-> >>> +			}
-> >>> +			if (status & BD_ENET_RX_NO)	/*
-> >>> Frame alignment */
-> >>> +				dev->stats.rx_frame_errors++;
-> >>> +			if (status & BD_ENET_RX_CR)	/* CRC
-> >>> Error */
-> >>> +				dev->stats.rx_crc_errors++;
-> >>> +			if (status & BD_ENET_RX_OV)	/*
-> >>> FIFO overrun */
-> >>> +				dev->stats.rx_fifo_errors++;
-> >>> +		}
-> >>> +
-> >>> +		/* Report late collisions as a frame error.
-> >>> +		 * On this error, the BD is closed, but we don't
-> >>> know what we
-> >>> +		 * have in the buffer.  So, just drop this frame
-> >>> on the floor.
-> >>> +		 */
-> >>> +		if (status & BD_ENET_RX_CL) {
-> >>> +			dev->stats.rx_errors++;
-> >>> +			dev->stats.rx_frame_errors++;
-> >>> +			goto rx_processing_done;
-> >>> +		}
-> >>> +
-> >>> +		/* Process the incoming frame */
-> >>> +		pkt_len =3D bdp->cbd_datlen;
-> >>> +		data =3D (__u8 *)__va(bdp->cbd_bufaddr);
-> >>> +
-> >>> +		dma_unmap_single(&fep->pdev->dev,
-> >>> bdp->cbd_bufaddr,
-> >>> +				 bdp->cbd_datlen,
-> >>> DMA_FROM_DEVICE);   =20
-> >>
-> >> I have read your explaination WRT unmap/map. Actually you don't
-> >> need to do any mapping here,  =20
-> >=20
-> > There are 16 cbd_t descriptors allocated (as dma_alloc_coherent).
-> > Those descriptors contain pointer to data (being read in this
-> > case). =20
->=20
-> I'm referring to the actual packet payload, that is the buffer at
-> bdp-cbd_bufaddr with len bdp->cbd_datlen; I'm not discussing the
-> descriptors contents.
-
-+1
-
->=20
-> > Hence the need to perform dma_map_single() for each descriptor,  =20
->=20
-> You are not unmapping the descriptor, you are unmapping the packet
-> payload.
-
-+1
-
->=20
-> >> since you are unconditionally copying the
-> >> whole buffer (why???) =20
-> >=20
-> > Only the value of=20
-> > pkt_len =3D bdp->cbd_datlen; is copied to SKB (after byte
-> > swap_buffer()). =20
->=20
-> The relevant line is:
->=20
-> 		skb_copy_to_linear_data(skb, data, pkt_len);
->=20
-> AFAICS that copies whole packet contents, which is usually quite
-> sub-optimal from performance PoV.
->=20
-
-fec_main.c just assigns:
-data=C2=B7=3D=C2=B7skb->data;
-
-so I would prefer to keep the:
-skb_copy_to_linear_data(skb, data, pkt_len);
-
-> >> and re-using it.
-> >>
-> >> Still you need a dma_sync_single() to ensure the CPUs see the
-> >> correct data. =20
-> >=20
-> > The descriptors - i.e. struct cbd_t fields are allocated with
-> > dma_alloc_coherent(), so this is OK. =20
->=20
-> I'm talking about packets contents, not packet descriptors. Please
-> re-read the above and have a look at other drivers code.
-
-The usage of dma_sync_single_for_cpu() works without issues in the
-mtip_switch_rx().
-
->=20
-> An additional point that I missed in the previous review is that the
-> rx allocation schema is quite uncorrect. At ring initialization time
-> you allocate full skbs, while what you need and use is just raw
-> buffers for the packet payload. Instead you could/should use the page
-> pool:
->=20
-> Documentation/networking/page_pool.rst
->=20
-
-Yes, for RX packets payload the page of 2048 bytes is allocated. By
-using dma page pool - I can state the same maximal size, but the usage
-of memory can be much more flexible.
-
-> That will also help doing the right thing WRT DMA handling.
->=20
-
-The dma_sync_single_for_cpu() shall work correctly with the current
-approach as well.
-
-> >> This patch is really too big, I'm pretty sure I missed some
-> >> relevant issues. You should split it in multiple ones: i.e.
-> >> initialization and h/w access, rx/tx, others ndos. =20
-> >=20
-> > It is quite hard to "scatter" this patch as:
-> >=20
-> > 1. I've already split it to several files (which correspond to
-> > different "logical" entities - like mtipl2sw_br.c).
-> > 2. The mtipl2sw.c file is the smallest part of the "core" of the
-> > driver.
-> > 3. If I split it, then at some point I would break bisectability for
-> > imx28. =20
->=20
-> Note that each patch don't need to provide complete functionality.
-> i.e. patch 1 could implement ndo_open()/close and related helper,
-> leaving ndo_start_xmit() and napi_poll empty and avoid allocating the
-> rx buffers. patch 2 could implement the rx patch, patch 3 the tx path.
->=20
-
-Yes, this seems to be a good idea... I will implement such approach.
-
-> The only constraint is that each patch will build successufully, which
-> is usually easy to achieve.
-
-+1
-
->=20
-> A 2K lines patches will probably lead to many more iterations and
-> unhappy (or no) reviewers.
-
-The problem is that all the patches "around" this driver (like *yaml,
-bindings, defconfig) would get outdated very fast if not pull to
-mainline.
-
-In such a way that already done work would need to be redo...
-
->=20
-> /P
->=20
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/sgnmYD9Yr/9ZQSdJ73NdC6_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhHZ/gACgkQAR8vZIA0
-zr35NAf7BsWyM4PkwH9k8LanL+CVfhF1A32/dAugkR1hlODpkay0KHkoIXvmUt2a
-+/0jcZiNrVmndySoOy+U6BCQsN6+qh34jg0Pn68gb1++WsLq473e8jldjZcyK35T
-4ke3yvNRDViSgjwIyM9qeoZvIXUrWr7sEWR5wxHPDhRacYRU4vbra4F/ONnrh43A
-e71Np4aSgTadeoPKMe9mkYHft5sE0PRU4Mm0jK6f3ubT4F5Hz086z/LKNmjfSz9F
-YLVkbQXJGUQlB4DJhwdYXc4R1cqCj5cuCBHyLIwbusHDrDaT4TJFinzoOLr3weCq
-q9bXC3suqEgacBcHzqSrZF8cXvjhjQ==
-=FVxJ
------END PGP SIGNATURE-----
-
---Sig_/sgnmYD9Yr/9ZQSdJ73NdC6_--
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEICPc775j2qHPGsRAjGbZB6QNzRds0L3R
+jB3KRCJ7JpcnMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYw
+OTIzMDQwMFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBALAShJ+pCE+56krh5cU172golEsO5e6SXL/7CnhlNCWWHNxkUCM/u22W3QNVeJso7AIk
+U7VrUd/kxB5hswkryNgxtDmJ2xqqSaT+WVpNLFwEhku4gk4Opw/6IrFOgBg/oMhwFXVIfgj6cViK
+/gAqLgqhAW1vO6xQcid/Pu4E9PmE/jlZIz++d6e14JWwHUWLTRZrFjINlg8VlOQxE4r6jjldbwfp
+D+4fQO5NiuFflY30/Le806IdvZZMMzZoaik7lRtIJy8V/uYJoQbQ+5h+ZG6CL+AF7p61NK7htmgB
+ZW5IbmJWDQbtb2hO+cq2+2rKRPn1fK1EDbRE8zAZJYIHIL4=
+--00000000000067384c06372b98fc--
 
