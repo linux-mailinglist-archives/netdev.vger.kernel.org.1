@@ -1,191 +1,193 @@
-Return-Path: <netdev+bounces-196393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60648AD471A
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 01:55:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA1EAD46D4
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 01:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CB83A6677
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:54:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD0DE17C1A4
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2903E26E705;
-	Tue, 10 Jun 2025 23:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE8F260593;
+	Tue, 10 Jun 2025 23:36:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="nkq5m1U3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aglHgGzC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FD52D5401
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 23:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856EC22B8A5;
+	Tue, 10 Jun 2025 23:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749599705; cv=none; b=hFSk0CUI2KGoX4GPxxXOJ8zPshaHXaTp20a1V6LQmLXA86H3/YH4UyTUYtYfYhXp+ewh577QStx1W/oRetdlMv3gFwFqEUvu4qK7PtNtPe+e29GPJydVJp4Ic4hP8Bpx0kksFieSmG1AvxkLC5IkTUHpXkID1TzPo29UvIFvFMw=
+	t=1749598611; cv=none; b=XxgW9j/rzU5JK0YrpOI+L53Sc16TUywBvUxlX+T5sqG6WYUYk65BwJTySgI6jpkhdpkJjyuIZz0QRPcJXZPY6L3/1jemymS/IlrjMMwNCestk5+6eBTy+A+rq2BslPVcnGJfUUFCPP5Nm2R4RGAZFREgDC4pAO4UpteEzNX8m6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749599705; c=relaxed/simple;
-	bh=jM17vFW3kW+WET6Ch4H8YCZ0fSNhcbjdrwSf4X+6vCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G/VJYtd4ltyBbEltlpXFcmAqdVDeOHjag9OhsrzS8gpaXGlW8VkGFq2cjdKItW3hkAUbMztYLl59PJ2GRGqoQ3S6s64ng6IK0XlovWedTQspClUcjmZqOuRBXdqW9Wu+IJQt7KSr2h02UITsHCFC/lpO2UgHzCQx4G11yLl9+OQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=nkq5m1U3; arc=none smtp.client-ip=67.231.149.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
-Received: from pps.filterd (m0050095.ppops.net [127.0.0.1])
-	by m0050095.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 55AMnvJR021918;
-	Wed, 11 Jun 2025 00:36:03 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=jan2016.eng;
-	 bh=cvvvyRD8r4TxcqfxWlv0dsqPHQyAxa1aFFuQB6ytzFQ=; b=nkq5m1U3jeMU
-	8i8EeHzW0r/82av6ABEJ/vEE/S3Ir9LS7B1fApwiiHIdRF8qIR6YYBXHheEgfAIT
-	RjvetYUifWxmFEUzVL1LuHAJstnvGTPgLoTMbDnmsxausGaQ26n1qSnSttlJmdqt
-	jjfgtiCoYAfAbO+iBdgem6nvSG1JP5XMy4YsgaqZ+nhEPxe1A+HpcoeXIdYfda7E
-	IWn4kFSttyyuB50u8mFN+FOtFJ8X5X+2QCzBLISApVslZulsS0LejZLJs0N5NW/3
-	xRfn9hf8Qglzq2KlmH3DmPnTxNTF9N3qJzsda+R66o+MA7oMHJLNh/+kzW4MMOcU
-	9W7Z/gocjQ==
-Received: from prod-mail-ppoint1 (prod-mail-ppoint1.akamai.com [184.51.33.18] (may be forged))
-	by m0050095.ppops.net-00190b01. (PPS) with ESMTPS id 475h7m97re-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Jun 2025 00:36:02 +0100 (BST)
-Received: from pps.filterd (prod-mail-ppoint1.akamai.com [127.0.0.1])
-	by prod-mail-ppoint1.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 55AHwnA8009315;
-	Tue, 10 Jun 2025 19:36:01 -0400
-Received: from prod-mail-relay19.dfw02.corp.akamai.com ([172.27.165.173])
-	by prod-mail-ppoint1.akamai.com (PPS) with ESMTP id 474gs8xj5t-1;
-	Tue, 10 Jun 2025 19:36:01 -0400
-Received: from [172.19.0.43] (unknown [172.19.0.43])
-	by prod-mail-relay19.dfw02.corp.akamai.com (Postfix) with ESMTP id 9230B63629;
-	Tue, 10 Jun 2025 23:36:00 +0000 (GMT)
-Message-ID: <f7c398f4-ea06-495c-b310-cae3c731cb4b@akamai.com>
-Date: Tue, 10 Jun 2025 19:36:00 -0400
+	s=arc-20240116; t=1749598611; c=relaxed/simple;
+	bh=kHWkJ5vN0DqrRwCNkI0qEg4WQoKQyw847+HTGAu+Rh4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=rv8I0tJm0eSADaDcYMv50l6sy0V2E91akq6yOT2fZjlv9PDKeL5kylnVSoJxmmFhikDGskIO6uq0ljscPp7t8Dv1ZybNHZCc3l/m5np0verC15ncVd9neE2EotB0zzFJlkCjzH6UAx2MC/AM6WOTwP5R1cOdbpFy24FWOD2F4AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aglHgGzC; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749598607;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0f+zwSuLYCy9Dl25vZBID+NIwmd7txRnqScklh0bo+U=;
+	b=aglHgGzCED5YbwANTCrT3tsgpVZNJZLZk3IIxRjAQcrLXyQkewF4zTxZpf++vgJJmw+lj9
+	RkI3D/RpVro4SBVQcO1r9UQEWYZfM35g4kMfXYWUc2IaJJ/P6sNLx9UrJsteamocLxfu9C
+	h6QOUNeBj77IGnKdJGLieJTsxtupPBI=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Simon Horman <horms@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Lei Wei <quic_leiwei@quicinc.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>
+Subject: [net-next PATCH v6 09/10] net: macb: Support external PCSs
+Date: Tue, 10 Jun 2025 19:36:42 -0400
+Message-Id: <20250610233642.3588414-1-sean.anderson@linux.dev>
+In-Reply-To: <20250610233134.3588011-1-sean.anderson@linux.dev>
+References: <20250610233134.3588011-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] netlink: Fix wraparounds of sk->sk_rmem_alloc
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com
-References: <20250609161244.3591029-1-jbaron@akamai.com>
- <20250610160946.10b5fb7d@kernel.org>
-Content-Language: en-US
-From: Jason Baron <jbaron@akamai.com>
-In-Reply-To: <20250610160946.10b5fb7d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-10_11,2025-06-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 suspectscore=0
- spamscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506100195
-X-Proofpoint-ORIG-GUID: raqfYNMOkTi5ieM6bQ3ncjzWwkC02L54
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEwMDE5NSBTYWx0ZWRfX5wvPHjuc991E
- 5BZnp4G2tXWbSCBNjApNU33AcEB/cFethtb9mSPsEoTIVUJl5gkG8+PGBFldZV4steTnLxyKZTF
- hO+nTblCAQSzUnHmE1GosA/vNV7JqhH16Z/r7szlWSHqlPpQbBGmWLg1Z9tcM5jOvBtwDhe7oHx
- Ssk9xBRMieY+T9qwGEZnZjYcyzq4i0OQSWZOej2WFCUs1G4HQKMCaIZlW9mPjSgGQiQ1AQiWsXS
- XsYm4mI6h5FfN7BSbToL24ugvNNeBfaxXgWmoD16n6znUxqQhsRUyCFqkUBCHb+OsYnaMu2J7CX
- dCvCXw+U+zcYvsCpWlgd9zT88L4ItNzUv7jcg1kHFJuPllR9RC3lZKMbZr25zS8KR44v+URPv7b
- fwoLv3BBquXcG6gw+oBnAQjlJKFmevrnVXIb7+Ir0w4habZYJD1sQPUtWmG+NuFvidEpirPi
-X-Authority-Analysis: v=2.4 cv=bt9MBFai c=1 sm=1 tr=0 ts=6848c162 cx=c_pps
- a=StLZT/nZ0R8Xs+spdojYmg==:117 a=StLZT/nZ0R8Xs+spdojYmg==:17
- a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=Sl0ZkJ6P1igRQq4LizkA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: raqfYNMOkTi5ieM6bQ3ncjzWwkC02L54
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-10_11,2025-06-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 spamscore=0 mlxscore=0 bulkscore=0 mlxlogscore=848
- impostorscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0 adultscore=0
- suspectscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506100195
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+This adds support for external PCSs. For example, the Xilinx UltraScale+
+processor exposes its GMII interface to the FPGA fabric. This fabric may
+implement PCS to convert GMII to a serial interface such as SGMII or
+1000BASE-X. When present, the external PCS takes precedence over the
+internal PCSs.
 
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+---
 
-On 6/10/25 7:09 PM, Jakub Kicinski wrote:
-> !-------------------------------------------------------------------|
->    This Message Is From an External Sender
->    This message came from outside your organization.
-> |-------------------------------------------------------------------!
-> 
-> On Mon,  9 Jun 2025 12:12:44 -0400 Jason Baron wrote:
->> As noted in that fix, if there are multiple threads writing to a
->> netlink socket it's possible to slightly exceed rcvbuf value. But as
->> noted this avoids an expensive 'atomic_add_return()' for the common
->> case. I've confirmed that with the fix the modified program from
->> SOCK_DIAG(7) can no longer fill memory and the sk->sk_rcvbuf limit
->> is enforced.
-> 
-> Looks good in general, could you add a Fixes tag?
+(no changes since v4)
 
-Sure I can add this for v2.
+Changes in v4:
+- Convert to dev-less pcs_put
 
-> A few coding style nit picks..
-> 
->> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
->> index e8972a857e51..607e5d72de39 100644
->> --- a/net/netlink/af_netlink.c
->> +++ b/net/netlink/af_netlink.c
->> @@ -1213,11 +1213,15 @@ int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
->>   		      long *timeo, struct sock *ssk)
->>   {
->>   	struct netlink_sock *nlk;
->> +	unsigned int rmem, rcvbuf, size;
-> 
-> Please try to short variable declaration lines longest to shortest
-> 
+Changes in v2:
+- Move update to macb_pcs_get_state to previous patch
 
-ok sure, will fix for v2.
+ drivers/net/ethernet/cadence/macb.h      |  1 +
+ drivers/net/ethernet/cadence/macb_main.c | 26 ++++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 2 deletions(-)
 
->>   	nlk = nlk_sk(sk);
->> +	rmem = atomic_read(&sk->sk_rmem_alloc);
->> +	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
->> +	size = skb->truesize;
-> 
-> I don't see a reason to store skb->truesize to a temp variable, is
-> there one?
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index c9a5c8beb2fa..9d310814f052 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1291,6 +1291,7 @@ struct macb {
+ 	struct phylink_config	phylink_config;
+ 	struct phylink_pcs	phylink_usx_pcs;
+ 	struct phylink_pcs	phylink_sgmii_pcs;
++	struct phylink_pcs	*phylink_ext_pcs;
+ 
+ 	u32			caps;
+ 	unsigned int		dma_burst_length;
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 78433d8f3746..cf7034c92672 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -21,6 +21,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+ #include <linux/dma-mapping.h>
++#include <linux/pcs.h>
+ #include <linux/platform_device.h>
+ #include <linux/phylink.h>
+ #include <linux/of.h>
+@@ -707,7 +708,10 @@ static struct phylink_pcs *macb_mac_select_pcs(struct phylink_config *config,
+ 	struct net_device *ndev = to_net_dev(config->dev);
+ 	struct macb *bp = netdev_priv(ndev);
+ 
+-	if (interface == PHY_INTERFACE_MODE_10GBASER)
++	if (bp->phylink_ext_pcs &&
++	    test_bit(interface, bp->phylink_ext_pcs->supported_interfaces))
++		return bp->phylink_ext_pcs;
++	else if (interface == PHY_INTERFACE_MODE_10GBASER)
+ 		return &bp->phylink_usx_pcs;
+ 	else if (interface == PHY_INTERFACE_MODE_SGMII)
+ 		return &bp->phylink_sgmii_pcs;
+@@ -733,7 +737,10 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
+ 		if (state->interface == PHY_INTERFACE_MODE_RMII)
+ 			ctrl |= MACB_BIT(RM9200_RMII);
+ 	} else if (macb_is_gem(bp)) {
+-		if (macb_mac_select_pcs(config, state->interface))
++		struct phylink_pcs *pcs = macb_mac_select_pcs(config,
++							      state->interface);
++
++		if (pcs && pcs != bp->phylink_ext_pcs)
+ 			ctrl |= GEM_BIT(PCSSEL);
+ 		else
+ 			ctrl &= ~GEM_BIT(PCSSEL);
+@@ -907,6 +914,14 @@ static int macb_mii_probe(struct net_device *dev)
+ 	bp->phylink_sgmii_pcs.ops = &macb_phylink_pcs_ops;
+ 	bp->phylink_usx_pcs.ops = &macb_phylink_usx_pcs_ops;
+ 
++	bp->phylink_ext_pcs = pcs_get_by_fwnode_optional(&bp->pdev->dev,
++							 bp->pdev->dev.fwnode,
++							 NULL);
++	if (IS_ERR(bp->phylink_ext_pcs))
++		return dev_err_probe(&bp->pdev->dev,
++				     PTR_ERR(bp->phylink_ext_pcs),
++				     "Could not get external PCS\n");
++
+ 	bp->phylink_config.dev = &dev->dev;
+ 	bp->phylink_config.type = PHYLINK_NETDEV;
+ 	bp->phylink_config.mac_managed_pm = true;
+@@ -924,6 +939,11 @@ static int macb_mii_probe(struct net_device *dev)
+ 	__set_bit(PHY_INTERFACE_MODE_RMII,
+ 		  bp->phylink_config.supported_interfaces);
+ 
++	if (bp->phylink_ext_pcs)
++		phy_interface_or(bp->phylink_config.supported_interfaces,
++				 bp->phylink_config.supported_interfaces,
++				 bp->phylink_ext_pcs->supported_interfaces);
++
+ 	/* Determine what modes are supported */
+ 	if (macb_is_gem(bp) && (bp->caps & MACB_CAPS_GIGABIT_MODE_AVAILABLE)) {
+ 		bp->phylink_config.mac_capabilities |= MAC_1000FD;
+@@ -950,6 +970,7 @@ static int macb_mii_probe(struct net_device *dev)
+ 	if (IS_ERR(bp->phylink)) {
+ 		netdev_err(dev, "Could not create a phylink instance (%ld)\n",
+ 			   PTR_ERR(bp->phylink));
++		pcs_put(bp->phylink_ext_pcs);
+ 		return PTR_ERR(bp->phylink);
+ 	}
+ 
+@@ -5459,6 +5480,7 @@ static void macb_remove(struct platform_device *pdev)
+ 					  bp->rx_clk, bp->tsu_clk);
+ 			pm_runtime_set_suspended(&pdev->dev);
+ 		}
++		pcs_put(bp->phylink_ext_pcs);
+ 		phylink_destroy(bp->phylink);
+ 		free_netdev(dev);
+ 	}
+-- 
+2.35.1.1320.gc452695387.dirty
 
-
-I only stored skb->truesize to 'size' in the first bit of the patch 
-where skb->truesize is not re-read and used a 2nd time. The other cases 
-I did use skb->truesize. So if you'd prefer skb->truesize twice even in 
-this first case, let me know and I can update it.
-
-> 
-> Actually rcvbuf gets re-read every time, we probably don't need a temp
-> for it either. Just rmem to shorten the lines.
-> 
->> -	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
->> -	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
->> +	if (((rmem + size) > rcvbuf) ||
-> 
-> too many brackets:
-> 
-> 	if (rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf) ||
->
-
-So the local variables function to type cast sk->sk_rmem_alloc and 
-sk->sk_rcvbuf to 'unsigned int' instead of their native type of 'int'. I 
-did that so that the comparison was all among the same types and didn't 
-have messy explicit casts to avoid potential compiler warnings. It 
-seemed more consistent with the style of the below patch I referenced in 
-the commit:
-
-5a465a0da13e ("udp: Fix multiple wraparounds of sk->sk_rmem_alloc.")
-
-
-Thanks,
-
--Jason
-
-> would be just fine.
-> 
-> Similar comments apply to other conditions.
 
