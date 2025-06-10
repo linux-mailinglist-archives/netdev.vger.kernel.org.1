@@ -1,186 +1,260 @@
-Return-Path: <netdev+bounces-195929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C3FAD2C3C
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:47:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DDBAD2C42
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:49:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 578813B01E0
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:46:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0E6918925BD
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CC81CEAC2;
-	Tue, 10 Jun 2025 03:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390C62566FD;
+	Tue, 10 Jun 2025 03:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RNMT8avU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6596825DCE5
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 03:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749527199; cv=none; b=j5XcZnJ53ra48M1Z3kjhdCGflQkkMcCCcvrOHUMlEGwptZlk0Y6rbJHXZWl57LkIQ4XrOPG6U/aDjOsmv83b8b30+D6XjrxP26aSVg6JFoFDJQbfckfpnRC2KwHtwfudt/lGZemSns4BDi/q3rEV2eLIKonk/Zn9yqiRVVhifSE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749527199; c=relaxed/simple;
-	bh=VyDvBEV3fO1OBjk1ynvl3O2WEV+B2F9EQqba8/egRPE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LYtixSJzT2EBnMdvCsPGfEdVnlJFajoy1FBAQLrnLwf6R7Dtkz7cYKrHiBgGUWD9pKMs5rrw3FcgsOhgB427sVb8dqDEayKyoIAbffy6070+KIipqNSujbtVfgvU+E4iyoJSHQg7/H9ZxcMU6oBy5EDs9qB3sMWHDZS2/vHhO+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpsz18t1749527177t5f63e611
-X-QQ-Originating-IP: ljHJWc5mYsz8c+zAitdh98wqTyP6NzWQ7V1j3ZUwtzY=
-Received: from localhost.localdomain ( [111.202.70.101])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 10 Jun 2025 11:46:11 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 13480387239181489020
-EX-QQ-RecipientCnt: 15
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Zengbing Tu <tuzengbing@didiglobal.com>
-Subject: [net-next v6 4/4] net: bonding: add tracepoint for 802.3ad
-Date: Tue, 10 Jun 2025 11:44:45 +0800
-Message-Id: <10b8f570bd59104a1c7d5ecdc9a82c6ec61d2d1c.1749525581.git.tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <cover.1749525581.git.tonghao@bamaicloud.com>
-References: <cover.1749525581.git.tonghao@bamaicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730835789D;
+	Tue, 10 Jun 2025 03:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749527356; cv=fail; b=b9ueynRB+0tigeRjkU6uwX6iyfI9o1Ns7mBYT9PRN5BiN1SWn+3P1JaWiOsa78u7T5UhMIPiNgz8EZW98B+1m+Nwx+nrEYGHa97lXUfYbfx/PTbIhTmFmnkxLnDwn/x+4u0eXFydHZH5uSdTdYrqN/iEnAdfDHWJGO/28RHbYlY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749527356; c=relaxed/simple;
+	bh=5qsQUBgj1+vLB9YSIOWdqLGVEQNOnMCWRgJpiLAD8i4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YoybxngHaaCnxDQFDXyU1vCHZQ2KVz4Km51yCPVvC9QEsvQJXJJR+xQtKlswJjngKmHG556/dxZ3utUzAIlCQJssCzAdlpGdlG60EiBkzPDNzrSzn66CMDlAVO4XNEKxd7EOIB0NDN4dfDsdjGLSoSfspFHVYO7n3YjGbpXdtbs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RNMT8avU; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749527355; x=1781063355;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5qsQUBgj1+vLB9YSIOWdqLGVEQNOnMCWRgJpiLAD8i4=;
+  b=RNMT8avUbB1yMZ5+qbuQPtKFAnCgnWVvHiDlomdylAIicSCRaZmOm8bG
+   4Rpw1gHDQC3eEuflw97fRxoa3S1BwHIGRmhWIeUGH/TumD/PAFZb7mHOG
+   76zAx8trE413Zo/vILHNeK0RDRAKw2gbCbe9e94WwrRryyz3YW2XCGzzY
+   XPkGqmRvkSQjYUS+FM2rPchfBUMkPmR09djaGMB4fbHpv9RHXf5nA2dSA
+   04PthzoL6Yutgml3Qhk+bq9755sMYl2lnzgF9rOdh6dXGnt7z8stpyj6S
+   CjBRE8XRuzbUhcHm3PCsklA/pyI3xBle9TAFqvqG3x/H4gHaR9vq1C7cH
+   g==;
+X-CSE-ConnectionGUID: p2pAiPqwSDOeFuxWvYp/XQ==
+X-CSE-MsgGUID: 5LVFNXKLTWWh5ivngDSjTg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="61889931"
+X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
+   d="scan'208";a="61889931"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 20:49:14 -0700
+X-CSE-ConnectionGUID: 3eXtqR6FRoasuUOiW5WyCA==
+X-CSE-MsgGUID: 8bvXhbQCRcGoVBlc8Oi8Ig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
+   d="scan'208";a="147216924"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 20:49:13 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 9 Jun 2025 20:49:12 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 9 Jun 2025 20:49:12 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (40.107.102.58)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Mon, 9 Jun 2025 20:49:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rgU37Lj8A0LgnpQkxgICSGH9aCeKkNKHBVpsRiz6ru+hW/8KD0Vm4veLzYZvvoKFWydOFGQMufVWuQFwfu4q+aQcOELHhK9GzCWk3TUVjcKXZuIuxt1wzMz5OcYTpuXp+B1kdfyZV1FiHU29g+GL+73XJlY3jFbGczpilwrc1m19b3lMB1D2UImPXGG+3CPSsavrs5kpyw1dBRN7//zSDw3ZMZPtfF6MoTUqBzB2Zok4EAU6K5u9RGiIM6N4WeQkoGaCicSzhqZ27za3augq2bzDnIxtXtv4XJ8xDpaMh/+FcqvLMeRBizVvGkpjS3tvsHMZeGMqN14sEGiE1v4jqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5qsQUBgj1+vLB9YSIOWdqLGVEQNOnMCWRgJpiLAD8i4=;
+ b=ZL2aSbwoTZBPj6kWTnkKu2CyiMUBn2lwye5rR0FQ5R1gHS1DfxzRBmZurIFw/WZ5zVtP2o8Phu4OEx5BDjGVER0MCaVVdFaz5I6mszAdtsHR8dj0+xD8lXL/XpeWlXB0SfQBnt275Z+T3mYXoVIMG+jxOjqJ5ZLFcNoIVpfXAMSoHOvBLOJUDNqPo+MsaXdm8OlPHMiSuY+BMpZey9kj2flrCeb7W7MTvz+eL1NaP6Zn3WJKMysQXMnqhaYuUeopjmjoYzey0DlwfEh0AQPXgTkHzq2hkC/HgRZjw1Pe+iXBDZ8xSBoqgUawtnvH7jxESfNgdOM2ZaQ8miT/aDbcEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com (2603:10b6:a03:574::22)
+ by DS0PR11MB7410.namprd11.prod.outlook.com (2603:10b6:8:151::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Tue, 10 Jun
+ 2025 03:49:03 +0000
+Received: from SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38]) by SJ2PR11MB8452.namprd11.prod.outlook.com
+ ([fe80::d200:bfac:918a:1a38%6]) with mapi id 15.20.8813.022; Tue, 10 Jun 2025
+ 03:49:03 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "donald.hunter@gmail.com" <donald.hunter@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "horms@kernel.org"
+	<horms@kernel.org>, "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>, "corbet@lwn.net" <corbet@lwn.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "Olech, Milena"
+	<milena.olech@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v4 1/3] dpll: add
+ reference-sync netlink attribute
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v4 1/3] dpll: add
+ reference-sync netlink attribute
+Thread-Index: AQHbzAj1jskmVX+BgEmMcDrLZVwUNbPqYUIAgBFoa0A=
+Date: Tue, 10 Jun 2025 03:49:03 +0000
+Message-ID: <SJ2PR11MB8452C09EFD87AAE4CE9A44819B6AA@SJ2PR11MB8452.namprd11.prod.outlook.com>
+References: <20250523172650.1517164-1-arkadiusz.kubalewski@intel.com>
+ <20250523172650.1517164-2-arkadiusz.kubalewski@intel.com>
+ <20250529174914.179c1a34@kernel.org>
+In-Reply-To: <20250529174914.179c1a34@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ2PR11MB8452:EE_|DS0PR11MB7410:EE_
+x-ms-office365-filtering-correlation-id: ce579bea-8ab9-4550-1f30-08dda7d1be04
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?arT8JKTjgx+XbZ5Gt2ckQMN5vEZ2RqmZmr6Qok0L+gGZTvve5tYc3ZxorekQ?=
+ =?us-ascii?Q?ZYoY5zP+/aB6+Lrgrtxe7uCRTEhzCyXFSQxCHItb73FT0vBWxuO4PDk+nU4w?=
+ =?us-ascii?Q?WFq7eIskOKVY71Ee/qF1j4phmC6wB5SDI/Oull1EO99nPQFagjUfM7iVHyRu?=
+ =?us-ascii?Q?akHVigasjd22QarVQzYFtCMFEEjUITk5eRc3ZZfZLOwzmnSDi0AfxCyGYEBT?=
+ =?us-ascii?Q?KFE3WBd0Rm35w+TSv7zlu3i/WgVAgG/rgvHB6i6Q7zBkMSTyNo0MLlbVf6wz?=
+ =?us-ascii?Q?CcEqvaGa5d8Ru4eJK380cQabmUzYTk3qhgD5ckTCcYuIJQyJ9ktbhdX8YiBa?=
+ =?us-ascii?Q?8/MV/IndWhh2EZ0rZVdjL8FJB4YtNsn4x6uiQ8Bs7KVuwhPn34dxBzXogI40?=
+ =?us-ascii?Q?xOL8QJF9UPuVe3uA40AC1PETIpn2te70S7PNXhnz9Q7WngPLpJWh9udUL/fG?=
+ =?us-ascii?Q?pGlwwq1tAlp3eYiLfDMZfyXCDQeUi9SUuRKiaL01alzYHRte3JtTqGbS8tpi?=
+ =?us-ascii?Q?DvOt4dAa9WoINMknlqMMnVysSrAlig70SV96dq1a5xZzui25TjoH9ewmQDAZ?=
+ =?us-ascii?Q?Vo51ilB8CJXvHsn9Fh8QZmftwADB9250wZsb6l0e5zgT2gF5zNY0qYakkZAf?=
+ =?us-ascii?Q?ZswCWAJ+P/wE2GF/BuLDTiIpFTI9iEUIzv8PHFa/k/q6slortUchSH93yuVc?=
+ =?us-ascii?Q?DosEY0v1/BVDYaF6iyPm6shYpNEc/bwFSPcgLtxDaX1OW7TQRWmk0LsJ/+O7?=
+ =?us-ascii?Q?D8Ful3JZNaThoAjqrbXXnvUwpV45R/dnGMFFCJXiPDU27f1Sc+Ty8cCY6DCh?=
+ =?us-ascii?Q?l4k55rIFLTmMXAxiEMVpN4hyr5JgOSTkmYi/S5OG7exSHWXiZADq1CSyGuUv?=
+ =?us-ascii?Q?Pu/9kTS7sQVLqbEA3F3IoAerS+PSxa1MHuJVUB3IzrK18HTUHzYBEvv5UGoS?=
+ =?us-ascii?Q?tG8Mu7pQNGyXlLVLVgY7/zVDUgW32qzrAI13H8BP60HcXNV8XVigF9k7QXQd?=
+ =?us-ascii?Q?yGh7n4Zrthhk1t3uRbtW5TMPpaW4MmfIVosBwHMGMyVhFkfA36QHUxGHS3vu?=
+ =?us-ascii?Q?Q0oR0LrWhyFeXnUUzlaSMsI9hDEaVt1f7bisJE+AuOvjk+1SDQ+mxb8A/I1p?=
+ =?us-ascii?Q?nONugyG7hXJqj3XK3Hab26TRV3lo2Ft8gkfhZq+zw8Kn9Tg1VQD0NkoFyFce?=
+ =?us-ascii?Q?a3eZOocaoGXrCiFNbDafHDShzOGwp8zb/nYsv4Kezq/YcEU3usnVpB17Jpmm?=
+ =?us-ascii?Q?68gqX31wYTgVW6+RmR521uwbRr7dQYvoKw4aj6MIGydKnLpV9ZbGrJqpD80w?=
+ =?us-ascii?Q?BLwpCCDoYdaUYfzd3mqeDCxb12Ai0Jlqv9BfT0HPQ0IyGtBSCwVQIJBGOwN7?=
+ =?us-ascii?Q?wTsFbP7QNztmV7VJWogtx/chldgTwZVv8qadg1l7V1jzgfh3rCYatIH/WIYj?=
+ =?us-ascii?Q?zMVwkk7P8+wVfkpBBc8o7rjDfQhhfJkt1q8dPNBM7rooenb/ktvoTReFg/6K?=
+ =?us-ascii?Q?QJ1mti0Um6iVP2I=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB8452.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fB7FVEtsVchs07SYS7DxmcK+ljrShiKpqYLo5YBkht4ol3jLwzQjDKnZrTBE?=
+ =?us-ascii?Q?N12CiRMWBuFGG05nRg8YuKC6QavtwLR4d8q7Q11+TMeXVdkeR1RfO98ZIHQ8?=
+ =?us-ascii?Q?TdQ2VhstyadpZXlvUTTmM05pqIWk5+U4aEP7iSR64m/ZSo1xJCCIaZ9BxzjM?=
+ =?us-ascii?Q?7gvStAzVfXi92XYCHwZhUyrO1fnVT52cY/1V3AJ6dkMnSIvfa2r3fd87I4j2?=
+ =?us-ascii?Q?eC34Xrw5bLL5lKZaJ0FSyruRsyRqPRg/rjVD0XyGH54hEqbWLhpa5Yp4dkh8?=
+ =?us-ascii?Q?3tuvHHCcah5rURSZV7uTITGQV1Zmqho7XFDmN/8jvyk6s1t8cTquI+20iomY?=
+ =?us-ascii?Q?yQc9ia3q3nFgnSkbg/ZnCg5h0YzJKH9bP5gAibeByPRhFQgJsiOi5HBHr+NN?=
+ =?us-ascii?Q?259uP1f6AE5ynFjFz7LPqVonomaJ0/RjicUZCqZve2DCDVSozxqOoaseOZ5X?=
+ =?us-ascii?Q?l40samUfHeKQwRgOYNjfbWpP/fBGwjFALbZzWP9tyH/jMdMxVhhJGnYvsfpC?=
+ =?us-ascii?Q?9W4K9LfiTztdVzOV2BRqx9Mp5fKhDj6bmsuIPc7l4JNU+/YAXYSnDHGw4VAy?=
+ =?us-ascii?Q?iwVQM9GEleA156JW3n/OHTnbJs2EZtJCx9dG4g2nsN5EsBJmCnRMQsz1r57n?=
+ =?us-ascii?Q?jh+VUEnqvACgDR6J6NP4A7WtHasJrsLMXT9T/+AAqTqyQ7zo7vfG4xJqfMSb?=
+ =?us-ascii?Q?VI/5sJPE9o9ynu1AnqhWz1ombIN6WA58Lst24OLaW+PkrLlxkN/PyRZANV4P?=
+ =?us-ascii?Q?9U2ltzDDGnak8r3eJ199RVJtxZJxUnoUuRvkQVGKVURiJsZ0hWZ8+mtZOZ1/?=
+ =?us-ascii?Q?zAgu2Od12ZEacwj2lB1l/XqjOVF9Ep9JVm8oY27GuucUBCTJA7oS7JRnd5kl?=
+ =?us-ascii?Q?ZnLl957uJTBpJIgnETxD1FOLC93hCEVkmnay2kniCjoR2ED+7WZOjZVmfJ0w?=
+ =?us-ascii?Q?MXb0WfV4HMK7536nXRd6TIgkZ+bBAYJLE2kybV9F5bPW/hGRhObRHRgXbnL2?=
+ =?us-ascii?Q?/biw7R96irz2X+C/qbFm06CzedutY1EdFDQJTQpnSM9c4TZNLL4I6CYXbwTS?=
+ =?us-ascii?Q?cvDCf4kpwuFinegd+V5Be16Hc0J6MwFNKw9f7Amtju/67KYuq5ZMLiAapQLy?=
+ =?us-ascii?Q?uxEWwC3kaQsx8rAJHtbVV70crbawhaSKYBmdC49qyCahSl/maNJj40L2AF5X?=
+ =?us-ascii?Q?4KFx/ULCMIelRXvPOCtNhYcTkmv9YGOqFuNc1mxKv6EsMRRFl09wz1B4Xpma?=
+ =?us-ascii?Q?UmqUuy6H+G/hE9DA/x0L51i1EV0Ddz9RUopg7JAupAyNaKyUgJj+n5X6DXe+?=
+ =?us-ascii?Q?ssr2AMirtOUILTgH1GtwPoD/W1m5HSNGRpb2AUovgQ5/k34AcSQaNhbct7Cl?=
+ =?us-ascii?Q?RfT/UZ2JpDsDN2Q6ee99DSFWPLG1ACm+TIvInX045tkv03IeOsvIIY5hM1Um?=
+ =?us-ascii?Q?GuX82eUULyOI9LDMQcJAmrMRUdVHwLjjzmtWrJ5dVggHkz24GPOcg9rhiI4z?=
+ =?us-ascii?Q?lIxrFosqYFqaJSpeXJQsHXIbNy1Aonm/Sp7wvh4Ds/aMiFHe9okTeVHkcGNj?=
+ =?us-ascii?Q?c/hKfW/fD2vGwIdKir9Kh/s1irKkFQ/l3gPakSgkKNjIFrJnLJF1M5GCeYKP?=
+ =?us-ascii?Q?/g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: M28vnsO5i7WeoD+SBIk8rxz+6ocB2ABaSU/0KOGGMJxcxuMPWSwwwL0y
-	Ea+7Dft3kMPmjjuiylIaOaRYvkEBxPS2c99TW+qw7+qpnHJfqrzkTqpKvnXmvYmYV+pjVrq
-	BFxSr49wpUvsBwENoLDqOYl8ZDwImno56pQ8nmdjaslA97KgmsqCLxXJqz0ywkCq/l5RoE5
-	C4Y6dGfVeaaDBzZZwaeQN5utd/tYkIWFpxuGbJ8pOqLOaxJV09NiCdXaMYpgp8z9QOd48fl
-	zXG1gjR4vsJIDQ1Ew7/VVjksQtNW1iBpYvRDOwyOGaBO4YxY5UTO2HcNcZ/gUqzlzpIp0kT
-	IJRURRs9ur9efERAX3pEnenROQLWdA6dyVSHHiv6H70h6n9QiLAbn+/MFoP4pQy1QeaMEW7
-	kOg0tx6CkcDOF1aiN7BkHYyL9zaVfunXL+FD5HkC0VJtdmlbvsTMXGRfLbZ9eQ7JihbYM5m
-	12E72Dl4aZzjK1LysPcB1KiQ+rgRuYSw5bt8aUOHY6heKw6+RUUJW0KJkUicaIGvPB+cU2A
-	oMcCMOBiExq85hnKvTf5AX5inxL1yCiv1a2NWgdl4RfN5cywBXlqwYsl4mgwZ4Ogm9BSXlZ
-	UUfwnkruvmo9e4Hu49pmBljPeAAGLtQAY8HOLRfbydouq4LuMJdPfXVRcrvPFKvvh3Hju6h
-	M90tSUIl6hRalDGCUipsE/z6E+U2qtS0rj9aW8n4zF8FdTBeIvrNjQPzDjvgj2QKSbQoSyB
-	nlhIkB0Qc/yy/bWX51Mv09OOQb+KSOI66/CqI74SwMUvzHTfJFqXEnWr0/GMRwcJXNCwqfN
-	/1z+NiL/pSRZdRoKPa79EOejjwcat6T+D1ImkcvIo/TBW+/Z5lYWEVAC6bgfaE5CMJ6qSPm
-	H2LaqjKVbzFTu2CmfC1H08e3r7R+XpBtmgOr/GEYqlfAxBvIlvecCfgKL4ueEdJk+SahxFD
-	A6SDJQK+BTg1wlfT4Sb2LkVGZI9QNAvBw0lS2mYPG9OGONIvhvnc3N2a0
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB8452.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce579bea-8ab9-4550-1f30-08dda7d1be04
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2025 03:49:03.4089
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: i3dx4ht/ZINCvxNSEb6uCRP2hxh4x+dwWoqJVDS2YkyIZf92aXkQiFa5wXARINaWxVWlvsTbcGDgWZ3SSPSBSRQPkhQTdmGkocRaolplrh4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7410
+X-OriginatorOrg: intel.com
 
-Users can monitor NIC link status changes through netlink. However, LACP
-protocol failures may occur despite operational physical links. There is
-no way to detect LACP state changes. This patch adds tracepoint at
-LACP state transition.
+>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+>Jakub Kicinski
+>Sent: Friday, May 30, 2025 2:49 AM
+>
+>On Fri, 23 May 2025 19:26:48 +0200 Arkadiusz Kubalewski wrote:
+>> +The device may support the Reference SYNC feature, which allows the
+>>combination
+>> +of two inputs into a Reference SYNC pair. In this configuration, clock
+>>signals
+>> +from both inputs are used to synchronize the dpll device. The higher
+>>frequency
+>> +signal is utilized for the loop bandwidth of the DPLL, while the lower
+>>frequency
+>> +signal is used to syntonize the output signal of the DPLL device. This
+>>feature
+>> +enables the provision of a high-quality loop bandwidth signal from an
+>>external
+>> +source.
+>
+>I'm uninitiated into the deeper arts of time sync, but to me this
+>sounds like a reference clock. Are you trying not to call it clock
+>because in time clock means a ticker, and this is an oscillator?
+>
 
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
----
- drivers/net/bonding/bond_3ad.c |  6 ++++++
- include/trace/events/bonding.h | 37 ++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
- create mode 100644 include/trace/events/bonding.h
+We shall refer to a reference clock for each input pin, right?
+TBH, I have reused the name from dpll chip docs, I believe they have
+tried to make similar features and naming convention for both:
+Embedded SYNC/Reference SYNC, and that makes some sense.
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index d1c2d416ac87..55703230ab29 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -16,6 +16,9 @@
- #include <net/bond_3ad.h>
- #include <net/netlink.h>
- 
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/bonding.h>
-+
- /* General definitions */
- #define AD_SHORT_TIMEOUT           1
- #define AD_LONG_TIMEOUT            0
-@@ -1146,6 +1149,9 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 			  port->actor_port_number,
- 			  last_state,
- 			  port->sm_mux_state);
-+
-+		trace_3ad_mux_state(port->slave->dev, last_state, port->sm_mux_state);
-+
- 		switch (port->sm_mux_state) {
- 		case AD_MUX_DETACHED:
- 			port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
-diff --git a/include/trace/events/bonding.h b/include/trace/events/bonding.h
-new file mode 100644
-index 000000000000..1ee4b07d912a
---- /dev/null
-+++ b/include/trace/events/bonding.h
-@@ -0,0 +1,37 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#if !defined(_TRACE_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_BONDING_H
-+
-+#include <linux/netdevice.h>
-+#include <linux/tracepoint.h>
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM bonding
-+
-+TRACE_EVENT(3ad_mux_state,
-+	TP_PROTO(struct net_device *dev, u32 last_state, u32 curr_state),
-+	TP_ARGS(dev, last_state, curr_state),
-+
-+	TP_STRUCT__entry(
-+		__field(int, ifindex)
-+		__string(dev_name, dev->name)
-+		__field(u32, last_state)
-+		__field(u32, curr_state)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->ifindex = dev->ifindex;
-+		__assign_str(dev_name);
-+		__entry->last_state = last_state;
-+		__entry->curr_state = curr_state;
-+	),
-+
-+	TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
-+		  __entry->ifindex, __get_str(dev_name),
-+		  __entry->last_state, __entry->curr_state)
-+);
-+
-+#endif /* _TRACE_BONDING_H */
-+
-+#include <trace/define_trace.h>
--- 
-2.34.1
+>> +A capable input provides a list of inputs that can be paired to create =
+a
+>> +Reference SYNC pair. To control this feature, the user must request a
+>>desired
+>> +state for a target pin: use ``DPLL_PIN_STATE_CONNECTED`` to enable or
+>> +``DPLL_PIN_STATE_DISCONNECTED`` to disable the feature. Only two pins
+>>can be
+>> +bound to form a Reference SYNC pair at any given time.
+>
+>Mostly I got confused by the doc saying "Reference SYNC pair".
+>I was expecting that you'll have to provide 2 ref sync signals.
+>But IIUC the first signal is still the existing signal we lock
+>into, so the pair is of a reference sync + an input pin?
+>Not a pair of two reference syncs.
+>
+>IOW my reading of the doc made me expect 2 pins to always be passed in
+>as ref sync, but the example from the cover letter shows only adding
+>one.
 
+Yes, exactly, will try to improve this in next version.
+
+Thank you!
+Arkadiusz
 
