@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-195919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBB2AD2B42
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:25:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D115AD2B4A
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:26:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A5F17118E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:25:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182E51893172
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596A4202F93;
-	Tue, 10 Jun 2025 01:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD7A21D5BC;
+	Tue, 10 Jun 2025 01:24:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5DD1E7C2D;
-	Tue, 10 Jun 2025 01:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4E720C463;
+	Tue, 10 Jun 2025 01:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749518665; cv=none; b=NdSAkB75rsPSNDqBTh6/61tFA1hBw9fhG/K2lCnjufKhGk5S5qzhqOCHdMbYZ+eCkCkcFcRb4FEp+NgB2C/aEhHk7GK3kMLqGrFkWTqalTjW2GkRI2XXVSPDdxgCiJzAHk521YXeufZ2pN0ynAu5mO1Y1sJeDFCr8l2gb8LqeNw=
+	t=1749518667; cv=none; b=cfpmCMnIZmSwVYE3+H6Cog+4kkdMUYgyCizumfwmx2xtQUoKZJpoFbp2+6XVjMS9IrXFSol17QBgYbqFiMtpC9G9rzV1W6eBOXMhS8yrkia2IsW2JqinRYpbRBe8iRDoR6G1PGK0NMnEMT/fNl5cxKQYy3CrcqBlWi0VeUt0Xw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749518665; c=relaxed/simple;
-	bh=niTQfAe3mnitW8DHBUFf0G5gpxM1At2/3CYLdrDk0MA=;
+	s=arc-20240116; t=1749518667; c=relaxed/simple;
+	bh=/gvGCpmuSdHpbLX3v4mrK5iEI7Ww+Hw2nHqemQ6NQp8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CdHfptfLtxq2oYIJqfj40z3oofh+8dumx28AGl67kJyIzzmwt1lS7VCCmEXhKXQW0XuJX4cGD4Mne/t3F4M+/Oxw/goxo+VQ5gco7+kIUMGFv+COWTqjo5FNSix3Xrr268PqgxIuugp9FnQ3GgRglcRM0IgOoLIlZKNBlHAthDg=
+	 MIME-Version:Content-Type; b=VPbeCuByrRaGlyC32mLqOKkQ7JcF0gN3xZUPEPFnTkJCBUXkqA2KT8JEzM/4WExxymrrxukvGeDYXPgAf209EVQlzRwzjnzYevWfY2iFZoJGCNuYjILNWqVHBNOZ7+ZujrvUWAis5VfEpMj/CkWskTnXwqw78jDDNsiijmh4z7c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -45,9 +45,9 @@ CC: <linux-arm-kernel@lists.infradead.org>, <linux-aspeed@lists.ozlabs.org>,
 	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <joel@jms.id.au>,
 	<andrew@codeconstruct.com.au>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
 	<p.zabel@pengutronix.de>, <BMC-SW@aspeedtech.com>
-Subject: [net-next v2 3/4] ARM: dts: aspeed-g6: Add resets property for MAC controllers
-Date: Tue, 10 Jun 2025 09:24:05 +0800
-Message-ID: <20250610012406.3703769-4-jacky_chou@aspeedtech.com>
+Subject: [net-next v2 4/4] net: ftgmac100: Add optional reset control for RMII mode on Aspeed SoCs
+Date: Tue, 10 Jun 2025 09:24:06 +0800
+Message-ID: <20250610012406.3703769-5-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250610012406.3703769-1-jacky_chou@aspeedtech.com>
 References: <20250610012406.3703769-1-jacky_chou@aspeedtech.com>
@@ -60,50 +60,76 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Add the "resets" property to the MAC nodes in the AST2600 device tree,
-using the appropriate ASPEED_RESET_MACx definitions.
+On Aspeed SoCs, the internal MAC reset is insufficient to fully reset the
+RMII interface; only the SoC-level reset line can properly reset the RMII
+logic. This patch adds support for an optional "resets" property in the
+device tree, allowing the driver to assert and deassert the SoC reset line
+when operating in RMII mode. This ensures the MAC and RMII interface are
+correctly reset and initialized.
 
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- arch/arm/boot/dts/aspeed/aspeed-g6.dtsi | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
-index 8ed715bd53aa..f9fe89665e49 100644
---- a/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
-+++ b/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
-@@ -236,6 +236,7 @@ mac0: ethernet@1e660000 {
- 			reg = <0x1e660000 0x180>;
- 			interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
- 			clocks = <&syscon ASPEED_CLK_GATE_MAC1CLK>;
-+			resets = <&syscon ASPEED_RESET_MAC1>;
- 			status = "disabled";
- 		};
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index 17ec35e75a65..01c4db6e5b91 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -9,6 +9,7 @@
+ #define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
  
-@@ -244,6 +245,7 @@ mac1: ethernet@1e680000 {
- 			reg = <0x1e680000 0x180>;
- 			interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
- 			clocks = <&syscon ASPEED_CLK_GATE_MAC2CLK>;
-+			resets = <&syscon ASPEED_RESET_MAC2>;
- 			status = "disabled";
- 		};
+ #include <linux/clk.h>
++#include <linux/reset.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
+@@ -101,6 +102,8 @@ struct ftgmac100 {
  
-@@ -252,6 +254,7 @@ mac2: ethernet@1e670000 {
- 			reg = <0x1e670000 0x180>;
- 			interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
- 			clocks = <&syscon ASPEED_CLK_GATE_MAC3CLK>;
-+			resets = <&syscon ASPEED_RESET_MAC3>;
- 			status = "disabled";
- 		};
+ 	/* AST2500/AST2600 RMII ref clock gate */
+ 	struct clk *rclk;
++	/* Aspeed reset control */
++	struct reset_control *rst;
  
-@@ -260,6 +263,7 @@ mac3: ethernet@1e690000 {
- 			reg = <0x1e690000 0x180>;
- 			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
- 			clocks = <&syscon ASPEED_CLK_GATE_MAC4CLK>;
-+			resets = <&syscon ASPEED_RESET_MAC4>;
- 			status = "disabled";
- 		};
+ 	/* Link management */
+ 	int cur_speed;
+@@ -148,6 +151,23 @@ static int ftgmac100_reset_and_config_mac(struct ftgmac100 *priv)
+ {
+ 	u32 maccr = 0;
  
++	/* Aspeed RMII needs SCU reset to clear status */
++	if (priv->is_aspeed && priv->netdev->phydev->interface == PHY_INTERFACE_MODE_RMII) {
++		int err;
++
++		err = reset_control_assert(priv->rst);
++		if (err) {
++			dev_err(priv->dev, "Failed to reset mac (%d)\n", err);
++			return err;
++		}
++		usleep_range(10000, 20000);
++		err = reset_control_deassert(priv->rst);
++		if (err) {
++			dev_err(priv->dev, "Failed to deassert mac reset (%d)\n", err);
++			return err;
++		}
++	}
++
+ 	switch (priv->cur_speed) {
+ 	case SPEED_10:
+ 	case 0: /* no link */
+@@ -1968,6 +1988,12 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 
+ 	}
+ 
++	priv->rst = devm_reset_control_get_optional_exclusive(priv->dev, NULL);
++	if (IS_ERR(priv->rst)) {
++		err = PTR_ERR(priv->rst);
++		goto err_phy_connect;
++	}
++
+ 	if (priv->is_aspeed) {
+ 		err = ftgmac100_setup_clk(priv);
+ 		if (err)
 -- 
 2.34.1
 
