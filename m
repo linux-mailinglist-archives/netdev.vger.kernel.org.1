@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-196375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D3DAD46C3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 01:34:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5B0AD46D3
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 01:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B0721613E0
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:34:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D54E31883399
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C94B29B233;
-	Tue, 10 Jun 2025 23:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71EB202981;
+	Tue, 10 Jun 2025 23:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wArqi2lZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tfNYDMO7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F68329AAEC
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 23:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B11F2D5414
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 23:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749598327; cv=none; b=oPYHiVE2ZqwDIw3tOrTABVrx/9byOyYKIDX/RctM9bTNyXTkQXH10xiJaLMrgDkhj6TusYGinVQvcq3P7v62RjlJk704nD93qDhdS5dGWmF820oiczhv+EQYskhigngtk0/7ZksXdgwxgvQlEpoINqNv0FNTKB6oDQhRuXenrzw=
+	t=1749598591; cv=none; b=o4Gm53SSvbVpyMEccrYaF9yYpFk4oPyVnMScBceO1oUOoee7XFrLJ+SWQ+NMaMHLmT0ddxZtx2uMczMJZa2T8M/W7P9CMG615VBac9PAJzPKpB03238aA0sh0sYWeP8823AlYsY0y6dN90llsfTf4MGrt0mIAVqpdzjscjLo/04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749598327; c=relaxed/simple;
+	s=arc-20240116; t=1749598591; c=relaxed/simple;
 	bh=a9mHbrJOiLHj5NsYMvttJmJI0NUURDRVikwiQPz8Cus=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZHceAHGKHewrs/rbu19o7YuMUwg2FNgu3pfR6fdCmgfE/sw8HlBIjxXcZ1SGtHYvYYYjaWYD4qJM3DrhOgu29QeGjB9IbM8nXqHTokO44VeGbMIh63aHqyWTS86HPrx28qSXt8+VSl6j7EP/TxKzYP3P7zMAiPhTAmN/+Ve3jOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wArqi2lZ; arc=none smtp.client-ip=91.218.175.173
+	 MIME-Version; b=IWmb9zPNhK18nGP015B4L/lH87aCIaHslUqiY03bREWzi7EFKljdWUc1e8wH47ANTPVaEckC94hyz+WrRFndO3/L8eeQ2AMFg4dj7GVsqIT9Jkafbi+6usDnAvTdivGxbR79xmVLHGSoazf/v8x1CWP7Y4JYOHLeybbzEjoBU+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tfNYDMO7; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749598323;
+	t=1749598587;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
 	bh=r8RdlCinf2+TlX4dL62XH9+5xu9xSdaTA7tP0qW17CU=;
-	b=wArqi2lZqUqF+oXUylRPZ+1QettdjP++OmHMV2lTAYMlHeUFcuYaEaKumXQ0J5XN+75Wcw
-	11c5pgEE1/0AjNiv5JECh9C0zixmNyZNBffDE63H5PcEK2OB2jWf+aHxYrnRS8WbhpSv2Q
-	glvmFyPc3rWoehjBwh+0lmQnhSAnoSU=
+	b=tfNYDMO7Au3DTDerxjE0DGvNgY2OqXdcMVgnOQRqTXw9fXo84yvLvCA+DQrgu/1mgMY49P
+	AloQrvAIeqAJVRzRHJqN0KqMCq+q47mn4yAeP4w5nE6U6j1xHayiqE5ZE4OQEbIpGxEpth
+	Ko22Xk0VPSTDvSugTlfI42g/jJi184c=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -50,20 +50,20 @@ To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>
-Cc: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
+Cc: linux-kernel@vger.kernel.org,
 	Daniel Golle <daniel@makrotopia.org>,
 	Simon Horman <horms@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Lei Wei <quic_leiwei@quicinc.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
 	Sean Anderson <sean.anderson@linux.dev>,
 	Claudiu Beznea <claudiu.beznea@microchip.com>,
 	Nicolas Ferre <nicolas.ferre@microchip.com>
 Subject: [net-next PATCH v6 08/10] net: macb: Move most of mac_config to mac_prepare
-Date: Tue, 10 Jun 2025 19:31:32 -0400
-Message-Id: <20250610233134.3588011-9-sean.anderson@linux.dev>
+Date: Tue, 10 Jun 2025 19:35:47 -0400
+Message-Id: <20250610233547.3588356-1-sean.anderson@linux.dev>
 In-Reply-To: <20250610233134.3588011-1-sean.anderson@linux.dev>
 References: <20250610233134.3588011-1-sean.anderson@linux.dev>
 Precedence: bulk
