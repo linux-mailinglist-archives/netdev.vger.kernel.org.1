@@ -1,81 +1,106 @@
-Return-Path: <netdev+bounces-195908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F9DAD2A8C
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:31:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD0CAD2AC5
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 02:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3797D7A1EB5
-	for <lists+netdev@lfdr.de>; Mon,  9 Jun 2025 23:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65CAE1891353
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27C622D4D8;
-	Mon,  9 Jun 2025 23:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A27C191F98;
+	Tue, 10 Jun 2025 00:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pIRChqwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from trinity3.trinnet.net (trinity.trinnet.net [96.78.144.185])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E5C148857;
-	Mon,  9 Jun 2025 23:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.78.144.185
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC2412EBE7;
+	Tue, 10 Jun 2025 00:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749511881; cv=none; b=jKusLQomTLgEdxuzda+furkBgbX1sQsGUSvDtGPeeDSzSVqGaC2wi+jExms7bPZSwzAs2+tpFan0JJjpatPK8ZjfV97+WWP/KEoe8qZ+mVAeaOm7d8SXiAMTPEYmBS5jRDiE+EfghUMoCDJ4WVtY9sFfh6K6BCLtrOrwwJSZXac=
+	t=1749513604; cv=none; b=fu730DPHVycddLE/joIh1bHSvxr5EnP1vhFAy2DF7Mn6cUI90tKNjbnAu4txxS4CAQQlkKYYwqmBHxn1dGmt/2nEsDIlCAd5gqaMalAejcB4UkgUySohz9SV5Ir/Fnd3Hm1t8WmMvb01jUOpCyCxWKly7qYnHk5B3Tl1DfIKxZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749511881; c=relaxed/simple;
-	bh=e4cngVeTJ3eRhYpYUjJHLm0cfk8IWeU6ftfJPlRuRXA=;
-	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BL5BeXG5ZkvlR1RVfs6Ty5fs0ypcykbssGMAtzjQumvLoKqoHgxdglc6GY6CWMEw14nxBjL1en0XgoiIu3QfQNwSmgL820bpFqH1zS81mQRvxfh55On6VKzbGzKlFaTszcHS9cLd2RKsCa5NvHmjHHltvhXdUUt1WkjaQoZjDPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net; spf=pass smtp.mailfrom=trinnet.net; arc=none smtp.client-ip=96.78.144.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trinnet.net
-Received: from trinity4.trinnet.net (trinity4.trinnet.net [192.168.0.11])
-	by trinity3.trinnet.net (TrinityOS hardened/TrinityOS Hardened) with ESMTP id 559NUq2A013070;
-	Mon, 9 Jun 2025 16:30:52 -0700
-Subject: Re: [PATCH net] netrom: fix possible deadlock in nr_rt_device_down
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20250605105449.12803-1-arefev@swemel.ru>
- <20250609155729.7922836d@kernel.org>
- <5f821879-6774-3dc2-e97d-e33b76513088@trinnet.net>
- <20250609162642.7cb49915@kernel.org>
-Cc: Denis Arefev <arefev@swemel.ru>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>, Nikita Marushkin <hfggklm@gmail.com>,
-        Ilya Shchipletsov <rabbelkin@mail.ru>,
-        Hongbo Li <lihongbo22@huawei.com>, linux-hams@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lvc-project@linuxtesting.org, stable@vger.kernel.org,
-        syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
-From: David Ranch <linux-hams@trinnet.net>
-Message-ID: <4cfc85af-c13a-aa9c-a57c-bf4b6e0f2186@trinnet.net>
-Date: Mon, 9 Jun 2025 16:30:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101
- Thunderbird/45.8.0
+	s=arc-20240116; t=1749513604; c=relaxed/simple;
+	bh=2Dg9peVSh4pyIyoa+bHf8UIL1uvI3U4Fg9EzKdMtpAs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pNCRekNI4BnT4UZxjc15UCaPGOukjoduYaILDCvVPD/ZFUzqjJ5ZkTVgys+F45Cr3vJLpBywRAEvXfB2KewOlfDb3pIeR804OBlt5yPcwq4GwENYdrhhTP7U1CQXkbCK7MKXM8qEd6PrFq8txPgKCJhZOa2rAOA/QXIEsJfzYdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pIRChqwG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF54C4CEEB;
+	Tue, 10 Jun 2025 00:00:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749513603;
+	bh=2Dg9peVSh4pyIyoa+bHf8UIL1uvI3U4Fg9EzKdMtpAs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pIRChqwGS4AJ/PxjT2VL4e2DXkTitTkC5tQf1QPnPXy472SpPI+/HKEPm455Z1SEP
+	 BbyMFLI2DKgz3H+nhlTzZa+ABZG8+NO3lo1HYMbZD3D8/qoR19Lp1QG2q8fvDY3mVU
+	 vhpEKzDV9+J+m9uymoCQ3MV3/nXGEhl6/lsZBGCA3DQGHJNhbXOPguDvKC2chhhbQS
+	 Uww0nq8RopRbX3u4rZRVbkNvh8pzTcD6X9B8xyTluue6i750MNOYx+FKkAkpEe2JhZ
+	 oM+6foA/CX3r53KOnYhOjUK9hBzSpOoAhLUxdcoUofRSwlE67f/Oks1J7AXjbq0Asa
+	 Q38NbzBOlhWdg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	willemb@google.com,
+	matttbe@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests/net: packetdrill: more xfail changes
+Date: Mon,  9 Jun 2025 17:00:01 -0700
+Message-ID: <20250610000001.1970934-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250609162642.7cb49915@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-3.0 (trinity3.trinnet.net [192.168.0.1]); Mon, 09 Jun 2025 16:30:52 -0700 (PDT)
+Content-Transfer-Encoding: 8bit
 
+Most of the packetdrill tests have not flaked once last week.
+Add the few which did to the XFAIL list.
 
-That's unclear to me but maybe someone else knowing the code better than 
-myself can chime in.  I have to assume having these locks present
-are for a reason.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: willemb@google.com
+CC: matttbe@kernel.org
+CC: linux-kselftest@vger.kernel.org
 
---David
-KI6ZHD
+Every time I sit down to add more I plan to just XFAIL all of packetdrill
+on slow machines, but then I convince myself otherwise. One last time?
+---
+ tools/testing/selftests/net/packetdrill/ksft_runner.sh | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+index ef8b25a606d8..c5b01e1bd4c7 100755
+--- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
++++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+@@ -39,11 +39,15 @@ if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
+ 	# xfail tests that are known flaky with dbg config, not fixable.
+ 	# still run them for coverage (and expect 100% pass without dbg).
+ 	declare -ar xfail_list=(
++		"tcp_blocking_blocking-connect.pkt"
++		"tcp_blocking_blocking-read.pkt"
+ 		"tcp_eor_no-coalesce-retrans.pkt"
+ 		"tcp_fast_recovery_prr-ss.*.pkt"
++		"tcp_sack_sack-route-refresh-ip-tos.pkt"
+ 		"tcp_slow_start_slow-start-after-win-update.pkt"
+ 		"tcp_timestamping.*.pkt"
+ 		"tcp_user_timeout_user-timeout-probe.pkt"
++		"tcp_zerocopy_cl.*.pkt"
+ 		"tcp_zerocopy_epoll_.*.pkt"
+ 		"tcp_tcp_info_tcp-info-.*-limited.pkt"
+ 	)
+-- 
+2.49.0
 
-On 06/09/2025 04:26 PM, Jakub Kicinski wrote:
-> On Mon, 9 Jun 2025 16:16:32 -0700 David Ranch wrote:
->> I'm not sure what you mean by "the only user of this code".  There are
->> many people using the Linux AX.25 + NETROM stack but we unfortunately
->> don't have a active kernel maintainer for this code today.
->
-> Alright, sorry. Either way - these locks are not performance critical
-> for you, right?
->
 
