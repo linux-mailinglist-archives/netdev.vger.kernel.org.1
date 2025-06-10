@@ -1,130 +1,131 @@
-Return-Path: <netdev+bounces-196302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45229AD41EF
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:31:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B26AD4275
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 21:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2208179EEA
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:31:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2438D7AB74C
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D433D23BCEC;
-	Tue, 10 Jun 2025 18:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561BC2609F7;
+	Tue, 10 Jun 2025 19:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="olkmG6TM"
 X-Original-To: netdev@vger.kernel.org
-Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4919238C1B;
-	Tue, 10 Jun 2025 18:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BE72609D9;
+	Tue, 10 Jun 2025 19:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749580304; cv=none; b=La2ASn5eoeOn3wLNbseUFEjaxNjMPUatXM/6ST4LAtJ0usdNUV/O03ijVpDHPFgF/kpaGiXNV5XLAGuikH7AZVzyHQK2mXk5iZ6AJIQhQgi+kUofLjfSI7qQG9oOK0jaE6K5htbDrIBFZrJygtKjHNDVzoTYSuW2VTgl1RS/yMI=
+	t=1749582341; cv=none; b=aszhTWWL9vq4buo5hmBJd1NgNC3MWv2XQ5RygF1UqCq/N7U96JGZ4esA0ItFE/6iZdZs9h3pDADz1pcyOIMMxZQ0200NamDT6lmhC2b3t8ilvGVGMDwJW48Qgi46u83ubxlG6Ri+QeBov8DiWioxWInKgZD13ZbICE2n4O6jk1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749580304; c=relaxed/simple;
-	bh=QUg0jZlbuzFB5jP9wY8764cHVeJKKVjbPNKXc2oti5c=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=O8LDDphFNceRgB+wGD0Z/tE3QZaFZ+4hGx4l6de+nlYcPWVEX9QbeAInp+HwEkjim5xGh4jXzr5oR/NVTBq6Uw+AQy1BwQySQqZR7QG/U6YyZ27y4obaKnf6+zk/sHb8THtQLbSVHIt8NkcqLzaIJ+qJNMToTQ2mh4BeFlu2Lo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
-Received: from mail.wizardsworks.org (localhost [127.0.0.1])
-	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55AIXZf6000833;
-	Tue, 10 Jun 2025 11:33:35 -0700
+	s=arc-20240116; t=1749582341; c=relaxed/simple;
+	bh=XoHE7rwIpW75cxE3NkPum8Nv0zq5MnmrOJxIUeuPjBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tWDNm3lQo9UColE/ZPfdBHXxpQTdiBZA4mGUnQ+4C++FozNieJlC4vMZY15ZpVttPfWYojttux9+oxMXs/fTMr+MkWg+qDnzdj9UCoCW75VfdODy/7x/X0N0j82J5HT8iA9rtRrhv6U0c8eidRynrVIjm+6z57NJL94Kd82zas4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=olkmG6TM; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=vsOL9HjFuesZRM4LC588aOJ2IAXWcopQUhkn/lRI5iY=; b=olkmG6TMQfW+uUtGze4N3AVXlf
+	kdVhKU9k1H6keVcJxAq9pFcloNt1ACUS2mQsayE+2okUDaVqQ87DcXzsm9gt2smnCTN5eKq451hGY
+	ZUWx1KW0rgRydseFQDj892Bw5uEapDxFnRJtbpz5BTwZZ5X1eLj05pyCZ5qdIo6xF0lFRpzE/l41y
+	MoJV0NuHkChkkbbXEH5y9apSihNoCz4MCr5GAIti70RRPpZC4v7JtMy9IyUKbIHgSJ3yIkcVngfwt
+	Mf5jiQE2axWqw9xPyVKsmzlAN1pjRb5jazsJWi3NJ5eedyCzq992mYwoLryd7rl3p9K3zZsULWPAJ
+	4PpvUV5Q==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uP3pj-000Pqd-1C;
+	Tue, 10 Jun 2025 20:36:27 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uP3pi-000Juz-1o;
+	Tue, 10 Jun 2025 20:36:26 +0200
+Message-ID: <1c133144-7868-4d6d-878d-e1db71de23be@iogearbox.net>
+Date: Tue, 10 Jun 2025 20:36:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 10 Jun 2025 11:33:35 -0700
-From: Greg Chandler <chandleg@wizardsworks.org>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: Tulip 21142 panic on physical link disconnect
-In-Reply-To: <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
-References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
- <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
-Message-ID: <70660feba172c7933cd5521527df523c@wizardsworks.org>
-X-Sender: chandleg@wizardsworks.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf] MAINTAINERS: add myself as bpf networking reviewer
+To: Stanislav Fomichev <stfomichev@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, akpm@linux-foundation.org, lumag@kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250610175442.2138504-1-stfomichev@gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20250610175442.2138504-1-stfomichev@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27664/Tue Jun 10 10:41:04 2025)
 
+On 6/10/25 7:54 PM, Stanislav Fomichev wrote:
+> I've been focusing on networking BPF bits lately, add myself as a
+> reviewer.
+> 
+> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
 
-Thanks!  I appreciate you getting back to me.  I've got about 30 huge 
-bugs I am shaking down, and this one just cropped up, so I haven't been 
-able to put a lot of time into it yet.
-I rolled a full debug kernel last night to troubleshoot what appears to 
-be a spinlock/mutex issue with something else, but I'm sure it'll help 
-with this too.
-
-If I find anything out I will also reply with the details....
-
-
-
-On 2025/06/10 09:27, Florian Fainelli wrote:
-> Howdy!
-> 
-> On 6/9/25 15:43, Greg Chandler wrote:
->> 
->> This is a from-scratch build (non-vendor/non-distribution)
->> Host/Target = alpha ev6
->> Kernel source = 6.12.12
->> 
->> My last working kernel on this was a 2.6.x, it's been a while since 
->> I've had time to bring this system up to date, so I don't know when 
->> this may have started.
->> I had a 3.0.102 in there, but I didn't test the networking while using 
->> it.
->> 
->> Please let me know what I can do to help out with figuring this one 
->> out.
-> 
-> I don't have an Alpha machine to try this on, but I do have a 
-> functional Cobalt Qube2 (MIPS 32/64) with these adapters connected 
-> directly over PCI:
-> 
-> 00:07.0 Ethernet controller: Digital Equipment Corporation DECchip 
-> 21142/43 (rev 41)
->         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
-> ParErr+ Stepping- SERR- FastB2B- DisINTx-
->         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
-> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
-> bytes
->         Interrupt: pin A routed to IRQ 19
->         Region 0: I/O ports at 1000 [size=128]
->         Region 1: Memory at 12082000 (32-bit, non-prefetchable) 
-> [size=1K]
->         Expansion ROM at 12000000 [disabled] [size=256K]
->         Kernel driver in use: tulip
-> 
-> 
-> 00:0c.0 Ethernet controller: Digital Equipment Corporation DECchip 
-> 21142/43 (rev 41)
->         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
-> ParErr- Stepping- SERR- FastB2B- DisINTx-
->         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
-> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
-> bytes
->         Interrupt: pin A routed to IRQ 20
->         Region 0: I/O ports at 1080 [size=128]
->         Region 1: Memory at 12082400 (32-bit, non-prefetchable) 
-> [size=1K]
->         Expansion ROM at 12040000 [disabled] [size=256K]
->         Kernel driver in use: tulip
-> 
-> the machine is not currently on a switch that I can control, but I can 
-> certainly try to plug in the cable and see what happens, give me a 
-> couple of days to get back to you, and if you don't hear back,  please 
-> holler. Here are the bits of kernel configuration:
-> 
-> CONFIG_NET_TULIP=y
-> CONFIG_TULIP=y
-> # CONFIG_TULIP_MWI is not set
-> # CONFIG_TULIP_MMIO is not set
-> # CONFIG_TULIP_NAPI is not set
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
