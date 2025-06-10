@@ -1,57 +1,68 @@
-Return-Path: <netdev+bounces-196320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F565AD43C0
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:30:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1271AD43DA
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5114617CEE7
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:30:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 585E6189DFD7
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E7C248F75;
-	Tue, 10 Jun 2025 20:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51AF265CC9;
+	Tue, 10 Jun 2025 20:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ekqP1kus"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nztG3FBU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC19F17BD3;
-	Tue, 10 Jun 2025 20:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3D5265CBA;
+	Tue, 10 Jun 2025 20:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749587433; cv=none; b=KmCc5mAZYqyCH/o0iOxyb6r7Pz9PYu43Q8EG8djwjARgPWbfGCDj01++Vd4ovenIX4h/ml4OPnki1fF+Xk1ygWmDHEQy4oIJWzAUeOyxK1FlqOFvI3ofjYolsOdQtfRNEf+7lNJm88ffC+pLI/5RLHJQ5DJmib9Sgxs5jh+Pai4=
+	t=1749587592; cv=none; b=Preq0fmT5bkq8RXgJfYZVPBq7FcWw1IyJ2p3Lc/pJ71FM2HkvpY+tWB5mD/9J+J7uqW7hMwvdZh5MfSbqZdxpjtsYoGrUjuvJ5hcQU0NRBkEL+oBdn/LwnvD/2LL1MdLZqbKRxZS+joG86F0KBPYcpklj3Qk/JsX4kSUKhdqCpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749587433; c=relaxed/simple;
-	bh=HQMB3+SvPse3R8MIezTVy0RDBSmkU6Tpe6NCORXyq+E=;
+	s=arc-20240116; t=1749587592; c=relaxed/simple;
+	bh=YqAtRU+UI0vXzRiV4CZ1vJF79I1Ncsncog4Fc6hDRkY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dh6dFGghk+g1qdGUTOWxewb5pCUVA44OYpDJZc75my2oZBcLLFS7pZJiXpySDk5ZOVHAGp3/vJQyDGOpCPkQjC1iuGuetxVj+8xI+Gu6xht4L0gvpNnWLr/8sEdKqkGNxXv5ezXpwO/xP7h5JC0CFUnJrn6Rp22Y/Hhjy1uMMNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ekqP1kus; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lDxmLE1jPO1VI0jONs4c76mO7n1Vg87qiWp7hT7GcV8=; b=ekqP1kuso37czHfXAgPFieh6HP
-	Q5LAx66x9P2+6ygrdhjfTWdlCyKzfgH0krWckymGTyG5J83WZxcdK45DiAbd5fd7HgnUq+6gvSW/D
-	r+IW+CKDdMZs/luprXm0Y315xLDxRBtEqSOuB7MsgkWeYwsQuIT8N5h0bZTxyi6+qrGg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uP5c3-00FJqb-MK; Tue, 10 Jun 2025 22:30:27 +0200
-Date: Tue, 10 Jun 2025 22:30:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
-Subject: Re: [PATCH RFC v1] rds: Expose feature parameters via sysfs and ELF
- note
-Message-ID: <4531f0f8-db0e-4a94-82a3-f1f8fccea865@lunn.ch>
-References: <20250610191144.422161-1-konrad.wilk@oracle.com>
- <20250610191144.422161-2-konrad.wilk@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lLnxFFamVn4pamC291uH5HE1Jf7SWEyM7XrfOR9BjaxaO7APacjptsX38CCK28D+mMPe0hzsVAoUmI/1drZ8O24P2KJgM5jY0EQLqQsSqrxvWMDxq13jAJ757uykKH3gr0hr1icTSjQyEBCy86aVEJox1ONP11bn8BV9QzT5Rp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nztG3FBU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3C1C4CEED;
+	Tue, 10 Jun 2025 20:33:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749587592;
+	bh=YqAtRU+UI0vXzRiV4CZ1vJF79I1Ncsncog4Fc6hDRkY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nztG3FBUb/dwPMNltE4uTNKS6+qtHQthGNxdk30oHQc+8V4GL6FBuDFRsKOH4ojYE
+	 86oNZJTgxlaa8pE1CauiNCy3E9PEbjEautOmloD/LiGyfC50l8tcqf3es32a9cCEcx
+	 igKawOiVs2S81NCqwrDMLY8FppIcKatwxWV4UKxIWOlBPLP9GdNp4Nc4vx86PZdPgm
+	 u/WIFoJA4MJbqBsRJZV2XTv0S46Z3xQ3vTNpo1WvkSb0M8aErLY4so3OR6wgXCW0bC
+	 BrrTyLAmho4mXUJ2uUABD+0NsCyHVJEsCrg94flPMxsGZKD/L87+KbhsB5iJJXkooL
+	 w+/LgGQWRUR1g==
+Date: Tue, 10 Jun 2025 17:33:09 -0300
+From: Arnaldo Carvalho de Melo <acme@kernel.org>
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH RFC net-next v2] page_pool: import Jesper's page_pool
+ benchmark
+Message-ID: <aEiWhUDsFskkcv46@x1>
+References: <20250525034354.258247-1-almasrymina@google.com>
+ <87iklna61r.fsf@toke.dk>
+ <CAHS8izOSW8dZpqgKT=ZxqpctVE3Y9AyR8qXyBGvdW0E8KFgonA@mail.gmail.com>
+ <87h615m6cp.fsf@toke.dk>
+ <CAHS8izNDSTkmC32aRA9R=phqRfZUyz06Psc=swOpfVW5SW4R_w@mail.gmail.com>
+ <6fd8b288-2719-424b-92d2-3dcfe03bbaef@kernel.org>
+ <CAC_iWjJcC7sK+71GVZHrXzPL=e3N_uFnKPnhSEi=PJkPwUywsA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,37 +71,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250610191144.422161-2-konrad.wilk@oracle.com>
+In-Reply-To: <CAC_iWjJcC7sK+71GVZHrXzPL=e3N_uFnKPnhSEi=PJkPwUywsA@mail.gmail.com>
 
-> +What:		/sys/module/rds/parameters/rds_ioctl_set_tos
-> +Date:		Jun 2025
-> +Contact:	rds-devel@oss.oracle.com
-> +Description:
-> +		The RDS driver supports the mechanism to set on a socket
-> +		the Quality of Service.
-> +
-> +		The returned value is the socket ioctl number and this is read-only.
+On Tue, Jun 10, 2025 at 10:41:49AM +0300, Ilias Apalodimas wrote:
+> On Wed, 4 Jun 2025 at 11:39, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+> > Okay, I think Ilias'es comment[1] and ACK convinced me, let us merge
+> > this as-is.  We have been asking people to run it over several years
+> > before accepting patches. We shouldn't be pointing people to use
+> > out-of-tree tests for accepting patches.
 
-From this, can i imply that the IOCTL number has changed sometime in
-the past? That would be an ABI break, which is not good.
+> > It is not perfect, but it have served us well for benchmarking in the
+> > last approx 10 years (5 years for page_pool test).  It is isolated as a
+> > selftest under (tools/testing/selftests/net/bench/page_pool/).
 
-More likely, none of the IOCTL numbers have changed. All you need to
-know is if the file exists or not. So i would makes the files the same
-as /dev/null.
+> > Realistically we are all too busy inventing a new "perfect" benchmark
+> > for page_pool. That said, I do encourage others with free cycles to
+> > integrated a better benchmark test into `perf bench`.  Then we can just
+> > remove this module again.
 
-Also, these are not actually parameters to the module, so putting them
-in parameters seems confusing at best.
+> I'll spend some time looking at acme comments. They seem to be moving
+> towards the right direction
 
-I doubt this is the first time this problem has been addressed in the
-kernel. Maybe look at:
+Glad that you think that way, and to add another perspective, 'perf
+test' and 'perf bench' goals are to run in any kernel, not just some
+specific one where a regression was fixed, so people running plain 'perf
+bench' will run whatever tests we add and thus widen the tester base for
+the benchmarks in there.
 
-$ find /sys -name "*features*"
-/sys/kernel/security/apparmor/features
-/sys/kernel/cgroup/features
+Being able to combine 'perf trace perf bench', 'perf stat perf bench',
+etc is something common and powerful.
 
-and see if you can copy/paste ideas/code from there. And also ask them
-if this was a good idea, or they say not don't do that, it was a bad
-idea, just call the IOCTL and test for ENOIOCTLCMD.
+But then the most important thing is to have actionable and expertly
+written benchmarks in place, that have been in use for a long time, in
+whatever form :-)
 
-	Andrew
+- Arnaldo
 
