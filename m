@@ -1,203 +1,308 @@
-Return-Path: <netdev+bounces-196054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF60BAD352E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:42:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6625AD353E
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9F63A2A74
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:41:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA5331752D3
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A2628C850;
-	Tue, 10 Jun 2025 11:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D425028DF54;
+	Tue, 10 Jun 2025 11:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2KmKgf9A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZO3MZDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2088.outbound.protection.outlook.com [40.107.95.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B829228C5B9;
-	Tue, 10 Jun 2025 11:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749555686; cv=fail; b=qkjhDe9YIdLnUk8sYvCv43UVSZ4A7kWHMl+QghsKUkc6SK8E0Owqc84KCw3fWZU1qd8nixype7ui4LTYGaFOH3PCvQf49Vg3HsXFBaDKrTaRp3ZmgiZ2foqy5b9ULoEifej5R3exICZmQYK7emo1ur9rMYERY6wJJVm1IHe231o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749555686; c=relaxed/simple;
-	bh=OOebeYAEksCuJUCvigL07ozKejScKNk4l33QPFwa7bM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e5fO8Vx6XV7Yh1jbCgoGjsKy5AoyQqYi4X+EVzwacORTOVcPTQOigWX6vLvfJ75K0mZT+pJkK7ViJmkDwik/iXuYrjEv4uh6BV8/3txRAs/KdJbkxo2FaAXBIOrMDt/pk8jB9GmPHJVhqiiIYCVxe3TZ58WwivipwR6IHfnLSm8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2KmKgf9A; arc=fail smtp.client-ip=40.107.95.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XJVVVwpeMpN8R6BaAoI6bB5pFXG855xlHzlIk8L5j539CXkUlZlJMzwZdoQrngHSqHKFGQ5Bmv4fo9Ex6Ek2oM/HgIAG7PEiUPgJ90uWbuLMoF1UgX7MEFbyuHnwMiV7VUNvPHK2q+fXYMnKjtALLBAPEZlgiPeV68Vpiy5IyjmxiPWN7OLv8f8Tx0iVY8qx1GZhsGKLKwzkTFdg4tsx3M/PSx3O+4VsuInpXL1jLtEwy8eu41thVLnjTD5CWiznN8xPJoPmnmUqb+rP3/lDAto8SvvvI9WNhoLDumgyV9EQxaMIXVpGvmhpO1I6LTBoSUjroQXiME3L+5XT971/vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ufLhMWzR/5Tbu7hhgPc+ummX0mqYB1smVSW3hlRdeiE=;
- b=llSyDJdhFmMgGOCI7q6gxqtOMysPdsXrS1Yey5pkVpvJCZdErsoJUoo+ZvSBRNEaW06M70ism4UfX0RiVFZlMzHjiiuFDN41//GQkEq6sd827GTbQ3eNwC9mdalzEDB1+eEiBeIGFJMe8rV339MGCdpxjNXO4gIgbH+TNE1+Hum45x1bKw9RExs+usAqn2lEnotpc8d1oOu7WKa/j7O00d2kzb68hoZ6r/e7aU1Uc7GHt7kvp2FNyd6qImURifllichsO8aMp3LpCp2xHJe3zgkgP2vO0x7wgJ2xozo26zEUsZ5AwUbmNYkQuNac1K8Oj8LoOsSvO8JqXs17eykgYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ufLhMWzR/5Tbu7hhgPc+ummX0mqYB1smVSW3hlRdeiE=;
- b=2KmKgf9A5yfh+D+BT7DCsERxMQGcVPNa/C2yZADEmZrqg3jKsYj1Cipnz9BOdviyP5QdKi110/xRjlvKR6VJDKo8PwN2vWpuzS0IVYUj+YfVQHiYy7h5M2sNp6nNilRlYgNxjyTvVc4gSrn/HOc0VnGRd/u6IlUe4nsqfkwqcHk=
-Received: from CH2PR14CA0039.namprd14.prod.outlook.com (2603:10b6:610:56::19)
- by MN6PR12MB8568.namprd12.prod.outlook.com (2603:10b6:208:471::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.31; Tue, 10 Jun
- 2025 11:41:22 +0000
-Received: from CH2PEPF0000009F.namprd02.prod.outlook.com
- (2603:10b6:610:56:cafe::55) by CH2PR14CA0039.outlook.office365.com
- (2603:10b6:610:56::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Tue,
- 10 Jun 2025 11:41:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CH2PEPF0000009F.mail.protection.outlook.com (10.167.244.21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8835.15 via Frontend Transport; Tue, 10 Jun 2025 11:41:22 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Jun
- 2025 06:41:20 -0500
-Received: from xhdsneeli41.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Tue, 10 Jun 2025 06:41:17 -0500
-From: Abin Joseph <abin.joseph@amd.com>
-To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <git@amd.com>, <abin.joseph@amd.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3] net: macb: Add shutdown operation support
-Date: Tue, 10 Jun 2025 17:11:11 +0530
-Message-ID: <20250610114111.1708614-1-abin.joseph@amd.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D3F1FC11F;
+	Tue, 10 Jun 2025 11:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749555814; cv=none; b=egGXZDKOID1HGK/89T1bByiXwoOXpVbqy6YIXAPIo3lKlixNObwujXTLqaNGidcHhXLVK4vFiOeVRcg1DtvUj7K8+LLUlGIYDtZfIG+t40PyAI+mEvRuuL+7h3XXlRNqG+j5iDyCfc6ycBt+lSsNMaTsa8HF57oIPSQlDHZvOZ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749555814; c=relaxed/simple;
+	bh=PDy2DKknaciUDyuqZoVc2ijlR0jqVrQviQ1Sx1M+ah0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XP9xSeuD7yPGFXLPABHm0+Dh3Xwd5gczxzqUnTek5+Z2JEtrn694Cdb1U+V2c/pHcdNVN6Y/rLkZn7dhFn9E05xydrp/5OxPUW90NGyK4gJP44APAphbr4nWz19npxHDmK9Ai3AFt2d5oqZccacYQDQhnlMuqTmaqAIUjZHTEpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZO3MZDf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A4DEC4CEED;
+	Tue, 10 Jun 2025 11:43:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749555814;
+	bh=PDy2DKknaciUDyuqZoVc2ijlR0jqVrQviQ1Sx1M+ah0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XZO3MZDf9rvY6vzzaIrO7Go3Mo27+Np3t0A8e51yhbrRVtPaDQvJaTr3sXwuq5rWa
+	 vhnp1eI8Ga+TYqs3SDNZOVqougzr4uyM8HvGfg3+cExMUWlW9WhZh25bTqZtJY39lm
+	 tggSvZAqQLuivXkLKy+HIJZ0PmBQbCbBkJZ6zkH7FOGwE8jiedQMRY62mcq2X/WjRc
+	 oJ/q9Q8qrynamhndtv/hU4K0H8VBeGZjUaLScgNz/6sxB0hhgJRtUYCxiVlNQpsc0f
+	 Aflx1vze0E9IhZ0VENTiqRhlmC09oUd4baYaoLrPzMtOGCSmFhtGQWsHBr4MKqUAPp
+	 sysmN+FoISuOQ==
+Message-ID: <b158cffc-582b-4a2f-bb13-a27c8f58b6fc@kernel.org>
+Date: Tue, 10 Jun 2025 13:43:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V7 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+To: Ihor Solodrai <ihor.solodrai@linux.dev>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc
+References: <174559288731.827981.8748257839971869213.stgit@firesoul>
+ <174559294022.827981.1282809941662942189.stgit@firesoul>
+ <fecfcad0-7a16-42b8-bff2-66ee83a6e5c4@linux.dev>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <fecfcad0-7a16-42b8-bff2-66ee83a6e5c4@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB03.amd.com: abin.joseph@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009F:EE_|MN6PR12MB8568:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64e87330-26f6-4940-67f2-08dda813b966
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UEva/+NtVSkEPiuYGJoNDvUOO9i612XTNKkZ/q4axH7ItRzW8nsOi+2+wdnm?=
- =?us-ascii?Q?ck82Ac9tdKYW6BXav8YDLnF/Tu/nVbahOM59vyKWGQfaDXOqcdWPLg3y+kBP?=
- =?us-ascii?Q?6OpqAYKSjWiYNGwNxAJJcKX66HfVZgqJumkNn6Pd4ja/PF9V66Nx2vTbgE4x?=
- =?us-ascii?Q?gPzJj34RPBQbqUa7XaI962NFRx5G4HlRGUkQzsdHpruZLW/5ts7JuLZZXTGS?=
- =?us-ascii?Q?edIg/h0CadG0e3aLvHWFndQmC5AT+1djAwzMz+b2rgpIwFBIOT7siQ3fN3/A?=
- =?us-ascii?Q?mnEGb3fOWmTTx3Ke8B6Uh8+ttrCiEHab5HTkPlPni2yrMBOkeauqDbLxTKo+?=
- =?us-ascii?Q?QWZr2UNb0gxkTXeBK4DSh6XGb/2WM901giOq2IKOObGfW2oVomN+UtUIL4cz?=
- =?us-ascii?Q?UImHqfv0jP0vhmuZIJtA+C9zAC9kmk9Xt1ET4p9VdSI32ozrPA8UD0TB0uSE?=
- =?us-ascii?Q?sHqgI9mjP3gtCcLFdbQg8452ZA/qEvJAAp4bpRxrIp/ickCpnGhLV324ehk3?=
- =?us-ascii?Q?J2ZetPrcGCN4aydi5GZ0n+mEforoRstZzgM1LpquxMxGh9ZUZFQWd68+xM8e?=
- =?us-ascii?Q?uLK3rg5VeJLb0DfLuwwtX2QhsU9v2RE08jxa6SFwMRyzRQyHpjHDyBYGFsV0?=
- =?us-ascii?Q?e6L52mnN+n9piFDe8kc6QuB6f/8jVNENZbPjm2sP3701+2jByiGlND0Ltn0m?=
- =?us-ascii?Q?xx7+1J+hpezmcUxYb58ikTQBVLELXSWhyV1TDX/ExlWZWSQDRkIV5YYHS1Bm?=
- =?us-ascii?Q?I0nSSdoORKm/l/rF/9UvANAW5h7B5u1Ww3WM6WaJf2Wjkg1w7+vRn48QOMeh?=
- =?us-ascii?Q?KM1jsx7fXF3wbr37Sp4VgOh66qL0PWJLS6hjivSg67BnUFbXFG0Auuwav5MG?=
- =?us-ascii?Q?NLsYszTXx4Uk85WTU7AP3+POhPXNsE9otxrpMODpdwpUgfANQm6h4QJKKZ5z?=
- =?us-ascii?Q?tmD5PghBQ7gXftt9i7bNlrR7kY7F3LMSh2/ob2ul208IPlFYZ/FixbjPP8g7?=
- =?us-ascii?Q?FXHMdrZsZBSjV29TsAMAN4uQg3/Cu0g3LA6Yd8fjv8OfHwRbX5eDxmuXlk2e?=
- =?us-ascii?Q?tzLG3+dJeghOghz/sZX9beWNLTZSynqH1rtrijy63hBFc8fxuoOVHcJPRCE6?=
- =?us-ascii?Q?LN4/GiRCIl0D1XQJdQShZfFKYeC2CAM6QbNL4Q6gLegvju5ZjBiWdnsMyEb2?=
- =?us-ascii?Q?ImpFkwYv8j0aPt3MZVpEO7IETInX0CNYbCTOEfuz/1P1bhJucguYZOJYSmzu?=
- =?us-ascii?Q?RaJAMLuepNwPp48drnlnnY08fW7jLtmztcIv2ucc+nXx95dAjPlTRNoyPdLO?=
- =?us-ascii?Q?0XMOr99Y91dMPYLZe7W0hoB8/QaRPC0JYT5/ynK+gIVXNx+B50htMpmx5u+e?=
- =?us-ascii?Q?1qnwHwZN7yBHvTfKy5j/PRPtbwT2eC/HulDAB+zyJLgsqms9sa1J5Y9jn3DP?=
- =?us-ascii?Q?vpsklJVfnnSO2QuBJ3h+9ypE+WPWQwarxeqWYF2jPRv71MYjLh78LLLBKTKK?=
- =?us-ascii?Q?LuMuMTJ1m6wzdlDJVlDDn8+KdD5amzBUZXTK?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 11:41:22.4255
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64e87330-26f6-4940-67f2-08dda813b966
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009F.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8568
-
-Implement the shutdown hook to ensure clean and complete deactivation of
-MACB controller. The shutdown sequence is protected with 'rtnl_lock()'
-to serialize access and prevent race conditions while detaching and
-closing the network device. This ensure a safe transition when the Kexec
-utility calls the shutdown hook, facilitating seamless loading and
-booting of a new kernel from the currently running one.
-
-Signed-off-by: Abin Joseph <abin.joseph@amd.com>
----
-
-Changes in v3:
-Move netif_device_detach after dev_close
-Added empty line after rtnl_lock
 
 
-Changes in v2:
-Update the commit description
-Update the code to call the close only when admin is up
 
----
- drivers/net/ethernet/cadence/macb_main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+On 10/06/2025 00.09, Ihor Solodrai wrote:
+> On 4/25/25 7:55 AM, Jesper Dangaard Brouer wrote:
+>> In production, we're seeing TX drops on veth devices when the ptr_ring
+>> fills up. This can occur when NAPI mode is enabled, though it's
+>> relatively rare. However, with threaded NAPI - which we use in
+>> production - the drops become significantly more frequent.
+>>
+>> The underlying issue is that with threaded NAPI, the consumer often runs
+>> on a different CPU than the producer. This increases the likelihood of
+>> the ring filling up before the consumer gets scheduled, especially under
+>> load, leading to drops in veth_xmit() (ndo_start_xmit()).
+>>
+>> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
+>> ring is full, signaling the qdisc layer to requeue the packet. The txq
+>> (netdev queue) is stopped in this condition and restarted once
+>> veth_poll() drains entries from the ring, ensuring coordination between
+>> NAPI and qdisc.
+>>
+>> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
+>> the driver retains its original behavior - dropping packets immediately
+>> when the ring is full. This avoids unexpected behavior changes in setups
+>> without a configured qdisc.
+>>
+>> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
+>> (AQM) to fairly schedule packets across flows and reduce collateral
+>> damage from elephant flows.
+>>
+>> A known limitation of this approach is that the full ring sits in front
+>> of the qdisc layer, effectively forming a FIFO buffer that introduces
+>> base latency. While AQM still improves fairness and mitigates flow
+>> dominance, the latency impact is measurable.
+>>
+>> In hardware drivers, this issue is typically addressed using BQL (Byte
+>> Queue Limits), which tracks in-flight bytes needed based on physical link
+>> rate. However, for virtual drivers like veth, there is no fixed bandwidth
+>> constraint - the bottleneck is CPU availability and the scheduler's 
+>> ability
+>> to run the NAPI thread. It is unclear how effective BQL would be in this
+>> context.
+>>
+>> This patch serves as a first step toward addressing TX drops. Future work
+>> may explore adapting a BQL-like mechanism to better suit virtual devices
+>> like veth.
+>>
+>> Reported-by: Yan Zhai <yan@cloudflare.com>
+>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>> ---
+>>   drivers/net/veth.c |   57 
+>> +++++++++++++++++++++++++++++++++++++++++++---------
+>>   1 file changed, 47 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+>> index 7bb53961c0ea..e58a0f1b5c5b 100644
+>> --- a/drivers/net/veth.c
+>> +++ b/drivers/net/veth.c
+>> @@ -307,12 +307,10 @@ static void __veth_xdp_flush(struct veth_rq *rq)
+>>   static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
+>>   {
+>> -    if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb))) {
+>> -        dev_kfree_skb_any(skb);
+>> -        return NET_RX_DROP;
+>> -    }
+>> +    if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
+>> +        return NETDEV_TX_BUSY; /* signal qdisc layer */
+>> -    return NET_RX_SUCCESS;
+>> +    return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
+>>   }
+>>   static int veth_forward_skb(struct net_device *dev, struct sk_buff 
+>> *skb,
+>> @@ -346,11 +344,11 @@ static netdev_tx_t veth_xmit(struct sk_buff 
+>> *skb, struct net_device *dev)
+>>   {
+>>       struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
+>>       struct veth_rq *rq = NULL;
+>> -    int ret = NETDEV_TX_OK;
+>> +    struct netdev_queue *txq;
+>>       struct net_device *rcv;
+>>       int length = skb->len;
+>>       bool use_napi = false;
+>> -    int rxq;
+>> +    int ret, rxq;
+>>       rcu_read_lock();
+>>       rcv = rcu_dereference(priv->peer);
+>> @@ -373,17 +371,45 @@ static netdev_tx_t veth_xmit(struct sk_buff 
+>> *skb, struct net_device *dev)
+>>       }
+>>       skb_tx_timestamp(skb);
+>> -    if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == 
+>> NET_RX_SUCCESS)) {
+>> +
+>> +    ret = veth_forward_skb(rcv, skb, rq, use_napi);
+>> +    switch (ret) {
+>> +    case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
+>>           if (!use_napi)
+>>               dev_sw_netstats_tx_add(dev, 1, length);
+>>           else
+>>               __veth_xdp_flush(rq);
+>> -    } else {
+>> +        break;
+>> +    case NETDEV_TX_BUSY:
+>> +        /* If a qdisc is attached to our virtual device, returning
+>> +         * NETDEV_TX_BUSY is allowed.
+>> +         */
+>> +        txq = netdev_get_tx_queue(dev, rxq);
+>> +
+>> +        if (qdisc_txq_has_no_queue(txq)) {
+>> +            dev_kfree_skb_any(skb);
+>> +            goto drop;
+>> +        }
+>> +        /* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
+>> +        __skb_push(skb, ETH_HLEN);
+>> +        /* Depend on prior success packets started NAPI consumer via
+>> +         * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
+>> +         * paired with empty check in veth_poll().
+>> +         */
+>> +        netif_tx_stop_queue(txq);
+>> +        smp_mb__after_atomic();
+>> +        if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
+>> +            netif_tx_wake_queue(txq);
+>> +        break;
+>> +    case NET_RX_DROP: /* same as NET_XMIT_DROP */
+>>   drop:
+>>           atomic64_inc(&priv->dropped);
+>>           ret = NET_XMIT_DROP;
+>> +        break;
+>> +    default:
+>> +        net_crit_ratelimited("%s(%s): Invalid return code(%d)",
+>> +                     __func__, dev->name, ret);
+>>       }
+>> -
+>>       rcu_read_unlock();
+>>       return ret;
+>> @@ -874,9 +900,17 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
+>> budget,
+>>               struct veth_xdp_tx_bq *bq,
+>>               struct veth_stats *stats)
+>>   {
+>> +    struct veth_priv *priv = netdev_priv(rq->dev);
+>> +    int queue_idx = rq->xdp_rxq.queue_index;
+>> +    struct netdev_queue *peer_txq;
+>> +    struct net_device *peer_dev;
+>>       int i, done = 0, n_xdpf = 0;
+>>       void *xdpf[VETH_XDP_BATCH];
+>> +    /* NAPI functions as RCU section */
+>> +    peer_dev = rcu_dereference_check(priv->peer, 
+>> rcu_read_lock_bh_held());
+>> +    peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
+>> +
+>>       for (i = 0; i < budget; i++) {
+>>           void *ptr = __ptr_ring_consume(&rq->xdp_ring);
+>>
+> 
+> Hi Jesper.
+> 
+> Could you please take a look at the reported call traces and help
+> understand whether this patch may have introduced a null dereference?
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index e1e8bd2ec155..9639c601fe64 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5650,6 +5650,20 @@ static int __maybe_unused macb_runtime_resume(struct device *dev)
- 	return 0;
- }
- 
-+static void macb_shutdown(struct platform_device *pdev)
-+{
-+	struct net_device *netdev = platform_get_drvdata(pdev);
-+
-+	rtnl_lock();
-+
-+	if (netif_running(netdev))
-+		dev_close(netdev);
-+
-+	netif_device_detach(netdev);
-+
-+	rtnl_unlock();
-+}
-+
- static const struct dev_pm_ops macb_pm_ops = {
- 	SET_SYSTEM_SLEEP_PM_OPS(macb_suspend, macb_resume)
- 	SET_RUNTIME_PM_OPS(macb_runtime_suspend, macb_runtime_resume, NULL)
-@@ -5663,6 +5677,7 @@ static struct platform_driver macb_driver = {
- 		.of_match_table	= of_match_ptr(macb_dt_ids),
- 		.pm	= &macb_pm_ops,
- 	},
-+	.shutdown	= macb_shutdown,
- };
- 
- module_platform_driver(macb_driver);
--- 
-2.34.1
+I'm investigating... thanks for reporting.
+(more below)
 
+> Pasting a snippet, for full logs (2 examples) see the link:
+> https://lore.kernel.org/bpf/6fd7a5b5-ee26-4cc5-8eb0-449c4e326ccc@linux.dev/
+> 
+> [  343.217465] BUG: kernel NULL pointer dereference, address: 0000000000000018
+> [  343.218173] #PF: supervisor read access in kernel mode
+> [  343.218644] #PF: error_code(0x0000) - not-present page
+> [  343.219128] PGD 0 P4D 0
+> [  343.219379] Oops: Oops: 0000 [#1] SMP NOPTI
+> [  343.219768] CPU: 1 UID: 0 PID: 7635 Comm: kworker/1:11 Tainted: G
+>      W  OE       6.15.0-g2b36f2252b0a-dirty #7 PREEMPT(full)
+> [  343.220844] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [  343.221436] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+> [  343.222356] Workqueue: mld mld_dad_work
+> [  343.222730] RIP: 0010:veth_xdp_rcv.constprop.0+0x6b/0x380
+> 
+
+Can you give me the output from below command (on your compiled kernel):
+
+  ./scripts/faddr2line drivers/net/veth.o veth_xdp_rcv.constprop.0+0x6b
+
+>      [...]
+> 
+> [  343.231061] Call Trace:
+> [  343.231306]  <IRQ>
+> [  343.231522]  veth_poll+0x7b/0x3a0
+> [  343.231856]  __napi_poll.constprop.0+0x28/0x1d0
+> [  343.232297]  net_rx_action+0x199/0x350
+> [  343.232682]  handle_softirqs+0xd3/0x400
+> [  343.233057]  ? __dev_queue_xmit+0x27b/0x1250
+> [  343.233473]  do_softirq+0x43/0x90
+> [  343.233804]  </IRQ>
+> [  343.234016]  <TASK>
+> [  343.234226]  __local_bh_enable_ip+0xb5/0xd0
+> [  343.234622]  ? __dev_queue_xmit+0x27b/0x1250
+> [  343.235035]  __dev_queue_xmit+0x290/0x1250
+> [  343.235431]  ? lock_acquire+0xbe/0x2c0
+> [  343.235797]  ? ip6_finish_output+0x25e/0x540
+> [  343.236210]  ? mark_held_locks+0x40/0x70
+> [  343.236583]  ip6_finish_output2+0x38f/0xb80
+> [  343.237002]  ? lock_release+0xc6/0x290
+> [  343.237364]  ip6_finish_output+0x25e/0x540
+> [  343.237761]  mld_sendpack+0x1c1/0x3a0
+> [  343.238123]  mld_dad_work+0x3e/0x150
+> [  343.238473]  process_one_work+0x1f8/0x580
+> [  343.238859]  worker_thread+0x1ce/0x3c0
+> [  343.239224]  ? __pfx_worker_thread+0x10/0x10
+> [  343.239638]  kthread+0x128/0x250
+> [  343.239954]  ? __pfx_kthread+0x10/0x10
+> [  343.240320]  ? __pfx_kthread+0x10/0x10
+> [  343.240691]  ret_from_fork+0x15c/0x1b0
+> [  343.241056]  ? __pfx_kthread+0x10/0x10
+> [  343.241418]  ret_from_fork_asm+0x1a/0x30
+> [  343.241800]  </TASK>
+> [  343.242021] Modules linked in: bpf_testmod(OE) [last unloaded:
+> est_no_cfi(OE)]
+> [  343.242737] CR2: 0000000000000018
+> [  343.243064] ---[ end trace 0000000000000000 ]---
+> 
+> 
+> Thank you.
+> 
+> 
+>> @@ -925,6 +959,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
+>> budget,
+>>       rq->stats.vs.xdp_packets += done;
+>>       u64_stats_update_end(&rq->stats.syncp);
+>> +    if (unlikely(netif_tx_queue_stopped(peer_txq)))
+>> +        netif_tx_wake_queue(peer_txq);
+>> +
+>>       return done;
+>>   }
+>>
+>>
+> 
 
