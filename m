@@ -1,283 +1,140 @@
-Return-Path: <netdev+bounces-196309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5854AD42A5
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 21:12:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDFD4AD41BD
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:12:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7164917D81E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:12:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B03F83A28EA
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C212620E9;
-	Tue, 10 Jun 2025 19:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E72238D56;
+	Tue, 10 Jun 2025 18:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TKRFx6Oo"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="vuO/4izA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Cs2aiyqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5DF26159D;
-	Tue, 10 Jun 2025 19:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C61E1DE2A8
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 18:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749582715; cv=none; b=ZwOn/xt6XiUdaqxb8GY0CFXPDXlQliEWjfSCafsKWIBnKDH4vfiUoWi4uaatoBvAyAZgTGcOmLckU++VCn2HElLtrq8QrWXGR7geDOQZWqn03j0/BfsKM0b1mGYMpu0KzrKQ8xRxKLhXxX9mgxKV896Ds9UwojtnQe6vnSlGxg4=
+	t=1749579150; cv=none; b=bGPxutHUTraxcZyQUEOxjKMLFyi9Lz5maifVkjaxarDwjX+FT/SoQ/sWXlIbcRGg1x6Z5tN4BQtC5Bav/9uTd2ec6QAOBJcY8bBtkm/bb+msPRCvKqoUSzSi3F6EtmLclSwcIKo5N1NKORhsPVNgADCQSzNWjX/6VHaPtXNs4Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749582715; c=relaxed/simple;
-	bh=8eyMwkNCgPgfaR4hpbqPQYYf9q8JaSUsX2SvYN/ABQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lw/AxQl1nO6TZHb7a9j2qzi0KohHvu6WFqDqYw32lnVAChRK4cuMXbE51RlVisoYVOkMIzRRxcRzvfLDkW0AAlZJlbvtsgdkvTKXINppr9Mo+dkPpOppbWtZtdfZVlHNujteAwS0WdDiSI6v/a7OiGF+i2RMmMlmhMBK5/TkePY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TKRFx6Oo; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55AGMn2k006076;
-	Tue, 10 Jun 2025 19:11:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=kKI4l
-	pdOo22aTZrPrC8vL49VNv0R+9H0RpyZOJ/1T+w=; b=TKRFx6OokaTrSc6eGE3n3
-	1/9IeeLaFahlPDSAnirN+KJTYBDXMif91OlXNWzPK+3+KB/QRyuU1OgYEaqJM6kM
-	yPMqutQAJzXJOTOEf9bf8paeT4IP6o2ONFFDnXnHARJyPrEerEW9lQ/5ZOUBxGFY
-	kThYkjO1Vp4Z6OdgAqwNoZGTWbErtNXGs2BavWddHOoLFptdSoKgEF5s7rMzdu7N
-	IfSAp5uweYSYzJeQZ41ehyklkIbTMVIscEgfWshq48HlG80GPtgqdPLRG2Q4crIB
-	2+VigI3iML3ahZttPve+LzjNj7puaA5jP0emSs2wSI//MsOOEg47yMugnuIZM/yx
-	A==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4752xjva5x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Jun 2025 19:11:51 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55AIjMoO007531;
-	Tue, 10 Jun 2025 19:11:50 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 474bv8waf4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Jun 2025 19:11:50 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55AJBm0W024832;
-	Tue, 10 Jun 2025 19:11:49 GMT
-Received: from konrad-char-us-oracle-com.osdevelopmeniad.oraclevcn.com (konrad-char-us-oracle-com.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.23])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 474bv8wadv-2;
-	Tue, 10 Jun 2025 19:11:49 +0000
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH RFC v1] rds: Expose feature parameters via sysfs and ELF note
-Date: Tue, 10 Jun 2025 12:27:25 -0400
-Message-ID: <20250610191144.422161-2-konrad.wilk@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250610191144.422161-1-konrad.wilk@oracle.com>
-References: <20250610191144.422161-1-konrad.wilk@oracle.com>
+	s=arc-20240116; t=1749579150; c=relaxed/simple;
+	bh=0DO9ji7fhUKeP8C4dffS5kIgVpayLGI6iU9FypMtU1c=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gC5UPxSepWNDN2RfapXsyOL6/gSSieJ/CyKVGiYXYRjsOOyk8XGm2BcIl3/TM07tyOU8LlHZ1tmL7kbWo4I5cn1LOaUx1aR9rBUccdBdktD2Rk2ec2iXZR/s4SpFtMjkN/6Hw9sGZYXC2ZFni031N6l5QUdKKPy2iQUPIm1jKZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=vuO/4izA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Cs2aiyqw; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 0DD5F1140152;
+	Tue, 10 Jun 2025 14:12:26 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 10 Jun 2025 14:12:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-type:content-type:date:date:from
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1749579145; x=
+	1749665545; bh=OoZ5u0oIBWN0fzLecqeatxwyVSEZ+6Btjcye8WjMJVM=; b=v
+	uO/4izAf8kmSVcAgo0zJr+JnvAK5kYhOe3m3kf1PU36+dpjnMj95X1bmIEWRuy4l
+	p4FXle5D4r/HdZT51DAbMrQLf1d7tZ0mmNjWx27UgUqglhJwq1BcWu0Bs0mwdHGZ
+	aLyRW6tPhwYXSMCOpVzJAAiJMeBi75vfZS7hhpsr1JWv+lPFSe58Nk6wjM37S3tE
+	UC/iTqvZUi2dQPg85Q6IT3Z7j9+UfzaQgSztndRsdT24h2IBB07mFCDKUejMJ49D
+	wk4KsHSO1wf2lsCAWm6s9cAHBJNeLwphbrn/JSw5FK0PuKxsZ2uSKEWZIUy/dN+p
+	E9/M+9IdcjWx5YeaY/Dfw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1749579145; x=1749665545; bh=O
+	oZ5u0oIBWN0fzLecqeatxwyVSEZ+6Btjcye8WjMJVM=; b=Cs2aiyqwK8u79uE28
+	/k+VuiOnnFuhdy+85VwXVs04frpIXjN5ACy2qhfIGZuDOtFQE2QaDYLncAM605ws
+	J75qYKLyRnedStcjA7FfoQXv8h7s8BxzZRa5tM2dxrU/TY4R1gSmNsV7QNuR3kap
+	xJ0RPxnBnyqM9F+4P64sQYxitaWyGdmlskdrRSdUii0/mMU0oC48Ly2/D+aMcGz6
+	D2E4VtjLp81y7f2Lh594cHBbVuG4cOFNcc44yjCs6xretb3pHrArSbzZM1FMa4Fh
+	InGB11/GcvVEl30NvNwEBpEx2GofCmbLidCSnBm79j7r7GLYZFdUN+HOHmghjP9j
+	lOxiw==
+X-ME-Sender: <xms:iXVIaO7EssFhD02b0xYv8uBu1ocOdZpEWUd-Sbv_LwHC_JbPJcrGjQ>
+    <xme:iXVIaH7JaU0-Y1VL4rrrVcC2YER7HYsn9h2cOm6SzHmzp7lGkBGqOjpEH6sQFec1q
+    -g5TTSMZTfzrIlQZg8>
+X-ME-Received: <xmr:iXVIaNdWmvxOdfG-NGnbgmC1CQN4m9daozf_PiHwqPsrNn7W072oVL-NIFI0u719P-LouQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdduuddtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtfffksehttdertdertddv
+    necuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnh
+    gvtheqnecuggftrfgrthhtvghrnhepjedvgffhteevvddufedvjeegleetveekveegtdfh
+    udekveeijeeuheekgeffjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthho
+    pedvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhmhhoohhrvgesqhhumhhulh
+    hordgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:iXVIaLKP0_xJNaRybGpOA9EqS25g_SjOvs_33G_uAv2ZD5tBkRk9eA>
+    <xmx:iXVIaCLfickWhxFS8FGbNjKDuNtCR1kgPiG6ViiE2d9UQKFkU3WzOw>
+    <xmx:iXVIaMwpa151-h4K1CjIx-wn8xX6eKAgZCLVRaq6L7XFndOt4_MWww>
+    <xmx:iXVIaGKl213e5ZOdLreBa_pn8yksZrZPA5LW8Ghf1eDV8KqNTeyJaw>
+    <xmx:iXVIaDzEgQ-H7iBJt-ZGBDmnlFB1Qr_4g5v213nHKJJqK_yNZ_GB5bql>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 10 Jun 2025 14:12:25 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 75EC49FCA9; Tue, 10 Jun 2025 11:12:24 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 731659FCA8;
+	Tue, 10 Jun 2025 11:12:24 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Haylin Moore <hmoore@qumulo.com>
+cc: netdev@vger.kernel.org
+Subject: Re: bond_eth_hash only uses the fifth byte of MAC address
+In-reply-to: 
+ <CALnKHDCKs-_XvW0jFAu1yv-Ex_OabqzuyBy=US_W-jzwy9N3Ug@mail.gmail.com>
+References: 
+ <CALnKHDCKs-_XvW0jFAu1yv-Ex_OabqzuyBy=US_W-jzwy9N3Ug@mail.gmail.com>
+Comments: In-reply-to Haylin Moore <hmoore@qumulo.com>
+   message dated "Tue, 10 Jun 2025 09:54:25 -0700."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-10_09,2025-06-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- malwarescore=0 suspectscore=0 spamscore=0 mlxscore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2506100156
-X-Authority-Analysis: v=2.4 cv=K4AiHzWI c=1 sm=1 tr=0 ts=68488377 cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=F2Ui4erszk5pojq0XdIA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjEwMDE1NiBTYWx0ZWRfXyA7s6Fktabjy 9XqnFYqVOHUBwGzXi9RENIpc6+GhETHn/5R3S6/0chyekg2/5+pOYnueJlE1+O57T9vabVPomDR uVnw+NAMBvSS32I/x0Yr9O/RwM4xdMe/85rZ/e98ltGWNh8xHDFj7de094kkiy0L7CTD8Wdpt1L
- mJyskKAKbGKrVVUkaeYdbZsEgbQGIxd0Mo+YM5nqFOZqALApiGxHofShIidPBvk2QnnfXBWpzoI 36IuNHRkO7NkTpBeY1X6gH8zE/tIkvgZ2PLKtGvfDPcfWGk7jLu7ohZhdqHTIYtupnXflyqCmKo R0hvraYasi7qug4rjmpHtISmranDO4KCWWiBAltuWox8gjC8lGaxwZ/W8RqlEnKQITawK+DQfpc
- 02LjB/5ZBU0ioiSod1fDqbm/j0JSYa/6hWhMmciS+OLEyX/gJSjpWwEwJvDy9CVOiJnucC8I
-X-Proofpoint-ORIG-GUID: Mr8ylqGzOBFmc3f7o9rIM-0WYWSoGFVh
-X-Proofpoint-GUID: Mr8ylqGzOBFmc3f7o9rIM-0WYWSoGFVh
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1518703.1749579144.1@famine>
+Date: Tue, 10 Jun 2025 11:12:24 -0700
+Message-ID: <1518704.1749579144@famine>
 
-We would like to have a programatic way for applications
-to query which of the features defined in include/uapi/linux/rds.h
-are actually implemented by the kernel.
+Haylin Moore <hmoore@qumulo.com> wrote:
 
-The problem is that applications can be built against newer
-kernel (or older) and they may have the feature implemented or not.
+>Hello All,
+>
+>I am currently digging into the source code powering layer2+3 bonding
+>and saw that for bond_eth_hash only the 5th byte of both the source
+>and destination MAC address is used in the XOR.
+>
+>Is there a reason for this? I was not able to find anything searching
+>the mailing lists or the web. This functionality while documented just
+>feels weird to me.
 
-The lack of a certain feature would signify that the kernel
-does not support it. The presence of it signifies the existence
-of it.
+	My recollection, which could be totally wrong, is that the
+described algorithm was chosen to mimic what was available on Cisco
+Etherchannel at the time.  Bonding's balance-xor mode was originally
+developed to interoperate with Etherchannel, before LACP became popular,
+so this would have been implemented circa 2000-2002.
 
-This would provide the application to query the sysfs and figure
-out what is supported (and which ones are deprecated) and also
-what ioctl number to use for the specific feature (albeit that
-is already in include/uapi/linux/rds.h but this is an extra
-check if someone messed up).
+	Development on bonding was done out of tree at that time, and
+updates were distributed on sourceforge, with discussion primarily on
+the bonding-devel mailing list.  marc.info has the bonding-devel list
+archived; you might be able to find the original discussion there.
 
-This patch would expose these extra sysfs values:
+	-J
 
-/sys/module/rds/parameters/rds_ioctl_get_tos: 35297
-/sys/module/rds/parameters/rds_ioctl_set_tos: 35296
-/sys/module/rds/parameters/rds_socket_cancel_sent_to: 1
-/sys/module/rds/parameters/rds_socket_cong_monitor: 6
-/sys/module/rds/parameters/rds_socket_free_mr: 3
-/sys/module/rds/parameters/rds_socket_get_mr: 2
-/sys/module/rds/parameters/rds_socket_get_mr_for_dest: 7
-/sys/module/rds/parameters/rds_socket_recverr: 5
-/sys/module/rds/parameters/rds_socket_so_rxpath_latency: 9
-/sys/module/rds/parameters/rds_socket_so_transport: 8
-/sys/module/rds/parameters/rds_so_transport_ib: 0
-/sys/module/rds/parameters/rds_so_transport_tcp: 2
-
-Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 ---
- Documentation/ABI/stable/sysfs-driver-rds | 92 +++++++++++++++++++++++
- net/rds/af_rds.c                          | 33 ++++++++
- 2 files changed, 125 insertions(+)
- create mode 100644 Documentation/ABI/stable/sysfs-driver-rds
-
-diff --git a/Documentation/ABI/stable/sysfs-driver-rds b/Documentation/ABI/stable/sysfs-driver-rds
-new file mode 100644
-index 000000000000..dcb1a335c5d6
---- /dev/null
-+++ b/Documentation/ABI/stable/sysfs-driver-rds
-@@ -0,0 +1,92 @@
-+What:		/sys/module/rds/parameters/rds_ioctl_set_tos
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to set on a socket
-+		the Quality of Service.
-+
-+		The returned value is the socket ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_ioctl_get_tos
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to get on a socket
-+		the Quality of Service.
-+
-+		The returned value is the socket ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_cancel_sent_to
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to cancel all pending
-+		messages to a given destination.
-+
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_get_mr
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to retrieve the memory
-+		ranges for the RDMA calls to setsockopt.
-+
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_free_mr
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to release the memory
-+		ranges for the RDMA calls to setsockopt.
-+
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_recverr
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports the mechanism to send RDMA notifications
-+		for any RDMA operation that fails.
-+
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_cong_monitor
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The RDS driver supports mechanism to provide Congestion updates via
-+		RDS_CMSG_CONG_UPDATE control messages.
-+
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_get_mr_for_dest
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_so_transport
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_socket_so_rxpath_latency
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The returned value is the ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_so_transport_ib
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The returned value for the IB transport ioctl number and this is read-only.
-+
-+What:		/sys/module/rds/parameters/rds_so_transport_tcp
-+Date:		Jun 2025
-+Contact:	rds-devel@oss.oracle.com
-+Description:
-+		The returned value is the TCP transport number and this is read-only.
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 8435a20968ef..15c8ded02dfb 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -31,6 +31,7 @@
-  *
-  */
- #include <linux/module.h>
-+#include <linux/elfnote.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/gfp.h>
-@@ -960,3 +961,35 @@ MODULE_DESCRIPTION("RDS: Reliable Datagram Sockets"
- MODULE_VERSION(DRV_VERSION);
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_ALIAS_NETPROTO(PF_RDS);
-+
-+#define RDS_IOCTL(feature, val) ELFNOTE64("rds.ioctl_" #feature, 0, val); \
-+				unsigned int rds_ioctl_##feature = val; \
-+				module_param(rds_ioctl_##feature, int, 0444)
-+
-+#define RDS_SOCKET(feature, val) ELFNOTE64("rds.socket_" #feature, 0, val); \
-+				unsigned int rds_socket_##feature = val; \
-+				module_param(rds_socket_##feature, int, 0444)
-+
-+#define RDS_SO_TRANSPORT(feature, val) ELFNOTE64("rds.so_transport_" #feature, 0, val); \
-+				unsigned int rds_so_transport_##feature = val; \
-+				module_param(rds_so_transport_##feature, int, 0444)
-+
-+/* The values used here correspond to include/uapi/linux/rds.h values */
-+
-+RDS_IOCTL(set_tos, SIOCRDSSETTOS);
-+RDS_IOCTL(get_tos, SIOCRDSGETTOS);
-+
-+/* Advertise setsocket/getsocket options. */
-+
-+RDS_SOCKET(cancel_sent_to, RDS_CANCEL_SENT_TO);
-+RDS_SOCKET(get_mr, RDS_GET_MR);
-+RDS_SOCKET(free_mr, RDS_FREE_MR);
-+RDS_SOCKET(recverr, RDS_RECVERR);
-+RDS_SOCKET(cong_monitor, RDS_CONG_MONITOR);
-+RDS_SOCKET(get_mr_for_dest, RDS_GET_MR_FOR_DEST);
-+RDS_SOCKET(so_transport, SO_RDS_TRANSPORT);
-+RDS_SOCKET(so_rxpath_latency, SO_RDS_MSG_RXPATH_LATENCY);
-+
-+/* The transport mechanisms. */
-+RDS_SO_TRANSPORT(ib, RDS_TRANS_IB);
-+RDS_SO_TRANSPORT(tcp, RDS_TRANS_TCP);
--- 
-2.43.5
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
