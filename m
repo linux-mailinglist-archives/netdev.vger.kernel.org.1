@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-196266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503F5AD407B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:25:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D244CAD40AF
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F7173A666F
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:24:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EBBD17E82F
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020EA248F56;
-	Tue, 10 Jun 2025 17:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A19258CC9;
+	Tue, 10 Jun 2025 17:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfCR8qwn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmXOpuND"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA99A2472B6;
-	Tue, 10 Jun 2025 17:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383BD25394C;
+	Tue, 10 Jun 2025 17:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749576197; cv=none; b=D8c72INIeNpbbZWWLL9FHmXyI8Aaaq524GWWJHk6dPJe/p70LQDRfTb1/ze100vf/hofkrhQNZ6UhpW0y9dTbZZEwb1tc+ny6BUugM0h4LlMc4usYMJ2auxngEN5Y6ENj5CqvSXSrfYwMg2yUhvN90biEgGLcV0lOF9hdzmBMIA=
+	t=1749576212; cv=none; b=Z4BKk9pwcBCN2HY4FERSBfbdLvvWuE2uIbucjv3IarsFaF7F4jvz9NwqoMpbMhLK7/LAhvUSZei1sHFdB78P91eOPb1mgPwvqid0KfkABNiFHEBFDK4Y9lrILasgVpqW/X3OlIT9tL/Jc+CCcmM04T4xu1qSjtj7raJyI6Xc6N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749576197; c=relaxed/simple;
-	bh=LaAY7LW12FIT6EhvMen1DBgLgEBv2Ba+m4DyF6YuEqA=;
+	s=arc-20240116; t=1749576212; c=relaxed/simple;
+	bh=sypPcmdzJjXuO4I/gedhAmza3DZRvlkZcE4R9+VL9f8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uzgcE31BR6uaoqVI0NmKEdBk0sQKk6PYxR0L9RFYCINzsq5phpMzI9NZ037h4ryuxVm8yxD2TUpbl1+YfivYmCBdX+O5TfGBA9K00ve0xGzPyaHkY9V5mUtOOn7WX4mU/01LKbjXAkgDRVyK5gZ1KyCEV9+HyAVto4YoYnUE5FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfCR8qwn; arc=none smtp.client-ip=209.85.222.172
+	 MIME-Version; b=Lmz8s6JoiX4dXuoFOe8In9MZiMiZvwFZ7008zwD81H2t1LE/uYXDdXVZI/wNOXFvCUh9f5/mCz1Wgg2Sw6tiBkG9RSFZdSgsKZlaFja6ggUF+ViQ1x09QpEbFcibvpsKZba+y/b6Tlq1NtncFslWI/JdPctPWy6n65t4iDwaYW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cmXOpuND; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7d3862646eeso184894285a.2;
-        Tue, 10 Jun 2025 10:23:15 -0700 (PDT)
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a43972dcd7so75162961cf.3;
+        Tue, 10 Jun 2025 10:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749576194; x=1750180994; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749576207; x=1750181007; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BunmXaBx1/F7vPrgZgZvxshwECw+mv+5GNNhPLRNw1s=;
-        b=RfCR8qwnURwP4QoJW1u2KePAgsAVSgkzjF2j4rn7cuiqMf9ZZzhrN9dw17zGQsbw1h
-         jERxyLzLBaPY479NIiDDxAR38r3q86zAkgQ5H5kncyt7TPTFeR9ItxllPz3YbOYXe5bC
-         nhHQE0QDA3J0Qdx/NcMiQ5tCQ6oP8Kdv+9wZaRV08RvKayHYC5XzoVyTSwXFCxKjS6+f
-         glA51A3xeVMAY7+gH2wEbkxcwIJVVDF4UCs1aad0sPn0HiIj0IsJP47d6vqTQsATTR+P
-         14R9Jb0DLsoqHRC05L4JvVBsiAV5rhsr2aaF60z3n8NCdjZ/dAQhrQGojgXBcq2rToV9
-         Stzw==
+        bh=OyWtHaCMt03//7wZa1v/j7/XjaKSQMx1UXaLarTBgKc=;
+        b=cmXOpuNDd+sykyCaPSvoTw01huLwj2R50f9KN6tT5buaMPuxl/TqTMhtD3MoTd/rpn
+         /wO6t2YrZajgK24fyoFsTPLPt0wikKAEh2FXO09mPTAHvvatnpcZJMhDEHYITovdPAjx
+         voX2Kdh16kyD/xzmmzOyAAsTWjVkEEEjq02o4IhTSh6l5vXz74v3GahwCtH/w36dDUay
+         CIJp2vBWKQFib7yPb2JzmRQDbM+NwnMYWOKuWJc7xmwR92nFU5rpSmt58amOp+1OAmH5
+         jg7vCl2M/otDm1P9RBF6kjIP6JfIlb6H/uPLJTn1ZW1xs8FYhMYbrN1N2g8p8dFa7fAF
+         ESsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749576194; x=1750180994;
+        d=1e100.net; s=20230601; t=1749576207; x=1750181007;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BunmXaBx1/F7vPrgZgZvxshwECw+mv+5GNNhPLRNw1s=;
-        b=sGgthq9byJv30SQsujhjFpIiimrwFlXhZl2YEmpmEV20KPuOPvsz+6txP+PfdRabSN
-         zPURawDc2WwhkpRtbEjyrmBsjEMsIPSVbnfKIHBy3NR+ybuX7ExuE3mGWsJ0VmEiVrdn
-         j05lNi3rd0nKW5U9Rx6RjK6HHNGjneEJTtrcIjoOqVbWvixoZtiCDSTv0h2T2LK7dFdx
-         t7fi+mI18qhr2Lixt2myndyWR1AkWwQKhKeJdPGr/Vm1gvLGtfuYUzFXmHdjJePgkmt1
-         dCK5tyn+nHuEQkB2QrLtghk8eiR181mgRKL/uzCqkMBWQQDKP1bTW7DBYPExbhCPrHHV
-         IGcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV2L1U/Sfp3yx5tISSqOkCFMEXeIoggNP0Y66BZnMp9++c/acosnm7vXHSwjRlmAnVMXC8Ozpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziDz6nxpPvLq4rdaJZg0+2I7cIqQ6n/Oqv1rCEq3Jfnr0n6Nf+
-	dW1qTl4Wdf5MZEb+Xk0egJBOLEdH9k0l/5X+RbPoTO/aR8CItC3kLaESnW1PrA==
-X-Gm-Gg: ASbGncs7K9OLIRRuxtItGYw1y3a3CHFyhoshsYOvS0bnd2xgXDUMlEZ/pD4/lkekdqh
-	A4elQqS3RYHAk/ZHlQQhtanZqfenUQbYh6l29wldEPq9PhRJ9mtfV9Iav5zjdwJjmMl3bRJLzBs
-	Kkn9PZvgBsWY2VxfparhPfx3/E4qHzG210mWdgzStpC5lsvq0g2y3NQ7rHiqUGH+Ny4fc+F1hF5
-	soYlla1GG0E3PEWTTC1/Ifwy12p2+W4TLY27zfTM28qUR11cdeHwxWITi8uzO6LmAEOsT0luAJy
-	6mOhN2Uqokke69yYxC67QRarQNOyw+kgb3miqWUuJAvjJLHXkoXF9MZRu3+u/y4SKEg957vWgZe
-	fFy1JemnF517+Z8L8oJ2su5ESD5yNSUGBf/HS/AzJbJ7qFStNUj8oVT5ipRUwD1JXyQ==
-X-Google-Smtp-Source: AGHT+IHy67NF/KalxZSLQuk+r1Bq6SKNZ5rN+X9DF0JH2o8PMyc2gDLMpuK4etI1vPiMWNb3jGXRrA==
-X-Received: by 2002:a05:620a:29c9:b0:7d3:9ecc:1bd2 with SMTP id af79cd13be357-7d3a8805fe9mr32397185a.10.1749576194287;
-        Tue, 10 Jun 2025 10:23:14 -0700 (PDT)
+        bh=OyWtHaCMt03//7wZa1v/j7/XjaKSQMx1UXaLarTBgKc=;
+        b=u1DNcX7caVJk+hktTadzSi7iNHxvaVuN1y0qwa9z2WL/kCSq0mvqlWNTIXqimaHXXz
+         KtAqemgXuj1hB9APeaxSrelx2VL2UVaMg5CdLINjRPBFv8snFPZnUA1BymnGA3dBmHFw
+         swXpzTkJWjJzLZOD8Z/6I4dpu5GmMEMikqa2RUkkGyuHr1XJto7aWjyalKD7gnEKMGPn
+         JB1w5YT2IZc93MOuWwcWzHIWaSf9bgap+ytzasDUcqv6v8yU5q2gDQDtpab1AtH6LGRT
+         vd+qwhd718GfcsIlmKIBzwcdLrVVaLZ4E4U92vwAtDTZ/d8LmhjH6HBCQ/NHmNp/iMZV
+         JkKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ3G5vWFZAV7bbvwaj2oIEM5+LZzCJ0cX+64Rxg/9SaW9EZGdEdQVSUZ89NFW58a1O4YYJ4Ck=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQuRn3TgtjywyAfyIHMR5sJC3dEygcZUUinB8OElcANy7WG/kG
+	g18xfhSmqXRwa5fGVKhZUC7ij3u9+LKrbRNh20nWZkmnF6VMf3hFDuSnidhssg==
+X-Gm-Gg: ASbGncs52hLWTCcXQZsZ18wR8obdRaX28qCtPMe7aayxgxQK4dlTofDy0gKvCx/UQ9U
+	Dmq04vEppSENG39WdD5ErWmRUQS2TqabksmwPKWeGQgqF4sasdUes/aCRY5byiy1vgfLxt2eeRo
+	apzNRKXLE1+D+AaxtBXD7XbhgoiiJnHp5/eerDC3SxZDJ6eOONkTmLVKBnfAIi3+Vl3RanhIMb+
+	K2wGEYiVaE2mutVkjusUIZy9VWq8TX5SP6EiGiWsAWHWO2G/UaOOc80ee8dT8xkhsJbP6GdIN3o
+	HNgj4cqhvdv5/KkRYUeJWdjOYSQSl5pX3j2nspIva7mw18Z4r0yQGTx+nKGSEkRdYwDBNK/Z/lk
+	LF4Hb4VjRi7vtm4RtuarRDa0pRJLNy1ijLxqVl0VWLBKvecboSSawgWR7zAoqKMbIsw==
+X-Google-Smtp-Source: AGHT+IFpMwVQ9Hv964djJYN48UIO6qGV0ADi5TBLZsfVaN0m1ssbqZaO46AXfbTeA+TXKf/5G8eGZA==
+X-Received: by 2002:a05:620a:2682:b0:7d2:1404:5888 with SMTP id af79cd13be357-7d3a888320cmr33202385a.45.1749576195314;
+        Tue, 10 Jun 2025 10:23:15 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a608d19sm716491185a.63.2025.06.10.10.23.13
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a608d19sm716491185a.63.2025.06.10.10.23.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 10:23:13 -0700 (PDT)
+        Tue, 10 Jun 2025 10:23:14 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
 	omosnace@redhat.com,
 	netdev@vger.kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v4 16/42] selinux: introduce a global SID table
-Date: Tue, 10 Jun 2025 13:21:47 -0400
-Message-ID: <20250610172226.1470741-17-stephen.smalley.work@gmail.com>
+Subject: [PATCH v4 17/42] selinux: wrap security server interfaces to use the global SID table
+Date: Tue, 10 Jun 2025 13:21:48 -0400
+Message-ID: <20250610172226.1470741-18-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
 References: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
@@ -93,269 +93,1806 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a global SID table to provide stable global SID values
-independent of any particular policy or namespace. This table will only
-map between global SIDs and security context strings since it must
-remain policy-independent. Internally each of these global SIDs can then
-be mapped on a per-policy/namespace basis to per-namespace SIDs and
-context structures. The LSM interfaces and blob structures will only use
-the global SID values and thus remain namespace-neutral.
+Wrap the security server interfaces to use the global SID table,
+transparently mapping between global SIDs and per-policy SIDs.
+Rename the existing security server functions with a selinux_ss
+prefix.
 
-Note that this required moving the SID table header and its dependencies
-out of the security server subdirectory. While we could re-factor it to
-to reduce the scope of this change, doing so does not seem worthwhile.
-The security server abstraction is largely obsoleted by LSM, no one has
-contributed any other security server implementation for SELinux, and
-over time there has been an increasing blurring of the boundary between the
-security server and the rest of the SELinux module. Eventually, I
-anticipate fully moving the security server files out of the ss
-subdirectory but that is left for a future change.
+The selinuxfs implementation directly uses the underlying
+selinux_ss interfaces since its functions are always acting
+relative to a particular SELinux namespace. In contrast,
+the hook function implementations always use the new
+wrapper functions to support the use of global SIDs.
+
+Since the global SID table always stores security context strings
+unmapped, this change removes the informational printk about
+unmapped contexts to avoid filling the logs with noise. If/when
+we split the global SID table and per-policy SID table implementations,
+this could be restored to the per-policy SID tables if desired.
+
+The implementation leaves a lot to be desired in efficiency,
+but optimizing the global SID mapping, splitting the global SID
+and per-policy SID table data structures to avoid wasting unused
+space in the sidtab entries of each, and/or eliminating the use
+of per-policy SIDs entirely is left to future changes. It would be
+good if we could further optimize for the case where there is only
+a single SELinux namespace and avoid imposing extra overhead on it.
+
+The security server interfaces were meant to be independent of
+the core kernel data structures and security blobs. Originally
+security_fs_use() passed the fstype, behavior, and sid parameters
+explicitly, but this was later simplified to just pass the
+superblock structure and set fields in the superblock security
+blob directly, breaking this layering. With the introduction of
+the global SID table, we need to map the SID returned by the
+security server to a global SID, which is less straightforward
+in the absence of proper layering. Revert the security_fs_use()
+interface and implementation to its original form and update the
+callers. This is not a performance-critical path regardless and
+any small benefit from passing the single superblock pointer
+instead of the three separate parameters is not worth the
+maintainability cost.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- security/selinux/Makefile                     |   2 +-
- security/selinux/global_sidtab.c              | 109 ++++++++++++++++++
- security/selinux/hooks.c                      |   4 +
- security/selinux/{ss => include}/avtab.h      |   0
- security/selinux/{ss => include}/constraint.h |   0
- security/selinux/{ss => include}/context.h    |   0
- security/selinux/{ss => include}/ebitmap.h    |   0
- security/selinux/include/global_sidtab.h      |  19 +++
- security/selinux/{ss => include}/hashtab.h    |   0
- security/selinux/{ss => include}/mls.h        |   0
- security/selinux/{ss => include}/mls_types.h  |   0
- security/selinux/{ss => include}/policydb.h   |   0
- security/selinux/{ss => include}/sidtab.h     |   0
- security/selinux/{ss => include}/symtab.h     |   0
- 14 files changed, 133 insertions(+), 1 deletion(-)
- create mode 100644 security/selinux/global_sidtab.c
- rename security/selinux/{ss => include}/avtab.h (100%)
- rename security/selinux/{ss => include}/constraint.h (100%)
- rename security/selinux/{ss => include}/context.h (100%)
- rename security/selinux/{ss => include}/ebitmap.h (100%)
- create mode 100644 security/selinux/include/global_sidtab.h
- rename security/selinux/{ss => include}/hashtab.h (100%)
- rename security/selinux/{ss => include}/mls.h (100%)
- rename security/selinux/{ss => include}/mls_types.h (100%)
- rename security/selinux/{ss => include}/policydb.h (100%)
- rename security/selinux/{ss => include}/sidtab.h (100%)
- rename security/selinux/{ss => include}/symtab.h (100%)
+ security/selinux/global_sidtab.c         | 651 ++++++++++++++++++++++-
+ security/selinux/hooks.c                 |   9 +-
+ security/selinux/include/global_sidtab.h |   7 -
+ security/selinux/include/security.h      |  25 +-
+ security/selinux/include/selinux_ss.h    | 119 +++++
+ security/selinux/include/sidtab.h        |   5 +
+ security/selinux/selinuxfs.c             |  51 +-
+ security/selinux/ss/services.c           | 174 +++---
+ security/selinux/ss/sidtab.c             |  14 +-
+ 9 files changed, 902 insertions(+), 153 deletions(-)
+ create mode 100644 security/selinux/include/selinux_ss.h
 
-diff --git a/security/selinux/Makefile b/security/selinux/Makefile
-index 66e56e9011df..fe5f6f4bb0ea 100644
---- a/security/selinux/Makefile
-+++ b/security/selinux/Makefile
-@@ -15,7 +15,7 @@ ccflags-y := -I$(srctree)/security/selinux -I$(srctree)/security/selinux/include
- ccflags-$(CONFIG_SECURITY_SELINUX_DEBUG) += -DDEBUG
- 
- selinux-y := avc.o hooks.o selinuxfs.o netlink.o nlmsgtab.o netif.o \
--	     netnode.o netport.o status.o \
-+	     netnode.o netport.o status.o global_sidtab.o \
- 	     ss/ebitmap.o ss/hashtab.o ss/symtab.o ss/sidtab.o ss/avtab.o \
- 	     ss/policydb.o ss/services.o ss/conditional.o ss/mls.o ss/context.o
- 
 diff --git a/security/selinux/global_sidtab.c b/security/selinux/global_sidtab.c
-new file mode 100644
-index 000000000000..57866a2d4cc2
---- /dev/null
+index 57866a2d4cc2..48934b429c8c 100644
+--- a/security/selinux/global_sidtab.c
 +++ b/security/selinux/global_sidtab.c
-@@ -0,0 +1,109 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "global_sidtab.h"
-+#include "sidtab.h"
+@@ -1,6 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include "global_sidtab.h"
+ #include "sidtab.h"
++#include "selinux_ss.h"
++#include "audit.h"
+ 
+ static struct sidtab global_sidtab;
+ 
+@@ -38,7 +40,7 @@ int global_sidtab_init(void)
+ 	return 0;
+ }
+ 
+-int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len)
++static int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len)
+ {
+ 	struct context *ctx;
+ 
+@@ -69,8 +71,9 @@ int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len)
+ 	return 0;
+ }
+ 
+-int global_context_to_sid(const char *scontext, u32 scontext_len, u32 *out_sid,
+-			gfp_t gfp)
++static int global_context_to_sid(struct selinux_state *state, u32 ss_sid,
++				const char *scontext, u32 scontext_len,
++				u32 *out_sid, gfp_t gfp)
+ {
+ 	char *str;
+ 	struct context ctx;
+@@ -98,7 +101,8 @@ int global_context_to_sid(const char *scontext, u32 scontext_len, u32 *out_sid,
+ 
+ retry:
+ 	rcu_read_lock();
+-	rc = sidtab_context_to_sid(&global_sidtab, &ctx, out_sid);
++	rc = sidtab_context_ss_to_sid(&global_sidtab, &ctx, state, ss_sid,
++				      out_sid);
+ 	if (rc == -ESTALE) {
+ 		rcu_read_unlock();
+ 		goto retry;
+@@ -107,3 +111,642 @@ int global_context_to_sid(const char *scontext, u32 scontext_len, u32 *out_sid,
+ 	kfree(str);
+ 	return rc;
+ }
 +
-+static struct sidtab global_sidtab;
-+
-+int global_sidtab_init(void)
++static int map_global_sid_to_ss(struct selinux_state *state, u32 sid,
++				u32 *ss_sid, gfp_t gfp)
 +{
-+	struct context ctx;
-+	int rc, sid;
++	struct sidtab_entry *entry;
++	int rc;
++	char *scontext;
++	u32 scontext_len;
 +
-+	rc = sidtab_init(&global_sidtab);
++	if (sid <= SECINITSID_NUM) {
++		*ss_sid = sid;
++		return 0;
++	}
++
++	rcu_read_lock();
++	entry = sidtab_search_entry_force(&global_sidtab, sid);
++	if (!entry) {
++		rcu_read_unlock();
++		return -EINVAL;
++	}
++	if (entry->state == state && entry->ss_sid) {
++		*ss_sid = entry->ss_sid;
++		rcu_read_unlock();
++		return 0;
++	}
++	rcu_read_unlock();
++
++	rc = global_sid_to_context(sid, &scontext, &scontext_len);
 +	if (rc)
 +		return rc;
 +
-+	memset(&ctx, 0, sizeof(ctx));
-+	for (sid = 1; sid <= SECINITSID_NUM; sid++) {
-+		const char *str = security_get_initial_sid_context(sid);
-+
-+		if (!str)
-+			continue;
-+		/*
-+		 * Before the policy is loaded, translate
-+		 * SECINITSID_INIT to "kernel", because systemd and
-+		 * libselinux < 2.6 take a getcon_raw() result that is
-+		 * both non-null and not "kernel" to mean that a policy
-+		 * is already loaded.
-+		 */
-+		if (sid == SECINITSID_INIT)
-+			str = "kernel";
-+		ctx.str = (char *)str;
-+		ctx.len = strlen(str)+1;
-+		rc = sidtab_set_initial(&global_sidtab, sid, &ctx);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len)
-+{
-+	struct context *ctx;
-+
-+	rcu_read_lock();
-+	ctx = sidtab_search_force(&global_sidtab, sid);
-+	if (!ctx) {
-+		rcu_read_unlock();
-+		*scontext = NULL;
-+		*scontext_len = 0;
-+		return -EINVAL;
-+	}
-+	*scontext_len = ctx->len;
-+	/*
-+	 * Could eliminate allocation + copy if callers do not free
-+	 * since the global sidtab entries are never freed.
-+	 * This however would not match the current expectation
-+	 * of callers of security_sid_to_context().
-+	 * TODO: Update all callers and get rid of this copy.
-+	 */
-+	*scontext = kstrdup(ctx->str, GFP_ATOMIC);
-+	if (!(*scontext)) {
-+		rcu_read_unlock();
-+		*scontext_len = 0;
-+		return -ENOMEM;
-+	}
-+
-+	rcu_read_unlock();
-+	return 0;
-+}
-+
-+int global_context_to_sid(const char *scontext, u32 scontext_len, u32 *out_sid,
-+			gfp_t gfp)
-+{
-+	char *str;
-+	struct context ctx;
-+	int rc;
-+
-+	if (!scontext_len)
-+		return -EINVAL;
-+
-+	/*
-+	 * Could eliminate allocation + copy if callers were required to
-+	 * pass in a NUL-terminated string or if the context_cmp/cpy()
-+	 * functions did not assume that ctx.str is NUL-terminated.
-+	 * This however would not match the current expectation of
-+	 * callers of security_context_to_sid, particularly contexts
-+	 * fetched from xattr values or provided by the xattr APIs.
-+	 * TODO: Change context_cmp/cpy() or update all callers and
-+	 * get rid of this copy.
-+	 */
-+	str = kmemdup_nul(scontext, scontext_len, gfp);
-+	if (!str)
-+		return -ENOMEM;
-+
-+	ctx.str = str;
-+	ctx.len = strlen(str)+1;
-+
-+retry:
-+	rcu_read_lock();
-+	rc = sidtab_context_to_sid(&global_sidtab, &ctx, out_sid);
-+	if (rc == -ESTALE) {
-+		rcu_read_unlock();
-+		goto retry;
-+	}
-+	rcu_read_unlock();
-+	kfree(str);
++	rc = selinux_ss_context_to_sid_force(state, scontext,
++					     scontext_len, ss_sid, gfp);
++	kfree(scontext);
 +	return rc;
 +}
++
++static int map_ss_sid_to_global(struct selinux_state *state, u32 ss_sid,
++				u32 *out_sid, gfp_t gfp)
++{
++	char *scontext;
++	u32 scontext_len;
++	int rc;
++
++	if (ss_sid <= SECINITSID_NUM) {
++		*out_sid = ss_sid;
++		return 0;
++	}
++
++	rc = selinux_ss_sid_to_context_force(state, ss_sid, &scontext,
++					     &scontext_len);
++	if (rc)
++		return rc;
++
++	rc = global_context_to_sid(state, ss_sid, scontext, scontext_len,
++				   out_sid, GFP_ATOMIC);
++	kfree(scontext);
++	return rc;
++}
++
++int security_sid_to_context(struct selinux_state *state, u32 sid,
++			    char **scontext, u32 *scontext_len)
++{
++	// initial SID contexts have to be obtained from the policy, if initialized
++	if (sid <= SECINITSID_NUM && selinux_initialized(state))
++		return selinux_ss_sid_to_context(state, sid, scontext, scontext_len);
++
++	return global_sid_to_context(sid, scontext, scontext_len);
++}
++
++int security_sid_to_context_valid(struct selinux_state *state, u32 sid,
++			    char **scontext, u32 *scontext_len)
++{
++	int rc;
++	u32 ss_sid;
++
++	// Valid SID contexts have to be obtained from the policy, if initialized
++	if (selinux_initialized(state)) {
++		rc = map_global_sid_to_ss(state, sid, &ss_sid, GFP_ATOMIC);
++		if (rc)
++			return rc;
++		return selinux_ss_sid_to_context(state, ss_sid, scontext,
++						 scontext_len);
++	}
++
++	return global_sid_to_context(sid, scontext, scontext_len);
++}
++
++int security_sid_to_context_force(struct selinux_state *state, u32 sid,
++				  char **scontext, u32 *scontext_len)
++{
++	// initial SID contexts have to be obtained from the policy, if initialized
++	if (sid <= SECINITSID_NUM && selinux_initialized(state))
++		return selinux_ss_sid_to_context_force(state, sid, scontext, scontext_len);
++
++	return global_sid_to_context(sid, scontext, scontext_len);
++}
++
++int security_sid_to_context_inval(struct selinux_state *state, u32 sid,
++				  char **scontext, u32 *scontext_len)
++{
++	int rc;
++	u32 ss_sid;
++
++	// TODO Cache invalid bit in global SID table so we do not need
++	// to lookup in the per-policy one each time.
++	if (selinux_initialized(state)) {
++		rc = map_global_sid_to_ss(state, sid, &ss_sid, GFP_ATOMIC);
++		if (rc)
++			return rc;
++		return selinux_ss_sid_to_context_inval(state, ss_sid, scontext,
++						       scontext_len);
++	}
++	return global_sid_to_context(sid, scontext, scontext_len);
++}
++
++int security_context_to_sid(struct selinux_state *state, const char *scontext,
++			    u32 scontext_len, u32 *out_sid, gfp_t gfp)
++{
++	int rc;
++	u32 sid, ss_sid = 0;
++	char *ctx = NULL;
++
++	/*
++	 * If initialized, validate and canonicalize the context against
++	 * the policy.
++	 */
++	if (selinux_initialized(state)) {
++		rc = selinux_ss_context_to_sid(state, scontext, scontext_len,
++					       &ss_sid, gfp);
++		if (rc)
++			return rc;
++
++		rc = selinux_ss_sid_to_context(state, ss_sid, &ctx,
++					       &scontext_len);
++		if (rc)
++			return rc;
++		scontext = ctx;
++	}
++
++	// allocate or lookup a SID in the global SID table
++	rc = global_context_to_sid(state, ss_sid, scontext, scontext_len,
++				   &sid, gfp);
++	if (rc)
++		goto out;
++
++	*out_sid = sid;
++
++out:
++	kfree(ctx);
++	return rc;
++}
++
++int security_context_str_to_sid(struct selinux_state *state,
++				const char *scontext, u32 *out_sid, gfp_t gfp)
++{
++	size_t scontext_len = strlen(scontext) + 1;
++
++	return security_context_to_sid(state, scontext, scontext_len, out_sid,
++				       gfp);
++}
++
++int security_context_to_sid_default(struct selinux_state *state,
++				    const char *scontext, u32 scontext_len,
++				    u32 *out_sid, u32 def_sid, gfp_t gfp)
++{
++	int rc;
++	u32 sid, ss_sid = 0;
++	char *ctx = NULL;
++
++	/*
++	 * If initialized, validate and canonicalize the context against
++	 * the policy.
++	 */
++	if (selinux_initialized(state)) {
++		rc = selinux_ss_context_to_sid_default(state, scontext,
++						       scontext_len, &ss_sid,
++						       def_sid, gfp);
++		if (rc)
++			return rc;
++
++		rc = selinux_ss_sid_to_context(state, ss_sid, &ctx,
++					       &scontext_len);
++		if (rc)
++			return rc;
++		scontext = ctx;
++	}
++
++	// allocate or lookup a SID in the global SID table
++	rc = global_context_to_sid(state, ss_sid, scontext, scontext_len,
++				   &sid, gfp);
++	if (rc)
++		goto out;
++
++	*out_sid = sid;
++
++out:
++	kfree(ctx);
++	return rc;
++}
++
++int security_context_to_sid_force(struct selinux_state *state,
++				  const char *scontext, u32 scontext_len,
++				  u32 *out_sid)
++{
++	int rc;
++	u32 sid, ss_sid = 0;
++	char *ctx = NULL;
++
++	/*
++	 * If initialized, validate and canonicalize the context against
++	 * the policy.
++	 */
++	if (selinux_initialized(state)) {
++		rc = selinux_ss_context_to_sid_force(state, scontext,
++						     scontext_len, &ss_sid,
++						     GFP_KERNEL);
++		if (rc)
++			return rc;
++
++		rc = selinux_ss_sid_to_context_force(state, ss_sid, &ctx,
++						     &scontext_len);
++		if (rc)
++			return rc;
++		scontext = ctx;
++	}
++
++	// allocate or lookup a SID in the global SID table
++	rc = global_context_to_sid(state, ss_sid, scontext, scontext_len,
++				   &sid, GFP_KERNEL);
++	if (rc)
++		goto out;
++
++	*out_sid = sid;
++
++out:
++	kfree(ctx);
++	return rc;
++}
++
++void security_compute_av(struct selinux_state *state, u32 ssid, u32 tsid,
++			 u16 tclass, struct av_decision *avd,
++			 struct extended_perms *xperms)
++{
++	u32 ss_ssid, ss_tsid;
++	int rc;
++
++	if (!selinux_initialized(state))
++		goto allow;
++
++	rc = map_global_sid_to_ss(state, ssid, &ss_ssid, GFP_ATOMIC);
++	if (rc)
++		goto deny;
++	rc = map_global_sid_to_ss(state, tsid, &ss_tsid, GFP_ATOMIC);
++	if (rc)
++		goto deny;
++	selinux_ss_compute_av(state, ss_ssid, ss_tsid, tclass, avd, xperms);
++	return;
++allow:
++	avd->allowed = ~0U;
++	goto out;
++deny:
++	avd->allowed = 0;
++out:
++	avd->auditallow = 0;
++	avd->auditdeny = ~0U;
++	avd->seqno = 0;
++	avd->flags = 0;
++	xperms->len = 0;
++}
++
++void security_compute_xperms_decision(struct selinux_state *state, u32 ssid,
++				      u32 tsid, u16 tclass, u8 driver,
++				      u8 base_perm,
++				      struct extended_perms_decision *xpermd)
++{
++	u32 ss_ssid, ss_tsid;
++	int rc;
++
++	if (!selinux_initialized(state))
++		goto allow;
++
++	rc = map_global_sid_to_ss(state, ssid, &ss_ssid, GFP_ATOMIC);
++	if (rc)
++		goto deny;
++	rc = map_global_sid_to_ss(state, tsid, &ss_tsid, GFP_ATOMIC);
++	if (rc)
++		goto deny;
++	selinux_ss_compute_xperms_decision(state, ss_ssid, ss_tsid, tclass,
++					   driver, base_perm, xpermd);
++	return;
++allow:
++	memset(xpermd->allowed->p, 0xff, sizeof(xpermd->allowed->p));
++	goto out;
++deny:
++	memset(xpermd->allowed->p, 0, sizeof(xpermd->allowed->p));
++out:
++	xpermd->driver = driver;
++	xpermd->used = 0;
++	memset(xpermd->auditallow->p, 0, sizeof(xpermd->auditallow->p));
++	memset(xpermd->dontaudit->p, 0, sizeof(xpermd->dontaudit->p));
++}
++
++int security_transition_sid(struct selinux_state *state, u32 ssid, u32 tsid,
++			    u16 tclass, const struct qstr *qstr, u32 *out_sid)
++{
++	u32 ss_ssid, ss_tsid, ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		switch (tclass) {
++		case SECCLASS_PROCESS:
++			*out_sid = ssid;
++			break;
++		default:
++			*out_sid = tsid;
++			break;
++		}
++		return 0;
++	}
++
++	rc = map_global_sid_to_ss(state, ssid, &ss_ssid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++	rc = map_global_sid_to_ss(state, tsid, &ss_tsid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++	rc = selinux_ss_transition_sid(state, ss_ssid, ss_tsid, tclass, qstr,
++				       &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_port_sid(struct selinux_state *state, u8 protocol, u16 port,
++		      u32 *out_sid)
++{
++	u32 ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_PORT;
++		return 0;
++	}
++
++	rc = selinux_ss_port_sid(state, protocol, port, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_ib_pkey_sid(struct selinux_state *state, u64 subnet_prefix,
++			 u16 pkey_num, u32 *out_sid)
++{
++	u32 ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_UNLABELED;
++		return 0;
++	}
++
++	rc = selinux_ss_ib_pkey_sid(state, subnet_prefix, pkey_num, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_ib_endport_sid(struct selinux_state *state, const char *dev_name,
++			    u8 port_num, u32 *out_sid)
++{
++	u32 ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_UNLABELED;
++		return 0;
++	}
++
++	rc = selinux_ss_ib_endport_sid(state, dev_name, port_num, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_netif_sid(struct selinux_state *state, const char *name, u32 *out_sid)
++{
++	u32 ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_NETIF;
++		return 0;
++	}
++
++	rc = selinux_ss_netif_sid(state, name, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_node_sid(struct selinux_state *state, u16 domain, const void *addr,
++		      u32 addrlen, u32 *out_sid)
++{
++	u32 ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_NODE;
++		return 0;
++	}
++
++	rc = selinux_ss_node_sid(state, domain, addr, addrlen, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_validate_transition(struct selinux_state *state, u32 oldsid,
++				 u32 newsid, u32 tasksid, u16 tclass)
++{
++	u32 ss_oldsid, ss_newsid, ss_tasksid;
++	int rc;
++
++	if (!selinux_initialized(state))
++		return 0;
++
++	rc = map_global_sid_to_ss(state, oldsid, &ss_oldsid, GFP_ATOMIC);
++	if (rc)
++		return -EINVAL;
++	rc = map_global_sid_to_ss(state, newsid, &ss_newsid, GFP_ATOMIC);
++	if (rc)
++		return -EINVAL;
++	rc = map_global_sid_to_ss(state, tasksid, &ss_tasksid, GFP_ATOMIC);
++	if (rc)
++		return -EINVAL;
++	return selinux_ss_validate_transition(state, ss_oldsid, ss_newsid,
++					      ss_tasksid, tclass);
++}
++
++int security_bounded_transition(struct selinux_state *state, u32 oldsid,
++				u32 newsid)
++{
++	u32 ss_oldsid, ss_newsid;
++	int rc;
++
++	if (!selinux_initialized(state))
++		return 0;
++
++	rc = map_global_sid_to_ss(state, oldsid, &ss_oldsid, GFP_ATOMIC);
++	if (rc)
++		return -EINVAL;
++	rc = map_global_sid_to_ss(state, newsid, &ss_newsid, GFP_ATOMIC);
++	if (rc)
++		return -EINVAL;
++	return selinux_ss_bounded_transition(state, ss_oldsid, ss_newsid);
++}
++
++int security_sid_mls_copy(struct selinux_state *state, u32 sid, u32 mls_sid,
++			  u32 *out_sid)
++{
++	u32 ss_sid, ss_mlssid, ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = sid;
++		return 0;
++	}
++
++	rc = map_global_sid_to_ss(state, sid, &ss_sid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++	rc = map_global_sid_to_ss(state, mls_sid, &ss_mlssid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++
++	rc = selinux_ss_sid_mls_copy(state, ss_sid, ss_mlssid, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_net_peersid_resolve(struct selinux_state *state, u32 nlbl_sid,
++				 u32 nlbl_type, u32 xfrm_sid, u32 *out_sid)
++{
++	u32 ss_nlblsid, ss_xfrmsid, ss_outsid;
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		if (xfrm_sid == SECSID_NULL) {
++			*out_sid = nlbl_sid;
++			return 0;
++		}
++		if (nlbl_sid == SECSID_NULL || nlbl_type == NETLBL_NLTYPE_UNLABELED) {
++			*out_sid = xfrm_sid;
++			return 0;
++		}
++		*out_sid = SECSID_NULL;
++		return 0;
++	}
++
++	rc = map_global_sid_to_ss(state, nlbl_sid, &ss_nlblsid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++	rc = map_global_sid_to_ss(state, xfrm_sid, &ss_xfrmsid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++
++	rc = selinux_ss_net_peersid_resolve(state, ss_nlblsid, nlbl_type, ss_xfrmsid, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_fs_use(struct selinux_state *state, const char *fstype,
++		    unsigned short *behavior, u32 *sid)
++{
++	int rc;
++
++	if (!selinux_initialized(state)) {
++		*behavior = SECURITY_FS_USE_NONE;
++		*sid = SECINITSID_UNLABELED;
++		return 0;
++	}
++
++	rc = selinux_ss_fs_use(state, fstype, behavior, sid);
++	if (rc)
++		return rc;
++
++	if (*sid <= SECINITSID_NUM)
++		return 0;
++
++	return map_ss_sid_to_global(state, *sid, sid, GFP_ATOMIC);
++}
++
++int security_genfs_sid(struct selinux_state *state, const char *fstype,
++		       const char *path, u16 sclass, u32 *out_sid)
++{
++	int rc;
++	u32 ss_outsid;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECINITSID_UNLABELED;
++		return 0;
++	}
++
++	rc = selinux_ss_genfs_sid(state, fstype, path, sclass, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int selinux_policy_genfs_sid(struct selinux_policy *policy, const char *fstype,
++			     const char *path, u16 sclass, u32 *out_sid)
++{
++	int rc;
++	u32 ss_outsid;
++
++	rc = selinux_ss_policy_genfs_sid(policy, fstype, path, sclass, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(current_selinux_state, ss_outsid, out_sid,
++				    GFP_ATOMIC);
++}
++
++int selinux_audit_rule_match(struct lsm_prop *prop, u32 field, u32 op, void *vrule)
++{
++	int rc;
++	struct lsm_prop local_prop;
++	struct selinux_state *state = current_selinux_state;
++
++	if (!selinux_initialized(state))
++		return 0;
++
++	rc = map_global_sid_to_ss(state, prop->selinux.secid,
++				  &local_prop.selinux.secid, GFP_ATOMIC);
++	if (rc)
++		return -ENOENT;
++	return selinux_ss_audit_rule_match(&local_prop, field, op, vrule);
++}
++
++#ifdef CONFIG_NETLABEL
++int security_netlbl_secattr_to_sid(struct selinux_state *state,
++				   struct netlbl_lsm_secattr *secattr,
++				   u32 *out_sid)
++{
++	int rc;
++	u32 ss_outsid;
++
++	if (!selinux_initialized(state)) {
++		*out_sid = SECSID_NULL;
++		return 0;
++	}
++
++	// The secattr secid is a global SID
++	if (secattr->flags & NETLBL_SECATTR_SECID) {
++		*out_sid = secattr->attr.secid;
++		return 0;
++	}
++
++	rc = selinux_ss_netlbl_secattr_to_sid(state, secattr, &ss_outsid);
++	if (rc)
++		return rc;
++
++	return map_ss_sid_to_global(state, ss_outsid, out_sid, GFP_ATOMIC);
++}
++
++int security_netlbl_sid_to_secattr(struct selinux_state *state, u32 sid,
++				   struct netlbl_lsm_secattr *secattr)
++{
++	int rc;
++	u32 ss_sid;
++
++	if (!selinux_initialized(state))
++		return 0;
++
++	rc = map_global_sid_to_ss(state, sid, &ss_sid, GFP_ATOMIC);
++	if (rc)
++		return rc;
++	rc = selinux_ss_netlbl_sid_to_secattr(state, ss_sid, secattr);
++	if (rc)
++		return rc;
++
++	// The secattr secid is a global SID.
++	secattr->attr.secid = sid;
++	secattr->flags |= NETLBL_SECATTR_SECID;
++	return 0;
++}
++#endif
 diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 8e1afcbae941..59a30b1f3723 100644
+index 59a30b1f3723..f7ce86f9ef57 100644
 --- a/security/selinux/hooks.c
 +++ b/security/selinux/hooks.c
-@@ -104,6 +104,7 @@
- #include "netlabel.h"
- #include "audit.h"
- #include "avc_ss.h"
-+#include "global_sidtab.h"
+@@ -767,7 +767,8 @@ static int selinux_set_mnt_opts(struct super_block *sb,
+ 		 * Determine the labeling behavior to use for this
+ 		 * filesystem type.
+ 		 */
+-		rc = security_fs_use(current_selinux_state, sb);
++		rc = security_fs_use(current_selinux_state, sb->s_type->name,
++				     &sbsec->behavior, &sbsec->sid);
+ 		if (rc) {
+ 			pr_warn("%s: security_fs_use(%s) returned %d\n",
+ 					__func__, sb->s_type->name, rc);
+@@ -978,7 +979,9 @@ static int selinux_sb_clone_mnt_opts(const struct super_block *oldsb,
  
- #define SELINUX_INODE_INIT_XATTRS 1
- 
-@@ -7885,6 +7886,9 @@ static __init int selinux_init(void)
- 
- 	enforcing_set(init_selinux_state, selinux_enforcing_boot);
- 
-+	if (global_sidtab_init())
-+		panic("SELinux: Could not create global SID table\n");
-+
- 	default_noexec = !(VM_DATA_DEFAULT_FLAGS & VM_EXEC);
- 	if (!default_noexec)
- 		pr_notice("SELinux:  virtual memory is executable by default\n");
-diff --git a/security/selinux/ss/avtab.h b/security/selinux/include/avtab.h
-similarity index 100%
-rename from security/selinux/ss/avtab.h
-rename to security/selinux/include/avtab.h
-diff --git a/security/selinux/ss/constraint.h b/security/selinux/include/constraint.h
-similarity index 100%
-rename from security/selinux/ss/constraint.h
-rename to security/selinux/include/constraint.h
-diff --git a/security/selinux/ss/context.h b/security/selinux/include/context.h
-similarity index 100%
-rename from security/selinux/ss/context.h
-rename to security/selinux/include/context.h
-diff --git a/security/selinux/ss/ebitmap.h b/security/selinux/include/ebitmap.h
-similarity index 100%
-rename from security/selinux/ss/ebitmap.h
-rename to security/selinux/include/ebitmap.h
+ 	if (newsbsec->behavior == SECURITY_FS_USE_NATIVE &&
+ 		!(kern_flags & SECURITY_LSM_NATIVE_LABELS) && !set_context) {
+-		rc = security_fs_use(current_selinux_state, newsb);
++		rc = security_fs_use(current_selinux_state,
++				     newsb->s_type->name,
++				     &newsbsec->behavior, &newsbsec->sid);
+ 		if (rc)
+ 			goto out;
+ 	}
+@@ -3633,7 +3636,7 @@ static int selinux_inode_getsecurity(struct mnt_idmap *idmap,
+ 						      isec->sid, &context,
+ 						      &size);
+ 	else
+-		error = security_sid_to_context(current_selinux_state, isec->sid,
++		error = security_sid_to_context_valid(current_selinux_state, isec->sid,
+ 						&context, &size);
+ 	if (error)
+ 		return error;
 diff --git a/security/selinux/include/global_sidtab.h b/security/selinux/include/global_sidtab.h
-new file mode 100644
-index 000000000000..f62a9165d26a
---- /dev/null
+index f62a9165d26a..a47cebecc944 100644
+--- a/security/selinux/include/global_sidtab.h
 +++ b/security/selinux/include/global_sidtab.h
-@@ -0,0 +1,19 @@
+@@ -7,13 +7,6 @@
+ #ifndef _GLOBAL_SIDTAB_H_
+ #define _GLOBAL_SIDTAB_H_
+ 
+-#include <linux/types.h>
+-
+ extern int global_sidtab_init(void);
+ 
+-extern int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len);
+-
+-extern int global_context_to_sid(const char *scontext, u32 scontext_len,
+-				 u32 *out_sid, gfp_t gfp);
+-
+ #endif /* _GLOBAL_SIDTAB_H_ */
+diff --git a/security/selinux/include/security.h b/security/selinux/include/security.h
+index e916c6da1824..4851f2d4ab9a 100644
+--- a/security/selinux/include/security.h
++++ b/security/selinux/include/security.h
+@@ -357,25 +357,15 @@ void security_compute_xperms_decision(struct selinux_state *state, u32 ssid,
+ 				      u8 base_perm,
+ 				      struct extended_perms_decision *xpermd);
+ 
+-void security_compute_av_user(struct selinux_state *state, u32 ssid, u32 tsid,
+-			      u16 tclass, struct av_decision *avd);
+-
+ int security_transition_sid(struct selinux_state *state, u32 ssid, u32 tsid,
+ 			    u16 tclass, const struct qstr *qstr, u32 *out_sid);
+ 
+-int security_transition_sid_user(struct selinux_state *state, u32 ssid,
+-				 u32 tsid, u16 tclass, const char *objname,
+-				 u32 *out_sid);
+-
+-int security_member_sid(struct selinux_state *state, u32 ssid, u32 tsid,
+-			u16 tclass, u32 *out_sid);
+-
+-int security_change_sid(struct selinux_state *state, u32 ssid, u32 tsid,
+-			u16 tclass, u32 *out_sid);
+-
+ int security_sid_to_context(struct selinux_state *state, u32 sid,
+ 			    char **scontext, u32 *scontext_len);
+ 
++int security_sid_to_context_valid(struct selinux_state *state, u32 sid,
++				  char **scontext, u32 *scontext_len);
++
+ int security_sid_to_context_force(struct selinux_state *state, u32 sid,
+ 				  char **scontext, u32 *scontext_len);
+ 
+@@ -396,9 +386,6 @@ int security_context_to_sid_force(struct selinux_state *state,
+ 				  const char *scontext, u32 scontext_len,
+ 				  u32 *sid);
+ 
+-int security_get_user_sids(struct selinux_state *state, u32 callsid,
+-			   const char *username, u32 **sids, u32 *nel);
+-
+ int security_port_sid(struct selinux_state *state, u8 protocol, u16 port,
+ 		      u32 *out_sid);
+ 
+@@ -417,9 +404,6 @@ int security_node_sid(struct selinux_state *state, u16 domain, const void *addr,
+ int security_validate_transition(struct selinux_state *state, u32 oldsid,
+ 				 u32 newsid, u32 tasksid, u16 tclass);
+ 
+-int security_validate_transition_user(struct selinux_state *state, u32 oldsid,
+-				      u32 newsid, u32 tasksid, u16 tclass);
+-
+ int security_bounded_transition(struct selinux_state *state, u32 old_sid,
+ 				u32 new_sid);
+ 
+@@ -445,7 +429,8 @@ int security_get_allow_unknown(struct selinux_state *state);
+ #define SECURITY_FS_USE_NATIVE	 7 /* use native label support */
+ #define SECURITY_FS_USE_MAX	 7 /* Highest SECURITY_FS_USE_XXX */
+ 
+-int security_fs_use(struct selinux_state *state, struct super_block *sb);
++int security_fs_use(struct selinux_state *state, const char *fstype,
++		    unsigned short *behavior, u32 *sid);
+ 
+ int security_genfs_sid(struct selinux_state *state, const char *fstype,
+ 		       const char *path, u16 sclass, u32 *sid);
+diff --git a/security/selinux/include/selinux_ss.h b/security/selinux/include/selinux_ss.h
+new file mode 100644
+index 000000000000..0c3c6df88f5d
+--- /dev/null
++++ b/security/selinux/include/selinux_ss.h
+@@ -0,0 +1,119 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _SELINUX_SS_H_
++#define _SELINUX_SS_H_
++
 +/*
-+ * A global security identifier table (sidtab) is a lookup table
-+ * of security context strings indexed by SID value.
++ * SELinux security server policy-dependent interfaces.
++ * Most callers should use the corresponding security_*() interfaces
++ * from security.h instead in order to transparently map to/from
++ * global SIDs.
 + */
 +
-+#ifndef _GLOBAL_SIDTAB_H_
-+#define _GLOBAL_SIDTAB_H_
++void selinux_ss_compute_av(struct selinux_state *state, u32 ssid, u32 tsid,
++			   u16 tclass, struct av_decision *avd,
++			   struct extended_perms *xperms);
 +
-+#include <linux/types.h>
++void selinux_ss_compute_xperms_decision(struct selinux_state *state, u32 ssid,
++					u32 tsid, u16 tclass, u8 driver,
++					u8 base_perm,
++					struct extended_perms_decision *xpermd);
 +
-+extern int global_sidtab_init(void);
++void selinux_ss_compute_av_user(struct selinux_state *state, u32 ssid, u32 tsid,
++				u16 tclass, struct av_decision *avd);
 +
-+extern int global_sid_to_context(u32 sid, char **scontext, u32 *scontext_len);
++int selinux_ss_transition_sid(struct selinux_state *state, u32 ssid, u32 tsid,
++			      u16 tclass, const struct qstr *qstr,
++			      u32 *out_sid);
 +
-+extern int global_context_to_sid(const char *scontext, u32 scontext_len,
-+				 u32 *out_sid, gfp_t gfp);
++int selinux_ss_transition_sid_user(struct selinux_state *state, u32 ssid,
++				   u32 tsid, u16 tclass, const char *objname,
++				   u32 *out_sid);
 +
-+#endif /* _GLOBAL_SIDTAB_H_ */
-diff --git a/security/selinux/ss/hashtab.h b/security/selinux/include/hashtab.h
-similarity index 100%
-rename from security/selinux/ss/hashtab.h
-rename to security/selinux/include/hashtab.h
-diff --git a/security/selinux/ss/mls.h b/security/selinux/include/mls.h
-similarity index 100%
-rename from security/selinux/ss/mls.h
-rename to security/selinux/include/mls.h
-diff --git a/security/selinux/ss/mls_types.h b/security/selinux/include/mls_types.h
-similarity index 100%
-rename from security/selinux/ss/mls_types.h
-rename to security/selinux/include/mls_types.h
-diff --git a/security/selinux/ss/policydb.h b/security/selinux/include/policydb.h
-similarity index 100%
-rename from security/selinux/ss/policydb.h
-rename to security/selinux/include/policydb.h
-diff --git a/security/selinux/ss/sidtab.h b/security/selinux/include/sidtab.h
-similarity index 100%
-rename from security/selinux/ss/sidtab.h
-rename to security/selinux/include/sidtab.h
-diff --git a/security/selinux/ss/symtab.h b/security/selinux/include/symtab.h
-similarity index 100%
-rename from security/selinux/ss/symtab.h
-rename to security/selinux/include/symtab.h
++int selinux_ss_member_sid(struct selinux_state *state, u32 ssid, u32 tsid,
++			  u16 tclass, u32 *out_sid);
++
++int selinux_ss_change_sid(struct selinux_state *state, u32 ssid, u32 tsid,
++			  u16 tclass, u32 *out_sid);
++
++int selinux_ss_sid_to_context(struct selinux_state *state, u32 sid,
++			      char **scontext, u32 *scontext_len);
++
++int selinux_ss_sid_to_context_force(struct selinux_state *state, u32 sid,
++				    char **scontext, u32 *scontext_len);
++
++int selinux_ss_sid_to_context_inval(struct selinux_state *state, u32 sid,
++				    char **scontext, u32 *scontext_len);
++
++int selinux_ss_context_to_sid(struct selinux_state *state, const char *scontext,
++			      u32 scontext_len, u32 *out_sid, gfp_t gfp);
++
++int selinux_ss_context_str_to_sid(struct selinux_state *state,
++				  const char *scontext, u32 *out_sid,
++				  gfp_t gfp);
++
++int selinux_ss_context_to_sid_default(struct selinux_state *state,
++				      const char *scontext, u32 scontext_len,
++				      u32 *out_sid, u32 def_sid,
++				      gfp_t gfp_flags);
++
++int selinux_ss_context_to_sid_force(struct selinux_state *state,
++				    const char *scontext, u32 scontext_len,
++				    u32 *sid, gfp_t gfp);
++
++int selinux_ss_get_user_sids(struct selinux_state *state, u32 callsid,
++			     const char *username, u32 **sids, u32 *nel);
++
++int selinux_ss_port_sid(struct selinux_state *state, u8 protocol, u16 port,
++			u32 *out_sid);
++
++int selinux_ss_ib_pkey_sid(struct selinux_state *state, u64 subnet_prefix,
++			   u16 pkey_num, u32 *out_sid);
++
++int selinux_ss_ib_endport_sid(struct selinux_state *state, const char *dev_name,
++			      u8 port_num, u32 *out_sid);
++
++int selinux_ss_netif_sid(struct selinux_state *state, const char *name,
++			 u32 *if_sid);
++
++int selinux_ss_node_sid(struct selinux_state *state, u16 domain,
++			const void *addr, u32 addrlen, u32 *out_sid);
++
++int selinux_ss_validate_transition(struct selinux_state *state, u32 oldsid,
++				   u32 newsid, u32 tasksid, u16 tclass);
++
++int selinux_ss_validate_transition_user(struct selinux_state *state, u32 oldsid,
++					u32 newsid, u32 tasksid, u16 tclass);
++
++int selinux_ss_bounded_transition(struct selinux_state *state, u32 oldsid,
++				  u32 newsid);
++
++int selinux_ss_sid_mls_copy(struct selinux_state *state, u32 sid, u32 mls_sid,
++			    u32 *new_sid);
++
++int selinux_ss_net_peersid_resolve(struct selinux_state *state, u32 nlbl_sid,
++				   u32 nlbl_type, u32 xfrm_sid, u32 *peer_sid);
++
++int selinux_ss_fs_use(struct selinux_state *state, const char *fstype,
++		      unsigned short *behavior, u32 *sid);
++
++int selinux_ss_genfs_sid(struct selinux_state *state, const char *fstype,
++			 const char *path, u16 sclass, u32 *sid);
++
++int selinux_ss_policy_genfs_sid(struct selinux_policy *policy,
++				const char *fstype, const char *path,
++				u16 sclass, u32 *sid);
++
++int selinux_ss_audit_rule_match(struct lsm_prop *prop, u32 field, u32 op,
++				void *rule);
++
++#ifdef CONFIG_NETLABEL
++int selinux_ss_netlbl_secattr_to_sid(struct selinux_state *state,
++				     struct netlbl_lsm_secattr *secattr,
++				     u32 *sid);
++
++int selinux_ss_netlbl_sid_to_secattr(struct selinux_state *state, u32 sid,
++				     struct netlbl_lsm_secattr *secattr);
++#endif
++
++#endif /* _SELINUX_SS_H_ */
+diff --git a/security/selinux/include/sidtab.h b/security/selinux/include/sidtab.h
+index 832c85c70d83..1d40e1a7fa42 100644
+--- a/security/selinux/include/sidtab.h
++++ b/security/selinux/include/sidtab.h
+@@ -26,6 +26,8 @@ struct sidtab_entry {
+ 	struct sidtab_str_cache __rcu *cache;
+ #endif
+ 	struct hlist_node list;
++	u32 ss_sid; // global SID table only
++	struct selinux_state *state; // global SID table only
+ };
+ 
+ union sidtab_entry_inner {
+@@ -134,6 +136,9 @@ void sidtab_freeze_end(struct sidtab *s, unsigned long *flags)
+ 
+ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid);
+ 
++int sidtab_context_ss_to_sid(struct sidtab *s, struct context *context,
++			     struct selinux_state *state, u32 ss_sid, u32 *sid);
++
+ void sidtab_destroy(struct sidtab *s);
+ 
+ int sidtab_hash_stats(struct sidtab *sidtab, char *page);
+diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.c
+index 09d22af6e3ea..19cd4cc4c01a 100644
+--- a/security/selinux/selinuxfs.c
++++ b/security/selinux/selinuxfs.c
+@@ -39,6 +39,7 @@
+ #include "avc.h"
+ #include "avc_ss.h"
+ #include "security.h"
++#include "selinux_ss.h"
+ #include "objsec.h"
+ #include "conditional.h"
+ #include "ima.h"
+@@ -868,11 +869,11 @@ static ssize_t sel_write_context(struct file *file, char *buf, size_t size)
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_context_to_sid(state, buf, size, &sid, GFP_KERNEL);
++	length = selinux_ss_context_to_sid(state, buf, size, &sid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_sid_to_context(state, sid, &canon, &len);
++	length = selinux_ss_sid_to_context(state, sid, &canon, &len);
+ 	if (length)
+ 		goto out;
+ 
+@@ -1011,19 +1012,19 @@ static ssize_t sel_write_validatetrans(struct file *file,
+ 	if (sscanf(req, "%s %s %hu %s", oldcon, newcon, &tclass, taskcon) != 4)
+ 		goto out;
+ 
+-	rc = security_context_str_to_sid(state, oldcon, &osid, GFP_KERNEL);
++	rc = selinux_ss_context_str_to_sid(state, oldcon, &osid, GFP_KERNEL);
+ 	if (rc)
+ 		goto out;
+ 
+-	rc = security_context_str_to_sid(state, newcon, &nsid, GFP_KERNEL);
++	rc = selinux_ss_context_str_to_sid(state, newcon, &nsid, GFP_KERNEL);
+ 	if (rc)
+ 		goto out;
+ 
+-	rc = security_context_str_to_sid(state, taskcon, &tsid, GFP_KERNEL);
++	rc = selinux_ss_context_str_to_sid(state, taskcon, &tsid, GFP_KERNEL);
+ 	if (rc)
+ 		goto out;
+ 
+-	rc = security_validate_transition_user(state, osid, nsid, tsid, tclass);
++	rc = selinux_ss_validate_transition_user(state, osid, nsid, tsid, tclass);
+ 	if (!rc)
+ 		rc = count;
+ out:
+@@ -1125,15 +1126,15 @@ static ssize_t sel_write_access(struct file *file, char *buf, size_t size)
+ 	if (sscanf(buf, "%s %s %hu", scon, tcon, &tclass) != 3)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	security_compute_av_user(state, ssid, tsid, tclass, &avd);
++	selinux_ss_compute_av_user(state, ssid, tsid, tclass, &avd);
+ 
+ 	length = scnprintf(buf, SIMPLE_TRANSACTION_LIMIT,
+ 			  "%x %x %x %x %u %x",
+@@ -1216,20 +1217,20 @@ static ssize_t sel_write_create(struct file *file, char *buf, size_t size)
+ 		objname = namebuf;
+ 	}
+ 
+-	length = security_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_transition_sid_user(state, ssid, tsid, tclass,
++	length = selinux_ss_transition_sid_user(state, ssid, tsid, tclass,
+ 					      objname, &newsid);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_sid_to_context(state, newsid, &newcon, &len);
++	length = selinux_ss_sid_to_context(state, newsid, &newcon, &len);
+ 	if (length)
+ 		goto out;
+ 
+@@ -1282,19 +1283,19 @@ static ssize_t sel_write_relabel(struct file *file, char *buf, size_t size)
+ 	if (sscanf(buf, "%s %s %hu", scon, tcon, &tclass) != 3)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_change_sid(state, ssid, tsid, tclass, &newsid);
++	length = selinux_ss_change_sid(state, ssid, tsid, tclass, &newsid);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_sid_to_context(state, newsid, &newcon, &len);
++	length = selinux_ss_sid_to_context(state, newsid, &newcon, &len);
+ 	if (length)
+ 		goto out;
+ 
+@@ -1348,18 +1349,18 @@ static ssize_t sel_write_user(struct file *file, char *buf, size_t size)
+ 	if (sscanf(buf, "%s %s", con, user) != 2)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, con, &sid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, con, &sid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_get_user_sids(state, sid, user, &sids, &nsids);
++	length = selinux_ss_get_user_sids(state, sid, user, &sids, &nsids);
+ 	if (length)
+ 		goto out;
+ 
+ 	length = sprintf(buf, "%u", nsids) + 1;
+ 	ptr = buf + length;
+ 	for (i = 0; i < nsids; i++) {
+-		rc = security_sid_to_context(state, sids[i], &newcon, &len);
++		rc = selinux_ss_sid_to_context(state, sids[i], &newcon, &len);
+ 		if (rc) {
+ 			length = rc;
+ 			goto out;
+@@ -1413,19 +1414,19 @@ static ssize_t sel_write_member(struct file *file, char *buf, size_t size)
+ 	if (sscanf(buf, "%s %s %hu", scon, tcon, &tclass) != 3)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, scon, &ssid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
++	length = selinux_ss_context_str_to_sid(state, tcon, &tsid, GFP_KERNEL);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_member_sid(state, ssid, tsid, tclass, &newsid);
++	length = selinux_ss_member_sid(state, ssid, tsid, tclass, &newsid);
+ 	if (length)
+ 		goto out;
+ 
+-	length = security_sid_to_context(state, newsid, &newcon, &len);
++	length = selinux_ss_sid_to_context(state, newsid, &newcon, &len);
+ 	if (length)
+ 		goto out;
+ 
+@@ -1937,7 +1938,7 @@ static ssize_t sel_read_initcon(struct file *file, char __user *buf,
+ 	ssize_t ret;
+ 
+ 	sid = file_inode(file)->i_ino&SEL_INO_MASK;
+-	ret = security_sid_to_context(fsi->state, sid, &con, &len);
++	ret = selinux_ss_sid_to_context(fsi->state, sid, &con, &len);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/security/selinux/ss/services.c b/security/selinux/ss/services.c
+index c67965cbfcba..32eb57af8a7a 100644
+--- a/security/selinux/ss/services.c
++++ b/security/selinux/ss/services.c
+@@ -55,13 +55,13 @@
+ #include "avc.h"
+ #include "avc_ss.h"
+ #include "security.h"
++#include "selinux_ss.h"
+ #include "context.h"
+ #include "policydb.h"
+ #include "sidtab.h"
+ #include "services.h"
+ #include "conditional.h"
+ #include "mls.h"
+-#include "objsec.h"
+ #include "netlabel.h"
+ #include "xfrm.h"
+ #include "ebitmap.h"
+@@ -838,7 +838,7 @@ static int security_compute_validatetrans(struct selinux_state *state,
+ 	return rc;
+ }
+ 
+-int security_validate_transition_user(struct selinux_state *state,
++int selinux_ss_validate_transition_user(struct selinux_state *state,
+ 				      u32 oldsid, u32 newsid, u32 tasksid,
+ 				      u16 tclass)
+ {
+@@ -846,7 +846,7 @@ int security_validate_transition_user(struct selinux_state *state,
+ 					      tclass, true);
+ }
+ 
+-int security_validate_transition(struct selinux_state *state,
++int selinux_ss_validate_transition(struct selinux_state *state,
+ 				 u32 oldsid, u32 newsid, u32 tasksid,
+ 				 u16 orig_tclass)
+ {
+@@ -855,7 +855,7 @@ int security_validate_transition(struct selinux_state *state,
+ }
+ 
+ /*
+- * security_bounded_transition - check whether the given
++ * selinux_ss_bounded_transition - check whether the given
+  * transition is directed to bounded, or not.
+  * It returns 0, if @newsid is bounded by @oldsid.
+  * Otherwise, it returns error code.
+@@ -864,7 +864,7 @@ int security_validate_transition(struct selinux_state *state,
+  * @oldsid : current security identifier
+  * @newsid : destinated security identifier
+  */
+-int security_bounded_transition(struct selinux_state *state,
++int selinux_ss_bounded_transition(struct selinux_state *state,
+ 				u32 old_sid, u32 new_sid)
+ {
+ 	struct selinux_policy *policy;
+@@ -1030,7 +1030,7 @@ void services_compute_xperms_decision(struct extended_perms_decision *xpermd,
+ 	}
+ }
+ 
+-void security_compute_xperms_decision(struct selinux_state *state,
++void selinux_ss_compute_xperms_decision(struct selinux_state *state,
+ 				      u32 ssid,
+ 				      u32 tsid,
+ 				      u16 orig_tclass,
+@@ -1118,7 +1118,7 @@ void security_compute_xperms_decision(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_compute_av - Compute access vector decisions.
++ * selinux_ss_compute_av - Compute access vector decisions.
+  * @state: SELinux state
+  * @ssid: source security identifier
+  * @tsid: target security identifier
+@@ -1129,7 +1129,7 @@ void security_compute_xperms_decision(struct selinux_state *state,
+  * Compute a set of access vector decisions based on the
+  * SID pair (@ssid, @tsid) for the permissions in @tclass.
+  */
+-void security_compute_av(struct selinux_state *state,
++void selinux_ss_compute_av(struct selinux_state *state,
+ 			 u32 ssid,
+ 			 u32 tsid,
+ 			 u16 orig_tclass,
+@@ -1188,7 +1188,7 @@ void security_compute_av(struct selinux_state *state,
+ 	goto out;
+ }
+ 
+-void security_compute_av_user(struct selinux_state *state,
++void selinux_ss_compute_av_user(struct selinux_state *state,
+ 			      u32 ssid,
+ 			      u32 tsid,
+ 			      u16 tclass,
+@@ -1418,7 +1418,7 @@ static int security_sid_to_context_core(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_sid_to_context - Obtain a context for a given SID.
++ * selinux_ss_sid_to_context - Obtain a context for a given SID.
+  * @state: SELinux state
+  * @sid: security identifier, SID
+  * @scontext: security context
+@@ -1428,23 +1428,23 @@ static int security_sid_to_context_core(struct selinux_state *state,
+  * into a dynamically allocated string of the correct size.  Set @scontext
+  * to point to this string and set @scontext_len to the length of the string.
+  */
+-int security_sid_to_context(struct selinux_state *state,
+-			    u32 sid, char **scontext, u32 *scontext_len)
++int selinux_ss_sid_to_context(struct selinux_state *state,
++			      u32 sid, char **scontext, u32 *scontext_len)
+ {
+ 	return security_sid_to_context_core(state, sid, scontext,
+ 					    scontext_len, 0, 0);
+ }
+ 
+-int security_sid_to_context_force(struct selinux_state *state, u32 sid,
+-				  char **scontext, u32 *scontext_len)
++int selinux_ss_sid_to_context_force(struct selinux_state *state, u32 sid,
++				    char **scontext, u32 *scontext_len)
+ {
+ 	return security_sid_to_context_core(state, sid, scontext,
+ 					    scontext_len, 1, 0);
+ }
+ 
+ /**
+- * security_sid_to_context_inval - Obtain a context for a given SID if it
+- *                                 is invalid.
++ * selinux_ss_sid_to_context_inval - Obtain a context for a given SID if it
++ *                                   is invalid.
+  * @state: SELinux state
+  * @sid: security identifier, SID
+  * @scontext: security context
+@@ -1456,8 +1456,8 @@ int security_sid_to_context_force(struct selinux_state *state, u32 sid,
+  * this string (or NULL if the context is valid) and set @scontext_len to
+  * the length of the string (or 0 if the context is valid).
+  */
+-int security_sid_to_context_inval(struct selinux_state *state, u32 sid,
+-				  char **scontext, u32 *scontext_len)
++int selinux_ss_sid_to_context_inval(struct selinux_state *state, u32 sid,
++				    char **scontext, u32 *scontext_len)
+ {
+ 	return security_sid_to_context_core(state, sid, scontext,
+ 					    scontext_len, 1, 1);
+@@ -1620,7 +1620,7 @@ static int security_context_to_sid_core(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_context_to_sid - Obtain a SID for a given security context.
++ * selinux_ss_context_to_sid - Obtain a SID for a given security context.
+  * @state: SELinux state
+  * @scontext: security context
+  * @scontext_len: length in bytes
+@@ -1632,23 +1632,23 @@ static int security_context_to_sid_core(struct selinux_state *state,
+  * Returns -%EINVAL if the context is invalid, -%ENOMEM if insufficient
+  * memory is available, or 0 on success.
+  */
+-int security_context_to_sid(struct selinux_state *state,
+-			    const char *scontext, u32 scontext_len, u32 *sid,
+-			    gfp_t gfp)
++int selinux_ss_context_to_sid(struct selinux_state *state,
++			      const char *scontext, u32 scontext_len, u32 *sid,
++			      gfp_t gfp)
+ {
+ 	return security_context_to_sid_core(state, scontext, scontext_len,
+ 					    sid, SECSID_NULL, gfp, 0);
+ }
+ 
+-int security_context_str_to_sid(struct selinux_state *state,
+-				const char *scontext, u32 *sid, gfp_t gfp)
++int selinux_ss_context_str_to_sid(struct selinux_state *state,
++				  const char *scontext, u32 *sid, gfp_t gfp)
+ {
+-	return security_context_to_sid(state, scontext, strlen(scontext),
+-				       sid, gfp);
++	return security_context_to_sid_core(state, scontext, strlen(scontext),
++					    sid, SECSID_NULL, gfp, 0);
+ }
+ 
+ /**
+- * security_context_to_sid_default - Obtain a SID for a given security context,
++ * selinux_ss_context_to_sid_default - Obtain a SID for a given security context,
+  * falling back to specified default if needed.
+  *
+  * @state: SELinux state
+@@ -1667,20 +1667,20 @@ int security_context_str_to_sid(struct selinux_state *state,
+  * Returns -%EINVAL if the context is invalid, -%ENOMEM if insufficient
+  * memory is available, or 0 on success.
+  */
+-int security_context_to_sid_default(struct selinux_state *state,
+-				    const char *scontext, u32 scontext_len,
+-				    u32 *sid, u32 def_sid, gfp_t gfp_flags)
++int selinux_ss_context_to_sid_default(struct selinux_state *state,
++				      const char *scontext, u32 scontext_len,
++				      u32 *sid, u32 def_sid, gfp_t gfp_flags)
+ {
+ 	return security_context_to_sid_core(state, scontext, scontext_len,
+ 					    sid, def_sid, gfp_flags, 1);
+ }
+ 
+-int security_context_to_sid_force(struct selinux_state *state,
+-				  const char *scontext, u32 scontext_len,
+-				  u32 *sid)
++int selinux_ss_context_to_sid_force(struct selinux_state *state,
++				    const char *scontext, u32 scontext_len,
++				    u32 *sid, gfp_t gfp)
+ {
+ 	return security_context_to_sid_core(state, scontext, scontext_len,
+-					    sid, SECSID_NULL, GFP_KERNEL, 1);
++					    sid, SECSID_NULL, gfp, 1);
+ }
+ 
+ static int compute_sid_handle_invalid_context(
+@@ -1946,7 +1946,7 @@ static int security_compute_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_transition_sid - Compute the SID for a new subject/object.
++ * selinux_ss_transition_sid - Compute the SID for a new subject/object.
+  * @state: SELinux state
+  * @ssid: source security identifier
+  * @tsid: target security identifier
+@@ -1960,7 +1960,7 @@ static int security_compute_sid(struct selinux_state *state,
+  * if insufficient memory is available, or %0 if the new SID was
+  * computed successfully.
+  */
+-int security_transition_sid(struct selinux_state *state,
++int selinux_ss_transition_sid(struct selinux_state *state,
+ 			    u32 ssid, u32 tsid, u16 tclass,
+ 			    const struct qstr *qstr, u32 *out_sid)
+ {
+@@ -1969,7 +1969,7 @@ int security_transition_sid(struct selinux_state *state,
+ 				    qstr ? qstr->name : NULL, out_sid, true);
+ }
+ 
+-int security_transition_sid_user(struct selinux_state *state,
++int selinux_ss_transition_sid_user(struct selinux_state *state,
+ 				 u32 ssid, u32 tsid, u16 tclass,
+ 				 const char *objname, u32 *out_sid)
+ {
+@@ -1979,7 +1979,7 @@ int security_transition_sid_user(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_member_sid - Compute the SID for member selection.
++ * selinux_ss_member_sid - Compute the SID for member selection.
+  * @state: SELinux state
+  * @ssid: source security identifier
+  * @tsid: target security identifier
+@@ -1992,7 +1992,7 @@ int security_transition_sid_user(struct selinux_state *state,
+  * if insufficient memory is available, or %0 if the SID was
+  * computed successfully.
+  */
+-int security_member_sid(struct selinux_state *state,
++int selinux_ss_member_sid(struct selinux_state *state,
+ 			u32 ssid,
+ 			u32 tsid,
+ 			u16 tclass,
+@@ -2004,7 +2004,7 @@ int security_member_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_change_sid - Compute the SID for object relabeling.
++ * selinux_ss_change_sid - Compute the SID for object relabeling.
+  * @state: SELinux state
+  * @ssid: source security identifier
+  * @tsid: target security identifier
+@@ -2017,7 +2017,7 @@ int security_member_sid(struct selinux_state *state,
+  * if insufficient memory is available, or %0 if the SID was
+  * computed successfully.
+  */
+-int security_change_sid(struct selinux_state *state,
++int selinux_ss_change_sid(struct selinux_state *state,
+ 			u32 ssid,
+ 			u32 tsid,
+ 			u16 tclass,
+@@ -2448,13 +2448,13 @@ static int ocontext_to_sid(struct sidtab *sidtab, struct ocontext *c,
+ }
+ 
+ /**
+- * security_port_sid - Obtain the SID for a port.
++ * selinux_ss_port_sid - Obtain the SID for a port.
+  * @state: SELinux state
+  * @protocol: protocol number
+  * @port: port number
+  * @out_sid: security identifier
+  */
+-int security_port_sid(struct selinux_state *state,
++int selinux_ss_port_sid(struct selinux_state *state,
+ 		      u8 protocol, u16 port, u32 *out_sid)
+ {
+ 	struct selinux_policy *policy;
+@@ -2502,13 +2502,13 @@ int security_port_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_ib_pkey_sid - Obtain the SID for a pkey.
++ * selinux_ss_ib_pkey_sid - Obtain the SID for a pkey.
+  * @state: SELinux state
+  * @subnet_prefix: Subnet Prefix
+  * @pkey_num: pkey number
+  * @out_sid: security identifier
+  */
+-int security_ib_pkey_sid(struct selinux_state *state,
++int selinux_ss_ib_pkey_sid(struct selinux_state *state,
+ 			 u64 subnet_prefix, u16 pkey_num, u32 *out_sid)
+ {
+ 	struct selinux_policy *policy;
+@@ -2556,13 +2556,13 @@ int security_ib_pkey_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_ib_endport_sid - Obtain the SID for a subnet management interface.
++ * selinux_ss_ib_endport_sid - Obtain the SID for a subnet management interface.
+  * @state: SELinux state
+  * @dev_name: device name
+  * @port_num: port number
+  * @out_sid: security identifier
+  */
+-int security_ib_endport_sid(struct selinux_state *state,
++int selinux_ss_ib_endport_sid(struct selinux_state *state,
+ 			    const char *dev_name, u8 port_num, u32 *out_sid)
+ {
+ 	struct selinux_policy *policy;
+@@ -2611,13 +2611,13 @@ int security_ib_endport_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_netif_sid - Obtain the SID for a network interface.
++ * selinux_ss_netif_sid - Obtain the SID for a network interface.
+  * @state: SELinux state
+  * @name: interface name
+  * @if_sid: interface SID
+  */
+-int security_netif_sid(struct selinux_state *state,
+-		       const char *name, u32 *if_sid)
++int selinux_ss_netif_sid(struct selinux_state *state,
++			 const char *name, u32 *if_sid)
+ {
+ 	struct selinux_policy *policy;
+ 	struct policydb *policydb;
+@@ -2680,14 +2680,14 @@ static bool match_ipv6_addrmask(const u32 input[4], const u32 addr[4], const u32
+ }
+ 
+ /**
+- * security_node_sid - Obtain the SID for a node (host).
++ * selinux_ss_node_sid - Obtain the SID for a node (host).
+  * @state: SELinux state
+  * @domain: communication domain aka address family
+  * @addrp: address
+  * @addrlen: address length in bytes
+  * @out_sid: security identifier
+  */
+-int security_node_sid(struct selinux_state *state,
++int selinux_ss_node_sid(struct selinux_state *state,
+ 		      u16 domain,
+ 		      const void *addrp,
+ 		      u32 addrlen,
+@@ -2769,7 +2769,7 @@ int security_node_sid(struct selinux_state *state,
+ #define SIDS_NEL 25
+ 
+ /**
+- * security_get_user_sids - Obtain reachable SIDs for a user.
++ * selinux_ss_get_user_sids - Obtain reachable SIDs for a user.
+  * @state: SELinux state
+  * @fromsid: starting SID
+  * @username: username
+@@ -2782,13 +2782,11 @@ int security_node_sid(struct selinux_state *state,
+  * array containing the set of SIDs.  Set *@nel to the
+  * number of elements in the array.
+  */
+-
+-
+-int security_get_user_sids(struct selinux_state *state,
+-			   u32 fromsid,
+-			   const char *username,
+-			   u32 **sids,
+-			   u32 *nel)
++int selinux_ss_get_user_sids(struct selinux_state *state,
++			     u32 fromsid,
++			     const char *username,
++			     u32 **sids,
++			     u32 *nel)
+ {
+ 	struct selinux_policy *policy;
+ 	struct policydb *policydb;
+@@ -2962,7 +2960,7 @@ static inline int __security_genfs_sid(struct selinux_policy *policy,
+ }
+ 
+ /**
+- * security_genfs_sid - Obtain a SID for a file in a filesystem
++ * selinux_ss_genfs_sid - Obtain a SID for a file in a filesystem
+  * @state: SELinux state
+  * @fstype: filesystem type
+  * @path: path from root of mount
+@@ -2972,7 +2970,7 @@ static inline int __security_genfs_sid(struct selinux_policy *policy,
+  * Acquire policy_rwlock before calling __security_genfs_sid() and release
+  * it afterward.
+  */
+-int security_genfs_sid(struct selinux_state *state,
++int selinux_ss_genfs_sid(struct selinux_state *state,
+ 		       const char *fstype,
+ 		       const char *path,
+ 		       u16 orig_sclass,
+@@ -2996,7 +2994,7 @@ int security_genfs_sid(struct selinux_state *state,
+ 	return retval;
+ }
+ 
+-int selinux_policy_genfs_sid(struct selinux_policy *policy,
++int selinux_ss_policy_genfs_sid(struct selinux_policy *policy,
+ 			const char *fstype,
+ 			const char *path,
+ 			u16 orig_sclass,
+@@ -3007,23 +3005,24 @@ int selinux_policy_genfs_sid(struct selinux_policy *policy,
+ }
+ 
+ /**
+- * security_fs_use - Determine how to handle labeling for a filesystem.
++ * selinux_ss_fs_use - Determine how to handle labeling for a filesystem.
+  * @state: SELinux state
+- * @sb: superblock in question
++ * @fstype: filesystem type
++ * @behavior: labeling behavior to apply
++ * @sid: SID for superblock
+  */
+-int security_fs_use(struct selinux_state *state, struct super_block *sb)
++int selinux_ss_fs_use(struct selinux_state *state, const char *fstype,
++		      unsigned short *behavior, u32 *sid)
+ {
+ 	struct selinux_policy *policy;
+ 	struct policydb *policydb;
+ 	struct sidtab *sidtab;
+ 	int rc;
+ 	struct ocontext *c;
+-	struct superblock_security_struct *sbsec = selinux_superblock(sb);
+-	const char *fstype = sb->s_type->name;
+ 
+ 	if (!selinux_initialized(state)) {
+-		sbsec->behavior = SECURITY_FS_USE_NONE;
+-		sbsec->sid = SECINITSID_UNLABELED;
++		*behavior = SECURITY_FS_USE_NONE;
++		*sid = SECINITSID_UNLABELED;
+ 		return 0;
+ 	}
+ 
+@@ -3041,8 +3040,8 @@ int security_fs_use(struct selinux_state *state, struct super_block *sb)
+ 	}
+ 
+ 	if (c) {
+-		sbsec->behavior = c->v.behavior;
+-		rc = ocontext_to_sid(sidtab, c, 0, &sbsec->sid);
++		*behavior = c->v.behavior;
++		rc = ocontext_to_sid(sidtab, c, 0, sid);
+ 		if (rc == -ESTALE) {
+ 			rcu_read_unlock();
+ 			goto retry;
+@@ -3051,16 +3050,16 @@ int security_fs_use(struct selinux_state *state, struct super_block *sb)
+ 			goto out;
+ 	} else {
+ 		rc = __security_genfs_sid(policy, fstype, "/",
+-					SECCLASS_DIR, &sbsec->sid);
++					SECCLASS_DIR, sid);
+ 		if (rc == -ESTALE) {
+ 			rcu_read_unlock();
+ 			goto retry;
+ 		}
+ 		if (rc) {
+-			sbsec->behavior = SECURITY_FS_USE_NONE;
++			*behavior = SECURITY_FS_USE_NONE;
+ 			rc = 0;
+ 		} else {
+-			sbsec->behavior = SECURITY_FS_USE_GENFS;
++			*behavior = SECURITY_FS_USE_GENFS;
+ 		}
+ 	}
+ 
+@@ -3250,10 +3249,10 @@ static int security_preserve_bools(struct selinux_policy *oldpolicy,
+ }
+ 
+ /*
+- * security_sid_mls_copy() - computes a new sid based on the given
++ * selinux_ss_sid_mls_copy() - computes a new sid based on the given
+  * sid and the mls portion of mls_sid.
+  */
+-int security_sid_mls_copy(struct selinux_state *state,
++int selinux_ss_sid_mls_copy(struct selinux_state *state,
+ 			  u32 sid, u32 mls_sid, u32 *new_sid)
+ {
+ 	struct selinux_policy *policy;
+@@ -3343,7 +3342,7 @@ int security_sid_mls_copy(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_net_peersid_resolve - Compare and resolve two network peer SIDs
++ * selinux_ss_net_peersid_resolve - Compare and resolve two network peer SIDs
+  * @state: SELinux state
+  * @nlbl_sid: NetLabel SID
+  * @nlbl_type: NetLabel labeling protocol type
+@@ -3364,7 +3363,7 @@ int security_sid_mls_copy(struct selinux_state *state,
+  *   multiple, inconsistent labels |    -<errno>     |    SECSID_NULL
+  *
+  */
+-int security_net_peersid_resolve(struct selinux_state *state,
++int selinux_ss_net_peersid_resolve(struct selinux_state *state,
+ 				 u32 nlbl_sid, u32 nlbl_type,
+ 				 u32 xfrm_sid,
+ 				 u32 *peer_sid)
+@@ -3614,7 +3613,7 @@ void selinux_audit_rule_free(void *vrule)
+ }
+ 
+ int selinux_audit_rule_init(u32 field, u32 op, char *rulestr, void **vrule,
+-			    gfp_t gfp)
++			gfp_t gfp)
+ {
+ 	struct selinux_state *state = current_selinux_state;
+ 	struct selinux_policy *policy;
+@@ -3739,7 +3738,7 @@ int selinux_audit_rule_known(struct audit_krule *rule)
+ 	return 0;
+ }
+ 
+-int selinux_audit_rule_match(struct lsm_prop *prop, u32 field, u32 op, void *vrule)
++int selinux_ss_audit_rule_match(struct lsm_prop *prop, u32 field, u32 op, void *vrule)
+ {
+ 	struct selinux_state *state = current_selinux_state;
+ 	struct selinux_policy *policy;
+@@ -3905,7 +3904,7 @@ static void security_netlbl_cache_add(struct netlbl_lsm_secattr *secattr,
+ }
+ 
+ /**
+- * security_netlbl_secattr_to_sid - Convert a NetLabel secattr to a SELinux SID
++ * selinux_ss_netlbl_secattr_to_sid - Convert a NetLabel secattr to a SELinux SID
+  * @state: SELinux state
+  * @secattr: the NetLabel packet security attributes
+  * @sid: the SELinux SID
+@@ -3920,7 +3919,7 @@ static void security_netlbl_cache_add(struct netlbl_lsm_secattr *secattr,
+  * failure.
+  *
+  */
+-int security_netlbl_secattr_to_sid(struct selinux_state *state,
++int selinux_ss_netlbl_secattr_to_sid(struct selinux_state *state,
+ 				   struct netlbl_lsm_secattr *secattr,
+ 				   u32 *sid)
+ {
+@@ -3945,8 +3944,6 @@ int security_netlbl_secattr_to_sid(struct selinux_state *state,
+ 
+ 	if (secattr->flags & NETLBL_SECATTR_CACHE)
+ 		*sid = *(u32 *)secattr->cache->data;
+-	else if (secattr->flags & NETLBL_SECATTR_SECID)
+-		*sid = secattr->attr.secid;
+ 	else if (secattr->flags & NETLBL_SECATTR_MLS_LVL) {
+ 		rc = -EIDRM;
+ 		ctx = sidtab_search(sidtab, SECINITSID_NETMSG);
+@@ -3988,7 +3985,7 @@ int security_netlbl_secattr_to_sid(struct selinux_state *state,
+ }
+ 
+ /**
+- * security_netlbl_sid_to_secattr - Convert a SELinux SID to a NetLabel secattr
++ * selinux_ss_netlbl_sid_to_secattr - Convert a SELinux SID to a NetLabel secattr
+  * @state: SELinux state
+  * @sid: the SELinux SID
+  * @secattr: the NetLabel packet security attributes
+@@ -3998,7 +3995,7 @@ int security_netlbl_secattr_to_sid(struct selinux_state *state,
+  * Returns zero on success, negative values on failure.
+  *
+  */
+-int security_netlbl_sid_to_secattr(struct selinux_state *state,
++int selinux_ss_netlbl_sid_to_secattr(struct selinux_state *state,
+ 				   u32 sid, struct netlbl_lsm_secattr *secattr)
+ {
+ 	struct selinux_policy *policy;
+@@ -4024,8 +4021,7 @@ int security_netlbl_sid_to_secattr(struct selinux_state *state,
+ 	if (secattr->domain == NULL)
+ 		goto out;
+ 
+-	secattr->attr.secid = sid;
+-	secattr->flags |= NETLBL_SECATTR_DOMAIN_CPY | NETLBL_SECATTR_SECID;
++	secattr->flags |= NETLBL_SECATTR_DOMAIN_CPY;
+ 	mls_export_netlbl_lvl(policydb, ctx, secattr);
+ 	rc = mls_export_netlbl_cat(policydb, ctx, secattr);
+ out:
+diff --git a/security/selinux/ss/sidtab.c b/security/selinux/ss/sidtab.c
+index 59f8c09158ef..da8d19ce5866 100644
+--- a/security/selinux/ss/sidtab.c
++++ b/security/selinux/ss/sidtab.c
+@@ -265,7 +265,8 @@ struct sidtab_entry *sidtab_search_entry_force(struct sidtab *s, u32 sid)
+ 	return sidtab_search_core(s, sid, 1);
+ }
+ 
+-int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
++int sidtab_context_ss_to_sid(struct sidtab *s, struct context *context,
++			     struct selinux_state *state, u32 ss_sid, u32 *sid)
+ {
+ 	unsigned long flags;
+ 	u32 count, hash = context_compute_hash(context);
+@@ -308,6 +309,8 @@ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
+ 		goto out_unlock;
+ 
+ 	dst->sid = index_to_sid(count);
++	dst->state = state;
++	dst->ss_sid = ss_sid;
+ 	dst->hash = hash;
+ 
+ 	rc = context_cpy(&dst->context, context);
+@@ -344,10 +347,6 @@ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
+ 			     dst_convert->hash);
+ 	}
+ 
+-	if (context->len)
+-		pr_info("SELinux:  Context %s is not valid (left unmapped).\n",
+-			context->str);
+-
+ 	*sid = index_to_sid(count);
+ 
+ 	/* write entries before updating count */
+@@ -360,6 +359,11 @@ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
+ 	return rc;
+ }
+ 
++int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
++{
++	return sidtab_context_ss_to_sid(s, context, NULL, 0, sid);
++}
++
+ static void sidtab_convert_hashtable(struct sidtab *s, u32 count)
+ {
+ 	struct sidtab_entry *entry;
 -- 
 2.49.0
 
