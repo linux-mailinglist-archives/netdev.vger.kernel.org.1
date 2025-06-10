@@ -1,206 +1,153 @@
-Return-Path: <netdev+bounces-196195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60815AD3CB7
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:22:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0A4AD3CCC
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E322189753E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:19:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3D5E175392
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85AF24466F;
-	Tue, 10 Jun 2025 15:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WfnYqNZu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80B223F43C;
+	Tue, 10 Jun 2025 15:18:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255062441AF;
-	Tue, 10 Jun 2025 15:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749568602; cv=fail; b=sZddyLEOBWOpmzeEu5NvA2jkXHND3uTlR3biJoUgMu/qBEWzQS1Lwih4G5PTGgBTXsyFM5f5oNZLKsFDabUuiiuKezPldEOjo64kC3W9odArxXMlD/hxkDOQC0H8aUVsfpaWN6xq+VlZM2nX6n2mhYgGJc2ef8ekO/GFTS7m5qc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749568602; c=relaxed/simple;
-	bh=A8w3E5NZoBjwQKv0LCjpaiIF1/GCJ6OwYhhVTnZV/B4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LwOo0w/YdRjDsGIFXw/ndWnKkbX8XH8hgVLkCXhccfHe0feDxBAHYHnF8gCUX9YQYftIgWGvlu4lvwKp0P1RDumNNGFy/71ncMoYZhV1cJgmaJbhypKn8moURIg7GKYwct2OLAUk4fmjSwZi5TweG//gmR6j8+yNju3hW1tXlHI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WfnYqNZu; arc=fail smtp.client-ip=40.107.223.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QIBLGpl1agUoCbr+TZzAfX81p2Jn5Gf5I2gZ0JihXrhPOTCwRh16l32CqLBzNC0hO057zwtHROKYs4LaHX76yWXvJkJ7+Ax7sNjlilPgsqypTeWL08Ag3mvJwQZm7GXkk/r/22VgG1UrRcFdWeGDVrdLGzo0zleuKB5epCcGDRJMCjGsixMemoYe5iJDc19DYkICdyWXu6f9fIEoh+U/lVd1jPBTzV/WeyGFM1XVVMywOOE8BtDwZ9gPD7rTgENwFPI385P4fbKmSGfugZLaI2bLjCGr/jvtoxSCdKE0Jp5OwoSzdA4lsuBL0bvp6DNrtv3bGO0qg8JvVzOKTAj8YQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mAcXlUnuztOWMxV0h6BHLXgTDjOkQHbn4Nuc/x315A8=;
- b=HEMeh9496C+LF8ZjmokDZR79OWgpKpqY/3QOAVK8K9qkMP2WcYW8lOZXxsRtwkPnGkI0Y3ODvMFmXwrRmpwt45Qr3XcFLbSa8TUDyuSVsdUe1hmW3URnjwsp8bvgnVbE+5DF15TwleU2IWFp3qE0HEyLmtDqw0Z8qjzpfDRArcCvNaKo8ib3RRF3u1FfKaNiPR8rAjQarz/nPSiEO7/vGXOp61C5JS0NO9dDeQQOCtLKOlm9enHaSi7gARApFka6z12ni6gtnZPNhRq+Qr+MXVITDPIq3L6OZxQPEVl2IDJtOkYiu8CuLpf0nLTwDk8VhtLrlsCXHYu9LWha5DG52g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mAcXlUnuztOWMxV0h6BHLXgTDjOkQHbn4Nuc/x315A8=;
- b=WfnYqNZuma7D5CWlp4BhOLP457x36UKwSrQJJjXEwWiq4RaObnNj1XCaHU05fAxXuKvM3Rrx1vJUABJ8j6jeVVQ9A9kg8czzonxaposoSDd9T0uIvbF6L3EAJagvzP051QAfDgEeS1Fu/GTJIiDgVsIaWRE7PejmkSQa8fHRv4E1Zc+5N2s3lcrSswmfvH/4iuZf70rt4ljk2Ns+T+DRRs39UyVtJD65a+dO3F5d+MkvkFmgfSsDm+bXOtCF7pAD7NNUhSTECOeE2/pJkMylqVF4QFc+mc0EJ40V6glAXkbvNOoJYbtnTSeMR65Ys7JpiGAue7qNtmixT27hFLyqBA==
-Received: from SJ0PR03CA0183.namprd03.prod.outlook.com (2603:10b6:a03:2ef::8)
- by IA0PR12MB8376.namprd12.prod.outlook.com (2603:10b6:208:40b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Tue, 10 Jun
- 2025 15:16:38 +0000
-Received: from CO1PEPF000066E7.namprd05.prod.outlook.com
- (2603:10b6:a03:2ef:cafe::5b) by SJ0PR03CA0183.outlook.office365.com
- (2603:10b6:a03:2ef::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Tue,
- 10 Jun 2025 15:16:37 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000066E7.mail.protection.outlook.com (10.167.249.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.15 via Frontend Transport; Tue, 10 Jun 2025 15:16:37 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 10 Jun
- 2025 08:16:16 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 10 Jun
- 2025 08:16:15 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 10
- Jun 2025 08:16:11 -0700
-From: Mark Bloch <mbloch@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
-CC: <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
-	<tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Shahar Shitrit <shshitrit@nvidia.com>, "Mark
- Bloch" <mbloch@nvidia.com>
-Subject: [PATCH net 9/9] net/mlx5e: Fix number of lanes to UNKNOWN when using data_rate_oper
-Date: Tue, 10 Jun 2025 18:15:14 +0300
-Message-ID: <20250610151514.1094735-10-mbloch@nvidia.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250610151514.1094735-1-mbloch@nvidia.com>
-References: <20250610151514.1094735-1-mbloch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40D523E32D;
+	Tue, 10 Jun 2025 15:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749568707; cv=none; b=QhdJYrsLN0FuCRYA3gWt9bqOdQrQBAwKP+IfdBzc7pyxmbhc0lSdSm8zClDaFB0iTwR5r3xhfNPlDR4NUN0G4YsVALxKNs9SMVS0fSRuaBIn0YrJZ19l6Et0nzipHLu/qnkPsDzAbdSLsU+SH8oqID5PU39GIt1+qTIG7XNGvgc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749568707; c=relaxed/simple;
+	bh=VzoLQyE4wl6OHnhW3cdOsqTAdS7RUvOcmDCMwL7brDs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t4s/EDx14BFyhQsg+O6zUdnQduwdshD64CGwbeoFUyk8+zUiNRxG4a+PUiGanubNmpis9YgcPFbdRUOkb0dQOB464qcpx1Gv42znLtISDFARFCqh1QKbhpKeXbmB4783ZGumVryTKW66mamLP0k4N3wb6b2AswywzdZC4w9xPsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ad56cbc7b07so818218466b.0;
+        Tue, 10 Jun 2025 08:18:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749568704; x=1750173504;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=irqUA8MmTfr+t8bn/uEmRMXvR9i+NTIZlr/iv1nvdzA=;
+        b=DvJs6p7Wi6v/og9hAo+yAo6T+wKefDs/iv1o9MOrq5FGOHsVt0EHmp/OZ0I2dFneVf
+         3uFGPqNkezwJ7ng2ESuLfn7hL/8TCXsZHkFR0t3FJBc4FZCYGQdOQSYYABmZ7GN9XPjy
+         T7RXRFjToN9nFAD/8XpMe+/8wohZ0U6V+b+SIU6FilMxr3rAHnyvH2Lr3bcCAj3UvB/J
+         CDbkQfBTcq6Tx9CJIOczJ5oLqypTuyaBA6fojGFJy+zM4wanZRAO893He4S4mn+8DQog
+         xzobGd7BvKH9BuAyJnjCPCvX5RGY0HDVcxCcy7Rx4Y53QMrFIY1UUwqHTfvCKsMW/dir
+         56cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkguM5b5tbrM4b/LKk0klqj3/oqu27YbaOpTGyX/f2+oVxyllaNJN66p7whHFUd4zwMKqVoE2f2m5naJM=@vger.kernel.org, AJvYcCXEo09soMAQu/+DAVwOY1UrsD2FkIhFNpX2VOuUtfJ5JwmZPr4xopQWg8KnOPjNO9L3n5cnBccnMoSoHtSAQZCQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRqe55bhGj2CMPyeWFbmiKP8IrGRnz+Arm6DFHC3VRkjep9jP2
+	kxGjIHUvmFibr9K5wjq5hwQiUSOojGrUCTsyqa0uV3S5jYW8/+HPR2xV
+X-Gm-Gg: ASbGnctoAol3S4lz73KMJ5T2rHNNLViaLVGXA8++G0dlmQ73VIKCRDwNtk8R4FO8wrK
+	Vh2xWRswGQZ96xYoBbA+SIcFPaKr5jHXEU9N7x/gWvk1doKkmSAz6QxUvJlYI7vSqCXIh1nlvne
+	UVrneODGdociJiQuwLQ9SrKcE7XkwWDUK9H/v8QYY4F4BJlsJ5UPhekV7/42ierdRV1+Ekt6nOL
+	Zsw+Lf63d09xSQvvEkoGLH30Hew3GJuaWn5AZluCS14FuIduTcwaQzZa5Qoihsh4UVl1f3FYuuO
+	IwBvSBBQPvs3PbxUpWyoeWWPkMwrwlZ/rLwNfF4KfGmHgTn+jA4d
+X-Google-Smtp-Source: AGHT+IGA75b9YcASk2D5n/bwRadF4WvuuJsbkaEyipV19iAdWDM29jLzv700q9BkuPpQqahnED6w1g==
+X-Received: by 2002:a17:906:f58e:b0:ad8:a9fc:8127 with SMTP id a640c23a62f3a-ade1a9c7b43mr1688656666b.41.1749568703757;
+        Tue, 10 Jun 2025 08:18:23 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc39c4asm750849566b.142.2025.06.10.08.18.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jun 2025 08:18:23 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/7] netpoll: Untangle netconsole and netpoll
+Date: Tue, 10 Jun 2025 08:18:12 -0700
+Message-Id: <20250610-rework-v1-0-7cfde283f246@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000066E7:EE_|IA0PR12MB8376:EE_
-X-MS-Office365-Filtering-Correlation-Id: 618d7724-c69b-48fa-6282-08dda831cb82
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?CwFXIxraEGjULcI0sXin/xErFEHUsl2VS8JQe80MxFbZMjenFvnXwHhq7Ha3?=
- =?us-ascii?Q?8XXCAnj6DM8XkNhaTT+HnjGpa8WOI1S6d/LFPOTfYr0enR7s5STLVX+hf+F9?=
- =?us-ascii?Q?b3H/d8pKLXkPwWS8Nvhav3M4wuymy78xSqpCE9C6dNg6nIR8aJGojSd/BDZ6?=
- =?us-ascii?Q?6sU5vnZL2aqeJVaWteMkGm7GY4xNFoNs8wzFK9ZZlIPELlVKzy7u3Ooux7lh?=
- =?us-ascii?Q?pljJzbOVbIxHcK0bW/iEGOC4vIyqNL1f07mmRYITobpMzpNcB+y5xfsCvxU+?=
- =?us-ascii?Q?Pfw5NERJpPJmuiVE6oX5+k39I/K4U1PBe+feW/g3uXI59jYUYKDyVo3TqgcQ?=
- =?us-ascii?Q?1YbNtCOSVkmxxpuPHqRuAQC3NOryWsJexI2vhgFORDcvpluwdh7Z0g/E8aHX?=
- =?us-ascii?Q?TceoUxydoBXuHodXuogcwDNDoflXgbEM89pyWVUee1zGVEkmAKtfkf7U/kXO?=
- =?us-ascii?Q?4DL8HFxTWU00owMN/V7YkladJT43UjxLEqsZMpdyfdqNUuN5Jloej3Qqyqg9?=
- =?us-ascii?Q?jYM4BMP0zUKTvXx/sIvXOlOc+LSICnGSvCqegd0PdvpOM/YjPLuf8LxkMEwm?=
- =?us-ascii?Q?JJUXQc7Q+QqfbqPcF2mDU27EO0f+DdaSQI/bBBEVHGgAfizBknTsqRBUDMRx?=
- =?us-ascii?Q?7FhSSXc2pCh3KlhYCDlHRZOylp1GJfg0UyboTVMerylE2fmbrECmuzYokF5M?=
- =?us-ascii?Q?/yTuKqGJkqaAOwW8wG1mLZC8MRLftDKv1ZGJ0DfPORmVhenRJ6ZPxicOe5eF?=
- =?us-ascii?Q?zmn1mOPGWPT+OT1HctrP1d+tC5P0z9V4stz/ZTvSu4sqBG9wFk1PqDsZ72iO?=
- =?us-ascii?Q?uaQkZ0OdkPvqp8tOOCdcQHf6vDLg4Zoyn6n49m1jQF3Et9LkWvGBYWdAIb0e?=
- =?us-ascii?Q?0ncaXrCniWIE2ooSlDosWPO7qtLX2YiBUoDeL3raApihDg/RCLHWwom1H9G9?=
- =?us-ascii?Q?WrUEoUdhTHkRomxDwj1BDBoj0xS58oxnspP0/Wpbp3qyE620/pbGEyAk8zcY?=
- =?us-ascii?Q?HARI4avMIZPt3pjs4K2g4iIARSb3OmfYuAynMC2VUWr6vBz/LV+xqdzhJqa2?=
- =?us-ascii?Q?yBWAiEG1sMiof75OydolfNUbFBMW1mpuehhtnSlHcLmitmcccJ1u6mVzKGWV?=
- =?us-ascii?Q?xL25lD2gc9Yu1Hdf/fkTFqcs6n6e1uvRyKwyv8oPlVJQA6GMYKgKi0t0jgnc?=
- =?us-ascii?Q?i43GP+9EmVzBMMr+nGvlAWoojaFMoi1BV0j63PDk/axCYhMq9NVkXbF0nXZZ?=
- =?us-ascii?Q?zLkzXSiLAoCL63BgCIL8MKqqn0O4bOIsNjDaHtgza0lMfdKPX/iz1w+v6WYE?=
- =?us-ascii?Q?YFNp/Rg9FqsgE7KGtBUTop1khRn+Fn3P2Ks9yS0cWBMZ3pMh39otj8a+tOuR?=
- =?us-ascii?Q?MLLcty4/vdQiV5au2/n3Xw2BaKMWkmrTqid5OJMkpMcMqKHjX+LwABe304XG?=
- =?us-ascii?Q?4K9vkGA8+R/eAy5pl7E5DwbDqwV97ocRkc6Q73GCfEk64V5Yg4z4Zmcjn2Tj?=
- =?us-ascii?Q?3lR7a3hfHFLBHuGPAZX3QzWHCOy7a4TVU6A7?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 15:16:37.6093
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 618d7724-c69b-48fa-6282-08dda831cb82
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000066E7.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8376
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALRMSGgC/x3MQQqDMBAF0KsMf20gRmwlVyldSPJtByGWiVRBv
+ LvgO8A7UGnKiigHjH+tuhREaRtB+o7lQ6cZURB86P3Dd864LTa71D77NOYhh0A0gp9x0v2OXih
+ cXeG+4n2eFzQPg9NiAAAA
+X-Change-ID: 20250603-rework-c175cad8d22e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2303; i=leitao@debian.org;
+ h=from:subject:message-id; bh=VzoLQyE4wl6OHnhW3cdOsqTAdS7RUvOcmDCMwL7brDs=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoSEy9Oux/XDfzkJfTEyRM1B+R0ahEONt9ysa3T
+ uGnDbFk5Q6JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEhMvQAKCRA1o5Of/Hh3
+ bbBmEACYtS0IcqbN240pTfocSzNrfxewiIgC8hV4fthdTzdovD9c3WRT+CCJP72XhXv3r4vs0nB
+ X2ZC4Ogh8kxVhCIYNf/kdpPXinlo0XeUOTRVEqKr14XxtpKuDBbF06QXGcaDU+fbcuZLoZVVcHz
+ Z1GJz7DGilv8aqGsTtEGFI+wOou1NlUfnlmuWEYz1IyS2hPPDpMkYEiV7XgH07jjQaz+ByR+MhM
+ eox3dMiI4yaI9D5l+lUwmATVlXrRXW8l3fLkC07WSCQcF44AKdLG9X7/7gIFilU2Xo2nQhMDwGe
+ /doO4edBn0ri15oOc+mQVPQeZaOj2Nwn2TRpStMY9IiDjZlGYlUQ6AN+e/YTNqY5LaPmdwsG4Eb
+ 8x0rYA689xym6BBJsu7XC8n4KBC2KbHfn7WGFL3JdgfoCdqrRzz7SjWoBh2sYydwasBnV9FP2ET
+ J6FhTFZbtWm7xLVnayd9O5BpTqsoZ2+VUBXySuvnRcsjg50/jSzJ1918RmcwxCpLg5TWxxTnCrm
+ 7s8xPJ21rxWpi+mMj3L3lvXOIBekdHbX019ZVcOr5aXnvcMxTHZPCQfak4nkTSAG2+0NYCJ4p45
+ 2XX0lnwHFTC0PwvRCylItePQ12JNhnQQSQ0rd320i1DuWK85Rwm0ky0yql/L+iCoVPD6SrSGN2y
+ groae+YtVDwgQWQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-From: Shahar Shitrit <shshitrit@nvidia.com>
+Initially netpoll and netconsole were created together, and some
+functions are in the wrong file. Seperate netconsole-only functions
+in netconsole, avoiding exports.
 
-When the link is up, either eth_proto_oper or ext_eth_proto_oper
-typically reports the active link protocol, from which both speed
-and number of lanes can be retrieved. However, in certain cases,
-such as when a NIC is connected via a non-standard cable, the
-firmware may not report the protocol.
+1. Expose netpoll logging macros in the public header to enable consistent
+   log formatting across netpoll consumers.
 
-In such scenarios, the speed can still be obtained from the
-data_rate_oper field in PTYS register. Since data_rate_oper
-provides only speed information and lacks lane details, it is
-incorrect to derive the number of lanes from it.
+2. Relocate netconsole-specific functions from netpoll to the netconsole
+   module where they are actually used, reducing unnecessary coupling.
 
-This patch corrects the behavior by setting the number of lanes to
-UNKNOWN instead of incorrectly using MAX_LANES when relying on
-data_rate_oper.
+3. Remove unnecessary function exports
 
-Fixes: 7e959797f021 ("net/mlx5e: Enable lanes configuration when auto-negotiation is off")
-Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+4. Rename netpoll parsing functions in netconsole to better reflect their
+   specific usage.
+
+5. Create a test to check that cmdline works fine. This was in my todo
+   list since [1], this was a good time to add it here to make sure this
+   patchset doesn't regress.
+
+PS: The code was split in a way that it is easy to review. When copying
+the functions from netpoll to netconsole, I do not change than other
+than adding `static`. This will make checkpatch unhappy, but, further
+patches will address the issues. It is done this way to make it easy for
+reviewers.
+
+Link: https://lore.kernel.org/netdev/Z36TlACdNMwFD7wv@dev-ushankar.dev.purestorage.com/ [1]
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Breno Leitao (7):
+      netpoll: remove __netpoll_cleanup from exported API
+      netpoll: expose netpoll logging macros in public header
+      netpoll: relocate netconsole-specific functions to netconsole module
+      netpoll: move netpoll_print_options to netconsole
+      netconsole: rename functions to better reflect their purpose
+      netconsole: improve code style in parser function
+      selftest: netconsole: add test for cmdline configuration
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index ea078c9f5d15..3cb8d3bf9044 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -43,7 +43,6 @@
- #include "en/fs_ethtool.h"
- 
- #define LANES_UNKNOWN		 0
--#define MAX_LANES		 8
- 
- void mlx5e_ethtool_get_drvinfo(struct mlx5e_priv *priv,
- 			       struct ethtool_drvinfo *drvinfo)
-@@ -1098,10 +1097,8 @@ static void get_link_properties(struct net_device *netdev,
- 		speed = info->speed;
- 		lanes = info->lanes;
- 		duplex = DUPLEX_FULL;
--	} else if (data_rate_oper) {
-+	} else if (data_rate_oper)
- 		speed = 100 * data_rate_oper;
--		lanes = MAX_LANES;
--	}
- 
- out:
- 	link_ksettings->base.duplex = duplex;
+ drivers/net/netconsole.c                           | 137 ++++++++++++++++++++-
+ include/linux/netpoll.h                            |  10 +-
+ net/core/netpoll.c                                 | 136 +-------------------
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  39 +++++-
+ .../selftests/drivers/net/netcons_cmdline.sh       |  52 ++++++++
+ 6 files changed, 228 insertions(+), 147 deletions(-)
+---
+base-commit: 2c7e4a2663a1ab5a740c59c31991579b6b865a26
+change-id: 20250603-rework-c175cad8d22e
+
+Best regards,
 -- 
-2.34.1
+Breno Leitao <leitao@debian.org>
 
 
