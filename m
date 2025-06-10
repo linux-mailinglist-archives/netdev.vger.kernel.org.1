@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-195928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1290AD2C3A
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:47:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C3FAD2C3C
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A317A8393
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:45:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 578813B01E0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9038525DCFF;
-	Tue, 10 Jun 2025 03:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CC81CEAC2;
+	Tue, 10 Jun 2025 03:46:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9282F33985
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 03:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6596825DCE5
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 03:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749527195; cv=none; b=RYYVyj1hxJpgTJEDybKCrD8gXWXh1AMmxJxEcA/TSmVaF6UnqZKtaItvmuz+fF8zLbhUqXF/KecjNzIbBLdvib1zalxqa6EGIA5ti8RAPuk/+wwMlPPaTXhDfflKlzvOlHKAZohpw4zjRzz31gB6rr4LSsNXTMkujd9K9hd/wzs=
+	t=1749527199; cv=none; b=j5XcZnJ53ra48M1Z3kjhdCGflQkkMcCCcvrOHUMlEGwptZlk0Y6rbJHXZWl57LkIQ4XrOPG6U/aDjOsmv83b8b30+D6XjrxP26aSVg6JFoFDJQbfckfpnRC2KwHtwfudt/lGZemSns4BDi/q3rEV2eLIKonk/Zn9yqiRVVhifSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749527195; c=relaxed/simple;
-	bh=2ZGi94tMoIWR0+UROYhU6I5IxlA+QqathFUUEDbuG0I=;
+	s=arc-20240116; t=1749527199; c=relaxed/simple;
+	bh=VyDvBEV3fO1OBjk1ynvl3O2WEV+B2F9EQqba8/egRPE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EgodJ8M4b+VHA/3iG8E+POwtYbzhi1NbivHFpMcdCYJovQFJurrftZweEMoeIy6+DNSY4CV5fb9gouFS5b3NrCw7fkDHK0NFlvI3rXRClcMusOCaZOSYJVCIwrC94F1euTqJTgzo6H7GRQvh2UoPGuyrf5oeLawmzUhGUos/GhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.194.254.142
+	 MIME-Version; b=LYtixSJzT2EBnMdvCsPGfEdVnlJFajoy1FBAQLrnLwf6R7Dtkz7cYKrHiBgGUWD9pKMs5rrw3FcgsOhgB427sVb8dqDEayKyoIAbffy6070+KIipqNSujbtVfgvU+E4iyoJSHQg7/H9ZxcMU6oBy5EDs9qB3sMWHDZS2/vHhO+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpsz18t1749527170ta949d520
-X-QQ-Originating-IP: r8AH0oOJlPqDJNxRwIm2xbJ793Pj7a3deiDxXeu/su0=
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz18t1749527177t5f63e611
+X-QQ-Originating-IP: ljHJWc5mYsz8c+zAitdh98wqTyP6NzWQ7V1j3ZUwtzY=
 Received: from localhost.localdomain ( [111.202.70.101])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 10 Jun 2025 11:46:01 +0800 (CST)
+	id ; Tue, 10 Jun 2025 11:46:11 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 16349489029027878949
+X-BIZMAIL-ID: 13480387239181489020
 EX-QQ-RecipientCnt: 15
 From: Tonghao Zhang <tonghao@bamaicloud.com>
 To: netdev@vger.kernel.org
@@ -54,9 +54,9 @@ Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
 	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Zengbing Tu <tuzengbing@didiglobal.com>
-Subject: [net-next v6 3/4] net: bonding: send peer notify when failure recovery
-Date: Tue, 10 Jun 2025 11:44:44 +0800
-Message-Id: <81185ef7f9227cff906903fe8e74258727529491.1749525581.git.tonghao@bamaicloud.com>
+Subject: [net-next v6 4/4] net: bonding: add tracepoint for 802.3ad
+Date: Tue, 10 Jun 2025 11:44:45 +0800
+Message-Id: <10b8f570bd59104a1c7d5ecdc9a82c6ec61d2d1c.1749525581.git.tonghao@bamaicloud.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <cover.1749525581.git.tonghao@bamaicloud.com>
 References: <cover.1749525581.git.tonghao@bamaicloud.com>
@@ -69,29 +69,28 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MKzYG8XJzx27oJ+SOxK6WF8G9SBBqwqVXfIL/AFTR+wEtvrGoIpRarkU
-	bM5OCQDxZvSHQVLFXW2h96PTcSRNcmusqUldTvKAW9fUvQtecbglNdZjgAGMvgU4xBpTSV+
-	Ed9V9p23KWNUTI3XfnsgvqxeByXDp45iX9hDyIUJS/hYO3CSOgfNz1urdPs1nQf/kzp8e6M
-	dJsTd6ZSQj5JkdkhBYD6s11ZDN5W41HgReFsReH1NOYvtGUagXgWkYl8WfYdCkptYV/h7F4
-	iY/hjQnKz/uvNc05p5Lp0TAUVp5AHdf9KZxPDkhlhWf7FQ4geCz4R0yvIoB3qeshmR2gecq
-	iO9XeOR/E2766fePS0ZtEZTXPU1yHomGZEsYzyIaEYnJeJdp2Dd07sdy9duQprzh3ning/h
-	rTrrHKnJ/xlptk+/nrQBbcTBCgnBZONCAc7QhaDufIuyMqXV8wvGm87j0iuM0uqvQSZ0Gne
-	UwDLrxq5FrDxZ3TJMx/IcZRc5x+S2vPCOiD+RlBcXhEgL06OK27iL/NZ3b+Ad3GUh9itDDG
-	Vv8uxpR+jaAuUU690dHT6xYxQHG6kidZZM2l13bhnAsAZzwr/q2w/MVkN3I/9iN2TE7rGIm
-	tGJcrU5rrBiu5D2ul44C/xbd0RHIqTklMc7rB12eb3oWg9pt4TQo1SruXzXeed0BVHPuE/2
-	YV9BU7QFwmFjMau8eElycgpZ8J58KOMO0poGSYwhJ4eKvCm+iX5aW6Q0Honrl9kEZNBHGBG
-	bZqvOjHTGNbeWFUwuLNG5PGrWqBWO4AB+4YR0zakyaNDVTWSM4U/7gzMTIFxvi5ZDPYydEx
-	bBkFlp+caRgqi3mdsoeQWzyAav8JAgHI6fn46YerFhY9SCv8DgMqgDBe9BBD5sR2+3phbsj
-	GHzIBtcS5vW4HspbBiA8P4zR3rhTtOQT48ffhR7NF+GZKaElAizTlWQzwtoBZcWe3j/z+6s
-	VMmve+KkzZqQdAX40efYypV6xTWUxcYJeu89kQwPrq4yEQKgMhYy8Myja0u+mZXyoR8s=
+X-QQ-XMAILINFO: M28vnsO5i7WeoD+SBIk8rxz+6ocB2ABaSU/0KOGGMJxcxuMPWSwwwL0y
+	Ea+7Dft3kMPmjjuiylIaOaRYvkEBxPS2c99TW+qw7+qpnHJfqrzkTqpKvnXmvYmYV+pjVrq
+	BFxSr49wpUvsBwENoLDqOYl8ZDwImno56pQ8nmdjaslA97KgmsqCLxXJqz0ywkCq/l5RoE5
+	C4Y6dGfVeaaDBzZZwaeQN5utd/tYkIWFpxuGbJ8pOqLOaxJV09NiCdXaMYpgp8z9QOd48fl
+	zXG1gjR4vsJIDQ1Ew7/VVjksQtNW1iBpYvRDOwyOGaBO4YxY5UTO2HcNcZ/gUqzlzpIp0kT
+	IJRURRs9ur9efERAX3pEnenROQLWdA6dyVSHHiv6H70h6n9QiLAbn+/MFoP4pQy1QeaMEW7
+	kOg0tx6CkcDOF1aiN7BkHYyL9zaVfunXL+FD5HkC0VJtdmlbvsTMXGRfLbZ9eQ7JihbYM5m
+	12E72Dl4aZzjK1LysPcB1KiQ+rgRuYSw5bt8aUOHY6heKw6+RUUJW0KJkUicaIGvPB+cU2A
+	oMcCMOBiExq85hnKvTf5AX5inxL1yCiv1a2NWgdl4RfN5cywBXlqwYsl4mgwZ4Ogm9BSXlZ
+	UUfwnkruvmo9e4Hu49pmBljPeAAGLtQAY8HOLRfbydouq4LuMJdPfXVRcrvPFKvvh3Hju6h
+	M90tSUIl6hRalDGCUipsE/z6E+U2qtS0rj9aW8n4zF8FdTBeIvrNjQPzDjvgj2QKSbQoSyB
+	nlhIkB0Qc/yy/bWX51Mv09OOQb+KSOI66/CqI74SwMUvzHTfJFqXEnWr0/GMRwcJXNCwqfN
+	/1z+NiL/pSRZdRoKPa79EOejjwcat6T+D1ImkcvIo/TBW+/Z5lYWEVAC6bgfaE5CMJ6qSPm
+	H2LaqjKVbzFTu2CmfC1H08e3r7R+XpBtmgOr/GEYqlfAxBvIlvecCfgKL4ueEdJk+SahxFD
+	A6SDJQK+BTg1wlfT4Sb2LkVGZI9QNAvBw0lS2mYPG9OGONIvhvnc3N2a0
 X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
 X-QQ-RECHKSPAM: 0
 
-After LACP protocol recovery, the port can transmit packets.
-However, if the bond port doesn't send gratuitous ARP/ND
-packets to the switch, the switch won't return packets through
-the current interface. This causes traffic imbalance. To resolve
-this issue, when LACP protocol recovers, send ARP/ND packets.
+Users can monitor NIC link status changes through netlink. However, LACP
+protocol failures may occur despite operational physical links. There is
+no way to detect LACP state changes. This patch adds tracepoint at
+LACP state transition.
 
 Cc: Jay Vosburgh <jv@jvosburgh.net>
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -109,96 +108,78 @@ Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
 Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- Documentation/networking/bonding.rst |  5 +++--
- drivers/net/bonding/bond_3ad.c       | 13 +++++++++++++
- drivers/net/bonding/bond_main.c      | 21 ++++++++++++++++-----
- 3 files changed, 32 insertions(+), 7 deletions(-)
+ drivers/net/bonding/bond_3ad.c |  6 ++++++
+ include/trace/events/bonding.h | 37 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+ create mode 100644 include/trace/events/bonding.h
 
-diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
-index 14f7593d888d..f8f5766703d4 100644
---- a/Documentation/networking/bonding.rst
-+++ b/Documentation/networking/bonding.rst
-@@ -773,8 +773,9 @@ num_unsol_na
- 	greater than 1.
- 
- 	The valid range is 0 - 255; the default value is 1.  These options
--	affect only the active-backup mode.  These options were added for
--	bonding versions 3.3.0 and 3.4.0 respectively.
-+	affect the active-backup or 802.3ad (broadcast_neighbor enabled) mode.
-+	These options were added for bonding versions 3.3.0 and 3.4.0
-+	respectively.
- 
- 	From Linux 3.0 and bonding version 3.7.1, these notifications
- 	are generated by the ipv4 and ipv6 code and the numbers of
 diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index c6807e473ab7..d1c2d416ac87 100644
+index d1c2d416ac87..55703230ab29 100644
 --- a/drivers/net/bonding/bond_3ad.c
 +++ b/drivers/net/bonding/bond_3ad.c
-@@ -982,6 +982,17 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
- 	return 0;
- }
+@@ -16,6 +16,9 @@
+ #include <net/bond_3ad.h>
+ #include <net/netlink.h>
  
-+static void ad_cond_set_peer_notif(struct port *port)
-+{
-+	struct bonding *bond = port->slave->bond;
++#define CREATE_TRACE_POINTS
++#include <trace/events/bonding.h>
 +
-+	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
-+		bond->send_peer_notif = bond->params.num_peer_notif *
-+			max(1, bond->params.peer_notif_delay);
-+		rtnl_unlock();
-+	}
-+}
+ /* General definitions */
+ #define AD_SHORT_TIMEOUT           1
+ #define AD_LONG_TIMEOUT            0
+@@ -1146,6 +1149,9 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 			  port->actor_port_number,
+ 			  last_state,
+ 			  port->sm_mux_state);
 +
- /**
-  * ad_mux_machine - handle a port's mux state machine
-  * @port: the port we're looking at
-@@ -2061,6 +2072,8 @@ static void ad_enable_collecting_distributing(struct port *port,
- 		__enable_port(port);
- 		/* Slave array needs update */
- 		*update_slave_arr = true;
-+		/* Should notify peers if possible */
-+		ad_cond_set_peer_notif(port);
- 	}
- }
- 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 12046ef51569..0acece55d9cb 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1237,17 +1237,28 @@ static struct slave *bond_find_best_slave(struct bonding *bond)
- /* must be called in RCU critical section or with RTNL held */
- static bool bond_should_notify_peers(struct bonding *bond)
- {
--	struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
-+	struct bond_up_slave *usable;
-+	struct slave *slave = NULL;
- 
--	if (!slave || !bond->send_peer_notif ||
-+	if (!bond->send_peer_notif ||
- 	    bond->send_peer_notif %
- 	    max(1, bond->params.peer_notif_delay) != 0 ||
--	    !netif_carrier_ok(bond->dev) ||
--	    test_bit(__LINK_STATE_LINKWATCH_PENDING, &slave->dev->state))
-+	    !netif_carrier_ok(bond->dev))
- 		return false;
- 
-+	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
-+		usable = rcu_dereference_rtnl(bond->usable_slaves);
-+		if (!usable || !READ_ONCE(usable->count))
-+			return false;
-+	} else {
-+		slave = rcu_dereference_rtnl(bond->curr_active_slave);
-+		if (!slave || test_bit(__LINK_STATE_LINKWATCH_PENDING,
-+				       &slave->dev->state))
-+			return false;
-+	}
++		trace_3ad_mux_state(port->slave->dev, last_state, port->sm_mux_state);
 +
- 	netdev_dbg(bond->dev, "bond_should_notify_peers: slave %s\n",
--		   slave ? slave->dev->name : "NULL");
-+		   slave ? slave->dev->name : "all");
- 
- 	return true;
- }
+ 		switch (port->sm_mux_state) {
+ 		case AD_MUX_DETACHED:
+ 			port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
+diff --git a/include/trace/events/bonding.h b/include/trace/events/bonding.h
+new file mode 100644
+index 000000000000..1ee4b07d912a
+--- /dev/null
++++ b/include/trace/events/bonding.h
+@@ -0,0 +1,37 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#if !defined(_TRACE_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_BONDING_H
++
++#include <linux/netdevice.h>
++#include <linux/tracepoint.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM bonding
++
++TRACE_EVENT(3ad_mux_state,
++	TP_PROTO(struct net_device *dev, u32 last_state, u32 curr_state),
++	TP_ARGS(dev, last_state, curr_state),
++
++	TP_STRUCT__entry(
++		__field(int, ifindex)
++		__string(dev_name, dev->name)
++		__field(u32, last_state)
++		__field(u32, curr_state)
++	),
++
++	TP_fast_assign(
++		__entry->ifindex = dev->ifindex;
++		__assign_str(dev_name);
++		__entry->last_state = last_state;
++		__entry->curr_state = curr_state;
++	),
++
++	TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
++		  __entry->ifindex, __get_str(dev_name),
++		  __entry->last_state, __entry->curr_state)
++);
++
++#endif /* _TRACE_BONDING_H */
++
++#include <trace/define_trace.h>
 -- 
 2.34.1
 
