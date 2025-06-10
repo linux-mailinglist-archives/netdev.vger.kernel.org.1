@@ -1,158 +1,175 @@
-Return-Path: <netdev+bounces-196204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D6CAD3CEF
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:26:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E83F2AD3D39
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D3DC189F00F
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:23:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CDB07A4A30
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F391248F55;
-	Tue, 10 Jun 2025 15:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C143248862;
+	Tue, 10 Jun 2025 15:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRlSM1rU"
+	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="XRjbG5YJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C84324887A;
-	Tue, 10 Jun 2025 15:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535BB2376E1
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 15:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749568723; cv=none; b=FaP0ux71tEjCP698tfR9fslxWseZCFMLsX6rM7b+g1Ft8zDy0HlwZ3FXtG2FH9DUNQgE8hhEdVWrJvz1GaQjCV/UeBcXG6sBIyRmrKh7Y3jEqKhmYutgp9l6CStIjKHLxuX6cpwYS9TjYE1GqNnD//sklcSaIJjjPwMfsggTYXg=
+	t=1749569014; cv=none; b=EZnjDNR5u1mYqWDq2IdgZHPOaVpWlwBdwkyu+roqUrjyFz6y94SJEoG7Y91AV6kni71aF/prwtcoiT8J8I3gcU1CEH8U34FD1X2uWHpNTl5odauyNYVY9vR83NI6DpdnrvwMP1OfLr0s5VSUmof0eWsXrumdCuLFAYD/wBWpGXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749568723; c=relaxed/simple;
-	bh=gOnIpi7jKT6E0yFvnngAH2TDUzwDY8Q0gWw1+BeaW+c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C3JNBkcZSMacdusBHamfZjGyRvQDFUF8Rgt1z3Bbxdi8rvIpLZ2OpH52hcOeS2h+qI49B/6mLgCHuuMV9WyKvZSpSbaomYKZdlUMHjo33NJJZbhZt4WogQKva4DhnMb/XecFFW9LPc+wCl02T1oObqhzKTsZZDlZ//C6nAVLK4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRlSM1rU; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-313a188174fso677605a91.1;
-        Tue, 10 Jun 2025 08:18:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749568720; x=1750173520; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hbx+bHktyO4/4VPvenmlBdgvye7zZKBy6tNsedw1riY=;
-        b=GRlSM1rU3T53yAj33gXUbvE+HTYNND41ip1lf5mieUylJLXzuAnMcfDErS4szgS4gf
-         QxRKt/av8bGxn0Qv14Mq2bQwB2OQ6aPWswa2dgsTQ+cnPGhGS8mPB0SSWV/yQHC/ibnR
-         n+UJMSN9TV5tqoJPCiNgi5tzm9S254lJwMhP8Ub/CBxu2zY4uYewlZ267JDqoP4xL673
-         1GQw2ACxXlxUhyQrL5OdVyt5fE+1cd137KgREZX3PeMpFOLfhOYjvLxceRBS+Y80UdyC
-         xg3iyqjMDsT8eze/vsxJ6kML9ZjWpt7F8p8sb80xEujVnx2KMJL2inodANT4BBvZSA4e
-         XzfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749568720; x=1750173520;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hbx+bHktyO4/4VPvenmlBdgvye7zZKBy6tNsedw1riY=;
-        b=pIx7BCtnG8WGtJ5jUo84qWj/uCdGE3r6KmKcqt7AGxaaKgMx+Yp4cqhWlQu09rlZBs
-         6TvtU1nYrjH+XqOxOSFQpWwAMjCCKJlGvzBbYxeYx6D/cGRye/HODpBA9Qat5aw2BBc0
-         Ael2jsK7q2r4ujN9MGs5c5+aD8MMmDEHREFW6EGkFsha/L9HB24Szt5mR8jHzvUbDUyf
-         8pO4DdHqUzaHppg8xxgbar7qu8Exwk9ryU5rA20S757ZufOx4vyiiXmNvNF+tRq3mSdr
-         zKM59LTBM8CD6kkU/eqhgBYrb3hz7RUH4s5UZsyE5m0Q4bnch4ZCtJW9L1qgzl9ViRck
-         ju1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUrc7qQiQbnTplaGwXj+qClCX/TKSAPgeVavoRInAlM7LVkmmTF3hFhPRAzYYOPksjFgSY=@vger.kernel.org, AJvYcCVgagnqlbefL1di3C5AXsvYw/XiL6RE5ytKP1HSXmBk1wIKAcIeQVxt18/xqGpCdYjcRkcIOYGC@vger.kernel.org, AJvYcCXWK/uNDQFF1mwPLVjzk9IZ/C9ByE1mgCGyDwDSbDdw8ce1eonxEP2SRIYhqgFkrRZPfy+b20Vx0f+jtnwV@vger.kernel.org, AJvYcCXX3BnByirBk65o1uNxQMQASCGiQiPmJ68Oqh8ZstSK0Giz1jjIKqvesqJWP55utIPkuwclAsc/@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf1v42WAYGtUJ7wKLGdEw1rOtgONGgrkQMOvOUN7GGXBfmrwZk
-	utXx48lRi6jdPjyvhdpbagzcz4US9At8JeK9QeOMb8bo63tFR5VR1rQE
-X-Gm-Gg: ASbGncsCREQzADC60kIiCWmqPBdHecW2iqeLG5PD37hNwzuhHpT8iLYkCYd/kwg0i1K
-	q2/mfN8/40iEc4fxNRUWtznGV4XRf6w0EJH4HWA3QY4CUXuXE99Zc725TR96Oo45MN6ReUqKFHA
-	nJOaJmkMZnnICP0gdo6vsaJaSVCZ5erc54oIXx5c8z3GJ7/5fQI9Quqs1uy/j307pUAJHPW6jWR
-	c9zeKT5RMugEM/rd+rvyYqQPa2I+F32UX11ZJcaSDMbIObvd+VDaVXzezFdtFhmt2s9Q8UbWT+p
-	4T1oU4ev6CoggXIMJ7aQi4SY79PF/k73qNWIE9o7wOPiVA9xp+CW1ZuYa7RKkh/BLH9AXW9NKwf
-	a+36c1c9LeeffMlUy75XuO5prcPEkylr4wRdh6HXF
-X-Google-Smtp-Source: AGHT+IFaLkJBXLMB5kRAXzQ6BTbGig21zU55qmOvpJ9RWPtjwP3TLdPuITWrEAgEHQ56jpCpm82CNQ==
-X-Received: by 2002:a17:90a:dfd0:b0:30e:9b31:9495 with SMTP id 98e67ed59e1d1-3139e039a1dmr4917189a91.9.1749568720457;
-        Tue, 10 Jun 2025 08:18:40 -0700 (PDT)
-Received: from ?IPV6:2001:ee0:4f0e:fb30:6df1:5935:37b2:fe6a? ([2001:ee0:4f0e:fb30:6df1:5935:37b2:fe6a])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31349f17bd2sm7467484a91.5.2025.06.10.08.18.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jun 2025 08:18:40 -0700 (PDT)
-Message-ID: <e2de0cd8-6ee2-4dab-9d41-cfe5e85d796d@gmail.com>
-Date: Tue, 10 Jun 2025 22:18:32 +0700
+	s=arc-20240116; t=1749569014; c=relaxed/simple;
+	bh=SmTNhAOGAIip/lVL+aZeJrx7rLBvuTmZXxhKmCJfKN0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DeGBu/TehD2JpKZvUs79yFgur7mYXs+Y//XhmrbF4I6Z+v/YQQsnrqBm5u/aOAPKAkyOAbbe+tKR86+E4YedQIkjUr3jDAZ7peG3ruS0WSqJ2mrnZHn3s/2DCIaH6TVr7dj5Wb+UQ85+fth0/KgWHx7M8EkzT4/YnmDpz2Yn8B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=XRjbG5YJ; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id ABC3924002B
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 17:23:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
+	s=1984.ea087b; t=1749569004;
+	bh=SmTNhAOGAIip/lVL+aZeJrx7rLBvuTmZXxhKmCJfKN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:From;
+	b=XRjbG5YJSFBhe9cN3yB5/CnawZNTtXh/BSkgyk1JJFkPUMmSPey/IArAFYpVepx6a
+	 feohYEhUb5f2QRh0gfx6wPoxODSGKDafGf8JvSo3s52P44hnsUcQFpSWLAI6oJWM/D
+	 2McjbpEYG/5V9tfz5HNo0hOqsuqk3sf7NizwDStDHOqmGvfdestdm7ZQPyudU48j9s
+	 Q+fqpkT9AUIgTCgZYXGLzubZbid6OEZ69fGKRP5+XtxN80j20biP1gwftVOyptS+xg
+	 IsxLkh8PHnnsAYp7+fxMJ1aqGQlxofozO/9WrhHS4nlC3kKXamq4Tyk4PxYU+pVTiq
+	 4J1zMbmDbnFuSQyVodKzyBPBC54nt4lnACdbK1MRiVhkmEGuAyo2dx3iD00hHZ6GcZ
+	 8T68j476UQMTeeFNOAbvrXuHlIhQFaTByqqztdeVilnf/CX409RtmOTOkhnRujg2wD
+	 IKDncBsSgmnacs6ExcHVY1eI0maegdDeuCRTLQcmagsKFEisxw6
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4bGsxh35bsz6v1N;
+	Tue, 10 Jun 2025 17:23:20 +0200 (CEST)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,  John
+ Fastabend <john.fastabend@gmail.com>,  Alexei Starovoitov
+ <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Stanislav
+ Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>,  Feng Yang <yangfeng@kylinos.cn>,  Tejun Heo
+ <tj@kernel.org>,  Network Development <netdev@vger.kernel.org>,  LKML
+ <linux-kernel@vger.kernel.org>,  bpf <bpf@vger.kernel.org>,
+  syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+Subject: Re: [PATCH bpf-next] bpf: Fix RCU usage in
+ bpf_get_cgroup_classid_curr helper
+In-Reply-To: <CAADnVQK_k4ReDwS_urGtJPQ1SXaHdrGWYxJGd-QK=tAn60p4vw@mail.gmail.com>
+References: <20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net>
+	<CAADnVQLxaxVpCaK90FfePOKMLpH=axaK3gDwVZLp0L1+fNxgtA@mail.gmail.com>
+	<9eae82be-0900-44ea-b105-67fadc7d480d@iogearbox.net>
+	<CAADnVQK_k4ReDwS_urGtJPQ1SXaHdrGWYxJGd-QK=tAn60p4vw@mail.gmail.com>
+Date: Tue, 10 Jun 2025 15:23:00 +0000
+Message-ID: <87wm9jy623.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] virtio-net: drop the multi-buffer XDP packet in
- zerocopy
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
-References: <20250603150613.83802-1-minhquangbui99@gmail.com>
- <dd087fdf-5d6c-4015-bed3-29760002f859@redhat.com>
- <f6d7610b-abfe-415d-adf8-08ce791e4e72@gmail.com>
- <20250605074810.2b3b2637@kernel.org>
- <f073b150-b2e9-43db-aa61-87eee4755a2f@gmail.com>
- <20250609095824.414cffa1@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20250609095824.414cffa1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 6/9/25 23:58, Jakub Kicinski wrote:
-> On Fri, 6 Jun 2025 22:48:53 +0700 Bui Quang Minh wrote:
->>>> But currently, if a multi-buffer packet arrives, it will not go through
->>>> XDP program so it doesn't increase the stats but still goes to network
->>>> stack. So I think it's not a correct behavior.
->>> Sounds fair, but at a glance the normal XDP path seems to be trying to
->>> linearize the frame. Can we not try to flatten the frame here?
->>> If it's simply to long for the chunk size that's a frame length error,
->>> right?
->> Here we are in the zerocopy path, so the buffers for the frame to fill
->> in are allocated from XDP socket's umem. And if the frame spans across
->> multiple buffers then the total frame size is larger than the chunk
->> size.
-> Is that always the case? Can the multi-buf not be due to header-data
-> split of the incoming frame? (I'm not familiar with the virtio spec)
+Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 
-Ah, maybe I cause some confusion :) zerocopy here means zerocopy if the 
-frame is redirected to XDP socket. In this zerocopy mode, XDP socket 
-will provide buffers to virtio-net, the frame from vhost will be placed 
-in those buffers. If the bind XDP program in virtio-net returns 
-XDP_REDIRECT to that XDP socket, then the frame is zerocopy. In case 
-XDP_PASS is returned, the frame's data is copied to newly created skb 
-and the frame's buffer is returned to XDP socket. AFAIK, virtio-net has 
-not supported header-data split yet.
-
->> Furthermore, we are in the zerocopy so we cannot linearize by
->> allocating a large enough buffer to cover the whole frame then copy the
->> frame data to it. That's not zerocopy anymore. Also, XDP socket zerocopy
->> receive has assumption that the packet it receives must from the umem
->> pool. AFAIK, the generic XDP path is for copy mode only.
-> Generic XDP == do_xdp_generic(), here I think you mean the normal XDP
-> patch in the virtio driver? If so then no, XDP is very much not
-> expected to copy each frame before processing.
-
-Yes, I mean generic XDP = do_xdp_generic(). I mean that we can linearize 
-the frame if needed (like in netif_skb_check_for_xdp()) in copy mode for 
-XDP socket but not in zerocopy mode.
-
+> On Tue, Jun 10, 2025 at 5:58=E2=80=AFAM Daniel Borkmann <daniel@iogearbox=
+.net> wrote:
+>>
+>> On 6/9/25 5:51 PM, Alexei Starovoitov wrote:
+>> > On Sun, Jun 8, 2025 at 8:35=E2=80=AFAM Charalampos Mitrodimas
+>> > <charmitro@posteo.net> wrote:
+>> >>
+>> >> The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
+>> >> types") made bpf_get_cgroup_classid_curr helper available to all BPF
+>> >> program types.  This helper used __task_get_classid() which calls
+>> >> task_cls_state() that requires rcu_read_lock_bh_held().
+>> >>
+>> >> This triggers an RCU warning when called from BPF syscall programs
+>> >> which run under rcu_read_lock_trace():
+>> >>
+>> >>    WARNING: suspicious RCU usage
+>> >>    6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
+>> >>    -----------------------------
+>> >>    net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check()=
+ usage!
+>> >>
+>> >> Fix this by replacing __task_get_classid() with task_cls_classid()
+>> >> which handles RCU locking internally using regular rcu_read_lock() and
+>> >> is safe to call from any context.
+>> >>
+>> >> Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+>> >> Closes: https://syzkaller.appspot.com/bug?extid=3Db4169a1cfb945d2ed0ec
+>> >> Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog type=
+s")
+>> >> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+>> >> ---
+>> >>   net/core/filter.c | 2 +-
+>> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+>> >>
+>> >> diff --git a/net/core/filter.c b/net/core/filter.c
+>> >> index 30e7d36790883b29174654315738e93237e21dd0..3b3f81cf674dde7d2bd83=
+488450edad4e129bdac 100644
+>> >> --- a/net/core/filter.c
+>> >> +++ b/net/core/filter.c
+>> >> @@ -3083,7 +3083,7 @@ static const struct bpf_func_proto bpf_msg_pop_=
+data_proto =3D {
+>> >>   #ifdef CONFIG_CGROUP_NET_CLASSID
+>> >>   BPF_CALL_0(bpf_get_cgroup_classid_curr)
+>> >>   {
+>> >> -       return __task_get_classid(current);
+>> >> +       return task_cls_classid(current);
+>> >>   }
+>> >
+>> > Daniel added this helper in
+>> > commit 5a52ae4e32a6 ("bpf: Allow to retrieve cgroup v1 classid from v2=
+ hooks")
+>> > with intention to use it from networking hooks.
+>> >
+>> > But task_cls_classid() has
+>> >          if (in_interrupt())
+>> >                  return 0;
+>> >
+>> > which will trigger in softirq and tc hooks.
+>> > So this might break Daniel's use case.
+>>
+>> Yeap, we cannot break tc(x) BPF programs. It probably makes sense to have
+>> a new helper implementation for the more generic, non-networking case wh=
+ich
+>> then internally uses task_cls_classid().
 >
-> This is only slightly related to you patch but while we talk about
-> multi-buf - in the netdev CI the test which sends ping while XDP
-> multi-buf program is attached is really flaky :(
-> https://netdev.bots.linux.dev/contest.html?executor=vmksft-drv-hw&test=ping-py.ping-test-xdp-native-mb&ld-cases=1
+> Instead of forking the helper I think we can :
+> rcu_read_lock_bh_held() || rcu_read_lock_held()
+> in task_cls_state().
 
-metal-drv-hw means the NETIF is the real NIC, right?
+I tested your suggestion with,
 
-Thanks,
-Quang Minh.
+  rcu_read_lock_bh_held() || rcu_read_lock_held()
 
+but it still triggers the RCU warning because BPF syscall programs use
+rcu_read_lock_trace().
+
+Adding rcu_read_lock_trace_held() fixes it functionally but triggers a
+checkpatch warning:
+
+  WARNING: use of RCU tasks trace is incorrect outside BPF or core RCU code
+
+I think the best solution here would be to add
+local_bh_disable()/enable() protection directly in the BPF helper. This
+keeps the fix localized to where the problem exists, and avoids
+modifying core cgroup RCU.
+
+> And that will do it.
 
