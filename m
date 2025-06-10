@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-195989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D2EAD2FE1
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:21:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D123AD2FF0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0133B5676
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:20:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 167501894EA0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9041286D4E;
-	Tue, 10 Jun 2025 08:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A34288C97;
+	Tue, 10 Jun 2025 08:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K5FsT4Px"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dj9+FhOQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B99B284B26;
-	Tue, 10 Jun 2025 08:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B2C2868B8;
+	Tue, 10 Jun 2025 08:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749543530; cv=none; b=TTR/TcyY40sJy1SqMW4LN9iAVlpjviDB6/1kWh+fLVnE7UBJmUn5qEXpGzK1NLpoLJeMK4bZ5IpFKhsE/QrOob/s+8QHVk51Gq4+pVrWGGPL0EFrfP17IJiW2SPkHtwOCWkaNLm9jQPsmMaZ5nAs56jWF+YrNoU32FQqw8FqOhQ=
+	t=1749543534; cv=none; b=hPweE6Sf7fMjqDGL9x9G3WTFXZDrCTZkaO72t370DAAtr3Xe46340UoKLAboLhXftqdXHgCblTPO1n0gzSmqR4bSWnPyNBWh9QYPfNw9J+WYGmd/k6EVcwpgvsMDKAqIqABbUATP+kYkrDKnm37uFTCnk2FYXnHqDb593DbR2zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749543530; c=relaxed/simple;
-	bh=cyjcWXKE8OOxVZytz02eb4bGA3frkzhzQFdQgZX1EoI=;
+	s=arc-20240116; t=1749543534; c=relaxed/simple;
+	bh=6CgKAAUo2JHD7yFHhbo+1T4kIagvIlgRJCvhKYrQlbU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XTZ6Mye0o9d5bQAO6rczKYwjt3JeEWUQ2uwSEjJEJcn048ALH7Ote4CBFrTAmAWO9/WyHELM53bFoyhxOiHCu1HajYyLKZDBk44765nLp/LNiH5QnRO8xxnYK2acScJqsNVWMos4mSYWWahuzqM+RSV0b1n//8uu5vanOUYqSFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K5FsT4Px; arc=none smtp.client-ip=217.70.183.198
+	 In-Reply-To:To:Cc; b=ceZBEimBVzDTq/SJ0KmvxEvcz5D43mWCXl7EPLPs2C6FVpfR9aJjRkri0wBt60nFypLpQGCjSe8fJ8BAvrw6UjAmvuPBnZD2Tnh9L/nhz/7AlF7+3NkWDJ0OlfywcpsRwcPHHjCsGvfhovPIPzIlzBxs0TiAbBmTMRezV/xIMRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dj9+FhOQ; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 168E84426A;
-	Tue, 10 Jun 2025 08:18:45 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 72C0544250;
+	Tue, 10 Jun 2025 08:18:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1749543526;
+	t=1749543527;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gT69Wrg1NLJlzBA9AnKs5lP8TSxmCTVpEJFHkX3DHM0=;
-	b=K5FsT4Pxrt++Xr+/qIO8KXzPnMJj+r8zTArl1u6RCS7bRBsuwZkbZEasDwOJ7aXyOicsHX
-	/+/NV+hS54SfvIyaNL8ytQbiy0t5LShv++FBAoE8CQ0hwbgzxXrefrfhLT6wGyP0NgCuYG
-	oHqglFz5XRe/jIOXebQGdX4YFhWm8+BFmYFeaybhzg+T9ZTG7DaAhTZFD3jL5A1GlZB9pZ
-	8B8FQkF1HRBBjvhdESfoK8h2DijPDRLmhLCflw/mIigr+As2xpMMZgaDm/o3phw4SgOkzW
-	o/RbCcdsST9hMBY4v2OnVIiGvnT6aoEv2nHSmxvwXzm051i/cjREc8aCQ4ZOmA==
+	bh=ZDG/Y1XmDGe9GkL9daMK3NUZhybT+HAZPX9S1Ul60BE=;
+	b=dj9+FhOQf1ZzSb9zYh5eTsBoDq0vQ9BP2yAcZnZg1rT18wiuNefGyunrF5Er5RjDIviAHf
+	ni0AUZOK24XHwEXZpWNhcMufSpsHAFhXcJpXcFSQkqdwcnIyYSFL4Z3X0aQAod9OoTf5Mi
+	3QX0/TQ/XnxuRCcQvwlpSdMOOOk7HOOEMrdLa25G5kcpWxmwflTcp/dqL8WbbJJ0iqDVyM
+	T01YRrenyT21o3VddgGHLJt4OTMEzl+I/SmxG9J5U1Wwd+wdbA4v9ASVsv3RLLPgR+HgY3
+	IMxT2Mu5+isL6hG0jaYU094q10iN4TLVV+WW+X0bQ1c4DdMX/xH8q+MkcVBBiw==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 10 Jun 2025 10:11:42 +0200
-Subject: [PATCH net-next v13 08/13] net: ethtool: Add PSE port priority
- support feature
+Date: Tue, 10 Jun 2025 10:11:43 +0200
+Subject: [PATCH net-next v13 09/13] net: pse-pd: pd692x0: Add support for
+ PSE PI priority feature
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250610-feature_poe_port_prio-v13-8-c5edc16b9ee2@bootlin.com>
+Message-Id: <20250610-feature_poe_port_prio-v13-9-c5edc16b9ee2@bootlin.com>
 References: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
 In-Reply-To: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -85,195 +85,332 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This patch expands the status information provided by ethtool for PSE c33
-with current port priority and max port priority. It also adds a call to
-pse_ethtool_set_prio() to configure the PSE port priority.
+This patch extends the PSE callbacks by adding support for the newly
+introduced pi_set_prio() callback, enabling the configuration of PSE PI
+priorities. The current port priority is now also included in the status
+information returned to users.
 
 Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
+Changes in v7:
+- Nitpick change.
 
-Changes in v13:
-- Small change, no need for >0 condition check for unsigned variables.
-
-Change in v6:
-- Remove c33 standard reference from new netlink field in documentation.
-- Remove report of budget evaluation strategy.
-
-Change in v4:
-- Remove disconnection policy features.
-- Rename port priority to budget evaluation strategy.
-
-Change in v3:
-- Add disconnection policy.
-
-Change in v2:
-- Improve port priority documentation.
-- Add port priority modes.
+Changes in v3:
+- New patch
 ---
- Documentation/netlink/specs/ethtool.yaml       | 11 +++++++++++
- Documentation/networking/ethtool-netlink.rst   | 26 ++++++++++++++++++++++++++
- include/uapi/linux/ethtool_netlink_generated.h |  2 ++
- net/ethtool/pse-pd.c                           | 18 ++++++++++++++++++
- 4 files changed, 57 insertions(+)
+ drivers/net/pse-pd/pd692x0.c | 205 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 205 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index bb09aa4ed1ba..baf71541521e 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1434,6 +1434,14 @@ attribute-sets:
-         name: pse-pw-d-id
-         type: u32
-         name-prefix: ethtool-a-
-+      -
-+        name: pse-prio-max
-+        type: u32
-+        name-prefix: ethtool-a-
-+      -
-+        name: pse-prio
-+        type: u32
-+        name-prefix: ethtool-a-
-   -
-     name: rss
-     attr-cnt-name: __ethtool-a-rss-cnt
-@@ -2258,6 +2266,8 @@ operations:
-             - c33-pse-avail-pw-limit
-             - c33-pse-pw-limit-ranges
-             - pse-pw-d-id
-+            - pse-prio-max
-+            - pse-prio
-       dump: *pse-get-op
-     -
-       name: pse-set
-@@ -2272,6 +2282,7 @@ operations:
-             - podl-pse-admin-control
-             - c33-pse-admin-control
-             - c33-pse-avail-pw-limit
-+            - pse-prio
-     -
-       name: rss-get
-       doc: Get RSS params.
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index e9af8e58564c..e45bb555e909 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1790,6 +1790,10 @@ Kernel response contents:
-   ``ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES``       nested  Supported power limit
-                                                       configuration ranges.
-   ``ETHTOOL_A_PSE_PW_D_ID``                      u32  Index of the PSE power domain
-+  ``ETHTOOL_A_PSE_PRIO_MAX``                     u32  Priority maximum configurable
-+                                                      on the PoE PSE
-+  ``ETHTOOL_A_PSE_PRIO``                         u32  Priority of the PoE PSE
-+                                                      currently configured
-   ==========================================  ======  =============================
+diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
+index 7d60a714ca53..a4766c18f333 100644
+--- a/drivers/net/pse-pd/pd692x0.c
++++ b/drivers/net/pse-pd/pd692x0.c
+@@ -12,6 +12,8 @@
+ #include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/pse-pd/pse.h>
++#include <linux/regulator/driver.h>
++#include <linux/regulator/machine.h>
  
- When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
-@@ -1866,6 +1870,12 @@ equal.
- The ``ETHTOOL_A_PSE_PW_D_ID`` attribute identifies the index of PSE power
- domain.
+ #define PD692X0_PSE_NAME "pd692x0_pse"
  
-+When set, the optional ``ETHTOOL_A_PSE_PRIO_MAX`` attribute identifies
-+the PSE maximum priority value.
-+When set, the optional ``ETHTOOL_A_PSE_PRIO`` attributes is used to
-+identifies the currently configured PSE priority.
-+For a description of PSE priority attributes, see ``PSE_SET``.
-+
- PSE_SET
- =======
+@@ -76,6 +78,8 @@ enum {
+ 	PD692X0_MSG_GET_PORT_CLASS,
+ 	PD692X0_MSG_GET_PORT_MEAS,
+ 	PD692X0_MSG_GET_PORT_PARAM,
++	PD692X0_MSG_GET_POWER_BANK,
++	PD692X0_MSG_SET_POWER_BANK,
  
-@@ -1879,6 +1889,8 @@ Request contents:
-   ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
-   ``ETHTOOL_A_C33_PSE_AVAIL_PWR_LIMIT``      u32  Control PoE PSE available
-                                                   power limit
-+  ``ETHTOOL_A_PSE_PRIO``                     u32  Control priority of the
-+                                                  PoE PSE
-   ======================================  ======  =============================
+ 	/* add new message above here */
+ 	PD692X0_MSG_CNT
+@@ -95,6 +99,8 @@ struct pd692x0_priv {
+ 	unsigned long last_cmd_key_time;
  
- When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
-@@ -1901,6 +1913,20 @@ various existing products that document power consumption in watts rather than
- classes. If power limit configuration based on classes is needed, the
- conversion can be done in user space, for example by ethtool.
- 
-+When set, the optional ``ETHTOOL_A_PSE_PRIO`` attributes is used to
-+control the PSE priority. Allowed priority value are between zero and
-+the value of ``ETHTOOL_A_PSE_PRIO_MAX`` attribute.
-+
-+A lower value indicates a higher priority, meaning that a priority value
-+of 0 corresponds to the highest port priority.
-+Port priority serves two functions:
-+
-+ - Power-up Order: After a reset, ports are powered up in order of their
-+   priority from highest to lowest. Ports with higher priority
-+   (lower values) power up first.
-+ - Shutdown Order: When the power budget is exceeded, ports with lower
-+   priority (higher values) are turned off first.
-+
- PSE_NTF
- =======
- 
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index c6a95224be25..8e5d067e7ddf 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -671,6 +671,8 @@ enum {
- 	ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT,
- 	ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES,
- 	ETHTOOL_A_PSE_PW_D_ID,
-+	ETHTOOL_A_PSE_PRIO_MAX,
-+	ETHTOOL_A_PSE_PRIO,
- 
- 	__ETHTOOL_A_PSE_CNT,
- 	ETHTOOL_A_PSE_MAX = (__ETHTOOL_A_PSE_CNT - 1)
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 45c61216ef87..33b5e3926175 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -111,6 +111,9 @@ static int pse_reply_size(const struct ethnl_req_info *req_base,
- 		len += st->c33_pw_limit_nb_ranges *
- 		       (nla_total_size(0) +
- 			nla_total_size(sizeof(u32)) * 2);
-+	if (st->prio_max)
-+		/* _PSE_PRIO_MAX + _PSE_PRIO */
-+		len += nla_total_size(sizeof(u32)) * 2;
- 
- 	return len;
- }
-@@ -205,6 +208,11 @@ static int pse_fill_reply(struct sk_buff *skb,
- 	    pse_put_pw_limit_ranges(skb, st))
- 		return -EMSGSIZE;
- 
-+	if (st->prio_max &&
-+	    (nla_put_u32(skb, ETHTOOL_A_PSE_PRIO_MAX, st->prio_max) ||
-+	     nla_put_u32(skb, ETHTOOL_A_PSE_PRIO, st->prio)))
-+		return -EMSGSIZE;
-+
- 	return 0;
- }
- 
-@@ -226,6 +234,7 @@ const struct nla_policy ethnl_pse_set_policy[ETHTOOL_A_PSE_MAX + 1] = {
- 		NLA_POLICY_RANGE(NLA_U32, ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
- 				 ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED),
- 	[ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT] = { .type = NLA_U32 },
-+	[ETHTOOL_A_PSE_PRIO] = { .type = NLA_U32 },
+ 	enum ethtool_c33_pse_admin_state admin_state[PD692X0_MAX_PIS];
++	struct regulator_dev *manager_reg[PD692X0_MAX_MANAGERS];
++	int manager_pw_budget[PD692X0_MAX_MANAGERS];
  };
  
- static int
-@@ -274,6 +283,15 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
- 	if (ret)
- 		return ret;
+ /* Template list of communication messages. The non-null bytes defined here
+@@ -170,6 +176,16 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
+ 		.data = {0x4e, 0x4e, 0x4e, 0x4e,
+ 			 0x4e, 0x4e, 0x4e, 0x4e},
+ 	},
++	[PD692X0_MSG_GET_POWER_BANK] = {
++		.key = PD692X0_KEY_REQ,
++		.sub = {0x07, 0x0b, 0x57},
++		.data = {   0, 0x4e, 0x4e, 0x4e,
++			 0x4e, 0x4e, 0x4e, 0x4e},
++	},
++	[PD692X0_MSG_SET_POWER_BANK] = {
++		.key = PD692X0_KEY_CMD,
++		.sub = {0x07, 0x0b, 0x57},
++	},
+ };
  
-+	if (tb[ETHTOOL_A_PSE_PRIO]) {
-+		unsigned int prio;
+ static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
+@@ -739,6 +755,29 @@ pd692x0_pi_get_actual_pw(struct pse_controller_dev *pcdev, int id)
+ 	return (buf.data[0] << 4 | buf.data[1]) * 100;
+ }
+ 
++static int
++pd692x0_pi_get_prio(struct pse_controller_dev *pcdev, int id)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
 +
-+		prio = nla_get_u32(tb[ETHTOOL_A_PSE_PRIO]);
-+		ret = pse_ethtool_set_prio(phydev->psec, info->extack, prio);
-+		if (ret)
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		return ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
++	msg.sub[2] = id;
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret < 0)
++		return ret;
++	if (!buf.data[2] || buf.data[2] > pcdev->pis_prio_max + 1)
++		return -ERANGE;
++
++	/* PSE core priority start at 0 */
++	return buf.data[2] - 1;
++}
++
+ static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
+ {
+ 	struct device *dev = &priv->client->dev;
+@@ -766,6 +805,7 @@ static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
+ 
+ struct pd692x0_manager {
+ 	struct device_node *port_node[PD692X0_MAX_MANAGER_PORTS];
++	struct device_node *node;
+ 	int nports;
+ };
+ 
+@@ -857,6 +897,8 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
+ 		if (ret)
+ 			goto out;
+ 
++		of_node_get(node);
++		manager[manager_id].node = node;
+ 		nmanagers++;
+ 	}
+ 
+@@ -869,6 +911,8 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
+ 			of_node_put(manager[i].port_node[j]);
+ 			manager[i].port_node[j] = NULL;
+ 		}
++		of_node_put(manager[i].node);
++		manager[i].node = NULL;
+ 	}
+ 
+ 	of_node_put(node);
+@@ -876,6 +920,130 @@ pd692x0_of_get_managers(struct pd692x0_priv *priv,
+ 	return ret;
+ }
+ 
++static const struct regulator_ops dummy_ops;
++
++static struct regulator_dev *
++pd692x0_register_manager_regulator(struct device *dev, char *reg_name,
++				   struct device_node *node)
++{
++	struct regulator_init_data *rinit_data;
++	struct regulator_config rconfig = {0};
++	struct regulator_desc *rdesc;
++	struct regulator_dev *rdev;
++
++	rinit_data = devm_kzalloc(dev, sizeof(*rinit_data),
++				  GFP_KERNEL);
++	if (!rinit_data)
++		return ERR_PTR(-ENOMEM);
++
++	rdesc = devm_kzalloc(dev, sizeof(*rdesc), GFP_KERNEL);
++	if (!rdesc)
++		return ERR_PTR(-ENOMEM);
++
++	rdesc->name = reg_name;
++	rdesc->type = REGULATOR_VOLTAGE;
++	rdesc->ops = &dummy_ops;
++	rdesc->owner = THIS_MODULE;
++
++	rinit_data->supply_regulator = "vmain";
++
++	rconfig.dev = dev;
++	rconfig.init_data = rinit_data;
++	rconfig.of_node = node;
++
++	rdev = devm_regulator_register(dev, rdesc, &rconfig);
++	if (IS_ERR(rdev)) {
++		dev_err_probe(dev, PTR_ERR(rdev),
++			      "Failed to register regulator\n");
++		return rdev;
++	}
++
++	return rdev;
++}
++
++static int
++pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
++				    const struct pd692x0_manager *manager,
++				    int nmanagers)
++{
++	struct device *dev = &priv->client->dev;
++	size_t reg_name_len;
++	int i;
++
++	/* Each regulator name len is dev name + 12 char +
++	 * int max digit number (10) + 1
++	 */
++	reg_name_len = strlen(dev_name(dev)) + 23;
++
++	for (i = 0; i < nmanagers; i++) {
++		struct regulator_dev *rdev;
++		char *reg_name;
++
++		reg_name = devm_kzalloc(dev, reg_name_len, GFP_KERNEL);
++		if (!reg_name)
++			return -ENOMEM;
++		snprintf(reg_name, 26, "pse-%s-manager%d", dev_name(dev), i);
++		rdev = pd692x0_register_manager_regulator(dev, reg_name,
++							  manager[i].node);
++		if (IS_ERR(rdev))
++			return PTR_ERR(rdev);
++
++		priv->manager_reg[i] = rdev;
++	}
++
++	return 0;
++}
++
++static int
++pd692x0_conf_manager_power_budget(struct pd692x0_priv *priv, int id, int pw)
++{
++	struct pd692x0_msg msg, buf;
++	int ret, pw_mW = pw / 1000;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_POWER_BANK];
++	msg.data[0] = id;
++	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
++	if (ret < 0)
++		return ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_POWER_BANK];
++	msg.data[0] = id;
++	msg.data[1] = pw_mW >> 8;
++	msg.data[2] = pw_mW & 0xff;
++	msg.data[3] = buf.sub[2];
++	msg.data[4] = buf.data[0];
++	msg.data[5] = buf.data[1];
++	msg.data[6] = buf.data[2];
++	msg.data[7] = buf.data[3];
++	return pd692x0_sendrecv_msg(priv, &msg, &buf);
++}
++
++static int
++pd692x0_configure_managers(struct pd692x0_priv *priv, int nmanagers)
++{
++	int i, ret;
++
++	for (i = 0; i < nmanagers; i++) {
++		struct regulator *supply = priv->manager_reg[i]->supply;
++		int pw_budget;
++
++		pw_budget = regulator_get_unclaimed_power_budget(supply);
++		/* Max power budget per manager */
++		if (pw_budget > 6000000)
++			pw_budget = 6000000;
++		ret = regulator_request_power_budget(supply, pw_budget);
++		if (ret < 0)
++			return ret;
++
++		priv->manager_pw_budget[i] = pw_budget;
++		ret = pd692x0_conf_manager_power_budget(priv, i, pw_budget);
++		if (ret < 0)
 +			return ret;
 +	}
 +
- 	if (tb[ETHTOOL_A_C33_PSE_AVAIL_PW_LIMIT]) {
- 		unsigned int pw_limit;
++	return 0;
++}
++
+ static int
+ pd692x0_set_port_matrix(const struct pse_pi_pairset *pairset,
+ 			const struct pd692x0_manager *manager,
+@@ -998,6 +1166,14 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 		return ret;
  
+ 	nmanagers = ret;
++	ret = pd692x0_register_managers_regulator(priv, manager, nmanagers);
++	if (ret)
++		goto out;
++
++	ret = pd692x0_configure_managers(priv, nmanagers);
++	if (ret)
++		goto out;
++
+ 	ret = pd692x0_set_ports_matrix(priv, manager, nmanagers, port_matrix);
+ 	if (ret)
+ 		goto out;
+@@ -1008,8 +1184,14 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 
+ out:
+ 	for (i = 0; i < nmanagers; i++) {
++		struct regulator *supply = priv->manager_reg[i]->supply;
++
++		regulator_free_power_budget(supply,
++					    priv->manager_pw_budget[i]);
++
+ 		for (j = 0; j < manager[i].nports; j++)
+ 			of_node_put(manager[i].port_node[j]);
++		of_node_put(manager[i].node);
+ 	}
+ 	return ret;
+ }
+@@ -1071,6 +1253,25 @@ static int pd692x0_pi_set_pw_limit(struct pse_controller_dev *pcdev,
+ 	return pd692x0_sendrecv_msg(priv, &msg, &buf);
+ }
+ 
++static int pd692x0_pi_set_prio(struct pse_controller_dev *pcdev, int id,
++			       unsigned int prio)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
++
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		return ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
++	msg.sub[2] = id;
++	/* Controller priority from 1 to 3 */
++	msg.data[4] = prio + 1;
++
++	return pd692x0_sendrecv_msg(priv, &msg, &buf);
++}
++
+ static const struct pse_controller_ops pd692x0_ops = {
+ 	.setup_pi_matrix = pd692x0_setup_pi_matrix,
+ 	.pi_get_admin_state = pd692x0_pi_get_admin_state,
+@@ -1084,6 +1285,8 @@ static const struct pse_controller_ops pd692x0_ops = {
+ 	.pi_get_pw_limit = pd692x0_pi_get_pw_limit,
+ 	.pi_set_pw_limit = pd692x0_pi_set_pw_limit,
+ 	.pi_get_pw_limit_ranges = pd692x0_pi_get_pw_limit_ranges,
++	.pi_get_prio = pd692x0_pi_get_prio,
++	.pi_set_prio = pd692x0_pi_set_prio,
+ };
+ 
+ #define PD692X0_FW_LINE_MAX_SZ 0xff
+@@ -1500,6 +1703,8 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 	priv->pcdev.ops = &pd692x0_ops;
+ 	priv->pcdev.dev = dev;
+ 	priv->pcdev.types = ETHTOOL_PSE_C33;
++	priv->pcdev.supp_budget_eval_strategies = PSE_BUDGET_EVAL_STRAT_DYNAMIC;
++	priv->pcdev.pis_prio_max = 2;
+ 	ret = devm_pse_controller_register(dev, &priv->pcdev);
+ 	if (ret)
+ 		return dev_err_probe(dev, ret,
 
 -- 
 2.43.0
