@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-195977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C538AD2F91
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:11:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5BF5AD2F92
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35F5A188ED33
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:11:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 900C63AE62E
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD372280310;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6642280317;
 	Tue, 10 Jun 2025 08:11:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E625A21FF25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0634A22172F
 	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 08:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749543094; cv=none; b=AJOoAmY2PVGCIfEjShCKxVnm1zPZlMFCE/DWzXlmn923tZtUIiqqvun8jByhmLeMGVrdN1oCRaFJ7cWA8RNyu6ziB90M7KkkkZT1rw5t/nBCIhSoCyinvzVotJplO5Rw+liLBS1Fc8DQpOouoqqpOBrJ3VpXkVmwhQh+kaeyo/g=
+	t=1749543094; cv=none; b=K/CRoCuBFVw+06DuOpLyllIvhjtiERtoAnGaKAokIw3l4S4aVphKmx6WtwQNgZFY6uUEfVgECC8BRY/mth6ZPNObJApnxC+r52LB+Ty9TqQhgwu9KImYwiV2TOUzqFUSyd+lmgcWYxGHFrGG4n4dJK4vjQBq96K3QEEHkP18rz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749543094; c=relaxed/simple;
-	bh=hAFywkrXtxpAhlguoSPB5Kr0FN5vqzunIDN9TmRX+w8=;
+	bh=Rfbd2AeOuynZLpm2mqn/rs/wraAqSIYANp04mVqZhw0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P80al0gEi6eKP7kEy5enqXwF+eWTgqJ2O/PB80VnU8icYgiHEMnROSnE+LO5EPaIHdKcuy2xByh/SFmbVmbEW1v2lItxrx9181OXh9587C0jQwxKwzJyCQD2AI5Ak4j/mpc0e7V9eVtIGMuYmjjgjxKolnCWJKaM24kks2FxaPs=
+	 MIME-Version; b=a/3NoRb0lCG9Bn08oczkIfBbailBtHULtlGnh6VtWvTzqszJYgHkp2X7Rrv/RFTNvsfKWLSHgmxqKGeXFa2MFP4qw55zKmrYXwt/1zv+qrbH5WW7Z7AavZrI5q2HwsjvKcPM68BkLN0zcjAsu+3p9tbcrSP1Xv3MfkezQn7huBQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4T-0006BG-Dh; Tue, 10 Jun 2025 10:11:01 +0200
+	id 1uOu4T-0006BH-Dh; Tue, 10 Jun 2025 10:11:01 +0200
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4S-002jx4-0c;
+	id 1uOu4S-002jx5-0k;
 	Tue, 10 Jun 2025 10:11:00 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4S-00G7cj-0O;
+	id 1uOu4S-00G7ct-0S;
 	Tue, 10 Jun 2025 10:11:00 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -57,9 +57,9 @@ Cc: David Jander <david@protonic.nl>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v1 2/3] net: phy: dp83tg720: remove redundant 600ms post-reset delay
-Date: Tue, 10 Jun 2025 10:10:58 +0200
-Message-Id: <20250610081059.3842459-3-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v1 3/3] net: phy: dp83tg720: switch to adaptive polling and remove random delays
+Date: Tue, 10 Jun 2025 10:10:59 +0200
+Message-Id: <20250610081059.3842459-4-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250610081059.3842459-1-o.rempel@pengutronix.de>
 References: <20250610081059.3842459-1-o.rempel@pengutronix.de>
@@ -77,46 +77,174 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: David Jander <david@protonic.nl>
 
-Now that dp83tg720_soft_reset() introduces role-specific delays to avoid
-reset synchronization deadlocks, the fixed 600ms post-reset delay in
-dp83tg720_read_status() is no longer needed.
+Now that the PHY reset logic includes a role-specific asymmetric delay
+to avoid synchronized reset deadlocks, the previously used randomized
+polling intervals are no longer necessary.
 
-The new logic provides both the required MDC timing and link stabilization,
-making the old empirical delay redundant and unnecessarily long.
+This patch removes the get_random_u32_below()-based logic and introduces
+an adaptive polling strategy:
+- Fast polling for a short time after link-down
+- Slow polling if the link remains down
+- Slower polling when the link is up
+
+This balances CPU usage and responsiveness while avoiding reset
+collisions. Additionally, the driver still relies on polling for
+all link state changes, as interrupt support is not implemented,
+and link-up events are not reliably signaled by the PHY.
+
+The polling parameters are now documented in the updated top-of-file
+comment.
 
 Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: David Jander <david@protonic.nl>
 ---
- drivers/net/phy/dp83tg720.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ drivers/net/phy/dp83tg720.c | 94 ++++++++++++++++++++++---------------
+ 1 file changed, 55 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 2c86d05bf857..00963ce0eb10 100644
+index 00963ce0eb10..8c14b5a70cb7 100644
 --- a/drivers/net/phy/dp83tg720.c
 +++ b/drivers/net/phy/dp83tg720.c
-@@ -444,21 +444,11 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 		/* According to the "DP83TC81x, DP83TG72x Software
- 		 * Implementation Guide", the PHY needs to be reset after a
- 		 * link loss or if no link is created after at least 100ms.
--		 *
--		 * Currently we are polling with the PHY_STATE_TIME (1000ms)
--		 * interval, which is still enough for not automotive use cases.
- 		 */
- 		ret = phy_init_hw(phydev);
- 		if (ret)
- 			return ret;
+@@ -46,15 +46,37 @@
+  * The functions that implement this logic are:
+  * - dp83tg720_soft_reset()
+  * - dp83tg720_get_next_update_time()
++ *
++ * 2. Polling-Based Link Detection and IRQ Support
++ * -----------------------------------------------
++ * Due to the PHY-specific limitation described in section 1, link-up events
++ * cannot be reliably detected via interrupts on the DP83TG720. Therefore,
++ * polling is required to detect transitions from link-down to link-up.
++ *
++ * While link-down events *can* be detected via IRQs on this PHY, this driver
++ * currently does **not** implement interrupt support. As a result, all link
++ * state changes must be detected using polling.
++ *
++ * Polling behavior:
++ * - When the link is up: slow polling (e.g. 1s).
++ * - When the link just went down: fast polling for a short time.
++ * - When the link stays down: fallback to slow polling.
++ *
++ * This design balances responsiveness and CPU usage. It sacrifices fast link-up
++ * times in cases where the link is expected to remain down for extended periods,
++ * assuming that such systems do not require immediate reactivity.
+  */
  
--		/* Sleep 600ms for PHY stabilization post-reset.
--		 * Empirically chosen value (not documented).
--		 * Helps reduce reset bounces with link partners having similar
--		 * issues.
+ /*
+  * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
+  *				 is active.
+- * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
+- *				 the link is down.
+- * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
+- *				 the link is down.
++ * DP83TG720S_POLL_NO_LINK     - Polling interval in milliseconds when the
++ *				 link is down.
++ * DP83TG720S_FAST_POLL_DURATION_MS - Timeout in milliseconds for no-link
++ *				 polling after which polling interval is
++ *				 increased.
++ * DP83TG720S_POLL_SLOW	       - Slow polling interval when there is no
++ *				 link for a prolongued period.
+  * DP83TG720S_RESET_DELAY_MS_MASTER - Delay after a reset before attempting
+  *				 to establish a link again for master phy.
+  * DP83TG720S_RESET_DELAY_MS_SLAVE  - Delay after a reset before attempting
+@@ -65,9 +87,10 @@
+  * minimizing the number of reset retries while ensuring reliable link recovery
+  * within a reasonable timeframe.
+  */
+-#define DP83TG720S_POLL_ACTIVE_LINK		1000
+-#define DP83TG720S_POLL_NO_LINK_MIN		100
+-#define DP83TG720S_POLL_NO_LINK_MAX		1000
++#define DP83TG720S_POLL_ACTIVE_LINK		421
++#define DP83TG720S_POLL_NO_LINK			149
++#define DP83TG720S_FAST_POLL_DURATION_MS	6000
++#define DP83TG720S_POLL_SLOW			1117
+ #define DP83TG720S_RESET_DELAY_MS_MASTER	97
+ #define DP83TG720S_RESET_DELAY_MS_SLAVE		149
+ 
+@@ -166,6 +189,7 @@ struct dp83tg720_stats {
+ 
+ struct dp83tg720_priv {
+ 	struct dp83tg720_stats stats;
++	unsigned long last_link_down_jiffies;
+ };
+ 
+ /**
+@@ -569,50 +593,42 @@ static int dp83tg720_probe(struct phy_device *phydev)
+ }
+ 
+ /**
+- * dp83tg720_get_next_update_time - Determine the next update time for PHY
+- *                                  state
++ * dp83tg720_get_next_update_time - Return next polling interval for PHY state
+  * @phydev: Pointer to the phy_device structure
+  *
+- * This function addresses a limitation of the DP83TG720 PHY, which cannot
+- * reliably detect or report a stable link state. To recover from such
+- * scenarios, the PHY must be periodically reset when the link is down. However,
+- * if the link partner also runs Linux with the same driver, synchronized reset
+- * intervals can lead to a deadlock where the link never establishes due to
+- * simultaneous resets on both sides.
+- *
+- * To avoid this, the function implements randomized polling intervals when the
+- * link is down. It ensures that reset intervals are desynchronized by
+- * introducing a random delay between a configured minimum and maximum range.
+- * When the link is up, a fixed polling interval is used to minimize overhead.
+- *
+- * This mechanism guarantees that the link will reestablish within 10 seconds
+- * in the worst-case scenario.
++ * Implements adaptive polling interval logic depending on link state and
++ * downtime duration. See the "2. Polling-Based Link Detection and IRQ Support"
++ * section at the top of this file for details.
+  *
+- * Return: Time (in jiffies) until the next update event for the PHY state
+- * machine.
++ * Return: Time (in jiffies) until the next poll
+  */
+ static unsigned int dp83tg720_get_next_update_time(struct phy_device *phydev)
+ {
++	struct dp83tg720_priv *priv = phydev->priv;
+ 	unsigned int next_time_jiffies;
+ 
+ 	if (phydev->link) {
+-		/* When the link is up, use a fixed 1000ms interval
+-		 * (in jiffies)
 -		 */
--		msleep(600);
++		priv->last_link_down_jiffies = 0;
++
++		/* When the link is up, use a slower interval (in jiffies) */
+ 		next_time_jiffies =
+ 			msecs_to_jiffies(DP83TG720S_POLL_ACTIVE_LINK);
+ 	} else {
+-		unsigned int min_jiffies, max_jiffies, rand_jiffies;
 -
- 		/* After HW reset we need to restore master/slave configuration.
- 		 * genphy_c45_pma_baset1_read_master_slave() call will be done
- 		 * by the dp83tg720_config_aneg() function.
+-		/* When the link is down, randomize interval between min/max
+-		 * (in jiffies)
+-		 */
+-		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
+-		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
+-
+-		rand_jiffies = min_jiffies +
+-			get_random_u32_below(max_jiffies - min_jiffies + 1);
+-		next_time_jiffies = rand_jiffies;
++		unsigned long now = jiffies;
++
++		if (!priv->last_link_down_jiffies)
++			priv->last_link_down_jiffies = now;
++
++		if (time_before(now, priv->last_link_down_jiffies +
++			  msecs_to_jiffies(DP83TG720S_FAST_POLL_DURATION_MS))) {
++			/* Link recently went down: fast polling */
++			next_time_jiffies =
++				msecs_to_jiffies(DP83TG720S_POLL_NO_LINK);
++		} else {
++			/* Link has been down for a while: slow polling */
++			next_time_jiffies =
++				msecs_to_jiffies(DP83TG720S_POLL_SLOW);
++		}
+ 	}
+ 
+ 	/* Ensure the polling time is at least one jiffy */
 -- 
 2.39.5
 
