@@ -1,152 +1,139 @@
-Return-Path: <netdev+bounces-196229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 454F6AD3F04
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B9BAD3F2D
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:39:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 332F8189BA37
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 16:32:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 493A23A7A41
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 16:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C54A24395C;
-	Tue, 10 Jun 2025 16:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36249242900;
+	Tue, 10 Jun 2025 16:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPeglLck"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VZJ55YOb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3570242D6B;
-	Tue, 10 Jun 2025 16:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B6E24167A
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 16:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749573124; cv=none; b=Td8aqR0gRZ0p2kl6Lyu9YGhtlWA9f+OSP2g6FJM0Kh+jxhnCwpdV3f2YbuNls0kiWbKp/tDIlO9dV52u/IhRQKr36gIw7xaG+xJCX224mLsWZhYKdVzgR4f4eQ9u7SV7w87b6mQ3+c0a7zCMbdtusSoyPfWZGuUW5Pk3nacrRAs=
+	t=1749573511; cv=none; b=acymxHj9s/x4Kr+MBkBOy2Ct/SxbCu0AHZ10ywMM578m/sSzcr9ghcpjN6uggAO89FZViePHVTeRU0iHXRVsrQXnp1zkeH4ASW6LmC2IrRkAYUe6o/pif3oL200+UyFG98IK55rW38fHr2s2O3+CeYk5+0do1/JmQ8EzMO1Q628=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749573124; c=relaxed/simple;
-	bh=hNuCDM0jUQWKqc6R9z3C05bZeqq7L3xWaTOLAJKfXZM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qchqiNcQ0w0ZBOWUxmqdl6unvyiBdqEPySJ7lks2bN3wv0Wdt4Z1kr311OBXQlwdkWtCVaUPShPTuzPJnzB2byddnn8FxAzvPhBPJmrPp1RhSpqL68VvFxjo30BGXMJrfXkMkjQSQo/TISgwVC10iurh8zREtp9RmGywEhiluYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPeglLck; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so68549545e9.1;
-        Tue, 10 Jun 2025 09:32:02 -0700 (PDT)
+	s=arc-20240116; t=1749573511; c=relaxed/simple;
+	bh=UTYAbYhoQ5I8eQ3oIsCWd15WzpkQDH0pbsPDuJMUmJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CZQ4MzY7PPiUmVgv8NQrG4ew+ODIKRs4tZfdasGH+weWCHbMyrnAOjHjfcpsy6aDo4Zd9TrE8/MQm13B+ib7WX43AOZj+JD3wqLrT1BcusDtyhSPE7pCWb/Ow0OtY1U3V3eOFEePiz4MWI8x+/TCFNbUoki0iVxgst9YYJvUkcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VZJ55YOb; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23636167afeso13059125ad.3
+        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 09:38:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749573121; x=1750177921; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ZI48i2uXHjCqf8G8iB6bi5iAlWdT2du2T86rodgrys=;
-        b=DPeglLckwP1XLfp28/u0TKqOFl6d1YIwjc2ujup3MyhqoiuhBibTZn0DePpNI/RIOo
-         ESEJ/UkSzSW/C+gsi5i8bC0NiVO7FaOzlsUSf7aN+k+T7S6aJRELhDkhAQY7ID2Ohp4Q
-         uEVR7moEaU9++QasUPwrO0YUHdhkuXqZHNhBxYyIYFbbmJ6717/svEzcaXvL8NM48dWV
-         71oVKyFi/n0zg1iPV1Coyvjc/wasbdo6nnUcnpJml2HOeZ08U7PC1TUwZAUx1hZGCrVw
-         C6FW3E1OydX73Eao54nXnJR6AERfEHqePFKDrVM3/xLnAlbb2+Z/Jac359aZL1MvCshM
-         rkkw==
+        d=broadcom.com; s=google; t=1749573509; x=1750178309; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZmHDFRJgjoALTI9+QQgJgvyBqToRl7O295DxD9va/Q=;
+        b=VZJ55YObFZDi5Ic1A5mvCUd+pOKXP6FYXt9pzSZnh4pF7Aly8W4D4sMbcR11mXMjLB
+         V52ibnLqBk0SGaQNmFK98UkgG6rRkoGX/vRnpofesYFULdJrUjOUIdpYD3o4dYBT5I3A
+         gIQbk/YMPTxoH5dFghddzXRB72tv+Q1DP7I+k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749573121; x=1750177921;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4ZI48i2uXHjCqf8G8iB6bi5iAlWdT2du2T86rodgrys=;
-        b=sxh48ba7WOM1Kwp/5zQ0ByOQ8scO0lxhBz1YgO1akTPPcWkhzvigrUkGUUp+5JfE2p
-         iXk3nOLqESYdtyCqJPVwBdIaWRG94fiEpKj1Omkz8b77SFsLel3fZq9WryUKnKWktTph
-         mc1Sl/lHzaulsCk5ywSbaod92WETCQg6cC4aLLe30FpxYRA9g0GVCR4ul6BVaWf3Grxr
-         sojTG9RGAMC8/39w0c0lluCeg2ZgfSoKsiSPYuQj2HLBT3VgIhFTXb9kmg/sAsCiscWb
-         h881GGKPjOFt/0Mx9UcFohaXKPooK/lHb7f9ifVJwIQttpd+7gYqrMbAvV5YLw+MMUnf
-         +4cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhAnFA0qGkzt424VEJHtCXyNIZI3yaEfHJ0+0/SXwA/Pl5qHgOZL2sCR9orZeH0X0dHi8/73IT@vger.kernel.org, AJvYcCX1l9HNa448BCi0pqhGEZVulPuL6cwtcs/kGX/0AENEuqlF1kWerHge6Vq2MAEttnUUSA2tvpCOM8wc6J4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWBOeX89dS9JL+HObHA3lHl4HRWKd+cKZr1I4ZAmLCnLTyJyG6
-	7EDWVk6LBdGH9dI577G2ZZ4YcPZXhQSCniFns5JvpBpFnfBbM2fmNPpc
-X-Gm-Gg: ASbGncu7Y1hCOdWxfe2HNGxweve1XBYEM5yNY636sbtkscij5MWRmZh0eEVcdDlDee7
-	HUUfbIGw2nNTRl1eKahcL1J4KptJXma74iX2QQoSkAbg9mJ4fOiwmkmagt+YtI74focCqyAyfGB
-	C5m4fdovsNXfInbkXrzi/EAiMkyXM5EDsSirBonF3Vnja6AMjPdzxAm2dfgPbI96a7AHg6TXYXw
-	v7nk9CVNeSP92wWWUNgosQ15mKWvK3Ec5E4CQRvuTAB5L8uch7M+ecwr0WV/8XLqI1B5RtdP8ku
-	1ZnLewij8k9G8YOQZNl7RH+p0Yfg0V8AVUoiPct2BSfrsSjpJUVVUXsRoCwpmk3lJ/O3e+vKKo6
-	K7LJqIIBaNVVSyI21vG4ERB+doEKdlYmOa/2bEAKfVyk9P3S+EQifN2Wew8iq+oI=
-X-Google-Smtp-Source: AGHT+IFvZxxK+tyRgFocFz3UtSFmfIb+tEX2An49P06Lo+Ypw8FLZLGdUNwpZKVta0rbMtZE8oRa2Q==
-X-Received: by 2002:a05:600c:a00e:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-452013d7e0emr162270725e9.21.1749573120948;
-        Tue, 10 Jun 2025 09:32:00 -0700 (PDT)
-Received: from skynet.lan (2a02-9142-4580-1900-0000-0000-0000-0008.red-2a02-914.customerbaf.ipv6.rima-tde.net. [2a02:9142:4580:1900::8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a532435fa6sm12494857f8f.48.2025.06.10.09.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 09:32:00 -0700 (PDT)
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-To: jonas.gorski@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dgcbueu@gmail.com
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Subject: [PATCH net-next v2 3/3] net: dsa: b53: support legacy FCS tags
-Date: Tue, 10 Jun 2025 18:31:54 +0200
-Message-Id: <20250610163154.281454-4-noltari@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250610163154.281454-1-noltari@gmail.com>
-References: <20250610163154.281454-1-noltari@gmail.com>
+        d=1e100.net; s=20230601; t=1749573509; x=1750178309;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IZmHDFRJgjoALTI9+QQgJgvyBqToRl7O295DxD9va/Q=;
+        b=O+6ulaemvaIo9dpvXwQbcz8d+1bgNdp7gmEMrVdZ/N/Q4NM/TW4PvxpCqx1nSF2nM2
+         6Z43OPRMD47hFr0CfUxosW3+2XlYn3qixhu/pEbIwTi+0lBoGvPb1dTrU2GH2ufB5R3b
+         Ea4jMozSNoiIaZqa0UsHEzx7AQ2cFmFMUT1/G/QQi+73h4YkyjsrOpO1sBolufd2QEde
+         ozWcBFsqKKgWeNTR4asK38CFsKwhQ6iKfDMsdXCKnm8l6cI3ZrRdp4lDhxDM7KgLEhiD
+         prmtJm8rxQMn+dZPBGThNk8HQ9h+u5lHNnT7L7n2/FrBqn9i0VcOxgLcroDxcx1tovYr
+         2GZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdvVYnY8EwsPeqazIAd3offgRb/97bOfRVUuKY5xHs6ogEKsPnS4SCv1Leh5gvXlzeNjUDMZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK1zMQWbo887hRoYgLtbFV+WvcC73YNX5ZD8Nvue3H9jqb/stK
+	rG++IQi/HEv8FuNBWLMgMJMpNUIJEDnNLVtyl81XZv5C5cTbNuqOX1n/tXHnHsfdag==
+X-Gm-Gg: ASbGncv/pKXpLMzJPcRJFuFDZ6d/MNiXRwcmzUUJd2BXCkSq7sZuf2L9sN7vJSY3u2s
+	ByuDg2WNOcu1QP+1HfsJ0qO42YMpZpBT6TMW2XK8JTSD0D043yLKYfFKBWnGzeDoq2TL9UzkFcm
+	2o/1r+L1ZMSQqnSLWw9ZiFIyUg7x7BnO4nTYZiwc0AtWykGlgTQzrdPDpVM7XDWMeGHUqV9nkDN
+	r+WjoS7d/xuY/1hkblREgHuMTRxQdUlNjrhW1AThSX3hKRpVYiC14/mbEGQxJh+gYFhBhkeWOVm
+	VIO+DNN/Omc1BleNyJ8+YJmBKjfvyC9RU8Odode7Dg3z1Tj4Iix6UblXv6UnQju79Ns/LjRYRhs
+	KOvZDROhaLoaZnLyv/MsZv2UWbA==
+X-Google-Smtp-Source: AGHT+IHUiRuGFGaYxyo/VmQe0/2GkK7iuLM/Rm7nqPetAGEmPYgHj3X+OaCUL4CWfrD7Ala5dBOpaw==
+X-Received: by 2002:a17:902:e74e:b0:235:60e:3704 with SMTP id d9443c01a7336-23601cfd8aamr248720685ad.12.1749573509048;
+        Tue, 10 Jun 2025 09:38:29 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2f5ee6f1ebsm5975984a12.20.2025.06.10.09.38.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jun 2025 09:38:28 -0700 (PDT)
+Message-ID: <48e3e2c9-3cb0-4097-af7e-98f67e7ac5ad@broadcom.com>
+Date: Tue, 10 Jun 2025 09:38:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] net: dsa: tag_brcm: legacy: reorganize
+ functions
+To: =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>,
+ jonas.gorski@gmail.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+References: <20250610163154.281454-1-noltari@gmail.com>
+ <20250610163154.281454-2-noltari@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250610163154.281454-2-noltari@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Commit 46c5176c586c ("net: dsa: b53: support legacy tags") introduced
-support for legacy tags, but it turns out that BCM5325 and BCM5365
-switches require the original FCS value and length, so they have to be
-treated differently.
+On 6/10/25 09:31, Álvaro Fernández Rojas wrote:
+> Move brcm_leg_tag_rcv() definition to top.
+> This function is going to be shared between two different tags.
+> 
+> Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
 
-Fixes: 46c5176c586c ("net: dsa: b53: support legacy tags")
-Signed-off-by: Álvaro Fernández Rojas <noltari@gmail.com>
----
- drivers/net/dsa/b53/Kconfig      | 1 +
- drivers/net/dsa/b53/b53_common.c | 7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
-
- v2: no changes
-
-diff --git a/drivers/net/dsa/b53/Kconfig b/drivers/net/dsa/b53/Kconfig
-index ebaa4a80d5444..915008e8eff53 100644
---- a/drivers/net/dsa/b53/Kconfig
-+++ b/drivers/net/dsa/b53/Kconfig
-@@ -5,6 +5,7 @@ menuconfig B53
- 	select NET_DSA_TAG_NONE
- 	select NET_DSA_TAG_BRCM
- 	select NET_DSA_TAG_BRCM_LEGACY
-+	select NET_DSA_TAG_BRCM_LEGACY_FCS
- 	select NET_DSA_TAG_BRCM_PREPEND
- 	help
- 	  This driver adds support for Broadcom managed switch chips. It supports
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 862bdccb74397..222107223d109 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -2245,8 +2245,11 @@ enum dsa_tag_protocol b53_get_tag_protocol(struct dsa_switch *ds, int port,
- 		goto out;
- 	}
- 
--	/* Older models require a different 6 byte tag */
--	if (is5325(dev) || is5365(dev) || is63xx(dev)) {
-+	/* Older models require different 6 byte tags */
-+	if (is5325(dev) || is5365(dev)) {
-+		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY_FCS;
-+		goto out;
-+	} else if (is63xx(dev)) {
- 		dev->tag_protocol = DSA_TAG_PROTO_BRCM_LEGACY;
- 		goto out;
- 	}
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.39.5
-
+Florian
 
