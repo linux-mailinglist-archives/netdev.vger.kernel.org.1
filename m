@@ -1,120 +1,109 @@
-Return-Path: <netdev+bounces-196080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7A2AD3773
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:55:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23670AD375E
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96ADE188F246
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:53:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 222EB17B702
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AECC2C0313;
-	Tue, 10 Jun 2025 12:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hZoQ3j3I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0385F2BEC5E;
+	Tue, 10 Jun 2025 12:46:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EFF2AF1E;
-	Tue, 10 Jun 2025 12:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46990299A88
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 12:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749559588; cv=none; b=MGQ677CVh193UYci+sAXbQEuLIyB9F3zVkO1hemplgIiDAbIHo8mU5szHoDjofngSgdplR7vAizWkzqOe2FTKfucApe5OEWVgnmyESPD1B4DArcNDAdVt1UX5qdbmpDt07F88t4crfeNXqU3jgxSi4um8eO8NHbXIibDY9INEgg=
+	t=1749559580; cv=none; b=hgM6uhWiCpn3lnVA+KjN9f3jTlFJJCWfoouTcQd5DW2vZB1j8+VLxcExE8z3qO3Rgbe8yuR00xhl0YMYKZWvDlEcYzoQEZXF+SeAbYniZy/VipwIyZiFCdUOquVlxCwYXSjmlPN0NcFVGH8+OWPBjsydKcLsmmspc4GdJnOxu8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749559588; c=relaxed/simple;
-	bh=mSF2gA5Qb1wekKI7B0KlNmhWLve3DeW+P+aVaydV8OI=;
+	s=arc-20240116; t=1749559580; c=relaxed/simple;
+	bh=unA5W+ItyflOyuJHHOVR/vJuGZskAiqVajFb4X+nV24=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDG8xMUzv9NRdY4XlWSv0IwB5J7nFcOzF9MAgRwtEZJzdBb7gDbTiK/g+CU5K3SRqmYiaGuzKwP2iYkOlqrswD1AmpqLosfkURrvpHuS0cQbscFwmevbnfatASowfe0UIPmDT83sIRFaYqaXKwQ3GIhbD3DbdVMyll1g5ma2D48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hZoQ3j3I; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IxovBajuiG9VZJ3XmWy0NzjagqDViV1ywWm/ai8Bd1M=; b=hZoQ3j3IzpoxwljSwnB8bccPSM
-	XRrBw7WFNZ8PxtzbiIXdJUnm/tkBx5fm8LE2KeugPzbPkZOxOSYZeqWHG27E/pZqa2VZB9z9EYDNc
-	cwy1nsznvNnVMKnbEY13v7IRURpmJET03jHqxGcIuSW+kSzh3eWH+oyjvx03UBx9A2i8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uOyMc-00FGUL-0t; Tue, 10 Jun 2025 14:46:02 +0200
-Date: Tue, 10 Jun 2025 14:46:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=hU5GJ3JybRFTeOrn2QWNSht53fzEZlaceTm+IVqatE/N1duPiK8SB4xEjj7z+6XXQLJS6M2P6UaJ0ElzCZmyxu9XYRcMQh13IsCQWm7jPQegRDgOmLtq0wgxoNfg1f/QtKwijEmZ848Ci1B8lt6gYz55KrqOJiAMi7d/mfbPjIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyMl-0001ub-Gg; Tue, 10 Jun 2025 14:46:11 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyMl-002mGS-0U;
+	Tue, 10 Jun 2025 14:46:11 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyMl-004pya-06;
+	Tue, 10 Jun 2025 14:46:11 +0200
+Date: Tue, 10 Jun 2025 14:46:11 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH 4/4] net: phy: qca807x: use new GPIO line value setter
- callbacks
-Message-ID: <5c9a127b-8538-4856-bdb3-cbee87993428@lunn.ch>
-References: <20250610-gpiochip-set-rv-net-v1-0-35668dd1c76f@linaro.org>
- <20250610-gpiochip-set-rv-net-v1-4-35668dd1c76f@linaro.org>
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/3] net: phy: micrel: add MDI/MDI-X control
+ support for KSZ9477 switch-integrated PHYs
+Message-ID: <aEgpE7dZNT_GqhSV@pengutronix.de>
+References: <20250610091354.4060454-1-o.rempel@pengutronix.de>
+ <20250610091354.4060454-2-o.rempel@pengutronix.de>
+ <6597c2fd-077a-4eac-945f-97b43c130418@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250610-gpiochip-set-rv-net-v1-4-35668dd1c76f@linaro.org>
+In-Reply-To: <6597c2fd-077a-4eac-945f-97b43c130418@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> -static void qca807x_gpio_set(struct gpio_chip *gc, unsigned int offset, int value)
-> +static int qca807x_gpio_set(struct gpio_chip *gc, unsigned int offset, int value)
->  {
->  	struct qca807x_gpio_priv *priv = gpiochip_get_data(gc);
->  	u16 reg;
-> @@ -390,14 +390,12 @@ static void qca807x_gpio_set(struct gpio_chip *gc, unsigned int offset, int valu
->  	val |= QCA807X_GPIO_FORCE_EN;
->  	val |= FIELD_PREP(QCA807X_GPIO_FORCE_MODE_MASK, value);
->  
-> -	phy_write_mmd(priv->phy, MDIO_MMD_AN, reg, val);
-> +	return phy_write_mmd(priv->phy, MDIO_MMD_AN, reg, val);
->  }
+On Tue, Jun 10, 2025 at 02:31:45PM +0200, Andrew Lunn wrote:
+> On Tue, Jun 10, 2025 at 11:13:52AM +0200, Oleksij Rempel wrote:
+> > Add MDI/MDI-X configuration support for PHYs integrated in the KSZ9477
+> > family of Ethernet switches.
+> > 
+> > All MDI/MDI-X configuration modes are supported:
+> >   - Automatic MDI/MDI-X (ETH_TP_MDI_AUTO)
+> >   - Forced MDI (ETH_TP_MDI)
+> >   - Forced MDI-X (ETH_TP_MDI_X)
+> > 
+> > However, when operating in automatic mode, the PHY does not expose the
+> > resolved crossover status (i.e., whether MDI or MDI-X is active).
+> > Therefore, in auto mode, the driver reports ETH_TP_MDI_INVALID as
+> > the current status.
+> 
+> I assume you also considered returning ETH_TP_MDI_AUTO? What makes
+> INVALID better than AUTO?
 
-The full function is:
+The phydev->mdix_ctrl returns configuration state, which cant be set to
+ETH_TP_MDI_AUTO.
+The phydev->mdix should return actual crossover state, which is
+ETH_TP_MDI or ETH_TP_MDI_X. Setting it to ETH_TP_MDI_AUTO, would not
+provide any usable information.
 
-static void qca807x_gpio_set(struct gpio_chip *gc, unsigned int offset, int value)
-{
-	struct qca807x_gpio_priv *priv = gpiochip_get_data(gc);
-	u16 reg;
-	int val;
-
-	reg = QCA807X_MMD7_LED_FORCE_CTRL(offset);
-
-	val = phy_read_mmd(priv->phy, MDIO_MMD_AN, reg);
-	val &= ~QCA807X_GPIO_FORCE_MODE_MASK;
-	val |= QCA807X_GPIO_FORCE_EN;
-	val |= FIELD_PREP(QCA807X_GPIO_FORCE_MODE_MASK, value);
-
-	phy_write_mmd(priv->phy, MDIO_MMD_AN, reg, val);
-}
-
-The phy_read_mmd() could also fail and return an error code.
-
-    Andrew
-
----
-pw-bot: cr
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
