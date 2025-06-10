@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-196063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BDCEAD3601
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:22:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC91AD3600
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C409A3B75B2
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:21:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CFF91605A3
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE86D290BCB;
-	Tue, 10 Jun 2025 12:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85621290BAD;
+	Tue, 10 Jun 2025 12:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Hl+c7KWr"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="IDYcT1dy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480F1290BBA
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 12:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366E3222598
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 12:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749558093; cv=none; b=JVKBLCgxJTVhAgHo8gtrf5Eq2xKQJCilCkbTMk1Zx/JfbnsAm9cyPtM6Q4vw2EfGWIprkpeNPzm0Nf9BimDCDgWVTLKJLBS4o9H0UnSOeMxvYXuOy96tYOkzw3Bgvt817eYW1W994T0IusN1kQON567MVWVl8VjqGatW2qK13SA=
+	t=1749558117; cv=none; b=Bc/TnlJAmKEMWF7hpDFmQNefAcQiKsdV2ThxyJdrWU3490V8cKYWwqidJn2kvHMQ6wxOXZMiXK8pMJM8/OL3ogGKx1N7SBsCJeNd//SR9XXpZzFvTTx0/FSOH6w8tlrYQbT/2oYeBDxzTggMVlAe/TnffiNPMcrHv73llQSTBYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749558093; c=relaxed/simple;
-	bh=j+kjI1Cr46kXYcnCOLIGfPEopv/e5BdzQZE6/Lie3LU=;
+	s=arc-20240116; t=1749558117; c=relaxed/simple;
+	bh=pGkjcw6YDzKi2PtQFF1DybqZsg9nWYh5T4MBtqVpx5U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oTIVSCvYZHrQnG1KgtIN/Ysy9MUCRqumT0IM6JJPdzMncyhdUZsyDY+Cn9XbHl9+61tkZR+RD0fissh2Gl6SOIWh/aONk7KlnZt5exY2rS9KMrCnyLnlV+5hwjqhr4JQQFIRX7uM3jz+2vTd0V5oBBw7MWAPu7TSXz+D4DGzLik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Hl+c7KWr; arc=none smtp.client-ip=209.85.167.45
+	 In-Reply-To:Content-Type; b=o5nInGCG8uRK7XCuWLIwcstibascAID8lyY8ZCqVYLgGKTpnv3DwLUXvSRHP53Wlr2GgcUMF20uC4LVG/hXAck15f37hEwz8Zd/c1V5pfPi7IMDUwruLLBxhJifjIqfhK1iHx7AJhGmLUaykHCh03vGVLN6mBeo5G+IXsosxHQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=IDYcT1dy; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54b10594812so5934101e87.1
-        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 05:21:32 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32b019bdeaaso17219741fa.0
+        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 05:21:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749558090; x=1750162890; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749558113; x=1750162913; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=90hBZk4CDyR14IAw9VNCcUh9JhW2CycBOFXCvhBzbfs=;
-        b=Hl+c7KWrfPzjuh1M88aZXNzqkFNEe+SSIJAcwQ8i4J9NdpYV7JzOfswVMhc1VoTJRe
-         BW34LLttfiVP/q8wJcKxsnlGQRWXvsNrrtfig1kJd/zDG1mXMXuUlPaldZha/SI/KbAC
-         Nb+A92HFAHlERbRNWd/7Hf8buwmsNoaXzhQmCE2kX56xZlC/cCtmCpue2mXJUXPKVFJX
-         dYlaUe3nQbAz0YjVCC0VoHGZeMgy4t+cTVLH5N9XMd/ImZF/nmEVR7b5gy1mB1ztD8RT
-         aan+ZRP2WDgWJCL0halbCVyaHFoA9sIxMJU4CvQHiBPvmHjExvYrzYZD24z8x35gtVgt
-         +5kA==
+        bh=Wkr8NlzrT7q+6KLISKYLjBRPxrJzkpjNvX6605AbOkg=;
+        b=IDYcT1dyDQvUGDQsVP/HXo9/6L7LQ00QEH95reH8MAbwWIqH8JBVXaRQrQ8il4ElY5
+         yxgmQbwUfQvyCeTUIl1uTCkiDGsvLNq71Y5fv22hVxOXCC9Im8ZNHtLQLQP0dHhw3Msc
+         yJKy5yC+R3jPBXKZ89FjEMle0OGOwOfzTK6KLiNRBCMCcedNnAzphzKygj+21M8FTgkY
+         M+nn7uJTUpKR/75/jbJtVTbyf3OaaUBA0EXRzs3WG347Agt6R7U7qW87wZOLYOZieqYm
+         TXTR1zpElQRsvE0yklzcmQFKK0UW5FCYINeoG1dcXx5H9bxMel1UmWGtYhxo2mpJ8ZUz
+         VJhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749558090; x=1750162890;
+        d=1e100.net; s=20230601; t=1749558113; x=1750162913;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=90hBZk4CDyR14IAw9VNCcUh9JhW2CycBOFXCvhBzbfs=;
-        b=n8T9hGdgasWzKxTIhkwnqmhEI1CQfYo47gb8iy0kQnCICNNP+leEsJEe8nsxGcGVvk
-         NqpNBTDgBuCI9LreeERUa39VErK7aTBkCY0lXxogbqtpz4Wj/zj/MyEKhogWvaR7Z9ig
-         qdvYuPvX+Xcozd3PTKo5uVezGpJmSZ8CAMohykG/25fG3zrXryHqNOu5gf1AidyzDLTO
-         n0CpllEhYqRgTND/OlFFvmggbKQnpp+X8RVEAzQ5fLMTpmXwoISuSHlhCmal1Ew+DffO
-         369YRs1NjeVD9CCUnB0B66pADtwpn0iRVpn7F6HIQfOrhM6KZP/E+t9smC0c6JB7ziji
-         A71g==
-X-Forwarded-Encrypted: i=1; AJvYcCUMAN5gOd3k5VTo+M9UPI0VW7sPlyBgPIHOyl9RqOhS71h+l2pvWE9Gbx5MV9xAENYi8kYk7r8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8yFlGJ0Qn3RozvAOeaMJWsonVlrJPADmyH5OEHkl6Um0tWOW/
-	Qc0xKqsCsioh1WWWVK5UdXAcVg7nNa7Xp1IzICtqhy2GTJ7+yFP6oQOLEF+QZP2sldw=
-X-Gm-Gg: ASbGncv0lubHys0rxS7vkPZwEQIL4Liv3ttKitRzY/vGXCMJcgP3f0QdEFqwV/RzMEE
-	AJDtGXxAcjgNqZ9jjs/AFF+v4IQiVkPupnacYOmZC+wjx+DX+RSTREioavi1kspTYDCXF6+SlEY
-	xlMJ2Slw48toap2hYqqXdku1I68uvjkfaVvJPfFi/sNnUQHdI+LtXULiLua3OfdAFKdYiYFEEQ3
-	DkpaLXdxA2aZEaiiq5Qj/v7xcBTwHasXGE8bisDFKUNLUrBKxsL5b5xpjw9+Asc6InuRo6cRt4I
-	aQEOXsx/iwXbfenTnmS7X3fk1lHOnht5eTA4aBr0BXxKxGK+pqReG2FRZF+RytfR4O923wfmYWL
-	lfc/BP/nBlD3d72GAlvC8FIrbNhpvF9c=
-X-Google-Smtp-Source: AGHT+IHmGTena6fqAcYhevTo/MniFuCsCwAJhSNtQSdZdrt8rUXODpILzrQfAf1qsCiMYoGHYp/zgQ==
-X-Received: by 2002:a05:6512:e88:b0:553:2f78:d7f4 with SMTP id 2adb3069b0e04-55366bd23a5mr4565732e87.7.1749558090387;
-        Tue, 10 Jun 2025 05:21:30 -0700 (PDT)
+        bh=Wkr8NlzrT7q+6KLISKYLjBRPxrJzkpjNvX6605AbOkg=;
+        b=juq0Yogd+L+y023TcyBO7XuAZe3ZQzUS9Mq3DN8l/2MaoeKH3iF7jAdBXgvqgxPODY
+         0UcwCjFfm+rhboY5yOH1Cmbl2Ox4M+vdmK9Z4woOvVSdSYViI/0b1gyil5rvq0lcoCBw
+         WEFN2wEz3/2zjU3TP1T2ZWtJ1Ar3jPfv08rRvmWh1gtse6WOyjzxVjnlRDjVV7ebKHJ8
+         Onj7FeO+jjXE7l1fr6fJowpCHBbyrKR7sQBONbKtWLVgxg8eScZuveOmGYyrs9egtlLP
+         +VQjcUQBX2zjpVCJvIktCWEOWiYD/1Yo2fko9yfw1Tl+w8dc4+2FyIedyKZcdDGv15PK
+         nBzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRAMsGG3vX9M78/4FUAqiCLNE/AUdsVH0KkXcvKkRz+m0EGldm2cNlR9U79NFUfFz3v0F5GPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLRwlS5V9312F74a5hVv+STr6ExjK7tqFOJ2P3EGnO2qoYh0x8
+	EidaQdwcrJO+0mqCrMqJ7PfLVfRTFzGbQAZY+jSzB6xZ5qiQjD8DZhMu/8lfYpUgaHo=
+X-Gm-Gg: ASbGnctZ/RSGDHBS+Yl6FmO2MOXf8lUtcheljFZAq8fYIdFO5YxCJGrIP22aDGA+u3H
+	U9fQg6+Hd5tzlMMqYIaPEHEuGGsf+ACxsLhYAZpWI80kf49aPeOxbF1i4fJVn6ixjO9ydgTRqFO
+	VFVUXquW66saPnWDBb/KFJq7LRZDcZkQusOPhjBd6O4eVr0aym8xUIYLZlWGGVe46+pCYeMdub/
+	DZMkHFxbcbAe1vqNR3l5pb+wZc57furAKXu+pVZ+MBv9qcCWv7qSxY6YQiFY60fVmavo5PktK0V
+	xO4UDUXWNAGJFMtaps3hAsmPyAZuPFjbk0+3M5qG/CAU2Hjpf/RNo+WRecW7e5QW4Cl7iw2Y5i/
+	Hvfjo/eG64YRNZbbkB+1MY/U0Q1f5M+8=
+X-Google-Smtp-Source: AGHT+IEgwRAVIyE6nLzZ0225oh2wo8Bpgx3Maq6YW9HopN0ZkGH0l2d9dudPlx3GX8xSOSGIfI4g+g==
+X-Received: by 2002:a2e:be9c:0:b0:32a:6502:df45 with SMTP id 38308e7fff4ca-32adfe900c4mr41634491fa.40.1749558113312;
+        Tue, 10 Jun 2025 05:21:53 -0700 (PDT)
 Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-55367722181sm1557175e87.132.2025.06.10.05.21.29
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32ae1ccfc48sm14389601fa.95.2025.06.10.05.21.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jun 2025 05:21:29 -0700 (PDT)
-Message-ID: <552e0ea4-f8b0-431a-9382-95adad7f2b9f@blackwall.org>
-Date: Tue, 10 Jun 2025 15:21:28 +0300
+        Tue, 10 Jun 2025 05:21:52 -0700 (PDT)
+Message-ID: <23d87175-9212-49f6-b4fd-2d5ba251c085@blackwall.org>
+Date: Tue, 10 Jun 2025 15:21:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,43 +82,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2 3/4] lib: bridge: Add a module for
- bridge-related helpers
+Subject: Re: [PATCH iproute2-next v2 4/4] ip: iplink_bridge: Support bridge
+ VLAN stats in `ip stats'
 To: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@gmail.com>,
  netdev@vger.kernel.org
 Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux-foundation.org
 References: <cover.1749484902.git.petrm@nvidia.com>
- <b50c8fdb2fed1c8d47f06ee139f26fcb263472bb.1749484902.git.petrm@nvidia.com>
+ <c0d97a28464afeb3c123f73b656e5e5532893726.1749484902.git.petrm@nvidia.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <b50c8fdb2fed1c8d47f06ee139f26fcb263472bb.1749484902.git.petrm@nvidia.com>
+In-Reply-To: <c0d97a28464afeb3c123f73b656e5e5532893726.1749484902.git.petrm@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 6/9/25 19:05, Petr Machata wrote:
-> `ip stats' displays a range of bridge_slave-related statistics, but not
-> the VLAN stats. `bridge vlan' actually has code to show these. Extract the
-> code to libutil so that it can be reused between the bridge and ip stats
-> tools.
+> Add support for displaying bridge VLAN statistics in `ip stats'.
+> Reuse the existing `bridge vlan' display and JSON format:
 > 
-> Rename them reasonably so as not to litter the global namespace.
+>   # ip stats show dev v2 group xstats_slave subgroup bridge suite vlan
+>   2: v2: group xstats_slave subgroup bridge suite vlan
+>                     10
+>                       RX: 3376 bytes 50 packets
+>                       TX: 2824 bytes 44 packets
+> 
+>                     20
+>                       RX: 684 bytes 7 packets
+>                       TX: 0 bytes 0 packets
+> 
+>   # ip -j -p stats show dev v2 group xstats_slave subgroup bridge suite vlan
+>   [ {
+>           "ifindex": 2,
+>           "ifname": "v2",
+>           "group": "xstats_slave",
+>           "subgroup": "bridge",
+>           "suite": "vlan",
+>           "vlans": [ {
+>                   "vid": 10,
+>                   "rx_bytes": 3376,
+>                   "rx_packets": 50,
+>                   "tx_bytes": 2824,
+>                   "tx_packets": 44
+>               },{
+>                   "vid": 20,
+>                   "rx_bytes": 684,
+>                   "rx_packets": 7,
+>                   "tx_bytes": 0,
+>                   "tx_packets": 0
+>               } ]
+>       } ]
+> 
+> Similarly for the master stats:
+> 
+>   # ip stats show dev br1 group xstats subgroup bridge suite vlan
+>   211: br1: group xstats subgroup bridge suite vlan
+>                     10
+>                       RX: 3376 bytes 50 packets
+>                       TX: 2824 bytes 44 packets
+> 
+>                     20
+>                       RX: 684 bytes 7 packets
+>                       TX: 0 bytes 0 packets
+> 
+>   # ip -j -p stats show dev br1 group xstats subgroup bridge suite vlan
+>   [ {
+>           "ifindex": 211,
+>           "ifname": "br1",
+>           "group": "xstats",
+>           "subgroup": "bridge",
+>           "suite": "vlan",
+>           "vlans": [ {
+>                   "vid": 10,
+>                   "flags": [ ],
+>                   "rx_bytes": 3376,
+>                   "rx_packets": 50,
+>                   "tx_bytes": 2824,
+>                   "tx_packets": 44
+>               },{
+>                   "vid": 20,
+>                   "flags": [ ],
+>                   "rx_bytes": 684,
+>                   "rx_packets": 7,
+>                   "tx_bytes": 0,
+>                   "tx_packets": 0
+>               } ]
+>       } ]
 > 
 > Signed-off-by: Petr Machata <petrm@nvidia.com>
 > ---
 > 
 > Notes:
 >      v2:
->      - Add MAINTAINERS entry for the module
+>      - Add the master stats as well.
 > 
->   MAINTAINERS      |  2 ++
->   bridge/vlan.c    | 50 +++++-------------------------------------------
->   include/bridge.h | 11 +++++++++++
->   lib/Makefile     |  3 ++-
->   lib/bridge.c     | 47 +++++++++++++++++++++++++++++++++++++++++++++
->   5 files changed, 67 insertions(+), 46 deletions(-)
->   create mode 100644 include/bridge.h
->   create mode 100644 lib/bridge.c
+>   ip/iplink_bridge.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 48 insertions(+)
 > 
 
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
