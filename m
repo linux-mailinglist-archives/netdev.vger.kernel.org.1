@@ -1,101 +1,100 @@
-Return-Path: <netdev+bounces-196052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80BD9AD34F1
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:30:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27F00AD3544
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5268E3A5D10
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5CCA175733
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B7A27FD67;
-	Tue, 10 Jun 2025 11:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuvPwHe1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429A828D856;
+	Tue, 10 Jun 2025 11:43:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC6F227EA3;
-	Tue, 10 Jun 2025 11:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749555000; cv=none; b=EVA7ugL9x+8cyLgjlnDoc+H6PckHwXiVQ20XF2RRkYHjO7MSdV+URhcqPM6xl8f4pirs1C3YMN7khTZSlzcLJtGsyKbuv7MjRVUYVeap+D3BpgY2h54c5VWN3JukCiS1JMQ+hQ7DMiJzd9a5tFYQidynleaeoh6/dQlByCrslTc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749555000; c=relaxed/simple;
-	bh=b5nUIzqm3EUmBKYjt0opVpGPnsw1G6P3eA2WugutoP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KpXC7G7F0LdRn8JtpEmBRrTQh7vHLFh67NVS8PI9ywWt73RJ0xYBt43QjHrb0WjhKzl1TtVInrG2JdrE3m3HSpa1xqKN9X5cDcr20HL6WmRwmrnrRBRQ/rrBc5apC0bHrLlJZge30sb69TbRu2OIBg/NdD18A+paMr8qqzMFGcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuvPwHe1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48035C4CEED;
-	Tue, 10 Jun 2025 11:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749554999;
-	bh=b5nUIzqm3EUmBKYjt0opVpGPnsw1G6P3eA2WugutoP8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FuvPwHe1xCld1Q8ATLa4J8sn2DcS8xWs3+Kj5Uvn3Q/4nd3jXarHhvEInSuped4w2
-	 sIQyPLJbJuTWqAevPBbwKTXTTwgDqA0wOHBEfcDyu6od9jeEH/a15ItmZUcPcMkCYf
-	 vWQ+NNznSeTHp6GxWhQDZPVMiKbaxuzJrXnrfR2+29dnqXuEG2g24jIgtN2x6SE3+q
-	 UGBbxt+C95dKwjUVozaTZISOGdv5dBJWKj7ac8eqLv22tONXYS5P3JS/SR7sQP0myG
-	 xRTxh/GEHGo4Saf2sq3Qwsg0Dd0Ww5s/c1hrT+DAEazxMFSxfXc3T308tILHD5lWFH
-	 UA4huvjkfXCpQ==
-Message-ID: <2d7c6d00-692b-442c-931f-ace85f8b1477@kernel.org>
-Date: Tue, 10 Jun 2025 13:29:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACAB226D07;
+	Tue, 10 Jun 2025 11:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.216
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749555838; cv=pass; b=AZoeTnYbCL6wWX2SchVdC4z15Ftb41ziYItAvWoYL9PlCdvv33K/zg1RNaK1Qib8BDZrIL0drMUZiUmrDkgEikmorVplCEjZL9cgH+PioBXeEtaHZoj5vmU+L4B/1eh4KVZ6Ib+j1z//bSEzN4EaIwHxzpDqP2wkZLImlUCp3Yk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749555838; c=relaxed/simple;
+	bh=uiITjteoxkaeAuq1hjBPppcndqOMCUH+QZXMDGdZR/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lU5NEzHWKV1EdTbhSqp+0yYBrwFofiVzCw+lKKh2Za+Nm5Si4in+9qNENk67Ww5D35V2Ut57f9QIdHIcS8oy+KCIqobvO/Qt21Nuq+j61KneWjSSAFVEsNDK3yv9ntwZ9xjSeCZ1SPkW/rVsCEaZJFT39pIdVUd5qKJChDHm+eI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inhub.de; spf=pass smtp.mailfrom=inhub.de; arc=pass smtp.client-ip=81.169.146.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inhub.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inhub.de
+ARC-Seal: i=1; a=rsa-sha256; t=1749555645; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=GSJbHVVXfiFocmAbCNc1BiCOuG4pSUxEwOCWR/uVL71ziE0ixT8c/+9su8PLV7XTW0
+    7ZkXy5ZSxj+rfd66IvWPo0JkdEg3fP6xdlVmPrxQH//XDnQazN0wnkiE2aD4wzf/8dFu
+    PWXefsScr/A5m1CCJY7vRBuMBCWZ0fFesR1eLqq9zhGNL7029TpXLodkRNsbILPX0KYE
+    NdMfYvAKTfL3+pGF7wC/ICWNNVDLk2j29tblnfbncolM+XttLYhFQKe5eZVSNPOUaBsU
+    lmZtPVA4vfLSd4otyt8wafRFjMmqt8ta5EKGqjmdV7/HR5t+Rop7mTFkEnIlF/GCJjYV
+    ECCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1749555645;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=z0j/rSmihpzXd5aYpATr1YjCDRitMRewVaq3O4GQK0s=;
+    b=BiiLCWt0GlVQcoXb3URwJBXtNaq6dvf3vjjOHg9vore3uKqwZrC7bTXFlsp+0+UzYr
+    vV7mDRis437K46lOFJZ2U49WJ1SU4+7odAUqNqCz9AwpHZLBuymtGZrvN0iVHP1v13l7
+    zrRHxSBAFG01l9amzjPvbbeeJUoDj059BpwDV5BExgZl6loPXXKFyqdo65r66skAucRI
+    Nou2/K6p64TGY0jYTQa8YpVYBpuAilFeZXucoia76km/zMYFr/M/3geIlB3+EIxLhljE
+    uCp19/0flSLexIs85UDOIFvoTUoSAwBKRyhioPXlVtpmDhtvm+PiyE3LoKONImK8A5SZ
+    iRSg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+X-RZG-AUTH: ":OGMGfEG7NfU1WQAxQKSndOy9b62IXRUXP1G+n0e9SfNgaKe3jg5kqErvsv7wxhn7R+CZYOGugK8="
+Received: from crypto.lan.inhub.de
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id J569d715ABej5yY
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 10 Jun 2025 13:40:45 +0200 (CEST)
+From: Tobias Junghans <tobias.junghans@inhub.de>
+To: Lee Jones <lee@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tobias Junghans <tobias.junghans@inhub.de>
+Subject: [PATCH 0/2]  leds: trigger: netdev: refactor event handling
+Date: Tue, 10 Jun 2025 13:40:18 +0200
+Message-ID: <20250610114029.268938-1-tobias.junghans@inhub.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bpf: cpumap: report Rx queue index to xdp_rxq_info
-To: Ujwal Kundur <ujwal.kundur@gmail.com>, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
- john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@fomichev.me, aoluo@google.com, jolsa@kernel.org
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250609173851.778-1-ujwal.kundur@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250609173851.778-1-ujwal.kundur@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
+This series fixes issues in the netdev event handling code which lead to
+erroneous netdev associations if e.g. net devices in different net
+namespaces have the same name before or after being renamed.
 
+The series based on different previous approaches:
+- https://lore.kernel.org/linux-leds/20250401085002.492904-1-tobias.junghans@inhub.de/
+- https://lore.kernel.org/linux-leds/20250425132059.393144-1-tobias.junghans@inhub.de/
 
-On 09/06/2025 19.38, Ujwal Kundur wrote:
-> Refer to the Rx queue using a XDP frame's attached netdev and ascertain
-> the queue index from it.
-> 
-> Signed-off-by: Ujwal Kundur <ujwal.kundur@gmail.com>
-> ---
->   kernel/bpf/cpumap.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> index 67e8a2fc1a99..8230292deac1 100644
-> --- a/kernel/bpf/cpumap.c
-> +++ b/kernel/bpf/cpumap.c
-> @@ -34,6 +34,7 @@
->   #include <linux/btf_ids.h>
->   
->   #include <linux/netdevice.h>
-> +#include <net/netdev_rx_queue.h>
->   #include <net/gro.h>
->   
->   /* General idea: XDP packets getting XDP redirected to another CPU,
-> @@ -196,7 +197,7 @@ static int cpu_map_bpf_prog_run_xdp(struct bpf_cpu_map_entry *rcpu,
->   
->   		rxq.dev = xdpf->dev_rx;
->   		rxq.mem.type = xdpf->mem_type;
-> -		/* TODO: report queue_index to xdp_rxq_info */
-> +		rxq.queue_index = get_netdev_rx_queue_index(xdpf->dev_rx->_rx);
+Signed-off-by: Tobias Junghans <tobias.junghans@inhub.de>
 
-This looks wrong...
-I think this will always return index 0
+---
+Tobias Junghans (2):
+  leds: trigger: netdev: separate event checks
+  leds: trigger: netdev: refactor netdev_event_requires_handling()
 
---Jesper
+ drivers/leds/trigger/ledtrig-netdev.c | 38 +++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
+
+-- 
+2.43.0
+
 
