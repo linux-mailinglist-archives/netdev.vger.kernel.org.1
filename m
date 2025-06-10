@@ -1,144 +1,121 @@
-Return-Path: <netdev+bounces-196060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90023AD35D8
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:17:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 208B3AD35F4
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D07CF3B05CE
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:16:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBC897AA3FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA7B28F930;
-	Tue, 10 Jun 2025 12:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A020728FAB8;
+	Tue, 10 Jun 2025 12:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U6LiZTq7"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PI9xuf7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA60528F509;
-	Tue, 10 Jun 2025 12:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6F828FAB6
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 12:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749557827; cv=none; b=N7ZaVlounI8m5CxazM0uH0B9v6XYsxB5lvPD+nnTzcffFOwNoyzPhZFQiBEY5GnFKRHMiAYzo5bZ07t4rmzbLtB7/4EGAQeY3jpnoYFeLuxd9aWuJ8eILsCzRMMYnTEgndu01cdg2tZxdqPQqY446Y983sxWeO++2D1w1V0PwVs=
+	t=1749558036; cv=none; b=qyfBAjB6RSWqCP+Pts9ExTlz06TVIHJrkT9d0Q7AaE+ZnbyPhg4HBFyNFut0zLcqeCnmjGbpeDx1ZDBq3qE0nLh7sFH1qVq97epla6zY7a/pkujgkVld0zIGHosUtJABuuupIhn5PUecf3cE5Gg/XW02Oxmb8ijDVt+OyfkYqP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749557827; c=relaxed/simple;
-	bh=omxUG8bbtsYAboaiJAE2LR4AXyYHGu7YqcfKF6Y8qZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YotjftGEVpZ1ExF84uKtNM7upnSyZLMSA93ZXmAqZSVTfCYbJqKfFTaUOYYumgORoUrOUbks9pldWCin7bZIIGFZDuoWe/ODNzza72qFdldV/ppXkjoSwlfYQTobw4vusqxSpharGw8s+Y9YBJFiIq5G5ww6fBuLTOgGRewsOm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U6LiZTq7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EaIbOxWHGz4F6US80CpGSyzZKAY2qo/Md4Gb+B5yJdY=; b=U6LiZTq7nBCexaEQ/Ascd7UmU8
-	9ojqDaA3EJ6lbO/MBPC3N5sP4FW2TK/uUJoCTq/xK0kLRDnM/+MEtTtGUg8PGzUNluc7lAZaPvIOK
-	soKWiXpykte4UNMdzoH3i2Kaa0+sQm6NIpS6IsSWpLHw9WxH1eG5o8T4LkSzNDNaMPoc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uOxuB-00FFx1-7p; Tue, 10 Jun 2025 14:16:39 +0200
-Date: Tue, 10 Jun 2025 14:16:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Jander <david@protonic.nl>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/3] net: phy: dp83tg720: implement soft
- reset with asymmetric delay
-Message-ID: <534b3aed-bef5-410e-b970-495b62534d96@lunn.ch>
-References: <20250610081059.3842459-1-o.rempel@pengutronix.de>
- <20250610081059.3842459-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1749558036; c=relaxed/simple;
+	bh=GxAzovlHgLGnYrZU1ySFi76vhcQRxNyPfdNwRBun9e8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C0j2bkGhEnxAxDltcJ3nBU4NT9GX2WG/1Cjq1BLQxLzrXzJ/fgUxQ/x24EdP12m9bDVAUM3REOWuxcLzCK+5c6X1idP7yRIAj8IukXJlX86f3dVL5ovmwipm9StXyCUP6PvDAlEEkCgSKbHoCWKWn36BZWTOoRcDlQQNQarwx+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=PI9xuf7W; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5532f9ac219so6222476e87.1
+        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 05:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1749558033; x=1750162833; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+/yj1cI+THStCgol0p5dxqSrifx2yS1OsxMik6/kECg=;
+        b=PI9xuf7Wiunjfwc2+tx9Z29olaOMy6XfNMWLLqRQlP2wMc4eimKTRjyl4k+6oMAwxT
+         f5XNT9gh+/+xFJSFmWPqBFSpM69iRj5ej5iXeBUKrztSqjir7YQC+Cv95k1OcyCqyvDk
+         EVrRcOnAyyR47Sx1Gxdkd4l9KA+2h3EKuRSRX7ONj35M5U4K1jW4uLllJmQPFvCAF7/x
+         aM7pteY1XIERSyx86ouUrfLmLGSfhigZu0Qq/gT2dOeVeySlBq5M9JwQGf9kTK0WX4Au
+         aio/vf/mdpXkL/um+QFFDcM7xlku8PCxe5NWgAbk4+QXFygzFgqNFYTgKJt4kaFXOwhw
+         EcaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749558033; x=1750162833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+/yj1cI+THStCgol0p5dxqSrifx2yS1OsxMik6/kECg=;
+        b=q6c8bxhrovnJDsTMXx2tdQ1UR8adxiTPYXVNZwkKJ963ONDh6rSluDpbHiAI20SRO3
+         HvIguyeNdl2eKKnYPhPKx4r4EQIqERX4PvPvxgY99OcxitYyjd+2HoD8D0rftJKRMySi
+         V3i4jkISqhP/zT5RS5lbMKvKh1pVgyEeHPZvbgr/pLrcHX5o6il4YaXbIVBYItuDtnfm
+         NqvxXvmGd87NwqYmpGNxWRYaYSCLlqJYYwUC7X2ihUQBPXR4/l73YmPV5g5hhtQ79ly2
+         Bn6pDLlia1LwxQHYyonmttUN60xEQ/b8DMBIkRin6+p7qzCFOw9xc902TsC0OiXPrr5s
+         jKhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7rsU8Fq105VfvUtRmyWDHWIHZR8QJHPQq8dzxXQdxy+HHNeXos5vB7HZOJGWU5MA9KvnplfE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQdW8KaJ4//IY+WA6tYF2OHbgv1wJ3H6dFAsAl/TeNpnsGWGTK
+	C6bfPXR8OPGBx6cB3d8qSWGUmeoEzuZV0k6QCNnkJBXZoGGZW0xyFf+mHvay6dALldCQmjQDt5D
+	w0x/f
+X-Gm-Gg: ASbGnct8/+7bT3UgBiNjMqvNLeWr4ADPUOwToyjKlyk9675py6pEWnAyCqqWRvRJ5g2
+	UXAU4i4arwt8CeB2hDKuFLtxv0f+iXpEVuMg+bmye9CWP9le0kpCi5XTdBAKxo8sIL369iZGLG5
+	R0O2CBsgRer/mfpbLXsW+PvD+wQv/3CTieZ+zy6vTZ/yA0Qk6QPDR23DdgWJCQzXJlWs3a0+Pzi
+	XRWrpxeHNOzql2v1D71Trd3Ao167mXGrZsjgEzN2bBIj/LlzSO7e8QN5tOtTqAO2mat2xtsxEQN
+	DK5h5u8XgdQxFafJHOY/cj+23T/aGTAF9xZHnTeiMY5PC0S1CtB4syW6Zt7tzX8R3qz7EwYxt7y
+	atY/j4bmgNkxfFXmd9bvxpAroXNp7d/0=
+X-Google-Smtp-Source: AGHT+IEl1JdeQusLwp3zre1k9d82StLthBpTHKOhic5o5TqIO+6zKIQSHxAEW6Ax+/UcbkiOXIeGvA==
+X-Received: by 2002:ac2:4e0a:0:b0:553:65eb:319b with SMTP id 2adb3069b0e04-5539475e453mr745771e87.22.1749558032370;
+        Tue, 10 Jun 2025 05:20:32 -0700 (PDT)
+Received: from [100.115.92.205] (176.111.185.210.kyiv.nat.volia.net. [176.111.185.210])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5536772254dsm1525207e87.111.2025.06.10.05.20.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jun 2025 05:20:31 -0700 (PDT)
+Message-ID: <5a6798b9-5e6a-47fc-8217-d7907e0f8720@blackwall.org>
+Date: Tue, 10 Jun 2025 15:20:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250610081059.3842459-2-o.rempel@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v2 1/4] ip: ipstats: Iterate all xstats
+ attributes
+To: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@gmail.com>,
+ netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux-foundation.org
+References: <cover.1749484902.git.petrm@nvidia.com>
+ <e8834ec759b3e7f94545fe07a219ca592e84e402.1749484902.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <e8834ec759b3e7f94545fe07a219ca592e84e402.1749484902.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 10, 2025 at 10:10:57AM +0200, Oleksij Rempel wrote:
-> From: David Jander <david@protonic.nl>
+On 6/9/25 19:05, Petr Machata wrote:
+> ipstats_stat_desc_show_xstats() operates by first parsing the attribute
+> stream into a type-indexed table, and then accessing the right attribute.
+> But bridge VLAN stats are given as several BRIDGE_XSTATS_VLAN attributes,
+> one per VLAN. With the above approach to parsing, only one of these
+> attributes would be shown. Instead, iterate the stream of attributes and
+> call the show_cb for each one with a matching type.
 > 
-> Add a .soft_reset callback for the DP83TG720 PHY that issues a hardware
-> reset followed by an asymmetric post-reset delay. The delay differs
-> based on the PHY's master/slave role to avoid synchronized reset
-> deadlocks, which are known to occur when both link partners use
-> identical reset intervals.
-> 
-> The delay includes:
-> - a fixed 1ms wait to satisfy MDC access timing per datasheet, and
-> - an empirically chosen extra delay (97ms for master, 149ms for slave).
-> 
-> Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Signed-off-by: David Jander <david@protonic.nl>
-
-Hi Oleksij
-
-Since you are submitting it, your Signed-off-by should come last. The
-order signifies the developers who passed it along towards merging.
-
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 > ---
->  drivers/net/phy/dp83tg720.c | 75 ++++++++++++++++++++++++++++++++-----
->  1 file changed, 65 insertions(+), 10 deletions(-)
 > 
-> diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-> index 7e76323409c4..2c86d05bf857 100644
-> --- a/drivers/net/phy/dp83tg720.c
-> +++ b/drivers/net/phy/dp83tg720.c
-> @@ -12,6 +12,42 @@
->  
->  #include "open_alliance_helpers.h"
->  
-> +/*
-> + * DP83TG720 PHY Limitations and Workarounds
-> + *
-> + * The DP83TG720 1000BASE-T1 PHY has several limitations that require
-> + * software-side mitigations. These workarounds are implemented throughout
-> + * this driver. This section documents the known issues and their corresponding
-> + * mitigation strategies.
+> Notes:
+>      v2:
+>      - Use rtattr_for_each_nested
+>      - Drop #include <alloca.h>, it's not used anymore
+> 
+>   ip/ipstats.c | 17 +++++++----------
+>   1 file changed, 7 insertions(+), 10 deletions(-)
+> 
 
-Is there a public errata you can reference?
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-> + *
-> + * 1. Unreliable Link Detection and Synchronized Reset Deadlock
-> + * ------------------------------------------------------------
-> + * After a link loss or during link establishment, the DP83TG720 PHY may fail
-> + * to detect or report link status correctly. To work around this, the PHY must
-> + * be reset periodically when no link is detected.
-> + *
-> + * However, in point-to-point setups where both link partners use the same
-> + * driver (e.g. Linux on both sides), a synchronized reset pattern may emerge.
-> + * This leads to a deadlock, where both PHYs reset at the same time and
-> + * continuously miss each other during auto-negotiation.
-> + *
-> + * To address this, the reset procedure includes two components:
-> + *
-> + * - A **fixed minimum delay of 1ms** after issuing a hardware reset, as
-> + *   required by the "DP83TG720S-Q1 1000BASE-T1 Automotive Ethernet PHY with
-> + *   SGMII and RGMII" datasheet. This ensures MDC access timing is respected
-> + *   before any further MDIO operations.
-> + *
-> + * - An **additional asymmetric delay**, empirically chosen based on
-> + *   master/slave role. This reduces the risk of synchronized resets on both
-> + *   link partners. Values are selected to avoid periodic overlap and ensure
-> + *   the link is re-established within a few cycles.
-
-Maybe there is more about this in the following patches, i've not read
-them yet. Does autoneg get as far as determining master/slave role? Or
-are you assuming the link partners are somehow set as
-prefer_master/prefer_slave?
-
-	Andrew
 
