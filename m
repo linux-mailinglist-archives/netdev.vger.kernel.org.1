@@ -1,251 +1,254 @@
-Return-Path: <netdev+bounces-195978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BF5AD2F92
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:11:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF2FEAD2FBB
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 900C63AE62E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:11:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69253A5726
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6642280317;
-	Tue, 10 Jun 2025 08:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2E227A906;
+	Tue, 10 Jun 2025 08:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jO4QuuS+"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0634A22172F
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 08:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245DF21578D;
+	Tue, 10 Jun 2025 08:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749543094; cv=none; b=K/CRoCuBFVw+06DuOpLyllIvhjtiERtoAnGaKAokIw3l4S4aVphKmx6WtwQNgZFY6uUEfVgECC8BRY/mth6ZPNObJApnxC+r52LB+Ty9TqQhgwu9KImYwiV2TOUzqFUSyd+lmgcWYxGHFrGG4n4dJK4vjQBq96K3QEEHkP18rz4=
+	t=1749543520; cv=none; b=Iav9A7NZ4s2k2QRsmQWO52ew1/OU9acb0VpDd0DpAlKt2JPFb5GbL78VjFCtqqbx4SHLKqaHnGlyl5lsZgk4AB49pGLbDQf5yq0nHJNFalFqyLD8mtAoUMrhEneprRz8S1z4tA6LUlIJSMuGxPPTzlPBCd/efGMB4gS2Ciba/Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749543094; c=relaxed/simple;
-	bh=Rfbd2AeOuynZLpm2mqn/rs/wraAqSIYANp04mVqZhw0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a/3NoRb0lCG9Bn08oczkIfBbailBtHULtlGnh6VtWvTzqszJYgHkp2X7Rrv/RFTNvsfKWLSHgmxqKGeXFa2MFP4qw55zKmrYXwt/1zv+qrbH5WW7Z7AavZrI5q2HwsjvKcPM68BkLN0zcjAsu+3p9tbcrSP1Xv3MfkezQn7huBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4T-0006BH-Dh; Tue, 10 Jun 2025 10:11:01 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4S-002jx5-0k;
-	Tue, 10 Jun 2025 10:11:00 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uOu4S-00G7ct-0S;
-	Tue, 10 Jun 2025 10:11:00 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Jander <david@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v1 3/3] net: phy: dp83tg720: switch to adaptive polling and remove random delays
-Date: Tue, 10 Jun 2025 10:10:59 +0200
-Message-Id: <20250610081059.3842459-4-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250610081059.3842459-1-o.rempel@pengutronix.de>
-References: <20250610081059.3842459-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1749543520; c=relaxed/simple;
+	bh=0O8yujLEJLMJ3hUgzFfiYx8X6y8n0uKkiblzYtmGvtw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Skv6e4+unATqlVJKoypkA8GMT6wbvGHV9k33N2tXQKUr5h15xiNSdZWJvsvXgDCfpLs/Rwzt5vQxoJdNtk76gQFkTHhpxp+ixnlbREEjT7fWi+SNoV3AGjn1vpt2sMH9nPWiwX3XLBtAUxNNvqc4FCSQymi5E3gZ+NKRCFIEYkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jO4QuuS+; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 57B464426E;
+	Tue, 10 Jun 2025 08:18:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749543515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0LzaDuer9xNWjAddXjLU6iPOUE3PiHIk5+pn0I9K6wQ=;
+	b=jO4QuuS+a5O24WThoIYuFwA9x+6PkLFXHYythzHObGmD7fdH3sIFh5+8NRdT62+P6fqdsQ
+	DPKBQk7aozNSwYh0LQnOMckCSYj7rPMno9cIHtCfjgn6hbF/8sAtuxGZagdMuiDghiNw96
+	jqYmvbTqn8eDw+Cf4wn4Rb4/kNNG6d1PhHGm1bi2+zaWJ91f83hfavM5AvD9qadnfe8H87
+	WSM4pb7UxwNDsnVlGzOs42vahY3EH7870uDH2WCcRrHeLSdvfDXLwXguRHFfdIEJp+CPEw
+	/J5Q4twYyfZ7E73jT9y4SVko2umiptJGV727zr5lgmsMHotTJv7a/XiImPc1pg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v13 00/13] Add support for PSE budget evaluation
+ strategy
+Date: Tue, 10 Jun 2025 10:11:34 +0200
+Message-Id: <20250610-feature_poe_port_prio-v13-0-c5edc16b9ee2@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-B4-Tracking: v=1; b=H4sIALfoR2gC/3XSzW7DIAwA4FepOC8T5s+w095jmioCZkXakirJo
+ k5V330k0tRoKQcOYPFhY1/ZSEOmkb0crmygOY+578oG5NOBhZPvPqjJsRwwwYXiDmSTyE/fAx3
+ P/bKG6Xgect94DZ4iSikosHL3PFDKlxV+Yx1NTUeXib2XyCmPUz/8rC/OsMYXGzgXFXuGhjdok
+ WuVUFHUr23fT5+5ew7912rOYuNIXnNEcZzWzghBpNDvHXl3QEDNkcWxUjiXvHEGw95Rf47mJaG
+ ao4oTgwMvAw9gce/ouyPA1hxdHBm9soZ0ikbtHbw7ilcdXP4n6RQclepC3Dt244CpObY4SpkgX
+ QwSpd07buOIat/d4gCmwDlqFA/yAX6HNK8mBLxIWht05ZOcTu6BBBtJVEcIlllsW5+UQoJWPKg
+ NxFZSVWmZxmiWhkFM6P91/3a7/QJC9sZYnQMAAA==
+To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, 
+ Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.15-dev-8cb71
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugddutdeglecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffufffkgggtgffvvefosehtkeertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudfhveduteffgfekvdfhveehgeehtdelgefhffduiefffedvheefgeeiiedvkeetnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggvnhhtphhrohhjvggttheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhli
+ hhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehkvghrnhgvlhesphgvnhhguhhtrhhonhhigidruggv
+X-GND-Sasl: kory.maincent@bootlin.com
 
-From: David Jander <david@protonic.nl>
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Now that the PHY reset logic includes a role-specific asymmetric delay
-to avoid synchronized reset deadlocks, the previously used randomized
-polling intervals are no longer necessary.
+This series brings support for budget evaluation strategy in the PSE
+subsystem. PSE controllers can set priorities to decide which ports should
+be turned off in case of special events like over-current.
 
-This patch removes the get_random_u32_below()-based logic and introduces
-an adaptive polling strategy:
-- Fast polling for a short time after link-down
-- Slow polling if the link remains down
-- Slower polling when the link is up
+This patch series adds support for two budget evaluation strategy.
+1. Static Method:
 
-This balances CPU usage and responsiveness while avoiding reset
-collisions. Additionally, the driver still relies on polling for
-all link state changes, as interrupt support is not implemented,
-and link-up events are not reliably signaled by the PHY.
+   This method involves distributing power based on PD classification.
+   It’s straightforward and stable, the PSE core keeping track of the
+   budget and subtracting the power requested by each PD’s class.
 
-The polling parameters are now documented in the updated top-of-file
-comment.
+   Advantages: Every PD gets its promised power at any time, which
+   guarantees reliability.
 
-Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Signed-off-by: David Jander <david@protonic.nl>
+   Disadvantages: PD classification steps are large, meaning devices
+   request much more power than they actually need. As a result, the power
+   supply may only operate at, say, 50% capacity, which is inefficient and
+   wastes money.
+
+2. Dynamic Method:
+
+   To address the inefficiencies of the static method, vendors like
+   Microchip have introduced dynamic power budgeting, as seen in the
+   PD692x0 firmware. This method monitors the current consumption per port
+   and subtracts it from the available power budget. When the budget is
+   exceeded, lower-priority ports are shut down.
+
+   Advantages: This method optimizes resource utilization, saving costs.
+
+   Disadvantages: Low-priority devices may experience instability.
+
+The UAPI allows adding support for software port priority mode managed from
+userspace later if needed.
+
+Patches 1-2: Add support for interrupt event report in PSE core, ethtool
+	     and ethtool specs.
+Patch 3: Adds support for interrupt and event report in TPS23881 driver.
+Patches 4,5: Add support for PSE power domain in PSE core and ethtool.
+Patches 6-8: Add support for budget evaluation strategy in PSE core,
+	     ethtool and ethtool specs.
+Patches 9-11: Add support for port priority and power supplies in PD692x0
+	      drivers.
+Patches 12,13: Add support for port priority in TPS23881 drivers.
+
+Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 ---
- drivers/net/phy/dp83tg720.c | 94 ++++++++++++++++++++++---------------
- 1 file changed, 55 insertions(+), 39 deletions(-)
+Changes in v13:
+- Small change, no need for >0 condition check for unsigned variables.
+- Link to v12: https://lore.kernel.org/r/20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com
 
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 00963ce0eb10..8c14b5a70cb7 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -46,15 +46,37 @@
-  * The functions that implement this logic are:
-  * - dp83tg720_soft_reset()
-  * - dp83tg720_get_next_update_time()
-+ *
-+ * 2. Polling-Based Link Detection and IRQ Support
-+ * -----------------------------------------------
-+ * Due to the PHY-specific limitation described in section 1, link-up events
-+ * cannot be reliably detected via interrupts on the DP83TG720. Therefore,
-+ * polling is required to detect transitions from link-down to link-up.
-+ *
-+ * While link-down events *can* be detected via IRQs on this PHY, this driver
-+ * currently does **not** implement interrupt support. As a result, all link
-+ * state changes must be detected using polling.
-+ *
-+ * Polling behavior:
-+ * - When the link is up: slow polling (e.g. 1s).
-+ * - When the link just went down: fast polling for a short time.
-+ * - When the link stays down: fallback to slow polling.
-+ *
-+ * This design balances responsiveness and CPU usage. It sacrifices fast link-up
-+ * times in cases where the link is expected to remain down for extended periods,
-+ * assuming that such systems do not require immediate reactivity.
-  */
- 
- /*
-  * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
-  *				 is active.
-- * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
-- *				 the link is down.
-- * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
-- *				 the link is down.
-+ * DP83TG720S_POLL_NO_LINK     - Polling interval in milliseconds when the
-+ *				 link is down.
-+ * DP83TG720S_FAST_POLL_DURATION_MS - Timeout in milliseconds for no-link
-+ *				 polling after which polling interval is
-+ *				 increased.
-+ * DP83TG720S_POLL_SLOW	       - Slow polling interval when there is no
-+ *				 link for a prolongued period.
-  * DP83TG720S_RESET_DELAY_MS_MASTER - Delay after a reset before attempting
-  *				 to establish a link again for master phy.
-  * DP83TG720S_RESET_DELAY_MS_SLAVE  - Delay after a reset before attempting
-@@ -65,9 +87,10 @@
-  * minimizing the number of reset retries while ensuring reliable link recovery
-  * within a reasonable timeframe.
-  */
--#define DP83TG720S_POLL_ACTIVE_LINK		1000
--#define DP83TG720S_POLL_NO_LINK_MIN		100
--#define DP83TG720S_POLL_NO_LINK_MAX		1000
-+#define DP83TG720S_POLL_ACTIVE_LINK		421
-+#define DP83TG720S_POLL_NO_LINK			149
-+#define DP83TG720S_FAST_POLL_DURATION_MS	6000
-+#define DP83TG720S_POLL_SLOW			1117
- #define DP83TG720S_RESET_DELAY_MS_MASTER	97
- #define DP83TG720S_RESET_DELAY_MS_SLAVE		149
- 
-@@ -166,6 +189,7 @@ struct dp83tg720_stats {
- 
- struct dp83tg720_priv {
- 	struct dp83tg720_stats stats;
-+	unsigned long last_link_down_jiffies;
- };
- 
- /**
-@@ -569,50 +593,42 @@ static int dp83tg720_probe(struct phy_device *phydev)
- }
- 
- /**
-- * dp83tg720_get_next_update_time - Determine the next update time for PHY
-- *                                  state
-+ * dp83tg720_get_next_update_time - Return next polling interval for PHY state
-  * @phydev: Pointer to the phy_device structure
-  *
-- * This function addresses a limitation of the DP83TG720 PHY, which cannot
-- * reliably detect or report a stable link state. To recover from such
-- * scenarios, the PHY must be periodically reset when the link is down. However,
-- * if the link partner also runs Linux with the same driver, synchronized reset
-- * intervals can lead to a deadlock where the link never establishes due to
-- * simultaneous resets on both sides.
-- *
-- * To avoid this, the function implements randomized polling intervals when the
-- * link is down. It ensures that reset intervals are desynchronized by
-- * introducing a random delay between a configured minimum and maximum range.
-- * When the link is up, a fixed polling interval is used to minimize overhead.
-- *
-- * This mechanism guarantees that the link will reestablish within 10 seconds
-- * in the worst-case scenario.
-+ * Implements adaptive polling interval logic depending on link state and
-+ * downtime duration. See the "2. Polling-Based Link Detection and IRQ Support"
-+ * section at the top of this file for details.
-  *
-- * Return: Time (in jiffies) until the next update event for the PHY state
-- * machine.
-+ * Return: Time (in jiffies) until the next poll
-  */
- static unsigned int dp83tg720_get_next_update_time(struct phy_device *phydev)
- {
-+	struct dp83tg720_priv *priv = phydev->priv;
- 	unsigned int next_time_jiffies;
- 
- 	if (phydev->link) {
--		/* When the link is up, use a fixed 1000ms interval
--		 * (in jiffies)
--		 */
-+		priv->last_link_down_jiffies = 0;
-+
-+		/* When the link is up, use a slower interval (in jiffies) */
- 		next_time_jiffies =
- 			msecs_to_jiffies(DP83TG720S_POLL_ACTIVE_LINK);
- 	} else {
--		unsigned int min_jiffies, max_jiffies, rand_jiffies;
--
--		/* When the link is down, randomize interval between min/max
--		 * (in jiffies)
--		 */
--		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
--		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
--
--		rand_jiffies = min_jiffies +
--			get_random_u32_below(max_jiffies - min_jiffies + 1);
--		next_time_jiffies = rand_jiffies;
-+		unsigned long now = jiffies;
-+
-+		if (!priv->last_link_down_jiffies)
-+			priv->last_link_down_jiffies = now;
-+
-+		if (time_before(now, priv->last_link_down_jiffies +
-+			  msecs_to_jiffies(DP83TG720S_FAST_POLL_DURATION_MS))) {
-+			/* Link recently went down: fast polling */
-+			next_time_jiffies =
-+				msecs_to_jiffies(DP83TG720S_POLL_NO_LINK);
-+		} else {
-+			/* Link has been down for a while: slow polling */
-+			next_time_jiffies =
-+				msecs_to_jiffies(DP83TG720S_POLL_SLOW);
-+		}
- 	}
- 
- 	/* Ensure the polling time is at least one jiffy */
+Changes in v12:
+- Rebase on net-next.
+- Link to v11: https://lore.kernel.org/r/20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com
+
+Changes in v11:
+- Move the PSE events enum description fully in the ethtool spec.
+- Remove the first patch which was useless as not used.
+- Split the second patch to separate the attached_phydev introduction to
+  the PSE interrupt support.
+- Link to v10: https://lore.kernel.org/r/20250506-feature_poe_port_prio-v10-0-55679a4895f9@bootlin.com
+
+Changes in v10:
+- Change patch 2 and 7 due to possible used after free scenario or
+  deadlock scenario. Move the PSE notification send management to a
+  workqueue to protect it from the deadlock scenario.
+- Link to v9: https://lore.kernel.org/r/20250422-feature_poe_port_prio-v9-0-417fc007572d@bootlin.com
+
+Changes in v9:
+- Add a missing check after skb creation.
+- Link to v8: https://lore.kernel.org/r/20250416-feature_poe_port_prio-v8-0-446c39dc3738@bootlin.com
+
+Changes in v8:
+- Rename a few functions for better clarity.
+- Add missing kref_init in PSE power domain support and a wrong error
+  check condition.
+- Link to v7: https://lore.kernel.org/r/20250408-feature_poe_port_prio-v7-0-9f5fc9e329cd@bootlin.com
+
+Changes in v7:
+- Add reference count and mutex lock for PSE power domain.
+- Add support to retry enabling port that failed to be powered in case of
+  port disconnection or priority change.
+- Use flags definition for pse events in ethtool specs.
+- Small changes in the TPS23881 driver.
+- Link to v6: https://lore.kernel.org/r/20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com
+
+Changes in v6:
+- Few typos.
+- Use uint instead of bitset for PSE_EVENT.
+- Remove report of budget evaluation strategy in the uAPI.
+- Link to v5: https://lore.kernel.org/r/20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com
+
+Changes in v5:
+- Remove the first part of the patch series which tackled PSE
+  improvement and already gets merged:
+  https://lore.kernel.org/netdev/20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com/
+- Remove the PSE index support which is useless for now. The PSE power
+  domain ID is sufficient.
+- Add support for PD692x0 power supplies other than Vmain which was already
+  in the patch series.
+- Few other small fixes.
+- Link to v4: https://lore.kernel.org/r/20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com
+
+Changes in v4:
+- Remove disconnection policy.
+- Rename port priority mode to budget evaluation strategy.
+- Add cosmetic changes in PSE core.
+- Add support for port priority in PD692x0 driver.
+- Link to v3: https://lore.kernel.org/r/20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com
+
+Changes in v3:
+- Move power budget to regulator core.
+- Add disconnection policies with PIs using the same priority.
+- Several fixes on the TPS23881 drivers.
+- Several new cosmetic patches.
+- Link to v2: https://lore.kernel.org/r/20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com
+
+Changes in v2:
+- Rethink the port priority management.
+- Add PSE id.
+- Add support for PSE power domains.
+- Add get power budget regulator constraint.
+- Link to v1: https://lore.kernel.org/r/20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com
+
+---
+Kory Maincent (13):
+      net: pse-pd: Introduce attached_phydev to pse control
+      net: pse-pd: Add support for reporting events
+      net: pse-pd: tps23881: Add support for PSE events and interrupts
+      net: pse-pd: Add support for PSE power domains
+      net: ethtool: Add support for new power domains index description
+      net: pse-pd: Add helper to report hardware enable status of the PI
+      net: pse-pd: Add support for budget evaluation strategies
+      net: ethtool: Add PSE port priority support feature
+      net: pse-pd: pd692x0: Add support for PSE PI priority feature
+      net: pse-pd: pd692x0: Add support for controller and manager power supplies
+      dt-bindings: net: pse-pd: microchip,pd692x0: Add manager regulator supply
+      net: pse-pd: tps23881: Add support for static port priority feature
+      dt-bindings: net: pse-pd: ti,tps23881: Add interrupt description
+
+ .../bindings/net/pse-pd/microchip,pd692x0.yaml     |   22 +-
+ .../bindings/net/pse-pd/ti,tps23881.yaml           |    8 +
+ Documentation/netlink/specs/ethtool.yaml           |   76 ++
+ Documentation/networking/ethtool-netlink.rst       |   49 +
+ drivers/net/mdio/fwnode_mdio.c                     |   26 +-
+ drivers/net/pse-pd/pd692x0.c                       |  225 +++++
+ drivers/net/pse-pd/pse_core.c                      | 1068 +++++++++++++++++++-
+ drivers/net/pse-pd/tps23881.c                      |  403 +++++++-
+ include/linux/ethtool_netlink.h                    |    9 +
+ include/linux/pse-pd/pse.h                         |  108 +-
+ include/uapi/linux/ethtool_netlink_generated.h     |   40 +
+ net/ethtool/pse-pd.c                               |   63 ++
+ 12 files changed, 2043 insertions(+), 54 deletions(-)
+---
+base-commit: 62937b656898ae9039071a41f6e06e8bea9cb67c
+change-id: 20240913-feature_poe_port_prio-a51aed7332ec
+
+Best regards,
 -- 
-2.39.5
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
