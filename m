@@ -1,209 +1,336 @@
-Return-Path: <netdev+bounces-196305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155F3AD4227
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:45:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 240E6AD423F
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16D067AA2AF
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:44:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF5027A2335
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD4324500E;
-	Tue, 10 Jun 2025 18:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="MFQJ/Sqd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279292494C2;
+	Tue, 10 Jun 2025 18:51:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11021135.outbound.protection.outlook.com [52.101.57.135])
+Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F8B13790B;
-	Tue, 10 Jun 2025 18:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.135
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749581128; cv=fail; b=YFXduR0Pi4lo0rCXDRq5LLn/9sY7Qq6qhzR1yLw7L0aQ4Sgy522AOE+AiwfhT1nNg371DHq7JF8wjf2TyghzHXWbRnPOcE3WhFLl5v30Ae0H1g/SW+nCWxisKpEWqEslJVOX+JhEI2t8Q5RVvceAD4eY+bGFso9Lmml/jiayENA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749581128; c=relaxed/simple;
-	bh=E8yKD16HUthNJ8ai8a2zNd5pzC2YLHHaEgm9SXG1ILk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ab3D4e6WMVVdaPwpwI8jrsV4zeOmCEIOfe/rjbB1Yfw6/N77HXZJd6rVl9O6nRbXGCYG6SzorgJoiKtlD4iyJb9Ld2/qC4TKi0NA6+AJXPLNvj+ifydlQVm03YOtW2cQyxmM2ddXqOVhmvFWgxtV354TwyA48atWpMBpeBq7LY0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=MFQJ/Sqd; arc=fail smtp.client-ip=52.101.57.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FcG5rOI0riVANrd5o68LoZEy54j/P/d+wJMp6H50iMiXN9vUlApSvQa3bldC1neifHJ3YUFz63g/WGIoBIF6+dhq9SQ1G7hrHLPeXY+AREjp+aVwCzazFlTRXsqSAx0ynM/+Edt64fTifnhvD0wl/+oIudso/REHJpETXopxVzJGlTcVgpqjusy0gUObOMExqoxY0IH2Df6cEVcrGXoTSdB6A2aODqx8RvJzFNcg8dFV7vSax6VywoUqMBagEws44GJqgIO4vIV1Q/HTAvZJx7lHGqjHoMhqBaQtgopkLnYi5WvFcAGbyJKJaslXS2R98buGpYrUZTvP5N+JEbKPnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E8yKD16HUthNJ8ai8a2zNd5pzC2YLHHaEgm9SXG1ILk=;
- b=Vq3klLXLBLbxCNxBiE1D16jxklPwVD1GB52Hum9zD4/G7QZOVvXmOQrPsOWS0mGJ5Ti2sGeJW5VMglg0vSyGYNyYxmng2srusvspYitOz7Io8SNiyaXtk+VT/tx13KE+/Vcd2nae97GUbISiHO51/VSFbmqLG/3Z+ugiTLbSO+yvzGBaU81AIJmy3d5wVKY8FfNA4ZcwKKqgoReucA4hzmsYmJqzxjltab3GStPCALSIZjMiviwL1SlJS30ZryvPsFjGI+YmyjH7tllu2t7XwLc58ZFjMmSk6CDkmjv1ZCEdVfLa1VngL/yKuT0XiguhIGH7K1hmvKzvlIiV4alKnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E8yKD16HUthNJ8ai8a2zNd5pzC2YLHHaEgm9SXG1ILk=;
- b=MFQJ/SqdU5CPF5c45Z3Nc2T6O7Pf1en/SweCj5DnfViP+wrql0KZ/NFpk2ndEI3iuA+Ixf3DQA25aEVabWZqk4cDNXQWHJD+a6PEtI5w/liRRHzNWOTBFTVXV6zTvsdHMnbtdjoXXEiyZsCMDgIShj6P9Qsi8Df3DhWQ3a4LIrw=
-Received: from SN6PR2101MB0943.namprd21.prod.outlook.com (2603:10b6:805:f::12)
- by SA6PR21MB4439.namprd21.prod.outlook.com (2603:10b6:806:428::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.7; Tue, 10 Jun
- 2025 18:45:23 +0000
-Received: from SN6PR2101MB0943.namprd21.prod.outlook.com
- ([fe80::c112:335:8240:6ecf]) by SN6PR2101MB0943.namprd21.prod.outlook.com
- ([fe80::c112:335:8240:6ecf%6]) with mapi id 15.20.8835.015; Tue, 10 Jun 2025
- 18:45:17 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: Dexuan Cui <decui@microsoft.com>, "stephen@networkplumber.org"
-	<stephen@networkplumber.org>, KY Srinivasan <kys@microsoft.com>, Paul
- Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org"
-	<leon@kernel.org>, Long Li <longli@microsoft.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "john.fastabend@gmail.com"
-	<john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>, "hawk@kernel.org" <hawk@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, Konstantin Taranov <kotaranov@microsoft.com>,
-	"horms@kernel.org" <horms@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next,v6] net: mana: Add handler for hardware servicing
- events
-Thread-Topic: [PATCH net-next,v6] net: mana: Add handler for hardware
- servicing events
-Thread-Index: AQHb2UwBnA3Q8Y0HEkWRvFDfxb79+bP8vLXA
-Date: Tue, 10 Jun 2025 18:45:17 +0000
-Message-ID:
- <SN6PR2101MB09435086F05835B226855B6FCA6AA@SN6PR2101MB0943.namprd21.prod.outlook.com>
-References: <1749479764-5992-1-git-send-email-haiyangz@microsoft.com>
-In-Reply-To: <1749479764-5992-1-git-send-email-haiyangz@microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1850e4b7-7068-444c-9f4c-432202184677;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-06-10T18:44:09Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR2101MB0943:EE_|SA6PR21MB4439:EE_
-x-ms-office365-filtering-correlation-id: beffc6f7-05fb-4fcc-a3f9-08dda84ef19d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|1800799024|366016|7416014|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?ArZB9o/M6ynswW1FgzVolLi8p+LBTSlpBfQ9uFBA2mbKOWCo8Pg8fPzhxS/v?=
- =?us-ascii?Q?0azzRhhP4iju+3MWm7zzPhHnP7fmqa/qS8kcfrq1q5nHXQ4JALRiWHGZcPJr?=
- =?us-ascii?Q?orv3FEl75ScrMhuzj2T3L+HLoXbal94MIGA25weB1+yUSxOCdynaII6cAzNn?=
- =?us-ascii?Q?Airix1yo28x5On6kCyjVECzfvcHmfMN9t/a50+YZD8lXdNkh/vqbnsyHMfjq?=
- =?us-ascii?Q?6i3Z/RbO+aTYTUg334PMYbIsKPiPkP/qICekjcohFFFwEJXwXv/zTG4ys8F3?=
- =?us-ascii?Q?+jxv92kzOUw83JJVGxZUUPrTLKJuz6PHaX3meoP5Y+vl660sStBI+9UBqRPg?=
- =?us-ascii?Q?h7Ja91prDySYEwCntmtlfCkRQEuxL8te+rec5fREAAizNigzGv1W8yDXRgMw?=
- =?us-ascii?Q?504tnXBtgkUQDY5bXA8KJO33KWtRe6UAjq6phFHREFDX336VDRPWMghk9omf?=
- =?us-ascii?Q?tNIXxg5OJISTH9K6Ts83XXXzRohNz/m6oRRkbcqL4+/KYxza7tmzn9vw9iBS?=
- =?us-ascii?Q?f3nQG5FFllnJmkTbSFZ4MzLbGzYqaQfBYwN/60111PA040Y/CbHEsNdVPE5a?=
- =?us-ascii?Q?F8hV/XsZTWq8J5BYMSl7QQkzoC/m17UEX2+l1aByuodlDr6wXCC5PT+LHQQq?=
- =?us-ascii?Q?zCZYhKjnR4Pn0gjXoPuh3mpeyk+VSkZ1CPDFH+qqmCtW8yKK+gWUObpg2Bl4?=
- =?us-ascii?Q?09V1l3bvf+JVFRCwG22jV27PstTJC4IGF8BPmArO8MTv2DBjqXD3uYcDdrXK?=
- =?us-ascii?Q?gUcjYX/kPvoM4BJ6F9ORagnrzC9HiH0h89wkbXYEojLld94vZ02OqfEweUIu?=
- =?us-ascii?Q?X6FWFADGk/Ks+7aaAl+5RqZNu72up4Do8UlDrG7pkF0C1UXA1XUfPZvCf57L?=
- =?us-ascii?Q?5FRE4UzVplYMhBvUloj6P4mRmW+fseyTB0VyAKjwd+2dR36nTqyo7KGj7oOc?=
- =?us-ascii?Q?zo+UjztgwH8eJ7gHtGRvBCMpuLg+AaCUUfiOBqsP/o2Z6WF4WG5bPkKA+CVM?=
- =?us-ascii?Q?VY24okPkmKDnij97Sm4YaHSKRWOCylHUUd0h05oFDw7OpQTyKgwphncefCOG?=
- =?us-ascii?Q?Fzye6nRVK8MPMqberN9Q3975zaElzNCe/WMqSeIadIxeeYaBRmgUDrFsoYFl?=
- =?us-ascii?Q?d+XW5uLwAt1NPDyGn4BkVhRt4Id6H0TZn0zr89DCBMSOyAGAXsmJnOHtQMi3?=
- =?us-ascii?Q?lRnFekkx/yhWkWJe7OOFehYBrwT44mS/IqlgCWlZ9rDjPeY5M43+t/F5ny3Y?=
- =?us-ascii?Q?LiGV5d4PiINcpLrJmUSJG1skYsAMmUN4RcPOckPdVfhVyuzP36NxJnViDg00?=
- =?us-ascii?Q?DNKkf9cluYuZj9OuxiDhNSE09PZPyO+mSskhPcbmhcC1CgL9vxbGG5bpY/Og?=
- =?us-ascii?Q?bOFw0TJ/hZQYKWjbqCSqgMaxbPCZWSQR77TUgbBw3uRZCoQ7U3hUDMFAyIH7?=
- =?us-ascii?Q?EGbDd0lqw/vWVm0n+sdnDoQtvFuxLnUH24cyE+Lej/0uooUQCq0jgQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR2101MB0943.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(7053199007)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?N4dpdZ3G3+tJaVzZ6IJVyxrf5nTwr9gM/5/irKrX2Clis/nieaPTiGSLJ7nj?=
- =?us-ascii?Q?FWdFXpGDJWZJ32giPjrHlmGjDxfYXJ3mDtQsexFcmZ/EXnmZgMFp7Z3hm1lX?=
- =?us-ascii?Q?wKD3EfLyx0PoEfVzvOuTUxx2nKeQ0MRFSPnBiIqFpZ2PD//53TpLJqWPLQOz?=
- =?us-ascii?Q?3X7YamyxIjiaKN5F+ddGQDPWWkiTEtpR1k3wlb3RXeHtmErVzK2D6NTfu84u?=
- =?us-ascii?Q?uC63BSomDbulLUb2UTUP5SIjglKhHS+zbHWqWdPGuP/gayWyVCbSKZnIeE+Q?=
- =?us-ascii?Q?+mU6nF9WmuUuPfmWoTM9sx3C3v/WA181S8g/+vyvNf5naJ5fUAZhpYWcWldb?=
- =?us-ascii?Q?cTzv/MYHN78OeBk9aU0gp/dXPd3etCw0RycE0BZEGBSElpIVKABWyoHU437D?=
- =?us-ascii?Q?S6BaqkIQctUks+bygM5HXi9/Cm/wziYK6a06RKoHfchP6I4FdrtsjLPlX6tE?=
- =?us-ascii?Q?TAjlvuVQgqbgiWTJ3tK5Hz5nHF3zgq3yU7RAQgNOsxXn5M9BXwb1HgQLT4Yn?=
- =?us-ascii?Q?x2r2rDe0mwfH3rwH99dUBrWI/5PQsE56irRi0LHhVD70Nm1kw26Jafh7WnoI?=
- =?us-ascii?Q?nLaPUrforpWv2GtKsxqL2ZqUmyC4oPgbqCiH9y00SFyhon+0SDisv2Q7cUN8?=
- =?us-ascii?Q?ItNAFQKk1JxoDRd4a0TwhODvwLVlqUrH+acBiZ9EA6N2t2i6/rKuQr/vkAMy?=
- =?us-ascii?Q?fRp+W3D+iucM010TyBydqWbCE+0E0LcqpBoiQo4hiczBFC1FOhQrRCXNZhdm?=
- =?us-ascii?Q?g76QqZVvHOW1iCTbsng9bUAW9VwxMuCxif6kf+w5FcNwwdKRv56UFv4L2w+/?=
- =?us-ascii?Q?YWCMFMpx3uAwn2Na7Yp7I7jEgJ2Fvot1hAsBwgiuL0Pm5IJBAwG4FtZR+I72?=
- =?us-ascii?Q?yLLZ6Ya8cCBD2/HrD0roqy2PkvjH1iP21cqejxDfOgfYupqEWy0gCcnZpwKT?=
- =?us-ascii?Q?IH1onyPdCZKpYvFjwXMbtT0NIToljp5QwtKMrgN97Ovlo5wSVrLB9uejiEEv?=
- =?us-ascii?Q?HFKfdxDQQKc9H0fMg0QveJtYFUiptSDylajTNUPvf7enKqjYglicu0sAvVzP?=
- =?us-ascii?Q?oVRhdsG2Ou4ugsVc1o53I5w+EtGbBF7Zz03iIi/3e8uPyPuvN6jde6/tDM9Y?=
- =?us-ascii?Q?Nql0bqfaceN1IUbSRjGvGrWAT0hA1NZd6zoU7e5W7dlFsU0N7XFxL3NTRoeY?=
- =?us-ascii?Q?00XhL05nQJ/NUXrM03LP5UbvhdRCb3hPWoKWBjxMht0MNGfpVoEqFKbpm6u+?=
- =?us-ascii?Q?wHxTxBe6m7u/i319Kl/O++tLA/+dnm0GS9/s3YzulxUKJwScvj2FHbXwTZEN?=
- =?us-ascii?Q?oR04zRdrIBooYL8LEsa8t31YuA1qhLvcdKQYhK82maS4OyHk79FpqP6F0BHR?=
- =?us-ascii?Q?W+bfh6EvKdGXW7zFK+3b65sNWI3ECRDCHO6um0q2h0ab+ybW+8hm0mHEIW1A?=
- =?us-ascii?Q?kMXm+cfB+ftbpdV1twMMC3tBwulK8treNGseq9lpTGzEN0EERi2Cqsiy5CkH?=
- =?us-ascii?Q?DDLADntuBrQsYQsXzS9FKAm1XlVw9d6yHvMpMcDaaXlp89e5sNI4FQzbN1BR?=
- =?us-ascii?Q?GYWEOepP1LMNApLhjZAtzn4CDmuX6SIjNh3TjewX?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39EC248F73;
+	Tue, 10 Jun 2025 18:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749581506; cv=none; b=iaf91ihnzgxHSecnMZ8LkUaWxN7AGt/Wr5m7QkFSLhhoriemTdNXgsV5xqwogAZUiYNB9WzwqXU4mSo3qMWvmhTJZGWzT9H4roGC6qMQ+Vh3XkGUPIujNhOxmA8JSywUf55qh8S14D+SdRLty3XEXzRY7tDjnSz9iKkxDm30PTI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749581506; c=relaxed/simple;
+	bh=kkBnKdtcGib5Pt8puNdpG+R7rOnu2/QGnpy7xh8y1q0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=D6KH4MDTL7Pb8qBE0U3Wt3kDSltdu0rTMT38Z9WxT21Yo7mRmjVgFhmbPgpiSKBUcvbgPknd94IPdqodOsoO2lBBnDiV2DUW62B33meFDGMUM7+/zSzAnt77CEa0xTPmCG1GDwgDW6xPt98pTnfTouAkqKVbuYwf2dEQWohfGCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
+Received: from mail.wizardsworks.org (localhost [127.0.0.1])
+	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55AIraMY001192;
+	Tue, 10 Jun 2025 11:53:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR2101MB0943.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: beffc6f7-05fb-4fcc-a3f9-08dda84ef19d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2025 18:45:17.0468
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RslmRvJd8n7OuQEIAWKUWXgDbJRRkL+bkgU4aat+2htR+X9fJXJ5zW0Kemegu8Um32w12/b77WD0+RiU9tQHvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR21MB4439
+Date: Tue, 10 Jun 2025 11:53:36 -0700
+From: Greg Chandler <chandleg@wizardsworks.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+Message-ID: <385f2469f504dd293775d3c39affa979@wizardsworks.org>
+X-Sender: chandleg@wizardsworks.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-> -----Original Message-----
-> From: LKML haiyangz <lkmlhyz@microsoft.com> On Behalf Of Haiyang Zhang
-> Sent: Monday, June 9, 2025 10:36 AM
-> To: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>; Dexuan Cui
-> <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
-> <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
-> olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
-> wei.liu@kernel.org; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
-> ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
-> daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
-> ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
-> shradhagupta@linux.microsoft.com; andrew+netdev@lunn.ch; Konstantin
-> Taranov <kotaranov@microsoft.com>; horms@kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: [PATCH net-next,v6] net: mana: Add handler for hardware servicin=
-g events
->=20
+I decided to test this again before I got sidetracked on my bigger 
+issue.
+The kernel I repored this on was 6.12.12 on alpha, this is also that 
+same version, but with a make distclean, and just about every single 
+debug option turned on.
 
-Rebased it, and sent out v7.
+I left the last line of the kernel boot in this output as well, showing 
+"link beat good"
 
-Thanks,
-- Haiyang
+I pulled the plug and it happened again immediately.
+I waited 10 sec, and plugged it back in, and I do not get a "link up" 
+type message that I would expect to see.
+
+This should have popped up between:
+[ 1088.732841] ---[ end trace 0000000000000000 ]---
+
+     and this one:
+[ 1133.693755] ------------[ cut here ]------------
+
+
+
+I waited for the switch to negotiate, which it only does at 10 half for 
+this.
+I waited a few seconds more and pulled the plug again and got the second 
+one:
+
+
+
+[   18.469717] net eth2: 21143 10baseT link beat good
+[ 1088.732841] ------------[ cut here ]------------
+[ 1088.732841] WARNING: CPU: 0 PID: 0 at kernel/time/timer.c:1657 
+__timer_delete_sync+0x104/0x120
+[ 1088.732841] Modules linked in: loop
+[ 1088.732841] CPU: 0 UID: 0 PID: 0 Comm: swapper Not tainted 6.12.12 #4
+[ 1088.732841]        fffffc0000c83ab0 fffffc0000388c94 fffffc0000326744 
+fffffc0000afbee8
+[ 1088.732841]        0000000000000000 fffffc0000388c94 fffffc00009e0d70 
+0000000000000000
+[ 1088.732841]        fffffc0000afbee8 0000000000000679 fffffc0000388c94 
+0000000000000009
+[ 1088.732841]        fffffc0000cf9100 000000011f821600 fffffc0000388c94 
+0000000000000000
+[ 1088.732841]        fffffc00020e6000 fffffc00020e73d0 fffffffff0669000 
+fffffd000a120000
+[ 1088.732841]        fffffc0000358f10 fffffc000203e180 0000000000000008 
+fffffc000203e6b0
+[ 1088.732841] Trace:
+[ 1088.732841] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1088.732841] [<fffffc0000326744>] __warn+0x194/0x1a0
+[ 1088.732841] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1088.732841] [<fffffc00009e0d70>] warn_slowpath_fmt+0x84/0xf0
+[ 1088.732841] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1088.732841] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1088.732841] [<fffffc0000358f10>] try_to_wake_up+0x170/0x2d0
+[ 1088.732841] [<fffffc0000358bb8>] wakeup_preempt+0x68/0xd0
+[ 1088.732841] [<fffffc0000919a2c>] tcp_orphan_update+0x6c/0x90
+[ 1088.732841] [<fffffc000038be64>] timekeeping_update+0xd4/0x290
+[ 1088.732841] [<fffffc0000780fdc>] t21142_lnk_change+0x1bc/0x790
+[ 1088.732841] [<fffffc000077a890>] tulip_interrupt+0x280/0xac0
+[ 1088.732841] [<fffffc0000372b90>] __handle_irq_event_percpu+0x60/0x180
+[ 1088.732841] [<fffffc0000372d30>] handle_irq_event_percpu+0x80/0xa0
+[ 1088.732841] [<fffffc0000372d98>] handle_irq_event+0x48/0xe0
+[ 1088.732841] [<fffffc0000377af0>] handle_level_irq+0xc0/0x1f0
+[ 1088.732841] [<fffffc0000315300>] handle_irq+0x70/0xe0
+[ 1088.732841] [<fffffc000031d6c0>] dp264_srm_device_interrupt+0x30/0x50
+[ 1088.732841] [<fffffc00003153dc>] do_entInt+0x6c/0x1c0
+[ 1088.732841] [<fffffc0000310cc0>] ret_from_sys_call+0x0/0x10
+[ 1088.732841] [<fffffc000035c69c>] pick_task_fair+0x3c/0x100
+[ 1088.732841] [<fffffc000035d89c>] task_non_contending+0x6c/0x2a0
+[ 1088.732841] [<fffffc000035fc28>] do_idle+0x58/0x190
+[ 1088.732841] [<fffffc00009eda20>] cpu_idle_poll.isra.0+0x0/0x60
+[ 1088.732841] [<fffffc00009eda60>] cpu_idle_poll.isra.0+0x40/0x60
+[ 1088.732841] [<fffffc0000360058>] cpu_startup_entry+0x38/0x50
+[ 1088.732841] [<fffffc00009edbc8>] rest_init+0xe8/0xec
+[ 1088.732841] [<fffffc000031001c>] _stext+0x1c/0x20
+
+[ 1088.732841] ---[ end trace 0000000000000000 ]---
+[ 1133.693755] ------------[ cut here ]------------
+[ 1133.693755] WARNING: CPU: 0 PID: 0 at kernel/time/timer.c:1657 
+__timer_delete_sync+0x104/0x120
+[ 1133.693755] Modules linked in: loop
+[ 1133.693755] CPU: 0 UID: 0 PID: 0 Comm: swapper Tainted: G        W    
+       6.12.12 #4
+[ 1133.693755] Tainted: [W]=WARN
+[ 1133.693755]        fffffc0000c83ab0 fffffc0000388c94 fffffc0000326744 
+fffffc0000afbee8
+[ 1133.693755]        0000000000000000 fffffc0000388c94 fffffc00009e0d70 
+0000000000000000
+[ 1133.693755]        fffffc0000afbee8 0000000000000679 fffffc0000388c94 
+0000000000000009
+[ 1133.693755]        fffffc0000cf9100 000000011f821600 fffffc0000388c94 
+0000000000000000
+[ 1133.693755]        fffffc00020e6000 fffffc00020e73d0 fffffffff8668000 
+fffffd000a120000
+[ 1133.693755]        fffffc0000358f10 fffffc000203e180 0000000000000008 
+fffffc000203e6b0
+[ 1133.693755] Trace:
+[ 1133.693755] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1133.693755] [<fffffc0000326744>] __warn+0x194/0x1a0
+[ 1133.693755] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1133.693755] [<fffffc00009e0d70>] warn_slowpath_fmt+0x84/0xf0
+[ 1133.693755] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1133.693755] [<fffffc0000388c94>] __timer_delete_sync+0x104/0x120
+[ 1133.693755] [<fffffc0000358f10>] try_to_wake_up+0x170/0x2d0
+[ 1133.693755] [<fffffc0000358bb8>] wakeup_preempt+0x68/0xd0
+[ 1133.693755] [<fffffc0000919a2c>] tcp_orphan_update+0x6c/0x90
+[ 1133.693755] [<fffffc000038be64>] timekeeping_update+0xd4/0x290
+[ 1133.693755] [<fffffc0000780fdc>] t21142_lnk_change+0x1bc/0x790
+[ 1133.693755] [<fffffc000077a890>] tulip_interrupt+0x280/0xac0
+[ 1133.693755] [<fffffc0000372b90>] __handle_irq_event_percpu+0x60/0x180
+[ 1133.693755] [<fffffc0000372d30>] handle_irq_event_percpu+0x80/0xa0
+[ 1133.693755] [<fffffc0000372d98>] handle_irq_event+0x48/0xe0
+[ 1133.693755] [<fffffc0000377af0>] handle_level_irq+0xc0/0x1f0
+[ 1133.693755] [<fffffc0000315300>] handle_irq+0x70/0xe0
+[ 1133.693755] [<fffffc000031d6c0>] dp264_srm_device_interrupt+0x30/0x50
+[ 1133.693755] [<fffffc00003153dc>] do_entInt+0x6c/0x1c0
+[ 1133.693755] [<fffffc0000310cc0>] ret_from_sys_call+0x0/0x10
+[ 1133.693755] [<fffffc000035c69c>] pick_task_fair+0x3c/0x100
+[ 1133.693755] [<fffffc000035d89c>] task_non_contending+0x6c/0x2a0
+[ 1133.693755] [<fffffc000035fc28>] do_idle+0x58/0x190
+[ 1133.693755] [<fffffc00009eda20>] cpu_idle_poll.isra.0+0x0/0x60
+[ 1133.693755] [<fffffc00009eda50>] cpu_idle_poll.isra.0+0x30/0x60
+[ 1133.693755] [<fffffc0000360058>] cpu_startup_entry+0x38/0x50
+[ 1133.693755] [<fffffc00009edbc8>] rest_init+0xe8/0xec
+[ 1133.693755] [<fffffc000031001c>] _stext+0x1c/0x20
+
+[ 1133.693755] ---[ end trace 0000000000000000 ]---
+
+
+
+
+After this, even though the link is shown at the switch mii-tool 
+confirms:
+root@bigbang:~# mii-tool eth2
+eth2: no link
+
+
+Which I think leans towards it not showing the link up message.  I think 
+the driver croaked which is a pain as it's not a module.  I can 
+recompile to test that if someone thinks that would be helpful.
+
+root@bigbang:~# dmesg |grep eth
+[    8.150386] net eth0: Digital DS21142/43 Tulip rev 65 at Port 0x8400, 
+08:00:2b:86:ab:b1, IRQ 29
+[    8.170894] net eth1: Digital DS21142/43 Tulip rev 65 at Port 0x8480, 
+08:00:2b:86:a8:5b, IRQ 30
+[    8.809565] e1000 0000:00:10.0 eth2: (PCI:33MHz:64-bit) 
+00:02:b3:f3:e6:3d
+[    8.811518] e1000 0000:00:10.0 eth2: Intel(R) PRO/1000 Network 
+Connection
+[    8.813472] usbcore: registered new interface driver kaweth
+[   25.848619] tulip 0000:00:09.0 eth126: renamed from eth0
+[   26.400377] tulip 0000:00:09.0 rename_eth126: renamed from eth126
+[   26.861314] e1000 0000:00:10.0 eth124: renamed from eth2
+[   26.887681] e1000 0000:00:10.0 eth0: renamed from eth124
+[   27.122056] tulip 0000:00:09.0 eth2: renamed from rename_eth126
+[   68.313441] tulip 0000:00:0b.0 eth1: tulip_stop_rxtx() failed (CSR5 
+0xf0660000 CSR6 0xb3862002)
+[   68.791956] tulip 0000:00:09.0 eth2: tulip_stop_rxtx() failed (CSR5 
+0xf0660000 CSR6 0xb3862002)
+
+root@bigbang:~# mii-tool eth2
+eth2: no link
+
+root@bigbang:~# mii-tool eth1
+eth1: no link
+
+root@bigbang:~# ifconfig -a
+eth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+         inet 192.168.1.75  netmask 255.255.255.0  broadcast 
+192.168.1.255
+         ether 00:02:b3:f3:e6:3d  txqueuelen 1000  (Ethernet)
+         RX packets 0  bytes 0 (0.0 B)
+         RX errors 0  dropped 0  overruns 0  frame 0
+         TX packets 0  bytes 0 (0.0 B)
+         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+         inet 192.168.1.76  netmask 255.255.255.0  broadcast 
+192.168.1.255
+         inet6 fe80::a00:2bff:fe86:a85b  prefixlen 64  scopeid 0x20<link>
+         ether 08:00:2b:86:a8:5b  txqueuelen 1000  (Ethernet)
+         RX packets 0  bytes 0 (0.0 B)
+         RX errors 11  dropped 0  overruns 0  frame 0
+         TX packets 0  bytes 0 (0.0 B)
+         TX errors 5  dropped 0 overruns 0  carrier 15  collisions 0
+
+eth2: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+         inet 192.168.1.77  netmask 255.255.255.0  broadcast 
+192.168.1.255
+         inet6 fe80::a00:2bff:fe86:abb1  prefixlen 64  scopeid 0x20<link>
+         ether 08:00:2b:86:ab:b1  txqueuelen 1000  (Ethernet)
+         RX packets 0  bytes 0 (0.0 B)
+         RX errors 11  dropped 0  overruns 0  frame 0
+         TX packets 0  bytes 0 (0.0 B)
+         TX errors 5  dropped 0 overruns 0  carrier 15  collisions 0
+
+
+Clearly the interface doesn't work at all, which I hadn't noticed up 
+until now.  I have been using a USB stick to copy stuff, and a serial 
+console for everything else.
+
+I took a quick look at the motherboard and these are Intel 21143-TD 
+chips vs DEC ones.
+
+I had not noticed the "tulip_stop_rxtx" errors until now, more likely 
+becuase I wasn't looking for them, vs them not being there.
+
+
+
+
+
+
+
+
+On 2025/06/10 09:27, Florian Fainelli wrote:
+> Howdy!
+> 
+> On 6/9/25 15:43, Greg Chandler wrote:
+>> 
+>> This is a from-scratch build (non-vendor/non-distribution)
+>> Host/Target = alpha ev6
+>> Kernel source = 6.12.12
+>> 
+>> My last working kernel on this was a 2.6.x, it's been a while since 
+>> I've had time to bring this system up to date, so I don't know when 
+>> this may have started.
+>> I had a 3.0.102 in there, but I didn't test the networking while using 
+>> it.
+>> 
+>> Please let me know what I can do to help out with figuring this one 
+>> out.
+> 
+> I don't have an Alpha machine to try this on, but I do have a 
+> functional Cobalt Qube2 (MIPS 32/64) with these adapters connected 
+> directly over PCI:
+> 
+> 00:07.0 Ethernet controller: Digital Equipment Corporation DECchip 
+> 21142/43 (rev 41)
+>         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
+> ParErr+ Stepping- SERR- FastB2B- DisINTx-
+>         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
+> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+>         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
+> bytes
+>         Interrupt: pin A routed to IRQ 19
+>         Region 0: I/O ports at 1000 [size=128]
+>         Region 1: Memory at 12082000 (32-bit, non-prefetchable) 
+> [size=1K]
+>         Expansion ROM at 12000000 [disabled] [size=256K]
+>         Kernel driver in use: tulip
+> 
+> 
+> 00:0c.0 Ethernet controller: Digital Equipment Corporation DECchip 
+> 21142/43 (rev 41)
+>         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
+> ParErr- Stepping- SERR- FastB2B- DisINTx-
+>         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
+> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+>         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
+> bytes
+>         Interrupt: pin A routed to IRQ 20
+>         Region 0: I/O ports at 1080 [size=128]
+>         Region 1: Memory at 12082400 (32-bit, non-prefetchable) 
+> [size=1K]
+>         Expansion ROM at 12040000 [disabled] [size=256K]
+>         Kernel driver in use: tulip
+> 
+> the machine is not currently on a switch that I can control, but I can 
+> certainly try to plug in the cable and see what happens, give me a 
+> couple of days to get back to you, and if you don't hear back,  please 
+> holler. Here are the bits of kernel configuration:
+> 
+> CONFIG_NET_TULIP=y
+> CONFIG_TULIP=y
+> # CONFIG_TULIP_MWI is not set
+> # CONFIG_TULIP_MMIO is not set
+> # CONFIG_TULIP_NAPI is not set
 
 
