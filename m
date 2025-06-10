@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-196167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74287AD3C12
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:01:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B98BAD3C1C
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2B047B091A
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:59:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2A63AB5E5
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4254A23717C;
-	Tue, 10 Jun 2025 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392C4238173;
+	Tue, 10 Jun 2025 14:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KeQSNh67"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M5rL0v3E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199A5235052;
-	Tue, 10 Jun 2025 14:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10598238159;
+	Tue, 10 Jun 2025 14:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749567592; cv=none; b=GBJoq75wZiXZCzM+PK28fNLxM5NnWXvEMAM7y7eUzF7v10R2K4lF61YpTJEEDCdAcGI7SUaubN0nGzjJArjjFaLJIUPFeDwZJbeEVusDPmqjaXJ7eEWSGRoJpeTXI+OEpRo57/bif1VfKr4a6XS/2eqOAp4HIX+ozDHGWOIu/jM=
+	t=1749567594; cv=none; b=mirnhCxBVyFEBi3rxlQCqGXWf9WXIWK8M2u0D6GtfLy2bNISr8k+UnCQVUHYHK95RH/DaHdfJt8P8y8OxLvLOYCKV2nlGQ82JVFYUNKtplZoKi2X2yhuAWH91U4GC3t8fiH1cfN5U8ZZMMOFRoycYWy3R9q+BMfs5Q8WYjEHWzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749567592; c=relaxed/simple;
-	bh=sDvBzK8bp/Z2sPKX3249YaEV241YJ6Xk50FlZaY0KPY=;
+	s=arc-20240116; t=1749567594; c=relaxed/simple;
+	bh=fIUtfKsTxdswV0+z7NV6Nx2ljCgH4pcViNimfWT3u1o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fLrW9rnCQiNCHW8cAme4p/Mk+eof+s+X0eb8VsIjehYHb3MgeLeOm3O3ISltyu2UVEInC81hEFNgjIOze6reE4mIGhxSDy7/17wnQxMql/cRe0KhusDGsfY+QyJs9yiJrRk7QQqJXoEV3dYY1YzOAfFtOp4Pgkoga47TnTjZAus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KeQSNh67; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1747C4CEF3;
-	Tue, 10 Jun 2025 14:59:49 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ehTUnf8Np9GQzyuOcw5xf4fbDUWfZ1NoBlr076x834hWNxoYUIeYbbySZuOeHI0LZP6BYvXg9sBkocTFX7eJra4xYPpiDZdav3C/N2sPWOp5Ua7x5WxoPCkYlGrEy646QxBcaT9anLGuxOrlnqdWdI+PQfvyH5CVne2Do58CnxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M5rL0v3E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA0AC4CEF0;
+	Tue, 10 Jun 2025 14:59:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749567591;
-	bh=sDvBzK8bp/Z2sPKX3249YaEV241YJ6Xk50FlZaY0KPY=;
+	s=k20201202; t=1749567593;
+	bh=fIUtfKsTxdswV0+z7NV6Nx2ljCgH4pcViNimfWT3u1o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KeQSNh67vtUl8X+urRiWp3K5tMh7rnfFMmHK7G5oCLikDHNqMdMQzb/j4Ifkai5Ot
-	 AX0DL+YdUTSzU2mjcgvaYEIWOJfQ8gbXL5LPqi66YWOkVWFJPk3AeEshbzA8aK9TKM
-	 QDSTpH7jSuaxbX8O/HlH55+ZiI4SOmUjs2QlzwRUDvdFTUUXSuZyt809rnG81xFm+h
-	 tTgVakiOIGJLRINsQSEiNvdTr9nDBsm742C2JYISKeZgOslotzNZzB3bnezbLsiFce
-	 bm+p6qEfbJRP18+bNo9jzA6OqemnBCIvNCpkLP1Rja4ATnoxEL61dPtlz+LUSculXd
-	 nRzLOlZGIvoEA==
+	b=M5rL0v3EHgtzm1+YPuRcK2PSIOLO9mlfBdonjLj5F4sfLQypAm1+pB1TXYtMM7fpk
+	 6KLgCw5CkKufVZ1l0tkGw6xLxxX/1vMyCfzgLNZDdN0DPv0EyOAfhqHmBB0Xe1KO+1
+	 0VXLviw2MPa0tpydfSLnut1HqjP2FFqsjAGEc4/FTXyy/RH6I9ZFP6zdePgiG18yB7
+	 nZA7IqiEUXYtL9A2aSJbrsJRp7YASgQqfFnSb1gSFuPq4wi3h+r+yV04K2vTORqz9D
+	 HL8+Be9UTgYmTKddM1NeJzxOOM9X2twBrT9nli2s8bAMgU1mtfuj1CAOEjKH/cvfFr
+	 toNQhgU8MIaXA==
 From: Jeff Layton <jlayton@kernel.org>
-Date: Tue, 10 Jun 2025 10:59:24 -0400
-Subject: [PATCH v14 4/9] ref_tracker: add a static classname string to each
- ref_tracker_dir
+Date: Tue, 10 Jun 2025 10:59:25 -0400
+Subject: [PATCH v14 5/9] ref_tracker: allow pr_ostream() to print directly
+ to a seq_file
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250610-reftrack-dbgfs-v14-4-efb532861428@kernel.org>
+Message-Id: <20250610-reftrack-dbgfs-v14-5-efb532861428@kernel.org>
 References: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
 In-Reply-To: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -74,166 +74,85 @@ Cc: Krzysztof Karas <krzysztof.karas@intel.com>,
  dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
  Jeff Layton <jlayton@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6203; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=sDvBzK8bp/Z2sPKX3249YaEV241YJ6Xk50FlZaY0KPY=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoSEhcWfgeOiWExVMYAVfWu2ssAvojdefj6czlX
- EPvRCHNdzeJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaEhIXAAKCRAADmhBGVaC
- FcsVEAC64sXyuR2WZW/x+h4KSMGEHpc//yvFp/Ov7veq6oSj/eRBsP/KlrajR1lHp8HB2hYxHZT
- gcbk6tElrXzn6oBZI/mhqfNoQBZO/zVvZFMmQOOwp5pNDwNZ49xvaisZagoY53HpzGawJ78okzB
- VJ3aHnSWdX9Ujn+OnevEELBTDfmgIFzd1KXJaYCAJmcvrEXifmixP/H4d6tiQBc+ZpW89ui7r3G
- T5yy9sEA9AkYEupq/7ajW6bWM/n/PR8H91HUrVusMhAK/6ycPF+mQQ+vc0rOvZHVrXMcttApHRo
- ZuVFHzt4UWma58r5K9H4N0NezCteZKOHAk2cA+Vs3S6/PNA8kOQGeaktuno+JRRuDxP1lu7CALV
- k21b3T1P7ZyivUpTMRzN8i3gq2Gwfl3S139JwrLBvABa+gX9tBg/0WtVdDhT0PP2j3+ZHE8lpsX
- I/h0KVwpdC8KHr6H5JzxoXHD20d02X2ffAoiKa6qBm1eWYAFys6pZEqL/ov47SmoPIr17XE4PIL
- B4CsrwIHUmvkewbsxD3HGqyGq5VZ4Oy76g7MN+qmZD8XBYa0IEsT93Ily2hvxOr4QIytUQpoC+l
- v7SXh+o1AV66OClZ4mv8qxs7dgMiNnaTMiFkmW5nmRUWXOgIjPHCnLI+6z01N70F48QkSLKTc8G
- 00vTZjdfJQx6DuQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1919; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=fIUtfKsTxdswV0+z7NV6Nx2ljCgH4pcViNimfWT3u1o=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoSEhcnHtf/8juAzoak1v6poZL6p29vAqIwvQWR
+ a6pOohhBWyJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaEhIXAAKCRAADmhBGVaC
+ Ff+HD/9vTdoNPo+3wTbGpEMt9ydg3c6ivO2MrcOnnHyyGvkoa/t7uiHV1J93vQln5SQpAnQpjls
+ RtfB3oXiuxy3z/9it2bTtHqUlES5HpHDPhycMos5uAtjlPpFYVUkGUnKKlSEzzMjfK3xzHyOmE7
+ 1Aq3rXvaqxSU+SnxZRRVBECoSZn8Al1Wm7WRrpwmqGi38RD9zMBgl7VrqVcrSBwYe+WBaXg7erF
+ VvajFxbiIRvv4CBFvVyhv3RXPWvknXC3sPs9mt2DEqpcEG3tuLsZUn4+EUBJedDdSwJK4UyaGcE
+ k5pbvKZrUzUIzb0RNDlqYC76ej9KTT4I3UlqoLr8X3aoMSdM2vwmxQ3ve6UNL5DnHz89wzkwurZ
+ E/B8XiseC1+x3kMON/Gcrwvu7v4hdggbPZdksjrgCQrCISoF4ka5AHjvh2/34bFCgbPjgDfBtbM
+ iRj7E/OSQ6niXden1KFkbuekkrg/tP9B9/tYQMekqzw6kULbB7idAJF8eQWNqN7caOcHLoiEfYu
+ ctfKLA0JCrrxTsBlPTjsKVW6PQvtMNf74ZwPHPDoe4TR2wlKNTpv6j/Wnod5L6VCoCIz/fbkZb0
+ crqSXwCGeryhbAdVz1gwGlD3m143OGGHltOGC83GRviAcRp+Vh6uwjx4EwcuLED38MCuvB88dUC
+ RpjWRF4q3ehSslw==
 X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
  fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-A later patch in the series will be adding debugfs files for each
-ref_tracker that get created in ref_tracker_dir_init(). The format will
-be "class@%px". The current "name" string can vary between
-ref_tracker_dir objects of the same type, so it's not suitable for this
-purpose.
+Allow pr_ostream to also output directly to a seq_file without an
+intermediate buffer. The first caller of +ref_tracker_dir_seq_print()
+will come in a later patch, so mark that __maybe_unused for now. That
+designation will be removed once it is used.
 
-Add a new "class" string to the ref_tracker dir that describes the
-the type of object (sans any individual info for that object).
-
-Also, in the i915 driver, gate the creation of debugfs files on whether
-the dentry pointer is still set to NULL. CI has shown that the
-ref_tracker_dir can be initialized more than once.
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- drivers/gpu/drm/display/drm_dp_tunnel.c | 2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c | 4 +++-
- drivers/gpu/drm/i915/intel_wakeref.c    | 3 ++-
- include/linux/ref_tracker.h             | 4 ++++
- lib/test_ref_tracker.c                  | 2 +-
- net/core/dev.c                          | 2 +-
- net/core/net_namespace.c                | 4 ++--
- 7 files changed, 14 insertions(+), 7 deletions(-)
+ lib/ref_tracker.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index 076edf1610480275c62395334ab0536befa42f15..b9c12b8bf2a3e400b6d8e9d184145834c603b9e1 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
+diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
+index 42872f406b2a91b5bc611405cae7ce883fd8ed22..73b606570cce9e551d13e65365a87dc4ce748b13 100644
+--- a/lib/ref_tracker.c
++++ b/lib/ref_tracker.c
+@@ -8,6 +8,7 @@
+ #include <linux/slab.h>
+ #include <linux/stacktrace.h>
+ #include <linux/stackdepot.h>
++#include <linux/seq_file.h>
  
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 8d9f4c410546e4144d4bc8bbc6696f3bd9498848..90d90145a1890bf788e789858ddad3b3d8e3b978 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -59,7 +59,9 @@ static struct drm_i915_private *rpm_to_i915(struct intel_runtime_pm *rpm)
- 
- static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
--	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT, dev_name(rpm->kdev));
-+	if (!rpm->debug.class)
-+		ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
-+				     "intel_runtime_pm", dev_name(rpm->kdev));
- }
- 
- static intel_wakeref_t
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 07e81be4d3920febece34709c63a63204a41583c..21dcee7c9a659ac1fb0aa19f3018647be3bda754 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -114,7 +114,8 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 			 "wakeref.work", &key->work, 0);
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
--	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, name);
-+	if (!wf->debug.class)
-+		ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
- #endif
- }
- 
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index a0a1ee43724ffa00e60c116be18e481bfe1d1455..3968f993db81e95c0d58c81454311841c1b9cd35 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -19,6 +19,7 @@ struct ref_tracker_dir {
- 	bool			dead;
- 	struct list_head	list; /* List of active trackers */
- 	struct list_head	quarantine; /* List of dead trackers */
-+	const char		*class; /* object classname */
- 	char			name[32];
- #endif
+ #define REF_TRACKER_STACK_ENTRIES 16
+ #define STACK_BUF_SIZE 1024
+@@ -66,6 +67,7 @@ struct ostream {
+ 	void __ostream_printf (*func)(struct ostream *stream, char *fmt, ...);
+ 	char *prefix;
+ 	char *buf;
++	struct seq_file *seq;
+ 	int size, used;
  };
-@@ -27,6 +28,7 @@ struct ref_tracker_dir {
  
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
-+					const char *class,
- 					const char *name)
+@@ -301,6 +303,30 @@ EXPORT_SYMBOL_GPL(ref_tracker_free);
+ 
+ static struct dentry *ref_tracker_debug_dir = (struct dentry *)-ENOENT;
+ 
++static void __ostream_printf pr_ostream_seq(struct ostream *stream, char *fmt, ...)
++{
++	va_list args;
++
++	va_start(args, fmt);
++	seq_vprintf(stream->seq, fmt, args);
++	va_end(args);
++}
++
++static __maybe_unused int
++ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
++{
++	struct ostream os = { .func = pr_ostream_seq,
++			      .prefix = "",
++			      .seq = seq };
++	unsigned long flags;
++
++	spin_lock_irqsave(&dir->lock, flags);
++	__ref_tracker_dir_pr_ostream(dir, 16, &os);
++	spin_unlock_irqrestore(&dir->lock, flags);
++
++	return os.used;
++}
++
+ static int __init ref_tracker_debugfs_init(void)
  {
- 	INIT_LIST_HEAD(&dir->list);
-@@ -36,6 +38,7 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dead = false;
- 	refcount_set(&dir->untracked, 1);
- 	refcount_set(&dir->no_tracker, 1);
-+	dir->class = class;
- 	strscpy(dir->name, name, sizeof(dir->name));
- 	stack_depot_init();
- }
-@@ -60,6 +63,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
-+					const char *class,
- 					const char *name)
- {
- }
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index b983ceb12afcb84ad60360a1e6fec0072e78ef79..d263502a4c1db248f64a66a468e96c8e4cffab25 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index be97c440ecd5f993344ae08d76c0b5216c4d296a..12cf4e5ae9c5437bcfec657e37b7e08792bc14bf 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11715,7 +11715,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index ae54f26709ca242567e5d62d7b5dcc7f6303da57..aa1e34181ed6f353921a23411fa227b612db661a 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -403,8 +403,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
+ 	ref_tracker_debug_dir = debugfs_create_dir("ref_tracker", NULL);
 
 -- 
 2.49.0
