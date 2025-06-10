@@ -1,97 +1,172 @@
-Return-Path: <netdev+bounces-196070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14441AD36EA
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:44:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3B4AD3716
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 14:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2728E17982F
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CF843BCAE1
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03652298259;
-	Tue, 10 Jun 2025 12:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZnxpDKS1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259942989A3;
+	Tue, 10 Jun 2025 12:37:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA6729825A;
-	Tue, 10 Jun 2025 12:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26952BD585
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 12:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749558991; cv=none; b=nf3mKklsQZRpPKJMWiP1bx0x9icSq4iePbdhLiOHsX96ofgY/LNIfQBxVAcaFsebl12OAeCubuofIVWP6Vuq+RbhOwlXmK10jOFfQ6iSEQl9i4+PHn7Zzk87pOszXvrB7eGR79gj2ch9DyjjC0VKMKo/9LqZwGvmZoNGfX3Zhh4=
+	t=1749559028; cv=none; b=NnVuFXh6PlVhaNvp0BMovoppr+sTqQvmVCrRa+IVdbx8CdCHb1k0+HL0Yq3vTarTRJS0C83qt3YbAHBXiK8VkAZxhYU8E/REzD5YYp/XnYbyezNSfM+QN/suoy1jpL/g92d1rQJzGuQr0pZTyZDDHQSxS9fAFYQ+UIujK8iODgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749558991; c=relaxed/simple;
-	bh=eb78fjp8O59KlG+tYk+l3V8QOJEcFRCWcHwDZA9xSp0=;
+	s=arc-20240116; t=1749559028; c=relaxed/simple;
+	bh=Y2+mkO42/awpZM2bLETZj0n6m3//E5rkkcfN2qCdTaU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K7Lc76qO8JiOGH7n2ajST3kyl47g6jFFbQkkxxTEzOW46R0azj1UeJlEo6ry6g2DtUGML6MCaqX0qx3PGPb9gQZ1ROk4wnxDIw2tpyQUGJ68+ZnuGBBc0URFN2ejlVj3cPaBjefRPFRHYcU+QeCGCrdjvLCi+yefFymUWPfQAu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZnxpDKS1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Zae5DDEfWQ2jhoUpOo4fsJWUq416KZg0lCS/OrSRA1c=; b=ZnxpDKS1meMC/Bbkof7RKRlORU
-	AbL7MuoMDJRz6IS65M8b94uiB9LbBiHxtFDy8FsC8YijVz47W/xs0uB/5CT9JvWW7jEeYCLzrW1UB
-	9vI4VEmkKAVx8XejaRV7lvuPZU1mfwcDJGRGEwXexxIoGVPUV/N2h4U0GsxY3TO2CrOw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uOyDF-00FGHX-WF; Tue, 10 Jun 2025 14:36:22 +0200
-Date: Tue, 10 Jun 2025 14:36:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=e3grU1GtavOrJK985UFZPsD1zWSNY3+1zibwOWGb8KQod0KSVnGOm42j5PpHfY6CF/GrYYR/Vs1yzwA/2yMEnrE3qlZStQvlm4wrF9qc4y7XGJvMh20HL2NEICjciYS4BFv2k4m5YyMz3T6Hu1BID7Pk0zdMkvfz8Tec94eUgbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyDd-0004QT-5V; Tue, 10 Jun 2025 14:36:45 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyDb-002mF7-2Q;
+	Tue, 10 Jun 2025 14:36:43 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uOyDb-004pqg-1x;
+	Tue, 10 Jun 2025 14:36:43 +0200
+Date: Tue, 10 Jun 2025 14:36:43 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 2/3] net: phy: micrel: Add RX error counter
- support for KSZ9477 switch-integrated PHYs
-Message-ID: <f8f953d5-a35a-4054-a853-3b04ae9b2c67@lunn.ch>
-References: <20250610091354.4060454-1-o.rempel@pengutronix.de>
- <20250610091354.4060454-3-o.rempel@pengutronix.de>
+	David Jander <david@protonic.nl>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/3] net: phy: dp83tg720: implement soft
+ reset with asymmetric delay
+Message-ID: <aEgm25HcomOxE8oX@pengutronix.de>
+References: <20250610081059.3842459-1-o.rempel@pengutronix.de>
+ <20250610081059.3842459-2-o.rempel@pengutronix.de>
+ <534b3aed-bef5-410e-b970-495b62534d96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250610091354.4060454-3-o.rempel@pengutronix.de>
+In-Reply-To: <534b3aed-bef5-410e-b970-495b62534d96@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Jun 10, 2025 at 11:13:53AM +0200, Oleksij Rempel wrote:
-> Add support for tracking receive error statistics from PHYs integrated
-> into the KSZ9477 family of Ethernet switches.
+On Tue, Jun 10, 2025 at 02:16:39PM +0200, Andrew Lunn wrote:
+> On Tue, Jun 10, 2025 at 10:10:57AM +0200, Oleksij Rempel wrote:
+> > From: David Jander <david@protonic.nl>
+> > 
+> > Add a .soft_reset callback for the DP83TG720 PHY that issues a hardware
+> > reset followed by an asymmetric post-reset delay. The delay differs
+> > based on the PHY's master/slave role to avoid synchronized reset
+> > deadlocks, which are known to occur when both link partners use
+> > identical reset intervals.
+> > 
+> > The delay includes:
+> > - a fixed 1ms wait to satisfy MDC access timing per datasheet, and
+> > - an empirically chosen extra delay (97ms for master, 149ms for slave).
+> > 
+> > Co-developed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > Signed-off-by: David Jander <david@protonic.nl>
 > 
-> The integrated PHYs expose a receive error (RXER) counter in register 0x15.
-> This counter increments when the PHY detects one or more symbol errors
-> on a received frame. The register is cleared upon reading.
+> Hi Oleksij
 > 
-> Changes include:
-> - `kszphy_update_stats()` to accumulate the RX error count.
-> - `kszphy_get_phy_stats()` to expose this count via ethtool PHY stats.
-> - Addition of a private `rx_err_pkt_cnt` field in the driver.
-> - Registration of `.update_stats` and `.get_phy_stats` callbacks in the
->   KSZ9477 PHY driver structure.
-> 
-> The functionality of this counter was confirmed by physically disturbing
-> the signal lines - specifically by wiggling exposed twisted pair wires and
-> intentionally shorting between pairs. These actions triggered RXER
-> increments, validating the counter's behavior.
-> 
-> This RXER counter is confirmed for KSZ9477 and likely applicable to
-> other related PHYs like those in KSZ9313.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Since you are submitting it, your Signed-off-by should come last. The
+> order signifies the developers who passed it along towards merging.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Ack. checkpatch blamed it, so i changed the order.
 
-    Andrew
+> > ---
+> >  drivers/net/phy/dp83tg720.c | 75 ++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 65 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+> > index 7e76323409c4..2c86d05bf857 100644
+> > --- a/drivers/net/phy/dp83tg720.c
+> > +++ b/drivers/net/phy/dp83tg720.c
+> > @@ -12,6 +12,42 @@
+> >  
+> >  #include "open_alliance_helpers.h"
+> >  
+> > +/*
+> > + * DP83TG720 PHY Limitations and Workarounds
+> > + *
+> > + * The DP83TG720 1000BASE-T1 PHY has several limitations that require
+> > + * software-side mitigations. These workarounds are implemented throughout
+> > + * this driver. This section documents the known issues and their corresponding
+> > + * mitigation strategies.
+> 
+> Is there a public errata you can reference?
+
+The PHY Reset Sequence on polling is described in the "DP83TC81x,
+DP83TG72x Software Implementation Guide", A Appendix:
+https://www.ti.com/lit/an/snla404/snla404.pdf
+
+I do not have access to the errata sheet.
+
+> > + *
+> > + * 1. Unreliable Link Detection and Synchronized Reset Deadlock
+> > + * ------------------------------------------------------------
+> > + * After a link loss or during link establishment, the DP83TG720 PHY may fail
+> > + * to detect or report link status correctly. To work around this, the PHY must
+> > + * be reset periodically when no link is detected.
+> > + *
+> > + * However, in point-to-point setups where both link partners use the same
+> > + * driver (e.g. Linux on both sides), a synchronized reset pattern may emerge.
+> > + * This leads to a deadlock, where both PHYs reset at the same time and
+> > + * continuously miss each other during auto-negotiation.
+> > + *
+> > + * To address this, the reset procedure includes two components:
+> > + *
+> > + * - A **fixed minimum delay of 1ms** after issuing a hardware reset, as
+> > + *   required by the "DP83TG720S-Q1 1000BASE-T1 Automotive Ethernet PHY with
+> > + *   SGMII and RGMII" datasheet. This ensures MDC access timing is respected
+> > + *   before any further MDIO operations.
+> > + *
+> > + * - An **additional asymmetric delay**, empirically chosen based on
+> > + *   master/slave role. This reduces the risk of synchronized resets on both
+> > + *   link partners. Values are selected to avoid periodic overlap and ensure
+> > + *   the link is re-established within a few cycles.
+> 
+> Maybe there is more about this in the following patches, i've not read
+> them yet. Does autoneg get as far as determining master/slave role? Or
+> are you assuming the link partners are somehow set as
+> prefer_master/prefer_slave?
+
+This PHY do not support autoneg (as required for automotive PHYs),
+master/slave roles should be assigned by strapping or from software to
+make the link functional.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
