@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-196340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95DAAD44EE
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:41:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7132AD44F8
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 23:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11FC3189E059
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 21:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB30717673B
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 21:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2FC284B4F;
-	Tue, 10 Jun 2025 21:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FE426980D;
+	Tue, 10 Jun 2025 21:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ft4a7voO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/2kXy8w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F89266B6B;
-	Tue, 10 Jun 2025 21:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EDD245007;
+	Tue, 10 Jun 2025 21:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749591649; cv=none; b=k+ALiJaXnqe/BKJ9IClvIhnNZ2zztsLq7fgQIbKJZ8MMf0o89tYLkdk5fXEVx4e86he065LJLvrXIW+ajQBA96CzOHD18VloNLmVVM85WPT2nMwQwP+yEb537NOSGwSDKnY/pOTdtulUnpqFyrbfsS6AMSEatavmmqcQyoixr94=
+	t=1749592199; cv=none; b=UnDqZUMDMYRP2GW6IBgpiDBNF27JF5Pu7KMnH4soItdIfJGqXbv31L3aF0VTCFw+n+y5Sqam5vJxYHsu5N1vC9qJdMcfxXthcWwcbcYxcfTpFV/cqq9NV/lNbuQF0dSeRlKfslk5mehP7ZuJPAQHE50iNSQaYkxcfaNa4Fyuai4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749591649; c=relaxed/simple;
-	bh=BZq6T1x4KIZtBIcys6uVoEwFxLpJVCHmantsmFcGQDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q5FBasJ99GJ5+g17sChNtEWAVsROJrIFhvrgslUCGEO54bX9foHsjJ4QZr69SgOmeRI2MKOUE53u6NhLg5V8uj9mDBswk5XoQDMzxzZL4CJNvNTUxOJUzUJw1uPyTzfqniaILtnuVF9hqtCVlCqMQxg4N4OXi0fHzV5SJ3USWUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ft4a7voO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADAF8C4CEED;
-	Tue, 10 Jun 2025 21:40:47 +0000 (UTC)
+	s=arc-20240116; t=1749592199; c=relaxed/simple;
+	bh=3v3KDffzGVIHhQCWFOO/7kXK7VpNLiWoC7TKe7D8+ZA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=n4wD/lunirSxQWx+Pm65aoy7M0zY1TQZHwauC9rx4SDoSp40ZLYAjqpvTJUQDjoFWpSuapvLjZBc+Vr1iC/vLBt9TRJbKDzdeqJaG5nRJv9imERxB338z26Ochxt5+7tUbEhIiusQUvkwrskBer6JyZdk/RkGsv7/ATOD5ZF6QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/2kXy8w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F73FC4CEED;
+	Tue, 10 Jun 2025 21:49:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749591649;
-	bh=BZq6T1x4KIZtBIcys6uVoEwFxLpJVCHmantsmFcGQDs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ft4a7voOspcJwOWlf2EJmAVYLdTwes/6C5mrPYEB+sfdxJnHknBXJDch63NcfTcya
-	 uw+ct359WqwFSpW0sL4Ap7YbemhUGP00JxAitl+L+b1D8ZBQQzy0ajLO0L0TzuJRye
-	 9mKDxnSpHoy4oXH51K1FDYuKPsqblCQ2S0FWOcXtBJpk4H046OHLD1wLZ0BeyCQ1Ni
-	 twP0D0mMA1f/eHtzCvB3Zk4J4qOEhYZY/24EU8IIIBylNkIwaNYok7PyxQIDkV6Cqn
-	 srrMJJtUnzfPXP6DSVfLeYDkb3oYr9zYDIEm3vijDdolOy1X+NHkyZZtMMEdO44ApE
-	 rtgj5rgUhxTcQ==
-Date: Tue, 10 Jun 2025 14:40:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>, Yury Norov
- <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron
- <Jonathan.Cameron@huwei.com>, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, Long Li
- <longli@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas
- <bhelgaas@google.com>, Rob Herring <robh@kernel.org>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Krzysztof =?UTF-8?B?V2lsY3p577+9fkRz?=
- =?UTF-8?B?a2k=?= <kw@linux.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Haiyang
- Zhang <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Konstantin Taranov <kotaranov@microsoft.com>, Simon
- Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>, Maxim
- Levitsky <mlevitsk@redhat.com>, Erni Sri Satya Vennela
- <ernis@linux.microsoft.com>, Peter Zijlstra <peterz@infradead.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, Paul Rosswurm
- <paulros@microsoft.com>, Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v5 0/5] Allow dyn MSI-X vector allocation of MANA
-Message-ID: <20250610144046.1deba9f3@kernel.org>
-In-Reply-To: <1749476901-27251-1-git-send-email-shradhagupta@linux.microsoft.com>
-References: <1749476901-27251-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=k20201202; t=1749592198;
+	bh=3v3KDffzGVIHhQCWFOO/7kXK7VpNLiWoC7TKe7D8+ZA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=J/2kXy8wfSc5VREM5/rp6OlcwFkpNwr35MByowjDjJImTKIhiu6sHp4oJv1zM/gWG
+	 ldOegAUosq8s1V7DLTguiFCilktgfZ9Lwhm5uZMrzO4fUTJc9xjPIHDh0Ib0D2ImbN
+	 fw0lrqhHBXoRvNwY03mrvywhzMEI3s4kHdMgee6fCLp5Bs2QsiK4EviK2UwxuEoFig
+	 8cDLqozqYmjFKfUiIPZ22LhBrxhtb3dr48faWOhYWJ4Tpbc5FF1+3HZJ5V6IU3yEq3
+	 toitefVVrF2tSFc1h248UF5p6780T9stRESefiYh0K4253VpO12pkaksUCoG29OYcP
+	 C78mtbtoGaJUw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D8538111E3;
+	Tue, 10 Jun 2025 21:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: usb: r8152: Add device ID for TP-Link UE200
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174959222900.2621984.6053351569462412932.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Jun 2025 21:50:29 +0000
+References: <20250609145536.26648-1-lucsansag@gmail.com>
+In-Reply-To: <20250609145536.26648-1-lucsansag@gmail.com>
+To: Lucas Sanchez Sagrado <lucsansag@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon,  9 Jun 2025 06:48:21 -0700 Shradha Gupta wrote:
-> Since this patchset has patches from PCI and net tree, I am not entirely
-> sure what should be the target tree. Any suggestions/recommendations on
-> the same are welcomed.
+Hello:
 
-Could you put these on a branch based on v6.16-rc1 ?
-That why if someone else needs them before the next merge window
-they can pull that branch. The patches look fine to me.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  9 Jun 2025 16:55:36 +0200 you wrote:
+> The TP-Link UE200 is a RTL8152B based USB 2.0 Fast Ethernet adapter. This
+> patch adds its device ID. It has been tested on Ubuntu 22.04.5.
+> 
+> Signed-off-by: Lucas Sanchez Sagrado <lucsansag@gmail.com>
+> ---
+>  drivers/net/usb/r8152.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: usb: r8152: Add device ID for TP-Link UE200
+    https://git.kernel.org/netdev/net/c/dc9c67820f81
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
