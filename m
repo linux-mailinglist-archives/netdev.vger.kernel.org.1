@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-195938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C3EAD2D73
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 07:43:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0076FAD2D75
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 07:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C60F16FA7F
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:43:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF7E216AC45
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 05:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A841425EFBE;
-	Tue, 10 Jun 2025 05:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2151219312;
+	Tue, 10 Jun 2025 05:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmbfDGIV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQ7ss50l"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF2E259CBF
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 05:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064221F874F
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 05:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749534221; cv=none; b=YyJX1Gf16Vk6//8uHJGL596sIDhqlz96AblQQKyJDo4ZSKtYua/UplDocdvMei64W7zUjVEaVLh6HznH228j5v2EaadWDOSK8rbOwbOLCJO/kltTuH0wv1PJhHSiBRawOqbJPa/KYFwN243O7qBOekZxPgbPOzTVnCxL6fe7IkA=
+	t=1749534364; cv=none; b=eaAFbjytDHQQ+Dji8N1LT/rgkIcWQMxh9exwqP4gLfU3ekqjFeHhSrZHiS5DMa9CNpOFvqu/t2UpMKmg+vup3sJg9HvAQ/etvM/Liopl/COfdc15vHA1an0Odc9H8prl0TtIqb3NrcSBS8ZnEfGctquzR0nLXWIEbvkY7gp1ics=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749534221; c=relaxed/simple;
-	bh=TpZQUkZD/0/znO/mvohm8jB09vSGl+Ce1dJ4Zn7aiXE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=QosRlnR056GpJbRpV/aWxh4GakNGeRalI7CduTaCjGTxgdHsv0MUT8B00Eog1XCyLK4/XrOjzgcnisdl1R2Gltk8q+lKjsALppwk5L9fm/FGFPenFN61WdzUdRZYFGunvc6a+/W5tsC+m/zu9jivyCKUUPOaWlyzwpvk7GETqZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmbfDGIV; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1749534364; c=relaxed/simple;
+	bh=MTjpBDz0SA7I2SCflgEOiH6t0+ZjfFciUf3iPa8qbhQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Tvn1bUd36peNzkoH2LNtMHtIxgBkyy9uqUYYmpRvG6wamVDnhGO7O0mT0uWfyyuJN5ACRovD2KfpZZtp5jRs2uoj/P5XHAqYylowVxgITQ013M1q71lPeC1kvwPJnPYMtubhbq5E5GuOKjJxVdv8uPZn/aVN4kAyNAyPJ9+CLAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQ7ss50l; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-451ebd3d149so30950795e9.2
-        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 22:43:39 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-451d6ade159so41725125e9.1
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 22:46:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749534218; x=1750139018; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749534361; x=1750139161; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=RfRZPZTuFzasJ+ZPz9XWfHK9jyJlUykAcEoNSEdkP+o=;
-        b=nmbfDGIVrgxcT/suXCJXi6aBxTuBHNjuUK62x2+MoUq3S4Noyr24rRchifBhWkmTen
-         yFmwND8KPMh8wvi9ygO2WX9+y0wtWzRAWG+HRY7Ca441A7wX4bb2DZ4PA1WP6op8zeT4
-         CyNf/wbquJFeBVQxLsQgGAZq0k6KIOEcv2RLJM0DplMXaV10xHYEHDXPrPzRBGxA7o6k
-         N1+QNy2zUhWmZDdf3lzae3sp9ynn1AW3zRv/GVnOBSASuX04mdwaL08OpuGC4otpA1tM
-         w6DT1lMi3MxmPKfs9ed3Ei1maT8wjskFAa03v8XDj34/4RTHOPGFcs0Qh5q5jQczYz1b
-         4fng==
+        bh=9ddg6oAkkl7xekYjpMnaN0HodSnQgYl8lcsmC5o35ZA=;
+        b=HQ7ss50lDZRLwhCxsjbD2PoRO8SNrq17//JvGdyzCb+PMMGsuC2JZ69s960l0Eb0RB
+         DavYUUA4rFcYF2yFjGJcJuXbkxNcaXFmEEyn47x25xSJ6bcohNTSGdYSvO2J6r+ZCfgn
+         Uh1hhvEFy0QqpW66fH2jitmWP2HQrFaTk0qCITGNsNzYMcR6qYNz/vLcli9hkDoSC+xY
+         NKjfJsRoPlzmbXIeeK4iNTbOjAE4sEIVV0Rmb4Q4T7l0SDe7xr6TVD3Mu3VG2mM0i9I8
+         aT52NU/7KYiM+HGIMrrGSB3Z98CsTVx0/AkzSlqrGpRkFHG7M3Z9Ypf5QH/jWkU1CleV
+         sWAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749534218; x=1750139018;
+        d=1e100.net; s=20230601; t=1749534361; x=1750139161;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=RfRZPZTuFzasJ+ZPz9XWfHK9jyJlUykAcEoNSEdkP+o=;
-        b=on6UNVK2qnC3zu3rjavxlNJ7gG4f9bReyKKOpcqZjHM0FQnYI9bFMMjSjJI+QJf+j/
-         UxAsflusgzw2H1U4b3AiSVo6fUftUUF5M+2RrzsAYVdU8p8BiT5DQvGNq7iVOaa+5OUr
-         hpOTK5/UDr+Shkpma0c3ALwTGvsJoDVe1D2MDKj59E269QELIcT35NqA8z7R2WPeKjBq
-         tmfV2y98nY1NuNNYYTzkcUEUwtWIptkosLd6NsxgEiX3Uu6av/xurvazYNBum60MRPQG
-         rhNQL3AEkiyonhb3BI8rO+C6zKHBVZZvipqXiFM8J0mJl+pfJBQsJSwwi52m+L4OUHGK
-         /4dA==
-X-Gm-Message-State: AOJu0Yzd3CEF48Gelu+psWySZQKa+xgX6cjY4SJPHiJJfb86G++G/WCj
-	XgCuwy8L3B9ki8eR3uFXHOoscgqWocgQpw1N6yofvOKRgH7CEjgcDAdE
-X-Gm-Gg: ASbGnctfKrjy7ndQfSQRQvgQWz/6+bxc8XEQXo9FoJGm+ckRKWkKR9wZZPu7pDHr+SA
-	/OL5hAOo0wiIjvczlmd4hCvD6wFaj1BHsRMd7C4pAN2H8hZSjTASwXb8TDWdRSJASO8a6bSsYIJ
-	2/Qlk5d/OZ9ExHRV99ybKlZ0GYrcLUVKFEtt5PmOo6h5Un/P6tSrIiP+V2cGvzCOtWyLIZl7XCm
-	PL3cKmmm7XhED8qknFKpjMkd8yIP7CRbH7lU0tdEHeEZkC3WDV57xMCBL/LRW1w2Ewm35+UP1wl
-	+KzatQV9mTTfaJo152z1fB6gjoPEAWqnDL5q6RBQcDo1soJDZ9QSgG5+QrihVDbfjbISk0kzroX
-	kwvZzaewVfQBrhBP/ddJgZEaNlul6NzTEPrNRJlXO5aoh+NuxJqpgeRc8bT4OPA1fDEPK3ieoEP
-	Mar9kunHAfeFAwQrRPT1ag1v3xOQ==
-X-Google-Smtp-Source: AGHT+IGurCMCYp/EVVGHXENyJP4ioW8nHVvD949rBlW/NfNO5jTQmYpqrtzWU+Qkhnx+Az2LVfduxQ==
-X-Received: by 2002:a05:600c:8595:b0:452:fdfa:3b3b with SMTP id 5b1f17b1804b1-452fdfa3c0emr77142435e9.5.1749534217909;
-        Mon, 09 Jun 2025 22:43:37 -0700 (PDT)
+        bh=9ddg6oAkkl7xekYjpMnaN0HodSnQgYl8lcsmC5o35ZA=;
+        b=FycibXZ/kCHWY6gGJn70z7cSDVQ3kXyPOy6S4OK8cHOXqPqFQNLSI9UEBDkNnaWcbN
+         5hpHAgMlAlrgtuteIpcyjJ/XEM6WuzlMGBlGNhnK9M24eVE2HD4ybPXGsO0/7+zlXz+B
+         YoMsOnRUY7mBr4Di9KWkc/Rkt1Npuel1TxIGdCCN3w4ly1jAU2HEf/LTUiV/gXHokI0c
+         IlDb8W9m9gEhIuiFe8r+okHTodCqMpp6Q1DaKkbnX69EDnYX99nUXrXI3bPb4H595Lrh
+         +rtS3RQZdAsdRiQLQaVyyZlINu/jUhNeK4+5etiv/TX7h0KF19XEhqg153JiDTBfMeE/
+         n6mQ==
+X-Gm-Message-State: AOJu0YxrZkbrhNIbXStDjMmnf0K4zZ7M6eQbxwv50fDPkx57lD7mA+3a
+	59Nz0VIr+6qTu58hXnh/euJ5HVOhbM9vnoe++J2zvr69oyArpiHVUrrx
+X-Gm-Gg: ASbGncsqOyyfd99GXcRNBd5R9KzBLarfYDrI2bilCM0vDAUxQ0WZOrjG0dDUpj8o1x0
+	BwOY1dgKbrncIsSyyCkZvjdZsPELS12rf+Kc8g4lsoVG/MpZzJs1h0DF1FtEvWB0CHpUQAtdlo6
+	Ei0rFQSQtooauCpGzjMKNUiH3m2qbHQsJetq/vjEBG70umYyrAR/GP9iXBumkRe6ji2UgBB2gbI
+	j803wlPsxaQGDS4W1PIpFKrjMM+brO4H3FvarPmRHFx+b51+SFZOSq55g/hpzd+8BI8o5phkYpt
+	PP4nj47oifT/Tu43HUSz2sf7iqsyU19gTdufIloxzkfLtdSwmjzC7tqaie4jS7BhOglK0/2xKW3
+	QK0QY8arSNVaH9zgoa4W8y0Cr6b2cFwSM9wjmDEt07QW98bKIf8hipncYi3CtI0Yunc3Trrw/my
+	LqxC/aG2oQZxZndnTgfffcEV+/Hg==
+X-Google-Smtp-Source: AGHT+IFkL1dO8Tz9U1u//CbtdYaXKT1mQfcT1G/X/C2OcwZIJUckzSKBHbUyltJYXCzBWxjVpCVM9Q==
+X-Received: by 2002:a05:600c:19cc:b0:453:1058:f8aa with SMTP id 5b1f17b1804b1-453123f5e09mr63954425e9.15.1749534361115;
+        Mon, 09 Jun 2025 22:46:01 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f1a:8200:19e3:25e6:afd9:6d60? (p200300ea8f1a820019e325e6afd96d60.dip0.t-ipconnect.de. [2003:ea:8f1a:8200:19e3:25e6:afd9:6d60])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a53229de48sm11425881f8f.10.2025.06.09.22.43.37
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-45209bc6d6dsm129458355e9.3.2025.06.09.22.46.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Jun 2025 22:43:37 -0700 (PDT)
-Message-ID: <18ce0996-0182-4a11-a93a-df14b0e6876c@gmail.com>
-Date: Tue, 10 Jun 2025 07:43:38 +0200
+        Mon, 09 Jun 2025 22:46:00 -0700 (PDT)
+Message-ID: <2d81fe20-f71d-4483-817d-d46f9ec88cce@gmail.com>
+Date: Tue, 10 Jun 2025 07:46:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: enable EEE at 5Gbps on RTL8126
+Subject: [PATCH net-next] r8169: remove redundant pci_tbl entry
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
@@ -135,27 +135,26 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-According to Realtek [0] it's safe to enable EEE at 5Gbps on RTL8126.
-
-[0] https://www.spinics.net/lists/netdev/msg1091873.html
+This entry is covered by the entry in the next line already.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 43170500d..013b06182 100644
+index 013b06182..9c601f271 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5262,7 +5262,6 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
- 		phy_disable_eee_mode(tp->phydev,
- 				     ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
--	phy_disable_eee_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
- 
- 	/* PHY will be woken up in rtl_open() */
- 	phy_suspend(tp->phydev);
+@@ -216,8 +216,6 @@ static const struct pci_device_id rtl8169_pci_tbl[] = {
+ 	{ PCI_VDEVICE(REALTEK,	0x8168) },
+ 	{ PCI_VDEVICE(NCUBE,	0x8168) },
+ 	{ PCI_VDEVICE(REALTEK,	0x8169) },
+-	{ PCI_VENDOR_ID_DLINK,	0x4300,
+-		PCI_VENDOR_ID_DLINK, 0x4b10, 0, 0 },
+ 	{ PCI_VDEVICE(DLINK,	0x4300) },
+ 	{ PCI_VDEVICE(DLINK,	0x4302) },
+ 	{ PCI_VDEVICE(AT,	0xc107) },
 -- 
 2.49.0
 
