@@ -1,125 +1,131 @@
-Return-Path: <netdev+bounces-196128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7F11AD3996
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:41:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A830AAD39A0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA6113A9850
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:37:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D31173A29C0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A0A25B2FB;
-	Tue, 10 Jun 2025 13:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8952224AE1;
+	Tue, 10 Jun 2025 13:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg7gc6O6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMwjgDNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78F5246BC0;
-	Tue, 10 Jun 2025 13:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B482119CD0E
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 13:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749562643; cv=none; b=j6VL+PunNSBBy7jjDoNtNKjmJ7FLMXBlLvlHo8ZU4zJz6dqHV6a9hTMk0Sc4lHFZ/R6Rjjy+VWaY8XG1PjC16kB5hyzIu/dG6FMUPUfdCCa2YVcOH9F9+guWqGIQew3BXzKxgDxeSTnbKR4AxTFtV2ijleIosBGBzOy8BSqxhBM=
+	t=1749562779; cv=none; b=pYKn/+oWD1X1cES1XLXFnIgaMuvw/KHBjKdE3nZsyw/1ALwDmk1NATNFJG3C43h+55FrP8JQq81ktYjzufX9/h/SWsnJauhTr3t9AVDMCTTYk2ZCTCEA0422ETDDRMZbIWXxKZ+N+iViviOUaVMD9hmXC56gmUdSfI+mks7Dsz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749562643; c=relaxed/simple;
-	bh=oOWVuLO2T4RnSw7Vz1x2rYEpuImpONyqClwgxnMeXIY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qwtTcSszJhFfyFbtnc/88btBZ+CU7/SsULPyLw+e7F19McTPIG7in0pHdRDNqErLCHkpmQbURsQrHrtjOVMGK5l2HdCvi2k4zZBlvqhKBVUxM4An9JCebicntCp5FHofhqpCfY1j9aj05YUUzVKy21SYH+dtgjIRYjoIp0TWazc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gg7gc6O6; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-70e6bddc30aso44381097b3.0;
-        Tue, 10 Jun 2025 06:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749562641; x=1750167441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xxIrKS/FqjNsM2xFokaxGJ/xqDLh5zv82FrSmAhAsqA=;
-        b=gg7gc6O60ehL72MlXfAL1e+OE34CgQicKulsxHm0M7cftC9h1g89OU1A9lRluBbgzZ
-         Xt+6HH6u2J/pmYxYqFuDXHQHYUuQvP7pG15Nd2qGE9Yt5G2rHjjigpxweKLDAVjKcu4D
-         0dB0apRP7rKQvxOwI/6bzDD1oz4FHtNBMW0iJEFche/uz+Wq4le9bjikDQHsQsw0dysE
-         uIztNU9y4AdSSxDSHbbYVI5D0u4DNm0DaJZoGeTsmv/W+ddbgeoLrWEddiVLJI3worbN
-         UBrkYaZ2wrC1+Tahtcfx5xLxC81LvG/h+UchqQmCjVLUYZM0oUvD0mjVYak+gQ5Sk4dD
-         zkCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749562641; x=1750167441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xxIrKS/FqjNsM2xFokaxGJ/xqDLh5zv82FrSmAhAsqA=;
-        b=wLIuUR1XVdG94ZibIY7mkEi9BwdGyPFK4A80l5v5xDYKZ03v4MxBEWG2rQ0ulZqqsT
-         Vv42tyyA5dGGDpRZDyjHhoKW4Z50T4TEK9igpJtTDTP7dLi50YWvPsWBrhe56hmAsUwT
-         Xkj/S2nCAgpW2arTwUx+iBzf3lwViDYvhgW1Q7WFjE4SKpfXsSl5+x14TLwACWJs5BNc
-         2bU/786YVEuVdak2QyzFpTtBRkHvuTppe77cWpbWgV80/YGaLx7jRDiAy0aMu2MYsU8h
-         ZX6CDnvUZEp3YWhMj8GbmbW+u6L3Ivc2UvMJ61OwVdp47n5bCtBDfNrXnmPVAt3ebfev
-         iLFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUE9kkKii/bSLqeZ6/uun3Cx1yJQgq8dg+nayqnfF21CJZby8+KcJM0YuCPru0CVjPQmYRCfv0t2BcwCtIO@vger.kernel.org, AJvYcCV1QA19AQOC2v7gUIGR+D8OhbPOGkr53I3f1vFNmjPDpU7EBzkKAeDz51OzBSvbg522ELVGm36ApgYW@vger.kernel.org, AJvYcCVvAKK9ga+KzR7fwZDAdrvB7srlAhpjJ31EU+f01aDMarinvEr3hWTv6X/bTP7iBmgiOtF9274C@vger.kernel.org, AJvYcCWHaaDLCUk8LRxgIbt6+3P2dTQbYSJN0I4UF6H9uV7mKSukpGWffZU8l+SP/0Lu6LFbTdQ7PpOT@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWV4d8PKZq1QtX3DsET+AEgqc0LXKSGIZVXTA8DEbb51gICmOv
-	SrZ4M7z20QBzJ1m3tjTJGOcko7jFrn6k9B8WaaPAci3nebXBhOtUu/hiLZG+qBx5/86YtMyMu73
-	sAfKftum2u6DGoEqxcc8nCBlVfdA99mo=
-X-Gm-Gg: ASbGncuzCfsy6C9qkbznRB1hUgypDOfEoO1XMsvWUy/ooeekPT9Eac9wXPLh9pidaB3
-	OeL3QmXA+BJsPv3fKJjzSkJn1dxaa6JXC9sxre2AsY8IMnB3jvS6pLHp72CyCg5CtoPaYCHOGBq
-	X/8LxqJbWbH7xMxEaAo7rex6OSugS7D2jO5QirgQgi3tJgydlbk0HWn0wHlgrDLIlTIf3iIKHdv
-	WE6Xz7oH1LALJE=
-X-Google-Smtp-Source: AGHT+IFM1XwmtOLu46/6hnB8HE+OYFSHJX6Sjmr/fbwlTVJpbAdiZS0DZi1jGEnlfK67xiMSjcPRgzR6HPYhzLNQ7ZQ=
-X-Received: by 2002:a05:6902:98f:b0:e81:86ae:2c40 with SMTP id
- 3f1490d57ef6-e81a213224cmr24404325276.19.1749562640474; Tue, 10 Jun 2025
- 06:37:20 -0700 (PDT)
+	s=arc-20240116; t=1749562779; c=relaxed/simple;
+	bh=5avbO0Ao+zxHI6T3ghbReJ8vJ24StY6YPNICgLkqxcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wd6JcSM4V6nCEFuR1DM4yIl+bYQAhYnZanKFVsF1aspk7Ur22ak/+QXb1TAbU04H1TPWEPoAREGBhmJp8vqklStFQf0kQOoWorctwJkcwMmWlzHgp42hnvEgT//aKLayLS7mnEJPArEJb+TER1jsqHNTYI3aPSUgb+nyevCTCbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMwjgDNq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98201C4CEED;
+	Tue, 10 Jun 2025 13:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749562779;
+	bh=5avbO0Ao+zxHI6T3ghbReJ8vJ24StY6YPNICgLkqxcg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JMwjgDNqWfSZV7W/JGiCqq0dEE/Ye+1kfAkZ4XV203t6F946jc0EF3npK/Q0wEoBc
+	 HL3ts1Xs+3/PBc9SYwPFCnM2z+MUvlnvqBO1CV6oc8asYfAFiUzYoTylPqc7H7yohn
+	 OzIYm+Tg5rTndx68BhsYHcdrKJ4seqHsBT6KkrgKQK6qpM8Lhv+lVrFkAL3iJu/r10
+	 yqq+/QgT1qixROOTMkGFuHsEN6XhDY3/mIBul+to91IbppkSLTQLOBNFgRGGwEedBA
+	 6RyXf6IeA24zeCsEByscH8ScHnys5UR72nWZesf6nZSo2pGx7we8ieg/YloSN2QFu4
+	 BqHGpXGyuC9jw==
+Date: Tue, 10 Jun 2025 15:39:34 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
+Message-ID: <aEg1lvstEFgiZST1@lore-rh-laptop>
+References: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
+ <CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605105449.12803-1-arefev@swemel.ru> <20250609155729.7922836d@kernel.org>
- <5f821879-6774-3dc2-e97d-e33b76513088@trinnet.net> <20250609162642.7cb49915@kernel.org>
- <4cfc85af-c13a-aa9c-a57c-bf4b6e0f2186@trinnet.net>
-In-Reply-To: <4cfc85af-c13a-aa9c-a57c-bf4b6e0f2186@trinnet.net>
-From: Dan Cross <crossd@gmail.com>
-Date: Tue, 10 Jun 2025 09:36:44 -0400
-X-Gm-Features: AX0GCFvn-7qD2cihhzkYj_5iK1X4T6iJ_-iI3ppeXU5PRwGVUbNgolRtiKDGC9E
-Message-ID: <CAEoi9W57D-BfpYUAe5M3zjJvTUQUL4UUB+iWkpRO_o8JWfS7FQ@mail.gmail.com>
-Subject: Re: [PATCH net] netrom: fix possible deadlock in nr_rt_device_down
-To: David Ranch <linux-hams@trinnet.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Denis Arefev <arefev@swemel.ru>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Nikita Marushkin <hfggklm@gmail.com>, Ilya Shchipletsov <rabbelkin@mail.ru>, Hongbo Li <lihongbo22@huawei.com>, 
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, 
-	stable@vger.kernel.org, syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="I0VjOkFHRgh8EgMY"
+Content-Disposition: inline
+In-Reply-To: <CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
+
+
+--I0VjOkFHRgh8EgMY
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 9, 2025 at 7:31=E2=80=AFPM David Ranch <linux-hams@trinnet.net>=
- wrote:
-> That's unclear to me but maybe someone else knowing the code better than
-> myself can chime in.  I have to assume having these locks present
-> are for a reason.
-
-The suggestion was not to remove locking, but rather, to fold multiple
-separate locks into one. That is, have a single lock that covers both
-the neighbor list and the node list. Naturally, there would be more
-contention around a single lock in contrast to multiple, more granular
-locks. But given that NETROM has very low performance requirements,
-and that the data that these locks protect doesn't change that often,
-that's probably fine and would eliminate the possibility of deadlock
-due to lock ordering issues.
-
-        - Dan C.
-
-> On 06/09/2025 04:26 PM, Jakub Kicinski wrote:
-> > On Mon, 9 Jun 2025 16:16:32 -0700 David Ranch wrote:
-> >> I'm not sure what you mean by "the only user of this code".  There are
-> >> many people using the Linux AX.25 + NETROM stack but we unfortunately
-> >> don't have a active kernel maintainer for this code today.
+On Jun 10, Eric Dumazet wrote:
+> On Tue, Jun 10, 2025 at 2:12=E2=80=AFAM Lorenzo Bianconi <lorenzo@kernel.=
+org> wrote:
 > >
-> > Alright, sorry. Either way - these locks are not performance critical
-> > for you, right?
+[...]
+> > @@ -767,7 +887,7 @@ static int airoha_qdma_init_rx_queue(struct airoha_=
+queue *q,
+> >         int qid =3D q - &qdma->q_rx[0], thr;
+> >         dma_addr_t dma_addr;
 > >
->
+> > -       q->buf_size =3D PAGE_SIZE / 2;
+> > +       q->buf_size =3D pp_params.max_len / (2 * (1 + lro_queue));
+>=20
+> Tell us more... It seems small LRO packets will consume a lot of
+> space, incurring a small skb->len/skb->truesize ratio, and bad TCP WAN
+> performance.
+
+I think the main idea is forward to hw LRO queues (queues 24-31 in this
+case) just specific protocols with mostly big packets but I completely
+agree we have an issue for small packets. One possible approach would be
+to define a threshold (e.g. 256B) and allocate a buffer or page from the
+page allocator for small packets (something similar to what mt7601u driver
+is doing[0]).  What do you think?
+
+>=20
+> And order-5 pages are unlikely to be available in the long run anyway.
+
+I agree. I guess we can reduce the order to ~ 2 (something similar to
+mtk_eth_soc hw LRO implementation [1]).
+
+>=20
+> LRO support would only make sense if the NIC is able to use multiple
+> order-0 pages to store the payload.
+
+The hw supports splitting big packets over multiple order-0 pages if we
+increase the MTU over one page size, but according to my understanding
+hw LRO requires contiguous memory to work.
+
+Regards,
+Lorenzo
+
+[0] https://github.com/torvalds/linux/blob/master/drivers/net/wireless/medi=
+atek/mt7601u/dma.c#L146
+[1] https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/medi=
+atek/mtk_eth_soc.c#L2258
+
+--I0VjOkFHRgh8EgMY
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaEg1kwAKCRA6cBh0uS2t
+rAYMAQD0nBIhigRn4PPAvOPLw/L0LoFZ4JC7kFUvDHjLuDo7PAD+IXfceq+l1hbh
+YjnyMxgeMGT9Hs0OOZbSoMd5kNU/Lwg=
+=z/fk
+-----END PGP SIGNATURE-----
+
+--I0VjOkFHRgh8EgMY--
 
