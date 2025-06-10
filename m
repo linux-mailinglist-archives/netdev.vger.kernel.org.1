@@ -1,224 +1,145 @@
-Return-Path: <netdev+bounces-196317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E19BAD438D
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:14:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76F59AD4398
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6597B7A8D24
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:12:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E7217CA0B
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CB3267B71;
-	Tue, 10 Jun 2025 20:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C30261390;
+	Tue, 10 Jun 2025 20:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K10jK+A8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/D/fk6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A85C267396
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 20:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD9919A2A3;
+	Tue, 10 Jun 2025 20:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749586372; cv=none; b=Ru2B11B31p2VVngtP0mGatoEO224vQlz+eRVlvxkXvNpqscbvLWCfqQIjbqVxWbc8oFDiqFQ86816m1bUrI6nDwGisCw64af4vxGlCtCIIEl5SQgmdyf2+A9E5H6a6xKbNsd91huApCyXld5xzE6Vn4WyXi3tRIXhFUnb69dkQ8=
+	t=1749586643; cv=none; b=gGCAhKNTCo1aw4ZYQiR+/74TtxiLrA7xXDUnk28rzVK3hAMXw58Efxw0mFikle6tPenFNDw+//4VmstXGgleG7CBf3I+67OPIx0J19AX5Pf1nopgoio5oc/vvhzTFwX+16+csQh3tyJZpVzuWkUMKjVgtwcVTFbxFqEDjQeEt5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749586372; c=relaxed/simple;
-	bh=9HZg/zGdCA3uPb4SkTr8gpbbnD935x6loHb47pHsqRc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HJvP98YTHk0u1l43s87gddAXWyYhbogLTxC7wHhKeZbL+6lMjn0uaYaylqwJpMsU5coW2DaqpbQzbZtSGzPkXUsLdltV+DuT3PLq5YOA6Vdq/qXGn7iXtZwZN26etYWoRbBHIWzkLVXxRt7SzkjKr1cZgzFpm2TvirlLa9x+sb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K10jK+A8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749586369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SN4L+FP9co++O04iFLwWVF/+cUo3J0C+YHwejI7xqYg=;
-	b=K10jK+A8lfACHrp46icizqiMqfA25kathRFTzQRiRR4bZ8c/TrT79TuRbqTjCoNQwa/tHe
-	h8sQ9tg+69/DDV4x5afsazCdWN+lMTb6BUkCO7VYpkBiQHT+eJY0srkzBHuJqD1VffTzp2
-	q58IzUKcwDGr1908wu03bgsrg75nkns=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-41-nlt5RR_VNMKFdogxyM-mTA-1; Tue, 10 Jun 2025 16:12:48 -0400
-X-MC-Unique: nlt5RR_VNMKFdogxyM-mTA-1
-X-Mimecast-MFC-AGG-ID: nlt5RR_VNMKFdogxyM-mTA_1749586366
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-551efecc173so3339011e87.0
-        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 13:12:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749586365; x=1750191165;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SN4L+FP9co++O04iFLwWVF/+cUo3J0C+YHwejI7xqYg=;
-        b=hc5ASkYuDwq8e3oq73LT5S4iNPeAJ7Dlq6i6J2tEzDdhj2KZzRlZ4zIHOWPrjz1vC5
-         8nbNEiYNBzdVVwgC/cGsboP95j9PVPZgtHIRSYRJKTfy3HrVgKHWpRyGmSXeqTEsUe1H
-         ncQJriNrF7QUJN2Y+eN+dg6bL+opJXgXwsMNhE05Gjv43OwNFDoO6K6OMKJJVjMNV/l6
-         NIKEo+ZVIwESYoEzYNQ3fr0p4QP+oYEFEv6ZNCnftMgi8kKpx5FNpG0VRJ679mVKLRym
-         6zyX2E/8B2rgDCLiDGBMw1Nd60LszjhgLdJfwadFI48d08hwQbfnFyalrktzRNvt3ews
-         jA/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxk4CL3aSL4M8/0rcTAltFyW3i5/V+cjHTteaJMhJ+JIO/taiJshv2+L8ZVaCZ3lrflwq1Yuc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzB0jotJzswev8r7reRKn12sQqD0sNWlkdki8ZMxmjK8Qi2SFcd
-	HbeIOoI6GEE1BNFIcVf0IawSfY9Mcee/em5FUpfSn5onv4rovF0sbL/i08/O457yxZx3jwPvr6X
-	LSQGHY3dQC2G3/JHK7IEgDFbQLPcssMroV+dFlL9Nx2/ofb8Yp2ppaEDmRw==
-X-Gm-Gg: ASbGncvtcsrCDUNACaJ8PcJZ+d2K5FyRr0UWVf97+OeAki5/rSFU5uAo8f1iUbEtQca
-	mb2WP7y5tPxPUc4BAi/qNaV/wCwXLUlwjK3VBuxa/2ibsXXgbdWko8do8nTA6z15Qe1mD4QCK0T
-	x9Ci07al7O0vpqoAno5oMyqKqc+s6LQkKfp3Pculk7QhTKKqTETS0/T3LMWT8RqA0/NjrrnXbf4
-	HGW5N2cZgm6YMPIucJq9NfEk++EjP8podAk45Zoqwt3gQqQGiBheidAVwxD68D2Ixl2i0ymhGRl
-	T4p99TysPeGIDObJOKs=
-X-Received: by 2002:a05:6512:1290:b0:553:2438:8d02 with SMTP id 2adb3069b0e04-5539c256e90mr289020e87.47.1749586365443;
-        Tue, 10 Jun 2025 13:12:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IETd7q66qjBBDNFnAaWMNeZTHbVKgAYdc2PTw/KS13FF24A4gTLmlNwf6c5ZdZRW9tFDroFYA==
-X-Received: by 2002:a05:6512:1290:b0:553:2438:8d02 with SMTP id 2adb3069b0e04-5539c256e90mr289014e87.47.1749586364896;
-        Tue, 10 Jun 2025 13:12:44 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553676d712fsm1673767e87.57.2025.06.10.13.12.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 13:12:43 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 505FE1AF6B64; Tue, 10 Jun 2025 22:12:41 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, Stanislav Fomichev
- <stfomichev@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, lorenzo@kernel.org, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <borkmann@iogearbox.net>, Eric Dumazet
- <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, sdf@fomichev.me, kernel-team@cloudflare.com,
- arthur@arthurfabre.com, jakub@cloudflare.com, Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
- xdp-rx-metadata.rst
-In-Reply-To: <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
-References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
- <174897279518.1677018.5982630277641723936.stgit@firesoul>
- <aEJWTPdaVmlIYyKC@mini-arch>
- <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 10 Jun 2025 22:12:41 +0200
-Message-ID: <87plfbcq4m.fsf@toke.dk>
+	s=arc-20240116; t=1749586643; c=relaxed/simple;
+	bh=KkMPpLWarAObIGFdc/4Gj8U/zmuf7yOK4LH5HnaJns8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDbBTu/IDxzQiH1ZcTGCmlpLnvlwiL38iavDMIxx1cqvtL74wecCZ58Ozu7wzex4ciMTx6tOc1eGye4jorjOMSzcNfQiRAPEuN2O7xqw2JjzrGVFD4o+T21b+W7Ha9RPkSs/5Z++77jcVhU8mIZx7w4eQTWqlIr+D0lZWuuCo6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/D/fk6n; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749586642; x=1781122642;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KkMPpLWarAObIGFdc/4Gj8U/zmuf7yOK4LH5HnaJns8=;
+  b=U/D/fk6nw+LSXzVxNPDemOLSzMl++rdBvPsfxn91Dp++J9WdjLhj+e3w
+   Jvp2zFIchcn/v9iliWliqcT+z243NcmvV8W+5fKz6O8jXkblkLmnUm5lK
+   F0bd4bToZsXyb8GeMK1O+UH6uQr59t/PEO0Z8a7Sc2iN5exIyI1Gd3HSM
+   QPZnWUQy1MAKddDq9SZDa4Ch5iKDc/6cnw7CcEWSaQMBB/BmJufQyGPt+
+   wA4jQsC5no3cLiquV/YoLXQx3ZK2N0uusb94zffY84HWeye5FqPVul19s
+   Ht8Efk6AQn7zuSPc9pYGYSAPjq2yk63lq0TeOjLpDnfARBZNvuZCwV+kX
+   A==;
+X-CSE-ConnectionGUID: gvIU2YZyTv2/q6Ods3v4IQ==
+X-CSE-MsgGUID: U1HGsKehRRiewPzxaINxhQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="51811055"
+X-IronPort-AV: E=Sophos;i="6.16,225,1744095600"; 
+   d="scan'208";a="51811055"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 13:17:21 -0700
+X-CSE-ConnectionGUID: mULnA7/tT0Sddi3uk+PAJQ==
+X-CSE-MsgGUID: +G96++PuQdm5BLTlEDt8iw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,225,1744095600"; 
+   d="scan'208";a="146864596"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 13:17:15 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1uP5PC-00000005RU8-34rs;
+	Tue, 10 Jun 2025 23:17:10 +0300
+Date: Tue, 10 Jun 2025 23:17:10 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	"zhangzekun (A)" <zhangzekun11@huawei.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, robh@kernel.org,
+	saravanak@google.com, justin.chen@broadcom.com,
+	florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
+	kuba@kernel.org, kory.maincent@bootlin.com,
+	jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
+	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, taras.chornyi@plvision.eu,
+	edumazet@google.com, pabeni@redhat.com, sudeep.holla@arm.com,
+	cristian.marussi@arm.com, arm-scmi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-media@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	chenjun102@huawei.com, Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 1/9] of: Add warpper function
+ of_find_node_by_name_balanced()
+Message-ID: <aEiSxq6lNNJq5DJM@smile.fi.intel.com>
+References: <20250207013117.104205-1-zhangzekun11@huawei.com>
+ <20250207013117.104205-2-zhangzekun11@huawei.com>
+ <Z6XDKi_V0BZSdCeL@pengutronix.de>
+ <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
+ <20250207153722.GA24886@pendragon.ideasonboard.com>
+ <be93486b-91bb-4fdd-9f6c-ec295c448476@stanley.mountain>
+ <aAuqgiSxrh24-L-D@stanley.mountain>
+ <20250425170732.GA21390@pendragon.ideasonboard.com>
+ <aEiJ856egeMCC6ao@black.fi.intel.com>
+ <20250610200339.GA1233@pendragon.ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250610200339.GA1233@pendragon.ideasonboard.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+On Tue, Jun 10, 2025 at 11:03:39PM +0300, Laurent Pinchart wrote:
+> On Tue, Jun 10, 2025 at 10:39:31PM +0300, Andy Shevchenko wrote:
+> > On Fri, Apr 25, 2025 at 08:07:32PM +0300, Laurent Pinchart wrote:
+> > > On Fri, Apr 25, 2025 at 06:30:10PM +0300, Dan Carpenter wrote:
+> > > > Whatever happened with this thread from Feb.
+> > > > https://lore.kernel.org/all/20250207013117.104205-1-zhangzekun11@huawei.com/
+> > > > 
+> > > > The issue was that people weren't expecting of_find_node_by_name() to
+> > > > drop the reference on the of_node.  The patchset introduced a wrapper
+> > > > which basically worked as expected except no liked the naming.  Krzysztof
+> > > > suggested that maybe the callers should be using of_get_child_by_name()
+> > > > instead.
+> > > 
+> > > My conclusion is that most of the users of of_find_node_by_name() with a
+> > > non-NULL first argument are wrong, and should be replaced by
+> > > of_get_child_by_name(). We need a volunteer to do that work.
+> > 
+> > Wouldn't be coccinelle a good worker for this job done?
+> 
+> It's not mechanical work, every single user need to be audited manually.
 
-> On 6/6/25 4:45 AM, Stanislav Fomichev wrote:
->> On 06/03, Jesper Dangaard Brouer wrote:
->>> Update the documentation[1] based on the changes in this patchset.
->>>
->>> [1] https://docs.kernel.org/networking/xdp-rx-metadata.html
->>>
->>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> ---
->>>   Documentation/networking/xdp-rx-metadata.rst |   74 ++++++++++++++++++++------
->>>   net/core/xdp.c                               |   32 +++++++++++
->>>   2 files changed, 90 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
->>> index a6e0ece18be5..2c54208e4f7e 100644
->>> --- a/Documentation/networking/xdp-rx-metadata.rst
->>> +++ b/Documentation/networking/xdp-rx-metadata.rst
->>> @@ -90,22 +90,64 @@ the ``data_meta`` pointer.
->>>   In the future, we'd like to support a case where an XDP program
->>>   can override some of the metadata used for building ``skbs``.
->>>   
->>> -bpf_redirect_map
->>> -================
->>> -
->>> -``bpf_redirect_map`` can redirect the frame to a different device.
->>> -Some devices (like virtual ethernet links) support running a second XDP
->>> -program after the redirect. However, the final consumer doesn't have
->>> -access to the original hardware descriptor and can't access any of
->>> -the original metadata. The same applies to XDP programs installed
->>> -into devmaps and cpumaps.
->>> -
->>> -This means that for redirected packets only custom metadata is
->>> -currently supported, which has to be prepared by the initial XDP program
->>> -before redirect. If the frame is eventually passed to the kernel, the
->>> -``skb`` created from such a frame won't have any hardware metadata populated
->>> -in its ``skb``. If such a packet is later redirected into an ``XSK``,
->>> -that will also only have access to the custom metadata.
->>> +XDP_REDIRECT
->>> +============
->>> +
->>> +The ``XDP_REDIRECT`` action forwards an XDP frame to another net device or a CPU
->>> +(via cpumap/devmap) for further processing. It is invoked using BPF helpers like
->>> +``bpf_redirect_map()`` or ``bpf_redirect()``.  When an XDP frame is redirected,
->>> +the recipient (e.g., an XDP program on a veth device, or the kernel stack via
->>> +cpumap) loses direct access to the original NIC's hardware descriptor and thus
->>> +its hardware metadata
->>> +
->>> +By default, this loss of access means that if an ``xdp_frame`` is redirected and
->>> +then converted to an ``skb``, its ``skb`` fields for hardware-derived metadata
->>> +(like ``skb->hash`` or VLAN info) are not populated from the original
->>> +packet. This can impact features like Generic Receive Offload (GRO).  While XDP
->>> +programs can manually save custom data (e.g., using ``bpf_xdp_adjust_meta()``),
->>> +propagating specific *hardware* RX hints to ``skb`` creation requires using the
->>> +kfuncs described below.
->>> +
->>> +To enable propagating selected hardware RX hints, store BPF kfuncs allow an
->>> +XDP program on the initial NIC to read these hints and then explicitly
->>> +*store* them. The kfuncs place this metadata in locations associated with
->>> +the XDP packet buffer, making it available if an ``skb`` is later built or
->>> +the frame is otherwise processed. For instance, RX hash and VLAN tags are
->>> +stored within the XDP frame's addressable headroom, while RX timestamps are
->>> +typically written to an area corresponding to ``skb_shared_info``.
->>> +
->>> +**Crucially, the BPF programmer must call these "store" kfuncs to save the
->>> +desired hardware hints for propagation.** The system does not do this
->>> +automatically. The NIC driver is responsible for ensuring sufficient headroom is
->>> +available; kfuncs may return ``-ENOSPC`` if space is inadequate for storing
->>> +these hints.
->> 
->> Why not have a new flag for bpf_redirect that transparently stores all
->> available metadata? If you care only about the redirect -> skb case.
->> Might give us more wiggle room in the future to make it work with
->> traits.
->
-> Also q from my side: If I understand the proposal correctly, in order to fully
-> populate an skb at some point, you have to call all the bpf_xdp_metadata_* kfuncs
-> to collect the data from the driver descriptors (indirect call), and then yet
-> again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data in struct
-> xdp_rx_meta again. This seems rather costly and once you add more kfuncs with
-> meta data aren't you better off switching to tc(x) directly so the driver can
-> do all this natively? :/
+Sure, but at least it can do some job that can be done automatically.
 
-I agree that the "one kfunc per metadata item" scales poorly. IIRC, the
-hope was (back when we added the initial HW metadata support) that we
-would be able to inline them to avoid the function call overhead.
+> Finding the call sites is the easy part, and we have them already.
 
-That being said, even with half a dozen function calls, that's still a
-lot less overhead from going all the way to TC(x). The goal of the use
-case here is to do as little work as possible on the CPU that initially
-receives the packet, instead moving the network stack processing (and
-skb allocation) to a different CPU with cpumap.
+> > > > I created a Smatch warning for this and here are the four issues it
+> > > > found.  The line numbers are from linux-next.
+> > > > 
+> > > > drivers/net/ethernet/broadcom/asp2/bcmasp.c:1370 bcmasp_probe() warn: 'dev->of_node' was not incremented
+> > > > drivers/net/pse-pd/tps23881.c:505 tps23881_get_of_channels() warn: 'priv->np' was not incremented
+> > > > drivers/media/platform/qcom/venus/core.c:301 venus_add_video_core() warn: 'dev->of_node' was not incremented
+> > > > drivers/regulator/tps6594-regulator.c:618 tps6594_regulator_probe() warn: 'tps->dev->of_node' was not incremented
 
-So even if the *total* amount of work being done is a bit higher because
-of the kfunc overhead, that can still be beneficial because it's split
-between two (or more) CPUs.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-I'm sure Jesper has some concrete benchmarks for this lying around
-somewhere, hopefully he can share those :)
-
-> Also, have you thought about taking the opportunity to generalize the existing
-> struct xsk_tx_metadata? It would be nice to actually use the same/similar struct
-> for RX and TX, similarly as done in struct virtio_net_hdr. Such that we have
-> XDP_{RX,TX}_METADATA and XDP_{RX,TX}MD_FLAGS_* to describe what meta data we
-> have and from a developer PoV this will be a nicely consistent API in XDP. Then
-> you could store at the right location in the meta data region just with
-> bpf_xdp_metadata_* kfuncs (and/or plain BPF code) and finally set XDP_RX_METADATA
-> indicator bit.
-
-Wouldn't this make the whole thing (effectively) UAPI?
-
--Toke
 
 
