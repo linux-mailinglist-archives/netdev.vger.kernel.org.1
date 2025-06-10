@@ -1,117 +1,94 @@
-Return-Path: <netdev+bounces-196034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67484AD33A2
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:33:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6426AD33A6
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 12:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87E421897ADA
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:33:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5B271896AE9
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754A328C87F;
-	Tue, 10 Jun 2025 10:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD42428B7C5;
+	Tue, 10 Jun 2025 10:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IhHdX2Qv"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="QwAlEmQG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED5921D59F;
-	Tue, 10 Jun 2025 10:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9338B21CC71;
+	Tue, 10 Jun 2025 10:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749551557; cv=none; b=vE9wuNO7Tvso9Wddw8vzo/l0Mn+HzcIfOwXMOHzNwAtofahsv+oULx/hhn2iWArn0X0zztH+sJrkr+f3Z0hnpo3xZHqSIbCmm10sWgdNDnkRuh2fo/peUy7K3H6oDnnkiklvTdciJ/FZDuKC5PXORqKOHDBa/3KpAw/C5yNFhzI=
+	t=1749551646; cv=none; b=eMDTbUgSoV7zHA5xnRizVZbJ8MEHxaTP8QTyZwpB9KWvYJgheaUOQBU1QgK7g6UcwkbbZSXwO+WwzWYzVHuXVYn9csc2L4n7uRUYs6zR20N7sYctbbn5BSor7BJ7Ly4DIc+KY6j8hUwlCDp0aJiWll9RtXKpeYu4U0IQhkLNkZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749551557; c=relaxed/simple;
-	bh=FpBSC2xVTPB5Ko/OrzcBChzht3GRAD298DcZnb89s98=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZUWmAkP+Bh3sytHCE9KEUJ7eLSEwyLXddjoethiMxB8ctSGI1M90n2z5vtcpP9aEdSHt0CADYVzIxTnlYorJ2M6zBXXpW/h12lPldWlMWcqbRkUHS2Ot4BGMQA9rjO8VYNIaHw9ItV4Zz6kG9YDcVPwPLcL6SreNV+TCurwzk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IhHdX2Qv; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749551556; x=1781087556;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FpBSC2xVTPB5Ko/OrzcBChzht3GRAD298DcZnb89s98=;
-  b=IhHdX2Qvg1Alou/fvtli3LcsBYiF2egnEc8G0YVQL/H21bWsaW65O7O7
-   IT6Mr/HKAIluC/bE3gs3k01L+EVOgy4gIyQhNLSjX9GP0orRjGSihstgm
-   UAywAWtXHi3nky7PkZFHk3XdGU7VK01M2wkDnblYtA4SMpSi0flskmKey
-   4AvrzeFvlWTQNW/+JXC1wg8csv/neBUiMZ/NcvLS9EW1G/ktlAMjbDd0H
-   3M5EENL2VXHzbXGQmmOTC+5V/rP2bSuSbcV/5bkDOeh0pMuLgh4zDDGgu
-   yYdydCw6z0kt9T35+6uyqR8lX8Ib0jTvt2PNDjJcPKBl4yTaX/LOo3YpN
-   w==;
-X-CSE-ConnectionGUID: dLEBSYOERfe5cH00juuKwA==
-X-CSE-MsgGUID: WDTOiF8nRRWSue6V7ww0iQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="51362683"
-X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="51362683"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 03:32:35 -0700
-X-CSE-ConnectionGUID: i4huHt0qQiam06ejMiMQaA==
-X-CSE-MsgGUID: mLbvw7MwRGy97naDlMpxUQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="146720033"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.196])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 03:32:31 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: linux-pci@vger.kernel.org,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH 3/3] cxgb3: Split complex PCI write statement into logic + write
-Date: Tue, 10 Jun 2025 13:32:05 +0300
-Message-Id: <20250610103205.6750-3-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250610103205.6750-1-ilpo.jarvinen@linux.intel.com>
-References: <20250610103205.6750-1-ilpo.jarvinen@linux.intel.com>
+	s=arc-20240116; t=1749551646; c=relaxed/simple;
+	bh=m4goNCfrUBsfUghsVZna+NlSw2nfn6WIDNr/eDQeE3o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VHNa5UXzrX1CfHH2O9wbhDCeyyBl3ZuUSw23588PElB+F36TcvWCSJYhpMoFbDNG//vBqYq1e8Zpg02+AmTm3mL+0cg65Iqa5CPFFYzysIXRjIQJOr29/fSRXlj27kJOvsVrHMUbo88EpDsUgWRwLjhCNp0kujpsf+ExEgxR2Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=QwAlEmQG; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 55AAXf6Y22658194, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1749551621; bh=pmXT15qPRz+MbHhykCdehTk1H+13FgoMXnhT2YU9bww=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=QwAlEmQGSVLYHk61GvbQsLiORlsLV2pY480ygIX/YriyXhAC/VyyTQ7TQ2JfA9/5y
+	 6p6KNQ90G4XqSQUzlv4GuGuYWLNrk0I/zzw5EV2LJ+vlSD1rWI5Q41oE6BjtLRrU/+
+	 FQAaFfg65MYMlL5GkUt4afb17FqCSC/0z9h8jnN+yMyIbSEXhxL9N1UaV1ZgACzcli
+	 /sS9km0hdsmUkSW/8xbAAzfKIWz83JJNjmzjcFVRo+v//aRMB+txU54ShDxTm8NvIl
+	 0olSqmDA/N7B415IfZKYcYkNgSMzHUpIsbmR59LUySBkck7pWsNAO8nkM5O+AtVsao
+	 wXfvNXlIpUFMA==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 55AAXf6Y22658194
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 10 Jun 2025 18:33:41 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 10 Jun 2025 18:33:42 +0800
+Received: from RTDOMAIN (172.21.210.109) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 10 Jun
+ 2025 18:33:41 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <jdamato@fastly.com>,
+        <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next 0/2] Link NAPI instances to queues and IRQs
+Date: Tue, 10 Jun 2025 18:33:32 +0800
+Message-ID: <20250610103334.10446-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Instead of trying to complex logic within the PCI capability write
-statement, split the logic onto separate lines for better readability.
-Also, don't pretend just clearing the fields, but set the fields to
-what 0 means (128 bytes).
+This patch series introduces netdev-genl support to rtase, enabling
+user-space applications to query the relationships between IRQs,
+queues, and NAPI instances.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
----
- drivers/net/ethernet/chelsio/cxgb3/t3_hw.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Justin Lai (2):
+  rtase: Link IRQs to NAPI instances
+  rtase: Link queues to NAPI instances
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/t3_hw.c b/drivers/net/ethernet/chelsio/cxgb3/t3_hw.c
-index 171bf6cf1abf..b9327d8c6893 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/t3_hw.c
-+++ b/drivers/net/ethernet/chelsio/cxgb3/t3_hw.c
-@@ -3267,9 +3267,9 @@ static void config_pcie(struct adapter *adap)
- 
- 	pci_read_config_word(adap->pdev, PCI_DEVICE_ID, &devid);
- 	if (devid == 0x37) {
--		pcie_capability_write_word(adap->pdev, PCI_EXP_DEVCTL,
--					   val & ~PCI_EXP_DEVCTL_READRQ &
--					   ~PCI_EXP_DEVCTL_PAYLOAD);
-+		val &= ~(PCI_EXP_DEVCTL_PAYLOAD|PCI_EXP_DEVCTL_READRQ);
-+		val |= PCI_EXP_DEVCTL_PAYLOAD_128B|PCI_EXP_DEVCTL_READRQ_128B;
-+		pcie_capability_write_word(adap->pdev, PCI_EXP_DEVCTL, val);
- 		pldsize = 0;
- 	}
- 
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  4 ++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 53 ++++++++++++++++---
+ 2 files changed, 49 insertions(+), 8 deletions(-)
+
 -- 
-2.39.5
+2.34.1
 
 
