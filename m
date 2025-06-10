@@ -1,115 +1,107 @@
-Return-Path: <netdev+bounces-195912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41637AD2AD4
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 02:13:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E861EAD2ADC
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 02:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 084451712F0
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:13:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB5A6188FD77
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 00:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5467E645;
-	Tue, 10 Jun 2025 00:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCB517736;
+	Tue, 10 Jun 2025 00:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPs4KfbR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWchU1Jt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9C317555
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 00:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0135722338
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 00:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749514385; cv=none; b=aHplvQTPr/QRB/tFFZAw11rn3AWNUHwLgssdpvsHjh0MzIphC/1JlXG2BcE/xw73GcDxEZ/gr1Gl8En5BXGNXL6d62Ta8otmXei4N/hup6eMQ+G4MdGLYu45R2tqXPQfUi2J4JusZ8x8rpCMXdT4A+G2A3P/dSZHGv7H0O8fjLE=
+	t=1749514755; cv=none; b=N6Ni59T/W32YVdCojJ5WGxxPRI1Jrt6bIH5lkJoAbLJdGmFdZMHVAOJfkuDIeuXlcvozDqfqDplZnB2q5w+Ps+OE9BbHjcTAZ8hkf2ACaO+DqHXVhszsPtyH1XnWhczMhIqYJNGAIQoQuu1g4YrjJqSfE9Isn56WbukUCRKMUqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749514385; c=relaxed/simple;
-	bh=PxK7xrnS3JWmjtI+TTMMB8xnV+QeNR+NSdfJgIIr1wU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X/VldLvm2ni8uqcfg2Wg6vv2T5HXZWFIxHK4zXqfasf12zeIiogd/WbNROfisltLeYQYZ8OYBYm06GxNuqufLL7mLtJbzzBa0wuctOQlCP8uLqiBj9UNkvEz1WtMJ98g1ryowEIO6TXBSVkuzn52p5hBkEdliwOtxlArmJplsRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPs4KfbR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CBF1C4CEED;
-	Tue, 10 Jun 2025 00:13:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749514384;
-	bh=PxK7xrnS3JWmjtI+TTMMB8xnV+QeNR+NSdfJgIIr1wU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bPs4KfbRblXvCx+tbSgh8CAUTuszG4a/lQiHBSNgDIOuEOoEQdg0tlZ6gBx9+YFlR
-	 nzZsdORoBuNw0QPi4nLsWlAR3Rgo7HfuZaGRSW4UlcHHk5fCpGtDPhiCObl9TlUxuM
-	 tHapwFBnxgngYfu11vHYwT6EMO3CNNbrLasAJ/WhRAhD7zRYNgYTGfOTHYjGZIzzbS
-	 Sfd22UFiggF00gzc6U+k/T1Wl7a3STfyHtTB5bfYvj3GQ+ifEoDffQOmMmVNVIqUdt
-	 Zfqpc1HDJfyvkvVqOIB2B9kDAqyf+F8g+LT48BZBcW+NUARxqp9PibFY5pf9dhz/lr
-	 ON2Ftj8d8pDEQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	maze@google.com,
-	daniel@iogearbox.net,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v3 2/2] selftests: net: add test case for NAT46 looping back dst
-Date: Mon,  9 Jun 2025 17:12:45 -0700
-Message-ID: <20250610001245.1981782-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250610001245.1981782-1-kuba@kernel.org>
-References: <20250610001245.1981782-1-kuba@kernel.org>
+	s=arc-20240116; t=1749514755; c=relaxed/simple;
+	bh=xfRLloP880sgsyg09fmAhOtVKkoEENYd1eGdvm0a5yw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QDSLLUNanJxJuSl6B3wTBkEDLkBO8YmLEYhN5/4JoT1sPICwxKyV6/GBCcSh4/BdhTEzp7VMziuq0Y4882PgBGK3eyDPNbUr3FTvTZyIZKz/em70Xc2jgS4JWwrDf26fMVRCjs1vxkD9bMmetTN/oJ4enydfh8nsRRxsQ0bZkXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWchU1Jt; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3ddd68aeb4fso26566965ab.2
+        for <netdev@vger.kernel.org>; Mon, 09 Jun 2025 17:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749514753; x=1750119553; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xfRLloP880sgsyg09fmAhOtVKkoEENYd1eGdvm0a5yw=;
+        b=AWchU1Jt+a3B47f8GKFw+xtbmzw9ZujZ9lLknVL6h04xM8LyxC8YUM7KoOi2PG+wWL
+         NWxibq1cffHyWQZ1xZGe771EH+uHH0fcSjZFxnjnfL/QAJlr7UwmdDnT9v5pFGJxGBJl
+         ie2VrBwKNKe8kMNSlY68yl0A9InSBIla94xpC79k7gh6OO5mtJZfQtY4F+R1HwFunPsI
+         f0+k7QZtDZQdNBLyY8XXc83Y7lyKWFodQwUfPzm+7qpsNWZR8NTEh0mbhnWtI1G6b+kl
+         kNlJVlAqpDtFmY4wCnk1eJtjCCON8zZ5UYtgJES1lyFbjeCFIIXG4pjj+IEHu4ag/E18
+         VKgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749514753; x=1750119553;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xfRLloP880sgsyg09fmAhOtVKkoEENYd1eGdvm0a5yw=;
+        b=rQzgP0jqs+LsJoNjS25kCpAh4W/HQOpZbtbyoLZiEUZqzMNzWyjHRN3Eyh/I0drzhJ
+         M6Wv+p4LPdXi/o38ZDlPuWtDAWiPawBMI4rqta4Mj255Z20Zq7UY8tirfFKG+r2KanHe
+         RMqXremFzfcCvwE4llS1LiMw3ETVow1sZIXL0zkPCavxuz1fUOvsHeHQp4amviCgwuox
+         ghCoevNRXMqamsSGuc2Uy4W0oUONxbCzmq7vW5VvuLIpONutK9/J+uViGLjgYqEYS/te
+         szmh/L01VeRp4lVk9+r4D1hmycjviarbOy3TINEIjnSx7DT68FR12QdW6jpPP0PQT8gm
+         NefQ==
+X-Gm-Message-State: AOJu0YxKXqcKzmH0yH5hn1bhi/0SL6m9ON3WQAuZzVNNzs5Kesc84czJ
+	8zmK2h/XWwQblq9T6ycl4rglN18r6GE45FFM9ixjLSvFR4so1ps0xgZ7Js/CfcKItrxpxWEf/RF
+	GTlidKwns35YGC/fsNdHbcYvvx2tnLIE=
+X-Gm-Gg: ASbGnctwwpH81G5ZlHE2TrLOsLJKSsnQgxNUokS82yy92anmpLFwJDIxCi+OCFMXL+g
+	9T9H3sQkbFugEVxErLLfiX70xDGReNIu/QszozVwqtHUu3hCf6/fvYHR7bzGDsZEhcz1lfHf515
+	1gWZH5sPoBiPqy39OMNkguGCrLUOXoiNDmKQ/T12uDXpA=
+X-Google-Smtp-Source: AGHT+IHSAZLZt34TqaHtGlRoqwi1iVjJ2lN/IwM1lZG5cs+i/GyoCkR+WZpMIgDNpLNTqYGTKR+PVZ6Bv/Cxg++G6HU=
+X-Received: by 2002:a05:6e02:1689:b0:3dd:d6c0:cccd with SMTP id
+ e9e14a558f8ab-3ddeddc65d6mr4885215ab.13.1749514753085; Mon, 09 Jun 2025
+ 17:19:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250609153254.3504909-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250609153254.3504909-1-willemdebruijn.kernel@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 10 Jun 2025 08:18:37 +0800
+X-Gm-Features: AX0GCFuHrllGzfVaiqrUoeY5Gu8bfFe2Ikt84jkb4KJMINdsKlX2Yb00hbbVuQA
+Message-ID: <CAL+tcoAUMA3oSvhXREKr95BN_LXV-N+t6K7ipoP2pEEbPX8AUg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: remove unused sock_enable_timestamps
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	kernelxing@tencent.com, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Simple test for crash involving multicast loopback and stale dst.
-Reuse exising NAT46 program.
+On Mon, Jun 9, 2025 at 11:33=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> This function was introduced in commit 783da70e8396 ("net: add
+> sock_enable_timestamps"), with one caller in rxrpc.
+>
+> That only caller was removed in commit 7903d4438b3f ("rxrpc: Don't use
+> received skbuff timestamps").
+>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/Makefile   |  1 +
- tools/testing/selftests/net/nat6to4.sh | 15 +++++++++++++++
- 2 files changed, 16 insertions(+)
- create mode 100755 tools/testing/selftests/net/nat6to4.sh
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index ea84b88bcb30..ab996bd22a5f 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -27,6 +27,7 @@ TEST_PROGS += amt.sh
- TEST_PROGS += unicast_extensions.sh
- TEST_PROGS += udpgro_fwd.sh
- TEST_PROGS += udpgro_frglist.sh
-+TEST_PROGS += nat6to4.sh
- TEST_PROGS += veth.sh
- TEST_PROGS += ioam6.sh
- TEST_PROGS += gro.sh
-diff --git a/tools/testing/selftests/net/nat6to4.sh b/tools/testing/selftests/net/nat6to4.sh
-new file mode 100755
-index 000000000000..0ee859b622a4
---- /dev/null
-+++ b/tools/testing/selftests/net/nat6to4.sh
-@@ -0,0 +1,15 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+NS="ns-peer-$(mktemp -u XXXXXX)"
-+
-+ip netns add "${NS}"
-+ip -netns "${NS}" link set lo up
-+ip -netns "${NS}" route add default via 127.0.0.2 dev lo
-+
-+tc -n "${NS}" qdisc add dev lo ingress
-+tc -n "${NS}" filter add dev lo ingress prio 4 protocol ip \
-+   bpf object-file nat6to4.bpf.o section schedcls/egress4/snat4 direct-action
-+
-+ip netns exec "${NS}" \
-+   bash -c 'echo 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789abc | socat - UDP4-DATAGRAM:224.1.0.1:6666,ip-multicast-loop=1'
--- 
-2.49.0
-
+Thanks,
+Jason
 
