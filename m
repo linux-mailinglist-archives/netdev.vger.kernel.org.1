@@ -1,373 +1,203 @@
-Return-Path: <netdev+bounces-195968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F37AD2F13
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:44:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BDA4AD2F1B
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56905188678E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 07:44:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DE8D3A4174
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 07:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A4927FD50;
-	Tue, 10 Jun 2025 07:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A69220E328;
+	Tue, 10 Jun 2025 07:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="lOIHRSDg"
+	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="Dlp4z0Oi"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010064.outbound.protection.outlook.com [52.101.229.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC4227A93A;
-	Tue, 10 Jun 2025 07:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749541451; cv=none; b=WXlj6OHwbDGZQ0oq6XQoToNvCUwDTt2qbnFQeVuFux7vXX+AmkvXR7ms91ZhH2GDEf8BjXS9uFzrw44fMbUYo1YIFrIkrvfO5cgsZi0GJvYZfRQOLz3kudRw7WZyaQiQkKl8n7/dL7nwyVT/BXafYQpubGI1MY0i+kPhL9OYQns=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749541451; c=relaxed/simple;
-	bh=GPs4VwI2U5i8OoCpd+/wSuyPS02mqcIUAES+8JvevRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=EhEiGSid7LjvyIlxfsMJtswL8fEgICQMiUKY1PuLUm8d5cGZwnQUmjjyab2bdFyDv2f4K6aSStUf6334HonUs4cqgXDiwm2+x5uWv+T3Nd3NXSktyz05uuqd/JLFIYTSAwNfax7BJHuA0fDSfm8863jP9qhm3lHa7XgOsQ1c2AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=lOIHRSDg; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55A7hk4Y2222666;
-	Tue, 10 Jun 2025 02:43:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1749541426;
-	bh=/PBz8UPegQOn0D3yRInXOsNjObgy56E8YRqME4+wtDk=;
-	h=Date:Subject:From:To:CC:References:In-Reply-To;
-	b=lOIHRSDgxhpOUqtBAZ0USZStUQKX+SfLIvtsb7s12396AutRTpbxYXW1rixIu34d9
-	 O357Cxikurhh9Fuap+iTSFbMyEokilGzgiLgAQblNm9OiIVK4XIBoF2WHM7a4F+OoY
-	 lqGQg1EHXk0cz8PnpXNa+wSDMV7ph8nJMhp9gQtk=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55A7hjnU093402
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Tue, 10 Jun 2025 02:43:46 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 10
- Jun 2025 02:43:45 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 10 Jun 2025 02:43:45 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55A7hdsS2713905;
-	Tue, 10 Jun 2025 02:43:39 -0500
-Message-ID: <b05cc264-44f1-42e9-ba38-d2ef587763f5@ti.com>
-Date: Tue, 10 Jun 2025 13:13:38 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B30EC4;
+	Tue, 10 Jun 2025 07:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.229.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749541597; cv=fail; b=WHVNnmR8AT+0qva+UXddsZzcs2BvHWw1BrLkQFJtc0OAoQ0nnfTLvo05bPxu6Z25UPdPU3pko4eqXU1Xyjq4320wEJyoLxV09Mj+zq4uNALypCliAaPO45QToiz0xY526lBJvR4rk7WS7kPlb7K1fbSCyJtO6P1SD+c1+gNe1gk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749541597; c=relaxed/simple;
+	bh=DDhQrrF90E3dxjN+1Cd8Y5oZrWAh/e0fSR6BMmke6SA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MuwIV4a9jGKj9Fhisykaclvix9Yo6lc/vqNGPLVwPBJsh1X/wXHZuqFYzSoUP9xg1Hn9Px4ZdGS7eNVjFJMCTCjjj8KDcEavsXDb2j4h8pdLe61dh8wdjefwa+PRj6sRT3JK/I8KkT/gM2fV6MR+Xb0GXhtrlgitGRNaNs6VX24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=Dlp4z0Oi; arc=fail smtp.client-ip=52.101.229.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Mhz2KzmKeNaliNUYMPGwr4fkuGbtSDx7BrE6rfKBVNBgh0HnjxJrhX6TKZhCNhAwwdkY4hGYPvWkNSw6MBWqDV9vTx8eAtS5x+PUrpBnScoiU3QlshjzqyqlhWtQGknqPaAuHA/9x5fhBCN1HkJZYTCKewzu6OO/ClVzw+DqqVN4DFIfr08REztO3B6S4G8EN9bdZUvYW+bbcSNwp1JEThE569OF2iD0UhMEVGQtjx+yodeljsHYRHj5kgtVCUaN5HkLOh+6bevhDi+mNCGkuu6Yk2LnpRt9SHos0PIHB3vYMSbFWoYQuaRR3aTu6/MNWxoUaYT/GKOfBlBkg5XS0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wmOYmH5RQHLL+jjqgOZU45/J1PAzzpNxbtDksaV2UXk=;
+ b=DGwaruIObQAaHvIBL9FTUdD5WjexRaKkO3LOHSfNv0p6Mft9mkllsS8wbIGnAl4kg2TZAXrSHjR35rLikKX366V0EKzn5oktdPfJMk7IMHuz1nGBW0a9RsCSDm4xZVx57mjOPJ7cNlDcVMBVQeITvhu6B7reaes343L6oOVWOI9qrUpsDGUCrXbz14MiCZkz8sifEYBh5qfW56xtpKnzOdTtrCjqryTQPKFjakqsQ2Wo/S35f2/znBWwzPnTSVNNyuev9/hb5FPaVD5zJL2Kz4lcf97aMGIiB2AuPPS2XfPvuSsxZCEbUMnIGLTpUXAI4hrWSVQGhGcTg/ZZl8Lhlg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
+ header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wmOYmH5RQHLL+jjqgOZU45/J1PAzzpNxbtDksaV2UXk=;
+ b=Dlp4z0Oia0IvCbPST5HdFsebWPRJc5dwxwjTaZSskAoYEF9cectMS6kbhG0d5nJR5nLrIjOClNnJnNY3BepeP8h1NJv7bNVtbt0Vo9CaEpaEN8yapML1UrmFR0eTJczxayIoMF+AV/Xb2wzgnJRKrhKRJW7DystNpCsldKHYTNM=
+Received: from OSCPR01MB14647.jpnprd01.prod.outlook.com (2603:1096:604:3a0::6)
+ by TYCPR01MB10808.jpnprd01.prod.outlook.com (2603:1096:400:295::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.30; Tue, 10 Jun
+ 2025 07:46:29 +0000
+Received: from OSCPR01MB14647.jpnprd01.prod.outlook.com
+ ([fe80::40e:e798:1aea:ca82]) by OSCPR01MB14647.jpnprd01.prod.outlook.com
+ ([fe80::40e:e798:1aea:ca82%4]) with mapi id 15.20.8813.022; Tue, 10 Jun 2025
+ 07:46:23 +0000
+From: John Madieu <john.madieu.xa@bp.renesas.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"magnus.damm@gmail.com" <magnus.damm@gmail.com>, Biju Das
+	<biju.das.jz@bp.renesas.com>, "john.madieu@gmail.com"
+	<john.madieu@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 2/4] dt-bindings: net: renesas-gbeth: Add support for
+ RZ/G3E (R9A09G047) SoC
+Thread-Topic: [PATCH 2/4] dt-bindings: net: renesas-gbeth: Add support for
+ RZ/G3E (R9A09G047) SoC
+Thread-Index: AQHb1R1BfHFcHLJi6UmVzaLkmUeX27P6/IgAgAEQTPA=
+Date: Tue, 10 Jun 2025 07:46:23 +0000
+Message-ID:
+ <OSCPR01MB146478CA8317CDBC8BFE5077DFF6AA@OSCPR01MB14647.jpnprd01.prod.outlook.com>
+References: <20250604065200.163778-1-john.madieu.xa@bp.renesas.com>
+	<20250604065200.163778-3-john.madieu.xa@bp.renesas.com>
+ <20250609083008.0157fe47@kernel.org>
+In-Reply-To: <20250609083008.0157fe47@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bp.renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OSCPR01MB14647:EE_|TYCPR01MB10808:EE_
+x-ms-office365-filtering-correlation-id: 90b5a89b-1b77-4050-e655-08dda7f2e5db
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?kTRlhKNdtzea5/7uVesBTjSuLQLqoEO+0qMdgsgkXCdN5I9cTdn2gNGEzu/Q?=
+ =?us-ascii?Q?mpu4scJVvZGfC92TdQlnyeHEBo6nmd6djZwyQbu7ht676+YB0BKlCxa9BI2x?=
+ =?us-ascii?Q?XSZfE19x6FclTYQB5mGvVBpZ/fhHpSP5Fw1hRMR230zA7RL/HVeTYagLnYcA?=
+ =?us-ascii?Q?meyQ0A+9z11DULj6/G5LFLFtSMB2LSpMd21h2yfWFM0n41cVga3ZWuUmZnSv?=
+ =?us-ascii?Q?op/Lxgr3C2JXMJJijMdoa4MfmWNbiXxB20xOSHkLH6O72rjsOLd1Esnsynro?=
+ =?us-ascii?Q?o4K06jHnwAUbn1c4Dq+9PKKGiYiD+mQR2qX3SzodpuljdkfdaBsWmbSzRo9F?=
+ =?us-ascii?Q?aUNBywVJbI5B5pdGo995ObiiMSxXm3Jf7JtSgpHHpO9x5t5KGvEvBLzyt0a7?=
+ =?us-ascii?Q?VSklIESuCjCPXgB6k8CLcBmTziNk2PtS+iy2IDYkmbAsTi0nyAfRqjUfziuo?=
+ =?us-ascii?Q?3gFf0CbyH9ugXBunHcacYt7LQYni8Ehcc9/QoStywzXl7vUBdfa74lwWxogZ?=
+ =?us-ascii?Q?GHH7K7wXbexjRPSYMWXkQeRaKjsjVsJF3Em9e6A7tIbjEteCofoXYSkZH2SZ?=
+ =?us-ascii?Q?88yJlAR76j4m7OXc3QdfPy7DIJl7I2Ss2IA46o6XmXK4dQDJo+adDNwFjLi+?=
+ =?us-ascii?Q?72vgO3nk882bGRqJYB+PJjaGx+uiYJVffA/S1o3EfZZDjCj4UFr8S2MS8ByS?=
+ =?us-ascii?Q?weB9rzqSEGxNdCD6AJQHPCXbnoewQa/0SYK36M+LLxu7lA/+Bj0GwahQTzKG?=
+ =?us-ascii?Q?JsKPn5516TzOH+B7+TQgp+Rh+38JOL57pKvoi/95D8gXG+8VUvV1EokkXsT+?=
+ =?us-ascii?Q?cf1qfvbGLyF8gXs2QuNXoDi2xyufMPacZZb7woY+2WLpAK3CHq1N7/T2c4T3?=
+ =?us-ascii?Q?YRJfm+BpIiAmSp5sM9G8druz1pDSNaYr+UHlU4rHqTCGum8qolsFJ7HGpHkC?=
+ =?us-ascii?Q?pcyJrEnF3KsoElNv9UvKBudfJr2FnodCmprN2jsa9u/yqGcBS+OJ5TSMafnQ?=
+ =?us-ascii?Q?gBaeTzscTMkgCTLSV7cz1dkPIuUy3HgOzqXA6U2XqC8QnamubqktsDTFvu3q?=
+ =?us-ascii?Q?9BiO6qrIMIL1QUzqdXpsZvEW8TgsCqpx+qVW2v5FDcTPs8BrMdVNYByQ28tJ?=
+ =?us-ascii?Q?HA49tGWy2GOqiX1JBV/6foOyLzS2rviU4xrWnQr1tyMaVl6ABLhUC6hjAjpU?=
+ =?us-ascii?Q?5p8PJPBTdHVCloq+qROFrrT2iOKZuFjLww4JooTxnrWQljWcDlkt9IgO0Z2Q?=
+ =?us-ascii?Q?//cg1uXbE/aJYDy39cgyYreuNV5kaH3NIkCWoY5qGJIRUg0u0Hoc6Ckq8I1l?=
+ =?us-ascii?Q?GHIPQFunP9blDnSWrHi/V8NS1GbKZ7/pM1wMf2BUIfrvgIgCjSEJbqcYmzY1?=
+ =?us-ascii?Q?3vhhuEWBATmHPXj/Bqzv90uW6HR5tz/IDENfzZLsK9OAkQ2rMXcFQfAo++uV?=
+ =?us-ascii?Q?gdHrCgXCzz0wkrhEkL4vmkQdZxsrLNTVMwTVJd3rTEOTNWgaM40k8YZCV0kt?=
+ =?us-ascii?Q?RO1nkTQGgWpyVdw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OSCPR01MB14647.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?RGQYa+UymkIGEi5MqrIssGwi23UGPp3coYxyMs8LdSm1WSAggRN9DKvLXiIz?=
+ =?us-ascii?Q?zKCSTUwIePtO73xUmDs58Y+G5dHxZWdBGg4AIxzKPhA3j2R4nF/pGNkwkeZq?=
+ =?us-ascii?Q?k0fG4E60Ln4fQeCKKQrJxF2uoSrKwJW6z0jdZ8/MlTKXtF569BrSNRPsFRNj?=
+ =?us-ascii?Q?XyIl+NYbGDKcRExhVZjkPLnToFdGK05hwnrtlaIm/ArzsbKpgpg6txXX7GaA?=
+ =?us-ascii?Q?l/A5vvxhYMFqMspShz07A3HxDZxmEXoQXgQJJb4Sp4CTh4Uf536vPgqTh8l2?=
+ =?us-ascii?Q?ybX/M137DedWzzvpEEeqzdV+32XHZkKhFkLhcB4Yg/0ZnqNi3nOga2OjJAP9?=
+ =?us-ascii?Q?BNRLr6k/euXQZv0Tbnu+qTCmESB5oJLvwZ+vPx7AQGii70B7Ayu0bK0kAMMU?=
+ =?us-ascii?Q?IZKu/heP82VtYJFaGNJiS+e2uLK7+UpqLsGZF3GaoUpJ9Iyud4MoY/bAeVeM?=
+ =?us-ascii?Q?fXStNdCTJ/WR+HwM61HAD2j2GZ3gNLH6twFFqUXSNty4FWQ1r5OhbSGiNiAq?=
+ =?us-ascii?Q?lescCEI8ENCnzByyKZwYLa8iQlJsPNKQUXh2wY+/VSV87X5rU+GH5jjGiq9M?=
+ =?us-ascii?Q?VOzoah4IM6cri4HvRMWGCGITcc6rV5n0wD2TRbZAnE5uJku2ssXthbWcl+HN?=
+ =?us-ascii?Q?wt5UMBde0PZKc+T+AuT2Qmi8o2h4jEe78biIrqqtwowRBOPKyoMa8RlFwU22?=
+ =?us-ascii?Q?zSgYFQ3/b3TJPHyXSCSEpWiduaRIrVsLzdABPLhZfOQt5uWjRe61V3QcYCDa?=
+ =?us-ascii?Q?l9R7m3INVyU2od8rSzn/XPG61l8wkMEbeagZblqh+TvMX3IHGsThf8e3wDiU?=
+ =?us-ascii?Q?cNDOtiW8XsJvS+azG3QoB0ZO+X3cCCRQypL/XmCdNO3uNF2kEJxDVHtceT/8?=
+ =?us-ascii?Q?DI3rIJPw7cUx1x8JI/PhXRo79TtrjZmtTY8Zrwg0Ohim1I9GD9+GPe00UmDY?=
+ =?us-ascii?Q?/S8aTrujh1jBA4kZdN+9by1MJICguzCHUkXetAvggb0eOxW5T7Bke1r6gaff?=
+ =?us-ascii?Q?/Gat4RNUYUuj4dSoJaGg3Dcz+erSoqUi+nL11c29H+FB3pInGfu+4aqasK59?=
+ =?us-ascii?Q?GLhgkgbj5Xkx1VF7JZQ7RYrF1Omqph2H5TO8sJ6aWXzMOmf8EhrJhmiiiyar?=
+ =?us-ascii?Q?Za/3eJ62fNMN1WmiXayyg4ZYs4b4byUi/17xtZDLDYRYuqWxZVkGp+M5YbLb?=
+ =?us-ascii?Q?0Zsviu/WAzTlH2A7Ilz0qQpfG4dmTf8GykhpqDFfjzv0AcVn7rs2Iz7e5EaL?=
+ =?us-ascii?Q?GpsngjOAmWrZxQeMiudhCICEgEYrKtZSSeFpJIcSgKiNmf/pYsXWH9NjJn71?=
+ =?us-ascii?Q?MXnUc0VZ+tSQUsm/gO+K3st8v8qkALzfaHqIS9UiixtkCNr6Eao0O7fFNqgR?=
+ =?us-ascii?Q?uN1mdHFOtRm/7sbE4PFJ4oEs1g6ddnyrn4D1n9f2eJy8ICNw/+XnaiYaOJ2+?=
+ =?us-ascii?Q?yVAz8YPLCCC5402hSC43x97/Lcks9lUqmlDIBCiWcfstWKyyqONkQ8zl/7rb?=
+ =?us-ascii?Q?nRtzfNuzi2B6+3O/uTXnq3Fa4YRlN3Rjhfcng+fo/pqSEyTScri7JRuPXVAw?=
+ =?us-ascii?Q?YceLN3Gr8n7aIMsnQjyQW8NciClN9wu627EUiTQaUMtQS2P/3CUyBsgMP3bl?=
+ =?us-ascii?Q?xA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10] net: ti: icssg-prueth: add TAPRIO offload
- support
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Meghana Malladi <m-malladi@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Simon Horman <horms@kernel.org>,
-        Guillaume La Roque <glaroque@baylibre.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Roger
- Quadros <rogerq@ti.com>
-References: <20250502104235.492896-1-danishanwar@ti.com>
- <20250506154631.gvzt75gl2saqdpqj@skbuf>
- <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
-Content-Language: en-US
-In-Reply-To: <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-OriginatorOrg: bp.renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OSCPR01MB14647.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90b5a89b-1b77-4050-e655-08dda7f2e5db
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2025 07:46:23.6666
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lmOXRS2FRQ17Vus5ebaHGdqZ0EHM6ilxdQttRRQ60qUhnBcEOPoDxvNeLhqEZE2ed+1OUNv8EwMEqtUS0mcs1tmrQ/haJpm4NCQ915XxFd8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB10808
 
-Hi Vladimir,
+Hi Jakub,
 
-On 15/05/25 4:24 pm, MD Danish Anwar wrote:
-> Hi Vladimir,
-> 
-> On 06/05/25 9:16 pm, Vladimir Oltean wrote:
->> It has been a long time since the last posting, everything has been
->> swapped out from my memory. Sorry if some comments are repeated.
->>
-> 
-> Yes. It has been almost a year since my last revision.
-> 
->> On Fri, May 02, 2025 at 04:12:35PM +0530, MD Danish Anwar wrote:
->>> From: Roger Quadros <rogerq@ti.com>
->>>
->>> The Time-Aware Shaper (TAS) is a key feature of the Enhanced Scheduled
->>> Traffic (EST) mechanism defined in IEEE 802.1Q-2018. This patch adds TAS
->>> support for the ICSSG driver by interacting with the ICSSG firmware to
->>> manage gate control lists, cycle times, and other TAS parameters.
->>>
->>> The firmware maintains active and shadow lists. The driver updates the
->>> operating list using API `tas_update_oper_list()` which,
->>> - Updates firmware list pointers via `tas_update_fw_list_pointers`.
->>> - Writes gate masks, window end times, and clears unused entries in the
->>>   shadow list.
->>> - Updates gate close times and Max SDU values for each queue.
->>> - Triggers list changes using `tas_set_trigger_list_change`, which
->>>   - Computes cycle count (base-time % cycle-time) and extend (base-time %
->>>     cycle-time)
->>
->> Please define the "cycle count" concept (local invention, not IEEE
-> 
-> cycle count here means number of cycles in the base-time.
-> If base-time is 1747291156846086012 and cycle-time is 1000000 (1ms) then
-> the cycle count is 1747291156846 where as extend will be 86012
-> 
->> standard). Also, cross-checking with the code, base-time % cycle-time is
->> incorrect here, that's not how you calculate it.
-> 
-> That's actually a typo. It should be
-> 
->  - Computes cycle count (base-time / cycle-time) and extend (base-time %
->    cycle-time)
-> 
->>
->> I'm afraid you also need to define the "extend" concept. It is not at
->> all clear what it does and how it does it. Does it have any relationship
->> with the CycleTimeExtension variables as documented by IEEE 802.1Q annex
->> Q.5 definitions?
->>
->> A very compressed summary of the standard variable is this:
->> the CycleTimeExtension applies when:
->> - an Open schedule exists
->> - an Admin schedule is pending
->> - the AdminBaseTime is not an integer multiple of OperBaseTime + (N *
->>   OperCycleTime) - i.o.w. the admin schedule does not "line up" with the
->>   end of the oper schedule
->>
->> The misalignment of the oper vs admin schedules might cause the very
->> last oper cycle to be truncated to an undesirably short value. The
->> OperCycleTimeExtension variable exists to prevent this, as such:
->>
->> - If the length of the last oper cycle is < OperCycleTimeExtension,
->>   then this cycle does not execute at all. The gate states from the end
->>   of the next-to-last oper cycle remain in place (that cycle is extended)
->>   until the activation of the admin schedule at AdminBaseTime.
->>
->> - If the length of the last oper cycle is >= OperCycleTimeExtension,
->>   this last cycle is left to execute until AdminBaseTime, and is
->>   potentially truncated during the switchover event (unless it perfectly
->>   lines up). Extension of the next-to-last oper cycle does not take
->>   place.
->>
->> Is this the same functionality as the "extend" feature of the PRU
->> firmware - should I be reading the code and the commit message in this
->> key, in order to understand what it achieves?
-> 
-> 
-> "extend" here is not same as `CycleTimeExtension`. The current firmware
-> implementation always extends the next-to-last cycle so that it aligns
-> with the new base-time.
-> 
-> Eg,
-> existing schedule, base-time 125ms cycle-time 1ms
-> New schedule, base-time 239.4ms cycle-time 1ms
-> 
-> Here the second-to-last cycle starts at 238ms and lasts for 1ms. The
-> Last cycle starts at 239ms and is only lasting for 0.4ms.
-> 
-> In this case, the existing schedule will continue till 238ms. After that
-> the next cycle will last for 1.4 ms instead of 1ms. And the new schedule
-> will happen at 239.4 ms.
-> 
-> The extend variable can be anything between 0 to 1ms in this case and
-> the second last cycle will be extended and the last cycle won't be
-> executed at all.
-> 
->>
->>>   - Writes cycle time, cycle count, and extend values to firmware memory.
->>>   - base-time being in past or base-time not being a multiple of
->>>     cycle-time is taken care by the firmware. Driver just writes these
->>>     variable for firmware and firmware takes care of the scheduling.
->>
->> "base-time not being a multiple of cycle-time is taken care by the firmware":
->> To what extent is this true? You don't actually pass the base-time to
->> the firmware, so how would it know that it's not a multiple of cycle-time?
->>
-> 
-> We pass cycle-count and extend. If extend is zero, it implies base-time
-> is multiple of cycle-time. This way firmware knows whether base-time is
-> multiple of cycle-time or not.
-> 
->>>   - If base-time is not a multiple of cycle-time, the value of extend
->>>     (base-time % cycle-time) is used by the firmware to extend the last
->>>     cycle.
->>
->> I'm surprised to read this. Why does the firmware expect the base time
->> to be a multiple of the cycle time?
->>
-> 
-> Earlier the limitation was that firmware can only start schedules at
-> multiple of cycle-times. If a base-time is not multiple of cycle-time
-> then the schedule is started at next nearest multiple of cycle-time from
-> the base-time. But now we have fix that, and schedule can be started at
-> any time. No need for base-time to be multiple of cycle-time.
-> 
->> Also, I don't understand what the workaround achieves. If the "extend"
->> feature is similar to CycleTimeExtension, then it applies at the _end_
->> of the cycle. I.o.w. if you never change the cycle, it never applies.
->> How does that help address a problem which exists since the very first
->> cycle of the schedule (that it may be shifted relative to integer
->> multiples of the cycle time)?
->>
->> And even assuming that a schedule change will take place - what's the
->> math that would suggest the "extend" feature does anything at all to
->> address the request to apply a phase-shifted schedule? The last cycle of
->> the oper schedule passes, the admin schedule becomes the new oper, and
->> then what? It still runs phase-aligned with its own cycle-time, but
->> misaligned with the user-provided base time, no?
->>
->> The expectation is for all cycles to be shifted relative to N *
->> base-time, not just the first or last one. It doesn't "sound" like you
->> can achieve that using CycleTimeExtension (assuming that's what this
-> 
-> Yes I understand that. All the cycles will be shifted not just the first
-> or the last one. Let me explain with example.
-> 
-> Let's assume the existing schedule is as below,
-> base-time 500ms cycle-time 1ms
-> 
-> The schedule will start at 500ms and keep going on. The cycles will
-> start at 500ms, 501ms, 502ms ...
-> 
-> Now let's say new requested schedule is having base-time as 1000.821 ms
-> and cycle-time as 1ms.
-> 
-> In this case the earlier schedule's second-to-last cycle will start at
-> 999ms and end at 1000.821ms. The cycle gets extended by 0.821ms
-> 
-> It will look like this, 500ms, 501ms, 502ms ... 997ms, 998ms, 999ms,
-> 1000.821ms.
-> 
-> Now our new schedule will start at 1000.821ms and continue with 1ms
-> cycle-time.
-> 
-> The cycles will go on as 1000.821ms, 1001.821ms, 1002.821ms ......
-> 
-> Now in future some other schedule comes up with base-time as 1525.486ms
-> then again the second last cycle of current schedule will extend.
-> 
-> So the cycles will be like 1000.821ms, 1001.821ms, 1002.821ms ...
-> 1521.821ms, 1522.821ms, 1523.821ms, 1525.486ms. Here the second-to-last
-> cycle will last for 1.665ms (extended by 0.665ms) where as all other
-> cycles will be 1ms as requested by user.
-> 
-> Here all cycles are aligned with base-time (shifter by N*base-time).
-> Only the last cycle is extended depending upon the base-time of new
-> schedule.
-> 
->> is), so better refuse those schedules which don't have the base-time you
->> need.
->>
-> 
-> That's what our first approach was. If it's okay with you I can drop all
-> these changes and add below check in driver
-> 
-> if (taprio->base_time % taprio->cycle_time) {
-> 	NL_SET_ERR_MSG_MOD(taprio->extack, "Base-time should be multiple of
-> cycle-time");
-> 	return -EOPNOTSUPP;
-> }
-> 
->>>   - Sets `config_change` and `config_pending` flags to notify firmware of
->>>     the new shadow list and its readiness for activation.
->>>   - Sends the `ICSSG_EMAC_PORT_TAS_TRIGGER` r30 command to ask firmware to
->>>     swap active and shadow lists.
->>> - Waits for the firmware to clear the `config_change` flag before
->>>   completing the update and returning successfully.
->>>
->>> This implementation ensures seamless TAS functionality by offloading
->>> scheduling complexities to the firmware.
->>>
->>> Signed-off-by: Roger Quadros <rogerq@ti.com>
->>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->>> Reviewed-by: Simon Horman <horms@kernel.org>
->>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>> ---
->>> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
->>> v9 - v10:
->>> There has been significant changes since v9. I have tried to address all
->>> the comments given by Vladimir Oltean <vladimir.oltean@nxp.com> on v9
->>> *) Made the driver depend on NET_SCH_TAPRIO || NET_SCH_TAPRIO=n for TAS
->>> *) Used MACRO for max sdu size instead of magic number
->>> *) Kept `tas->state = state` outside of the switch case in `tas_set_state`
->>> *) Implemented TC_QUERY_CAPS case in `icssg_qos_ndo_setup_tc`
->>> *) Calling `tas_update_fw_list_pointers` only once in
->>>    `tas_update_oper_list` as the second call as unnecessary.
->>> *) Moved the check for TAS_MAX_CYCLE_TIME to beginning of
->>>    `emac_taprio_replace`
->>> *) Added `__packed` to structures in `icssg_qos.h`
->>> *) Modified implementation of `tas_set_trigger_list_change` to handle
->>>    cases where base-time isn't a multiple of cycle-time. For this a new
->>>    variable extend has to be calculated as base-time % cycle-time. This
->>>    variable is used by firmware to extend the last cycle.
->>> *) The API prueth_iep_gettime() and prueth_iep_settime() also needs to be
->>>    adjusted according to the cycle time extension. These changes are also
->>>    taken care in this patch.
->>
->> Why? Given the explanation of CycleTimeExtension above, it makes no
->> sense to me why you would alter the gettime() and settime() values.
->>
-> 
-> The Firmware has two counters
-> 
-> counter0 counts the number of miliseconds in current time
-> counter1 counts the number of nanoseconds in the current ms.
-> 
-> Let's say the current time is 1747305807237749032 ns.
-> counter0 will read 1747305807237 counter1 will read 749032.
-> 
-> The current time = counter0* 1ms + counter1
-> 
-> For taprio scheduling also counter0 is used. Now let's say below is are
-> the cycles of a schedule
-> 
-> cycles   = 500ms 501ms 502ms ... 997ms, 998ms, 999ms, 1000.821ms
-> counter0 = 500   501   502   ... 997    998    999    1000
-> curr_time= 500*1, 501*1, 502*2...997*1, 998*1, 999*1, 1000*1
-> 
-> Here you see after the last cycle the time is 1000.821 however our above
-> formula will give us 1000 as the time since last cycle was extended.
-> 
-> To compensate this, whatever extension firmware applies need to be added
-> during current time calculation. Below is the code for that.
-> 
->       ts += readl(prueth->shram.va + TIMESYNC_CYCLE_EXTN_TIME);
-> 
-> Now the current time becomes,
-> 	counter0* 1ms + counter1 + EXTEND
-> 
-> This is why change to set/get_time() APIs are needed. This will not be
-> needed if we drop this extends implementation.
-> 
-> Let me know if above explanation makes sense and if I should continue
-> with this approach or drop the extend feature at all and just refuse the
-> schedules?
-> 
+Thanks for the feedback.
 
-I am not sure if you got the change to review my replies to your initial
-comments. Let me know if I should continue with this approach or just
-refuse the schedules that don't have the base time that we need.
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Monday, June 9, 2025 5:30 PM
+> To: John Madieu <john.madieu.xa@bp.renesas.com>
+> Subject: Re: [PATCH 2/4] dt-bindings: net: renesas-gbeth: Add support for
+> RZ/G3E (R9A09G047) SoC
+>=20
+> On Wed,  4 Jun 2025 08:51:58 +0200 John Madieu wrote:
+> > Document support for the GBETH IP found on the Renesas RZ/G3E
+> (R9A09G047) SoC.
+> > The GBETH block on RZ/G3E is equivalent in functionality to the GBETH
+> > found on
+> > RZ/V2H(P) (R9A09G057).
+>=20
+> Could you repost this as a stand-alone patch with [PATCH net-next] in the
+> subject? I believe the patches in this series need to go to 3 different
+> trees, /Documentation/devicetree/bindings/net
+> to networking.
 
-> Thanks for the feedback.
-> 
+Got it. I'll send a v2 with a standalone patch for the binding.
 
-
--- 
-Thanks and Regards,
-Danish
+Regards,
+John
 
