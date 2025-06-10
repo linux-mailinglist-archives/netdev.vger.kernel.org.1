@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-196275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F710AD4099
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:27:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7C7AD4095
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 004F71BA096F
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:25:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5679D7A98A0
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C6424DD1E;
-	Tue, 10 Jun 2025 17:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B2B251792;
+	Tue, 10 Jun 2025 17:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gtALLtsJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ap+PgYSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B0F24C68B;
-	Tue, 10 Jun 2025 17:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D812459F7;
+	Tue, 10 Jun 2025 17:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749576206; cv=none; b=C+U8AY6tWppSrVAidRL9uHGJM/YUZpW2cHdwSwiCZd1OmkuM/mV7rd/7mB6EvsQsHvdd3KfKZm3FkoTqAg0WbcbSH74dnaPz/3NhbTRgKfF9jqABQRNNUAbmsYVFq5mBTwYDAnXS3gUpCfr/7LIhViKaIon3eSSgqI4WpbG9v4g=
+	t=1749576207; cv=none; b=YQjEZsW9Mw1o4cDqoSBDasHVzHgO/b07TnsZ/0ZirMscjk0Tkp84uItbpQCpTDnjESBGUR9h92R7T0eZt0WHZ5IwpzO8atwbFDPPS+RPbcXmpqwO9ij7jnfjyspiDFe12K69AzUHL/STC5xILZELhu7r0Guag37zSLS/TPf5dr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749576206; c=relaxed/simple;
-	bh=dmlC9vCx/cjd8t180gK3iH72DBeKN08btiG3Lz/Uev8=;
+	s=arc-20240116; t=1749576207; c=relaxed/simple;
+	bh=RK2c2snQV1174G2mJ1l0C1Ecfhhrc6r9NDzsqJ4oOmo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LeCt3nqDLPlgmrC2wKeY7VDjAtk0RzDLlNGJiGBGwvjTSTD7QfDAMLa6v15KuGgvt7xJ3V9veyJ1MFAHKnH4DIemWg444rrNoB7eKJOdlkVTm3DTxZWxLtpAOpXWtUAcijwunx4Gm3nQ63oPP6rYAl5qni7LoBMI+HVLIz9KJF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gtALLtsJ; arc=none smtp.client-ip=209.85.222.169
+	 MIME-Version; b=oV7OaGGBnnpacWY6eeVawTE9i9W/wsEXDpx0MEen/QHic7vqWFFUSyDOSB6hbvm8b9xI1Zk9bHxjipHYrdlAEjQWaBV9xDc7Xe9cVUJM2lotM+U4FSZsF79mhmxarRkLQ75PKvUW7qSoR4eOUuo0Bf7d5vCNp5Nk6WnrAWeo0+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ap+PgYSx; arc=none smtp.client-ip=209.85.219.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7cadd46ea9aso832439885a.1;
-        Tue, 10 Jun 2025 10:23:24 -0700 (PDT)
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6fb0eb0f0fbso786846d6.1;
+        Tue, 10 Jun 2025 10:23:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749576203; x=1750181003; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749576204; x=1750181004; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/JEjxGOq/Zd4Bd7XW8vuItSiK8Ht5QKss+KyyUpNftY=;
-        b=gtALLtsJkSTm9nFhnAR5ugxPXeIt97slnlQ3/H9+tl9qQp4jzqasR4ciWDTrCv8ArX
-         waqmt/wqGwdsuX5/FkJf3NxslwyiHVy/xuJjBA0SPQUMtg21Zelky+7trEZDYGpMvnox
-         hD1g/gu2H88UcE2AOpQqUQr82+MhouhnhXXOZxdmrb60RX3iJEs7Rvt2poH3qNyl5tf4
-         HfeImNakMMedCHS6CrdiI3AWmPGKP/Q0gyjE9CX+VDGlilSBHr73TXSQj3IeOjamV6JL
-         Ttx6NlzSDk2dWbsAjyxCXYjWDO8WQWSgRJNz5OwgGDt+9ljH1Is1Hg8cnN2/ciJd/P67
-         Ws5A==
+        bh=iKHxJvOpFKszXBb9FdUByVo94kwP1xAcywVPr+4ePz8=;
+        b=ap+PgYSxiHWRBb0JU8Lkbcl3iuU97bfrTVgwRHvpIq6ObnQTjQvkXcmf8YDBhi7CLI
+         dlV97eBHZ10AzomHRksgNYa3H4M6OW1OT7QBb15cFkyDfFOpUYDiNAbdrTaIO/MHO9vh
+         4z1SDi1buUtt66JTfLMMdTNdHoFYuNkhuIGZpnNSVTSsoFxmcGRQ40wgdXIXV/dyIZem
+         HICEshL5y1NgouozDXk+ApaeZAV+ceKwOQgLxE0wMXLGCTmKFzKrhr+tYJoO22K0WAAh
+         YVTm50f4/hn4Io7kqw7dLD9O4LbAqssUqpFhRAjnqGSoc7tk1XtzyUxWgAWi8M75l+67
+         8QXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749576203; x=1750181003;
+        d=1e100.net; s=20230601; t=1749576204; x=1750181004;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/JEjxGOq/Zd4Bd7XW8vuItSiK8Ht5QKss+KyyUpNftY=;
-        b=hb9JoYg/dJXrPR0zzWljmOAXvq3VjyScCbq1Hh+Adhq1mZ+3HhEwoRn5DbNRmSUXt9
-         ZYNrD/6g9yu2WxuaNtuH3t8ftnMGob3rHN86rNhd9RDPN8slx9nx2VhUunHjCkg1d38z
-         4hD9HKQ2Bo5s0HM+s4Sk93tGl5LGmjf6OfIGl80/2asZ0tuf2cQ35KL5JQfWbaMftD/u
-         arP6SnMpg7GJGTNTR7tZ12YXrrA661nxwZAVzJqOJR5y16ajxGKTuMJDFgKVeGGQRfhE
-         n11ugTflQMHbs8O+9T430qQYSSBCw6dvPtn92DwE5Y8aX1x20OEWlssg0v86FXOsVUhU
-         BR6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUdh+TLEAn9mecqYc2hcL+0ZMRgxXyceRiahT1hCPI69m9IszIpzKqs02tuc6mKr557RepFfn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNWoznKbX1WQYFNbF3ifBKxPhaDFFbT3+Ye6G7Fs+p2j7Wm0uW
-	O2FHxhKsjyLmYVk7dqJ/MbNcWo5kqI82ToLvn18N5TwtjRe3lknqAzwvxdmNKA==
-X-Gm-Gg: ASbGncu2oQvMPyD3QrHXB86aVsE5H0nBckDAhVccbE4r2yeRx9+T85uvNkCmxTkHAJc
-	u/60rsfMVkJgYoYS/g9vAIGjqYFaoTQSV7kBan/L4+p7+wZMH6+RTd9wsk+SxqgJlytO/vnkkpt
-	fVAYFSKzQpv8Vv1zMeTvLNpZAorjnUxoo824SNkiWs7OX1Iar5i5rgYCpu0zHsANVqVJqxQm1ld
-	gexkertyz9yliDyzFvsyVOJNhqIegrE+RsRSvbKBfzhYq4hrCWvKPdk0EFnJL7a60Ti6L+PcDeL
-	vPmesq+S0+lWlP5sGOspXWjfAFz/t6qgtA73z2FdoKaTjhDGxd4ELqMFLAx8qSKky282mxD/QRD
-	nLjMVAlIce4ksgEkedDw8Wa+u6YTCWe6jFs+vb9dzayX3E48vhdmCrJW5T56LbNTosQ==
-X-Google-Smtp-Source: AGHT+IHZrLgpPpfwBbbF9MX4fOYRpjpQ3r8tm5oqicMlYL0Rl0uSJD/OKdhGYOsNsv2w1GgOGjmLiQ==
-X-Received: by 2002:a05:620a:40ca:b0:7d0:98fc:83f9 with SMTP id af79cd13be357-7d3a87e5e36mr40473885a.18.1749576203048;
+        bh=iKHxJvOpFKszXBb9FdUByVo94kwP1xAcywVPr+4ePz8=;
+        b=VzNffDC8msVLeIjGl8FdOtKMK5FDfUKO4geq0y/IRqrgjrf8/b/EvgBdBQ1X75ADSM
+         sZf6wjlPt7wVDCZPYSAlYHBBrF/P8fTCSAGQ6srLuHLx2j0Am6caWZB4aXt75R8RivyR
+         0hJJ5XhXkH7xFfbazOY7bSMaXREYrWv9ag5YLa5n9ThCQJOS78c+yRF2FcNci7nxLzzA
+         2XztJ1IZ75yfJ34RCDb+lv5AkH5qL1gIegBUBGqYH+bFRUSxqw9FZ9Y9p1jv0Hw8F9kt
+         fiXhfd0CpXpZXZBN5FLdX53FGU6XcizO+31TP1DOy9M/hKNeeHuYbRDEkyShzs9qSkno
+         VYBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlL8o0jbxZwiRuazmatcrvugrIbD1FL6DzDwDksdUtZ3ChkUag1uoXrQAHVE5AcyXjtzjaD4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1reyZHnsZ1MC2NEwijrB04XGQux9LBalkQRDKyZFtIQCM5g0c
+	Rsx5V2eToUGAi3Zq6mRMlvr8KfD7hGlI01BhWW/9DcYVkjl1Nlv4c/hv1czHdg==
+X-Gm-Gg: ASbGncuMOR9VSioSUv1p18Q1JODSn6lFtl9dr7NYh9DnLNlMjKW2r7aLKn5Z1ZD8khB
+	eqQYrQWBc4y5ndk1kMZ7W8/4w7luMCNwkU3GIHXcEbR6hMrb3ibaNr5lczvcs0VmYBuywWjqtrw
+	xIST2xPBYnU1nUS89SB+ByL3cV8QYr5U0cnsrnIskwdezp9wf/YJvVIU6rJDtnnyW0fK+H8JVhU
+	xk07PX2ZpdB5/Kmdl3Z4ftQHiqDgVmGt/8Jd+P9P4P2TxYQPSbrQINrwfHh3ryzLp+2Wp5A7Qxv
+	1P6z7me9xZ3j2vCJn1P5x9fWmQnu7NwTw7Ps1+CBiQBi+8y5qO6CcKizksWRmKLhWve6BkinzcI
+	hkJK70JSm13bSbBNE018IC62ZwxcZQR7KsGwPkN/MrqZVJ308388wa5qwC5r1Gk8kO+t3NUdRiz
+	gD
+X-Google-Smtp-Source: AGHT+IGyQ5Eb+lS6MLcGxsaQXqKmNhfuPnjFeGV9nnqt7BFuzFPB7kdrCl3HaAg9thu9KEncoMBwqA==
+X-Received: by 2002:a05:6214:1d2d:b0:6fa:ee98:65b6 with SMTP id 6a1803df08f44-6fb2c37a117mr4496706d6.4.1749576203934;
         Tue, 10 Jun 2025 10:23:23 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a608d19sm716491185a.63.2025.06.10.10.23.22
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a608d19sm716491185a.63.2025.06.10.10.23.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 10:23:22 -0700 (PDT)
+        Tue, 10 Jun 2025 10:23:23 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
 	omosnace@redhat.com,
 	netdev@vger.kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v4 27/42] selinux: introduce task_obj_perm()
-Date: Tue, 10 Jun 2025 13:21:58 -0400
-Message-ID: <20250610172226.1470741-28-stephen.smalley.work@gmail.com>
+Subject: [PATCH v4 28/42] selinux: update bprm hooks for selinux namespaces
+Date: Tue, 10 Jun 2025 13:21:59 -0400
+Message-ID: <20250610172226.1470741-29-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
 References: <20250610172226.1470741-1-stephen.smalley.work@gmail.com>
@@ -93,117 +94,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce task_obj_perm() for namespace-aware permission checking
-between two tasks using the objective SID for both tasks and
-without assuming that either task is current.
-
-Convert the permission checks of this form in the hook functions
-to use this new helper.
+Update the bprm hook functions for SELinux namespaces.
+Unlike most of the hook functions, this does not require
+converting all of the permission checks to use the new
+helpers that check permissions against the current and
+all ancestor namespaces. Instead, we only need to check
+the transition-related permissions against the current
+namespace since only the SID in that current namespace
+is changed by a transition. However, we do want to
+check execute_no_trans against the ancestor namespaces
+since they are not transitioning; hence, a check
+is added to the end of selinux_bprm_creds_for_exec()
+for that purpose. Otherwise, we just document the
+fact that we are intentionally only checking against
+the current SELinux namespace for the other checks.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- security/selinux/avc.c         | 56 ++++++++++++++++++++++++++++++++++
- security/selinux/hooks.c       |  5 ++-
- security/selinux/include/avc.h |  3 ++
- 3 files changed, 61 insertions(+), 3 deletions(-)
+ security/selinux/hooks.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/security/selinux/avc.c b/security/selinux/avc.c
-index 9385dcd84eee..07cd1b037ed1 100644
---- a/security/selinux/avc.c
-+++ b/security/selinux/avc.c
-@@ -1291,6 +1291,62 @@ int cred_task_has_perm(const struct cred *cred, const struct task_struct *p,
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index 44730629c772..2e2aa80b76af 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -2283,6 +2283,11 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
+ 			av |= PROCESS2__NNP_TRANSITION;
+ 		if (nosuid)
+ 			av |= PROCESS2__NOSUID_TRANSITION;
++		/*
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
++		 */
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  old_tsec->sid, new_tsec->sid,
+ 				  SECCLASS_PROCESS2, av, NULL);
+@@ -2312,6 +2317,7 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
+ 
+ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ {
++	const struct cred *cred = current_cred();
+ 	const struct task_security_struct *old_tsec;
+ 	struct task_security_struct *new_tsec;
+ 	struct inode_security_struct *isec;
+@@ -2322,7 +2328,7 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 	/* SELinux context only depends on initial program or script and not
+ 	 * the script interpreter */
+ 
+-	old_tsec = selinux_cred(current_cred());
++	old_tsec = selinux_cred(cred);
+ 	new_tsec = selinux_cred(bprm->cred);
+ 	isec = inode_security(inode);
+ 
+@@ -2378,12 +2384,23 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 	ad.u.file = bprm->file;
+ 
+ 	if (new_tsec->sid == old_tsec->sid) {
++		/*
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
++		 */
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  old_tsec->sid, isec->sid,
+ 				  SECCLASS_FILE, FILE__EXECUTE_NO_TRANS, &ad);
+ 		if (rc)
+ 			return rc;
+ 	} else {
++		/*
++		 * Only check against the current SELinux namespace
++		 * because only the SID in the current namespace
++		 * is changed by a transition.
++		 */
++
+ 		/* Check permissions for the transition. */
+ 		rc = avc_has_perm(current_selinux_state,
+ 				  old_tsec->sid, new_tsec->sid,
+@@ -2434,6 +2451,19 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
+ 		bprm->secureexec |= !!rc;
+ 	}
+ 
++	/*
++	 * If in a non-init namespace, also check the ability of the
++	 * ancestors to execute without transitioning since the SID
++	 * in ancestor namespaces is NOT modified.
++	 */
++	cred = old_tsec->parent_cred;
++	if (cred) {
++		rc = cred_has_perm(cred, isec->sid,
++				  SECCLASS_FILE, FILE__EXECUTE_NO_TRANS, &ad);
++		if (rc)
++			return rc;
++	}
++
  	return 0;
  }
  
-+static const struct task_security_struct *task_security(
-+	const struct task_struct *p)
-+{
-+	const struct task_security_struct *tsec;
-+
-+	tsec = selinux_cred(__task_cred(p));
-+	while (tsec->state != current_selinux_state && tsec->parent_cred)
-+		tsec = selinux_cred(tsec->parent_cred);
-+	if (tsec->state != current_selinux_state)
-+		return NULL;
-+	return tsec;
-+}
-+
-+int task_obj_has_perm(const struct task_struct *s,
-+		      const struct task_struct *t,
-+		      u16 tclass, u32 requested,
-+		      struct common_audit_data *ad)
-+{
-+	const struct cred *cred;
-+	const struct task_security_struct *tsec;
-+	struct selinux_state *state;
-+	u32 ssid;
-+	u32 tsid;
-+	int rc;
-+
-+	state = current_selinux_state;
-+	rcu_read_lock();
-+	tsec = task_security(s);
-+	if (tsec)
-+		ssid = tsec->sid;
-+	else
-+		ssid = SECINITSID_UNLABELED;
-+	rcu_read_unlock();
-+
-+	do {
-+		tsid = task_sid_obj_for_state(t, state);
-+
-+		rc = avc_has_perm(state, ssid, tsid, tclass, requested, ad);
-+		if (rc)
-+			return rc;
-+
-+		cred = tsec->parent_cred;
-+		if (!cred)
-+			break;
-+
-+		rcu_read_lock();
-+		tsec = selinux_cred(cred);
-+		ssid = tsec->sid;
-+		state = tsec->state;
-+		rcu_read_unlock();
-+	} while (cred);
-+
-+	return 0;
-+}
-+
-+
- int cred_has_extended_perms(const struct cred *cred, u32 tsid, u16 tclass,
- 			    u32 requested, u8 driver, u8 base_perm, u8 xperm,
- 			    struct common_audit_data *ad)
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 4c2f7491803b..44730629c772 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -2126,9 +2126,8 @@ static int selinux_ptrace_access_check(struct task_struct *child,
- 
- static int selinux_ptrace_traceme(struct task_struct *parent)
- {
--	return avc_has_perm(current_selinux_state,
--			    task_sid_obj(parent), task_sid_obj(current),
--			    SECCLASS_PROCESS, PROCESS__PTRACE, NULL);
-+	return task_obj_has_perm(parent, current, SECCLASS_PROCESS,
-+				 PROCESS__PTRACE, NULL);
- }
- 
- static int selinux_capget(const struct task_struct *target, kernel_cap_t *effective,
-diff --git a/security/selinux/include/avc.h b/security/selinux/include/avc.h
-index 1631f6cdbefd..2c2268249b44 100644
---- a/security/selinux/include/avc.h
-+++ b/security/selinux/include/avc.h
-@@ -173,6 +173,9 @@ int cred_other_has_perm(const struct cred *cred, const struct cred *other,
- 			u16 tclass, u32 requested,
- 			struct common_audit_data *ad);
- 
-+int task_obj_has_perm(const struct task_struct *s, const struct task_struct *t,
-+		      u16 tclass, u32 requested, struct common_audit_data *ad);
-+
- u32 avc_policy_seqno(struct selinux_state *state);
- 
- #define AVC_CALLBACK_GRANT		1
+@@ -2520,6 +2550,9 @@ static void selinux_bprm_committing_creds(const struct linux_binprm *bprm)
+ 	 * higher than the default soft limit for cases where the default is
+ 	 * lower than the hard limit, e.g. RLIMIT_CORE or RLIMIT_STACK.
+ 	 */
++	/* Only check against the current namespace because the SID
++	 * does not change in the parent.
++	 */
+ 	rc = avc_has_perm(current_selinux_state,
+ 			  new_tsec->osid, new_tsec->sid, SECCLASS_PROCESS,
+ 			  PROCESS__RLIMITINH, NULL);
+@@ -2560,6 +2593,9 @@ static void selinux_bprm_committed_creds(const struct linux_binprm *bprm)
+ 	 * This must occur _after_ the task SID has been updated so that any
+ 	 * kill done after the flush will be checked against the new SID.
+ 	 */
++	/* Only check against the current namespace because the SID
++	 * does not change in the parent.
++	 */
+ 	rc = avc_has_perm(current_selinux_state,
+ 			  osid, sid, SECCLASS_PROCESS, PROCESS__SIGINH, NULL);
+ 	if (rc) {
 -- 
 2.49.0
 
