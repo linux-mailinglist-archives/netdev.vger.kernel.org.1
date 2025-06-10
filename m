@@ -1,58 +1,64 @@
-Return-Path: <netdev+bounces-196358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFBC2AD4604
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:34:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B017FAD460C
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F8F217B23B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:34:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E2217B3A8
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DC8278754;
-	Tue, 10 Jun 2025 22:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3487E283686;
+	Tue, 10 Jun 2025 22:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEY4l/pC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZ3HR1Wv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6394269B01;
-	Tue, 10 Jun 2025 22:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00826248F74;
+	Tue, 10 Jun 2025 22:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749594872; cv=none; b=jGLTznC8xY9iN+fClj5bOqyjqjSocs+YZmgcF6lCJnJzCPA1wi8Wpw5kidH/LMHblQ9Xnwr0NeJyfBV86g1PzS1dJW6fhMeigW2ZfEbhUJQujJ6FtsyzNljCtJjn4JL1VuNEIPdWrMDCHk2iTPnsjMGriaRL4IsjZ6FzuLDM/Bc=
+	t=1749594939; cv=none; b=AnPYNgbaH28GaxvpoBHhWCvFcN1/cqVk+V6GC/Dm5WlO4DHbQbgXgTYVZByT/ZnMoWx6D8hupgxAGxGQnyh8Qr58Tw/9n09sBI9EHFT1aF0X4dgUu2uJHSkQYbUn1p8LdtTRv3HC6fTAoAAmEUCpGCTiuC1AHaT4c/L/RUpL//s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749594872; c=relaxed/simple;
-	bh=tXbDG69pqssgcGg4iB0p/RaU/dHtIZh4hPHnxu2hRoQ=;
+	s=arc-20240116; t=1749594939; c=relaxed/simple;
+	bh=4/j43Zu0GL7ig2H6mfd+D0Go2TbiM72gN9/cHaPFpys=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X8cVhP8u133t+XeEVryErnw3/6rV+/ttvtWXKaJ2KKvuAIxK3UhQXmRjvFoVtkYOuuWNFN/84dsefMbmtiI2I8704quYuy4zaxfy5hWO9hQ1+DEkjx/l5eYkcDgGBwNh0no4geDXS7NexxgjuAbfRF+ArY1S++mMFNGfLnHXxTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEY4l/pC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19CC1C4CEED;
-	Tue, 10 Jun 2025 22:34:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=p2t13wStAPQkaENMjCPT+b+7Nv8WXMfjcWW6vuf83a/yOvr3UCbya0vQupD/kc7Q6DOjsyp8xKXgCLP97kqQXO7GtoSrNmyjWUcY4bZuwpDvF/M8D2nGzmFGqH71G7a92K7bbP1tm6zbizs3qPjyeRoeWu1S1O1vDJSIVjeee3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZ3HR1Wv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE2B3C4CEED;
+	Tue, 10 Jun 2025 22:35:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749594871;
-	bh=tXbDG69pqssgcGg4iB0p/RaU/dHtIZh4hPHnxu2hRoQ=;
+	s=k20201202; t=1749594936;
+	bh=4/j43Zu0GL7ig2H6mfd+D0Go2TbiM72gN9/cHaPFpys=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oEY4l/pCZ/oxiNa4jR/eK0R4GqrZifkAS3m83DiLTkUxjwZ/nFzvEHz9V/Vpawfbg
-	 hBA6wg03dfXVhFS8KzglagkrxCc3m5VNBdFgNoW/ZoRm4+0AVB07gYw0ybgA+m0DMl
-	 Um8hl+BAR3u18vKkgPxkG7/x+PNZGiFfdL729awIH6pSARSutkvQejq3yb+25ch9JB
-	 SXjK4OkHekibY4OF7p5Sv2xzDe39u+P8zC+FAHOZu7rVfIwKEWMGRD0w5/JIb8Ozja
-	 tXuEeu9eWnR2tSbfbH+sHjjJEb1pLWvKeeevYyarnwbL420CMJr0LCtHIzW/aVwuKe
-	 4dczQf8pYUNVw==
-Date: Tue, 10 Jun 2025 15:34:29 -0700
+	b=mZ3HR1WvCKa33xdcXVYbE6utkjLLnDVYJEfLFRVDyMYU3h7xtoQLWYg093qRYIsfM
+	 702nFmtpaaOn+kijo8h4cLXhIDR8FaMziah2KcAFYZr4PMsfufJHA0AbBHpa3Bt+b3
+	 BKwVlSTt4XeBN8mqEsAa3YT3HoS17EZ2HmdSq3DvKhBP+kahlVjyjtCyizWiIbzY5F
+	 rlp9g7hX87aZSfD2qptConTnYP59+JHOXVdyVIAMUVfBjVrQa/HFfO1fO+OwsLVWaf
+	 BIqoaYBh+nqFqIBEhH9GMK6wg9s2umLKr3bMnx8zuVsHVXo9njGggczkEsmRM0+npE
+	 OVDAws/s3DjTQ==
+Date: Tue, 10 Jun 2025 15:35:34 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, David Ahern <dsahern@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jason Xing <kerneljasonxing@gmail.com>
-Subject: Re: [PATCH RESEND net-next] net: tcp: tsq: Convert from tasklet to
- BH workqueue
-Message-ID: <20250610153429.0f098b07@kernel.org>
-In-Reply-To: <aEdIXQkxiORwc5v4@slm.duckdns.org>
-References: <aEdIXQkxiORwc5v4@slm.duckdns.org>
+To: longli@linuxonhyperv.com
+Cc: longli@microsoft.com, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shradha
+ Gupta <shradhagupta@linux.microsoft.com>, Simon Horman <horms@kernel.org>,
+ Konstantin Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
+ <schakrabarti@linux.microsoft.com>, Erick Archer
+ <erick.archer@outlook.com>, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mana: Record doorbell physical address in
+ PF mode
+Message-ID: <20250610153534.0011c952@kernel.org>
+In-Reply-To: <1749510580-21011-1-git-send-email-longli@linuxonhyperv.com>
+References: <1749510580-21011-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,24 +68,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 9 Jun 2025 10:47:25 -1000 Tejun Heo wrote:
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
+On Mon,  9 Jun 2025 16:09:40 -0700 longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> MANA supports RDMA in PF mode. The driver should record the doorbell
+> physical address when in PF mode.
 
-Could you rebase on latest net-next? Doesn't seem to apply:
-
-Applying: net: tcp: tsq: Convert from tasklet to BH workqueue
-error: patch failed: net/ipv4/tcp_output.c:1164
-error: net/ipv4/tcp_output.c: patch does not apply
-Patch failed at 0001 net: tcp: tsq: Convert from tasklet to BH workqueue
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort".
-hint: Disable this message with "git config set advice.mergeConflict false"
+Could you explain in more detail what happens if it doesn't?
+What user-visible improvement does this patch bring?
 -- 
 pw-bot: cr
 
