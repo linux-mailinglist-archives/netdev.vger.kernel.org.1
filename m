@@ -1,119 +1,102 @@
-Return-Path: <netdev+bounces-196029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D075AD32CE
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:54:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48705AD32DB
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:56:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54DEA3B899B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:53:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4891E3A2D28
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8807E28B7E6;
-	Tue, 10 Jun 2025 09:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D35D28B7F0;
+	Tue, 10 Jun 2025 09:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Pkud2SEv"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="JbhND1dQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6763828AB03
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 09:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADB528B7CC;
+	Tue, 10 Jun 2025 09:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749549202; cv=none; b=M2hnrlt2dVg9fULTHOlpyhnJ+LNGmUCBzA/5MRavi9nfIXXxMfUtGCTFnyq7aexz2hlAAM200oveIU+yuRygki86QzJvnQZ12p+5yfecJrDNlPR2+c5D85Q/5gXr0w4dXuHspnQuj0hTchW7evCM4fggsuS4g7ZseSdOnsPldy0=
+	t=1749549366; cv=none; b=OfEdoBPaDL9WjzJMw68+MzsNkqzDTOLWk9YkggVy4Gs5HLrrzYcYBz99JIc3bUgE+BzNIVyVBm7s9sU8BzPj7xiamb3hc6HUrpHta3TzhpWwicAcsdeAWiBFix3au1o/fHOosEgie0e2riLt9ouc3WJPLjuRnl9IQkVHO1GhQSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749549202; c=relaxed/simple;
-	bh=lf/Q0CP0+3JGF8skn4vJN8mCuS9rEjV0RqPQBwzodGc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cQmyathWlMhDpmkZptI1Na68YGzMUQq8guZc08ONB5U1FJY5bjd39EJx2WEsCy6FyQyXbe++rti46bMsOgQuuLiiMWzHvbrRJnG9qXYwYKPwA6reTnboNOtEgGgOOfIjohbEMtLPVnZ+vOmwZ0prPW/kYY74zq/hHTuMozvvrvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Pkud2SEv; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a50fc819f2so4254016f8f.2
-        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 02:53:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1749549198; x=1750153998; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9IEkGDFBIs7IrBtufGEQ1UvIq45B77cgWp5iZKKgIpk=;
-        b=Pkud2SEv4d5Zd8qEFxIsJJyS650FzgonHEnjoeteyOCLnwMNXSRVlxKjWX785MUMpd
-         ISwCy07c2Xyt+xs2SKBEEBUXnSVsPFYI7QMzwMvP1hoDyWgDIDTSTXsgvj2vHiKkzleE
-         6NYiFsKvp8XmTcSDh8RII1yggx0PS0yJ9tSlfOI1dmHE6UhO7VCYQ5yB72CJZZmQ/BFx
-         dwi7ZZOtTRTNU5P8XdKAXRDPJvJEb8vnlPmLoTvj2TXv07o2BA+i/q1VQ2fvYVid3loJ
-         exsJETJ1B+e6wctTjXtPfHGUv6Gm9NiTOe97p8WaLIBFxBvaGaQgABKn+nRHz71tgGdf
-         N2GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749549198; x=1750153998;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9IEkGDFBIs7IrBtufGEQ1UvIq45B77cgWp5iZKKgIpk=;
-        b=gyF8pQYATiIfFvAmds1J1IzXI5/j28VrjRvZjk9HbYl7a+g2GagkFE24xsmL8sjjM9
-         5wgOdeFbtHjnXL61ypmsH+n6UVECRVI+VRgJJoj6qiNFv2GpvewonXAUDNMpoqbvZSOw
-         dP1Wgstp4Eb9NVQguDgmUNeCatMixXhQFnyXSeIdv1OrY/hTG6MRavLISj4OlQk8v0ng
-         mFp24PpVgh6k2evXJ6SFVlfh65VBhHQcTNAaOJy1Y2WMFkukf87ccols5ipLWHdA9riu
-         LaytLtgrQCdoDeFbpDqE7KljI02Z90qiSsm+q/2LnPiDdBV378xlImi2lyZa4nFTjAx0
-         LAdg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3Sb0VqPcS9bDj3TP00TCTxM6y+/iSUZ4Ave4HURnlfQnfJOT0nrreeNqOOVFsN8tw69a3um4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh3UtpLPpFxURyg8h8VsoUPf88+BLXslwmKFTgXrwI2HSYLe+d
-	+41pVVNtyzAbVwQSpTOOwcd/xA1iKWKfa5vBjkJMy1zqd9eF+j78p61Gy3F9J36s0fE=
-X-Gm-Gg: ASbGncvjXHqtlLWpSCLLIF+nW/LhnYJp1h6v4glA8/5IyPoK8NLb8tni1+6wHcvhpuk
-	vROieA1yfASDlLrxUvkklaOTjfLXHHw7NfYsl/Al1hOzTvfzdzHiD2IjAoVKmTTovxJD1q/+ooC
-	2QFvwoBQ53hHWnPNvH/snbwXFfs57I4RTip/XYfTiBUN8mBgPLb1UN2yS2jcBtOelxMI+nr4QTN
-	/2bElpJewug5fEeMT1nfwGIxlAypRfA0Yjb4c0nNvbcqpQun48h+6nKI8+ImRPWaf8bqTRsBsDX
-	igC/GDNpDb8JW4KiDiztsZQ12N/rtvgPRgWsjrQoMIhM+qw5k01dPAIFRf0zaK8WdKvfTj9OnXN
-	QrlBjvIB0dooGyDyYTvnx3oGP4Y4o
-X-Google-Smtp-Source: AGHT+IF43HoF+ckI+JNZf8sM8mBLEsIZIzrQldZAYBnhq+ZWk+6w2oq6oTjq3frqJQUO14CjjL46AQ==
-X-Received: by 2002:a05:6000:40c7:b0:3a4:f430:2547 with SMTP id ffacd0b85a97d-3a55226cd6amr1466032f8f.6.1749549197729;
-        Tue, 10 Jun 2025 02:53:17 -0700 (PDT)
-Received: from ?IPV6:2001:a61:1316:3301:be75:b4b4:7520:e2e4? ([2001:a61:1316:3301:be75:b4b4:7520:e2e4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a532131df6sm11612214f8f.0.2025.06.10.02.53.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jun 2025 02:53:17 -0700 (PDT)
-Message-ID: <dc4e3500-b5fb-4aa1-b74c-c37708146c3c@suse.com>
-Date: Tue, 10 Jun 2025 11:53:15 +0200
+	s=arc-20240116; t=1749549366; c=relaxed/simple;
+	bh=0q1ktw7qbknJvvv/nfcfl4BooLobcwr9kcQ2Be+XVyc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dimkBatPLvC4lCcPbxdn1kefzm+oXKFV8vmhDuzJSs0H95PDQdGw64MyKtqIvAz1SEENIxRVXlsYLhV9PyctRz5abLt9J2W2/eOVvyRQaULyVBjQ/hVbuKRhES8Vzvzw//K8DHFeMir6FrBK6fcKl28mZwrDTtavUNC2qwLQnfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=JbhND1dQ; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 55A9tR2i92612669, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1749549327; bh=O+63X+TPXlermj3mzhPv5J76m80xbz8M1MdxAzrI/xs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=JbhND1dQc6uAST53Trx1G2vH1npz419p0hWOrD2zTrrPchUbBZ0gx9/PUzvAlbssG
+	 RFUTHfzIFk8tQukTcOkuL6AnBWLefbr/YWXMRNI/Gg20s+9jyT1bHLau/GyOOa5YZD
+	 4V3yXl0aA9aiSqPddqALWvF2dy5Jtog0/J44QctcxV+VUpEJaAtHG9nStITa0rSXZa
+	 iKOgljEzwpxmNdGlnr8IM+S5awcvioWWmbRFZ+JVMesWs0JkVxUkcq7NJzy47FAv1g
+	 nVmQz8Ea+pWlSFC4Ut8HvNPE0p9Fd/yVykoRAjAu+FiLTSJtorbvV6NcwijfAombGQ
+	 7BALRFN2tjUZw==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 55A9tR2i92612669
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 10 Jun 2025 17:55:27 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 10 Jun 2025 17:55:27 +0800
+Received: from RTDOMAIN (172.21.210.109) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 10 Jun
+ 2025 17:55:27 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net-next] rtase: Refine the flexibility of Rx queue allocation
+Date: Tue, 10 Jun 2025 17:55:18 +0800
+Message-ID: <20250610095518.6585-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: Convert tasklet API to new bottom half
- workqueue mechanism
-To: "Miao, Jun" <jun.miao@intel.com>, Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: "oneukum@suse.com" <oneukum@suse.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20250609072610.2024729-1-jun.miao@intel.com>
- <aEajxQxP_aWhqHHB@82bae11342dd>
- <PH7PR11MB84552A6D3723B68D5B83E4BE9A6BA@PH7PR11MB8455.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <PH7PR11MB84552A6D3723B68D5B83E4BE9A6BA@PH7PR11MB8455.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-On 09.06.25 11:53, Miao, Jun wrote:
+Refine the flexibility of Rx queue allocation by using alloc_etherdev_mqs.
 
->> You can change it to GFP_KERNEL since this is not atomic context now.
->>
-> 
-> Thanks,  the usbnet_bh() function only be called by usbnet_bh_workqueue which is sleepable.
+Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+---
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Yes, but it can be waited on in usbnet_stop(), which in turn can
-be called for a device reset. Hence this must be GFP_NOIO, not
-GFP_KERNEL.
-
-	Regards
-		Oliver
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 4d37217e9a14..c22dd573418a 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -2080,8 +2080,8 @@ static int rtase_init_board(struct pci_dev *pdev, struct net_device **dev_out,
+ 	int ret = -ENOMEM;
+ 
+ 	/* dev zeroed in alloc_etherdev */
+-	dev = alloc_etherdev_mq(sizeof(struct rtase_private),
+-				RTASE_FUNC_TXQ_NUM);
++	dev = alloc_etherdev_mqs(sizeof(struct rtase_private),
++				 RTASE_FUNC_TXQ_NUM, RTASE_FUNC_RXQ_NUM);
+ 	if (!dev)
+ 		goto err_out;
+ 
+-- 
+2.34.1
 
 
