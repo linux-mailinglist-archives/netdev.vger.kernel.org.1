@@ -1,205 +1,136 @@
-Return-Path: <netdev+bounces-195922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1140CAD2B8B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 03:45:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA7DAD2BED
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 04:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF4123AD198
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 01:44:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABED47A899F
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 02:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605C51ACE0C;
-	Tue, 10 Jun 2025 01:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6762925C82D;
+	Tue, 10 Jun 2025 02:26:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YpB3tFA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE11F10957;
-	Tue, 10 Jun 2025 01:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD0225C6E8;
+	Tue, 10 Jun 2025 02:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749519913; cv=none; b=N4dDZQMqFOZ4JwqXns+90oh4sl3IAHwTJlCZISe2RPuc9fKcDvAor16koo+x8Drw1b+nLhekabqHMdhB4nOp2Wacl7+LYkSvW4nE070YJ6NTOiFckx/M+q0yaZ2UCv7bcmLYFjsne91k45fMdpvUm+jV9dRXc7CX/Q5b5KiHjH8=
+	t=1749522414; cv=none; b=md8qk3auY927ECHwMIY6a4DPHSIDte2YGijew3qO32O5GjHpXeOyUpCJ3EKMy0Ez1R78x044ZZgylLZqqhmwgTwDcJ/wOQif+ecw397JYfv1sQ0fcqM0EuDDj9Lb1mswWGtKbWiPCgC4bZtKIBRq9WtecjYxn6XC9bdjjQ3fOz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749519913; c=relaxed/simple;
-	bh=kS12EYAOcFxTZ4qK73JMK7AHOrtNTiMMQDIU+wcqEEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GZ8yuSbMCauAiVC0kqNWMMsaX2iqvqA4OQzIxbfdBAH3OLSS4ce+mvkLGxI14WcnfF6mq5GC0ZZSf3ErnMwC1v0Dh+B34c+ymAU1R464f6pZYYPvdDME232o3xdkLljUYw6BOKYjpSNPlCpLukk1UX2TaXVpMqnSv2rJR2OI8HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-f7-68478e213ff4
-Date: Tue, 10 Jun 2025 10:45:00 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com
-Subject: Re: [PATCH net-next 9/9] page_pool: access ->pp_magic through struct
- netmem_desc in page_pool_page_is_pp()
-Message-ID: <20250610014500.GB65598@system.software.com>
-References: <20250609043225.77229-1-byungchul@sk.com>
- <20250609043225.77229-10-byungchul@sk.com>
- <CAHS8izMLnyJNnK-K-kR1cSt0LOaZ5iGSYsM2R=QhTQDSjCm8pg@mail.gmail.com>
+	s=arc-20240116; t=1749522414; c=relaxed/simple;
+	bh=J8kM33vsRGHi9m8T8d7X7J2CWub4VfFnBrC5y0DnWRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=OWcQr0ldKHzO1r3cQ96DOXohxCMn8ZuodDqxG2tNtrGoKgYQxT5+Pdh572HVd5T0nR7zY6JJ5owdEADRhbvlcQLJV+ztAptPWQNNDQJ350yZ2jYU5tIXzQFiSEbxyAzBZOB3ezWcEQkto3ypFI4bH/PG+hmGVnWVzosztAbzp78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YpB3tFA0; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1749522401;
+	bh=EWSk6KSIljgLvLf6oA5qBj0Z+cLLmJQZ8aL2WMZmYNU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YpB3tFA0L69dzDtsAQJ1greJDZnQ1pfbulXYIFNeN92UaPocXOnF4xz33jMdju5lU
+	 74WH/x03DYho5c77O5q5mhej50JOFha+Wsedp+eeQ1vBkGxqe5HBVEzjwWHMr7SXm9
+	 CjGlhuCcsLtt+/oolbyNL1LPfwwePn3oLMZ7YW5Y4NdGA20dmU8YqI7pPszfFT4WgV
+	 oIydTt4oNYicOaqdC/FJk3JJHkYMIeZb+I/j9i/uwp0mdoGFBVJY5bwfeuwyxPWZRB
+	 1zNmQsNlQB8Be6VN89xzDkUcgQhTr3yIfFzLnrSQKrw9cYOoH581p5PB4C0+5GuK4X
+	 nEh72Yg59yQ9w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bGXjX2fh6z4wbX;
+	Tue, 10 Jun 2025 12:26:40 +1000 (AEST)
+Date: Tue, 10 Jun 2025 12:26:39 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patches in the bluetooth tree
+Message-ID: <20250610122639.3600392a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izMLnyJNnK-K-kR1cSt0LOaZ5iGSYsM2R=QhTQDSjCm8pg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfO3h2Xg+PKfNOuCwkjTcvo+VCiWHr6ENlFhC7UyENbXpn3
-	KJiX1EyXllHNFavMyxJGy3RKSC3T2U2bmbObNtMKupCmWZrllMhvP/7P5fd8eBhKelXoySjj
-	k3lVvDxWhsW0+LPrZd9lmnCF/7lMH9AZazBcH0uHyj6zEHSGOgTff74UwXBzK4arl0cp0LXn
-	0DBi/EXBQItDBL0VgzTczqunwHHKiqEoZ5yCLHOVADrqNEIo/XWNgnp1nwg6G3UY3tT8EcKg
-	pYiGNm01Db2aYGjRz4fRh58QNBvrBTBaeBHDGZseQ39OLwLbPQcNZZkaBMYmuxDGx3Q4eBlX
-	W90j4Bq0r0Wc3pTC3axayRXYbRRnMpzAnGnotIh79fw25qznx2muwTws4Iqyv2Du28ALmvva
-	1IU5Y20XzT3SN4u4YdPiCHa3eEM0H6tM5VWrgw6IFbkGA0r8vCi9v2REoEZ9HgXIhSFsIOno
-	cdD/eMRqRk6mWW/S0mMUORmzK4jd/pNy8jzWh5Q3lQidTLG9QvJEd9jJc9kUktdePN0vYYG0
-	5T/ABUjMSNlqRMbHNIKZghtpu/COnhleQSYu2aaWMlPsRSonmZl4Ccm+VTbtcmG3kxH18PSo
-	O7uc3KlrFTh3EraWIYUfG/DM0QvI3So7XYzctLMU2lkK7X+FdpZCj2gDkirjU+PkythAP0VG
-	vDLd72BCnAlNvU7FsYk9ZjTUsdOCWAbJXCXWzjCFVChPTcqIsyDCULJ5kmpnJImWZxzhVQn7
-	VSmxfJIFeTG0zEOyZjQtWsoekifzMTyfyKv+VQWMi6ca7Uj2FO8byp2wbJaoA8WT9XE1F9Uh
-	URlM45uNDu3ZcFupV3/yUkuA9v6NrYVpQRFuWZaor99ODthfPhyM2OW9SeK+Xhr5PmRL2NHI
-	dWuzfz/23RYz+eG6JnQH7n5VWrUwIv/K4Wdvn27Dfmk+WNR44dbeVd3NJZ5zyn3TrKEFxT+O
-	+8voJIU8YCWlSpL/BWPEUSU2AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTcRTH+d3X7kaLm1pdtIgWoRVaUcLBJCIqLxFRgfSCcuWlrabF5kyL
-	ZKWkSa7ZuzlrZbm2rMEynRYjlrmt12L2mPaY7wrKHjrRLTKnRP734XvO93P+OTQedZyMpeXZ
-	ObwyW6qQUCJCtH5ZYeJsbZps0auSaDBYayi4NZQHpnY7CQZLHYKB4XcC6G9yUVB1dRAHg7eI
-	gKA1hENPc6cAAtW9BDworseh85SbgrKiMA7H7DcxeFTpIeFlnZaEs6EbONRr2gXQ0mig4GPN
-	CAm9zjICPHozAQHtCmg2ToPBp18RNFnrMRg8WUnBGZ+Rgq6iAALfo04CKo5qEVgdfhLCQwZq
-	hYSrNbdiXIP+g4Az2tTc3ZvzuVK/D+dslhMUZ/t1WsC9f/OA4twXwwTXYO/HuLLCPor72dNG
-	cN8drymu6vMPjLPWvia4Z8YmwYYp20SpmbxCnssrFy7PEMmOWyzowLeZeV3lQUyD2qeXIiHN
-	MkvZoNuOIkwwc9nmVqsgwhQTz/r9w3iEY5h57HVHORlhnAmQ7AvD3ghHM2q22Ksb2xczwHpK
-	nlClSERHMWbEhoe02PhgCuu51E2Ml+PZ35d9o1J6lONY0x96PJ7FFt6rGLslZDayQU3/WHUq
-	M4d9WOfCdGiyfoJJP8Gk/2/STzAZEWFBMfLs3CypXJGcpNony8+W5yXt3p9lQ6PfUX3kd7kd
-	DbSkORFDI8kksbtljSyKlOaq8rOciKVxSYzYHInEmdL8Q7xy/06lWsGrnCiOJiTTxWs38xlR
-	zB5pDr+P5w/wyn9TjBbGapBZvlV8znQ+vMtQ27DAZzE9ThhpSVR9WuKiC9IHErZv6jC12W6n
-	dLzVHl618EaB7pR55Z2dM5Y0pugbu5MDyyt0oeeylcH1e4stjur0r78So+eSwtbVO/Dhmpfx
-	W641tdmtX97db4DQY8c6dULJQe+xvorGc+SVnC7x2zLvhVRXlYRQyaSL5+NKlfQvyPaoXxkD
-	AAA=
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; boundary="Sig_/WhzEbeZGeG3SkQc2pBPI.=5";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Mon, Jun 09, 2025 at 10:39:06AM -0700, Mina Almasry wrote:
-> On Sun, Jun 8, 2025 at 9:32 PM Byungchul Park <byungchul@sk.com> wrote:
-> >
-> > To simplify struct page, the effort to separate its own descriptor from
-> > struct page is required and the work for page pool is on going.
-> >
-> > To achieve that, all the code should avoid directly accessing page pool
-> > members of struct page.
-> >
-> > Access ->pp_magic through struct netmem_desc instead of directly
-> > accessing it through struct page in page_pool_page_is_pp().  Plus, move
-> > page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
-> > without header dependency issue.
-> >
-> > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> > ---
-> >  include/linux/mm.h   | 12 ------------
-> >  include/net/netmem.h | 14 ++++++++++++++
-> >  mm/page_alloc.c      |  1 +
-> >  3 files changed, 15 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index e51dba8398f7..f23560853447 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -4311,16 +4311,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
-> >   */
-> >  #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> >
-> > -#ifdef CONFIG_PAGE_POOL
-> > -static inline bool page_pool_page_is_pp(struct page *page)
-> > -{
-> > -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > -}
-> > -#else
-> > -static inline bool page_pool_page_is_pp(struct page *page)
-> > -{
-> > -       return false;
-> > -}
-> > -#endif
-> > -
-> >  #endif /* _LINUX_MM_H */
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index d84ab624b489..8f354ae7d5c3 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-> >   */
-> >  static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
-> >
-> > +#ifdef CONFIG_PAGE_POOL
-> > +static inline bool page_pool_page_is_pp(struct page *page)
-> > +{
-> > +       struct netmem_desc *desc = (struct netmem_desc *)page;
-> > +
-> > +       return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
-> > +}
-> > +#else
-> > +static inline bool page_pool_page_is_pp(struct page *page)
-> > +{
-> > +       return false;
-> > +}
-> > +#endif
-> > +
-> >  /* net_iov */
-> >
-> >  DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
-> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> > index 4f29e393f6af..be0752c0ac92 100644
-> > --- a/mm/page_alloc.c
-> > +++ b/mm/page_alloc.c
-> > @@ -55,6 +55,7 @@
-> >  #include <linux/delayacct.h>
-> >  #include <linux/cacheinfo.h>
-> >  #include <linux/pgalloc_tag.h>
-> > +#include <net/netmem.h>
-> 
-> mm files starting to include netmem.h is a bit interesting. I did not
-> expect/want dependencies outside of net. If anything the netmem stuff
-> include linux/mm.h
+--Sig_/WhzEbeZGeG3SkQc2pBPI.=5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-That's what I also concerned.  However, now that there are no way to
-check the type of memory in a general way but require to use one of pp
-fields, page_pool_page_is_pp() should be served by pp code e.i. network
-subsystem.
+Hi all,
 
-This should be changed once either 1) mm provides a general way to check
-the type or 2) pp code is moved to mm code.  I think this approach
-should acceptable until then.
+The following commits are also in the net tree as different commits
+(but the same patches):
 
-> But I don't have a butter suggestion here and I don't see any huge
-			^
-			lol
+  3812bd9eae38 ("Bluetooth: MGMT: Protect mgmt_pending list with its own lo=
+ck")
+  fa2c8bfe6794 ("Bluetooth: btintel_pcie: Reduce driver buffer posting to p=
+revent race condition")
+  e849b59c9db0 ("Bluetooth: btintel_pcie: Increase the tx and rx descriptor=
+ count")
+  31b3d39c89f9 ("Bluetooth: btintel_pcie: Fix driver not posting maximum rx=
+ buffers")
+  6c5d0010e8a4 ("Bluetooth: hci_core: fix list_for_each_entry_rcu usage")
 
-	Byungchul
 
-> problems with this off the top of my head, so
-> 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> 
-> Lets see if Jakub objects though. To be fair, we did put the netmem
-> private stuff in net/core/netmem_priv.h, so technically
-> include/net/netmem.h should be exportable indeed.
-> 
-> -- 
-> Thanks,
-> Mina
+These are commits
+
+  6fe26f694c82 ("Bluetooth: MGMT: Protect mgmt_pending list with its own lo=
+ck")
+  bf2ffc4d14db ("Bluetooth: btintel_pcie: Reduce driver buffer posting to p=
+revent race condition")
+  2dd711102ce6 ("Bluetooth: btintel_pcie: Increase the tx and rx descriptor=
+ count")
+  daabd2769850 ("Bluetooth: btintel_pcie: Fix driver not posting maximum rx=
+ buffers")
+  308a3a8ce8ea ("Bluetooth: hci_core: fix list_for_each_entry_rcu usage")
+
+In the net tree.
+
+Also commit
+
+  a214e21449f2 ("Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_comple=
+te")
+
+is almost identical to commit
+
+  e6ed54e86aae ("Bluetooth: MGMT: Fix UAF on mgmt_remove_adv_monitor_comple=
+te")
+
+in the net tree and, due to other changes in the bluetooth tree, is
+causing a conflict.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/WhzEbeZGeG3SkQc2pBPI.=5
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhHl98ACgkQAVBC80lX
+0Gz3wAf9GWm88hi/qZV6+reaD2tF/KzMZarLQOgPtRE6TSAYt0ZVUP9dEOIOPWyh
+Jvyn43Kjz6eOwewlwURoQeyWfpNUQEQlidmJN259sXOGxI4uU8TJrNtMubgBLvdO
+vBPPRJQN89XUGD8uL2CxCjg6acqjlc7s/uiKiauw+mu0Kj644YGnQ/0mvJkgJgky
+ITc4b+KBcwjwDAAPWBN2Vm1qUrT8fFsd4qMB9JB3SuezYV2F3lvuUfY9eOzO3499
+dJMNcPONiCP73aR7EGRDEN3zfcEwSU7wRdDmF+2Dqou/qmNEw4Rwnc/AM/qyUlGz
+P58ip+zT38WtOAczieYAZZFYL0a3MA==
+=2XaW
+-----END PGP SIGNATURE-----
+
+--Sig_/WhzEbeZGeG3SkQc2pBPI.=5--
 
