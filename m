@@ -1,217 +1,183 @@
-Return-Path: <netdev+bounces-195995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-195996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A26AD306A
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:32:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC62BAD3095
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 10:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D4D71883B81
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:32:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F635188E455
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 08:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E4121CC4A;
-	Tue, 10 Jun 2025 08:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA3C27B4EF;
+	Tue, 10 Jun 2025 08:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/ybdNK1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rjm4/r/y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549AE1D555;
-	Tue, 10 Jun 2025 08:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05E41D555;
+	Tue, 10 Jun 2025 08:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749544338; cv=none; b=P+9icXUhlYMn9oW8zKcwV2gUjR9mQOOGX6qsnN38G9aaCiHfuiCHTBmwDGQ8QakgfzNW0ZK7FkZDvk8awz+qC945EQLgK8Rhv5q/DH3KwHIet5ayVPV5NHcTukpe+tWg4wY2jl8IwYq9CdTWvlQWpgiVBn8T3fw0C3x1kP+JcNY=
+	t=1749544687; cv=none; b=jNoJuDdVMbMm83A52uDFKMbtTJxfDQHJNhObLgazLorOZpT398THTE23jg+KA/9fWNzQ4sxufhbHLEzPzxpsiI3UPlbkCEhXmixHpMVCDkP1RRse7CeVmWNuN+k/3OTn9XnDDRNXT7zC7DoIZVmTrm1XdHEu+8Bn1qixSrkQ/mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749544338; c=relaxed/simple;
-	bh=Yp+B483bGr5JsxmbsBMlSY4r4Owg2LtMYr+J3QjmBEE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Ta3BsKfpIDpmOJz4hAXnNT37Z0Fs7rupKtlKgpSSIoc18d3tPPrrY6jNOzHKPTJmyuAGvhzbHGRptowQ4GIvSAaK7kqal5GAJhxKwYABqGsKu1z+ZSzJgHns3PGmXQXjJ8Dy2si5rnSpZ3XdDRHUrPk5RuAt/gzNv/tuFTXpAAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/ybdNK1; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234fcadde3eso61273345ad.0;
-        Tue, 10 Jun 2025 01:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749544337; x=1750149137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zsy+hT9I5m8iP9tXJhRUDsN9FbpKL0q9AU8+LK8cJo=;
-        b=Y/ybdNK1LrzI4BmCu60KFi7vouJYTMB3tpXGrLRK2jP9wh6jSlTAuTv83Q5wh/3d6O
-         h05JU0us2LaQnKilhVhst3Wu1jfFxIq/LkuydUapShZh3eu3iu9iz7Me4ZRWG7YtLP9h
-         Br+ArZ0K6ro7yUUVqPHv6x0JRZbeUYgNu6lYvNTg2xXPpItHUKh/X8X3MNZA7P7lXbpq
-         MKVGlLNN4fg8n9c/0vEUkpx66Mg/czeq4JfBU4l1GPPkWziOY0wc3Km+EuncfsFOTbzK
-         4QCCDSXFY4lbLeYXdBbP3mrqHE3UFKTd9hGQpOwbMS7sWqnPuj6ck+HLqQCoj1dJ0ICX
-         x/zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749544337; x=1750149137;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Zsy+hT9I5m8iP9tXJhRUDsN9FbpKL0q9AU8+LK8cJo=;
-        b=s52diwMs0Ar2dCIOtOSDBr7AcG/IU4X0ZlVXe4kmEyh7yCujcUPLJuFru0dnR4OQzj
-         Y/X+bS6siz2432P4ToI5N5fqCPFvIeVh08b0zg7FTOEkhPMNsakqwwYifDEF4mFT3puQ
-         jXnZsUGxL91DQYpe35Gmn7gwKk5dKru/nMENZ/N6bAQyAMedIngQ1RzhFReYxqOqN8+d
-         rcTM/QveKr+CRtJZKsZZ+F9nnSrvPrQHT5SPqvlGl5fSFK7INH2jOet7gPkULzMw01mT
-         KnM5HIduTqX5SJtsE3vF3QFdJlbUyL8X8ms4iXEmd+7yi8i8ZJ9MuaDehqXv1ulpfiXo
-         1S0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUz+T4hLmsvQAAbtOqn7hrxn7FJFZ5v6MUVgSHelgKbkCsiPoLEjev/6KWMn5OyyUVamWA2SMY5hK0g@vger.kernel.org, AJvYcCW37eXkPuyl3zb0RlGlBsIzl/AfvqqwY1z78BrSj7oEsW7MeCpKenCrlxNuGeGlWV4+I1K5RmO53jw6kxg=@vger.kernel.org, AJvYcCWCMoz437Ukg73ezSgnoMxkOoyqe5QXBQkXNaKHXCfr4Al7/96DKewXq+nAsBlQTY3N3bgG6E1s@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrzOF0b4SDsigZ25l3T1Z5c7eZZd3oQEPCyQYk0rsgcxPa6WM8
-	SbmdDQFjP6Y0gAa6yhzQrxzNlcGaL8wOOLp1SzQM+zPDcqYNwppgGpSrD7PNu6FfaBDv6Q==
-X-Gm-Gg: ASbGncuRNmhm09AApJtuVXpUhV/+QS0RBVyHy+IaCb0xDVcdB4ZRZArXcsFcAh72W0V
-	pgQMuu+xHMO08CgwKd/z2ai26Hnmtbyh8kfdgt9VeLOdw3/TP/CqNUO3WXNYnPYeJHcHogtgJs3
-	Oj8G0Wd6WiC5ZrDlRejJdPd0mvn11yqKujvYXPyl4Yt+TDY/5Hh/z+3pP+VoKvXtorwQzJRHa9r
-	6HWEh6cupy34WZAPpmy549VblLIWz/JSTbw49GaQBb0uGScZ8ooWsChXIdAOWeoRtuCttRPvb/U
-	OGa6FtfZ1DwKh7rEa9oLUlxkznbYMxZ4Z3e6hvuaeJS6rBH479ZMWsSZ
-X-Google-Smtp-Source: AGHT+IHToBkeQKLwjseAoh6XUM8IfJ5n0alUhBlbLyVmgOB/3nbfZQ9g0uCbffWaw8f6KQ5i7OiNdA==
-X-Received: by 2002:a17:902:dace:b0:234:8ec1:4aea with SMTP id d9443c01a7336-23601deb4bemr230726405ad.52.1749544336540;
-        Tue, 10 Jun 2025 01:32:16 -0700 (PDT)
-Received: from gmail.com ([116.237.168.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236032fc9ebsm66175635ad.106.2025.06.10.01.32.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 01:32:16 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-Subject: [PATCH RESEND net-next] ppp: convert to percpu netstats
-Date: Tue, 10 Jun 2025 16:32:10 +0800
-Message-ID: <20250610083211.909015-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1749544687; c=relaxed/simple;
+	bh=/aYos+rPD2Y4dFN66OBYv1f3rtmQl6eqmHlQLOMph6w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GjqIKyLv472nyFPleB4hNEDImR49YpUtg0TdPzfc0U59lBm8TQujUJbns4+SxQ8Tm8MSktTksMoyBWxEVGINZh7Dt3QjN/3SBmsnUApi9GDdcti9aT6zKdLcU3/Wc/tGCulMi6Eg32H4Tr8VgxGEnNrfh5K6CQEh6DAEbs/uyzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rjm4/r/y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CFE2C4CEEF;
+	Tue, 10 Jun 2025 08:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749544686;
+	bh=/aYos+rPD2Y4dFN66OBYv1f3rtmQl6eqmHlQLOMph6w=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=Rjm4/r/y4LWZt/taUrSjd849ukEIigVyqsK9NcwaJVCWXWbt0sIMtYPU02FDiTP/5
+	 Rdy7O20Fu6pIvaAVTfMHx16QKBzUJ9o+GvLp1WehVLMXsAHUJc5pftCmPBh6R/d89W
+	 U9TEe1nsIa1+aTpvffnN9mTXf+F2Zw3SiO01wLAMq4lp7RjQ/A3NLHSDvPVhBEvnmK
+	 PzZLTi6TCnfBKAUkj5yZD9OHPvZD40d19EeyGVoakU9jiKvu6cFzzbDsYECCMUEkjg
+	 T+rBQTzPXbRol7c+cL4kj5S+4TdOjWNL0Kv3hFrUP9wvmMzXqRL5UmMrBFLqwRxkJG
+	 ni1ozzbz99O6A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73094C5B552;
+	Tue, 10 Jun 2025 08:38:06 +0000 (UTC)
+From: George Moussalem via B4 Relay <devnull+george.moussalem.outlook.com@kernel.org>
+Subject: [PATCH v5 0/5] Add support for the IPQ5018 Internal GE PHY
+Date: Tue, 10 Jun 2025 12:37:54 +0400
+Message-Id: <20250610-ipq5018-ge-phy-v5-0-daa9694bdbd1@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOLuR2gC/2XPQQ6CMBAF0KuYrq1pZ1pAV97DuChtkUalCEgkh
+ LtbcCGhyz+T/zIzktY2zrbktBtJY3vXOl+FIPc7oktV3Sx1JmQCDCQTyKirX5LxjIZNXQ7U5Ik
+ UqlBCW0NCqW5s4T4LeLmGXLq2882w+D2fpz9KgtxSPaeMGqPyLJPCgsSzf3cP7+8H7Z9kxnpYA
+ 1kEwAKwBJNU6JTrGMA/kDCIAAyAAI6YKoY8hxgQa+AYASIA3KDiEO4DvXlhmqYvQajisnEBAAA
+ =
+X-Change-ID: 20250430-ipq5018-ge-phy-db654afa4ced
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-clk@vger.kernel.org, George Moussalem <george.moussalem@outlook.com>, 
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1749544683; l=4433;
+ i=george.moussalem@outlook.com; s=20250321; h=from:subject:message-id;
+ bh=/aYos+rPD2Y4dFN66OBYv1f3rtmQl6eqmHlQLOMph6w=;
+ b=ErY5VM5/oi8F8MyZ8xNVUFP8isDxbUNFIt0N0v1lRgTUTd/ciHKkyFtfqhYIUmT8NYRH9cYS0
+ nYesuaI0rKMB0kaXcNXiB92GPAVKQw7ikoyC1VgFywYwQLVg20qHZ1C
+X-Developer-Key: i=george.moussalem@outlook.com; a=ed25519;
+ pk=/PuRTSI9iYiHwcc6Nrde8qF4ZDhJBlUgpHdhsIjnqIk=
+X-Endpoint-Received: by B4 Relay for george.moussalem@outlook.com/20250321
+ with auth_id=364
+X-Original-From: George Moussalem <george.moussalem@outlook.com>
+Reply-To: george.moussalem@outlook.com
 
-Convert to percpu netstats to avoid lock contention when reading them.
+The IPQ5018 SoC contains an internal Gigabit Ethernet PHY with its
+output pins that provide an MDI interface to either an external switch
+in a PHY to PHY link architecture or directly to an attached RJ45
+connector.
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+The PHY supports 10BASE-T/100BASE-TX/1000BASE-T link modes in SGMII
+interface mode, CDT, auto-negotiation and 802.3az EEE.
+
+The LDO controller found in the IPQ5018 SoC needs to be enabled to drive
+power to the CMN Ethernet Block (CMN BLK) which the GE PHY depends on.
+The LDO must be enabled in TCSR by writing to a specific register.
+
+In a phy to phy architecture, DAC values need to be set to accommodate
+for the short cable length.
+
+Signed-off-by: George Moussalem <george.moussalem@outlook.com>
 ---
- drivers/net/ppp/ppp_generic.c | 52 +++++++++++++----------------------
- 1 file changed, 19 insertions(+), 33 deletions(-)
+Changes in v5:
+- Removed unused macro definition (IPQ5018_TCSR_ETH_LDO_READY)
+- Reverted sorting of header files for which a separate patch can be
+  submitted
+- Added a comment to explain why the FIFO buffer needs to be reset
+- Do not initialize local variable as caught by Russell
+- Updated macro definition names to more accurately describe the PHY
+  registers and their functions
+- Include SGMII as supported interface mode in driver commit message
+- Changed error handling of acquirement of PHY reset to use IR_ERR
+  instead of IS_ERR_OR_NULL
+- Link to v4: https://lore.kernel.org/r/20250609-ipq5018-ge-phy-v4-0-1d3a125282c3@outlook.com
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index a27357bd674e..330c0cd89c15 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -107,18 +107,6 @@ struct ppp_file {
- #define PF_TO_PPP(pf)		PF_TO_X(pf, struct ppp)
- #define PF_TO_CHANNEL(pf)	PF_TO_X(pf, struct channel)
- 
--/*
-- * Data structure to hold primary network stats for which
-- * we want to use 64 bit storage.  Other network stats
-- * are stored in dev->stats of the ppp strucute.
-- */
--struct ppp_link_stats {
--	u64 rx_packets;
--	u64 tx_packets;
--	u64 rx_bytes;
--	u64 tx_bytes;
--};
--
- /*
-  * Data structure describing one ppp unit.
-  * A ppp unit corresponds to a ppp network interface device
-@@ -162,7 +150,6 @@ struct ppp {
- 	struct bpf_prog *active_filter; /* filter for pkts to reset idle */
- #endif /* CONFIG_PPP_FILTER */
- 	struct net	*ppp_net;	/* the net we belong to */
--	struct ppp_link_stats stats64;	/* 64 bit network stats */
- };
- 
- /*
-@@ -1539,23 +1526,12 @@ ppp_net_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
- static void
- ppp_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats64)
- {
--	struct ppp *ppp = netdev_priv(dev);
--
--	ppp_recv_lock(ppp);
--	stats64->rx_packets = ppp->stats64.rx_packets;
--	stats64->rx_bytes   = ppp->stats64.rx_bytes;
--	ppp_recv_unlock(ppp);
--
--	ppp_xmit_lock(ppp);
--	stats64->tx_packets = ppp->stats64.tx_packets;
--	stats64->tx_bytes   = ppp->stats64.tx_bytes;
--	ppp_xmit_unlock(ppp);
--
- 	stats64->rx_errors        = dev->stats.rx_errors;
- 	stats64->tx_errors        = dev->stats.tx_errors;
- 	stats64->rx_dropped       = dev->stats.rx_dropped;
- 	stats64->tx_dropped       = dev->stats.tx_dropped;
- 	stats64->rx_length_errors = dev->stats.rx_length_errors;
-+	dev_fetch_sw_netstats(stats64, dev->tstats);
- }
- 
- static int ppp_dev_init(struct net_device *dev)
-@@ -1650,6 +1626,7 @@ static void ppp_setup(struct net_device *dev)
- 	dev->type = ARPHRD_PPP;
- 	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
- 	dev->priv_destructor = ppp_dev_priv_destructor;
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
- 	netif_keep_dst(dev);
- }
- 
-@@ -1796,8 +1773,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- #endif /* CONFIG_PPP_FILTER */
- 	}
- 
--	++ppp->stats64.tx_packets;
--	ppp->stats64.tx_bytes += skb->len - PPP_PROTO_LEN;
-+	dev_sw_netstats_tx_add(ppp->dev, 1, skb->len - PPP_PROTO_LEN);
- 
- 	switch (proto) {
- 	case PPP_IP:
-@@ -2474,8 +2450,7 @@ ppp_receive_nonmp_frame(struct ppp *ppp, struct sk_buff *skb)
- 		break;
- 	}
- 
--	++ppp->stats64.rx_packets;
--	ppp->stats64.rx_bytes += skb->len - 2;
-+	dev_sw_netstats_rx_add(ppp->dev, skb->len - PPP_PROTO_LEN);
- 
- 	npi = proto_to_npindex(proto);
- 	if (npi < 0) {
-@@ -3303,14 +3278,25 @@ static void
- ppp_get_stats(struct ppp *ppp, struct ppp_stats *st)
- {
- 	struct slcompress *vj = ppp->vj;
-+	int cpu;
- 
- 	memset(st, 0, sizeof(*st));
--	st->p.ppp_ipackets = ppp->stats64.rx_packets;
-+	for_each_possible_cpu(cpu) {
-+		struct pcpu_sw_netstats *p = per_cpu_ptr(ppp->dev->tstats, cpu);
-+		u64 rx_packets, rx_bytes, tx_packets, tx_bytes;
-+
-+		rx_packets = u64_stats_read(&p->rx_packets);
-+		rx_bytes = u64_stats_read(&p->rx_bytes);
-+		tx_packets = u64_stats_read(&p->tx_packets);
-+		tx_bytes = u64_stats_read(&p->tx_bytes);
-+
-+		st->p.ppp_ipackets += rx_packets;
-+		st->p.ppp_ibytes += rx_bytes;
-+		st->p.ppp_opackets += tx_packets;
-+		st->p.ppp_obytes += tx_bytes;
-+	}
- 	st->p.ppp_ierrors = ppp->dev->stats.rx_errors;
--	st->p.ppp_ibytes = ppp->stats64.rx_bytes;
--	st->p.ppp_opackets = ppp->stats64.tx_packets;
- 	st->p.ppp_oerrors = ppp->dev->stats.tx_errors;
--	st->p.ppp_obytes = ppp->stats64.tx_bytes;
- 	if (!vj)
- 		return;
- 	st->vj.vjs_packets = vj->sls_o_compressed + vj->sls_o_uncompressed;
+Changes in v4:
+- Updated description of qcom,dac-preset-short-cable property in
+  accordance with Andrew's recommendation to indicate that if the
+  property is not set, no DAC values will be modified.
+- Added newlines between properties
+- Added PHY ID as compatible in DT bindings for conditional check to
+  evaluate correctly. Did a 'git grep' on all other PHY IDs defined in
+  the driver but none are explicitly referenced so I haven't added them
+- Link to v3: https://lore.kernel.org/r/20250602-ipq5018-ge-phy-v3-0-421337a031b2@outlook.com
+
+Changes in v3:
+- Replace bitmask of GEPHY_MISC_ARES with GENMASK as suggested by Konrad
+- Removed references to RX and TX clocks as the driver need not
+  explicitly enable them. The GCC gatecontrols and routes the PHY's
+  output clocks, registered in the DT as fixed clocks, back to the PHY.
+  The bindings file has been updated accordingly.
+- Removed acquisition and enablement of RX and TX clocks from the driver
+- Link to v2: https://lore.kernel.org/r/20250528-ipq5018-ge-phy-v2-0-dd063674c71c@outlook.com
+
+Changes in v2:
+- Moved values for MDAC and EDAC into the driver and converted DT
+  property qca,dac to a new boolean: qcom,dac-preset-short-cable as per
+  discussion.
+- Added compatible string along with a condition with a description of
+  properties including clocks, resets, and qcom,dac-preset-short-cable
+  in the bindings to address bindings issues reported by Rob and to
+  bypass restrictions on nr of clocks and resets in ethernet-phy.yaml
+- Added example to bindings file
+- Renamed all instances of IPQ5018_PHY_MMD3* macros to IPQ5018_PHY_PCS*
+- Removed qca,eth-ldo-ready property and moved the TCSR register to the
+  mdio bus the phy is on as there's already support for setting this reg
+  property in the mdio-ipq4019 driver as per commit:
+  23a890d493e3ec1e957bc925fabb120962ae90a7
+- Explicitly probe on PHY ID as otherwise the PHY wouldn't come up and
+  initialize as found during further testing when the kernel is flashed
+  to NAND
+- Link to v1: https://lore.kernel.org/r/20250525-ipq5018-ge-phy-v1-0-ddab8854e253@outlook.com
+
+---
+George Moussalem (5):
+      clk: qcom: gcc-ipq5018: fix GE PHY reset
+      dt-bindings: net: qca,ar803x: Add IPQ5018 Internal GE PHY support
+      net: phy: qcom: at803x: Add Qualcomm IPQ5018 Internal PHY support
+      arm64: dts: qcom: ipq5018: Add MDIO buses
+      arm64: dts: qcom: ipq5018: Add GE PHY to internal mdio bus
+
+ .../devicetree/bindings/net/qca,ar803x.yaml        |  43 ++++++
+ arch/arm64/boot/dts/qcom/ipq5018.dtsi              |  48 +++++-
+ drivers/clk/qcom/gcc-ipq5018.c                     |   2 +-
+ drivers/net/phy/qcom/Kconfig                       |   2 +-
+ drivers/net/phy/qcom/at803x.c                      | 167 +++++++++++++++++++++
+ 5 files changed, 258 insertions(+), 4 deletions(-)
+---
+base-commit: ebfff09f63e3efb6b75b0328b3536d3ce0e26565
+change-id: 20250430-ipq5018-ge-phy-db654afa4ced
+
+Best regards,
 -- 
-2.43.0
+George Moussalem <george.moussalem@outlook.com>
+
 
 
