@@ -1,90 +1,116 @@
-Return-Path: <netdev+bounces-196232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84CDDAD3F9B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD9AAD3FCB
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 19:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DA467A0629
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 16:53:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E93A37A3E38
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 16:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E6E242D6B;
-	Tue, 10 Jun 2025 16:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qumulo.com header.i=@qumulo.com header.b="lmC68gaW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F29242914;
+	Tue, 10 Jun 2025 17:00:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E787D23AE96
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 16:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+Received: from trinity3.trinnet.net (trinity.trinnet.net [96.78.144.185])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89BD1EBA09;
+	Tue, 10 Jun 2025 17:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.78.144.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749574479; cv=none; b=ZI2a2w0yACu9ckWJBdg0cz4QK1L0l66WxjcEBixgMLR3DIWfXkMobC8teP2j6hNxKmYzWakZl8yfqTaFoIlWRWzN6rA4Hlnl1vWT4f7l0ctWWvFLJnw1AZv6vZwUmUAqsqIAomBhT74deMnvFNUzdHNkCNKjLKXBagSNRyYhQyM=
+	t=1749574843; cv=none; b=DSXmDoy+OyFi9dz5C4BY97/OEPTjIAI5sCHzJwieRKQM/wMM7C47v45Ty9f8QmjveOmK0Egpyjk9ZAUmOWUrX1Lm1vNkH5ZPJpJquhT5ClKoLHXM7b+rWt6Tyxv1atLet5rs7ZWFQUYKskTFjPKakLRcfOBwqU3C9Y3LtfXJxqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749574479; c=relaxed/simple;
-	bh=mt3soXNDfq2pJoAQ2Rbfgn/0tXLNN8vqGxuyoKsK2PQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=G0mYZzxWdAzANNsU/8zV1uH3B93enk8Kr7e0Cskcq8IT67EcWHGaEcSS8ATOysCMNEXtv4v1FFeK/s6s3k9tzF24EeGQYy2hx+OQ+RXxozeBUysQvkY4neQUfSxd9q/pq0+ApXXXzHuZo21YP8EgwECZE8CkOpBX065ECTA9VsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qumulo.com; spf=pass smtp.mailfrom=qumulo.com; dkim=pass (1024-bit key) header.d=qumulo.com header.i=@qumulo.com header.b=lmC68gaW; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qumulo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qumulo.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-313a188174fso27940a91.1
-        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 09:54:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=qumulo.com; s=google; t=1749574477; x=1750179277; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mt3soXNDfq2pJoAQ2Rbfgn/0tXLNN8vqGxuyoKsK2PQ=;
-        b=lmC68gaWfQgc0enIFn1HV3aESqqxZr+LC9ptbiOs5YnQTCnlWoGi1X77kd/KR+i7Gi
-         gcIfqOKn6YWywr1F44eQdO17V9SVaVTX9quLX5icX12X0097rgSJIO4Q7TUYk9YDMUYR
-         dbsZFx2GYhmgRqmOJe3lBBj+KdjmQOfgdNo/w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749574477; x=1750179277;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mt3soXNDfq2pJoAQ2Rbfgn/0tXLNN8vqGxuyoKsK2PQ=;
-        b=DWZtPTF9jovkjtZrjwDTmvL4sLRSGUxtbwXaKJpIxBH41Jyu07yUqlHoRiEjhVek4J
-         NnVx7vkxuWlXZHpikv+e4Ztsso8Z1GDhpVuMDDghYncRiCQg0dUtRUQ1hYyZe9Kz+9IK
-         1meAA4a0yVUEnWFlgO4pOZ+HHTH/oDc0i7GVRun6EI12EAzCtjZr/UQmOzOa3rpvqlQg
-         wDM03Nzih+2YEmg2ILMJwVayk0RYwNRcjXjp3sNzPbobzZhQ63YIjw4DXn3eUiNFIhRv
-         hSO7B5X7xdIdkOp89359BgvOOfGDZKjfDVPmpoeb4w/AIIYae/itjA7xpGrXMNVxMsex
-         Sr1w==
-X-Gm-Message-State: AOJu0YzRCMnuBO1dHQolCA/inRGgRH/xJLquFWGy7HqwrEkTqBwbW2pJ
-	lx7MUgAI/ukZuAII4SlBOHQdqrwCyXqqbyDROb9SG8xHpFoUcxwG1ibT6Y7W1MikhfAeSBGz2U1
-	/EbCS4rPnNDuGrGnzFromJRe2ty9hxtTqmT7c8mx2Ad9ubTnhDBJrxt4=
-X-Gm-Gg: ASbGnctl8q0pAPL6YkozbJEBbnFT13iAtdPgIvj6UNFhod0BGa4C3uE3NcU2Csk/g3f
-	qHXlSzSEABdUYQqxgEX/1ixDzFigSsT79D+8+v5nZSx5HbPGd9iasV/98SJ79wM442xflaYkcU2
-	drSO/53nqfwyy3z/AM39eHDRpsHPnCxmJuEm3lh54be8d2s3wwSOB8
-X-Google-Smtp-Source: AGHT+IF5we/SYOxJ1qLL56kbYZVbMvig/6sV2CaJjzn8LDBnCNX/3E0vdybpMy4qloixKSb28jQhalMQA+BPdog9Dy0=
-X-Received: by 2002:a17:90b:2dca:b0:310:8d4a:4a97 with SMTP id
- 98e67ed59e1d1-313af9858a5mr148037a91.15.1749574476646; Tue, 10 Jun 2025
- 09:54:36 -0700 (PDT)
+	s=arc-20240116; t=1749574843; c=relaxed/simple;
+	bh=Rwc4NuErVkFpHBkoUx3q2sPM3JKnIPVvz372v7HbkF4=;
+	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FnnI+RMMmo/bPaPx0AE4ITj3VDsH26EXFjTBAWhSSouyH4HswX9RaS1C/+uQHV1L6IswhZrPAo5G/cNEDm5CeKjs8pdXYtdBhwQsKLFO8S3ZHdgBRogbRcZmHwXPgKrHWYdjLhE0aou3F1HY2QUIo2oZbdI7bzk7PeuVq3iBZ1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net; spf=pass smtp.mailfrom=trinnet.net; arc=none smtp.client-ip=96.78.144.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=trinnet.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trinnet.net
+Received: from trinity4.trinnet.net (trinity4.trinnet.net [192.168.0.11])
+	by trinity3.trinnet.net (TrinityOS hardened/TrinityOS Hardened) with ESMTP id 55AH05eh017638;
+	Tue, 10 Jun 2025 10:00:05 -0700
+Subject: Re: [PATCH net] netrom: fix possible deadlock in nr_rt_device_down
+To: Dan Cross <crossd@gmail.com>
+References: <20250605105449.12803-1-arefev@swemel.ru>
+ <20250609155729.7922836d@kernel.org>
+ <5f821879-6774-3dc2-e97d-e33b76513088@trinnet.net>
+ <20250609162642.7cb49915@kernel.org>
+ <4cfc85af-c13a-aa9c-a57c-bf4b6e0f2186@trinnet.net>
+ <CAEoi9W57D-BfpYUAe5M3zjJvTUQUL4UUB+iWkpRO_o8JWfS7FQ@mail.gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Denis Arefev <arefev@swemel.ru>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>, Nikita Marushkin <hfggklm@gmail.com>,
+        Ilya Shchipletsov <rabbelkin@mail.ru>,
+        Hongbo Li <lihongbo22@huawei.com>, linux-hams@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lvc-project@linuxtesting.org, stable@vger.kernel.org,
+        syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
+From: David Ranch <linux-hams@trinnet.net>
+Message-ID: <50676604-b8c9-cc57-1ce0-a4db4758b190@trinnet.net>
+Date: Tue, 10 Jun 2025 10:00:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101
+ Thunderbird/45.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Haylin Moore <hmoore@qumulo.com>
-Date: Tue, 10 Jun 2025 09:54:25 -0700
-X-Gm-Features: AX0GCFu0zOGGpEaS8pXlMuePYPYFnRXwPK9VsM4vdK_z8M90sV_29HvrasJ1z8Y
-Message-ID: <CALnKHDCKs-_XvW0jFAu1yv-Ex_OabqzuyBy=US_W-jzwy9N3Ug@mail.gmail.com>
-Subject: bond_eth_hash only uses the fifth byte of MAC address
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAEoi9W57D-BfpYUAe5M3zjJvTUQUL4UUB+iWkpRO_o8JWfS7FQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-3.0 (trinity3.trinnet.net [192.168.0.1]); Tue, 10 Jun 2025 10:00:07 -0700 (PDT)
 
-Hello All,
+Yes, this seems like a reasonable approach though I understand all this=20
+code is old, overly complicated, and when proposed changes are=20
+available, little to no proper testing is done before it's commited and=20
+it takes a very long time to get properly fixed.
 
-I am currently digging into the source code powering layer2+3 bonding
-and saw that for bond_eth_hash only the 5th byte of both the source
-and destination MAC address is used in the XOR.
+I only bring this all up as the Linux AX.25 community has been badly=20
+bitten by similar commits in the last few years.  I've tried to help=20
+find a new maintainer and/or find somewhere to possibly create and run=20
+CI tests to catch issues but I've been unsuccessful so far.
 
-Is there a reason for this? I was not able to find anything searching
-the mailing lists or the web. This functionality while documented just
-feels weird to me.
+I am happy to try helping on the testing side once I know what the test=20
+harness is but I'm out of my league when it comes to the code side.
 
-Thank you,
-Haylin Moore
+--David
+KI6ZHD
+
+
+On 06/10/2025 06:36 AM, Dan Cross wrote:
+> On Mon, Jun 9, 2025 at 7:31=E2=80=AFPM David Ranch <linux-hams@trinnet.=
+net> wrote:
+>> That's unclear to me but maybe someone else knowing the code better th=
+an
+>> myself can chime in.  I have to assume having these locks present
+>> are for a reason.
+>
+> The suggestion was not to remove locking, but rather, to fold multiple
+> separate locks into one. That is, have a single lock that covers both
+> the neighbor list and the node list. Naturally, there would be more
+> contention around a single lock in contrast to multiple, more granular
+> locks. But given that NETROM has very low performance requirements,
+> and that the data that these locks protect doesn't change that often,
+> that's probably fine and would eliminate the possibility of deadlock
+> due to lock ordering issues.
+>
+>         - Dan C.
+>
+>> On 06/09/2025 04:26 PM, Jakub Kicinski wrote:
+>>> On Mon, 9 Jun 2025 16:16:32 -0700 David Ranch wrote:
+>>>> I'm not sure what you mean by "the only user of this code".  There a=
+re
+>>>> many people using the Linux AX.25 + NETROM stack but we unfortunatel=
+y
+>>>> don't have a active kernel maintainer for this code today.
+>>>
+>>> Alright, sorry. Either way - these locks are not performance critical=
+
+>>> for you, right?
+>>>
+>>
+
 
