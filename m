@@ -1,166 +1,198 @@
-Return-Path: <netdev+bounces-196210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C390AAD3DD9
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:48:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFBFAD3DEF
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87676168633
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:48:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF483A1AAC
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5765A234970;
-	Tue, 10 Jun 2025 15:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A61238C23;
+	Tue, 10 Jun 2025 15:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="EC83WCWq"
+	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="YjxV+QGx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-72.smtpout.orange.fr [193.252.22.72])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F601EB5B;
-	Tue, 10 Jun 2025 15:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360682327A7
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 15:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749570511; cv=none; b=RN2K58O9fnMwPjTDIEvi8ZgJqcY0Zjvd0j5tbKwU2hcpP/q938p8cA2En6mbXeFxjHUSDEG5K9g4NpH5G84Y1qtctwD1n+FDEqqMPoPQDa4uSJacJKmdmbET+oSsDkv7gB2lUQ5HlSCSfZQRzEWjSgOBwXllJpAY+RqEP1iDaPw=
+	t=1749570701; cv=none; b=OxQrRSuDCDmb2B91NYxgG/X8YU4gPyz1tTxSLz2NyApU1RiiuYsuXgxgOVbFcC2zTep0At7GxVg7QyiqzOB1ihOuO0NhFiW3/ORPlXy2kWoaaqvB7cp8v8DCidpfFsaa6GniZeDKgXIzpBmwZWZ7j/YC5NsijNnmW9faSwmNEu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749570511; c=relaxed/simple;
-	bh=DPCZKmqe6KLsdpWRELAuTfIYliurAwbzWQccF/Ay6zk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WxBXOMre/rvsX+7DbV6xD9ZAWdEJKLCYscmNoGsChR8Q4JkcBlKatNMGo3Bmi26glHMilKIqf5+IB85OdCoCM+YcF9UoE71na0QfgyzL+MbCzHTd6mXgH1P9VnPCSt1KiXdBw+5GYKCXOsAnw9+nztkgCCbWkQsczvV3uud43VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=EC83WCWq; arc=none smtp.client-ip=193.252.22.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id P1CsuQaoBVbicP1Cuu8707; Tue, 10 Jun 2025 17:48:25 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1749570505;
-	bh=hLNYfBAm8Db4RivC9m4UtJY5EbKQApeN/nL5cCj0Ugs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=EC83WCWq0Suc7xo7F75oL6tuLJhZcGgcA6T6SjE5M2HznAFXg+53/ja2YV2L9jlm4
-	 67XAJYZjzNIulLfpR9HbVmuA69kx2uRbqwRC7P4itIvQxYL7jWvnqZIqoFwUBoyCaG
-	 H3MPbtXKHrbdoEz3hjUlSsEwc2yUrPfZcdlFT5dWCWJJ/0qWSWULoXHqI8jwgTD9wt
-	 +88473ymjTW0O1lA5aOjECvA7xFkyKjOqMpuNk4fIXCc5bKmdofVWaX8JRwPiGBEKr
-	 AfmH/5enwlcQEMJBSCx3HPKFHMg8JhbUC/Q3N0I4p387Fb8+i1cIfr4CTBAhSvUx1/
-	 QTmOlFNpa0KAw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 10 Jun 2025 17:48:25 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <b9ea7e0e-7dd1-460b-950a-083620dd52e9@wanadoo.fr>
-Date: Wed, 11 Jun 2025 00:48:09 +0900
+	s=arc-20240116; t=1749570701; c=relaxed/simple;
+	bh=N5bzsVPZ4HgGRnUY8AqgbXkIodLpbg7XJrFNxtMMTNk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mvv7984UbfiZfrnvWopTZ5WRQeeF/PPdyX+5P7wyIVjCX6K4SwV7JfTQFKtJYGDMu/c5HzdKODojDG+gWi/R/pVGEvIVsz1Cq5+zqFfvDdtlJX7CnxrhLI4GLnWw4G5HPGqW83Ub8XYFMcIkOG0vmK5zTSkagAF/ECsv2ZTMlRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=YjxV+QGx; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id A057E240105
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 17:51:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
+	s=1984.ea087b; t=1749570696;
+	bh=N5bzsVPZ4HgGRnUY8AqgbXkIodLpbg7XJrFNxtMMTNk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:From;
+	b=YjxV+QGx20H7yCqc8wC4bs8W9LF1WaMm+Ht8KPIpVASjJtxUV/kDSBJ1iQ6ijlQPV
+	 UX2sF67Yuv6F6y1zHNKH+fRND0JYCtGH/a2RMtalZ0XrZlCSupH6rtQxqZF3kricSh
+	 ov9ch27X1DxaHGqyQiQcO7sItMTSIxNmnjT9HnStFgn9mXQWRRlrXPB14GGhQ3oYGH
+	 bBDyyDttkCCdNTNPkSm2pewwqsJs0dFNPpxuOTH+shgmjbRjYKDxB9MffJqzjyedKM
+	 Uh5153C83Xk9y1XoSWLaJx8Rwtq86L/1WPefRi0N+DgALhU/UF3Nph+S6JNrMvjBg5
+	 pdBjoJu50y/wU/smhD0jDOG9QpjkbHdgMPESHxmzVmOToV5kmJdmlyfOExJOGkz4Oh
+	 WKgsE+Lxx3o2hy7m0y/5iZLhj4VS0JOjdBuGsHRGLp5ld343lpX6ANM7aDWD3kUw9+
+	 3QpZhEa+Kn3SUAP8N4uPuG3FZrhjPJzjzH8dmu1cIwEreol02bn
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4bGtZ72s8Kz6tlh;
+	Tue, 10 Jun 2025 17:51:27 +0200 (CEST)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Martin KaFai Lau <martin.lau@linux.dev>,  John
+ Fastabend <john.fastabend@gmail.com>,  Alexei Starovoitov
+ <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Stanislav
+ Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>,  Feng Yang <yangfeng@kylinos.cn>,  Tejun Heo
+ <tj@kernel.org>,  Network Development <netdev@vger.kernel.org>,  LKML
+ <linux-kernel@vger.kernel.org>,  bpf <bpf@vger.kernel.org>,
+  syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+Subject: Re: [PATCH bpf-next] bpf: Fix RCU usage in
+ bpf_get_cgroup_classid_curr helper
+In-Reply-To: <CAADnVQ+mzrDH+8S=ddDCtyo6YUO4dUUsAS88Jza93pDQ2K3Bng@mail.gmail.com>
+References: <20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net>
+	<CAADnVQLxaxVpCaK90FfePOKMLpH=axaK3gDwVZLp0L1+fNxgtA@mail.gmail.com>
+	<9eae82be-0900-44ea-b105-67fadc7d480d@iogearbox.net>
+	<CAADnVQK_k4ReDwS_urGtJPQ1SXaHdrGWYxJGd-QK=tAn60p4vw@mail.gmail.com>
+	<87wm9jy623.fsf@posteo.net>
+	<CAADnVQ+mzrDH+8S=ddDCtyo6YUO4dUUsAS88Jza93pDQ2K3Bng@mail.gmail.com>
+Date: Tue, 10 Jun 2025 15:51:05 +0000
+Message-ID: <87tt4nzjbq.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] net: can: mcp251x: use new GPIO line value setter
- callbacks
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org,
- linux-arm-msm@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- "Chester A. Unal" <chester.a.unal@arinc9.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-References: <20250610-gpiochip-set-rv-net-v1-0-35668dd1c76f@linaro.org>
- <20250610-gpiochip-set-rv-net-v1-3-35668dd1c76f@linaro.org>
- <b2f87cff-3a81-482b-bfdd-389950b7ec8e@wanadoo.fr>
- <CAMRc=MfCwz3BV15aATr_5er7wU=AmKV=Z=sHJyrjEvLwx2cMjQ@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CAMRc=MfCwz3BV15aATr_5er7wU=AmKV=Z=sHJyrjEvLwx2cMjQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 10/06/2025 at 23:05, Bartosz Golaszewski wrote:
-> On Tue, Jun 10, 2025 at 3:55 PM Vincent Mailhol
-> <mailhol.vincent@wanadoo.fr> wrote:
+Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+
+> On Tue, Jun 10, 2025 at 8:23=E2=80=AFAM Charalampos Mitrodimas
+> <charmitro@posteo.net> wrote:
 >>
->> On 10/06/2025 at 21:37, Bartosz Golaszewski wrote:
->>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>
->>> struct gpio_chip now has callbacks for setting line values that return
->>> an integer, allowing to indicate failures. Convert the driver to using
->>> them.
->>>
->>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 >>
->> This does not match the address with which you sent the patch: brgl@bgdev.pl
+>> > On Tue, Jun 10, 2025 at 5:58=E2=80=AFAM Daniel Borkmann <daniel@iogear=
+box.net> wrote:
+>> >>
+>> >> On 6/9/25 5:51 PM, Alexei Starovoitov wrote:
+>> >> > On Sun, Jun 8, 2025 at 8:35=E2=80=AFAM Charalampos Mitrodimas
+>> >> > <charmitro@posteo.net> wrote:
+>> >> >>
+>> >> >> The commit ee971630f20f ("bpf: Allow some trace helpers for all pr=
+og
+>> >> >> types") made bpf_get_cgroup_classid_curr helper available to all B=
+PF
+>> >> >> program types.  This helper used __task_get_classid() which calls
+>> >> >> task_cls_state() that requires rcu_read_lock_bh_held().
+>> >> >>
+>> >> >> This triggers an RCU warning when called from BPF syscall programs
+>> >> >> which run under rcu_read_lock_trace():
+>> >> >>
+>> >> >>    WARNING: suspicious RCU usage
+>> >> >>    6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
+>> >> >>    -----------------------------
+>> >> >>    net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_chec=
+k() usage!
+>> >> >>
+>> >> >> Fix this by replacing __task_get_classid() with task_cls_classid()
+>> >> >> which handles RCU locking internally using regular rcu_read_lock()=
+ and
+>> >> >> is safe to call from any context.
+>> >> >>
+>> >> >> Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+>> >> >> Closes: https://syzkaller.appspot.com/bug?extid=3Db4169a1cfb945d2e=
+d0ec
+>> >> >> Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog t=
+ypes")
+>> >> >> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+>> >> >> ---
+>> >> >>   net/core/filter.c | 2 +-
+>> >> >>   1 file changed, 1 insertion(+), 1 deletion(-)
+>> >> >>
+>> >> >> diff --git a/net/core/filter.c b/net/core/filter.c
+>> >> >> index 30e7d36790883b29174654315738e93237e21dd0..3b3f81cf674dde7d2b=
+d83488450edad4e129bdac 100644
+>> >> >> --- a/net/core/filter.c
+>> >> >> +++ b/net/core/filter.c
+>> >> >> @@ -3083,7 +3083,7 @@ static const struct bpf_func_proto bpf_msg_p=
+op_data_proto =3D {
+>> >> >>   #ifdef CONFIG_CGROUP_NET_CLASSID
+>> >> >>   BPF_CALL_0(bpf_get_cgroup_classid_curr)
+>> >> >>   {
+>> >> >> -       return __task_get_classid(current);
+>> >> >> +       return task_cls_classid(current);
+>> >> >>   }
+>> >> >
+>> >> > Daniel added this helper in
+>> >> > commit 5a52ae4e32a6 ("bpf: Allow to retrieve cgroup v1 classid from=
+ v2 hooks")
+>> >> > with intention to use it from networking hooks.
+>> >> >
+>> >> > But task_cls_classid() has
+>> >> >          if (in_interrupt())
+>> >> >                  return 0;
+>> >> >
+>> >> > which will trigger in softirq and tc hooks.
+>> >> > So this might break Daniel's use case.
+>> >>
+>> >> Yeap, we cannot break tc(x) BPF programs. It probably makes sense to =
+have
+>> >> a new helper implementation for the more generic, non-networking case=
+ which
+>> >> then internally uses task_cls_classid().
+>> >
+>> > Instead of forking the helper I think we can :
+>> > rcu_read_lock_bh_held() || rcu_read_lock_held()
+>> > in task_cls_state().
 >>
->>> ---
->>>  drivers/net/can/spi/mcp251x.c | 16 ++++++++++------
->>>  1 file changed, 10 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/net/can/spi/mcp251x.c b/drivers/net/can/spi/mcp251x.c
->>> index ec5c64006a16f703bc816983765584c5f3ac76e8..7545497d14b46c6388f3976c2bf7b9a99e959c1e 100644
->>> --- a/drivers/net/can/spi/mcp251x.c
->>> +++ b/drivers/net/can/spi/mcp251x.c
->>> @@ -530,8 +530,8 @@ static int mcp251x_gpio_get_multiple(struct gpio_chip *chip,
->>>       return 0;
->>>  }
->>>
->>> -static void mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
->>> -                          int value)
->>> +static int mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
->>> +                         int value)
->>>  {
->>>       struct mcp251x_priv *priv = gpiochip_get_data(chip);
->>>       u8 mask, val;
->>> @@ -545,9 +545,11 @@ static void mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
->>>
->>>       priv->reg_bfpctrl &= ~mask;
->>>       priv->reg_bfpctrl |= val;
->>> +
->>> +     return 0;
+>> I tested your suggestion with,
 >>
->> mcp251x_gpio_set() calls mcp251x_write_bits() which calls mcp251x_spi_write()
->> which can fail.
+>>   rcu_read_lock_bh_held() || rcu_read_lock_held()
 >>
->> For this change to really make sense, the return value of mcp251x_spi_write()
->> should be propagated all the way around.
+>> but it still triggers the RCU warning because BPF syscall programs use
+>> rcu_read_lock_trace().
 >>
-> 
-> I don't know this code so I followed the example of the rest of the
-> codebase where the result of this function is never checked - even in
-> functions that do return values. I didn't know the reason for this and
-> so didn't want to break anything as I have no means of testing it.
+>> Adding rcu_read_lock_trace_held() fixes it functionally but triggers a
+>> checkpatch warning:
+>>
+>>   WARNING: use of RCU tasks trace is incorrect outside BPF or core RCU c=
+ode
+>
+> It's safe to ignore checkpatch in this case.
 
-The return value of mcp251x_spi_write() is used in mcp251x_hw_reset(). In other
-locations, mcp251x_spi_write() is only used in functions which return void, so
-obviously, the return value is not checked.
+If that is the case I'll move forward with this. It was my initial fix
+for this[1] anyway, but checkpatch made me change it.
 
-> Can you confirm that you really want the result to be checked here?
+[1]: https://github.com/charmitro/linux/commit/e5c42d49bfb967c3c35f536971f3=
+97492d2f46bf
 
-That's the point of those new gpio setters, isn't it? If we do not check the
-result, I do not understand the purpose of the migration.
-
-
-Yours sincerely,
-Vincent Mailhol
-
+>
+>> I think the best solution here would be to add
+>> local_bh_disable()/enable() protection directly in the BPF helper. This
+>> keeps the fix localized to where the problem exists, and avoids
+>> modifying core cgroup RCU.
+>
+> That works, but it will add runtime overhead.
+> I doubt the helper is in a critical path, so I don't mind.
 
