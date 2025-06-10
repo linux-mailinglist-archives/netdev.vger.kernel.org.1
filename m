@@ -1,267 +1,158 @@
-Return-Path: <netdev+bounces-196202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D5EAD3CE7
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:25:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D6CAD3CEF
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D63D189C7B8
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:23:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D3DC189F00F
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC09D2475C3;
-	Tue, 10 Jun 2025 15:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F391248F55;
+	Tue, 10 Jun 2025 15:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRlSM1rU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BEB24728D;
-	Tue, 10 Jun 2025 15:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C84324887A;
+	Tue, 10 Jun 2025 15:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749568718; cv=none; b=PQmK8kTBiipNKAzAxz0PPUBxiUdWjlWy0xSVY1t7QDa/VsR7FuV85Y3CoQpX+j7tNgJQdYyCFYGNd5vxvZB32tjD8kBsch4jr964CshO3toI5v9wG3OP2jmrLT/TMUfDLxPbi5/J6kTH/v9TVXMLcxX6yNpkf4iad+4Ud4Sd8Zg=
+	t=1749568723; cv=none; b=FaP0ux71tEjCP698tfR9fslxWseZCFMLsX6rM7b+g1Ft8zDy0HlwZ3FXtG2FH9DUNQgE8hhEdVWrJvz1GaQjCV/UeBcXG6sBIyRmrKh7Y3jEqKhmYutgp9l6CStIjKHLxuX6cpwYS9TjYE1GqNnD//sklcSaIJjjPwMfsggTYXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749568718; c=relaxed/simple;
-	bh=hPZb8Nw1IuP4F5I5h55bS2jnLuizM8vNJnpbTBELM00=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BVdZTLkxRWaOMUzQXox5b4sJcHbjk871Lr2RuQ0a361C0ZGNHDYDOCInQ0ZsPK02prxzTmEuQLWpAARlREkQgI767dpvuSVPwi8NBahNn9lwrg8UntqdX1r09XqtVxd93IH4gCqYVNtICYSphsq764BZGTB6p0ot8pSCQWDTARo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1749568723; c=relaxed/simple;
+	bh=gOnIpi7jKT6E0yFvnngAH2TDUzwDY8Q0gWw1+BeaW+c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C3JNBkcZSMacdusBHamfZjGyRvQDFUF8Rgt1z3Bbxdi8rvIpLZ2OpH52hcOeS2h+qI49B/6mLgCHuuMV9WyKvZSpSbaomYKZdlUMHjo33NJJZbhZt4WogQKva4DhnMb/XecFFW9LPc+wCl02T1oObqhzKTsZZDlZ//C6nAVLK4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRlSM1rU; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ade750971f2so161084766b.2;
-        Tue, 10 Jun 2025 08:18:35 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-313a188174fso677605a91.1;
+        Tue, 10 Jun 2025 08:18:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749568720; x=1750173520; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Hbx+bHktyO4/4VPvenmlBdgvye7zZKBy6tNsedw1riY=;
+        b=GRlSM1rU3T53yAj33gXUbvE+HTYNND41ip1lf5mieUylJLXzuAnMcfDErS4szgS4gf
+         QxRKt/av8bGxn0Qv14Mq2bQwB2OQ6aPWswa2dgsTQ+cnPGhGS8mPB0SSWV/yQHC/ibnR
+         n+UJMSN9TV5tqoJPCiNgi5tzm9S254lJwMhP8Ub/CBxu2zY4uYewlZ267JDqoP4xL673
+         1GQw2ACxXlxUhyQrL5OdVyt5fE+1cd137KgREZX3PeMpFOLfhOYjvLxceRBS+Y80UdyC
+         xg3iyqjMDsT8eze/vsxJ6kML9ZjWpt7F8p8sb80xEujVnx2KMJL2inodANT4BBvZSA4e
+         XzfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749568714; x=1750173514;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o4cUGNOuwVhN2a6Wgm+mSMUHrtnStHJlUP7RSdOBQSk=;
-        b=JUHQTPU9AdWV9bll2T4hiBazUjnwsBWoQBM1FjNayF0zuWUGeRKfItRFEzstFpT9ZC
-         EMvnDI5dfqLr7yy5mEkZGR7dsrXBP8NS42175IhcWjCNg/enZtoBOP/djABvbxbSwhIM
-         UksMB2vqSpsJP/kF3jcA0Susxvy0h5P0n7Y54dzOrhWptcDmZQE6lOFGv8SVknLgZnBc
-         M1HBEs55Hg/nBSNj1yqxUy4yhReEKRkDIdNsGEu5N9YEIZyd6qdrV2fSGDsFrKLbz0pR
-         ObizNsjkFnFw6EG9O2Pbz+ZEfees5gmHDEFFG8P11hTLKMr6aV/WdGda6AYRCaJBHlYU
-         pceg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkCtkD3WzJt8xZzEbNgtARx5ya63BYxhP/UAloDruuoQwOoaqfELS6alDGJNTuNGUakDVI+E8Pn0UyS9yVOUwn@vger.kernel.org, AJvYcCWK0gmJtZjgzxtpKCqlD4yg78j2bD6u/uXhsjTkNealQVvLRPOWTTCAXFlhAFiPnnrdVhzeZuNl1n3wygg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCLAYrg2FOVFh2imSyblhenwkiqMRPRboBkCo6A0E1i84/BJmZ
-	GbEIRkgz9FYi1ZQIuoPJ5tRP2SN83ktTewtmNyQ6eaELTWaXWlQYJRf4
-X-Gm-Gg: ASbGncv9aV/0JtIEgxY9CtdLS5JYA3ElIYPume4GEho+KT5XWz/UWJZ1C/RdskF7cg7
-	dVhup6fafY5BMurLwZ18muaZjLwB7hQhZc+PXmUok+2jK3UIFjz/hiMFRfa2LP0A/xB+DrOFwyb
-	tiGp3vXBjNi0NcFlKwxYy04g3c24zM9I8PPgKbhBzFV83rcV8k4ZwxNZNvnTzmwKautHQosNWi7
-	6R3VatndKgKRMyNSjTznSrMkf1S5QTd0n5OZ3zKG0SxmfMUkq7trB6Qv8N5Tx2MZzF5fmXESBe+
-	vpuacJ0Lkno29PLs3VG+TG2aPNxia/IxaqoiK0LOF8GQd2wUAaCX
-X-Google-Smtp-Source: AGHT+IGnGBT0yDRCGFnwgDaFrKXCuG0tFdl0+Y1Fdv0DP0GXVyOqqGUFOA4ckLxv5IDPmagvLUYiHA==
-X-Received: by 2002:a17:906:dc8d:b0:adb:2a66:85bc with SMTP id a640c23a62f3a-ade1aab9e47mr1534646266b.34.1749568713962;
-        Tue, 10 Jun 2025 08:18:33 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:4::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade343eeea1sm636189066b.74.2025.06.10.08.18.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 08:18:33 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 10 Jun 2025 08:18:19 -0700
-Subject: [PATCH net-next 7/7] selftest: netconsole: add test for cmdline
- configuration
+        d=1e100.net; s=20230601; t=1749568720; x=1750173520;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hbx+bHktyO4/4VPvenmlBdgvye7zZKBy6tNsedw1riY=;
+        b=pIx7BCtnG8WGtJ5jUo84qWj/uCdGE3r6KmKcqt7AGxaaKgMx+Yp4cqhWlQu09rlZBs
+         6TvtU1nYrjH+XqOxOSFQpWwAMjCCKJlGvzBbYxeYx6D/cGRye/HODpBA9Qat5aw2BBc0
+         Ael2jsK7q2r4ujN9MGs5c5+aD8MMmDEHREFW6EGkFsha/L9HB24Szt5mR8jHzvUbDUyf
+         8pO4DdHqUzaHppg8xxgbar7qu8Exwk9ryU5rA20S757ZufOx4vyiiXmNvNF+tRq3mSdr
+         zKM59LTBM8CD6kkU/eqhgBYrb3hz7RUH4s5UZsyE5m0Q4bnch4ZCtJW9L1qgzl9ViRck
+         ju1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUrc7qQiQbnTplaGwXj+qClCX/TKSAPgeVavoRInAlM7LVkmmTF3hFhPRAzYYOPksjFgSY=@vger.kernel.org, AJvYcCVgagnqlbefL1di3C5AXsvYw/XiL6RE5ytKP1HSXmBk1wIKAcIeQVxt18/xqGpCdYjcRkcIOYGC@vger.kernel.org, AJvYcCXWK/uNDQFF1mwPLVjzk9IZ/C9ByE1mgCGyDwDSbDdw8ce1eonxEP2SRIYhqgFkrRZPfy+b20Vx0f+jtnwV@vger.kernel.org, AJvYcCXX3BnByirBk65o1uNxQMQASCGiQiPmJ68Oqh8ZstSK0Giz1jjIKqvesqJWP55utIPkuwclAsc/@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf1v42WAYGtUJ7wKLGdEw1rOtgONGgrkQMOvOUN7GGXBfmrwZk
+	utXx48lRi6jdPjyvhdpbagzcz4US9At8JeK9QeOMb8bo63tFR5VR1rQE
+X-Gm-Gg: ASbGncsCREQzADC60kIiCWmqPBdHecW2iqeLG5PD37hNwzuhHpT8iLYkCYd/kwg0i1K
+	q2/mfN8/40iEc4fxNRUWtznGV4XRf6w0EJH4HWA3QY4CUXuXE99Zc725TR96Oo45MN6ReUqKFHA
+	nJOaJmkMZnnICP0gdo6vsaJaSVCZ5erc54oIXx5c8z3GJ7/5fQI9Quqs1uy/j307pUAJHPW6jWR
+	c9zeKT5RMugEM/rd+rvyYqQPa2I+F32UX11ZJcaSDMbIObvd+VDaVXzezFdtFhmt2s9Q8UbWT+p
+	4T1oU4ev6CoggXIMJ7aQi4SY79PF/k73qNWIE9o7wOPiVA9xp+CW1ZuYa7RKkh/BLH9AXW9NKwf
+	a+36c1c9LeeffMlUy75XuO5prcPEkylr4wRdh6HXF
+X-Google-Smtp-Source: AGHT+IFaLkJBXLMB5kRAXzQ6BTbGig21zU55qmOvpJ9RWPtjwP3TLdPuITWrEAgEHQ56jpCpm82CNQ==
+X-Received: by 2002:a17:90a:dfd0:b0:30e:9b31:9495 with SMTP id 98e67ed59e1d1-3139e039a1dmr4917189a91.9.1749568720457;
+        Tue, 10 Jun 2025 08:18:40 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:6df1:5935:37b2:fe6a? ([2001:ee0:4f0e:fb30:6df1:5935:37b2:fe6a])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31349f17bd2sm7467484a91.5.2025.06.10.08.18.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Jun 2025 08:18:40 -0700 (PDT)
+Message-ID: <e2de0cd8-6ee2-4dab-9d41-cfe5e85d796d@gmail.com>
+Date: Tue, 10 Jun 2025 22:18:32 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] virtio-net: drop the multi-buffer XDP packet in
+ zerocopy
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+References: <20250603150613.83802-1-minhquangbui99@gmail.com>
+ <dd087fdf-5d6c-4015-bed3-29760002f859@redhat.com>
+ <f6d7610b-abfe-415d-adf8-08ce791e4e72@gmail.com>
+ <20250605074810.2b3b2637@kernel.org>
+ <f073b150-b2e9-43db-aa61-87eee4755a2f@gmail.com>
+ <20250609095824.414cffa1@kernel.org>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20250609095824.414cffa1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250610-rework-v1-7-7cfde283f246@debian.org>
-References: <20250610-rework-v1-0-7cfde283f246@debian.org>
-In-Reply-To: <20250610-rework-v1-0-7cfde283f246@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6008; i=leitao@debian.org;
- h=from:subject:message-id; bh=hPZb8Nw1IuP4F5I5h55bS2jnLuizM8vNJnpbTBELM00=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoSEy+3U7nbPd4IvWNtmUI4sfQZ5L151a93Wuxr
- tvLoIVsdAOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaEhMvgAKCRA1o5Of/Hh3
- bfesD/42YmOcr2cmcrcIOZwSGJU74Sar6s2sMqctjxrP8QLrUX9be54e0Q1CUgjM34edM2Xp6ub
- B34nc3c3m2m3BlImfwI9Dun9t87Q6qvGQjW93bCSE+c84vba7wLSwFOAQxnx1gG27UWtKHjlQhk
- 8g5v6KZVYBq242laRTWJfzFmiPl9Uo9jeIAjpluEwqVW0DUTM1eE2A1vu1zCIfHYFtV2u6VHfHC
- /ogoj4qd01IOKQLU1zlt/DoswSfgDToqzWmOI3yDPSbqmgK27gxiZsBAJEfUvM3WeewmTadLyem
- lqK+sSEzvAaf4/3Jy/S39DcQVsDaucDLiltNzoGhh7EyEvPGDk/4iqYOI019Skrk3NGjDsdAbHR
- vOSkgqiqDMHPYL4szbPYQeZO+CxsrANOn14W5gVph3Pti8+HVgcp1OL6wHaK2zdVn3a+F+diZYo
- Ss32/OGDHlJu40YRJczLaIRlRXcB44mOVIIMU36Kr9z6cmgxDnuPOjKisVIiboflgt+5wbQ9Grm
- nR0PXE9nhKtK1oasrcjOvuEUgLCXxy2VfrsbTv1G83I0L5216CabqGDVP+fJS2lkVa0kC8QIpzp
- 2EaC/NVAaB6iiXJSO91+EKzlm3EUBr03+rydbd/3pmkukPh+PHrlF7/ZucK7968OT/051il/Vll
- CWyPsrR3TkCxNsQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Add a new selftest to verify netconsole module loading with command
-line arguments. This test exercises the init_netconsole() path and
-validates proper parsing of the netconsole= parameter format.
+On 6/9/25 23:58, Jakub Kicinski wrote:
+> On Fri, 6 Jun 2025 22:48:53 +0700 Bui Quang Minh wrote:
+>>>> But currently, if a multi-buffer packet arrives, it will not go through
+>>>> XDP program so it doesn't increase the stats but still goes to network
+>>>> stack. So I think it's not a correct behavior.
+>>> Sounds fair, but at a glance the normal XDP path seems to be trying to
+>>> linearize the frame. Can we not try to flatten the frame here?
+>>> If it's simply to long for the chunk size that's a frame length error,
+>>> right?
+>> Here we are in the zerocopy path, so the buffers for the frame to fill
+>> in are allocated from XDP socket's umem. And if the frame spans across
+>> multiple buffers then the total frame size is larger than the chunk
+>> size.
+> Is that always the case? Can the multi-buf not be due to header-data
+> split of the incoming frame? (I'm not familiar with the virtio spec)
 
-The test:
-- Loads netconsole module with cmdline configuration instead of
-  dynamic reconfiguration
-- Validates message transmission through the configured target
-- Adds helper functions for cmdline string generation and module
-  validation
+Ah, maybe I cause some confusion :) zerocopy here means zerocopy if the 
+frame is redirected to XDP socket. In this zerocopy mode, XDP socket 
+will provide buffers to virtio-net, the frame from vhost will be placed 
+in those buffers. If the bind XDP program in virtio-net returns 
+XDP_REDIRECT to that XDP socket, then the frame is zerocopy. In case 
+XDP_PASS is returned, the frame's data is copied to newly created skb 
+and the frame's buffer is returned to XDP socket. AFAIK, virtio-net has 
+not supported header-data split yet.
 
-This complements existing netconsole selftests by covering the
-module initialization code path that processes boot-time parameters.
-This test is useful to test issues like the one described in [1].
+>> Furthermore, we are in the zerocopy so we cannot linearize by
+>> allocating a large enough buffer to cover the whole frame then copy the
+>> frame data to it. That's not zerocopy anymore. Also, XDP socket zerocopy
+>> receive has assumption that the packet it receives must from the umem
+>> pool. AFAIK, the generic XDP path is for copy mode only.
+> Generic XDP == do_xdp_generic(), here I think you mean the normal XDP
+> patch in the virtio driver? If so then no, XDP is very much not
+> expected to copy each frame before processing.
 
-Link: https://lore.kernel.org/netdev/Z36TlACdNMwFD7wv@dev-ushankar.dev.purestorage.com/ [1]
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/Makefile       |  1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 39 +++++++++++++---
- .../selftests/drivers/net/netcons_cmdline.sh       | 52 ++++++++++++++++++++++
- 3 files changed, 86 insertions(+), 6 deletions(-)
+Yes, I mean generic XDP = do_xdp_generic(). I mean that we can linearize 
+the frame if needed (like in netif_skb_check_for_xdp()) in copy mode for 
+XDP socket but not in zerocopy mode.
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index be780bcb73a3b..bd309b2d39095 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -12,6 +12,7 @@ TEST_GEN_FILES := \
- TEST_PROGS := \
- 	napi_id.py \
- 	netcons_basic.sh \
-+	netcons_cmdline.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
- 	netcons_sysdata.sh \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 29b01b8e2215c..bacd98c7a9eb6 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -109,6 +109,17 @@ function create_dynamic_target() {
- 	echo 1 > "${NETCONS_PATH}"/enabled
- }
- 
-+# Generate the command line argument for netconsole following:
-+#  netconsole=[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
-+function create_cmdline_str() {
-+	DSTMAC=$(ip netns exec "${NAMESPACE}" \
-+		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
-+	SRCPORT="1514"
-+	TGTPORT="6666"
-+
-+	echo "netconsole=\"+${SRCPORT}@${SRCIP}/${SRCIF},${TGTPORT}@${DSTIP}/${DSTMAC}\""
-+}
-+
- # Do not append the release to the header of the message
- function disable_release_append() {
- 	echo 0 > "${NETCONS_PATH}"/enabled
-@@ -157,13 +168,9 @@ function listen_port_and_save_to() {
- 		socat UDP-LISTEN:"${PORT}",fork "${OUTPUT}"
- }
- 
--function validate_result() {
-+# Only validate that the message arrived properly
-+function validate_msg() {
- 	local TMPFILENAME="$1"
--
--	# TMPFILENAME will contain something like:
--	# 6.11.1-0_fbk0_rc13_509_g30d75cea12f7,13,1822,115075213798,-;netconsole selftest: netcons_gtJHM
--	#  key=value
--
- 	# Check if the file exists
- 	if [ ! -f "$TMPFILENAME" ]; then
- 		echo "FAIL: File was not generated." >&2
-@@ -175,6 +182,17 @@ function validate_result() {
- 		cat "${TMPFILENAME}" >&2
- 		exit "${ksft_fail}"
- 	fi
-+}
-+
-+# Validate the message and userdata
-+function validate_result() {
-+	local TMPFILENAME="$1"
-+
-+	# TMPFILENAME will contain something like:
-+	# 6.11.1-0_fbk0_rc13_509_g30d75cea12f7,13,1822,115075213798,-;netconsole selftest: netcons_gtJHM
-+	#  key=value
-+
-+	validate_msg "${TMPFILENAME}"
- 
- 	if ! grep -q "${USERDATA_KEY}=${USERDATA_VALUE}" "${TMPFILENAME}"; then
- 		echo "FAIL: ${USERDATA_KEY}=${USERDATA_VALUE} not found in ${TMPFILENAME}" >&2
-@@ -246,3 +264,12 @@ function pkill_socat() {
- 	pkill -f "${PROCESS_NAME}"
- 	set -e
- }
-+
-+# Check if netconsole was compiled as a module, otherwise exit
-+function check_netconsole_module() {
-+	if modinfo netconsole | grep filename: | grep -q builtin
-+	then
-+		echo "SKIP: netconsole should be compiled as a module" >&2
-+		exit "${ksft_skip}"
-+	fi
-+}
-diff --git a/tools/testing/selftests/drivers/net/netcons_cmdline.sh b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-new file mode 100755
-index 0000000000000..6d743b6e4922b
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_cmdline.sh
-@@ -0,0 +1,52 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This is a selftest to test cmdline arguments on netconsole.
-+# It exercises loading of netconsole from cmdline instead of the dynamic
-+# reconfiguration. This includes parsing the long netconsole= line and all the
-+# flow through init_netconsole().
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+check_netconsole_module
-+
-+modprobe netdevsim 2> /dev/null || true
-+rmmod netconsole 2> /dev/null || true
-+
-+# The content of kmsg will be save to the following file
-+OUTPUT_FILE="/tmp/${TARGET}"
-+
-+# Check for basic system dependency and exit if not found
-+# check_for_dependencies
-+# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+echo "6 5" > /proc/sys/kernel/printk
-+# Remove the namespace and network interfaces
-+trap cleanup_all_ns EXIT
-+# Create one namespace and two interfaces
-+set_network
-+# Create the command line for netconsole, with the configuration from the
-+# function above
-+CMDLINE="$(create_cmdline_str)"
-+
-+# Load the module, with the cmdline set
-+modprobe netconsole "${CMDLINE}"
-+
-+# Listed for netconsole port inside the namespace and destination interface
-+listen_port_and_save_to "${OUTPUT_FILE}" &
-+# Wait for socat to start and listen to the port.
-+wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+# Send the message
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+# Wait until socat saves the file to disk
-+busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+# Make sure the message was received in the dst part
-+# and exit
-+validate_msg "${OUTPUT_FILE}"
-+
-+exit "${ksft_pass}"
+>
+> This is only slightly related to you patch but while we talk about
+> multi-buf - in the netdev CI the test which sends ping while XDP
+> multi-buf program is attached is really flaky :(
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-drv-hw&test=ping-py.ping-test-xdp-native-mb&ld-cases=1
 
--- 
-2.47.1
+metal-drv-hw means the NETIF is the real NIC, right?
+
+Thanks,
+Quang Minh.
 
 
