@@ -1,125 +1,166 @@
-Return-Path: <netdev+bounces-196209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA492AD3DD7
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:48:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C390AAD3DD9
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 17:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8664C3A155C
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87676168633
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 15:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A310A236A88;
-	Tue, 10 Jun 2025 15:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5765A234970;
+	Tue, 10 Jun 2025 15:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="EC83WCWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out.smtpout.orange.fr (out-72.smtpout.orange.fr [193.252.22.72])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD8B201034;
-	Tue, 10 Jun 2025 15:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F601EB5B;
+	Tue, 10 Jun 2025 15:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749570242; cv=none; b=nmEpNEUE/yVOmotFouDP1+BlX6fZjl5Js3f5ZxFJn4HacsURsqiJa2L/2OQUbA1PjKCYcFe+mYuOhrdNMwSn5aaGXY6s3FZXI5xz0nIwBCtSMDTEadP0m1oy63iXYb+4VSuqKbUIIjXaorn9tQNGWpwdpumzd4dRVtIyXx4PtqM=
+	t=1749570511; cv=none; b=RN2K58O9fnMwPjTDIEvi8ZgJqcY0Zjvd0j5tbKwU2hcpP/q938p8cA2En6mbXeFxjHUSDEG5K9g4NpH5G84Y1qtctwD1n+FDEqqMPoPQDa4uSJacJKmdmbET+oSsDkv7gB2lUQ5HlSCSfZQRzEWjSgOBwXllJpAY+RqEP1iDaPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749570242; c=relaxed/simple;
-	bh=FpHd5k/WuqGkFa8AqlRyJwsexbf+fo2WnOclxAlQJgg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AsGmBX3dRtV8cacwhrz0t2VcbCLsBpD4VtGjz32gmRiWa6bSt3Q2MbBVAQWEjKqGCx4sfye2s/07r8YvTx1vR5peM2fxq82ZuGyhnrATQo8s+PhqAORfpAkCwlNdGI6ztao+ogB0e8fRYw162MhiTDpQWwC+kYQOs5TCCd745xA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-acb5ec407b1so1009452466b.1;
-        Tue, 10 Jun 2025 08:44:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749570239; x=1750175039;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uuDaN3v7IKjjOwPuI92C78hEQA3//blEo1hg6ajXKJQ=;
-        b=q6UIZiqG4f1V73zM6C8/7eZjhty/VQILej1SeBZrFr83k98g2lJcsFJ4cQ81sIJDhJ
-         YRuxgqcIfr/srXxZZV4c1YppgfR92HWmlar89KjFOHX7NeS5ftHH6zSQRGbt0fCYXExM
-         OknpoPEGT9XSyNXSJqjlVjKYV6kYorWSSi4U9Y+8WJaiQ7zfChGrZbWNJ3Afn92U1icb
-         4PF3rxEp90uxBc69dcHGsshkR2raRPENbCtOaEM+jbGDKvxJ1WF9lmaw+NvTOhn1Fg8F
-         tJWUauRAE+nT9JsuWPzSVdWHyeSFaRJMUMwnGEZTpgC1qXdEEZYg0Jl69P0uLxqy9cAo
-         kwMw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+3raEqor6JcEX9mXibfjVaFqef2AjaN4j8JMvqitS9OIf8HBUf019xjcnbV/DFM3XfYmcHK9f@vger.kernel.org, AJvYcCU1qrgyQLo7BILe2oBQNQ1Z4g9DMS2aAnDttDlCs5GYMazLZ4dcx1mP+SnSRsKX/ROUee/buMo03h6b4+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz16E1+ubH1FLzMm2LqrEzTqQ9iy3EeFJNiE7Bk0YHMIhh0N1vQ
-	udMZqI6SzUPK8BpezXMGTWRIqZweJ+OtBvRiyqi1w0bRvmlsERv4G20S
-X-Gm-Gg: ASbGncsm1OLxmRYv8t29kGGwQ5QJBWaljh+ulrzLTXgHH86v8Gb7HFrTSLz25+gaWNH
-	DYmkZCmzhq71K6XSgM5XtrpEKy8/c8QDItq44KdsgpH6BSt19vSmNxLxF1VY5tVhjAnKuBF+N6a
-	RIDpxYr7DITZ/S5W1P7h77j9xI7yPAVeTvKDiMrGObCx/BNKA8T5WuufXt9RYrrF8eZnahl7846
-	Lg1lnLB/OQo2WZu9T8xE2yjMksAipkdFKatkjtJcU7a44jAZPgntuirMqm2cvcU2r1CLT4/VuR7
-	aooCmJr1QYyb40rS7cP6LbJ3XnB5NbXR1vnZPtXOIv6YPZVXExy5
-X-Google-Smtp-Source: AGHT+IH7vBoM84CZWFqasHt9KzLiG9LovQysp/riPIFgA4hZQCuVBAr5gBWic0qBZysBWtn+fw9E0w==
-X-Received: by 2002:a17:907:608e:b0:ad5:c462:3f60 with SMTP id a640c23a62f3a-ade1aa93187mr1760955366b.16.1749570238942;
-        Tue, 10 Jun 2025 08:43:58 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:3::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc76feesm738828966b.147.2025.06.10.08.43.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 08:43:58 -0700 (PDT)
-Date: Tue, 10 Jun 2025 08:43:55 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Akira Yokosawa <akiyks@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ignacio Encinas Rubio <ignacio@iencinas.com>,
-	Marco Elver <elver@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jan Stancek <jstancek@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ruben Wauters <rubenru09@aol.com>, joel@joelfernandes.org,
-	linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
-	stern@rowland.harvard.edu
-Subject: Re: [PATCH 4/4] docs: netlink: store generated .rst files at
- Documentation/output
-Message-ID: <aEhSu56ePZ/QPHUW@gmail.com>
-References: <cover.1749551140.git.mchehab+huawei@kernel.org>
- <5183ad8aacc1a56e2dce9cc125b62905b93e83ca.1749551140.git.mchehab+huawei@kernel.org>
+	s=arc-20240116; t=1749570511; c=relaxed/simple;
+	bh=DPCZKmqe6KLsdpWRELAuTfIYliurAwbzWQccF/Ay6zk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WxBXOMre/rvsX+7DbV6xD9ZAWdEJKLCYscmNoGsChR8Q4JkcBlKatNMGo3Bmi26glHMilKIqf5+IB85OdCoCM+YcF9UoE71na0QfgyzL+MbCzHTd6mXgH1P9VnPCSt1KiXdBw+5GYKCXOsAnw9+nztkgCCbWkQsczvV3uud43VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=EC83WCWq; arc=none smtp.client-ip=193.252.22.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id P1CsuQaoBVbicP1Cuu8707; Tue, 10 Jun 2025 17:48:25 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1749570505;
+	bh=hLNYfBAm8Db4RivC9m4UtJY5EbKQApeN/nL5cCj0Ugs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=EC83WCWq0Suc7xo7F75oL6tuLJhZcGgcA6T6SjE5M2HznAFXg+53/ja2YV2L9jlm4
+	 67XAJYZjzNIulLfpR9HbVmuA69kx2uRbqwRC7P4itIvQxYL7jWvnqZIqoFwUBoyCaG
+	 H3MPbtXKHrbdoEz3hjUlSsEwc2yUrPfZcdlFT5dWCWJJ/0qWSWULoXHqI8jwgTD9wt
+	 +88473ymjTW0O1lA5aOjECvA7xFkyKjOqMpuNk4fIXCc5bKmdofVWaX8JRwPiGBEKr
+	 AfmH/5enwlcQEMJBSCx3HPKFHMg8JhbUC/Q3N0I4p387Fb8+i1cIfr4CTBAhSvUx1/
+	 QTmOlFNpa0KAw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 10 Jun 2025 17:48:25 +0200
+X-ME-IP: 124.33.176.97
+Message-ID: <b9ea7e0e-7dd1-460b-950a-083620dd52e9@wanadoo.fr>
+Date: Wed, 11 Jun 2025 00:48:09 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5183ad8aacc1a56e2dce9cc125b62905b93e83ca.1749551140.git.mchehab+huawei@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] net: can: mcp251x: use new GPIO line value setter
+ callbacks
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-can@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ "Chester A. Unal" <chester.a.unal@arinc9.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+References: <20250610-gpiochip-set-rv-net-v1-0-35668dd1c76f@linaro.org>
+ <20250610-gpiochip-set-rv-net-v1-3-35668dd1c76f@linaro.org>
+ <b2f87cff-3a81-482b-bfdd-389950b7ec8e@wanadoo.fr>
+ <CAMRc=MfCwz3BV15aATr_5er7wU=AmKV=Z=sHJyrjEvLwx2cMjQ@mail.gmail.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <CAMRc=MfCwz3BV15aATr_5er7wU=AmKV=Z=sHJyrjEvLwx2cMjQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello Mauro,
+On 10/06/2025 at 23:05, Bartosz Golaszewski wrote:
+> On Tue, Jun 10, 2025 at 3:55 PM Vincent Mailhol
+> <mailhol.vincent@wanadoo.fr> wrote:
+>>
+>> On 10/06/2025 at 21:37, Bartosz Golaszewski wrote:
+>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>
+>>> struct gpio_chip now has callbacks for setting line values that return
+>>> an integer, allowing to indicate failures. Convert the driver to using
+>>> them.
+>>>
+>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>
+>> This does not match the address with which you sent the patch: brgl@bgdev.pl
+>>
+>>> ---
+>>>  drivers/net/can/spi/mcp251x.c | 16 ++++++++++------
+>>>  1 file changed, 10 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/drivers/net/can/spi/mcp251x.c b/drivers/net/can/spi/mcp251x.c
+>>> index ec5c64006a16f703bc816983765584c5f3ac76e8..7545497d14b46c6388f3976c2bf7b9a99e959c1e 100644
+>>> --- a/drivers/net/can/spi/mcp251x.c
+>>> +++ b/drivers/net/can/spi/mcp251x.c
+>>> @@ -530,8 +530,8 @@ static int mcp251x_gpio_get_multiple(struct gpio_chip *chip,
+>>>       return 0;
+>>>  }
+>>>
+>>> -static void mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
+>>> -                          int value)
+>>> +static int mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
+>>> +                         int value)
+>>>  {
+>>>       struct mcp251x_priv *priv = gpiochip_get_data(chip);
+>>>       u8 mask, val;
+>>> @@ -545,9 +545,11 @@ static void mcp251x_gpio_set(struct gpio_chip *chip, unsigned int offset,
+>>>
+>>>       priv->reg_bfpctrl &= ~mask;
+>>>       priv->reg_bfpctrl |= val;
+>>> +
+>>> +     return 0;
+>>
+>> mcp251x_gpio_set() calls mcp251x_write_bits() which calls mcp251x_spi_write()
+>> which can fail.
+>>
+>> For this change to really make sense, the return value of mcp251x_spi_write()
+>> should be propagated all the way around.
+>>
+> 
+> I don't know this code so I followed the example of the rest of the
+> codebase where the result of this function is never checked - even in
+> functions that do return values. I didn't know the reason for this and
+> so didn't want to break anything as I have no means of testing it.
 
-On Tue, Jun 10, 2025 at 12:46:07PM +0200, Mauro Carvalho Chehab wrote:
-> A better long term solution is to have an extension at
-> Documentation/sphinx that parses *.yaml files for netlink files,
-> which could internally be calling ynl_gen_rst.py. Yet, some care
-> needs to be taken, as yaml extensions are also used inside device
-> tree.
+The return value of mcp251x_spi_write() is used in mcp251x_hw_reset(). In other
+locations, mcp251x_spi_write() is only used in functions which return void, so
+obviously, the return value is not checked.
 
-In fact, This is very similar to what I did initially in v1. And I was
-creating a sphinx extension to handle the generation, have a look here:
+> Can you confirm that you really want the result to be checked here?
 
-https://lore.kernel.org/all/20231103135622.250314-1-leitao@debian.org/
+That's the point of those new gpio setters, isn't it? If we do not check the
+result, I do not understand the purpose of the migration.
 
-During the review, we agree to move out of the sphinx extension.
-the reasons are the stubs/templates that needs to be created and you are
-creating here.
 
-So, if we decide to come back to sphinx extension, we can leverage that
-code from v1 ?!
+Yours sincerely,
+Vincent Mailhol
 
-> -def generate_main_index_rst(output: str) -> None:
-> +def generate_main_index_rst(output: str, index_dir: str, ) -> None:
-
-You probably don't need the last , before ).
-
-Other than that, LGTM.
-
-The question is, are we OK with the templates that need to be created
-for netlink specs?! 
-
-Thanks for looking at it,
---breno
 
