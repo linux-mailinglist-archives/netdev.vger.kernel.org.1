@@ -1,403 +1,130 @@
-Return-Path: <netdev+bounces-196301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE703AD41E7
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:26:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45229AD41EF
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 20:31:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 981993A3F3B
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:26:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2208179EEA
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 18:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B7B24728D;
-	Tue, 10 Jun 2025 18:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j6RuBqnW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D433D23BCEC;
+	Tue, 10 Jun 2025 18:31:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from constellation.wizardsworks.org (wizardsworks.org [24.234.38.212])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C39235062
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 18:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4919238C1B;
+	Tue, 10 Jun 2025 18:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.234.38.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749579998; cv=none; b=P87dt/6RokmbhHKjbxkQbjCpp5P0NNiW1GGWSzral8ejsJ+VtBENwsfcS7bKDZSjGT/du2OqAucloUako8yOrpB5IZ+Tm7Gng5LUFYi/0tKgeYS8LAwLnHB0OQhaUJn6IQkgRhwv/AnHYgtTVZAf4akpWb7jRYFxuUenEf0qseA=
+	t=1749580304; cv=none; b=La2ASn5eoeOn3wLNbseUFEjaxNjMPUatXM/6ST4LAtJ0usdNUV/O03ijVpDHPFgF/kpaGiXNV5XLAGuikH7AZVzyHQK2mXk5iZ6AJIQhQgi+kUofLjfSI7qQG9oOK0jaE6K5htbDrIBFZrJygtKjHNDVzoTYSuW2VTgl1RS/yMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749579998; c=relaxed/simple;
-	bh=1CGiVweZPOVBOlC48CBMdFxeRyzi2HVM7o+02KJQE6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HfMhATx5abnGkKL/GKSIF0t+LhKsbBI2nLRXB0k55PHu+XFj5dqdazYbjZfKCvoz9pM+Vq3owgEDNG0Gb3uFJK3q646q/w9Aijj324HQoh505rWa0klLeEW+hhlb6Iqid/X+I/uwOM+tr3932jLn6ssjxtbS5UQuGHvpdOph1pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j6RuBqnW; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6812c58a-4f33-46b5-8886-1198e36823ed@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749579983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tNkxq8ubb4pA1gusRAMSs5vuUzrqjmlrrMAIJLZlxEc=;
-	b=j6RuBqnWxSYPYq7JZE6NeHOQ7raiNyDu758KkDLVZ9NijhkbIuYHuxbElu+KCdKV807hRU
-	bojrxyEk8NCR2a0zyMRhZW5YqDIeA+0X1SVs4EgpFMiAo7evwclDz9/2GvTZV8BTcTWm0w
-	p1qJFDUxJN1ZZSZ/BmjQjCO2dUyV9FE=
-Date: Tue, 10 Jun 2025 11:26:15 -0700
+	s=arc-20240116; t=1749580304; c=relaxed/simple;
+	bh=QUg0jZlbuzFB5jP9wY8764cHVeJKKVjbPNKXc2oti5c=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=O8LDDphFNceRgB+wGD0Z/tE3QZaFZ+4hGx4l6de+nlYcPWVEX9QbeAInp+HwEkjim5xGh4jXzr5oR/NVTBq6Uw+AQy1BwQySQqZR7QG/U6YyZ27y4obaKnf6+zk/sHb8THtQLbSVHIt8NkcqLzaIJ+qJNMToTQ2mh4BeFlu2Lo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org; spf=pass smtp.mailfrom=wizardsworks.org; arc=none smtp.client-ip=24.234.38.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wizardsworks.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wizardsworks.org
+Received: from mail.wizardsworks.org (localhost [127.0.0.1])
+	by constellation.wizardsworks.org (8.18.1/8.18.1) with ESMTP id 55AIXZf6000833;
+	Tue, 10 Jun 2025 11:33:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next V7 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
- kernel-team@cloudflare.com, phil@nwl.cc,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <174559288731.827981.8748257839971869213.stgit@firesoul>
- <174559294022.827981.1282809941662942189.stgit@firesoul>
- <fecfcad0-7a16-42b8-bff2-66ee83a6e5c4@linux.dev>
- <b158cffc-582b-4a2f-bb13-a27c8f58b6fc@kernel.org>
- <46a47776-dcd9-4c6f-8d71-f94b22b077e2@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Ihor Solodrai <ihor.solodrai@linux.dev>
-In-Reply-To: <46a47776-dcd9-4c6f-8d71-f94b22b077e2@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Date: Tue, 10 Jun 2025 11:33:35 -0700
+From: Greg Chandler <chandleg@wizardsworks.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Tulip 21142 panic on physical link disconnect
+In-Reply-To: <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+References: <53bb866f5bb12cc1b6c33b3866007f2b@wizardsworks.org>
+ <02e3f9b8-9e60-4574-88e2-906ccd727829@gmail.com>
+Message-ID: <70660feba172c7933cd5521527df523c@wizardsworks.org>
+X-Sender: chandleg@wizardsworks.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 6/10/25 8:56 AM, Jesper Dangaard Brouer wrote:
+
+Thanks!  I appreciate you getting back to me.  I've got about 30 huge 
+bugs I am shaking down, and this one just cropped up, so I haven't been 
+able to put a lot of time into it yet.
+I rolled a full debug kernel last night to troubleshoot what appears to 
+be a spinlock/mutex issue with something else, but I'm sure it'll help 
+with this too.
+
+If I find anything out I will also reply with the details....
+
+
+
+On 2025/06/10 09:27, Florian Fainelli wrote:
+> Howdy!
+> 
+> On 6/9/25 15:43, Greg Chandler wrote:
+>> 
+>> This is a from-scratch build (non-vendor/non-distribution)
+>> Host/Target = alpha ev6
+>> Kernel source = 6.12.12
+>> 
+>> My last working kernel on this was a 2.6.x, it's been a while since 
+>> I've had time to bring this system up to date, so I don't know when 
+>> this may have started.
+>> I had a 3.0.102 in there, but I didn't test the networking while using 
+>> it.
+>> 
+>> Please let me know what I can do to help out with figuring this one 
+>> out.
+> 
+> I don't have an Alpha machine to try this on, but I do have a 
+> functional Cobalt Qube2 (MIPS 32/64) with these adapters connected 
+> directly over PCI:
+> 
+> 00:07.0 Ethernet controller: Digital Equipment Corporation DECchip 
+> 21142/43 (rev 41)
+>         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
+> ParErr+ Stepping- SERR- FastB2B- DisINTx-
+>         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
+> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+>         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
+> bytes
+>         Interrupt: pin A routed to IRQ 19
+>         Region 0: I/O ports at 1000 [size=128]
+>         Region 1: Memory at 12082000 (32-bit, non-prefetchable) 
+> [size=1K]
+>         Expansion ROM at 12000000 [disabled] [size=256K]
+>         Kernel driver in use: tulip
 > 
 > 
-> On 10/06/2025 13.43, Jesper Dangaard Brouer wrote:
->>
->> On 10/06/2025 00.09, Ihor Solodrai wrote:
->>> On 4/25/25 7:55 AM, Jesper Dangaard Brouer wrote:
-> [...]
->>>> ---
->>>>   drivers/net/veth.c |   57 ++++++++++++++++++++++++++++++++++++++++ 
->>>> +++---------
->>>>   1 file changed, 47 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->>>> index 7bb53961c0ea..e58a0f1b5c5b 100644
->>>> --- a/drivers/net/veth.c
->>>> +++ b/drivers/net/veth.c
->>>> @@ -307,12 +307,10 @@ static void __veth_xdp_flush(struct veth_rq *rq)
->>>>   static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
->>>>   {
->>>> -    if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb))) {
->>>> -        dev_kfree_skb_any(skb);
->>>> -        return NET_RX_DROP;
->>>> -    }
->>>> +    if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb)))
->>>> +        return NETDEV_TX_BUSY; /* signal qdisc layer */
->>>> -    return NET_RX_SUCCESS;
->>>> +    return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
->>>>   }
->>>>   static int veth_forward_skb(struct net_device *dev, struct sk_buff 
->>>> *skb,
->>>> @@ -346,11 +344,11 @@ static netdev_tx_t veth_xmit(struct sk_buff 
->>>> *skb, struct net_device *dev)
->>>>   {
->>>>       struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
->>>>       struct veth_rq *rq = NULL;
->>>> -    int ret = NETDEV_TX_OK;
->>>> +    struct netdev_queue *txq;
->>>>       struct net_device *rcv;
->>>>       int length = skb->len;
->>>>       bool use_napi = false;
->>>> -    int rxq;
->>>> +    int ret, rxq;
->>>>       rcu_read_lock();
->>>>       rcv = rcu_dereference(priv->peer);
->>>> @@ -373,17 +371,45 @@ static netdev_tx_t veth_xmit(struct sk_buff 
->>>> *skb, struct net_device *dev)
->>>>       }
->>>>       skb_tx_timestamp(skb);
->>>> -    if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == 
->>>> NET_RX_SUCCESS)) {
->>>> +
->>>> +    ret = veth_forward_skb(rcv, skb, rq, use_napi);
->>>> +    switch (ret) {
->>>> +    case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
->>>>           if (!use_napi)
->>>>               dev_sw_netstats_tx_add(dev, 1, length);
->>>>           else
->>>>               __veth_xdp_flush(rq);
->>>> -    } else {
->>>> +        break;
->>>> +    case NETDEV_TX_BUSY:
->>>> +        /* If a qdisc is attached to our virtual device, returning
->>>> +         * NETDEV_TX_BUSY is allowed.
->>>> +         */
->>>> +        txq = netdev_get_tx_queue(dev, rxq);
->>>> +
->>>> +        if (qdisc_txq_has_no_queue(txq)) {
->>>> +            dev_kfree_skb_any(skb);
->>>> +            goto drop;
->>>> +        }
->>>> +        /* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
->>>> +        __skb_push(skb, ETH_HLEN);
->>>> +        /* Depend on prior success packets started NAPI consumer via
->>>> +         * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
->>>> +         * paired with empty check in veth_poll().
->>>> +         */
->>>> +        netif_tx_stop_queue(txq);
->>>> +        smp_mb__after_atomic();
->>>> +        if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
->>>> +            netif_tx_wake_queue(txq);
->>>> +        break;
->>>> +    case NET_RX_DROP: /* same as NET_XMIT_DROP */
->>>>   drop:
->>>>           atomic64_inc(&priv->dropped);
->>>>           ret = NET_XMIT_DROP;
->>>> +        break;
->>>> +    default:
->>>> +        net_crit_ratelimited("%s(%s): Invalid return code(%d)",
->>>> +                     __func__, dev->name, ret);
->>>>       }
->>>> -
->>>>       rcu_read_unlock();
->>>>       return ret;
->>>> @@ -874,9 +900,17 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
->>>> budget,
->>>>               struct veth_xdp_tx_bq *bq,
->>>>               struct veth_stats *stats)
->>>>   {
->>>> +    struct veth_priv *priv = netdev_priv(rq->dev);
->>>> +    int queue_idx = rq->xdp_rxq.queue_index;
->>>> +    struct netdev_queue *peer_txq;
->>>> +    struct net_device *peer_dev;
->>>>       int i, done = 0, n_xdpf = 0;
->>>>       void *xdpf[VETH_XDP_BATCH];
->>>> +    /* NAPI functions as RCU section */
->>>> +    peer_dev = rcu_dereference_check(priv->peer, 
->>>> rcu_read_lock_bh_held());
->>>> +    peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
->>>> +
->>>>       for (i = 0; i < budget; i++) {
->>>>           void *ptr = __ptr_ring_consume(&rq->xdp_ring);
->>>>
->>>
->>> Hi Jesper.
->>>
->>> Could you please take a look at the reported call traces and help
->>> understand whether this patch may have introduced a null dereference?
->>
->> I'm investigating... thanks for reporting.
-
-Thank you for looking into this.
-
->> (more below)
->>
->>> Pasting a snippet, for full logs (2 examples) see the link:
->>> https://lore.kernel.org/bpf/6fd7a5b5- 
->>> ee26-4cc5-8eb0-449c4e326ccc@linux.dev/
+> 00:0c.0 Ethernet controller: Digital Equipment Corporation DECchip 
+> 21142/43 (rev 41)
+>         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- 
+> ParErr- Stepping- SERR- FastB2B- DisINTx-
+>         Status: Cap- 66MHz- UDF- FastB2B+ ParErr- DEVSEL=medium 
+> >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+>         Latency: 64 (5000ns min, 10000ns max), Cache Line Size: 32 
+> bytes
+>         Interrupt: pin A routed to IRQ 20
+>         Region 0: I/O ports at 1080 [size=128]
+>         Region 1: Memory at 12082400 (32-bit, non-prefetchable) 
+> [size=1K]
+>         Expansion ROM at 12040000 [disabled] [size=256K]
+>         Kernel driver in use: tulip
 > 
-> Do you have any qdisc's attached to the veth device when reproducing?
-
-Looking at the selftest code, I don't see any qdisc set up in the
-create_network. But I am not familiar with all this, and could be
-wrong.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/tree/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c#n172
-
+> the machine is not currently on a switch that I can control, but I can 
+> certainly try to plug in the cable and see what happens, give me a 
+> couple of days to get back to you, and if you don't hear back,  please 
+> holler. Here are the bits of kernel configuration:
 > 
-> Via above link I see that you managed to reproduce by running BPF 
-> selftest "xdp_veth_broadcast_redirect".  (Is this correct?)
-> 
-> How often does this happen?
-
-So far I wasn't able to reproduce it locally.
-
-It does not happen often. There were two failures on BPF CI out of
-100+ runs in the past couple of days:
-
-* One on bpf-next:
-   * 
-https://github.com/kernel-patches/bpf/commit/e41079f53e8792c99cc8888f545c31bc341ea9ac
-   * 
-https://github.com/kernel-patches/bpf/actions/runs/15543380196/job/43759847203
-* One on netdev tree (netdev merged into bpf-next):
-   * 
-https://github.com/kernel-patches/bpf/commit/6f3b8b4f8c133ff4eaf3fb74865731d2105c77eb
-   * 
-https://github.com/kernel-patches/bpf/actions/runs/15563091012/job/43820682289
-
-Click on a gear in top-right and "View raw logs" for full logs.
-Note that you can download kbuild-output from the job artifacts.
-
-Also a syzbot report does not involve the selftests:
-* https://lore.kernel.org/lkml/683da55e.a00a0220.d8eae.0052.GAE@google.com/
-
-> 
-> Does this only happen with XDP redirected frames?
-> (Func veth_xdp_rcv() also active for SKBs when veth is in GRO mode)
-
-
-Sorry, I don't know an answer to this... Bastien, could you please comment?
-
-It seems to happen after xdp_veth_broadcast_redirect test successfully
-completed, so before/during xdp_veth_egress tests.
-
-> 
-> I'm not able to reproduce this running selftests (bpf-next at 
-> 5fcf896efe28c)
-> Below example selecting all "xdp_veth*" related tests:
-> 
-> $ sudo ./test_progs --name=xdp_veth
-> #630/1   xdp_veth_broadcast_redirect/0/BROADCAST:OK
-> #630/2   xdp_veth_broadcast_redirect/0/(BROADCAST | EXCLUDE_INGRESS):OK
-> #630/3   xdp_veth_broadcast_redirect/DRV_MODE/BROADCAST:OK
-> #630/4   xdp_veth_broadcast_redirect/DRV_MODE/(BROADCAST | 
-> EXCLUDE_INGRESS):OK
-> #630/5   xdp_veth_broadcast_redirect/SKB_MODE/BROADCAST:OK
-> #630/6   xdp_veth_broadcast_redirect/SKB_MODE/(BROADCAST | 
-> EXCLUDE_INGRESS):OK
-> #630     xdp_veth_broadcast_redirect:OK
-> #631/1   xdp_veth_egress/0/egress:OK
-> #631/2   xdp_veth_egress/DRV_MODE/egress:OK
-> #631/3   xdp_veth_egress/SKB_MODE/egress:OK
-> #631     xdp_veth_egress:OK
-> #632/1   xdp_veth_redirect/0:OK
-> #632/2   xdp_veth_redirect/DRV_MODE:OK
-> #632/3   xdp_veth_redirect/SKB_MODE:OK
-> #632     xdp_veth_redirect:OK
-> Summary: 3/12 PASSED, 0 SKIPPED, 0 FAILED
-> 
-> 
->>> [  343.217465] BUG: kernel NULL pointer dereference, address: 
->>> 0000000000000018
->>> [  343.218173] #PF: supervisor read access in kernel mode
->>> [  343.218644] #PF: error_code(0x0000) - not-present page
->>> [  343.219128] PGD 0 P4D 0
->>> [  343.219379] Oops: Oops: 0000 [#1] SMP NOPTI
->>> [  343.219768] CPU: 1 UID: 0 PID: 7635 Comm: kworker/1:11 Tainted: G
->>>      W  OE       6.15.0-g2b36f2252b0a-dirty #7 PREEMPT(full)
->                              ^^^^^^^^^^^^
-> The SHA 2b36f2252b0 doesn't seem to exist.
-> What upstream kernel commit SHA is this kernel based on?
-
-This sha isn't very helpful, unfortunately, because CI adds commits on
-top. See the links to github I shared above for exact revisions.
-
-> 
->>> [  343.220844] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
->>> [  343.221436] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 
->>> 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
->>> [  343.222356] Workqueue: mld mld_dad_work
->>> [  343.222730] RIP: 0010:veth_xdp_rcv.constprop.0+0x6b/0x380
->>>
->>
->> Can you give me the output from below command (on your compiled kernel):
->>
->>   ./scripts/faddr2line drivers/net/veth.o veth_xdp_rcv.constprop.0+0x6b
->>
-> 
-> Still need above data/info please.
-
-root@devvm7589:/ci/workspace# ./scripts/faddr2line 
-./kout.gcc/drivers/net/veth.o veth_xdp_rcv.constprop.0+0x6b
-veth_xdp_rcv.constprop.0+0x6b/0x390:
-netdev_get_tx_queue at 
-/ci/workspace/kout.gcc/../include/linux/netdevice.h:2637
-(inlined by) veth_xdp_rcv at 
-/ci/workspace/kout.gcc/../drivers/net/veth.c:912
-
-Which is:
-
-veth.c:912
-	struct veth_priv *priv = netdev_priv(rq->dev);
-	int queue_idx = rq->xdp_rxq.queue_index;
-	struct netdev_queue *peer_txq;
-	struct net_device *peer_dev;
-	int i, done = 0, n_xdpf = 0;
-	void *xdpf[VETH_XDP_BATCH];
-
-	/* NAPI functions as RCU section */
-	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-  --->	peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
-
-netdevice.h:2637
-	static inline
-	struct netdev_queue *netdev_get_tx_queue(const struct net_device *dev,
-					 unsigned int index)
-	{
-		DEBUG_NET_WARN_ON_ONCE(index >= dev->num_tx_queues);
-  --->		return &dev->_tx[index];
-	}
-
-So the suspect is peer_dev (priv->peer)?
-
-Didn't know about faddr2line, thanks.
-
-Let me know if I can help with anything else.
-
-> 
-> --Jesper
-> 
->>>      [...]
->>>
->>> [  343.231061] Call Trace:
->>> [  343.231306]  <IRQ>
->>> [  343.231522]  veth_poll+0x7b/0x3a0
->>> [  343.231856]  __napi_poll.constprop.0+0x28/0x1d0
->>> [  343.232297]  net_rx_action+0x199/0x350
->>> [  343.232682]  handle_softirqs+0xd3/0x400
->>> [  343.233057]  ? __dev_queue_xmit+0x27b/0x1250
->>> [  343.233473]  do_softirq+0x43/0x90
->>> [  343.233804]  </IRQ>
->>> [  343.234016]  <TASK>
->>> [  343.234226]  __local_bh_enable_ip+0xb5/0xd0
->>> [  343.234622]  ? __dev_queue_xmit+0x27b/0x1250
->>> [  343.235035]  __dev_queue_xmit+0x290/0x1250
->>> [  343.235431]  ? lock_acquire+0xbe/0x2c0
->>> [  343.235797]  ? ip6_finish_output+0x25e/0x540
->>> [  343.236210]  ? mark_held_locks+0x40/0x70
->>> [  343.236583]  ip6_finish_output2+0x38f/0xb80
->>> [  343.237002]  ? lock_release+0xc6/0x290
->>> [  343.237364]  ip6_finish_output+0x25e/0x540
->>> [  343.237761]  mld_sendpack+0x1c1/0x3a0
->>> [  343.238123]  mld_dad_work+0x3e/0x150
->>> [  343.238473]  process_one_work+0x1f8/0x580
->>> [  343.238859]  worker_thread+0x1ce/0x3c0
->>> [  343.239224]  ? __pfx_worker_thread+0x10/0x10
->>> [  343.239638]  kthread+0x128/0x250
->>> [  343.239954]  ? __pfx_kthread+0x10/0x10
->>> [  343.240320]  ? __pfx_kthread+0x10/0x10
->>> [  343.240691]  ret_from_fork+0x15c/0x1b0
->>> [  343.241056]  ? __pfx_kthread+0x10/0x10
->>> [  343.241418]  ret_from_fork_asm+0x1a/0x30
->>> [  343.241800]  </TASK>
->>> [  343.242021] Modules linked in: bpf_testmod(OE) [last unloaded:
->>> est_no_cfi(OE)]
->>> [  343.242737] CR2: 0000000000000018
->>> [  343.243064] ---[ end trace 0000000000000000 ]---
->>>
->>>
->>> Thank you.
->>>
->>>
->>>> @@ -925,6 +959,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
->>>> budget,
->>>>       rq->stats.vs.xdp_packets += done;
->>>>       u64_stats_update_end(&rq->stats.syncp);
->>>> +    if (unlikely(netif_tx_queue_stopped(peer_txq)))
->>>> +        netif_tx_wake_queue(peer_txq);
->>>> +
->>>>       return done;
->>>>   }
->>>>
->>>>
->>>
-
+> CONFIG_NET_TULIP=y
+> CONFIG_TULIP=y
+> # CONFIG_TULIP_MWI is not set
+> # CONFIG_TULIP_MMIO is not set
+> # CONFIG_TULIP_NAPI is not set
 
