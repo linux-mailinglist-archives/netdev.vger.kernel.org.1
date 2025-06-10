@@ -1,76 +1,87 @@
-Return-Path: <netdev+bounces-196058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD176AD354C
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:46:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B593AAD3529
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 13:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AF1F7A260E
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:45:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C5093A8414
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6794220FA97;
-	Tue, 10 Jun 2025 11:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3632857FB;
+	Tue, 10 Jun 2025 11:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="ZSqOzO9j";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="ff3VuJZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.217])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0219421B9F7;
-	Tue, 10 Jun 2025 11:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.217
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749556013; cv=pass; b=BZhbwsRKm3MoD74JbvnZWO4DVPew9GehrvcsK8k7i4GF2u5AJLa+B9STTz6/Vo6iFvlYCB90oy4SKJzcIjgvMjCBBhnK++5iNCYGzcG2BKowNEYu7PvBFoIrRuctBdcdMwr7dyJjDzCUniuDfcUWl3pkYJ/nv2gP9g16KgRljqQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749556013; c=relaxed/simple;
-	bh=uHJX0DxWeFqVosoMPeKr16q7fAhmSfsN6OaFvUHtD08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nc1bOQ4dLGKlRTkxp33yvYvVh4oEZv33soE4q0tymsrJLa9NKK/MtVykXHHY05sv4HYqmU4nDDhR1Pllzkq7mbJrMtAiBiV2Tfvi3F+7VFJvXQCcJ+Pxzm3nFT/o3sLiU5MRRlt9BH2YM0QgRn2A1WYtxWCSQPpc7nkX9jGlS1Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inhub.de; spf=pass smtp.mailfrom=inhub.de; arc=pass smtp.client-ip=81.169.146.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inhub.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inhub.de
-ARC-Seal: i=1; a=rsa-sha256; t=1749555649; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Evh0aWvulWGMvk/ec2Ra1bRNhjCgyglFzo9ECK+/MjvM7bn0quUl30F8Jgy4kI6iMy
-    RW3KTtvbIoehlVfEVhGj5785lCszP6c7BGOSN5NJ2lV2tUHrOb3tn/A3WoNeGobxcy3y
-    0T58BI23nxCdOCxOi43jZgtikCDZpA3j3C3kPIucDZL+6nEePO1D96ySVE9kQ1dRWXg7
-    WXlRKXGzFdqyOtJV0O2cQRBgR+bPRdXLJpSJnqFSdZ28CFaSobEpY6Ayl6SUDTg6NyEt
-    o/a/dNNbU+Bvq7GCYBJSDHwuqtORqhkwlTUKGAkPF/fcMrFeOZJaH1rmR7eOl6NLDyD8
-    li9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1749555649;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=eIpbhmNUjy3O7tv0PtPRwrwhNYwNcqRDWPgwFL0PBm8=;
-    b=qWfkXyo+oyR1rIg1fH4gzCzAMnWmP+gkQ9Fl50Vzx73Lv9Hnp7jwglD+d3GCyPjj1c
-    OG/8lkhZf8l50wudwqKBPwPpBi0M7esL1WbvuaX9rl5+hUxJLNzPD2Gut87A5Ig9wzoO
-    naaqZhN6fc5ULK13l740wR0UsQkg3rhfjNoXzSKj3RfldkfMSqU7ao7DB9A6Oei0T28o
-    mAVM9nT61YlTZjNcmd24gAXCU5uHV+No5ITa/72AFIA7X/vyZ1zieIi2LB0mEj6SPnIZ
-    bLegrHMoP2ytLczhfdUV5zlMpaktcL1SoBACX43oQpnQm35BkUpfFSdCrkM2sToR2xp/
-    /tyw==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-X-RZG-AUTH: ":OGMGfEG7NfU1WQAxQKSndOy9b62IXRUXP1G+n0e9SfNgaKe3jg5kqErvsv7wxhn7R+CZYOGugK8="
-Received: from crypto.lan.inhub.de
-    by smtp.strato.de (RZmta 51.3.0 AUTH)
-    with ESMTPSA id J569d715ABen5yb
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Tue, 10 Jun 2025 13:40:49 +0200 (CEST)
-From: Tobias Junghans <tobias.junghans@inhub.de>
-To: Lee Jones <lee@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Tobias Junghans <tobias.junghans@inhub.de>
-Subject: [PATCH 2/2] leds: trigger: netdev: refactor netdev_event_requires_handling()
-Date: Tue, 10 Jun 2025 13:40:20 +0200
-Message-ID: <20250610114029.268938-3-tobias.junghans@inhub.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B7A170A23;
+	Tue, 10 Jun 2025 11:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749555675; cv=none; b=tlCcK1a4Jg5zUflBB3cvORaKcvoq5iG0GA/Qo+RhcD6Cj+8Xl1Gt9EEkOBIRmRMpTy2TH2rnOd5Kqfvg6fno6EUWJUn+7eHBNvUHJqd7jLggDgXjwmXfKJuVGvJVztMy2jlwqDfzOKndCL+J+uMWxoyyrJtx2mjkBaIa8EjxaME=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749555675; c=relaxed/simple;
+	bh=n0ML7zRSEOuaaURpftI7CAfQ7mwr7h1bbhbOBwd5Elg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JO/eTa9BmvXYRYhErJnmeXBLaUctTgVObp5/VSAxreSlbxO6Ic2IqmkqdrfnCEREkvyjH7DljiRFIeJ6OcvUgY/p4MtjX8Wx0dG0gDqqrSIYOgjjWn1Wb2f1TTRArU1B1DQL7chs3urNlSgSOQP0c0tsM7tpVzIw/WyUV9azb8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=ZSqOzO9j; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=ff3VuJZh reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1749555672; x=1781091672;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T0hn3QlUDDx93aZ+2OLzS2n7KSVRomyjHzy0XcJuNHM=;
+  b=ZSqOzO9jHjXbs9xfDDn2d7FAEcFOsjGWn4jTbExm13l65/cL2i1xqvzA
+   NFYosRPONpRWO5HoG2HGpnnqL2A50F+UF1h6JqrGxIee+pMTWx/apbM0Y
+   Hic95jRKd5ZxjzwoIbwCDj6DAx25Vqgc6A8TsfCy9HTYUVVq0bFblW2UE
+   VeowG+DIBOzhvkEGaWIurNIlhGG5FZPXyrPVDwcf/apEtthuReJftydM5
+   moja8nEvEIhzufbwx8bLrq/vG26rExP190FXk1vEb499GSRI9vzw5uC59
+   Agd1YSMigMoJQv8iZ7DFWrVJgcCrtjofr+PCvHjx018l2G3OV0TVbiOvR
+   g==;
+X-CSE-ConnectionGUID: vsjij+9nQ2uFUS1Pg5iwLw==
+X-CSE-MsgGUID: I3JfwE03TIS1nmD1YgaJPA==
+X-IronPort-AV: E=Sophos;i="6.16,225,1744063200"; 
+   d="scan'208";a="44544268"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 10 Jun 2025 13:41:09 +0200
+X-CheckPoint: {684819D4-36-28ACC837-DD1065DB}
+X-MAIL-CPID: 9A11648A6B4940251418317FFD709A70_2
+X-Control-Analysis: str=0001.0A006374.684819DB.001E,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BB09B167453;
+	Tue, 10 Jun 2025 13:41:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1749555664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=T0hn3QlUDDx93aZ+2OLzS2n7KSVRomyjHzy0XcJuNHM=;
+	b=ff3VuJZhBQBkP0NPYqsWcI1Cj4BdXMCFheJYKRJMr/DdM/sHlvydBcZevz4h1l4pN+xWPF
+	TPqbVO5J08m3MAMdd95L+Du1JEvt5NwCnxB2wwmkFSQX3hm15SA50BeBr47Uajed6VHoLP
+	ajrrbIodbM2iIKQOtSCg8/oXYI0avq1R8aSIBRhjYKLAoZK/hP9DXkqfYPdCCMm8pL+MMa
+	B6t1rcH/B63Frg9fBunsc+bPVgYMFlKqDRW6b8Y9DUx4KS+ukyLVwF6hfvIFyeO4pGQ8s8
+	/HKKOCKYm8bV6+MbjonBtMActakK0mRJwJ94DEtFsGD3epCln8bwBX+lZUW9eA==
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Madalin Bucur <madalin.bucur@nxp.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Alexander Stein <alexander.stein@ew.tq-group.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] net: fman_memac: Don't use of_property_read_bool on non-boolean property managed
+Date: Tue, 10 Jun 2025 13:40:56 +0200
+Message-ID: <20250610114057.414791-1-alexander.stein@ew.tq-group.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250610114029.268938-1-tobias.junghans@inhub.de>
-References: <20250610114029.268938-1-tobias.junghans@inhub.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,81 +89,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+X-Last-TLS-Session-Version: TLSv1.3
 
-If there are network devices with the same name in different
-namespaces, ledtrig-netdev gets confused easily and switches between
-these devices whenever there are NETDEV_CHANGENAME/NETDEV_REGISTER
-notifications.  This happens since ledtrig-netdev only checks for
-device name equality regardless of previous associations with another
-network device with the same name.
+'managed' is a non-boolean property specified in ethernet-controller.yaml.
+Since commit c141ecc3cecd7 ("of: Warn when of_property_read_bool() is
+used on non-boolean properties") this raises a warning. Use the
+replacement of_property_present() instead.
 
-Real world example: eth0 is the primary physical network interface and
-ledltrig-netdev is associated with that interface. If now Docker creates
-a virtual Ethernet interface (vethXXXX), moves it to the
-container's net namespace and renames it to eth0, ledtrig-netdev
-switches to this device and the LED no longer blinks for the original
-(physical) network device.
-
-Fix this by refactoring the conditions under which to handle netdev
-events:
-
-- For processing NETDEV_REGISTER events, the device name has to match
-  and no association with a net_dev must exist.
-
-- For processing NETDEV_CHANGENAME events, the associated and notified
-  network device have to match. Alternatively the device name has to
-  match and no association with a net_dev must exist.
-
-- For all other events, the associated and notified network device have
-  to match.
-
-Signed-off-by: Tobias Junghans <tobias.junghans@inhub.de>
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
 ---
- drivers/leds/trigger/ledtrig-netdev.c | 29 +++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/freescale/fman/fman_memac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index 6e16619719fe..a3f30e6f74b4 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -578,15 +578,28 @@ static const struct attribute_group *netdev_trig_groups[] = {
- static bool netdev_event_requires_handling(unsigned long evt, struct net_device *dev,
- 					   struct led_netdev_data *trigger_data)
- {
--	if (evt != NETDEV_UP && evt != NETDEV_DOWN && evt != NETDEV_CHANGE
--	    && evt != NETDEV_REGISTER && evt != NETDEV_UNREGISTER
--	    && evt != NETDEV_CHANGENAME)
--		return false;
--
--	if (!(dev == trigger_data->net_dev ||
--	     (evt == NETDEV_CHANGENAME && !strcmp(dev->name, trigger_data->device_name)) ||
--	     (evt == NETDEV_REGISTER && !strcmp(dev->name, trigger_data->device_name))))
-+	switch (evt) {
-+	case NETDEV_REGISTER:
-+		if (trigger_data->net_dev ||
-+		    strcmp(dev->name, trigger_data->device_name))
-+			return false;
-+		break;
-+	case NETDEV_CHANGENAME:
-+		if (trigger_data->net_dev != dev &&
-+		    (trigger_data->net_dev ||
-+		     strcmp(dev->name, trigger_data->device_name)))
-+			return false;
-+		break;
-+	case NETDEV_UNREGISTER:
-+	case NETDEV_UP:
-+	case NETDEV_DOWN:
-+	case NETDEV_CHANGE:
-+		if (trigger_data->net_dev != dev)
-+			return false;
-+		break;
-+	default:
- 		return false;
-+	}
- 
- 	return true;
- }
+diff --git a/drivers/net/ethernet/freescale/fman/fman_memac.c b/drivers/net/ethernet/freescale/fman/fman_memac.c
+index 3925441143fac..0291093f2e4e4 100644
+--- a/drivers/net/ethernet/freescale/fman/fman_memac.c
++++ b/drivers/net/ethernet/freescale/fman/fman_memac.c
+@@ -1225,7 +1225,7 @@ int memac_initialization(struct mac_device *mac_dev,
+ 	 * be careful and not enable this if we are using MII or RGMII, since
+ 	 * those configurations modes don't use in-band autonegotiation.
+ 	 */
+-	if (!of_property_read_bool(mac_node, "managed") &&
++	if (!of_property_present(mac_node, "managed") &&
+ 	    mac_dev->phy_if != PHY_INTERFACE_MODE_MII &&
+ 	    !phy_interface_mode_is_rgmii(mac_dev->phy_if))
+ 		mac_dev->phylink_config.default_an_inband = true;
 -- 
 2.43.0
 
