@@ -1,116 +1,169 @@
-Return-Path: <netdev+bounces-196355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD0DAD45AE
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:09:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E75AD45F2
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7FF417C59C
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:09:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5AE8178EB2
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 22:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A672874EB;
-	Tue, 10 Jun 2025 22:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F9C28B7F3;
+	Tue, 10 Jun 2025 22:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HNuDHYPl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjp088z+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC9428688D
-	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 22:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3782B27FD73;
+	Tue, 10 Jun 2025 22:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749593335; cv=none; b=DAW7cPO7m63HKy18wiI0vdBCxlzoUchCawltF+9m/9q6zgUqfNTCRENQLkf7dIHjEaCx7sSQTZ5hBjHy+Ya+dDkruvVBfWUzSPpvzl8vfenv7NbM9j67CswtlLfOw18XoGcerrNdKFxiKHJUtrcGKlSA1yXjdAEP0PzC1rldK3Y=
+	t=1749594390; cv=none; b=g0CYj6KoYZMUzmDcJyHHGAbHYNtA8Z+fSCxhx7jnNWYhOdSF6+VnPxkzaO2aOfVHMu8AmiRZyxAcHbOKymF9Vd1C3MQ1CO08GpJOa1ysdUdhv0IZsxdX1CwY7q74Q6ptsyR/cTBiIkCKbf2hczGnNuv5gg55c57L42ZtjMk3dT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749593335; c=relaxed/simple;
-	bh=y7nuDXxHMeW+apAcE+4L7YtuvyqeNU/MY3xvfvw+85c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ihqIvfJya7dk8hWvjEibNNAuO+PQ3ft/Nur4m5op4tQVxWPuOVinLyYYJgI1IsW5IJGURRQUwMoWd9c3hUZxDO83X7ecoxUm/68zThclGwTP5snbgXnVGj+I8AL+wzv75ZXpsgRna9CdeFfkainev+YRB2IfjvNWF2VaScxPd2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HNuDHYPl; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-55350d0eedeso6227826e87.2
-        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 15:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1749593332; x=1750198132; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y7nuDXxHMeW+apAcE+4L7YtuvyqeNU/MY3xvfvw+85c=;
-        b=HNuDHYPl+K2Zm5Mnxn2A5pYoDofWUVMI9eny4zxnJqj9L+tNaq3dT9srblTB9Cl+Yo
-         cMdG/rtMGo02HzGBe2TU3voDdHpHg5Eb9cK1o/VLXS0Ng2MjiKY9lrmh0Un6XNL643eq
-         cEhhRXkcoMAEZTdH0eBxGpsluQHJJtox9sdfAuS5hd0vRva4vdtsTOXF8ChPGfVsOLvR
-         KLOza4yaAa/VOROLBFy9QhzupDz0JVGzXkYMKwwFLmjR/rdX2++MX6ESNmNZQOceaQuJ
-         oAFBK9EKp6EK0rChdUA5oZfrJ35zRnxZtJmqJqVbcocgfahNKuCTtVGupI6Y82qhuSh8
-         qcQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749593332; x=1750198132;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y7nuDXxHMeW+apAcE+4L7YtuvyqeNU/MY3xvfvw+85c=;
-        b=ggBpMIUj2bF9XpqmOk9dZDtcK1heXNgITwH8OH8iSgXPvKuLJ8B2hyHeKpb2l7zpcX
-         zftgpNurSNJDGS3nZeLTpyBmJFTeluI33WtfvDJv3Y8s+j8CdacP+8wSTKszXfdqejXE
-         dbMvAj2nf9eFkBbfIbg/Mo3g/NMGTXdpzAi0DrrUzzDAjiyKmYPrArVZZC2uzqnZ8zib
-         TRVM4zxAG6N8ml6Q/xYeZm27PzjjoTS9zO87NBu8iJsqji7KSknmfX3hZFE17/fpSLRB
-         7jwLzCiQU2vlcSZhHELWIfICkiz+xzY9bUBsPEXqi9eL7hditx4QFBu6tpSZteBTsuPF
-         UO1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWRoC1UAKydAbGieVXQGAWygM+btzOgpUdJB0ZkW38bdg5g6jA8zYH6spWxUHDW7JPvQHGZayw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxB+bdsBYfKP4ltiIpi2RoXLBH3fvBcQOiOjPO0dbtq5De7DnzP
-	voOpEUFCHTZD9XrVxf1kU+IBDcnefdhh42vrDQixiWTRHgK9ryZNy3TOaV6m6u1iTvDLGJ5Rpi3
-	GeiQoKIBeH4BLYEOTw1QKdzWOTmI7FhTynx3mMiV80A==
-X-Gm-Gg: ASbGncvEdiaiJBGOWRDlcc/0G+/q4pFrmEnD1Hi1XRSlcDIMSoWawdZcXr1TAeQiYTz
-	7pFAoWexjG7fVShDxjMev+1hGacToRfLxvpe1Pj2S8INhJJHdKSUlXjbm75EEkRuOuGsKuNv7nt
-	zVSZzlUtvanxMCdPvFVb6dl6ddANGPyaT2/ljgvsfJvL8=
-X-Google-Smtp-Source: AGHT+IH8MetiTltiLxVsoQdcqnz9SyKbfeIivBe6BgaYPax7FqypUr47bqpDDYKrtQHdmKVxRlIZT6Fr1Q1yswx0lfM=
-X-Received: by 2002:a05:6512:3b96:b0:553:202e:a405 with SMTP id
- 2adb3069b0e04-5539d327776mr135286e87.0.1749593331540; Tue, 10 Jun 2025
- 15:08:51 -0700 (PDT)
+	s=arc-20240116; t=1749594390; c=relaxed/simple;
+	bh=6wPcP7bMx/JJAoXO55SI+6bSUFw7itbX7Ix25yYf7i8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BFuy29w57T0D9wKqdSJMwdlhP1Y5MxmS7Whxx0bO3FVTZcVqTcDjOG2JnSgsWEfrjcqTQPf3sGhMa8e6JlH/4eDGrWtCu26afP4NcXBDCi6uD09CDFoMkX6Y+E74oHzy9E/aw6kybv/ARCbaLIZUP22xRhPyvTXi+qO2SvgwQ5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjp088z+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D10FC4CEED;
+	Tue, 10 Jun 2025 22:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749594389;
+	bh=6wPcP7bMx/JJAoXO55SI+6bSUFw7itbX7Ix25yYf7i8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pjp088z+6v3jKwmVkIVs16nHmHSXtUL7cmDG+iCRKMiOwlOBuLlElc2Y5AuQycJs6
+	 KmQUCdg5oQ1xnpCIyAG5WCgxbfJ6xvcUPzaAy8ftKsVd0Myu6OoU//9UJ6u9wmWS6t
+	 e8SqjcIHTLTPiHW6ZSJAh+7mrx1fll75HFz8/W7E0hnRu35Ug9Pho5FH6ZoZT1iRjX
+	 J2QYJXek3EQjoUO0yHHZLPjYGC9UGBCiQMbdPXwHzxBJUWtuXXtYm6Z8SmT7MQaKRP
+	 8Vrs/Yt7un7OrvOXw5SUfLE3eS7jDhPso4Zv2k5IBl+NSMczJxWqo1qqlx/slPwb1L
+	 u/JKZmmzOikwA==
+Date: Wed, 11 Jun 2025 00:26:25 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <borkmann@iogearbox.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+	kernel-team@cloudflare.com, arthur@arthurfabre.com,
+	jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
+ xdp-rx-metadata.rst
+Message-ID: <aEixEV-nZxb1yjyk@lore-rh-laptop>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
+ <87plfbcq4m.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250610-gpiochip-set-rv-net-v1-0-35668dd1c76f@linaro.org> <20250610-gpiochip-set-rv-net-v1-1-35668dd1c76f@linaro.org>
-In-Reply-To: <20250610-gpiochip-set-rv-net-v1-1-35668dd1c76f@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 11 Jun 2025 00:08:40 +0200
-X-Gm-Features: AX0GCFvL7R8uIhwfFeu8Zy5wwVjWQCtUtnOLFaGyd-WVGbMxfXjNiZWqOaZW5QQ
-Message-ID: <CACRpkdb+1uYy92975JbFUgvO0GWZBru1A8gOsF_VY-opzxopSQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] net: dsa: vsc73xx: use new GPIO line value setter callbacks
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Chester A. Unal" <chester.a.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
-	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-can@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="rQvr/Q3jiYP0UDkh"
+Content-Disposition: inline
+In-Reply-To: <87plfbcq4m.fsf@toke.dk>
+
+
+--rQvr/Q3jiYP0UDkh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 10, 2025 at 2:38=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
+> Daniel Borkmann <daniel@iogearbox.net> writes:
+>=20
+[...]
+> >>=20
+> >> Why not have a new flag for bpf_redirect that transparently stores all
+> >> available metadata? If you care only about the redirect -> skb case.
+> >> Might give us more wiggle room in the future to make it work with
+> >> traits.
+> >
+> > Also q from my side: If I understand the proposal correctly, in order t=
+o fully
+> > populate an skb at some point, you have to call all the bpf_xdp_metadat=
+a_* kfuncs
+> > to collect the data from the driver descriptors (indirect call), and th=
+en yet
+> > again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data in =
+struct
+> > xdp_rx_meta again. This seems rather costly and once you add more kfunc=
+s with
+> > meta data aren't you better off switching to tc(x) directly so the driv=
+er can
+> > do all this natively? :/
+>=20
+> I agree that the "one kfunc per metadata item" scales poorly. IIRC, the
+> hope was (back when we added the initial HW metadata support) that we
+> would be able to inline them to avoid the function call overhead.
+>=20
+> That being said, even with half a dozen function calls, that's still a
+> lot less overhead from going all the way to TC(x). The goal of the use
+> case here is to do as little work as possible on the CPU that initially
+> receives the packet, instead moving the network stack processing (and
+> skb allocation) to a different CPU with cpumap.
+>=20
+> So even if the *total* amount of work being done is a bit higher because
+> of the kfunc overhead, that can still be beneficial because it's split
+> between two (or more) CPUs.
+>=20
+> I'm sure Jesper has some concrete benchmarks for this lying around
+> somewhere, hopefully he can share those :)
 
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> struct gpio_chip now has callbacks for setting line values that return
-> an integer, allowing to indicate failures. Convert the driver to using
-> them.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Another possible approach would be to have some utility functions (not kfun=
+cs)
+used to 'store' the hw metadata in the xdp_frame that are executed in each
+driver codebase before performing XDP_REDIRECT. The downside of this approa=
+ch
+is we need to parse the hw metadata twice if the eBPF program that is bound=
+ed
+to the NIC is consuming these info. What do you think?
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Regards,
+Lorenzo
 
-Yours,
-Linus Walleij
+>=20
+> > Also, have you thought about taking the opportunity to generalize the e=
+xisting
+> > struct xsk_tx_metadata? It would be nice to actually use the same/simil=
+ar struct
+> > for RX and TX, similarly as done in struct virtio_net_hdr. Such that we=
+ have
+> > XDP_{RX,TX}_METADATA and XDP_{RX,TX}MD_FLAGS_* to describe what meta da=
+ta we
+> > have and from a developer PoV this will be a nicely consistent API in X=
+DP. Then
+> > you could store at the right location in the meta data region just with
+> > bpf_xdp_metadata_* kfuncs (and/or plain BPF code) and finally set XDP_R=
+X_METADATA
+> > indicator bit.
+>=20
+> Wouldn't this make the whole thing (effectively) UAPI?
+>=20
+> -Toke
+>=20
+
+--rQvr/Q3jiYP0UDkh
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaEixDwAKCRA6cBh0uS2t
+rJ/+AQCU4KqKc4HlNK1xWh72nioKOj93PVApUchVG/suCzEVQAEA2dXHsUhz6N80
+EQaT0viqZObt97Zje4q4B/J4MdOmlA0=
+=/t4b
+-----END PGP SIGNATURE-----
+
+--rQvr/Q3jiYP0UDkh--
 
