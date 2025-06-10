@@ -1,182 +1,321 @@
-Return-Path: <netdev+bounces-196013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D587AAD31DE
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:25:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13611AD323A
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 11:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BADE16D20D
-	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:25:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D223B757F
+	for <lists+netdev@lfdr.de>; Tue, 10 Jun 2025 09:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B802D28AAE3;
-	Tue, 10 Jun 2025 09:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0550628AB03;
+	Tue, 10 Jun 2025 09:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="i7cx6frK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vRz4Bcxh"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011016.outbound.protection.outlook.com [40.107.130.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303D11FF5F9;
-	Tue, 10 Jun 2025 09:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749547520; cv=fail; b=A7O4LQVwRBBPNI2vqQwrkdm+pOSCxnKGym1S/oSzFz0vF9Jyxs5UhoQXyU9m9lRD205WrJMm5JU2ZQOZ6ncF88lIGIptDEENpWJp47gFHFB2Of//nNcSisQeo5nLVH+NgTTCpW2SQcSeVqVzlisZtMvBnHa2eMxe2kI4/RbjbJY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749547520; c=relaxed/simple;
-	bh=afGPBRoFR8qn/SbRycHc7jptXjhADWpHyaSWWTqzeOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hVPzxdFV/VvFtmqZKeCrYE7nQ+GU4ZafxPPNW5DdRoUlwYeJKUtPUuIVn0nuv1Tv2FT8snVYm2WpC4Wl8mDLZLmlnDdZV/tSvRInNeME2q7TNnbUOn8wHEQbCR4zXMZKVJN9Sqff6H9OgY0gznDtmBV9PIZWNPcMZZWySqT/938=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=i7cx6frK; arc=fail smtp.client-ip=40.107.130.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZrbO4a3vFel4C0M2l4qSr7W+1pUwOv5shnPsQ6B4wWlPInSeboNGa6h6pdGZz2iMlI7SKQSiIxpr82IwlronN9GaV8+Zng4mxm1vplT0PpwFnIGeh85Jg/Uf/2UHl99/OH4HVhQPi3pQuimY8T6/mNuGHhP4KEc3mXn8+o4PheZE86X5R2wpT7XD6dssKG5TeRbI2TCZCtkbLheTBLxIEMFEzL+zoBPTwx4IjhNAHB0wPmPvpWelGK2oPc+BSwSNnsobdY8PpSsrRXBwtgtYrsfVyZD8vYgG2vH+l42/rvslww07vMx6d0YpU7Vu2CkSGNK6IGIoM0nNKFxWThiD7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KtSFHDqCsIkf1iQ7Dhwq+Rgln9mAb3UEoYp2yGhElrI=;
- b=ls9XeNZIRYxmtM2cdpAK0atQ829greeg3v25Pq4lwO3Tox7Ocry0Z/DZCPkTU8pQVHoZMKB3zHiJRZDzUs3N5UBzEL8xh5BNO/48UnfPTkxeC8lQ/r2ZwuDeYctJRhVXlDFpN8WgrMDT9epUNjZesg/QRmhUYarbvWPO5RuCHgcPRBkNouX2oW7C4Zfvp33uWTXD8A6Ta+NZA4EhhcikLGzMEQVc9cYo0Iwcnx5tHOUcteEPzfDNMqlKv8PhxGnjkw4Im2R+9dVej9S1tyBr94/r0DmfZXeFV36xCSyItiVxMXuXnbkqUyXkJ7JxE+yMs+thwWSv4cNS6j0k3z0IFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KtSFHDqCsIkf1iQ7Dhwq+Rgln9mAb3UEoYp2yGhElrI=;
- b=i7cx6frKXYpB7rAXkKLK/aXYxjXFptBrZboDPIn5rkIuPZfm83UXZq3FpPiGpZkDl0k3HoRRzojjarOjLMSNqRiBCzBy4iy8kd3x+hOFuNxDryt0lEE5OgGEz2jjz0BF79T7YTFCoNJbbB5fnfin1fzUYGe7Min+kBkdvrTgV9YTpcl52+ILLgYHXJ8eFLHGqrIliW5MYEjI9xXEVtE8psOX33B7siotyJuYbEHBAu2MG1sc8a0Y7jvFhLP1r/mB24DiaV4zlYVP/CiY9wQJFj52IT5iiYY9Z54zKPL7EqhipME30kO5mQ+X2ihpRI2LiF5L5hs+osoQFoqx8+XbbQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by DB9PR04MB8251.eurprd04.prod.outlook.com (2603:10a6:10:24f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.25; Tue, 10 Jun
- 2025 09:25:14 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8813.024; Tue, 10 Jun 2025
- 09:25:14 +0000
-Date: Tue, 10 Jun 2025 12:25:11 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Meghana Malladi <m-malladi@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Guillaume La Roque <glaroque@baylibre.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com,
-	Roger Quadros <rogerq@ti.com>
-Subject: Re: [PATCH net-next v10] net: ti: icssg-prueth: add TAPRIO offload
- support
-Message-ID: <20250610092511.ggf2kqpdokzvn352@skbuf>
-References: <20250502104235.492896-1-danishanwar@ti.com>
- <20250506154631.gvzt75gl2saqdpqj@skbuf>
- <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e928ff0-e75b-4618-b84c-609138598801@ti.com>
-X-ClientProxiedBy: VI1PR0102CA0093.eurprd01.prod.exchangelabs.com
- (2603:10a6:803:15::34) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0F427932B
+	for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 09:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749548122; cv=none; b=e5EJN9+vQvMjIC9lTYSIj3GY/kUmMK+wspO1uldaHWLC1/PgA4WiBHQJM7mLKRcGIzB5Tisw2ldeLVbPziMHHt7GbjAdm7ydCzjCejuvK6rQ2CbcQUU1N0b/wJRbZgKO66p3SXYUZx0UHCBqx23LQLnaTYaypGzj4MtZy//7lNs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749548122; c=relaxed/simple;
+	bh=0ZNl5noaZdKip7JbscTTW0e7noXY0QYuYfycP3iWNXA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LzaYHX/vJDF1EfAMMtGNpth/AVr081UEqhhx1n9omhh6zglSGv0X1idgVy/9qH8/W1KyE9+ziT1kGu0xA1rxMJULSsC4AuN7azDHpNO5jCUc+KA8tPhTNaHPsI3zwvwUtMJ1UvGSsZ//DES+QYsP9jh4BGllynSdAXwwIwvSZX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vRz4Bcxh; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4a5a196f057so115391651cf.3
+        for <netdev@vger.kernel.org>; Tue, 10 Jun 2025 02:35:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749548118; x=1750152918; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wsdrXpgQvufl30tw+xFnwjynEEaG+R4jXiG8VrmKG+s=;
+        b=vRz4Bcxh396DQpzfdJuI4XMxSUa/ldqpGwKRqwbKTjX7fYce6l9g4PxHHeZjLLflfL
+         le+Op9OJAyXi8CkyFuDV7WL+NEYxQtgFpmy+uW8lhBxpVSCM+ynC29S8LopPvXLvL2kJ
+         HCOpnWT6Z7WYrAyuThu2NAtmbE3jiIakQFFaXJHINc6N6esTri0RoOJ837M6ov00kLP8
+         s3IQ8TibVYvyrI+z6Vf0ty4h0+fBhNxkDLzml18FXAAVl6b/7eqhtX8cpTKDCKsTMhXf
+         MLuZo75zogbpIsm/61yGKG7XKP0BDlQTtoTi3xrmjhMcoMSEGFGLep8PQcdOfNpwxtzN
+         fZ2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749548118; x=1750152918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wsdrXpgQvufl30tw+xFnwjynEEaG+R4jXiG8VrmKG+s=;
+        b=b5aeqotTYFyeYpbR+eMiBZ+prRNOcyx7NLZtUXC5dy5kNOACGb82ltV0i7CpZxgoRG
+         DYbqH2Le9b+GKCuOnu/tlYoAUjQMVQKeXV5t6R56niBvmSN2BrRR/2yexXisk6HdHJu5
+         f3dJOgmdIH+lmRkdk2m/nrhXa9sHeL3EW4//RESBGgXbORiNZSWuOWYX5aMf0dyjrCgA
+         UR4KLzQ9/FLZN9e4CCICOyAEYwy0etyWzq3myYv1u6SSaWYjBM0gRHbIks0px2UXtJpy
+         9FHsoHvN2usBin1sPhiBF5A7zU1916ihu+Kcvum5sQWhDv74fbwXSnjcyQzvwMXlMDMC
+         P+fg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8c0041Gt+/PL0X8BxiGajNgXICxXxNkZm3qdYCgI9M4y77gWkCbHGL9US6e6EB+xvsXAom1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB3Tf6/MiwZS2qzc/joRyOkyFyAZky1u7XaKCdyNEdtBwlWqQ2
+	wgy2ipEUfzT/g9wtGioE9rj9/bHHaGwpOu1LWFu0K2NniKlETvknqbpZWhpzyadm62COfDCy8d+
+	z4seFfQ1mCzl3GZRttFhO6Rdqvnw05ALM11gvitaCw3ayE5hFMlbd63fBZAQ=
+X-Gm-Gg: ASbGncvAnAtEA15Z+M9mpHDH1FjJg8AsBgh3KL7oWCfarlbGNsai+gLOgkfJ9j8OIJS
+	LSXjbbdpSvEnzF2uCjW+jYLQ9/BDOhRi1e1qFQFL+kozh2F2LlAyzmkgWSgi8YFYSGQme4NfA6d
+	/4TdLKdAFGEdZieTtjv3VAiDS4L9KIeewo2fdjchwoxGVS
+X-Google-Smtp-Source: AGHT+IGhRH5aE3niOaYItuG73rF2TfxvjZzeKaYfyvLTlm49rzRiaTfOsn0DR0kd1fA23ZF8Eh+l09mxfhsoTuQEp6c=
+X-Received: by 2002:a05:6214:4116:b0:6e8:ddf6:d11e with SMTP id
+ 6a1803df08f44-6fb08ff67eemr261241026d6.21.1749548105349; Tue, 10 Jun 2025
+ 02:35:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DB9PR04MB8251:EE_
-X-MS-Office365-Filtering-Correlation-Id: 714293a7-8042-4525-e97d-08dda800b4aa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QjCuaEdW6Sag3CX7goWZ01RJanzjl71j+Nk6vkyeCrR08qqO4bFL5zbFPYeX?=
- =?us-ascii?Q?8A6uLLISX4otvGjATzoYu4piMT0Uz1wXAPrho++z4hk6D+IDy+x1/o2WRca8?=
- =?us-ascii?Q?E7MBGFCfHdGmLS/JMQdNo6rx+T+h/uw23RHDf6hvswiore1TI1nRPaPyDkvX?=
- =?us-ascii?Q?5wTmciKZeQNGPq5fvoti6SwNOA1p/8I1Bd2q3dOov/xA0dNPIlsQoruE4tq6?=
- =?us-ascii?Q?I1Dp4ypefxfyOXwQJUIqGFl/jniBFWERZRTYJTgo1z3d+FCyDj1jX3MrAJyR?=
- =?us-ascii?Q?hdj0ZXxXHvBpZyKOt73olFQ65Zvh0jERAgzu3iqt2zxyAQfXBrloI6a++GUj?=
- =?us-ascii?Q?CeOE4Nma2FO/fBdL/y5JG1RXo72es9NPvKJlOyd08yHA39lAzFVIiazXnhYT?=
- =?us-ascii?Q?xAlnj3R8YbCCJ1926mzI+9WQRLZgZRFoyfomdYA16sNCvkRMyWaJFhEEJtmu?=
- =?us-ascii?Q?7un0GPrOAkrWgZGiD/n/IG+Adwgc+1BX07lh+OyyztQUx2xO+MCySSiMmifK?=
- =?us-ascii?Q?9UXkXWXM169l+zncOJ44WySNJWEVYxEoCj05IN4nCnwYnF3ODht4VG/4fVHI?=
- =?us-ascii?Q?k6xcMjYR0QIPQNNqx5wTMGE8+M7GOjkh56HC3TzVMVWzrOeh3LYv2Et3jkgF?=
- =?us-ascii?Q?0XkLr4b4s/tO20Q++PBiQlgdFvPi7rhpSp4oamazcnhm1flZ1cH8JUa9M98s?=
- =?us-ascii?Q?JokQQeZJrG2OBG7+3FXgr6MEPqCTUXiwg9PdtrdC3z33CnepBXI1mtAEohPg?=
- =?us-ascii?Q?0DdW6QLEpPRt6FLfFr7QP/+adPcUbZ/an2o4qqUvuSUjdDEbBdx+nHdUx80Z?=
- =?us-ascii?Q?KhPWOu42rC3UfitYx2hv2uAwr8+ikt86I8vDi0VwO1hXnjFs487+oK/r4vLz?=
- =?us-ascii?Q?GTn9jdo2ils3nW5AsTgiszOGHIo8ooM8ApI38+U0pFuKL3TMz7uHyTLrmXoo?=
- =?us-ascii?Q?eO+7BPMhilqCdpCyLIOekvz6lV1wK7VFsIQR/ASCDgEfiHz2B0bTmt/Tt9ec?=
- =?us-ascii?Q?iA+gkMEj4CMSGr0XjRint7FWcqMmA9gLApwo84BIcr2Mmv+xonoey+t9uBnm?=
- =?us-ascii?Q?k9ovUc/qHvOBZJZeJDRqhfLXXQRprgQX8Lo0Af6shFrLnv93SJMrg3DTKvXm?=
- =?us-ascii?Q?KbEFN4ivZgieo8o4I/gv8j7d896e9sLMxOIZTtvUDV2z50KfkIl7owpRTavj?=
- =?us-ascii?Q?OKmBTb2dlwN0nu0jeK12nGaIkXgZ2U2vFfC/XEMn/Cq8AYJYOi7QBnkWMLKF?=
- =?us-ascii?Q?LQoK78D8zfpbII0tMGKJs1rNKvdHQvpnkEY8e6szKNMIDJjuVrxlqSfhOTHy?=
- =?us-ascii?Q?ZpexpMoFTcWVkvNNMavPZqBoK/bqFjxZr3XDo+2Q26Djhu65mpJmQdb6F7sr?=
- =?us-ascii?Q?L62ttbW1jL15TNQKUCbarntb6h/XSEfs/QscvIf0wfWPWG5HDlQPB+EKELOf?=
- =?us-ascii?Q?6AsOcSgImN4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MuVRWKr6JvI68xD9l62t0R372QXJCK1RyS8jLXh85op+TkRs2uUYqc9lAmOI?=
- =?us-ascii?Q?DC4CnhHQZ8nJ1ntZWDPeGA7UTDImUcK1ksLDrSr2rHrH0NbPmbiPG/6Ea2WZ?=
- =?us-ascii?Q?by8FVSx9qygRphoGKxn2z91TZRohgz6yVRkwH9orjVGl6g4xuTl1d90Ua696?=
- =?us-ascii?Q?owi0NyBto+S2dM4XYimmshP0sBk0M39fbPglm1shPYrGSZSqDkl1fhVTOpzp?=
- =?us-ascii?Q?QspeunFnI/Zx+EaIwevZocx9c8ekc3YF/XyRxRxNspK18HcMfZ4ntQzsm27d?=
- =?us-ascii?Q?6ErhpIhjOmM+Zp7QyPL9u4yp3PwcgKVRCIWrA0NxMEt1rC43DaGcdH6ZEKFy?=
- =?us-ascii?Q?ouN1JBAHl58Yo0M0Ks9siyG1hV47evdwr/ND0rklZwzvtAcXx8heSivTTTqI?=
- =?us-ascii?Q?MucRVr9o9rpXw8eU+WfxT1wyl9hiDvl87qFmDaPXiEyE+xdDftti9LvB8deD?=
- =?us-ascii?Q?yzHg8vn5Wl07ZrFy9ENJGgbxY4auEhNQl7Le2TKi6TVexDzMPx2gYtYJXo5q?=
- =?us-ascii?Q?LGl3ndH9wZ0Xd/UqLYU0qX/xs97Ss8FgLaB0SmWsWphbVDJF6pLTJIzSOeAQ?=
- =?us-ascii?Q?xoSI/Ug4gzXWpfns5cRv8U2ti7hdpaqkbDtd7h3loGFnkrtEo+G8MTnxBEN9?=
- =?us-ascii?Q?uMbWCtM0W9B0yKYD+z7WWrohNpKaaflPhsdV0OKb6C/INYzVvLkq4HgGKQT5?=
- =?us-ascii?Q?dvFkBrfainTqpuN+4Y+TYiVbUfFQ3IQfM1/fkhl7dU60jYXBQV2STqhs4XUe?=
- =?us-ascii?Q?B3JcNB6y+mvvqyd37tfXbgI0ElmdZjxBZ4ZU/+s7kOwdLzKdVH+b5y3R/IEg?=
- =?us-ascii?Q?dRfrlBVOmIDrX1kgApOVl+E7f/M3yEfVQ/CjKQZ7d74OVzrCTfsngp0cYGol?=
- =?us-ascii?Q?hoNcfJmXVLDv8p8aYxMBysoIaY9XK9w6DeD5Uoy6TQ5MpzdvYHXGuSmD2WP3?=
- =?us-ascii?Q?3N1n6uCuvBv6lSsytrFwLJVCeg6yLLRUKRhaVtWAVuEtqctVFz1rnOo3CxEa?=
- =?us-ascii?Q?OvgNF3/0y+bEe7f4ra5waODclWzqylP8q9v9IxZPZClpXNfQdSczbmQYn9Bw?=
- =?us-ascii?Q?ddaHpYCmwuj1iVt9Skys+YuBX1w9FNxd6q/SdrmMYRRR41IMKXooswFK8OxY?=
- =?us-ascii?Q?uD2TAtjKGL8qXuqGG30nSCM6SqOGTxVHW436HZ54SBC4ZCoXHjfpYL8t0mqZ?=
- =?us-ascii?Q?mKl4Wsgvc1reuB2vqEhO12+rGB5i2i+L/1yXx8mH+mq4O2wNh+jL2dHR5GAv?=
- =?us-ascii?Q?rI14t7+szd+DOF52iMmv3oHL9E9ddU6gA49hkvzG9fBZ2K/syT+LLuvESyAU?=
- =?us-ascii?Q?szvkuiWOhMwbyRIUYyMsCrMwkEi9Wc6s5XKDuBzoalKEDgCWs8/DeR0YZhzp?=
- =?us-ascii?Q?lA18k+K1Yab0Q1hQB1iGOIsatddJLdGMcmaCcCHtlmhiVa3ZZeoyDBWoHTFM?=
- =?us-ascii?Q?RIoVyBCysvYhrGnXjMgjlWMjmiKx3X/iS18WM7AosKzeo4QAvIRygG2y3+Ou?=
- =?us-ascii?Q?2MBYWTeSHTpassePbXGrlbDrrDcK91F+b+O+bQSe3EGW5KlAZjxjUAzbjV1l?=
- =?us-ascii?Q?MztKp0IUa7K79B1SXqhS7nuNYqbE6qAaM/kiRLJ6QXO4hU4xM7FSUzK7ky/U?=
- =?us-ascii?Q?Ww=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 714293a7-8042-4525-e97d-08dda800b4aa
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 09:25:14.2709
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ccNRQx70YN8X92+7SIMD0ON+vin5leyKmwIz6ZpYc+Ckg4o692kMRSF4zAianGy4uqTyXKtUaVSGLhEC2yEEzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8251
+References: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
+In-Reply-To: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 10 Jun 2025 02:34:54 -0700
+X-Gm-Features: AX0GCFsOQjueGBnQJH0bxT-ejS8z6yrtGKMc3jCHZ5tSrg15lgc6ROnIRuf0xmo
+Message-ID: <CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 15, 2025 at 04:24:50PM +0530, MD Danish Anwar wrote:
-> To compensate this, whatever extension firmware applies need to be added
-> during current time calculation. Below is the code for that.
-> 
->       ts += readl(prueth->shram.va + TIMESYNC_CYCLE_EXTN_TIME);
-> 
-> Now the current time becomes,
-> 	counter0* 1ms + counter1 + EXTEND
+On Tue, Jun 10, 2025 at 2:12=E2=80=AFAM Lorenzo Bianconi <lorenzo@kernel.or=
+g> wrote:
+>
+> EN7581 SoC supports TCP hw Large Receive Offload (LRO) for 8 hw queues.
+> Introduce TCP LRO support to airoha_eth driver for RX queues 24-31.
+> In order to support hw TCP LRO, increase page_pool order to 5 for RX
+> queues 24-31.
+>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c  | 191 ++++++++++++++++++++++++=
++++---
+>  drivers/net/ethernet/airoha/airoha_eth.h  |  10 ++
+>  drivers/net/ethernet/airoha/airoha_regs.h |  25 +++-
+>  3 files changed, 210 insertions(+), 16 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index a7ec609d64dee9c8e901c7eb650bb3fe144ee00a..9378ca384fe2025a40cc52871=
+4859dd59300fbcd 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -12,6 +12,7 @@
+>  #include <net/dst_metadata.h>
+>  #include <net/page_pool/helpers.h>
+>  #include <net/pkt_cls.h>
+> +#include <net/tcp.h>
+>  #include <uapi/linux/ppp_defs.h>
+>
+>  #include "airoha_regs.h"
+> @@ -439,6 +440,40 @@ static void airoha_fe_crsn_qsel_init(struct airoha_e=
+th *eth)
+>                                  CDM_CRSN_QSEL_Q1));
+>  }
+>
+> +static void airoha_fe_lro_init_rx_queue(struct airoha_eth *eth, int qdma=
+_id,
+> +                                       int lro_queue_index, int qid,
+> +                                       int nbuf, int buf_size)
+> +{
+> +       airoha_fe_rmw(eth, REG_CDM_LRO_LIMIT(qdma_id),
+> +                     CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK,
+> +                     FIELD_PREP(CDM_LRO_AGG_NUM_MASK, nbuf) |
+> +                     FIELD_PREP(CDM_LRO_AGG_SIZE_MASK, buf_size));
+> +       airoha_fe_rmw(eth, REG_CDM_LRO_AGE_TIME(qdma_id),
+> +                     CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK,
+> +                     FIELD_PREP(CDM_LRO_AGE_TIME_MASK,
+> +                                AIROHA_RXQ_LRO_MAX_AGE_TIME) |
+> +                     FIELD_PREP(CDM_LRO_AGG_TIME_MASK,
+> +                                AIROHA_RXQ_LRO_MAX_AGG_TIME));
+> +       airoha_fe_rmw(eth, REG_CDM_LRO_RXQ(qdma_id, lro_queue_index),
+> +                     LRO_RXQ_MASK(lro_queue_index),
+> +                     qid << __ffs(LRO_RXQ_MASK(lro_queue_index)));
+> +       airoha_fe_set(eth, REG_CDM_LRO_EN(qdma_id), BIT(lro_queue_index))=
+;
+> +}
+> +
+> +static void airoha_fe_lro_disable(struct airoha_eth *eth, int qdma_id)
+> +{
+> +       int i;
+> +
+> +       airoha_fe_clear(eth, REG_CDM_LRO_LIMIT(qdma_id),
+> +                       CDM_LRO_AGG_NUM_MASK | CDM_LRO_AGG_SIZE_MASK);
+> +       airoha_fe_clear(eth, REG_CDM_LRO_AGE_TIME(qdma_id),
+> +                       CDM_LRO_AGE_TIME_MASK | CDM_LRO_AGG_TIME_MASK);
+> +       airoha_fe_clear(eth, REG_CDM_LRO_EN(qdma_id), LRO_RXQ_EN_MASK);
+> +       for (i =3D 0; i < AIROHA_MAX_NUM_LRO_QUEUES; i++)
+> +               airoha_fe_clear(eth, REG_CDM_LRO_RXQ(qdma_id, i),
+> +                               LRO_RXQ_MASK(i));
+> +}
+> +
+>  static int airoha_fe_init(struct airoha_eth *eth)
+>  {
+>         airoha_fe_maccr_init(eth);
+> @@ -618,9 +653,87 @@ static int airoha_qdma_get_gdm_port(struct airoha_et=
+h *eth,
+>         return port >=3D ARRAY_SIZE(eth->ports) ? -EINVAL : port;
+>  }
+>
+> +static bool airoha_qdma_is_lro_rx_queue(struct airoha_queue *q,
+> +                                       struct airoha_qdma *qdma)
+> +{
+> +       int qid =3D q - &qdma->q_rx[0];
+> +
+> +       /* EN7581 SoC supports at most 8 LRO rx queues */
+> +       BUILD_BUG_ON(hweight32(AIROHA_RXQ_LRO_EN_MASK) >
+> +                    AIROHA_MAX_NUM_LRO_QUEUES);
+> +
+> +       return !!(AIROHA_RXQ_LRO_EN_MASK & BIT(qid));
+> +}
+> +
+> +static int airoha_qdma_lro_rx_process(struct airoha_queue *q,
+> +                                     struct airoha_qdma_desc *desc)
+> +{
+> +       u32 msg1 =3D le32_to_cpu(desc->msg1), msg2 =3D le32_to_cpu(desc->=
+msg2);
+> +       u32 th_off, tcp_ack_seq, msg3 =3D le32_to_cpu(desc->msg3);
+> +       bool ipv4 =3D FIELD_GET(QDMA_ETH_RXMSG_IP4_MASK, msg1);
+> +       bool ipv6 =3D FIELD_GET(QDMA_ETH_RXMSG_IP6_MASK, msg1);
+> +       struct sk_buff *skb =3D q->skb;
+> +       u16 tcp_win, l2_len;
+> +       struct tcphdr *th;
+> +
+> +       if (FIELD_GET(QDMA_ETH_RXMSG_AGG_COUNT_MASK, msg2) <=3D 1)
+> +               return 0;
+> +
+> +       if (!ipv4 && !ipv6)
+> +               return -EOPNOTSUPP;
+> +
+> +       l2_len =3D FIELD_GET(QDMA_ETH_RXMSG_L2_LEN_MASK, msg2);
+> +       if (ipv4) {
+> +               u16 agg_len =3D FIELD_GET(QDMA_ETH_RXMSG_AGG_LEN_MASK, ms=
+g3);
+> +               struct iphdr *iph =3D (struct iphdr *)(skb->data + l2_len=
+);
+> +
+> +               if (iph->protocol !=3D IPPROTO_TCP)
+> +                       return -EOPNOTSUPP;
+> +
+> +               iph->tot_len =3D cpu_to_be16(agg_len);
+> +               iph->check =3D 0;
+> +               iph->check =3D ip_fast_csum((void *)iph, iph->ihl);
+> +               th_off =3D l2_len + (iph->ihl << 2);
+> +       } else {
+> +               struct ipv6hdr *ip6h =3D (struct ipv6hdr *)(skb->data + l=
+2_len);
+> +               u32 len, desc_ctrl =3D le32_to_cpu(desc->ctrl);
+> +
+> +               if (ip6h->nexthdr !=3D NEXTHDR_TCP)
+> +                       return -EOPNOTSUPP;
+> +
+> +               len =3D FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
+> +               ip6h->payload_len =3D cpu_to_be16(len - l2_len - sizeof(*=
+ip6h));
+> +               th_off =3D l2_len + sizeof(*ip6h);
+> +       }
+> +
+> +       tcp_win =3D FIELD_GET(QDMA_ETH_RXMSG_TCP_WIN_MASK, msg3);
+> +       tcp_ack_seq =3D le32_to_cpu(desc->data);
+> +
+> +       th =3D (struct tcphdr *)(skb->data + th_off);
+> +       th->ack_seq =3D cpu_to_be32(tcp_ack_seq);
+> +       th->window =3D cpu_to_be16(tcp_win);
+> +
+> +       /* check tcp timestamp option */
+> +       if (th->doff =3D=3D sizeof(*th) + TCPOLEN_TSTAMP_ALIGNED) {
+> +               __be32 *topt =3D (__be32 *)(th + 1);
+> +
+> +               if (*topt =3D=3D cpu_to_be32((TCPOPT_NOP << 24) |
+> +                                        (TCPOPT_NOP << 16) |
+> +                                        (TCPOPT_TIMESTAMP << 8) |
+> +                                        TCPOLEN_TIMESTAMP)) {
+> +                       u32 tcp_ts_reply =3D le32_to_cpu(desc->tcp_ts_rep=
+ly);
+> +
+> +                       put_unaligned_be32(tcp_ts_reply, topt + 2);
+> +               }
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+>  {
+>         enum dma_data_direction dir =3D page_pool_get_dma_dir(q->page_poo=
+l);
+> +       bool lro_queue =3D airoha_qdma_is_lro_rx_queue(q, q->qdma);
+>         struct airoha_qdma *qdma =3D q->qdma;
+>         struct airoha_eth *eth =3D qdma->eth;
+>         int qid =3D q - &qdma->q_rx[0];
+> @@ -663,9 +776,14 @@ static int airoha_qdma_rx_process(struct airoha_queu=
+e *q, int budget)
+>                         __skb_put(q->skb, len);
+>                         skb_mark_for_recycle(q->skb);
+>                         q->skb->dev =3D port->dev;
+> -                       q->skb->protocol =3D eth_type_trans(q->skb, port-=
+>dev);
+>                         q->skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+>                         skb_record_rx_queue(q->skb, qid);
+> +
+> +                       if (lro_queue && (port->dev->features & NETIF_F_L=
+RO) &&
+> +                           airoha_qdma_lro_rx_process(q, desc) < 0)
+> +                               goto free_frag;
+> +
+> +                       q->skb->protocol =3D eth_type_trans(q->skb, port-=
+>dev);
+>                 } else { /* scattered frame */
+>                         struct skb_shared_info *shinfo =3D skb_shinfo(q->=
+skb);
+>                         int nr_frags =3D shinfo->nr_frags;
+> @@ -751,14 +869,16 @@ static int airoha_qdma_rx_napi_poll(struct napi_str=
+uct *napi, int budget)
+>  }
+>
+>  static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
+> -                                    struct airoha_qdma *qdma, int ndesc)
+> +                                    struct airoha_qdma *qdma,
+> +                                    int ndesc, bool lro_queue)
+>  {
+> +       int pp_order =3D lro_queue ? 5 : 0;
+>         const struct page_pool_params pp_params =3D {
+> -               .order =3D 0,
+> -               .pool_size =3D 256,
+> +               .order =3D pp_order,
+> +               .pool_size =3D 256 >> pp_order,
+>                 .flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+>                 .dma_dir =3D DMA_FROM_DEVICE,
+> -               .max_len =3D PAGE_SIZE,
+> +               .max_len =3D PAGE_SIZE << pp_order,
+>                 .nid =3D NUMA_NO_NODE,
+>                 .dev =3D qdma->eth->dev,
+>                 .napi =3D &q->napi,
+> @@ -767,7 +887,7 @@ static int airoha_qdma_init_rx_queue(struct airoha_qu=
+eue *q,
+>         int qid =3D q - &qdma->q_rx[0], thr;
+>         dma_addr_t dma_addr;
+>
+> -       q->buf_size =3D PAGE_SIZE / 2;
+> +       q->buf_size =3D pp_params.max_len / (2 * (1 + lro_queue));
 
-What will the TIMESYNC_CYCLE_EXTN_TIME register read (and what is its
-exact meaning)? Is its value derived from TAS_CONFIG_CYCLE_EXTEND? I'm
-asking because the driver only writes TIMESYNC_CYCLE_EXTN_TIME to zero
-(for a reason that isn't clear to me either).
+Tell us more... It seems small LRO packets will consume a lot of
+space, incurring a small skb->len/skb->truesize ratio, and bad TCP WAN
+performance.
+
+And order-5 pages are unlikely to be available in the long run anyway.
+
+LRO support would only make sense if the NIC is able to use multiple
+order-0 pages to store the payload.
 
