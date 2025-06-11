@@ -1,174 +1,157 @@
-Return-Path: <netdev+bounces-196464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87495AD4E95
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:38:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14ADAD4E9C
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:39:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F31A3A8D2D
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:37:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0F31886249
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1AB23F41F;
-	Wed, 11 Jun 2025 08:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748C323E25B;
+	Wed, 11 Jun 2025 08:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KLE3P8/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CF023ABAF
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8832356B3;
+	Wed, 11 Jun 2025 08:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749631052; cv=none; b=R7TYYqgqMfiKgASux7BAgj/RSem5Yv07k4gaRZ0ACUTuic0vaw438Lf3IX0cKZTOCgwnlzTsyQu1esWuTlS4DLizvQzT+OQ9FDgMAM2UxjHXOZJFh755cp2sHjfW2VJn5XUX1LMBiqYn94xFyJOGeRwQ7sTX6T+WZJJc9Km6bFo=
+	t=1749631169; cv=none; b=NvFp+04iiMYaxUyBH6gogu3Ks01gzwg7In/wkrIMxmcwwhan1vYZUSmEWyVNfte9zdPIGpKRgkYImOMbCuXrHYhUVQdLgOtTjz9E+LfMDl9mliGOfLcWezUggCWDHurRQNT97jKxQk8lzFVu121DKAQDZQRQeAqFeHUcbgdJaso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749631052; c=relaxed/simple;
-	bh=niS2teVaPDV5GBvziCefBB55Uuzt72qtQQRoztZyfQA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GFVV6tzG0E0he6b8huiftz0hYIkz7E+Q1G4HBcql1pkuRIB0wOxxRChxG1wCBlLUxj6E5vSWRIzxanFMwuGO9qqO39J1qMeVz4p0ty4R/sOCDpoJacmvBTfZt1fVabdyhBcoCBTTtWhJi50FEvjIRMYvGdfXG/YwiuWPsm2PCjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: zesmtpgz1t1749630992td9f21fe9
-X-QQ-Originating-IP: 0BmRionrXgmzI6xW4yuGZZVREv/v61DLwqtJEQF2wrw=
-Received: from localhost.localdomain ( [36.20.60.58])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 11 Jun 2025 16:36:31 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 8487931790450883411
-EX-QQ-RecipientCnt: 9
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch,
-	duanqiangwen@net-swift.com,
-	linglingzhang@trustnetic.com,
-	jiawenwu@net-swift.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next 12/12] net: ngbevf: add phylink check flow
-Date: Wed, 11 Jun 2025 16:35:59 +0800
-Message-Id: <20250611083559.14175-13-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20250611083559.14175-1-mengyuanlou@net-swift.com>
-References: <20250611083559.14175-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1749631169; c=relaxed/simple;
+	bh=eP94DKa1bGgh8+jsHYYEwHFsK16PrWPSAXehlu4LTTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VJA9tQWvHzwe5v6El3ZIqcvP0y8Te7HRJXMrxqU3IGdOjD+jmrN7gavgCwPVc88JQZsJ4ASbdjHdy8n7AGFC4ZkE+LLzgpJis1gVR3CL/TXr025wiimv22jQ/3+40yBUAz+whtq8qnhQlDzN7JRWvEObSnEaYHQNMJMoHuYsHCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KLE3P8/3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PksZhMl9JN4rPrIRu6s9JViPUrN3CPq4Uz9I+7xLHjQ=; b=KLE3P8/3OR/Go6Ck/x5tQyoe7i
+	b3qmYLjwwrb/PeJ2gvOWPC/AKpjqzCTFWzfMXrUUkSbMSDUgDMdSHWM5eMA16ld8ud5dxGHLCdf+Z
+	3PHQnit14ofoMsZja+uNXU3DevYTidgnXTNeRjATBqcam9CYpoyBLkXsQHDv4Y1skXXEeP4Rg1LVH
+	JzJ1Ob6f/Ky8rxerGZlkLGdK+qBkCACHUacIXmlgJkh1/jBhuM8edHqGlQDBH8z89Spy5kNqNiKGV
+	u3qtJ0ieX8kze6aeHdd0MbKnkWrYZGZJKpQX79z5UPYmewQRHbWWZ23PMNshrAKttNn9j4Lh0zYRV
+	AXcYk7GQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57842)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uPGzJ-0005rz-0t;
+	Wed, 11 Jun 2025 09:39:13 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uPGzE-00085W-2w;
+	Wed, 11 Jun 2025 09:39:08 +0100
+Date: Wed, 11 Jun 2025 09:39:08 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Icenowy Zheng <uwu@icenowy.me>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
+ informative text about RGMII delays
+Message-ID: <aElArNHIwm1--GUn@shell.armlinux.org.uk>
+References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
+ <e4db4e6f0a5a42ceacacc925adbe13747a6f948e.camel@icenowy.me>
+ <debcb2e1-b7ef-493b-a4c4-e13d4aaf0223@lunn.ch>
+ <2e42f2f7985fb036bec6ab085432a49961c8dc42.camel@icenowy.me>
+ <aEFmNMSvffMvNA8I@shell.armlinux.org.uk>
+ <84c534f9dbfa7c82300863cd40e5a9b6e6e29411.camel@icenowy.me>
+ <ba7b290d-0cd1-4809-822a-bfe902684d7e@lunn.ch>
+ <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MTZmBNp7l7aiX+2nbRLP9qERGsPIhWrT7f7xMkPOPgClSR/7T20XgifO
-	xQsyP8Vw7EGEDCswABsJf3bo7IuMSt3rxZ9ACKdIPQZ1PIWfoa4s8lMERGmQpFpLnxTsUVg
-	pDE/LE7RXrWmi7+5T4MAIRRJROzAJ/Ds3hw5ilsaFMiWCjIMF9rWhXYlY+wH97KJ+BBPDmQ
-	PJUq6+qdC1nLKwXFUzzTOrXYX1EEO0BY2Ql4VNIZ2m7omztGYoMlx6cGekavafG/nqDFtgE
-	v1abk4gzyJtaeYmnEotZTwEAULjANBkgGK07VQ6xiyVMQ/+GxQ5/VeRgjfXwWO9RNcOqW6L
-	EjSbRlWQi2hD7xJxCcV6yC7hDWRqin17FAYjFx4ey6NfivzzfwYflrXg3kebuOqAuy7Ufg9
-	GD9Bmx7Vuz+vWl9NZpFSaHZeI59Pa1SbguRY6ycYWBfpca4I1mysUfLapgz/BJzmbcfOaXC
-	v9n7j4DVi1Ia9C3z/92gRBmyUYUpC0bSCQ/BrDWVzblL03wc1Ytc4JrWGGuBbOCt3yRE3ZH
-	UURG/7NeirmOTeUbY02CwA5Ihjtr9zW/yy5FXt0J089aowOuVzbfDoe9vzMXi4hZDoUi1KE
-	OQvEv0H5TdE00ZJz62F/M+RczTum8rAJ/u7BrgvdNl2IWAzqO8kwpSlfsal3CAYLTfw7dgC
-	M2dUPbblYj3aBL6TciQsCITaxGtXJsp+phDHtkrTrBC38IeKWZOxy0WDNXzA1vw16tZ6Vwe
-	2QKoEhYofqu7Vr0vzZurrPaXdrZpduwBA5H7QgFHfSVMYN6mO/oYNjqlcB8bVHCuSIA219d
-	uafcmp6rQAOJxfZfr3UI6u5qE+7IPxUWydwX8Lqe5ziLhWMwIOi6u5GW14JIkiz5iaUYv4p
-	rh+uhLvcoXjW/WplB9/zeRjBGl7G23XPG8jQq/mh+Ae1klJzmRTCq9szAX6PTPqW8NnP1Y/
-	nnrVDJbwq1CtgCDhO8ADWC3PmVsrPmwxY82nyNcdKCSNm9wDvEX5gH0ZnBUJdza+lytihu8
-	4yHLDkbVVDMvpER9+Rqiymweli+PxeSbSuCqocJzkNOMcNPI/GMr2hK9lu6HVAd4Zc2ePoE
-	aJPJ0NwKGSRDQGkqpFBmaMizppq98Fs3dUkKAGgbFKCNa4j4DEcf+Z/nWDQ9+hxIeU5KQAQ
-	PAQ8
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+In-Reply-To: <9ebe16a8d33e00c39c142748a1ea6fff96b9565a.camel@icenowy.me>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add phylink support to wangxun 1G virtual functions.
-Get link status from pf in mbox, and if it is failed then
-check the vx_status, because vx_status switching is too slow.
+On Wed, Jun 11, 2025 at 04:03:11PM +0800, Icenowy Zheng wrote:
+> 在 2025-06-05星期四的 15:48 +0200，Andrew Lunn写道：
+> > Which is theoretically fine. I've not looked at this driver in
+> > particular, but there are some MACs were you cannot disable the
+> > delay.
+> > The MAC always imposes 2ns delay. That would mean a PCB which also
+> > has
+> > extra long clock lines is simply FUBAR, cannot work, and 'rgmii' is
+> > invalid, so reject it.
+> 
+> BTW I found that in some case the assumption of PHY-side delay being
+> always better than MAC-side one is wrong -- modern MACs usually have
+> adjustable delay line, but Realtek 8211-series PHYs have only on/off
+> delay with a fixed 2ns value.
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- .../net/ethernet/wangxun/ngbevf/ngbevf_main.c | 50 +++++++++++++++++++
- 1 file changed, 50 insertions(+)
+The only time that MACs may implement delays based on the
+PHY_INTERFACE_MODE_RGMII* is if they also include code to pass
+PHY_INTERFACE_MODE_RGMII (no suffixes) to phylink / phylib to ensure
+that the PHY doesn't _also_ add delays. This isn't something we
+encourage because it's more code, more review, and a different way
+of implementing it - thus adding to maintainers workloads that are
+already high enough.
 
-diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-index a629b645d3a1..e5b7e1753213 100644
---- a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-@@ -120,6 +120,50 @@ static int ngbevf_sw_init(struct wx *wx)
- 	return err;
- }
- 
-+static const struct phylink_mac_ops ngbevf_mac_ops = {
-+	.mac_config = wxvf_mac_config,
-+	.mac_link_down = wxvf_mac_link_down,
-+	.mac_link_up = wxvf_mac_link_up,
-+};
-+
-+static int ngbevf_phylink_init(struct wx *wx)
-+{
-+	struct phylink_link_state link_state;
-+	struct phylink_config *phy_config;
-+	phy_interface_t phy_mode;
-+	struct phylink *phylink;
-+	int err;
-+
-+	phy_config = &wx->phylink_config;
-+	phy_config->dev = &wx->netdev->dev;
-+	phy_config->type = PHYLINK_NETDEV;
-+	phy_config->mac_capabilities = MAC_1000FD | MAC_100FD | MAC_10FD;
-+	phy_config->get_fixed_state = wx_get_mac_link_vf;
-+
-+	phy_mode = PHY_INTERFACE_MODE_RGMII;
-+	__set_bit(PHY_INTERFACE_MODE_RGMII, phy_config->supported_interfaces);
-+
-+	/* Initialize the phylink */
-+	phylink = phylink_create(phy_config, NULL,
-+				 phy_mode, &ngbevf_mac_ops);
-+	if (IS_ERR(phylink)) {
-+		wx_err(wx, "Failed to create phylink\n");
-+		return PTR_ERR(phylink);
-+	}
-+
-+	link_state.speed = SPEED_1000;
-+	link_state.duplex = DUPLEX_FULL;
-+	err = phylink_set_fixed_link(phylink, &link_state);
-+	if (err) {
-+		wx_err(wx, "Failed to set fixed link\n");
-+		return err;
-+	}
-+
-+	wx->phylink = phylink;
-+
-+	return 0;
-+}
-+
- /**
-  * ngbevf_probe - Device Initialization Routine
-  * @pdev: PCI device information struct
-@@ -201,6 +245,10 @@ static int ngbevf_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto err_free_sw_init;
- 
-+	err = ngbevf_phylink_init(wx);
-+	if (err)
-+		goto err_clear_interrupt_scheme;
-+
- 	err = register_netdev(netdev);
- 	if (err)
- 		goto err_register;
-@@ -211,6 +259,8 @@ static int ngbevf_probe(struct pci_dev *pdev,
- 	return 0;
- 
- err_register:
-+	phylink_destroy(wx->phylink);
-+err_clear_interrupt_scheme:
- 	wx_clear_interrupt_scheme(wx);
- err_free_sw_init:
- 	kfree(wx->vfinfo);
+> > Just for a minute, consider your interpretation of the old text is
+> > wrong. Read the old text again and again, and see if you can find an
+> > interpretation which is the same as the new text. If you do:
+> > 
+> > * It proves our point that describing what this means is hard, and
+> >   developers will get it wrong.
+> > 
+> > * There is an interpretation of both the old and new where nothing
+> >   changed.
+> > 
+> > * You have to be careful looking at drivers, because some percent of
+> >   developers also interpreted it wrongly, and have broken
+> >   implementations as a result.  You cannot say the binding means X,
+> >   not Y, because there is a driver using meaning X.
+> > 
+> > My hope with the new text is that it focuses on hardware, which is
+> > what DT is about. You can look at the schematic, see if there is
+> > extra
+> > long clock lines or not, and then decided on 'rgmii-id' if there are
+> > not, and 'rgmii' is there are. The rest then follows from that.
+> 
+> Well I think "rgmii-*" shouldn't exist at all, if focusing on hardware.
+> I prefer only "rgmii" with properties describing the delay numbers.
+
+Yes, I think we as phylib maintainers have also come to the same
+conclusion with all the hassle this causes, but we can't get rid
+of this without breaking the kernel and breaking device-tree
+compatibility. So, we're stuck with it.
+
+> > You are not reading it carefully enough. The binding describes
+> > hardware, the board. phy.rst describes the phylib interface. They are
+> > different.
+> 
+> Well I can't find the reason of phy-mode being so designed except for
+> leaky abstraction from phylib.
+
+I have no idea what that sentence means, sorry.
+
 -- 
-2.30.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
