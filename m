@@ -1,131 +1,151 @@
-Return-Path: <netdev+bounces-196680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04DDAD5DDE
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:10:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD78AD5DE9
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 452493AAAF3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:09:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75D65188C294
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADABA288C0C;
-	Wed, 11 Jun 2025 18:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CD5248191;
+	Wed, 11 Jun 2025 18:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqE1mMoc"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="La17B5WS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D2325E45A
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 18:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267EE244678
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 18:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749665402; cv=none; b=bFq2MS01MX8D94ZDyL1P8caZ/qV8eC7mldbM7gSZCnH6hNTvVyJAReLMPIqBwl2qSp5bouksVDX/M7asD5EfN4w0sMC2L0Y+bhY0AFUiZn2y3sGDl1fgvLCtkKW4Xe8IXh2AwE4ThBEu/hsmt/dc2kf7HewX69mjv7wOlPzihqc=
+	t=1749665512; cv=none; b=ZQlUsrmHKdCpPdbR46Ln7z83H59/cXaYreRqWUmGeRvOKM6sRmziMpVeGhfcZcnpD62Ttb04JYjFErEZAp/Tu9GZ0mSCFqxIxpN1ZGMr+PDFgEKxiwO0ws+aUF6lOOhv+jp4x9FyPrJiNm9JPGtUEXo6v8BJWnIbA6m6Br7plKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749665402; c=relaxed/simple;
-	bh=bu4xPoBt76F+Eq0kat9hmnO6V+OwxxMkfVAKZ5Yj/Q8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QVbORnZkUzPsw89xHeAZAepG4dudyhhyTs7/rROtRv/IXl1Ab0ln8b3x00XjTwS0UpiXSTTdTRDmTupS3XLoQLVksUf2RuU8eouuwkbcjCqA6Eb3Mqxw28AKRGHpCPHQaxqahv2HK+xKD+TCY8Rtm5WZw/Ycla9FnGOd9DTVu+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MqE1mMoc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749665400;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oj/ZmTISV0zLWehd/r37qsP548vbvorWZeWxWtJq4lI=;
-	b=MqE1mMocmUgT6849h3Qr+vB6bGQc6tA7sUQhG4HT4gXMKYqfVpFrgzHn9sTZFVr2gSOpOA
-	MM55OIIf6brKQnUBuSgL8Rnu92wdMZkDlqdZUNyTLHn1er6ofIkRINg6tCVqMYGDmkLPkQ
-	crOHz0pAuq1KjtsIqZNZMDxpaU3tGyM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-RAzo4OtWPCGHAzNAxIKJRQ-1; Wed,
- 11 Jun 2025 14:09:54 -0400
-X-MC-Unique: RAzo4OtWPCGHAzNAxIKJRQ-1
-X-Mimecast-MFC-AGG-ID: RAzo4OtWPCGHAzNAxIKJRQ_1749665393
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D0DC19560BD;
-	Wed, 11 Jun 2025 18:09:53 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.122])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4F108180035C;
-	Wed, 11 Jun 2025 18:09:52 +0000 (UTC)
-Date: Wed, 11 Jun 2025 14:09:51 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	darren.kenny@oracle.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] vhost-scsi: Fix typos and formatting in comments and
- logs
-Message-ID: <20250611180951.GA190743@fedora>
-References: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
+	s=arc-20240116; t=1749665512; c=relaxed/simple;
+	bh=x2LAshC4TaowOHTTAfdCSxFpB1VG0IOM05NdXRo/GcQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Jcwz0pmwFvO/vpu1SEVO/I3P/NFj6c4JnMLuP1jMzymlM6S2M92b78i774r8PxaMfLVV0uc/dut1HSK9w5EfGMbwRtrtRGICuXd2lrsc1TSP9xQ40R/90FTCgp9t4iHW6O3v6TT+gYXd+JJmouOXB0w/kcWwUtLKJ0jLwQpLD64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=La17B5WS; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-40791b696a2so37234b6e.2
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1749665509; x=1750270309; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xix0JxJ/wHDD577WOa2daCtZJP2bD7JoNgtk2Dh0B/s=;
+        b=La17B5WSB892ulsxuu8IWfqt3gvwiGX6vLPles3ejgFUhPDo1rSwqicwNsvNGkNeY5
+         va4Yen8KLLQWCg0RIEhZlaPjB5qWKhqzdaUrbRbTnGz0ggZv6bfewQqT5AhAPnlklCNc
+         MkGKDM9vjU4PXibjjkXPdhyk9tsx6idcR3VxmDV3WLfCcQRGJEHqWgG4dHqwLX1Cc060
+         Rtc8OxdebYwOP9kbu+rZ2bkjXeEHP+Kc0DgbnNHApP/OjG3Barg7/exfbtWa6J0X2Om/
+         S2XDBWzfnrob8e0p9r2l/eozR4AKJNNY0E2rxWzpmGDrwvuT4aaq42+wg2mRu+yExKcd
+         gP3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749665509; x=1750270309;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xix0JxJ/wHDD577WOa2daCtZJP2bD7JoNgtk2Dh0B/s=;
+        b=QjJud6BBHwhrQzCUTp7ZthcZG+MVX+93NmQBzIk+Ogd2ca8c/oR8CoH/ZD//gOGpGr
+         sbPqs7jvz9F5AmDbyycLMDGT9GmtFruSUtK1/fkc0vX8COyokP1YSkl/x4qVrrPuYaom
+         dS4TCn8ONG99ekj4BYcPppQ8/Ps+ygrHxWHU4Czt9+OniQ0X9ugILfVo7Zr214eNEldT
+         aTY4SbcTQHVzAQsysmY0IXrJWurMpO2w381A4jNe82hD1nOazfcpGP1QAqClvltBbXZt
+         862FnQiMjt4zH/37pd7L4WQz4nWLJteNFyckY5d2CCzWTfnlMuPd7rFpqJvnP9Tfeil+
+         uzRw==
+X-Gm-Message-State: AOJu0Ywi5MgnkGxlEMgFW09dDZwNKZzYKJuuMCv3z+AJ+rFhtmdTSGom
+	VVDMXmiA603QN/X1VBCXyCCD6F0OhLOVHXEnws44xc4ttVw5MLItMcgc8jbm6BJ/YD8=
+X-Gm-Gg: ASbGncv6S4PQLKvHT4dPifW7/O/3G7CafVWjw5mLTIfRzNlwGvFPQ7US+yEDinanLju
+	aK9ENd12P4/yeYhObrCJ7UM1JHjGjS3MN/VFHmhjHBoFbzHdX2UwYkwU1eP2M6HDW1G9QexAGSJ
+	/JXJdoXo2ys5JjvQTsduyk+FjE7rQgEe0VGu2YJkJfYbBgX9hRyeKo4CY4ItT7flV8PJriu7bs5
+	QOleoO87PwmEmlOaeiSFR+OdiduLvs436DRRo3jCjRwXhELQ1RBAkSyDNaT+0OgdcahO3n2WV53
+	xGELKgtgLjO4ooU2PxfrFYpKRzdkkXatcUAweols1zZ1+JzyLx8HQMcuROrCod+4wFZJfn43WFh
+	ErHo=
+X-Google-Smtp-Source: AGHT+IHf9DVkWmbX6t+akoi4x+O8WSA+NWzTIrXuhlLrnn7dTD81mWETTKau86Jvi85i8SCQm9Zr1A==
+X-Received: by 2002:a05:6808:23cd:b0:403:25bd:ca71 with SMTP id 5614622812f47-40a6611ea15mr300602b6e.15.1749665509066;
+        Wed, 11 Jun 2025 11:11:49 -0700 (PDT)
+Received: from [127.0.1.1] ([2600:8803:e7e4:1d00:4753:719f:673f:547c])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-40a5d94147esm424719b6e.28.2025.06.11.11.11.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 11:11:48 -0700 (PDT)
+From: David Lechner <dlechner@baylibre.com>
+Date: Wed, 11 Jun 2025 13:11:36 -0500
+Subject: [PATCH RESEND] net: mdio: mux-gpio: use
+ gpiod_multi_set_value_cansleep
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gL1+kZGNyJIUcrAQ"
-Content-Disposition: inline
-In-Reply-To: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250611-net-mdio-mux-gpio-use-gpiod_multi_set_value_cansleep-v1-1-6eb5281f1b41@baylibre.com>
+X-B4-Tracking: v=1; b=H4sIANfGSWgC/x2NPQvCMBQA/0p5s4GkGG2d7eqgo0gIzbM+SNKQj
+ 1Io/e+GbnfL3QYJI2GCW7NBxIUSzb6KODUw/rSfkJGpDi1vJb8IwTxm5gzNzJWVTaFCSXiAUa7
+ YTCphVou2BdWofbKIgSHv5Vl2vdHXDmo6RPzSemzf8Bxew+MOn33/AwhwSfaOAAAA
+X-Change-ID: 20250611-net-mdio-mux-gpio-use-gpiod_multi_set_value_cansleep-e0954589da78
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Linus Walleij <linus.walleij@linaro.org>, 
+ David Lechner <dlechner@baylibre.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1495; i=dlechner@baylibre.com;
+ h=from:subject:message-id; bh=x2LAshC4TaowOHTTAfdCSxFpB1VG0IOM05NdXRo/GcQ=;
+ b=owEBbQGS/pANAwAKAcLMIAH/AY/AAcsmYgBoScbdHEvJMh49ii8PaXm06NcRK+4G6Qji4mc3I
+ 3TUxFf2n1GJATMEAAEKAB0WIQTsGNmeYg6D1pzYaJjCzCAB/wGPwAUCaEnG3QAKCRDCzCAB/wGP
+ wLmRB/wJEQPXAFte0Br8P+SmauFUXC8UTnHAKRXPpH8BojKuIfDgrC1wNdEwKMZh46vbXvAHpXG
+ X/CnEN+ox+eAjVXNSc3UacvLPk8qycSRXKYCTpvGxvYQkHYWK1R7UCtvBOxpz2DjjEU644pGmT3
+ LfnepErKd3uHDNeJ05Ty+/BTVBcEd2GnSv39G5O8k6S3yR8fngUlviT24vd3aa0DXYYemQdpxo+
+ JyW6QbNyTBIukj/wjctMDaHcqEIUpA4c1TR0hAcbZ1bMIMVsnU9IqySeJ62zgg92ufZGjWASUXL
+ fuMLT31VN/6z6//tazIRidTeyEwxwsL7Oyo/ksv/fkdPY9UD
+X-Developer-Key: i=dlechner@baylibre.com; a=openpgp;
+ fpr=8A73D82A6A1F509907F373881F8AF88C82F77C03
 
+Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
+gpiod_set_array_value_cansleep().
 
---gL1+kZGNyJIUcrAQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: David Lechner <dlechner@baylibre.com>
+---
+This is a resend of a patch from the series "[PATCH v3 00/15] gpiolib:
+add gpiod_multi_set_value_cansleep" [1].
 
-On Wed, Jun 11, 2025 at 07:39:21AM -0700, Alok Tiwari wrote:
-> This patch corrects several minor typos and formatting issues.
-> Changes include:
->=20
-> Fixing misspellings like in comments
-> - "explict" -> "explicit"
-> - "infight" -> "inflight",
-> - "with generate" -> "will generate"
->=20
-> formatting in logs
-> - Correcting log formatting specifier from "%dd" to "%d"
-> - Adding a missing space in the sysfs emit string to prevent
->   misinterpreted output like "X86_64on ". changing to "X86_64 on "
-> - Cleaning up stray semicolons in struct definition endings
->=20
-> These changes improve code readability and consistency.
-> no functionality changes.
->=20
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
->  drivers/vhost/scsi.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+This patch never got acked so didn't go picked up with the rest of that
+series. The dependency has been in mainline since v6.15-rc1 so this
+patch can now be applied independently.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[1]: https://lore.kernel.org/all/20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com/
+---
+ drivers/net/mdio/mdio-mux-gpio.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
---gL1+kZGNyJIUcrAQ
-Content-Type: application/pgp-signature; name=signature.asc
+diff --git a/drivers/net/mdio/mdio-mux-gpio.c b/drivers/net/mdio/mdio-mux-gpio.c
+index ef77bd1abae984e5b1e51315de39cae33e0d063d..fefa40ea5227c5a35d89ec2c6f95c6668a2470f6 100644
+--- a/drivers/net/mdio/mdio-mux-gpio.c
++++ b/drivers/net/mdio/mdio-mux-gpio.c
+@@ -30,8 +30,7 @@ static int mdio_mux_gpio_switch_fn(int current_child, int desired_child,
+ 
+ 	values[0] = desired_child;
+ 
+-	gpiod_set_array_value_cansleep(s->gpios->ndescs, s->gpios->desc,
+-				       s->gpios->info, values);
++	gpiod_multi_set_value_cansleep(s->gpios, values);
+ 
+ 	return 0;
+ }
 
------BEGIN PGP SIGNATURE-----
+---
+base-commit: 19a60293b9925080d97f22f122aca3fc46dadaf9
+change-id: 20250611-net-mdio-mux-gpio-use-gpiod_multi_set_value_cansleep-e0954589da78
 
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmhJxm8ACgkQnKSrs4Gr
-c8h+5Af+Pw6W/Lmi0FuHsDBbsZP4bq67qUmcf5R9aAbd6M6bpBLfLwsQOolA4RG0
-3pewOLgln11imSS632hXDd3KLntR2IoW1t0iwdHwfXX+/wzc3FuEdMahpsscEVxx
-ont13Xst6s6C134RD1RSti9uJlqU2KpjnXlKgMjswVSbgO3YoBcCTlTubramxWIR
-nxlwlghg6s9QTCqoCoCd4w6cNyKuYUF3AOZnnL0uTaomu3kRHjipN3cbzoVl+c5X
-M/OnNP08C1WVhsapy/GvGZFa/PUysPqCacprK4FKkJH3WThZ7Z25SkTa+/zyiTO1
-QiJBcXiNYrgyuzuicGpTiU0SStERnA==
-=HVM3
------END PGP SIGNATURE-----
-
---gL1+kZGNyJIUcrAQ--
+Best regards,
+-- 
+David Lechner <dlechner@baylibre.com>
 
 
