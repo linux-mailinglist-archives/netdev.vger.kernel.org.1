@@ -1,144 +1,132 @@
-Return-Path: <netdev+bounces-196708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9AB9AD6058
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:48:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33E6AD605C
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:49:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE953A2FFA
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:48:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5C711895FB1
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BF325BF01;
-	Wed, 11 Jun 2025 20:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291252253BA;
+	Wed, 11 Jun 2025 20:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tT4KmrVq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PmaEG6Pr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97563226D03
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 20:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F86C185920;
+	Wed, 11 Jun 2025 20:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749674932; cv=none; b=hmt0SqiXnt1K0NASME16kcQa0AEavo4xGKzKZtapGITGpKqrggKsALnOYeXyEfZssD7zr9yuwLPD0cx3iBRhqTe2+dp8ENOZzUgMQlN2Rjosv52WlapxmW2t91oDoLjdZ37188mMIEkDt14E4loioSx91AAUkHtUW0cbXCrBfVk=
+	t=1749674990; cv=none; b=iPcmGGxJRQq3irVHdRM92CA0prKbSGbCuvGNvlMPjYlMhgXvSFNqRYs9piDTOBX7LmLdXCj8ca59zmbjb8B/u7kIkvRrzjatbLK8HNAVEetCiW5zBVV1BeUNSKp5pmeWc/N7yakinT+MMtZYLpu09/Tgv0nKb2er1xjusLtjnz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749674932; c=relaxed/simple;
-	bh=dy/Bwb6Thnom4khEjtNBkceEkdwxV066C0Be2MDTp9A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kWLXiMGg9tA5fcG+Y5aCxemL6KvpgEM2Xved09X6Xikf+2nkUqyPccpJ/5IF9s+CqDc/lpjcCQwBED8IvD/paETc657C9VEtPprIoxThdQt0O8o2cp5dRpCr4cSACZdilyMybCctqgyfxAvZBIiD19BjTwRZ73hZMh7eRZyJk1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tT4KmrVq; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-235e389599fso57815ad.0
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 13:48:50 -0700 (PDT)
+	s=arc-20240116; t=1749674990; c=relaxed/simple;
+	bh=879lWa45Gxs+c1Uod6OWR0UZAINZ2KggI3MRLWxWitY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aq2XCKVTQ2gEObeG4CHxCiA6LL2e2VMC6SAp/+aklk79B0xlPYkdFlZXIx8s0X/FklnodGEZckhYPrNceUFSmronZ4/yYDp+qljdMDhLbHDTljg6g6GfMxDZqLdKfm6CvichceWvKc2Elm6+o1IECeL2PBNJmXGGhWo1PqYgpuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PmaEG6Pr; arc=none smtp.client-ip=209.85.217.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4e7cb3a277fso70617137.2;
+        Wed, 11 Jun 2025 13:49:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749674930; x=1750279730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MUvCi02xABTrop0OD7rFaiszrr+jU6INxefWYNqLLI8=;
-        b=tT4KmrVqknjLs8qzr6UWSjt5mo+eef31F2aM9nz5IspAqwF7Aa1JIungUKk8h1qzQg
-         uaPVaTBDZ5Y0Mr5HtmLN+w5CwseQTY1cal77Njj43cE8VM44xAQbglfBILtphlcZIF/5
-         sqOkrVvLIqiL54+Fbqua2BvovxTIIjikNV4ei8OGaFG6XZyDqibGz1N3u8Ycz3OH4Msk
-         HLjexu8cSIrp9WRrCgmpNm2GmCY+YLk5766s8X5M4Vkd4tVB1eJea51xcMQvK7Ugr7uI
-         tByho5TjJaDxnZtLY9LuLVDSGJYRwXPm4H5hp7KO4zt2pT7LBD8OV4rS7is6YU8ysHHl
-         SNqQ==
+        d=gmail.com; s=20230601; t=1749674987; x=1750279787; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uw4O2qIGPBbQpF99dSGo25y5I+6IYxs2uEM9DviZMJk=;
+        b=PmaEG6Pr/QHR0r8CgiYnC+XHiayVMkYE1iAkJsDVdkICNpfhzFc/kk8rDwPLvO8Urm
+         5gKKUfw5YOOEKTLFMsN8wnpUBAzUo9Pxh7M08KNok0y06MwLCVAir7m4tQ9xrLAYQqgO
+         MSOT6SdK43JBLvCPbyvW8IjGOJxIVWlhDeZ5swNKYvjLjLjvSvRo1Z5he5/ky6CblvCQ
+         mz7vcjgXCTlkn2Yl8eH1rL/PW0XtAStQxP/b/THevB0o/l+wrhwhuUh2VDiXUCLzdi2a
+         DOWGohBMPKkqgUj2Ztcb6Gj7YAyy8GxtZ+uKSuWxsjuAVz3jePAbbaRhcJuGhH4NX2ud
+         OYwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749674930; x=1750279730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MUvCi02xABTrop0OD7rFaiszrr+jU6INxefWYNqLLI8=;
-        b=ipIcJiz8oEB9zNJVOT8CkzmRoVdBV7tyAfo4hodEW98KQs3j58LSTcanqsmUYWs9+7
-         v/9/PBSPqDb1GzJNdkjJOxQ2ave2uIuSlsfJOzH7FCqPOH7kgWSF/TzJo1Cb/cc2Z6FP
-         OHezi9V7nGJnb08N1ZNhU+PBXflldbt/RoE0eqBbKRP6zdNlAoJCWmA5AlpjdrpZcLqW
-         v2oY4S7ZqSgcinn4r2zcMifyp2HhlMPnYr6P0VfOyMzKUxkigKxO1aebj8GmX5otCxv2
-         Gf3ItBRSEYmucO3XRizkkcWaee+JSVIXSSXmrDYn604oyO98NQcJrzgWoRyJGePmNBmz
-         Tesg==
-X-Forwarded-Encrypted: i=1; AJvYcCXobcUQu+cK41WHthNSr13nKqbkTy7qgbCXAU6+uMVe3LFrDMNzs/UchT2W7NJPIq41qYgxta8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHeIW+ZE/xhbg6+g48eEice4svBSsJYtro38+BRAKl0roEXXDq
-	0ORkyVgh8vHP5iuufu9ZRUypoHjMJ2NJizBVgqzGvnnhAX9S6j7kmyPko9w9A32lsgQbi50Yt8I
-	4CUHPjiSV6Sj80AV0mjsYEF8n0qE+SjRkYvMZZwG6
-X-Gm-Gg: ASbGnctE3LK527IeWPLxOkLnG++WRfZEJ654/mUulK6It/KIE3vlTwWJu1S0rH87FRR
-	8JLZ+YJxzBzUGIl4qK+9Wt+HEzK50qQdH4GM1zf6Knvy6rrFfzP7fwHhjM5rF+r5itYdo3twEZf
-	/fI/hMQVZWmCPdjCZZnNfRZ7mJkf6oE2C7bF9J1LA9mjC9AOrAwXzmwIH1XXav8+/pzCiXOkQ7
-X-Google-Smtp-Source: AGHT+IHPOhN+2kRO/ieW+5bXzKNpmLOWrF7VTuuMHfPxMqYhDS9sFU10fG4M5zXkX7CwS4WlSGyc/8tNtPMJ+fMmqfA=
-X-Received: by 2002:a17:903:2ac3:b0:231:d0ef:e8ff with SMTP id
- d9443c01a7336-2364dc4e38fmr398195ad.8.1749674929600; Wed, 11 Jun 2025
- 13:48:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749674987; x=1750279787;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Uw4O2qIGPBbQpF99dSGo25y5I+6IYxs2uEM9DviZMJk=;
+        b=d8L/YxCSAvycCsg/Rsci0gsvnIyfWgA0PXPtWROHzaqRq/7MAH2FynQITF+yh89cFK
+         yduADp2dYeO3c7uUO6IDhwpwP0LFTrpYHwkoeo1YF/bNyi5VxKPwt9wAEMbZPaAezMUx
+         BMiySna3cSuw2vZik5u8LmIw8Ol1DoKS7VGWgNMrSbqf90cQOMG/r668UIT5RhXe55RH
+         7wQBDgggfK8bT71b2qcB9ijkpIR/14CZkoZ5TRcuxyZ5ch5ThVMSYCxkoQOOHcRkMnRF
+         893qkC/wqUtVb4knB9y33aF3aCPxEiARsqA7UZS1FW94ftyAQn/qA6KjPMMRoAM801pl
+         tieg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5kHDXgWXmWWX/wCOwsY0fXL9doOeX0judDmCrls2yWpQMVEn6sUwyPFTUvg8pMTVrEu3TPhQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDevERA07E8FJ2cNLikF8DfxyDIq2QmuZuYo0GgzksG3HBXsZM
+	EnjCkJiBZie0QUa4ET0F3w2OSZV67PByppxK3OiIX5L3sx9IYR/Eeo6/cnlrPSNzFs8=
+X-Gm-Gg: ASbGncsqjUVwfqKBIKuG/rhkzMO354HP/yq5ky483zTYqnQp5rH5Q0Z1/TbhFB939Mb
+	rSQF3Lyp1kKsm1RRzovYJ2ON7NCrTCST8OTYGRfmb/Hnmy1eLdOofGysO4BKNGrFGrpaoRejTJK
+	LkLpW1WuVVAnuS1lEYgcNYlUxwtpVQ2cB+kgIyCo/ZphLUKkuPXNt2euITGu5boVsPTzAGC7vCf
+	fqOFdqzd+slZa4xhPn73oztwdQox1CApQov0jX1am0uHcMJOeuq5zTBeHI81ZGruXLAnxOGOOdh
+	bujuNWDK+XiExGgSmD+UPczi+CpC0rx9hfkw2D2JP3TiOtSau0EopJ72PvhQARGr0OQQDobHNbW
+	7nDq0iQ7gW1HQ5vkxZ1KanFVCRvrMi676yfqiUG3R9g==
+X-Google-Smtp-Source: AGHT+IG4uiXvw/zPS/X5x+9L2Y6LFcey82zpdiBfbM6siv47q9IKbz79AY8RF9SUNAllu3Q0Gry3kQ==
+X-Received: by 2002:a05:6102:441e:b0:4da:fc9d:f00 with SMTP id ada2fe7eead31-4e7ce96d107mr639309137.13.1749674987366;
+        Wed, 11 Jun 2025 13:49:47 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-87f0127330csm21846241.15.2025.06.11.13.49.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 13:49:46 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-06-11
+Date: Wed, 11 Jun 2025 16:49:44 -0400
+Message-ID: <20250611204944.1559356-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609043225.77229-1-byungchul@sk.com> <8c7c1039-5b9c-4060-8292-87047dfd9845@gmail.com>
-In-Reply-To: <8c7c1039-5b9c-4060-8292-87047dfd9845@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 11 Jun 2025 13:48:36 -0700
-X-Gm-Features: AX0GCFsiObw-5gr4V36jOF5DxyaQMi5Vz9ZSIsC4_vLQ1YuMrAJGB2FI0rG1Qcg
-Message-ID: <CAHS8izNiFA71bbLd1fq3sFh1CuC5Zh19f53XMPYk2Dj8iOfkOA@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/9] Split netmem from struct page
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Byungchul Park <byungchul@sk.com>, willy@infradead.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com, 
-	kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com, 
-	hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 11, 2025 at 7:24=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 6/9/25 05:32, Byungchul Park wrote:
-> > Hi all,
-> >
-> > In this version, I'm posting non-controversial patches first.  I will
-> > post the rest more carefully later.  In this version, no update has bee=
-n
-> > applied except excluding some patches from the previous version.  See
-> > the changes below.
->
-> fwiw, I tried it with net_iov (zcrx), it didn't blow up during a
-> short test.
->
+The following changes since commit 260388f79e94fb3026c419a208ece8358bb7b555:
 
-FWIW, I ran my devmem TCP tests, and pp benchmark regression tests.
-Both look good to me. For the pp benchmark:
+  net/mdiobus: Fix potential out-of-bounds clause 45 read/write access (2025-06-11 12:49:03 +0100)
 
-Before:
+are available in the Git repository at:
 
-Fast path results:
-no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.337 ns
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-11
 
-ptr_ring results:
-no-softirq-page_pool02 Per elem: 529 cycles(tsc) 196.073 ns
+for you to fetch changes up to 7dd38ba4acbea9875b4ee061e20a26413e39d9f4:
 
-slow path results:
-no-softirq-page_pool03 Per elem: 554 cycles(tsc) 205.195 ns
+  Bluetooth: MGMT: Fix sparse errors (2025-06-11 16:39:25 -0400)
 
-After:
+----------------------------------------------------------------
+bluetooth pull request for net:
 
-Fast path results:
-no-softirq-page_pool01 Per elem: 11 cycles(tsc) 4.401 ns
+ - eir: Fix NULL pointer deference on eir_get_service_data
+ - eir: Fix possible crashes on eir_create_adv_data
+ - hci_sync: Fix broadcast/PA when using an existing instance
+ - ISO: Fix using BT_SK_PA_SYNC to detect BIS sockets
+ - ISO: Fix not using bc_sid as advertisement SID
+ - MGMT: Fix sparse errors
 
-ptr_ring results:
-no-softirq-page_pool02 Per elem: 530 cycles(tsc) 196.443 ns
+----------------------------------------------------------------
+Luiz Augusto von Dentz (6):
+      Bluetooth: Fix NULL pointer deference on eir_get_service_data
+      Bluetooth: hci_sync: Fix broadcast/PA when using an existing instance
+      Bluetooth: eir: Fix possible crashes on eir_create_adv_data
+      Bluetooth: ISO: Fix using BT_SK_PA_SYNC to detect BIS sockets
+      Bluetooth: ISO: Fix not using bc_sid as advertisement SID
+      Bluetooth: MGMT: Fix sparse errors
 
-slow path results:
-no-softirq-page_pool03 Per elem: 551 cycles(tsc) 204.287 ns
-
-
-
---=20
-Thanks,
-Mina
+ include/net/bluetooth/hci_core.h |  9 +++++---
+ include/net/bluetooth/hci_sync.h |  4 ++--
+ net/bluetooth/eir.c              | 17 ++++++++-------
+ net/bluetooth/eir.h              |  2 +-
+ net/bluetooth/hci_conn.c         | 31 ++++++++++++++++++++-------
+ net/bluetooth/hci_core.c         | 16 +++++++++++++-
+ net/bluetooth/hci_sync.c         | 45 +++++++++++++++++++++++++++++++---------
+ net/bluetooth/iso.c              | 17 ++++++++++-----
+ net/bluetooth/mgmt.c             |  4 ++--
+ 9 files changed, 107 insertions(+), 38 deletions(-)
 
