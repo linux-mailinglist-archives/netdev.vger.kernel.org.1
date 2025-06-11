@@ -1,147 +1,197 @@
-Return-Path: <netdev+bounces-196614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A780AAD58FD
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:39:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CBBFAD5904
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:40:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EB5E3A67E1
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:38:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E0771776F9
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0392BEC5A;
-	Wed, 11 Jun 2025 14:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4972B2BD589;
+	Wed, 11 Jun 2025 14:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BtBKBOaO"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DINZXAat"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700DD2BD5B6;
-	Wed, 11 Jun 2025 14:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DABD2690F4;
+	Wed, 11 Jun 2025 14:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749652682; cv=none; b=T+DeZNUV4ArF6yvfpwZsvTRWaE4PtkHrOhaF/NUbv+sgUYr7w7oYwdLnvO0aeY0hCG7omUP4UUv5r+tDmODlA7mbuq+IBC9oygB4exI1ejF0V5VDViB9COrfIaj44KU7R+JnvAGUO+2Z/CzqQljMeI5XcVABOmylqimlGGM+ooY=
+	t=1749652784; cv=none; b=HcfCmXh7m2f80j9aMfaPq0SJ/uguQ5nbz8aFBgQLeSCU5qClvFHQfwkVX71cXncV3DFNfUTMLDQvLGckBpMeNUIBefkkh/OrThcivCuUcQEDy9yy6p1WQhlsLw5lBxoZoTdIIiF8NTfXtDIoVh0oP/DvSn5o7RJZmYycjoK+wiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749652682; c=relaxed/simple;
-	bh=tOzgL0KY9yFrjchFg5tvk0J/AejOvH97Tt3OuAqyGZA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KEV0sLsItpP/XmXMxAaidgJ4jZlicIs8t59Fot/nUVkNs0/b8JVDlKWmJRKFZmHGs3iG9Q/BmiisWWOHoIm5gRzdIbnZcf9HtGKqmr0zk3GVA6mjUfH1Fay97f+/g4cq6k1gmnu3OqISLpuziLrvev4cPTPGtfykeIWad0euNmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BtBKBOaO; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6fac4e2fcd1so144046d6.0;
-        Wed, 11 Jun 2025 07:38:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749652679; x=1750257479; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LEWFUemvl7siyfmS6XSp2BMVs4pqCozC91INbpbQZrY=;
-        b=BtBKBOaOaRWiPauG8AGmK0BnMFHDRD1TBBwGUqHJ4KatXjnWyn5CffwDCgai9MkhUe
-         9vbFMvuauXgFesDJdqxcyhbJLz8K6lYzMDaKl0ilz+CoHlmZ95xshZmlcl2bT+82NVvC
-         JLEbFiaQh00rIl6J5biOmSHGvUgoAYGOnFngwWBc2lFBy+DSeBI6VtEJKkgsEs//KV5l
-         jIDTwXcRMPDyyJtH/eapUteX5l23Cgwtuh1TqexQFuU4M50jYmN00qYzzAFGUhyphqHi
-         Mt3Z2W5N8kccQNTKE9cYJtbeBOYZkrwgdtSLgPnt4QMDDLd+qrFWtmOXK59hZF7Bg9Eb
-         nPew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749652679; x=1750257479;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LEWFUemvl7siyfmS6XSp2BMVs4pqCozC91INbpbQZrY=;
-        b=qYluR5EpSHnjpLj3XFFqJG8+8jBQkjO8yy4G5nRxhFRBKKkN40/PdM8qR8UrgFKOr6
-         /+OTOjMKVdqXJbvR6eiEZsa/GWLiqCOlNZ50jsfVztIzB7T9kvzfGzb6DsQ4UeGu7e9h
-         Rdn4VoBbMHT8HUTl0emSHxC2PMWkbNjjt5mGkOUpyBqA8tlX2pjfC2UzoV1m71JPE7rr
-         LtqRJ5cVnvE7yv+N26dVqe6puErkrOlMtNkYc7umJisf1t8++d1n7cOESYqKB+gtTHRS
-         fwWwHLIDecAnfEL8/QgpUTgbRmleF5PxJshcYqY705JmJAxqVJOqSSYX0TVb4k5IVlyq
-         nHlA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0qmUQ+EvMl1+H+l8OthJ3HD9xy84dfQNVUwOfJKHzKK9sIs7lV+U+dt5+T4cJR4TvRWI3v8a02EdEf9K8@vger.kernel.org, AJvYcCVbOBKg0C58OMo5u0MWrAAa2Z3gz8OzGmQcSnQCo7PQz/wSteDdx8QlSDFekWdG7npIy18PpZAf1lY=@vger.kernel.org, AJvYcCXJypFgIsrzUxk3iUgQON7lgJRgeoQjoCRAuETlt5jXhGKmsvBpUyU3d5H1gDt4lV9ASaXzY13+FaScFidtZ8ol@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9TVH+czVCLpmFQDL6WQLY1b00VPj3VxH0D2a3uY+anTS/AP6Q
-	IYmkKnuSSvjsjNiduDmhhAycGkWSbes1UZKj4e5scJ7Dq+H2RP1Z1F3uIF8aJEgfnEU=
-X-Gm-Gg: ASbGnctjQFYTVDgii2tb+Gj6YPOOoa2XZtkUSyVO98Xz70dszhM8xwvaH8Y4SR7tnBC
-	EaCfBwogocssnMBXE7h1o5XSADIlT5UJVzUJosrdmX/4jJSO0HHVfDE9hQS/tEnKn4K5InoHt5E
-	tMOmIEZaUldbcXN34jFwHKZWQdAJ9booS93yqrZIKQUUWHAlz0d4Gt3MiOlhtR6d1sHv3bUTdIt
-	79+JTc9C8QKihl5buRGb9Y9GysD6kuJlYWGEDB0GfX9Kfq58DEPcaYPMexF3pfImdFNP4xsjM9J
-	Jn9AofbzcpUT7A+InsR9YiwRd2leUArf5UWRmuZZw6pDl5ULUp8QhbE=
-X-Google-Smtp-Source: AGHT+IHJUXXQFyBk9F2cncTLJpxIYvehgFqAwrqxUqIhkdJDPaNUQfAOqJdsZttNUJYQKPxTN6q6Ng==
-X-Received: by 2002:a05:6214:2509:b0:6fb:fe9:e90d with SMTP id 6a1803df08f44-6fb2c38cb32mr22229576d6.10.1749652678841;
-        Wed, 11 Jun 2025 07:37:58 -0700 (PDT)
-Received: from localhost ([2a03:2880:20ff:8::])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb09b1ce20sm82252766d6.67.2025.06.11.07.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 07:37:58 -0700 (PDT)
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Wed, 11 Jun 2025 07:36:07 -0700
-Subject: [PATCH net-next 5/5] docs: netconsole: document msgid feature
+	s=arc-20240116; t=1749652784; c=relaxed/simple;
+	bh=aqypGgqD5Z1GVJzaOtiUWHGS5FYKgTtrDXNfRtBkNVI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kdKJXPYMaLL3PQ7OQ329m9CHruzzhAhpNckr7qfh9oDIKVV+UcPosCUHqvAfn98lESJMltfo42CgxaIlnyNOBxHiYBbNhv5gA7Np7Y98hDlPtrITwEdlJUPmt0URhfRIkXic+nft8M+z/zIMDMlZ+Rv7A35IciBSJaRiC3xI9L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DINZXAat; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55BEdFdP010522;
+	Wed, 11 Jun 2025 14:39:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=+MbQXWPeLML3LfbjNcfAYDmrMVvqa
+	WCRa0dvaIisA3M=; b=DINZXAatO86U3hlxEdSrT/AP4kfGqwbv8Z1mx96Q+xSky
+	NUFxqnlhNeU/6oe8r5ac/21i04SUm9QKIYkjgWHF1Ob48GTI0oHECPLftLsLuNcl
+	9fAwju5rvZdy2//fWU4bwrB0yPywCSMnDvW7rYw4oEZePRXc0VKKq1BV2QE8oKW4
+	AVppmjRnHRYTAX7yCu6uGD7KXIbsfKBTYxjIpmEdjyNtKuCD6eT5sYTNi3Db4U4T
+	txhqfFGBAV80bIWiWiqLuIAXz6oNkLUqztPW2SN+IQrBsH3/B6rbzTDUZX76gHII
+	hxEk4eCthKZkHEH0L1nxqtkQfZlT6Rdi7dH+uo4Mw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4752xjxyhj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Jun 2025 14:39:37 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55BE1llZ021378;
+	Wed, 11 Jun 2025 14:39:36 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 474bvb0crr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Jun 2025 14:39:36 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55BEda1m013641;
+	Wed, 11 Jun 2025 14:39:36 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 474bvb0cr1-1;
+	Wed, 11 Jun 2025 14:39:35 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
+        pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
+        virtualization@lists.linux.dev, kvm@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] vhost-scsi: Fix typos and formatting in comments and logs
+Date: Wed, 11 Jun 2025 07:39:21 -0700
+Message-ID: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250611-netconsole-msgid-v1-5-1784a51feb1e@gmail.com>
-References: <20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com>
-In-Reply-To: <20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
- Gustavo Luiz Duarte <gustavold@gmail.com>
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-11_05,2025-06-10_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506110122
+X-Authority-Analysis: v=2.4 cv=K4AiHzWI c=1 sm=1 tr=0 ts=68499529 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=C3Wo5I0qEXIME_MCgsYA:9 cc=ntf awl=host:13206
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDEyMyBTYWx0ZWRfX8QdIum7iYPdu YYxfQnC0Ddc5lXR1VFfIjnKFWFWa6IlT8vxweUYw9JAwjOqMVZXmRCoItNowjz7golvsFMwacEs 2f3DwTe2Pz42rKzoo3s6IYxD77lO/U+Vg5M3goHA+7ATb6tctCq8Ke9GpzVG8ZD94TeQhT1QcKF
+ APa9uwP+i2SEyr+orNNVQMJoSyd54OSmt0qkvqoCxV8aNCA0o9CyPKCw3scIH77mOreRUG9EheD NQ6YDfwsLqzdf9XeJM7nji2DFqDKmuguQlu8Qy6e2mIC2GVbpTVhWHEKEM6MpHaHiBt3ZEfiva0 0qPI42IKTcjse3iL5qIOd9D+YRIsXaWgX4KSLP5mNxdax8kGH+zZSBa7VrLIosBzwskfhmVo2PK
+ 3w4VLbWeCdIo8eTIYbeyUluhh33fQuc+DCIM7Ia+a2UR62vRK028V7gbCKWOX9/buTY2fyNU
+X-Proofpoint-ORIG-GUID: 72saJQB-Odq-BQtwRVcSZu6Kv3VxDEVK
+X-Proofpoint-GUID: 72saJQB-Odq-BQtwRVcSZu6Kv3VxDEVK
 
-Add documentation explaining the msgid feature in netconsole.
+This patch corrects several minor typos and formatting issues.
+Changes include:
 
-This feature appends unique id to the userdata dictionary. The message
-ID is populated from a per-target 32 bit counter which is incremented
-for each message sent to the target. This allows a target to detect if
-messages are dropped before reaching the target.
+Fixing misspellings like in comments
+- "explict" -> "explicit"
+- "infight" -> "inflight",
+- "with generate" -> "will generate"
 
-Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+formatting in logs
+- Correcting log formatting specifier from "%dd" to "%d"
+- Adding a missing space in the sysfs emit string to prevent
+  misinterpreted output like "X86_64on ". changing to "X86_64 on "
+- Cleaning up stray semicolons in struct definition endings
+
+These changes improve code readability and consistency.
+no functionality changes.
+
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
- Documentation/networking/netconsole.rst | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/vhost/scsi.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index a0076b542e9c..42a0acf2eb5e 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -340,6 +340,28 @@ In this example, the message was sent by CPU 42.
-       cpu=42    # kernel-populated value
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index c12a0d4e6386..508ff3b29f39 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -152,7 +152,7 @@ struct vhost_scsi_nexus {
+ struct vhost_scsi_tpg {
+ 	/* Vhost port target portal group tag for TCM */
+ 	u16 tport_tpgt;
+-	/* Used to track number of TPG Port/Lun Links wrt to explict I_T Nexus shutdown */
++	/* Used to track number of TPG Port/Lun Links wrt to explicit I_T Nexus shutdown */
+ 	int tv_tpg_port_count;
+ 	/* Used for vhost_scsi device reference to tpg_nexus, protected by tv_tpg_mutex */
+ 	int tv_tpg_vhost_count;
+@@ -311,12 +311,12 @@ static void vhost_scsi_init_inflight(struct vhost_scsi *vs,
  
+ 		mutex_lock(&vq->mutex);
  
-+Message ID auto population in userdata
-+--------------------------------------
-+
-+Within the netconsole configfs hierarchy, there is a file named `msgid_enabled`
-+located in the `userdata` directory. This file controls the message ID
-+auto-population feature, which assigns a unique id to each message sent to a
-+given target and appends the ID to userdata dictionary in every message sent.
-+
-+The message ID is built from a per-target 32 bit counter that is incremented
-+for every message sent to the target. This ID can be used by the target to
-+detect if messages were dropped before reaching the target.
-+
-+Example::
-+
-+  echo "This is message #1" > /dev/kmsg
-+  echo "This is message #2" > /dev/kmsg
-+  13,434,54928466,-;This is message #1
-+   msgid=1
-+  13,435,54934019,-;This is message #2
-+   msgid=2
-+
-+
- Extended console:
- =================
+-		/* store old infight */
++		/* store old inflight */
+ 		idx = vs->vqs[i].inflight_idx;
+ 		if (old_inflight)
+ 			old_inflight[i] = &vs->vqs[i].inflights[idx];
  
-
+-		/* setup new infight */
++		/* setup new inflight */
+ 		vs->vqs[i].inflight_idx = idx ^ 1;
+ 		new_inflight = &vs->vqs[i].inflights[idx ^ 1];
+ 		kref_init(&new_inflight->kref);
+@@ -1249,7 +1249,7 @@ vhost_scsi_setup_resp_iovs(struct vhost_scsi_cmd *cmd, struct iovec *in_iovs,
+ 	if (!in_iovs_cnt)
+ 		return 0;
+ 	/*
+-	 * Initiator's normally just put the virtio_scsi_cmd_resp in the first
++	 * Initiators normally just put the virtio_scsi_cmd_resp in the first
+ 	 * iov, but just in case they wedged in some data with it we check for
+ 	 * greater than or equal to the response struct.
+ 	 */
+@@ -1457,7 +1457,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 		cmd = vhost_scsi_get_cmd(vq, tag);
+ 		if (IS_ERR(cmd)) {
+ 			ret = PTR_ERR(cmd);
+-			vq_err(vq, "vhost_scsi_get_tag failed %dd\n", ret);
++			vq_err(vq, "vhost_scsi_get_tag failed %d\n", ret);
+ 			goto err;
+ 		}
+ 		cmd->tvc_vq = vq;
+@@ -2609,7 +2609,7 @@ static int vhost_scsi_make_nexus(struct vhost_scsi_tpg *tpg,
+ 		return -ENOMEM;
+ 	}
+ 	/*
+-	 * Since we are running in 'demo mode' this call with generate a
++	 * Since we are running in 'demo mode' this call will generate a
+ 	 * struct se_node_acl for the vhost_scsi struct se_portal_group with
+ 	 * the SCSI Initiator port name of the passed configfs group 'name'.
+ 	 */
+@@ -2915,7 +2915,7 @@ static ssize_t
+ vhost_scsi_wwn_version_show(struct config_item *item, char *page)
+ {
+ 	return sysfs_emit(page, "TCM_VHOST fabric module %s on %s/%s"
+-		"on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
++		" on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
+ 		utsname()->machine);
+ }
+ 
+@@ -2983,13 +2983,13 @@ static int __init vhost_scsi_init(void)
+ 	vhost_scsi_deregister();
+ out:
+ 	return ret;
+-};
++}
+ 
+ static void vhost_scsi_exit(void)
+ {
+ 	target_unregister_template(&vhost_scsi_ops);
+ 	vhost_scsi_deregister();
+-};
++}
+ 
+ MODULE_DESCRIPTION("VHOST_SCSI series fabric driver");
+ MODULE_ALIAS("tcm_vhost");
 -- 
 2.47.1
 
