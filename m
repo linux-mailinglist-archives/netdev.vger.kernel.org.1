@@ -1,198 +1,209 @@
-Return-Path: <netdev+bounces-196411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDAFAD4A43
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 07:08:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659EDAD4A4A
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 07:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F36A71888159
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 05:09:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1A1179F1E
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 05:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7BB22171A;
-	Wed, 11 Jun 2025 05:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039E521FF45;
+	Wed, 11 Jun 2025 05:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMXtuiZw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bmw3YhiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBC62045B5;
-	Wed, 11 Jun 2025 05:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0938F5B;
+	Wed, 11 Jun 2025 05:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749618529; cv=none; b=H2H2jIBjGyMmYPbglsAE+7lSHGkO3SHPvpfFfCHHCTEAwqIUcJd7y6u/1v9uLnqUgRwshn28qMy7JFUdoU3FolTMeX3ep+Ufxujwa3RWV0DdSSfrcnqB7aOASh4XBcGI8afbanu1GHMvY6+6f7VmKLEHA5A6Pt9ENvGMM0QFxsQ=
+	t=1749618688; cv=none; b=AeY2DbzlH5wle0klKAe2Qma736ObSA01mD3TNacWHM8TxQG9yekA23tgxqQYI0oS6U6IDCEiWDXR47eucRHLhtgG7cqfSDpv76W51mqH9Wu0BLqYJPnEAW1F62kKo1iTb618v/52W8URUq4jhjRu4WlR7GtqJDGFe3W/WRzEJpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749618529; c=relaxed/simple;
-	bh=ayaMEU/Ch5YOHTkvvKRCj+w/PTv2ZLP+L7N+vECgU7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DflK0Kj0zGdJNtfHGV941KhIsxIw2ERYf3cC0MDZWFap6HZcEpRQ68ZoVsXv/wFqJI/53Q+6ibTr8xHB453rhGwxEVim+zuvpBPccmlY5dhdcBb+A/yeMt7y6JP9qAidc3DoK42cavHlnNDyHEAtg0/ae2GKDy6mFrnRsq/QsXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mMXtuiZw; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2363616a1a6so15575505ad.3;
-        Tue, 10 Jun 2025 22:08:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749618526; x=1750223326; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jwiLk2bUgnnXObqCMxhj7bAHaeNINQCjvFcpBiWLLv0=;
-        b=mMXtuiZw4oF2yL2P6XJHBoU5TJhUr+zRYb5CoL3dIfsr2T0F/4HA8gmpOOWZN2lOID
-         LHETHr7QaSAtA10ua2hleOS+6nQyWYl6pQw/kkuwlpcVDEQ2KwI5AinIWV+xXnB4FFwB
-         awbIc7MvC7SD8tpJ0F2206dUGUzXKPsu19iln4Lz8qBfxY/IPYrSTMBddmlDZ215ppd4
-         Gqblw5SJCkddR+39/KC4Ejls2sCuSgoh15hbTQkKomn1iXyH+mgmJ6zvv17IyJYeBMxy
-         /ysPWKMXsEJ8OBYwieeA04xBoufiVvg4y2OOxt8N5ZZN4fUsJXSkoYrw/6cumGJGqKoF
-         lidA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749618526; x=1750223326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jwiLk2bUgnnXObqCMxhj7bAHaeNINQCjvFcpBiWLLv0=;
-        b=S+vjMmFIGXkZ77eAgyOUStd8wMI9OIMS7z3/cu8yD+q1Wojy5HEIvDZ/wj/MR4j84v
-         eLSFV7oCOU6Hg+3CFXJcLSQvI0WDEKxh/0vZSc+2EWOD8ezguXZaFfEDkdJxXTKg4yoH
-         2szAskTQwMSkoCsII2yhLX89WjkQSQQEce11BisSoNiTl6H7VSSfMvETYJOSM+WdogWo
-         PCGMXGfxI9Hm0LImS9s4CWfKDPmjPkCtX6xNQh40Psl8VgPcDqCEgmvtiNMaRbH5ycaQ
-         4Mlz3QroQ4q1uxtWLPfWByr9hS5YJ+vH6TPXxTfxxuv3rydTnnyCD1iAvSB/uTOvIu62
-         vIcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV2BwBcGebNjCquWNMIUTHmVwZmZefMZCcNJQALdJpf5BmGmswQZjcRaoXVlm6sEaWMoirraU+h5dV0ctw=@vger.kernel.org, AJvYcCVNWhPR7pBiPSH8je6uvYkiIMYyLt3LhFSkWni+HHsZKnxgKHpu1enjBBLDtV32PhSdocO3Iqanf+Xoo4b4TWhi@vger.kernel.org, AJvYcCXnwJBxsJkpZ/EKvU4VGP42J4xURj283GPU2ZLLBtsDGodh0PwsfdJPF5GCavF5Sh5WzqFTl/V8@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZLP7MDgD+/IoWF9bSUw/Zx0FrI92xkiDGZytz7mjZ2JqeJO59
-	W66DmffnszMSPwYeLsxxGuMj8P7K5OC7X3cDs1CUCxMtTwD4/Ud61MQz
-X-Gm-Gg: ASbGncvqDikgpCSWoo2Es2DL9uJv3dueaDxM53dBpn0R5YoT7k08fSATeDpxNjpK4C2
-	AHZWU6zNTmQx86F362xGntK1Ywx1+1fMdAifZNH7owcEK/PFpWker7N+sIRxnw6iFvagVbtfCzQ
-	RPdFJhkcFdSBv+XOUrKZiSs6/cwLnjCLu2NjqUSrEMPKFPn9MfsCvxWxwgF5I3ONFkZADNo/HE+
-	jQEfrfTaEuEFDQJf6omotwsMHLinzyWSnhh3bGXjGfKEdttTD3EAN26FstlAFIlRwgHdiGeRS9H
-	7/rkKzwuYoppFDNnrjw+CrVAMCbmZDSv2ERw4BDX47001WTkMMhgypDYacjkPK8=
-X-Google-Smtp-Source: AGHT+IGFM8Xvo2UN55UsTBkO320mepaStb5pz10Jir+u7mWjTOBuxTEy2kBpib0AZ9LWVKswMmg+FQ==
-X-Received: by 2002:a17:902:f548:b0:234:b41e:37a4 with SMTP id d9443c01a7336-23641a8ab3cmr19101185ad.6.1749618525494;
-        Tue, 10 Jun 2025 22:08:45 -0700 (PDT)
-Received: from gmail.com ([98.97.39.122])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313b21393d7sm447552a91.37.2025.06.10.22.08.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 22:08:45 -0700 (PDT)
-Date: Tue, 10 Jun 2025 22:08:33 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	Ihor Solodrai <isolodrai@meta.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 2/2] selftests/bpf: Add test to cover ktls
- with bpf_msg_pop_data
-Message-ID: <20250611050833.lhyymoung6rpo5zo@gmail.com>
-References: <20250609020910.397930-1-jiayuan.chen@linux.dev>
- <20250609020910.397930-3-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1749618688; c=relaxed/simple;
+	bh=RM5CpY0Enw/hyyNlyClEDl4qkSL++OqhZn2e9P/mW84=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RXiDJG8bhglJLkxy4E43XNWHTHo86nNzL8FmWPt40h452FZDWoc4mpyEgSOCT2CrG6RbdSzaK1/gBLmGbbrMn2LdmhEoUDRZXSHOdwp9LCnTf9XPVxVyDHD8CsBgkIqJFDuhu6HUo3CHXgzob1dIry0ImoyFglcMvTkyILTixvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Bmw3YhiK; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DD38C43B0F;
+	Wed, 11 Jun 2025 05:11:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1749618677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DoYbi3JELt9emY7SA7bGng9kPhfQuex7MkdinZ5Sc+4=;
+	b=Bmw3YhiKxOb3FffWRz1dwPZ6w587I+OLRgWmx4cZDpJz7xFfOSSdn3e+4WhHC4GsFAF9g4
+	pS7KaubaItkavkYVFNOArnEz8Wo7HvHADyDMdGtoJtWgCd2xbpSeBLBh5h40J/kRvLqHiI
+	istm7ikbbTOK1RHnWuqPCJ/qnoSLo5klrleLUAqMAQincYEvi3pubEtDWZtHRcw0HgEvN5
+	fskxm0hsz2HYtfpJ6oWwDa++w9OllXw2yYqz38T87aNa+T0SmHhgXqoHsu+/gyjrr3iR64
+	Wry1A2WXf4ltsDkdhoP7u8kpkIcvd82zQGeYcJOjpEuycaDnCJ+8gxh9qtV+4w==
+Date: Wed, 11 Jun 2025 07:11:14 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org, Kory
+ Maincent <kory.maincent@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Simon Horman <horms@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>,
+ Lei Wei <quic_leiwei@quicinc.com>, Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Robert Hancock
+ <robert.hancock@calian.com>, linux-arm-kernel@lists.infradead.org
+Subject: Re: [net-next PATCH v6 06/10] net: pcs: Add Xilinx PCS driver
+Message-ID: <20250611071114.325fb630@fedora.home>
+In-Reply-To: <20250610233134.3588011-7-sean.anderson@linux.dev>
+References: <20250610233134.3588011-1-sean.anderson@linux.dev>
+	<20250610233134.3588011-7-sean.anderson@linux.dev>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250609020910.397930-3-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdduudejgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopehsvggrnhdrrghnuggvrhhsohhnsehlihhnuhigrdguvghvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhesl
+ hhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhk
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 2025-06-09 10:08:53, Jiayuan Chen wrote:
-> The selftest can reproduce an issue where using bpf_msg_pop_data() in
-> ktls causes errors on the receiving end.
+Hi Sean,
+
+I only 
+
+On Tue, 10 Jun 2025 19:31:30 -0400
+Sean Anderson <sean.anderson@linux.dev> wrote:
+
+> This adds support for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
+> This is a soft device which converts between GMII and either SGMII,
+> 1000Base-X, or 2500Base-X. If configured correctly, it can also switch
+> between SGMII and 1000BASE-X at runtime. Thoretically this is also possible
+> for 2500Base-X, but that requires reconfiguring the serdes. The exact
+> capabilities depend on synthesis parameters, so they are read from the
+> devicetree.
 > 
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> This device has a c22-compliant PHY interface, so for the most part we can
+> just use the phylink helpers. This device supports an interrupt which is
+> triggered on autonegotiation completion. I'm not sure how useful this is,
+> since we can never detect a link down (in the PCS).
+> 
+> This device supports sharing some logic between different implementations
+> of the device. In this case, one device contains the "shared logic" and the
+> clocks are connected to other devices. To coordinate this, one device
+> registers a clock that the other devices can request.  The clock is enabled
+> in the probe function by releasing the device from reset. There are no othe
+> software controls, so the clock ops are empty.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 > ---
-
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>
-
->  .../selftests/bpf/prog_tests/sockmap_ktls.c   | 91 +++++++++++++++++++
->  .../selftests/bpf/progs/test_sockmap_ktls.c   |  4 +
->  2 files changed, 95 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-> index b6c471da5c28..b87e7f39e15a 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-> @@ -314,6 +314,95 @@ static void test_sockmap_ktls_tx_no_buf(int family, int sotype, bool push)
->  	test_sockmap_ktls__destroy(skel);
->  }
+> Changes in v6:
+> - Move axienet_pcs_fixup to AXI Ethernet commit
+> - Use an empty statement for next label
+> 
+> Changes in v5:
+> - Export get_phy_c22_id when it is used
+> - Expose bind attributes, since there is no issue in doing so
+> - Use MDIO_BUS instead of MDIO_DEVICE
+> 
+> Changes in v4:
+> - Re-add documentation for axienet_xilinx_pcs_get that was accidentally
+>   removed
+> 
+> Changes in v3:
+> - Adjust axienet_xilinx_pcs_get for changes to pcs_find_fwnode API
+> - Call devm_pcs_register instead of devm_pcs_register_provider
+> 
+> Changes in v2:
+> - Add support for #pcs-cells
+> - Change compatible to just xlnx,pcs
+> - Drop PCS_ALTERA_TSE which was accidentally added while rebasing
+> - Rework xilinx_pcs_validate to just clear out half-duplex modes instead
+>   of constraining modes based on the interface.
+> 
+>  MAINTAINERS                  |   6 +
+>  drivers/net/pcs/Kconfig      |  22 ++
+>  drivers/net/pcs/Makefile     |   2 +
+>  drivers/net/pcs/pcs-xilinx.c | 427 +++++++++++++++++++++++++++++++++++
+>  drivers/net/phy/phy_device.c |   3 +-
+>  include/linux/phy.h          |   1 +
+>  6 files changed, 460 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/pcs/pcs-xilinx.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0ac6ba5c40cb..496513837921 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -27060,6 +27060,12 @@ L:	netdev@vger.kernel.org
+>  S:	Orphan
+>  F:	drivers/net/ethernet/xilinx/ll_temac*
 >  
-> +static void test_sockmap_ktls_tx_pop(int family, int sotype)
-> +{
-> +	char msg[37] = "0123456789abcdefghijklmnopqrstuvwxyz\0";
-> +	int c = 0, p = 0, one = 1, sent, recvd;
-> +	struct test_sockmap_ktls *skel;
-> +	int prog_fd, map_fd;
-> +	char rcv[50] = {0};
-> +	int err;
-> +	int i, m, r;
+> +XILINX PCS DRIVER
+> +M:	Sean Anderson <sean.anderson@linux.dev>
+> +S:	Maintained
+> +F:	Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+> +F:	drivers/net/pcs/pcs-xilinx.c
 > +
-> +	skel = test_sockmap_ktls__open_and_load();
-> +	if (!ASSERT_TRUE(skel, "open ktls skel"))
-> +		return;
+>  XILINX PWM DRIVER
+>  M:	Sean Anderson <sean.anderson@seco.com>
+>  S:	Maintained
+> diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
+> index f42839a0c332..e0223914362b 100644
+> --- a/drivers/net/pcs/Kconfig
+> +++ b/drivers/net/pcs/Kconfig
+> @@ -52,4 +52,26 @@ config PCS_RZN1_MIIC
+>  	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
+>  	  pass-through mode for MII.
+>  
+> +config PCS_XILINX
+> +	tristate "Xilinx PCS driver"
+> +	default XILINX_AXI_EMAC
+> +	select COMMON_CLK
+> +	select GPIOLIB
+> +	select MDIO_BUS
+> +	select OF
+> +	select PCS
+> +	select PHYLINK
+> +	help
+> +	  PCS driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
+> +	  This device can either act as a PCS+PMA for 1000BASE-X or 2500BASE-X,
+> +	  or as a GMII-to-SGMII bridge. It can also switch between 1000BASE-X
+> +	  and SGMII dynamically if configured correctly when synthesized.
+> +	  Typical applications use this device on an FPGA connected to a GEM or
+> +	  TEMAC on the GMII side. The other side is typically connected to
+> +	  on-device gigabit transceivers, off-device SERDES devices using TBI,
+> +	  or LVDS IO resources directly.
 > +
-> +	err = create_pair(family, sotype, &c, &p);
-> +	if (!ASSERT_OK(err, "create_pair()"))
-> +		goto out;
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called pcs-xilinx.
 > +
-> +	prog_fd = bpf_program__fd(skel->progs.prog_sk_policy);
-> +	map_fd = bpf_map__fd(skel->maps.sock_map);
-> +
-> +	err = bpf_prog_attach(prog_fd, map_fd, BPF_SK_MSG_VERDICT, 0);
-> +	if (!ASSERT_OK(err, "bpf_prog_attach sk msg"))
-> +		goto out;
-> +
-> +	err = bpf_map_update_elem(map_fd, &one, &c, BPF_NOEXIST);
-> +	if (!ASSERT_OK(err, "bpf_map_update_elem(c)"))
-> +		goto out;
-> +
-> +	err = init_ktls_pairs(c, p);
-> +	if (!ASSERT_OK(err, "init_ktls_pairs(c, p)"))
-> +		goto out;
-> +
-> +	struct {
-> +		int	pop_start;
-> +		int	pop_len;
-> +	} pop_policy[] = {
-> +		/* trim the start */
-> +		{0, 2},
-> +		{0, 10},
-> +		{1, 2},
-> +		{1, 10},
-> +		/* trim the end */
-> +		{35, 2},
-> +		/* New entries should be added before this line */
-> +		{-1, -1},
-> +	};
-> +
-> +	i = 0;
-> +	while (pop_policy[i].pop_start >= 0) {
-> +		skel->bss->pop_start = pop_policy[i].pop_start;
-> +		skel->bss->pop_end =  pop_policy[i].pop_len;
-> +
-> +		sent = send(c, msg, sizeof(msg), 0);
-> +		if (!ASSERT_EQ(sent, sizeof(msg), "send(msg)"))
-> +			goto out;
+>  endmenu
+> diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
+> index 35e3324fc26e..347afd91f034 100644
+> --- a/drivers/net/pcs/Makefile
+> +++ b/drivers/net/pcs/Makefile
+> @@ -10,3 +10,5 @@ obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
+>  obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
+>  obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
+>  obj-$(CONFIG_PCS_RZN1_MIIC)	+= pcs-rzn1-miic.o
+> +obj-$(CONFIG_PCS_ALTERA_TSE)	+= pcs-altera-tse.o
 
-Its possible this could actually not send 38B (sent < 38), but then again
-it is only 38B so I guess it should never fail? Anyways we have this
-case in a few places already I think and its not tripping CI so lets go
-for it.
+There's something strange going-on here, as pcs-altera-tse was removed
+in v6.4 :)
 
-Thanks,
-John
+> +obj-$(CONFIG_PCS_XILINX)	+= pcs-xilinx.o
 
-> +
-> +		recvd = recv_timeout(p, rcv, sizeof(rcv), MSG_DONTWAIT, 1);
-> +		if (!ASSERT_EQ(recvd, sizeof(msg) - pop_policy[i].pop_len, "pop len mismatch"))
-> +			goto out;
+Maxime
 
