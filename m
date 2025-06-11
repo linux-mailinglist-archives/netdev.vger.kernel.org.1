@@ -1,177 +1,148 @@
-Return-Path: <netdev+bounces-196665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F549AD5CAD
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:50:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAE6AD5CD7
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CB271661E4
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97AE33A63C3
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750222036F3;
-	Wed, 11 Jun 2025 16:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C46C20A5E5;
+	Wed, 11 Jun 2025 17:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="n5VnOf12"
+	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="AdfQw0xm"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45412E610F;
-	Wed, 11 Jun 2025 16:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA6A1A317A
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 17:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749660634; cv=none; b=YYQ04DlVtDDKYK/9oZBnlvc9gevSkTDZM1lO5/PmTOTyqqRIffaj5vRFUQRt1FpSOkxBe00NqD3rjY/TqWj/QGWho6DL0zjYRx3VZGZ9WLpOeUjn0rUHl8UxtEGaB7WfBVhRdE8KL6NrBbLuqiHSinTTCz2H1omr04FvWEpuVQM=
+	t=1749661706; cv=none; b=tXZDoz0DFPDnDI1iaaciFFGaVwTtsaD6NGnElXBzGhzsgM7zU6FSfZAVojDwacZZHLEORg/p0Fjg8DUq2e10yRjfn2Jp8GOzNknNZBBHZhizALDF6+sXTdAaeT5eaSyyjz9aTBMzi9nH2ZG/kgVtMH3RK3+qGBw5LtDkhxWFZ1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749660634; c=relaxed/simple;
-	bh=pKeHfuJCvibCVUEiijmqIbl2R3U0gwLuy7BlutemhL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J0upvQa3pjZdK9cz1rA56qs+1sD8iFs51Rw3HzdYCHMT3zfpumF9RKNF/iOR1jzLoDVxZRstbAOqzkB9MMdgKO4BBeRFqDWAUd0B8e8ynipz6TaTzhDj0TbVf2S+7g4EGAAhd8y7VP2vcEk9y6VSLatvh/dU2TES0onTevlZRE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=n5VnOf12; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [100.65.208.185] (unknown [20.236.11.69])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 3DB1F21151A2;
-	Wed, 11 Jun 2025 09:50:30 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3DB1F21151A2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1749660632;
-	bh=FPPX7YYZ8XcYflcrWTpvoOffBT2d5LZYxQ3qxbCqh4s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=n5VnOf12XqDy1EJXmNidNMRRrGTiqAP2sCXq0CDii1u/gxSlrbHUUBZNbDVvNlzvG
-	 pC+FRSOjFzu21Z8Be5lz4e77cvw2ht+jbnG0a00v68Sx9350zHovrdMvXRywTy104j
-	 vnSsJY80Za2jPuW6uSY5Flm3KJYdI4MpQcqyg7fc=
-Message-ID: <789d1112-020f-402e-9fd2-aa6e061879ff@linux.microsoft.com>
-Date: Wed, 11 Jun 2025 09:50:29 -0700
+	s=arc-20240116; t=1749661706; c=relaxed/simple;
+	bh=kRrsCeAqTmErlKC0k5gaTGk9ZNHTyvFfX5wo9NjwhSA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qdN1M8LJvrROW5bvnAK0YJzUW1Db8YL5GnU74nQl5X8xT1CZvT04bhaqNW/dc7S+TsKbqiSQ/Zo1zDORyvFOqnVLEVk1wmrOTylw3WIQ2A23WrGJ3PvuIE7Qoxcf2F3XTxwsXO5rxsp4QMNZKB4hJAR2IcQZS8U5DVkgZQKKe7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=AdfQw0xm; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id 7FE4C240028
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 19:08:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
+	s=1984.ea087b; t=1749661697;
+	bh=kRrsCeAqTmErlKC0k5gaTGk9ZNHTyvFfX5wo9NjwhSA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:From;
+	b=AdfQw0xmrR3sSgDJdg8qjsLfg84fq37iQ6UNJWVn7knVezHi2CNfLvuE42O4Mlx+2
+	 ZuPdZe8Y8RCAIwc0Tq351VB4NDp7ynZZR4SC2TgeR0kV82nGdNKUO1XygJWWH2eH8Y
+	 xDKPfiJZaX17PJLlXzmbSnFob5VWDMceKimy83pOLOt2vngWU/bbQv1PezoE2+yyZQ
+	 lkzvThxdg8sfnzrPrz9fwrZCZ/UjeHREJDD9squVc7vXjauGTydgbpxHm3VC0dbSrm
+	 vcdmLwWpVs1gu1z7St/ztACI2VxfvJyOvCTcTK4/ZUQFVyp21W50tjzvPjyOq1617v
+	 WVMXGU92RIit1iIxJG/oOxM/ztFgQi+bgTXZr5bjfzQncKwgX+cJ+O76R3CRn5rY9f
+	 oqu+23MXaSepCVkjcAVzWbctCvx/GSSko3XENIEwuisKqQt2+5HvWf9EhrAbMhNa7h
+	 lZKGccL1tqCukMlVkAEvMCaTgdOmERyNcy60T5luKCO6zn+rncl
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4bHXDF0DwBz6v04;
+	Wed, 11 Jun 2025 19:08:12 +0200 (CEST)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Martin KaFai Lau
+ <martin.lau@linux.dev>,  Daniel Borkmann <daniel@iogearbox.net>,  John
+ Fastabend <john.fastabend@gmail.com>,  Alexei Starovoitov
+ <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Stanislav
+ Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>,  Feng Yang <yangfeng@kylinos.cn>,  Tejun Heo
+ <tj@kernel.org>,  Network Development <netdev@vger.kernel.org>,  LKML
+ <linux-kernel@vger.kernel.org>,  bpf <bpf@vger.kernel.org>,
+  syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+Subject: Re: [PATCH bpf-next v2] net: Fix RCU usage in task_cls_state() for
+ BPF programs
+In-Reply-To: <CAADnVQJu3fYTfdRTWxeB5hraqe3_Esm7cgKfO38nxodknABeHg@mail.gmail.com>
+References: <20250611-rcu-fix-task_cls_state-v2-1-1a7fc248232a@posteo.net>
+	<CAADnVQJu3fYTfdRTWxeB5hraqe3_Esm7cgKfO38nxodknABeHg@mail.gmail.com>
+Date: Wed, 11 Jun 2025 17:07:49 +0000
+Message-ID: <871prqyzoa.fsf@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] Drivers: hv: Fix warnings for missing export.h header
- inclusion
-To: Naman Jain <namjain@linux.microsoft.com>,
- "K . Y . Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H . Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Konstantin Taranov <kotaranov@microsoft.com>,
- Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>,
- Shiraz Saleem <shirazsaleem@microsoft.com>,
- Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
- Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20250611100459.92900-1-namjain@linux.microsoft.com>
- <20250611100459.92900-2-namjain@linux.microsoft.com>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <20250611100459.92900-2-namjain@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 6/11/2025 3:04 AM, Naman Jain wrote:
-> Fix below warning in Hyper-V drivers that comes when kernel is compiled
-> with W=1 option. Include export.h in driver files to fix it.
-> * warning: EXPORT_SYMBOL() is used, but #include <linux/export.h>
-> is missing
-> 
-> Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
-> ---
->  drivers/hv/channel.c           | 1 +
->  drivers/hv/channel_mgmt.c      | 1 +
->  drivers/hv/hv_proc.c           | 1 +
->  drivers/hv/mshv_common.c       | 1 +
->  drivers/hv/mshv_root_hv_call.c | 1 +
->  drivers/hv/ring_buffer.c       | 1 +
->  6 files changed, 6 insertions(+)
-> 
-> diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
-> index 35f26fa1ffe7..7c7c66e0dc3f 100644
-> --- a/drivers/hv/channel.c
-> +++ b/drivers/hv/channel.c
-> @@ -18,6 +18,7 @@
->  #include <linux/uio.h>
->  #include <linux/interrupt.h>
->  #include <linux/set_memory.h>
-> +#include <linux/export.h>
->  #include <asm/page.h>
->  #include <asm/mshyperv.h>
->  
-> diff --git a/drivers/hv/channel_mgmt.c b/drivers/hv/channel_mgmt.c
-> index 6e084c207414..65dd299e2944 100644
-> --- a/drivers/hv/channel_mgmt.c
-> +++ b/drivers/hv/channel_mgmt.c
-> @@ -20,6 +20,7 @@
->  #include <linux/delay.h>
->  #include <linux/cpu.h>
->  #include <linux/hyperv.h>
-> +#include <linux/export.h>
->  #include <asm/mshyperv.h>
->  #include <linux/sched/isolation.h>
->  
-> diff --git a/drivers/hv/hv_proc.c b/drivers/hv/hv_proc.c
-> index 7d7ecb6f6137..fbb4eb3901bb 100644
-> --- a/drivers/hv/hv_proc.c
-> +++ b/drivers/hv/hv_proc.c
-> @@ -6,6 +6,7 @@
->  #include <linux/slab.h>
->  #include <linux/cpuhotplug.h>
->  #include <linux/minmax.h>
-> +#include <linux/export.h>
->  #include <asm/mshyperv.h>
->  
->  /*
-> diff --git a/drivers/hv/mshv_common.c b/drivers/hv/mshv_common.c
-> index 2575e6d7a71f..6f227a8a5af7 100644
-> --- a/drivers/hv/mshv_common.c
-> +++ b/drivers/hv/mshv_common.c
-> @@ -13,6 +13,7 @@
->  #include <linux/mm.h>
->  #include <asm/mshyperv.h>
->  #include <linux/resume_user_mode.h>
-> +#include <linux/export.h>
->  
->  #include "mshv.h"
->  
-> diff --git a/drivers/hv/mshv_root_hv_call.c b/drivers/hv/mshv_root_hv_call.c
-> index a222a16107f6..c9c274f29c3c 100644
-> --- a/drivers/hv/mshv_root_hv_call.c
-> +++ b/drivers/hv/mshv_root_hv_call.c
-> @@ -9,6 +9,7 @@
->  
->  #include <linux/kernel.h>
->  #include <linux/mm.h>
-> +#include <linux/export.h>
->  #include <asm/mshyperv.h>
->  
->  #include "mshv_root.h"
-> diff --git a/drivers/hv/ring_buffer.c b/drivers/hv/ring_buffer.c
-> index 3c9b02471760..23ce1fb70de1 100644
-> --- a/drivers/hv/ring_buffer.c
-> +++ b/drivers/hv/ring_buffer.c
-> @@ -18,6 +18,7 @@
->  #include <linux/slab.h>
->  #include <linux/prefetch.h>
->  #include <linux/io.h>
-> +#include <linux/export.h>
->  #include <asm/mshyperv.h>
->  
->  #include "hyperv_vmbus.h"
+Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 
-Reviewed-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+> On Wed, Jun 11, 2025 at 2:04=E2=80=AFAM Charalampos Mitrodimas
+> <charmitro@posteo.net> wrote:
+>>
+>> The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
+>> types") made bpf_get_cgroup_classid_curr helper available to all BPF
+>> program types, not just networking programs.
+>>
+>> This helper calls __task_get_classid() which internally calls
+>> task_cls_state() requiring rcu_read_lock_bh_held(). This works in
+>> networking/tc context where RCU BH is held, but triggers an RCU
+>> warning when called from other contexts like BPF syscall programs that
+>> run under rcu_read_lock_trace():
+>>
+>>   WARNING: suspicious RCU usage
+>>   6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
+>>   -----------------------------
+>>   net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usa=
+ge!
+>>
+>> Fix this by also accepting rcu_read_lock_trace_held() as a valid RCU
+>> context in the task_cls_state() function. This is safe because BPF
+>> programs are non-sleepable and task_cls_state() is only doing an RCU
+>> dereference to get the classid.
+>>
+>> Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=3Db4169a1cfb945d2ed0ec
+>> Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
+>> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
+>> ---
+>> Changes in v2:
+>> - Fix RCU usage in task_cls_state() instead of BPF helper
+>> - Add rcu_read_lock_trace_held() check to accept trace RCU as valdi
+>>   context
+>> - Drop the approach of using task_cls_classid() which has in_interrupt()
+>>   check
+>> - Link to v1: https://lore.kernel.org/r/20250608-rcu-fix-task_cls_state-=
+v1-1-2a2025b4603b@posteo.net
+>> ---
+>>  net/core/netclassid_cgroup.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
+>> index d22f0919821e931fbdedf5a8a7a2998d59d73978..df86f82d747ac40e99597d6f=
+2d921e8cc2834e64 100644
+>> --- a/net/core/netclassid_cgroup.c
+>> +++ b/net/core/netclassid_cgroup.c
+>> @@ -21,7 +21,8 @@ static inline struct cgroup_cls_state *css_cls_state(s=
+truct cgroup_subsys_state
+>>  struct cgroup_cls_state *task_cls_state(struct task_struct *p)
+>>  {
+>>         return css_cls_state(task_css_check(p, net_cls_cgrp_id,
+>> -                                           rcu_read_lock_bh_held()));
+>> +                                           rcu_read_lock_bh_held() ||
+>> +                                           rcu_read_lock_trace_held()));
+>
+> This is incomplete. It only addresses one particular syzbot report.
+> It needs to include rcu_read_lock_held() as well.
+
+To which other report you are refering to?
+
+>
+> pw-bot: cr
 
