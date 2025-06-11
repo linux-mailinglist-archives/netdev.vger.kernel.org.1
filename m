@@ -1,208 +1,149 @@
-Return-Path: <netdev+bounces-196608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26318AD58BA
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:29:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 951E0AD58E8
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E840189AADC
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:29:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B7F8189F57F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0693C28C876;
-	Wed, 11 Jun 2025 14:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1CF2749C2;
+	Wed, 11 Jun 2025 14:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FpiEgkrj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fA9scOt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B432882DD;
-	Wed, 11 Jun 2025 14:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E48E1865FA;
+	Wed, 11 Jun 2025 14:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749652151; cv=none; b=Q3gRHeCOGomykeYkcloBWvFl62v0D7cnu+7wK9UTO+fLe9NiwnhC2MbVkvBjdD1Al0ejY/tAGDWqXOCPIygPNWem2w7tLVOUet4dBvjRw/2ffPybzFsVuHUmA/K3qbNxb2g5dLz8yA7xd8KhJa1lf1UcwxZNCF8l68CdO8AIums=
+	t=1749652652; cv=none; b=RqsvIYDD4e5TICI2gPAlnW4yoggGzgMR/MdjOvNQD3rOph748EdKerEdCgu/76zYq6FZljgbfVmKawvNshXhMkmhnP4B8VQwCahTiJV50knZuX0bw7qG2/Uyr0hiJIxIwfQUkeVXwhWiSURAivzRxGadRgUgfWrkx5zSg1EEvEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749652151; c=relaxed/simple;
-	bh=UxNA7j6sLsgsrjFV1dPxluvU1vzmXNZ8ByJQsQehtIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Txw1qEhTFG/8TBDsCetIBvx9BO7sJyk/eEvVNy5oLzcj9o60yXCd1hEZVmgQigvAswEFeilmaR3ev8LVoou1Do3K4M+mS8HX6gytiRORsZHCo66dR0Pn5Pb16AINrtaVfGAHk6JaFyDudYSHWxDbDS4HQGXxBzQrSvHXZwX416Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FpiEgkrj; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1749652652; c=relaxed/simple;
+	bh=lP770bZ1D8klIhRSLVtQSTgWgmEEE7/etBWV1RRYVPE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Q/rGqwhNXPoZY+kfQLVdJwOs6QaG+PijkVuvY56qU36TxfE13VwKf1d0W3OcG6wA6Xk8Pe8HrwfCTltRQBgwA8wAHCdNKLcGGBJXn44XDrkKsbOKPTlg5Z04xzx/au8Uhad/PunXCNoQyhvY5PlcxFa0tkdP6Fxr+o0zxyMPsus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fA9scOt8; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a35c894313so5940635f8f.2;
-        Wed, 11 Jun 2025 07:29:09 -0700 (PDT)
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6fae8838c1aso307936d6.2;
+        Wed, 11 Jun 2025 07:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749652148; x=1750256948; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5y5kfhj5cbce1cwVnaZbUHmhhz08gC5FIwyfzGaoaCo=;
-        b=FpiEgkrjkQZxgF5ZBMdy+Pm4xBj24jIVJ1v4wBER/tsxezVwimJP81S/LCXf64UhML
-         NP/muKQlHw7VfrBmAYsUw3cyP105+ICBL/kP7/kBQAgOUIv6/FDbPAs8uu8kbxiqH/Ip
-         siC4Bny3SXOXa2xhK+YAZscWJO9DLC7FMmJJdCyUKaLyZs2/HLgMJ2WYAnf5aJnJpmLJ
-         FCgYqp1c3z8UWJvUuF7aGBvetO0zn6NvbOeA7L/qiqW/AeecY8b5uBZJp/5fK3+3Nsu7
-         gRIoyhwPBV3ydvMOsCI7/zbGXq78ldGdd9wHD4i2r/J1Ict/Kln1QK5MGIyx1L/MC2kI
-         sG9A==
+        d=gmail.com; s=20230601; t=1749652649; x=1750257449; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BgV3v5SPPWzgcce8CqjU5pHfWiAeujETQN1ykorZ1jI=;
+        b=fA9scOt8qC0qbJsmwdm1HELYKX+mRe/RIKCd1Rpi0p3j0fezRaGVEADeZwXE0KgddH
+         6NUeXhBCF0RmKln3f9jCmW8J3/Q8r7fWdajmEADc2Bl489snE+UqR8mij/MZvOCxEwDm
+         N8NsN6MtjLh0ASLmUVkZcVAajJ/rVGYyt+30y/BOPqlE7J/cnm+ti1ALtlqOQp4nZqmq
+         p4RnmQUNPigIQhtOCdA0VZ/DQGAyT3Pg5mXDsNYE5nSV3GT2fQ3nwP0ELuQg6LTpASxL
+         4mNBJ56HD4Xf+hNh/OnJcH2e1TbTPO3AB4DRCI6GxctiXxFSj47wyxgjmK385RrWfcKK
+         L5PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749652148; x=1750256948;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5y5kfhj5cbce1cwVnaZbUHmhhz08gC5FIwyfzGaoaCo=;
-        b=YIOGJs9nO/IcWbKY+Y5ZRgofEP25YLijGqY8y9IGGOXdkLnF6QCRQgUS7sXRG8xk3u
-         Wl/L91FXZX22+7UtE7p6EESaI1nxVKjsP5SXpZyUB83baUtxV9axkLGnWM7/haKL7Zi+
-         vHbH2UoEWfTwjaPwJs0QsCzZQGlJPyO7g97wJUP8dULYw5GAei3liYwrYAaLnzJ66X5E
-         XyPP0UwMHG4x4vwJL+jABhtYxdwBar7gMTHj1nEyisqa05QdDYVIY13OkT37sz8I08U5
-         snfYSg9uV81y1OPBEh74GhO96WvJQZroISlu7XAxIuO3Q0xt+RdiWm6d5JwVabfeR/Fj
-         46Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3xB4BDgbcmyb7XKOrp3qEbqXhV8o8dFl9De2fir/2qOwFioouUfdI6dNw7DbdiIkbfaSdeCSA6+/Vfw==@vger.kernel.org, AJvYcCUzZRFonfet7t2F4wc3/XkQNlobpgUdirluW0sNQozIgXrdXiqA9voyBxcRKAlC4zvkrBTlvoi3wPGWGFBl@vger.kernel.org, AJvYcCXTe80VQKDn2/3f0dWZ3vMN0hdLXIXE59vsYrrp7ElNz4gBw2jUNGEJf9Z9Ii36ZOqAguU=@vger.kernel.org, AJvYcCXUmeB2DrnKASDcO76jug7cx8r46cWxTPYsYQjsxlLDcZEMd3JA8OxoOh2HzCUcYA2y7JESh2Wt@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLR0gAB1MlTJAQLZDAfcA96fML+VC49CO1D2S6qRgsiaS88sx6
-	oMzij8gkftiBFaRJMRm4EtK+Uo/4UpnfocUd4RIpQlvpsUwjtys97ENN
-X-Gm-Gg: ASbGncsiTq+l/KvGChIvtKxKICuQH2Etk61bhtQS9PcVQE46u2Hxit+8FNCSSXxtKvx
-	27CdkUxipAl7Ss1Eck7V7e6O5IOHd9vxeHoc+I422zJF6v20TR3czE8c1JlsYuRrnqYd0e5v3N/
-	3cFyxxUjdvfJeilVOOCobrEnh/z0AEFkAWY+63lieA1dfKpGBKnrPlJeAIEPLS+2Uh/xKkHGOwu
-	/y0/CrXcgTe1OGJV3TF9ba1RjWKNsoS2STZNOW45NF/Wo5BZn/RHpKMklJZRAo/6OjtcnmKwgNR
-	oykq1xF+q7J+1vuTyv0zZxVPvK9SG55t2abdSxUZZh/A1ih99vBGvEx3cPUEISwALoPhSnA=
-X-Google-Smtp-Source: AGHT+IHmkB8/NBjZkYtctHG9v624zEnD1N4W2D/2KDPOKG11BkanIXfCpmFC/D77CHTnUyMvt0ZpaQ==
-X-Received: by 2002:a05:6000:250e:b0:3a3:727d:10e8 with SMTP id ffacd0b85a97d-3a558a1e2a2mr2708910f8f.50.1749652147978;
-        Wed, 11 Jun 2025 07:29:07 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.145.22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45320562afbsm35319785e9.1.2025.06.11.07.29.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jun 2025 07:29:07 -0700 (PDT)
-Message-ID: <937e62c5-0d12-4bea-b0c1-a267c491cf72@gmail.com>
-Date: Wed, 11 Jun 2025 15:30:28 +0100
+        d=1e100.net; s=20230601; t=1749652649; x=1750257449;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BgV3v5SPPWzgcce8CqjU5pHfWiAeujETQN1ykorZ1jI=;
+        b=gd3bh0GIi7MnS3+t2BzWblMxCX8KwBdaVSU6G7Dv0aDujpYXK4re/q01HCsr7UuiWt
+         HjYOLoYpv0F7eGHm8CXFPzfzul19nfpCl3yQx7eYzliTY2BZ0k1Z/xblNdGlWgSoXhhm
+         A7RWNVTJu7HUBEQNuZC9oc62My3A+2BJurh0lCLzpCEkRwaun0B/h37v5SYSfpg6EoT8
+         Q97punqivE2IcP558ldp/ZJ8q3hYbE++PifdNZmr4DCn5ZxqC2RHIn1a860SwRQNAJWw
+         FFDDOvSNk4X373hWsNdtOXnW+9v0AHywL/fbQTcsBCzkXDScfJa4alqFPbCtqgTo8Wmq
+         y/fA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6Wzmoo5HyiqpxGqmP1hvQtsb+kgEm0R6cp9hRSGdK65+x1jcqwutLqJXfKdmFJ9Te2r/58X0KM98=@vger.kernel.org, AJvYcCV3hiNffiQ31hP9bWCE8PnIZZKWtmfnNr3l2NID+DRXHcni047W0z28M3xezTBxXm574MTIVkLnbwiUHmLn@vger.kernel.org, AJvYcCXsmWGAZSiuxVhe8s2W/O6OFYLVLmJ+5Q2kS/2cqCEY3/GJW+HYLSfAZF77wLw634Ah7mylHO2BHwsqpfnD5D99@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPR7emUP4B//hmrCRssmLwmfL8bt+D9AuCzui2DocR+M4esvo/
+	A5GOKTh5DaZg++fzZVKCwbh+sK0dPHh+oPOqmFub6ui++/VMt0cd72kiDRjKce4Iajg=
+X-Gm-Gg: ASbGncsjMbQ9l4jd6QMDhAwofAqILml/abb5wqQj9lNsljYaMeta77zvoKD0mGuHGpy
+	69jwClcBwIGFrw3aoYSZO80wt1xpvLUkk52C1gMNhPg0AvbQI5AKhZxK4qVBVE8SmL029yraGnx
+	kxvlftK+4TbrOmomeT9jmUk0Pul1+Gj1zjV4ZdFcQg5NpOsoDZ92gnkAqVbrtIoeimwYPdpwxsW
+	qghtLiffAKylq8I8AssB0obCmPF1bnXhIeowjCUol35rc+4Ytw2b2jB7QbYaLxO2XPZ9a8JdkOp
+	H3hImyu7aNBov2zFL7u5IHzgrWJjCYN4V913ujYikKIz9LyoKY894Ng=
+X-Google-Smtp-Source: AGHT+IFZqBVl/qLyo7aucRRJSwROpq10T0edSvlAYOD6FEKlO5S9bmObYcShGgPbt1faHpN6NIml4w==
+X-Received: by 2002:a05:6214:b6d:b0:6fa:ed19:2566 with SMTP id 6a1803df08f44-6fb2c31ea88mr22241426d6.2.1749652649092;
+        Wed, 11 Jun 2025 07:37:29 -0700 (PDT)
+Received: from localhost ([2a03:2880:20ff:1::])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d25a61d73csm871410885a.98.2025.06.11.07.37.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 07:37:28 -0700 (PDT)
+From: Gustavo Luiz Duarte <gustavold@gmail.com>
+Subject: [PATCH net-next 0/5] netconsole: Add support for msgid in sysdata
+Date: Wed, 11 Jun 2025 07:36:02 -0700
+Message-Id: <20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 9/9] page_pool: access ->pp_magic through struct
- netmem_desc in page_pool_page_is_pp()
-To: Byungchul Park <byungchul@sk.com>, Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
- kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
- hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net,
- john.fastabend@gmail.com, andrew+netdev@lunn.ch, toke@redhat.com,
- tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- vishal.moola@gmail.com
-References: <20250609043225.77229-1-byungchul@sk.com>
- <20250609043225.77229-10-byungchul@sk.com>
- <CAHS8izMLnyJNnK-K-kR1cSt0LOaZ5iGSYsM2R=QhTQDSjCm8pg@mail.gmail.com>
- <20250610014500.GB65598@system.software.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250610014500.GB65598@system.software.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFKUSWgC/x2MQQqAIBAAvxJ7TrAiyb4SHcpWWygNNyKI/t7Sc
+ WBmHmDMhAx98UDGi5hSFKjKAtw6xYCKFmGodd1qo62KeLoUOW2odg60qNk2zvgOrTMaJDsyerr
+ /5QBiS3GfML7vB9Cghm9sAAAA
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Gustavo Luiz Duarte <gustavold@gmail.com>
+X-Mailer: b4 0.13.0
 
-On 6/10/25 02:45, Byungchul Park wrote:
-> On Mon, Jun 09, 2025 at 10:39:06AM -0700, Mina Almasry wrote:
->> On Sun, Jun 8, 2025 at 9:32 PM Byungchul Park <byungchul@sk.com> wrote:
->>>
->>> To simplify struct page, the effort to separate its own descriptor from
->>> struct page is required and the work for page pool is on going.
->>>
->>> To achieve that, all the code should avoid directly accessing page pool
->>> members of struct page.
->>>
->>> Access ->pp_magic through struct netmem_desc instead of directly
->>> accessing it through struct page in page_pool_page_is_pp().  Plus, move
->>> page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
->>> without header dependency issue.
->>>
->>> Signed-off-by: Byungchul Park <byungchul@sk.com>
->>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->>> ---
->>>   include/linux/mm.h   | 12 ------------
->>>   include/net/netmem.h | 14 ++++++++++++++
->>>   mm/page_alloc.c      |  1 +
->>>   3 files changed, 15 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/include/linux/mm.h b/include/linux/mm.h
->>> index e51dba8398f7..f23560853447 100644
->>> --- a/include/linux/mm.h
->>> +++ b/include/linux/mm.h
->>> @@ -4311,16 +4311,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
->>>    */
->>>   #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->>>
->>> -#ifdef CONFIG_PAGE_POOL
->>> -static inline bool page_pool_page_is_pp(struct page *page)
->>> -{
->>> -       return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
->>> -}
->>> -#else
->>> -static inline bool page_pool_page_is_pp(struct page *page)
->>> -{
->>> -       return false;
->>> -}
->>> -#endif
->>> -
->>>   #endif /* _LINUX_MM_H */
->>> diff --git a/include/net/netmem.h b/include/net/netmem.h
->>> index d84ab624b489..8f354ae7d5c3 100644
->>> --- a/include/net/netmem.h
->>> +++ b/include/net/netmem.h
->>> @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
->>>    */
->>>   static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
->>>
->>> +#ifdef CONFIG_PAGE_POOL
->>> +static inline bool page_pool_page_is_pp(struct page *page)
->>> +{
->>> +       struct netmem_desc *desc = (struct netmem_desc *)page;
->>> +
->>> +       return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
->>> +}
->>> +#else
->>> +static inline bool page_pool_page_is_pp(struct page *page)
->>> +{
->>> +       return false;
->>> +}
->>> +#endif
->>> +
->>>   /* net_iov */
->>>
->>>   DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
->>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->>> index 4f29e393f6af..be0752c0ac92 100644
->>> --- a/mm/page_alloc.c
->>> +++ b/mm/page_alloc.c
->>> @@ -55,6 +55,7 @@
->>>   #include <linux/delayacct.h>
->>>   #include <linux/cacheinfo.h>
->>>   #include <linux/pgalloc_tag.h>
->>> +#include <net/netmem.h>
->>
->> mm files starting to include netmem.h is a bit interesting. I did not
->> expect/want dependencies outside of net. If anything the netmem stuff
->> include linux/mm.h
-> 
-> That's what I also concerned.  However, now that there are no way to
-> check the type of memory in a general way but require to use one of pp
-> fields, page_pool_page_is_pp() should be served by pp code e.i. network
-> subsystem.
-> 
-> This should be changed once either 1) mm provides a general way to check
-> the type or 2) pp code is moved to mm code.  I think this approach
-> should acceptable until then.
+This patch series introduces a new feature to netconsole which allows
+appending a message ID to the userdata dictionary.
 
-I'd argue in the end the helper should be in mm.h as mm is going to
-dictate how to check the type and keep them enumerated.
+If the msgid feature is enabled, the message ID is built from a per-target 32
+bit counter that is incremented and appended to every message sent to the target.
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+Example::
+  echo 1 > "/sys/kernel/config/netconsole/cmdline0/userdata/msgid_enabled"
+  echo "This is message #1" > /dev/kmsg
+  echo "This is message #2" > /dev/kmsg
+  13,434,54928466,-;This is message #1
+   msgid=1
+  13,435,54934019,-;This is message #2
+   msgid=2
 
+This feature can be used by the target to detect if messages were dropped or
+reordered before reaching the target. This allows system administrators to
+assess the reliability of their netconsole pipeline and detect loss of messages
+due to network contention or temporary unavailability.
+
+Suggested-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
+
+Note to maintainer:
+This will conflict with a fix I sent recently to net:
+
+c85bf1975108 netconsole: fix appending sysdata when sysdata_fields ==
+SYSDATA_RELEASE
+
+Please let me know if I should rebase at some point and send a v2.
+
+---
+Gustavo Luiz Duarte (5):
+      netconsole: introduce 'msgid' as a new sysdata field
+      netconsole: implement configfs for msgid_enabled
+      netconsole: append msgid to sysdata
+      selftests: netconsole: Add tests for 'msgid' feature in sysdata
+      docs: netconsole: document msgid feature
+
+ Documentation/networking/netconsole.rst            | 22 +++++++
+ drivers/net/netconsole.c                           | 67 +++++++++++++++++++++-
+ .../selftests/drivers/net/netcons_sysdata.sh       | 30 ++++++++++
+ 3 files changed, 118 insertions(+), 1 deletion(-)
+---
+base-commit: 0097c4195b1d0ca57d15979626c769c74747b5a0
+change-id: 20250609-netconsole-msgid-b93c6f8e9c60
+
+Best regards,
 -- 
-Pavel Begunkov
+Gustavo Luiz Duarte <gustavold@gmail.com>
 
 
