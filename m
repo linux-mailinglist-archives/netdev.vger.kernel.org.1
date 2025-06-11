@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-196532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 730A0AD531D
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:07:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA20DAD5338
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F07B1E0795
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E10923B324D
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF49025BF15;
-	Wed, 11 Jun 2025 11:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11879273D63;
+	Wed, 11 Jun 2025 11:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="E1sqL85o"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JdWjFfyP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAFF25BF0F
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAB025BF18
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639748; cv=none; b=UWerGotJltXoX13pRO6GXS+3wbPGLsivVIUXiX4lMCc1B9fxHNe3984Pxy/1Xu244nhzuWqwAV/zLC9IOuapFdyC5rLfmQf4GtRULPe8jnOuvzvpacSJdS2s/MoF12LBLZXoUOWQ0RH+ht+ibWeY7es5+RkK1S7IW02c12y1Sik=
+	t=1749639752; cv=none; b=iKy+4Ybd7osdzQNFIOzi5c0lwsPwZU1LRgWXPJJ0bkDylN8gAEJftXtgJPRfK1Gj6BDO/pC4oBcIWdYdOhAq2fbKohor0qMuzJB6BTU/BLBLP+uDJnhITXUQB47gzQ1gi47O9avYNg/jBwlSmpQ1BkKO+MMi9DNWzxC9aJqGq2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639748; c=relaxed/simple;
-	bh=9rynKM3mPNIwedipk4tRrJ2GKg88+7GjCvAGhePAOO8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oaspw6Hhr3KXriOZKNB/pdJQpCcJByiwwvLI6Po4RuC/dU2prKBAAMUvBcHx2Q9zDwvYSDyaYvqga09Id0YGJeMzCAOBDC9/3E8IutC28cIuh4PR7zFZg1dgQu7nO6uvh/nDS2b+3Y5cZlsR45gWA5fr7cW1qaU6tBAaS3Le0Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=E1sqL85o; arc=none smtp.client-ip=67.231.156.173
+	s=arc-20240116; t=1749639752; c=relaxed/simple;
+	bh=m6y12H/3/cH3cCp8WPDS6QMDBHq/n/tnayCKOpzQexk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d3AUm8Jgvg0MYMrMSjkJm4NDH5TdHXG9vGZzSCl0dSTBUlbAv7TafujQi4KMNTqK76eUuxy6rpgBbIOF2IXa7TooKQ3M+9X0la1VYCnOoIHRPix8AYgd5tDAGnVzXu+0GzrKNm/iNDOovNElYqbfTxHlkbVTDjOMCxKnS0Cawq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JdWjFfyP; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55B8Wn0K025175;
-	Wed, 11 Jun 2025 04:02:05 -0700
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55B8geo1032670;
+	Wed, 11 Jun 2025 04:02:11 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=U2gZBZWrnfdRnSfMn142SCZqeEx1hYN8YSYcfqf3avY=; b=E1s
-	qL85oB1/qh+9ZHCfLd4N2ShslDIHSUCm3z7rVYTVwjLgY0kU12pFcIShHhmzwjiR
-	OszYdNN2wSphXBF39rzG9wa+5jg4b83LpOsLW3A3TmKeq4AnH+NPrwRQb+5X93xs
-	LGPg4cvj+tx2nf8f9pNVTG9keEIaCarZST9wiPeWeF1CQ0uofHGpf34qRS/u3CNS
-	Qegtq7v68mAC33VOoSH6tPzbKpah2bMVvquen3sK8RrIKzC/Tw8wyQV2VDqYT46H
-	RyRK2KUweO9xN6+kauI6kPkKGTvq/AQ4drtOV2qQg7uQyeigQ5sfslfgM7bNyOEI
-	HnsT/10NmsTNZp5sqPQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4769bn49hk-1
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=BGFqk3h9uE3ODc3DkxJuIg+gI
+	mdyAEruKExZS7VU4ls=; b=JdWjFfyPO7cTHa7vAKCTU0yQSE8gDGJdmOvRnnT/s
+	7tDdKAz8vjRG8IPskU1LAwXMe8YP3mYoSNkYYXGM7CtVpJgeKYwIOQGTuwnYS+LU
+	89bDPs0I1Wb1mc9c1xxINsHWs+ONN5Bk07K+hXXCoU7d4xc3G7iqMUXwV12RGHDc
+	o8kPcsETepNOmM+py+IU4k2aokem9GzC/ATbiyvsUmkA0Uj2ez8Jcfeu690iA1+W
+	gNu+HOMyt0bABrQxb5ANaKlsgOLvPY2x6ZLqzaDq61LAFQ/hui33NzQK64dxfYdb
+	fH6oOuOeLKIhOeX834XufC51iDLELYBaiMjYLnidql4hQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 47741jgjyb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Jun 2025 04:02:04 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Wed, 11 Jun 2025 04:02:11 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 11 Jun 2025 04:02:03 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 11 Jun 2025 04:02:03 -0700
+ 15.2.1544.4; Wed, 11 Jun 2025 04:02:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 11 Jun 2025 04:02:09 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 29FFA3F706A;
-	Wed, 11 Jun 2025 04:01:58 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 385233F706A;
+	Wed, 11 Jun 2025 04:02:03 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>
@@ -64,10 +65,12 @@ CC: <netdev@vger.kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
         <jerinj@marvell.com>, <saikrishnag@marvell.com>,
         Subbaraya Sundeep
 	<sbhatta@marvell.com>
-Subject: [net-next v11 0/6] CN20K silicon with mbox support
-Date: Wed, 11 Jun 2025 16:31:50 +0530
-Message-ID: <1749639716-13868-1-git-send-email-sbhatta@marvell.com>
+Subject: [net-next v11 1/6] octeontx2: Set appropriate PF, VF masks and shifts based on silicon
+Date: Wed, 11 Jun 2025 16:31:51 +0530
+Message-ID: <1749639716-13868-2-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1749639716-13868-1-git-send-email-sbhatta@marvell.com>
+References: <1749639716-13868-1-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,175 +78,1597 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDA5NCBTYWx0ZWRfX8JxwHRHqEpL9 rQ2inLUjEbS9ftxJssJzns3vZ3rIq8Fp8Y4jU54CryqgJIt/idAQmckgO7Y4+5+JmqW0y9AqCb9 Nr8NqXfqHwBA8BjuMOBQth/EKnfs6lmOJA48HC8qQ/lbTgDFBMpPHHcEre9ZSWWE8C47TVywtoS
- w1v9zjxRJRZMXchCxX0W2xjPcQpwoWKC0yA9Cd9x4y7t8FS4F6whhwHNqK43ox2SclH/8MoLvA8 Cbu/vsuYcnDcTPCCIvtYlipaqKRKw/2CGEp/G/6sX94NjTYoEObbXvwyZqLjpIxJP2Cb3tLtOwB YVq9FDGqVCJa7+i4JUefRb4YYNP5n+lti4xD+u7n8ngPb7XHs0pzmK4R3tEUHoVBY/qb/zqb3m1
- l1YLp1JAZ9E5+ctOasqKKeRSQI6Y8o2x8JSmrHNIznuDMxXNSjI/dl/FQC7G/s/NWT8uTwtl
-X-Proofpoint-ORIG-GUID: YqSfZIxuGSItNyrSTtVFDXbeJhQNI8rS
-X-Proofpoint-GUID: YqSfZIxuGSItNyrSTtVFDXbeJhQNI8rS
-X-Authority-Analysis: v=2.4 cv=ZuDtK87G c=1 sm=1 tr=0 ts=6849622c cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=6IFa9wvqVegA:10 a=I60V7ryXsXke0IewSq0A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDA5NCBTYWx0ZWRfX+YwPOKRpPOGy dofLSUGorsJX0XA2bweToW8tiHcXy6aPMaI4N1VAW+k+1AK+dv349WiOi5RNeyZgAmMW5NGoJ7J cVBrFt4pZlcPsoIsE9xmq1EkNB73V2P9jVK6S3uCcb7zwz9vhUib/yR6BIZX3sd6b733xh1wwwS
+ zUNNniZyy9URjP1y2ppEUUlsxLuEZItWn8L3zyaBiZAzR8of5KyArR63M50DcBq2rXnylMZEyrk Xz3iWQJrmVHieTtgPto23clMxnx/JTqAuN0fKTG7Zj2yHEBE3MdQ+HUjr/IPMwFq5Uf26SZfaDP 1QQz5LCSNQWNMkRjm5wHThrrKNzz599Grmgiq5NNs8UzqU4cGqE3qmUNJm41DZ2TLN8+Eu+vivG
+ obY4d9ZFqNrj8cmoVo44Fe/bIau3cVmV1Fw1TQ0LJyee7U1oyreCQhpTKJt05x//uqBsxwHk
+X-Proofpoint-GUID: auAAFf1u6qIuDPDI4qGo-F0kgb-Qs_lr
+X-Proofpoint-ORIG-GUID: auAAFf1u6qIuDPDI4qGo-F0kgb-Qs_lr
+X-Authority-Analysis: v=2.4 cv=eM4TjGp1 c=1 sm=1 tr=0 ts=68496233 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=WsazfGDJ1GmOAQOuEVkA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-06-11_04,2025-06-10_01,2025-03-28_01
 
-CN20K is the next generation silicon in the Octeon series with various
-improvements and new features.
+Number of RVU PFs on CN20K silicon have increased to 96 from maximum
+of 32 that were supported on earlier silicons. Every RVU PF and VF is
+identified by HW using a 16bit PF_FUNC value. Due to the change in
+Max number of PFs in CN20K, the bit encoding of this PF_FUNC has changed.
 
-Along with other changes the mailbox communication mechanism between RVU
-(Resource virtualization Unit) SRIOV PFs/VFs with Admin function (AF) has
-also gone through some changes.
+This patch handles the change by using helper functions(using silicon
+check) to use PF,VF masks and shifts to support both new silicon CN20K,
+OcteonTx series. These helper functions are used in different modules.
 
-Some of those changes are
-- Separate IRQs for mbox request and response/ack.
-- Configurable mbox size, default being 64KB.
-- Ability for VFs to communicate with RVU AF instead of going through
-  parent SRIOV PF.
+Also moved the NIX AF register offset macros to other files which
+will be posted in coming patches.
 
-Due to more memory requirement due to configurable mbox size, mbox memory
-will now have to be allocated by
-- AF (PF0) for communicating with other PFs and all VFs in the system.
-- PF for communicating with it's child VFs.
-
-On previous silicons mbox memory was reserved and configured by firmware.
-
-This patch series add basic mbox support for AF (PF0) <=> PFs and
-PF <=> VFs. AF <=> VFs communication and variable mbox size support will
-come in later.
-
-Patch #1 Supported co-existance of bit encoding PFs and VFs in 16-bit
-         hardware pcifunc format between CN20K silicon and older octeon
-         series. Also exported PF,VF masks and shifts present in mailbox
-         module to all other modules.
-
-Patch #2 Added basic mbox operation APIs and structures to support both
-         CN20K and previous version of silicons.
-
-Patch #3 This patch adds support for basic mbox infrastructure
-         implementation for CN20K silicon in AF perspective. There are
-         few updates w.r.t MBOX ACK interrupt and offsets in CN20k.
-         
-Patch #4 Added mbox implementation between NIC PF and AF for CN20K.
-
-Patch #5 Added mbox communication support between AF and AF's VFs.
-
-Patch #6 This patch adds support for MBOX communication between NIC PF and
-         its VFs.
-
-Sai Krishna (5):
-  octeontx2-af: CN20k basic mbox operations and structures
-  octeontx2-af: CN20k mbox to support AF REQ/ACK functionality
-  octeontx2-pf: CN20K mbox REQ/ACK implementation for NIC PF
-  octeontx2-af: CN20K mbox implementation for AF's VF
-  octeontx2-pf: CN20K mbox implementation between PF-VF
-
-Subbaraya Sundeep (1):
-  octeontx2: Set appropriate PF, VF masks and shifts based on silicon
-
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
 ---
-
-v11 changes:
-	Fixed comments from Paolo Abeni -
-	Fixed memory leak of rvu->ng_rvu struct
-	Removed unnecessary forward declaration of struct rvu
-	Removed code which fixes sparse warnings from this patch set and
-	submitted as separate patches
-	Changed vf_trig_val type from int to u64
-
-	Removed changes which fix warings of -Wenum-enum-conversion as
-	suggested by Simon Horman
-
-v10 changes:
-	Fixed compilation issue reported by kernel test robot.
-
-v9 changes:
-	Addressed review comments given by Jakub Kicinski
-	 1. Removed macro indirections and converted PF func mask, shift macros
-	 usage into helper APIs and used the same in different modules.
-
-v8 changes:
-	No changes, re-posting, as the previous patchset got deferred.
-
-v7 changes:
-	Addressed review comments given by Jakub Kicinski
-	1. Fixed few clang warnings of enum conversion related to the patchset.
-
-v6 changes:
-	Addressed review comments given by Jakub Kicinski
-	1. Fixed minor line alignment issue to fit in 80 char.
-	2. Jakub also suggested to convert macros from patch1 into helper APIs.
-	   Since this will result in lot of changes (at >100 places across
-	   multiple drivers), will submit that patch as a separate cleanup
-	   patch.
-
-v5 changes:
-	No changes, re-posting.
-
-v4 changes:
-	Addressed minor conflits suggested by Jakub Kicinski
-        1. This V4 version of patch set is just a rebase of V3 on top of
-	net-next to address some minor conflicts.
-
-v3 changes:
-	Addressed review comments given by Jakub Kicinski, Simon Horman
-        1. Fixed sparse errors, warnings.
-        2. Fixed a comment mistake, inline with kernel-doc format.
-        3. Removed un-necessary type casting to honor Networking code format.
-
-v2 changes:
-	Addressed review comments given by Kalesh Anakkur Purayil
-        1. Optimized code in parts of patches, removed redundant code
-        2. Fixed sparse warning
-        3. Removed debug log.
-
- drivers/crypto/marvell/octeontx2/otx2_cpt_common.h |   5 +-
- drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c |  13 +-
- .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    |   4 +-
- drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |   6 +-
- drivers/net/ethernet/marvell/octeontx2/af/Makefile |   2 +-
- .../net/ethernet/marvell/octeontx2/af/cn20k/api.h  |  32 ++
- .../marvell/octeontx2/af/cn20k/mbox_init.c         | 424 +++++++++++++++++++++
- .../net/ethernet/marvell/octeontx2/af/cn20k/reg.h  |  81 ++++
- .../ethernet/marvell/octeontx2/af/cn20k/struct.h   |  40 ++
- drivers/net/ethernet/marvell/octeontx2/af/common.h |   2 +-
- drivers/net/ethernet/marvell/octeontx2/af/mbox.c   | 106 +++++-
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   8 +
- .../net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c |   6 +-
- drivers/net/ethernet/marvell/octeontx2/af/rvu.c    | 222 +++++++----
- drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |  81 +++-
- .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    |  68 ++--
- .../net/ethernet/marvell/octeontx2/af/rvu_cn10k.c  |   4 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_cpt.c    |   4 +-
- .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    |  22 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  54 +--
- .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    |   8 +-
- .../ethernet/marvell/octeontx2/af/rvu_npc_hash.c   |  16 +-
- .../ethernet/marvell/octeontx2/af/rvu_npc_hash.h   |   4 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_rep.c    |  13 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_sdp.c    |  10 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_struct.h |   6 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_switch.c |   8 +-
- .../net/ethernet/marvell/octeontx2/nic/Makefile    |   2 +-
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c |  18 +-
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h |   1 +
- .../ethernet/marvell/octeontx2/nic/cn10k_ipsec.c   |   2 +-
- .../ethernet/marvell/octeontx2/nic/cn10k_ipsec.h   |   2 +-
- drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c | 252 ++++++++++++
- drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h |  17 +
- .../ethernet/marvell/octeontx2/nic/otx2_common.h   |  35 +-
- .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   | 166 ++++++--
- .../net/ethernet/marvell/octeontx2/nic/otx2_reg.h  |  49 +--
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c   |   3 +-
- .../net/ethernet/marvell/octeontx2/nic/otx2_vf.c   |  44 ++-
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c   |   7 +-
- include/linux/soc/marvell/silicons.h               |  25 ++
- 41 files changed, 1570 insertions(+), 302 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/api.h
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/reg.h
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/cn20k/struct.h
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
+ drivers/crypto/marvell/octeontx2/otx2_cpt_common.h |  5 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c | 13 ++---
+ .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c    |  4 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c |  6 +-
+ .../net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c |  6 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    | 30 ++++------
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    | 52 ++++++++++++++---
+ .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    | 68 +++++++++++-----------
+ .../net/ethernet/marvell/octeontx2/af/rvu_cn10k.c  |  4 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_cpt.c    |  4 +-
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    | 22 +++----
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    | 54 +++++++++--------
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    |  8 ++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc_hash.c   | 16 ++---
+ .../ethernet/marvell/octeontx2/af/rvu_npc_hash.h   |  4 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_rep.c    | 13 ++---
+ .../net/ethernet/marvell/octeontx2/af/rvu_sdp.c    | 10 ++--
+ .../net/ethernet/marvell/octeontx2/af/rvu_switch.c |  8 +--
+ .../ethernet/marvell/octeontx2/nic/cn10k_ipsec.c   |  2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k_ipsec.h   |  2 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h   | 11 +---
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   | 21 ++++---
+ .../net/ethernet/marvell/octeontx2/nic/otx2_reg.h  | 30 ----------
+ .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c   |  3 +-
+ drivers/net/ethernet/marvell/octeontx2/nic/rep.c   |  7 ++-
+ include/linux/soc/marvell/silicons.h               | 25 ++++++++
+ 26 files changed, 225 insertions(+), 203 deletions(-)
  create mode 100644 include/linux/soc/marvell/silicons.h
 
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+index d529bcb..062def3 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
++++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
+@@ -18,9 +18,8 @@
+ #define OTX2_CPT_MAX_VFS_NUM 128
+ #define OTX2_CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
+ 		(((blk) << 20) | ((slot) << 12) | (offs))
+-#define OTX2_CPT_RVU_PFFUNC(pf, func)	\
+-		((((pf) & RVU_PFVF_PF_MASK) << RVU_PFVF_PF_SHIFT) | \
+-		(((func) & RVU_PFVF_FUNC_MASK) << RVU_PFVF_FUNC_SHIFT))
++
++#define OTX2_CPT_RVU_PFFUNC(pdev, pf, func) rvu_make_pcifunc(pdev, pf, func)
+ 
+ #define OTX2_CPT_INVALID_CRYPTO_ENG_GRP 0xFF
+ #define OTX2_CPT_NAME_LENGTH 64
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+index 12c0e96..b4b2d3d 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
+@@ -142,7 +142,7 @@ static int send_inline_ipsec_inbound_msg(struct otx2_cptpf_dev *cptpf,
+ 	memset(req, 0, sizeof(*req));
+ 	req->hdr.id = MBOX_MSG_CPT_INLINE_IPSEC_CFG;
+ 	req->hdr.sig = OTX2_MBOX_REQ_SIG;
+-	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptpf->pf_id, 0);
++	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptpf->pdev, cptpf->pf_id, 0);
+ 	req->dir = CPT_INLINE_INBOUND;
+ 	req->slot = slot;
+ 	req->sso_pf_func_ovrd = cptpf->sso_pf_func_ovrd;
+@@ -184,7 +184,8 @@ static int rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf, u8 egrp,
+ 		nix_req->gen_cfg.opcode = cpt_inline_rx_opcode(pdev);
+ 	nix_req->gen_cfg.param1 = req->param1;
+ 	nix_req->gen_cfg.param2 = req->param2;
+-	nix_req->inst_qsel.cpt_pf_func = OTX2_CPT_RVU_PFFUNC(cptpf->pf_id, 0);
++	nix_req->inst_qsel.cpt_pf_func =
++		OTX2_CPT_RVU_PFFUNC(cptpf->pdev, cptpf->pf_id, 0);
+ 	nix_req->inst_qsel.cpt_slot = 0;
+ 	ret = otx2_cpt_send_mbox_msg(&cptpf->afpf_mbox, pdev);
+ 	if (ret)
+@@ -392,9 +393,8 @@ void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work)
+ 		msg = (struct mbox_msghdr *)(mdev->mbase + offset);
+ 
+ 		/* Set which VF sent this message based on mbox IRQ */
+-		msg->pcifunc = ((u16)cptpf->pf_id << RVU_PFVF_PF_SHIFT) |
+-				((vf->vf_id + 1) & RVU_PFVF_FUNC_MASK);
+-
++		msg->pcifunc = rvu_make_pcifunc(cptpf->pdev, cptpf->pf_id,
++						(vf->vf_id + 1));
+ 		err = cptpf_handle_vf_req(cptpf, vf, msg,
+ 					  msg->next_msgoff - offset);
+ 		/*
+@@ -469,8 +469,7 @@ static void process_afpf_mbox_msg(struct otx2_cptpf_dev *cptpf,
+ 
+ 	switch (msg->id) {
+ 	case MBOX_MSG_READY:
+-		cptpf->pf_id = (msg->pcifunc >> RVU_PFVF_PF_SHIFT) &
+-				RVU_PFVF_PF_MASK;
++		cptpf->pf_id = rvu_get_pf(cptpf->pdev, msg->pcifunc);
+ 		break;
+ 	case MBOX_MSG_MSIX_OFFSET:
+ 		rsp_msix = (struct msix_offset_rsp *) msg;
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+index 7836784..7180944 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+@@ -176,7 +176,9 @@ static int cptx_set_ucode_base(struct otx2_cpt_eng_grp_info *eng_grp,
+ 	/* Set PF number for microcode fetches */
+ 	ret = otx2_cpt_write_af_reg(&cptpf->afpf_mbox, cptpf->pdev,
+ 				    CPT_AF_PF_FUNC,
+-				    cptpf->pf_id << RVU_PFVF_PF_SHIFT, blkaddr);
++				    rvu_make_pcifunc(cptpf->pdev,
++						     cptpf->pf_id, 0),
++				    blkaddr);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+index 931b725..92e49ba 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_mbox.c
+@@ -189,7 +189,7 @@ int otx2_cptvf_send_eng_grp_num_msg(struct otx2_cptvf_dev *cptvf, int eng_type)
+ 	}
+ 	req->hdr.id = MBOX_MSG_GET_ENG_GRP_NUM;
+ 	req->hdr.sig = OTX2_MBOX_REQ_SIG;
+-	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->vf_id, 0);
++	req->hdr.pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->pdev, cptvf->vf_id, 0);
+ 	req->eng_type = eng_type;
+ 
+ 	return otx2_cpt_send_mbox_msg(mbox, pdev);
+@@ -210,7 +210,7 @@ int otx2_cptvf_send_kvf_limits_msg(struct otx2_cptvf_dev *cptvf)
+ 	}
+ 	req->id = MBOX_MSG_GET_KVF_LIMITS;
+ 	req->sig = OTX2_MBOX_REQ_SIG;
+-	req->pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->vf_id, 0);
++	req->pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->pdev, cptvf->vf_id, 0);
+ 
+ 	return otx2_cpt_send_mbox_msg(mbox, pdev);
+ }
+@@ -230,7 +230,7 @@ int otx2_cptvf_send_caps_msg(struct otx2_cptvf_dev *cptvf)
+ 	}
+ 	req->id = MBOX_MSG_GET_CAPS;
+ 	req->sig = OTX2_MBOX_REQ_SIG;
+-	req->pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->vf_id, 0);
++	req->pcifunc = OTX2_CPT_RVU_PFFUNC(cptvf->pdev, cptvf->vf_id, 0);
+ 
+ 	return otx2_cpt_send_mbox_msg(mbox, pdev);
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+index 0277d22..d7030df 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+@@ -97,7 +97,7 @@ int mcs_add_intr_wq_entry(struct mcs *mcs, struct mcs_intr_event *event)
+ 	if (pcifunc & RVU_PFVF_FUNC_MASK)
+ 		pfvf = &mcs->vf[rvu_get_hwvf(rvu, pcifunc)];
+ 	else
+-		pfvf = &mcs->pf[rvu_get_pf(pcifunc)];
++		pfvf = &mcs->pf[rvu_get_pf(rvu->pdev, pcifunc)];
+ 
+ 	event->intr_mask &= pfvf->intr_mask;
+ 
+@@ -123,7 +123,7 @@ static int mcs_notify_pfvf(struct mcs_intr_event *event, struct rvu *rvu)
+ 	struct mcs_intr_info *req;
+ 	int pf;
+ 
+-	pf = rvu_get_pf(event->pcifunc);
++	pf = rvu_get_pf(rvu->pdev, event->pcifunc);
+ 
+ 	mutex_lock(&rvu->mbox_lock);
+ 
+@@ -193,7 +193,7 @@ int rvu_mbox_handler_mcs_intr_cfg(struct rvu *rvu,
+ 	if (pcifunc & RVU_PFVF_FUNC_MASK)
+ 		pfvf = &mcs->vf[rvu_get_hwvf(rvu, pcifunc)];
+ 	else
+-		pfvf = &mcs->pf[rvu_get_pf(pcifunc)];
++		pfvf = &mcs->pf[rvu_get_pf(rvu->pdev, pcifunc)];
+ 
+ 	mcs->pf_map[0] = pcifunc;
+ 	pfvf->intr_mask = req->intr_mask;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 43eea74..61d80a2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -294,7 +294,7 @@ int rvu_get_blkaddr(struct rvu *rvu, int blktype, u16 pcifunc)
+ 		devnum = rvu_get_hwvf(rvu, pcifunc);
+ 	} else {
+ 		is_pf = true;
+-		devnum = rvu_get_pf(pcifunc);
++		devnum = rvu_get_pf(rvu->pdev, pcifunc);
+ 	}
+ 
+ 	/* Check if the 'pcifunc' has a NIX LF from 'BLKADDR_NIX0' or
+@@ -359,7 +359,7 @@ static void rvu_update_rsrc_map(struct rvu *rvu, struct rvu_pfvf *pfvf,
+ 		devnum = rvu_get_hwvf(rvu, pcifunc);
+ 	} else {
+ 		is_pf = true;
+-		devnum = rvu_get_pf(pcifunc);
++		devnum = rvu_get_pf(rvu->pdev, pcifunc);
+ 	}
+ 
+ 	block->fn_map[lf] = attach ? pcifunc : 0;
+@@ -400,11 +400,6 @@ static void rvu_update_rsrc_map(struct rvu *rvu, struct rvu_pfvf *pfvf,
+ 	rvu_write64(rvu, BLKADDR_RVUM, reg | (devnum << 16), num_lfs);
+ }
+ 
+-inline int rvu_get_pf(u16 pcifunc)
+-{
+-	return (pcifunc >> RVU_PFVF_PF_SHIFT) & RVU_PFVF_PF_MASK;
+-}
+-
+ void rvu_get_pf_numvfs(struct rvu *rvu, int pf, int *numvfs, int *hwvf)
+ {
+ 	u64 cfg;
+@@ -422,7 +417,7 @@ int rvu_get_hwvf(struct rvu *rvu, int pcifunc)
+ 	int pf, func;
+ 	u64 cfg;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	func = pcifunc & RVU_PFVF_FUNC_MASK;
+ 
+ 	/* Get first HWVF attached to this PF */
+@@ -437,7 +432,7 @@ struct rvu_pfvf *rvu_get_pfvf(struct rvu *rvu, int pcifunc)
+ 	if (pcifunc & RVU_PFVF_FUNC_MASK)
+ 		return &rvu->hwvf[rvu_get_hwvf(rvu, pcifunc)];
+ 	else
+-		return &rvu->pf[rvu_get_pf(pcifunc)];
++		return &rvu->pf[rvu_get_pf(rvu->pdev, pcifunc)];
+ }
+ 
+ static bool is_pf_func_valid(struct rvu *rvu, u16 pcifunc)
+@@ -445,7 +440,7 @@ static bool is_pf_func_valid(struct rvu *rvu, u16 pcifunc)
+ 	int pf, vf, nvfs;
+ 	u64 cfg;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (pf >= rvu->hw->total_pfs)
+ 		return false;
+ 
+@@ -1487,7 +1482,7 @@ int rvu_get_nix_blkaddr(struct rvu *rvu, u16 pcifunc)
+ 	pf = rvu_get_pfvf(rvu, pcifunc & ~RVU_PFVF_FUNC_MASK);
+ 
+ 	/* All CGX mapped PFs are set with assigned NIX block during init */
+-	if (is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc))) {
++	if (is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc))) {
+ 		blkaddr = pf->nix_blkaddr;
+ 	} else if (is_lbk_vf(rvu, pcifunc)) {
+ 		vf = pcifunc - 1;
+@@ -1501,7 +1496,7 @@ int rvu_get_nix_blkaddr(struct rvu *rvu, u16 pcifunc)
+ 	}
+ 
+ 	/* if SDP1 then the blkaddr is NIX1 */
+-	if (is_sdp_pfvf(pcifunc) && pf->sdp_info->node_id == 1)
++	if (is_sdp_pfvf(rvu, pcifunc) && pf->sdp_info->node_id == 1)
+ 		blkaddr = BLKADDR_NIX1;
+ 
+ 	switch (blkaddr) {
+@@ -2006,7 +2001,7 @@ int rvu_mbox_handler_vf_flr(struct rvu *rvu, struct msg_req *req,
+ 
+ 	vf = pcifunc & RVU_PFVF_FUNC_MASK;
+ 	cfg = rvu_read64(rvu, BLKADDR_RVUM,
+-			 RVU_PRIV_PFX_CFG(rvu_get_pf(pcifunc)));
++			 RVU_PRIV_PFX_CFG(rvu_get_pf(rvu->pdev, pcifunc)));
+ 	numvfs = (cfg >> 12) & 0xFF;
+ 
+ 	if (vf && vf <= numvfs)
+@@ -2229,9 +2224,8 @@ static void __rvu_mbox_handler(struct rvu_work *mwork, int type, bool poll)
+ 		/* Set which PF/VF sent this message based on mbox IRQ */
+ 		switch (type) {
+ 		case TYPE_AFPF:
+-			msg->pcifunc &=
+-				~(RVU_PFVF_PF_MASK << RVU_PFVF_PF_SHIFT);
+-			msg->pcifunc |= (devid << RVU_PFVF_PF_SHIFT);
++			msg->pcifunc &= rvu_pcifunc_pf_mask(rvu->pdev);
++			msg->pcifunc |= rvu_make_pcifunc(rvu->pdev, devid, 0);
+ 			break;
+ 		case TYPE_AFVF:
+ 			msg->pcifunc &=
+@@ -2249,7 +2243,7 @@ static void __rvu_mbox_handler(struct rvu_work *mwork, int type, bool poll)
+ 		if (msg->pcifunc & RVU_PFVF_FUNC_MASK)
+ 			dev_warn(rvu->dev, "Error %d when processing message %s (0x%x) from PF%d:VF%d\n",
+ 				 err, otx2_mbox_id2name(msg->id),
+-				 msg->id, rvu_get_pf(msg->pcifunc),
++				 msg->id, rvu_get_pf(rvu->pdev, msg->pcifunc),
+ 				 (msg->pcifunc & RVU_PFVF_FUNC_MASK) - 1);
+ 		else
+ 			dev_warn(rvu->dev, "Error %d when processing message %s (0x%x) from PF%d\n",
+@@ -2773,7 +2767,7 @@ static void rvu_flr_handler(struct work_struct *work)
+ 
+ 	cfg = rvu_read64(rvu, BLKADDR_RVUM, RVU_PRIV_PFX_CFG(pf));
+ 	numvfs = (cfg >> 12) & 0xFF;
+-	pcifunc  = pf << RVU_PFVF_PF_SHIFT;
++	pcifunc  = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 
+ 	for (vf = 0; vf < numvfs; vf++)
+ 		__rvu_flr_handler(rvu, (pcifunc | (vf + 1)));
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 48f6629..5c179df 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -10,6 +10,7 @@
+ 
+ #include <linux/pci.h>
+ #include <net/devlink.h>
++#include <linux/soc/marvell/silicons.h>
+ 
+ #include "rvu_struct.h"
+ #include "rvu_devlink.h"
+@@ -43,10 +44,34 @@
+ #define MAX_CPT_BLKS				2
+ 
+ /* PF_FUNC */
+-#define RVU_PFVF_PF_SHIFT	10
+-#define RVU_PFVF_PF_MASK	0x3F
+-#define RVU_PFVF_FUNC_SHIFT	0
+-#define RVU_PFVF_FUNC_MASK	0x3FF
++#define RVU_OTX2_PFVF_PF_SHIFT			10
++#define RVU_OTX2_PFVF_PF_MASK			0x3F
++#define RVU_PFVF_FUNC_SHIFT			0
++#define RVU_PFVF_FUNC_MASK			0x3FF
++#define RVU_CN20K_PFVF_PF_SHIFT			9
++#define RVU_CN20K_PFVF_PF_MASK			0x7F
++
++static inline u16 rvu_make_pcifunc(struct pci_dev *pdev, int pf, int func)
++{
++	if (is_cn20k(pdev))
++		return ((pf & RVU_CN20K_PFVF_PF_MASK) <<
++			RVU_CN20K_PFVF_PF_SHIFT) |
++			((func & RVU_PFVF_FUNC_MASK) <<
++			RVU_PFVF_FUNC_SHIFT);
++	else
++		return ((pf & RVU_OTX2_PFVF_PF_MASK) <<
++			RVU_OTX2_PFVF_PF_SHIFT) |
++			((func & RVU_PFVF_FUNC_MASK) <<
++			RVU_PFVF_FUNC_SHIFT);
++}
++
++static inline int rvu_pcifunc_pf_mask(struct pci_dev *pdev)
++{
++	if (is_cn20k(pdev))
++		return ~(RVU_CN20K_PFVF_PF_MASK << RVU_CN20K_PFVF_PF_SHIFT);
++	else
++		return ~(RVU_OTX2_PFVF_PF_MASK << RVU_OTX2_PFVF_PF_SHIFT);
++}
+ 
+ #ifdef CONFIG_DEBUG_FS
+ struct dump_ctx {
+@@ -836,7 +861,6 @@ int rvu_alloc_rsrc_contig(struct rsrc_bmap *rsrc, int nrsrc);
+ void rvu_free_rsrc_contig(struct rsrc_bmap *rsrc, int nrsrc, int start);
+ bool rvu_rsrc_check_contig(struct rsrc_bmap *rsrc, int nrsrc);
+ u16 rvu_get_rsrc_mapcount(struct rvu_pfvf *pfvf, int blkaddr);
+-int rvu_get_pf(u16 pcifunc);
+ struct rvu_pfvf *rvu_get_pfvf(struct rvu *rvu, int pcifunc);
+ void rvu_get_pf_numvfs(struct rvu *rvu, int pf, int *numvfs, int *hwvf);
+ bool is_block_implemented(struct rvu_hwinfo *hw, int blkaddr);
+@@ -865,8 +889,8 @@ void rvu_aq_free(struct rvu *rvu, struct admin_queue *aq);
+ 
+ /* SDP APIs */
+ int rvu_sdp_init(struct rvu *rvu);
+-bool is_sdp_pfvf(u16 pcifunc);
+-bool is_sdp_pf(u16 pcifunc);
++bool is_sdp_pfvf(struct rvu *rvu, u16 pcifunc);
++bool is_sdp_pf(struct rvu *rvu, u16 pcifunc);
+ bool is_sdp_vf(struct rvu *rvu, u16 pcifunc);
+ 
+ static inline bool is_rep_dev(struct rvu *rvu, u16 pcifunc)
+@@ -877,11 +901,21 @@ static inline bool is_rep_dev(struct rvu *rvu, u16 pcifunc)
+ 	return false;
+ }
+ 
++static inline int rvu_get_pf(struct pci_dev *pdev, u16 pcifunc)
++{
++	if (is_cn20k(pdev))
++		return (pcifunc >> RVU_CN20K_PFVF_PF_SHIFT) &
++			RVU_CN20K_PFVF_PF_MASK;
++	else
++		return (pcifunc >> RVU_OTX2_PFVF_PF_SHIFT) &
++			RVU_OTX2_PFVF_PF_MASK;
++}
++
+ /* CGX APIs */
+ static inline bool is_pf_cgxmapped(struct rvu *rvu, u8 pf)
+ {
+ 	return (pf >= PF_CGXMAP_BASE && pf <= rvu->cgx_mapped_pfs) &&
+-		!is_sdp_pf(pf << RVU_PFVF_PF_SHIFT);
++		!is_sdp_pf(rvu, rvu_make_pcifunc(rvu->pdev, pf, 0));
+ }
+ 
+ static inline void rvu_get_cgx_lmac_id(u8 map, u8 *cgx_id, u8 *lmac_id)
+@@ -893,7 +927,7 @@ static inline void rvu_get_cgx_lmac_id(u8 map, u8 *cgx_id, u8 *lmac_id)
+ static inline bool is_cgx_vf(struct rvu *rvu, u16 pcifunc)
+ {
+ 	return ((pcifunc & RVU_PFVF_FUNC_MASK) &&
+-		is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)));
++		is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)));
+ }
+ 
+ #define M(_name, _id, fn_name, req, rsp)				\
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index d0331b0e..b79db88 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -457,7 +457,7 @@ int rvu_cgx_exit(struct rvu *rvu)
+ inline bool is_cgx_config_permitted(struct rvu *rvu, u16 pcifunc)
+ {
+ 	if ((pcifunc & RVU_PFVF_FUNC_MASK) ||
+-	    !is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)))
++	    !is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)))
+ 		return false;
+ 	return true;
+ }
+@@ -484,7 +484,7 @@ void rvu_cgx_enadis_rx_bp(struct rvu *rvu, int pf, bool enable)
+ 
+ int rvu_cgx_config_rxtx(struct rvu *rvu, u16 pcifunc, bool start)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	void *cgxd;
+@@ -501,7 +501,7 @@ int rvu_cgx_config_rxtx(struct rvu *rvu, u16 pcifunc, bool start)
+ 
+ int rvu_cgx_tx_enable(struct rvu *rvu, u16 pcifunc, bool enable)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	void *cgxd;
+@@ -526,7 +526,7 @@ int rvu_cgx_config_tx(void *cgxd, int lmac_id, bool enable)
+ 
+ void rvu_cgx_disable_dmac_entries(struct rvu *rvu, u16 pcifunc)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	int i = 0, lmac_count = 0;
+ 	struct mac_ops *mac_ops;
+ 	u8 max_dmac_filters;
+@@ -577,7 +577,7 @@ int rvu_mbox_handler_cgx_stop_rxtx(struct rvu *rvu, struct msg_req *req,
+ static int rvu_lmac_get_stats(struct rvu *rvu, struct msg_req *req,
+ 			      void *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	int stat = 0, err = 0;
+ 	u64 tx_stat, rx_stat;
+@@ -633,7 +633,7 @@ int rvu_mbox_handler_rpm_stats(struct rvu *rvu, struct msg_req *req,
+ int rvu_mbox_handler_cgx_stats_rst(struct rvu *rvu, struct msg_req *req,
+ 				   struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct rvu_pfvf	*parent_pf;
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_idx, lmac;
+@@ -663,7 +663,7 @@ int rvu_mbox_handler_cgx_fec_stats(struct rvu *rvu,
+ 				   struct msg_req *req,
+ 				   struct cgx_fec_stats_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_idx, lmac;
+ 	void *cgxd;
+@@ -681,7 +681,7 @@ int rvu_mbox_handler_cgx_mac_addr_set(struct rvu *rvu,
+ 				      struct cgx_mac_addr_set_or_get *req,
+ 				      struct cgx_mac_addr_set_or_get *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -701,7 +701,7 @@ int rvu_mbox_handler_cgx_mac_addr_add(struct rvu *rvu,
+ 				      struct cgx_mac_addr_add_req *req,
+ 				      struct cgx_mac_addr_add_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 	int rc = 0;
+ 
+@@ -725,7 +725,7 @@ int rvu_mbox_handler_cgx_mac_addr_del(struct rvu *rvu,
+ 				      struct cgx_mac_addr_del_req *req,
+ 				      struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -743,7 +743,7 @@ int rvu_mbox_handler_cgx_mac_max_entries_get(struct rvu *rvu,
+ 					     struct cgx_max_dmac_entries_get_rsp
+ 					     *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	/* If msg is received from PFs(which are not mapped to CGX LMACs)
+@@ -769,7 +769,7 @@ int rvu_mbox_handler_cgx_mac_addr_get(struct rvu *rvu,
+ 				      struct cgx_mac_addr_set_or_get *req,
+ 				      struct cgx_mac_addr_set_or_get *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 	int rc = 0;
+ 	u64 cfg;
+@@ -790,7 +790,7 @@ int rvu_mbox_handler_cgx_promisc_enable(struct rvu *rvu, struct msg_req *req,
+ 					struct msg_rsp *rsp)
+ {
+ 	u16 pcifunc = req->hdr.pcifunc;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -809,7 +809,7 @@ int rvu_mbox_handler_cgx_promisc_enable(struct rvu *rvu, struct msg_req *req,
+ int rvu_mbox_handler_cgx_promisc_disable(struct rvu *rvu, struct msg_req *req,
+ 					 struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -828,7 +828,7 @@ int rvu_mbox_handler_cgx_promisc_disable(struct rvu *rvu, struct msg_req *req,
+ static int rvu_cgx_ptp_rx_cfg(struct rvu *rvu, u16 pcifunc, bool enable)
+ {
+ 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	void *cgxd;
+@@ -864,7 +864,7 @@ static int rvu_cgx_ptp_rx_cfg(struct rvu *rvu, u16 pcifunc, bool enable)
+ int rvu_mbox_handler_cgx_ptp_rx_enable(struct rvu *rvu, struct msg_req *req,
+ 				       struct msg_rsp *rsp)
+ {
+-	if (!is_pf_cgxmapped(rvu, rvu_get_pf(req->hdr.pcifunc)))
++	if (!is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, req->hdr.pcifunc)))
+ 		return -EPERM;
+ 
+ 	return rvu_cgx_ptp_rx_cfg(rvu, req->hdr.pcifunc, true);
+@@ -878,7 +878,7 @@ int rvu_mbox_handler_cgx_ptp_rx_disable(struct rvu *rvu, struct msg_req *req,
+ 
+ static int rvu_cgx_config_linkevents(struct rvu *rvu, u16 pcifunc, bool en)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, pcifunc))
+@@ -917,7 +917,7 @@ int rvu_mbox_handler_cgx_get_linkinfo(struct rvu *rvu, struct msg_req *req,
+ 	u8 cgx_id, lmac_id;
+ 	int pf, err;
+ 
+-	pf = rvu_get_pf(req->hdr.pcifunc);
++	pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 
+ 	if (!is_pf_cgxmapped(rvu, pf))
+ 		return -ENODEV;
+@@ -933,7 +933,7 @@ int rvu_mbox_handler_cgx_features_get(struct rvu *rvu,
+ 				      struct msg_req *req,
+ 				      struct cgx_features_info_msg *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_idx, lmac;
+ 	void *cgxd;
+ 
+@@ -975,7 +975,7 @@ u32 rvu_cgx_get_lmac_fifolen(struct rvu *rvu, int cgx, int lmac)
+ 
+ static int rvu_cgx_config_intlbk(struct rvu *rvu, u16 pcifunc, bool en)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 
+@@ -1005,7 +1005,7 @@ int rvu_mbox_handler_cgx_intlbk_disable(struct rvu *rvu, struct msg_req *req,
+ 
+ int rvu_cgx_cfg_pause_frm(struct rvu *rvu, u16 pcifunc, u8 tx_pause, u8 rx_pause)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 rx_pfc = 0, tx_pfc = 0;
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+@@ -1046,7 +1046,7 @@ int rvu_mbox_handler_cgx_cfg_pause_frm(struct rvu *rvu,
+ 				       struct cgx_pause_frm_cfg *req,
+ 				       struct cgx_pause_frm_cfg *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	int err = 0;
+@@ -1073,7 +1073,7 @@ int rvu_mbox_handler_cgx_cfg_pause_frm(struct rvu *rvu,
+ int rvu_mbox_handler_cgx_get_phy_fec_stats(struct rvu *rvu, struct msg_req *req,
+ 					   struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_pf_cgxmapped(rvu, pf))
+@@ -1106,7 +1106,7 @@ int rvu_cgx_nix_cuml_stats(struct rvu *rvu, void *cgxd, int lmac_id,
+ 	/* Assumes LF of a PF and all of its VF belongs to the same
+ 	 * NIX block
+ 	 */
+-	pcifunc = pf << RVU_PFVF_PF_SHIFT;
++	pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NIX, pcifunc);
+ 	if (blkaddr < 0)
+ 		return 0;
+@@ -1133,10 +1133,10 @@ int rvu_cgx_start_stop_io(struct rvu *rvu, u16 pcifunc, bool start)
+ 	struct rvu_pfvf *parent_pf, *pfvf;
+ 	int cgx_users, err = 0;
+ 
+-	if (!is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)))
++	if (!is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)))
+ 		return 0;
+ 
+-	parent_pf = &rvu->pf[rvu_get_pf(pcifunc)];
++	parent_pf = &rvu->pf[rvu_get_pf(rvu->pdev, pcifunc)];
+ 	pfvf = rvu_get_pfvf(rvu, pcifunc);
+ 
+ 	mutex_lock(&rvu->cgx_cfg_lock);
+@@ -1179,7 +1179,7 @@ int rvu_mbox_handler_cgx_set_fec_param(struct rvu *rvu,
+ 				       struct fec_mode *req,
+ 				       struct fec_mode *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_pf_cgxmapped(rvu, pf))
+@@ -1195,7 +1195,7 @@ int rvu_mbox_handler_cgx_set_fec_param(struct rvu *rvu,
+ int rvu_mbox_handler_cgx_get_aux_link_info(struct rvu *rvu, struct msg_req *req,
+ 					   struct cgx_fw_data *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!rvu->fwdata)
+@@ -1222,7 +1222,7 @@ int rvu_mbox_handler_cgx_set_link_mode(struct rvu *rvu,
+ 				       struct cgx_set_link_mode_req *req,
+ 				       struct cgx_set_link_mode_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_idx, lmac;
+ 	void *cgxd;
+ 
+@@ -1238,7 +1238,7 @@ int rvu_mbox_handler_cgx_set_link_mode(struct rvu *rvu,
+ int rvu_mbox_handler_cgx_mac_addr_reset(struct rvu *rvu, struct cgx_mac_addr_reset_req *req,
+ 					struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -1256,7 +1256,7 @@ int rvu_mbox_handler_cgx_mac_addr_update(struct rvu *rvu,
+ 					 struct cgx_mac_addr_update_req *req,
+ 					 struct cgx_mac_addr_update_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 
+ 	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
+@@ -1272,7 +1272,7 @@ int rvu_mbox_handler_cgx_mac_addr_update(struct rvu *rvu,
+ int rvu_cgx_prio_flow_ctrl_cfg(struct rvu *rvu, u16 pcifunc, u8 tx_pause,
+ 			       u8 rx_pause, u16 pfc_en)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 rx_8023 = 0, tx_8023 = 0;
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+@@ -1310,7 +1310,7 @@ int rvu_mbox_handler_cgx_prio_flow_ctrl_cfg(struct rvu *rvu,
+ 					    struct cgx_pfc_cfg *req,
+ 					    struct cgx_pfc_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	void *cgxd;
+@@ -1335,7 +1335,7 @@ int rvu_mbox_handler_cgx_prio_flow_ctrl_cfg(struct rvu *rvu,
+ 
+ void rvu_mac_reset(struct rvu *rvu, u16 pcifunc)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	struct cgx *cgxd;
+ 	u8 cgx, lmac;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+index 4a3370a..05adc54 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+@@ -66,7 +66,7 @@ static int lmtst_map_table_ops(struct rvu *rvu, u32 index, u64 *val,
+ #define LMT_MAP_TBL_W1_OFF  8
+ static u32 rvu_get_lmtst_tbl_index(struct rvu *rvu, u16 pcifunc)
+ {
+-	return ((rvu_get_pf(pcifunc) * LMT_MAX_VFS) +
++	return ((rvu_get_pf(rvu->pdev, pcifunc) * LMT_MAX_VFS) +
+ 		(pcifunc & RVU_PFVF_FUNC_MASK)) * LMT_MAPTBL_ENTRY_SIZE;
+ }
+ 
+@@ -83,7 +83,7 @@ static int rvu_get_lmtaddr(struct rvu *rvu, u16 pcifunc,
+ 
+ 	mutex_lock(&rvu->rsrc_lock);
+ 	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_SMMU_ADDR_REQ, iova);
+-	pf = rvu_get_pf(pcifunc) & RVU_PFVF_PF_MASK;
++	pf = rvu_get_pf(rvu->pdev, pcifunc) & RVU_OTX2_PFVF_PF_MASK;
+ 	val = BIT_ULL(63) | BIT_ULL(14) | BIT_ULL(13) | pf << 8 |
+ 	      ((pcifunc & RVU_PFVF_FUNC_MASK) & 0xFF);
+ 	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_SMMU_TXN_REQ, val);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+index 3c5bbaf..f404117 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+@@ -410,7 +410,7 @@ static bool is_cpt_pf(struct rvu *rvu, u16 pcifunc)
+ {
+ 	int cpt_pf_num = rvu->cpt_pf_num;
+ 
+-	if (rvu_get_pf(pcifunc) != cpt_pf_num)
++	if (rvu_get_pf(rvu->pdev, pcifunc) != cpt_pf_num)
+ 		return false;
+ 	if (pcifunc & RVU_PFVF_FUNC_MASK)
+ 		return false;
+@@ -422,7 +422,7 @@ static bool is_cpt_vf(struct rvu *rvu, u16 pcifunc)
+ {
+ 	int cpt_pf_num = rvu->cpt_pf_num;
+ 
+-	if (rvu_get_pf(pcifunc) != cpt_pf_num)
++	if (rvu_get_pf(rvu->pdev, pcifunc) != cpt_pf_num)
+ 		return false;
+ 	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
+ 		return false;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index c827da6..0c20642 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -688,7 +688,7 @@ static int get_max_column_width(struct rvu *rvu)
+ 
+ 	for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
+ 		for (vf = 0; vf <= rvu->hw->total_vfs; vf++) {
+-			pcifunc = pf << 10 | vf;
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, vf);
+ 			if (!pcifunc)
+ 				continue;
+ 
+@@ -759,7 +759,7 @@ static ssize_t rvu_dbg_rsrc_attach_status(struct file *filp,
+ 		for (vf = 0; vf <= rvu->hw->total_vfs; vf++) {
+ 			off = 0;
+ 			flag = 0;
+-			pcifunc = pf << 10 | vf;
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, vf);
+ 			if (!pcifunc)
+ 				continue;
+ 
+@@ -842,7 +842,7 @@ static int rvu_dbg_rvu_pf_cgx_map_display(struct seq_file *filp, void *unused)
+ 
+ 		cgx[0] = 0;
+ 		lmac[0] = 0;
+-		pcifunc = pf << 10;
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		pfvf = rvu_get_pfvf(rvu, pcifunc);
+ 
+ 		if (pfvf->nix_blkaddr == BLKADDR_NIX0)
+@@ -2623,10 +2623,10 @@ static int rvu_dbg_nix_band_prof_ctx_display(struct seq_file *m, void *unused)
+ 			pcifunc = ipolicer->pfvf_map[idx];
+ 			if (!(pcifunc & RVU_PFVF_FUNC_MASK))
+ 				seq_printf(m, "Allocated to :: PF %d\n",
+-					   rvu_get_pf(pcifunc));
++					   rvu_get_pf(rvu->pdev, pcifunc));
+ 			else
+ 				seq_printf(m, "Allocated to :: PF %d VF %d\n",
+-					   rvu_get_pf(pcifunc),
++					   rvu_get_pf(rvu->pdev, pcifunc),
+ 					   (pcifunc & RVU_PFVF_FUNC_MASK) - 1);
+ 			print_band_prof_ctx(m, &aq_rsp.prof);
+ 		}
+@@ -2983,10 +2983,10 @@ static void rvu_print_npc_mcam_info(struct seq_file *s,
+ 
+ 	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
+ 		seq_printf(s, "\n\t\t Device \t\t: PF%d\n",
+-			   rvu_get_pf(pcifunc));
++			   rvu_get_pf(rvu->pdev, pcifunc));
+ 	else
+ 		seq_printf(s, "\n\t\t Device \t\t: PF%d VF%d\n",
+-			   rvu_get_pf(pcifunc),
++			   rvu_get_pf(rvu->pdev, pcifunc),
+ 			   (pcifunc & RVU_PFVF_FUNC_MASK) - 1);
+ 
+ 	if (entry_acnt) {
+@@ -3049,13 +3049,13 @@ static int rvu_dbg_npc_mcam_info_display(struct seq_file *filp, void *unsued)
+ 	seq_puts(filp, "\n\t\t Current allocation\n");
+ 	seq_puts(filp, "\t\t====================\n");
+ 	for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
+-		pcifunc = (pf << RVU_PFVF_PF_SHIFT);
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		rvu_print_npc_mcam_info(filp, pcifunc, blkaddr);
+ 
+ 		cfg = rvu_read64(rvu, BLKADDR_RVUM, RVU_PRIV_PFX_CFG(pf));
+ 		numvfs = (cfg >> 12) & 0xFF;
+ 		for (vf = 0; vf < numvfs; vf++) {
+-			pcifunc = (pf << RVU_PFVF_PF_SHIFT) | (vf + 1);
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, (vf + 1));
+ 			rvu_print_npc_mcam_info(filp, pcifunc, blkaddr);
+ 		}
+ 	}
+@@ -3326,7 +3326,7 @@ static int rvu_dbg_npc_mcam_show_rules(struct seq_file *s, void *unused)
+ 
+ 	mutex_lock(&mcam->lock);
+ 	list_for_each_entry(iter, &mcam->mcam_rules, list) {
+-		pf = (iter->owner >> RVU_PFVF_PF_SHIFT) & RVU_PFVF_PF_MASK;
++		pf = rvu_get_pf(rvu->pdev, iter->owner);
+ 		seq_printf(s, "\n\tInstalled by: PF%d ", pf);
+ 
+ 		if (iter->owner & RVU_PFVF_FUNC_MASK) {
+@@ -3344,7 +3344,7 @@ static int rvu_dbg_npc_mcam_show_rules(struct seq_file *s, void *unused)
+ 		rvu_dbg_npc_mcam_show_flows(s, iter);
+ 		if (is_npc_intf_rx(iter->intf)) {
+ 			target = iter->rx_action.pf_func;
+-			pf = (target >> RVU_PFVF_PF_SHIFT) & RVU_PFVF_PF_MASK;
++			pf = rvu_get_pf(rvu->pdev, target);
+ 			seq_printf(s, "\tForward to: PF%d ", pf);
+ 
+ 			if (target & RVU_PFVF_FUNC_MASK) {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 613655fc..bdf4d85 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -315,7 +315,8 @@ static bool is_valid_txschq(struct rvu *rvu, int blkaddr,
+ 	if (lvl >= hw->cap.nix_tx_aggr_lvl) {
+ 		if ((nix_get_tx_link(rvu, map_func) !=
+ 		     nix_get_tx_link(rvu, pcifunc)) &&
+-		     (rvu_get_pf(map_func) != rvu_get_pf(pcifunc)))
++		     (rvu_get_pf(rvu->pdev, map_func) !=
++				rvu_get_pf(rvu->pdev, pcifunc)))
+ 			return false;
+ 		else
+ 			return true;
+@@ -339,7 +340,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 	bool from_vf;
+ 	int err;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (!is_pf_cgxmapped(rvu, pf) && type != NIX_INTF_TYPE_LBK &&
+ 	    type != NIX_INTF_TYPE_SDP)
+ 		return 0;
+@@ -416,7 +417,7 @@ static int nix_interface_init(struct rvu *rvu, u16 pcifunc, int type, int nixlf,
+ 		break;
+ 	case NIX_INTF_TYPE_SDP:
+ 		from_vf = !!(pcifunc & RVU_PFVF_FUNC_MASK);
+-		parent_pf = &rvu->pf[rvu_get_pf(pcifunc)];
++		parent_pf = &rvu->pf[rvu_get_pf(rvu->pdev, pcifunc)];
+ 		sdp_info = parent_pf->sdp_info;
+ 		if (!sdp_info) {
+ 			dev_err(rvu->dev, "Invalid sdp_info pointer\n");
+@@ -590,12 +591,12 @@ static int nix_bp_disable(struct rvu *rvu,
+ 	u16 chan_v;
+ 	u64 cfg;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	type = is_lbk_vf(rvu, pcifunc) ? NIX_INTF_TYPE_LBK : NIX_INTF_TYPE_CGX;
+ 	if (!is_pf_cgxmapped(rvu, pf) && type != NIX_INTF_TYPE_LBK)
+ 		return 0;
+ 
+-	if (is_sdp_pfvf(pcifunc))
++	if (is_sdp_pfvf(rvu, pcifunc))
+ 		type = NIX_INTF_TYPE_SDP;
+ 
+ 	if (cpt_link && !rvu->hw->cpt_links)
+@@ -736,9 +737,9 @@ static int nix_bp_enable(struct rvu *rvu,
+ 	u16 chan_v;
+ 	u64 cfg;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	type = is_lbk_vf(rvu, pcifunc) ? NIX_INTF_TYPE_LBK : NIX_INTF_TYPE_CGX;
+-	if (is_sdp_pfvf(pcifunc))
++	if (is_sdp_pfvf(rvu, pcifunc))
+ 		type = NIX_INTF_TYPE_SDP;
+ 
+ 	/* Enable backpressure only for CGX mapped PFs and LBK/SDP interface */
+@@ -1674,7 +1675,7 @@ int rvu_mbox_handler_nix_lf_alloc(struct rvu *rvu,
+ 	}
+ 
+ 	intf = is_lbk_vf(rvu, pcifunc) ? NIX_INTF_TYPE_LBK : NIX_INTF_TYPE_CGX;
+-	if (is_sdp_pfvf(pcifunc))
++	if (is_sdp_pfvf(rvu, pcifunc))
+ 		intf = NIX_INTF_TYPE_SDP;
+ 
+ 	err = nix_interface_init(rvu, pcifunc, intf, nixlf, rsp,
+@@ -1798,7 +1799,8 @@ int rvu_mbox_handler_nix_mark_format_cfg(struct rvu *rvu,
+ 	rc = rvu_nix_reserve_mark_format(rvu, nix_hw, blkaddr, cfg);
+ 	if (rc < 0) {
+ 		dev_err(rvu->dev, "No mark_format_ctl for (pf:%d, vf:%d)",
+-			rvu_get_pf(pcifunc), pcifunc & RVU_PFVF_FUNC_MASK);
++			rvu_get_pf(rvu->pdev,  pcifunc),
++				   pcifunc & RVU_PFVF_FUNC_MASK);
+ 		return NIX_AF_ERR_MARK_CFG_FAIL;
+ 	}
+ 
+@@ -2050,7 +2052,7 @@ static void nix_clear_tx_xoff(struct rvu *rvu, int blkaddr,
+ static int nix_get_tx_link(struct rvu *rvu, u16 pcifunc)
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id = 0, lmac_id = 0;
+ 
+ 	if (is_lbk_vf(rvu, pcifunc)) {/* LBK links */
+@@ -2068,7 +2070,7 @@ static void nix_get_txschq_range(struct rvu *rvu, u16 pcifunc,
+ 				 int link, int *start, int *end)
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 
+ 	/* LBK links */
+ 	if (is_lbk_vf(rvu, pcifunc) || is_rep_dev(rvu, pcifunc)) {
+@@ -2426,7 +2428,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
+ {
+ 	struct nix_smq_flush_ctx *smq_flush_ctx;
+ 	int err, restore_tx_en = 0, i;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id = 0, lmac_id = 0;
+ 	u16 tl2_tl3_link_schq;
+ 	u8 link, link_level;
+@@ -2820,7 +2822,7 @@ void rvu_nix_tx_tl2_cfg(struct rvu *rvu, int blkaddr, u16 pcifunc,
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 	int lbk_link_start, lbk_links;
+-	u8 pf = rvu_get_pf(pcifunc);
++	u8 pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	int schq;
+ 	u64 cfg;
+ 
+@@ -3190,7 +3192,8 @@ static int nix_blk_setup_mce(struct rvu *rvu, struct nix_hw *nix_hw,
+ 	err = rvu_nix_blk_aq_enq_inst(rvu, nix_hw, &aq_req, NULL);
+ 	if (err) {
+ 		dev_err(rvu->dev, "Failed to setup Bcast MCE for PF%d:VF%d\n",
+-			rvu_get_pf(pcifunc), pcifunc & RVU_PFVF_FUNC_MASK);
++			rvu_get_pf(rvu->pdev, pcifunc),
++				pcifunc & RVU_PFVF_FUNC_MASK);
+ 		return err;
+ 	}
+ 	return 0;
+@@ -3458,7 +3461,7 @@ int nix_update_mce_list(struct rvu *rvu, u16 pcifunc,
+ 		dev_err(rvu->dev,
+ 			"%s: Idx %d > max MCE idx %d, for PF%d bcast list\n",
+ 			__func__, idx, mce_list->max,
+-			pcifunc >> RVU_PFVF_PF_SHIFT);
++			rvu_get_pf(rvu->pdev, pcifunc));
+ 		return -EINVAL;
+ 	}
+ 
+@@ -3510,7 +3513,8 @@ void nix_get_mce_list(struct rvu *rvu, u16 pcifunc, int type,
+ 	struct rvu_pfvf *pfvf;
+ 
+ 	if (!hw->cap.nix_rx_multicast ||
+-	    !is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc & ~RVU_PFVF_FUNC_MASK))) {
++	    !is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev,
++			     pcifunc & ~RVU_PFVF_FUNC_MASK))) {
+ 		*mce_list = NULL;
+ 		*mce_idx = 0;
+ 		return;
+@@ -3544,13 +3548,13 @@ static int nix_update_mce_rule(struct rvu *rvu, u16 pcifunc,
+ 	int pf;
+ 
+ 	/* skip multicast pkt replication for AF's VFs & SDP links */
+-	if (is_lbk_vf(rvu, pcifunc) || is_sdp_pfvf(pcifunc))
++	if (is_lbk_vf(rvu, pcifunc) || is_sdp_pfvf(rvu, pcifunc))
+ 		return 0;
+ 
+ 	if (!hw->cap.nix_rx_multicast)
+ 		return 0;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (!is_pf_cgxmapped(rvu, pf))
+ 		return 0;
+ 
+@@ -3619,7 +3623,7 @@ static int nix_setup_mce_tables(struct rvu *rvu, struct nix_hw *nix_hw)
+ 
+ 		for (idx = 0; idx < (numvfs + 1); idx++) {
+ 			/* idx-0 is for PF, followed by VFs */
+-			pcifunc = (pf << RVU_PFVF_PF_SHIFT);
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 			pcifunc |= idx;
+ 			/* Add dummy entries now, so that we don't have to check
+ 			 * for whether AQ_OP should be INIT/WRITE later on.
+@@ -4554,7 +4558,7 @@ int rvu_mbox_handler_nix_set_rx_mode(struct rvu *rvu, struct nix_rx_mode *req,
+ static void nix_find_link_frs(struct rvu *rvu,
+ 			      struct nix_frs_cfg *req, u16 pcifunc)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct rvu_pfvf *pfvf;
+ 	int maxlen, minlen;
+ 	int numvfs, hwvf;
+@@ -4601,7 +4605,7 @@ int rvu_mbox_handler_nix_set_hw_frs(struct rvu *rvu, struct nix_frs_cfg *req,
+ {
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 	u16 pcifunc = req->hdr.pcifunc;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	int blkaddr, link = -1;
+ 	struct nix_hw *nix_hw;
+ 	struct rvu_pfvf *pfvf;
+@@ -5251,7 +5255,7 @@ int rvu_mbox_handler_nix_lf_start_rx(struct rvu *rvu, struct msg_req *req,
+ 
+ 	rvu_switch_update_rules(rvu, pcifunc, true);
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (is_pf_cgxmapped(rvu, pf) && rvu->rep_mode)
+ 		rvu_rep_notify_pfvf_state(rvu, pcifunc, true);
+ 
+@@ -5284,7 +5288,7 @@ int rvu_mbox_handler_nix_lf_stop_rx(struct rvu *rvu, struct msg_req *req,
+ 	rvu_switch_update_rules(rvu, pcifunc, false);
+ 	rvu_cgx_tx_enable(rvu, pcifunc, true);
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (is_pf_cgxmapped(rvu, pf) && rvu->rep_mode)
+ 		rvu_rep_notify_pfvf_state(rvu, pcifunc, false);
+ 	return 0;
+@@ -5296,7 +5300,7 @@ void rvu_nix_lf_teardown(struct rvu *rvu, u16 pcifunc, int blkaddr, int nixlf)
+ {
+ 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
+ 	struct hwctx_disable_req ctx_req;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	struct mac_ops *mac_ops;
+ 	u8 cgx_id, lmac_id;
+ 	u64 sa_base;
+@@ -5385,7 +5389,7 @@ static int rvu_nix_lf_ptp_tx_cfg(struct rvu *rvu, u16 pcifunc, bool enable)
+ 	int nixlf;
+ 	u64 cfg;
+ 
+-	pf = rvu_get_pf(pcifunc);
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (!is_mac_feature_supported(rvu, pf, RVU_LMAC_FEAT_PTP))
+ 		return 0;
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index da15bb4..c7c7042 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -147,7 +147,9 @@ static int npc_get_ucast_mcam_index(struct npc_mcam *mcam, u16 pcifunc,
+ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
+ 			     u16 pcifunc, int nixlf, int type)
+ {
+-	int pf = rvu_get_pf(pcifunc);
++	struct rvu_hwinfo *hw = container_of(mcam, struct rvu_hwinfo, mcam);
++	struct rvu *rvu = hw->rvu;
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	int index;
+ 
+ 	/* Check if this is for a PF */
+@@ -698,7 +700,7 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
+ 
+ 	/* RX_ACTION set to MCAST for CGX PF's */
+ 	if (hw->cap.nix_rx_multicast && pfvf->use_mce_list &&
+-	    is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc))) {
++	    is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc))) {
+ 		*(u64 *)&action = 0;
+ 		action.op = NIX_RX_ACTIONOP_MCAST;
+ 		pfvf = rvu_get_pfvf(rvu, pcifunc & ~RVU_PFVF_FUNC_MASK);
+@@ -3434,7 +3436,7 @@ int rvu_npc_set_parse_mode(struct rvu *rvu, u16 pcifunc, u64 mode, u8 dir,
+ {
+ 	struct rvu_pfvf *pfvf = rvu_get_pfvf(rvu, pcifunc);
+ 	int blkaddr, nixlf, rc, intf_mode;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u64 rxpkind, txpkind;
+ 	u8 cgx_id, lmac_id;
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+index d2661e7..999f6d9 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+@@ -1465,7 +1465,7 @@ static int rvu_npc_exact_update_table_entry(struct rvu *rvu, u8 cgx_id, u8 lmac_
+ int rvu_npc_exact_promisc_disable(struct rvu *rvu, u16 pcifunc)
+ {
+ 	struct npc_exact_table *table;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 	u32 drop_mcam_idx;
+ 	bool *promisc;
+@@ -1512,7 +1512,7 @@ int rvu_npc_exact_promisc_disable(struct rvu *rvu, u16 pcifunc)
+ int rvu_npc_exact_promisc_enable(struct rvu *rvu, u16 pcifunc)
+ {
+ 	struct npc_exact_table *table;
+-	int pf = rvu_get_pf(pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u8 cgx_id, lmac_id;
+ 	u32 drop_mcam_idx;
+ 	bool *promisc;
+@@ -1560,7 +1560,7 @@ int rvu_npc_exact_promisc_enable(struct rvu *rvu, u16 pcifunc)
+ int rvu_npc_exact_mac_addr_reset(struct rvu *rvu, struct cgx_mac_addr_reset_req *req,
+ 				 struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u32 seq_id = req->index;
+ 	struct rvu_pfvf *pfvf;
+ 	u8 cgx_id, lmac_id;
+@@ -1593,7 +1593,7 @@ int rvu_npc_exact_mac_addr_update(struct rvu *rvu,
+ 				  struct cgx_mac_addr_update_req *req,
+ 				  struct cgx_mac_addr_update_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct npc_exact_table_entry *entry;
+ 	struct npc_exact_table *table;
+ 	struct rvu_pfvf *pfvf;
+@@ -1675,7 +1675,7 @@ int rvu_npc_exact_mac_addr_add(struct rvu *rvu,
+ 			       struct cgx_mac_addr_add_req *req,
+ 			       struct cgx_mac_addr_add_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	struct rvu_pfvf *pfvf;
+ 	u8 cgx_id, lmac_id;
+ 	int rc = 0;
+@@ -1711,7 +1711,7 @@ int rvu_npc_exact_mac_addr_del(struct rvu *rvu,
+ 			       struct cgx_mac_addr_del_req *req,
+ 			       struct msg_rsp *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	int rc;
+ 
+ 	rc = rvu_npc_exact_del_table_entry_by_id(rvu, req->index);
+@@ -1736,7 +1736,7 @@ int rvu_npc_exact_mac_addr_del(struct rvu *rvu,
+ int rvu_npc_exact_mac_addr_set(struct rvu *rvu, struct cgx_mac_addr_set_or_get *req,
+ 			       struct cgx_mac_addr_set_or_get *rsp)
+ {
+-	int pf = rvu_get_pf(req->hdr.pcifunc);
++	int pf = rvu_get_pf(rvu->pdev, req->hdr.pcifunc);
+ 	u32 seq_id = req->index;
+ 	struct rvu_pfvf *pfvf;
+ 	u8 cgx_id, lmac_id;
+@@ -2001,7 +2001,7 @@ int rvu_npc_exact_init(struct rvu *rvu)
+ 		}
+ 
+ 		/* Filter rules are only for PF */
+-		pcifunc = RVU_PFFUNC(i, 0);
++		pcifunc = RVU_PFFUNC(rvu->pdev, i, 0);
+ 
+ 		dev_dbg(rvu->dev,
+ 			"%s:Drop rule cgx=%d lmac=%d chan(val=0x%llx, mask=0x%llx\n",
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+index 57a0932..cb25cf4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+@@ -139,9 +139,7 @@ static struct npc_mcam_kex_hash npc_mkex_hash_default __maybe_unused = {
+ #define NPC_MCAM_DROP_RULE_MAX 30
+ #define NPC_MCAM_SDP_DROP_RULE_IDX 0
+ 
+-#define RVU_PFFUNC(pf, func)	\
+-	((((pf) & RVU_PFVF_PF_MASK) << RVU_PFVF_PF_SHIFT) | \
+-	(((func) & RVU_PFVF_FUNC_MASK) << RVU_PFVF_FUNC_SHIFT))
++#define RVU_PFFUNC(pdev, pf, func) rvu_make_pcifunc(pdev, pf, func)
+ 
+ enum npc_exact_opc_type {
+ 	NPC_EXACT_OPC_MEM,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+index 32953cc..03099bc 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+@@ -39,7 +39,7 @@ static int rvu_rep_up_notify(struct rvu *rvu, struct rep_event *event)
+ 	struct rep_event *msg;
+ 	int pf;
+ 
+-	pf = rvu_get_pf(event->pcifunc);
++	pf = rvu_get_pf(rvu->pdev, event->pcifunc);
+ 
+ 	if (event->event & RVU_EVENT_MAC_ADDR_CHANGE)
+ 		ether_addr_copy(pfvf->mac_addr, event->evt_data.mac);
+@@ -114,10 +114,10 @@ int rvu_rep_notify_pfvf_state(struct rvu *rvu, u16 pcifunc, bool enable)
+ 	struct rep_event *req;
+ 	int pf;
+ 
+-	if (!is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)))
++	if (!is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)))
+ 		return 0;
+ 
+-	pf = rvu_get_pf(rvu->rep_pcifunc);
++	pf = rvu_get_pf(rvu->pdev, rvu->rep_pcifunc);
+ 
+ 	mutex_lock(&rvu->mbox_lock);
+ 	req = otx2_mbox_alloc_msg_rep_event_up_notify(rvu, pf);
+@@ -325,7 +325,7 @@ int rvu_rep_install_mcam_rules(struct rvu *rvu)
+ 		if (!is_pf_cgxmapped(rvu, pf))
+ 			continue;
+ 
+-		pcifunc = pf << RVU_PFVF_PF_SHIFT;
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		rvu_get_nix_blkaddr(rvu, pcifunc);
+ 		rep = true;
+ 		for (i = 0; i < 2; i++) {
+@@ -345,8 +345,7 @@ int rvu_rep_install_mcam_rules(struct rvu *rvu)
+ 
+ 		rvu_get_pf_numvfs(rvu, pf, &numvfs, NULL);
+ 		for (vf = 0; vf < numvfs; vf++) {
+-			pcifunc = pf << RVU_PFVF_PF_SHIFT |
+-				  ((vf + 1) & RVU_PFVF_FUNC_MASK);
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, vf + 1);
+ 			rvu_get_nix_blkaddr(rvu, pcifunc);
+ 
+ 			/* Skip installimg rules if nixlf is not attached */
+@@ -454,7 +453,7 @@ int rvu_mbox_handler_get_rep_cnt(struct rvu *rvu, struct msg_req *req,
+ 	for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
+ 		if (!is_pf_cgxmapped(rvu, pf))
+ 			continue;
+-		pcifunc = pf << RVU_PFVF_PF_SHIFT;
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		rvu->rep2pfvf_map[rep] = pcifunc;
+ 		rsp->rep_pf_map[rep] = pcifunc;
+ 		rep++;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
+index 38cfe14..e4a5f9f 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
+@@ -17,9 +17,9 @@
+ /* SDP PF number */
+ static int sdp_pf_num[MAX_SDP] = {-1, -1};
+ 
+-bool is_sdp_pfvf(u16 pcifunc)
++bool is_sdp_pfvf(struct rvu *rvu, u16 pcifunc)
+ {
+-	u16 pf = rvu_get_pf(pcifunc);
++	u16 pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	u32 found = 0, i = 0;
+ 
+ 	while (i < MAX_SDP) {
+@@ -34,9 +34,9 @@ bool is_sdp_pfvf(u16 pcifunc)
+ 	return true;
+ }
+ 
+-bool is_sdp_pf(u16 pcifunc)
++bool is_sdp_pf(struct rvu *rvu, u16 pcifunc)
+ {
+-	return (is_sdp_pfvf(pcifunc) &&
++	return (is_sdp_pfvf(rvu, pcifunc) &&
+ 		!(pcifunc & RVU_PFVF_FUNC_MASK));
+ }
+ 
+@@ -46,7 +46,7 @@ bool is_sdp_vf(struct rvu *rvu, u16 pcifunc)
+ 	if (!(pcifunc & ~RVU_PFVF_FUNC_MASK))
+ 		return (rvu->vf_devid == RVU_SDP_VF_DEVID);
+ 
+-	return (is_sdp_pfvf(pcifunc) &&
++	return (is_sdp_pfvf(rvu, pcifunc) &&
+ 		!!(pcifunc & RVU_PFVF_FUNC_MASK));
+ }
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
+index 268efb7..49ce386 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_switch.c
+@@ -93,7 +93,7 @@ static int rvu_switch_install_rules(struct rvu *rvu)
+ 		if (!is_pf_cgxmapped(rvu, pf))
+ 			continue;
+ 
+-		pcifunc = pf << 10;
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		/* rvu_get_nix_blkaddr sets up the corresponding NIX block
+ 		 * address and NIX RX and TX interfaces for a pcifunc.
+ 		 * Generally it is called during attach call of a pcifunc but it
+@@ -126,7 +126,7 @@ static int rvu_switch_install_rules(struct rvu *rvu)
+ 
+ 		rvu_get_pf_numvfs(rvu, pf, &numvfs, NULL);
+ 		for (vf = 0; vf < numvfs; vf++) {
+-			pcifunc = pf << 10 | ((vf + 1) & 0x3FF);
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, (vf + 1));
+ 			rvu_get_nix_blkaddr(rvu, pcifunc);
+ 
+ 			err = rvu_switch_install_rx_rule(rvu, pcifunc, 0x0);
+@@ -236,7 +236,7 @@ void rvu_switch_disable(struct rvu *rvu)
+ 		if (!is_pf_cgxmapped(rvu, pf))
+ 			continue;
+ 
+-		pcifunc = pf << 10;
++		pcifunc = rvu_make_pcifunc(rvu->pdev, pf, 0);
+ 		err = rvu_switch_install_rx_rule(rvu, pcifunc, 0xFFF);
+ 		if (err)
+ 			dev_err(rvu->dev,
+@@ -248,7 +248,7 @@ void rvu_switch_disable(struct rvu *rvu)
+ 
+ 		rvu_get_pf_numvfs(rvu, pf, &numvfs, NULL);
+ 		for (vf = 0; vf < numvfs; vf++) {
+-			pcifunc = pf << 10 | ((vf + 1) & 0x3FF);
++			pcifunc = rvu_make_pcifunc(rvu->pdev, pf, (vf + 1));
+ 			err = rvu_switch_install_rx_rule(rvu, pcifunc, 0xFFF);
+ 			if (err)
+ 				dev_err(rvu->dev,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+index a6500e3..c691f072 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+@@ -481,7 +481,7 @@ static int cn10k_outb_write_sa(struct otx2_nic *pf, struct qmem *sa_info)
+ 		goto set_available;
+ 
+ 	/* Trigger CTX flush to write dirty data back to DRAM */
+-	reg_val = FIELD_PREP(CPT_LF_CTX_FLUSH, sa_iova >> 7);
++	reg_val = FIELD_PREP(CPT_LF_CTX_FLUSH_CPTR, sa_iova >> 7);
+ 	otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
+ 
+ set_available:
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+index 9965df0..43fbce0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+@@ -220,7 +220,7 @@ struct cpt_sg_s {
+ #define CPT_LF_Q_SIZE_DIV40 GENMASK_ULL(14, 0)
+ 
+ /* CPT LF CTX Flush Register */
+-#define CPT_LF_CTX_FLUSH GENMASK_ULL(45, 0)
++#define CPT_LF_CTX_FLUSH_CPTR GENMASK_ULL(45, 0)
+ 
+ #ifdef CONFIG_XFRM_OFFLOAD
+ int cn10k_ipsec_init(struct net_device *netdev);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index a2a7fc9..8ada34a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -28,6 +28,7 @@
+ #include "otx2_reg.h"
+ #include "otx2_txrx.h"
+ #include "otx2_devlink.h"
++#include <rvu.h>
+ #include <rvu_trace.h>
+ #include "qos.h"
+ #include "rep.h"
+@@ -904,21 +905,11 @@ MBOX_UP_MCS_MESSAGES
+ /* Time to wait before watchdog kicks off */
+ #define OTX2_TX_TIMEOUT		(100 * HZ)
+ 
+-#define	RVU_PFVF_PF_SHIFT	10
+-#define	RVU_PFVF_PF_MASK	0x3F
+-#define	RVU_PFVF_FUNC_SHIFT	0
+-#define	RVU_PFVF_FUNC_MASK	0x3FF
+-
+ static inline bool is_otx2_vf(u16 pcifunc)
+ {
+ 	return !!(pcifunc & RVU_PFVF_FUNC_MASK);
+ }
+ 
+-static inline int rvu_get_pf(u16 pcifunc)
+-{
+-	return (pcifunc >> RVU_PFVF_PF_SHIFT) & RVU_PFVF_PF_MASK;
+-}
+-
+ static inline dma_addr_t otx2_dma_map_page(struct otx2_nic *pfvf,
+ 					   struct page *page,
+ 					   size_t offset, size_t size,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 07da4d6..1dc3e05 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -206,7 +206,8 @@ static int otx2_register_flr_me_intr(struct otx2_nic *pf, int numvfs)
+ 
+ 	/* Register ME interrupt handler*/
+ 	irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFME0 * NAME_SIZE];
+-	snprintf(irq_name, NAME_SIZE, "RVUPF%d_ME0", rvu_get_pf(pf->pcifunc));
++	snprintf(irq_name, NAME_SIZE, "RVUPF%d_ME0",
++		 rvu_get_pf(pf->pdev, pf->pcifunc));
+ 	ret = request_irq(pci_irq_vector(pf->pdev, RVU_PF_INT_VEC_VFME0),
+ 			  otx2_pf_me_intr_handler, 0, irq_name, pf);
+ 	if (ret) {
+@@ -216,7 +217,8 @@ static int otx2_register_flr_me_intr(struct otx2_nic *pf, int numvfs)
+ 
+ 	/* Register FLR interrupt handler */
+ 	irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFFLR0 * NAME_SIZE];
+-	snprintf(irq_name, NAME_SIZE, "RVUPF%d_FLR0", rvu_get_pf(pf->pcifunc));
++	snprintf(irq_name, NAME_SIZE, "RVUPF%d_FLR0",
++		 rvu_get_pf(pf->pdev, pf->pcifunc));
+ 	ret = request_irq(pci_irq_vector(pf->pdev, RVU_PF_INT_VEC_VFFLR0),
+ 			  otx2_pf_flr_intr_handler, 0, irq_name, pf);
+ 	if (ret) {
+@@ -228,7 +230,7 @@ static int otx2_register_flr_me_intr(struct otx2_nic *pf, int numvfs)
+ 	if (numvfs > 64) {
+ 		irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFME1 * NAME_SIZE];
+ 		snprintf(irq_name, NAME_SIZE, "RVUPF%d_ME1",
+-			 rvu_get_pf(pf->pcifunc));
++			 rvu_get_pf(pf->pdev, pf->pcifunc));
+ 		ret = request_irq(pci_irq_vector
+ 				  (pf->pdev, RVU_PF_INT_VEC_VFME1),
+ 				  otx2_pf_me_intr_handler, 0, irq_name, pf);
+@@ -238,7 +240,7 @@ static int otx2_register_flr_me_intr(struct otx2_nic *pf, int numvfs)
+ 		}
+ 		irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFFLR1 * NAME_SIZE];
+ 		snprintf(irq_name, NAME_SIZE, "RVUPF%d_FLR1",
+-			 rvu_get_pf(pf->pcifunc));
++			 rvu_get_pf(pf->pdev, pf->pcifunc));
+ 		ret = request_irq(pci_irq_vector
+ 				  (pf->pdev, RVU_PF_INT_VEC_VFFLR1),
+ 				  otx2_pf_flr_intr_handler, 0, irq_name, pf);
+@@ -700,7 +702,7 @@ static int otx2_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
+ 	irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFPF_MBOX0 * NAME_SIZE];
+ 	if (pf->pcifunc)
+ 		snprintf(irq_name, NAME_SIZE,
+-			 "RVUPF%d_VF Mbox0", rvu_get_pf(pf->pcifunc));
++			 "RVUPF%d_VF Mbox0", rvu_get_pf(pf->pdev, pf->pcifunc));
+ 	else
+ 		snprintf(irq_name, NAME_SIZE, "RVUPF_VF Mbox0");
+ 	err = request_irq(pci_irq_vector(pf->pdev, RVU_PF_INT_VEC_VFPF_MBOX0),
+@@ -716,7 +718,8 @@ static int otx2_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
+ 		irq_name = &hw->irq_name[RVU_PF_INT_VEC_VFPF_MBOX1 * NAME_SIZE];
+ 		if (pf->pcifunc)
+ 			snprintf(irq_name, NAME_SIZE,
+-				 "RVUPF%d_VF Mbox1", rvu_get_pf(pf->pcifunc));
++				 "RVUPF%d_VF Mbox1",
++				 rvu_get_pf(pf->pdev, pf->pcifunc));
+ 		else
+ 			snprintf(irq_name, NAME_SIZE, "RVUPF_VF Mbox1");
+ 		err = request_irq(pci_irq_vector(pf->pdev,
+@@ -1971,7 +1974,7 @@ int otx2_open(struct net_device *netdev)
+ 	if (err) {
+ 		dev_err(pf->dev,
+ 			"RVUPF%d: IRQ registration failed for QERR\n",
+-			rvu_get_pf(pf->pcifunc));
++			rvu_get_pf(pf->pdev, pf->pcifunc));
+ 		goto err_disable_napi;
+ 	}
+ 
+@@ -1989,7 +1992,7 @@ int otx2_open(struct net_device *netdev)
+ 		if (name_len >= NAME_SIZE) {
+ 			dev_err(pf->dev,
+ 				"RVUPF%d: IRQ registration failed for CQ%d, irq name is too long\n",
+-				rvu_get_pf(pf->pcifunc), qidx);
++				rvu_get_pf(pf->pdev, pf->pcifunc), qidx);
+ 			err = -EINVAL;
+ 			goto err_free_cints;
+ 		}
+@@ -2000,7 +2003,7 @@ int otx2_open(struct net_device *netdev)
+ 		if (err) {
+ 			dev_err(pf->dev,
+ 				"RVUPF%d: IRQ registration failed for CQ%d\n",
+-				rvu_get_pf(pf->pcifunc), qidx);
++				rvu_get_pf(pf->pdev, pf->pcifunc), qidx);
+ 			goto err_free_cints;
+ 		}
+ 		vec++;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
+index e3aee6e..858f084 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
+@@ -138,36 +138,6 @@
+ #define	NIX_LF_CINTX_ENA_W1S(a)		(NIX_LFBASE | 0xD40 | (a) << 12)
+ #define	NIX_LF_CINTX_ENA_W1C(a)		(NIX_LFBASE | 0xD50 | (a) << 12)
+ 
+-/* NIX AF transmit scheduler registers */
+-#define NIX_AF_SMQX_CFG(a)		(0x700 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_SDP_LINK_CFG(a)	(0xB10 | (u64)(a) << 16)
+-#define NIX_AF_TL1X_SCHEDULE(a)		(0xC00 | (u64)(a) << 16)
+-#define NIX_AF_TL1X_CIR(a)		(0xC20 | (u64)(a) << 16)
+-#define NIX_AF_TL1X_TOPOLOGY(a)		(0xC80 | (u64)(a) << 16)
+-#define NIX_AF_TL2X_PARENT(a)		(0xE88 | (u64)(a) << 16)
+-#define NIX_AF_TL2X_SCHEDULE(a)		(0xE00 | (u64)(a) << 16)
+-#define NIX_AF_TL2X_TOPOLOGY(a)		(0xE80 | (u64)(a) << 16)
+-#define NIX_AF_TL2X_CIR(a)		(0xE20 | (u64)(a) << 16)
+-#define NIX_AF_TL2X_PIR(a)		(0xE30 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_PARENT(a)		(0x1088 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_SCHEDULE(a)		(0x1000 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_SHAPE(a)		(0x1010 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_CIR(a)		(0x1020 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_PIR(a)		(0x1030 | (u64)(a) << 16)
+-#define NIX_AF_TL3X_TOPOLOGY(a)		(0x1080 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_PARENT(a)		(0x1288 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_SCHEDULE(a)		(0x1200 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_SHAPE(a)		(0x1210 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_CIR(a)		(0x1220 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_PIR(a)		(0x1230 | (u64)(a) << 16)
+-#define NIX_AF_TL4X_TOPOLOGY(a)		(0x1280 | (u64)(a) << 16)
+-#define NIX_AF_MDQX_SCHEDULE(a)		(0x1400 | (u64)(a) << 16)
+-#define NIX_AF_MDQX_SHAPE(a)		(0x1410 | (u64)(a) << 16)
+-#define NIX_AF_MDQX_CIR(a)		(0x1420 | (u64)(a) << 16)
+-#define NIX_AF_MDQX_PIR(a)		(0x1430 | (u64)(a) << 16)
+-#define NIX_AF_MDQX_PARENT(a)		(0x1480 | (u64)(a) << 16)
+-#define NIX_AF_TL3_TL2X_LINKX_CFG(a, b)	(0x1700 | (u64)(a) << 16 | (b) << 3)
+-
+ /* LMT LF registers */
+ #define LMT_LFBASE			BIT_ULL(RVU_FUNC_BLKADDR_SHIFT)
+ #define LMT_LF_LMTLINEX(a)		(LMT_LFBASE | 0x000 | (a) << 12)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 9a226ca..5f80b23 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -467,7 +467,8 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
+ 			target = act->dev;
+ 			if (target->dev.parent) {
+ 				priv = netdev_priv(target);
+-				if (rvu_get_pf(nic->pcifunc) != rvu_get_pf(priv->pcifunc)) {
++				if (rvu_get_pf(nic->pdev, nic->pcifunc) !=
++					rvu_get_pf(nic->pdev, priv->pcifunc)) {
+ 					NL_SET_ERR_MSG_MOD(extack,
+ 							   "can't redirect to other pf/vf");
+ 					return -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+index 2cd3da3..25af980 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+@@ -244,10 +244,10 @@ static int rvu_rep_devlink_port_register(struct rep_dev *rep)
+ 
+ 	if (!(rep->pcifunc & RVU_PFVF_FUNC_MASK)) {
+ 		attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
+-		attrs.phys.port_number = rvu_get_pf(rep->pcifunc);
++		attrs.phys.port_number = rvu_get_pf(priv->pdev, rep->pcifunc);
+ 	} else {
+ 		attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
+-		attrs.pci_vf.pf = rvu_get_pf(rep->pcifunc);
++		attrs.pci_vf.pf = rvu_get_pf(priv->pdev, rep->pcifunc);
+ 		attrs.pci_vf.vf = rep->pcifunc & RVU_PFVF_FUNC_MASK;
+ 	}
+ 
+@@ -672,7 +672,8 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
+ 		rep->pcifunc = pcifunc;
+ 
+ 		snprintf(ndev->name, sizeof(ndev->name), "Rpf%dvf%d",
+-			 rvu_get_pf(pcifunc), (pcifunc & RVU_PFVF_FUNC_MASK));
++			 rvu_get_pf(priv->pdev, pcifunc),
++			 (pcifunc & RVU_PFVF_FUNC_MASK));
+ 
+ 		ndev->hw_features = (NETIF_F_RXCSUM | NETIF_F_IP_CSUM |
+ 			       NETIF_F_IPV6_CSUM | NETIF_F_RXHASH |
+diff --git a/include/linux/soc/marvell/silicons.h b/include/linux/soc/marvell/silicons.h
+new file mode 100644
+index 0000000..66bb9bf
+--- /dev/null
++++ b/include/linux/soc/marvell/silicons.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only
++ * Copyright (C) 2024 Marvell.
++ */
++
++#ifndef __SOC_SILICON_H
++#define __SOC_SILICON_H
++
++#include <linux/types.h>
++#include <linux/pci.h>
++
++#if defined(CONFIG_ARM64)
++
++#define CN20K_CHIPID	0x20
++/*
++ * Silicon check for CN20K family
++ */
++static inline bool is_cn20k(struct pci_dev *pdev)
++{
++	return (pdev->subsystem_device & 0xFF) == CN20K_CHIPID;
++}
++#else
++#define is_cn20k(pdev)		((void)(pdev), 0)
++#endif
++
++#endif /* __SOC_SILICON_H */
 -- 
 2.7.4
 
