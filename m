@@ -1,138 +1,136 @@
-Return-Path: <netdev+bounces-196504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F1AD50D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:04:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 547BBAD5136
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3052F177101
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:04:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDC8317F54B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2914265290;
-	Wed, 11 Jun 2025 10:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B88267B7D;
+	Wed, 11 Jun 2025 10:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5jUiS+x"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NkO+L4no"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A365264F89
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 10:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8958F2620CA;
+	Wed, 11 Jun 2025 10:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749636206; cv=none; b=UFvfbw15wNtYm2jcmoN51H5t4YlaYtS+poQZAhDrE/sNNEN1XOETYqnUNXAZ62m/jOEnM/CM3O8QaH13uPjJjwshKGGUAzKhP5jz7HpuI8VlnwhV92KlklgLCpfYvlBXM8YThlnV4e+2JKUaeLz//C0TOY0vAx3Gtn1pdn/7UMA=
+	t=1749636313; cv=none; b=dh+JwU7veS93i8Km6A3E/SBlkJwUnnnlNPwuMNPlLkPQwo09lSudM9OGbV3v7X511Juhf0HXijuaKfC1r0P3e72AhxzYOk/1TQeo4oMECQUlH87YTQ7II5MHnu4To2UVV9uftji0eYrtrtlLMz1N03EJWDAyK1w1zu6DWcxDs/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749636206; c=relaxed/simple;
-	bh=2jo8QWa/Ki7fu4LsMSRYrVQNMs+IQd8tPkZjlP+Mkew=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=HVGrLjOBtmhTz58e9NQfAEkOoZsabA0Fv/Mt0LQwGi8g5Vgh4PB38I1835OM4j4fPLZlIcCgrf7QQK+L0/35Mw/VJoublT5pVjCS6o48qEoTDC4YLtlHpMUUWeTI1Tll9aL+cY1Jo2GQetZVtvMPcn9+wKi+YTBagPBZwe5+hA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l5jUiS+x; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2353a2bc210so56283215ad.2
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 03:03:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749636205; x=1750241005; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uO0HDocWQrGpNJnG9ZFCm3Y7fIbFztwtrTDovEGEp0U=;
-        b=l5jUiS+x1hL+QoOJgm3QcEgGx9OkGQMo/Jkc/MiIB7RMRqDC8HnlrRok45jeP00i78
-         e4SIRuvH2Ge8RYjbHQKDOumKsXgQCaiFSFJj/tWikxBdqWU2cpBUsWns3hTfLiRz6T7R
-         aFByCE7x0PJwK2048Aot2mfOSq+DORQd3nspLlSB7/LDNtd9rDM8iXil5YCJaqScUjP0
-         6s0bju84YGk81eOfXil0EvNzDBU8E/I6S4lRuXvqr15UgqZKM0vW9oYCvvSMxtZLAfPE
-         ZZKz45DIQ//0G1UHHlhCxbSKvjN7t+ZEDgglXuw/Jeamzr+vuRRat9AFC5GVotTiAfGm
-         QwUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749636205; x=1750241005;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uO0HDocWQrGpNJnG9ZFCm3Y7fIbFztwtrTDovEGEp0U=;
-        b=obIQ2xenQuz1LLhycJQZYWFNiNCim2695dHx3AN0vtSpLL6ynRajhVCMI++crN40z9
-         I36wkBX44nwrfxjcr85oTVTfD7r6jAwGDfoFDRah/nSFQriYoS8jbY3k+Pj08weutr3Y
-         WIqqZ/mmo7DLlsS6Ab4cos5jJdiEXSCnwGv/+9eja7NTdsDWfXGsxSTWwnkGHEUJ+7zm
-         aqNakI+8+AFY+e15jie+mGqbt/NOa/778jqTj2FsJ4i6j155nPRwgbdIzQ5jfJQGQqvC
-         Yiyl404coA6gxC6Xtg51B7p8XTS2vCAoLdjUN0Fld8TChzkqj5ZUq9Q7i2ys3uFErMgW
-         CzdA==
-X-Gm-Message-State: AOJu0YysdBYH4+shqGeKJOtGzZS0Ktsw5UsAKf6TR2wDeLmeZSjMb/ff
-	Uye43kNkU/mESRIYf/E3EOCQM6A7NfDAPKzTAUqAkC/+gPf93bCn0i28
-X-Gm-Gg: ASbGncugeArTFuJ4Mynw4rrXVuyMZp9TqTUdqy3U7cd900SVl6X4jC7jpvXvHWjaMMg
-	VWgUkVgIvgNZIvzbCo74nKms84i6KzxL0oxyOm95pjks5t4PozY8uoKhZ27dTKPtb/V279sDl7U
-	UFoug4iUAaKxPXoNTdOwDqpcbWPwVld6nc2UR2QlnMcPBhdPWj1lT4gDUbjuVlgraTKnWbKVx4+
-	cCw3luURijLxpHYsXy/2vLZcCGQTjM94XFjmi8LwYU6x3oZouEWxDbzswc1rRWlOKLtls7y1/4l
-	eMvq4Dc5vGnG2nnBZ++puQ+K5V/sjj44g6a3L9hYoUYtZhfB5AsD5oXZXOpjUyHz3H9VZLNquum
-	iAY/uek+ZFYyX
-X-Google-Smtp-Source: AGHT+IHQqRyvN0tIvHjsnc5F6meBEOcVseyzjBfnN9orMbJLqXHkQJUapzuy7RpyKPSVvzzoYGjCQA==
-X-Received: by 2002:a17:903:244a:b0:234:986c:66e0 with SMTP id d9443c01a7336-236425fe59cmr33239025ad.4.1749636204550;
-        Wed, 11 Jun 2025 03:03:24 -0700 (PDT)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2360309266bsm84036595ad.74.2025.06.11.03.03.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 03:03:24 -0700 (PDT)
-Date: Wed, 11 Jun 2025 06:03:19 -0400
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: vinicius.gomes@intel.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, imv4bel@gmail.com, v4bel@theori.io
-Subject: [PATCH] net/sched: fix use-after-free in taprio_dev_notifier
-Message-ID: <aElUZyKy7x66X3SD@v4bel-B760M-AORUS-ELITE-AX>
+	s=arc-20240116; t=1749636313; c=relaxed/simple;
+	bh=TeLI3Lddts0BIYHmBS0TtowM9nVihM9glw/C2T0j7XM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uytTF1zh73FuMbWatoRXIwZBrZqZWIhAx4pPrlUWUDI47HVzh5eLk/V50GZevv8UOQnwZ0d9nGDM0Fwf4c9ClvI0xnQY8uh/+Cu1/BVhIvsTRoltmjs+PFy7ncLwPlWILyU6SSo/hw0ptZ50QWUl7Ecln/DtgEf2gdZ62iBmNh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NkO+L4no; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from DESKTOP-RSFL4TU.corp.microsoft.com (unknown [167.220.238.139])
+	by linux.microsoft.com (Postfix) with ESMTPSA id E878B2115188;
+	Wed, 11 Jun 2025 03:05:01 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E878B2115188
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1749636311;
+	bh=iFH/A224Q7Iky4IKjuP9TxBCXGPTpQ+mWawcgol9EaM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=NkO+L4noU0fsiOO/C7biOMxA6iMyK/EamuP/4x0qx+xMoA4wcnRKwpXYB6GBSXnyS
+	 8XpgrGCgIkGGbl0cadlbp0unuMHuYlREdNsRhXOp27/vWCp2T6ZcnSUCcMJ3IbzZAM
+	 Zk5vBoLeQmK9m+OUqW1a7AnaUtSJT/mdUrSy875g=
+From: Naman Jain <namjain@linux.microsoft.com>
+To: "K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Long Li <longli@microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: [PATCH 0/6] Fix warning for missing export.h in Hyper-V drivers
+Date: Wed, 11 Jun 2025 15:34:53 +0530
+Message-Id: <20250611100459.92900-1-namjain@linux.microsoft.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-Since taprio’s taprio_dev_notifier() isn’t protected by an
-RCU read-side critical section, a race with advance_sched()
-can lead to a use-after-free.
+When the kernel is compiled with W=1 option, a warning is reported
+if a .c file exports a symbol but does not include export.h header
+file. This warning was added in below patch, which merged recently:
+commit a934a57a42f6 ("scripts/misc-check: check missing #include <linux/export.h> when W=1")
 
-Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
+Fix this issue in Hyper-V drivers. This does not bring any
+functional changes.
 
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- net/sched/sch_taprio.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+The one in drivers/hv/vmbus_drv.c is going to be fixed with 
+https://lore.kernel.org/all/20250611072704.83199-2-namjain@linux.microsoft.com/
+so it is not included in this series.
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 14021b812329..bd2b02d1dc63 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1320,6 +1320,7 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
- 	if (event != NETDEV_UP && event != NETDEV_CHANGE)
- 		return NOTIFY_DONE;
- 
-+	rcu_read_lock();
- 	list_for_each_entry(q, &taprio_list, taprio_list) {
- 		if (dev != qdisc_dev(q->root))
- 			continue;
-@@ -1328,16 +1329,17 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
- 
- 		stab = rtnl_dereference(q->root->stab);
- 
--		oper = rtnl_dereference(q->oper_sched);
-+		oper = rcu_dereference(q->oper_sched);
- 		if (oper)
- 			taprio_update_queue_max_sdu(q, oper, stab);
- 
--		admin = rtnl_dereference(q->admin_sched);
-+		admin = rcu_dereference(q->admin_sched);
- 		if (admin)
- 			taprio_update_queue_max_sdu(q, admin, stab);
- 
- 		break;
- 	}
-+	rcu_read_unlock();
- 
- 	return NOTIFY_DONE;
- }
+Naman Jain (6):
+  Drivers: hv: Fix warnings for missing export.h header inclusion
+  x86/hyperv: Fix warnings for missing export.h header inclusion
+  KVM: x86: hyper-v: Fix warnings for missing export.h header inclusion
+  clocksource: hyper-v: Fix warnings for missing export.h header
+    inclusion
+  PCI: hv: Fix warnings for missing export.h header inclusion
+  net: mana: Fix warnings for missing export.h header inclusion
+
+ arch/x86/hyperv/hv_init.c                       | 1 +
+ arch/x86/hyperv/irqdomain.c                     | 1 +
+ arch/x86/hyperv/ivm.c                           | 1 +
+ arch/x86/hyperv/nested.c                        | 1 +
+ arch/x86/kvm/hyperv.c                           | 1 +
+ arch/x86/kvm/kvm_onhyperv.c                     | 1 +
+ drivers/clocksource/hyperv_timer.c              | 1 +
+ drivers/hv/channel.c                            | 1 +
+ drivers/hv/channel_mgmt.c                       | 1 +
+ drivers/hv/hv_proc.c                            | 1 +
+ drivers/hv/mshv_common.c                        | 1 +
+ drivers/hv/mshv_root_hv_call.c                  | 1 +
+ drivers/hv/ring_buffer.c                        | 1 +
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c   | 1 +
+ drivers/pci/controller/pci-hyperv-intf.c        | 1 +
+ 16 files changed, 16 insertions(+)
+
+
+base-commit: 475c850a7fdd0915b856173186d5922899d65686
 -- 
 2.34.1
 
