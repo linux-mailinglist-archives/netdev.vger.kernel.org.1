@@ -1,86 +1,80 @@
-Return-Path: <netdev+bounces-196736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79DF2AD61EC
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:52:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C91C4AD61F3
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21FA11884A5A
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:52:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B48431899707
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA62248F5C;
-	Wed, 11 Jun 2025 21:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BB2228CA9;
+	Wed, 11 Jun 2025 21:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lww1Z/aU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3unw4LjE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53415248F4C;
-	Wed, 11 Jun 2025 21:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277D71E376C
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749678706; cv=none; b=noXxzZ/GaWQAgrhtsTBv51hzqomWEVu2WIR+Vn5z9Cpk7SBMZy8Yc+iErbZnrPLppZZQO2SET5kn9dlk9nfabZ2FmTaHLs6T1bD+emMrWSicJKfNOQZc1F6Hl1NYxnfP3cbT3er+y+T38JErMEF+sdgzOGsvI67/ziTggIVpcV4=
+	t=1749678879; cv=none; b=ZvqSUaI1eXWInKkSRHwA/4hYvxQE8QI+xxtyrZniGTNqn0LqaLZ9PrCQCIItCVNYmzEOJSyKDiVhY0jBA2ofE+P6DDK3QiomuPMWf44ErM6ndTGHOyiVJ0g6Ovwi9vmlRBEhwHQl9h6vZLqNCg9Bv0idXBBPH01EkZYWsPtYi80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749678706; c=relaxed/simple;
-	bh=lOF+vJkSoTcD/Yeh5Qod+FBW7jj9zn7uSn8kVPYoEfg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PcD+nrAl35n2oW87hWnee1ICCpw+Phr4WFZzdOYXPr8b7a8unQMiNnechN1nI8Kx+W9JNyKaYOGCE5RUyqYsAoCgCwklPurcmYg4uTkWJ+Os+7Pt4/tzyKYkHR+hGMOaYPgSCloaQqW8udy1WXQBOIGjzU8ZLPJkTzTYEiz1nyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lww1Z/aU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A7BDC4CEF1;
-	Wed, 11 Jun 2025 21:51:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749678705;
-	bh=lOF+vJkSoTcD/Yeh5Qod+FBW7jj9zn7uSn8kVPYoEfg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Lww1Z/aUQX7bXggPR8ZyY05kKqlKxNVkxCw0upkeypbOW5zMKMSdDlYwgkxYQ8tQ2
-	 2TpY8mURV7V3Z+h8zRrOSErEjrsi4KTP422kHomSwJCs3mSSVRb0TSw1hoEUL/cThw
-	 G1aj6m9fSSWTxRmN4Biobgyr2tMRI1TPHyS+7+SuKtPRIrCkFx1EBrdCryCwblRvR0
-	 DHoaPk1ZzK/uW7aKUee4uHWIshXBiV5XroU3fgVuD/WLUAnBJLxbHGxstQMrV5grgK
-	 Sul9VB52Hg2RyZ0bTxyiFozvYRJDLRiiAnIjpByz+fKPRdBDdkGvlcJ6k7xADnFgvm
-	 wqs700Tay4vSw==
-Date: Wed, 11 Jun 2025 14:51:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Charalampos Mitrodimas <charmitro@posteo.net>
-Cc: RubenKelevra <rubenkelevra@gmail.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] net: pfcp: fix typo in message_priority field name
-Message-ID: <20250611145144.2bc0a7b7@kernel.org>
-In-Reply-To: <87cybbzbe3.fsf@posteo.net>
-References: <20250610160612.268612-1-rubenkelevra@gmail.com>
-	<87cybbzbe3.fsf@posteo.net>
+	s=arc-20240116; t=1749678879; c=relaxed/simple;
+	bh=GuZNk/LX1sDfa1H74bNw12LfYSjZRlGfoDps5wDLPbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zf34j8n9dZFOkyqUzfDcy2FKhqwrA5RfxfQphu1sCas6P3/UkYISZ/WV/p8y/i8Na8USWY1S9fKyom91bA7H9kG5xUKuGaC0uqOhaOtrwg2TK4J5UK96+mmO2HKruRPqLnFkC+5kF+mU459kcL2tW/ZB1cUvqk61w8IS5f8RA/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3unw4LjE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w+DrNpiWZPwCmdhyUp5QZplOdv0f5LqQFW+E20Kyel8=; b=3unw4LjEVY+UpMkmw78njzBMOF
+	UCJExB4mX+L5B5GU/o7bq65FQN+Nnudv3nRUHK/IEXYZRlm7KFstNTyLO0JYXmrFI+UUwYn6z6BSA
+	R0g2r7MFm6hM4GtVsF21XAkLOl399JtK2Cm6rc+NCYWe1ouqA2N63/R5jjSJ4S0HkfYk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uPTOv-00FSU1-Gg; Wed, 11 Jun 2025 23:54:29 +0200
+Date: Wed, 11 Jun 2025 23:54:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
+	sanman.p211993@gmail.com, jacob.e.keller@intel.com, lee@trager.us,
+	suhui@nfschina.com
+Subject: Re: [PATCH net-next 1/2] eth: Update rmon hist range
+Message-ID: <e2196bf7-5e97-4235-bf99-f6d546e6f621@lunn.ch>
+References: <20250610171109.1481229-1-mohsin.bashr@gmail.com>
+ <20250610171109.1481229-2-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250610171109.1481229-2-mohsin.bashr@gmail.com>
 
-On Tue, 10 Jun 2025 18:42:28 +0000 Charalampos Mitrodimas wrote:
-> > Fix 'message_priprity' typo to 'message_priority' in big endian
-> > bitfield definition. This typo breaks compilation on big endian
-> > architectures.
-> >
-> > Fixes: 6dd514f48110 ("pfcp: always set pfcp metadata")
-> > Cc: stable@vger.kernel.org # commit 6dd514f48110 ("pfcp: always set pfcp metadata")
-> > Signed-off-by: RubenKelevra <rubenkelevra@gmail.com>
->
-> I had the same issue today, happy there's a patch for this.
+On Tue, Jun 10, 2025 at 10:11:08AM -0700, Mohsin Bashir wrote:
+> The fbnic driver reports up-to 11 ranges resulting in the drop of the
+> last range. This patch increment the value of ETHTOOL_RMON_HIST_MAX to
+> address this limitation.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 
-Could y'all share more? What compilation does this break?
-The field is never used.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-More info about how you found the problem would be useful.
-And I believe this can go to net-next, without the CC stable
-and without the Fixes tag. Unless my grep is lying to me:
+    Andrew
 
-net-next$ git grep message_priority
-include/net/pfcp.h:     u8      message_priority:4,
--- 
-pw-bot: cr
+ 
 
