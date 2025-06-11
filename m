@@ -1,169 +1,126 @@
-Return-Path: <netdev+bounces-196441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6B1AD4DB3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:58:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF61AD4DCB
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F7851BC08B0
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 07:58:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B43EA189FBCB
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDCF238C3D;
-	Wed, 11 Jun 2025 07:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15CA234973;
+	Wed, 11 Jun 2025 08:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nogh/cLW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BC055Krx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776FC2367B9;
-	Wed, 11 Jun 2025 07:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DADD1EBA09;
+	Wed, 11 Jun 2025 08:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749628572; cv=none; b=es6D5NLUwIwSD3wuXLnEnYsPFKUXEdbhOBlOBdJ4u4GdhhsGkoRjJ/9LjVJrhHdHf374o+LExESVwTVemg6hkqy378tqyNluK1P/Ij55Fc0qj/tnPm93ux+/tunDNxKmhkIih7bE3nHZspqKOZw7ZohP7ELbmm26EbIUVLJvWv4=
+	t=1749629030; cv=none; b=gxKKGmDsgmozjpqok/LKc9ECYJzEeCZ2EklcL754/LtbdfF7R6FSwyO3dpDrkmbRjLxDieKF496PGyybJLVCpubkcWNUGFaW86i4zE9XKx8vBu6JdVVR7MOTC+4yaV09riAbzgecvQlOtiBC1zFUSB6cj5VHZ2eKf3NTu56zuFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749628572; c=relaxed/simple;
-	bh=7To7WI9XwMMtA66JWXTA1CAUBiFHtDp+UJB/oeWMvgE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=piKfnM5wPcLx4vU2jdIHlVMvFCVHGn4rO959996CE6avBLcHovVlZfkZRaJe8kRQ27x2lqOzuw+9HTWVwuuUasAbhd9Td0dTmxrexdYMPpsWeqBDRzQbz+bYmibtTY27AmSXO3p8XL516gjvmcDYILTYC5Ea8AzeMVV+KfSxSE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nogh/cLW; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1749629030; c=relaxed/simple;
+	bh=6ajor1B5tTDHU56MZ9Ugg0LYtwl5SvHnXqqwV6bNozc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i94nOMIY0kPB6UTmP50FNDK19nDbHaLsZ5u/0VhEQcqLG+b+fQTypPL42hg0R5eSAeV+nF7FWp9dAJNcqxt/X9C9e9Yml2gyCefAlGD7RB2Vsq7TyxxrgPBO3I8ifTeZGKHp09fUkCY9ltUEGSm1xQ44J3nlc4dKlvjFqiScHdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BC055Krx; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3122368d7cfso4952168a91.1;
-        Wed, 11 Jun 2025 00:56:10 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a4bb155edeso78577371cf.2;
+        Wed, 11 Jun 2025 01:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749628570; x=1750233370; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V6TJM3iIHz3tB+nb8hhVbd7mqPPM3Iw3zLYnp9N8mLE=;
-        b=Nogh/cLWuBR9sTL36zWeobxf/UhLu3egdGRW5kFVmJ/DoF/6TXMF7SvHBC6FhmEDJR
-         D4SmIGt5EZJIFepjGwnV65LY1sgqY8tkHXOyIREBN16sbtQw43Uavi5NKp2tgUs8OJ1R
-         0bQuVYuCRlqPetKsFwvm8N0X6T1oTYtgd11oyK8DsNjb0VdZcnXq6Wm6JLlnlWfscp3i
-         JyGk5S9xH1hCcz2NNDDy/K1L0fmsV5PSlJVfynIIj0yc4NtRUINiWWb/HpeSym/H+FfP
-         fivGUiLTb8EC+g89jLzAdoGpBpPaoKIqLXX4ajscX3INvDaQrL94LCEj06++15uwpzm5
-         5xBg==
+        d=gmail.com; s=20230601; t=1749629028; x=1750233828; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lO0oOIhU9gTDAHfzv4bngGzr8nk9uJvKVCCgCMFOJ7s=;
+        b=BC055KrxvJ2HWdx7D5clYcBLesSmMMTQkHWxClGwE6aESkUsl8ji5DP4UJPAayFNBz
+         5TosPuk8BmC79AUBj7ATu2XJd/wrM+Wc/mLE832ZhHKmGUEnFKLtiU+ihoOo3yFHeLqZ
+         Qj4m8jh1VUSHt7cqKcZDRyhup+0yqeFZTIP4z74KttWMxe/LIBkCDsqS+Nvoe/ZQjWbv
+         2pu43mkhLIKM6bl6hnoysyh6mMMmwhXHF5Ja+rtSjQTnX/b6IjaGqKzqid2WkM90ujpW
+         v/GzL0MLjG2KTlTH4rR4X1Ic9nGB/ZbVk4aGC/XLz5SPMFXMGZ3CRsbl1hYmELibp1sH
+         mpmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749628570; x=1750233370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V6TJM3iIHz3tB+nb8hhVbd7mqPPM3Iw3zLYnp9N8mLE=;
-        b=weoRDL6bj2g1XyzoQBWolfghtFPj4ZpVJqr2LIq8ontdeLHxad+aJccQiZ91G+BvUH
-         0FLTklXmvP6L0wQbhEAD0CZcATOmh/hrI0bc1z/sd7UINhJ2uooIJEWBlTqO4jISQxMy
-         0LOPZ3rDxyyizHyVJDHTi9SMoi8/kF1YbcMchX2VatI7eXfNm4FLF21pXhh8vNXLR7UJ
-         MtsnJsQICZ4vOycCTOA32PfwVC/VHBNn/uVNBEV3CO/86MteRvoVHwsGlqXIxqTRLwX1
-         BFOgYyTeKjX+1QEAvGfR47GNlgTN+NRyEbM4HR6SX9jvmY39i1jjeaVuu3ScB9wDgUNg
-         Ancg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWApqGsEoJ/6uz/YdKgeyt/mqZt7gqzytXVzQfU8Lf95nZ/3Nt3hfBDKvJN2sHN1qKCB6FWkEDKtIo70k=@vger.kernel.org, AJvYcCWjILkx6bmX/g3UZ9+HcgVEV+jbaMnMT7HWWuduDsY1P01KRpyuSbapgsskOAPd1Pko643kmGDR@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfVRAA65Yr4/wv2P6zi+6WJd+ZzMX7DbTD9Vj31iH9DjphCuFb
-	4UHQKDCclg20ESyNjpEVm6Q0Rr3lCSIDaZ4GDgukrOaoE9rdkI+s8sDYjPlYY0UFvXxXHZaWI1e
-	j50zs98vpT1FpOlSJbqDdmxEeuQe9g/c=
-X-Gm-Gg: ASbGncuuI1B3G8NwlPuy8U6C3OFsllNFeDjYBTweFP8XwireIvnX5mUuQwyJga60jHI
-	lcf7dgUht6Wvm92K7jhwQMxu0ShD7mo5dMA3pZ+SEKan/xurZazrhyI4tgxb5jRZHnWeBIrnptB
-	Eic/YVqQkD8pzSZ8PunnXw2xe9pA926R2T/3w9YzVMlxbDb+FzpAs6csT6rc/0jap1ti3U+J8BU
-	uuAig==
-X-Google-Smtp-Source: AGHT+IEGu/HRiaDx7N9wwGgDKWEyvWvXU6gKXh4ODwPCXIMqNMtx+Ito2uXPce5z6WK7Fa0t+cRRbv4Xoj+KCg+sjNM=
-X-Received: by 2002:a17:90b:224c:b0:313:2adc:b4c4 with SMTP id
- 98e67ed59e1d1-313b1ff8937mr2759927a91.24.1749628569445; Wed, 11 Jun 2025
- 00:56:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749629028; x=1750233828;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lO0oOIhU9gTDAHfzv4bngGzr8nk9uJvKVCCgCMFOJ7s=;
+        b=Abzggy6JiU3v9IZxEahXKNxuOB2t1P4NtRVdQrlpAHDvNLOopYg6GmBDV2tqJHjBbM
+         l8KuUgy5NF7agohuNaT7cMdgOveMDh7/4S8iqEnnZNVvN0evtkVWk2Mw/jeUI4aDaq8N
+         h0QGiGa7WqVWVLbIT8QULASKNvkjNNBDCAQsnfgl8TIjQg3qO5v+M6AfdMtqS3wc4crd
+         q04H1JPmHOCbM973hQbt1d4/A4NoGJXwe7lmS9wXgEDbm+NHmL89JGN0bchngG9ms4tT
+         7gbeTjJff3jnI5KDhmfAEYHDtDxYXxtSBm58RZ4SMqQlZ/I0gv8bI2OZbF+rwRBEgi1d
+         N31Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVg1hJOdCMnLzGFQYshiEtfPdVlnxdEv8B3ZJ1gcVQLpDlPGwL/F60B+nowu7TnB/kbUVeqwuZ0awngN3R6@vger.kernel.org, AJvYcCVynYHUhmJClX+cur7ZWVuG8mzQGFM+v9eiT0EaxOQu5vrcD/O6+0Nr8WdpKK/okSV6bnqpgQMJ61go@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSPnK4wOOf5CB47LSzz1j/3o5Y3XJl360fp2/q0ETGuZnFY0GA
+	yQWmYgJEj1pticwi+/4Fk4a/wC2Kxwc1IWVL3UKao+JULD6ZuBOiEs1M
+X-Gm-Gg: ASbGncu0giDpbGdY4YvCqNPCaj19yQWdjtTEsydITclSxOrsPtPKyWfKJrOPmwpNP04
+	ligg9hWrGzdPimYM9oyJxufUxGo0D8l/uCRPvYdC/QyK2kEV5UxZQrtXaPS/N71btABQyrNSRxq
+	HXt7DFFJYsr0sXoUsbqgvy9tim7c4FrKD/iV+Pra9IG194PpcIINWFc+vLRKr9TTI5v9/iRyMgY
+	988ZyoRIoS5msv5uD4edWO3JNZ/MsRXtOqUBJIXX/k1VURcURoMwaZw7MMwAIbNLWf9TU7x+6Jz
+	MR9wdNNMW4nA0O1GCUbvrYvdOuoCAyCqPumUoQ==
+X-Google-Smtp-Source: AGHT+IG+DVPIIzWnmuIfybYPUVY9Wm0WTbrG5rT0kebswDgegdaXVZwVdvA8Qy8soVcQDTBv9EOxqA==
+X-Received: by 2002:a05:622a:4249:b0:4a5:a96d:6068 with SMTP id d75a77b69052e-4a713c5871dmr47918471cf.37.1749629027868;
+        Wed, 11 Jun 2025 01:03:47 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4a61116ae58sm85983721cf.17.2025.06.11.01.03.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 01:03:47 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH net-next 0/2] riscv: dts: sophgo: Add mdio multiplexer for cv18xx
+Date: Wed, 11 Jun 2025 16:01:58 +0800
+Message-ID: <20250611080228.1166090-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603204858.72402-1-noltari@gmail.com> <20250603204858.72402-2-noltari@gmail.com>
- <507a09f6-8b6e-4800-8c90-f2b1662cafa2@broadcom.com> <CAOiHx==HkOqi4TY6v7bdzWoHEQxO4Q4=HH8kWe7hJiEdLTy3-g@mail.gmail.com>
-In-Reply-To: <CAOiHx==HkOqi4TY6v7bdzWoHEQxO4Q4=HH8kWe7hJiEdLTy3-g@mail.gmail.com>
-From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
-Date: Wed, 11 Jun 2025 09:55:35 +0200
-X-Gm-Features: AX0GCFvO2K9WMbRwW6sNOIi5HI3SZ7oMAMCJu6EBqkRi4K2T-ILrj2BAouyE2Qc
-Message-ID: <CAKR-sGe6K=Za+eSspTc92Fj=XjAwSm1UQCzunU4TVovZ_4V_fA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v2 01/10] net: dsa: b53: add support for FDB
- operations on 5325/5365
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, andrew@lunn.ch, olteanv@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vivien.didelot@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-El mi=C3=A9, 4 jun 2025 a las 8:32, Jonas Gorski (<jonas.gorski@gmail.com>)=
- escribi=C3=B3:
->
-> On Wed, Jun 4, 2025 at 12:10=E2=80=AFAM Florian Fainelli
-> <florian.fainelli@broadcom.com> wrote:
-> >
-> > On 6/3/25 13:48, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
-> > > From: Florian Fainelli <f.fainelli@gmail.com>
-> > >
-> > > BCM5325 and BCM5365 are part of a much older generation of switches w=
-hich,
-> > > due to their limited number of ports and VLAN entries (up to 256) all=
-owed
-> > > a single 64-bit register to hold a full ARL entry.
-> > > This requires a little bit of massaging when reading, writing and
-> > > converting ARL entries in both directions.
-> > >
-> > > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> > > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
-> > > ---
-> >
-> > [snip]
-> >
-> > >   static int b53_arl_op(struct b53_device *dev, int op, int port,
-> > >                     const unsigned char *addr, u16 vid, bool is_valid=
-)
-> > >   {
-> > > @@ -1795,14 +1834,18 @@ static int b53_arl_op(struct b53_device *dev,=
- int op, int port,
-> > >
-> > >       /* Perform a read for the given MAC and VID */
-> > >       b53_write48(dev, B53_ARLIO_PAGE, B53_MAC_ADDR_IDX, mac);
-> > > -     b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
-> > > +     if (!is5325(dev))
-> > > +             b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
-> >
-> > I used the 5325M-DS113-RDS datasheet for this code initially but the
-> > 5325E-DS14-R datasheet shows that this register is defined. It's not
-> > clear to me how to differentiate the two kinds of switches. The 5325M
-> > would report itself as:
-> >
-> > 0x00406330
-> >
-> > in the integrated PHY PHYSID1/2 registers, whereas a 5325E would report
-> > itself as 0x0143bc30. Maybe we can use that to key off the very first
-> > generation 5325 switches?
->
-> According to the product brief and other documents BCM5325M does not
-> support 802.1Q VLANs, which would explain the missing register
-> descriptions. It does have 2k ARL entries compared to 1k for the 5325E
-> though, so I now see where that value comes from.
->
-> If it really doesn't support 802.1Q, then checking if related
-> registers are writable might also work.
+Add mdio multiplexer support for CV18XX series SoC.
 
-Considering that I don't have access to a 5325M in order to properly
-test it, I prefer the solution proposed by Florian.
+Inochi Amaoto (2):
+  dt-bindings: net: Add Sophgo CV1800 MDIO multiplexer
+  net: mdio-mux: Add MDIO mux driver for Sophgo CV1800 SoCs
 
-I've implemented it in the following branch:
-https://github.com/Noltari/linux/commits/b53-bcm5325-v3/
-https://github.com/Noltari/linux/commit/e2d3d541ac421bbb5d2fc783e07fda26b10=
-5d1a5
+ .../bindings/net/sophgo,cv1800b-mdio-mux.yaml |  47 +++++++
+ drivers/net/mdio/Kconfig                      |  10 ++
+ drivers/net/mdio/Makefile                     |   1 +
+ drivers/net/mdio/mdio-mux-cv1800b.c           | 119 ++++++++++++++++++
+ 4 files changed, 177 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/sophgo,cv1800b-mdio-mux.yaml
+ create mode 100644 drivers/net/mdio/mdio-mux-cv1800b.c
 
-I will wait a bit just in case there are some comments for the
-recently submitted v2 of the dsa tag patches and then I will merge
-both sets of patches into one since your proposed change of checking
-the tag protocol for the BRCM_HDR register access requires having the
-new legacy FCS tag.
+--
+2.49.0
 
->
-> Jonas
-
-Best regards,
-=C3=81lvaro.
 
