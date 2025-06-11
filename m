@@ -1,59 +1,81 @@
-Return-Path: <netdev+bounces-196671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0900AD5D67
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:46:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C624AAD5DBD
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:03:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 726687ABE70
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:45:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 338903A301B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B66204096;
-	Wed, 11 Jun 2025 17:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA8922173D;
+	Wed, 11 Jun 2025 18:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjHvxKUy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CDynZHo1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69341273FE
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 17:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D79013A3F2
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 18:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749664006; cv=none; b=iIXWw/t/S+eMxYc+POcnDsD2F744jXZyEQbKeiZr3jTo12nYDPhtnT3D3CQ3O3kbpPX5crMFftEk481uW/ucC4t0x5YgIPHZdeZ+9zpc9JRfTnOI3KuH/K37cxIgAVoyEocjuA2Ps8cb6/s+TtXjnBaLjUOWgCjeViDd6VrK4/k=
+	t=1749665007; cv=none; b=bx3DBgWLqF+otCbVP7Mjo9KFSBhslK49BHcH+ewPFMs5MttlX4A6nZcrfBkZswd2RoCvc5LyQyLb2x8C43eQHN91p83dNZVWEhaVPZ/GRGnOjFgFULKrac9FDbJO9ngdhzoAe6xEYEq7bVIpfGJk2AIE48ZnNV62WVm99If8VA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749664006; c=relaxed/simple;
-	bh=Uah8nOC5sBq39D5mMDtdMlFlA738Qynzcjz2QMVFZrQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ow5WHVpXlfzo6ThtWb0fSKa7SJQDNg6mb5IZlvkJ2Pp1P7mtHmHfkembTuTO19CdkkcP/xjzs5ZkNc7gG33rIrC5YejecGXh5BF8Ny6H3NoorlHHVEiM0KZEion1lzhUucdSbnucWkpeP9JjiR9itmq33f8Y0ClJSJQ/iiXjI4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjHvxKUy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE86C4CEE3;
-	Wed, 11 Jun 2025 17:46:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749664004;
-	bh=Uah8nOC5sBq39D5mMDtdMlFlA738Qynzcjz2QMVFZrQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZjHvxKUy7saaKsn+avSG1kFOb4tby3ru2Dk4ZFXY5oz3AjrDbB+avHyPUCNlOlV1S
-	 CIRvF8xP/DiFKSJ9w7cZhVFNv+0D6AYI/TG0zXa3nCFMi8FfVapELKsFakrZ1a8hlM
-	 Ag9w78eYsqBRDa9n5ijWNreYGt18jKCEUcEsNjC9Su0N5fGNjOpv3PFLxKj1exxzq3
-	 lh7DWrVwGlBkEcZEwJBVh9S6Q3qwTWWvI4etPrcPaxtOsGvcXtnj0UgXSPYOozE6Fz
-	 ENHvvHEeaUcJi/aslHz0/0VW00piCy8OBLP7XB/JHR8T+LEe9RaGGLzxoj6y+2zYzW
-	 NBsq87A3l9Alw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
+	s=arc-20240116; t=1749665007; c=relaxed/simple;
+	bh=/aVdoO2QJqPMb5dpAsNkKQVDF+UP4ApXq/tzLwU3wL0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KiOzUXWZhxIrmARGbr0L+zeX+u9xtBAw5T7iaMeYc4SlSlUwJJwEmW3bEe2qxoOwRutb3kIu4X8BL9RCGxsgU4ScmO7fYS1iHDDnzRaLb8NPTu9rJ1BjUWVJwHtXkdPnnUqrc2W5GZ+yA8sW3yTAatxgCdcMSJm5xW90C4c+L5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CDynZHo1; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749665005; x=1781201005;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/aVdoO2QJqPMb5dpAsNkKQVDF+UP4ApXq/tzLwU3wL0=;
+  b=CDynZHo1ReDlVQ/G3zq2LFblxtnLtNUx0TpRTdCGYB8A2gMr9Jki5Yc4
+   uXfCFCC375VWTCJU2Jne4gTFoPfkf3yXEcUhOOMJE5cGiZgudp/a9ff3q
+   klJL4+2LszUirWBr6m6Y8WSxIrLkelDFE20f7wpz6R1JWCtxSppjghp5n
+   6oxhw9Z76cifCZrYYjwchZTSBEqq4cTVTYW6N8oWVdScY6ViH14+GrjiG
+   eIPENmtYWcGqOQdsH1ix7g5aT4UPnO4uSgOPi4DWOH9iO0YYzVmMB9XKN
+   SQgw6cOL//zV/0tr5w0R0IpDEU9O0fyTIsKyoRaJo9xksL4DajTpuNLHP
+   w==;
+X-CSE-ConnectionGUID: th5Lc1ynQ/+UpskxYOK8iQ==
+X-CSE-MsgGUID: HwpWw0IoS7ypl0+Xd0aXwA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51042530"
+X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
+   d="scan'208";a="51042530"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 11:03:25 -0700
+X-CSE-ConnectionGUID: R6SgpyuASK27esVfn7wPqg==
+X-CSE-MsgGUID: fKC0ILmORwmY0KUE8Kk+Pg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
+   d="scan'208";a="152418240"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa004.fm.intel.com with ESMTP; 11 Jun 2025 11:03:24 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	edumazet@google.com,
 	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	faizal.abdul.rahim@linux.intel.com,
+	faizal.abdul.rahim@intel.com,
+	chwee.lin.choong@intel.com,
+	vladimir.oltean@nxp.com,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	dw@davidwei.uk
-Subject: [PATCH net] net: drv: netdevsim: don't napi_complete() from netpoll
-Date: Wed, 11 Jun 2025 10:46:43 -0700
-Message-ID: <20250611174643.2769263-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com
+Subject: [PATCH net-next 0/7][pull request] igc: harmonize queue priority and add preemptible queue support
+Date: Wed, 11 Jun 2025 11:03:02 -0700
+Message-ID: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,40 +84,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-netdevsim supports netpoll. Make sure we don't call napi_complete()
-from it, since it may not be scheduled. Breno reports hitting a
-warning in napi_complete_done():
+Faizal Rahim says:
 
-WARNING: CPU: 14 PID: 104 at net/core/dev.c:6592 napi_complete_done+0x2cc/0x560
-  __napi_poll+0x2d8/0x3a0
-  handle_softirqs+0x1fe/0x710
+MAC Merge support for frame preemption was previously added for igc:
+https://lore.kernel.org/netdev/20250418163822.3519810-1-anthony.l.nguyen@intel.com/
 
-This is presumably after netpoll stole the SCHED bit prematurely.
+This series builds on that work and adds support for:
+- Harmonizing taprio and mqprio queue priority behavior, based on past
+  discussions and suggestions:
+  https://lore.kernel.org/all/20250214102206.25dqgut5tbak2rkz@skbuf/
+- Enabling preemptible queue support for both taprio and mqprio, with
+  priority harmonization as a prerequisite.
 
-Reported-by: Breno Leitao <leitao@debian.org>
-Fixes: 3762ec05a9fb ("netdevsim: add NAPI support")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Patch organization:
+- Patches 1-3: Preparation work for patches 6 and 7
+- Patches 4-5: Queue priority harmonization
+- Patches 6-7: Add preemptible queue support
 ---
-CC: dw@davidwei.uk
----
- drivers/net/netdevsim/netdev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+IWL: https://lore.kernel.org/intel-wired-lan/20250519071911.2748406-1-faizal.abdul.rahim@intel.com/
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index af545d42961c..fa5fbd97ad69 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -371,7 +371,8 @@ static int nsim_poll(struct napi_struct *napi, int budget)
- 	int done;
- 
- 	done = nsim_rcv(rq, budget);
--	napi_complete(napi);
-+	if (done < budget)
-+		napi_complete_done(napi, done);
- 
- 	return done;
- }
+The following are changes since commit 0097c4195b1d0ca57d15979626c769c74747b5a0:
+  net: airoha: Add PPPoE offload support
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
+
+Faizal Rahim (7):
+  igc: move TXDCTL and RXDCTL related macros
+  igc: add DCTL prefix to related macros
+  igc: refactor TXDCTL macros to use FIELD_PREP and GEN_MASK
+  igc: assign highest TX queue number as highest priority in mqprio
+  igc: add private flag to reverse TX queue priority in TSN mode
+  igc: add preemptible queue support in taprio
+  igc: add preemptible queue support in mqprio
+
+ drivers/net/ethernet/intel/igc/igc.h         |  33 +++++-
+ drivers/net/ethernet/intel/igc/igc_base.h    |   8 --
+ drivers/net/ethernet/intel/igc/igc_defines.h |   1 +
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |  12 +-
+ drivers/net/ethernet/intel/igc/igc_main.c    |  57 ++++++---
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 116 ++++++++++++++++---
+ drivers/net/ethernet/intel/igc/igc_tsn.h     |   5 +
+ 7 files changed, 189 insertions(+), 43 deletions(-)
+
 -- 
-2.49.0
+2.47.1
 
 
