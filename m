@@ -1,142 +1,152 @@
-Return-Path: <netdev+bounces-196655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC418AD5B81
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:12:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0DFAD5B8B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C5961885E86
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:11:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB5D3A52BA
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392A11DF75C;
-	Wed, 11 Jun 2025 16:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FC61E47BA;
+	Wed, 11 Jun 2025 16:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jy6IT4ki"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nHNSOBGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23861A5B99;
-	Wed, 11 Jun 2025 16:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C2A1A725A;
+	Wed, 11 Jun 2025 16:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749658265; cv=none; b=sK/unnk1vNILlkHkvdaca/Ya5kH3GOcImFHOBiKBrsWsE0JQNX/tv2BVxrJ85h0ToYU0FTP1TmFQ7YDMgm76KEeXGFKXslpXZajuycF2pAgNB08o/2dh4FA3ZPx/YtW2Il5U5BBplQgQEqF6qFJt5bXD340lqpdqf/ZujyMICLc=
+	t=1749658398; cv=none; b=HbwHRjvUm0Yo9NlUBNX7uYih8uhM03vnUWS2QNA2OzgeudM44I3U41QGlVoeSj2wfbwI9ig8trY3daP5jMm6jlwrkYcAF96rBNPnxuXJPClWY0IQMunHBTjKqcgy4D0iaTtHtEv2cejdiJVs3isPjlgWWJ6lFrjJoLzeg1WFAEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749658265; c=relaxed/simple;
-	bh=dZ8l0HjmwfhJtitEaf6kw6c4ZQY523g8u3AvC2TJ93A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mgaUesONdmHxQPxGjFbRlizKrG+cQZRYFp+gIng/sc1frNcfrhO4AtAIc9J9LvdcbkOOhoJ2c/MPuIe4LYLLNbEK3hobDQ3YASYH5uPS8lxCHuco7w/oysezgQTUWPmJFnKoXqcvt3xSwArBDFNBuQHJ8nfT1c76h4gttUCC9M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jy6IT4ki; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 007BEC4CEE3;
-	Wed, 11 Jun 2025 16:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749658264;
-	bh=dZ8l0HjmwfhJtitEaf6kw6c4ZQY523g8u3AvC2TJ93A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jy6IT4kiD2lDYe71W7diDiGt7oL1e/xuNhWSoXCCAtj4caCgRHLRqPdmYvYW0PiRI
-	 JU/i/Csy6gD8wNDGapjxU9VaUk4rfzlXsP7nOW74W1Jeq1gqes+i5e5I3jsafmU3xv
-	 OR4zg1wvmNKL9bItwL/Sz95VxD1D1hxCXh00OkDsfBDfZvLytbwFD8QO/9dImO9tEb
-	 EAC3SYvvn6DuYJ0ueHh8NNuitcZcf2HP1E6QglBZYOh3TI1kMLoOjCgdZ4yZFTg5XJ
-	 GD87oKR3rk08/4zSSO8ZZmL1RbKPuxwuVORjYwDN8svITdJw7XtZnCg7PfNLmzaL0j
-	 XBdqKJN8dmhjA==
-Date: Wed, 11 Jun 2025 18:10:56 +0200
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, "Jonathan Corbet"
- <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
- <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Ignacio
- Encinas Rubio" <ignacio@iencinas.com>, "Marco Elver" <elver@google.com>,
- "Shuah Khan" <skhan@linuxfoundation.org>, Eric Dumazet
- <edumazet@google.com>, Jan Stancek <jstancek@redhat.com>, Paolo Abeni
- <pabeni@redhat.com>, Ruben Wauters <rubenru09@aol.com>,
- joel@joelfernandes.org, linux-kernel-mentees@lists.linux.dev,
- linux-kernel@vger.kernel.org, lkmm@lists.linux.dev, netdev@vger.kernel.org,
- peterz@infradead.org, stern@rowland.harvard.edu
-Subject: Re: [PATCH 4/4] docs: netlink: store generated .rst files at
- Documentation/output
-Message-ID: <20250611181056.6543e71e@sal.lan>
-In-Reply-To: <m24iwmpl0m.fsf@gmail.com>
-References: <cover.1749551140.git.mchehab+huawei@kernel.org>
-	<5183ad8aacc1a56e2dce9cc125b62905b93e83ca.1749551140.git.mchehab+huawei@kernel.org>
-	<m24iwmpl0m.fsf@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1749658398; c=relaxed/simple;
+	bh=ADdy1oX/BGm/0yfMjA6C1xUCsUR3Il5JAfLEmSkSbpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D4RWi2Z3AQDin3Y3WhNc//ErMqa5aduA+ZS4RoUPx3kI+vlG0Ferz0yPzip5EAHdTEtY+uiSCGfwcU0JwMebn73Z8cnL0YimqCOjdEKAe52ANz22t6ojCjY+SVSLSir8L7VHcPZDbmbfcNViqgBHQIeLINCzzv2S8kFptvNkQgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nHNSOBGb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5Pah9/CBtffo+lrIVkKDlsrLYUZHo+PGjMuqf3Dti3w=; b=nHNSOBGbRNP8l8/sOdiLU3RC5W
+	7oIdZKQsC3Yyg5Nz4H1AsjKFQSG3miVUFKAYqSkGkVKLxk6roKXNElCQHyV3Q91pTENKucD11UZcX
+	zfZoyNJ4Cl0yj+fZJaNFXs0pDjXUuAFYQhvO9hovm+8deePxRYep9qk7Y/OlwVxg6auM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uPO4S-00FQMS-G7; Wed, 11 Jun 2025 18:13:00 +0200
+Date: Wed, 11 Jun 2025 18:13:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: mdio-mux: Add MDIO mux driver for
+ Sophgo CV1800 SoCs
+Message-ID: <eb419ffa-055f-48db-8c6a-60bf240fbb9d@lunn.ch>
+References: <20250611080228.1166090-1-inochiama@gmail.com>
+ <20250611080228.1166090-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611080228.1166090-3-inochiama@gmail.com>
 
-Em Wed, 11 Jun 2025 12:36:57 +0100
-Donald Hunter <donald.hunter@gmail.com> escreveu:
-
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+On Wed, Jun 11, 2025 at 04:02:00PM +0800, Inochi Amaoto wrote:
+> Add device driver for the mux driver for Sophgo CV18XX/SG200X
+> series SoCs.
 > 
-> > It is not a good practice to store build-generated files
-> > inside $(srctree), as one may be using O=<BUILDDIR> and even
-> > have the Kernel on a read-only directory.
-> >
-> > Change the YAML generation for netlink files to be inside
-> > the documentation output directory.
-> >
-> > This solution is not perfect, though, as sphinx-build only produces
-> > html files only for files inside the source tree. As it is desired
-> > to have one netlink file per family, it means that one template
-> > file is required for every file inside Documentation/netlink/specs.
-> > Such template files are simple enough. All they need is:
-> >
-> > 	# Template for Documentation/netlink/specs/<foo>.yaml
-> > 	.. kernel-include:: $BUILDDIR/networking/netlink_spec/<foo>.rst  
-> 
-> I am not a fan of this approach because it pollutes the
-> Documentation/output dir with source files and the kernel-include
-> directive is a bit of a hacky workaround.
-> 
-> > A better long term solution is to have an extension at
-> > Documentation/sphinx that parses *.yaml files for netlink files,
-> > which could internally be calling ynl_gen_rst.py. Yet, some care
-> > needs to be taken, as yaml extensions are also used inside device
-> > tree.  
-> 
-> The extension does seem like a better approach, but as mentioned by
-> Jakub, we'd want to add stub creation to the YNL regen.
-> 
-> The only other approach I can think of to avoid generating files in the
-> source tree or polluting the Documentation/output dir is to stage all of
-> the Documentation/ tree into BUILDDIR before adding generated files
-> there, then running:
-> 
->   sphinx-build BUILDDIR/Documentation BUILDDIR/Documentation/output
+> @@ -0,0 +1,119 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Sophgo CV1800 MDIO multiplexer driver
+> + *
+> + * Copyright (C) 2025 Inochi Amaoto <inochiama@gmail.com>
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/bits.h>
+> +#include <linux/delay.h>
+> +#include <linux/clk.h>
+> +#include <linux/io.h>
+> +#include <linux/mdio-mux.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +
+> +#define EPHY_PAGE_SELECT		0x07c
+> +#define EPHY_CTRL			0x800
+> +#define EPHY_REG_SELECT			0x804
+> +
+> +#define EPHY_PAGE_SELECT_SRC		GENMASK(12, 8)
+> +
+> +#define EPHY_CTRL_ANALOG_SHUTDOWN	BIT(0)
+> +#define EPHY_CTRL_USE_EXTPHY		BIT(7)
+> +#define EPHY_CTRL_PHYMODE		BIT(8)
+> +#define EPHY_CTRL_PHYMODE_SMI_RMII	1
+> +#define EPHY_CTRL_EXTPHY_ID		GENMASK(15, 11)
 
-I did some tests here adding yaml to conf.py:
+There are a lot of defines here which are not used, but as far as i
+see, there is one 8bit register, where bit 7 controls the mux.
 
-	-source_suffix = '.rst'
-	+source_suffix = ['.rst', '.yaml']
+It looks like you can throw this driver away and just use
+mdio-mux-mmioreg.c. This is from the binding documentation with a few
+tweaks:
 
-Such change made the extension to automatically generate one file per 
-each existing yaml without the need of adding any template. I tested on 
-a brand new tree with just Sphinx + netlink files + Breno's original
-extension (untouched). Such empty tree was generated with 
-sphinx-quickstart (sent a reply to Breno with a patch with all inside
-it).
+   mdio-mux@3009000 {
+        compatible = "mdio-mux-mmioreg", "mdio-mux";
+        mdio-parent-bus = <&xmdio0>;
+        #address-cells = <1>;
+        #size-cells = <0>;
+        reg = <0x3009000 1>;
+        mux-mask = <128>;
 
-When applying it to the Kernel, we can do this change at
-Documentation/conf.py, together with:
+        mdio@0 {
+            reg = <0>;
+            #address-cells = <1>;
+            #size-cells = <0>;
 
-	-exclude_patterns = ['output']
-	+exclude_patterns = ['output', 'devicetree/bindings/**.yaml']
+            phy_xgmii_slot1: ethernet-phy@4 {
+                compatible = "ethernet-phy-ieee802.3-c45";
+                reg = <4>;
+            };
+        };
 
-(glob pattern not tested)
+        mdio@128 {
+            reg = <128>;
+            #address-cells = <1>;
+            #size-cells = <0>;
 
-As we don't want DT yaml files to be processed as netlink families.
+            ethernet-phy@4 {
+                compatible = "ethernet-phy-ieee802.3-c45";
+                reg = <4>;
+            };
+        };
+    };
 
-After such tests, it sounds to me that the Sphinx extension approach 
-may work without requiring templates. Tested here with Sphinx 8.1.3.
-
-Regards,
-Mauro
+    Andrew
 
