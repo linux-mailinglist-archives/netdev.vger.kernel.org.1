@@ -1,125 +1,107 @@
-Return-Path: <netdev+bounces-196476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C202AD4EFB
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:58:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F623AD4EB1
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B023A3865
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:57:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E8673A8232
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36985241136;
-	Wed, 11 Jun 2025 08:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061431865E3;
+	Wed, 11 Jun 2025 08:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=datadoghq.com header.i=@datadoghq.com header.b="X7gC7ug8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eva4gneo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61CD227E89
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9EE282ED
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749632275; cv=none; b=Kvd/ifblXhQ032DNbEYl8qzxO89yjiR6kHp6VXpyICvQ2jBWnt1ObnNiOv3MVJHLNK7yb2+/FONgQ3nDAwsRWid9D/tIK37w6BFOnefZhGoKiIkmt5hoCDvgrGgiHO6O6gPD6n3/vTyMTyJ80RPTbi5bD10zfvGkaitUad405HI=
+	t=1749631569; cv=none; b=aSvZwNhjvEDUxQRjL8hYj+tibJggMHu2v1dk3SJ4ERTCAt0N7NIs2BuG9TjdNwP3rv92tJ0IJ7+nhLL1h/2x/CD3WqEwTLuYiqoxg4IzfYzOLewvm0Jbl4OuY60LQPnv2yv3v9OpxT0Oo/Jsrio4MtS/rYqPOKN+PjxZMQJJ8Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749632275; c=relaxed/simple;
-	bh=PuA2ndzsf6qV8+DZjFJzpHjynq2dG7WznWmQHytru3g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IYIl+ATWcOCMRQ1FIqp8pmIiqetE258c04OafSMhiRpb9LKUB40Y8+I2AgqFVnrivu8CZZoHgZNgvOFav9fq2CLbRP+FKj+6WBB++rDcJLI5qTZeUhtho230NKCYVC/amo6KyIIoFEef+fO5Sq7njhAHfx/U95hZRDXF8PVtwUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=datadoghq.com; spf=pass smtp.mailfrom=datadoghq.com; dkim=pass (1024-bit key) header.d=datadoghq.com header.i=@datadoghq.com header.b=X7gC7ug8; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=datadoghq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datadoghq.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-703f3830906so243627b3.3
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 01:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=datadoghq.com; s=google; t=1749632272; x=1750237072; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jjvJV8ZhcGRvupyFP8whmvE6fGj3kxjqSux4Bqr/JI4=;
-        b=X7gC7ug8jA2cprDslC41cXhxHpfciejBoUgfTTdJWpwVEQngBHGA+pLPRZgiZJvvsX
-         QJoU03RRxtlDmNThT3v5rg3701W9/aMyoRgzqA2gUVKnV5acMtrcnBsDmKGpEgZl4gtx
-         HzHH+A/xn7NtHmKGXBp8q4uLPGs8u9NGNaba0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749632272; x=1750237072;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jjvJV8ZhcGRvupyFP8whmvE6fGj3kxjqSux4Bqr/JI4=;
-        b=GxqevT6O3p2Qqn0RAGDIG8Yr4w/rI6MsCscrgoofy6KEVVWGT9x41r5+sTtkdrX9Jq
-         lg4Lot/pkosEI/VC5XmoyG1oODhVVVwOcyhP2j3K2tAwV8hlLOe2+95V6ah6If+onLJm
-         N1sTZVCwtrVOinIYKdFIn7p8u99hB7yGnjacRLCJXCyrLYeZU41RSJQmgVVo2v4icFIn
-         2xqnUvzEn5uaz+YNuZMtgEYPNIdtHGYchflEqfA2gxJvOQ4VSdJ2WnTc1Mn7NNaDoYOU
-         sQuMXHwfEedcatvaZXgFtq8usBnkOWIuS0KtN+Ye8Zyp4nYBrLsUfFEMCc7X1gRAgu3j
-         B6pg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKDSYot8eRlAIBYbxFPNaHFoNltqSJGn0woetaswuyWz7j67ZiKsrfqfnmMyVe6SBN+Ki24Vg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOy4wtpEWJq74qMyts1Rx4UP7jUzO4WNxwDZxQOmVoIVzjrWp1
-	c2YgNd1zIAGcxH57uT3hK9swnOJO2NSXbdyOLBWK3fO2a7KV2fHiu3qxEHKxh3j0xiFqd7IQAS2
-	nBOILYIC2MI7vb/8/VfdiyLIYdiSPmnYech4Q15vhbo1in8AhS/bY86I=
-X-Gm-Gg: ASbGncvNMncM/Tz7A3QzpXg3sMnW69ASajyULbZFZtzQB0r/e7kkUUCJiCvDRvL0j/G
-	Ebz6W+ti9oCmCvcL8pALbNVYBw4YANGTYcyNEwOWy4jxkysKJF5WBVDr/kz0USPKTVGd5EehsLy
-	/nz62TERzfAtl9I8fKq5+gQnTyyFmDq9bEICX/VBbH9l7t6DZ4hbD1R65x
-X-Google-Smtp-Source: AGHT+IFFUX7swcm0JEVkBkoeXBxQqu33hMdHpH5TkNq62BrSmW92rmo/SE91S3zNAbTom0l5kxhyos7zTLCHUuzheJg=
-X-Received: by 2002:a05:690c:3685:b0:70e:4cdc:6e7a with SMTP id
- 00721157ae682-71140ae3679mr14818867b3.6.1749632272516; Wed, 11 Jun 2025
- 01:57:52 -0700 (PDT)
+	s=arc-20240116; t=1749631569; c=relaxed/simple;
+	bh=+hlyDmCmIQ4PsUfkbEueYhY4IaOnijscWCQJVN/4tnQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dcaP99he7+gKJC1oF7FQpL5PR16IBg2LYj5i/y9U3ivAIg825kytSgEA4Gi+Qa1oejnpbgzRcwhlUZlGaH+pPUBQVHKY6YT+x+p6sUquj8HIcW/J4on1tygIgsmMib5HKWk6b5BY2Cx+NcxBiYg9PcMedwMmPSilacJ81w3pVx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eva4gneo; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749631569; x=1781167569;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+hlyDmCmIQ4PsUfkbEueYhY4IaOnijscWCQJVN/4tnQ=;
+  b=eva4gneovopDVBHYVDgnnGbiz02YkcW9Qmh2DXGU0WFzchOxh8QQ6sv+
+   QZp3sP85dyGUMANKZ+/XpuqFiKoQ8l17S/ds6oxwRl3WSR7k6sIp4lEJn
+   0QAlO9sft5FaAEsUkVk2b8b+c10imFKWu/pO3ILa5feVkcTJws7UpIfVk
+   8F00IUn0pGDuRmf+tImlmgaEvCJGzcYZo6m205Qwbkft1J/Kxs0gA2WSY
+   THEoKkOFI8gDZ4LtWZjYCWpKI4x/WayvsYaK6YqOfa5JulrkL/Vwm5Nuf
+   FO5piKdjOZ18d6uJZtX267ih8THSqBuuMFzL8x5CBHS3QXTy9WEsuo8eD
+   Q==;
+X-CSE-ConnectionGUID: F8nTOJyxQHecrRC+0AQhyg==
+X-CSE-MsgGUID: 40+uDuHkQfqo3X5iJId2uA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="62046150"
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="62046150"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:46:08 -0700
+X-CSE-ConnectionGUID: PgUZ6FMQQ5iE88b0EVrLEg==
+X-CSE-MsgGUID: mv/cWiQBTwuxby+dZJQ7Nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
+   d="scan'208";a="152298372"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa004.fm.intel.com with ESMTP; 11 Jun 2025 01:46:06 -0700
+Received: from kord.igk.intel.com (kord.igk.intel.com [10.123.220.9])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 834F5332AE;
+	Wed, 11 Jun 2025 09:46:05 +0100 (IST)
+From: Konrad Knitter <konrad.knitter@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Konrad Knitter <konrad.knitter@intel.com>
+Subject: [PATCH iwl-next v1 0/3] add override mask from factory settings
+Date: Wed, 11 Jun 2025 11:01:19 +0200
+Message-Id: <20250611090122.4312-1-konrad.knitter@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250609-sockmap-splice-v2-0-9c50645cfa32@datadoghq.com>
- <20250609-sockmap-splice-v2-1-9c50645cfa32@datadoghq.com> <20250609122146.3e92eaef@kernel.org>
-In-Reply-To: <20250609122146.3e92eaef@kernel.org>
-From: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
-Date: Wed, 11 Jun 2025 10:57:41 +0200
-X-Gm-Features: AX0GCFthcjUN2-ZcbaCjBFu9eICTHSIis43T6ijos1tz5aAY4JHlgHWN205uMSw
-Message-ID: <CALye=__1_5Zr99AEZhxXXBtzbTPDC_KEZz_WCDDavjwujECYtQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 1/5] net: Add splice_read to prot
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Vincent Whitchurch via B4 Relay <devnull+vincent.whitchurch.datadoghq.com@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 9, 2025 at 9:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
-> Can we not override proto_ops in tcp_bpf for some specific reason?
-> TLS does that, IIUC.
+Support for restoring settings and identifiers from factory settings
+instead of using those found in the image during the update.
+ 
+Restoring data from factory settings requires restoring both settings
+and identifiers simultaneously. Other combinations are not supported.
+ 
+The following command can be used to overwrite settings and
+identifiers with data from factory settings.
+ 
+$ devlink dev flash <pci-address> <update-image.bin> overwrite settings
+     overwrite identifier overwrite from_factory_settings
 
-I see that TLS writes to sk->sk_socket->ops to override the proto_ops.
-I added some prints to tcp_bpf_update_proto() but there I see that
-sk->sk_socket is NULL in some code paths, like the one below.
+Konrad Knitter (3):
+  devlink: add overwrite mask from factory settings
+  ice: add overwrite mask from factory settings
+  ixgbe: add overwrite mask from factory settings
 
- tcp_bpf_update_proto: restore 0 sk_prot 000000002cf13dcc sk_socket
-0000000000000000
- CPU: 0 UID: 0 PID: 392 Comm: test_sockmap Not tainted
-6.15.0-12313-g39e87f4ff7c3-dirty #77 PREEMPT(voluntary)
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x83/0xa0
-  tcp_bpf_update_proto+0x116/0x790
-  sock_map_link+0x425/0xdd0
-  sock_map_update_common+0xb8/0x6a0
-  bpf_sock_map_update+0x102/0x190
-  bpf_prog_4d9ceaf804942d01_bpf_sockmap+0x79/0x81
-  __cgroup_bpf_run_filter_sock_ops+0x1db/0x4b0
-  tcp_init_transfer+0x852/0xc00
-  tcp_rcv_state_process+0x3147/0x4b30
-  tcp_child_process+0x346/0x8b0
-  tcp_v4_rcv+0x1616/0x3e10
-  ip_protocol_deliver_rcu+0x93/0x370
-  ip_local_deliver_finish+0x29c/0x420
-  ip_local_deliver+0x193/0x450
-  ip_rcv+0x497/0x710
-  __netif_receive_skb_one_core+0x164/0x1b0
-  process_backlog+0x3a7/0x12b0
-  __napi_poll.constprop.0+0xa0/0x440
-  net_rx_action+0x8ce/0xca0
-  handle_softirqs+0x1c3/0x7b0
-  do_softirq+0xa5/0xd0
+ Documentation/networking/devlink/devlink-flash.rst | 3 +++
+ Documentation/networking/devlink/ice.rst           | 6 ++++++
+ drivers/net/ethernet/intel/ice/ice_fw_update.c     | 4 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c | 6 ++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 1 +
+ include/uapi/linux/devlink.h                       | 2 ++
+ 6 files changed, 22 insertions(+)
+
+-- 
+2.38.1
+
 
