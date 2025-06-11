@@ -1,194 +1,160 @@
-Return-Path: <netdev+bounces-196745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73C81AD6295
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:40:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C6AAD6298
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51AA51E0A69
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861B83AB34E
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAC324DFF4;
-	Wed, 11 Jun 2025 22:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D39624A079;
+	Wed, 11 Jun 2025 22:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="W6EwsrQJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VTBtcSJq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D9124728D;
-	Wed, 11 Jun 2025 22:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739F824887E
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 22:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749681631; cv=none; b=FJh4lnCcXteTx4qzJQGSNstxkysc+dPUjHPHPXFJc/PNWlvE1knuMlpFqrdE4Ihf74GxiTCWwBBjRGXQ32baCXZX6hLnXYYDA49M9ONMF/Nx6LwhiJt7on56DjJPSzE2IeGmdqRStTBBOscgjXfVOfY6WxI19QEkzsTFymaucxo=
+	t=1749681649; cv=none; b=OJV1LwWYDAW9wp3x1HM9e5buwHHcAHcfogoNever2DO4VReX1+uQi4hNhDejsGAjLfEluEvRinEe33zeMuK4cDm1QPpVrqzhAUBpIc6AaPqQlD88UZVtQgD3vQDJ3FQBp+1Hv/GBSFsFtPoxJUinpn9yoYQv/txxBmNwixDrIlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749681631; c=relaxed/simple;
-	bh=bhg6VV5fefD5/D2dMoTu5GchPBluVIuYo6VdkzioHd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AdmdNUUXFVE4rIh7AYTf8tUzMw4FJd0fXaRc8xfPkcFaZmXAOe7BqJ+GuNBa3zO4uDMta1aq287FZwNwHTggtsreJJFsMxNnCnPIqKWhpjGBu9C4/zO+kXlAl6AmAf+iohbBVfjbhmimyXINwS+SnTYzoJWV/PQttcBhLaR6I6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=W6EwsrQJ; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55BMPKeB016901;
-	Wed, 11 Jun 2025 22:40:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=c2rub
-	8hiefcE3BLuft3zzQ4IjsFpqXPHaMjPhaIqefU=; b=W6EwsrQJIXudQ5Dem7II8
-	r7KQN/LISmIkXO20bHINZGLqZuCG8LgjyNmvZQnGt9II/Jcn1QRbmprccjie6okJ
-	2QGUGJx5uVldNm86z4IxpKftJSSyKqcm8VB6UiZCi9cOk75/P6Rh85+4JFZHa/+k
-	stLgkLSoWlxyahaRo8GsE4VnDSy5wnqw7NMfyi42EQDnpbvD4y6ypW8Eef45vNXz
-	jYmiQS5fOzRIwHoswmP9IQPz6mDWWUcBGImFxhd/hzNPzWazRP8Ei+9j/KqAUcGC
-	RpBMAFJGOFQjjVq8zCbDfD6uLySmWkLG41LXb9+msM4LLdHax+O0SaNvEmGmNe5R
-	Q==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 474c750nb1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Jun 2025 22:40:23 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55BLrBr7021009;
-	Wed, 11 Jun 2025 22:40:23 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 474bvh2j4e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Jun 2025 22:40:23 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55BMeMxU024452;
-	Wed, 11 Jun 2025 22:40:22 GMT
-Received: from konrad-char-us-oracle-com.osdevelopmeniad.oraclevcn.com (konrad-char-us-oracle-com.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.23])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 474bvh2j3t-2;
-	Wed, 11 Jun 2025 22:40:22 +0000
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
-        andrew@lunn.ch
-Cc: hannes@cmpxchg.org, mkoutny@suse.com, cgroups@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH v2] rds: Expose feature parameters via sysfs
-Date: Wed, 11 Jun 2025 18:39:19 -0400
-Message-ID: <20250611224020.318684-2-konrad.wilk@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250611224020.318684-1-konrad.wilk@oracle.com>
-References: <20250611224020.318684-1-konrad.wilk@oracle.com>
+	s=arc-20240116; t=1749681649; c=relaxed/simple;
+	bh=clL+hHukW8hOdwCbYC9qmyTSO39mKRqxJ0JAVmgRT4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a4UP9YkZFaYPRXLtaU9VegREE5oWty1j6ZRGZywkvKk6G81YZcjMkTEHO7y09yrhZfSSua2S6aZiYPx/kSIAxVs25XSB+h4YOD9hFaXigPrZ174BALYfNFc7LUpjW7igpPUW76pq4PtJd8PnY3IIjwYbMDbV7aLMiRO/7+yNS5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VTBtcSJq; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749681648; x=1781217648;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=clL+hHukW8hOdwCbYC9qmyTSO39mKRqxJ0JAVmgRT4M=;
+  b=VTBtcSJqDmqy2pTuF4SYbyuTBimCJcpDOVcltKlm34zWKQ/GsnnapBTR
+   ILEFFbKJ15SGR/LXbrlj12A+XNjqFYxyaRhEnWg6q+6oa/MxmM06I+mdZ
+   LeLRpQ9xhgYzjWPTY30CXD36qtosOjBXxxGpXLgnazuY/wGqapdu8Ldzz
+   n9f1VaOcuNSYVZ3PFtbaTByuelIufr3grIeWZIdjTd77+ZkjiVet/+x9g
+   XQyoXcp0kI4If83vnEVyPt2aiJ1wCVhiZI+Jvs6nbnAnQroz0bc3vgIKr
+   h9411jZ98s4EY1F6fOAAmSjsRmKKIBJbuTHFvN5sIxMokCIEXcBT3qSd0
+   A==;
+X-CSE-ConnectionGUID: 6HN9VREsQFSET9QNHLnf3Q==
+X-CSE-MsgGUID: x7EG7V4gSJChsuFpQXp8zA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="69405161"
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="69405161"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 15:40:44 -0700
+X-CSE-ConnectionGUID: 5TGcI8TISU2TWTN2UvZkQw==
+X-CSE-MsgGUID: Q8IkK4TCQJOPK1eDbmrX+Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="151130052"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 11 Jun 2025 15:40:40 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uPU7a-000AuI-10;
+	Wed, 11 Jun 2025 22:40:38 +0000
+Date: Thu, 12 Jun 2025 06:39:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
+	duanqiangwen@net-swift.com, linglingzhang@trustnetic.com,
+	jiawenwu@net-swift.com, Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next 06/12] net: txgbevf: init interrupts and request
+ irqs
+Message-ID: <202506120658.JRvrXNTk-lkp@intel.com>
+References: <20250611083559.14175-7-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-11_10,2025-06-10_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
- bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
- definitions=main-2506110192
-X-Authority-Analysis: v=2.4 cv=LIpmQIW9 c=1 sm=1 tr=0 ts=684a05d7 b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=8U2Zs_ofZIoWyWS-D5wA:9 cc=ntf awl=host:13207
-X-Proofpoint-ORIG-GUID: OaKRnGAI33T3a5nS2pRQGSHr3Llj6BWJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDE5MiBTYWx0ZWRfX45D4M3k4em7C eAwK3ucmwGML1K05V6E4cdqpu1yWZfTOOHPM4xnRb4Js7Nt4xnEVFEdzmu5rGHYRdU8TVvxiAcl aAVUf0OtcQhvvXM2s2rteeVxSgZStrI3Z0CivOQlSuMoy9HSiMjqYMnLh+1yM/yeFYsfw0zCSF1
- 7Yx9dNOlsNCGws++p7cUtGL4+YMQPoESwDJOW/hDpLbVmjce0zvXPkzaJ9lRcsRdJ1mf5YDFdjT 1a3yC/bRpYQxNTI7DKc1zSsNt3A6edGkrRcBkot4ZA0uyTxDFEU11d+3ygbAXdT4L8yioY9XtAd 1WpdVF4tp7KzGZIf0Qq2AP5zyfNzif6EqKqnAjhTRHdWdj2yAiP7S+jrHKIzaZRKMrwi3jmq4Yn
- 9r5hugiBIOO5tjzydSnCjeEHDWfxX8MiNXkG5uBmYAluMKWVr/YI8MELyQ4fCCJSj4YA2rjG
-X-Proofpoint-GUID: OaKRnGAI33T3a5nS2pRQGSHr3Llj6BWJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611083559.14175-7-mengyuanlou@net-swift.com>
 
-We would like to have a programatic way for applications
-to query which of the features defined in include/uapi/linux/rds.h
-are actually implemented by the kernel.
+Hi Mengyuan,
 
-The problem is that applications can be built against newer
-kernel (or older) and they may have the feature implemented or not.
+kernel test robot noticed the following build warnings:
 
-The lack of a certain feature would signify that the kernel
-does not support it. The presence of it signifies the existence
-of it.
+[auto build test WARNING on net-next/main]
 
-This would provide the application to query the sysfs and figure
-out what is supported.
+url:    https://github.com/intel-lab-lkp/linux/commits/Mengyuan-Lou/net-libwx-add-mailbox-api-for-wangxun-vf-drivers/20250611-165134
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250611083559.14175-7-mengyuanlou%40net-swift.com
+patch subject: [PATCH net-next 06/12] net: txgbevf: init interrupts and request irqs
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20250612/202506120658.JRvrXNTk-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250612/202506120658.JRvrXNTk-lkp@intel.com/reproduce)
 
-This patch would expose this extra sysfs file:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506120658.JRvrXNTk-lkp@intel.com/
 
-/sys/kernel/rds/features
+All warnings (new ones prefixed by >>):
 
-which would contain string values of what the RDS driver supports.
+>> drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c:77:3: warning: unannotated fall-through between switch labels [-Wimplicit-fallthrough]
+      77 |                 default:
+         |                 ^
+   drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c:77:3: note: insert 'break;' to avoid fall-through
+      77 |                 default:
+         |                 ^
+         |                 break; 
+   1 warning generated.
 
-Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
----
- net/rds/af_rds.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
 
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 8435a20968ef..46cb8655df20 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -33,6 +33,7 @@
- #include <linux/module.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
-+#include <linux/kobject.h>
- #include <linux/gfp.h>
- #include <linux/in.h>
- #include <linux/ipv6.h>
-@@ -871,6 +872,33 @@ static void rds6_sock_info(struct socket *sock, unsigned int len,
- }
- #endif
- 
-+#ifdef CONFIG_SYSFS
-+static ssize_t features_show(struct kobject *kobj, struct kobj_attribute *attr,
-+			     char *buf)
-+{
-+	return snprintf(buf, PAGE_SIZE, "get_tos\n"
-+			"set_tos\n"
-+			"socket_cancel_sent_to\n"
-+			"socket_get_mr\n"
-+			"socket_free_mr\n"
-+			"socket_recverr\n"
-+			"socket_cong_monitor\n"
-+			"socket_get_mr_for_dest\n"
-+			"socket_so_transport\n"
-+			"socket_so_rxpath_latency\n");
-+}
-+static struct kobj_attribute rds_features_attr = __ATTR_RO(features);
-+
-+static struct attribute *rds_sysfs_attrs[] = {
-+	&rds_features_attr.attr,
-+	NULL,
-+};
-+static const struct attribute_group rds_sysfs_attr_group = {
-+	.attrs = rds_sysfs_attrs,
-+	.name = "rds",
-+};
-+#endif
-+
- static void rds_exit(void)
- {
- 	sock_unregister(rds_family_ops.family);
-@@ -882,6 +910,9 @@ static void rds_exit(void)
- 	rds_stats_exit();
- 	rds_page_exit();
- 	rds_bind_lock_destroy();
-+#ifdef CONFIG_SYSFS
-+	sysfs_remove_group(kernel_kobj, &rds_sysfs_attr_group);
-+#endif
- 	rds_info_deregister_func(RDS_INFO_SOCKETS, rds_sock_info);
- 	rds_info_deregister_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -923,6 +954,12 @@ static int __init rds_init(void)
- 	if (ret)
- 		goto out_proto;
- 
-+#ifdef CONFIG_SYSFS
-+	ret = sysfs_create_group(kernel_kobj, &rds_sysfs_attr_group);
-+	if (ret)
-+		goto out_proto;
-+#endif
-+
- 	rds_info_register_func(RDS_INFO_SOCKETS, rds_sock_info);
- 	rds_info_register_func(RDS_INFO_RECV_MESSAGES, rds_sock_inc_info);
- #if IS_ENABLED(CONFIG_IPV6)
+vim +77 drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
+
+    46	
+    47	static void txgbevf_set_num_queues(struct wx *wx)
+    48	{
+    49		u32 def_q = 0, num_tcs = 0;
+    50		u16 rss, queue;
+    51		int ret = 0;
+    52	
+    53		/* Start with base case */
+    54		wx->num_rx_queues = 1;
+    55		wx->num_tx_queues = 1;
+    56	
+    57		spin_lock_bh(&wx->mbx.mbx_lock);
+    58		/* fetch queue configuration from the PF */
+    59		ret = wx_get_queues_vf(wx, &num_tcs, &def_q);
+    60		spin_unlock_bh(&wx->mbx.mbx_lock);
+    61	
+    62		if (ret)
+    63			return;
+    64	
+    65		/* we need as many queues as traffic classes */
+    66		if (num_tcs > 1) {
+    67			wx->num_rx_queues = num_tcs;
+    68		} else {
+    69			rss = min_t(u16, num_online_cpus(), TXGBEVF_MAX_RSS_NUM);
+    70			queue = min_t(u16, wx->mac.max_rx_queues, wx->mac.max_tx_queues);
+    71			rss = min_t(u16, queue, rss);
+    72	
+    73			switch (wx->vfinfo->vf_api) {
+    74			case wx_mbox_api_13:
+    75				wx->num_rx_queues = rss;
+    76				wx->num_tx_queues = rss;
+  > 77			default:
+    78				break;
+    79			}
+    80		}
+    81	}
+    82	
+
 -- 
-2.43.5
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
