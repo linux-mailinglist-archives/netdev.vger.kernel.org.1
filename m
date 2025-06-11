@@ -1,148 +1,190 @@
-Return-Path: <netdev+bounces-196666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFAE6AD5CD7
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:08:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D0FAD5CE9
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97AE33A63C3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:08:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A825B1BC2710
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C46C20A5E5;
-	Wed, 11 Jun 2025 17:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C571DF994;
+	Wed, 11 Jun 2025 17:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="AdfQw0xm"
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="NSeA5sYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA6A1A317A
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 17:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDE9153598;
+	Wed, 11 Jun 2025 17:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749661706; cv=none; b=tXZDoz0DFPDnDI1iaaciFFGaVwTtsaD6NGnElXBzGhzsgM7zU6FSfZAVojDwacZZHLEORg/p0Fjg8DUq2e10yRjfn2Jp8GOzNknNZBBHZhizALDF6+sXTdAaeT5eaSyyjz9aTBMzi9nH2ZG/kgVtMH3RK3+qGBw5LtDkhxWFZ1U=
+	t=1749662209; cv=none; b=ZrFd5nlQz0RDaTZjp2igSjYX3zcLhksbuEPrneOY3gfeDhKv55+IfArRG0AZpBiFDe2Sge+U2b/aQkk4/KPWbf7DpkevUO4IdnvEofs7BgBQ+f1eM0iItg5tcNxo3nNOHBMsdhaQ8LXzXg9uYdnUCEW5EqND/MZZonE8ZzDpZwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749661706; c=relaxed/simple;
-	bh=kRrsCeAqTmErlKC0k5gaTGk9ZNHTyvFfX5wo9NjwhSA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qdN1M8LJvrROW5bvnAK0YJzUW1Db8YL5GnU74nQl5X8xT1CZvT04bhaqNW/dc7S+TsKbqiSQ/Zo1zDORyvFOqnVLEVk1wmrOTylw3WIQ2A23WrGJ3PvuIE7Qoxcf2F3XTxwsXO5rxsp4QMNZKB4hJAR2IcQZS8U5DVkgZQKKe7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=AdfQw0xm; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 7FE4C240028
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 19:08:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
-	s=1984.ea087b; t=1749661697;
-	bh=kRrsCeAqTmErlKC0k5gaTGk9ZNHTyvFfX5wo9NjwhSA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:From;
-	b=AdfQw0xmrR3sSgDJdg8qjsLfg84fq37iQ6UNJWVn7knVezHi2CNfLvuE42O4Mlx+2
-	 ZuPdZe8Y8RCAIwc0Tq351VB4NDp7ynZZR4SC2TgeR0kV82nGdNKUO1XygJWWH2eH8Y
-	 xDKPfiJZaX17PJLlXzmbSnFob5VWDMceKimy83pOLOt2vngWU/bbQv1PezoE2+yyZQ
-	 lkzvThxdg8sfnzrPrz9fwrZCZ/UjeHREJDD9squVc7vXjauGTydgbpxHm3VC0dbSrm
-	 vcdmLwWpVs1gu1z7St/ztACI2VxfvJyOvCTcTK4/ZUQFVyp21W50tjzvPjyOq1617v
-	 WVMXGU92RIit1iIxJG/oOxM/ztFgQi+bgTXZr5bjfzQncKwgX+cJ+O76R3CRn5rY9f
-	 oqu+23MXaSepCVkjcAVzWbctCvx/GSSko3XENIEwuisKqQt2+5HvWf9EhrAbMhNa7h
-	 lZKGccL1tqCukMlVkAEvMCaTgdOmERyNcy60T5luKCO6zn+rncl
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bHXDF0DwBz6v04;
-	Wed, 11 Jun 2025 19:08:12 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Martin KaFai Lau
- <martin.lau@linux.dev>,  Daniel Borkmann <daniel@iogearbox.net>,  John
- Fastabend <john.fastabend@gmail.com>,  Alexei Starovoitov
- <ast@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
- <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Stanislav
- Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
- <jolsa@kernel.org>,  Feng Yang <yangfeng@kylinos.cn>,  Tejun Heo
- <tj@kernel.org>,  Network Development <netdev@vger.kernel.org>,  LKML
- <linux-kernel@vger.kernel.org>,  bpf <bpf@vger.kernel.org>,
-  syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
-Subject: Re: [PATCH bpf-next v2] net: Fix RCU usage in task_cls_state() for
- BPF programs
-In-Reply-To: <CAADnVQJu3fYTfdRTWxeB5hraqe3_Esm7cgKfO38nxodknABeHg@mail.gmail.com>
-References: <20250611-rcu-fix-task_cls_state-v2-1-1a7fc248232a@posteo.net>
-	<CAADnVQJu3fYTfdRTWxeB5hraqe3_Esm7cgKfO38nxodknABeHg@mail.gmail.com>
-Date: Wed, 11 Jun 2025 17:07:49 +0000
-Message-ID: <871prqyzoa.fsf@posteo.net>
+	s=arc-20240116; t=1749662209; c=relaxed/simple;
+	bh=wfGTFbVzrnm/eFJldsr80LKPWcoUnp2SqjZ2kKDQPrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JMRa/XIii4YyQ88JjCLfyeuSxkAVKIqa6u4C0cKkWWA0lutacX3IICM5uw7dneRClEpK2ClyTkbRiRQ8zVLnYbBK3kjLXsbcwaYT33cThr0M7Lw8e7vmtxCnsul128LilxWYggeWbDgHRtx5Q5qwDDWYXKCg5yEm+E7KHRrdNM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=NSeA5sYT; arc=none smtp.client-ip=217.72.192.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1749662187; x=1750266987; i=christian@heusel.eu;
+	bh=OEGHZmIjk+ceUvrd8ghMlpfcoXbIaBBA/lq77JDDIEY=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=NSeA5sYTpdeUAXOW0nAdhxtbkzlC3k4Fzw/TwSOLKEvY0KseEvpHMXTcjyaEbmOI
+	 BZOxYLUoZcXVN/vETY7A3oXGXw1TztDsY3i33UHyPtUh2iE5Wg3gvffiU+Mjh+HOO
+	 3tjyB8FZMIdn7uKPoZ522RKbriaYWhB3djTTSpCpNU8n2be23R2STafDRRhaw09vR
+	 U++C9WsGgkJLgR5m8AVNjS4zlr5w4DpFf/ddHmZ4BqYNJxKDnjyf5g3w5ouMDkAR1
+	 g+SWEPDuxMDuIYF8q7ZvPlNds8B3J52wCEs3NmVSDbE4Hw5FtP4Q5F+kG0mtg3o9o
+	 odOKXaZBV4CNrM1spw==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([89.244.90.56]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1M890H-1uU3w91Y2N-00C4J0; Wed, 11 Jun 2025 19:10:26 +0200
+Date: Wed, 11 Jun 2025 19:10:24 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: davem@davemloft.net, difrost.kernel@gmail.com, dnaim@cachyos.org, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com, 
+	linux-kernel@vger.kernel.org, mario.limonciello@amd.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, regressions@lists.linux.dev
+Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
+Message-ID: <b5628073-3d14-42a9-9b91-3ec31db8f7f9@heusel.eu>
+References: <58be003a-c956-494b-be04-09a5d2c411b9@heusel.eu>
+ <20250611164339.2828069-1-kuni1840@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pvxh2zg2om6kjmmk"
+Content-Disposition: inline
+In-Reply-To: <20250611164339.2828069-1-kuni1840@gmail.com>
+X-Provags-ID: V03:K1:aPP1kRugb8Gbyx5XYk0iGW9/YSGeRy4gHEeQocsJrZRUzb8N94G
+ oyX59AnGy5Wq2qsKTEwEVjAlDWR91DGT0xIzcvbhOri8Fo9K6orhXeK6LBtGZdp+gBjaqww
+ sJWFmqs2zRk0j25GnRA+RNVxNrUGtk2xjeEJKBEScUNUkgQa3SYgk02+F2yE26rZzjoXTfx
+ tVT122yEqPzOywbLyBrIQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Vd/q57WHzcA=;3xgV+VQEIl1UmQAff2UJdyKnQZg
+ 598rDFSzh0WCIeTMJQyI0Y1xPD3uoWW4Pe9t221k1UQyShH3qFUwSrE6myYNkSglqDv/B1ND+
+ WlY+db1egCqkXIYHZrBNwNRN/FZ03H9YBVCB54Iuhy5Gh4D8n8VyEZYwnyMRUVWjDjoo8cgNK
+ IbyBApAOQTIMRRL18b9If4id49UHqzPDetTGvILxV9jKjPm9G8G74+FE0VUn2rTB6E4aBTIR8
+ T1aUmCNWspTrWO/GInkYWQIel2uxdk9iLQqPQWTj7oeAEJNwmN5n7D+1HLRF0mXp9UhGuiEpf
+ LehYUpuWvXxfh+q3ktINSXZPldrP8Ktm9s8pcYsyQ+iGzW8XTpGb/vB/fZ+LXYut3yvCuf4HH
+ hsdp6em8RtSjIrjYgT8Sbuy7SdtsA+NFxz9wd0keY94kKend0qljVD5VOd3riOy9w+hx8hf6E
+ 8hS8OxkYlmHkFniNHsu5T8g/GqVAz3oulktRg7WWkxD/HKSi1mM2WHs9buUwnakYbgiLcDwb6
+ +MjDG6MhczOzw2jsmZkoeR4o8qxNMvO6wBNyrts32d4gCnMm4VlskTenP8gYHp2R0VG1pQRcX
+ wAUsIbpk6EaJtNPdJMY6j1MP4GZ1ebTA0bR7TbzzrKq4M48HteK+kZlXX7XvXwJaolNvSnsig
+ lJlO5kxxpdsFr43QZgsfUbsyiQZ+9BjlcPRb/GxA09623Uqbbe5xYYlEdBW5QsLgDPD+ywPpr
+ vSZwKNmvTnN0qrUjWL3g/zRQ5V8WO23f6dDZ429dXclLpHZJjsTKBu2aWK5EiHYoHvnZ/WsDS
+ zMiUImZToJyOb8SVUIhoCya4OVoLsXtHbVyxq1EPqQDLjJINANIWbX10hkhVM1jkuXlfOxpQ9
+ iauDiLfeNVEJqfEOTpw/bNvke3h0vQEakcIwul/VUj5Y5IH0FVrI0GR7i7aztuupt808HVak8
+ pGROY4yV16/SjQfSUKp/7TtBMqq8V0K3355EzTCSlnTCmJF+WiWokD8rQQvk7SrjlnQHpFlb3
+ /poHxUOpnuBeKgfghk8dwMoYLg/w+7R96i9pfguJuBpaXcAblIiYwm45yLKsONWa5kMeroDjs
+ xHVpBE/Yf/LuiEkMvfDjkFFOzxnul/aS4eiacCfcZAwmW5D0DiwemcQDk2Yf1aoj5mrNQ7iO/
+ cVOYaMOCOxPcvw9RYC6A/aTEr6Bdi3Fy4PRUWDrYBrA5eGLdOSbmorl0T9lMjuduYvQ4cJis4
+ VDRnS+fe8ulOp8jpU22m8ngxJA1LcoCTZxHdrNo5EBTYxpHiXYVJtsJGpMDcxFvmFKmbmfZVB
+ gt80m/CulhnRtem9roti9a57El+wg/DmDkxSqeKZtrWqXOgPQikGZc1eJ5JUWSSIcBPFfzzr6
+ 6gqhF+sEUVlft+XGqUdjlvmcxlUt3hb2O8u9SSbt6m9OGxYnpf2GDKPOp0
+
+
+--pvxh2zg2om6kjmmk
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
+MIME-Version: 1.0
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+On 25/06/11 09:42AM, Kuniyuki Iwashima wrote:
+> From: Christian Heusel <christian@heusel.eu>
+> Date: Wed, 11 Jun 2025 13:46:01 +0200
+> > On 25/06/10 09:22PM, Jacek =C5=81uczak wrote:
+> > > Hi,
+> >=20
+> > Hey,
+> >=20
+> > > Bisection points to:
+> > > [3f84d577b79d2fce8221244f2509734940609ca6] af_unix: Inherit sk_flags
+> > > at connect().
+> >=20
+> > I'm also suffering from an issue that I have bisected to the same commi=
+t,
+> > although in a totally different environment and with other reproduction
+> > steps: For me the Xorg server crashes as soon as I re-plug my laptops
+> > power chord and afterwards I can only switch to a TTY to debug. No
+> > errors are logged in the dmesg.
+> >=20
+> > I can also confirm that reverting the patch on top of 6.16-rc1 fixes the
+> > issue for me (thanks for coming up with the revert to Naim from the
+> > CachyOS team!).
+> >=20
+> > My xorg version is 21.1.16-1 on Arch Linux and I have attached the
+> > revert, my xorg log from the crash and bisection log to this mail!
+> >=20
+> > I'll also CC a few of the netdev people that might have further insights
+> > for this issue!
+> >=20
+> > > Reverting entire SO_PASSRIGHTS fixes the issue.
+>=20
+> Thanks for the report.
+>=20
+> Could you test the diff below ?
 
-> On Wed, Jun 11, 2025 at 2:04=E2=80=AFAM Charalampos Mitrodimas
-> <charmitro@posteo.net> wrote:
->>
->> The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
->> types") made bpf_get_cgroup_classid_curr helper available to all BPF
->> program types, not just networking programs.
->>
->> This helper calls __task_get_classid() which internally calls
->> task_cls_state() requiring rcu_read_lock_bh_held(). This works in
->> networking/tc context where RCU BH is held, but triggers an RCU
->> warning when called from other contexts like BPF syscall programs that
->> run under rcu_read_lock_trace():
->>
->>   WARNING: suspicious RCU usage
->>   6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
->>   -----------------------------
->>   net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usa=
-ge!
->>
->> Fix this by also accepting rcu_read_lock_trace_held() as a valid RCU
->> context in the task_cls_state() function. This is safe because BPF
->> programs are non-sleepable and task_cls_state() is only doing an RCU
->> dereference to get the classid.
->>
->> Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=3Db4169a1cfb945d2ed0ec
->> Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
->> Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
->> ---
->> Changes in v2:
->> - Fix RCU usage in task_cls_state() instead of BPF helper
->> - Add rcu_read_lock_trace_held() check to accept trace RCU as valdi
->>   context
->> - Drop the approach of using task_cls_classid() which has in_interrupt()
->>   check
->> - Link to v1: https://lore.kernel.org/r/20250608-rcu-fix-task_cls_state-=
-v1-1-2a2025b4603b@posteo.net
->> ---
->>  net/core/netclassid_cgroup.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
->> index d22f0919821e931fbdedf5a8a7a2998d59d73978..df86f82d747ac40e99597d6f=
-2d921e8cc2834e64 100644
->> --- a/net/core/netclassid_cgroup.c
->> +++ b/net/core/netclassid_cgroup.c
->> @@ -21,7 +21,8 @@ static inline struct cgroup_cls_state *css_cls_state(s=
-truct cgroup_subsys_state
->>  struct cgroup_cls_state *task_cls_state(struct task_struct *p)
->>  {
->>         return css_cls_state(task_css_check(p, net_cls_cgrp_id,
->> -                                           rcu_read_lock_bh_held()));
->> +                                           rcu_read_lock_bh_held() ||
->> +                                           rcu_read_lock_trace_held()));
->
-> This is incomplete. It only addresses one particular syzbot report.
-> It needs to include rcu_read_lock_held() as well.
+It seems like the patch you posted has fixed the issue for me, thanks
+for the lightning-fast answer!
 
-To which other report you are refering to?
+> look like some programs start listen()ing before setting
+> SO_PASSCRED or SO_PASSPIDFD and there's a small race window.
+>=20
+> ---8<---
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index fd6b5e17f6c4..87439d7f965d 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff *sk=
+b, const struct sock *sk,
+>  	if (UNIXCB(skb).pid)
+>  		return;
+> =20
+> -	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
+> +	if (unix_may_passcred(sk) || unix_may_passcred(other) ||
+> +	    !other->sk_socket) {
+>  		UNIXCB(skb).pid =3D get_pid(task_tgid(current));
+>  		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
+>  	}
+> ---8<---
 
->
-> pw-bot: cr
+Have a great week everyone!
+Chris
+
+--pvxh2zg2om6kjmmk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIyBAABCgAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmhJuIAACgkQwEfU8yi1
+JYV8IQ/4q05ypgWVUCyUkdHVeTY4QNiayhgnfex9hX2ya3Qx2J4LoKoFGM2JYwF9
+v3xvC4HTqWC/fMIgwncD8wph10wpE1Mme1aHLP2iUK2J0eukv2nn5tNSgHFUtjiE
+V+b1yFbV1GNgp9AtNVfQun0oW0TVqu+GE2IE0PaaKJryIOhl0HEWrck5HpyYOnaO
+Oqs7B2fD8tQ43qngXLwQZEqGY1RKplndGJ9FvJtGrgwCYFlha638uj4tQm2yh7im
+4mHvWy0HQBe5VOvWoPwk37giAHZfx0NMpFqNzXAtsI4v6SLr38MRTjp9wctgfFvM
+OqFjuZkCVEjV7Qr3ZDMzJWgo4lMMgYmJ9SWvW0BfXWGN4Ym5Bw4KWoYyNCfW3s+r
+ZHZnoH2cDP8we2FHZhHa8w8dTy+VAerVE1QCoiwBOZrTAVcY5g3SIf+XAAYCbGRb
+BflcnGE9B5fZTYh7SgrjVInL6uOOn/5ouj23ZvukJlepaCKv5EvvZYeQ5NRgY9lp
+4YDEmuglyaRXUZGzYd+JUbRdcoxLV8xwPYYWYX//YRP8YCisYGADxMu/FtGaM0TS
+GpnW4SW1J++j9nAiAgLJW+R4XrLZkTxh1vfbSvLAb4OQDLynF/wzp8kR20GXc4V0
+uUusdclFornCeHctDA0p8NIA5qlItdJfiC30NPxyhlIyLOai8w==
+=RB66
+-----END PGP SIGNATURE-----
+
+--pvxh2zg2om6kjmmk--
 
