@@ -1,142 +1,117 @@
-Return-Path: <netdev+bounces-196592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B80DAD583C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:13:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8388FAD5852
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E2DF18868E3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:13:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937633A65A5
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0CA29AB16;
-	Wed, 11 Jun 2025 14:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44059248F74;
+	Wed, 11 Jun 2025 14:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQVGahRD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8DzUkCV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF8C295502;
-	Wed, 11 Jun 2025 14:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B49B43147;
+	Wed, 11 Jun 2025 14:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749651176; cv=none; b=tKtlNuRwbM7TelsKJ1KVeVgK07/L2Vf3sRO/7tqpcm848m5pxNXRhKKcX/4VVHX0cwGAJFdQCG8Jy0oxycP95ontwY2gqX82tJL20Plaz2xStzIxM9zk3zWjfu8niRG2ybElxPgOwBUwtivIi/Dv8dg/b5D+R3NXaiYONzJJifE=
+	t=1749651327; cv=none; b=rfxVg0aItKxyRyHTlunPfsA4r+B2JmlPHvF5/ibF6+kUix0Mkw6FEnZKzqgRamY/M2fuen+jfO3ccR2r78OeFlTBKRj1XUVzMTwDpp51pnts0FgM3gBMYbt5zAcDFCEnyVnnUsIbnjIrwk30A2xgl86zbrwBkBSpv7ADpYqeEUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749651176; c=relaxed/simple;
-	bh=AiOkcrQXv5dBfuU+br0+1pqKGEfPTV809EosE5nl+x8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qiHSKQrHNBaEbeWi0aNj3nVp4MHbk8noDStWpQR2oEvO5HhqP1SWrrNZo4iQ3pW1iWzUSsuPoUFpsT7LrtLT2W26ZU0M+sWuZR9n+TFgJGFwgwRb3PUGY9+rFDpwkVAHZarnEbslLmcK/l2LBGwe7VZRU2C/1f51E8TMzX3/t6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQVGahRD; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32a72e61a3fso10067851fa.0;
-        Wed, 11 Jun 2025 07:12:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749651173; x=1750255973; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hiHg7SNH+pSMtOhNSqpQ2vUspKGZ2spdd3OjZnoxU8Q=;
-        b=cQVGahRDaya0o0hXjC2NjMEeGVwfCk7GMDdB6b9Gdwrbj/OPdkvjDsh0p4djzqe7mj
-         RbraucB19j2CQJcb/wU+3ArcAvAjyXBhL4XUmY3wPNu2rfoMdtclM7WRS0xg16MfSy37
-         x4MRfdfMmAhj6CCYceaUI+UOA4JmtLo/FMkT214//ZNX4eLmhCupHd5rX/iWlzeyxAdC
-         50FYCmWAvS2Srd2CUBAax2HVJcAFuHC7Sf9xNRNrR2vLD5ob+pesRu9ftHzvz04YAyjj
-         oGHVD3CFbk0Li8B1YbwAYfQUaPGHS2h34wHyDpV/n+VHB68wJB7lYspuIP2O1yk/BaxQ
-         NLAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749651173; x=1750255973;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hiHg7SNH+pSMtOhNSqpQ2vUspKGZ2spdd3OjZnoxU8Q=;
-        b=b2jP9HG2dpXUtWXgvmTdzSLGPLu3L52AeSrkj9DU0HjBqqbEaw2bF/Nw2xNGQsH5u9
-         wTYVoSPi4TxhRNZ2TB9ZYXfs95S8nrMOE+4H8Ex/I1HeT1c0HvxtSXn27dkjIAgacd6j
-         mDkUGo6dH1LRz2B7QOwhtddyrv80gkqjzFNCt7bcBfp7OtOqyw/4XRSsuN7NuIvJApLq
-         1csExWqSXdClKJXRCi2MP8aL5VHQAyKb4RQRmf5WISsC/AQGKqyKqDWj2q9GOCVtuZRi
-         60ApCC1P83kROLU5H+ZWPPFmc8wZX6/y2oGzqpyT7Hgwl/Ot9+uOqqiMZ7lUZEjXMRT7
-         V0jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUX7wMR2UcqUwfRZlX1u4NbxnasR1YTnYx1pu06ncTRdHT/VnR29q88cUahDDzZpm8xnS6HkyaA@vger.kernel.org, AJvYcCXMIQCN5NTPKMZZEWfFOLGBKhCAYbrBmTlxS0zRPO6vbdApCzlflkOTzsVHNh/bv2Qp3pVa8ou6bcP9mqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRQzUBYtA3ZIZMOKiMUFASgjtk90UPbRNxzS2UEKu2IuMkCEtK
-	v0RdEClljnhKYF/cNDxQohbgw1OrwpURzrB/j/qXOReCaKZr7FeLK5SjmZ/FqhA7z9N8XUT99Q5
-	BmO0vZMpq6IOTj7yKh5J0L5rdnzerkzA=
-X-Gm-Gg: ASbGncvDFtOMzY4mEB19Za98y1AMpolW3R5H4oKm7cg5MKmWsCi7fMKJIWOovfw+eAY
-	XC69JfQ7av/DRlZYb/LIx6AIFRbsid6fdLlftrJkhQFF9awhKCNgP6ok0Hh+LnkP8MrssyP+Tng
-	o5I7Cst1pVHScYxHv2/sCWB/u5+3CfYM1iBO2bNsQSp8QvEMuRWkwv6OylBbcVGHqXBOfLzK8dl
-	yzqAQ==
-X-Google-Smtp-Source: AGHT+IEAValel8liDMEYhfCrnmQ5CestXZtWv84livqk4j/ymswdWR+PpAD0W4JSr184M5y7GQRG879SrHISz7W20Eg=
-X-Received: by 2002:a05:651c:4ca:b0:328:d50:d7cc with SMTP id
- 38308e7fff4ca-32b21269b9dmr10951451fa.20.1749651172599; Wed, 11 Jun 2025
- 07:12:52 -0700 (PDT)
+	s=arc-20240116; t=1749651327; c=relaxed/simple;
+	bh=jGzXWB7Z6lzbV8KChEUJK6VRbCA9SZ8qZoS2gYqKiaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N0jhJYzYrOx1brdGyUj2ZGXKe7pZbWRJAvOonqmB3f5/s/ZlCLHXIWlUdlksJqGEG/n74WUatDldYHdlQhb7Rm1NjX44zfYlWAj1nWnhKOqOf5QZvEaUbhcfzLMdpGppRY3ymqg7FMM1/KeC7R91av1hJ9oAPW2+9GroNmeWFZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8DzUkCV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD517C4CEE3;
+	Wed, 11 Jun 2025 14:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749651326;
+	bh=jGzXWB7Z6lzbV8KChEUJK6VRbCA9SZ8qZoS2gYqKiaA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o8DzUkCV/ZoZNi8iSePEs+4VAAp7r4P4oOJk1UEfOiykLfTnYn6yOBuEECTEtANsP
+	 kb7AUIrZbC0nACt7vLuInaOtQt6TpGLGjytu+w2h4UtAqDTWI3NqqjO+bPR6p0c6ND
+	 9F/cTKnK2/Q/JGzlRG3CrTKCan34ABVz/g+YHNVU2ceBewCUIR52HOxNWofpLRXgw3
+	 VdExIH0pucJrFOnR0g9CuC6WK8hvUz12k+2NC+M5tbXbiqG4aI1v5/3n0MI6bmfTJT
+	 a5a1QqYq9iyihxOkZPtewTumep1qPq5M5VNsUtIpb/fauI4tiO9Q85M1eEV+NMne0G
+	 MpLBkAxPNSqdQ==
+Date: Wed, 11 Jun 2025 07:15:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
+ <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, Krzysztof
+ Karas <krzysztof.karas@intel.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
+ <thomas.weissschuh@linutronix.de>
+Subject: Re: [PATCH v14 0/9] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Message-ID: <20250611071524.45610986@kernel.org>
+In-Reply-To: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
+References: <20250610-reftrack-dbgfs-v14-0-efb532861428@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250607152830.26597-1-pranav.tyagi03@gmail.com> <20250607164200.GC197663@horms.kernel.org>
-In-Reply-To: <20250607164200.GC197663@horms.kernel.org>
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Date: Wed, 11 Jun 2025 19:42:41 +0530
-X-Gm-Features: AX0GCFvcXQG5H4Lymw6YWunRZt95liFnErGnHf7Tk2DyxYxDDx34gA1WdzNq0ac
-Message-ID: <CAH4c4jKcnmquBJ1fXo0ENRf+D3xuogF+Cu4iGVsR18FZfggqqw@mail.gmail.com>
-Subject: Re: [PATCH] net: ipconfig: replace strncpy with strscpy
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kernel-mentees@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 7, 2025 at 10:12=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Sat, Jun 07, 2025 at 08:58:30PM +0530, Pranav Tyagi wrote:
-> > Replace the deprecated strncpy() with strscpy() as the destination
-> > buffer is NUL-terminated and does not require any
-> > trailing NUL-padding. Also increase the length to 252
-> > as NUL-termination is guaranteed.
-> >
-> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
->
-> Hi Pranav,
->
-> As a non-bug fix for Networking code this should be targeted
-> at net-next. And it's helpful to do so explicitly in the patch subject,
-> like this:
->
->         [PATCH v2 net-next] ...
->
-> Also, unfortunately the timing of this patch is not good
-> as net-next is currently closed for the merge window.
->
-> You can find more information about the above,
-> and other aspects of the workflow for the Networking subsystem
-> in https://docs.kernel.org/process/maintainer-netdev.html
->
->
-> ## Form letter - net-next-closed
->
-> The merge window for v6.16 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations. We are
-> currently accepting bug fixes only.
->
-> Please repost when net-next reopens after June 8th.
->
-> RFC patches sent for review only are obviously welcome at any time.
->
-> --
-> pw-bot: defer
+On Tue, 10 Jun 2025 10:59:20 -0400 Jeff Layton wrote:
+> For those just joining in, this series adds a new top-level
+> "ref_tracker" debugfs directory, and has each ref_tracker_dir register a
+> file in there as part of its initialization. It also adds the ability to
+> register a symlink with a more human-usable name that points to the
+> file, and does some general cleanup of how the ref_tracker object names
+> are handled.
 
-Hi,
+Still has the lockdep problem. Please triple check that it's fixed
+before you post next version, the number of warnings this series
+generates is quite burdensome for our CI.
 
-Thanks for pointing out the shortcomings in the patch.
-The doc will help a lot. I will correct the patch accordingly and
-send the v2 as the merge window has reopened.
+[  440.139336][    C1] ================================
+[  440.139684][    C1] WARNING: inconsistent lock state
+[  440.140019][    C1] 6.15.0-virtme #1 Not tainted
+[  440.140360][    C1] --------------------------------
+[  440.140705][    C1] inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+[  440.141124][    C1] ksoftirqd/1/22 [HC0[0]:SC1[1]:HE1:SE0] takes:
+[  440.141541][    C1] ffffffffad243218 (&xa->xa_lock#8){+.?.}-{3:3}, at: xa_set_mark+0x73/0x120
+[  440.142146][    C1] {SOFTIRQ-ON-W} state was registered at:
+[  440.142485][    C1]   __lock_acquire+0x20b/0x7e0
+[  440.142832][    C1]   lock_acquire.part.0+0xb6/0x240
+[  440.143181][    C1]   _raw_spin_lock+0x33/0x40
+[  440.143521][    C1]   xa_store+0x1c/0x50
+[  440.143784][    C1]   ref_tracker_dir_debugfs+0x168/0x1b0
+[  440.144137][    C1]   init_net_debugfs+0x15/0x70
+[  440.144480][    C1]   do_one_initcall+0x8c/0x1e0
+[  440.144845][    C1]   do_initcalls+0x176/0x280
+[  440.145184][    C1]   kernel_init_freeable+0x22d/0x300
+[  440.145530][    C1]   kernel_init+0x20/0x200
+[  440.145871][    C1]   ret_from_fork+0x240/0x320
+[  440.146205][    C1]   ret_from_fork_asm+0x1a/0x30
+[  440.146545][    C1] irq event stamp: 5141102
+[  440.146886][    C1] hardirqs last  enabled at (5141102): [<ffffffffa96fa4ed>] _raw_spin_unlock_irqrestore+0x5d/0x80
+[  440.147613][    C1] hardirqs last disabled at (5141101): [<ffffffffa96fa1cb>] _raw_spin_lock_irqsave+0x5b/0x60
+[  440.148283][    C1] softirqs last  enabled at (5139838): [<ffffffffa6c8ef18>] handle_softirqs+0x358/0x620
+[  440.148883][    C1] softirqs last disabled at (5139843): [<ffffffffa6c8f41f>] run_ksoftirqd+0x3f/0x70
 
-Regards
-
-Pranav Tyagi
+https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/160722/1-mptcp-join-sh/stderr
+https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/160722/vm-crash-thr0-0
+-- 
+pw-bot: cr
 
