@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-196456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1A1AD4E88
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:37:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15FFEAD4E8D
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:37:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C21933A6B6F
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:36:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B4373A7F60
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5AD23ED69;
-	Wed, 11 Jun 2025 08:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F381623E25A;
+	Wed, 11 Jun 2025 08:37:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21CB22F75D
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D07723CEF9
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749631018; cv=none; b=hAyRwR59YzyxtKHDYkLDNgLhYs2vjtIKWDUaxedNwcP9FqyVqzeunUjh510CaKWpET8JKmW05nqLywsdcuN6jW9w2U77YH3cqmU/7OKaNNXAV/wcScKzcxTSN04JhtWF08pLf1qKlNxiXN39WzsE8ojuFMMz0P2W9HrPp9jbPnI=
+	t=1749631026; cv=none; b=u6/4+Q+WCEe99RhKTeOI/2Snk17PwH07cqKNcMi0WmuHahKTcChsZYRkV+d+B8hKD71jcqaZMWLYJSR98IOi3DUyE+pTkpfEbj8unrxE/kfEck6qss0o8vwZxjvVH5zD+gq4jFhXvMHk+wqeIDiR/S3UeaXm9BNNWA5uMJyU7tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749631018; c=relaxed/simple;
-	bh=cbsnBsM2CO9WyRpcRDNW3KuVj4MnYgXj4BSULKxGYsE=;
+	s=arc-20240116; t=1749631026; c=relaxed/simple;
+	bh=RXFyn2n0qyBIR7UEWxzN/TZFEwVE6PHzZiXLpdwSdVI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=POH1kqJzI0zp6Di99mxbn+Mr0shHL9iqw4uRE/jJwC3mTy/tAyId5Bi6UgPkZeepd21GAV+IWKx7T4RiGKAqibsNrTAzXMN7h2A1idv0TPOjVdJ4odyQoL0Gca6I/V7Al+xpeIDFJnlkZklhzYmD73S6hjxjVbqBemzKfcAGTDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.132.163.193
+	 MIME-Version; b=k1EYGnA3ekH0fHO3FAVblGZFpUIviVozc5J5y1CelLo7x5DlppS7LyT0MVpJf5OzfETNcoixbnMg7yyywD2isxrlTefbIijMJiz6z4sVsdQIBJw5HDHvk9ngunnbo2KUqWLZVDbjg+dgi/hZe7Zq+SRt5TeWR0QE1pZ8XK+4ius=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.204.34.129
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: zesmtpgz1t1749630983te966aac6
-X-QQ-Originating-IP: Sk7tpus1mn04WRIzF+IjtbqlOOXTOAjF6+AC/Cw1r1s=
+X-QQ-mid: zesmtpgz1t1749630985t6d722d97
+X-QQ-Originating-IP: burWIKPCNSWcYVPve6VSRhlrfcbfcz5YtWE2qXq95KM=
 Received: from localhost.localdomain ( [36.20.60.58])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 11 Jun 2025 16:36:22 +0800 (CST)
+	id ; Wed, 11 Jun 2025 16:36:24 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6893949515969875678
+X-BIZMAIL-ID: 3668617052570383599
 EX-QQ-RecipientCnt: 9
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
@@ -48,9 +48,9 @@ Cc: kuba@kernel.org,
 	linglingzhang@trustnetic.com,
 	jiawenwu@net-swift.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next 08/12] net: txgbevf: add phylink check flow
-Date: Wed, 11 Jun 2025 16:35:55 +0800
-Message-Id: <20250611083559.14175-9-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next 09/12] net: wangxun: add ngbevf build
+Date: Wed, 11 Jun 2025 16:35:56 +0800
+Message-Id: <20250611083559.14175-10-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20250611083559.14175-1-mengyuanlou@net-swift.com>
 References: <20250611083559.14175-1-mengyuanlou@net-swift.com>
@@ -63,419 +63,313 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NX3nY7OJg9VpDI/wbc2ix38ufQhWy3Kk1W4iQ5/SGo3Zy7dsf2JYkhTs
-	+X6dxqX6JEMWrcMCT0rB0P9yBoqt9tz5yqyR7H0ToHyModPpH7Z1PR0Eg1iCtvaseW7fNiw
-	b0FoErdqzIE73AiAKsCGEAajhvn+SF2hHghDwfgP4MIxJW7R69J1L4IIRp07LRgQVA8ikwt
-	D+MwRzX1SBNxEXngOZspW7oF9FF5JUpA3IW312vYwefQLeTKnvQSloqMu7DZbFLkfxk1mx/
-	jYIOdGPuBvNqJh/qx+k7/I+hnBbgQE5xUqMsBZty98AcynOdtA9JqrKGNPe3FBQNkaZjBZq
-	/3fYMS3JHayQb1mxlHf/zPg+3SxV7TeKda0fIEruVN7MUKXPbddA+0Q25tb2QDloqHemvBC
-	pjuqlf/TtrnF77fuQRcc0dTd718v/vJyCzg67t6+QJOp/sAo3fzwIauKMFGG62y36x1Vkwa
-	kfYe7MUiV8HhjHYDZrCMquA1F29hDsccFf+NMTiYaP+mk+YCJ6vh0zyUn9/1LY7IN+xhZja
-	FjIYOFxZkFrUr6iIVCZxczR1dm61euNkcM4/aY5uAduJam1avDDkVKbyz89uIx90iCVHXdu
-	rZGY3z8G1C3bSORcIpne3ILNcN/yHmUzq96FQtI8eKPHXvqcaPdZ8SN0R6J9PT4goWKPjfJ
-	cvzVB/+yS9pTso+72ZIaut1KRoiqHcB1/dmXXJQ/yYj7PcJvG1cQqb5+qYUjr2JQHRY8/sW
-	OPvVr9E7iYlKz6psXfPC8rK7LzarbFKA787Sf53JYkeyQ9oEQ1N1mf2MCN1drfsoiDPsFeE
-	e/R1EMbtbZi7OpIOGrdpFsIp6vpiEWiud7CKYiD397n0pcoKpV+w11Hr4x4ujQV58aegwNa
-	SPfoe/rEwk134yIqLk/7ZpQxh88vxOiCMWIflCXDBxUqEJ3Wps5t9n87nJIV9c5BEZ9WNTX
-	2Ly+mBteGWHL6a5ImPMTZRSZ+7FTWpZcVGIlS+v4Fv93oFK13aIy13zrDb+YdSCJLSetC0l
-	Z9r+HUNYerhYRBMpizUyIx0NaKe5ZKDk5DWvuqCBS5fZ/YyG0yMQCITWVNZmlF3WFgOkTn3
-	dQpZ9UfXSRICS63wIZ2kOM=
+X-QQ-XMAILINFO: N754UttbGfoJ7awHGxhzWPsrguCAxTO6ZugcUp8NpS0g9yPLBmI8APWX
+	Rc4DsXlyQ9Q/GNFnKs41xOZDoMq+43p7k5grtGygQgOsR9A3v5UoFZ9AepENy/KgsFdGxJ9
+	qrgdMGs7EcqEVx81AIB6k5wS65yU1G0J8yVS4Soe16zlDYc2IEwl55+zODzZoaXL6O6kTFX
+	tYSA6bo3cUXSa2oJxLD7LbUTJKHOv9mCgYpizFM4ygT9AdIT8X/5i8t/nOwM8igENGyhwzY
+	mzRGO/uV9JO9KaTeQ9SWe8eHSqbD/oQzbxsnbD84E6rTP48t9nfKbBLJowdoKaIKVW/P0tT
+	XY8sB2uANy66wRIm+F0o8tqor2DBwmPGV87fBWP+uCftcLbSGcHZIImawtBwyULa4pA3Yuq
+	mBDwxA8n8ktvG1NHC5tJlwPw2kRafpnZFP5GizeYjUteLMtfqmCsIT7m+UNXKPNXC6n7djz
+	iG5knnh+q0rdfJcFX8jE8cAxI3gy+68puP2ltq5KywE3sEtlmrxviN7W31gqWo+vv7tb67p
+	L1KVyHHokEUbDoeOuO2OV3QjnxawA4m/XCDG+R4WVeyMy4klwQihgccZUfzX8yXzdtzd8P6
+	ocwl/8MGDTV2FHCXGxxwBk/NCa4u6idFVmujSPUoXYdpDmVk98natdB40NA3nLjdxQU0zpP
+	/ZCd2AmkLnE67XbP8EupZYBsiFfVhb36VYDF1RapmmhwW4wptz/ziU9ObU44WLBmQwycIzl
+	Sp/b5Nv+tfM9CQ+7cDcE5KYeMAGOEM77icXlVob+KDB7TV3wCH13mdpAUXQIwg1mC4++cWq
+	agoXEb2OKXKZgIP3WiQ3oBXez9CEiiplqdt8Aarf+bc1O6t7hfM/aK3+kxh+5rnOjvGlN2C
+	ipe2vnqZran0wm4zvGLlo+PDFyRm6DTN+Z3mmdjYBRGl1cRqT/IIVmC2e+KbBTmhJ/xUBWu
+	/pP5AfPjapZEv+aWPErANSycvTTYcY6mYL6dWLJtpULqaUoGoqW24zp9SdkWugr6fAZxvPA
+	bQD45JsmGFo3qkq/XSubepsDzvyrpssA/NXQgWDmdBXeOqTavOK8zCrQld0qALmDy6VYMGL
+	u4Q7i59GgZJqG3P9yhEWGD8q8Q4TsoazK6oRHXekhIq6cN8jWbI0ds=
 X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
 X-QQ-RECHKSPAM: 0
 
-Add phylink support to wangxun 10/25/40G virtual functions.
-Get link status from pf in mbox, and if it is failed then
-check the vx_status, because vx_status switching is too slow.
+Add doc build infrastructure for ngbevf driver.
+Implement the basic PCI driver loading and unloading interface.
+Initialize the id_table which support 1G virtual
+functions for Wangxun.
 
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_vf.c    | 121 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_vf.h    |  14 ++
- .../net/ethernet/wangxun/libwx/wx_vf_common.c |  43 +++++++
- .../net/ethernet/wangxun/libwx/wx_vf_common.h |   9 ++
- .../ethernet/wangxun/txgbevf/txgbevf_main.c   |  88 +++++++++++++
- 5 files changed, 275 insertions(+)
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../ethernet/wangxun/ngbevf.rst               |  16 ++
+ drivers/net/ethernet/wangxun/Kconfig          |  15 ++
+ drivers/net/ethernet/wangxun/Makefile         |   1 +
+ drivers/net/ethernet/wangxun/ngbevf/Makefile  |   9 ++
+ .../net/ethernet/wangxun/ngbevf/ngbevf_main.c | 149 ++++++++++++++++++
+ .../net/ethernet/wangxun/ngbevf/ngbevf_type.h |  24 +++
+ 7 files changed, 215 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst
+ create mode 100644 drivers/net/ethernet/wangxun/ngbevf/Makefile
+ create mode 100644 drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
+ create mode 100644 drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.c b/drivers/net/ethernet/wangxun/libwx/wx_vf.c
-index a211329fd71a..cba6641a4c7b 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf.c
-@@ -519,3 +519,124 @@ int wx_get_queues_vf(struct wx *wx, u32 *num_tcs, u32 *default_tc)
- 	return ret;
- }
- EXPORT_SYMBOL(wx_get_queues_vf);
+diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+index e93453410772..40ac552641a3 100644
+--- a/Documentation/networking/device_drivers/ethernet/index.rst
++++ b/Documentation/networking/device_drivers/ethernet/index.rst
+@@ -60,6 +60,7 @@ Contents:
+    wangxun/txgbe
+    wangxun/txgbevf
+    wangxun/ngbe
++   wangxun/ngbevf
+ 
+ .. only::  subproject and html
+ 
+diff --git a/Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst b/Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst
+new file mode 100644
+index 000000000000..a39e3d5a1038
+--- /dev/null
++++ b/Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst
+@@ -0,0 +1,16 @@
++.. SPDX-License-Identifier: GPL-2.0+
 +
-+static int wx_get_link_status_from_pf(struct wx *wx, u32 *msgbuf)
-+{
-+	u32 links_reg = msgbuf[1];
++==================================================================
++Linux Base Virtual Function Driver for Wangxun(R) Gigabit Ethernet
++==================================================================
 +
-+	if (msgbuf[1] & WX_PF_NOFITY_VF_NET_NOT_RUNNING)
-+		wx->notify_down = true;
-+	else
-+		wx->notify_down = false;
++WangXun Gigabit Virtual Function Linux driver.
++Copyright(c) 2015 - 2025 Beijing WangXun Technology Co., Ltd.
 +
-+	if (wx->notify_down) {
-+		wx->link = false;
-+		wx->speed = SPEED_UNKNOWN;
-+		return 0;
-+	}
++Support
++=======
++For general information, go to the website at:
++https://www.net-swift.com
 +
-+	wx->link = WX_PFLINK_STATUS(links_reg);
-+	wx->speed = WX_PFLINK_SPEED(links_reg);
++If you got any problem, contact Wangxun support team via nic-support@net-swift.com
++and Cc: netdev.
+diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
+index a6ec73e4f300..c548f4e80565 100644
+--- a/drivers/net/ethernet/wangxun/Kconfig
++++ b/drivers/net/ethernet/wangxun/Kconfig
+@@ -82,4 +82,19 @@ config TXGBEVF
+ 	  To compile this driver as a module, choose M here. MSI-X interrupt
+ 	  support is required for this driver to work correctly.
+ 
++config NGBEVF
++	tristate "Wangxun(R) GbE Virtual Function Ethernet support"
++	depends on PCI_MSI
++	select LIBWX
++	help
++	  This driver supports virtual functions for WX1860, WX1860AL.
 +
-+	return 0;
-+}
++	  This driver was formerly named ngbevf.
 +
-+static int wx_pf_ping_vf(struct wx *wx, u32 *msgbuf)
-+{
-+	if (!(msgbuf[0] & WX_VT_MSGTYPE_CTS))
-+		/* msg is not CTS, we need to do reset */
-+		return -EINVAL;
++	  More specific information on configuring the driver is in
++	  <file:Documentation/networking/device_drivers/ethernet/wangxun/ngbevf.rst>.
 +
-+	return 0;
-+}
++	  To compile this driver as a module, choose M here. MSI-X interrupt
++	  support is required for this driver to work correctly.
 +
-+static struct wx_link_reg_fields wx_speed_lookup_vf[] = {
-+	{wx_mac_unknown},
-+	{wx_mac_sp, SPEED_10000, SPEED_1000, SPEED_100, SPEED_UNKNOWN, SPEED_UNKNOWN},
-+	{wx_mac_em, SPEED_1000,  SPEED_100, SPEED_10, SPEED_UNKNOWN, SPEED_UNKNOWN},
-+	{wx_mac_aml, SPEED_40000, SPEED_25000, SPEED_10000, SPEED_1000, SPEED_UNKNOWN},
-+	{wx_mac_aml40, SPEED_40000, SPEED_25000, SPEED_10000, SPEED_1000, SPEED_UNKNOWN},
+ endif # NET_VENDOR_WANGXUN
+diff --git a/drivers/net/ethernet/wangxun/Makefile b/drivers/net/ethernet/wangxun/Makefile
+index 71371d47a6ee..0a71a710b717 100644
+--- a/drivers/net/ethernet/wangxun/Makefile
++++ b/drivers/net/ethernet/wangxun/Makefile
+@@ -7,3 +7,4 @@ obj-$(CONFIG_LIBWX) += libwx/
+ obj-$(CONFIG_TXGBE) += txgbe/
+ obj-$(CONFIG_TXGBEVF) += txgbevf/
+ obj-$(CONFIG_NGBE) += ngbe/
++obj-$(CONFIG_NGBEVF) += ngbevf/
+diff --git a/drivers/net/ethernet/wangxun/ngbevf/Makefile b/drivers/net/ethernet/wangxun/ngbevf/Makefile
+new file mode 100644
+index 000000000000..11a4f15e2ce3
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/ngbevf/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd.
++#
++# Makefile for the Wangxun(R) 1GbE virtual functions driver
++#
++
++obj-$(CONFIG_NGBE) += ngbevf.o
++
++ngbevf-objs := ngbevf_main.o
+diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
+new file mode 100644
+index 000000000000..77025e7deeeb
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
+@@ -0,0 +1,149 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
++
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/netdevice.h>
++#include <linux/string.h>
++#include <linux/etherdevice.h>
++
++#include "../libwx/wx_type.h"
++#include "../libwx/wx_vf_common.h"
++#include "ngbevf_type.h"
++
++/* ngbevf_pci_tbl - PCI Device ID Table
++ *
++ * Wildcard entries (PCI_ANY_ID) should come last
++ * Last entry must be all 0s
++ *
++ * { Vendor ID, Device ID, SubVendor ID, SubDevice ID,
++ *   Class, Class Mask, private data (not used) }
++ */
++static const struct pci_device_id ngbevf_pci_tbl[] = {
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL_W), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860A2), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860A2S), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860A4), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860A4S), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL2), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL2S), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL4), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL4S), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860NCSI), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860A1), 0},
++	{ PCI_VDEVICE(WANGXUN, NGBEVF_DEV_ID_EM_WX1860AL1), 0},
++	/* required last entry */
++	{ .device = 0 }
 +};
 +
-+static void wx_check_physical_link(struct wx *wx, u32 link_val)
++/**
++ * ngbevf_probe - Device Initialization Routine
++ * @pdev: PCI device information struct
++ * @ent: entry in ngbevf_pci_tbl
++ *
++ * Return: return 0 on success, negative on failure
++ *
++ * ngbevf_probe initializes an adapter identified by a pci_dev structure.
++ * The OS initialization, configuring of the adapter private structure,
++ * and a hardware reset occur.
++ **/
++static int ngbevf_probe(struct pci_dev *pdev,
++			const struct pci_device_id __always_unused *ent)
 +{
-+	wx->link = true;
-+
-+	switch (WX_VXSTATUS_SPEED(link_val)) {
-+	case BIT(0):
-+		wx->speed = wx_speed_lookup_vf[wx->mac.type].bit0_f;
-+		break;
-+	case BIT(1):
-+		wx->speed = wx_speed_lookup_vf[wx->mac.type].bit1_f;
-+		break;
-+	case BIT(2):
-+		wx->speed = wx_speed_lookup_vf[wx->mac.type].bit2_f;
-+		break;
-+	case BIT(3):
-+		wx->speed = wx_speed_lookup_vf[wx->mac.type].bit3_f;
-+		break;
-+	case BIT(4):
-+	default:
-+		wx->speed = SPEED_UNKNOWN;
-+		break;
-+	}
-+
-+	if (wx->speed == SPEED_UNKNOWN)
-+		wx->link = false;
-+}
-+
-+int wx_check_mac_link_vf(struct wx *wx)
-+{
-+	struct wx_mbx_info *mbx = &wx->mbx;
-+	u32 val, msgbuf[2] = {0};
-+	int ret = 0;
-+
-+	/* If we were hit with a reset drop the link */
-+	if (!wx_check_for_rst_vf(wx) || !mbx->timeout)
-+		goto out;
-+
-+	if (!wx_check_for_msg_vf(wx))
-+		ret = wx_read_mbx_vf(wx, msgbuf, 2);
-+	if (ret)
-+		goto out;
-+
-+	switch (msgbuf[0] & GENMASK(8, 0)) {
-+	case WX_PF_NOFITY_VF_LINK_STATUS | WX_PF_CONTROL_MSG:
-+		ret = wx_get_link_status_from_pf(wx, msgbuf);
-+		goto out;
-+	case WX_PF_CONTROL_MSG:
-+		ret = wx_pf_ping_vf(wx, msgbuf);
-+		goto out;
-+	default:
-+		break;
-+	}
-+
-+	/* get link status from hw status reg */
-+	/* for SFP+ modules and DA cables, it can take up to 500usecs
-+	 * before the link status is correct
-+	 */
-+	ret = read_poll_timeout_atomic(rd32, val, val & BIT(0), 100,
-+				       500, false, wx, WX_VXSTATUS);
-+	if (ret)
-+		goto out;
-+
-+	/* check link status */
-+	wx_check_physical_link(wx, val);
-+
-+	if (!(msgbuf[0] & WX_VT_MSGTYPE_CTS)) {
-+		/* msg is not CTS and is NACK we must have lost CTS status */
-+		if (msgbuf[0] & WX_VT_MSGTYPE_NACK)
-+			ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	/* the pf is talking, if we timed out in the past we reinit */
-+	if (!mbx->timeout) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+out:
-+	return ret;
-+}
-+EXPORT_SYMBOL(wx_check_mac_link_vf);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-index 3bb70421622a..59bb4aa1ec93 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
-@@ -90,6 +90,19 @@
- #define WX_VXMRQC_RSS_EN             BIT(8)
- #define WX_VXMRQC_RSS_HASH(f)    FIELD_PREP(GENMASK(15, 13), f)
- 
-+#define WX_PFLINK_STATUS(g)      FIELD_GET(BIT(0), g)
-+#define WX_PFLINK_SPEED(g)       FIELD_GET(GENMASK(31, 1), g)
-+#define WX_VXSTATUS_SPEED(g)      FIELD_GET(GENMASK(4, 1), g)
-+
-+struct wx_link_reg_fields {
-+	u32 mac_type;
-+	u32 bit0_f;
-+	u32 bit1_f;
-+	u32 bit2_f;
-+	u32 bit3_f;
-+	u32 bit4_f;
-+};
-+
- void wx_start_hw_vf(struct wx *wx);
- void wx_init_hw_vf(struct wx *wx);
- int wx_reset_hw_vf(struct wx *wx);
-@@ -106,5 +119,6 @@ int wx_update_xcast_mode_vf(struct wx *wx, int xcast_mode);
- int wx_get_link_state_vf(struct wx *wx, u16 *link_state);
- int wx_set_vfta_vf(struct wx *wx, u32 vlan, u32 vind, bool vlan_on,
- 		   bool vlvf_bypass);
-+int wx_check_mac_link_vf(struct wx *wx);
- 
- #endif /* _WX_VF_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-index 51c93364aaf1..c14d8fbcf990 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
-@@ -53,6 +53,7 @@ void wxvf_remove(struct pci_dev *pdev)
- 	kfree(wx->vfinfo);
- 	kfree(wx->rss_key);
- 	kfree(wx->mac_table);
-+	phylink_destroy(wx->phylink);
- 	wx_clear_interrupt_scheme(wx);
- 	pci_release_selected_regions(pdev,
- 				     pci_select_bars(pdev, IORESOURCE_MEM));
-@@ -64,6 +65,7 @@ static irqreturn_t wx_msix_misc_vf(int __always_unused irq, void *data)
- {
- 	struct wx *wx = data;
- 
-+	phylink_mac_change(wx->phylink, wx->link);
- 	/* Clear the interrupt */
- 	if (netif_running(wx->netdev))
- 		wr32(wx, WX_VXIMC, wx->eims_other);
-@@ -242,6 +244,23 @@ int wx_set_mac_vf(struct net_device *netdev, void *p)
- }
- EXPORT_SYMBOL(wx_set_mac_vf);
- 
-+void wx_get_mac_link_vf(struct phylink_config *config,
-+			struct phylink_link_state *state)
-+{
-+	struct wx *wx = phylink_to_wx(config);
++	struct net_device *netdev;
++	struct wx *wx = NULL;
 +	int err;
 +
-+	spin_lock_bh(&wx->mbx.mbx_lock);
-+	err = wx_check_mac_link_vf(wx);
-+	spin_unlock_bh(&wx->mbx.mbx_lock);
++	err = pci_enable_device_mem(pdev);
 +	if (err)
-+		return;
-+
-+	state->link = wx->link;
-+	state->speed = wx->speed;
-+}
-+EXPORT_SYMBOL(wx_get_mac_link_vf);
-+
- static void wxvf_irq_enable(struct wx *wx)
- {
- 	wr32(wx, WX_VXIMC, wx->eims_enable_mask);
-@@ -258,6 +277,7 @@ static void wxvf_up_complete(struct wx *wx)
- 	wxvf_irq_enable(wx);
- 	/* enable transmits */
- 	netif_tx_start_all_queues(wx->netdev);
-+	phylink_start(wx->phylink);
- }
- 
- int wxvf_open(struct net_device *netdev)
-@@ -300,6 +320,7 @@ static void wxvf_down(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
- 
-+	phylink_stop(wx->phylink);
- 	netif_tx_stop_all_queues(netdev);
- 	netif_tx_disable(netdev);
- 	wx_napi_disable_all(wx);
-@@ -320,3 +341,25 @@ int wxvf_close(struct net_device *netdev)
- 	return 0;
- }
- EXPORT_SYMBOL(wxvf_close);
-+
-+void wxvf_mac_config(struct phylink_config *config, unsigned int mode,
-+		     const struct phylink_link_state *state)
-+{
-+}
-+EXPORT_SYMBOL(wxvf_mac_config);
-+
-+void wxvf_mac_link_down(struct phylink_config *config,
-+			unsigned int mode, phy_interface_t interface)
-+{
-+	struct wx *wx = phylink_to_wx(config);
-+
-+	wx->speed = SPEED_UNKNOWN;
-+}
-+EXPORT_SYMBOL(wxvf_mac_link_down);
-+
-+void wxvf_mac_link_up(struct phylink_config *config, struct phy_device *phy,
-+		      unsigned int mode, phy_interface_t interface,
-+		      int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+}
-+EXPORT_SYMBOL(wxvf_mac_link_up);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
-index 272743a3c878..946a61bd4c3e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
-@@ -14,7 +14,16 @@ void wx_reset_vf(struct wx *wx);
- void wx_set_rx_mode_vf(struct net_device *netdev);
- void wx_configure_vf(struct wx *wx);
- int wx_set_mac_vf(struct net_device *netdev, void *p);
-+void wx_get_mac_link_vf(struct phylink_config *config,
-+			struct phylink_link_state *state);
- int wxvf_open(struct net_device *netdev);
- int wxvf_close(struct net_device *netdev);
-+void wxvf_mac_config(struct phylink_config *config, unsigned int mode,
-+		     const struct phylink_link_state *state);
-+void wxvf_mac_link_down(struct phylink_config *config, unsigned int mode,
-+			phy_interface_t interface);
-+void wxvf_mac_link_up(struct phylink_config *config, struct phy_device *phy,
-+		      unsigned int mode, phy_interface_t interface,
-+		      int speed, int duplex, bool tx_pause, bool rx_pause);
- 
- #endif /* _WX_VF_COMMON_H_ */
-diff --git a/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c b/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
-index 448513cf882c..5a8eb8856a87 100644
---- a/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbevf/txgbevf_main.c
-@@ -37,6 +37,88 @@ static const struct pci_device_id txgbevf_pci_tbl[] = {
- 	{ .device = 0 }
- };
- 
-+static const struct phylink_mac_ops txgbevf_mac_ops = {
-+	.mac_config = wxvf_mac_config,
-+	.mac_link_down = wxvf_mac_link_down,
-+	.mac_link_up = wxvf_mac_link_up,
-+};
-+
-+static int txgbevf_interface_max_speed(phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_10GBASER:
-+		return SPEED_10000;
-+	case PHY_INTERFACE_MODE_25GBASER:
-+		return SPEED_25000;
-+	case PHY_INTERFACE_MODE_XLGMII:
-+		return SPEED_40000;
-+	default:
-+		/* No idea! Garbage in, unknown out */
-+		return SPEED_UNKNOWN;
-+	}
-+
-+	return SPEED_UNKNOWN;
-+}
-+
-+static int txgbevf_phylink_init(struct wx *wx)
-+{
-+	struct phylink_link_state link_state;
-+	struct phylink_config *phy_config;
-+	phy_interface_t phy_mode;
-+	struct phylink *phylink;
-+	int err;
-+
-+	phy_config = &wx->phylink_config;
-+	phy_config->dev = &wx->netdev->dev;
-+	phy_config->type = PHYLINK_NETDEV;
-+	phy_config->mac_capabilities = MAC_40000FD | MAC_25000FD | MAC_10000FD |
-+				       MAC_1000FD | MAC_100FD | MAC_10FD;
-+	phy_config->get_fixed_state = wx_get_mac_link_vf;
-+
-+	if (wx->mac.type == wx_mac_aml40) {
-+		phy_mode = PHY_INTERFACE_MODE_XLGMII;
-+		__set_bit(PHY_INTERFACE_MODE_XLGMII,
-+			  phy_config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER,
-+			  phy_config->supported_interfaces);
-+	} else if (wx->mac.type == wx_mac_aml) {
-+		phy_mode = PHY_INTERFACE_MODE_25GBASER;
-+		__set_bit(PHY_INTERFACE_MODE_25GBASER,
-+			  phy_config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER,
-+			  phy_config->supported_interfaces);
-+	} else if (wx->mac.type == wx_mac_sp) {
-+		phy_mode = PHY_INTERFACE_MODE_10GBASER;
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER,
-+			  phy_config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+			  phy_config->supported_interfaces);
-+	} else {
-+		wx_err(wx, "Unsupported MAC type for VF\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Initialize the phylink */
-+	phylink = phylink_create(phy_config, NULL,
-+				 phy_mode, &txgbevf_mac_ops);
-+	if (IS_ERR(phylink)) {
-+		wx_err(wx, "Failed to create phylink\n");
-+		return PTR_ERR(phylink);
-+	}
-+
-+	link_state.speed = txgbevf_interface_max_speed(phy_mode);
-+	link_state.duplex = DUPLEX_FULL;
-+	err = phylink_set_fixed_link(phylink, &link_state);
-+	if (err) {
-+		wx_err(wx, "Failed to set fixed link\n");
 +		return err;
++
++	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
++	if (err) {
++		dev_err(&pdev->dev,
++			"No usable DMA configuration, aborting\n");
++		goto err_pci_disable_dev;
 +	}
 +
-+	wx->phylink = phylink;
++	err = pci_request_selected_regions(pdev,
++					   pci_select_bars(pdev, IORESOURCE_MEM),
++					   dev_driver_string(&pdev->dev));
++	if (err) {
++		dev_err(&pdev->dev,
++			"pci_request_selected_regions failed 0x%x\n", err);
++		goto err_pci_disable_dev;
++	}
++
++	pci_set_master(pdev);
++
++	netdev = devm_alloc_etherdev_mqs(&pdev->dev,
++					 sizeof(struct wx),
++					 NGBEVF_MAX_TX_QUEUES,
++					 NGBEVF_MAX_RX_QUEUES);
++	if (!netdev) {
++		err = -ENOMEM;
++		goto err_pci_release_regions;
++	}
++
++	SET_NETDEV_DEV(netdev, &pdev->dev);
++
++	wx = netdev_priv(netdev);
++	wx->netdev = netdev;
++	wx->pdev = pdev;
++
++	wx->msg_enable = netif_msg_init(-1, NETIF_MSG_DRV |
++					NETIF_MSG_PROBE | NETIF_MSG_LINK);
++	wx->hw_addr = devm_ioremap(&pdev->dev,
++				   pci_resource_start(pdev, 0),
++				   pci_resource_len(pdev, 0));
++	if (!wx->hw_addr) {
++		err = -EIO;
++		goto err_pci_release_regions;
++	}
++
++	netdev->features |= NETIF_F_HIGHDMA;
++	pci_set_drvdata(pdev, wx);
 +
 +	return 0;
++
++err_pci_release_regions:
++	pci_release_selected_regions(pdev,
++				     pci_select_bars(pdev, IORESOURCE_MEM));
++err_pci_disable_dev:
++	pci_disable_device(pdev);
++	return err;
 +}
 +
- static const struct net_device_ops txgbevf_netdev_ops = {
- 	.ndo_open               = wxvf_open,
- 	.ndo_stop               = wxvf_close,
-@@ -257,6 +339,10 @@ static int txgbevf_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto err_free_sw_init;
- 
-+	err = txgbevf_phylink_init(wx);
-+	if (err)
-+		goto err_clear_interrupt_scheme;
++/**
++ * ngbevf_remove - Device Removal Routine
++ * @pdev: PCI device information struct
++ *
++ * ngbevf_remove is called by the PCI subsystem to alert the driver
++ * that it should release a PCI device.  The could be caused by a
++ * Hot-Plug event, or because the driver is going to be removed from
++ * memory.
++ **/
++static void ngbevf_remove(struct pci_dev *pdev)
++{
++	wxvf_remove(pdev);
++}
 +
- 	err = register_netdev(netdev);
- 	if (err)
- 		goto err_register;
-@@ -267,6 +353,8 @@ static int txgbevf_probe(struct pci_dev *pdev,
- 	return 0;
- 
- err_register:
-+	phylink_destroy(wx->phylink);
-+err_clear_interrupt_scheme:
- 	wx_clear_interrupt_scheme(wx);
- err_free_sw_init:
- 	kfree(wx->vfinfo);
++static DEFINE_SIMPLE_DEV_PM_OPS(ngbevf_pm_ops, wxvf_suspend, wxvf_resume);
++
++static struct pci_driver ngbevf_driver = {
++	.name     = KBUILD_MODNAME,
++	.id_table = ngbevf_pci_tbl,
++	.probe    = ngbevf_probe,
++	.remove   = ngbevf_remove,
++	.shutdown = wxvf_shutdown,
++	/* Power Management Hooks */
++	.driver.pm	= pm_sleep_ptr(&ngbevf_pm_ops)
++};
++
++module_pci_driver(ngbevf_driver);
++
++MODULE_DEVICE_TABLE(pci, ngbevf_pci_tbl);
++MODULE_AUTHOR("Beijing WangXun Technology Co., Ltd, <software@trustnetic.com>");
++MODULE_DESCRIPTION("WangXun(R) Gigabit PCI Express Network Driver");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
+new file mode 100644
+index 000000000000..c71a244ec6b9
+--- /dev/null
++++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
++
++#ifndef _NGBEVF_TYPE_H_
++#define _NGBEVF_TYPE_H_
++
++/* Device IDs */
++#define NGBEVF_DEV_ID_EM_WX1860AL_W             0x0110
++#define NGBEVF_DEV_ID_EM_WX1860A2               0x0111
++#define NGBEVF_DEV_ID_EM_WX1860A2S              0x0112
++#define NGBEVF_DEV_ID_EM_WX1860A4               0x0113
++#define NGBEVF_DEV_ID_EM_WX1860A4S              0x0114
++#define NGBEVF_DEV_ID_EM_WX1860AL2              0x0115
++#define NGBEVF_DEV_ID_EM_WX1860AL2S             0x0116
++#define NGBEVF_DEV_ID_EM_WX1860AL4              0x0117
++#define NGBEVF_DEV_ID_EM_WX1860AL4S             0x0118
++#define NGBEVF_DEV_ID_EM_WX1860NCSI             0x0119
++#define NGBEVF_DEV_ID_EM_WX1860A1               0x011a
++#define NGBEVF_DEV_ID_EM_WX1860AL1              0x011b
++
++#define NGBEVF_MAX_RX_QUEUES                  1
++#define NGBEVF_MAX_TX_QUEUES                  1
++
++#endif /* _NGBEVF_TYPE_H_ */
 -- 
 2.30.1
 
