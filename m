@@ -1,145 +1,153 @@
-Return-Path: <netdev+bounces-196407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 714A7AD4956
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 05:29:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26B19AD497C
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 05:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEFB71767E3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 03:29:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55D1B3A605B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 03:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E7A17A300;
-	Wed, 11 Jun 2025 03:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8535C1E9B0D;
+	Wed, 11 Jun 2025 03:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GCU1peVw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZESwgR2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBB66BFCE;
-	Wed, 11 Jun 2025 03:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACC481749;
+	Wed, 11 Jun 2025 03:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749612572; cv=none; b=k5jSk3sSFJuVIeXk3f6MjAFS0J7BT10wk+cAdW+7ePnWkuwiphDBLRdWTbRW/cdNsBp1z6o6Rjw7isWtkvjb0D9/tlwNA/U1xpwQP2UY5DRcknN2jONx5Xz8l2dNLsQCIzkWocz+RwS8yjhrCkIJxd6RWfryB4ceqGezzqUPjNk=
+	t=1749613218; cv=none; b=ZYFaSi0CSdfoszg/meuFj7NtB31w54BQzy4utcavC+qeryozt/vgWDJlTVkpNz92vWbdHgBIHu9hvjMm7+huipNWyVwPqFzYHn0fdchRHx/XChW3M5bv8VukIJBoyGZup9Y+vXrRJQ3KhY2sH+o3iT+yR7q4gWFFTqzjecBFGOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749612572; c=relaxed/simple;
-	bh=ZmEIS0ewIEsyBe6SRYgcoDY9nHhjZrdFf9XsyDfIIxY=;
+	s=arc-20240116; t=1749613218; c=relaxed/simple;
+	bh=rPVriNA7cxls0TdVbUs4Xq8KhWGVGAU8k13T96+qt+k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hW8n2B5e2rWU0ZBhZVjczyLoGaLdo8Gaqg/pOQULgILuLe8ogRx1i6aWrUQbRLBLr5VR0nsvrAmm5BjELI6eztu5S87fgpLz+eU7FPwdF+a5uy6pU1kC8mLm2jKV+kZOtl30CLoxANvPCBBHfis7J/QpB4dUjp76EDJ7UyWqIfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GCU1peVw; arc=none smtp.client-ip=209.85.210.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUG4GHYG6zwex4FB99knROU0Us9RVziJKtZy/dbqRhGj/gU5Fd/h36BLFbXmG54PxCJhhg0uy7RRdDwM37r04IHhezlEXRGyMj8xw8+ru5BWZgIlioVmBV2uFF1yibC7mU4vhq8F1yj2t/pWLjfQ15GvnZGMTVqZOW0qQWlwA4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZESwgR2e; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-74800b81f1bso4808142b3a.1;
-        Tue, 10 Jun 2025 20:29:30 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-312028c644bso4706237a91.0;
+        Tue, 10 Jun 2025 20:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749612570; x=1750217370; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749613216; x=1750218016; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=42bdD8KpWulugTYz5Jl9lO5/i14UE0R8FG/ItYTb/Cw=;
-        b=GCU1peVw7uygQjaG3+Pilgww8lT2rjfDtRGtrZTiISFuH6HnIeRGvDRvK/gINlUU/n
-         c6i7FUVpk9RoDmyLpT599/7mUIvf9kbkNniySFaYExpG2Fn2X6VXHM1BZbnEAg4kTL1Y
-         AzeDR2LvFGUovEGo9Eu4SKkbrGGVMTHm+dFDfw0oVDHfX33evk5ecWY4XT6QBmWRoMiO
-         1SrJFO7X+ER55q8ehuuhSeJWoEMbBzb09G1mnQFF/DdorK0ffOi0HqTP+n66AOz/aAIy
-         MpVNwFCRZ/2mxv/eQW3vQCd70Y4mz1yqkSx+3lHHp9hqDP526Mwsw0/qL6KPhxb5b4O8
-         aKig==
+        bh=ZHZXq9/HSysGqtsKjHNbmYLUzfUw6ExCfU0Zi8dr+gw=;
+        b=ZESwgR2eV9qBwoxBdb+R3O/sqRzKQN0fS5mxaVulebOETj6rkkPGqYBiFWTREmwcC3
+         WXXibFMRHctCUjp+lL6E82Og+vr/l2K7xanlOj5IwQ5pE4PyQexZNx2SyI8OaF8WEwDZ
+         drasFVtqTiNq3yR9pzWDlbnJBcUMWId23djAvrgKt5bepv6JTSFaKP6NVFYEp3rWTTcy
+         wW1FEtbnuQY1UkxCOsqT6MnWcft6zihvmeziMwrNYO+JZ4cxGEs5Tpk0DY+1+/sNXN0I
+         XNh4wsFi1kSHYkGE4AkX7Lbo5g8ZUu/9+kV8/pCa5RQXOPjY6lw677v2nrvX3vN7euCn
+         bJqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749612570; x=1750217370;
+        d=1e100.net; s=20230601; t=1749613216; x=1750218016;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=42bdD8KpWulugTYz5Jl9lO5/i14UE0R8FG/ItYTb/Cw=;
-        b=aJr7KiKOLlBpH3iOk2R/p/pxFjXUxFEHZXqs2LrEUiPmop64pldK3KyFmtZs1cJWjg
-         4e9mNBZvZYVIBdWXogYLkpcsHBGqgAmmcSxIaxK+FIX+p/Um/dxyVlI5DSbaRJW0fdXa
-         yCOcmxTgZqBlMeOYKWn64HZSQ1bVVivXpv3BqZaow2RPJ/nzrzEAhKC2EaT4Ru3OL39e
-         7WeKWemvgL32x9wK5LVBlK7nWY8G8eEIa8p412flHecKdlCdtBnTvfwHDvmmOcr8t9V0
-         +gXXi/pt+RnwM8LqawBBV3E6Lk878s1KsAo8fzU8+/ZELk1zHPiL03SH6FVaRDVY35f2
-         eo6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUy7wXSqYnPF0evEvOGLE8W372axLFkzDZPRDAFxKoXtFAXrtodRPbXt5cWeLEMrSlVJOM9eZGK@vger.kernel.org, AJvYcCV+K59Awf43xQZcHH42ELyZWg8qNbfqPsyIuf0UbsgLJ4liJG8P+or/wPEJSFMjz5rYyjOKYrVtQaxQSUQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw36GxdNSNQzRQ6WjdqfoaskZI6/lV0zSwrpPVZmOWUuK5IFwlC
-	7s69RtQ35S28BZivqluDvGqHjRbcsRbOJjdVvoqQveodvGyu4aYTBzz5
-X-Gm-Gg: ASbGnctC0gBiuZkQE2Nm54aQ/YXl0q7tdXjwdk7mdl6l1cBreuvcph9qgYqMxVOUyqi
-	s7KRAkDP3M/9iqV52A4rp6JK9vpYv7ntgrspeGvPN+QdNol0N5dtHsH9i3juez1gw1KxjUfvlQv
-	Hnw79RyW4HKt6Mh1sU5IUPOb1sa/w561pULjakH9CC5/B5GCB2cYGr2oVXFsbBS9aInIXVwZMme
-	eZ16BCY9m2Vz6XU/S99nfGcRNeYmjadampUFgBuXK0ujUZIf1nrNGackzYZkzYcz1NivopRA2Nv
-	2Id4oV6R2x0KB+aekPEqTHyl198pJI8qOpkPTkHlO+pPaNYIFfWZBYLYEKY8Wtu7YCKQ6kCI7bY
-	oq3BRMQ==
-X-Google-Smtp-Source: AGHT+IGK6S2dXv+NJ8cZYRLHgfNM+hpO0P8zM0qGDSdEQ2oFP/EuSxTv9q/UxdtD6w+DUyf94PmblQ==
-X-Received: by 2002:a05:6a20:e608:b0:21f:545e:84f0 with SMTP id adf61e73a8af0-21f89145850mr1798661637.40.1749612569755;
-        Tue, 10 Jun 2025 20:29:29 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2f5f791d30sm7557806a12.65.2025.06.10.20.29.27
+        bh=ZHZXq9/HSysGqtsKjHNbmYLUzfUw6ExCfU0Zi8dr+gw=;
+        b=JQbbCZidXsJY1G7ovVyKszsB40bXweybL7sUUsEu9PFmbGF1Ew8/f/HEXwBT0aujOd
+         Kohn3qjKRKtUnqSVoTe0UuHpOlqyTZ/S5XD7YMG1HhT1csbbB7ZMO1XUyl3f+Hrf+Mk3
+         GbUjEDAFn2c5oQQ35dUAM9+0GQjTwyJi15ddTs+bwpotIUVYhEoyl0tHTLvT8YCDZphH
+         +0JCyaD8DnTlI8jqfSBe5WgTEq8CllKVoWoHgqN66LuxmKCYQ2EWyr75WHqW1FZD0Y0w
+         xWweVKE5qYhwr61/UpViwagMm+cdm7Uoka87WRdyr5DKB1VwmCN+Rth7r7rtDmbgj2lj
+         Q0XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVU/r9DUx4SR9Ss0wMMd44dDQ2LLmm4OTQMrLkBGgAfkn2JUXEWQZGuGD8sUNLCMGvb40wrx0fm@vger.kernel.org, AJvYcCXP0uia2tSPf6wKjlYmscruEvROISr6MEIHd4oA1orfhwUHBf4whtU2urN/XA45n7TIUZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIZsXkkl1hESu4+2xX08F87XDkdt0BtHzf8xGlhvLNy8SFpQ+t
+	DtulveK4GepEXBmtdYkJiN+jKd8607oXbsbbPNCc3c7O0Kd2q+Xr8Ns=
+X-Gm-Gg: ASbGncvnYw7ptOAI5MEgBL/kFLrGnwbaD3K/VzblKWPb+lHChPS7iy0fay7EDceVg4V
+	9RLzNEocaTfCymQLCXmmH8WTmi86jXNff8XGMsjNDvmj2qiv4L3qpZy3n+Ov9QzanBBPAAb+g5N
+	0+ZXJ3+UYYqoWrL+oIRT+ivz0sZEq/Tt+XpIW4Z2mb8kjPVM/ZVWc/ai/ppuWYHQDs1KX+v261y
+	6VdpA1hCJlrJakwQsVfnzAhATQ8sKdjwZtb/50taDRaGjA6s0caoF5afh8xdayvyBaIKIOshUul
+	Po41aG2NXcBYwO3Vk2IR607jpRMtYreQBz7YE3ZAiVGmhX9udCbAV2LLDFkYi5HS23OwYfeuy+P
+	Bqp2D6P2qwJnd6/CLxevj79o=
+X-Google-Smtp-Source: AGHT+IHvl4h1exi8ywoBtqahTT6cB9WdxUmxRjR4cIi8C/TCYDUq70I/2vURRUdE43RufRpKbowwuw==
+X-Received: by 2002:a17:90b:5107:b0:312:1c83:58e7 with SMTP id 98e67ed59e1d1-313af11f53dmr2459071a91.1.1749613216026;
+        Tue, 10 Jun 2025 20:40:16 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23603504eefsm78038785ad.218.2025.06.10.20.40.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jun 2025 20:29:29 -0700 (PDT)
-Date: Tue, 10 Jun 2025 20:29:26 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        Tue, 10 Jun 2025 20:40:15 -0700 (PDT)
+Date: Tue, 10 Jun 2025 20:40:14 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <borkmann@iogearbox.net>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Bar Shapira <bshapira@nvidia.com>,
-	Maciek Machnikowski <maciejm@nvidia.com>,
-	Wojtek Wasko <wwasko@nvidia.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mahesh Bandewar <maheshb@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] ptp: extend offset ioctls to expose raw free-running
- cycles
-Message-ID: <aEj4Fp05_lTdMgu3@hoboy.vegasvil.org>
-References: <20250610171905.4042496-1-cjubran@nvidia.com>
+	Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
+	kernel-team@cloudflare.com, arthur@arthurfabre.com,
+	jakub@cloudflare.com, Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH bpf-next V1 7/7] net: xdp: update documentation for
+ xdp-rx-metadata.rst
+Message-ID: <aEj6nqH85uBe2IlW@mini-arch>
+References: <174897271826.1677018.9096866882347745168.stgit@firesoul>
+ <174897279518.1677018.5982630277641723936.stgit@firesoul>
+ <aEJWTPdaVmlIYyKC@mini-arch>
+ <bf7209aa-8775-448d-a12e-3a30451dad22@iogearbox.net>
+ <87plfbcq4m.fsf@toke.dk>
+ <aEixEV-nZxb1yjyk@lore-rh-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250610171905.4042496-1-cjubran@nvidia.com>
+In-Reply-To: <aEixEV-nZxb1yjyk@lore-rh-laptop>
 
-On Tue, Jun 10, 2025 at 08:19:05PM +0300, Carolina Jubran wrote:
+On 06/11, Lorenzo Bianconi wrote:
+> > Daniel Borkmann <daniel@iogearbox.net> writes:
+> > 
+> [...]
+> > >> 
+> > >> Why not have a new flag for bpf_redirect that transparently stores all
+> > >> available metadata? If you care only about the redirect -> skb case.
+> > >> Might give us more wiggle room in the future to make it work with
+> > >> traits.
+> > >
+> > > Also q from my side: If I understand the proposal correctly, in order to fully
+> > > populate an skb at some point, you have to call all the bpf_xdp_metadata_* kfuncs
+> > > to collect the data from the driver descriptors (indirect call), and then yet
+> > > again all equivalent bpf_xdp_store_rx_* kfuncs to re-store the data in struct
+> > > xdp_rx_meta again. This seems rather costly and once you add more kfuncs with
+> > > meta data aren't you better off switching to tc(x) directly so the driver can
+> > > do all this natively? :/
+> > 
+> > I agree that the "one kfunc per metadata item" scales poorly. IIRC, the
+> > hope was (back when we added the initial HW metadata support) that we
+> > would be able to inline them to avoid the function call overhead.
+> > 
+> > That being said, even with half a dozen function calls, that's still a
+> > lot less overhead from going all the way to TC(x). The goal of the use
+> > case here is to do as little work as possible on the CPU that initially
+> > receives the packet, instead moving the network stack processing (and
+> > skb allocation) to a different CPU with cpumap.
+> > 
+> > So even if the *total* amount of work being done is a bit higher because
+> > of the kfunc overhead, that can still be beneficial because it's split
+> > between two (or more) CPUs.
+> > 
+> > I'm sure Jesper has some concrete benchmarks for this lying around
+> > somewhere, hopefully he can share those :)
+> 
+> Another possible approach would be to have some utility functions (not kfuncs)
+> used to 'store' the hw metadata in the xdp_frame that are executed in each
+> driver codebase before performing XDP_REDIRECT. The downside of this approach
+> is we need to parse the hw metadata twice if the eBPF program that is bounded
+> to the NIC is consuming these info. What do you think?
 
-> @@ -398,8 +423,14 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
->  			break;
->  		}
->  		sts.clockid = extoff->clockid;
-> +		cycles = !!(extoff->rsv[0] & PTP_OFFSET_CYCLES);
->  		for (i = 0; i < extoff->n_samples; i++) {
-> -			err = ptp->info->gettimex64(ptp->info, &ts, &sts);
-> +			if (cycles)
-> +				err = ptp->info->getcyclesx64(ptp->info, &ts,
-> +							      &sts);
-> +			else
-> +				err = ptp->info->gettimex64(ptp->info, &ts,
-> +							    &sts);
-
-ugh...
-
-> @@ -86,9 +111,15 @@
->   *
->   */
->  struct ptp_clock_time {
-> -	__s64 sec;  /* seconds */
-> -	__u32 nsec; /* nanoseconds */
-> -	__u32 reserved;
-> +	union {
-> +		struct {
-> +			__s64 sec;  /* seconds */
-> +			__u32 nsec; /* nanoseconds */
-> +			__u32 reserved;
-> +		};
-> +		__u64 cycles;
-> +	};
-> +
->  };
-
-This overloading of an ioctl with even more flags goes too far.
-Why not just add a new ioctl in a clean way?
-
-Thanks,
-Richard
+That's the option I was asking about. I'm assuming we should be able
+to reuse existing xmo metadata callbacks for this. We should be able
+to hide it from the drivers also hopefully.
 
