@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-196726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2935AD6143
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:27:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD1DAD6144
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E130E3A5571
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:27:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AFF47A94DE
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A54241136;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B452242D94;
 	Wed, 11 Jun 2025 21:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WNYowpiP"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SuBhTbwA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.166.231])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C42225413;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE874236457;
 	Wed, 11 Jun 2025 21:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.231
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749677260; cv=none; b=pI6UDaZ5eJFBZOhPOAqpH+PkUJDIohr9u19n4NUJcvSr02S07MeLXjA7sc/YNsJfVXVTBd4/mGjBUR7bzr+hGRBq2esmYjYu6kmkxH6jzhAk+mt4FkdjcDI1NZy8ZYTFMZn4Hu/LjGWfYqfnucOnNbNfMmd4V/kivi100TMI+/E=
+	t=1749677260; cv=none; b=jpbIWWb4ZSMzBj+PYMqR358iyfoV8Ka6lZi18frg3EvbbGDZYF8fcN/ged0ebCOI6la+i/AnfAUfVpl0dLnHCiPgThp4csdHmTWXXzLeACtE2W/oMweGL/UQ/UyFGrBCCcHs28kQQLWt6ud2VGoausqgmbZi28iuVxdYxfvPRpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1749677260; c=relaxed/simple;
-	bh=r1BuQBYBAW6rqeGVd7IX2D2PqK1FkNIQJArsBxJUFIg=;
+	bh=zhY1k/sLMn4MWgTbf/3hZAY4Z5DhtE0MLr/4MyfmzAc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QMdr6hjxTp6tEp+ykE1gUMx5efk8UJ34uPQhnUNtwcn7+6Y9binSvZFf3WxIR4mnin+TofLMewH3B3COKrrbXulr/WltX8Tcx2SgTyke43TEWRLaNNkB7po4Wze0+S/OFAxaBMpYNRLInQs7uKOhy6pid35j/JsHCf+K46w+QJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WNYowpiP; arc=none smtp.client-ip=192.19.166.231
+	 MIME-Version; b=jVde4glo3mevWAjIr3LWnDw2kMKKgemYwsVb6znYQhQb2nOP6ro16V1BLE0m3sHY9ktkJnAhvx6f4ULo8DGsYNuY3/gaFOUM3CvNB+S8DCsn5+aUKIQ8i3iB87Ey9M/iwkaz0X/u8s+RjPEGcUhdMLQYrU//TZcMncoX67vepyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SuBhTbwA; arc=none smtp.client-ip=192.19.144.205
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Received: from mail-lvn-it-01.broadcom.com (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 19CE1C0000D6;
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 69389C000C61;
 	Wed, 11 Jun 2025 14:27:32 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 19CE1C0000D6
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 69389C000C61
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
 	s=dkimrelay; t=1749677252;
-	bh=r1BuQBYBAW6rqeGVd7IX2D2PqK1FkNIQJArsBxJUFIg=;
+	bh=zhY1k/sLMn4MWgTbf/3hZAY4Z5DhtE0MLr/4MyfmzAc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WNYowpiPzGiZU2qDtJSgdkP6iIrwuNHjEzSf5zCPesXpv8WpY5YJhwQze/SiBFuqY
-	 OVRgnTVg7f1DH+DoDSXsCtv+flEmDHfYbceQIgAgejj853nAVipv4oxlZc8IV1GuO/
-	 oEsz5EtxWhqhGfdlaIPaaZY0JdYxdbJthaK9qhus=
+	b=SuBhTbwAdHVriXjE+upbYMpwh/lK3dzrOVhrdibZXpJYC3sCyWYykrABmOB0tDWDo
+	 VBlcp9V0NMnmmtemXv6YB6dRiNMBmy40ARGfynSlQ0J3yspcw2WQgVxXvrqNVzMKmk
+	 ESjWYeavhXin12FIslJan6dYld/daFIcKlyADnuA=
 Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail-lvn-it-01.broadcom.com (Postfix) with ESMTPSA id ECDA618000847;
-	Wed, 11 Jun 2025 14:27:31 -0700 (PDT)
+	by mail-lvn-it-01.broadcom.com (Postfix) with ESMTPSA id 18E8D1800051E;
+	Wed, 11 Jun 2025 14:27:32 -0700 (PDT)
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -59,9 +59,9 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2 1/2] net: bcmasp: Utilize napi_complete_done() return value
-Date: Wed, 11 Jun 2025 14:27:29 -0700
-Message-Id: <20250611212730.252342-2-florian.fainelli@broadcom.com>
+Subject: [PATCH net-next v2 2/2] net: bcmasp: enable GRO software interrupt coalescing by default
+Date: Wed, 11 Jun 2025 14:27:30 -0700
+Message-Id: <20250611212730.252342-3-florian.fainelli@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250611212730.252342-1-florian.fainelli@broadcom.com>
 References: <20250611212730.252342-1-florian.fainelli@broadcom.com>
@@ -73,32 +73,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make use of the return value from napi_complete_done(). This allows
-users to use the gro_flush_timeout and napi_defer_hard_irqs sysfs
-attributes for configuring software interrupt coalescing.
+Utilize netdev_sw_irq_coalesce_default_on() to provide conservative
+default settings for GRO software interrupt coalescing.
 
 Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Reviewed-by: Justin Chen <justin.chen@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 0d61b8580d72..7dc28166d337 100644
+index 7dc28166d337..a6ea477bce3c 100644
 --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
 +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -605,10 +605,8 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
+@@ -1279,6 +1279,8 @@ struct bcmasp_intf *bcmasp_interface_create(struct bcmasp_priv *priv,
+ 	ndev->hw_features |= ndev->features;
+ 	ndev->needed_headroom += sizeof(struct bcmasp_pkt_offload);
  
- 	bcmasp_intf_rx_desc_write(intf, intf->rx_edpkt_dma_read);
++	netdev_sw_irq_coalesce_default_on(ndev);
++
+ 	return intf;
  
--	if (processed < budget) {
--		napi_complete_done(&intf->rx_napi, processed);
-+	if (processed < budget && napi_complete_done(&intf->rx_napi, processed))
- 		bcmasp_enable_rx_irq(intf, 1);
--	}
- 
- 	return processed;
- }
+ err_free_netdev:
 -- 
 2.34.1
 
