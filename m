@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-196626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569EAAD5972
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:01:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E1F0AD5975
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29EC3A5C17
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:00:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 018B9189ECC0
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A382BEC2E;
-	Wed, 11 Jun 2025 14:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3062BF3C5;
+	Wed, 11 Jun 2025 14:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o/LA2e8C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hROu9cu5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304D02BEC25;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B3C2BEC57;
 	Wed, 11 Jun 2025 14:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749653998; cv=none; b=q1H4iW+nOjlPVYUgKQE9FEbEmVCAd59MC0+L7mxDBI380cwIlHcDqdwwKKYzvJyd8IqwaeAmwDTCZn35O6U03bi/DVtXW27sp0MF8xt2tbx1ukBe619FBsPO+ZN72gy01J3XPTJQLpfyztflUWYoUxf1MojkvMOMr9J6GkDBOIQ=
+	t=1749653999; cv=none; b=qakWjMQRwP3D5x2sYBL2pZj970JIOy5c4SMdyiz4GqMsKeK7CKYSff0kAQmA24R7IMfQ92l1bFhFAB+KqCfj3uI3qtN0WMaeXI+6IdWnLhHXB6QvFRvjILjpzu65NaqpSHk9KE3FFZAZBq9LUdndSqGgoVvhKFNpPVusPaVHobM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749653998; c=relaxed/simple;
-	bh=h9qmosAz+vAYhkNwkZ+iy8d19OT9uqxy2kBvrYS9AEU=;
+	s=arc-20240116; t=1749653999; c=relaxed/simple;
+	bh=PlJfPfdZ6LPISUeVTSiRPqUa55sVvPJwIdL6Z078ZH8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VOHVCyeKO32s+5dkP039H/hxt0q9iwxRHVSO6V6qPfk95nP6m/gaU7Or9AD7yvDbqbGWVis55rlXiSidNye/Ov0EBmF4WsrR+FiLkEqEBEHOKu1YGTCQG0pu2UVl7blRNwypU7vQ25KCrHww68uV5/y1/EBnyYBO4AB7Fa9Lahc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o/LA2e8C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9A33C4CEF4;
-	Wed, 11 Jun 2025 14:59:57 +0000 (UTC)
+	 MIME-Version; b=Q8VB9WEV1agi89be2wR5IjqVuWH1eXldsU7Gl86F7y/0deOr9iPCR0qnm6JADiqbJK2Cj/DWDm1AayFZOuRwa/Uoh0UALmrJEFhnySCE8vBj7Mr+KfTXFAwwv7/sZ9AVwJHmKszIfdHqt3tqe2HsCawhQcXp4yYf8mY0aVx0oFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hROu9cu5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 343C8C4CEE3;
+	Wed, 11 Jun 2025 14:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1749653998;
-	bh=h9qmosAz+vAYhkNwkZ+iy8d19OT9uqxy2kBvrYS9AEU=;
+	bh=PlJfPfdZ6LPISUeVTSiRPqUa55sVvPJwIdL6Z078ZH8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o/LA2e8Cwaa3ZHvgtF4q/Y1iLKt1oHY6JXY3JEYpgPPxwP6DjmxVGFyji37LB5MoU
-	 DrCFwDv6l/DuD/L791oIjZfk7kGNOdA6oBmcj7Cn9S5Uo0syPY7VlWHO7FdVGU6lGn
-	 J4CMbXQdU9aM42KzSyDCu15iRaLoMRR3iK+Las/JplbucjAATQ9qyQG8gkM+tCs7Ic
-	 y9DquVkz9XX0n1Ux9T1i/qEISYMinsXv27pz3qxIf1cnWkdRtNcwWLdbLv1bgIrru+
-	 rkX/hhT1wASyJaLGZnUndGql7hqUvCdjRi25HPq5o6oBZY8FR1QEjsV3x0t5WyI7WO
-	 D3TBif0b2b9EA==
+	b=hROu9cu5UPfLUjlZlgWal5bkST6hIYyO5m/vQ7j/P5hsOWrM7464Me7QSDlXJG+X2
+	 H9HUdRYrH0+vjHUN4yW/BEwq30vaweD+U2CpBFp0hED3i2Rp9lRIyxUW4xwl8LWhHo
+	 4DrcEuU9/Fz6Bzxpymt/f6vFXrNOiX7DOWhbmfSp9xB4OXRsUb4DGUgT5ABz/DixXs
+	 2j5v8VQhJ4zR5fQpur+BOtUxdMixKppglj9bB1zC2UjJVtqjGWkEdsh9aNIG0zoq1z
+	 r7Lopjk61xcTBhODGHMnfpsbbvuh+en8RYoejnSIak66sFk+aQSwP7hVAj7maUzzPr
+	 7u0GpEa/ODbHw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,14 +50,14 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	virtualization@lists.linux.dev
-Subject: [PATCH net-next 8/9] net: drv: virtio: migrate to new RXFH callbacks
-Date: Wed, 11 Jun 2025 07:59:48 -0700
-Message-ID: <20250611145949.2674086-9-kuba@kernel.org>
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	linux-hyperv@vger.kernel.org
+Subject: [PATCH net-next 9/9] net: drv: hyperv: migrate to new RXFH callbacks
+Date: Wed, 11 Jun 2025 07:59:49 -0700
+Message-ID: <20250611145949.2674086-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250611145949.2674086-1-kuba@kernel.org>
 References: <20250611145949.2674086-1-kuba@kernel.org>
@@ -75,123 +75,87 @@ the set_rxnfc callback is completely removed.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: mst@redhat.com
-CC: jasowang@redhat.com
-CC: xuanzhuo@linux.alibaba.com
-CC: eperezma@redhat.com
-CC: virtualization@lists.linux.dev
+CC: kys@microsoft.com
+CC: haiyangz@microsoft.com
+CC: wei.liu@kernel.org
+CC: decui@microsoft.com
+CC: linux-hyperv@vger.kernel.org
 ---
- drivers/net/virtio_net.c | 47 +++++++++++++++-------------------------
- 1 file changed, 18 insertions(+), 29 deletions(-)
+ drivers/net/hyperv/netvsc_drv.c | 30 +++++++++++-------------------
+ 1 file changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index e53ba600605a..07e41dce4203 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4193,8 +4193,11 @@ static void virtnet_init_default_rss(struct virtnet_info *vi)
- 	netdev_rss_key_fill(vi->rss_hash_key_data, vi->rss_key_size);
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index c41a025c66f0..42d98e99566e 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -1580,9 +1580,10 @@ static void netvsc_get_strings(struct net_device *dev, u32 stringset, u8 *data)
  }
  
--static void virtnet_get_hashflow(const struct virtnet_info *vi, struct ethtool_rxnfc *info)
-+static int virtnet_get_hashflow(struct net_device *dev,
-+				struct ethtool_rxfh_fields *info)
+ static int
+-netvsc_get_rss_hash_opts(struct net_device_context *ndc,
+-			 struct ethtool_rxnfc *info)
++netvsc_get_rxfh_fields(struct net_device *ndev,
++		       struct ethtool_rxfh_fields *info)
  {
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
- 	info->data = 0;
- 	switch (info->flow_type) {
- 	case TCP_V4_FLOW:
-@@ -4243,17 +4246,22 @@ static void virtnet_get_hashflow(const struct virtnet_info *vi, struct ethtool_r
- 		info->data = 0;
- 		break;
- 	}
-+
-+	return 0;
- }
++	struct net_device_context *ndc = netdev_priv(ndev);
+ 	const u32 l4_flag = RXH_L4_B_0_1 | RXH_L4_B_2_3;
  
--static bool virtnet_set_hashflow(struct virtnet_info *vi, struct ethtool_rxnfc *info)
-+static int virtnet_set_hashflow(struct net_device *dev,
-+				const struct ethtool_rxfh_fields *info,
-+				struct netlink_ext_ack *extack)
- {
-+	struct virtnet_info *vi = netdev_priv(dev);
- 	u32 new_hashtypes = vi->rss_hash_types_saved;
- 	bool is_disable = info->data & RXH_DISCARD;
- 	bool is_l4 = info->data == (RXH_IP_SRC | RXH_IP_DST | RXH_L4_B_0_1 | RXH_L4_B_2_3);
- 
- 	/* supports only 'sd', 'sdfn' and 'r' */
- 	if (!((info->data == (RXH_IP_SRC | RXH_IP_DST)) | is_l4 | is_disable))
--		return false;
-+		return -EINVAL;
- 
- 	switch (info->flow_type) {
- 	case TCP_V4_FLOW:
-@@ -4292,21 +4300,22 @@ static bool virtnet_set_hashflow(struct virtnet_info *vi, struct ethtool_rxnfc *
- 		break;
- 	default:
- 		/* unsupported flow */
--		return false;
-+		return -EINVAL;
- 	}
- 
- 	/* if unsupported hashtype was set */
- 	if (new_hashtypes != (new_hashtypes & vi->rss_hash_types_supported))
--		return false;
-+		return -EINVAL;
- 
- 	if (new_hashtypes != vi->rss_hash_types_saved) {
- 		vi->rss_hash_types_saved = new_hashtypes;
- 		vi->rss_hdr->hash_types = cpu_to_le32(vi->rss_hash_types_saved);
- 		if (vi->dev->features & NETIF_F_RXHASH)
--			return virtnet_commit_rss_command(vi);
-+			if (!virtnet_commit_rss_command(vi))
-+				return -EINVAL;
- 	}
- 
--	return true;
-+	return 0;
- }
- 
- static void virtnet_get_drvinfo(struct net_device *dev,
-@@ -5539,27 +5548,6 @@ static int virtnet_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
- 	switch (info->cmd) {
+ 	info->data = RXH_IP_SRC | RXH_IP_DST;
+@@ -1637,16 +1638,17 @@ netvsc_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
  	case ETHTOOL_GRXRINGS:
- 		info->data = vi->curr_queue_pairs;
--		break;
--	case ETHTOOL_GRXFH:
--		virtnet_get_hashflow(vi, info);
--		break;
--	default:
--		rc = -EOPNOTSUPP;
--	}
+ 		info->data = nvdev->num_chn;
+ 		return 0;
 -
--	return rc;
+-	case ETHTOOL_GRXFH:
+-		return netvsc_get_rss_hash_opts(ndc, info);
+ 	}
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static int netvsc_set_rss_hash_opts(struct net_device_context *ndc,
+-				    struct ethtool_rxnfc *info)
++static int
++netvsc_set_rxfh_fields(struct net_device *dev,
++		       const struct ethtool_rxfh_fields *info,
++		       struct netlink_ext_ack *extack)
+ {
++	struct net_device_context *ndc = netdev_priv(dev);
++
+ 	if (info->data == (RXH_IP_SRC | RXH_IP_DST |
+ 			   RXH_L4_B_0_1 | RXH_L4_B_2_3)) {
+ 		switch (info->flow_type) {
+@@ -1701,17 +1703,6 @@ static int netvsc_set_rss_hash_opts(struct net_device_context *ndc,
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static int
+-netvsc_set_rxnfc(struct net_device *ndev, struct ethtool_rxnfc *info)
+-{
+-	struct net_device_context *ndc = netdev_priv(ndev);
+-
+-	if (info->cmd == ETHTOOL_SRXFH)
+-		return netvsc_set_rss_hash_opts(ndc, info);
+-
+-	return -EOPNOTSUPP;
 -}
 -
--static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
--{
--	struct virtnet_info *vi = netdev_priv(dev);
--	int rc = 0;
--
--	switch (info->cmd) {
--	case ETHTOOL_SRXFH:
--		if (!virtnet_set_hashflow(vi, info))
--			rc = -EINVAL;
--
- 		break;
- 	default:
- 		rc = -EOPNOTSUPP;
-@@ -5591,8 +5579,9 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.get_rxfh_indir_size = virtnet_get_rxfh_indir_size,
- 	.get_rxfh = virtnet_get_rxfh,
- 	.set_rxfh = virtnet_set_rxfh,
-+	.get_rxfh_fields = virtnet_get_hashflow,
-+	.set_rxfh_fields = virtnet_set_hashflow,
- 	.get_rxnfc = virtnet_get_rxnfc,
--	.set_rxnfc = virtnet_set_rxnfc,
- };
- 
- static void virtnet_get_queue_stats_rx(struct net_device *dev, int i,
+ static u32 netvsc_get_rxfh_key_size(struct net_device *dev)
+ {
+ 	return NETVSC_HASH_KEYLEN;
+@@ -1979,11 +1970,12 @@ static const struct ethtool_ops ethtool_ops = {
+ 	.set_channels   = netvsc_set_channels,
+ 	.get_ts_info	= ethtool_op_get_ts_info,
+ 	.get_rxnfc	= netvsc_get_rxnfc,
+-	.set_rxnfc	= netvsc_set_rxnfc,
+ 	.get_rxfh_key_size = netvsc_get_rxfh_key_size,
+ 	.get_rxfh_indir_size = netvsc_rss_indir_size,
+ 	.get_rxfh	= netvsc_get_rxfh,
+ 	.set_rxfh	= netvsc_set_rxfh,
++	.get_rxfh_fields = netvsc_get_rxfh_fields,
++	.set_rxfh_fields = netvsc_set_rxfh_fields,
+ 	.get_link_ksettings = netvsc_get_link_ksettings,
+ 	.set_link_ksettings = netvsc_set_link_ksettings,
+ 	.get_ringparam	= netvsc_get_ringparam,
 -- 
 2.49.0
 
