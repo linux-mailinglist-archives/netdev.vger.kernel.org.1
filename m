@@ -1,118 +1,112 @@
-Return-Path: <netdev+bounces-196734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A9E3AD61CB
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:46:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C070AAD61E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6CE1188611E
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:46:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D80E1E245F
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AECE21CC5D;
-	Wed, 11 Jun 2025 21:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418372459D2;
+	Wed, 11 Jun 2025 21:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fA/VcPaY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIhOLYFE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3EB18A6AD;
-	Wed, 11 Jun 2025 21:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11240218591;
+	Wed, 11 Jun 2025 21:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749678397; cv=none; b=hX+L94jpAO3qEHebbkmlJ/oiTwfEX6t73HYYyOVPmo/VSY+aFTre+pmy8eVJGFocuu6ZmfmDBq7qmexjYzCDQ0+Natz6zcydA7A+bkjgc2c/eEHcf2/p7h2myzEhdp7UF7/0ZQc+ALvT0ukFsXXmPvg0ByGO10s9DGAYHDCmOcQ=
+	t=1749678608; cv=none; b=ajN24+wTVyaAY8MiSKM0ypd01LYySkkQfZN2qOE8E1QNFKcLK7ENkD0i8Jvgtz3XktXMB2Li+vRsWIDdkgZEYCjLTbFzUw842s0cDl4ZyXlRWn67B2Ww9eJj/LTSK7lfXl6Hb8Qg8oy1syoTyiO/AuxXh9dEoRPBeqeSi5lBB40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749678397; c=relaxed/simple;
-	bh=pBwBKrSA6Q1Th81r6c9urru5D5rWEbXIy3CKQgIAEZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hNmSU66ulcB9N8Qj5rSZ7Ey1ZQjsF3y/dmbZlO+Jv/CkEYnpCE7dL0KgIpoRdX7wp7eHY7rempnCIcOyR9877dHbFf/XNzSTiWg3FGH1IlDNvYmxDZmDEbxhZdrxtEqQXCpMWrfrOaozRTJS1aAiNiNruxeXhsp00XUgLqysfRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fA/VcPaY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29F8FC4CEE3;
-	Wed, 11 Jun 2025 21:46:36 +0000 (UTC)
+	s=arc-20240116; t=1749678608; c=relaxed/simple;
+	bh=t7g7nDWGInSfgmZbN0xOrHOEo4ASBz/pYBaLiletTrY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LPIvyaLlgpQ33/tkO5JSFOTQmP4PPOtLiMtLoemUKO4EdRM0e2aw9PY5jFBW2NyfqXk9d4+NhG11Y3eTHbN55evZOFp0urlxppar9OVK5ZeSjnIjiE4LAf/DOwFVYuxEq4CuK5g/n5273hwD7Xs9bVtgsFNawKFK493KGjTUXGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIhOLYFE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC95FC4CEEE;
+	Wed, 11 Jun 2025 21:50:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749678396;
-	bh=pBwBKrSA6Q1Th81r6c9urru5D5rWEbXIy3CKQgIAEZs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fA/VcPaYBOMovMMmuuhvToI/BO10byqlZPxci9AS+gJOWSvysDaejdbza8At9BPgG
-	 pcfgV026K/i31JOqJS8axtbzUAz29LByZ6pdCulcaIfangH7FfawMpD5CoDvCLTPTj
-	 +O2d89Kwfi0NnH9ruVB9pZMS2afrAo05Ypkjd1omKEqnRpOrEc90FDCNQKsiT+ZMPl
-	 gJOjHlDODWctxSo4hVbkjVYMZ9Z1+Zf9xV+zgEQjdy8tRJmI0jlf+7wbgCh9UH+28r
-	 HDnW4ZZoOe8LOs9Kk8Sw7qemMFTSN/BYVK2eyKr0DHzI4bEgxafaeKluzXXdmfHcwP
-	 IFJZt2iMNZH1A==
-Date: Wed, 11 Jun 2025 14:46:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6?= Rojas <noltari@gmail.com>
-Cc: jonas.gorski@gmail.com, florian.fainelli@broadcom.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, dgcbueu@gmail.com
-Subject: Re: [PATCH net-next v2 2/3] net: dsa: tag_brcm: add support for
- legacy FCS tags
-Message-ID: <20250611144635.37207d22@kernel.org>
-In-Reply-To: <20250610163154.281454-3-noltari@gmail.com>
-References: <20250610163154.281454-1-noltari@gmail.com>
-	<20250610163154.281454-3-noltari@gmail.com>
+	s=k20201202; t=1749678607;
+	bh=t7g7nDWGInSfgmZbN0xOrHOEo4ASBz/pYBaLiletTrY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aIhOLYFEKe+qk2YVj08IfRhzzvcdXR7sX1AVx2qR0C3bjo8ALEO/QTWq62kHTIaSf
+	 LwxlCNYG3e0qZP1eOrIyKpRBSHt0HYl+WCqeAyOpmjjH6REHDJSJOeZZI/PWcSV1wO
+	 CLIRJvk3Udh4k6YxNn/OXqxBogfgHkLUhafPtN1vGTuvw/eeGwBsNlb0yq6gTD7BQP
+	 TKtg2im351+CZIDrFhY7DMf+IFOWtvwrDrfFSG4wV9Bkjgnl5nj9a1EMfK4lkR3xfF
+	 iJ1Cri+Wyl3+GxgJwVNV9xIgzxSgXZqYv4njIhL0KmwGpIdYE0jriHUjZ7eRmUAMGU
+	 89Hq/gniZ6rdQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D05380DBE9;
+	Wed, 11 Jun 2025 21:50:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/9] mlx5 misc fixes 2025-06-10
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174967863800.3499598.6852687009576458740.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Jun 2025 21:50:38 +0000
+References: <20250610151514.1094735-1-mbloch@nvidia.com>
+In-Reply-To: <20250610151514.1094735-1-mbloch@nvidia.com>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
+ leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 10 Jun 2025 18:31:53 +0200 =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
-> +	struct dsa_port *dp =3D dsa_user_to_port(dev);
-> +	unsigned int fcs_len;
-> +	u32 fcs_val;
-> +	u8 *brcm_tag;
+Hello:
 
-nit: please reorder the variable declaration lines longest to shortest
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	/* The Ethernet switch we are interfaced with needs packets to be at
-> +	 * least 64 bytes (including FCS) otherwise they will be discarded when
-> +	 * they enter the switch port logic. When Broadcom tags are enabled, we
-> +	 * need to make sure that packets are at least 70 bytes
-> +	 * (including FCS and tag) because the length verification is done after
-> +	 * the Broadcom tag is stripped off the ingress packet.
-> +	 *
-> +	 * Let dsa_user_xmit() free the SKB
-> +	 */
-> +	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_LEG_TAG_LEN, false))
-> +		return NULL;
-> +
-> +	fcs_len =3D skb->len;
-> +	fcs_val =3D cpu_to_le32(crc32(~0, skb->data, fcs_len) ^ ~0);
+On Tue, 10 Jun 2025 18:15:05 +0300 you wrote:
+> This patchset includes misc fixes from the team for the mlx5 core
+> and Ethernet drivers.
+> 
+> Thanks,
+> Mark
+> 
+> Amir Tzin (1):
+>   net/mlx5: Fix ECVF vports unload on shutdown flow
+> 
+> [...]
 
-sparse (C=3D1 build flag) complains about the loss of type annotation:
+Here is the summary with links:
+  - [net,1/9] net/mlx5: Ensure fw pages are always allocated on same NUMA
+    https://git.kernel.org/netdev/net/c/f37258133c1e
+  - [net,2/9] net/mlx5: Fix ECVF vports unload on shutdown flow
+    https://git.kernel.org/netdev/net/c/687560d8a9a2
+  - [net,3/9] net/mlx5: Fix return value when searching for existing flow group
+    https://git.kernel.org/netdev/net/c/8ec40e3f1f72
+  - [net,4/9] net/mlx5: HWS, Init mutex on the correct path
+    https://git.kernel.org/netdev/net/c/a002602676cd
+  - [net,5/9] net/mlx5: HWS, fix missing ip_version handling in definer
+    https://git.kernel.org/netdev/net/c/b5e3c76f35ee
+  - [net,6/9] net/mlx5: HWS, make sure the uplink is the last destination
+    https://git.kernel.org/netdev/net/c/b8335829518e
+  - [net,7/9] net/mlx5e: Properly access RCU protected qdisc_sleeping variable
+    (no matching commit)
+  - [net,8/9] net/mlx5e: Fix leak of Geneve TLV option object
+    https://git.kernel.org/netdev/net/c/aa9c44b84209
+  - [net,9/9] net/mlx5e: Fix number of lanes to UNKNOWN when using data_rate_oper
+    https://git.kernel.org/netdev/net/c/875d7c160d60
 
-net/dsa/tag_brcm.c:327:17: warning: incorrect type in assignment (different=
- base types)
-net/dsa/tag_brcm.c:327:17:    expected unsigned int [usertype] fcs_val
-net/dsa/tag_brcm.c:327:17:    got restricted __le32 [usertype]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +	skb_push(skb, BRCM_LEG_TAG_LEN);
-> +
-> +	dsa_alloc_etype_header(skb, BRCM_LEG_TAG_LEN);
-> +
-> +	brcm_tag =3D skb->data + 2 * ETH_ALEN;
-> +
-> +	/* Broadcom tag type */
-> +	brcm_tag[0] =3D BRCM_LEG_TYPE_HI;
-> +	brcm_tag[1] =3D BRCM_LEG_TYPE_LO;
-> +
-> +	/* Broadcom tag value */
-> +	brcm_tag[2] =3D BRCM_LEG_EGRESS | BRCM_LEG_LEN_HI(fcs_len);
-> +	brcm_tag[3] =3D BRCM_LEG_LEN_LO(fcs_len);
-> +	brcm_tag[4] =3D 0;
-> +	brcm_tag[5] =3D dp->index & BRCM_LEG_PORT_ID;
-> +
-> +	/* Original FCS value */
-> +	if (__skb_pad(skb, ETH_FCS_LEN, false))
-> +		return NULL;
-> +	skb_put_data(skb, &fcs_val, ETH_FCS_LEN);
---=20
-pw-bot: cr
+
 
