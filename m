@@ -1,96 +1,102 @@
-Return-Path: <netdev+bounces-196725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E34AD613E
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3566CAD6148
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE2D1E15C3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 763E9173669
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35330248195;
-	Wed, 11 Jun 2025 21:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AF524503C;
+	Wed, 11 Jun 2025 21:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hDJP3oC0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="es1BCsef"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.166.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D263247DEA;
-	Wed, 11 Jun 2025 21:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF11E23E336;
+	Wed, 11 Jun 2025 21:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749677125; cv=none; b=MzrXT+lBnttSR8Og/iWKgzGw9b9HdJiavSlxAm9OeaRt5zMoAdmValsHPc6EDQsRnhhKlzNJMhwJheCkWi+xFvJ3FC+jYjeDIjnkRvBLwvpNeVXjj1MUs8DW0QXTjInDr49EXRvcBPfk6DMVdEmt1LqKa7BrVfc2l9lhqa3uSxU=
+	t=1749677261; cv=none; b=eZBx6ihXk9ryckS+Vqs9QO+3r7Pl3lZn4/XUksOIQyCIPb6sSyKmMZJcEpj9h1jDUvgNGZ/UUCOx2isEqLz6wh0R/ekgni6hcgshIaIT+BBn9cC2p+e+ibCn42xmY6FLp7SCFrzBajSL802RyuSIzEwA5ceG+TzpTdJvY9Wi+Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749677125; c=relaxed/simple;
-	bh=p5G9hodyoqquGQv0FDJLWXP70EcteeuZIP/ixo9N4RM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X8bWY8BlfegQtyReVnJgDGaBW/d5phhEr1+fdd7HQfjAzb1a6uJSPMsC8/aBnjPwNb59wOXGbf0HB89zD1eT3Im+WnH7X64aZxFKXMDpzrWyiAFOFJUdc7bPWALVsSfxj7qDZKWd2Qx8vQN2vjaLJMWWNewH8gNzfStjUx1K5e0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hDJP3oC0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 516DCC4CEF2;
-	Wed, 11 Jun 2025 21:25:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749677124;
-	bh=p5G9hodyoqquGQv0FDJLWXP70EcteeuZIP/ixo9N4RM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hDJP3oC0xQexyVhR/7d4PZtjUyHFBj0hP2HYXx5kEDYYvUG173CJ5Qfo9lSNM07Vy
-	 8r4fFR37bDAD94oq9ai0JOuHFxKCjX9DM1WV9tXJ2vyuvxnD2Yb/KTTYCngc8baNOD
-	 zCDftQ49uBaS114bnMk3PIOJ1lL24Gy3Qayqj4tB95uYkcB78ymm3dMweLJ82kKNKd
-	 dtc7QTPlvNwUOBvQGGPLeiMtk9esKZhdTqF6DFrnNqzQt1wIXyCZKVQkjvo0a8HQFy
-	 4Vj1cnFaQQ9k6P6zreTMcMj/Dd4Sdp5WL6VN582GftigXuql4dXcGDKFMiKL00CcNj
-	 UIr2ywhn1x1Mg==
-Date: Wed, 11 Jun 2025 14:25:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
- <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next] rtase: Refine the flexibility of Rx queue
- allocation
-Message-ID: <20250611142523.67e7d984@kernel.org>
-In-Reply-To: <20250610095518.6585-1-justinlai0215@realtek.com>
-References: <20250610095518.6585-1-justinlai0215@realtek.com>
+	s=arc-20240116; t=1749677261; c=relaxed/simple;
+	bh=w/qE2pwetIGNkIlmcH5nt44JyP/Q8xHENA6U8HkjNTA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t1wXsc55mjK73gjiJ2qxy2nIzxjWu/KOE+BZ7vNib5pehsbEE/dgszOxuZLqjj3IRtOCgqdtFoHQhXKbP59bm3U4O+s7qXQOimyxYrRvMOGa5j4rmsMLA/ib+yBroMDwA4iPMKAuXCQ2pepeZNmGdT8AJgNW9c0mDXmXYWHzA3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=es1BCsef; arc=none smtp.client-ip=192.19.166.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.broadcom.com (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id F0489C004E6C;
+	Wed, 11 Jun 2025 14:27:31 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com F0489C004E6C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1749677252;
+	bh=w/qE2pwetIGNkIlmcH5nt44JyP/Q8xHENA6U8HkjNTA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=es1BCsefq9/JOnotMXE2D1FfgIzV+L6z9S2gfBXJsO+/0nlylS5OhABg0tn32U8se
+	 qKGRlGKf7XLyEOQogNGj0AQTNJfIwM8lEpczQlojhc9QRHBq3rf7PD0DNS1GR3TDvX
+	 qPxaDZ5+84SiBAV95ggZ7MnwkxQGF/g+K9KKKsDk=
+Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-lvn-it-01.broadcom.com (Postfix) with ESMTPSA id CB6F91800051E;
+	Wed, 11 Jun 2025 14:27:31 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v2 0/2] net: bcmasp: add support for GRO
+Date: Wed, 11 Jun 2025 14:27:28 -0700
+Message-Id: <20250611212730.252342-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 10 Jun 2025 17:55:18 +0800 Justin Lai wrote:
-> Refine the flexibility of Rx queue allocation by using alloc_etherdev_mqs.
-> 
-> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> ---
->  drivers/net/ethernet/realtek/rtase/rtase_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> index 4d37217e9a14..c22dd573418a 100644
-> --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> @@ -2080,8 +2080,8 @@ static int rtase_init_board(struct pci_dev *pdev, struct net_device **dev_out,
->  	int ret = -ENOMEM;
->  
->  	/* dev zeroed in alloc_etherdev */
-> -	dev = alloc_etherdev_mq(sizeof(struct rtase_private),
-> -				RTASE_FUNC_TXQ_NUM);
-> +	dev = alloc_etherdev_mqs(sizeof(struct rtase_private),
-> +				 RTASE_FUNC_TXQ_NUM, RTASE_FUNC_RXQ_NUM);
->  	if (!dev)
->  		goto err_out;
->  
+These two patches add support for GRO software interrupt coalescing,
+kudos to Zak for doing this on bcmgenet first.
 
-$ git grep RTASE_FUNC_.XQ_NUM
-drivers/net/ethernet/realtek/rtase/rtase.h:#define RTASE_FUNC_TXQ_NUM  1
-drivers/net/ethernet/realtek/rtase/rtase.h:#define RTASE_FUNC_RXQ_NUM  1
+before:
 
-This patch is a nop?
+00:03:31     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal
+%guest   %idle
+00:03:32     all    0.00    0.00    1.51    0.00    0.50    7.29    0.00 0.00   90.70
+
+after:
+
+00:02:35     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal
+%guest   %idle
+00:02:36     all    0.25    0.00    1.26    0.00    0.50    7.29    0.00 0.00   90.70
+
+Changes in v2:
+
+- corrected net_device variable in the scope
+
+Florian Fainelli (2):
+  net: bcmasp: Utilize napi_complete_done() return value
+  net: bcmasp: enable GRO software interrupt coalescing by default
+
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
 -- 
-pw-bot: reject
+2.34.1
+
 
