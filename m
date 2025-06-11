@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-196621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519B5AD596C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:00:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F86EAD5970
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DEC73A5DA4
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:59:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8266E188B9C1
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB65F2BDC14;
-	Wed, 11 Jun 2025 14:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD8E2BDC35;
+	Wed, 11 Jun 2025 14:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVOA0Npf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pk4qoIyn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A2B2BD5BB;
-	Wed, 11 Jun 2025 14:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791862BDC2D
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 14:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749653995; cv=none; b=HBDLP3e8AGC1i99TdA6qBLK2nrZnMOjaw5wXrHBWmYILMXHe2qz3evtA3/Y09tcHKnJ0iZziRf8MW2pFWYomeMVFuLdRDPL33eEQ7k/3xfS4UoNrhd79e/Vi3ORbSLg2baMX1TT2i1K0w+SzO5c1Ved1HfoaegXoFyhN5GuG0DQ=
+	t=1749653996; cv=none; b=jscmQg4VCxWejR/4NhnVo7cL025NuTHwL/mXp4dH15GfMoTQx3Rhezc+Q4BBpyXewSk8chKTcNPU0Kj5cP0+5rwa8tY36l3d+2m30ApGobRvz9IcAGJ78a3Rpx1v1UZIOIc4Jo2OkFOLVdAjg284QhqWohhEPoP4Em9vptji1C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749653995; c=relaxed/simple;
-	bh=k7uvwDoCQy7WbgbdbUpZHePfkgjqcUTHAu2jnYCKAZQ=;
+	s=arc-20240116; t=1749653996; c=relaxed/simple;
+	bh=vf0SrRqSJKsk+hxZ1lPa9n3z6RTUd+maU0he34GuoV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bhJVGF5HdjUalzadGrMsLPJrulk48Kx4GeWBpRvFHXSwLwUUxqww9YIGcojHEl2iOl6Sr8+5oqIFAnxMoVdzsqyKLUKzqjWGj2fN2SDFxmE7XcFo/OGmSNEFgBXXm6+N3O0n+O1v1QlU5boNZPixiSg7kDJ+7ogbqXsD6D+1w6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVOA0Npf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44075C4CEF1;
+	 MIME-Version; b=d006corl6RxHN5jBZuhOfd9fZ/Dn2uGoA6d0bPEokwe9buTP5SuIpG2rD7/J0wxbU+CEWZUZA0kXx1cD0etz5mKZwYWonWsOj5or8K/t/8OVkDXAOGBBAsFL/UarLNosd74uNBnDUG9t1Cx3C1oMBl3lrNL0y1dLbxLVA2s5ceE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pk4qoIyn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4437C4CEF0;
 	Wed, 11 Jun 2025 14:59:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749653995;
-	bh=k7uvwDoCQy7WbgbdbUpZHePfkgjqcUTHAu2jnYCKAZQ=;
+	s=k20201202; t=1749653996;
+	bh=vf0SrRqSJKsk+hxZ1lPa9n3z6RTUd+maU0he34GuoV8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YVOA0NpfLjZiLMFXJeoYffEhJgjY3b4BNlsk7AJMEnBHH2LBJHGemvVuowAqEA/q8
-	 J+NsGzW9fG3XkylwLjzJXrcvKaalqgDHmCVJL+aQl56tupQA7G0qDbDyTQ4JsBI7ns
-	 bKc1Xl9gfh+3CjQXC7DaQdmM6xoanRxVpij4gh8gZ2KTvNEGHRjXByV3u7XUFDEPVn
-	 jVBFQZVY9CdSZ74SHdEQvJe4tIfaNrAGP0P4fWyTpkupE6kUv4bw3TGUA5aYd9L185
-	 ou5bxjqsh8t83oBB/MMAyfXcGComu2Pyk7Y5QxBNMGeG8cA39fbT1DfR72lnlauoQT
-	 zkXddDVf8h8oA==
+	b=Pk4qoIynitagM7inLw3s/EQil0Woh+DfTa5pfgUyB3MMi2pRbcG3t9tVj5FQMIp0l
+	 rRgxm5jvo8HfSU+hjeBc81hdxykMOUzQo4t+nKSmV+Nf1P42J+U4MAQCvpvdzA/qzB
+	 gjL1CE3LRpVpoa6QwiRdGBkzbdVElISfz8ofiKXTsq5p6pmxoqiXGtmGz2qtArD63E
+	 JxfMFbKOWAUlIxQ8Pugr6Mdb21seXv64yzxFp7mVlie8/ZLD2Xq8XuSFMzY8r7d6+n
+	 qNVA4WY2MGFUTvx8rl6UNgPObBXDIDijD3SHxLwW9zqAgFKQRF7/xGK+YBNRA0/W1N
+	 NzuWMucyYCbEg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,14 +50,10 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-net-drivers@amd.com
-Subject: [PATCH net-next 3/9] net: ethtool: require drivers to opt into the per-RSS ctx RXFH
-Date: Wed, 11 Jun 2025 07:59:43 -0700
-Message-ID: <20250611145949.2674086-4-kuba@kernel.org>
+	andrew@lunn.ch
+Subject: [PATCH net-next 4/9] net: ethtool: add dedicated callbacks for getting and setting rxfh fields
+Date: Wed, 11 Jun 2025 07:59:44 -0700
+Message-ID: <20250611145949.2674086-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250611145949.2674086-1-kuba@kernel.org>
 References: <20250611145949.2674086-1-kuba@kernel.org>
@@ -69,96 +65,178 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-RX Flow Hashing supports using different configuration for different
-RSS contexts. Only two drivers seem to support it. Make sure we
-uniformly error out for drivers which don't.
+We mux multiple calls to the drivers via the .get_nfc and .set_nfc
+callbacks. This is slightly inconvenient to the drivers as they
+have to de-mux them back. It will also be awkward for netlink code
+to construct struct ethtool_rxnfc when it wants to get info about
+RX Flow Hash, from the RSS module.
+
+Add dedicated driver callbacks. Create struct ethtool_rxfh_fields
+which contains only data relevant to RXFH. Maintain the names of
+the fields to avoid having to heavily modify the drivers.
+
+For now support both callbacks, once all drivers are converted
+ethtool_*et_rxfh_fields() will stop using the rxnfc callbacks.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: saeedm@nvidia.com
-CC: tariqt@nvidia.com
-CC: leon@kernel.org
+CC: andrew@lunn.ch
 CC: ecree.xilinx@gmail.com
-CC: linux-rdma@vger.kernel.org
-CC: linux-net-drivers@amd.com
 ---
- include/linux/ethtool.h                              | 3 +++
- drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 1 +
- drivers/net/ethernet/sfc/ethtool.c                   | 1 +
- net/ethtool/ioctl.c                                  | 8 ++++++++
- 4 files changed, 13 insertions(+)
+ include/linux/ethtool.h | 20 +++++++++++++++
+ net/ethtool/ioctl.c     | 55 +++++++++++++++++++++++++++++++++--------
+ 2 files changed, 65 insertions(+), 10 deletions(-)
 
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 5e0dd333ad1f..fc1c2379e7ff 100644
+index fc1c2379e7ff..b2e71e641f62 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -855,6 +855,8 @@ struct kernel_ethtool_ts_info {
-  * @cap_rss_ctx_supported: indicates if the driver supports RSS
-  *	contexts via legacy API, drivers implementing @create_rxfh_context
-  *	do not have to set this bit.
-+ * @rxfh_per_ctx_fields: device supports selecting different header fields
-+ *	for Rx hash calculation and RSS for each additional context.
-  * @rxfh_per_ctx_key: device supports setting different RSS key for each
-  *	additional context. Netlink API should report hfunc, key, and input_xfrm
-  *	for every context, not just context 0.
-@@ -1084,6 +1086,7 @@ struct ethtool_ops {
- 	u32     supported_input_xfrm:8;
- 	u32     cap_link_lanes_supported:1;
- 	u32     cap_rss_ctx_supported:1;
-+	u32	rxfh_per_ctx_fields:1;
- 	u32	rxfh_per_ctx_key:1;
- 	u32	cap_rss_rxnfc_adds:1;
- 	u32	rxfh_indir_space;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-index ea078c9f5d15..90c760057bb6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-@@ -2619,6 +2619,7 @@ static void mlx5e_get_ts_stats(struct net_device *netdev,
- const struct ethtool_ops mlx5e_ethtool_ops = {
- 	.cap_link_lanes_supported = true,
- 	.cap_rss_ctx_supported	= true,
-+	.rxfh_per_ctx_fields	= true,
- 	.rxfh_per_ctx_key	= true,
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES |
-diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
-index 83d715544f7f..afbedca63b29 100644
---- a/drivers/net/ethernet/sfc/ethtool.c
-+++ b/drivers/net/ethernet/sfc/ethtool.c
-@@ -262,6 +262,7 @@ const struct ethtool_ops efx_ethtool_ops = {
- 	.set_rxnfc		= efx_ethtool_set_rxnfc,
- 	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
- 	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
-+	.rxfh_per_ctx_fields	= true,
- 	.rxfh_per_ctx_key	= true,
- 	.cap_rss_rxnfc_adds	= true,
- 	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+@@ -825,6 +825,19 @@ struct ethtool_rxfh_param {
+ 	u8	input_xfrm;
+ };
+ 
++/**
++ * struct ethtool_rxfh_fields - Rx Flow Hashing (RXFH) header field config
++ * @data: which header fields are used for hashing, bitmask of RXH_* defines
++ * @flow_type: L2-L4 network traffic flow type
++ * @rss_context: RSS context, will only be used if rxfh_per_ctx_fields is
++ *	set in struct ethtool_ops
++ */
++struct ethtool_rxfh_fields {
++	u32 data;
++	u32 flow_type;
++	u32 rss_context;
++};
++
+ /**
+  * struct kernel_ethtool_ts_info - kernel copy of struct ethtool_ts_info
+  * @cmd: command number = %ETHTOOL_GET_TS_INFO
+@@ -970,6 +983,8 @@ struct kernel_ethtool_ts_info {
+  *	will remain unchanged.
+  *	Returns a negative error code or zero. An error code must be returned
+  *	if at least one unsupported change was requested.
++ * @get_rxfh_fields: Get header fields used for flow hashing.
++ * @set_rxfh_fields: Set header fields used for flow hashing.
+  * @create_rxfh_context: Create a new RSS context with the specified RX flow
+  *	hash indirection table, hash key, and hash function.
+  *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
+@@ -1156,6 +1171,11 @@ struct ethtool_ops {
+ 	int	(*get_rxfh)(struct net_device *, struct ethtool_rxfh_param *);
+ 	int	(*set_rxfh)(struct net_device *, struct ethtool_rxfh_param *,
+ 			    struct netlink_ext_ack *extack);
++	int	(*get_rxfh_fields)(struct net_device *,
++				   struct ethtool_rxfh_fields *);
++	int	(*set_rxfh_fields)(struct net_device *,
++				   const struct ethtool_rxfh_fields *,
++				   struct netlink_ext_ack *extack);
+ 	int	(*create_rxfh_context)(struct net_device *,
+ 				       struct ethtool_rxfh_context *ctx,
+ 				       const struct ethtool_rxfh_param *rxfh,
 diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 330ca99800ce..bd9fd95bb82f 100644
+index bd9fd95bb82f..f4d4d60275f8 100644
 --- a/net/ethtool/ioctl.c
 +++ b/net/ethtool/ioctl.c
-@@ -1075,6 +1075,10 @@ ethtool_set_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	if (rc)
- 		return rc;
+@@ -1048,9 +1048,20 @@ static int ethtool_check_flow_types(struct net_device *dev, u32 input_xfrm)
+ 			continue;
  
-+	if (info.flow_type & FLOW_RSS && info.rss_context &&
-+	    !ops->rxfh_per_ctx_fields)
-+		return -EINVAL;
+ 		info.flow_type = i;
+-		err = ops->get_rxnfc(dev, &info, NULL);
+-		if (err)
+-			continue;
 +
- 	if (ops->get_rxfh) {
- 		struct ethtool_rxfh_param rxfh = {};
- 
-@@ -1105,6 +1109,10 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
- 	if (ret)
- 		return ret;
- 
-+	if (info.flow_type & FLOW_RSS && info.rss_context &&
-+	    !ops->rxfh_per_ctx_fields)
-+		return -EINVAL;
++		if (ops->get_rxfh_fields) {
++			struct ethtool_rxfh_fields fields = {
++				.flow_type	= info.flow_type,
++			};
 +
- 	ret = ops->get_rxnfc(dev, &info, NULL);
- 	if (ret < 0)
- 		return ret;
++			if (ops->get_rxfh_fields(dev, &fields))
++				continue;
++
++			info.data = fields.data;
++		} else {
++			if (ops->get_rxnfc(dev, &info, NULL))
++				continue;
++		}
+ 
+ 		err = ethtool_check_xfrm_rxfh(input_xfrm, info.data);
+ 		if (err)
+@@ -1064,11 +1075,12 @@ static noinline_for_stack int
+ ethtool_set_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
+ {
+ 	const struct ethtool_ops *ops = dev->ethtool_ops;
++	struct ethtool_rxfh_fields fields = {};
+ 	struct ethtool_rxnfc info;
+ 	size_t info_size = sizeof(info);
+ 	int rc;
+ 
+-	if (!ops->set_rxnfc)
++	if (!ops->set_rxnfc && !ops->set_rxfh_fields)
+ 		return -EOPNOTSUPP;
+ 
+ 	rc = ethtool_rxnfc_copy_struct(cmd, &info, &info_size, useraddr);
+@@ -1091,7 +1103,15 @@ ethtool_set_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
+ 			return rc;
+ 	}
+ 
+-	return ops->set_rxnfc(dev, &info);
++	if (!ops->set_rxfh_fields)
++		return ops->set_rxnfc(dev, &info);
++
++	fields.data = info.data;
++	fields.flow_type = info.flow_type & ~FLOW_RSS;
++	if (info.flow_type & FLOW_RSS)
++		fields.rss_context = info.rss_context;
++
++	return ops->set_rxfh_fields(dev, &fields, NULL);
+ }
+ 
+ static noinline_for_stack int
+@@ -1102,7 +1122,7 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
+ 	const struct ethtool_ops *ops = dev->ethtool_ops;
+ 	int ret;
+ 
+-	if (!ops->get_rxnfc)
++	if (!ops->get_rxnfc && !ops->get_rxfh_fields)
+ 		return -EOPNOTSUPP;
+ 
+ 	ret = ethtool_rxnfc_copy_struct(cmd, &info, &info_size, useraddr);
+@@ -1113,9 +1133,24 @@ ethtool_get_rxfh_fields(struct net_device *dev, u32 cmd, void __user *useraddr)
+ 	    !ops->rxfh_per_ctx_fields)
+ 		return -EINVAL;
+ 
+-	ret = ops->get_rxnfc(dev, &info, NULL);
+-	if (ret < 0)
+-		return ret;
++	if (ops->get_rxfh_fields) {
++		struct ethtool_rxfh_fields fields = {
++			.flow_type	= info.flow_type & ~FLOW_RSS,
++		};
++
++		if (info.flow_type & FLOW_RSS)
++			fields.rss_context = info.rss_context;
++
++		ret = ops->get_rxfh_fields(dev, &fields);
++		if (ret < 0)
++			return ret;
++
++		info.data = fields.data;
++	} else {
++		ret = ops->get_rxnfc(dev, &info, NULL);
++		if (ret < 0)
++			return ret;
++	}
+ 
+ 	return ethtool_rxnfc_copy_to_user(useraddr, &info, info_size, NULL);
+ }
+@@ -1492,7 +1527,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 	u8 *rss_config;
+ 	int ret;
+ 
+-	if (!ops->get_rxnfc || !ops->set_rxfh)
++	if ((!ops->get_rxnfc && !ops->get_rxfh_fields) || !ops->set_rxfh)
+ 		return -EOPNOTSUPP;
+ 
+ 	if (ops->get_rxfh_indir_size)
 -- 
 2.49.0
 
