@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-196668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D0FAD5CE9
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:16:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650DAAD5CDA
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 19:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A825B1BC2710
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:17:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AC231771F8
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C571DF994;
-	Wed, 11 Jun 2025 17:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="NSeA5sYT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C020320C47A;
+	Wed, 11 Jun 2025 17:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDE9153598;
-	Wed, 11 Jun 2025 17:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182041DE2CC
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 17:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749662209; cv=none; b=ZrFd5nlQz0RDaTZjp2igSjYX3zcLhksbuEPrneOY3gfeDhKv55+IfArRG0AZpBiFDe2Sge+U2b/aQkk4/KPWbf7DpkevUO4IdnvEofs7BgBQ+f1eM0iItg5tcNxo3nNOHBMsdhaQ8LXzXg9uYdnUCEW5EqND/MZZonE8ZzDpZwk=
+	t=1749661893; cv=none; b=Tf8W+A2js7Zo08UOGz9nSwk7Gubd0lxCoAr0jHl8fn9JsvacSovRoQNwRY+RsNfkq7BK0B+86XWGX7I4dLYwM0mgzn0sp5+YpLiQhOackw2eBeSXOWJAgc3matgsT4PXaB/iSZL+n6DKliCFEuvs/mODvlAjADvj6w/nahZUKnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749662209; c=relaxed/simple;
-	bh=wfGTFbVzrnm/eFJldsr80LKPWcoUnp2SqjZ2kKDQPrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JMRa/XIii4YyQ88JjCLfyeuSxkAVKIqa6u4C0cKkWWA0lutacX3IICM5uw7dneRClEpK2ClyTkbRiRQ8zVLnYbBK3kjLXsbcwaYT33cThr0M7Lw8e7vmtxCnsul128LilxWYggeWbDgHRtx5Q5qwDDWYXKCg5yEm+E7KHRrdNM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=NSeA5sYT; arc=none smtp.client-ip=217.72.192.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
-	s=s1-ionos; t=1749662187; x=1750266987; i=christian@heusel.eu;
-	bh=OEGHZmIjk+ceUvrd8ghMlpfcoXbIaBBA/lq77JDDIEY=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:In-Reply-To:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=NSeA5sYTpdeUAXOW0nAdhxtbkzlC3k4Fzw/TwSOLKEvY0KseEvpHMXTcjyaEbmOI
-	 BZOxYLUoZcXVN/vETY7A3oXGXw1TztDsY3i33UHyPtUh2iE5Wg3gvffiU+Mjh+HOO
-	 3tjyB8FZMIdn7uKPoZ522RKbriaYWhB3djTTSpCpNU8n2be23R2STafDRRhaw09vR
-	 U++C9WsGgkJLgR5m8AVNjS4zlr5w4DpFf/ddHmZ4BqYNJxKDnjyf5g3w5ouMDkAR1
-	 g+SWEPDuxMDuIYF8q7ZvPlNds8B3J52wCEs3NmVSDbE4Hw5FtP4Q5F+kG0mtg3o9o
-	 odOKXaZBV4CNrM1spw==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from localhost ([89.244.90.56]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1M890H-1uU3w91Y2N-00C4J0; Wed, 11 Jun 2025 19:10:26 +0200
-Date: Wed, 11 Jun 2025 19:10:24 +0200
-From: Christian Heusel <christian@heusel.eu>
-To: Kuniyuki Iwashima <kuni1840@gmail.com>
-Cc: davem@davemloft.net, difrost.kernel@gmail.com, dnaim@cachyos.org, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, mario.limonciello@amd.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, regressions@lists.linux.dev
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-Message-ID: <b5628073-3d14-42a9-9b91-3ec31db8f7f9@heusel.eu>
-References: <58be003a-c956-494b-be04-09a5d2c411b9@heusel.eu>
- <20250611164339.2828069-1-kuni1840@gmail.com>
+	s=arc-20240116; t=1749661893; c=relaxed/simple;
+	bh=QSvOOWtJuIfjCJoBL0OeEuYhKXRsvAxL1NMhQtkpLIE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kE62Gug5KL2OiN6LmhNtA8wA1kDK2bvugncOXwDK3TPKh9zqhqA17ed5f4nbCFIjGLjr51bFr5aGFPqAXGUlWx33ozRg7W6eEqGDAWYd3dvQ4S6XHf6KlSi6GbmcaPMLBP17INeqEG2E9Gm6ilwvM6KljygC7zWfvRAUkwuYBkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddd03db24dso680625ab.2
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 10:11:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749661891; x=1750266691;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z+K6Kx1kOSQm1j6AFupjyRqIrRPupxlxYt0QZP8QvpM=;
+        b=v6HQD2wK8n5JbWFqhBr0M83bB2qtH3jkf/uoQqG9Gtp50x2tzXKIU7tO4MKGO/k62w
+         WMWoqgHPpN77I1E+XVw3/t74WjFFq9Vj9foptYXqGYKKH+5IFFP8DxxPY2OLbhvahaFA
+         BRSwvjSy1fAJgys+7/9QncMV09yUtPnBeffL8KI6U/k5tM3EBAJ8scX683oGTHYO1WYN
+         wk5b49pHbyKIR+cyxCE2fLZkRZbZq7KUG+dj+q1AtQf/2Aa7OB+N5PGHChjPWGJsFVKf
+         M8gRbB7T8kHqg/K0ZpMSsVRYDZwchqn36h06ExX9wKN4HxBS5C+mkM7EjAtvknbE/W7e
+         BLaA==
+X-Forwarded-Encrypted: i=1; AJvYcCXb0DJ8v/ZZtDThj9GvAcn/k6GUUPtNHC6wg7TIVLOYyfp4T44wvIIHrGTNdQj4b+IAVGez5RM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrEIMpjIeaH3Mz+6JyWKBASCiLCXijbZGoT1HQ+Uj4uLskayx8
+	s/jS66W46spt844JVaF2qbcqQAXoBFN56k1+qRu4Zvd3CGJjdw6UwWYx1kUjLsiFgsH7KMMu+4M
+	BY1WwlZFjTX4S1UvnrgV5KE+/HzVupy+JKi4GiRxzAvGhVLLZ+dHIhGdyEcE=
+X-Google-Smtp-Source: AGHT+IHlv/eHUy36bYNYYEhpPRJd73Rsq3ggZvS8irzQdhSmr3jVWcH32BzcPmsCfAipjJUFhoM4O7Q9sRK81rYd7pZcaPoGIdgX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pvxh2zg2om6kjmmk"
-Content-Disposition: inline
-In-Reply-To: <20250611164339.2828069-1-kuni1840@gmail.com>
-X-Provags-ID: V03:K1:aPP1kRugb8Gbyx5XYk0iGW9/YSGeRy4gHEeQocsJrZRUzb8N94G
- oyX59AnGy5Wq2qsKTEwEVjAlDWR91DGT0xIzcvbhOri8Fo9K6orhXeK6LBtGZdp+gBjaqww
- sJWFmqs2zRk0j25GnRA+RNVxNrUGtk2xjeEJKBEScUNUkgQa3SYgk02+F2yE26rZzjoXTfx
- tVT122yEqPzOywbLyBrIQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Vd/q57WHzcA=;3xgV+VQEIl1UmQAff2UJdyKnQZg
- 598rDFSzh0WCIeTMJQyI0Y1xPD3uoWW4Pe9t221k1UQyShH3qFUwSrE6myYNkSglqDv/B1ND+
- WlY+db1egCqkXIYHZrBNwNRN/FZ03H9YBVCB54Iuhy5Gh4D8n8VyEZYwnyMRUVWjDjoo8cgNK
- IbyBApAOQTIMRRL18b9If4id49UHqzPDetTGvILxV9jKjPm9G8G74+FE0VUn2rTB6E4aBTIR8
- T1aUmCNWspTrWO/GInkYWQIel2uxdk9iLQqPQWTj7oeAEJNwmN5n7D+1HLRF0mXp9UhGuiEpf
- LehYUpuWvXxfh+q3ktINSXZPldrP8Ktm9s8pcYsyQ+iGzW8XTpGb/vB/fZ+LXYut3yvCuf4HH
- hsdp6em8RtSjIrjYgT8Sbuy7SdtsA+NFxz9wd0keY94kKend0qljVD5VOd3riOy9w+hx8hf6E
- 8hS8OxkYlmHkFniNHsu5T8g/GqVAz3oulktRg7WWkxD/HKSi1mM2WHs9buUwnakYbgiLcDwb6
- +MjDG6MhczOzw2jsmZkoeR4o8qxNMvO6wBNyrts32d4gCnMm4VlskTenP8gYHp2R0VG1pQRcX
- wAUsIbpk6EaJtNPdJMY6j1MP4GZ1ebTA0bR7TbzzrKq4M48HteK+kZlXX7XvXwJaolNvSnsig
- lJlO5kxxpdsFr43QZgsfUbsyiQZ+9BjlcPRb/GxA09623Uqbbe5xYYlEdBW5QsLgDPD+ywPpr
- vSZwKNmvTnN0qrUjWL3g/zRQ5V8WO23f6dDZ429dXclLpHZJjsTKBu2aWK5EiHYoHvnZ/WsDS
- zMiUImZToJyOb8SVUIhoCya4OVoLsXtHbVyxq1EPqQDLjJINANIWbX10hkhVM1jkuXlfOxpQ9
- iauDiLfeNVEJqfEOTpw/bNvke3h0vQEakcIwul/VUj5Y5IH0FVrI0GR7i7aztuupt808HVak8
- pGROY4yV16/SjQfSUKp/7TtBMqq8V0K3355EzTCSlnTCmJF+WiWokD8rQQvk7SrjlnQHpFlb3
- /poHxUOpnuBeKgfghk8dwMoYLg/w+7R96i9pfguJuBpaXcAblIiYwm45yLKsONWa5kMeroDjs
- xHVpBE/Yf/LuiEkMvfDjkFFOzxnul/aS4eiacCfcZAwmW5D0DiwemcQDk2Yf1aoj5mrNQ7iO/
- cVOYaMOCOxPcvw9RYC6A/aTEr6Bdi3Fy4PRUWDrYBrA5eGLdOSbmorl0T9lMjuduYvQ4cJis4
- VDRnS+fe8ulOp8jpU22m8ngxJA1LcoCTZxHdrNo5EBTYxpHiXYVJtsJGpMDcxFvmFKmbmfZVB
- gt80m/CulhnRtem9roti9a57El+wg/DmDkxSqeKZtrWqXOgPQikGZc1eJ5JUWSSIcBPFfzzr6
- 6gqhF+sEUVlft+XGqUdjlvmcxlUt3hb2O8u9SSbt6m9OGxYnpf2GDKPOp0
+X-Received: by 2002:a05:6e02:2701:b0:3dc:7fa4:823 with SMTP id
+ e9e14a558f8ab-3ddf42fe5e7mr48967045ab.16.1749661891154; Wed, 11 Jun 2025
+ 10:11:31 -0700 (PDT)
+Date: Wed, 11 Jun 2025 10:11:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6849b8c3.a00a0220.1eb5f5.00f0.GAE@google.com>
+Subject: [syzbot] [net?] UBSAN: array-index-out-of-bounds in ip6_route_info_create
+From: syzbot <syzbot+4c2358694722d304c44e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    19272b37aa4f Linux 6.16-rc1
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git for-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=145fa60c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=476ea327030dfdb4
+dashboard link: https://syzkaller.appspot.com/bug?extid=4c2358694722d304c44e
+compiler:       riscv64-linux-gnu-gcc (Debian 12.2.0-13) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: riscv64
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/a741b348759c/non_bootable_disk-19272b37.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c2cd09d10344/vmlinux-19272b37.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/94da7167c434/Image-19272b37.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4c2358694722d304c44e@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in ./include/net/ipv6.h:616:34
+index 20 is out of range for type '__u8 [16]'
+CPU: 1 UID: 0 PID: 7444 Comm: syz.0.708 Not tainted 6.16.0-rc1-syzkaller-g19272b37aa4f #0 PREEMPT 
+Hardware name: riscv-virtio,qemu (DT)
+Call Trace:
+[<ffffffff80078a80>] dump_backtrace+0x2e/0x3c arch/riscv/kernel/stacktrace.c:132
+[<ffffffff8000327a>] show_stack+0x30/0x3c arch/riscv/kernel/stacktrace.c:138
+[<ffffffff80061012>] __dump_stack lib/dump_stack.c:94 [inline]
+[<ffffffff80061012>] dump_stack_lvl+0x12e/0x1a6 lib/dump_stack.c:120
+[<ffffffff800610a6>] dump_stack+0x1c/0x24 lib/dump_stack.c:129
+[<ffffffff8001c0ea>] ubsan_epilogue+0x14/0x46 lib/ubsan.c:233
+[<ffffffff819ba290>] __ubsan_handle_out_of_bounds+0xf6/0xf8 lib/ubsan.c:455
+[<ffffffff85b363a4>] ipv6_addr_prefix include/net/ipv6.h:616 [inline]
+[<ffffffff85b363a4>] ip6_route_info_create+0x8f8/0x96e net/ipv6/route.c:3793
+[<ffffffff85b635da>] ip6_route_add+0x2a/0x1aa net/ipv6/route.c:3889
+[<ffffffff85b02e08>] addrconf_prefix_route+0x2c4/0x4e8 net/ipv6/addrconf.c:2487
+[<ffffffff85b23bb2>] addrconf_prefix_rcv+0x1720/0x1e62 net/ipv6/addrconf.c:2878
+[<ffffffff85b92664>] ndisc_router_discovery+0x1a06/0x3504 net/ipv6/ndisc.c:1570
+[<ffffffff85b99038>] ndisc_rcv+0x500/0x600 net/ipv6/ndisc.c:1874
+[<ffffffff85bc2c18>] icmpv6_rcv+0x145e/0x1e0a net/ipv6/icmp.c:988
+[<ffffffff85af6798>] ip6_protocol_deliver_rcu+0x18a/0x1976 net/ipv6/ip6_input.c:436
+[<ffffffff85af8078>] ip6_input_finish+0xf4/0x174 net/ipv6/ip6_input.c:480
+[<ffffffff85af8262>] NF_HOOK include/linux/netfilter.h:317 [inline]
+[<ffffffff85af8262>] NF_HOOK include/linux/netfilter.h:311 [inline]
+[<ffffffff85af8262>] ip6_input+0x16a/0x70c net/ipv6/ip6_input.c:491
+[<ffffffff85af8dcc>] ip6_mc_input+0x5c8/0x1268 net/ipv6/ip6_input.c:588
+[<ffffffff85af6112>] dst_input include/net/dst.h:469 [inline]
+[<ffffffff85af6112>] ip6_rcv_finish net/ipv6/ip6_input.c:79 [inline]
+[<ffffffff85af6112>] NF_HOOK include/linux/netfilter.h:317 [inline]
+[<ffffffff85af6112>] NF_HOOK include/linux/netfilter.h:311 [inline]
+[<ffffffff85af6112>] ipv6_rcv+0x5ae/0x6e0 net/ipv6/ip6_input.c:309
+[<ffffffff85087e84>] __netif_receive_skb_one_core+0x106/0x16e net/core/dev.c:5977
+[<ffffffff85088104>] __netif_receive_skb+0x2c/0x144 net/core/dev.c:6090
+[<ffffffff850883c6>] netif_receive_skb_internal net/core/dev.c:6176 [inline]
+[<ffffffff850883c6>] netif_receive_skb+0x1aa/0xbf2 net/core/dev.c:6235
+[<ffffffff8328656e>] tun_rx_batched.isra.0+0x430/0x686 drivers/net/tun.c:1485
+[<ffffffff8329ed3a>] tun_get_user+0x2952/0x3d6c drivers/net/tun.c:1938
+[<ffffffff832a21e0>] tun_chr_write_iter+0xc4/0x21c drivers/net/tun.c:1984
+[<ffffffff80b9b9ae>] new_sync_write fs/read_write.c:593 [inline]
+[<ffffffff80b9b9ae>] vfs_write+0x56c/0xa9a fs/read_write.c:686
+[<ffffffff80b9c2be>] ksys_write+0x126/0x228 fs/read_write.c:738
+[<ffffffff80b9c42e>] __do_sys_write fs/read_write.c:749 [inline]
+[<ffffffff80b9c42e>] __se_sys_write fs/read_write.c:746 [inline]
+[<ffffffff80b9c42e>] __riscv_sys_write+0x6e/0x94 fs/read_write.c:746
+[<ffffffff80076912>] syscall_handler+0x94/0x118 arch/riscv/include/asm/syscall.h:112
+[<ffffffff8637e31e>] do_trap_ecall_u+0x396/0x530 arch/riscv/kernel/traps.c:341
+[<ffffffff863a69e2>] handle_exception+0x146/0x152 arch/riscv/kernel/entry.S:197
+---[ end trace ]---
 
 
---pvxh2zg2om6kjmmk
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [REGRESSION] af_unix: Introduce SO_PASSRIGHTS - break OpenGL
-MIME-Version: 1.0
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 25/06/11 09:42AM, Kuniyuki Iwashima wrote:
-> From: Christian Heusel <christian@heusel.eu>
-> Date: Wed, 11 Jun 2025 13:46:01 +0200
-> > On 25/06/10 09:22PM, Jacek =C5=81uczak wrote:
-> > > Hi,
-> >=20
-> > Hey,
-> >=20
-> > > Bisection points to:
-> > > [3f84d577b79d2fce8221244f2509734940609ca6] af_unix: Inherit sk_flags
-> > > at connect().
-> >=20
-> > I'm also suffering from an issue that I have bisected to the same commi=
-t,
-> > although in a totally different environment and with other reproduction
-> > steps: For me the Xorg server crashes as soon as I re-plug my laptops
-> > power chord and afterwards I can only switch to a TTY to debug. No
-> > errors are logged in the dmesg.
-> >=20
-> > I can also confirm that reverting the patch on top of 6.16-rc1 fixes the
-> > issue for me (thanks for coming up with the revert to Naim from the
-> > CachyOS team!).
-> >=20
-> > My xorg version is 21.1.16-1 on Arch Linux and I have attached the
-> > revert, my xorg log from the crash and bisection log to this mail!
-> >=20
-> > I'll also CC a few of the netdev people that might have further insights
-> > for this issue!
-> >=20
-> > > Reverting entire SO_PASSRIGHTS fixes the issue.
->=20
-> Thanks for the report.
->=20
-> Could you test the diff below ?
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-It seems like the patch you posted has fixed the issue for me, thanks
-for the lightning-fast answer!
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> look like some programs start listen()ing before setting
-> SO_PASSCRED or SO_PASSPIDFD and there's a small race window.
->=20
-> ---8<---
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index fd6b5e17f6c4..87439d7f965d 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff *sk=
-b, const struct sock *sk,
->  	if (UNIXCB(skb).pid)
->  		return;
-> =20
-> -	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> +	if (unix_may_passcred(sk) || unix_may_passcred(other) ||
-> +	    !other->sk_socket) {
->  		UNIXCB(skb).pid =3D get_pid(task_tgid(current));
->  		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
->  	}
-> ---8<---
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Have a great week everyone!
-Chris
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
---pvxh2zg2om6kjmmk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIyBAABCgAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmhJuIAACgkQwEfU8yi1
-JYV8IQ/4q05ypgWVUCyUkdHVeTY4QNiayhgnfex9hX2ya3Qx2J4LoKoFGM2JYwF9
-v3xvC4HTqWC/fMIgwncD8wph10wpE1Mme1aHLP2iUK2J0eukv2nn5tNSgHFUtjiE
-V+b1yFbV1GNgp9AtNVfQun0oW0TVqu+GE2IE0PaaKJryIOhl0HEWrck5HpyYOnaO
-Oqs7B2fD8tQ43qngXLwQZEqGY1RKplndGJ9FvJtGrgwCYFlha638uj4tQm2yh7im
-4mHvWy0HQBe5VOvWoPwk37giAHZfx0NMpFqNzXAtsI4v6SLr38MRTjp9wctgfFvM
-OqFjuZkCVEjV7Qr3ZDMzJWgo4lMMgYmJ9SWvW0BfXWGN4Ym5Bw4KWoYyNCfW3s+r
-ZHZnoH2cDP8we2FHZhHa8w8dTy+VAerVE1QCoiwBOZrTAVcY5g3SIf+XAAYCbGRb
-BflcnGE9B5fZTYh7SgrjVInL6uOOn/5ouj23ZvukJlepaCKv5EvvZYeQ5NRgY9lp
-4YDEmuglyaRXUZGzYd+JUbRdcoxLV8xwPYYWYX//YRP8YCisYGADxMu/FtGaM0TS
-GpnW4SW1J++j9nAiAgLJW+R4XrLZkTxh1vfbSvLAb4OQDLynF/wzp8kR20GXc4V0
-uUusdclFornCeHctDA0p8NIA5qlItdJfiC30NPxyhlIyLOai8w==
-=RB66
------END PGP SIGNATURE-----
-
---pvxh2zg2om6kjmmk--
+If you want to undo deduplication, reply with:
+#syz undup
 
