@@ -1,185 +1,169 @@
-Return-Path: <netdev+bounces-196440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68497AD4D5C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6B1AD4DB3
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795D91BC1D55
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 07:43:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F7851BC08B0
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 07:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DAB236442;
-	Wed, 11 Jun 2025 07:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDCF238C3D;
+	Wed, 11 Jun 2025 07:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Txg7FG+E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nogh/cLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3662206BE;
-	Wed, 11 Jun 2025 07:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776FC2367B9;
+	Wed, 11 Jun 2025 07:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749627656; cv=none; b=Ui2lYBRA8rmFBSq81OoR2mGlsCRGakwZbFhZYRZFexQhiAo9nrMiEH05IjJwIHo1xrMeTuEOxMe3Btn5u2shSKuw2duz1ztRM+yuELgORVTxFfv3dJNR4YX8EJSohT0dgcYtSYVkMXb4sKBw7UmFivAkhEPQkNawgZBGWs7LVVI=
+	t=1749628572; cv=none; b=es6D5NLUwIwSD3wuXLnEnYsPFKUXEdbhOBlOBdJ4u4GdhhsGkoRjJ/9LjVJrhHdHf374o+LExESVwTVemg6hkqy378tqyNluK1P/Ij55Fc0qj/tnPm93ux+/tunDNxKmhkIih7bE3nHZspqKOZw7ZohP7ELbmm26EbIUVLJvWv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749627656; c=relaxed/simple;
-	bh=f0kjirpReolxShcc+9FUMC/yR29IE/CXkhCKm2mADLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qsbmt93bROTLJoNqCUEHymoPMsaHlnDkngWgzCa8qAmoeQpQ2oTWSneHyXEdkwqX2u72oOSjZETaoNacW6j8DSr0wtqCeh1oI1krqhQ+3e3u4g5htAzeuVvETCfHKyIu5rVELs64aqcert18YN+JyYHsUwOeSzhv0jV5G8X0Q+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Txg7FG+E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F3D1C4CEEF;
-	Wed, 11 Jun 2025 07:40:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749627655;
-	bh=f0kjirpReolxShcc+9FUMC/yR29IE/CXkhCKm2mADLA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Txg7FG+EluNb03Oo6wkDLo9bia0nlRDlU0OxlwEaUnCGE5TB02Z49zGOAXsx6WcYV
-	 7Q+NHbey7k97TqH8Cu82cVyC8m05an7TBxypLtAksLBZPv1zGTeLTzNUZFClx9QBCp
-	 t4pMDA0Z1DXGwBtWMEusWCj/k+AhlCsGajK76LKL5AA0gHsXzDKbGLXi0KSjCmftbq
-	 gzK7YI9EBIs+Q7k3LCtbp5ieDr8EXaPBKzI3nQxt7tfUMGA50e/h7mk0J4CXuOhBft
-	 EFBHC9elQwpjUvPHYSnuKOhAPU51FVLCZMk2+QLRQJjcHkTJ8YXX+lyebIFes8hZLB
-	 vWMHICojUA6zg==
-Message-ID: <da1f2506-5cb0-446c-b623-dc8f74c53462@kernel.org>
-Date: Wed, 11 Jun 2025 09:40:49 +0200
+	s=arc-20240116; t=1749628572; c=relaxed/simple;
+	bh=7To7WI9XwMMtA66JWXTA1CAUBiFHtDp+UJB/oeWMvgE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=piKfnM5wPcLx4vU2jdIHlVMvFCVHGn4rO959996CE6avBLcHovVlZfkZRaJe8kRQ27x2lqOzuw+9HTWVwuuUasAbhd9Td0dTmxrexdYMPpsWeqBDRzQbz+bYmibtTY27AmSXO3p8XL516gjvmcDYILTYC5Ea8AzeMVV+KfSxSE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nogh/cLW; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3122368d7cfso4952168a91.1;
+        Wed, 11 Jun 2025 00:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749628570; x=1750233370; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V6TJM3iIHz3tB+nb8hhVbd7mqPPM3Iw3zLYnp9N8mLE=;
+        b=Nogh/cLWuBR9sTL36zWeobxf/UhLu3egdGRW5kFVmJ/DoF/6TXMF7SvHBC6FhmEDJR
+         D4SmIGt5EZJIFepjGwnV65LY1sgqY8tkHXOyIREBN16sbtQw43Uavi5NKp2tgUs8OJ1R
+         0bQuVYuCRlqPetKsFwvm8N0X6T1oTYtgd11oyK8DsNjb0VdZcnXq6Wm6JLlnlWfscp3i
+         JyGk5S9xH1hCcz2NNDDy/K1L0fmsV5PSlJVfynIIj0yc4NtRUINiWWb/HpeSym/H+FfP
+         fivGUiLTb8EC+g89jLzAdoGpBpPaoKIqLXX4ajscX3INvDaQrL94LCEj06++15uwpzm5
+         5xBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749628570; x=1750233370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V6TJM3iIHz3tB+nb8hhVbd7mqPPM3Iw3zLYnp9N8mLE=;
+        b=weoRDL6bj2g1XyzoQBWolfghtFPj4ZpVJqr2LIq8ontdeLHxad+aJccQiZ91G+BvUH
+         0FLTklXmvP6L0wQbhEAD0CZcATOmh/hrI0bc1z/sd7UINhJ2uooIJEWBlTqO4jISQxMy
+         0LOPZ3rDxyyizHyVJDHTi9SMoi8/kF1YbcMchX2VatI7eXfNm4FLF21pXhh8vNXLR7UJ
+         MtsnJsQICZ4vOycCTOA32PfwVC/VHBNn/uVNBEV3CO/86MteRvoVHwsGlqXIxqTRLwX1
+         BFOgYyTeKjX+1QEAvGfR47GNlgTN+NRyEbM4HR6SX9jvmY39i1jjeaVuu3ScB9wDgUNg
+         Ancg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWApqGsEoJ/6uz/YdKgeyt/mqZt7gqzytXVzQfU8Lf95nZ/3Nt3hfBDKvJN2sHN1qKCB6FWkEDKtIo70k=@vger.kernel.org, AJvYcCWjILkx6bmX/g3UZ9+HcgVEV+jbaMnMT7HWWuduDsY1P01KRpyuSbapgsskOAPd1Pko643kmGDR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfVRAA65Yr4/wv2P6zi+6WJd+ZzMX7DbTD9Vj31iH9DjphCuFb
+	4UHQKDCclg20ESyNjpEVm6Q0Rr3lCSIDaZ4GDgukrOaoE9rdkI+s8sDYjPlYY0UFvXxXHZaWI1e
+	j50zs98vpT1FpOlSJbqDdmxEeuQe9g/c=
+X-Gm-Gg: ASbGncuuI1B3G8NwlPuy8U6C3OFsllNFeDjYBTweFP8XwireIvnX5mUuQwyJga60jHI
+	lcf7dgUht6Wvm92K7jhwQMxu0ShD7mo5dMA3pZ+SEKan/xurZazrhyI4tgxb5jRZHnWeBIrnptB
+	Eic/YVqQkD8pzSZ8PunnXw2xe9pA926R2T/3w9YzVMlxbDb+FzpAs6csT6rc/0jap1ti3U+J8BU
+	uuAig==
+X-Google-Smtp-Source: AGHT+IEGu/HRiaDx7N9wwGgDKWEyvWvXU6gKXh4ODwPCXIMqNMtx+Ito2uXPce5z6WK7Fa0t+cRRbv4Xoj+KCg+sjNM=
+X-Received: by 2002:a17:90b:224c:b0:313:2adc:b4c4 with SMTP id
+ 98e67ed59e1d1-313b1ff8937mr2759927a91.24.1749628569445; Wed, 11 Jun 2025
+ 00:56:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V7 2/2] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-To: Ihor Solodrai <ihor.solodrai@linux.dev>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
- kernel-team@cloudflare.com, phil@nwl.cc,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <174559288731.827981.8748257839971869213.stgit@firesoul>
- <174559294022.827981.1282809941662942189.stgit@firesoul>
- <fecfcad0-7a16-42b8-bff2-66ee83a6e5c4@linux.dev>
- <b158cffc-582b-4a2f-bb13-a27c8f58b6fc@kernel.org>
- <46a47776-dcd9-4c6f-8d71-f94b22b077e2@kernel.org>
- <6812c58a-4f33-46b5-8886-1198e36823ed@linux.dev>
- <cba926c1-66b9-45fb-a203-13ff646567f9@kernel.org>
- <68106010-f34b-45a8-aaf5-003f5c925c01@linux.dev>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <68106010-f34b-45a8-aaf5-003f5c925c01@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250603204858.72402-1-noltari@gmail.com> <20250603204858.72402-2-noltari@gmail.com>
+ <507a09f6-8b6e-4800-8c90-f2b1662cafa2@broadcom.com> <CAOiHx==HkOqi4TY6v7bdzWoHEQxO4Q4=HH8kWe7hJiEdLTy3-g@mail.gmail.com>
+In-Reply-To: <CAOiHx==HkOqi4TY6v7bdzWoHEQxO4Q4=HH8kWe7hJiEdLTy3-g@mail.gmail.com>
+From: =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
+Date: Wed, 11 Jun 2025 09:55:35 +0200
+X-Gm-Features: AX0GCFvO2K9WMbRwW6sNOIi5HI3SZ7oMAMCJu6EBqkRi4K2T-ILrj2BAouyE2Qc
+Message-ID: <CAKR-sGe6K=Za+eSspTc92Fj=XjAwSm1UQCzunU4TVovZ_4V_fA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v2 01/10] net: dsa: b53: add support for FDB
+ operations on 5325/5365
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, andrew@lunn.ch, olteanv@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vivien.didelot@gmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dgcbueu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+El mi=C3=A9, 4 jun 2025 a las 8:32, Jonas Gorski (<jonas.gorski@gmail.com>)=
+ escribi=C3=B3:
+>
+> On Wed, Jun 4, 2025 at 12:10=E2=80=AFAM Florian Fainelli
+> <florian.fainelli@broadcom.com> wrote:
+> >
+> > On 6/3/25 13:48, =C3=81lvaro Fern=C3=A1ndez Rojas wrote:
+> > > From: Florian Fainelli <f.fainelli@gmail.com>
+> > >
+> > > BCM5325 and BCM5365 are part of a much older generation of switches w=
+hich,
+> > > due to their limited number of ports and VLAN entries (up to 256) all=
+owed
+> > > a single 64-bit register to hold a full ARL entry.
+> > > This requires a little bit of massaging when reading, writing and
+> > > converting ARL entries in both directions.
+> > >
+> > > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> > > Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+> > > ---
+> >
+> > [snip]
+> >
+> > >   static int b53_arl_op(struct b53_device *dev, int op, int port,
+> > >                     const unsigned char *addr, u16 vid, bool is_valid=
+)
+> > >   {
+> > > @@ -1795,14 +1834,18 @@ static int b53_arl_op(struct b53_device *dev,=
+ int op, int port,
+> > >
+> > >       /* Perform a read for the given MAC and VID */
+> > >       b53_write48(dev, B53_ARLIO_PAGE, B53_MAC_ADDR_IDX, mac);
+> > > -     b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
+> > > +     if (!is5325(dev))
+> > > +             b53_write16(dev, B53_ARLIO_PAGE, B53_VLAN_ID_IDX, vid);
+> >
+> > I used the 5325M-DS113-RDS datasheet for this code initially but the
+> > 5325E-DS14-R datasheet shows that this register is defined. It's not
+> > clear to me how to differentiate the two kinds of switches. The 5325M
+> > would report itself as:
+> >
+> > 0x00406330
+> >
+> > in the integrated PHY PHYSID1/2 registers, whereas a 5325E would report
+> > itself as 0x0143bc30. Maybe we can use that to key off the very first
+> > generation 5325 switches?
+>
+> According to the product brief and other documents BCM5325M does not
+> support 802.1Q VLANs, which would explain the missing register
+> descriptions. It does have 2k ARL entries compared to 1k for the 5325E
+> though, so I now see where that value comes from.
+>
+> If it really doesn't support 802.1Q, then checking if related
+> registers are writable might also work.
 
+Considering that I don't have access to a 5325M in order to properly
+test it, I prefer the solution proposed by Florian.
 
-On 11/06/2025 02.25, Ihor Solodrai wrote:
-> On 6/10/25 2:40 PM, Jesper Dangaard Brouer wrote:
->>
->>
->> On 10/06/2025 20.26, Ihor Solodrai wrote:
->>> On 6/10/25 8:56 AM, Jesper Dangaard Brouer wrote:
->>>>
->>>>
->>>> On 10/06/2025 13.43, Jesper Dangaard Brouer wrote:
->>>>>
->>>>> On 10/06/2025 00.09, Ihor Solodrai wrote:
->>>> [...]
->>>>>
->>>>> Can you give me the output from below command (on your compiled 
->>>>> kernel):
->>>>>
->>>>>   ./scripts/faddr2line drivers/net/veth.o 
->>>>> veth_xdp_rcv.constprop.0+0x6b
->>>>>
->>>>
->>>> Still need above data/info please.
->>>
->>> root@devvm7589:/ci/workspace# ./scripts/faddr2line 
->>> ./kout.gcc/drivers/ net/veth.o veth_xdp_rcv.constprop.0+0x6b
->>> veth_xdp_rcv.constprop.0+0x6b/0x390:
->>> netdev_get_tx_queue at /ci/workspace/kout.gcc/../include/linux/ 
->>> netdevice.h:2637
->>> (inlined by) veth_xdp_rcv at /ci/workspace/kout.gcc/../drivers/net/ 
->>> veth.c:912
->>>
->>> Which is:
->>>
->>> veth.c:912
->>>      struct veth_priv *priv = netdev_priv(rq->dev);
->>>      int queue_idx = rq->xdp_rxq.queue_index;
->>>      struct netdev_queue *peer_txq;
->>>      struct net_device *peer_dev;
->>>      int i, done = 0, n_xdpf = 0;
->>>      void *xdpf[VETH_XDP_BATCH];
->>>
->>>      /* NAPI functions as RCU section */
->>>      peer_dev = rcu_dereference_check(priv->peer, 
->>> rcu_read_lock_bh_held());
->>>   --->    peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
->>>
->>> netdevice.h:2637
->>>      static inline
->>>      struct netdev_queue *netdev_get_tx_queue(const struct net_device 
->>> *dev,
->>>                       unsigned int index)
->>>      {
->>>          DEBUG_NET_WARN_ON_ONCE(index >= dev->num_tx_queues);
->>>   --->        return &dev->_tx[index];
->>>      }
->>>
->>> So the suspect is peer_dev (priv->peer)?
->>
->> Yes, this is the problem!
->>
->> So, it seems that peer_dev (priv->peer) can become a NULL pointer.
->>
->> Managed to reproduce - via manually deleting the peer device:
->>   - ip link delete dev veth42
->>   - while overloading veth41 via XDP redirecting packets into it.
->>
->> Managed to trigger concurrent crashes on two CPUs (C0 + C3)
->>   - so below output gets interlaced a bit:
->>
->> [...]
->>
->> A fix could look like this:
->>
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index e58a0f1b5c5b..a3046142cb8e 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -909,7 +909,7 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
->> budget,
->>
->>          /* NAPI functions as RCU section */
->>          peer_dev = rcu_dereference_check(priv->peer, 
->> rcu_read_lock_bh_held());
->> -       peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
->> +       peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) 
->> : NULL;
->>
->>          for (i = 0; i < budget; i++) {
->>                  void *ptr = __ptr_ring_consume(&rq->xdp_ring);
->> @@ -959,7 +959,7 @@ static int veth_xdp_rcv(struct veth_rq *rq, int 
->> budget,
->>          rq->stats.vs.xdp_packets += done;
->>          u64_stats_update_end(&rq->stats.syncp);
->>
->> -       if (unlikely(netif_tx_queue_stopped(peer_txq)))
->> +       if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq)))
->>                  netif_tx_wake_queue(peer_txq);
->>
-> 
-> Great! I presume you will send a patch separately?
+I've implemented it in the following branch:
+https://github.com/Noltari/linux/commits/b53-bcm5325-v3/
+https://github.com/Noltari/linux/commit/e2d3d541ac421bbb5d2fc783e07fda26b10=
+5d1a5
 
-Yes, I will send this as a separate patch.  In a couple of hours (first 
-some breakfast and a walk with the dog ;-)).
+I will wait a bit just in case there are some comments for the
+recently submitted v2 of the dsa tag patches and then I will merge
+both sets of patches into one since your proposed change of checking
+the tag protocol for the BRCM_HDR register access requires having the
+new legacy FCS tag.
 
---Jesper
+>
+> Jonas
+
+Best regards,
+=C3=81lvaro.
 
