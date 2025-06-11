@@ -1,211 +1,182 @@
-Return-Path: <netdev+bounces-196395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B73AAD4779
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 02:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B07AD477A
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 02:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2C6188B22C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:24:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F29F51898FAF
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 00:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D002079DA;
-	Wed, 11 Jun 2025 00:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD9363CF;
+	Wed, 11 Jun 2025 00:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OERa/DC2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l5JDaIli"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F15EC4;
-	Wed, 11 Jun 2025 00:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0853AEC4
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 00:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749601461; cv=none; b=cnkWNli/gN9ShUHExAj+9dXtPC/M/d4kVc9Yxqlh1MC1RSXLfhvUt1mvD5Idq3o4sayP906gZRx2JDm4JNmrYkmwhScQCxQlaASV5tYdWDk3yXzUHfCvkvCKOI0gxHJMPLJCbj5kVxpuzh9Fe0lGURoPJAOhv9IwumFSy5aHA6A=
+	t=1749601540; cv=none; b=o1C8FOZZ2sBpP3ItQQMDPuv9g+NvMaIWbSAM+dq9OKPbZppQF6ACBb1m8buafVrWEHitHdv6XalrOOv62VX/QQfEN9Rd7KOdqpNG4atkRuz0HrmhQhHzIuOuR0ONPy9c45QKGqJ/NjSpr8wwjFcb5OyZwht6ZgSy70zcT1IoN8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749601461; c=relaxed/simple;
-	bh=IVm0goz3CniBVUljGLrw4V1pfZi1rYq3L/LJlF3nFms=;
+	s=arc-20240116; t=1749601540; c=relaxed/simple;
+	bh=mFag4hz+lv7bx3Z8BEnZDowZA4eQdv8p3Ld0WnRSmX8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gmc1Chc1jq6v7KppqrdAXow/Xt9RbIKnxGr3QBTKDVnKMcZBQJ97c3HlER5ql/Ef+BWUzYgUaC2Y/tl0vtkKkPkKm9H9TEOadc/JMIP4sdFykjsiqK8mYr41+wREx6ThT2tFYYQPWmRTdJASWre6FZfCaCyhNe+UoKfXXONFPIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OERa/DC2; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=W5WmDo95Xn51VsMSBY51s9wgDJb9kKGLVAW/HIReidM=; b=OERa/DC2pVQ24dez9qLd4fEZXV
-	xbHcmzcTQIiAtuZgqOEVeEpVeYpbV0Ip9cqWX4Ltb9wXKFHxi0zdmbpa8fp8kRhVOrA0wqXPPhXuF
-	HvWoc2ZjeLyLgMR68HBCDjR+grb26BcZwMxn+ZjzjajnkXJPqf7A4MkTN1VFo+J5nKK3k3yBTVKga
-	3o9vK1gGOnmFxWkKRbpLsD3yKT7BuDuym7foawp7ahAP1CIyvu9I1VCmYzbUyKPIzhkovhRNsSfTE
-	gedhvIqaA1lRhfcwmhuq0BvQyM72DwQ626JIsaK5KtK6M9quPiwx+EgNAnt4pHLODLNqTSYEzSVbN
-	l9z8xQrQ==;
-Received: from [50.53.25.54] (helo=[192.168.254.17])
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uP9GH-000000022uX-1BI3;
-	Wed, 11 Jun 2025 00:24:13 +0000
-Message-ID: <f5b16bd6-01b6-45c0-9668-41ccf90445a3@infradead.org>
-Date: Tue, 10 Jun 2025 17:24:08 -0700
+	 In-Reply-To:Content-Type; b=RMx+v8U/JeoMzyBeYVb9ymx+HdIpvQPfhwasK8SO5rL1ZLaK63MY6mM97la3VzveattaezolRt1cHS/yDis4+ERfOI7tIs5yAdCMd2mLAMDX0GxK1kXBeJcFkAL2jQfyEpmC24gpuCb8sog9IMY/A6S8UJDa4gRYCOW6tTpIOg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l5JDaIli; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <68106010-f34b-45a8-aaf5-003f5c925c01@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749601536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OH4ApGYmn/DMBgrAa1vHydYXZRuq4f/WNOze5miWktY=;
+	b=l5JDaIliqGax9nCiNWoNNyi6hrwme+E9qfvM4NE+RsJJRlu5WXkURDmC6mSALN3pvWi2fT
+	KB7lFOOEFR33expXmQ8uf9HaXAtdb/Y0IiimPuL7R+vl9UBPpYxqMFvhBfws5hyhjqd9eo
+	n+AUEuKPTVtDEYA5GI3fj6j0xfp2boo=
+Date: Tue, 10 Jun 2025 17:25:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v6 03/10] net: pcs: Add subsystem
-To: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
- Kory Maincent <kory.maincent@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>, Simon Horman <horms@kernel.org>,
- Christian Marangi <ansuelsmth@gmail.com>, Lei Wei <quic_leiwei@quicinc.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-References: <20250610233134.3588011-1-sean.anderson@linux.dev>
- <20250610233134.3588011-4-sean.anderson@linux.dev>
+Subject: Re: [PATCH net-next V7 2/2] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Bastien Curutchet <bastien.curutchet@bootlin.com>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp,
+ kernel-team@cloudflare.com, phil@nwl.cc,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <174559288731.827981.8748257839971869213.stgit@firesoul>
+ <174559294022.827981.1282809941662942189.stgit@firesoul>
+ <fecfcad0-7a16-42b8-bff2-66ee83a6e5c4@linux.dev>
+ <b158cffc-582b-4a2f-bb13-a27c8f58b6fc@kernel.org>
+ <46a47776-dcd9-4c6f-8d71-f94b22b077e2@kernel.org>
+ <6812c58a-4f33-46b5-8886-1198e36823ed@linux.dev>
+ <cba926c1-66b9-45fb-a203-13ff646567f9@kernel.org>
 Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250610233134.3588011-4-sean.anderson@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+In-Reply-To: <cba926c1-66b9-45fb-a203-13ff646567f9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 6/10/25 2:40 PM, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 10/06/2025 20.26, Ihor Solodrai wrote:
+>> On 6/10/25 8:56 AM, Jesper Dangaard Brouer wrote:
+>>>
+>>>
+>>> On 10/06/2025 13.43, Jesper Dangaard Brouer wrote:
+>>>>
+>>>> On 10/06/2025 00.09, Ihor Solodrai wrote:
+>>> [...]
+>>>>
+>>>> Can you give me the output from below command (on your compiled 
+>>>> kernel):
+>>>>
+>>>>   ./scripts/faddr2line drivers/net/veth.o veth_xdp_rcv.constprop.0+0x6b
+>>>>
+>>>
+>>> Still need above data/info please.
+>>
+>> root@devvm7589:/ci/workspace# ./scripts/faddr2line ./kout.gcc/drivers/ 
+>> net/veth.o veth_xdp_rcv.constprop.0+0x6b
+>> veth_xdp_rcv.constprop.0+0x6b/0x390:
+>> netdev_get_tx_queue at /ci/workspace/kout.gcc/../include/linux/ 
+>> netdevice.h:2637
+>> (inlined by) veth_xdp_rcv at /ci/workspace/kout.gcc/../drivers/net/ 
+>> veth.c:912
+>>
+>> Which is:
+>>
+>> veth.c:912
+>>      struct veth_priv *priv = netdev_priv(rq->dev);
+>>      int queue_idx = rq->xdp_rxq.queue_index;
+>>      struct netdev_queue *peer_txq;
+>>      struct net_device *peer_dev;
+>>      int i, done = 0, n_xdpf = 0;
+>>      void *xdpf[VETH_XDP_BATCH];
+>>
+>>      /* NAPI functions as RCU section */
+>>      peer_dev = rcu_dereference_check(priv->peer, 
+>> rcu_read_lock_bh_held());
+>>   --->    peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
+>>
+>> netdevice.h:2637
+>>      static inline
+>>      struct netdev_queue *netdev_get_tx_queue(const struct net_device 
+>> *dev,
+>>                       unsigned int index)
+>>      {
+>>          DEBUG_NET_WARN_ON_ONCE(index >= dev->num_tx_queues);
+>>   --->        return &dev->_tx[index];
+>>      }
+>>
+>> So the suspect is peer_dev (priv->peer)?
+> 
+> Yes, this is the problem!
+> 
+> So, it seems that peer_dev (priv->peer) can become a NULL pointer.
+> 
+> Managed to reproduce - via manually deleting the peer device:
+>   - ip link delete dev veth42
+>   - while overloading veth41 via XDP redirecting packets into it.
+> 
+> Managed to trigger concurrent crashes on two CPUs (C0 + C3)
+>   - so below output gets interlaced a bit:
+> 
+> [...]
+> 
+> A fix could look like this:
+> 
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index e58a0f1b5c5b..a3046142cb8e 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -909,7 +909,7 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+> 
+>          /* NAPI functions as RCU section */
+>          peer_dev = rcu_dereference_check(priv->peer, 
+> rcu_read_lock_bh_held());
+> -       peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
+> +       peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : 
+> NULL;
+> 
+>          for (i = 0; i < budget; i++) {
+>                  void *ptr = __ptr_ring_consume(&rq->xdp_ring);
+> @@ -959,7 +959,7 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>          rq->stats.vs.xdp_packets += done;
+>          u64_stats_update_end(&rq->stats.syncp);
+> 
+> -       if (unlikely(netif_tx_queue_stopped(peer_txq)))
+> +       if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq)))
+>                  netif_tx_wake_queue(peer_txq);
+> 
 
+Great! I presume you will send a patch separately?
 
-> diff --git a/Documentation/networking/pcs.rst b/Documentation/networking/pcs.rst
-> new file mode 100644
-> index 000000000000..4b41ba884160
-> --- /dev/null
-> +++ b/Documentation/networking/pcs.rst
-> @@ -0,0 +1,102 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=============
-> +PCS Subsystem
-> +=============
-> +
-> +The PCS (Physical Coding Sublayer) subsystem handles the registration and lookup
-> +of PCS devices. These devices contain the upper sublayers of the Ethernet
-> +physical layer, generally handling framing, scrambling, and encoding tasks. PCS
-> +devices may also include PMA (Physical Medium Attachment) components. PCS
-> +devices transfer data between the Link-layer MAC device, and the rest of the
-> +physical layer, typically via a serdes. The output of the serdes may be
-> +connected more-or-less directly to the medium when using fiber-optic or
-> +backplane connections (1000BASE-SX, 1000BASE-KX, etc). It may also communicate
-> +with a separate PHY (such as over SGMII) which handles the connection to the
-> +medium (such as 1000BASE-T).
-> +
-> +Looking up PCS Devices
-> +----------------------
-> +
-> +There are generally two ways to look up a PCS device. If the PCS device is
-> +internal to a larger device (such as a MAC or switch), and it does not share an
-> +implementation with an existing PCS, then it does not need to be registered with
-> +the PCS subsystem. Instead, you can populate a :c:type:`phylink_pcs`
-> +in your probe function. Otherwise, you must look up the PCS.
-> +
-> +If your device has a :c:type:`fwnode_handle`, you can add a PCS using the
-> +``pcs-handle`` property::
-> +
-> +    ethernet-controller {
-> +        // ...
-> +        pcs-handle = <&pcs>;
-> +        pcs-handle-names = "internal";
-> +    };
-> +
-> +Then, during your probe function, you can get the PCS using :c:func:`pcs_get`::
-
-It's preferable to use                               PCS using pcs_get()::
-instead of the :c:func: notation to make the .rst file more human-readable.
-They produce the same generated output.
-
-> +
-> +    mac->pcs = pcs_get(dev, "internal");
-> +    if (IS_ERR(mac->pcs)) {
-> +        err = PTR_ERR(mac->pcs);
-> +        return dev_err_probe(dev, "Could not get PCS\n");
-> +    }
-> +
-> +If your device doesn't have a :c:type:`fwnode_handle`, you can get the PCS
-> +based on the providing device using :c:func:`pcs_get_by_dev`. Typically, you
-
-ditto.
-
-> +will create the device and bind your PCS driver to it before calling this
-> +function. This allows reuse of an existing PCS driver.
-> +
-> +Once you are done using the PCS, you must call :c:func:`pcs_put`.
-
-ditto.
-
-> +
-> +Using PCS Devices
-> +-----------------
-> +
-> +To select the PCS from a MAC driver, implement the ``mac_select_pcs`` callback
-> +of :c:type:`phylink_mac_ops`. In this example, the PCS is selected for SGMII
-> +and 1000BASE-X, and deselected for other interfaces::
-> +
-> +    static struct phylink_pcs *mac_select_pcs(struct phylink_config *config,
-> +                                              phy_interface_t iface)
-> +    {
-> +        struct mac *mac = config_to_mac(config);
-> +
-> +        switch (iface) {
-> +        case PHY_INTERFACE_MODE_SGMII:
-> +        case PHY_INTERFACE_MODE_1000BASEX:
-> +            return mac->pcs;
-> +        default:
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +To do the same from a DSA driver, implement the ``phylink_mac_select_pcs``
-> +callback of :c:type:`dsa_switch_ops`.
-> +
-> +Writing PCS Drivers
-> +-------------------
-> +
-> +To write a PCS driver, first implement :c:type:`phylink_pcs_ops`. Then,
-> +register your PCS in your probe function using :c:func:`pcs_register`. If you
-
-ditto
-
-> +need to provide multiple PCSs for the same device, then you can pass specific
-> +firmware nodes using :c:macro:`pcs_register_full`.
-> +
-> +You must call :c:func:`pcs_unregister` from your remove function. You can avoid
-
-ditto.
-
-> +this step by registering with :c:func:`devm_pcs_unregister`.
-> +
-> +API Reference
-> +-------------
-> +
-> +.. kernel-doc:: include/linux/phylink.h
-> +   :identifiers: phylink_pcs phylink_pcs_ops pcs_validate pcs_inband_caps
-> +      pcs_enable pcs_disable pcs_pre_config pcs_post_config pcs_get_state
-> +      pcs_config pcs_an_restart pcs_link_up pcs_disable_eee pcs_enable_eee
-> +      pcs_pre_init
-> +
-> +.. kernel-doc:: include/linux/pcs.h
-> +   :internal:
-> +
-> +.. kernel-doc:: drivers/net/pcs/core.c
-> +   :export:
-> +
-> +.. kernel-doc:: drivers/net/pcs/core.c
-> +   :internal:
-
-Thanks.
-
--- 
-~Randy
+> 
+> 
+> 
+> --Jesper
+> 
+> 
 
 
