@@ -1,240 +1,205 @@
-Return-Path: <netdev+bounces-196716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C9BAD60A6
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:06:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96806AD60A4
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574181E113C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:06:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 116587A9BE0
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD6F23E355;
-	Wed, 11 Jun 2025 21:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303F023ABB9;
+	Wed, 11 Jun 2025 21:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqxUQzh6"
+	dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b="267jpaH2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FCC19A
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790D619A
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749675994; cv=none; b=T5yPWws0VmqOn6zhlrLc+fGvtBQZuQvkJo45VFg8cGJFWN2MgAoh3QiM3PuDcNwBbSMS2FZEZ0UoFDZhBUDmqZ0qWisJUWKAvmUIHqsJ2ji6B+uk113rvoeUJXqtZZlI8HmPDzxEMJ7HptU3UhEcq0yd/ZiF62CUfQhKRXKOHnk=
+	t=1749675846; cv=none; b=uYm4efD8blzulyPPJpMPAhutJYQ4amiPGczp7O8J+d9ZrddE74Vjuw/adYNFrufCx/ddRnvqiHcRtNusKW51wnbX6Oobj/5uHdvRVatkDPF+xWV8OffoDzWndmt9XxqABxXA15atJjCDv0P3SaiyMfOLptdXvL+zQfu3D7avtZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749675994; c=relaxed/simple;
-	bh=wvgAb2FqJAawbrjQjx2wJEGlkxQADIg2B0krO+/lfGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RivgAakk266LEEUez49rmlUwXS8nzn8wTR9lMTDnqFUSAL+t3HsHNe1nq2PELBgkS+BHgivPeoidWt1gXB5WxpgDhRV9hyaaZg3xlu162I+7ykX3Wg1xgQh7DbuEN+UMvEqKVdzgaUEaYrklLwHmKp8dG+XVhgyoamWkcRnhBQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqxUQzh6; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so357285b3a.0
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 14:06:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749675992; x=1750280792; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=43B3Wj+dfSFoXoBSfombz/oJnumxEkfSEIEr/e0BkJs=;
-        b=jqxUQzh6Kd5Dl9kgUvgO9L/q2T9VNl0CX//LJRP19SArUY9DUaRCg12SgjMh79iZz6
-         sfU87dpUq9MmN9fBgbJhyVvcdPd5Fqm/RhjXWFYA36EQ2DwJJ7oJhPvPkVAPKygWtY0Q
-         5KkMzx862/hRAEhRD/dAyL+HEWBL1/Kv3+CY9k5cpW+zV65r3K5ZWzU+qxqbcKjJRoeo
-         wAf5YVdb+OqmiyNEolLZ0nfm1P9gkkjC30aDoMYN50TvSoZzQk1uBa/BahqmMfdeHc1i
-         jPBqGe+baCM+rVp8siuR3uy31cVw125WEd+dfpmiHhDhSNvdrBWGZEECSKMYNNVLZUL6
-         8Wew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749675992; x=1750280792;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=43B3Wj+dfSFoXoBSfombz/oJnumxEkfSEIEr/e0BkJs=;
-        b=pJgCtAKUdYU9J+EPL4YEE2LKULND0bIKBnTRZZQSUg9K2ByEYCqBtFubizW+kFOHU+
-         Wi1KScS8VwvJlSDe/o2hh3pndQ+evVtuaEsfHMgn+UyUXozyG+SbjwW2XuhmE2Su+k2Q
-         Ai1YrNTuIN0pr1/RmEF9xXPplOTDOjz8IJbe/V1BLS+8PSumbMqm0JlCmWw2A436ukDk
-         mTHVpJ1secspKWzvt84ms+PL5hp96+P8YuG2DaN3pP4L2Gfvwum4qGKFeAIEBF8o+c7H
-         sjHRXjiWIgVxD7s56rtcGThrNIPPkFFF4d5q42rySaUhLEDs1ZC5rg8Rb0/GpWzRMpG3
-         2awg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHpPPNL4I7RGDWEth/bA+OgmF/OS/9JfYVC7LdBLWQipHR7Qv59PC7S49bMmEAArJSAZvs89I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPxDxyF2JA5glMBZfG0PxLIuaG6rBoIZd8q9o07itLWzIFac6b
-	2ShnZDMk559Qn2BOB+AdR0iezqNmbDeDY/3k5ahIOm8vDJd8F364gtc=
-X-Gm-Gg: ASbGncu7C8NdUboCJB6lNWUktvwLlZg0p+77cKezZF/246om8RHTfkRVXP84BDu6iRX
-	+kkwea4u7E0Bez/CSNx9AP83eTwNjtpZyGPyUAiikuECJANbsbzn5YvzH0H0s8oLcY17cz9XR1f
-	V3p114yE6FZWvqbjYn/wxSXW7SiEEMns5yoIq+WfhQCfRY4hqDHArdt2SVOvr7IZnbRF9swjOf6
-	8B9NsXMRPNaS0PI0w5ub+XXkfXIvCA2vyXqjd6v+W0/ly9xB2ifgV5UASW1lPKaJlU3AaDKyJ1G
-	d0nvrvGBPqyS++IcQfo1ycDUllSp61N6Iu5jGfc=
-X-Google-Smtp-Source: AGHT+IGQMyTtvtdVnTsrPdCeMtURnJ4RC3zZ8hAU2H7KlTBZWURnNvvocs9a9Q4K1iMaCUysIgGUBQ==
-X-Received: by 2002:a05:6a00:3a17:b0:742:aecc:c47c with SMTP id d2e1a72fcca58-7486cb480damr6909662b3a.7.1749675991408;
-        Wed, 11 Jun 2025 14:06:31 -0700 (PDT)
-Received: from fedora.. ([2601:647:6700:3390::c8d1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488087aa34sm11784b3a.12.2025.06.11.14.06.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 14:06:30 -0700 (PDT)
-From: Kuniyuki Iwashima <kuni1840@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	dsahern@gmail.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	idosch@nvidia.com,
-	kuniyu@google.com,
-	mlxsw@nvidia.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	petrm@nvidia.com,
-	razor@blackwall.org
-Subject: Re: [PATCH net-next 00/14] ipmr, ip6mr: Allow MC-routing locally-generated MC packets
-Date: Wed, 11 Jun 2025 14:03:20 -0700
-Message-ID: <20250611210629.3099711-1-kuni1840@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250611132320.53c5bebc@kernel.org>
-References: <20250611132320.53c5bebc@kernel.org>
+	s=arc-20240116; t=1749675846; c=relaxed/simple;
+	bh=X/oNfTwVvxRJTvcY4bXWod49oQGk+6oqNSmx+lW1Eek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f/ZuWIuuFS91aqO/41E3TtblPEx/sgiQp/gkqh11+BpHz0Gd6jYQ8zqUyqxFAwNUQXNo3qfbCM9wLGP/dwWD/EEF2vYgVMyGySy00pe4vzk51ixcxx4OLj7f1GUA7Net87hIIELZtvvZUDs2ZAUMx381AH19IPQdgVNfA0KDepw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu; spf=pass smtp.mailfrom=heusel.eu; dkim=pass (2048-bit key) header.d=heusel.eu header.i=christian@heusel.eu header.b=267jpaH2; arc=none smtp.client-ip=217.72.192.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heusel.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heusel.eu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heusel.eu;
+	s=s1-ionos; t=1749675836; x=1750280636; i=christian@heusel.eu;
+	bh=7kQRjfdNymvaTbY6Xo18TtLrInSfaTRdm5FoPKzCOVY=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=267jpaH2NOlgAZbYQW4ozmGlaPWV2kw9ZoneQZstzpNdijQIDvuGeJBPL8or0sEv
+	 1/9Tw80ziXzimAdVILnLkiN82HpSUSDQHywMG9eJXnI1CDib9f4MME6r5n6R55N+l
+	 9ClzQ3n02KYG5bbb9Ruan3veuAZXOnCsL+pYwdYm2Xe/X35JBDCEOOQS2okAwJ0mW
+	 LUsrgqQdh2auRBo2xAPYPjNnCA5FHEhfm02/6ltCCIgresC9KMidCk43ZpkonXZ+F
+	 viKQSzNvZLezd6EF6aJhBcUN0eOIEAMv1zh9oCtT+8Ajmo2S86t6+GGjQIvu5TZPB
+	 q160cjI5Y7gAUDUpRw==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from localhost ([89.244.90.56]) by mrelayeu.kundenserver.de
+ (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MJn8J-1u5JC92FPF-00Xcpj; Wed, 11 Jun 2025 23:03:56 +0200
+Date: Wed, 11 Jun 2025 23:03:52 +0200
+From: Christian Heusel <christian@heusel.eu>
+To: Kuniyuki Iwashima <kuni1840@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, =?utf-8?B?QW5kcsOp?= Almeida <andrealmeid@igalia.com>, 
+	netdev@vger.kernel.org, Jacek =?utf-8?Q?=C5=81uczak?= <difrost.kernel@gmail.com>
+Subject: Re: [PATCH v1 net] af_unix: Allow passing cred for embryo without
+ SO_PASSCRED/SO_PASSPIDFD.
+Message-ID: <a7a96192-9c45-496e-9bd5-130c6e4f7365@heusel.eu>
+References: <20250611202758.3075858-1-kuni1840@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3omltpkik7q4a6ln"
+Content-Disposition: inline
+In-Reply-To: <20250611202758.3075858-1-kuni1840@gmail.com>
+X-Provags-ID: V03:K1:iz+UjK40YL+GvkHBuFy0BapJhMJUjvOFI3iZkXMlIkp/p6Zhh0c
+ 4Tl472PPXZhVw6kspzBw4wHo25SPgmiGPfUuzmBBpzwl6tyx5uOFh2EHMw1EdpVv8ISIMNu
+ 7aibhAHoB01fSJibqIRp/G/C1xpW3E23OwFLPqD4Aq1+FpGMZ+3oGq9u8MZbogKa22U4WG0
+ hGWHibq2BY3vO6bQVyAgg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:W2r+fwJIYS4=;IV4yrVYZk8Mt5boQkpweI1RZFKv
+ cCoyr94R9qEz6qWMjANkhr5pqvJPE0On8hBI6cZrnDWnD4i0gA0aIaE6im2Gc3GGNiczT+hlh
+ t0nmKliiKaZQZ+MWtFApNHgWaLkzyaP/tcVukNaobmsGtyz4IL6kWiTeZ9FJmfUJdoAXouYZG
+ 63LvN91MSWBSGMssJ6uvD99cGiwomKbpE6oTMBjz69iutgDZeKobzHjkUPO8+FeTkUPP4jqLf
+ H8EYaGDW+0927Z0hIIZYFk484qzX+WaTHzJgTwgF01nfhknR4H3pV4pmYNtyTZp4wI+g32FeT
+ /7zYu0JJSjqVdjb5NdNCD5dWAJYzaSXU0/MSQFEMf822wIRQgPmyz8O5VCk4iJzSTR3aXvkEx
+ ifmXyNblLB7bnBetrXldfv6u7Woqu7VoYJPd74C0WEnhYM0WCg+J3TlXgmYUtqemRQNPBE7ul
+ Zs/InM8Y3u+EHGgV+RcH/FpnH9Nt0v3HdDrOdkyC2b0+NB/HHh+gksh/eCuWswiewVKpqNqw1
+ JgxHQuOVStRMfpWbqcobupx1rlWhIxgY1jqYKi+DpvUjHYIkHrLK658E3Epg7K6TuMts05vBY
+ hPj4EWFng4gVliaUlTbq5pUuQpYWpVUM0sG+ZymR1uUca4x3wOF0WiZkRlzsUROilMtm2LbPl
+ 6YeJ+ec0sv+71+J8rwP/hJkAAtuXxcz0n35YrGWpiOhVOodoFkWo9snqlzwmOr1z566xWoMPP
+ sticnBevkVtbn0U33/jTwcZymabxzYoyDtJjcwZhrcIj92owYgamFfMRts3dOgEpH7+8YbXba
+ vuKsl6FqTrh5ecJuUxISWMNv5R3w6wEv7AVfJwr4fKqmSHFNE9oepnMs2mf61BZNesE0UbCMW
+ M/ltJ+wUefyITjYGvZwZyc2Q9bhsQHH4U8Al7eAxoRUsJ/54ubZThbOivtZITgM8seCgDDS7u
+ OdKS69nb50iXelT7bxyo/S/GxmibmrDRFyeWVDo6xIRZkTRNFsku8fRwXjjxEK6axI85qnY2t
+ w9IQ5QecO2VTT/Pd3mSY3suwFfta7K5ydYRVOje/s7n7/KXL0O3QyKSzT2gf+0aVgvDm3zSYn
+ fC+zo+fsoi1SWx6HttXQ4VbF9a+ngXirbbPmzyl1Hy4N8aQCluaCOUN24oB125wIuYDzgrGvn
+ g24iGqgkuwFyNxtsyi7jpRa/8csRk3hql+C95Av832s/dS7ibrMGVRDkC6GYZ4c+fmRCICSJb
+ 6teHz2NS5su+ThqLi1JVHZidW4Zi2JyPJX2AqQsNCj83jfdMao8gtRPt/8scFxxULZ0GSk6m3
+ c5W56E+BRrKl5izI0Gu+qrve451esPhPDdu1ZB7YgM1KffK6i2AHjP/Ob6JIaYNuK43a8PhQZ
+ NEFByQ1l4zzuZ3XK1qwoGQLwosXgxFF4qEmfXsBUNl6vKW0hUzpALFs2HbzJ55RBoyKNgMY4U
+ 00b2Ucg==
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Wed, 11 Jun 2025 13:23:20 -0700
-> On Wed, 11 Jun 2025 17:30:15 +0200 Petr Machata wrote:
-> > Could it actually have been caused by another test? The howto page
-> > mentions that the CI is running the tests one at a time, so I don't
-> > suppose that's a possibility.
-> > 
-> > I'll try to run a more fuller suite tomorrow and star at the code a bit
-> > to see if I might be missing an error branch or something.
-> 
-> We also hit a crash in ipv6 fcnal.sh, too. Looks like this is either a
-> kmemleak false positive or possibly related to the rtnl changes in ipv6.
-> Either way I it's not related to you changes, sorry about that! :(
-> 
-> [ 2900.792890] BUG: kernel NULL pointer dereference, address: 0000000000000108
-> [ 2900.792961] #PF: supervisor read access in kernel mode
-> [ 2900.793017] #PF: error_code(0x0000) - not-present page
-> [ 2900.793053] PGD 8fd6067 P4D 8fd6067 PUD 6402067 PMD 0 
-> [ 2900.793097] Oops: Oops: 0000 [#1] SMP NOPTI
-> [ 2900.793127] CPU: 0 UID: 0 PID: 15652 Comm: nettest Not tainted 6.15.0-virtme #1 PREEMPT(voluntary) 
-> [ 2900.793200] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> [ 2900.793245] RIP: 0010:ip6_pol_route+0x286/0x4a0
 
-fwiw, my local syzkaller had the same splat on 6a325aed130b,
-where my IPv6 series hadn't landed, and syzbot had a similar
-one on f1b785f4c787, where my RTNL work was on the prep stage,
-so I think this is an old? bug :)
+--3omltpkik7q4a6ln
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 net] af_unix: Allow passing cred for embryo without
+ SO_PASSCRED/SO_PASSPIDFD.
+MIME-Version: 1.0
 
-I'll see if the .syz repro in the report still works on the latest.
+On 25/06/11 01:27PM, Kuniyuki Iwashima wrote:
+> From: Kuniyuki Iwashima <kuniyu@google.com>
+>=20
+> Before the cited commit, the kernel unconditionally embedded SCM
+> credentials to skb for embryo sockets even when both the sender
+> and listener disabled SO_PASSCRED and SO_PASSPIDFD.
+>=20
+> Now, the credentials are added to skb only when configured by the
+> sender or the listener.
+>=20
+> However, as reported in the link below, it caused a regression for
+> some programs that assume credentials are included in every skb,
+> but sometimes not now.
+>=20
+> The only problematic scenario would be that a socket starts listening
+> before setting the option.  Then, there will be 2 types of non-small
+> race window, where a client can send skb without credentials, which
+> the peer receives as an "invalid" message (and aborts the connection
+> it seems ?):
+>=20
+>   Client                    Server
+>   ------                    ------
+>                             s1.listen()  <-- No SO_PASS{CRED,PIDFD}
+>   s2.connect()
+>   s2.send()  <-- w/o cred
+>                             s1.setsockopt(SO_PASS{CRED,PIDFD})
+>   s2.send()  <-- w/  cred
+>=20
+> or
+>=20
+>   Client                    Server
+>   ------                    ------
+>                             s1.listen()  <-- No SO_PASS{CRED,PIDFD}
+>   s2.connect()
+>   s2.send()  <-- w/o cred
+>                             s3, _ =3D s1.accept()  <-- Inherit cred optio=
+ns
+>   s2.send()  <-- w/o cred                            but not set yet
+>=20
+>                             s3.setsockopt(SO_PASS{CRED,PIDFD})
+>   s2.send()  <-- w/  cred
+>=20
+> It's unfortunate that buggy programs depend on the behaviour,
+> but let's restore the previous behaviour.
+>=20
+> Fixes: 3f84d577b79d ("af_unix: Inherit sk_flags at connect().")
+> Reported-by: Jacek =C5=81uczak <difrost.kernel@gmail.com>
+> Closes: https://lore.kernel.org/all/68d38b0b-1666-4974-85d4-15575789c8d4@=
+gmail.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  net/unix/af_unix.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index fd6b5e17f6c4..87439d7f965d 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1971,7 +1971,8 @@ static void unix_maybe_add_creds(struct sk_buff *sk=
+b, const struct sock *sk,
+>  	if (UNIXCB(skb).pid)
+>  		return;
+> =20
+> -	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
+> +	if (unix_may_passcred(sk) || unix_may_passcred(other) ||
+> +	    !other->sk_socket) {
+>  		UNIXCB(skb).pid =3D get_pid(task_tgid(current));
+>  		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
+>  	}
+> --=20
+> 2.49.0
 
-syzbot:
-https://lore.kernel.org/netdev/67a21f26.050a0220.163cdc.0068.GAE@google.com/
+Tested-by: Christian Heusel <christian@heusel.eu>
 
-syzkaller:
----8<---
-BUG: unable to handle page fault for address: 00007f93e4d51a23
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 12cd4c067 P4D 125130067 PUD 0 
-Oops: Oops: 0000 [#1] SMP
-CPU: 1 UID: 0 PID: 2259 Comm: syz.2.555 Not tainted 6.15.0-rc1-00220-g6a325aed130b #2 PREEMPT(voluntary)  fb2957dd255dfc2983199dfa2ccdedc09370f316
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:23 [inline]
-RIP: 0010:raw_atomic_read include/linux/atomic/atomic-arch-fallback.h:457 [inline]
-RIP: 0010:atomic_read include/linux/atomic/atomic-instrumented.h:33 [inline]
-RIP: 0010:rt_genid_ipv6 include/net/net_namespace.h:537 [inline]
-RIP: 0010:rt6_is_valid net/ipv6/route.c:1435 [inline]
-RIP: 0010:rt6_get_pcpu_route net/ipv6/route.c:1445 [inline]
-RIP: 0010:ip6_pol_route+0x301/0x9d0 net/ipv6/route.c:2298
-Code: a9 fe 4d 85 ff 4c 8b 74 24 10 74 3b 41 8b 9f 98 00 00 00 31 ff 89 de e8 3d 37 a9 fe 85 db 74 33 49 8b 07 48 8b 80 08 01 00 00 <8b> a8 24 0a 00 00 89 df 89 ee e8 f0 34 a9 fe 39 eb 75 20 e8 67 33
-RSP: 0018:ffa0000000c3ba20 EFLAGS: 00010202
-RAX: 00007f93e4d50fff RBX: 000000001ac62540 RCX: 0000000000000002
-RDX: ff11000005e99700 RSI: 000000001ac62540 RDI: 0000000000000000
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000ffff0000 R11: 0000000000000002 R12: ffffffff829af127
-R13: 0000000000000000 R14: ff110001053e2580 R15: ff1100012505f400
-FS:  00007f190e8276c0(0000) GS:ff110001b79d2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f93e4d51a23 CR3: 000000011d7b5004 CR4: 0000000000771ef0
-DR0: 0000000080000001 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000600
-PKRU: 80000000
-Call Trace:
- <TASK>
- pol_lookup_func include/net/ip6_fib.h:616 [inline]
- fib6_rule_lookup+0xe8/0x2a0 net/ipv6/fib6_rules.c:120
- ip6_route_output_flags_noref net/ipv6/route.c:2673 [inline]
- ip6_route_output_flags+0x188/0x260 net/ipv6/route.c:2685
- ip6_route_output include/net/ip6_route.h:93 [inline]
- ip6_dst_lookup_tail+0x9a/0x7d0 net/ipv6/ip6_output.c:1128
- ip6_dst_lookup_flow+0x47/0xe0 net/ipv6/ip6_output.c:1259
- tcp_v6_connect+0x50c/0x8e0 net/ipv6/tcp_ipv6.c:277
- mptcp_connect+0x389/0x680 net/mptcp/protocol.c:3683
- __inet_stream_connect+0x11f/0x5c0 net/ipv4/af_inet.c:677
- inet_stream_connect+0x36/0x50 net/ipv4/af_inet.c:748
- __sys_connect_file net/socket.c:2038 [inline]
- __sys_connect+0x17b/0x220 net/socket.c:2057
- __do_sys_connect net/socket.c:2063 [inline]
- __se_sys_connect net/socket.c:2060 [inline]
- __x64_sys_connect+0x1c/0x20 net/socket.c:2060
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xc8/0x1a0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-RIP: 0033:0x7f19101bd169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f190e827038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f19103d5fa0 RCX: 00007f19101bd169
-RDX: 000000000000001c RSI: 0000200000000000 RDI: 0000000000000004
-RBP: 00007f191023e730 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f19103d5fa0 R15: 00007f19104ffa28
- </TASK>
-Modules linked in:
-CR2: 00007f93e4d51a23
----[ end trace 0000000000000000 ]---
-RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:23 [inline]
-RIP: 0010:raw_atomic_read include/linux/atomic/atomic-arch-fallback.h:457 [inline]
-RIP: 0010:atomic_read include/linux/atomic/atomic-instrumented.h:33 [inline]
-RIP: 0010:rt_genid_ipv6 include/net/net_namespace.h:537 [inline]
-RIP: 0010:rt6_is_valid net/ipv6/route.c:1435 [inline]
-RIP: 0010:rt6_get_pcpu_route net/ipv6/route.c:1445 [inline]
-RIP: 0010:ip6_pol_route+0x301/0x9d0 net/ipv6/route.c:2298
-Code: a9 fe 4d 85 ff 4c 8b 74 24 10 74 3b 41 8b 9f 98 00 00 00 31 ff 89 de e8 3d 37 a9 fe 85 db 74 33 49 8b 07 48 8b 80 08 01 00 00 <8b> a8 24 0a 00 00 89 df 89 ee e8 f0 34 a9 fe 39 eb 75 20 e8 67 33
-RSP: 0018:ffa0000000c3ba20 EFLAGS: 00010202
-RAX: 00007f93e4d50fff RBX: 000000001ac62540 RCX: 0000000000000002
-RDX: ff11000005e99700 RSI: 000000001ac62540 RDI: 0000000000000000
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000ffff0000 R11: 0000000000000002 R12: ffffffff829af127
-R13: 0000000000000000 R14: ff110001053e2580 R15: ff1100012505f400
-FS:  00007f190e8276c0(0000) GS:ff110001b79d2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f93e4d51a23 CR3: 000000011d7b5004 CR4: 0000000000771ef0
-DR0: 0000000080000001 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000600
-PKRU: 80000000
-----------------
-Code disassembly (best guess):
-   0:	a9 fe 4d 85 ff       	test   $0xff854dfe,%eax
-   5:	4c 8b 74 24 10       	mov    0x10(%rsp),%r14
-   a:	74 3b                	je     0x47
-   c:	41 8b 9f 98 00 00 00 	mov    0x98(%r15),%ebx
-  13:	31 ff                	xor    %edi,%edi
-  15:	89 de                	mov    %ebx,%esi
-  17:	e8 3d 37 a9 fe       	call   0xfea93759
-  1c:	85 db                	test   %ebx,%ebx
-  1e:	74 33                	je     0x53
-  20:	49 8b 07             	mov    (%r15),%rax
-  23:	48 8b 80 08 01 00 00 	mov    0x108(%rax),%rax
-* 2a:	8b a8 24 0a 00 00    	mov    0xa24(%rax),%ebp <-- trapping instruction
-  30:	89 df                	mov    %ebx,%edi
-  32:	89 ee                	mov    %ebp,%esi
-  34:	e8 f0 34 a9 fe       	call   0xfea93529
-  39:	39 eb                	cmp    %ebp,%ebx
-  3b:	75 20                	jne    0x5d
-  3d:	e8                   	.byte 0xe8
-  3e:	67                   	addr32
-  3f:	33                   	.byte 0x33
----8<---
+--3omltpkik7q4a6ln
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEb3ea3iR6a4oPcswTwEfU8yi1JYUFAmhJ7zgACgkQwEfU8yi1
+JYU19xAAgnDvJ2VrhrdVI2ra0MlvKv8EEp1Jga1UBd5wGUBDiyB3HNiTkKSLshJ8
+37QE+PVZHtABva176eda22//9VZsw/tpZuplMQdBDaa2CcdgrJvvevjgrF4fG7pU
+3ybKVkXHnn8t4wWGCbj6tRtEd9WNAj/uaC+yrUwLqReAAZsFF/WTakdD2DPBJg0c
+p6x/AJ89X3vIImwbBQhpbotwGdXFFD2xZPFbvD+DHlseplX2mLKOQUY9JKsOgo8z
+pJ2wgH4vf02yqVg1n3tDQnXvnMkFCA1I3Lpc7GQDP7AOCuB7fjpVMn1KHB0tvl0P
+PsQFmvNH2FG1/JZKKXU+2hjxRly6XPk3lLEOB2d02FJ5FE4lDCDy5bcfnli0dg5h
+KTXA9QLrJu/+C30OgsQPakNKPqxSfYRRwyt+ofgKqJVB/RuLLERqeVC3Pf4xGBGE
+HXHWw2oxQJC5zPxiEG5DvjfFiZb6bA2IgttfCX8ctx0hzMhA6k8bzpxwnG68QTxj
+vKXwN5DJxoM+U/HwNUX4fmXu9JTzJKb8kTNnn5sCStf7Bh85l63SqXfMIkFt4zcc
+s70780TcipcQ27jtuADzf1RQEXlk3bjwbkYAOyXs/tMnyb0nG3HL9H4M0s7b0wuZ
+HS+XQsrjrUXh+J6GBSC9tse0BzWivm1vH/1gFWF5/cRYIWqECBw=
+=FKxS
+-----END PGP SIGNATURE-----
+
+--3omltpkik7q4a6ln--
 
