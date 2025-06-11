@@ -1,184 +1,141 @@
-Return-Path: <netdev+bounces-196551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CADC3AD53E8
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:29:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A234BAD5418
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7D63AA1A6
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:28:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9BBE3A3E08
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5363525BF0D;
-	Wed, 11 Jun 2025 11:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5BE23F404;
+	Wed, 11 Jun 2025 11:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bqRMK5x5"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="tD8xfmPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FCA25BF07
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2D92E611B;
+	Wed, 11 Jun 2025 11:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749641339; cv=none; b=upkGSXctIYUB93rCxxGRO+yq4LtzwlgowDY8mVifEIUU6B746opxyR706bF4QJFOHfU1/vkubXIX/VNF8uai/QmRDxG41Ktvt9KqTv7JBsZRmuqwV4jfHKd4Epo9N1z/woJDYJcT1yGjt+M7oe5/VkW3fSq4HIa3T19lRODXAbk=
+	t=1749641741; cv=none; b=OVjr0vvFaHlTtHAe2NVm/ZyD74/3sV53FCnHEnZec6ORbq80QCMJ2G5ljjPAZaupED9YoGiVe3U7Y6V+0ab9jTN/D9/avtTTKZ20MhXPweB0kFjNbbwZGSWUMHgZVWA5cZH+owGymHJmDglgIUCoVRixstvrBx2eTIdhomppguU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749641339; c=relaxed/simple;
-	bh=+iNUH6xk43jcmXrRewwpOfXNqzB8sirT6mgDhM17CMg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uoHU2qqnDM1FwULrcwh4Vi/opYXCSmhcikVwSuj2Ie0tw4R6puOmEpGMRBp/Ut4LpM0XA3nIjjtcNdUi8HtvXa3/KfG6omZ+h6mB3PL4N0fopxt0L1Uk0bsthB2FY/juxW5iwrtFPKOwXhT6BACE4mMofTB9WqgBgLD/PDMqKDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bqRMK5x5; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5a196f057so140105541cf.3
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 04:28:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749641336; x=1750246136; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2oh04zvqs+YSpNUtfn7HOfxHy42uR0hcqa9/M7g8Y2c=;
-        b=bqRMK5x5En614C6WpK0lj3+7vxEWVcHPV4YrM+OJbdsBxNlgKdJpxRvSTrmg4QjNH7
-         6rL7G8qtXI93KFno3dAVV26nNWGdDzxCC7Ka57R7ft+jLZajG2/SjzELDWBUCJ0YcTs3
-         BXsW1UKJR+PQ3gt346uY1RoBw/Azs5FrnRGDKqVniOiyXfq3d1PRZQQAT9baeU9wa7rw
-         4cmMC0+ybyYMwv72z4Qn+1V5pLsisi1+sww298AB1DWBKBfyLX3Ae/7hquZSIm6ZK9iu
-         V2Z7IQ8AC1J6OikB/3gg6bIvDZes0uJWavQe54zYmCjlaJmbnXmInICQ+wHUXO1jtmOX
-         LH0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749641336; x=1750246136;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2oh04zvqs+YSpNUtfn7HOfxHy42uR0hcqa9/M7g8Y2c=;
-        b=oZjGc4qQrB8sFJDZ6RrH0ggMRjWBzf44yLNfHRXunKP8x8Uw2UxcdvxlARqhGQPJNW
-         jtKmPDD27uwbvUYNfxYEgB+gaZEv+CXBnPY3nD+7TikXASAMVduP4aJho689w/DuwxsY
-         Dm8dA2tDTAceRvgLSFKo/5SqhikdlE9DaWNptc3Hr8Dgp1UyHQQL83M4/Ed5U3SeRh8r
-         seb65ECkwNevem2biRhSI1mPFJup1mtUJzm+GBLLUF4l2zpJiVAJFJSel8Eq0yrk/gN8
-         sI4JLDPmuEWC5ZAb3F/nBYsnC+8NrKoJhQqKUlJhYQmTsdMXT31A6YH0LdnmlDVRgK3m
-         KuCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOTCtrANfGZuNbC1DymSwCdT/7nC+0hdEAnnt1cryw5w5L/WstJSBpJniRHcS5zWIblbk/ER4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdPEKeidO8RNhbfvD7Dq0OUdzRIsl75odkAv4RcTi9rNcWsMQw
-	Z47OB+urPqaFOv+EIuNhOL5dOl/Vzz2iaRVaDN8GRfxm0txd/gzToXA9vdI7l5TW94IiA7iDABY
-	iYeJME1279cxFsqi49FYe+GyHFKIVxfUbD0iuJ6+0
-X-Gm-Gg: ASbGncvh7BbzkfMQLHDO4YkXy2RAwc6uAL9l7em+tRh1frJaObJD1gk2MAoNmed1SNs
-	SCKWU5yAYYMWfNjAdurxXjixqmsL0RaZkK0Nfb8s6SZJAs9NUSxHfcHAn24OgTSDTylG1sAPZW9
-	e77Wgc9go5CLJka5VqtCDzEV+F8bqSipLTHeDpBu/bPsILiqxyMxuXfmcqkShzp9DCqkG+xBytf
-	25qPQ==
-X-Google-Smtp-Source: AGHT+IEDMWCOnvibZp/kL4/gsW/5pDpxCVdSGMg7O3Et0QKbIvK99zOhpIYPM9+9N1FjoDNw/aYS78l4sgXpYYz1eUc=
-X-Received: by 2002:a05:622a:1b1f:b0:476:7199:4da1 with SMTP id
- d75a77b69052e-4a714c6be41mr42108551cf.46.1749641336168; Wed, 11 Jun 2025
- 04:28:56 -0700 (PDT)
+	s=arc-20240116; t=1749641741; c=relaxed/simple;
+	bh=gdzkfF2i2Tltnxp3wCW3EYmYB3Ip+td0r7l4VMxs5ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iGyPs9UN46sbz1shp7JDfnZhtTnNkHwL0jq2ah9FbFO5dORCpt8rm40uWpzPOe8oVQJ49B3XHvH+Dw2NTanuCGXexG80wMAQJOG4RwAAUfQEQh1b0tQw6npY4kQMfNuzzRLRKFXAPGY9vytlyCtjcvrDlYEy83J5J5fjWBGW1+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=tD8xfmPi; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 679F52115190; Wed, 11 Jun 2025 04:35:39 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 679F52115190
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1749641739;
+	bh=yTM0EgThVZQxa2c0e+/uF2mVqguQ/f7u3RX7IVxP8Ho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tD8xfmPinXTIogxftAkkmwRRNqSWjiDqnrdFyJPG4ZhaaaXpwiPD/YjxcBDDUVZzx
+	 7gi5WUQDUWJZQ1TI/94+3m6IkjT/I2JXb+8RycBqK7POrXWUBipwXeNFCxjqt4OZUo
+	 4Hk0koikSo3CIk3lciY1GvcNO/DZNErd2CK+Qek8=
+Date: Wed, 11 Jun 2025 04:35:39 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	kotaranov@microsoft.com, longli@microsoft.com, horms@kernel.org,
+	shirazsaleem@microsoft.com, leon@kernel.org,
+	shradhagupta@linux.microsoft.com, schakrabarti@linux.microsoft.com,
+	rosenp@gmail.com, sdf@fomichev.me, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] net: mana: Handle unsupported HWC commands
+Message-ID: <20250611113539.GB4690@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1749631576-2517-1-git-send-email-ernis@linux.microsoft.com>
+ <1749631576-2517-5-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aElUZyKy7x66X3SD@v4bel-B760M-AORUS-ELITE-AX> <CANn89iJiLKn8Nb8mnTHowBM3UumJQrwKHPam0JYGfo482DoE-w@mail.gmail.com>
- <aElna+n07/Jrfxlh@v4bel-B760M-AORUS-ELITE-AX>
-In-Reply-To: <aElna+n07/Jrfxlh@v4bel-B760M-AORUS-ELITE-AX>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Jun 2025 04:28:44 -0700
-X-Gm-Features: AX0GCFufjfb5MyqDJn3P1TmPLjOv--LQ0BxiHEctFAonMYvTWKY1idwtOAmX5_s
-Message-ID: <CANn89i+Lp5n-+TQHLg1=1FauDt45w0P3mneZaiWD7gRnFesVpg@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: fix use-after-free in taprio_dev_notifier
-To: Hyunwoo Kim <imv4bel@gmail.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, vinicius.gomes@intel.com, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	v4bel@theori.io
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1749631576-2517-5-git-send-email-ernis@linux.microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Jun 11, 2025 at 4:24=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com> wro=
-te:
->
-> On Wed, Jun 11, 2025 at 04:01:50AM -0700, Eric Dumazet wrote:
-> > On Wed, Jun 11, 2025 at 3:03=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com>=
- wrote:
-> > >
-> > > Since taprio=E2=80=99s taprio_dev_notifier() isn=E2=80=99t protected =
-by an
-> > > RCU read-side critical section, a race with advance_sched()
-> > > can lead to a use-after-free.
-> > >
-> > > Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
-> > >
-> > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> >
-> > Looks good to me, but we need a Fixes: tag and/or a CC: stable@ o make
-> > sure this patch reaches appropriate stable trees.
->
-> Understood. I will submit the v2 patch after adding the tags.
+On Wed, Jun 11, 2025 at 01:46:16AM -0700, Erni Sri Satya Vennela wrote:
+> If any of the HWC commands are not recognized by the
+> underlying hardware, the hardware returns the response
+> header status of -1. Log the information using
+> netdev_info_once to avoid multiple error logs in dmesg.
+> 
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/hw_channel.c |  4 ++++
+>  drivers/net/ethernet/microsoft/mana/mana_en.c    | 11 +++++++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> index a8c4d8db75a5..70c3b57b1e75 100644
+> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> @@ -890,6 +890,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+>  	}
+>  
+>  	if (ctx->status_code && ctx->status_code != GDMA_STATUS_MORE_ENTRIES) {
+> +		if (ctx->status_code == -1) {
+Minor comment: instead of == -1 could use some macro like GDMA_STATUS_CMD_UNSUPPORTED, rest LGTM.
 
-Thanks, please wait ~24 hours (as described in
-Documentation/process/maintainer-netdev.rst )
-
+> +			err = -EOPNOTSUPP;
+> +			goto out;
+> +		}
+>  		dev_err(hwc->dev, "HWC: Failed hw_channel req: 0x%x\n",
+>  			ctx->status_code);
+>  		err = -EPROTO;
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index d5644400e71f..10e766c73fca 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -847,6 +847,9 @@ static int mana_send_request(struct mana_context *ac, void *in_buf,
+>  	err = mana_gd_send_request(gc, in_len, in_buf, out_len,
+>  				   out_buf);
+>  	if (err || resp->status) {
+> +		if (err == -EOPNOTSUPP)
+> +			return err;
+> +
+>  		dev_err(dev, "Failed to send mana message: %d, 0x%x\n",
+>  			err, resp->status);
+>  		return err ? err : -EPROTO;
+> @@ -1251,6 +1254,10 @@ int mana_query_link_cfg(struct mana_port_context *apc)
+>  				sizeof(resp));
+>  
+>  	if (err) {
+> +		if (err == -EOPNOTSUPP) {
+> +			netdev_info_once(ndev, "MANA_QUERY_LINK_CONFIG not supported\n");
+> +			return err;
+> +		}
+>  		netdev_err(ndev, "Failed to query link config: %d\n", err);
+>  		return err;
+>  	}
+> @@ -1293,6 +1300,10 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
+>  				sizeof(resp));
+>  
+>  	if (err) {
+> +		if (err == -EOPNOTSUPP) {
+> +			netdev_info_once(ndev, "MANA_SET_BW_CLAMP not supported\n");
+> +			return err;
+> +		}
+>  		netdev_err(ndev, "Failed to set bandwidth clamp for speed %u, err = %d",
+>  			   speed, err);
+>  		return err;
+> -- 
+> 2.34.1
 >
-> >
-> > Also please CC the author of the  patch.
->
-> Does =E2=80=9CCC=E2=80=9D here refer to a patch tag, or to the email=E2=
-=80=99s cc? And by
-> =E2=80=9Cpatch author=E2=80=9D you mean the author of the patch
-> fed87cc6718ad5f80aa739fee3c5979a8b09d3a6, right?
 
-Exactly. Blamed patch author.
-
->
-> >
-> > It seems bug came with
-> >
-> > commit fed87cc6718ad5f80aa739fee3c5979a8b09d3a6
-> > Author: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > Date:   Tue Feb 7 15:54:38 2023 +0200
-> >
-> >     net/sched: taprio: automatically calculate queueMaxSDU based on TC
-> > gate durations
-> >
-> >
-> >
-> >
-> > > ---
-> > >  net/sched/sch_taprio.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> > > index 14021b812329..bd2b02d1dc63 100644
-> > > --- a/net/sched/sch_taprio.c
-> > > +++ b/net/sched/sch_taprio.c
-> > > @@ -1320,6 +1320,7 @@ static int taprio_dev_notifier(struct notifier_=
-block *nb, unsigned long event,
-> > >         if (event !=3D NETDEV_UP && event !=3D NETDEV_CHANGE)
-> > >                 return NOTIFY_DONE;
-> > >
-> > > +       rcu_read_lock();
-> > >         list_for_each_entry(q, &taprio_list, taprio_list) {
-> > >                 if (dev !=3D qdisc_dev(q->root))
-> > >                         continue;
-> > > @@ -1328,16 +1329,17 @@ static int taprio_dev_notifier(struct notifie=
-r_block *nb, unsigned long event,
-> > >
-> > >                 stab =3D rtnl_dereference(q->root->stab);
-> > >
-> > > -               oper =3D rtnl_dereference(q->oper_sched);
-> > > +               oper =3D rcu_dereference(q->oper_sched);
-> > >                 if (oper)
-> > >                         taprio_update_queue_max_sdu(q, oper, stab);
-> > >
-> > > -               admin =3D rtnl_dereference(q->admin_sched);
-> > > +               admin =3D rcu_dereference(q->admin_sched);
-> > >                 if (admin)
-> > >                         taprio_update_queue_max_sdu(q, admin, stab);
-> > >
-> > >                 break;
-> > >         }
-> > > +       rcu_read_unlock();
-> > >
-> > >         return NOTIFY_DONE;
-> > >  }
-> > > --
-> > > 2.34.1
-> > >
+Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
