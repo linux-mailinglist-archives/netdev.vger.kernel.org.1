@@ -1,174 +1,184 @@
-Return-Path: <netdev+bounces-196550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D23AD53CF
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:25:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CADC3AD53E8
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1FD11886838
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:25:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7D63AA1A6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDAD241116;
-	Wed, 11 Jun 2025 11:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5363525BF0D;
+	Wed, 11 Jun 2025 11:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7aDMJ5n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bqRMK5x5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CC3255F5C
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FCA25BF07
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749641075; cv=none; b=pTli4BhP0ld4Emv04BqM067aO3RnbxFXNvvfdhexdev+R1CKgqWeBV9rRTjBz1a6AakAr/4pj2rRTjYWSVlkwPCwVxoNRVcJY/ppC8VErL4ZAg2QNtiBBIXgiTDiNuPw+dGkrtc5WZ+kEhpxFtashUXfYxRROlG5IitlyTlj3oE=
+	t=1749641339; cv=none; b=upkGSXctIYUB93rCxxGRO+yq4LtzwlgowDY8mVifEIUU6B746opxyR706bF4QJFOHfU1/vkubXIX/VNF8uai/QmRDxG41Ktvt9KqTv7JBsZRmuqwV4jfHKd4Epo9N1z/woJDYJcT1yGjt+M7oe5/VkW3fSq4HIa3T19lRODXAbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749641075; c=relaxed/simple;
-	bh=n2sCuIGW6nUSRAdvVdyxbrqbUYkNbc6C4w7kUS6xJB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LU9hHp9aBD7ZzrSIEpoXL2jkW+s9O2TOTDxcYihBw7LrrQoJ/p+OnflSQZxkwxJFq94GCDzXHEC++B4HfJ+KZBdVaaUJMwAN0A75xEcK8xehu4J+arkMVo3TosqUpOAFyVXVdRUcq4AH3Zi/ykHM6xlONxK0WNF8SezXT7C0B58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7aDMJ5n; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-afc857702d1so5337517a12.3
-        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 04:24:33 -0700 (PDT)
+	s=arc-20240116; t=1749641339; c=relaxed/simple;
+	bh=+iNUH6xk43jcmXrRewwpOfXNqzB8sirT6mgDhM17CMg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uoHU2qqnDM1FwULrcwh4Vi/opYXCSmhcikVwSuj2Ie0tw4R6puOmEpGMRBp/Ut4LpM0XA3nIjjtcNdUi8HtvXa3/KfG6omZ+h6mB3PL4N0fopxt0L1Uk0bsthB2FY/juxW5iwrtFPKOwXhT6BACE4mMofTB9WqgBgLD/PDMqKDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bqRMK5x5; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5a196f057so140105541cf.3
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 04:28:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749641073; x=1750245873; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=01q9lmBrR4WkJt3VKlEY17LHa4ar7JHvakmVAsN7gv4=;
-        b=W7aDMJ5njAYK2NOGkA1/c+OACsPzujGTs4kovrKaGU780fvmD6R6Q/DO6bklBWlkAU
-         WofPFbo9+7bx8dbWQksIoCLcuEuCIid5ByhdOuUgm1Oo7U4oz/1LRUXSBLZHEBPSewYf
-         9t723pvP46yUo1QlvQV2CEUUpt4VpCI9yOEH0tKe6NCCPiHMUK0yCs4aSUOWAYm9vIB5
-         nI54MJF6lQqDEllUksunTDhSm0jnuPNP/s4TymzGhV4orvrWcJy3VRa7XYZSjBHlIxgl
-         4qHulSEA+dldBvqx6QuPbUmjZQo9/XYGzJ3rpCUyAl0SriARI0LjiyFuCJzGRHgmvu0r
-         OiRg==
+        d=google.com; s=20230601; t=1749641336; x=1750246136; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2oh04zvqs+YSpNUtfn7HOfxHy42uR0hcqa9/M7g8Y2c=;
+        b=bqRMK5x5En614C6WpK0lj3+7vxEWVcHPV4YrM+OJbdsBxNlgKdJpxRvSTrmg4QjNH7
+         6rL7G8qtXI93KFno3dAVV26nNWGdDzxCC7Ka57R7ft+jLZajG2/SjzELDWBUCJ0YcTs3
+         BXsW1UKJR+PQ3gt346uY1RoBw/Azs5FrnRGDKqVniOiyXfq3d1PRZQQAT9baeU9wa7rw
+         4cmMC0+ybyYMwv72z4Qn+1V5pLsisi1+sww298AB1DWBKBfyLX3Ae/7hquZSIm6ZK9iu
+         V2Z7IQ8AC1J6OikB/3gg6bIvDZes0uJWavQe54zYmCjlaJmbnXmInICQ+wHUXO1jtmOX
+         LH0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749641073; x=1750245873;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=01q9lmBrR4WkJt3VKlEY17LHa4ar7JHvakmVAsN7gv4=;
-        b=bCYesJQzNKfeDNhp2Zk6RoXhKvf5nQiYHSZPhWTC/5AK8f3nxiXq+zJ/Q1HLZpEhBa
-         QaiU0oF/xZhu9UnvgUgwQn+BhJtZ9o3kWFZYu3wmGRkHDQippCsFrxvPJukNc8kU135B
-         Jj+7w1h36p0p7+07QvupUJUN+xJWPDTqPmLqI2x1guLZdzgNQF+zVmk9cjgieVoQpd3+
-         x8caO83m0lzkrYxGjvNkSRue2OQotzpVZXEUWeQScjmCOtVo0s+6YGy0nqwMLg+JByPT
-         fuO3VW5jySULJzOebwnSf3n+qHlU7+Rhn0j9toVmi4nFDXk9p8sC3Cgr4QoRquF/vs6T
-         O3cA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2LGmtL3YEwWpgFNvZ2jhuP92YKM2gyOuLl/JO0yaGcdVgtonMHGEuUBgZMVvevgD7/UB4mz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytU2J5Mk1wfMUPfJuC82JS2UZ8jiahkc/JObf+V4Fw03c3LGa0
-	kqcfx5egbA6DQ8BzAyae2ZVv6WpZ4lu1f6Wa0nc56+qb6OPGR2D7rMZA
-X-Gm-Gg: ASbGncvpZEKdRwbg6z++f7CPmU+Cc1opv4fF2rt8T96zWh7IQd2MkIRrJ5WBZ5k8ebN
-	OIQWm6KyMq2EpqUbSO/dDqCOMNWZx1rODU9hrdW9VaFdJ9oO5mqlAbPYFbjFIC6feCWc2V7+9Ii
-	RHxGkGx9vANIkw8iWzz+CRBc8Lux3fwWF+0yapFzYriFgn4DwrZCaAB37tcIGiJJqXAd//Jk7bu
-	2hTxt2YaOBTRURtqY9rrJzvMNJkiipcOloBpTxsZmG/8t5EVUSXY8lNZUaLju84Al4aF+n7bg83
-	T/MLCGYS1MGxH6ItFeJrRd6Ud2inv1lnGvn+QH3Wng9lBnJo9fxCxd0kdAvIW9hVju49VxbNwLh
-	ld1IGy5FFPDaw
-X-Google-Smtp-Source: AGHT+IHtSTT6gNjQJsf1d4CouuOm5NNb+EWVYo6p/YYkc7VkSHh8H4SO2Dlk2gJ4e0RZF1vzySsDSw==
-X-Received: by 2002:a17:90b:3510:b0:308:7270:d6ea with SMTP id 98e67ed59e1d1-313af22d60bmr4237615a91.30.1749641072797;
-        Wed, 11 Jun 2025 04:24:32 -0700 (PDT)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313b20078b1sm1190627a91.14.2025.06.11.04.24.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jun 2025 04:24:32 -0700 (PDT)
-Date: Wed, 11 Jun 2025 07:24:27 -0400
-From: Hyunwoo Kim <imv4bel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, vinicius.gomes@intel.com,
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org, v4bel@theori.io,
-	imv4bel@gmail.com
-Subject: Re: [PATCH] net/sched: fix use-after-free in taprio_dev_notifier
-Message-ID: <aElna+n07/Jrfxlh@v4bel-B760M-AORUS-ELITE-AX>
-References: <aElUZyKy7x66X3SD@v4bel-B760M-AORUS-ELITE-AX>
- <CANn89iJiLKn8Nb8mnTHowBM3UumJQrwKHPam0JYGfo482DoE-w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1749641336; x=1750246136;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2oh04zvqs+YSpNUtfn7HOfxHy42uR0hcqa9/M7g8Y2c=;
+        b=oZjGc4qQrB8sFJDZ6RrH0ggMRjWBzf44yLNfHRXunKP8x8Uw2UxcdvxlARqhGQPJNW
+         jtKmPDD27uwbvUYNfxYEgB+gaZEv+CXBnPY3nD+7TikXASAMVduP4aJho689w/DuwxsY
+         Dm8dA2tDTAceRvgLSFKo/5SqhikdlE9DaWNptc3Hr8Dgp1UyHQQL83M4/Ed5U3SeRh8r
+         seb65ECkwNevem2biRhSI1mPFJup1mtUJzm+GBLLUF4l2zpJiVAJFJSel8Eq0yrk/gN8
+         sI4JLDPmuEWC5ZAb3F/nBYsnC+8NrKoJhQqKUlJhYQmTsdMXT31A6YH0LdnmlDVRgK3m
+         KuCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWOTCtrANfGZuNbC1DymSwCdT/7nC+0hdEAnnt1cryw5w5L/WstJSBpJniRHcS5zWIblbk/ER4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdPEKeidO8RNhbfvD7Dq0OUdzRIsl75odkAv4RcTi9rNcWsMQw
+	Z47OB+urPqaFOv+EIuNhOL5dOl/Vzz2iaRVaDN8GRfxm0txd/gzToXA9vdI7l5TW94IiA7iDABY
+	iYeJME1279cxFsqi49FYe+GyHFKIVxfUbD0iuJ6+0
+X-Gm-Gg: ASbGncvh7BbzkfMQLHDO4YkXy2RAwc6uAL9l7em+tRh1frJaObJD1gk2MAoNmed1SNs
+	SCKWU5yAYYMWfNjAdurxXjixqmsL0RaZkK0Nfb8s6SZJAs9NUSxHfcHAn24OgTSDTylG1sAPZW9
+	e77Wgc9go5CLJka5VqtCDzEV+F8bqSipLTHeDpBu/bPsILiqxyMxuXfmcqkShzp9DCqkG+xBytf
+	25qPQ==
+X-Google-Smtp-Source: AGHT+IEDMWCOnvibZp/kL4/gsW/5pDpxCVdSGMg7O3Et0QKbIvK99zOhpIYPM9+9N1FjoDNw/aYS78l4sgXpYYz1eUc=
+X-Received: by 2002:a05:622a:1b1f:b0:476:7199:4da1 with SMTP id
+ d75a77b69052e-4a714c6be41mr42108551cf.46.1749641336168; Wed, 11 Jun 2025
+ 04:28:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJiLKn8Nb8mnTHowBM3UumJQrwKHPam0JYGfo482DoE-w@mail.gmail.com>
+References: <aElUZyKy7x66X3SD@v4bel-B760M-AORUS-ELITE-AX> <CANn89iJiLKn8Nb8mnTHowBM3UumJQrwKHPam0JYGfo482DoE-w@mail.gmail.com>
+ <aElna+n07/Jrfxlh@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <aElna+n07/Jrfxlh@v4bel-B760M-AORUS-ELITE-AX>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 11 Jun 2025 04:28:44 -0700
+X-Gm-Features: AX0GCFufjfb5MyqDJn3P1TmPLjOv--LQ0BxiHEctFAonMYvTWKY1idwtOAmX5_s
+Message-ID: <CANn89i+Lp5n-+TQHLg1=1FauDt45w0P3mneZaiWD7gRnFesVpg@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: fix use-after-free in taprio_dev_notifier
+To: Hyunwoo Kim <imv4bel@gmail.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, vinicius.gomes@intel.com, jhs@mojatatu.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	v4bel@theori.io
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 11, 2025 at 04:01:50AM -0700, Eric Dumazet wrote:
-> On Wed, Jun 11, 2025 at 3:03 AM Hyunwoo Kim <imv4bel@gmail.com> wrote:
+On Wed, Jun 11, 2025 at 4:24=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com> wro=
+te:
+>
+> On Wed, Jun 11, 2025 at 04:01:50AM -0700, Eric Dumazet wrote:
+> > On Wed, Jun 11, 2025 at 3:03=E2=80=AFAM Hyunwoo Kim <imv4bel@gmail.com>=
+ wrote:
+> > >
+> > > Since taprio=E2=80=99s taprio_dev_notifier() isn=E2=80=99t protected =
+by an
+> > > RCU read-side critical section, a race with advance_sched()
+> > > can lead to a use-after-free.
+> > >
+> > > Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
+> > >
+> > > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
 > >
-> > Since taprio’s taprio_dev_notifier() isn’t protected by an
-> > RCU read-side critical section, a race with advance_sched()
-> > can lead to a use-after-free.
-> >
-> > Adding rcu_read_lock() inside taprio_dev_notifier() prevents this.
-> >
-> > Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
-> 
-> Looks good to me, but we need a Fixes: tag and/or a CC: stable@ o make
-> sure this patch reaches appropriate stable trees.
+> > Looks good to me, but we need a Fixes: tag and/or a CC: stable@ o make
+> > sure this patch reaches appropriate stable trees.
+>
+> Understood. I will submit the v2 patch after adding the tags.
 
-Understood. I will submit the v2 patch after adding the tags.
+Thanks, please wait ~24 hours (as described in
+Documentation/process/maintainer-netdev.rst )
 
-> 
-> Also please CC the author of the  patch.
+>
+> >
+> > Also please CC the author of the  patch.
+>
+> Does =E2=80=9CCC=E2=80=9D here refer to a patch tag, or to the email=E2=
+=80=99s cc? And by
+> =E2=80=9Cpatch author=E2=80=9D you mean the author of the patch
+> fed87cc6718ad5f80aa739fee3c5979a8b09d3a6, right?
 
-Does “CC” here refer to a patch tag, or to the email’s cc? And by 
-“patch author” you mean the author of the patch 
-fed87cc6718ad5f80aa739fee3c5979a8b09d3a6, right?
+Exactly. Blamed patch author.
 
-> 
-> It seems bug came with
-> 
-> commit fed87cc6718ad5f80aa739fee3c5979a8b09d3a6
-> Author: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Date:   Tue Feb 7 15:54:38 2023 +0200
-> 
->     net/sched: taprio: automatically calculate queueMaxSDU based on TC
-> gate durations
-> 
-> 
-> 
-> 
-> > ---
-> >  net/sched/sch_taprio.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
+>
 > >
-> > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> > index 14021b812329..bd2b02d1dc63 100644
-> > --- a/net/sched/sch_taprio.c
-> > +++ b/net/sched/sch_taprio.c
-> > @@ -1320,6 +1320,7 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
-> >         if (event != NETDEV_UP && event != NETDEV_CHANGE)
-> >                 return NOTIFY_DONE;
+> > It seems bug came with
 > >
-> > +       rcu_read_lock();
-> >         list_for_each_entry(q, &taprio_list, taprio_list) {
-> >                 if (dev != qdisc_dev(q->root))
-> >                         continue;
-> > @@ -1328,16 +1329,17 @@ static int taprio_dev_notifier(struct notifier_block *nb, unsigned long event,
+> > commit fed87cc6718ad5f80aa739fee3c5979a8b09d3a6
+> > Author: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > Date:   Tue Feb 7 15:54:38 2023 +0200
 > >
-> >                 stab = rtnl_dereference(q->root->stab);
+> >     net/sched: taprio: automatically calculate queueMaxSDU based on TC
+> > gate durations
 > >
-> > -               oper = rtnl_dereference(q->oper_sched);
-> > +               oper = rcu_dereference(q->oper_sched);
-> >                 if (oper)
-> >                         taprio_update_queue_max_sdu(q, oper, stab);
 > >
-> > -               admin = rtnl_dereference(q->admin_sched);
-> > +               admin = rcu_dereference(q->admin_sched);
-> >                 if (admin)
-> >                         taprio_update_queue_max_sdu(q, admin, stab);
 > >
-> >                 break;
-> >         }
-> > +       rcu_read_unlock();
 > >
-> >         return NOTIFY_DONE;
-> >  }
-> > --
-> > 2.34.1
-> >
+> > > ---
+> > >  net/sched/sch_taprio.c | 6 ++++--
+> > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> > > index 14021b812329..bd2b02d1dc63 100644
+> > > --- a/net/sched/sch_taprio.c
+> > > +++ b/net/sched/sch_taprio.c
+> > > @@ -1320,6 +1320,7 @@ static int taprio_dev_notifier(struct notifier_=
+block *nb, unsigned long event,
+> > >         if (event !=3D NETDEV_UP && event !=3D NETDEV_CHANGE)
+> > >                 return NOTIFY_DONE;
+> > >
+> > > +       rcu_read_lock();
+> > >         list_for_each_entry(q, &taprio_list, taprio_list) {
+> > >                 if (dev !=3D qdisc_dev(q->root))
+> > >                         continue;
+> > > @@ -1328,16 +1329,17 @@ static int taprio_dev_notifier(struct notifie=
+r_block *nb, unsigned long event,
+> > >
+> > >                 stab =3D rtnl_dereference(q->root->stab);
+> > >
+> > > -               oper =3D rtnl_dereference(q->oper_sched);
+> > > +               oper =3D rcu_dereference(q->oper_sched);
+> > >                 if (oper)
+> > >                         taprio_update_queue_max_sdu(q, oper, stab);
+> > >
+> > > -               admin =3D rtnl_dereference(q->admin_sched);
+> > > +               admin =3D rcu_dereference(q->admin_sched);
+> > >                 if (admin)
+> > >                         taprio_update_queue_max_sdu(q, admin, stab);
+> > >
+> > >                 break;
+> > >         }
+> > > +       rcu_read_unlock();
+> > >
+> > >         return NOTIFY_DONE;
+> > >  }
+> > > --
+> > > 2.34.1
+> > >
 
