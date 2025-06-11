@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-196721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4936AD6115
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:21:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCF3AD6118
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:21:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EDA73AB3A8
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:20:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 683A7178075
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA4F246BD5;
-	Wed, 11 Jun 2025 21:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABBF2475E8;
+	Wed, 11 Jun 2025 21:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgdA8olK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BRfPnrxF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0365246BC9;
-	Wed, 11 Jun 2025 21:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DDD2472B5
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749676803; cv=none; b=g9f7xyRybnoiNwWpYNsOMbYyplYuW/aKmJbFYCFULK4h0MNI/FJUgVKdLK6yceHR+mDFK+nxPank0aGftU7Eb6n0FgcvY6iDzPX2bkU3Rrfe5JJtlnXrPINSGrcyw3gJDmlUkh8gcTb/mvseQUhhEtdTh9pJ27vcQzMuMGIN9OQ=
+	t=1749676804; cv=none; b=i/2IrjiGNAxEKixdew51AuWANMHBL9R49MIkRBUHa0BLbClkIQT4YvvY5VNRYlmfwveT7vT1iTnGGbIZXU3NroP1py+LE5qv7eo5oeus5Thv2bDs3/bQXs33IwtMqN9XmnwW1uk2SP1q7ziUUAeRuEbMUz0Gpg3oyxPdApgKWqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749676803; c=relaxed/simple;
-	bh=CPYyCwG0Dux7us0Crce0/S48JKXEZaZ3Ex1aW1zFDmQ=;
+	s=arc-20240116; t=1749676804; c=relaxed/simple;
+	bh=iXWnMeDRI3Wvty3AIOK/4L9SQFqNNM8L99k1K4czOOA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZSJ/73u40U6k/RbVxyi8zNo0m4tErnp0Pw7o2bmvN/tLn5gJmO60GVxLdYAU2NsJGyh4rkeUroImTZnlE10c9GiB0JSg5ll22yXrLoF7tugqhJ9FD560pmJ4j2/1415eM00wh6XVsRItbdSeVfjBfwfXCJ0qD4iVucbXukPSg8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgdA8olK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26358C4CEE3;
-	Wed, 11 Jun 2025 21:20:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dziT/+dqgnJnBq8X9cYlXg0xTuOF+rgtQhrIP6Tg4vcgpwKHbk6WvPj2e6/twhT3fo9zLYN4aizNMF87/7lWledezidCtdI8CyUExmwAFLIT53jCE9Q7jlrsSmuA1aP/wung1ePh0fydbiJYJNOD9w0OEs757F+WPFHWL6DKlOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BRfPnrxF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F562C4CEE3;
+	Wed, 11 Jun 2025 21:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749676803;
-	bh=CPYyCwG0Dux7us0Crce0/S48JKXEZaZ3Ex1aW1zFDmQ=;
+	s=k20201202; t=1749676804;
+	bh=iXWnMeDRI3Wvty3AIOK/4L9SQFqNNM8L99k1K4czOOA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cgdA8olK1dLNc/O0SI4XLazPRzFdjnUvf9WN7lKwIHRUhHtSsStYalgtJtNk/i/vt
-	 eC8mpNV5fnmAZFiBI5/IwbsjiemEt92iomKfvx84dI2Ndf0icMZY6PB20D5bvUAaUK
-	 y/PAMiO9PLF2O1x69xiglYoWCl1K5tjTGm3UTAYAoE5Yx7a+f+kZJYmA3Ht93RZqsn
-	 Z+DfDKNGOvRnbHwN4oghmETxXajrI1tbeoX/Kqdjogi9gFlblCJniZaSyED/ia1hrd
-	 HDHyGCRh9BhcSHlMV4oMNFfIgC3y8T3RKX75L4oo5Jg1fgfwLMFChavT6YCtc9+Vuz
-	 I4qaq4DlL2Ztg==
+	b=BRfPnrxFpExLPWptRDBPIJmcMW1XZDObfIIK4oN3hTlKMw4P7Y1MJMzY9qqiqq/0N
+	 m74ohHsAVCF4Ke+uJ3xgC8ShS3oAo8GddaWnkAFtzRdlWgCkVM4AZP1/uNkXmrtzxV
+	 SEjRm6WWuhW9IJBisMP0H5HGdJitV0oeLP01wOVz13Rz3JwSgvRG4mG6M2AwAfB4Ab
+	 K268uK7xFlR0MjRpnWf4BFZhqoMBcLL9WO+gjd3PdgoHXE5zXCt2yjPZOVqaSlcjLs
+	 LcsHDsBnaw1c3UlKuVFMDVrvSom1z2e4Y+lasZaV2ga6pb+hwnDJ/AaxLE/yyuGxvQ
+	 0MUviM0r7pwPQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D43380DBE9;
-	Wed, 11 Jun 2025 21:20:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADDF380DBE9;
+	Wed, 11 Jun 2025 21:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,34 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net-next] ppp: convert to percpu netstats
+Subject: Re: [PATCH net-next] r8169: remove redundant pci_tbl entry
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174967683325.3488937.12767579212904816682.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Jun 2025 21:20:33 +0000
-References: <20250610083211.909015-1-dqfext@gmail.com>
-In-Reply-To: <20250610083211.909015-1-dqfext@gmail.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
+ <174967683449.3488937.11711221422088405505.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Jun 2025 21:20:34 +0000
+References: <2d81fe20-f71d-4483-817d-d46f9ec88cce@gmail.com>
+In-Reply-To: <2d81fe20-f71d-4483-817d-d46f9ec88cce@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Jun 2025 16:32:10 +0800 you wrote:
-> Convert to percpu netstats to avoid lock contention when reading them.
+On Tue, 10 Jun 2025 07:46:02 +0200 you wrote:
+> This entry is covered by the entry in the next line already.
 > 
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > ---
->  drivers/net/ppp/ppp_generic.c | 52 +++++++++++++----------------------
->  1 file changed, 19 insertions(+), 33 deletions(-)
+>  drivers/net/ethernet/realtek/r8169_main.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Here is the summary with links:
-  - [RESEND,net-next] ppp: convert to percpu netstats
-    https://git.kernel.org/netdev/net-next/c/1a3e9b7a6b09
+  - [net-next] r8169: remove redundant pci_tbl entry
+    https://git.kernel.org/netdev/net-next/c/f6a0bc565028
 
 You are awesome, thank you!
 -- 
