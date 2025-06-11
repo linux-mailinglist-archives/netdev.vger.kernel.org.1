@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-196484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B067AD4FA9
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:24:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D119EAD4FAC
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11E8D16E678
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:24:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57C307ACB40
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762FD25EF9F;
-	Wed, 11 Jun 2025 09:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A3F25C83E;
+	Wed, 11 Jun 2025 09:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="saKCboCm"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LZyKL+/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F037425C83E
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 09:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA25825C834
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 09:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749633878; cv=none; b=komGQOi1BEEgvvD78Uf1eH7Z28v9BJesek8PQhnbQi/3X6DtPyQIME6PisbsOunADX7A22AYBN0j8NCfcAMF92dSZ4ylldiDGJjXhVzcTnCd2kgAM8QxpiM/dUx/AuwGWWs4qLEDY2FrROHSfW6+Jm2x/4OeBoEyntAXPv9Vkas=
+	t=1749633891; cv=none; b=cxRPjNg8mwnxAXfApo/1zrEqiUkyW027zUe8vSGt90p6i+Q+JjO5Eq9seMQ9KPj6IyuYEss/Bocaq2VI3LsZ9Nk7DdEnaWEtg+tPSyqLRxldAT0TiU+AVF6ATcMnckkgyyio49TtFVLZu8t28gL4gTzwSPICYSlFxXT6nELj6Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749633878; c=relaxed/simple;
-	bh=9fuIsMrKfByr08viERJ4H3Guz5fiei3MNhay3ImwnQQ=;
+	s=arc-20240116; t=1749633891; c=relaxed/simple;
+	bh=tPzeYxMklWfSNwE/FSJEm2TflXcxF7/3qKph1efgiqc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mSPl7ydOc5PVkbYif4r6Utp61exrnwWMXLrBhggmoQHgN6ozTpwbDpHWwZEzZCxSTf5b2/6wmHrg+sJ6L6TMi9Hi0zalhMYuBlFZDE0/7e4W0yeT/9TP/ZvEPmN9Rbe8NV0+T9Sjk1sDIF0iTuA5WdWDrQAlIaDrnUg7uuo68ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=saKCboCm; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=Yu5Eaw99/qFnXSnbTtx5wtRH/rxqHQ3znBbg9mm+CxZ1NpYTxwv6W/CXYIlfGmWFmXoocCR1Kk26pERSZ9SHMpYpVnS1IynDIJqKndIoDKLgd3Av105RDZx3YF6xE1dAq+jv5pLMKe7DnQLvQo9mNZ9pjVTQCvaX6qsFf+ofAoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LZyKL+/n; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749633877; x=1781169877;
+  t=1749633890; x=1781169890;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TGGVDqP7BbgcmSDXZvO56tN5sA+HZ4gWTi2xMmNMBfk=;
-  b=saKCboCmXL7I80kCdbHxtNUHD3ckukzqR2VoEmKOCWnS68jYxPy4ZCPG
-   nnPIsA+/w9xb3PjV5xAp6dbW4/WztCymjfv9nxNGUgOZM2OJV6NpNtB8Y
-   wqkg9vRGQA0Bn4yqdTrnHwG/ExiOoFnL/TShaVLZqFiZHIKDs3s1Y4Psr
-   kLi1mcvFk0XPn6k+z7bHvSJUNX4yN4QIAjUplRlM+xT57pmDrH0gOzTXR
-   D/VDIeI7YVGaUdkwo6nOMdYbUZsK/Wf78b68EmrrvgJZUyB4jvE5mdUph
-   0dTqueCvFFRWXOaElU3vhj9iieFcP2W8UJmCbgxEdzLNRTVLnYuy+YyLx
-   Q==;
+  bh=/oLmxDZ3j7ZnfjqmKc+n2Qaa9t2FjdWDpoye9QaCGJ8=;
+  b=LZyKL+/ntU+/jcXm/Y+8JPRSkEoH12nto39yvX/VexDmqVzygo3zlsFD
+   fHFHBqHprRKC+eMCKL9G2J74SRnyx1lEhH8B9NOY+0ihVMz291RVGx7Fm
+   f1KerUnFiJ+rnG9yfb8PgN0y+HCAjdiXnQqnIaaxeUFgUSAwwqnmdc6hM
+   337JkKluUp7UMnZ5cThShD3K1Oyff3K6a1AuWlTEJsAtk549AOz4t5YgY
+   UzpIMV3+fKkE3I/Xh/IjAX74o4994LeO1nW+MN4A7bwI8GtQaQEn+TD2A
+   tZl/yWvbamJ9W2NUm2JAcxFIhB3mZs/ftBE/nH6+VBgFvgtDDhm9BVSxG
+   w==;
 X-IronPort-AV: E=Sophos;i="6.16,227,1744070400"; 
-   d="scan'208";a="530050750"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 09:24:29 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:20038]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.25.199:2525] with esmtp (Farcaster)
- id 496c6fa5-99a3-4014-9079-139f9be6a37b; Wed, 11 Jun 2025 09:24:27 +0000 (UTC)
-X-Farcaster-Flow-ID: 496c6fa5-99a3-4014-9079-139f9be6a37b
+   d="scan'208";a="508253898"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 09:24:47 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:6875]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.30.39:2525] with esmtp (Farcaster)
+ id 01b8b994-1438-478c-869c-e0a4205b1afd; Wed, 11 Jun 2025 09:24:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 01b8b994-1438-478c-869c-e0a4205b1afd
 Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 09:24:25 +0000
+ Wed, 11 Jun 2025 09:24:45 +0000
 Received: from HFA15-G9FV5D3.amazon.com (10.85.143.176) by
  EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 09:24:13 +0000
+ Wed, 11 Jun 2025 09:24:32 +0000
 From: David Arinzon <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -78,10 +78,11 @@ CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
 	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
 	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
 	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
-	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH v12 net-next 4/9] net: ena: Add devlink port support
-Date: Wed, 11 Jun 2025 12:22:33 +0300
-Message-ID: <20250611092238.2651-5-darinzon@amazon.com>
+	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Jiri Pirko
+	<jiri@nvidia.com>
+Subject: [PATCH v12 net-next 5/9] devlink: Add new "enable_phc" generic device param
+Date: Wed, 11 Jun 2025 12:22:34 +0300
+Message-ID: <20250611092238.2651-6-darinzon@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250611092238.2651-1-darinzon@amazon.com>
 References: <20250611092238.2651-1-darinzon@amazon.com>
@@ -96,93 +97,67 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
  EX19D005EUA002.ant.amazon.com (10.252.50.11)
 
-Add the basic functionality to support devlink port
-for devlink model completeness purposes.
-Current support is for registration/un-registration.
+Add a new device generic parameter to enable/disable the
+PHC (PTP Hardware Clock) functionality in the device associated
+with the devlink instance.
 
 Signed-off-by: David Arinzon <darinzon@amazon.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_devlink.c | 31 +++++++++++++++++--
- drivers/net/ethernet/amazon/ena/ena_netdev.h  |  1 +
- 2 files changed, 30 insertions(+), 2 deletions(-)
+ Documentation/networking/devlink/devlink-params.rst | 3 +++
+ include/net/devlink.h                               | 4 ++++
+ net/devlink/param.c                                 | 5 +++++
+ 3 files changed, 12 insertions(+)
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_devlink.c b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-index db56916c..1aa977a6 100644
---- a/drivers/net/ethernet/amazon/ena/ena_devlink.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-@@ -6,6 +6,23 @@
- #include "linux/pci.h"
- #include "ena_devlink.h"
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index 4e01dc32..3da8f4ef 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -137,3 +137,6 @@ own name.
+    * - ``event_eq_size``
+      - u32
+      - Control the size of asynchronous control events EQ.
++   * - ``enable_phc``
++     - Boolean
++     - Enable PHC (PTP Hardware Clock) functionality in the device.
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index 0091f23a..63517646 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -520,6 +520,7 @@ enum devlink_param_generic_id {
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
+ 	DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
+ 	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
++	DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
  
-+static void ena_devlink_port_register(struct devlink *devlink)
-+{
-+	struct ena_adapter *adapter = ENA_DEVLINK_PRIV(devlink);
-+	struct devlink_port_attrs attrs = {};
+ 	/* add new param generic ids above here*/
+ 	__DEVLINK_PARAM_GENERIC_ID_MAX,
+@@ -578,6 +579,9 @@ enum devlink_param_generic_id {
+ #define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME "event_eq_size"
+ #define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE DEVLINK_PARAM_TYPE_U32
+ 
++#define DEVLINK_PARAM_GENERIC_ENABLE_PHC_NAME "enable_phc"
++#define DEVLINK_PARAM_GENERIC_ENABLE_PHC_TYPE DEVLINK_PARAM_TYPE_BOOL
 +
-+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
-+	devlink_port_attrs_set(&adapter->devlink_port, &attrs);
-+	devl_port_register(devlink, &adapter->devlink_port, 0);
-+}
-+
-+static void ena_devlink_port_unregister(struct devlink *devlink)
-+{
-+	struct ena_adapter *adapter = ENA_DEVLINK_PRIV(devlink);
-+
-+	devl_port_unregister(&adapter->devlink_port);
-+}
-+
- static int ena_devlink_reload_down(struct devlink *devlink,
- 				   bool netns_change,
- 				   enum devlink_reload_action action,
-@@ -20,6 +37,8 @@ static int ena_devlink_reload_down(struct devlink *devlink,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	ena_devlink_port_unregister(devlink);
-+
- 	rtnl_lock();
- 	ena_destroy_device(adapter, false);
- 	rtnl_unlock();
-@@ -46,6 +65,8 @@ static int ena_devlink_reload_up(struct devlink *devlink,
- 
- 	rtnl_unlock();
- 
-+	ena_devlink_port_register(devlink);
-+
- 	if (!err)
- 		*actions_performed = BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
- 
-@@ -85,10 +106,16 @@ void ena_devlink_free(struct devlink *devlink)
- 
- void ena_devlink_register(struct devlink *devlink, struct device *dev)
- {
--	devlink_register(devlink);
-+	devl_lock(devlink);
-+	ena_devlink_port_register(devlink);
-+	devl_register(devlink);
-+	devl_unlock(devlink);
- }
- 
- void ena_devlink_unregister(struct devlink *devlink)
- {
--	devlink_unregister(devlink);
-+	devl_lock(devlink);
-+	ena_devlink_port_unregister(devlink);
-+	devl_unregister(devlink);
-+	devl_unlock(devlink);
- }
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.h b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-index a732a19e..cba67867 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.h
-@@ -390,6 +390,7 @@ struct ena_adapter {
- 	u32 xdp_num_queues;
- 
- 	struct devlink *devlink;
-+	struct devlink_port devlink_port;
+ #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+ {									\
+ 	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
+diff --git a/net/devlink/param.c b/net/devlink/param.c
+index b29abf8d..396b8a7f 100644
+--- a/net/devlink/param.c
++++ b/net/devlink/param.c
+@@ -92,6 +92,11 @@ static const struct devlink_param devlink_param_generic[] = {
+ 		.name = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE,
+ 	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_PHC_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_PHC_TYPE,
++	},
  };
  
- void ena_set_ethtool_ops(struct net_device *netdev);
+ static int devlink_param_generic_verify(const struct devlink_param *param)
 -- 
 2.47.1
 
