@@ -1,225 +1,201 @@
-Return-Path: <netdev+bounces-196489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7414AD4FB3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:26:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DAAAD4FFF
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C1BE3A4836
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:26:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C6F41888D65
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B846725C834;
-	Wed, 11 Jun 2025 09:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598F7242D90;
+	Wed, 11 Jun 2025 09:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ic7yJBM+"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Kizb/z0w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEED013A3F2
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 09:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48687482EB;
+	Wed, 11 Jun 2025 09:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749633992; cv=none; b=MZq5FtazefVTr1+L1g+wGIHkvhPMXtkDy27h2wubegRskz4qv9zyZT0xy+WhyzYRVLrUlc15OySu2KO9Zsb6YJYBpGVNThq+GPOKbNwhV2g6o06jBgiMz90+WhqL4JdzJmDijGcZ5EllkOLGr1pnpaeud8uULwYxgEMr0gpOR1w=
+	t=1749634422; cv=none; b=QzpdUvdOB7qf1s4A/uCm/vhAyaIZ3ewLVW8Fk6qUEf1umxAvBA5+PZohrPjVsaW+v16YYTZxOmNOMBrqw2mxcpZhwYnOBUGsFGXLD12i5VhZYma8wGWKgs0LWNg1zLEqGr/nnFIg/hNU1BpEJZflerLcKOrOR41ThzdapmEoUM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749633992; c=relaxed/simple;
-	bh=vKiTYOcvwoQmM0ImQU64EU7uXY0aj4ywj0be8wiZjD4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t0nK316qLEX9IvPzy9eIZViJOa5XSTB5lhCKCwUXlVjfRRWyprv3Dnnp1lZdG207GvJT3FDGYMXwtrdTqpK5jIUPIP8EFPfIa6THbC+oL9hHpxEpbsJka2y78BCkKFROHM9SvsBmgTSZgm90d1nO2On1yYgMIsF9NXTWe8dBBwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ic7yJBM+; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1749633991; x=1781169991;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mh3kzTbRrFl/E7avOcV9qzXi75piTAx505VHtT6pCAk=;
-  b=Ic7yJBM+ED11SGZR1F2dExsl3iQ8mKzBmA25cRoxpFWrdtWTmLq/5xtM
-   /pIdftzONrbjrPbzsViMgD345ul1S9/S5LErAZLwSvTL2KTSrKSVa/uyH
-   82j1OhcVxUDt27UYtsUN5nBLIr3Nc9ZXDopyX8YAL/XAAWqCYGMkNaT5Z
-   cCz3BALd+fjkVA7sbTPpmONikUaxHOriaaFh4tLaiC6knaR6KhTtWqbZg
-   YViOdJ28mQXWH1+ztxmrq+23XvYwNJv88LS42rv5mqTnB1Mc7chdumiBO
-   454mZ8CUTU0AXgRUgtguGUdQCHJjST2geqrYGSGj4RqGxwqjQafxYngOL
-   w==;
-X-IronPort-AV: E=Sophos;i="6.16,227,1744070400"; 
-   d="scan'208";a="732189949"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 09:26:25 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:7500]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.7.229:2525] with esmtp (Farcaster)
- id 0d4e7372-33bd-4c6d-b1d9-00deb04a4d77; Wed, 11 Jun 2025 09:26:24 +0000 (UTC)
-X-Farcaster-Flow-ID: 0d4e7372-33bd-4c6d-b1d9-00deb04a4d77
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 09:26:23 +0000
-Received: from HFA15-G9FV5D3.amazon.com (10.85.143.176) by
- EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 11 Jun 2025 09:26:12 +0000
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
- Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Leon Romanovsky
-	<leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH v12 net-next 9/9] net: ena: Add PHC documentation
-Date: Wed, 11 Jun 2025 12:22:38 +0300
-Message-ID: <20250611092238.2651-10-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250611092238.2651-1-darinzon@amazon.com>
-References: <20250611092238.2651-1-darinzon@amazon.com>
+	s=arc-20240116; t=1749634422; c=relaxed/simple;
+	bh=oZEcpnP061nNjDS/WgnKTb1UcVd/WXF6k/yr0VPQsvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jj8OhQJpfXXXw9Qn8tR5JLACvHP5iieRzYAD86eZnpiKljM3S3QyVQJPSzCrsHNTVL1YJPE6DRk7HQ3zKojTKHuovSPBIPEQTvV1NbxNWD6hrvRTgv4ttAcwl0tqIIU8rqKt6TUtjHKfCfKZtB+oEttaG0eQzk78HK/WX46qsSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Kizb/z0w; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1749634418;
+	bh=oZEcpnP061nNjDS/WgnKTb1UcVd/WXF6k/yr0VPQsvg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Kizb/z0wcw/aH9ltLLM1EZhO+eukqEK/6W7COvd3FhHzaFkMY6jpcQX0Y3jUK6y6w
+	 logvkP55UMr/w1LWJkNQTgfe0gSwSyrIPV/bnnpcXaO4tA/QKK50LTVw91PWrcNb45
+	 /J/Kfdw8XBbwsl3cosQH2Kpyj/TFkCrZlgFpk6qtz1qjJJqDNfiIOdsQqtPBYFh1A7
+	 i0qPQQlgQuQapncN3qsw7/PbGiWHeDTQYTCxUcZUMGjEHnl24SDwe1c9hnc/bgh9ye
+	 A+35IOtHqr7+cPMV18Xw3AgB4gsC0WSELGgOAtzJjR+xC0jJhePabvljxkO6AWOxW+
+	 tYqNLJlm+Lw+Q==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 8EC4417E05C1;
+	Wed, 11 Jun 2025 11:33:36 +0200 (CEST)
+Message-ID: <fecf4045-9cc4-46d2-ba4a-5818fcfcb059@collabora.com>
+Date: Wed, 11 Jun 2025 11:33:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
- EX19D005EUA002.ant.amazon.com (10.252.50.11)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 13/13] arm64: dts: mediatek: mt7988a-bpi-r4: configure
+ switch phys and leds
+To: Frank Wunderlich <linux@fw-web.de>,
+ MyungJoo Ham <myungjoo.ham@samsung.com>,
+ Kyungmin Park <kyungmin.park@samsung.com>,
+ Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+ Jia-Wei Chang <jia-wei.chang@mediatek.com>,
+ Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
+ <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20250608211452.72920-1-linux@fw-web.de>
+ <20250608211452.72920-14-linux@fw-web.de>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20250608211452.72920-14-linux@fw-web.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Provide the relevant information and guidelines
-about the feature support in the ENA driver.
+Il 08/06/25 23:14, Frank Wunderlich ha scritto:
+> From: Frank Wunderlich <frank-w@public-files.de>
+> 
+> Assign pinctrl to switch phys and leds.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> ---
+> v2:
+> - add labels and led-function and include after dropping from soc dtsi
+> ---
+>   .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 61 +++++++++++++++++++
+>   1 file changed, 61 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+> index d8b9cd794ee3..f10d3617dcac 100644
+> --- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+> +++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+> @@ -4,6 +4,7 @@
+>   
+>   #include <dt-bindings/gpio/gpio.h>
+>   #include <dt-bindings/regulator/richtek,rt5190a-regulator.h>
+> +#include <dt-bindings/leds/common.h>
+>   
+>   #include "mt7988a.dtsi"
+>   
+> @@ -151,6 +152,66 @@ &gmac2 {
+>   	phy-mode = "usxgmii";
+>   };
+>   
+> +&gsw_phy0 {
+> +	pinctrl-names = "gbe-led";
+> +	pinctrl-0 = <&gbe0_led0_pins>;
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
-Signed-off-by: David Arinzon <darinzon@amazon.com>
----
- .../device_drivers/ethernet/amazon/ena.rst    | 103 ++++++++++++++++++
- 1 file changed, 103 insertions(+)
+pinctrl-0
+pinctrl-names (here and everywhere else)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 347aec34..6892e3f1 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -224,6 +224,109 @@ descriptor it was received on would be recycled. When a packet smaller
- than RX copybreak bytes is received, it is copied into a new memory
- buffer and the RX descriptor is returned to HW.
- 
-+.. _`PHC`:
-+
-+PTP Hardware Clock (PHC)
-+========================
-+.. _`ptp-userspace-api`: https://docs.kernel.org/driver-api/ptp.html#ptp-hardware-clock-user-space-api
-+.. _`testptp`: https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/ptp/testptp.c
-+
-+ENA Linux driver supports PTP hardware clock providing timestamp reference to achieve nanosecond resolution.
-+
-+**PHC support**
-+
-+PHC depends on the PTP module, which needs to be either loaded as a module or compiled into the kernel.
-+
-+Verify if the PTP module is present:
-+
-+.. code-block:: shell
-+
-+  grep -w '^CONFIG_PTP_1588_CLOCK=[ym]' /boot/config-`uname -r`
-+
-+- If no output is provided, the ENA driver cannot be loaded with PHC support.
-+
-+- ``CONFIG_PTP_1588_CLOCK=y``: the PTP module is already compiled and loaded inside the kernel binary file.
-+
-+- ``CONFIG_PTP_1588_CLOCK=m``: the PTP module needs to be loaded prior to loading the ENA driver:
-+
-+Load PTP module:
-+
-+.. code-block:: shell
-+
-+  sudo modprobe ptp
-+
-+**PHC activation**
-+
-+The feature is turned off by default, in order to turn the feature on, the ENA driver
-+can be loaded in the following way:
-+
-+- devlink:
-+
-+.. code-block:: shell
-+
-+  sudo devlink dev param set pci/<domain:bus:slot.function> name enable_phc value true cmode driverinit
-+  sudo devlink dev reload pci/<domain:bus:slot.function>
-+  # for example:
-+  sudo devlink dev param set pci/0000:00:06.0 name enable_phc value true cmode driverinit
-+  sudo devlink dev reload pci/0000:00:06.0
-+
-+All available PTP clock sources can be tracked here:
-+
-+.. code-block:: shell
-+
-+  ls /sys/class/ptp
-+
-+PHC support and capabilities can be verified using ethtool:
-+
-+.. code-block:: shell
-+
-+  ethtool -T <interface>
-+
-+**PHC timestamp**
-+
-+To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example using `testptp`_:
-+
-+.. code-block:: shell
-+
-+  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware Clock:/ {print $NF}') -k 1
-+
-+PHC get time requests should be within reasonable bounds,
-+avoid excessive utilization to ensure optimal performance and efficiency.
-+The ENA device restricts the frequency of PHC get time requests to a maximum
-+of 125 requests per second. If this limit is surpassed, the get time request
-+will fail, leading to an increment in the phc_err_ts statistic.
-+
-+**PHC statistics**
-+
-+PHC can be monitored using debugfs (if mounted):
-+
-+.. code-block:: shell
-+
-+  sudo cat /sys/kernel/debug/<domain:bus:slot.function>/phc_stats
-+
-+  # for example:
-+  sudo cat /sys/kernel/debug/0000:00:06.0/phc_stats
-+
-+PHC errors must remain below 1% of all PHC requests to maintain the desired level of accuracy and reliability
-+
-+=================   ======================================================
-+**phc_cnt**         | Number of successful retrieved timestamps (below expire timeout).
-+**phc_exp**         | Number of expired retrieved timestamps (above expire timeout).
-+**phc_skp**         | Number of skipped get time attempts (during block period).
-+**phc_err_dv**      | Number of failed get time attempts due to device errors (entering into block state).
-+**phc_err_ts**      | Number of failed get time attempts due to timestamp errors (entering into block state),
-+                    | This occurs if driver exceeded the request limit or device received an invalid timestamp.
-+=================   ======================================================
-+
-+PHC timeouts:
-+
-+=================   ======================================================
-+**expire**          | Max time for a valid timestamp retrieval, passing this threshold will fail
-+                    | the get time request and block new requests until block timeout.
-+**block**           | Blocking period starts once get time request expires or fails,
-+                    | all get time requests during block period will be skipped.
-+=================   ======================================================
-+
- Statistics
- ==========
- 
--- 
-2.47.1
+> +};
+> +
+> +&gsw_phy0_led0 {
+
+function
+color
+status
+
+> +	status = "okay";
+> +	function = LED_FUNCTION_WAN;
+> +	color = <LED_COLOR_ID_GREEN>;
+> +};
+> +
+> +&gsw_port0 {
+> +	label = "wan";
+> +};
+> +
+> +&gsw_phy1 {
+> +	pinctrl-names = "gbe-led";
+> +	pinctrl-0 = <&gbe1_led0_pins>;
+> +};
+> +
+> +&gsw_phy1_led0 {
+> +	status = "okay";
+> +	function = LED_FUNCTION_LAN;
+> +	color = <LED_COLOR_ID_GREEN>;
+> +};
+> +
+> +&gsw_port1 {
+> +	label = "lan1";
+> +};
+> +
+> +&gsw_phy2 {
+> +	pinctrl-names = "gbe-led";
+> +	pinctrl-0 = <&gbe2_led0_pins>;
+> +};
+> +
+> +&gsw_phy2_led0 {
+> +	status = "okay";
+> +	function = LED_FUNCTION_LAN;
+> +	color = <LED_COLOR_ID_GREEN>;
+> +};
+> +
+> +&gsw_port2 {
+> +	label = "lan2";
+> +};
+> +
+> +&gsw_phy3 {
+
+function
+
+pinctrl-0
+pinctrl-names
+
+
+> +	pinctrl-names = "gbe-led";
+> +	function = LED_FUNCTION_LAN;
+> +	pinctrl-0 = <&gbe3_led0_pins>;
+> +};
+> +
+> +&gsw_phy3_led0 {
+
+color
+status
+
+> +	status = "okay";
+> +	color = <LED_COLOR_ID_GREEN>;
+> +};
+
+...after which
+
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+
 
 
