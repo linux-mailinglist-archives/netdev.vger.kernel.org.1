@@ -1,105 +1,96 @@
-Return-Path: <netdev+bounces-196637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D63AD59D8
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF283AD5A17
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 17:18:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8A6B3A2CF4
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:09:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F265D3A9D24
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FC019FA92;
-	Wed, 11 Jun 2025 15:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uxjl5+hS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCE81DE2A1;
+	Wed, 11 Jun 2025 15:14:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26731925AB;
-	Wed, 11 Jun 2025 15:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABBF1B6D01;
+	Wed, 11 Jun 2025 15:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749654602; cv=none; b=HG7YJpHyh/HBU/oZA0VWS1f9inNMSjkf90Ht/Yo57uUnQi13uLl4LmJZ0M2O5hiNopDOR9r4GYivLp8Po3Z5b1+BR2z8IWXVvjDX5ZBoqLDyTLRIRXU2/XVoyIPLNav6x9YwynZzwy4/70hx5woxtuKUhdjzBII3phBGQ50QTus=
+	t=1749654855; cv=none; b=cWWkogX2JB6nmyX2V/f1Mg0yWjYjesLgbaaYJdRWLNNpGRSyRYsGUM3Fw3Wm1dC4MSot4GQpJMcTY/o32r6JSx1QpDvFxpBmqQwDjLKSHeDag7IQRdtaT/+RNlhKh8uIkk7hR3ixFHvz2Z0p11wrfFWs0RTIGgfvr+yR21bxXHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749654602; c=relaxed/simple;
-	bh=guKx/eVi2Puq98lD0YDWfUIP3bFaTVE4m7+rdn1ALhg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=r2MLn4Ey+RffrvldeHQ0w8FvJfbbPs1kidNA2E/HxF9J/tzemZ+jgBUD5AIkJYkq454qMTUvFVf6e2YxIYwo13dPVaxObpFkMFR8xxcXC3UTxVpaWqSUNnk3ndDUqsPZHrXZulYRSG5lV6SjaiGmzgi5HolV6TM+G7P7IGHmAg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uxjl5+hS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 169E1C4CEE3;
-	Wed, 11 Jun 2025 15:10:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749654602;
-	bh=guKx/eVi2Puq98lD0YDWfUIP3bFaTVE4m7+rdn1ALhg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Uxjl5+hSuA3qGWEACdYUufGb7KdAXvbKM4SVrAiQ7qGPTR/UXWJz2doaRJQMG0sTI
-	 IRlqYL+rY5rllS3WPdMUf8mRcVRO1OJPGX+X6NchKjdSTWK26M7KZRMmyIxQjTuE6b
-	 uUoge4ZhwmQ7PWg2lWvhKpun36dSiVrXViaNN12HvCvvucoY5k3tvnAslP1RTVtiTz
-	 9koeb9YtkYKY9vwRr82AoEd8FbIL6rZ9fpzuBR/OKhc64marCPno/838iehN/GdMwI
-	 Q6kFBjm5Z/EEH36RE/Pg3tH3QbGA9rQXR/yccJ2spxqdq2omSIdjKhxwY5qOx+KxEt
-	 CCF4V/eHJgLKw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CC739EFFC5;
-	Wed, 11 Jun 2025 15:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1749654855; c=relaxed/simple;
+	bh=j4HtOeH+lQJTeLsbYvGMDZFJPCC7o1GI6t95ynQNJ9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRQLlGBv7m//Ir5O6Ja6c42/eU4AWpCiPZx3hgjxEyDDis61yj6QiTNiRfbz15EDCmMOxy6keN0Tv9RhFIWA6G6eZ1YC9J9yU0gK/wvjIOrKBF8uA1bFz/Om90NFSEYIRKSJQjTiwBfoHyzurbnB+wiGfu+10YhOqSbbOwELth4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ade5b8aab41so684202566b.0;
+        Wed, 11 Jun 2025 08:14:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749654852; x=1750259652;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xxtjsYc5WzCsw0sWcakgTm1NCq+gnxfAoujY6jqX05Y=;
+        b=k8XEMhkE3lEujU1Koaubi3uuOVM+kieDgrJSd489TimiI7mC7VZ8w/596ACH2I8BCj
+         VX9jspf79zjWZ64Rl84QfjaNx4RvN5zccV/jcKM111qfKZNDiGuPpsACOz/UFlRfUNiM
+         nRlOfkArYyD5c3XSzbkcFHjxNlrmB4s+g7EMy7YdBxUChO3Qo9eLab9B2Yn5vu8YslrF
+         +V0DOz1IhvIHR5utf7iTGRO5XLw7hmW4AT8KMt9UZlhb3Ls24GyfTgHjF7usWkmmxrga
+         LkLl8SkfGV9E6JCtWs1iTS2+B/HLAi1F/iX5CnhGvPSkLa8Dtcp2le/yIwliXujMtTQu
+         v6tg==
+X-Forwarded-Encrypted: i=1; AJvYcCVznSPwsJeBQ0WhrQCdYBrb0+AZmw6XCvia7pqsJvHkvP+IfVooKn+iRytrVmLafuQssnKsSI7Z4p/aHAOg@vger.kernel.org, AJvYcCWbKRu3tULiHWsV7R/7k1N11/Ie+z9PVruGo9/rsA8oDCwCn2B3KNhovgWAtK/8rle0YQmESKCe0ZM=@vger.kernel.org, AJvYcCWo9vkmNjxLvQ+KCSDyaAAcQ5mG4FwQJ4+XQY/FeI02xoD2cIOiHOaft4qc7EXwWRlJJd00zKpA@vger.kernel.org, AJvYcCXGgyNIBKIimzHGH1XNhViUCfTOKIq801CAXf1LyQCrIimXalh682PWw+xHrd0hg8coUnk8aHM5a4aUkdQNEwJu@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyj2pdMzY++zUhX8uNbm2RjDRqJRuBVAb11/QgoaNr8qwkDNG/S
+	67LumXCH/yNhKNEVSmc8JFIesO29daPn705K+0n8y+dpgMSTqcyfCpHe
+X-Gm-Gg: ASbGnct79JJnkqDOhS5MGGeIHsRNb5FeCMVknIvU45un489YjtOI1kN1eO4IsNAUucZ
+	jAU6sG7QeWZHCniyNI+ulhDHPH7FapnpkHmxFiKOtR4ZYGXBi+wk+eylMOHHe0th4H4ayzaRZzv
+	R4Y/hd4+c2x0hwuAi2HGO7jbInluEjNKEBJPPKPbdZEIVhT56yUfV0iLM0FSBm1trJkRn1F3/lY
+	sjRw7TptYQcCAIPIfN5FuwfEg/cS0OocQm9CazLB02o3RnkA8QdPr3qbWVNGfCqWuM+yqTd76pW
+	96UN8tAQCcLXRd/FT7UzXFGHbsjVOgkORulcoQo/vsr+N8fuMynSiA==
+X-Google-Smtp-Source: AGHT+IEJvF/k6wW9sOP1mWvnvDvmZbJ83yqSoXHsvG5vRtSWUDSp4eE4+B2E5P14jKw4coIWl3JZ3Q==
+X-Received: by 2002:a17:907:72d1:b0:ade:3bec:ea40 with SMTP id a640c23a62f3a-ade893e2b8dmr406508566b.10.1749654851743;
+        Wed, 11 Jun 2025 08:14:11 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:74::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc3a241sm900604066b.135.2025.06.11.08.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 08:14:11 -0700 (PDT)
+Date: Wed, 11 Jun 2025 08:14:09 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] netconsole: introduce 'msgid' as a new
+ sysdata field
+Message-ID: <aEmdQaxnlS4jbfSO@gmail.com>
+References: <20250611-netconsole-msgid-v1-0-1784a51feb1e@gmail.com>
+ <20250611-netconsole-msgid-v1-1-1784a51feb1e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v2 0/2] bpf,ktls: Fix data corruption caused by
- using
- bpf_msg_pop_data() in ktls
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174965463225.3362912.890575326348538837.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Jun 2025 15:10:32 +0000
-References: <20250609020910.397930-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20250609020910.397930-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- kuba@kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
- isolodrai@meta.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611-netconsole-msgid-v1-1-1784a51feb1e@gmail.com>
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (net)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Mon,  9 Jun 2025 10:08:51 +0800 you wrote:
-> Cong reported an issue where running 'test_sockmap' in the current
-> bpf-next tree results in an error [1].
+On Wed, Jun 11, 2025 at 07:36:03AM -0700, Gustavo Luiz Duarte wrote:
+> This adds a new sysdata field to enable assigning a per-target unique id
+> to each message sent to that target. This id can later be appended as
+> part of sysdata, allowing targets to detect dropped netconsole messages.
+> Update count_extradata_entries() to take the new field into account.
 > 
-> The specific test case that triggered the error is a combined test
-> involving ktls and bpf_msg_pop_data().
-> 
-> Root Cause:
-> When sending plaintext data, we initially calculated the corresponding
-> ciphertext length. However, if we later reduced the plaintext data length
-> via socket policy, we failed to recalculate the ciphertext length.
-> 
-> [...]
+> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 
-Here is the summary with links:
-  - [bpf-next,v2,1/2] bpf,ktls: Fix data corruption when using bpf_msg_pop_data() in ktls
-    https://git.kernel.org/bpf/bpf-next/c/178f6a5c8cb3
-  - [bpf-next,v2,2/2] selftests/bpf: Add test to cover ktls with bpf_msg_pop_data
-    https://git.kernel.org/bpf/bpf-next/c/f1c025773f25
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
