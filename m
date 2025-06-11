@@ -1,309 +1,225 @@
-Return-Path: <netdev+bounces-196502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83182AD5096
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:53:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9ABAD509D
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 416323A7B04
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4436F3A7BC6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1D3255F5C;
-	Wed, 11 Jun 2025 09:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A7C2AD2C;
+	Wed, 11 Jun 2025 09:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="Xo8m6QJC"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="F43anofT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from PNYPR01CU001.outbound.protection.outlook.com (mail-centralindiaazolkn19010008.outbound.protection.outlook.com [52.103.68.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0002AD2C;
-	Wed, 11 Jun 2025 09:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749635613; cv=none; b=A/TfqIf8/n3nzTP3Q2STi553QVEv6b5v8CRtwdeYNjNx3bqHjDpTn8WRP12ZuPDwqIxjUKuINFmfUXtisIph9TPqTlftvkTeOm4LKbLmfZXxOUF3eUQ6QLawESqAKLlcvyAx5alp94hbrycLVi2gNUlfO5vZDOGmzxEIxEG3s9c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749635613; c=relaxed/simple;
-	bh=HKpIzjGHEcjtHwxkZNmWbD6HEfZzSXNM1aVPTfuLGTw=;
-	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
-	 In-Reply-To:References; b=l6eYTsuwXdXSGysd+U11USX0t6YvFi5hfQH0zDpARyn1/1mDtwWS3viybTOX6ru90Lbq+tEO1Z5wnfpLMGeX7qtd5HeiK8LuvvmYVPcKxOH/Vj56z9UYmiYEjV3CE0Fv2Z8Hzs+QCgM4JLSU9wz5upglVLa3794AXJE+NYIIvb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=Xo8m6QJC; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1749635594; x=1750240394; i=frank-w@public-files.de;
-	bh=zYXRhiTCKjL/ILq0gnh0QN/qZigjj3xGh6BayDOZZXM=;
-	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Date:In-Reply-To:References:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=Xo8m6QJCi1JyBEsPJjQ97sZu9YQMq5UsQ72KLON8c8AQU4UkYH2k0L6HiMzd8Qm/
-	 vgz3OvDfSnHTx+ByyF7I2B3iCZU+PtY3wyiVoq4DjAzGRiIFjQMkFjs5PFIkiPdzE
-	 nJca4cpThicSjz1ZKm3bk4nhioTV0OoKHuOYhw2UTt126ntxmmGLnXKta8UTeuzs4
-	 V8i1JA+Y7mWJy/o7GuOkogc0h7MBnYdlvBKCc7LS6StO97JvVXleC68/NaDVTWOfz
-	 ieSKAWS5rGI0OUKqz5/Lx8/sc2QPwulr/6nVh40Gf8BAeeRSoIveN92IAPr/z2IXK
-	 3r/sEEgp5T+chUDbJQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [100.64.173.171] ([100.64.173.171]) by
- trinity-msg-rest-gmx-gmx-live-847b5f5c86-xfcwg (via HTTP); Wed, 11 Jun 2025
- 09:53:14 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45602609C6;
+	Wed, 11 Jun 2025 09:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.68.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749635650; cv=fail; b=fRMIN5e56u1bFBSEUbJ6RI/HxyT3hFy8LT3tMniGT5cgcyyNkJRUeTdPrLLqWjNbUpnUSn972F9K4TUPxb2aLj0zWHUGw+cq1iBXbEyjpItCaMLQ39Ocur64ytd0zslBO7bGe3rLHjdbVHV94vvao5z0pSMdl8Hrwna8lpOgB0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749635650; c=relaxed/simple;
+	bh=KiBUrs1/VCxq8ZNGp5OIt53fyKePPpWJWdwuRvvu8EU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QKbt4tECygydBzxkf0n2QQjkXAEUjWq93zEhvh5RJ9Xgy4XsmqMXnISkg0tWZSX55nmuMutLG/ZSGDQ/M//hfSxoOFgUvJjyJIbFvEuw3kYqT2Aom8Jnx6OlFeW27zWWf0Mw1to3aqW9VJyiSdT2ecld5brDGlCkXPEcmfovEVQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=F43anofT; arc=fail smtp.client-ip=52.103.68.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lTGxgZYzwH1neMM2YB+0BAMcmleZX8OTZyrmHHeJJUMQw1kIqx/absS/8w4MNnVjnQ7Q8b+VR7eejXY9/1zoLIEb64kkrPAtcrXgzNbEMg7vttcj1i64NuUJ1AaW4rVmu8APbqvc0ee8HALRUESWHwEhUn/QiLGRJdrplMLd2aMb2VGzL9dvHUaM/9I10qf/C92ujmUAGADQc9kzBTuFS2YerwgyAt9E6iq7FgOYvg5PqL0+IjMfqq49OKLGzYtBOqH7RZx8ce+0OVnuFHPfqgnp3lx21guyaGrAIU7EYFwQaBUxcSy9vrr7OqP8abfrfokNMpSmUSK6mpQ6ifYj/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ySZYBIjpGAQdtRc2xZ4ebPQMnX2efCp8IBjwigWG5mY=;
+ b=NxWZeCek/CwCjHIkLUZtqOxRF6xbswsFkxbl3mjis7nd3O0+wsY7K46yEU1wuB2MXcfSBpAHpzHotg6gTW458MJd9ZgTus5DECcfG4PH3ErNHTY/jTc8PomQ+L4+LGFlcuj9424roxzLCm6tY27cOR85fxS3liVgaB+sNCX9U0omccp60clXLegEuTPelvVz7nzNdyss4rA4LdyaWMhP6sVCPaj2ef9pVWhaKfkwaErc69i4jUipydnW69aWR0QoFQfSjWnm8Evb7rF+zSha5ArCEA8JlMvUBZaxo4fMK89SvaIH6LYDsObxPCjFcfZbcgI99raKpfS3C6EQbWLGtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ySZYBIjpGAQdtRc2xZ4ebPQMnX2efCp8IBjwigWG5mY=;
+ b=F43anofThBmwjIuSXM4z+HC2Ycbs4YOmgblnuglaV/jXGiA25WA3OY3aZsRGkp8YySYf6P1dNiIkGhWh02dV8zI13bPe0pb5vYhAa532XwUXTlMRUy/NDCfsqntyOMnLfPckY8Bs6d0H25OXxn0mPdu3tjitkTp+UiTO5AtVrgxa20PDFuopnEXGfl/k/Rque/LN8nsIr+GSl+qFiSfWpDDj8oBEARJV1VAaX7FT4+cyu0YKslCdKhjdsWiadhKgpLETj0ZnZRPcCIvVOeMgrhrQ1V088VAKvqmSVmEH5ve6Eda0yXPZsZ3DXK5qKlPK2D5X+pB7Kee9SItvcamAcQ==
+Received: from PN0P287MB2258.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:1c0::8)
+ by PNYP287MB4069.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:287::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Wed, 11 Jun
+ 2025 09:54:01 +0000
+Received: from PN0P287MB2258.INDP287.PROD.OUTLOOK.COM
+ ([fe80::b63f:e256:4db1:2e9f]) by PN0P287MB2258.INDP287.PROD.OUTLOOK.COM
+ ([fe80::b63f:e256:4db1:2e9f%6]) with mapi id 15.20.8813.024; Wed, 11 Jun 2025
+ 09:54:00 +0000
+Message-ID:
+ <PN0P287MB2258F2BB409F70955D6EE248FE75A@PN0P287MB2258.INDP287.PROD.OUTLOOK.COM>
+Date: Wed, 11 Jun 2025 17:53:54 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 11/11] riscv: dts: sophgo: add pwm controller for SG2044
+To: Inochi Amaoto <inochiama@gmail.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>,
+ Longbin Li <looong.bin@gmail.com>
+Cc: Han Gao <rabenda.cn@gmail.com>, devicetree@vger.kernel.org,
+ linux-riscv@lists.infradead.org, sophgo@lists.linux.dev,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Yixun Lan <dlan@gentoo.org>
+References: <20250608232836.784737-1-inochiama@gmail.com>
+ <20250608232836.784737-12-inochiama@gmail.com>
+From: Chen Wang <unicorn_wang@outlook.com>
+In-Reply-To: <20250608232836.784737-12-inochiama@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR04CA0184.apcprd04.prod.outlook.com
+ (2603:1096:4:14::22) To PN0P287MB2258.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:1c0::8)
+X-Microsoft-Original-Message-ID:
+ <39096efa-a3e2-4d31-a7e4-43a13484a137@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <trinity-86821bec-44c3-4443-948c-129059072e31-1749635594371@trinity-msg-rest-gmx-gmx-live-847b5f5c86-xfcwg>
-From: Frank Wunderlich <frank-w@public-files.de>
-To: angelogioacchino.delregno@collabora.com, linux@fw-web.de,
- myungjoo.ham@samsung.com, kyungmin.park@samsung.com, cw00.choi@samsung.com,
- djakov@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com
-Cc: jia-wei.chang@mediatek.com, johnson.wang@mediatek.com,
- arinc.unal@arinc9.com, Landen.Chao@mediatek.com, dqfext@gmail.com,
- sean.wang@mediatek.com, daniel@makrotopia.org, lorenzo@kernel.org,
- nbd@nbd.name, linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Aw: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic
- ethernet-nodes
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Jun 2025 09:53:14 +0000
-In-Reply-To: <10d6fe88-75ff-4c02-8fdd-e1101aaa565c@collabora.com>
-References: <20250608211452.72920-1-linux@fw-web.de>
- <20250608211452.72920-7-linux@fw-web.de>
- <10d6fe88-75ff-4c02-8fdd-e1101aaa565c@collabora.com>
-X-UI-CLIENT-META-MAIL-DROP: W10=
-X-Provags-ID: V03:K1:Q2R61HcTqndi0q11hWidyahbItcW6ovT4kgROL1nVAsKt0arHVAd/NiryzdzXvAIws3t1
- ltx6Ujod5/iaAeAuFrBp4VokrPC0pJudFY+6gFvpd1MtY33eWlb2ozX94z0F2Mjq/aXDsO/3ET5G
- GFAlTdZsBexqzqnJ+QwafaN3oXIxoVCkaoBT1kMbhQtbf32oXXYwf8ZlyRiRYv/4/94izt82b38Q
- NThXJCHzy8z7Zt5QvO7dDdxPjFfYAK6TA992FYMywk7zpo/mgwL3rvjWvd59fDqeE2tV7SE01nEu
- hMqr+0lS+1c7ydPOToBhQUpp+Fg99b2tHnBunWJPcfetcBJ0wpzTXiMDJJ+hiq5Tv4=
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:2Zyrp1I1JME=;mBDTp/4Eo5Q/GEjqqicjM4prH5Z
- mErsbe7W04+/fSUcsWlkGgTiwOXG4l0/j+0Fxmnizs/WaSXOO3nPEe7OoiOuhMVa7uIQcaS6A
- SfmcAInDdoob7j+Fi5jK9s8pSB5UJboZfEH+CemOIiem8CjQeubKxhTGqz8RPatJOic5uTNQI
- Hr1DifNsa4ji42LQcQRQyGo9sK+UwQY6+mkdTqtUwRx0V4HFfr48tdX284epP4mUE6/DQxGQi
- pIV+l5tDrLdA72Y+EFW8/vmv1ixCQ9q6tJ3Z69sPPC3WDgPnIXSVbgCJMzhudC58pWoBZLNc3
- cmtWT8Di+2HaYbZoI5oMGPchVD7hb/NixvXEb+MAEKyTyMlB5udWxsXHXiz/tavZ2hYahBLa9
- ss69SJ2ReKmju8KQ8NRcEPXmLo7w6mWGaE+E1n6DilrxULmj6twt3GvwZ9e8fvuc5Mehp+sn7
- eoKWLnibhYtLbZcD6F5e8GFKU/AsaKIhVDwStVaRvmqsLud1CwOwTzzsC11SUwaxVy8+njNpY
- STGmfR2FRTlN82x/3+B3tN0lokNo7Nr7M6EkruBwZzohygShMS6kFHI0rzTUonNn4HM2T4BLA
- xbANxdmSbtmXDhmdpBbmmPnXDLGULAbbDdiZJTOKhltGKse2kmtsf4nGLdvmssmir7jDwl3+X
- kms1UgCqCAdXr00EVmIDR3o5vj4oerpZnoS3jCS2qQLb0eyjAc9rdeHgaGwpoy0/pOKt4pOQR
- q4UsMsRl9DODYWoxR90XaOmj4sLeaztK2m14JlC3JUHurS0PyBQKXIv8FT/EpIM4UusJrgGfq
- uYvaj8+VMnhsxiz+pfHvsxx1pBASA9CMJilGZ801kFscBTfmN+0Sin92EGno5OacgIgSpa82V
- EDW/ueeiI5H+r05Ie1UDOMzOcEJVoIAkRI7seBApUaPprYJM6R8FeuaOlecl2ZlUPyzjxbemY
- u2p29fN1AFHqi9ajtWxR12WrIvBus9BnAWEaCabx1B7XAQaQr7BHoGU+pU4vfUgEqmZ38OFTh
- T6gUKXB5NAwM+GtwQlOHR/FkUG1x9izvQBtnjtW9Of/XsKe8YkgJGd0fumrj0MCXQxfjU+zma
- Rew/HgD4efY7HWxKfEWkIBYQIZ54ccQRYrlAzV4kS1OFaRp/sLmtgknSWC9lSntvcgVLDJ8Ro
- 20RUazCSA5RrIaW5Ph3MsskKOcGB16EQyMdp0SY7SqNIuDtq7pyoxzjbZyVhGZvv/A2uJO2wU
- 1S5HANLd3z9Q+wf13xiUnqrHZ/WCSyrLGMgi0ZuEu8g7/d5FFpudmSs/dtkyIiQs8O0S7Ebhp
- jtEtXFRfODuRhMEIsx0Qiiis2bLYEDpIkQjo5VExiUP4q6nphA+6D7AR5oIjESx1bjKnXeMA8
- 4/69ahVSuVMG7fBdRPQrZjU9mI/zBi+saZ5LCZmHi1cGKMxrZLkBsonDxLyMlRb2N23Z47FH3
- vo2kYhNGyIynzxN4MgSqeuQUlryZRftq80dlsBlWOwh4HF7BewT4Pn13wY6Jar55F3rqb4rH+
- Hujbs7QmSA7Ou7GrgqaTSY5cO/87kYMhyvxryfl/JKASOC+GxO/v8+DkRqI1tq3MG8tDx2yVR
- +yVePDN3KIoxWxKBumRSKgAiPTIQ74sEIPYQctHzw7SV5PXS8AzWaELD3P4WWWoCTGowpZShw
- 2HHM0ZXmnqhpSFLPKiD7aPI2XGaHj4QtmHhrm9qINTAkXIa5UrQJPQ8LoRPMfrPAv10mlAhFJ
- TC3/Z0rJwR5hWU4icOjcLlG9kUmPYKod2hhNA6VerIoVonb3GmD4ozzuduFNWdOzpzXTMkl18
- 86bwoaU6ES3u0Xe6q9Bv6lNWcgpR0u14KESCOnOl1yysJ+Lw7qQSxcYoGaOCwQm/FnxddBdge
- 9a5jQd5zs66h7tzElBVg9iNfs6/nenhqKgp5vZfg0RXH+Wl6yJCrtD20tiJa96HyC91sxhxc6
- pTiyQ9BYDR9ujUPnupZyirLitCE4t/xCrFPJ+8rZUVHDglDB5K1E53Mc2mVrK+3XmyCRRGV05
- 44MW42rp17LfSCWoFCbYSDEZZLsLKg4AEzsJA687VoUMdXhBNm1+F2TrvjKE043QzTv6V76b6
- NTIweovi5Vf0H+l2zKLq+omGMM1kXaFJ0EOtwD/tPnA7ed6bEvzZ4AQjrZgzeaBW56KF0B9cz
- lR+oMeQEZo28x/BHxc2djHcFuUl5PvL0cJntRoVAjnpTN7pL4XwNcl6HbtBbgNTQpU9LiN03p
- 3kfmzndh6E2O5RvGOlTBWm84OisxXO1s/lS7oy7CxIY2hksgNSelR90pTTE/jvg5wLhwOSxqN
- xFqA2slNqCnzq3dR8H5XQbjXuYoJ4/IKg1FwlFoV3CPJ60HudcfX5iGT61e6KHYezFnruDC7k
- Kx0deg0eVhphNdxU2KKRmHjqCx/aRcJ5R6q8rU49yNLF9NBygH+aNkDzzEVB2zfmhW4qMHrwz
- CuAAmrqfS5YN7LCYW/goSy5Ikn98LYgCjNaV3N/aZmxm52Me681bgJ+/NuYF45+NmFHLE915M
- FazYkYEAz61ECOenRLzroS2KcCLyWUAjfy/jNga+y2ZtDHDArsM0AVtFjc7XrC5a5bRKyfzWF
- VFPfEXOHKIQiP03MUH2BEfX8cFPDY91OCbA4C/xSMyHp40jbZs2fricJEduFRYBLUb1akIYaH
- 6GbbveLzwxHIkUCeLnK9hAc1Cx6cj1veqeajdGZd5mLWjH2gGkv8tLLMd9xnGASGEmfgAE0O4
- rgnMHBTkrFSAUH06vzE1UcASghp/o7rm5lxYrcsLThhtpb3XqWH0pQVaq//S4iT2iFO5RzYsA
- 9IYBQ6ydHZ5eqbBR+1zuqJVOjw8MTprZWJfcr0+wqLpITIt2UylsT2qdaK8eFwEDyVDrVsUaw
- lC8cTq+mLzkpLQi0e6EI+woambt4rjGSqp29NVwK/9jDrOHUS4tLA3A25Q3Olyz15E4ht84EY
- 6/+IGGwuXw==
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PN0P287MB2258:EE_|PNYP287MB4069:EE_
+X-MS-Office365-Filtering-Correlation-Id: c013136d-04c7-4a3d-c819-08dda8cde40d
+X-MS-Exchange-SLBlob-MailProps:
+	Cq7lScuPrnqTDjd4Fy0PN0HVJKAgc5hFtHC/ptq2/B1XzN9fSXJqzO+4xixLBbK9OujE8EFb88Bb4VOczjSF+kYkcsSLkGe36HzeiV3AWkpPj4nMOHLtze9lG8BndpEkKRWGc9pASS++baLHOpG+Q0mN3w0d6XC+cN8c2beruMelrnngkEMdsui77lzpYBNUT2WGeBqyEIKke6rrLQTM9BatnAKg0AFhDhP17Wpzwpn1gZBlym7KSEd0t+xx+2mj56sZBrZWfBAMj9FlkYkym5rBSOcIyk7fobt+5FNyZBYympPnbzl3KDxhoRrJswpiHcdoitOqwALFl9Aa/xvhcJNlsAoEisJbnmzFBHEzEWGHbhYaQYRvkcBDwHXeAdTHCsbdA1YKsjUmBhN7iMKm0aZS4mPI+6vK8/tKZJ4Z1D75GgPRTIAVm+zwE2dQu3RatxQO8YLS0Qf2bWdvIF9mDCT1RF6brzAJCD4eQdmt7HWjfG6/RrnJI2HE39bIYEsL5teFo5r+WF4ef37kOA+FzfB4vypDueiCY1hfUMZMQu+dd5Lox8xsarvSzCDp0w54X3EumUmse25Lrsd+XIFIshIjlgZ8fbzkUiYeCwfmTxa+oDvNqLoip87dkKcy4SRfXAjE8IwlHEeEjJjn51Ym1aT0qhMF9IYNo0Mh59CNLaRy6EqF3GIWykdR829645uX5n8x4QABGymZRNEidvgsu2gLaUfJYCro1+iamw+fuglQhpZNhJZEn3Srnu9DJvHTlz/7P2i7/j0=
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|6090799003|461199028|19110799006|7092599006|8060799009|5072599009|15080799009|3412199025|440099028;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NE0vVE5KMzVHZTQyZWMvV0tkemp0alE1SW9jRFNjcnlVSlUzWGFBZkQ3RDJr?=
+ =?utf-8?B?NjhkNEkvMHZudE5IaHZERjVzMUZjQ0JhZCtHajF4QlBTclRvRG9FSnZHWEpU?=
+ =?utf-8?B?S01SQ2hmRHRUQUpycmd2b0JwWFFsdU1aQ2ViNndnS0pOMm91ZGd1MnU1dzhP?=
+ =?utf-8?B?MW43S1pnMXdKS2IvTE5ldTlYdTc5VGR4aWluVzhuWmxCSGJreTJBZzBrTTBP?=
+ =?utf-8?B?VVYyMzdBc1lDbk9EQ0EvdllxaGFpakI2bjJ0ZlNscndxZFhraXZSVnNVK0pj?=
+ =?utf-8?B?TW80VlRWeEJUYjlmY3FSb1JoOU1XWUlpZFE4a05SZjBzcXR4bFRaZ3VPRG1E?=
+ =?utf-8?B?TS9JOC92VFlkOXdQQ2ZXSkhseXZFZk8ybUhoeEJlM0svRDAvYko2bDg1aHlx?=
+ =?utf-8?B?SHd0eHlKSmUrUEFmTmgyeEFoMUJIMzJ4L2U4MFRCZ3N5VTFNbnBQdHBsSnhr?=
+ =?utf-8?B?azczWnlXVFd0VkhBMEZqeTdPV3IwemxIa1AyMGlwbWdnSHlaWnJYLzlKRmFz?=
+ =?utf-8?B?WGhFakNWdms0VE45cDJ2eDJyOTM1bDNtbzNWMU5nRFNZSVorVlJZdkxTNTRm?=
+ =?utf-8?B?V3crWXdNeWM2Z01kM1lrYXI5Q2Q4MDJST3ZaV0o4UHVhd3A5Qkk4K2c4WDE2?=
+ =?utf-8?B?TmVSN0gyZ3NoNUdad0YvdFI1R0d5VkhNdGV4VTZyd1ZPMkc1RW9NZW9vM1or?=
+ =?utf-8?B?NWE5Qmd3bWZEbERkVzBLcWRXeTdQaW5zNWNEZHdqa1VjTUZWV041emVoTGZT?=
+ =?utf-8?B?dXpsNFR6Zk5Rcjl6TkxsZzFQdWZLajU0WncxK0JkdDA3SzdzaW5TbFdyZ3pT?=
+ =?utf-8?B?Z3d2VnVEOXMxSGZhemIyQ3N1SGtJdmxlLy9paEM5dWJ2WFBpbVgxYjEwMTZU?=
+ =?utf-8?B?QVhReUtKd2pZRTZKK1VYOXMrblNsWmsyR3psRGRmNWlQbHBCU05mRTBpc1lx?=
+ =?utf-8?B?NmZWRE9tSW9rOURNUVpYMGhnUHFyd0YwblFCMDZUbzR4WjRxNmVlVGpOa21B?=
+ =?utf-8?B?bWhwS292NGhiNTdaUW41L2RrVzZ1QjVzQlltUVk1bDFjK2NPajduS0hCQUQr?=
+ =?utf-8?B?a0N3S1VnejNadFFjaklPOU5idldpL1BSR0dncWQzeGYxcGVaZGFrR1dUNkZx?=
+ =?utf-8?B?a0RYTlZ3dHNUZnNHWWx2bXZnbFVpVTJDK3FuZS91akpzWUo0WlNKeFpLaDB2?=
+ =?utf-8?B?enlrUDRYYVV3ckZOdG8rVWJ2cjMvM2tZMS9ZZVBuV0MwTkU4d2tBdi85NTNM?=
+ =?utf-8?B?MnV3K0JYMXl1YlRXeEpYWnJWbGlGM3B2a3E4RUlyTElYbFVGQWJFTU1IRkJQ?=
+ =?utf-8?B?SW1TbkhWaUhyYUtwN0RWWnJnKzRTcnY2eWo4NnhZVmc1V016Wms0T2wrU0Fp?=
+ =?utf-8?B?b0pGTHRkRGZrNDlaMXpGNkxPL3JVRnVJY1lBcTRMZmZOZlRleHJTaVlzanVT?=
+ =?utf-8?B?bDU0VmhLbVlib1REaXdtcGlQalNaeXF0UFZmRWRvdzZIMFZob3RjOHRXMFBv?=
+ =?utf-8?B?eUxDeStuV2hrTEtXYU5nbEFWbjBadjl2WnFFYUVpUytITXNEbnR6RUM3YWZq?=
+ =?utf-8?B?ODlhZz09?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?L1MzdjBSQTh2SStFRzVQRmxrNmlQZ29lRi91bUdpNFRjb1FmbFpienhsUUV5?=
+ =?utf-8?B?WS9iSHJsYlQ4ajllRXkrc1YwOCs4dXpYMmxmNlBxN1ZzM0Q5bVRoeVU2OC9L?=
+ =?utf-8?B?RW5QcGpFUFI5N21xem9ieUgrbnVZUXgrWmtJazVNM05wVHFydFVPSTVjM215?=
+ =?utf-8?B?UmhHVFFnYlMyNVlLMGxLNDdmc1pYTUcrQ0t1V3YveHhwbk5sWFJOTXEzTFU2?=
+ =?utf-8?B?eGErMllVZG54WWc3cmw3WlVna1Z0MTRFUlh6dVNoQWx1YTBzK0d1cmRTT0xY?=
+ =?utf-8?B?TW9pUDh3RC9wbDJFMmdkYmxRdm5sbHZ1WStUNURwSUpoNG9aS2VMRHd4NWJC?=
+ =?utf-8?B?cnkzaUs4QTlxc2JRcEhPcmxHUFB2WFp5djMxdHBYTk92ci9TZ2RwRmRmZjkr?=
+ =?utf-8?B?SWdlZ0piWWNKZ1BqZ2tXMm0zUUVnWllkRmR3anFIclhSNkl1SHVpVE45NjlX?=
+ =?utf-8?B?a1hwM3pFK2pUUVY1MkZxQy8zYTJjV1dyS05lZVpETXMvTnFLVUpIcHZpVG1I?=
+ =?utf-8?B?cWZDdWZjbHRDWHBYNVoxUUxBMWFGU2FrTE1mSnNFTjFMM1ByYjFDeFlxVVpu?=
+ =?utf-8?B?OUJ5Z1d1VG1oWm1TaEdnVk9wa1h6cTVhemNQbjBSRnM2TmREQ3pJZzZLY0pn?=
+ =?utf-8?B?bWI2RmFnOGNQZkowMCtFQjJaNXhaQmtIaXgxQWxYWFk5a3o1MllVYUNCd09P?=
+ =?utf-8?B?VWtjMGZ0QVkwd3JGbWdpcVpBYndhZXNqZmpKMTMybEtZVkh4SStCM0RueS9n?=
+ =?utf-8?B?Z1ZDWGExSlQxb3FIZi9QSlRlSTBOTDE0bDZrb2hxWGR6RzcvUEd2RFNhZXln?=
+ =?utf-8?B?SE9BRXA0MHNIWjBmV1l3MTNVVTRnSWhSVnY1L21iMHZtTi93TDNNQzI1ZEJx?=
+ =?utf-8?B?ZDBJdk0rOG0reEJPS3VKQjJSTDBmYUlqcm5zcmo5eFFmQjREQTBzZVR1WlBU?=
+ =?utf-8?B?MWFhZzJsc1NJYy9PdjJPdGtsY0V6T3B4VStnbVZjQXdoR3JRb1lLQ2pYWC9y?=
+ =?utf-8?B?SWk3eXU1M1RZeFVnQVR0WTJjek1iZFJkSXA1dzRqelc1bEczcE5qQTZmM1Nj?=
+ =?utf-8?B?V2pHa0YxL0NDbG9SbDFEZkdjZVVIMis2eEVka0ZSL21TSFhoVjdHZ1MvQjRn?=
+ =?utf-8?B?QmtuSXBHbEFHc0lPS2krVU9zdHE1TEg2a25qNFIxdWFnN2JZa3prOFZodFF5?=
+ =?utf-8?B?cGJnZ2c5OUhiVVQ0L1FJdGlYTUNTQ1FISXFPVkJlUm5OMjVoQ0s0RDNwRHZk?=
+ =?utf-8?B?Ly9mQndsQkNJZVlaWmtlM201ZVRJY29kaXlITElGYS9OZVd4MU5JQ1lyOWJE?=
+ =?utf-8?B?aHpjWjkxK1VOV2dnMG1QaHkyai9DcWN0VmhTbjdEMW45RkR2TGNQQmhnL2l1?=
+ =?utf-8?B?VmxERGx3MGc5VFVRenY2WGc3TmJTQnBMdzZRVi92OFg1ejVNcDZ5TWlkQXp3?=
+ =?utf-8?B?NWVNYzNHbFZCN3JGZDRJeTYvdmhWRU9DcVNaRnBrQ2lPOFRDWnVzd2FwTVlj?=
+ =?utf-8?B?VUNZM2FTN0lNdFVVL1ZUK2g2YjVyVmpNYXlCQnBrU0NHaWovUWEzWFRiOWRu?=
+ =?utf-8?B?RGVSZmFiaDhBS3N3a0tjbnRvVE82K2pMV1p1NGZJNit3VjhtZFZ5OTFGa2pZ?=
+ =?utf-8?B?WTdleEVZYlUrQUdtRlV4bFRHM0VMejh1b3l2ZDg5R2JRQzV4YjFZaHhxQkRI?=
+ =?utf-8?B?Z21TeVB0U0w4TkhMekNqdjliZ0JHWVdDOEEzZGJoYnR2K0NFK2RsSjE3VHpR?=
+ =?utf-8?Q?RSE8uBFSHhOzCmIzPF4Etpk7L6njiZqwLXvU13S?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c013136d-04c7-4a3d-c819-08dda8cde40d
+X-MS-Exchange-CrossTenant-AuthSource: PN0P287MB2258.INDP287.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 09:54:00.7195
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PNYP287MB4069
 
-Hi Angelo,
+"sophgo,sg2044-pwm" should have not been in 6.16, submit this after that?
 
-thanks for review.
+Others. LGTM.
 
-> Gesendet: Mittwoch, 11. Juni 2025 um 11:33
-> Von: "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.c=
-om>
-> Betreff: Re: [PATCH v3 06/13] arm64: dts: mediatek: mt7988: add basic et=
-hernet-nodes
+Reviewed-by: Chen Wang <unicorn_wang@outlook.com>
+
+Thanks
+
+On 2025/6/9 7:28, Inochi Amaoto wrote:
+> From: Longbin Li <looong.bin@gmail.com>
 >
-> Il 08/06/25 23:14, Frank Wunderlich ha scritto:
-> > From: Frank Wunderlich <frank-w@public-files.de>
-> >=20
-> > Add basic ethernet related nodes.
-> >=20
-> > Mac1+2 needs pcs (sgmii+usxgmii) to work correctly which will be linke=
-d
-> > later when driver is merged.
-> >=20
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> > ---
-> >   arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 124 ++++++++++++++++++++=
-+-
-> >   1 file changed, 121 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/bo=
-ot/dts/mediatek/mt7988a.dtsi
-> > index 560ec86dbec0..ee1e01d720fe 100644
-> > --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> > +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> > @@ -680,7 +680,28 @@ xphyu3port0: usb-phy@11e13000 {
-> >   			};
-> >   		};
-> >  =20
-> > -		clock-controller@11f40000 {
-> > +		xfi_tphy0: phy@11f20000 {
-> > +			compatible =3D "mediatek,mt7988-xfi-tphy";
-> > +			reg =3D <0 0x11f20000 0 0x10000>;
-> > +			resets =3D <&watchdog 14>;
-> > +			clocks =3D <&xfi_pll CLK_XFIPLL_PLL_EN>,
-> > +				 <&topckgen CLK_TOP_XFI_PHY_0_XTAL_SEL>;
-> > +			clock-names =3D "xfipll", "topxtal";
->=20
-> resets here please, not after reg.
-
-OK
-
-> > +			mediatek,usxgmii-performance-errata;
-> > +			#phy-cells =3D <0>;
-
-maybe #phy-cells above vendor-specific property like below?
-
-> > +		};
-> > +
-> > +		xfi_tphy1: phy@11f30000 {
-> > +			compatible =3D "mediatek,mt7988-xfi-tphy";
-> > +			reg =3D <0 0x11f30000 0 0x10000>;
-> > +			resets =3D <&watchdog 15>;
-> > +			clocks =3D <&xfi_pll CLK_XFIPLL_PLL_EN>,
-> > +				 <&topckgen CLK_TOP_XFI_PHY_1_XTAL_SEL>;
-> > +			clock-names =3D "xfipll", "topxtal";
->=20
-> ditto
-
-ok, #phy-cells last?
-
-> > +			#phy-cells =3D <0>;
-> > +		};
-> > +
-> > +		xfi_pll: clock-controller@11f40000 {
-> >   			compatible =3D "mediatek,mt7988-xfi-pll";
-> >   			reg =3D <0 0x11f40000 0 0x1000>;
-> >   			resets =3D <&watchdog 16>;
-> > @@ -714,19 +735,116 @@ phy_calibration_p3: calib@97c {
-> >   			};
-> >   		};
-> >  =20
-> > -		clock-controller@15000000 {
-> > +		ethsys: clock-controller@15000000 {
-> >   			compatible =3D "mediatek,mt7988-ethsys", "syscon";
-> >   			reg =3D <0 0x15000000 0 0x1000>;
-> >   			#clock-cells =3D <1>;
-> >   			#reset-cells =3D <1>;
-> >   		};
-> >  =20
-> > -		clock-controller@15031000 {
-> > +		ethwarp: clock-controller@15031000 {
-> >   			compatible =3D "mediatek,mt7988-ethwarp";
-> >   			reg =3D <0 0x15031000 0 0x1000>;
-> >   			#clock-cells =3D <1>;
-> >   			#reset-cells =3D <1>;
-> >   		};
-> > +
-> > +		eth: ethernet@15100000 {
-> > +			compatible =3D "mediatek,mt7988-eth";
-> > +			reg =3D <0 0x15100000 0 0x80000>,
-> > +			      <0 0x15400000 0 0x200000>;
->=20
-> reg =3D <0 0x15100000 0 0x80000>, <0 0x15400000 0 0x200000>;
->=20
-> it's 83 columns - it's fine.
-
-ok, thought 80 columns is the limit...
-
-> > +			interrupts =3D <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
-> > +				     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
-> > +				     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
-> > +				     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
-> > +			clocks =3D <&ethsys CLK_ETHDMA_CRYPT0_EN>,
-> > +				 <&ethsys CLK_ETHDMA_FE_EN>,
-> > +				 <&ethsys CLK_ETHDMA_GP2_EN>,
-> > +				 <&ethsys CLK_ETHDMA_GP1_EN>,
-> > +				 <&ethsys CLK_ETHDMA_GP3_EN>,
-> > +				 <&ethwarp CLK_ETHWARP_WOCPU2_EN>,
-> > +				 <&ethwarp CLK_ETHWARP_WOCPU1_EN>,
-> > +				 <&ethwarp CLK_ETHWARP_WOCPU0_EN>,
-> > +				 <&ethsys CLK_ETHDMA_ESW_EN>,
-> > +				 <&topckgen CLK_TOP_ETH_GMII_SEL>,
-> > +				 <&topckgen CLK_TOP_ETH_REFCK_50M_SEL>,
-> > +				 <&topckgen CLK_TOP_ETH_SYS_200M_SEL>,
-> > +				 <&topckgen CLK_TOP_ETH_SYS_SEL>,
-> > +				 <&topckgen CLK_TOP_ETH_XGMII_SEL>,
-> > +				 <&topckgen CLK_TOP_ETH_MII_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_500M_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_PAO_2X_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_SYNC_250M_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_PPEFB_250M_SEL>,
-> > +				 <&topckgen CLK_TOP_NETSYS_WARP_SEL>,
-> > +				 <&ethsys CLK_ETHDMA_XGP1_EN>,
-> > +				 <&ethsys CLK_ETHDMA_XGP2_EN>,
-> > +				 <&ethsys CLK_ETHDMA_XGP3_EN>;
-> > +			clock-names =3D "crypto", "fe", "gp2", "gp1",
-> > +				      "gp3",
->=20
-> clock-names =3D "crypto", "fe", "gp2", "gp1", "gp3",
->=20
-> :-)
-
-do not know how this was happen...of course i change this ;)
-
-> > +				      "ethwarp_wocpu2", "ethwarp_wocpu1",
-> > +				      "ethwarp_wocpu0", "esw", "top_eth_gmii_sel",
-> > +				      "top_eth_refck_50m_sel", "top_eth_sys_200m_sel",
-> > +				      "top_eth_sys_sel", "top_eth_xgmii_sel",
-> > +				      "top_eth_mii_sel", "top_netsys_sel",
-> > +				      "top_netsys_500m_sel", "top_netsys_pao_2x_sel",
-> > +				      "top_netsys_sync_250m_sel",
-> > +				      "top_netsys_ppefb_250m_sel",
-> > +				      "top_netsys_warp_sel","xgp1", "xgp2", "xgp3";
-> > +			assigned-clocks =3D <&topckgen CLK_TOP_NETSYS_2X_SEL>,
-> > +					  <&topckgen CLK_TOP_NETSYS_GSW_SEL>,
-> > +					  <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>,
-> > +					  <&topckgen CLK_TOP_USXGMII_SBUS_1_SEL>,
-> > +					  <&topckgen CLK_TOP_SGM_0_SEL>,
-> > +					  <&topckgen CLK_TOP_SGM_1_SEL>;
-> > +			assigned-clock-parents =3D <&apmixedsys CLK_APMIXED_NET2PLL>,
-> > +						 <&topckgen CLK_TOP_NET1PLL_D4>,
-> > +						 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
-> > +						 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
-> > +						 <&apmixedsys CLK_APMIXED_SGMPLL>,
-> > +						 <&apmixedsys CLK_APMIXED_SGMPLL>;
->=20
-> Address and size cells must go *before* vendor-specific properties
-
-OK, same for #phy-cells above?
-
-> > +			mediatek,ethsys =3D <&ethsys>;
-> > +			mediatek,infracfg =3D <&topmisc>;
-> > +			#address-cells =3D <1>;
-> > +			#size-cells =3D <0>;
-> > +
->=20
-> Cheers!
-> Angelo
->=20
+> Add pwm device node for SG2044.
+>
+> Signed-off-by: Longbin Li <looong.bin@gmail.com>
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>   arch/riscv/boot/dts/sophgo/sg2044-sophgo-srd3-10.dts |  4 ++++
+>   arch/riscv/boot/dts/sophgo/sg2044.dtsi               | 10 ++++++++++
+>   2 files changed, 14 insertions(+)
+>
+> diff --git a/arch/riscv/boot/dts/sophgo/sg2044-sophgo-srd3-10.dts b/arch/riscv/boot/dts/sophgo/sg2044-sophgo-srd3-10.dts
+> index 01340f21848f..b50c3a872d8b 100644
+> --- a/arch/riscv/boot/dts/sophgo/sg2044-sophgo-srd3-10.dts
+> +++ b/arch/riscv/boot/dts/sophgo/sg2044-sophgo-srd3-10.dts
+> @@ -63,6 +63,10 @@ mcu: syscon@17 {
+>   	};
+>   };
+>   
+> +&pwm {
+> +	status = "okay";
+> +};
+> +
+>   &sd {
+>   	bus-width = <4>;
+>   	no-sdio;
+> diff --git a/arch/riscv/boot/dts/sophgo/sg2044.dtsi b/arch/riscv/boot/dts/sophgo/sg2044.dtsi
+> index b65e491deb8f..f88cabe75790 100644
+> --- a/arch/riscv/boot/dts/sophgo/sg2044.dtsi
+> +++ b/arch/riscv/boot/dts/sophgo/sg2044.dtsi
+> @@ -347,6 +347,16 @@ portc: gpio-controller@0 {
+>   			};
+>   		};
+>   
+> +		pwm: pwm@704000c000 {
+> +			compatible = "sophgo,sg2044-pwm";
+> +			reg = <0x70 0x4000c000 0x0 0x1000>;
+> +			#pwm-cells = <3>;
+> +			clocks = <&clk CLK_GATE_APB_PWM>;
+> +			clock-names = "apb";
+> +			resets = <&rst RST_PWM>;
+> +			status = "disabled";
+> +		};
+> +
+>   		syscon: syscon@7050000000 {
+>   			compatible = "sophgo,sg2044-top-syscon", "syscon";
+>   			reg = <0x70 0x50000000 0x0 0x1000>;
 
