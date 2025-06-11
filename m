@@ -1,126 +1,152 @@
-Return-Path: <netdev+bounces-196470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77106AD4EB9
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:46:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA44BAD4F51
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E91317C41B
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:46:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177504601E0
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE7523F41F;
-	Wed, 11 Jun 2025 08:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE81E25B319;
+	Wed, 11 Jun 2025 09:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lkFXsMSp"
+	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="TLTRiRSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7785223C8CD
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA87254AEC
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 09:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749631579; cv=none; b=SM+My9MXuFO6ocFdGVvZ2vwDt8BuXX/+Xl3ViA2tuK/lBKQnYvUTrFoxUqUd0co1rb7LLBIKrSThVUiHscu4aIvnKoTn6Y+gCJrGnZ+3mopVFKegRG5mWNWvLOw+K8LdHxuIEEilg2WKJGUgDA9b6F9humtvqWZeGCb387TIknI=
+	t=1749632678; cv=none; b=STyDrGhqLPqiDKr66C9c5b4Gjw/engfUPipl1Fl3WJ/D1Y6jwmRfcVUeZObfUTutbLFOfIYLCMebeLD9LH0kRvCLRGeDsXrpApSrAY67zL3Ub65flvcGRQKmfqtPk2p8/XIbm3dvhKlyUud0Q5Xq8Cvuh0yoTfi0mrOkTaW6qB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749631579; c=relaxed/simple;
-	bh=6x6QL82OphoxZIikvvYXWnq+2WXRIS75JJh3r94rvgE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tDV9b9cUkuqSTnJYigsCxZP79vSgYpgfCoZ2EEXAxQbNnQsFyz0C6p+s3kzk5XeNYpmy6UvbTgRmzkBzsjrBznGDkT9M5HghMzepLRvmKyNEKPo7qbM2+k2+zWlcPSUZR/xDEL8FqRZ4IT0Zh1g/ubid9N3pabLrNTCgdPekiaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lkFXsMSp; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749631578; x=1781167578;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6x6QL82OphoxZIikvvYXWnq+2WXRIS75JJh3r94rvgE=;
-  b=lkFXsMSpQ4MAwjN7S0NM73BmMdi+Mosni5++d7ccXyeiDeE3GI451A1+
-   qYHQL4H8EpjKkp9yuNocNuVval4xR4egCAKsKH9jEaEZGCRUBmhd/R1RS
-   TKIaHT5qNBxANhYxJrNZDAeElANC71h2ZnjbM+Cp1Xm0/iAPhRDtz0tko
-   SfXlo8y74RDTXSUEL3dwDAgVxB2Ccayg5syLPferJJQBm4sJ58LSMiwmo
-   mot9F9WsfQTftCbsrhw3yv0hMq6hlEhQS2WEtPL8w2Hoxm5UGRyUtyW9V
-   QXtmvE5PJNfdOMhR1yuUOORGqEcwjfcZpZ7GNIC7TKXWIZR/NEjT+9ehB
-   A==;
-X-CSE-ConnectionGUID: Rq8LR9UFQIy2ha6Ux9sX4A==
-X-CSE-MsgGUID: xMZ8b62HR9qKD8DRWTWBzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="62046158"
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="62046158"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:46:17 -0700
-X-CSE-ConnectionGUID: bTb/FLHOST6nd0bHeHumug==
-X-CSE-MsgGUID: 3sHeCa0ERRqjoandVdG6KQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="152298394"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa004.fm.intel.com with ESMTP; 11 Jun 2025 01:46:16 -0700
-Received: from kord.igk.intel.com (kord.igk.intel.com [10.123.220.9])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 73C8B332AE;
-	Wed, 11 Jun 2025 09:46:15 +0100 (IST)
-From: Konrad Knitter <konrad.knitter@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Konrad Knitter <konrad.knitter@intel.com>
-Subject: [PATCH iwl-next v1 3/3] ixgbe: add overwrite mask from factory settings
-Date: Wed, 11 Jun 2025 11:01:22 +0200
-Message-Id: <20250611090122.4312-4-konrad.knitter@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250611090122.4312-1-konrad.knitter@intel.com>
-References: <20250611090122.4312-1-konrad.knitter@intel.com>
+	s=arc-20240116; t=1749632678; c=relaxed/simple;
+	bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=aZDs++23vkB4sBX1DIsITFudrofPow+8qEL5dUvre9dtNAkBMaOtZhht7af0MzKI+mb38Gvvjr8MRSjKyYuGtTUwW/nB0F7FNHdJuo2WkBX4utnWbh2na6mmhRI7jNWVJTOKRAd1SAGice1XPCoZ8WlnP2wNYr74LClaoOHdby8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=TLTRiRSr; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 6EC31240103
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:04:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
+	s=1984.ea087b; t=1749632674;
+	bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
+	b=TLTRiRSralZsGm3Chv0w46FoF9yz05ZenISNsjEbDf1uAv57sSKGwfxX5t39QR7tY
+	 6OdFvRBFohyAo8lqz3dbBh2kKYnZWmrGcJ6ElmMeJ2n6lvCl39S9Uoe+TizkYSN+cm
+	 kfPuRcaEWToQKHP85flDWDLB9qMtdChPMUHnBIGXCp4fEjL6sSq/dXeoDdJmoNFqJA
+	 xOa4RlWzmmiFEGgkUb5RJXOQtYI8PM47xnxzf5bqMnSZscL7BhaMZ7kHQzj9MEeo1G
+	 vDX7kz0yBJT66DqbnQwPzlj/iomKdjzaFSme88s2k8PR7cf71zEoqTCzs+EQzvtNT0
+	 hMPKDKYlFIzmlE0BGMrwRICgF31FdjK4+GLE8X8txDXRB8ir+s476XCFx01VYBtapw
+	 KFBPqbtoJ+eLnr8xUHXcbOqTeYc0LJUdCOp7OH1xP/qrjvhOKPcZNpASFUzVPnfPFK
+	 0CXk/6CgSd7q0TpGWzOvtvWXApDDUIKtvaMaZ+0wJxL7Q5n5mVa
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4bHKV61lB6z9rxD;
+	Wed, 11 Jun 2025 11:04:30 +0200 (CEST)
+From: Charalampos Mitrodimas <charmitro@posteo.net>
+Date: Wed, 11 Jun 2025 09:04:06 +0000
+Subject: [PATCH bpf-next v2] net: Fix RCU usage in task_cls_state() for BPF
+ programs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250611-rcu-fix-task_cls_state-v2-1-1a7fc248232a@posteo.net>
+X-B4-Tracking: v=1; b=H4sIAIVGSWgC/4WNXQ6CMBCEr0L22TX9QTA+cQ9DSKGLNBpKupVoS
+ O9u4QI+fpOZbzZgCo4YbsUGgVbHzs8Z1KmAYTLzg9DZzKCEuohKXDEMbxzdB6PhZze8uONoIqE
+ gW+ux1LWVBHm8BMqtQ3xvM0+Oow/f42eVe/pXuUqUqMxe68tK6L5ZPEfy55kitCmlHwADJY29A
+ AAA
+X-Change-ID: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
+ Tejun Heo <tj@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com, 
+ Charalampos Mitrodimas <charmitro@posteo.net>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1749632650; l=2465;
+ i=charmitro@posteo.net; s=20250526; h=from:subject:message-id;
+ bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
+ b=ut6ePDZlYIfJ1ZYNH55TQtCyEKaPR4TU6r3rukgknfjavYlrrn/IkxJBy746Ht37XV5aI87Ex
+ oBOn6hKvQS4C7IH8VFFYisxJPoXcJkH3SO1bxjld9hRyPF4Iq2fnFUw
+X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
+ pk=PNHEh5o1dcr5kfKoZhfwdsfm3CxVfRje7vFYKIW0Mp4=
 
-Support for restoring settings and identifiers from factory settings
-instead of using those found in the image.
+The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
+types") made bpf_get_cgroup_classid_curr helper available to all BPF
+program types, not just networking programs.
 
-Restoring data from factory settings requires restoring both settings
-and identifiers simultaneously. Other combinations are not supported.
+This helper calls __task_get_classid() which internally calls
+task_cls_state() requiring rcu_read_lock_bh_held(). This works in
+networking/tc context where RCU BH is held, but triggers an RCU
+warning when called from other contexts like BPF syscall programs that
+run under rcu_read_lock_trace():
 
-Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+  WARNING: suspicious RCU usage
+  6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
+  -----------------------------
+  net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usage!
+
+Fix this by also accepting rcu_read_lock_trace_held() as a valid RCU
+context in the task_cls_state() function. This is safe because BPF
+programs are non-sleepable and task_cls_state() is only doing an RCU
+dereference to get the classid.
+
+Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b4169a1cfb945d2ed0ec
+Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
+Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c | 6 ++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 1 +
- 2 files changed, 7 insertions(+)
+Changes in v2:
+- Fix RCU usage in task_cls_state() instead of BPF helper
+- Add rcu_read_lock_trace_held() check to accept trace RCU as valdi
+  context
+- Drop the approach of using task_cls_classid() which has in_interrupt()
+  check
+- Link to v1: https://lore.kernel.org/r/20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net
+---
+ net/core/netclassid_cgroup.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
-index e5479fc07a07..6b46da369934 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
-@@ -654,6 +654,12 @@ int ixgbe_flash_pldm_image(struct devlink *devlink,
- 		/* overwrite both settings and identifiers, preserve nothing */
- 		preservation = IXGBE_ACI_NVM_NO_PRESERVATION;
- 		break;
-+	case (DEVLINK_FLASH_OVERWRITE_SETTINGS |
-+	     DEVLINK_FLASH_OVERWRITE_IDENTIFIERS |
-+	     DEVLINK_FLASH_OVERWRITE_FROM_FACTORY_SETTINGS):
-+		/* overwrite both settings and identifiers, from factory settings */
-+		preservation = IXGBE_ACI_NVM_FACTORY_DEFAULT;
-+		break;
- 	default:
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Requested overwrite mask is not supported");
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index d76334b8fbad..426bb2424620 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -691,6 +691,7 @@ struct ixgbe_aci_cmd_nvm {
- #define IXGBE_ACI_NVM_LAST_CMD		BIT(0)
- #define IXGBE_ACI_NVM_PCIR_REQ		BIT(0) /* Used by NVM Write reply */
- #define IXGBE_ACI_NVM_PRESERVE_ALL	BIT(1)
-+#define IXGBE_ACI_NVM_FACTORY_DEFAULT	BIT(2)
- #define IXGBE_ACI_NVM_ACTIV_SEL_NVM	BIT(3) /* Write Activate/SR Dump only */
- #define IXGBE_ACI_NVM_ACTIV_SEL_OROM	BIT(4)
- #define IXGBE_ACI_NVM_ACTIV_SEL_NETLIST	BIT(5)
+diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
+index d22f0919821e931fbdedf5a8a7a2998d59d73978..df86f82d747ac40e99597d6f2d921e8cc2834e64 100644
+--- a/net/core/netclassid_cgroup.c
++++ b/net/core/netclassid_cgroup.c
+@@ -21,7 +21,8 @@ static inline struct cgroup_cls_state *css_cls_state(struct cgroup_subsys_state
+ struct cgroup_cls_state *task_cls_state(struct task_struct *p)
+ {
+ 	return css_cls_state(task_css_check(p, net_cls_cgrp_id,
+-					    rcu_read_lock_bh_held()));
++					    rcu_read_lock_bh_held() ||
++					    rcu_read_lock_trace_held()));
+ }
+ EXPORT_SYMBOL_GPL(task_cls_state);
+ 
+
+---
+base-commit: 079e5c56a5c41d285068939ff7b0041ab10386fa
+change-id: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
+
+Best regards,
 -- 
-2.38.1
+Charalampos Mitrodimas <charmitro@posteo.net>
 
 
