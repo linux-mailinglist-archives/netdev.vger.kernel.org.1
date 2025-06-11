@@ -1,107 +1,141 @@
-Return-Path: <netdev+bounces-196567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B32AD557E
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:26:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B94BAD55B2
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 14:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1306A3A2A98
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:26:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29B9B7ACAFC
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 12:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBFF27FD48;
-	Wed, 11 Jun 2025 12:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E488B281358;
+	Wed, 11 Jun 2025 12:36:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9D327E1CA
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 12:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DAF27FD7E
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 12:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749644800; cv=none; b=eUK7M1N6ZM9n5JiCvnXJtYn4AGQpOfVALG0tlEQIzvsZFSqomxSagxHpARtHx4fphgi7mFm9sqzxSzhZAab6F21u7xoPbt5cSSD4c96m2CJ3DZA2NRNzUHqMyYaM03MsHOdw3JbDFEP2zTZPudSw+/tw5FNWFBmxvMAOm/IvrQc=
+	t=1749645398; cv=none; b=gDyxheBalTTCBbnI5i6ts3smEDtd8pFXO3cPeeunZlZvUhSA70sDd3CXdNwOHIHrJqubqbfd7dmmvADUyWWlhDYWh5eLn57vfA1bIpNZC6TFKvmP7lKr7y899Kw/mEXePhz4g924VT/I0hdZ+VcC3B/4k+S0qZmDcSkH71K/8sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749644800; c=relaxed/simple;
-	bh=LnUumeNEdEHZqFIrLiHzMV5L1txyW+F+LXghYm2oaCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=In97yFxePbPFo8+s7BRQ0PwcIq9pjPr2X4hmCcjGB50Vziz2P1KBDGVzcaBsXbBqLE0IfsX9VQKY92T6ElpAgJqXjSUGRWIiuKATaN2HuFRunIJ+o9NxkdsJy3ucjQ8Uxt9ztEIsg0lhX5d+DpPiBpaJPd/V3DGfFda5qi7QChk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <f.pfitzner@pengutronix.de>)
-	id 1uPKXM-0000zY-3u; Wed, 11 Jun 2025 14:26:36 +0200
-Message-ID: <73539d7f-75a9-4f52-a95c-b2b1a608fe6d@pengutronix.de>
-Date: Wed, 11 Jun 2025 14:26:34 +0200
+	s=arc-20240116; t=1749645398; c=relaxed/simple;
+	bh=uCvKZDotiP9ZjEzoiagEp86OqFBjkyOM3QpgLpJB/5M=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RYKwp+eviYDION/OQufjaLudToMzucBAPRCLlhbyq5lbz7uQxze1QRPHGW0RK78hO+gx+g958xT9VdTesvItnSQdzorb9XH53mtlRju146YEtDyk6+p/lemLM+pH1OOA7QyK/eD8+MofxxD+331wNoYor3UFBIFR7bA9GF1pEDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddb4a92e80so85553945ab.3
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 05:36:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749645396; x=1750250196;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vng/YzV4Bzb6RRDIX+KXOBf9o2CxIKJMdOrtad0eo1E=;
+        b=MrYgWZAqCSb2TmPSQK490avWZ3dF3vzobRZQ7h4kkCXvg/Q2NvKRNT71Gm5M8qALHd
+         vA87U6Kj7Sc6hFU0ze6oVr7uRjNuvIV4QVulVvu5BwKI8ouUwBCosySp43U0BFZ0u5G3
+         N0oQ83KUR4m0uM5Ck1ThlRQ8k828nvyUoCq00ztLI3vElIpC7xhd5k7PRdlghIWl6V8q
+         HveWWynJYK39JrGxxOaE2E3M7dux9qtAo4X1gs47pnZQvQJjO3XEJAR2kS/LFUhczPjS
+         6oPFFqqM5mHEXIx61A899zCH61jKfxnWn/R5CvI9pmF8ch8LwMKWdQ/ZU/hjxjzOlDug
+         WmPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAgmmKa5shjABEbuX8+YnQS7ex8Jx3LCvCk6qOV/iaFK8/biLLSrVxiYggHL/ZN0MDmvQevQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOA29m1iPx0rNTQYIa+tU3opcbatehCEd/EhszfWKt47bU9HmY
+	umRiwa6FJUxbISyUHVhhhwMZM4rsUBs6UmTZXfv2RLI5af/n3DZPUDmHQOmZb9OCdhTk4XWa6vg
+	wQ9hXbSn5xQUE/NGiZlqyX/IuQOd5qdgcXX9qfcYDPlVV5JaWDEFsRh0vjfY=
+X-Google-Smtp-Source: AGHT+IEbaV9OobI4y3/HlQ3UpH4KVgxxud1pe3uzFkgBOj6OhGhqJCvoimSBn3WgN3hJwve+Y8P3FGFf+FRQvXicv53Nz12B7jts
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] bridge: dump mcast querier state per vlan
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com,
- bridge@lists.linux-foundation.org, entwicklung@pengutronix.de,
- razor@blackwall.org
-References: <20250611121151.1660231-1-f.pfitzner@pengutronix.de>
- <aEl0eD0qm5xYgvE7@shredder>
-Content-Language: en-US, de-DE
-From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-In-Reply-To: <aEl0eD0qm5xYgvE7@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: f.pfitzner@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:1fe5:b0:3dd:b762:ed1b with SMTP id
+ e9e14a558f8ab-3ddf42f060fmr33724955ab.16.1749645396357; Wed, 11 Jun 2025
+ 05:36:36 -0700 (PDT)
+Date: Wed, 11 Jun 2025 05:36:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68497854.050a0220.33aa0e.036c.GAE@google.com>
+Subject: [syzbot] [wpan?] KMSAN: uninit-value in ieee802154_max_payload
+From: syzbot <syzbot+fe68c78fbbd3c0ad70ee@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/11/25 14:20, Ido Schimmel wrote:
-> On Wed, Jun 11, 2025 at 02:11:52PM +0200, Fabian Pfitzner wrote:
->> Dump the multicast querier state per vlan.
->> This commit is almost identical to [1].
->>
->> The querier state can be seen with:
->>
->> bridge -d vlan global
->>
->> The options for vlan filtering and vlan mcast snooping have to be enabled
->> in order to see the output:
->>
->> ip link set [dev] type bridge mcast_vlan_snooping 1 vlan_filtering 1
->>
->> The querier state shows the following information for IPv4 and IPv6
->> respectively:
->>
->> 1) The ip address of the current querier in the network. This could be
->>     ourselves or an external querier.
->> 2) The port on which the querier was seen
->> 3) Querier timeout in seconds
->>
->> [1] https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=16aa4494d7fc6543e5e92beb2ce01648b79f8fa2
->>
->> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
->> ---
->>
->> v1->v2
->> 	- refactor code
->> 	- link to v1: https://lore.kernel.org/netdev/20250604105322.1185872-1-f.pfitzner@pengutronix.de/
-> Regarding your note on v1, there is a patch under review to add a bridge
-> lib file:
->
-> https://lore.kernel.org/netdev/8a4999a27c11934f75086354314269f295ee998a.1749567243.git.petrm@nvidia.com/
->
-> Maybe wait until it's accepted and then submit v3 with a shared helper
-> function?
-Sounds good to me. I'll submit a v3 then.
->
--- 
-Pengutronix e.K.                           | Fabian Pfitzner             |
-Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
+Hello,
 
+syzbot found the following issue on:
+
+HEAD commit:    5b032cac6225 Merge tag 'ubifs-for-linus-6.16-rc1' of git:/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14d0820c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=529cf323140e1748
+dashboard link: https://syzkaller.appspot.com/bug?extid=fe68c78fbbd3c0ad70ee
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2e197ad38b02/disk-5b032cac.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f05af0a6e9f6/vmlinux-5b032cac.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d7c0456f7931/bzImage-5b032cac.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fe68c78fbbd3c0ad70ee@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee802154_max_payload+0x399/0x3c0 net/ieee802154/header_ops.c:372
+ ieee802154_max_payload+0x399/0x3c0 net/ieee802154/header_ops.c:372
+ ieee802154_header_create+0x99b/0xb90 net/mac802154/iface.c:403
+ wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
+ dgram_sendmsg+0xb3d/0x16d0 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x92/0xd0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x330/0x3d0 net/socket.c:727
+ ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2566
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2655
+ x64_sys_call+0x32fb/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Local variable hdr created at:
+ ieee802154_header_create+0x4e/0xb90 net/mac802154/iface.c:360
+ wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
+ dgram_sendmsg+0xb3d/0x16d0 net/ieee802154/socket.c:677
+
+CPU: 1 UID: 0 PID: 17215 Comm: syz.9.2647 Not tainted 6.15.0-syzkaller-13659-g5b032cac6225 #0 PREEMPT(undef) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
