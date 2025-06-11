@@ -1,125 +1,84 @@
-Return-Path: <netdev+bounces-196718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1795AD60C1
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:10:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268C7AD6104
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 23:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2023E1E1256
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:10:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 006B87A7A07
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 21:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD882BE7BE;
-	Wed, 11 Jun 2025 21:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F2C250C18;
+	Wed, 11 Jun 2025 21:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txbxgyjn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crn5xSiM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B056288C1D
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 21:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76B824EAAF;
+	Wed, 11 Jun 2025 21:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749676211; cv=none; b=L9QILN9KEyB7pmK6urjnA/EZIqagnklrAHyqt/7qwkkMHsHx8l6PEDl1VjcvMaIwlmCj5EHjl2xZMqqDdM8t6erQmJ2onyLgPY6jt4YdAJfMPGysEHCqSiYR2nGm2RI9qdt9qJeJ5Ii5g7IYTjRJbqGru19sjyYUsxsDqrDNTwk=
+	t=1749676629; cv=none; b=euINOYFPKbLaOFbvWYuV15dt1ae9UOP8L8QNFQ0SimBm7tibMKXAFuK6y5alVTDbm41QH55cYNc0k5/tGfEIgdoUcHyVN8mZ00idLsFqoMhLGUc0lqDQH1lhe2zafUldeWI8FXjVhHQ/6d5haQLesmEZ1yGlKnHHc7LSycUvXMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749676211; c=relaxed/simple;
-	bh=tQVepzhCtbTeLX9mqtZl2HvxMf4x+7n/PPF0Ln6jVK0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nwIXem1ub+J1sc/9gJytZn4scyA75IarLXygpDgt9TjU1kClqDhDzoqUHc1gBdnKdBnDwVIlxr7SMm0WeMzwDGnl4bPiLzVC5DtRjciZGBVa9INdlDaB8HnnUQxCWPfmP1eEE8SBTRfTY4BBoKCMpMQkDPaDmhTIlsKjkGEP9jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txbxgyjn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97451C4CEEF;
-	Wed, 11 Jun 2025 21:10:09 +0000 (UTC)
+	s=arc-20240116; t=1749676629; c=relaxed/simple;
+	bh=jm6YAMEI2w2bPtK1+XGUCqX2+AtqBcb2XwmANQwlY04=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kjhRO573DVwhui8ZNfU+10juTV6QPgnYDack0c0nQtezI9rch6cZFphuu8uhjiGGOQZjfcefng235SgDGe/mTKCt+r1Fbr35uRxWFV62erjvq2kN+Y/RaaRcTCEuSiHR2z72jA3UlI/CL9gnOAF7rbq0nphyG7t8a46t4p1nLAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crn5xSiM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2A7C4CEEA;
+	Wed, 11 Jun 2025 21:17:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749676209;
-	bh=tQVepzhCtbTeLX9mqtZl2HvxMf4x+7n/PPF0Ln6jVK0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=txbxgyjnawTGwwil9c6/dqewL4XDdKKrUB/Z/DuQ+SpwlWYtcCUEC995qQD5TWzVq
-	 aLbtkvuUro2Z08+DgniIjSpvLVOhqG9O9Xq/3ex9Snpp/SrkLuB+YFL5DffaBo1bPR
-	 X03QfQjV4f3sjODhj47o7eApmNiPlsRYe3pXuChgWXE2X1/7kAMte/tC4UUk2bBbHC
-	 Li8ZPTNi3lJRx0i4dbVbeJkqCwv4Y2CxyHcy43t5II0Q/vwt/3dowKbEqzNQm+URP1
-	 fGLiIvLbByNmbx43ekDYd5Zauc/uGWqF9pQ5c72lMqwjsXJJ8LEPKhihqOG3dIur6N
-	 7ezmGvRG4cMdQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE38380DBE9;
-	Wed, 11 Jun 2025 21:10:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1749676629;
+	bh=jm6YAMEI2w2bPtK1+XGUCqX2+AtqBcb2XwmANQwlY04=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=crn5xSiMLRNCcCSCkkUgfe/DxNxgFUJK+XC0dZ4txcnO9MA64W44YX6b98zOd/tIS
+	 lrqLEAZyt+2f9FLZgqj9aHfW64mWEZL+bvvfxKEbxP85eFQ/nH3mIFo0jLBajqr6qY
+	 Wgdun6FOLVICUxKiyIb0PMsgR+15qkvfhtmB/o9M3C2lxQMrd/Q5iNMJFR2EPeA2LH
+	 azP09qsX6hKsa64CSztLRvoQwlfbgnol9XRPHMmC2DRTbt3eJIhPwJcUsBhSaQwnMP
+	 kFoveuLXe5ivnbyCRbf55BxW7qCR2DzmUcYKQTUK/APzp9QMzNy3pP8o1U9Y4Aq2PS
+	 3lTn53jlv4akA==
+Date: Wed, 11 Jun 2025 14:17:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: George Moussalem via B4 Relay
+ <devnull+george.moussalem.outlook.com@kernel.org>
+Cc: george.moussalem@outlook.com, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Philipp
+ Zabel <p.zabel@pengutronix.de>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Michael Turquette
+ <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-clk@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH v5 0/5] Add support for the IPQ5018 Internal GE PHY
+Message-ID: <20250611141707.7f4371a1@kernel.org>
+In-Reply-To: <20250610-ipq5018-ge-phy-v5-0-daa9694bdbd1@outlook.com>
+References: <20250610-ipq5018-ge-phy-v5-0-daa9694bdbd1@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] net/mlx5: Expose serial numbers in devlink
- info
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174967623949.3484955.17549462353872588347.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Jun 2025 21:10:39 +0000
-References: <20250610025128.109232-1-jiri@resnulli.us>
-In-Reply-To: <20250610025128.109232-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, parav@nvidia.com,
- kalesh-anakkur.purayil@broadcom.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 10 Jun 2025 12:37:54 +0400 George Moussalem via B4 Relay wrote:
+> The IPQ5018 SoC contains an internal Gigabit Ethernet PHY with its
+> output pins that provide an MDI interface to either an external switch
+> in a PHY to PHY link architecture or directly to an attached RJ45
+> connector.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 10 Jun 2025 04:51:28 +0200 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Devlink info allows to expose serial number and board serial number
-> Get the values from PCI VPD and expose it.
-> 
-> $ devlink dev info
-> pci/0000:08:00.0:
->   driver mlx5_core
->   serial_number e4397f872caeed218000846daa7d2f49
->   board.serial_number MT2314XZ00YA
->   versions:
->       fixed:
->         fw.psid MT_0000000894
->       running:
->         fw.version 28.41.1000
->         fw 28.41.1000
->       stored:
->         fw.version 28.41.1000
->         fw 28.41.1000
-> auxiliary/mlx5_core.eth.0:
->   driver mlx5_core.eth
-> pci/0000:08:00.1:
->   driver mlx5_core
->   serial_number e4397f872caeed218000846daa7d2f49
->   board.serial_number MT2314XZ00YA
->   versions:
->       fixed:
->         fw.psid MT_0000000894
->       running:
->         fw.version 28.41.1000
->         fw 28.41.1000
->       stored:
->         fw.version 28.41.1000
->         fw 28.41.1000
-> auxiliary/mlx5_core.eth.1:
->   driver mlx5_core.eth
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4] net/mlx5: Expose serial numbers in devlink info
-    https://git.kernel.org/netdev/net-next/c/18667214b955
-
-You are awesome, thank you!
+Please repost just patches 2 and 3 for networking to merge (with 
+[PATCH net-next] in the subject). The other patches will be merged
+by other trees.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
