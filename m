@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-196741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D57AD6253
-	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:20:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32723AD625A
+	for <lists+netdev@lfdr.de>; Thu, 12 Jun 2025 00:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 837957A8B9B
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D010D3A86A4
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B728924A049;
-	Wed, 11 Jun 2025 22:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4942248F7E;
+	Wed, 11 Jun 2025 22:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k+AZrdtk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kZZuf8Qj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 297DD24BCF5;
-	Wed, 11 Jun 2025 22:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C40E248F40
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 22:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749680386; cv=none; b=ACr3VsnEE6C7pje6zzuX9vLZ3+bZeSzmHUdqUTUetqFgDn5qGdiuEuGnlG0idnK5pMvZOyM4atZ2Yd7Jm5Hj6bJkfLJLtp/qf7w5YoHgZwUckMSvA4VhAg21EIjoVK03xnQfnfyZYpHvUsD6o8GOrlZ/n2h6oz0mnoB0zvNscyU=
+	t=1749680635; cv=none; b=pZqEQKPMB2yb3kK2CuY72y031YAfCBUGkgK/9V0+BzqMYmmTfzf89ttczhyBVy+iNtYpwh3v0HsRskqiBCbq3ZA2C0deez01RAZFSh8ZCYphXnSXEzdVTawcfjhYorRpGxOITPAyTuOh+uqhUprxg05XYO3dCsjAO/bbCa6piI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749680386; c=relaxed/simple;
-	bh=wdxumVoCLJh+JMH/3Nh+7BhbG0x4FmGjuT4dteTeG34=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ToX070U+oIpSZZFZmnpOSum7web5s3aFq1y3r4TLN/jZv//mfnv5Ur9skpb4jR9IC8b7ua7fvgdINnYlKpNFXHSPE+sxd/+TiawbHM9MeVkIHi1eqtZzWVqFhEX3LLgFavbV4uHY4NxJ1hAyiCUumO3E2pgxPOBEzlkO9OZFqRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k+AZrdtk; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749680385; x=1781216385;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wdxumVoCLJh+JMH/3Nh+7BhbG0x4FmGjuT4dteTeG34=;
-  b=k+AZrdtkABy9GhzRskkDzRXfa11KOV7AODWSksh83R9qglTmPFHhxZ//
-   9tUxYZUiT+cd73Bm4y+2T27sJKmEKS/pktQfC2dcMieos8ePMEawDqfXq
-   OiQBfJ1Pf31F5A4u66RKUys16s5mGJD0HkuNKdqeV7ekbQCLxUZeivIzN
-   J49Qw8upx1OdCUT0twirzXuEEtxfoi3u2KSH46MhKP3eswpHSyxOW0Gxe
-   X85K5ptTGTgfNKPhCHgpGIKYWHmW1D1vzwU6P0nU/jmJ97ye1rqqhwMBi
-   o+X4Yf0Zvkdjy6t6AJIOLgNTug6+ybebekXUSk7H17II+bkO64cbdmk02
-   A==;
-X-CSE-ConnectionGUID: A9zymzw4TmGH5vJ2piycOw==
-X-CSE-MsgGUID: j6+KpFiGT5WTuOWzAYL7BA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51717612"
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="51717612"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 15:19:45 -0700
-X-CSE-ConnectionGUID: n3Gn2FfVQuGQfZa8mq2jOw==
-X-CSE-MsgGUID: 5nLAmQBUSYWRx003nnH4eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="147315997"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 11 Jun 2025 15:19:38 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uPTnE-000Ati-1g;
-	Wed, 11 Jun 2025 22:19:36 +0000
-Date: Thu, 12 Jun 2025 06:19:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev,
-	Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Simon Horman <horms@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Michal Simek <monstr@monstr.eu>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Robert Hancock <robert.hancock@calian.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [net-next PATCH v6 07/10] net: axienet: Convert to use PCS
- subsystem
-Message-ID: <202506120616.NvIbQEgS-lkp@intel.com>
-References: <20250610233134.3588011-8-sean.anderson@linux.dev>
+	s=arc-20240116; t=1749680635; c=relaxed/simple;
+	bh=YkPIXsVgqaEADWR3Di2XH/sr5j2JkGCMKdso6VcbzRQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kjop62KhsHKnBF1JdMVDwb2b9Ey5g0tbJD4sMAD2cTIcBNqWPreTz+djzaUnWB8dGv5rZBi1j+w5ByECqIorEb60zfzsyyVaHy4ArcBZon2DQGoOFrm5LzLpkIbXl4nHnPnCvI8tv/fOHQWpC1pTaxAtHFHfX4tljbcy7Ym1yms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kZZuf8Qj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55BImQgp032616;
+	Wed, 11 Jun 2025 22:23:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=AYWWfm+DgbyHxPrSCH1TCg3EsQ9kuc
+	Dm5xhvxigRRmc=; b=kZZuf8QjfJ6jvLQy8KuUt63/maNt/qsSyuDF3RziNWDt+Q
+	VHrXwdDP8tVjd//DZmmC0izc1YF1/8eTCRnmwzbWZky1oXunkysXNiZSlvHmk0BF
+	hIiQxelG/VNPBmXuxtfghe5oYcy3ZVRS+xdTuEBvw+wsW8EkJCYN5z1gt2YU/OQ9
+	A5Hz/mKzOUJLymQ66c4U1zUl6Tm2IQN8G4T8FuuGIzWoY0iKhSLXgiD0NvoCR4lu
+	Y1Bz+P92n7JMxmHkyQY7AbcPpSpiwMfaaqyDyK/cz+/+iZfg48GQ4lyYtM/Piayc
+	/3WuZJ8eqpzWx1+K/0W8O34NN75IXwU6v9XrAj/A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4769wyuxq6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 22:23:38 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55BMJ4ac005208;
+	Wed, 11 Jun 2025 22:23:36 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4769wyuxq4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 22:23:36 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55BLRpVF015369;
+	Wed, 11 Jun 2025 22:23:35 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4750rp9thc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Jun 2025 22:23:35 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55BMNZG226018318
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Jun 2025 22:23:35 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ECAF558054;
+	Wed, 11 Jun 2025 22:23:34 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 69F8B5805D;
+	Wed, 11 Jun 2025 22:23:34 +0000 (GMT)
+Received: from d.ibm.com (unknown [9.61.46.212])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 11 Jun 2025 22:23:34 +0000 (GMT)
+From: Dave Marquardt <davemarq@linux.ibm.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+        Breno
+ Leitao <leitao@debian.org>, dw@davidwei.uk
+Subject: Re: [PATCH net] net: drv: netdevsim: don't napi_complete() from
+ netpoll
+In-Reply-To: <20250611174643.2769263-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 11 Jun 2025 10:46:43 -0700")
+References: <20250611174643.2769263-1-kuba@kernel.org>
+Date: Wed, 11 Jun 2025 17:23:33 -0500
+Message-ID: <87a56dj4t6.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250610233134.3588011-8-sean.anderson@linux.dev>
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Yqgl6lETvV0xT2cBF1Z_eRAuXtaKViMH
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDE4OSBTYWx0ZWRfX30xhhqIAIMer lel9goPbzVmlh6uOnPHBPWZTj9kN+EBewnsZXYdPcdUm3wNs94xpmkH4ikcVxcyzz7yXlxhvdpM Y9L4dLYaNEzayQCd+VFT8ZPJEiKzuvnskM9KOY5xwWBUMxthQmZYlPnQYhV0NtDbYQZLv1uK0RJ
+ HdEMXSmWdQdkqxC5wUBTyyqVdu9t8TRgAe8y2hr/d5Qb0XkFMBMFM+lAETsf3XcXYVjU6F0OwuL ne9rVIMM5yV5sfVsfCldGGT2lEYpA+xeD8ENm9bYjvl9FhTGjE7iJiUPFoEH4cckegLLd2swYFy XeYfN0WGRSfedqsFc/RTqxq+9M/M+TTPToMIxymocW/PFLJSl/QYbdI/Xq4oNWKxdacjXLCovL9
+ r1aeWU9f1WhaqqDmS6fQxtP4nd7+5nvui1OlchMsyQ5TXpL11UGQRONlYGzH02kxYQmgCWpA
+X-Authority-Analysis: v=2.4 cv=YKGfyQGx c=1 sm=1 tr=0 ts=684a01ea cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=F_mWqpn8S2fbzUKNZgkA:9
+X-Proofpoint-GUID: rX45Moq1d-B_dxqYAPRbar4Uj2o7YQbw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-11_09,2025-06-10_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ malwarescore=0 bulkscore=0 priorityscore=1501 phishscore=0 mlxscore=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 mlxlogscore=460
+ suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506110189
 
-Hi Sean,
+Jakub Kicinski <kuba@kernel.org> writes:
 
-kernel test robot noticed the following build warnings:
+> netdevsim supports netpoll. Make sure we don't call napi_complete()
+> from it, since it may not be scheduled. Breno reports hitting a
+> warning in napi_complete_done():
 
-[auto build test WARNING on net-next/main]
+I decided to go learn a bit more about netdevsim, and ran across a typo
+in Documentation/networking/devlink/netdevsim.rst:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Anderson/dt-bindings-net-Add-Xilinx-PCS/20250611-143544
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250610233134.3588011-8-sean.anderson%40linux.dev
-patch subject: [net-next PATCH v6 07/10] net: axienet: Convert to use PCS subsystem
-config: alpha-kismet-CONFIG_OF_DYNAMIC-CONFIG_XILINX_AXI_EMAC_PCS_COMPAT-0-0 (https://download.01.org/0day-ci/archive/20250612/202506120616.NvIbQEgS-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20250612/202506120616.NvIbQEgS-lkp@intel.com/reproduce)
+The ``netdevsim`` driver supports rate objects management, which includes:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506120616.NvIbQEgS-lkp@intel.com/
+- registerging/unregistering leaf rate objects per VF devlink port;
+  ^^^^^^^^^^^^
 
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for OF_DYNAMIC when selected by XILINX_AXI_EMAC_PCS_COMPAT
-   WARNING: unmet direct dependencies detected for OF_DYNAMIC
-     Depends on [n]: OF [=n]
-     Selected by [y]:
-     - XILINX_AXI_EMAC [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_XILINX [=y] && HAS_IOMEM [=y] && XILINX_DMA [=y]
-     - XILINX_AXI_EMAC_PCS_COMPAT [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_XILINX [=y] && XILINX_AXI_EMAC [=y]
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+-Dave
 
