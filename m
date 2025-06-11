@@ -1,125 +1,129 @@
-Return-Path: <netdev+bounces-196578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC40FAD5705
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:31:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 284EAAD5754
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 15:37:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5DC318895D2
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:31:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD7E87A7EC5
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 13:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334DA28751B;
-	Wed, 11 Jun 2025 13:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341FA29AAF0;
+	Wed, 11 Jun 2025 13:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nT61unBB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DVgMGJU0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E18F35897;
-	Wed, 11 Jun 2025 13:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE34528C037;
+	Wed, 11 Jun 2025 13:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749648687; cv=none; b=iaKfl/B8rjVHhgDu+2tWuXot3IJTeH0XHUbBQM3RIdQnsWDTSlxKRXTxqgJQ2GcpFOeAZyNliZm7AAkqSpQzN8FOYM1usuwK7fXe6a1gXmg7vZMyduv122uTpDpTcoRiCHCj7Zuf8t3hzbL9lP4XXulR/wGyLSOmdFfetIqK0EY=
+	t=1749648994; cv=none; b=C5zjstb2lidWxf94a/8mvFvB/jn7k+ss+PLHIbTbINsswgrzSsWr4pxxW61/f7Xzx7Wxd9wYj0O37NYRqCxZPFv6ddzqHGYHfo6+O5EiNS2sY1Pf+NemYapINXkMf3PFcWGlEh/NgeInd8iFivhrjFwBHzw2qKUiAZMEAOKmO/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749648687; c=relaxed/simple;
-	bh=PRa45XHRyBZTLzhuAprRop3kJMcOBLwjBiDC1TfDrp0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RVl3F3tQ4tYsNBMS3QJviojSWshcjQwjdixwfyaQpPTVueHQWrSZknHIGaOlga+Z5Dp4aoJeM684j2KtiKDeuw8cyXCw3ckVnLm1PmJXjbH4GSmCgoPgnyiBQp3NBl2aI1XjcV0byU43CvA+kLrACAE388auaqhjZe+bPANxbE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nT61unBB; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-553644b8f56so6387574e87.1;
-        Wed, 11 Jun 2025 06:31:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749648683; x=1750253483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=by0JqHx34YNkgxgVF7BPRx6qQXycEbtV2xtHdw17AjI=;
-        b=nT61unBB7HEaAnN6ln5NwuHGoFuVOZOCDP+LsxO58fuf+2XBJ9+uAXGbuB5qGS7ytJ
-         DLbj+gdW209Y0+IE1FTLp5SZbI5MShngIpnQ1rZpjviQZn7ZmL3oeUl4Kbda0JnqskLE
-         YYGa9Vs0biZKEFReV5pFYunRYlDmtwmALPxOBnWdcI3tUYKlL6d4wFEhTTs88f2YDLYy
-         Saec2OA4aeyohZi5G0dQn3dCkDhak0UjZ0EqSDaZWdWaig8Wivb2LessszQXCPGVi6Vr
-         sSXgWd39xdEutecaPeHNDz7Y72/P9pUTmTQ/QW/wx0izs/XoG/xbl2DQWJaJ2nWvcXmh
-         3O2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749648683; x=1750253483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=by0JqHx34YNkgxgVF7BPRx6qQXycEbtV2xtHdw17AjI=;
-        b=sd7ZePgDX7Qa3v/wUdK0GZ2BguyPa2OjpkhSB19lAfgOYdMiEe+TqsqqOSq0W08lSl
-         qGVsDbaPZI69Dwtzn9tFzBCpOd/H75fTlYwrGN0s5rdNYlUtf6kJ/F+JtwR7PNQSJZsF
-         +CuPcGcEEUTGf0lJOWfQ+yZ22NJ44h5zg9FWKChmh2V5k1o9osKVNX0/iiq9Cd6lixbR
-         uSRhP8adHxY5Mfb4aHV8Gt/5Z9VlK9uXvn7RKWwuFe5Z9HCCRqChTekf/tXNNfV1mZj9
-         3KACmpcw/9Xq1sjjneXAcFSRbSh7Mf+F30hIcB1LqVI3NWk3A0aic6hKQYOoV2A6vvdv
-         dcFA==
-X-Forwarded-Encrypted: i=1; AJvYcCV28bTH7E8vzYn/SZK/JIes0NjQNxftPPc+vlc9/XMPGLoD0aBTAny32oZfrGj9r99sgcq847HD@vger.kernel.org, AJvYcCWWLYkVAalHk/8+s7wbxitykKKPA0zRO6HiN4oLR/41pDcbIjclDOaeU2Ok46//4Tq/WDHD+e7Hz7H1sIE=@vger.kernel.org, AJvYcCWvjQzg2SKUt8RND9kovSGvsDrwbRBuKoEmAe7OpbBhjsMcjarJMDXYKqq3mT3Sa+2e2kFOLCYQpxmZdNNDDqM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU3daWXrbbJlB6eRNXerRpN9YI+Ja82OAixmnLzRQ6amjF+LfT
-	lrh7enR40qt/FHO+T3AjwXghrGusFWsZvY3OrSIWh3MgV4Rgi6TCneyDK0ZFMp0moFTLahOYuBX
-	0+/bFkHsJwHjJikoWwrr2TZgsoWnZH1o=
-X-Gm-Gg: ASbGncvp/g+bxiP/FQn4y6+3jzcra6hXdQyO+mSXtfxvbDLEHJZu8ZkaKFGcnGmZlFU
-	i3dxs8JcoumQc6OmAToGmpmwwyYz+WlVlETvobQKz/Qv1P9NW6UZGX5gESEuLkaPMwm2G7vWKll
-	xS1oSAnd2ppUm7UlLnkrrK2W7Lq8S5XIiMUVDL1zEUal5ScyIR6GXGp/+4RKg=
-X-Google-Smtp-Source: AGHT+IEDPWyfJNtGTu4LypSaugkwIwqz2/qnaItV9jD0VPbgjbjAa2W2Tl+OD/G9iuaydAxR42mAP7rdnWAmqEma1yk=
-X-Received: by 2002:a05:6512:3089:b0:550:dee7:54b5 with SMTP id
- 2adb3069b0e04-5539c171886mr1139842e87.41.1749648683215; Wed, 11 Jun 2025
- 06:31:23 -0700 (PDT)
+	s=arc-20240116; t=1749648994; c=relaxed/simple;
+	bh=qxeEX+fpLYiFMxZjd8T8WFKqd8/tarfK/1nXUbP+oow=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m3j494GdEfFM+myfAyp1KgSww09c9Std2z4DlzRW+FVccuPOL8zPMBIBCkX1nQwzKGfxOVWxIptZA8Sjx0kqUPBrDXbITh9irD/WVft2V/24ysPIM1FojuaPgbNE07+8Sy8jDkWMkp2JuBov0mQEuqbiZ7EtG9VSaUvTXLA6JMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DVgMGJU0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vVK1lv1eg0ugU/Wlcq0qw8RSX2k3WrhR6fk/iNeFFPc=; b=DVgMGJU05gH/oIK5E5D9B47wVC
+	GIR3UdOd8V+Wd5k0QiTngzWgSaDshWYZqcxKeXPOgRgvN7NV/q6mfkM2faOnAzMEBNdMRH/wAYIvp
+	dZxers4Mp06vL74YaphTtZ+8PSeLS76pFIIro7UzfXnc0Ong0p1ps2qiJrDJOOtQYGcM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uPLcV-00FOq5-P6; Wed, 11 Jun 2025 15:35:59 +0200
+Date: Wed, 11 Jun 2025 15:35:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gal Pressman <gal@nvidia.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v12 00/13] Add support for PSE budget evaluation
+ strategy
+Message-ID: <78daedb4-afe7-429d-9447-a3f76ea65e16@lunn.ch>
+References: <20250524-feature_poe_port_prio-v12-0-d65fd61df7a7@bootlin.com>
+ <8b3cdc35-8bcc-41f6-84ec-aee50638b929@redhat.com>
+ <71dc12de-410d-4c69-84c5-26c1a5b3fa6e@nvidia.com>
+ <20250609103622.7e7e471d@kmaincent-XPS-13-7390>
+ <f5fb49b6-1007-4879-956d-cead2b0f1c86@nvidia.com>
+ <20250609160346.39776688@kmaincent-XPS-13-7390>
+ <0ba3c459-f95f-483e-923d-78bf406554ea@nvidia.com>
+ <cfb35f07-7f35-4c1f-9239-5c35cc301fce@lunn.ch>
+ <b1b7b052-ceac-4119-9b72-ed8f4c1fbfe2@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611-correct-type-cast-v1-1-06c1cf970727@gmail.com> <CAH5fLghomO3znaj14ZSR9FeJSTAtJhLjR=fNdmSQ0MJdO+NfjQ@mail.gmail.com>
-In-Reply-To: <CAH5fLghomO3znaj14ZSR9FeJSTAtJhLjR=fNdmSQ0MJdO+NfjQ@mail.gmail.com>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 11 Jun 2025 09:30:46 -0400
-X-Gm-Features: AX0GCFtT1DHjt0sfo9S71NUi0h0ys836XgvRmUssTQNIwrVYzCc2sCzzIIu5zYw
-Message-ID: <CAJ-ks9m837aTYsS9Qd8bC0_abE_GT9TZUDZbbPnpyOtgrF9Ehw@mail.gmail.com>
-Subject: Re: [PATCH] rust: cast to the proper type
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b1b7b052-ceac-4119-9b72-ed8f4c1fbfe2@nvidia.com>
 
-On Wed, Jun 11, 2025 at 7:42=E2=80=AFAM Alice Ryhl <aliceryhl@google.com> w=
-rote:
->
-> On Wed, Jun 11, 2025 at 12:28=E2=80=AFPM Tamir Duberstein <tamird@gmail.c=
-om> wrote:
-> >
-> > Use the ffi type rather than the resolved underlying type.
-> >
-> > Fixes: f20fd5449ada ("rust: core abstractions for network PHY drivers")
->
-> Does this need to be backported? If not, I wouldn't include a Fixes tag.
+On Wed, Jun 11, 2025 at 09:05:01AM +0300, Gal Pressman wrote:
+> On 09/06/2025 18:12, Andrew Lunn wrote:
+> >> I think that in theory the userspace patches need to be posted together
+> >> with the kernel, from maintainer-netdev.rst:
+> >>
+> >> 	User space code exercising kernel features should be posted
+> >> 	alongside kernel patches. This gives reviewers a chance to see
+> >> 	how any new interface is used and how well it works.
+> >>
+> >> I am not sure if that's really the case though.
+> > 
+> > The ethtool Maintainer tends to wait to the end of the cycle to pick
+> > up all patches and then applies and releases a new ethtool binary. The
+> > same applies for iproute2. That means the CI tests are not capable of
+> > testing new features using ethtool. I'm also not sure if it needs a
+> > human to update the ethtool binary on the CI systems, and how active
+> > that human is. Could this be changed, sure, if somebody has the needed
+> > bandwidth.
+> > 
+> > Using the APIs directly via ynl python is possible in CI, since that
+> > is all in tree, as far as i know. However, ethtool is the primary user
+> > tool, so i do see having tests for it as useful. But they might need
+> > to wait for a cycle, or at least fail gracefully until the ethtool
+> > binary is updated.
+> 
+> Thanks Andrew, so I interpret this as selftests should be added when the
+> userspace patches get accepted (or released?)? Not part of the original
+> kernel submission?
 
-I'm fine with omitting it. I wanted to leave a breadcrumb to the
-commit that introduced the current code.
+I personally would submit the tests at the same time, but make them
+gracefully fail when the ethtool binary is too old. As a reviewer,
+seeing the tests as well and the ethtool patches and the kernel code
+gives me a warm fuzzy feeling the overall quality is good, the new
+code is actually tested, etc and the code should be merged.
 
->
-> > +            DuplexMode::Full =3D> bindings::DUPLEX_FULL,
-> > +            DuplexMode::Half =3D> bindings::DUPLEX_HALF,
-> > +            DuplexMode::Unknown =3D> bindings::DUPLEX_UNKNOWN,
-> > +        } as crate::ffi::c_int;
->
-> This file imports the prelude, so this can just be c_int without the
-> crate::ffI:: path.
-
-This has come up a few times now; should we consider denying
-unused_qualifications?
-
-https://doc.rust-lang.org/stable/nightly-rustc/rustc_lint/builtin/static.UN=
-USED_QUALIFICATIONS.html
+     Andrew
 
