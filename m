@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-196676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2895DAD5DC1
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:04:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81FEAD5DC2
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5103AA004
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:03:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F087C3AA262
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640CF283C8C;
-	Wed, 11 Jun 2025 18:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D71628C2AF;
+	Wed, 11 Jun 2025 18:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cLP1EWcF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hDYWlrsb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA2225F7A8
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 18:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C092777F2
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 18:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749665010; cv=none; b=JAI81JbYuHNyCvvoRQh32w3zCelNYBNXEwIoxCVqGHsV7rlPyEYU8dp5I5THVZpPHs72YDUREbrKyVdtyiXf/Xs2KuCqAgL1Z/e2celNO+xmNjuCMFyFJp+XpS3zM9CIAO73qPjCdRLSEgbOTmhOYo1tjFQn8aBNIj/bfv2El3U=
+	t=1749665011; cv=none; b=AThIP9VVOhUalyBG2ACrudIlnEYcAnXQcpPqGlJCS7Q3I/+4nD4IRtaZ13ITP2bwYoFrYFlhkAEYkDF19VsU/gMKh9vwnkAELN5WgHlFRuViy2DMjs9VyGHauutQMnmFe8baHms7h0nMvze7KkverqiJ0/kksUlLtNmGp2e8pqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749665010; c=relaxed/simple;
-	bh=gcoHXpJ0DTqj4HEsauunNiiq8Z5dsdw20rsHEnwZvxo=;
+	s=arc-20240116; t=1749665011; c=relaxed/simple;
+	bh=0gmTLQ7lh0jLlzrU/TMtnNbuWYDNguxnD+D4RnWMfuA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aCHp0f7ErcJYqYdZ/50Lvg4zNHptiGGBOr3w/MZsimtmX8ONu68yNjtPi3VapurkAfEQTE70r+pV4ynbNX/uuahDUpueSNiEer2sBIr788EF5b7u/CqNeRGCQcEH7T90CuPrcMN/tjgwn3qBw1SUYLCzMX95uUu19pc+neqVP0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cLP1EWcF; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=It7OXrRsiHQds+e8UF/cLW4NNJDb3E+OTDWXJrItAKUu7eL5HBI1CV2k9AxJe5WTicCGfAoVbdxH+itnAR4cAYohwXZHuVPqa3na8/eJubxcl16H1YHCg7y2jLIAsqRizgKxR1UjGG2Qhit224Pj8MG9FBn/Tzlr/OAm+f7Kn3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hDYWlrsb; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749665008; x=1781201008;
+  t=1749665009; x=1781201009;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gcoHXpJ0DTqj4HEsauunNiiq8Z5dsdw20rsHEnwZvxo=;
-  b=cLP1EWcF+n7S5cQM0OVU11lv5wu58qr3qqoHlwybhN9S4sAkSN+q26CN
-   TsSv1jIXSzG4Yb2ITJYbQUCn2AMazijduimBEKYqPVO17i5FP71zFP78m
-   70vdqtt4rrgo6xe75RNhYiABP59DqHOwa4ANwf8ethJMxu+eDeXiQgeGq
-   UErNpfHplqiVxDlV+A7scV4qjcLRmEPe+Fzw+gY8YGAIMfgInBTfzFgT7
-   woeA55NAGAmmaYaN9fTXxEHPIhNdf9mwLwbgDzvRz11wH8tImzjhjAc8b
-   zPvEsXqAWW4uBN67OV0vkM/YKgQGVFQognzyU7umPxcVQamCsRWB5jYuN
+  bh=0gmTLQ7lh0jLlzrU/TMtnNbuWYDNguxnD+D4RnWMfuA=;
+  b=hDYWlrsby5S2CdqD79AJszO3mjzwTLsBFucg6qEItQ8cV0KCrJFQQHTE
+   FFORmp5KEjGdrFZ8UvnhbapNSd3blEFC/d36oii+PaUUNKlUwXiJ52qM9
+   VKb8m4its6kOybLNmxwidrCaJX0Am8qsosoQiy4kCoT2C8uoORKAm7/gI
+   VHieihi5lRqQ3HYSf40vGRfB0kvEY4Ts2Yv9afJSLpflaDep1BtRmLYfw
+   wFaruootazFDvijAiNEmFrZ+WKhjvDqG+Nz6M+yqkA3f/py0sJqznGv2h
+   vFBMSkIVzaHkadJpqEogmmSI0cy3uW9qC42XYJhuFoai12KsYZhraARxC
    A==;
-X-CSE-ConnectionGUID: p56PYegOSYWVGaML2lkEUQ==
-X-CSE-MsgGUID: SvmnsxZ+S2miAPhPV1WBqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51042560"
+X-CSE-ConnectionGUID: mFHlVxReSvWfZKC/LEZtbQ==
+X-CSE-MsgGUID: cs+sM2woQEWpMQy+AindXA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51042575"
 X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="51042560"
+   d="scan'208";a="51042575"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 11:03:27 -0700
-X-CSE-ConnectionGUID: gpIVua8UQqWj1AKwh8GdZQ==
-X-CSE-MsgGUID: KCchuVPgQb+N7xlLMopLAA==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 11:03:29 -0700
+X-CSE-ConnectionGUID: 39va4gW5QcKFVY0PAxSabw==
+X-CSE-MsgGUID: Ukqs6FM9QRSJk605o2z9BA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="152418282"
+   d="scan'208";a="152418301"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 11 Jun 2025 11:03:27 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 11 Jun 2025 11:03:28 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -73,10 +73,11 @@ Cc: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
 	horms@kernel.org,
 	vitaly.lifshits@intel.com,
 	dima.ruinskiy@intel.com,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net-next 4/7] igc: assign highest TX queue number as highest priority in mqprio
-Date: Wed, 11 Jun 2025 11:03:06 -0700
-Message-ID: <20250611180314.2059166-5-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 6/7] igc: add preemptible queue support in taprio
+Date: Wed, 11 Jun 2025 11:03:08 -0700
+Message-ID: <20250611180314.2059166-7-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
 References: <20250611180314.2059166-1-anthony.l.nguyen@intel.com>
@@ -90,147 +91,292 @@ Content-Transfer-Encoding: 8bit
 
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 
-Previously, TX arbitration prioritized queues based on the TC they were
-mapped to. A queue mapped to TC 3 had higher priority than one mapped to
-TC 0.
+Changes:
+1. Introduce tx_enabled flag to control preemptible queue. tx_enabled
+   is set via mmsv module based on multiple factors, including link
+   up/down status, to determine if FPE is active or inactive.
+2. Add priority field to TXDCTL for express queue to improve data
+   fetch performance.
+3. Block preemptible queue setup in taprio unless reverse-tsn-txq-prio
+   private flag is set. Encourages adoption of standard queue priority
+   scheme for new features.
+4. Hardware-padded frames from preemptible queues result in incorrect
+   mCRC values, as padding bytes are excluded from the computation. Pad
+   frames to at least 60 bytes using skb_padto() before transmission to
+   ensure the hardware includes padding in the mCRC calculation.
 
-To improve code reuse for upcoming patches and align with typical NIC
-behavior, this patch updates the logic to prioritize higher queue numbers
-when mqprio is used. As a result, queue 0 becomes the lowest priority and
-queue 3 becomes the highest.
+Tested preemption with taprio by:
+1. Enable FPE:
+   ethtool --set-mm enp1s0 pmac-enabled on tx-enabled on verify-enabled on
+2. Enable private flag to reverse TX queue priority:
+   ethtool --set-priv-flags enp1s0 reverse-txq-prio on
+3. Enable preemptible queue in taprio:
+   taprio num_tc 4 map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
+   queues 1@0 1@1 1@2 1@3 \
+   fp P P P E
 
-This patch also introduces igc_tsn_is_tc_to_queue_priority_ordered() to
-preserve the original TC-based priority rule and reject configurations
-where a higher TC maps to a lower queue offset.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Co-developed-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
 Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 20 +++++++++++++
- drivers/net/ethernet/intel/igc/igc_tsn.c  | 35 ++++++++++++++---------
- 2 files changed, 42 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/intel/igc/igc.h         |  6 ++
+ drivers/net/ethernet/intel/igc/igc_defines.h |  1 +
+ drivers/net/ethernet/intel/igc/igc_main.c    | 21 +++++-
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 71 ++++++++++++++++++++
+ drivers/net/ethernet/intel/igc/igc_tsn.h     |  4 ++
+ 5 files changed, 100 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 023ff8a5b285..1525ae25fd3e 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -43,6 +43,7 @@ void igc_ethtool_set_ops(struct net_device *);
+ struct igc_fpe_t {
+ 	struct ethtool_mmsv mmsv;
+ 	u32 tx_min_frag_size;
++	bool tx_enabled;
+ };
+ 
+ enum igc_mac_filter_type {
+@@ -163,6 +164,7 @@ struct igc_ring {
+ 	bool launchtime_enable;         /* true if LaunchTime is enabled */
+ 	ktime_t last_tx_cycle;          /* end of the cycle with a launchtime transmission */
+ 	ktime_t last_ff_cycle;          /* Last cycle with an active first flag */
++	bool preemptible;		/* True if preemptible queue, false if express queue */
+ 
+ 	u32 start_time;
+ 	u32 end_time;
+@@ -499,6 +501,8 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
+ #define IGC_TXDCTL_WTHRESH_MASK		GENMASK(20, 16)
+ #define IGC_TXDCTL_QUEUE_ENABLE_MASK	GENMASK(25, 25)
+ #define IGC_TXDCTL_SWFLUSH_MASK		GENMASK(26, 26)
++#define IGC_TXDCTL_PRIORITY_MASK	GENMASK(27, 27)
++
+ #define IGC_TXDCTL_PTHRESH(x)		FIELD_PREP(IGC_TXDCTL_PTHRESH_MASK, (x))
+ #define IGC_TXDCTL_HTHRESH(x)		FIELD_PREP(IGC_TXDCTL_HTHRESH_MASK, (x))
+ #define IGC_TXDCTL_WTHRESH(x)		FIELD_PREP(IGC_TXDCTL_WTHRESH_MASK, (x))
+@@ -506,6 +510,8 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
+ #define IGC_TXDCTL_QUEUE_ENABLE		FIELD_PREP(IGC_TXDCTL_QUEUE_ENABLE_MASK, 1)
+ /* Transmit Software Flush */
+ #define IGC_TXDCTL_SWFLUSH		FIELD_PREP(IGC_TXDCTL_SWFLUSH_MASK, 1)
++#define IGC_TXDCTL_PRIORITY(x)		FIELD_PREP(IGC_TXDCTL_PRIORITY_MASK, (x))
++#define IGC_TXDCTL_PRIORITY_HIGH	IGC_TXDCTL_PRIORITY(1)
+ 
+ #define IGC_RX_DMA_ATTR \
+ 	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 7189dfc389ad..86b346687196 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -588,6 +588,7 @@
+ #define IGC_TXQCTL_QUEUE_MODE_LAUNCHT	0x00000001
+ #define IGC_TXQCTL_STRICT_CYCLE		0x00000002
+ #define IGC_TXQCTL_STRICT_END		0x00000004
++#define IGC_TXQCTL_PREEMPTIBLE		0x00000008
+ #define IGC_TXQCTL_QAV_SEL_MASK		0x000000C0
+ #define IGC_TXQCTL_QAV_SEL_CBS0		0x00000080
+ #define IGC_TXQCTL_QAV_SEL_CBS1		0x000000C0
 diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index f3a312c9413b..1322a2db6dba 100644
+index 82d53fad6b6a..23cbe02ee238 100644
 --- a/drivers/net/ethernet/intel/igc/igc_main.c
 +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6724,6 +6724,20 @@ static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_tc,
- 		adapter->queue_per_tc[i] = offset[i];
- }
+@@ -1685,6 +1685,15 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
+ 	first->tx_flags = tx_flags;
+ 	first->protocol = protocol;
  
-+static bool
-+igc_tsn_is_tc_to_queue_priority_ordered(struct tc_mqprio_qopt_offload *mqprio)
-+{
-+	int num_tc = mqprio->qopt.num_tc;
-+	int i;
-+
-+	for (i = 1; i < num_tc; i++) {
-+		if (mqprio->qopt.offset[i - 1] > mqprio->qopt.offset[i])
-+			return false;
++	/* For preemptible queue, manually pad the skb so that HW includes
++	 * padding bytes in mCRC calculation
++	 */
++	if (tx_ring->preemptible && skb->len < ETH_ZLEN) {
++		if (skb_padto(skb, ETH_ZLEN))
++			goto out_drop;
++		skb_put(skb, ETH_ZLEN - skb->len);
 +	}
 +
-+	return true;
-+}
-+
- static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 				 struct tc_mqprio_qopt_offload *mqprio)
- {
-@@ -6756,6 +6770,12 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 		}
+ 	tso = igc_tso(tx_ring, first, launch_time, first_flag, &hdr_len);
+ 	if (tso < 0)
+ 		goto out_drop;
+@@ -6419,6 +6428,7 @@ static int igc_qbv_clear_schedule(struct igc_adapter *adapter)
+ 		ring->start_time = 0;
+ 		ring->end_time = NSEC_PER_SEC;
+ 		ring->max_sdu = 0;
++		ring->preemptible = false;
  	}
  
-+	if (!igc_tsn_is_tc_to_queue_priority_ordered(mqprio)) {
-+		NL_SET_ERR_MSG_MOD(mqprio->extack,
-+				   "tc to queue mapping must preserve increasing priority (higher tc -> higher queue)");
-+		return -EOPNOTSUPP;
+ 	spin_lock_irqsave(&adapter->qbv_tx_lock, flags);
+@@ -6484,9 +6494,12 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+ 	if (!validate_schedule(adapter, qopt))
+ 		return -EINVAL;
+ 
+-	/* preemptible isn't supported yet */
+-	if (qopt->mqprio.preemptible_tcs)
+-		return -EOPNOTSUPP;
++	if (qopt->mqprio.preemptible_tcs &&
++	    !(adapter->flags & IGC_FLAG_TSN_REVERSE_TXQ_PRIO)) {
++		NL_SET_ERR_MSG_MOD(qopt->extack,
++				   "reverse-tsn-txq-prio private flag must be enabled before setting preemptible tc");
++		return -ENODEV;
 +	}
+ 
+ 	igc_ptp_read(adapter, &now);
+ 
+@@ -6579,6 +6592,8 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+ 			ring->max_sdu = 0;
+ 	}
+ 
++	igc_fpe_save_preempt_queue(adapter, &qopt->mqprio);
 +
- 	/* Preemption is not supported yet. */
- 	if (mqprio->preemptible_tcs) {
- 		NL_SET_ERR_MSG_MOD(mqprio->extack,
+ 	return 0;
+ }
+ 
 diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index f22cc4d4f459..78a4a9cf5f96 100644
+index 43151ab4c1b7..811856d66571 100644
 --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
 +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -13,6 +13,13 @@
- #define TX_MAX_FRAG_SIZE	(TX_MIN_FRAG_SIZE * \
- 				 (MAX_MULTPLIER_TX_MIN_FRAG + 1))
+@@ -116,6 +116,18 @@ static int igc_fpe_xmit_smd_frame(struct igc_adapter *adapter,
+ 	return err;
+ }
  
-+enum tx_queue {
-+	TX_QUEUE_0 = 0,
-+	TX_QUEUE_1,
-+	TX_QUEUE_2,
-+	TX_QUEUE_3,
-+};
++static void igc_fpe_configure_tx(struct ethtool_mmsv *mmsv, bool tx_enable)
++{
++	struct igc_fpe_t *fpe = container_of(mmsv, struct igc_fpe_t, mmsv);
++	struct igc_adapter *adapter;
 +
- DEFINE_STATIC_KEY_FALSE(igc_fpe_enabled);
- 
- static int igc_fpe_init_smd_frame(struct igc_ring *ring,
-@@ -238,7 +245,7 @@ bool igc_tsn_is_taprio_activated_by_user(struct igc_adapter *adapter)
- 		adapter->taprio_offload_enable;
++	adapter = container_of(fpe, struct igc_adapter, fpe);
++	adapter->fpe.tx_enabled = tx_enable;
++
++	/* Update config since tx_enabled affects preemptible queue configuration */
++	igc_tsn_offload_apply(adapter);
++}
++
+ static void igc_fpe_send_mpacket(struct ethtool_mmsv *mmsv,
+ 				 enum ethtool_mpacket type)
+ {
+@@ -137,15 +149,50 @@ static void igc_fpe_send_mpacket(struct ethtool_mmsv *mmsv,
  }
  
--static void igc_tsn_tx_arb(struct igc_adapter *adapter, u16 *queue_per_tc)
-+static void igc_tsn_tx_arb(struct igc_adapter *adapter, bool reverse_prio)
- {
- 	struct igc_hw *hw = &adapter->hw;
- 	u32 txarb;
-@@ -250,10 +257,17 @@ static void igc_tsn_tx_arb(struct igc_adapter *adapter, u16 *queue_per_tc)
- 		   IGC_TXARB_TXQ_PRIO_2_MASK |
- 		   IGC_TXARB_TXQ_PRIO_3_MASK);
+ static const struct ethtool_mmsv_ops igc_mmsv_ops = {
++	.configure_tx = igc_fpe_configure_tx,
+ 	.send_mpacket = igc_fpe_send_mpacket,
+ };
  
--	txarb |= IGC_TXARB_TXQ_PRIO_0(queue_per_tc[3]);
--	txarb |= IGC_TXARB_TXQ_PRIO_1(queue_per_tc[2]);
--	txarb |= IGC_TXARB_TXQ_PRIO_2(queue_per_tc[1]);
--	txarb |= IGC_TXARB_TXQ_PRIO_3(queue_per_tc[0]);
-+	if (reverse_prio) {
-+		txarb |= IGC_TXARB_TXQ_PRIO_0(TX_QUEUE_3);
-+		txarb |= IGC_TXARB_TXQ_PRIO_1(TX_QUEUE_2);
-+		txarb |= IGC_TXARB_TXQ_PRIO_2(TX_QUEUE_1);
-+		txarb |= IGC_TXARB_TXQ_PRIO_3(TX_QUEUE_0);
-+	} else {
-+		txarb |= IGC_TXARB_TXQ_PRIO_0(TX_QUEUE_0);
-+		txarb |= IGC_TXARB_TXQ_PRIO_1(TX_QUEUE_1);
-+		txarb |= IGC_TXARB_TXQ_PRIO_2(TX_QUEUE_2);
-+		txarb |= IGC_TXARB_TXQ_PRIO_3(TX_QUEUE_3);
+ void igc_fpe_init(struct igc_adapter *adapter)
+ {
+ 	adapter->fpe.tx_min_frag_size = TX_MIN_FRAG_SIZE;
++	adapter->fpe.tx_enabled = false;
+ 	ethtool_mmsv_init(&adapter->fpe.mmsv, adapter->netdev, &igc_mmsv_ops);
+ }
+ 
++static u32 igc_fpe_map_preempt_tc_to_queue(const struct igc_adapter *adapter,
++					   unsigned long preemptible_tcs)
++{
++	struct net_device *dev = adapter->netdev;
++	u32 i, queue = 0;
++
++	for (i = 0; i < dev->num_tc; i++) {
++		u32 offset, count;
++
++		if (!(preemptible_tcs & BIT(i)))
++			continue;
++
++		offset = dev->tc_to_txq[i].offset;
++		count = dev->tc_to_txq[i].count;
++		queue |= GENMASK(offset + count - 1, offset);
 +	}
- 
- 	wr32(IGC_TXARB, txarb);
- }
-@@ -286,7 +300,6 @@ static void igc_tsn_set_rxpbsize(struct igc_adapter *adapter,
-  */
- static int igc_tsn_disable_offload(struct igc_adapter *adapter)
++
++	return queue;
++}
++
++void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
++				const struct tc_mqprio_qopt_offload *mqprio)
++{
++	u32 preemptible_queue = igc_fpe_map_preempt_tc_to_queue(adapter,
++								mqprio->preemptible_tcs);
++
++	for (int i = 0; i < adapter->num_tx_queues; i++) {
++		struct igc_ring *tx_ring = adapter->tx_ring[i];
++
++		tx_ring->preemptible = !!(preemptible_queue & BIT(i));
++	}
++}
++
+ static bool is_any_launchtime(struct igc_adapter *adapter)
  {
--	u16 queue_per_tc[4] = { 3, 2, 1, 0 };
- 	struct igc_hw *hw = &adapter->hw;
- 	u32 tqavctrl;
  	int i;
-@@ -319,7 +332,7 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
- 	/* Restore the default Tx arbitration: Priority 0 has the highest
- 	 * priority and is assigned to queue 0 and so on and so forth.
- 	 */
--	igc_tsn_tx_arb(adapter, queue_per_tc);
-+	igc_tsn_tx_arb(adapter, false);
+@@ -321,9 +368,16 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_TQAVCTRL, tqavctrl);
  
- 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
++		int reg_idx = adapter->tx_ring[i]->reg_idx;
++		u32 txdctl;
++
+ 		wr32(IGC_TXQCTL(i), 0);
+ 		wr32(IGC_STQT(i), 0);
+ 		wr32(IGC_ENDQT(i), NSEC_PER_SEC);
++
++		txdctl = rd32(IGC_TXDCTL(reg_idx));
++		txdctl &= ~IGC_TXDCTL_PRIORITY_HIGH;
++		wr32(IGC_TXDCTL(reg_idx), txdctl);
+ 	}
  
-@@ -385,12 +398,8 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
- 	if (igc_is_device_id_i226(hw))
- 		igc_tsn_set_retx_qbvfullthreshold(adapter);
- 
--	if (adapter->strict_priority_enable) {
--		/* Configure queue priorities according to the user provided
--		 * mapping.
--		 */
--		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
--	}
-+	if (adapter->strict_priority_enable)
-+		igc_tsn_tx_arb(adapter, true);
+ 	wr32(IGC_QBVCYCLET_S, 0);
+@@ -404,6 +458,7 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
  
  	for (i = 0; i < adapter->num_tx_queues; i++) {
  		struct igc_ring *ring = adapter->tx_ring[i];
++		u32 txdctl = rd32(IGC_TXDCTL(ring->reg_idx));
+ 		u32 txqctl = 0;
+ 		u16 cbs_value;
+ 		u32 tqavcc;
+@@ -437,6 +492,22 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ 		if (ring->launchtime_enable)
+ 			txqctl |= IGC_TXQCTL_QUEUE_MODE_LAUNCHT;
+ 
++		if (!adapter->fpe.tx_enabled) {
++			/* fpe inactive: clear both flags */
++			txqctl &= ~IGC_TXQCTL_PREEMPTIBLE;
++			txdctl &= ~IGC_TXDCTL_PRIORITY_HIGH;
++		} else if (ring->preemptible) {
++			/* fpe active + preemptible: enable preemptible queue + set low priority */
++			txqctl |= IGC_TXQCTL_PREEMPTIBLE;
++			txdctl &= ~IGC_TXDCTL_PRIORITY_HIGH;
++		} else {
++			/* fpe active + express: enable express queue + set high priority */
++			txqctl &= ~IGC_TXQCTL_PREEMPTIBLE;
++			txdctl |= IGC_TXDCTL_PRIORITY_HIGH;
++		}
++
++		wr32(IGC_TXDCTL(ring->reg_idx), txdctl);
++
+ 		/* Skip configuring CBS for Q2 and Q3 */
+ 		if (i > 1)
+ 			goto skip_cbs;
+diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ethernet/intel/igc/igc_tsn.h
+index c2a77229207b..f2e8bfef4871 100644
+--- a/drivers/net/ethernet/intel/igc/igc_tsn.h
++++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
+@@ -4,6 +4,8 @@
+ #ifndef _IGC_TSN_H_
+ #define _IGC_TSN_H_
+ 
++#include <net/pkt_sched.h>
++
+ #define IGC_RX_MIN_FRAG_SIZE		60
+ #define SMD_FRAME_SIZE			60
+ 
+@@ -15,6 +17,8 @@ enum igc_txd_popts_type {
+ DECLARE_STATIC_KEY_FALSE(igc_fpe_enabled);
+ 
+ void igc_fpe_init(struct igc_adapter *adapter);
++void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
++				const struct tc_mqprio_qopt_offload *mqprio);
+ u32 igc_fpe_get_supported_frag_size(u32 frag_size);
+ int igc_tsn_offload_apply(struct igc_adapter *adapter);
+ int igc_tsn_reset(struct igc_adapter *adapter);
 -- 
 2.47.1
 
