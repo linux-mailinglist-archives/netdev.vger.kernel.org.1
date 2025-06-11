@@ -1,152 +1,121 @@
-Return-Path: <netdev+bounces-196477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA44BAD4F51
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:06:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4CBAD4F64
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 11:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177504601E0
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:06:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AFAD7A6785
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 09:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE81E25B319;
-	Wed, 11 Jun 2025 09:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CC92417F8;
+	Wed, 11 Jun 2025 09:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b="TLTRiRSr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdTS2ryo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA87254AEC
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 09:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B1A13A3F2;
+	Wed, 11 Jun 2025 09:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749632678; cv=none; b=STyDrGhqLPqiDKr66C9c5b4Gjw/engfUPipl1Fl3WJ/D1Y6jwmRfcVUeZObfUTutbLFOfIYLCMebeLD9LH0kRvCLRGeDsXrpApSrAY67zL3Ub65flvcGRQKmfqtPk2p8/XIbm3dvhKlyUud0Q5Xq8Cvuh0yoTfi0mrOkTaW6qB8=
+	t=1749632951; cv=none; b=Fy9vQ+YIWlDp9PWmccV9GpxUV1tjCDEuMAhn/EKZMYyEGZvguXEJUTQn4QdpvVlRcF5KtM7/4swuuUqvVuvEQNGhoEHXjROCfnc7+sIYSC89h8UmYZ/Or5pjPyenijsOhs/qFvenE3i0FIXr1G0ZznwrU2UK4FRF4SveUgoRAcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749632678; c=relaxed/simple;
-	bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=aZDs++23vkB4sBX1DIsITFudrofPow+8qEL5dUvre9dtNAkBMaOtZhht7af0MzKI+mb38Gvvjr8MRSjKyYuGtTUwW/nB0F7FNHdJuo2WkBX4utnWbh2na6mmhRI7jNWVJTOKRAd1SAGice1XPCoZ8WlnP2wNYr74LClaoOHdby8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (3072-bit key) header.d=posteo.net header.i=@posteo.net header.b=TLTRiRSr; arc=none smtp.client-ip=185.67.36.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id 6EC31240103
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 11:04:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net;
-	s=1984.ea087b; t=1749632674;
-	bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:To:Cc:From;
-	b=TLTRiRSralZsGm3Chv0w46FoF9yz05ZenISNsjEbDf1uAv57sSKGwfxX5t39QR7tY
-	 6OdFvRBFohyAo8lqz3dbBh2kKYnZWmrGcJ6ElmMeJ2n6lvCl39S9Uoe+TizkYSN+cm
-	 kfPuRcaEWToQKHP85flDWDLB9qMtdChPMUHnBIGXCp4fEjL6sSq/dXeoDdJmoNFqJA
-	 xOa4RlWzmmiFEGgkUb5RJXOQtYI8PM47xnxzf5bqMnSZscL7BhaMZ7kHQzj9MEeo1G
-	 vDX7kz0yBJT66DqbnQwPzlj/iomKdjzaFSme88s2k8PR7cf71zEoqTCzs+EQzvtNT0
-	 hMPKDKYlFIzmlE0BGMrwRICgF31FdjK4+GLE8X8txDXRB8ir+s476XCFx01VYBtapw
-	 KFBPqbtoJ+eLnr8xUHXcbOqTeYc0LJUdCOp7OH1xP/qrjvhOKPcZNpASFUzVPnfPFK
-	 0CXk/6CgSd7q0TpGWzOvtvWXApDDUIKtvaMaZ+0wJxL7Q5n5mVa
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4bHKV61lB6z9rxD;
-	Wed, 11 Jun 2025 11:04:30 +0200 (CEST)
-From: Charalampos Mitrodimas <charmitro@posteo.net>
-Date: Wed, 11 Jun 2025 09:04:06 +0000
-Subject: [PATCH bpf-next v2] net: Fix RCU usage in task_cls_state() for BPF
- programs
+	s=arc-20240116; t=1749632951; c=relaxed/simple;
+	bh=/ulSuPmv3Z31n1JyJiqmNsB3uzV7uIoVWgBAXmxAlXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a5ci/i9YrOwf2b5ibSA1IstnGku+8eaqkiVwgHsx6JJrh9xAd5FTVV17Pli5HzlNVLib9KnRhm7IBszkpF39BoxIiej0AOVEq2FzLpYliVUx1sQ3ZjKpjRxwTCQZ2oqwCwEzmdSPsdnIaz4a7ozzW4G4/4CVSMtbvX0dM5v3jJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdTS2ryo; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c56a3def84so584202785a.0;
+        Wed, 11 Jun 2025 02:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749632948; x=1750237748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I0uNjouf1tVKiKNvEBer2Dir89BlROQ9UZqvbNds5Zs=;
+        b=HdTS2ryoOiOcjVPX881Cr4xqw4anyXRg+n33tWF3ya3c9U7BmL7vaaNyJ8xRs2Tvw5
+         5guzwFZtPmbXWfzx2FVrxbYzPkeNOb0IQ3oRG44Z54ShEDIr6lX/dc9VWpB+zCsK3eY3
+         kE3SQ8KSos5fwI/zyy/sAEH7SP2pIP1FLal/v3suAndNKsexu35FqR9VCiQVT0oWzloG
+         fXUKG3IOK230K6tGKB6IcP6uiir3uHP1AV3fq6sM7b/2RikRwOLk13cL6rmLpuhHT+F5
+         7wJM+J+Ezn/4foFqLU/bSokyt6dk5/SFAgb6smsCFtxtm9U//fWDHPiSRUbwKjjYFSJb
+         tRUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749632948; x=1750237748;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I0uNjouf1tVKiKNvEBer2Dir89BlROQ9UZqvbNds5Zs=;
+        b=XeOx9bCAPr7WrSnrw0rsmMn+lLwgfssy5KSv4ifDaCDqr9tIzDXuyO21mYnblyLzLQ
+         92nVcl1LIiCIfBrG1PWavzhBxOL+OvonSlP1aT1MixxhIT5Jg55HRtWgRMluuTKwEHX3
+         Sc8hrm7SsgddRDAWtiU7FalYZtaAQPCnzsiKrG3iTLzJb2N02CS21BbCs/reiMslpibK
+         Hh1drOkYtGdGnGrrz2zZ1c639TbBDmnYBx212I1GE2cmhl7o8b3fOw+9oF5B6oQ+9Ctq
+         kwqSQgJUF+DU7Q9oDMsYQJ9c9qaUh+PObqhHVALS3Go9MdetXWzEW1fIETVT9tSyQvm2
+         apKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmIijSljyxS+nn5nNCNoI6h833QJ+ki9WY05fnaFDdG7SVEXxQf1NYNkSEtuWaD44/ztySviR37RIkhck=@vger.kernel.org, AJvYcCXPW43MuZESaZh7EML/RgPKsf+aieDe24522FaTDRUX6axo+nLE+FVIgglzYP70xzykW4YPNEMR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXyB0wpVXAqI/+xIusaR1O1K2/aAN6n0tw66hPmB0GKEuD1tmU
+	+J6hjmJ8OXyCrJy++ANiV43JKbPY4QAtoUXJshZj/5Ao+kdqDGQ/IUQe
+X-Gm-Gg: ASbGncvUWZzbBkhoM/sRtZidAybMQ8osGd6uKm7yC+KjzTpBocCLO6w97wnH3FbVnPf
+	7GKGt15a4M8pyZeRtBbZHDAzcqWg3Tfx/FbqrIggysUgyWgPy2SF9ByM8xxfweeMgjGsOUGvA+g
+	GOKjTFe60d1G3AeaOutYyZNKbJgAl8cWzO5HyGSzIEZvfDJ+NOjvKUykAS+7WTvyKw0r/LxmcG/
+	GveOIG6d717zUK1II2rBAcs28LgDEgIfrEfkaNhELxo8Dv2N0f9/s9DKkiQJuItccRW3VFhlTyq
+	oZAsoRARqe1Y2O0+gOfGJIiYHfQK/Mx8dv63jmR3h+jT6ScZ90/PU/vLLQ7nzFAmqs9ccK8JA2U
+	l8fz3Bhjf4Fo=
+X-Google-Smtp-Source: AGHT+IFy9aKXEbpBdOIwlB7FEB9sJJStW5dF+mQfKY3NEa978nxRPDFAr1gnJPXdH94Fwr8xDTw7sw==
+X-Received: by 2002:a05:620a:6289:b0:7d2:107c:4228 with SMTP id af79cd13be357-7d3a88316b0mr370207285a.18.1749632948405;
+        Wed, 11 Jun 2025 02:09:08 -0700 (PDT)
+Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d2669b4759sm839297585a.111.2025.06.11.02.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 02:09:07 -0700 (PDT)
+Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
+	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 55B993HZ000421;
+	Wed, 11 Jun 2025 12:09:04 +0300
+Received: (from paul@localhost)
+	by home.paul.comp (8.15.2/8.15.2/Submit) id 55B9919M000418;
+	Wed, 11 Jun 2025 12:09:01 +0300
+Date: Wed, 11 Jun 2025 12:09:01 +0300
+From: Paul Fertser <fercerpav@gmail.com>
+To: kalavakunta.hari.prasad@gmail.com
+Cc: sam@mendozajonas.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        npeacock@meta.com, hkalavakunta@meta.com
+Subject: Re: [PATCH net-next] net: ncsi: Fix buffer overflow in fetching
+ version id
+Message-ID: <aElHrRb5Vk7PzEAs@home.paul.comp>
+References: <20250610193338.1368-1-kalavakunta.hari.prasad@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250611-rcu-fix-task_cls_state-v2-1-1a7fc248232a@posteo.net>
-X-B4-Tracking: v=1; b=H4sIAIVGSWgC/4WNXQ6CMBCEr0L22TX9QTA+cQ9DSKGLNBpKupVoS
- O9u4QI+fpOZbzZgCo4YbsUGgVbHzs8Z1KmAYTLzg9DZzKCEuohKXDEMbxzdB6PhZze8uONoIqE
- gW+ux1LWVBHm8BMqtQ3xvM0+Oow/f42eVe/pXuUqUqMxe68tK6L5ZPEfy55kitCmlHwADJY29A
- AAA
-X-Change-ID: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Feng Yang <yangfeng@kylinos.cn>, 
- Tejun Heo <tj@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com, 
- Charalampos Mitrodimas <charmitro@posteo.net>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1749632650; l=2465;
- i=charmitro@posteo.net; s=20250526; h=from:subject:message-id;
- bh=jLq8TQOAMhHdsylHL7FElHZIu/bvuM8qtmokE4WqBTs=;
- b=ut6ePDZlYIfJ1ZYNH55TQtCyEKaPR4TU6r3rukgknfjavYlrrn/IkxJBy746Ht37XV5aI87Ex
- oBOn6hKvQS4C7IH8VFFYisxJPoXcJkH3SO1bxjld9hRyPF4Iq2fnFUw
-X-Developer-Key: i=charmitro@posteo.net; a=ed25519;
- pk=PNHEh5o1dcr5kfKoZhfwdsfm3CxVfRje7vFYKIW0Mp4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250610193338.1368-1-kalavakunta.hari.prasad@gmail.com>
 
-The commit ee971630f20f ("bpf: Allow some trace helpers for all prog
-types") made bpf_get_cgroup_classid_curr helper available to all BPF
-program types, not just networking programs.
+Hello Hari,
 
-This helper calls __task_get_classid() which internally calls
-task_cls_state() requiring rcu_read_lock_bh_held(). This works in
-networking/tc context where RCU BH is held, but triggers an RCU
-warning when called from other contexts like BPF syscall programs that
-run under rcu_read_lock_trace():
+On Tue, Jun 10, 2025 at 12:33:38PM -0700, kalavakunta.hari.prasad@gmail.com wrote:
+> From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+> 
+> In NC-SI spec v1.2 section 8.4.44.2, the firmware name doesn't
+> need to be null terminated while its size occupies the full size
+> of the field. Fix the buffer overflow issue by adding one
+> additional byte for null terminator.
+> 
+> Signed-off-by: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
 
-  WARNING: suspicious RCU usage
-  6.15.0-rc4-syzkaller-g079e5c56a5c4 #0 Not tainted
-  -----------------------------
-  net/core/netclassid_cgroup.c:24 suspicious rcu_dereference_check() usage!
+You seem to be surprisingly persistent about ignoring my remarks on
+your commit message.
 
-Fix this by also accepting rcu_read_lock_trace_held() as a valid RCU
-context in the task_cls_state() function. This is safe because BPF
-programs are non-sleepable and task_cls_state() is only doing an RCU
-dereference to get the classid.
+So be it, since the code looks correct and reliable, fixes a real life
+bug, and actually applies to the right tree now,
 
-Reported-by: syzbot+b4169a1cfb945d2ed0ec@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b4169a1cfb945d2ed0ec
-Fixes: ee971630f20f ("bpf: Allow some trace helpers for all prog types")
-Signed-off-by: Charalampos Mitrodimas <charmitro@posteo.net>
----
-Changes in v2:
-- Fix RCU usage in task_cls_state() instead of BPF helper
-- Add rcu_read_lock_trace_held() check to accept trace RCU as valdi
-  context
-- Drop the approach of using task_cls_classid() which has in_interrupt()
-  check
-- Link to v1: https://lore.kernel.org/r/20250608-rcu-fix-task_cls_state-v1-1-2a2025b4603b@posteo.net
----
- net/core/netclassid_cgroup.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
-index d22f0919821e931fbdedf5a8a7a2998d59d73978..df86f82d747ac40e99597d6f2d921e8cc2834e64 100644
---- a/net/core/netclassid_cgroup.c
-+++ b/net/core/netclassid_cgroup.c
-@@ -21,7 +21,8 @@ static inline struct cgroup_cls_state *css_cls_state(struct cgroup_subsys_state
- struct cgroup_cls_state *task_cls_state(struct task_struct *p)
- {
- 	return css_cls_state(task_css_check(p, net_cls_cgrp_id,
--					    rcu_read_lock_bh_held()));
-+					    rcu_read_lock_bh_held() ||
-+					    rcu_read_lock_trace_held()));
- }
- EXPORT_SYMBOL_GPL(task_cls_state);
- 
-
----
-base-commit: 079e5c56a5c41d285068939ff7b0041ab10386fa
-change-id: 20250608-rcu-fix-task_cls_state-0ed73f437d1e
-
-Best regards,
--- 
-Charalampos Mitrodimas <charmitro@posteo.net>
-
+Reviewed-by: Paul Fertser <fercerpav@gmail.com>
 
