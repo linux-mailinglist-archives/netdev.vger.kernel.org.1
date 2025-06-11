@@ -1,115 +1,155 @@
-Return-Path: <netdev+bounces-196704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2295AD600C
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:27:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA03FAD5FD2
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 22:08:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E11A3A876B
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:27:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B7383A8F5D
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 20:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7FE235348;
-	Wed, 11 Jun 2025 20:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D365286D57;
+	Wed, 11 Jun 2025 20:08:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KTGAP0oJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBQN8TI1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668E1210F44;
-	Wed, 11 Jun 2025 20:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01DA22E01E
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 20:08:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749673666; cv=none; b=VdhLCjlGZ96kY7r2BYjodCjAJp/Y5edAQPrMbJ1YUVa+1XzAoYm5qRhcCFfBWR+fqGIvrJmGR1kDELlAU/3TZ3ADhj/m7p3VbJlFU3yzuyypI3QrHkxLjQWEV0Cykan0jwSeCfXq5fmiJXgtXpwjg4aPIXarJudMaVGf5ftGdOc=
+	t=1749672526; cv=none; b=dDBEpoEmYwvlXf2bb7vclosJlthMrmralwq1osHw0NWabcbzDHyjGExJhtuzaYYWQoilo3hBJb0uvP6ESWobgvDFaLgUNllJX/4/0ZRVNCOxW2AMxdcod2zSEYTHlApdzFrr5vQkx/g6cIwZGm5inHfPMwS9+fb4GQrO0BBhHXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749673666; c=relaxed/simple;
-	bh=MU8Zi+pntPYytdt49KNwDwq4ACCf3lHI4qQsBgK7E6g=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qd8o+onRBPh6GAu8RFql6jbvYWcKiU/BafGOJcF9bR1JR32k+K0cuUrx0pjz62cRaO+0PipPyattUWvFxS7kiP124eIg6444SRo+GLVhKjMx2bPsDxgo+Za8PObujsz9xIJ1uvjqxUkDsUuQ6xWasUa2A4eUdV+sfFIv2QgYJZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KTGAP0oJ; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uPRZW-00BKls-1R; Wed, 11 Jun 2025 21:57:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From; bh=d1QaSFHfEh3cM2Uv7I3zUqxXFc1eWwgg2qbFxn/xMxc=
-	; b=KTGAP0oJ7ZLO4T+XONPBBuZ8nO5acq803LvkagTvlFsHLizXcHUUNHkwSl4x+PGiPriobqTJk
-	u7/5LM2t7Zl5CEIFaelft39YuLdSwumZCY01r/tWC+BAHHYS+URDpJtzj/HtTIDwyFW7WPlV4DuCw
-	tPOvDs0TGlQfuKlKAT0WeYMGAJr20p7ETXT+X9AM8seNzlgFswC2upqvafnuOMRUD5MVjvDRQSQXC
-	XwEGj38a2lelMCjiMdrAjvju58mc60qkIdxrWcwwSgCHHsjmurFyx8trG98niAVYf4B1o9oO7ViPV
-	+mDGsjgI2VFjP7GN0mqQDw0b8KAAtHdJX4d1AA==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uPRZV-0005DR-G9; Wed, 11 Jun 2025 21:57:17 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uPRZH-00BycS-19; Wed, 11 Jun 2025 21:57:03 +0200
-From: Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH net-next v3 0/3] vsock/test: Improve transport_uaf test
-Date: Wed, 11 Jun 2025 21:56:49 +0200
-Message-Id: <20250611-vsock-test-inc-cov-v3-0-5834060d9c20@rbox.co>
+	s=arc-20240116; t=1749672526; c=relaxed/simple;
+	bh=6AhyEK5giZWmGi8bqGKQJGz0VU8Md9FsF+tjvwF0y7g=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=RCeHpMEkuLgALpF4n+pQ63kzFVRdayZEm94Y/9sivinCr2tmt8a7Egz4WOhKW0MEhB9Wn/4Rm2aUKixBd2Hcjq1qyU769EPW0NwfkxUNfaZCKC6b3Cp/GuyeFzaH11AOomVSDB5hLRGuk2ZS9f/Ku+lCtAh2+baNh2sBAH+NkEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBQN8TI1; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-450ce671a08so1040295e9.3
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 13:08:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749672523; x=1750277323; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TjVtKIM5pPO+K8LZ5hfiImShHvU2AYoeNklXm9bz80o=;
+        b=gBQN8TI1v4+LI3j3ELzK64lynH9JQy5iiVZuIiSXt/sYesOI61fSHU8C1XRI7oHHCl
+         XLwxN3YElmtprAOgQa/3fpO5g7VddAHjtr98vENlH1OSrMcp2cTptD6PPGz58e48s/Bs
+         u351XV0HKk6WIkyzY7QqermkhE+CRClLH61tRoEMWoATIoRhq5QXXlXH4ITf0+52O1XU
+         qXwYxsH5BZxykvkfYufJK6bDAyRyjUT3PV8PrHAkSJ2MAVr6+e14b5oUmsCj/AgoeBIH
+         J6bQI9wj/biPWb1Fkr8OS5dl+JMeSIyd8zmwVl6MgTEBDMhwJv2fEhg5AW8f7/4GOo0C
+         Mylg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749672523; x=1750277323;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TjVtKIM5pPO+K8LZ5hfiImShHvU2AYoeNklXm9bz80o=;
+        b=PJykwQkEOuYF7OwsJzGDxtTYptu7ghuzl/gFpZmttTOJtJSSO/CIMgIZ/8SC8n8D3j
+         GQqjeZzqDiW7LvU0cL3aeNmE438llNcCgEJ3HNeAlUDZenGPDuLBhmCHxNWeX51TV/Pa
+         iPP732inXM9YHvBXRx+ssYvYE5kJYJ3yEUyB19sa84rV9wRunlb3PWaWqHkjjvQRIeZ9
+         iBbktNhnKkK2/O4pXB15AvURpdofOoYDvS517lG44zrkWrb98Fk71WW2HC6czLTUGjrN
+         VMLG/DSbOGHH3fmQJrmLNHpFZJAwlCZY/YddPvTlMhTHOMK7zP23wWpDAeMaLXX0OfA5
+         lWcw==
+X-Gm-Message-State: AOJu0YwSegcaURrgZn3TpRLkZ8o1pNHfdHnI0gQgEnLiX4ZlboH3ljVD
+	awTqNx8QM7c0M1csJ+IXXLISxplXNPDCqud2Qpy2K1VJBaydnHR6oGq5
+X-Gm-Gg: ASbGncuhvrhG8jKMUQQPV1U1sOCkbsAmMjZg1W4I7bnJfg9cTF0vVzaMXvY0dQOMypL
+	29hh3dr1hWgUzm7G2efmTLuXs4+o/3SThd7yaOXwBL9JBmcdAFCuiOMb5m22X/gTZNGIijJiy6C
+	1qB3DBIeZ047AYVftmspai0Z/O3ocZALI4BzQi3n2sEMrXJOJopl7W2Ioxqx9SlHasUAt/9vsKo
+	c/QUYe4jHjQZT8188kV3eB+68K/lYC5t78fRDCjTj4ffIWrPMomh62IscLAiqerHcT3cM9ANkT7
+	x9fq2XI9yn6nl3MQv9EdtTh3rUUKknaDHpV93dretit9TAQgxVA3E3bu0zSj7Xf9IUWjq2N8DGL
+	GriIwDMWzm/1JwNLaJz3z2FFKKCq0lCbmRe42vC3sS6K9kDIvoZGBAIDqPI9ktZk2B05X3amBL4
+	Ar6KAQGJkfgsf4wmHn10SPFYvM/Q==
+X-Google-Smtp-Source: AGHT+IEDaeL6TnggTf2WVPEZKqSCC+0+Ttje/g5aVuHTgWF8OX2yncTpu/2C8jNfe9HYuqXU6h9cJQ==
+X-Received: by 2002:a05:600c:5395:b0:445:1984:247d with SMTP id 5b1f17b1804b1-4532d293cf5mr2781755e9.7.1749672522952;
+        Wed, 11 Jun 2025 13:08:42 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f1d:5400:69f2:2062:82e9:fc02? (p200300ea8f1d540069f2206282e9fc02.dip0.t-ipconnect.de. [2003:ea:8f1d:5400:69f2:2062:82e9:fc02])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4532da8fc18sm465685e9.25.2025.06.11.13.08.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Jun 2025 13:08:42 -0700 (PDT)
+Message-ID: <6ae7bda0-c093-468a-8ac0-50a2afa73c45@gmail.com>
+Date: Wed, 11 Jun 2025 22:08:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next 0/4] net: phy: improve mdio-boardinfo handling
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIHfSWgC/23NTQ7CIBQE4Ks0rH0GHqVFV97DuCg/tcQEDBBS0
- /TuEja66HIymW82kmx0NpFrt5Foi0su+Br4qSN6mfzTgjM1E6QoKMcBSgr6BdmmDM5r0KGAksg
- lojJqlKQO39HObm3onXibwds1k0dtFpdyiJ/2VljrGyyQH8GFAYN54oKOl54pZW5RhfWsQ8MK/
- gPyEECgIOdBCNVTI0b9A/Z9/wLGVSFF/QAAAA==
-X-Change-ID: 20250326-vsock-test-inc-cov-b823822bdb78
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-Increase the coverage of a test implemented in commit 301a62dfb0d0
-("vsock/test: Add test for UAF due to socket unbinding"). Take this
-opportunity to factor out some utility code, drop a redundant sync between
-client and server, and introduce a /proc/kallsyms harvesting logic for
-auto-detecting registered vsock transports.
+This series includes smaller improvements to mdio-boardinfo handling.
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
-Changes in v3:
-- Drop "RFC" prefix, rebase, amend commit logs
-- get_transports(): don't look for a symbol that was already found
-- Expand testcase comments, clean up the code [Stefano]
-- Streamline `enum transport` and `transport_ksyms` [Stefano]
-- Move KALLSYMS_* defines from utils.h to utils.c [Stefano]
-- Link to v2: https://lore.kernel.org/r/20250528-vsock-test-inc-cov-v2-0-8f655b40d57c@rbox.co
+Heiner Kallweit (4):
+  net: phy: simplify mdiobus_setup_mdiodev_from_board_info
+  net: phy: move definition of struct mdio_board_entry to
+    mdio-boardinfo.c
+  net: phy: improve mdio-boardinfo.h
+  net: phy: directly copy struct mdio_board_info in
+    mdiobus_register_board_info
 
-Changes in v2:
-- Speed up: don't bother checking EINTR or respecting timeout on connect()s
-- Introduce get_transports(), warn on unsupported setup [Stefano]
-- Comment the code, drop the sync, introduce vsock_bind_try() [Stefano]
-- Link to v1: https://lore.kernel.org/r/20250523-vsock-test-inc-cov-v1-1-fa3507941bbd@rbox.co
+ drivers/net/phy/mdio-boardinfo.c | 29 ++++++++++++++---------------
+ drivers/net/phy/mdio-boardinfo.h |  9 ++-------
+ 2 files changed, 16 insertions(+), 22 deletions(-)
 
----
-Michal Luczaj (3):
-      vsock/test: Introduce vsock_bind_try() helper
-      vsock/test: Introduce get_transports()
-      vsock/test: Cover more CIDs in transport_uaf test
-
- tools/testing/vsock/util.c       | 80 ++++++++++++++++++++++++++++++++--
- tools/testing/vsock/util.h       | 30 +++++++++++++
- tools/testing/vsock/vsock_test.c | 93 ++++++++++++++++++++++++++++++++--------
- 3 files changed, 181 insertions(+), 22 deletions(-)
----
-base-commit: 0097c4195b1d0ca57d15979626c769c74747b5a0
-change-id: 20250326-vsock-test-inc-cov-b823822bdb78
-
-Best regards,
 -- 
-Michal Luczaj <mhal@rbox.co>
-
+2.49.0
 
