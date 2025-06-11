@@ -1,156 +1,150 @@
-Return-Path: <netdev+bounces-196451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239A2AD4E6F
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:31:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03865AD4E84
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 10:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 601633A4FDC
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:30:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE2041BC00EA
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 08:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1573D2309B6;
-	Wed, 11 Jun 2025 08:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6D323C8A4;
+	Wed, 11 Jun 2025 08:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Fhy8LIVi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aUV4CA7G"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FB82367B0
-	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5A72367C0
+	for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 08:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749630681; cv=none; b=oT9UnAgvvWcUbhCs/VxJsWfQGv67dTWeAHp6lTLfw8nbVdtqygXEu7krksZy4jxO56sWGmippTFgkYC2u2kapPjVASKViiNpmHc/SMwAzU27gbCrq6KnF5bK6A4qC6k2sj5FK+g67B8hFdCmgmDJb9NxhLapN0bX8lPCjEmtb5k=
+	t=1749630906; cv=none; b=n1rqO5g3grLmXoJn+PGWPPD7bADeKd0KJBvhzahR09X4rUZ3iAt9ZEejiN5j9w/0i524GByMMGmQ2mJSx6Vih2U5CkhoKnRcEoqHQzqgsdL5WDIHr8/aNTsFirJW/DSymfmcvnzI1DJvMjuCbC8ySnTYQiPLDKh2lRz9inQlf/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749630681; c=relaxed/simple;
-	bh=/vwDBjl9yEau2jcTEiQKyUboG2fbIwSob/pGFKRNf1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mQp0+S4QaSJpaIoHh5zhArUeBRnAm1ws+DuxwU31tg/5w723sjqLQt7KMQ1MEzhFlS6pr7iPgFWGKs/pLJYGg3eVCWdCNSLeZ43Nm2yQpCgA6c6nXJ2ePul0KjTZaUn2bdzvsOy8TzYz7gTIKbVBsV6hLDbnp8I7AD1bU6fz+yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Fhy8LIVi; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=TGqx7JiEzOuIGW4c5ERhspoFoZOLiM85mcafwel2dOA=; b=Fhy8LIViRxY2CLPWKzOx50JjEu
-	CpNXR4SgpyVasp8QdjIc8rFCvczg04r6tyNS2qx2mBKW8x5LBCzjmcv0OVolKNbjvXOBqwheKa7sX
-	MtKUG+K4AJyrJl+ZmvD25OlacljTBPiT8eU8isxMEkA4ednoXgOMnKVSTCvn22nNLEGhlIQcU2OVg
-	t5WH760mCjJmA8s7L9oAMCSZHq/VKCcO3PHHjXf6ZlqmrTe0iFeEynuL1CAJsfwSQJ6jVS5llxLj0
-	vNwucqn50VpDdK+cepDiQfhbAw2mwuJ+Fdw1dev4U9Gnblg0vSS3rkV3Z0RmRfofll/LYhXpYsa7g
-	976Hr+Wg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34298)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uPGrY-0005rR-0A;
-	Wed, 11 Jun 2025 09:31:12 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uPGrV-00085H-10;
-	Wed, 11 Jun 2025 09:31:09 +0100
-Date: Wed, 11 Jun 2025 09:31:09 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chris Morgan <macromorgan@hotmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Chris Morgan <macroalpha82@gmail.com>,
-	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH V2] net: sfp: add quirk for Potron SFP+ XGSPON ONU Stick
-Message-ID: <aEk-zY0gfGx-PPa6@shell.armlinux.org.uk>
-References: <20250606022203.479864-1-macroalpha82@gmail.com>
- <ab987609-0cc7-4051-bc51-234e254cbec0@lunn.ch>
- <SN6PR1901MB46541BA6488F73EB49EBCDDFA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
- <eb99e702-5766-4af6-b527-660988ad9b54@lunn.ch>
- <SN6PR1901MB465464D2B7D905F6CD076F3FA56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
- <aENb4YX4mkAUgfi2@shell.armlinux.org.uk>
- <SN6PR1901MB46545250D870E79670E43E06A56EA@SN6PR1901MB4654.namprd19.prod.outlook.com>
- <aENv5BI2Amtqui4v@shell.armlinux.org.uk>
- <SN6PR1901MB4654B995FBAFAC7298C7C6A3A575A@SN6PR1901MB4654.namprd19.prod.outlook.com>
+	s=arc-20240116; t=1749630906; c=relaxed/simple;
+	bh=sh28WoI07kRUIOUIAPoZClX6B7O6vXzsXebAB+1KS2g=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gvheTCQ/Hvjs+yye82L7iSOcib/l7jj9cfON5GAsvGTwZlBwxyLpFojt3t3QyF1jHck4bnXje8YRkiTPuFvYc/N5rVNA12OPhSoGHhoOjuKFmkujn3id+HzrC9vBGk+kwxQfbt2nwr4nQTKjOBUAIRomexiKWRqN9MLgfyNzVHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aUV4CA7G; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6f53913e2b6so93024686d6.2
+        for <netdev@vger.kernel.org>; Wed, 11 Jun 2025 01:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749630904; x=1750235704; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IJ/Ii+kzH15uD/kklpl8P0Wjrt+djWjANqmqylLT3w4=;
+        b=aUV4CA7G7bpNTtWcY7F0cLIj7pxdvL36l+IDqAjm85d28e3VXW6BjCWIckIglY/nPM
+         6B9IQez8dd694RLUGLPo1AabVkudY9KZS8AT8bVeqb/Tl5TpSfUgxnHFL+vInUY6kDsC
+         PrfHA3mztoqYO3kOXtQ36jhdWdOv1t40ABi6hm4D0e5Y2KkAnqFSYaGPozOPTCwfatSA
+         B4++I6H5YaAoBfRBjdPlImNAgBcRr8W/vsZ0y2KTE0v3mHpGw7231LBtrUDxNqrSQqt3
+         0UJmx+4wQSzLLK7mhZ1r8RSfhYIncpCgOeHzrpRCoHBC2aL58eaBaKaZqxzu9gDBhebB
+         KpbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749630904; x=1750235704;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IJ/Ii+kzH15uD/kklpl8P0Wjrt+djWjANqmqylLT3w4=;
+        b=jjpoVGRDTf8RUf6Z5nANSHGLsVlwS2AMprT6nrbH3nTmAxfng9ol01qJ6J2t0FRdHL
+         LYpKHH5vnYZX5wA1lAR3CXK58nSs2EMyMSkLF4yslIdxj2Isqq8Q3V536J8XpHxwWvVS
+         mll4ZNVLM16cZAliXrGq3k9fd9sSw6GNBWjNHbGDjbB+HEultYPx2gX1TAgdEJ0A4kBG
+         C+SduWCY3GdccobVb1fPVxSHdqZKG8VpynXU4eate3kw3v/WvOxmHgEBSVWyR77kXSxa
+         3mORLF6pQOcUMLdHH6OjS4NSYYaAAENwQJrT1wLvPaqPCRkZAm6Jl7IxF+YgYKbzoz5A
+         aj8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWAlMy4+xxyd5LL2kZ2MxBCL6eCy6fTwUMzj4SFEJwEMOs9bdJn70owhugKmxcq00VRCw3X3ls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoiF166Z1o6/pnSB7gBM0RyjPAH6UjqqsYRNWIR7qT3hBaVzWc
+	BmrtY2wHWt0Y6tp+Tw17O09FVLie2mtEl5UrjZs1niF2DLBXIwu3E4o/EtcmmQI70skt397PVvT
+	wtuGXoF6EJEqxTg==
+X-Google-Smtp-Source: AGHT+IHw9sP/8Wq7IkSrM4UC8Nhhb2G5uH2e5zWZM44KSph1JcvfbhuuK/JHaueoOQppzQT9FDzSJA+zFpr+MA==
+X-Received: from qvblx13.prod.google.com ([2002:a05:6214:5f0d:b0:6fb:461:b629])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ad4:5dc8:0:b0:6fa:c4cd:cca3 with SMTP id 6a1803df08f44-6fb2c3274edmr41060906d6.14.1749630903742;
+ Wed, 11 Jun 2025 01:35:03 -0700 (PDT)
+Date: Wed, 11 Jun 2025 08:35:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR1901MB4654B995FBAFAC7298C7C6A3A575A@SN6PR1901MB4654.namprd19.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
+Message-ID: <20250611083501.1810459-1-edumazet@google.com>
+Subject: [PATCH net] net_sched: sch_sfq: reject invalid perturb period
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Gerrard Tai <gerrard.tai@starlabs.sg>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jun 10, 2025 at 10:43:31PM -0500, Chris Morgan wrote:
-> On Fri, Jun 06, 2025 at 11:47:00PM +0100, Russell King (Oracle) wrote:
-> > On Fri, Jun 06, 2025 at 05:32:43PM -0500, Chris Morgan wrote:
-> > > On Fri, Jun 06, 2025 at 10:21:37PM +0100, Russell King (Oracle) wrote:
-> > > > On Fri, Jun 06, 2025 at 01:54:27PM -0500, Chris Morgan wrote:
-> > > > > 	Option values					: 0x00 0x00
-> > > > 
-> > > > This suggests that LOS is not supported, nor any of the other hardware
-> > > > signals. However, because early revisions of the SFP MSA didn't have
-> > > > an option byte, and thus was zero, but did have the hardware signals,
-> > > > we can't simply take this to mean the signals aren't implemented,
-> > > > except for RX_LOS.
-> > > > 
-> > > > > I'll send the bin dump in another message (privately). Since the OUI
-> > > > > is 00:00:00 and the serial number appears to be a datestamp, I'm not
-> > > > > seeing anything on here that's sensitive.
-> > > > 
-> > > > I have augmented tools which can parse the binary dump, so I get a
-> > > > bit more decode:
-> > > > 
-> > > >         Enhanced Options                          : soft TX_DISABLE
-> > > >         Enhanced Options                          : soft TX_FAULT
-> > > >         Enhanced Options                          : soft RX_LOS
-> > > > 
-> > > > So, this tells sfp.c that the status bits in the diagnostics address
-> > > > offset 110 (SFP_STATUS) are supported.
-> > > > 
-> > > > Digging into your binary dump, SFP_STATUS has the value 0x02, which
-> > > > indicates RX_LOS is set (signal lost), but TX_FAULT is clear (no
-> > > > transmit fault.)
-> > > > 
-> > > > I'm guessing the SFP didn't have link at the time you took this
-> > > > dump given that SFP_STATUS indicates RX_LOS was set?
-> > > > 
-> > > 
-> > > That is correct.
-> > 
-> > Are you able to confirm that SFP_STATUS RX_LOS clears when the
-> > module has link?
-> 
-> I believe this is the case. I've sent you a dump of my EEPROM when the
-> SFP+ is active (it's now powering my internet connection at home) in a
-> private message to confirm.
+Gerrard Tai reported that SFQ perturb_period has no range check yet,
+and this can be used to trigger a race condition fixed in a separate patch.
 
-Yes, I can confirm this. The RX_LOS bit on SFP_STATUS appears to work
-correctly, so all we need to do is ignore the hardware signal(s).
+We want to make sure ctl->perturb_period * HZ will not overflow
+and is positive.
 
-> > I'd prefer to have an additional couple of functions:
-> > 
-> > sfp_fixup_ignore_hw_tx_fault()
-> > sfp_fixup_ignore_hw_los()
-> > 
-> > or possibly:
-> > 
-> > sfp_fixup_ignore_hw(struct sfp *sfp, unsigned int mask)
-> > 
-> 
-> Which of these would you prefer? Do you want a function for each
-> scenario or just a generic sfp_fixup_ignore_hw_fault_signal()? I can 
-> create functions for each and then apply them to my device (and
-> probably update the sfp_fixup_halny_gsfp() too since it's identical to
-> what I'm trying to do plus the delay bits).
+Tested:
 
-I think the latter as it's more flexible and less code.
+tc qd add dev lo root sfq perturb -10   # negative value : error
+Error: sch_sfq: invalid perturb period.
 
-Yes, please update sfp_fixup_halny_gsfp() as well.
+tc qd add dev lo root sfq perturb 1000000000 # too big : error
+Error: sch_sfq: invalid perturb period.
 
-Thanks.
+tc qd add dev lo root sfq perturb 2000000 # acceptable value
+tc -s -d qd sh dev lo
+qdisc sfq 8005: root refcnt 2 limit 127p quantum 64Kb depth 127 flows 128 divisor 1024 perturb 2000000sec
+ Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
+ backlog 0b 0p requeues 0
 
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Gerrard Tai <gerrard.tai@starlabs.sg>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: stable@vger.kernel.org
+---
+ net/sched/sch_sfq.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+index 77fa02f2bfcd56a36815199aa2e7987943ea226f..a8cca549b5a2eb2407949560c2b6b658fb7a581f 100644
+--- a/net/sched/sch_sfq.c
++++ b/net/sched/sch_sfq.c
+@@ -656,6 +656,14 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 		NL_SET_ERR_MSG_MOD(extack, "invalid quantum");
+ 		return -EINVAL;
+ 	}
++
++	if (ctl->perturb_period < 0 ||
++	    ctl->perturb_period > INT_MAX / HZ) {
++		NL_SET_ERR_MSG_MOD(extack, "invalid perturb period");
++		return -EINVAL;
++	}
++	perturb_period = ctl->perturb_period * HZ;
++
+ 	if (ctl_v1 && !red_check_params(ctl_v1->qth_min, ctl_v1->qth_max,
+ 					ctl_v1->Wlog, ctl_v1->Scell_log, NULL))
+ 		return -EINVAL;
+@@ -672,14 +680,12 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 	headdrop = q->headdrop;
+ 	maxdepth = q->maxdepth;
+ 	maxflows = q->maxflows;
+-	perturb_period = q->perturb_period;
+ 	quantum = q->quantum;
+ 	flags = q->flags;
+ 
+ 	/* update and validate configuration */
+ 	if (ctl->quantum)
+ 		quantum = ctl->quantum;
+-	perturb_period = ctl->perturb_period * HZ;
+ 	if (ctl->flows)
+ 		maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
+ 	if (ctl->divisor) {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.50.0.rc0.642.g800a2b2222-goog
+
 
