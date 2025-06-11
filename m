@@ -1,101 +1,108 @@
-Return-Path: <netdev+bounces-196659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-196660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C02DFAD5C64
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:37:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1199AD5C6B
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 18:38:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D73A51BC57F3
-	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:36:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10B9A1E2AF6
+	for <lists+netdev@lfdr.de>; Wed, 11 Jun 2025 16:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D24321D3F4;
-	Wed, 11 Jun 2025 16:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPB7cStP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8590C1624E9;
+	Wed, 11 Jun 2025 16:35:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A63121CC71;
-	Wed, 11 Jun 2025 16:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB4518D63A;
+	Wed, 11 Jun 2025 16:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749659700; cv=none; b=sNLkwXnz5PVR7hEZkGzAtnwiBo3HYFLMOgD0icPN6a4x8TCIBlmPqveBiFfA+JGLAG/+rYvtxaGSwjQKf6MvFRMTWCK2W+gBAcaTBJARDUYhM3cH3oLPYc0t65nKsWLR70UQkoqTjgeeqkWnWf6KMaXb37jBbGPAL6JFcUy9M2Q=
+	t=1749659752; cv=none; b=m6fP9LGxw0yxhsNOPJtKB0SAMQpoioS/5Z3Kdf4k3AzrMqKqmz7tCS3XV0XQM/SJE5tKEHZXn3aojjst22Vec/gryASTwRgc+G4NtzUheVifuRoAUtijx0hZHSKlvgRGcRsKZN/4+3G2cCiftm8IIVFcioR0aGeK9dpqRVhorN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749659700; c=relaxed/simple;
-	bh=OP4h1eDhXUPEY+AGbAU6rFlICAMX4bumPauxNj7gIkg=;
+	s=arc-20240116; t=1749659752; c=relaxed/simple;
+	bh=yRWiyKzTZIwYVSICMOESJzF/0ezgw16gZI784NSkC9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uM2J7gZbixdqj93lmYrZ7+5rntx3g40JApx4Yft4P44yInmby14KRjiuUSiyxrtQwmUUxxsk4+hi5OCPSwWs3pzv4nAO+r6rb9BVLRqklaad/dQzo5th8B/BJygsifZewSHfyNZH9t96Aun1QTk/FIkFQJ60O+t+PFB8ysCfJ1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPB7cStP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775E6C4CEEA;
-	Wed, 11 Jun 2025 16:34:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749659699;
-	bh=OP4h1eDhXUPEY+AGbAU6rFlICAMX4bumPauxNj7gIkg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IPB7cStPWtZPmIFZTSApq6xdkX000GBEFqzxhkPFEKPotXJjkl7FI0nKyN0S1dVc/
-	 6cnqk0M6dEdsnUl/3HNJnkKdIQ8cfi5PIDj3dQyya2LBrg2uTuYKdQzrcriPIF+j1l
-	 VWjUuy84vKXsoQ+0KT0jFZ2ccLfcy5EWwkml2nJLkewdLPhhfi6IWhuEjQzRbihZub
-	 OapnHujslY3XlEuNl+LUXOVUWj7kNW9P9aIUPWBxnvinj0DqQbLiKfOcJcM2L139Je
-	 TK5NWGZVYka+XB2Vg+mG7XCdO4CuF76O8XFs5g2VVUjKJKqILRv2RN2GewqklstM8c
-	 XO9M1L8IYAnQQ==
-Date: Wed, 11 Jun 2025 17:34:54 +0100
-From: Conor Dooley <conor@kernel.org>
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: andrew+netdev@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
-	edumazet@google.com, geert+renesas@glider.be, krzk+dt@kernel.org,
-	kuba@kernel.org, pabeni@redhat.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, robh@kernel.org,
-	biju.das.jz@bp.renesas.com, devicetree@vger.kernel.org,
-	john.madieu@gmail.com, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, magnus.damm@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: renesas-gbeth: Add support
- for RZ/G3E (R9A09G047) SoC
-Message-ID: <20250611-lushly-watch-eed37703b92f@spud>
-References: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mhmLnkxNCTpwOGYEPYo3YqNo/1qKuwyKCttmYcDHyvciKMA6Cw90fEgbzgcoRitWR8t59GlnjWtFj8xAPC19stGBW1ER5TzEd4k1G4O4R9EgrZQfQbYAmwhfQC1s5ExLwwWyJrUyvRbAYdTQluI9YfmC1m+3iiuBRCvLgGjeMQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ad8a8da2376so1524266b.3;
+        Wed, 11 Jun 2025 09:35:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749659749; x=1750264549;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yRWiyKzTZIwYVSICMOESJzF/0ezgw16gZI784NSkC9c=;
+        b=ok4DBTMHEXjbEJlkG9z9IzBXKRiZVFmRyLw3B6hTB+RzfUFhCgfkTBB2Mwp5Aia++2
+         lgLICZYLjm0ROja7umFaGuCx6n7TDQnzhg35HapHOOhUydx7+E2E6ArDiTo1T3pxLxnt
+         XNUsWf/2GkXWS25qWvVJHepMFuh8zSWY/aHM5JEfVRg61hVrvoawfBTSrN3CiAv2ul+9
+         aZbjLNi0kC3GtU4bub3f1wSO/t89ThEnEPhiJN36vceAQSdBR/RlutdBTUAVjm2KrHg3
+         ICbTutWhmc4W986qnH3w3/Sum/Ze45fk+o2Vhn2tI3lWGRZvKYxPal2doNRbj9ModiV1
+         mF4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUsqPoYqQa3bVlf8ePplX3oHEYa2j/hUHrQ6toXJxWIiLyREiLlQxMzU029YUkGg+yJI1Q=@vger.kernel.org, AJvYcCVUaQkO0oxLG+okw6YilhrAh+Tt8og598ngmIjWO7OjOryIjXpl9HqG8WbfJr5Q5rA3DN8nrWUzrMWWBQ==@vger.kernel.org, AJvYcCVxZMQUpxknwaGFoyqqVWBar4eZjBUfuI1AwPtmflNGrQTUfUU3XiYn4CaX+XlKJcV3qUgYORv5@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcastT6IjGVTSC485Bt5/Iqp3J82KqwOiNv/N0ETqImbf5nYu2
+	ipCfrZUci8neOwK7F0kNE0qEiQJyR+GgWGeecPKA1E9JtAhwtOt2I9BI
+X-Gm-Gg: ASbGncvJ3EXidBI8eeKHARpM9qizLwGTSzqRxuaiqa6zurkJGxfsDBCGowKg9l9WrQE
+	AyhTxes5cARgk6mtHWl7sNsYtMLF+uOdMaf+C25s4mHqKmxyOGZwGCGTAHl2afLitf8FpdZPDZn
+	rxQkEUoUE74KGPiqx9R3Wo7iqSSITIEcMQupCYk7MTW7cgLLjc4WiwMuEXB+ymv/UpCoQbeqrQ0
+	m40dxYRlGcNN4H9g6DWoMMu5mAgb7r0nlKIIIcIfKCsucI9FuRYXOykJJwU0O4+WpOf+3RXiqvr
+	Edv0YBHS20NQsU2B+yJwCsnbRSTc7kXxxNV2SW0MjA3u3KcX2axx
+X-Google-Smtp-Source: AGHT+IH8800fbrEqV/iLLY12BMrBiMpvGEluYR//L52df8OeajstZoqRP5d+Y/gWnB/DDPCfo8cCXw==
+X-Received: by 2002:a17:907:6d08:b0:add:ee2c:7313 with SMTP id a640c23a62f3a-ade894c18edmr316262166b.22.1749659748826;
+        Wed, 11 Jun 2025 09:35:48 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ade1dc1c788sm923016766b.101.2025.06.11.09.35.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 09:35:48 -0700 (PDT)
+Date: Wed, 11 Jun 2025 09:35:45 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Yonglong Liu <liuyonglong@huawei.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org,
+	Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>,
+	gregkh@linuxfoundation.org, sashal@kernel.org
+Subject: Re: [PATCH net-next v9 2/2] page_pool: Track DMA-mapped pages and
+ unmap them when destroying the pool
+Message-ID: <aEmwYU/V/9/Ul04P@gmail.com>
+References: <20250409-page-pool-track-dma-v9-0-6a9ef2e0cba8@redhat.com>
+ <20250409-page-pool-track-dma-v9-2-6a9ef2e0cba8@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="kw187fJ1qkVK7A2k"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250611061204.15393-1-john.madieu.xa@bp.renesas.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250409-page-pool-track-dma-v9-2-6a9ef2e0cba8@redhat.com>
 
+Hello Toke,
 
---kw187fJ1qkVK7A2k
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Apr 09, 2025 at 12:41:37PM +0200, Toke Høiland-Jørgensen wrote:
+> Fixes: ff7d6b27f894 ("page_pool: refurbish version of page_pool code")
 
-On Wed, Jun 11, 2025 at 08:12:04AM +0200, John Madieu wrote:
-> Document support for the GBETH IP found on the Renesas RZ/G3E (R9A09G047)=
- SoC.
-> The GBETH block on RZ/G3E is equivalent in functionality to the GBETH fou=
-nd on
-> RZ/V2H(P) (R9A09G057).
->=20
-> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Reviwed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+Do you have plan to backport this fix to LTS kernels? I am getting some
+of these crashes on older kernel, and I am curious if there are plans to
+backport this to LTS kernels.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
---kw187fJ1qkVK7A2k
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaEmwLgAKCRB4tDGHoIJi
-0hJxAQCPqhlyriyyP1aSi+WgGIMgpg+7uNLM+44pSHu+dtE8ggEApyhN7DXybSKl
-/HL+MqZroKdVMoHcwf8K2A2BerYe9wI=
-=0vPR
------END PGP SIGNATURE-----
-
---kw187fJ1qkVK7A2k--
+--breno
 
